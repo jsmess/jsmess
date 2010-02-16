@@ -564,7 +564,7 @@ void kermit_receive_byte( running_device *device, UINT8 data )
 							break;
 
 						case KERMIT_SEND_EOF:
- 						        /* send EOT */
+						        /* send EOT */
 							kermit_send_simple_packet( state, KERMIT_EOT );
 							state->state = KERMIT_SEND_EOT;
 							break;

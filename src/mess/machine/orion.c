@@ -181,7 +181,7 @@ static WRITE8_HANDLER ( orion_disk_control_w )
 	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 
 	wd17xx_set_side(fdc,((data & 0x10) >> 4) ^ 1);
- 	wd17xx_set_drive(fdc,data & 3);
+	wd17xx_set_drive(fdc,data & 3);
 }
 
 READ8_HANDLER ( orion128_floppy_r )
@@ -192,7 +192,7 @@ READ8_HANDLER ( orion128_floppy_r )
 	{
 		case 0x0	:
 		case 0x10 : return wd17xx_status_r(fdc,0);
-		case 0x1 	:
+		case 0x1	:
 		case 0x11 : return wd17xx_track_r(fdc,0);
 		case 0x2  :
 		case 0x12 : return wd17xx_sector_r(fdc,0);
@@ -210,7 +210,7 @@ WRITE8_HANDLER ( orion128_floppy_w )
 	{
 		case 0x0	:
 		case 0x10 : wd17xx_command_w(fdc,0,data); break;
-		case 0x1 	:
+		case 0x1	:
 		case 0x11 : wd17xx_track_w(fdc,0,data);break;
 		case 0x2  :
 		case 0x12 : wd17xx_sector_w(fdc,0,data);break;
@@ -410,7 +410,7 @@ WRITE8_HANDLER ( orionz80_io_w )
 					  break;
 		case 0xbffd :
 		case 0xbefd : ay8910_data_w(devtag_get_device(space->machine, "ay8912"), 0, data);
-		 			  break;
+					  break;
 	}
 }
 
@@ -601,7 +601,7 @@ WRITE8_HANDLER ( orionpro_io_w )
 		case 0x04 : orionpro_ram0_segment = data; orionpro_bank_switch(space->machine); break;
 		case 0x05 : orionpro_ram1_segment = data; orionpro_bank_switch(space->machine); break;
 		case 0x06 : orionpro_ram2_segment = data; orionpro_bank_switch(space->machine); break;
-		case 0x08 : orionpro_page = data; 		  orionpro_bank_switch(space->machine); break;
+		case 0x08 : orionpro_page = data;		  orionpro_bank_switch(space->machine); break;
 		case 0x09 : orionpro_rom2_segment = data; orionpro_bank_switch(space->machine); break;
 		case 0x0a : orionpro_dispatcher = data;   orionpro_bank_switch(space->machine); break;
 		case 0x10 : wd17xx_command_w(fdc,0,data); break;
@@ -631,6 +631,6 @@ WRITE8_HANDLER ( orionpro_io_w )
 					  break;
 		case 0xbffd :
 		case 0xbefd : ay8910_data_w(devtag_get_device(space->machine, "ay8912"), 0, data);
-		 			  break;
+					  break;
 	}
 }

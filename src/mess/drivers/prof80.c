@@ -180,11 +180,11 @@ static void prof80_bankswitch(running_machine *machine)
 		case BLK_RAM4:
 			memory_install_ram(program, start_addr, end_addr, 0, 0, ram + 0x18000 + ((bank % 8) * 0x1000));
 			break;
-		
-		case BLK_EPROM:	
+
+		case BLK_EPROM:
 			memory_install_rom(program, start_addr, end_addr, 0, 0, rom + ((bank % 2) * 0x1000));
 			break;
-		
+
 		default:
 			memory_unmap_readwrite(program, start_addr, end_addr, 0, 0);
 		}
@@ -607,8 +607,8 @@ static ADDRESS_MAP_START( prof80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x9e, 0x9e) AM_MIRROR(0xff00) AM_WRITE(unio_ctrl_w)
 //  AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
 //  AM_RANGE(0x9d, 0x9d) AM_MIRROR(0xff00) AM_DEVWRITE(UNIO_CENTRONICS1_TAG, centronics_data_w)
-//	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
-//	AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
+//  AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_READ(gripc_r)
+//  AM_RANGE(0xc1, 0xc1) AM_MIRROR(0xff00) AM_READWRITE(gripd_r, gripd_w)
 	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(flr_w)
 	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_READ(status_r)
 	AM_RANGE(0xdb, 0xdb) AM_MIRROR(0xff00) AM_READ(status2_r)
@@ -1318,7 +1318,7 @@ static MACHINE_DRIVER_START( prof80 )
 
     MDRV_VIDEO_START(prof80)
     MDRV_VIDEO_UPDATE(prof80)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")

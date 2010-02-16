@@ -16,8 +16,8 @@
 
 #define MAX_FLOPPIES 4
 
-enum buf_mode_t { 
-	bm_off, bm_read, bm_write 
+enum buf_mode_t {
+	bm_off, bm_read, bm_write
 };
 static struct
 {

@@ -743,7 +743,7 @@ static const ay8910_interface ay8912_interface =
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, dgnalpha_psg_porta_read),	/* portA read */
-	DEVCB_NULL,    					/* portB read */
+	DEVCB_NULL, 					/* portB read */
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, dgnalpha_psg_porta_write),	/* portA write */
 	DEVCB_NULL						/* portB write */
 };
@@ -818,7 +818,7 @@ static MACHINE_DRIVER_START( dragon32 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
 	MDRV_RAM_EXTRA_OPTIONS("64K")
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -867,7 +867,7 @@ static MACHINE_DRIVER_START( dragon64 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -917,7 +917,7 @@ static MACHINE_DRIVER_START( d64plus )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1025,7 +1025,7 @@ static MACHINE_DRIVER_START( tanodr64 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1074,7 +1074,7 @@ static MACHINE_DRIVER_START( coco )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("4K,32K,64K")
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1122,7 +1122,7 @@ static MACHINE_DRIVER_START( coco2 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("16K")
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1170,7 +1170,7 @@ static MACHINE_DRIVER_START( coco2b )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
 	MDRV_RAM_EXTRA_OPTIONS("16K")
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1230,7 +1230,7 @@ static MACHINE_DRIVER_START( coco3 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("512K")
 	MDRV_RAM_EXTRA_OPTIONS("128K,2M,8M")
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(coco_floppy_config)
 MACHINE_DRIVER_END
 
@@ -1338,7 +1338,7 @@ ROM_END
 ROM_START(coco2)
 	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD(			"bas12.rom",	0x2000, 0x2000, CRC(54368805) SHA1(0f14dc46c647510eb0b7bd3f53e33da07907d04f))
-	ROM_LOAD(      	"extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
+	ROM_LOAD(   	"extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 
 	ROM_REGION(0x4000,"cart",0)
 	ROM_LOAD_OPTIONAL(	"disk11.rom",	0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))
@@ -1348,7 +1348,7 @@ ROM_END
 ROM_START(coco2b)
 	ROM_REGION(0x8000,"maincpu",0)
 	ROM_LOAD(			"bas13.rom",	0x2000, 0x2000, CRC(d8f4d15e) SHA1(28b92bebe35fa4f026a084416d6ea3b1552b63d3))
-	ROM_LOAD(      	"extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
+	ROM_LOAD(   	"extbas11.rom",	0x0000, 0x2000, CRC(a82a6254) SHA1(ad927fb4f30746d820cb8b860ebb585e7f095dea))
 
 	ROM_REGION(0x4000,"cart",0)
 	ROM_LOAD_OPTIONAL(	"disk11.rom",	0x0000, 0x2000, CRC(0b9c5415) SHA1(10bdc5aa2d7d7f205f67b47b19003a4bd89defd1))

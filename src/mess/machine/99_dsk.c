@@ -21,9 +21,9 @@
     but I think this computer supported the TI-99/4(a) disk controllers, too.
 
     Raphael Nabet, 1999-2004.
-    
+
     CHANGES
-    
+
     * Removed format definition and put it in separate file (ti99_dsk)
       Michael Zapf, Feb 2010
 */
@@ -68,15 +68,15 @@ static int motor_on;
 static emu_timer *motor_on_timer;
 
 /*
-	Resets the drive geometry. This is required because the heuristic of
-	the default implementation sets the drive geometry to the geometry
-	of the medium.
+    Resets the drive geometry. This is required because the heuristic of
+    the default implementation sets the drive geometry to the geometry
+    of the medium.
 */
 static void set_geometry(running_device *drive, floppy_type_t type)
 {
 	if (drive!=NULL)
 		floppy_drive_set_geometry(drive, type);
-	else 
+	else
 		logerror("Drive not found\n");
 }
 
@@ -89,8 +89,8 @@ static void set_all_geometries(running_machine *machine, floppy_type_t type)
 }
 
 /*
-	Callback for the ti99_dsk format. Required for the image format handler
-	to find out whether we have a 40-track disk in an 80-track drive.
+    Callback for the ti99_dsk format. Required for the image format handler
+    to find out whether we have a 40-track disk in an 80-track drive.
 */
 int ti99_image_in_80_track_drive()
 {
@@ -656,7 +656,7 @@ void ti99_bwg_reset(running_machine *machine)
 	motor_on = 0;
 
 	set_all_geometries(machine, FLOPPY_DRIVE_DS_40);
-     	use_80_track_drives = FALSE;
+    	use_80_track_drives = FALSE;
 
 	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
 

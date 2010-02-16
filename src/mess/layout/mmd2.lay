@@ -7,14 +7,14 @@
 			<color red="1.0" green="0.0" blue="0.0" />
 		</disk>
 	</element>
-	
+
 	<element name="background">
 		<rect>
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="0.0" green="0.0" blue="0.0" />
 		</rect>
 	</element>
-	
+
 	<view name="LED's">
 		<bezel element="background">
 			<bounds left="0" top="0" right="1280" bottom="150" />

@@ -388,7 +388,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 		for (device = pPickerInfo->config->mconfig->devicelist.first(); device != NULL;device = device->next)
 		{
 			if (is_image_device(device))
-			{		
+			{
 				if (image_device_uses_file_extension(device, pszExtension))
 					break;
 			}
@@ -428,7 +428,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 		pInfo->base_name = pInfo->file_name;
 
 	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
-	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));	
+	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));
 	if (pPickerInfo->file_index) global_free(pPickerInfo->file_index);
 	if (!ppNewIndex)
 		goto error;
@@ -651,7 +651,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
 	pSearchInfo = pPickerInfo->first_search_info;
-	
+
 	if (pSearchInfo)
 	{
 		// searching through directories

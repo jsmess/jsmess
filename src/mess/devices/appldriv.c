@@ -292,6 +292,6 @@ DEVICE_GET_INFO( apple525 )
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(apple525_floppy); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = sizeof(appledriv_config); break;
 
-		default: 									DEVICE_GET_INFO_CALL(floppy);				break;
+		default:									DEVICE_GET_INFO_CALL(floppy);				break;
 	}
 }

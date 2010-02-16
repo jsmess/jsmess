@@ -148,7 +148,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 	dst = gba_state->dma_dst[ch];
 	ctrl = gba_state->dma_regs[(ch*3)+2] >> 16;
 	srcadd = gba_state->dma_srcadd[ch];
- 	dstadd = gba_state->dma_dstadd[ch];
+	dstadd = gba_state->dma_dstadd[ch];
 
 	cnt = gba_state->dma_cnt[ch];
 	if (!cnt)
@@ -230,7 +230,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 			src &= 0xfffffffe;
 			dst &= 0xfffffffe;
 
-		 	// 16-bit
+			// 16-bit
 			memory_write_word(space, dst, memory_read_word(space, src));
 			switch (dstadd)
 			{
@@ -1611,7 +1611,7 @@ static WRITE32_HANDLER( gba_io_w )
 							dma_exec(machine, ch);
 							return;
 						}
-				 	}
+					}
 				}
 
 				COMBINE_DATA(&gba_state->dma_regs[offset]);

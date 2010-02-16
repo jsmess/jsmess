@@ -234,19 +234,19 @@ INPUT_PORTS_START( amiga_us_keyboard )
 	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 6A
 	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 6B
 	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 6C
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 6D
-	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 6E
-	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 6F
-	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 70
-	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 71
-	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 72
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 6D
+	PORT_BIT( 0x00004000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 6E
+	PORT_BIT( 0x00008000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 6F
+	PORT_BIT( 0x00010000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 70
+	PORT_BIT( 0x00020000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 71
+	PORT_BIT( 0x00040000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 72
 	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 73
-	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 74
-	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 75
-	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 76
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 77
-	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 78
-	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3]) 									// 79
+	PORT_BIT( 0x00100000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 74
+	PORT_BIT( 0x00200000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 75
+	PORT_BIT( 0x00400000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 76
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 77
+	PORT_BIT( 0x01000000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 78
+	PORT_BIT( 0x02000000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 79
 	PORT_BIT( 0x04000000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 7A
 	PORT_BIT( 0x08000000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 7B
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CHANGED(kbd_update, &kbd_index[3])									// 7C

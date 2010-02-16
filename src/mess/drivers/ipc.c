@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Intel iPC
 
         17/12/2009 Skeleton driver.
@@ -24,9 +24,9 @@ INPUT_PORTS_START( ipc )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(ipc) 
+static MACHINE_RESET(ipc)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), I8085_PC, 0xE800);	
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), I8085_PC, 0xE800);
 }
 
 static VIDEO_START( ipc )
@@ -42,10 +42,10 @@ static MACHINE_DRIVER_START( ipc )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",8085A, XTAL_19_6608MHz / 4)
     MDRV_CPU_PROGRAM_MAP(ipc_mem)
-    MDRV_CPU_IO_MAP(ipc_io)	
+    MDRV_CPU_IO_MAP(ipc_io)
 
     MDRV_MACHINE_RESET(ipc)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -69,5 +69,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, ipc,  0,       0, 			ipc, 	ipc, 	 0,  	 "Intel",   "iPC",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, ipc,  0,       0,			ipc,	ipc,	 0, 	 "Intel",   "iPC",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

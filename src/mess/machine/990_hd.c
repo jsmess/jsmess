@@ -75,9 +75,9 @@ enum
 };
 
 enum format_t
-{ 
-	format_mame, 
-	format_old 
+{
+	format_mame,
+	format_old
 };
 
 /* disk drive unit descriptor */

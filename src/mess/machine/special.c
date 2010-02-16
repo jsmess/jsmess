@@ -74,7 +74,7 @@ static READ8_DEVICE_HANDLER (specialist_8255_portb_r )
 	if (level >=  0)
 	{
 			dat ^= 0x01;
- 	}
+	}
 	return dat & 0xff;
 }
 
@@ -281,11 +281,11 @@ WRITE8_HANDLER( specimx_disk_ctrl_w )
 	switch(offset)
 	{
 		case 2 :
-		 		wd17xx_set_side(fdc,data & 1);
+				wd17xx_set_side(fdc,data & 1);
 				break;
 		case 3 :
-		 		wd17xx_set_drive(fdc,data & 1);
-		 		break;
+				wd17xx_set_drive(fdc,data & 1);
+				break;
 
 	}
 }
@@ -314,50 +314,50 @@ static void erik_set_bank(running_machine *machine)
 
 	switch(bank1)
 	{
-		case 	1:
-		case 	2:
-		case 	3:
+		case	1:
+		case	2:
+		case	3:
 						memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank1-1));
 						break;
-		case 	0:
+		case	0:
 						memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 						memory_set_bankptr(machine, "bank1", mem + 0x10000);
 						break;
 	}
 	switch(bank2)
 	{
-		case 	1:
-		case 	2:
-		case 	3:
+		case	1:
+		case	2:
+		case	3:
 						memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank2-1) + 0x4000);
 						break;
-		case 	0:
+		case	0:
 						memory_unmap_write(space, 0x4000, 0x8fff, 0, 0);
 						memory_set_bankptr(machine, "bank2", mem + 0x14000);
 						break;
 	}
 	switch(bank3)
 	{
-		case 	1:
-		case 	2:
-		case 	3:
+		case	1:
+		case	2:
+		case	3:
 						memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank3-1) + 0x9000);
 						break;
-		case 	0:
+		case	0:
 						memory_unmap_write(space, 0x9000, 0xbfff, 0, 0);
 						memory_set_bankptr(machine, "bank3", mem + 0x19000);
 						break;
 	}
 	switch(bank4)
 	{
-		case 	1:
-		case 	2:
-		case 	3:
+		case	1:
+		case	2:
+		case	3:
 						memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank4-1) + 0x0c000);
 						memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank4-1) + 0x0f000);
 						memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank4-1) + 0x0f800);
 						break;
-		case 	0:
+		case	0:
 						memory_unmap_write(space, 0xc000, 0xefff, 0, 0);
 						memory_set_bankptr(machine, "bank4", mem + 0x1c000);
 						memory_unmap_write(space, 0xf000, 0xf7ff, 0, 0);

@@ -231,7 +231,7 @@ static floperr_t sap_post_format(floppy_image *floppy, option_resolution *params
                         tag->sector_pos[track][sector] = 0;
 
         /* create all sectors with valid header and CRC */
- 	memset(buf, 0xe5, 256);
+	memset(buf, 0xe5, 256);
         pos = 0x42;
         header[0] = (tag->sector_size==128) ? 1 : 0;
         header[1] = 0;

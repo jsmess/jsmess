@@ -600,7 +600,7 @@ static MACHINE_DRIVER_START( ip204415 )
 	MDRV_SCC8530_ADD("scc")
 
 	MDRV_CDROM_ADD( "cdrom" )
-	
+
 	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C56)
 MACHINE_DRIVER_END
 

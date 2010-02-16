@@ -143,18 +143,18 @@ ROM_START( h19 )
 
 	ROM_REGION( 0x0800, "chargen", 0 )
 	// Original font dump
-  	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
+	ROM_LOAD( "2716_444-29_h19font.bin", 0x0000, 0x0800, CRC(d595ac1d) SHA1(130fb4ea8754106340c318592eec2d8a0deaf3d0))
 
-  	ROM_REGION( 0x0800, "keyboard", 0 )
-  	// Original dump
-  	ROM_LOAD( "2716_444-37_h19keyb.bin", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
-  	// Watzman keyboard
-  	ROM_LOAD( "keybd.bin", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
+	ROM_REGION( 0x0800, "keyboard", 0 )
+	// Original dump
+	ROM_LOAD( "2716_444-37_h19keyb.bin", 0x0000, 0x0800, CRC(5c3e6972) SHA1(df49ce64ae48652346a91648c58178a34fb37d3c))
+	// Watzman keyboard
+	ROM_LOAD( "keybd.bin", 0x0000, 0x0800, CRC(58dc8217) SHA1(1b23705290bdf9fc6342065c6a528c04bff67b13))
 
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, h19,     0,       0, 	h19, 	h19, 	 0,  	"Heath, Inc.", "Heathkit H19", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, h19,     0,       0,	h19,	h19,	 0, 	"Heath, Inc.", "Heathkit H19", GAME_NOT_WORKING | GAME_NO_SOUND)
 

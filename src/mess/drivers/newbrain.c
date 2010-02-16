@@ -1341,9 +1341,9 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 static Z80CTC_INTERFACE( newbrain_ctc_intf )
 {
 	0,              		/* timer disables */
-	DEVCB_NULL,			 	/* interrupt handler */
+	DEVCB_NULL,				/* interrupt handler */
 	DEVCB_LINE(ctc_z0_w),	/* ZC/TO0 callback */
-	DEVCB_LINE(ctc_z1_w),  	/* ZC/TO1 callback */
+	DEVCB_LINE(ctc_z1_w),	/* ZC/TO1 callback */
 	DEVCB_LINE(ctc_z2_w)	/* ZC/TO2 callback */
 };
 
@@ -1517,8 +1517,8 @@ static DEVICE_GET_INFO( newbrain_serial )
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;		
-		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 0;                                        	break;
+		default:									DEVICE_GET_INFO_CALL(serial);	break;
 	}
 }
 
@@ -1576,7 +1576,7 @@ static MACHINE_DRIVER_START( newbrain_a )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32K")
-	
+
 	MDRV_NEWBRAIN_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
@@ -1725,11 +1725,11 @@ ROM_START( newbraim )
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "char eprom iss 1.ic453", 0x0000, 0x0a01, BAD_DUMP CRC(46ecbc65) SHA1(3fe064d49a4de5e3b7383752e98ad35a674e26dd) ) // 8248R7
 ROM_END
-	
+
 /* System Drivers */
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE         INPUT       INIT    COMPANY                         FULLNAME        FLAGS
-COMP( 1981, newbrain,	0,	    0,      newbrain_a,	    newbrain,   0, 	"Grundy Business Systems Ltd.",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1981, newbraie,	newbrain,   0,	    newbrain_eim,   newbrain,   0, 	"Grundy Business Systems Ltd.",	"NewBrain AD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
-COMP( 1981, newbraia,	newbrain,   0,	    newbrain_a,	    newbrain,   0, 	"Grundy Business Systems Ltd.",	"NewBrain A",	GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1981, newbraim,	newbrain,   0,	    newbrain_a,	    newbrain,   0, 	"Grundy Business Systems Ltd.",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbrain,	0,	    0,      newbrain_a,	    newbrain,   0,	"Grundy Business Systems Ltd.",	"NewBrain AD",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, newbraie,	newbrain,   0,	    newbrain_eim,   newbrain,   0,	"Grundy Business Systems Ltd.",	"NewBrain AD with Expansion Interface",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1981, newbraia,	newbrain,   0,	    newbrain_a,	    newbrain,   0,	"Grundy Business Systems Ltd.",	"NewBrain A",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, newbraim,	newbrain,   0,	    newbrain_a,	    newbrain,   0,	"Grundy Business Systems Ltd.",	"NewBrain MD",	GAME_NOT_WORKING | GAME_NO_SOUND )

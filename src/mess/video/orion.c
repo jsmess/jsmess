@@ -44,18 +44,18 @@ VIDEO_UPDATE( orion128 )
 					case 1 : color = ((code1 >> b) & 0x01) ? 17 : 16; break;
 					case 4 : val = (((code1 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
 							 switch(val) {
-							 	case 0 : color = 0; break; // black
-							 	case 1 : color = 4; break; // red
-							 	case 2 : color = 2; break; // green
-							 	case 3 : color = 1; break; // blue
+								case 0 : color = 0; break; // black
+								case 1 : color = 4; break; // red
+								case 2 : color = 2; break; // green
+								case 3 : color = 1; break; // blue
 							 }
 							 break;
 					case 5 : val = (((code1 >> b) & 0x01) << 1) + ((code2 >> b) & 0x01);
 							 switch(val) {
-							 	case 0 : color = 7; break; // white
-							 	case 1 : color = 4; break; // red
-							 	case 2 : color = 2; break; // green
-							 	case 3 : color = 1; break; // blue
+								case 0 : color = 7; break; // white
+								case 1 : color = 4; break; // red
+								case 2 : color = 2; break; // green
+								case 3 : color = 1; break; // blue
 							 }
 							 break;
 					case 6 :

@@ -95,7 +95,7 @@ static DEVICE_START(coco_cartridge)
 	{
 		cococart->pcb = cartslot_get_pcb(cartslot);
 		if (cococart->pcb == NULL)
-		{			
+		{
 			throw device_missing_dependencies();
 		}
 
@@ -371,7 +371,7 @@ DEVICE_GET_INFO(coco_cartridge)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "CoCo Cartridge Slot");		break;
 
-		default: 										DEVICE_GET_INFO_CALL(general_cartridge);	break;
+		default:										DEVICE_GET_INFO_CALL(general_cartridge);	break;
 	}
 }
 
@@ -402,6 +402,6 @@ DEVICE_GET_INFO(dragon_cartridge)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Dragon Cartridge Slot");		break;
 
-		default: 										DEVICE_GET_INFO_CALL(general_cartridge);	break;
+		default:										DEVICE_GET_INFO_CALL(general_cartridge);	break;
 	}
 }

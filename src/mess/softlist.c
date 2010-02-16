@@ -33,7 +33,7 @@ const software_list* software_list_get_by_name(const char *name)
 
 
 /*-------------------------------------------------
-    software_get_by_name - return a pointer to 
+    software_get_by_name - return a pointer to
     a software entry list given its name and a
     software list.
 -------------------------------------------------*/

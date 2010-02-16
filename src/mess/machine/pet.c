@@ -58,18 +58,18 @@ static READ8_DEVICE_HANDLER( pia0_pa_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		KEY A
-		PA1		KEY B
-		PA2		KEY C
-		PA3		KEY D
-		PA4		#1 CASS SWITCH
-		PA5		#2 CASS SWITCH
-		PA6		_EOI IN
-		PA7		DIAG JUMPER
+        PA0     KEY A
+        PA1     KEY B
+        PA2     KEY C
+        PA3     KEY D
+        PA4     #1 CASS SWITCH
+        PA5     #2 CASS SWITCH
+        PA6     _EOI IN
+        PA7     DIAG JUMPER
 
-	*/
+    */
 
 	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	UINT8 data = 0;
@@ -96,18 +96,18 @@ static WRITE8_DEVICE_HANDLER( pia0_pa_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PA0		KEY A
-		PA1		KEY B
-		PA2		KEY C
-		PA3		KEY D
-		PA4		#1 CASS SWITCH
-		PA5		#2 CASS SWITCH
-		PA6		_EOI IN
-		PA7		DIAG JUMPER
+        PA0     KEY A
+        PA1     KEY B
+        PA2     KEY C
+        PA3     KEY D
+        PA4     #1 CASS SWITCH
+        PA5     #2 CASS SWITCH
+        PA6     _EOI IN
+        PA7     DIAG JUMPER
 
-	*/
+    */
 
 	/* key */
 	pet_keyline_select = data & 0x0f;
@@ -118,18 +118,18 @@ static READ8_DEVICE_HANDLER( kin_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		KIN0
-		PB1		KIN1
-		PB2		KIN2
-		PB3		KIN3
-		PB4		KIN4
-		PB5		KIN5
-		PB6		KIN6
-		PB7		KIN7
+        PB0     KIN0
+        PB1     KIN1
+        PB2     KIN2
+        PB3     KIN3
+        PB4     KIN4
+        PB5     KIN5
+        PB6     KIN6
+        PB7     KIN7
 
-	*/
+    */
 
 	UINT8 data = 0xff;
 	static const char *const keynames[] = {
@@ -187,7 +187,7 @@ static READ8_DEVICE_HANDLER( cass1_r )
 static WRITE8_DEVICE_HANDLER( eoi_w )
 {
 	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	
+
 	ieee488_eoi_w(ieeebus, device, data);
 }
 
@@ -260,18 +260,18 @@ static WRITE8_DEVICE_HANDLER( do_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		DO-1
-		PB1		DO-2
-		PB2		DO-3
-		PB3		DO-4
-		PB4		DO-5
-		PB5		DO-6
-		PB6		DO-7
-		PB7		DO-8
+        PB0     DO-1
+        PB1     DO-2
+        PB2     DO-3
+        PB3     DO-4
+        PB4     DO-5
+        PB5     DO-6
+        PB6     DO-7
+        PB7     DO-8
 
-	*/
+    */
 
 	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 
@@ -281,14 +281,14 @@ static WRITE8_DEVICE_HANDLER( do_w )
 static WRITE8_DEVICE_HANDLER( ndac_w )
 {
 	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	
+
 	ieee488_ndac_w(ieeebus, device, data);
 }
 
 static WRITE8_DEVICE_HANDLER( dav_w )
 {
 	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
-	
+
 	ieee488_dav_w(ieeebus, device, data);
 }
 
@@ -339,18 +339,18 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		_NDAC IN
-		PB1		_NRFD OUT
-		PB2		_ATN OUT
-		PB3		CASS WRITE
-		PB4		#2 CASS MOTOR
-		PB5		SYNC IN
-		PB6		_NRFD IN
-		PB7		_DAV IN
+        PB0     _NDAC IN
+        PB1     _NRFD OUT
+        PB2     _ATN OUT
+        PB3     CASS WRITE
+        PB4     #2 CASS MOTOR
+        PB5     SYNC IN
+        PB6     _NRFD IN
+        PB7     _DAV IN
 
-	*/
+    */
 
 	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 	UINT8 data = 0;
@@ -380,18 +380,18 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		PB0		_NDAC IN
-		PB1		_NRFD OUT
-		PB2		_ATN OUT
-		PB3		CASS WRITE
-		PB4		#2 CASS MOTOR
-		PB5		SYNC IN
-		PB6		_NRFD IN
-		PB7		_DAV IN
+        PB0     _NDAC IN
+        PB1     _NRFD OUT
+        PB2     _ATN OUT
+        PB3     CASS WRITE
+        PB4     #2 CASS MOTOR
+        PB5     SYNC IN
+        PB6     _NRFD IN
+        PB7     _DAV IN
 
-	*/
+    */
 
 	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
 
@@ -810,8 +810,8 @@ MACHINE_RESET( pet )
 		cbm8096_w(cputag_get_address_space(machine,"maincpu",ADDRESS_SPACE_PROGRAM), 0, 0);
 	}
 
-//removed	cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
-//removed	cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
+//removed   cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
+//removed   cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
 	devtag_get_device(machine, "maincpu")->reset();
 
 	ieee488_ren_w(ieeebus, scapegoat, 0);
@@ -861,7 +861,7 @@ static DEVICE_IMAGE_LOAD(pet_cart)
 
 	filetype = image_filetype(image);
 
- 	if (!mame_stricmp(filetype, "crt"))
+	if (!mame_stricmp(filetype, "crt"))
 	{
 	/* We temporarily remove .crt loading. Previous versions directly used
     the same routines used to load C64 .crt file, but I seriously doubt the

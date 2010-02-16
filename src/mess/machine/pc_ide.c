@@ -13,8 +13,8 @@
 
 typedef	struct {
 	int lba;				/* 0 CHS mode, 1 LBA mode */
-	int cylinder; 		/* current cylinder (lba = 0) */
-	int head; 			/* current head (lba = 0) */
+	int cylinder;		/* current cylinder (lba = 0) */
+	int head;			/* current head (lba = 0) */
 	int sector;			/* current sector (or LBA if lba = 1) */
 	int sector_cnt;		/* sector count */
 	int error;			/* error code */
@@ -26,7 +26,7 @@ typedef	struct {
 } DEVICE;
 
 typedef struct {
-	int drv; 					/* 0 master, 1 slave drive */
+	int drv;					/* 0 master, 1 slave drive */
 	DEVICE devs[2];
 } IDE;
 static IDE ide[1]={ // currently only 1 is enough
@@ -266,9 +266,9 @@ WRITE8_HANDLER(at_mfm_0_w)
 	int data=0;
 
 	switch (offset) {
-	case 0: data = pc_ide_data_r(ide->devs+ide->drv); 			break;
+	case 0: data = pc_ide_data_r(ide->devs+ide->drv);			break;
 	case 1: data = pc_ide_error_r(ide->devs+ide->drv);			break;
-	case 2: data = pc_ide_sector_count_r(ide->devs+ide->drv); 	break;
+	case 2: data = pc_ide_sector_count_r(ide->devs+ide->drv);	break;
 	case 3: data = pc_ide_sector_number_r(ide->devs+ide->drv);	break;
 	case 4: data = pc_ide_cylinder_number_l_r(ide->devs+ide->drv);break;
 	case 5: data = pc_ide_cylinder_number_h_r(ide->devs+ide->drv);break;

@@ -18,7 +18,7 @@ VIDEO_START( bk0010 )
 
 VIDEO_UPDATE( bk0010 )
 {
-  	UINT16 code;
+	UINT16 code;
 	int y, x, b;
 	int nOfs;
 

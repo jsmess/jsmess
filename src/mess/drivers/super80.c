@@ -1,4 +1,4 @@
-/* 
+/*
 Super80.c written by Robbbert, 2005-2009. See the MESS sysinfo and wiki for usage documentation. Below for the most technical bits:
 
 = Architecture (super80):
@@ -20,44 +20,44 @@ Super80.c written by Robbbert, 2005-2009. See the MESS sysinfo and wiki for usag
 = Super80 ports:
 
   port $F0: General Purpose output port
-  	Bit 0 - cassette output
-  	Bit 1 - cassette relay control; 0=relay on
-  	Bit 2 - turns screen on and off;0=screen off
-  	Bit 3 - Available for user projects [We will use it for sound]
-  	Bit 4 - Available for user projects
-  	Bit 5 - cassette LED; 0=LED on
-  	Bit 6/7 - not decoded
-  
+    Bit 0 - cassette output
+    Bit 1 - cassette relay control; 0=relay on
+    Bit 2 - turns screen on and off;0=screen off
+    Bit 3 - Available for user projects [We will use it for sound]
+    Bit 4 - Available for user projects
+    Bit 5 - cassette LED; 0=LED on
+    Bit 6/7 - not decoded
+
   port $F1: Video page output port
-  	Bit 0 - not decoded [we will use it for video switching]
-  	Bits 1 to 7 - choose video page to display
-  	Bit 1 controls A9, bit 2 does A10, etc
-  
+    Bit 0 - not decoded [we will use it for video switching]
+    Bits 1 to 7 - choose video page to display
+    Bit 1 controls A9, bit 2 does A10, etc
+
   port $F2: General purpose input port
-  	Bit 0 - cassette input
-  	Bit 1 - Available for user projects
-  	Bit 2 - Available for user projects
-  	Bit 3 - not decoded
-  	Bit 4 - Switch A [These switches are actual DIP switches on the motherboard]
-  	Bit 5 - Switch B
-  	Bit 6 - Switch C
-  	Bit 7 - Switch D
+    Bit 0 - cassette input
+    Bit 1 - Available for user projects
+    Bit 2 - Available for user projects
+    Bit 3 - not decoded
+    Bit 4 - Switch A [These switches are actual DIP switches on the motherboard]
+    Bit 5 - Switch B
+    Bit 6 - Switch C
+    Bit 7 - Switch D
 
 = Super80v ports:
 
   port $10: MC6845 control port
-  
+
   port $11: MC6845 data port
-  
+
   port $F0: General Purpose output port
-  	Bit 0 - cassette output
-  	Bit 1 - Cassette relay control; 0=relay on
-  	Bit 2 - Colour banking (0 = Colour Ram, 1 = Video Ram)
-  	Bit 3 - Sound
-  	Bit 4 - PCG banking (0 = PROM, 1 = PCG)
-  	Bit 5 - cassette LED; 0=LED on
-  	Bit 6/7 - not decoded
-  
+    Bit 0 - cassette output
+    Bit 1 - Cassette relay control; 0=relay on
+    Bit 2 - Colour banking (0 = Colour Ram, 1 = Video Ram)
+    Bit 3 - Sound
+    Bit 4 - PCG banking (0 = PROM, 1 = PCG)
+    Bit 5 - cassette LED; 0=LED on
+    Bit 6/7 - not decoded
+
   port $F2: General purpose input port - same as for Super80.
 
 = Cassette information:
@@ -66,12 +66,12 @@ The standard cassette system uses sequences of 1200 Hz and 2400 Hz to represent 
 This is identical to the Exidy Sorcerer and the Microbee. Data rates available are 300, 400, 600, and 1200 baud.
 The user has to adjust some bytes in memory in order to select a different baud rate.
 
-  BDF8	BDF9	Baud
+  BDF8  BDF9    Baud
   ---------------------
-  F8	4	300
-  BA	3	400
-  7C	2	600
-  3E	1	1200
+  F8    4   300
+  BA    3   400
+  7C    2   600
+  3E    1   1200
 
 The enhanced Monitor roms (those not supplied by Dick Smith) have extra commands to change the rates
 without the tedium of manually modifying memory.

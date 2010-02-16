@@ -53,10 +53,10 @@
 		</bezel>
 		<bezel name="led0" element="led">
 			<bounds x="256" y="390" width="15" height="15" />
-		</bezel>	
+		</bezel>
 		<bezel name="led1" element="led">
 			<bounds x="308" y="390" width="15" height="15" />
-		</bezel>	
+		</bezel>
 
 	</view>
 </mamelayout>

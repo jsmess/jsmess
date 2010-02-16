@@ -1696,12 +1696,12 @@ static WRITE8_DEVICE_HANDLER( dgnalpha_pia2_pa_w )
 
 	switch (bc_flags)
 	{
-		case 0x00	: 		/* Inactive, do nothing */
+		case 0x00	:		/* Inactive, do nothing */
 			break;
-		case 0x01	: 		/* Write to selected port */
+		case 0x01	:		/* Write to selected port */
 			ay8910_data_w(ay8912, 0, pia6821_get_output_b(device));
 			break;
-		case 0x02	: 		/* Read from selected port */
+		case 0x02	:		/* Read from selected port */
 			pia6821_portb_w(device, 0, ay8910_r(ay8912, 0));
 			break;
 		case 0x03	:		/* Select port to write to */
@@ -2040,8 +2040,8 @@ static void setup_memory_map(running_machine *machine)
 	//UINT8 pagemode  = sam6883_pagemode(machine);
 	int 		last_ram_block;		/* Last block that will be RAM, dependent on maptype */
 	int 		block_index;		/* Index of block being processed */
-	int	 	wbank;			/* bank no to go in this block */
-	UINT8 		*offset;		/* offset into coco rom for rom mapping */
+	int		wbank;			/* bank no to go in this block */
+	UINT8		*offset;		/* offset into coco rom for rom mapping */
 	char	bank[10];
 
 	/* Set last RAM block dependent on map type */
@@ -2594,8 +2594,8 @@ WRITE8_HANDLER(coco3_gime_w)
             *         Bits 0-7 Low order eight bits of the timer
             */
 			if (timer_was_off && (coco3_gimereg[5] != 0x00))
-  	                {
-  	                        /* Writes to $FF95 do not cause the timer to reset, but MESS
+	                {
+	                        /* Writes to $FF95 do not cause the timer to reset, but MESS
                             * will invoke coco3_timer_reset() if $FF94/5 was previously
                             * $0000.  The reason for this is because the timer is not
                             * actually off when $FF94/5 are loaded with $0000; rather it
@@ -2607,7 +2607,7 @@ WRITE8_HANDLER(coco3_gime_w)
                             * direction
                 */
 				coco3_timer_reset(space->machine);
-  	                }
+	                }
 			break;
 
 		case 8:

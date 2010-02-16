@@ -120,8 +120,8 @@ static INPUT_PORTS_START( tx0 )
 	PORT_BIT( 0000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Toggle Switch Register Switch 13") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Toggle Switch Register Switch 14") PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Toggle Switch Register Switch 15") PORT_CODE(KEYCODE_M)
-   	PORT_BIT( 0000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Toggle Switch Register Switch 16") PORT_CODE(KEYCODE_COMMA)
-   	PORT_BIT( 0000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Toggle Switch Register Switch 17") PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Toggle Switch Register Switch 16") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Toggle Switch Register Switch 17") PORT_CODE(KEYCODE_STOP)
 
     PORT_START("TWR0")		/* 3: typewriter codes 00-17 */
 	PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
@@ -379,59 +379,59 @@ ROM_END
 /*
 static void tx0_punchtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PUNCHTAPE; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+    switch(state)
+    {
+        case MESS_DEVINFO_INT_TYPE:                         info->i = IO_PUNCHTAPE; break;
+        case MESS_DEVINFO_INT_COUNT:                            info->i = 2; break;
 
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(tx0_tape); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(tx0_tape); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(tx0_tape); break;
-		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = tx0_tape_get_open_mode; break;
+        case MESS_DEVINFO_PTR_START:                            info->start = DEVICE_START_NAME(tx0_tape); break;
+        case MESS_DEVINFO_PTR_LOAD:                         info->load = DEVICE_IMAGE_LOAD_NAME(tx0_tape); break;
+        case MESS_DEVINFO_PTR_UNLOAD:                       info->unload = DEVICE_IMAGE_UNLOAD_NAME(tx0_tape); break;
+        case MESS_DEVINFO_PTR_GET_DISPOSITIONS:             info->getdispositions = tx0_tape_get_open_mode; break;
 
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap,rim"); break;
-	}
+        case MESS_DEVINFO_STR_FILE_EXTENSIONS:              strcpy(info->s = device_temp_str(), "tap,rim"); break;
+    }
 }
 
 static void tx0_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PRINTER; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+    switch(state)
+    {
+        case MESS_DEVINFO_INT_TYPE:                         info->i = IO_PRINTER; break;
+        case MESS_DEVINFO_INT_READABLE:                     info->i = 0; break;
+        case MESS_DEVINFO_INT_WRITEABLE:                        info->i = 1; break;
+        case MESS_DEVINFO_INT_CREATABLE:                        info->i = 1; break;
+        case MESS_DEVINFO_INT_COUNT:                            info->i = 1; break;
 
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(tx0_typewriter); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(tx0_typewriter); break;
+        case MESS_DEVINFO_PTR_LOAD:                         info->load = DEVICE_IMAGE_LOAD_NAME(tx0_typewriter); break;
+        case MESS_DEVINFO_PTR_UNLOAD:                       info->unload = DEVICE_IMAGE_UNLOAD_NAME(tx0_typewriter); break;
 
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "typ"); break;
-	}
+        case MESS_DEVINFO_STR_FILE_EXTENSIONS:              strcpy(info->s = device_temp_str(), "typ"); break;
+    }
 }
 
 static void tx0_magtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_MAGTAPE; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+    switch(state)
+    {
+        case MESS_DEVINFO_INT_TYPE:                         info->i = IO_MAGTAPE; break;
+        case MESS_DEVINFO_INT_READABLE:                     info->i = 1; break;
+        case MESS_DEVINFO_INT_WRITEABLE:                        info->i = 1; break;
+        case MESS_DEVINFO_INT_CREATABLE:                        info->i = 0; break;
+        case MESS_DEVINFO_INT_COUNT:                            info->i = 1; break;
 
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(tx0_magtape); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(tx0_magtape); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(tx0_magtape); break;
+        case MESS_DEVINFO_PTR_START:                            info->start = DEVICE_START_NAME(tx0_magtape); break;
+        case MESS_DEVINFO_PTR_LOAD:                         info->load = DEVICE_IMAGE_LOAD_NAME(tx0_magtape); break;
+        case MESS_DEVINFO_PTR_UNLOAD:                       info->unload = DEVICE_IMAGE_UNLOAD_NAME(tx0_magtape); break;
 
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap"); break;
-	}
+        case MESS_DEVINFO_STR_FILE_EXTENSIONS:              strcpy(info->s = device_temp_str(), "tap"); break;
+    }
 }
 
 static SYSTEM_CONFIG_START(tx0)
-	CONFIG_DEVICE(tx0_punchtape_getinfo)
-	CONFIG_DEVICE(tx0_magtape_getinfo)
-	CONFIG_DEVICE(tx0_printer_getinfo)
+    CONFIG_DEVICE(tx0_punchtape_getinfo)
+    CONFIG_DEVICE(tx0_magtape_getinfo)
+    CONFIG_DEVICE(tx0_printer_getinfo)
 SYSTEM_CONFIG_END
 */
 
@@ -442,5 +442,5 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT INIT     COMPANY                   FULLNAME */
-COMP( 1956, tx0_64kw, 0, 	0,	tx0_64kw, tx0,	tx0,			"MIT", "TX-0 original demonstrator (64 kWords of RAM)" , GAME_NO_SOUND)
+COMP( 1956, tx0_64kw, 0,	0,	tx0_64kw, tx0,	tx0,			"MIT", "TX-0 original demonstrator (64 kWords of RAM)" , GAME_NO_SOUND)
 COMP( 1962, tx0_8kw,  tx0_64kw,	0,	tx0_8kw,  tx0,	tx0,		"MIT", "TX-0 upgraded system (8 kWords of RAM)" , GAME_NO_SOUND)

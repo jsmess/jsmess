@@ -75,11 +75,11 @@ static WRITE8_DEVICE_HANDLER(spc1000_gmode_w)
 	GMODE = data;
 
 	// GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
-	//	[PS2,PS1] is used to set screen 0/1 pages
+	//  [PS2,PS1] is used to set screen 0/1 pages
 	mc6847_gm1_w(device, BIT(data, 1));
 	mc6847_gm0_w(device, BIT(data, 2));
 	mc6847_ag_w(device, BIT(data, 3));
-	mc6847_css_w(device, BIT(data, 7));	
+	mc6847_css_w(device, BIT(data, 7));
 }
 
 static READ8_DEVICE_HANDLER(spc1000_gmode_r)
@@ -211,9 +211,9 @@ static MACHINE_RESET(spc1000)
 }
 
 static READ8_DEVICE_HANDLER( spc1000_mc6847_videoram_r )
-{	
+{
 	// GMODE layout: CSS|NA|PS2|PS1|~A/G|GM0|GM1|NA
-	//	[PS2,PS1] is used to set screen 0/1 pages
+	//  [PS2,PS1] is used to set screen 0/1 pages
 	if ( !BIT(GMODE, 3) ) {	// text mode (~A/G set to A)
 		unsigned int page = (BIT(GMODE, 5) << 1) | BIT(GMODE, 4);
 		mc6847_inv_w(device, BIT(spc1000_video_ram[offset+page*0x200+0x800], 0));
@@ -319,4 +319,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1982, spc1000,  0,       0, 	spc1000, 	spc1000, 	 0,  "Samsung",   "SPC-1000",		GAME_NOT_WORKING)
+COMP( 1982, spc1000,  0,       0,	spc1000,	spc1000,	 0,  "Samsung",   "SPC-1000",		GAME_NOT_WORKING)

@@ -392,7 +392,7 @@ static MACHINE_DRIVER_START( scorpion )
 	MDRV_IMPORT_FROM( spectrum_128 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(scorpion_io)
-	
+
 	MDRV_MACHINE_START( scorpion )
 	MDRV_MACHINE_RESET( scorpion )
 	MDRV_GFXDECODE(scorpion)
@@ -465,11 +465,11 @@ ROM_START(profi)
 	ROM_SYSTEM_BIOS(3, "v4", "ver 4")
 	ROMX_LOAD( "profi_1.rom", 0x010000, 0x10000, CRC(f07fbee8) SHA1(b29c81a94658a4d50274ba953775a49e855534de), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "v5", "T-Rex")
-  	ROMX_LOAD( "profi-p.rom", 0x010000, 0x10000, CRC(314f6b57) SHA1(1507f53ec64dcf5154b5cfce6922f69f70296a53), ROM_BIOS(5))
-  	ROM_SYSTEM_BIOS(5, "v6", "JV Kramis V0.2")
+	ROMX_LOAD( "profi-p.rom", 0x010000, 0x10000, CRC(314f6b57) SHA1(1507f53ec64dcf5154b5cfce6922f69f70296a53), ROM_BIOS(5))
+	ROM_SYSTEM_BIOS(5, "v6", "JV Kramis V0.2")
 	ROMX_LOAD( "profi32.rom", 0x010000, 0x10000, CRC(77327f52) SHA1(019bd00cc7939741d99b99beac6ae1298652e652), ROM_BIOS(6))
 	ROM_SYSTEM_BIOS(6, "v7", "Power Of Sound Group")
-  	ROMX_LOAD( "profi1k.rom", 0x010000, 0x10000, CRC(a932676f) SHA1(907ac56219f325949a7c2fe8168799d9cdd5ba6c), ROM_BIOS(7))
+	ROMX_LOAD( "profi1k.rom", 0x010000, 0x10000, CRC(a932676f) SHA1(907ac56219f325949a7c2fe8168799d9cdd5ba6c), ROM_BIOS(7))
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
@@ -483,16 +483,16 @@ ROM_START(bestzx)
 	ROM_REGION(0x020000, "maincpu", 0)
 	ROM_LOAD( "bestzx.rom", 0x010000, 0x10000, CRC(fc7936e8) SHA1(0d6378c51b2f08a3e2b4c75e64c76c15ae5dc76d))
 ROM_END
-	
+
 ROM_START( kay1024 )
 	ROM_REGION(0x020000, "maincpu", ROMREGION_ERASEFF)
 	ROM_SYSTEM_BIOS(0, "v1", "ver 1")
 	ROMX_LOAD( "kay98.rom",    0x010000, 0x08000, CRC(7fbf2d43) SHA1(e555f2ed01ecf2231d493bd70a4d79b436e9f10e), ROM_BIOS(1))
 	ROMX_LOAD( "trd503.rom",   0x01c000, 0x04000, CRC(10751aba) SHA1(21695e3f2a8f796386ce66eea8a246b0ac44810c), ROM_BIOS(1))
-  	ROM_SYSTEM_BIOS(1, "v2", "Kramis V0.2")
+	ROM_SYSTEM_BIOS(1, "v2", "Kramis V0.2")
 	ROMX_LOAD( "kay1024b.rom", 0x010000, 0x10000, CRC(ab99c31e) SHA1(cfa9e6553aea72956fce4f0130c007981d684734), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS(2, "v3", "Kramis V0.3")
-  	ROMX_LOAD( "kay1024s.rom", 0x010000, 0x10000, CRC(67351caa) SHA1(1d9c0606b380c000ca1dfa33f90a122ecf9df1f1), ROM_BIOS(3))
+	ROMX_LOAD( "kay1024s.rom", 0x010000, 0x10000, CRC(67351caa) SHA1(1d9c0606b380c000ca1dfa33f90a122ecf9df1f1), ROM_BIOS(3))
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
@@ -501,4 +501,4 @@ COMP( 1994, scorpion, spec128,	 0,	scorpion,	spec_plus,	0,		"Zonov and Co.",		"S
 COMP( 1991, profi,    spec128,	 0,	profi,  	spec_plus,	0,		"Kondor and Kramis",		"Profi", GAME_NOT_WORKING )
 COMP( 1998, kay1024,  spec128,	 0,	scorpion,	spec_plus,	0,		"NEMO",		"Kay 1024", GAME_NOT_WORKING )
 COMP( ????, quorum,   spec128,	 0,	quorum, 	spec_plus,	0,		"",		"Quorum", GAME_NOT_WORKING )
-COMP( ????, bestzx,   spec128,	 0,	scorpion, 	spec_plus,	0,		"",		"BestZX", GAME_NOT_WORKING )
+COMP( ????, bestzx,   spec128,	 0,	scorpion,	spec_plus,	0,		"",		"BestZX", GAME_NOT_WORKING )

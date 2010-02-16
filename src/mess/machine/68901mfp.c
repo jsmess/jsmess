@@ -1378,10 +1378,10 @@ static void timer_count(running_device *device, int index)
 
 		switch (index)
 		{
-		case MC68901_TIMER_A: 	devcb_call_write_line(&mc68901->out_tao_func, mc68901->to[index]);	break;
-		case MC68901_TIMER_B: 	devcb_call_write_line(&mc68901->out_tbo_func, mc68901->to[index]);	break;
-		case MC68901_TIMER_C: 	devcb_call_write_line(&mc68901->out_tco_func, mc68901->to[index]);	break;
-		case MC68901_TIMER_D: 	devcb_call_write_line(&mc68901->out_tdo_func, mc68901->to[index]);	break;
+		case MC68901_TIMER_A:	devcb_call_write_line(&mc68901->out_tao_func, mc68901->to[index]);	break;
+		case MC68901_TIMER_B:	devcb_call_write_line(&mc68901->out_tbo_func, mc68901->to[index]);	break;
+		case MC68901_TIMER_C:	devcb_call_write_line(&mc68901->out_tco_func, mc68901->to[index]);	break;
+		case MC68901_TIMER_D:	devcb_call_write_line(&mc68901->out_tdo_func, mc68901->to[index]);	break;
 		}
 
 		if (mc68901->ier & MC68901_INT_MASK_TIMER[index])

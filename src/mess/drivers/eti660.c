@@ -1,11 +1,11 @@
 /*
 
-	TODO:
+    TODO:
 
-	- does not boot!
-	- allocate color ram
-	- quickload
-	- color on
+    - does not boot!
+    - allocate color ram
+    - quickload
+    - color on
 
 */
 
@@ -355,7 +355,7 @@ static MACHINE_DRIVER_START( eti660 )
 	/* devices */
 	MDRV_PIA6821_ADD(MC6821_TAG, eti660_mc6821_intf)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, eti660_cassette_config)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("3K")
@@ -368,5 +368,5 @@ ROM_START( eti660 )
 	ROM_LOAD( "eti660.bin", 0x0000, 0x0400, CRC(811dfa62) SHA1(c0c4951e02f873f15560bdc3f35cdf3f99653922) )
 ROM_END
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY								FULLNAME				FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT        COMPANY                             FULLNAME                FLAGS */
 COMP( 1981, eti660,		0,		0,		eti660,		eti660,		0,			"Electronics Today International",	"ETI-660 (Australia)",	GAME_NOT_WORKING )

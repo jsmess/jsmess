@@ -148,7 +148,7 @@ WRITE8_HANDLER (pp01_mem_block_w)
 
 READ8_HANDLER (pp01_mem_block_r)
 {
-	return 	memory_block[offset];
+	return	memory_block[offset];
 }
 
 MACHINE_START(pp01)

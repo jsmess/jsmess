@@ -43,7 +43,7 @@ static const char* gp2x_regnames[0x200] =
 	"HSYNC width",
 	"HSYNC start",
 	"HSYNC end",
-	"VSYNC control", 	// 20
+	"VSYNC control",	// 20
 	"VSYNC end",
 	"",
 	"DE Control",
@@ -186,7 +186,7 @@ static READ32_HANDLER(nand_r)
 				{
 					return ROM[nand_ptr++];
 				}
-				else if (mem_mask == 0x000000ff)  	// byte-wide reads?
+				else if (mem_mask == 0x000000ff)	// byte-wide reads?
 				{
 					switch (nand_subword_stage++)
 					{

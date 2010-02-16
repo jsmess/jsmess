@@ -13,7 +13,7 @@
 
     - power/activity LEDs
 
-	http://www.unusedino.de/ec64/technical/aay/c1581/ro81main.htm
+    http://www.unusedino.de/ec64/technical/aay/c1581/ro81main.htm
 
 */
 
@@ -345,7 +345,7 @@ static WRITE8_DEVICE_HANDLER( cia_pb_w )
 static MOS8520_INTERFACE( cia_intf )
 {
 	XTAL_16MHz/8,
-//	DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0),
+//  DEVCB_CPU_INPUT_LINE(M6502_TAG, INPUT_LINE_IRQ0),
 	DEVCB_LINE(cia_irq_w),
 	DEVCB_NULL,
 	DEVCB_LINE(cia_cnt_w),

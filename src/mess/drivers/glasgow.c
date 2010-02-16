@@ -50,7 +50,7 @@ Note about clickable artwork: it seems the horizontal coordinates can vary
 static UINT8 lcd_shift_counter;
 // static UINT8 led_status;
 static UINT8 led7;
-static UINT8 	key_select,
+static UINT8	key_select,
 		irq_flag,
 		lcd_invert,
 		key_selector;

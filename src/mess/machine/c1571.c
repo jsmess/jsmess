@@ -9,11 +9,11 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- fast serial only works with PAL C128
-	- 1541/1571 Alignment shows drive speed as 266 rpm, should be 310
-	- CP/M disks
+    - fast serial only works with PAL C128
+    - 1541/1571 Alignment shows drive speed as 266 rpm, should be 310
+    - CP/M disks
     - power/activity LEDs
 
 */
@@ -447,7 +447,7 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 
 	/* 1/2 MHz */
 	int clock_1_2 = BIT(data, 5);
-	
+
 	if (c1571->clock != clock_1_2)
 	{
 		UINT32 clock = clock_1_2 ? XTAL_16MHz/8 : XTAL_16MHz/16;
@@ -468,7 +468,7 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 	/* side select */
 	int side = BIT(data, 2);
 	set_side(c1571, side);
-	
+
 	/* attention out */
 	cbm_iec_atn_w(c1571->serial_bus, device->owner, !BIT(data, 6));
 }
@@ -622,7 +622,7 @@ static WRITE8_DEVICE_HANDLER( yb_w )
         PA7     YB7
 
     */
-	
+
 	c1571_t *c1571 = get_safe_token(device->owner);
 
 	c1571->yb = data;

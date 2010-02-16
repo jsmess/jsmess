@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Digital Microsystems ZSBC-3
 
         11/01/2010 Skeleton driver.
@@ -25,8 +25,8 @@ INPUT_PORTS_START( zsbc3 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(zsbc3) 
-{	
+static MACHINE_RESET(zsbc3)
+{
 }
 
 static VIDEO_START( zsbc3 )
@@ -42,10 +42,10 @@ static MACHINE_DRIVER_START( zsbc3 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_16MHz /4)
     MDRV_CPU_PROGRAM_MAP(zsbc3_mem)
-    MDRV_CPU_IO_MAP(zsbc3_io)	
+    MDRV_CPU_IO_MAP(zsbc3_io)
 
     MDRV_MACHINE_RESET(zsbc3)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -70,6 +70,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   			FULLNAME       FLAGS */
-COMP( 1980, zsbc3,  0,       0, 		zsbc3, 	zsbc3, 	 0,  	  "Digital Microsystems",   "ZSBC-3",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY               FULLNAME       FLAGS */
+COMP( 1980, zsbc3,  0,       0, 		zsbc3,	zsbc3,	 0, 	  "Digital Microsystems",   "ZSBC-3",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

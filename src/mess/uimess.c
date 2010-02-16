@@ -31,7 +31,7 @@ void ui_mess_handler_ingame(running_machine *machine)
 	/* run display routine for devices */
 	if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
 	{
-	
+
 		for (dev = machine->devicelist.first(); dev != NULL; dev = dev->next)
 		{
 			if (is_image_device(dev))
@@ -145,14 +145,14 @@ void ui_mess_menu_image_info(running_machine *machine, ui_menu *menu, void *para
 -------------------------------------------------*/
 
 void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
-{	
-  	/* add image info menu */
+{
+	/* add image info menu */
 	ui_menu_item_append(menu, "Image Information", NULL, 0, (void*)ui_mess_menu_image_info);
 
-  	/* add image info menu */
+	/* add image info menu */
 	ui_menu_item_append(menu, "File Manager", NULL, 0, (void*)ui_mess_menu_file_manager);
 
-  	/* add tape control menu */
+	/* add tape control menu */
 	if (machine->devicelist.first(CASSETTE))
 		ui_menu_item_append(menu, "Tape Control", NULL, 0, (void*)ui_mess_menu_tape_control);
 }

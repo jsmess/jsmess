@@ -9,11 +9,11 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- byte latching does not match hardware behavior 
-	  (CPU skips data bytes if implemented per schematics)
-	- activity LED
+    - byte latching does not match hardware behavior
+      (CPU skips data bytes if implemented per schematics)
+    - activity LED
 
 */
 
@@ -53,7 +53,7 @@ struct _c1551_t
 	/* motors */
 	int stp;								/* stepper motor phase */
 	int mtr;								/* spindle motor on */
-	
+
 	/* track */
 	UINT8 track_buffer[G64_BUFFER_SIZE];	/* track data buffer */
 	int track_len;							/* track length */
@@ -161,7 +161,7 @@ static TIMER_CALLBACK( bit_tick )
 			/* simulate weak bits with randomness */
 			c1551->yb = mame_rand(machine) & 0xff;
 		}
-	
+
 		c1551->byte = byte;
 	}
 }
@@ -250,7 +250,7 @@ static UINT8 c1551_port_r( running_device *device, UINT8 direction )
 
 	/* write protect sense */
 	data |= !floppy_wpt_r(c1551->image) << 4;
-	
+
 	/* byte latched */
 	data |= (c1551->soe & c1551->byte) << 7;
 
@@ -544,12 +544,12 @@ static READ8_DEVICE_HANDLER( tpi1_pb_r )
 
         PB0     STATUS0
         PB1     STATUS1
-        PB2     
-        PB3     
-        PB4     
-        PB5     
-        PB6     
-        PB7     
+        PB2
+        PB3
+        PB4
+        PB5
+        PB6
+        PB7
 
     */
 
@@ -564,19 +564,19 @@ static READ8_DEVICE_HANDLER( tpi1_pc_r )
 
         bit     description
 
-        PC0     
-        PC1     
-        PC2     
-        PC3     
-        PC4     
-        PC5     
+        PC0
+        PC1
+        PC2
+        PC3
+        PC4
+        PC5
         PC6     TCBM DAV
         PC7     TCBM ACK
 
     */
 
 	c1551_t *c1551 = get_safe_token(device->owner);
-	
+
 	UINT8 data = 0;
 
 	/* TCBM acknowledge */
@@ -591,12 +591,12 @@ static WRITE8_DEVICE_HANDLER( tpi1_pc_w )
 
         bit     description
 
-        PC0     
-        PC1     
-        PC2     
-        PC3     
-        PC4     
-        PC5     
+        PC0
+        PC1
+        PC2
+        PC3
+        PC4
+        PC5
         PC6     TCBM DAV
         PC7     TCBM ACK
 

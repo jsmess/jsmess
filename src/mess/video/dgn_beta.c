@@ -165,15 +165,15 @@ static const struct m6845_interface beta_m6845_interface = {
 	0
 };
 
-static int 	ClkMax;		/* max crtc clock, used to timeout screen refresh */
+static int	ClkMax;		/* max crtc clock, used to timeout screen refresh */
 static int	GCtrl;		/* Graphics control reg, from I28 PB0..5, PB6-7, top address lines for text mode */
 
 static	int	FlashCount;	/* Flash counter, IC2, LS393 decade counter */
-static int 	FlashBit;	/* Flash bit, FL input to I38 */
+static int	FlashBit;	/* Flash bit, FL input to I38 */
 static int	DoubleY;	/* Double height latch, 'Y' in I38 */
-static int 	DoubleHL;	/* Double height second row 'HL' in I38 */
+static int	DoubleHL;	/* Double height second row 'HL' in I38 */
 
-static int 	ColourRAM[4];	/* I59, 74ls670, 4x4bit colour ram for graphics modes */
+static int	ColourRAM[4];	/* I59, 74ls670, 4x4bit colour ram for graphics modes */
 
 static int	Field;		/* will be 0 or 1, for even or odd field, used by interlaced display */
 static int	DrawInterlace;	/* Should we draw interlaced or not ? */
@@ -195,7 +195,7 @@ typedef enum {
 #define GCtrlFS		0x20	/* labeled F/S, not yet sure of function Fast or Slow scan ? */
 #define GCtrlAddrLines	0xC0	/* Top two address lines for text mode */
 
-#define IsTextMode 	(GCtrl & GCtrlChrGfx) ? 1 : 0					// Is this text mode ?
+#define IsTextMode	(GCtrl & GCtrlChrGfx) ? 1 : 0					// Is this text mode ?
 #define IsGfx16 	((~GCtrl & GCtrlChrGfx) && (~GCtrl & GCtrlControl)) ? 1 : 0	// is this 320x256x16bpp mode
 #define IsGfx2		((GCtrl & GCtrlHiLo) && (~GCtrl & GCtrlFS)) ? 1 : 0		// Is this a 2 colour mode
 #define SWChar		(GCtrl & GCtrlSWChar)>>1					// Swchar bit
@@ -242,7 +242,7 @@ static void beta_Set_RA(int offset, int data)
 // called when the 6845 changes the HSync
 static void beta_Set_HSync(running_machine *machine, int offset, int data)
 {
-	int Dots; 	/* Pixels per 16 bits */
+	int Dots;	/* Pixels per 16 bits */
 
 	beta_HSync=data;
 
@@ -311,7 +311,7 @@ void dgnbeta_init_video(running_machine *machine)
 	/* initialise 6845 */
 	m6845_config(&beta_m6845_interface);
 	m6845_set_personality(M6845_PERSONALITY_HD6845S);
-    
+
 	GCtrl=0;
 
 	machine->generic.videoram.u8=messram_get_ptr(devtag_get_device(machine, "messram"));
@@ -417,7 +417,7 @@ static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t 
 			Offset=0;
 
 		/* Get the character to display */
-		char_code 	= machine->generic.videoram.u8[Offset];
+		char_code	= machine->generic.videoram.u8[Offset];
 
 		/* Extract non-colour attributes, in character set 1, undeline is used */
 		/* We will extract the colours below, when we have decoded inverse */
@@ -627,7 +627,7 @@ static void beta_plot_gfx_line(running_machine *machine,int x,int y, bitmap_t *b
 			}
 		}
 
- 	}
+	}
 	else
 	{
 		for (Dot=0;Dot<Dots;Dot++)

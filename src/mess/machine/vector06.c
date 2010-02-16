@@ -40,7 +40,7 @@ static READ8_DEVICE_HANDLER (vector06_8255_portc_r )
 	UINT8 retVal = input_port_read(device->machine, "LINE8");
 	if (level >  0) {
 		retVal |= 0x10;
- 	}
+	}
 	return retVal;
 }
 
@@ -168,7 +168,7 @@ WRITE8_HANDLER(vector06_disc_w)
 {
 	running_device *fdc = devtag_get_device(space->machine, "wd1793");
 	wd17xx_set_side (fdc,((data & 4) >> 2) ^ 1);
- 	wd17xx_set_drive(fdc,data & 1);
+	wd17xx_set_drive(fdc,data & 1);
 }
 
 MACHINE_START( vector06 )

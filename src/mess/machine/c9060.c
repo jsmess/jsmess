@@ -9,9 +9,9 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- everything
+    - everything
 
 */
 
@@ -223,13 +223,13 @@ static READ8_DEVICE_HANDLER( riot1_pa_r )
         bit     description
 
         PA0     ATNA
-        PA1		DACO
-        PA2		RFDO
-        PA3		EOIO
-        PA4		DAVO
-        PA5		EOII
-        PA6		DAVI
-        PA7		_ATN
+        PA1     DACO
+        PA2     RFDO
+        PA3     EOIO
+        PA4     DAVO
+        PA5     EOII
+        PA6     DAVI
+        PA7     _ATN
 
     */
 
@@ -256,13 +256,13 @@ static WRITE8_DEVICE_HANDLER( riot1_pa_w )
         bit     description
 
         PA0     ATNA
-        PA1		DACO
-        PA2		RFDO
-        PA3		EOIO
-        PA4		DAVO
-        PA5		EOII
-        PA6		DAVI
-        PA7		_ATN
+        PA1     DACO
+        PA2     RFDO
+        PA3     EOIO
+        PA4     DAVO
+        PA5     EOII
+        PA6     DAVI
+        PA7     _ATN
 
     */
 
@@ -292,14 +292,14 @@ static READ8_DEVICE_HANDLER( riot1_pb_r )
 
         bit     description
 
-        PB0		
-        PB1		
-        PB2		
-        PB3		
-        PB4		DRIVE RDY
-        PB5		PWR ON AND NO ERRORS
-        PB6		DACI
-        PB7		RFDI
+        PB0
+        PB1
+        PB2
+        PB3
+        PB4     DRIVE RDY
+        PB5     PWR ON AND NO ERRORS
+        PB6     DACI
+        PB7     RFDI
 
     */
 
@@ -322,14 +322,14 @@ static WRITE8_DEVICE_HANDLER( riot1_pb_w )
 
         bit     description
 
-        PB0		
-        PB1		
-        PB2		
-        PB3		
-        PB4		DRIVE RDY
-        PB5		PWR ON AND NO ERRORS
-        PB6		DACI
-        PB7		RFDI
+        PB0
+        PB1
+        PB2
+        PB3
+        PB4     DRIVE RDY
+        PB5     PWR ON AND NO ERRORS
+        PB6     DACI
+        PB7     RFDI
 
     */
 }
@@ -361,13 +361,13 @@ static READ8_DEVICE_HANDLER( via_pa_r )
         bit     description
 
         PA0     DB0
-        PA1		DB1
-        PA2		DB2
-        PA3		DB3
-        PA4		DB4
-        PA5		DB5
-        PA6		DB6
-        PA7		DB7
+        PA1     DB1
+        PA2     DB2
+        PA3     DB3
+        PA4     DB4
+        PA5     DB5
+        PA6     DB6
+        PA7     DB7
 
     */
 
@@ -381,13 +381,13 @@ static WRITE8_DEVICE_HANDLER( via_pa_w )
         bit     description
 
         PA0     DB0
-        PA1		DB1
-        PA2		DB2
-        PA3		DB3
-        PA4		DB4
-        PA5		DB5
-        PA6		DB6
-        PA7		DB7
+        PA1     DB1
+        PA2     DB2
+        PA3     DB3
+        PA4     DB4
+        PA5     DB5
+        PA6     DB6
+        PA7     DB7
 
     */
 }
@@ -398,14 +398,14 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 
         bit     description
 
-        PB0		SEL
-        PB1		RST
-        PB2		C/D
-        PB3		BUSY
-        PB4		J14
-        PB5		J14
-        PB6		I/O
-        PB7		MSG
+        PB0     SEL
+        PB1     RST
+        PB2     C/D
+        PB3     BUSY
+        PB4     J14
+        PB5     J14
+        PB6     I/O
+        PB7     MSG
 
     */
 
@@ -418,14 +418,14 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
         bit     description
 
-        PB0		SEL
-        PB1		RST
-        PB2		C/D
-        PB3		BUSY
-        PB4		J14
-        PB5		J14
-        PB6		I/O
-        PB7		MSG
+        PB0     SEL
+        PB1     RST
+        PB2     C/D
+        PB3     BUSY
+        PB4     J14
+        PB5     J14
+        PB6     I/O
+        PB7     MSG
 
     */
 }
@@ -457,14 +457,14 @@ static MACHINE_DRIVER_START( c9060 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c9060_dos_map)
-	
+
 	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
 	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
 
 	/* controller */
 	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c9060_fdc_map)
-	
+
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
 
 	// Tandon TM602S
@@ -516,7 +516,7 @@ static DEVICE_START( c9060 )
 	c9060->bus = devtag_get_device(device->machine, config->bus_tag);
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, c9060->);
+//  state_save_register_device_item(device, 0, c9060->);
 }
 
 /*-------------------------------------------------

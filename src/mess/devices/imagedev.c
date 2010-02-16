@@ -24,7 +24,7 @@ typedef struct _image_t image_t;
 struct _image_t
 {
     core_file *file;
-	
+
 	const image_interface *intf;
 };
 
@@ -52,10 +52,10 @@ INLINE image_t *get_safe_token(running_device *device)
 
 static DEVICE_START( image )
 {
-	image_t *image = get_safe_token(device);	
-	
+	image_t *image = get_safe_token(device);
+
 	image->intf = (const image_interface*)device->baseconfig().static_config;
-	
+
 }
 
 static DEVICE_RESET( image )

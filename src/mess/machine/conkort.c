@@ -163,13 +163,13 @@ INLINE fast_t *get_safe_token_fast(running_device *device)
 
 INLINE slow_t *get_safe_token_machine_slow(running_machine *machine)
 {
-   	running_device *device = devtag_get_device(machine, CONKORT_TAG);
+	running_device *device = devtag_get_device(machine, CONKORT_TAG);
 	return get_safe_token_slow(device);
 }
 
 INLINE fast_t *get_safe_token_machine_fast(running_machine *machine)
 {
-   	running_device *device = devtag_get_device(machine, CONKORT_TAG);
+	running_device *device = devtag_get_device(machine, CONKORT_TAG);
 	return get_safe_token_fast(device);
 }
 

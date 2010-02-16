@@ -30,16 +30,16 @@ static TIMER_CALLBACK( gal_video )
 		{
 			UINT8 mode = (galaxy_latch_value >> 1) & 1; // bit 2 latch represents mode
 			UINT16 addr = (cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_I) << 8) | cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R) | ((galaxy_latch_value & 0x80) ^ 0x80);
-  			if (mode == 0)
+			if (mode == 0)
 			{
-  				// Text mode
-	  			if (first == 0 && (cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R) & 0x1f) == 0)
+				// Text mode
+				if (first == 0 && (cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R) & 0x1f) == 0)
 				{
-		  			// Due to a fact that on real processor latch value is set at
-		  			// the end of last cycle we need to skip dusplay of double
-		  			// first char in each row
-		  			code = 0x00;
-		  			first = 1;
+					// Due to a fact that on real processor latch value is set at
+					// the end of last cycle we need to skip dusplay of double
+					// first char in each row
+					code = 0x00;
+					first = 1;
 				}
 				else
 				{
@@ -62,13 +62,13 @@ static TIMER_CALLBACK( gal_video )
 			}
 			else
 			{ // Graphics mode
-	  			if (first < 4 && (cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R) & 0x1f) == 0)
+				if (first < 4 && (cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R) & 0x1f) == 0)
 				{
-		  			// Due to a fact that on real processor latch value is set at
-		  			// the end of last cycle we need to skip dusplay of 4 times
-		  			// first char in each row
-		  			code = 0x00;
-		  			first++;
+					// Due to a fact that on real processor latch value is set at
+					// the end of last cycle we need to skip dusplay of 4 times
+					// first char in each row
+					code = 0x00;
+					first++;
 				}
 				else
 				{

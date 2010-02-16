@@ -22,7 +22,7 @@ DRIVER_INIT(ut88)
 	/* set initialy ROM to be visible on first bank */
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memset(RAM,0x0000,0x0800); // make frist page empty by default
-  	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
+	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
 	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
 }
 
@@ -96,8 +96,8 @@ READ8_HANDLER( ut88_tape_r )
 {
 	double level = cassette_input(devtag_get_device(space->machine, "cassette"));
 	if (level <  0) {
-		 	return 0x00;
- 	}
+			return 0x00;
+	}
 	return 0xff;
 }
 

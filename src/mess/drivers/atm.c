@@ -187,7 +187,7 @@ ROM_START( atm )
 	ROM_SYSTEM_BIOS(3, "v4", "v.1.03rs")
 	ROMX_LOAD( "atm103rs.rom", 0x010000, 0x10000, CRC(cdec1dfb) SHA1(08190807c6b110cb2e657d8e7d0ad18668915375), ROM_BIOS(4))
 
-  	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_NOCLEAR | ROM_NOMIRROR | ROM_OPTIONAL)
 ROM_END
 
 ROM_START( atmtb2 )
@@ -214,7 +214,7 @@ ROM_START( atmtb2 )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( 1991, atm, 	spec128,	0,		atm,	spec_plus,	0,			"MicroART",		"ATM", GAME_NOT_WORKING)
+COMP( 1991, atm,	spec128,	0,		atm,	spec_plus,	0,			"MicroART",		"ATM", GAME_NOT_WORKING)
 //COMP( 1991, atmtb1,   spec128,    0,      atm,    spec_plus,  0,      "MicroART",     "ATM-turbo1", GAME_NOT_WORKING)
 COMP( 1993, atmtb2, spec128,	0,		atmtb2,	spec_plus,	0,			"MicroART",		"ATM-turbo2", GAME_NOT_WORKING)
 //COMP( 1994, turbo2, spec128,  0,      atm,    spec_plus,  0,          "MicroART",     "TURBO 2+", GAME_NOT_WORKING)

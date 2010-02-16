@@ -209,7 +209,7 @@ static UINT8 NMI_reset;
 static void system_reset(void);
 static UINT8 en_68k;
 /*SCU stuff*/
-static int 	  timer_0;			/* Counter for Timer 0 irq*/
+static int	  timer_0;			/* Counter for Timer 0 irq*/
 static int    timer_1;          /* Counter for Timer 1 irq*/
 /*Maybe add these in a struct...*/
 static UINT32 scu_src_0,		/* Source DMA lv 0 address*/
@@ -680,7 +680,7 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 		                if(LOG_SMPC) logerror ("SMPC: Status Acquire (IntBack)\n");
 				smpc_ram[0x5f]=0x10;
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
-			  	smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
+				smpc_ram[0x23] = dec_2_bcd(systime.local_time.year / 100);
 			    	smpc_ram[0x25] = dec_2_bcd(systime.local_time.year % 100);
 		    		smpc_ram[0x27] = (systime.local_time.weekday << 4) | (systime.local_time.month + 1);
 			    	smpc_ram[0x29] = dec_2_bcd(systime.local_time.mday);
@@ -743,10 +743,10 @@ static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 			/* SMPC memory setting*/
 			case 0x17:
 				if(LOG_SMPC) logerror ("SMPC: memory setting\n");
-		       		SMEM[0] = smpc_ram[1];
-		       		SMEM[1] = smpc_ram[3];
-		       		SMEM[2] = smpc_ram[5];
-		       		SMEM[3] = smpc_ram[7];
+		    		SMEM[0] = smpc_ram[1];
+		    		SMEM[1] = smpc_ram[3];
+		    		SMEM[2] = smpc_ram[5];
+		    		SMEM[3] = smpc_ram[7];
 
 				smpc_ram[0x5f]=0x17;
 			break;
@@ -919,8 +919,8 @@ DMA TODO:
 #define D0MV_1	if(!(DMA_STATUS & 0x10))    DMA_STATUS^=0x10
 #define D1MV_1	if(!(DMA_STATUS & 0x100))   DMA_STATUS^=0x100
 #define D2MV_1	if(!(DMA_STATUS & 0x1000))  DMA_STATUS^=0x1000
-#define D0MV_0	if(DMA_STATUS & 0x10) 	    DMA_STATUS^=0x10
-#define D1MV_0	if(DMA_STATUS & 0x100) 	    DMA_STATUS^=0x100
+#define D0MV_0	if(DMA_STATUS & 0x10)	    DMA_STATUS^=0x10
+#define D1MV_0	if(DMA_STATUS & 0x100)	    DMA_STATUS^=0x100
 #define D2MV_0	if(DMA_STATUS & 0x1000)     DMA_STATUS^=0x1000
 
 static UINT32 scu_index_0,scu_index_1,scu_index_2;
@@ -991,7 +991,7 @@ static READ32_HANDLER( stv_scu_r32 )
     {
     	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(space->cpu),offset,stv_scu[offset]);
     	return stv_scu[offset];
-   	}
+	}
 }
 
 static WRITE32_HANDLER( stv_scu_w32 )
@@ -1202,7 +1202,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		stv_irq.vblank_in =  (((stv_scu[40] & 0x0001)>>0) ^ 1);
 		stv_irq.vblank_out = (((stv_scu[40] & 0x0002)>>1) ^ 1);
 		stv_irq.hblank_in =  (((stv_scu[40] & 0x0004)>>2) ^ 1);
-		stv_irq.timer_0 = 	 (((stv_scu[40] & 0x0008)>>3) ^ 1);
+		stv_irq.timer_0 =	 (((stv_scu[40] & 0x0008)>>3) ^ 1);
 		stv_irq.timer_1 =    (((stv_scu[40] & 0x0010)>>4) ^ 1);
 		stv_irq.dsp_end =    (((stv_scu[40] & 0x0020)>>5) ^ 1);
 		stv_irq.sound_req =  (((stv_scu[40] & 0x0040)>>6) ^ 1);
@@ -1636,7 +1636,7 @@ static void dma_indirect_lv0(const address_space *space)
 		}
 
 		if(LOG_SCU) logerror("DMA lv 0 indirect mode transfer START\n"
-			 	 "Start %08x End %08x Size %04x\n",scu_src_0,scu_dst_0,scu_size_0);
+				 "Start %08x End %08x Size %04x\n",scu_src_0,scu_dst_0,scu_size_0);
 		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_0,scu_dst_add_0);
 
 		//guess,but I believe it's right.
@@ -1703,7 +1703,7 @@ static void dma_indirect_lv1(const address_space *space)
 		}
 
 		if(LOG_SCU) logerror("DMA lv 1 indirect mode transfer START\n"
-			 	 "Start %08x End %08x Size %04x\n",scu_src_1,scu_dst_1,scu_size_1);
+				 "Start %08x End %08x Size %04x\n",scu_src_1,scu_dst_1,scu_size_1);
 		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_1,scu_dst_add_1);
 
 		//guess,but I believe it's right.
@@ -1772,7 +1772,7 @@ static void dma_indirect_lv2(const address_space *space)
 		}
 
 		if(LOG_SCU) logerror("DMA lv 2 indirect mode transfer START\n"
-			 	 "Start %08x End %08x Size %04x\n",scu_src_2,scu_dst_2,scu_size_2);
+				 "Start %08x End %08x Size %04x\n",scu_src_2,scu_dst_2,scu_size_2);
 		if(LOG_SCU) logerror("Start Add %04x Destination Add %04x\n",scu_src_add_2,scu_dst_add_2);
 
 		//guess,but I believe it's right.
@@ -1885,7 +1885,7 @@ static NVRAM_HANDLER(saturn)
 	{
 		if (file)
 		{
-		 	mame_fread(file, backup, 64*1024/4);
+			mame_fread(file, backup, 64*1024/4);
 		}
 		else
 		{
@@ -2197,7 +2197,7 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	smpc_ram[0x2f] = dec_2_bcd(systime.local_time.second);
 	smpc_ram[0x31] = 0x00; //CTG1=0 CTG0=0 (correct??)
 //  smpc_ram[0x33] = input_port_read(machine, "???");
- 	smpc_ram[0x5f] = 0x10;
+	smpc_ram[0x5f] = 0x10;
 }
 
 static DRIVER_INIT( saturnus )

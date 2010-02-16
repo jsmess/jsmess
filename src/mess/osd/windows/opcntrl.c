@@ -191,7 +191,7 @@ static BOOL check_editbox(HWND control)
 	HANDLE h;
 	void *val;
 	int i_val;
-	
+
 
 	guide = (const option_guide *) GetProp(control, guide_prop);
 	optspec = (const char *) GetProp(control, spec_prop);

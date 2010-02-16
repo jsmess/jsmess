@@ -77,7 +77,7 @@
 #define OBJ_SIZE_32			0x8000
 #define OBJ_SIZE_64			0xc000
 
-#define OBJ_TILENUM    			0x03ff
+#define OBJ_TILENUM 			0x03ff
 #define OBJ_PRIORITY			0x0c00
 #define OBJ_PRIORITY_SHIFT		10
 #define OBJ_PALNUM			0xf000

@@ -25,11 +25,11 @@
                => add BR/HR switching
                => add bank switch for HRX
                => add device MX80c and bank switching for the ROM
-	   03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
-			   => add the port mapping for keyboard
+       03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
+               => add the port mapping for keyboard
 
       don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-      (and thank's to Daniel!)             
+      (and thank's to Daniel!)
 
     TODO : Add the cartridge function,
            Adjust the one shot and A/D timing (sn76477)
@@ -79,7 +79,7 @@ extern sn76477_interface hector_sn76477_interface;
 /* Enum status for high memory bank (c000 - ffff)*/
 enum
 {
-	HECTOR_BANK_PROG = 0,        		/* first BANK is program ram*/
+	HECTOR_BANK_PROG = 0,       		/* first BANK is program ram*/
 	HECTOR_BANK_VIDEO					/* second BANK is Video ram */
 };
 /* Status for rom memory bank (0000 - 3fff) in MX machine*/
@@ -87,5 +87,5 @@ enum
 {
 	HECTORMX_BANK_PAGE0 = 0,        	/* first BANK is base rom*/
 	HECTORMX_BANK_PAGE1,				/* second BANK is basic rom */
-	HECTORMX_BANK_PAGE2			  		/* 3 BANK is monitrix / assemblex rom */
+	HECTORMX_BANK_PAGE2					/* 3 BANK is monitrix / assemblex rom */
 };

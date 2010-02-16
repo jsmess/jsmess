@@ -28,9 +28,9 @@ static FLOPPY_CONSTRUCT(trd_dsk_construct)
 
 	floppy_image_read( floppy, data, 0x8e3 , 1 );
 
-  	/* guess geometry of disk */
-  	heads =  data[0] & 0x08 ? 1 : 2;
-  	cylinders = data[0] & 0x01 ? 40 : 80;
+	/* guess geometry of disk */
+	heads =  data[0] & 0x08 ? 1 : 2;
+	cylinders = data[0] & 0x01 ? 40 : 80;
 
 	memset(&geometry, 0, sizeof(geometry));
 	geometry.heads = heads;

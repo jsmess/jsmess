@@ -1075,7 +1075,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		relocate = 0x2000;
 		genesis_last_loaded_image_length = length;
 
- 		for (ptr = 0; ptr < MAX_MD_CART_SIZE + relocate; ptr += 2)		/* mangle bytes for little endian machines */
+		for (ptr = 0; ptr < MAX_MD_CART_SIZE + relocate; ptr += 2)		/* mangle bytes for little endian machines */
 		{
 #ifdef LSB_FIRST
 			int temp = ROM[relocate + ptr];

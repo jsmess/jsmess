@@ -9,11 +9,11 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- interrupt flag register
-	- internal RAM
-	- internal ROM
+    - interrupt flag register
+    - internal RAM
+    - internal ROM
 
 */
 

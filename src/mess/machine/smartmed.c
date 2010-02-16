@@ -87,7 +87,7 @@ enum pointer_sm_mode_t
 	SM_PM_B,		// accessing second 256-byte half of 512-byte data field
 	SM_PM_C			// accessing spare field
 };
-	
+
 typedef struct _smartmedia_t smartmedia_t;
 struct _smartmedia_t
 {
@@ -629,7 +629,7 @@ DEVICE_GET_INFO( smartmedia )
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_MEMCARD;                                      break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                               break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                               break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                               break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 0;                                               break;
 		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( smartmedia );              break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( smartmedia );			break;
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( smartmedia );    break;

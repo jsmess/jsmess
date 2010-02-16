@@ -755,7 +755,7 @@ static void draw_gba_oam_window(gba_state_t *gba_state, running_machine *machine
 				tiledrawindex = tileindex = (attr2 & OBJ_TILENUM);
 				tilebytebase = 0x10000;	// the index doesn't change in the higher modes, we just ignore sprites that are out of range
 
- 				if (attr0 & OBJ_ROZMODE_ROZ)
+				if (attr0 & OBJ_ROZMODE_ROZ)
 				{
 					INT32 fx, fy, ax, ay, rx, ry;
 					INT16 dx, dy, dmx, dmy;
@@ -1196,7 +1196,7 @@ static void draw_gba_oam(gba_state_t *gba_state, running_machine *machine, UINT3
 				tiledrawindex = tileindex = (attr2 & OBJ_TILENUM);
 				tilebytebase = 0x10000;	// the index doesn't change in the higher modes, we just ignore sprites that are out of range
 
- 				if (attr0 & OBJ_ROZMODE_ROZ)
+				if (attr0 & OBJ_ROZMODE_ROZ)
 				{
 					INT32 sx, sy;
 					INT32 fx, fy, rx, ry;

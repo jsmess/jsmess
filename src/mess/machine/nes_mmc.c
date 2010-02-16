@@ -226,7 +226,7 @@ static UINT8 mapper83_reg[10];
 static UINT8 mapper83_low_reg[4];
 static UINT8 mapper95_reg[4];
 static UINT8 mapper115_reg[4];
-static UINT8 txc_reg[4]; 	// used by mappers 132, 172 & 173
+static UINT8 txc_reg[4];	// used by mappers 132, 172 & 173
 static UINT8 subor_reg[4];	// used by mappers 166 & 167
 static UINT8 sachen_reg[8];	// used by mappers 137, 138, 139 & 141
 static UINT8 mapper12_reg;

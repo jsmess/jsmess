@@ -98,7 +98,7 @@ void ti99_clk_interrupt_callback(running_device *device, int state)
 */
 void ti99_ide_init(running_machine *machine)
 {
-//	rtc65271_init(machine, memory_region(machine, region_dsr) + offset_ide_ram2, clk_interrupt_callback);
+//  rtc65271_init(machine, memory_region(machine, region_dsr) + offset_ide_ram2, clk_interrupt_callback);
 	ti99_ide_RAM = memory_region(machine, region_dsr) + offset_ide_ram;
 }
 

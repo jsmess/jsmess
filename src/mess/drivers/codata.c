@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Contel Codata Corporation Codata
 
         11/01/2010 Skeleton driver.
@@ -19,8 +19,8 @@ INPUT_PORTS_START( codata )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(codata) 
-{	
+static MACHINE_RESET(codata)
+{
 }
 
 static VIDEO_START( codata )
@@ -38,7 +38,7 @@ static MACHINE_DRIVER_START( codata )
     MDRV_CPU_PROGRAM_MAP(codata_mem)
 
     MDRV_MACHINE_RESET(codata)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -65,5 +65,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( ????, codata,  0,       0, 	codata, 	codata, 	 0,   "Contel Codata Corporation",   "Codata",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, codata,  0,       0,	codata, 	codata, 	 0,   "Contel Codata Corporation",   "Codata",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

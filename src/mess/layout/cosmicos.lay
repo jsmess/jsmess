@@ -14,17 +14,17 @@
       <color red="0.09375" green="0.0" blue="0.0" />
     </disk>
   </element>
-  
+
   <view name="Standard">
 		<!-- Led address display -->
 		<bezel name="digit0" element="digit">
 			<bounds x="0" y="5" width="18" height="24" />
 		</bezel>
-    
+
 		<bezel name="digit1" element="digit">
 			<bounds x="18" y="5" width="18" height="24" />
 		</bezel>
-    
+
     <!-- G led -->
     <bezel name="led0" element="red_led">
       <bounds x="108" y="0" width="5" height="5" />

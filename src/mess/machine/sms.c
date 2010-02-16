@@ -514,7 +514,7 @@ READ8_HANDLER( sms_input_port_1_r )
 
 	/* Do region detection if TH of ports A and B are set to output (0) */
 	if (!(sms_state.ctrl_reg & 0x0a))
- 	{
+	{
 		/* Move bits 7,5 of IO control port into bits 7, 6 */
 		sms_state.input_port1 = (sms_state.input_port1 & 0x3f) | (sms_state.ctrl_reg & 0x80) | (sms_state.ctrl_reg & 0x20) << 1;
 
@@ -1054,7 +1054,7 @@ static int sms_verify_cart( UINT8 *magic, int size )
 						retval = IMAGE_VERIFY_PASS;
 				}
 #endif
-		 		retval = IMAGE_VERIFY_PASS;
+				retval = IMAGE_VERIFY_PASS;
 			}
 		}
 #endif
@@ -1406,7 +1406,7 @@ MACHINE_START( sms )
 	sms_state.rapid_fire_timer = timer_alloc(machine, rapid_fire_callback , NULL);
 	timer_adjust_periodic(sms_state.rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10));
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
-	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);	
+	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
 }
 
 

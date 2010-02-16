@@ -264,13 +264,13 @@ static int intl_toupper(int c)
 static int intl_stricmp(const char *s1, const char *s2)
 {
 	for (;;)
- 	{
+	{
 		int c1 = intl_toupper(*s1++);
 		int c2 = intl_toupper(*s2++);
 
 		if (c1 == 0 || c1 != c2)
 			return c1 - c2;
- 	}
+	}
 }
 
 

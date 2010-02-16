@@ -300,7 +300,7 @@ static void gb_init(running_machine *machine)
 MACHINE_START( gb )
 {
 	add_exit_callback(machine, gb_machine_stop);
-	
+
 	/* Allocate the serial timer, and disable it */
 	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
 	timer_enable( gb_driver_data.gb_serial_timer, 0 );

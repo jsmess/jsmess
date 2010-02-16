@@ -242,7 +242,7 @@ static Z80CTC_INTERFACE( p8k_ctc_0_intf )
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_NULL,			/* ZC/TO0 callback */
 	DEVCB_NULL,			/* ZC/TO1 callback */
-	DEVCB_NULL    		/* ZC/TO2 callback */
+	DEVCB_NULL  		/* ZC/TO2 callback */
 };
 
 /* Z80 CTC 1 */
@@ -403,7 +403,7 @@ static Z80CTC_INTERFACE( p8k_16_ctc_0_intf )
 	DEVCB_LINE(p8k_16_daisy_interrupt),	/* interrupt handler */
 	DEVCB_NULL,				/* ZC/TO0 callback */
 	DEVCB_NULL,				/* ZC/TO1 callback */
-	DEVCB_NULL    			/* ZC/TO2 callback */
+	DEVCB_NULL  			/* ZC/TO2 callback */
 };
 
 /* Z80 CTC 1 */

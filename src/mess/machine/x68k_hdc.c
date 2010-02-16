@@ -462,8 +462,8 @@ DEVICE_GET_INFO(x68k_hdc)
 		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 		break;
-		case DEVINFO_STR_IMAGE_INSTANCE_NAME:			strcpy(info->s, "sasihd"); 			break;
-		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:		strcpy(info->s, "sasi"); 			break;
+		case DEVINFO_STR_IMAGE_INSTANCE_NAME:			strcpy(info->s, "sasihd");			break;
+		case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME:		strcpy(info->s, "sasi");			break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "hdf"); break;
 	}
 }

@@ -30,10 +30,10 @@ LIBCASTOOL = $(OBJ)/libcastool.a
 # castool lib objects
 CASTOOL_LIB_OBJS =						\
 	$(OBJ)/version.o					\
-	$(EMUOBJ)/emualloc.o 				\
+	$(EMUOBJ)/emualloc.o				\
 	$(EMUOBJ)/emucore.o					\
 	$(EMUOBJ)/emuopts.o 				\
-	$(EMUOBJ)/memory.o 					\
+	$(EMUOBJ)/memory.o					\
 	$(MESSOBJ)/utils.o					\
 	$(MESSOBJ)/opresolv.o				\
 	$(MESS_FORMATS)/a26_cas.o           \

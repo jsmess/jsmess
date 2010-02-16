@@ -250,7 +250,7 @@ static INPUT_PORTS_START( kb_keytronic_common )
 	PORT_START( "kb_keytronic_37_0" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )									PORT_NAME("PA1")					/* 7b */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )									PORT_NAME("|<--")					/* 7e */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )									PORT_NAME("/a\\") 					/* 7a */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )									PORT_NAME("/a\\")					/* 7a */
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_KEYBOARD )	PORT_CODE(KEYCODE_PLUS_PAD)		PORT_NAME("KP +")					/* 4e */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 

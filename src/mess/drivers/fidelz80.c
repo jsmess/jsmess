@@ -1,7 +1,7 @@
 /******************************************************************************
 *
 *  Fidelity Electronics Z80 based board driver
-*  By Kevin 'kevtris' Horton and Jonathan Gevaryahu AKA Lord Nightmare 
+*  By Kevin 'kevtris' Horton and Jonathan Gevaryahu AKA Lord Nightmare
 *
 *  All detailed RE work done by Kevin 'kevtris' Horton
 *
@@ -93,7 +93,7 @@ one to latch the state of A12 to the speech ROM.  The english version has the ch
 missing, and a jumper pulling "A12" to ground.  This line is really a negative
 enable.
 
-To make the VCC multi-language, one would install the 74367 (note: it must be a 74367 
+To make the VCC multi-language, one would install the 74367 (note: it must be a 74367
 or possibly a 74LS367.  A 74HC367 would not work since they rely on the input current
 to keep the inputs pulled up), solder a piggybacked ROM to the existing english
 speech ROM, and finally install a 7474 dual flipflop.
@@ -136,7 +136,7 @@ UINT8 columnlatch;
 
 /*static READ8_DEVICE_HANDLER( vcc_porta_r )
 {
-	return 0;
+    return 0;
 };*/
 
 static READ8_DEVICE_HANDLER( vcc_portb_r )
@@ -224,7 +224,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(vcc_z80_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xFC) AM_DEVREADWRITE("vcc_ppi8255", i8255a_r, i8255a_w) // 8255 i/o chip  
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0xFC) AM_DEVREADWRITE("vcc_ppi8255", i8255a_r, i8255a_w) // 8255 i/o chip
 ADDRESS_MAP_END
 
 
@@ -250,7 +250,7 @@ static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )
 
 static MACHINE_DRIVER_START(vcc)
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)  
+    MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(vcc_z80_mem)
     MDRV_CPU_IO_MAP(vcc_z80_io)
     MDRV_QUANTUM_TIME(HZ(60))
@@ -260,10 +260,10 @@ static MACHINE_DRIVER_START(vcc)
     //MDRV_DEFAULT_LAYOUT(layout_dectalk) // hack to avoid screenless system crash
 	MDRV_IMPORT_FROM( generic_terminal )
 	MDRV_GENERIC_TERMINAL_ADD(TERMINAL_TAG,dectalk_terminal_intf)
-	
+
 	/* other hardware */
 	MDRV_I8255A_ADD("vcc_ppi8255", vcc_ppi8255_intf)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speech", S14001A, 25000) // around 25khz

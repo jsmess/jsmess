@@ -21,7 +21,7 @@
 
 struct vic3_sprite
 {
-	int x, y;	
+	int x, y;
 
 	int repeat;                         /* expand, line once drawn */
 	int line;                           /* 0 not painting, else painting */
@@ -147,7 +147,7 @@ struct _vic3_state
 #define VIC3_BITPLANES			(vic3->reg[0x31] & 0x10)
 #define VIC3_80COLUMNS			(vic3->reg[0x31] & 0x80)
 #define VIC3_LINES			((vic3->reg[0x31] & 0x19) == 0x19 ? 400 : 200)
-#define VIC3_BITPLANES_WIDTH 		(vic3->reg[0x31] & 0x80 ? 640 : 320)
+#define VIC3_BITPLANES_WIDTH		(vic3->reg[0x31] & 0x80 ? 640 : 320)
 
 /*#define VIC2E_TEST (vic2[0x30] & 2) */
 #define DOUBLE_CLOCK			(vic3->reg[0x30] & 0x01)
@@ -246,13 +246,13 @@ INLINE const vic3_interface *get_interface( running_device *device )
 
 INLINE int vic3_getforeground( running_device *device, int y, int x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	return ((vic3->screen[y][x >> 3] << 8) | (vic3->screen[y][(x >> 3) + 1])) >> (8 - (x & 7));
 }
 
 INLINE int vic3_getforeground16(running_device *device, int y, int x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	return ((vic3->screen[y][x >> 3] << 16) | (vic3->screen[y][(x >> 3) + 1] << 8) | (vic3->screen[y][(x >> 3) + 2])) >> (8 - (x & 7));
 }
 
@@ -283,7 +283,7 @@ static void vic3_clear_interrupt( running_machine *machine, int mask, vic3_state
 
 static TIMER_CALLBACK(vic3_timer_timeout)
 {
- 	vic3_state *vic3 = (vic3_state *)ptr;
+	vic3_state *vic3 = (vic3_state *)ptr;
 	int which = param;
 	//DBG_LOG(3, "vic3 ", ("timer %d timeout\n", which));
 	switch (which)
@@ -301,7 +301,7 @@ static TIMER_CALLBACK(vic3_timer_timeout)
 }
 static void vic3_draw_character( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, UINT16 *color, int start_x, int end_x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int y, code;
 
 	for (y = ybegin; y <= yend; y++)
@@ -321,7 +321,7 @@ static void vic3_draw_character( running_device *device, int ybegin, int yend, i
 
 static void vic3_draw_character_multi( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int y, code;
 
 	for (y = ybegin; y <= yend; y++)
@@ -341,7 +341,7 @@ static void vic3_draw_character_multi( running_device *device, int ybegin, int y
 
 static void vic3_draw_bitmap( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int y, code;
 
 	for (y = ybegin; y <= yend; y++)
@@ -361,7 +361,7 @@ static void vic3_draw_bitmap( running_device *device, int ybegin, int yend, int 
 
 static void vic3_draw_bitmap_multi( running_device *device, int ybegin, int yend, int ch, int yoff, int xoff, int start_x, int end_x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int y, code;
 
 	for (y = ybegin; y <= yend; y++)
@@ -381,7 +381,7 @@ static void vic3_draw_bitmap_multi( running_device *device, int ybegin, int yend
 
 static void vic3_draw_sprite_code( running_device *device, int y, int xbegin, int code, int color, int start_x, int end_x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	register int mask, x;
 
 	if ((y < YPOS) || (y >= (VIC2_STARTVISIBLELINES + VIC2_VISIBLELINES)) || (xbegin <= 1) || (xbegin >= (VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)))
@@ -399,7 +399,7 @@ static void vic3_draw_sprite_code( running_device *device, int y, int xbegin, in
 
 static void vic3_draw_sprite_code_multi( running_device *device, int y, int xbegin, int code, int prior, int start_x, int end_x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	register int x, mask, shift;
 
 	if ((y < YPOS) || (y >= (VIC2_STARTVISIBLELINES + VIC2_VISIBLELINES)) || (xbegin <= 1) || (xbegin >= (VIC2_STARTVISIBLECOLUMNS + VIC2_VISIBLECOLUMNS)))
@@ -434,7 +434,7 @@ static void vic3_draw_sprite_code_multi( running_device *device, int y, int xbeg
 
 static void vic3_sprite_collision( running_device *device, int nr, int y, int x, int mask )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int i, value, xdiff;
 
 	for (i = 7; i > nr; i--)
@@ -467,7 +467,7 @@ static void vic3_sprite_collision( running_device *device, int nr, int y, int x,
 
 static void vic3_draw_sprite( running_device *device, int nr, int yoff, int ybegin, int yend, int start_x, int end_x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int y, i, addr, xbegin, color, prior, collision;
 	int value, value3 = 0;
 
@@ -562,7 +562,7 @@ static void vic3_draw_sprite( running_device *device, int nr, int yoff, int ybeg
 
 static void vic3_draw_sprite_multi( running_device *device, int nr, int yoff, int ybegin, int yend, int start_x, int end_x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int y, i, prior, addr, xbegin, collision;
 	int value, value2, value3 = 0, bg, color[2];
 
@@ -675,7 +675,7 @@ static void vic3_draw_sprite_multi( running_device *device, int nr, int yoff, in
 
 static void vic3_drawlines( running_device *device, int first, int last, int start_x, int end_x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int line, vline, end;
 	int attr, ch, ecm;
 	int syend;
@@ -897,14 +897,14 @@ static void vic3_drawlines( running_device *device, int first, int last, int sta
 
 static void vic2_drawlines( running_device *device, int first, int last, int start_x, int end_x )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int line, vline, end;
 	int attr, ch, ecm;
 	int syend;
 	int offs, yoff, xoff, ybegin, yend, xbegin, xend;
 	int i;
 
-	if (VIC3_BITPLANES) 
+	if (VIC3_BITPLANES)
 		return ;
 
 	/* temporary allowing vic3 displaying 80 columns */
@@ -1142,13 +1142,13 @@ static void vic2_drawlines( running_device *device, int first, int last, int sta
 
 WRITE8_DEVICE_HANDLER( vic3_palette_w )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 
-	if (offset < 0x100) 
+	if (offset < 0x100)
 		vic3->palette_red[offset] = data;
-	else if (offset < 0x200) 
+	else if (offset < 0x200)
 		vic3->palette_green[offset & 0xff] = data;
-	else 
+	else
 		vic3->palette_blue[offset & 0xff] = data;
 
 	vic3->palette_dirty = 1;
@@ -1157,7 +1157,7 @@ WRITE8_DEVICE_HANDLER( vic3_palette_w )
 
 WRITE8_DEVICE_HANDLER( vic3_port_w )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 
 	DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
 	offset &= 0x7f;
@@ -1277,7 +1277,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 
 	case 0x1a:							/* irq mask */
 		vic3->reg[offset] = data;
-		vic3_set_interrupt(device->machine, 0, vic3); 	// beamrider needs this
+		vic3_set_interrupt(device->machine, 0, vic3);	// beamrider needs this
 		break;
 
 	case 0x11:
@@ -1376,9 +1376,9 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 		break;
 	case 0x31:
 		vic3->reg[offset] = data;
-		if (data & 0x40) 
+		if (data & 0x40)
 			cpu_set_clockscale(vic3->cpu, 1.0);
-		else 
+		else
 			cpu_set_clockscale(vic3->cpu, 1.0/3.5);
 		break;
 	case 0x32:
@@ -1416,7 +1416,7 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 
 READ8_DEVICE_HANDLER( vic3_port_r )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int val = 0;
 	offset &= 0x7f;
 
@@ -1611,11 +1611,11 @@ READ8_DEVICE_HANDLER( vic3_port_r )
 #define VIC3_ADDR(a) VIC3_BITPLANE_IADDR(a)
 static void vic3_interlace_draw_block( running_device *device, int x, int y, int offset )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int colors[8] = {0};
 	int i, p;
 
-	switch (VIC3_BITPLANES_MASK) 
+	switch (VIC3_BITPLANES_MASK)
 	{
 	case 0x05:
 		VIC3_MASK(0x05)
@@ -1636,10 +1636,10 @@ static void vic3_interlace_draw_block( running_device *device, int x, int y, int
 		VIC3_MASK(0xff)
 		break;
 	default:
-		if (VIC3_BITPLANES_MASK & 0x01) 
+		if (VIC3_BITPLANES_MASK & 0x01)
 			colors[0] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(0) + offset);
 
-		if (VIC3_BITPLANES_MASK & 0x02) 
+		if (VIC3_BITPLANES_MASK & 0x02)
 			colors[1] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(1) + offset) << 1;
 
 		if (VIC3_BITPLANES_MASK & 0x04)
@@ -1660,7 +1660,7 @@ static void vic3_interlace_draw_block( running_device *device, int x, int y, int
 		if (VIC3_BITPLANES_MASK & 0x80)
 			colors[7] = vic3->c64_mem_r(VIC3_BITPLANE_IADDR(7) + offset) << 7;
 
-		for (i = 7; i >= 0; i--) 
+		for (i = 7; i >= 0; i--)
 		{
 			*BITMAP_ADDR16(vic3->bitmap, YPOS + y, XPOS + x + i) =
 				(colors[0] & 0x01) | (colors[1] & 0x02)
@@ -1683,11 +1683,11 @@ static void vic3_interlace_draw_block( running_device *device, int x, int y, int
 #define VIC3_ADDR(a) VIC3_BITPLANE_ADDR(a)
 static void vic3_draw_block( running_device *device, int x, int y, int offset )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int colors[8] = {0};
 	int i, p;
 
-	switch (VIC3_BITPLANES_MASK) 
+	switch (VIC3_BITPLANES_MASK)
 	{
 	case 5:
 		VIC3_MASK(0x05)
@@ -1732,7 +1732,7 @@ static void vic3_draw_block( running_device *device, int x, int y, int offset )
 		if (VIC3_BITPLANES_MASK & 0x80)
 			colors[7] = vic3->c64_mem_r(VIC3_BITPLANE_ADDR(7) + offset) << 7;
 
-		for (i = 7; i >= 0; i--) 
+		for (i = 7; i >= 0; i--)
 		{
 			*BITMAP_ADDR16(vic3->bitmap, YPOS + y, XPOS + x + i) =
 				(colors[0] & 0x01) | (colors[1] & 0x02)
@@ -1754,18 +1754,18 @@ static void vic3_draw_block( running_device *device, int x, int y, int offset )
 
 static void vic3_draw_bitplanes( running_device *device )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	int x, y, y1s, offset;
 	rectangle vis;
 	const rectangle *visarea = video_screen_get_visible_area(vic3->main_screen);
 
-	if (VIC3_LINES == 400) 
+	if (VIC3_LINES == 400)
 	{ /* interlaced! */
-		for (y1s = 0, offset = 0; y1s < 400; y1s += 16) 
+		for (y1s = 0, offset = 0; y1s < 400; y1s += 16)
 		{
-			for (x = 0; x < VIC3_BITPLANES_WIDTH; x += 8) 
+			for (x = 0; x < VIC3_BITPLANES_WIDTH; x += 8)
 			{
-				for (y = y1s; y < y1s + 16; y += 2, offset++) 
+				for (y = y1s; y < y1s + 16; y += 2, offset++)
 				{
 					if (vic3->interlace)
 						vic3_draw_block(device, x, y, offset);
@@ -1775,14 +1775,14 @@ static void vic3_draw_bitplanes( running_device *device )
 			}
 		}
 		vic3->interlace ^= 1;
-	} 
-	else 
+	}
+	else
 	{
-		for (y1s = 0, offset = 0; y1s < 200; y1s += 8) 
+		for (y1s = 0, offset = 0; y1s < 200; y1s += 8)
 		{
-			for (x = 0; x < VIC3_BITPLANES_WIDTH; x += 8) 
+			for (x = 0; x < VIC3_BITPLANES_WIDTH; x += 8)
 			{
-				for (y = y1s; y < y1s + 8; y++, offset++) 
+				for (y = y1s; y < y1s + 8; y++, offset++)
 				{
 					vic3_draw_block(device, x, y, offset);
 				}
@@ -1790,7 +1790,7 @@ static void vic3_draw_bitplanes( running_device *device )
 		}
 	}
 
-	if (XPOS > 0) 
+	if (XPOS > 0)
 	{
 		vis.min_x = 0;
 		vis.max_x = XPOS - 1;
@@ -1799,7 +1799,7 @@ static void vic3_draw_bitplanes( running_device *device )
 		bitmap_fill(vic3->bitmap, &vis, FRAMECOLOR);
 	}
 
-	if (XPOS + VIC3_BITPLANES_WIDTH < visarea->max_x) 
+	if (XPOS + VIC3_BITPLANES_WIDTH < visarea->max_x)
 	{
 		vis.min_x = XPOS + VIC3_BITPLANES_WIDTH;
 		vis.max_x = visarea->max_x;
@@ -1817,7 +1817,7 @@ static void vic3_draw_bitplanes( running_device *device )
 		bitmap_fill(vic3->bitmap, &vis, FRAMECOLOR);
 	}
 
-	if (YPOS + VIC3_LINES < visarea->max_y) 
+	if (YPOS + VIC3_LINES < visarea->max_y)
 	{
 		vis.min_y = YPOS + VIC3_LINES;
 		vis.max_y = visarea->max_y;
@@ -1829,7 +1829,7 @@ static void vic3_draw_bitplanes( running_device *device )
 
 void vic3_raster_interrupt_gen( running_device *device )
 {
- 	vic3_state *vic3 = get_safe_token(device);
+	vic3_state *vic3 = get_safe_token(device);
 	running_machine *machine = device->machine;
 	int new_columns, new_rows;
 	int i;
@@ -1842,7 +1842,7 @@ void vic3_raster_interrupt_gen( running_device *device )
 			for (i = 0; i < 256; i++)
 				palette_set_color_rgb(machine, i, vic3->palette_red[i] << 4, vic3->palette_green[i] << 4, vic3->palette_blue[i] << 4);
 
-		if (vic3->palette_dirty) 
+		if (vic3->palette_dirty)
 		{
 			vic3->spritemulti[1] = SPRITE_MULTICOLOR1;
 			vic3->spritemulti[3] = SPRITE_MULTICOLOR2;
@@ -1890,17 +1890,17 @@ void vic3_raster_interrupt_gen( running_device *device )
 		if (VIC3_BITPLANES)
 		{
 			vic3_draw_bitplanes(device);
-		} 
-		else 
+		}
+		else
 		{
 			if (vic3->type == VIC4567_PAL)
 			{
-				if (vic3->on) 
+				if (vic3->on)
 					vic2_drawlines(device, vic3->lastline, vic3->lines, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + vic3->columns + 16 - 1);
 			}
 			else
 			{
-				if (vic3->on) 
+				if (vic3->on)
 					vic2_drawlines(device, vic3->lastline, vic3->lines, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + vic3->columns + 16 - 1);
 			}
 		}
@@ -1928,12 +1928,12 @@ void vic3_raster_interrupt_gen( running_device *device )
 		{
 			if (vic3->type == VIC4567_PAL)
 			{
-				if (vic3->on) 
+				if (vic3->on)
 					vic2_drawlines(device, vic3->rasterline - 1, vic3->rasterline, VIC2_STARTVISIBLECOLUMNS + 32, VIC2_STARTVISIBLECOLUMNS + 32 + vic3->columns + 16 - 1);
 			}
 			else
 			{
-				if (vic3->on) 
+				if (vic3->on)
 					vic2_drawlines(device, vic3->rasterline - 1, vic3->rasterline, VIC2_STARTVISIBLECOLUMNS + 34, VIC2_STARTVISIBLECOLUMNS + 34 + vic3->columns + 16 - 1);
 			}
 		}
@@ -2135,9 +2135,9 @@ static DEVICE_RESET( vic3 )
 
 	for (i = 0; i < 4; i++)
 	{
-		vic3->bitmapmulti[i] = 0; 
+		vic3->bitmapmulti[i] = 0;
 		vic3->multi[i] = 0;
-		vic3->colors[i] = 0; 
+		vic3->colors[i] = 0;
 		vic3->spritemulti[i] = 0;
 	}
 

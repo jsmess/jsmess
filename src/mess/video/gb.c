@@ -1369,7 +1369,7 @@ void gb_video_reset( running_machine *machine, int mode )
 		timer_set(machine,  cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, gb_video_init_vbl );
 
 		/* Initialize some video registers */
- 		gb_video_w( space, 0x0, 0x91 );    /* LCDCONT */
+		gb_video_w( space, 0x0, 0x91 );    /* LCDCONT */
 		gb_video_w( space, 0x7, 0xFC );    /* BGRDPAL */
 		gb_video_w( space, 0x8, 0xFC );    /* SPR0PAL */
 		gb_video_w( space, 0x9, 0xFC );    /* SPR1PAL */

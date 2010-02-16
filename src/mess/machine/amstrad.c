@@ -206,7 +206,7 @@ static const rgb_t amstrad_palette[32] =
 	MAKE_RGB(0x060, 0x000, 0x000),			   /* Red */
 	MAKE_RGB(0x060, 0x000, 0x0ff),			   /* mauve */
 	MAKE_RGB(0x060, 0x060, 0x000),			   /* yellow */
-	MAKE_RGB(0x060, 0x060, 0x0ff)	  		   /* pastel blue */
+	MAKE_RGB(0x060, 0x060, 0x0ff)			   /* pastel blue */
 };
 
 
@@ -2062,7 +2062,7 @@ Bit Value Function        Bit Value Function
 1   x     |               1   x     |
 0   x     |               0   x     |
 */
-  	case 0x00:
+	case 0x00:
 		/* Select Border Number, get b4 */
 		/* if b4 = 0 : Select Pen Number, get b3-b0 */
 		gate_array.pen_selected = ( dataToGateArray & 0x10 ) ? 0x10 : ( dataToGateArray & 0x0f );
@@ -2377,7 +2377,7 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
  */
 	if ( amstrad_system_type != SYSTEM_GX4000 )
 	{
- 		if ( ( offset & (1<<10) ) == 0 )
+		if ( ( offset & (1<<10) ) == 0 )
 		{
 			if ( ( offset & (1<<10) ) == 0 )
 			{
@@ -2385,14 +2385,14 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 
 				switch (b8b0)
 				{
-  				case 0x02:
-  					data = upd765_status_r(fdc, 0);
-  					break;
-  				case 0x03:
-  					data = upd765_data_r(fdc, 0);
-  					break;
-  				default:
-  					break;
+				case 0x02:
+					data = upd765_status_r(fdc, 0);
+					break;
+				case 0x03:
+					data = upd765_data_r(fdc, 0);
+					break;
+				default:
+					break;
 				}
 			}
 		}
@@ -2446,7 +2446,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 		{
 			/* if b15 = 0 and b14 = 1 : Gate-Array Write Selected*/
 			if ((offset & (1<<14)) != 0)
-	   			amstrad_GateArray_write(space->machine, data);
+				amstrad_GateArray_write(space->machine, data);
 
 			/* if b15 = 0 : RAM Configuration Write Selected*/
 			AmstradCPC_GA_SetRamConfiguration(space->machine);
@@ -2459,7 +2459,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		switch ((offset & 0x0300) >> 8) // r1r0
 		{
-  		case 0x00:		/* Select internal 6845 register Write Only */
+		case 0x00:		/* Select internal 6845 register Write Only */
 			mc6845_address_w( mc6845, 0, data );
 			if ( amstrad_system_type == SYSTEM_PLUS || amstrad_system_type == SYSTEM_GX4000 )
 				amstrad_plus_seqcheck(data);
@@ -2884,26 +2884,26 @@ static void update_psg(running_machine *machine)
 	}
 	switch (amstrad_Psg_FunctionSelected)
 	{
-  	case 0:
+	case 0:
 		{/* Inactive */
 		} break;
-  	case 1:
+	case 1:
 		{/* b6 = 1 ? : Read from selected PSG register and make the register data available to PPI Port A */
-  			ppi_port_inputs[amstrad_ppi_PortA] = ay8910_r(ay8910, 0);
-  		}
+			ppi_port_inputs[amstrad_ppi_PortA] = ay8910_r(ay8910, 0);
+		}
 		break;
-  	case 2:
+	case 2:
 		{/* b7 = 1 ? : Write to selected PSG register and write data to PPI Port A */
-  			ay8910_data_w(ay8910, 0, ppi_port_outputs[amstrad_ppi_PortA]);
-  		}
+			ay8910_data_w(ay8910, 0, ppi_port_outputs[amstrad_ppi_PortA]);
+		}
 		break;
-  	case 3:
+	case 3:
 		{/* b6 and b7 = 1 ? : The register will now be selected and the user can read from or write to it.  The register will remain selected until another is chosen.*/
-  			ay8910_address_w(ay8910, 0, ppi_port_outputs[amstrad_ppi_PortA]);
+			ay8910_address_w(ay8910, 0, ppi_port_outputs[amstrad_ppi_PortA]);
 			prev_reg = ppi_port_outputs[amstrad_ppi_PortA];
-  		}
+		}
 		break;
-  	default:
+	default:
 		{
 		} break;
 	}

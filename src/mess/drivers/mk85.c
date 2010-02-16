@@ -63,12 +63,12 @@ MACHINE_DRIVER_END
 /* ROM definition */
 ROM_START( mk85 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-  	ROM_LOAD( "mk85.rom", 0x0000, 0x4000, CRC(398e4fd1) SHA1(5e2f877d0f451b46840f01190004552bad5248c8))
-  	ROM_COPY("maincpu", 0x0000,0x4000,0x4000)
+	ROM_LOAD( "mk85.rom", 0x0000, 0x4000, CRC(398e4fd1) SHA1(5e2f877d0f451b46840f01190004552bad5248c8))
+	ROM_COPY("maincpu", 0x0000,0x4000,0x4000)
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, mk85,  0,       0, 			mk85, 	mk85, 	 0,  	 "Elektronika",   "MK-85",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, mk85,  0,       0,			mk85,	mk85,	 0, 	 "Elektronika",   "MK-85",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

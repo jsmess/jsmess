@@ -102,7 +102,7 @@ WRITE8_HANDLER(ncr5380_w)
 			// if we're in the command phase, collect the command bytes
 			if ((n5380_Registers[R5380_BUSSTATUS] & 0x1c) == 0x08)
 			{
-			 	n5380_Command[cmd_ptr++] = data;
+				n5380_Command[cmd_ptr++] = data;
 			}
 
 			// if we're in the select phase, this is the target id
@@ -204,7 +204,7 @@ WRITE8_HANDLER(ncr5380_w)
 							ncr5380_read_data((d_limit < 512) ? d_limit : 512, n5380_Data);
 
 							// raise REQ to indicate data is available
-			 				n5380_Registers[R5380_BUSSTATUS] |= 0x20;
+							n5380_Registers[R5380_BUSSTATUS] |= 0x20;
 						}
 					}
 				}
@@ -252,7 +252,7 @@ WRITE8_HANDLER(ncr5380_w)
 
 			if (data == 1)	// arbitrate?
 			{
-				n5380_Registers[R5380_INICOMMAND] |= 0x40; 	// set arbitration in progress
+				n5380_Registers[R5380_INICOMMAND] |= 0x40;	// set arbitration in progress
 				n5380_Registers[R5380_INICOMMAND] &= ~0x20;	// clear "lost arbitration"
 			}
 
@@ -324,7 +324,7 @@ READ8_HANDLER(ncr5380_r)
 				}
 				else
 				{
-				 	if (d_ptr < 511)
+					if (d_ptr < 511)
 					{
 						d_ptr++;
 					}
@@ -474,19 +474,19 @@ DEVICE_GET_INFO( ncr5380 ) {
 	switch ( state ) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ncr5380_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;				      		break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;				    		break;
 		case DEVINFO_INT_CLASS:				info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(ncr5380);	break;
-		case DEVINFO_FCT_STOP:				/* nothing */				 	break;
+		case DEVINFO_FCT_STOP:				/* nothing */					break;
 		case DEVINFO_FCT_RESET:				info->reset = DEVICE_RESET_NAME(ncr5380);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:				strcpy(info->s, "NCR 5380");		   		break;
-		case DEVINFO_STR_FAMILY:			strcpy(info->s, "NCR53xx");		   		break;
-		case DEVINFO_STR_VERSION:			strcpy(info->s, "1.1");		   		break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);		   		break;
+		case DEVINFO_STR_NAME:				strcpy(info->s, "NCR 5380");				break;
+		case DEVINFO_STR_FAMILY:			strcpy(info->s, "NCR53xx");				break;
+		case DEVINFO_STR_VERSION:			strcpy(info->s, "1.1");				break;
+		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;
 		case DEVINFO_STR_CREDITS:			strcpy(info->s, "Copyright the MAME and MESS Teams"); break;
 	}
 }

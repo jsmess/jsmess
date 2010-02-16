@@ -664,7 +664,7 @@ static DEVICE_GET_INFO( ql_serial )
 	{
 		case DEVINFO_STR_NAME:		                strcpy(info->s, "QL serial port");	                    break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                 break;
-		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+		default:									DEVICE_GET_INFO_CALL(serial);	break;
 	}
 }
 
@@ -675,7 +675,7 @@ static DEVICE_GET_INFO( ql_serial )
 
 #define MDRV_QL_SERIAL_REMOVE(_tag)		\
   MDRV_DEVICE_REMOVE(_tag)
-  
+
 static MACHINE_DRIVER_START( ql )
 	MDRV_DRIVER_DATA(ql_state)
 
@@ -749,7 +749,7 @@ static MACHINE_DRIVER_START( opd )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("256K")
-	
+
 	MDRV_QL_SERIAL_REMOVE("serial0")
 	MDRV_QL_SERIAL_REMOVE("serial1")
 MACHINE_DRIVER_END
@@ -931,7 +931,7 @@ static QUICKLOAD_LOAD( ql )
 
 	return INIT_PASS;
 }
-	
+
 /* Computer Drivers */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                     FULLNAME        FLAGS */

@@ -21,8 +21,8 @@
 
 /*-------------------------------------------------
     d81_translate_offset - translates the
-	physical offset to a logical offset within
-	the disk image
+    physical offset to a logical offset within
+    the disk image
 -------------------------------------------------*/
 
 /*
@@ -92,7 +92,7 @@ FLOPPY_IDENTIFY( d81_dsk_identify )
 /*
 PER TRACK ORGANIZATION:
 
-      Hex 4E written as a gap, with 10 sectors of data, with full gaps written for motor speed variation. 
+      Hex 4E written as a gap, with 10 sectors of data, with full gaps written for motor speed variation.
 
 PER SECTOR ORGANIZATION:
 

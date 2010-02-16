@@ -56,17 +56,17 @@ typedef struct
 
 typedef struct
 	{
-	imgtool_image 		base;
-	imgtool_stream 		*file_handle;
+	imgtool_image		base;
+	imgtool_stream		*file_handle;
 	int 		size;
 	UINT8		*data;
 	int 		count;
-	TAP_ENTRY 	*entries;
+	TAP_ENTRY	*entries;
 	} TAP_IMAGE;
 
 typedef struct
 	{
-	imgtool_directory 	base;
+	imgtool_directory	base;
 	TAP_IMAGE	*image;
 	int			index;
 	} TAP_ITERATOR;

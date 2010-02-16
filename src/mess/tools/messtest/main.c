@@ -79,7 +79,7 @@ int CLIB_DECL main(int argc, char *argv[])
 	clock_t begin_time;
 	double elapsed_time;
 	core_options *messtest_options = NULL;
-	
+
 	test_count = 0;
 	failure_count = 0;
 	messtest_options = NULL;

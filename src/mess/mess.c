@@ -46,14 +46,14 @@ static char *filename_basename(char *filename)
 	// otherwise, return the whole thing
 	return filename;
 }
-		
+
 /*-------------------------------------------------
     mess_predevice_init - initialize devices for a specific
     running_machine
 -------------------------------------------------*/
 
 void mess_predevice_init(running_machine *machine)
-{	
+{
 	const char *image_name;
 	running_device *image;
 	image_device_info info;
@@ -76,10 +76,10 @@ void mess_predevice_init(running_machine *machine)
 			if ((image_name != NULL) && (image_name[0] != '\0'))
 			{
 				int result = INIT_FAIL;
-				
+
 				/* mark init state */
 				set_init_phase(image);
-				
+
 				/* try to load this image */
 				result = image_load(image, image_name);
 
@@ -90,7 +90,7 @@ void mess_predevice_init(running_machine *machine)
 					const char *image_err = image_error(image);
 
 					/* unload all images */
-					image_unload_all(machine);					
+					image_unload_all(machine);
 					/* FIXME: image_name is always empty in this message because of the image_unload_all() call */
 					fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
 						info.name,
@@ -111,7 +111,7 @@ void mess_predevice_init(running_machine *machine)
 			get_image_devices = (device_get_image_devices_func) image->get_config_fct(DEVINFO_FCT_GET_IMAGE_DEVICES);
 			if (get_image_devices != NULL)
 				(*get_image_devices)(image);
-		}	
+		}
 	}
 }
 
@@ -124,7 +124,7 @@ void mess_predevice_init(running_machine *machine)
 
 void mess_postdevice_init(running_machine *machine)
 {
-	running_device *device;	
+	running_device *device;
 
 	/* make sure that any required devices have been allocated */
     for (device = machine->devicelist.first(); device != NULL; device = device->next)

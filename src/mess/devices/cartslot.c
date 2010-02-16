@@ -389,7 +389,7 @@ static void add_device_with_subdevices(const running_device *_owner, device_type
 	device_list *devlist = &_owner->machine->devicelist;
 	const device_config *cfg = new device_config(&_owner->baseconfig(), _type, _tag, _clock);
 	running_device *dev = devlist->append(_owner->subtag(tempstring,_tag), new running_device(*_owner->machine, *cfg));
-	
+
 	const machine_config_token *tokens = (const machine_config_token *)dev->get_config_ptr(DEVINFO_PTR_MACHINE_CONFIG);
 	machine_config *config;
 	const device_config *config_dev;
@@ -398,13 +398,13 @@ static void add_device_with_subdevices(const running_device *_owner, device_type
 	{
 		config = machine_config_alloc(tokens);
 		for (config_dev = config->devicelist.first(); config_dev != NULL; config_dev = config_dev->next)
-		{					
+		{
 			device_config *new_cfg = new device_config(cfg, config_dev->type, config_dev->tag, config_dev->clock);
 			new_cfg->static_config = config_dev->static_config;
 			memcpy(
 				new_cfg->inline_config,
 				config_dev->inline_config,
-				new_cfg->get_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES));								
+				new_cfg->get_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES));
 			new_dev = devlist->append(dev->subtag(tempstring,config_dev->tag), new running_device(*_owner->machine, *new_cfg));
 			new_dev->owner = dev;
 		}
@@ -414,8 +414,8 @@ static void add_device_with_subdevices(const running_device *_owner, device_type
 
 static DEVICE_GET_IMAGE_DEVICES(cartslot)
 {
-	const cartslot_pcb_type *pcb_type;	
-	
+	const cartslot_pcb_type *pcb_type;
+
 	pcb_type = identify_pcb(device);
 	if (pcb_type != NULL)
 	{

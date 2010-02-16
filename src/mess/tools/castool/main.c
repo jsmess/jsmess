@@ -32,7 +32,7 @@
 #include "formats/csw_cas.h"
 #include "formats/fmsx_cas.h"
 #include "formats/gtp_cas.h"
-#include "formats/hect_tap.h" 
+#include "formats/hect_tap.h"
 #include "formats/jupi_tap.h"
 #include "formats/kim1_cas.h"
 #include "formats/lviv_lvt.h"

@@ -2208,8 +2208,8 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT      MACHINE     INPUT    INIT    COMPANY      FULLNAME            FLAGS */
-COMP( 1989, fmtowns,  0,    	0, 		towns, 		towns, 	 towns,  "Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
-COMP( 1989, fmtownsa, fmtowns,	0, 		towns, 		towns, 	 towns,  "Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
-CONS( 1993, fmtmarty, 0,    	0, 		marty, 		marty, 	 marty,  "Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
-CONS( 1994, carmarty, fmtmarty,	0, 		marty, 		marty, 	 marty,  "Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
+COMP( 1989, fmtowns,  0,    	0,		towns,		towns,	 towns,  "Fujitsu",   "FM-Towns",		 GAME_NOT_WORKING)
+COMP( 1989, fmtownsa, fmtowns,	0,		towns,		towns,	 towns,  "Fujitsu",   "FM-Towns (alternate)", GAME_NOT_WORKING)
+CONS( 1993, fmtmarty, 0,    	0,		marty,		marty,	 marty,  "Fujitsu",   "FM-Towns Marty",	 GAME_NOT_WORKING)
+CONS( 1994, carmarty, fmtmarty,	0,		marty,		marty,	 marty,  "Fujitsu",   "FM-Towns Car Marty",	 GAME_NOT_WORKING)
 

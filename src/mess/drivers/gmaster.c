@@ -10,7 +10,7 @@
 #include "includes/gmaster.h"
 
 
-#define MAIN_XTAL 	12000000
+#define MAIN_XTAL	12000000
 
 static struct {
     UINT8 data[8];

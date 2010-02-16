@@ -96,7 +96,7 @@ VIDEO_START( specimx )
 
 VIDEO_UPDATE( specimx )
 {
-  	UINT8 code,color;
+	UINT8 code,color;
 	int y, x, b;
 
 	for (x = 0; x < 48; x++)

@@ -9,10 +9,10 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- 2040 DOS 1 FDC rom
-	- Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
+    - 2040 DOS 1 FDC rom
+    - Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
     - error/activity LEDs
 
 */
@@ -130,7 +130,7 @@ INLINE c2040_t *get_safe_token(running_device *device)
 INLINE c2040_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == C2040) || (device->type == C3040) || (device->type == C4040) || 
+	assert((device->type == C2040) || (device->type == C3040) || (device->type == C4040) ||
 		(device->type == C8050) || (device->type == C8250) || (device->type == SFD1001));
 	return (c2040_config *)device->baseconfig().inline_config;
 }
@@ -157,21 +157,21 @@ INLINE void update_gcr_data(c2040_t *c2040)
 	{
 		/*
 
-			bit		description
+            bit     description
 
-			I0		SR0
-			I1		SR1
-			I2		SR2
-			I3		SR3
-			I4		SR4
-			I5		SR5
-			I6		SR6
-			I7		SR7
-			I8		SR8
-			I9		SR9
-			I10		R/_W SEL
+            I0      SR0
+            I1      SR1
+            I2      SR2
+            I3      SR3
+            I4      SR4
+            I5      SR5
+            I6      SR6
+            I7      SR7
+            I8      SR8
+            I9      SR9
+            I10     R/_W SEL
 
-		*/
+        */
 
 		c2040->i = (c2040->rw << 10) | (c2040->sr & 0x3ff);
 	}
@@ -179,21 +179,21 @@ INLINE void update_gcr_data(c2040_t *c2040)
 	{
 		/*
 
-			bit		description
+            bit     description
 
-			I0		PI0
-			I1		PI1
-			I2		PI2
-			I3		PI3
-			I4		MODE SEL
-			I5		PI4
-			I6		PI5
-			I7		PI6
-			I8		PI7
-			I9		0
-			I10		R/_W SEL
+            I0      PI0
+            I1      PI1
+            I2      PI2
+            I3      PI3
+            I4      MODE SEL
+            I5      PI4
+            I6      PI5
+            I7      PI6
+            I8      PI7
+            I9      0
+            I10     R/_W SEL
 
-		*/
+        */
 
 		c2040->i = (c2040->rw << 10) | ((c2040->pi & 0xf0) << 1) | (c2040->mode << 4) | (c2040->pi & 0x0f);
 	}
@@ -306,7 +306,7 @@ static void spindle_motor(c2040_t *c2040, int unit, int mtr)
 
 /*-------------------------------------------------
     micropolis_step_motor - Micropolis stepper
-	motor control
+    motor control
 -------------------------------------------------*/
 
 static void micropolis_step_motor(c2040_t *c2040, int unit, int mtr, int stp)
@@ -591,13 +591,13 @@ static READ8_DEVICE_HANDLER( riot1_pa_r )
         bit     description
 
         PA0     ATNA
-        PA1		DACO
-        PA2		RFDO
-        PA3		EOIO
-        PA4		DAVO
-        PA5		EOII
-        PA6		DAVI
-        PA7		_ATN
+        PA1     DACO
+        PA2     RFDO
+        PA3     EOIO
+        PA4     DAVO
+        PA5     EOII
+        PA6     DAVI
+        PA7     _ATN
 
     */
 
@@ -624,13 +624,13 @@ static WRITE8_DEVICE_HANDLER( riot1_pa_w )
         bit     description
 
         PA0     ATNA
-        PA1		DACO
-        PA2		RFDO
-        PA3		EOIO
-        PA4		DAVO
-        PA5		EOII
-        PA6		DAVI
-        PA7		_ATN
+        PA1     DACO
+        PA2     RFDO
+        PA3     EOIO
+        PA4     DAVO
+        PA5     EOII
+        PA6     DAVI
+        PA7     _ATN
 
     */
 
@@ -660,14 +660,14 @@ static READ8_DEVICE_HANDLER( riot1_pb_r )
 
         bit     description
 
-        PB0		DEVICE NUMBER SELECTION
-        PB1		DEVICE NUMBER SELECTION
-        PB2		DEVICE NUMBER SELECTION
-        PB3		ACT LED 1
-        PB4		ACT LED 0
-        PB5		ERR LED
-        PB6		DACI
-        PB7		RFDI
+        PB0     DEVICE NUMBER SELECTION
+        PB1     DEVICE NUMBER SELECTION
+        PB2     DEVICE NUMBER SELECTION
+        PB3     ACT LED 1
+        PB4     ACT LED 0
+        PB5     ERR LED
+        PB6     DACI
+        PB7     RFDI
 
     */
 
@@ -693,14 +693,14 @@ static WRITE8_DEVICE_HANDLER( riot1_pb_w )
 
         bit     description
 
-        PB0		DEVICE NUMBER SELECTION
-        PB1		DEVICE NUMBER SELECTION
-        PB2		DEVICE NUMBER SELECTION
-        PB3		ACT LED 1
-        PB4		ACT LED 0
-        PB5		ERR LED
-        PB6		DACI
-        PB7		RFDI
+        PB0     DEVICE NUMBER SELECTION
+        PB1     DEVICE NUMBER SELECTION
+        PB2     DEVICE NUMBER SELECTION
+        PB3     ACT LED 1
+        PB4     ACT LED 0
+        PB5     ERR LED
+        PB6     DACI
+        PB7     RFDI
 
     */
 
@@ -738,13 +738,13 @@ static READ8_DEVICE_HANDLER( via_pa_r )
         bit     description
 
         PA0     E0
-        PA1		E1
-        PA2		I2
-        PA3		E2
-        PA4		E4
-        PA5		E5
-        PA6		I7
-        PA7		E6
+        PA1     E1
+        PA2     I2
+        PA3     E2
+        PA4     E4
+        PA5     E5
+        PA6     I7
+        PA7     E6
 
     */
 
@@ -763,14 +763,14 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
         bit     description
 
-        PB0		S1A
-        PB1		S1B
-        PB2		S0A
-        PB3		S0B
-        PB4		MTR1
-        PB5		MTR0
-        PB6		
-        PB7		
+        PB0     S1A
+        PB1     S1B
+        PB2     S0A
+        PB3     S0B
+        PB4     MTR1
+        PB5     MTR0
+        PB6
+        PB7
 
     */
 
@@ -860,14 +860,14 @@ static READ8_DEVICE_HANDLER( c8050_via_pb_r )
 
         bit     description
 
-        PB0		S1A
-        PB1		S1B
-        PB2		S0A
-        PB3		S0B
-        PB4		MTR1
-        PB5		MTR0
-        PB6		PULL SYNC
-        PB7		SYNC
+        PB0     S1A
+        PB1     S1B
+        PB2     S0A
+        PB3     S0B
+        PB4     MTR1
+        PB5     MTR0
+        PB6     PULL SYNC
+        PB7     SYNC
 
     */
 
@@ -887,14 +887,14 @@ static WRITE8_DEVICE_HANDLER( c8050_via_pb_w )
 
         bit     description
 
-        PB0		S1A
-        PB1		S1B
-        PB2		S0A
-        PB3		S0B
-        PB4		MTR1
-        PB5		MTR0
-        PB6		PULL SYNC
-        PB7		SYNC
+        PB0     S1A
+        PB1     S1B
+        PB2     S0A
+        PB3     S0B
+        PB4     MTR1
+        PB5     MTR0
+        PB6     PULL SYNC
+        PB7     SYNC
 
     */
 
@@ -949,13 +949,13 @@ static UINT8 pi_r(running_device *device, UINT8 olddata)
         bit     description
 
         PA0     PI0
-        PA1		PI1
-        PA2		PI2
-        PA3		PI3
-        PA4		PI4
-        PA5		PI5
-        PA6		PI6
-        PA7		PI7
+        PA1     PI1
+        PA2     PI2
+        PA3     PI3
+        PA4     PI4
+        PA5     PI5
+        PA6     PI6
+        PA7     PI7
 
     */
 
@@ -971,13 +971,13 @@ static void pi_w(running_device *device, UINT8 newdata, UINT8 olddata)
         bit     description
 
         PA0     PI0
-        PA1		PI1
-        PA2		PI2
-        PA3		PI3
-        PA4		PI4
-        PA5		PI5
-        PA6		PI6
-        PA7		PI7
+        PA1     PI1
+        PA2     PI2
+        PA3     PI3
+        PA4     PI4
+        PA5     PI5
+        PA6     PI6
+        PA7     PI7
 
     */
 
@@ -993,13 +993,13 @@ static UINT8 miot_pb_r(running_device *device, UINT8 olddata)
         bit     description
 
         PB0     DRV SEL
-        PB1		DS0
-        PB2		DS1
-        PB3		WPS
-        PB4		
+        PB1     DS0
+        PB2     DS1
+        PB3     WPS
+        PB4
         PB5
-        PB6		SYNC
-        PB7		M6504 IRQ
+        PB6     SYNC
+        PB7     M6504 IRQ
 
     */
 
@@ -1023,13 +1023,13 @@ static void miot_pb_w(running_device *device, UINT8 newdata, UINT8 olddata)
         bit     description
 
         PB0     DRV SEL
-        PB1		DS0
-        PB2		DS1
-        PB3		WPS
-        PB4		
+        PB1     DS0
+        PB2     DS1
+        PB3     WPS
+        PB4
         PB5
-        PB6		SYNC
-        PB7		M6504 IRQ
+        PB6     SYNC
+        PB7     M6504 IRQ
 
     */
 
@@ -1074,13 +1074,13 @@ static UINT8 c8050_miot_pb_r(running_device *device, UINT8 olddata)
         bit     description
 
         PB0     DRV SEL
-        PB1		DS0
-        PB2		DS1
-        PB3		WPS
-        PB4		DRIVE TYPE (0=2A, 1=2C)
+        PB1     DS0
+        PB2     DS1
+        PB3     WPS
+        PB4     DRIVE TYPE (0=2A, 1=2C)
         PB5
-        PB6		(0=DS, 1=SS)
-        PB7		M6504 IRQ
+        PB6     (0=DS, 1=SS)
+        PB7     M6504 IRQ
 
     */
 
@@ -1110,13 +1110,13 @@ static void c8050_miot_pb_w(running_device *device, UINT8 newdata, UINT8 olddata
         bit     description
 
         PB0     DRV SEL
-        PB1		DS0
-        PB2		DS1
-        PB3		WPS
-        PB4		ODD HD (0=78-154, 1=1-77)
+        PB1     DS0
+        PB2     DS1
+        PB3     WPS
+        PB4     ODD HD (0=78-154, 1=1-77)
         PB5
-        PB6		(0=DS, 1=SS)
-        PB7		M6504 IRQ
+        PB6     (0=DS, 1=SS)
+        PB7     M6504 IRQ
 
     */
 
@@ -1266,14 +1266,14 @@ static MACHINE_DRIVER_START( c2040 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c2040_dos_map)
-	
+
 	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_16MHz/16, riot0_intf)
 	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_16MHz/16, riot1_intf)
 
 	/* controller */
 	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_16MHz/16)
 	MDRV_CPU_PROGRAM_MAP(c2040_fdc_map)
-	
+
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_16MHz/16, via_intf)
 	MDRV_MIOT6530_ADD(M6530_TAG, XTAL_16MHz/16, miot_intf)
 
@@ -1310,14 +1310,14 @@ static MACHINE_DRIVER_START( c8050 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
 	MDRV_CPU_PROGRAM_MAP(c8050_dos_map)
-	
+
 	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/12, riot0_intf)
 	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/12, riot1_intf)
 
 	/* controller */
 	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_12MHz/12)
 	MDRV_CPU_PROGRAM_MAP(c8050_fdc_map)
-	
+
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
 	MDRV_MIOT6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
@@ -1332,14 +1332,14 @@ static MACHINE_DRIVER_START( c8250 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
 	MDRV_CPU_PROGRAM_MAP(c8050_dos_map)
-	
+
 	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/12, riot0_intf)
 	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/12, riot1_intf)
 
 	/* controller */
 	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_12MHz/12)
 	MDRV_CPU_PROGRAM_MAP(c8050_fdc_map)
-	
+
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
 	MDRV_MIOT6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
@@ -1354,14 +1354,14 @@ static MACHINE_DRIVER_START( sfd1001 )
 	/* DOS */
 	MDRV_CPU_ADD(M6502_TAG, M6502, XTAL_12MHz/12)
 	MDRV_CPU_PROGRAM_MAP(sfd1001_dos_map)
-	
+
 	MDRV_RIOT6532_ADD(M6532_0_TAG, XTAL_12MHz/12, riot0_intf)
 	MDRV_RIOT6532_ADD(M6532_1_TAG, XTAL_12MHz/12, riot1_intf)
 
 	/* controller */
 	MDRV_CPU_ADD(M6504_TAG, M6502, XTAL_12MHz/12)
 	MDRV_CPU_PROGRAM_MAP(sfd1001_fdc_map)
-	
+
 	MDRV_VIA6522_ADD(M6522_TAG, XTAL_12MHz/12, c8050_via_intf)
 	MDRV_MIOT6530_ADD(M6530_TAG, XTAL_12MHz/12, c8050_miot_intf)
 
@@ -1413,16 +1413,16 @@ ROM_END
 
 /*
 
-	DOS/CONTROLLER ROMS FOR DIGITAL PCB #8050002
+    DOS/CONTROLLER ROMS FOR DIGITAL PCB #8050002
 
-	DESCRIPTION		PCB PART NO.		UL1			UH1			UK3
+    DESCRIPTION     PCB PART NO.        UL1         UH1         UK3
 
-	2.5 Micropolis	8050002-01		901482-07	901482-06	901483-03
-	2.5 Tandon		8050002-02		901482-07	901482-06	901483-04
-	2.7 Tandon		8050002-03		901887-01	901888-01	901884-01
-	2.7 Micropolis	8050002-04		901887-01	901888-01	901885-04
-	2.7 MPI 8050	8050002-05		901887-01	901888-01	901869-01
-	2.7 MPI 8250	8050002-06		901887-01	901888-01	901869-01
+    2.5 Micropolis  8050002-01      901482-07   901482-06   901483-03
+    2.5 Tandon      8050002-02      901482-07   901482-06   901483-04
+    2.7 Tandon      8050002-03      901887-01   901888-01   901884-01
+    2.7 Micropolis  8050002-04      901887-01   901888-01   901885-04
+    2.7 MPI 8050    8050002-05      901887-01   901888-01   901869-01
+    2.7 MPI 8250    8050002-06      901887-01   901888-01   901869-01
 
 */
 
@@ -1444,7 +1444,7 @@ ROM_START( c8050 ) // schematic 8050001
 	ROM_LOAD( "901884-01.uk3", 0x4000, 0x0400, NO_DUMP )
 	ROM_LOAD( "901885-04.uk3", 0x4000, 0x0400, CRC(bab998c9) SHA1(0dc9a3b60f1b866c63eebd882403532fc59fe57f) )
 	ROM_LOAD( "901869-01.uk3", 0x4000, 0x0400, CRC(2915327a) SHA1(3a9a80f72ce76e5f5c72513f8ef7553212912ae3) )
-	
+
 	/* GCR decoder */
 	ROM_LOAD( "901467.uk6",    0x4400, 0x0800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
 ROM_END

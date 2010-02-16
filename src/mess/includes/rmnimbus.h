@@ -1,7 +1,7 @@
-/* 
+/*
     rmnimbus.c
     Machine driver for the Research Machines Nimbus.
-    
+
     Phill Harvey-Smith
     2009-11-29.
 */
@@ -121,7 +121,7 @@ WRITE8_HANDLER( nimbus_disk_w );
 
 #define SCSIBUS_TAG             "scsibus"
 
-void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state); 
+void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state);
 
 /* Masks for writes to port 0x400 */
 #define FDC_DRIVE0_MASK 0x01
@@ -238,7 +238,7 @@ void nimbus_msm5205_vck(running_device *device);
 
 /* Nimbus sub-bios structures for debugging */
 
-typedef struct 
+typedef struct
 {
     UINT16  ofs_brush;
     UINT16  seg_brush;
@@ -247,7 +247,7 @@ typedef struct
     UINT16  count;
 } t_area_params;
 
-typedef struct 
+typedef struct
 {
     UINT16  ofs_font;
     UINT16  seg_font;

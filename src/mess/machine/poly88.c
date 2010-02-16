@@ -60,7 +60,7 @@ static TIMER_CALLBACK(keyboard_callback)
 	for(i = 0; i < 7; i++)
 	{
 
-		code = 	input_port_read(machine, keynames[i]);
+		code =	input_port_read(machine, keynames[i]);
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {

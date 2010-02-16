@@ -644,7 +644,7 @@ $(MESSOBJ)/atari.a:				\
 	$(MAME_VIDEO)/jaguar.o		\
 	$(MESS_FORMATS)/a26_cas.o	\
 	$(MESS_FORMATS)/atarist_dsk.o	\
-	$(MESS_DRIVERS)/atarist.o 	\
+	$(MESS_DRIVERS)/atarist.o	\
 	$(MESS_VIDEO)/atarist.o 	\
 	$(MESS_DRIVERS)/lynx.o		\
 	$(MESS_AUDIO)/lynx.o		\
@@ -727,11 +727,11 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_DRIVERS)/clcd.o		\
 
 $(MESSOBJ)/cbmshare.a:			\
-	$(MESS_FORMATS)/cbm_tap.o 	\
+	$(MESS_FORMATS)/cbm_tap.o	\
 	$(MESS_MACHINE)/6525tpi.o	\
 	$(MESS_MACHINE)/cbm.o		\
-	$(MESS_MACHINE)/cbmipt.o   	\
-	$(MESS_MACHINE)/c64.o    	\
+	$(MESS_MACHINE)/cbmipt.o	\
+	$(MESS_MACHINE)/c64.o   	\
 	$(MESS_MACHINE)/c65.o		\
 	$(MESS_MACHINE)/c128.o		\
 	$(MESS_VIDEO)/vdc8563.o		\
@@ -912,7 +912,7 @@ $(MESSOBJ)/gamepark.a:			\
 	$(MESS_DRIVERS)/gp32.o		\
 	$(MESS_DRIVERS)/gp2x.o		\
 
-$(MESSOBJ)/gce.a:	           	\
+$(MESSOBJ)/gce.a:	        	\
 	$(MESS_DRIVERS)/vectrex.o	\
 	$(MESS_VIDEO)/vectrex.o		\
 	$(MESS_MACHINE)/vectrex.o	\
@@ -1113,7 +1113,7 @@ $(MESSOBJ)/nintendo.a:			\
 	$(MAME_MACHINE)/snes.o		\
 	$(MAME_VIDEO)/snes.o		\
 	$(MESS_MACHINE)/snescart.o	\
-	$(MESS_DRIVERS)/snes.o	 	\
+	$(MESS_DRIVERS)/snes.o		\
 	$(MESS_DRIVERS)/n64.o		\
 	$(MAME_MACHINE)/n64.o		\
 	$(MAME_VIDEO)/n64.o			\
@@ -1275,7 +1275,7 @@ $(MESSOBJ)/sega.a:				\
 	$(MAME_DRIVERS)/megadriv.o  \
 	$(MESS_DRIVERS)/sg1000.o	\
 	$(MESS_DRIVERS)/dc.o		\
-	$(MAME_MACHINE)/dc.o 		\
+	$(MAME_MACHINE)/dc.o		\
 	$(MAME_MACHINE)/naomibd.o	\
 	$(MAME_MACHINE)/gdcrypt.o	\
 	$(MAME_VIDEO)/dc.o			\
@@ -1635,12 +1635,12 @@ $(MAME_MACHINE)/snes.o: 	$(MAMESRC)/machine/snesdsp1.c \
 				$(MAMESRC)/machine/snesst10.c \
 				$(MAMESRC)/machine/snes7110.c
 
-$(MESS_VIDEO)/gba.o: 		$(MESSSRC)/video/gbamode0.c \
+$(MESS_VIDEO)/gba.o:		$(MESSSRC)/video/gbamode0.c \
 				$(MESSSRC)/video/gbamode1.c \
 				$(MESSSRC)/video/gbamode2.c \
 				$(MESSSRC)/video/gbam345.c
 
-$(MESS_MACHINE)/nes_mmc.o: 	$(MESSSRC)/machine/nes_ines.c \
+$(MESS_MACHINE)/nes_mmc.o:	$(MESSSRC)/machine/nes_ines.c \
 				$(MESSSRC)/machine/nes_unif.c \
 
 

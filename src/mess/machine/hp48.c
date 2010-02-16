@@ -53,7 +53,7 @@ typedef struct
 	write8_space_func write;
 	void* data;                  /* non-NULL for banks */
 	int isnop;
-	
+
 	/* configurable part */
 	UINT8  state;                /* one of HP48_MODULE_ */
 	UINT32 base;                 /* base address */
@@ -801,7 +801,7 @@ static void hp48_apply_modules( running_machine *machine, void* param )
 		UINT32 end = base + (off_mask & nselect_mask);
 		char bank[10];
 		sprintf(bank,"bank%d",i);
-		
+
 		if ( hp48_modules[i].state != HP48_MODULE_CONFIGURED ) continue;
 
 		if ( (i == 4) && !nce2_enable ) continue;
@@ -1024,7 +1024,7 @@ static void hp48_fill_port( running_device* image )
 	hp48_modules[conf->module].isnop    = 0;
 	if (hp48_port_write[conf->port]) {
 		hp48_modules[conf->module].isnop    = 1;
-	} 
+	}
 	hp48_modules[conf->module].data     = hp48_port_data[conf->port];
 	hp48_apply_modules( image->machine, NULL );
 }

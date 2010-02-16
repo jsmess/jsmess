@@ -63,7 +63,7 @@ INLINE float get_dos_track(int track)
 
 /*-------------------------------------------------
     g64_get_heads_per_disk - returns the number
-	of heads in the disk image
+    of heads in the disk image
 -------------------------------------------------*/
 
 static int g64_get_heads_per_disk(floppy_image *floppy)
@@ -73,7 +73,7 @@ static int g64_get_heads_per_disk(floppy_image *floppy)
 
 /*-------------------------------------------------
     g64_get_tracks_per_disk - returns the number
-	of DOS tracks in the disk image
+    of DOS tracks in the disk image
 -------------------------------------------------*/
 
 static int g64_get_tracks_per_disk(floppy_image *floppy)
@@ -83,7 +83,7 @@ static int g64_get_tracks_per_disk(floppy_image *floppy)
 
 /*-------------------------------------------------
     get_track_offset - returns the offset within
-	the disk image for a given track
+    the disk image for a given track
 -------------------------------------------------*/
 
 static floperr_t get_track_offset(floppy_image *floppy, int track, UINT64 *offset)
@@ -103,8 +103,8 @@ static floperr_t get_track_offset(floppy_image *floppy, int track, UINT64 *offse
 }
 
 /*-------------------------------------------------
-	g64_read_track - reads a full track from the
-	disk image
+    g64_read_track - reads a full track from the
+    disk image
 -------------------------------------------------*/
 
 static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT64 offset, void *buffer, size_t buflen)
@@ -139,8 +139,8 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 }
 
 /*-------------------------------------------------
-	g64_write_track - writes a full track to the
-	disk image
+    g64_write_track - writes a full track to the
+    disk image
 -------------------------------------------------*/
 
 static floperr_t g64_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
@@ -149,7 +149,7 @@ static floperr_t g64_write_track(floppy_image *floppy, int head, int track, UINT
 }
 
 /*-------------------------------------------------
-	FLOPPY_IDENTIFY( g64_dsk_identify )
+    FLOPPY_IDENTIFY( g64_dsk_identify )
 -------------------------------------------------*/
 
 FLOPPY_IDENTIFY( g64_dsk_identify )
@@ -171,12 +171,12 @@ FLOPPY_IDENTIFY( g64_dsk_identify )
 }
 
 /*-------------------------------------------------
-	FLOPPY_CONSTRUCT( g64_dsk_construct )
+    FLOPPY_CONSTRUCT( g64_dsk_construct )
 -------------------------------------------------*/
 
 /*
 
-	G64 File Header Format
+    G64 File Header Format
 
   Bytes: $0000-0007: File signature "GCR-1541"
                0008: G64 version (presently only $00 defined)

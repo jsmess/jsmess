@@ -172,12 +172,12 @@ static WRITE_LINE_DEVICE_HANDLER( apricot_wd2793_intrq_w )
 	apricot_state *apricot = (apricot_state *)device->machine->driver_data;
 
 	pic8259_set_irq_line(apricot->pic8259, 4, state);
-//	i8089 external terminate channel 1
+//  i8089 external terminate channel 1
 }
 
 static WRITE_LINE_DEVICE_HANDLER( apricot_wd2793_drq_w )
 {
-//	i8089 data request channel 1
+//  i8089 data request channel 1
 }
 
 static const wd17xx_interface apricot_wd17xx_intf =
@@ -308,8 +308,8 @@ static ADDRESS_MAP_START( apricot_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE8("ic15", apricot_sio_r, apricot_sio_w, 0x00ff)
 	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", mc6845_address_w, 0x00ff)
 	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", mc6845_register_r, mc6845_register_w, 0x00ff)
-//	AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) 8089 channel attention 1
-//	AM_RANGE(0x72, 0x73) AM_MIRROR(0x04) 8089 channel attention 2
+//  AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) 8089 channel attention 1
+//  AM_RANGE(0x72, 0x73) AM_MIRROR(0x04) 8089 channel attention 2
 	AM_RANGE(0x78, 0x7f) AM_NOP /* unavailable */
 ADDRESS_MAP_END
 
@@ -370,7 +370,7 @@ static MACHINE_DRIVER_START( apricot )
 	MDRV_CPU_PROGRAM_MAP(apricot_mem)
 	MDRV_CPU_IO_MAP(apricot_io)
 
-//	MDRV_CPU_ADD("ic71", I8089, XTAL_15MHz / 3)
+//  MDRV_CPU_ADD("ic71", I8089, XTAL_15MHz / 3)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

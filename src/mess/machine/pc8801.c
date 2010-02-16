@@ -826,7 +826,7 @@ MACHINE_START( pc88srl )
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
 	upd1990a_oe_w(state->upd1990a, 1);
-	
+
 	timer_pulse(machine, ATTOTIME_IN_HZ(600), NULL, 0, pc8801_timer_interrupt);
 }
 

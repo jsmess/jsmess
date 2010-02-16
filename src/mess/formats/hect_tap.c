@@ -2,12 +2,12 @@
 
 Support for Micronique machine .K7 and *.FOR cassette images
 
-Note that the usual type for hector cassette is *.K7, 
-     the *.FOR type is only for programming screen in forth format. 
+Note that the usual type for hector cassette is *.K7,
+     the *.FOR type is only for programming screen in forth format.
 
-You can find some *.K7 file on serveral server in France 
+You can find some *.K7 file on serveral server in France
 (Micronique is a French factory) Enjoy !
- 
+
  jj.stacino@aliceadsl.fr
 
 Updated 3/1/10 : use real value for timing.
@@ -23,12 +23,12 @@ Updated 3/1/10 : use real value for timing.
 static int cas_size;
 
 
-int  Header_cycles = 77; /* Valeur Théorique 66 = 44100 * 1.5 / 1000  // mesuré sur jeu Formule1 = 1,75ms*/
-int  Zero_cycles =   27; /* Valeur Théorique 17 = 44100 * 0.4 / 1000  // mesuré sur jeu Formule1 = 0,61ms*/
-int  Un_cycles =     50; /* Valeur Théorique 40 = 44100 * 0.9 / 1000  // mesuré sur jeu Formule1 = 1,13ms*/
-/* Here I prefer use the value that I read on a real tape, and not the theorical value; note that these 
+int  Header_cycles = 77; /* Valeur Th?orique 66 = 44100 * 1.5 / 1000  // mesur? sur jeu Formule1 = 1,75ms*/
+int  Zero_cycles =   27; /* Valeur Th?orique 17 = 44100 * 0.4 / 1000  // mesur? sur jeu Formule1 = 0,61ms*/
+int  Un_cycles =     50; /* Valeur Th?orique 40 = 44100 * 0.9 / 1000  // mesur? sur jeu Formule1 = 1,13ms*/
+/* Here I prefer use the value that I read on a real tape, and not the theorical value; note that these
    value work best on my HRX...    Yo_fr   (jj.stacino@aliceadsl.fr)  */
-   
+
 /*******************************************************************
    Generate one high-low cycle of sample data
 ********************************************************************/
@@ -95,30 +95,30 @@ static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
 	sample_count = 0;
     block_count = 0;
     previous_block = 0;
-    
+
 	/* First 768 cycle of synchro */
-	sample_count += hector_tap_synchro( buffer, sample_count, 768-4 );		
-	
+	sample_count += hector_tap_synchro( buffer, sample_count, 768-4 );
+
 	/* on the entire file*/
     while( data_pos < cas_size )
 	{
 		UINT16	block_size;
 
         if (previous_block == 0xFE)
-          	    /* Starting a block with 150 cycle of synchro to let time to Hector to do the job ! */
+        	    /* Starting a block with 150 cycle of synchro to let time to Hector to do the job ! */
 	           sample_count += hector_tap_synchro( buffer, sample_count, 150 );
         else
                   /* Starting a block with 4 cycle of synchro */
 	           sample_count += hector_tap_synchro( buffer, sample_count, 4 );
 
        if (data_pos>1)
-                previous_block = casdata[data_pos-1]; 
+                previous_block = casdata[data_pos-1];
 
 		/* Handle block lenght on tape data */
 		block_size = casdata[data_pos] ;
-		if (block_size==0) 
+		if (block_size==0)
 		   block_size=256;
-		   
+
 		block_count++;
         sample_count += hector_tap_byte(buffer, sample_count, casdata[data_pos] );
         data_pos++;
@@ -136,7 +136,7 @@ static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
     }
     /*Finish by a zero*/
     sample_count += hector_tap_byte( buffer, sample_count, 0 );
-    
+
 	return sample_count;
 }
 /*******************************************************************
@@ -185,7 +185,7 @@ static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
 
     /*Finish by a zero*/
     sample_count += hector_tap_byte( buffer, sample_count, 0 );
-    
+
 	return sample_count;
 }
 /*******************************************************************

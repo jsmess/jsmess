@@ -41,7 +41,7 @@ struct _expected_dirent
 static const char *tempfile_name(void)
 {
 	static char buffer[256];
-//	osd_get_temp_filename(buffer, ARRAY_LENGTH(buffer), NULL);
+//  osd_get_temp_filename(buffer, ARRAY_LENGTH(buffer), NULL);
 	return buffer;
 }
 

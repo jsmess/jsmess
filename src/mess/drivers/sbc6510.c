@@ -1,18 +1,18 @@
 /***************************************************************************
-   
-        SBC6510 from Josip Perusanec 
+
+        SBC6510 from Josip Perusanec
 
         18/12/2009 Skeleton driver.
 
-	CPU MOS 6510 (1MHz)
-	ROM 4KB
-	RAM 128KB
-	CIA 6526 - for interrupt gen and scan of keyboard
-	YM2149/AY-3-8910 - sound + HDD/CF IDE 
-	GAL16V8 - address decoder
-	ATMEGA8 - gen. of PAL video signal (modified TellyMate)
-	keyboard of C64 computer used
-		
+    CPU MOS 6510 (1MHz)
+    ROM 4KB
+    RAM 128KB
+    CIA 6526 - for interrupt gen and scan of keyboard
+    YM2149/AY-3-8910 - sound + HDD/CF IDE
+    GAL16V8 - address decoder
+    ATMEGA8 - gen. of PAL video signal (modified TellyMate)
+    keyboard of C64 computer used
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -22,8 +22,8 @@
 
 static ADDRESS_MAP_START(sbc6510_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xdfff) AM_RAM 	
-	AM_RANGE(0xf000, 0xffff) AM_ROM 
+	AM_RANGE(0x0000, 0xdfff) AM_RAM
+	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -31,8 +31,8 @@ INPUT_PORTS_START( sbc6510 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(sbc6510) 
-{	
+static MACHINE_RESET(sbc6510)
+{
 }
 
 static VIDEO_START( sbc6510 )
@@ -77,9 +77,9 @@ static MACHINE_DRIVER_START( sbc6510 )
     MDRV_CPU_ADD("maincpu",M6510, XTAL_1MHz)
 	MDRV_CPU_CONFIG( sbc6510_m6510_interface )
     MDRV_CPU_PROGRAM_MAP(sbc6510_mem)
-	
+
     MDRV_MACHINE_RESET(sbc6510)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -92,13 +92,13 @@ static MACHINE_DRIVER_START( sbc6510 )
 
     MDRV_VIDEO_START(sbc6510)
     MDRV_VIDEO_UPDATE(sbc6510)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_1MHz)
 	MDRV_SOUND_CONFIG(sbc6510_ay_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)	
-	
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
 	MDRV_MOS6526R1_ADD("cia_0", XTAL_1MHz, sbc6510_ntsc_cia0)
 MACHINE_DRIVER_END
 
@@ -115,5 +115,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 2009, sbc6510,  0,       0, 	sbc6510, 	sbc6510, 	 0,   "Josip Perusanec",   "SBC6510",		GAME_NOT_WORKING)
+COMP( 2009, sbc6510,  0,       0,	sbc6510,	sbc6510,	 0,   "Josip Perusanec",   "SBC6510",		GAME_NOT_WORKING)
 

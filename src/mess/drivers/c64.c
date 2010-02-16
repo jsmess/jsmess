@@ -516,7 +516,7 @@ static PALETTE_INIT( c64 )
 {
 	int i;
 
-	for (i = 0; i < sizeof(c64_palette) / 3; i++) 
+	for (i = 0; i < sizeof(c64_palette) / 3; i++)
 	{
 		palette_set_color_rgb(machine, i, c64_palette[i * 3], c64_palette[i * 3 + 1], c64_palette[i * 3 + 2]);
 	}
@@ -629,7 +629,7 @@ static const vic2_interface c64_vic2_ntsc_intf = {
 	c64_lightpen_x_cb,
 	c64_lightpen_y_cb,
 	c64_lightpen_button_cb,
-	c64_dma_read, 
+	c64_dma_read,
 	c64_dma_read_color,
 	c64_vic_interrupt,
 	c64_rdy_cb
@@ -642,7 +642,7 @@ static const vic2_interface c64_vic2_pal_intf = {
 	c64_lightpen_x_cb,
 	c64_lightpen_y_cb,
 	c64_lightpen_button_cb,
-	c64_dma_read, 
+	c64_dma_read,
 	c64_dma_read_color,
 	c64_vic_interrupt,
 	c64_rdy_cb
@@ -655,7 +655,7 @@ static const vic2_interface ultimax_vic2_intf = {
 	c64_lightpen_x_cb,
 	c64_lightpen_y_cb,
 	c64_lightpen_button_cb,
-	c64_dma_read_ultimax, 
+	c64_dma_read_ultimax,
 	c64_dma_read_color,
 	c64_vic_interrupt,
 	c64_rdy_cb

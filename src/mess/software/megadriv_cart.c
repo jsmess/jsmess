@@ -18,15 +18,15 @@ SOFTWARE_START( f22a )
 	ROM_LOAD16_BYTE( "f-22_intercept_f-202-1.u2", 0x080001, 0x020000, CRC(d3d7cbb8) SHA1(72e56f858bfe88c2529939304ba49eee3fe14353) )
 	// no even rom (it becomes a 0x1a fill in the cart copier dump)
 	/*
-	Roms Labeled
+    Roms Labeled
 
-	F-22 Intercept F-202-4
-	(c)Electronic Arts 1991
-	All Rights Reserved
+    F-22 Intercept F-202-4
+    (c)Electronic Arts 1991
+    All Rights Reserved
 
-	F-22 Intercept F-202-1
-	(c)Electronic Arts 1991
-	All Rights Reserved
+    F-22 Intercept F-202-1
+    (c)Electronic Arts 1991
+    All Rights Reserved
     */
 SOFTWARE_END
 
@@ -40,8 +40,8 @@ SOFTWARE_START( fifa97 )
     FIFA 97 B1
     (c)ELECTRONIC ARTS 1996
     ALL RIGHTS RESERVED
-	S77481/00000046
-	9640
+    S77481/00000046
+    9640
     */
 SOFTWARE_END
 
@@ -168,9 +168,9 @@ SOFTWARE_START( zerotol )
     (C) ACCOLADE 1994
 
     ACCOLADE, INC
-	ZETSG LO
-	7500-00034A
-	(C) ACCOLADE 1994
+    ZETSG LO
+    7500-00034A
+    (C) ACCOLADE 1994
     */
 SOFTWARE_END
 
@@ -5622,67 +5622,67 @@ MEGADRIVE_ROM_LOAD( flavio, "debug flavio's dma test (pd).bin",                 
 
 // UNDUMPED / TO BE REDUMPED LIST
 //
-// 2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY)	PAL
-// 2IN1 (PSYCHIC PINBALL MICRO MACHINES)	PAL
-// AAAHH!!! REAL MONSTERS					PAL			dump check
-// ADVANCED DAISENRYAKU						JAPAN		we have Rev 0, Rev A needed
-// ARNOLD PALMER TOURNAMENT GOLF			PAL
-// AWESOME POSSUM							JAPAN
-// BATTLE SQUADRON							PAL
-// BEAVIS & BUTTHEAD						PAL
-// BUGS BUNNY IN DOUBLE TROUBLE				PAL
-// BULLS VS LAKERS							PAL
-// CAPTAIN LANG								JAPAN
-// CAPTAIN PLANET							ASIA
-// CENTURION								USA/PAL		needs proper dump
-// DAVIS CUP TENNIS							JAPAN
-// DRAGON'S REVENGE							JAPAN
-// DYNAMITE HEADDY SAMPLE					JAPAN
-// ECCO JR									USA/PAL		graphic corruption on later revision
-// ESWAT									PAL			dump check
-// EVANDER HOLYFIELD'S BOXING				PAL
-// EX-MUTANTS								PAL
-// F-22 (JUNE 1992)							USA/PAL		needs proper dump
-// FAERY TALE ADVENTURE						PAL
-// FATAL FURY 2								PAL			Australia-only PAL release
-// FERRARI GRAND PRIX CHALLENGE				PAL			we have Rev A, Rev 0 needed
-// FIFA SOCCER								JAPAN
-// FIRE SHARK								PAL			dump check
-// GAIN GROUND								PAL			revision order check
-// GALAXY FORCE II							ALL			we have Rev B, Rev 0 and Rev A needed
-// GO NET									JAPAN
-// HOOK										PAL
-// INTERNATIONAL SUPERSTAR SOCCER			BRAZIL
-// JEWEL MASTER								USA/PAL		we have Rev A, Rev 0 needed (does it match Japanese release?)
-// KING OF THE MONSTERS						JAPAN
-// MARBLE MADNESS							JAPAN
-// MIDNIGHT RESISTANCE						PAL
-// MOTHERBASE								PAL			32X cart
-// MUTANT LEAGUE FOOTBALL					PAL
-// NBA PLAYOFFS - BULLS VS BLAZERS			JAPAN		conflict in current info
-// NFL PRO FOOTBALL '94						JAPAN
-// OSAKA BANK MY LINE						JAPAN
-// OSAKA BANK MY LINE DEMO					JAPAN
-// PAC-PANIC								PAL
-// PAPERBOY 2								PAL
-// PGA TOUR GOLF							USA/PAL		we have v1.1 and v1.2, v1.0 needed (does it exist?)
-// PHANTASY STAR IV							PAL
-// PINK GOES TO HOLLYWOOD					PAL
-// ROAD RASH								JAPAN
-// ROAD RASH								USA/PAL		needs proper dump
-// ROBOCOP VERSUS THE TERMINATOR			JAPAN
-// SAN SAN									JAPAN
-// SHINING FORCE							PAL
-// SIDE POCKET								JAPAN/USA	conflict in current info
-// SMURFS									PAL			we have Rev A, Rev 0 needed
-// SPIDERMAN AND X-MEN ARCADE'S REVENGE		PAL
-// SUMISEI HOME TANMATSU					JAPAN
-// SUPER DAISENRYAKU						JAPAN		we have Rev 0, Rev A needed (confirmed by Ototo)
-// TOM & JERRY								JAPAN
-// VALIS III								JAPAN		we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
-// WONDER MIDI								JAPAN
-// WORLD CHAMPIONSHIP SOCCER II				PAL
-// WORLD CUP SOCCER							JAPAN/USA	we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
-// WORLD OF ILLUSION						JAPAN		we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
-// ZANY GOLF								PAL
-// ZOOM!									PAL
+// 2IN1 (COSMIC SPACEHEAD FANTASTIC DIZZY)  PAL
+// 2IN1 (PSYCHIC PINBALL MICRO MACHINES)    PAL
+// AAAHH!!! REAL MONSTERS                   PAL         dump check
+// ADVANCED DAISENRYAKU                     JAPAN       we have Rev 0, Rev A needed
+// ARNOLD PALMER TOURNAMENT GOLF            PAL
+// AWESOME POSSUM                           JAPAN
+// BATTLE SQUADRON                          PAL
+// BEAVIS & BUTTHEAD                        PAL
+// BUGS BUNNY IN DOUBLE TROUBLE             PAL
+// BULLS VS LAKERS                          PAL
+// CAPTAIN LANG                             JAPAN
+// CAPTAIN PLANET                           ASIA
+// CENTURION                                USA/PAL     needs proper dump
+// DAVIS CUP TENNIS                         JAPAN
+// DRAGON'S REVENGE                         JAPAN
+// DYNAMITE HEADDY SAMPLE                   JAPAN
+// ECCO JR                                  USA/PAL     graphic corruption on later revision
+// ESWAT                                    PAL         dump check
+// EVANDER HOLYFIELD'S BOXING               PAL
+// EX-MUTANTS                               PAL
+// F-22 (JUNE 1992)                         USA/PAL     needs proper dump
+// FAERY TALE ADVENTURE                     PAL
+// FATAL FURY 2                             PAL         Australia-only PAL release
+// FERRARI GRAND PRIX CHALLENGE             PAL         we have Rev A, Rev 0 needed
+// FIFA SOCCER                              JAPAN
+// FIRE SHARK                               PAL         dump check
+// GAIN GROUND                              PAL         revision order check
+// GALAXY FORCE II                          ALL         we have Rev B, Rev 0 and Rev A needed
+// GO NET                                   JAPAN
+// HOOK                                     PAL
+// INTERNATIONAL SUPERSTAR SOCCER           BRAZIL
+// JEWEL MASTER                             USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
+// KING OF THE MONSTERS                     JAPAN
+// MARBLE MADNESS                           JAPAN
+// MIDNIGHT RESISTANCE                      PAL
+// MOTHERBASE                               PAL         32X cart
+// MUTANT LEAGUE FOOTBALL                   PAL
+// NBA PLAYOFFS - BULLS VS BLAZERS          JAPAN       conflict in current info
+// NFL PRO FOOTBALL '94                     JAPAN
+// OSAKA BANK MY LINE                       JAPAN
+// OSAKA BANK MY LINE DEMO                  JAPAN
+// PAC-PANIC                                PAL
+// PAPERBOY 2                               PAL
+// PGA TOUR GOLF                            USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
+// PHANTASY STAR IV                         PAL
+// PINK GOES TO HOLLYWOOD                   PAL
+// ROAD RASH                                JAPAN
+// ROAD RASH                                USA/PAL     needs proper dump
+// ROBOCOP VERSUS THE TERMINATOR            JAPAN
+// SAN SAN                                  JAPAN
+// SHINING FORCE                            PAL
+// SIDE POCKET                              JAPAN/USA   conflict in current info
+// SMURFS                                   PAL         we have Rev A, Rev 0 needed
+// SPIDERMAN AND X-MEN ARCADE'S REVENGE     PAL
+// SUMISEI HOME TANMATSU                    JAPAN
+// SUPER DAISENRYAKU                        JAPAN       we have Rev 0, Rev A needed (confirmed by Ototo)
+// TOM & JERRY                              JAPAN
+// VALIS III                                JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
+// WONDER MIDI                              JAPAN
+// WORLD CHAMPIONSHIP SOCCER II             PAL
+// WORLD CUP SOCCER                         JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
+// WORLD OF ILLUSION                        JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
+// ZANY GOLF                                PAL
+// ZOOM!                                    PAL

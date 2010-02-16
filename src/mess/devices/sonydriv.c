@@ -495,6 +495,6 @@ DEVICE_GET_INFO( sonydriv )
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(sonydriv_floppy); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(sonydriv_floppy); break;
 
-		default: 									DEVICE_GET_INFO_CALL(floppy);				break;
+		default:									DEVICE_GET_INFO_CALL(floppy);				break;
 	}
 }

@@ -101,8 +101,8 @@ VIDEO_START( mc8020 )
 VIDEO_UPDATE( mc8020 )
 {
 	int x,y,j,b;
-  	UINT16 addr;
-  	int xpos;
+	UINT16 addr;
+	int xpos;
 
 	for(y = 0; y < 8; y++ )
 	{
@@ -115,7 +115,7 @@ VIDEO_UPDATE( mc8020 )
 			{
 			  for(b = 0; b < 6; b++ )
 			  {
-		  		*BITMAP_ADDR16(bitmap, y*16+j, xpos+b ) = (prom[code*8 + j] >> (5-b)) & 1;
+				*BITMAP_ADDR16(bitmap, y*16+j, xpos+b ) = (prom[code*8 + j] >> (5-b)) & 1;
 			  }
 			}
 			xpos += 6;

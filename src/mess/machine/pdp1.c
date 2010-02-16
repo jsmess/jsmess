@@ -366,11 +366,11 @@ MACHINE_START( pdp1 )
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
 	add_exit_callback(machine, pdp1_machine_stop);
-	
+
 	tape_reader.timer = timer_alloc(machine, reader_callback, NULL);
 	tape_puncher.timer = timer_alloc(machine, puncher_callback, NULL);
 	typewriter.tyo_timer = timer_alloc(machine, tyo_callback, NULL);
-	dpy_timer = timer_alloc(machine, dpy_callback, NULL);	
+	dpy_timer = timer_alloc(machine, dpy_callback, NULL);
 }
 
 
@@ -471,7 +471,7 @@ DEVICE_IMAGE_UNLOAD( pdp1_tape )
 		break;
 	}
 }
-#endif 
+#endif
 /*
     Read a byte from perforated tape
 */

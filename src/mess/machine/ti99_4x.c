@@ -2702,7 +2702,7 @@ static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data)
 {
 	int i;
 	char bank_name[10];
-	
+
 	if (offset == 1)
 	{
 		if (ti99_4p_mapper_on != data)

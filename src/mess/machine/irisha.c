@@ -52,8 +52,8 @@ static const char *const keynames[] = {
 static READ8_DEVICE_HANDLER (irisha_8255_portb_r )
 {
   if (irisha_keypressed==1) {
-  	irisha_keypressed =0;
-  	return 0x80;
+	irisha_keypressed =0;
+	return 0x80;
   }
 
 	return 0x00;
@@ -68,7 +68,7 @@ static READ8_DEVICE_HANDLER (irisha_8255_portc_r )
 READ8_HANDLER (irisha_keyboard_r)
 {
 	UINT8 keycode;
- 	if (irisha_keyboard_cnt!=0 && irisha_keyboard_cnt<11) {
+	if (irisha_keyboard_cnt!=0 && irisha_keyboard_cnt<11) {
 		keycode = input_port_read(space->machine, keynames[irisha_keyboard_cnt-1]) ^ 0xff;
 	} else {
 		keycode = 0xff;

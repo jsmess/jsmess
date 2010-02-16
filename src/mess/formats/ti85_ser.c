@@ -292,7 +292,7 @@ static void ti85_convert_data_to_stream (const UINT8* file_data, unsigned int si
 	unsigned int i, bits;
 
 	for (i=0; i<size; i++)
- 		for (bits = 0; bits < 8; bits++)
+		for (bits = 0; bits < 8; bits++)
 			serial_data[i*8+bits] = (file_data[i]>>bits) & 0x01;
 }
 
@@ -307,7 +307,7 @@ static void ti85_convert_stream_to_data (const UINT8* serial_data, UINT32 size, 
 	for (i=0; i<size; i++)
 	{
 		data[i] = 0;
- 		for (bits = 0; bits < 8; bits++)
+		for (bits = 0; bits < 8; bits++)
 			data[i] |= serial_data[i*8+bits]<<bits;
 	}
 }

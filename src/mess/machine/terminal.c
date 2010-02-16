@@ -213,7 +213,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 		switch(data) {
 			case 0x07 : // bell
 						break;
-			case 0x08: 	if (term->x_pos!=0) {
+			case 0x08:	if (term->x_pos!=0) {
 							term->x_pos--;
 						}
 						break;
@@ -221,7 +221,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 							term->x_pos ++;
 						} while ((term->x_pos % 8)!=0);
 						break;
-			case 0x0a: 	term->y_pos++;
+			case 0x0a:	term->y_pos++;
 						term->x_pos = 0;
 						if (term->y_pos==TERMINAL_HEIGHT) {
 							terminal_scroll_line(device);
@@ -232,7 +232,7 @@ WRITE8_DEVICE_HANDLER ( terminal_write )
 							term->y_pos--;
 						}
 						break;
-			case 0x0d: 	term->x_pos = 0;
+			case 0x0d:	term->x_pos = 0;
 						break;
 			case 0x1e:  term->x_pos = 0;
 						term->y_pos = 0;
@@ -293,7 +293,7 @@ UINT8 terminal_keyboard_handler(running_machine *machine, devcb_resolved_write8 
 	UINT8 ctrl  = BIT(input_port_read(machine, "TERM_LINEC"),0);
 	i = *scan_line;
 	{
-		code = 	input_port_read(machine, keynames[i]);
+		code =	input_port_read(machine, keynames[i]);
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {

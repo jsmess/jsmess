@@ -49,13 +49,13 @@ typedef struct
 	{
 	imgtool_image			base;
 	char			*file_name;
-	imgtool_stream 			*file_handle;
+	imgtool_stream			*file_handle;
 	int 			size, format, disks;
 	} DSK_IMAGE;
 
 typedef struct
 	{
-	imgtool_directory 	base;
+	imgtool_directory	base;
 	DSK_IMAGE	*image;
 	int			index;
 	} DSK_ITERATOR;

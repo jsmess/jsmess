@@ -327,7 +327,7 @@ static TIMER_CALLBACK(keyboard_callback)
 	for(i = 0; i < 7; i++)
 	{
 
-		code = 	input_port_read(machine, keynames[i]);
+		code =	input_port_read(machine, keynames[i]);
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {
@@ -532,5 +532,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( ????, nanos,  0,       0, 	nanos, 	nanos, 	 0,  	  "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow",   "Nanos",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, nanos,  0,       0, 	nanos,	nanos,	 0, 	  "Ingenieurhochschule fur Seefahrt Warnemunde/Wustrow",   "Nanos",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

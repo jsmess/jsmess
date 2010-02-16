@@ -62,7 +62,7 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 	/* load RAM contents */
 	apexc_cylinder_t *cyl = (apexc_cylinder_t *)image->token;
 	cyl->writable = image_is_writable(image);
-	
+
 	image_fread(image, memory_region(image->machine, "maincpu"), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
 	{	/* fix endianness */
@@ -74,7 +74,7 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 		for (i=0; i < /*0x2000*/0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 	}
-#endif	
+#endif
 
 	return INIT_PASS;
 }
@@ -117,19 +117,19 @@ static DEVICE_GET_INFO( apexc_cylinder )
 {
 	switch ( state )
 	{
-		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;           			break;
+		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;          			break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(apexc_cylinder_t);						break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
-		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_CYLINDER;                                	break;
+		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_CYLINDER;                              	break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 0;                                        	break;
 		case DEVINFO_INT_IMAGE_RESET_ON_LOAD:	    info->i = 1;                                        	break;
 
 		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( apexc_cylinder );          	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( apexc_cylinder );				break;
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( apexc_cylinder ); 	break;
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( apexc_cylinder );	break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(apexc_cylinder );	break;
 		case DEVINFO_STR_NAME:		                strcpy( info->s, "APEXC Cylinder");	                    break;
 		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Cylinder");	                    	break;
@@ -144,7 +144,7 @@ static DEVICE_GET_INFO( apexc_cylinder )
 
 #define MDRV_APEXC_CYLINDER_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, APEXC_CYLINDER, 0)
-	
+
 
 /*
     APEXC tape support
@@ -207,14 +207,14 @@ static DEVICE_GET_INFO(apexc_tape_puncher)
 {
 	switch ( state )
 	{
-		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;           			break;
+		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;          			break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(apexc_tape_t);							break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
-		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_PUNCHTAPE;                                	break;
+		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_PUNCHTAPE;                             	break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 0;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                        	break;
-		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME(apexc_tape_puncher);          	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 1;                                        	break;
+		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME(apexc_tape_puncher);        	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(apexc_tape_puncher);				break;
 
@@ -240,8 +240,8 @@ static DEVICE_GET_INFO(apexc_tape_reader)
 		case DEVINFO_STR_NAME:		                strcpy(info->s, "APEXC Tape Reader");	                    break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;		
-		default: 									DEVICE_GET_INFO_CALL(apexc_tape_puncher);	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 0;                                        	break;
+		default:									DEVICE_GET_INFO_CALL(apexc_tape_puncher);	break;
 	}
 }
 
@@ -268,7 +268,7 @@ static WRITE8_DEVICE_HANDLER(tape_write)
 {
 	UINT8 data5 = (data & 0x1f);
 
-	if (image_exists(device)) 
+	if (image_exists(device))
 		image_fwrite(device, & data5, 1);
 
 	apexc_teletyper_putchar(device->machine, data & 0x1f);	/* display on screen */

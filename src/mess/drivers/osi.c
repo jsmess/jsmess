@@ -937,7 +937,7 @@ static DRIVER_INIT( c1p )
 
 //    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY            FULLNAME
 COMP( 1978, sb2m600b,	0,		0,	osi600,   osi600,    0,		"Ohio Scientific", "Superboard II Model 600 (Rev. B)", GAME_NOT_WORKING)
-//COMP( 1980, sb2m600c, 0,      	0,      osi600c,  osi600,    0,		"Ohio Scientific", "Superboard II Model 600 (Rev. C)", GAME_NOT_WORKING)
+//COMP( 1980, sb2m600c, 0,          0,      osi600c,  osi600,    0,     "Ohio Scientific", "Superboard II Model 600 (Rev. C)", GAME_NOT_WORKING)
 COMP( 1980, c1p,	sb2m600b,	0,	c1p,	  osi600,    c1p,	"Ohio Scientific", "Challenger 1P Series 2", GAME_NOT_WORKING)
 COMP( 1980, c1pmf,	sb2m600b,	0,	c1pmf,	  osi600,    c1p,	"Ohio Scientific", "Challenger 1P MF Series 2", GAME_NOT_WORKING)
 COMP( 1979, uk101,	sb2m600b,	0,	uk101,	  uk101,     0, 	"Compukit",        "UK101", GAME_NOT_WORKING | GAME_NO_SOUND)

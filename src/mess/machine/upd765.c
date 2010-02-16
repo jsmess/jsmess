@@ -2396,7 +2396,7 @@ DEVICE_GET_INFO( upd765b )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd765b);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(upd765a);				break;
+		default:										DEVICE_GET_INFO_CALL(upd765a);				break;
 	}
 }
 
@@ -2410,7 +2410,7 @@ DEVICE_GET_INFO( smc37c78 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(smc37c78);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(upd765a);				break;
+		default:										DEVICE_GET_INFO_CALL(upd765a);				break;
 	}
 }
 
@@ -2424,6 +2424,6 @@ DEVICE_GET_INFO( upd72065 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd72065);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(upd765a);				break;
+		default:										DEVICE_GET_INFO_CALL(upd765a);				break;
 	}
 }

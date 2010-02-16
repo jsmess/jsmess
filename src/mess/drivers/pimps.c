@@ -82,5 +82,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( ????, pimps,  0,       0, 	pimps, 	pimps, 	 0,  		"Henry Colford",   "PIMPS",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, pimps,  0,       0, 	pimps,	pimps,	 0, 		"Henry Colford",   "PIMPS",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

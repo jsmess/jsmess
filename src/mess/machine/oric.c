@@ -118,7 +118,7 @@ static void oric_keyboard_sense_refresh(running_machine *machine)
 	int input_port_data;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
- 	input_port_data = input_port_read(machine, keynames[oric_keyboard_line]);
+	input_port_data = input_port_read(machine, keynames[oric_keyboard_line]);
 
 	/* go through all bits in line */
 	for (i=0; i<8; i++)
@@ -474,7 +474,7 @@ static void oric_install_apple2_interface(running_machine *machine)
 
 	memory_install_write8_handler(space, 0x0300, 0x030f, 0, 0, oric_IO_w);
 	memory_install_write8_device_handler(space, fdc, 0x0310, 0x031f, 0, 0, applefdc_w);
-	memory_set_bankptr(machine, "bank4", 	memory_region(machine, "maincpu") + 0x014000 + 0x020);
+	memory_set_bankptr(machine, "bank4",	memory_region(machine, "maincpu") + 0x014000 + 0x020);
 }
 
 

@@ -72,7 +72,7 @@ struct dmk_tag
 		/* For every sector (10) 301 bytes */
 		#define DMK_IDAM_LEN			7	/* IDAM (0xFE, Track, 0x00, Sector, 0x00, CRChi, CRClo) */
 		#define DMK_ID_GAP_LEN			17	/* GAP2 (11 bytes 0xFF and 6 bytes 0x00) */
-		#define DMK_DAM_LEN  			1	/* Data Address Mark (0xFB) */
+		#define DMK_DAM_LEN 			1	/* Data Address Mark (0xFB) */
 		#define DMK_DATA_LEN			256 /* Data */
 		#define DMK_DATA_CRC_LEN		2	/* Data CRC (CRChi, CRClo) */
 		#define DMK_DATA_GAP_LEN		18  /* GAP3 (12 bytes 0xFF and 6 bytes 0x00) (not for last sector) */

@@ -1,10 +1,10 @@
 /*
     SCSIBus.h
-    
+
     Implementation of a raw SCSI/SASI bus for machines that don't use a SCSI
-    controler chip such as the RM Nimbus, which implements it as a bunch of 
+    controler chip such as the RM Nimbus, which implements it as a bunch of
     74LS series chips.
-    
+
 */
 
 #ifndef _SCSIBUS_H_
@@ -23,8 +23,8 @@
 #define MDRV_SCSIBUS_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, SCSIBUS, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
-    
-    
+
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
@@ -40,7 +40,7 @@
 
 // Perhaps thse should be in scsi.h ?
 #define SCSI_PHASE_BUS_FREE 8
-#define SCSI_PHASE_SELECT   9   
+#define SCSI_PHASE_SELECT   9
 
 #define REQ_DELAY_NS    90
 #define ACK_DELAY_NS    90
@@ -71,7 +71,7 @@ typedef struct _SCSIBus_interface SCSIBus_interface;
 struct _SCSIBus_interface
 {
     const SCSIConfigTable *scsidevs;		/* SCSI devices */
-    void (*line_change_cb)(running_device *device, UINT8 line, UINT8 state);    
+    void (*line_change_cb)(running_device *device, UINT8 line, UINT8 state);
 };
 
 /* SCSI Bus read/write */

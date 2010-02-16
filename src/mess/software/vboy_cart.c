@@ -49,14 +49,14 @@ VBOY_ROM_LOAD( waterwld,  "waterworld (usa).bin",                               
 SOFTWARE_LIST_START( vboy_cart )
 	SOFTWARE( 3dtetris,  0,        1996, "Nintendo", "3-D Tetris (USA)", 0, 0 )                       /* Id: VUE-VPBE-USA - Developers: T&E Soft */
 	SOFTWARE( galactic,  0,        1995, "Nintendo", "Galactic Pinball (Jpn, USA)", 0, 0 )            /* Id: VUE-VGPJ-JPN/USA - Developers: Intelligent Systems - Releases: 1995-07-01 (JPN) */
-	SOFTWARE( golf,      0,        1995, "Nintendo", "Golf (USA)", 0, 0 )                             /* Id: VUE-VVGE-USA - Developers: T&E Soft */   
+	SOFTWARE( golf,      0,        1995, "Nintendo", "Golf (USA)", 0, 0 )                             /* Id: VUE-VVGE-USA - Developers: T&E Soft */
 	SOFTWARE( innsmout,  0,        1995, "I'Max", "Innsmouth no Yakata (Jpn)", 0, 0 )                 /* Id: VUE-VIMJ-JPN - Developers: Betop (I'Max) - Releases: 1995-10-13 (JPN) */
 	SOFTWARE( jackbros,  0,        1995, "Atlus", "Jack Bros. (USA)", 0, 0 )                          /* Id: VUE-VJBE-USA - Developers: Atlus  */
 	SOFTWARE( jackbrosj, jackbros, 1995, "Atlus", "Jack Bros. no Meiro de Hiihoo! (Jpn)", 0, 0 )      /* Id: VUE-VJBJ-JPN - Developers: Atlus - Releases: 1995-09-29 (JPN) */
 	SOFTWARE( mariocla,  0,        1995, "Nintendo", "Mario Clash (Jpn, USA)", 0, 0 )                 /* Id: VUE-VMCJ-JPN/USA - Developers: Nintendo R&D1 - Releases: 1995-09-28 (JPN) */
 	SOFTWARE( marioten,  0,        1995, "Nintendo", "Mario's Tennis (Jpn, USA)", 0, 0 )              /* Id: VUE-VMTJ-JPN/USA - Developers: Nintendo R&D1 / Tose Software - Releases: 1995-07-21 (JPN) */
-	SOFTWARE( nesterfb,  0,        1996, "Nintendo", "Nester's Funky Bowling (USA)", 0, 0 )           /* Id: VUE-VNFE-USA - Developers: Nintendo IRD */ 
-	SOFTWARE( panicbom,  0,        1995, "Nintendo", "Panic Bomber (USA)", 0, 0 )                     /* Id: VUE-VH2E-USA - Developers: Raizing */ 
+	SOFTWARE( nesterfb,  0,        1996, "Nintendo", "Nester's Funky Bowling (USA)", 0, 0 )           /* Id: VUE-VNFE-USA - Developers: Nintendo IRD */
+	SOFTWARE( panicbom,  0,        1995, "Nintendo", "Panic Bomber (USA)", 0, 0 )                     /* Id: VUE-VH2E-USA - Developers: Raizing */
 	SOFTWARE( redalarmj, redalarm, 1995, "T&E Soft", "Red Alarm (Jpn)", 0, 0 )                        /* Id: VUE-VREJ-JPN - Developers: T&E Soft - Releases: 1995-07-21 (JPN) */
 	SOFTWARE( redalarm,  0,        1995, "Nintendo", "Red Alarm (USA)", 0, 0 )                        /* Id: VUE-VREE-USA - Developers: T&E Soft */
 	SOFTWARE( sdgundam,  0,        1995, "Bandai", "SD Gundam - Dimension War (Jpn)", 0, 0 )          /* Id: VUE-VSDJ-JPN - Developers: Bandai? - Releases: 1995-12-22 (JPN) */

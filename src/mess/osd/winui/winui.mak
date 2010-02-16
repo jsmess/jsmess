@@ -13,7 +13,7 @@ WINUISRC = $(SRC)/osd/winui
 WINUIOBJ = $(OBJ)/osd/winui
 
 OBJDIRS += $(WINUIOBJ)
-	
+
 MESS_WINUISRC = $(SRC)/mess/osd/winui
 MESS_WINUIOBJ = $(OBJ)/mess/osd/winui
 OBJDIRS += $(MESS_WINUIOBJ)
@@ -52,7 +52,7 @@ WINUIOBJS += \
 	$(WINUIOBJ)/mui_main.o \
 	$(MESS_WINUIOBJ)/messui.o \
 	$(MESS_WINUIOBJ)/optionsms.o \
- 	$(MESS_WINUIOBJ)/layoutms.o \
+	$(MESS_WINUIOBJ)/layoutms.o \
 	$(MESS_WINUIOBJ)/msuiutil.o \
 	$(MESS_WINUIOBJ)/propertiesms.o \
 	$(MESS_WINUIOBJ)/swconfig.o \
@@ -64,7 +64,7 @@ WINUIOBJS += \
 RESFILEUI = $(MESS_WINUIOBJ)/messui.res
 
 #-------------------------------------------------
-# rules for creating helpids.c 
+# rules for creating helpids.c
 #-------------------------------------------------
 
 $(WINUIOBJ)/helpids.o : $(WINUIOBJ)/helpids.c

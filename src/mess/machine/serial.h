@@ -130,7 +130,7 @@ void serial_connection_set_in_callback(running_machine *machine, struct serial_c
 void serial_connection_out(running_machine *machine, struct serial_connection *connection);
 
 /* join two serial connections */
-void serial_connection_link(running_machine *machine, struct serial_connection *connection_a, struct serial_connection *connection_b);  
+void serial_connection_link(running_machine *machine, struct serial_connection *connection_a, struct serial_connection *connection_b);
 
 
 /*******************************************************************************/

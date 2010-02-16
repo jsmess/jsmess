@@ -41,14 +41,14 @@ static struct
 } p2000t_ports;
 
 /*
-	Keyboard port 0x0x
+    Keyboard port 0x0x
 
-	If the keyboard interrupt is enabled, all keyboard matrix rows are
-	connected and reading from either of these ports will give the
-	keyboard status (FF=no key pressed)
+    If the keyboard interrupt is enabled, all keyboard matrix rows are
+    connected and reading from either of these ports will give the
+    keyboard status (FF=no key pressed)
 
-	If the keyboard interrupt is disabled, reading one of these ports
-	will read the corresponding keyboard matrix row
+    If the keyboard interrupt is disabled, reading one of these ports
+    will read the corresponding keyboard matrix row
 */
 READ8_HANDLER (	p2000t_port_000f_r )
 {
@@ -155,7 +155,7 @@ WRITE8_HANDLER ( p2000t_port_505f_w )
     bit 6 - Unused
     bit 7 - Unused
 
-	When the DISAS is active, the CPU has the highest priority and
+    When the DISAS is active, the CPU has the highest priority and
     video refresh is disabled when the CPU accesses video memory
 
 */

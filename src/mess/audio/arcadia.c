@@ -142,7 +142,7 @@ static STREAM_UPDATE( arcadia_update )
 
 			if (token->pos >= token->size){
 
-				//calculate new noise bit (	taps: 0000T000T)
+				//calculate new noise bit ( taps: 0000T000T)
 				unsigned char newBit = token->lfsr & 1;         //first tap
 				newBit = (newBit ^ ((token->lfsr & 0x10)?1:0) );//xor with second tap
 

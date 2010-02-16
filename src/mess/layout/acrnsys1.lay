@@ -14,7 +14,7 @@
 		<rect>
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="0.0" green="0.0" blue="0.0" />
-		</rect>	
+		</rect>
 	</element>
 
 	<view name="LEDs only">

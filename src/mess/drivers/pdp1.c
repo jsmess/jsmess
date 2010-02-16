@@ -126,8 +126,8 @@ static INPUT_PORTS_START( pdp1 )
 	PORT_BIT( 0000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Address Switch 14") PORT_CODE(KEYCODE_EQUALS)
 	PORT_BIT( 0000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Address Switch 15") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Address Switch 16") PORT_CODE(KEYCODE_W)
-   	PORT_BIT( 0000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Address Switch 17") PORT_CODE(KEYCODE_E)
-   	PORT_BIT( 0000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Address Switch 18") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Address Switch 17") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Address Switch 18") PORT_CODE(KEYCODE_R)
 
 	PORT_START("TWDMSB")		/* 4: operator control panel test word switches MSB */
 	PORT_BIT(    0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 1") PORT_CODE(KEYCODE_A)
@@ -148,8 +148,8 @@ static INPUT_PORTS_START( pdp1 )
 	PORT_BIT( 0000020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 14") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0000010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 15") PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0000004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 16") PORT_CODE(KEYCODE_V)
-   	PORT_BIT( 0000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 17") PORT_CODE(KEYCODE_B)
-   	PORT_BIT( 0000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 18") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0000002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 17") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Test Word Switch 18") PORT_CODE(KEYCODE_N)
 
 	/*
         Note that I can see 2 additional keys whose purpose is unknown to me.
@@ -385,58 +385,58 @@ ROM_END
 /*
 static void pdp1_punchtape_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PUNCHTAPE; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 2; break;
+    switch(state)
+    {
+        case MESS_DEVINFO_INT_TYPE:                         info->i = IO_PUNCHTAPE; break;
+        case MESS_DEVINFO_INT_COUNT:                            info->i = 2; break;
 
-		case MESS_DEVINFO_PTR_START:							info->start = DEVICE_START_NAME(pdp1_tape); break;
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_tape); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_tape); break;
-		case MESS_DEVINFO_PTR_GET_DISPOSITIONS:				info->getdispositions = pdp1_get_open_mode; break;
+        case MESS_DEVINFO_PTR_START:                            info->start = DEVICE_START_NAME(pdp1_tape); break;
+        case MESS_DEVINFO_PTR_LOAD:                         info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_tape); break;
+        case MESS_DEVINFO_PTR_UNLOAD:                       info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_tape); break;
+        case MESS_DEVINFO_PTR_GET_DISPOSITIONS:             info->getdispositions = pdp1_get_open_mode; break;
 
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "tap,rim"); break;
-	}
+        case MESS_DEVINFO_STR_FILE_EXTENSIONS:              strcpy(info->s = device_temp_str(), "tap,rim"); break;
+    }
 }
 
 static void pdp1_printer_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_PRINTER; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+    switch(state)
+    {
+        case MESS_DEVINFO_INT_TYPE:                         info->i = IO_PRINTER; break;
+        case MESS_DEVINFO_INT_READABLE:                     info->i = 0; break;
+        case MESS_DEVINFO_INT_WRITEABLE:                        info->i = 1; break;
+        case MESS_DEVINFO_INT_CREATABLE:                        info->i = 1; break;
+        case MESS_DEVINFO_INT_COUNT:                            info->i = 1; break;
 
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_typewriter); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_typewriter); break;
+        case MESS_DEVINFO_PTR_LOAD:                         info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_typewriter); break;
+        case MESS_DEVINFO_PTR_UNLOAD:                       info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_typewriter); break;
 
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "typ"); break;
-	}
+        case MESS_DEVINFO_STR_FILE_EXTENSIONS:              strcpy(info->s = device_temp_str(), "typ"); break;
+    }
 }
 
 static void pdp1_cylinder_getinfo(const mess_device_class *devclass, UINT32 state, union devinfo *info)
 {
-	switch(state)
-	{
-		case MESS_DEVINFO_INT_TYPE:							info->i = IO_CYLINDER; break;
-		case MESS_DEVINFO_INT_READABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_WRITEABLE:						info->i = 1; break;
-		case MESS_DEVINFO_INT_CREATABLE:						info->i = 0; break;
-		case MESS_DEVINFO_INT_COUNT:							info->i = 1; break;
+    switch(state)
+    {
+        case MESS_DEVINFO_INT_TYPE:                         info->i = IO_CYLINDER; break;
+        case MESS_DEVINFO_INT_READABLE:                     info->i = 1; break;
+        case MESS_DEVINFO_INT_WRITEABLE:                        info->i = 1; break;
+        case MESS_DEVINFO_INT_CREATABLE:                        info->i = 0; break;
+        case MESS_DEVINFO_INT_COUNT:                            info->i = 1; break;
 
-		case MESS_DEVINFO_PTR_LOAD:							info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_drum); break;
-		case MESS_DEVINFO_PTR_UNLOAD:						info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_drum); break;
-		
-		case MESS_DEVINFO_STR_FILE_EXTENSIONS:				strcpy(info->s = device_temp_str(), "drm"); break;
-	}
+        case MESS_DEVINFO_PTR_LOAD:                         info->load = DEVICE_IMAGE_LOAD_NAME(pdp1_drum); break;
+        case MESS_DEVINFO_PTR_UNLOAD:                       info->unload = DEVICE_IMAGE_UNLOAD_NAME(pdp1_drum); break;
+
+        case MESS_DEVINFO_STR_FILE_EXTENSIONS:              strcpy(info->s = device_temp_str(), "drm"); break;
+    }
 }
 
 static SYSTEM_CONFIG_START(pdp1)
-	CONFIG_DEVICE(pdp1_punchtape_getinfo)
-	CONFIG_DEVICE(pdp1_printer_getinfo)
-	CONFIG_DEVICE(pdp1_cylinder_getinfo)
+    CONFIG_DEVICE(pdp1_punchtape_getinfo)
+    CONFIG_DEVICE(pdp1_printer_getinfo)
+    CONFIG_DEVICE(pdp1_cylinder_getinfo)
 SYSTEM_CONFIG_END
 */
 
@@ -447,4 +447,4 @@ SYSTEM_CONFIG_END
 ***************************************************************************/
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT    COMPANY FULLNAME */
-COMP( 1961, pdp1,	  0, 		0,		pdp1,	  pdp1, 	0,		"Digital Equipment Corporation",  "PDP-1" , GAME_NO_SOUND)
+COMP( 1961, pdp1,	  0,		0,		pdp1,	  pdp1, 	0,		"Digital Equipment Corporation",  "PDP-1" , GAME_NO_SOUND)

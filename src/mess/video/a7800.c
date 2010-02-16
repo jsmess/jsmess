@@ -146,9 +146,9 @@ static void maria_draw_scanline(running_machine *machine)
 			pal = READ_MEM(dl+1) >> 5;
 			ind = 0x00;
 			dl+=4;
-	 	}
+		}
 
-	 	mode = maria_rm | maria_write_mode;
+		mode = maria_rm | maria_write_mode;
 
 		/*logerror("%x DL: ADR=%x  width=%x  hpos=%x  pal=%x  mode=%x  ind=%x\n",maria_scanline,graph_adr,width,hpos,pal,mode,ind );*/
 
@@ -159,19 +159,19 @@ static void maria_draw_scanline(running_machine *machine)
 			/* Do indirect mode */
 			if (ind)
 			{
-	 			c = READ_MEM(graph_adr + x) & 0xFF;
-	 			data_addr= (maria_charbase | c) + (maria_offset << 8);
-	 			if( maria_cwidth )
+				c = READ_MEM(graph_adr + x) & 0xFF;
+				data_addr= (maria_charbase | c) + (maria_offset << 8);
+				if( maria_cwidth )
 					ind_bytes = 2;
 			}
 			else
 			{
-	 			data_addr = graph_adr + x + (maria_offset  << 8);
+				data_addr = graph_adr + x + (maria_offset  << 8);
 			}
 
- 			if ( (maria_holey & 0x02) && ((data_addr & 0x9000) == 0x9000))
+			if ( (maria_holey & 0x02) && ((data_addr & 0x9000) == 0x9000))
 				continue;
- 			if ( (maria_holey & 0x01) && ((data_addr & 0x8800) == 0x8800))
+			if ( (maria_holey & 0x01) && ((data_addr & 0x8800) == 0x8800))
 				continue;
 
 			while (ind_bytes > 0)
@@ -179,7 +179,7 @@ static void maria_draw_scanline(running_machine *machine)
 				ind_bytes--;
 				d = READ_MEM(data_addr++);
 
-			 	switch (mode)
+				switch (mode)
 				{
 					case 0x00:  /* 160A (160x2) */
 					case 0x01:  /* 160A (160x2) */
@@ -214,7 +214,7 @@ static void maria_draw_scanline(running_machine *machine)
 							scanline[hpos + 1] = maria_palette[pal][c];
 						}
 						inc_hpos_by_2();
-					 	break;
+						break;
 
 					case 0x02: /* 320D used by Jinks! */
 						c = pal & 0x04;
@@ -246,7 +246,7 @@ static void maria_draw_scanline(running_machine *machine)
 						}
 						inc_hpos_by_2();
 
-					 	break;
+						break;
 
 					case 0x03:  /* MODE 320A */
 						if (d & 0xC0 || maria_kangaroo)
@@ -276,7 +276,7 @@ static void maria_draw_scanline(running_machine *machine)
 							scanline[hpos + 1] = maria_palette[pal][(d & 0x01) << 1];
 						}
 						inc_hpos_by_2();
-					 	break;
+						break;
 
 					case 0x04:  /* 160B (160x4) */
 					case 0x05:  /* 160B (160x4) */
@@ -295,9 +295,9 @@ static void maria_draw_scanline(running_machine *machine)
 							scanline[hpos + 1] = maria_palette[(pal & 0x04) | (d & 0x03)][c];
 						}
 						inc_hpos_by_2();
-					 	break;
+						break;
 
-				 	case 0x06:  /* MODE 320B */
+					case 0x06:  /* MODE 320B */
 						if (d & 0xCC || maria_kangaroo)
 						{
 							scanline[hpos + 0] = maria_palette[pal][((d & 0x80) >> 6) | ((d & 0x08) >> 3)];
@@ -331,7 +331,7 @@ static void maria_draw_scanline(running_machine *machine)
 
 				}	/* endswitch (mode) */
 			}	/* endwhile (ind_bytes > 0)*/
-	 	}	/* endfor (x=0; x<width; x++) */
+		}	/* endfor (x=0; x<width; x++) */
 	}	/* endwhile (READ_MEM(dl + 1) != 0) */
 }
 

@@ -641,4 +641,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, elwro800,  0,       0, 	elwro800, 	elwro800, 	 0,  "Elwro",   "800 Junior",		0)
+COMP( 1986, elwro800,  0,       0,	elwro800,	elwro800,	 0,  "Elwro",   "800 Junior",		0)

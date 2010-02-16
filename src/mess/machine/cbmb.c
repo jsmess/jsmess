@@ -362,8 +362,8 @@ DRIVER_INIT( p500 )
 
 MACHINE_RESET( cbmb )
 {
-//removed	cbm_drive_0_config (IEEE8ON ? IEEE : 0, 8);
-//removed	cbm_drive_1_config (IEEE9ON ? IEEE : 0, 9);
+//removed   cbm_drive_0_config (IEEE8ON ? IEEE : 0, 8);
+//removed   cbm_drive_1_config (IEEE9ON ? IEEE : 0, 9);
 }
 
 
@@ -490,7 +490,7 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 
 	filetype = image_filetype(image);
 
- 	if (!mame_stricmp(filetype, "crt"))
+	if (!mame_stricmp(filetype, "crt"))
 	{
 	/* We temporarily remove .crt loading. Previous versions directly used
     the same routines used to load C64 .crt file, but I seriously doubt the

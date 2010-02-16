@@ -632,38 +632,38 @@ Additional note about natural keyboard support: currently,
 	PORT_BIT (0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_DEL_PAD)	PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 
 static INPUT_PORTS_START( msx )
- 	PORT_START("KEY0")
+	PORT_START("KEY0")
 	KEYB_ROW0
 	KEYB_ROW1
 
- 	PORT_START("KEY1")
+	PORT_START("KEY1")
 	KEYB_ROW2
 	KEYB_ROW3
 
- 	PORT_START("KEY2")
+	PORT_START("KEY2")
 	KEYB_ROW4
 	KEYB_ROW5
 
- 	PORT_START("KEY3")
+	PORT_START("KEY3")
 	KEYB_ROW6
 	KEYB_ROW7
 
- 	PORT_START("KEY4")
+	PORT_START("KEY4")
 	KEYB_ROW8
 	PORT_BIT (0xff00, IP_ACTIVE_LOW, IPT_UNUSED)
 
- 	PORT_START("KEY5")
+	PORT_START("KEY5")
 	PORT_BIT (0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_INCLUDE( msx_dips )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( msxuk )
- 	PORT_START("KEY0")
+	PORT_START("KEY0")
 	KEYB_ROW0
 	KEYB_ROW1
 
- 	PORT_START("KEY1")
+	PORT_START("KEY1")
 	PORT_BIT (0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_QUOTE)			PORT_CHAR('\'') PORT_CHAR('"')
 	PORT_BIT (0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_BACKSLASH)		PORT_CHAR('\xA3') PORT_CHAR('~')
 	PORT_BIT (0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA)			PORT_CHAR(',') PORT_CHAR('<')
@@ -674,19 +674,19 @@ static INPUT_PORTS_START( msxuk )
 	PORT_BIT (0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)				PORT_CHAR('b') PORT_CHAR('B')
 	KEYB_ROW3
 
- 	PORT_START("KEY2")
+	PORT_START("KEY2")
 	KEYB_ROW4
 	KEYB_ROW5
 
- 	PORT_START("KEY3")
+	PORT_START("KEY3")
 	KEYB_ROW6
 	KEYB_ROW7
 
- 	PORT_START("KEY4")
+	PORT_START("KEY4")
 	KEYB_ROW8
 	PORT_BIT (0xff00, IP_ACTIVE_LOW, IPT_UNUSED)
 
- 	PORT_START("KEY5")
+	PORT_START("KEY5")
 	PORT_BIT (0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_INCLUDE( msx_dips )
@@ -733,19 +733,19 @@ INPUT_PORTS_END
 	PORT_BIT (0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_B)			PORT_CHAR('b') PORT_CHAR('B')
 
 static INPUT_PORTS_START( msxjp )
- 	PORT_START("KEY0")
+	PORT_START("KEY0")
 	KEYB_JAP_ROW0
 	KEYB_JAP_ROW1
 
- 	PORT_START("KEY1")
+	PORT_START("KEY1")
 	KEYB_JAP_ROW2
 	KEYB_ROW3
 
- 	PORT_START("KEY2")
+	PORT_START("KEY2")
 	KEYB_ROW4
 	KEYB_ROW5
 
- 	PORT_START("KEY3")
+	PORT_START("KEY3")
 	PORT_BIT (0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)						PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT (0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)						PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT (0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_PGUP)		PORT_CHAR(UCHAR_MAMEKEY(F6))
@@ -756,30 +756,30 @@ static INPUT_PORTS_START( msxjp )
 	PORT_BIT (0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3  F8") PORT_CODE(KEYCODE_F3)		PORT_CHAR(UCHAR_MAMEKEY(F3))
 	KEYB_ROW7
 
- 	PORT_START("KEY4")
+	PORT_START("KEY4")
 	KEYB_ROW8
 	PORT_BIT (0xff00, IP_ACTIVE_LOW, IPT_UNUSED)
 
- 	PORT_START("KEY5")
+	PORT_START("KEY5")
 	PORT_BIT (0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_INCLUDE( msx_dips )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( msxkr )
- 	PORT_START("KEY0")
+	PORT_START("KEY0")
 	KEYB_JAP_ROW0
 	KEYB_KOR_ROW1
 
- 	PORT_START("KEY1")
+	PORT_START("KEY1")
 	KEYB_JAP_ROW2
 	KEYB_ROW3
 
- 	PORT_START("KEY2")
+	PORT_START("KEY2")
 	KEYB_ROW4
 	KEYB_ROW5
 
- 	PORT_START("KEY3")
+	PORT_START("KEY3")
 	PORT_BIT (0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)						PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT (0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)						PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT (0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_PGUP)		PORT_CHAR(UCHAR_MAMEKEY(F6))
@@ -790,38 +790,38 @@ static INPUT_PORTS_START( msxkr )
 	PORT_BIT (0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3  F8") PORT_CODE(KEYCODE_F3)		PORT_CHAR(UCHAR_MAMEKEY(F3))
 	KEYB_ROW7
 
- 	PORT_START("KEY4")
+	PORT_START("KEY4")
 	KEYB_ROW8
 	PORT_BIT (0xff00, IP_ACTIVE_LOW, IPT_UNUSED)
 
- 	PORT_START("KEY5")
+	PORT_START("KEY5")
 	PORT_BIT (0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_INCLUDE( msx_dips )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotbit )
- 	PORT_START("KEY0")
+	PORT_START("KEY0")
 	KEYB_HOTBIT_ROW0
 	KEYB_HOTBIT_ROW1
 
- 	PORT_START("KEY1")
+	PORT_START("KEY1")
 	KEYB_HOTBIT_ROW2
 	KEYB_ROW3
 
- 	PORT_START("KEY2")
+	PORT_START("KEY2")
 	KEYB_ROW4
 	KEYB_ROW5
 
- 	PORT_START("KEY3")
+	PORT_START("KEY3")
 	KEYB_ROW6
 	KEYB_ROW7
 
- 	PORT_START("KEY4")
+	PORT_START("KEY4")
 	KEYB_ROW8
 	PORT_BIT (0xff00, IP_ACTIVE_LOW, IPT_UNUSED)
 
- 	PORT_START("KEY5")
+	PORT_START("KEY5")
 	PORT_BIT (0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_INCLUDE( msx_dips )
@@ -836,100 +836,100 @@ INPUT_PORTS_END
 	PORT_BIT (0xf000, IP_ACTIVE_LOW, IPT_UNUSED)	\
 
 static INPUT_PORTS_START( expert11 )
- 	PORT_START("KEY0")
+	PORT_START("KEY0")
 	KEYB_EXPERT11_ROW0
 	KEYB_EXPERT11_ROW1
 
- 	PORT_START("KEY1")
+	PORT_START("KEY1")
 	KEYB_EXPERT11_ROW2
 	KEYB_ROW3
 
- 	PORT_START("KEY2")
+	PORT_START("KEY2")
 	KEYB_ROW4
 	KEYB_ROW5
 
- 	PORT_START("KEY3")
+	PORT_START("KEY3")
 	KEYB_EXPERT11_ROW6
 	KEYB_ROW7
 
- 	PORT_START("KEY4")
+	PORT_START("KEY4")
 	KEYB_ROW8
 	KEYB_EXPERT11_ROW9
 
- 	PORT_START("KEY5")
+	PORT_START("KEY5")
 	PORT_BIT (0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_INCLUDE( msx_dips )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( expert10 )
- 	PORT_START("KEY0")
+	PORT_START("KEY0")
 	KEYB_ROW0
 	KEYB_ROW1
 
- 	PORT_START("KEY1")
+	PORT_START("KEY1")
 	KEYB_EXPERT10_ROW2
 	KEYB_ROW3
 
- 	PORT_START("KEY2")
+	PORT_START("KEY2")
 	KEYB_ROW4
 	KEYB_ROW5
 
- 	PORT_START("KEY3")
+	PORT_START("KEY3")
 	KEYB_EXPERT11_ROW6
 	KEYB_ROW7
 
- 	PORT_START("KEY4")
+	PORT_START("KEY4")
 	KEYB_ROW8
 	KEYB_EXPERT11_ROW9
 
- 	PORT_START("KEY5")
+	PORT_START("KEY5")
 	PORT_BIT (0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_INCLUDE( msx_dips )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( msx2 )
- 	PORT_START("KEY0")
+	PORT_START("KEY0")
 	KEYB_ROW0
 	KEYB_ROW1
 
- 	PORT_START("KEY1")
+	PORT_START("KEY1")
 	KEYB_ROW2
 	KEYB_ROW3
 
- 	PORT_START("KEY2")
+	PORT_START("KEY2")
 	KEYB_ROW4
 	KEYB_ROW5
 
- 	PORT_START("KEY3")
+	PORT_START("KEY3")
 	KEYB_ROW6
 	KEYB_ROW7
 
- 	PORT_START("KEY4")
+	PORT_START("KEY4")
 	KEYB_ROW8
 	KEYB_ROW9
 
- 	PORT_START("KEY5")
+	PORT_START("KEY5")
 	KEYB_ROW10
 
 	PORT_INCLUDE( msx_dips )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( msx2jp )
- 	PORT_START("KEY0")
+	PORT_START("KEY0")
 	KEYB_JAP_ROW0
 	KEYB_JAP_ROW1
 
- 	PORT_START("KEY1")
+	PORT_START("KEY1")
 	KEYB_JAP_ROW2
 	KEYB_ROW3
 
- 	PORT_START("KEY2")
+	PORT_START("KEY2")
 	KEYB_ROW4
 	KEYB_ROW5
 
- 	PORT_START("KEY3")
+	PORT_START("KEY3")
 	PORT_BIT (0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)						PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT (0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)						PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT (0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_PGUP)		PORT_CHAR(UCHAR_MAMEKEY(F6))
@@ -940,30 +940,30 @@ static INPUT_PORTS_START( msx2jp )
 	PORT_BIT (0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3  F8") PORT_CODE(KEYCODE_F3)		PORT_CHAR(UCHAR_MAMEKEY(F3))
 	KEYB_ROW7
 
- 	PORT_START("KEY4")
+	PORT_START("KEY4")
 	KEYB_ROW8
 	KEYB_ROW9
 
- 	PORT_START("KEY5")
+	PORT_START("KEY5")
 	KEYB_ROW10
 
 	PORT_INCLUDE( msx_dips )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( msx2kr )
- 	PORT_START("KEY0")
+	PORT_START("KEY0")
 	KEYB_JAP_ROW0
 	KEYB_KOR_ROW1
 
- 	PORT_START("KEY1")
+	PORT_START("KEY1")
 	KEYB_JAP_ROW2
 	KEYB_ROW3
 
- 	PORT_START("KEY2")
+	PORT_START("KEY2")
 	KEYB_ROW4
 	KEYB_ROW5
 
- 	PORT_START("KEY3")
+	PORT_START("KEY3")
 	PORT_BIT (0x0001, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)						PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT (0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)						PORT_CHAR(UCHAR_SHIFT_2)
 	PORT_BIT (0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_PGUP)		PORT_CHAR(UCHAR_MAMEKEY(F6))
@@ -974,11 +974,11 @@ static INPUT_PORTS_START( msx2kr )
 	PORT_BIT (0x0080, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("F3  F8") PORT_CODE(KEYCODE_F3)		PORT_CHAR(UCHAR_MAMEKEY(F3))
 	KEYB_ROW7
 
- 	PORT_START("KEY4")
+	PORT_START("KEY4")
 	KEYB_ROW8
 	PORT_BIT (0xff00, IP_ACTIVE_LOW, IPT_UNUSED)
 
- 	PORT_START("KEY5")
+	PORT_START("KEY5")
 	PORT_BIT (0xffff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_INCLUDE( msx_dips )
@@ -1203,7 +1203,7 @@ MSX_LAYOUT_INIT (ax170)
 	MSX_LAYOUT_SLOT (1, 0, 1, 2, ROM, 0x8000, 0x8000)
 	MSX_LAYOUT_SLOT (2, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM, 0x10000, 0x0000) 	/* 64KB RAM */
+	MSX_LAYOUT_SLOT (3, 2, 0, 4, RAM, 0x10000, 0x0000)	/* 64KB RAM */
 MSX_LAYOUT_END
 
 /* MSX - Canon V-10 */
@@ -1216,7 +1216,7 @@ ROM_END
 MSX_LAYOUT_INIT (canonv10)
 	MSX_LAYOUT_SLOT (0, 0, 0, 2, ROM, 0x8000, 0x0000)
 	MSX_LAYOUT_SLOT (1, 0, 0, 4, CARTRIDGE1, 0x0000, 0x0000)
-	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0xC000) 	/* 16KB RAM */
+	MSX_LAYOUT_SLOT (2, 0, 3, 1, RAM, 0x4000, 0xC000)	/* 16KB RAM */
 	MSX_LAYOUT_SLOT (3, 0, 0, 4, CARTRIDGE2, 0x0000, 0x0000)
 MSX_LAYOUT_END
 
@@ -1976,7 +1976,7 @@ ROM_START (cx5m128)
 	ROM_REGION (0x18000, "maincpu",0)
 	ROM_LOAD ("cx5m128bios.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
 	ROM_LOAD ("cx5m128ext.rom",  0x8000, 0x4000, CRC(feada82e) SHA1(48b0c2ff1f1e407cc44394219f7b3878efaa919f))
-	ROM_LOAD ("sfg05.rom", 		0xc000, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321))
+	ROM_LOAD ("sfg05.rom",		0xc000, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321))
 	ROM_LOAD ("yrm502.rom", 	0x14000,0x4000, CRC(5330fe21) SHA1(7b1798561ee1844a7d6432924fbee9b4fc591c19))
 ROM_END
 
@@ -1996,7 +1996,7 @@ ROM_START (cx5m2)
 	ROM_REGION (0x14000, "maincpu",0)
 	ROM_LOAD ("cx5m2bios.rom", 0x0000, 0x8000, CRC(507b2caa) SHA1(0dde59e8d98fa524961cd37b0e100dbfb42cf576))
 	ROM_LOAD ("cx5m2ext.rom",  0x8000, 0x4000, CRC(feada82e) SHA1(48b0c2ff1f1e407cc44394219f7b3878efaa919f))
-	ROM_LOAD ("sfg05.rom", 		 0xc000, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321))
+	ROM_LOAD ("sfg05.rom",		 0xc000, 0x8000, CRC(2425c279) SHA1(d956167e234f60ad916120437120f86fc8c3c321))
 ROM_END
 
 MSX_LAYOUT_INIT (cx5m2)
@@ -3783,7 +3783,7 @@ MSX_DRIVER_LIST
 	MSX_DRIVER (fsa1wx)
 	MSX_DRIVER (fsa1wxa)
 	MSX_DRIVER (fsa1wsx)
- 	MSX_DRIVER (hbf1xdj)
+	MSX_DRIVER (hbf1xdj)
 	MSX_DRIVER (hbf1xv)
 	MSX_DRIVER (phc70fd)
 	MSX_DRIVER (phc70fd2)
@@ -3801,7 +3801,7 @@ MSX_DRIVER_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT     INIT   COMPANY              FULLNAME */
 COMP(1983, msx,	     0,		0,	msx_pal,  msx,	    msx,      "ASCII & Microsoft", "MSX" , 0)
 
-COMP(1983, ax170,  	msx,	0,	msx_pal,  msx,      msx,     "Al Alamiah", "AX-170" , 0)
+COMP(1983, ax170,	msx,	0,	msx_pal,  msx,      msx,     "Al Alamiah", "AX-170" , 0)
 COMP(1983, canonv10,  msx,	0,	msx_pal,  msx,      msx,     "Canon", "V-10" , 0)
 COMP(1983, canonv20,  msx,	0,	msx_pal,  msx,      msx,     "Canon", "V-20" , 0)
 COMP(1984, dpc100,   msx,	0,	msx,	  msxkr,    msx,     "Daewoo", "IQ-1000 DPC-100 (Korea)" , 0)
@@ -3814,8 +3814,8 @@ COMP(1984, expert13, msx,	0,	msx,	  expert11, msx,     "Gradiente", "Expert 1.3 
 COMP(1985, expertdp, msx,	0,	msx,	  expert11, msx,     "Gradiente", "Expert DDPlus (Brazil)", 0 )
 COMP(1984, expertpl, msx,	0,	msx,	  expert11, msx,     "Gradiente", "Expert Plus (Brazil)" , 0)
 COMP(1983, jvchc7gb,  msx,	0,	msx_pal,  msx,      msx,     "JVC", "HC-7GB" , 0)
-COMP(1983, mlf80,  	  msx,	0,	msx_pal,  msx,      msx,     "Mitsubishi", "ML-F80" , 0)
-COMP(1983, mlfx1, 	  msx,	0,	msx_pal,  msx,      msx,     "Mitsubishi", "ML-FX1" , 0)
+COMP(1983, mlf80,	  msx,	0,	msx_pal,  msx,      msx,     "Mitsubishi", "ML-F80" , 0)
+COMP(1983, mlfx1,	  msx,	0,	msx_pal,  msx,      msx,     "Mitsubishi", "ML-FX1" , 0)
 COMP(1984, cf1200,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "CF-1200 (Japan)" , 0)
 COMP(1983, cf2000,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "CF-2000 (Japan)" , 0)
 COMP(1984, cf2700,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "CF-2700 (Japan)" , 0)
@@ -3823,20 +3823,20 @@ COMP(1984, cf3000,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushit
 COMP(1985, cf3300,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "CF-3300 (Japan)", 0 )
 COMP(1985, fs1300,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "FS-1300 (Japan)" , 0)
 COMP(1985, fs4000,   msx,	0,  msx,      msxjp,    msx,     "National / Matsushita", "FS-4000 (Japan)" , 0)
-COMP(1983, nms801, 	  msx,	0,	msx_pal,  msx,      msx,     "Philips", "NMS-801" , 0)
+COMP(1983, nms801,	  msx,	0,	msx_pal,  msx,      msx,     "Philips", "NMS-801" , 0)
 COMP(1984, vg8000,  msx,	0,	msx,	  msx,      msx,     "Philips",	 "VG-8000" , GAME_NOT_WORKING)
 COMP(1984, vg8010,  msx,	0,	msx,	  msx,      msx,     "Philips",	 "VG-8010" , GAME_NOT_WORKING)
 COMP(1984, vg8010f,  msx,	0,	msx,	  msx,      msx,     "Philips",	 "VG-8010F" , GAME_NOT_WORKING)
 COMP(1985, vg802000,  msx,	0,	msx,	  msx,      msx,     "Philips",	 "VG-8020-00" , 0)
 COMP(1985, vg802020, msx,	0,	msx,	  msx,      msx,     "Philips",	 "VG-8020-20" , 0)
-COMP(1985, piopx7, 	  msx,	0,	msx_pal,  msx,      msx,     "Pioneer",	 "PX-07" , 0)
-COMP(1985, mpc100, 	  msx,	0,	msx_pal,  msx,      msx,     "Sanyo",	 "MPC-100" , 0)
+COMP(1985, piopx7,	  msx,	0,	msx_pal,  msx,      msx,     "Pioneer",	 "PX-07" , 0)
+COMP(1985, mpc100,	  msx,	0,	msx_pal,  msx,      msx,     "Sanyo",	 "MPC-100" , 0)
 COMP(1985, hotbit11, msx,	0,	msx,	  hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.1" , 0)
 COMP(1985, hotbit12, msx,	0,	msx,	  hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.2" , 0)
 COMP(1985, hotbi13b, msx,	0,	msx,	  hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.3b" , 0)
 COMP(1985, hotbi13p, msx,	0,	msx,	  hotbit,   msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 1.3p" , 0)
-COMP(1985, hb10p,    msx,	0,  msx_pal,  msx,    	msx,     "Sony", "HB-10P" , 0)
-COMP(1985, hb20p,    msx,	0,  msx_pal,  msx,    	msx,     "Sony", "HB-20P (Spanish)" , 0)
+COMP(1985, hb10p,    msx,	0,  msx_pal,  msx,  	msx,     "Sony", "HB-10P" , 0)
+COMP(1985, hb20p,    msx,	0,  msx_pal,  msx,  	msx,     "Sony", "HB-20P (Spanish)" , 0)
 COMP(1985, hb201,    msx,	0,  msx,      msxjp,    msx,     "Sony", "HB-201 (Japan)" , 0)
 COMP(1985, hb201p,   msx,	0,	msx_pal,  msx,      msx,     "Sony", "HB-201P" , 0)
 COMP(1984, hb501p,   msx,	0,	msx_pal,  msx,      msx,     "Sony", "HB-501P" , 0)
@@ -3854,14 +3854,14 @@ COMP(1984, hx10s,     msx,	0,	msx_pal,  msx,      msx,     "Toshiba",	 "HX-10S" 
 COMP(1984, hx20,     msx,	0,	msx_pal,  msx,      msx,     "Toshiba",	 "HX-20" , 0)
 COMP(1984, cx5m,     msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "CX5M" , GAME_NOT_WORKING)
 COMP(1984, cx5m128,  msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "CX5M-128" , GAME_NOT_WORKING)
-COMP(1984, cx5m2,  	msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "CX5MII" , GAME_NOT_WORKING)
+COMP(1984, cx5m2,	msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "CX5MII" , GAME_NOT_WORKING)
 COMP(1984, yis303,  msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "YIS303" , 0)
-COMP(1984, yis503, 	msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "YIS503" , 0)
+COMP(1984, yis503,	msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "YIS503" , 0)
 COMP(1984, yis503ii,msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "YIS503II" , 0)
 COMP(1986, y503iir, msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "YIS503IIR (Russian)" , 0)
 COMP(1986, y503iir2, msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "YIS503IIR (Estonian)" , 0)
 COMP(1984, yis503m, msx,	0,	msx_pal,  msx,      msx,     "Yamaha",	 "YIS503M" , GAME_NOT_WORKING)
-COMP(1984, yc64,  	msx,	0,	msx_pal,  msx,      msx,     "Yashica", "YC-64" , 0)
+COMP(1984, yc64,	msx,	0,	msx_pal,  msx,      msx,     "Yashica", "YC-64" , 0)
 COMP(1984, bruc100, msx,	0,	msx_pal,  msx,      msx,     "Frael", "Bruc 100-1" , 0)
 
 COMP(1985, msx2,     0,		msx,msx2_pal, msx2,	    msx,     "ASCII & Microsoft", "MSX2", 0)
@@ -3889,7 +3889,7 @@ COMP(1985, hbf700p,  msx2,	0,	msx2_pal, msx2,	    msx,     "Sony", "HB-F700P" , 
 COMP(1985, hbf700s,  msx2,	0,	msx2_pal, msx2,	    msx,     "Sony", "HB-F700S (Spain)", 0)
 COMP(1986, hbg900ap, msx2,	0,	msx2_pal, msx2,	    msx,     "Sony", "HB-G900AP", 0 )
 COMP(1986, hbg900p,  msx2,	0,	msx2_pal, msx2,	    msx,     "Sony", "HB-G900P", 0 )
-COMP(1986, hotbit20, msx2,	0,	msx2_pal, msx2,   	msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 2.0" , GAME_NOT_WORKING)
+COMP(1986, hotbit20, msx2,	0,	msx2_pal, msx2, 	msx,     "Sharp / Epcom",	 "HB-8000 Hotbit 2.0" , GAME_NOT_WORKING)
 COMP(1986, tpc310,   msx2,	0,  msx2_pal, msx2,     msx,     "Talent", "TPC-310", 0)
 COMP(1986, hx23,     msx2,	0,  msx2_pal, msx2,     msx,     "Toshiba", "HX-23", 0)
 COMP(1986, hx23f,    msx2,	0,  msx2_pal, msx2,     msx,     "Toshiba", "HX-23F", 0)
@@ -3913,7 +3913,7 @@ COMP(1987, hbf12,    msx2,	0,  msx2,     msx2jp,   msx,     "Sony", "HB-F1II (Ja
 COMP(1987, hbf1xd,   msx2,	0,  msx2,     msx2jp,   msx,     "Sony", "HB-F1XD (Japan)", 0)
 COMP(1988, hbf1xdm2, msx2,	0,  msx2,     msx2jp,   msx,     "Sony", "HB-F1XDMK2 (Japan)", 0)
 COMP(1988, phc23,    msx2,	0,  msx2,     msx2jp,   msx,     "Sanyo", "WAVY PHC-23 (Japan)", 0)
-                                                             
+
 COMP(1986, cpc300,   msx2,	0,	msx2,	  msx2kr,   msx,     "Daewoo", "IQ-2000 CPC-300 (Korea)", 0)
 COMP(1986, cpc300e,  msx2,	0,	msx2,	  msx2kr,   msx,     "Daewoo", "IQ-2000 CPC-300E (Korea)", 0)
 COMP(1986, cpc400,   msx2,	0,	msx2,	  msx2kr,   msx,     "Daewoo", "X-II CPC-400 (Korea)", 0 )

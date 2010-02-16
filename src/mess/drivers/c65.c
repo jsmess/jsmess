@@ -180,7 +180,7 @@ static PALETTE_INIT( c65 )
 {
 	int i;
 
-	for ( i = 0; i < 0x100; i++ ) 
+	for ( i = 0; i < 0x100; i++ )
 	{
 		palette_set_color_rgb(machine, i, 0, 0, 0);
 	}
@@ -247,7 +247,7 @@ static const vic3_interface c65_vic3_ntsc_intf = {
 	c65_lightpen_x_cb,
 	c65_lightpen_y_cb,
 	c65_lightpen_button_cb,
-	c65_dma_read, 
+	c65_dma_read,
 	c65_dma_read_color,
 	c65_vic_interrupt,
 	c65_bankswitch_interface,
@@ -261,7 +261,7 @@ static const vic3_interface c65_vic3_pal_intf = {
 	c65_lightpen_x_cb,
 	c65_lightpen_y_cb,
 	c65_lightpen_button_cb,
-	c65_dma_read, 
+	c65_dma_read,
 	c65_dma_read_color,
 	c65_vic_interrupt,
 	c65_bankswitch_interface,

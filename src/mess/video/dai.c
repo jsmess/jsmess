@@ -104,7 +104,7 @@ VIDEO_UPDATE( dai )
 	while (current_scan_line < dai_scan_lines)
 	{
 		mode = memory_read_byte(space, current_video_memory_address--);
- 		colour = memory_read_byte(space, current_video_memory_address--);
+		colour = memory_read_byte(space, current_video_memory_address--);
 		line_repeat_count = mode & 0x0f;
 		horizontal_resolution = (mode & 0x30) >> 4;
 		display_mode = (mode & 0xc0) >> 6;
@@ -603,7 +603,7 @@ VIDEO_UPDATE( dai )
 				break;
 			}
 			break;
-  		case 0x03:	/* 16 colour characters */
+		case 0x03:	/* 16 colour characters */
 			switch (horizontal_resolution)
 			{
 

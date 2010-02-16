@@ -112,13 +112,13 @@ static void avigo_setbank(running_machine *machine, int bank, void *address, rea
 	{
 		memory_install_read8_handler(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0, rh);
 	} else {
-//		memory_nop_read(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
+//      memory_nop_read(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
 	}
 	if (wh)
 	{
 		memory_install_write8_handler(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0, wh);
 	} else {
-//		memory_nop_write(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
+//      memory_nop_write(space, (bank * 0x4000),(bank * 0x4000) + 0x3FFF, 0, 0);
 	}
 }
 
@@ -303,7 +303,7 @@ static void avigo_refresh_memory(running_machine *machine)
 {
 	unsigned char *addr;
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	
+
 	switch (avigo_rom_bank_h)
 	{
 		/* 011 */
@@ -340,12 +340,12 @@ static void avigo_refresh_memory(running_machine *machine)
 		/* %001 */
 		/* ram */
 		case 0x01:
-			addr = messram_get_ptr(devtag_get_device(machine, "messram")) + ((avigo_ram_bank_l & 0x07)<<14);			
+			addr = messram_get_ptr(devtag_get_device(machine, "messram")) + ((avigo_ram_bank_l & 0x07)<<14);
 			memory_set_bankptr(machine, "bank3", addr);
 			memory_set_bankptr(machine, "bank7", addr);
 			avigo_banked_opbase[2] = ((UINT8 *) addr) - (2 * 0x4000);
 			memory_install_read_bank (space, (2 * 0x4000),(2 * 0x4000) + 0x3FFF, 0, 0, "bank3");
-			memory_install_write_bank(space, (2 * 0x4000),(2 * 0x4000) + 0x3FFF, 0, 0, "bank7");			
+			memory_install_write_bank(space, (2 * 0x4000),(2 * 0x4000) + 0x3FFF, 0, 0, "bank7");
 			break;
 
 		/* %111 */

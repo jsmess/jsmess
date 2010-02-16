@@ -52,7 +52,7 @@ struct _atari_fdc_t
 	UINT8 serin_buff[512];
 	UINT8 serin_chksum;
 	int  serin_delay;
-	
+
 	atari_drive drv[4];
 };
 
@@ -404,7 +404,7 @@ static	void make_chksum(UINT8 * chksum, UINT8 data)
 static	void clr_serout(running_device *device,int expect_data)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
-	
+
 	fdc->serout_chksum = 0;
 	fdc->serout_offs = 0;
 	fdc->serout_count = expect_data + 1;
@@ -413,7 +413,7 @@ static	void clr_serout(running_device *device,int expect_data)
 static void add_serout(running_device *device,int expect_data)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
-	
+
 	fdc->serout_chksum = 0;
 	fdc->serout_count = expect_data + 1;
 }
@@ -451,7 +451,7 @@ static void a800_serial_command(running_device *device)
 {
 	int i, drive, sector, offset;
 	atari_fdc_t *fdc = get_safe_token(device);
-	
+
 	if( !fdc->serout_offs )
 	{
 		if (VERBOSE_SERIAL)
@@ -826,16 +826,16 @@ running_device *atari_floppy_get_device_child(running_device *device,int drive)
 }
 
 static DEVICE_START(atari_fdc)
-{	
+{
 	int id;
-	for(id=0;id<4;id++) 
+	for(id=0;id<4;id++)
 	{
 		floppy_install_load_proc(atari_floppy_get_device_child(device, id), atari_load_proc);
 	}
 }
 
 static DEVICE_RESET(atari_fdc)
-{	
+{
 }
 
 DEVICE_GET_INFO( atari_fdc )

@@ -39,14 +39,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sol20_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-/*	AM_RANGE(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
-	AM_RANGE(0xf9, 0xf9) serial data in, out
-	AM_RANGE(0xfa, 0xfa) general status in (bit 0=keyb data av, bit 1=parin data av, bit 2=parout ready)
-	AM_RANGE(0xfb, 0xfb) tape
-	AM_RANGE(0xfc, 0xfc) keyboard data in
-	AM_RANGE(0xfd, 0xfd) parallel data in, out
-	AM_RANGE(0xfe, 0xfe) scroll register
-	AM_RANGE(0xff, 0xff) sense switches */
+/*  AM_RANGE(0xf8, 0xf8) serial status in (bit 6=data av, bit 7=tmbe)
+    AM_RANGE(0xf9, 0xf9) serial data in, out
+    AM_RANGE(0xfa, 0xfa) general status in (bit 0=keyb data av, bit 1=parin data av, bit 2=parout ready)
+    AM_RANGE(0xfb, 0xfb) tape
+    AM_RANGE(0xfc, 0xfc) keyboard data in
+    AM_RANGE(0xfd, 0xfd) parallel data in, out
+    AM_RANGE(0xfe, 0xfe) scroll register
+    AM_RANGE(0xff, 0xff) sense switches */
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -90,9 +90,9 @@ static MACHINE_DRIVER_START( sol20 )
 	MDRV_VIDEO_UPDATE(sol20)
 
 	/* internal ram */
-//	MDRV_RAM_ADD("messram")
-//	MDRV_RAM_DEFAULT_SIZE("8K")
-//	MDRV_RAM_EXTRA_OPTIONS("16K,32K")
+//  MDRV_RAM_ADD("messram")
+//  MDRV_RAM_DEFAULT_SIZE("8K")
+//  MDRV_RAM_EXTRA_OPTIONS("16K,32K")
 MACHINE_DRIVER_END
 
 /* ROM definition */

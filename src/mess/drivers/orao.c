@@ -117,7 +117,7 @@ static INPUT_PORTS_START( orao )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 
-  	PORT_START("LINE13")
+	PORT_START("LINE13")
 	PORT_BIT(0x0F, IP_ACTIVE_HIGH, IPT_UNUSED)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
@@ -214,5 +214,5 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME   PARENT  COMPAT  MACHINE  INPUT   INIT           COMPANY          FULLNAME       FLAGS */
-COMP( 1984, orao,     0,      0, 		orao, 	orao, 	orao, 	   "PEL Varazdin", "Orao 102",		 0)
-COMP( 1985, orao103,  orao,   0, 		orao, 	orao, 	orao103,   "PEL Varazdin", "Orao 103",		 0)
+COMP( 1984, orao,     0,      0,		orao,	orao,	orao,	   "PEL Varazdin", "Orao 102",		 0)
+COMP( 1985, orao103,  orao,   0,		orao,	orao,	orao103,   "PEL Varazdin", "Orao 103",		 0)

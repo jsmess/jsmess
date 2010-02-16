@@ -68,7 +68,7 @@ static INT16 *vtech1_fill_wave_byte(INT16 *buffer, int byte)
 
     for( i = 7; i >= 0; i-- )
 	{
-		*buffer++ = V1_HI; 	/* initial cycle */
+		*buffer++ = V1_HI;	/* initial cycle */
 		*buffer++ = V1_LO;
 		if( (byte >> i) & 1 )
 		{

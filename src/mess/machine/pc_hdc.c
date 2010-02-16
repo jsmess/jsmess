@@ -95,13 +95,13 @@ static int ecc[MAX_HARD];			/* ECC bytes */
 /* indexes */
 static int cylinder[MAX_HARD];			/* current cylinder */
 static int head[MAX_HARD];				/* current head */
-static int sector[MAX_HARD]; 			/* current sector */
+static int sector[MAX_HARD];			/* current sector */
 static int sector_cnt[MAX_HARD];		/* sector count */
 static int control[MAX_HARD];			/* control */
 
 static int csb[MAX_BOARD];				/* command status byte */
 static int status[MAX_BOARD];			/* drive status */
-static int error[MAX_BOARD]; 			/* error code */
+static int error[MAX_BOARD];			/* error code */
 static int dip[MAX_BOARD];				/* dip switches */
 static emu_timer *timer[MAX_BOARD];
 

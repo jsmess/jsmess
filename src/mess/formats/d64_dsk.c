@@ -11,7 +11,7 @@
     TODO:
 
     - disk errors
-	- variable gaps
+    - variable gaps
 
 */
 
@@ -180,7 +180,7 @@ INLINE float get_dos_track(int track)
 
 /*-------------------------------------------------
     d64_get_heads_per_disk - returns the number
-	of heads in the disk image
+    of heads in the disk image
 -------------------------------------------------*/
 
 static int d64_get_heads_per_disk(floppy_image *floppy)
@@ -190,7 +190,7 @@ static int d64_get_heads_per_disk(floppy_image *floppy)
 
 /*-------------------------------------------------
     d64_get_tracks_per_disk - returns the number
-	of DOS tracks in the disk image
+    of DOS tracks in the disk image
 -------------------------------------------------*/
 
 static int d64_get_tracks_per_disk(floppy_image *floppy)
@@ -200,13 +200,13 @@ static int d64_get_tracks_per_disk(floppy_image *floppy)
 
 /*-------------------------------------------------
     d64_get_sectors_per_track - returns the number
-	of sectors per given track
+    of sectors per given track
 -------------------------------------------------*/
 
 static int d64_get_sectors_per_track(floppy_image *floppy, int head, int track)
 {
-	int sectors_per_track = 0; 
-	
+	int sectors_per_track = 0;
+
 	switch (get_tag(floppy)->dos)
 	{
 	case DOS1:	sectors_per_track = DOS1_SECTORS_PER_TRACK[track / 2]; break;
@@ -219,7 +219,7 @@ static int d64_get_sectors_per_track(floppy_image *floppy, int head, int track)
 
 /*-------------------------------------------------
     get_track_offset - returns the offset within
-	the disk image for a given track
+    the disk image for a given track
 -------------------------------------------------*/
 
 static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
@@ -250,7 +250,7 @@ static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UIN
 
 /*
 
- Commodore GCR format 
+ Commodore GCR format
 
 Original    Encoded
 4 bits      5 bits
@@ -301,29 +301,29 @@ static void gcr_double_2_gcr(UINT8 a, UINT8 b, UINT8 c, UINT8 d, UINT8 *dest)
 
 /*-------------------------------------------------
     d64_read_track - reads a full track from the
-	disk image
+    disk image
 -------------------------------------------------*/
 
 /*
 
-	Commodore sector format
+    Commodore sector format
 
-	SYNC						FF * 5
-	08
-	CHECKSUM					sector ^ track ^ id2 ^ id1
-	SECTOR						0..20 (2040), 0..28 (8050)
-	TRACK						1..35 (2040), 1..77 (8050), 1..70 (1571)
-	ID2
-	ID1
-	GAP 1						55 * 9 (2040), 55 * 8 (1541)
+    SYNC                        FF * 5
+    08
+    CHECKSUM                    sector ^ track ^ id2 ^ id1
+    SECTOR                      0..20 (2040), 0..28 (8050)
+    TRACK                       1..35 (2040), 1..77 (8050), 1..70 (1571)
+    ID2
+    ID1
+    GAP 1                       55 * 9 (2040), 55 * 8 (1541)
 
-	SYNC						FF * 5
-	07
-	NEXT TRACK
-	NEXT SECTOR
-	254 BYTES OF DATA
-	CHECKSUM
-	GAP 2						55 * 8..19
+    SYNC                        FF * 5
+    07
+    NEXT TRACK
+    NEXT SECTOR
+    254 BYTES OF DATA
+    CHECKSUM
+    GAP 2                       55 * 8..19
 
 */
 
@@ -352,7 +352,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 
 		/* determine logical track number */
 		int dos_track = get_dos_track(track);
-		
+
 		if (tag->dos == DOS25)
 		{
 			dos_track = track + 1;
@@ -362,7 +362,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		if (head == 1) dos_track += tag->dos_tracks;
 
 		/* determine number of sectors per track */
-		sectors_per_track = d64_get_sectors_per_track(floppy, head, track); 
+		sectors_per_track = d64_get_sectors_per_track(floppy, head, track);
 
 		/* allocate D64 track data buffer */
 		d64_track_size = sectors_per_track * SECTOR_SIZE;
@@ -371,7 +371,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		/* allocate temporary GCR track data buffer */
 		gcr_track_size = sectors_per_track * SECTOR_SIZE_GCR;
 		gcr_track_data = (UINT8 *)alloca(gcr_track_size);
-		
+
 		if (buflen < gcr_track_size) fatalerror("D64 track buffer too small: %u!\n", (UINT32)buflen);
 
 		/* prepend GCR track data buffer with GCR track size */
@@ -479,7 +479,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 
 /*-------------------------------------------------
     d64_write_track - writes a full track to the
-	disk image
+    disk image
 -------------------------------------------------*/
 
 static floperr_t d64_write_track(floppy_image *floppy, int head, int track, UINT64 offset, const void *buffer, size_t buflen)
@@ -620,7 +620,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 
 	int track_offset = 0;
 	int head, track;
-	
+
 	int heads = 0, dos_tracks = 0, dos = 0;
 	bool has_errors;
 
@@ -675,7 +675,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 				{
 					tag->track_offset[head][track] = track_offset;
 					track_offset += DOS25_SECTORS_PER_TRACK[track] * SECTOR_SIZE;
-	
+
 					if (LOG) logerror("D64 head %u track %u data offset: %04x\n", head, track + 1, tag->track_offset[head][track]);
 				}
 			}
@@ -690,7 +690,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 				{
 					/* full track */
 					tag->track_offset[head][track] = track_offset;
-					
+
 					if (dos == DOS1)
 						track_offset += DOS1_SECTORS_PER_TRACK[track / 2] * SECTOR_SIZE;
 					else
@@ -721,16 +721,16 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 
 	/* read format ID from directory */
 	/*
-	id1, id2 are the same for extended d64 (i.e. with error tables), for d67 and for d71
+    id1, id2 are the same for extended d64 (i.e. with error tables), for d67 and for d71
 
-	for d81 they are at track 40 bytes 0x17 & 0x18
-	for d80 & d82 they are at track 39 bytes 0x18 & 0x19
-	*/
+    for d81 they are at track 40 bytes 0x17 & 0x18
+    for d80 & d82 they are at track 39 bytes 0x18 & 0x19
+    */
 	if (dos == DOS25)
 		floppy_image_read(floppy, id, tag->track_offset[0][38] + 0x18, 2);
 	else
 		floppy_image_read(floppy, id, tag->track_offset[0][34] + 0xa2, 2);
-	
+
 	tag->id1 = id[0];
 	tag->id2 = id[1];
 

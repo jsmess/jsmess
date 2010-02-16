@@ -477,7 +477,7 @@ static void pce_cd_nec_set_audio_stop_position( running_machine *machine )
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
 		cdda_stop_audio( devtag_get_device( machine, "cdda" ) );
 		pce_cd.end_frame = pce_cd.last_frame;
-//		assert( NULL == pce_cd_nec_set_audio_stop_position );
+//      assert( NULL == pce_cd_nec_set_audio_stop_position );
 	}
 
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
@@ -611,7 +611,7 @@ static void pce_cd_nec_get_dir_info( running_machine *machine )
 		pce_cd.data_buffer_size = 4;
 		break;
 	default:
-//		assert( pce_cd_nec_get_dir_info == NULL );  // Not implemented yet
+//      assert( pce_cd_nec_get_dir_info == NULL );  // Not implemented yet
 		break;
 	}
 

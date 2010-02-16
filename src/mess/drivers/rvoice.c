@@ -2,7 +2,7 @@
 *
 *  Bare bones Realvoice PC driver
 *  By Jonathan Gevaryahu AKA Lord Nightmare
-*  Binary supplied by Kevin 'kevtris' Horton 
+*  Binary supplied by Kevin 'kevtris' Horton
 *
 
 ******************************************************************************/

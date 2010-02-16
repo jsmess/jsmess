@@ -147,15 +147,15 @@ static WRITE8_HANDLER(gzu_w)
 	} else {
 		// Plane mode
 		UINT8 mask = (pk8020_color & 1) ? data : 0;
-   		if (!(pk8020_color & 0x02)) {
-	   		plane_0[offset] = (plane_0[offset] & ~data) | mask;
-   		}
-   		if (!(pk8020_color & 0x04)) {
-	   		plane_1[offset] = (plane_1[offset] & ~data) | mask;
-   		}
-   		if (!(pk8020_color & 0x08)) {
-	   		plane_2[offset] = (plane_2[offset] & ~data) | mask;
-   		}
+		if (!(pk8020_color & 0x02)) {
+			plane_0[offset] = (plane_0[offset] & ~data) | mask;
+		}
+		if (!(pk8020_color & 0x04)) {
+			plane_1[offset] = (plane_1[offset] & ~data) | mask;
+		}
+		if (!(pk8020_color & 0x08)) {
+			plane_2[offset] = (plane_2[offset] & ~data) | mask;
+		}
 	}
 }
 
@@ -176,7 +176,7 @@ static READ8_HANDLER(devices_r)
 		case 0x08: return i8255a_r(ppi3,offset & 3);
 		case 0x10: switch(offset & 1) {
 						case 0 : return msm8251_data_r(rs232,0);
-				   		case 1 : return msm8251_status_r(rs232,0);
+						case 1 : return msm8251_status_r(rs232,0);
 				   }
 				   break;
 		case 0x18: switch(offset & 3) {
@@ -188,7 +188,7 @@ static READ8_HANDLER(devices_r)
 					break;
 		case 0x20: switch(offset & 1) {
 						case 0 : return msm8251_data_r(lan,0);
-				   		case 1 : return msm8251_status_r(lan,0);
+						case 1 : return msm8251_status_r(lan,0);
 				   }
 				   break;
 		case 0x28: return pic8259_r(pic,offset & 1);
@@ -215,7 +215,7 @@ static WRITE8_HANDLER(devices_w)
 		case 0x08: i8255a_w(ppi3,offset & 3,data); break;
 		case 0x10: switch(offset & 1) {
 						case 0 : msm8251_data_w(rs232,0,data); break;
-				   		case 1 : msm8251_control_w(rs232,0,data); break;
+						case 1 : msm8251_control_w(rs232,0,data); break;
 				   }
 				   break;
 		case 0x18: switch(offset & 3) {
@@ -227,7 +227,7 @@ static WRITE8_HANDLER(devices_w)
 					break;
 		case 0x20: switch(offset & 1) {
 						case 0 : msm8251_data_w(lan,0,data); break;
-				   		case 1 : msm8251_control_w(lan,0,data); break;
+						case 1 : msm8251_control_w(lan,0,data); break;
 				   }
 				   break;
 		case 0x28: pic8259_w(pic,offset & 1,data);break;
@@ -872,13 +872,13 @@ static WRITE8_DEVICE_HANDLER(pk8020_portb_w)
 	running_device *fdc = devtag_get_device(device->machine, "wd1793");
 	wd17xx_set_side(fdc,BIT(data,4));
 	if (BIT(data,0)) {
- 		wd17xx_set_drive(fdc,0);
+		wd17xx_set_drive(fdc,0);
 	} else if (BIT(data,1)) {
- 		wd17xx_set_drive(fdc,1);
+		wd17xx_set_drive(fdc,1);
 	} else if (BIT(data,2)) {
- 		wd17xx_set_drive(fdc,2);
+		wd17xx_set_drive(fdc,2);
 	} else if (BIT(data,3)) {
- 		wd17xx_set_drive(fdc,3);
+		wd17xx_set_drive(fdc,3);
 	}
 }
 

@@ -113,7 +113,7 @@ DEVICE_GET_INFO( pf10 )
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(pf10);	break;
-		case DEVINFO_PTR_ROM_REGION:			info->romregion = ROM_NAME(pf10); 				break;
+		case DEVINFO_PTR_ROM_REGION:			info->romregion = ROM_NAME(pf10);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(pf10);			break;

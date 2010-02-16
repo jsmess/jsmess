@@ -207,7 +207,7 @@ static void jaguar_nvram_load(running_machine *machine)
 				nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_READ);
 			(*nvram)(device, nvram_file, 0);
 		}
-	}	
+	}
 	if (nvram_file != NULL)
 		mame_fclose(nvram_file);
 }
@@ -217,7 +217,7 @@ static void jaguar_nvram_save(running_machine *machine)
 {
 	mame_file *nvram_file = NULL;
 	running_device *device;
-	
+
 	for (device = machine->devicelist.first(); device != NULL; device = device->next)
 	{
 		device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
@@ -234,8 +234,8 @@ static void jaguar_nvram_save(running_machine *machine)
 }
 
 static NVRAM_HANDLER( jaguar )
-{		
-	if (read_or_write)	{		
+{
+	if (read_or_write)	{
 		jaguar_nvram_save(machine);
 	}
 	else
@@ -643,7 +643,7 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("jag,abs,rom,j64,j01")
 	MDRV_CARTSLOT_LOAD(jaguar)
-	
+
 	MDRV_EEPROM_93C46_ADD("eeprom")
 MACHINE_DRIVER_END
 

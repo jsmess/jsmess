@@ -1127,7 +1127,7 @@ static DEVICE_GET_INFO( abc800_serial )
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( abc800_serial );    break;
 		case DEVINFO_STR_NAME:		                strcpy(info->s, "ABC800 serial port");	                         break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                           break;
-		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+		default:									DEVICE_GET_INFO_CALL(serial);	break;
 	}
 }
 
@@ -1135,7 +1135,7 @@ static DEVICE_GET_INFO( abc800_serial )
 
 #define MDRV_ABC800_SERIAL_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, ABC800_SERIAL, 0)
-	
+
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( abc800m )
@@ -1176,7 +1176,7 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
-	
+
 	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
@@ -1218,7 +1218,7 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
-	
+
 	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
@@ -1259,7 +1259,7 @@ static MACHINE_DRIVER_START( abc802 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-	
+
 	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
@@ -1299,7 +1299,7 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("160K") // 32KB + 128KB
 	MDRV_RAM_EXTRA_OPTIONS("544K") // 32KB + 512KB
-	
+
 	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 

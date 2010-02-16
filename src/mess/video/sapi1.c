@@ -94,7 +94,7 @@ VIDEO_START( sapi1 )
 
 VIDEO_UPDATE( sapi1 )
 {
- 	int x,y,j,b;
+	int x,y,j,b;
   UINT16 addr;
   int xpos;
 
@@ -111,25 +111,25 @@ VIDEO_UPDATE( sapi1 )
 			{
 				for(b = 0; b < 6; b++ )
 			  {
-			  	UINT8 val;
-			  	if (j==8) {
-			  		if (attr==2) {
-			  			val = (refresh_counter & 0x20) ? 1 : 0;
-			  		} else {
-			  			val = 0;
-			  		}
-			  	} else {
-			  		val = (MHB2501[code*8 + j] >> (5-b)) & 1;
-			  		if (attr==1) {
-			  			val = (refresh_counter & 0x20) ? val : 0;
-			  		}
-			  	}
-			  	if(attr==3) {
-			  		*BITMAP_ADDR16(bitmap, y*9+j, xpos+2*b   ) = val;
-			  		*BITMAP_ADDR16(bitmap, y*9+j, xpos+2*b+1 ) = val;
-			  	} else {
-			  		*BITMAP_ADDR16(bitmap, y*9+j, xpos+b ) = val;
-			  	}
+				UINT8 val;
+				if (j==8) {
+					if (attr==2) {
+						val = (refresh_counter & 0x20) ? 1 : 0;
+					} else {
+						val = 0;
+					}
+				} else {
+					val = (MHB2501[code*8 + j] >> (5-b)) & 1;
+					if (attr==1) {
+						val = (refresh_counter & 0x20) ? val : 0;
+					}
+				}
+				if(attr==3) {
+					*BITMAP_ADDR16(bitmap, y*9+j, xpos+2*b   ) = val;
+					*BITMAP_ADDR16(bitmap, y*9+j, xpos+2*b+1 ) = val;
+				} else {
+					*BITMAP_ADDR16(bitmap, y*9+j, xpos+b ) = val;
+				}
 			  }
 			}
 			xpos+= (attr==3) ? 12 : 6;
@@ -147,5 +147,5 @@ VIDEO_START( sapizps3 )
 
 VIDEO_UPDATE( sapizps3 )
 {
- 	return 0;
+	return 0;
 }

@@ -189,7 +189,7 @@ INLINE UINT16 *cps1_base(int offset,int boundary)
 {
 	int base = cps1_cps_a_regs[offset]*256;
 	base &= ~(boundary-1);
- 	return &cps1_gfxram[(base&0x3ffff)/2];
+	return &cps1_gfxram[(base&0x3ffff)/2];
 }
 
 

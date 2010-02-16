@@ -1,7 +1,7 @@
 /**********************************************************************
 
     IEEE-488.1 General Purpose Interface Bus emulation
-	(aka HP-IB, GPIB, CBM IEEE)
+    (aka HP-IB, GPIB, CBM IEEE)
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -299,7 +299,7 @@ static DEVICE_START( ieee488 )
 	ieee488->daisy_state = head;
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, ieee488->);
+//  state_save_register_device_item(device, 0, ieee488->);
 }
 
 /*-------------------------------------------------

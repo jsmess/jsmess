@@ -211,7 +211,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 		for (dev = pDevViewInfo->config->mconfig->devicelist.first();dev != NULL;dev = dev->next)
 		{
 			if (is_image_device(dev))
-			{	
+			{
 				image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
 
 				s = tstring_from_utf8(info.name);
@@ -250,7 +250,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 		for (dev = pDevViewInfo->config->mconfig->devicelist.first();dev != NULL;dev = dev->next)
 		{
 			if (is_image_device(dev))
-			{	
+			{
 				image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
 
 				pEnt->dev = dev;

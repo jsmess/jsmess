@@ -470,7 +470,7 @@ static MACHINE_DRIVER_START( a1200n )
 	/* cia */
 	MDRV_MOS8520_ADD("cia_0", AMIGA_68EC020_NTSC_CLOCK / 10, a1200_cia_0_intf)
 	MDRV_MOS8520_ADD("cia_1", AMIGA_68EC020_NTSC_CLOCK / 10, a1200_cia_1_intf)
-	
+
 	MDRV_AMIGA_FDC_ADD("fdc")
 MACHINE_DRIVER_END
 
@@ -613,7 +613,7 @@ static DRIVER_INIT( cd32 )
 		cd32_potgo_w,		/* potgo_w */
 		NULL, NULL,			/* dskbytr_r & dsklen_w */
 		NULL,				/* serdat_w */
-		NULL, 				/* scanline0_callback */
+		NULL,				/* scanline0_callback */
 		NULL,				/* reset_callback */
 		NULL,				/* nmi_callback */
 		FLAGS_AGA_CHIPSET	/* flags */

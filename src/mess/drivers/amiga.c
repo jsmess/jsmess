@@ -300,7 +300,7 @@ static const mos6526_interface cia_0_pal_intf =
 	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(amiga_cia_0_portA_r), 
+	DEVCB_HANDLER(amiga_cia_0_portA_r),
 	DEVCB_HANDLER(amiga_cia_0_portA_w),						/* port A */
 	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w)	/* port B */
@@ -326,9 +326,9 @@ static const mos6526_interface cia_0_cdtv_intf =
 	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),	/* pc_func */
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(amiga_cia_0_cdtv_portA_r), 
+	DEVCB_HANDLER(amiga_cia_0_cdtv_portA_r),
 	DEVCB_HANDLER(amiga_cia_0_portA_w),						/* port A */
-	DEVCB_NULL, 
+	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w)	/* port B */
 };
 
@@ -406,7 +406,7 @@ static MACHINE_DRIVER_START( ntsc )
 	/* cia */
 	MDRV_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_ntsc_intf)
 	MDRV_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK, cia_1_intf)
-	
+
 	MDRV_AMIGA_FDC_ADD("fdc")
 MACHINE_DRIVER_END
 

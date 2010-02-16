@@ -482,7 +482,7 @@
         </text>
     </element>
 
- 	<element name="floppy_led" defstate="0">
+	<element name="floppy_led" defstate="0">
 		<disk state="0">
 			<color red="0.09375" green="0.0" blue="0.0" />
 		</disk>
@@ -1191,7 +1191,7 @@
         </text>
     </element>
 
- 	<element name="floppy_led" defstate="0">
+	<element name="floppy_led" defstate="0">
 		<disk state="0">
 			<color red="0.09375" green="0.0" blue="0.0" />
 		</disk>

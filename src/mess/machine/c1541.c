@@ -11,7 +11,7 @@
 
     TODO:
 
-	- some copy protections fail
+    - some copy protections fail
     - more accurate timing
     - power/activity LEDs
 
@@ -171,7 +171,7 @@ struct _c1541_t
 	/* motors */
 	int stp;								/* stepper motor phase */
 	int mtr;								/* spindle motor on */
-	
+
 	/* track */
 	UINT8 track_buffer[G64_BUFFER_SIZE];	/* track data buffer */
 	int track_len;							/* track length */

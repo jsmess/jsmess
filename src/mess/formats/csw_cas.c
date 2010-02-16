@@ -51,9 +51,9 @@ UINT8  HeaderExtensionLength;
 UINT8 *gz_ptr = NULL;
 
 int			total_size;
-z_stream 	d_stream;
+z_stream	d_stream;
 int 		err;
-UINT8 		*in_ptr;
+UINT8		*in_ptr;
 int 		bsize=0;
 
 	if ( memcmp( casdata, CSW_HEADER, sizeof(CSW_HEADER) ) ) {
@@ -179,9 +179,9 @@ INT8   Bit;
 
 UINT8 *gz_ptr = NULL;
 int			total_size;
-z_stream 	d_stream;
+z_stream	d_stream;
 int 		err;
-UINT8 		*in_ptr;
+UINT8		*in_ptr;
 int 		bsize=0;
 int		i;
 

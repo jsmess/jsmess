@@ -711,22 +711,22 @@ static WRITE16_HANDLER( vii_io_w )
 /*
 static WRITE16_HANDLER( vii_rowscroll_w )
 {
-	switch(offset)
-	{
-		default:
-			verboselog(space->machine, 0, "vii_rowscroll_w: %04x = %04x (%04x)\n", 0x2900 + offset, data, mem_mask);
-			break;
-	}
+    switch(offset)
+    {
+        default:
+            verboselog(space->machine, 0, "vii_rowscroll_w: %04x = %04x (%04x)\n", 0x2900 + offset, data, mem_mask);
+            break;
+    }
 }
 
 static WRITE16_HANDLER( vii_spriteram_w )
 {
-	switch(offset)
-	{
-		default:
-			verboselog(space->machine, 0, "vii_spriteram_w: %04x = %04x (%04x)\n", 0x2c00 + offset, data, mem_mask);
-			break;
-	}
+    switch(offset)
+    {
+        default:
+            verboselog(space->machine, 0, "vii_spriteram_w: %04x = %04x (%04x)\n", 0x2c00 + offset, data, mem_mask);
+            break;
+    }
 }
 */
 

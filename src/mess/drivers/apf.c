@@ -183,7 +183,7 @@ static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_a_func )
 
 	if (state)
 	{
-	  	state_->apf_ints |= 1;
+		state_->apf_ints |= 1;
 	}
 	else
 	{
@@ -202,7 +202,7 @@ static WRITE_LINE_DEVICE_HANDLER( apf_m1000_irq_b_func )
 
 	if (state)
 	{
-	  	state_->apf_ints |= 2;
+		state_->apf_ints |= 2;
 	}
 	else
 	{

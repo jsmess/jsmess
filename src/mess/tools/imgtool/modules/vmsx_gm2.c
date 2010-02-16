@@ -22,7 +22,7 @@
 typedef struct
 	{
 	imgtool_image			base;
-	imgtool_stream 			*file_handle;
+	imgtool_stream			*file_handle;
 	int 			size;
 	unsigned char	*data;
 	int 			count;
@@ -30,7 +30,7 @@ typedef struct
 
 typedef struct
 	{
-	imgtool_directory 	base;
+	imgtool_directory	base;
 	GM2_IMAGE	*image;
 	int			index;
 	} TAP_ITERATOR;

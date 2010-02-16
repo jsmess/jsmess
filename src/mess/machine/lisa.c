@@ -339,7 +339,7 @@ static struct
 	int tenths;		/* tenths of second (BCD : 0-9) */
 
 	int clock_write_ptr;	/* clock byte to be written next (-1 if clock write disabled) */
-	
+
 	enum clock_mode_t clock_mode;
 } clock_regs;
 
@@ -1146,7 +1146,7 @@ MACHINE_START( lisa )
 	mouse_timer = timer_alloc(machine, handle_mouse, NULL);
 
 	/* read command every ms (don't know the real value) */
-	timer_pulse(machine, ATTOTIME_IN_MSEC(1), NULL, 0, set_COPS_ready);	
+	timer_pulse(machine, ATTOTIME_IN_MSEC(1), NULL, 0, set_COPS_ready);
 }
 
 MACHINE_RESET( lisa )
@@ -1626,12 +1626,12 @@ READ16_HANDLER ( lisa_r )
 					if ((time_in_frame >= 364) && (time_in_frame <= 375))
 					{
 						answer = videoROM_ptr[videoROM_address|0x80] << 8;
-  				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(devtag_get_device(space->machine, "maincpu")), time_in_frame);
+				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(devtag_get_device(space->machine, "maincpu")), time_in_frame);
 					}
 					else
 					{
 						answer = videoROM_ptr[videoROM_address] << 8;
-  				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(devtag_get_device(space->machine, "maincpu")), time_in_frame);
+				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(devtag_get_device(space->machine, "maincpu")), time_in_frame);
 					}
 				}
 

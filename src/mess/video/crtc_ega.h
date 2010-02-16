@@ -19,11 +19,11 @@ typedef void * (*crtc_ega_begin_update_func)(running_device *device, bitmap_t *b
 #define CRTC_EGA_BEGIN_UPDATE(name)	void *name(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
 
 typedef void (*crtc_ega_update_row_func)(running_device *device, bitmap_t *bitmap,
-					   				   const rectangle *cliprect, UINT16 ma, UINT8 ra,
-					   				   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
+									   const rectangle *cliprect, UINT16 ma, UINT8 ra,
+									   UINT16 y, UINT8 x_count, INT8 cursor_x, void *param);
 #define CRTC_EGA_UPDATE_ROW(name)		void name(running_device *device, bitmap_t *bitmap,	\
-					   						  const rectangle *cliprect, UINT16 ma, UINT8 ra,					\
-					   						  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
+											  const rectangle *cliprect, UINT16 ma, UINT8 ra,					\
+											  UINT16 y, UINT8 x_count, INT8 cursor_x, void *param)
 
 typedef void (*crtc_ega_end_update_func)(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, void *param);
 #define CRTC_EGA_END_UPDATE(name)		void name(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, void *param)

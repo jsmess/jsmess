@@ -13,8 +13,8 @@
                                 CPU             FDC     Kbd/Mouse  PRAM   Video
          - Mac 128k             68k             IWM     orig       orig   Original
          - Mac 512k             68k             IWM     orig       orig   Original
-         - Mac 512ke    	68k             IWM     orig       orig   Original
-         - Mac Plus 		68k             IWM     orig       ext    Original
+         - Mac 512ke        68k             IWM     orig       orig   Original
+         - Mac Plus         68k             IWM     orig       ext    Original
          - Mac SE               68k             IWM     MacII ADB  ext    Original
          - Mac Classic          68k             SWIM    MacII ADB  ext    Original
          - Mac Portable         68k (16 MHz)    SWIM    ADB-PMU    PMU    640x400 B&W
@@ -378,7 +378,7 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 		{
 			mac_install_memory(machine, 0x000000, 0x8fffff, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((mac->mac_model == MODEL_MAC_CLASSIC_II) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30))) 
+		else if ((mac->mac_model == MODEL_MAC_CLASSIC_II) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30)))
 		{
 			mac_install_memory(machine, 0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, "bank1");
 		}
@@ -841,7 +841,7 @@ READ16_HANDLER ( macplus_scsi_r )
 {
 	int reg = (offset>>3) & 0xf;
 
-//	logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
+//  logerror("macplus_scsi_r: offset %x mask %x\n", offset, mem_mask);
 
 	if ((reg == 6) && (offset == 0x130))
 	{
@@ -901,7 +901,7 @@ WRITE16_HANDLER ( macplus_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
 
-//	logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
+//  logerror("macplus_scsi_w: data %x offset %x mask %x\n", data, offset, mem_mask);
 
 	if ((reg == 0) && (offset == 0x100))
 	{
@@ -915,7 +915,7 @@ WRITE16_HANDLER ( macii_scsi_w )
 {
 	int reg = (offset>>3) & 0xf;
 
-//	logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
+//  logerror("macplus_scsi_w: data %x offset %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 
 	if ((reg == 0) && (offset == 0x100))
 	{
@@ -1149,7 +1149,7 @@ static void rtc_execute_cmd(mac_state *mac, int data)
 		case 0: case 1: case 2: case 3:	/* seconds register */
 		case 4: case 5: case 6: case 7:	/* ??? (not described in IM III) */
 			/* after various tries, I assumed mac->rtc_seconds[4+i] is mapped to mac->rtc_seconds[i] */
- 			if (LOG_RTC)
+			if (LOG_RTC)
 				logerror("RTC clock write, address = %X, data = %X\n", i, (int) mac->rtc_data_byte);
 			mac->rtc_seconds[i & 3] = mac->rtc_data_byte;
 			break;
@@ -1286,7 +1286,7 @@ NVRAM_HANDLER( mac )
 			mac->rtc_ram[5] = 0x0a;
 			mac->rtc_ram[6] = 0xcc;
 			mac->rtc_ram[7] = 0x0a;
-			mac->rtc_ram[0xc] = 0x42; 	// XPRAM valid for Plus/SE
+			mac->rtc_ram[0xc] = 0x42;	// XPRAM valid for Plus/SE
 			mac->rtc_ram[0xd] = 0x75;
 			mac->rtc_ram[0xe] = 0x67;
 			mac->rtc_ram[0xf] = 0x73;
@@ -1297,7 +1297,7 @@ NVRAM_HANDLER( mac )
 
 			if (mac->mac_model >= MODEL_MAC_II)
 			{
-				mac->rtc_ram[0xc] = 0x4e; 	// XPRAM valid is different for these
+				mac->rtc_ram[0xc] = 0x4e;	// XPRAM valid is different for these
 				mac->rtc_ram[0xd] = 0x75;
 				mac->rtc_ram[0xe] = 0x4d;
 				mac->rtc_ram[0xf] = 0x63;
@@ -1404,8 +1404,8 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 
 	for (i = 0; i < 6; i++)
 	{
-		keybuf = input_port_read(machine, keynames[i]); 
-		
+		keybuf = input_port_read(machine, keynames[i]);
+
 		// any changes in this row?
 		if ((keybuf != mac->key_matrix[i]) && (report < 2))
 		{
@@ -1421,7 +1421,7 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 					}
 
 					codes[report] = (i<<4)|j;
-					
+
 					// key up?
 					if (!(keybuf & (1 << j)))
 					{
@@ -1437,7 +1437,7 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 							{
 								adb_modifiers &= ~0x20;
 							}
-							else 
+							else
 							{
 								adb_modifiers |= 0x20;
 							}
@@ -1448,7 +1448,7 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 							{
 								adb_modifiers &= ~0x8;
 							}
-							else 
+							else
 							{
 								adb_modifiers |= 0x08;
 							}
@@ -1459,7 +1459,7 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 							{
 								adb_modifiers &= ~0x4;
 							}
-							else 
+							else
 							{
 								adb_modifiers |= 0x04;
 							}
@@ -1470,7 +1470,7 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 							{
 								adb_modifiers &= ~0x2;
 							}
-							else 
+							else
 							{
 								adb_modifiers |= 0x02;
 							}
@@ -1481,7 +1481,7 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 							{
 								adb_modifiers &= ~0x1;
 							}
-							else 
+							else
 							{
 								adb_modifiers |= 0x01;
 							}
@@ -1505,7 +1505,7 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 		}
 	}
 
-//	printf("ADB keyboard: update %d keys %02x %02x\n", update, codes[0], codes[1]);
+//  printf("ADB keyboard: update %d keys %02x %02x\n", update, codes[0], codes[1]);
 
 	// figure out if there was a change
 	if ((adb_currentkeys[0] != codes[0]) || (adb_currentkeys[1] != codes[1]))
@@ -1515,8 +1515,8 @@ static int mac_adb_pollkbd(running_machine *machine, int update)
 		// if we want to update the current read, do so
 		if (update)
 		{
-		 	adb_currentkeys[0] = codes[0];
-		 	adb_currentkeys[1] = codes[1];
+			adb_currentkeys[0] = codes[0];
+			adb_currentkeys[1] = codes[1];
 		}
 	}
 
@@ -1596,7 +1596,7 @@ static void mac_adb_talk(running_machine *machine)
 	addr = (mac->adb_command>>4);
 	reg = (mac->adb_command & 3);
 
-//	printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", mac->adb_command, (mac->adb_command>>2)&3, addr, reg, adb_mouseaddr, adb_keybaddr);
+//  printf("Mac sent %x (cmd %d addr %d reg %d mr %d kr %d)\n", mac->adb_command, (mac->adb_command>>2)&3, addr, reg, adb_mouseaddr, adb_keybaddr);
 
 	if (mac->adb_waiting_cmd)
 	{
@@ -1647,7 +1647,7 @@ static void mac_adb_talk(running_machine *machine)
 				// keep track of what device the Mac last TALKed to
 				mac->adb_last_talk = addr;
 
-				mac->adb_direction = 0;    	// output to Mac
+				mac->adb_direction = 0; 	// output to Mac
 				if (addr == adb_mouseaddr)
 				{
 					UINT8 mouseX, mouseY;
@@ -1706,7 +1706,7 @@ static void mac_adb_talk(running_machine *machine)
 							{
 								mac_adb_pollkbd(machine, 1);
 							}
-//							printf("keyboard = %02x %02x\n", adb_currentkeys[0], adb_currentkeys[1]);
+//                          printf("keyboard = %02x %02x\n", adb_currentkeys[0], adb_currentkeys[1]);
 							mac->adb_buffer[0] = adb_currentkeys[1];
 							mac->adb_buffer[1] = adb_currentkeys[0];
 							mac->adb_datasize = 2;
@@ -1757,7 +1757,7 @@ static void mac_adb_talk(running_machine *machine)
 			if ((mac->adb_listenreg == 3) && (mac->adb_command > 0) && (mac->adb_command < 16))
 			{
 				#if LOG_ADB
-			 	printf("MOUSE: moving to address %x\n", mac->adb_command);
+				printf("MOUSE: moving to address %x\n", mac->adb_command);
 				#endif
 				adb_mouseaddr = mac->adb_command&0x0f;
 			}
@@ -1767,7 +1767,7 @@ static void mac_adb_talk(running_machine *machine)
 			if ((mac->adb_listenreg == 3) && (mac->adb_command > 0) && (mac->adb_command < 16))
 			{
 				#if LOG_ADB
-			 	printf("KEYBOARD: moving to address %x\n", mac->adb_command);
+				printf("KEYBOARD: moving to address %x\n", mac->adb_command);
 				#endif
 				adb_keybaddr = mac->adb_command&0x0f;
 			}
@@ -1841,7 +1841,7 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 	ret = (mac->adb_send & 0x80)>>7;
 	mac->adb_send <<= 1;
 
-//	printf("IN CB2 = %x\n", ret);
+//  printf("IN CB2 = %x\n", ret);
 
 	return ret;
 }
@@ -1927,7 +1927,7 @@ static void mac_egret_response_std(mac_state *mac, int type, int flag, int cmd)
 
 static void mac_egret_response_read_pram(mac_state *mac, int addr)
 {
-	int count = 0x100 - addr;	
+	int count = 0x100 - addr;
 
 	mac->adb_datasize = count+3;
 
@@ -1969,7 +1969,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 		case 0x07: // read PRAM
 			#if LOG_ADB
 			printf("ADB: Egret read PRAM from %x\n", mac->adb_buffer[2]<<8 | mac->adb_buffer[3]);
-	 		#endif
+			#endif
 
 			mac_egret_response_read_pram(mac, mac->adb_buffer[2]<<8 | mac->adb_buffer[3]);
 			break;
@@ -2027,7 +2027,7 @@ static void mac_egret_newaction(mac_state *mac, int state)
 		#if LOG_ADB
 		printf("ADB: New Egret state: SS %d VF %d XS %d\n", (state>>2)&1, (state>>1)&1, mac->adb_state&1);
 		#endif
-		
+
 		// if bit 2 is high and stays high, the rising edge of bit 1 indicates the start of sending a command
 		if ((state & 0x04) && (mac->adb_state & 0x04) && (state & 0x02) && !(mac->adb_state & 0x02))
 		{
@@ -2087,7 +2087,7 @@ static void adb_vblank(running_machine *machine)
 		if (mac_adb_pollmouse(machine))
 		{
 			// if the mouse was the last TALK, we can just send the new data
-			// otherwise we need to pull SRQ 
+			// otherwise we need to pull SRQ
 			if (mac->adb_last_talk == adb_mouseaddr)
 			{
 				// repeat last TALK to get updated data
@@ -2151,14 +2151,14 @@ static void adb_reset(mac_state *mac)
 	mac->adb_direction = 0;
 	mac->adb_datasize = 0;
 	mac->adb_last_talk = -1;
-	
+
 	// mouse
 	adb_mouseaddr = 3;
 	adb_lastmousex = adb_lastmousey = adb_lastbutton = 0;
 	adb_mouse_initialized = 0;
 
 	// keyboard
-	adb_keybaddr = 2;			     
+	adb_keybaddr = 2;
 	adb_keybinitialized = 0;
 	adb_currentkeys[0] = adb_currentkeys[1] = 0x80;
 	adb_modifiers = 0;
@@ -2208,7 +2208,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
 	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-//	printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
@@ -2216,7 +2216,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 	}
 
 	if ((mac->mac_model == MODEL_MAC_CLASSIC) ||
-	    (mac->mac_model == MODEL_MAC_II) || (mac->mac_model == MODEL_MAC_II_FDHD) || 
+	    (mac->mac_model == MODEL_MAC_II) || (mac->mac_model == MODEL_MAC_II_FDHD) ||
 	    (mac->mac_model == MODEL_MAC_IIX) || (mac->mac_model == MODEL_MAC_POWERMAC_6100))
 	{
 		return 0x81;		// bit 0 must be set to avoid attempting to boot from AppleTalk
@@ -2298,7 +2298,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 			val |= 1;
 	}
 
-//	printf("VIA1 IN_B = %02x (PC %x)\n", val, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  printf("VIA1 IN_B = %02x (PC %x)\n", val, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 	return val;
 }
@@ -2309,7 +2309,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 	running_device *fdc = devtag_get_device(device->machine, "fdc");
 	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-//	printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
@@ -2336,8 +2336,8 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 	}
 
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
-	 * possibly later models), overlay was set on reset, but cleared on the
-	 * first access to the ROM. */
+     * possibly later models), overlay was set on reset, but cleared on the
+     * first access to the ROM. */
 	if (mac->mac_model < MODEL_MAC_SE)
 		set_memory_overlay(device->machine, (data & 0x10) >> 4);
 }
@@ -2348,7 +2348,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	int new_rtc_rTCClk;
 	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-//	printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
@@ -2370,18 +2370,18 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 	if ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC))
 	{
 		mac->mac_scsiirq_enable = (data & 0x40) ? 0 : 1;
-//		printf("VIAB & 0x40 = %02x, IRQ enable %d\n", data & 0x40, mac->mac_scsiirq_enable);
+//      printf("VIAB & 0x40 = %02x, IRQ enable %d\n", data & 0x40, mac->mac_scsiirq_enable);
 	}
 
 	if (mac->mac_model == MODEL_MAC_SE30)
 	{
-		// 0x40 = 0 means enable vblank on SE/30		
+		// 0x40 = 0 means enable vblank on SE/30
 		mac->mac_se30_vbl_enable = (data & 0x40) ? 0 : 1;
 
 		// clear the interrupt if we disabled it
 		if (!mac->mac_se30_vbl_enable)
 		{
-		 	mac_nubus_slot_interrupt(device->machine, 0xe, 0);
+			mac_nubus_slot_interrupt(device->machine, 0xe, 0);
 		}
 	}
 
@@ -2465,7 +2465,7 @@ WRITE16_HANDLER ( mac_via2_w )
 	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 
 	offset >>= 8;
-	offset &= 0x0f;	 
+	offset &= 0x0f;
 
 	if (LOG_VIA)
 		logerror("mac_via2_w: offset=%x data=0x%08x\n", offset, data);
@@ -2480,7 +2480,7 @@ static READ8_DEVICE_HANDLER(mac_via2_in_a)
 	UINT8 result = 0xc0;
 	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-	result |= mac->mac_nubus_irq_state; 
+	result |= mac->mac_nubus_irq_state;
 
 	if ((mac->mac_model == MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_IISI))
 	{
@@ -2494,7 +2494,7 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 {
 	mac_state *mac =(mac_state *)device->machine->driver_data;
 
-//	logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
 	if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
 	{
@@ -2511,16 +2511,16 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_a)
 {
-//	logerror("VIA2 OUT A: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 {
 	running_device *via_0 = devtag_get_device(device->machine, "via6522_0");
 
-//	logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
-//	printf("VIA2 OUT B: %02x (MMU = %02x)\n", data, data & 0x08);
+//  printf("VIA2 OUT B: %02x (MMU = %02x)\n", data, data & 0x08);
 
 	// chain 60.15 Hz to VIA1
 	via_ca1_w(via_0, data>>7);
@@ -2539,7 +2539,7 @@ MACHINE_START( mac )
 		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
 	}
 	mac_scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
-	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);	
+	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 MACHINE_RESET(mac)
 {
@@ -2599,7 +2599,7 @@ static STATE_POSTLOAD( mac_state_load )
 	int overlay;
 	mac_state *mac = (mac_state *)machine->driver_data;
 
-	overlay = mac->mac_overlay; 
+	overlay = mac->mac_overlay;
 	mac->mac_overlay = -1;
 	set_memory_overlay(machine, overlay);
 }
@@ -2682,7 +2682,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 
 	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
 
-	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) || 
+	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) ||
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30)) ||
 	    (model == MODEL_MAC_PORTABLE) || (model == MODEL_MAC_PB100))
 	{
@@ -2717,7 +2717,7 @@ static const SCSIConfigTable dev_table =
 	 { SCSI_ID_5, "harddisk2", SCSI_DEVICE_HARDDISK }   /* SCSI ID 5, using disk2, and it's a harddisk */
 	}
 };
-				       
+
 static const struct NCR5380interface macplus_5380intf =
 {
 	&dev_table,	// SCSI device table
@@ -2732,7 +2732,7 @@ static void macscsi_exit(running_machine *machine)
 MACHINE_START( macscsi )
 {
 	MACHINE_START_CALL(mac);
-	
+
 	ncr5380_init(machine, &macplus_5380intf);
 
 	add_exit_callback(machine, macscsi_exit);
@@ -2740,9 +2740,9 @@ MACHINE_START( macscsi )
 
 DRIVER_INIT(macplus)
 {
-//	UINT32 *ROM = (UINT32 *)memory_region(machine, "bootrom");
+//  UINT32 *ROM = (UINT32 *)memory_region(machine, "bootrom");
 
-//	ROM[0x1aefc/4] = 0x6bbe709e;	// AppleTalk: change bpl to bmi
+//  ROM[0x1aefc/4] = 0x6bbe709e;    // AppleTalk: change bpl to bmi
 
 	mac_driver_init(machine, MODEL_MAC_PLUS);
 }

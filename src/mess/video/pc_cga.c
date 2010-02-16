@@ -530,7 +530,7 @@ static VIDEO_UPDATE( mc6845_cga )
 static VIDEO_START( cga_poisk2 )
 {
 	VIDEO_START_CALL(pc_cga);
-	cga.chr_gen = memory_region( machine, "gfx1" ) + 0x0000;	
+	cga.chr_gen = memory_region( machine, "gfx1" ) + 0x0000;
 }
 
 static VIDEO_UPDATE( cga_poisk2 )
@@ -1215,7 +1215,7 @@ static void pc_cga_plantronics_w(running_machine *machine, int data)
 
 WRITE8_HANDLER ( char_ram_w )
 {
-	UINT8 *gfx = memory_region(space->machine, "gfx1");	
+	UINT8 *gfx = memory_region(space->machine, "gfx1");
 	logerror("write char ram %04x %02x\n",offset,data);
 	gfx[offset + 0x0000] = data;
 	gfx[offset + 0x0800] = data;
@@ -1228,7 +1228,7 @@ WRITE32_HANDLER( char_ram_32_w )   { write32le_with_write8_handler(char_ram_w, s
 
 READ8_HANDLER ( char_ram_r )
 {
-	UINT8 *gfx = memory_region(space->machine, "gfx1");	
+	UINT8 *gfx = memory_region(space->machine, "gfx1");
 	return gfx[offset];
 }
 
@@ -1249,7 +1249,7 @@ static READ8_HANDLER( pc_cga8_r )
 			break;
 		case 10:
 			data = cga.vsync | ( ( data & 0x40 ) >> 4 ) | cga.hsync;
-			break;			
+			break;
 		case 0x0f:
 			data = cga.p3df;
 			break;
@@ -1286,7 +1286,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 		UINT8 buswidth = space->machine->firstcpu->databus_width(AS_PROGRAM);
 		const address_space *space_prg = cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 		cga.p3df = data;
-		if (data & 1) {	
+		if (data & 1) {
 			switch(buswidth)
 			{
 				case 8:
@@ -1304,8 +1304,8 @@ static WRITE8_HANDLER( pc_cga8_w )
 				default:
 					fatalerror("CGA:  Bus width %d not supported\n", buswidth);
 					break;
-			}				
-		} else {			
+			}
+		} else {
 			memory_install_read_bank(space_prg, 0xb8000, 0xbbfff, 0, 0x04000, "bank11" );
 			switch(buswidth)
 			{
@@ -1325,10 +1325,10 @@ static WRITE8_HANDLER( pc_cga8_w )
 					fatalerror("CGA:  Bus width %d not supported\n", buswidth);
 					break;
 			}
-		
+
 		}
 		break;
-		
+
 	}
 }
 

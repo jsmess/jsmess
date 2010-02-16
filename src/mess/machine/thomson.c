@@ -383,7 +383,7 @@ static void thom_set_caps_led ( running_machine *machine, int led )
 static struct serial_connection to7_io_line;
 
 static DEVICE_START( thom_serial_cc90323 )
-{	
+{
 	DEVICE_START_CALL(serial);
 	LOG(( "thom_serial_init: init CD 90-320 RS232 device\n" ));
 	serial_device_connect( device, &to7_io_line );
@@ -428,7 +428,7 @@ DEVICE_GET_INFO( thom_serial_cc90323 )
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( thom_serial );break;
 		case DEVINFO_STR_NAME:		                strcpy(info->s, "CD 90-320 RS232");	                 break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                  break;
-		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+		default:									DEVICE_GET_INFO_CALL(serial);	break;
 	}
 }
 
@@ -440,7 +440,7 @@ DEVICE_GET_INFO( thom_serial_rf57232 )
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( thom_serial );break;
 		case DEVINFO_STR_NAME:		                strcpy(info->s, "RF 57-232 RS232");	                 break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                  break;
-		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+		default:									DEVICE_GET_INFO_CALL(serial);	break;
 	}
 }
 
@@ -453,10 +453,10 @@ DEVICE_GET_INFO( thom_serial_modem )
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( thom_serial );break;
 		case DEVINFO_STR_NAME:		                strcpy(info->s, "MODEM (MD 90-120)");	                 break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                  break;
-		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+		default:									DEVICE_GET_INFO_CALL(serial);	break;
 	}
 }
-		
+
 /* ------------ 6850 defines ------------ */
 
 #define ACIA_6850_RDRF  0x01    /* Receive data register full */
@@ -4678,7 +4678,7 @@ static WRITE8_DEVICE_HANDLER ( mo6_sys_porta_out )
 	thom_set_mode_point( device->machine,data & 1 );				/* bit 0: video bank switch */
 	to7_game_mute = data & 4;						/* bit 2: sound mute */
 	thom_set_caps_led( device->machine,(data & 16) ? 0 : 1 ) ;		/* bit 4: keyboard led */
-	mo5_set_cassette( device->machine, (data & 0x40) ? 1 : 0 );	 	/* bit 6: cassette output */
+	mo5_set_cassette( device->machine, (data & 0x40) ? 1 : 0 );		/* bit 6: cassette output */
 	mo6_update_cart_bank(device->machine);					/* bit 5: rom bank */
 	to7_game_sound_update(device->machine);
 }

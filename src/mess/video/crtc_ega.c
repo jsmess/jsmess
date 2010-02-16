@@ -688,10 +688,10 @@ void crtc_ega_update(running_device *device, bitmap_t *bitmap, const rectangle *
 
 			/* check if the cursor is visible and is on this scanline */
 			int cursor_visible = crtc_ega->cursor_state &&
-							 	(ra >= (crtc_ega->cursor_start_ras & 0x1f)) &&
-							 	(ra <= crtc_ega->cursor_end_ras) &&
-							 	(crtc_ega->cursor_addr >= crtc_ega->current_disp_addr) &&
-							 	(crtc_ega->cursor_addr < (crtc_ega->current_disp_addr + ( crtc_ega->horiz_disp + 1 )));
+								(ra >= (crtc_ega->cursor_start_ras & 0x1f)) &&
+								(ra <= crtc_ega->cursor_end_ras) &&
+								(crtc_ega->cursor_addr >= crtc_ega->current_disp_addr) &&
+								(crtc_ega->cursor_addr < (crtc_ega->current_disp_addr + ( crtc_ega->horiz_disp + 1 )));
 
 			/* compute the cursor X position, or -1 if not visible */
 			INT8 cursor_x = cursor_visible ? (crtc_ega->cursor_addr - crtc_ega->current_disp_addr) : -1;

@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Digital Microsystems DMS-86
 
         11/01/2010 Skeleton driver.
@@ -24,8 +24,8 @@ INPUT_PORTS_START( dms86 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dms86) 
-{	
+static MACHINE_RESET(dms86)
+{
 }
 
 static VIDEO_START( dms86 )
@@ -41,10 +41,10 @@ static MACHINE_DRIVER_START( dms86 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8086, XTAL_9_8304MHz)
     MDRV_CPU_PROGRAM_MAP(dms86_mem)
-    MDRV_CPU_IO_MAP(dms86_io)	
+    MDRV_CPU_IO_MAP(dms86_io)
 
     MDRV_MACHINE_RESET(dms86)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -69,5 +69,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1982, dms86,  0,       0, 	dms86, 	dms86, 	 0,   	 "Digital Microsystems",   "DMS-86",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1982, dms86,  0,       0, 	dms86,	dms86,	 0, 	 "Digital Microsystems",   "DMS-86",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

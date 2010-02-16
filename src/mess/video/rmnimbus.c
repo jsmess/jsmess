@@ -1,24 +1,24 @@
 /*
     video/rmnimbus.c
-    
+
     Research machines Nimbus.
-    
+
     2009-11-14, P.Harvey-Smith.
-    
-    This is my best guess implementation of the operation of the Nimbus 
+
+    This is my best guess implementation of the operation of the Nimbus
     video system.
-    
+
     On the real machine, the Video chip has a block of 64K of memory which is
-    completely seperate from the main 80186 memory. 
-    
-    The main CPU write to the video chip via a series of registers in the 
-    0x0000 to 0x002F reigon, the video chip then manages all video memory 
+    completely seperate from the main 80186 memory.
+
+    The main CPU write to the video chip via a series of registers in the
+    0x0000 to 0x002F reigon, the video chip then manages all video memory
     from there.
-    
-    As I cannot find a datasheet for the vide chip marked 	
+
+    As I cannot find a datasheet for the vide chip marked
     MB61H201 Fujitsu RML 12835 GCV, I have had to determine most of its
     operation by disassembling the Nimbus bios and by writing experemental
-    code on the real machine.  
+    code on the real machine.
 */
 
 #include "emu.h"
@@ -58,7 +58,7 @@ UINT8 video_mem[SCREEN_WIDTH_PIXELS][SCREEN_HEIGHT_LINES];
 #define reg01C          0x0E
 #define reg01E          0x0F
 #define reg020          0x10
-#define reg022          0x11 
+#define reg022          0x11
 #define reg024          0x12
 #define reg026          0x13
 #define reg028          0x14
@@ -111,7 +111,7 @@ READ16_HANDLER (nimbus_video_io_r)
 {
     int     pc=cpu_get_pc(space->cpu);
     UINT16  result;
-        
+
     switch (offset)
     {
         case    reg000  : result=vidregs[reg000]; break;
@@ -145,7 +145,7 @@ READ16_HANDLER (nimbus_video_io_r)
 
     if(DEBUG_SET(DEBUG_TEXT))
         logerror("Nimbus video IOR at %05X from %04X mask=%04X, data=%04X\n",pc,(offset*2),mem_mask,result);
-    
+
     return result;
 }
 
@@ -160,7 +160,7 @@ static UINT8 get_pixel(UINT16 x, UINT16 y)
         else
             result=video_mem[x*2][y];
     }
-    
+
     return result;
 }
 
@@ -174,18 +174,18 @@ static UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width)
 
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
         logerror("read_pixel_line(x=%04X, y=%04X, width=%02X, bpp=%02X, pixel_mask=%02X)\n",x,y,width,bpp,pixel_mask);
-    
-    shifts=width-bpp;    
-    
+
+    shifts=width-bpp;
+
     for(mask=pixel_mask, pixel_x=(x*(width/bpp)); mask>0; mask=(mask>>bpp), pixel_x++)
     {
         colour=get_pixel(pixel_x,y);
-        
+
         if(bpp==1)
             colour=((colour==FG_COLOUR) ? 1 : 0) << shifts;
         else
             colour=colour << shifts;
-    
+
         result=(result & ~mask)  | colour;
 
         shifts-=bpp;
@@ -197,31 +197,31 @@ static UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width)
 static UINT16 read_pixel_data(UINT16 x, UINT16 y)
 {
     UINT16  result=0;
-    
+
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
         logerror("read_pixel_data(x=%04X, y=%04X), reg022=%04X\n",x,y,vidregs[reg022]);
-    
+
     if(IS_80COL)
     {
         switch (vidregs[reg022] & WIDTH_MASK)
         {
             case 0x00   : break;
-                      
+
             case 0x01   : break;
-                      
+
             case 0x02   : break;
-        
-            case 0x03   : break; 
-        
+
+            case 0x03   : break;
+
             case 0x04   : break;
-        
+
             case 0x05   : break;
-        
+
             case 0x06   : bpp=2; pixel_mask=0xC000;
-                          result=read_pixel_line(x,y,16); 
+                          result=read_pixel_line(x,y,16);
                           break;
-        
-            case 0x07   : break;   
+
+            case 0x07   : break;
         }
     }
     else /* 40 Col */
@@ -229,25 +229,25 @@ static UINT16 read_pixel_data(UINT16 x, UINT16 y)
         switch (vidregs[reg022] & WIDTH_MASK)
         {
             case 0x00   : break;
-                      
+
             case 0x01   : break;
-                      
+
             case 0x02   : break;
-        
-            case 0x03   : break; 
-        
+
+            case 0x03   : break;
+
             case 0x04   : break;
-        
+
             case 0x05   : break;
-        
+
             case 0x06   : bpp=4; pixel_mask=0xF000;
-                          result=read_pixel_line(x,y,16); 
+                          result=read_pixel_line(x,y,16);
                           break;
-        
-            case 0x07   : break;   
+
+            case 0x07   : break;
         }
     }
-    
+
     return result;
 }
 
@@ -260,11 +260,11 @@ static UINT16 read_reg_00A(void)
 /*
     Write to the video registers, the default action is to write to the array of registers.
     If a register also needs some special action call the action function for that register.
-    
-    Incase anyone wonders about the DEBUG_DB statement, this allows me to log which registers 
+
+    Incase anyone wonders about the DEBUG_DB statement, this allows me to log which registers
     are being written to and then play them back at the real machine, this has helped greatly
     in figuring out what the video registers do.
-    
+
 */
 
 WRITE16_HANDLER (nimbus_video_io_w)
@@ -279,7 +279,7 @@ WRITE16_HANDLER (nimbus_video_io_w)
         if(DEBUG_SET(DEBUG_DB))
             logerror("dw %05X,%05X\n",(offset*2),data);
     }
-    
+
     switch (offset)
     {
         case    reg000  : vidregs[reg000]=data; break;
@@ -308,7 +308,7 @@ WRITE16_HANDLER (nimbus_video_io_w)
         case    reg02A  : change_palette(space->machine,1,data,reg02A); break;
         case    reg02C  : change_palette(space->machine,2,data,reg02C); break;
         case    reg02E  : change_palette(space->machine,3,data,reg02E); break;
-        
+
         default         : break;
     }
 }
@@ -317,7 +317,7 @@ static void set_pixel(UINT16 x, UINT16 y, UINT8 colour)
 {
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
         logerror("set_pixel(x=%04X, y=%04X, colour=%04X), IS_XOR=%02X\n",x,y,colour,IS_XOR);
-    
+
     if(IS_80COL)
         colour&=0x03;
 
@@ -345,18 +345,18 @@ static void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
 
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
         logerror("write_pixel_line(x=%04X, y=%04X, data=%04X, width=%02X, bpp=%02X, pixel_mask=%02X)\n",x,y,data,width,bpp,pixel_mask);
-    
-    shifts=width-bpp;    
-    
+
+    shifts=width-bpp;
+
     for(mask=pixel_mask, pixel_x=(x*(width/bpp)); mask>0; mask=(mask>>bpp), pixel_x++)
     {
         if(bpp==1)
             colour=(data & mask) ? FG_COLOUR : BG_COLOUR;
         else
             colour=(data & mask) >> shifts;
-        
-        //logerror("write_pixel_line: data=%04X, mask=%04X, shifts=%02X, bpp=%02X colour=%02X\n",data,mask,shifts,bpp,colour); 
-        
+
+        //logerror("write_pixel_line: data=%04X, mask=%04X, shifts=%02X, bpp=%02X colour=%02X\n",data,mask,shifts,bpp,colour);
+
         if(IS_80COL)
             set_pixel(pixel_x,y,colour);
         else
@@ -370,10 +370,10 @@ static void move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
 {
     UINT16  pixelno;
     UINT16  pixelx;
-    
+
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
        logerror("move_pixel_line(x=%04X, y=%04X, data=%04X, width=%02X)\n",x,y,data,width);
-       
+
     for(pixelno=0;pixelno<width;pixelno++)
     {
         pixelx=(x*width)+pixelno;
@@ -385,70 +385,70 @@ static void move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width)
 
 
 
-/* 
+/*
     The values in the bottom 3 bits of reg022 seem to determine the number of bits per pixel
     for following operations.
-    
+
     The values that I have decoded so far are :
-    
+
     000 1bpp, foreground and background colours taken from reg024
     001 2bpp, using the first 4 colours of the pallette
-    010 
-    011 
+    010
+    011
     100 4bpp, must be a 16 bit word, of which the upper byte is a mask anded with the lower byte
               containing the pixel data for two pixels.
     101 Move pixel data at x,reg020 to x,y, used for scrolling.
     110 if 40 col
             4bpp, 16 bit word containing the pixel data for 4 pixels.
-        else 
+        else
             2bpp, 16 bit word containing the pixel data for 8 pixels.
     111
-    
+
     Bit 3 of reg022 is as follows :
-    
+
     0   pixels are written from supplied colour data
     1   pixels are xor'ed onto the screen
 */
 
 static void write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
-{    
+{
     if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
         logerror("write_pixel_data(x=%04X, y=%04X, data=%04X), reg022=%04X\n",x,y,data,vidregs[reg022]);
-    
+
     if(IS_80COL)
     {
         switch (vidregs[reg022] & WIDTH_MASK)
         {
             case 0x00   : bpp=1; pixel_mask=0x8000;
-                          write_pixel_line(x,y,data,16); 
+                          write_pixel_line(x,y,data,16);
                           break;
-                      
+
             case 0x01   : bpp=1; pixel_mask=0x80;
-                          write_pixel_line(x,y,data,8); 
+                          write_pixel_line(x,y,data,8);
                           break;
-                      
+
             case 0x02   : bpp=1; pixel_mask=0x0080;
-                          write_pixel_line(x,y,data,8); 
+                          write_pixel_line(x,y,data,8);
                           break;
-        
-            case 0x03   : bpp=1; 
-                          set_pixel(x,y,FG_COLOUR); 
-                          break; 
-        
+
+            case 0x03   : bpp=1;
+                          set_pixel(x,y,FG_COLOUR);
+                          break;
+
             case 0x04   : bpp=2; pixel_mask=0xC0;
-                          write_pixel_line(x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8); 
+                          write_pixel_line(x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8);
                           break;
-        
+
             case 0x05   : move_pixel_line(x,y,data,16);
                           break;
-        
+
             case 0x06   : bpp=2; pixel_mask=0xC000;
-                          write_pixel_line(x,y,data,16); 
+                          write_pixel_line(x,y,data,16);
                           break;
-        
-            case 0x07   : bpp=1; 
+
+            case 0x07   : bpp=1;
                           set_pixel(x,y,FG_COLOUR);
-                          break;   
+                          break;
         }
     }
     else /* 40 Col */
@@ -456,35 +456,35 @@ static void write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
         switch (vidregs[reg022] & WIDTH_MASK)
         {
             case 0x00   : bpp=1; pixel_mask=0x0080;
-                          write_pixel_line(x,y,data,8); 
+                          write_pixel_line(x,y,data,8);
                           break;
-                      
+
             case 0x01   : bpp=2; pixel_mask=0xC0;
-                          write_pixel_line(x,y,data,8); 
+                          write_pixel_line(x,y,data,8);
                           break;
-                      
+
             case 0x02   : bpp=1; pixel_mask=0x0080;
                           set_pixel40(x,y,FG_COLOUR);
                           break;
-        
-            case 0x03   : bpp=1; 
-                          set_pixel(x,y,FG_COLOUR); 
-                          break; 
-        
-            case 0x04   : bpp=4; pixel_mask=0xF0;
-                          write_pixel_line(x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8); 
+
+            case 0x03   : bpp=1;
+                          set_pixel(x,y,FG_COLOUR);
                           break;
-        
+
+            case 0x04   : bpp=4; pixel_mask=0xF0;
+                          write_pixel_line(x,y,((data & 0xFF) & ((data & 0xFF00)>>8)),8);
+                          break;
+
             case 0x05   : move_pixel_line(x,y,data,16);
                           break;
-        
+
             case 0x06   : bpp=4; pixel_mask=0xF000;
-                          write_pixel_line(x,y,data,16); 
+                          write_pixel_line(x,y,data,16);
                           break;
-        
-            case 0x07   : bpp=1; 
+
+            case 0x07   : bpp=1;
                           set_pixel(x,y,FG_COLOUR);
-                          break;   
+                          break;
         }
     }
 }
@@ -497,7 +497,7 @@ static void write_reg_004(void)
 
 static void write_reg_010(void)
 {
-    write_pixel_data(vidregs[reg002],vidregs[reg00C],vidregs[reg010]);    
+    write_pixel_data(vidregs[reg002],vidregs[reg00C],vidregs[reg010]);
 }
 
 static void write_reg_012(void)
@@ -511,20 +511,20 @@ static void write_reg_012(void)
 }
 
 static void write_reg_014(void)
-{  
+{
     write_pixel_data(vidregs[reg002],vidregs[reg00C]++,vidregs[reg014]);
 }
 
 static void write_reg_01A(void)
 {
-    write_pixel_data(++vidregs[reg002],vidregs[reg00C],vidregs[reg01A]);  
+    write_pixel_data(++vidregs[reg002],vidregs[reg00C],vidregs[reg01A]);
 }
 
 static void write_reg_01C(void)
 {
     // I dunno if this is actually what is happening as the regs seem to be write only....
-    // doing this however does seem to make some programs (welcome from the welcom disk, 
-    // and others using the standard RM box menus) work correctly.   
+    // doing this however does seem to make some programs (welcome from the welcom disk,
+    // and others using the standard RM box menus) work correctly.
     vidregs[reg00C]=vidregs[reg01C];
 
     write_pixel_data(vidregs[reg002],vidregs[reg01C],FG_COLOUR);
@@ -549,26 +549,26 @@ static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours,
     UINT8   paletteidx;
     UINT8   colourmax;
     UINT8   first;
-    
+
     // for the register's data has changed update it, and then update the pallette, else do nothing.
     if(vidregs[regno]!=colours)
         vidregs[regno]=colours;
     else
         return;
-    
+
     // Setup parameters for pallette change
     colourmax=IS_80COL ? 1 : 4;
     first=IS_80COL ? bank : bank*4;
 
     shifts=0;
     mask=0x000F;
-    
+
     // loop over changing colours
     for(colourno=first; colourno<(first+colourmax); colourno++)
     {
         paletteidx=(colours & mask) >> shifts;
         palette_set_color_rgb(machine, colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE]);
-        
+
         if(DEBUG_SET(DEBUG_TEXT))
             logerror("set colourno[%02X](r,g,b)=(%02X,%02X,%02X), paletteidx=%02X\n",colourno, nimbus_palette[paletteidx][RED], nimbus_palette[paletteidx][GREEN], nimbus_palette[paletteidx][BLUE],paletteidx);
         mask=mask<<4;
@@ -579,8 +579,8 @@ static void change_palette(running_machine *machine, UINT8 bank, UINT16 colours,
 static void video_debug(running_machine *machine, int ref, int params, const char *param[])
 {
     if(params>0)
-    {   
-        sscanf(param[0],"%d",&debug_on);        
+    {
+        sscanf(param[0],"%d",&debug_on);
     }
     else
     {
@@ -592,7 +592,7 @@ static void video_debug(running_machine *machine, int ref, int params, const cha
 static void video_regdump(running_machine *machine, int ref, int params, const char *param[])
 {
     int regno;
-    
+
     for(regno=0;regno<0x08;regno++)
     {
         debug_console_printf(machine,"reg%03X=%04X reg%03X=%04X reg%03X=%04X\n",
@@ -610,10 +610,10 @@ static void video_regdump(running_machine *machine, int ref, int params, const c
 VIDEO_START( nimbus )
 {
     debug_on=0;
-    
+
     logerror("VIDEO_START\n");
-  
-   	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+
+	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
         debug_console_register_command(machine, "nimbus_vid_debug", CMDFLAG_NONE, 0, 0, 1, video_debug);
         debug_console_register_command(machine, "nimbus_vid_regdump", CMDFLAG_NONE, 0, 0, 1, video_regdump);
@@ -624,7 +624,7 @@ VIDEO_RESET( nimbus )
 {
     // When we reset clear the video registers and video memory.
     memset(&vidregs,0x00,sizeof(vidregs));
-    memset(&video_mem,0,sizeof(video_mem)); 
+    memset(&video_mem,0,sizeof(video_mem));
 
     bpp=4;          // bits per pixel
     logerror("Video reset\n");
@@ -640,9 +640,9 @@ VIDEO_UPDATE( nimbus )
 {
     int     XCoord;
     int     YCoord = video_screen_get_vpos(screen);
-     
+
     for(XCoord=0;XCoord<SCREEN_WIDTH_PIXELS;XCoord++)
-    {       
+    {
         *BITMAP_ADDR16(bitmap, YCoord, XCoord)=video_mem[XCoord][YCoord];
     }
 

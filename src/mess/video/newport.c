@@ -1584,8 +1584,8 @@ WRITE32_HANDLER( newport_rex3_w )
 			newport_vc2_w( space, 0, data, mem_mask );
 			break;
 		case 0x01:
- 			newport_cmap0_w( space, 0, data, mem_mask );
- 			break;
+			newport_cmap0_w( space, 0, data, mem_mask );
+			break;
 		case 0x04:
 			newport_xmap0_w( space, 0, data, mem_mask );
 			newport_xmap1_w( space, 0, data, mem_mask );

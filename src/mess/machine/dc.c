@@ -96,7 +96,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_xferlen -= 2048;
 
 		// perform the DMA
-		ddtdata.destination = atapi_xferbase; 	// destination address
+		ddtdata.destination = atapi_xferbase;	// destination address
 		ddtdata.length = 2048/4;
 		ddtdata.size = 4;
 		ddtdata.buffer = sector_buffer;
@@ -378,7 +378,7 @@ static WRITE32_HANDLER( atapi_w )
 			}
 			else
 			{
-              			printf("ATAPI: SCSI device returned error!\n");
+            			printf("ATAPI: SCSI device returned error!\n");
 
 				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_CHECK;
 				atapi_regs[ATAPI_REG_ERROR] = 0x50;	// sense key = ILLEGAL REQUEST
@@ -395,26 +395,26 @@ static WRITE32_HANDLER( atapi_w )
 		{
 		case ATAPI_REG_DATA:
 			printf( "atapi_w: data=%02x\n", data );
-	      		break;
-	      	case ATAPI_REG_FEATURES:
+	    		break;
+	    	case ATAPI_REG_FEATURES:
 			printf( "atapi_w: features=%02x\n", data );
-	      		break;
-	      	case ATAPI_REG_INTREASON:
+	    		break;
+	    	case ATAPI_REG_INTREASON:
 			printf( "atapi_w: intreason=%02x\n", data );
-	      		break;
-	      	case ATAPI_REG_SAMTAG:
+	    		break;
+	    	case ATAPI_REG_SAMTAG:
 			printf( "atapi_w: samtag=%02x\n", data );
-	      		break;
-	      	case ATAPI_REG_COUNTLOW:
+	    		break;
+	    	case ATAPI_REG_COUNTLOW:
 			printf( "atapi_w: countlow=%02x\n", data );
-	      		break;
-	      	case ATAPI_REG_COUNTHIGH:
+	    		break;
+	    	case ATAPI_REG_COUNTHIGH:
 			printf( "atapi_w: counthigh=%02x\n", data );
-	      		break;
-	      	case ATAPI_REG_DRIVESEL:
+	    		break;
+	    	case ATAPI_REG_DRIVESEL:
 			printf( "atapi_w: drivesel=%02x\n", data );
-	      		break;
-	      	case ATAPI_REG_CMDSTATUS:
+	    		break;
+	    	case ATAPI_REG_CMDSTATUS:
 			printf( "atapi_w: cmdstatus=%02x\n", data );
 			break;
 		}
@@ -429,7 +429,7 @@ static WRITE32_HANDLER( atapi_w )
 			switch (data)
 			{
 				case 0xa0:	// PACKET
-		 			atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
+					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 					gdrom_alt_status = ATAPI_STAT_DRQ;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
@@ -444,7 +444,7 @@ static WRITE32_HANDLER( atapi_w )
 					break;
 
 				case 0xa1:	// IDENTIFY PACKET DEVICE
-		 			atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
+					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 					gdrom_alt_status = ATAPI_STAT_DRQ;
 
 					atapi_data_ptr = 0;
@@ -506,7 +506,7 @@ static WRITE32_HANDLER( atapi_w )
 						printf("ATAPI: Unknown set features %x\n", atapi_regs[ATAPI_REG_FEATURES]);
 					}
 
-		 			atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
+					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 					gdrom_alt_status = 0;	// is this correct?
 
 					atapi_data_ptr = 0;
@@ -678,7 +678,7 @@ INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_m
 	{
 		reg++;
 		*shift = 32;
- 	}
+	}
 
 	return reg;
 }

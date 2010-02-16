@@ -662,7 +662,7 @@ DEVICE_GET_INFO(applefdc)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(oldfdc);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(applefdc_base);	break;
+		default:										DEVICE_GET_INFO_CALL(applefdc_base);	break;
 	}
 }
 
@@ -695,7 +695,7 @@ DEVICE_GET_INFO(iwm)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(iwm);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(applefdc_base);	break;
+		default:										DEVICE_GET_INFO_CALL(applefdc_base);	break;
 	}
 }
 
@@ -728,6 +728,6 @@ DEVICE_GET_INFO(swim)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(swim);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(applefdc_base);	break;
+		default:										DEVICE_GET_INFO_CALL(applefdc_base);	break;
 	}
 }

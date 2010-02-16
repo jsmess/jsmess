@@ -5,7 +5,7 @@
 			<color red="0.1" green="0.1" blue="0.1" />
 		</rect>
 	</element>
-	
+
 	<element name="power_led" defstate="1">
 		<rect state="0">
 			<color red="0" green="0.2" blue="0" />
@@ -30,7 +30,7 @@
 			<color red="0.8" green="0" blue="0" />
 		</rect>
 	</element>
-	
+
 	<element name="power_str" defstate="0">
 		<text string="POWER">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -55,7 +55,7 @@
 			<bounds x="0" y="0" width="35" height="4" />
 		</text>
 	</element>
-	
+
 	<view name="Control panel">
 		<bezel element="background">
 			<bounds x="0" y="0" width="67" height="52" />

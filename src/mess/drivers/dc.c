@@ -106,7 +106,7 @@ static WRITE64_HANDLER( dc_arm_w )
  // SB_LMMODE1
  static WRITE64_HANDLER( ta_texture_directpath1_w )
  {
- 	int mode = pvrctrl_regs[SB_LMMODE1]&1;
+	int mode = pvrctrl_regs[SB_LMMODE1]&1;
 	if (mode&1)
 	{
 		printf("ta_texture_directpath0_w 32-bit access!\n");

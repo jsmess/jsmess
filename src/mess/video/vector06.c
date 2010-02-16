@@ -17,8 +17,8 @@ VIDEO_START( vector06 )
 
 VIDEO_UPDATE( vector06 )
 {
- 	UINT8 code1,code2,code3,code4;
- 	UINT8 col;
+	UINT8 code1,code2,code3,code4;
+	UINT8 col;
 	int y, x, b,draw_y;
 
 	int width = (vector06_video_mode==0x00) ? 256 : 512;

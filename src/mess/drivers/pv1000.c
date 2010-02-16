@@ -17,8 +17,8 @@ typedef struct _pvaudio_voice pvaudio_voice;
 struct _pvaudio_voice
 {
 	UINT32 count;
-	UINT16 period;	
-	UINT8  val;	
+	UINT16 period;
+	UINT8  val;
 };
 
 
@@ -67,16 +67,16 @@ static WRITE8_HANDLER( pv1000_gfxram_w )
 
 static WRITE8_HANDLER( pv1000_io_w )
 {
-	
+
 	switch ( offset )
 	{
 	case 0x00:
 	case 0x01:
 	case 0x02:
-		//logerror("pv1000_io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);	
+		//logerror("pv1000_io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);
 		g_audio.voice[offset].period=data;
 	break;
-	
+
 	case 0x03:
 		//currently unknown use
 	break;
@@ -94,7 +94,7 @@ static READ8_HANDLER( pv1000_io_r )
 {
 	UINT8 data = pv1000_io_regs[offset];
 
-//	logerror("pv1000_io_r offset=%02x\n", offset );
+//  logerror("pv1000_io_r offset=%02x\n", offset );
 
 	switch ( offset )
 	{
@@ -225,11 +225,11 @@ static VIDEO_UPDATE( pv1000 )
 
 /*
  plgDavid's audio implementation/analysis notes:
- 
+
  Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
- then by the value of the 6bit period registers. 
+ then by the value of the 6bit period registers.
  This creates a surprisingly accurate pitch range.
- 
+
  Note: the register periods are inverted.
  */
 
@@ -258,7 +258,7 @@ static STREAM_UPDATE( pv1000_sound_update )
 			   v->val = !v->val;
 			}
 		}
-		
+
 		buffer++;
 		samples--;
 	}

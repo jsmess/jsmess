@@ -300,7 +300,7 @@ static WRITE8_HANDLER( mapper4_w )
 			break;
 
 		case 0x2001: /* extra RAM enable/disable */
-			mmc_cmd2 = data; 	/* This actually is made of two parts: data&0x80 = WRAM enabled and data&0x40 = WRAM readonly!  */
+			mmc_cmd2 = data;	/* This actually is made of two parts: data&0x80 = WRAM enabled and data&0x40 = WRAM readonly!  */
 						/* We save this twice because we will need mmc_cmd2 in some clone mapper */
 			nes.mid_ram_enable = data;
 			break;
@@ -1611,7 +1611,7 @@ static void jaleco_irq( running_device *device, int scanline, int vblank, int bl
 			if ((IRQ_count & 0x00ff) < 114)
 			{
 				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-				IRQ_count = (IRQ_count & ~0x00ff) | (0xff - 114 + (IRQ_count & 0x00ff)); 	// wrap around the 8 bits counter
+				IRQ_count = (IRQ_count & ~0x00ff) | (0xff - 114 + (IRQ_count & 0x00ff));	// wrap around the 8 bits counter
 			}
 			else
 				IRQ_count -= 114;
@@ -1621,7 +1621,7 @@ static void jaleco_irq( running_device *device, int scanline, int vblank, int bl
 			if ((IRQ_count & 0x0fff)  < 114)
 			{
 				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-				IRQ_count = (IRQ_count & ~0x0fff) | (0xfff - 114 + (IRQ_count & 0x0fff)); 	// wrap around the 12 bits counter
+				IRQ_count = (IRQ_count & ~0x0fff) | (0xfff - 114 + (IRQ_count & 0x0fff));	// wrap around the 12 bits counter
 			}
 			else
 				IRQ_count -= 114;
@@ -2585,7 +2585,7 @@ static WRITE8_HANDLER( mapper34_w )
 	/* Deadly Towers is really a Mapper 34 game - the demo screens look wrong using mapper 7. */
 	LOG_MMC(("mapper34_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (!nes.crc_hack) 	// is it plain BxROM?
+	if (!nes.crc_hack)	// is it plain BxROM?
 		prg32(space->machine, data);
 }
 

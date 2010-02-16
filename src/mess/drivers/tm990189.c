@@ -106,7 +106,7 @@ static const TMS9928a_interface tms9918_interface =
 static MACHINE_START( tm990_189_v )
 {
 	TMS9928A_configure(&tms9918_interface);
-	
+
 	displayena_timer = timer_alloc(machine, NULL, NULL);
 
 	joy1x_timer = timer_alloc(machine, NULL, NULL);
@@ -400,8 +400,8 @@ static DEVICE_GET_INFO( tm990_189_rs232 )
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "");                                         break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                        	break;		
-		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 1;                                        	break;
+		default:									DEVICE_GET_INFO_CALL(serial);	break;
 	}
 }
 
@@ -409,7 +409,7 @@ static DEVICE_GET_INFO( tm990_189_rs232 )
 
 #define MDRV_TM990_189_RS232_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, TM990_189_RS232, 0)
-	
+
 
 static TMS9902_RST_CALLBACK( rts_callback )
 {
@@ -795,7 +795,7 @@ static MACHINE_DRIVER_START(tm990_189)
 	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902", tms9902_params)
-	
+
 	MDRV_TM990_189_RS232_ADD("rs232")
 MACHINE_DRIVER_END
 
@@ -841,7 +841,7 @@ static MACHINE_DRIVER_START(tm990_189_v)
 	MDRV_TMS9901_ADD("tms9901_1", sys9901reset_param)
 	/* tms9902 */
 	MDRV_TMS9902_ADD("tms9902", tms9902_params)
-	
+
 	MDRV_TM990_189_RS232_ADD("rs232")
 MACHINE_DRIVER_END
 

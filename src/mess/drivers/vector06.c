@@ -23,7 +23,7 @@
 /* Address maps */
 static ADDRESS_MAP_START(vector06_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x7fff ) AM_READ_BANK("bank1") AM_WRITE_BANK("bank2")
-  	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
+	AM_RANGE( 0x8000, 0xffff ) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vector06_io , ADDRESS_SPACE_IO, 8)
@@ -35,8 +35,8 @@ static ADDRESS_MAP_START( vector06_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x18, 0x18) AM_DEVREADWRITE("wd1793", wd17xx_data_r,wd17xx_data_w)
 	AM_RANGE( 0x19, 0x19) AM_DEVREADWRITE("wd1793", wd17xx_sector_r,wd17xx_sector_w)
 	AM_RANGE( 0x1A, 0x1A) AM_DEVREADWRITE("wd1793", wd17xx_track_r,wd17xx_track_w)
-  	AM_RANGE( 0x1B, 0x1B) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w)
-  	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector06_disc_w)
+	AM_RANGE( 0x1B, 0x1B) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w)
+	AM_RANGE( 0x1C, 0x1C) AM_WRITE(vector06_disc_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -168,14 +168,14 @@ const wd17xx_interface vector06_wd17xx_interface =
 /* Machine driver */
 static MACHINE_DRIVER_START( vector06 )
   /* basic machine hardware */
-  	MDRV_CPU_ADD("maincpu", 8080, 3000000)
+	MDRV_CPU_ADD("maincpu", 8080, 3000000)
 //  MDRV_CPU_ADD("maincpu", Z80, 3000000)
-  	MDRV_CPU_PROGRAM_MAP(vector06_mem)
-  	MDRV_CPU_IO_MAP(vector06_io)
-  	MDRV_CPU_VBLANK_INT("screen", vector06_interrupt)
+	MDRV_CPU_PROGRAM_MAP(vector06_mem)
+	MDRV_CPU_IO_MAP(vector06_io)
+	MDRV_CPU_VBLANK_INT("screen", vector06_interrupt)
 
 	MDRV_MACHINE_START( vector06 )
-  	MDRV_MACHINE_RESET( vector06 )
+	MDRV_MACHINE_RESET( vector06 )
 
 	MDRV_I8255A_ADD( "ppi8255", vector06_ppi8255_interface )
 
@@ -192,7 +192,7 @@ static MACHINE_DRIVER_START( vector06 )
 	MDRV_PALETTE_INIT(vector06)
 
 	MDRV_VIDEO_START(vector06)
-  	MDRV_VIDEO_UPDATE(vector06)
+	MDRV_VIDEO_UPDATE(vector06)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
@@ -235,20 +235,20 @@ ROM_END
 
 ROM_START( vec1200 )
     ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-  	ROM_LOAD( "vec1200.bin", 0x10000, 0x2000, CRC(37349224) SHA1(060fbb2c1a89040c929521cfd58cb6f1431a8b75))
-  	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_LOAD( "vec1200.bin", 0x10000, 0x2000, CRC(37349224) SHA1(060fbb2c1a89040c929521cfd58cb6f1431a8b75))
+	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_FILL_FF | ROM_OPTIONAL)
     ROM_REGION( 0x0200, "palette", 0 )
-  	ROM_LOAD( "palette.bin", 0x0000, 0x0200, CRC(74b7376b) SHA1(fb56b60babd7e6ed68e5f4e791ad2800d7ef6729))
+	ROM_LOAD( "palette.bin", 0x0000, 0x0200, CRC(74b7376b) SHA1(fb56b60babd7e6ed68e5f4e791ad2800d7ef6729))
 ROM_END
 ROM_START( pk6128c )
     ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
-  	ROM_LOAD( "6128.bin", 0x10000, 0x4000, CRC(d4f68433) SHA1(ef5ac75f9240ca8996689c23642d4e47e5e774d8))
-  	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_FILL_FF | ROM_OPTIONAL)
+	ROM_LOAD( "6128.bin", 0x10000, 0x4000, CRC(d4f68433) SHA1(ef5ac75f9240ca8996689c23642d4e47e5e774d8))
+	ROM_CART_LOAD("cart", 0x18000, 0x8000, ROM_FILL_FF | ROM_OPTIONAL)
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME         PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1987, vector06, 	 0,  	 	0,	vector06, 	vector06, 	0,        "", 					 "Vector 06c",	 GAME_NOT_WORKING)
-COMP( 1987, vec1200, 	 vector06, 	0,	vector06, 	vector06, 	0,        "", 					 "Vector 1200",	 GAME_NOT_WORKING)
-COMP( 1987, pk6128c, 	 vector06,  0,	vector06, 	vector06, 	0,        "", 					 "PK-6128c",	 GAME_NOT_WORKING)
+COMP( 1987, vector06,	 0, 		0,	vector06,	vector06,	0,        "",					 "Vector 06c",	 GAME_NOT_WORKING)
+COMP( 1987, vec1200,	 vector06,	0,	vector06,	vector06,	0,        "",					 "Vector 1200",	 GAME_NOT_WORKING)
+COMP( 1987, pk6128c,	 vector06,  0,	vector06,	vector06,	0,        "",					 "PK-6128c",	 GAME_NOT_WORKING)

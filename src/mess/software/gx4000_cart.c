@@ -147,8 +147,8 @@ SOFTWARE_LIST_START( gx4000_cart )
 	SOFTWARE( klax,     0,         1990, "Domark", "Klax", 0, 0 )
 	SOFTWARE( mystical, 0,         1990, "Infogrames", "Mystical", 0, 0 )
 	SOFTWARE( nvyseals, 0,         1990, "Ocean Software", "Navy Seals", 0, 0 )
-	SOFTWARE( noexit,   0,         1990, "CVS", "No Exit", 0, 0 ) 				/* doesn't boot */
-	SOFTWARE( optndblt, 0,         1990, "Ocean Software", "Operation Thunderbolt", 0, 0 ) 	/* doesn't boot */
+	SOFTWARE( noexit,   0,         1990, "CVS", "No Exit", 0, 0 )				/* doesn't boot */
+	SOFTWARE( optndblt, 0,         1990, "Ocean Software", "Operation Thunderbolt", 0, 0 )	/* doesn't boot */
 	SOFTWARE( pang,     0,         1990, "Ocean Software", "Pang", 0, 0 )			/* minor gfx glitch */
 	SOFTWARE( pkckbox,  0,         1991, "Loriciel Software", "Panza Kick Boxing", 0, 0 )
 	SOFTWARE( pbmagic,  0,         1991, "Loriciel Software", "Pinball Magic", 0, 0 )	/* glitched title screen */

@@ -76,4 +76,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, prof180x,  0,       0, 	prof180x, 	prof180x, 	 0,  "Conitec Datensysteme",   "PROF-180X",		GAME_NOT_WORKING  | GAME_NO_SOUND)
+COMP( 1986, prof180x,  0,       0,	prof180x,	prof180x,	 0,  "Conitec Datensysteme",   "PROF-180X",		GAME_NOT_WORKING  | GAME_NO_SOUND)

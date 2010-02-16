@@ -78,5 +78,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, sc2,  0,       0, 	sc2, 	sc2, 	 0,  	  	 	 "VEB Mikroelektronik Erfurt",   "Schachcomputer SC2",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, sc2,  0,       0,	sc2,	sc2,	 0, 			 "VEB Mikroelektronik Erfurt",   "Schachcomputer SC2",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

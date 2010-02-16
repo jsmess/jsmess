@@ -531,11 +531,11 @@ static void wd17xx_command_restore(running_device *device)
 
 /*
         Gets the size in bytes of the current track. For real hardware this
-	may vary per system in small degree, and there even for each track 
-	and head, so we should not assume a fixed value here. 
-	As we are using a buffered track writing, we have to find out how long
-	the track will become. The only object which can tell us is the 
-	selected format.
+    may vary per system in small degree, and there even for each track
+    and head, so we should not assume a fixed value here.
+    As we are using a buffered track writing, we have to find out how long
+    the track will become. The only object which can tell us is the
+    selected format.
 */
 static int get_track_size(wd1770_state *w)
 {
@@ -553,12 +553,12 @@ static int get_track_size(wd1770_state *w)
 }
 
 /*
-	Write an entire track. Formats which do not define a write_track
-	function pointer will cause a silent return.
-	What is written to the image depends on the selected format. Sector 
-	dumps have to extract the sectors in the track, while track dumps
-	may directly write the bytes.
-	(The if-part below may thus be removed.)
+    Write an entire track. Formats which do not define a write_track
+    function pointer will cause a silent return.
+    What is written to the image depends on the selected format. Sector
+    dumps have to extract the sectors in the track, while track dumps
+    may directly write the bytes.
+    (The if-part below may thus be removed.)
 */
 static void write_track(running_device *device)
 {
@@ -586,7 +586,7 @@ static void write_track(running_device *device)
 #endif
 
 	/* Determine the track size. We cannot allow different sizes in this
-	   design. */
+       design. */
         w->data_count = get_track_size(w);
 
         if (w->data_count==0)
@@ -606,11 +606,11 @@ static void write_track(running_device *device)
 	w->busy_count = 0;
 }
 
-/* 
-	Read an entire track. It is up to the format to deliver the data. Sector
-	dumps may be required to fantasize the missing track bytes, while track
-	dumps can directly deliver them.
-	(The if-part below may thus be removed.)
+/*
+    Read an entire track. It is up to the format to deliver the data. Sector
+    dumps may be required to fantasize the missing track bytes, while track
+    dumps can directly deliver them.
+    (The if-part below may thus be removed.)
 */
 static void read_track(running_device *device)
 {
@@ -734,7 +734,7 @@ static void read_track(running_device *device)
 	}
 #endif
 	/* Determine the track size. We cannot allow different sizes in this
-	   design. */
+       design. */
         w->data_count = get_track_size(w);
 
         if (w->data_count==0)
@@ -1580,7 +1580,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 
 			w->command_type = TYPE_III;
 			w->status &= ~STA_2_LOST_DAT;
-  			wd17xx_clear_drq(device);
+			wd17xx_clear_drq(device);
 
 			if (floppy_drive_get_flag_state(w->drive, FLOPPY_DRIVE_READY))
 				wd17xx_read_id(device);
@@ -1772,37 +1772,37 @@ WRITE8_DEVICE_HANDLER( wd17xx_sector_w )
 WRITE8_DEVICE_HANDLER( wd17xx_data_w )
 {
 	wd1770_state *w = get_safe_token(device);
-	
+
 	if (w->data_count > 0)
 	{
 		wd17xx_clear_drq(device);
-		
+
 		/* put byte into buffer */
 		if (VERBOSE_DATA)
 			logerror("wd17xx_info buffered data: $%02X at offset %d.\n", data, w->data_offset);
-		
+
 		w->buffer[w->data_offset++] = data;
-		
+
                 if (--w->data_count < 1)
                 {
                         if (w->command == FDC_WRITE_TRK)
                                 write_track(device);
                         else
                                 wd17xx_write_sector(device);
-			
+
                         w->data_offset = 0;
-			
+
                         wd17xx_complete_command(device, DELAY_DATADONE);
                 }
                 else
                 {
                         if (w->command == FDC_WRITE_TRK)
                         {
-                                /* Process special data values according to WD17xx specification. 
-				   Note that as CRC values take up two bytes which are written on
-				   every 0xf7 byte, this will cause the actual image to
-				   grow larger than what was written from the system. So we need 
-				   to take the value of data_offset when writing the track.
+                                /* Process special data values according to WD17xx specification.
+                   Note that as CRC values take up two bytes which are written on
+                   every 0xf7 byte, this will cause the actual image to
+                   grow larger than what was written from the system. So we need
+                   to take the value of data_offset when writing the track.
                                 */
                                 if (!wd17xx_dden(device))
                                 {
@@ -1835,7 +1835,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w )
                                                 break;
                                         case 0xfc:
                                                 /* Write index mark. No effect here as we do not store clock patterns.
-						   Maybe later. */
+                           Maybe later. */
                                                 break;
                                         case 0xfd:
                                                 /* Just write, don't use for CRC. */
@@ -1896,7 +1896,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w )
                         /* yes... setup a timed data request */
                         wd17xx_timed_data_request(device);
                 }
-	}		
+	}
 	else
 	{
 		if (VERBOSE)

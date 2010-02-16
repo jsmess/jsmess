@@ -21,7 +21,7 @@ OBJDIRS += \
 #-------------------------------------------------
 
 DAT2HTML_OBJS =								\
-	$(EMUOBJ)/emualloc.o 				\
+	$(EMUOBJ)/emualloc.o				\
 	$(EMUOBJ)/emucore.o						\
 	$(MESSOBJ)/tools/dat2html/dat2html.o	\
 	$(MESSOBJ)/tools/imgtool/stubs.o		\

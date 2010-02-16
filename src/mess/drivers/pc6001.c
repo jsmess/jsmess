@@ -326,10 +326,10 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
 		}
 		switch(data) {
         	case 0x08: port_c_8255 |= 0x88; break;
-         	case 0x09: port_c_8255 &= 0xf7; break;
-         	case 0x0c: port_c_8255 |= 0x28; break;
-         	case 0x0d: port_c_8255 &= 0xf7; break;
-         	default: break;
+        	case 0x09: port_c_8255 &= 0xf7; break;
+        	case 0x0c: port_c_8255 |= 0x28; break;
+        	case 0x0d: port_c_8255 &= 0xf7; break;
+        	default: break;
 		}
 		port_c_8255 |= 0xa8;
 
@@ -396,41 +396,41 @@ ADDRESS_MAP_END
 	0x38000+0x2000*_v_ \
 
 static const UINT32 banksw_table_r0[0x10][4] = {
-	{ -1,			-1,				-1,				-1 }, 		   	//0x00: <invalid setting>
-	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) }, 	//0x01: basic rom 0 & 1 / basic rom 2 & 3
-	{ TVROM(0),		TVROM(1),		VOICEROM(0),	VOICEROM(1) }, 	//0x02: tv rom 0 & 1 / voice rom 0 & 1
-	{ EXROM(1),		EXROM(1), 		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
-	{ EXROM(0),		EXROM(0), 		EXROM(0),		EXROM(0)	}, 	//0x04: ex rom 0 & 0 / ex rom 0 & 0
-	{ TVROM(1),		BASICROM(1),	VOICEROM(0),	BASICROM(3) }, 	//0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
+	{ -1,			-1,				-1,				-1 },			//0x00: <invalid setting>
+	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) },	//0x01: basic rom 0 & 1 / basic rom 2 & 3
+	{ TVROM(0),		TVROM(1),		VOICEROM(0),	VOICEROM(1) },	//0x02: tv rom 0 & 1 / voice rom 0 & 1
+	{ EXROM(1),		EXROM(1),		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
+	{ EXROM(0),		EXROM(0),		EXROM(0),		EXROM(0)	},	//0x04: ex rom 0 & 0 / ex rom 0 & 0
+	{ TVROM(1),		BASICROM(1),	VOICEROM(0),	BASICROM(3) },	//0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
 	{ BASICROM(0),	TVROM(2),		BASICROM(2),	VOICEROM(1) },	//0x06: basic rom 0 & tv rom 2 / basic rom 2 & voice 1
 	{ EXROM(0),		EXROM(1),		EXROM(0),		EXROM(1)	},	//0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
-	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	}, 	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
+	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	},	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
 	{ EXROM(1),		BASICROM(1),	EXROM(1),		BASICROM(3) },	//0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
 	{ BASICROM(0),  EXROM(1),		BASICROM(2),	EXROM(1)	},	//0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
 	{ EXROM(0),		TVROM(2),		EXROM(0),		VOICEROM(1) },	//0x0b: ex rom 0 & tv rom 2 / ex rom 0 & voice 1
-	{ TVROM(1),		EXROM(0),		VOICEROM(0),	EXROM(0)	}, 	//0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
+	{ TVROM(1),		EXROM(0),		VOICEROM(0),	EXROM(0)	},	//0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
 	{ WRAM(0),		WRAM(1),		WRAM(2),		WRAM(3)		},	//0x0d: ram 0 & 1 / ram 2 & 3
 	{ EXWRAM(0),	EXWRAM(1),		EXWRAM(2),		EXWRAM(3)	},	//0x0e: exram 0 & 1 / exram 2 & 3
-	{ -1,			-1,				-1,				-1 }, 		   	//0x0f: <invalid setting>
+	{ -1,			-1,				-1,				-1 },			//0x0f: <invalid setting>
 };
 
 static const UINT32 banksw_table_r1[0x10][4] = {
-	{ -1,			-1,				-1,				-1 }, 		   	//0x00: <invalid setting>
-	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) }, 	//0x01: basic rom 0 & 1 / basic rom 2 & 3
-	{ TVROM(0),		TVROM(1),		VOICEROM(0),	VOICEROM(1) }, 	//0x02: tv rom 0 & 1 / voice rom 0 & 1
-	{ EXROM(1),		EXROM(1), 		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
-	{ EXROM(0),		EXROM(0), 		EXROM(0),		EXROM(0)	}, 	//0x04: ex rom 0 & 0 / ex rom 0 & 0
-	{ TVROM(1),		BASICROM(1),	VOICEROM(0),	BASICROM(3) }, 	//0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
+	{ -1,			-1,				-1,				-1 },			//0x00: <invalid setting>
+	{ BASICROM(0),	BASICROM(1),	BASICROM(2),	BASICROM(3) },	//0x01: basic rom 0 & 1 / basic rom 2 & 3
+	{ TVROM(0),		TVROM(1),		VOICEROM(0),	VOICEROM(1) },	//0x02: tv rom 0 & 1 / voice rom 0 & 1
+	{ EXROM(1),		EXROM(1),		EXROM(1),		EXROM(1)	},	//0x03: ex rom 1 & 1 / ex rom 1 & 1
+	{ EXROM(0),		EXROM(0),		EXROM(0),		EXROM(0)	},	//0x04: ex rom 0 & 0 / ex rom 0 & 0
+	{ TVROM(1),		BASICROM(1),	VOICEROM(0),	BASICROM(3) },	//0x05: tv rom 1 & basic rom 1 / voice rom 0 & basic 3
 	{ BASICROM(0),	TVROM(2),		BASICROM(2),	VOICEROM(1) },	//0x06: basic rom 0 & tv rom 2 / basic rom 2 & voice 1
 	{ EXROM(0),		EXROM(1),		EXROM(0),		EXROM(1)	},	//0x07: ex rom 0 & ex rom 1 / ex rom 0 & ex rom 1
-	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	}, 	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
+	{ EXROM(1),		EXROM(0),		EXROM(1),		EXROM(0)	},	//0x08: ex rom 1 & ex rom 0 / ex rom 1 & ex rom 0
 	{ EXROM(1),		BASICROM(1),	EXROM(1),		BASICROM(3) },	//0x09: ex rom 1 & basic rom 1 / ex rom 1 & basic 3
 	{ BASICROM(0),  EXROM(1),		BASICROM(2),	EXROM(1)	},	//0x0a: basic rom 0 & ex rom 1 / basic rom 2 & ex rom 1
 	{ EXROM(0),		TVROM(2),		EXROM(0),		VOICEROM(1) },	//0x0b: ex rom 0 & tv rom 2 / ex rom 0 & voice 1
-	{ TVROM(1),		EXROM(0),		VOICEROM(0),	EXROM(0)	}, 	//0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
+	{ TVROM(1),		EXROM(0),		VOICEROM(0),	EXROM(0)	},	//0x0c: tv rom 1 & ex rom 0 / voice rom 0 & ex rom 0
 	{ WRAM(4),		WRAM(5),		WRAM(6),		WRAM(7)		},	//0x0d: ram 4 & 5 / ram 6 & 7
 	{ EXWRAM(4),	EXWRAM(5),		EXWRAM(6),		EXWRAM(7)	},	//0x0e: exram 4 & 5 / exram 6 & 7
-	{ -1,			-1,				-1,				-1 }, 		   	//0x0f: <invalid setting>
+	{ -1,			-1,				-1,				-1 },			//0x0f: <invalid setting>
 };
 
 static WRITE8_HANDLER( pc6001m2_bank_r0_w )
@@ -840,7 +840,7 @@ static MACHINE_RESET(pc6001m2)
 		// Added next two lines to prevent crash of driver, please update according to neeeds
 		memory_set_bankptr(machine, "bank3", &ROM[BASICROM(0)]);
 		memory_set_bankptr(machine, "bank4", &ROM[BASICROM(1)]);
-		
+
 		memory_set_bankptr(machine, "bank5", &ROM[WRAM(4)]);
 		memory_set_bankptr(machine, "bank6", &ROM[WRAM(5)]);
 		memory_set_bankptr(machine, "bank7", &ROM[WRAM(6)]);

@@ -526,12 +526,12 @@ static PALETTE_INIT( c128 )
 {
 	int i;
 
-	for (i = 0; i < sizeof(vic2_palette) / 3; i++) 
+	for (i = 0; i < sizeof(vic2_palette) / 3; i++)
 	{
 		palette_set_color_rgb(machine, i, vic2_palette[i * 3], vic2_palette[i * 3 + 1], vic2_palette[i * 3 + 2]);
 	}
 
-	for (i = 0; i < sizeof(vdc8563_palette) / 3; i++) 
+	for (i = 0; i < sizeof(vdc8563_palette) / 3; i++)
 	{
 		palette_set_color_rgb(machine, i + sizeof(vic2_palette) / 3, vdc8563_palette[i * 3], vdc8563_palette[i * 3 + 1], vdc8563_palette[i * 3 + 2]);
 	}
@@ -642,7 +642,7 @@ static const vic2_interface c128_vic2_ntsc_intf = {
 	c128_lightpen_x_cb,
 	c128_lightpen_y_cb,
 	c128_lightpen_button_cb,
-	c128_dma_read, 
+	c128_dma_read,
 	c128_dma_read_color,
 	c128_vic_interrupt,
 	c128_rdy_cb
@@ -655,7 +655,7 @@ static const vic2_interface c128_vic2_pal_intf = {
 	c128_lightpen_x_cb,
 	c128_lightpen_y_cb,
 	c128_lightpen_button_cb,
-	c128_dma_read, 
+	c128_dma_read,
 	c128_dma_read_color,
 	c128_vic_interrupt,
 	c128_rdy_cb

@@ -258,7 +258,7 @@ struct PageReg
 	UINT8	*memory;		/* The memory it actually points to */
 };
 
-static int 	TaskReg;			/* Task register, for current task */
+static int	TaskReg;			/* Task register, for current task */
 static int	PIATaskReg;			/* Set to what PIA is set to, may not be same as TaskReg */
 static int	EnableMapRegs;		/* Should we use map registers, or just map normal */
 static struct PageReg	PageRegs[MaxTasks+1][MaxPage+1];	/* 16 sets of 16 page regs, allowing for 16 seperate contexts */
@@ -286,8 +286,8 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 	const address_space *space_0 = cputag_get_address_space(machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM);
 	const address_space *space_1 = cputag_get_address_space(machine, DMACPU_TAG, ADDRESS_SPACE_PROGRAM);
 	int		            Page;
-	UINT8 		        *readbank;
-	write8_space_func 	writebank;
+	UINT8		        *readbank;
+	write8_space_func	writebank;
 	int		            bank_start;
 	int		            bank_end;
 	int		            MapPage;

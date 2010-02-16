@@ -145,85 +145,85 @@ static READ16_HANDLER( vip_r )
 	vboy_state *state = (vboy_state *)space->machine->driver_data;
 
 	switch(offset << 1) {
-		case 0x00: 	//INTPND
+		case 0x00:	//INTPND
 					return state->vip_regs.INTPND;
 					break;
-		case 0x02: 	//INTENB
+		case 0x02:	//INTENB
 					return state->vip_regs.INTENB;
 					break;
-		case 0x04: 	//INTCLR
+		case 0x04:	//INTCLR
 					logerror("Error reading INTCLR\n");
 					break;
-		case 0x20: 	//DPSTTS
+		case 0x20:	//DPSTTS
 					return state->vip_regs.DPSTTS;
 					break;
-		case 0x22: 	//DPCTRL
+		case 0x22:	//DPCTRL
 					return state->vip_regs.DPCTRL;
 					break;
-		case 0x24: 	//BRTA
+		case 0x24:	//BRTA
 					return state->vip_regs.BRTA;
 					break;
-		case 0x26: 	//BRTB
+		case 0x26:	//BRTB
 					return state->vip_regs.BRTB;
 					break;
-		case 0x28: 	//BRTC
+		case 0x28:	//BRTC
 					return state->vip_regs.BRTC;
 					break;
-		case 0x2A: 	//REST
+		case 0x2A:	//REST
 					return state->vip_regs.REST;
 					break;
-		case 0x2E: 	//FRMCYC
+		case 0x2E:	//FRMCYC
 					return state->vip_regs.FRMCYC;
 					break;
-		case 0x30: 	//CTA
+		case 0x30:	//CTA
 					return state->vip_regs.CTA;
 					break;
-		case 0x40: 	//XPSTTS
+		case 0x40:	//XPSTTS
 					return state->vip_regs.XPSTTS;
 					break;
-		case 0x42: 	//XPCTRL
+		case 0x42:	//XPCTRL
 					return state->vip_regs.XPCTRL;
 					break;
-		case 0x44: 	//VER
+		case 0x44:	//VER
 					return state->vip_regs.VER;
 					break;
-		case 0x48: 	//SPT0
+		case 0x48:	//SPT0
 					return state->vip_regs.SPT[0];
 					break;
-		case 0x4A: 	//SPT1
+		case 0x4A:	//SPT1
 					return state->vip_regs.SPT[1];
 					break;
-		case 0x4C: 	//SPT2
+		case 0x4C:	//SPT2
 					return state->vip_regs.SPT[2];
 					break;
-		case 0x4E: 	//SPT3
+		case 0x4E:	//SPT3
 					return state->vip_regs.SPT[3];
 					break;
-		case 0x60: 	//GPLT0
+		case 0x60:	//GPLT0
 					return state->vip_regs.GPLT[0];
 					break;
-		case 0x62: 	//GPLT1
+		case 0x62:	//GPLT1
 					return state->vip_regs.GPLT[1];
 					break;
-		case 0x64: 	//GPLT2
+		case 0x64:	//GPLT2
 					return state->vip_regs.GPLT[2];
 					break;
-		case 0x66: 	//GPLT3
+		case 0x66:	//GPLT3
 					return state->vip_regs.GPLT[3];
 					break;
-		case 0x68: 	//JPLT0
+		case 0x68:	//JPLT0
 					return state->vip_regs.JPLT[0];
 					break;
-		case 0x6A: 	//JPLT1
+		case 0x6A:	//JPLT1
 					return state->vip_regs.JPLT[1];
 					break;
-		case 0x6C: 	//JPLT2
+		case 0x6C:	//JPLT2
 					return state->vip_regs.JPLT[2];
 					break;
-		case 0x6E: 	//JPLT3
+		case 0x6E:	//JPLT3
 					return state->vip_regs.JPLT[3];
 					break;
-		case 0x70: 	//BKCOL
+		case 0x70:	//BKCOL
 					return state->vip_regs.BKCOL;
 					break;
 		default:
@@ -238,88 +238,88 @@ static WRITE16_HANDLER( vip_w )
 	vboy_state *state = (vboy_state *)space->machine->driver_data;
 
 	switch(offset << 1) {
-		case 0x00: 	//INTPND
+		case 0x00:	//INTPND
 					logerror("Error writing INTPND\n");
 					break;
-		case 0x02: 	//INTENB
+		case 0x02:	//INTENB
 					state->vip_regs.INTENB = data;
 					break;
-		case 0x04: 	//INTCLR
+		case 0x04:	//INTCLR
 					state->vip_regs.INTPND &= ~data;
 					break;
-		case 0x20: 	//DPSTTS
+		case 0x20:	//DPSTTS
 					logerror("Error writing DPSTTS\n");
 					break;
-		case 0x22: 	//DPCTRL
+		case 0x22:	//DPCTRL
 					state->vip_regs.DPCTRL = data;
 					break;
-		case 0x24: 	//BRTA
+		case 0x24:	//BRTA
 					state->vip_regs.BRTA = data;
 					palette_set_color_rgb(space->machine, 1,(state->vip_regs.BRTA) & 0xff,0,0);
 					break;
-		case 0x26: 	//BRTB
+		case 0x26:	//BRTB
 					state->vip_regs.BRTB = data;
 					palette_set_color_rgb(space->machine, 2,(state->vip_regs.BRTA + state->vip_regs.BRTB) & 0xff,0,0);
 					break;
-		case 0x28: 	//BRTC
+		case 0x28:	//BRTC
 					state->vip_regs.BRTC = data;
 					palette_set_color_rgb(space->machine, 3,(state->vip_regs.BRTA + state->vip_regs.BRTB + state->vip_regs.BRTC) & 0xff,0,0);
 					break;
-		case 0x2A: 	//REST
+		case 0x2A:	//REST
 					state->vip_regs.REST = data;
 					break;
-		case 0x2E: 	//FRMCYC
+		case 0x2E:	//FRMCYC
 					state->vip_regs.FRMCYC = data;
 					break;
-		case 0x30: 	//CTA
+		case 0x30:	//CTA
 					state->vip_regs.CTA = data;
 					break;
-		case 0x40: 	//XPSTTS
+		case 0x40:	//XPSTTS
 					logerror("Error writing XPSTTS\n");
 					break;
-		case 0x42: 	//XPCTRL
+		case 0x42:	//XPCTRL
 					state->vip_regs.XPCTRL = data;
 					break;
-		case 0x44: 	//VER
+		case 0x44:	//VER
 					state->vip_regs.VER = data;
 					break;
-		case 0x48: 	//SPT0
+		case 0x48:	//SPT0
 					state->vip_regs.SPT[0] = data;
 					break;
-		case 0x4A: 	//SPT1
+		case 0x4A:	//SPT1
 					state->vip_regs.SPT[1] = data;
 					break;
-		case 0x4C: 	//SPT2
+		case 0x4C:	//SPT2
 					state->vip_regs.SPT[2] = data;
 					break;
-		case 0x4E: 	//SPT3
+		case 0x4E:	//SPT3
 					state->vip_regs.SPT[3] = data;
 					break;
-		case 0x60: 	//GPLT0
+		case 0x60:	//GPLT0
 					state->vip_regs.GPLT[0] = data;
 					break;
-		case 0x62: 	//GPLT1
+		case 0x62:	//GPLT1
 					state->vip_regs.GPLT[1] = data;
 					break;
-		case 0x64: 	//GPLT2
+		case 0x64:	//GPLT2
 					state->vip_regs.GPLT[2] = data;
 					break;
-		case 0x66: 	//GPLT3
+		case 0x66:	//GPLT3
 					state->vip_regs.GPLT[3] = data;
 					break;
-		case 0x68: 	//JPLT0
+		case 0x68:	//JPLT0
 					state->vip_regs.JPLT[0] = data;
 					break;
-		case 0x6A: 	//JPLT1
+		case 0x6A:	//JPLT1
 					state->vip_regs.JPLT[1] = data;
 					break;
-		case 0x6C: 	//JPLT2
+		case 0x6C:	//JPLT2
 					state->vip_regs.JPLT[2] = data;
 					break;
-		case 0x6E: 	//JPLT3
+		case 0x6E:	//JPLT3
 					state->vip_regs.JPLT[3] = data;
 					break;
-		case 0x70: 	//BKCOL
+		case 0x70:	//BKCOL
 					state->vip_regs.BKCOL = data;
 					break;
 		default:
@@ -742,4 +742,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY     FULLNAME       FLAGS */
-CONS( 1995, vboy,   0,      0, 		 vboy, 		vboy, 	 0,  	 "Nintendo", "Virtual Boy", GAME_NOT_WORKING | GAME_NO_SOUND)
+CONS( 1995, vboy,   0,      0,		 vboy,		vboy,	 0, 	 "Nintendo", "Virtual Boy", GAME_NOT_WORKING | GAME_NO_SOUND)

@@ -611,7 +611,7 @@ static void vga_cpu_interface(running_machine *machine)
 		{
 			case 0x00:
 				if (vga.vga_intf.vga_memory_bank != NULL)
-				{					
+				{
 					vga.vga_intf.map_vga_memory(machine, 0xA0000, 0xBFFFF, read_handler, write_handler);
 					memory_set_bankptr(machine, vga.vga_intf.vga_memory_bank, vga.memory);
 				}

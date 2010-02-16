@@ -1,20 +1,20 @@
 /*
 
-	TODO:
+    TODO:
 
-	- C1540 is unreliable (VIA timing issues?)
-	- devicify VIC6560/6561
-	- clean up inputs
-	- clean up VIA interface
-	- access violation in vic6560.c
-		* In the Chips (Japan, USA).60
-		* K-Star Patrol (Europe).60
-		* Seafox (Japan, USA).60
-	- SHIFT LOCK
-	- restore key
-	- light pen
-	- VIC21 (built in 21K ram)
-	- new cart system (rpk)
+    - C1540 is unreliable (VIA timing issues?)
+    - devicify VIC6560/6561
+    - clean up inputs
+    - clean up VIA interface
+    - access violation in vic6560.c
+        * In the Chips (Japan, USA).60
+        * K-Star Patrol (Europe).60
+        * Seafox (Japan, USA).60
+    - SHIFT LOCK
+    - restore key
+    - light pen
+    - VIC21 (built in 21K ram)
+    - new cart system (rpk)
 
 */
 
@@ -35,21 +35,21 @@
 
 static ADDRESS_MAP_START( vic20_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-//	AM_RANGE(0x0400, 0x07ff) RAM1
-//	AM_RANGE(0x0800, 0x0bff) RAM2
-//	AM_RANGE(0x0c00, 0x0fff) RAM3
+//  AM_RANGE(0x0400, 0x07ff) RAM1
+//  AM_RANGE(0x0800, 0x0bff) RAM2
+//  AM_RANGE(0x0c00, 0x0fff) RAM3
 	AM_RANGE(0x1000, 0x1fff) AM_RAM
-//	AM_RANGE(0x2000, 0x3fff) BLK1
-//	AM_RANGE(0x4000, 0x5fff) BLK2
-//	AM_RANGE(0x6000, 0x7fff) BLK3
+//  AM_RANGE(0x2000, 0x3fff) BLK1
+//  AM_RANGE(0x4000, 0x5fff) BLK2
+//  AM_RANGE(0x6000, 0x7fff) BLK3
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
 	AM_RANGE(0x9000, 0x900f) AM_READWRITE(vic6560_port_r, vic6560_port_w)
 	AM_RANGE(0x9110, 0x911f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
 	AM_RANGE(0x9120, 0x912f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM
-//	AM_RANGE(0x9800, 0x9bff) I/O2
-//	AM_RANGE(0x9c00, 0x9fff) I/O3
-//	AM_RANGE(0xa000, 0xbfff) BLK5
+//  AM_RANGE(0x9800, 0x9bff) I/O2
+//  AM_RANGE(0x9c00, 0x9fff) I/O3
+//  AM_RANGE(0xa000, 0xbfff) BLK5
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -191,20 +191,20 @@ static INPUT_PORTS_START( vic20s )
 	PORT_MODIFY( "ROW0" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-	
+
 	PORT_MODIFY( "ROW1" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('@')
-	
+
 	PORT_MODIFY( "ROW2" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00C4)
-	
+
 	PORT_MODIFY( "ROW5" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(';') PORT_CHAR('+')
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00D6)
-	
+
 	PORT_MODIFY( "ROW6" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00C5)
-	
+
 	PORT_MODIFY( "ROW7" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
 INPUT_PORTS_END
@@ -218,13 +218,13 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
         bit     description
 
         PA0     SERIAL CLK IN
-        PA1		SERIAL DATA IN
-        PA2		JOY 0
-        PA3		JOY 1
-        PA4		JOY 2
-        PA5		LITE PEN
-        PA6		CASS SWITCH
-        PA7		SERIAL ATN OUT
+        PA1     SERIAL DATA IN
+        PA2     JOY 0
+        PA3     JOY 1
+        PA4     JOY 2
+        PA5     LITE PEN
+        PA6     CASS SWITCH
+        PA7     SERIAL ATN OUT
 
     */
 
@@ -241,7 +241,7 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 	data &= ~(input_port_read(device->machine, "JOY") & 0x3c);
 
 	/* cassette switch */
-	if ((cassette_get_state(state->cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) 
+	if ((cassette_get_state(state->cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x40;
 	else
 		data |=  0x40;
@@ -256,13 +256,13 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
         bit     description
 
         PA0     SERIAL CLK IN
-        PA1		SERIAL DATA IN
-        PA2		JOY 0
-        PA3		JOY 1
-        PA4		JOY 2
-        PA5		LITE PEN
-        PA6		CASS SWITCH
-        PA7		SERIAL ATN OUT
+        PA1     SERIAL DATA IN
+        PA2     JOY 0
+        PA3     JOY 1
+        PA4     JOY 2
+        PA5     LITE PEN
+        PA6     CASS SWITCH
+        PA7     SERIAL ATN OUT
 
     */
 
@@ -278,14 +278,14 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 
         bit     description
 
-        PB0		USER PORT C
-        PB1		USER PORT D
-        PB2		USER PORT E
-        PB3		USER PORT F
-        PB4		USER PORT H
-        PB5		USER PORT J
-        PB6		USER PORT K
-        PB7		USER PORT L
+        PB0     USER PORT C
+        PB1     USER PORT D
+        PB2     USER PORT E
+        PB3     USER PORT F
+        PB4     USER PORT H
+        PB5     USER PORT J
+        PB6     USER PORT K
+        PB7     USER PORT L
 
     */
 
@@ -298,14 +298,14 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
         bit     description
 
-        PB0		USER PORT C
-        PB1		USER PORT D
-        PB2		USER PORT E
-        PB3		USER PORT F
-        PB4		USER PORT H
-        PB5		USER PORT J
-        PB6		USER PORT K
-        PB7		USER PORT L
+        PB0     USER PORT C
+        PB1     USER PORT D
+        PB2     USER PORT E
+        PB3     USER PORT F
+        PB4     USER PORT H
+        PB5     USER PORT J
+        PB6     USER PORT K
+        PB7     USER PORT L
 
     */
 }
@@ -469,7 +469,7 @@ static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
 	vic20_state *state = (vic20_state *)timer->machine->driver_data;
 	int data = (cassette_input(state->cassette) > +0.0) ? 1 : 0;
-	
+
 	via_ca1_w(state->via1, data);
 }
 
@@ -507,7 +507,7 @@ static int vic6560_dma_read_color( running_machine *machine, int offset )
 static int vic6560_dma_read( running_machine *machine, int offset )
 {
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
-	
+
 	return memory_read_byte(program, VIC6560ADDR2VC20ADDR(offset));
 }
 
@@ -589,7 +589,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 		address = 0xb000;
 
 	ptr = memory_region(image->machine, M6502_TAG);
-	
+
 	if (size == 0x4000 && address != 0x4000)
 	{
 		image_fread(image, ptr + address, 0x2000);
@@ -624,9 +624,9 @@ static MACHINE_DRIVER_START( vic20_common )
 	MDRV_CBM_IEC_ADD(IEC_TAG, cbm_iec_daisy)
 	MDRV_C1540_ADD(C1540_TAG, IEC_TAG, 8)
 /*
-	MDRV_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
-	MDRV_VIC1112_ADD(IEEE488_TAG)
-	MDRV_C2031_ADD(C2031_TAG, IEEE488_TAG, 9)
+    MDRV_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
+    MDRV_VIC1112_ADD(IEEE488_TAG)
+    MDRV_C2031_ADD(C2031_TAG, IEEE488_TAG, 9)
 */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("20,40,60,70,a0,b0")
@@ -699,7 +699,7 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME		PARENT		COMPAT  MACHINE		INPUT   INIT    COMPANY							FULLNAME					FLAGS */
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY                         FULLNAME                    FLAGS */
 COMP( 1980, vic1001,	0,			0,		vic20_ntsc,	vic20,	0,		"Commodore Business Machines",	"VIC-1001 (Japan)",			GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 COMP( 1981, vic20,		vic1001,	0,		vic20_ntsc,	vic20,	0,		"Commodore Business Machines",	"VIC-20 (NTSC)",			GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 COMP( 1981, vic20p,		vic1001,	0,		vic20_pal,	vic20,	0,		"Commodore Business Machines",	"VIC-20 / VC-20 (PAL)",		GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )

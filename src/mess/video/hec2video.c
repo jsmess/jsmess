@@ -86,28 +86,28 @@ void hector_hr(bitmap_t *bitmap, UINT8 *page, int ymax, int yram)
 			switch (gfx & 0x03) {
 			     case 0x00 : *p=hector_color[0]; break;
 			     case 0x01 : *p=hector_color[1]; break;
- 			     case 0x02 : *p=hector_color[2]; break;
+			     case 0x02 : *p=hector_color[2]; break;
 			     default   : *p=hector_color[3]; break;}
 			p++;
 
 			switch (gfx & 0x0c)	{
 			     case 0x00 : *p=hector_color[0]; break;
 			     case 0x04 : *p=hector_color[1]; break;
- 			     case 0x08 : *p=hector_color[2]; break;
+			     case 0x08 : *p=hector_color[2]; break;
 			     default   : *p=hector_color[3]; break;}
 			p++;
 
 			switch (gfx & 0x30)	{
 			     case 0x00 : *p=hector_color[0]; break;
 			     case 0x10 : *p=hector_color[1]; break;
- 			     case 0x20 : *p=hector_color[2]; break;
+			     case 0x20 : *p=hector_color[2]; break;
 			     default   : *p=hector_color[3]; break;}
 			p++;
 
 			switch (gfx & 0xc0) {
 			     case 0x00 : *p=hector_color[0]; break;
 			     case 0x40 : *p=hector_color[1]; break;
- 			     case 0x80 : *p=hector_color[2]; break;
+			     case 0x80 : *p=hector_color[2]; break;
 			     default   : *p=hector_color[3]; break;}
 			p++;
 		}

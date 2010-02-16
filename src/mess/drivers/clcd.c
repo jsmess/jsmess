@@ -73,4 +73,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1985, clcd,  0,       0, 	clcd, 	clcd, 	 0,		  	 "Commodore",   "LCD (Prototype)",		GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1985, clcd,  0,       0,	clcd,	clcd,	 0,			 "Commodore",   "LCD (Prototype)",		GAME_NOT_WORKING | GAME_NO_SOUND )

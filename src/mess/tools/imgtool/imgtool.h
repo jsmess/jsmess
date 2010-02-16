@@ -33,7 +33,7 @@ enum
 	OSD_FOPEN_WRITE,
 	OSD_FOPEN_RW,
 	OSD_FOPEN_RW_CREATE
-};  
+};
 
 /* ---------------------------------------------------------------------------
  * Image calls

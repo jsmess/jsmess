@@ -846,7 +846,7 @@ DEVICE_GET_INFO( mc6843 ) {
 		case DEVINFO_FCT_RESET:				info->reset = DEVICE_RESET_NAME(mc6843);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-   	        case DEVINFO_STR_NAME:				strcpy(info->s, "Motorola MC6843 floppy controller");	break;
+	        case DEVINFO_STR_NAME:				strcpy(info->s, "Motorola MC6843 floppy controller");	break;
 		case DEVINFO_STR_FAMILY:			strcpy(info->s, "MC6843");				break;
 		case DEVINFO_STR_VERSION:			strcpy(info->s, "1.00");				break;
 		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__);				break;

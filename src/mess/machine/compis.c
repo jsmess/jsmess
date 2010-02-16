@@ -288,7 +288,7 @@ static void compis_fdc_tc(running_machine *machine, int state)
 {
 	running_device *fdc = devtag_get_device(machine, "upd765");
 	/* Terminal count if iSBX-218A has DMA enabled */
-  	if (input_port_read(machine, "DSW1"))
+	if (input_port_read(machine, "DSW1"))
 	{
 		upd765_tc_w(fdc, state);
 	}
@@ -297,7 +297,7 @@ static void compis_fdc_tc(running_machine *machine, int state)
 static WRITE_LINE_DEVICE_HANDLER( compis_fdc_int )
 {
 	/* No interrupt requests if iSBX-218A has DMA enabled */
-  	if (!input_port_read(device->machine, "DSW1") && state)
+	if (!input_port_read(device->machine, "DSW1") && state)
 	{
 		compis_osp_pic_irq(COMPIS_IRQ_SBX0_INT1);
 	}
@@ -306,7 +306,7 @@ static WRITE_LINE_DEVICE_HANDLER( compis_fdc_int )
 static UPD765_DMA_REQUEST( compis_fdc_dma_drq )
 {
 	/* DMA requst if iSBX-218A has DMA enabled */
-  	if (input_port_read(device->machine, "DSW1") && state)
+	if (input_port_read(device->machine, "DSW1") && state)
 	{
 		//compis_dma_drq(state, read);
 	}
@@ -327,8 +327,8 @@ READ16_HANDLER (compis_fdc_dack_r)
 	UINT16 data;
 	data = 0xffff;
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
-  	if (input_port_read(space->machine, "DSW1"))
-  	{
+	if (input_port_read(space->machine, "DSW1"))
+	{
 		data = upd765_dack_r(fdc, 0);
 	}
 
@@ -793,7 +793,7 @@ static void internal_timer_update(running_machine *machine,
 		t->maxA = new_maxA;
 		if (new_maxA == 0)
 		{
-         		new_maxA = 0x10000;
+        		new_maxA = 0x10000;
 		}
 	}
 
@@ -810,9 +810,9 @@ static void internal_timer_update(running_machine *machine,
 
 		if (new_maxB == 0)
 		{
-         		new_maxB = 0x10000;
+        		new_maxB = 0x10000;
 		}
-   	}
+	}
 
 
 	/* handle control changes */
@@ -871,20 +871,20 @@ static void internal_timer_update(running_machine *machine,
 	}
 
 	/* update the interrupt timer */
-   	if (update_int_timer)
-   	{
-	      	if ((t->control & 0x8000) && (t->control & 0x2000))
-	      	{
+	if (update_int_timer)
+	{
+	    	if ((t->control & 0x8000) && (t->control & 0x2000))
+	    	{
 	        	int diff = t->maxA - t->count;
-	         	if (diff <= 0)
-	         		diff += 0x10000;
-	         	timer_adjust_oneshot(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), diff), which);
-	         	if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
-	      	}
-	      	else
-	      	{
+	        	if (diff <= 0)
+	        		diff += 0x10000;
+	        	timer_adjust_oneshot(t->int_timer, attotime_mul(ATTOTIME_IN_HZ(2000000), diff), which);
+	        	if (LOG_TIMER) logerror("Set interrupt timer for %d\n", which);
+	    	}
+	    	else
+	    	{
 	        	timer_adjust_oneshot(t->int_timer, attotime_never, which);
-	      	}
+	    	}
 	}
 }
 
@@ -958,7 +958,7 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 //          int count = d->count;
 
 			/* adjust for redline racer */
-         	// int dacnum = (d->dest & 0x3f) / 2;
+        	// int dacnum = (d->dest & 0x3f) / 2;
 
 			if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
 

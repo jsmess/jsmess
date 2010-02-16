@@ -303,7 +303,7 @@ int pc8801_is_vram_select( running_machine *machine )
 				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc000, 0xefff, 0, 0, read_gvram_alu7_bank5);
 				memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, read_gvram_alu7_bank6);
 				break;
-      		}
+    		}
 
 			switch (alu_2 & 0x30)
 			{
@@ -324,7 +324,7 @@ int pc8801_is_vram_select( running_machine *machine )
 				memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf000, 0xffff, 0, 0, write_gvram_alu3_bank6);
 				break;
 			}
-      		return 1;
+    		return 1;
 		}
 		else
 		{
@@ -600,7 +600,7 @@ VIDEO_UPDATE( pc8801 )
 					((attr_new & TX_REV) ? 8 : 0) + ((attr_new & TX_COL_MASK) >> TX_COL_SHIFT), 0, 0, x * 8, y * BLOCK_YSIZE, (attr_new & TX_REV) ? 1 : 0);
 				}
 				if (attr_new & TX_UL)
-	 				plot_box(wbm2, x * 8, y * BLOCK_YSIZE + (pc8801_is_24KHz ? 3 : 1), 8, 1, (attr_new & TX_REV) ? palette_transparent_pen : ct);
+					plot_box(wbm2, x * 8, y * BLOCK_YSIZE + (pc8801_is_24KHz ? 3 : 1), 8, 1, (attr_new & TX_REV) ? palette_transparent_pen : ct);
 
 				if (attr_new & TX_OL)
 					plot_box(wbm2, x * 8, y * BLOCK_YSIZE, 8, 1, (attr_new & TX_REV) ? palette_transparent_pen : ct);

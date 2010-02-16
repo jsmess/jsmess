@@ -29,7 +29,7 @@ static TIMER_CALLBACK(keyboard_callback)
 
 	for(i = 1; i < 12; i++)
 	{
-		code = 	input_port_read(machine, keynames[i-1]);
+		code =	input_port_read(machine, keynames[i-1]);
 		if (code != 0)
 		{
 			for(j = 0; j < 8; j++)
@@ -111,8 +111,8 @@ READ16_HANDLER (bk_key_press_r)
 	UINT16 cas;
 	if (level < 0)
 	{
-	 	cas = 0x00;
- 	}
+		cas = 0x00;
+	}
 	else
 	{
 		cas = 0x20;

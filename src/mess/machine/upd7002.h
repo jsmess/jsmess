@@ -32,7 +32,7 @@ typedef struct _uPD7002_interface uPD7002_interface;
 struct _uPD7002_interface
 {
 	uPD7002_get_analogue_func get_analogue_func;
-	uPD7002_eoc_func 		  EOC_func;
+	uPD7002_eoc_func		  EOC_func;
 };
 
 /***************************************************************************

@@ -23,7 +23,7 @@
 const int C2040_BITRATE[] =
 {
 	XTAL_16MHz/16,	/* tracks  1-17 */
-	XTAL_16MHz/15, 	/* tracks 18-24 */
+	XTAL_16MHz/15,	/* tracks 18-24 */
 	XTAL_16MHz/14,	/* tracks 25-30 */
 	XTAL_16MHz/13	/* tracks 31-42 */
 };

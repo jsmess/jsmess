@@ -63,5 +63,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1986, a7150,  0,       0, 	a7150, 	a7150, 	 0,  	   	 "Robotron",   "A7150",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, a7150,  0,       0, 	a7150,	a7150,	 0, 		 "Robotron",   "A7150",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

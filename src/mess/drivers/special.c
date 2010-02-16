@@ -67,7 +67,7 @@ static ADDRESS_MAP_START(specimx_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
     AM_RANGE( 0x0000, 0x8fff ) AM_RAMBANK("bank1")
 	AM_RANGE( 0x9000, 0xbfff ) AM_RAMBANK("bank2")
-  	AM_RANGE( 0xc000, 0xffbf ) AM_RAMBANK("bank3")
+	AM_RANGE( 0xc000, 0xffbf ) AM_RAMBANK("bank3")
     AM_RANGE( 0xffc0, 0xffdf ) AM_RAMBANK("bank4")
     AM_RANGE( 0xffe0, 0xffe3 ) AM_READWRITE(specialist_keyboard_r,specialist_keyboard_w) // 8255 for keyboard
     AM_RANGE( 0xffe4, 0xffe7 ) AM_RAM //external 8255
@@ -459,18 +459,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( specimx )
     MDRV_IMPORT_FROM(special)
     MDRV_CPU_MODIFY("maincpu")
-  	MDRV_CPU_PROGRAM_MAP(specimx_mem)
+	MDRV_CPU_PROGRAM_MAP(specimx_mem)
 
-  	MDRV_MACHINE_START ( specimx )
-  	MDRV_MACHINE_RESET ( specimx )
+	MDRV_MACHINE_START ( specimx )
+	MDRV_MACHINE_RESET ( specimx )
 
     /* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT( specimx )
 
-   	MDRV_VIDEO_START(specimx)
-   	MDRV_VIDEO_UPDATE(specimx)
+	MDRV_VIDEO_START(specimx)
+	MDRV_VIDEO_UPDATE(specimx)
 
     /* audio hardware */
 	MDRV_SOUND_ADD("custom", SPECIMX, 0)
@@ -568,7 +568,7 @@ ROM_END
 ROM_START( lik )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
     ROM_SYSTEM_BIOS(0, "1st", "1st rev.")
-    ROMX_LOAD( "lik.rom", 	0xc000, 0x3000, CRC(705BB3A0) SHA1(f90b009ec9d3303bbda228714dd24de057e744b6), ROM_BIOS(1))
+    ROMX_LOAD( "lik.rom",	0xc000, 0x3000, CRC(705BB3A0) SHA1(f90b009ec9d3303bbda228714dd24de057e744b6), ROM_BIOS(1))
     ROM_SYSTEM_BIOS(1, "2nd", "2nd rev.")
     ROMX_LOAD( "lik2.rom",	0xc000, 0x3000, CRC(71820E43) SHA1(a85b4fc33b1ea96a1b8fe0c791f1aab8e967bb44), ROM_BIOS(2))
 ROM_END
@@ -591,9 +591,9 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME        PARENT  COMPAT   MACHINE    INPUT       INIT        COMPANY              FULLNAME       FLAGS */
-COMP( 1985, special,    0,     	0, 		special, 	special, 	special,    "", 				 "Specialist",		0)
-COMP( 1985, specialm,   special,0, 		special, 	special, 	special,    "", 				 "Specialist M",		0)
-COMP( 1985, specialp,   special,0, 		specialp, 	specialp, 	special,    "", 				 "Specialist + hires graph",		0)
-COMP( 1985, lik,    	special,0, 		special, 	lik,		special,    "", 				 "Lik",		 		0)
-COMP( 1985, specimx,   	special,0, 		specimx, 	specimx, 	0,	        "", 				 "Specialist MX", 	0)
-COMP( 1994, erik,   	special,0, 		erik, 		special, 	erik, 		"", 				 "Erik", 	0)
+COMP( 1985, special,    0,  	0,		special,	special,	special,    "", 				 "Specialist",		0)
+COMP( 1985, specialm,   special,0,		special,	special,	special,    "", 				 "Specialist M",		0)
+COMP( 1985, specialp,   special,0,		specialp,	specialp,	special,    "", 				 "Specialist + hires graph",		0)
+COMP( 1985, lik,    	special,0,		special,	lik,		special,    "", 				 "Lik",				0)
+COMP( 1985, specimx,	special,0,		specimx,	specimx,	0,	        "", 				 "Specialist MX",	0)
+COMP( 1994, erik,   	special,0,		erik,		special,	erik,		"", 				 "Erik",	0)

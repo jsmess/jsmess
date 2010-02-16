@@ -66,7 +66,7 @@ struct apr_tag
 static floperr_t apr_read_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
-//	printf("apr_read_sector %d %d %d\n", head, track, sector);
+//  printf("apr_read_sector %d %d %d\n", head, track, sector);
 	memcpy(buffer, tag->sectors[head * track * sector].data, buflen);
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -74,7 +74,7 @@ static floperr_t apr_read_sector(floppy_image *floppy, int head, int track, int 
 static floperr_t apr_read_indexed_sector(floppy_image *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
 	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
-//	printf("apr_read_indexed_sector %d %d %d\n", head, track, sector);
+//  printf("apr_read_indexed_sector %d %d %d\n", head, track, sector);
 	memcpy(buffer, tag->sectors[head * track * sector].data, buflen);
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -102,7 +102,7 @@ static floperr_t apr_get_indexed_sector_info(floppy_image *floppy, int head, int
 {
 	struct apr_tag *tag = (apr_tag *)floppy_tag(floppy);
 
-//	printf("apr_get_indexed_sector_info %d %d %d\n", head, track, sector_index);
+//  printf("apr_get_indexed_sector_info %d %d %d\n", head, track, sector_index);
 
 	/* sanity checks */
 	if (head         < 0 || head         > (tag->heads - 1))             return FLOPPY_ERROR_SEEKERROR;
@@ -184,7 +184,7 @@ FLOPPY_CONSTRUCT( apridisk_construct )
 
 				length = pick_integer_le(buffer, 0, 2);
 				value = pick_integer_le(buffer, 2, 1);
-				
+
 				osd_free(buffer);
 
 				/* not sure if this is possible */

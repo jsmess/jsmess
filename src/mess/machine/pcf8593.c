@@ -141,7 +141,7 @@ void pcf8593_pin_scl(running_device *device, int data)
 					// enter receive mode when 1st byte = 0xA3
 					if ((rtc->data_recv[0] == 0xA3) && (rtc->data_recv_index == 0))
 					{
-  						rtc->mode = RTC_MODE_SEND;
+						rtc->mode = RTC_MODE_SEND;
 					}
 					// A2 + xx = "read from pos xx" command
 					if ((rtc->data_recv[0] == 0xA2) && (rtc->data_recv_index == 1))
@@ -159,7 +159,7 @@ void pcf8593_pin_scl(running_device *device, int data)
 					}
 					// next byte
 					rtc->bits = 0;
-  					rtc->data_recv_index++;
+					rtc->data_recv_index++;
 				}
 			}
 			break;
@@ -174,11 +174,11 @@ void pcf8593_pin_scl(running_device *device, int data)
 				{
 					_logerror( 2, ("pcf8593_read_byte(%02X)\n", rtc->data[rtc->pos]));
 					// end ?
-  					if (rtc->pin_sda)
+					if (rtc->pin_sda)
 					{
 						_logerror( 2, ("pcf8593 end\n"));
-  						rtc->mode = RTC_MODE_RECV;
-           				pcf8593_clear_buffer_rx(device);
+						rtc->mode = RTC_MODE_RECV;
+        				pcf8593_clear_buffer_rx(device);
 					}
 					// next byte
 					rtc->bits = 0;

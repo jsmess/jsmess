@@ -955,7 +955,7 @@ static MACHINE_DRIVER_START( einstei2 )
 
 	MDRV_CPU_MODIFY(IC_I001)
 	MDRV_CPU_IO_MAP(einstein2_io)
-	
+
 	MDRV_MACHINE_START(einstein2)
 	MDRV_MACHINE_RESET(einstein2)
 

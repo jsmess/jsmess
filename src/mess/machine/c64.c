@@ -287,7 +287,7 @@ WRITE8_HANDLER( c64_write_io )
 			DBG_LOG(space->machine, 1, "io write", ("%.3x %.2x\n", offset, data));
 	}
 	else if (offset < 0xf00)
-		DBG_LOG(space->machine, 1, "io write", ("%.3x %.2x\n", offset, data)); 		/* i/o 1 */
+		DBG_LOG(space->machine, 1, "io write", ("%.3x %.2x\n", offset, data));		/* i/o 1 */
 	else
 		DBG_LOG(space->machine, 1, "io write", ("%.3x %.2x\n", offset, data));		/* i/o 2 */
 }
@@ -1278,7 +1278,7 @@ static WRITE8_HANDLER( ocean1_bank_w )
 		else
 			memcpy(romh, cart + (bank - 16) * 0x2000, 0x2000);
 	}
-	else  											// Terminator II
+	else											// Terminator II
 	{
 		memcpy(roml, cart + bank * 0x2000, 0x2000);
 	}

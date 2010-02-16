@@ -204,7 +204,7 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 	int x,y;
 	int scrollx,scrolly;
 	int region = 0;
-//	int gfx_mode;
+//  int gfx_mode;
 	int xsize,ysize;
 	UINT16 tile_bank;
 
@@ -232,7 +232,7 @@ static void draw_roz(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 	//roz_mode & 0x20 enables roz capabilities
 
- 	tile_bank = (state->roz_tile_bank & 0xf000) >> 3; //FIXME: check this
+	tile_bank = (state->roz_tile_bank & 0xf000) >> 3; //FIXME: check this
 
 	for (y=0;y<ysize;y++)
 	{
@@ -274,19 +274,19 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	region = (state->spr_flags & 1) ? 0 : 1; //8bpp : 4bpp
 
 	/*
-		[0]
-		---h hhh- ---- ---- Y size
-		---- ---- yyyy yyyy Y offset
-		[1]
-		bbbb ---- ---- ---- sprite offset bank
-		---- d--- ---- ---- horizontal direction
-		---- ---- ---- -www X size
-		[2]
-		zzz- ---- ---- ---- X shrinking
-		---- ---S xxxx xxxx X offset
-		[3]
-		oooo oooo oooo oooo sprite pointer
-	*/
+        [0]
+        ---h hhh- ---- ---- Y size
+        ---- ---- yyyy yyyy Y offset
+        [1]
+        bbbb ---- ---- ---- sprite offset bank
+        ---- d--- ---- ---- horizontal direction
+        ---- ---- ---- -www X size
+        [2]
+        zzz- ---- ---- ---- X shrinking
+        ---- ---S xxxx xxxx X offset
+        [3]
+        oooo oooo oooo oooo sprite pointer
+    */
 
 	for(i=spr_base/2;i<(spr_base+(state->spr_limit*8))/2;i+=4)
 	{
@@ -496,10 +496,10 @@ static WRITE16_HANDLER( supracan_dma_w )
 			{
 				//if(data != 0x9800 && data != 0x8800)
 				//{
-				//	fatalerror("%04x",data);
+				//  fatalerror("%04x",data);
 				//}
-//				if(data & 0x2000)
-//					acan_dma_regs->source-=2;
+//              if(data & 0x2000)
+//                  acan_dma_regs->source-=2;
 				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1, data);
 
 				for(i = 0; i <= acan_dma_regs->count[ch]; i++)
@@ -534,7 +534,7 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x3fffff ) AM_ROM AM_REGION( "cart", 0 )
 	AM_RANGE( 0xe80200, 0xe80201 ) AM_READ_PORT("P1")
 	AM_RANGE( 0xe80202, 0xe80203 ) AM_READ_PORT("P2")
-//	AM_RANGE( 0xe80204, 0xe80205 ) AM_READ( supracan_unk1_r ) //or'ed with player 2 inputs, why?
+//  AM_RANGE( 0xe80204, 0xe80205 ) AM_READ( supracan_unk1_r ) //or'ed with player 2 inputs, why?
 	AM_RANGE( 0xe80208, 0xe80209 ) AM_READ_PORT("P3")
 	AM_RANGE( 0xe8020c, 0xe8020d ) AM_READ_PORT("P4")
 	AM_RANGE( 0xe80300, 0xe80301 ) AM_READ( supracan_unk1_r )
@@ -544,8 +544,8 @@ static ADDRESS_MAP_START( supracan_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0xf00000, 0xf001ff ) AM_READWRITE( supracan_video_r, supracan_video_w )
 	AM_RANGE( 0xf00200, 0xf003ff ) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE( 0xf40000, 0xf5ffff ) AM_RAM_WRITE(supracan_char_w) AM_BASE_MEMBER(supracan_state,vram)	/* Unknown, some data gets copied here during boot */
-//	AM_RANGE( 0xf44000, 0xf441ff ) AM_RAM AM_BASE_MEMBER(supracan_state,rozpal) /* clut data for the ROZ? */
-//	AM_RANGE( 0xf44600, 0xf44fff ) AM_RAM	/* Unknown, stuff gets written here. Zoom table?? */
+//  AM_RANGE( 0xf44000, 0xf441ff ) AM_RAM AM_BASE_MEMBER(supracan_state,rozpal) /* clut data for the ROZ? */
+//  AM_RANGE( 0xf44600, 0xf44fff ) AM_RAM   /* Unknown, stuff gets written here. Zoom table?? */
 	AM_RANGE( 0xfc0000, 0xfcffff ) AM_MIRROR(0x30000) AM_RAM /* System work ram */
 ADDRESS_MAP_END
 
@@ -736,7 +736,7 @@ static WRITE16_HANDLER( supracan_sound_w )
 	{
 		case 0x000a/2:
 			//soundlatch_w(space, 0, (data & 0xff00) >> 8);
-		 	//cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
+			//cputag_set_input_line(space->machine, "soundcpu", 0, HOLD_LINE);
 			break;
 		case 0x001c/2:	/* Sound cpu control. Bit 0 tied to sound cpu RESET line */
 			if ( data & 0x01 )

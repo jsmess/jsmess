@@ -838,7 +838,7 @@ static DRIVER_INIT( arcadia )
 }
 
 
-/*   YEAR  NAME		PARENT     COMPAT    MACHINE	INPUT     INIT		COMPANY		 	FULLNAME */
+/*   YEAR  NAME     PARENT     COMPAT    MACHINE    INPUT     INIT      COMPANY         FULLNAME */
 CONS(1983, advsnha,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Advision",		"Advision Home Arcade", GAME_IMPERFECT_SOUND )					/* France */
 CONS(1982, bndarc,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Bandai",		"Arcadia", GAME_IMPERFECT_SOUND )						/* Japan */
 CONS(1982, arcadia,	0,	   0,        arcadia,	arcadia,  arcadia,	"Emerson",		"Arcadia 2001", GAME_IMPERFECT_SOUND )						/* U.S.A. */

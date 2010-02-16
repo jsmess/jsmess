@@ -212,6 +212,6 @@ DEVICE_GET_INFO( sst39vf400a )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sst39vf400a);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(sst39vf020);				break;
+		default:										DEVICE_GET_INFO_CALL(sst39vf020);				break;
 	}
 }

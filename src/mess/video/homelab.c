@@ -30,7 +30,7 @@ VIDEO_UPDATE( homelab )
 			{
 				for(b = 0; b < 8; b++ )
 			  {
-			  	*BITMAP_ADDR16(bitmap, y * 8 + j, x * 8 + b ) = (gfx[code + j * 256] >> (7 - b)) & 1;
+				*BITMAP_ADDR16(bitmap, y * 8 + j, x * 8 + b ) = (gfx[code + j * 256] >> (7 - b)) & 1;
 			  }
 			}
 		}
@@ -53,7 +53,7 @@ VIDEO_UPDATE( homelab3 )
 			{
 				for(b = 0; b < 8; b++ )
 			  {
-			  	*BITMAP_ADDR16(bitmap, y * 8 + j, x * 8 + b ) = (gfx[code + j * 256] >> (7 - b)) & 1;
+				*BITMAP_ADDR16(bitmap, y * 8 + j, x * 8 + b ) = (gfx[code + j * 256] >> (7 - b)) & 1;
 			  }
 			}
 		}

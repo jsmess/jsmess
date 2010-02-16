@@ -993,7 +993,7 @@ static void smc_write( running_machine *machine, UINT8 data)
 		else
 		{
 			verboselog( machine, 5, "smartmedia_data_w %08X\n", data);
- 			smartmedia_data_w( smartmedia, data);
+			smartmedia_data_w( smartmedia, data);
 		}
 	}
 }

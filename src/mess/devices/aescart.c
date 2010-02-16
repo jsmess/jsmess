@@ -400,7 +400,7 @@ static DEVICE_START( aes_cartridge )
 	astring tempstring;
 
 	/* find the PCB device */
-	cart->pcb_device = device->subdevice(TAG_PCB);	
+	cart->pcb_device = device->subdevice(TAG_PCB);
 }
 
 /*

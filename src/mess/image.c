@@ -85,7 +85,7 @@ struct _image_slot_data
 
     /* pointer */
     void *ptr;
-	
+
 	int not_init_phase;
 };
 
@@ -190,7 +190,7 @@ void image_init(running_machine *machine)
 
     /* initialize the devices */
     indx = 0;
-    
+
     for (dev = machine->devicelist.first(); dev != NULL; dev = dev->next)
     {
         if (is_image_device(dev))
@@ -199,7 +199,7 @@ void image_init(running_machine *machine)
         slot = &machine->images_data->slots[indx];
 
 		slot->not_init_phase = 1;
-		
+
         /* create a memory pool, and allocated strings */
         slot->mempool = pool_alloc_lib(memory_error);
         slot->name = astring_alloc();
@@ -238,7 +238,7 @@ void image_init(running_machine *machine)
 
 	            /* populate it */
 	            format->index       = cnt;
-	            format->name        = auto_strdup(machine, slot->dev->get_config_string(DEVINFO_STR_IMAGE_CREATE_OPTNAME + i));				
+	            format->name        = auto_strdup(machine, slot->dev->get_config_string(DEVINFO_STR_IMAGE_CREATE_OPTNAME + i));
 	            format->description = auto_strdup(machine, slot->dev->get_config_string(DEVINFO_STR_IMAGE_CREATE_OPTDESC + i));
 	            format->extensions  = auto_strdup(machine, slot->dev->get_config_string(DEVINFO_STR_IMAGE_CREATE_OPTEXTS + i));
 	            format->optspec     = (char*)slot->dev->get_config_ptr(DEVINFO_PTR_IMAGE_CREATE_OPTSPEC + i);
@@ -248,7 +248,7 @@ void image_init(running_machine *machine)
 	            formatptr = &format->next;
 	            cnt++;
 	        }
-        }		
+        }
 
         indx++;
 		}
@@ -400,7 +400,7 @@ static void get_device_instance_name(const machine_config *config, const device_
         /* are there multiple devices of the same type */
         count = 0;
         index = -1;
-		
+
 		for (that_device = config->devicelist.first(); that_device != NULL; that_device = that_device->next)
 		{
 			if (is_image_device(that_device))
@@ -481,7 +481,7 @@ image_device_info image_device_getinfo(const machine_config *config, running_dev
         }
         assert(found);
     }
-	
+
 	return image_device_getinfo(config,&device->baseconfig());
 }
 
@@ -1638,9 +1638,9 @@ static void setup_working_directory(image_slot_data *image)
 {
     const game_driver *gamedrv;
 	char *dst = NULL;
-	
+
 	osd_get_full_path(&dst,".");
-    /* first set up the working directory to be the MESS directory */	
+    /* first set up the working directory to be the MESS directory */
     astring_cpyc(image->working_directory, dst);
 
     /* now try browsing down to "software" */

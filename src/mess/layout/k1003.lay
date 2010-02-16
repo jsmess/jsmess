@@ -17,7 +17,7 @@
 		<bezel element="background">
 			<bounds left="1" top="1" right="920" bottom="100" />
 		</bezel>
-		
+
 		<!-- first 2 digits are away from others -->
 		<bezel name="digit0" element="digit">
 			<bounds left="0" top="10" right="48" bottom="90" />
@@ -25,7 +25,7 @@
 		<bezel name="digit1" element="digit">
 			<bounds left="48" top="10" right="96" bottom="90" />
 		</bezel>
-		
+
 		<bezel name="digit2" element="digit">
 			<bounds left="196" top="10" right="244" bottom="90" />
 		</bezel>

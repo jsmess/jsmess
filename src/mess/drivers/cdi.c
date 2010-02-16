@@ -497,7 +497,7 @@ typedef struct
 #define MCD212_RC_OP_SHIFT			20
 
 #define MCD212_CSR1W_ST				0x0002	// Standard
-#define MCD212_CSR1W_BE				0x0001 	// Bus Error
+#define MCD212_CSR1W_BE				0x0001	// Bus Error
 
 #define MCD212_CSR2R_IT1			0x0004	// Interrupt 1
 #define MCD212_CSR2R_IT2			0x0002	// Interrupt 2
@@ -1475,8 +1475,8 @@ static void cdic_decode_xa_stereo(int *cdic_xa_last, const unsigned char *xa, si
 			for (i=0; i<28; i++)
 			{
 				short d=xa[(16+(i<<2)+s)^1],
-						 	d0=(d&0xf)<<12,
-						 	d1=(d>>4)<<12;
+							d0=(d&0xf)<<12,
+							d1=(d>>4)<<12;
 				d0=clamp((d0>>shift0)+(((l0*f0)+(l1*f1)+32)>>6));
 				*dp++=d0;
 				l1=l0;
@@ -1914,7 +1914,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 					   (cdic->channel & cdic->audio_channel & (1 << buffer[CDIC_SECTOR_CHAN2])))
 					{
 						{
-					 		verboselog(machine, 0, "Audio sector\n" );
+							verboselog(machine, 0, "Audio sector\n" );
 
 							cdic->x_buffer |= 0x8000;
 							//cdic->data_buffer |= 0x4000;
@@ -2037,7 +2037,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			}
 
 			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0001;								//  CTRL
-			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x926/2] = 0x0001; 								//  TRACK
+			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x926/2] = 0x0001;								//  TRACK
 			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x928/2] = 0x0000;								//  INDEX
 			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x92a/2] = (cdic->time >> 24) & 0x000000ff;	//  MIN
 			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x92c/2] = (cdic->time >> 16) & 0x000000ff;	//  SEC
@@ -2098,7 +2098,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			}
 
 			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x924/2] = 0x0041;								//  CTRL
-			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x926/2] = 0x0001; 								//  TRACK
+			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x926/2] = 0x0001;								//  TRACK
 			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x928/2] = 0x0000;								//  INDEX
 			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x92a/2] = (cdic->time >> 24) & 0x000000ff;	//  MIN
 			cdic->ram[(cdic->data_buffer & 5) * (0xa00/2) + 0x92c/2] = (cdic->time >> 16) & 0x000000ff;	//  SEC

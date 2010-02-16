@@ -80,7 +80,7 @@ JAGUAR_ROM_LOAD( zoop,      "zoop! (world).j64",                                
 
 Are the following undumped?
 * Battlesphere - by ScatoLOGIC, 2000
-* Breakout 2000 - by Telegames, 1996 
+* Breakout 2000 - by Telegames, 1996
 * Protector - by Songbird Productions, 1999
 
 */
@@ -138,7 +138,7 @@ SOFTWARE_LIST_START( jaguar_cart )
 	SOFTWARE( troyaik,   0,        1995, "Williams Entertainment", "Troy Aikman NFL Football (World)", 0, 0 )
 	SOFTWARE( ultravor1, ultravor, 1995, "Atari", "Ultra Vortek (World, v0.94 Prototype)", 0, 0 )
 	SOFTWARE( ultravor,  0,        1995, "Atari", "Ultra Vortek (World)", 0, 0 )
-	SOFTWARE( valdiser,  0,        1994, "Atari", "Val d'Isère Skiing and Snowboarding (World)", 0, 0 )
+	SOFTWARE( valdiser,  0,        1994, "Atari", "Val d'Is?re Skiing and Snowboarding (World)", 0, 0 )
 	SOFTWARE( whitemen,  0,        1995, "Atari", "White Men Can't Jump (World)", 0, 0 )
 	SOFTWARE( wolfn3d,   0,        1994, "Atari", "Wolfenstein 3D (World)", 0, 0 )
 	SOFTWARE( worms,     0,        1998, "Telegames", "Worms (World)", 0, 0 )

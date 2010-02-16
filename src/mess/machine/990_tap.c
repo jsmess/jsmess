@@ -51,7 +51,7 @@ struct _tap_990_t
 	UINT16 w[8];
 
 	const ti990_tpc_interface *intf;
-	
+
 	tape_unit_t t[MAX_TAPE_UNIT];
 };
 
@@ -136,7 +136,7 @@ DEVICE_START( ti990_tape )
 	tape_unit_t *t;
 	tap_990_t *tpc = get_safe_token(device->owner);
 	int id = tape_get_id(device);
-	
+
 	t = &tpc->t[id];
 	memset(t, 0, sizeof(*t));
 
@@ -154,7 +154,7 @@ DEVICE_IMAGE_LOAD( ti990_tape )
 	tape_unit_t *t;
 	tap_990_t *tpc = get_safe_token(image->owner);
 	int id = tape_get_id(image);
-	
+
 	t = &tpc->t[id];
 	memset(t, 0, sizeof(*t));
 
@@ -1002,16 +1002,16 @@ DEVICE_GET_INFO( ti990_tape )
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ti990_tape_t);								break;
 		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
-		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_MAGTAPE; 										break;
-		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1; 												break;
+		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_MAGTAPE;										break;
+		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1;												break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1;												break;
-		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 0; 												break;		
+		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 0;												break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ti990_tape); 					break;
-		case DEVINFO_FCT_IMAGE_LOAD:					info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(ti990_tape); 		break;
-		case DEVINFO_FCT_IMAGE_UNLOAD:					info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(ti990_tape); 		break;
-		
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ti990_tape);					break;
+		case DEVINFO_FCT_IMAGE_LOAD:					info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(ti990_tape);		break;
+		case DEVINFO_FCT_IMAGE_UNLOAD:					info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(ti990_tape);		break;
+
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "tap"); 									break;
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "TI990 Magnetic Tape");			break;
@@ -1026,7 +1026,7 @@ DEVICE_GET_INFO( ti990_tape )
 #define MDRV_TI990_TAPE_ADD(_tag)	\
 	MDRV_DEVICE_ADD((_tag),  TI990_TAPE, 0)
 
-	
+
 static MACHINE_DRIVER_START( tap_990 )
 	MDRV_TI990_TAPE_ADD("tape0")
 	MDRV_TI990_TAPE_ADD("tape1")
@@ -1042,10 +1042,10 @@ DEVICE_START(tap_990)
 	tap_990_t *tpc = get_safe_token(device);
 	/* verify that we have an interface assigned */
 	assert(device->baseconfig().static_config != NULL);
-	
+
 	/* copy interface pointer */
 	tpc->intf = (const ti990_tpc_interface*)device->baseconfig().static_config;
-	
+
 	memset(tpc->w, 0, sizeof(tpc->w));
 	/* The PE bit is always set for the MT3200 (but not MT1600) */
 	/* According to MT3200 manual, w7 bit #4 (reserved) is always set */

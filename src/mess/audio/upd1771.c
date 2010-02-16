@@ -109,7 +109,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 	upd1771_state *state = get_safe_token( device );
 
 	//if (LOG)
-	//	logerror( "upd1771_w: received byte 0x%02x\n", data );
+	//  logerror( "upd1771_w: received byte 0x%02x\n", data );
 
 	devcb_call_write_line( &state->ack_out_func, 0 );
 

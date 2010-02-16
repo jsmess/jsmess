@@ -13,13 +13,13 @@ typedef struct
 	{
 	imgtool_image			base;
 	char			*file_name;
-	imgtool_stream 			*file_handle;
+	imgtool_stream			*file_handle;
 	int 			size;
 	} XSA_IMAGE;
 
 typedef struct
 	{
-	imgtool_directory 	base;
+	imgtool_directory	base;
 	XSA_IMAGE	*image;
 	int			index;
 	} XSA_ITERATOR;
@@ -383,7 +383,7 @@ static void charout(UINT8 ch)
 
   if ((outbufcnt++) == outbufsize) {
     if ( (outbufsize-slwinsize) != stream_write (out_stream, outbuf, outbufsize-slwinsize) )
-	 	error_occ = IMGTOOLERR_WRITEERROR;
+		error_occ = IMGTOOLERR_WRITEERROR;
 
     memcpy(outbuf, outbuf+outbufsize-slwinsize, slwinsize);
     outbufpos = outbuf+slwinsize;

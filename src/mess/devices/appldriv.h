@@ -34,7 +34,7 @@ DEVICE_GET_INFO(apple525);
 	MDRV_DEVICE_CONFIG_DATA32(appledriv_config, dividend, _dividend)	\
 	MDRV_DEVICE_CONFIG_DATA32(appledriv_config, divisor,  _divisor)
 
-#define MDRV_FLOPPY_APPLE_2_DRIVES_ADD(_config,_dividend,_divisor) 	\
+#define MDRV_FLOPPY_APPLE_2_DRIVES_ADD(_config,_dividend,_divisor)	\
 	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY_APPLE, 0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \
@@ -42,7 +42,7 @@ DEVICE_GET_INFO(apple525);
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_FLOPPY_APPLE_PARAMS(_dividend,_divisor)
 
-#define MDRV_FLOPPY_APPLE_4_DRIVES_ADD(_config,_dividend,_divisor) 	\
+#define MDRV_FLOPPY_APPLE_4_DRIVES_ADD(_config,_dividend,_divisor)	\
 	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY_APPLE, 0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_FLOPPY_APPLE_PARAMS(_dividend,_divisor) \

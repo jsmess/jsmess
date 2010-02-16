@@ -19,7 +19,7 @@ SOFTWARE_END
 /*
 A couple of comments about the 6k/8k images (thanks to Luca Antignano):
 - game code occupies 6k, but there can be different chips inside the actual carts:
-  1x8k eprom, 2x4k eproms or 1x2k + 1x4k eproms. In the 1x8k case, the console 
+  1x8k eprom, 2x4k eproms or 1x2k + 1x4k eproms. In the 1x8k case, the console
   actually accesses only the first 2k and the final 4k.
 There have been found carts where the remaining part is empty, and carts where the lower
 2k are repeated (see the Alt dumps below), but the dumps are basically the same and

@@ -159,9 +159,9 @@ static void vt_video_display_char(running_device *device,bitmap_t *bitmap, UINT8
 	int x, int y,UINT8 scroll_region,UINT8 display_type)
 {
 	UINT8 line=0;
-   	int i,b,bit=0,j;
- 	int double_width = (display_type==2) ? 1 : 0;
- 	vt_video_t *vt = get_safe_token(device);
+	int i,b,bit=0,j;
+	int double_width = (display_type==2) ? 1 : 0;
+	vt_video_t *vt = get_safe_token(device);
 
 	for (i = 0; i < 10; i++)
 	{
@@ -170,7 +170,7 @@ static void vt_video_display_char(running_device *device,bitmap_t *bitmap, UINT8
 			case 0 : // bottom half, double height
 					 j = (i >> 1)+5; break;
 			case 1 : // top half, double height
-				 	 j = (i >> 1); break;
+					 j = (i >> 1); break;
 			case 2 : // double width
 			case 3 : // normal
 					 j = i;	break;
@@ -286,7 +286,7 @@ static DEVICE_START( vt_video )
 	vt->screen = devtag_get_device(device->machine, intf->screen_tag);
 	assert(vt->screen != NULL);
 
-  	vt->gfx = memory_region(device->machine, intf->char_rom_region_tag);
+	vt->gfx = memory_region(device->machine, intf->char_rom_region_tag);
 	assert(vt->gfx != NULL);
 
     // LBA7 is scan line frequency update

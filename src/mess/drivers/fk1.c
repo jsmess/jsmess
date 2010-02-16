@@ -391,7 +391,7 @@ static MACHINE_START( fk1 )
 static VIDEO_UPDATE( fk1 )
 {
 	fk1_state *state = (fk1_state *)screen->machine->driver_data;
- 	UINT8 code;
+	UINT8 code;
 	int y, x, b;
 	UINT8 *ram = messram_get_ptr(devtag_get_device(screen->machine, "messram"));
 
@@ -449,7 +449,7 @@ MACHINE_DRIVER_END
 ROM_START( fk1 )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_SYSTEM_BIOS( 0, "orig", "Original BIOS" )
-	ROMX_LOAD( "fk1.u65", 	   0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(1))
+	ROMX_LOAD( "fk1.u65",	   0x0000, 0x0800, CRC(145561f8) SHA1(a4eb17d773e51b34620c508b6cebcb4531ae99c2), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "diag", "Diag BIOS" )
 	ROMX_LOAD( "fk1-diag.u65", 0x0000, 0x0800, CRC(e0660ae1) SHA1(6ad609049b28f27126af0a8a6224362351073dee), ROM_BIOS(2))
 ROM_END
@@ -457,5 +457,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( 1989, fk1,  0,       0, 	fk1, 	fk1, 	 0,  	   	 "Statni statek Klicany",   "FK-1",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, fk1,  0,       0,	fk1,	fk1,	 0, 		 "Statni statek Klicany",   "FK-1",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -612,7 +612,7 @@ static void lynx_blit_lines(void)
 
 	ydir = 1;
 
-	if (blitter.mem[blitter.cmd] & 0x10) 	/* Vertical Flip */
+	if (blitter.mem[blitter.cmd] & 0x10)	/* Vertical Flip */
 	{
 		ydir = -1;
 		blitter.y--;	/*?*/
@@ -1815,7 +1815,7 @@ WRITE8_HANDLER( lynx_memory_config_w )
 }
 
 static void lynx_reset(running_machine *machine)
-{	
+{
 	lynx_memory_config_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
 
 	cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
@@ -1867,7 +1867,7 @@ MACHINE_START( lynx )
 	memset(&suzy, 0, sizeof(suzy));
 
 	add_reset_callback(machine, lynx_reset);
-	
+
 	for (i = 0; i < NR_LYNX_TIMERS; i++)
 		lynx_timer_init(machine, i);
 

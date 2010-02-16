@@ -17,7 +17,7 @@ typedef struct
 	{
 	imgtool_image			base;
 	char			*file_name;
-	imgtool_stream 			*file_handle;
+	imgtool_stream			*file_handle;
 	int 			size;
 	unsigned char	*data;
 	int 			count;
@@ -25,7 +25,7 @@ typedef struct
 
 typedef struct
 	{
-	imgtool_directory 	base;
+	imgtool_directory	base;
 	CAS_IMAGE	*image;
 	int			index;
 	} CAS_ITERATOR;
@@ -94,7 +94,7 @@ static int fmsx_cas_image_init(const imgtool_module *mod, imgtool_stream *f, img
 		return IMGTOOLERR_OUTOFMEMORY;
 	}
 
-  	if ( (image->count = fmsx_cas_to_wav_size (image->data, image->size) ) < 0)
+	if ( (image->count = fmsx_cas_to_wav_size (image->data, image->size) ) < 0)
 		{
 		free(image->data);
 		free(image);

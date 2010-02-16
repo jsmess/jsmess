@@ -62,7 +62,7 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 	else
 	{
 		memory_unmap_readwrite(mem, 0x0000, 0x3fff, 0, 0);
- 		memory_install_read_bank (mem, 0x0000, 0x3fff, 0, 0, "bank2");
+		memory_install_read_bank (mem, 0x0000, 0x3fff, 0, 0, "bank2");
 		memory_install_write_bank (mem, 0x0000, 0x3fff, 0, 0, "bank3");
 		memory_set_bankptr(mem->machine, "bank2", memory_region(mem->machine, "rambank"));
 		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));

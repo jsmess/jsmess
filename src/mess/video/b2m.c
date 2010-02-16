@@ -17,9 +17,9 @@ VIDEO_START( b2m )
 
 VIDEO_UPDATE( b2m )
 {
- 	UINT8 code1;
- 	UINT8 code2;
- 	UINT8 col;
+	UINT8 code1;
+	UINT8 code2;
+	UINT8 col;
 	int y, x, b;
 	b2m_state *state = (b2m_state *)screen->machine->driver_data;
 

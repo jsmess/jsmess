@@ -14,9 +14,9 @@
  * CONS is for consoles
  * COMP is for computers
  ******************************************************************************/
- 
+
 #define CONS(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver GAME_NAME(NAME) = 	\
+extern const game_driver GAME_NAME(NAME) =	\
 {											\
 	__FILE__,								\
 	#PARENT,								\
@@ -34,7 +34,7 @@ extern const game_driver GAME_NAME(NAME) = 	\
 };
 
 #define COMP(YEAR,NAME,PARENT,COMPAT,MACHINE,INPUT,INIT,COMPANY,FULLNAME,FLAGS)	\
-extern const game_driver GAME_NAME(NAME) = 	\
+extern const game_driver GAME_NAME(NAME) =	\
 {											\
 	__FILE__,								\
 	#PARENT,								\

@@ -1791,16 +1791,16 @@ Z80CTC_INTERFACE( kc85_ctc_intf )
     DEVCB_LINE(kc85_zc2_callback)
 };
 
-MACHINE_START(kc85) 
+MACHINE_START(kc85)
 {
 	kc_cassette_init(machine);
-	
+
 	// from keyboard init
 	/* 50 Hz is just a arbitrary value - used to put scan-codes into the queue for transmitting */
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, kc_keyboard_update);
 
 	/* timer to transmit pulses to kc base unit */
-	timer_pulse(machine, ATTOTIME_IN_USEC(1024), NULL, 0, kc_keyboard_transmit_timer_callback);	
+	timer_pulse(machine, ATTOTIME_IN_USEC(1024), NULL, 0, kc_keyboard_transmit_timer_callback);
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(15625), (void *)devtag_get_device(machine, "z80ctc"), 0, kc85_15khz_timer_callback);
 	timer_set(machine, attotime_zero, NULL, 0, kc85_reset_timer_callback);

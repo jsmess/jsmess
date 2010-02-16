@@ -66,6 +66,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT	COMPANY   FULLNAME       FLAGS */
-COMP( ????, swtpc,  0,       0, 		swtpc, 	swtpc, 	 0,  	"Southwest Technical Products Corporation",   "SWTPC 6800",		GAME_NOT_WORKING | GAME_NO_SOUND)
+/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
+COMP( ????, swtpc,  0,       0, 		swtpc,	swtpc,	 0, 	"Southwest Technical Products Corporation",   "SWTPC 6800",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

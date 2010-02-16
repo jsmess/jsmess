@@ -63,7 +63,7 @@ static void build_crc_table(running_machine *machine)
 				{
 					if(!this_game_crc)
 						this_game_crc = crc;
-						
+
 					tmp_list = (UINT32*)malloc((device_crc_list_length + 1) * sizeof(UINT32));
 					memcpy(tmp_list,device_crc_list,device_crc_list_length * sizeof(UINT32));
 					if (device_crc_list) free(device_crc_list);

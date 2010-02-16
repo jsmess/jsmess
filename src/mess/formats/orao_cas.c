@@ -11,8 +11,8 @@
 #define WAVE_HIGH		-32768
 #define WAVE_LOW		0
 
-#define ORAO_WAVE_ONE 	24
-#define ORAO_WAVE_ZERO 	11
+#define ORAO_WAVE_ONE	24
+#define ORAO_WAVE_ZERO	11
 
 #define ORAO_HEADER_SIZE 360
 
@@ -48,7 +48,7 @@ static int orao_cas_to_wav_size( const UINT8 *casdata, int caslen ) {
 			}
 		}
 	}
- 	len = caslen;
+	len = caslen;
 	return size;
 }
 

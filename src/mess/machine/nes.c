@@ -220,7 +220,7 @@ MACHINE_RESET( nes )
 	/* Reset the serial input ports */
 	in_0.shift = 0;
 	in_1.shift = 0;
-	
+
 	devtag_get_device(machine, "maincpu")->reset();
 }
 
@@ -236,7 +236,7 @@ MACHINE_START( nes )
 {
 	init_nes_core(machine);
 	add_exit_callback(machine, nes_machine_stop);
-	
+
 	nes_irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
 }
 
@@ -928,8 +928,8 @@ void nes_partialhash( char *dest, const unsigned char *data, unsigned long lengt
 
 static void nes_load_proc(running_device *image)
 {
-	nes_fds.sides = 0;	
-	
+	nes_fds.sides = 0;
+
 	image_fseek(image, 0, SEEK_END);
 	nes_fds.sides = (image_ftell(image) - 16) / 65500;
 	nes_fds.data = (UINT8*)image_malloc(image, nes_fds.sides * 65500);
@@ -945,8 +945,8 @@ static void nes_unload_proc(running_device *image)
 	image_freeptr(image,nes_fds.data);
 }
 
-DRIVER_INIT( famicom) 
-{	
+DRIVER_INIT( famicom)
+{
 	/* clear some of the cart variables we don't use */
 	nes.trainer = 0;
 	nes.battery = 0;
@@ -960,7 +960,7 @@ DRIVER_INIT( famicom)
 
 	nes_fds.sides = 0;
 	nes_fds.data = NULL;
-	
+
 	floppy_install_load_proc(floppy_get_device(machine,0), nes_load_proc);
 	floppy_install_unload_proc(floppy_get_device(machine,0), nes_unload_proc);
 }

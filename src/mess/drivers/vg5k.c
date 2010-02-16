@@ -98,7 +98,7 @@ static DRIVER_INIT( vg5k )
 				for (d = 0; d < 64; d+=4)
 					FNT[dest++]=FNT[a|b|c|d];
 }
-	
+
 static MACHINE_DRIVER_START( vg5k )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)

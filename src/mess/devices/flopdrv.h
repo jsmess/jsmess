@@ -38,7 +38,7 @@ struct floppy_config_t
 	devcb_write_line out_tk00_func; /* track 00 */
 	devcb_write_line out_wpt_func;  /* write protect */
 	devcb_write_line out_rdy_func;  /* ready */
-//	devcb_write_line out_dskchg_func;  /* disk changed */
+//  devcb_write_line out_dskchg_func;  /* disk changed */
 
 	floppy_type_t floppy_type;
 	const struct FloppyFormat *formats;
@@ -167,7 +167,7 @@ extern DEVICE_IMAGE_UNLOAD( floppy );
 #define FLOPPY_3 "floppy3"
 
 
-#define MDRV_FLOPPY_DRIVE_ADD(_tag, _config) 	\
+#define MDRV_FLOPPY_DRIVE_ADD(_tag, _config)	\
 	MDRV_DEVICE_ADD(_tag, FLOPPY, 0)			\
 	MDRV_DEVICE_CONFIG(_config)
 
@@ -175,7 +175,7 @@ extern DEVICE_IMAGE_UNLOAD( floppy );
 	MDRV_DEVICE_MODIFY(_tag)		\
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_4_DRIVES_ADD(_config) 	\
+#define MDRV_FLOPPY_4_DRIVES_ADD(_config)	\
 	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY, 0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_ADD(FLOPPY_1, FLOPPY, 0)		\
@@ -185,7 +185,7 @@ extern DEVICE_IMAGE_UNLOAD( floppy );
 	MDRV_DEVICE_ADD(FLOPPY_3, FLOPPY, 0)		\
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_4_DRIVES_MODIFY(_config) 	\
+#define MDRV_FLOPPY_4_DRIVES_MODIFY(_config)	\
 	MDRV_DEVICE_MODIFY(FLOPPY_0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_MODIFY(FLOPPY_1)		\
@@ -195,25 +195,25 @@ extern DEVICE_IMAGE_UNLOAD( floppy );
 	MDRV_DEVICE_MODIFY(FLOPPY_3)		\
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_4_DRIVES_REMOVE() 	\
+#define MDRV_FLOPPY_4_DRIVES_REMOVE()	\
 	MDRV_DEVICE_REMOVE(FLOPPY_0)		\
 	MDRV_DEVICE_REMOVE(FLOPPY_1)		\
 	MDRV_DEVICE_REMOVE(FLOPPY_2)		\
 	MDRV_DEVICE_REMOVE(FLOPPY_3)
 
-#define MDRV_FLOPPY_2_DRIVES_ADD(_config) 	\
+#define MDRV_FLOPPY_2_DRIVES_ADD(_config)	\
 	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY, 0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_ADD(FLOPPY_1, FLOPPY, 0)		\
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_2_DRIVES_MODIFY(_config) 	\
+#define MDRV_FLOPPY_2_DRIVES_MODIFY(_config)	\
 	MDRV_DEVICE_MODIFY(FLOPPY_0)		\
 	MDRV_DEVICE_CONFIG(_config)	\
 	MDRV_DEVICE_MODIFY(FLOPPY_1)		\
 	MDRV_DEVICE_CONFIG(_config)
 
-#define MDRV_FLOPPY_2_DRIVES_REMOVE() 	\
+#define MDRV_FLOPPY_2_DRIVES_REMOVE()	\
 	MDRV_DEVICE_REMOVE(FLOPPY_0)		\
 	MDRV_DEVICE_REMOVE(FLOPPY_1)
 

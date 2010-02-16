@@ -315,7 +315,7 @@ void vic2_lightpen_write( running_device *device, int level )
 
 static TIMER_CALLBACK( vic2_timer_timeout )
 {
- 	vic2_state *vic2 = (vic2_state *)ptr;
+	vic2_state *vic2 = (vic2_state *)ptr;
 	int which = param;
 
 	DBG_LOG(3, "vic2 ", ("timer %d timeout\n", which));
@@ -974,7 +974,7 @@ static void vic2_draw_sprites( running_machine *machine, vic2_state *vic2 )
 	else
 	{
 		SPRITE_COLL = spr_coll;
-		if (SPRITE_COLL) 
+		if (SPRITE_COLL)
 			vic2_set_interrupt(machine, 4, vic2);
 	}
 
@@ -983,7 +983,7 @@ static void vic2_draw_sprites( running_machine *machine, vic2_state *vic2 )
 	else
 	{
 		SPRITE_BG_COLL = gfx_coll;
-		if (SPRITE_BG_COLL) 
+		if (SPRITE_BG_COLL)
 			vic2_set_interrupt(machine, 2, vic2);
 	}
 }
@@ -1815,7 +1815,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 					else
 						if (vic2->ud_border_on == 0)
 							vic2->border_on = 0;
-				} 
+				}
 				else
 					if (vic2->ud_border_on == 0)
 						vic2->border_on = 0;
@@ -1850,7 +1850,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 					else
 						if (vic2->ud_border_on == 0)
 							vic2->border_on = 0;
-				} 
+				}
 				else
 					if (vic2->ud_border_on == 0)
 						vic2->border_on = 0;
@@ -2132,32 +2132,32 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 
 void vic2_set_rastering( running_device *device, int onoff )
 {
- 	vic2_state *vic2 = get_safe_token(device);
+	vic2_state *vic2 = get_safe_token(device);
 	vic2->on = onoff;
 }
 
 int vic2e_k0_r( running_device *device )
 {
- 	vic2_state *vic2 = get_safe_token(device);
+	vic2_state *vic2 = get_safe_token(device);
 	return VIC2E_K0_LEVEL;
 }
 
 int vic2e_k1_r( running_device *device )
 {
- 	vic2_state *vic2 = get_safe_token(device);
+	vic2_state *vic2 = get_safe_token(device);
 	return VIC2E_K1_LEVEL;
 }
 
 int vic2e_k2_r( running_device *device )
 {
- 	vic2_state *vic2 = get_safe_token(device);
+	vic2_state *vic2 = get_safe_token(device);
 	return VIC2E_K2_LEVEL;
 }
 
 
 WRITE8_DEVICE_HANDLER( vic2_port_w )
 {
- 	vic2_state *vic2 = get_safe_token(device);
+	vic2_state *vic2 = get_safe_token(device);
 	running_machine *machine = device->machine;
 
 	DBG_LOG(2, "vic write", ("%.2x:%.2x\n", offset, data));
@@ -2257,19 +2257,19 @@ WRITE8_DEVICE_HANDLER( vic2_port_w )
 
 	case 0x1a:							/* irq mask */
 		vic2->reg[offset] = data;
-		vic2_set_interrupt(machine, 0, vic2); 	// beamrider needs this
+		vic2_set_interrupt(machine, 0, vic2);	// beamrider needs this
 		break;
 
 	case 0x11:
 		if (vic2->reg[offset] != data)
 		{
 			vic2->reg[offset] = data;
-			if (data & 8) 
+			if (data & 8)
 			{
 				vic2->dy_start = ROW25_YSTART;
 				vic2->dy_stop = ROW25_YSTOP;
-			} 
-			else 
+			}
+			else
 			{
 				vic2->dy_start = ROW24_YSTART;
 				vic2->dy_stop = ROW24_YSTOP;
@@ -2382,7 +2382,7 @@ WRITE8_DEVICE_HANDLER( vic2_port_w )
 
 READ8_DEVICE_HANDLER( vic2_port_r )
 {
- 	vic2_state *vic2 = get_safe_token(device);
+	vic2_state *vic2 = get_safe_token(device);
 	running_machine *machine = device->machine;
 	int val = 0;
 
@@ -2721,12 +2721,12 @@ static DEVICE_RESET( vic2 )
 
 	for (i = 0; i < 8; i++)
 	{
-		vic2->spr_ptr[i] = 0; 
+		vic2->spr_ptr[i] = 0;
 		vic2->mc_base[i] = 0;
-		vic2->mc[i] = 0; 
+		vic2->mc[i] = 0;
 		for (j = 0; j < 4; j++)
 		{
-			vic2->spr_draw_data[i][j] = 0; 
+			vic2->spr_draw_data[i][j] = 0;
 			vic2->spr_data[i][j] = 0;
 		}
 	}

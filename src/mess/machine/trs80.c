@@ -42,12 +42,12 @@ static UINT8 trs80_nmi_data=0xff;	/* Passes FDC int to NMI handler */
 UINT8 trs80_mode = 0;			/* Control bits passed to video output routine */
 
 #define IRQ_M1_RTC		0x80	/* RTC on Model I */
-#define IRQ_M1_FDC 		0x40	/* FDC on Model I */
+#define IRQ_M1_FDC		0x40	/* FDC on Model I */
 #define IRQ_M4_RTC		0x04	/* RTC on Model 4 */
 #define CASS_RISE		0x01	/* high speed cass on Model III/4) */
 #define CASS_FALL		0x02	/* high speed cass on Model III/4) */
 
-#define MAX_LUMPS	192	 	/* crude storage units - don't know much about it */
+#define MAX_LUMPS	192		/* crude storage units - don't know much about it */
 #define MAX_GRANULES	8		/* lumps consisted of granules.. aha */
 #define MAX_SECTORS 	5		/* and granules of sectors */
 
@@ -688,7 +688,7 @@ WRITE8_HANDLER( lnw80_fe_w )
 	else
 	{
 		memory_unmap_readwrite (mem, 0x0000, 0x3fff, 0, 0);
- 		memory_install_read_bank (mem, 0x0000, 0x2fff, 0, 0, "bank1");
+		memory_install_read_bank (mem, 0x0000, 0x2fff, 0, 0, "bank1");
 		memory_set_bankptr(mem->machine, "bank1", memory_region(mem->machine, "maincpu"));
 		memory_install_readwrite8_handler (mem, 0x37e0, 0x37e3, 0, 0, trs80_irq_status_r, trs80_motor_w);
 		memory_install_readwrite8_handler (mem, 0x37e8, 0x37eb, 0, 0, trs80_printer_r, trs80_printer_w);

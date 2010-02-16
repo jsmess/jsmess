@@ -37,7 +37,7 @@ static VIDEO_START( plan80 )
 static VIDEO_UPDATE( plan80 )
 {
 	UINT8 *gfx = memory_region(screen->machine, "gfx");
- 	int x,y,j,b;
+	int x,y,j,b;
 	UINT16 addr;
 
 	for(y = 0; y < 32; y++ )
@@ -114,5 +114,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY          FULLNAME       FLAGS */
-COMP( 1988, plan80,  0,       0, 	plan80, 	plan80, 	 0,   "Tesla Eltos",   "Plan-80",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1988, plan80,  0,       0,	plan80, 	plan80, 	 0,   "Tesla Eltos",   "Plan-80",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

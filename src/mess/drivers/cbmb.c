@@ -330,7 +330,7 @@ static PALETTE_INIT( p500 )
 {
 	int i;
 
-	for (i = 0; i < sizeof(p500_palette) / 3; i++) 
+	for (i = 0; i < sizeof(p500_palette) / 3; i++)
 	{
 		palette_set_color_rgb(machine, i, p500_palette[i * 3], p500_palette[i * 3 + 1], p500_palette[i * 3 + 2]);
 	}
@@ -372,7 +372,7 @@ static const vic2_interface p500_vic2_intf = {
 	cbmb_lightpen_x_cb,
 	cbmb_lightpen_y_cb,
 	cbmb_lightpen_button_cb,
-	cbmb_dma_read, 
+	cbmb_dma_read,
 	cbmb_dma_read_color,
 	NULL,
 	cbmb_rdy_cb

@@ -808,8 +808,8 @@ static DEVICE_GET_INFO( bw2_serial )
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 0;                                        	break;
-		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 0;                                        	break;
+		default:									DEVICE_GET_INFO_CALL(serial);	break;
 	}
 }
 

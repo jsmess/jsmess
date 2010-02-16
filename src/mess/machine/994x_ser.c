@@ -454,7 +454,7 @@ static DEVICE_GET_INFO( ti99_4_rs232 )
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_SERIAL;                                      break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                               break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                               break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                               break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 1;                                               break;
 
 		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( ti99_4_rs232 );              break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( ti99_4_rs232 );			break;
@@ -487,7 +487,7 @@ DEVICE_GET_INFO( ti99_4_pio )
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_PARALLEL;                                      break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                               break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                               break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                               break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 1;                                               break;
 
 		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( ti99_4_pio );              break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( ti99_4_pio );			break;

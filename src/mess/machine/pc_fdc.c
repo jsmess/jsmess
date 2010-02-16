@@ -226,7 +226,7 @@ static void pc_fdc_data_rate_w(running_machine *machine, UINT8 data)
 
 		/* toggle reset state */
 		upd765_reset_w(pc_get_device(machine), 1);
- 		upd765_reset_w(pc_get_device(machine), 0);
+		upd765_reset_w(pc_get_device(machine), 0);
 
 		/* bit is self-clearing */
 		data &= ~0x080;

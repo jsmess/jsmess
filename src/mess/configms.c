@@ -37,7 +37,7 @@ static void device_dirs_load(running_machine *machine, int config_type, xml_data
 
 			if ((dev_instance != NULL) && (dev_instance[0] != '\0'))
 			{
-			
+
 				for (dev = machine->devicelist.first(); dev != NULL; dev = dev->next)
 				{
 					if (is_image_device(dev))
@@ -90,7 +90,7 @@ static void device_dirs_save(running_machine *machine, int config_type, xml_data
 					xml_set_attribute(node, "directory", image_working_directory(image));
 				}
 			}
-		}		
+		}
 	}
 }
 

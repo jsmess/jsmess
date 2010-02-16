@@ -1720,8 +1720,8 @@ static READ8_HANDLER( apple2gs_read_vector )
 
 MACHINE_RESET( apple2gs )
 {
-/* Something needs to be here? 
-	When F3 pressed, the video mode changes and the machine goes into Basic */
+/* Something needs to be here?
+    When F3 pressed, the video mode changes and the machine goes into Basic */
 }
 
 MACHINE_START( apple2gs )

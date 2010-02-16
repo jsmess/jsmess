@@ -256,8 +256,8 @@ MACHINE_RESET( primob )
 {
 	primo_common_machine_init(machine);
 
-//removed	cbm_drive_0_config(SERIAL, 8);
-//removed	cbm_drive_1_config(SERIAL, 9);
+//removed   cbm_drive_0_config(SERIAL, 8);
+//removed   cbm_drive_1_config(SERIAL, 9);
 }
 
 /*******************************************************************************

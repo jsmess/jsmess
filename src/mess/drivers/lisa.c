@@ -296,7 +296,7 @@ static INPUT_PORTS_START( lisa )
 	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) 			PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) 			PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) 			PORT_CHAR('w') PORT_CHAR('W')
-	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB) 			PORT_CHAR('\t')
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_TAB)			PORT_CHAR('\t')
 	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) 			PORT_CHAR('z') PORT_CHAR('Z')
 	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) 			PORT_CHAR('x') PORT_CHAR('X')
 	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) 			PORT_CHAR('d') PORT_CHAR('D')
@@ -461,7 +461,7 @@ ROM_END
     the GAME_NOT_WORKING flag...
 */
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT  INIT   COMPANY  FULLNAME */
-COMP( 1983, lisa,     0,	0,	lisa,     lisa,	 lisa2,    		"Apple Computer",  "Lisa", GAME_NOT_WORKING )
-COMP( 1984, lisa2,    0,	0,	lisa,     lisa,	 lisa2,    		"Apple Computer",  "Lisa2", GAME_NOT_WORKING )
-COMP( 1984, lisa210,  lisa2,	0,	lisa210,  lisa,	 lisa210, 	"Apple Computer",  "Lisa2/10", GAME_NOT_WORKING )
-COMP( 1985, macxl,    lisa2,	0,	macxl,    lisa,	 mac_xl,  	"Apple Computer",  "Macintosh XL", /*GAME_NOT_WORKING*/0 )
+COMP( 1983, lisa,     0,	0,	lisa,     lisa,	 lisa2, 		"Apple Computer",  "Lisa", GAME_NOT_WORKING )
+COMP( 1984, lisa2,    0,	0,	lisa,     lisa,	 lisa2, 		"Apple Computer",  "Lisa2", GAME_NOT_WORKING )
+COMP( 1984, lisa210,  lisa2,	0,	lisa210,  lisa,	 lisa210,	"Apple Computer",  "Lisa2/10", GAME_NOT_WORKING )
+COMP( 1985, macxl,    lisa2,	0,	macxl,    lisa,	 mac_xl,	"Apple Computer",  "Macintosh XL", /*GAME_NOT_WORKING*/0 )

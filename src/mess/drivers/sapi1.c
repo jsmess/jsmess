@@ -181,13 +181,13 @@ ROM_START( sapizps3 )
 	ROM_SYSTEM_BIOS( 1, "per", "Perina" )
 	ROMX_LOAD( "perina_1988.bin",0x0000, 0x0800, CRC(d71e8d3a) SHA1(9b3a26ea7c2f2c8a1fb10b51c1c880acc9fd806d), ROM_BIOS(2))
 	ROM_SYSTEM_BIOS( 2, "pkt1", "PKT 1" )
-	ROMX_LOAD( "pkt1.bin", 		 0x0000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c), ROM_BIOS(3))
+	ROMX_LOAD( "pkt1.bin",		 0x0000, 0x0800, CRC(ed5a2725) SHA1(3383c15f87f976400b8d0f31829e2a95236c4b6c), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS( 3, "1zmod", "JPR-1Zmod" )
-	ROMX_LOAD( "jpr1zmod.bin", 	 0x0000, 0x0800, CRC(69a29b07) SHA1(1cd31032954fcd7d10b1586be62db6f7597eb4f2), ROM_BIOS(4))
+	ROMX_LOAD( "jpr1zmod.bin",	 0x0000, 0x0800, CRC(69a29b07) SHA1(1cd31032954fcd7d10b1586be62db6f7597eb4f2), ROM_BIOS(4))
 ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1985, sapi1, 	0, 	 	0,		sapi1, 		sapi1, 		sapi1, 	 "Tesla",					 "SAPI-1 ZPS 1",	 GAME_NO_SOUND)
-COMP( 1985, sapizps2,sapi1,	0,		sapi1, 		sapi1, 		sapi1, 	 "Tesla",					 "SAPI-1 ZPS 2",	 GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1985, sapizps3,sapi1,	0,		sapizps3, 	sapi1, 		sapi1, 	 "Tesla",					 "SAPI-1 ZPS 3",	 GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, sapi1,	0,		0,		sapi1,		sapi1,		sapi1,	 "Tesla",					 "SAPI-1 ZPS 1",	 GAME_NO_SOUND)
+COMP( 1985, sapizps2,sapi1,	0,		sapi1,		sapi1,		sapi1,	 "Tesla",					 "SAPI-1 ZPS 2",	 GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1985, sapizps3,sapi1,	0,		sapizps3,	sapi1,		sapi1,	 "Tesla",					 "SAPI-1 ZPS 3",	 GAME_NOT_WORKING | GAME_NO_SOUND)

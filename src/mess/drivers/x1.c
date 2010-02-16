@@ -286,7 +286,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
-						if(color & 0x10 && 	video_screen_get_frame_number(machine->primary_screen) & 0x10) //reverse flickering
+						if(color & 0x10 &&	video_screen_get_frame_number(machine->primary_screen) & 0x10) //reverse flickering
 							pcg_pen^=7;
 
 						if(pcg_pen == 0 && (!(color & 8)))
@@ -1046,14 +1046,14 @@ static READ8_HANDLER( x1_pcg_r )
 	}
 	else
 	{
- 		gfx_data = memory_region(space->machine, "pcg");
- 		calc_pcg_offset = (pcg_index_r[addr-1]) | ((addr-1)*0x800);
- 		res = gfx_data[0x0000+calc_pcg_offset+(pcg_write_addr*8)];
+		gfx_data = memory_region(space->machine, "pcg");
+		calc_pcg_offset = (pcg_index_r[addr-1]) | ((addr-1)*0x800);
+		res = gfx_data[0x0000+calc_pcg_offset+(pcg_write_addr*8)];
 
- 		pcg_index_r[addr-1]++;
+		pcg_index_r[addr-1]++;
 		pcg_index_r[addr-1]&=0x7;
- 		return res;
- 	}
+		return res;
+	}
 
 	return mame_rand(space->machine);
 }
@@ -1103,8 +1103,8 @@ static WRITE8_HANDLER( x1_pcg_w )
 
     		gfx_element_mark_dirty(space->machine->gfx[1], pcg_offset >> 3);
 
-  			pcg_index[addr-1]++;
-  			pcg_index[addr-1]&=7;
+			pcg_index[addr-1]++;
+			pcg_index[addr-1]&=7;
 		}
 	}
 }
@@ -1335,10 +1335,10 @@ static READ8_HANDLER( x1_io_r )
 
 static WRITE8_HANDLER( x1_io_w )
 {
-	if(io_bank_mode == 1)                        	{ x1_ex_gfxram_w(space, offset, data); }
+	if(io_bank_mode == 1)                       	{ x1_ex_gfxram_w(space, offset, data); }
 //  else if(offset >= 0x0704 && offset <= 0x0707)   { z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x0704,data); }
 //  else if(offset >= 0x0c00 && offset <= 0x0cff)   { x1_rs232c_w(space->machine, 0, data); }
-	else if(offset >= 0x0e00 && offset <= 0x0e02)  	{ x1_rom_w(space, offset-0xe00,data); }
+	else if(offset >= 0x0e00 && offset <= 0x0e02)	{ x1_rom_w(space, offset-0xe00,data); }
 //  else if(offset >= 0x0e80 && offset <= 0x0e82)   { x1_kanji_w(space->machine, offset-0xe80,data); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ x1_fdc_w(space, offset-0xff8,data); }
 	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }
@@ -1380,7 +1380,7 @@ static READ8_HANDLER( x1turbo_io_r )
 	if(offset == 0x0700)							{ return (ym2151_r(devtag_get_device(space->machine, "ym"), offset-0x0700) & 0x7f) | (input_port_read(space->machine, "SOUND_SW") & 0x80); }
 	else if(offset == 0x0701)		                { return ym2151_r(devtag_get_device(space->machine, "ym"), offset-0x0700); }
 	else if(offset >= 0x0704 && offset <= 0x0707)   { return z80ctc_r(devtag_get_device(space->machine, "ctc"), offset-0x0704); }
-	else if(offset == 0x0e03)                    	{ return x1_rom_r(space, 0); }
+	else if(offset == 0x0e03)                   	{ return x1_rom_r(space, 0); }
 	else if(offset >= 0x0e80 && offset <= 0x0e83)	{ return x1_kanji_r(space, offset-0xe80); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ return x1_fdc_r(space, offset-0xff8); }
 	else if(offset >= 0x1400 && offset <= 0x17ff)	{ return x1_pcg_r(space, offset-0x1400); }
@@ -1412,11 +1412,11 @@ static READ8_HANDLER( x1turbo_io_r )
 
 static WRITE8_HANDLER( x1turbo_io_w )
 {
-	if(io_bank_mode == 1)                        	{ x1_ex_gfxram_w(space, offset, data); }
+	if(io_bank_mode == 1)                       	{ x1_ex_gfxram_w(space, offset, data); }
 	else if(offset == 0x0700 || offset == 0x0701)	{ ym2151_w(devtag_get_device(space->machine, "ym"), offset-0x0700,data); }
 	else if(offset >= 0x0704 && offset <= 0x0707)	{ z80ctc_w(devtag_get_device(space->machine, "ctc"), offset-0x0704,data); }
 //  else if(offset >= 0x0c00 && offset <= 0x0cff)   { x1_rs232c_w(space->machine, 0, data); }
-	else if(offset >= 0x0e00 && offset <= 0x0e02)  	{ x1_rom_w(space, offset-0xe00,data); }
+	else if(offset >= 0x0e00 && offset <= 0x0e02)	{ x1_rom_w(space, offset-0xe00,data); }
 	else if(offset >= 0x0e80 && offset <= 0x0e83)	{ x1_kanji_w(space, offset-0xe80,data); }
 	else if(offset >= 0x0ff8 && offset <= 0x0fff)	{ x1_fdc_w(space, offset-0xff8,data); }
 	else if(offset >= 0x1000 && offset <= 0x10ff)	{ x1_pal_b_w(space, 0,data); }

@@ -424,7 +424,7 @@ static MACHINE_DRIVER_START( qsound )
 	MDRV_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-	
+
 	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 MACHINE_DRIVER_END
 

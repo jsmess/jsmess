@@ -69,19 +69,19 @@
  *      YM (bit 2) - unknown
  *      peltype (bits 4 and 5)
  *
- * 
- *	Sprite registers:
- * 
- * 	0,1:	Maximum sprite (last one to render?) (10-bit)
- * 
- * 	1 (bit 7):	Enable sprite display
- * 
- * 	2,3:	X offset (9-bit)
- * 
- *  4,5:	Y offset (9-bit)
- * 
- * 	6 (bit 4):	VRAM location (0=0x40000,1=0x60000)
- * 
+ *
+ *  Sprite registers:
+ *
+ *  0,1:    Maximum sprite (last one to render?) (10-bit)
+ *
+ *  1 (bit 7):  Enable sprite display
+ *
+ *  2,3:    X offset (9-bit)
+ *
+ *  4,5:    Y offset (9-bit)
+ *
+ *  6 (bit 4):  VRAM location (0=0x40000,1=0x60000)
+ *
  */
 
 #include "emu.h"
@@ -174,7 +174,7 @@ WRITE8_HANDLER( towns_gfx_high_w )
 READ8_HANDLER( towns_gfx_r )
 {
 	UINT8 ret = 0;
-	
+
 	if(towns_mainmem_enable != 0)
 		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xc0000];
 
@@ -191,7 +191,7 @@ READ8_HANDLER( towns_gfx_r )
 		| (((towns_gfxvram[offset+2] >> towns_vram_rplane) >> 2) & 0x04)
 		| (((towns_gfxvram[offset+3] >> towns_vram_rplane) << 1) & 0x02)
 		| (((towns_gfxvram[offset+3] >> towns_vram_rplane) >> 4) & 0x01);
-	
+
 	return ret;
 }
 
@@ -277,7 +277,7 @@ static void towns_update_kanji_offset(void)
 		                   | ((towns_kanji_code_h & 0x07) << 9)
 		                   | 0x38000;
 	}
-} 
+}
 
 READ8_HANDLER( towns_video_cff80_r )
 {
@@ -571,9 +571,9 @@ READ8_HANDLER(towns_spriteram_low_r)
 	{  // 0xc8000-0xc8fff
 		if(towns_mainmem_enable == 0)
 		{
-//			if(towns_tvram_enable == 0)
-//				return towns_sprram[offset];
-//			else
+//          if(towns_tvram_enable == 0)
+//              return towns_sprram[offset];
+//          else
 				return towns_txtvram[offset];
 		}
 		else
@@ -589,9 +589,9 @@ READ8_HANDLER(towns_spriteram_low_r)
 		{
 			if(towns_ankcg_enable != 0 && offset < 0x2800)
 				return ROM[0x180000 + 0x3d000 + (offset-0x2000)];
-//			if(towns_tvram_enable == 0)
-//				return towns_sprram[offset];
-//			else
+//          if(towns_tvram_enable == 0)
+//              return towns_sprram[offset];
+//          else
 				return towns_txtvram[offset];
 		}
 		else
@@ -637,22 +637,22 @@ WRITE8_HANDLER( towns_spriteram_w)
 
 /*
  *  Sprites
- * 
- * 	Max. 1024, 16x16, 16 colours per sprite
- * 	128kB Sprite RAM (8kB attributes, 120kB pattern/colour data)
- * 	Sprites are rendered directly to VRAM layer 1 (VRAM offset 0x40000 or 0x60000)
- * 
- * 	Sprite RAM format:
- * 		4 words per sprite
- * 		+0: X position (10-bit)
- * 		+2: Y position (10-bit)
- * 		+4: Sprite Attribute
- * 			bit 15: enforce offsets (regs 2-5)
- * 			bit 12,13: flip sprite
- * 			bits 10-0: Sprite RAM offset containing sprite pattern
- * 			TODO: other attributes (zoom?)
- * 		+6: Sprite Colour
- * 			bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32) 
+ *
+ *  Max. 1024, 16x16, 16 colours per sprite
+ *  128kB Sprite RAM (8kB attributes, 120kB pattern/colour data)
+ *  Sprites are rendered directly to VRAM layer 1 (VRAM offset 0x40000 or 0x60000)
+ *
+ *  Sprite RAM format:
+ *      4 words per sprite
+ *      +0: X position (10-bit)
+ *      +2: Y position (10-bit)
+ *      +4: Sprite Attribute
+ *          bit 15: enforce offsets (regs 2-5)
+ *          bit 12,13: flip sprite
+ *          bits 10-0: Sprite RAM offset containing sprite pattern
+ *          TODO: other attributes (zoom?)
+ *      +6: Sprite Colour
+ *          bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32)
  */
 void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
@@ -660,7 +660,7 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 	UINT16 col,pixel;
 	UINT32 voffset;
 	int xstart,xend,xdir,ystart,yend,ydir;
-	
+
 	if(xflip)
 	{
 		xstart = x+14;
@@ -685,7 +685,7 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 		yend = y+16;
 		ydir = 1;
 	}
-	
+
 	for(ypos=ystart;ypos!=yend;ypos+=ydir)
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir)
@@ -726,7 +726,7 @@ void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 y
 	UINT16 col;
 	UINT32 voffset;
 	int xstart,ystart,xend,yend,xdir,ydir;
-	
+
 	if(xflip)
 	{
 		xstart = x+16;
@@ -751,7 +751,7 @@ void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 y
 		yend = y+16;
 		ydir = 1;
 	}
-	
+
 	for(ypos=ystart;ypos!=yend;ypos+=ydir)
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir)
@@ -779,13 +779,13 @@ void draw_sprites(running_machine* machine, const rectangle* rect)
 	UINT16 xoff = (towns_sprite_reg[2] | (towns_sprite_reg[3] << 8)) & 0x1ff;
 	UINT16 yoff = (towns_sprite_reg[4] | (towns_sprite_reg[5] << 8)) & 0x1ff;
 	UINT32 poffset,coffset;
-	
+
 	if(!(towns_sprite_reg[1] & 0x80))
 		return;
-		
+
 	// clears VRAM for each frame?
 	memset(towns_gfxvram+0x40000,0x80,0x40000);
-	
+
 	for(n=sprite_limit;n<1024;n++)
 	{
 		x = towns_txtvram[8*n] | (towns_txtvram[8*n+1] << 8);
@@ -799,7 +799,7 @@ void draw_sprites(running_machine* machine, const rectangle* rect)
 		}
 		x &= 0x1ff;
 		y &= 0x1ff;
-		
+
 		if(colour & 0x8000)
 		{
 			poffset = (attr & 0x3ff) << 7;
@@ -864,7 +864,7 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-		
+
 			colour = (towns_gfxvram[off+(layer*0x40000)+1] << 8) | towns_gfxvram[off+(layer*0x40000)];
 			if(colour < 0x8000)
 			{
@@ -1167,10 +1167,10 @@ void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 ascii, U
 	UINT8 temp;
 	UINT8* font_rom = memory_region(machine,"user");
 	int a,b;
-	
+
 	// all characters are 16 pixels high
 	vram_addr = (x * 16) * linesize;
-	
+
 	if((attr & 0xc0) == 0)
 		rom_addr = 0x3d800 + (ascii * 128);
 	else
@@ -1204,7 +1204,7 @@ void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 ascii, U
 	colour = attr & 0x07;
 	if(attr & 0x20)
 		colour |= 0x08;
-		
+
 	for(a=0;a<16;a++)  // for each scanline
 	{
 		if((attr & 0xc0) == 0)
@@ -1216,10 +1216,10 @@ void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 ascii, U
 			else
 				data = font_rom[0x180000 + rom_addr + (a*2) + 1];
 		}
-		
+
 		if(attr & 0x08)
 			data = ~data;  // inverse
-		
+
 		// and finally, put the data in VRAM
 		for(b=0;b<8;b+=2)
 		{
@@ -1228,8 +1228,8 @@ void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 ascii, U
 				temp |= ((colour & 0x0f) << 4);
 			if(data & (1<<(b+1)))
 				temp |= (colour & 0x0f);
-		} 
-		
+		}
+
 		vram_addr += linesize;
 	}
 }
@@ -1250,7 +1250,7 @@ void draw_text_layer(running_machine* machine)
  *  If either bits 6 or 7 are high, then a fullwidth Kanji character is displayed
  *  at this location.  The character displayed is represented by a 2-byte
  *  JIS code at the same offset at 0xca000.
- * 
+ *
  *  The video hardware renders text to VRAM layer 1, there is no separate text layer
  */
 	int x,y,c = 0;

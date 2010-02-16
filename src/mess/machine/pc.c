@@ -288,7 +288,7 @@ static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out0_changed )
 static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out1_changed )
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
- 	/* Trigger DMA channel #0 */
+	/* Trigger DMA channel #0 */
 	if ( st->out1 == 0 && state == 1 && st->u73_q2 == 0 )
 	{
 		st->u73_q2 = 1;

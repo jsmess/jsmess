@@ -427,16 +427,16 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	LPCSTR pszSoftware;
 	BOOL bResult = FALSE;
 
-//	begin_resource_tracking();
+//  begin_resource_tracking();
 
-	// allocate the machine config	
+	// allocate the machine config
 	config = machine_config_alloc(drivers[drvindex]->machine_config);
 
 	nPos = 0;
 	for (dev = config->devicelist.first(); dev != NULL; dev = dev->next)
 	{
 		if (is_image_device(dev))
-		{	
+		{
 			image_device_info info = image_device_getinfo(config, dev);
 
 			// confirm any mandatory devices are loaded
@@ -506,7 +506,7 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 		for (device = config->mconfig->devicelist.first(); device != NULL;device = device->next)
 		{
 			if (is_image_device(device))
-			{			
+			{
 				s = GetSelectedSoftware(drvindex, config->mconfig, device);
 				if ((s != NULL) && !mame_stricmp(s, pszFilename))
 					break;
@@ -529,7 +529,7 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 			for (device = config->mconfig->devicelist.first(); device != NULL;device = device->next)
 			{
 				if (is_image_device(device))
-				{			
+				{
 					s = GetSelectedSoftware(drvindex, config->mconfig, device);
 					if (is_null_or_empty(s) && image_device_uses_file_extension(device, file_extension))
 						break;
@@ -561,7 +561,7 @@ static void MessRemoveImage(int drvindex, const char *pszFilename)
 	for (device = config->mconfig->devicelist.first(); device != NULL;device = device->next)
 	{
 		if (is_image_device(device))
-		{	
+		{
 			s = GetSelectedSoftware(drvindex, config->mconfig, device);
 			if ((s != NULL) && !strcmp(pszFilename, s))
 				MessSpecifyImage(drvindex, device, NULL);
@@ -601,7 +601,7 @@ static void MessRefreshPicker(void)
 	for (dev = config->mconfig->devicelist.first(); dev != NULL;dev = dev->next)
 	{
 		if (is_image_device(dev))
-		{		
+		{
 			pszSoftware = GetSelectedSoftware(config->driver_index, config->mconfig, dev);
 			if (pszSoftware && *pszSoftware)
 			{
@@ -793,7 +793,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 		for (dev = config->devicelist.first(); dev != NULL;dev = dev->next)
 		{
 			if (is_image_device(dev))
-			{	
+			{
 				image_device_info info = image_device_getinfo(config, dev);
 
 				if (info.type != IO_PRINTER)
@@ -835,7 +835,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 	char* utf8_filename;
 	machine_config *config;
 
-//	begin_resource_tracking();
+//  begin_resource_tracking();
 
 	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
 	drvindex = Picker_GetSelectedItem(hwndList);
@@ -927,7 +927,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 			if ((!osd_opendir(astring_c(&as))) || (astring_chr(&as, 0, ':') == -1))
 			{
 				char *dst = NULL;
-	
+
 				osd_get_full_path(&dst,".");
 				/* Default to emu directory */
 				s = tstring_from_utf8(dst);

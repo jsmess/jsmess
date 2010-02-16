@@ -82,7 +82,7 @@ INLINE serial_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	
+
 	return (serial_t *)device->token;
 }
 
@@ -128,9 +128,9 @@ static unsigned char serial_helper_get_parity(unsigned char data)
 
 static void serial_device_in_callback(running_machine *machine, int id, unsigned long status)
 {
-/*	serial_t *ser = get_safe_token(device);
-	
-	ser->connection.input_state = status;*/
+/*  serial_t *ser = get_safe_token(device);
+
+    ser->connection.input_state = status;*/
 }
 
 /***** SERIAL DEVICE ******/
@@ -165,7 +165,7 @@ void serial_device_setup(running_device *device, int baud_rate, int num_data_bit
 unsigned long serial_device_get_state(running_device *device)
 {
 	serial_t *ser = get_safe_token(device);
-	
+
 	return ser->connection.State;
 }
 
@@ -477,7 +477,7 @@ static void serial_protocol_none_sent_char(running_device *device)
 	int bit;
 	unsigned char data_byte;
 	serial_t *ser = get_safe_token(device);
-	
+
 	/* generate byte to transmit */
 	data_byte = 0;
 	for (i=0; i<ser->data_form.word_length; i++)
@@ -591,12 +591,12 @@ static void data_stream_init(struct data_stream *stream, unsigned char *pData, u
 
 DEVICE_START(serial)
 {
-	//serial_t *ser = get_safe_token(device);		
+	//serial_t *ser = get_safe_token(device);
 }
 
 DEVICE_RESET(serial)
 {
-//	serial_t *ser = get_safe_token(device);
+//  serial_t *ser = get_safe_token(device);
 }
 
 DEVICE_IMAGE_LOAD(serial)
@@ -633,17 +633,17 @@ DEVICE_GET_INFO( serial )
 {
 	switch ( state )
 	{
-		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;           			break;
+		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;          			break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(serial_t);								break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_SERIAL;                                	break;
 		case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                        	break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1;                                        	break;
-		case DEVINFO_INT_IMAGE_CREATABLE:	     	info->i = 1;                                        	break;
+		case DEVINFO_INT_IMAGE_CREATABLE:	    	info->i = 1;                                        	break;
 
 		case DEVINFO_FCT_START:		                info->start = DEVICE_START_NAME( serial );          	break;
 		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME( serial );				break;
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( serial ); 	break;
+		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( serial );	break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:		        info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(serial );	break;
 		case DEVINFO_STR_NAME:		                strcpy( info->s, "Serial port");	                    break;
 		case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Serial port");	                        break;
@@ -726,4 +726,4 @@ void	serial_connection_link(running_machine *machine, struct serial_connection *
 	serial_connection_out(machine,connection_a);
 	/* let a know the state of b */
 	serial_connection_out(machine,connection_b);
-} 
+}

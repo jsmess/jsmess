@@ -1523,8 +1523,8 @@ static MACHINE_START( atarist )
 
 	/* find devices */
 	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
- 	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
- 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* register for state saving */
 	atarist_state_save(machine);
@@ -1621,7 +1621,7 @@ static MACHINE_START( atariste )
 
 	/* find devices */
 	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
- 	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
+	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
 	state->lmc1992 = devtag_get_device(machine, LMC1992_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
@@ -1769,8 +1769,8 @@ static MACHINE_START( stbook )
 
 	/* find devices */
 	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
- 	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
- 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
+	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* register for state saving */
 	atariste_state_save(machine);
@@ -1818,7 +1818,7 @@ static DEVICE_GET_INFO( atarist_serial )
 		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( atarist_serial );    break;
 		case DEVINFO_STR_NAME:		                strcpy(info->s, "Atari ST serial port");	                    break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
-		default: 									DEVICE_GET_INFO_CALL(serial);	break;
+		default:									DEVICE_GET_INFO_CALL(serial);	break;
 	}
 }
 

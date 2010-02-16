@@ -2463,7 +2463,7 @@ MSX_SLOT_WRITE(soundcartridge)
 
 		state->cart.sccp.scc_active =
 			(((state->cart.sccp.banks_saved[2] & 0x3f) == 0x3f) &&
-		 	!(val & 0x20));
+			!(val & 0x20));
 
 		state->cart.sccp.sccp_active =
 				((state->cart.sccp.banks_saved[3] & 0x80) && (val & 0x20));

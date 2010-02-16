@@ -298,7 +298,7 @@ static void vtech1_load_proc(running_device *image)
 {
 	vtech1_state *vtech1 = (vtech1_state *)image->machine->driver_data;
 	int id = floppy_get_drive(image);
-	
+
 	if (image_is_writable(image))
 		vtech1->fdc_wrprot[id] = 0x00;
 	else
@@ -731,16 +731,16 @@ static DRIVER_INIT( vtech1 )
 	vtech1->fdc_write = 0;
 	vtech1->fdc_offs = 0;
 	vtech1->fdc_latch = 0;
-	
-	for(id=0;id<2;id++) 
+
+	for(id=0;id<2;id++)
 	{
 		floppy_install_load_proc(floppy_get_device(machine, id), vtech1_load_proc);
-	}	
+	}
 }
 
 static DRIVER_INIT( vtech1h )
 {
-	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);	
+	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	DRIVER_INIT_CALL(vtech1);
 
@@ -750,7 +750,7 @@ static DRIVER_INIT( vtech1h )
 
 	memory_install_readwrite_bank(prg, 0x7000, 0x77ff, 0, 0, "bank4");
 	memory_configure_bank(machine, "bank4", 0, 4, machine->generic.videoram.u8, 0x800);
-	memory_set_bank(machine, "bank4", 0);	
+	memory_set_bank(machine, "bank4", 0);
 }
 
 /***************************************************************************
@@ -1044,7 +1044,7 @@ static MACHINE_DRIVER_START( laser110 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("66K")
 	MDRV_RAM_EXTRA_OPTIONS("2K,18K,4098K")
-	
+
 	MDRV_FLOPPY_2_DRIVES_ADD(vtech1_floppy_config)
 MACHINE_DRIVER_END
 

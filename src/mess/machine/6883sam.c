@@ -319,6 +319,6 @@ DEVICE_GET_INFO( sam6883_gime )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sam6883_gime);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(sam6883);				break;
+		default:										DEVICE_GET_INFO_CALL(sam6883);				break;
 	}
 }

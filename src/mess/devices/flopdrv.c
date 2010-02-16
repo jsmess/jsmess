@@ -635,7 +635,7 @@ DEVICE_START( floppy )
 	devcb_resolve_write_line(&floppy->out_tk00_func, &floppy->config->out_tk00_func, device);
 	devcb_resolve_write_line(&floppy->out_wpt_func, &floppy->config->out_wpt_func, device);
 	devcb_resolve_write_line(&floppy->out_rdy_func, &floppy->config->out_rdy_func, device);
-//	devcb_resolve_write_line(&floppy->out_dskchg_func, &floppy->config->out_dskchg_func, device);
+//  devcb_resolve_write_line(&floppy->out_dskchg_func, &floppy->config->out_dskchg_func, device);
 
 	/* by default we are not write-protected */
 	floppy->wpt = ASSERT_LINE;
@@ -650,7 +650,7 @@ DEVICE_START( floppy )
 
 	/* disk changed */
 	floppy->dskchg = CLEAR_LINE;
-//	devcb_call_write_line(&floppy->out_dskchg_func, floppy->dskchg);
+//  devcb_call_write_line(&floppy->out_dskchg_func, floppy->dskchg);
 }
 
 static int internal_floppy_device_load(running_device *image, int create_format, option_resolution *create_args)

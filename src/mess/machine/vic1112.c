@@ -61,7 +61,7 @@ INLINE vic1112_config *get_safe_config(running_device *device)
 
 /*-------------------------------------------------
     vic1112_ieee488_srq_w - IEEE-488 service
-	request
+    request
 -------------------------------------------------*/
 
 WRITE_LINE_DEVICE_HANDLER( vic1112_ieee488_srq_w )

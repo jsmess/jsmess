@@ -73,7 +73,7 @@ int info_listmedia(core_options *options, const char *gamename)
 			for (dev = config->devicelist.first(); dev != NULL; dev = dev->next)
 			{
 				if (is_image_device(dev))
-				{				
+				{
 					info = image_device_getinfo(config, dev);
 
 					src = info.file_extensions;

@@ -62,7 +62,7 @@ DMAC controller.
 typedef struct
 {
 	UINT16		istr;		/* Interrupt Status Register (R) */
- 	UINT16		cntr;		/* Control Register (RW) */
+	UINT16		cntr;		/* Control Register (RW) */
 	UINT32		wtc;		/* Word Transfer Count Register (RW) */
 	UINT32		acr;		/* Address Count Register (RW) */
 	UINT16		dawr;		/* DACK Width Register (W) */

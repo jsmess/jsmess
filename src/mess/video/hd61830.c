@@ -311,7 +311,7 @@ static void draw_scanline(running_device *device, bitmap_t *bitmap, const rectan
 	hd61830_t *hd61830 = get_safe_token(device);
 	int sx, x;
 	const address_space *space = cputag_get_address_space(device->machine, HD61830_TAG, ADDRESS_SPACE_PROGRAM);
-	
+
 	for (sx = 0; sx < hd61830->hn; sx++)
 	{
 		UINT8 data = memory_read_byte(space, ra++);

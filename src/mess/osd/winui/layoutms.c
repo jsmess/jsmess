@@ -42,8 +42,8 @@ extern const FOLDERDATA g_folderData[] =
 #ifdef SHOW_UNAVAILABLE_FOLDER
 	{"Unavailable",     "unavailable",       FOLDER_UNAVAILABLE,  IDI_FOLDER_UNAVAILABLE,	0,             F_AVAILABLE,  NULL,                       FilterAvailable,              FALSE },
 #endif
-	//{"Console",         "console",           FOLDER_CONSOLE,      IDI_FOLDER,				F_CONSOLE,     F_COMPUTER,   NULL,                       DriverIsComputer,  FALSE },
-	//{"Computer",        "computer",          FOLDER_COMPUTER,     IDI_FOLDER,				F_COMPUTER,    F_CONSOLE,    NULL,                       DriverIsComputer,  TRUE },
+	//{"Console",         "console",           FOLDER_CONSOLE,      IDI_FOLDER,             F_CONSOLE,     F_COMPUTER,   NULL,                       DriverIsComputer,  FALSE },
+	//{"Computer",        "computer",          FOLDER_COMPUTER,     IDI_FOLDER,             F_COMPUTER,    F_CONSOLE,    NULL,                       DriverIsComputer,  TRUE },
 	{"Modified/Hacked", "modified",          FOLDER_MODIFIED,     IDI_FOLDER,				0,             0,            NULL,                       DriverIsModified,  TRUE },
 	{"Manufacturer",    "manufacturer",      FOLDER_MANUFACTURER, IDI_FOLDER_MANUFACTURER,  0,             0,            CreateManufacturerFolders },
 	{"Year",            "year",              FOLDER_YEAR,         IDI_FOLDER_YEAR,          0,             0,            CreateYearFolders },
@@ -51,7 +51,7 @@ extern const FOLDERDATA g_folderData[] =
 	{"CPU",             "cpu",               FOLDER_CPU,          IDI_FOLDER,               0,             0,            CreateCPUFolders },
 	{"Sound",           "sound",             FOLDER_SND,          IDI_FOLDER,               0,             0,            CreateSoundFolders },
 	{"Imperfect",       "imperfect",         FOLDER_DEFICIENCY,   IDI_FOLDER,               0,             0,            CreateDeficiencyFolders },
-  	{"Dumping Status",  "dumping",           FOLDER_DUMPING,      IDI_FOLDER,               0,             0,            CreateDumpingFolders },
+	{"Dumping Status",  "dumping",           FOLDER_DUMPING,      IDI_FOLDER,               0,             0,            CreateDumpingFolders },
 	{"Working",         "working",           FOLDER_WORKING,      IDI_WORKING,              F_WORKING,     F_NONWORKING, NULL,                       DriverIsBroken,    FALSE },
 	{"Not Working",     "nonworking",        FOLDER_NONWORKING,   IDI_NONWORKING,           F_NONWORKING,  F_WORKING,    NULL,                       DriverIsBroken,    TRUE },
 	{"Originals",       "originals",         FOLDER_ORIGINAL,     IDI_FOLDER,               F_ORIGINALS,   F_CLONES,     NULL,                       DriverIsClone,     FALSE },

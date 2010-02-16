@@ -185,7 +185,7 @@ static void update_ti86_memory (running_machine *machine)
 		memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu") + 0x010000 + 0x004000*(ti8x_memory_page_2&0x0f));
 		memory_unmap_write(space, 0x8000, 0xbfff, 0, 0);
 	}
-	
+
 }
 
 /***************************************************************************

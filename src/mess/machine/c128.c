@@ -223,7 +223,7 @@ static void c128_iec_data_out_w(running_machine *machine)
 
 	/* fast serial data */
 	if (MMU_FSDIR) data &= c128_sp1;
-	
+
 	cbm_iec_data_w(iec, cia_1, data);
 }
 
@@ -232,7 +232,7 @@ static void c128_iec_srq_out_w(running_machine *machine)
 	running_device *cia_1 = devtag_get_device(machine, "cia_1");
 	running_device *iec = devtag_get_device(machine, "iec");
 	int srq = 1;
-	
+
 	/* fast serial clock */
 	if (MMU_FSDIR) srq &= c128_cnt1;
 

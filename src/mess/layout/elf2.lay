@@ -14,7 +14,7 @@
       <color red="0.09375" green="0.0" blue="0.0" />
     </disk>
   </element>
-  
+
   <view name="Standard">
 		<!-- Led address display -->
 		<bezel name="digit0" element="digit">

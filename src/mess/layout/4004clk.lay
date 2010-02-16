@@ -22,11 +22,11 @@
 			<bounds left="0" top="0" right="1" bottom="1" />
 			<color red="0.0" green="0.0" blue="0.0" />
 		</rect>
-	</element>	
+	</element>
 	<view name="Clock">
 		<bezel element="background">
 			<bounds left="0" top="0" right="580" bottom="150" />
-		</bezel>	
+		</bezel>
 		<bezel name="nixie0" element="nixie">
 			<bounds left="0" top="0" right="90" bottom="150" />
 		</bezel>
@@ -40,7 +40,7 @@
 		<bezel name="neon1" element="neon">
 			<bounds left="182" top="40" right="198" bottom="54" />
 		</bezel>
-		
+
 		<bezel name="nixie2" element="nixie">
 			<bounds left="200" top="0" right="290" bottom="150" />
 		</bezel>
@@ -54,7 +54,7 @@
 		<bezel name="neon3" element="neon">
 			<bounds left="382" top="80" right="398" bottom="94" />
 		</bezel>
-		
+
 		<bezel name="nixie4" element="nixie">
 			<bounds left="400" top="0" right="490" bottom="150" />
 		</bezel>

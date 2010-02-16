@@ -384,7 +384,7 @@ static void i8275_draw_char_line(running_device *device)
 
 			i8275->intf->display_pixels(device,
 				xpos * i8275->intf->width, // x position on screen of starting point
-			 	i8275->ypos, // y position on screen
+				i8275->ypos, // y position on screen
 				lc, // current line of char
 				(chr & 0x7f),  // char code to be displayed
 				i8275->lineattr,  // line attribute code

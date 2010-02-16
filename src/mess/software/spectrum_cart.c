@@ -15,8 +15,8 @@
 #define PCB_ZXCALL      (PCB_ZXC1 | PCB_ZXC2 | PCB_ZXC3)  // by multiple designs
 #define PCB_DROY        0x08                              // Droy's 32 Kbytes cartridge
 #define PCB_ZXFLASH     0x10                              // Droy's ZX-Flash 512 Kbytes cartridge
-#define PCB_HUEHN       0x20                              // Scott-Falk Hühn's 512 Kbytes cartridge
-#define PCB_SCARTIF2    0x40                              // José Leandro Novellón Martínez' Super Cartucho IF2 512 Kbytes cartridge
+#define PCB_HUEHN       0x20                              // Scott-Falk H??hn's 512 Kbytes cartridge
+#define PCB_SCARTIF2    0x40                              // Jos?? Leandro Novell??n Mart??nez' Super Cartucho IF2 512 Kbytes cartridge
 
 #define ZX48_ONLY       0x80000000                        // Cartridge cannot run on an unexpanded ZX Spectrum
 
@@ -48,7 +48,7 @@ SOFTWARE_START( set ) \
     ROM_LOAD(name, offset, length, hash) \
 SOFTWARE_END
 
-/* ZX-FLASH, Hühn's and Super Cartucho IF2 cartridges support up to 512 Kbytes of data */
+/* ZX-FLASH, H??hn's and Super Cartucho IF2 cartridges support up to 512 Kbytes of data */
 #define ZXSPECTRUM_ROM512K_LOAD( set, name, offset, length, hash )  \
 SOFTWARE_START( set ) \
     ROM_REGION( 0x80000, CARTRIDGE_REGION_ROM, ROMREGION_ERASEFF ) \
@@ -167,13 +167,13 @@ SOFTWARE_LIST_START( spectrum_cart )
     SOFTWARE( zxfldroy, 0, 2005, "<Homebrew>", "Droy's 512Kb Multicartridge Demo",                    PCB_ZXFLASH, 0 )
 
 /*
-   The following conversion demonstrates the bank switching capabilities of Scott-Falk Hühn's PCB.
+   The following conversion demonstrates the bank switching capabilities of Scott-Falk H??hn's PCB.
    The 512 Kbytes PCB description and usage are described at http://s-huehn.de/spectrum/hardware2.htm#if2rom
 */
-    SOFTWARE( if2huehn, 0, 2007, "<Homebrew>", "Hühn's 512Kb Multicartridge Demo", PCB_HUEHN, 0 ) // This demo cartridge uses just 16 of the 32 available banks
+    SOFTWARE( if2huehn, 0, 2007, "<Homebrew>", "H??hn's 512Kb Multicartridge Demo", PCB_HUEHN, 0 ) // This demo cartridge uses just 16 of the 32 available banks
 
 /*
-   The following conversion demonstrates the bank switching capabilities of José Leandro Novellón Martínez' PCB.
+   The following conversion demonstrates the bank switching capabilities of Jos?? Leandro Novell??n Mart??nez' PCB.
    The 512 Kbytes PCB description and usage are described at http://www.speccy.org/trastero/cosas/JL/if2/IF2-1.html
 */
     SOFTWARE( scartif2, 0, 2004, "<Homebrew>", "Super Cartucho IF2 512Kb Multicartridge Demo", PCB_SCARTIF2, 0 ) // This demo cartridge uses just 16 of the 32 available banks

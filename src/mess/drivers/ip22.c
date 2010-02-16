@@ -132,9 +132,9 @@ static NVRAM_HANDLER( ip22 )
 #define INT3_LOCAL1_PANEL	(0x02)
 #define INT3_LOCAL1_GP2		(0x04)
 #define INT3_LOCAL1_MAPPABLE1   (0x08)
-#define INT3_LOCAL1_HPC_DMA    	(0x10)
+#define INT3_LOCAL1_HPC_DMA 	(0x10)
 #define INT3_LOCAL1_AC_FAIL     (0x20)
-#define INT3_LOCAL1_VSYNC 	(0x40)
+#define INT3_LOCAL1_VSYNC	(0x40)
 #define INT3_LOCAL1_RETRACE	(0x80)
 
 static UINT32 int3_regs[64];
@@ -1157,7 +1157,7 @@ static ADDRESS_MAP_START( ip225015_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE( 0x1f0f0000, 0x1f0f1fff ) AM_READWRITE( newport_rex3_r, newport_rex3_w )
 	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_READWRITE( sgi_mc_r, sgi_mc_w )
 	AM_RANGE( 0x1fb90000, 0x1fb9ffff ) AM_READWRITE( hpc3_hd_enet_r, hpc3_hd_enet_w )
-	AM_RANGE( 0x1fbb0000, 0x1fbb0003 ) AM_RAM 	/* unknown, but read a lot and discarded */
+	AM_RANGE( 0x1fbb0000, 0x1fbb0003 ) AM_RAM	/* unknown, but read a lot and discarded */
 	AM_RANGE( 0x1fbc0000, 0x1fbc7fff ) AM_READWRITE( hpc3_hd0_r, hpc3_hd0_w )
 	AM_RANGE( 0x1fbc8000, 0x1fbcffff ) AM_READWRITE( hpc3_unkpbus0_r, hpc3_unkpbus0_w ) AM_BASE(&unkpbus0)
 	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE( hpc3_pbusdma_r, hpc3_pbusdma_w )

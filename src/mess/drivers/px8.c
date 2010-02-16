@@ -106,7 +106,7 @@ static MACHINE_DRIVER_START( px8 )
 	MDRV_CPU_PROGRAM_MAP(px8_slave_mem)
 
     /* sub CPU (uPD7508) */
-//	MDRV_CPU_ADD("sub", UPD7508, 200000) /* 200 kHz */
+//  MDRV_CPU_ADD("sub", UPD7508, 200000) /* 200 kHz */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", LCD)

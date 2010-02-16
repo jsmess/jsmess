@@ -32,7 +32,7 @@ DRIVER_INIT(radio86)
 	/* set initialy ROM to be visible on first bank */
 	UINT8 *RAM = memory_region(machine, "maincpu");
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
-  	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
+	memory_configure_bank(machine, "bank1", 1, 2, RAM, 0x0000);
 	memory_configure_bank(machine, "bank1", 0, 2, RAM, 0xf800);
 	radio86_init_keyboard();
 }
@@ -63,7 +63,7 @@ static READ8_DEVICE_HANDLER (radio86_8255_portc_r2 )
 	UINT8 dat = input_port_read(device->machine, "LINE8");
 	if (level <  0) {
 		dat ^= radio86_tape_value;
- 	}
+	}
 	return dat;
 }
 
@@ -115,7 +115,7 @@ static READ8_DEVICE_HANDLER (rk7007_8255_portc_r )
 	key &= 0xe0;
 	if (level <  0) {
 		key ^= radio86_tape_value;
- 	}
+	}
 	return key;
 }
 

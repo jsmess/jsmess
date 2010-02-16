@@ -24,7 +24,7 @@ typedef struct
 	UINT32 play_err_flag;
 	UINT32 read_type;	// for command 0x30 only
 	UINT32 data_select;	// for command 0x30 only
- 	cdrom_file *cdrom;
+	cdrom_file *cdrom;
 } SCSIGd;
 
 static const UINT8 GDROM_Cmd11_Reply[32] =

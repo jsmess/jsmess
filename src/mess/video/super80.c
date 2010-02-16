@@ -253,7 +253,7 @@ VIDEO_UPDATE( super80m )
 
 				if (!(options & 0x40))
 				{
-		 			col = RAM[0xfe00 | ma | x];	/* byte of colour to display */
+					col = RAM[0xfe00 | ma | x];	/* byte of colour to display */
 					fg = col & 0x0f;
 					bg = (col & 0xf0) >> 4;
 				}
@@ -429,7 +429,7 @@ MC6845_UPDATE_ROW( super80v_update_row )
 
 		if (~options & 0x40)
 		{
- 			col = super80_colorram[mem];					/* byte of colour to display */
+			col = super80_colorram[mem];					/* byte of colour to display */
 			fg = col & 0x0f;
 			bg = (col & 0xf0) >> 4;
 		}

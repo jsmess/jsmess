@@ -1,8 +1,8 @@
 /*
-	
-	Tandy Radio Shack TRS-80 Model II/12/16/16B/6000
 
-	http://home.iae.nl/users/pb0aia/cm/modelii.html
+    Tandy Radio Shack TRS-80 Model II/12/16/16B/6000
+
+    http://home.iae.nl/users/pb0aia/cm/modelii.html
 
 */
 
@@ -10,12 +10,12 @@
 
     TODO:
 
-	- BOOT ERROR PI 24 (Defective PIO Chip)
+    - BOOT ERROR PI 24 (Defective PIO Chip)
     - Z80 daisy chain
-	- keyboard CPU ROM
-	- keyboard layout
-	- main RAM banking
-	- graphics board
+    - keyboard CPU ROM
+    - keyboard layout
+    - main RAM banking
+    - graphics board
 
 */
 
@@ -65,16 +65,16 @@ static WRITE8_DEVICE_HANDLER( drvslt_w )
 {
 	/*
 
-        bit     signal		
+        bit     signal
 
-        0		DS1
-        1		DS2
-        2		DS3
-        3		DS4
-        4		
-        5		
-        6		SDSEL
-        7		FM/MFM
+        0       DS1
+        1       DS2
+        2       DS3
+        3       DS4
+        4
+        5
+        6       SDSEL
+        7       FM/MFM
 
     */
 
@@ -98,13 +98,13 @@ static WRITE8_HANDLER( rom_enable_w )
         bit     description
 
         0       BOOT ROM
-        1       
-        2       
-        3       
-        4       
+        1
+        2
+        3
+        4
         5
         6
-        7       
+        7
 
     */
 
@@ -149,16 +149,16 @@ static READ8_HANDLER( nmi_r )
 {
 	/*
 
-        bit     signal				description
+        bit     signal              description
 
-        0       
-        1       
-        2       
-        3       
-        4		80/40 CHAR EN		80/40 character mode
-        5		ENABLE RTC INT		RTC interrupt enable
-        6		DE					display enabled
-        7       KBIRQ				keyboard interrupt
+        0
+        1
+        2
+        3
+        4       80/40 CHAR EN       80/40 character mode
+        5       ENABLE RTC INT      RTC interrupt enable
+        6       DE                  display enabled
+        7       KBIRQ               keyboard interrupt
 
     */
 
@@ -185,16 +185,16 @@ static WRITE8_HANDLER( nmi_w )
 {
 	/*
 
-        bit     signal				description
+        bit     signal              description
 
-        0							memory bank select bit 0
-        1							memory bank select bit 1
-        2							memory bank select bit 2
-        3							memory bank select bit 3
-        4		80/40 CHAR EN		80/40 character mode
-        5		ENABLE RTC INT		RTC interrupt enable
-        6		BLNKVID				video display enable
-        7							video RAM enable
+        0                           memory bank select bit 0
+        1                           memory bank select bit 1
+        2                           memory bank select bit 2
+        3                           memory bank select bit 3
+        4       80/40 CHAR EN       80/40 character mode
+        5       ENABLE RTC INT      RTC interrupt enable
+        6       BLNKVID             video display enable
+        7                           video RAM enable
 
     */
 
@@ -259,16 +259,16 @@ static WRITE8_HANDLER( keyboard_ctrl_w )
         0       DATA
         1       CLOCK
         2       LED
-        3       
+        3
         4       LED
         5
         6
-        7       
+        7
 
     */
 
 	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
-	
+
 	int kbdata = BIT(data, 0);
 	int kbclk = BIT(data, 1);
 
@@ -306,10 +306,10 @@ static WRITE8_HANDLER( keyboard_latch_w )
         1       C
         2       B
         3       A
-        4       
+        4
         5
         6
-        7       
+        7
 
     */
 
@@ -528,7 +528,7 @@ static WRITE_LINE_DEVICE_HANDLER( vsync_w )
 	}
 }
 
-static const mc6845_interface mc6845_intf = 
+static const mc6845_interface mc6845_intf =
 {
 	SCREEN_TAG,
 	8,
@@ -588,21 +588,21 @@ static READ8_DEVICE_HANDLER( pio_pa_r )
 {
 	/*
 
-        bit     signal		description
+        bit     signal      description
 
-        0					FDC INT request
-        1					2-sided diskette
-        2					disk change
-        3					prime
-        4					printer fault
-        5					printer select
-        6					paper empty
-        7					printer busy
+        0                   FDC INT request
+        1                   2-sided diskette
+        2                   disk change
+        3                   prime
+        4                   printer fault
+        5                   printer select
+        6                   paper empty
+        7                   printer busy
 
     */
 
 	trs80m2_state *state = (trs80m2_state *)device->machine->driver_data;
-	
+
 	UINT8 data = 0;
 
 	/* floppy interrupt */
@@ -630,16 +630,16 @@ static WRITE8_DEVICE_HANDLER( pio_pa_w )
 {
 	/*
 
-        bit     signal		description
+        bit     signal      description
 
-        0		INTRQ		FDC INT request
-        1		_TWOSID		2-sided diskette
-        2		_DSKCHG		disk change
-        3					prime
-        4					printer fault
-        5					printer select
-        6					paper empty
-        7					printer busy
+        0       INTRQ       FDC INT request
+        1       _TWOSID     2-sided diskette
+        2       _DSKCHG     disk change
+        3                   prime
+        4                   printer fault
+        5                   printer select
+        6                   paper empty
+        7                   printer busy
 
     */
 
@@ -690,10 +690,10 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 	z80ctc_trg0_w(state->z80ctc, 1);
 	z80ctc_trg0_w(state->z80ctc, 0);
-	
+
 	z80ctc_trg1_w(state->z80ctc, 1);
 	z80ctc_trg1_w(state->z80ctc, 0);
-	
+
 	z80ctc_trg2_w(state->z80ctc, 1);
 	z80ctc_trg2_w(state->z80ctc, 0);
 }
@@ -702,9 +702,9 @@ static Z80CTC_INTERFACE( ctc_intf )
 {
 	0,              								/* timer disables */
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
-	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_rxca_w),	/* ZC/TO0 callback */
-	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_txca_w),	/* ZC/TO1 callback */
-	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_rxtxcb_w)	/* ZC/TO2 callback */
+	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_rxca_w),    /* ZC/TO0 callback */
+	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_txca_w),    /* ZC/TO1 callback */
+	DEVCB_NULL, // DEVCB_DEVICE_LINE(Z80SIO_TAG, z80sio_rxtxcb_w)   /* ZC/TO2 callback */
 };
 
 /* FD1791 Interface */
@@ -782,8 +782,8 @@ static MACHINE_DRIVER_START( trs80m2 )
     MDRV_CPU_PROGRAM_MAP(z80_mem)
     MDRV_CPU_IO_MAP(z80_io)
 
-//	MDRV_CPU_ADD(I8021_TAG, I8021, 100000)
-//	MDRV_CPU_IO_MAP(trs80m2_keyboard_io)
+//  MDRV_CPU_ADD(I8021_TAG, I8021, 100000)
+//  MDRV_CPU_IO_MAP(trs80m2_keyboard_io)
 
     MDRV_MACHINE_START(trs80m2)
     MDRV_MACHINE_RESET(trs80m2)
@@ -850,34 +850,34 @@ ROM_END
 
 /*
 
-	TRS-80 Model II/16 Z80 CPU Board ROM
+    TRS-80 Model II/16 Z80 CPU Board ROM
 
-	It would seem that every processor board I find has a different ROM on it!  It seems that the early ROMs 
-	don't boot directly from a hard drive.  But there seems to be many versions of ROMs.  I've placed them in 
-	order of serial number in the list below.  There also appears to be at least two board revisions, "C" and "D".
+    It would seem that every processor board I find has a different ROM on it!  It seems that the early ROMs
+    don't boot directly from a hard drive.  But there seems to be many versions of ROMs.  I've placed them in
+    order of serial number in the list below.  There also appears to be at least two board revisions, "C" and "D".
 
-	cpu_c8ff.bin/hex:
-	Mask Programmable PROM, Equivilant to Intel 2716 EPROM, with checksum C8FF came from a cpu board with 
-	serial number 120353 out of a Model II with serial number 2002102 and catalog number 26-6002.  The board 
-	was labeled, "Revision C".  This appears to be an early ROM and according to a very helpful fellow 
-	collector, Aaron in Australia, doesn't allow boot directly from a hard disk.
+    cpu_c8ff.bin/hex:
+    Mask Programmable PROM, Equivilant to Intel 2716 EPROM, with checksum C8FF came from a cpu board with
+    serial number 120353 out of a Model II with serial number 2002102 and catalog number 26-6002.  The board
+    was labeled, "Revision C".  This appears to be an early ROM and according to a very helpful fellow
+    collector, Aaron in Australia, doesn't allow boot directly from a hard disk.
 
-	cpu_9733.bin/hex:
-	An actual SGS-Ates (Now STMicroelectronics) 2716 EPROM, with checksum 9733 came from a cpu board with 
-	serial number 161993 out of a pile of random cards that I have.  I don't know what machine it originated 
-	from.  The board was labeled, "Revision C".  This appears to be a later ROM in that it is able to boot 
-	directly from an 8MB hard disk.  The EPROM had a windows sticker on it labeled, "U54".
+    cpu_9733.bin/hex:
+    An actual SGS-Ates (Now STMicroelectronics) 2716 EPROM, with checksum 9733 came from a cpu board with
+    serial number 161993 out of a pile of random cards that I have.  I don't know what machine it originated
+    from.  The board was labeled, "Revision C".  This appears to be a later ROM in that it is able to boot
+    directly from an 8MB hard disk.  The EPROM had a windows sticker on it labeled, "U54".
 
-	cpu_2119.bin/hex:
-	An actual Texas Instruments 2716 EPROM, with checksum 2119 came from a cpu board with serial number 
-	178892 out of a Model 16 with serial number 64014509 and catalog number 26-4002.  The board was labeled,
-	"Revision D".  This appears to be a later ROM and does appear to allow boot directly from an 8MB hard disk.
+    cpu_2119.bin/hex:
+    An actual Texas Instruments 2716 EPROM, with checksum 2119 came from a cpu board with serial number
+    178892 out of a Model 16 with serial number 64014509 and catalog number 26-4002.  The board was labeled,
+    "Revision D".  This appears to be a later ROM and does appear to allow boot directly from an 8MB hard disk.
 
-	cpu_2bff.bin/hex:
-	Mask Programmable PROM, Equivilant to Intel 2716 EPROM, with checksum 2BFF came from a cpu board with 
-	serial number 187173 our of a pile of random cards that I have.  I don't know what machine it originated 
-	from.  The board was labeled, "Revision D".  This appears to be a later ROM in that it is able to boot 
-	directly from an 8MB hard disk.
+    cpu_2bff.bin/hex:
+    Mask Programmable PROM, Equivilant to Intel 2716 EPROM, with checksum 2BFF came from a cpu board with
+    serial number 187173 our of a pile of random cards that I have.  I don't know what machine it originated
+    from.  The board was labeled, "Revision D".  This appears to be a later ROM in that it is able to boot
+    directly from an 8MB hard disk.
 
 */
 
@@ -904,9 +904,9 @@ ROM_END
 
 /* System Drivers */
 
-/*	  YEAR	NAME		PARENT		COMPAT	MACHINE		INPUT		INIT	COMPANY                 FULLNAME			FLAGS */
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME            FLAGS */
 COMP( 1979, trs80m2,	0,			0,		trs80m2,	trs80m2,	0,		"Tandy Radio Shack",	"TRS-80 Model II",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
 COMP( 1982, trs80m16,	trs80m2,	0,		trs80m16,	trs80m2,	0,		"Tandy Radio Shack",	"TRS-80 Model 16",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
-//COMP( 1983, trs80m12,	trs80m2,	0,		trs80m16,	trs80m2,	0,		"Tandy Radio Shack",	"TRS-80 Model 12",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
-//COMP( 1984, trs80m16b,trs80m2,	0,		trs80m16,	trs80m2,	0,		"Tandy Radio Shack",	"TRS-80 Model 16B",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
-//COMP( 1985, tandy6k,	trs80m2,	0,		tandy6k,	trs80m2,	0,		"Tandy Radio Shack",	"Tandy 6000 HD",	GAME_NO_SOUND_HW | GAME_NOT_WORKING )
+//COMP( 1983, trs80m12, trs80m2,    0,      trs80m16,   trs80m2,    0,      "Tandy Radio Shack",    "TRS-80 Model 12",  GAME_NO_SOUND_HW | GAME_NOT_WORKING )
+//COMP( 1984, trs80m16b,trs80m2,    0,      trs80m16,   trs80m2,    0,      "Tandy Radio Shack",    "TRS-80 Model 16B", GAME_NO_SOUND_HW | GAME_NOT_WORKING )
+//COMP( 1985, tandy6k,  trs80m2,    0,      tandy6k,    trs80m2,    0,      "Tandy Radio Shack",    "Tandy 6000 HD",    GAME_NO_SOUND_HW | GAME_NOT_WORKING )

@@ -449,7 +449,7 @@ DEVICE_GET_INFO( at45db081 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(at45db081);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(at45db041);				break;
+		default:										DEVICE_GET_INFO_CALL(at45db041);				break;
 	}
 }
 
@@ -463,6 +463,6 @@ DEVICE_GET_INFO( at45db161 )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(at45db161);	break;
 
-		default: 										DEVICE_GET_INFO_CALL(at45db041);				break;
+		default:										DEVICE_GET_INFO_CALL(at45db041);				break;
 	}
 }

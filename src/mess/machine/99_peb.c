@@ -110,7 +110,7 @@ static int has_16bit_peb;
 static ti99_peb_card_handlers_t expansion_ports[16+16];
 
 enum width_t {
-	width_8bit = 0, 
+	width_8bit = 0,
 	width_16bit
 };
 /* expansion card structure for the snug sgcpu 99/4p system, which supports

@@ -421,7 +421,7 @@ static void Nick_WritePixels(unsigned char DataByte, unsigned char CharIndex)
 				nick_write_pixel(&Nick, PalIndex);
 
 				Data = Data<<1;
- 			}
+			}
 		}
 		break;
 
@@ -577,7 +577,7 @@ static void Nick_WritePixelsLPIXEL(unsigned char DataByte, unsigned char CharInd
 				nick_write_pixel(&Nick, PalIndex);
 
 				Data = Data<<1;
- 			}
+			}
 		}
 		break;
 
@@ -782,7 +782,7 @@ static void Nick_DoDisplay(running_machine *machine,LPT_ENTRY *pLPT)
 		{
 			/* doing first line */
 			/* reload LD1, and LD2 (if necessary) regardless of display mode */
-			Nick.LD1 = 	(pLPT->LD1L & 0x0ff) |
+			Nick.LD1 =	(pLPT->LD1L & 0x0ff) |
 					((pLPT->LD1H & 0x0ff)<<8);
 
 			if ((DisplayMode != NICK_LPIXEL_MODE) && (DisplayMode != NICK_PIXEL_MODE))

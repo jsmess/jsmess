@@ -186,9 +186,9 @@ Notes:
 
     TODO:
 
-	- disable ic13/14 when cartridge plugged in
+    - disable ic13/14 when cartridge plugged in
     - mpt02 clones' colors
-	- visicom colors
+    - visicom colors
     - NE555 discrete sound
 
 */

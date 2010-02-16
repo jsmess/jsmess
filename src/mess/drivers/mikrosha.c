@@ -28,7 +28,7 @@ static ADDRESS_MAP_START(mikrosha_mem, ADDRESS_SPACE_PROGRAM, 8)
     AM_RANGE( 0xd000, 0xd001 ) AM_DEVREADWRITE("i8275", i8275_r, i8275_w) AM_MIRROR(0x07fe) // video
     AM_RANGE( 0xd800, 0xd803 ) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w) AM_MIRROR(0x07fc) // Timer
     AM_RANGE( 0xe000, 0xf7ff ) AM_READ(radio_cpu_state_r) // Not connected
-  	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
+	AM_RANGE( 0xf800, 0xffff ) AM_DEVWRITE("dma8257", i8257_w)	 // DMA
     AM_RANGE( 0xf800, 0xffff ) AM_ROM  // System ROM
 ADDRESS_MAP_END
 
@@ -231,4 +231,4 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME      PARENT  COMPAT    MACHINE     INPUT       INIT        COMPANY     FULLNAME        FLAGS */
-COMP( 1987, mikrosha, radio86,0, 		mikrosha, 	mikrosha,	radio86,	"Lianozovo Electromechanical Factory", 		"Mikrosha",		0)
+COMP( 1987, mikrosha, radio86,0,		mikrosha,	mikrosha,	radio86,	"Lianozovo Electromechanical Factory",		"Mikrosha",		0)

@@ -17,8 +17,8 @@ VIDEO_START( irisha )
 
 VIDEO_UPDATE( irisha )
 {
- 	UINT8 code1, code2;
- 	UINT8 col;
+	UINT8 code1, code2;
+	UINT8 col;
 	int y, x, b;
 	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 

@@ -18,7 +18,7 @@ VIDEO_START( z1013 )
 
 VIDEO_UPDATE( z1013 )
 {
- 	UINT8 code, line;
+	UINT8 code, line;
 	int y, x, b,i;
 	UINT8 *gfx = memory_region(screen->machine, "gfx1");
 

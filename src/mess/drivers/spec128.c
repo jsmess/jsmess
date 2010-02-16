@@ -84,7 +84,7 @@ xx/xx/2001  KS -    TS-2068 sound fixed.
                 like monitors, tape copiers, decrunchers, etc.
                 works now.
                 Fixed problem with interrupt vector set to 0xffff (much
-		more 128k games works now).
+        more 128k games works now).
                 A useful used trick on the Spectrum is to set
                 interrupt vector to 0xffff (using the table
                 which contain 0xff's) and put a byte 0x18 hex,

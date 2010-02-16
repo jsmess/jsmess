@@ -45,7 +45,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ut88_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x04, 0x07) AM_DEVREADWRITE ( "ppi8255", ut88_keyboard_r, ut88_keyboard_w )
-	AM_RANGE( 0xA1, 0xA1) AM_READWRITE ( ut88_tape_r, 	  ut88_sound_w	  )
+	AM_RANGE( 0xA1, 0xA1) AM_READWRITE ( ut88_tape_r,	  ut88_sound_w	  )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -212,8 +212,8 @@ static MACHINE_DRIVER_START( ut88mini )
     MDRV_CPU_ADD("maincpu", 8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(ut88mini_mem)
     MDRV_CPU_IO_MAP(ut88mini_io)
-   	MDRV_MACHINE_START(ut88mini)
-   	MDRV_MACHINE_RESET( ut88mini )
+	MDRV_MACHINE_START(ut88mini)
+	MDRV_MACHINE_RESET( ut88mini )
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_ut88mini)
@@ -239,5 +239,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME       PARENT   COMPAT  MACHINE     INPUT       INIT        COMPANY   FULLNAME       FLAGS */
-COMP( 1989, ut88mini,  0,      	0, 		ut88mini, 	ut88mini, 	ut88mini, 	"", 		 "UT-88 mini",	 GAME_NO_SOUND)
-COMP( 1989, ut88,      ut88mini,0, 		ut88, 		ut88,		ut88, 		"", 		 "UT-88",		 0)
+COMP( 1989, ut88mini,  0,   	0,		ut88mini,	ut88mini,	ut88mini,	"", 		 "UT-88 mini",	 GAME_NO_SOUND)
+COMP( 1989, ut88,      ut88mini,0,		ut88,		ut88,		ut88,		"", 		 "UT-88",		 0)

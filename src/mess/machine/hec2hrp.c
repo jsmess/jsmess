@@ -23,11 +23,11 @@
                => add BR/HR switching
                => add bank switch for HRX
                => add device MX80c and bank switching for the ROM
-	   03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
-			   => add the port mapping for keyboard
+       03/01/2010 Update and clean prog  by yo_fr       (jj.stac@aliceadsl.fr)
+               => add the port mapping for keyboard
 
       don't forget to keep some information about these machines, see DChector project : http://dchector.free.fr/ made by DanielCoulom
-      (and thank's to Daniel!) 
+      (and thank's to Daniel!)
 
     TODO : Add the cartridge function,
            Adjust the one shot and A/D timing (sn76477)
@@ -83,7 +83,7 @@ WRITE8_HANDLER( hector_switch_bank_w )
                         	memory_set_bank(space->machine, "bank1", HECTOR_BANK_VIDEO);
 							if (flag_clk ==1)
 							{
-           	    				flag_clk=0;
+        	    				flag_clk=0;
 								cputag_set_clock(space->machine, "maincpu", XTAL_5MHz);  /* Augmentation CPU*/
 							}
 						}
@@ -135,7 +135,7 @@ READ8_HANDLER( hector_keyboard_r )
 
 		if (data & 0x01) /* Reset machine ! (on ESC key)*/
 		{
-  		  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
+		  cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, PULSE_LINE);
           if (!strncmp(machine->gamedrv->name , "hec2xxxx" , 4) |
               !strncmp(machine->gamedrv->name , "victor" , 6)     ) /* aviable for all HR machines*/
           {
@@ -148,7 +148,7 @@ READ8_HANDLER( hector_keyboard_r )
           /*Common flag*/
           hector_flag_80c = 0;
           flag_clk = 0;
-          
+
 		}
 
 		actions = 0;
@@ -205,9 +205,9 @@ if ((state3000 & 0x38) != 0x38 )   /* Selon Sb choix cassette ou timer (74153)*/
    Data_K7 =  0x00;  /* No cassette => clear bit*/
        switch (state3000 & 0x38 )
        {
-          case 0x08: value = (actions & 1) ? 0x80 : 0; break;  
+          case 0x08: value = (actions & 1) ? 0x80 : 0; break;
           case 0x10: value = pot0; break;
-	      case 0x20: value = (actions & 2) ? 0x80 : 0; break; 
+	      case 0x20: value = (actions & 2) ? 0x80 : 0; break;
           case 0x28: value = pot1; break;
           default: value = 0; break;
        }
@@ -257,7 +257,7 @@ static int counter_write=0; /* Attente de quelque cycles avant demettre en route
 
        if (data & 0x40)
 	   {
- 		 /* Bit 6 => motor ON/OFF => for cassette state!*/
+		 /* Bit 6 => motor ON/OFF => for cassette state!*/
          if (write_cassette==0)
 			{
 			 cassette_set_state(cassette_device_image(space->machine) , (cassette_state)(CASSETTE_PLAY | CASSETTE_SPEAKER_ENABLED));
@@ -271,7 +271,7 @@ static int counter_write=0; /* Attente de quelque cycles avant demettre en route
        }
 	   if (((data & 0x80) != (oldstate1000 & 0x80)) && ((oldstate1000 & 7)==(data & 7)) ) /* Bit7 had change but not the color statement*/
        {
- 		/* Bit 7 => Write bit for cassette!*/
+		/* Bit 7 => Write bit for cassette!*/
 		counter_write +=1;
 
 		if (counter_write > 5)
@@ -297,7 +297,7 @@ static int counter_write=0; /* Attente de quelque cycles avant demettre en route
 WRITE8_HANDLER( hector_color_b_w )
 {
 	running_device *discrete = devtag_get_device(space->machine, "discrete");
-       	hector_color[1] =  data        & 0x07;
+    	hector_color[1] =  data        & 0x07;
 	hector_color[3] = (data >> 3)  & 0x07;
 
 	/* Half light on color 2 only on HR machines:*/
@@ -329,7 +329,7 @@ READ8_HANDLER( hector_mx_io_port_r)
 WRITE8_HANDLER( hector_mx40_io_port_w)
 {
    if ((offset &0x0ff) == 0xf0) /* Port A => to printer*/
-   		printer_output(devtag_get_device(space->machine, "printer"), data);
+		printer_output(devtag_get_device(space->machine, "printer"), data);
    if ((offset &0x0ff) == 0x40) /* Port page 0*/
       memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE0);
    if ((offset &0x0ff) == 0x41) /* Port page 1*/
@@ -346,7 +346,7 @@ WRITE8_HANDLER( hector_mx40_io_port_w)
 WRITE8_HANDLER( hector_mx80_io_port_w)
 {
    if ((offset &0x0ff) == 0xf0) /* Port A => to printer*/
-   		printer_output(devtag_get_device(space->machine, "printer"), data);
+		printer_output(devtag_get_device(space->machine, "printer"), data);
    if ((offset &0x0ff) == 0x40) /* Port page 0*/
       memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE0);
    if ((offset &0x0ff) == 0x41) /* Port page 1*/
@@ -480,7 +480,7 @@ static void Init_Value_SN76477_Hector(void)
              // 0 16 SOUND 1,3KHz => 1,2KHz
              // 0 32 SOUND 580Hz  => 570Hz
              // 0 48 SOUND 132Hz  => 120Hz*/
-     Pin_Value[17][0] = CAP_N(47.0) ;  /*47,0 mesure ok */  
+     Pin_Value[17][0] = CAP_N(47.0) ;  /*47,0 mesure ok */
      Pin_Value[17][1] = CAP_N(580.0) ; /*580  mesure ok */
      /* R VCO   Version 3*/
      Pin_Value[18][1] = RES_K(1400.0   );/*1300 mesure ok    // au lieu de 1Mohm*/
@@ -492,22 +492,22 @@ static void Init_Value_SN76477_Hector(void)
 
      /* Pitch*/
      Pin_Value[19][0] = 0.0;   /*Volts */
-     Pin_Value[19][1] = 1.41; 
+     Pin_Value[19][1] = 1.41;
 
 
      Pin_Value[22][0] = 0; /* TOR */
-     Pin_Value[22][1] = 1; 
+     Pin_Value[22][1] = 1;
 
      /* R OneShot*/
-     Pin_Value[24][1] = RES_K(100);  
+     Pin_Value[24][1] = RES_K(100);
 	 Pin_Value[24][0] = RES_K(1000);  /*RES_M(1) infini sur Hector car non connectee*/
 
      /* Capa OneShot*/
-     Pin_Value[23][0] = 1.0;  
+     Pin_Value[23][0] = 1.0;
      Pin_Value[23][1] = 0.0;  /* Valeur Bidon sur Hector car mise au 5Volts sans capa*/
 
      /* Enabled*/
-     Pin_Value[9][0] = 0;    
+     Pin_Value[9][0] = 0;
      Pin_Value[9][1] = 1;
 
      /* Volume*/
@@ -604,7 +604,7 @@ void Update_Sound(const address_space *space, UINT8 data)
     sn76477_envelope_1_w(sn76477, Pin_Value[1 ][AU[6]]);
     sn76477_envelope_2_w(sn76477, Pin_Value[28][AU[7]]);
 
- 	/* En dernier on lance (ou pas !)*/
+	/* En dernier on lance (ou pas !)*/
     sn76477_enable_w(sn76477, Pin_Value[9][AU[14]]);
 }
 

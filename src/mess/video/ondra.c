@@ -21,7 +21,7 @@ VIDEO_START( ondra )
 
 VIDEO_UPDATE( ondra )
 {
- 	UINT8 code1,code2;
+	UINT8 code1,code2;
 	int y, x, b;
 	int Vaddr = 0x2800;
 

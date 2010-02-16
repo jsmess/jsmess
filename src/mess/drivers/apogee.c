@@ -195,4 +195,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT   INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1989, apogee, radio86,0, 		 apogee, 	apogee,radio86, "Zavod BRA", 	"Apogee BK-01",	0)
+COMP( 1989, apogee, radio86,0,		 apogee,	apogee,radio86, "Zavod BRA",	"Apogee BK-01",	0)

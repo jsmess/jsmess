@@ -917,14 +917,14 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 				rect.max_y=rect.min_y + x68k_sys.crtc.visible_height-1;
 				gpage = x68k_sys.video.gfxlayer_pri[priority];
 				if(x68k_sys.video.reg[2] & (1 << priority))
- 				{
+				{
 					if(gpage == 0 || gpage == 2)  // so that we aren't drawing the same pages twice
 					{
 						xscr = x68k_sys.crtc.hbegin-(x68k_sys.crtc.reg[12 + (gpage*2)] & 0x1ff);
 						yscr = x68k_sys.crtc.vbegin-(x68k_sys.crtc.reg[13 + (gpage*2)] & 0x1ff);
 						copyscrollbitmap_trans(bitmap, x68k_get_gfx_page(gpage,GFX256), 1, &xscr, 1, &yscr, &cliprect,0);
 					}
- 				}
+				}
 				break;
 			case 0x00:
 				// 16 colour gfx screen
@@ -934,11 +934,11 @@ static void x68k_draw_gfx(bitmap_t* bitmap,rectangle cliprect)
 				rect.max_y=rect.min_y + x68k_sys.crtc.visible_height-1;
 				gpage = x68k_sys.video.gfxlayer_pri[priority];
 				if(x68k_sys.video.reg[2] & (1 << priority))
- 				{
+				{
 					xscr = x68k_sys.crtc.hbegin-(x68k_sys.crtc.reg[12+(gpage*2)] & 0x1ff);
 					yscr = x68k_sys.crtc.vbegin-(x68k_sys.crtc.reg[13+(gpage*2)] & 0x1ff);
 					copyscrollbitmap_trans(bitmap, x68k_get_gfx_page(gpage,GFX16), 1, &xscr, 1, &yscr ,&cliprect,0);
- 				}
+				}
 				break;
 			}
 		}
@@ -1028,7 +1028,7 @@ static const gfx_layout x68k_pcg_8 =
 	4,
 	{ 0,1,2,3 },
 	{ 8,12,0,4,24,28,16,20 },
-   	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8
 };
 
@@ -1039,7 +1039,7 @@ static const gfx_layout x68k_pcg_16 =
 	4,
 	{ 0,1,2,3 },
 	{ 8,12,0,4,24,28,16,20,8+64*8,12+64*8,64*8,4+64*8,24+64*8,28+64*8,16+64*8,20+64*8 },
-   	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
 	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
 	128*8
 };

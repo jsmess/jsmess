@@ -25,13 +25,13 @@ static FLOPPY_IDENTIFY( nes_dsk_identify )
 	UINT8 header[3];
 
 	*vote = 100;
-	
+
 	/* get first 3 bytes */
 	floppy_image_read(floppy, &header, 0, sizeof(header));
 
 	/* first check the size of the image */
 	size = floppy_image_size(floppy);
-		
+
 	if ((size != 65516) && (size != 131016) && (size != 262016))
 		*vote = 0;
 

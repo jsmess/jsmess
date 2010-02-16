@@ -12,7 +12,7 @@
 
 /* LOGLEVEL 0=no logging, 1=just commands and data, 2=everything ! */
 
-#define LOGLEVEL			0	
+#define LOGLEVEL			0
 
 #define LOG(level,...)      if(LOGLEVEL>=level) logerror(__VA_ARGS__)
 #define LOG_BITS(bits)      logerror("CS=%d CK=%d DI=%d DO=%d", (bits&CS_MASK) ? 1 : 0, (bits&CK_MASK) ? 1 : 0, (bits&DI_MASK) ? 1 : 0, (bits&DO_MASK) ? 1 : 0)
@@ -28,22 +28,22 @@ struct _er59256_t
 	UINT16  eerom[EEROM_WORDS];
 
     /* Bits as they appear on the io pins, current state */
-    UINT8   io_bits;   
-    
+    UINT8   io_bits;
+
     /* Bits as they appear on the io pins, previous state */
-    UINT8   old_io_bits;   
-    
-    
+    UINT8   old_io_bits;
+
+
     /* the 16 bit shift in/out reg */
     UINT16  in_shifter;
     UINT32  out_shifter;
-    
+
     /* Count of bits recieved since last CS low->high */
     UINT8   bitcount;
-    
+
     /* Command & addresss */
     UINT8   command;
-    
+
     /* Write enable and write in progress flags */
     UINT8   flags;
 };
@@ -79,11 +79,11 @@ void preload_rom(running_device *device, UINT16 *rom_data, int count)
     if(count>EEROM_WORDS)
         memcpy(&er59256->eerom,rom_data,count*2);
     else
-        memcpy(&er59256->eerom,rom_data,EEROM_WORDS*2);   
-        
+        memcpy(&er59256->eerom,rom_data,EEROM_WORDS*2);
+
     for(WordNo=0;WordNo<EEROM_WORDS;WordNo++)
         logerror("%04X ",er59256->eerom[WordNo]);
-        
+
     logerror("\n");
 }
 
@@ -103,12 +103,12 @@ static DEVICE_START( er59256 )
 	er59256_t *er59256 = get_token(device);
 
     memset(er59256, 0x00, sizeof(er59256_t));
-    
+
     // Start with rom defaulted to erased
 	memset(&er59256->eerom, 0xFF, EEROM_WORDS*2);
-    
+
     er59256->command=CMD_INVALID;
-    
+
     er59256->flags&= ~FLAG_DATA_LOADED;
 }
 
@@ -124,7 +124,7 @@ void er59256_set_iobits(running_device *device, UINT8 newbits)
 
     // Make sure we only apply valid bits
     newbits&=ALL_MASK;
-    
+
     if(LOGLEVEL>1)
     {
         logerror("er59256:newbits=%02X : ",newbits);
@@ -141,7 +141,7 @@ void er59256_set_iobits(running_device *device, UINT8 newbits)
         // save the current state, then set the new one, remembering to preserve data out
         er59256->old_io_bits=er59256->io_bits;
         er59256->io_bits=(newbits & ~DO_MASK) | (er59256->old_io_bits&DO_MASK);
-        
+
         if(CS_RISE(er59256))
         {
             er59256->flags&=~FLAG_START_BIT;
@@ -151,7 +151,7 @@ void er59256_set_iobits(running_device *device, UINT8 newbits)
         if(LOGLEVEL>1)
         {
             if(CK_RISE(er59256)) logerror("er59256:CK rise\n");
-            if(CS_RISE(er59256)) logerror("er59256:CS rise\n");          
+            if(CS_RISE(er59256)) logerror("er59256:CS rise\n");
             if(CK_FALL(er59256)) logerror("er59256:CK fall\n");
             if(CS_FALL(er59256)) logerror("er59256:CS fall\n");
         }
@@ -167,20 +167,20 @@ void er59256_set_iobits(running_device *device, UINT8 newbits)
             {
                 SHIFT_IN(er59256);
                 er59256->bitcount++;
-            
+
                 if(er59256->bitcount==CMD_BITLEN)
                     decode_command(er59256);
-            
+
                 if((er59256->bitcount==WRITE_BITLEN) && ((er59256->command & CMD_MASK)==CMD_WRITE))
                 {
                     er59256->eerom[er59256->command & ADDR_MASK]=er59256->in_shifter;
                     LOG(1,"er59256:write[%02X]=%04X\n",(er59256->command & ADDR_MASK),er59256->in_shifter);
-                    er59256->command=CMD_INVALID;                  
+                    er59256->command=CMD_INVALID;
                 }
                 LOG(1,"out_shifter=%05X, io_bits=%02X\n",er59256->out_shifter,er59256->io_bits);
-                SHIFT_OUT(er59256);                
+                SHIFT_OUT(er59256);
             }
-            
+
             LOG(2,"io_bits:out=%02X\n",er59256->io_bits);
         }
     }
@@ -189,36 +189,36 @@ void er59256_set_iobits(running_device *device, UINT8 newbits)
 UINT8 er59256_get_iobits(running_device *device)
 {
     er59256_t *er59256 = get_token(device);
-    
+
     return er59256->io_bits;
 }
 
 
 void decode_command(er59256_t *er59256)
-{  
+{
     er59256->out_shifter=0x0000;
     er59256->command=(er59256->in_shifter & (CMD_MASK | ADDR_MASK));
-      
+
     switch(er59256->command & CMD_MASK)
     {
-        case CMD_READ   : er59256->out_shifter=er59256->eerom[er59256->command & ADDR_MASK]; 
+        case CMD_READ   : er59256->out_shifter=er59256->eerom[er59256->command & ADDR_MASK];
                           LOG(1,"er59256:read[%02X]=%04X\n",(er59256->command&ADDR_MASK),er59256->eerom[er59256->command & ADDR_MASK]);
                           break;
-        case CMD_WRITE  : break;      
-        case CMD_ERASE  : if (WRITE_ENABLED(er59256)) er59256->eerom[er59256->command & ADDR_MASK]=0xFF; 
+        case CMD_WRITE  : break;
+        case CMD_ERASE  : if (WRITE_ENABLED(er59256)) er59256->eerom[er59256->command & ADDR_MASK]=0xFF;
                           LOG(1,"er59256:erase[%02X]\n",(er59256->command&ADDR_MASK));
                           break;
-        case CMD_EWEN   : er59256->flags|=FLAG_WRITE_EN; 
+        case CMD_EWEN   : er59256->flags|=FLAG_WRITE_EN;
                           LOG(1,"er59256:erase/write enabled\n");
                           break;
-        case CMD_EWDS   : er59256->flags&=~FLAG_WRITE_EN; 
+        case CMD_EWDS   : er59256->flags&=~FLAG_WRITE_EN;
                           LOG(1,"er59256:erase/write disabled\n");
-                          break;      
-        case CMD_ERAL   : if (WRITE_ENABLED(er59256)) memset(&er59256->eerom, 0xFF, EEROM_WORDS*2); 
+                          break;
+        case CMD_ERAL   : if (WRITE_ENABLED(er59256)) memset(&er59256->eerom, 0xFF, EEROM_WORDS*2);
                           LOG(1,"er59256:erase all\n");
                           break;
     }
-    
+
     if ((er59256->command & CMD_MASK)!=CMD_WRITE)
         er59256->command=CMD_INVALID;
 }

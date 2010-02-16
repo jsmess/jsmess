@@ -389,21 +389,21 @@ WRITE8_HANDLER ( bbcm_ACCCON_write )
 	int tempIRR;
 	ACCCON=data;
 
-  	logerror("ACCCON write  %d %d \n",offset,data);
+	logerror("ACCCON write  %d %d \n",offset,data);
 
-  	tempIRR=ACCCON_IRR;
-  	ACCCON_IRR=(data>>7)&1;
+	tempIRR=ACCCON_IRR;
+	ACCCON_IRR=(data>>7)&1;
 
-  	ACCCON_TST=(data>>6)&1;
-  	ACCCON_IFJ=(data>>5)&1;
-  	ACCCON_ITU=(data>>4)&1;
-  	ACCCON_Y  =(data>>3)&1;
-  	ACCCON_X  =(data>>2)&1;
-  	ACCCON_E  =(data>>1)&1;
-  	ACCCON_D  =(data>>0)&1;
+	ACCCON_TST=(data>>6)&1;
+	ACCCON_IFJ=(data>>5)&1;
+	ACCCON_ITU=(data>>4)&1;
+	ACCCON_Y  =(data>>3)&1;
+	ACCCON_X  =(data>>2)&1;
+	ACCCON_E  =(data>>1)&1;
+	ACCCON_D  =(data>>0)&1;
 
-  	if (tempIRR!=ACCCON_IRR)
-  	{
+	if (tempIRR!=ACCCON_IRR)
+	{
 		cputag_set_input_line(space->machine, "maincpu", M6502_IRQ_LINE, ACCCON_IRR);
 	}
 
@@ -666,8 +666,8 @@ long myo;
 		if ((myo>=0x10) && (myo<=0x17)) bbc_SerialULA_w(space, myo-0x10,data);		/* Serial System Chip */
 		if ((myo>=0x18) && (myo<=0x1f)) uPD7002_w(devtag_get_device(space->machine, "upd7002"),myo-0x18,data);			/* A to D converter */
 		if ((myo>=0x20) && (myo<=0x23)) bbc_videoULA_w(space, myo-0x20,data);			/* VideoULA */
-		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data); 	/* 1770 */
-		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);  	/* disc control latch */
+		if ((myo>=0x24) && (myo<=0x27)) bbcm_wd1770l_write(space, myo-0x24,data);	/* 1770 */
+		if ((myo>=0x28) && (myo<=0x2f)) bbcm_wd1770_write(space, myo-0x28,data);	/* disc control latch */
 		if ((myo>=0x30) && (myo<=0x33)) page_selectbm_w(space, myo-0x30,data);		/* page select */
 		if ((myo>=0x34) && (myo<=0x37)) bbcm_ACCCON_write(space, myo-0x34,data);	/* ACCCON */
 		//if ((myo>=0x38) && (myo<=0x3f))                                   /* NC ?? */
@@ -815,17 +815,17 @@ INTERRUPT_GEN( bbcb_keyscan )
 	};
 	running_device *via_0 = devtag_get_device(device->machine, "via6522_0");
 
-  	/* only do auto scan if keyboard is not enabled */
+	/* only do auto scan if keyboard is not enabled */
 	if (b3_keyboard == 1)
 	{
-  		/* KBD IC1 4 bit addressable counter */
-  		/* KBD IC3 4 to 10 line decoder */
+		/* KBD IC1 4 bit addressable counter */
+		/* KBD IC3 4 to 10 line decoder */
 		/* keyboard not enabled so increment counter */
 		column = (column + 1) % 16;
 		if (column < 10)
 		{
-  			/* KBD IC4 8 input NAND gate */
-  			/* set the value of via_system ca2, by checking for any keys
+			/* KBD IC4 8 input NAND gate */
+			/* set the value of via_system ca2, by checking for any keys
                  being pressed on the selected column */
 			if ((input_port_read(device->machine, colnames[column]) | 0x01) != 0xff)
 			{
@@ -853,11 +853,11 @@ INTERRUPT_GEN( bbcm_keyscan )
 	};
 	running_device *via_0 = devtag_get_device(device->machine, "via6522_0");
 
-  	/* only do auto scan if keyboard is not enabled */
+	/* only do auto scan if keyboard is not enabled */
 	if (b3_keyboard == 1)
 	{
-  		/* KBD IC1 4 bit addressable counter */
-  		/* KBD IC3 4 to 10 line decoder */
+		/* KBD IC1 4 bit addressable counter */
+		/* KBD IC3 4 to 10 line decoder */
 		/* keyboard not enabled so increment counter */
 		column = (column + 1) % 16;
 
@@ -985,12 +985,12 @@ static WRITE8_DEVICE_HANDLER( bbcb_via_system_write_porta )
 	via_system_porta = data;
 	if (b0_sound == 0)
 	{
- 		//logerror("Doing an unsafe write to the sound chip %d \n",data);
+		//logerror("Doing an unsafe write to the sound chip %d \n",data);
 		sn76496_w(devtag_get_device(device->machine, "sn76489"), 0,via_system_porta);
 	}
 	if (b3_keyboard == 0)
 	{
- 		//logerror("Doing an unsafe write to the keyboard %d \n",data);
+		//logerror("Doing an unsafe write to the keyboard %d \n",data);
 		via_system_porta = bbc_keyboard(space, via_system_porta);
 	}
 	if (bbc_Master) MC146818_set(space);

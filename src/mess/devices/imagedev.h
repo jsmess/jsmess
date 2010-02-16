@@ -35,7 +35,7 @@ typedef enum
 #define IMAGE_CREATABLE        0x00000004
 #define IMAGE_MUST_BE_LOADED   0x00000008
 #define IMAGE_RESET_ON_LOAD    0x00000010
-	
+
 typedef struct _image_interface image_interface;
 struct _image_interface
 {
@@ -62,7 +62,7 @@ DEVICE_GET_INFO( image );
 
 #define MDRV_IMAGE_ADD(_tag,_intf) \
 	MDRV_DEVICE_ADD(_tag, IMAGE, 0) \
-	MDRV_DEVICE_CONFIG(_intf) 
+	MDRV_DEVICE_CONFIG(_intf)
 
 
 /***************************************************************************

@@ -43,7 +43,7 @@ typedef enum _cassette_state cassette_state;
 typedef struct cassette_config_t	cassette_config;
 struct cassette_config_t
 {
-	const struct CassetteFormat* 	const *formats;
+	const struct CassetteFormat*	const *formats;
 	const struct CassetteOptions	*create_opts;
 	const cassette_state			default_state;
 };
@@ -72,7 +72,7 @@ DEVICE_GET_INFO(cassette);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_CASSETTE_ADD(_tag, _config) 	\
+#define MDRV_CASSETTE_ADD(_tag, _config)	\
 	MDRV_DEVICE_ADD(_tag, CASSETTE, 0)			\
 	MDRV_DEVICE_CONFIG(_config)
 

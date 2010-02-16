@@ -18,7 +18,7 @@
 #define	GTP_BLOCK_NAME		0x10
 
 static INT16	wave_data;
-static INT16  	len;
+static INT16	len;
 
 #define PULSE_WIDTH		30
 #define PERIOD_BASE		150
@@ -26,7 +26,7 @@ static INT16  	len;
 #define PERIOD_0		150
 
 #define INTERBYTE_PAUSE		225
-#define INTERBLOCK_PAUSE 	100000
+#define INTERBLOCK_PAUSE	100000
 
 
 static void gtp_output_wave( INT16 **buffer, int length ) {

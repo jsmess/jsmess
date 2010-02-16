@@ -205,7 +205,7 @@ static WRITE8_HANDLER( x120_system_w )
 
 static WRITE8_HANDLER( bell_w )
 {
-//	xerox820_state *state = (xerox820_state *)space->machine->driver_data;
+//  xerox820_state *state = (xerox820_state *)space->machine->driver_data;
 }
 
 static WRITE8_HANDLER( slden_w )
@@ -231,7 +231,7 @@ static WRITE8_HANDLER( lowlite_w )
 
 static WRITE8_HANDLER( sync_w )
 {
-//	xerox820_state *state = (xerox820_state *)space->machine->driver_data;
+//  xerox820_state *state = (xerox820_state *)space->machine->driver_data;
 
 	if (offset)
 	{
@@ -568,7 +568,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* interrupt handler */
 	DEVCB_LINE(ctc_z0_w),		/* ZC/TO0 callback */
 	DEVCB_LINE(z80ctc_trg2_w),	/* ZC/TO1 callback */
-	DEVCB_LINE(ctc_z2_w)  		/* ZC/TO2 callback */
+	DEVCB_LINE(ctc_z2_w)		/* ZC/TO2 callback */
 };
 
 /* Z80 Daisy Chain */
@@ -747,12 +747,12 @@ static MACHINE_START( xerox820 )
 
 static MACHINE_START( xerox820ii )
 {
-//	xerox820_state *state = (xerox820_state *)machine->driver_data;
+//  xerox820_state *state = (xerox820_state *)machine->driver_data;
 
 	MACHINE_START_CALL(xerox820);
 
 	/* register for state saving */
-//	state_save_register_global(machine, state->);
+//  state_save_register_global(machine, state->);
 }
 
 static MACHINE_RESET( xerox820 )

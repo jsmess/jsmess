@@ -24,33 +24,33 @@
 /* Address maps */
 static ADDRESS_MAP_START(b2m_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE (0x0000, 0x27ff) AM_RAMBANK("bank1")
- 	AM_RANGE (0x2800, 0x2fff) AM_RAMBANK("bank2")
- 	AM_RANGE (0x3000, 0x6fff) AM_RAMBANK("bank3")
- 	AM_RANGE (0x7000, 0xdfff) AM_RAMBANK("bank4")
- 	AM_RANGE (0xe000, 0xffff) AM_RAMBANK("bank5")
+	AM_RANGE (0x2800, 0x2fff) AM_RAMBANK("bank2")
+	AM_RANGE (0x3000, 0x6fff) AM_RAMBANK("bank3")
+	AM_RANGE (0x7000, 0xdfff) AM_RAMBANK("bank4")
+	AM_RANGE (0xe000, 0xffff) AM_RAMBANK("bank5")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( b2m_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
-  	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
     AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w )
 	AM_RANGE(0x18, 0x18) AM_DEVREADWRITE("uart", msm8251_data_r,msm8251_data_w)
 	AM_RANGE(0x19, 0x19) AM_DEVREADWRITE("uart", msm8251_status_r,msm8251_control_w)
-  	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w)
-  	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE("wd1793", wd17xx_track_r,wd17xx_track_w)
-  	AM_RANGE(0x1e, 0x1e) AM_DEVREADWRITE("wd1793", wd17xx_sector_r,wd17xx_sector_w)
-  	AM_RANGE(0x1f, 0x1f) AM_DEVREADWRITE("wd1793", wd17xx_data_r,wd17xx_data_w)
+	AM_RANGE(0x1c, 0x1c) AM_DEVREADWRITE("wd1793", wd17xx_status_r,wd17xx_command_w)
+	AM_RANGE(0x1d, 0x1d) AM_DEVREADWRITE("wd1793", wd17xx_track_r,wd17xx_track_w)
+	AM_RANGE(0x1e, 0x1e) AM_DEVREADWRITE("wd1793", wd17xx_sector_r,wd17xx_sector_w)
+	AM_RANGE(0x1f, 0x1f) AM_DEVREADWRITE("wd1793", wd17xx_data_r,wd17xx_data_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( b2m_rom_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("pit8253", pit8253_r,pit8253_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_3", i8255a_r, i8255a_w)
-  	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
     AM_RANGE(0x0c, 0x0c) AM_READWRITE(b2m_localmachine_r,b2m_localmachine_w)
 	AM_RANGE(0x10, 0x13) AM_READWRITE(b2m_palette_r,b2m_palette_w)
 	AM_RANGE(0x14, 0x15) AM_DEVREADWRITE("pic8259", pic8259_r, pic8259_w )
@@ -253,7 +253,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( b2mrom )
     MDRV_IMPORT_FROM(b2m)
     MDRV_CPU_MODIFY("maincpu")
-  	MDRV_CPU_IO_MAP(b2m_rom_io)
+	MDRV_CPU_IO_MAP(b2m_rom_io)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -273,5 +273,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1989, b2m, 	0, 	 	0,		b2m, 		b2m, 		b2m, 	 "BNPO",					 "Bashkiria-2M",	 GAME_SUPPORTS_SAVE)
-COMP( 1989, b2mrom,	b2m, 	0,		b2mrom,		b2m, 		b2m, 	 "BNPO",					 "Bashkiria-2M ROM-disk",	 GAME_SUPPORTS_SAVE)
+COMP( 1989, b2m,	0,		0,		b2m,		b2m,		b2m,	 "BNPO",					 "Bashkiria-2M",	 GAME_SUPPORTS_SAVE)
+COMP( 1989, b2mrom,	b2m,	0,		b2mrom,		b2m,		b2m,	 "BNPO",					 "Bashkiria-2M ROM-disk",	 GAME_SUPPORTS_SAVE)

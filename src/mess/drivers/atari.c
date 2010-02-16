@@ -981,7 +981,7 @@ static MACHINE_DRIVER_START( atari_common_nodac )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("40K")
-	
+
 	MDRV_ATARI_FDC_ADD("fdc")
 MACHINE_DRIVER_END
 

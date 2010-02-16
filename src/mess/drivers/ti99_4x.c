@@ -648,7 +648,7 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 
 	MDRV_IMPORT_FROM( smc92x4_hd )
 
-	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )	
+	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
