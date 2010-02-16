@@ -134,6 +134,7 @@
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
 
+#include "formats/flopimg.h"
 
 /***************************************************************************
     CONSTANTS
@@ -297,6 +298,9 @@ struct _wd1770_state
 	UINT8 status;
 
 	int stepping_rate[4];  /* track stepping rate in ms */
+
+        unsigned short  crc;    /* Holds the current CRC value for write_track CRC calculation */
+        int     crc_active;	/* Flag indicating that CRC calculation in write_track is active. */
 
 	UINT8	track_reg;				/* value of track register */
 	UINT8	command_type;			/* last command type */
@@ -525,10 +529,36 @@ static void wd17xx_command_restore(running_device *device)
 	wd17xx_set_busy(device, ATTOTIME_IN_USEC(100));
 }
 
+/*
+        Gets the size in bytes of the current track. For real hardware this
+	may vary per system in small degree, and there even for each track 
+	and head, so we should not assume a fixed value here. 
+	As we are using a buffered track writing, we have to find out how long
+	the track will become. The only object which can tell us is the 
+	selected format.
+*/
+static int get_track_size(wd1770_state *w)
+{
+        int size = 0;
+        floppy_image *floppy = flopimg_get_image(w->drive);
+        if (floppy != NULL)
+        {
+                const struct FloppyCallbacks *fmt = floppy_callbacks(floppy);
+                if (fmt != NULL)
+                {
+                        size = fmt->get_track_size(floppy, w->hd, w->track);
+                }
+        }
+        return size;
+}
 
 /*
-    Write an entire track. Formats which do not define a write_track
-    function pointer will cause a silent return.
+	Write an entire track. Formats which do not define a write_track
+	function pointer will cause a silent return.
+	What is written to the image depends on the selected format. Sector 
+	dumps have to extract the sectors in the track, while track dumps
+	may directly write the bytes.
+	(The if-part below may thus be removed.)
 */
 static void write_track(running_device *device)
 {
@@ -555,10 +585,17 @@ static void write_track(running_device *device)
 	}
 #endif
 
-	if (device->type == WD1771)
-		w->data_count = TRKSIZE_SD;
-	else
-		w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
+	/* Determine the track size. We cannot allow different sizes in this
+	   design. */
+        w->data_count = get_track_size(w);
+
+        if (w->data_count==0)
+        {
+                if (device->type == WD1771)
+                        w->data_count = TRKSIZE_SD;
+                else
+			w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
+        }
 
 	floppy_drive_write_track_data_info_buffer( w->drive, w->hd, (char *)w->buffer, &(w->data_count) );
 
@@ -569,8 +606,12 @@ static void write_track(running_device *device)
 	w->busy_count = 0;
 }
 
-
-/* read an entire track */
+/* 
+	Read an entire track. It is up to the format to deliver the data. Sector
+	dumps may be required to fantasize the missing track bytes, while track
+	dumps can directly deliver them.
+	(The if-part below may thus be removed.)
+*/
 static void read_track(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
@@ -692,11 +733,17 @@ static void read_track(running_device *device)
 		}
 	}
 #endif
+	/* Determine the track size. We cannot allow different sizes in this
+	   design. */
+        w->data_count = get_track_size(w);
 
-	if (device->type == WD1771)
-		w->data_count = TRKSIZE_SD;
-	else
-		w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
+        if (w->data_count==0)
+        {
+                if (device->type == WD1771)
+                        w->data_count = TRKSIZE_SD;
+                else
+			w->data_count = wd17xx_dden(device) ? TRKSIZE_SD : TRKSIZE_DD;
+        }
 
 	floppy_drive_read_track_data_info_buffer( w->drive, w->hd, (char *)w->buffer, &(w->data_count) );
 
@@ -1725,55 +1772,131 @@ WRITE8_DEVICE_HANDLER( wd17xx_sector_w )
 WRITE8_DEVICE_HANDLER( wd17xx_data_w )
 {
 	wd1770_state *w = get_safe_token(device);
-
+	
 	if (w->data_count > 0)
 	{
 		wd17xx_clear_drq(device);
-
+		
 		/* put byte into buffer */
 		if (VERBOSE_DATA)
 			logerror("wd17xx_info buffered data: $%02X at offset %d.\n", data, w->data_offset);
-
+		
 		w->buffer[w->data_offset++] = data;
-
-		if (--w->data_count < 1)
-		{
-			if (w->command == FDC_WRITE_TRK)
-				write_track(device);
-			else
-				wd17xx_write_sector(device);
-
-			w->data_offset = 0;
-
-
-			/* Check we should handle the next sector for a multi record write */
-			if ( w->command_type == TYPE_II && w->command == FDC_WRITE_SEC && ( w->write_cmd & 0x10 ) )
-            {
-				w->sector++;
-				if (wd17xx_locate_sector(device))
-				{
-					w->data_count = w->sector_length;
-
-					w->status |= STA_2_BUSY;
-					w->busy_count = 0;
-
-					wd17xx_timed_data_request(device);
-				}
-            }
-            else
-            {
-                wd17xx_complete_command(device, DELAY_DATADONE);
-                if (VERBOSE)
-					logerror("wd17xx_data_w(): multi data write completed\n");
-            }
-        }
-		else
-		{
-			/* yes... setup a timed data request */
-			wd17xx_timed_data_request(device);
-		}
-
-	}
+		
+                if (--w->data_count < 1)
+                {
+                        if (w->command == FDC_WRITE_TRK)
+                                write_track(device);
+                        else
+                                wd17xx_write_sector(device);
+			
+                        w->data_offset = 0;
+			
+                        wd17xx_complete_command(device, DELAY_DATADONE);
+                }
+                else
+                {
+                        if (w->command == FDC_WRITE_TRK)
+                        {
+                                /* Process special data values according to WD17xx specification. 
+				   Note that as CRC values take up two bytes which are written on
+				   every 0xf7 byte, this will cause the actual image to
+				   grow larger than what was written from the system. So we need 
+				   to take the value of data_offset when writing the track.
+                                */
+                                if (!wd17xx_dden(device))
+                                {
+                                        switch (data)
+                                        {
+                                        case 0xf5:
+                                        case 0xf6:
+                                                /* not allowed in FM. */
+                                                /* Take back the last write. */
+                                                w->data_offset--;
+                                                break;
+                                        case 0xf7:
+                                                /* Take back the last write. */
+                                                w->data_offset--;
+                                                /* write two crc bytes */
+                                                w->buffer[w->data_offset++] = (w->crc>>8)&0xff;
+                                                w->buffer[w->data_offset++] = (w->crc&0xff);
+                                                w->crc_active = FALSE;
+                                                break;
+                                        case 0xf8:
+                                        case 0xf9:
+                                        case 0xfa:
+                                        case 0xfb:
+                                        case 0xfe:
+                                                /* Preset crc */
+                                                w->crc = 0xffff;
+						/* AM is included in the CRC */
+						w->crc = ccitt_crc16_one(w->crc, data);
+                                                w->crc_active = TRUE;
+                                                break;
+                                        case 0xfc:
+                                                /* Write index mark. No effect here as we do not store clock patterns.
+						   Maybe later. */
+                                                break;
+                                        case 0xfd:
+                                                /* Just write, don't use for CRC. */
+                                                break;
+                                        default:
+                                                /* Byte already written. */
+                                                if (w->crc_active)
+                                                        w->crc = ccitt_crc16_one(w->crc, data);
+                                        }
+                                }
+                                else  /* MFM */
+                                {
+                                        switch (data)
+                                        {
+                                        case 0xf5:
+                                                /* Take back the last write. */
+                                                w->data_offset--;
+                                                /* Write a1 */
+                                                w->buffer[w->data_offset++] = 0xa1;
+                                                /* Preset CRC */
+                                                w->crc = 0xffff;
+                                                w->crc_active = TRUE;
+                                                break;
+                                        case 0xf6:
+                                                /* Take back the last write. */
+                                                w->data_offset--;
+                                                /* Write c2 */
+                                                w->buffer[w->data_offset++] = 0xc2;
+                                                break;
+                                        case 0xf7:
+                                                /* Take back the last write. */
+                                                w->data_offset--;
+                                                /* write two crc bytes */
+                                                w->buffer[w->data_offset++] = (w->crc>>8)&0xff;
+                                                w->buffer[w->data_offset++] = (w->crc&0xff);
+                                                w->crc_active = FALSE;
+                                                break;
+                                        case 0xf8:
+                                        case 0xf9:
+                                        case 0xfa:
+                                        case 0xfb:
+                                        case 0xfc:
+                                        case 0xfd:
+                                                /* Just write, don't use for CRC. */
+                                                break;
+                                        case 0xfe:
+						/* AM is included in the CRC */
+						if (w->crc_active)
+							w->crc = ccitt_crc16_one(w->crc, data);
+                                                break;
+                                        default:
+                                                /* Byte already written. */
+                                                if (w->crc_active)
+                                                        w->crc = ccitt_crc16_one(w->crc, data);
+                                        }
+                                }
+                        }
+                        /* yes... setup a timed data request */
+                        wd17xx_timed_data_request(device);
+                }
+	}		
 	else
 	{
 		if (VERBOSE)

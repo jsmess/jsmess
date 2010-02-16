@@ -43,6 +43,7 @@ Historical notes: TI made several last minute design changes.
 #include "machine/mm58274c.h"
 #include "machine/rtc65271.h"
 #include "devices/ti99cart.h"
+#include "formats/ti99_dsk.h"
 
 /*
     memory map
@@ -609,7 +610,7 @@ static const floppy_config ti99_4_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(ti99),
-	KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY
 };
 
 static MACHINE_DRIVER_START(ti99_4_60hz)

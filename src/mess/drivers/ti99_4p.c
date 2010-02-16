@@ -59,6 +59,7 @@
 #include "machine/idectrl.h"
 #include "machine/smc92x4.h"
 #include "machine/rtc65271.h"
+#include "formats/ti99_dsk.h"
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")								/*system ROM*/
