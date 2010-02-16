@@ -524,6 +524,8 @@ const game_driver * const drivers[] =
 	DRIVER( c232 )	  /* Commodore 232 - Prototype  */
 	DRIVER( c264 )	  /* Commodore 264 - Prototype  */
 	DRIVER( c364 )	  /* Commodore V364 - Prototype    */
+	DRIVER( c16sid )	   /* Commodore 16  sid card  */
+	DRIVER( plus4sid )	 /* Commodore +4  sid card  */
 
 	DRIVER( c128 )	  /* Commodore 128 - NTSC    */
 	DRIVER( c128cr )	/* Commodore 128CR - NTSC (proto?)    */

@@ -116,8 +116,9 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "cpu/m6502/m6502.h"
 #include "sound/sid6581.h"
 
-#include "machine/cbmipt.h"
 #include "audio/ted7360.h"
+#include "audio/t6721.h"
+#include "machine/cbmipt.h"
 #include "devices/messram.h"
 #include "machine/c1541.h"
 #include "machine/c1551.h"
@@ -133,7 +134,6 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
  *  Main CPU memory handlers
  *
  *************************************/
-
 
 
 /*
@@ -184,14 +184,6 @@ static ADDRESS_MAP_START(c16_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
 	AM_RANGE(0xff3e, 0xff3e) AM_WRITE(c16_switch_to_rom)
 	AM_RANGE(0xff3f, 0xff3f) AM_WRITE(c16_switch_to_ram)
-#if 0
-	AM_RANGE(0x4000, 0x7fff) AM_WRITE( c16_write_4000)  /*configured in c16_common_init */
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE( c16_write_8000)  /*configured in c16_common_init */
-	AM_RANGE(0xc000, 0xfcff) AM_WRITE( c16_write_c000)  /*configured in c16_common_init */
-	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
-	AM_RANGE(0xff20, 0xff3d) AM_WRITE( c16_write_ff20)  /*configure in c16_common_init */
-	AM_RANGE(0xff40, 0xffff) AM_WRITE( c16_write_ff40)  /*configure in c16_common_init */
-#endif
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(plus4_map, ADDRESS_SPACE_PROGRAM, 8)
@@ -204,9 +196,6 @@ static ADDRESS_MAP_START(plus4_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xfd10, 0xfd1f) AM_READWRITE(plus4_6529_port_r, plus4_6529_port_w)
 	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE(c16_6529_port_r, c16_6529_port_w) /* 6529 keyboard matrix */
 	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE( c16_select_roms) /* rom chips selection */
-#if 0
-	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
-#endif
 	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE("ted7360", ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
 	AM_RANGE(0xff20, 0xff3d) AM_WRITEONLY
@@ -223,12 +212,9 @@ static ADDRESS_MAP_START(c364_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0xfcff) AM_WRITE_BANK("bank9")
 	AM_RANGE(0xfd00, 0xfd0f) AM_READWRITE(c16_6551_port_r, c16_6551_port_w)
 	AM_RANGE(0xfd10, 0xfd1f) AM_READWRITE(plus4_6529_port_r, plus4_6529_port_w)
-	AM_RANGE(0xfd20, 0xfd2f) AM_READWRITE(c364_speech_r, c364_speech_w)
+	AM_RANGE(0xfd20, 0xfd2f) AM_DEVREADWRITE("t6721", t6721_speech_r, t6721_speech_w)
 	AM_RANGE(0xfd30, 0xfd3f) AM_READWRITE(c16_6529_port_r, c16_6529_port_w) /* 6529 keyboard matrix */
-	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE( c16_select_roms) /* rom chips selection */
-#if 0
-	AM_RANGE(0xfd40, 0xfd5f) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)	/* sidcard, eoroidpro ... */
-#endif
+	AM_RANGE(0xfdd0, 0xfddf) AM_WRITE(c16_select_roms) /* rom chips selection */
 	AM_RANGE(0xff00, 0xff1f) AM_DEVREADWRITE("ted7360", ted7360_port_r, ted7360_port_w)
 	AM_RANGE(0xff20, 0xffff) AM_READ_BANK("bank8")
 	AM_RANGE(0xff20, 0xff3d) AM_WRITEONLY
@@ -280,9 +266,7 @@ static INPUT_PORTS_START( c16 )
 
 	PORT_INCLUDE( c16_special )				/* SPECIAL */
 
-	PORT_INCLUDE( c16_controls )			/* JOY0, JOY1 */
-
-	PORT_INCLUDE( c16_config )				/* DSW0, CFG1 */
+	PORT_INCLUDE( c16_controls )			/* CTRLSEL, JOY0, JOY1 */
 INPUT_PORTS_END
 
 
@@ -301,25 +285,36 @@ static INPUT_PORTS_START( plus4 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT)							PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_INSERT)						PORT_CHAR('*')
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT)							PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+INPUT_PORTS_END
 
-	PORT_MODIFY("CFG1")
-	PORT_BIT( 0x10, 0x10, IPT_UNUSED )			/* ntsc */
-	PORT_BIT( 0x0c, 0x04, IPT_UNUSED )			/* plus4 */
+static INPUT_PORTS_START( c16sid )
+	PORT_INCLUDE( c16 )
+
+	PORT_START("SID")
+	PORT_CONFNAME( 0x01, 0x00, "SID Card Address")
+	PORT_CONFSETTING(	0x00, "0xfd40" )
+	PORT_CONFSETTING(	0x01, "0xfe80" )
+#if 0	
+	PORT_CONFNAME( 0x02, 0x00, "Enable SID writes to 0xd400")
+	PORT_CONFSETTING(	0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(	0x02, DEF_STR( Yes ) )
+#endif
 INPUT_PORTS_END
 
 
-
-#if 0
-static INPUT_PORTS_START (c364)
+static INPUT_PORTS_START( plus4sid )
 	PORT_INCLUDE( plus4 )
 
-	PORT_MODIFY("CFG1")
-	PORT_BIT( 0x10, 0x10, IPT_UNUSED )			/* ntsc */
-	PORT_BIT( 0x0c, 0x08, IPT_UNUSED )			/* 364 */
-	/* numeric block - hardware wired to other keys? */
-	/* check cbmipt.c for layout */
-INPUT_PORTS_END
+	PORT_START("SID")
+	PORT_CONFNAME( 0x01, 0x00, "SID Card Address")
+	PORT_CONFSETTING(	0x00, "0xfd40" )
+	PORT_CONFSETTING(	0x01, "0xfe80" )
+#if 0	
+	PORT_CONFNAME( 0x02, 0x00, "Enable SID writes to 0xd400")
+	PORT_CONFSETTING(	0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(	0x02, DEF_STR( Yes ) )
 #endif
+INPUT_PORTS_END
 
 
 /*************************************
@@ -478,8 +473,6 @@ static MACHINE_DRIVER_START( c16 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_TED7360_ADD("ted7360", c16_ted7360_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-	MDRV_SOUND_ADD("sid", SID8580, TED7360PAL_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MDRV_QUICKLOAD_ADD("quickload", cbm_c16, "p00,prg", CBM_QUICKLOAD_DELAY_SECONDS)
@@ -532,10 +525,9 @@ static MACHINE_DRIVER_START( plus4 )
 	MDRV_CPU_REPLACE( "maincpu", M7501, XTAL_14_31818MHz/16)
 	MDRV_CPU_PROGRAM_MAP(plus4_map)
 	MDRV_CPU_CONFIG( c16_m7501_interface )
+
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(TED7360NTSC_VRETRACERATE)
-
-	MDRV_SOUND_REPLACE("sid", SID8580, TED7360NTSC_CLOCK/4)
 
 	MDRV_DEVICE_REMOVE("ted7360")
 	MDRV_TED7360_ADD("ted7360", plus4_ted7360_intf)
@@ -586,6 +578,8 @@ static MACHINE_DRIVER_START( c364 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(c364_map)
+
+	MDRV_T6721_ADD("t6721")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( c264 )
@@ -593,6 +587,20 @@ static MACHINE_DRIVER_START( c264 )
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( c16sid )
+	MDRV_IMPORT_FROM( c16 )
+
+	MDRV_SOUND_ADD("sid", SID8580, TED7360PAL_CLOCK/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( plus4sid )
+	MDRV_IMPORT_FROM( plus4 )
+
+	MDRV_SOUND_ADD("sid", SID8580, TED7360NTSC_CLOCK/4)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 
@@ -695,27 +703,33 @@ ROM_START( plus4v )
 	ROM_LOAD( "317054-01.bin", 0x1c000, 0x4000, CRC(109de2fc) SHA1(0ad7ac2db7da692d972e586ca0dfd747d82c7693) )
 ROM_END
 
+#define rom_c16sid		rom_c16
+#define rom_plus4sid		rom_plus4
+
 /***************************************************************************
 
   Game driver(s)
 
 ***************************************************************************/
 
-/*    YEAR  NAME  PARENT COMPAT MACHINE INPUT   INIT      COMPANY                             FULLNAME            FLAGS */
+/*    YEAR  NAME  PARENT COMPAT MACHINE     INPUT      INIT      COMPANY                         FULLNAME            FLAGS */
 
-COMP( 1984, c16,     0,     0,  c16,    c16,    c16,   "Commodore Business Machines",  "Commodore 16 (PAL)", 0)
-COMP( 1984, c16c,    c16,   0,  c16c,   c16,    c16,   "Commodore Business Machines",  "Commodore 16 (PAL, 1551)", 0 )
-COMP( 1984, c16v,    c16,   0,  c16v,   c16,    c16,   "Commodore Business Machines",  "Commodore 16 (PAL, VC1541)", 0)
-COMP( 1984, c16hun,  c16,   0,  c16,    c16,    c16,   "Commodore Business Machines",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
+COMP( 1984, c16,      0,     0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 16 (PAL)", 0)
+COMP( 1984, c16c,     c16,   0,  c16c,      c16,       c16,      "Commodore Business Machines",  "Commodore 16 (PAL, 1551)", 0 )
+COMP( 1984, c16v,     c16,   0,  c16v,      c16,       c16,      "Commodore Business Machines",  "Commodore 16 (PAL, VC1541)", 0)
+COMP( 1984, c16hun,   c16,   0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 16 Novotrade (PAL, Hungary)", 0)
 
-COMP( 1984, c116,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines",  "Commodore 116 (PAL)", 0)
-COMP( 1984, c116c,   c16,   0,  c16c,   c16,    c16,   "Commodore Business Machines",  "Commodore 116 (PAL, 1551)", 0 )
-COMP( 1984, c116v,   c16,   0,  c16v,   c16,    c16,   "Commodore Business Machines",  "Commodore 116 (PAL, VC1541)", 0 )
+COMP( 1984, c116,     c16,   0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 116 (PAL)", 0)
+COMP( 1984, c116c,    c16,   0,  c16c,      c16,       c16,      "Commodore Business Machines",  "Commodore 116 (PAL, 1551)", 0 )
+COMP( 1984, c116v,    c16,   0,  c16v,      c16,       c16,      "Commodore Business Machines",  "Commodore 116 (PAL, VC1541)", 0 )
 
-COMP( 1984, plus4,   c16,   0,  plus4,  plus4,  c16,   "Commodore Business Machines",  "Commodore Plus/4 (NTSC)", 0)
-COMP( 1984, plus4c,  c16,   0,  plus4c, plus4,  c16,   "Commodore Business Machines",  "Commodore Plus/4 (NTSC, 1551)", 0 )
-COMP( 1984, plus4v,  c16,   0,  plus4v, plus4,  c16,   "Commodore Business Machines",  "Commodore Plus/4 (NTSC, VC1541)", 0)
+COMP( 1984, plus4,    c16,   0,  plus4,     plus4,     plus4,    "Commodore Business Machines",  "Commodore Plus/4 (NTSC)", 0)
+COMP( 1984, plus4c,   c16,   0,  plus4c,    plus4,     plus4,    "Commodore Business Machines",  "Commodore Plus/4 (NTSC, 1551)", 0 )
+COMP( 1984, plus4v,   c16,   0,  plus4v,    plus4,     plus4,    "Commodore Business Machines",  "Commodore Plus/4 (NTSC, VC1541)", 0)
 
-COMP( 1984, c232,    c16,   0,  c16,    c16,    c16,   "Commodore Business Machines",  "Commodore 232 (Prototype)", 0)
-COMP( 1984, c264,    c16,   0,  c264,   plus4,  c16,   "Commodore Business Machines",  "Commodore 264 (Prototype)", 0)
-COMP( 1984, c364,    c16,   0,  c364,   plus4,  c16,   "Commodore Business Machines",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)
+COMP( 1984, c232,     c16,   0,  c16,       c16,       c16,      "Commodore Business Machines",  "Commodore 232 (Prototype)", 0)
+COMP( 1984, c264,     c16,   0,  c264,      plus4,     plus4,    "Commodore Business Machines",  "Commodore 264 (Prototype)", 0)
+COMP( 1984, c364,     c16,   0,  c364,      plus4,     plus4,    "Commodore Business Machines",  "Commodore V364 (Prototype)", GAME_IMPERFECT_SOUND)
+
+COMP( 1984, c16sid,   c16,   0,  c16sid,    c16sid,    c16sid,   "Commodore Business Machines",  "Commodore 16 (PAL, SID Card)", GAME_UNOFFICIAL | GAME_IMPERFECT_SOUND)
+COMP( 1984, plus4sid, c16,   0,  plus4sid,  plus4sid,  plus4sid, "Commodore Business Machines",  "Commodore Plus/4 (NTSC, SID Card)", GAME_UNOFFICIAL | GAME_IMPERFECT_SOUND)

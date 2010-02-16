@@ -52,6 +52,8 @@ static UINT8 keyline[10] =
  * 7 ack input edge ready for next datum
  */
 
+static int c16_has_sid, c16_pal;
+
 static UINT8 port6529;
 
 static int lowrom, highrom;
@@ -64,23 +66,6 @@ static UINT8 *c16_memory_20000;
 static UINT8 *c16_memory_24000;
 static UINT8 *c16_memory_28000;
 static UINT8 *c16_memory_2c000;
-
-static UINT8 read_cfg1( running_machine *machine )
-{
-	UINT8 result;
-	switch (mame_get_phase(machine))
-	{
-		case MAME_PHASE_RESET:
-		case MAME_PHASE_RUNNING:
-			result = input_port_read(machine, "CFG1");
-			break;
-
-		default:
-			result = 0x00;
-			break;
-	}
-	return result;
-}
 
 /*
   ddr bit 1 port line is output
@@ -461,38 +446,40 @@ static void c16_common_driver_init( running_machine *machine )
 DRIVER_INIT( c16 )
 {
 	c16_common_driver_init(machine);
+
+	c16_has_sid = 0;
+	c16_pal = 1;
 }
 
-MACHINE_START( c16 )
+DRIVER_INIT( plus4 )
 {
-	c364_speech_init(machine);
+	c16_common_driver_init(machine);
+
+	c16_has_sid = 0;
+	c16_pal = 0;
+}
+
+DRIVER_INIT( c16sid )
+{
+	c16_common_driver_init(machine);
+
+	c16_has_sid = 1;
+	c16_pal = 1;
+}
+
+DRIVER_INIT( plus4sid )
+{
+	c16_common_driver_init(machine);
+
+	c16_has_sid = 1;
+	c16_pal = 0;
 }
 
 MACHINE_RESET( c16 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *sid = devtag_get_device(space->machine, "sid");
 
-	c364_speech_reset(machine);
-
-	if (read_cfg1(machine) & 0x80)  /* SID card present */
-	{
-		memory_install_read8_device_handler(space, sid, 0xfd40, 0xfd5f, 0, 0, sid6581_r);
-		memory_install_write8_device_handler(space, sid, 0xfd40, 0xfd5f, 0, 0, sid6581_w);
-		memory_install_read8_device_handler(space, sid, 0xfe80, 0xfe9f, 0, 0, sid6581_r);
-		memory_install_write8_device_handler(space, sid, 0xfe80, 0xfe9f, 0, 0, sid6581_w);
-	}
-	else
-	{
-		memory_nop_readwrite(space, 0xfd40, 0xfd5f, 0, 0);
-		memory_nop_readwrite(space, 0xfe80, 0xfe9f, 0, 0);
-	}
-
-#if 0
-	c16_switch_to_rom (0, 0);
-	c16_select_roms (0, 0);
-#endif
-	if ((read_cfg1(machine) & 0x0c) == 0x00)		/* is it C16? */
+	if (c16_pal)
 	{
 		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + (0x4000 % messram_get_size(devtag_get_device(machine, "messram"))));
 
@@ -512,6 +499,63 @@ MACHINE_RESET( c16 )
 	}
 }
 
+#if 0
+// FIXME
+// in very old MESS versions, we had these handlers to enable SID writes to 0xd400. 
+// would a real SID Card allow for this? If not, this should be removed completely
+static WRITE8_HANDLER( c16_sidcart_16k )
+{
+	running_device *sid = devtag_get_device(space->machine, "sid");
+
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x1400 + offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x5400 + offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x9400 + offset] = data;
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[0xd400 + offset] = data;
+
+	sid6581_w(sid, offset, data);
+}
+
+static WRITE8_HANDLER( c16_sidcart_64k )
+{
+	running_device *sid = devtag_get_device(space->machine, "sid");
+
+	messram_get_ptr(devtag_get_device(space->machine, "messram"))[0xd400 + offset] = data;
+
+	sid6581_w(sid, offset, data);
+}
+
+static TIMER_CALLBACK( c16_sidhack_tick )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	if (input_port_read_safe(machine, "SID", 0x00) & 0x02)
+	{
+		if (c16_pal)
+			memory_install_write8_handler(space, 0xd400, 0xd41f, 0, 0, c16_sidcart_16k);
+		else
+			memory_install_write8_handler(space, 0xd400, 0xd41f, 0, 0, c16_sidcart_64k);
+	}
+	else
+	{
+		memory_unmap_write(space, 0xd400, 0xd41f, 0, 0);
+	}
+}
+#endif
+
+static TIMER_CALLBACK( c16_sidcard_tick )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	running_device *sid = devtag_get_device(machine, "sid");
+
+	if (input_port_read_safe(machine, "SID", 0x00) & 0x01)
+	{
+		memory_install_readwrite8_device_handler(space, sid, 0xfe80, 0xfe9f, 0, 0, sid6581_r, sid6581_w);
+	}
+	else
+	{
+		memory_install_readwrite8_device_handler(space, sid, 0xfd40, 0xfd5f, 0, 0, sid6581_r, sid6581_w);
+	}
+}
 
 INTERRUPT_GEN( c16_frame_interrupt )
 {
@@ -532,7 +576,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 		keyline[i] = value;
 	}
 
-	if (input_port_read(device->machine, "DSW0") & 0x80)
+	if (input_port_read(device->machine, "CTRLSEL") & 0x01)
 	{
 		value = 0xff;
 		if (input_port_read(device->machine, "JOY0") & 0x10)			/* Joypad1_Button */
@@ -551,7 +595,7 @@ INTERRUPT_GEN( c16_frame_interrupt )
 			keyline[8] = value;
 	}
 
-	if (input_port_read(device->machine, "DSW0") & 0x40)
+	if (input_port_read(device->machine, "CTRLSEL") & 0x10)
 	{
 		value = 0xff;
 		if (input_port_read(device->machine, "JOY1") & 0x10)			/* Joypad2_Button */
@@ -572,6 +616,16 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 	ted7360_frame_interrupt_gen(ted7360);
 
+	if (c16_has_sid)
+	{
+		/* if we are emulating the SID card, check which memory area should be accessed */
+		timer_set(device->machine, attotime_zero, NULL, 0, c16_sidcard_tick);
+#if 0
+		/* if we are emulating the SID card, check if writes to 0xd400 have been enabled */
+		timer_set(device->machine, attotime_zero, NULL, 0, c16_sidhack_tick);
+#endif
+	}
+
 	set_led_status(device->machine, 1, input_port_read(device->machine, "SPECIAL") & 0x80 ? 1 : 0);		/* Shift Lock */
 	set_led_status(device->machine, 0, input_port_read(device->machine, "SPECIAL") & 0x40 ? 1 : 0);		/* Joystick Swap */
 }
@@ -590,7 +644,7 @@ static DEVICE_IMAGE_LOAD( c16_cart )
 	const char *filetype;
 	int address = 0;
 
-    /* magic lowrom at offset 7: $43 $42 $4d */
+	/* magic lowrom at offset 7: $43 $42 $4d */
 	/* if at offset 6 stands 1 it will immediatly jumped to offset 0 (0x8000) */
 	static const unsigned char magic[] = {0x43, 0x42, 0x4d};
 	unsigned char buffer[sizeof (magic)];
