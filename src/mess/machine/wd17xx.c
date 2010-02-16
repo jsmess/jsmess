@@ -1804,7 +1804,7 @@ WRITE8_DEVICE_HANDLER( wd17xx_data_w )
                    grow larger than what was written from the system. So we need
                    to take the value of data_offset when writing the track.
                                 */
-                                if (!wd17xx_dden(device))
+                                if (wd17xx_dden(device))
                                 {
                                         switch (data)
                                         {
