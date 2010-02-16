@@ -1586,7 +1586,7 @@ static floperr_t ti99_tdf_write_indexed_sector(floppy_image *floppy, int head, i
 static floperr_t ti99_tdf_find_indexed_sector(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, void *buffer, unsigned long *flags) 
 {
 	/* Read track, head */
-	int byte;
+	int byte = 0;
 	struct ti99dsk_tag *tag = (ti99dsk_tag*)floppy_tag(floppy); 
 	UINT8 *track_data;
 	int imgtrack = track;
@@ -1731,7 +1731,7 @@ static floperr_t ti99_tdf_read_indexed_sector(floppy_image *floppy, int head, in
 static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 	struct ti99dsk_geometry *geometry)
 {
-	int idamcnt, state, track, head, i, totalseclen, format, byte, tracklength, trackadd;
+	int idamcnt, state, track, head, i, totalseclen = 0, format = 0, byte, tracklength, trackadd = 0;
 	int first_idam = 0;
 	UINT8 *track_data;
 	int offset;
