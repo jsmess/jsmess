@@ -939,9 +939,8 @@ INPUT_PORTS_END
  *  - vic_keyboard: basic Vic 20 keyboard
  *  - vic_special: input port for the Shift Lock Switch
  *  - vic_controls: joypads and paddles
- *  - vic_expansion: RAM expansions
  *  - VIC20 also has 2 lightpen ports, vic_lightpen_6560 & vic_lightpen_6561
- *          currently in vc20.c (they need visible area parameters for centering)
+ *          currently in vic20.c (they need visible area parameters for centering)
  *
  **********************************************************************************/
 
@@ -1107,31 +1106,4 @@ INPUT_PORTS_START( vic_controls )
 
 	PORT_START( "PADDLE1" )
 	PORT_BIT( 0xff,128,IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0,255) PORT_CATEGORY(11) PORT_CODE_DEC(KEYCODE_END) PORT_CODE_INC(KEYCODE_PGDN) PORT_PLAYER(2) PORT_REVERSE
-INPUT_PORTS_END
-
-
-INPUT_PORTS_START( vic_expansion )
-	PORT_START( "EXP" )
-	PORT_DIPNAME( 0x07, 0x00, "RAM Cartridge")
-	PORT_DIPSETTING(	0x00, DEF_STR( None ) )
-	PORT_DIPSETTING(	0x01, "3k" )
-	PORT_DIPSETTING(	0x02, "8k" )
-	PORT_DIPSETTING(	0x03, "16k" )
-	PORT_DIPSETTING(	0x04, "32k" )
-	PORT_DIPSETTING(	0x05, "Custom" )
-	PORT_DIPNAME( 0x08, 0x00, "RAM at 0x0400")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x10, 0x00, "RAM at 0x2000")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "RAM at 0x4000")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x00, "RAM at 0x6000")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x00, "RAM at 0xa000")
-	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( Yes ) )
 INPUT_PORTS_END

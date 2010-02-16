@@ -45,7 +45,6 @@ INPUT_PORTS_EXTERN( cbmb_special );
 INPUT_PORTS_EXTERN( vic_keyboard );
 INPUT_PORTS_EXTERN( vic_special );
 INPUT_PORTS_EXTERN( vic_controls );
-INPUT_PORTS_EXTERN( vic_expansion );
 
 
 #endif /* CBMIPT_H_ */

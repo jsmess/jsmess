@@ -698,6 +698,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_DRIVERS)/pet.o		\
 	$(MESS_MACHINE)/pet.o		\
 	$(MESS_DRIVERS)/c64.o		\
+	$(MESS_AUDIO)/vic6560.o		\
 	$(MESS_DRIVERS)/vic20.o		\
 	$(MESS_MACHINE)/vic1112.o	\
 	$(MESS_AUDIO)/ted7360.o		\
@@ -710,9 +711,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_VIDEO)/cbmb.o		\
 	$(MESS_DRIVERS)/c65.o		\
 	$(MESS_DRIVERS)/c128.o		\
-	$(MESS_AUDIO)/vic6560.o		\
 	$(MESS_VIDEO)/ted7360.o		\
-	$(MESS_VIDEO)/vic6560.o		\
 	$(MESS_MACHINE)/cbmiec.o	\
 	$(MESS_MACHINE)/c1541.o		\
 	$(MESS_MACHINE)/c1551.o		\

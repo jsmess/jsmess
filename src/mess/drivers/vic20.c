@@ -1,5 +1,59 @@
 /*
 
+[CBM systems which belong to this driver (info to be moved to sysinfo.dat soon)]
+(most of the informations are taken from http://www.zimmers.net/cbmpics/ )
+
+
+* VIC-1001 (1981, Japan)
+
+  The first model released was the Japanese one. It featured support for the
+Japanese katakana character.
+
+CPU: MOS Technology 6502 (1.01 MHz)
+RAM: 5 kilobytes (Expanded to 21k though an external 16k unit)
+ROM: 20 kilobytes
+Video: MOS Technology 6560 "VIC"(Text: 22 columns, 23 rows; Hires: 176x184
+pixels bitmapped; 8 text colors, 16 background colors)
+Sound: MOS Technology 6560 "VIC" (3 voices -square wave-, noise and volume)
+Ports: 6522 VIA x2 (1 Joystick/Mouse port; CBM Serial port; 'Cartridge /
+    Game / Expansion' port; CBM Monitor port; CBM 'USER' port; Power and
+    reset switches; Power connector)
+Keyboard: Full-sized QWERTY 66 key (8 programmable function keys; 2 sets of
+    Keyboardable graphic characters; 2 key direction cursor-pad)
+
+
+* VIC 20 (1981)
+
+  This system was the first computer to sell more than one million units
+worldwide. It was sold both in Europe and in the US. In Germany the
+computer was renamed as VC 20 (apparently, it stands for 'VolksComputer'
+
+CPU: MOS Technology 6502A (1.01 MHz)
+RAM: 5 kilobytes (Expanded to 32k)
+ROM: 20 kilobytes
+Video: MOS Technology 6560 "VIC"(Text: 22 columns, 23 rows; Hires: 176x184
+pixels bitmapped; 8 text colors, 16 background colors)
+Sound: MOS Technology 6560 "VIC" (3 voices -square wave-, noise and volume)
+Ports: 6522 VIA x2 (1 Joystick/Mouse port; CBM Serial port; 'Cartridge /
+    Game / Expansion' port; CBM Monitor port; CBM 'USER' port; Power and
+    reset switches; Power connector)
+Keyboard: Full-sized QWERTY 66 key (8 programmable function keys; 2 sets of
+    Keyboardable graphic characters; 2 key direction cursor-pad)
+
+
+* VIC 21 (1983)
+
+  It consists of a VIC 20 with built-in RAM expansion, to reach a RAM
+  capability of 21 kilobytes.
+
+
+* VIC 20CR
+
+  CR stands for Cost Reduced, as it consisted of a board with only 2 (larger)
+block of RAM instead of 8.
+
+*******************************************************************************
+
     TODO:
 
     - C1540 is unreliable (VIA timing issues?)
@@ -29,7 +83,9 @@
 #include "machine/cbmiec.h"
 #include "machine/ieee488.h"
 #include "machine/vic1112.h"
-#include "video/vic6560.h"
+#include "machine/cbmipt.h"
+#include "audio/vic6560.h"
+#include "sound/dac.h"
 
 /* Memory Maps */
 
@@ -43,7 +99,7 @@ static ADDRESS_MAP_START( vic20_mem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x4000, 0x5fff) BLK2
 //  AM_RANGE(0x6000, 0x7fff) BLK3
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
-	AM_RANGE(0x9000, 0x900f) AM_READWRITE(vic6560_port_r, vic6560_port_w)
+	AM_RANGE(0x9000, 0x900f) AM_DEVREADWRITE(M6560_TAG, vic6560_port_r, vic6560_port_w)
 	AM_RANGE(0x9110, 0x911f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
 	AM_RANGE(0x9120, 0x912f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM
@@ -55,158 +111,59 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-static CUSTOM_INPUT( vic_custom_inputs )
-{
-	int bit_mask = (FPTR)param;
-	UINT8 port = 0;
+#ifdef UNUSED_FUNCTION
+static INPUT_PORTS_START( vic_lightpen_6560 )
+	PORT_START( "LIGHTX" )
+	PORT_BIT( 0xff, 0, IPT_PADDLE ) PORT_NAME("Lightpen X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(VIC6560_MAME_XSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
 
-	if ((input_port_read(field->port->machine, "CTRLSEL") & 0xf0) == 0x10)
-		port |= (input_port_read(field->port->machine, "FAKE0") & bit_mask) ? 1 : 0;
+	PORT_START( "LIGHTY" )
+	PORT_BIT( 0xff, 0, IPT_PADDLE ) PORT_NAME("Lightpen Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(VIC6560_MAME_YSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
+INPUT_PORTS_END
 
-	if ((input_port_read(field->port->machine, "CTRLSEL") & 0xf0) == 0x00)
-		port |= (input_port_read(field->port->machine, "FAKE1") & bit_mask) ? 1 : 0;
 
-	return port;
-}
+static INPUT_PORTS_START( vic_lightpen_6561 )
+	PORT_START( "LIGHTX" )
+	PORT_BIT( 0xff, 0, IPT_PADDLE ) PORT_NAME("Lightpen X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(VIC6560_MAME_XSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
+
+	PORT_START( "LIGHTY" )
+	PORT_BIT( 0x1ff, 0, IPT_PADDLE ) PORT_NAME("Lightpen Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(VIC6561_MAME_YSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
+INPUT_PORTS_END
+#endif
 
 static INPUT_PORTS_START( vic20 )
-	PORT_START("ROW0")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Del Inst") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8) PORT_CHAR(UCHAR_MAMEKEY(INSERT))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('\xA3')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('+')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9') PORT_CHAR(')')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5') PORT_CHAR('%')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3') PORT_CHAR('#')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1') PORT_CHAR('!')
+	PORT_INCLUDE( vic_keyboard )       /* ROW0 -> ROW7 */
 
-	PORT_START("ROW1")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Return") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('*')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x90") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(0x2190)
+	PORT_INCLUDE( vic_special )        /* SPECIAL */
 
-	PORT_START("ROW2")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Right Left") PORT_CODE(KEYCODE_RCONTROL) PORT_CHAR(UCHAR_MAMEKEY(RIGHT)) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(';') PORT_CHAR(']')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_CHAR(UCHAR_SHIFT_2)
-
-	PORT_START("ROW3")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Crsr Down Up") PORT_CODE(KEYCODE_RALT) PORT_CHAR(UCHAR_MAMEKEY(DOWN)) PORT_CHAR(UCHAR_MAMEKEY(UP))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/') PORT_CHAR('?')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Shift (Left)") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Stop Run") PORT_CODE(KEYCODE_HOME)
-
-	PORT_START("ROW4")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1)) PORT_CHAR(UCHAR_MAMEKEY(F2))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Shift (Right)") PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.') PORT_CHAR('>')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
-
-	PORT_START("ROW5")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F3)) PORT_CHAR(UCHAR_MAMEKEY(F4))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('=')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(':') PORT_CHAR('[')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CBM") PORT_CODE(KEYCODE_LCONTROL)
-
-	PORT_START("ROW6")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHAR(UCHAR_MAMEKEY(F6))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91  Pi") PORT_CODE(KEYCODE_DEL) PORT_CHAR(0x2191) PORT_CHAR(0x03C0)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CHAR('@')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
-
-	PORT_START("ROW7")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F7)) PORT_CHAR(UCHAR_MAMEKEY(F8))
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Home  Clr") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(HOME))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('-')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6') PORT_CHAR('&')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4') PORT_CHAR('$')
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2') PORT_CHAR('"')
-
-	PORT_START( "SPECIAL" )  /* special keys */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Restore") PORT_CODE(KEYCODE_PRTSCR) PORT_WRITE_LINE_DEVICE(M6522_0_TAG, via_ca1_w)
-	PORT_DIPNAME( 0x01, 0x00, "Shift Lock (switch)") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( On ) )
-
-	PORT_START( "CTRLSEL" )
-	PORT_CATEGORY_CLASS( 0xf0, 0x00, DEF_STR( Controller ) )
-	PORT_CATEGORY_ITEM( 0x00, DEF_STR( Joystick ), 10 )
-	PORT_CATEGORY_ITEM( 0x10, "Paddles", 11 )
-	PORT_CATEGORY_ITEM( 0x20, "Lightpen", 12 )
-
-	PORT_START( "JOY" )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vic_custom_inputs, (void *)0x02)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Lightpen Signal") PORT_CODE(KEYCODE_LALT) PORT_CATEGORY(12)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vic_custom_inputs, (void *)0x01)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_CATEGORY(10)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_CATEGORY(10)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_CATEGORY(10)
-
-	PORT_START( "FAKE0" )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Paddle 2 Button") PORT_CODE(KEYCODE_DEL) PORT_CATEGORY(11)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Paddle 1 Button") PORT_CODE(KEYCODE_INSERT) PORT_CATEGORY(11)
-
-	PORT_START( "FAKE1" )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_CATEGORY(10)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CATEGORY(10)
-
-	PORT_START( "PADDLE0" )
-	PORT_BIT( 0xff,128,IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0,255) PORT_CATEGORY(11) PORT_CODE_DEC(KEYCODE_HOME) PORT_CODE_INC(KEYCODE_PGUP) PORT_REVERSE
-
-	PORT_START( "PADDLE1" )
-	PORT_BIT( 0xff,128,IPT_PADDLE) PORT_SENSITIVITY(30) PORT_KEYDELTA(20) PORT_MINMAX(0,255) PORT_CATEGORY(11) PORT_CODE_DEC(KEYCODE_END) PORT_CODE_INC(KEYCODE_PGDN) PORT_PLAYER(2) PORT_REVERSE
+	PORT_INCLUDE( vic_controls )       /* CTRLSEL, JOY, FAKE0, FAKE1, PADDLE0, PADDLE1 */
 INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( vic1001 )
+	PORT_INCLUDE( vic20 )
+
+	PORT_MODIFY( "ROW0" )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('\xA5')
+INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( vic20s )
 	PORT_INCLUDE( vic20 )
 
 	PORT_MODIFY( "ROW0" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR(':') PORT_CHAR('*')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH2)		PORT_CHAR(':') PORT_CHAR('*')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS)			PORT_CHAR('-')
 	PORT_MODIFY( "ROW1" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('@')
-
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE)		PORT_CHAR('@')
 	PORT_MODIFY( "ROW2" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(0x00C4)
-
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)			PORT_CHAR(0x00C4)
 	PORT_MODIFY( "ROW5" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(';') PORT_CHAR('+')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(0x00D6)
-
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)		PORT_CHAR(';') PORT_CHAR('+')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)			PORT_CHAR(0x00D6)
 	PORT_MODIFY( "ROW6" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR(0x00C5)
-
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)		PORT_CHAR(0x00C5)
 	PORT_MODIFY( "ROW7" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('=')
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS)			PORT_CHAR('=')
 INPUT_PORTS_END
 
 /* VIA 0 Interface */
@@ -511,9 +468,53 @@ static int vic6560_dma_read( running_machine *machine, int offset )
 	return memory_read_byte(program, VIC6560ADDR2VC20ADDR(offset));
 }
 
+static UINT8 vic20_lightx_cb( running_machine *machine )
+{
+	return (input_port_read_safe(machine, "LIGHTX", 0) & ~0x01);
+}
+
+static UINT8 vic20_lighty_cb( running_machine *machine )
+{
+	return (input_port_read_safe(machine, "LIGHTY", 0) & ~0x01);
+}
+
+static UINT8 vic20_lightbut_cb( running_machine *machine )
+{
+	return (((input_port_read(machine, "CTRLSEL") & 0xf0) == 0x20) && (input_port_read(machine, "JOY") & 0x40));
+}
+
+static UINT8 vic20_paddle0_cb( running_machine *machine )
+{
+	return input_port_read(machine, "PADDLE0");
+}
+
+static UINT8 vic20_paddle1_cb( running_machine *machine )
+{
+	return input_port_read(machine, "PADDLE1");
+}
+
+static const vic656x_interface vic20_6560_intf =
+{
+	"screen",	/* screen */
+	VIC6560,
+	vic20_lightx_cb, vic20_lighty_cb, vic20_lightbut_cb,	/* lightgun cb */
+	vic20_paddle0_cb, vic20_paddle1_cb,		/* paddle cb */
+	vic6560_dma_read, vic6560_dma_read_color	/* DMA */
+};
+
+static const vic656x_interface vic20_6561_intf =
+{
+	"screen",	/* screen */
+	VIC6561,
+	vic20_lightx_cb, vic20_lighty_cb, vic20_lightbut_cb,	/* lightgun cb */
+	vic20_paddle0_cb, vic20_paddle1_cb,		/* paddle cb */
+	vic6560_dma_read, vic6560_dma_read_color	/* DMA */
+};
+
+
 /* Machine Initialization */
 
-static MACHINE_START( vic20_common )
+static MACHINE_START( vic20 )
 {
 	vic20_state *state = (vic20_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
@@ -524,6 +525,7 @@ static MACHINE_START( vic20_common )
 	state->iec = devtag_get_device(machine, IEC_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 	state->cassette_timer = devtag_get_device(machine, TIMER_C1530_TAG);
+	state->vic6560 = devtag_get_device(machine, M6560_TAG);
 
 	/* set VIA clocks */
 	state->via0->set_clock(cputag_get_clock(machine, M6502_TAG));
@@ -549,21 +551,6 @@ static MACHINE_START( vic20_common )
 	state_save_register_global(machine, state->key_col);
 }
 
-static MACHINE_START( vic20_ntsc )
-{
-	MACHINE_START_CALL(vic20_common);
-
-	/* initialize VIC6560 */
-	vic6560_init(vic6560_dma_read, vic6560_dma_read_color);
-}
-
-static MACHINE_START( vic20_pal )
-{
-	MACHINE_START_CALL(vic20_common);
-
-	/* initialize VIC6561 */
-	vic6561_init(vic6560_dma_read, vic6560_dma_read_color);
-}
 
 /* Cartridge */
 
@@ -608,7 +595,45 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 	return INIT_PASS;
 }
 
+/* Graphics Definitions and Video Emulation */
+
+static const unsigned char vic6560_palette[] =
+{
+/* ripped from vice, a very excellent emulator */
+/* black, white, red, cyan */
+	0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xf0, 0x00, 0x00, 0x00, 0xf0, 0xf0,
+/* purple, green, blue, yellow */
+	0x60, 0x00, 0x60, 0x00, 0xa0, 0x00, 0x00, 0x00, 0xf0, 0xd0, 0xd0, 0x00,
+/* orange, light orange, pink, light cyan, */
+	0xc0, 0xa0, 0x00, 0xff, 0xa0, 0x00, 0xf0, 0x80, 0x80, 0x00, 0xff, 0xff,
+/* light violett, light green, light blue, light yellow */
+	0xff, 0x00, 0xff, 0x00, 0xff, 0x00, 0x00, 0xa0, 0xff, 0xff, 0xff, 0x00
+};
+
+static PALETTE_INIT( vic20 )
+{
+	int i;
+
+	for (i = 0; i < sizeof(vic6560_palette) / 3; i++)
+	{
+		palette_set_color_rgb(machine, i, vic6560_palette[i * 3], vic6560_palette[i * 3 + 1], vic6560_palette[i * 3 + 2]);
+	}
+}
+
+static VIDEO_UPDATE( vic20 )
+{
+	vic20_state *state = (vic20_state *)screen->machine->driver_data;
+	vic656x_video_update(state->vic6560, bitmap, cliprect);
+	return 0;
+}
+
 /* Machine Driver */
+
+INTERRUPT_GEN( vic20_raster_interrupt )
+{
+	vic20_state *state = (vic20_state *)device->machine->driver_data;
+	vic656x_raster_interrupt_gen(state->vic6560);
+}
 
 static MACHINE_DRIVER_START( vic20_common )
 	MDRV_DRIVER_DATA(vic20_state)
@@ -643,28 +668,62 @@ static MACHINE_DRIVER_START( vic20_ntsc )
 	MDRV_IMPORT_FROM( vic20_common )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(M6502_TAG, M6502, VIC6560_CLOCK)
-    MDRV_CPU_PROGRAM_MAP(vic20_mem)
-	MDRV_CPU_PERIODIC_INT(vic656x_raster_interrupt, VIC656X_HRETRACERATE)
+	MDRV_CPU_ADD(M6502_TAG, M6502, VIC6560_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(vic20_mem)
+	MDRV_CPU_PERIODIC_INT(vic20_raster_interrupt, VIC656X_HRETRACERATE)
 
-    MDRV_MACHINE_START(vic20_ntsc)
+	MDRV_MACHINE_START(vic20)
 
-    /* video & sound hardware */
-	MDRV_IMPORT_FROM( vic6560_video )
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(VIC6560_VRETRACERATE)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE((VIC6560_XSIZE + 7) & ~7, VIC6560_YSIZE)
+	MDRV_SCREEN_VISIBLE_AREA(VIC6560_MAME_XPOS, VIC6560_MAME_XPOS + VIC6560_MAME_XSIZE - 1, VIC6560_MAME_YPOS, VIC6560_MAME_YPOS + VIC6560_MAME_YSIZE - 1)
+
+	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_INIT( vic20 )
+
+	MDRV_VIDEO_UPDATE( vic20 )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_VIC656X_ADD(M6560_TAG, vic20_6560_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vic20_pal )
 	MDRV_IMPORT_FROM( vic20_common )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(M6502_TAG, M6502, VIC6561_CLOCK)
-    MDRV_CPU_PROGRAM_MAP(vic20_mem)
-	MDRV_CPU_PERIODIC_INT(vic656x_raster_interrupt, VIC656X_HRETRACERATE)
+	MDRV_CPU_ADD(M6502_TAG, M6502, VIC6561_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(vic20_mem)
+	MDRV_CPU_PERIODIC_INT(vic20_raster_interrupt, VIC656X_HRETRACERATE)
 
-	MDRV_MACHINE_START(vic20_pal)
+	MDRV_MACHINE_START(vic20)
 
-    /* video & sound hardware */
-	MDRV_IMPORT_FROM( vic6561_video )
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(VIC6561_VRETRACERATE)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE((VIC6561_XSIZE + 7) & ~7, VIC6561_YSIZE)
+	MDRV_SCREEN_VISIBLE_AREA(VIC6561_MAME_XPOS, VIC6561_MAME_XPOS + VIC6561_MAME_XSIZE - 1, VIC6561_MAME_YPOS, VIC6561_MAME_YPOS + VIC6561_MAME_YSIZE - 1)
+
+	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_INIT( vic20 )
+
+	MDRV_VIDEO_UPDATE( vic20 )
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_VIC656X_ADD(M6560_TAG, vic20_6561_intf)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -699,8 +758,8 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY                         FULLNAME                    FLAGS */
-COMP( 1980, vic1001,	0,			0,		vic20_ntsc,	vic20,	0,		"Commodore Business Machines",	"VIC-1001 (Japan)",			GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20,		vic1001,	0,		vic20_ntsc,	vic20,	0,		"Commodore Business Machines",	"VIC-20 (NTSC)",			GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20p,		vic1001,	0,		vic20_pal,	vic20,	0,		"Commodore Business Machines",	"VIC-20 / VC-20 (PAL)",		GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-COMP( 1981, vic20s,		vic1001,	0,		vic20_pal,	vic20s,	0,		"Commodore Business Machines",	"VIC-20 (Sweden/Finland)",	GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT        INIT        COMPANY                             FULLNAME                    FLAGS */
+COMP( 1980, vic1001,    0,          0,      vic20_ntsc,  vic1001,    0,          "Commodore Business Machines",      "VIC-1001 (Japan)",         GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20,      vic1001,    0,      vic20_ntsc,  vic20,      0,          "Commodore Business Machines",      "VIC-20 (NTSC)",            GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20p,     vic1001,    0,      vic20_pal,   vic20,      0,          "Commodore Business Machines",      "VIC-20 / VC-20 (PAL)",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+COMP( 1981, vic20s,     vic1001,    0,      vic20_pal,   vic20s,     0,          "Commodore Business Machines",      "VIC-20 (Sweden/Finland)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
