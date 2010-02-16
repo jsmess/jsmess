@@ -390,7 +390,7 @@ static MACHINE_DRIVER_START( kc85_3 )
 	MDRV_MACHINE_START( kc85 )
 	MDRV_MACHINE_RESET( kc85_3 )
 
-	MDRV_Z80PIO_ADD( "z80pio", kc85_pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio", 1379310.344828, kc85_pio_intf )
 	MDRV_Z80CTC_ADD( "z80ctc", 1379310.344828, kc85_ctc_intf )
 
 	/* video hardware */

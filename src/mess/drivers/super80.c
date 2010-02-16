@@ -643,7 +643,7 @@ static MACHINE_DRIVER_START( super80 )
 
 	MDRV_MACHINE_RESET( super80 )
 
-	MDRV_Z80PIO_ADD( "z80pio", super80_pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(48.8)
@@ -710,7 +710,7 @@ static MACHINE_DRIVER_START( super80v )
 
 	MDRV_MACHINE_RESET( super80 )
 
-	MDRV_Z80PIO_ADD( "z80pio", super80_pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio", MASTER_CLOCK/6, super80_pio_intf )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)

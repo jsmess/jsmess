@@ -42,6 +42,8 @@ Skeleton drivers:
 System Driver Changes:
 ----------------------
 
+- [ABC80] Partially fixed keyboard input. [Curt Coder]
+
 - [APEXC] Fixed disassembly in the debugger. [Robbbert]
 
 - [C16] Connected Commodore 1551 floppy drive. [Curt Coder]
@@ -86,7 +88,7 @@ Source Changes:
 - The core is based on MAME 0.136u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
-- [CIA6526] Refactored interface, added SP/CNT callbacks, and fixed serial
+- Refactored MOS6526 CIA interface, added SP/CNT callbacks, and fixed serial
   port transfer. [Curt Coder]
 
 - Cleanups for driver_data and Standard C library usage.  [Atari Ace]

@@ -108,34 +108,6 @@ const z80pio_interface kayproii_pio_s_intf =
 	DEVCB_NULL			/* portB ready active callback */
 };
 
-READ8_DEVICE_HANDLER( kayproii_pio_r )
-{
-	if (!offset)
-		return z80pio_d_r(device, 0);
-	else
-	if (offset == 1)
-		return z80pio_c_r(device, 0);
-	else
-	if (offset == 2)
-		return z80pio_d_r(device, 1);
-	else
-		return z80pio_c_r(device, 1);
-}
-
-WRITE8_DEVICE_HANDLER( kayproii_pio_w )
-{
-	if (!offset)
-		z80pio_d_w(device, 0, data);
-	else
-	if (offset == 1)
-		z80pio_c_w(device, 0, data);
-	else
-	if (offset == 2)
-		z80pio_d_w(device, 1, data);
-	else
-		z80pio_c_w(device, 1, data);
-}
-
 /***********************************************************
 
     KAYPRO2X SYSTEM PORT

@@ -28,9 +28,7 @@ extern const z80pio_interface mbee_z80pio_intf;
 MACHINE_RESET( mbee );
 
 READ8_HANDLER ( mbee_fdc_status_r );
-READ8_DEVICE_HANDLER( mbee_pio_r );
 WRITE8_HANDLER ( mbee_fdc_motor_w );
-WRITE8_DEVICE_HANDLER( mbee_pio_w );
 INTERRUPT_GEN( mbee_interrupt );
 Z80BIN_EXECUTE( mbee );
 QUICKLOAD_LOAD( mbee );

@@ -140,7 +140,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define VERBOSE			0	/* General logging */
+#define VERBOSE			1	/* General logging */
 #define VERBOSE_DATA	0	/* Logging of each byte during read and write */
 
 #define DELAY_ERROR		3

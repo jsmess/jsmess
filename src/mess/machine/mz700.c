@@ -599,10 +599,10 @@ const z80pio_interface mz800_z80pio_config =
 {
 	DEVCB_LINE(mz800_z80pio_irq),
 	DEVCB_HANDLER(mz800_z80pio_port_a_r),
-	DEVCB_NULL,
 	DEVCB_HANDLER(mz800_z80pio_port_a_w),
-	DEVCB_HANDLER(mz800_printer_data_w),
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER(mz800_printer_data_w),
 	DEVCB_NULL,
 };
 

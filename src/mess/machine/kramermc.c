@@ -30,13 +30,13 @@ static WRITE8_DEVICE_HANDLER (kramermc_port_a_w)
 	kramermc_key_row = ((data >> 1) & 0x07);
 }
 
-const z80pio_interface kramermc_z80pio_intf =
+Z80PIO_INTERFACE( kramermc_z80pio_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_HANDLER(kramermc_port_a_r),
-	DEVCB_HANDLER(kramermc_port_b_r),
 	DEVCB_HANDLER(kramermc_port_a_w),
 	DEVCB_NULL,
+	DEVCB_HANDLER(kramermc_port_b_r),
 	DEVCB_NULL,
 	DEVCB_NULL
 };

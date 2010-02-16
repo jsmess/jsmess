@@ -224,24 +224,24 @@ static READ8_DEVICE_HANDLER (llc2_port_a_r)
 }
 
 
-const z80pio_interface llc2_z80pio_intf =
+Z80PIO_INTERFACE( llc2_z80pio_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_HANDLER(llc2_port_a_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_HANDLER(llc2_port_b_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };
 
-const z80pio_interface llc1_z80pio_intf =
+Z80PIO_INTERFACE( llc1_z80pio_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_HANDLER(llc1_port_a_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_HANDLER(llc1_port_b_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };

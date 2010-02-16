@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( nascom1_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
 	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w )
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w )
 ADDRESS_MAP_END
 
 
@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( nascom2_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READWRITE(nascom1_port_00_r, nascom1_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(nascom1_port_01_r, nascom1_port_01_w)
 	AM_RANGE(0x02, 0x02) AM_READ(nascom1_port_02_r)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w )
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w )
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("wd1793", wd17xx_r, wd17xx_w)
 	AM_RANGE(0xe4, 0xe4) AM_READWRITE(nascom2_fdc_select_r, nascom2_fdc_select_w)
 	AM_RANGE(0xe5, 0xe5) AM_READ(nascom2_fdc_status_r)
@@ -263,7 +263,7 @@ static const ay31015_config nascom1_ay31015_config =
 };
 
 
-static const z80pio_interface nascom1_z80pio_intf =
+static Z80PIO_INTERFACE( nascom1_z80pio_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -298,7 +298,7 @@ static MACHINE_DRIVER_START( nascom1 )
 
 	MDRV_AY31015_ADD( "hd6402", nascom1_ay31015_config )
 
-	MDRV_Z80PIO_ADD( "z80pio", nascom1_z80pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio", XTAL_16MHz/8, nascom1_z80pio_intf )
 
 	/* devices */
 	MDRV_SNAPSHOT_ADD("snapshot", nascom1, "nas", 0.5)

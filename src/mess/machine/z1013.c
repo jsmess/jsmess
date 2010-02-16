@@ -13,20 +13,6 @@
 static UINT8 z1013_keyboard_line;
 static UINT8 z1013_keyboard_part;
 
-/* Wires on Z80 PIO are switched */
-READ8_DEVICE_HANDLER(z1013_z80pio_r)
-{
-	if ((offset & 1) ==0) return z80pio_d_r(device, offset >> 1); else return z80pio_c_r(device, offset >> 1);
-}
-
-WRITE8_DEVICE_HANDLER(z1013_z80pio_w)
-{
-	if ((offset & 1) ==0)
-		z80pio_d_w(device, offset >> 1, data);
-	else
-		z80pio_c_w(device, offset >> 1, data);
-}
-
 /* Driver initialization */
 DRIVER_INIT(z1013)
 {
@@ -65,10 +51,10 @@ const z80pio_interface z1013_z80pio_intf =
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_HANDLER(z1013_port_b_r),
-	DEVCB_NULL,
 	DEVCB_HANDLER(z1013_port_b_w),
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -81,9 +67,9 @@ const z80pio_interface z1013k7659_z80pio_intf =
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_HANDLER(z1013k7659_port_b_r),
-	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL
 };

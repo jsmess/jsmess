@@ -64,8 +64,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( poly880_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xaf)
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_alt_r, z80pio_alt_w)
-	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
+	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x88, 0x8b) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x0f) AM_WRITE(cldig_w)
 ADDRESS_MAP_END
@@ -229,25 +229,25 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 	cassette_output(state->cassette, BIT(data, 2) ? +1.0 : -1.0);
 }
 
-static const z80pio_interface pio1_intf =
+static Z80PIO_INTERFACE( pio1_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_NULL,						/* port A read callback */
-	DEVCB_HANDLER(pio1_port_b_r),	/* port B read callback */
 	DEVCB_HANDLER(pio1_port_a_w),	/* port A write callback */
-	DEVCB_HANDLER(pio1_port_b_w),	/* port B write callback */
 	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_HANDLER(pio1_port_b_r),	/* port B read callback */
+	DEVCB_HANDLER(pio1_port_b_w),	/* port B write callback */
 	DEVCB_NULL						/* portB ready active callback */
 };
 
-static const z80pio_interface pio2_intf =
+static Z80PIO_INTERFACE( pio2_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port B read callback */
 	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* port B write callback */
 	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL,						/* port B read callback */
+	DEVCB_NULL,						/* port B write callback */
 	DEVCB_NULL						/* portB ready active callback */
 };
 
@@ -299,8 +299,8 @@ static MACHINE_DRIVER_START( poly880 )
 
 	/* devices */
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_7_3728MHz/16, ctc_intf)
-	MDRV_Z80PIO_ADD(Z80PIO1_TAG, pio1_intf)
-	MDRV_Z80PIO_ADD(Z80PIO2_TAG, pio2_intf)
+	MDRV_Z80PIO_ADD(Z80PIO1_TAG, XTAL_7_3728MHz/16, pio1_intf)
+	MDRV_Z80PIO_ADD(Z80PIO2_TAG, XTAL_7_3728MHz/16, pio2_intf)
 
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, poly880_cassette_config)
 

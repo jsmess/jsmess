@@ -63,10 +63,10 @@ static ADDRESS_MAP_START( kayproii_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00, 0x03) AM_WRITE(kaypro_baud_a_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80sio", kaypro_sio_r, kaypro_sio_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_g", kayproii_pio_r, kayproii_pio_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("z80pio_g", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x0c, 0x0f) AM_WRITE(kayproii_baud_b_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE("wd1793", wd17xx_r, wd17xx_w)
-	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", kayproii_pio_r, kayproii_pio_w)
+	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_s", z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kaypro2x_io, ADDRESS_SPACE_IO, 8 )
@@ -252,8 +252,8 @@ static MACHINE_DRIVER_START( kayproii )
 	MDRV_QUICKLOAD_ADD("quickload", kayproii, "com,cpm", 3)
 	MDRV_WD1793_ADD("wd1793", kaypro_wd1793_interface )
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
-	MDRV_Z80PIO_ADD( "z80pio_g", kayproii_pio_g_intf )
-	MDRV_Z80PIO_ADD( "z80pio_s", kayproii_pio_s_intf )
+	MDRV_Z80PIO_ADD( "z80pio_g", 2500000, kayproii_pio_g_intf )
+	MDRV_Z80PIO_ADD( "z80pio_s", 2500000, kayproii_pio_s_intf )
 	MDRV_Z80SIO_ADD( "z80sio", 4800, kaypro_sio_intf )	/* start at 300 baud */
 
 	MDRV_FLOPPY_2_DRIVES_ADD(kayproii_floppy_config)

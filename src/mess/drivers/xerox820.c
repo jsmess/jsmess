@@ -117,9 +117,10 @@ static void xerox820_keyboard_scan(running_machine *machine)
 				if (state->keydata != keydata)
 				{
 					state->keydata = keydata;
-					//z80pio_bstb_w(state->kbpio, 0);
-					//z80pio_bstb_w(state->kbpio, 1);
-					z80pio_p_w(state->kbpio, 1, state->keydata);
+
+					/* strobe in keyboard data */
+					z80pio_bstb_w(state->kbpio, 0);
+					z80pio_bstb_w(state->kbpio, 1);
 				}
 			}
 		}
@@ -255,12 +256,12 @@ static ADDRESS_MAP_START( xerox820_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_str_w)
 	AM_RANGE(0x04, 0x04) AM_MIRROR(0xff02) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_d_r, z80sio_d_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0xff02) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_c_r, z80sio_c_w)
-	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80GPPIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80GPPIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_stt_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_DEVREADWRITE(WD1771_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0xff03) AM_MASK(0xff00) AM_WRITE(scroll_w)
 	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80KBPIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80KBPIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( xerox820ii_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -492,36 +493,36 @@ static READ8_DEVICE_HANDLER( kbpio_pb_r )
 	return state->keydata;
 };
 
-static const z80pio_interface xerox820_kbpio_intf =
+static Z80PIO_INTERFACE( xerox820_kbpio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_HANDLER(kbpio_pa_r),			/* port A read callback */
-	DEVCB_HANDLER(kbpio_pb_r),			/* port B read callback */
 	DEVCB_HANDLER(xerox820_kbpio_pa_w),	/* port A write callback */
-	DEVCB_NULL,							/* port B write callback */
 	DEVCB_NULL,							/* portA ready active callback */
+	DEVCB_HANDLER(kbpio_pb_r),			/* port B read callback */
+	DEVCB_NULL,							/* port B write callback */
 	DEVCB_LINE(kbpio_pbrdy_w)			/* portB ready active callback */
 };
 
-static const z80pio_interface xerox820ii_kbpio_intf =
+static Z80PIO_INTERFACE( xerox820ii_kbpio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_HANDLER(kbpio_pa_r),			/* port A read callback */
-	DEVCB_HANDLER(kbpio_pb_r),			/* port B read callback */
 	DEVCB_HANDLER(xerox820ii_kbpio_pa_w),	/* port A write callback */
-	DEVCB_NULL,							/* port B write callback */
 	DEVCB_NULL,							/* portA ready active callback */
+	DEVCB_HANDLER(kbpio_pb_r),			/* port B read callback */
+	DEVCB_NULL,							/* port B write callback */
 	DEVCB_LINE(kbpio_pbrdy_w)			/* portB ready active callback */
 };
 
-static const z80pio_interface gppio_intf =
+static Z80PIO_INTERFACE( gppio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_NULL,		/* port A read callback */
-	DEVCB_NULL,		/* port B read callback */
 	DEVCB_NULL,		/* port A write callback */
-	DEVCB_NULL,		/* port B write callback */
 	DEVCB_NULL,		/* portA ready active callback */
+	DEVCB_NULL,		/* port B read callback */
+	DEVCB_NULL,		/* port B write callback */
 	DEVCB_NULL		/* portB ready active callback */
 };
 
@@ -874,8 +875,8 @@ static MACHINE_DRIVER_START( xerox820 )
 
 	/* devices */
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_20MHz/8, sio_intf)
-	MDRV_Z80PIO_ADD(Z80KBPIO_TAG, xerox820_kbpio_intf)
-	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, gppio_intf)
+	MDRV_Z80PIO_ADD(Z80KBPIO_TAG, XTAL_20MHz/8, xerox820_kbpio_intf)
+	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_20MHz/8, gppio_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_20MHz/8, ctc_intf)
 	MDRV_WD1771_ADD(WD1771_TAG, wd1771_intf)
 	MDRV_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)
@@ -916,8 +917,8 @@ static MACHINE_DRIVER_START( xerox820ii )
 
 	/* devices */
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_16MHz/4, sio_intf)
-	MDRV_Z80PIO_ADD(Z80KBPIO_TAG, xerox820ii_kbpio_intf)
-	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, gppio_intf)
+	MDRV_Z80PIO_ADD(Z80KBPIO_TAG, XTAL_16MHz/4, xerox820ii_kbpio_intf)
+	MDRV_Z80PIO_ADD(Z80GPPIO_TAG, XTAL_16MHz/4, gppio_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_16MHz/4, ctc_intf)
 	MDRV_WD179X_ADD(WD1771_TAG, wd1771_intf) // WD1797
 	MDRV_FLOPPY_2_DRIVES_ADD(xerox820_floppy_config)

@@ -480,7 +480,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slow_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_alt_r, z80pio_alt_w)
+	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0xb0, 0xb3) AM_MIRROR(0x0c) AM_DEVREADWRITE(WD1791_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_WRITE(slow_status_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_WRITE(slow_ctrl_w)
@@ -626,14 +626,14 @@ static WRITE_LINE_DEVICE_HANDLER( conkort_pio_ardy_w )
 	conkort->pio_ardy = state;
 }
 
-static const z80pio_interface conkort_pio_intf =
+static Z80PIO_INTERFACE( conkort_pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* interrupt callback */
 	DEVCB_HANDLER(conkort_pio_port_a_r),	/* port A read callback */
-	DEVCB_HANDLER(conkort_pio_port_b_r),	/* port B read callback */
 	DEVCB_HANDLER(conkort_pio_port_a_w),	/* port A write callback */
-	DEVCB_HANDLER(conkort_pio_port_b_w),	/* port B write callback */
 	DEVCB_LINE(conkort_pio_ardy_w),			/* port A ready callback */
+	DEVCB_HANDLER(conkort_pio_port_b_r),	/* port B read callback */
+	DEVCB_HANDLER(conkort_pio_port_b_w),	/* port B write callback */
 	DEVCB_NULL								/* port B ready callback */
 };
 
@@ -773,7 +773,7 @@ static MACHINE_DRIVER_START( luxor_55_10828 )
 	MDRV_CPU_IO_MAP(slow_io_map)
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, conkort_pio_intf)
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, conkort_pio_intf)
 	MDRV_WD179X_ADD(WD1791_TAG, slow_wd17xx_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)

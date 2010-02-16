@@ -667,7 +667,7 @@ static ADDRESS_MAP_START( einstein_io, ADDRESS_SPACE_IO, 8 )
 	/* block 5, z80ctc */
 	AM_RANGE(0x28, 0x2b) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I058, z80ctc_r, z80ctc_w)
 	/* block 6, z80pio */
-	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I063, z80pio_r, z80pio_w)
+	AM_RANGE(0x30, 0x33) AM_MIRROR(0xff04) AM_DEVREADWRITE(IC_I063, z80pio_cd_ba_r, z80pio_cd_ba_w)
 #if 0
 	/* block 7, adc */
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff07) AM_DEVREADWRITE(IC_I050, adc0844_r, adc0844_w)
@@ -839,12 +839,12 @@ static Z80CTC_INTERFACE( einstein_ctc_intf )
 };
 
 
-static const z80pio_interface einstein_pio_intf =
+static Z80PIO_INTERFACE( einstein_pio_intf )
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_DEVICE_LINE("centronics", centronics_strobe_w),
 	DEVCB_NULL
@@ -910,7 +910,7 @@ static MACHINE_DRIVER_START( einstein )
     driver. So we update at 50Hz and hope this is good enough. */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", einstein_keyboard_timer_callback, HZ(50))
 
-	MDRV_Z80PIO_ADD(IC_I063, einstein_pio_intf)
+	MDRV_Z80PIO_ADD(IC_I063, XTAL_X002 / 2, einstein_pio_intf)
 
 	MDRV_Z80CTC_ADD(IC_I058, XTAL_X002 / 2, einstein_ctc_intf)
 	/* the input to channel 0 and 1 of the ctc is a 2 MHz clock */

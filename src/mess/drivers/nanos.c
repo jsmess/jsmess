@@ -56,25 +56,25 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 /* Z80-PIO Interface */
 
-static const z80pio_interface pio1_intf =
+static Z80PIO_INTERFACE( pio1_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port B read callback */
 	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* port B write callback */
 	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL,						/* port B read callback */
+	DEVCB_NULL,						/* port B write callback */
 	DEVCB_NULL						/* portB ready active callback */
 };
 
-static const z80pio_interface pio2_intf =
+static Z80PIO_INTERFACE( pio2_intf )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port B read callback */
 	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* port B write callback */
 	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL,						/* port B read callback */
+	DEVCB_NULL,						/* port B write callback */
 	DEVCB_NULL						/* portB ready active callback */
 };
 
@@ -112,15 +112,15 @@ static ADDRESS_MAP_START( nanos_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* CPU card */
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
 
 	/* I/O card */
-	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio_0", z80pio_r, z80pio_w)
+	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("z80pio_0", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x84, 0x84) AM_DEVREADWRITE("z80sio_0", z80sio_d_r, z80sio_d_w)
 	AM_RANGE(0x85, 0x85) AM_DEVREADWRITE("z80sio_0", z80sio_c_r, z80sio_c_w)
 	AM_RANGE(0x86, 0x86) AM_DEVREADWRITE("z80sio_0", z80sio_d_r, z80sio_d_w)
 	AM_RANGE(0x87, 0x87) AM_DEVREADWRITE("z80sio_0", z80sio_c_r, z80sio_c_w)
-	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80pio_1", z80pio_r, z80pio_w)
+	AM_RANGE(0x88, 0x8B) AM_DEVREADWRITE("z80pio_1", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x8C, 0x8F) AM_DEVREADWRITE("z80ctc_0", z80ctc_r, z80ctc_w)
 
 	/* FDC card */
@@ -417,14 +417,14 @@ static MACHINE_RESET(nanos)
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);
 }
 
-static const z80pio_interface nanos_z80pio_intf =
+static Z80PIO_INTERFACE( nanos_z80pio_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_HANDLER(nanos_port_a_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_HANDLER(nanos_port_b_r),
-	DEVCB_NULL,
 	DEVCB_HANDLER(nanos_port_b_w),
-	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -504,11 +504,11 @@ static MACHINE_DRIVER_START( nanos )
 	/* devices */
 	MDRV_Z80CTC_ADD( "z80ctc_0", XTAL_4MHz, ctc_intf)
 	MDRV_Z80CTC_ADD( "z80ctc_1", XTAL_4MHz, ctc_intf)
-	MDRV_Z80PIO_ADD( "z80pio_0", pio1_intf)
-	MDRV_Z80PIO_ADD( "z80pio_1", pio2_intf)
+	MDRV_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, pio1_intf)
+	MDRV_Z80PIO_ADD( "z80pio_1", XTAL_4MHz, pio2_intf)
 	MDRV_Z80SIO_ADD( "z80sio_0", XTAL_4MHz, sio_intf)
 	MDRV_Z80SIO_ADD( "z80sio_1", XTAL_4MHz, sio_intf)
-	MDRV_Z80PIO_ADD( "z80pio", nanos_z80pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio", XTAL_4MHz, nanos_z80pio_intf )
 	/* UPD765 */
 	MDRV_UPD765A_ADD("upd765", nanos_upd765_interface)
 

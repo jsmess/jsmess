@@ -440,7 +440,7 @@ static MACHINE_DRIVER_START( mz800 )
 	/* devices */
 	MDRV_DEVICE_REMOVE("pit8253")
 	MDRV_PIT8253_ADD("pit8253", mz800_pit8253_config)
-	MDRV_Z80PIO_ADD("z80pio", mz800_z80pio_config)
+	MDRV_Z80PIO_ADD("z80pio", XTAL_17_73447MHz/5, mz800_z80pio_config)
 	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 MACHINE_DRIVER_END
 

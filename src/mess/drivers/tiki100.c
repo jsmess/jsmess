@@ -246,7 +246,7 @@ static ADDRESS_MAP_START( tiki100_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0x03) AM_READWRITE(keyboard_r, keyboard_w)
 	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE(Z80DART_TAG, z80dart_cd_ba_r, z80dart_cd_ba_w)
-	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_r, z80pio_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0x03) AM_WRITE(video_mode_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(FD1797_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0x14, 0x14) AM_MIRROR(0x01) AM_WRITE(palette_w)
@@ -499,14 +499,14 @@ static Z80DART_INTERFACE( dart_intf )
 
 /* Z80-PIO Interface */
 
-static const z80pio_interface pio_intf =
+static Z80PIO_INTERFACE( pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port B read callback */
 	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* port B write callback */
 	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL,						/* port B read callback */
+	DEVCB_NULL,						/* port B write callback */
 	DEVCB_NULL						/* portB ready active callback */
 };
 
@@ -676,7 +676,7 @@ static MACHINE_DRIVER_START( tiki100 )
 
 	/* devices */
 	MDRV_Z80DART_ADD(Z80DART_TAG, 2000000, dart_intf)
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, pio_intf)
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, 2000000, pio_intf)
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, 2000000, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(2000000))
 	MDRV_WD179X_ADD(FD1797_TAG, tiki100_wd17xx_interface) // FD1767PL-02 or FD1797-PL

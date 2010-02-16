@@ -73,16 +73,30 @@ static WRITE8_DEVICE_HANDLER (ac1_port_a_w)
 
 static WRITE8_DEVICE_HANDLER (ac1_port_b_w)
 {
+	/*
+
+		bit		description
+
+		0
+		1		RTTY receive
+		2		RTTY transmit
+		3		RTTY PTT
+		4
+		5
+		6		cassette out
+		7		cassette in
+
+	*/
 }
 
-const z80pio_interface ac1_z80pio_intf =
+Z80PIO_INTERFACE( ac1_z80pio_intf )
 {
 	DEVCB_NULL,	/* callback when change interrupt status */
 	DEVCB_HANDLER(ac1_port_a_r),
-	DEVCB_HANDLER(ac1_port_b_r),
 	DEVCB_HANDLER(ac1_port_a_w),
-	DEVCB_HANDLER(ac1_port_b_w),
 	DEVCB_NULL,
+	DEVCB_HANDLER(ac1_port_b_r),
+	DEVCB_HANDLER(ac1_port_b_w),
 	DEVCB_NULL
 };
 

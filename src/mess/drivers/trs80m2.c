@@ -10,7 +10,8 @@
 
     TODO:
 
-    - BOOT ERROR PI 24 (Defective PIO Chip)
+	- NOT A SYSTEM DISK, RE-BOOT
+	- centronics ACK -> pio BSTB
     - Z80 daisy chain
     - keyboard CPU ROM
     - keyboard layout
@@ -327,7 +328,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_r, z80pio_w)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(FD1791_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0xef, 0xef) AM_DEVWRITE(FD1791_TAG, drvslt_w)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
@@ -654,14 +655,14 @@ static WRITE_LINE_DEVICE_HANDLER( strobe_w )
 	centronics_strobe_w(device, !state);
 }
 
-static const z80pio_interface pio_intf =
+static Z80PIO_INTERFACE( pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),				/* interrupt callback */
 	DEVCB_HANDLER(pio_pa_r),									/* port A read callback */
-	DEVCB_NULL,													/* port B read callback */
 	DEVCB_HANDLER(pio_pa_w),									/* port A write callback */
-	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	/* port B write callback */
 	DEVCB_NULL,													/* port A ready callback */
+	DEVCB_NULL,													/* port B read callback */
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	/* port B write callback */
 	DEVCB_DEVICE_LINE(CENTRONICS_TAG, strobe_w)					/* port B ready callback */
 };
 
@@ -726,6 +727,8 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 	trs80m2_state *driver_state = (trs80m2_state *)device->machine->driver_data;
 
 	driver_state->fdc_intrq = state;
+
+	z80pio_pa_w(driver_state->z80pio, 0, state);
 }
 
 static const wd17xx_interface fd1791_intf =
@@ -755,6 +758,7 @@ static MACHINE_START( trs80m2 )
 
 	/* find devices */
 	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
+	state->z80pio = devtag_get_device(machine, Z80PIO_TAG);
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
@@ -765,10 +769,13 @@ static MACHINE_START( trs80m2 )
 
 static MACHINE_RESET( trs80m2 )
 {
+	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* enable boot ROM */
 	rom_enable_w(program, 0, 1);
+
+	state->kbirq = 1;
 }
 
 /* Machine Driver */
@@ -809,7 +816,7 @@ static MACHINE_DRIVER_START( trs80m2 )
 	MDRV_Z80CTC_ADD(Z80CTC_TAG, XTAL_8MHz/2, ctc_intf)
 	MDRV_TIMER_ADD_PERIODIC("ctc", ctc_tick, HZ(XTAL_8MHz/2/2))
 	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, /* XTAL_8MHz/2, */ pio_intf)
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_config)

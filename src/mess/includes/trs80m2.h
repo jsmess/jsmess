@@ -41,6 +41,7 @@ struct _trs80m2_state
 
 	/* devices */
 	running_device *z80ctc;
+	running_device *z80pio;
 	running_device *mc6845;
 	running_device *centronics;
 	running_device *floppy;

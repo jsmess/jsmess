@@ -25,8 +25,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( c80_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_r, z80pio_w)
-	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_r, z80pio_w)
+	AM_RANGE(0x7c, 0x7f) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
+	AM_RANGE(0xbc, 0xbf) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_cd_ba_r, z80pio_cd_ba_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -191,25 +191,25 @@ static WRITE_LINE_DEVICE_HANDLER( pio1_brdy_w )
 	}
 }
 
-static const z80pio_interface pio1_intf =
+static Z80PIO_INTERFACE( pio1_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_HANDLER(pio1_port_a_r),	/* port A read callback */
-	DEVCB_NULL,						/* port B read callback */
 	DEVCB_HANDLER(pio1_port_a_w),	/* port A write callback */
-	DEVCB_HANDLER(pio1_port_b_w),	/* port B write callback */
 	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL,						/* port B read callback */
+	DEVCB_HANDLER(pio1_port_b_w),	/* port B write callback */
 	DEVCB_LINE(pio1_brdy_w)			/* portB ready active callback */
 };
 
-static const z80pio_interface pio2_intf =
+static Z80PIO_INTERFACE( pio2_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
 	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port B read callback */
 	DEVCB_NULL,						/* port A write callback */
-	DEVCB_NULL,						/* port B write callback */
 	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL,						/* port B read callback */
+	DEVCB_NULL,						/* port B write callback */
 	DEVCB_NULL						/* portB ready active callback */
 };
 
@@ -262,8 +262,8 @@ static MACHINE_DRIVER_START( c80 )
 	MDRV_DEFAULT_LAYOUT( layout_c80 )
 
 	/* devices */
-	MDRV_Z80PIO_ADD(Z80PIO1_TAG, pio1_intf)
-	MDRV_Z80PIO_ADD(Z80PIO2_TAG, pio2_intf)
+	MDRV_Z80PIO_ADD(Z80PIO1_TAG, 2500000, pio1_intf)
+	MDRV_Z80PIO_ADD(Z80PIO2_TAG, 2500000, pio2_intf)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, c80_cassette_config)
 
 	/* internal ram */

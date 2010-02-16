@@ -80,41 +80,12 @@ const z80pio_interface mbee_z80pio_intf =
 {
 	DEVCB_HANDLER(mbee_pio_interrupt),	/* callback when change interrupt status */
 	DEVCB_NULL,
-	DEVCB_HANDLER(pio_port_b_r),
 	DEVCB_HANDLER(pio_port_a_w),
-	DEVCB_HANDLER(pio_port_b_w),
 	DEVCB_HANDLER(pio_ardy),
+	DEVCB_HANDLER(pio_port_b_r),
+	DEVCB_HANDLER(pio_port_b_w),
 	DEVCB_NULL
 };
-
-READ8_DEVICE_HANDLER( mbee_pio_r )
-{
-	if (!offset)
-		return z80pio_d_r(device, 0);
-	else
-	if (offset == 1)
-		return z80pio_c_r(device, 0);
-	else
-	if (offset == 2)
-		return z80pio_d_r(device, 1);
-	else
-		return z80pio_c_r(device, 1);
-}
-
-WRITE8_DEVICE_HANDLER( mbee_pio_w )
-{
-	if (!offset)
-		z80pio_d_w(device, 0, data);
-	else
-	if (offset == 1)
-		z80pio_c_w(device, 0, data);
-	else
-	if (offset == 2)
-		z80pio_d_w(device, 1, data);
-	else
-		z80pio_c_w(device, 1, data);
-}
-
 
 /*************************************************************************************
 

@@ -34,7 +34,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ac1_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_r, z80pio_w)
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("z80pio", z80pio_cd_ba_r, z80pio_cd_ba_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -115,7 +115,7 @@ static MACHINE_DRIVER_START( ac1 )
 	MDRV_CPU_IO_MAP(ac1_io)
 	MDRV_MACHINE_RESET( ac1 )
 
-	MDRV_Z80PIO_ADD( "z80pio", ac1_z80pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio", XTAL_8MHz / 4, ac1_z80pio_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

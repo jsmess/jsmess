@@ -51,14 +51,14 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 	return data;
 };
 
-const z80pio_interface super80_pio_intf =
+Z80PIO_INTERFACE( super80_pio_intf )
 {
 	DEVCB_LINE(super80_pio_interrupt),		/* callback when change interrupt status */
 	DEVCB_NULL,
-	DEVCB_HANDLER(pio_port_b_r),
 	DEVCB_HANDLER(pio_port_a_w),
-	DEVCB_NULL,
 	DEVCB_NULL,			/* portA ready active callback (not used in super80) */
+	DEVCB_HANDLER(pio_port_b_r),
+	DEVCB_NULL,
 	DEVCB_NULL			/* portB ready active callback (not used in super80) */
 };
 
@@ -116,7 +116,7 @@ static TIMER_CALLBACK( super80_timer )
 		cass_data[1] = 0;
 	}
 
-	z80pio_p_w(super80_z80pio,1,pio_port_b_r(super80_z80pio,0));
+	z80pio_pb_w(super80_z80pio,1,pio_port_b_r(super80_z80pio,0));
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */

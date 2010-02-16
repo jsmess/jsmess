@@ -23,9 +23,6 @@ extern WRITE8_HANDLER(z1013_keyboard_w);
 
 extern SNAPSHOT_LOAD( z1013 );
 
-extern READ8_DEVICE_HANDLER(z1013_z80pio_r);
-extern WRITE8_DEVICE_HANDLER(z1013_z80pio_w);
-
 /*----------- defined in video/z1013.c -----------*/
 extern UINT8 *z1013_video_ram;
 

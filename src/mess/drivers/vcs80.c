@@ -92,6 +92,21 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 {
+	vcs80_state *state = (vcs80_state *)timer->machine->driver_data;
+
+	if (state->keyclk)
+	{
+		state->keylatch++;
+		state->keylatch &= 7;
+	}
+
+	z80pio_pa_w(state->z80pio, 0, state->keyclk << 7);
+
+	state->keyclk = !state->keyclk;
+}
+
+static READ8_DEVICE_HANDLER( pio_port_a_r )
+{
 	/*
 
         bit     description
@@ -107,25 +122,22 @@ static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 
     */
 
-	vcs80_state *state = (vcs80_state *)timer->machine->driver_data;
+	vcs80_state *state = (vcs80_state *)device->machine->driver_data;
 
 	UINT8 data = 0;
 
-	if (state->keyclk)
-	{
-		state->keylatch++;
-		state->keylatch &= 0x07;
-	}
+	/* keyboard and led latch */
+	data |= state->keylatch;
 
-	data = (state->keyclk << 7) | 0x70 | state->keylatch;
+	/* keyboard rows */
+	data |= BIT(input_port_read(device->machine, "ROW0"), state->keylatch) << 4;
+	data |= BIT(input_port_read(device->machine, "ROW1"), state->keylatch) << 5;
+	data |= BIT(input_port_read(device->machine, "ROW2"), state->keylatch) << 6;
 
-	if (!BIT(input_port_read(timer->machine, "ROW0"), state->keylatch)) data &= ~0x10;
-	if (!BIT(input_port_read(timer->machine, "ROW1"), state->keylatch)) data &= ~0x20;
-	if (!BIT(input_port_read(timer->machine, "ROW2"), state->keylatch)) data &= ~0x40;
+	/* demultiplexer clock */
+	data |= (state->keyclk << 7);
 
-	z80pio_p_w(state->z80pio, 0, data);
-
-	state->keyclk = !state->keyclk;
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( pio_port_b_w )
@@ -156,14 +168,14 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 	output_set_digit_value(8 - digit, led_data);
 }
 
-static const z80pio_interface pio_intf =
+static Z80PIO_INTERFACE( pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),	/* callback when change interrupt status */
-	DEVCB_NULL,						/* port A read callback */
-	DEVCB_NULL,						/* port B read callback */
+	DEVCB_HANDLER(pio_port_a_r),	/* port A read callback */
 	DEVCB_NULL,						/* port A write callback */
-	DEVCB_HANDLER(pio_port_b_w),	/* port B write callback */
 	DEVCB_NULL,						/* portA ready active callback */
+	DEVCB_NULL,						/* port B read callback */
+	DEVCB_HANDLER(pio_port_b_w),	/* port B write callback */
 	DEVCB_NULL						/* portB ready active callback */
 };
 
@@ -183,6 +195,9 @@ static MACHINE_START(vcs80)
 
 	/* find devices */
 	state->z80pio = devtag_get_device(machine, Z80PIO_TAG);
+
+	z80pio_astb_w(state->z80pio, 1);
+	z80pio_bstb_w(state->z80pio, 1);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);
@@ -209,7 +224,7 @@ static MACHINE_DRIVER_START( vcs80 )
 	MDRV_DEFAULT_LAYOUT( layout_vcs80 )
 
 	/* devices */
-	MDRV_Z80PIO_ADD(Z80PIO_TAG, pio_intf)
+	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_5MHz/2, pio_intf)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -230,7 +245,7 @@ static DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
 	vcs80_state *state = (vcs80_state *)space->machine->driver_data;
 
 	/* _A0 is connected to PIO PB7 */
-	z80pio_p_w(state->z80pio, 1, (!BIT(address, 0)) << 7);
+	z80pio_pb_w(state->z80pio, 0, (!BIT(address, 0)) << 7);
 
 	return address;
 }
