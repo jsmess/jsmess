@@ -14,6 +14,7 @@
 #include "machine/ieee488.h"
 
 #include "includes/cbmb.h"
+#include "crsshair.h"
 
 #include "devices/cartslot.h"
 
@@ -367,6 +368,20 @@ MACHINE_RESET( cbmb )
 }
 
 
+static TIMER_CALLBACK( p500_lightpen_tick )
+{
+	if ((input_port_read_safe(machine, "CTRLSEL", 0x00) & 0x07) == 0x04)
+	{
+		/* enable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
+	}
+	else
+	{
+		/* disable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
+	}
+}
+
 static TIMER_CALLBACK(cbmb_frame_interrupt)
 {
 	static int level = 0;
@@ -468,6 +483,9 @@ static TIMER_CALLBACK(cbmb_frame_interrupt)
 
 // 128u4 FIXME
 //  vic2_frame_interrupt (device);
+
+	/* for p500, check if lightpen has been chosen as input: if so, enable crosshair (but c64-like inputs for p500 are not working atm) */
+	timer_set(machine, attotime_zero, NULL, 0, p500_lightpen_tick);
 
 	set_led_status(machine, 1, input_port_read(machine, "SPECIAL") & 0x04 ? 1 : 0);		/* Shift Lock */
 }
