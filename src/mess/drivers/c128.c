@@ -255,7 +255,7 @@ static ADDRESS_MAP_START( c128_z80_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xd000, 0xd3ff) AM_DEVREADWRITE("vic2e", vic2_port_r, vic2_port_w)
 	AM_RANGE(0xd400, 0xd4ff) AM_DEVREADWRITE("sid6581", sid6581_r, sid6581_w)
 	AM_RANGE(0xd500, 0xd5ff) AM_READWRITE(c128_mmu8722_port_r, c128_mmu8722_port_w)
-	AM_RANGE(0xd600, 0xd7ff) AM_READWRITE(vdc8563_port_r, vdc8563_port_w)
+	AM_RANGE(0xd600, 0xd7ff) AM_DEVREADWRITE("vdc8563", vdc8563_port_r, vdc8563_port_w)
 	AM_RANGE(0xdc00, 0xdcff) AM_DEVREADWRITE("cia_0", mos6526_r, mos6526_w)
 	AM_RANGE(0xdd00, 0xddff) AM_DEVREADWRITE("cia_1", mos6526_r, mos6526_w)
 /*  AM_RANGE(0xdf00, 0xdfff) AM_READWRITE(dma_port_r, dma_port_w) */
@@ -522,6 +522,70 @@ static const unsigned char vic2_palette[] =
 	0x70, 0x74, 0x6f,  0x59, 0xfe, 0x59,  0x5f, 0x53, 0xfe,  0xa4, 0xa7, 0xa2
 };
 
+/* permutation for c64/vic6567 conversion to vdc8563
+ 0 --> 0 black
+ 1 --> 0xf white
+ 2 --> 8 red
+ 3 --> 7 cyan
+ 4 --> 0xb violett
+ 5 --> 4 green
+ 6 --> 2 blue
+ 7 --> 0xd yellow
+ 8 --> 0xa orange
+ 9 --> 0xc brown
+ 0xa --> 9 light red
+ 0xb --> 6 dark gray
+ 0xc --> 1 gray
+ 0xd --> 5 light green
+ 0xe --> 3 light blue
+ 0xf --> 0xf light gray
+ */
+
+/* c128
+ commodore assignment!?
+ black gray orange yellow dardgrey vio red lgreen
+ lred lgray brown blue white green cyan lblue
+*/
+const unsigned char vdc8563_palette[] =
+{
+#if 0
+	0x00, 0x00, 0x00, /* black */
+	0x70, 0x74, 0x6f, /* gray */
+	0x21, 0x1b, 0xae, /* blue */
+	0x5f, 0x53, 0xfe, /* light blue */
+	0x1f, 0xd2, 0x1e, /* green */
+	0x59, 0xfe, 0x59, /* light green */
+	0x42, 0x45, 0x40, /* dark gray */
+	0x30, 0xe6, 0xc6, /* cyan */
+	0xbe, 0x1a, 0x24, /* red */
+	0xfe, 0x4a, 0x57, /* light red */
+	0xb8, 0x41, 0x04, /* orange */
+	0xb4, 0x1a, 0xe2, /* purple */
+	0x6a, 0x33, 0x04, /* brown */
+	0xdf, 0xf6, 0x0a, /* yellow */
+	0xa4, 0xa7, 0xa2, /* light gray */
+	0xfd, 0xfe, 0xfc /* white */
+#else
+	/* vice */
+	0x00, 0x00, 0x00, /* black */
+	0x20, 0x20, 0x20, /* gray */
+	0x00, 0x00, 0x80, /* blue */
+	0x00, 0x00, 0xff, /* light blue */
+	0x00, 0x80, 0x00, /* green */
+	0x00, 0xff, 0x00, /* light green */
+	0x00, 0x80, 0x80, /* cyan */
+	0x00, 0xff, 0xff, /* light cyan */
+	0x80, 0x00, 0x00, /* red */
+	0xff, 0x00, 0x00, /* light red */
+	0x80, 0x00, 0x80, /* purble */
+	0xff, 0x00, 0xff, /* light purble */
+	0x80, 0x80, 0x00, /* brown */
+	0xff, 0xff, 0x00, /* yellow */
+	0xc0, 0xc0, 0xc0, /* light gray */
+	0xff, 0xff, 0xff  /* white */
+#endif
+};
+
 static PALETTE_INIT( c128 )
 {
 	int i;
@@ -611,7 +675,7 @@ static CBM_IEC_DAISY( c128d81_iec_bus )
 
 /*************************************
  *
- *  VIC II interfaces
+ *  VIC II / VDC interfaces
  *
  *************************************/
 
@@ -661,6 +725,11 @@ static const vic2_interface c128_vic2_pal_intf = {
 	c128_rdy_cb
 };
 
+static const vdc8563_interface c128_vdc8563_intf = {
+	"screen",
+	0
+};
+
 /*************************************
 
  *
@@ -697,10 +766,10 @@ static MACHINE_DRIVER_START( c128 )
 	MDRV_PALETTE_LENGTH((ARRAY_LENGTH(vic2_palette) + ARRAY_LENGTH(vdc8563_palette)) / 3 )
 	MDRV_PALETTE_INIT( c128 )
 
-	MDRV_VIDEO_START( c128 )
 	MDRV_VIDEO_UPDATE( c128 )
 
 	MDRV_VIC2_ADD("vic2e", c128_vic2_ntsc_intf)
+	MDRV_VDC8563_ADD("vdc8563", c128_vdc8563_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

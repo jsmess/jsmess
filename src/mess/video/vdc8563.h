@@ -8,35 +8,47 @@
  *
  ****************************************************************************/
 
-#ifndef VDC8563_H_
-#define VDC8563_H_
+#ifndef __VDC8563_H__
+#define __VDC8563_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "devcb.h"
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _vdc8563_interface vdc8563_interface;
+struct _vdc8563_interface
+{
+	const char         *screen;
+	int                ram16konly;
+};
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+DEVICE_GET_INFO( vdc8563 );
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define VDC8563 DEVICE_GET_INFO_NAME( vdc8563 )
+
+#define MDRV_VDC8563_ADD(_tag, _interface) \
+	MDRV_DEVICE_ADD(_tag, VDC8563, 0) \
+	MDRV_DEVICE_CONFIG(_interface)
 
 
 /*----------- defined in video/vdc8563.c -----------*/
 
-/* call to init videodriver */
-extern void vdc8563_init (int ram16konly);
+void vdc8563_set_rastering(running_device *device, int on);
+UINT32 vdc8563_video_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 
-extern void vdc8563_set_rastering(int on);
-
-extern VIDEO_START( vdc8563 );
-extern VIDEO_UPDATE( vdc8563 );
-
-extern const unsigned char vdc8563_palette[16 * 3];
-
-/* to be called when writting to port */
-extern WRITE8_HANDLER ( vdc8563_port_w );
-
-/* to be called when reading from port */
-extern  READ8_HANDLER ( vdc8563_port_r );
+WRITE8_DEVICE_HANDLER( vdc8563_port_w );
+READ8_DEVICE_HANDLER( vdc8563_port_r );
 
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* VDC8563_H_ */
+#endif /* __VDC8563_H__ */

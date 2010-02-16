@@ -2,7 +2,13 @@
 
   CBM Video Device Chip 8563
 
-  copyright 2000 peter.trauner@jk.uni-linz.ac.at
+  Original code by PeT (peter.trauner@jk.uni-linz.ac.at)
+
+    2010-02: converted to be a device
+
+    TODO:
+      - clean up the code
+      - add RAM with an internal address map
 
 ***************************************************************************/
 /*
@@ -10,96 +16,17 @@
  some are in the rastering engine and should be solved during its evalution
  rare and short documentation,
  registers and some words of description in the c128 user guide */
-
-#include <math.h>
-#include <stdio.h>
-#include <assert.h>
-#include "emu.h"
-
-#include "includes/crtc6845.h" // include only several register defines
-#include "vdc8563.h"
-
-#define VERBOSE 0
-#define VERBOSE_DBG	0
-
-#define DBG_LOG(N,M,A)      \
-	do { \
-		if(VERBOSE>=N) \
-		{ \
-			if( M ) \
-				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(machine)),(char*)M ); \
-			logerror A; \
-		} \
-	} while (0)
-
 /* seems to be a motorola m6845 variant */
 
-/* permutation for c64/vic6567 conversion to vdc8563
- 0 --> 0 black
- 1 --> 0xf white
- 2 --> 8 red
- 3 --> 7 cyan
- 4 --> 0xb violett
- 5 --> 4 green
- 6 --> 2 blue
- 7 --> 0xd yellow
- 8 --> 0xa orange
- 9 --> 0xc brown
- 0xa --> 9 light red
- 0xb --> 6 dark gray
- 0xc --> 1 gray
- 0xd --> 5 light green
- 0xe --> 3 light blue
- 0xf --> 0xf light gray
- */
 
-/* x128
- commodore assignment!?
- black gray orange yellow dardgrey vio red lgreen
- lred lgray brown blue white green cyan lblue
-*/
-const unsigned char vdc8563_palette[] =
+#include "emu.h"
+#include "video/vdc8563.h"
+
+typedef struct _vdc8563_state vdc8563_state;
+struct _vdc8563_state
 {
-#if 0
-	0x00, 0x00, 0x00, /* black */
-	0x70, 0x74, 0x6f, /* gray */
-	0x21, 0x1b, 0xae, /* blue */
-	0x5f, 0x53, 0xfe, /* light blue */
-	0x1f, 0xd2, 0x1e, /* green */
-	0x59, 0xfe, 0x59, /* light green */
-	0x42, 0x45, 0x40, /* dark gray */
-	0x30, 0xe6, 0xc6, /* cyan */
-	0xbe, 0x1a, 0x24, /* red */
-	0xfe, 0x4a, 0x57, /* light red */
-	0xb8, 0x41, 0x04, /* orange */
-	0xb4, 0x1a, 0xe2, /* purple */
-	0x6a, 0x33, 0x04, /* brown */
-	0xdf, 0xf6, 0x0a, /* yellow */
-	0xa4, 0xa7, 0xa2, /* light gray */
-	0xfd, 0xfe, 0xfc /* white */
-#else
-	/* vice */
-	0,0,0, /* black */
-	0x20,0x20,0x20, /* gray */
-	0,0,0x80, /* blue */
-	0,0,0xff, /* light blue */
-	0,0x80,0, /* green */
-	0,0xff,0, /* light green */
-	0,0x80,0x80, /* cyan */
-	0,0xff,0xff, /* light cyan */
-	0x80,0,0, /* red */
-	0xff,0,0, /* light red */
-	0x80,0,0x80, /* purble */
-	0xff,0,0xff, /* light purble */
-	0x80,0x80,0, /* brown */
-	0xff, 0xff, 0, /* yellow */
-	0xc0,0xc0,0xc0, /* light gray */
-	0xff, 0xff,0xff /* white */
-#endif
-};
+	running_device *screen;
 
-
-static struct {
 	int state;
 	UINT8 reg[37];
 	UINT8 index;
@@ -120,7 +47,23 @@ static struct {
 	int	cursor_on;
 
 	int changed;
-} vdc;
+};
+
+/*****************************************************************************
+    CONSTANTS
+*****************************************************************************/
+
+#define VERBOSE_LEVEL 0
+#define DBG_LOG(N, M, A)      \
+	do { \
+		if (VERBOSE_LEVEL >= N) \
+		{ \
+			if (M) \
+				logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(device->machine)),(char*)M ); \
+			logerror A; \
+		} \
+	} while (0)
+
 
 static const struct {
 	int stored,
@@ -164,318 +107,358 @@ static const struct {
 	{  0xff, -1 },
 	{  0x0f, -1 },
 };
-#define REG(x) (vdc.reg[x]&reg_mask[x].stored)
+#define REG(x)          (vdc8563->reg[x] & reg_mask[x].stored)
 
-void vdc8563_init (int ram16konly)
-{
-	memset(&vdc, 0, sizeof(vdc));
-	vdc.cursor_time=0.0;
-	vdc.state=1;
 
-	if (ram16konly) {
-		vdc.mask=0x3fff;
-		vdc.fontmask=0x2000;
-	} else {
-		vdc.mask=0xffff;
-		vdc.fontmask=0xe000;
-	}
+#define CHAR_WIDTH      (((vdc8563->reg[0x16] & 0xf0) >> 4) + 1)
+#define CHAR_WIDTH_VISIBLE ((vdc8563->reg[0x16] & 0x0f) + 1)
 
-	vdc.rastering=1;
-}
+#define BLOCK_COPY      (vdc8563->reg[0x18] & 0x80)
 
-static void vdc_videoram_w(int offset, int data)
-{
-	offset&=vdc.mask;
-    if (vdc.ram[offset]!=data) {
-		vdc.ram[offset] = data;
-		vdc.dirty[offset] = 1;
-		if ((vdc.fontram_start&vdc.fontmask)==(offset&vdc.fontmask))
-			vdc.fontdirty[(offset&0x1ff0)>>4]=1;
-	}
-}
+#define MONOTEXT        ((vdc8563->reg[0x19] & 0xc0) == 0)
+#define TEXT            ((vdc8563->reg[0x19] & 0xc0) == 0x40)
+#define GRAPHIC         (vdc8563->reg[0x19] & 0x80)
 
-INLINE int vdc_videoram_r(int offset)
-{
-	return vdc.ram[offset&vdc.mask];
-}
+#define FRAMECOLOR      (vdc8563->reg[0x1a] & 0x0f)
+#define MONOCOLOR       (vdc8563->reg[0x1a] >> 4)
 
-void vdc8563_set_rastering(int on)
-{
-	vdc.rastering=on;
-	vdc.changed|=1;
-}
-
-VIDEO_START( vdc8563 )
-{
-	vdc.ram = auto_alloc_array(machine, UINT8, 0x20000);
-	vdc.dirty = vdc.ram + 0x10000;
-}
-
-#define CHAR_WIDTH (((vdc.reg[0x16]&0xf0)>>4)+1)
-#define CHAR_WIDTH_VISIBLE ((vdc.reg[0x16]&0xf)+1)
-
-#define BLOCK_COPY (vdc.reg[0x18]&0x80)
-
-#define MONOTEXT ((vdc.reg[0x19]&0xc0)==0)
-#define TEXT ((vdc.reg[0x19]&0xc0)==0x40)
-#define GRAPHIC (vdc.reg[0x19]&0x80)
-
-#define FRAMECOLOR (vdc.reg[0x1a]&0xf)
-#define MONOCOLOR (vdc.reg[0x1a]>>4)
-
-#define LINEDIFF (vdc.reg[0x1b])
-#define FONT_START ((vdc.reg[0x1c]&0xe0)<<8)
+#define LINEDIFF        (vdc8563->reg[0x1b])
+#define FONT_START      ((vdc8563->reg[0x1c] & 0xe0) << 8)
 /* 0x1c 0x10 dram 0:4416, 1: 4164 */
 
 /* 0x1d 0x1f counter for underlining */
 
-#define FILLBYTE vdc.reg[0x1f]
+#define FILLBYTE        vdc8563->reg[0x1f]
 
-#define CLOCK_HALFING (vdc.reg[25]&0x10)
+#define CLOCK_HALFING   (vdc8563->reg[25] & 0x10)
+
+
+/* the regs below corresponds to the ones used by 6845, hence we borrow the macros */
+#define CRTC6845_COLUMNS (REG(0) + 1)
+#define CRTC6845_CHAR_COLUMNS (REG(1))
+#define CRTC6845_CHAR_LINES REG(6)
+#define CRTC6845_CHAR_HEIGHT ((REG(9) & 0x1f) + 1)
+#define CRTC6845_LINES (REG(4) * CRTC6845_CHAR_HEIGHT + REG(5))
+#define CRTC6845_VIDEO_START ((REG(0xc) << 8) | REG(0xd))
+#define CRTC6845_INTERLACE_MODE (REG(8) & 3)
+#define CRTC6845_INTERLACE_SIGNAL 1
+#define CRTC6845_INTERLACE 3
+#define CRTC6845_CURSOR_MODE (REG(0xa) & 0x60)
+#define CRTC6845_CURSOR_OFF 0x20
+#define CRTC6845_CURSOR_16FRAMES 0x40
+#define CRTC6845_CURSOR_32FRAMES 0x60
+#define CRTC6845_SKEW	(REG(8) & 15)
+#define CRTC6845_CURSOR_POS ((REG(0xe) << 8) | REG(0xf))
+#define CRTC6845_CURSOR_TOP	(REG(0xa) & 0x1f)
+#define CRTC6845_CURSOR_BOTTOM REG(0xb)
+
+
+/*****************************************************************************
+    INLINE FUNCTIONS
+*****************************************************************************/
+
+INLINE vdc8563_state *get_safe_token( running_device *device )
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == VDC8563);
+
+	return (vdc8563_state *)device->token;
+}
+
+INLINE const vdc8563_interface *get_interface( running_device *device )
+{
+	assert(device != NULL);
+	assert((device->type == VDC8563));
+	return (const vdc8563_interface *) device->baseconfig().static_config;
+}
+
+/*****************************************************************************
+    IMPLEMENTATION
+*****************************************************************************/
+
+static void vdc_videoram_w( running_device *device, int offset, int data )
+{
+	vdc8563_state *vdc8563 = get_safe_token(device);
+
+	offset &= vdc8563->mask;
+
+	if (vdc8563->ram[offset] != data)
+	{
+		vdc8563->ram[offset] = data;
+		vdc8563->dirty[offset] = 1;
+		if ((vdc8563->fontram_start & vdc8563->fontmask) == (offset & vdc8563->fontmask))
+			vdc8563->fontdirty[(offset & 0x1ff0) >> 4] = 1;
+	}
+}
+
+INLINE int vdc_videoram_r( running_device *device, int offset )
+{
+	vdc8563_state *vdc8563 = get_safe_token(device);
+	return vdc8563->ram[offset & vdc8563->mask];
+}
+
+void vdc8563_set_rastering( running_device *device, int on )
+{
+	vdc8563_state *vdc8563 = get_safe_token(device);
+	vdc8563->rastering = on;
+	vdc8563->changed |= 1;
+}
+
+
 
 /* 0x22 number of chars from start of line to positiv edge of display enable */
 /* 0x23 number of chars from start of line to negativ edge of display enable */
 /* 0x24 0xf number of refresh cycles per line */
 
-WRITE8_HANDLER ( vdc8563_port_w )
+WRITE8_DEVICE_HANDLER( vdc8563_port_w )
 {
-	running_machine *machine = space->machine;
+	vdc8563_state *vdc8563 = get_safe_token(device);
 	UINT8 i;
 
 	if (offset & 1)
 	{
-		if ((vdc.index & 0x3f) < 37)
+		if ((vdc8563->index & 0x3f) < 37)
 		{
-			switch (vdc.index & 0x3f)
+			switch (vdc8563->index & 0x3f)
 			{
 			case 1: case 4: case 0x1b:
-				vdc.reg[vdc.index]=data;
-				vdc.videoram_size=CRTC6845_CHAR_LINES*(CRTC6845_CHAR_COLUMNS+LINEDIFF);
-				vdc.changed=1;
+				vdc8563->reg[vdc8563->index] = data;
+				vdc8563->videoram_size = CRTC6845_CHAR_LINES * (CRTC6845_CHAR_COLUMNS + LINEDIFF);
+				vdc8563->changed = 1;
 				break;
 			case 0xe: case 0xf: case 0xa: case 0xb:
-				vdc.dirty[CRTC6845_CURSOR_POS&vdc.mask]=1;
-				vdc.reg[vdc.index]=data;
+				vdc8563->dirty[CRTC6845_CURSOR_POS & vdc8563->mask] = 1;
+				vdc8563->reg[vdc8563->index] = data;
 				break;
 			case 0xc: case 0xd:
-				vdc.reg[vdc.index]=data;
-				vdc.videoram_start=CRTC6845_VIDEO_START;
-				vdc.changed=1;
+				vdc8563->reg[vdc8563->index] = data;
+				vdc8563->videoram_start = CRTC6845_VIDEO_START;
+				vdc8563->changed = 1;
 				break;
 			case 0x12:
-				vdc.addr=(vdc.addr&0xff)|(data<<8);
+				vdc8563->addr = (vdc8563->addr & 0x00ff) | (data << 8);
 				break;
 			case 0x13:
-				vdc.addr=(vdc.addr&0xff00)|data;
+				vdc8563->addr = (vdc8563->addr & 0xff00) | data;
 				break;
 			case 0x20:
-				vdc.src=(vdc.src&0xff)|(data<<8);
+				vdc8563->src = (vdc8563->src & 0x00ff) | (data << 8);
 				break;
 			case 0x21:
-				vdc.src=(vdc.src&0xff00)|data;
+				vdc8563->src = (vdc8563->src & 0xff00) | data;
 				break;
 			case 0x14: case 0x15:
-				vdc.reg[vdc.index]=data;
-				vdc.colorram_start=(vdc.reg[0x14]<<8)|vdc.reg[0x15];
-				vdc.changed=1;
+				vdc8563->reg[vdc8563->index] = data;
+				vdc8563->colorram_start = (vdc8563->reg[0x14] << 8) | vdc8563->reg[0x15];
+				vdc8563->changed = 1;
 				break;
 			case 0x1c:
-				vdc.reg[vdc.index]=data;
-				vdc.fontram_start=FONT_START;
-				vdc.changed=1;
+				vdc8563->reg[vdc8563->index] = data;
+				vdc8563->fontram_start = FONT_START;
+				vdc8563->changed = 1;
 				break;
 			case 0x16: case 0x19: case 0x1a:
-				vdc.reg[vdc.index]=data;
-				vdc.changed=1;
+				vdc8563->reg[vdc8563->index] = data;
+				vdc8563->changed = 1;
 				break;
 			case 0x1e:
-				vdc.reg[vdc.index]=data;
-				if (BLOCK_COPY) {
-					DBG_LOG (2, "vdc block copy",
-							 ("src:%.4x dst:%.4x size:%.2x\n",
-							  vdc.src, vdc.addr, data));
-					i=data;do {
-						vdc_videoram_w(vdc.addr++, vdc_videoram_r(vdc.src++));
-					} while (--i!=0);
-				} else {
-					DBG_LOG (2, "vdc block set",
-							 ("dest:%.4x value:%.2x size:%.2x\n",
-							  vdc.addr, FILLBYTE, data));
-					i=data;do {
-						vdc_videoram_w(vdc.addr++, FILLBYTE);
-					} while (--i!=0);
+				vdc8563->reg[vdc8563->index] = data;
+				if (BLOCK_COPY)
+				{
+					DBG_LOG(2, "vdc block copy", ("src:%.4x dst:%.4x size:%.2x\n", vdc8563->src, vdc8563->addr, data));
+					i = data;
+					do {
+						vdc_videoram_w(device, vdc8563->addr++, vdc_videoram_r(device, vdc8563->src++));
+					} while (--i != 0);
+				}
+				else
+				{
+					DBG_LOG(2, "vdc block set", ("dest:%.4x value:%.2x size:%.2x\n", vdc8563->addr, FILLBYTE, data));
+					i = data;
+					do {
+						vdc_videoram_w(device, vdc8563->addr++, FILLBYTE);
+					} while (--i != 0);
 				}
 				break;
 			case 0x1f:
-				DBG_LOG (2, "vdc written",
-						 ("dest:%.4x size:%.2x\n",
-						  vdc.addr, data));
-				vdc.reg[vdc.index]=data;
-				vdc_videoram_w(vdc.addr++, data);
+				DBG_LOG(2, "vdc written", ("dest:%.4x size:%.2x\n", vdc8563->addr, data));
+				vdc8563->reg[vdc8563->index] = data;
+				vdc_videoram_w(device, vdc8563->addr++, data);
 				break;
 			default:
-				vdc.reg[vdc.index]=data;
-				DBG_LOG (2, "vdc8563_port_w",
-						 ("%.2x:%.2x\n", vdc.index, data));
+				vdc8563->reg[vdc8563->index] = data;
+				DBG_LOG(2, "vdc8563_port_w", ("%.2x:%.2x\n", vdc8563->index, data));
 				break;
 			}
 		}
-		DBG_LOG (3, "vdc8563_port_w",
-				 ("%.2x:%.2x\n", vdc.index, data));
+		DBG_LOG(3, "vdc8563_port_w", ("%.2x:%.2x\n", vdc8563->index, data));
 	}
 	else
 	{
-		vdc.index = data;
+		vdc8563->index = data;
 	}
 }
 
-READ8_HANDLER ( vdc8563_port_r )
+READ8_DEVICE_HANDLER( vdc8563_port_r )
 {
-	running_machine *machine = space->machine;
+	vdc8563_state *vdc8563 = get_safe_token(device);
 	int val;
 
 	val = 0xff;
 	if (offset & 1)
 	{
-		if ((vdc.index & 0x3f) < 37)
+		if ((vdc8563->index & 0x3f) < 37)
 		{
-			switch (vdc.index & 0x3f)
+			switch (vdc8563->index & 0x3f)
 			{
 			case 0x12:
-				val=vdc.addr>>8;
+				val = vdc8563->addr >> 8;
 				break;
 			case 0x13:
-				val=vdc.addr&0xff;
+				val = vdc8563->addr & 0xff;
 				break;
 			case 0x1e:
-				val=0;
+				val = 0;
 				break;
 			case 0x1f:
-				val=vdc_videoram_r(vdc.addr);
-				DBG_LOG (2, "vdc read", ("%.4x %.2x\n", vdc.addr, val));
+				val = vdc_videoram_r(device, vdc8563->addr);
+				DBG_LOG(2, "vdc read", ("%.4x %.2x\n", vdc8563->addr, val));
 				break;
 			case 0x20:
-				val=vdc.src>>8;
+				val = vdc8563->src >> 8;
 				break;
 			case 0x21:
-				val=vdc.src&0xff;
+				val = vdc8563->src & 0xff;
 				break;
 			default:
-				val=vdc.reg[vdc.index&0x3f]&reg_mask[vdc.index&0x3f].read;
+				val = vdc8563->reg[vdc8563->index & 0x3f] & reg_mask[vdc8563->index & 0x3f].read;
 			}
 		}
-		DBG_LOG (2, "vdc8563_port_r", ("%.2x:%.2x\n", vdc.index, val));
+		DBG_LOG(2, "vdc8563_port_r", ("%.2x:%.2x\n", vdc8563->index, val));
 	}
 	else
 	{
-		val = vdc.index;
-		if (vdc.state) val|=0x80;
+		val = vdc8563->index;
+		if (vdc8563->state)
+			val |= 0x80;
 	}
 	return val;
 }
 
-static int vdc8563_clocks_in_frame(void)
+static int vdc8563_clocks_in_frame( running_device *device )
 {
-	int clocks=CRTC6845_COLUMNS*CRTC6845_LINES;
-	switch (CRTC6845_INTERLACE_MODE) {
+	vdc8563_state *vdc8563 = get_safe_token(device);
+	int clocks = CRTC6845_COLUMNS * CRTC6845_LINES;
+
+	switch (CRTC6845_INTERLACE_MODE)
+	{
 	case CRTC6845_INTERLACE_SIGNAL: // interlace generation of video signals only
 	case CRTC6845_INTERLACE: // interlace
-		return clocks/2;
+		return clocks / 2;
 	default:
 		return clocks;
 	}
 }
 
-static void vdc8563_time(running_machine *machine)
+static void vdc8563_time( running_device *device )
 {
-	double neu, ftime;
-	neu=attotime_to_double(timer_get_time(machine));
+	vdc8563_state *vdc8563 = get_safe_token(device);
+	double newtime, ftime;
+	newtime = attotime_to_double(timer_get_time(device->machine));
 
-	if (vdc8563_clocks_in_frame()==0.0) return;
-	ftime=16*vdc8563_clocks_in_frame()/2000000.0;
-	if (CLOCK_HALFING) ftime*=2;
-	switch (CRTC6845_CURSOR_MODE) {
-	case CRTC6845_CURSOR_OFF: vdc.cursor_on=0;break;
+	if (vdc8563_clocks_in_frame(device) == 0.0)
+		return;
+
+	ftime = 16 * vdc8563_clocks_in_frame(device) / 2000000.0;
+	if (CLOCK_HALFING)
+		ftime *= 2;
+	switch (CRTC6845_CURSOR_MODE)
+	{
+	case CRTC6845_CURSOR_OFF:
+		vdc8563->cursor_on = 0;
+		break;
 	case CRTC6845_CURSOR_32FRAMES:
-		ftime*=2;
+		ftime *= 2;
 	case CRTC6845_CURSOR_16FRAMES:
-		if (neu-vdc.cursor_time>ftime) {
-			vdc.cursor_time+=ftime;
-			vdc.dirty[CRTC6845_CURSOR_POS&vdc.mask]=1;
-			vdc.cursor_on^=1;
+		if (newtime - vdc8563->cursor_time > ftime)
+		{
+			vdc8563->cursor_time += ftime;
+			vdc8563->dirty[CRTC6845_CURSOR_POS & vdc8563->mask] = 1;
+			vdc8563->cursor_on ^= 1;
 		}
 		break;
 	default:
-		vdc.cursor_on=1;break;
+		vdc8563->cursor_on = 1;
+		break;
 	}
 }
 
-static void vdc8563_monotext_screenrefresh (running_machine *machine, bitmap_t *bitmap, int full_refresh)
+static void vdc8563_monotext_screenrefresh( running_device *device, bitmap_t *bitmap, int full_refresh )
 {
+	vdc8563_state *vdc8563 = get_safe_token(device);
+	running_machine *machine = device->machine;
 	int x, y, i;
 	rectangle rect;
-	int w=CRTC6845_CHAR_COLUMNS;
-	int h=CRTC6845_CHAR_LINES;
-	int height=CRTC6845_CHAR_HEIGHT;
-	running_device *screen = video_screen_first(machine);
+	int w = CRTC6845_CHAR_COLUMNS;
+	int h = CRTC6845_CHAR_LINES;
+	int height = CRTC6845_CHAR_HEIGHT;
 
-	rect.min_x = video_screen_get_visible_area(screen)->min_x;
-	rect.max_x = video_screen_get_visible_area(screen)->max_x;
+	rect.min_x = video_screen_get_visible_area(vdc8563->screen)->min_x;
+	rect.max_x = video_screen_get_visible_area(vdc8563->screen)->max_x;
 
 	if (full_refresh)
-		memset(vdc.dirty+vdc.videoram_start, 1, vdc.videoram_size);
+		memset(vdc8563->dirty + vdc8563->videoram_start, 1, vdc8563->videoram_size);
 
-	for (y=0, rect.min_y=height, rect.max_y=rect.min_y+height-1,
-		i=vdc.videoram_start&vdc.mask; y<h;
-		y++, rect.min_y+=height, rect.max_y+=height)
+	for (y = 0, rect.min_y = height, rect.max_y = rect.min_y + height - 1, i = vdc8563->videoram_start & vdc8563->mask; y < h;
+		y++, rect.min_y += height, rect.max_y += height)
 	{
-		for (x=0; x<w; x++, i=(i+1)&vdc.mask)
+		for (x = 0; x < w; x++, i = (i + 1) & vdc8563->mask)
 		{
-			if (vdc.dirty[i])
+			if (vdc8563->dirty[i])
 			{
-				drawgfx_opaque(bitmap,&rect,machine->gfx[0],
-						vdc.ram[i], FRAMECOLOR|(MONOCOLOR<<4), 0, 0,
-						machine->gfx[0]->width*x+8,height*y+height);
-				if ((vdc.cursor_on)&&(i==(CRTC6845_CURSOR_POS&vdc.mask)))
-				{
-					int k=height-CRTC6845_CURSOR_TOP;
-					if (CRTC6845_CURSOR_BOTTOM<height) k=CRTC6845_CURSOR_BOTTOM-CRTC6845_CURSOR_TOP+1;
+				drawgfx_opaque(bitmap,&rect,machine->gfx[0], vdc8563->ram[i], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
+						machine->gfx[0]->width * x + 8, height * y + height);
 
-					if (k>0)
-						plot_box(bitmap, machine->gfx[0]->width*x+8,
-								 height*y+height+CRTC6845_CURSOR_TOP,
-								 machine->gfx[0]->width, k, FRAMECOLOR);
+				if ((vdc8563->cursor_on) && (i == (CRTC6845_CURSOR_POS & vdc8563->mask)))
+				{
+					int k = height - CRTC6845_CURSOR_TOP;
+					if (CRTC6845_CURSOR_BOTTOM < height)
+						k = CRTC6845_CURSOR_BOTTOM - CRTC6845_CURSOR_TOP + 1;
+
+					if (k > 0)
+						plot_box(bitmap, machine->gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine->gfx[0]->width, k, FRAMECOLOR);
 				}
 
-				vdc.dirty[i]=0;
+				vdc8563->dirty[i] = 0;
 			}
 		}
-		i+=LINEDIFF;
+		i += LINEDIFF;
 	}
 }
 
-static void vdc8563_text_screenrefresh (running_machine *machine, bitmap_t *bitmap, int full_refresh)
+static void vdc8563_text_screenrefresh( running_device *device, bitmap_t *bitmap, int full_refresh )
 {
+	vdc8563_state *vdc8563 = get_safe_token(device);
+	running_machine *machine = device->machine;
 	int x, y, i, j;
 	rectangle rect;
-	int w=CRTC6845_CHAR_COLUMNS;
-	int h=CRTC6845_CHAR_LINES;
-	int height=CRTC6845_CHAR_HEIGHT;
-	running_device *screen = video_screen_first(machine);
+	int w = CRTC6845_CHAR_COLUMNS;
+	int h = CRTC6845_CHAR_LINES;
+	int height = CRTC6845_CHAR_HEIGHT;
 
-	rect.min_x = video_screen_get_visible_area(screen)->min_x;
-	rect.max_x = video_screen_get_visible_area(screen)->max_x;
+	rect.min_x = video_screen_get_visible_area(vdc8563->screen)->min_x;
+	rect.max_x = video_screen_get_visible_area(vdc8563->screen)->max_x;
 
 	if (full_refresh)
-		memset(vdc.dirty+vdc.videoram_start, 1, vdc.videoram_size);
+		memset(vdc8563->dirty + vdc8563->videoram_start, 1, vdc8563->videoram_size);
 
-	for (y=0, rect.min_y=height, rect.max_y=rect.min_y+height-1,
-		i=vdc.videoram_start&vdc.mask, j=vdc.colorram_start&vdc.mask; y<h;
-		y++, rect.min_y+=height, rect.max_y+=height)
+	for (y = 0, rect.min_y = height, rect.max_y = rect.min_y + height - 1, i = vdc8563->videoram_start & vdc8563->mask,
+		j = vdc8563->colorram_start & vdc8563->mask; y < h; y++, rect.min_y += height, rect.max_y += height)
 	{
-		for (x=0; x<w; x++, i=(i+1)&vdc.mask, j=(j+1)&vdc.mask)
+		for (x = 0; x < w; x++, i = (i + 1) & vdc8563->mask, j = (j + 1) & vdc8563->mask)
 		{
-			if (vdc.dirty[i]||vdc.dirty[j])
+			if (vdc8563->dirty[i] || vdc8563->dirty[j])
 			{
 				{
 					UINT16 ch, fg, bg;
@@ -483,10 +466,10 @@ static void vdc8563_text_screenrefresh (running_machine *machine, bitmap_t *bitm
 					int v, h;
 					UINT16 *pixel;
 
-					ch = vdc.ram[i] | ((vdc.ram[j] & 0x80) ? 0x100 : 0);
-					charptr = &vdc.ram[(vdc.fontram_start + (ch * 16)) & vdc.mask];
-					fg = ((vdc.ram[j] & 0x0F) >> 0) + 0x10;
-					bg = ((vdc.ram[j] & 0x70) >> 4) + 0x10;
+					ch = vdc8563->ram[i] | ((vdc8563->ram[j] & 0x80) ? 0x100 : 0);
+					charptr = &vdc8563->ram[(vdc8563->fontram_start + (ch * 16)) & vdc8563->mask];
+					fg = ((vdc8563->ram[j] & 0x0f) >> 0) + 0x10;
+					bg = ((vdc8563->ram[j] & 0x70) >> 4) + 0x10;
 
 					for (v = 0; v < 16; v++)
 					{
@@ -498,107 +481,195 @@ static void vdc8563_text_screenrefresh (running_machine *machine, bitmap_t *bitm
 					}
 				}
 
-				if ((vdc.cursor_on)&&(i==(CRTC6845_CURSOR_POS&vdc.mask)))
+				if ((vdc8563->cursor_on) && (i == (CRTC6845_CURSOR_POS & vdc8563->mask)))
 				{
-					int k=height-CRTC6845_CURSOR_TOP;
-					if (CRTC6845_CURSOR_BOTTOM<height) k=CRTC6845_CURSOR_BOTTOM-CRTC6845_CURSOR_TOP+1;
+					int k = height - CRTC6845_CURSOR_TOP;
+					if (CRTC6845_CURSOR_BOTTOM < height)
+						k = CRTC6845_CURSOR_BOTTOM - CRTC6845_CURSOR_TOP + 1;
 
-					if (k>0)
-						plot_box(bitmap, machine->gfx[0]->width*x+8,
-								 height*y+height+CRTC6845_CURSOR_TOP,
-								 machine->gfx[0]->width, k, 0x10|(vdc.ram[j]&0xf));
+					if (k > 0)
+						plot_box(bitmap, machine->gfx[0]->width * x + 8, height * y + height + CRTC6845_CURSOR_TOP, machine->gfx[0]->width,
+								k, 0x10 | (vdc8563->ram[j] & 0x0f));
 				}
 
-				vdc.dirty[i]=0;
-				vdc.dirty[j]=0;
+				vdc8563->dirty[i] = 0;
+				vdc8563->dirty[j] = 0;
 			}
 		}
-		i+=LINEDIFF;
-		j+=LINEDIFF;
+		i += LINEDIFF;
+		j += LINEDIFF;
 	}
 }
 
-static void vdc8563_graphic_screenrefresh (running_machine *machine, bitmap_t *bitmap, int full_refresh)
+static void vdc8563_graphic_screenrefresh( running_device *device, bitmap_t *bitmap, int full_refresh )
 {
+	vdc8563_state *vdc8563 = get_safe_token(device);
+	running_machine *machine = device->machine;
 	int x, y, i, j, k;
 	rectangle rect;
-	int w=CRTC6845_CHAR_COLUMNS;
-	int h=CRTC6845_CHAR_LINES;
-	int height=CRTC6845_CHAR_HEIGHT;
-	running_device *screen = video_screen_first(machine);
+	int w = CRTC6845_CHAR_COLUMNS;
+	int h = CRTC6845_CHAR_LINES;
+	int height = CRTC6845_CHAR_HEIGHT;
 
-	rect.min_x = video_screen_get_visible_area(screen)->min_x;
-	rect.max_x = video_screen_get_visible_area(screen)->max_x;
+	rect.min_x = video_screen_get_visible_area(vdc8563->screen)->min_x;
+	rect.max_x = video_screen_get_visible_area(vdc8563->screen)->max_x;
 
 	if (full_refresh)
-		memset(vdc.dirty, 1, vdc.mask+1);
+		memset(vdc8563->dirty, 1, vdc8563->mask + 1);
 
-	for (y=0, rect.min_y=height, rect.max_y=rect.min_y+height-1,
-		i=vdc.videoram_start&vdc.mask; y<h;
-		y++, rect.min_y+=height, rect.max_y+=height)
+	for (y = 0, rect.min_y = height, rect.max_y = rect.min_y + height - 1, i = vdc8563->videoram_start & vdc8563->mask; y < h;
+		y++, rect.min_y += height, rect.max_y += height)
 	{
-		for (x=0; x<w; x++, i=(i+1)&vdc.mask)
+		for (x = 0; x < w; x++, i = (i + 1) & vdc8563->mask)
 		{
-			for (j=0; j<height; j++)
+			for (j = 0; j < height; j++)
 			{
-				k=((i<<4)+j)&vdc.mask;
-				if (vdc.dirty[k])
+				k = ((i << 4) + j) & vdc8563->mask;
+				if (vdc8563->dirty[k])
 				{
-					drawgfx_opaque(bitmap,&rect,machine->gfx[1],
-							vdc.ram[k], FRAMECOLOR|(MONOCOLOR<<4), 0, 0,
-							machine->gfx[0]->width*x+8,height*y+height+j);
-					vdc.dirty[k]=0;
+					drawgfx_opaque(bitmap, &rect, machine->gfx[1], vdc8563->ram[k], FRAMECOLOR | (MONOCOLOR << 4), 0, 0,
+							machine->gfx[0]->width * x + 8, height * y + height + j);
+					vdc8563->dirty[k] = 0;
 				}
 			}
 		}
-		i+=LINEDIFF;
+		i += LINEDIFF;
 	}
 }
 
-VIDEO_UPDATE( vdc8563 )
+UINT32 vdc8563_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	vdc8563_state *vdc8563 = get_safe_token(device);
 	int i;
 	int full_refresh = 1;
 
-	if (!vdc.rastering) return 0;
-	vdc8563_time(screen->machine);
+	if (!vdc8563->rastering)
+		return 0;
 
-	full_refresh|=vdc.changed;
+	vdc8563_time(device);
+
+	full_refresh |= vdc8563->changed;
+
 	if (GRAPHIC)
 	{
-		vdc8563_graphic_screenrefresh(screen->machine, bitmap, full_refresh);
+		vdc8563_graphic_screenrefresh(device, bitmap, full_refresh);
 	}
 	else
 	{
-		for (i=0; i<512; i++)
+		for (i = 0; i < 512; i++)
 		{
-			if (full_refresh||vdc.fontdirty[i])
+			if (full_refresh || vdc8563->fontdirty[i])
 			{
-				gfx_element_mark_dirty(screen->machine->gfx[0],i);
-				vdc.fontdirty[i]=0;
+				gfx_element_mark_dirty(device->machine->gfx[0],i);
+				vdc8563->fontdirty[i] = 0;
 			}
 		}
-		if (TEXT) vdc8563_text_screenrefresh(screen->machine, bitmap, full_refresh);
-		else vdc8563_monotext_screenrefresh(screen->machine, bitmap, full_refresh);
+		if (TEXT)
+			vdc8563_text_screenrefresh(device, bitmap, full_refresh);
+		else
+			vdc8563_monotext_screenrefresh(device, bitmap, full_refresh);
 	}
 
 	if (full_refresh)
 	{
-		int w=CRTC6845_CHAR_COLUMNS;
-		int h=CRTC6845_CHAR_LINES;
-		int height=CRTC6845_CHAR_HEIGHT;
+		int w = CRTC6845_CHAR_COLUMNS;
+		int h = CRTC6845_CHAR_LINES;
+		int height = CRTC6845_CHAR_HEIGHT;
 
-		plot_box(bitmap, 0, 0, screen->machine->gfx[0]->width*(w+2), height, FRAMECOLOR);
+		plot_box(bitmap, 0, 0, device->machine->gfx[0]->width * (w + 2), height, FRAMECOLOR);
 
-		plot_box(bitmap, 0, height, screen->machine->gfx[0]->width, height*h, FRAMECOLOR);
+		plot_box(bitmap, 0, height, device->machine->gfx[0]->width, height * h, FRAMECOLOR);
 
-		plot_box(bitmap, screen->machine->gfx[0]->width*(w+1), height, screen->machine->gfx[0]->width, height*h,
-				 FRAMECOLOR);
+		plot_box(bitmap, device->machine->gfx[0]->width * (w + 1), height, device->machine->gfx[0]->width, height * h, FRAMECOLOR);
 
-		plot_box(bitmap, 0, height*(h+1), screen->machine->gfx[0]->width*(w+2), height,
-				 FRAMECOLOR);
+		plot_box(bitmap, 0, height * (h + 1), device->machine->gfx[0]->width * (w + 2), height, FRAMECOLOR);
 	}
 
-	vdc.changed=0;
+	vdc8563->changed = 0;
 	return 0;
 }
+
+/*****************************************************************************
+    DEVICE INTERFACE
+*****************************************************************************/
+
+static DEVICE_START( vdc8563 )
+{
+	vdc8563_state *vdc8563 = get_safe_token(device);
+	const vdc8563_interface *intf = (vdc8563_interface *)device->baseconfig().static_config;
+
+	vdc8563->screen = devtag_get_device(device->machine, intf->screen);
+
+	vdc8563->ram = auto_alloc_array_clear(device->machine, UINT8, 0x20000);
+	vdc8563->dirty = vdc8563->ram + 0x10000;
+
+	/* currently no driver uses 16k only */
+	if (intf->ram16konly)
+	{
+		vdc8563->mask = 0x3fff;
+		vdc8563->fontmask = 0x2000;
+	}
+	else
+	{
+		vdc8563->mask = 0xffff;
+		vdc8563->fontmask = 0xe000;
+	}
+
+	state_save_register_device_item_pointer(device, 0, vdc8563->ram, 0x20000);
+
+	state_save_register_device_item_array(device, 0, vdc8563->reg);
+	state_save_register_device_item(device, 0, vdc8563->state);
+	state_save_register_device_item(device, 0, vdc8563->index);
+
+	state_save_register_device_item(device, 0, vdc8563->addr);
+	state_save_register_device_item(device, 0, vdc8563->src);
+
+	state_save_register_device_item(device, 0, vdc8563->videoram_start);
+	state_save_register_device_item(device, 0, vdc8563->colorram_start);
+	state_save_register_device_item(device, 0, vdc8563->fontram_start);
+	state_save_register_device_item(device, 0, vdc8563->videoram_size);
+
+	state_save_register_device_item(device, 0, vdc8563->rastering);
+
+	state_save_register_device_item_array(device, 0, vdc8563->fontdirty);
+
+	state_save_register_device_item(device, 0, vdc8563->cursor_time);
+	state_save_register_device_item(device, 0, vdc8563->cursor_on);
+
+	state_save_register_device_item(device, 0, vdc8563->changed);
+}
+
+
+static DEVICE_RESET( vdc8563 )
+{
+	vdc8563_state *vdc8563 = get_safe_token(device);
+
+	memset(vdc8563->reg, 0, ARRAY_LENGTH(vdc8563->reg));
+	memset(vdc8563->fontdirty, 0, ARRAY_LENGTH(vdc8563->fontdirty));
+
+	vdc8563->cursor_time = 0.0;
+	vdc8563->state = 1;
+
+	vdc8563->index = 0;
+	vdc8563->addr = 0;
+	vdc8563->src = 0;
+	vdc8563->videoram_start = 0;
+	vdc8563->colorram_start = 0;
+	vdc8563->fontram_start = 0;
+	vdc8563->videoram_size = 0;
+	vdc8563->rastering = 1;
+	vdc8563->cursor_on = 0;
+	vdc8563->changed = 0;
+}
+
+/*-------------------------------------------------
+    device definition
+-------------------------------------------------*/
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)				p##vdc8563##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME				"8563 / 8568 VDC"
+#define DEVTEMPLATE_FAMILY				"8563 / 8568 VDC"
+#include "devtempl.h"

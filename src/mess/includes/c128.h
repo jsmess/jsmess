@@ -11,8 +11,8 @@
  *
  ****************************************************************************/
 
-#ifndef C128_H_
-#define C128_H_
+#ifndef __C128_H__
+#define __C128_H__
 
 #include "machine/6526cia.h"
 
@@ -54,7 +54,6 @@ extern MACHINE_START( c128 );
 extern MACHINE_RESET( c128 );
 extern INTERRUPT_GEN( c128_frame_interrupt );
 
-extern VIDEO_START( c128 );
 extern VIDEO_UPDATE( c128 );
 
 void c128_bankswitch_64(running_machine *machine, int reset);
@@ -72,4 +71,4 @@ extern const mos6526_interface c128_ntsc_cia1, c128_pal_cia1;
 WRITE_LINE_DEVICE_HANDLER( c128_iec_srq_w );
 WRITE_LINE_DEVICE_HANDLER( c128_iec_data_w );
 
-#endif /* C128_H_ */
+#endif /* __C128_H__ */

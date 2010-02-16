@@ -152,15 +152,9 @@ DEVICE_GET_INFO( vic3 );
 
 /*----------- defined in video/vic4567.c -----------*/
 
-/* to be called when writting to port */
 WRITE8_DEVICE_HANDLER( vic3_port_w );
 WRITE8_DEVICE_HANDLER( vic3_palette_w );
-
-/* to be called when reading from port */
 READ8_DEVICE_HANDLER( vic3_port_r );
-READ8_DEVICE_HANDLER( vic3_palette_red_r );
-READ8_DEVICE_HANDLER( vic3_palette_green_r );
-READ8_DEVICE_HANDLER( vic3_palette_blue_r );
 
 void vic3_raster_interrupt_gen( running_device *device );
 UINT32 vic3_video_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect );
