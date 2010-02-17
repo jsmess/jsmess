@@ -11,7 +11,6 @@
     TODO:
 
 	- NOT A SYSTEM DISK, RE-BOOT
-    - Z80 daisy chain
     - keyboard CPU ROM
     - keyboard layout
 	- 2-sided diskette flag
@@ -761,9 +760,9 @@ static const wd17xx_interface fd1791_intf =
 static const z80_daisy_chain trs80m2_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
+	{ Z80SIO_TAG },
 	{ Z80DMA_TAG },
 	{ Z80PIO_TAG },
-	{ Z80SIO_TAG },
 	{ NULL }
 };
 
