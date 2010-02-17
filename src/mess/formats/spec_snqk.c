@@ -1518,7 +1518,7 @@ void spectrum_setup_snp(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 static void spectrum_snx_decompress_block(running_machine *machine, UINT8 *source, UINT16 dest, UINT16 size)
 {
     UINT8 counthi, countlo, compress, fill;
-    UINT16 block, count, i, j, numbytes;
+    UINT16 block = 0, count, i, j, numbytes;
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     i = SNX_HDR - 1;
