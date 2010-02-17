@@ -2611,7 +2611,7 @@ static BOOL FolderCheck(void)
 		lvfi.lParam = nGameIndex;
 
 		i = ListView_FindItem(hwndList, -1, &lvfi);
-		if (changed && i != -1);
+		if (changed && i != -1)
 		{
 			res = ListView_RedrawItems(hwndList, i, i);
 			while( PeekMessage( &msg, hwndList, 0, 0, PM_REMOVE ) != 0)
@@ -2665,7 +2665,7 @@ static BOOL GameCheck(void)
 	lvfi.lParam = game_index;
 
 	i = ListView_FindItem(hwndList, -1, &lvfi);
-	if (changed && i != -1);
+	if (changed && i != -1)
 		res = ListView_RedrawItems(hwndList, i, i);
 	if ((game_index % progBarStep) == 0)
 		ProgressBarStep();
