@@ -1265,7 +1265,7 @@ static floperr_t ti99_tdf_read_track_internal(floppy_image *floppy, int head, in
 			/* Do we have a valid CRCs already? Then this image
                already contains proper CRCs handling. Do not
                recreate them. */
-			if (track_data[i+5] != 0xf7 || track_data[i+5] != 0xf7)
+			if (track_data[i+5] != 0xf7 || track_data[i+6] != 0xf7)
 				return FLOPPY_ERROR_SUCCESS;
 
 			crc = ccitt_crc16(0xffff, &track_data[i], 5);
