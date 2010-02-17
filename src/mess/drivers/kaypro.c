@@ -227,6 +227,7 @@ static MACHINE_DRIVER_START( kayproii )
 	MDRV_CPU_VBLANK_INT("screen", kay_kbd_interrupt)	/* this doesn't actually exist, it is to run the keyboard */
 	MDRV_CPU_CONFIG(kayproii_daisy_chain)
 
+	MDRV_MACHINE_START( kayproii )
 	MDRV_MACHINE_RESET( kayproii )
 
 	/* video hardware */
@@ -267,6 +268,7 @@ static MACHINE_DRIVER_START( kaypro2x )
 	MDRV_CPU_VBLANK_INT("screen", kay_kbd_interrupt)
 	MDRV_CPU_CONFIG(kaypro2x_daisy_chain)
 
+	MDRV_MACHINE_START( kaypro2x )
 	MDRV_MACHINE_RESET( kaypro2x )
 
 	/* video hardware */

@@ -28,7 +28,9 @@ WRITE8_HANDLER( kaypro2x_baud_a_w );
 WRITE8_HANDLER( kaypro2x_system_port_w );
 
 MACHINE_RESET( kayproii );
+MACHINE_START( kayproii );
 MACHINE_RESET( kaypro2x );
+MACHINE_START( kaypro2x );
 
 QUICKLOAD_LOAD( kayproii );
 QUICKLOAD_LOAD( kaypro2x );

@@ -68,9 +68,6 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));
 	}
 
-	kaypro_fdc = devtag_get_device(mem->machine, "wd1793");
-	kaypro_printer = devtag_get_device(mem->machine, "centronics");
-	
 	wd17xx_dden_w(kaypro_fdc, BIT(data, 5));
 
 	centronics_strobe_w(kaypro_printer, BIT(data, 4));
@@ -351,29 +348,35 @@ const wd17xx_interface kaypro_wd1793_interface =
     Machine
 
 ************************************************************/
-
-MACHINE_RESET( kayproii )
+MACHINE_START( kayproii )
 {
 	kayproii_z80pio_g = devtag_get_device(machine, "z80pio_g");
 	kayproii_z80pio_s = devtag_get_device(machine, "z80pio_s");
 	kaypro_z80sio = devtag_get_device(machine, "z80sio");
 	kaypro_printer = devtag_get_device(machine, "centronics");
 	kaypro_fdc = devtag_get_device(machine, "wd1793");
+}
+
+MACHINE_RESET( kayproii )
+{
 	pio_system_w(kayproii_z80pio_s, 0, 0x80);
 	MACHINE_RESET_CALL(kay_kbd);
+}
+
+MACHINE_START( kaypro2x )
+{
+	kaypro_z80sio = devtag_get_device(machine, "z80sio");
+	kaypro2x_z80sio = devtag_get_device(machine, "z80sio_2x");
+	kaypro_printer = devtag_get_device(machine, "centronics");
+	kaypro_fdc = devtag_get_device(machine, "wd1793");
 }
 
 MACHINE_RESET( kaypro2x )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	kaypro_z80sio = devtag_get_device(machine, "z80sio");
-	kaypro2x_z80sio = devtag_get_device(machine, "z80sio_2x");
-	kaypro_printer = devtag_get_device(machine, "centronics");
-	kaypro_fdc = devtag_get_device(machine, "wd1793");
 	kaypro2x_system_port_w(space, 0, 0x80);
 	MACHINE_RESET_CALL(kay_kbd);
 }
-
 
 /***********************************************************
 
