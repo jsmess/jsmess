@@ -68,6 +68,9 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 		memory_set_bankptr(mem->machine, "bank3", memory_region(mem->machine, "rambank"));
 	}
 
+	kaypro_fdc = devtag_get_device(mem->machine, "wd1793");
+	kaypro_printer = devtag_get_device(mem->machine, "centronics");
+	
 	wd17xx_dden_w(kaypro_fdc, BIT(data, 5));
 
 	centronics_strobe_w(kaypro_printer, BIT(data, 4));
