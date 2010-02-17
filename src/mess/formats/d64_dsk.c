@@ -3,6 +3,7 @@
     formats/d64_dsk.c
 
     Floppy format code for Commodore 2040/8050 type disk images
+    and for Commodore 1541 D64 disk images
 
 *********************************************************************/
 
@@ -13,6 +14,8 @@
     - disk errors
     - variable gaps
 
+    2010-02 FP: I added partial support for disk images with errors 
+    but due to lack of docs I'm not sure if we can do better
 */
 
 #include "emu.h"
@@ -155,6 +158,7 @@ struct d64dsk_tag
 	int dos_tracks;								/* number of logical tracks */
 	int track_offset[MAX_HEADS][MAX_TRACKS];	/* offset within image for each physical track */
 	UINT32 speed_zone[MAX_TRACKS];				/* speed zone for each physical track */
+	bool has_errors;						/* flag to check for available error codes */
 	int error[MAX_ERROR_SECTORS];				/* error code for each logical sector */
 
 	UINT8 id1, id2;								/* DOS disk format ID */
@@ -236,6 +240,42 @@ static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UIN
 		*offset = offs;
 
 	return FLOPPY_ERROR_SUCCESS;
+}
+
+/*-------------------------------------------------
+    d64_get_sectors_per_track - returns the offset
+    of the error correspondent to the 1st sector 
+    of a given track
+-------------------------------------------------*/
+
+static int d64_get_error_offset(floppy_image *floppy, int head, int track)
+{
+	struct d64dsk_tag *tag = get_tag(floppy);
+	int i, j;
+	int error_offset = 0;
+
+	for (i = 0; i <= head; i++)
+	{
+		for (j = 0; j < track; j++)
+		{
+			if (tag->dos == DOS25)
+			{
+				error_offset += DOS25_SECTORS_PER_TRACK[j];
+			}
+			else if (tag->dos == DOS2)
+			{
+				if(!(j % 2))
+					error_offset += DOS2_SECTORS_PER_TRACK[j / 2];
+			}
+			else
+			{
+				if(!(j % 2))
+					error_offset += DOS1_SECTORS_PER_TRACK[j / 2];
+			}
+		}
+	}
+
+	return error_offset;
 }
 
 /*-------------------------------------------------
@@ -349,6 +389,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		UINT16 gcr_track_size;
 		UINT8 *gcr_track_data;
 		UINT64 gcr_pos = G64_DATA_START;
+		int error_offset = 0, tmp1, tmp2;
 
 		/* determine logical track number */
 		int dos_track = get_dos_track(track);
@@ -363,6 +404,10 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 
 		/* determine number of sectors per track */
 		sectors_per_track = d64_get_sectors_per_track(floppy, head, track);
+
+		/* determine the position of the error byte for the first sector of this track */
+		if (tag->has_errors)
+			error_offset = d64_get_error_offset(floppy, head, track);
 
 		/* allocate D64 track data buffer */
 		d64_track_size = sectors_per_track * SECTOR_SIZE;
@@ -385,10 +430,9 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		for (int sector = 0; sector < sectors_per_track; sector++)
 		{
 			// here we convert the sector data to gcr directly!
-			// IMPORTANT: we shall implement errors in reading sectors!
-			// these can modify e.g. header info $01 & $05
+			// IMPORTANT: errors in reading sectors can modify e.g. header info $01 & $05
 
-			// first we set the position at which sector data starts in the image
+			/* first we set the position at which sector data starts in the image */
 			UINT64 d64_pos = sector * SECTOR_SIZE;
 			int i;
 
@@ -401,10 +445,19 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
                 6. Inter-sector gap  55 55 55 55...55 55 (4 to 19 bytes, never read)
             */
 
+			if (tag->has_errors)
+			{
+				error_offset += sector;
+
+				if (tag->error[error_offset] == ERROR_29)
+					id1 ^= 0xff;
+			}
+
 			/* Header sync */
 			for (i = 0; i < 5; i++)
 				gcr_track_data[gcr_pos + i] = 0xff;
 			gcr_pos += 5;
+
 
 			/* Header info */
 			/* These are 8 bytes unencoded, which become 10 bytes encoded */
@@ -412,7 +465,13 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 			// $01 - header block checksum (EOR of $02-$05)     // this byte can be modified by error code 27 -> ^ 0xff
 			// $02 - Sector# of data block
 			// $03 - Track# of data block
-			gcr_double_2_gcr(0x08, sector ^ dos_track ^ id2 ^ id1, sector, dos_track, gcr_track_data + gcr_pos);
+			tmp1 = (tag->has_errors && tag->error[error_offset] == ERROR_20) ? 0xff : 0x08;
+			tmp2 = sector ^ dos_track ^ id2 ^ id1;
+
+			if (tag->has_errors && tag->error[error_offset] == ERROR_27)
+				tmp2 ^= 0xff;
+
+			gcr_double_2_gcr(tmp1, tmp2, sector, dos_track, gcr_track_data + gcr_pos);
 			gcr_pos += 5;
 
 			// $04 - Format ID byte #2
@@ -623,6 +682,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 
 	int heads = 0, dos_tracks = 0, dos = 0;
 	bool has_errors;
+	int errors_size = 0;
 
 	if (params)
 	{
@@ -641,6 +701,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	tag->heads = heads;
 	tag->tracks = MAX_TRACKS;
 	tag->dos_tracks = dos_tracks;
+	tag->has_errors = has_errors;
 
 	if (LOG)
 	{
@@ -648,6 +709,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 		logerror("D64 heads: %u\n", heads);
 		logerror("D64 tracks: %u\n", dos_tracks);
 		logerror("D64 DOS version: %s\n", DOS_VERSION[dos]);
+		logerror("D64 error codes: %s\n", has_errors ? "yes" : "no");
 	}
 
 	/* clear track data offsets */
@@ -676,6 +738,9 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 					tag->track_offset[head][track] = track_offset;
 					track_offset += DOS25_SECTORS_PER_TRACK[track] * SECTOR_SIZE;
 
+					/* also store an error entry for each sector */
+					errors_size += DOS25_SECTORS_PER_TRACK[track];
+
 					if (LOG) logerror("D64 head %u track %u data offset: %04x\n", head, track + 1, tag->track_offset[head][track]);
 				}
 			}
@@ -692,9 +757,17 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 					tag->track_offset[head][track] = track_offset;
 
 					if (dos == DOS1)
+					{
 						track_offset += DOS1_SECTORS_PER_TRACK[track / 2] * SECTOR_SIZE;
+						/* also store an error entry for each sector */
+						errors_size += DOS1_SECTORS_PER_TRACK[track / 2];
+					}
 					else
+					{
 						track_offset += DOS2_SECTORS_PER_TRACK[track / 2] * SECTOR_SIZE;
+						/* also store an error entry for each sector */
+						errors_size += DOS2_SECTORS_PER_TRACK[track / 2];
+					}
 
 					if (LOG) logerror("D64 head %u track %.1f data offset: %04x\n", head, get_dos_track(track), tag->track_offset[head][track]);
 				}
@@ -735,6 +808,12 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	tag->id2 = id[1];
 
 	if (LOG) logerror("D64 format ID: %02x%02x\n", id[0], id[1]);
+
+	/* read errors */
+	if (tag->has_errors)
+		floppy_image_read(floppy, tag->error, track_offset, errors_size);
+	else
+		memset(tag->error, 0, MAX_ERROR_SECTORS);
 
 	/* set callbacks */
 	callbacks = floppy_callbacks(floppy);
