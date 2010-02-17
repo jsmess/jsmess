@@ -365,9 +365,9 @@ INT_PTR CALLBACK InterfaceDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM 
  			}
 			nCurSelection = ComboBox_GetCurSel(GetDlgItem(hDlg,IDC_SNAPNAME));
 			if (nCurSelection != CB_ERR) {
-				const char* snapname = (const char*)ComboBox_GetItemData(GetDlgItem(hDlg,IDC_SNAPNAME), nCurSelection);
-				if (snapname) {
-					SetSnapName(snapname);
+				const char* snapname_selection = (const char*)ComboBox_GetItemData(GetDlgItem(hDlg,IDC_SNAPNAME), nCurSelection);
+				if (snapname_selection) {
+					SetSnapName(snapname_selection);
 				}
 			}
 			EndDialog(hDlg, 0);

@@ -2544,7 +2544,7 @@ static void copy_options_ex(core_options *pDestOpts, core_options *pSourceOpts)
 }
 
 // Adds our folder flags to a temporarty core_options, for saving.
-static core_options * AddFolderFlags(core_options *settings)
+static core_options * AddFolderFlags(core_options *opts_param)
 {
 	core_options *opts;
 	int numFolders;
@@ -2561,7 +2561,7 @@ static core_options * AddFolderFlags(core_options *settings)
 	}
 
 	options_add_entries(opts, regSettings);
-	copy_options_ex(opts, settings);
+	copy_options_ex(opts, opts_param);
 
 	memcpy(entries, filterOptions, sizeof(filterOptions));
 	entries[0].name = NULL;

@@ -201,8 +201,8 @@ static void InitializeVideoUI(HWND hwnd);
 static void InitializeEffectUI(HWND hWnd);
 static void InitializeBIOSUI(HWND hwnd);
 static void InitializeControllerMappingUI(HWND hwnd);
-static void UpdateOptions(HWND hDlg, datamap *properties_datamap, core_options *opts);
-static void UpdateProperties(HWND hDlg, datamap *properties_datamap, core_options *opts);
+static void UpdateOptions(HWND hDlg, datamap *map, core_options *opts);
+static void UpdateProperties(HWND hDlg, datamap *map, core_options *opts);
 static void PropToOptions(HWND hWnd, core_options *o);
 static void OptionsToProp(HWND hWnd, core_options *o);
 static void SetPropEnabledControls(HWND hWnd);
@@ -1582,18 +1582,18 @@ static void PropToOptions(HWND hWnd, core_options *o)
 }
 
 /* Update options from the dialog */
-static void UpdateOptions(HWND hDlg, datamap *properties_datamap, core_options *opts)
+static void UpdateOptions(HWND hDlg, datamap *map, core_options *opts)
 {
 	/* These are always called together, so make one conveniece function. */
-	datamap_read_all_controls(properties_datamap, hDlg, opts);
+	datamap_read_all_controls(map, hDlg, opts);
 	PropToOptions(hDlg, opts);
 }
 
 /* Update the dialog from the options */
-static void UpdateProperties(HWND hDlg, datamap *properties_datamap, core_options *opts)
+static void UpdateProperties(HWND hDlg, datamap *map, core_options *opts)
 {
 	/* These are always called together, so make one conviniece function. */
-	datamap_populate_all_controls(properties_datamap, hDlg, opts);
+	datamap_populate_all_controls(map, hDlg, opts);
 	OptionsToProp(hDlg, opts);
 	SetPropEnabledControls(hDlg);
 }

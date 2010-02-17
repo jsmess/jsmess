@@ -691,7 +691,7 @@ static POPUPSTRING popstr[MAX_MENUS + 1];
 
 /* Tool and Status bar variables */
 static HWND hStatusBar = 0;
-static HWND hToolBar   = 0;
+static HWND s_hToolBar   = 0;
 
 /* Column Order as Displayed */
 static BOOL oldControl = FALSE;
@@ -1335,13 +1335,13 @@ void UpdateScreenShot(void)
 	{
 		//nWidth = nSplitterOffset[GetSplitterCount() - 1];
 		CheckMenuItem(GetMenu(hMain),ID_VIEW_PICTURE_AREA, MF_CHECKED);
-		ToolBar_CheckButton(hToolBar, ID_VIEW_PICTURE_AREA, MF_CHECKED);
+		ToolBar_CheckButton(s_hToolBar, ID_VIEW_PICTURE_AREA, MF_CHECKED);
 	}
 	else
 	{
 		//nWidth = rect.right;
 		CheckMenuItem(GetMenu(hMain),ID_VIEW_PICTURE_AREA, MF_UNCHECKED);
-		ToolBar_CheckButton(hToolBar, ID_VIEW_PICTURE_AREA, MF_UNCHECKED);
+		ToolBar_CheckButton(s_hToolBar, ID_VIEW_PICTURE_AREA, MF_UNCHECKED);
 	}
 
 	ResizeTreeAndListViews(FALSE);
@@ -1432,7 +1432,7 @@ void ResizePickerControls(HWND hWnd)
 
 		GetWindowRect(hStatusBar, &rWindow);
 		bottomMargin = rWindow.bottom - rWindow.top;
-		GetWindowRect(hToolBar, &rWindow);
+		GetWindowRect(s_hToolBar, &rWindow);
 		topMargin = rWindow.bottom - rWindow.top;
 		/*buttonMargin = (sRect.bottom + 4); */
 
@@ -1868,11 +1868,11 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 	/* Stash hInstance for later use */
 	hInst = hInstance;
 
-	hToolBar   = InitToolbar(hMain);
+	s_hToolBar   = InitToolbar(hMain);
 	hStatusBar = InitStatusBar(hMain);
 	hProgWnd   = InitProgressBar(hStatusBar);
 
-	main_resize_items[0].u.hwnd = hToolBar;
+	main_resize_items[0].u.hwnd = s_hToolBar;
 	main_resize_items[1].u.hwnd = hStatusBar;
 
 	/* In order to handle 'Large Fonts' as the Windows
@@ -1928,9 +1928,9 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 	bShowTabCtrl   = GetShowTabCtrl();
 
 	CheckMenuItem(GetMenu(hMain), ID_VIEW_FOLDERS, (bShowTree) ? MF_CHECKED : MF_UNCHECKED);
-	ToolBar_CheckButton(hToolBar, ID_VIEW_FOLDERS, (bShowTree) ? MF_CHECKED : MF_UNCHECKED);
+	ToolBar_CheckButton(s_hToolBar, ID_VIEW_FOLDERS, (bShowTree) ? MF_CHECKED : MF_UNCHECKED);
 	CheckMenuItem(GetMenu(hMain), ID_VIEW_TOOLBARS, (bShowToolBar) ? MF_CHECKED : MF_UNCHECKED);
-	ShowWindow(hToolBar, (bShowToolBar) ? SW_SHOW : SW_HIDE);
+	ShowWindow(s_hToolBar, (bShowToolBar) ? SW_SHOW : SW_HIDE);
 	CheckMenuItem(GetMenu(hMain), ID_VIEW_STATUS, (bShowStatusBar) ? MF_CHECKED : MF_UNCHECKED);
 	ShowWindow(hStatusBar, (bShowStatusBar) ? SW_SHOW : SW_HIDE);
 	CheckMenuItem(GetMenu(hMain), ID_VIEW_PAGETAB, (bShowTabCtrl) ? MF_CHECKED : MF_UNCHECKED);
@@ -3816,7 +3816,7 @@ static void SetView(int menu_id)
 
 	// first uncheck previous menu item, check new one
 	CheckMenuRadioItem(GetMenu(hMain), ID_VIEW_LARGE_ICON, ID_VIEW_GROUPED, menu_id, MF_CHECKED);
-	ToolBar_CheckButton(hToolBar, menu_id, MF_CHECKED);
+	ToolBar_CheckButton(s_hToolBar, menu_id, MF_CHECKED);
 
 	if (Picker_GetViewID(hwndList) == VIEW_GROUPED || menu_id == ID_VIEW_GROUPED)
 	{
@@ -4182,7 +4182,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 		bShowTree = !bShowTree;
 		SetShowFolderList(bShowTree);
 		CheckMenuItem(GetMenu(hMain), ID_VIEW_FOLDERS, (bShowTree) ? MF_CHECKED : MF_UNCHECKED);
-		ToolBar_CheckButton(hToolBar, ID_VIEW_FOLDERS, (bShowTree) ? MF_CHECKED : MF_UNCHECKED);
+		ToolBar_CheckButton(s_hToolBar, ID_VIEW_FOLDERS, (bShowTree) ? MF_CHECKED : MF_UNCHECKED);
 		UpdateScreenShot();
 		break;
 
@@ -4190,8 +4190,8 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 		bShowToolBar = !bShowToolBar;
 		SetShowToolBar(bShowToolBar);
 		CheckMenuItem(GetMenu(hMain), ID_VIEW_TOOLBARS, (bShowToolBar) ? MF_CHECKED : MF_UNCHECKED);
-		ToolBar_CheckButton(hToolBar, ID_VIEW_TOOLBARS, (bShowToolBar) ? MF_CHECKED : MF_UNCHECKED);
-		ShowWindow(hToolBar, (bShowToolBar) ? SW_SHOW : SW_HIDE);
+		ToolBar_CheckButton(s_hToolBar, ID_VIEW_TOOLBARS, (bShowToolBar) ? MF_CHECKED : MF_UNCHECKED);
+		ShowWindow(s_hToolBar, (bShowToolBar) ? SW_SHOW : SW_HIDE);
 		ResizePickerControls(hMain);
 		UpdateScreenShot();
 		break;
@@ -4200,7 +4200,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 		bShowStatusBar = !bShowStatusBar;
 		SetShowStatusBar(bShowStatusBar);
 		CheckMenuItem(GetMenu(hMain), ID_VIEW_STATUS, (bShowStatusBar) ? MF_CHECKED : MF_UNCHECKED);
-		ToolBar_CheckButton(hToolBar, ID_VIEW_STATUS, (bShowStatusBar) ? MF_CHECKED : MF_UNCHECKED);
+		ToolBar_CheckButton(s_hToolBar, ID_VIEW_STATUS, (bShowStatusBar) ? MF_CHECKED : MF_UNCHECKED);
 		ShowWindow(hStatusBar, (bShowStatusBar) ? SW_SHOW : SW_HIDE);
 		ResizePickerControls(hMain);
 		UpdateScreenShot();
@@ -4233,7 +4233,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 			switch (codeNotify)
 			{
 			case TOOLBAR_EDIT_ACCELERATOR_PRESSED:
-				hToolbarEdit = GetDlgItem( hToolBar, ID_TOOLBAR_EDIT);
+				hToolbarEdit = GetDlgItem( s_hToolBar, ID_TOOLBAR_EDIT);
 				SetFocus(hToolbarEdit);
 				break;
 			case EN_CHANGE:
@@ -6901,7 +6901,6 @@ static HICON GetSelectedFolderIcon(void)
 	BOOL res;
 
 	htree = TreeView_GetSelection(hTreeView);
-
 	if (htree != NULL)
 	{
 		tvi.hItem = htree;
