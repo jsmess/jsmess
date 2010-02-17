@@ -1530,10 +1530,10 @@ static void PropToOptions(HWND hWnd, core_options *o)
 			TCHAR buffer[200];
 			char buffer2[200];
 
-			Edit_GetText(hCtrl,buffer,sizeof(buffer));
+			Edit_GetText(hCtrl, buffer, ARRAY_LENGTH(buffer));
 			_stscanf(buffer,TEXT("%d"),&n);
 
-			Edit_GetText(hCtrl2,buffer,sizeof(buffer));
+			Edit_GetText(hCtrl2, buffer, ARRAY_LENGTH(buffer));
 			_stscanf(buffer,TEXT("%d"),&d);
 
 			if (n == 0 || d == 0)
@@ -1542,7 +1542,7 @@ static void PropToOptions(HWND hWnd, core_options *o)
 				d = 3;
 			}
 
-			snprintf(buffer2,sizeof(buffer2),"%d:%d",n,d);
+			snprintf(buffer2, sizeof(buffer2), "%d:%d", n, d);
 			options_set_string(o, aspect_option, buffer2, OPTION_PRIORITY_CMDLINE);
 		}
 	}
@@ -1563,11 +1563,11 @@ static void PropToOptions(HWND hWnd, core_options *o)
 			TCHAR buffer[200];
 			char buffer2[200];
 
-			Edit_GetText(hCtrl,buffer,sizeof(buffer));
-			_stscanf(buffer,TEXT("%d"),&width);
+			Edit_GetText(hCtrl, buffer, ARRAY_LENGTH(buffer));
+			_stscanf(buffer, TEXT("%d"), &width);
 
-			Edit_GetText(hCtrl2,buffer,sizeof(buffer));
-			_stscanf(buffer,TEXT("%d"),&height);
+			Edit_GetText(hCtrl2, buffer, ARRAY_LENGTH(buffer));
+			_stscanf(buffer, TEXT("%d"), &height);
 
 			if (width == 0 || height == 0)
 			{
@@ -1575,7 +1575,7 @@ static void PropToOptions(HWND hWnd, core_options *o)
 				height = 480;
 			}
 
-			snprintf(buffer2,sizeof(buffer2),"%dx%d",width,height);
+			snprintf(buffer2, sizeof(buffer2), "%dx%d", width, height);
 			options_set_string(o, OPTION_SNAPSIZE, buffer2, OPTION_PRIORITY_CMDLINE);
 		}
 	}

@@ -1193,7 +1193,7 @@ static LPCTSTR MakeShortString(HDC hDC, LPCTSTR lpszLong, int nColumnLen, int nO
 		return lpszLong;
 
 	lstrcpy(szShort, lpszLong);
-	GetTextExtentPoint32(hDC, szThreeDots, sizeof(szThreeDots), &size);
+	GetTextExtentPoint32(hDC, szThreeDots, ARRAY_LENGTH(szThreeDots), &size);
 	nAddLen = size.cx;
 
 	for (i = nStringLen - 1; i > 0; i--)
@@ -1280,7 +1280,7 @@ void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	/* Labels are offset by a certain amount */
 	/* This offset is related to the width of a space character */
-	GetTextExtentPoint32(hDC, TEXT(" "), 1 , &size);
+	GetTextExtentPoint32(hDC, TEXT(" "), 1, &size);
 	offset = size.cx;
 
 	lvi.mask	   = LVIF_TEXT | LVIF_IMAGE | LVIF_STATE | LVIF_PARAM;
