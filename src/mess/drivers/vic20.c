@@ -57,10 +57,9 @@ block of RAM instead of 8.
     TODO:
 
     - C1540 is unreliable (VIA timing issues?)
-    - devicify VIC6560/6561
     - clean up inputs
     - clean up VIA interface
-    - access violation in vic6560.c
+    - access violation in mos6560.c
         * In the Chips (Japan, USA).60
         * K-Star Patrol (Europe).60
         * Seafox (Japan, USA).60
@@ -84,7 +83,7 @@ block of RAM instead of 8.
 #include "machine/ieee488.h"
 #include "machine/vic1112.h"
 #include "machine/cbmipt.h"
-#include "audio/vic6560.h"
+#include "sound/mos6560.h"
 #include "sound/dac.h"
 
 /* Memory Maps */
@@ -99,7 +98,7 @@ static ADDRESS_MAP_START( vic20_mem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x4000, 0x5fff) BLK2
 //  AM_RANGE(0x6000, 0x7fff) BLK3
 	AM_RANGE(0x8000, 0x8fff) AM_ROM
-	AM_RANGE(0x9000, 0x900f) AM_DEVREADWRITE(M6560_TAG, vic6560_port_r, vic6560_port_w)
+	AM_RANGE(0x9000, 0x900f) AM_DEVREADWRITE(M6560_TAG, mos6560_port_r, mos6560_port_w)
 	AM_RANGE(0x9110, 0x911f) AM_DEVREADWRITE(M6522_0_TAG, via_r, via_w)
 	AM_RANGE(0x9120, 0x912f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM
@@ -114,19 +113,19 @@ ADDRESS_MAP_END
 #ifdef UNUSED_FUNCTION
 static INPUT_PORTS_START( vic_lightpen_6560 )
 	PORT_START( "LIGHTX" )
-	PORT_BIT( 0xff, 0, IPT_PADDLE ) PORT_NAME("Lightpen X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(VIC6560_MAME_XSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
+	PORT_BIT( 0xff, 0, IPT_PADDLE ) PORT_NAME("Lightpen X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(MOS6560_MAME_XSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
 
 	PORT_START( "LIGHTY" )
-	PORT_BIT( 0xff, 0, IPT_PADDLE ) PORT_NAME("Lightpen Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(VIC6560_MAME_YSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
+	PORT_BIT( 0xff, 0, IPT_PADDLE ) PORT_NAME("Lightpen Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(MOS6560_MAME_YSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( vic_lightpen_6561 )
 	PORT_START( "LIGHTX" )
-	PORT_BIT( 0xff, 0, IPT_PADDLE ) PORT_NAME("Lightpen X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(VIC6560_MAME_XSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
+	PORT_BIT( 0xff, 0, IPT_PADDLE ) PORT_NAME("Lightpen X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(MOS6560_MAME_XSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_LEFT) PORT_CODE_INC(KEYCODE_RIGHT) PORT_CODE_DEC(JOYCODE_X_LEFT_SWITCH) PORT_CODE_INC(JOYCODE_X_RIGHT_SWITCH)
 
 	PORT_START( "LIGHTY" )
-	PORT_BIT( 0x1ff, 0, IPT_PADDLE ) PORT_NAME("Lightpen Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(VIC6561_MAME_YSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
+	PORT_BIT( 0x1ff, 0, IPT_PADDLE ) PORT_NAME("Lightpen Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(30) PORT_KEYDELTA(2) PORT_MINMAX(0,(MOS6561_MAME_YSIZE - 1)) PORT_CATEGORY(12) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH)
 INPUT_PORTS_END
 #endif
 
@@ -449,23 +448,23 @@ static IEEE488_DAISY( ieee488_daisy )
 	{ NULL}
 };
 
-/* VIC6560 Interface */
+/* MOS6560 Interface */
 
-#define VC20ADDR2VIC6560ADDR(a) (((a) > 0x8000) ? ((a) & 0x1fff) : ((a) | 0x2000))
-#define VIC6560ADDR2VC20ADDR(a) (((a) > 0x2000) ? ((a) & 0x1fff) : ((a) | 0x8000))
+#define VC20ADDR2MOS6560ADDR(a) (((a) > 0x8000) ? ((a) & 0x1fff) : ((a) | 0x2000))
+#define MOS6560ADDR2VC20ADDR(a) (((a) > 0x2000) ? ((a) & 0x1fff) : ((a) | 0x8000))
 
-static int vic6560_dma_read_color( running_machine *machine, int offset )
+static int vic20_dma_read_color( running_machine *machine, int offset )
 {
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	return memory_read_byte(program, 0x9400 | (offset & 0x3ff));
 }
 
-static int vic6560_dma_read( running_machine *machine, int offset )
+static int vic20_dma_read( running_machine *machine, int offset )
 {
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
-	return memory_read_byte(program, VIC6560ADDR2VC20ADDR(offset));
+	return memory_read_byte(program, MOS6560ADDR2VC20ADDR(offset));
 }
 
 static UINT8 vic20_lightx_cb( running_machine *machine )
@@ -493,22 +492,22 @@ static UINT8 vic20_paddle1_cb( running_machine *machine )
 	return input_port_read(machine, "PADDLE1");
 }
 
-static const vic656x_interface vic20_6560_intf =
+static const mos6560_interface vic20_6560_intf =
 {
 	"screen",	/* screen */
-	VIC6560,
+	MOS6560,
 	vic20_lightx_cb, vic20_lighty_cb, vic20_lightbut_cb,	/* lightgun cb */
 	vic20_paddle0_cb, vic20_paddle1_cb,		/* paddle cb */
-	vic6560_dma_read, vic6560_dma_read_color	/* DMA */
+	vic20_dma_read, vic20_dma_read_color	/* DMA */
 };
 
-static const vic656x_interface vic20_6561_intf =
+static const mos6560_interface vic20_6561_intf =
 {
 	"screen",	/* screen */
-	VIC6561,
+	MOS6561,
 	vic20_lightx_cb, vic20_lighty_cb, vic20_lightbut_cb,	/* lightgun cb */
 	vic20_paddle0_cb, vic20_paddle1_cb,		/* paddle cb */
-	vic6560_dma_read, vic6560_dma_read_color	/* DMA */
+	vic20_dma_read, vic20_dma_read_color	/* DMA */
 };
 
 
@@ -525,7 +524,7 @@ static MACHINE_START( vic20 )
 	state->iec = devtag_get_device(machine, IEC_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 	state->cassette_timer = devtag_get_device(machine, TIMER_C1530_TAG);
-	state->vic6560 = devtag_get_device(machine, M6560_TAG);
+	state->mos6560 = devtag_get_device(machine, M6560_TAG);
 
 	/* set VIA clocks */
 	state->via0->set_clock(cputag_get_clock(machine, M6502_TAG));
@@ -597,7 +596,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 
 /* Graphics Definitions and Video Emulation */
 
-static const unsigned char vic6560_palette[] =
+static const unsigned char mos6560_palette[] =
 {
 /* ripped from vice, a very excellent emulator */
 /* black, white, red, cyan */
@@ -614,16 +613,16 @@ static PALETTE_INIT( vic20 )
 {
 	int i;
 
-	for (i = 0; i < sizeof(vic6560_palette) / 3; i++)
+	for (i = 0; i < sizeof(mos6560_palette) / 3; i++)
 	{
-		palette_set_color_rgb(machine, i, vic6560_palette[i * 3], vic6560_palette[i * 3 + 1], vic6560_palette[i * 3 + 2]);
+		palette_set_color_rgb(machine, i, mos6560_palette[i * 3], mos6560_palette[i * 3 + 1], mos6560_palette[i * 3 + 2]);
 	}
 }
 
 static VIDEO_UPDATE( vic20 )
 {
 	vic20_state *state = (vic20_state *)screen->machine->driver_data;
-	vic656x_video_update(state->vic6560, bitmap, cliprect);
+	mos6560_video_update(state->mos6560, bitmap, cliprect);
 	return 0;
 }
 
@@ -632,7 +631,7 @@ static VIDEO_UPDATE( vic20 )
 static INTERRUPT_GEN( vic20_raster_interrupt )
 {
 	vic20_state *state = (vic20_state *)device->machine->driver_data;
-	vic656x_raster_interrupt_gen(state->vic6560);
+	mos6560_raster_interrupt_gen(state->mos6560);
 }
 
 static MACHINE_DRIVER_START( vic20_common )
@@ -668,19 +667,19 @@ static MACHINE_DRIVER_START( vic20_ntsc )
 	MDRV_IMPORT_FROM( vic20_common )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502_TAG, M6502, VIC6560_CLOCK)
+	MDRV_CPU_ADD(M6502_TAG, M6502, MOS6560_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(vic20_mem)
-	MDRV_CPU_PERIODIC_INT(vic20_raster_interrupt, VIC656X_HRETRACERATE)
+	MDRV_CPU_PERIODIC_INT(vic20_raster_interrupt, MOS656X_HRETRACERATE)
 
 	MDRV_MACHINE_START(vic20)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(VIC6560_VRETRACERATE)
+	MDRV_SCREEN_REFRESH_RATE(MOS6560_VRETRACERATE)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((VIC6560_XSIZE + 7) & ~7, VIC6560_YSIZE)
-	MDRV_SCREEN_VISIBLE_AREA(VIC6560_MAME_XPOS, VIC6560_MAME_XPOS + VIC6560_MAME_XSIZE - 1, VIC6560_MAME_YPOS, VIC6560_MAME_YPOS + VIC6560_MAME_YSIZE - 1)
+	MDRV_SCREEN_SIZE((MOS6560_XSIZE + 7) & ~7, MOS6560_YSIZE)
+	MDRV_SCREEN_VISIBLE_AREA(MOS6560_MAME_XPOS, MOS6560_MAME_XPOS + MOS6560_MAME_XSIZE - 1, MOS6560_MAME_YPOS, MOS6560_MAME_YPOS + MOS6560_MAME_YSIZE - 1)
 
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT( vic20 )
@@ -689,7 +688,7 @@ static MACHINE_DRIVER_START( vic20_ntsc )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_VIC656X_ADD(M6560_TAG, vic20_6560_intf)
+	MDRV_MOS656X_ADD(M6560_TAG, vic20_6560_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -699,19 +698,19 @@ static MACHINE_DRIVER_START( vic20_pal )
 	MDRV_IMPORT_FROM( vic20_common )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502_TAG, M6502, VIC6561_CLOCK)
+	MDRV_CPU_ADD(M6502_TAG, M6502, MOS6561_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(vic20_mem)
-	MDRV_CPU_PERIODIC_INT(vic20_raster_interrupt, VIC656X_HRETRACERATE)
+	MDRV_CPU_PERIODIC_INT(vic20_raster_interrupt, MOS656X_HRETRACERATE)
 
 	MDRV_MACHINE_START(vic20)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(VIC6561_VRETRACERATE)
+	MDRV_SCREEN_REFRESH_RATE(MOS6561_VRETRACERATE)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((VIC6561_XSIZE + 7) & ~7, VIC6561_YSIZE)
-	MDRV_SCREEN_VISIBLE_AREA(VIC6561_MAME_XPOS, VIC6561_MAME_XPOS + VIC6561_MAME_XSIZE - 1, VIC6561_MAME_YPOS, VIC6561_MAME_YPOS + VIC6561_MAME_YSIZE - 1)
+	MDRV_SCREEN_SIZE((MOS6561_XSIZE + 7) & ~7, MOS6561_YSIZE)
+	MDRV_SCREEN_VISIBLE_AREA(MOS6561_MAME_XPOS, MOS6561_MAME_XPOS + MOS6561_MAME_XSIZE - 1, MOS6561_MAME_YPOS, MOS6561_MAME_YPOS + MOS6561_MAME_YSIZE - 1)
 
 	MDRV_PALETTE_LENGTH(16)
 	MDRV_PALETTE_INIT( vic20 )
@@ -720,7 +719,7 @@ static MACHINE_DRIVER_START( vic20_pal )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_VIC656X_ADD(M6560_TAG, vic20_6561_intf)
+	MDRV_MOS656X_ADD(M6560_TAG, vic20_6561_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

@@ -25,7 +25,7 @@ struct _vic20_state
 	running_device *via1;
 	running_device *iec;
 	running_device *cassette;
-	running_device *vic6560;
+	running_device *mos6560;
 
 	/* timers */
 	running_device *cassette_timer;

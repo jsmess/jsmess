@@ -239,6 +239,7 @@ SOUNDS += TMS5200
 #SOUNDS += TMC0281
 #SOUNDS += TMS5100
 #SOUNDS += TMS5110A
+SOUNDS += MOS656X
 
 
 #-------------------------------------------------
@@ -698,7 +699,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_DRIVERS)/pet.o		\
 	$(MESS_MACHINE)/pet.o		\
 	$(MESS_DRIVERS)/c64.o		\
-	$(MESS_AUDIO)/vic6560.o		\
 	$(MESS_DRIVERS)/vic20.o		\
 	$(MESS_MACHINE)/vic1112.o	\
 	$(MESS_AUDIO)/ted7360.o		\
