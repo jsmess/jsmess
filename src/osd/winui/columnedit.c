@@ -473,8 +473,7 @@ INT_PTR CALLBACK ColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPa
 {
 	static int shown[COLUMN_MAX];
 	static int order[COLUMN_MAX];
-	extern LPCTSTR column_names[COLUMN_MAX]; // from win32ui.c, should improve
-
+	extern const LPCTSTR column_names[COLUMN_MAX]; // from winui.c, should improve
 
 	return InternalColumnDialogProc(hDlg, Msg, wParam, lParam, COLUMN_MAX,
 		shown, order, column_names, GetRealColumnOrder, GetColumnInfo, SetColumnInfo);

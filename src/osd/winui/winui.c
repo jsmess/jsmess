@@ -995,7 +995,7 @@ int MameUIMain(HINSTANCE    hInstance,
 	if (__argc != 1)
 	{
 		/* Rename main because gcc will use it instead of WinMain even with -mwindows */
-		extern int /*DECL_SPEC*/ utf8_main(int, char**);
+		extern int /*DECL_SPEC*/ utf8_main(int, char*[]);
 		char **utf8_argv;
 		int i, rc;
 
