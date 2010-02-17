@@ -42,7 +42,7 @@ static READ8_DEVICE_HANDLER( pio_system_r )
 static WRITE8_DEVICE_HANDLER( pio_system_w )
 {
 /*  d7 bank select
-    d6 disk drive motors - not emulated (0=on)
+    d6 disk drive motors - (0=on)
     d5 double-density enable (0=double density)
     d4 Centronics strobe
     d2 side select (1=side 1)
@@ -82,6 +82,10 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 
 	output_set_value("ledA",(data & 1) ? 1 : 0);		/* LEDs in artwork */
 	output_set_value("ledB",(data & 2) ? 1 : 0);
+
+	/* CLEAR_LINE means to turn motors on */
+	floppy_mon_w(floppy_get_device(mem->machine, 0), (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	floppy_mon_w(floppy_get_device(mem->machine, 1), (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	kaypro_system_port = data;
 }
