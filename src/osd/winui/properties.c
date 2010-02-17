@@ -1988,7 +1988,7 @@ static BOOL ScreenReadControl(datamap *map, HWND dialog, HWND control, core_opti
 
 static BOOL ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_options *opts, const char *option_name)
 {
-	int iMonitors;
+	//int iMonitors;
 	DISPLAY_DEVICE dd;
 	int i = 0;
 	int nSelection = 0;
@@ -2000,7 +2000,7 @@ static BOOL ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 	(void)ComboBox_SetItemData(control, 0, (const char*)mame_strdup("auto"));
 
 	//Dynamically populate it, by enumerating the Monitors
-	iMonitors = GetSystemMetrics(SM_CMONITORS); // this gets the count of monitors attached
+	//iMonitors = GetSystemMetrics(SM_CMONITORS); // this gets the count of monitors attached
 	ZeroMemory(&dd, sizeof(dd));
 	dd.cb = sizeof(dd);
 	for(i=0; EnumDisplayDevices(NULL, i, &dd, 0); i++)

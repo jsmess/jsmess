@@ -336,7 +336,7 @@ static void Picker_InternalResetColumnDisplay(HWND hWnd, BOOL bFirstTime)
 	int         *widths;
 	int         *order;
 	int         *shown;
-	int shown_columns;
+	//int shown_columns;
 	LVCOLUMN col;
 	struct PickerInfo *pPickerInfo;
 	HRESULT res;
@@ -400,7 +400,7 @@ static void Picker_InternalResetColumnDisplay(HWND hWnd, BOOL bFirstTime)
 		}
 	}
 
-	shown_columns = nColumn;
+	//shown_columns = nColumn;
 
 	/* Fill this in so we can still sort on columns NOT shown */
 	for (i = 0; i < pPickerInfo->nColumnCount && nColumn < pPickerInfo->nColumnCount; i++)

@@ -38,7 +38,8 @@ static int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 	LV_ITEM lvi;
 	TCHAR	buf[80];
 	int 	nFrom, nTo;
-	HRESULT res;
+	int 	res;
+	BOOL 	b_res;
 
 	nFrom = ListView_GetItemCount(hFrom);
 	nTo   = ListView_GetItemCount(hTo);
@@ -58,7 +59,7 @@ static int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 	if (ListView_GetItem(hFrom, &lvi))
 	{
 		// Add this item to the Show and delete it from Available
-		res = ListView_DeleteItem(hFrom, lvi.iItem);
+		b_res = ListView_DeleteItem(hFrom, lvi.iItem);
 		lvi.iItem = ListView_GetItemCount(hTo);
 		res = ListView_InsertItem(hTo, &lvi);
 		ListView_SetItemState(hTo, lvi.iItem,
@@ -75,7 +76,8 @@ static void DoMoveItem( HWND hWnd, BOOL bDown)
 	LV_ITEM lvi;
 	TCHAR	buf[80];
 	int 	nMaxpos;
-	HRESULT res;
+	int		res;
+	BOOL 	b_res;
 	
 	lvi.iItem = ListView_GetNextItem(hWnd, -1, LVIS_SELECTED | LVIS_FOCUSED);
 	nMaxpos = ListView_GetItemCount(hWnd);
@@ -94,7 +96,7 @@ static void DoMoveItem( HWND hWnd, BOOL bDown)
 	if (ListView_GetItem(hWnd, &lvi))
 	{
 		// Add this item to the Show and delete it from Available
-		res = ListView_DeleteItem(hWnd, lvi.iItem);
+		b_res = ListView_DeleteItem(hWnd, lvi.iItem);
 		lvi.iItem += (bDown) ? 1 : -1;
 		res = ListView_InsertItem(hWnd,&lvi);
 		ListView_SetItemState(hWnd, lvi.iItem,
@@ -127,8 +129,9 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 	int         nAvail;
 	int         i, nCount = 0;
 	LV_ITEM     lvi;
-	DWORD dwShowStyle, dwAvailableStyle, dwView;
-	HRESULT res;
+	DWORD		dwShowStyle, dwAvailableStyle, dwView;
+	int			res;
+	BOOL		b_res;
 
 	switch (Msg)
 	{
@@ -411,7 +414,7 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 						lvi.mask     = LVIF_PARAM;
 						lvi.pszText  = 0;
 						lvi.iItem    = i;
-						res = ListView_GetItem(hShown, &lvi);
+						b_res = ListView_GetItem(hShown, &lvi);
 						order[nCount++]   = lvi.lParam;
 						shown[lvi.lParam] = TRUE;
 					}
@@ -421,7 +424,7 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 						lvi.mask     = LVIF_PARAM;
 						lvi.pszText  = 0;
 						lvi.iItem    = i;
-						res = ListView_GetItem(hAvailable, &lvi);
+						b_res = ListView_GetItem(hAvailable, &lvi);
 						order[nCount++]   = lvi.lParam;
 						shown[lvi.lParam] = FALSE;
 					}

@@ -1343,7 +1343,7 @@ void ResetTreeViewFolders(void)
 	int i;
 	TVITEM tvi;
 	TVINSERTSTRUCT	tvs;
-	HRESULT res;
+	BOOL res;
 
 	HTREEITEM shti; // for current child branches
 
@@ -1407,7 +1407,7 @@ void ResetTreeViewFolders(void)
 
 				tvi.hItem = hti_parent;
 				tvi.mask = TVIF_PARAM;
-				res= TreeView_GetItem(hTreeView,&tvi);
+				res = TreeView_GetItem(hTreeView,&tvi);
 				if (((LPTREEFOLDER)tvi.lParam) == treeFolders[treeFolders[i]->m_nParent])
 					break;
 
@@ -1444,7 +1444,7 @@ void SelectTreeViewFolder(int folder_id)
 	HWND hTreeView = GetTreeView();
 	HTREEITEM hti;
 	TVITEM tvi;
-	HRESULT res;
+	BOOL res;
 
 	memset(&tvi,0,sizeof(tvi));
 
@@ -1858,7 +1858,6 @@ static LRESULT CALLBACK TreeWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 
 		case WM_ERASEBKGND:
 			return TRUE;
-			break;
 
 		case WM_PAINT:
 			TreeCtrlOnPaint(hWnd, uMsg, wParam, lParam);

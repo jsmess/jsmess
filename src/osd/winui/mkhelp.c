@@ -99,7 +99,6 @@ int main(int argc, char *argv[])
 
 	/* close the files */
 	free(buffer);
-//	fclose(dst);
 	return 0;
 }
 

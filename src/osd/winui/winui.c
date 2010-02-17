@@ -1263,7 +1263,7 @@ static void ResizeTreeAndListViews(BOOL bResizeHidden)
 	int nLeftWindowWidth = 0;
 	RECT rect;
 	BOOL bVisible;
-	int nLastOverlap = -1;
+	//int nLastOverlap = -1;
 
 	/* Size the List Control in the Picker */
 	GetClientRect(hMain, &rect);
@@ -1290,7 +1290,7 @@ static void ResizeTreeAndListViews(BOOL bResizeHidden)
 			/* woah?  are we overlapping ourselves? */
 			if (nLeftWindowWidth < MIN_VIEW_WIDTH)
 			{
-				nLastOverlap = i;
+				//nLastOverlap = i;
 				nLastWidth = nLastWidth2;
 				nLeftWindowWidth = nSplitterOffset[i] - MIN_VIEW_WIDTH - (SPLITTER_WIDTH*3/2) - nLastWidth;
 				i--;
@@ -1315,7 +1315,7 @@ static void ResizeTreeAndListViews(BOOL bResizeHidden)
 void UpdateScreenShot(void)
 {
 	RECT rect;
-	int  nWidth;
+	//int  nWidth;
 	RECT fRect;
 	POINT p = {0, 0};
 
@@ -1333,13 +1333,13 @@ void UpdateScreenShot(void)
 
 	if (GetShowScreenShot())
 	{
-		nWidth = nSplitterOffset[GetSplitterCount() - 1];
+		//nWidth = nSplitterOffset[GetSplitterCount() - 1];
 		CheckMenuItem(GetMenu(hMain),ID_VIEW_PICTURE_AREA, MF_CHECKED);
 		ToolBar_CheckButton(hToolBar, ID_VIEW_PICTURE_AREA, MF_CHECKED);
 	}
 	else
 	{
-		nWidth = rect.right;
+		//nWidth = rect.right;
 		CheckMenuItem(GetMenu(hMain),ID_VIEW_PICTURE_AREA, MF_UNCHECKED);
 		ToolBar_CheckButton(hToolBar, ID_VIEW_PICTURE_AREA, MF_UNCHECKED);
 	}
@@ -5242,7 +5242,6 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 	case COLUMN_GAMES:
 		return mame_stricmp(ModifyThe(drivers[index1]->description),
 						ModifyThe(drivers[index2]->description));
-		break;
 
 	case COLUMN_ORIENTATION:
 		nTemp1 = DriverIsVertical(index1) ? 1 : 0;

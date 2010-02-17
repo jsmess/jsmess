@@ -737,8 +737,6 @@ INT_PTR CALLBACK AddCustomFileDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPA
 
 		   EndDialog(hDlg, 0);
 		   return TRUE;
-
-		   break;
 		}
 		case IDCANCEL:
 			EndDialog(hDlg, 0);

@@ -119,7 +119,6 @@ const char * GetAuditString(int audit_result)
 	case NOTFOUND :
 	case INCORRECT :
 		return "No";
-		break;
 
 	case UNKNOWN :
 		return "?";

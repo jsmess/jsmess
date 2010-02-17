@@ -216,11 +216,12 @@ static void UpdateDirectoryList(HWND hDlg)
 	LV_ITEM Item;
 	HWND	hList  = GetDlgItem(hDlg, IDC_DIR_LIST);
 	HWND	hCombo = GetDlgItem(hDlg, IDC_DIR_COMBO);
-	HRESULT res;
+	int		res;
+	BOOL	b_res;
 
 	/* Remove previous */
 
-	res = ListView_DeleteAllItems(hList);
+	b_res = ListView_DeleteAllItems(hList);
 
 	/* Update list */
 
