@@ -969,7 +969,7 @@ enum
 #define M6847_RGB(r,g,b)	((r << 16) | (g << 8) | (b << 0))
 
 
-static const UINT32 palette[] =
+static const UINT32 default_palette[] =
 {
 	M6847_RGB(0x00, 0xff, 0x00),	/* GREEN */
 	M6847_RGB(0xff, 0xff, 0x00),	/* YELLOW */
@@ -1807,7 +1807,7 @@ static DEVICE_START( mc6847 )
 	}
 	else
 	{
-		mc6847->palette = palette;
+		mc6847->palette = default_palette;
 	}
 
 	/* allocate timers */
