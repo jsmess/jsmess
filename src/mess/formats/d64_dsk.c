@@ -681,7 +681,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	int head, track;
 
 	int heads = 0, dos_tracks = 0, dos = 0;
-	bool has_errors;
+	bool has_errors = 0;
 	int errors_size = 0;
 
 	if (params)
