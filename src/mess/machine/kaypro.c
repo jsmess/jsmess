@@ -33,13 +33,18 @@ static void kaypro_interrupt(running_device *device, int state)
 
 static READ8_DEVICE_HANDLER( pio_system_r )
 {
-/*  d3 Centronics ready flag */
+	UINT8 data = 0;
 
-	UINT8 data = ~centronics_busy_r(kaypro_printer) << 3;
-	return (kaypro_system_port & 0xf7) | (data & 8) ;
+	/* centronics busy */
+	data |= centronics_not_busy_r(kaypro_printer) << 3;
+
+	/* PA7 is pulled high */
+	data |= 0x80;
+
+	return data;
 }
 
-static WRITE8_DEVICE_HANDLER( pio_system_w )
+static WRITE8_DEVICE_HANDLER( common_pio_system_w )
 {
 /*  d7 bank select
     d6 disk drive motors - (0=on)
@@ -78,8 +83,6 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 	if (data & 2)
 		wd17xx_set_drive(kaypro_fdc, 1);
 
-	wd17xx_set_side(kaypro_fdc, (data & 4) ? 1 : 0);	/* only has one side but this circuit exists... */
-
 	output_set_value("ledA",(data & 1) ? 1 : 0);		/* LEDs in artwork */
 	output_set_value("ledB",(data & 2) ? 1 : 0);
 
@@ -88,6 +91,22 @@ static WRITE8_DEVICE_HANDLER( pio_system_w )
 	floppy_mon_w(floppy_get_device(mem->machine, 1), (data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	kaypro_system_port = data;
+}
+
+static WRITE8_DEVICE_HANDLER( kayproii_pio_system_w )
+{
+	common_pio_system_w(device, offset, data);
+
+	/* side select */
+	wd17xx_set_side(kaypro_fdc, !BIT(data, 2));
+}
+
+static WRITE8_DEVICE_HANDLER( kaypro4_pio_system_w )
+{
+	common_pio_system_w(device, offset, data);
+
+	/* side select */
+	wd17xx_set_side(kaypro_fdc, BIT(data, 2));
 }
 
 const z80pio_interface kayproii_pio_g_intf =
@@ -105,7 +124,18 @@ const z80pio_interface kayproii_pio_s_intf =
 {
 	DEVCB_LINE(kaypro_interrupt),
 	DEVCB_HANDLER(pio_system_r),	/* read printer status */
-	DEVCB_HANDLER(pio_system_w),	/* activate various internal devices */
+	DEVCB_HANDLER(kayproii_pio_system_w),	/* activate various internal devices */
+	DEVCB_NULL,			/* portA ready active callback */
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL			/* portB ready active callback */
+};
+
+const z80pio_interface kaypro4_pio_s_intf =
+{
+	DEVCB_LINE(kaypro_interrupt),
+	DEVCB_HANDLER(pio_system_r),	/* read printer status */
+	DEVCB_HANDLER(kaypro4_pio_system_w),	/* activate various internal devices */
 	DEVCB_NULL,			/* portA ready active callback */
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -359,11 +389,12 @@ MACHINE_START( kayproii )
 	kaypro_z80sio = devtag_get_device(machine, "z80sio");
 	kaypro_printer = devtag_get_device(machine, "centronics");
 	kaypro_fdc = devtag_get_device(machine, "wd1793");
+
+	z80pio_astb_w(kayproii_z80pio_s, 0);
 }
 
 MACHINE_RESET( kayproii )
 {
-	pio_system_w(kayproii_z80pio_s, 0, 0x80);
 	MACHINE_RESET_CALL(kay_kbd);
 }
 
@@ -410,7 +441,7 @@ QUICKLOAD_LOAD( kayproii )
 
 //  if (input_port_read(image->machine, "CONFIG") & 1)
 	{
-		pio_system_w(kayproii_z80pio_s, 0, kaypro_system_port & 0x7f);	// switch TPA in
+		common_pio_system_w(kayproii_z80pio_s, 0, kaypro_system_port & 0x7f);	// switch TPA in
 		RAM[0x80]=0;							// clear out command tail
 		RAM[0x81]=0;
 		cpu_set_reg(cpu, REG_GENPC, 0x100);				// start program

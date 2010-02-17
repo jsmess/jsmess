@@ -394,7 +394,8 @@ WRITE8_DEVICE_HANDLER( z80pio_d_w )
 		break;
 
 	case MODE_INPUT:
-		/* do nothing */
+		/* latch output data */
+		port->output = data;
 		break;
 
 	case MODE_BIDIRECTIONAL:
@@ -853,9 +854,6 @@ static DEVICE_RESET( z80pio )
 
 		/* set mode 1 */
 		set_mode(device, index, MODE_INPUT);
-
-		/* reset port mask registers */
-		port->mask = 0;
 
 		/* reset interrupt enable flip-flops */
 		port->icw &= ~ICW_ENABLE_INT;
