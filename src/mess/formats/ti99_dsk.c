@@ -1959,8 +1959,8 @@ FLOPPY_CONSTRUCT(ti99_tdf_construct)
 	if (params)
 	{
 		/* create */
+		memset(&geometry, 0, sizeof(geometry));
 /*
-        memset(&geometry, 0, sizeof(geometry));
         geometry.sides              = option_resolution_lookup_int(params, PARAM_HEADS);
         geometry.tracksperside          = option_resolution_lookup_int(params, PARAM_TRACKS);
         geometry.secspertrack           = option_resolution_lookup_int(params, PARAM_SECTORS);
