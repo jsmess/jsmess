@@ -11,11 +11,10 @@
     TODO:
 
 	- NOT A SYSTEM DISK, RE-BOOT
-	- centronics ACK -> pio BSTB
     - Z80 daisy chain
     - keyboard CPU ROM
     - keyboard layout
-    - main RAM banking
+	- 2-sided diskette flag
     - graphics board
 
 */
@@ -202,7 +201,8 @@ static WRITE8_HANDLER( nmi_w )
 	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
 
 	const address_space *program = cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xf800;
+	UINT8 *ram = messram_get_ptr(devtag_get_device(space->machine, "messram"));
+	int last_page = (messram_get_size(devtag_get_device(space->machine, "messram")) / 0x8000) - 1;
 
 	/* memory bank select */
 	state->bank = data & 0x0f;
@@ -230,8 +230,15 @@ static WRITE8_HANDLER( nmi_w )
 	}
 	else
 	{
-		/* enable RAM */
-		memory_install_ram(program, 0xf800, 0xffff, 0, 0, ram);
+		if (state->bank > last_page)
+		{
+			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+		}
+		else
+		{
+			/* enable RAM */
+			memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + (state->bank * 0x8000));
+		}
 	}
 }
 
@@ -591,14 +598,14 @@ static READ8_DEVICE_HANDLER( pio_pa_r )
 
         bit     signal      description
 
-        0                   FDC INT request
-        1                   2-sided diskette
-        2                   disk change
-        3                   prime
-        4                   printer fault
-        5                   printer select
-        6                   paper empty
-        7                   printer busy
+        0       INTRQ       FDC INT request
+        1       _TWOSID     2-sided diskette
+        2       _DSKCHG     disk change
+        3       PRIME       prime
+        4       FAULT       printer fault
+        5       PSEL        printer select
+        6       PE          paper empty
+        7       BUSY        printer busy
 
     */
 
@@ -636,11 +643,11 @@ static WRITE8_DEVICE_HANDLER( pio_pa_w )
         0       INTRQ       FDC INT request
         1       _TWOSID     2-sided diskette
         2       _DSKCHG     disk change
-        3                   prime
-        4                   printer fault
-        5                   printer select
-        6                   paper empty
-        7                   printer busy
+        3       PRIME       prime
+        4       FAULT       printer fault
+        5       PSEL        printer select
+        6       PE          paper empty
+        7       BUSY        printer busy
 
     */
 
@@ -664,6 +671,16 @@ static Z80PIO_INTERFACE( pio_intf )
 	DEVCB_NULL,													/* port B read callback */
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w),	/* port B write callback */
 	DEVCB_DEVICE_LINE(CENTRONICS_TAG, strobe_w)					/* port B ready callback */
+};
+
+/* Centronics Interface */
+
+static const centronics_interface centronics_intf =
+{
+	0,												/* is IBM PC? */
+	DEVCB_DEVICE_LINE(Z80PIO_TAG, z80pio_bstb_w),	/* ACK output */
+	DEVCB_NULL,										/* BUSY output */
+	DEVCB_NULL										/* NOT BUSY output */
 };
 
 /* Z80-SIO/0 Interface */
@@ -818,12 +835,13 @@ static MACHINE_DRIVER_START( trs80m2 )
 	MDRV_Z80DMA_ADD(Z80DMA_TAG, XTAL_8MHz/2, dma_intf)
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_8MHz/2, pio_intf)
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, XTAL_8MHz/2, sio_intf)
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, centronics_intf)
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, trs80m2_floppy_config)
 
 	/* internal RAM */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_DEFAULT_SIZE("32K")
+	MDRV_RAM_EXTRA_OPTIONS("64K,96K,128K,160K,192K,224K,256K,288K,320K,352K,384K,416K,448K,480K,512K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( trs80m16 )
