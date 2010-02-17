@@ -628,7 +628,7 @@ INT_PTR CALLBACK AddCustomFileDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPA
 {
     static LPTREEFOLDER default_selection = NULL;
 	static int driver_index;
-	HRESULT res;
+	BOOL res;
 
 	switch (Msg)
 	{

@@ -340,6 +340,7 @@ static void Picker_InternalResetColumnDisplay(HWND hWnd, BOOL bFirstTime)
 	LVCOLUMN col;
 	struct PickerInfo *pPickerInfo;
 	HRESULT res;
+	BOOL b_res;
 
 	pPickerInfo = GetPickerInfo(hWnd);
 
@@ -372,7 +373,7 @@ static void Picker_InternalResetColumnDisplay(HWND hWnd, BOOL bFirstTime)
 		{
 			nColumn = Picker_GetRealColumnFromViewColumn(hWnd, i++);
 			widths[nColumn] = col.cx;
-			res = ListView_DeleteColumn(hWnd, 0);
+			b_res = ListView_DeleteColumn(hWnd, 0);
 		}
 
 		pPickerInfo->pCallbacks->pfnSetColumnWidths(widths);
@@ -413,9 +414,9 @@ static void Picker_InternalResetColumnDisplay(HWND hWnd, BOOL bFirstTime)
 	}
 
 	if (GetListFontColor() == RGB(255, 255, 255))
-		res = ListView_SetTextColor(hWnd, RGB(240, 240, 240));
+		b_res = ListView_SetTextColor(hWnd, RGB(240, 240, 240));
 	else
-		res = ListView_SetTextColor(hWnd, GetListFontColor());
+		b_res = ListView_SetTextColor(hWnd, GetListFontColor());
 
 done:
 	if (widths)
@@ -676,7 +677,7 @@ int Picker_GetSelectedItem(HWND hWnd)
 {
 	int nItem;
 	LV_ITEM lvi;
-	HRESULT res;
+	BOOL res;
 
 	nItem = ListView_GetNextItem(hWnd, -1, LVIS_SELECTED | LVIS_FOCUSED);
 	if (nItem < 0)
@@ -693,7 +694,7 @@ int Picker_GetSelectedItem(HWND hWnd)
 
 void Picker_SetSelectedPick(HWND hWnd, int nIndex)
 {
-	HRESULT res;
+	BOOL res;
 	
 	if (nIndex < 0)
 		nIndex = 0;
@@ -759,7 +760,7 @@ static void Picker_ResetHeaderSortIcon(HWND hwndPicker)
 	HWND hwndHeader;
 	HD_ITEM hdi;
 	int i, nViewColumn;
-	HRESULT res;
+	BOOL res;
 
 	pPickerInfo = GetPickerInfo(hwndPicker);
 
@@ -929,7 +930,7 @@ void Picker_Sort(HWND hwndPicker)
 	struct PickerInfo *pPickerInfo;
 	struct CompareProcParams params;
 	int nItem;
-	HRESULT res;
+	BOOL res;
 
 	pPickerInfo = GetPickerInfo(hwndPicker);
 
@@ -957,7 +958,7 @@ int Picker_InsertItemSorted(HWND hwndPicker, int nParam)
 	struct CompareProcParams params;
 	int nCompareResult;
 	LVITEM lvi;
-	HRESULT res;
+	BOOL res;
 
 	pPickerInfo = GetPickerInfo(hwndPicker);
 
@@ -1244,7 +1245,7 @@ void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 	int			nParent;
 	HBITMAP		hBackground = GetBackgroundBitmap();
 	MYBITMAPINFO *pbmDesc = GetBackgroundInfo();
-	HRESULT res;
+	BOOL res;
 
 	pPickerInfo = GetPickerInfo(hWnd);
 
@@ -1618,7 +1619,7 @@ BOOL Picker_SaveColumnWidths(HWND hwndPicker)
 	int *tmpOrder;
 	int nColumnMax, i;
 	BOOL bSuccess = FALSE;
-	HRESULT res;
+	BOOL res;
 
 	pPickerInfo = GetPickerInfo(hwndPicker);
 

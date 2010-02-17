@@ -75,7 +75,7 @@ static BOOL SoftwareDirectories_OnInsertBrowse(HWND hDlg, BOOL bBrowse, LPCTSTR 
     TCHAR outbuf[MAX_PATH];
     HWND hList;
 	LPTSTR lpIn;
-	HRESULT res;
+	BOOL res;
 
 	g_bModifiedSoftwarePaths = TRUE;
 
@@ -120,7 +120,7 @@ static BOOL SoftwareDirectories_OnDelete(HWND hDlg)
     int     nSelect;
     int     nItem;
     HWND    hList = GetDlgItem(hDlg, IDC_DIR_LIST);
-	HRESULT res;
+	BOOL res;
 
 	g_bModifiedSoftwarePaths = TRUE;
 
@@ -285,7 +285,7 @@ static BOOL DirListReadControl(datamap *map, HWND dialog, HWND control, core_opt
 	TCHAR buffer[2048];
 	char *dir_list;
 	int i, pos, driver_index;
-	HRESULT res;
+	BOOL res;
 
 	// determine the directory count; note that one item is the "<    >" entry
 	directory_count = ListView_GetItemCount(control);
@@ -334,6 +334,7 @@ static BOOL DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 	LV_COLUMN lvc;
 	RECT r;
 	HRESULT res;
+	BOOL b_res;
 
 	// access the directory list, and convert to TCHARs
 	driver_index = PropertiesCurrentGame(dialog);
@@ -343,7 +344,7 @@ static BOOL DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 		return FALSE;
 
 	// delete all items in the list control
-	res = ListView_DeleteAllItems(control);
+	b_res = ListView_DeleteAllItems(control);
 
 	// add the column
 	GetClientRect(control, &r);

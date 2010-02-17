@@ -276,10 +276,11 @@ void TabView_Reset(HWND hwndTabView)
 	int i;
 	TCHAR* t_text;
 	HRESULT res;
+	BOOL b_res;
 
 	pTabViewInfo = GetTabViewInfo(hwndTabView);
 
-	res = TabCtrl_DeleteAllItems(hwndTabView);
+	b_res = TabCtrl_DeleteAllItems(hwndTabView);
 
 	memset(&tci, 0, sizeof(tci));
 	tci.mask = TCIF_TEXT;

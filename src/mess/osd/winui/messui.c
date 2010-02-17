@@ -1347,7 +1347,7 @@ static void SoftwareTabView_OnMoveSize(void)
 	HWND hwndSoftwarePicker;
 	HWND hwndSoftwareDevView;
 	RECT rMain, rSoftwareTabView, rClient, rTab;
-	HRESULT res;
+	BOOL res;
 
 	hwndSoftwareTabView = GetDlgItem(GetMainWindow(), IDC_SWTAB);
 	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
