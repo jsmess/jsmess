@@ -1446,7 +1446,6 @@ static WRITE32_HANDLER( gba_io_w )
 				running_device *gb_a_r = devtag_get_device(machine, "direct_a_right");
 				running_device *gb_b_l = devtag_get_device(machine, "direct_b_left");
 				running_device *gb_b_r = devtag_get_device(machine, "direct_b_right");
-				running_device *gb_device = devtag_get_device(space->machine, "custom");
 
 				gb_sound_w(gb_device, 0x16, data);
 				if ((data & 0x80) && !(gba_state->SOUNDCNT_X & 0x80))
