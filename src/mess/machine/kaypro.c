@@ -90,10 +90,10 @@ const z80pio_interface kayproii_pio_g_intf =
 {
 	DEVCB_LINE(kaypro_interrupt),
 	DEVCB_NULL,
-	DEVCB_NULL,
 	DEVCB_DEVICE_HANDLER("centronics", centronics_data_w),
-	DEVCB_NULL,
 	DEVCB_NULL,			/* portA ready active callback */
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL			/* portB ready active callback */
 };
 
@@ -101,10 +101,10 @@ const z80pio_interface kayproii_pio_s_intf =
 {
 	DEVCB_LINE(kaypro_interrupt),
 	DEVCB_HANDLER(pio_system_r),	/* read printer status */
-	DEVCB_NULL,
 	DEVCB_HANDLER(pio_system_w),	/* activate various internal devices */
-	DEVCB_NULL,
 	DEVCB_NULL,			/* portA ready active callback */
+	DEVCB_NULL,
+	DEVCB_NULL,
 	DEVCB_NULL			/* portB ready active callback */
 };
 
