@@ -942,6 +942,8 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(s, GetOpenFileName, pszFilename, config, imagetypes);
+	
+	/* TODO: free() calls? */
 
 	return bResult;
 }
@@ -1003,6 +1005,8 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(s, GetSaveFileName, pszFilename, config, imagetypes);
+	
+	/* TODO: free() calls? */
 
 	return bResult;
 }
@@ -1114,6 +1118,7 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 {
 	LPCSTR pszFullName;
 	LPCSTR pszName;
+	const char* tmp;
 	LPSTR s;
 	int drvindex;
 	HWND hwndList;
@@ -1126,8 +1131,8 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 
 		// Get the fullname and partialname for this file
 		pszFullName = SoftwarePicker_LookupFilename(hwndSoftwarePicker, nItem);
-		s = strchr(pszFullName, '\\');
-		pszName = s ? s + 1 : pszFullName;
+		tmp = strchr(pszFullName, '\\');
+		pszName = tmp ? tmp + 1 : pszFullName;
 
 		// Do the dirty work
 		MessSpecifyImage(drvindex, NULL, pszFullName);

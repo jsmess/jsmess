@@ -2156,8 +2156,8 @@ static void SplitterDecodeString(const char *str, int *value)
 /* Parse the given comma-delimited string into a LOGFONT structure */
 static void FontDecodeString(const char* str, LOGFONT *f)
 {
-	char*	 ptr;
-	TCHAR* 	 t_ptr;
+	const char*	ptr;
+	TCHAR*		t_ptr;
 
 	sscanf(str, "%li,%li,%li,%li,%li,%i,%i,%i,%i,%i,%i,%i,%i",
 		   &f->lfHeight,

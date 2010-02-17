@@ -1208,7 +1208,7 @@ static LPCTSTR MakeShortString(HDC hDC, LPCTSTR lpszLong, int nColumnLen, int nO
 	return szShort;
 }
 
-#define ListView_GetItemRect_Modified(hwnd,i,prc,code) (WINBOOL)SNDMSG((hwnd),LVM_GETITEMRECT,(WPARAM)(int)(i),(((RECT *)(prc))->left = (code),(LPARAM)(RECT *)(prc)))
+#define ListView_GetItemRect_Modified(hwnd,i,prc,code) (BOOL)SNDMSG((hwnd),LVM_GETITEMRECT,(WPARAM)(int)(i),(((RECT *)(prc))->left = (code),(LPARAM)(RECT *)(prc)))
 
 void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
