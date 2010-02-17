@@ -7,14 +7,6 @@
 	
 ***************************************************************************/
 
-/*
-
-	TODO:
-
-	- save state
-
-*/
-
 #include "emu.h"
 #include "z80pio.h"
 #include "cpu/z80/z80daisy.h"
@@ -23,7 +15,7 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 1
+#define LOG 0
 
 enum
 {
@@ -144,6 +136,8 @@ static void set_rdy(running_device *device, int index, int state)
 	z80pio_t *z80pio = get_safe_token(device);
 	pio_port *port = &z80pio->port[index];
 
+	if (port->rdy == state) return;
+
 	if (LOG) logerror("Z80PIO '%s' Port %c Ready: %u\n", device->tag.cstr(), 'A' + index, state);
 
 	port->rdy = state;
@@ -243,6 +237,11 @@ WRITE8_DEVICE_HANDLER( z80pio_c_w )
 			/* load interrupt vector */
 			port->vector = data;
 			if (LOG) logerror("Z80PIO '%s' Port %c Interrupt Vector: %02x\n", device->tag.cstr(), 'A' + index, data);
+
+			/* set interrupt enable */
+			port->icw |= ICW_ENABLE_INT;
+			port->ie = 1;
+			check_interrupts(device);
 		}
 		else
 		{
@@ -412,7 +411,7 @@ WRITE8_DEVICE_HANDLER( z80pio_d_w )
 		}
 
 		/* assert ready line */
-		set_rdy(device, index, 0);
+		set_rdy(device, index, 1);
 		break;
 
 	case MODE_BIT_CONTROL:
@@ -616,6 +615,8 @@ static void strobe(running_device *device, int index, int state)
 	z80pio_t *z80pio = get_safe_token(device);
 	pio_port *port = &z80pio->port[index];
 
+	if (LOG) logerror("Z80PIO '%s' Port %c Strobe: %u\n", device->tag.cstr(), 'A' + index, state);
+
 	if (z80pio->port[PORT_A].mode == MODE_BIDIRECTIONAL)
 	{
 		pio_port *port_a = &z80pio->port[PORT_A];
@@ -631,8 +632,10 @@ static void strobe(running_device *device, int index, int state)
 				}
 				else if (!port->stb && state) /* rising edge */
 				{
-					trigger_interrupt(device, PORT_A);
-					set_rdy(device, PORT_A, 0);
+					trigger_interrupt(device, index);
+					
+					/* clear ready line */
+					set_rdy(device, index, 0);
 				}
 			}
 			break;
@@ -646,8 +649,10 @@ static void strobe(running_device *device, int index, int state)
 				}
 				else if (!port->stb && state) /* rising edge */
 				{
-					trigger_interrupt(device, PORT_A);
-					set_rdy(device, PORT_B, 0);
+					trigger_interrupt(device, index);
+
+					/* clear ready line */
+					set_rdy(device, index, 0);
 				}
 			}
 			break;
@@ -658,21 +663,29 @@ static void strobe(running_device *device, int index, int state)
 		switch (port->mode)
 		{
 		case MODE_OUTPUT:
-			if (!port->stb && state) /* rising edge */
+			if (port->rdy)
 			{
-				trigger_interrupt(device, index);
-				set_rdy(device, index, 0);
+				if (!port->stb && state) /* rising edge */
+				{
+					trigger_interrupt(device, index);
+
+					/* clear ready line */
+					set_rdy(device, index, 0);
+				}
 			}
 			break;
 
 		case MODE_INPUT:
 			if (!state)
 			{
+				/* input port data */
 				port->input = devcb_call_read8(&port->in_p_func, 0);
 			}
 			else if (!port->stb && state) /* rising edge */
 			{
 				trigger_interrupt(device, index);
+
+				/* clear ready line */
 				set_rdy(device, index, 0);
 			}
 			break;
@@ -807,7 +820,23 @@ static DEVICE_START( z80pio )
 	devcb_resolve_write_line(&z80pio->port[PORT_B].out_rdy_func, &intf->out_brdy_func, device);
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, z80pio->);
+	for (int index = PORT_A; index < PORT_COUNT; index++)
+	{
+		state_save_register_device_item(device, 0, z80pio->port[index].mode);
+		state_save_register_device_item(device, 0, z80pio->port[index].next_control_word);
+		state_save_register_device_item(device, 0, z80pio->port[index].input);
+		state_save_register_device_item(device, 0, z80pio->port[index].output);
+		state_save_register_device_item(device, 0, z80pio->port[index].ior);
+		state_save_register_device_item(device, 0, z80pio->port[index].rdy);
+		state_save_register_device_item(device, 0, z80pio->port[index].stb);
+		state_save_register_device_item(device, 0, z80pio->port[index].ie);
+		state_save_register_device_item(device, 0, z80pio->port[index].ip);
+		state_save_register_device_item(device, 0, z80pio->port[index].ius);
+		state_save_register_device_item(device, 0, z80pio->port[index].icw);
+		state_save_register_device_item(device, 0, z80pio->port[index].vector);
+		state_save_register_device_item(device, 0, z80pio->port[index].mask);
+		state_save_register_device_item(device, 0, z80pio->port[index].match);
+	}
 }
 
 /*-------------------------------------------------
