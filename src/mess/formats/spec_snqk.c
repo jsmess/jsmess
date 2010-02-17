@@ -354,7 +354,8 @@ void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
     cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 
     data = BIT(status, 5);
-    /* TODO: Flash bit */
+    state->flash_invert = data;
+    logerror("FLASH state: %s\n", data ? "PAPER on INK" : "INK on PAPER");
 
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", size, start);
@@ -1389,7 +1390,7 @@ void spectrum_setup_snp(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     LOAD_REG(cpu, Z80_PC, data);
 
 
-    data = snapdata[SNP_OFFSET + 91] & 0x03;
+    data = snapdata[SNP_OFFSET + 20] & 0x03;
     LOAD_REG(cpu, Z80_IM, data);
 
     data = BIT(snapdata[SNP_OFFSET + 19], 0);
@@ -2074,3 +2075,4 @@ QUICKLOAD_LOAD(spectrum)
     logerror("quick loading at %.4x size:%.4x\n", quick_addr, quick_length);
     return INIT_PASS;
 }
+
