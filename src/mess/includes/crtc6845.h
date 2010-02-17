@@ -13,11 +13,6 @@
 #ifndef MSCRTC6845_H_
 #define MSCRTC6845_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-
 /***************************************************************************
 
     Constants
@@ -98,7 +93,7 @@ int mscrtc6845_port_w(struct mscrtc6845 *crtc, int offset, UINT8 data);
 WRITE8_HANDLER ( mscrtc6845_0_port_w );
 
 /* to be called when reading from port */
- READ8_HANDLER ( mscrtc6845_0_port_r );
+READ8_HANDLER ( mscrtc6845_0_port_r );
 
 /***************************************************************************
 
@@ -126,10 +121,5 @@ WRITE8_HANDLER ( mscrtc6845_0_port_w );
 #define CRTC6845_CURSOR_POS ((REG(0xe)<<8)|REG(0xf))
 #define CRTC6845_CURSOR_TOP	(REG(0xa)&0x1f)
 #define CRTC6845_CURSOR_BOTTOM REG(0xb)
-
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* MSCRTC6845_H_ */
