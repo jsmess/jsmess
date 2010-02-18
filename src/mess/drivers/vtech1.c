@@ -525,11 +525,7 @@ static const floppy_config vtech1_floppy_config =
 
 static READ8_DEVICE_HANDLER( vtech1_printer_r )
 {
-	UINT8 result = 0xff;
-
-	result &= ~(centronics_busy_r(device) ? 0x00 : 0x01);
-
-	return result;
+	return 0xfe | centronics_busy_r(device);
 }
 
 /* TODO: figure out how this really works */
