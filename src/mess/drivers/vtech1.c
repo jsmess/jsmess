@@ -527,7 +527,7 @@ static READ8_DEVICE_HANDLER( vtech1_printer_r )
 {
 	UINT8 result = 0xff;
 
-	result &= ~(!centronics_busy_r(device));
+	result &= ~(centronics_busy_r(device) ? 0x00 : 0x01);
 
 	return result;
 }

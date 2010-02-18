@@ -206,7 +206,7 @@ static void towns_init_serial_rom(running_machine* machine)
 {
 	// TODO: init serial ROM contents
 	int x;
-	char code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
+	UINT8 code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
 	UINT8* srom = memory_region(machine,"serial");
 
 	memset(towns_serial_rom,0,256/8);

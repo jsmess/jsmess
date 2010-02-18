@@ -14,12 +14,12 @@ Atari 2600 SuperCharger support
 #define BIT_ONE_LENGTH			15
 #define ZEROS_ONES				2755
 
-static const INT16 one_wave[BIT_ONE_LENGTH] = {
+static const UINT16 one_wave[BIT_ONE_LENGTH] = {
 	0x2AE5, 0x4E60, 0x644E, 0x68E4, 0x5B56, 0x3DFE, 0x15ED, 0xEA13, 0xC202, 0xA4AA,
 	0x971C, 0x9BB2, 0xB1A0, 0xD51B, 0x0000
 };
 
-static const INT16 zero_wave[BIT_ZERO_LENGTH] = {
+static const UINT16 zero_wave[BIT_ZERO_LENGTH] = {
 	0x3DFE, 0x644E, 0x644E, 0x3DFE, 0x0000, 0xC202, 0x9BB2, 0x9BB2, 0xC202, 0x0000
 };
 
@@ -38,7 +38,7 @@ static int a26_cas_output_wave( INT16 **buffer, INT16 wave_data, int length ) {
 static int a26_cas_output_bit( INT16 **buffer, int bit ) {
 	int size = 0;
 	int	bit_size = bit ? BIT_ONE_LENGTH : BIT_ZERO_LENGTH;
-	const INT16 *p = bit ? one_wave : zero_wave;
+	const INT16 *p = bit ? (const INT16 *)one_wave : (const INT16 *)zero_wave;
 	int i;
 
 	for ( i = 0; i < bit_size; i++ ) {

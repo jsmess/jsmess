@@ -171,7 +171,7 @@ static UINT8 kbd_tail = 0;
 static UINT8 beep_on = 0;
 static UINT8 control_status = 0;
 static UINT8 keyrows[10] = { 0,0,0,0,0,0,0,0,0,0 };
-static const char keyboard[8][10][8] = {
+static const UINT8 keyboard[8][10][8] = {
 	{ /* normal */
 		{ 27,'1','2','3','4','5','6','7'},
 		{'8','9','0','-','=','`',  8,  9},

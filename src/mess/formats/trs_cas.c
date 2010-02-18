@@ -8,7 +8,7 @@ Support for TRS80 .cas cassette images
 
 #define SILENCE	0
 #define SMPLO   -32768
-#define SMPHI   32768
+#define SMPHI   32767
 
 
 static int cas_size;
