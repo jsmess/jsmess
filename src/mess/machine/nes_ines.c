@@ -1969,6 +1969,20 @@ WRITE8_HANDLER( nes_fds_w )
 
 *************************************************************/
 
+static void vrc4_set_prg( running_machine *machine )
+{
+	if (mmc_cmd1 & 0x02)
+	{
+		prg8_89(machine, 0xfe);
+		prg8_cd(machine, prg_bank[0]);
+	}
+	else
+	{
+		prg8_89(machine, prg_bank[0]);
+		prg8_cd(machine, 0xfe);
+	}
+}
+
 static void konami_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	/* Increment & check the IRQ scanline counter */
@@ -1980,16 +1994,26 @@ static void konami_irq( running_device *device, int scanline, int vblank, int bl
 	}
 }
 
-static WRITE8_HANDLER( konami_vrc4_w )
+static WRITE8_HANDLER( konami_vrc4a_w )
 {
-	LOG_MMC(("konami_vrc4_w, offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("konami_vrc4a_w, offset: %04x, data: %02x\n", offset, data));
 
-	switch (offset & 0x7007)
+	switch (offset & 0x7fff)
 	{
 		case 0x0000:
-			prg8_89(space->machine, data);
+		case 0x0002:
+		case 0x0004:
+		case 0x0006:
+		case 0x0040:
+		case 0x0080:
+		case 0x00c0:
+			prg_bank[0] = data;
+			vrc4_set_prg(space->machine);
 			break;
+
 		case 0x1000:
+		case 0x1002:
+		case 0x1040:
 			switch (data & 0x03)
 			{
 				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
@@ -1999,16 +2023,179 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			}
 			break;
 
-		/* $1001 is uncaught */
+		case 0x1004:
+		case 0x1006:
+		case 0x1080:
+		case 0x10c0:
+			mmc_cmd1 = data & 0x02;
+			vrc4_set_prg(space->machine);
+			break;
 
 		case 0x2000:
+		case 0x2002:
+		case 0x2004:
+		case 0x2006:
+		case 0x2040:
+		case 0x2080:
+		case 0x20c0:
 			prg8_ab(space->machine, data);
 			break;
+
 		case 0x3000:
 			vrom_bank[0] = (vrom_bank[0] & 0xf0) | (data & 0x0f);
 			chr1_0(space->machine, vrom_bank[0], CHRROM);
 			break;
 		case 0x3002:
+		case 0x3040:
+			vrom_bank[0] = (vrom_bank[0] & 0x0f) | (data << 4);
+			chr1_0(space->machine, vrom_bank[0], CHRROM);
+			break;
+		case 0x3004:
+		case 0x3080:
+			vrom_bank[1] = (vrom_bank[1] & 0xf0) | (data & 0x0f);
+			chr1_1(space->machine, vrom_bank[1], CHRROM);
+			break;
+		case 0x3006:
+		case 0x30c0:
+			vrom_bank[1] = (vrom_bank[1] & 0x0f) | (data << 4);
+			chr1_1(space->machine, vrom_bank[1], CHRROM);
+			break;
+		case 0x4000:
+			vrom_bank[2] = (vrom_bank[2] & 0xf0) | (data & 0x0f);
+			chr1_2(space->machine, vrom_bank[2], CHRROM);
+			break;
+		case 0x4002:
+		case 0x4040:
+			vrom_bank[2] = (vrom_bank[2] & 0x0f) | (data << 4);
+			chr1_2(space->machine, vrom_bank[2], CHRROM);
+			break;
+		case 0x4004:
+		case 0x4080:
+			vrom_bank[3] = (vrom_bank[3] & 0xf0) | (data & 0x0f);
+			chr1_3(space->machine, vrom_bank[3], CHRROM);
+			break;
+		case 0x4006:
+		case 0x40c0:
+			vrom_bank[3] = (vrom_bank[3] & 0x0f) | (data << 4);
+			chr1_3(space->machine, vrom_bank[3], CHRROM);
+			break;
+		case 0x5000:
+			vrom_bank[4] = (vrom_bank[4] & 0xf0) | (data & 0x0f);
+			chr1_4(space->machine, vrom_bank[4], CHRROM);
+			break;
+		case 0x5002:
+		case 0x5040:
+			vrom_bank[4] = (vrom_bank[4] & 0x0f) | (data << 4);
+			chr1_4(space->machine, vrom_bank[4], CHRROM);
+			break;
+		case 0x5004:
+		case 0x5080:
+			vrom_bank[5] = (vrom_bank[5] & 0xf0) | (data & 0x0f);
+			chr1_5(space->machine, vrom_bank[5], CHRROM);
+			break;
+		case 0x5006:
+		case 0x50c0:
+			vrom_bank[5] = (vrom_bank[5] & 0x0f) | (data << 4);
+			chr1_5(space->machine, vrom_bank[5], CHRROM);
+			break;
+		case 0x6000:
+			vrom_bank[6] = (vrom_bank[6] & 0xf0) | (data & 0x0f);
+			chr1_6(space->machine, vrom_bank[6], CHRROM);
+			break;
+		case 0x6002:
+		case 0x6040:
+			vrom_bank[6] = (vrom_bank[6] & 0x0f) | (data << 4);
+			chr1_6(space->machine, vrom_bank[6], CHRROM);
+			break;
+		case 0x6004:
+		case 0x6080:
+			vrom_bank[7] = (vrom_bank[7] & 0xf0) | (data & 0x0f);
+			chr1_7(space->machine, vrom_bank[7], CHRROM);
+			break;
+		case 0x6006:
+		case 0x60c0:
+			vrom_bank[7] = (vrom_bank[7] & 0x0f) | (data << 4);
+			chr1_7(space->machine, vrom_bank[7], CHRROM);
+			break;
+
+		case 0x7000:
+			IRQ_count_latch = (IRQ_count_latch & 0xf0) | (data & 0x0f);
+			break;
+		case 0x7002:
+		case 0x7040:
+			IRQ_count_latch = (IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4 );
+			break;
+		case 0x7004:
+		case 0x7080:
+			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+			IRQ_enable = data & 0x02;
+			IRQ_enable_latch = data & 0x01;
+			if (data & 0x02)
+				IRQ_count = IRQ_count_latch;
+			break;
+		case 0x7006:
+		case 0x70c0:
+			IRQ_enable = IRQ_enable_latch;
+			break;
+		default:
+			LOG_MMC(("konami_vrc4a_w uncaught offset: %04x value: %02x\n", offset, data));
+			break;
+	}
+}
+
+static WRITE8_HANDLER( konami_vrc4b_w )
+{
+	LOG_MMC(("konami_vrc4b_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x7fff)
+	{
+		case 0x0000:
+		case 0x0001:
+		case 0x0002:
+		case 0x0003:
+		case 0x0004:
+		case 0x0008:
+		case 0x000c:
+			prg_bank[0] = data;
+			vrc4_set_prg(space->machine);
+			break;
+
+		case 0x1000:
+		case 0x1002:
+		case 0x1008:
+			switch (data & 0x03)
+			{
+				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
+				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
+				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+			}
+			break;
+
+		case 0x1001:
+		case 0x1003:
+		case 0x1004:
+		case 0x100c:
+			mmc_cmd1 = data & 0x02;
+			vrc4_set_prg(space->machine);
+			break;
+
+		case 0x2000:
+		case 0x2001:
+		case 0x2002:
+		case 0x2003:
+		case 0x2004:
+		case 0x2008:
+		case 0x200c:
+			prg8_ab(space->machine, data);
+			break;
+
+		case 0x3000:
+			vrom_bank[0] = (vrom_bank[0] & 0xf0) | (data & 0x0f);
+			chr1_0(space->machine, vrom_bank[0], CHRROM);
+			break;
+		case 0x3002:
+		case 0x3008:
 			vrom_bank[0] = (vrom_bank[0] & 0x0f) | (data << 4);
 			chr1_0(space->machine, vrom_bank[0], CHRROM);
 			break;
@@ -2018,7 +2205,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			chr1_1(space->machine, vrom_bank[1], CHRROM);
 			break;
 		case 0x3003:
-		case 0x3006:
+		case 0x300c:
 			vrom_bank[1] = (vrom_bank[1] & 0x0f) | (data << 4);
 			chr1_1(space->machine, vrom_bank[1], CHRROM);
 			break;
@@ -2027,6 +2214,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			chr1_2(space->machine, vrom_bank[2], CHRROM);
 			break;
 		case 0x4002:
+		case 0x4008:
 			vrom_bank[2] = (vrom_bank[2] & 0x0f) | (data << 4);
 			chr1_2(space->machine, vrom_bank[2], CHRROM);
 			break;
@@ -2036,7 +2224,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			chr1_3(space->machine, vrom_bank[3], CHRROM);
 			break;
 		case 0x4003:
-		case 0x4006:
+		case 0x400c:
 			vrom_bank[3] = (vrom_bank[3] & 0x0f) | (data << 4);
 			chr1_3(space->machine, vrom_bank[3], CHRROM);
 			break;
@@ -2045,6 +2233,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			chr1_4(space->machine, vrom_bank[4], CHRROM);
 			break;
 		case 0x5002:
+		case 0x5008:
 			vrom_bank[4] = (vrom_bank[4] & 0x0f) | (data << 4);
 			chr1_4(space->machine, vrom_bank[4], CHRROM);
 			break;
@@ -2054,7 +2243,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			chr1_5(space->machine, vrom_bank[5], CHRROM);
 			break;
 		case 0x5003:
-		case 0x5006:
+		case 0x500c:
 			vrom_bank[5] = (vrom_bank[5] & 0x0f) | (data << 4);
 			chr1_5(space->machine, vrom_bank[5], CHRROM);
 			break;
@@ -2063,6 +2252,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			chr1_6(space->machine, vrom_bank[6], CHRROM);
 			break;
 		case 0x6002:
+		case 0x6008:
 			vrom_bank[6] = (vrom_bank[6] & 0x0f) | (data << 4);
 			chr1_6(space->machine, vrom_bank[6], CHRROM);
 			break;
@@ -2072,7 +2262,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			chr1_7(space->machine, vrom_bank[7], CHRROM);
 			break;
 		case 0x6003:
-		case 0x6006:
+		case 0x600c:
 			vrom_bank[7] = (vrom_bank[7] & 0x0f) | (data << 4);
 			chr1_7(space->machine, vrom_bank[7], CHRROM);
 			break;
@@ -2081,22 +2271,23 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			IRQ_count_latch = (IRQ_count_latch & 0xf0) | (data & 0x0f);
 			break;
 		case 0x7002:
+		case 0x7008:
 			IRQ_count_latch = (IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4 );
 			break;
-		case 0x7004:
 		case 0x7001:
+		case 0x7004:
 			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
 			IRQ_enable = data & 0x02;
 			IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
 				IRQ_count = IRQ_count_latch;
 			break;
-		case 0x7006:
 		case 0x7003:
+		case 0x700c:
 			IRQ_enable = IRQ_enable_latch;
 			break;
 		default:
-			LOG_MMC(("konami_vrc4_w uncaught offset: %04x value: %02x\n", offset, data));
+			LOG_MMC(("konami_vrc4b_w uncaught offset: %04x value: %02x\n", offset, data));
 			break;
 	}
 }
@@ -10434,11 +10625,11 @@ static const mmc mmc_list[] =
 	{ 18, "Jaleco SS88006",            NULL, NULL, NULL, mapper18_w, NULL, NULL, jaleco_irq },
 	{ 19, "Namcot 106 + N106",         mapper19_l_w, mapper19_l_r, NULL, mapper19_w, NULL, NULL, namcot_irq },
 	{ 20, "Famicom Disk System",       NULL, NULL, NULL, NULL, NULL, NULL, fds_irq },
-	{ 21, "Konami VRC 4",              NULL, NULL, NULL, konami_vrc4_w, NULL, NULL, konami_irq },
+	{ 21, "Konami VRC 4a",             NULL, NULL, NULL, konami_vrc4a_w, NULL, NULL, konami_irq },
 	{ 22, "Konami VRC 2a",             NULL, NULL, NULL, konami_vrc2a_w, NULL, NULL, NULL },
 	{ 23, "Konami VRC 2b",             NULL, NULL, NULL, konami_vrc2b_w, NULL, NULL, konami_irq },
 	{ 24, "Konami VRC 6a",             NULL, NULL, NULL, konami_vrc6a_w, NULL, NULL, konami_irq },
-	{ 25, "Konami VRC 4",              NULL, NULL, NULL, konami_vrc4_w, NULL, NULL, konami_irq },
+	{ 25, "Konami VRC 4b",             NULL, NULL, NULL, konami_vrc4b_w, NULL, NULL, konami_irq },
 	{ 26, "Konami VRC 6b",             NULL, NULL, NULL, konami_vrc6b_w, NULL, NULL, konami_irq },
 // 27 World Hero
 // 28, 29, 30, 31 Unused

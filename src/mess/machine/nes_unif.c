@@ -990,7 +990,8 @@ static const unif unif_list[] =
 	{ "KONAMI-VRC-2",               NULL, NULL, NULL, konami_vrc2a_w, NULL, NULL, NULL,                 8,   32,   0,    0, CHRRAM_0,  NT_VERT,  KONAMI_VRC2},
 	// variant 2b (mapper 23) exists! how to distinguish?!? NULL, NULL, NULL, konami_vrc2b_w, NULL, NULL, konami_irq
 	{ "KONAMI-VRC-3",               NULL, NULL, NULL, mapper73_w, NULL, NULL, konami_irq,               8,    0,   8,    0, CHRRAM_8,  NT_X,  KONAMI_VRC3},
-	{ "KONAMI-VRC-4",               NULL, NULL, NULL, konami_vrc4_w, NULL, NULL, konami_irq,           16,   32,   0,    0, CHRRAM_0,  NT_VERT,  KONAMI_VRC4},
+	{ "KONAMI-VRC-4",               NULL, NULL, NULL, konami_vrc4a_w, NULL, NULL, konami_irq,           16,   32,   0,    0, CHRRAM_0,  NT_VERT,  KONAMI_VRC4},
+	// variant 4b (mapper 23) exists! how to distinguish?!? NULL, NULL, NULL, konami_vrc4b_w, NULL, NULL, konami_irq
 	// exist also variants with 2 & 8 NVWRAM!
 	{ "KONAMI-VRC-6",               NULL, NULL, NULL, konami_vrc6a_w, NULL, NULL, konami_irq,          16,   32,   0,    0, CHRRAM_0,  NT_VERT,  KONAMI_VRC6},
 	// variant 6b (mapper 26) exists! how to distinguish?!? NULL, NULL, NULL, konami_vrc6b_w, NULL, NULL, konami_irq
