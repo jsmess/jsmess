@@ -77,7 +77,6 @@
     * 242 In Dragon Quest VIII graphics of the main character is not drawn (it seems similar to Shanghai Tycoon [map15]
           because in place of the missing graphics we get glitches in the left border)
     * 249 only half of the games work (and Du Bao Ying Hao seems to suffer the same problem as DQ8 and Shanghai Tycoon)
-    * 252 shows logo, but doesn't reach the game
     * 255 does not really select game (same in NEStopia apparently)
 
     A few Mappers suffer of hardware conflict: original dumpers have used the same mapper number for more than

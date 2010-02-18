@@ -2081,12 +2081,10 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			IRQ_count_latch = (IRQ_count_latch & 0xf0) | (data & 0x0f);
 			break;
 		case 0x7002:
-		case 0x7040:
 			IRQ_count_latch = (IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4 );
 			break;
 		case 0x7004:
 		case 0x7001:
-		case 0x7080:
 			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
 			IRQ_enable = data & 0x02;
 			IRQ_enable_latch = data & 0x01;
@@ -2095,7 +2093,6 @@ static WRITE8_HANDLER( konami_vrc4_w )
 			break;
 		case 0x7006:
 		case 0x7003:
-		case 0x70c0:
 			IRQ_enable = IRQ_enable_latch;
 			break;
 		default:
@@ -3889,9 +3886,9 @@ static WRITE8_HANDLER( mapper67_w )
 
 *************************************************************/
 
-static void mapper68_mirror( running_machine *machine, int m68_mirror, int m0, int m1 )
+static void mapper68_mirror( running_machine *machine, int mirror, int mirr0, int mirr1 )
 {
-	switch (m68_mirror)
+	switch (mirror)
 	{
 		case 0x00:
 			set_nt_mirroring(PPU_MIRROR_HORZ);
@@ -3906,28 +3903,28 @@ static void mapper68_mirror( running_machine *machine, int m68_mirror, int m0, i
 			set_nt_mirroring(PPU_MIRROR_HIGH);
 			break;
 		case 0x10:
-			set_nt_page(0, ROM, m0 | 0x80, 0);
-			set_nt_page(1, ROM, m1 | 0x80, 0);
-			set_nt_page(2, ROM, m0 | 0x80, 0);
-			set_nt_page(3, ROM, m1 | 0x80, 0);
+			set_nt_page(0, ROM, mirr0 | 0x80, 0);
+			set_nt_page(1, ROM, mirr1 | 0x80, 0);
+			set_nt_page(2, ROM, mirr0 | 0x80, 0);
+			set_nt_page(3, ROM, mirr1 | 0x80, 0);
 			break;
 		case 0x11:
-			set_nt_page(0, ROM, m0 | 0x80, 0);
-			set_nt_page(1, ROM, m0 | 0x80, 0);
-			set_nt_page(2, ROM, m1 | 0x80, 0);
-			set_nt_page(3, ROM, m1 | 0x80, 0);
+			set_nt_page(0, ROM, mirr0 | 0x80, 0);
+			set_nt_page(1, ROM, mirr0 | 0x80, 0);
+			set_nt_page(2, ROM, mirr1 | 0x80, 0);
+			set_nt_page(3, ROM, mirr1 | 0x80, 0);
 			break;
 		case 0x12:
-			set_nt_page(0, ROM, m0 | 0x80, 0);
-			set_nt_page(1, ROM, m0 | 0x80, 0);
-			set_nt_page(2, ROM, m0 | 0x80, 0);
-			set_nt_page(3, ROM, m0 | 0x80, 0);
+			set_nt_page(0, ROM, mirr0 | 0x80, 0);
+			set_nt_page(1, ROM, mirr0 | 0x80, 0);
+			set_nt_page(2, ROM, mirr0 | 0x80, 0);
+			set_nt_page(3, ROM, mirr0 | 0x80, 0);
 			break;
 		case 0x13:
-			set_nt_page(0, ROM, m1 | 0x80, 0);
-			set_nt_page(1, ROM, m1 | 0x80, 0);
-			set_nt_page(2, ROM, m1 | 0x80, 0);
-			set_nt_page(3, ROM, m1 | 0x80, 0);
+			set_nt_page(0, ROM, mirr1 | 0x80, 0);
+			set_nt_page(1, ROM, mirr1 | 0x80, 0);
+			set_nt_page(2, ROM, mirr1 | 0x80, 0);
+			set_nt_page(3, ROM, mirr1 | 0x80, 0);
 			break;
 	}
 }
@@ -9607,34 +9604,34 @@ static WRITE8_HANDLER( mapper227_w )
 
 static WRITE8_HANDLER( mapper228_w )
 {
-	int prg_bank, prg_chip, chr_bank;
-	UINT8 prg_mode;
+	int pbank, pchip, cbank;
+	UINT8 pmode;
 	LOG_MMC(("mapper228_w, offset: %04x, data: %02x\n", offset, data));
 
 	set_nt_mirroring((offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	chr_bank = (data & 0x03) | ((offset & 0x0f) << 2);
-	chr8(space->machine, chr_bank, CHRROM);
+	cbank = (data & 0x03) | ((offset & 0x0f) << 2);
+	chr8(space->machine, cbank, CHRROM);
 
-	prg_bank = (offset & 0x7c0) >> 6;
-	prg_chip = (offset & 0x1800) >> 11;
-	prg_mode = offset & 0x20;
+	pbank = (offset & 0x7c0) >> 6;
+	pchip = (offset & 0x1800) >> 11;
+	pmode = offset & 0x20;
 
-	switch (prg_chip)
+	switch (pchip)
 	{
 		case 0: break;			// we are already at the correct bank
-		case 1: prg_bank |= 0x10; break;	// chip 1 starts at block 16
+		case 1: pbank |= 0x10; break;	// chip 1 starts at block 16
 		case 2: break;			// chip 2 was an empty socket
-		case 3: prg_bank |= 0x20; break;	// chip 3 starts at block 32
+		case 3: pbank |= 0x20; break;	// chip 3 starts at block 32
 	}
 
-	if (prg_mode)
+	if (pmode)
 	{
-		prg16_89ab(space->machine, prg_bank);
-		prg16_cdef(space->machine, prg_bank);
+		prg16_89ab(space->machine, pbank);
+		prg16_cdef(space->machine, pbank);
 	}
 	else
-		prg32(space->machine, prg_bank >> 1);
+		prg32(space->machine, pbank >> 1);
 }
 
 /*************************************************************
@@ -10331,7 +10328,7 @@ static WRITE8_HANDLER( mapper252_w )
 			vrom_bank[bank] = (vrom_bank[bank] & 0xf0) | (data & 0x0f);
 		chr1_x(space->machine, bank, vrom_bank[bank], CHRROM);
 		break;
-	case 0xf000:
+	case 0x7000:
 		switch (offset & 0x0c)
 		{
 		case 0x00:
