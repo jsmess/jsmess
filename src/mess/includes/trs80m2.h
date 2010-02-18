@@ -17,7 +17,9 @@ typedef struct _trs80m2_state trs80m2_state;
 struct _trs80m2_state
 {
 	/* memory state */
+	int boot_rom;
 	int bank;
+	int msel;
 
 	/* floppy state */
 	int fdc_intrq;

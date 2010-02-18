@@ -90,6 +90,45 @@ static WRITE8_DEVICE_HANDLER( drvslt_w )
 	wd17xx_dden_w(device, BIT(data, 7));
 }
 
+static void bankswitch(running_machine *machine)
+{
+	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
+
+	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	running_device *messram = devtag_get_device(machine, "messram");
+	UINT8 *rom = memory_region(machine, Z80_TAG);
+	UINT8 *ram = messram_get_ptr(messram);
+	int last_page = (messram_get_size(messram) / 0x8000) - 1;
+
+	if (state->boot_rom)
+	{
+		/* enable BOOT ROM */
+		memory_install_rom(program, 0x0000, 0x07ff, 0, 0x800, rom);
+		memory_install_ram(program, 0x1000, 0x7fff, 0, 0, ram + 0x1000);
+	}
+	else
+	{
+		/* enable RAM */
+		memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram);
+	}
+
+	if (state->bank > last_page)
+	{
+		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+	}
+	else
+	{
+		/* enable RAM */
+		memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + (state->bank * 0x8000));
+	}
+
+	if (state->msel)
+	{
+		/* enable video RAM */
+		memory_install_ram(program, 0xf800, 0xffff, 0, 0, state->video_ram);
+	}
+}
+
 static WRITE8_HANDLER( rom_enable_w )
 {
 	/*
@@ -107,20 +146,10 @@ static WRITE8_HANDLER( rom_enable_w )
 
     */
 
-	const address_space *program = cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(space->machine, "messram"));
-	UINT8 *rom = memory_region(space->machine, Z80_TAG);
+	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
 
-	if (BIT(data, 0))
-	{
-		/* enable BOOT ROM */
-		memory_install_rom(program, 0x0000, 0x07ff, 0, 0x800, rom);
-	}
-	else
-	{
-		/* enable RAM */
-		memory_install_ram(program, 0x0000, 0x0fff, 0, 0, ram);
-	}
+	state->boot_rom = BIT(data, 0);
+	bankswitch(space->machine);
 }
 
 static READ8_HANDLER( keyboard_r )
@@ -199,10 +228,6 @@ static WRITE8_HANDLER( nmi_w )
 
 	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
 
-	const address_space *program = cputag_get_address_space(space->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(space->machine, "messram"));
-	int last_page = (messram_get_size(devtag_get_device(space->machine, "messram")) / 0x8000) - 1;
-
 	/* memory bank select */
 	state->bank = data & 0x0f;
 
@@ -213,7 +238,7 @@ static WRITE8_HANDLER( nmi_w )
 	/* RTC interrupt enable */
 	state->enable_rtc_int = BIT(data, 5);
 
-	if ((state->rtc_int == 2) && state->enable_rtc_int)
+	if (state->enable_rtc_int && state->rtc_int)
 	{
 		/* trigger RTC interrupt */
 		cputag_set_input_line(space->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
@@ -222,23 +247,9 @@ static WRITE8_HANDLER( nmi_w )
 	/* video display enable */
 	state->blnkvid = BIT(data, 6);
 
-	if (BIT(data, 7))
-	{
-		/* enable video RAM */
-		memory_install_ram(program, 0xf800, 0xffff, 0, 0, state->video_ram);
-	}
-	else
-	{
-		if (state->bank > last_page)
-		{
-			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
-		}
-		else
-		{
-			/* enable RAM */
-			memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + (state->bank * 0x8000));
-		}
-	}
+	/* video RAM enable */
+	state->msel = BIT(data, 7);
+	bankswitch(space->machine);
 }
 
 static READ8_HANDLER( keyboard_busy_r )
@@ -521,14 +532,13 @@ static WRITE_LINE_DEVICE_HANDLER( vsync_w )
 {
 	trs80m2_state *driver_state = (trs80m2_state *)device->machine->driver_data;
 
-	if (state) driver_state->rtc_int++;
-
-	if (driver_state->rtc_int == 2)
+	if (state)
 	{
-		driver_state->rtc_int = 0;
+		driver_state->rtc_int = !driver_state->rtc_int;
 
-		if (driver_state->enable_rtc_int)
+		if (driver_state->enable_rtc_int && driver_state->rtc_int)
 		{
+			logerror("RTC INT\n");
 			/* trigger RTC interrupt */
 			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
 		}
@@ -779,19 +789,37 @@ static MACHINE_START( trs80m2 )
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 
 	/* register for state saving */
+	state_save_register_global(machine, state->boot_rom);
+	state_save_register_global(machine, state->bank);
+	state_save_register_global(machine, state->msel);
+	state_save_register_global(machine, state->fdc_intrq);
 	state_save_register_global(machine, state->key_latch);
 	state_save_register_global(machine, state->key_data);
+	state_save_register_global(machine, state->key_bit);
+	state_save_register_global(machine, state->kbclk);
+	state_save_register_global(machine, state->kbdata);
+	state_save_register_global(machine, state->kbirq);
+	state_save_register_global(machine, state->blnkvid);
+	state_save_register_global(machine, state->_80_40_char_en);
+	state_save_register_global(machine, state->de);
+	state_save_register_global(machine, state->rtc_int);
+	state_save_register_global(machine, state->enable_rtc_int);
 }
 
 static MACHINE_RESET( trs80m2 )
 {
 	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
-	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+
+	/* clear keyboard interrupt */
+	state->kbirq = 1;
 
 	/* enable boot ROM */
-	rom_enable_w(program, 0, 1);
+	state->boot_rom = 1;
 
-	state->kbirq = 1;
+	/* disable video RAM */
+	state->msel = 0;
+
+	bankswitch(machine);
 }
 
 /* Machine Driver */
