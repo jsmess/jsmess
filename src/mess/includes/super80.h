@@ -33,8 +33,6 @@ READ8_HANDLER( super80_f2_r );
 WRITE8_HANDLER( super80_dc_w );
 WRITE8_HANDLER( super80_f0_w );
 WRITE8_HANDLER( super80r_f0_w );
-READ8_DEVICE_HANDLER( super80_pio_r );
-WRITE8_DEVICE_HANDLER( super80_pio_w );
 MACHINE_RESET( super80 );
 DRIVER_INIT( super80 );
 DRIVER_INIT( super80v );

@@ -215,34 +215,6 @@ WRITE8_HANDLER( super80r_f0_w )
 	super80_shared |= 0x14;
 }
 
-READ8_DEVICE_HANDLER( super80_pio_r )
-{
-	if (!offset)
-		return z80pio_d_r(device, 0);
-	else
-	if (offset == 1)
-		return z80pio_c_r(device, 0);
-	else
-	if (offset == 2)
-		return z80pio_d_r(device, 1);
-	else
-		return z80pio_c_r(device, 1);
-}
-
-WRITE8_DEVICE_HANDLER( super80_pio_w )
-{
-	if (!offset)
-		z80pio_d_w(device, 0, data);
-	else
-	if (offset == 1)
-		z80pio_c_w(device, 0, data);
-	else
-	if (offset == 2)
-		z80pio_d_w(device, 1, data);
-	else
-		z80pio_c_w(device, 1, data);
-}
-
 /**************************** BASIC MACHINE CONSTRUCTION ***********************************************************/
 
 MACHINE_RESET( super80 )
