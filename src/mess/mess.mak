@@ -1504,6 +1504,7 @@ $(MESSOBJ)/trs.a:				\
 	$(MESS_DRIVERS)/trs80.o		\
 	$(MESS_DRIVERS)/trs80m2.o	\
 	$(MESS_VIDEO)/coco6847.o	\
+	$(MESS_DRIVERS)/tandy2k.o	\
 
 $(MESSOBJ)/unisys.a:			\
 	$(MESS_DRIVERS)/univac.o	\
@@ -1610,7 +1611,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/eti660.o	\
 	$(MESS_DRIVERS)/rvoice.o	\
 	$(MESS_DRIVERS)/fidelz80.o	\
-	$(MESS_DRIVERS)/tandy2k.o	\
 
 
 
