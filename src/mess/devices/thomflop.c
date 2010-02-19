@@ -1674,7 +1674,6 @@ static void to7_network_got_frame( running_device *device, UINT8* data, int leng
 	else if ( ! data[1] )
 	{
 		char name[33];
-		int i;
 		memcpy( name, data + 12, 32 );
 		name[32] = 0;
 		for (i=0;i<32;i++)

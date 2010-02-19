@@ -82,7 +82,7 @@ char g_szSelectedItem[MAX_PATH];
 //  LOCAL VARIABLES
 //============================================================
 
-static software_config *config;
+static software_config *s_config;
 static BOOL s_bIgnoreSoftwarePickerNotifies;
 
 static int *mess_icon_index;
@@ -349,10 +349,10 @@ static BOOL AddSoftwarePickerDirs(HWND hwndPicker, LPCSTR pszDirectories, LPCSTR
 void MySoftwareListClose(void)
 {
 	// free the machine config, if necessary
-	if (config != NULL)
+	if (s_config != NULL)
 	{
-		software_config_free(config);
-		config = NULL;
+		software_config_free(s_config);
+		s_config = NULL;
 	}
 }
 
@@ -366,8 +366,8 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	// do we have to do anything?
 	if (!bForce)
 	{
-		if (config != NULL)
-			is_same = (drvindex == config->driver_index);
+		if (s_config != NULL)
+			is_same = (drvindex == s_config->driver_index);
 		else
 			is_same = (drvindex < 0);
 		if (is_same)
@@ -375,16 +375,12 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	}
 
 	// free the machine config, if necessary
-	if (config != NULL)
-	{
-		software_config_free(config);
-		config = NULL;
-	}
+	MySoftwareListClose();
 
 	// allocate the machine config, if necessary
 	if (drvindex >= 0)
 	{
-		config = software_config_alloc(drvindex, MameUIGlobal(), NULL);
+		s_config = software_config_alloc(drvindex, MameUIGlobal(), NULL);
 	}
 
 	// locate key widgets
@@ -392,11 +388,11 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
 
 	// set up the device view
-	DevView_SetDriver(hwndSoftwareDevView, config);
+	DevView_SetDriver(hwndSoftwareDevView, s_config);
 
 	// set up the software picker
 	SoftwarePicker_Clear(hwndSoftwarePicker);
-	SoftwarePicker_SetDriver(hwndSoftwarePicker, config);
+	SoftwarePicker_SetDriver(hwndSoftwarePicker, s_config);
 
 	// add the relevant paths
 	drv = drivers[drvindex];
@@ -503,11 +499,11 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 	// if device is NULL, this is a special case; try to find existing image
 	if (device == NULL)
 	{
-		for (device = config->mconfig->devicelist.first(); device != NULL;device = device->next)
+		for (device = s_config->mconfig->devicelist.first(); device != NULL;device = device->next)
 		{
 			if (is_image_device(device))
 			{
-				s = GetSelectedSoftware(drvindex, config->mconfig, device);
+				s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
 				if ((s != NULL) && !mame_stricmp(s, pszFilename))
 					break;
 			}
@@ -526,11 +522,11 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 
 		if (file_extension != NULL)
 		{
-			for (device = config->mconfig->devicelist.first(); device != NULL;device = device->next)
+			for (device = s_config->mconfig->devicelist.first(); device != NULL;device = device->next)
 			{
 				if (is_image_device(device))
 				{
-					s = GetSelectedSoftware(drvindex, config->mconfig, device);
+					s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
 					if (is_null_or_empty(s) && image_device_uses_file_extension(device, file_extension))
 						break;
 				}
@@ -541,7 +537,7 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 	if (device != NULL)
 	{
 		// place the image
-		InternalSetSelectedSoftware(drvindex, config->mconfig, device, pszFilename);
+		InternalSetSelectedSoftware(drvindex, s_config->mconfig, device, pszFilename);
 	}
 	else
 	{
@@ -558,11 +554,11 @@ static void MessRemoveImage(int drvindex, const char *pszFilename)
 	const device_config *device;
 	const char *s;
 
-	for (device = config->mconfig->devicelist.first(); device != NULL;device = device->next)
+	for (device = s_config->mconfig->devicelist.first(); device != NULL;device = device->next)
 	{
 		if (is_image_device(device))
 		{
-			s = GetSelectedSoftware(drvindex, config->mconfig, device);
+			s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
 			if ((s != NULL) && !strcmp(pszFilename, s))
 				MessSpecifyImage(drvindex, device, NULL);
 		}
@@ -598,11 +594,11 @@ static void MessRefreshPicker(void)
 	// be problematic
 	ListView_SetItemState(hwndSoftware, -1, 0, LVIS_SELECTED);
 
-	for (dev = config->mconfig->devicelist.first(); dev != NULL;dev = dev->next)
+	for (dev = s_config->mconfig->devicelist.first(); dev != NULL;dev = dev->next)
 	{
 		if (is_image_device(dev))
 		{
-			pszSoftware = GetSelectedSoftware(config->driver_index, config->mconfig, dev);
+			pszSoftware = GetSelectedSoftware(s_config->driver_index, s_config->mconfig, dev);
 			if (pszSoftware && *pszSoftware)
 			{
 				i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
@@ -633,7 +629,7 @@ void InitMessPicker(void)
 	struct PickerOptions opts;
 	HWND hwndSoftware;
 
-	config = NULL;
+	s_config = NULL;
 	hwndSoftware = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 
 	memset(&opts, 0, sizeof(opts));

@@ -390,7 +390,7 @@ static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image *floppy, int head, 
 	UINT16 calculated_crc;
 	size_t i, j;
 	size_t offs;
-	int state;
+	/*int state;*/
 	UINT8 *track_data;
 	void *track_data_v;
 	size_t track_length;
@@ -477,7 +477,7 @@ static floperr_t z80ne_dmk_seek_sector_in_track(floppy_image *floppy, int head, 
 	}
 
 	/* we found a matching sector ID */
-	state = 0;
+	/*state = 0;*/
 	offs = idam_offset + 2 * DMK_IDAM_LEN;
 
 	/* find pattern 0x0000FB; this represents the start of a data sector */

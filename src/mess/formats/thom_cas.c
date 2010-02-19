@@ -514,9 +514,9 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 	{								\
 		if ( (SIZE) > 0 )					\
 		{							\
-			int i;						\
+			int j;						\
 			LOG (( "mo5_k5_load: 0-filler size=%i hbitstart=%i\n", (SIZE), hbitsize )); \
-			for ( i = 0; i < (SIZE); i++ )			\
+			for ( j = 0; j < (SIZE); j++ )			\
 				K5_PUT_BIT( 0 );			\
 		}							\
 	} while (0)
@@ -526,9 +526,9 @@ static casserr_t mo5_k5_load( cassette_image *cass )
 	{								\
 		if ( (SIZE) > 0 )					\
 		{							\
-			int i;						\
+			int j;						\
 			LOG (( "mo5_k5_load: 0x01 filler size=%i bitstart=%i\n", (SIZE), hbitsize )); \
-			for ( i = 0; i < (SIZE); i++ )			\
+			for ( j = 0; j < (SIZE); j++ )			\
 				K5_PUT_BYTE( 0x01 );			\
 		}							\
 	} while (0)

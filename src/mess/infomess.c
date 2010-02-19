@@ -92,14 +92,14 @@ void print_game_ramoptions(FILE *out, const game_driver *game, const machine_con
 
 	for (device = ram_first(config); device != NULL; device = ram_next(device))
 	{
-		ram_config *config = (ram_config *)device->inline_config;
-		fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n",  messram_parse_string(config->default_size));
-		if (config->extra_options != NULL)
+		ram_config *ram = (ram_config *)device->inline_config;
+		fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n",  messram_parse_string(ram->default_size));
+		if (ram->extra_options != NULL)
 		{
 			const char *s;
 
 			astring buffer;
-			astring_cpyc(&buffer, config->extra_options);
+			astring_cpyc(&buffer, ram->extra_options);
 			astring_replacechr(&buffer, ',', 0);
 
 			s = astring_c(&buffer);

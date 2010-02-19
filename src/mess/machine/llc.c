@@ -12,14 +12,14 @@
 #include "includes/llc.h"
 #include "devices/messram.h"
 
-static UINT8 code = 0;
+static UINT8 s_code = 0;
 
 static UINT8 llc1_key_state = 0;
 
 static READ8_DEVICE_HANDLER (llc1_port_b_r)
 {
 	UINT8 retVal = 0;
-	if (code!=0) {
+	if (s_code!=0) {
 		if (llc1_key_state==0) {
 			llc1_key_state = 1;
 			retVal = 0x5F;
@@ -29,8 +29,8 @@ static READ8_DEVICE_HANDLER (llc1_port_b_r)
 				retVal = 0;
 			} else {
 				llc1_key_state = 0;
-				retVal = code;
-				code =0;
+				retVal = s_code;
+				s_code =0;
 			}
 		}
 	} else {
@@ -82,7 +82,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			{
 				if (c == (1 << j))
 				{
-					code = j + i*8;
+					s_code = j + i*8;
 					break;
 				}
 			}

@@ -268,7 +268,7 @@ static struct ntsc_decoder
 	int Y_total;
 	int I_total;
 	int Q_total;
-} ntsc;
+} s_ntsc;
 
 
 /* Clear NTSC buffers and running totals. Call this before the beginning of each new line. */
@@ -502,7 +502,7 @@ static VIDEO_START( pc_cga )
 
 	internal_pc_cga_video_start(machine, M6845_PERSONALITY_GENUINE);
 
-	ntsc_decoder_init( machine, &ntsc, 8, 256 );
+	ntsc_decoder_init( machine, &s_ntsc, 8, 256 );
 }
 
 
@@ -831,7 +831,7 @@ static MC6845_UPDATE_ROW( cga_gfx_4bpph_update_row )
 	if ( y == 0 ) CGA_LOG(1,"cga_gfx_4bpph_update_row",("\n"));
 if ( NTSC_FILTER )
 {
-	ntsc_clear( &ntsc );
+	ntsc_clear( &s_ntsc );
 	memset( ntsc_decoded, 0, sizeof(ntsc_decoded));
 }
 	for ( i = 0; i < x_count; i++ )
@@ -903,7 +903,7 @@ if ( NTSC_FILTER )
 	}
 if (NTSC_FILTER)
 {
-	ntsc_decode( &ntsc, samples, ntsc_decoded, 160 );
+	ntsc_decode( &s_ntsc, samples, ntsc_decoded, 160 );
 	p = BITMAP_ADDR16(bitmap, y, 0);
 	samp_index = 0;
 	for ( i = 0; i < ( 8 * x_count ); i++ )
@@ -1553,13 +1553,13 @@ static MC6845_UPDATE_ROW( pc1512_gfx_4bpp_update_row )
 {
 	UINT16  *p = BITMAP_ADDR16(bitmap, y, 0);
 	UINT16	offset_base = ra << 13;
-	int i;
+	int j;
 	running_machine *machine = device->machine;
 
 	if ( y == 0 ) CGA_LOG(1,"pc1512_gfx_4bpp_update_row",("\n"));
-	for ( i = 0; i < x_count; i++ )
+	for ( j = 0; j < x_count; j++ )
 	{
-		UINT16 offset = offset_base | ( ( ma + i ) & 0x1FFF );
+		UINT16 offset = offset_base | ( ( ma + j ) & 0x1FFF );
 		UINT16 i = ( cga.color_select & 8 ) ? device->machine->generic.videoram.u8[ videoram_offset[3] | offset ] << 3 : 0;
 		UINT16 r = ( cga.color_select & 4 ) ? device->machine->generic.videoram.u8[ videoram_offset[2] | offset ] << 2 : 0;
 		UINT16 g = ( cga.color_select & 2 ) ? device->machine->generic.videoram.u8[ videoram_offset[1] | offset ] << 1 : 0;

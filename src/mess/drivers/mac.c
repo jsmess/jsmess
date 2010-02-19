@@ -82,7 +82,6 @@ static READ8_HANDLER(mac_asc_r)
 	{
 		case 0:	// VERSION
 			return 0;	// original ASC
-			break;
 
 		default:
 			break;

@@ -2253,7 +2253,6 @@ static READ32_HANDLER( eeprom_r )
 		case EEP_IDLE:
 //          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, gba_state->eeprom_state, activecpu_get_pc(), 1);
 			return 0x00010001;	// "ready"
-			break;
 
         case EEP_READFIRST:
             gba_state->eeprom_count--;
@@ -2290,7 +2289,6 @@ static READ32_HANDLER( eeprom_r )
 //          printf("out = %08x\n", out);
 //          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %08x\n", offset, ~mem_mask, gba_state->eeprom_state, activecpu_get_pc(), out);
 			return out;
-			break;
 	}
 //  printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, gba_state->eeprom_state, activecpu_get_pc(), 0);
 	return 0;

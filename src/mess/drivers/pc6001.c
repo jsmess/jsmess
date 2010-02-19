@@ -136,7 +136,7 @@ static VIDEO_UPDATE( pc6001 )
 	{
 		if(attr & 0x10) // 256x192x1 mode (FIXME: might be a different trigger)
 		{
-			int fgcol = (attr & 2) ? 7 : 2;
+			fgcol = (attr & 2) ? 7 : 2;
 
 			for(y=0;y<192;y++)
 			{

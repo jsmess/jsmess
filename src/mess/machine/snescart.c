@@ -347,7 +347,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	UINT8 *temp_buffer = auto_alloc_array(machine, UINT8, 0x410000);
 	UINT8 valid_mode20, valid_mode21, valid_mode25;
 	unsigned char *ROM;
-	int length;
+	/*int length;*/
 
 	snes_ram = memory_region(machine, "maincpu");
 	memset( snes_ram, 0, 0x1000000 );
@@ -420,7 +420,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 	/* Loading data */
 	ROM = memory_region(image->machine, "cart");
-	length = image_fread(image, ROM, snes_rom_size - offset);
+	/*length =*/ image_fread(image, ROM, snes_rom_size - offset);
 
 	if (SNES_CART_DEBUG) printf("size %08X\n", snes_rom_size - offset);
 

@@ -563,11 +563,11 @@ static int x68k_read_mouse(running_machine *machine)
 	x68k_sys.mouse.inputtype++;
 	if(x68k_sys.mouse.inputtype > 2)
 	{
-		int val = scc8530_get_reg_b(scc, 0);
+		int i_val = scc8530_get_reg_b(scc, 0);
 		x68k_sys.mouse.inputtype = 0;
 		x68k_sys.mouse.bufferempty = 1;
-		val &= ~0x01;
-		scc8530_set_reg_b(scc, 0, val);
+		i_val &= ~0x01;
+		scc8530_set_reg_b(scc, 0, i_val);
 		logerror("SCC: mouse buffer empty\n");
 	}
 

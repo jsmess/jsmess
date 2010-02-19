@@ -438,7 +438,7 @@ static int microtan_varify_snapshot(UINT8 *data, int size)
 static int parse_intel_hex(UINT8 *snapshot_buff, char *src)
 {
     char line[128];
-    int row = 0, column = 0, last_addr = 0, last_size = 0;
+    int /*row = 0,*/ column = 0, last_addr = 0, last_size = 0;
 
     while (*src)
     {
@@ -449,7 +449,7 @@ static int parse_intel_hex(UINT8 *snapshot_buff, char *src)
                 unsigned int size, addr, null, b[32], cs, n;
 
                 line[column] = '\0';
-                row++;
+                /*row++;*/
                 n = sscanf(line, ":%02x%04x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x",
                     &size, &addr, &null,
                     &b[ 0], &b[ 1], &b[ 2], &b[ 3], &b[ 4], &b[ 5], &b[ 6], &b[ 7],
@@ -519,7 +519,7 @@ static int parse_intel_hex(UINT8 *snapshot_buff, char *src)
 static int parse_zillion_hex(UINT8 *snapshot_buff, char *src)
 {
     char line[128];
-    int parsing = 0, row = 0, column = 0;
+    int parsing = 0, /*row = 0,*/ column = 0;
 
     while (*src)
     {
@@ -536,7 +536,7 @@ static int parse_zillion_hex(UINT8 *snapshot_buff, char *src)
                         unsigned int addr, b[8], n;
 
                         line[column] = '\0';
-                        row++;
+                        /*row++;*/
                         n = sscanf(line, "%x %x %x %x %x %x %x %x %x", &addr, &b[0], &b[1], &b[2], &b[3], &b[4], &b[5], &b[6], &b[7]);
                         if (n == 0)
                         {
@@ -572,7 +572,7 @@ static int parse_zillion_hex(UINT8 *snapshot_buff, char *src)
                 {
                     int addr, n;
 
-                    row++;
+                    /*row++;*/
                     line[column] = '\0';
                     n = sscanf(line, "G%x", (unsigned int *) &addr);
                     if (n == 1 && !snapshot_buff[8192+64+1] && !snapshot_buff[8192+64+1])

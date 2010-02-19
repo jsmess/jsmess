@@ -16,7 +16,7 @@ static UINT8 current_palette;	/* for super80m and super80v */
 static UINT8 current_charset;	/* for super80m */
 
 static const UINT8 *FNT;
-static UINT8 options;
+static UINT8 s_options;
 extern UINT8 *super80_colorram;
 
 /**************************** PALETTES for super80m and super80v ******************************************/
@@ -404,7 +404,7 @@ VIDEO_UPDATE( super80v )
 	framecnt++;
 	speed = mc6845_reg[10]&0x20, flash = mc6845_reg[10]&0x40;			// cursor modes
 	cursor = (mc6845_reg[14]<<8) | mc6845_reg[15];					// get cursor position
-	options=input_port_read(screen->machine, "CONFIG");
+	s_options=input_port_read(screen->machine, "CONFIG");
 	output_set_value("cass_led",(super80_shared & 0x20) ? 1 : 0);
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
@@ -425,9 +425,9 @@ MC6845_UPDATE_ROW( super80v_update_row )
 
 		/* get colour or b&w */
 		fg = 5;						/* green */
-		if ((options & 0x60) == 0x60) fg = 15;		/* b&w */
+		if ((s_options & 0x60) == 0x60) fg = 15;		/* b&w */
 
-		if (~options & 0x40)
+		if (~s_options & 0x40)
 		{
 			col = super80_colorram[mem];					/* byte of colour to display */
 			fg = col & 0x0f;

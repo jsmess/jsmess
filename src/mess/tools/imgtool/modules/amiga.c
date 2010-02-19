@@ -1107,8 +1107,6 @@ static imgtoolerr_t find_entry(imgtool_image *img, const char *path, int start_b
 		/* TODO: Softlink support */
 		return IMGTOOLERR_UNIMPLEMENTED;
 
-		break;
-
 	case ST_LINKDIR:
 	case ST_LINKFILE:
 	{

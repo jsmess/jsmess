@@ -351,10 +351,13 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 		{
 			UINT8 code = messram_get_ptr(devtag_get_device(device->machine, "messram"))[(((ma + column) & 0x0fff) + 0xf000)];
 			code = ((code << 1) | (code >> 7)) & 0xff;
-			data = charrom[((code << 3) | (ra & 0x07)) & 0x7ff];
 			if (column == cursor_x-2)
 			{
 				data = 0xff;
+			}
+			else
+			{
+				data = charrom[((code << 3) | (ra & 0x07)) & 0x7ff];
 			}
 			for (bit = 0; bit < 8; bit++)
 			{
@@ -371,7 +374,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 	{
 		for (i = 0; i < x_count; i++)
 		{
-			UINT8 data = messram_get_ptr(devtag_get_device(device->machine, "messram"))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			data = messram_get_ptr(devtag_get_device(device->machine, "messram"))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
 				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;
@@ -413,7 +416,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 	{
 		for (i = 0; i < x_count; i++)
 		{
-			UINT8 data = messram_get_ptr(devtag_get_device(device->machine, "messram"))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			data = messram_get_ptr(devtag_get_device(device->machine, "messram"))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
 				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;

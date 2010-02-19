@@ -43,8 +43,8 @@ static void invalid_gba_draw_function(running_machine *machine, gba_state_t *gba
 /* Utility functions */
 INLINE int is_in_window(gba_state_t *gba_state, int x, int window);
 INLINE UINT32 alpha_blend_pixel(UINT32 color0, UINT32 color1, int ca, int cb);
-INLINE UINT32 increase_brightness(UINT32 color, int coeff);
-INLINE UINT32 decrease_brightness(UINT32 color, int coeff);
+INLINE UINT32 increase_brightness(UINT32 color, int coeff_);
+INLINE UINT32 decrease_brightness(UINT32 color, int coeff_);
 
 #include "gbamode0.c"
 #include "gbamode1.c"
@@ -482,7 +482,6 @@ static void draw_bg_scanline(gba_state_t *gba_state, UINT32 *scanline, int ypos,
 	if(ctrl & BGCNT_PALETTE256)
 	{
 		UINT16 *src = screendata + 0x400 * (pixx >> 8) + ((pixx & 255) >> 3) + stride;
-		INT32 x = 0;
 		for(x = 0; x < 240; x++)
 		{
 			UINT16 data = *src;
@@ -546,7 +545,6 @@ static void draw_bg_scanline(gba_state_t *gba_state, UINT32 *scanline, int ypos,
 	else
 	{
 		UINT16 *src = screendata + 0x400 * (pixx >> 8) + ((pixx & 255) >> 3) + stride;
-		INT32 x = 0;
 		for(x = 0; x < 240; x++)
 		{
 			UINT16 data = *src;
@@ -882,12 +880,12 @@ static void draw_gba_oam_window(gba_state_t *gba_state, running_machine *machine
 				else
 				{
 					INT32 ax;
-					int cury = y - sy;
+					int cury_ = y - sy;
 
 					width *= 8;
 					height *= 8;
 
-					if(cury >= 0 && cury < height)
+					if(cury_ >= 0 && cury_ < height)
 					{
 						if( ( (sx < 240) || ( ( (sx + width) & 0x1ff ) < 240 ) ) && (attr0 & OBJ_ROZMODE_DISABLE) == 0)
 						{
@@ -897,7 +895,7 @@ static void draw_gba_oam_window(gba_state_t *gba_state, running_machine *machine
 								int address = 0;
 								if(attr1 & OBJ_VFLIP)
 								{
-									cury = height - cury - 1;
+									cury_ = height - cury_ - 1;
 								}
 								if((gba_state->DISPCNT & DISPCNT_MODE) > 2 && tiledrawindex < 0x200)
 								{
@@ -919,7 +917,7 @@ static void draw_gba_oam_window(gba_state_t *gba_state, running_machine *machine
 									ax = width - 1;
 								}
 
-								address = 0x10000 + ((((tiledrawindex + (cury >> 3) * inc) << 5) + ((cury & 7) << 3) + ((ax >> 3) << 6) + (ax & 7)) & 0x7fff);
+								address = 0x10000 + ((((tiledrawindex + (cury_ >> 3) * inc) << 5) + ((cury_ & 7) << 3) + ((ax >> 3) << 6) + (ax & 7)) & 0x7fff);
 
 								if(attr1 & OBJ_HFLIP)
 								{
@@ -976,7 +974,7 @@ static void draw_gba_oam_window(gba_state_t *gba_state, running_machine *machine
 								UINT32 address;
 								if(attr1 & OBJ_VFLIP)
 								{
-									cury = height - cury - 1;
+									cury_ = height - cury_ - 1;
 								}
 								if((gba_state->DISPCNT & DISPCNT_MODE) > 2 && tiledrawindex < 0x200)
 								{
@@ -994,7 +992,7 @@ static void draw_gba_oam_window(gba_state_t *gba_state, running_machine *machine
 									ax = width - 1;
 								}
 
-								address = 0x10000 + ((((tiledrawindex + (cury >> 3) * inc) << 5) + ((cury & 0x07) << 2) + ((ax >> 3) << 5) + ((ax & 0x07) >> 1)) & 0x7fff);
+								address = 0x10000 + ((((tiledrawindex + (cury_ >> 3) * inc) << 5) + ((cury_ & 0x07) << 2) + ((ax >> 3) << 5) + ((ax & 0x07) >> 1)) & 0x7fff);
 								if(attr1 & OBJ_HFLIP)
 								{
 									ax = 7;
@@ -1729,15 +1727,15 @@ INLINE UINT32 alpha_blend_pixel(UINT32 color0, UINT32 color1, int ca, int cb)
 	return color0;
 }
 
-INLINE UINT32 increase_brightness(UINT32 color, int coeff)
+INLINE UINT32 increase_brightness(UINT32 color, int coeff_)
 {
 	int r = (color >>  0) & 0x1f;
 	int g = (color >>  5) & 0x1f;
 	int b = (color >> 10) & 0x1f;
 
-	r += ((0x1f - r) * coeff) >> 4;
-	g += ((0x1f - g) * coeff) >> 4;
-	b += ((0x1f - b) * coeff) >> 4;
+	r += ((0x1f - r) * coeff_) >> 4;
+	g += ((0x1f - g) * coeff_) >> 4;
+	b += ((0x1f - b) * coeff_) >> 4;
 
 	if(r > 0x1f) r = 0x1f;
 	if(g > 0x1f) g = 0x1f;
@@ -1746,15 +1744,15 @@ INLINE UINT32 increase_brightness(UINT32 color, int coeff)
 	return (color & 0xffff0000) | (b << 10) | (g << 5) | r;
 }
 
-INLINE UINT32 decrease_brightness(UINT32 color, int coeff)
+INLINE UINT32 decrease_brightness(UINT32 color, int coeff_)
 {
 	int r = (color >>  0) & 0x1f;
 	int g = (color >>  5) & 0x1f;
 	int b = (color >> 10) & 0x1f;
 
-	r -= (r * coeff) >> 4;
-	g -= (g * coeff) >> 4;
-	b -= (b * coeff) >> 4;
+	r -= (r * coeff_) >> 4;
+	g -= (g * coeff_) >> 4;
+	b -= (b * coeff_) >> 4;
 
 	if(r < 0) r = 0;
 	if(g < 0) g = 0;

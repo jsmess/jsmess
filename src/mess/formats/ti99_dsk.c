@@ -1734,7 +1734,7 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
 	int idamcnt, state, track, head, i, totalseclen = 0, format = 0, byte, tracklength, trackadd = 0;
 	int first_idam = 0;
 	UINT8 *track_data;
-	int offset;
+	/*int offset;*/
 
 	struct ti99dsk_geometry dummy_geometry;
 
@@ -1889,7 +1889,7 @@ static int ti99_tdf_guess_geometry(floppy_image *floppy, UINT64 size,
     */
 
 	tracklength = idamcnt * totalseclen + trackadd;
-	offset = 0;
+	/*offset = 0;*/
 
 	/* Read the last track. We assume that all tracks are properly
        formatted; otherwise, the above calculations would already fail.

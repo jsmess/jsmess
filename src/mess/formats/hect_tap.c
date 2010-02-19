@@ -88,12 +88,12 @@ INLINE int hector_tap_synchro(INT16 *buffer, int sample_pos, int nb_synchro)
 
 static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
 {
-	int	data_pos, sample_count, block_count;
+	int	data_pos, sample_count/*, block_count*/;
     int previous_block=0;
 
 	data_pos = 0;
 	sample_count = 0;
-    block_count = 0;
+    /*block_count = 0;*/
     previous_block = 0;
 
 	/* First 768 cycle of synchro */
@@ -119,7 +119,7 @@ static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
 		if (block_size==0)
 		   block_size=256;
 
-		block_count++;
+		/*block_count++;*/
         sample_count += hector_tap_byte(buffer, sample_count, casdata[data_pos] );
         data_pos++;
 
@@ -146,13 +146,13 @@ static int hector_handle_tap(INT16 *buffer, const UINT8 *casdata)
 
 static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
 {
-	int	data_pos, sample_count, block_count;
-    int previous_block=0;
+	int	data_pos, sample_count/*, block_count*/;
+    /*int previous_block=0;*/
 
 	data_pos = 0;
 	sample_count = 0;
-    block_count = 0;
-    previous_block = 0;
+    /*block_count = 0;*/
+    /*previous_block = 0;*/
 
     /* Out if len of file not modulo 822 octets    */
 	if ( (cas_size % 822) != 0 )
@@ -169,7 +169,7 @@ static int hector_handle_forth_tap(INT16 *buffer, const UINT8 *casdata)
 		/* Handle block lenght on tape data */
 		block_size = 822 ; /* Fixed size for the forth*/
 
-		block_count=0;
+		/*block_count=0;*/
 
 		/* Data samples */
 		for ( ; block_size ; data_pos++, block_size-- )

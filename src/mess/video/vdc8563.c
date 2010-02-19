@@ -463,7 +463,7 @@ static void vdc8563_text_screenrefresh( running_device *device, bitmap_t *bitmap
 				{
 					UINT16 ch, fg, bg;
 					const UINT8 *charptr;
-					int v, h;
+					int v, h2;
 					UINT16 *pixel;
 
 					ch = vdc8563->ram[i] | ((vdc8563->ram[j] & 0x80) ? 0x100 : 0);
@@ -473,10 +473,10 @@ static void vdc8563_text_screenrefresh( running_device *device, bitmap_t *bitmap
 
 					for (v = 0; v < 16; v++)
 					{
-						for (h = 0; h < 8; h++)
+						for (h2 = 0; h2 < 8; h2++)
 						{
-							pixel = BITMAP_ADDR16(bitmap, (y * height) + height + v, (x * 8) + 8 + h);
-							*pixel = (charptr[v] & (0x80 >> h)) ? fg : bg;
+							pixel = BITMAP_ADDR16(bitmap, (y * height) + height + v, (x * 8) + 8 + h2);
+							*pixel = (charptr[v] & (0x80 >> h2)) ? fg : bg;
 						}
 					}
 				}

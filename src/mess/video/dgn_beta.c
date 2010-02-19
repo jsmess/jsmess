@@ -170,7 +170,7 @@ static int	GCtrl;		/* Graphics control reg, from I28 PB0..5, PB6-7, top address 
 
 static	int	FlashCount;	/* Flash counter, IC2, LS393 decade counter */
 static int	FlashBit;	/* Flash bit, FL input to I38 */
-static int	DoubleY;	/* Double height latch, 'Y' in I38 */
+static int	s_DoubleY;	/* Double height latch, 'Y' in I38 */
 static int	DoubleHL;	/* Double height second row 'HL' in I38 */
 
 static int	ColourRAM[4];	/* I59, 74ls670, 4x4bit colour ram for graphics modes */
@@ -320,7 +320,7 @@ void dgnbeta_init_video(running_machine *machine)
 	FlashCount=0;
 	FlashBit=0;
 	DoubleHL=1;			/* Default to normal height */
-	DoubleY=1;
+	s_DoubleY=1;
 	DrawInterlace=INTERLACE_OFF;	/* No interlace by default */
 
 	/* setup debug commands */
@@ -429,9 +429,9 @@ static void beta_plot_char_line(running_machine *machine, int x,int y, bitmap_t 
 		ULActive=(UnderLine && (beta_6845_RA==9) && ~SWChar);
 
 		/* If Character set one, and undeline set, latch double height */
-		DoubleY=(UnderLine & SWChar & DoubleHL) |
-		        (SWChar & ~DoubleY & DoubleHL) |
-			(SWChar & ~DoubleY & (beta_6845_RA==9));
+		s_DoubleY=(UnderLine & SWChar & DoubleHL) |
+		        (SWChar & ~s_DoubleY & DoubleHL) |
+			(SWChar & ~s_DoubleY & (beta_6845_RA==9));
 
 		/* Invert forground and background if flashing char and flash acive */
 		Invert=(FlashChar & FlashBit);

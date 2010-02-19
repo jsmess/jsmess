@@ -79,7 +79,7 @@ int CLIB_DECL main(int ac, char **av)
 	char html_directory[128] = "sysinfo";
 	char system_filename[128] = "";
 	char system_name[128] = "";
-	int systemcount = 0, linecount = 0, emptycount = 0, ulcount = 0;
+	int /*systemcount = 0,*/ linecount = 0, emptycount = 0, ulcount = 0;
 	FILE *dat, *html, *html_system = NULL;
 	time_t tm;
 
@@ -148,7 +148,7 @@ int CLIB_DECL main(int ac, char **av)
 					sprintf(system_filename, "%s/%s.htm", html_directory, system_name);
 					fprintf(html, "&bull;&nbsp;&nbsp;<a href=\"%s\">%s</a>\n", system_filename, system_name);
 
-					systemcount++;
+					/*systemcount++;*/
 
 					html_system = fopen(system_filename, "w");
 

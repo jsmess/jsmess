@@ -703,7 +703,6 @@ static READ16_HANDLER( scc68070_periphs_r )
 				verboselog(space->machine, 12, "scc68070_periphs_r: Timer Status Register: %02x & %04x\n", scc68070->timers.timer_status_register, mem_mask);
 			}
 			return (scc68070->timers.timer_status_register << 8) | scc68070->timers.timer_control_register;
-			break;
 		case 0x2022/2:
 			verboselog(space->machine, 2, "scc68070_periphs_r: Timer Reload Register: %04x & %04x\n", scc68070->timers.reload_register, mem_mask);
 			return scc68070->timers.reload_register;
@@ -747,7 +746,6 @@ static READ16_HANDLER( scc68070_periphs_r )
 				verboselog(space->machine, 2, "scc68070_periphs_r: DMA(%d) Status Register: %04x & %04x\n", (offset - 0x2000) / 32, scc68070->dma.channel[(offset - 0x2000) / 32].channel_status, mem_mask);
 			}
 			return (scc68070->dma.channel[(offset - 0x2000) / 32].channel_status << 8) | scc68070->dma.channel[(offset - 0x2000) / 32].channel_error;
-			break;
 		case 0x4004/2:
 		case 0x4044/2:
 			if(ACCESSING_BITS_0_7)
@@ -1453,7 +1451,7 @@ static void cdic_decode_xa_stereo(int *cdic_xa_last, const unsigned char *xa, si
 			l3=cdic_xa_last[3];
 	int b=0;
 	int s=0;
-	int decoded = 0;
+	//int decoded = 0;
 
 	for (b=0; b<18; b++)
 	{
@@ -1486,7 +1484,7 @@ static void cdic_decode_xa_stereo(int *cdic_xa_last, const unsigned char *xa, si
 				*dp++=d1;
 				l3=l2;
 				l2=d1;
-				decoded += 2;
+				//decoded += 2;
 			}
 		}
 
@@ -3472,20 +3470,20 @@ static void mcd212_update_region_arrays(running_machine *machine)
 	{
 		if(mcd212->channel[0].image_coding_method & MCD212_ICM_NR)
 		{
-			int reg = 0;
+			int reg_ = 0;
 			int flag = 0;
 
 			for(flag = 0; flag < 2; flag++)
 			{
-				for(reg = 0; reg < 4; reg++)
+				for(reg_ = 0; reg_ < 4; reg_++)
 				{
-					if(mcd212->channel[0].region_control[reg] == 0)
+					if(mcd212->channel[0].region_control[reg_] == 0)
 					{
 						break;
 					}
-					if(x == (mcd212->channel[0].region_control[flag*4 + reg] & MCD212_RC_X))
+					if(x == (mcd212->channel[0].region_control[flag*4 + reg_] & MCD212_RC_X))
 					{
-						switch((mcd212->channel[0].region_control[flag*4 + reg] & MCD212_RC_OP) >> MCD212_RC_OP_SHIFT)
+						switch((mcd212->channel[0].region_control[flag*4 + reg_] & MCD212_RC_OP) >> MCD212_RC_OP_SHIFT)
 						{
 							case 0: // End of region control for line
 								break;
@@ -3494,12 +3492,12 @@ static void mcd212_update_region_arrays(running_machine *machine)
 							case 3: // Not used
 								break;
 							case 4: // Change weight of plane A
-								latched_wfa = (mcd212->channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfa = (mcd212->channel[0].region_control[flag*4 + reg_] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								break;
 							case 5:	// Not used
 								break;
 							case 6: // Change weight of plane B
-								latched_wfb = (mcd212->channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfb = (mcd212->channel[0].region_control[flag*4 + reg_] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								break;
 							case 7:	// Not used
 								break;
@@ -3527,7 +3525,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 							case 11:	// Not used
 								break;
 							case 12: // Reset region flag and change weight of plane A
-								latched_wfa = (mcd212->channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfa = (mcd212->channel[0].region_control[flag*4 + reg_] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
 									latched_rf1 = 0;
@@ -3538,7 +3536,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 								}
 								break;
 							case 13: // Set region flag and change weight of plane A
-								latched_wfa = (mcd212->channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfa = (mcd212->channel[0].region_control[flag*4 + reg_] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
 									latched_rf1 = 1;
@@ -3549,7 +3547,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 								}
 								break;
 							case 14: // Reset region flag and change weight of plane B
-								latched_wfb = (mcd212->channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfb = (mcd212->channel[0].region_control[flag*4 + reg_] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
 									latched_rf1 = 0;
@@ -3560,7 +3558,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 								}
 								break;
 							case 15: // Set region flag and change weight of plane B
-								latched_wfb = (mcd212->channel[0].region_control[flag*4 + reg] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
+								latched_wfb = (mcd212->channel[0].region_control[flag*4 + reg_] & MCD212_RC_WF) >> MCD212_RC_WF_SHIFT;
 								if(flag)
 								{
 									latched_rf1 = 1;

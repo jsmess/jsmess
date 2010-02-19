@@ -2005,7 +2005,7 @@ READ16_HANDLER( nimbus_io_r )
 
     switch (offset*2)
     {
-        default         : return IOPorts[offset]; break;
+        default         : return IOPorts[offset];
     }
     return 0;
 }

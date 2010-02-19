@@ -266,13 +266,13 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 	case HD61830_INSTRUCTION_CLEAR_BIT:
 		{
 		int nb = data & 0x07;
-		UINT8 data = memory_read_byte(space, hd61830->cac);
+		UINT8 data_ = memory_read_byte(space, hd61830->cac);
 
-		data &= ~(2 << nb);
+		data_ &= ~(2 << nb);
 
 		if (LOG) logerror("HD61380 '%s' Clear Bit %u at %04x\n", device->tag.cstr(), nb + 1, hd61830->cac);
 
-		memory_write_byte(space, hd61830->cac, data);
+		memory_write_byte(space, hd61830->cac, data_);
 
 		hd61830->cac++;
 		}
@@ -281,13 +281,13 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 	case HD61830_INSTRUCTION_SET_BIT:
 		{
 		int nb = data & 0x07;
-		UINT8 data = memory_read_byte(space, hd61830->cac);
+		UINT8 data_ = memory_read_byte(space, hd61830->cac);
 
-		data |= 2 << nb;
+		data_ |= 2 << nb;
 
 		if (LOG) logerror("HD61380 '%s' Set Bit %u at %04x\n", device->tag.cstr(), nb + 1, hd61830->cac);
 
-		memory_write_byte(space, hd61830->cac, data);
+		memory_write_byte(space, hd61830->cac, data_);
 
 		hd61830->cac++;
 		}

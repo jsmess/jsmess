@@ -147,85 +147,59 @@ static READ16_HANDLER( vip_r )
 	switch(offset << 1) {
 		case 0x00:	//INTPND
 					return state->vip_regs.INTPND;
-					break;
 		case 0x02:	//INTENB
 					return state->vip_regs.INTENB;
-					break;
 		case 0x04:	//INTCLR
 					logerror("Error reading INTCLR\n");
 					break;
 		case 0x20:	//DPSTTS
 					return state->vip_regs.DPSTTS;
-					break;
 		case 0x22:	//DPCTRL
 					return state->vip_regs.DPCTRL;
-					break;
 		case 0x24:	//BRTA
 					return state->vip_regs.BRTA;
-					break;
 		case 0x26:	//BRTB
 					return state->vip_regs.BRTB;
-					break;
 		case 0x28:	//BRTC
 					return state->vip_regs.BRTC;
-					break;
 		case 0x2A:	//REST
 					return state->vip_regs.REST;
-					break;
 		case 0x2E:	//FRMCYC
 					return state->vip_regs.FRMCYC;
-					break;
 		case 0x30:	//CTA
 					return state->vip_regs.CTA;
-					break;
 		case 0x40:	//XPSTTS
 					return state->vip_regs.XPSTTS;
-					break;
 		case 0x42:	//XPCTRL
 					return state->vip_regs.XPCTRL;
-					break;
 		case 0x44:	//VER
 					return state->vip_regs.VER;
-					break;
 		case 0x48:	//SPT0
 					return state->vip_regs.SPT[0];
-					break;
 		case 0x4A:	//SPT1
 					return state->vip_regs.SPT[1];
-					break;
 		case 0x4C:	//SPT2
 					return state->vip_regs.SPT[2];
-					break;
 		case 0x4E:	//SPT3
 					return state->vip_regs.SPT[3];
-					break;
 		case 0x60:	//GPLT0
 					return state->vip_regs.GPLT[0];
-					break;
 		case 0x62:	//GPLT1
 					return state->vip_regs.GPLT[1];
-					break;
 		case 0x64:	//GPLT2
 					return state->vip_regs.GPLT[2];
-					break;
 		case 0x66:	//GPLT3
 					return state->vip_regs.GPLT[3];
-					break;
 		case 0x68:	//JPLT0
 					return state->vip_regs.JPLT[0];
-					break;
 		case 0x6A:	//JPLT1
 					return state->vip_regs.JPLT[1];
-					break;
 		case 0x6C:	//JPLT2
 					return state->vip_regs.JPLT[2];
-					break;
 		case 0x6E:	//JPLT3
 					return state->vip_regs.JPLT[3];
-					break;
 		case 0x70:	//BKCOL
 					return state->vip_regs.BKCOL;
-					break;
 		default:
 					logerror("Unemulated read: addr %08x\n", offset * 2 + 0x0005f800);
 					break;

@@ -174,26 +174,25 @@ static floperr_t internal_td0_read_sector(floppy_image *floppy, int head, int tr
 				//      size of data that should be reapeted next byte times
 				while(buff_pos<realsize) {
 					if (data[data_pos]==0x00) {
-						int size = data[data_pos+1];
-						memcpy(buf+buff_pos,data + data_pos + 2,size);
-						data_pos += 2 + size;
-						buff_pos += size;
+						int size_ = data[data_pos+1];
+						memcpy(buf+buff_pos,data + data_pos + 2,size_);
+						data_pos += 2 + size_;
+						buff_pos += size_;
 					} else {
-						int size   = 2*data[data_pos];
+						int size_  = 2*data[data_pos];
 						int repeat = data[data_pos+1];
 						data_pos+=2;
 
 						for (i=0;i<repeat;i++) {
-							memcpy(buf + buff_pos,data + data_pos,size);
-							buff_pos += size;
+							memcpy(buf + buff_pos,data + data_pos,size_);
+							buff_pos += size_;
 						}
-						data_pos += size;
+						data_pos += size_;
 					}
 				}
 				break;
 		default:
 				return FLOPPY_ERROR_INTERNAL;
-				break;
 	}
 	return FLOPPY_ERROR_SUCCESS;
 }
