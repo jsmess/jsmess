@@ -150,6 +150,9 @@ READ_LINE_DEVICE_HANDLER( floppy_tk00_r );
 /* disk changed */
 READ_LINE_DEVICE_HANDLER( floppy_dskchg_r );
 
+/* 2-sided disk */
+READ_LINE_DEVICE_HANDLER( floppy_twosid_r );
+
 #define FLOPPY	DEVICE_GET_INFO_NAME(floppy)
 DEVICE_GET_INFO(floppy);
 

@@ -996,6 +996,17 @@ READ_LINE_DEVICE_HANDLER( floppy_dskchg_r )
 	return drive->dskchg;
 }
 
+/* 2-sided disk */
+READ_LINE_DEVICE_HANDLER( floppy_twosid_r )
+{
+	floppy_drive *drive = get_safe_token(device);
+
+	if (drive->floppy == NULL)
+		return ASSERT_LINE;
+	else
+		return !floppy_get_heads_per_disk(drive->floppy);
+}
+
 /*************************************
  *
  *  Device specification function

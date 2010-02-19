@@ -103,10 +103,12 @@ Source Changes:
 - Placed floppy drive head initially on track 0 to fix alignment issues
   with Commodore drives, where physical track 1 is a half track. [Curt Coder]
 
-- Implemented 'disk changed' floppy drive signal. [Curt Coder]
+- Implemented 'disk changed' (DSKCHG) floppy drive signal. [Curt Coder]
 
 - Implemented floppy drive write protect signal toggling on floppy
   disk insert/eject. [Curt Coder]
+  
+- Implemented 'disk double sided' (TWOSID) floppy drive signal. [Curt Coder]
 
 - Emulated the following Commodore floppy disk drives at hardware level:
   1551, 1571, 1581, 2040, 3040, 4040, 8050, 8250, SFD-1001. [Curt Coder]
