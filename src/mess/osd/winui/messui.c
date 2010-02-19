@@ -418,7 +418,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 {
 	machine_config *config;
 	const device_config *dev;
-	int nPos;
+	//int nPos;
 	char szMessage[256];
 	LPCSTR pszSoftware;
 	BOOL bResult = FALSE;
@@ -428,7 +428,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	// allocate the machine config
 	config = machine_config_alloc(drivers[drvindex]->machine_config);
 
-	nPos = 0;
+	//nPos = 0;
 	for (dev = config->devicelist.first(); dev != NULL; dev = dev->next)
 	{
 		if (is_image_device(dev))
@@ -449,7 +449,7 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 				}
 			}
 
-			nPos++;
+			//nPos++;
 		}
 	}
 	bResult = TRUE;
