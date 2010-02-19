@@ -905,7 +905,7 @@ static int allendianmemcmp(const void *s1, const void *s2, size_t n)
 
 #else
 
-	realbuf = s2;
+	realbuf = (unsigned char *)s2;
 
 #endif
 	return memcmp(s1,realbuf,n);
