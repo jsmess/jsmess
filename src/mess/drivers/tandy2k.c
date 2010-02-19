@@ -15,10 +15,11 @@
 	- CRT9007
 	- video
 	- hires graphics board
-	- floppy
+	- floppy 720K DSQD
 	- DMA
 	- WD1010
 	- hard disk
+	- mouse
 	- save state
 
 */
@@ -735,6 +736,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT		COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME				FLAGS */
-COMP( 1983, tandy2k,	0,			0,		tandy2k,	tandy2k,	0,		"Tandy Radio Shack",	"Tandy 2000 (26-5103)",	GAME_NOT_WORKING)
-COMP( 1983, tandy2khd,	tandy2k,	0,		tandy2k_hd,	tandy2k,	0,		"Tandy Radio Shack",	"Tandy 2000 (26-5104)",	GAME_NOT_WORKING)
+/*    YEAR  NAME        PARENT		COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME		FLAGS */
+COMP( 1983, tandy2k,	0,			0,		tandy2k,	tandy2k,	0,		"Tandy Radio Shack",	"Tandy 2000",	GAME_NOT_WORKING)
+COMP( 1983, tandy2khd,	tandy2k,	0,		tandy2k_hd,	tandy2k,	0,		"Tandy Radio Shack",	"Tandy 2000HD",	GAME_NOT_WORKING)
