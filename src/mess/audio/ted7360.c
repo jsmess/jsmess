@@ -1445,7 +1445,7 @@ static DEVICE_RESET( ted7360 )
 
 	memset(ted7360->reg, 0, ARRAY_LENGTH(ted7360->reg));
 
-	ted7360->rom = 1;	// FIXME: at start should be RAM or ROM?
+	ted7360->rom = 1;	// FIXME: at start should be RAM or ROM? old c16 code set it to ROM at init: is it correct?
 
 	ted7360->lines = TED7360_LINES;
 	ted7360->chargenaddr = ted7360->bitmapaddr = ted7360->videoaddr = 0;

@@ -7,6 +7,37 @@
 #ifndef __C16_H__
 #define __C16_H__
 
+typedef struct _c16_state c16_state;
+struct _c16_state
+{
+	/* memory pointers */
+	UINT8 *      mem10000;
+	UINT8 *      mem14000;
+	UINT8 *      mem18000;
+	UINT8 *      mem1c000;
+	UINT8 *      mem20000;
+	UINT8 *      mem24000;
+	UINT8 *      mem28000;
+	UINT8 *      mem2c000;
+
+	/* misc */
+	UINT8        keyline[10];
+	UINT8        port6529;
+	int          lowrom, highrom;
+	int          old_level;
+
+	int          sidcard, pal;
+
+	/* devices */
+	running_device *maincpu;
+	running_device *ted7360;
+	running_device *serbus;
+	running_device *cassette;
+	running_device *messram;
+	running_device *sid;
+};
+
+
 /*----------- defined in machine/c16.c -----------*/
 
 UINT8 c16_m7501_port_read(running_device *device, UINT8 direction);

@@ -113,21 +113,18 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 
 
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
-#include "sound/sid6581.h"
-
 #include "audio/ted7360.h"
 #include "audio/t6721.h"
-#include "machine/cbmipt.h"
+#include "cpu/m6502/m6502.h"
 #include "devices/messram.h"
+#include "includes/cbm.h"
+#include "includes/c16.h"
 #include "machine/c1541.h"
 #include "machine/c1551.h"
-
-/* devices config */
-#include "includes/cbm.h"
 #include "machine/cbmiec.h"
+#include "machine/cbmipt.h"
+#include "sound/sid6581.h"
 
-#include "includes/c16.h"
 
 /*************************************
  *
@@ -434,19 +431,41 @@ static CBM_IEC_DAISY( c16_iec_1541 )
 
 static VIDEO_UPDATE( c16 )
 {
-	running_device *ted7360 = devtag_get_device(screen->machine, "ted7360");
-	ted7360_video_update(ted7360, bitmap, cliprect);
+	c16_state *state = (c16_state *)screen->machine->driver_data;
+	ted7360_video_update(state->ted7360, bitmap, cliprect);
 	return 0;
 }
 
 static INTERRUPT_GEN( c16_raster_interrupt )
 {
-	running_device *ted7360 = devtag_get_device(device->machine, "ted7360");
-	ted7360_raster_interrupt_gen(ted7360);
+	c16_state *state = (c16_state *)device->machine->driver_data;
+	ted7360_raster_interrupt_gen(state->ted7360);
 }
 
 
+static MACHINE_START( c16 )
+{
+	c16_state *state = (c16_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->ted7360 = devtag_get_device(machine, "ted7360");
+	state->serbus = devtag_get_device(machine, "iec");
+	state->cassette = devtag_get_device(machine, "cassette");
+	state->messram = devtag_get_device(machine, "messram");
+	state->sid = devtag_get_device(machine, "sid");
+
+	state_save_register_global(machine, state->old_level);
+	state_save_register_global(machine, state->lowrom);
+	state_save_register_global(machine, state->highrom);
+	state_save_register_global(machine, state->port6529);
+	state_save_register_global_array(machine, state->keyline);
+}
+
 static MACHINE_DRIVER_START( c16 )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(c16_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M7501, XTAL_17_73447MHz/20)
 	MDRV_CPU_PROGRAM_MAP(c16_map)
@@ -455,6 +474,7 @@ static MACHINE_DRIVER_START( c16 )
 	MDRV_CPU_PERIODIC_INT(c16_raster_interrupt, TED7360_HRETRACERATE)
 	MDRV_QUANTUM_TIME(HZ(60))
 
+	MDRV_MACHINE_START( c16 )
 	MDRV_MACHINE_RESET( c16 )
 
 	/* video hardware */
