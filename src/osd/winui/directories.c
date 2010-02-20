@@ -121,7 +121,6 @@ INT_PTR CALLBACK DirectoriesDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARA
 
 	case WM_NOTIFY:
 		return (BOOL)HANDLE_WM_NOTIFY(hDlg, wParam, lParam, Directories_OnNotify);
-		break;
 
 	case WM_CLOSE:
 		HANDLE_WM_CLOSE(hDlg, wParam, lParam, Directories_OnClose);
@@ -216,7 +215,7 @@ static void UpdateDirectoryList(HWND hDlg)
 	LV_ITEM Item;
 	HWND	hList  = GetDlgItem(hDlg, IDC_DIR_LIST);
 	HWND	hCombo = GetDlgItem(hDlg, IDC_DIR_COMBO);
-	int		res;
+	//int		res;
 	BOOL	b_res;
 
 	/* Remove previous */
@@ -232,17 +231,17 @@ static void UpdateDirectoryList(HWND hDlg)
 	if (IsMultiDir(nType))
 	{
 		Item.pszText = (TCHAR*) TEXT(DIRLIST_NEWENTRYTEXT);
-		res = ListView_InsertItem(hList, &Item);
+		/*res =*/ ListView_InsertItem(hList, &Item);
 		for (i = DirInfo_NumDir(g_pDirInfo, nType) - 1; 0 <= i; i--)
 		{
 			Item.pszText = DirInfo_Path(g_pDirInfo, nType, i);
-			res = ListView_InsertItem(hList, &Item);
+			/*res =*/ ListView_InsertItem(hList, &Item);
 		}
 	}
 	else
 	{
 		Item.pszText = DirInfo_Dir(g_pDirInfo, nType);
-		res = ListView_InsertItem(hList, &Item);
+		/*res =*/ ListView_InsertItem(hList, &Item);
 	}
 
 	/* select first one */
