@@ -270,8 +270,8 @@ ROM_START(apple1)
 	ROM_LOAD_NIB_HIGH( "apple-a2.a2",    0xFF00, 0x0100, CRC(254bfb95) SHA1(b6468b72295b7d8ac288d104d252f24de1f1d611) )
 	ROM_LOAD_NIB_LOW( "apple-a1.a1",    0xFF00, 0x0100, CRC(434f8ce6) SHA1(9deee2d39903209b20c3fc6b58e16372f8efece1) )
 	/* 256-byte cassette interface ROM, in two 82s129 or mmi6301 256x4 proms at locations 3 and 4 on the cassette interface daughtercard (they are labeled "MMI 6301-IJ // 7623L // APPLE-A3" and "MMI 6301-IJ // 7623L // APPLE-A4") */
-	ROM_LOAD_NIB_HIGH( "apple-a4.4",    0xc100, 0x0100, CRC(94efa977) SHA1(851f3bd6863859a1a6909179a5e5bf744b3d807e) )
-	ROM_LOAD_NIB_LOW( "apple-a3.3",    0xc100, 0x0100, CRC(6eae8f52) SHA1(71906932727ef70952ef6afe6b08708df15cd67d) )
+	ROM_LOAD_NIB_HIGH( "apple-a3.3",    0xc100, 0x0100, CRC(6eae8f52) SHA1(71906932727ef70952ef6afe6b08708df15cd67d) )
+	ROM_LOAD_NIB_LOW( "apple-a4.4",    0xc100, 0x0100, CRC(94efa977) SHA1(851f3bd6863859a1a6909179a5e5bf744b3d807e) )
 	/* 512-byte Signetics 2513 character generator ROM at location D2-D3 */
 	ROM_REGION(0x0200, "gfx1",0)
 	ROM_LOAD("s2513.d2", 0x0000, 0x0200, CRC(a7e567fc) SHA1(b18aae0a2d4f92f5a7e22640719bbc4652f3f4ee)) // apple1.vid
