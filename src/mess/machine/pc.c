@@ -1321,6 +1321,11 @@ static IRQ_CALLBACK(pc_irq_callback)
 
 MACHINE_START( pc )
 {
+	pc_state *st = (pc_state *)machine->driver_data;
+
+	st->pic8259 = devtag_get_device(machine, "pic8259");	
+	st->dma8237 = devtag_get_device(machine, "dma8237");
+	st->pit8253 = devtag_get_device(machine, "pit8253");
 	pc_fdc_init( machine, &fdc_interface_nc );
 }
 
@@ -1333,9 +1338,6 @@ MACHINE_RESET( pc )
 	st->maincpu = devtag_get_device(machine, "maincpu" );
 	cpu_set_irq_callback(st->maincpu, pc_irq_callback);
 
-	st->pic8259 = devtag_get_device(machine, "pic8259");
-	st->dma8237 = devtag_get_device(machine, "dma8237");
-	st->pit8253 = devtag_get_device(machine, "pit8253");
 	st->u73_q2 = 0;
 	st->out1 = 0;
 	st->pc_spkrdata = 0;
@@ -1348,9 +1350,16 @@ MACHINE_RESET( pc )
 
 MACHINE_START( pcjr )
 {
+	pc_state *st = (pc_state *)machine->driver_data;
 	pc_fdc_init( machine, &pcjr_fdc_interface_nc );
 	pcjr_keyb.keyb_signal_timer = timer_alloc(machine,  pcjr_keyb_signal_callback, NULL );
 	pc_int_delay_timer = timer_alloc(machine,  pcjr_delayed_pic8259_irq, NULL );
+	st->maincpu = devtag_get_device(machine, "maincpu" );
+	cpu_set_irq_callback(st->maincpu, pc_irq_callback);
+
+	st->pic8259 = devtag_get_device(machine, "pic8259");
+	st->dma8237 = NULL;
+	st->pit8253 = devtag_get_device(machine, "pit8253");
 }
 
 
@@ -1359,12 +1368,6 @@ MACHINE_RESET( pcjr )
 	running_device *speaker = devtag_get_device(machine, "speaker");
 	pc_state *st = (pc_state *)machine->driver_data;
 	memset(st,0,sizeof(st));
-	st->maincpu = devtag_get_device(machine, "maincpu" );
-	cpu_set_irq_callback(st->maincpu, pc_irq_callback);
-
-	st->pic8259 = devtag_get_device(machine, "pic8259");
-	st->dma8237 = NULL;
-	st->pit8253 = devtag_get_device(machine, "pit8253");
 	st->u73_q2 = 0;
 	st->out1 = 0;
 	st->pc_spkrdata = 0;
