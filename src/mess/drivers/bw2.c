@@ -525,7 +525,8 @@ static MACHINE_START( bw2 )
 	/* memory banking */
 	memory_configure_bank(machine, "bank1", BANK_RAM1, 1, state->work_ram, 0);
 	memory_configure_bank(machine, "bank1", BANK_VRAM, 1, state->video_ram, 0);
-
+	memory_configure_bank(machine, "bank1", BANK_ROM, 1, memory_region(machine, "ic1"), 0);
+	
 	/* register for state saving */
 	state_save_register_global(machine, state->keyboard_row);
 	state_save_register_global_pointer(machine, state->work_ram, messram_get_size(devtag_get_device(machine, "messram")));
@@ -549,7 +550,6 @@ static MACHINE_RESET( bw2 )
 		memory_configure_bank(machine, "bank1", BANK_RAM3, 2, state->work_ram + 0x8000, 0x8000);
 		memory_configure_bank(machine, "bank1", BANK_RAMCARD_RAM, 1, state->ramcard_ram, 0);
 		memory_configure_bank(machine, "bank1", BANK_RAM6, 1, state->work_ram + 0x18000, 0);
-		memory_configure_bank(machine, "bank1", BANK_ROM, 1, memory_region(machine, "ic1"), 0);
 
 		memory_install_write8_handler(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_IO), 0x30, 0x30, 0, 0x0f, &ramcard_bank_w);
 	}
@@ -558,7 +558,6 @@ static MACHINE_RESET( bw2 )
 		// no RAMCARD
 
 		memory_configure_bank(machine, "bank1", BANK_RAM2, 5, state->work_ram + 0x8000, 0x8000);
-		memory_configure_bank(machine, "bank1", BANK_ROM, 1, memory_region(machine, "ic1"), 0);
 
 		memory_unmap_write(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_IO), 0x30, 0x30, 0, 0x0f);
 	}
