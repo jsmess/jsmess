@@ -3292,13 +3292,12 @@ MACHINE_START( amstrad )
 {
 
 	multiface_init(machine);
+	amstrad_system_type = SYSTEM_CPC;
 }
 MACHINE_RESET( amstrad )
 {
 	int i;
 	UINT8 *rom = memory_region(machine, "maincpu");
-
-	amstrad_system_type = SYSTEM_CPC;
 
 	for (i=0; i<256; i++)
 	{
@@ -3317,6 +3316,7 @@ MACHINE_RESET( amstrad )
 MACHINE_START( plus )
 {
 	amstrad_plus_asic_ram = memory_region(machine, "user1");  // 16kB RAM for ASIC, memory-mapped registers.
+	amstrad_system_type = SYSTEM_PLUS;
 }
 
 
@@ -3324,8 +3324,6 @@ MACHINE_RESET( plus )
 {
 	int i;
 	UINT8 *rom = memory_region(machine, "maincpu");
-
-	amstrad_system_type = SYSTEM_PLUS;
 
 	for (i=0; i<128; i++)  // fill ROM table
 	{
@@ -3359,13 +3357,16 @@ MACHINE_RESET( plus )
 	//  multiface_init();
 }
 
+MACHINE_START( gx4000 )
+{
+	amstrad_plus_asic_ram = memory_region(machine, "user1");  // 16kB RAM for ASIC, memory-mapped registers.
+	amstrad_system_type = SYSTEM_GX4000;
+}
 
 MACHINE_RESET( gx4000 )
 {
 	int i;
 	UINT8 *rom = memory_region(machine, "maincpu");
-
-	amstrad_system_type = SYSTEM_GX4000;
 
 	for (i=0; i<128; i++)  // fill ROM table
 	{
@@ -3398,13 +3399,17 @@ MACHINE_RESET( gx4000 )
 	//  multiface_init();
 }
 
+MACHINE_START( kccomp )
+{
+	multiface_init(machine);
+	amstrad_system_type = SYSTEM_CPC;
+}
+
 
 MACHINE_RESET( kccomp )
 {
 	int i;
 	UINT8 *rom = memory_region(machine, "maincpu");
-
-	amstrad_system_type = SYSTEM_CPC;
 
 	for (i=0; i<256; i++)
 	{
@@ -3424,12 +3429,16 @@ MACHINE_RESET( kccomp )
 }
 
 
+MACHINE_START( aleste )
+{
+	multiface_init(machine);
+	amstrad_system_type = SYSTEM_ALESTE;
+}
+
 MACHINE_RESET( aleste )
 {
 	int i;
 	UINT8 *rom = memory_region(machine, "maincpu");
-
-	amstrad_system_type = SYSTEM_ALESTE;
 
 	for (i=0; i<256; i++)
 	{

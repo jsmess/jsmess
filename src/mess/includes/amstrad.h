@@ -32,10 +32,13 @@ WRITE_LINE_DEVICE_HANDLER( aleste_interrupt );
 
 MACHINE_START( amstrad );
 MACHINE_RESET( amstrad );
+MACHINE_START( kccomp );
 MACHINE_RESET( kccomp );
 MACHINE_START( plus );
 MACHINE_RESET( plus );
+MACHINE_START( gx4000 );
 MACHINE_RESET( gx4000 );
+MACHINE_START( aleste );
 MACHINE_RESET( aleste );
 
 SNAPSHOT_LOAD( amstrad );
