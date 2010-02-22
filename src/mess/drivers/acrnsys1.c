@@ -146,11 +146,11 @@ INPUT_PORTS_END
 
 static const ins8154_interface ins8154_b1 =
 {
-	ins8154_b1_port_a_r,
-	NULL,
-	ins8154_b1_port_a_w,
-	acrnsys1_led_segment_w,
-	NULL
+	DEVCB_HANDLER(ins8154_b1_port_a_r),
+	DEVCB_HANDLER(ins8154_b1_port_a_w),
+	DEVCB_NULL,
+	DEVCB_HANDLER(acrnsys1_led_segment_w),
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( acrnsys1 )
