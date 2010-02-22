@@ -14,6 +14,7 @@
 #include "machine/i8257.h"
 #include "video/i8275.h"
 #include "devices/cassette.h"
+#include "devices/cartslot.h"
 #include "formats/rk_cas.h"
 #include "includes/radio86.h"
 
@@ -382,6 +383,10 @@ static MACHINE_DRIVER_START( radiorom )
 	MDRV_CPU_PROGRAM_MAP(radio86rom_mem)
 
 	MDRV_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
+	
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( radioram )
@@ -451,10 +456,13 @@ ROM_START( radio16 )
 ROM_END
 
 ROM_START( radiorom )
-	ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(B5CDEAB7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8))
+	ROM_REGION( 0x20000, "maincpu", ROMREGION_ERASEFF )
+	ROM_SYSTEM_BIOS(0, "32k", "32 KB rom disk")
+	ROMX_LOAD( "radiorom.rom", 0xf800, 0x0800, CRC(B5CDEAB7) SHA1(1c80d72082f2fb2190b575726cb82d86ae0ee7d8), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "64k", "64 KB rom disk")
+	ROMX_LOAD( "radiorom.64",  0xf800, 0x0800, CRC(5250b927) SHA1(e885e0f5b2325190b38a4c92b20a8b4fa78fbd8f), ROM_BIOS(2))
 	ROM_COPY( "maincpu", 0xf800, 0xf000, 0x0800 )
-	ROM_LOAD( "romdisk.rk", 0x10000, 0x8000, CRC(6B16FC04) SHA1(8c09322ae184f4d900f1032d20b5cf3eb2f1a24b))
+	ROM_CART_LOAD("cart", 0x10000,  0x10000, ROM_NOMIRROR | ROM_OPTIONAL)
 	ROM_REGION(0x0800, "gfx1",0)
 	ROM_LOAD ("radio86.fnt", 0x0000, 0x0400, CRC(7666bd5e) SHA1(8652787603bee9b4da204745e3b2aa07a4783dfc))
 ROM_END
