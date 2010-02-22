@@ -120,11 +120,11 @@ static MACHINE_RESET(mk14)
 
 static const ins8154_interface mk14_ins8154 =
 {
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 static MACHINE_DRIVER_START( mk14 )
