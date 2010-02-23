@@ -58,6 +58,7 @@ static WRITE_LINE_DEVICE_HANDLER( vsync_w )
 	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
 
 	pic8259_set_irq_line(driver_state->pic, 7, state);
+	driver_state->vert = state;
 }
 
 static const mc6845_interface hd46505s_intf = 
@@ -213,7 +214,9 @@ static READ8_DEVICE_HANDLER( via1_pa_r )
 
     */
 
-	return 0;
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+
+	return ieee488_dio_r(state->ieee488, 0);
 }
 
 static WRITE8_DEVICE_HANDLER( via1_pa_w )
@@ -232,6 +235,10 @@ static WRITE8_DEVICE_HANDLER( via1_pa_w )
         PA7     DIO8
 
     */
+
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+
+	ieee488_dio_w(state->ieee488, device, data);
 }
 
 static READ8_DEVICE_HANDLER( via1_pb_r )
@@ -251,7 +258,35 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 
     */
 
-	return 0;
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+
+	UINT8 data = 0;
+
+	/* data valid */
+	data |= ieee488_dav_r(state->ieee488);
+
+	/* end or identify */
+	data |= ieee488_eoi_r(state->ieee488) << 1;
+
+	/* remote enable */
+	data |= ieee488_ren_r(state->ieee488) << 2;
+
+	/* attention */
+	data |= ieee488_atn_r(state->ieee488) << 3;
+
+	/* interface clear */
+	data |= ieee488_ifc_r(state->ieee488) << 4;
+
+	/* service request */
+	data |= ieee488_srq_r(state->ieee488) << 5;
+
+	/* not ready for data */
+	data |= ieee488_nrfd_r(state->ieee488) << 6;
+
+	/* data not accepted */
+	data |= ieee488_ndac_r(state->ieee488) << 7;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( via1_pb_w )
@@ -270,6 +305,32 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
         PB7     NDAC
 
     */
+
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+
+	/* data valid */
+	ieee488_dav_w(state->ieee488, device, BIT(data, 0));
+
+	/* end or identify */
+	ieee488_eoi_w(state->ieee488, device, BIT(data, 1));
+
+	/* remote enable */
+	ieee488_ren_w(state->ieee488, device, BIT(data, 2));
+
+	/* attention */
+	ieee488_atn_w(state->ieee488, device, BIT(data, 3));
+
+	/* interface clear */
+	ieee488_ifc_w(state->ieee488, device, BIT(data, 4));
+
+	/* service request */
+	ieee488_srq_w(state->ieee488, device, BIT(data, 5));
+
+	/* not ready for data */
+	ieee488_nrfd_w(state->ieee488, device, BIT(data, 6));
+
+	/* data not accepted */
+	ieee488_ndac_w(state->ieee488, device, BIT(data, 7));
 }
 
 static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
@@ -285,9 +346,9 @@ static const via6522_interface via1_intf =
 {
 	DEVCB_HANDLER(via1_pa_r),
 	DEVCB_HANDLER(via1_pb_r),
-	DEVCB_NULL, // NRFD
+	DEVCB_DEVICE_LINE(IEEE488_TAG, ieee488_nrfd_r),
 	DEVCB_NULL,
-	DEVCB_NULL, // NDAC
+	DEVCB_DEVICE_LINE(IEEE488_TAG, ieee488_ndac_r),
 	DEVCB_NULL,
 
 	DEVCB_HANDLER(via1_pa_w),
@@ -317,7 +378,14 @@ static READ8_DEVICE_HANDLER( via2_pa_r )
 
     */
 
-	return 0;
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+
+	UINT8 data = 0;
+
+	/* vertical sync */
+	data |= state->vert << 7;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( via2_pa_w )
@@ -635,7 +703,20 @@ static READ8_DEVICE_HANDLER( via6_pa_r )
 
     */
 
-	return 0;
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+
+	UINT8 data = 0;
+
+	/* drive A track 0 sense */
+	data |= floppy_tk00_r(state->floppy[0].image) << 1;
+
+	/* drive B track 0 sense */
+	data |= floppy_tk00_r(state->floppy[0].image) << 3;
+
+	/* write protect sense */
+	data |= floppy_wpt_r(state->floppy[state->drive].image) << 6;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( via6_pa_w )
@@ -654,6 +735,14 @@ static WRITE8_DEVICE_HANDLER( via6_pa_w )
         PA7     SYNC
 
     */
+
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+
+	/* side select */
+	state->side = BIT(data, 4);
+
+	/* drive select */
+	state->drive = BIT(data, 5);
 }
 
 static READ8_DEVICE_HANDLER( via6_pb_r )
@@ -673,7 +762,14 @@ static READ8_DEVICE_HANDLER( via6_pb_r )
 
     */
 
-	return 0;
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+
+	UINT8 data = 0;
+
+	/* single/double sided */
+	data |= floppy_twosid_r(state->floppy[state->drive].image) << 5;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( via6_pb_w )
@@ -692,6 +788,14 @@ static WRITE8_DEVICE_HANDLER( via6_pb_w )
         PB7     stepper enable B
 
     */
+
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+
+	/* stepper enable A */
+	state->floppy[0].se = BIT(data, 6);
+
+	/* stepper enable B */
+	state->floppy[1].se = BIT(data, 7);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( via6_irq_w )
@@ -740,7 +844,7 @@ static const floppy_config victor9k_floppy_config =
 
 static IEEE488_DAISY( ieee488_daisy )
 {
-//	{ M6522_1_TAG },
+	{ M6522_1_TAG, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE(M6522_1_TAG, via_ca1_w), DEVCB_DEVICE_LINE(M6522_1_TAG, via_ca2_w) },
 	{ NULL }
 };
 
@@ -753,6 +857,8 @@ static MACHINE_START( victor9k )
 	/* find devices */
 	state->ieee488 = devtag_get_device(machine, IEEE488_TAG);
 	state->pic = devtag_get_device(machine, I8259A_TAG);
+	state->floppy[0].image = devtag_get_device(machine, FLOPPY_0);
+	state->floppy[1].image = devtag_get_device(machine, FLOPPY_1);
 }
 
 /* Machine Driver */

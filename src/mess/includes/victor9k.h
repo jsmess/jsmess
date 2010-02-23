@@ -18,11 +18,24 @@
 #define CENTRONICS_TAG	"centronics"
 #define IEEE488_TAG		"ieee488"
 
+typedef struct _victor9k_drive_t victor9k_drive_t;
+struct _victor9k_drive_t
+{
+	/* motors */
+	int lms;			/* motor speed */
+	int st;				/* stepper phase */
+	int se;				/* stepper enable */
+
+	/* devices */
+	running_device *image;
+};
+
 typedef struct _victor9k_state victor9k_state;
 struct _victor9k_state
 {
 	/* video state */
 	UINT8 *video_ram;
+	int vert;
 
 	/* interrupts */
 	int via1_irq;
@@ -31,6 +44,11 @@ struct _victor9k_state
 	int via4_irq;
 	int via5_irq;
 	int via6_irq;
+
+	/* floppy state */
+	victor9k_drive_t floppy[2];			/* drive unit */
+	int drive;							/* selected drive */
+	int side;							/* selected side */
 
 	/* devices */
 	running_device *pic;
