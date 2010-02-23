@@ -9,6 +9,19 @@
 
 ***************************************************************************/
 
+/*
+
+	TODO:
+
+	- RAM expansions
+	- video
+	- keyboard
+	- floppy
+	- codec sound
+	- MC6852
+
+*/
+
 #include "emu.h"
 #include "includes/victor9k.h"
 #include "cpu/i86/i86.h"
@@ -33,7 +46,7 @@ static ADDRESS_MAP_START( victor9k_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe8001, 0xe8001) AM_DEVREADWRITE(HD46505S_TAG, mc6845_status_r, mc6845_address_w)
 	AM_RANGE(0xe8020, 0xe802f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0xe8040, 0xe804f) AM_DEVREADWRITE(M6522_2_TAG, via_r, via_w)
-//	AM_RANGE(0xe8060, 0xe806f) AM_DEVREADWRITE(M6852_TAG, m6852_r, m6852_w)
+//	AM_RANGE(0xe8060, 0xe806f) AM_DEVREADWRITE(MC6852_TAG, mc6852_r, mc6852_w)
 	AM_RANGE(0xe8080, 0xe808f) AM_DEVREADWRITE(M6522_3_TAG, via_r, via_w)
 	AM_RANGE(0xe80a0, 0xe80af) AM_DEVREADWRITE(M6522_4_TAG, via_r, via_w)
 	AM_RANGE(0xe80c0, 0xe80cf) AM_DEVREADWRITE(M6522_6_TAG, via_r, via_w)
@@ -333,6 +346,10 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	ieee488_ndac_w(state->ieee488, device, BIT(data, 7));
 }
 
+static WRITE_LINE_DEVICE_HANDLER( codec_vol_w )
+{
+}
+
 static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 {
 	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
@@ -356,7 +373,7 @@ static const via6522_interface via1_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL, // CODEC VOL
+	DEVCB_LINE(codec_vol_w),
 
 	DEVCB_LINE(via1_irq_w)
 };
@@ -526,6 +543,10 @@ static WRITE8_DEVICE_HANDLER( via3_pb_w )
         PB7     J5-46
 
     */
+
+	/* codec clock output */
+	//mc6852_rxclk_w(state->ssda, BIT(data, 7));
+	//mc6852_txclk_w(state->ssda, BIT(data, 7));
 }
 
 static WRITE_LINE_DEVICE_HANDLER( via3_irq_w )
@@ -592,6 +613,10 @@ static WRITE8_DEVICE_HANDLER( via4_pb_w )
     */
 }
 
+static WRITE_LINE_DEVICE_HANDLER( mode_w )
+{
+}
+
 static WRITE_LINE_DEVICE_HANDLER( via4_irq_w )
 {
 	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
@@ -614,7 +639,7 @@ static const via6522_interface via4_intf =
 	DEVCB_HANDLER(via4_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL, // MODE
+	DEVCB_LINE(mode_w),
 	DEVCB_NULL,
 
 	DEVCB_LINE(via4_irq_w)
@@ -798,6 +823,14 @@ static WRITE8_DEVICE_HANDLER( via6_pb_w )
 	state->floppy[1].se = BIT(data, 7);
 }
 
+static WRITE_LINE_DEVICE_HANDLER( drw_w )
+{
+}
+
+static WRITE_LINE_DEVICE_HANDLER( erase_w )
+{
+}
+
 static WRITE_LINE_DEVICE_HANDLER( via6_irq_w )
 {
 	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
@@ -820,8 +853,8 @@ static const via6522_interface via6_intf =
 	DEVCB_HANDLER(via6_pb_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL, // DRW
-	DEVCB_NULL, // ERASE
+	DEVCB_LINE(drw_w),
+	DEVCB_LINE(erase_w),
 
 	DEVCB_LINE(via6_irq_w)
 };
@@ -857,6 +890,7 @@ static MACHINE_START( victor9k )
 	/* find devices */
 	state->ieee488 = devtag_get_device(machine, IEEE488_TAG);
 	state->pic = devtag_get_device(machine, I8259A_TAG);
+	state->ssda = devtag_get_device(machine, MC6852_TAG);
 	state->floppy[0].image = devtag_get_device(machine, FLOPPY_0);
 	state->floppy[1].image = devtag_get_device(machine, FLOPPY_1);
 }
@@ -890,14 +924,13 @@ static MACHINE_DRIVER_START( victor9k )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-//	MDRV_M6852_ADD(M6852_TAG, 0, m6852_intf)
-//	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MDRV_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
 	MDRV_PIC8259_ADD(I8259A_TAG, pic_intf)
 	MDRV_PIT8253_ADD(I8253_TAG, pit_intf)
 	MDRV_UPD7201_ADD(UPD7201_TAG, 0, mpsc_intf)
+//	MDRV_MC6852_ADD(MC6852_TAG, 0, mc6852_intf)
 	MDRV_VIA6522_ADD(M6522_1_TAG, 0, via1_intf)
 	MDRV_VIA6522_ADD(M6522_2_TAG, 0, via2_intf)
 	MDRV_VIA6522_ADD(M6522_3_TAG, 0, via3_intf)

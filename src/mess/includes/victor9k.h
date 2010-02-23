@@ -7,7 +7,7 @@
 #define I8259A_TAG		"i8259"
 #define UPD7201_TAG		"upd7201"
 #define HD46505S_TAG	"hd46505s"
-#define M6852_TAG		"m6852"
+#define MC6852_TAG		"mc6852"
 #define M6522_1_TAG		"m6522_1"
 #define M6522_2_TAG		"m6522_2"
 #define M6522_3_TAG		"m6522_3"
@@ -53,6 +53,7 @@ struct _victor9k_state
 	/* devices */
 	running_device *pic;
 	running_device *crt;
+	running_device *ssda;
 	running_device *ieee488;
 };
 
