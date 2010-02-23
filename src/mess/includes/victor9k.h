@@ -21,7 +21,19 @@
 typedef struct _victor9k_state victor9k_state;
 struct _victor9k_state
 {
+	/* video state */
+	UINT8 *video_ram;
+
+	/* interrupts */
+	int via1_irq;
+	int via2_irq;
+	int via3_irq;
+	int via4_irq;
+	int via5_irq;
+	int via6_irq;
+
 	/* devices */
+	running_device *pic;
 	running_device *crt;
 	running_device *ieee488;
 };
