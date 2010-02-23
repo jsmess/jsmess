@@ -493,6 +493,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/z80sti.o	\
 	$(MESS_VIDEO)/cdp1861.o		\
 	$(MESS_VIDEO)/cdp1862.o		\
+	$(MESS_VIDEO)/crt9007.o		\
 	$(MESS_VIDEO)/crtc6845.o	\
 	$(MESS_VIDEO)/dl1416.o		\
 	$(MESS_VIDEO)/dm9368.o		\

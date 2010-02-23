@@ -37,6 +37,7 @@
 #include "machine/pic8259.h"
 #include "machine/upd765.h"
 #include "sound/speaker.h"
+#include "video/crt9007.h"
 
 /* Read/Write Handlers */
 
@@ -45,6 +46,26 @@ static void speaker_update(tandy2k_state *state)
 	int level = !(state->spkrdata & state->outspkr);
 
 	speaker_level_w(state->speaker, level);
+}
+
+static READ8_HANDLER( enable_r )
+{
+	/*
+
+		bit		signal		description
+
+		0					RS-232 ring indicator
+		1					RS-232 carrier detect
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		_ACLOW		
+
+	*/
+
+	return 0x80;
 }
 
 static WRITE8_HANDLER( enable_w )
@@ -121,6 +142,24 @@ static WRITE8_DEVICE_HANDLER( fldtc_w )
 {
 	upd765_tc_w(device, 1);
 	upd765_tc_w(device, 0);
+}
+
+static WRITE8_HANDLER( addr_ctrl_w )
+{
+	/*
+
+		bit		description
+
+		8		A15 of video access
+		9		A16 of video access
+		10		A17 of video access
+		11		A18 of video access
+		12		A19 of video access
+		13		clock speed (0 = 22.4 MHz, 1 = 28 MHz)
+		14		dots/char (0 = 10 [800x400], 1 = 8 [640x400])
+		15		vidout-sel, selects the video source for display on monochrome monitor
+
+	*/
 }
 
 static READ8_HANDLER( keyboard_x0_r )
@@ -209,23 +248,32 @@ static WRITE8_HANDLER( keyboard_y8_w )
 /* Memory Maps */
 
 static ADDRESS_MAP_START( tandy2k_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0xf8000, 0xfbfff) AM_RAM // char ram
-	AM_RANGE(0xfc000, 0xfdfff) AM_MIRROR(0x2000) AM_ROM
+//	AM_RANGE(0x20000, 0xdffff) AM_RAM // expanded RAM
+//	AM_RANGE(0xe0000, 0xf7fff) AM_RAM // hires graphics
+	AM_RANGE(0xf8000, 0xfbfff) AM_RAM // character generator
+	AM_RANGE(0xfc000, 0xfdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy2k_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x00000, 0x00001) AM_WRITE8(enable_w, 0xff00)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x00000, 0x00001) AM_READWRITE8(enable_r, enable_w, 0xff00)
 	AM_RANGE(0x00002, 0x00003) AM_WRITE8(dma_mux_w, 0xff00)
 	AM_RANGE(0x00004, 0x00005) AM_DEVREADWRITE8(I8272A_TAG, fldtc_r, fldtc_w, 0xff00)
-	AM_RANGE(0x00010, 0x0001f) AM_DEVREADWRITE8(I8251A_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
+	AM_RANGE(0x00010, 0x00013) AM_DEVREADWRITE8(I8251A_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
 	AM_RANGE(0x00030, 0x00031) AM_DEVREAD8(I8272A_TAG, upd765_status_r, 0xff00)
 	AM_RANGE(0x00032, 0x00033) AM_DEVREADWRITE8(I8272A_TAG, upd765_data_r, upd765_data_w, 0xff00)
-	AM_RANGE(0x00040, 0x0004f) AM_DEVREADWRITE8(I8253_TAG, pit8253_r, pit8253_w, 0xff00)
+	AM_RANGE(0x00040, 0x00047) AM_DEVREADWRITE8(I8253_TAG, pit8253_r, pit8253_w, 0xff00)
 	AM_RANGE(0x00050, 0x00057) AM_DEVREADWRITE8(I8255A_TAG, i8255a_r, i8255a_w, 0xff00)
-	AM_RANGE(0x00060, 0x0006f) AM_DEVREADWRITE8(I8259A_0_TAG, pic8259_r, pic8259_w, 0xff00)
-	AM_RANGE(0x00070, 0x0007f) AM_DEVREADWRITE8(I8259A_1_TAG, pic8259_r, pic8259_w, 0xff00)
-	AM_RANGE(0x00080, 0x0009f) AM_DEVREADWRITE8(I8272A_TAG, upd765_dack_r, upd765_dack_w, 0xff00)
+	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8(I8259A_0_TAG, pic8259_r, pic8259_w, 0xff00)
+	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8(I8259A_1_TAG, pic8259_r, pic8259_w, 0xff00)
+	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8(I8272A_TAG, upd765_dack_r, upd765_dack_w, 0xff00)
+	AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_r, crt9007_w, 0xff00)
+	AM_RANGE(0x00100, 0x0017f) AM_WRITE8(addr_ctrl_w, 0x00ff)
+//	AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
+//	AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
+//	AM_RANGE(0x001a0, 0x001a0) AM_READ8(hires_plane_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy2k_hd_io, ADDRESS_SPACE_IO, 16 )
@@ -375,6 +423,13 @@ static VIDEO_UPDATE( tandy2k )
 {
     return 0;
 }
+
+static CRT9007_INTERFACE( crt9007_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 /* Intel 8251A Interface */
 
@@ -671,8 +726,8 @@ static MACHINE_DRIVER_START( tandy2k )
     MDRV_CPU_PROGRAM_MAP(tandy2k_mem)
     MDRV_CPU_IO_MAP(tandy2k_io)
 
-	MDRV_CPU_ADD(I8048_TAG, I8048, 1000000) // ?
-	MDRV_CPU_IO_MAP(keyboard_io)
+//	MDRV_CPU_ADD(I8048_TAG, I8048, 1000000) // ?
+//	MDRV_CPU_IO_MAP(keyboard_io)
 
     MDRV_MACHINE_START(tandy2k)
     MDRV_MACHINE_RESET(tandy2k)
@@ -689,6 +744,7 @@ static MACHINE_DRIVER_START( tandy2k )
     MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(tandy2k)
     MDRV_VIDEO_UPDATE(tandy2k)
+	MDRV_CRT9007_ADD(CRT9007_TAG, XTAL_16MHz*28/16, crt9007_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -707,7 +763,8 @@ static MACHINE_DRIVER_START( tandy2k )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("128K,256K")
+	MDRV_RAM_DEFAULT_SIZE("128K")
+	MDRV_RAM_EXTRA_OPTIONS("256K,384K,512K,640K,768K,896K")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tandy2k_hd )
@@ -724,9 +781,9 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( tandy2k )
-	ROM_REGION( 0x100000, I80186_TAG, 0 )
-	ROM_LOAD16_BYTE( "484a00.u48", 0xfe000, 0x1000, CRC(a5ee3e90) SHA1(4b1f404a4337c67065dd272d62ff88dcdee5e34b) )
-	ROM_LOAD16_BYTE( "474600.u47", 0xfe001, 0x1000, CRC(345701c5) SHA1(a775cbfa110b7a88f32834aaa2a9b868cbeed25b) )
+	ROM_REGION( 0x2000, I80186_TAG, 0 )
+	ROM_LOAD16_BYTE( "484a00.u48", 0x0000, 0x1000, CRC(a5ee3e90) SHA1(4b1f404a4337c67065dd272d62ff88dcdee5e34b) )
+	ROM_LOAD16_BYTE( "474600.u47", 0x0001, 0x1000, CRC(345701c5) SHA1(a775cbfa110b7a88f32834aaa2a9b868cbeed25b) )
 
 	ROM_REGION( 0x400, I8048_TAG, 0 )
 	ROM_LOAD( "keyboard.m1", 0x0000, 0x0400, NO_DUMP )
