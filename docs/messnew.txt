@@ -34,6 +34,7 @@ Skeleton drivers:
 - Tandy 2000 [Curt Coder]
 - TRS-80 Model II [Curt Coder]
 - TRS-80 Model II/16 [Curt Coder]
+- Victor 9000 [Curt Coder]
 - Xerox 820-II [Curt Coder]
 - Xerox 16/8 [Curt Coder]
 
