@@ -31,6 +31,10 @@ struct _tandy2k_state
 	/* PPI state */
 	int pb_sel;
 
+	/* video state */
+	UINT8 *hires_ram;
+	UINT16 palette[16];
+
 	/* sound state */
 	int outspkr;
 	int spkrdata;
@@ -41,6 +45,7 @@ struct _tandy2k_state
 	running_device *fdc;
 	running_device *pic0;
 	running_device *pic1;
+	running_device *crt;
 	running_device *centronics;
 	running_device *speaker;
 };

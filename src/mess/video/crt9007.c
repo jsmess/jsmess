@@ -73,6 +73,14 @@ WRITE8_DEVICE_HANDLER( crt9007_w )
 }
 
 /*-------------------------------------------------
+    crt9007_update - update screen
+-------------------------------------------------*/
+
+void crt9007_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+{
+}
+
+/*-------------------------------------------------
     DEVICE_START( crt9007 )
 -------------------------------------------------*/
 

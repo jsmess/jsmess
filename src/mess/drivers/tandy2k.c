@@ -417,18 +417,34 @@ INPUT_PORTS_END
 
 static VIDEO_START( tandy2k )
 {
+	tandy2k_state *state = (tandy2k_state *)machine->driver_data;
+
+	/* find devices */
+	state->crt = devtag_get_device(machine, CRT9007_TAG);
 }
 
 static VIDEO_UPDATE( tandy2k )
 {
-    return 0;
+	tandy2k_state *state = (tandy2k_state *)screen->machine->driver_data;
+
+	crt9007_update(state->crt, bitmap, cliprect);
+
+	return 0;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( vidint11_w )
+{
+	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
+	
+	pic8259_set_irq_line(driver_state->pic1, 1, state);
 }
 
 static CRT9007_INTERFACE( crt9007_intf )
 {
+	DEVCB_LINE(vidint11_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_MEMORY_HANDLER(I80186_TAG, PROGRAM, memory_read_byte_16le)
 };
 
 /* Intel 8251A Interface */
@@ -774,7 +790,7 @@ static MACHINE_DRIVER_START( tandy2k_hd )
 	MDRV_CPU_MODIFY(I80186_TAG)
     MDRV_CPU_IO_MAP(tandy2k_hd_io)
 
-	/* Tandom TM502 hard disk */
+	/* Tandon TM502 hard disk */
 	//MDRV_WD1010_ADD(WD1010_TAG, wd1010_intf)
 MACHINE_DRIVER_END
 

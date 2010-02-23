@@ -74,4 +74,7 @@ DEVICE_GET_INFO( crt9007 );
 READ8_DEVICE_HANDLER( crt9007_r );
 WRITE8_DEVICE_HANDLER( crt9007_w );
 
+/* screen update */
+void crt9007_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
+
 #endif
