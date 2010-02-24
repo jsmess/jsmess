@@ -684,25 +684,20 @@ static MACHINE_RESET(pc9821)
  *
  *************************************************************/
 
-static PIC8259_SET_INT_LINE( pc98_master_set_int_line ) {
-	//printf("%02x\n",interrupt);
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
-}
-
-
-static PIC8259_SET_INT_LINE( pc98_slave_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( pc98_master_set_int_line )
 {
-	pic8259_ir2_w(devtag_get_device(device->machine, "pic8259_master"), interrupt);
+	//printf("%02x\n",interrupt);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-
-static const struct pic8259_interface pic8259_master_config = {
-	pc98_master_set_int_line
+static const struct pic8259_interface pic8259_master_config =
+{
+	DEVCB_LINE(pc98_master_set_int_line)
 };
 
-
-static const struct pic8259_interface pic8259_slave_config = {
-	pc98_slave_set_int_line
+static const struct pic8259_interface pic8259_slave_config =
+{
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir2_w)
 };
 
 static VIDEO_START( pc9821 )

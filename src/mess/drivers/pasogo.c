@@ -490,14 +490,14 @@ static const struct pit8253_config pc_pit8254_config =
 };
 
 
-static PIC8259_SET_INT_LINE( pasogo_pic8259_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( pasogo_pic8259_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-
-static const struct pic8259_interface pasogo_pic8259_config = {
-	pasogo_pic8259_set_int_line
+static const struct pic8259_interface pasogo_pic8259_config =
+{
+	DEVCB_LINE(pasogo_pic8259_set_int_line)
 };
 
 static DEVICE_IMAGE_LOAD( pasogo_cart )

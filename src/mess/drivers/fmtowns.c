@@ -181,7 +181,7 @@ static struct towns_cdrom_controller
 	emu_timer* read_timer;
 } towns_cd;
 
-static PIC8259_SET_INT_LINE( towns_pic_irq );
+static WRITE_LINE_DEVICE_HANDLER( towns_pic_irq );
 
 INLINE UINT8 byte_to_bcd(UINT8 val)
 {
@@ -1617,18 +1617,10 @@ void towns_pcm_irq(running_device* device, int channel)
 		pic8259_ir5_w(pic, 1);
 }
 
-static PIC8259_SET_INT_LINE( towns_pic_irq )
+static WRITE_LINE_DEVICE_HANDLER( towns_pic_irq )
 {
-	cputag_set_input_line(device->machine,"maincpu",0,interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 //  logerror("PIC#1: set IRQ line to %i\n",interrupt);
-}
-
-static PIC8259_SET_INT_LINE( towns_slave_pic_irq )
-{
-	running_device* dev = devtag_get_device(device->machine,"pic8259_master");
-
-	pic8259_ir7_w(dev, interrupt);
-//  logerror("PIC#2: set IRQ line to %i\n",interrupt);
 }
 
 static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
@@ -2019,13 +2011,13 @@ static const struct pit8253_config towns_pit8253_config =
 
 static const struct pic8259_interface towns_pic8259_master_config =
 {
-	towns_pic_irq
+	DEVCB_LINE(towns_pic_irq)
 };
 
 
 static const struct pic8259_interface towns_pic8259_slave_config =
 {
-	towns_slave_pic_irq
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w)
 };
 
 static const wd17xx_interface towns_mb8877a_interface =

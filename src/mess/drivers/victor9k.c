@@ -208,14 +208,9 @@ static const struct pit8253_config pit_intf =
 
 */
 
-static WRITE_LINE_DEVICE_HANDLER( int0_w )
-{
-	cputag_set_input_line(device->machine, I8088_TAG, INPUT_LINE_IRQ0, state);
-}
-
 static const struct pic8259_interface pic_intf =
 {
-	int0_w
+	DEVCB_CPU_INPUT_LINE(I8088_TAG, INPUT_LINE_IRQ0)
 };
 
 /* NEC uPD7201 Interface */
@@ -949,7 +944,7 @@ static IEEE488_DAISY( ieee488_daisy )
 static IRQ_CALLBACK( victor9k_irq_callback )
 {
 	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
-	
+
 	return pic8259_acknowledge(state->pic);
 }
 

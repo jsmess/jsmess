@@ -152,14 +152,9 @@ static IRQ_CALLBACK( apricot_irq_ack )
 	return pic8259_acknowledge(apricot->pic8259);
 }
 
-static PIC8259_SET_INT_LINE( apricot_pic8259_interrupt )
-{
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
-}
-
 static const struct pic8259_interface apricot_pic8259_intf =
 {
-	apricot_pic8259_interrupt
+	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
 

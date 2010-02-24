@@ -187,15 +187,9 @@ I8237_INTERFACE( ibm5150_dma8237_config )
  *
  *************************************************************/
 
-static PIC8259_SET_INT_LINE( pc_pic8259_set_int_line )
-{
-	cpu_set_input_line(device->machine->firstcpu, 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 const struct pic8259_interface ibm5150_pic8259_config =
 {
-	pc_pic8259_set_int_line
+	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
 
@@ -216,29 +210,26 @@ const struct pic8259_interface ibm5150_pic8259_config =
 
 static emu_timer	*pc_int_delay_timer;
 
-
 static TIMER_CALLBACK( pcjr_delayed_pic8259_irq )
 {
     cpu_set_input_line(machine->firstcpu, 0, param ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-static PIC8259_SET_INT_LINE( pcjr_pic8259_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( pcjr_pic8259_set_int_line )
 {
 	if ( cpu_get_reg( device->machine->firstcpu, REG_GENPC ) == 0xF0454 )
 	{
-		timer_adjust_oneshot( pc_int_delay_timer, cpu_clocks_to_attotime(device->machine->firstcpu, 1), interrupt );
+		timer_adjust_oneshot( pc_int_delay_timer, cpu_clocks_to_attotime(device->machine->firstcpu, 1), state );
 	}
 	else
 	{
-		cpu_set_input_line(device->machine->firstcpu, 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(device->machine->firstcpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
-
 const struct pic8259_interface pcjr_pic8259_config =
 {
-	pcjr_pic8259_set_int_line
+	DEVCB_LINE(pcjr_pic8259_set_int_line)
 };
 
 

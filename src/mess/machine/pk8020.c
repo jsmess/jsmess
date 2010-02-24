@@ -965,16 +965,17 @@ const struct pit8253_config pk8020_pit8253_intf =
 	}
 };
 
-static PIC8259_SET_INT_LINE( pk8020_pic_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( pk8020_pic_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ?  HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-const struct pic8259_interface pk8020_pic8259_config = {
-	pk8020_pic_set_int_line
+const struct pic8259_interface pk8020_pic8259_config =
+{
+	DEVCB_LINE(pk8020_pic_set_int_line)
 };
 
-static IRQ_CALLBACK(pk8020_irq_callback)
+static IRQ_CALLBACK( pk8020_irq_callback )
 {
 	return pic8259_acknowledge(devtag_get_device(device->machine, "pic8259"));
 }

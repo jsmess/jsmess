@@ -361,15 +361,14 @@ static const struct pit8253_config qx10_pit8253_2_config =
     IR6     Floppy controller interrupt
 */
 
-static PIC8259_SET_INT_LINE( qx10_pic8259_master_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( qx10_pic8259_master_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
-
 
 static const struct pic8259_interface qx10_pic8259_master_config =
 {
-	qx10_pic8259_master_set_int_line
+	DEVCB_LINE(qx10_pic8259_master_set_int_line)
 };
 
 /*
@@ -385,17 +384,12 @@ static const struct pic8259_interface qx10_pic8259_master_config =
 
 */
 
-static PIC8259_SET_INT_LINE( qx10_pic8259_slave_set_int_line )
-{
-	pic8259_ir7_w(((qx10_state*)device->machine->driver_data)->pic8259_master, interrupt);
-}
-
 static const struct pic8259_interface qx10_pic8259_slave_config =
 {
-	qx10_pic8259_slave_set_int_line
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir7_w)
 };
 
-static IRQ_CALLBACK(irq_callback)
+static IRQ_CALLBACK( irq_callback )
 {
 	int r = 0;
 	r = pic8259_acknowledge( ((qx10_state*)device->machine->driver_data)->pic8259_slave );

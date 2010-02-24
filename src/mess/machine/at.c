@@ -48,25 +48,14 @@ static int poll_delay;
  *
  *************************************************************/
 
-static PIC8259_SET_INT_LINE( at_pic8259_master_set_int_line ) {
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-static PIC8259_SET_INT_LINE( at_pic8259_slave_set_int_line )
+const struct pic8259_interface at_pic8259_master_config =
 {
-	at_state *st = (at_state *)device->machine->driver_data;
-	pic8259_ir2_w(st->pic8259_master, interrupt);
-}
-
-
-const struct pic8259_interface at_pic8259_master_config = {
-	at_pic8259_master_set_int_line
+	DEVCB_CPU_INPUT_LINE("maincpu", 0)
 };
 
-
-const struct pic8259_interface at_pic8259_slave_config = {
-	at_pic8259_slave_set_int_line
+const struct pic8259_interface at_pic8259_slave_config =
+{
+	DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir2_w)
 };
 
 

@@ -102,13 +102,14 @@ I8255A_INTERFACE( irisha_ppi8255_interface )
 	DEVCB_HANDLER(irisha_8255_portc_w),
 };
 
-static PIC8259_SET_INT_LINE( irisha_pic_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( irisha_pic_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ?  HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-const struct pic8259_interface irisha_pic8259_config = {
-	irisha_pic_set_int_line
+const struct pic8259_interface irisha_pic8259_config =
+{
+	DEVCB_LINE(irisha_pic_set_int_line)
 };
 
 const struct pit8253_config irisha_pit8253_intf =

@@ -1424,34 +1424,31 @@ static void compis_cpu_init(running_machine *machine)
  *
  *************************************************************/
 
-static PIC8259_SET_INT_LINE( compis_pic8259_master_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( compis_pic8259_master_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ? HOLD_LINE : CLEAR_LINE);
 }
 
-
-static PIC8259_SET_INT_LINE( compis_pic8259_slave_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( compis_pic8259_slave_set_int_line )
 {
-	if ( compis_devices.pic8259_master )
-	{
-		pic8259_ir2_w(compis_devices.pic8259_master, interrupt);
-	}
+	if (compis_devices.pic8259_master)
+		pic8259_ir2_w(compis_devices.pic8259_master, state);
 }
 
+const struct pic8259_interface compis_pic8259_master_config =
+{
+	DEVCB_LINE(compis_pic8259_master_set_int_line)
+};
 
-const struct pic8259_interface compis_pic8259_master_config = {
-	compis_pic8259_master_set_int_line
+const struct pic8259_interface compis_pic8259_slave_config =
+{
+	DEVCB_LINE(compis_pic8259_slave_set_int_line)
 };
 
 
-const struct pic8259_interface compis_pic8259_slave_config = {
-	compis_pic8259_slave_set_int_line
-};
-
-
-static IRQ_CALLBACK(compis_irq_callback)
+static IRQ_CALLBACK( compis_irq_callback )
 {
-	return pic8259_acknowledge( compis_devices.pic8259_master);
+	return pic8259_acknowledge(compis_devices.pic8259_master);
 }
 
 static const compis_gdc_interface i82720_interface =

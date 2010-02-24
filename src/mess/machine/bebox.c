@@ -467,25 +467,25 @@ READ64_HANDLER( bebox_interrupt_ack_r )
  *
  *************************************************************/
 
-static PIC8259_SET_INT_LINE( bebox_pic8259_master_set_int_line ) {
-	bebox_set_irq_bit(device->machine, 5, interrupt);
+static WRITE_LINE_DEVICE_HANDLER( bebox_pic8259_master_set_int_line )
+{
+	bebox_set_irq_bit(device->machine, 5, state);
 }
 
-
-static PIC8259_SET_INT_LINE( bebox_pic8259_slave_set_int_line ) {
-	if ( bebox_devices.pic8259_master ) {
-		pic8259_ir2_w(bebox_devices.pic8259_master, interrupt);
-	}
+static WRITE_LINE_DEVICE_HANDLER( bebox_pic8259_slave_set_int_line )
+{
+	if (bebox_devices.pic8259_master)
+		pic8259_ir2_w(bebox_devices.pic8259_master, state);
 }
 
-
-const struct pic8259_interface bebox_pic8259_master_config = {
-	bebox_pic8259_master_set_int_line
+const struct pic8259_interface bebox_pic8259_master_config =
+{
+	DEVCB_LINE(bebox_pic8259_master_set_int_line)
 };
 
-
-const struct pic8259_interface bebox_pic8259_slave_config = {
-	bebox_pic8259_slave_set_int_line
+const struct pic8259_interface bebox_pic8259_slave_config =
+{
+	DEVCB_LINE(bebox_pic8259_slave_set_int_line)
 };
 
 

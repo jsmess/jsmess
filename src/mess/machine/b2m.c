@@ -271,9 +271,9 @@ I8255A_INTERFACE( b2m_ppi8255_interface_3 )
 	DEVCB_HANDLER(b2m_romdisk_portc_w)
 };
 
-static PIC8259_SET_INT_LINE( b2m_pic_set_int_line )
+static WRITE_LINE_DEVICE_HANDLER( b2m_pic_set_int_line )
 {
-	cputag_set_input_line(device->machine, "maincpu", 0, interrupt ?  HOLD_LINE : CLEAR_LINE);
+	cputag_set_input_line(device->machine, "maincpu", 0, state ?  HOLD_LINE : CLEAR_LINE);
 }
 
 /* Driver initialization */
@@ -357,8 +357,9 @@ static IRQ_CALLBACK(b2m_irq_callback)
 	return pic8259_acknowledge(state->pic);
 }
 
-const struct pic8259_interface b2m_pic8259_config = {
-	b2m_pic_set_int_line
+const struct pic8259_interface b2m_pic8259_config =
+{
+	DEVCB_LINE(b2m_pic_set_int_line)
 };
 
 INTERRUPT_GEN( b2m_vblank_interrupt )

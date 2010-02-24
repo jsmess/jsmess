@@ -627,14 +627,9 @@ static I8255A_INTERFACE( i8255_intf )
 
 */
 
-static WRITE_LINE_DEVICE_HANDLER( int0_w )
-{
-	cputag_set_input_line(device->machine, I80186_TAG, 0, state);
-}
-
 static const struct pic8259_interface i8259_0_intf =
 {
-	int0_w
+	DEVCB_CPU_INPUT_LINE(I80186_TAG, 0)
 };
 
 /*
@@ -650,15 +645,10 @@ static const struct pic8259_interface i8259_0_intf =
 
 */
 
-static WRITE_LINE_DEVICE_HANDLER( int1_w )
-{
-	/* TODO: INT1 is not implemented in the 80186 core */
-	cputag_set_input_line(device->machine, I80186_TAG, 1, state);
-}
-
 static const struct pic8259_interface i8259_1_intf =
 {
-	int1_w
+	/* TODO: INT1 is not implemented in the 80186 core */
+	DEVCB_CPU_INPUT_LINE(I80186_TAG, 1)
 };
 
 /* Floppy Configuration */
