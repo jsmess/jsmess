@@ -430,8 +430,8 @@ static READ8_DEVICE_HANDLER( via2_pa_r )
 
         bit     description
 
-        PA0     INT/EXTA
-        PA1     INT/EXTB
+        PA0     _INT/EXTA
+        PA1     _INT/EXTB
         PA2     RIA
         PA3     DSRA
         PA4     RIB
@@ -457,8 +457,8 @@ static WRITE8_DEVICE_HANDLER( via2_pa_w )
 
         bit     description
 
-        PA0     INT/EXTA
-        PA1     INT/EXTB
+        PA0     _INT/EXTA
+        PA1     _INT/EXTB
         PA2     RIA
         PA3     DSRA
         PA4     RIB
@@ -485,6 +485,14 @@ static WRITE8_DEVICE_HANDLER( via2_pb_w )
         PB7     CONT2
 
     */
+
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+
+	/* brightness */
+	state->brt = (data >> 2) & 0x07;
+
+	/* contrast */
+	state->cont = data >> 5;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( via2_irq_w )
@@ -825,8 +833,8 @@ static READ8_DEVICE_HANDLER( via6_pb_r )
         PB0     RDY0
         PB1     RDY1
         PB2     SCRESET
-        PB3     DS1
-        PB4     DS0
+        PB3     _DS1
+        PB4     _DS0
         PB5     SINGLE/_DOUBLE SIDED
         PB6     stepper enable A
         PB7     stepper enable B
@@ -836,6 +844,12 @@ static READ8_DEVICE_HANDLER( via6_pb_r )
 	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
 
 	UINT8 data = 0;
+
+	/* drive 0 ready */
+	data |= !(floppy_drive_get_flag_state(state->floppy[0].image, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 4;
+
+	/* drive 1 ready */
+	data |= !(floppy_drive_get_flag_state(state->floppy[0].image, FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY) << 3;
 
 	/* single/double sided */
 	data |= floppy_twosid_r(state->floppy[state->drive].image) << 5;
@@ -852,8 +866,8 @@ static WRITE8_DEVICE_HANDLER( via6_pb_w )
         PB0     RDY0
         PB1     RDY1
         PB2     SCRESET
-        PB3     DS1
-        PB4     DS0
+        PB3     _DS1
+        PB4     _DS0
         PB5     SINGLE/_DOUBLE SIDED
         PB6     stepper enable A
         PB7     stepper enable B
@@ -968,10 +982,10 @@ static MACHINE_DRIVER_START( victor9k )
 	MDRV_DRIVER_DATA(victor9k_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8088_TAG, I8088, 5000000)
+	MDRV_CPU_ADD(I8088_TAG, I8088, XTAL_30MHz/6)
 	MDRV_CPU_PROGRAM_MAP(victor9k_mem)
 
-	MDRV_CPU_ADD(I8048_TAG, I8048, 1000000)
+	MDRV_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
 	MDRV_CPU_IO_MAP(floppy_io)
 
 //	MDRV_CPU_ADD(I8022_TAG, I8022, 100000)
@@ -1004,14 +1018,14 @@ static MACHINE_DRIVER_START( victor9k )
 	MDRV_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
 	MDRV_PIC8259_ADD(I8259A_TAG, pic_intf)
 	MDRV_PIT8253_ADD(I8253_TAG, pit_intf)
-	MDRV_UPD7201_ADD(UPD7201_TAG, 0, mpsc_intf)
-//	MDRV_MC6852_ADD(MC6852_TAG, 0, mc6852_intf)
-	MDRV_VIA6522_ADD(M6522_1_TAG, 0, via1_intf)
-	MDRV_VIA6522_ADD(M6522_2_TAG, 0, via2_intf)
-	MDRV_VIA6522_ADD(M6522_3_TAG, 0, via3_intf)
-	MDRV_VIA6522_ADD(M6522_4_TAG, 0, via4_intf)
-	MDRV_VIA6522_ADD(M6522_5_TAG, 0, via5_intf)
-	MDRV_VIA6522_ADD(M6522_6_TAG, 0, via6_intf)
+	MDRV_UPD7201_ADD(UPD7201_TAG, XTAL_30MHz/30, mpsc_intf)
+//	MDRV_MC6852_ADD(MC6852_TAG, XTAL_30MHz/30, mc6852_intf)
+	MDRV_VIA6522_ADD(M6522_1_TAG, XTAL_30MHz/30, via1_intf)
+	MDRV_VIA6522_ADD(M6522_2_TAG, XTAL_30MHz/30, via2_intf)
+	MDRV_VIA6522_ADD(M6522_3_TAG, XTAL_30MHz/30, via3_intf)
+	MDRV_VIA6522_ADD(M6522_4_TAG, XTAL_30MHz/30, via4_intf)
+	MDRV_VIA6522_ADD(M6522_5_TAG, XTAL_30MHz/30, via5_intf)
+	MDRV_VIA6522_ADD(M6522_6_TAG, XTAL_30MHz/30, via6_intf)
 	MDRV_FLOPPY_2_DRIVES_ADD(victor9k_floppy_config)
 
 	/* internal ram */

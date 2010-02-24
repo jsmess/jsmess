@@ -39,6 +39,8 @@ struct _victor9k_state
 	/* video state */
 	UINT8 *video_ram;
 	int vert;
+	int brt;
+	int cont;
 
 	/* interrupts */
 	int via1_irq;
