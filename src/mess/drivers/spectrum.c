@@ -564,7 +564,7 @@ MACHINE_DRIVER_START( spectrum )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_SNAPSHOT_ADD("snapshot", spectrum, "ach,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
+	MDRV_SNAPSHOT_ADD("snapshot", spectrum, "ach,frz,plusd,prg,sem,sit,sna,snp,snx,sp,z80,zx", 0)
 	MDRV_QUICKLOAD_ADD("quickload", spectrum, "scr", 0)
 	MDRV_CASSETTE_ADD( "cassette", spectrum_cassette_config )
 

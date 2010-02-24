@@ -15,11 +15,13 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
 void spectrum_setup_ach(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
 void spectrum_setup_prg(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
+void spectrum_setup_plusd(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
 void spectrum_setup_sem(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
 void spectrum_setup_sit(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
 void spectrum_setup_zx(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
 void spectrum_setup_snp(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
 void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
+void spectrum_setup_frz(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
 
 #define BASE_RAM      0x4000
 #define SPECTRUM_BANK 0x4000
@@ -69,6 +71,18 @@ void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
 /*****************************************************************************
  *
+ * .PLUSD format (used by FUSE)
+ *
+ ****************************************************************************/
+#define PLUSD_OFFSET 0
+#define PLUSD48_HDR  22
+#define PLUSD48_SIZE (PLUSD48_HDR + 3*SPECTRUM_BANK)
+
+#define PLUSD128_HDR  23
+#define PLUSD128_SIZE (PLUSD128_HDR + 8*SPECTRUM_BANK)
+
+/*****************************************************************************
+ *
  * .SEM format (used by SpecEmu)
  *
  ****************************************************************************/
@@ -114,6 +128,15 @@ void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
 #define SNX_COMPRESSED   0xff
 #define SNX_UNCOMPRESSED 0x00
+
+/*****************************************************************************
+ *
+ * .FRZ format (used by CBSpeccy, ZX-Live and ASp)
+ *
+ ****************************************************************************/
+#define FRZ_OFFSET 0
+#define FRZ_HDR    42
+#define FRZ_SIZE   (FRZ_HDR + 8*SPECTRUM_BANK)
 
 typedef enum
 {

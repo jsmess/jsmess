@@ -6,8 +6,6 @@
 
     - Implement the following snapshot formats
       .89C (Tezxas)
-      .FRZ (CBSpeccy)
-      .PLUSD (DISCiPLE/+D)
       .SLT (Various emulators)
       .SZX (Spectaculator)
       .ZLS (ZX-Live!)
@@ -129,6 +127,15 @@ SNAPSHOT_LOAD(spectrum)
         }
         spectrum_setup_prg(image->machine, snapshot_data, snapshot_size);
     }
+    else if (!mame_stricmp(file_type, "plusd"))
+    {
+        if ((snapshot_size != PLUSD48_SIZE) || (snapshot_size != PLUSD128_SIZE))
+        {
+            logerror("Invalid .PLUSD file size.\n");
+            goto error;
+        }
+        spectrum_setup_plusd(image->machine, snapshot_data, snapshot_size);
+    }
     else if (!mame_stricmp(file_type, "sem"))
     {
         if (snapshot_data[0] != 0x05 && snapshot_data[1] != 'S' && \
@@ -175,10 +182,19 @@ SNAPSHOT_LOAD(spectrum)
         if (snapshot_data[0] != 'X' && snapshot_data[1] != 'S' && \
             snapshot_data[2] != 'N' && snapshot_data[3] != 'A')
         {
-          logerror("Invalid .SEM file size.\n");
+          logerror("Invalid .SNX file size.\n");
           goto error;
         }
         spectrum_setup_snx(image->machine, snapshot_data, snapshot_size);
+    }
+    else if (!mame_stricmp(file_type, "frz"))
+    {
+        if (snapshot_size != FRZ_SIZE)
+        {
+            logerror("Invalid .FRZ file size.\n");
+            goto error;
+        }
+        spectrum_setup_frz(image->machine, snapshot_data, snapshot_size);
     }
     else
     {
@@ -235,9 +251,9 @@ error:
  *      21      27          1       I
  *      22      28          2       SP
  *      24      30          2       PC
- *      26      32          2       0 (reserved for future use)
+ *      26      32          2       0x00 (reserved for future use)
  *      28      34          1       Border color
- *      29      35          1       0 (reserved for future use)
+ *      29      35          1       0x00 (reserved for future use)
  *      30      36          2       Status word
  *      32      38          16384/  RAM dump
  *                          49152
@@ -380,7 +396,7 @@ void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
  *      Load a .SNA file.
  *
  *      This format was used by Arnt Gulbrandsen for its JPP
- *      emulator, and it's based on the format developed for the Mirage
+ *      emulator, and it's based on the format used by the Mirage
  *      Microdriver, a Microdrive backup accessory.
  *
  *      http://www.worldofspectrum.org/infoseekid.cgi?id=1000266
@@ -393,9 +409,9 @@ void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
  *      It's been reported that snapshots saved at critical moments would
  *      subsequently crash on restore due to the fact that the stack was full
  *      or pointed to a ROM address. A workaround for this situation is to
- *      store 0x0000 into the word that stored the PC.
+ *      store 0x0000 into the word where the PC was located.
  *
- *      For sake of fidelity, the code that clears the top of the stack has
+ *      For sake of fidelity, the code that zeroes the top of the stack has
  *      been written but commented out.
  *
  *      Later, the format has been extended to store the whole Spectrum 128 status.
@@ -448,7 +464,7 @@ void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
  *      16411   16384   RAM bank 2 (0x8000-0xbfff)
  *      32795   16384   RAM bank n (0xc000-0xffff - currently paged bank)
  *      49179   2       PC
- *      49181   1       Port 7FFD data
+ *      49181   1       Port 0x7FFD data
  *      49182   1       TR-DOS rom paged (0=no/1=yes)
  *      49183   81920/  Remaining RAM banks in ascending order
  *              98304
@@ -540,6 +556,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     {
         /* 128K Snapshot */
         state->port_7ffd_data = snapdata[SNA128_OFFSET + 2];
+        logerror ("Port 7FFD:%02X\n", state->port_7ffd_data);
         if (snapdata[SNA128_OFFSET + 3])
         {
           /* TODO: page TR-DOS ROM when supported */
@@ -557,8 +574,8 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         /* Get PC from stack */
         addr = cpu_get_reg(cpu, Z80_SP);
 
-        if (addr < BASE_RAM)
-          logerror("Corrupted SP points to ROM at:%04X", addr);
+        if (addr < BASE_RAM || addr > 4*SPECTRUM_BANK - 2)
+          logerror("Corrupted SP out of range:%04X", addr);
         else
           logerror("Fetching PC from the stack at SP:%04X\n", addr);
 
@@ -587,7 +604,6 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     else
     {
         /* Set up other RAM banks */
-        bank_offset = SNA48_SIZE + SNA128_OFFSET;
         for (i = 0; i < 8; i++)
             usedbanks[i] = 0;
 
@@ -602,6 +618,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         for (i = 0; i < 3*SPECTRUM_BANK; i++)
           memory_write_byte(space, BASE_RAM + i, snapdata[SNA48_HDR + i]);
 
+        bank_offset = SNA48_SIZE + SNA128_HDR;
         for (i = 0; i < 8; i++)
         {
             if (!usedbanks[i])
@@ -611,7 +628,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
                 state->port_7ffd_data += i;
                 spectrum_update_paging(machine);
                 for (j = 0; j < SPECTRUM_BANK; j++)
-                    memory_write_byte(space,j + 3*SPECTRUM_BANK, snapdata[bank_offset + j]);
+                    memory_write_byte(space, j + 3*SPECTRUM_BANK, snapdata[bank_offset + j]);
                 bank_offset += SPECTRUM_BANK;
             }
         }
@@ -633,7 +650,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         state->port_7ffd_data = snapdata[SNA128_OFFSET + 2];
         spectrum_update_paging(machine);
 
-        logerror("Snapshot loaded.\nExecution resuming at Bank:%d %s\n", data, cpu_get_reg_string(cpu, Z80_PC));
+        logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", data, cpu_get_reg_string(cpu, Z80_PC));
     }
 }
 
@@ -660,18 +677,18 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
  *      24      4       H
  *      28      4       L
  *      32      4       PC
- *      36      4       0 (reserved for future use)
+ *      36      4       0x00 (reserved for future use)
  *      40      4       SP
- *      44      104     0 (reserved for future use)
+ *      44      104     0x00 (reserved for future use)
  *      148     4       R
- *      152     4       0 (reserved for future use)
+ *      152     4       0x00 (reserved for future use)
  *      156     4       Border color
- *      160     4       0 (reserved for future use)
+ *      160     4       0x00 (reserved for future use)
  *      164     2       Interrupt mode (0=IM0/1=IM1/2=IM2)
- *      166     24      0 (reserved for future use)
+ *      166     24      0x00 (reserved for future use)
  *      190     1       I
  *      191     1       IFF1/2: (0=DI/1=EI)
- *      192     44      0 (reserved for future use)
+ *      192     44      0x00 (reserved for future use)
  *      236     4       AF' *BE*
  *      240     4       BC' *BE*
  *      244     2       DE' *BE*
@@ -793,7 +810,7 @@ void spectrum_setup_ach(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
  *      13      1       Track number of the first sector of the file
  *      14      1       Sector number of the first sector of the file
  *      15      195     Sector allocation bitmap
- *      210     10      0 (reserved for future use)
+ *      210     10      0x00 (reserved for future use)
  *      220     2       IY
  *      222     2       IX
  *      224     2       DE'
@@ -803,14 +820,14 @@ void spectrum_setup_ach(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
  *      232     2       DE
  *      234     2       BC
  *      236     2       HL
- *      238     1       IFF1/2: (bit 2, 0=DI/1=EI)
+ *      238     1       Junk created when saving I via LD A,I/PUSH AF
  *      239     1       I
  *      240     2       SP
- *      242     14      0 (reserved for future use)
+ *      242     14      0x00 (reserved for future use)
  *      256     49152   RAM dump
  *
- *      R,AF and PC are stored on the stack. Due to a bug in the
- *      BIOS, the snapshots created with the +D have the AF' register
+ *      IFF1/2, R, AF and PC are stored on the stack. Due to a bug in the
+ *      BIOS, the snapshots created with the DISCiPLE have the AF' register
  *      replaced with the AF register.
  *
  *      It's unknown (but likely possible) that the snapshots could
@@ -864,26 +881,24 @@ void spectrum_setup_prg(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
     LOAD_REG(cpu, Z80_IM, (data == 0x00 || data == 0x3f) ? 1 : 2);
 
-    data = snapdata[PRG_OFFSET + 238];
-    LOAD_REG(cpu, Z80_IFF1, BIT(data, 2));
-    LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
-
-    intr = BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE;
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
-
     /* Memory dump */
     logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
     for (i = 0; i < 3*SPECTRUM_BANK; i++)
         memory_write_byte(space, BASE_RAM + i, snapdata[PRG_HDR + i]);
 
     addr = (snapdata[PRG_OFFSET + 241] << 8) | snapdata[PRG_OFFSET + 240];
-    if (addr < BASE_RAM)
-      logerror("Corrupted SP points to ROM at:%04X", addr);
+    if (addr < BASE_RAM || addr > 4*SPECTRUM_BANK - 6)
+      logerror("Corrupted SP out of range:%04X", addr);
     else
-      logerror("Fetching registers R, AF and PC from the stack at SP:%04X\n", addr);
+      logerror("Fetching registers IFF1/2, R, AF and PC from the stack at SP:%04X\n", addr);
 
-    data = memory_read_byte(space, addr + 0); // Junk created when pushing R on the stack via LD A,R/PUSH AF
+    data = memory_read_byte(space, addr + 0); // IFF1/2: (bit 2, 0=DI/1=EI)
+    LOAD_REG(cpu, Z80_IFF1, BIT(data, 2));
+    LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
+
+    intr = BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE;
+    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
+    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 
     data = memory_read_byte(space, addr + 1);
     LOAD_REG(cpu, Z80_R, data);
@@ -893,6 +908,15 @@ void spectrum_setup_prg(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
     data = (memory_read_byte(space, addr + 5) << 8) | memory_read_byte(space, addr + 4);
     LOAD_REG(cpu, Z80_PC, data);
+
+#if 0
+    memory_write_byte(space, addr + 0, 0); // It's been reported that zeroing these locations fixes the loading
+    memory_write_byte(space, addr + 1, 0); // of a few images that were snapshot at a "wrong" instant
+    memory_write_byte(space, addr + 2, 0);
+    memory_write_byte(space, addr + 3, 0);
+    memory_write_byte(space, addr + 4, 0);
+    memory_write_byte(space, addr + 5, 0);
+#endif
 
     addr += 6;
     logerror("Fixing SP:%04X\n", addr);
@@ -909,6 +933,211 @@ void spectrum_setup_prg(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     spectrum_page_basicrom(machine);
 
     logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+}
+
+/*******************************************************************
+ *
+ *      Load a .PLUSD file.
+ *
+ *      .PLUSD files are the snapshots produced by the DISCiPLE or
+ *      the +D disk interface, thus share the same internal organization
+ *      of the .PRG files, with a couple of notable exceptions:
+ *
+ *      1) The filesystem metadata is missing
+ *      2) Spectrum 128 snapshots (file type 9) are allowed
+ *
+ *      A commented disassembly of both BIOSes is avilable at:
+ *
+ *      http://www.biehold.nl/rudy/
+ *
+ *      48K snapshots are 49174 bytes long, 128K snapshots are 131095
+ *      bytes long.
+ *
+ *      Philip Kendall's FUSE emulator at http://fuse-emulator.sourceforge.net
+ *      supports this format, but no extension is officially provided.
+ *      Therefore I have used .PLUSD - corrections are welcome!
+ *
+ *      48K snapshot format
+ *      -------------------
+ *
+ *      Offset  Size    Description (all registers stored with LSB first
+ *      ------- ------- -------------------------------------------------
+ *      0       2       IY
+ *      2       2       IX
+ *      4       2       DE'
+ *      6       2       BC'
+ *      8       2       HL'
+ *      10      2       AF'
+ *      12      2       DE
+ *      14      2       BC
+ *      16      2       HL
+ *      18      1       Junk created when saving I via LD A,I/PUSH AF
+ *      19      1       I
+ *      20      2       SP
+ *      22      49152   RAM dump
+ *
+ *      128K snapshot format
+ *      --------------------
+ *
+ *      Offset  Size    Description (all registers stored with LSB first
+ *      ------- ------- -------------------------------------------------
+ *      0       2       IY
+ *      2       2       IX
+ *      4       2       DE'
+ *      6       2       BC'
+ *      8       2       HL'
+ *      10      2       AF'
+ *      12      2       DE
+ *      14      2       BC
+ *      16      2       HL
+ *      18      1       Junk created when saving I via LD A,I/PUSH AF
+ *      19      1       I
+ *      20      2       SP
+ *      22      1       Port 0x7FFD data
+ *      23      131072  RAM dump
+ *
+ *      The 8 RAM banks are stored in the order 0-7.
+ *
+ *      IFF1/2, R, AF and PC are stored on the stack. Due to a bug in the
+ *      BIOS, the snapshots created with the DISCiPLE have the AF' register
+ *      replaced with the AF register.
+ *
+ *      It's unknown (but likely possible) that the snapshots could
+ *      suffer from the same "top of the stack" bug as well as .SNA images.
+ *
+ *******************************************************************/
+void spectrum_setup_plusd(running_machine *machine, UINT8 *snapdata, UINT32 snapsize)
+{
+    int i, j;
+    UINT8 intr;
+    UINT16 addr, data;
+    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    running_device *cpu = devtag_get_device(machine, "maincpu");
+    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+    data = (snapdata[PLUSD_OFFSET + 15] << 8) | snapdata[PLUSD_OFFSET + 14];
+    LOAD_REG(cpu, Z80_BC, data);
+
+    data = (snapdata[PLUSD_OFFSET + 13] << 8) | snapdata[PLUSD_OFFSET + 12];
+    LOAD_REG(cpu, Z80_DE, data);
+
+    data = (snapdata[PLUSD_OFFSET + 17] << 8) | snapdata[PLUSD_OFFSET + 16];
+    LOAD_REG(cpu, Z80_HL, data);
+
+
+    data = (snapdata[PLUSD_OFFSET + 11] << 8) | snapdata[PLUSD_OFFSET + 10];
+    LOAD_REG(cpu, Z80_AF2, data);
+
+    data = (snapdata[PLUSD_OFFSET +  7] << 8) | snapdata[PLUSD_OFFSET +  6];
+    LOAD_REG(cpu, Z80_BC2, data);
+
+    data = (snapdata[PLUSD_OFFSET +  5] << 8) | snapdata[PLUSD_OFFSET +  4];
+    LOAD_REG(cpu, Z80_DE2, data);
+
+    data = (snapdata[PLUSD_OFFSET +  9] << 8) | snapdata[PLUSD_OFFSET +  8];
+    LOAD_REG(cpu, Z80_HL2, data);
+
+
+    data = (snapdata[PLUSD_OFFSET +  3] << 8) | snapdata[PLUSD_OFFSET +  2];
+    LOAD_REG(cpu, Z80_IX, data);
+
+    data = (snapdata[PLUSD_OFFSET +  1] << 8) | snapdata[PLUSD_OFFSET +  0];
+    LOAD_REG(cpu, Z80_IY, data);
+
+    data = snapdata[PLUSD_OFFSET + 19];
+    LOAD_REG(cpu, Z80_I, data);
+
+    LOAD_REG(cpu, Z80_IM, (data == 0x00 || data == 0x3f) ? 1 : 2);
+
+    if (snapsize == PLUSD48_SIZE)
+    {
+        spectrum_page_basicrom(machine);
+
+        /* Memory dump */
+        logerror("Loading %04X bytes of RAM at %04X\n", 3*SPECTRUM_BANK, BASE_RAM);
+        for (i = 0; i < 3*SPECTRUM_BANK; i++)
+            memory_write_byte(space, BASE_RAM + i, snapdata[PLUSD48_HDR + i]);
+    }
+    else
+    {
+        logerror("Loading %05X bytes of RAM at %04X\n", 8*SPECTRUM_BANK, BASE_RAM);
+        for (i = 0; i < 8; i++)
+        {
+            switch (i)
+            {
+              case 5: addr = SPECTRUM_BANK;
+                      break;
+              case 2: addr = 2*SPECTRUM_BANK;
+                      break;
+              case 0:
+              case 1:
+              case 3:
+              case 4:
+              case 6:
+              case 7: addr = 3*SPECTRUM_BANK;
+                      state->port_7ffd_data &= 0xf8;
+                      state->port_7ffd_data += i;
+                      spectrum_update_paging(machine);
+                      break;
+            };
+            logerror("Loading bank %d from offset:%05X\n", i, PLUSD128_HDR + i*SPECTRUM_BANK);
+            for (j = 0; j < SPECTRUM_BANK; j++)
+                memory_write_byte(space, j + addr, snapdata[j + PLUSD128_HDR + i*SPECTRUM_BANK]);
+        }
+        state->port_7ffd_data = snapdata[PLUSD_OFFSET + 22];
+        logerror ("Port 7FFD:%02X\n", state->port_7ffd_data);
+        logerror ("Paging bank:%d\n", state->port_7ffd_data & 0x07);
+        spectrum_update_paging(machine);
+    }
+
+    addr = (snapdata[PLUSD_OFFSET + 21] << 8) | snapdata[PLUSD_OFFSET + 20];
+    if (addr < BASE_RAM || addr > 4*SPECTRUM_BANK - 6)
+      logerror("Corrupted SP out of range:%04X", addr);
+    else
+      logerror("Fetching registers IFF1/2, R, AF and PC from the stack at SP:%04X\n", addr);
+
+    data = memory_read_byte(space, addr + 0); // IFF1/2: (bit 2, 0=DI/1=EI)
+    LOAD_REG(cpu, Z80_IFF1, BIT(data, 2));
+    LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
+
+    intr = BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE;
+    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
+    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+
+    data = memory_read_byte(space, addr + 1);
+    LOAD_REG(cpu, Z80_R, data);
+
+    data = (memory_read_byte(space, addr + 3) << 8) | memory_read_byte(space, addr + 2);
+    LOAD_REG(cpu, Z80_AF, data);
+
+    data = (memory_read_byte(space, addr + 5) << 8) | memory_read_byte(space, addr + 4);
+    LOAD_REG(cpu, Z80_PC, data);
+
+#if 0
+    memory_write_byte(space, addr + 0, 0); // It's been reported that zeroing these locations fixes the loading
+    memory_write_byte(space, addr + 1, 0); // of a few images that were snapshot at a "wrong" instant
+    memory_write_byte(space, addr + 2, 0);
+    memory_write_byte(space, addr + 3, 0);
+    memory_write_byte(space, addr + 4, 0);
+    memory_write_byte(space, addr + 5, 0);
+#endif
+
+    addr += 6;
+    logerror("Fixing SP:%04X\n", addr);
+    cpu_set_reg(cpu, Z80_SP, addr);
+
+    /* Set border color */
+    data = (memory_read_byte(space, 0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+    state->port_fe_data = (state->port_fe_data & 0xf8) | data;
+    EventList_Reset();
+    border_set_last_color(data);
+    border_force_redraw();
+    logerror("Border color:%02X\n", data);
+
+    if (snapsize == PLUSD48_SIZE)
+        logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+    else
+        logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", state->port_7ffd_data & 0x07, cpu_get_reg_string(cpu, Z80_PC));
 }
 
 /*******************************************************************
@@ -1166,12 +1395,12 @@ void spectrum_setup_sit(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
  *      ------- ------- -------------------------------------------------
  *      0       132     Last 132 bytes of ROM dump
  *      132     49152   RAM dump
- *      49284   132     0 (reserved for future use)
+ *      49284   132     0x00 (reserved for future use)
  *      49416   10      Various KGB settings
  *      49426   1       IFF1/2: (0=DI/1=EI)
  *      49427   2       Reserved (must be 0x0003)
  *      49429   1       KGB ColorMode (0=BW/1=Color)
- *      49430   4       0 (reserved for future use)
+ *      49430   4       0x00 (reserved for future use)
  *      49434   2       BC
  *      49436   2       BC'
  *      49438   2       DE
@@ -1182,22 +1411,22 @@ void spectrum_setup_sit(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
  *      49448   2       IY
  *      49450   1       I
  *      49451   1       R
- *      49452   3       0 (reserved for future use)
+ *      49452   3       0x00 (reserved for future use)
  *      49455   1       A'
- *      49456   1       0 (reserved for future use)
+ *      49456   1       0x00 (reserved for future use)
  *      49457   1       A
- *      49458   1       0 (reserved for future use)
+ *      49458   1       0x00 (reserved for future use)
  *      49459   1       F'
- *      49460   1       0 (reserved for future use)
+ *      49460   1       0x00 (reserved for future use)
  *      49461   1       F
- *      49462   2       0 (reserved for future use)
+ *      49462   2       0x00 (reserved for future use)
  *      49464   2       PC
- *      49466   2       0 (reserved for future use)
+ *      49466   2       0x00 (reserved for future use)
  *      49468   2       SP
  *      49470   2       KGB Soundmode (0=Simple/1=Pitch/2=RomOnly)
  *      49472   2       KGB HaltMode (0=NoHalt/1=Halt)
  *      49474   2       Interrupt mode (-1=IM0/0=IM1/1=IM2)
- *      49476   10      0 (reserved for future use)
+ *      49476   10      0x00 (reserved for future use)
  *
  *******************************************************************/
 void spectrum_setup_zx(running_machine *machine, UINT8 *snapdata, UINT32 snapsize)
@@ -1315,7 +1544,7 @@ void spectrum_setup_zx(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
  *      0       49152   RAM dump
  *      49152   2       AF
  *      49154   1       Border color
- *      49155   1       0 (reserved for future use)
+ *      49155   1       0x00 (reserved for future use)
  *      49156   2       BC
  *      49158   2       DE
  *      49160   2       HL
@@ -1323,7 +1552,7 @@ void spectrum_setup_zx(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
  *      49164   2       SP
  *      49166   2       IX
  *      49168   2       IY
- *      49170   1       0 (reserved for IFF2 but not implemented)
+ *      49170   1       0x00 (reserved for IFF2 but not implemented)
  *      49171   1       IFF1 (0=DI/other=EI)
  *      49172   1       Interrupt mode (0=IM0/1=IM1/2=IM2)
  *      49173   1       R
@@ -1463,7 +1692,7 @@ void spectrum_setup_snp(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
  *                                            10 = IF2 Right
  *                                            11 = Cursor/AGF/Protek
  *      37      1       Specci settings: R register emulation (0=no/1=yes)
- *                                       Bit 7 - value of the EAR bit
+ *                                       Bit 7 - EAR bit (0=Issue 3/1=Issue 2)
  *      38      1       Specci settings: Interrupt frequency (0=50 Hz/1=100 Hz)
  *      39      1       Specci settings: RS232 redirection (0=RS232/1=Centronics)
  *      40      1       Specci settings: Sound emulation
@@ -1548,17 +1777,17 @@ static void spectrum_snx_decompress_block(running_machine *machine, UINT8 *sourc
         if (compress == SNX_COMPRESSED)
         {
             fill = source[++i];
-            logerror("Dest:%04X  Filler:%02X\n", SPECTRUM_BANK + numbytes, fill);
+            logerror("Dest:%04X  Filler:%02X\n", BASE_RAM + numbytes, fill);
             for(j = 0; j < count; j++)
-                memory_write_byte(space, SPECTRUM_BANK + numbytes + j, fill);
+                memory_write_byte(space, BASE_RAM + numbytes + j, fill);
             numbytes += count;
         }
         else
         {
-            logerror("Dest:%04X\n", SPECTRUM_BANK + numbytes);
+            logerror("Dest:%04X\n", BASE_RAM + numbytes);
             j = 0;
             while (j < count)
-                memory_write_byte(space, SPECTRUM_BANK + numbytes + j++, source[++i]);
+                memory_write_byte(space, BASE_RAM + numbytes + j++, source[++i]);
             numbytes += count;
         }
     }
@@ -1640,8 +1869,8 @@ void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     /* get pc from stack */
     addr = cpu_get_reg(cpu, Z80_SP);
 
-    if (addr < BASE_RAM)
-      logerror("Corrupted SP points to ROM at:%04X", addr);
+    if (addr < BASE_RAM || addr > 4*SPECTRUM_BANK - 2)
+      logerror("Corrupted SP out of range:%04X", addr);
     else
       logerror("Fetching PC from the stack at SP:%04X\n", addr);
 
@@ -1670,10 +1899,172 @@ void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
 /* TODO: Enable/disable joysticks as per snapdata[SNX_OFFSET + 36] */
 
+/* TODO: Enable selection of Issue 2/3 config switch as per snapdata[SNX_OFFSET + 37] */
+
     logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
 }
 
-static void spectrum_z80_decompress_block(running_machine *machine,UINT8 *pSource, int Dest, int size)
+/*******************************************************************
+ *
+ *      Load a .FRZ file.
+ *
+ *      .FRZ files were produced by the czech Amiga emulator CBSpeccy
+ *      written by the CodeBusters. Kudos to Dmitriy Zhivilov and
+ *      Ian Greenway for having reverse-engineered and shared the
+ *      description of this format.
+ *
+ *      The original specs of this format were published on a
+ *      russian electronics magazine.
+ *
+ *      The format is always 131114 bytes long and supports only
+ *      Spectrum 128K images.
+ *
+ *      Offset  Size    Description (all registers stored with MSB first)
+ *      ------- ------- -------------------------------------------------
+ *      0       1       0x00 (reserved for future use)
+ *      1       1       Port 0x7FFD data
+ *      2       2       HL'
+ *      4       2       HL
+ *      6       2       DE'
+ *      8       2       DE
+ *      10      2       BC'
+ *      12      2       BC
+ *      14      2       AF'
+ *      16      2       AF
+ *      18      7       Emulation disk registers and T-states
+ *      25      1       R
+ *      26      2       PC
+ *      28      2       SP
+ *      30      1       I
+ *      31      1       0xFF (reserved for future use)
+ *      32      1       0x00 (reserved for future use)
+ *      33      1       Interrupt mode (0=IM0/1=IM1/2=IM2)
+ *      34      3       0x00 (reserved for future use)
+ *      37      1       IFF1: bit 2 contains IFF1 (0=DI/1=EI)
+ *      38      2       IY
+ *      40      2       IX
+ *      42      131072  RAM dump
+ *
+ *      The 8 16K banks are stored in the order 5, 2, 0, 1, 3, 4, 6, 7
+ *
+ *******************************************************************/
+void spectrum_setup_frz(running_machine *machine, UINT8 *snapdata, UINT32 snapsize)
+{
+    int i, j;
+    UINT8 intr;
+    UINT16 addr, data;
+    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    running_device *cpu = devtag_get_device(machine, "maincpu");
+    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+    if (state->port_7ffd_data == -1)
+    {
+        logerror("Can't load 128K .FRZ file into 48K machine\n");
+        return;
+    }
+
+    data = (snapdata[FRZ_OFFSET + 16] << 8) | snapdata[FRZ_OFFSET + 17];
+    LOAD_REG(cpu, Z80_AF, data);
+
+    data = (snapdata[FRZ_OFFSET + 12] << 8) | snapdata[FRZ_OFFSET + 13];
+    LOAD_REG(cpu, Z80_BC, data);
+
+    data = (snapdata[FRZ_OFFSET +  8] << 8) | snapdata[FRZ_OFFSET +  9];
+    LOAD_REG(cpu, Z80_DE, data);
+
+    data = (snapdata[FRZ_OFFSET +  4] << 8) | snapdata[FRZ_OFFSET +  5];
+    LOAD_REG(cpu, Z80_HL, data);
+
+
+    data = (snapdata[FRZ_OFFSET + 14] << 8) | snapdata[FRZ_OFFSET + 15];
+    LOAD_REG(cpu, Z80_AF2, data);
+
+    data = (snapdata[FRZ_OFFSET + 10] << 8) | snapdata[FRZ_OFFSET + 11];
+    LOAD_REG(cpu, Z80_BC2, data);
+
+    data = (snapdata[FRZ_OFFSET +  6] << 8) | snapdata[FRZ_OFFSET +  7];
+    LOAD_REG(cpu, Z80_DE2, data);
+
+    data = (snapdata[FRZ_OFFSET +  2] << 8) | snapdata[FRZ_OFFSET +  3];
+    LOAD_REG(cpu, Z80_HL2, data);
+
+
+    data = (snapdata[FRZ_OFFSET + 40] << 8) | snapdata[FRZ_OFFSET + 41];
+    LOAD_REG(cpu, Z80_IX, data);
+
+    data = (snapdata[FRZ_OFFSET + 38] << 8) | snapdata[FRZ_OFFSET + 39];
+    LOAD_REG(cpu, Z80_IY, data);
+
+
+    data = snapdata[FRZ_OFFSET + 25];
+    LOAD_REG(cpu, Z80_R, data);
+
+    data = snapdata[FRZ_OFFSET + 30];
+    LOAD_REG(cpu, Z80_I, data);
+
+
+    data = (snapdata[FRZ_OFFSET + 28] << 8) | snapdata[FRZ_OFFSET + 29];
+    LOAD_REG(cpu, Z80_SP, data);
+
+    data = (snapdata[FRZ_OFFSET + 26] << 8) | snapdata[FRZ_OFFSET + 27];
+    LOAD_REG(cpu, Z80_PC, data);
+
+
+    data = snapdata[FRZ_OFFSET + 33];
+    LOAD_REG(cpu, Z80_IM, data);
+
+    data = snapdata[FRZ_OFFSET + 37];
+    LOAD_REG(cpu, Z80_IFF1, BIT(data, 2));
+    LOAD_REG(cpu, Z80_IFF2, BIT(data, 2));
+
+    intr = BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE;
+    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, intr);
+    cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
+
+    /* Memory dump */
+    addr = 0;
+    const UINT8 banks[] = { 5, 2, 0, 1, 3, 4, 6, 7 };
+    logerror("Loading %05X bytes of RAM at %04X\n", 8*SPECTRUM_BANK, BASE_RAM);
+    for (i = 0; i < 8; i++)
+    {
+        switch (banks[i])
+        {
+          case 5: addr = SPECTRUM_BANK;
+                  break;
+          case 2: addr = 2*SPECTRUM_BANK;
+                  break;
+          case 0:
+          case 1:
+          case 3:
+          case 4:
+          case 6:
+          case 7: addr = 3*SPECTRUM_BANK;
+                  state->port_7ffd_data &= 0xf8;
+                  state->port_7ffd_data += banks[i];
+                  spectrum_update_paging(machine);
+                  break;
+        };
+        logerror("Loading bank %d from offset:%05X\n", banks[i], FRZ_HDR + i*SPECTRUM_BANK);
+        for (j = 0; j < SPECTRUM_BANK; j++)
+            memory_write_byte(space, j + addr, snapdata[j + FRZ_HDR + i*SPECTRUM_BANK]);
+    }
+    state->port_7ffd_data = snapdata[FRZ_OFFSET +  1];
+    logerror ("Port 7FFD:%02X\n", state->port_7ffd_data);
+    logerror ("Paging bank:%d\n", state->port_7ffd_data & 0x07);
+    spectrum_update_paging(machine);
+
+    /* Set border color */
+    data = (memory_read_byte(space, 0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+    state->port_fe_data = (state->port_fe_data & 0xf8) | data;
+    EventList_Reset();
+    border_set_last_color(data);
+    border_force_redraw();
+    logerror("Border color:%02X\n", data);
+
+    logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", state->port_7ffd_data & 0x07, cpu_get_reg_string(cpu, Z80_PC));
+}
+
+static void spectrum_z80_decompress_block(running_machine *machine,UINT8 *source, UINT16 dest, UINT16 size)
 {
     UINT8 ch;
     int i;
@@ -1682,29 +2073,25 @@ static void spectrum_z80_decompress_block(running_machine *machine,UINT8 *pSourc
     do
     {
         /* get byte */
-        ch = pSource[0];
+        ch = source[0];
 
-        /* either start 0f 0x0ed, 0x0ed, xx yy or
-         * single 0x0ed */
-        if (ch == (UINT8) 0x0ed)
+        /* either start 0f 0x0ed, 0x0ed, xx yy or single 0x0ed */
+        if (ch == 0x0ed)
         {
-            if (pSource[1] == (UINT8) 0x0ed)
+            if (source[1] == 0x0ed)
             {
+                /* 0x0ed, 0x0ed, xx yy - repetition */
+                UINT8 count;
+                UINT8 data;
 
-                /* 0x0ed, 0x0ed, xx yy */
-                /* repetition */
-
-                int count;
-                int data;
-
-                count = (pSource[2] & 0x0ff);
+                count = source[2];
 
                 if (count == 0)
                     return;
 
-                data = (pSource[3] & 0x0ff);
+                data = source[3];
 
-                pSource += 4;
+                source += 4;
 
                 if (count > size)
                     count = size;
@@ -1713,29 +2100,27 @@ static void spectrum_z80_decompress_block(running_machine *machine,UINT8 *pSourc
 
                 for (i = 0; i < count; i++)
                 {
-                    memory_write_byte(space,Dest, data);
-                    Dest++;
+                    memory_write_byte(space, dest, data);
+                    dest++;
                 }
             }
             else
             {
                 /* single 0x0ed */
-                memory_write_byte(space,Dest, ch);
-                Dest++;
-                pSource++;
+                memory_write_byte(space, dest, ch);
+                dest++;
+                source++;
                 size--;
-
             }
         }
         else
         {
             /* not 0x0ed */
-            memory_write_byte(space,Dest, ch);
-            Dest++;
-            pSource++;
+            memory_write_byte(space, dest, ch);
+            dest++;
+            source++;
             size--;
         }
-
     }
     while (size > 0);
 }
@@ -1933,7 +2318,7 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         {
             logerror("Not compressed\n");   /* not compressed */
             for (i = 0; i < 49152; i++)
-                memory_write_byte(space,i + 16384, snapdata[30 + i]);
+                memory_write_byte(space, i + 16384, snapdata[30 + i]);
         }
         else
         {
@@ -2014,7 +2399,7 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
                     /* not compressed */
                     for (i = 0; i < 16384; i++)
-                        memory_write_byte(space,i + Dest, pSource[i]);
+                        memory_write_byte(space, i + Dest, pSource[i]);
                 }
                 else
                 {
@@ -2070,7 +2455,7 @@ QUICKLOAD_LOAD(spectrum)
         return INIT_FAIL;
 
     for (i = 0; i < quick_length; i++)
-        memory_write_byte(space,i + quick_addr, quick_data[i]);
+        memory_write_byte(space, i + quick_addr, quick_data[i]);
 
     logerror("quick loading at %.4x size:%.4x\n", quick_addr, quick_length);
     return INIT_PASS;

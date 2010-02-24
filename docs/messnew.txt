@@ -74,10 +74,10 @@ System Driver Changes:
 - [SMS] Fixed PGA Tour Golf freeze based on Flubba's & RetroRalph's
   research (bug #1911). [Enik Land]
 
-- [SPECTRUM] Added support for .ach, .prg, .sem, .sit, .snp, .snx and .zx
-  snapshot formats. Hopefully fixed existing issues with .sna and .sp
-  formats (both VGASpec-style and Spanish Spectrum-style formats are
-  supported now).
+- [SPECTRUM] Added support for .ach, .frz, .plusd, .prg, .sem, .sit,
+  .snp, .snx and .zx snapshot formats. Hopefully fixed existing issues
+  with .sna and .spformats (both VGASpec-style and Spanish Spectrum-style
+  formats are supported now).
 
 - [TX0] Fixed disassembly in the debugger. [Robbbert]
 
@@ -108,7 +108,7 @@ Source Changes:
 
 - Implemented floppy drive write protect signal toggling on floppy
   disk insert/eject. [Curt Coder]
-  
+
 - Implemented 'disk double sided' (TWOSID) floppy drive signal. [Curt Coder]
 
 - Emulated the following Commodore floppy disk drives at hardware level:
