@@ -32,6 +32,7 @@ struct _tandy2k_state
 	int pb_sel;
 
 	/* video state */
+	UINT8 *char_ram;
 	UINT8 *hires_ram;
 	UINT16 palette[16];
 

@@ -10,10 +10,15 @@
 	
 	TODO:
 
-	- 80186
-	- keyboard ROM
+	- port FFFE?
+
+		'u76' (FFF07): unmapped I/O memory word write to FFFE = 00FF & FFFF
+		'u76' (FFF0F): unmapped I/O memory word read from FFFE & FFFF
+
 	- CRT9007
 	- video
+	- 80186
+	- keyboard ROM
 	- hires graphics board
 	- floppy 720K DSQD
 	- DMA
@@ -148,16 +153,16 @@ static WRITE8_HANDLER( addr_ctrl_w )
 {
 	/*
 
-		bit		description
+		bit		signal		description
 
-		8		A15 of video access
-		9		A16 of video access
-		10		A17 of video access
-		11		A18 of video access
-		12		A19 of video access
-		13		clock speed (0 = 22.4 MHz, 1 = 28 MHz)
-		14		dots/char (0 = 10 [800x400], 1 = 8 [640x400])
-		15		vidout-sel, selects the video source for display on monochrome monitor
+		8		A15			A15 of video access
+		9		A16			A16 of video access
+		10		A17			A17 of video access
+		11		A18			A18 of video access
+		12		A19			A19 of video access
+		13		CLKSPD		clock speed (0 = 22.4 MHz, 1 = 28 MHz)
+		14		CLKCNT		dots/char (0 = 10 [800x400], 1 = 8 [640x400])
+		15		VIDOUTS		selects the video source for display on monochrome monitor
 
 	*/
 }
@@ -249,28 +254,27 @@ static WRITE8_HANDLER( keyboard_y8_w )
 
 static ADDRESS_MAP_START( tandy2k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-//	AM_RANGE(0x20000, 0xdffff) AM_RAM // expanded RAM
+//	AM_RANGE(0x00000, 0xdffff) AM_RAM
 //	AM_RANGE(0xe0000, 0xf7fff) AM_RAM // hires graphics
-	AM_RANGE(0xf8000, 0xfbfff) AM_RAM // character generator
+	AM_RANGE(0xf8000, 0xfbfff) AM_RAM AM_BASE_MEMBER(tandy2k_state, char_ram)
 	AM_RANGE(0xfc000, 0xfdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy2k_io, ADDRESS_SPACE_IO, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x00000, 0x00001) AM_READWRITE8(enable_r, enable_w, 0xff00)
-	AM_RANGE(0x00002, 0x00003) AM_WRITE8(dma_mux_w, 0xff00)
-	AM_RANGE(0x00004, 0x00005) AM_DEVREADWRITE8(I8272A_TAG, fldtc_r, fldtc_w, 0xff00)
-	AM_RANGE(0x00010, 0x00013) AM_DEVREADWRITE8(I8251A_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
-	AM_RANGE(0x00030, 0x00031) AM_DEVREAD8(I8272A_TAG, upd765_status_r, 0xff00)
-	AM_RANGE(0x00032, 0x00033) AM_DEVREADWRITE8(I8272A_TAG, upd765_data_r, upd765_data_w, 0xff00)
-	AM_RANGE(0x00040, 0x00047) AM_DEVREADWRITE8(I8253_TAG, pit8253_r, pit8253_w, 0xff00)
-	AM_RANGE(0x00050, 0x00057) AM_DEVREADWRITE8(I8255A_TAG, i8255a_r, i8255a_w, 0xff00)
-	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8(I8259A_0_TAG, pic8259_r, pic8259_w, 0xff00)
-	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8(I8259A_1_TAG, pic8259_r, pic8259_w, 0xff00)
-	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8(I8272A_TAG, upd765_dack_r, upd765_dack_w, 0xff00)
-	AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_r, crt9007_w, 0xff00)
-	AM_RANGE(0x00100, 0x0017f) AM_WRITE8(addr_ctrl_w, 0x00ff)
+	AM_RANGE(0x00000, 0x00001) AM_READWRITE8(enable_r, enable_w, 0x00ff)
+	AM_RANGE(0x00002, 0x00003) AM_WRITE8(dma_mux_w, 0x00ff)
+	AM_RANGE(0x00004, 0x00005) AM_DEVREADWRITE8(I8272A_TAG, fldtc_r, fldtc_w, 0x00ff)
+	AM_RANGE(0x00010, 0x00013) AM_DEVREADWRITE8(I8251A_TAG, msm8251_data_r, msm8251_data_w, 0x00ff)
+	AM_RANGE(0x00030, 0x00031) AM_DEVREAD8(I8272A_TAG, upd765_status_r, 0x00ff)
+	AM_RANGE(0x00032, 0x00033) AM_DEVREADWRITE8(I8272A_TAG, upd765_data_r, upd765_data_w, 0x00ff)
+	AM_RANGE(0x00040, 0x00047) AM_DEVREADWRITE8(I8253_TAG, pit8253_r, pit8253_w, 0x00ff)
+	AM_RANGE(0x00050, 0x00057) AM_DEVREADWRITE8(I8255A_TAG, i8255a_r, i8255a_w, 0x00ff)
+	AM_RANGE(0x00060, 0x00063) AM_DEVREADWRITE8(I8259A_0_TAG, pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0x00070, 0x00073) AM_DEVREADWRITE8(I8259A_1_TAG, pic8259_r, pic8259_w, 0x00ff)
+	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8(I8272A_TAG, upd765_dack_r, upd765_dack_w, 0x00ff)
+	AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_r, crt9007_w, 0x00ff)
+	AM_RANGE(0x00100, 0x0017f) AM_WRITE8(addr_ctrl_w, 0xff00)
 //	AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
 //	AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
 //	AM_RANGE(0x001a0, 0x001a0) AM_READ8(hires_plane_w, 0x00ff)
@@ -278,9 +282,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy2k_hd_io, ADDRESS_SPACE_IO, 16 )
 	AM_IMPORT_FROM(tandy2k_io)
-//	AM_RANGE(0x000e0, 0x000ff) AM_WRITE8(hdc_dack_w, 0xff00)
-//	AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8(WD1010_TAG, hdc_reset_r, hdc_reset_w, 0xff00)
-//	AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_r, wd1010_w, 0xff00)
+//	AM_RANGE(0x000e0, 0x000ff) AM_WRITE8(hdc_dack_w, 0x00ff)
+//	AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8(WD1010_TAG, hdc_reset_r, hdc_reset_w, 0x00ff)
+//	AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_r, wd1010_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
@@ -442,6 +446,7 @@ static WRITE_LINE_DEVICE_HANDLER( vidint11_w )
 static CRT9007_INTERFACE( crt9007_intf )
 {
 	DEVCB_LINE(vidint11_w),
+	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER(I80186_TAG, PROGRAM, memory_read_byte_16le)
@@ -723,6 +728,13 @@ static MACHINE_START( tandy2k )
 	state->fdc = devtag_get_device(machine, I8272A_TAG);
 	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+
+	/* memory banking */
+	const address_space *program = cputag_get_address_space(machine, I80186_TAG, ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	int ram_size = messram_get_size(devtag_get_device(machine, "messram"));
+
+	memory_install_ram(program, 0x00000, ram_size - 1, 0, 0, ram);
 
 	/* register for state saving */
 //	state_save_register_global(machine, state->);

@@ -56,6 +56,7 @@ typedef struct _crt9007_interface crt9007_interface;
 struct _crt9007_interface
 {
 	devcb_write_line		out_int_func;
+	devcb_write_line		out_dmar_func;
 
 	devcb_write_line		out_hs_func;
 	devcb_write_line		out_vs_func;
