@@ -123,11 +123,11 @@ static WRITE_LINE_DEVICE_HANDLER( vsync_w )
 {
 	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
 
-	pic8259_set_irq_line(driver_state->pic, 7, state);
+	pic8259_ir7_w(driver_state->pic, state);
 	driver_state->vert = state;
 }
 
-static const mc6845_interface hd46505s_intf = 
+static const mc6845_interface hd46505s_intf =
 {
 	SCREEN_TAG,
 	10,
@@ -172,7 +172,7 @@ static PIT8253_OUTPUT_CHANGED( timer_w )
 {
 	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
 
-	pic8259_set_irq_line(driver_state->pic, 2, state);
+	pic8259_ir2_w(driver_state->pic, state);
 }
 
 static const struct pit8253_config pit_intf =
@@ -220,16 +220,9 @@ static const struct pic8259_interface pic_intf =
 
 /* NEC uPD7201 Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( upd7201_int_w )
-{
-	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
-
-	pic8259_set_irq_line(driver_state->pic, 1, state);
-}
-
 static UPD7201_INTERFACE( mpsc_intf )
 {
-	DEVCB_LINE(upd7201_int_w),	/* interrupt */
+	DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir1_w), /* interrupt */
 	{
 		{
 			0,					/* receive clock */
@@ -409,7 +402,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 
 	driver_state->via1_irq = state;
 
-	pic8259_set_irq_line(driver_state->pic, 3, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq );
+	pic8259_ir3_w(driver_state->pic, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
 }
 
 static const via6522_interface via1_intf =
@@ -500,7 +493,7 @@ static WRITE_LINE_DEVICE_HANDLER( via2_irq_w )
 
 	driver_state->via2_irq = state;
 
-	pic8259_set_irq_line(driver_state->pic, 3, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq );
+	pic8259_ir3_w(driver_state->pic, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
 }
 
 static const via6522_interface via2_intf =
@@ -608,7 +601,7 @@ static WRITE_LINE_DEVICE_HANDLER( via3_irq_w )
 
 	driver_state->via3_irq = state;
 
-	pic8259_set_irq_line(driver_state->pic, 3, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq );
+	pic8259_ir3_w(driver_state->pic, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
 }
 
 static const via6522_interface via3_intf =
@@ -676,7 +669,7 @@ static WRITE_LINE_DEVICE_HANDLER( via4_irq_w )
 
 	driver_state->via4_irq = state;
 
-	pic8259_set_irq_line(driver_state->pic, 3, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq );
+	pic8259_ir3_w(driver_state->pic, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
 }
 
 static const via6522_interface via4_intf =
@@ -742,7 +735,7 @@ static WRITE_LINE_DEVICE_HANDLER( via5_irq_w )
 
 	driver_state->via5_irq = state;
 
-	pic8259_set_irq_line(driver_state->pic, 3, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq );
+	pic8259_ir3_w(driver_state->pic, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
 }
 
 static const via6522_interface via5_intf =
@@ -893,7 +886,7 @@ static WRITE_LINE_DEVICE_HANDLER( via6_irq_w )
 
 	driver_state->via6_irq = state;
 
-	pic8259_set_irq_line(driver_state->pic, 3, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq );
+	pic8259_ir3_w(driver_state->pic, driver_state->via1_irq | driver_state->via2_irq | driver_state->via3_irq | driver_state->via4_irq | driver_state->via5_irq | driver_state->via6_irq);
 }
 
 static const via6522_interface via6_intf =

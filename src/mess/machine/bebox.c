@@ -409,7 +409,7 @@ static void bebox_fdc_interrupt(running_machine *machine, int state)
 {
 	bebox_set_irq_bit(machine, 13, state);
 	if ( bebox_devices.pic8259_master ) {
-		pic8259_set_irq_line(bebox_devices.pic8259_master, 6, state);
+		pic8259_ir6_w(bebox_devices.pic8259_master, state);
 	}
 }
 
@@ -474,7 +474,7 @@ static PIC8259_SET_INT_LINE( bebox_pic8259_master_set_int_line ) {
 
 static PIC8259_SET_INT_LINE( bebox_pic8259_slave_set_int_line ) {
 	if ( bebox_devices.pic8259_master ) {
-		pic8259_set_irq_line( bebox_devices.pic8259_master, 2, interrupt );
+		pic8259_ir2_w(bebox_devices.pic8259_master, interrupt);
 	}
 }
 
@@ -542,7 +542,7 @@ void bebox_ide_interrupt(running_device *device, int state)
 {
 	bebox_set_irq_bit(device->machine, 7, state);
 	if ( bebox_devices.pic8259_master ) {
-		pic8259_set_irq_line( bebox_devices.pic8259_master, 6, state);
+		pic8259_ir6_w(bebox_devices.pic8259_master, state);
 	}
 }
 
@@ -781,7 +781,7 @@ I8237_INTERFACE( bebox_dma8237_2_config )
 static void bebox_timer0_w(running_device *device, int state)
 {
 	if ( bebox_devices.pic8259_master ) {
-		pic8259_set_irq_line(bebox_devices.pic8259_master, 0, state);
+		pic8259_ir0_w(bebox_devices.pic8259_master, state);
 	}
 }
 
@@ -847,7 +847,7 @@ static void bebox_keyboard_interrupt(running_machine *machine,int state)
 {
 	bebox_set_irq_bit(machine, 16, state);
 	if ( bebox_devices.pic8259_master ) {
-		pic8259_set_irq_line( bebox_devices.pic8259_master, 1, state);
+		pic8259_ir1_w(bebox_devices.pic8259_master, state);
 	}
 }
 

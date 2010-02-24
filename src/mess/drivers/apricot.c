@@ -79,7 +79,7 @@ static const i8255a_interface apricot_i8255a_intf =
 static PIT8253_OUTPUT_CHANGED( apricot_pit8253_out0 )
 {
 	apricot_state *apricot = (apricot_state *)device->machine->driver_data;
-	pic8259_set_irq_line(apricot->pic8259, 6, state);
+	pic8259_ir6_w(apricot->pic8259, state);
 }
 
 static PIT8253_OUTPUT_CHANGED( apricot_pit8253_out1 )
@@ -104,7 +104,7 @@ static const struct pit8253_config apricot_pit8253_intf =
 static void apricot_sio_irq_w(running_device *device, int state)
 {
 	apricot_state *apricot = (apricot_state *)device->machine->driver_data;
-	pic8259_set_irq_line(apricot->pic8259, 5, state);
+	pic8259_ir5_w(apricot->pic8259, state);
 }
 
 static READ8_DEVICE_HANDLER( apricot_sio_r )
@@ -171,7 +171,7 @@ static WRITE_LINE_DEVICE_HANDLER( apricot_wd2793_intrq_w )
 {
 	apricot_state *apricot = (apricot_state *)device->machine->driver_data;
 
-	pic8259_set_irq_line(apricot->pic8259, 4, state);
+	pic8259_ir4_w(apricot->pic8259, state);
 //  i8089 external terminate channel 1
 }
 

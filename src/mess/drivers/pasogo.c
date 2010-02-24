@@ -470,7 +470,7 @@ static MACHINE_RESET( pasogo )
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
-	pic8259_set_irq_line(devtag_get_device(device->machine, "pic8259"), 0, state);
+	pic8259_ir0_w(devtag_get_device(device->machine, "pic8259"), state);
 }
 
 static const struct pit8253_config pc_pit8254_config =

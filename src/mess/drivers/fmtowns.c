@@ -388,7 +388,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_irq_w )
 {
 	if(towns_fdc_irq6mask == 0)
 		state = 0;
-	pic8259_set_irq_line(device,6,state);  // IRQ6 = FDC
+	pic8259_ir6_w(device, state);  // IRQ6 = FDC
 }
 
 static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_drq_w )
@@ -552,7 +552,7 @@ static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int rele
 	}
 	towns_kb_status |= 0x01;
 	if(towns_kb_irq1_enable)
-		pic8259_set_irq_line(dev,1,1);
+		pic8259_ir1_w(dev, 1);
 	logerror("KB: sending scancode 0x%02x\n",scancode);
 }
 
@@ -591,7 +591,7 @@ static READ8_HANDLER(towns_keyboard_r)
 		case 0:  // scancode output
 			ret = towns_kb_output;
 			logerror("KB: read keyboard output port, returning %02x\n",ret);
-			pic8259_set_irq_line(devtag_get_device(space->machine,"pic8259_master"),1,0);
+			pic8259_ir1_w(devtag_get_device(space->machine,"pic8259_master"), 0);
 			if(towns_kb_extend != 0xff)
 			{
 				towns_kb_sendcode(space->machine,towns_kb_extend,2);
@@ -726,7 +726,7 @@ static READ8_HANDLER(towns_sound_ctrl_r)
 			ret = towns_pcm_channel_flag;
 			towns_pcm_channel_flag = 0;
 			towns_pcm_irq_flag = 0;
-			pic8259_set_irq_line(devtag_get_device(space->machine,"pic8259_slave"),5,0);
+			pic8259_ir5_w(devtag_get_device(space->machine,"pic8259_slave"), 0);
 			break;
 		default:
 			logerror("FM: unimplemented port 0x%04x read\n",offset + 0x4e8);
@@ -961,13 +961,13 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 				{
 					towns_cd.status |= 0x80;
 					if(towns_cd.mpu_irq_enable)
-						pic8259_set_irq_line(devtag_get_device(machine,"pic8259_slave"),1,1);
+						pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 1);
 				}
 			}
 			else
 			{
 				towns_cd.status &= ~0x80;
-				pic8259_set_irq_line(devtag_get_device(machine,"pic8259_slave"),1,0);
+				pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 0);
 			}
 			break;
 		case TOWNS_CD_IRQ_DMA:
@@ -977,13 +977,13 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 				{
 					towns_cd.status |= 0x40;
 					if(towns_cd.dma_irq_enable)
-						pic8259_set_irq_line(devtag_get_device(machine,"pic8259_slave"),1,1);
+						pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 1);
 				}
 			}
 			else
 			{
 				towns_cd.status &= ~0x40;
-				pic8259_set_irq_line(devtag_get_device(machine,"pic8259_slave"),1,0);
+				pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 0);
 			}
 			break;
 	}
@@ -1597,12 +1597,12 @@ void towns_fm_irq(running_device* device, int irq)
 	if(irq)
 	{
 		towns_fm_irq_flag = 1;
-		pic8259_set_irq_line(pic,5,1);
+		pic8259_ir5_w(pic, 1);
 	}
 	else
 	{
 		towns_fm_irq_flag = 0;
-		pic8259_set_irq_line(pic,5,0);
+		pic8259_ir5_w(pic, 0);
 	}
 }
 
@@ -1614,7 +1614,7 @@ void towns_pcm_irq(running_device* device, int channel)
 	towns_pcm_irq_flag = 1;
 	towns_pcm_channel_flag |= (1 << channel);
 	if(towns_pcm_channel_flag & (1 << channel))
-		pic8259_set_irq_line(pic,5,1);
+		pic8259_ir5_w(pic, 1);
 }
 
 static PIC8259_SET_INT_LINE( towns_pic_irq )
@@ -1627,7 +1627,7 @@ static PIC8259_SET_INT_LINE( towns_slave_pic_irq )
 {
 	running_device* dev = devtag_get_device(device->machine,"pic8259_master");
 
-	pic8259_set_irq_line(dev,7,interrupt);
+	pic8259_ir7_w(dev, interrupt);
 //  logerror("PIC#2: set IRQ line to %i\n",interrupt);
 }
 
@@ -1637,7 +1637,7 @@ static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
 
 	if(towns_timer_mask & 0x01)
 	{
-		pic8259_set_irq_line(dev,0,state);
+		pic8259_ir0_w(dev, state);
 	}
 }
 
@@ -1647,7 +1647,7 @@ static PIT8253_OUTPUT_CHANGED( towns_pit_out1_changed )
 
 	if(towns_timer_mask & 0x02)
 	{
-	//  pic8259_set_irq_line(dev,0,state);
+	//  pic8259_ir0_w(dev, state);
 	}
 }
 

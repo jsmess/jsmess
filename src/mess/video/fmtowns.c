@@ -464,7 +464,7 @@ WRITE8_HANDLER(towns_video_5c8_w)
 	switch(offset)
 	{
 		case 0x02:  // 0x5ca - VSync clear?
-			pic8259_set_irq_line(dev,3,0);
+			pic8259_ir3_w(dev, 0);
 			//towns_vblank_flag = 0;
 			break;
 	}
@@ -1269,14 +1269,14 @@ static TIMER_CALLBACK( towns_vblank_end )
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
 	running_device* dev = (running_device*)ptr;
-	pic8259_set_irq_line(dev,3,0);  // IRQ11 = VSync
+	pic8259_ir3_w(dev, 0);  // IRQ11 = VSync
 	towns_vblank_flag = 0;
 }
 
 INTERRUPT_GEN( towns_vsync_irq )
 {
 	running_device* dev = devtag_get_device(device->machine,"pic8259_slave");
-	pic8259_set_irq_line(dev,3,1);  // IRQ11 = VSync
+	pic8259_ir3_w(dev, 1);  // IRQ11 = VSync
 	towns_vblank_flag = 1;
 	timer_set(device->machine,video_screen_get_time_until_vblank_end(device->machine->primary_screen),(void*)dev,0,towns_vblank_end);
 	if(towns_tvram_enable)

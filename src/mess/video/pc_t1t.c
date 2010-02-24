@@ -932,6 +932,5 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed )
 	{
 		pcjr.pc_framecnt++;
 	}
-	pic8259_set_irq_line(devtag_get_device(device->machine, "pic8259"), 5, state);
+	pic8259_ir5_w(devtag_get_device(device->machine, "pic8259"), state);
 }
-

@@ -142,7 +142,7 @@ static void b2m_set_bank(running_machine *machine,int bank)
 static PIT8253_OUTPUT_CHANGED(bm2_pit_out0)
 {
 	b2m_state *st = (b2m_state *)device->machine->driver_data;
-	pic8259_set_irq_line(st->pic,1,state);
+	pic8259_ir1_w(st->pic, state);
 }
 
 
@@ -361,12 +361,12 @@ const struct pic8259_interface b2m_pic8259_config = {
 	b2m_pic_set_int_line
 };
 
-INTERRUPT_GEN (b2m_vblank_interrupt)
+INTERRUPT_GEN( b2m_vblank_interrupt )
 {
 	b2m_state *state = (b2m_state *)device->machine->driver_data;
 	state->vblank_state++;
 	if (state->vblank_state>1) state->vblank_state=0;
-	pic8259_set_irq_line(state->pic, 0, state->vblank_state);
+	pic8259_ir0_w(state->pic, state->vblank_state);
 }
 
 MACHINE_RESET(b2m)

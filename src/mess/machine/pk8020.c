@@ -943,7 +943,7 @@ static PIT8253_OUTPUT_CHANGED(pk8020_pit_out1)
 
 static PIT8253_OUTPUT_CHANGED(pk8020_pit_out2)
 {
-	pic8259_set_irq_line(devtag_get_device(device->machine, "pic8259"),5,state);
+	pic8259_ir5_w(devtag_get_device(device->machine, "pic8259"), state);
 }
 
 
@@ -991,6 +991,5 @@ MACHINE_RESET( pk8020 )
 INTERRUPT_GEN( pk8020_interrupt )
 {
 	takt ^= 1;
-	pic8259_set_irq_line(devtag_get_device(device->machine, "pic8259"),4,1);
+	pic8259_ir4_w(devtag_get_device(device->machine, "pic8259"), 1);
 }
-

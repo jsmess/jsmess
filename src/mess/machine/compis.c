@@ -193,17 +193,6 @@ void compis_irq_set(UINT8 irq)
 }
 #endif
 
-/*-------------------------------------------------------------------------*/
-/*  OSP PIC 8259                                                           */
-/*-------------------------------------------------------------------------*/
-
-static void compis_osp_pic_irq(UINT8 irq)
-{
-	if ( compis_devices.pic8259_master ) {
-		pic8259_set_irq_line(compis_devices.pic8259_master, irq, 1);
-		pic8259_set_irq_line(compis_devices.pic8259_master, irq, 0);
-	}
-}
 
 /*-------------------------------------------------------------------------*/
 /*  Keyboard                                                               */
@@ -299,7 +288,11 @@ static WRITE_LINE_DEVICE_HANDLER( compis_fdc_int )
 	/* No interrupt requests if iSBX-218A has DMA enabled */
 	if (!input_port_read(device->machine, "DSW1") && state)
 	{
-		compis_osp_pic_irq(COMPIS_IRQ_SBX0_INT1);
+		if (compis_devices.pic8259_master)
+		{
+			pic8259_ir0_w(compis_devices.pic8259_master, 1);
+			pic8259_ir0_w(compis_devices.pic8259_master, 0);
+		}
 	}
 }
 
@@ -1441,7 +1434,7 @@ static PIC8259_SET_INT_LINE( compis_pic8259_slave_set_int_line )
 {
 	if ( compis_devices.pic8259_master )
 	{
-		pic8259_set_irq_line(compis_devices.pic8259_master, 2, interrupt);
+		pic8259_ir2_w(compis_devices.pic8259_master, interrupt);
 	}
 }
 

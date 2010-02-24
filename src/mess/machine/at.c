@@ -53,9 +53,10 @@ static PIC8259_SET_INT_LINE( at_pic8259_master_set_int_line ) {
 }
 
 
-static PIC8259_SET_INT_LINE( at_pic8259_slave_set_int_line ) {
+static PIC8259_SET_INT_LINE( at_pic8259_slave_set_int_line )
+{
 	at_state *st = (at_state *)device->machine->driver_data;
-	pic8259_set_irq_line( st->pic8259_master, 2, interrupt);
+	pic8259_ir2_w(st->pic8259_master, interrupt);
 }
 
 
@@ -111,8 +112,9 @@ static void at_speaker_set_input(running_machine *machine, UINT8 data)
 static PIT8253_OUTPUT_CHANGED( at_pit8254_out0_changed )
 {
 	at_state *st = (at_state *)device->machine->driver_data;
-	if ( st->pic8259_master ) {
-		pic8259_set_irq_line(st->pic8259_master, 0, state);
+	if (st->pic8259_master)
+	{
+		pic8259_ir0_w(st->pic8259_master, state);
 	}
 }
 
@@ -147,15 +149,28 @@ static void at_set_gate_a20(running_machine *machine, int a20)
 }
 
 
-static void at_set_irq_line(running_machine *machine,int irq, int state) {
+static void at_set_irq_line(running_machine *machine,int irq, int state)
+{
 	at_state *st = (at_state *)machine->driver_data;
-	pic8259_set_irq_line(st->pic8259_master, irq, state);
+
+	switch (irq)
+	{
+	case 0: pic8259_ir0_w(st->pic8259_master, state); break;
+	case 1: pic8259_ir1_w(st->pic8259_master, state); break;
+	case 2: pic8259_ir2_w(st->pic8259_master, state); break;
+	case 3: pic8259_ir3_w(st->pic8259_master, state); break;
+	case 4: pic8259_ir4_w(st->pic8259_master, state); break;
+	case 5: pic8259_ir5_w(st->pic8259_master, state); break;
+	case 6: pic8259_ir6_w(st->pic8259_master, state); break;
+	case 7: pic8259_ir7_w(st->pic8259_master, state); break;
+	}
 }
 
 
-static void at_set_keyb_int(running_machine *machine, int state) {
+static void at_set_keyb_int(running_machine *machine, int state)
+{
 	at_state *st = (at_state *)machine->driver_data;
-	pic8259_set_irq_line(st->pic8259_master, 1, state);
+	pic8259_ir1_w(st->pic8259_master, state);
 }
 
 
@@ -181,7 +196,7 @@ static void init_at_common(running_machine *machine, const struct kbdc8042_inter
 static void at_keyboard_interrupt(running_machine *machine, int state)
 {
 	at_state *st = (at_state *)machine->driver_data;
-	pic8259_set_irq_line(st->pic8259_master, 1, state);
+	pic8259_ir1_w(st->pic8259_master, state);
 }
 
 
@@ -344,13 +359,13 @@ I8237_INTERFACE( at_dma8237_2_config )
 static INS8250_INTERRUPT( at_com_interrupt_1 )
 {
 	at_state *st = (at_state *)device->machine->driver_data;
-	pic8259_set_irq_line(st->pic8259_master, 4, state);
+	pic8259_ir4_w(st->pic8259_master, state);
 }
 
 static INS8250_INTERRUPT( at_com_interrupt_2 )
 {
 	at_state *st = (at_state *)device->machine->driver_data;
-	pic8259_set_irq_line(st->pic8259_master, 3, state);
+	pic8259_ir3_w(st->pic8259_master, state);
 }
 
 /* called when com registers read/written - used to update peripherals that
@@ -413,7 +428,7 @@ const ins8250_interface ibm5170_com_interface[4]=
 static void at_fdc_interrupt(running_machine *machine, int state)
 {
 	at_state *st = (at_state *)machine->driver_data;
-	pic8259_set_irq_line(st->pic8259_master, 6, state);
+	pic8259_ir6_w(st->pic8259_master, state);
 //if ( messram_get_ptr(devtag_get_device(machine, "messram"))[0x0490] == 0x74 )
 //  messram_get_ptr(devtag_get_device(machine, "messram"))[0x0490] = 0x54;
 }
@@ -513,8 +528,8 @@ static WRITE8_HANDLER( at_kbdc8042_p2_w )
 	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_RESET, ( data & 0x01 ) ? CLEAR_LINE : ASSERT_LINE );
 
 	/* OPT BUF FULL is connected to IR1 on the master 8259 */
-	if ( st->pic8259_master)
-		pic8259_set_irq_line(st->pic8259_master, 1, ( data & 0x10 ) ? ASSERT_LINE : CLEAR_LINE );
+	if (st->pic8259_master)
+		pic8259_ir1_w(st->pic8259_master, BIT(data, 4));
 
 	at_kbdc8042.clock_signal = ( data & 0x40 ) ? 0 : 1;
 	at_kbdc8042.data_signal = ( data & 0x80 ) ? 1 : 0;
@@ -739,9 +754,21 @@ static IRQ_CALLBACK(at_irq_callback)
 	return pic8259_acknowledge( st->pic8259_master);
 }
 
-static void pc_set_irq_line(running_machine *machine,int irq, int state) {
+static void pc_set_irq_line(running_machine *machine,int irq, int state)
+{
 	pc_state *st = (pc_state*)machine->driver_data;
-	pic8259_set_irq_line(st->pic8259, irq, state);
+
+	switch (irq)
+	{
+	case 0: pic8259_ir0_w(st->pic8259, state); break;
+	case 1: pic8259_ir1_w(st->pic8259, state); break;
+	case 2: pic8259_ir2_w(st->pic8259, state); break;
+	case 3: pic8259_ir3_w(st->pic8259, state); break;
+	case 4: pic8259_ir4_w(st->pic8259, state); break;
+	case 5: pic8259_ir5_w(st->pic8259, state); break;
+	case 6: pic8259_ir6_w(st->pic8259, state); break;
+	case 7: pic8259_ir7_w(st->pic8259, state); break;
+	}
 }
 
 MACHINE_START( at )

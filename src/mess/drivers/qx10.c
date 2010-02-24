@@ -143,7 +143,7 @@ static WRITE_LINE_DEVICE_HANDLER(qx10_upd765_interrupt)
 
 	//logerror("Interrupt from upd765: %d\n", state);
 	// signal interrupt
-	pic8259_set_irq_line(driver_state->pic8259_master, 6, state);
+	pic8259_ir6_w(driver_state->pic8259_master, state);
 };
 
 static UPD765_DMA_REQUEST( drq_w )
@@ -387,7 +387,7 @@ static const struct pic8259_interface qx10_pic8259_master_config =
 
 static PIC8259_SET_INT_LINE( qx10_pic8259_slave_set_int_line )
 {
-	pic8259_set_irq_line(((qx10_state*)device->machine->driver_data)->pic8259_master, 7, interrupt);
+	pic8259_ir7_w(((qx10_state*)device->machine->driver_data)->pic8259_master, interrupt);
 }
 
 static const struct pic8259_interface qx10_pic8259_slave_config =

@@ -690,8 +690,9 @@ static PIC8259_SET_INT_LINE( pc98_master_set_int_line ) {
 }
 
 
-static PIC8259_SET_INT_LINE( pc98_slave_set_int_line ) {
-	pic8259_set_irq_line( devtag_get_device( device->machine, "pic8259_master" ), 2, interrupt);
+static PIC8259_SET_INT_LINE( pc98_slave_set_int_line )
+{
+	pic8259_ir2_w(devtag_get_device(device->machine, "pic8259_master"), interrupt);
 }
 
 
@@ -822,7 +823,7 @@ static I8255A_INTERFACE( printer_intf )
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
-	pic8259_set_irq_line(devtag_get_device( device->machine, "pic8259_master" ), 0, state);
+	pic8259_ir0_w(devtag_get_device(device->machine, "pic8259_master"), state);
 }
 
 static const struct pit8253_config pit8253_config =

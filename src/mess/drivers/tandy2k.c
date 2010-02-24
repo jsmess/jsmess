@@ -7,7 +7,7 @@
 ****************************************************************************/
 
 /*
-	
+
 	TODO:
 
 	- port FFFE?
@@ -61,12 +61,12 @@ static READ8_HANDLER( enable_r )
 
 		0					RS-232 ring indicator
 		1					RS-232 carrier detect
-		2		
-		3		
-		4		
-		5		
-		6		
-		7		_ACLOW		
+		2
+		3
+		4
+		5
+		6
+		7		_ACLOW
 
 	*/
 
@@ -239,8 +239,8 @@ static WRITE8_HANDLER( keyboard_y8_w )
 		3		Y11
 		4		LED 2
 		5		LED 1
-		6		
-		7		
+		6
+		7
 
 	*/
 
@@ -436,16 +436,9 @@ static VIDEO_UPDATE( tandy2k )
 	return 0;
 }
 
-static WRITE_LINE_DEVICE_HANDLER( vidint11_w )
-{
-	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
-	
-	pic8259_set_irq_line(driver_state->pic1, 1, state);
-}
-
 static CRT9007_INTERFACE( crt9007_intf )
 {
-	DEVCB_LINE(vidint11_w),
+	DEVCB_DEVICE_LINE(I8259A_1_TAG, pic8259_ir1_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -457,9 +450,9 @@ static CRT9007_INTERFACE( crt9007_intf )
 static WRITE_LINE_DEVICE_HANDLER( rxrdy_w )
 {
 	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
-	
+
 	driver_state->rxrdy = state;
-	pic8259_set_irq_line(driver_state->pic0, 2, driver_state->rxrdy | driver_state->txrdy);
+	pic8259_ir2_w(driver_state->pic0, driver_state->rxrdy | driver_state->txrdy);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( txrdy_w )
@@ -467,7 +460,7 @@ static WRITE_LINE_DEVICE_HANDLER( txrdy_w )
 	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
 
 	driver_state->txrdy = state;
-	pic8259_set_irq_line(driver_state->pic0, 2, driver_state->rxrdy | driver_state->txrdy);
+	pic8259_ir2_w(driver_state->pic0, driver_state->rxrdy | driver_state->txrdy);
 }
 
 static const msm8251_interface i8251_intf =
@@ -603,7 +596,7 @@ static WRITE8_DEVICE_HANDLER( ppi_pc_w )
 	state->pb_sel = (data >> 1) & 0x03;
 
 	/* interrupt */
-	pic8259_set_irq_line(state->pic1, 3, BIT(data, 3));
+	pic8259_ir3_w(state->pic1, BIT(data, 3));
 
 	/* printer strobe */
 	centronics_strobe_w(state->centronics, BIT(data, 7));
@@ -684,20 +677,13 @@ static const floppy_config tandy2k_floppy_config =
 
 /* Intel 8272 Interface */
 
-static WRITE_LINE_DEVICE_HANDLER( fldint04_w )
-{
-	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
-
-	pic8259_set_irq_line(driver_state->pic0, 4, state);
-}
-
 static UPD765_DMA_REQUEST( busdmarq0_w )
 {
 }
 
 static const struct upd765_interface i8272_intf =
 {
-	DEVCB_LINE(fldint04_w),
+	DEVCB_DEVICE_LINE(I8259A_0_TAG, pic8259_ir4_w),
 	busdmarq0_w,
 	NULL,
 	UPD765_RDY_PIN_CONNECTED,
@@ -767,7 +753,7 @@ static MACHINE_DRIVER_START( tandy2k )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    
+
 	MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_START(tandy2k)

@@ -281,7 +281,7 @@ void pc_speaker_set_input(running_machine *machine, UINT8 data)
 static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out0_changed )
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
-	pic8259_set_irq_line(st->pic8259, 0, state);
+	pic8259_ir0_w(st->pic8259, state);
 }
 
 
@@ -353,13 +353,13 @@ const struct pit8253_config pcjr_pit8253_config =
 static INS8250_INTERRUPT( pc_com_interrupt_1 )
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
-	pic8259_set_irq_line(st->pic8259, 4, state);
+	pic8259_ir4_w(st->pic8259, state);
 }
 
 static INS8250_INTERRUPT( pc_com_interrupt_2 )
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
-	pic8259_set_irq_line(st->pic8259, 3, state);
+	pic8259_ir3_w(st->pic8259, state);
 }
 
 /* called when com registers read/written - used to update peripherals that
@@ -764,7 +764,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( st->ppi_keyboard_clear )
 	{
-		pic8259_set_irq_line(st->pic8259, 1, 0);
+		pic8259_ir1_w(st->pic8259, 0);
 		st->ppi_shift_register = 0;
 		st->ppi_shift_enable = 1;
 	}
@@ -800,7 +800,7 @@ WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 					st->ppi_shift_register = ( st->ppi_shift_register >> 1 ) | ( st->ppi_data_signal << 7 );
 					if ( trigger_irq )
 					{
-						pic8259_set_irq_line(st->pic8259, 1, 1);
+						pic8259_ir1_w(st->pic8259, 1);
 						st->ppi_shift_enable = 0;
 						st->ppi_clock_signal = 0;
 						kb_keytronic_clock_w(keyboard, st->ppi_clock_signal);
@@ -920,7 +920,7 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 	/* If PB7 is set clear the shift register and reset the IRQ line */
 	if ( st->ppi_keyboard_clear )
 	{
-		pic8259_set_irq_line(st->pic8259, 1, 0);
+		pic8259_ir1_w(st->pic8259, 0);
 		st->ppi_shift_register = 0;
 		st->ppi_shift_enable = 1;
 	}
@@ -1091,8 +1091,9 @@ I8255A_INTERFACE( pcjr_ppi8255_interface )
 static void pc_fdc_interrupt(running_machine *machine, int state)
 {
 	pc_state *st = (pc_state *)machine->driver_data;
-	if ( st->pic8259 ) {
-		pic8259_set_irq_line(st->pic8259, 6, state);
+	if (st->pic8259)
+	{
+		pic8259_ir6_w(st->pic8259, state);
 	}
 }
 
@@ -1125,9 +1126,21 @@ static const struct pc_fdc_interface pcjr_fdc_interface_nc =
 };
 
 
-static void pc_set_irq_line(running_machine *machine,int irq, int state) {
+static void pc_set_irq_line(running_machine *machine,int irq, int state)
+{
 	pc_state *st = (pc_state *)machine->driver_data;
-	pic8259_set_irq_line(st->pic8259, irq, state);
+
+	switch (irq)
+	{
+	case 0: pic8259_ir0_w(st->pic8259, state); break;
+	case 1: pic8259_ir1_w(st->pic8259, state); break;
+	case 2: pic8259_ir2_w(st->pic8259, state); break;
+	case 3: pic8259_ir3_w(st->pic8259, state); break;
+	case 4: pic8259_ir4_w(st->pic8259, state); break;
+	case 5: pic8259_ir5_w(st->pic8259, state); break;
+	case 6: pic8259_ir6_w(st->pic8259, state); break;
+	case 7: pic8259_ir7_w(st->pic8259, state); break;
+	}
 }
 
 static void pc_set_keyb_int(running_machine *machine, int state)
@@ -1323,7 +1336,7 @@ MACHINE_START( pc )
 {
 	pc_state *st = (pc_state *)machine->driver_data;
 
-	st->pic8259 = devtag_get_device(machine, "pic8259");	
+	st->pic8259 = devtag_get_device(machine, "pic8259");
 	st->dma8237 = devtag_get_device(machine, "dma8237");
 	st->pit8253 = devtag_get_device(machine, "pit8253");
 	pc_fdc_init( machine, &fdc_interface_nc );
