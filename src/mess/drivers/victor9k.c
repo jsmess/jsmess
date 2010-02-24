@@ -13,18 +13,21 @@
 
 	TODO:
 
-	- RAM expansions
-	- video
+	- floppy 8048
 	- keyboard
-	- floppy
-	- codec sound
+	- add HD46505S variant to mc6845.c
+	- hires graphics
+	- character attributes
+	- brightness/contrast
 	- MC6852
+	- codec sound
 
 */
 
 #include "emu.h"
 #include "includes/victor9k.h"
 #include "cpu/i86/i86.h"
+#include "cpu/mcs48/mcs48.h"
 #include "devices/flopdrv.h"
 #include "devices/messram.h"
 #include "machine/ctronics.h"
@@ -33,17 +36,18 @@
 #include "machine/pit8253.h"
 #include "machine/pic8259.h"
 #include "machine/upd7201.h"
+#include "sound/hc55516.h"
 #include "video/mc6845.h"
 
 /* Memory Maps */
 
 static ADDRESS_MAP_START( victor9k_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x1ffff) AM_RAM
+//	AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xe0000, 0xe0001) AM_DEVREADWRITE(I8259A_TAG, pic8259_r, pic8259_w)
 	AM_RANGE(0xe0020, 0xe0023) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
 	AM_RANGE(0xe0040, 0xe0043) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
-	AM_RANGE(0xe8000, 0xe8000) AM_DEVREADWRITE(HD46505S_TAG, mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0xe8001, 0xe8001) AM_DEVREADWRITE(HD46505S_TAG, mc6845_status_r, mc6845_address_w)
+	AM_RANGE(0xe8000, 0xe8000) AM_DEVREADWRITE(HD46505S_TAG, mc6845_status_r, mc6845_address_w)
+	AM_RANGE(0xe8001, 0xe8001) AM_DEVREADWRITE(HD46505S_TAG, mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xe8020, 0xe802f) AM_DEVREADWRITE(M6522_1_TAG, via_r, via_w)
 	AM_RANGE(0xe8040, 0xe804f) AM_DEVREADWRITE(M6522_2_TAG, via_r, via_w)
 //	AM_RANGE(0xe8060, 0xe806f) AM_DEVREADWRITE(MC6852_TAG, mc6852_r, mc6852_w)
@@ -51,8 +55,22 @@ static ADDRESS_MAP_START( victor9k_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe80a0, 0xe80af) AM_DEVREADWRITE(M6522_4_TAG, via_r, via_w)
 	AM_RANGE(0xe80c0, 0xe80cf) AM_DEVREADWRITE(M6522_6_TAG, via_r, via_w)
 	AM_RANGE(0xe80e0, 0xe80ef) AM_DEVREADWRITE(M6522_5_TAG, via_r, via_w)
-	AM_RANGE(0xf0000, 0xf0fff) AM_RAM AM_BASE_MEMBER(victor9k_state, video_ram)
+	AM_RANGE(0xf0000, 0xf0fff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(victor9k_state, video_ram)
 	AM_RANGE(0xfe000, 0xfffff) AM_ROM AM_REGION(I8088_TAG, 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( floppy_io, ADDRESS_SPACE_IO, 8 )
+//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
+//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
+//  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
+//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
+//  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
+//  AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
+//  AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
+//  AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -62,8 +80,43 @@ INPUT_PORTS_END
 
 /* Video */
 
+#define CODE_NON_DISPLAY	0x1000
+#define CODE_UNDERLINE		0x2000
+#define CODE_LOW_INTENSITY	0x4000
+#define CODE_REVERSE_VIDEO	0x8000
+
 static MC6845_UPDATE_ROW( victor9k_update_row )
 {
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	const address_space *program = cputag_get_address_space(device->machine, I8088_TAG, ADDRESS_SPACE_PROGRAM);
+
+	if (BIT(ma, 13))
+	{
+		fatalerror("Graphics mode not supported!");
+	}
+	else
+	{
+		UINT16 video_ram_addr = (ma & 0xfff) << 1;
+
+		for (int sx = 0; sx < x_count; sx++)
+		{
+			UINT16 code = (state->video_ram[video_ram_addr + 1] << 8) | state->video_ram[video_ram_addr];
+			UINT32 char_ram_addr = (BIT(ma, 12) << 16) | ((code & 0xff) << 5) | (ra << 1);
+			UINT16 data = memory_read_word_16le(program, char_ram_addr);
+
+			for (int x = 0; x <= 10; x++)
+			{
+				int color = BIT(data, x);
+
+				if (sx == cursor_x) color = 1;
+
+				*BITMAP_ADDR16(bitmap, y, x + sx*10) = color;
+			}
+
+			video_ram_addr += 2;
+			video_ram_addr &= 0xfff;
+		}
+	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( vsync_w )
@@ -732,11 +785,11 @@ static READ8_DEVICE_HANDLER( via6_pa_r )
 
 	UINT8 data = 0;
 
-	/* drive A track 0 sense */
+	/* drive 0 track 0 sense */
 	data |= floppy_tk00_r(state->floppy[0].image) << 1;
 
-	/* drive B track 0 sense */
-	data |= floppy_tk00_r(state->floppy[0].image) << 3;
+	/* drive 1 track 0 sense */
+	data |= floppy_tk00_r(state->floppy[1].image) << 3;
 
 	/* write protect sense */
 	data |= floppy_wpt_r(state->floppy[state->drive].image) << 6;
@@ -816,6 +869,9 @@ static WRITE8_DEVICE_HANDLER( via6_pb_w )
 
 	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
 
+	/* motor speed controller reset */
+	cputag_set_input_line(device->machine, I8048_TAG, INPUT_LINE_RESET, BIT(data, 2));
+
 	/* stepper enable A */
 	state->floppy[0].se = BIT(data, 6);
 
@@ -883,16 +939,34 @@ static IEEE488_DAISY( ieee488_daisy )
 
 /* Machine Initialization */
 
+static IRQ_CALLBACK( victor9k_irq_callback )
+{
+	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	
+	return pic8259_acknowledge(state->pic);
+}
+
 static MACHINE_START( victor9k )
 {
 	victor9k_state *state = (victor9k_state *)machine->driver_data;
+
+	/* set interrupt callback */
+	cpu_set_irq_callback(machine->firstcpu, victor9k_irq_callback);
 
 	/* find devices */
 	state->ieee488 = devtag_get_device(machine, IEEE488_TAG);
 	state->pic = devtag_get_device(machine, I8259A_TAG);
 	state->ssda = devtag_get_device(machine, MC6852_TAG);
+	state->cvsd = devtag_get_device(machine, HC55516_TAG);
 	state->floppy[0].image = devtag_get_device(machine, FLOPPY_0);
 	state->floppy[1].image = devtag_get_device(machine, FLOPPY_1);
+
+	/* memory banking */
+	const address_space *program = cputag_get_address_space(machine, I8088_TAG, ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	int ram_size = messram_get_size(devtag_get_device(machine, "messram"));
+
+	memory_install_ram(program, 0x00000, ram_size - 1, 0, 0, ram);
 }
 
 /* Machine Driver */
@@ -903,6 +977,12 @@ static MACHINE_DRIVER_START( victor9k )
 	/* basic machine hardware */
 	MDRV_CPU_ADD(I8088_TAG, I8088, 5000000)
 	MDRV_CPU_PROGRAM_MAP(victor9k_mem)
+
+	MDRV_CPU_ADD(I8048_TAG, I8048, 1000000)
+	MDRV_CPU_IO_MAP(floppy_io)
+
+//	MDRV_CPU_ADD(I8022_TAG, I8022, 100000)
+//	MDRV_CPU_IO_MAP(keyboard_io)
 
 	MDRV_MACHINE_START(victor9k)
 
@@ -924,6 +1004,8 @@ static MACHINE_DRIVER_START( victor9k )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(HC55516_TAG, HC55516, 100000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* devices */
 	MDRV_IEEE488_ADD(IEEE488_TAG, ieee488_daisy)
@@ -949,22 +1031,25 @@ MACHINE_DRIVER_END
 
 ROM_START( victor9k )
 	ROM_REGION( 0x2000, I8088_TAG, 0 )
-	ROM_LOAD( "102320.7j", 0x0000, 0x1000, CRC(3d615fd7) SHA1(b22f7e5d66404185395d8effbf57efded0079a92) )
-	ROM_LOAD( "102322.8j", 0x1000, 0x1000, CRC(9209df0e) SHA1(3ee8e0c15186bbd5768b550ecc1fa3b6b1dbb928) )
-	ROM_LOAD( "v9000_univ._fe_f3f7_13db.7j", 0x0000, 0x1000, CRC(25c7a59f) SHA1(8784e9aa7eb9439f81e18b8e223c94714e033911) )
-	ROM_LOAD( "v9000_univ._ff_f3f7_39fe.8j", 0x1000, 0x1000, CRC(496c7467) SHA1(eccf428f62ef94ab85f4a43ba59ae6a066244a66) )
+	ROM_DEFAULT_BIOS( "univ" )
+	ROM_SYSTEM_BIOS( 0, "old", "Older" )
+	ROMX_LOAD( "102320.7j", 0x0000, 0x1000, CRC(3d615fd7) SHA1(b22f7e5d66404185395d8effbf57efded0079a92), ROM_BIOS(1) )
+	ROMX_LOAD( "102322.8j", 0x1000, 0x1000, CRC(9209df0e) SHA1(3ee8e0c15186bbd5768b550ecc1fa3b6b1dbb928), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "univ", "Universal" )
+	ROMX_LOAD( "v9000 univ. fe f3f7 13db.7j", 0x0000, 0x1000, CRC(25c7a59f) SHA1(8784e9aa7eb9439f81e18b8e223c94714e033911), ROM_BIOS(2) )
+	ROMX_LOAD( "v9000 univ. ff f3f7 39fe.8j", 0x1000, 0x1000, CRC(496c7467) SHA1(eccf428f62ef94ab85f4a43ba59ae6a066244a66), ROM_BIOS(2) )
 
 	ROM_REGION( 0x800, "gcr", 0 )
-	ROM_LOAD( "100836-01.4k", 0x000, 0x800, CRC(adc601bd) SHA1(6eeff3d2063ae2d97452101aa61e27ef83a467e5) )
+	ROM_LOAD( "100836-001.4k", 0x000, 0x800, CRC(adc601bd) SHA1(6eeff3d2063ae2d97452101aa61e27ef83a467e5) )
 
-	ROM_REGION( 0x800, "motor", 0)
-	ROM_LOAD( "disk spindle motor control i8048", 0x000, 0x800, NO_DUMP )
+	ROM_REGION( 0x400, I8048_TAG, 0)
+	ROM_LOAD( "36080.5d", 0x000, 0x400, CRC(9bf49f7d) SHA1(b3a11bb65105db66ae1985b6f482aab6ea1da38b) )
 
-	ROM_REGION( 0x800, "keyboard", 0)
-	ROM_LOAD( "keyboard controller i8048", 0x000, 0x800, NO_DUMP )
+	ROM_REGION( 0x800, I8022_TAG, 0)
+	ROM_LOAD( "keyboard controller i8022", 0x000, 0x800, NO_DUMP )
 ROM_END
 
 /* System Drivers */
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY						FULLNAME		FLAGS */
-COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, 0,    "Victor Business Products", "Victor 9000",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, 0,    "Victor Business Products", "Victor 9000",	GAME_NOT_WORKING )

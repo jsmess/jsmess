@@ -2,12 +2,15 @@
 #define __VICTOR9K__
 
 #define SCREEN_TAG		"screen"
-#define I8088_TAG		"i8088"
-#define I8253_TAG		"i8253"
-#define I8259A_TAG		"i8259"
-#define UPD7201_TAG		"upd7201"
-#define HD46505S_TAG	"hd46505s"
-#define MC6852_TAG		"mc6852"
+#define I8088_TAG		"8l"
+#define I8048_TAG		"5d"
+#define I8022_TAG		"i8022"
+#define I8253_TAG		"13h"
+#define I8259A_TAG		"7l"
+#define UPD7201_TAG		"16e"
+#define HD46505S_TAG	"11a"
+#define MC6852_TAG		"13b"
+#define HC55516_TAG		"1m"
 #define M6522_1_TAG		"m6522_1"
 #define M6522_2_TAG		"m6522_2"
 #define M6522_3_TAG		"m6522_3"
@@ -54,6 +57,7 @@ struct _victor9k_state
 	running_device *pic;
 	running_device *crt;
 	running_device *ssda;
+	running_device *cvsd;
 	running_device *ieee488;
 };
 
