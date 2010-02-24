@@ -78,10 +78,10 @@ static READ8_DEVICE_HANDLER( pia0_pa_r )
 	data |= pet_keyline_select;
 
 	/* #1 cassette switch */
-	data |= ((cassette_get_state(devtag_get_device(device->machine, "cassette1")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 4;
+	data |= ((cassette_get_state(devtag_get_device(device->machine, "cassette1")) & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
 
 	/* #2 cassette switch */
-	data |= ((cassette_get_state(devtag_get_device(device->machine, "cassette2")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED) << 5;
+	data |= ((cassette_get_state(devtag_get_device(device->machine, "cassette2")) & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 5;
 
 	/* end or identify in */
 	data |= ieee488_eoi_r(ieeebus) << 6;
@@ -177,7 +177,6 @@ static READ8_DEVICE_HANDLER( petb_kin_r )
 	return data;
 }
 
-/* NOT WORKING - Just placeholder */
 static READ8_DEVICE_HANDLER( cass1_r )
 {
 	// cassette 1 read
@@ -369,8 +368,7 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 	return data;
 }
 
-/* NOT WORKING - Just placeholder */
-static READ_LINE_DEVICE_HANDLER( cass_2_r )
+static READ_LINE_DEVICE_HANDLER( cass2_r )
 {
 	// cassette 2 read
 	return (cassette_input(devtag_get_device(device->machine, "cassette2")) > +0.0) ? 1 : 0;
@@ -402,6 +400,8 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 	ieee488_atn_w(ieeebus, device, BIT(data, 2));
 
 	/* cassette write */
+	cassette_output(devtag_get_device(device->machine, "cassette1"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	cassette_output(devtag_get_device(device->machine, "cassette2"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
 	/* #2 cassette motor */
 	if (BIT(data, 4))
@@ -438,7 +438,7 @@ const via6522_interface pet_via =
 	DEVCB_NULL,					/* in_a_func */
 	DEVCB_HANDLER(via_pb_r),	/* in_b_func */
 	DEVCB_NULL,					/* in_ca1_func */
-	DEVCB_LINE(cass_2_r),		/* in_cb1_func */
+	DEVCB_LINE(cass2_r),		/* in_cb1_func */
 	DEVCB_NULL,					/* in_ca2_func */
 	DEVCB_NULL,					/* in_cb2_func */
 	DEVCB_NULL,					/* out_a_func */
@@ -677,7 +677,6 @@ static TIMER_CALLBACK( pet_interrupt )
 }
 
 
-/* NOT WORKING - Just placeholder */
 static TIMER_CALLBACK( pet_tape1_timer )
 {
 	running_device *pia_0 = devtag_get_device(machine, "pia_0");
@@ -686,7 +685,6 @@ static TIMER_CALLBACK( pet_tape1_timer )
 	pia6821_ca1_w(pia_0, 0, data);
 }
 
-/* NOT WORKING - Just placeholder */
 static TIMER_CALLBACK( pet_tape2_timer )
 {
 	running_device *via_0 = devtag_get_device(machine, "via6522_0");

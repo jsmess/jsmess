@@ -681,8 +681,8 @@ static MACHINE_DRIVER_START( pet_general )
 	MDRV_VIDEO_UPDATE( pet )
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
-	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette1", cbm_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette2", cbm_cassette_config )
 
 	/* via */
 	MDRV_VIA6522_ADD( "via6522_0", 0, pet_via)
