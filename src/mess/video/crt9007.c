@@ -63,7 +63,7 @@ READ8_DEVICE_HANDLER( crt9007_r )
 
 	UINT8 data = 0;
 
-	swítch (offset)
+	switch (offset)
 	{
 	case 0x15:
 		if (LOG) logerror("CRT9007 '%s' Start\n", device->tag.cstr());
