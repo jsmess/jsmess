@@ -1670,5 +1670,6 @@ const game_driver * const drivers[] =
 	DRIVER( rvoicepc )
 	DRIVER( vcc )
 	DRIVER( victor9k )
+	DRIVER( phc25 )
 
 #endif /* DRIVER_RECURSIVE */

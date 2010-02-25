@@ -361,6 +361,7 @@ DRVLIBS = \
 	$(MESSOBJ)/rockwell.a \
 	$(MESSOBJ)/samcoupe.a \
 	$(MESSOBJ)/samsung.a \
+	$(MESSOBJ)/sanyo.a \
 	$(MESSOBJ)/sega.a \
 	$(MESSOBJ)/sgi.a \
 	$(MESSOBJ)/sharp.a \
@@ -550,6 +551,7 @@ $(MESSOBJ)/act.a:				\
 	$(MESS_DRIVERS)/apricot.o	\
 	$(MESS_DRIVERS)/apricotf.o	\
 	$(MESS_FORMATS)/apridisk.o	\
+	$(MESS_DRIVERS)/victor9k.o	\
 
 $(MESSOBJ)/amiga.a:				\
 	$(MAME_VIDEO)/amiga.o		\
@@ -1259,6 +1261,9 @@ $(MESSOBJ)/samcoupe.a:			\
 $(MESSOBJ)/samsung.a:			\
 	$(MESS_DRIVERS)/spc1000.o	\
 
+$(MESSOBJ)/sanyo.a:				\
+	$(MESS_DRIVERS)/phc25.o		\
+
 $(MESSOBJ)/sega.a:				\
 	$(MESS_DRIVERS)/genesis.o	\
 	$(MESS_MACHINE)/genesis.o	\
@@ -1611,7 +1616,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/eti660.o	\
 	$(MESS_DRIVERS)/rvoice.o	\
 	$(MESS_DRIVERS)/fidelz80.o	\
-	$(MESS_DRIVERS)/victor9k.o	\
 
 
 
