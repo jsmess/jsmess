@@ -1010,7 +1010,7 @@ void spectrum_setup_plusd(running_machine *machine, UINT8 *snapdata, UINT32 snap
 {
     int i, j;
     UINT8 intr;
-    UINT16 addr, data;
+    UINT16 addr = 0, data;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
     running_device *cpu = devtag_get_device(machine, "maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
