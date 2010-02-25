@@ -420,9 +420,9 @@ static WRITE8_DEVICE_HANDLER ( pmd85_ppi_2_portc_w )
 const struct pit8253_config pmd85_pit8253_interface =
 {
 	{
-		{ 0,		NULL },
-		{ 2000000,	NULL },
-		{ 1,		NULL }
+		{ 0,		DEVCB_NULL,     DEVCB_NULL },
+		{ 2000000,	DEVCB_NULL,     DEVCB_NULL },
+		{ 1,		DEVCB_LINE_VCC, DEVCB_NULL }
 	}
 };
 
@@ -906,12 +906,7 @@ DRIVER_INIT ( c2717 )
 
 static TIMER_CALLBACK( setup_machine_state )
 {
-	running_device *pit8253 = devtag_get_device(machine, "pit8253");
-
-	pit8253_gate_w(pit8253, 0, 1);
-	pit8253_gate_w(pit8253, 1, 1);
-	pit8253_gate_w(pit8253, 2, 1);
-	if (pmd85_model!=MATO)
+	if (pmd85_model != MATO)
 	{
 		msm8251_connect(devtag_get_device(machine, "uart"), &pmd85_cassette_serial_connection);
 	}

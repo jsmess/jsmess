@@ -196,22 +196,22 @@ static I8255A_INTERFACE( fk1_ppi8255_interface_3 )
 	DEVCB_HANDLER(fk1_ppi_3_c_w)
 };
 
-static PIT8253_OUTPUT_CHANGED(fk1_pit_out0)
+static WRITE_LINE_DEVICE_HANDLER(fk1_pit_out0)
 {
 	// System time
-	logerror("PIT8253_OUTPUT_CHANGED(fk1_pit_out0)\n");
+	logerror("WRITE_LINE_DEVICE_HANDLER(fk1_pit_out0)\n");
 }
 
-static PIT8253_OUTPUT_CHANGED(fk1_pit_out1)
+static WRITE_LINE_DEVICE_HANDLER(fk1_pit_out1)
 {
 	// Timeout for disk operation
-	logerror("PIT8253_OUTPUT_CHANGED(fk1_pit_out1)\n");
+	logerror("WRITE_LINE_DEVICE_HANDLER(fk1_pit_out1)\n");
 }
 
-static PIT8253_OUTPUT_CHANGED(fk1_pit_out2)
+static WRITE_LINE_DEVICE_HANDLER(fk1_pit_out2)
 {
 	// Overflow for disk operations
-	logerror("PIT8253_OUTPUT_CHANGED(fk1_pit_out2)\n");
+	logerror("WRITE_LINE_DEVICE_HANDLER(fk1_pit_out2)\n");
 }
 
 
@@ -220,15 +220,18 @@ static const struct pit8253_config fk1_pit8253_intf =
 	{
 		{
 			50,
-			fk1_pit_out0
+			DEVCB_NULL,
+			DEVCB_LINE(fk1_pit_out0)
 		},
 		{
 			1000000,
-			fk1_pit_out1
+			DEVCB_NULL,
+			DEVCB_LINE(fk1_pit_out1)
 		},
 		{
 			0,
-			fk1_pit_out2
+			DEVCB_NULL,
+			DEVCB_LINE(fk1_pit_out2)
 		}
 	}
 };

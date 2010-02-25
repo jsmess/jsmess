@@ -269,14 +269,7 @@ void pc_speaker_set_input(running_machine *machine, UINT8 data)
  *
  *************************************************************/
 
-static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out0_changed )
-{
-	pc_state *st = (pc_state *)device->machine->driver_data;
-	pic8259_ir0_w(st->pic8259, state);
-}
-
-
-static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out1_changed )
+static WRITE_LINE_DEVICE_HANDLER( ibm5150_pit8253_out1_changed )
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
 	/* Trigger DMA channel #0 */
@@ -289,7 +282,7 @@ static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out1_changed )
 }
 
 
-static PIT8253_OUTPUT_CHANGED( ibm5150_pit8253_out2_changed )
+static WRITE_LINE_DEVICE_HANDLER( ibm5150_pit8253_out2_changed )
 {
 	pc_speaker_set_input( device->machine, state );
 }
@@ -300,13 +293,16 @@ const struct pit8253_config ibm5150_pit8253_config =
 	{
 		{
 			XTAL_14_31818MHz/12,				/* heartbeat IRQ */
-			ibm5150_pit8253_out0_changed
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
 		}, {
 			XTAL_14_31818MHz/12,				/* dram refresh */
-			ibm5150_pit8253_out1_changed
+			DEVCB_NULL,
+			DEVCB_LINE(ibm5150_pit8253_out1_changed)
 		}, {
 			XTAL_14_31818MHz/12,				/* pio port c pin 4, and speaker polling enough */
-			ibm5150_pit8253_out2_changed
+			DEVCB_NULL,
+			DEVCB_LINE(ibm5150_pit8253_out2_changed)
 		}
 	}
 };
@@ -323,13 +319,16 @@ const struct pit8253_config pcjr_pit8253_config =
 	{
 		{
 			XTAL_14_31818MHz/12,              /* heartbeat IRQ */
-			ibm5150_pit8253_out0_changed
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
 		}, {
 			XTAL_14_31818MHz/12,              /* dram refresh */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}, {
 			XTAL_14_31818MHz/12,              /* pio port c pin 4, and speaker polling enough */
-			ibm5150_pit8253_out2_changed
+			DEVCB_NULL,
+			DEVCB_LINE(ibm5150_pit8253_out2_changed)
 		}
 	}
 };
@@ -744,7 +743,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 	st->ppi_portc_switch_high = data & 0x08;
 	st->ppi_keyboard_clear = data & 0x80;
 	st->ppi_keyb_clock = data & 0x40;
-	pit8253_gate_w( st->pit8253, 2, data & 1);
+	pit8253_gate2_w(st->pit8253, BIT(data, 0));
 	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 
 	cassette_change_state( devtag_get_device(device->machine, "cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
@@ -902,7 +901,7 @@ static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 	st->ppi_portc_switch_high = data & 0x08;
 	st->ppi_keyboard_clear = data & 0x80;
 	st->ppi_keyb_clock = data & 0x40;
-	pit8253_gate_w( st->pit8253, 2, data & 0x01 );
+	pit8253_gate2_w(st->pit8253, BIT(data, 0));
 	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 
 	st->ppi_clock_signal = ( st->ppi_keyb_clock ) ? 1 : 0;
@@ -966,7 +965,7 @@ static WRITE8_DEVICE_HANDLER( pc_ppi_portb_w )
 	st->ppi_portc_switch_high = data & 0x08;
 	st->ppi_keyboard_clear = data & 0x80;
 	st->ppi_keyb_clock = data & 0x40;
-	pit8253_gate_w( st->pit8253, 2, data & 0x01 );
+	pit8253_gate2_w(st->pit8253, BIT(data, 0));
 	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 	pc_keyb_set_clock( st->ppi_keyb_clock );
 
@@ -992,7 +991,7 @@ static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 	/* KB controller port B */
 	st->ppi_portb = data;
 	st->ppi_portc_switch_high = data & 0x08;
-	pit8253_gate_w( devtag_get_device(device->machine, "pit8253"), 2, data & 1);
+	pit8253_gate2_w(devtag_get_device(device->machine, "pit8253"), BIT(data, 0));
 	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 
 	cassette_change_state( devtag_get_device(device->machine, "cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);

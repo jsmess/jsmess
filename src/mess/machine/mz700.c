@@ -52,27 +52,26 @@ I8255A_INTERFACE( mz700_ppi8255_interface )
 };
 
 
-static PIT8253_OUTPUT_CHANGED( pit_out0_changed );
-static PIT8253_OUTPUT_CHANGED( pit_out1_changed );
-static PIT8253_OUTPUT_CHANGED( pit_irq_2 );
+static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed );
+static WRITE_LINE_DEVICE_HANDLER( pit_irq_2 );
 
 const struct pit8253_config mz700_pit8253_config =
 {
 	{
-		/* clockin             callback */
-		{ XTAL_17_73447MHz/20, pit_out0_changed },
-		{	          15611.0, pit_out1_changed },
-		{		            0, pit_irq_2        },
+		/* clockin             gate            callback */
+		{ XTAL_17_73447MHz/20, DEVCB_NULL,     DEVCB_LINE(pit_out0_changed) },
+		{	          15611.0, DEVCB_LINE_VCC, DEVCB_LINE(pit8253_clk2_w)   },
+		{		            0, DEVCB_LINE_VCC, DEVCB_LINE(pit_irq_2)        },
 	}
 };
 
 const struct pit8253_config mz800_pit8253_config =
 {
 	{
-		/* clockin             callback */
-		{ XTAL_17_73447MHz/16, pit_out0_changed },
-		{	          15611.0, pit_out1_changed },
-		{		            0, pit_irq_2        },
+		/* clockin             gate            callback */
+		{ XTAL_17_73447MHz/16, DEVCB_NULL,     DEVCB_LINE(pit_out0_changed) },
+		{	          15611.0, DEVCB_LINE_VCC, DEVCB_LINE(pit8253_clk2_w)   },
+		{		            0, DEVCB_LINE_VCC, DEVCB_LINE(pit_irq_2)        },
 	}
 };
 
@@ -130,11 +129,17 @@ static READ8_HANDLER( mz700_e008_r )
 
 	data |= mz->other_timer;
 	data |= input_port_read(space->machine, "JOY");
-	data |= video_screen_get_hblank(space->machine->primary_screen);
+	data |= video_screen_get_hblank(space->machine->primary_screen) << 7;
 
 	LOG(1, "mz700_e008_r", ("%02X\n", data), space->machine);
 
 	return data;
+}
+
+static WRITE8_HANDLER( mz700_e008_w )
+{
+	mz_state *mz = (mz_state *)space->machine->driver_data;
+	pit8253_gate0_w(mz->pit, BIT(data, 0));
 }
 
 
@@ -283,15 +288,13 @@ WRITE8_HANDLER( mz700_bank_3_w )
 			{
 				memory_install_readwrite8_device_handler(spc, mz->ppi, 0xe000, 0xfff3, 0, 0x1ff0, i8255a_r, i8255a_w);
 				memory_install_readwrite8_device_handler(spc, mz->pit, 0xe004, 0xfff7, 0, 0x1ff0, pit8253_r, pit8253_w);
-				memory_install_read8_handler(spc, 0xe008, 0xfff8, 0, 0x1ff0, mz700_e008_r);
-				memory_install_write8_device_handler(spc, mz->pit, 0xe008, 0xfff8, 0, 0x1ff0, pit8253_gate_w);
+				memory_install_readwrite8_handler(spc, 0xe008, 0xfff8, 0, 0x1ff0, mz700_e008_r, mz700_e008_w);
 			}
 			else
 			{
 				memory_install_readwrite8_device_handler(spc, mz->ppi, 0xe000, 0xe003, 0, 0, i8255a_r, i8255a_w);
 				memory_install_readwrite8_device_handler(spc, mz->pit, 0xe004, 0xe007, 0, 0, pit8253_r, pit8253_w);
-				memory_install_read8_handler(spc, 0xe008, 0xe008, 0, 0, mz700_e008_r);
-				memory_install_write8_device_handler(spc, mz->pit, 0xe008, 0xe008, 0, 0, pit8253_gate_w);
+				memory_install_readwrite8_handler(spc, 0xe008, 0xe008, 0, 0, mz700_e008_r, mz700_e008_w);
 			}
 		}
 	}
@@ -417,7 +420,7 @@ WRITE8_HANDLER( mz700_bank_6_w )
 static UINT8 speaker_level = 0;
 static UINT8 prev_state = 0;
 
-static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
+static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 {
 	running_device *speaker = devtag_get_device(device->machine, "speaker");
 	if((prev_state==0) && (state==1)) {
@@ -427,16 +430,8 @@ static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 	speaker_level_w( speaker, speaker_level);
 }
 
-
-/* Timer 1 is the clock for timer 2 clock input */
-static PIT8253_OUTPUT_CHANGED( pit_out1_changed )
-{
-	pit8253_set_clock_signal(device, 2, state);
-}
-
-
 /* timer 2 is the AM/PM (12 hour) interrupt */
-static PIT8253_OUTPUT_CHANGED( pit_irq_2 )
+static WRITE_LINE_DEVICE_HANDLER( pit_irq_2 )
 {
 	mz_state *mz = (mz_state *)device->machine->driver_data;
 

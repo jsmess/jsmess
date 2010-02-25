@@ -1623,7 +1623,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pic_irq )
 //  logerror("PIC#1: set IRQ line to %i\n",interrupt);
 }
 
-static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
+static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 {
 	running_device* dev = devtag_get_device(device->machine,"pic8259_master");
 
@@ -1633,7 +1633,7 @@ static PIT8253_OUTPUT_CHANGED( towns_pit_out0_changed )
 	}
 }
 
-static PIT8253_OUTPUT_CHANGED( towns_pit_out1_changed )
+static WRITE_LINE_DEVICE_HANDLER( towns_pit_out1_changed )
 {
 //  running_device* dev = devtag_get_device(device->machine,"pic8259_master");
 
@@ -1996,15 +1996,18 @@ static const struct pit8253_config towns_pit8253_config =
 	{
 		{
 			307200,
-			towns_pit_out0_changed
+			DEVCB_NULL,
+			DEVCB_LINE(towns_pit_out0_changed)
 		},
 		{
 			307200,
-			towns_pit_out1_changed
+			DEVCB_NULL,
+			DEVCB_LINE(towns_pit_out1_changed)
 		},
 		{
 			307200,
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}
 	}
 };

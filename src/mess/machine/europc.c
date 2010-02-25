@@ -178,7 +178,7 @@ WRITE8_HANDLER( europc_pio_w )
 		europc_pio.port61=data;
 //      if (data == 0x30) pc1640.port62 = (pc1640.port65 & 0x10) >> 4;
 //      else if (data == 0x34) pc1640.port62 = pc1640.port65 & 0xf;
-		pit8253_gate_w(devtag_get_device(space->machine, "pit8253"), 2, BIT(data, 0));
+		pit8253_gate2_w(devtag_get_device(space->machine, "pit8253"), BIT(data, 0));
 		pc_speaker_set_spkrdata(space->machine, BIT(data, 1));
 		pc_keyb_set_clock(BIT(data, 6));
 		break;

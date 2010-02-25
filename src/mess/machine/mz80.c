@@ -70,7 +70,8 @@ static WRITE8_DEVICE_HANDLER(mz80k_8255_portc_w)
 
 static UINT8 speaker_level = 0;
 static UINT8 prev_state = 0;
-static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
+
+static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 {
 	running_device *speaker = devtag_get_device(device->machine, "speaker");
 	if((prev_state==0) && (state==1)) {
@@ -80,14 +81,7 @@ static PIT8253_OUTPUT_CHANGED( pit_out0_changed )
 	speaker_level_w( speaker, speaker_level);
 }
 
-
-static PIT8253_OUTPUT_CHANGED( pit_out1_changed )
-{
-	pit8253_set_clock_signal( device, 2, state );
-}
-
-
-static PIT8253_OUTPUT_CHANGED( pit_out2_changed )
+static WRITE_LINE_DEVICE_HANDLER( pit_out2_changed )
 {
 	cputag_set_input_line(device->machine, "maincpu", 0, HOLD_LINE);
 }
@@ -105,10 +99,10 @@ I8255A_INTERFACE( mz80k_8255_int )
 const struct pit8253_config mz80k_pit8253_config =
 {
 	{
-		/* clockin    irq callback    */
-		{ XTAL_8MHz/  4,  pit_out0_changed },
-		{ XTAL_8MHz/256,  pit_out1_changed },
-		{		      0,  pit_out2_changed },
+		/* clockin        gate        callback    */
+		{ XTAL_8MHz/  4,  DEVCB_NULL, DEVCB_LINE(pit_out0_changed) },
+		{ XTAL_8MHz/256,  DEVCB_NULL, DEVCB_LINE(pit8253_clk2_w)   },
+		{		      0,  DEVCB_NULL, DEVCB_LINE(pit_out2_changed) },
 	}
 };
 
@@ -119,6 +113,5 @@ READ8_HANDLER(mz80k_strobe_r)
 WRITE8_HANDLER(mz80k_strobe_w)
 {
 	running_device *pit = devtag_get_device(space->machine, "pit8253");
-	pit8253_gate_w(pit,0,data);
+	pit8253_gate0_w(pit, BIT(data, 0));
 }
-

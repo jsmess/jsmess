@@ -778,11 +778,10 @@ I8237_INTERFACE( bebox_dma8237_2_config )
  *
  *************************************/
 
-static void bebox_timer0_w(running_device *device, int state)
+static WRITE_LINE_DEVICE_HANDLER( bebox_timer0_w )
 {
-	if ( bebox_devices.pic8259_master ) {
+	if (bebox_devices.pic8259_master)
 		pic8259_ir0_w(bebox_devices.pic8259_master, state);
-	}
 }
 
 
@@ -791,15 +790,18 @@ const struct pit8253_config bebox_pit8254_config =
 	{
 		{
 			4772720/4,				/* heartbeat IRQ */
-			bebox_timer0_w
+			DEVCB_NULL,
+			DEVCB_LINE(bebox_timer0_w)
 		},
 		{
 			4772720/4,				/* dram refresh */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		},
 		{
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}
 	}
 };

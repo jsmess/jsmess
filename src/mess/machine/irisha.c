@@ -117,15 +117,18 @@ const struct pit8253_config irisha_pit8253_intf =
 	{
 		{
 			0,
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		},
 		{
 			0,
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		},
 		{
 			2000000,
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}
 	}
 };

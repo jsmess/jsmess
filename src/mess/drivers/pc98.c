@@ -816,23 +816,21 @@ static I8255A_INTERFACE( printer_intf )
 	DEVCB_NULL					/* Port C write */
 };
 
-static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
-{
-	pic8259_ir0_w(devtag_get_device(device->machine, "pic8259_master"), state);
-}
-
 static const struct pit8253_config pit8253_config =
 {
 	{
 		{
 			16000000/4,				/* heartbeat IRQ */
-			pc_timer0_w
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE("pic8259_master", pic8259_ir0_w)
 		}, {
 			16000000/4,				/* dram refresh */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}, {
 			16000000/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}
 	}
 };

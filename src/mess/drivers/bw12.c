@@ -583,15 +583,18 @@ static const struct pit8253_config bw12_pit8253_intf =
 	{
 		{
 			XTAL_1_8432MHz,
-			bw12_pit8253_out0_w,
+			DEVCB_NULL,
+			DEVCB_LINE(bw12_pit8253_out0_w)
 		},
 		{
 			XTAL_1_8432MHz,
-			bw12_pit8253_out1_w,
+			DEVCB_NULL,
+			DEVCB_LINE(bw12_pit8253_out1_w)
 		},
 		{
 			XTAL_1_8432MHz,
-			bw12_pit8253_out2_w,
+			DEVCB_NULL,
+			DEVCB_LINE(bw12_pit8253_out2_w)
 		}
 	}
 };

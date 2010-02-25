@@ -76,18 +76,12 @@ static const i8255a_interface apricot_i8255a_intf =
 	DEVCB_NULL
 };
 
-static PIT8253_OUTPUT_CHANGED( apricot_pit8253_out0 )
-{
-	apricot_state *apricot = (apricot_state *)device->machine->driver_data;
-	pic8259_ir6_w(apricot->pic8259, state);
-}
-
-static PIT8253_OUTPUT_CHANGED( apricot_pit8253_out1 )
+static WRITE_LINE_DEVICE_HANDLER( apricot_pit8253_out1 )
 {
 	/* connected to the rs232c interface */
 }
 
-static PIT8253_OUTPUT_CHANGED( apricot_pit8253_out2 )
+static WRITE_LINE_DEVICE_HANDLER( apricot_pit8253_out2 )
 {
 	/* connected to the rs232c interface */
 }
@@ -95,9 +89,9 @@ static PIT8253_OUTPUT_CHANGED( apricot_pit8253_out2 )
 static const struct pit8253_config apricot_pit8253_intf =
 {
 	{
-		{ XTAL_4MHz / 16, apricot_pit8253_out0 },
-		{ 0 /*XTAL_4MHz / 2*/, apricot_pit8253_out1 },
-		{ 0 /*XTAL_4MHz / 2*/, apricot_pit8253_out2 }
+		{ XTAL_4MHz / 16,      DEVCB_LINE_VCC, DEVCB_DEVICE_LINE("ic31", pic8259_ir6_w) },
+		{ 0 /*XTAL_4MHz / 2*/, DEVCB_LINE_VCC, DEVCB_LINE(apricot_pit8253_out1) },
+		{ 0 /*XTAL_4MHz / 2*/, DEVCB_LINE_VCC, DEVCB_LINE(apricot_pit8253_out2) }
 	}
 };
 

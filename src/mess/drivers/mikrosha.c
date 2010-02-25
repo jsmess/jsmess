@@ -139,7 +139,7 @@ static const cassette_config mikrosha_cassette_config =
 };
 
 
-static PIT8253_OUTPUT_CHANGED(mikrosha_pit_out2)
+static WRITE_LINE_DEVICE_HANDLER(mikrosha_pit_out2)
 {
 
 }
@@ -149,15 +149,18 @@ static const struct pit8253_config mikrosha_pit8253_intf =
 	{
 		{
 			0,
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		},
 		{
 			0,
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		},
 		{
 			2000000,
-			mikrosha_pit_out2
+			DEVCB_NULL,
+			DEVCB_LINE(mikrosha_pit_out2)
 		}
 	}
 };

@@ -431,11 +431,11 @@ const struct pit8253_config compis_pit8253_config =
 {
 	{
 		/* Timer0 */
-		{4770000/4, NULL },
+		{4770000/4, DEVCB_NULL, DEVCB_NULL },
 		/* Timer1 */
-		{4770000/4, NULL },
+		{4770000/4, DEVCB_NULL, DEVCB_NULL },
 		/* Timer2 */
-		{4770000/4, NULL }
+		{4770000/4, DEVCB_NULL, DEVCB_NULL }
 	}
 };
 
@@ -443,11 +443,11 @@ const struct pit8253_config compis_pit8254_config =
 {
 	{
 		/* Timer0 */
-		{4770000/4, NULL },
+		{4770000/4, DEVCB_NULL, DEVCB_NULL },
 		/* Timer1 */
-		{4770000/4, NULL },
+		{4770000/4, DEVCB_NULL, DEVCB_NULL },
 		/* Timer2 */
-		{4770000/4, NULL }
+		{4770000/4, DEVCB_NULL, DEVCB_NULL }
 	}
 };
 

@@ -160,19 +160,12 @@ static VIDEO_UPDATE( victor9k )
 
 /* Intel 8253 Interface */
 
-static PIT8253_OUTPUT_CHANGED( mux_serial_b_w )
+static WRITE_LINE_DEVICE_HANDLER( mux_serial_b_w )
 {
 }
 
-static PIT8253_OUTPUT_CHANGED( mux_serial_a_w )
+static WRITE_LINE_DEVICE_HANDLER( mux_serial_a_w )
 {
-}
-
-static PIT8253_OUTPUT_CHANGED( timer_w )
-{
-	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
-
-	pic8259_ir2_w(driver_state->pic, state);
 }
 
 static const struct pit8253_config pit_intf =
@@ -180,13 +173,16 @@ static const struct pit8253_config pit_intf =
 	{
 		{
 			2500000,
-			mux_serial_b_w
+			DEVCB_NULL,
+			DEVCB_LINE(mux_serial_b_w)
 		}, {
 			2500000,
-			mux_serial_a_w
+			DEVCB_NULL,
+			DEVCB_LINE(mux_serial_a_w)
 		}, {
 			100000,
-			timer_w
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir2_w)
 		}
 	}
 };

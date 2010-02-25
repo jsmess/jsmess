@@ -84,13 +84,16 @@ static const struct pit8253_config ip22_pit8254_config =
 	{
 		{
 			1000000,				/* Timer 0: 1MHz */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}, {
 			1000000,				/* Timer 1: 1MHz */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}, {
 			1000000,				/* Timer 2: 1MHz */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}
 	}
 };

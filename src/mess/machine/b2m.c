@@ -139,40 +139,30 @@ static void b2m_set_bank(running_machine *machine,int bank)
 	}
 }
 
-static PIT8253_OUTPUT_CHANGED(bm2_pit_out0)
-{
-	b2m_state *st = (b2m_state *)device->machine->driver_data;
-	pic8259_ir1_w(st->pic, state);
-}
 
-
-static PIT8253_OUTPUT_CHANGED(bm2_pit_out1)
+static WRITE_LINE_DEVICE_HANDLER(bm2_pit_out1)
 {
 	b2m_state *st = (b2m_state *) device->machine->driver_data;
 	speaker_level_w(st->speaker, state);
-
 }
-
-static PIT8253_OUTPUT_CHANGED(bm2_pit_out2)
-{
-	pit8253_set_clock_signal( device, 0, state );
-}
-
 
 const struct pit8253_config b2m_pit8253_intf =
 {
 	{
 		{
 			0,
-			bm2_pit_out0
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE("pic8259", pic8259_ir1_w)
 		},
 		{
 			2000000,
-			bm2_pit_out1
+			DEVCB_NULL,
+			DEVCB_LINE(bm2_pit_out1)
 		},
 		{
 			2000000,
-			bm2_pit_out2
+			DEVCB_NULL,
+			DEVCB_LINE(pit8253_clk0_w)
 		}
 	}
 };

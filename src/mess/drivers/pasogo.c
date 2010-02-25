@@ -468,23 +468,21 @@ static MACHINE_RESET( pasogo )
 
 //static const unsigned i86_address_mask = 0x000fffff;
 
-static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
-{
-	pic8259_ir0_w(devtag_get_device(device->machine, "pic8259"), state);
-}
-
 static const struct pit8253_config pc_pit8254_config =
 {
 	{
 		{
 			4772720/4,				/* heartbeat IRQ */
-			pc_timer0_w
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE("pic8259", pic8259_ir0_w)
 		}, {
 			4772720/4,				/* dram refresh */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}, {
 			4772720/4,				/* pio port c pin 4, and speaker polling enough */
-			NULL
+			DEVCB_NULL,
+			DEVCB_NULL
 		}
 	}
 };

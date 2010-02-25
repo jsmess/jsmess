@@ -479,7 +479,7 @@ static const upd765_interface mm1_upd765_intf =
 
 /* 8253 Interface */
 
-static PIT8253_OUTPUT_CHANGED( itxc_w )
+static WRITE_LINE_DEVICE_HANDLER( itxc_w )
 {
 	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
@@ -489,7 +489,7 @@ static PIT8253_OUTPUT_CHANGED( itxc_w )
 	}
 }
 
-static PIT8253_OUTPUT_CHANGED( irxc_w )
+static WRITE_LINE_DEVICE_HANDLER( irxc_w )
 {
 	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
@@ -499,7 +499,7 @@ static PIT8253_OUTPUT_CHANGED( irxc_w )
 	}
 }
 
-static PIT8253_OUTPUT_CHANGED( auxc_w )
+static WRITE_LINE_DEVICE_HANDLER( auxc_w )
 {
 	mm1_state *driver_state = (mm1_state *)device->machine->driver_data;
 
@@ -512,13 +512,16 @@ static const struct pit8253_config mm1_pit8253_intf =
 	{
 		{
 			XTAL_6_144MHz/2/2,
-			itxc_w
+			DEVCB_NULL,
+			DEVCB_LINE(itxc_w)
 		}, {
 			XTAL_6_144MHz/2/2,
-			irxc_w
+			DEVCB_NULL,
+			DEVCB_LINE(irxc_w)
 		}, {
 			XTAL_6_144MHz/2/2,
-			auxc_w
+			DEVCB_NULL,
+			DEVCB_LINE(auxc_w)
 		}
 	}
 };

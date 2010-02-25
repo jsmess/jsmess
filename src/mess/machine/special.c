@@ -207,21 +207,21 @@ WRITE8_HANDLER( specimx_select_bank )
 	specimx_set_bank(space->machine, offset, data);
 }
 
-static PIT8253_OUTPUT_CHANGED( specimx_pit8253_out0_changed )
+static WRITE_LINE_DEVICE_HANDLER( specimx_pit8253_out0_changed )
 {
 	specimx_set_input( device->machine, 0, state );
 }
 
 
 
-static PIT8253_OUTPUT_CHANGED(specimx_pit8253_out1_changed)
+static WRITE_LINE_DEVICE_HANDLER(specimx_pit8253_out1_changed)
 {
 	specimx_set_input( device->machine, 1, state );
 }
 
 
 
-static PIT8253_OUTPUT_CHANGED(specimx_pit8253_out2_changed)
+static WRITE_LINE_DEVICE_HANDLER(specimx_pit8253_out2_changed)
 {
 	specimx_set_input( device->machine, 2, state );
 }
@@ -233,15 +233,18 @@ const struct pit8253_config specimx_pit8253_intf =
 	{
 		{
 			2000000,
-			specimx_pit8253_out0_changed
+			DEVCB_NULL,
+			DEVCB_LINE(specimx_pit8253_out0_changed)
 		},
 		{
 			2000000,
-			specimx_pit8253_out1_changed
+			DEVCB_NULL,
+			DEVCB_LINE(specimx_pit8253_out1_changed)
 		},
 		{
 			2000000,
-			specimx_pit8253_out2_changed
+			DEVCB_NULL,
+			DEVCB_LINE(specimx_pit8253_out2_changed)
 		}
 	}
 };
@@ -256,9 +259,9 @@ static TIMER_CALLBACK( setup_pit8253_gates )
 {
 	running_device *pit8253 = devtag_get_device(machine, "pit8253");
 
-	pit8253_gate_w(pit8253, 0, 0);
-	pit8253_gate_w(pit8253, 1, 0);
-	pit8253_gate_w(pit8253, 2, 0);
+	pit8253_gate0_w(pit8253, 0);
+	pit8253_gate1_w(pit8253, 0);
+	pit8253_gate2_w(pit8253, 0);
 }
 
 MACHINE_RESET( specimx )

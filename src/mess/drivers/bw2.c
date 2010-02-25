@@ -430,7 +430,7 @@ static I8255A_INTERFACE( bw2_8255_interface )
 
 /* PIT */
 
-static PIT8253_OUTPUT_CHANGED( bw2_timer0_w )
+static WRITE_LINE_DEVICE_HANDLER( bw2_timer0_w )
 {
 	bw2_state *driver_state = (bw2_state *)device->machine->driver_data;
 
@@ -438,12 +438,7 @@ static PIT8253_OUTPUT_CHANGED( bw2_timer0_w )
 	msm8251_receive_clock(driver_state->msm8251);
 }
 
-static PIT8253_OUTPUT_CHANGED( bw2_timer1_w )
-{
-	pit8253_set_clock_signal(device, 2, state);
-}
-
-static PIT8253_OUTPUT_CHANGED( bw2_timer2_w )
+static WRITE_LINE_DEVICE_HANDLER( bw2_timer2_w )
 {
 	bw2_state *driver_state = (bw2_state *)device->machine->driver_data;
 
@@ -462,15 +457,18 @@ static const struct pit8253_config bw2_pit8253_interface =
 	{
 		{
 			XTAL_4MHz,	/* 8251 USART TXC, RXC */
-			bw2_timer0_w
+			DEVCB_NULL,
+			DEVCB_LINE(bw2_timer0_w)
 		},
 		{
 			11000,		/* LCD controller */
-			bw2_timer1_w
+			DEVCB_NULL,
+			DEVCB_LINE(pit8253_clk2_w)
 		},
 		{
 			0,		/* Floppy /MTRON */
-			bw2_timer2_w
+			DEVCB_NULL,
+			DEVCB_LINE(bw2_timer2_w)
 		}
 	}
 };
@@ -526,7 +524,7 @@ static MACHINE_START( bw2 )
 	memory_configure_bank(machine, "bank1", BANK_RAM1, 1, state->work_ram, 0);
 	memory_configure_bank(machine, "bank1", BANK_VRAM, 1, state->video_ram, 0);
 	memory_configure_bank(machine, "bank1", BANK_ROM, 1, memory_region(machine, "ic1"), 0);
-	
+
 	/* register for state saving */
 	state_save_register_global(machine, state->keyboard_row);
 	state_save_register_global_pointer(machine, state->work_ram, messram_get_size(devtag_get_device(machine, "messram")));

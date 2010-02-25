@@ -156,34 +156,31 @@ MACHINE_START(pp01)
 }
 
 
-static PIT8253_OUTPUT_CHANGED(pp01_pit_out0)
+static WRITE_LINE_DEVICE_HANDLER( pp01_pit_out0 )
 {
 }
 
-static PIT8253_OUTPUT_CHANGED(pp01_pit_out1)
+static WRITE_LINE_DEVICE_HANDLER( pp01_pit_out1 )
 {
 }
-
-static PIT8253_OUTPUT_CHANGED(pp01_pit_out2)
-{
-	pit8253_set_clock_signal( device, 0, state );
-}
-
 
 const struct pit8253_config pp01_pit8253_intf =
 {
 	{
 		{
 			0,
-			pp01_pit_out0
+			DEVCB_NULL,
+			DEVCB_LINE(pp01_pit_out0)
 		},
 		{
 			2000000,
-			pp01_pit_out1
+			DEVCB_NULL,
+			DEVCB_LINE(pp01_pit_out1)
 		},
 		{
 			2000000,
-			pp01_pit_out2
+			DEVCB_NULL,
+			DEVCB_LINE(pit8253_clk0_w)
 		}
 	}
 };

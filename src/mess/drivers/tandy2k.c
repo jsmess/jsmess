@@ -99,15 +99,15 @@ static WRITE8_HANDLER( enable_w )
 	state->extclk = BIT(data, 1);
 
 	/* speaker gate */
-	pit8253_gate_w(state->pit, 0, BIT(data, 2));
+	pit8253_gate0_w(state->pit, BIT(data, 2));
 
 	/* speaker data */
 	state->spkrdata = BIT(data, 3);
 	speaker_update(state);
 
 	/* refresh and baud rate clocks */
-	pit8253_gate_w(state->pit, 1, BIT(data, 4));
-	pit8253_gate_w(state->pit, 2, BIT(data, 4));
+	pit8253_gate1_w(state->pit, BIT(data, 4));
+	pit8253_gate2_w(state->pit, BIT(data, 4));
 
 	/* FDC reset */
 	upd765_reset_w(state->fdc, BIT(data, 5));
@@ -472,7 +472,7 @@ static const msm8251_interface i8251_intf =
 
 /* Intel 8253 Interface */
 
-static PIT8253_OUTPUT_CHANGED( outspkr_w )
+static WRITE_LINE_DEVICE_HANDLER( outspkr_w )
 {
 	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
 
@@ -480,7 +480,7 @@ static PIT8253_OUTPUT_CHANGED( outspkr_w )
 	speaker_update(driver_state);
 }
 
-static PIT8253_OUTPUT_CHANGED( intbrclk_w )
+static WRITE_LINE_DEVICE_HANDLER( intbrclk_w )
 {
 	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
 
@@ -491,7 +491,7 @@ static PIT8253_OUTPUT_CHANGED( intbrclk_w )
 	}
 }
 
-static PIT8253_OUTPUT_CHANGED( rfrqpulse_w )
+static WRITE_LINE_DEVICE_HANDLER( rfrqpulse_w )
 {
 }
 
@@ -500,13 +500,16 @@ static const struct pit8253_config i8253_intf =
 	{
 		{
 			XTAL_16MHz/16,
-			outspkr_w
+			DEVCB_NULL,
+			DEVCB_LINE(outspkr_w)
 		}, {
 			XTAL_16MHz/8,
-			intbrclk_w
+			DEVCB_NULL,
+			DEVCB_LINE(intbrclk_w)
 		}, {
 			XTAL_16MHz/8,
-			rfrqpulse_w
+			DEVCB_NULL,
+			DEVCB_LINE(rfrqpulse_w)
 		}
 	}
 };

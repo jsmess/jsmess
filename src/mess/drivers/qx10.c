@@ -327,9 +327,9 @@ static UPD7201_INTERFACE(qx10_upd7201_interface)
 static const struct pit8253_config qx10_pit8253_1_config =
 {
 	{
-		{ 1200, NULL },
-		{ 1200, NULL },
-		{ MAIN_CLK / 8, NULL },
+		{ 1200,         DEVCB_NULL,     DEVCB_NULL },
+		{ 1200,         DEVCB_LINE_VCC, DEVCB_NULL },
+		{ MAIN_CLK / 8, DEVCB_NULL,     DEVCB_NULL },
 	}
 };
 
@@ -343,9 +343,9 @@ static const struct pit8253_config qx10_pit8253_1_config =
 static const struct pit8253_config qx10_pit8253_2_config =
 {
 	{
-		{ MAIN_CLK / 8, NULL },
-		{ MAIN_CLK / 8, NULL },
-		{ MAIN_CLK / 8, NULL },
+		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_NULL },
+		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_NULL },
+		{ MAIN_CLK / 8, DEVCB_LINE_VCC, DEVCB_NULL },
 	}
 };
 

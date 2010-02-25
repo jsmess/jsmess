@@ -927,7 +927,7 @@ I8255A_INTERFACE( pk8020_ppi8255_interface_3 )
 	DEVCB_NULL
 };
 
-static PIT8253_OUTPUT_CHANGED(pk8020_pit_out0)
+static WRITE_LINE_DEVICE_HANDLER( pk8020_pit_out0 )
 {
 	running_device *speaker = devtag_get_device(device->machine, "speaker");
 
@@ -937,13 +937,8 @@ static PIT8253_OUTPUT_CHANGED(pk8020_pit_out0)
 }
 
 
-static PIT8253_OUTPUT_CHANGED(pk8020_pit_out1)
+static WRITE_LINE_DEVICE_HANDLER(pk8020_pit_out1)
 {
-}
-
-static PIT8253_OUTPUT_CHANGED(pk8020_pit_out2)
-{
-	pic8259_ir5_w(devtag_get_device(device->machine, "pic8259"), state);
 }
 
 
@@ -952,15 +947,18 @@ const struct pit8253_config pk8020_pit8253_intf =
 	{
 		{
 			XTAL_20MHz / 10,
-			pk8020_pit_out0
+			DEVCB_NULL,
+			DEVCB_LINE(pk8020_pit_out0)
 		},
 		{
 			XTAL_20MHz / 10,
-			pk8020_pit_out1
+			DEVCB_NULL,
+			DEVCB_LINE(pk8020_pit_out1)
 		},
 		{
 			(XTAL_20MHz / 8) / 164,
-			pk8020_pit_out2
+			DEVCB_NULL,
+			DEVCB_DEVICE_LINE("pic8259", pic8259_ir5_w)
 		}
 	}
 };
