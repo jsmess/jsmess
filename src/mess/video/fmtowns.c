@@ -938,9 +938,9 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	if(towns_display_page_sel != 0)
 		off = 0x20000;
 	if(layer == 0)
-		linesize = towns_crtc_reg[20] * 4;
+		linesize = towns_crtc_reg[20] * 8;
 	else
-		linesize = towns_crtc_reg[24] * 4;
+		linesize = towns_crtc_reg[24] * 8;
 
 	if(layer != 0)
 	{
