@@ -369,15 +369,41 @@ WRITE8_HANDLER( towns_video_cff80_w )
  */
 READ8_HANDLER(towns_video_440_r)
 {
+	UINT8 ret = 0;
+	UINT16 xpos,ypos;
+	
 	switch(offset)
 	{
 		case 0x00:
 			return towns_crtc_sel;
 		case 0x02:
 			logerror("CRTC: reading register %i (0x442) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
+			if(towns_crtc_sel == 30)
+					return 0x00;
 			return towns_crtc_reg[towns_crtc_sel] & 0x00ff;
 		case 0x03:
 			logerror("CRTC: reading register %i (0x443) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
+			if(towns_crtc_sel == 30)
+			{
+				// check video position
+				xpos = video_screen_get_hpos(space->machine->primary_screen);
+				ypos = video_screen_get_vpos(space->machine->primary_screen);
+				
+				if(xpos < (towns_crtc_reg[0] & 0xfe))
+					ret |= 0x02;
+				if(ypos < (towns_crtc_reg[6] & 0x1f))
+					ret |= 0x04;
+				if(xpos < towns_crtc_layerscr[0].max_x && xpos > towns_crtc_layerscr[0].min_x)
+					ret |= 0x10;
+				if(xpos < towns_crtc_layerscr[1].max_x && xpos > towns_crtc_layerscr[1].min_x)
+					ret |= 0x20;
+				if(ypos < towns_crtc_layerscr[0].max_y && ypos > towns_crtc_layerscr[0].min_y)
+					ret |= 0x40;
+				if(ypos < towns_crtc_layerscr[1].max_y && ypos > towns_crtc_layerscr[1].min_y)
+					ret |= 0x80;
+					
+				return ret;
+			}
 			return (towns_crtc_reg[towns_crtc_sel] & 0xff00) >> 8;
 		case 0x08:
 			return towns_video_sel;
@@ -388,10 +414,10 @@ READ8_HANDLER(towns_video_440_r)
 			if(towns_dpmd_flag != 0)
 			{
 				towns_dpmd_flag = 0;
-				return 0x80;
+				ret |= 0x80;
 			}
-			else
-				return 0x00;
+			ret |= (towns_vblank_flag ? 0x02 : 0x00);  // TODO: figure out just what this bit is...			
+			return ret;
 		case 0x10:
 			return towns_sprite_sel;
 		case 0x12:
@@ -907,14 +933,19 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	int x;
 	UINT8 colour;
 	int hzoom = 1;
+	int linesize;
 
 	if(towns_display_page_sel != 0)
 		off = 0x20000;
+	if(layer == 0)
+		linesize = towns_crtc_reg[20] * 4;
+	else
+		linesize = towns_crtc_reg[24] * 4;
+
 	if(layer != 0)
 	{
 		if(!(towns_video_reg[0] & 0x10))
 			return;
-		off += 0x40000;
 		off += towns_crtc_reg[21];  // initial offset
 		if(towns_crtc_reg[27] & 0x0100)
 			hzoom = 2;
@@ -926,13 +957,13 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 			hzoom = 2;
 	}
 
-	off += (line * (512 / hzoom));
+	off += line * linesize;
 
 	if(hzoom == 1)
 	{
 		for(x=rect->min_x;x<rect->max_x;x++)
 		{
-			colour = towns_gfxvram[off];
+			colour = towns_gfxvram[off+(layer*0x40000)];
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
@@ -947,7 +978,7 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	{  // x2 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=2)
 		{
-			colour = towns_gfxvram[off];
+			colour = towns_gfxvram[off+(layer*0x40000)+1];
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =

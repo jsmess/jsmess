@@ -49,9 +49,9 @@
  * 0x0200-0f: Floppy controller (MB8877A)
  * 0x0400   : Video / CRTC (unknown)
  * 0x0404   : Disable VRAM, CMOS, memory-mapped I/O (everything in low memory except the BIOS)
- * 0x0440-5f: Video / CRTC (unknown)
+ * 0x0440-5f: Video / CRTC 
  * 0x0480 RW: bit 1 = disable BIOS ROM
- * 0x04c0-cf: CD-ROM controller (unknown)
+ * 0x04c0-cf: CD-ROM controller 
  * 0x04d5   : Sound mute
  * 0x04d8   : YM3438 control port A / status
  * 0x04da   : YM3438 data port A / status
@@ -738,7 +738,7 @@ static WRITE8_HANDLER(towns_sound_ctrl_w)
 {
 	switch(offset)
 	{
-		case 0x02:
+		case 0x02:  // PCM channel interrupt mask
 			towns_pcm_channel_mask = data;
 			break;
 		default:
@@ -1648,10 +1648,6 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   // may not be (and probably is not) correct
   AM_RANGE(0x00000000, 0x000bffff) AM_RAM
   AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
-//  AM_RANGE(0x000c8000, 0x000c8fff) AM_READWRITE(SMH_BANK(2),SMH_BANK(2))
-//  AM_RANGE(0x000c9000, 0x000c9fff) AM_READWRITE(SMH_BANK(3),SMH_BANK(3))
-//  AM_RANGE(0x000ca000, 0x000ca7ff) AM_READWRITE(SMH_BANK(4),SMH_BANK(5))
-//  AM_RANGE(0x000ca800, 0x000cafff) AM_READWRITE(SMH_BANK(10),SMH_BANK(10))
   AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
   AM_RANGE(0x000cb000, 0x000cbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
   AM_RANGE(0x000cc000, 0x000cff7f) AM_RAMBANK("bank8")
@@ -1661,7 +1657,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
-  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - seems to be needed to boot
+  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM
   AM_RANGE(0x80000000, 0x8007ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
   AM_RANGE(0x81000000, 0x8101ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
   AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
@@ -1685,7 +1681,7 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
-  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - seems to be needed to boot
+  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM - the Marty has 6MB RAM (not upgradable)
   AM_RANGE(0x00600000, 0x0067ffff) AM_ROM AM_REGION("user",0x000000)  // OS
   AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
   AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
@@ -1695,19 +1691,11 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
   AM_RANGE(0x00f80000, 0x00f80fff) AM_DEVREADWRITE8("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
   AM_RANGE(0x00fc0000, 0x00ffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
-/*  AM_RANGE(0x80000000, 0x8007ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
-  AM_RANGE(0x81000000, 0x8101ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
-  AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
-  AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
-  AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
-  AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE8(towns_cmos_r,towns_cmos_w,0xffffffff) // CMOS (mirror?)
-  AM_RANGE(0xc2200000, 0xc2200fff) AM_NOP  // WAVE RAM
-*/AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
+  AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   // I/O ports derived from FM Towns/Bochs, these are specific to the FM Towns
-  // Some common PC ports are likely to also be used
   // System ports
   AM_RANGE(0x0000,0x0003) AM_DEVREADWRITE8("pic8259_master", pic8259_r, pic8259_w, 0x00ff00ff)
   AM_RANGE(0x0010,0x0013) AM_DEVREADWRITE8("pic8259_slave", pic8259_r, pic8259_w, 0x00ff00ff)
