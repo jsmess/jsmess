@@ -757,12 +757,12 @@ static READ32_HANDLER(towns_padport_r)
 	if(towns_pad_mask & 0x10)
 		ret |= (input_port_read(space->machine,"joy1") & 0x3f) | 0x00000040;
 	else
-		ret |= 0x0000003f;
+		ret |= (input_port_read(space->machine,"joy1") & 0x0f) | 0x00000030;
 
 	if(towns_pad_mask & 0x20)
 		ret |= ((input_port_read(space->machine,"joy2") & 0x3f) << 16) | 0x00400000;
 	else
-		ret |= 0x003f0000;
+		ret |= ((input_port_read(space->machine,"joy2") & 0x0f) << 16) | 0x00300000;
 
 	if(extra1 & 0x01) // Run button = left+right
 		ret &= ~0x0000000c;
