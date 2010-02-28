@@ -456,7 +456,7 @@ static WRITE8_HANDLER(towns_floppy_w)
 				floppy_drive_set_ready_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10,0);
 			}
 			wd17xx_set_side(fdc,(data & 0x04)>>2);
-			wd17xx_dden_w(fdc, BIT(data, 1));
+			wd17xx_dden_w(fdc, BIT(~data, 1));
 
 			towns_fdc_irq6mask = data & 0x01;
 			logerror("FDC: write %02x to offset 0x08\n",data);
