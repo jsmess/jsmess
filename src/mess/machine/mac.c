@@ -931,7 +931,6 @@ static void mac_scsi_irq(running_machine *machine, int state)
 
 	if ((mac->mac_scsiirq_enable) && ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC)))
 	{
-		printf("SCSI IRQ -> %d\n", state);
 		scsi_interrupt = state;
 		mac_field_interrupts(machine);
 	}
@@ -940,12 +939,12 @@ static void mac_scsi_irq(running_machine *machine, int state)
 /* *************************************************************************
  * SCC
  *
- * Serial Control Chip
+ * Serial Communications Controller
  * *************************************************************************/
 
-void mac_scc_ack(running_device *device)
+void mac_scc_irq(running_device *device, int status)
 {
-	set_scc_interrupt(device->machine, 0);
+	set_scc_interrupt(device->machine, status);
 }
 
 
@@ -954,7 +953,6 @@ void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 {
 	running_device *scc = devtag_get_device(machine, "scc");
 	static int last_was_x = 0;
-
 	if (x && y)
 	{
 		if (last_was_x)
@@ -2210,46 +2208,42 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 
 //  printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
 
-	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
+	switch (mac->mac_model)
 	{
-		return mac->pm_data_recv;
-	}
+		case MODEL_MAC_PORTABLE:
+		case MODEL_MAC_PB100:
+//			printf("Read PM data %x\n", mac->pm_data_recv);
+			return mac->pm_data_recv; 	
 
-	if ((mac->mac_model == MODEL_MAC_CLASSIC) ||
-	    (mac->mac_model == MODEL_MAC_II) || (mac->mac_model == MODEL_MAC_II_FDHD) ||
-	    (mac->mac_model == MODEL_MAC_IIX) || (mac->mac_model == MODEL_MAC_POWERMAC_6100))
-	{
-		return 0x81;		// bit 0 must be set to avoid attempting to boot from AppleTalk
-	}
+		case MODEL_MAC_CLASSIC:
+		case MODEL_MAC_II:
+		case MODEL_MAC_II_FDHD:
+		case MODEL_MAC_IIX:
+		case MODEL_MAC_POWERMAC_6100:
+			return 0x81;		// bit 0 must be set on most Macs to avoid attempting to boot from AppleTalk
 
-	if (mac->mac_model == MODEL_MAC_SE30)
-	{
-		return 0x81 | PA6;
-	}
+		case MODEL_MAC_SE30:
+			return 0x81 | PA6;
 
-	if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))	// these both use the V8 ASIC and should in theory ID the same
-	{
-		return 0x81 | PA6 | PA4 | PA2;
-	}
+		case MODEL_MAC_LC:
+		case MODEL_MAC_LC_II:
+			return 0x81 | PA6 | PA4 | PA2;
 
-	if (mac->mac_model == MODEL_MAC_IICI)
-	{
-		return 0x81 | PA6 | PA2 | PA1;
-	}
+		case MODEL_MAC_IICI:
+			return 0x81 | PA6 | PA2 | PA1;
 
-	if (mac->mac_model == MODEL_MAC_IISI)
-	{
-		return 0x81 | PA4 | PA2 | PA1;
-	}
+		case MODEL_MAC_IISI:
+			return 0x81 | PA4 | PA2 | PA1;
 
-	if (mac->mac_model == MODEL_MAC_IIFX)
-	{
-		return 0x81 | PA6 | PA1;
-	}
+		case MODEL_MAC_IIFX:
+			return 0x81 | PA6 | PA1;
 
-	if (mac->mac_model == MODEL_MAC_IICX)
-	{
-		return 0x81 | PA6;
+		case MODEL_MAC_IICX:
+			return 0x81 | PA6;
+
+		default:
+			return 0x80;
+
 	}
 
 	return 0x80;
@@ -2263,6 +2257,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 	// portable/PB100 is pretty different
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
+//		printf("Read VIA B: PM_ACK %x\n", mac->pm_ack);
 		val = 0x80 | mac->pm_ack;	// SCC wait/request
 	}
 	else
@@ -2313,6 +2308,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
+		printf("%02x to PM\n", data);
 		mac->pm_data_send = data;
 		return;
 	}
@@ -2357,6 +2353,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 		mac_enable_sound(sound, (data & 0x80) == 0);
 		sony_set_sel_line(fdc,(data & 0x20) >> 5);
 		mac->mac_drive_select = ((data & 0x10) >> 4);
+//		printf("PM_REQ = %x, was %x\n", data & 1, mac->pm_req);
 		mac->pm_req = data & 1;
 		return;
 	}

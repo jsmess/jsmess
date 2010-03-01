@@ -25,7 +25,7 @@
 typedef struct _scc8530_interface scc8530_interface;
 struct _scc8530_interface
 {
-	void (*acknowledge)(running_device *device);
+	void (*irq)(running_device *device, int state);
 };
 
 
@@ -37,9 +37,8 @@ struct _scc8530_interface
 #define MDRV_SCC8530_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, SCC8530, 0)
 
-#define MDRV_SCC8530_ACK(_acknowledge) \
-	MDRV_DEVICE_CONFIG_DATAPTR(scc8530_interface, acknowledge, _acknowledge)
-
+#define MDRV_SCC8530_IRQ(_irq) \
+	MDRV_DEVICE_CONFIG_DATAPTR(scc8530_interface, irq, _irq)
 
 
 /***************************************************************************

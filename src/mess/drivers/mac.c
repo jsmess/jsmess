@@ -470,7 +470,7 @@ static ADDRESS_MAP_START(macprtb_map, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xf90000, 0xf9ffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
 //  AM_RANGE(0xfa0000, 0xfaffff) AM_RAM // video RAM? registers?
 	AM_RANGE(0xfb0000, 0xfbffff) AM_READWRITE8(mac_asc_r, mac_asc_w, 0xffff)
-	AM_RANGE(0xfd0000, 0xfdffff) AM_READWRITE(mac_scc_r, mac_scc_2_w)
+	AM_RANGE(0xfd0000, 0xfdffff) AM_READWRITE(mac_scc_r, mac_scc_w)
 	AM_RANGE(0xfffff0, 0xffffff) AM_READWRITE(mac_autovector_r, mac_autovector_w)
 ADDRESS_MAP_END
 
@@ -681,7 +681,7 @@ static MACHINE_DRIVER_START( mac512ke )
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_config)
 
 	MDRV_SCC8530_ADD("scc")
-	MDRV_SCC8530_ACK(mac_scc_ack)
+	MDRV_SCC8530_IRQ(mac_scc_irq)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
 	/* internal ram */
@@ -803,7 +803,7 @@ static MACHINE_DRIVER_START( macii )
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
 	MDRV_SCC8530_ADD("scc")
-	MDRV_SCC8530_ACK(mac_scc_ack)
+	MDRV_SCC8530_IRQ(mac_scc_irq)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
 	MDRV_DEVICE_REMOVE("via6522_0")
@@ -915,7 +915,7 @@ static MACHINE_DRIVER_START( macse30 )
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
 	MDRV_SCC8530_ADD("scc")
-	MDRV_SCC8530_ACK(mac_scc_ack)
+	MDRV_SCC8530_IRQ(mac_scc_irq)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
 	MDRV_DEVICE_REMOVE("via6522_0")
@@ -1018,7 +1018,7 @@ static MACHINE_DRIVER_START( pwrmac )
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
 	MDRV_SCC8530_ADD("scc")
-	MDRV_SCC8530_ACK(mac_scc_ack)
+	MDRV_SCC8530_IRQ(mac_scc_irq)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
 	MDRV_DEVICE_REMOVE("via6522_0")
