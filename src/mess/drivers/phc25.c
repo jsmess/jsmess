@@ -24,8 +24,8 @@
 	TODO:
 
 	- MC6847 mode selection lines
-	- keyboard repeat is too fast
 	- tune cassette trigger level
+	- accurate video timing
 
 */
 
@@ -62,7 +62,7 @@ static READ8_HANDLER( port40_r )
 	UINT8 data = 0;
 
 	/* vertical sync */
-	data |= mc6847_fs_r(state->mc6847) << 4;
+	data |= !mc6847_fs_r(state->mc6847) << 4;
 
 	/* cassette read */
 	data |= (cassette_input(state->cassette) < +0.3) << 5;
@@ -71,7 +71,7 @@ static READ8_HANDLER( port40_r )
 	data |= centronics_busy_r(state->centronics) << 6;
 
 	/* horizontal sync */
-	data |= mc6847_hs_r(state->mc6847) << 7;
+	data |= !mc6847_hs_r(state->mc6847) << 7;
 
 	return data;
 }
@@ -227,7 +227,7 @@ INPUT_PORTS_START( phc25 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -265,16 +265,11 @@ static READ8_DEVICE_HANDLER( phc25_video_ram_r )
 	return state->video_ram[offset & 0x17ff];
 }
 
-static WRITE_LINE_DEVICE_HANDLER( phc25_fs_w )
-{
-	cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_IRQ0, state ? CLEAR_LINE : ASSERT_LINE);
-}
-
 static UINT8 phc25_char_rom_r(running_machine *machine, UINT8 ch, int line)
 {
 	phc25_state *state = (phc25_state *)machine->driver_data;
 
-	return state->char_rom[((ch-2) * 12) + line + 4];
+	return state->char_rom[((ch - 2) * 12) + line + 4];
 }
 
 static const mc6847_interface mc6847_intf =
@@ -288,7 +283,7 @@ static const mc6847_interface mc6847_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_LINE(phc25_fs_w),
+	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -392,6 +387,7 @@ static MACHINE_DRIVER_START( pal )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
     MDRV_PALETTE_LENGTH(16)
 
 	MDRV_MC6847_ADD(MC6847_TAG, mc6847_intf)
@@ -411,6 +407,7 @@ static MACHINE_DRIVER_START( ntsc )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
+
     MDRV_PALETTE_LENGTH(16)
 
 	MDRV_MC6847_ADD(MC6847_TAG, mc6847_intf)
