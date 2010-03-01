@@ -130,7 +130,7 @@ WRITE16_HANDLER ( macii_scsi_w );
 READ32_HANDLER (macii_scsi_drq_r);
 WRITE32_HANDLER (macii_scsi_drq_w);
 NVRAM_HANDLER( mac );
-void mac_scc_ack(running_device *device);
+void mac_scc_irq(running_device *device, int status);
 void mac_scc_mouse_irq( running_machine *machine, int x, int y );
 void mac_fdc_set_enable_lines(running_device *device, int enable_mask);
 
