@@ -512,15 +512,15 @@ static const struct pit8253_config mm1_pit8253_intf =
 	{
 		{
 			XTAL_6_144MHz/2/2,
-			DEVCB_NULL,
+			DEVCB_LINE_VCC,
 			DEVCB_LINE(itxc_w)
 		}, {
 			XTAL_6_144MHz/2/2,
-			DEVCB_NULL,
+			DEVCB_LINE_VCC,
 			DEVCB_LINE(irxc_w)
 		}, {
 			XTAL_6_144MHz/2/2,
-			DEVCB_NULL,
+			DEVCB_LINE_VCC,
 			DEVCB_LINE(auxc_w)
 		}
 	}

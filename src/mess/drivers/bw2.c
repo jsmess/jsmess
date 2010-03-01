@@ -457,17 +457,17 @@ static const struct pit8253_config bw2_pit8253_interface =
 	{
 		{
 			XTAL_4MHz,	/* 8251 USART TXC, RXC */
-			DEVCB_NULL,
+			DEVCB_LINE_VCC,
 			DEVCB_LINE(bw2_timer0_w)
 		},
 		{
 			11000,		/* LCD controller */
-			DEVCB_NULL,
+			DEVCB_LINE_VCC,
 			DEVCB_LINE(pit8253_clk2_w)
 		},
 		{
 			0,		/* Floppy /MTRON */
-			DEVCB_NULL,
+			DEVCB_LINE_VCC,
 			DEVCB_LINE(bw2_timer2_w)
 		}
 	}

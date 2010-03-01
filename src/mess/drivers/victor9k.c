@@ -173,15 +173,15 @@ static const struct pit8253_config pit_intf =
 	{
 		{
 			2500000,
-			DEVCB_NULL,
+			DEVCB_LINE_VCC,
 			DEVCB_LINE(mux_serial_b_w)
 		}, {
 			2500000,
-			DEVCB_NULL,
+			DEVCB_LINE_VCC,
 			DEVCB_LINE(mux_serial_a_w)
 		}, {
 			100000,
-			DEVCB_NULL,
+			DEVCB_LINE_VCC,
 			DEVCB_DEVICE_LINE(I8259A_TAG, pic8259_ir2_w)
 		}
 	}
