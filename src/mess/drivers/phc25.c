@@ -24,7 +24,6 @@
 	TODO:
 
 	- RAM should be 16KB
-	- chargen ROM
 	- MC6847 mode selection lines
 	- keyboard
 	- cassette
@@ -101,7 +100,7 @@ static WRITE8_HANDLER( port40_w )
 	cassette_output(state->cassette, BIT(data, 0) ? -1.0 : +1.0);
 
 	/* internal/external character generator */
-	mc6847_intext_w(state->mc6847, !BIT(data, 2));
+	mc6847_intext_w(state->mc6847, BIT(data, 2));
 
 	/* cassette motor */
 	cassette_change_state(state->cassette, CASSETTE_MASK_MOTOR, BIT(data, 1) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED);
@@ -286,7 +285,7 @@ static UINT8 phc25_char_rom_r(running_machine *machine, UINT8 ch, int line)
 {
 	phc25_state *state = (phc25_state *)machine->driver_data;
 
-	return state->char_rom[(ch << 4) | (line & 0x0f)];
+	return state->char_rom[((ch-2) * 12) + line + 4];
 }
 
 static const mc6847_interface mc6847_intf =
@@ -305,7 +304,18 @@ static const mc6847_interface mc6847_intf =
 	DEVCB_NULL
 };
 
-static VIDEO_START( phc25 )
+static VIDEO_START( pal )
+{
+	phc25_state *state = (phc25_state *)machine->driver_data;
+
+	/* find devices */
+	state->mc6847 = devtag_get_device(machine, MC6847_TAG);
+
+	/* find memory regions */
+	state->char_rom = memory_region(machine, Z80_TAG) + 0x5000;
+}
+
+static VIDEO_START( ntsc )
 {
 	phc25_state *state = (phc25_state *)machine->driver_data;
 
@@ -371,7 +381,6 @@ static MACHINE_DRIVER_START( phc25 )
     MDRV_MACHINE_START(phc25)
 
     /* video hardware */
-    MDRV_VIDEO_START(phc25)
     MDRV_VIDEO_UPDATE(phc25)
 
 	/* sound hardware */
@@ -404,6 +413,8 @@ static MACHINE_DRIVER_START( pal )
 	MDRV_MC6847_ADD(MC6847_TAG, mc6847_intf)
     MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_PAL)
 	MDRV_MC6847_CHAR_ROM(phc25_char_rom_r)
+
+	MDRV_VIDEO_START(pal)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ntsc )
@@ -421,6 +432,8 @@ static MACHINE_DRIVER_START( ntsc )
 	MDRV_MC6847_ADD(MC6847_TAG, mc6847_intf)
     MDRV_MC6847_TYPE(M6847_VERSION_ORIGINAL_NTSC)
 	MDRV_MC6847_CHAR_ROM(phc25_char_rom_r)
+
+	MDRV_VIDEO_START(ntsc)
 MACHINE_DRIVER_END
 
 /* ROMs */
@@ -430,9 +443,6 @@ ROM_START( phc25 )
 	ROM_LOAD( "phc25rom.0", 0x0000, 0x2000, CRC(fa28336b) SHA1(582376bee455e124de24ba4ac02326c8a592fa5a) )
 	ROM_LOAD( "phc25rom.1", 0x2000, 0x2000, CRC(38fd578b) SHA1(dc3db78c0cdc89f1605200d39535be65a4091705) )
 	ROM_LOAD( "phc25rom.2", 0x4000, 0x2000, CRC(54392b27) SHA1(1587827fe9438780b50164727ce3fdea1b98078a) )
-
-	ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "chargen.bin", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 ROM_START( phc25j )
