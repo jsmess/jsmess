@@ -306,7 +306,7 @@ static void upd765_seek_complete(running_device *device)
 		if (fdc->upd765_flags & UPD765_SEEK_OPERATION_IS_RECALIBRATE)
 		{
 			/* not at track 0? */
-			if (!floppy_tk00_r(img))
+			if (fdc->pcn[fdc->drive] != 0)
 				/* no, track 0 failed after 77 steps */
 				fdc->upd765_status[0] |= 0x40 | 0x10;
 		}
