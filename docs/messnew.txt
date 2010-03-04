@@ -77,8 +77,10 @@ System Driver Changes:
 
 - [SPECTRUM] Added support for .ach, .frz, .plusd, .prg, .sem, .sit,
   .snp, .snx and .zx snapshot formats. Hopefully fixed existing issues
-  with .sna and .spformats (both VGASpec-style and Spanish Spectrum-style
+  with .sna and .sp formats (both VGASpec-style and Spanish Spectrum-style
   formats are supported now).
+
+- [SPECTRUM] Added .raw quickload support. Converted to use messram device.
 
 - [TX0] Fixed disassembly in the debugger. [Robbbert]
 

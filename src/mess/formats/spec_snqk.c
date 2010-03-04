@@ -2438,26 +2438,131 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
 QUICKLOAD_LOAD(spectrum)
 {
-    const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    int i;
-    int quick_addr = BASE_RAM;
-    int quick_length;
-    UINT8 *quick_data;
-    int read_;
+    UINT8 *quickload_data = NULL;
 
-    quick_length = image_length(image);
-    quick_data = (UINT8 *)malloc(quick_length);
-    if (!quick_data)
-        return INIT_FAIL;
+    quickload_data = (UINT8*)malloc(quickload_size);
+    if (!quickload_data)
+        goto error;
 
-    read_ = image_fread(image, quick_data, quick_length);
-    if (read_ != quick_length)
-        return INIT_FAIL;
+    image_fread(image, quickload_data, quickload_size);
 
-    for (i = 0; i < quick_length; i++)
-        memory_write_byte(space, i + quick_addr, quick_data[i]);
+    if (!mame_stricmp(file_type, "scr"))
+    {
+        if ((quickload_size != SCR_SIZE) && (quickload_size != SCR_BITMAP))
+        {
+            logerror("Invalid .SCR file size.\n");
+            goto error;
+        }
+        spectrum_setup_scr(image->machine, quickload_data, quickload_size);
+    }
+    else if (!mame_stricmp(file_type, "raw"))
+    {
+        if (quickload_size != RAW_SIZE)
+        {
+            logerror("Invalid .RAW file size.\n");
+            goto error;
+        }
+        spectrum_setup_raw(image->machine, quickload_data, quickload_size);
+    }
 
-    logerror("quick loading at %.4x size:%.4x\n", quick_addr, quick_length);
+    free(quickload_data);
+
     return INIT_PASS;
+
+error:
+    if (quickload_data)
+        free(quickload_data);
+    return INIT_FAIL;
+}
+
+/*******************************************************************
+ *
+ *      Load a .SCR file.
+ *
+ *      .SCR files are just a binary dump of the ZX Spectrum's
+ *      display file, which is 256x192 pixels large.
+ *
+ *      These file are created using the Sinclair BASIC command
+ *
+ *      SAVE "filename" SCREEN$
+ *
+ *      where the keyword "SCREEN$" is a shortcut for "CODE 16384,6912"
+ *      i.e. the loading address and the length of the data.
+ *
+ *      The format is organized as follows:
+ *
+ *      Offset   Size    Description
+ *      -------- ------- -------------------------------------------------
+ *      0        6144    Screen bitmap
+ *      6144     768     Screen attributes
+ *
+ *      Some utilities and emulators support a B&W version of this
+ *      format, which stores only the bitmap. These files can't be
+ *      produced using the SAVE SCREEN$ command - rather they're
+ *      created by the command
+ *
+ *      SAVE "filename" CODE 16384,6144
+ *
+ *******************************************************************/
+void spectrum_setup_scr(running_machine *machine, UINT8 *quickdata, UINT32 quicksize)
+{
+    int i;
+    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+    for (i = 0; i < quicksize; i++)
+        memory_write_byte(space, i + BASE_RAM, quickdata[i]);
+
+    log_quickload(quicksize == SCR_SIZE ? "SCREEN$" : "SCREEN$ (Mono)", BASE_RAM, quicksize, NULL, EXEC_NA);
+}
+
+/*******************************************************************
+ *
+ *      Load a .RAW file.
+ *
+ *      .RAW files are a binary dump of the ZX Spectrum RAM
+ *      and are created using the Sinclair BASIC command
+ *
+ *      SAVE *"b" CODE 16384,49152
+ *
+ *      which copies the whole RAM to the Interface 1's RS232 interface.
+ *      The resulting file is always 49161 bytes long.
+ *
+ *      The format is organized as follows:
+ *
+ *      Offset  Size    Description (all registers stored with LSB first)
+ *      ------- ------- -------------------------------------------------
+ *      0       1       0x03 (BYTES file type)
+ *      1       2       Image size
+ *      3       2       Image start address
+ *      5       4       0xFF
+ *
+ *      Since the size and the start address are encoded in the header,
+ *      it would be possible to create .RAW images of any part of the RAM.
+ *      However, no image of such type has ever surfaced.
+ *
+ *******************************************************************/
+void spectrum_setup_raw(running_machine *machine, UINT8 *quickdata, UINT32 quicksize)
+{
+    int i;
+	UINT8 data;
+    UINT16 start, len;
+    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+    start = (quickdata[RAW_OFFSET + 4] << 8) | quickdata[RAW_OFFSET + 3];
+    len   = (quickdata[RAW_OFFSET + 2] << 8) | quickdata[RAW_OFFSET + 1];
+
+    for (i = 0; i < len; i++)
+        memory_write_byte(space, i + start, quickdata[i + RAW_HDR]);
+
+    /* Set border color */
+    data = (memory_read_byte(space, 0x5c48) >> 3) & 0x07; // Get the current border color from BORDCR system variable.
+    state->port_fe_data = (state->port_fe_data & 0xf8) | data;
+    EventList_Reset();
+    border_set_last_color(data);
+    border_force_redraw();
+    logerror("Border color:%02X\n", data);
+
+    log_quickload("BYTES", start, len, NULL, EXEC_NA);
 }
 

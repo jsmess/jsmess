@@ -1391,6 +1391,7 @@ $(MESSOBJ)/tangerin.a:			\
 	$(MESS_VIDEO)/microtan.o	\
 	$(MESS_MACHINE)/microtan.o	\
 	$(MESS_DRIVERS)/microtan.o	\
+	$(MESS_FORMATS)/m65_snqk.o	\
 	$(MESS_FORMATS)/oric_dsk.o	\
 	$(MESS_FORMATS)/oric_tap.o	\
 	$(MESS_DRIVERS)/oric.o		\

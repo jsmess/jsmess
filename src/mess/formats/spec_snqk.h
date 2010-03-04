@@ -23,6 +23,9 @@ void spectrum_setup_snp(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
 void spectrum_setup_frz(running_machine *machine, UINT8 *snapdata, UINT32 snapsize);
 
+void spectrum_setup_scr(running_machine *machine, UINT8 *quickdata, UINT32 quicksize);
+void spectrum_setup_raw(running_machine *machine, UINT8 *quickdata, UINT32 quicksize);
+
 #define BASE_RAM      0x4000
 #define SPECTRUM_BANK 0x4000
 
@@ -155,6 +158,24 @@ typedef enum {
     SPECTRUM_Z80_SNAPSHOT_128K,
     SPECTRUM_Z80_SNAPSHOT_TS2068
 } SPECTRUM_Z80_SNAPSHOT_TYPE;
+
+/*****************************************************************************
+ *
+ * .SCR format (used by many emulators)
+ *
+ ****************************************************************************/
+#define SCR_BITMAP 6144
+#define SCR_ATTR   768
+#define SCR_SIZE   (SCR_BITMAP + SCR_ATTR)
+
+/*****************************************************************************
+ *
+ * .RAW format (used by many emulators)
+ *
+ ****************************************************************************/
+#define RAW_OFFSET 0
+#define RAW_HDR    9
+#define RAW_SIZE   (RAW_HDR + 3*SPECTRUM_BANK)
 
 SNAPSHOT_LOAD( spectrum );
 QUICKLOAD_LOAD( spectrum );
