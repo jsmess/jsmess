@@ -436,13 +436,21 @@ static VIDEO_UPDATE( tandy2k )
 	return 0;
 }
 
+static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
+{
+}
+
 static CRT9007_INTERFACE( crt9007_intf )
 {
+	SCREEN_TAG,
+	10,
+	tandy2k_crt9007_display_pixels,
 	DEVCB_DEVICE_LINE(I8259A_1_TAG, pic8259_ir1_w),
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER(I80186_TAG, PROGRAM, memory_read_byte_16le)
+	DEVCB_MEMORY_HANDLER(I80186_TAG, PROGRAM, memory_read_byte_16le),
+	DEVCB_NULL
 };
 
 /* Intel 8251A Interface */
@@ -714,6 +722,11 @@ static MACHINE_START( tandy2k )
 	int ram_size = messram_get_size(devtag_get_device(machine, "messram"));
 
 	memory_install_ram(program, 0x00000, ram_size - 1, 0, 0, ram);
+
+	/* patch ROM */
+	UINT8 *rom = memory_region(machine, I80186_TAG);
+	rom[0x1f16] = 0x90;
+	rom[0x1f17] = 0x90;
 
 	/* register for state saving */
 //	state_save_register_global(machine, state->);

@@ -1,6 +1,6 @@
 /**********************************************************************
 
-    SMC CRT9007 CRT Video Processor and Controller VPAC emulation
+    SMC CRT9007 CRT Video Processor and Controller (VPAC) emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -52,16 +52,35 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef void (*crt9007_draw_scanline_func)(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 va, UINT8 sl, UINT8 data, int y, int x, int x_count, int cursor_x);
+#define CRT9007_DRAW_SCANLINE(name) void name(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, UINT16 va, UINT8 sl, UINT8 data, int y, int x, int x_count, int cursor_x)
+
 typedef struct _crt9007_interface crt9007_interface;
 struct _crt9007_interface
 {
+	const char *screen_tag;		/* screen we are acting on */
+	int hpixels_per_column;		/* number of pixels per video memory address */
+
+	crt9007_draw_scanline_func	draw_scanline_func;
+
 	devcb_write_line		out_int_func;
 	devcb_write_line		out_dmar_func;
 
 	devcb_write_line		out_hs_func;
 	devcb_write_line		out_vs_func;
+/*	
+	devcb_write_line		out_cblank_func;
+	devcb_write_line		out_vblank_func;
 
+	devcb_write_line		out_vlt_func;
+	devcb_write_line		out_curs_func;
+	devcb_write_line		out_drb_func;
+
+	devcb_write_line		out_slg_func;
+	devcb_write_line		out_sld_func;
+*/
 	devcb_read8				in_vd_func;
+	devcb_write8			out_vd_func;
 };
 
 /***************************************************************************
@@ -74,6 +93,12 @@ DEVICE_GET_INFO( crt9007 );
 /* register access */
 READ8_DEVICE_HANDLER( crt9007_r );
 WRITE8_DEVICE_HANDLER( crt9007_w );
+
+/* DMA acknowledge */
+WRITE8_DEVICE_HANDLER( crt9007_ack_w );
+
+/* light pen strobe */
+WRITE_LINE_DEVICE_HANDLER( crt9007_lpstb_w );
 
 /* screen update */
 void crt9007_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
