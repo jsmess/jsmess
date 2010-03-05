@@ -269,7 +269,7 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x,
 
 		if (!hires)
 		{
-			if (scanlines[SNES_MAINSCREEN].enable) 
+			if (scanlines[SNES_MAINSCREEN].enable)
 			{
 
 #ifdef SNES_LAYER_DEBUG
@@ -317,7 +317,7 @@ INLINE void snes_draw_tile( UINT8 planes, UINT8 layer, UINT16 tileaddr, INT16 x,
 				}
 			}
 
-			if (scanlines[SNES_SUBSCREEN].enable) 
+			if (scanlines[SNES_SUBSCREEN].enable)
 			{
 #ifdef SNES_LAYER_DEBUG
 				if (!debug_options.windows_disabled)
@@ -491,7 +491,7 @@ INLINE void snes_draw_tile_object( UINT16 tileaddr, INT16 x, UINT8 priority, UIN
 			mask >>= 1;
 		}
 
-		if (scanlines[SNES_MAINSCREEN].enable) 
+		if (scanlines[SNES_MAINSCREEN].enable)
 		{
 
 #ifdef SNES_LAYER_DEBUG
@@ -516,7 +516,7 @@ INLINE void snes_draw_tile_object( UINT16 tileaddr, INT16 x, UINT8 priority, UIN
 			}
 		}
 
-		if (scanlines[SNES_SUBSCREEN].enable) 
+		if (scanlines[SNES_SUBSCREEN].enable)
 		{
 
 #ifdef SNES_LAYER_DEBUG
@@ -650,14 +650,14 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 	while (ii < 256)
 	{
 		/*
-		Tilemap format
-		  vhopppcc cccccccc
+        Tilemap format
+          vhopppcc cccccccc
 
-		  v/h  = Vertical/Horizontal flip this tile.
-		  o    = Tile priority.
-		  ppp  = Tile palette. The number of entries in the palette depends on the Mode and the BG.
-		  cccccccccc = Tile number.
-		*/
+          v/h  = Vertical/Horizontal flip this tile.
+          o    = Tile priority.
+          ppp  = Tile palette. The number of entries in the palette depends on the Mode and the BG.
+          cccccccccc = Tile number.
+        */
 
 		// determine the horizontal position (Bishojo Janshi Suchi Pai & Desert Figther have tile_size & hires == 1)
 		UINT32 xpos = xoff + (ii << (tile_size * hires));
@@ -669,7 +669,7 @@ INLINE void snes_update_line( UINT8 color_depth, UINT8 hires, UINT8 priority_a, 
 			UINT32 haddr = 0, vaddr = 0;
 			UINT16 hval = 0, vval = 0;
 
-		      if (opt_x >= 8) 
+		      if (opt_x >= 8)
 			{
 				switch (offset_per_tile)
 				{
@@ -911,7 +911,7 @@ static void snes_update_line_mode7( UINT8 priority_a, UINT8 priority_b, UINT8 la
 			}
 		}
 
-		if (scanlines[SNES_SUBSCREEN].enable) 
+		if (scanlines[SNES_SUBSCREEN].enable)
 		{
 			if (scanlines[SNES_SUBSCREEN].clip)
 				colour &= snes_ppu.clipmasks[layer][xpos];
