@@ -33,8 +33,7 @@ static VIDEO_UPDATE(chsuper)
 		{
 			int tile = ((vram[count+1]<<8) | vram[count]) & 0xffff;
 
-			tile ^=chsuper_tilexor;
-			//int colour = tile>>12;
+			//tile ^=chsuper_tilexor;
 
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*4,y*8);
 			count+=2;
@@ -187,7 +186,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( chsuper )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( chsuper )
@@ -253,16 +252,97 @@ ROM_START( chsuper2 )
 	ROM_COPY( "maincpu", 0x10000, 0x00000, 0x70000 )
 ROM_END
 
+ROM_START( chmpnum )
+	ROM_REGION( 0x80000, "maincpu", 0 ) // code + samples
+	ROM_LOAD( "3.ic11", 0x00000, 0x80000, CRC(46aa2ce7) SHA1(036d67a26c890c4dc26599bfcd2c67f12e30fb52) )
+
+	ROM_REGION( 0x010000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "1.ic18", 0x00000, 0x80000, CRC(8e202eaa) SHA1(156b498873111e5890c00d447201ba4bcbe6e633) )
+	ROM_LOAD( "2.ic19", 0x80000, 0x80000, CRC(dc0790b0) SHA1(4550f85e609338635a3987f7832517ed1d6388d4) )
+
+	ROM_REGION( 0x80000, "adpcm", 0 )
+	ROM_COPY( "maincpu", 0x10000, 0x00000, 0x70000 )
+ROM_END
+
 static DRIVER_INIT( chsuper2 )
 {
+	UINT8 *buffer;
+	UINT8 *rom = memory_region(machine,"gfx1");
+	int i;
+
 	chsuper_tilexor = 0x7f00;
+
+	buffer = auto_alloc_array(machine, UINT8, 0x100000);
+
+	for (i=0;i<0x100000;i++)
+	{
+		int j;
+
+		j = i ^ (chsuper_tilexor << 5);
+
+		buffer[j] = rom[i];
+	}
+
+	memcpy(rom,buffer,0x100000);
+
+	chsuper_tilexor = 0x0000;
 }
 
 static DRIVER_INIT( chsuper3 )
 {
+	UINT8 *buffer;
+	UINT8 *rom = memory_region(machine,"gfx1");
+	int i;
+
 	chsuper_tilexor = 0x0e00;
+
+	buffer = auto_alloc_array(machine, UINT8, 0x100000);
+
+	for (i=0;i<0x100000;i++)
+	{
+		int j;
+
+		j = i ^ (chsuper_tilexor << 5);
+
+		buffer[j] = rom[i];
+	}
+
+	memcpy(rom,buffer,0x100000);
+
+	chsuper_tilexor = 0x0000;
+}
+
+static DRIVER_INIT( chmpnum )
+{
+	UINT8 *buffer;
+	UINT8 *rom = memory_region(machine,"gfx1");
+	int i;
+
+	chsuper_tilexor = 0x1800;
+
+	buffer = auto_alloc_array(machine, UINT8, 0x100000);
+
+	for (i=0;i<0x100000;i++)
+	{
+		int j;
+
+		j = i ^ (chsuper_tilexor << 5);
+
+		j = BITSWAP24(j,23,22,21,20,19,18,17,13, 15,14,16,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
+		j = BITSWAP24(j,23,22,21,20,19,18,17,14, 15,16,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
+		j = BITSWAP24(j,23,22,21,20,19,18,17,15, 16,14,13,12, 11,10,9,8, 7,6,5,4, 3,2,1,0);
+
+		buffer[j] = rom[i];
+	}
+
+	memcpy(rom,buffer,0x100000);
+
+	chsuper_tilexor = 0x0000;
 }
 
 
-GAME( 1999, chsuper3, 0,        chsuper, chsuper,  chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", GAME_NO_SOUND ) //24/02/99
-GAME( 1999, chsuper2, chsuper3, chsuper, chsuper,  chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", GAME_NO_SOUND ) //26/01/99
+GAME( 1999, chsuper3, 0,        chsuper, chsuper,  chsuper3, ROT0, "<unknown>",    "Champion Super 3 (V0.35)", GAME_IMPERFECT_SOUND ) //24/02/99
+GAME( 1999, chsuper2, chsuper3, chsuper, chsuper,  chsuper2, ROT0, "<unknown>",    "Champion Super 2 (V0.13)", GAME_IMPERFECT_SOUND ) //26/01/99
+GAME( 1999, chmpnum,  chsuper3, chsuper, chsuper,  chmpnum,  ROT0, "<unknown>",    "Champion Number (V0.74)",  GAME_IMPERFECT_SOUND ) //10/11/99

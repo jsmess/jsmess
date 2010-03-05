@@ -25,6 +25,8 @@
 #ifndef __PIC8259_H__
 #define __PIC8259_H__
 
+#include "devcb.h"
+
 #define PIC8259	DEVICE_GET_INFO_NAME(pic8259)
 
 /***************************************************************************

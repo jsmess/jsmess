@@ -109,22 +109,17 @@
 #include "cpu/h6280/h6280.h"
 #include "includes/decocrpt.h"
 #include "includes/decoprot.h"
-#include "includes/deco16ic.h"
+#include "includes/rohga.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "video/deco16ic.h"
 
-VIDEO_START( rohga );
-VIDEO_START( wizdfire );
-VIDEO_START( nitrobal );
-VIDEO_UPDATE( rohga );
-VIDEO_UPDATE( schmeisr );
-VIDEO_UPDATE( wizdfire );
-VIDEO_UPDATE( nitrobal );
-WRITE16_HANDLER( rohga_buffer_spriteram16_w );
 
 static READ16_HANDLER( rohga_irq_ack_r )
 {
-	cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
+	rohga_state *state = (rohga_state *)space->machine->driver_data;
+
+	cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
 	return 0;
 }
 
@@ -133,7 +128,8 @@ static WRITE16_HANDLER( wizdfire_irq_ack_w )
 	/* This might actually do more, nitrobal for example sets 0xca->0xffff->0x80 at startup then writes 7 all the time
        except when a credit is inserted (writes 6 twice).
        Wizard Fire / Dark Seal 2 just writes 1 all the time, so I just don't trust it much for now... -AS */
-	cputag_set_input_line(space->machine, "maincpu", 6, CLEAR_LINE);
+	rohga_state *state = (rohga_state *)space->machine->driver_data;
+	cpu_set_input_line(state->maincpu, 6, CLEAR_LINE);
 }
 
 /**********************************************************************************/
@@ -141,8 +137,8 @@ static WRITE16_HANDLER( wizdfire_irq_ack_w )
 static ADDRESS_MAP_START( rohga_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
-	AM_RANGE(0x200000, 0x20000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x240000, 0x24000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
 
 	AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w)  AM_BASE(&deco16_prot_ram) /* Protection device */
 
@@ -150,42 +146,42 @@ static ADDRESS_MAP_START( rohga_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(rohga_buffer_spriteram16_w) /* write 1 for sprite dma */
 	AM_RANGE(0x310000, 0x310009) AM_WRITENOP /* Palette control? */
-	AM_RANGE(0x31000a, 0x31000b) AM_WRITE(deco16_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
+	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE("deco_custom", deco16ic_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* ? */
-	AM_RANGE(0x322000, 0x322001) AM_WRITE(deco16_priority_w)
+	AM_RANGE(0x322000, 0x322001) AM_DEVWRITE("deco_custom", deco16ic_priority_w)
 	AM_RANGE(0x321100, 0x321101) AM_READ(rohga_irq_ack_r) /* Irq ack?  Value not used */
 
-	AM_RANGE(0x3c0000, 0x3c1fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x3c2000, 0x3c2fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x3c4000, 0x3c4fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
-	AM_RANGE(0x3c6000, 0x3c6fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
+	AM_RANGE(0x3c0000, 0x3c1fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x3c2000, 0x3c2fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x3c4000, 0x3c4fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x3c6000, 0x3c6fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
 
-	AM_RANGE(0x3c8000, 0x3c8fff) AM_MIRROR(0x1000) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x3ca000, 0x3cafff) AM_MIRROR(0x1000) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
-	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
-	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE(&deco16_pf4_rowscroll)
+	AM_RANGE(0x3c8000, 0x3c8fff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf1_rowscroll)
+	AM_RANGE(0x3ca000, 0x3cafff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf2_rowscroll)
+	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
+	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
 
 	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x3e0000, 0x3e1fff) AM_RAM_WRITE(deco16_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3e0000, 0x3e1fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x3f0000, 0x3f3fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wizdfire_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
-	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x202000, 0x202fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x208000, 0x208fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
-	AM_RANGE(0x20a000, 0x20afff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
+	AM_RANGE(0x200000, 0x200fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x202fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x208000, 0x208fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x20a000, 0x20afff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
 
 	AM_RANGE(0x20b000, 0x20b3ff) AM_WRITEONLY /* ? Always 0 written */
-	AM_RANGE(0x20c000, 0x20c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
-	AM_RANGE(0x20e000, 0x20e7ff) AM_RAM AM_BASE(&deco16_pf4_rowscroll)
+	AM_RANGE(0x20c000, 0x20c7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
+	AM_RANGE(0x20e000, 0x20e7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
 
-	AM_RANGE(0x300000, 0x30000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x310000, 0x31000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x310000, 0x31000f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
 
-	AM_RANGE(0x320000, 0x320001) AM_WRITE(deco16_priority_w) /* Priority */
+	AM_RANGE(0x320000, 0x320001) AM_DEVWRITE("deco_custom", deco16ic_priority_w) /* Priority */
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
 	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
@@ -194,8 +190,8 @@ static ADDRESS_MAP_START( wizdfire_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(buffer_spriteram16_2_w) /* Triggers DMA for spriteram */
 
-	AM_RANGE(0x380000, 0x381fff) AM_RAM_WRITE(deco16_buffered_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x390008, 0x390009) AM_WRITE(deco16_palette_dma_w)
+	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_custom", deco16ic_palette_dma_w)
 
 	AM_RANGE(0xfe4000, 0xfe47ff) AM_READWRITE(deco16_104_prot_r,deco16_104_prot_w) AM_BASE(&deco16_prot_ram) /* Protection device */
 	AM_RANGE(0xfdc000, 0xffffff) AM_RAM
@@ -204,20 +200,20 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nitrobal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
 
-	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x202000, 0x2027ff) AM_MIRROR(0x800) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x208000, 0x2087ff) AM_MIRROR(0x800) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
-	AM_RANGE(0x20a000, 0x20a7ff) AM_MIRROR(0x800) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
+	AM_RANGE(0x200000, 0x200fff) AM_MIRROR(0x1000) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x2027ff) AM_MIRROR(0x800) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x208000, 0x2087ff) AM_MIRROR(0x800) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x20a000, 0x20a7ff) AM_MIRROR(0x800) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
 
-	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
-	AM_RANGE(0x20c000, 0x20c7ff) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
-	AM_RANGE(0x20e000, 0x20e7ff) AM_RAM AM_BASE(&deco16_pf4_rowscroll)
+	AM_RANGE(0x204000, 0x2047ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf1_rowscroll)
+	AM_RANGE(0x206000, 0x2067ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf2_rowscroll)
+	AM_RANGE(0x20c000, 0x20c7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
+	AM_RANGE(0x20e000, 0x20e7ff) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
 
-	AM_RANGE(0x300000, 0x30000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x310000, 0x31000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x300000, 0x30000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x310000, 0x31000f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
 
-	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("DSW3") AM_WRITE(deco16_priority_w) /* Priority */
+	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("DSW3") AM_DEVWRITE("deco_custom", deco16ic_priority_w) /* Priority */
 	AM_RANGE(0x320002, 0x320003) AM_WRITENOP /* ? */
 	AM_RANGE(0x320004, 0x320005) AM_WRITE(wizdfire_irq_ack_w) /* VBL IRQ ack */
 
@@ -226,8 +222,8 @@ static ADDRESS_MAP_START( nitrobal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x3607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
 	AM_RANGE(0x370000, 0x370001) AM_WRITE(buffer_spriteram16_2_w) /* Triggers DMA for spriteram */
 
-	AM_RANGE(0x380000, 0x381fff) AM_RAM_WRITE(deco16_buffered_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x390008, 0x390009) AM_WRITE(deco16_palette_dma_w)
+	AM_RANGE(0x380000, 0x381fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x390008, 0x390009) AM_DEVWRITE("deco_custom", deco16ic_palette_dma_w)
 
 	AM_RANGE(0xfec000, 0xff3fff) AM_RAM
 	AM_RANGE(0xff4000, 0xff47ff) AM_MIRROR(0x800) AM_READWRITE(deco16_146_nitroball_prot_r,deco16_146_nitroball_prot_w) AM_BASE(&deco16_prot_ram) /* Protection device */
@@ -236,30 +232,30 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( schmeisr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x200000, 0x20000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
-	AM_RANGE(0x240000, 0x24000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x200000, 0x20000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
+	AM_RANGE(0x240000, 0x24000f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
 	AM_RANGE(0x280000, 0x2807ff) AM_MIRROR(0x800) AM_READWRITE(deco16_104_rohga_prot_r,deco16_104_rohga_prot_w) AM_BASE(&deco16_prot_ram) /* Protection device */
 
 	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("DSW3")
 	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("DSW3")  AM_WRITE(rohga_buffer_spriteram16_w) /* write 1 for sprite dma */
 	AM_RANGE(0x310002, 0x310003) AM_READ_PORT("IN1")
 	AM_RANGE(0x310000, 0x310009) AM_WRITENOP /* Palette control? */
-	AM_RANGE(0x31000a, 0x31000b) AM_WRITE(deco16_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
+	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE("deco_custom", deco16ic_palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
 	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* ? */
-	AM_RANGE(0x322000, 0x322001) AM_WRITE(deco16_priority_w)
+	AM_RANGE(0x322000, 0x322001) AM_DEVWRITE("deco_custom", deco16ic_priority_w)
 	AM_RANGE(0x321100, 0x321101) AM_WRITE(wizdfire_irq_ack_w)  /* Irq ack?  Value not used */
 
-	AM_RANGE(0x3c0000, 0x3c1fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x3c2000, 0x3c2fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x3c4000, 0x3c4fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
-	AM_RANGE(0x3c6000, 0x3c6fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
-	AM_RANGE(0x3c8000, 0x3c8fff) AM_MIRROR(0x1000) AM_RAM AM_BASE(&deco16_pf1_rowscroll)
-	AM_RANGE(0x3ca000, 0x3cafff) AM_MIRROR(0x1000) AM_RAM AM_BASE(&deco16_pf2_rowscroll)
-	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE(&deco16_pf3_rowscroll)
-	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE(&deco16_pf4_rowscroll)
+	AM_RANGE(0x3c0000, 0x3c1fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x3c2000, 0x3c2fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x3c4000, 0x3c4fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x3c6000, 0x3c6fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
+	AM_RANGE(0x3c8000, 0x3c8fff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf1_rowscroll)
+	AM_RANGE(0x3ca000, 0x3cafff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf2_rowscroll)
+	AM_RANGE(0x3cc000, 0x3ccfff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf3_rowscroll)
+	AM_RANGE(0x3ce000, 0x3cefff) AM_MIRROR(0x1000) AM_RAM AM_BASE_MEMBER(rohga_state, pf4_rowscroll)
 
 	AM_RANGE(0x3d0000, 0x3d07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x3e0000, 0x3e1fff) AM_MIRROR(0x2000) AM_RAM_WRITE(deco16_buffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x3e0000, 0x3e1fff) AM_MIRROR(0x2000) AM_RAM_DEVWRITE("deco_custom", deco16ic_buffered_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff7fff) AM_RAM /* Main ram */
 ADDRESS_MAP_END
 
@@ -727,13 +723,15 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, state); /* IRQ 2 */
+	rohga_state *driver_state = (rohga_state *)device->machine->driver_data;
+	cpu_set_input_line(driver_state->audiocpu, 1, state); /* IRQ 2 */
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
-	okim6295_set_bank_base(devtag_get_device(device->machine, "oki1"), ((data & 1)>>0) * 0x40000);
-	okim6295_set_bank_base(devtag_get_device(device->machine, "oki2"), ((data & 2)>>1) * 0x40000);
+	rohga_state *state = (rohga_state *)device->machine->driver_data;
+	okim6295_set_bank_base(state->oki1, BIT(data, 0) * 0x40000);
+	okim6295_set_bank_base(state->oki2, BIT(data, 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =
@@ -744,7 +742,52 @@ static const ym2151_interface ym2151_config =
 
 /**********************************************************************************/
 
+static int rohga_bank_callback( const int bank )
+{
+	return ((bank >> 4) & 0x3) << 12;
+}
+
+static const deco16ic_interface rohga_deco16ic_intf =
+{
+	"screen",
+	0, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, 0, 16, /* color base (default values) */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	rohga_bank_callback,
+	rohga_bank_callback,
+	rohga_bank_callback,
+	rohga_bank_callback
+};
+
+static const deco16ic_interface nitrobal_deco16ic_intf =
+{
+	"screen",
+	0, 0, 0,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, 0, 0, /* color base (pf4 is not default) */
+	0x0f, 0x0f, 0, 0,	/* color masks */
+	rohga_bank_callback,
+	rohga_bank_callback,
+	rohga_bank_callback,
+	rohga_bank_callback
+};
+
+static MACHINE_START( rohga )
+{
+	rohga_state *state = (rohga_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->deco16ic = devtag_get_device(machine, "deco_custom");
+	state->oki1 = devtag_get_device(machine, "oki1");
+	state->oki2 = devtag_get_device(machine, "oki2");
+}
+
 static MACHINE_DRIVER_START( rohga )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(rohga_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -753,6 +796,8 @@ static MACHINE_DRIVER_START( rohga )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
+
+	MDRV_MACHINE_START(rohga)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -769,6 +814,8 @@ static MACHINE_DRIVER_START( rohga )
 
 	MDRV_VIDEO_START(rohga)
 	MDRV_VIDEO_UPDATE(rohga)
+
+	MDRV_DECO16IC_ADD("deco_custom", rohga_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -791,6 +838,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( wizdfire )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(rohga_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(wizdfire_map)
@@ -798,6 +848,8 @@ static MACHINE_DRIVER_START( wizdfire )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
+
+	MDRV_MACHINE_START(rohga)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -812,8 +864,9 @@ static MACHINE_DRIVER_START( wizdfire )
 	MDRV_GFXDECODE(wizdfire)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(wizdfire)
 	MDRV_VIDEO_UPDATE(wizdfire)
+
+	MDRV_DECO16IC_ADD("deco_custom", rohga_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -836,6 +889,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nitrobal )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(rohga_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(nitrobal_map)
@@ -843,6 +899,8 @@ static MACHINE_DRIVER_START( nitrobal )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
+
+	MDRV_MACHINE_START(rohga)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -857,8 +915,9 @@ static MACHINE_DRIVER_START( nitrobal )
 	MDRV_GFXDECODE(wizdfire)
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(nitrobal)
 	MDRV_VIDEO_UPDATE(nitrobal)
+
+	MDRV_DECO16IC_ADD("deco_custom", nitrobal_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -881,6 +940,9 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( schmeisr )
 
+	/* driver data */
+	MDRV_DRIVER_DATA(rohga_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
 	MDRV_CPU_PROGRAM_MAP(schmeisr_map)
@@ -888,6 +950,8 @@ static MACHINE_DRIVER_START( schmeisr )
 
 	MDRV_CPU_ADD("audiocpu", H6280,32220000/4/3) /* verified on pcb (8.050Mhz is XIN on pin 10 of H6280 */
 	MDRV_CPU_PROGRAM_MAP(rohga_sound_map)
+
+	MDRV_MACHINE_START(rohga)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -904,6 +968,8 @@ static MACHINE_DRIVER_START( schmeisr )
 
 	MDRV_VIDEO_START(rohga)
 	MDRV_VIDEO_UPDATE(schmeisr)
+
+	MDRV_DECO16IC_ADD("deco_custom", rohga_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1480,8 +1546,8 @@ static DRIVER_INIT( schmeisr )
 	const UINT8 *src = memory_region(machine, "gfx2");
 	UINT8 *dst = memory_region(machine, "gfx1");
 
-	memcpy(dst,src,0x20000);
-	memcpy(dst+0x20000,src+0x80000,0x20000);
+	memcpy(dst, src, 0x20000);
+	memcpy(dst + 0x20000, src + 0x80000, 0x20000);
 
 	deco74_decrypt_gfx(machine, "gfx1");
 	deco74_decrypt_gfx(machine, "gfx2");
@@ -1489,15 +1555,15 @@ static DRIVER_INIT( schmeisr )
 	decoprot_reset(machine);
 }
 
-GAME( 1991, rohga,    0,       rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)" , 0 )
-GAME( 1991, rohga1,   rohga,   rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 Set 1)", 0 )
-GAME( 1991, rohga2,   rohga,   rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 Set 2)", 0 )
-GAME( 1991, rohgah,   rohga,   rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)", 0 )
-GAME( 1991, rohgau,   rohga,   rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)", 0 )
-GAME( 1991, wolffang, rohga,   rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)", 0 )
-GAME( 1992, wizdfire, 0,       wizdfire, wizdfire, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v2.1)", 0 )
-GAME( 1992, wizdfireu,wizdfire,wizdfire, wizdfire, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (US v1.1)", 0 )
-GAME( 1992, darkseal2,wizdfire,wizdfire, wizdfire, wizdfire, ROT0,   "Data East Corporation", "Dark Seal 2 (Japan v2.1)", 0 )
-GAME( 1992, nitrobal, 0,       nitrobal, nitrobal, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (US)", 0 )
-GAME( 1992, gunball,  nitrobal,nitrobal, nitrobal, nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)", 0 )
-GAME( 1993, schmeisr, 0,       schmeisr, schmeisr, schmeisr, ROT0,   "Hot B",                 "Schmeiser Robo (Japan)", 0 )
+GAME( 1991, rohga,     0,        rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v5.0)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rohga1,    rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 Set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rohga2,    rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Asia/Europe v3.0 Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rohgah,    rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (Hong Kong v3.0)", GAME_SUPPORTS_SAVE )
+GAME( 1991, rohgau,    rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Rohga Armor Force (US v1.0)", GAME_SUPPORTS_SAVE )
+GAME( 1991, wolffang,  rohga,    rohga,    rohga,    rohga,    ROT0,   "Data East Corporation", "Wolf Fang -Kuhga 2001- (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, wizdfire,  0,        wizdfire, wizdfire, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (Over Sea v2.1)", GAME_SUPPORTS_SAVE )
+GAME( 1992, wizdfireu, wizdfire, wizdfire, wizdfire, wizdfire, ROT0,   "Data East Corporation", "Wizard Fire (US v1.1)", GAME_SUPPORTS_SAVE )
+GAME( 1992, darkseal2, wizdfire, wizdfire, wizdfire, wizdfire, ROT0,   "Data East Corporation", "Dark Seal 2 (Japan v2.1)", GAME_SUPPORTS_SAVE )
+GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (US)", GAME_SUPPORTS_SAVE )
+GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, schmeisr, ROT0,   "Hot B",                 "Schmeiser Robo (Japan)", GAME_SUPPORTS_SAVE )

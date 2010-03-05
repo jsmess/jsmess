@@ -23,11 +23,9 @@
     TODO:
     - Palette is not right.
 
-    - H8/3002 now communicates with the H8/3334 on the I/O board, but it's not reliable yet.
-
-    - Hook up actual inputs (?) via the 2 serial latches at d00004 and d00006.
+    - Hook up gun inputs (?) via the 2 serial latches at d00004 and d00006.
       Works like this: write to d00004, then read d00004 12 times.  Ditto at
-      d00006.  This gives 24 bits of inputs (?) from the I/O board (?).
+      d00006.  This gives 24 bits of inputs (?) from the I/O board (?) or guns (?)
 
     - The entire 3D subsystem.  Is there a DSP living down there?  If not, why the 300k
       download on initial startup?
@@ -39,6 +37,60 @@
     - Serial number data is at offset 0x201 in the BIOS.  Until the games are running
       and displaying it I'm not going to meddle with it though.
 
+    - Ok, it's the "mt" roms, which the game calls data roms.  One pair is
+      at a8000000, the other at aa000000.  Point roms are accessed for
+      checksumming through a port at a200000x:
+      - reset the port by writing 0000 to a2000006
+      - write offset >> 16  to a2000004
+      - write offset & ffff to a2000004 (yes, same address, hence the reset)
+      - read 2 bytes from one rom at a200000a
+      - read 2 bytes from one rom at a200000c
+
+    - Super System 23 tests irqs in the post.  timecrs2c's code can
+    potentially test 7 sources, but only actually test 5.  With each
+    source there is code to clear the interrupt and code to raise it.
+    Levels 0 and 1 are not connected to anything according to the code.
+
+      VBlank (level 2):
+        clear: ad00000a.h = 0
+        raise: just wait for it
+
+      C361   (level 3):
+        clear: a6820008.h = 1ff
+               a100005c.w = 0
+               a100005c.w = 1
+               a4c3ff04.w = 0
+        raise: a6820008.h = c8
+               a100005c.w = 1
+
+      Subcpu (level 3, same as C361):
+        clear: same as C361
+        raise: a4405002.h = 3170
+
+      C435   (level 4):
+        clear: a200000e.h = 1
+               a200000e.h = 0
+        raise: a2000000.h = a200
+               a2000000.h = 1
+               a2000000.h = 1 (yes, twice)
+
+      C422   (level 5):
+        clear: a6400002.h = f
+               ad000008.h = 0
+        raise: a640000e.h = 0
+               a6400006.h = 1
+               a640000a.h = 1
+               a6400006.h = fffb
+               a6400006.h = 0
+
+      RS323  (level 6, not tested by timecrs2c):
+        clear: nothing
+        raise: nothing
+
+      Timer  (level 7, not tested by timecrs2c):
+        clear: c0.Compare = 10d880
+        raise: c0.Count   = 10c8e0
+               c0.Compare = 10d880
 */
 
 /*
@@ -394,7 +446,9 @@ Notes:
 
       Game           Code and revision
       --------------------------------
-      GP500          5GP3 Ver.C
+      GP500          5GP3 Ver.C (for Super System 23)
+      Time Crisis 2  TSS4 Ver.A (for Super System 23)
+
 Other games dumps with unknown PCB information....
 
       Game             Code and revision
@@ -498,6 +552,93 @@ Notes:
       PIC16F84 - Microchip PIC16F84 Programmable Interrupt Controller stamped 'CAP10' (SOIC20)
       MCU      - Fujitsu MB90F574 Microcontroller, stamped 'FCAF10' (QFP120)
       ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
+
+I/O Boards for Gun games
+------------------------
+
+Type 1:
+
+V185 I/O PCB
+2479961102 (2479971102)
+|-----------------------------------------|
+|   J601      LED1 LED2         |-------| |
+|   DSW(4)JP1 |-------|         |TSSIO  | |
+|     |-----| | C78   |14.746MHz|PLD    | |
+|     |TSSIO| |       |PST592   |-------| |
+|     |PROG | |-------|                   |
+|     |-----|                             |
+|                                         |
+|     62256                               |
+|ADM485                                   |
+|J1               SLA4060               J5|
+|                          J3       J4    |
+|-----------------------------------------|
+Notes:
+      TSSIOPROG - Atmel AT29C020 EEPROM stamped 'TSSIOP8' (PLCC32)
+      C78       - Namco Custom C78, actually a rebadged Hitachi HD643334 MCU (PLCC84)
+      TSSIOPLD  - Altera MAX EPM7128ELC84 CPLD with label 'TSSIOPLD' (PLCC84)
+      SLA4060   -
+      J1        - 12 position connector for power and I/O
+      J3        - 12 position connector for buttons and gun connection
+      J4        - not used?
+      J5        - 6 position connector for network
+      J601      - not used?
+      JP1       - jumper set to 1-2 (lower position), labelled 'WR'
+      DSW       - 4 position dipswitch block, all off
+
+This board is used only on Time Crisis II.
+Note the gun is a standard light gun.
+--------------
+
+Type 2:
+
+V221 MIU PCB
+2512960101 (2512970101)
+additional sticker for Time Crisis 3 says '2591961001 V291 XMIU PCB'
+|---------------------------------------------|
+|J10      J9    29C020     LC35256  DSW(4)    |
+|    M0105          PRG.8F                LED |
+|2267     6393                            LED |
+|    T082  T082                 |------|      |
+|           |--------|          | C78  |   J8 |
+|           |ALTERA  |          |      |      |
+|J11        |MAX     |          |------|    J7|
+|   LM1881  |EPM7128 |                  3771  |
+|R305526    |--------|                        |
+|      ZUW1R51212            14.746MHz        |
+|                                 ADM485    J6|
+|                                             |
+|  J1       J2   J3          J4    J5         |
+|---------------------------------------------|
+Notes:
+      2267    - JRC2267 Current limiting diode array? (SOIC8)
+      R305526 - Some kind of mini transformer or regulator?
+      LC35256 - Sanyo LC35256 32k x8 SRAM (SOP28)
+      LM1881  - National Semiconductor LM1881 Video Sync Separator (SOIC8)
+      M0105   - Matsushita Panasonic 0105 = ? (SOIC16)
+      T082    - Texas Instruments T082 (=TL082) JFET-Input operational amplifier (SOIC8)
+      6393    - Sanyo 6393 (LA6393) High Performance Dual Comparator (SOIC8)
+      ADM485  - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+      3771    - Fujitsu MB3771 Power Supply Monitor and Master Reset IC (SOIC8)
+      EPM7128 - Altera MAX EPM7128SLC84-15 PLD labelled 'TMIU1/PLD0' (Time Crisis 3)
+      29C020  - location for 29C020 PLCC32 Flash/EP ROM (not populated)
+      ZUW1R51212 - Cosel ZUW1R51212 DC to DC Power Supply Module (input 9-18VDC, output +-12VDC or +24VDC)
+      DSW     - 4 position dipswitch block, all off
+      J1      - 6-pin power input connector
+      J2      - 12-pin connector (cabinet buttons UP/DOWN/ENTER plus TEST/SERVICE/COIN etc)
+      J3      - 4 pin connector (not used)
+      J4      - 9 pin Namco female plug connector for gun (solenoid +24V/trigger/pedal/sensor)
+      J5      - 5 pin connector used for I/O --> S246 communications (connects to USB link connection on main unit)
+      J6      - 7-pin connector (not used)
+      J9      - 6-pin connector (not used)
+      J10     - 2-pin Namco female plug connector (not used)
+      J11     - 6-pin Namco female plug connector (video input from CCD camera)
+      PRG.8F  - 27C1001 EPROM with label...
+                                           'XMIU1 PRG0' (I/O program for Time Crisis 3)
+                                           'CSZ1 PRG0A' (I/O program for Crisis Zone)
+
+This board is used on Crisis Zone (System 23 Evolution2) and Time Crisis 3 (System 246)
+Note both games use a CCD camera for the gun sensor.
 */
 
 /*
@@ -742,11 +883,36 @@ Notes:
 #include "cpu/h83002/h8.h"
 #include "sound/c352.h"
 
-static int ss23_vstat = 0, hstat = 0, vstate = 0;
+#define S23_BUSCLOCK	(66664460/2)	// 33 MHz CPU bus clock / input, somehow derived from 14.31721 MHz crystal
+#define S23_VSYNC1	(59.8824)
+#define S23_VSYNC2	(59.915)
+#define S23_HSYNC	(16666150)
+#define S23_MODECLOCK	(130205)
+
+//static int ss23_vstat = 0, hstat = 0, vstate = 0;
 static tilemap_t *bgtilemap;
 static UINT32 *namcos23_textram, *namcos23_shared_ram;
 static UINT32 *namcos23_charram;
 static UINT8 namcos23_jvssense;
+static INT32 has_jvsio;
+
+static bool ctl_vbl_active;
+static UINT8 ctl_led;
+static UINT16 ctl_inp_buffer[2];
+
+static UINT16 c417_ram[0x10000], c417_adr = 0;
+
+static UINT16 c412_sdram_a[0x100000];
+static UINT16 c412_sdram_b[0x100000];
+static UINT16 c412_sram[0x20000];
+static UINT16 c412_pczram[0x200];
+static UINT32 c412_adr = 0;
+
+static UINT16 c421_dram_a[0x40000];
+static UINT16 c421_dram_b[0x40000];
+static UINT16 c421_sram[0x8000];
+static UINT32 c421_adr = 0;
+
 
 static UINT16 nthword( const UINT32 *pSource, int offs )
 {
@@ -774,6 +940,8 @@ static READ32_HANDLER( namcos23_textram_r )
 static WRITE32_HANDLER( namcos23_textram_w )
 {
 	COMBINE_DATA( &namcos23_textram[offset] );
+	tilemap_mark_tile_dirty(bgtilemap, offset*2);
+	tilemap_mark_tile_dirty(bgtilemap, (offset*2)+1);
 }
 
 static VIDEO_START( ss23 )
@@ -880,8 +1048,6 @@ static VIDEO_UPDATE( ss23 )
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
 
-	tilemap_mark_all_tiles_dirty(bgtilemap);
-	tilemap_set_palette_offset( bgtilemap, 0x7f00 );
 	tilemap_draw( bitmap, cliprect, bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
 
 #if 0
@@ -934,9 +1100,9 @@ static VIDEO_UPDATE( ss23 )
 	return 0;
 }
 
-static VIDEO_UPDATE( gorgon )
+static READ32_HANDLER( s23_txtchar_r )
 {
-	return 0;
+	return namcos23_charram[offset];
 }
 
 static WRITE32_HANDLER( s23_txtchar_w )
@@ -944,7 +1110,7 @@ static WRITE32_HANDLER( s23_txtchar_w )
 	COMBINE_DATA(&namcos23_charram[offset]);
 	gfx_element_mark_dirty(space->machine->gfx[0], offset/32);
 }
-
+#if 0
 static READ32_HANDLER( ss23_vstat_r )
 {
 	if (offset == 1)
@@ -961,7 +1127,7 @@ static READ32_HANDLER( ss23_vstat_r )
 	}
 	return ss23_vstat;
 }
-
+#endif
 static UINT8 nthbyte( const UINT32 *pSource, int offs )
 {
 	pSource += offs/4;
@@ -996,32 +1162,314 @@ static WRITE32_HANDLER( namcos23_paletteram_w )
 	UpdatePalette(space->machine, (offset % (0x10000/4))*2);
 }
 
-// must return this magic number
-static UINT32 s23_vbl = 0;
+static READ16_HANDLER(s23_c417_16_r)
+{
+	switch(offset) {
+	case 0: return 0x8e | (video_screen_get_vblank(space->machine->primary_screen) ? 0x8000 : 0);
+	case 1: return c417_adr;
+	case 4:
+		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417_adr, c417_ram[c417_adr], cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+		return c417_ram[c417_adr];
+	}
+
+	logerror("c417_16_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	return 0;
+}
+
+static WRITE16_HANDLER(s23_c417_16_w)
+{
+    switch(offset) {
+    case 1:
+        COMBINE_DATA(&c417_adr);
+        break;
+
+    case 4:
+		//        logerror("c417_w %04x = %04x (%08x, %08x)\n", c417_adr, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+        COMBINE_DATA(c417_ram + c417_adr);
+        break;
+    default:
+        logerror("c417_16_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+        break;
+    }
+}
+
+static READ32_HANDLER(s23_c417_32_r)
+{
+    UINT32 data = 0;
+    if (ACCESSING_BITS_16_31)
+        data |= s23_c417_16_r(space, offset*2, mem_mask >> 16) << 16;
+    if (ACCESSING_BITS_0_15)
+        data |= s23_c417_16_r(space, offset*2+1, mem_mask);
+    return data;
+}
+
+static WRITE32_HANDLER(s23_c417_32_w)
+{
+    if (ACCESSING_BITS_16_31)
+        s23_c417_16_w(space, offset*2, data >> 16, mem_mask >> 16);
+    if (ACCESSING_BITS_0_15)
+        s23_c417_16_w(space, offset*2+1, data, mem_mask);
+}
+
+static READ16_HANDLER(s23_c412_ram_r)
+{
+	//  logerror("c412_ram_r %06x (%08x, %08x)\n", offset, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	if(offset < 0x100000)
+		return c412_sdram_a[offset & 0xfffff];
+	else if(offset < 0x200000)
+		return c412_sdram_b[offset & 0xfffff];
+	else if(offset < 0x220000)
+		return c412_sram   [offset & 0x1ffff];
+	else if(offset < 0x220200)
+		return c412_pczram [offset & 0x001ff];
+
+	return 0xffff;
+}
+
+static WRITE16_HANDLER(s23_c412_ram_w)
+{
+	//  logerror("c412_ram_w %06x = %04x (%08x, %08x)\n", offset, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	if(offset < 0x100000)
+		COMBINE_DATA(c412_sdram_a + (offset & 0xfffff));
+	else if(offset < 0x200000)
+		COMBINE_DATA(c412_sdram_b + (offset & 0xfffff));
+	else if(offset < 0x220000)
+		COMBINE_DATA(c412_sram    + (offset & 0x1ffff));
+	else if(offset < 0x220200)
+		COMBINE_DATA(c412_pczram  + (offset & 0x001ff));
+}
+
+static READ16_HANDLER(s23_c412_16_r)
+{
+	switch(offset) {
+	case 8: return c412_adr;
+	case 9: return c412_adr >> 16;
+	case 10: return s23_c412_ram_r(space, c412_adr, mem_mask);
+	}
+
+	logerror("c412_16_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	return 0;
+}
+
+static WRITE16_HANDLER(s23_c412_16_w)
+{
+    switch(offset) {
+	case 8: c412_adr = (data & mem_mask) | (c412_adr & (0xffffffff ^ mem_mask)); break;
+	case 9: c412_adr = ((data & mem_mask) << 16) | (c412_adr & (0xffffffff ^ (mem_mask << 16))); break;
+	case 10: s23_c412_ram_w(space, c412_adr, data, mem_mask); break;
+    default:
+        logerror("c412_16_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+        break;
+    }
+}
+
+static READ32_HANDLER(s23_c412_32_r)
+{
+    UINT32 data = 0;
+    if (ACCESSING_BITS_16_31)
+        data |= s23_c412_16_r(space, offset*2, mem_mask >> 16) << 16;
+    if (ACCESSING_BITS_0_15)
+        data |= s23_c412_16_r(space, offset*2+1, mem_mask);
+    return data;
+}
+
+static WRITE32_HANDLER(s23_c412_32_w)
+{
+    if (ACCESSING_BITS_16_31)
+        s23_c412_16_w(space, offset*2, data >> 16, mem_mask >> 16);
+    if (ACCESSING_BITS_0_15)
+        s23_c412_16_w(space, offset*2+1, data, mem_mask);
+}
+
+
+static READ16_HANDLER(s23_c421_ram_r)
+{
+	//  logerror("c421_ram_r %06x (%08x, %08x)\n", offset, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	if(offset < 0x40000)
+		return c421_dram_a[offset & 0x3ffff];
+	else if(offset < 0x80000)
+		return c421_dram_b[offset & 0x3ffff];
+	else if(offset < 0x88000)
+		return c421_sram  [offset & 0x07fff];
+
+	return 0xffff;
+}
+
+static WRITE16_HANDLER(s23_c421_ram_w)
+{
+	//  logerror("c421_ram_w %06x = %04x (%08x, %08x)\n", offset, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	if(offset < 0x40000)
+		COMBINE_DATA(c421_dram_a + (offset & 0x3ffff));
+	else if(offset < 0x80000)
+		COMBINE_DATA(c421_dram_b + (offset & 0x3ffff));
+	else if(offset < 0x88000)
+		COMBINE_DATA(c421_sram   + (offset & 0x07fff));
+}
+
+static READ16_HANDLER(s23_c421_16_r)
+{
+	switch(offset) {
+	case 0: return s23_c421_ram_r(space, c421_adr & 0xfffff, mem_mask);
+	case 2: return c421_adr >> 16;
+	case 3: return c421_adr;
+	}
+
+	logerror("c421_16_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	return 0;
+}
+
+static WRITE16_HANDLER(s23_c421_16_w)
+{
+    switch(offset) {
+	case 0: s23_c421_ram_w(space, c421_adr & 0xfffff, data, mem_mask); break;
+	case 2: c421_adr = ((data & mem_mask) << 16) | (c421_adr & (0xffffffff ^ (mem_mask << 16))); break;
+	case 3: c421_adr = (data & mem_mask) | (c421_adr & (0xffffffff ^ mem_mask)); break;
+    default:
+        logerror("c421_16_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+        break;
+    }
+}
+
+static READ32_HANDLER(s23_c421_32_r)
+{
+    UINT32 data = 0;
+    if (ACCESSING_BITS_16_31)
+        data |= s23_c421_16_r(space, offset*2, mem_mask >> 16) << 16;
+    if (ACCESSING_BITS_0_15)
+        data |= s23_c421_16_r(space, offset*2+1, mem_mask);
+    return data;
+}
+
+static WRITE32_HANDLER(s23_c421_32_w)
+{
+    if (ACCESSING_BITS_16_31)
+        s23_c421_16_w(space, offset*2, data >> 16, mem_mask >> 16);
+    if (ACCESSING_BITS_0_15)
+        s23_c421_16_w(space, offset*2+1, data, mem_mask);
+}
+
+static WRITE16_HANDLER(s23_ctl_16_w)
+{
+	switch(offset) {
+	case 0: {
+		if(ctl_led != (data & 0xff)) {
+			ctl_led = data;
+			logerror("LEDS %c%c%c%c%c%c%c%c\n",
+					 ctl_led & 0x80 ? '.' : '#',
+					 ctl_led & 0x40 ? '.' : '#',
+					 ctl_led & 0x20 ? '.' : '#',
+					 ctl_led & 0x10 ? '.' : '#',
+					 ctl_led & 0x08 ? '.' : '#',
+					 ctl_led & 0x04 ? '.' : '#',
+					 ctl_led & 0x02 ? '.' : '#',
+					 ctl_led & 0x01 ? '.' : '#');
+		}
+		break;
+	}
+
+	case 2: case 3:
+		// These may be coming from another CPU, in particular the I/O one
+		ctl_inp_buffer[offset-2] = input_port_read(space->machine, offset == 2 ? "P1" : "P2");
+		break;
+	case 5:
+		if(ctl_vbl_active) {
+			ctl_vbl_active = false;
+			cpu_set_input_line(space->cpu, MIPS3_IRQ0, CLEAR_LINE);
+		}
+		break;
+
+	default:
+		logerror("ctl_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	}
+}
+
+static READ16_HANDLER(s23_ctl_16_r)
+{
+	switch(offset) {
+		// dips ?
+		// 0100 set freezes gorgon
+		// 0080 is service mode for gorgon
+		// 0004 unset freezes ss23 at the boot level
+		// 0002 unset skips the post on ss23
+	case 1: return 0x0004;
+	case 2: case 3: {
+		UINT16 res = ctl_inp_buffer[offset-2] & 0x800 ? 0xffff : 0x0000;
+		ctl_inp_buffer[offset-2] = (ctl_inp_buffer[offset-2] << 1) | 1;
+		return res;
+	}
+	}
+	logerror("ctl_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	return 0xffff;
+}
+
+static WRITE32_HANDLER(s23_ctl_32_w)
+{
+    if (ACCESSING_BITS_16_31)
+        s23_ctl_16_w(space, offset*2, data >> 16, mem_mask >> 16);
+    if (ACCESSING_BITS_0_15)
+        s23_ctl_16_w(space, offset*2+1, data, mem_mask);
+}
+
+static READ32_HANDLER(s23_ctl_32_r)
+{
+    UINT32 data = 0;
+    if (ACCESSING_BITS_16_31)
+        data |= s23_ctl_16_r(space, offset*2, mem_mask >> 16) << 16;
+    if (ACCESSING_BITS_0_15)
+        data |= s23_ctl_16_r(space, offset*2+1, mem_mask);
+    return data;
+}
+
+
+static WRITE16_HANDLER(s23_c361_16_w)
+{
+	switch(offset) {
+	default:
+		logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	}
+}
+
+static READ16_HANDLER(s23_c361_16_r)
+{
+	switch(offset) {
+	case 5: return video_screen_get_vpos(space->machine->primary_screen);
+	case 6: return video_screen_get_vblank(space->machine->primary_screen);
+	}
+	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+	return 0xffff;
+}
+
+static WRITE32_HANDLER(s23_c361_32_w)
+{
+    if (ACCESSING_BITS_16_31)
+        s23_c361_16_w(space, offset*2, data >> 16, mem_mask >> 16);
+    if (ACCESSING_BITS_0_15)
+        s23_c361_16_w(space, offset*2+1, data, mem_mask);
+}
+
+static READ32_HANDLER(s23_c361_32_r)
+{
+    UINT32 data = 0;
+    if (ACCESSING_BITS_16_31)
+        data |= s23_c361_16_r(space, offset*2, mem_mask >> 16) << 16;
+    if (ACCESSING_BITS_0_15)
+        data |= s23_c361_16_r(space, offset*2+1, mem_mask);
+    return data;
+}
 
 static INTERRUPT_GEN(s23_interrupt)
 {
-	s23_vbl ^= 0x80008000;
+	if(!ctl_vbl_active) {
+		ctl_vbl_active = true;
+		cpu_set_input_line(device, MIPS3_IRQ0, ASSERT_LINE);
+	}
 }
 
-static READ32_HANDLER(s23_unk_r)
-{
-	return 0x008e008e | s23_vbl;
-}
-
-// this & 8 and this & 4 are checked
-// offset = 1 for magic latch
-static READ32_HANDLER(sysctl_stat_r)
-{
-	if (offset == 1) return 0x0000ffff;	// all inputs in
-
-	return 0xffffffff;
-}
 
 // as with System 22, we need to halt the MCU while checking shared RAM
 static WRITE32_HANDLER( s23_mcuen_w )
 {
-	mame_printf_debug("mcuen_w: mask %08x, data %08x\n", mem_mask, data);
+	logerror("mcuen_w: mask %08x, data %08x\n", mem_mask, data);
 	if (mem_mask == 0x0000ffff)
 	{
 		if (data)
@@ -1037,39 +1485,83 @@ static WRITE32_HANDLER( s23_mcuen_w )
 	}
 }
 
-static UINT32 gorgon_vbl = 0;
-static READ32_HANDLER( gorgon_vbl_r )
+static READ32_HANDLER( gorgon_magic_r )
 {
-	gorgon_vbl ^= 0xffffffff;
+	return 0xffffffff;	// must be non-zero (rapidrvr @ 8000229C)
+}
 
-	return gorgon_vbl;
+/*
+    Final Furlong has a bug: it forgets to halt the H8/3002 before it zeros out the shared RAM
+    which contains the H8's stack and other working set.  This crashes MAME due to the PC going
+    off into the weeds, so we intercept
+*/
+
+static READ32_HANDLER( gorgon_sharedram_r )
+{
+	return namcos23_shared_ram[offset];
+}
+
+static WRITE32_HANDLER( gorgon_sharedram_w )
+{
+	COMBINE_DATA(&namcos23_shared_ram[offset]);
+
+	// hack for final furlong
+	if ((offset == 0x6000/4) && (data == 0) && (mem_mask == 0xff000000))
+	{
+		logerror("S23: Final Furlong hack stopping H8/3002\n");
+		cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
+	}
 }
 
 static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x02000000, 0x02000003) AM_READ( gorgon_vbl_r )
-	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(&namcos23_shared_ram)
+	AM_RANGE(0x01000000, 0x010000ff) AM_READ( gorgon_magic_r )
+	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE( s23_c417_32_r, s23_c417_32_w )
+	AM_RANGE(0x04400000, 0x0440ffff) AM_READWRITE( gorgon_sharedram_r, gorgon_sharedram_w ) AM_BASE(&namcos23_shared_ram)
+
+	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM				// 3d FIFO
-	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r)
+
+	AM_RANGE(0x06080000, 0x06081fff) AM_RAM
+
+	AM_RANGE(0x06108000, 0x061087ff) AM_RAM		// GAMMA (C404-3S)
+	AM_RANGE(0x06110000, 0x0613ffff) AM_READWRITE(namcos23_paletteram_r, namcos23_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x06400000, 0x06403fff) AM_READWRITE( s23_txtchar_r, s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters
+	AM_RANGE(0x06404000, 0x0641dfff) AM_RAM
+	AM_RANGE(0x0641e000, 0x0641ffff) AM_READWRITE(namcos23_textram_r, namcos23_textram_w) AM_BASE(&namcos23_textram)
+
+	AM_RANGE(0x08000000, 0x087fffff) AM_ROM AM_REGION("data", 0)	// data ROMs
+
+	AM_RANGE(0x0c000000, 0x0c00ffff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram) // BACKUP
+
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE (s23_ctl_32_r, s23_ctl_32_w ) // write for LEDs at d000000, watchdog at d000004
+
+	AM_RANGE(0x0f200000, 0x0f201fff) AM_RAM
+
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
-	AM_RANGE(0x02000000, 0x02000003) AM_READ( s23_unk_r )
+	AM_RANGE(0x01000000, 0x010000ff) AM_READ( gorgon_magic_r )
+	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE( s23_c417_32_r, s23_c417_32_w )
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(&namcos23_shared_ram)
 	AM_RANGE(0x04c3ff08, 0x04c3ff0b) AM_WRITE( s23_mcuen_w )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM				// 3d FIFO
-	AM_RANGE(0x06800000, 0x06800fff) AM_RAM 			// text layer palette
-	AM_RANGE(0x06800000, 0x06803fff) AM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters
+	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // Backup
+	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422
+	AM_RANGE(0x06800000, 0x06807fff) AM_READWRITE( s23_txtchar_r, s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters (shown as CGRAM in POST)
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
-	AM_RANGE(0x0681e000, 0x0681ffff) AM_READ(namcos23_textram_r) AM_WRITE(namcos23_textram_w) AM_BASE(&namcos23_textram)
-	AM_RANGE(0x06a08000, 0x06a0ffff) AM_RAM	//gamma?
-	AM_RANGE(0x06a10000, 0x06a3ffff) AM_READ(namcos23_paletteram_r) AM_WRITE(namcos23_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x06820008, 0x0682000f) AM_READ( ss23_vstat_r )	// vblank status?
-	AM_RANGE(0x08000000, 0x08017fff) AM_RAM
-	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r) AM_WRITENOP
+	AM_RANGE(0x0681e000, 0x0681ffff) AM_READWRITE(namcos23_textram_r, namcos23_textram_w) AM_BASE(&namcos23_textram)
+	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE( s23_c361_32_r, s23_c361_32_w )	// C361
+	AM_RANGE(0x06a08000, 0x06a0ffff) AM_RAM	// GAMMA (C404)
+	AM_RANGE(0x06a10000, 0x06a3ffff) AM_READWRITE(namcos23_paletteram_r, namcos23_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x01000000)	// data ROMs
+	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x01000000)
+	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE( s23_c412_32_r, s23_c412_32_w )
+	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE( s23_c421_32_r, s23_c421_32_w )
+	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE( s23_ctl_32_r, s23_ctl_32_w )
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -1078,10 +1570,13 @@ static WRITE16_HANDLER( sharedram_sub_w )
 {
 	UINT16 *shared16 = (UINT16 *)namcos23_shared_ram;
 
-	// fake that an I/O board is connected
-	if ((offset == 0x4052/2) && (data == 0x78))
+	// fake that an I/O board is connected for games w/o a dump or that aren't properly communicating with it yet
+	if (!has_jvsio)
 	{
-		data = 0;
+		if ((offset == 0x4052/2) && (data == 0x78))
+		{
+			data = 0;
+		}
 	}
 
 	COMBINE_DATA(&shared16[BYTE_XOR_BE(offset)]);
@@ -1099,8 +1594,7 @@ static ADDRESS_MAP_START( s23h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_DEVREADWRITE( "c352", c352_r, c352_w )
-	AM_RANGE(0x300000, 0x300001) AM_READNOP //AM_READ_PORT("IN1")
-	AM_RANGE(0x300002, 0x300003) AM_READNOP //AM_READ_PORT("IN2")
+	AM_RANGE(0x300000, 0x300003) AM_NOP	// seems to be more inputs, maybe false leftover code from System 12?
 	AM_RANGE(0x300010, 0x300011) AM_NOP
 	AM_RANGE(0x300030, 0x300031) AM_WRITENOP	// timecrs2 writes this when writing to the sync shared ram location, motoxgo doesn't
 ADDRESS_MAP_END
@@ -1222,15 +1716,15 @@ static WRITE8_HANDLER( s23_mcu_settings_w )
 	s23_setstate ^= 1;
 }
 
-static UINT8 maintoio[64], mi_rd, mi_wr;
-static UINT8 iotomain[64], im_rd, im_wr;
+static UINT8 maintoio[128], mi_rd, mi_wr;
+static UINT8 iotomain[128], im_rd, im_wr;
 
 static READ8_HANDLER( s23_mcu_iob_r )
 {
 	UINT8 ret = iotomain[im_rd];
 
 	im_rd++;
-	im_rd &= 0x3f;
+	im_rd &= 0x7f;
 
 	if (im_rd == im_wr)
 	{
@@ -1248,13 +1742,37 @@ static READ8_HANDLER( s23_mcu_iob_r )
 static WRITE8_HANDLER( s23_mcu_iob_w )
 {
 	maintoio[mi_wr++] = data;
-	mi_wr &= 0x3f;
+	mi_wr &= 0x7f;
 
 	cputag_set_input_line(space->machine, "ioboard", H8_SCI_0_RX, ASSERT_LINE);
 }
 
 static INPUT_PORTS_START( ss23 )
 	PORT_START("H8PORT")
+
+	// No idea if start is actually there, but we need buttons to pass error screens
+	PORT_START("P1")
+	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x001, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xffe, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("TC2P0")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )	// this is the "coin acceptor connected" signal
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )
+
+	PORT_START("TC2P1")
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// gun trigger
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// foot pedal
+	PORT_BIT(0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -1273,6 +1791,7 @@ static ADDRESS_MAP_START( s23h8iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_READWRITE( s23_mcu_p6_r, s23_mcu_p6_w )
 	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT( "H8PORT" )
 	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(H8_PORT_9, H8_PORT_9) AM_NOP	// read on Gorgon, purpose unknown
 	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s23_mcu_pa_r, s23_mcu_pa_w )
 	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE( s23_mcu_portB_r, s23_mcu_portB_w )
 	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE( s23_mcu_iob_r, s23_mcu_iob_w )
@@ -1302,7 +1821,7 @@ static READ8_HANDLER( s23_iob_mcu_r )
 	UINT8 ret = maintoio[mi_rd];
 
 	mi_rd++;
-	mi_rd &= 0x3f;
+	mi_rd &= 0x7f;
 
 	if (mi_rd == mi_wr)
 	{
@@ -1315,7 +1834,7 @@ static READ8_HANDLER( s23_iob_mcu_r )
 static WRITE8_HANDLER( s23_iob_mcu_w )
 {
 	iotomain[im_wr++] = data;
-	im_wr &= 0x3f;
+	im_wr &= 0x7f;
 
 	cputag_set_input_line(space->machine, "audiocpu", H8_SCI_0_RX, ASSERT_LINE);
 }
@@ -1334,10 +1853,20 @@ static WRITE8_HANDLER( s23_iob_p4_w )
 	namcos23_jvssense = (data & 0x04) ? 0 : 1;
 }
 
+static READ8_HANDLER(iob_r)
+{
+	return mame_rand(space->machine);
+}
+
 /* H8/3334 (Namco C78) I/O board MCU */
 static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION("ioboard", 0)
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("TC2P0")	  // 0-1 = coin 0-3 = coin connect, 0-5 = test 0-6 = down select, 0-7 = up select, 0-8 = enter
+	AM_RANGE(0x6001, 0x6001) AM_READ_PORT("TC2P1")	  // 1-1 = gun trigger 1-2 = foot pedal
+	AM_RANGE(0x6002, 0x6003) AM_READ( iob_r )
+	AM_RANGE(0x7000, 0x700f) AM_READ( iob_r )
+
+	AM_RANGE(0xc000, 0xf7ff) AM_RAM
 ADDRESS_MAP_END
 
 /*
@@ -1346,6 +1875,8 @@ ADDRESS_MAP_END
 */
 static ADDRESS_MAP_START( s23iobrdiomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(H8_PORT_4, H8_PORT_4) AM_READWRITE( s23_iob_p4_r, s23_iob_p4_w )
+	AM_RANGE(H8_PORT_5, H8_PORT_5) AM_NOP	// status LED in bit 2
+	AM_RANGE(H8_PORT_6, H8_PORT_6) AM_NOP	// unknown
 	AM_RANGE(H8_SERIAL_0, H8_SERIAL_0) AM_READWRITE( s23_iob_mcu_r, s23_iob_mcu_w )
 ADDRESS_MAP_END
 
@@ -1353,14 +1884,26 @@ static DRIVER_INIT(ss23)
 {
 	mi_rd = mi_wr = im_rd = im_wr = 0;
 	namcos23_jvssense = 1;
-	s23_vbl = 0;
+	ctl_vbl_active = false;
 	s23_lastpB = 0x50;
 	s23_setstate = 0;
 	s23_setnum = 0;
 	memset(s23_settings, 0, sizeof(s23_settings));
 	s23_tssio_port_4 = 0;
 	s23_porta = 0, s23_rtcstate = 0;
-	gorgon_vbl = 0;
+
+	if ((!strcmp(machine->gamedrv->name, "motoxgo")) ||
+	    (!strcmp(machine->gamedrv->name, "panicprk")) ||
+	    (!strcmp(machine->gamedrv->name, "rapidrvr")) ||
+	    (!strcmp(machine->gamedrv->name, "finlflng")) ||
+	    (!strcmp(machine->gamedrv->name, "timecrs2")))
+	{
+		has_jvsio = 1;
+	}
+	else
+	{
+		has_jvsio = 0;
+	}
 }
 
 #define XOR(a) WORD2_XOR_BE(a)
@@ -1399,7 +1942,7 @@ static const gfx_layout sprite_layout =
 #endif
 
 static GFXDECODE_START( namcos23 )
-	GFXDECODE_ENTRY( NULL, 0, namcos23_cg_layout,  0, 0x80 )
+	GFXDECODE_ENTRY( NULL, 0, namcos23_cg_layout, 0x7f00, 0x80 )
 GFXDECODE_END
 
 static const mips3_config config =
@@ -1408,37 +1951,40 @@ static const mips3_config config =
 	8192				/* data cache size - VERIFIED */
 };
 
-static INTERRUPT_GEN( namcos23_interrupt )
-{
-}
-
 static MACHINE_DRIVER_START( gorgon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R4650BE, 133000000)
+	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(gorgon_map)
+	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
-	MDRV_CPU_IO_MAP( s23h8ionoiobmap)
+	MDRV_CPU_PROGRAM_MAP( s23h8rwmap )
+	MDRV_CPU_IO_MAP( s23h8iomap )
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
+
+	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
+	MDRV_CPU_PROGRAM_MAP( s23iobrdmap )
+	MDRV_CPU_IO_MAP( s23iobrdiomap )
 
 	MDRV_QUANTUM_TIME(HZ(60000))
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*16, 30*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 64*16-1, 0, 30*16-1)
+	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
 	MDRV_PALETTE_LENGTH(0x8000)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_GFXDECODE(namcos23)
 
 	MDRV_VIDEO_START(ss23)
-	MDRV_VIDEO_UPDATE(gorgon)
+	MDRV_VIDEO_UPDATE(ss23)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1453,32 +1999,34 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( s23 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R4650BE, 166000000)
+	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map)
 	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
-	MDRV_CPU_IO_MAP( s23h8iomap)
+	MDRV_CPU_PROGRAM_MAP( s23h8rwmap )
+	MDRV_CPU_IO_MAP( s23h8iomap )
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23iobrdmap)
-	MDRV_CPU_IO_MAP( s23iobrdiomap)
+	MDRV_CPU_PROGRAM_MAP( s23iobrdmap )
+	MDRV_CPU_IO_MAP( s23iobrdiomap )
 
 	MDRV_QUANTUM_TIME(HZ(60*18000))	// higher than 60*20000 causes timecrs2 crash after power-on test $1e
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*16, 30*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 64*16-1, 0, 30*16-1)
+	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_GFXDECODE(namcos23)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
@@ -1496,28 +2044,30 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ss23 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R4650BE, 166000000)
+	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*5)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map)
-	MDRV_CPU_VBLANK_INT("screen", namcos23_interrupt)
+	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", H83002, 14745600 )
-	MDRV_CPU_PROGRAM_MAP( s23h8rwmap)
-	MDRV_CPU_IO_MAP( s23h8ionoiobmap)
+	MDRV_CPU_PROGRAM_MAP( s23h8rwmap )
+	MDRV_CPU_IO_MAP( s23h8ionoiobmap )
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_pulse)
 
 	MDRV_QUANTUM_TIME(HZ(60*40000))
 
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(48*16, 30*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 48*16-1, 0, 30*16-1)
+	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
 	MDRV_PALETTE_LENGTH(0x8000)
 
 	MDRV_GFXDECODE(namcos23)
+
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
@@ -1540,9 +2090,12 @@ ROM_START( rapidrvr )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
 	ROM_LOAD16_WORD_SWAP( "rd3verc.ic3",  0x000000, 0x080000, CRC(6e26fbaf) SHA1(4ab6637d22f0d26f7e1d10e9c80059c56f64303d) )
 
-	ROM_REGION( 0x800000, "sprite", 0 )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "rd1mtal.1j",   0x000000, 0x400000, CRC(8f0efa86) SHA1(9953461c258f2a96be275a7b18d6518ddfac3860) )
-        ROM_LOAD16_BYTE( "rd1mtah.3j",   0x000001, 0x400000, CRC(d8fa0f3d) SHA1(0d5bdb3a2e7be1dffe11b74baa2c10bfe011ae92) )
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+        ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
+
+	ROM_REGION32_BE( 0x800000, "data", 0 )	/* data */
+        ROM_LOAD16_BYTE( "rd1mtah.3j",   0x000000, 0x400000, CRC(d8fa0f3d) SHA1(0d5bdb3a2e7be1dffe11b74baa2c10bfe011ae92) )
+        ROM_LOAD16_BYTE( "rd1mtal.1j",   0x000001, 0x400000, CRC(8f0efa86) SHA1(9953461c258f2a96be275a7b18d6518ddfac3860) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "rd1cguu.5b",   0x0000000, 0x800000, CRC(611bab41) SHA1(84cddb2b63bf8336e92aecb06eddf1b34af73540) )
@@ -1599,9 +2152,12 @@ ROM_START( finlflng )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "ff2vera.ic3",  0x000000, 0x080000, CRC(ab681078) SHA1(ec8367404458a54893ab6bea29c8a2ba3272b816) )
 
-	ROM_REGION( 0x800000, "sprite", 0 )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "ff2mtal.1j",   0x000000, 0x400000, CRC(ed1a5bf2) SHA1(bd05388a125a0201a41af95fb2aa5fe1c8b0f270) )
-        ROM_LOAD16_BYTE( "ff2mtah.3j",   0x000001, 0x400000, CRC(161003cd) SHA1(04409333a4776b17700fc6d1aa06a39560132e03) )
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+        ROM_LOAD( "asca1_io-a.ic2", 0x000000, 0x040000, CRC(77cdf69a) SHA1(497af1059f85c07bea2dd0d303481623f6019dcf) )
+
+	ROM_REGION32_BE( 0x800000, "data", 0 )	/* data */
+        ROM_LOAD16_BYTE( "ff2mtah.3j",   0x000000, 0x400000, CRC(161003cd) SHA1(04409333a4776b17700fc6d1aa06a39560132e03) )
+        ROM_LOAD16_BYTE( "ff2mtal.1j",   0x000001, 0x400000, CRC(ed1a5bf2) SHA1(bd05388a125a0201a41af95fb2aa5fe1c8b0f270) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "ff2cguu.5b",   0x0000000, 0x400000, CRC(595deee4) SHA1(b29ff9c6ba17737f1f87c05b2d899d80b0b72dbb) )
@@ -1641,7 +2197,7 @@ ROM_START( finlflng )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
         ROM_LOAD( "ff2wavel.2s",  0x000000, 0x800000, CRC(6235c605) SHA1(521eaee80ac17c0936877d49394e5390fa0ff8a0) )
-        ROM_LOAD( "ff2waveh.3s",  0x00000, 0x800000, CRC(2a59492a) SHA1(886ec0a4a71048d65f93c52df96416e74d23b3ec) )
+        ROM_LOAD( "ff2waveh.3s",  0x800000, 0x800000, CRC(2a59492a) SHA1(886ec0a4a71048d65f93c52df96416e74d23b3ec) )
 ROM_END
 
 ROM_START( motoxgo )
@@ -1658,9 +2214,9 @@ ROM_START( motoxgo )
 	ROM_REGION( 0x20000, "exioboard", 0 )	/* "extra" I/O board (uses Fujitsu MB90611A MCU) */
         ROM_LOAD( "mg1prog0a.3a", 0x000000, 0x020000, CRC(b2b5be8f) SHA1(803652b7b8fde2196b7fb742ba8b9843e4fcd2de) )
 
-	ROM_REGION( 0x2000000, "sprite", ROMREGION_ERASEFF )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "mg1mtal.2h",   0x000000, 0x800000, CRC(fdad0f0a) SHA1(420d50f012af40f80b196d3aae320376e6c32367) )
-        ROM_LOAD16_BYTE( "mg1mtah.2j",   0x000001, 0x800000, CRC(845f4768) SHA1(9c03b1f6dcd9d1f43c2958d855221be7f9415c47) )
+	ROM_REGION32_BE( 0x2000000, "data", ROMREGION_ERASEFF )	/* data roms */
+        ROM_LOAD16_BYTE( "mg1mtah.2j",   0x000000, 0x800000, CRC(845f4768) SHA1(9c03b1f6dcd9d1f43c2958d855221be7f9415c47) )
+        ROM_LOAD16_BYTE( "mg1mtal.2h",   0x000001, 0x800000, CRC(fdad0f0a) SHA1(420d50f012af40f80b196d3aae320376e6c32367) )
 
 	ROM_REGION( 0x2000000, "textile", ROMREGION_ERASEFF )	/* texture tiles */
         ROM_LOAD( "mg1cgum.4j",   0x000000, 0x800000, CRC(46a77d73) SHA1(132ce2452ee68ba374e98b59032ac0a1a277078d) )
@@ -1702,11 +2258,11 @@ ROM_START( timecrs2 )
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 
-	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "tss1mtal.2h",  0x0000000, 0x800000, CRC(bfc79190) SHA1(04bda00c4cc5660d27af4f3b0ee3550dea8d3805) )
-        ROM_LOAD16_BYTE( "tss1mtah.2j",  0x0000001, 0x800000, CRC(697c26ed) SHA1(72f6f69e89496ba0c6183b35c3bde71f5a3c721f) )
-        ROM_LOAD16_BYTE( "tss1mtbl.2f",  0x1000000, 0x800000, CRC(e648bea4) SHA1(3803d03e72b25fbcc124d5b25066d25629b76b94) )
-        ROM_LOAD16_BYTE( "tss1mtbh.2m",  0x1000001, 0x800000, CRC(82582776) SHA1(7c790d09bac660ea1c62da3ffb21ab43f2461594) )
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+        ROM_LOAD16_BYTE( "tss1mtah.2j",  0x0000000, 0x800000, CRC(697c26ed) SHA1(72f6f69e89496ba0c6183b35c3bde71f5a3c721f) )
+        ROM_LOAD16_BYTE( "tss1mtal.2h",  0x0000001, 0x800000, CRC(bfc79190) SHA1(04bda00c4cc5660d27af4f3b0ee3550dea8d3805) )
+        ROM_LOAD16_BYTE( "tss1mtbh.2m",  0x1000000, 0x800000, CRC(82582776) SHA1(7c790d09bac660ea1c62da3ffb21ab43f2461594) )
+        ROM_LOAD16_BYTE( "tss1mtbl.2f",  0x1000001, 0x800000, CRC(e648bea4) SHA1(3803d03e72b25fbcc124d5b25066d25629b76b94) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "tss1cguu.4f",  0x0000000, 0x800000, CRC(76924e04) SHA1(751065d6ce658cbbcd88f854f6937ebd2204ec68) )
@@ -1742,11 +2298,51 @@ ROM_START( timecrs2b )
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 
-	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "tss1mtal.2h",  0x0000000, 0x800000, CRC(bfc79190) SHA1(04bda00c4cc5660d27af4f3b0ee3550dea8d3805) )
-        ROM_LOAD16_BYTE( "tss1mtah.2j",  0x0000001, 0x800000, CRC(697c26ed) SHA1(72f6f69e89496ba0c6183b35c3bde71f5a3c721f) )
-        ROM_LOAD16_BYTE( "tss1mtbl.2f",  0x1000000, 0x800000, CRC(e648bea4) SHA1(3803d03e72b25fbcc124d5b25066d25629b76b94) )
-        ROM_LOAD16_BYTE( "tss1mtbh.2m",  0x1000001, 0x800000, CRC(82582776) SHA1(7c790d09bac660ea1c62da3ffb21ab43f2461594) )
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+        ROM_LOAD16_BYTE( "tss1mtah.2j",  0x0000000, 0x800000, CRC(697c26ed) SHA1(72f6f69e89496ba0c6183b35c3bde71f5a3c721f) )
+        ROM_LOAD16_BYTE( "tss1mtal.2h",  0x0000001, 0x800000, CRC(bfc79190) SHA1(04bda00c4cc5660d27af4f3b0ee3550dea8d3805) )
+        ROM_LOAD16_BYTE( "tss1mtbh.2m",  0x1000000, 0x800000, CRC(82582776) SHA1(7c790d09bac660ea1c62da3ffb21ab43f2461594) )
+        ROM_LOAD16_BYTE( "tss1mtbl.2f",  0x1000001, 0x800000, CRC(e648bea4) SHA1(3803d03e72b25fbcc124d5b25066d25629b76b94) )
+
+	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
+        ROM_LOAD( "tss1cguu.4f",  0x0000000, 0x800000, CRC(76924e04) SHA1(751065d6ce658cbbcd88f854f6937ebd2204ec68) )
+        ROM_LOAD( "tss1cgum.4j",  0x0800000, 0x800000, CRC(c22739e1) SHA1(8671ee047bb248033656c50befd1c35e5e478e1a) )
+        ROM_LOAD( "tss1cgll.4m",  0x1000000, 0x800000, CRC(18433aaa) SHA1(08539beb2e66ec4e41062621fc098b121c669546) )
+        ROM_LOAD( "tss1cglm.4k",  0x1800000, 0x800000, CRC(669974c2) SHA1(cfebe199631e38f547b38fcd35f1645b74e8dd0a) )
+
+	ROM_REGION( 0x600000, "textilemap", 0 )	/* texture tilemap */
+        ROM_LOAD( "tss1ccrl.7f",  0x000000, 0x400000, CRC(3a325fe7) SHA1(882735dce7aeb36f9e88a983498360f5de901e9d) )
+        ROM_LOAD( "tss1ccrh.7e",  0x400000, 0x200000, CRC(f998de1a) SHA1(371f540f505608297c5ffcfb623b983ca8310afb) )
+
+	ROM_REGION32_LE( 0x2000000, "pointrom", 0 )	/* 3D model data */
+        ROM_LOAD32_WORD( "tss1pt0l.7c",  0x0000000, 0x400000, CRC(896f0fb4) SHA1(bdfa99eb21ce4fc8021f9d95a5558a34f9942c57) )
+        ROM_LOAD32_WORD( "tss1pt0h.7a",  0x0000002, 0x400000, CRC(cdbe0ba8) SHA1(f8c6da31654c0a2a8024888ffb7fc1c783b2d629) )
+        ROM_LOAD32_WORD( "tss1pt1l.5c",  0x0800000, 0x400000, CRC(5a09921f) SHA1(c23885708c7adf0b81c2c9346e21b869634a5b35) )
+        ROM_LOAD32_WORD( "tss1pt1h.5a",  0x0800002, 0x400000, CRC(63647596) SHA1(833412be8f61686bd7e06c2738df740e0e585d0f) )
+        ROM_LOAD32_WORD( "tss1pt2l.4c",  0x1000000, 0x400000, CRC(4b230d79) SHA1(794cee0a19993e90913f58507c53224f361e9663) )
+        ROM_LOAD32_WORD( "tss1pt2h.4a",  0x1000002, 0x400000, CRC(9b06e22d) SHA1(cff5ed098112a4f0a2bc8937e226f50066e605b1) )
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+        ROM_LOAD( "tss1wavel.2c", 0x000000, 0x800000, CRC(deaead26) SHA1(72dac0c3f41d4c3c290f9eb1b50236ae3040a472) )
+        ROM_LOAD( "tss1waveh.2a", 0x800000, 0x800000, CRC(5c8758b4) SHA1(b85c8f6869900224ef83a2340b17f5bbb2801af9) )
+ROM_END
+
+ROM_START( timecrs2c )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+        ROM_LOAD16_BYTE( "tss4vera.2",   0x000000, 0x200000, CRC(c84edd3b) SHA1(0b577a8ef6e74afa991dd81c2db19041787724da) )
+        ROM_LOAD16_BYTE( "tss4vera.1",   0x000001, 0x200000, CRC(26f57c83) SHA1(c8983c26b7524a35257a242b66a9413eb354ca0d) )
+
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
+        ROM_LOAD16_WORD_SWAP( "tss4vera.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
+
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+        ROM_LOAD16_BYTE( "tss1mtah.2j",  0x0000000, 0x800000, CRC(697c26ed) SHA1(72f6f69e89496ba0c6183b35c3bde71f5a3c721f) )
+        ROM_LOAD16_BYTE( "tss1mtal.2h",  0x0000001, 0x800000, CRC(bfc79190) SHA1(04bda00c4cc5660d27af4f3b0ee3550dea8d3805) )
+        ROM_LOAD16_BYTE( "tss1mtbh.2m",  0x1000000, 0x800000, CRC(82582776) SHA1(7c790d09bac660ea1c62da3ffb21ab43f2461594) )
+        ROM_LOAD16_BYTE( "tss1mtbl.2f",  0x1000001, 0x800000, CRC(e648bea4) SHA1(3803d03e72b25fbcc124d5b25066d25629b76b94) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "tss1cguu.4f",  0x0000000, 0x800000, CRC(76924e04) SHA1(751065d6ce658cbbcd88f854f6937ebd2204ec68) )
@@ -1780,9 +2376,9 @@ ROM_START( 500gp )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "5gp3verc.3",   0x000000, 0x080000, CRC(b323abdf) SHA1(8962e39b48a7074a2d492afb5db3f5f3e5ae2389) )
 
-	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
-	ROM_LOAD16_BYTE( "5gp1mtal.2h",  0x0000000, 0x800000, CRC(1bb00c7b) SHA1(922be45d57330c31853b2dc1642c589952b09188) )
-        ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000001, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+        ROM_LOAD16_BYTE( "5gp1mtah.2j",  0x0000000, 0x800000, CRC(246e4b7a) SHA1(75743294b8f48bffb84f062febfbc02230d49ce9) )
+		ROM_LOAD16_BYTE( "5gp1mtal.2h",  0x0000001, 0x800000, CRC(1bb00c7b) SHA1(922be45d57330c31853b2dc1642c589952b09188) )
 
 		/* COMMON FUJII YASUI WAKAO KURE INOUE
          * 0x000000..0x57ffff: all 0xff
@@ -1823,11 +2419,11 @@ ROM_START( finfurl2 )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
-	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "ffs1mtal.2h",  0x0000000, 0x800000, CRC(98730ad5) SHA1(9ba276ad88ec8730edbacab80cdacc34a99593e4) )
-        ROM_LOAD16_BYTE( "ffs1mtah.2j",  0x0000001, 0x800000, CRC(f336d81d) SHA1(a9177091e1412dea1b6ea6c53530ae31361b32d0) )
-        ROM_LOAD16_BYTE( "ffs1mtbl.2f",  0x1000000, 0x800000, CRC(0abc9e50) SHA1(be5e5e2b637811c59804ef9442c6da5a5a1315e2) )
-        ROM_LOAD16_BYTE( "ffs1mtbh.2m",  0x1000001, 0x800000, CRC(0f42c93b) SHA1(26b313fc5c33afb0a1ee42243486e38f052c95c2) )
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+        ROM_LOAD16_BYTE( "ffs1mtah.2j",  0x0000000, 0x800000, CRC(f336d81d) SHA1(a9177091e1412dea1b6ea6c53530ae31361b32d0) )
+        ROM_LOAD16_BYTE( "ffs1mtal.2h",  0x0000001, 0x800000, CRC(98730ad5) SHA1(9ba276ad88ec8730edbacab80cdacc34a99593e4) )
+        ROM_LOAD16_BYTE( "ffs1mtbh.2m",  0x1000000, 0x800000, CRC(0f42c93b) SHA1(26b313fc5c33afb0a1ee42243486e38f052c95c2) )
+        ROM_LOAD16_BYTE( "ffs1mtbl.2f",  0x1000001, 0x800000, CRC(0abc9e50) SHA1(be5e5e2b637811c59804ef9442c6da5a5a1315e2) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "ffs1cguu.4f",  0x0000000, 0x800000, CRC(52c0a19f) SHA1(e6b4b90ff88da09cb2e653e450e7ae66942a719e) )
@@ -1862,11 +2458,11 @@ ROM_START( finfurl2j )
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "m29f400.ic3",  0x000000, 0x080000, CRC(9fd69bbd) SHA1(53a9bf505de70495dcccc43fdc722b3381aad97c) )
 
-	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "ffs1mtal.2h",  0x0000000, 0x800000, CRC(98730ad5) SHA1(9ba276ad88ec8730edbacab80cdacc34a99593e4) )
-        ROM_LOAD16_BYTE( "ffs1mtah.2j",  0x0000001, 0x800000, CRC(f336d81d) SHA1(a9177091e1412dea1b6ea6c53530ae31361b32d0) )
-        ROM_LOAD16_BYTE( "ffs1mtbl.2f",  0x1000000, 0x800000, CRC(0abc9e50) SHA1(be5e5e2b637811c59804ef9442c6da5a5a1315e2) )
-        ROM_LOAD16_BYTE( "ffs1mtbh.2m",  0x1000001, 0x800000, CRC(0f42c93b) SHA1(26b313fc5c33afb0a1ee42243486e38f052c95c2) )
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+        ROM_LOAD16_BYTE( "ffs1mtah.2j",  0x0000000, 0x800000, CRC(f336d81d) SHA1(a9177091e1412dea1b6ea6c53530ae31361b32d0) )
+        ROM_LOAD16_BYTE( "ffs1mtal.2h",  0x0000001, 0x800000, CRC(98730ad5) SHA1(9ba276ad88ec8730edbacab80cdacc34a99593e4) )
+        ROM_LOAD16_BYTE( "ffs1mtbh.2m",  0x1000000, 0x800000, CRC(0f42c93b) SHA1(26b313fc5c33afb0a1ee42243486e38f052c95c2) )
+        ROM_LOAD16_BYTE( "ffs1mtbl.2f",  0x1000001, 0x800000, CRC(0abc9e50) SHA1(be5e5e2b637811c59804ef9442c6da5a5a1315e2) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "ffs1cguu.4f",  0x0000000, 0x800000, CRC(52c0a19f) SHA1(e6b4b90ff88da09cb2e653e450e7ae66942a719e) )
@@ -1902,13 +2498,11 @@ ROM_START( panicprk )
         ROM_LOAD16_WORD_SWAP( "pnp2ver-a.ic3", 0x000000, 0x080000, CRC(fe4bc6f4) SHA1(2114dc4bc63d589e6c3b26a73dbc60924f3b1765) )
 
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
-	// i/o program from motoxgo, as it's "general". however, game crashes(H8 unknown opcode) if add this program
-//      ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
-		ROM_FILL( 0x00000, 0x40000, 0 ) // Temporary - fixes validity check warning
+	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
 
-	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "pnp1mtal.2h",  0x000000, 0x800000, CRC(6490faaa) SHA1(03443746009b434e5d4074ea6314910418907360) )
-        ROM_LOAD16_BYTE( "pnp1mtah.2j",  0x000001, 0x800000, CRC(37addddd) SHA1(3032989653304417df80606bc3fde6e9425d8cbb) )
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+        ROM_LOAD16_BYTE( "pnp1mtah.2j",  0x000000, 0x800000, CRC(37addddd) SHA1(3032989653304417df80606bc3fde6e9425d8cbb) )
+        ROM_LOAD16_BYTE( "pnp1mtal.2h",  0x000001, 0x800000, CRC(6490faaa) SHA1(03443746009b434e5d4074ea6314910418907360) )
 
 	ROM_REGION( 0x4000000, "textile", 0 )	/* texture tiles */
         ROM_LOAD( "pnp1cguu.5f",  0x000000, 0x800000, CRC(cd64f57f) SHA1(8780270298e0823db1acbbf79396788df0c3c19c) )
@@ -1944,6 +2538,7 @@ GAME( 1997, finlflng, 0,      gorgon, ss23, ss23, ROT0, "Namco", "Final Furlong 
 GAME( 1997, motoxgo,  0,         s23, ss23, ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2, 0,         s23, ss23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS3 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2b,timecrs2,  s23, ss23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS2 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1997, timecrs2c,timecrs2, ss23, ss23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS4 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1998, panicprk, 0,         s23, ss23, ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, 500gp,    0,        ss23, ss23, ss23, ROT0, "Namco", "500GP", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfurl2, 0,        ss23, ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )

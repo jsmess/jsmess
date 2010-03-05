@@ -1,19 +1,31 @@
-typedef struct _liberate_state liberate_state;
-struct _liberate_state
+class liberate_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, liberate_state(machine)); }
+
+	liberate_state(running_machine &machine) { }
+
+	UINT8 *videoram;
+	UINT8 *colorram;
+	UINT8 *paletteram;
+	UINT8 *spriteram;
+	UINT8 *scratchram;
+	UINT8 *charram;	/* prosoccr */
+	UINT8 *bg_vram; /* prosport */
+
+	UINT8 io_ram[16];
+
 	int bank;
 	int latch;
 	UINT8 gfx_rom_readback;
 	int background_color;
 	int background_disable;
-	tilemap_t *background_tilemap;
+
+	tilemap_t *back_tilemap;
 	tilemap_t *fix_tilemap;
-	UINT8 io_ram[16];
-	UINT8 *videoram;
-	UINT8 *colorram;
-	UINT8 *scratchram;
-	UINT8 *charram;	/* prosoccr */
-	UINT8 *bg_vram; /* prosport */
+
+	running_device *maincpu;
+	running_device *audiocpu;
 };
 
 

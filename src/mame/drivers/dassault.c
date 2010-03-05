@@ -124,21 +124,18 @@ Dip locations verified with US conversion kit manual.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
-#include "includes/deco16ic.h"
+#include "includes/dassault.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "video/deco16ic.h"
 
-VIDEO_START( dassault );
-VIDEO_UPDATE( dassault );
-
-static UINT16 *dassault_ram,*shared_ram,*dassault_ram2;
 
 /**********************************************************************************/
 
 static READ16_HANDLER( dassault_control_r )
 {
-	switch (offset<<1)
+	switch (offset << 1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
 			return input_port_read(space->machine, "P1_P2");
@@ -161,9 +158,9 @@ static READ16_HANDLER( dassault_control_r )
 
 static WRITE16_HANDLER( dassault_control_w )
 {
-	coin_counter_w(space->machine, 0,data&1);
-	if (data&0xfffe)
-		logerror("Coin cointrol %04x\n",data);
+	coin_counter_w(space->machine, 0, data & 1);
+	if (data & 0xfffe)
+		logerror("Coin cointrol %04x\n", data);
 }
 
 static READ16_HANDLER( dassault_sub_control_r )
@@ -173,39 +170,45 @@ static READ16_HANDLER( dassault_sub_control_r )
 
 static WRITE16_HANDLER( dassault_sound_w )
 {
+	dassault_state *state = (dassault_state *)space->machine->driver_data;
 	soundlatch_w(space, 0, data & 0xff);
-	cputag_set_input_line(space->machine, "audiocpu", 0, HOLD_LINE); /* IRQ1 */
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
 static READ16_HANDLER( dassault_irq_r )
 {
-	switch (offset) {
-		case 0: cputag_set_input_line(space->machine, "maincpu", 5, CLEAR_LINE); break;
-		case 1: cputag_set_input_line(space->machine, "sub", 6, CLEAR_LINE); break;
+	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	switch (offset)
+	{
+	case 0: cpu_set_input_line(state->maincpu, 5, CLEAR_LINE); break;
+	case 1: cpu_set_input_line(state->subcpu, 6, CLEAR_LINE); break;
 	}
-	return shared_ram[(0xffc/2)+offset]; /* The values probably don't matter */
+	return state->shared_ram[(0xffc / 2) + offset]; /* The values probably don't matter */
 }
 
 static WRITE16_HANDLER( dassault_irq_w )
 {
+	dassault_state *state = (dassault_state *)space->machine->driver_data;
 	switch (offset)
 	{
-		case 0: cputag_set_input_line(space->machine, "maincpu", 5, ASSERT_LINE); break;
-		case 1: cputag_set_input_line(space->machine, "sub", 6, ASSERT_LINE); break;
+	case 0: cpu_set_input_line(state->maincpu, 5, ASSERT_LINE); break;
+	case 1: cpu_set_input_line(state->subcpu, 6, ASSERT_LINE); break;
 	}
 
-	COMBINE_DATA(&shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
+	COMBINE_DATA(&state->shared_ram[(0xffc / 2) + offset]); /* The values probably don't matter */
 }
 
 static WRITE16_HANDLER( shared_ram_w )
 {
-	COMBINE_DATA(&shared_ram[offset]);
+	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->shared_ram[offset]);
 }
 
 static READ16_HANDLER( shared_ram_r )
 {
-	return shared_ram[offset];
+	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	return state->shared_ram[offset];
 }
 
 /**********************************************************************************/
@@ -213,30 +216,30 @@ static READ16_HANDLER( shared_ram_r )
 static ADDRESS_MAP_START( dassault_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(deco16_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_DEVWRITE("deco_custom", deco16ic_nonbuffered_palette_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x140004, 0x140007) AM_WRITENOP /* ? */
 	AM_RANGE(0x180000, 0x180001) AM_WRITE(dassault_sound_w)
 
 	AM_RANGE(0x1c0000, 0x1c000f) AM_READ(dassault_control_r)
-	AM_RANGE(0x1c000a, 0x1c000b) AM_WRITE(deco16_priority_w)
+	AM_RANGE(0x1c000a, 0x1c000b) AM_DEVWRITE("deco_custom", deco16ic_priority_w)
 	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(buffer_spriteram16_2_w)
 	AM_RANGE(0x1c000e, 0x1c000f) AM_WRITE(dassault_control_w)
 
-	AM_RANGE(0x200000, 0x201fff) AM_RAM_WRITE(deco16_pf1_data_w) AM_BASE(&deco16_pf1_data)
-	AM_RANGE(0x202000, 0x203fff) AM_RAM_WRITE(deco16_pf2_data_w) AM_BASE(&deco16_pf2_data)
-	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_BASE(&deco16_pf2_rowscroll)
-	AM_RANGE(0x220000, 0x22000f) AM_WRITEONLY AM_BASE(&deco16_pf12_control)
+	AM_RANGE(0x200000, 0x201fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf1_data_r, deco16ic_pf1_data_w)
+	AM_RANGE(0x202000, 0x203fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf2_data_r, deco16ic_pf2_data_w)
+	AM_RANGE(0x212000, 0x212fff) AM_WRITEONLY AM_BASE_MEMBER(dassault_state, pf2_rowscroll)
+	AM_RANGE(0x220000, 0x22000f) AM_DEVWRITE("deco_custom", deco16ic_pf12_control_w)
 
-	AM_RANGE(0x240000, 0x240fff) AM_RAM_WRITE(deco16_pf3_data_w) AM_BASE(&deco16_pf3_data)
-	AM_RANGE(0x242000, 0x242fff) AM_RAM_WRITE(deco16_pf4_data_w) AM_BASE(&deco16_pf4_data)
-	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_BASE(&deco16_pf4_rowscroll)
-	AM_RANGE(0x260000, 0x26000f) AM_WRITEONLY AM_BASE(&deco16_pf34_control)
+	AM_RANGE(0x240000, 0x240fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf3_data_r, deco16ic_pf3_data_w)
+	AM_RANGE(0x242000, 0x242fff) AM_DEVREADWRITE("deco_custom", deco16ic_pf4_data_r, deco16ic_pf4_data_w)
+	AM_RANGE(0x252000, 0x252fff) AM_WRITEONLY AM_BASE_MEMBER(dassault_state, pf4_rowscroll)
+	AM_RANGE(0x260000, 0x26000f) AM_DEVWRITE("deco_custom", deco16ic_pf34_control_w)
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE(&dassault_ram) /* Main ram */
+	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, ram) /* Main ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2) /* Spriteram (2nd) */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
-	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&shared_ram) /* Shared ram */
+	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE_MEMBER(dassault_state, shared_ram) /* Shared ram */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dassault_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -246,7 +249,7 @@ static ADDRESS_MAP_START( dassault_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100002, 0x100007) AM_WRITENOP /* ? */
 	AM_RANGE(0x100004, 0x100005) AM_READ(dassault_sub_control_r)
 
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE(&dassault_ram2) /* Sub cpu ram */
+	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_BASE_MEMBER(dassault_state, ram2) /* Sub cpu ram */
 	AM_RANGE(0x3fc000, 0x3fcfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram) /* Sprite ram */
 	AM_RANGE(0x3feffc, 0x3fefff) AM_READWRITE(dassault_irq_r, dassault_irq_w)
 	AM_RANGE(0x3fe000, 0x3fefff) AM_READWRITE(shared_ram_r, shared_ram_w)
@@ -510,13 +513,16 @@ GFXDECODE_END
 
 static void sound_irq(running_device *device, int state)
 {
-	cputag_set_input_line(device->machine, "audiocpu", 1, state);
+	dassault_state *driver_state = (dassault_state *)device->machine->driver_data;
+	cpu_set_input_line(driver_state->audiocpu, 1, state);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_bankswitch_w )
 {
+	dassault_state *state = (dassault_state *)device->machine->driver_data;
+
 	/* the second OKIM6295 ROM is bank switched */
-	okim6295_set_bank_base(devtag_get_device(device->machine, "oki2"), (data & 1) * 0x40000);
+	okim6295_set_bank_base(state->oki2, (data & 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =
@@ -527,7 +533,39 @@ static const ym2151_interface ym2151_config =
 
 /**********************************************************************************/
 
+static int dassault_bank_callback( const int bank )
+{
+	return ((bank >> 4) & 0xf) << 12;
+}
+
+static const deco16ic_interface dassault_deco16ic_intf =
+{
+	"screen",
+	0, 0, 1,
+	0x0f, 0x0f, 0x0f, 0x0f,	/* trans masks (default values) */
+	0, 16, 0, 16, /* color base (default values) */
+	0x0f, 0x0f, 0x0f, 0x0f,	/* color masks (default values) */
+	dassault_bank_callback,
+	dassault_bank_callback,
+	dassault_bank_callback,
+	dassault_bank_callback
+};
+
+static MACHINE_START( dassault )
+{
+	dassault_state *state = (dassault_state *)machine->driver_data;
+
+	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->subcpu = devtag_get_device(machine, "sub");
+	state->deco16ic = devtag_get_device(machine, "deco_custom");
+	state->oki2 = devtag_get_device(machine, "oki2");
+}
+
 static MACHINE_DRIVER_START( dassault )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(dassault_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* Accurate */
@@ -543,6 +581,8 @@ static MACHINE_DRIVER_START( dassault )
 
 	MDRV_QUANTUM_TIME(HZ(8400)) /* 140 CPU slices per frame */
 
+	MDRV_MACHINE_START(dassault)
+
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
@@ -556,8 +596,9 @@ static MACHINE_DRIVER_START( dassault )
 	MDRV_GFXDECODE(dassault)
 	MDRV_PALETTE_LENGTH(4096)
 
-	MDRV_VIDEO_START(dassault)
 	MDRV_VIDEO_UPDATE(dassault)
+
+	MDRV_DECO16IC_ADD("deco_custom", dassault_deco16ic_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -786,9 +827,10 @@ ROM_END
 
 static READ16_HANDLER( dassault_main_skip )
 {
-	int ret=dassault_ram[0];
+	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	int ret = state->ram[0];
 
-	if (cpu_get_previouspc(space->cpu)==0x1170 && ret&0x8000)
+	if (cpu_get_previouspc(space->cpu) == 0x1170 && ret & 0x8000)
 		cpu_spinuntil_int(space->cpu);
 
 	return ret;
@@ -796,9 +838,10 @@ static READ16_HANDLER( dassault_main_skip )
 
 static READ16_HANDLER( thndzone_main_skip )
 {
-	int ret=dassault_ram[0];
+	dassault_state *state = (dassault_state *)space->machine->driver_data;
+	int ret = state->ram[0];
 
-	if (cpu_get_pc(space->cpu)==0x114c && ret&0x8000)
+	if (cpu_get_pc(space->cpu) == 0x114c && ret & 0x8000)
 		cpu_spinuntil_int(space->cpu);
 
 	return ret;
@@ -813,10 +856,10 @@ static DRIVER_INIT( dassault )
 	/* Playfield 4 also has access to the char graphics, make things easier
     by just copying the chars to both banks (if I just used a different gfx
     bank then the colours would be wrong). */
-	memcpy(tmp+0x000000,dst+0x80000,0x80000);
-	memcpy(dst+0x090000,tmp+0x00000,0x80000);
-	memcpy(dst+0x080000,src+0x00000,0x10000);
-	memcpy(dst+0x110000,src+0x10000,0x10000);
+	memcpy(tmp + 0x000000, dst + 0x80000, 0x80000);
+	memcpy(dst + 0x090000, tmp + 0x00000, 0x80000);
+	memcpy(dst + 0x080000, src + 0x00000, 0x10000);
+	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
 
 	auto_free(machine, tmp);
 
@@ -833,10 +876,10 @@ static DRIVER_INIT( thndzone )
 	/* Playfield 4 also has access to the char graphics, make things easier
     by just copying the chars to both banks (if I just used a different gfx
     bank then the colours would be wrong). */
-	memcpy(tmp+0x000000,dst+0x80000,0x80000);
-	memcpy(dst+0x090000,tmp+0x00000,0x80000);
-	memcpy(dst+0x080000,src+0x00000,0x10000);
-	memcpy(dst+0x110000,src+0x10000,0x10000);
+	memcpy(tmp + 0x000000, dst + 0x80000, 0x80000);
+	memcpy(dst + 0x090000, tmp + 0x00000, 0x80000);
+	memcpy(dst + 0x080000, src + 0x00000, 0x10000);
+	memcpy(dst + 0x110000, src + 0x10000, 0x10000);
 
 	auto_free(machine, tmp);
 
@@ -846,6 +889,6 @@ static DRIVER_INIT( thndzone )
 
 /**********************************************************************************/
 
-GAME( 1991, thndzone, 0,        dassault, thndzone, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)", 0 )
-GAME( 1991, dassault, thndzone, dassault, dassault, dassault, ROT0, "Data East Corporation", "Desert Assault (US)", 0 )
-GAME( 1991, dassault4,thndzone, dassault, dassault4,dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", 0 )
+GAME( 1991, thndzone, 0,        dassault, thndzone, thndzone, ROT0, "Data East Corporation", "Thunder Zone (World)", GAME_SUPPORTS_SAVE )
+GAME( 1991, dassault, thndzone, dassault, dassault, dassault, ROT0, "Data East Corporation", "Desert Assault (US)", GAME_SUPPORTS_SAVE )
+GAME( 1991, dassault4,thndzone, dassault, dassault4,dassault, ROT0, "Data East Corporation", "Desert Assault (US 4 Players)", GAME_SUPPORTS_SAVE )

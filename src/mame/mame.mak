@@ -221,6 +221,7 @@ SOUNDS += DIGITALKER
 SOUNDS += CDP1863
 SOUNDS += CDP1864
 SOUNDS += ZSG2
+SOUNDS += MOS656X
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -1094,7 +1095,7 @@ $(MAMEOBJ)/sanritsu.a: \
 	$(DRIVERS)/chinsan.o \
 	$(DRIVERS)/drmicro.o $(VIDEO)/drmicro.o \
 	$(DRIVERS)/jantotsu.o \
-	$(DRIVERS)/mayumi.o $(VIDEO)/mayumi.o \
+	$(DRIVERS)/mayumi.o \
 	$(DRIVERS)/mermaid.o $(VIDEO)/mermaid.o \
 	$(DRIVERS)/mjkjidai.o $(VIDEO)/mjkjidai.o \
 
@@ -1255,7 +1256,7 @@ $(MAMEOBJ)/suna.a: \
 
 $(MAMEOBJ)/taito.a: \
 	$(DRIVERS)/40love.o $(VIDEO)/40love.o \
-	$(DRIVERS)/arkanoid.o $(MACHINE)/arkanoid.o $(VIDEO)/arkanoid.o \
+	$(DRIVERS)/arkanoid.o $(MACHINE)/arkanoid.o $(VIDEO)/arkanoid.o\
 	$(DRIVERS)/ashnojoe.o $(VIDEO)/ashnojoe.o \
 	$(DRIVERS)/asuka.o $(MACHINE)/bonzeadv.o $(VIDEO)/asuka.o \
 	$(DRIVERS)/bigevglf.o $(MACHINE)/bigevglf.o $(VIDEO)/bigevglf.o \
@@ -1393,7 +1394,7 @@ $(MAMEOBJ)/thepit.a: \
 	$(DRIVERS)/timelimt.o $(VIDEO)/timelimt.o \
 
 $(MAMEOBJ)/toaplan.a: \
-	$(DRIVERS)/mjsister.o $(VIDEO)/mjsister.o \
+	$(DRIVERS)/mjsister.o \
 	$(DRIVERS)/slapfght.o $(MACHINE)/slapfght.o $(VIDEO)/slapfght.o \
 	$(DRIVERS)/snowbros.o $(VIDEO)/kan_pand.o $(VIDEO)/kan_panb.o \
 	$(DRIVERS)/toaplan1.o $(MACHINE)/toaplan1.o $(VIDEO)/toaplan1.o \
@@ -1485,7 +1486,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/amspdwy.o $(VIDEO)/amspdwy.o \
 	$(DRIVERS)/artmagic.o $(VIDEO)/artmagic.o \
 	$(DRIVERS)/astrocorp.o \
-	$(DRIVERS)/attckufo.o $(AUDIO)/attckufo.o $(VIDEO)/attckufo.o \
+	$(DRIVERS)/attckufo.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
 	$(DRIVERS)/beaminv.o \
 	$(DRIVERS)/big10.o \
@@ -1503,7 +1504,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/coinmvga.o \
 	$(DRIVERS)/comebaby.o \
 	$(DRIVERS)/coolpool.o \
-	$(DRIVERS)/cowrace.o \
 	$(DRIVERS)/crystal.o $(DRIVERS)/psattack.o $(VIDEO)/vrender0.o \
 	$(DRIVERS)/cubeqst.o \
 	$(DRIVERS)/cybertnk.o \
@@ -1536,7 +1536,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/gstream.o \
 	$(DRIVERS)/gumbo.o $(VIDEO)/gumbo.o \
 	$(DRIVERS)/gunpey.o \
-	$(DRIVERS)/hexa.o $(VIDEO)/hexa.o \
 	$(DRIVERS)/highvdeo.o \
 	$(DRIVERS)/himesiki.o $(VIDEO)/himesiki.o \
 	$(DRIVERS)/hitpoker.o \
@@ -1576,7 +1575,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/mirage.o \
 	$(DRIVERS)/mirax.o \
 	$(DRIVERS)/mirderby.o \
-	$(DRIVERS)/mole.o $(VIDEO)/mole.o \
+	$(DRIVERS)/mole.o \
 	$(DRIVERS)/mosaic.o $(VIDEO)/mosaic.o \
 	$(DRIVERS)/mrjong.o $(VIDEO)/mrjong.o \
 	$(DRIVERS)/multfish.o \
@@ -1606,6 +1605,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/pntnpuzl.o \
 	$(DRIVERS)/policetr.o $(VIDEO)/policetr.o \
 	$(DRIVERS)/polyplay.o $(AUDIO)/polyplay.o $(VIDEO)/polyplay.o \
+	$(DRIVERS)/poo.o \
 	$(DRIVERS)/quakeat.o \
 	$(DRIVERS)/queen.o \
 	$(DRIVERS)/quizo.o \
@@ -1613,6 +1613,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/rbmk.o \
 	$(DRIVERS)/rcorsair.o \
 	$(DRIVERS)/re900.o \
+	$(DRIVERS)/rgum.o \
 	$(DRIVERS)/roul.o \
 	$(DRIVERS)/sfbonus.o \
 	$(DRIVERS)/shangkid.o $(VIDEO)/shangkid.o \

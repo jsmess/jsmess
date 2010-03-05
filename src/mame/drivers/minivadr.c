@@ -14,6 +14,17 @@ Japan). It has no sound.
 #include "cpu/z80/z80.h"
 
 
+class minivadr_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, minivadr_state(machine)); }
+
+	minivadr_state(running_machine &machine) { }
+
+	/* memory pointers */
+	UINT8 *  videoram;
+	size_t   videoram_size;
+};
 
 /*************************************
  *
@@ -23,15 +34,16 @@ Japan). It has no sound.
 
 static VIDEO_UPDATE( minivadr )
 {
+	minivadr_state *state = (minivadr_state *)screen->machine->driver_data;
 	offs_t offs;
 
-	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
+	for (offs = 0; offs < state->videoram_size; offs++)
 	{
 		int i;
 
 		UINT8 x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = screen->machine->generic.videoram.u8[offs];
+		UINT8 data = state->videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -49,7 +61,7 @@ static VIDEO_UPDATE( minivadr )
 
 static ADDRESS_MAP_START( minivadr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE_SIZE_MEMBER(minivadr_state, videoram, videoram_size)
 	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("INPUTS") AM_WRITENOP		// W - ???
 ADDRESS_MAP_END
 
@@ -68,6 +80,9 @@ INPUT_PORTS_END
 
 
 static MACHINE_DRIVER_START( minivadr )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(minivadr_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,24000000 / 6)		 /* 4 MHz ? */
@@ -100,4 +115,4 @@ ROM_START( minivadr )
 ROM_END
 
 
-GAME( 1990, minivadr, 0, minivadr, minivadr, 0, ROT0, "Taito Corporation", "Minivader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW)
+GAME( 1990, minivadr, 0, minivadr, minivadr, 0, ROT0, "Taito Corporation", "Minivader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND_HW )

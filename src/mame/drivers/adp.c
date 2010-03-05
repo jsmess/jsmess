@@ -152,9 +152,13 @@ Video board has additional chips:
 #include "machine/microtch.h"
 #include "machine/68681.h"
 
-typedef struct _adp_state adp_state;
-struct _adp_state
+class adp_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, adp_state(machine)); }
+
+	adp_state(running_machine &machine) { }
+
 	/* misc */
 	UINT8 mux_data;
 	UINT8 register_active;
@@ -713,6 +717,9 @@ static MACHINE_DRIVER_START( backgamn )
 	MDRV_CPU_PROGRAM_MAP(backgamn_mem)
 
 	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2, skattv_duart68681_config )
+
+	MDRV_MACHINE_START(skattv)
+	MDRV_MACHINE_RESET(skattv)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
