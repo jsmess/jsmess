@@ -16,9 +16,13 @@
 #define SPEAKER_TAG		"speaker"
 #define CENTRONICS_TAG	"centronics"
 
-typedef struct _tandy2k_state tandy2k_state;
-struct _tandy2k_state
+class tandy2k_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tandy2k_state(machine)); }
+
+	tandy2k_state(running_machine &machine) { }
+
 	/* keyboard state */
 	int kben;
 	UINT16 keylatch;

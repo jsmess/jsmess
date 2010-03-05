@@ -15,9 +15,13 @@
 #define XEROX820_VIDEORAM_SIZE	0x1000
 #define XEROX820_VIDEORAM_MASK	0x0fff
 
-typedef struct _xerox820_state xerox820_state;
-struct _xerox820_state
+class xerox820_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, xerox820_state(machine)); }
+
+	xerox820_state(running_machine &machine) { }
+
 	/* keyboard state */
 	int pbrdy;							/* key pressed */
 	int keydata;						/* keyboard data */

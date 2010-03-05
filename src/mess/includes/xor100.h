@@ -13,9 +13,13 @@
 #define CENTRONICS_TAG	"centronics"
 #define TERMINAL_TAG	"terminal"
 
-typedef struct _xor100_state xor100_state;
-struct _xor100_state
+class xor100_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, xor100_state(machine)); }
+
+	xor100_state(running_machine &machine) { }
+
 	/* memory state */
 	int mode;
 	int bank;

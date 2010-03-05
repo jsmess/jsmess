@@ -14,9 +14,13 @@
 #define CASSETTE_TAG	"cassette"
 #define TIMER_C1530_TAG	"c1530"
 
-typedef struct _vic20_state vic20_state;
-struct _vic20_state
+class vic20_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vic20_state(machine)); }
+
+	vic20_state(running_machine &machine) { }
+
 	/* keyboard state */
 	int key_col;
 

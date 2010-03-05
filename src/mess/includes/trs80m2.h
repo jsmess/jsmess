@@ -13,9 +13,13 @@
 #define MC6845_TAG		"u11"
 #define CENTRONICS_TAG	"j2"
 
-typedef struct _trs80m2_state trs80m2_state;
-struct _trs80m2_state
+class trs80m2_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, trs80m2_state(machine)); }
+
+	trs80m2_state(running_machine &machine) { }
+
 	/* memory state */
 	int boot_rom;
 	int bank;

@@ -34,9 +34,13 @@
 #define INT_EXPANSION_B		0x40
 #define INT_EXPANSION_A		0x80
 
-typedef struct _v1050_state v1050_state;
-struct _v1050_state
+class v1050_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, v1050_state(machine)); }
+
+	v1050_state(running_machine &machine) { }
+
 	/* interrupt state */
 	UINT8 int_mask;				/* interrupt mask */
 	UINT8 int_state;			/* interrupt status */

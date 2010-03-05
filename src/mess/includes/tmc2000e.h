@@ -8,9 +8,13 @@
 
 #define TMC2000E_COLORRAM_SIZE 0x100 // ???
 
-typedef struct _tmc2000e_state tmc2000e_state;
-struct _tmc2000e_state
+class tmc2000e_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc2000e_state(machine)); }
+
+	tmc2000e_state(running_machine &machine) { }
+
 	/* video state */
 	int cdp1864_efx;		/* EFx */
 	UINT8 *colorram;		/* color memory */

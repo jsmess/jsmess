@@ -7,9 +7,13 @@
 #define CDP1864_TAG		"m3"
 #define CASSETTE_TAG	"cassette"
 
-typedef struct _tmc1800_state tmc1800_state;
-struct _tmc1800_state
+class tmc1800_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc1800_state(machine)); }
+
+	tmc1800_state(running_machine &machine) { }
+
 	/* cpu state */
 	int reset;				/* reset activated */
 
@@ -24,9 +28,13 @@ struct _tmc1800_state
 	running_device *cassette;
 };
 
-typedef struct _osc1000b_state osc1000b_state;
-struct _osc1000b_state
+class osc1000b_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, osc1000b_state(machine)); }
+
+	osc1000b_state(running_machine &machine) { }
+
 	/* cpu state */
 	int reset;				/* reset activated */
 
@@ -37,9 +45,13 @@ struct _osc1000b_state
 	running_device *cassette;
 };
 
-typedef struct _tmc2000_state tmc2000_state;
-struct _tmc2000_state
+class tmc2000_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc2000_state(machine)); }
+
+	tmc2000_state(running_machine &machine) { }
+
 	/* video state */
 	int cdp1864_efx;		/* EFx */
 	int reset;				/* reset activated */
@@ -55,9 +67,13 @@ struct _tmc2000_state
 	running_device *cassette;
 };
 
-typedef struct _oscnano_state oscnano_state;
-struct _oscnano_state
+class oscnano_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, oscnano_state(machine)); }
+
+	oscnano_state(running_machine &machine) { }
+
 	/* cpu state */
 	int monitor_ef4;		/* EF4 line */
 	int reset;				/* reset activated */

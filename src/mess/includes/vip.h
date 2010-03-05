@@ -31,9 +31,13 @@
 #define VIP_LED_Q				1
 #define VIP_LED_TAPE			2
 
-typedef struct _vip_state vip_state;
-struct _vip_state
+class vip_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vip_state(machine)); }
+
+	vip_state(running_machine &machine) { }
+
 	/* cpu state */
 	int reset;						/* reset activated */
 
