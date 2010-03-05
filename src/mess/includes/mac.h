@@ -169,8 +169,13 @@ void mac_sh_updatebuffer(running_device *device);
 
 /* Mac driver data */
 
-typedef struct
+class mac_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mac_state(machine)); }
+
+	mac_state(running_machine &machine) { }
+
 	mac_model_t mac_model;
 
 	UINT32 mac_overlay;
@@ -243,7 +248,7 @@ typedef struct
 	// Apple Sound Chip
 	UINT8 mac_asc_regs[0x2000];
 	INT16 xfersamples[0x800];
-} mac_state;
+};
 
 #endif /* MAC_H_ */
 

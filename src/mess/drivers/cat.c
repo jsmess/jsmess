@@ -11,9 +11,13 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/68681.h"
 
-typedef struct _cat_state cat_state;
-struct _cat_state
+class cat_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cat_state(machine)); }
+
+	cat_state(running_machine &machine) { }
+
 	UINT16 *video_ram;
 
 	UINT8 duart_inp;// = 0x0e;

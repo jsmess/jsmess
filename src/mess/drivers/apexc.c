@@ -10,9 +10,13 @@
 #include "cpu/apexc/apexc.h"
 
 
-typedef struct _apexc_state apexc_state;
-struct _apexc_state
+class apexc_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, apexc_state(machine)); }
+
+	apexc_state(running_machine &machine) { }
+
 	UINT32 panel_data_reg;	/* value of a data register on the control panel which can
                                 be edited - the existence of this register is a personnal
                                 guess */

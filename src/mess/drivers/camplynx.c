@@ -81,9 +81,13 @@
 #include "video/mc6845.h"
 #include "sound/dac.h"
 
-typedef struct _camplynx_state camplynx_state;
-struct _camplynx_state
+class camplynx_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, camplynx_state(machine)); }
+
+	camplynx_state(running_machine &machine) { }
+
 	running_device *mc6845;
 };
 
