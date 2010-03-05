@@ -58,9 +58,13 @@
 /* PI-5 interface is required. mode 2 of the 8255 is used to communicate with the FD-5 */
 
 
-typedef struct _sord_state sord_state;
-struct _sord_state
+class sord_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sord_state(machine)); }
+
+	sord_state(running_machine &machine) { }
+
 	UINT8 fd5_databus;
 	int fd5_port_0x020_data;
 	int obfa;

@@ -153,9 +153,13 @@ Notes:
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _vtech1_state vtech1_state;
-struct _vtech1_state
+class vtech1_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vtech1_state(machine)); }
+
+	vtech1_state(running_machine &machine) { }
+
 	/* devices */
 	running_device *mc6847;
 	running_device *speaker;

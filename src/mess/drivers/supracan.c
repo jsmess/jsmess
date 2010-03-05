@@ -65,9 +65,13 @@ struct _acan_sprdma_regs_t
 	UINT16 control;
 };
 
-typedef struct _supracan_state supracan_state;
-struct _supracan_state
+class supracan_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supracan_state(machine)); }
+
+	supracan_state(running_machine &machine) { }
+
 	acan_dma_regs_t acan_dma_regs;
 	acan_sprdma_regs_t acan_sprdma_regs;
 

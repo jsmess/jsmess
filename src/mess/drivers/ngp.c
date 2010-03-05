@@ -117,8 +117,13 @@ enum flash_state
 };
 
 
-typedef struct _ngp_state ngp_state;
-struct _ngp_state {
+class ngp_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ngp_state(machine)); }
+
+	ngp_state(running_machine &machine) { }
+
 	UINT8 io_reg[0x40];
 	UINT8 old_to3;
 	emu_timer* seconds_timer;

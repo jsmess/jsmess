@@ -13,9 +13,13 @@
 #include "machine/msm8251.h"
 #include "devices/messram.h"
 
-typedef struct _fk1_state fk1_state;
-struct _fk1_state
+class fk1_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, fk1_state(machine)); }
+
+	fk1_state(running_machine &machine) { }
+
 	UINT8 video_rol;
 	UINT8 int_vector;
 };

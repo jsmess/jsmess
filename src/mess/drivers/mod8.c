@@ -11,9 +11,13 @@
 #include "cpu/i8008/i8008.h"
 #include "machine/teleprinter.h"
 
-typedef struct _mod8_state mod8_state;
-struct _mod8_state
+class mod8_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mod8_state(machine)); }
+
+	mod8_state(running_machine &machine) { }
+
 	UINT16 tty_data;
 	UINT8 tty_key_data;
 	int tty_cnt;

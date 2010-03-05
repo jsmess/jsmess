@@ -32,25 +32,6 @@
 
 /*************************************
  *
- *  State/Globals
- *
- *************************************/
-
-typedef struct _elwro800_state elwro800_state;
-struct _elwro800_state
-{
-	spectrum_state spectrum;
-
-	/* RAM mapped at 0 */
-	UINT8 ram_at_0000;
-
-	/* NR signal */
-	UINT8 NR;
-	UINT8 df_on_databus;
-};
-
-/*************************************
- *
  * When RAM is mapped at 0x0000 - 0x1fff (in CP/J mode), reading a location 66 with /M1=0
  * (effectively reading NMI vector) is hardwired to return 0xDF (RST #18)
  * (note that in CP/J mode address 66 is used for FCB)
@@ -58,7 +39,7 @@ struct _elwro800_state
  *************************************/
 static DIRECT_UPDATE_HANDLER(elwro800_direct_handler)
 {
-	elwro800_state *state = (elwro800_state *)space->machine->driver_data;
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
 	if (state->ram_at_0000 && address == 0x66)
 	{
 		direct->raw = direct->decrypted = &state->df_on_databus;
@@ -109,7 +90,7 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
 	UINT8 cs;
 	UINT8 ls175;
-	elwro800_state *state = (elwro800_state *)machine->driver_data;
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
 
 	ls175 = BITSWAP8(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
 
@@ -151,11 +132,11 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 	if (BIT(ls175,2))
 	{
 		// relok
-		state->spectrum.screen_location = messram + 0xe000;
+		state->screen_location = messram + 0xe000;
 	}
 	else
 	{
-		state->spectrum.screen_location = messram + 0x4000;
+		state->screen_location = messram + 0x4000;
 	}
 
 	state->NR = BIT(ls175,3);
@@ -227,7 +208,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 {
 	UINT8 *prom = memory_region(space->machine, "proms");
 	UINT8 cs = prom[offset & 0x1ff];
-	elwro800_state *state = (elwro800_state *)space->machine->driver_data;
+	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
 
 	if (!BIT(cs,0))
 	{
@@ -510,7 +491,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(elwro800)
 {
-	elwro800_state *state = (elwro800_state *)machine->driver_data;
+	spectrum_state *state = (spectrum_state *)machine->driver_data;
 	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
 
 	state->df_on_databus = 0xdf;
@@ -518,8 +499,8 @@ static MACHINE_RESET(elwro800)
 
 	memory_set_bankptr(machine, "bank3", messram + 0x4000);
 
-	state->spectrum.port_7ffd_data = 0;
-	state->spectrum.port_1ffd_data = -1;
+	state->port_7ffd_data = 0;
+	state->port_1ffd_data = -1;
 
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(machine, 0);
@@ -572,7 +553,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( elwro800 )
 
-	MDRV_DRIVER_DATA(elwro800_state)
+	MDRV_DRIVER_DATA(spectrum_state)
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 3500000)	/* 3.5 MHz */

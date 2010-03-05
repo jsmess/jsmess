@@ -91,9 +91,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _einstein_state einstein_state;
-struct _einstein_state
+class einstein_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, einstein_state(machine)); }
+
+	einstein_state(running_machine &machine) { }
+
 	running_device *color_screen;
 	running_device *ctc;
 

@@ -9,9 +9,13 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-typedef struct _z9001_state z9001_state;
-struct _z9001_state
+class z9001_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, z9001_state(machine)); }
+
+	z9001_state(running_machine &machine) { }
+
 	UINT8 *videoram;
 };
 

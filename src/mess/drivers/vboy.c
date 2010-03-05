@@ -45,9 +45,13 @@ struct _vip_regs_t
 	UINT16 BKCOL;
 };
 
-typedef struct _vboy_state vboy_state;
-struct _vboy_state
+class vboy_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vboy_state(machine)); }
+
+	vboy_state(running_machine &machine) { }
+
 	UINT16 *font;
 	UINT16 *bgmap;
 	UINT16 *l_frame_0;

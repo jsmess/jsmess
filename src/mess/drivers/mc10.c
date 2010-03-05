@@ -21,9 +21,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _mc10_state mc10_state;
-struct _mc10_state
+class mc10_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mc10_state(machine)); }
+
+	mc10_state(running_machine &machine) { }
+
 	running_device *mc6847;
 	running_device *dac;
 	running_device *cassette;

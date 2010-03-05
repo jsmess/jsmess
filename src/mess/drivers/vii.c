@@ -53,9 +53,13 @@
 #define TILE_X_FLIP				0x0004
 #define TILE_Y_FLIP				0x0008
 
-typedef struct _vii_state vii_state;
-struct _vii_state
+class vii_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vii_state(machine)); }
+
+	vii_state(running_machine &machine) { }
+
 	UINT16 *ram;
 	UINT16 *cart;
 	UINT16 *rowscroll;

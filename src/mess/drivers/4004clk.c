@@ -11,9 +11,13 @@
 #include "sound/dac.h"
 #include "4004clk.lh"
 
-typedef struct __4004clk_state _4004clk_state;
-struct __4004clk_state
+class _4004clk_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _4004clk_state(machine)); }
+
+	_4004clk_state(running_machine &machine) { }
+
 	UINT16 nixie[16];
 	UINT8 timer;
 	running_device *dac;

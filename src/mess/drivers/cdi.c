@@ -559,9 +559,13 @@ struct _mcd212_ab_t
 	BYTE68K deltaUV[BYTE68K_MAX + 1];
 };
 
-typedef struct _cdi_state cdi_state;
-struct _cdi_state
+class cdi_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cdi_state(machine)); }
+
+	cdi_state(running_machine &machine) { }
+
 	UINT16 *planea;
 	UINT16 *planeb;
 
