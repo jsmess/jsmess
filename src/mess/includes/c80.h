@@ -7,9 +7,13 @@
 #define Z80PIO2_TAG		"d12"
 #define CASSETTE_TAG	"cassette"
 
-typedef struct _c80_state c80_state;
-struct _c80_state
+class c80_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, c80_state(machine)); }
+
+	c80_state(running_machine &machine) { }
+
 	/* keyboard state */
 	int keylatch;
 

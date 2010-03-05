@@ -15,9 +15,13 @@
 #define BW12_VIDEORAM_MASK	0x7ff
 #define BW12_CHARROM_MASK	0xfff
 
-typedef struct _bw12_state bw12_state;
-struct _bw12_state
+class bw12_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bw12_state(machine)); }
+
+	bw12_state(running_machine &machine) { }
+
 	/* memory state */
 	int bank;
 

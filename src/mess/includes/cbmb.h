@@ -15,9 +15,13 @@
 #include "machine/6526cia.h"
 #include "devices/cartslot.h"
 
-typedef struct _cbmb_state cbmb_state;
-struct _cbmb_state
+class cbmb_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cbmb_state(machine)); }
+
+	cbmb_state(running_machine &machine) { }
+
 	/* keyboard lines */
 	int cbmb_keyline_a;
 	int cbmb_keyline_b;

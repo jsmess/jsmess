@@ -24,9 +24,14 @@ enum {
 	BANK_ROM
 };
 
-typedef struct _bw2_state bw2_state;
-struct _bw2_state
+class bw2_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bw2_state(machine)); }
+
+	bw2_state(running_machine &machine) { }
+
+
 	/* keyboard state */
 	UINT8 keyboard_row;
 

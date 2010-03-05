@@ -11,9 +11,13 @@
 #define I8048_TAG	"i8048"
 #define COP411_TAG	"cop411"
 
-typedef struct _advision_state advision_state;
-struct _advision_state
+class advision_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, advision_state(machine)); }
+
+	advision_state(running_machine &machine) { }
+
 	/* external RAM state */
 	UINT8 *extram;
 	int rambank;

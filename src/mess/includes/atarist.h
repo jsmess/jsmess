@@ -41,9 +41,13 @@ enum
 	IKBD_MOUSE_PHASE_NEGATIVE
 };
 
-typedef struct _atarist_state atarist_state;
-struct _atarist_state
+class atarist_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atarist_state(machine)); }
+
+	atarist_state(running_machine &machine) { }
+
 	/* memory state */
 	UINT8 mmu;
 	UINT16 megaste_cache;

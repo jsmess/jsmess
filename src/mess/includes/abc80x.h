@@ -36,9 +36,13 @@
 #define ABC800_CHAR_WIDTH	6
 #define ABC800_CCLK			ABC800_X01/ABC800_CHAR_WIDTH
 
-typedef struct _abc800_state abc800_state;
-struct _abc800_state
+class abc800_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, abc800_state(machine)); }
+
+	abc800_state(running_machine &machine) { }
+
 	/* cpu state */
 	int fetch_charram;			/* opcode fetched from character RAM region (0x7800-0x7fff) */
 
@@ -62,9 +66,13 @@ struct _abc800_state
 	running_device *cassette;
 };
 
-typedef struct _abc802_state abc802_state;
-struct _abc802_state
+class abc802_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, abc802_state(machine)); }
+
+	abc802_state(running_machine &machine) { }
+
 	/* cpu state */
 	int lrs;				/* low RAM select */
 
@@ -88,9 +96,13 @@ struct _abc802_state
 	running_device *cassette;
 };
 
-typedef struct _abc806_state abc806_state;
-struct _abc806_state
+class abc806_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, abc806_state(machine)); }
+
+	abc806_state(running_machine &machine) { }
+
 	/* memory state */
 	int keydtr;				/* keyboard DTR */
 	int eme;				/* extended memory enable */
