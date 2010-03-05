@@ -16,9 +16,13 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-typedef struct _bcs3_state bcs3_state;
-struct _bcs3_state
+class bcs3_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bcs3_state(machine)); }
+
+	bcs3_state(running_machine &machine) { }
+
 	const UINT8 *fnt;
 	UINT8 *videoram;
 };

@@ -195,8 +195,13 @@ disabled). Perhaps power on/off related??
 #include "sound/speaker.h"
 
 
-typedef struct _nakajies_state nakajies_state;
-struct _nakajies_state {
+class nakajies_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nakajies_state(machine)); }
+
+	nakajies_state(running_machine &machine) { }
+
 	/* Device lookups */
 	running_device *cpu;
 

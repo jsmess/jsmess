@@ -17,9 +17,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _lx800_state lx800_state;
-struct _lx800_state
+class lx800_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lx800_state(machine)); }
+
+	lx800_state(running_machine &machine) { }
+
 	running_device *speaker;
 };
 

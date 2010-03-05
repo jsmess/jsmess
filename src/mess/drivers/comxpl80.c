@@ -1,9 +1,13 @@
 #include "emu.h"
 #include "cpu/m6805/m6805.h"
 
-typedef struct _comxpl80_state comxpl80_state;
-struct _comxpl80_state
+class comxpl80_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, comxpl80_state(machine)); }
+
+	comxpl80_state(running_machine &machine) { }
+
 	/* printer state */
 	UINT8 centronics_data;	/* centronics data */
 

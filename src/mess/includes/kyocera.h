@@ -47,9 +47,13 @@ public:
 	running_device *cassette;
 };
 
-typedef struct _tandy200_state tandy200_state;
-struct _tandy200_state
+class tandy200_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tandy200_state(machine)); }
+
+	tandy200_state(running_machine &machine) { }
+
 	/* memory state */
 	UINT8 bank;				/* memory bank selection */
 

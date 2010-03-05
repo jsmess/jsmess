@@ -33,9 +33,13 @@
     Driver data
 */
 
-typedef struct _qx10_state qx10_state;
-struct _qx10_state
+class qx10_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, qx10_state(machine)); }
+
+	qx10_state(running_machine &machine) { }
+
 	int		mc146818_offset;
 
 	/* FDD */

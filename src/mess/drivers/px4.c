@@ -66,9 +66,13 @@ static const int receive_rate[] = { 2112, 1536, 768, 384, 192, 96, 48, 24, 3072,
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _px4_state px4_state;
-struct _px4_state
+class px4_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, px4_state(machine)); }
+
+	px4_state(running_machine &machine) { }
+
 	/* internal ram */
 	running_device *ram;
 

@@ -27,9 +27,13 @@
 #define ENTERPRISE_XTAL_X1	XTAL_8MHz
 
 
-typedef struct _ep_state ep_state;
-struct _ep_state
+class ep_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ep_state(machine)); }
+
+	ep_state(running_machine &machine) { }
+
 	UINT8 exdos_card_value;  /* state of the wd1770 irq/drq lines */
 	UINT8 keyboard_line;     /* index of keyboard line to read */
 };

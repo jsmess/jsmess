@@ -22,9 +22,13 @@
 #define VIA6522_1_TAG "via6522_1"
 #define MC6845_TAG "mc6845"
 
-typedef struct _ec65_state ec65_state;
-struct _ec65_state
+class ec65_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ec65_state(machine)); }
+
+	ec65_state(running_machine &machine) { }
+
 	UINT8 *video_ram;
 };
 

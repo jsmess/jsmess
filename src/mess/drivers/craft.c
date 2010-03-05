@@ -172,9 +172,13 @@ typedef struct
 } avr8_regs;
 
 
-typedef struct _craft_state craft_state;
-struct _craft_state
+class craft_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, craft_state(machine)); }
+
+	craft_state(running_machine &machine) { }
+
 	avr8_regs regs;
 	int blah;
 };

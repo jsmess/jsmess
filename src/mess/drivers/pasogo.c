@@ -53,9 +53,14 @@ struct _ems_t
 	} mapper[26];
 };
 
-typedef struct _pasogo_state pasogo_state;
-struct _pasogo_state
+class pasogo_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pasogo_state(machine)); }
+
+	pasogo_state(running_machine &machine) { }
+
+
 	struct _vg230_t vg230;
 	struct _ems_t ems;
 };
