@@ -18,9 +18,13 @@
 #define X4 XTAL_11MHz
 
 
-typedef struct _ql_state ql_state;
-struct _ql_state
+class ql_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ql_state(machine)); }
+
+	ql_state(running_machine &machine) { }
+
 	/* IPC state */
 	UINT8 keylatch;
 	int ser1_txd;

@@ -11,9 +11,13 @@
 #include "machine/i8255a.h"
 #include "machine/8237dma.h"
 
-typedef struct _pc_state pc_state;
-struct _pc_state
+class pc_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pc_state(machine)); }
+
+	pc_state(running_machine &machine) { }
+
 	running_device *maincpu;
 	running_device *pic8259;
 	running_device *dma8237;

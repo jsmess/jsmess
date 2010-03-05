@@ -12,9 +12,13 @@
 #include "machine/6522via.h"
 #include "devices/cartslot.h"
 
-typedef struct _pet_state pet_state;
-struct _pet_state
+class pet_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pet_state(machine)); }
+
+	pet_state(running_machine &machine) { }
+
 	int pet_basic1; /* basic version 1 for quickloader */
 	int superpet;
 	int cbm8096;

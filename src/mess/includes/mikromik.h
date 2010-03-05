@@ -12,9 +12,13 @@
 #define UPD7220_TAG		"ic101"
 #define SPEAKER_TAG		"speaker"
 
-typedef struct _mm1_state mm1_state;
-struct _mm1_state
+class mm1_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mm1_state(machine)); }
+
+	mm1_state(running_machine &machine) { }
+
 	/* keyboard state */
 	int sense;
 	int drive;

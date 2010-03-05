@@ -18,9 +18,13 @@
 #define PC8500_LCD_VIDEORAM_SIZE	0x4000
 #define PC8500_LCD_VIDEORAM_MASK	0x3fff
 
-typedef struct _pc8401a_state pc8401a_state;
-struct _pc8401a_state
+class pc8401a_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pc8401a_state(machine)); }
+
+	pc8401a_state(running_machine &machine) { }
+
 	/* keyboard state */
 	int key_strobe;			/* key pressed */
 

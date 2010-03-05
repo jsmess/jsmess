@@ -51,9 +51,13 @@
 #define TS2068_RIGHT_BORDER  96   /* Number of right hand border pixels */
 #define TS2068_SCREEN_WIDTH (TS2068_LEFT_BORDER + TS2068_DISPLAY_XSIZE + TS2068_RIGHT_BORDER)
 
-typedef struct _spectrum_state spectrum_state;
-struct _spectrum_state
+class spectrum_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spectrum_state(machine)); }
+
+	spectrum_state(running_machine &machine) { }
+
 	int port_fe_data;
 	int port_7ffd_data;
 	int port_1ffd_data;	/* scorpion and plus3 */

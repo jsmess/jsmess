@@ -10,9 +10,13 @@
 
 #define ST2_BLOCK_SIZE 256
 
-typedef struct _studio2_state studio2_state;
-struct _studio2_state
+class studio2_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, studio2_state(machine)); }
+
+	studio2_state(running_machine &machine) { }
+
 	/* cpu state */
 	cdp1802_control_mode cdp1802_mode;
 

@@ -22,9 +22,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _nes_state nes_state;
-struct _nes_state
+class nes_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nes_state(machine)); }
+
+	nes_state(running_machine &machine) { }
+
 	running_device *ppu;
 	running_device *sound;
 	running_device *cart;

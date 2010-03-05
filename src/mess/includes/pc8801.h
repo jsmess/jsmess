@@ -19,9 +19,13 @@
 #include "machine/upd765.h"
 #include "machine/i8255a.h"
 
-typedef struct _pc88_state pc88_state;
-struct _pc88_state
+class pc88_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pc88_state(machine)); }
+
+	pc88_state(running_machine &machine) { }
+
 	/* floppy state */
 	UINT8 i8255_0_pc;
 	UINT8 i8255_1_pc;

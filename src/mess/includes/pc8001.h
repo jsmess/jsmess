@@ -12,9 +12,13 @@
 #define SCREEN_TAG		"screen"
 #define SPEAKER_TAG		"speaker"
 
-typedef struct _pc8001_state pc8001_state;
-struct _pc8001_state
+class pc8001_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pc8001_state(machine)); }
+
+	pc8001_state(running_machine &machine) { }
+
 	/* video state */
 	UINT8 *char_rom;
 	int width80;

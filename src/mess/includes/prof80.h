@@ -26,9 +26,13 @@
 #define UNIO_CENTRONICS1_TAG	"n3"
 #define UNIO_CENTRONICS2_TAG	"n4"
 
-typedef struct _prof80_state prof80_state;
-struct _prof80_state
+class prof80_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, prof80_state(machine)); }
+
+	prof80_state(running_machine &machine) { }
+
 	/* memory state */
 	UINT8 mmu[16];			/* MMU block register */
 	int init;				/* MMU enable */

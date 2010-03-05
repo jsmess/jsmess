@@ -38,9 +38,13 @@
 #define NEWBRAIN_VIDEO_UCR				0x08
 #define NEWBRAIN_VIDEO_80L				0x40
 
-typedef struct _newbrain_state newbrain_state;
-struct _newbrain_state
+class newbrain_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, newbrain_state(machine)); }
+
+	newbrain_state(running_machine &machine) { }
+
 	/* processor state */
 	int pwrup;				/* power up */
 	int userint;			/* user interrupt */

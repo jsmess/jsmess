@@ -17,9 +17,13 @@
 #include "machine/z80pio.h"
 
 
-typedef struct _mz_state mz_state;
-struct _mz_state
+class mz_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mz_state(machine)); }
+
+	mz_state(running_machine &machine) { }
+
 	int mz700;				/* 1 if running on an mz700 */
 
 	running_device *pit;

@@ -10,9 +10,13 @@
 
 #define PHC25_VIDEORAM_SIZE		0x1800
 
-typedef struct _phc25_state phc25_state;
-struct _phc25_state
+class phc25_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, phc25_state(machine)); }
+
+	phc25_state(running_machine &machine) { }
+
 	/* video state */
 	UINT8 *video_ram;
 	UINT8 *char_rom;

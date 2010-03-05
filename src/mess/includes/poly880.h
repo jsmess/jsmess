@@ -8,9 +8,13 @@
 #define Z80PIO2_TAG		"i3"
 #define CASSETTE_TAG	"cassette"
 
-typedef struct _poly880_state poly880_state;
-struct _poly880_state
+class poly880_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, poly880_state(machine)); }
+
+	poly880_state(running_machine &machine) { }
+
 	/* display state */
 	UINT8 digit;
 	UINT8 segment;

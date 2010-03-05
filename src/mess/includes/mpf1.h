@@ -9,9 +9,13 @@
 #define CASSETTE_TAG	"cassette"
 #define SPEAKER_TAG		"speaker"
 
-typedef struct _mpf1_state mpf1_state;
-struct _mpf1_state
+class mpf1_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mpf1_state(machine)); }
+
+	mpf1_state(running_machine &machine) { }
+
 	int _break;
 	int m1;
 
