@@ -7,6 +7,16 @@
 #ifndef _3DO_H_
 #define _3DO_H_
 
+class _3do_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _3do_state(machine)); }
+
+	_3do_state(running_machine &machine) { }
+
+	UINT32 *dram;
+	UINT32 *vram;
+};
 
 /*----------- defined in machine/3do.c -----------*/
 
