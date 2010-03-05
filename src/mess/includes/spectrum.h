@@ -10,6 +10,11 @@
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 
+/* Spectrum crystals */
+
+#define X1 XTAL_14MHz		// Main clock
+#define X2 XTAL_4_433619MHz // PAL color subcarrier
+
 /* Spectrum screen size in pixels */
 #define SPEC_UNSEEN_LINES  16   /* Non-visible scanlines before first border
                                    line. Some of these may be vertical retrace. */
