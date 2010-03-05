@@ -10,7 +10,7 @@
 #define __SNAPQUIK_H__
 
 #include "image.h"
-
+#include "ui.h"
 
 
 /***************************************************************************
@@ -43,6 +43,7 @@ enum
           logerror("Loading register %s\n", cpu_get_reg_string(_cpu, _reg)); \
         } while (0)
 
+#define EXEC_NA "N/A"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -90,6 +91,8 @@ struct _snapquick_config
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
+
+void log_quickload(const char *type, UINT32 start, UINT32 length, UINT32 exec, const char *exec_format);
 
 /* device getinfo function */
 DEVICE_GET_INFO(snapshot);

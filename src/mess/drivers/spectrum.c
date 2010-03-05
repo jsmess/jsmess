@@ -163,8 +163,109 @@ TODO: (the best resource for ZX Spectrum HW informations is the http://www.zxdes
 15. The TK90X and TK95 roms output 0 to port #df on start up. The purpose of this port is unknown
     (probably display mode as TS2068) and thus is not emulated.
 
-Very detailed infos about the ZX Spectrum +3e can be found at
-http://www.worldofspectrum.org/zxplus3e/
+16. Very detailed infos about the ZX Spectrum +3e can be found at
+    http://www.worldofspectrum.org/zxplus3e/
+
+17. The ZX Spectrum is known to support a huge number of peripherals, daisy-chained through its expansion bus.
+    In the earlier part of its life cycle, a common configuration consisted of a "docking station"-type
+    peripheral providing drive controllers (the disk drives were not part of the packages), a game
+    interface (joystick and/or sound chip) and the ZX Printer (which, if present, must terminate the chain).
+
+    Later, all-in-one peripherals became more common. The following list is just a little part of the huge
+    catalog of peripherals available to the ZX Spectrum; however these peripherals are both the most successful
+    and the better documented ones.
+
+    Except when noted, technical and usage manuals are available at http://www.worldofspectrum.org/
+
+------------------------
+Mass storage controllers
+------------------------
+
+ZX Interface 1
+	up to 8 Microdrives
+	1 RS-232 port
+	2 ZX Network ports - http://scratchpad.wikia.com/wiki/ZX_Net
+
+Opus Discovery
+	up to 2 Disk drives
+	1 Centronics port
+	1 Joystick port (Kempston)
+
+DISCiPLE Interface
+	up to 2 Disk drives
+	1 Centronics port
+	2 Joystick ports (RH: Sinclair/Kempston, LH: Sinclair)
+	2 ZX Network ports
+
+Plus D Interface
+	up to 2 Disk drives
+	1 Centronics port
+
+Rotronics Wafadrive
+	2 "Stringy" drives
+	1 RS-232 port
+	1 Centronics port
+
+Kempston Disc Interface
+	up to 4 Disk drives (KDOS)
+
+Beta 128 Disk Interface
+	up to 4 Disk drives (TR-DOS)
+
+Philips Disc ROM
+	???
+
+----------------
+Game controllers
+----------------
+
+ZX Interface 2
+	2 Joystick ports (Sinclair)
+	1 ROM slot
+
+Kempston Interface
+	1 Joystick port (Kempston)
+
+Protek/AGF/Cursor Interface
+	1 Joystick port (Protek)
+
+Fuller Box
+	1 Joystick port (Fuller)
+	1 G1-AY-3-8912 sound chip - the chip is identical to the one present on the 128 model,
+	                            but the I/O ports are different: http://scratchpad.wikia.com/wiki/AY-3-8912(a) and
+	                            http://scratchpad.wikia.com/wiki/Timex_2000_series#Sound_Chip
+
+Mikro-Plus Interface
+	1 Joystick port (Mikrogen)
+	1 ROM slot - http://www.worldofspectrum.org/showmag.cgi?mag=Crash/Issue19/Pages/Crash1900020.jpg
+
+------------
+Misc devices
+------------
+
+DK'Tronics Light Pen (identical to TK90X light pen)
+
+AMX Mouse
+    Schematics and test software at http://velesoft.speccy.cz/othermouse-cz.htm
+
+Kempston Mouse
+    Schematics and test software at http://8bit.yarek.pl/hardware/zx.mouse/
+
+Currah uSpeech
+    Speech synthesis thru allophones (SP0256-AL2)
+
+MGT Messenger
+    Allows connection between ZX Spectrum and SAM Coupé
+
+Soft-ROM
+    A development system board - http://www.wearmouth.demon.co.uk/softrom.htm
+
+Multiface 1/128/+3
+    The classic snapshot interface for ZX Spectrum, 128 and +3 models, with 8K internal RAM.
+
+SamRam
+    A more versatile "Multiface I"-type interface - http://8bit.yarek.pl/upgrade/zx.samram/samram.html
+
 
 *******************************************************************************/
 
