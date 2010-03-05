@@ -25,9 +25,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _apricot_state apricot_state;
-struct _apricot_state
+class apricot_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, apricot_state(machine)); }
+
+	apricot_state(running_machine &machine) { }
+
 	running_device *pic8259;
 	running_device *wd2793;
 	running_device *mc6845;

@@ -15,9 +15,13 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
-typedef struct _act_state act_state;
-struct _act_state
+class act_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, act_state(machine)); }
+
+	act_state(running_machine &machine) { }
+
 	UINT16 *paletteram;
 	UINT16 *vram;
 	UINT16 *scrollram;

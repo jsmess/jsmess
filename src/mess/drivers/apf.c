@@ -46,9 +46,13 @@ text screen in the superior part of the graphical screen.
 */
 
 /* 6600, 6500-6503 wd179x disc controller? 6400, 6401 */
-typedef struct _apf_state apf_state;
-struct _apf_state
+class apf_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, apf_state(machine)); }
+
+	apf_state(running_machine &machine) { }
+
 	unsigned char keyboard_data;
 	unsigned char pad_data;
 	UINT8 mc6847_css;
