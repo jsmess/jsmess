@@ -317,7 +317,7 @@ MACHINE_DRIVER_START( spectrum_128 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
+	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 MACHINE_DRIVER_END
 

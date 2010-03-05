@@ -692,7 +692,7 @@ static MACHINE_DRIVER_START( tc2048 )
 	MDRV_VIDEO_UPDATE( tc2048 )
 
 	/* internal ram */
-	MDRV_RAM_ADD("messram")
+	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("48K")
 MACHINE_DRIVER_END
 
