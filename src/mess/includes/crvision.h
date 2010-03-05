@@ -12,9 +12,13 @@
 #define BANK_ROM1	"bank1"
 #define BANK_ROM2	"bank2"
 
-typedef struct _crvision_state crvision_state;
-struct _crvision_state
+class crvision_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, crvision_state(machine)); }
+
+	crvision_state(running_machine &machine) { }
+
 	/* keyboard state */
 	int keylatch;
 

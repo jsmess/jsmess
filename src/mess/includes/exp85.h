@@ -8,9 +8,13 @@
 #define CASSETTE_TAG	"cassette"
 #define SPEAKER_TAG		"speaker"
 
-typedef struct _exp85_state exp85_state;
-struct _exp85_state
+class exp85_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, exp85_state(machine)); }
+
+	exp85_state(running_machine &machine) { }
+
 	/* cassette state */
 	int tape_control;
 

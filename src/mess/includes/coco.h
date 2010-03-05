@@ -29,9 +29,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _coco_state coco_state;
-struct _coco_state
+class coco_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, coco_state(machine)); }
+
+	coco_state(running_machine &machine) { }
+
 	running_device *cococart_device;
 	running_device *cassette_device;
 	running_device *bitbanger_device;

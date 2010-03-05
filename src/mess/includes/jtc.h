@@ -9,9 +9,13 @@
 
 #define JTC_ES40_VIDEORAM_SIZE	0x2000
 
-typedef struct _jtc_state jtc_state;
-struct _jtc_state
+class jtc_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, jtc_state(machine)); }
+
+	jtc_state(running_machine &machine) { }
+
 	/* video state */
 	UINT8 video_bank;
 	UINT8 *video_ram;

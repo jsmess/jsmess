@@ -9,9 +9,13 @@
 #define Z80PIO2_TAG		"z80pio2"
 #define CASSETTE_TAG	"cassette"
 
-typedef struct _amu880_state amu880_state;
-struct _amu880_state
+class amu880_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, amu880_state(machine)); }
+
+	amu880_state(running_machine &machine) { }
+
 	/* keyboard state */
 	int key_y;
 	int keylatch;

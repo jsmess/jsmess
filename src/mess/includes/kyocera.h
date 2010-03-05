@@ -18,9 +18,13 @@
 #define TCM5089_TAG		"m11"
 #define MSM8251_TAG		"m20"
 
-typedef struct _kc85_state kc85_state;
-struct _kc85_state
+class kc85_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, kc85_state(machine)); }
+
+	kc85_state(running_machine &machine) { }
+
 	/* memory state */
 	UINT8 bank;				/* memory bank selection */
 

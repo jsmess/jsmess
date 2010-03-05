@@ -15,9 +15,13 @@ enum
 	LED_PULSE
 };
 
-typedef struct _eti660_state eti660_state;
-struct _eti660_state
+class eti660_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, eti660_state(machine)); }
+
+	eti660_state(running_machine &machine) { }
+
 	/* cpu state */
 	cdp1802_control_mode cdp1802_mode;
 

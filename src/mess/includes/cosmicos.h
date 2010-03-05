@@ -28,9 +28,13 @@ enum
 	LED_CASSETTE
 };
 
-typedef struct _cosmicos_state cosmicos_state;
-struct _cosmicos_state
+class cosmicos_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cosmicos_state(machine)); }
+
+	cosmicos_state(running_machine &machine) { }
+
 	/* CPU state */
 	cdp1802_control_mode cdp1802_mode;
 	int sc1;

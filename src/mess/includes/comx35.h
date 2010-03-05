@@ -37,9 +37,13 @@ enum
 	BANK_RAMCARD
 };
 
-typedef struct _comx35_state comx35_state;
-struct _comx35_state
+class comx35_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, comx35_state(machine)); }
+
+	comx35_state(running_machine &machine) { }
+
 	/* processor state */
 	int cdp1802_mode;		/* CPU mode */
 	int cdp1802_q;			/* Q flag */

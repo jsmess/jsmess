@@ -9,9 +9,13 @@
 #define DM9368_H_TAG	"a8"
 #define CASSETTE_TAG	"cassette"
 
-typedef struct _elf2_state elf2_state;
-struct _elf2_state
+class elf2_state
 {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, elf2_state(machine)); }
+
+	elf2_state(running_machine &machine) { }
+
 	/* display state */
 	int cdp1861_efx;				/* EFx */
 	UINT8 data;
