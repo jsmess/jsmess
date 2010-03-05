@@ -49,6 +49,7 @@
 
 /* Devices */
 #include "devices/cassette.h"
+#include "formats/m65_snqk.h"
 
 
 static ADDRESS_MAP_START( microtan_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -251,7 +252,7 @@ static MACHINE_DRIVER_START( microtan )
 
 	/* snapshot/quickload */
 	MDRV_SNAPSHOT_ADD("snapshot", microtan, "m65", 0.5)
-	MDRV_QUICKLOAD_ADD("quickload", microtan_hexfile, "hex", 0.5)
+	MDRV_QUICKLOAD_ADD("quickload", microtan, "hex", 0.5)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
