@@ -36,9 +36,11 @@ public:
 	int pb_sel;
 
 	/* video state */
-	UINT8 *char_ram;
-	UINT8 *hires_ram;
+	UINT16 *char_ram;
+	UINT16 *hires_ram;
 	UINT16 palette[16];
+	UINT32 vram_base;
+	int vidouts;
 
 	/* sound state */
 	int outspkr;
@@ -50,7 +52,7 @@ public:
 	running_device *fdc;
 	running_device *pic0;
 	running_device *pic1;
-	running_device *crt;
+	running_device *vpac;
 	running_device *centronics;
 	running_device *speaker;
 };

@@ -100,6 +100,12 @@ WRITE8_DEVICE_HANDLER( crt9007_ack_w );
 /* light pen strobe */
 WRITE_LINE_DEVICE_HANDLER( crt9007_lpstb_w );
 
+/* set the clock of the chip */
+void crt9007_set_clock(running_device *device, UINT32 clock);
+
+/* set number of pixels per video memory address */
+void crt9007_set_hpixels_per_column(running_device *device, int hpixels_per_column);
+
 /* screen update */
 void crt9007_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 

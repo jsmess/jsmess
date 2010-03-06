@@ -10,14 +10,8 @@
 
 	TODO:
 
-	- port FFFE?
-
-		'u76' (FFF07): unmapped I/O memory word write to FFFE = 00FF & FFFF
-		'u76' (FFF0F): unmapped I/O memory word read from FFFE & FFFF
-
-	- CRT9007
-	- video
 	- 80186
+	- CRT9007
 	- keyboard ROM
 	- hires graphics board
 	- floppy 720K DSQD
@@ -165,6 +159,22 @@ static WRITE8_HANDLER( addr_ctrl_w )
 		15		VIDOUTS		selects the video source for display on monochrome monitor
 
 	*/
+
+	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+
+	/* video access */
+	state->vram_base = data << 15;
+
+	/* video clock speed */
+	crt9007_set_clock(state->vpac, BIT(data, 5) ? XTAL_16MHz*28/16 : XTAL_16MHz*28/20);
+
+	/* dots per char */
+	crt9007_set_hpixels_per_column(state->vpac, BIT(data, 6) ? 8 : 10);
+
+	/* video source select */
+	state->vidouts = BIT(data, 7);
+
+	logerror("Address Control %02x\n", data);
 }
 
 static READ8_HANDLER( keyboard_x0_r )
@@ -188,16 +198,16 @@ static READ8_HANDLER( keyboard_x0_r )
 
 	UINT8 data = 0xff;
 
-	if (!BIT(state->keylatch, 0)) data &= input_port_read(space->machine, "Y0");
-	if (!BIT(state->keylatch, 1)) data &= input_port_read(space->machine, "Y1");
-	if (!BIT(state->keylatch, 2)) data &= input_port_read(space->machine, "Y2");
-	if (!BIT(state->keylatch, 3)) data &= input_port_read(space->machine, "Y3");
-	if (!BIT(state->keylatch, 4)) data &= input_port_read(space->machine, "Y4");
-	if (!BIT(state->keylatch, 5)) data &= input_port_read(space->machine, "Y5");
-	if (!BIT(state->keylatch, 6)) data &= input_port_read(space->machine, "Y6");
-	if (!BIT(state->keylatch, 7)) data &= input_port_read(space->machine, "Y7");
-	if (!BIT(state->keylatch, 8)) data &= input_port_read(space->machine, "Y8");
-	if (!BIT(state->keylatch, 9)) data &= input_port_read(space->machine, "Y9");
+	if (!BIT(state->keylatch,  0)) data &= input_port_read(space->machine,  "Y0");
+	if (!BIT(state->keylatch,  1)) data &= input_port_read(space->machine,  "Y1");
+	if (!BIT(state->keylatch,  2)) data &= input_port_read(space->machine,  "Y2");
+	if (!BIT(state->keylatch,  3)) data &= input_port_read(space->machine,  "Y3");
+	if (!BIT(state->keylatch,  4)) data &= input_port_read(space->machine,  "Y4");
+	if (!BIT(state->keylatch,  5)) data &= input_port_read(space->machine,  "Y5");
+	if (!BIT(state->keylatch,  6)) data &= input_port_read(space->machine,  "Y6");
+	if (!BIT(state->keylatch,  7)) data &= input_port_read(space->machine,  "Y7");
+	if (!BIT(state->keylatch,  8)) data &= input_port_read(space->machine,  "Y8");
+	if (!BIT(state->keylatch,  9)) data &= input_port_read(space->machine,  "Y9");
 	if (!BIT(state->keylatch, 10)) data &= input_port_read(space->machine, "Y10");
 	if (!BIT(state->keylatch, 11)) data &= input_port_read(space->machine, "Y11");
 
@@ -278,6 +288,7 @@ static ADDRESS_MAP_START( tandy2k_io, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
 //	AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
 //	AM_RANGE(0x001a0, 0x001a0) AM_READ8(hires_plane_w, 0x00ff)
+//	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(i186_internal_port_r, i186_internal_port_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy2k_hd_io, ADDRESS_SPACE_IO, 16 )
@@ -424,20 +435,43 @@ static VIDEO_START( tandy2k )
 	tandy2k_state *state = (tandy2k_state *)machine->driver_data;
 
 	/* find devices */
-	state->crt = devtag_get_device(machine, CRT9007_TAG);
+	state->vpac = devtag_get_device(machine, CRT9007_TAG);
 }
 
 static VIDEO_UPDATE( tandy2k )
 {
 	tandy2k_state *state = (tandy2k_state *)screen->machine->driver_data;
 
-	crt9007_update(state->crt, bitmap, cliprect);
+	//if (state->vidouts)
+	{
+		crt9007_update(state->vpac, bitmap, cliprect);
+	}
 
 	return 0;
 }
 
 static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 {
+	tandy2k_state *state = (tandy2k_state *)device->machine->driver_data;
+	const address_space *program = cputag_get_address_space(device->machine, I80186_TAG, ADDRESS_SPACE_PROGRAM);
+
+	for (int sx = 0; sx < x_count; sx++)
+	{
+		UINT32 videoram_addr = (state->vram_base | (va << 1)) + sx;
+		UINT8 videoram_data = memory_read_word(program, videoram_addr);
+		UINT16 charram_addr = (videoram_data << 4) | sl;
+		UINT8 data = state->char_ram[charram_addr] & 0xff;
+
+		for (int bit = 0; bit < 10; bit++)
+		{
+			if (BIT(data, 7))
+			{
+				*BITMAP_ADDR16(bitmap, y, x + (sx * 10) + bit) = 1;
+			}
+
+			data <<= 1;
+		}
+	}
 }
 
 static CRT9007_INTERFACE( crt9007_intf )
@@ -449,7 +483,7 @@ static CRT9007_INTERFACE( crt9007_intf )
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER(I80186_TAG, PROGRAM, memory_read_byte_16le),
+	DEVCB_NULL,
 	DEVCB_NULL
 };
 
@@ -723,7 +757,7 @@ static MACHINE_START( tandy2k )
 
 	memory_install_ram(program, 0x00000, ram_size - 1, 0, 0, ram);
 
-	/* patch ROM */
+	/* patch out i186 relocation register check */
 	UINT8 *rom = memory_region(machine, I80186_TAG);
 	rom[0x1f16] = 0x90;
 	rom[0x1f17] = 0x90;
