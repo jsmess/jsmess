@@ -38,7 +38,23 @@
 
 /*************************************
  *
- *  Main CPU memory handlers
+ *  Memory handlers
+ *
+ *************************************/
+
+static READ8_HANDLER( spc_ram_100_r )
+{
+	return spc_ram_r(space, offset + 0x100);
+}
+
+static WRITE8_HANDLER( spc_ram_100_w )
+{
+	spc_ram_w(space, offset + 0x100, data);
+}
+
+/*************************************
+ *
+ *  Address maps
  *
  *************************************/
 
@@ -62,16 +78,6 @@ static ADDRESS_MAP_START( superfx_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe00000, 0xffffff) AM_READWRITE(superfx_r_bank3, superfx_w_bank3)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( spc_ram_100_r )
-{
-	return spc_ram_r(space, offset + 0x100);
-}
-
-static WRITE8_HANDLER( spc_ram_100_w )
-{
-	spc_ram_w(space, offset + 0x100, data);
-}
-
 static ADDRESS_MAP_START( spc_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x00ef) AM_READWRITE(spc_ram_r, spc_ram_w) AM_BASE(&spc_ram)   	/* lower 32k ram */
 	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE(spc_io_r, spc_io_w)   	/* spc io */
@@ -82,42 +88,58 @@ ADDRESS_MAP_END
 
 
 
-/***************************************************************************
-
-  Input ports
-
-***************************************************************************/
+/*************************************
+ *
+ *  Input ports
+ *
+ *************************************/
 
 static INPUT_PORTS_START( snes )
+	PORT_START("CTRLSEL")  /* Select Controller Type */
+	PORT_CATEGORY_CLASS( 0x0f, 0x01, "P1 Controller")
+	PORT_CATEGORY_ITEM(  0x00, "Unconnected",		10 )
+	PORT_CATEGORY_ITEM(  0x01, "Gamepad",		11 )
+//	PORT_CATEGORY_ITEM(  0x02, "Mouse",			12 )
+//	PORT_CATEGORY_ITEM(  0x03, "Superscope",		13 )
+//	PORT_CATEGORY_ITEM(  0x04, "Justfier",		14 )
+//	PORT_CATEGORY_ITEM(  0x05, "Multitap",		15 )
+	PORT_CATEGORY_CLASS( 0xf0, 0x10, "P2 Controller")
+	PORT_CATEGORY_ITEM(  0x00, "Unconnected",		20 )
+	PORT_CATEGORY_ITEM(  0x10, "Gamepad",		21 )
+//	PORT_CATEGORY_ITEM(  0x20, "Mouse",			22 )
+//	PORT_CATEGORY_ITEM(  0x30, "Superscope",		23 )
+//	PORT_CATEGORY_ITEM(  0x40, "Justfier",		24 )
+//	PORT_CATEGORY_ITEM(  0x50, "Multitap",		25 )
+
 	PORT_START("SERIAL1_DATA1_L")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button A") PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Button X") PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Button L") PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 Button R") PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button A") PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Button X") PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P1 Button L") PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P1 Button R") PORT_PLAYER(1) PORT_CATEGORY(11)
 	PORT_START("SERIAL1_DATA1_H")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B") PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button Y") PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("P1 Select")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Start")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B") PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button Y") PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("P1 Select") PORT_CATEGORY(11)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Start") PORT_CATEGORY(11)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_CATEGORY(11)
 
 	PORT_START("SERIAL2_DATA1_L")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 Button A") PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 Button X") PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P2 Button L") PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P2 Button R") PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P2 Button A") PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P2 Button X") PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("P2 Button L") PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("P2 Button R") PORT_PLAYER(2) PORT_CATEGORY(21)
 	PORT_START("SERIAL2_DATA1_H")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Button B") PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Button Y") PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("P2 Select")
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P2 Start")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Button B") PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Button Y") PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("P2 Select") PORT_CATEGORY(21)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P2 Start") PORT_CATEGORY(21)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_CATEGORY(21)
 
 	PORT_START("SERIAL1_DATA2_L")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -136,16 +158,16 @@ static INPUT_PORTS_START( snes )
 	PORT_CONFSETTING(   0x1, DEF_STR( Yes ) )
 
 	PORT_START("DEBUG1")
-	PORT_DIPNAME( 0x3, 0x0, "Browse tiles" )
-	PORT_DIPSETTING(   0x0, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x1, "2bpl" )
-	PORT_DIPSETTING(   0x2, "4bpl" )
-	PORT_DIPSETTING(   0x3, "8bpl" )
-	PORT_DIPNAME( 0xc, 0x0, "Browse maps" )
-	PORT_DIPSETTING(   0x0, DEF_STR( Off ) )
-	PORT_DIPSETTING(   0x4, "2bpl" )
-	PORT_DIPSETTING(   0x8, "4bpl" )
-	PORT_DIPSETTING(   0xc, "8bpl" )
+	PORT_CONFNAME( 0x3, 0x0, "Browse tiles" )
+	PORT_CONFSETTING(   0x0, DEF_STR( Off ) )
+	PORT_CONFSETTING(   0x1, "2bpl" )
+	PORT_CONFSETTING(   0x2, "4bpl" )
+	PORT_CONFSETTING(   0x3, "8bpl" )
+	PORT_CONFNAME( 0xc, 0x0, "Browse maps" )
+	PORT_CONFSETTING(   0x0, DEF_STR( Off ) )
+	PORT_CONFSETTING(   0x4, "2bpl" )
+	PORT_CONFSETTING(   0x8, "4bpl" )
+	PORT_CONFSETTING(   0xc, "8bpl" )
 
 	PORT_START("DEBUG2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle BG 1") PORT_CODE(KEYCODE_1_PAD)
@@ -175,12 +197,119 @@ static INPUT_PORTS_START( snes )
 INPUT_PORTS_END
 
 
-/***************************************************************************
+/*************************************
+ *
+ *  Input callbacks
+ *
+ *************************************/
 
-  Machine driver
+static void snes_input_read( running_machine *machine )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	UINT8 ctrl1 = input_port_read(machine, "CTRLSEL") & 0x0f;
+	UINT8 ctrl2 = input_port_read(machine, "CTRLSEL") & 0xf0;
+	int i;
 
-***************************************************************************/
+	switch (ctrl1)
+	{
+	case 1:	/* joystick */
+		state->joypad[0].low  = input_port_read(machine, "SERIAL1_DATA1_L");
+		state->joypad[0].high = input_port_read(machine, "SERIAL1_DATA1_H");
+		state->joypad[2].low  = input_port_read(machine, "SERIAL1_DATA2_L");
+		state->joypad[2].high = input_port_read(machine, "SERIAL1_DATA2_H");
+		break;
+	case 0:	/* no controller in port1 */
+	default:
+		break;
+	}
 
+	switch (ctrl2)
+	{
+	case 1:	/* joystick */
+		state->joypad[1].low  = input_port_read(machine, "SERIAL2_DATA1_L");
+		state->joypad[1].high = input_port_read(machine, "SERIAL2_DATA1_H");
+		state->joypad[3].low  = input_port_read(machine, "SERIAL2_DATA2_L");
+		state->joypad[3].high = input_port_read(machine, "SERIAL2_DATA2_H");
+		break;
+	case 0:	/* no controller in port2 */
+	default:
+		break;
+	}
+
+	// avoid sending signals that could crash games
+	for (i = 0; i < 4; i++)
+	{
+		// if left, no right
+		if (state->joypad[i].high & 2)
+			state->joypad[i].high &= ~1;
+		// if up, no down
+		if (state->joypad[i].high & 8)
+			state->joypad[i].high &= ~4;
+	}
+
+	// is automatic reading on?
+	if (snes_ram[NMITIMEN] & 1)
+	{
+		state->joy1l = state->joypad[0].low;
+		state->joy1h = state->joypad[0].high;
+		state->joy2l = state->joypad[1].low;
+		state->joy2h = state->joypad[1].high;
+		state->joy3l = state->joypad[2].low;
+		state->joy3h = state->joypad[2].high;
+		state->joy4l = state->joypad[3].low;
+		state->joy4h = state->joypad[3].high;
+
+		// make sure oldrol starts returning all 1s because the auto-read reads it :-)
+		state->read_idx[0] = 16;
+		state->read_idx[1] = 16;
+	}
+
+}
+
+static UINT8 snes_oldjoy1_read( running_machine *machine )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	UINT8 res = 0;
+
+	// joysticks
+	if (state->read_idx[0] >= 16)
+		res = 0x01;
+	else
+		res = ((state->joypad[0].low | (state->joypad[0].high << 8)) >> (15 - state->read_idx[0]++)) & 0x01;
+
+	return res;
+}
+
+static UINT8 snes_oldjoy2_read( running_machine *machine )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	UINT8 res = 0;
+
+	// joysticks
+	if (state->read_idx[1] >= 16)
+		res = 0x01;
+	else
+		res = ((state->joypad[1].low | (state->joypad[1].high << 8)) >> (15 - state->read_idx[1]++)) & 0x01;
+
+	return res;
+}
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
+
+static MACHINE_RESET( snes_mess )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+
+	MACHINE_RESET_CALL(snes);
+
+	state->io_read = snes_input_read;
+	state->oldjoy1_read = snes_oldjoy1_read;
+	state->oldjoy2_read = snes_oldjoy2_read;
+}
 
 static MACHINE_DRIVER_START( snes )
 
@@ -197,12 +326,12 @@ static MACHINE_DRIVER_START( snes )
 	//MDRV_QUANTUM_TIME(HZ(48000))
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START( snes_mess )
-	MDRV_MACHINE_RESET( snes )
+	MDRV_MACHINE_START(snes_mess)
+	MDRV_MACHINE_RESET(snes_mess)
 
 	/* video hardware */
-	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( snes )
+	MDRV_VIDEO_START(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(snes)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
