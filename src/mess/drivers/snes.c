@@ -119,8 +119,8 @@ static INPUT_PORTS_START( snes )
 	PORT_START("SERIAL1_DATA1_H")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Button B") PORT_PLAYER(1) PORT_CATEGORY(11)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Button Y") PORT_PLAYER(1) PORT_CATEGORY(11)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("P1 Select") PORT_CATEGORY(11)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("P1 Start") PORT_CATEGORY(11)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(1) PORT_CATEGORY(11)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 ) PORT_PLAYER(1) PORT_CATEGORY(11)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_CATEGORY(11)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_CATEGORY(11)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_CATEGORY(11)
@@ -134,8 +134,8 @@ static INPUT_PORTS_START( snes )
 	PORT_START("SERIAL2_DATA1_H")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Button B") PORT_PLAYER(2) PORT_CATEGORY(21)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Button Y") PORT_PLAYER(2) PORT_CATEGORY(21)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("P2 Select") PORT_CATEGORY(21)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 ) PORT_NAME("P2 Start") PORT_CATEGORY(21)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SELECT ) PORT_PLAYER(2) PORT_CATEGORY(21)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START2 ) PORT_PLAYER(2) PORT_CATEGORY(21)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_CATEGORY(21)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_CATEGORY(21)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_CATEGORY(21)
@@ -376,11 +376,11 @@ static MACHINE_DRIVER_START( snespsfx )
 	MDRV_CPU_CONFIG(snes_superfx_config)
 MACHINE_DRIVER_END
 
-/***************************************************************************
-
-  ROM definition(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START(snes)
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
@@ -437,11 +437,11 @@ ROM_START(sfcbox)
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  INIT  COMPANY     FULLNAME                                      FLAGS */
 CONS( 1989, snes,     0,      0,      snes,     snes,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
