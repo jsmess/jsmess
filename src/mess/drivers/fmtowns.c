@@ -1093,7 +1093,7 @@ static void towns_cdrom_read(running_device* device)
 	towns_cd.lba_last = msf_to_lba(lba2);
 
 	// first track starts at 00:02:00 - this is hardcoded in the boot procedure
-	track = cdrom_get_track(mess_cd_get_cdrom_file(device),lba1);
+	track = cdrom_get_track(mess_cd_get_cdrom_file(device),towns_cd.lba_current);
 	if(track < 2)
 	{  // recalculate LBA
 		if((towns_cd.parameter[6] & 0x0f) < 2)
