@@ -10,10 +10,11 @@
 
     TODO:
 
+	- z80dma RDY handling is broken, DMA from FDC fails
+	- wd17xx.c thinks the drive is always ready
 	- NOT A SYSTEM DISK, RE-BOOT
     - keyboard CPU ROM
     - keyboard layout
-	- 2-sided diskette flag
     - graphics board
 
 */
@@ -103,8 +104,8 @@ static void bankswitch(running_machine *machine)
 	if (state->boot_rom)
 	{
 		/* enable BOOT ROM */
-		memory_install_rom(program, 0x0000, 0x07ff, 0, 0x800, rom);
-		memory_install_ram(program, 0x1000, 0x7fff, 0, 0, ram + 0x1000);
+		memory_install_rom(program, 0x0000, 0x07ff, 0, 0, rom);
+		memory_install_ram(program, 0x0800, 0x7fff, 0, 0, ram + 0x800);
 	}
 	else
 	{
@@ -743,7 +744,7 @@ static const floppy_config trs80m2_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_80,
+	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(default),
 	DO_NOT_KEEP_GEOMETRY
 };
@@ -787,6 +788,10 @@ static MACHINE_START( trs80m2 )
 	state->z80pio = devtag_get_device(machine, Z80PIO_TAG);
 	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->floppy = devtag_get_device(machine, FLOPPY_0);
+
+	/* Shugart SA-800 motor spins constantly */
+	floppy_mon_w(state->floppy, CLEAR_LINE);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->boot_rom);
