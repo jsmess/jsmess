@@ -10,9 +10,7 @@
 
     TODO:
 
-	- z80dma RDY handling is broken, DMA from FDC fails
 	- wd17xx.c thinks the drive is always ready
-	- NOT A SYSTEM DISK, RE-BOOT
     - keyboard CPU ROM
     - keyboard layout
     - graphics board
@@ -539,7 +537,6 @@ static WRITE_LINE_DEVICE_HANDLER( vsync_w )
 
 		if (driver_state->enable_rtc_int && driver_state->rtc_int)
 		{
-			logerror("RTC INT\n");
 			/* trigger RTC interrupt */
 			cputag_set_input_line(device->machine, Z80_TAG, INPUT_LINE_NMI, ASSERT_LINE);
 		}
