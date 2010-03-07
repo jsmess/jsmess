@@ -114,7 +114,6 @@ struct _slow_t
 {
 	UINT8 status;			/* ABC BUS status */
 	UINT8 data;				/* ABC BUS data */
-	int pio_ardy;			/* PIO port A ready */
 	int fdc_irq;			/* floppy interrupt */
 	int fdc_drq;			/* floppy data request */
 	int fdc_dden;			/* floppy density */
@@ -215,7 +214,7 @@ static READ8_HANDLER( slow_bus_stat_r )
 {
 	slow_t *conkort = get_safe_token_machine_slow(space->machine);
 
-	return (conkort->status & 0xfe) | conkort->pio_ardy;
+	return (conkort->status & 0xfe) | z80pio_ardy_r(conkort->z80pio);
 }
 
 static WRITE8_HANDLER( slow_bus_c1_w )
@@ -619,19 +618,12 @@ static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 	wd17xx_dden_w(conkort->wd1791, conkort->fdc_dden);
 }
 
-static WRITE_LINE_DEVICE_HANDLER( conkort_pio_ardy_w )
-{
-	slow_t *conkort = get_safe_token_machine_slow(device->machine);
-
-	conkort->pio_ardy = state;
-}
-
 static Z80PIO_INTERFACE( conkort_pio_intf )
 {
 	DEVCB_CPU_INPUT_LINE(Z80_TAG, INPUT_LINE_IRQ0),		/* interrupt callback */
 	DEVCB_HANDLER(conkort_pio_port_a_r),	/* port A read callback */
 	DEVCB_HANDLER(conkort_pio_port_a_w),	/* port A write callback */
-	DEVCB_LINE(conkort_pio_ardy_w),			/* port A ready callback */
+	DEVCB_NULL,								/* port A ready callback */
 	DEVCB_HANDLER(conkort_pio_port_b_r),	/* port B read callback */
 	DEVCB_HANDLER(conkort_pio_port_b_w),	/* port B write callback */
 	DEVCB_NULL								/* port B ready callback */
@@ -858,7 +850,6 @@ static DEVICE_START( luxor_55_10828 )
 	/* register for state saving */
 	state_save_register_device_item(device, 0, conkort->status);
 	state_save_register_device_item(device, 0, conkort->data);
-	state_save_register_device_item(device, 0, conkort->pio_ardy);
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
 	state_save_register_device_item(device, 0, conkort->fdc_drq);
 	state_save_register_device_item(device, 0, conkort->fdc_dden);
