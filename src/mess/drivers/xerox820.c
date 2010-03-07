@@ -387,13 +387,6 @@ INPUT_PORTS_END
 
 /* Z80 PIO */
 
-static WRITE_LINE_DEVICE_HANDLER( kbpio_pbrdy_w )
-{
-	xerox820_state *driver_state = (xerox820_state *)device->machine->driver_data;
-
-	driver_state->pbrdy = state;
-}
-
 static READ8_DEVICE_HANDLER( kbpio_pa_r )
 {
 	/*
@@ -413,7 +406,7 @@ static READ8_DEVICE_HANDLER( kbpio_pa_r )
 
 	xerox820_state *state = (xerox820_state *)device->machine->driver_data;
 
-	return (state->dsdd << 5) | (state->_8n5 << 4) | (state->pbrdy << 3);
+	return (state->dsdd << 5) | (state->_8n5 << 4) | (z80pio_brdy_r(state->kbpio) << 3);
 };
 
 static WRITE8_DEVICE_HANDLER( kbpio_pa_w )
@@ -501,7 +494,7 @@ static Z80PIO_INTERFACE( xerox820_kbpio_intf )
 	DEVCB_NULL,							/* portA ready active callback */
 	DEVCB_HANDLER(kbpio_pb_r),			/* port B read callback */
 	DEVCB_NULL,							/* port B write callback */
-	DEVCB_LINE(kbpio_pbrdy_w)			/* portB ready active callback */
+	DEVCB_NULL							/* portB ready active callback */
 };
 
 static Z80PIO_INTERFACE( xerox820ii_kbpio_intf )
@@ -512,7 +505,7 @@ static Z80PIO_INTERFACE( xerox820ii_kbpio_intf )
 	DEVCB_NULL,							/* portA ready active callback */
 	DEVCB_HANDLER(kbpio_pb_r),			/* port B read callback */
 	DEVCB_NULL,							/* port B write callback */
-	DEVCB_LINE(kbpio_pbrdy_w)			/* portB ready active callback */
+	DEVCB_NULL							/* portB ready active callback */
 };
 
 static Z80PIO_INTERFACE( gppio_intf )
@@ -735,7 +728,6 @@ static MACHINE_START( xerox820 )
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine, state->video_ram, XEROX820_VIDEORAM_SIZE);
-	state_save_register_global(machine, state->pbrdy);
 	state_save_register_global(machine, state->keydata);
 	state_save_register_global(machine, state->scroll);
 	state_save_register_global(machine, state->ncset2);

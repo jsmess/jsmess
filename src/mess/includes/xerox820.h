@@ -23,7 +23,6 @@ public:
 	xerox820_state(running_machine &machine) { }
 
 	/* keyboard state */
-	int pbrdy;							/* key pressed */
 	int keydata;						/* keyboard data */
 
 	/* video state */
