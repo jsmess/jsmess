@@ -372,10 +372,10 @@ static FLOPPY_OPTIONS_START(mbee)
 		TRACKS([80])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
-		FIRST_SECTOR_ID([1]))
-	FLOPPY_OPTION(ds84, "ds84", "DS84 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		FIRST_SECTOR_ID([21]))
+	FLOPPY_OPTION(ds84, "ds82,ds84", "DS84 disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([2])
-		TRACKS([84])
+		TRACKS([80])
 		SECTORS([10])
 		SECTOR_LENGTH([512])
 		FIRST_SECTOR_ID([1]))
