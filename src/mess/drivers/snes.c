@@ -94,19 +94,34 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+static CUSTOM_INPUT( snes_mouse_speed_input )
+{
+	snes_state *state = (snes_state *)field->port->machine->driver_data;
+	int port = (FPTR)param;
+
+	if (snes_ram[OLDJOY1] & 0x1)
+	{
+		state->mouse[port].speed++;
+		if ((state->mouse[port].speed & 0x03) == 0x03)
+			state->mouse[port].speed = 0;
+	}
+
+	return state->mouse[port].speed;
+}
+
 static INPUT_PORTS_START( snes )
 	PORT_START("CTRLSEL")  /* Select Controller Type */
 	PORT_CATEGORY_CLASS( 0x0f, 0x01, "P1 Controller")
 	PORT_CATEGORY_ITEM(  0x00, "Unconnected",		10 )
 	PORT_CATEGORY_ITEM(  0x01, "Gamepad",		11 )
-//	PORT_CATEGORY_ITEM(  0x02, "Mouse",			12 )
+	PORT_CATEGORY_ITEM(  0x02, "Mouse",			12 )
 //	PORT_CATEGORY_ITEM(  0x03, "Superscope",		13 )
 //	PORT_CATEGORY_ITEM(  0x04, "Justfier",		14 )
 //	PORT_CATEGORY_ITEM(  0x05, "Multitap",		15 )
 	PORT_CATEGORY_CLASS( 0xf0, 0x10, "P2 Controller")
 	PORT_CATEGORY_ITEM(  0x00, "Unconnected",		20 )
 	PORT_CATEGORY_ITEM(  0x10, "Gamepad",		21 )
-//	PORT_CATEGORY_ITEM(  0x20, "Mouse",			22 )
+	PORT_CATEGORY_ITEM(  0x20, "Mouse",			22 )
 //	PORT_CATEGORY_ITEM(  0x30, "Superscope",		23 )
 //	PORT_CATEGORY_ITEM(  0x40, "Justfier",		24 )
 //	PORT_CATEGORY_ITEM(  0x50, "Multitap",		25 )
@@ -150,6 +165,42 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_START("SERIAL2_DATA2_H")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("MOUSE1")
+	/* bits 0,3 = mouse signature (must be 1) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	/* bits 4,5 = mouse speed: 0 = slow, 1 = normal, 2 = fast, 3 = unused */
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snes_mouse_speed_input, (void *)0)
+	/* bits 6,7 = mouse buttons */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Mouse Button Left") PORT_PLAYER(1) PORT_CATEGORY(12)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Mouse Button Right") PORT_PLAYER(1) PORT_CATEGORY(12)
+
+	PORT_START("MOUSE1_X")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CATEGORY(12)
+
+	PORT_START("MOUSE1_Y")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CATEGORY(12)
+
+	PORT_START("MOUSE2")
+	/* bits 0,3 = mouse signature (must be 1) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	/* bits 4,5 = mouse speed: 0 = slow, 1 = normal, 2 = fast, 3 = unused */
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snes_mouse_speed_input, (void *)1)
+	/* bits 6,7 = mouse buttons */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P2 Mouse Button Left") PORT_PLAYER(2) PORT_CATEGORY(22)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P2 Mouse Button Right") PORT_PLAYER(2) PORT_CATEGORY(22)
+
+	PORT_START("MOUSE2_X")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(2) PORT_CATEGORY(22)
+
+	PORT_START("MOUSE2_Y")
+	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(2) PORT_CATEGORY(22)
 
 #ifdef SNES_LAYER_DEBUG
 	PORT_START("INTERNAL")
@@ -203,20 +254,95 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static void snes_input_read_joy( running_machine *machine, int port )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	static const char *const portnames[2][4] =
+			{
+				{ "SERIAL1_DATA1_L", "SERIAL1_DATA1_H", "SERIAL1_DATA2_L", "SERIAL1_DATA2_H" },
+				{ "SERIAL2_DATA1_L", "SERIAL2_DATA1_H", "SERIAL2_DATA2_L", "SERIAL2_DATA2_H" },
+			};
+
+	state->joypad[port + 0].low  = input_port_read(machine, portnames[port][0]);
+	state->joypad[port + 0].high = input_port_read(machine, portnames[port][1]);
+	state->joypad[port + 2].low  = input_port_read(machine, portnames[port][2]);
+	state->joypad[port + 2].high = input_port_read(machine, portnames[port][3]);
+}
+
+static void snes_input_read_mouse( running_machine *machine, int port )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	INT16 var;
+	static const char *const portnames[2][3] =
+			{
+				{ "MOUSE1", "MOUSE1_X", "MOUSE1_Y" },
+				{ "MOUSE2", "MOUSE2_X", "MOUSE2_Y" },
+			};
+
+	state->mouse[port].buttons = input_port_read(machine, portnames[port][0]);
+	state->mouse[port].x = input_port_read(machine, portnames[port][1]);
+	state->mouse[port].y = input_port_read(machine, portnames[port][2]);
+	var = state->mouse[port].x - state->mouse[port].oldx;
+
+	if (var < -127)
+	{
+		state->mouse[port].deltax = 0xff;
+		state->mouse[port].oldx -= 127;
+	}
+	else if (var < 0)
+	{
+		state->mouse[port].deltax = 0x80 | (-var);
+		state->mouse[port].oldx = state->mouse[port].x;
+	}
+	else if (var > 127)
+	{
+		state->mouse[port].deltax = 0x7f;
+		state->mouse[port].oldx += 127;
+	}
+	else
+	{
+		state->mouse[port].deltax = var & 0xff;
+		state->mouse[port].oldx = state->mouse[port].x;
+	}
+
+	var = state->mouse[port].y - state->mouse[port].oldy;
+
+	if (var < -127)
+	{
+		state->mouse[port].deltay = 0xff;
+		state->mouse[port].oldy -= 127;
+	}
+	else if (var < 0)
+	{
+		state->mouse[port].deltay = 0x80 | (-var);
+		state->mouse[port].oldy = state->mouse[port].y;
+	}
+	else if (var > 127)
+	{
+		state->mouse[port].deltay = 0x7f;
+		state->mouse[port].oldy += 127;
+	}
+	else
+	{
+		state->mouse[port].deltay = var & 0xff;
+		state->mouse[port].oldy = state->mouse[port].y;
+	}
+}
+
 static void snes_input_read( running_machine *machine )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
 	UINT8 ctrl1 = input_port_read(machine, "CTRLSEL") & 0x0f;
-	UINT8 ctrl2 = input_port_read(machine, "CTRLSEL") & 0xf0;
+	UINT8 ctrl2 = (input_port_read(machine, "CTRLSEL") & 0xf0) >> 4;
 	int i;
 
 	switch (ctrl1)
 	{
 	case 1:	/* joystick */
-		state->joypad[0].low  = input_port_read(machine, "SERIAL1_DATA1_L");
-		state->joypad[0].high = input_port_read(machine, "SERIAL1_DATA1_H");
-		state->joypad[2].low  = input_port_read(machine, "SERIAL1_DATA2_L");
-		state->joypad[2].high = input_port_read(machine, "SERIAL1_DATA2_H");
+		snes_input_read_joy(machine, 0);
+		break;
+	case 2:	/* SNES Mouse */
+		snes_input_read_mouse(machine, 0);
 		break;
 	case 0:	/* no controller in port1 */
 	default:
@@ -226,10 +352,10 @@ static void snes_input_read( running_machine *machine )
 	switch (ctrl2)
 	{
 	case 1:	/* joystick */
-		state->joypad[1].low  = input_port_read(machine, "SERIAL2_DATA1_L");
-		state->joypad[1].high = input_port_read(machine, "SERIAL2_DATA1_H");
-		state->joypad[3].low  = input_port_read(machine, "SERIAL2_DATA2_L");
-		state->joypad[3].high = input_port_read(machine, "SERIAL2_DATA2_H");
+		snes_input_read_joy(machine, 1);
+		break;
+	case 2:	/* SNES Mouse */
+		snes_input_read_mouse(machine, 1);
 		break;
 	case 0:	/* no controller in port2 */
 	default:
@@ -250,14 +376,51 @@ static void snes_input_read( running_machine *machine )
 	// is automatic reading on?
 	if (snes_ram[NMITIMEN] & 1)
 	{
-		state->joy1l = state->joypad[0].low;
-		state->joy1h = state->joypad[0].high;
-		state->joy2l = state->joypad[1].low;
-		state->joy2h = state->joypad[1].high;
-		state->joy3l = state->joypad[2].low;
-		state->joy3h = state->joypad[2].high;
-		state->joy4l = state->joypad[3].low;
-		state->joy4h = state->joypad[3].high;
+		switch (ctrl1)
+		{
+		case 1:	/* joystick */
+			state->joy1l = state->joypad[0].low;
+			state->joy1h = state->joypad[0].high;
+			state->joy3l = state->joypad[2].low;
+			state->joy3h = state->joypad[2].high;
+			break;
+		case 2:	/* SNES Mouse */
+			state->joy1l = state->mouse[0].buttons;
+			state->joy1h = 0;
+			state->joy3l = 0;
+			state->joy3h = 0;
+			break;
+		case 0:	/* no controller in port2 */
+		default:
+			state->joy1l = 0;
+			state->joy1h = 0;
+			state->joy3l = 0;
+			state->joy3h = 0;
+			break;
+		}
+
+		switch (ctrl2)
+		{
+		case 1:	/* joystick */
+			state->joy2l = state->joypad[1].low;
+			state->joy2h = state->joypad[1].high;
+			state->joy4l = state->joypad[3].low;
+			state->joy4h = state->joypad[3].high;
+			break;
+		case 2:	/* SNES Mouse */
+			state->joy2l = state->mouse[1].buttons;
+			state->joy2h = 0;
+			state->joy4l = 0;
+			state->joy4h = 0;
+			break;
+		case 0:	/* no controller in port2 */
+		default:
+			state->joy2l = 0;
+			state->joy2h = 0;
+			state->joy4l = 0;
+			state->joy4h = 0;
+			break;
+		}
 
 		// make sure oldrol starts returning all 1s because the auto-read reads it :-)
 		state->read_idx[0] = 16;
@@ -269,13 +432,33 @@ static void snes_input_read( running_machine *machine )
 static UINT8 snes_oldjoy1_read( running_machine *machine )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
+	UINT8 ctrl1 = input_port_read(machine, "CTRLSEL") & 0x0f;
 	UINT8 res = 0;
 
-	// joysticks
-	if (state->read_idx[0] >= 16)
-		res = 0x01;
-	else
-		res = ((state->joypad[0].low | (state->joypad[0].high << 8)) >> (15 - state->read_idx[0]++)) & 0x01;
+	switch (ctrl1)
+	{
+	case 1:	/* joystick */
+		if (state->read_idx[0] >= 16)
+			res = 0x01;
+		else
+			res = ((state->joypad[0].low | (state->joypad[0].high << 8)) >> (15 - state->read_idx[0]++)) & 0x01;
+		break;
+	case 2:	/* SNES Mouse */
+		if (state->read_idx[0] >= 32)
+			res = 0x01;
+		else if (state->read_idx[0] >= 24)
+			res = (state->mouse[0].deltax >> (31 - state->read_idx[0]++)) & 0x01;
+		else if (state->read_idx[0] >= 16)
+			res = (state->mouse[0].deltay >> (23 - state->read_idx[0]++)) & 0x01;
+		else if (state->read_idx[0] >= 8)
+			res = (state->mouse[0].buttons >> (15 - state->read_idx[0]++)) & 0x01;
+		else
+			res = 0;
+		break;
+	case 0:	/* no controller in port2 */
+	default:
+		break;
+	}
 
 	return res;
 }
@@ -283,13 +466,33 @@ static UINT8 snes_oldjoy1_read( running_machine *machine )
 static UINT8 snes_oldjoy2_read( running_machine *machine )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
+	UINT8 ctrl2 = (input_port_read(machine, "CTRLSEL") & 0xf0) >> 4;
 	UINT8 res = 0;
 
-	// joysticks
-	if (state->read_idx[1] >= 16)
-		res = 0x01;
-	else
-		res = ((state->joypad[1].low | (state->joypad[1].high << 8)) >> (15 - state->read_idx[1]++)) & 0x01;
+	switch (ctrl2)
+	{
+	case 1:	/* joystick */
+		if (state->read_idx[1] >= 16)
+			res = 0x01;
+		else
+			res = ((state->joypad[1].low | (state->joypad[1].high << 8)) >> (15 - state->read_idx[1]++)) & 0x01;
+		break;
+	case 2:	/* SNES Mouse */
+		if (state->read_idx[1] >= 32)
+			res = 0x01;
+		else if (state->read_idx[1] >= 24)
+			res = (state->mouse[1].deltax >> (31 - state->read_idx[1]++)) & 0x01;
+		else if (state->read_idx[1] >= 16)
+			res = (state->mouse[1].deltay >> (23 - state->read_idx[1]++)) & 0x01;
+		else if (state->read_idx[1] >= 8)
+			res = (state->mouse[1].buttons >> (15 - state->read_idx[1]++)) & 0x01;
+		else
+			res = 0;
+		break;
+	case 0:	/* no controller in port2 */
+	default:
+		break;
+	}
 
 	return res;
 }
@@ -382,46 +585,59 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-ROM_START(snes)
+ROM_START( snes )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
 	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
 	ROM_LOAD( "dsp3data.bin", 0x000800, 0x000800, CRC(4a1c5453) SHA1(2f69c652109938cde21df5eb89890bf090256dbb) )
+
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START(snessfx)
+ROM_START( snessfx )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
 	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
+
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START(snespal)
+ROM_START( snespal )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
 	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
 	ROM_LOAD( "dsp3data.bin", 0x000800, 0x000800, CRC(4a1c5453) SHA1(2f69c652109938cde21df5eb89890bf090256dbb) )
+
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START(snespsfx)
+ROM_START( snespsfx )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
 	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
 	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
 	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
+
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
-ROM_START(sfcbox)
+ROM_START( sfcbox )
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
 	/* atm, we only load these here, but we don't really emulate anything */
 	ROM_REGION( 0x10000, "grom", 0 )
 	ROM_LOAD( "grom1-1.bin", 0x0000, 0x8000, CRC(333bf9a7) SHA1(5d0cd9ca29e5580c3eebe9f136839987c879f979) )
