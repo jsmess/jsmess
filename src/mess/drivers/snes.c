@@ -120,10 +120,10 @@ static CUSTOM_INPUT( snes_superscope_offscreen_input )
 				{ "SUPERSCOPE2", "SUPERSCOPE2_X", "SUPERSCOPE2_Y" },
 			};
 
-	UINT16 x = input_port_read(field->port->machine, portnames[port][1]);
-	UINT16 y = input_port_read(field->port->machine, portnames[port][2]);
+	INT16 x = input_port_read(field->port->machine, portnames[port][1]);
+	INT16 y = input_port_read(field->port->machine, portnames[port][2]);
 
-	/* these are the theoretical boundaries */
+	/* these are the theoretical boundaries, but we currently are always onscreen... */
 	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= snes_ppu.beam.last_visible_line)
 		state->scope[port].offscreen = 1;
 	else
