@@ -33,6 +33,7 @@
 #include "cpu/g65816/g65816.h"
 #include "includes/snes.h"
 #include "machine/snescart.h"
+#include "crsshair.h"
 
 #define MAX_SNES_CART_SIZE 0x600000
 
@@ -109,23 +110,55 @@ static CUSTOM_INPUT( snes_mouse_speed_input )
 	return state->mouse[port].speed;
 }
 
-static INPUT_PORTS_START( snes )
-	PORT_START("CTRLSEL")  /* Select Controller Type */
-	PORT_CATEGORY_CLASS( 0x0f, 0x01, "P1 Controller")
-	PORT_CATEGORY_ITEM(  0x00, "Unconnected",		10 )
-	PORT_CATEGORY_ITEM(  0x01, "Gamepad",		11 )
-	PORT_CATEGORY_ITEM(  0x02, "Mouse",			12 )
-//	PORT_CATEGORY_ITEM(  0x03, "Superscope",		13 )
-//	PORT_CATEGORY_ITEM(  0x04, "Justfier",		14 )
-//	PORT_CATEGORY_ITEM(  0x05, "Multitap",		15 )
-	PORT_CATEGORY_CLASS( 0xf0, 0x10, "P2 Controller")
-	PORT_CATEGORY_ITEM(  0x00, "Unconnected",		20 )
-	PORT_CATEGORY_ITEM(  0x10, "Gamepad",		21 )
-	PORT_CATEGORY_ITEM(  0x20, "Mouse",			22 )
-//	PORT_CATEGORY_ITEM(  0x30, "Superscope",		23 )
-//	PORT_CATEGORY_ITEM(  0x40, "Justfier",		24 )
-//	PORT_CATEGORY_ITEM(  0x50, "Multitap",		25 )
+static CUSTOM_INPUT( snes_superscope_offscreen_input )
+{
+	snes_state *state = (snes_state *)field->port->machine->driver_data;
+	int port = (FPTR)param;
+	static const char *const portnames[2][3] =
+			{
+				{ "SUPERSCOPE1", "SUPERSCOPE1_X", "SUPERSCOPE1_Y" },
+				{ "SUPERSCOPE2", "SUPERSCOPE2_X", "SUPERSCOPE2_Y" },
+			};
 
+	UINT16 x = input_port_read(field->port->machine, portnames[port][1]);
+	UINT16 y = input_port_read(field->port->machine, portnames[port][2]);
+
+	/* these are the theoretical boundaries */
+	if (x < 0 || x >= SNES_SCR_WIDTH || y < 0 || y >= snes_ppu.beam.last_visible_line)
+		state->scope[port].offscreen = 1;
+	else
+		state->scope[port].offscreen = 0;
+
+	return state->scope[port].offscreen;
+}
+
+static TIMER_CALLBACK( lightgun_tick )
+{
+	if ((input_port_read(machine, "CTRLSEL") & 0x0f) == 0x03 || (input_port_read(machine, "CTRLSEL") & 0x0f) == 0x04)
+	{
+		/* enable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);
+	}
+	else
+	{
+		/* disable lightpen crosshair */
+		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_NONE);
+	}
+
+	if ((input_port_read(machine, "CTRLSEL") & 0xf0) == 0x30 || (input_port_read(machine, "CTRLSEL") & 0xf0) == 0x40)
+	{
+		/* enable lightpen crosshair */
+		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_ALL);
+	}
+	else
+	{
+		/* disable lightpen crosshair */
+		crosshair_set_screen(machine, 1, CROSSHAIR_SCREEN_NONE);
+	}
+}
+
+
+static INPUT_PORTS_START( snes_joypads )
 	PORT_START("SERIAL1_DATA1_L")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Button A") PORT_PLAYER(1) PORT_CATEGORY(11)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 Button X") PORT_PLAYER(1) PORT_CATEGORY(11)
@@ -165,7 +198,9 @@ static INPUT_PORTS_START( snes )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_START("SERIAL2_DATA2_H")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
+static INPUT_PORTS_START( snes_mouse )
 	PORT_START("MOUSE1")
 	/* bits 0,3 = mouse signature (must be 1) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -201,6 +236,63 @@ static INPUT_PORTS_START( snes )
 
 	PORT_START("MOUSE2_Y")
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(2) PORT_CATEGORY(22)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( snes_superscope )
+	PORT_START("SUPERSCOPE1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )	// Noise
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snes_superscope_offscreen_input, (void *)0)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Port1 Superscope Pause") PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Port1 Superscope Turbo") PORT_TOGGLE PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Port1 Superscope Cursor") PORT_PLAYER(1) PORT_CATEGORY(13)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Port1 Superscope Fire") PORT_PLAYER(1) PORT_CATEGORY(13)
+
+	PORT_START("SUPERSCOPE1_X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_NAME("Port1 Superscope X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_CATEGORY(13)
+
+	PORT_START("SUPERSCOPE1_Y")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y) PORT_NAME("Port1 Superscope Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1) PORT_CATEGORY(13)
+
+	PORT_START("SUPERSCOPE2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )	// Noise
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snes_superscope_offscreen_input, (void *)1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Port2 Superscope Pause") PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Port2 Superscope Turbo") PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Port2 Superscope Cursor") PORT_PLAYER(2) PORT_CATEGORY(23)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Port2 Superscope Fire") PORT_PLAYER(2) PORT_CATEGORY(23)
+
+	PORT_START("SUPERSCOPE2_X")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_NAME("Port2 Superscope X Axis") PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CATEGORY(23)
+
+	PORT_START("SUPERSCOPE2_Y")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y) PORT_NAME("Port2 Superscope Y Axis") PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(2) PORT_CATEGORY(23)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( snes )
+	PORT_START("CTRLSEL")  /* Select Controller Type */
+	PORT_CATEGORY_CLASS( 0x0f, 0x01, "P1 Controller")
+	PORT_CATEGORY_ITEM(  0x00, "Unconnected",		10 )
+	PORT_CATEGORY_ITEM(  0x01, "Gamepad",		11 )
+	PORT_CATEGORY_ITEM(  0x02, "Mouse",			12 )
+	PORT_CATEGORY_ITEM(  0x03, "Superscope",		13 )
+//	PORT_CATEGORY_ITEM(  0x04, "Justfier",		14 )
+//	PORT_CATEGORY_ITEM(  0x05, "Multitap",		15 )
+	PORT_CATEGORY_CLASS( 0xf0, 0x10, "P2 Controller")
+	PORT_CATEGORY_ITEM(  0x00, "Unconnected",		20 )
+	PORT_CATEGORY_ITEM(  0x10, "Gamepad",		21 )
+	PORT_CATEGORY_ITEM(  0x20, "Mouse",			22 )
+	PORT_CATEGORY_ITEM(  0x30, "Superscope",		23 )
+//	PORT_CATEGORY_ITEM(  0x40, "Justfier",		24 )
+//	PORT_CATEGORY_ITEM(  0x50, "Multitap",		25 )
+
+	PORT_INCLUDE(snes_joypads)
+	PORT_INCLUDE(snes_mouse)
+	PORT_INCLUDE(snes_superscope)
+
 
 #ifdef SNES_LAYER_DEBUG
 	PORT_START("INTERNAL")
@@ -253,6 +345,24 @@ INPUT_PORTS_END
  *  Input callbacks
  *
  *************************************/
+
+static void snes_gun_latch( running_machine *machine, INT16 x, INT16 y )
+{
+	/* these are the theoretical boundaries */
+	if (x < 0)
+		x = 0;
+	if (x > (SNES_SCR_WIDTH - 1))
+		x = SNES_SCR_WIDTH - 1;
+
+	if (y < 0)
+		y = 0;
+	if (y > (snes_ppu.beam.last_visible_line - 1))
+		y = snes_ppu.beam.last_visible_line - 1;
+
+	snes_ppu.beam.latch_horz = x;
+	snes_ppu.beam.latch_vert = y;
+	snes_ram[STAT78] |= 0x40;
+}
 
 static void snes_input_read_joy( running_machine *machine, int port )
 {
@@ -329,6 +439,65 @@ static void snes_input_read_mouse( running_machine *machine, int port )
 	}
 }
 
+static void snes_input_read_superscope( running_machine *machine, int port )
+{
+	snes_state *state = (snes_state *)machine->driver_data;
+	static const char *const portnames[2][3] =
+			{
+				{ "SUPERSCOPE1", "SUPERSCOPE1_X", "SUPERSCOPE1_Y" },
+				{ "SUPERSCOPE2", "SUPERSCOPE2_X", "SUPERSCOPE2_Y" },
+			};
+	UINT8 input;
+
+	/* first read input bits */
+	state->scope[port].x = input_port_read(machine, portnames[port][1]);
+	state->scope[port].y = input_port_read(machine, portnames[port][2]);
+	input = input_port_read(machine, portnames[port][0]);
+
+	/* then start elaborating input bits: only keep old turbo value */
+	state->scope[port].buttons &= 0x20;
+
+	/* set onscreen/offscreen */
+	state->scope[port].buttons |= BIT(input, 1);
+
+	/* turbo is a switch; toggle is edge sensitive */
+	if (BIT(input, 5) && !state->scope[port].turbo_lock)
+	{
+		state->scope[port].buttons ^= 0x20;
+		state->scope[port].turbo_lock = 1;
+	}
+	else if (!BIT(input, 5))
+		state->scope[port].turbo_lock = 0;
+
+	/* fire is a button; if turbo is active, trigger is level sensitive; otherwise it is edge sensitive */
+	if (BIT(input, 7) && (BIT(state->scope[port].buttons, 5) || !state->scope[port].fire_lock))
+	{
+		state->scope[port].buttons |= 0x80;
+		state->scope[port].fire_lock = 1;
+	}
+	else if (!BIT(input, 7))
+		state->scope[port].fire_lock = 0;
+
+	/* cursor is a button; it is always level sensitive */
+	state->scope[port].buttons |= BIT(input, 6);
+
+	/* pause is a button; it is always edge sensitive */
+	if (BIT(input, 4) && !state->scope[port].pause_lock)
+	{
+		state->scope[port].buttons |= 0x10;
+		state->scope[port].pause_lock = 1;
+	}
+	else if (!BIT(input, 4))
+		state->scope[port].pause_lock = 0;
+
+	/* If we have pressed fire or cursor and we are on-screen and SuperScope is in Port2, then latch video signal.
+	Notice that we only latch Port2 because its IOBit pin is connected to bit7 of the IO Port, while Port1 has 
+	IOBit pin connected to bit6 of the IO Port, and the latter is not detected by the H/V Counters. In other
+	words, you can connect SuperScope to Port1, but there is no way SNES could detect its on-screen position */
+	if ((state->scope[port].buttons & 0xc0) && !(state->scope[port].buttons & 0x02) && port == 1)
+		snes_gun_latch(machine, state->scope[port].x, state->scope[port].y);
+}
+
 static void snes_input_read( running_machine *machine )
 {
 	snes_state *state = (snes_state *)machine->driver_data;
@@ -336,13 +505,19 @@ static void snes_input_read( running_machine *machine )
 	UINT8 ctrl2 = (input_port_read(machine, "CTRLSEL") & 0xf0) >> 4;
 	int i;
 
+	/* Check if lightgun has been chosen as input: if so, enable crosshair */
+	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
+
 	switch (ctrl1)
 	{
-	case 1:	/* joystick */
+	case 1:	/* SNES joypad */
 		snes_input_read_joy(machine, 0);
 		break;
 	case 2:	/* SNES Mouse */
 		snes_input_read_mouse(machine, 0);
+		break;
+	case 3:	/* SNES Superscope */
+		snes_input_read_superscope(machine, 0);
 		break;
 	case 0:	/* no controller in port1 */
 	default:
@@ -351,11 +526,14 @@ static void snes_input_read( running_machine *machine )
 
 	switch (ctrl2)
 	{
-	case 1:	/* joystick */
+	case 1:	/* SNES joypad */
 		snes_input_read_joy(machine, 1);
 		break;
 	case 2:	/* SNES Mouse */
 		snes_input_read_mouse(machine, 1);
+		break;
+	case 3:	/* SNES Superscope */
+		snes_input_read_superscope(machine, 1);
 		break;
 	case 0:	/* no controller in port2 */
 	default:
@@ -378,7 +556,7 @@ static void snes_input_read( running_machine *machine )
 	{
 		switch (ctrl1)
 		{
-		case 1:	/* joystick */
+		case 1:	/* SNES joypad */
 			state->joy1l = state->joypad[0].low;
 			state->joy1h = state->joypad[0].high;
 			state->joy3l = state->joypad[2].low;
@@ -387,6 +565,12 @@ static void snes_input_read( running_machine *machine )
 		case 2:	/* SNES Mouse */
 			state->joy1l = state->mouse[0].buttons;
 			state->joy1h = 0;
+			state->joy3l = 0;
+			state->joy3h = 0;
+			break;
+		case 3:	/* SNES Superscope */
+			state->joy1l = 0xff;
+			state->joy1h = state->scope[0].buttons;
 			state->joy3l = 0;
 			state->joy3h = 0;
 			break;
@@ -401,7 +585,7 @@ static void snes_input_read( running_machine *machine )
 
 		switch (ctrl2)
 		{
-		case 1:	/* joystick */
+		case 1:	/* SNES joypad */
 			state->joy2l = state->joypad[1].low;
 			state->joy2h = state->joypad[1].high;
 			state->joy4l = state->joypad[3].low;
@@ -410,6 +594,12 @@ static void snes_input_read( running_machine *machine )
 		case 2:	/* SNES Mouse */
 			state->joy2l = state->mouse[1].buttons;
 			state->joy2h = 0;
+			state->joy4l = 0;
+			state->joy4h = 0;
+			break;
+		case 3:	/* SNES Superscope */
+			state->joy2l = 0xff;
+			state->joy2h = state->scope[1].buttons;
 			state->joy4l = 0;
 			state->joy4h = 0;
 			break;
@@ -422,7 +612,7 @@ static void snes_input_read( running_machine *machine )
 			break;
 		}
 
-		// make sure oldrol starts returning all 1s because the auto-read reads it :-)
+		// make sure read_idx starts returning all 1s because the auto-read reads it :-)
 		state->read_idx[0] = 16;
 		state->read_idx[1] = 16;
 	}
@@ -437,7 +627,7 @@ static UINT8 snes_oldjoy1_read( running_machine *machine )
 
 	switch (ctrl1)
 	{
-	case 1:	/* joystick */
+	case 1:	/* SNES joypad */
 		if (state->read_idx[0] >= 16)
 			res = 0x01;
 		else
@@ -455,6 +645,12 @@ static UINT8 snes_oldjoy1_read( running_machine *machine )
 		else
 			res = 0;
 		break;
+	case 3:	/* SNES Superscope */
+		if (state->read_idx[0] >= 8)
+			res = 0x01;
+		else
+			res = (state->scope[0].buttons >> (7 - state->read_idx[0]++)) & 0x01;
+		break;
 	case 0:	/* no controller in port2 */
 	default:
 		break;
@@ -471,7 +667,7 @@ static UINT8 snes_oldjoy2_read( running_machine *machine )
 
 	switch (ctrl2)
 	{
-	case 1:	/* joystick */
+	case 1:	/* SNES joypad */
 		if (state->read_idx[1] >= 16)
 			res = 0x01;
 		else
@@ -488,6 +684,12 @@ static UINT8 snes_oldjoy2_read( running_machine *machine )
 			res = (state->mouse[1].buttons >> (15 - state->read_idx[1]++)) & 0x01;
 		else
 			res = 0;
+		break;
+	case 3:	/* SNES Superscope */
+		if (state->read_idx[1] >= 8)
+			res = 0x01;
+		else
+			res = (state->scope[1].buttons >> (7 - state->read_idx[1]++)) & 0x01;
 		break;
 	case 0:	/* no controller in port2 */
 	default:
