@@ -105,30 +105,6 @@ static void apricot_sio_irq_w(running_device *device, int state)
 	pic8259_ir5_w(apricot->pic8259, state);
 }
 
-static READ8_DEVICE_HANDLER( apricot_sio_r )
-{
-	switch (offset)
-	{
-	case 0: return z80sio_d_r(device, 0);
-	case 1: return z80sio_c_r(device, 0);
-	case 2: return z80sio_d_r(device, 1);
-	case 3: return z80sio_c_r(device, 1);
-	}
-
-	return 0xff;
-}
-
-static WRITE8_DEVICE_HANDLER( apricot_sio_w )
-{
-	switch (offset)
-	{
-	case 0: z80sio_d_w(device, 0, data); break;
-	case 1: z80sio_c_w(device, 0, data); break;
-	case 2: z80sio_d_w(device, 1, data); break;
-	case 3: z80sio_c_w(device, 1, data); break;
-	}
-}
-
 static const z80sio_interface apricot_z80sio_intf =
 {
 	apricot_sio_irq_w,
@@ -298,7 +274,7 @@ static ADDRESS_MAP_START( apricot_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x48, 0x4f) AM_DEVREADWRITE8("ic17", i8255a_r, i8255a_w, 0x00ff)
 	AM_RANGE(0x50, 0x51) AM_MIRROR(0x06) AM_DEVWRITE8("ic7", sn76496_w, 0x00ff)
 	AM_RANGE(0x58, 0x5f) AM_DEVREADWRITE8("ic16", pit8253_r, pit8253_w, 0x00ff)
-	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE8("ic15", apricot_sio_r, apricot_sio_w, 0x00ff)
+	AM_RANGE(0x60, 0x67) AM_DEVREADWRITE8("ic15", z80sio_ba_cd_r, z80sio_ba_cd_w, 0x00ff)
 	AM_RANGE(0x68, 0x69) AM_MIRROR(0x04) AM_DEVWRITE8("ic30", mc6845_address_w, 0x00ff)
 	AM_RANGE(0x6a, 0x6b) AM_MIRROR(0x04) AM_DEVREADWRITE8("ic30", mc6845_register_r, mc6845_register_w, 0x00ff)
 //  AM_RANGE(0x70, 0x71) AM_MIRROR(0x04) 8089 channel attention 1

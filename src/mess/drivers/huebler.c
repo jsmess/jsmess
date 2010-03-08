@@ -43,30 +43,6 @@ static TIMER_DEVICE_CALLBACK( keyboard_tick )
 
 /* Read/Write Handlers */
 
-static READ8_DEVICE_HANDLER( amu880_z80sio_r )
-{
-	switch (offset)
-	{
-	case 0: return z80sio_d_r(device, 0);
-	case 1: return z80sio_c_r(device, 0);
-	case 2: return z80sio_d_r(device, 1);
-	case 3: return z80sio_c_r(device, 1);
-	}
-
-	return 0;
-}
-
-static WRITE8_DEVICE_HANDLER( amu880_z80sio_w )
-{
-	switch (offset)
-	{
-	case 0: z80sio_d_w(device, 0, data); break;
-	case 1: z80sio_c_w(device, 0, data); break;
-	case 2: z80sio_d_w(device, 1, data); break;
-	case 3: z80sio_c_w(device, 1, data); break;
-	}
-}
-
 static READ8_HANDLER( keyboard_r )
 {
 	/*
@@ -127,7 +103,7 @@ static ADDRESS_MAP_START( amu880_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80SIO_TAG, amu880_z80sio_r, amu880_z80sio_w)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
 ADDRESS_MAP_END
 
 /* Input Ports */

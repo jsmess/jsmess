@@ -2102,57 +2102,6 @@ Z80SIO, used for the keyboard interface
 
 */
 
-READ8_DEVICE_HANDLER( sio_r )
-{
-    int pc=cpu_get_pc(devtag_get_device(device->machine,MAINCPU_TAG));
-    UINT8 result = 0;
-
-	switch (offset*2)
-	{
-        case 0 :
-            result=z80sio_d_r(device, 0);
-            break;
-        case 2 :
-            result=z80sio_d_r(device, 1);
-            break;
-        case 4 :
-            result=z80sio_c_r(device, 0);
-            break;
-        case 6 :
-            result=z80sio_c_r(device, 1);
-            break;
-	}
-
-    if(LOG_SIO)
-        logerror("Nimbus SIOR at pc=%08X from %04X data=%02X\n",pc,(offset*2)+0xF0,result);
-
-	return result;
-}
-
-WRITE8_DEVICE_HANDLER( sio_w )
-{
-    int pc=cpu_get_pc(devtag_get_device(device->machine,MAINCPU_TAG));
-
-    if(LOG_SIO)
-        logerror("Nimbus SIOW at %08X write of %02X to %04X\n",pc,data,(offset*2)+0xF0);
-
-	switch (offset*2)
-	{
-        case 0 :
-            z80sio_d_w(device, 0, data);
-            break;
-        case 2 :
-            z80sio_d_w(device, 1, data);
-            break;
-        case 4 :
-            z80sio_c_w(device, 0, data);
-            break;
-        case 5 :
-            z80sio_c_w(device, 1, data);
-            break;
-	}
-}
-
 /* Z80 SIO/2 */
 
 void sio_interrupt(running_device *device, int state)

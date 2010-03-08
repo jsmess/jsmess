@@ -29,42 +29,6 @@
 #include "sound/beep.h"
 
 
-static READ8_DEVICE_HANDLER( sio2_r )
-{
-	switch (offset)
-	{
-	case 0:
-		return z80sio_d_r(device, 0);
-	case 1:
-		return z80sio_c_r(device, 0);
-	case 2:
-		return z80sio_d_r(device, 1);
-	case 3:
-		return z80sio_c_r(device, 1);
-	}
-
-	return 0;
-}
-
-static WRITE8_DEVICE_HANDLER( sio2_w )
-{
-	switch (offset)
-	{
-	case 0:
-		z80sio_d_w(device, 0, data);
-		break;
-	case 1:
-		z80sio_c_w(device, 0, data);
-		break;
-	case 2:
-		z80sio_d_w(device, 1, data);
-		break;
-	case 3:
-		z80sio_c_w(device, 1, data);
-		break;
-	}
-}
-
 static ADDRESS_MAP_START(p8k_memmap, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xffff) AM_RAM
@@ -78,8 +42,8 @@ static ADDRESS_MAP_START(p8k_iomap, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x1c, 0x1f) AM_DEVREADWRITE("z80pio_2", z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("i8272", upd765_data_r, upd765_data_w)
 	AM_RANGE(0x21, 0x21) AM_DEVREAD("i8272", upd765_status_r)
-	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("z80sio_0", sio2_r, sio2_w)
-	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("z80sio_1", sio2_r, sio2_w)
+	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("z80sio_0", z80sio_ba_cd_r, z80sio_ba_cd_w)
+	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("z80sio_1", z80sio_ba_cd_r, z80sio_ba_cd_w)
 	AM_RANGE(0x2c, 0x2f) AM_DEVREADWRITE("z80ctc_1", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x3c, 0x3c) AM_DEVREADWRITE("z80dma", z80dma_r, z80dma_w)
 ADDRESS_MAP_END

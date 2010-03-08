@@ -35,30 +35,6 @@
 
 /* Read/Write Handlers */
 
-static READ8_DEVICE_HANDLER( sio0_r )
-{
-	switch (offset)
-	{
-	case 0:	return z80sio_d_r(device, 1);
-	case 1:	return z80sio_d_r(device, 0);
-	case 2:	return z80sio_c_r(device, 1);
-	case 3:	return z80sio_c_r(device, 0);
-	}
-
-	return 0;
-}
-
-static WRITE8_DEVICE_HANDLER( sio0_w )
-{
-	switch (offset)
-	{
-	case 0:	z80sio_d_w(device, 1, data); break;
-	case 1:	z80sio_d_w(device, 0, data); break;
-	case 2:	z80sio_c_w(device, 1, data); break;
-	case 3:	z80sio_c_w(device, 0, data); break;
-	}
-}
-
 static WRITE8_DEVICE_HANDLER( drvslt_w )
 {
 	/*
@@ -348,7 +324,7 @@ static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe4, 0xe7) AM_DEVREADWRITE(FD1791_TAG, wd17xx_r, wd17xx_w)
 	AM_RANGE(0xef, 0xef) AM_DEVWRITE(FD1791_TAG, drvslt_w)
 	AM_RANGE(0xf0, 0xf3) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80SIO_TAG, sio0_r, sio0_w)
+	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_cd_ba_r, z80sio_cd_ba_w)
 	AM_RANGE(0xf8, 0xf8) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_r, z80dma_w)
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(rom_enable_w)
 	AM_RANGE(0xfc, 0xfc) AM_READ(keyboard_r) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)

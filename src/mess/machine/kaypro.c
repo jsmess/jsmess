@@ -305,34 +305,6 @@ WRITE8_DEVICE_HANDLER( kaypro_sio_w )
 		z80sio_c_w(device, 1, data);
 }
 
-READ8_DEVICE_HANDLER( kaypro2x_sio_r )
-{
-	if (!offset)
-		return z80sio_d_r(device, 0);
-	else
-	if (offset == 1)
-		return z80sio_d_r(device, 1);
-	else
-	if (offset == 2)
-		return z80sio_c_r(device, 0);
-	else
-		return z80sio_c_r(device, 1);
-}
-
-WRITE8_DEVICE_HANDLER( kaypro2x_sio_w )
-{
-	if (!offset)
-		z80sio_d_w(device, 0, data);
-	else
-	if (offset == 1)
-		z80sio_d_w(device, 1, data);
-	else
-	if (offset == 2)
-		z80sio_c_w(device, 0, data);
-	else
-		z80sio_c_w(device, 1, data);
-}
-
 
 /*************************************************************************************
 

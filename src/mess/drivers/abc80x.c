@@ -410,44 +410,6 @@ static WRITE8_HANDLER( abc806_mao_w )
 	abc806_bankswitch(space->machine);
 }
 
-/* Z80 SIO/2 */
-
-static READ8_DEVICE_HANDLER( sio2_r )
-{
-	switch (offset)
-	{
-	case 0:
-		return z80sio_d_r(device, 0);
-	case 1:
-		return z80sio_c_r(device, 0);
-	case 2:
-		return z80sio_d_r(device, 1);
-	case 3:
-		return z80sio_c_r(device, 1);
-	}
-
-	return 0;
-}
-
-static WRITE8_DEVICE_HANDLER( sio2_w )
-{
-	switch (offset)
-	{
-	case 0:
-		z80sio_d_w(device, 0, data);
-		break;
-	case 1:
-		z80sio_c_w(device, 0, data);
-		break;
-	case 2:
-		z80sio_d_w(device, 1, data);
-		break;
-	case 3:
-		z80sio_c_w(device, 1, data);
-		break;
-	}
-}
-
 /* Pling */
 
 static READ8_HANDLER( abc800_pling_r )
@@ -497,7 +459,7 @@ static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, sio2_r, sio2_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -519,7 +481,7 @@ static ADDRESS_MAP_START( abc800c_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800_hrs_w)
 	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800_hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, sio2_r, sio2_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -541,7 +503,7 @@ static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, sio2_r, sio2_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
@@ -580,7 +542,7 @@ static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x37, 0x37) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_cli_r, abc806_sso_w)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
 	AM_RANGE(0x39, 0x39) AM_MIRROR(0xff06) AM_DEVWRITE(MC6845_TAG, mc6845_register_w)
-	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO_TAG, sio2_r, sio2_w)
+	AM_RANGE(0x40, 0x43) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0xff1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 

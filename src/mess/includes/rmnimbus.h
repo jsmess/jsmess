@@ -94,9 +94,6 @@ WRITE8_HANDLER( mcu_w );
 
 extern const z80sio_interface sio_intf;
 
-READ8_DEVICE_HANDLER( sio_r );
-WRITE8_DEVICE_HANDLER( sio_w );
-
 void sio_interrupt(running_device *device, int state);
 //WRITE8_DEVICE_HANDLER( sio_dtr_w );
 WRITE8_DEVICE_HANDLER( sio_serial_transmit );

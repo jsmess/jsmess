@@ -115,7 +115,7 @@ static ADDRESS_MAP_START(nimbus_io, ADDRESS_SPACE_IO, 16)
     AM_RANGE( 0x0092, 0x0093) AM_READWRITE8( iou_r, iou_w, 0x00FF)
     AM_RANGE( 0X00c0, 0X00cf) AM_READWRITE8( pc8031_r, pc8031_w, 0x00FF)
     AM_RANGE( 0X00e0, 0X00ef) AM_READWRITE8( sound_ay8910_r, sound_ay8910_w, 0x00FF)
-    AM_RANGE( 0X00f0, 0X00f7) AM_DEVREADWRITE8( Z80SIO_TAG, sio_r, sio_w, 0x00FF)
+    AM_RANGE( 0x00f0, 0x00f7) AM_DEVREADWRITE8(Z80SIO_TAG, z80sio_cd_ba_r, z80sio_cd_ba_w, 0x00ff)
     AM_RANGE( 0x0400, 0x041f) AM_READWRITE8( nimbus_disk_r, nimbus_disk_w, 0x00FF)
 	AM_RANGE( 0xff00, 0xffff) AM_READWRITE( i186_internal_port_r, i186_internal_port_w)/* CPU 80186         */
 ADDRESS_MAP_END
