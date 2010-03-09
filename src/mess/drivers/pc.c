@@ -3223,7 +3223,7 @@ ROM_END
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
 COMP(  1981,	ibm5150,	0,		0,	ibm5150,    ibm5150,	ibm5150,    "International Business Machines",  "IBM PC 5150" , 0)
 COMP(  1984,	dgone,		ibm5150,	0,	pccga,      pccga,	pccga,	    "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1985,	bw230,		ibm5150,	0,	pccga,	    bondwell,   bondwell,   "Bondwell Holding",  "BW230 (PRO28 Series)", GAME_NOT_WORKING )
+COMP(  1985,	bw230,		ibm5150,	0,	pccga,	    bondwell,   bondwell,   "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
 COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,	europc,     "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
