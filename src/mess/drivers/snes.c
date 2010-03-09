@@ -373,10 +373,18 @@ static void snes_input_read_joy( running_machine *machine, int port )
 				{ "SERIAL2_DATA1_L", "SERIAL2_DATA1_H", "SERIAL2_DATA2_L", "SERIAL2_DATA2_H" },
 			};
 
-	state->joypad[port + 0].low  = input_port_read(machine, portnames[port][0]);
-	state->joypad[port + 0].high = input_port_read(machine, portnames[port][1]);
-	state->joypad[port + 2].low  = input_port_read(machine, portnames[port][2]);
-	state->joypad[port + 2].high = input_port_read(machine, portnames[port][3]);
+	state->data1[port] = input_port_read(machine, portnames[port][0]) | (input_port_read(machine, portnames[port][1]) << 8);
+	state->data2[port] = input_port_read(machine, portnames[port][2]) | (input_port_read(machine, portnames[port][3]) << 8);
+
+	// avoid sending signals that could crash games
+	// if left, no right
+	if (state->data1[port] & 0x200)
+		state->data1[port] &= ~0x100;
+	// if up, no down
+	if (state->data1[port] & 0x800)
+		state->data1[port] &= ~0x400;
+
+	state->joypad[port].buttons = state->data1[port];
 }
 
 static void snes_input_read_mouse( running_machine *machine, int port )
@@ -437,6 +445,9 @@ static void snes_input_read_mouse( running_machine *machine, int port )
 		state->mouse[port].deltay = var & 0xff;
 		state->mouse[port].oldy = state->mouse[port].y;
 	}
+
+	state->data1[port] = state->mouse[port].buttons | (0x00 << 8);
+	state->data2[port] = 0;
 }
 
 static void snes_input_read_superscope( running_machine *machine, int port )
@@ -496,6 +507,9 @@ static void snes_input_read_superscope( running_machine *machine, int port )
 	words, you can connect SuperScope to Port1, but there is no way SNES could detect its on-screen position */
 	if ((state->scope[port].buttons & 0xc0) && !(state->scope[port].buttons & 0x02) && port == 1)
 		snes_gun_latch(machine, state->scope[port].x, state->scope[port].y);
+
+	state->data1[port] = 0xff | (state->scope[port].buttons << 8);
+	state->data2[port] = 0;
 }
 
 static void snes_input_read( running_machine *machine )
@@ -503,7 +517,6 @@ static void snes_input_read( running_machine *machine )
 	snes_state *state = (snes_state *)machine->driver_data;
 	UINT8 ctrl1 = input_port_read(machine, "CTRLSEL") & 0x0f;
 	UINT8 ctrl2 = (input_port_read(machine, "CTRLSEL") & 0xf0) >> 4;
-	int i;
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	timer_set(machine, attotime_zero, NULL, 0, lightgun_tick);
@@ -521,6 +534,8 @@ static void snes_input_read( running_machine *machine )
 		break;
 	case 0:	/* no controller in port1 */
 	default:
+		state->data1[0] = 0;
+		state->data2[0] = 0;
 		break;
 	}
 
@@ -537,80 +552,23 @@ static void snes_input_read( running_machine *machine )
 		break;
 	case 0:	/* no controller in port2 */
 	default:
+		state->data1[1] = 0;
+		state->data2[1] = 0;
 		break;
 	}
 
-	// avoid sending signals that could crash games
-	for (i = 0; i < 4; i++)
-	{
-		// if left, no right
-		if (state->joypad[i].high & 2)
-			state->joypad[i].high &= ~1;
-		// if up, no down
-		if (state->joypad[i].high & 8)
-			state->joypad[i].high &= ~4;
-	}
-
-	// is automatic reading on?
+	// is automatic reading on? if so, copy port data1/data2 to joy1l->joy4h
+	// this actually works like reading the first 16bits from oldjoy1/2 in reverse order
 	if (snes_ram[NMITIMEN] & 1)
 	{
-		switch (ctrl1)
-		{
-		case 1:	/* SNES joypad */
-			state->joy1l = state->joypad[0].low;
-			state->joy1h = state->joypad[0].high;
-			state->joy3l = state->joypad[2].low;
-			state->joy3h = state->joypad[2].high;
-			break;
-		case 2:	/* SNES Mouse */
-			state->joy1l = state->mouse[0].buttons;
-			state->joy1h = 0;
-			state->joy3l = 0;
-			state->joy3h = 0;
-			break;
-		case 3:	/* SNES Superscope */
-			state->joy1l = 0xff;
-			state->joy1h = state->scope[0].buttons;
-			state->joy3l = 0;
-			state->joy3h = 0;
-			break;
-		case 0:	/* no controller in port2 */
-		default:
-			state->joy1l = 0;
-			state->joy1h = 0;
-			state->joy3l = 0;
-			state->joy3h = 0;
-			break;
-		}
-
-		switch (ctrl2)
-		{
-		case 1:	/* SNES joypad */
-			state->joy2l = state->joypad[1].low;
-			state->joy2h = state->joypad[1].high;
-			state->joy4l = state->joypad[3].low;
-			state->joy4h = state->joypad[3].high;
-			break;
-		case 2:	/* SNES Mouse */
-			state->joy2l = state->mouse[1].buttons;
-			state->joy2h = 0;
-			state->joy4l = 0;
-			state->joy4h = 0;
-			break;
-		case 3:	/* SNES Superscope */
-			state->joy2l = 0xff;
-			state->joy2h = state->scope[1].buttons;
-			state->joy4l = 0;
-			state->joy4h = 0;
-			break;
-		case 0:	/* no controller in port2 */
-		default:
-			state->joy2l = 0;
-			state->joy2h = 0;
-			state->joy4l = 0;
-			state->joy4h = 0;
-			break;
-		}
+		state->joy1l = (state->data1[0] & 0x00ff) >> 0;
+		state->joy1h = (state->data1[0] & 0xff00) >> 8;
+		state->joy2l = (state->data1[1] & 0x00ff) >> 0;
+		state->joy2h = (state->data1[1] & 0xff00) >> 8;
+		state->joy3l = (state->data2[0] & 0x00ff) >> 0;
+		state->joy3h = (state->data2[0] & 0xff00) >> 8;
+		state->joy4l = (state->data2[1] & 0x00ff) >> 0;
+		state->joy4h = (state->data2[1] & 0xff00) >> 8;
 
 		// make sure read_idx starts returning all 1s because the auto-read reads it :-)
 		state->read_idx[0] = 16;
@@ -631,7 +589,7 @@ static UINT8 snes_oldjoy1_read( running_machine *machine )
 		if (state->read_idx[0] >= 16)
 			res = 0x01;
 		else
-			res = ((state->joypad[0].low | (state->joypad[0].high << 8)) >> (15 - state->read_idx[0]++)) & 0x01;
+			res = (state->joypad[0].buttons >> (15 - state->read_idx[0]++)) & 0x01;
 		break;
 	case 2:	/* SNES Mouse */
 		if (state->read_idx[0] >= 32)
@@ -671,7 +629,7 @@ static UINT8 snes_oldjoy2_read( running_machine *machine )
 		if (state->read_idx[1] >= 16)
 			res = 0x01;
 		else
-			res = ((state->joypad[1].low | (state->joypad[1].high << 8)) >> (15 - state->read_idx[1]++)) & 0x01;
+			res = (state->joypad[1].buttons >> (15 - state->read_idx[1]++)) & 0x01;
 		break;
 	case 2:	/* SNES Mouse */
 		if (state->read_idx[1] >= 32)
