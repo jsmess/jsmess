@@ -159,6 +159,7 @@ static READ16_HANDLER( glasgow_keys_r )
 	static const char *const keynames[] = { "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
 	static UINT8 board_row = 0;
 	static UINT16 mouse_down = 0;
+	UINT8 pos2num_res = 0;
 	board_row++;
 	board_row &= 7;
 
@@ -167,25 +168,26 @@ static READ16_HANDLER( glasgow_keys_r )
 
 	if ((data != 0xff) && (!mouse_down))
 	{
-		/* Moving a piece onto a blank */
-		if ((mouse_hold) && (!m_board[board_row][pos_to_num(data)].piece))
+		pos2num_res = pos_to_num(data);
+
+		if (!(pos2num_res < 8))
+			logerror("Position out of bound!");
+		else if ((mouse_hold) && (!m_board[board_row][pos2num_res].piece))
 		{
-			m_board[board_row][pos_to_num(data)].piece = mouse_hold;
+			/* Moving a piece onto a blank */
+			m_board[board_row][pos2num_res].piece = mouse_hold;
 			mouse_hold = 0;
 		}
-		else
-		/* Picking up a piece */
-		if ((!mouse_hold) && (m_board[board_row][pos_to_num(data)].piece))
+		else if ((!mouse_hold) && (m_board[board_row][pos2num_res].piece))
 		{
-			mouse_hold = m_board[board_row][pos_to_num(data)].piece;
-			m_board[board_row][pos_to_num(data)].piece = 0;
+			/* Picking up a piece */
+			mouse_hold = m_board[board_row][pos2num_res].piece;
+			m_board[board_row][pos2num_res].piece = 0;
 		}
 
 		mouse_down = board_row + 1;
-
 	}
-	else
-	if ((data == 0xff) && (mouse_down == (board_row + 1)))	/* Wait for mouse to be released */
+	else if ((data == 0xff) && (mouse_down == (board_row + 1)))	/* Wait for mouse to be released */
 		mouse_down = 0;
 
 	/* See if we are taking a piece off the board */
