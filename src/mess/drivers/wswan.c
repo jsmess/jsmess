@@ -28,11 +28,6 @@
   - Get a dump of the internal BIOSes.
   - Swan Crystal can handle up to 512Mbit ROMs??????
 
-- MameTesters bug 2808:
-  Due to MAME breakage, if you need to use the debugger, you will need to
-  modify src/emu/cpu/nec/necdasm.c, and comment out the 3 lines containing
-  (Iconfig->v25v35_decryptiontable). The "debug" build will assert after
-  about 20 instructions. You can comment out this assert check.
 
 ***************************************************************************/
 
