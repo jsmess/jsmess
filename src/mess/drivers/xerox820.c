@@ -166,7 +166,8 @@ static void xerox820ii_bankswitch(running_machine *machine, int bank)
 	if (bank)
 	{
 		/* ROM */
-		memory_install_rom(program, 0x0000, 0x2fff, 0, 0, memory_region(machine, "monitor"));
+		memory_install_rom(program, 0x0000, 0x17ff, 0, 0, memory_region(machine, "monitor"));
+		memory_unmap_readwrite(program, 0x1800, 0x2fff, 0, 0);
 		memory_install_ram(program, 0x3000, 0x3fff, 0, 0, state->video_ram);
 		memory_unmap_readwrite(program, 0x4000, 0xbfff, 0, 0);
 	}
@@ -958,12 +959,12 @@ ROM_START( xerox820 )
 ROM_END
 
 ROM_START( xerox820ii )
-	ROM_REGION( 0x3000, "monitor", 0 )
+	ROM_REGION( 0x1800, "monitor", 0 )
 	ROM_DEFAULT_BIOS( "v404" )
 	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" )
-	ROMX_LOAD( "537p3652.u33", 0x0000, 0x1000, CRC(16b569c4) SHA1(6c12ded1c6d5c4bd76ce67985a34aef3eff88735), ROM_BIOS(1) )
-	ROMX_LOAD( "537p3653.u34", 0x1000, 0x1000, CRC(1c84d047) SHA1(bc7b945799d468e4d9418f722217005d5efbd83f), ROM_BIOS(1) )
-	ROMX_LOAD( "537p3654.u35", 0x2000, 0x1000, CRC(ed6e3204) SHA1(cf7ff0c21d025e0740e4400e7904eebf5ab7f209), ROM_BIOS(1) )
+	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(1) )
+	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(1) )
+	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, "chargen", 0 )
 	ROM_LOAD( "x820ii.u57", 0x0000, 0x0800, CRC(1a50f600) SHA1(df4470c80611c14fa7ea8591f741fbbecdfe4fd9) )
@@ -971,12 +972,12 @@ ROM_START( xerox820ii )
 ROM_END
 
 ROM_START( xerox168 )
-	ROM_REGION( 0x3000, "monitor", 0 )
+	ROM_REGION( 0x1800, "monitor", 0 )
 	ROM_DEFAULT_BIOS( "v404" )
 	ROM_SYSTEM_BIOS( 0, "v404", "Balcones Operating System v4.04" )
-	ROMX_LOAD( "537p3652.u33", 0x0000, 0x1000, CRC(16b569c4) SHA1(6c12ded1c6d5c4bd76ce67985a34aef3eff88735), ROM_BIOS(1) )
-	ROMX_LOAD( "537p3653.u34", 0x1000, 0x1000, CRC(1c84d047) SHA1(bc7b945799d468e4d9418f722217005d5efbd83f), ROM_BIOS(1) )
-	ROMX_LOAD( "537p3654.u35", 0x2000, 0x1000, CRC(ed6e3204) SHA1(cf7ff0c21d025e0740e4400e7904eebf5ab7f209), ROM_BIOS(1) )
+	ROMX_LOAD( "537p3652.u33", 0x0000, 0x0800, CRC(7807cfbb) SHA1(bd3cc5cc5c59c84a50747aae5c17eb4617b0dbc3), ROM_BIOS(1) )
+	ROMX_LOAD( "537p3653.u34", 0x0800, 0x0800, CRC(a9c6c0c3) SHA1(c2da9d1bf0da96e6b8bfa722783e411d2fe6deb9), ROM_BIOS(1) )
+	ROMX_LOAD( "537p3654.u35", 0x1000, 0x0800, CRC(a8a07223) SHA1(e8ae1ebf2d7caf76771205f577b88ae493836ac9), ROM_BIOS(1) )
 
 	ROM_REGION( 0x1000, I8086_TAG, 0 )
 	ROM_LOAD( "8086.u33", 0x0000, 0x1000, CRC(ee49e3dc) SHA1(a5f20c74fc53f9d695d8894534ab69a39e2c38d8) )
