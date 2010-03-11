@@ -500,6 +500,7 @@ ROM_START( aquarius_qd )
 
 	/* quickdisk floppy drive */
 	ROM_LOAD("qd1_01.bin", 0xc000, 0x4000, CRC(06dc0ef3) SHA1(94b18c2f3f4baca8f5ab0feb2458c88b1682f8b2))
+	ROM_LOAD("qd1_02.bin", 0xc000, 0x4000, CRC(10fb3dca) SHA1(ea38ce45628c9d9e4e633c7638e8d860a40c3ffa))
 
 	/* charrom */
 	ROM_REGION(0x800, "gfx1", 0)
