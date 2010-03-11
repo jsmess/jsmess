@@ -1,4 +1,4 @@
-0.136.1
+﻿0.136.1
 
 New System Drivers Supported:
 -----------------------------
@@ -74,6 +74,42 @@ System Driver Changes:
 
 - [SMS] Fixed PGA Tour Golf freeze based on Flubba's & RetroRalph's
   research (bug #1911). [Enik Land]
+
+- [SNES] SNES video wip, part 1: [Fabio Priuli]
+  * moved color blending (background & subscreen color
+    addition/subtraction) at the end of the drawing process
+  * updated hires blending to work with two pixel at time.
+  * fixed clipmasks with hires modes
+
+- [SNES] reverted implementation of mult/div through timers since it broke 
+  many games in 0.136. [Fabio Priuli]
+
+- [SNES] SNES video wip, part 2: [Fabio Priuli]
+  * simplified drawing routines
+  * changed drawing logic: before we were drawing for each line first 
+    subscreen BGs and then mainscreen BGs; now we draw for each BGs both 
+    subscreen and mainscreen at once. This fixes most regressions introduced 
+    in the part 1 of video rewrite
+  * added preliminary support for offset-per-tile
+  * cleaned up the code
+
+- [SNES] Fixed remaining issues in hires modes. [Fabio Priuli]
+
+- [SNES] Fixed serial joystick reads, broken in 0.134. Super Double Dragon 
+  and Super Star Wars Empire Strikes Back (and probably other games as well) 
+  can be started again. [Fabio Priuli]
+
+- [SNES] Fixed Offset-per-tile graphics. [jbo_85]
+
+- [SNES] Fixed scrolling problems. [Fabio Priuli]
+
+- [SNES] Added SNES Mouse and SNES SuperScope support. You can use the 
+  Categories submenu to select the controller in each controller ports 
+  (None, Joypad, Mouse or Superscope). Notice that you can plug the 
+  Superscope in both controller ports, but it only works in Port2 (like on 
+  a real SNES). [Fabio Priuli]
+
+- [SNES] Fixed OAM overflow. [jbo_85, Fabio Priuli]
 
 - [SPECTRUM] Added support for .ach, .frz, .plusd, .prg, .sem, .sit,
   .snp, .snx and .zx snapshot formats. Hopefully fixed existing issues
