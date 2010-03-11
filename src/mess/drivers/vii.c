@@ -33,6 +33,7 @@
          D - SPG243 - The Batman
          D - SPG243 - Wall-E
          D - SPG243 - Chintendo / KenSingTon / Siatronics / Jungle Soft Vii
+ Partial D - SPG200 - V-Tech V-Smile
         ND - Likely many more
 
 *******************************************************************************/
@@ -77,7 +78,7 @@ public:
 	}
 	screen[320*240];
 
-	UINT16 io_regs[0x100];
+	UINT16 io_regs[0x200];
 	UINT16 uart_rx_count;
 	UINT8 controller_input[8];
 	UINT32 spg243_mode;
@@ -87,6 +88,7 @@ enum
 {
 	SPG243_VII = 0,
 	SPG243_BATMAN,
+	SPG243_VSMILE,
 
 	SPG243_MODEL_COUNT,
 };
@@ -153,20 +155,22 @@ static void vii_set_pixel(vii_state *state, UINT32 offset, UINT16 rgb)
 	state->screen[offset].b = expand_rgb5_to_rgb8(rgb);
 }
 
-static void vii_blit(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 xoff, UINT32 yoff, UINT32 flags, UINT32 bitmap_addr, UINT16 tile)
+static void vii_blit(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 xoff, UINT32 yoff, UINT32 attr, UINT32 ctrl, UINT32 bitmap_addr, UINT16 tile)
 {
 	vii_state *state = (vii_state *)machine->driver_data;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	UINT32 h = 8 << ((flags & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	UINT32 w = 8 << ((flags & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	UINT32 h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	UINT32 w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
-	UINT32 yflipmask = flags & TILE_Y_FLIP ? h - 1 : 0;
-	UINT32 xflipmask = flags & TILE_X_FLIP ? w - 1 : 0;
+	UINT32 yflipmask = attr & TILE_Y_FLIP ? h - 1 : 0;
+	UINT32 xflipmask = attr & TILE_X_FLIP ? w - 1 : 0;
 
-	UINT32 nc = ((flags & 0x0003) + 1) << 1;
+	UINT32 nc = ((attr & 0x0003) + 1) << 1;
 
-	UINT32 palette_offset = (flags & 0x0f00) >> 4;
+	UINT32 palette_offset = (attr & 0x0f00) >> 4;
+	palette_offset >>= nc;
+	palette_offset <<= nc;
 
 	UINT32 m = bitmap_addr + nc*w*h/16*tile;
 	UINT32 bits = 0;
@@ -193,10 +197,10 @@ static void vii_blit(running_machine *machine, bitmap_t *bitmap, const rectangle
 			}
 			nbits -= nc;
 
-			pal = palette_offset + (bits >> 16);
+			pal = palette_offset | (bits >> 16);
 			bits &= 0xffff;
 
-			if((flags & 0x00100000) && yy < 240)
+			if((ctrl & 0x0010) && yy < 240)
 			{
 				xx = (xx - (INT16)state->rowscroll[yy]) & 0x01ff;
 			}
@@ -206,7 +210,7 @@ static void vii_blit(running_machine *machine, bitmap_t *bitmap, const rectangle
 				UINT16 rgb = state->palette[pal];
 				if(!(rgb & 0x8000))
 				{
-					if (flags & 0x4000)
+					if (attr & 0x4000)
 					{
 						vii_mix_pixel(state, xx + 320*yy, rgb);
 					}
@@ -225,25 +229,25 @@ static void vii_blit_page(running_machine *machine, bitmap_t *bitmap, const rect
 	UINT32 x0, y0;
 	UINT32 xscroll = regs[0];
 	UINT32 yscroll = regs[1];
-	UINT32 flags = regs[2];
-	UINT32 flags2 = regs[3];
+	UINT32 attr = regs[2];
+	UINT32 ctrl = regs[3];
 	UINT32 tilemap = regs[4];
 	UINT32 palette_map = regs[5];
 	UINT32 h, w, hn, wn;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	if(!(flags2 & PAGE_ENABLE_MASK))
+	if(!(ctrl & PAGE_ENABLE_MASK))
 	{
 		return;
 	}
 
-	if(((flags & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
+	if(((attr & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
 	{
 		return;
 	}
 
-	h = 8 << ((flags & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-	w = 8 << ((flags & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+	h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+	w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
 	hn = 256 / h;
 	wn = 512 / w;
@@ -254,7 +258,6 @@ static void vii_blit_page(running_machine *machine, bitmap_t *bitmap, const rect
 		{
 			UINT16 tile = memory_read_word_16le(space, (tilemap + x0 + wn * y0) << 1);
 			UINT16 palette = 0;
-			UINT32 tileflags = 0;
 			UINT32 xx, yy;
 
 			if(!tile)
@@ -268,16 +271,24 @@ static void vii_blit_page(running_machine *machine, bitmap_t *bitmap, const rect
 				palette >>= 8;
 			}
 
-			if(palette & 0x10) // X flip
-			{
-				tileflags |= 4;
+			UINT32 tileattr = attr;
+			UINT32 tilectrl = ctrl;
+			if ((ctrl & 2) == 0)
+			{	// -(1) bld(1) flip(2) pal(4)
+				tileattr &= ~0x000c;
+				tileattr |= (palette >> 2) & 0x000c;	// flip
+
+				tileattr &= ~0x0f00;
+				tileattr |= (palette << 8) & 0x0f00;	// palette
+
+				tileattr &= ~0x0100;
+				tileattr |= (palette << 2) & 0x0100;	// blend
 			}
-			tileflags |= (palette & 0x0f) << 8;
 
 			yy = ((h*y0 - yscroll + 0x10) & 0xff) - 0x10;
 			xx = (w*x0 - xscroll) & 0x1ff;
 
-			vii_blit(machine, bitmap, cliprect, xx, yy, (flags2 << 16) | flags | tileflags, bitmap_addr, tile);
+			vii_blit(machine, bitmap, cliprect, xx, yy, tileattr, tilectrl, bitmap_addr, tile);
 		}
 	}
 }
@@ -286,7 +297,7 @@ static void vii_blit_sprite(running_machine *machine, bitmap_t *bitmap, const re
 {
 	vii_state *state = (vii_state *)machine->driver_data;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT16 tile, flags;
+	UINT16 tile, attr;
 	INT16 x, y;
 	UINT32 h, w;
 	UINT32 bitmap_addr = 0x40 * state->video_regs[0x22];
@@ -294,9 +305,14 @@ static void vii_blit_sprite(running_machine *machine, bitmap_t *bitmap, const re
 	tile = memory_read_word_16le(space, (base_addr + 0) << 1);
 	x = memory_read_word_16le(space, (base_addr + 1) << 1);
 	y = memory_read_word_16le(space, (base_addr + 2) << 1);
-	flags = memory_read_word_16le(space, (base_addr + 3) << 1);
+	attr = memory_read_word_16le(space, (base_addr + 3) << 1);
 
-	if(((flags & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
+	if(!tile)
+	{
+		return;
+	}
+
+	if(((attr & PAGE_DEPTH_FLAG_MASK) >> PAGE_DEPTH_FLAG_SHIFT) != depth)
 	{
 		return;
 	}
@@ -306,8 +322,8 @@ static void vii_blit_sprite(running_machine *machine, bitmap_t *bitmap, const re
 		x = 160 + x;
 		y = 120 - y;
 
-		h = 8 << ((flags & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
-		w = 8 << ((flags & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
+		h = 8 << ((attr & PAGE_TILE_HEIGHT_MASK) >> PAGE_TILE_HEIGHT_SHIFT);
+		w = 8 << ((attr & PAGE_TILE_WIDTH_MASK) >> PAGE_TILE_WIDTH_SHIFT);
 
 		x -= (w/2);
 		y -= (h/2) - 8;
@@ -316,16 +332,22 @@ static void vii_blit_sprite(running_machine *machine, bitmap_t *bitmap, const re
 	x &= 0x01ff;
 	y &= 0x01ff;
 
-	vii_blit(machine, bitmap, cliprect, x, y, flags, bitmap_addr, tile);
+	vii_blit(machine, bitmap, cliprect, x, y, attr, 0, bitmap_addr, tile);
 }
 
 static void vii_blit_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int depth)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	vii_state *state = (vii_state *)machine->driver_data;
 	UINT32 n;
+
+	if (!(state->video_regs[0x42] & 1))
+	{
+		return;
+	}
+
 	for(n = 0; n < 256; n++)
 	{
-		if(memory_read_word_16le(space, (0x2c00 + 4*n) << 1))
+		//if(memory_read_word_16le(space, (0x2c00 + 4*n) << 1))
 		{
 			vii_blit_sprite(machine, bitmap, cliprect, depth, 0x2c00 + 4*n);
 		}
@@ -485,10 +507,13 @@ static void vii_do_gpio(running_machine *machine, UINT32 offset)
 	UINT16 buffer = state->io_regs[5*index + 2];
 	UINT16 dir    = state->io_regs[5*index + 3];
 	UINT16 attr   = state->io_regs[5*index + 4];
+	UINT16 special= state->io_regs[5*index + 5];
 
 	UINT16 push   = dir;
 	UINT16 pull   = (~dir) & (~attr);
-	UINT16 what   = (buffer & (push | pull)) ^ (dir &~ attr);
+	UINT16 what   = (buffer & (push | pull));
+	what ^= (dir & ~attr);
+	what &= ~special;
 
 	if(state->spg243_mode == SPG243_VII)
 	{
@@ -523,6 +548,23 @@ static void vii_do_gpio(running_machine *machine, UINT32 offset)
 
 static void vii_do_i2c(running_machine *machine)
 {
+}
+
+static void spg_do_dma(running_machine *machine, UINT32 len)
+{
+	vii_state *state = (vii_state *)machine->driver_data;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	UINT32 src = ((state->io_regs[0x101] & 0x3f) << 16) | state->io_regs[0x100];
+	UINT32 dst = state->io_regs[0x103] & 0x3fff;
+	UINT32 j;
+
+	for(j = 0; j < len; j++)
+	{
+		memory_write_word_16le(space, (dst+j) << 1, memory_read_word_16le(space, (src+j) << 1));
+	}
+
+	state->io_regs[0x102] = 0;
 }
 
 static READ16_HANDLER( vii_io_r )
@@ -654,13 +696,17 @@ static WRITE16_HANDLER( vii_io_w )
 			COMBINE_DATA(&state->io_regs[offset]);
 			break;
 
+		case 0x32: // UART Reset
+			verboselog(space->machine, 3, "vii_io_r: UART Reset\n");
+			break;
+
 		case 0x33: // UART Baud Rate
-			verboselog(space->machine, 3, "vii_io_w: UART Baud Rate = %04x (%04x)\n", data, mem_mask);
+			verboselog(space->machine, 3, "vii_io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (state->io_regs[0x34] << 8) - data));
 			COMBINE_DATA(&state->io_regs[offset]);
 			break;
 
 		case 0x35: // UART TX Data
-			verboselog(space->machine, 3, "vii_io_w: UART TX Data = %04x (%04x)\n", data, mem_mask);
+			verboselog(space->machine, 3, "vii_io_w: UART Baud Rate = %u\n", 27000000 / 16 / (0x10000 - (data << 8) - state->io_regs[0x33]));
 			COMBINE_DATA(&state->io_regs[offset]);
 			break;
 
@@ -703,6 +749,16 @@ static WRITE16_HANDLER( vii_io_w )
 		case 0x59: // I2C Status / IRQ Acknowledge(?)
 			verboselog(space->machine, 3, "vii_io_w: I2C Status / Ack = %04x (%04x)\n", data, mem_mask);
 			state->io_regs[offset] &= ~data;
+			break;
+
+		case 0x100: // DMA Source (L)
+		case 0x101: // DMA Source (H)
+		case 0x103: // DMA Destination
+			COMBINE_DATA(&state->io_regs[offset]);
+			break;
+
+		case 0x102: // DMA Length
+			spg_do_dma(space->machine, data);
 			break;
 
 		default:
@@ -769,6 +825,18 @@ static INPUT_PORTS_START( batman )
 		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )		 PORT_PLAYER(1) PORT_NAME("X Button")
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( vsmile )
+	PORT_START("P1")
+		PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_PLAYER(1) PORT_NAME("Joypad Up")
+		PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1) PORT_NAME("Joypad Down")
+		PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_NAME("Joypad Left")
+		PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_NAME("Joypad Right")
+		PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )        PORT_PLAYER(1) PORT_NAME("A Button")
+		PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )        PORT_PLAYER(1) PORT_NAME("Menu")
+		PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON3 )        PORT_PLAYER(1) PORT_NAME("B Button")
+		PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 )		 PORT_PLAYER(1) PORT_NAME("X Button")
+INPUT_PORTS_END
+
 static DEVICE_IMAGE_LOAD( vii_cart )
 {
 	vii_state *state = (vii_state *)image->machine->driver_data;
@@ -794,6 +862,23 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 	{
 		state->centered_coordinates = 0;
 	}
+	return INIT_PASS;
+}
+
+static DEVICE_IMAGE_LOAD( vsmile_cart )
+{
+	vii_state *state = (vii_state *)image->machine->driver_data;
+	UINT8 *cart = memory_region( image->machine, "cart" );
+	int size = image_length( image );
+
+	if( image_fread( image, cart, size ) != size )
+	{
+		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
+		return INIT_FAIL;
+	}
+
+	memcpy(state->cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
+
 	return INIT_PASS;
 }
 
@@ -878,6 +963,34 @@ static MACHINE_DRIVER_START( vii )
 	MDRV_VIDEO_UPDATE( vii )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( vsmile )
+
+	MDRV_DRIVER_DATA( vii_state )
+
+	MDRV_CPU_ADD( "maincpu", UNSP, XTAL_27MHz)
+	MDRV_CPU_PROGRAM_MAP( vii_mem )
+	MDRV_CPU_VBLANK_INT("screen", vii_vblank)
+
+	MDRV_MACHINE_START( vii )
+	MDRV_MACHINE_RESET( vii )
+
+	MDRV_SCREEN_ADD( "screen", RASTER )
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(320, 240)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 240-1)
+
+	MDRV_PALETTE_LENGTH(32768)
+
+	MDRV_CARTSLOT_ADD( "cart" )
+	MDRV_CARTSLOT_EXTENSION_LIST( "bin" )
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD( vsmile_cart )
+
+	MDRV_VIDEO_START( vii )
+	MDRV_VIDEO_UPDATE( vii )
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( batman )
 
 	MDRV_DRIVER_DATA( vii_state )
@@ -920,6 +1033,14 @@ static DRIVER_INIT( batman )
 	i2cmem_init(machine, 0, I2CMEM_SLAVE_ADDRESS, 0, 0x200, NULL);
 }
 
+static DRIVER_INIT( vsmile )
+{
+	vii_state *state = (vii_state *)machine->driver_data;
+
+	state->spg243_mode = SPG243_VSMILE;
+	state->centered_coordinates = 1;
+}
+
 ROM_START( vii )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 
@@ -931,6 +1052,13 @@ ROM_START( batman )
 	ROM_LOAD16_WORD_SWAP( "batman.bin", 0x000000, 0x400000, CRC(46f848e5) SHA1(5875d57bb3fe0cac5d20e626e4f82a0e5f9bb94c) )
 ROM_END
 
+ROM_START( vsmile )
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
+
+	ROM_REGION( 0x2000000, "cart", ROMREGION_ERASE00 )
+ROM_END
+
 /*    YEAR  NAME     PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                                              FULLNAME      FLAGS */
 CONS( 2004, batman,  0,        0,        batman,   batman,   batman,   "JAKKS Pacific, Inc. / HotGen, Ltd.",                "The Batman", GAME_NO_SOUND )
-CONS( 2007, vii,     0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NOT_WORKING | GAME_NO_SOUND)
+CONS( 2005, vsmile,  0,        0,        vsmile,   vsmile,   vsmile,   "V-Tech",                                            "V-Smile",    GAME_NO_SOUND | GAME_NOT_WORKING )
+CONS( 2007, vii,     0,        0,        vii,      vii,      vii,      "Jungle Soft / KenSingTon / Chintendo / Siatronics", "Vii",        GAME_NO_SOUND )
