@@ -220,7 +220,7 @@ static void tpi6525_set_interrupt(running_device *device)
 	{
 		tpi6525->interrupt_level = 1;
 
-		DBG_LOG(device->machine, 3, "tpi6525", ("%s set interrupt\n", device->tag.cstr()));
+		DBG_LOG(device->machine, 3, "tpi6525", ("%s set interrupt\n", device->tag()));
 
 		if (tpi6525->intf->irq_func != NULL)
 			tpi6525->intf->irq_func(device, tpi6525->interrupt_level);
@@ -236,7 +236,7 @@ static void tpi6525_clear_interrupt(running_device *device)
 	{
 		tpi6525->interrupt_level = 0;
 
-		DBG_LOG(device->machine, 3, "tpi6525", ("%s clear interrupt\n", device->tag.cstr()));
+		DBG_LOG(device->machine, 3, "tpi6525", ("%s clear interrupt\n", device->tag()));
 
 		if (tpi6525->intf->irq_func != NULL)
 			tpi6525->intf->irq_func(device, tpi6525->interrupt_level);
@@ -450,7 +450,7 @@ READ8_DEVICE_HANDLER( tpi6525_r )
 			data = (data & ~tpi6525->ddr_c) | (tpi6525->ddr_c & tpi6525->port_c);
 		}
 
-		DBG_LOG(device->machine, 2, "tpi6525", ("%s read %.2x %.2x\n", device->tag.cstr(), offset, data));
+		DBG_LOG(device->machine, 2, "tpi6525", ("%s read %.2x %.2x\n", device->tag(), offset, data));
 		break;
 
 	case 3:
@@ -509,7 +509,7 @@ READ8_DEVICE_HANDLER( tpi6525_r )
 
 	}
 
-	DBG_LOG(device->machine, 3, "tpi6525", ("%s read %.2x %.2x\n", device->tag.cstr(), offset, data));
+	DBG_LOG(device->machine, 3, "tpi6525", ("%s read %.2x %.2x\n", device->tag(), offset, data));
 
 	return data;
 }
@@ -519,7 +519,7 @@ WRITE8_DEVICE_HANDLER( tpi6525_w )
 {
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
-	DBG_LOG(device->machine, 2, "tpi6525", ("%s write %.2x %.2x\n", device->tag.cstr(), offset, data));
+	DBG_LOG(device->machine, 2, "tpi6525", ("%s write %.2x %.2x\n", device->tag(), offset, data));
 
 	switch (offset & 7)
 	{

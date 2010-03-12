@@ -954,10 +954,10 @@ static DEVICE_START( c64_cart )
 {
 	int index = 0;
 
-	if (strcmp(device->tag.cstr(), "cart1") == 0)
+	if (strcmp(device->tag(), "cart1") == 0)
 		index = 0;
 
-	if (strcmp(device->tag.cstr(), "cart2") == 0)
+	if (strcmp(device->tag(), "cart2") == 0)
 		index = 1;
 
 
