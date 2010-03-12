@@ -277,11 +277,11 @@ INLINE void set_signal(running_device *iec, running_device *device, int line, in
 
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		if (!strcmp(daisy->device->tag.cstr(), device->tag.cstr()))
+		if (!strcmp(daisy->device->tag(), device->tag()))
 		{
 			if (daisy->line[line] != state)
 			{
-				if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag.cstr(), SIGNAL_NAME[line], state);
+				if (LOG) logerror("CBM IEC: '%s' %s %u\n", device->tag(), SIGNAL_NAME[line], state);
 				daisy->line[line] = state;
 			}
 			break;
