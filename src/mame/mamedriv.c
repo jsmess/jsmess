@@ -932,6 +932,7 @@ const game_driver * const drivers[] =
 	DRIVER( timecrs2b )	/* (c) 1997 */
 	DRIVER( timecrs2c )	/* (c) 1997 */
 	DRIVER( panicprk )	/* (c) 1998 */
+	DRIVER( gunwars )	/* (c) 1998 */
 	DRIVER( 500gp )		/* (c) 1999 */
 	DRIVER( finfurl2 )	/* (c) 1999 */
 	DRIVER( finfurl2j )	/* (c) 1999 */
@@ -2693,12 +2694,14 @@ V-V                           TP-027
 	DRIVER( dinoj )		/* 01/02/1993 (c) 1993 (Japan) (CPS1 + QSound) */
 	DRIVER( dinopic )	/* bootleg */
 	DRIVER( dinopic2 )	/* bootleg */
+	DRIVER( dinohunt )	/* bootleg */
 	DRIVER( punisher )	/* 22/04/1993 (c) 1993 (World) (CPS1 + QSound) */
 	DRIVER( punisheru )	/* 22/04/1993 (c) 1993 (US)    (CPS1 + QSound) */
 	DRIVER( punisherj )	/* 22/04/1993 (c) 1993 (Japan) (CPS1 + QSound) */
 	DRIVER( punipic )	/* bootleg */
 	DRIVER( punipic2 )	/* bootleg */
 	DRIVER( punipic3 )	/* bootleg */
+	DRIVER( punisherbz )/* bootleg */
 	DRIVER( slammast )	/* 13/07/1993 (c) 1993 (World) (CPS1 + QSound) */
 	DRIVER( slammastu )	/* 13/07/1993 (c) 1993 (US)    (CPS1 + QSound) */
 	DRIVER( mbomberj )	/* 13/07/1993 (c) 1993 (Japan) (CPS1 + QSound) */
@@ -5171,7 +5174,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( skullfng )	/* MCH (c) 1996 Data East Corporation (World) */
 	DRIVER( skullfngj )	/* MCH (c) 1996 Data East Corporation (Japan) */
 	DRIVER( stadhr96 )	/* MCM (c) 1996 Data East */
-	DRIVER( stadhr96a )	/* MCM (c) 1996 Data East */
+	DRIVER( stadhr96j )	/* MCM (c) 1996 Data East */
 
 	/* Tehkan / Tecmo games (Tehkan became Tecmo in 1986) */
 	DRIVER( senjyo )	/* (c) 1983 Tehkan */
@@ -5691,7 +5694,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( windheat )	/* GX677 (c)1996 */
 	DRIVER( windheatu )	/* GX677 (c)1996 */
 	DRIVER( windheatj )	/* GX677 (c)1996 */
-	DRIVER( jetwave )	/* GX678 (c)1996 */
+	DRIVER( waveshrk )	/* GX678 (c)1996 */
 
 	/* Konami M2 games */
 	DRIVER( polystar )	/* GX623 (c)1997 */
@@ -6888,6 +6891,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( smashtv6 )	/* (c) 1990 Williams */
 	DRIVER( smashtv5 )	/* (c) 1990 Williams */
 	DRIVER( smashtv4 )	/* (c) 1990 Williams */
+	DRIVER( smashtv3 )	/* (c) 1990 Williams */
 	DRIVER( hiimpact )	/* (c) 1990 Williams */
 	DRIVER( hiimpact4 )	/* (c) 1990 Williams */
 	DRIVER( hiimpact3 )	/* (c) 1990 Williams */
@@ -8253,6 +8257,9 @@ Other Sun games
 	DRIVER( stellecu )	/* (c) 1998 */
 	DRIVER( iqblock )	/* (c) 1993 */
 	DRIVER( grndtour )	/* (c) 1993 */
+	DRIVER( 5clown )	/* (c) IGS 1993 */
+	DRIVER( 5clowna )	/* (c) IGS 1993 */
+	DRIVER( 5clownsp )	/* (c) IGS 1993 */
 
 	/* IGS005 + IGS006 + IGS007 + IGS008 Games */
 	DRIVER( lordgun )	/* (c) 1994 */
@@ -9072,6 +9079,7 @@ Other Sun games
 	DRIVER( vegasfte )	/* (c) 1993 Soft Design */
 	DRIVER( jolyjokr )	/* (c) 198? Impera */
 	DRIVER( jolyjokra )	/* (c) 198? Impera */
+	DRIVER( jolyjokrb )	/* (c) 198? Impera */
 	DRIVER( jokercrd )	/* (c) 1993 Vesely Svet */
 	DRIVER( mongolnw )	/* 199? bootleg */
 	DRIVER( soccernw )	/* 199? bootleg */
@@ -9447,6 +9455,7 @@ Other Sun games
 	DRIVER( cmfun )		/* (c) 1995 Dyna Electronics */
 	DRIVER( cmaster )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterb )	/* (c) 1991 Dyna Electronics */
+	DRIVER( cmezspin )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterc )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmasterbv )	/* (c) 1991 Dyna Electronics / Gerald Duhamel?*/
 	DRIVER( cmasterd )	/* (c) 1991 Dyna Electronics */
@@ -9454,6 +9463,11 @@ Other Sun games
 	DRIVER( cmasterf )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmast91 )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmast92 )	/* (c) 1992 Dyna Electronics */
+
+	DRIVER( jkrmast )	/* (c) 199? unknown */
+	DRIVER( pkrmast )	/* (c) 199? unknown */
+	DRIVER( pkrmasta )	/* (c) 199? unknown */
+
 	DRIVER( cb2001 )	/* (c) 2001 Dyna Electronics */
 	DRIVER( scherrym )	/* (c) 2001? Dyna Electronics */
 

@@ -10,9 +10,10 @@ TODO:
 - inputs;
 - Understand how tilemap color offsets really works;
 - Discrete sound part? There's a Rossini's "William Tell" bgm on the Chinese bootlegs,
-  I think it's tied with ay8910 port B.
+  I think it's tied with ay8910 port B. Update: the 1986 version sounds that just fine, could be
+  that this is a btanb;
 - unknown memories;
-- Garbage on the window tilemap if you win, it could be a BTANB (masked by the color prom).
+- Garbage on the window tilemap if you win, it could be a btanb (masked by the color prom).
 - the name "King Derby" is a raw guess, there's a chance that it uses a different name
   (but there isn't any title screen in the game?)
 - Fix I/O in the 1986 bootleg version;
@@ -368,18 +369,27 @@ static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( kingdrbb_lamps_w )
+{
+	// (same as the inputs but active high)
+}
+
 static ADDRESS_MAP_START( slave_1986_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x3fff) AM_ROM //sound rom tested for the post check
 	AM_RANGE(0x4000, 0x47ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) //backup ram
 	AM_RANGE(0x5000, 0x5003) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* I/O Ports */
-	AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* I/O Ports */
+//  AM_RANGE(0x6000, 0x6003) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w) /* I/O Ports */
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x7400, 0x74ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x7600, 0x7600) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x7601, 0x7601) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-//  AM_RANGE(0x7800, 0x7803) AM_READ(test_r)
-	AM_RANGE(0x7a00, 0x7a00) AM_RAM //buffer for the key matrix
+	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("KEY0")
+    AM_RANGE(0x7801, 0x7801) AM_READ_PORT("KEY1")
+	AM_RANGE(0x7802, 0x7802) AM_READ_PORT("KEY2")
+	AM_RANGE(0x7803, 0x7803) AM_READ_PORT("KEY3")
+	AM_RANGE(0x7800, 0x7803) AM_WRITE(kingdrbb_lamps_w)
+	AM_RANGE(0x7a00, 0x7a00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
@@ -442,26 +452,32 @@ static const ppi8255_interface ppi8255_intf[2] =
 	}
 };
 
+static WRITE8_DEVICE_HANDLER( outportb_w )
+{
+//  printf("%02x B\n",data);
+}
+
+
 static const ppi8255_interface ppi8255_1986_intf[2] =
 {
 	/* C as input, (all) as output */
 	{
 		DEVCB_NULL,	                        /* Port A read */
 		DEVCB_INPUT_PORT("IN0"),	        /* Port B read */
-		DEVCB_INPUT_PORT("IN1"),		/* Port C read */
-		DEVCB_NULL,					/* Port A write */
-		DEVCB_NULL,					/* Port B write */
-		DEVCB_NULL   /* Port C write */
+		DEVCB_INPUT_PORT("IN1"),			/* Port C read */
+		DEVCB_HANDLER(sound_cmd_w),			/* Port A write */
+		DEVCB_HANDLER(outportb_w),			/* Port B write */
+		DEVCB_NULL						    /* Port C write */
 	},
 
-	/*  */
+	/* actually unused */
 	{
 		DEVCB_NULL,					/* Port A read */
-		DEVCB_HANDLER(key_matrix_r),/* Port B read */
-		DEVCB_HANDLER(input_mux_r),	/* Port C read */
-		DEVCB_HANDLER(sound_cmd_w),  /* Port A write */
+		DEVCB_NULL,					/* Port B read */
+		DEVCB_NULL,					/* Port C read */
+		DEVCB_NULL, 				/* Port A write */
 		DEVCB_NULL,					/* Port B write */
-		DEVCB_HANDLER(outport2_w)	/* Port C write */
+		DEVCB_NULL					/* Port C write */
 	}
 };
 
@@ -623,7 +639,7 @@ static INPUT_PORTS_START( kingdrby )
 	PORT_DIPNAME( 0x40, 0x40, "POST Check" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Reset Backup RAM" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -702,52 +718,12 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("KEY_1P")	// ppi1 (6001)
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("1P 1-2") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("1P 1-3") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("1P 1-4") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("1P 1-5") PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("1P 1-6") PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("1P 2-3") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("1P 2-4") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("1P 2-5") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("1P 2-6") PORT_CODE(KEYCODE_F)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("1P 3-4") PORT_CODE(KEYCODE_G)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("1P 3-5") PORT_CODE(KEYCODE_H)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("1P 3-6") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("1P 4-5") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("1P 4-6") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("1P 5-6") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("KEY_2P")	// ppi1 (6001)
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("2P 1-2") PORT_CODE(KEYCODE_Q) PORT_COCKTAIL
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("2P 1-3") PORT_CODE(KEYCODE_W) PORT_COCKTAIL
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("2P 1-4") PORT_CODE(KEYCODE_E) PORT_COCKTAIL
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("2P 1-5") PORT_CODE(KEYCODE_R) PORT_COCKTAIL
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("2P 1-6") PORT_CODE(KEYCODE_T) PORT_COCKTAIL
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("2P 2-3") PORT_CODE(KEYCODE_A) PORT_COCKTAIL
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("2P 2-4") PORT_CODE(KEYCODE_S) PORT_COCKTAIL
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("2P 2-5") PORT_CODE(KEYCODE_D) PORT_COCKTAIL
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("2P 2-6") PORT_CODE(KEYCODE_F) PORT_COCKTAIL
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("2P 3-4") PORT_CODE(KEYCODE_G) PORT_COCKTAIL
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("2P 3-5") PORT_CODE(KEYCODE_H) PORT_COCKTAIL
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("2P 3-6") PORT_CODE(KEYCODE_Z) PORT_COCKTAIL
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("2P 4-5") PORT_CODE(KEYCODE_X) PORT_COCKTAIL
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("2P 4-6") PORT_CODE(KEYCODE_C) PORT_COCKTAIL
-	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("2P 5-6") PORT_CODE(KEYCODE_V) PORT_COCKTAIL
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNUSED )
-
-	PORT_START("MUX0")	// ppi1 (6002)
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_START("SYSTEM")	// ppi0 (5001)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_DIPNAME( 0x02, 0x02, "SYSTEM" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -760,35 +736,37 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) //causes "hopper overpay" msg
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("MUX1")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("KEY0") // (7800)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("1P 1-2") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("1P 1-3") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("1P 1-4") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("1P 1-5") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY1") // (7801)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("1P 1-6") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("1P 2-3") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("1P 2-4") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("1P 2-5") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("1P 2-6") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("1P 3-4") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("1P 3-5") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("1P 3-6") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_NAME("1P 4-5") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("1P 4-6") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_NAME("1P 5-6") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
@@ -812,7 +790,7 @@ static INPUT_PORTS_START( kingdrbb )
 	PORT_DIPNAME( 0x40, 0x40, "POST Check" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, "Reset Backup RAM" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -955,6 +933,38 @@ static PALETTE_INIT(kingdrby)
 	}
 }
 
+static PALETTE_INIT(kingdrbb)
+{
+	UINT8 *raw_prom = memory_region(machine, "raw_prom");
+	UINT8 *prom = memory_region(machine, "proms");
+	int	bit0, bit1, bit2 , r, g, b;
+	int	i;
+
+	for(i = 0; i < 0x200; i++)
+	{
+		/* this set has an extra address line shuffle applied on the prom */
+		prom[i] = raw_prom[BITSWAP16(i, 15,14,13,12,11,10,9,8,7,6,5,0,1,2,3,4)+0x1000];
+	}
+
+	for(i = 0; i < 0x200; i++)
+	{
+		bit0 = 0;
+		bit1 = (prom[i] >> 1) & 0x01;
+		bit2 = (prom[i] >> 0) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (prom[i] >> 4) & 0x01;
+		bit1 = (prom[i] >> 3) & 0x01;
+		bit2 = (prom[i] >> 2) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		bit0 = (prom[i] >> 7) & 0x01;
+		bit1 = (prom[i] >> 6) & 0x01;
+		bit2 = (prom[i] >> 5) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
 static MACHINE_DRIVER_START( kingdrby )
 	MDRV_CPU_ADD("master", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(master_map)
@@ -1007,6 +1017,8 @@ static MACHINE_DRIVER_START( kingdrbb )
 	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(slave_1986_map)
 
+	MDRV_PALETTE_INIT(kingdrbb)
+
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", ppi8255_1986_intf[0] )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", ppi8255_1986_intf[1] )
 MACHINE_DRIVER_END
@@ -1019,6 +1031,7 @@ static MACHINE_DRIVER_START( cowrace )
 	MDRV_CPU_IO_MAP(cowrace_sound_io)
 
 	MDRV_GFXDECODE(cowrace)
+	MDRV_PALETTE_INIT(kingdrby)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
@@ -1089,8 +1102,8 @@ ROM_START( kingdrbb ) // has 'Made in Taiwan' on the PCB.
 	ROM_REGION( 0x4000, "raw_prom", 0 )
 	ROM_LOAD( "kingdrbb_u1.bin", 0x0000, 0x4000, CRC(97931952) SHA1(a0ef3be105f2ed7f744c73e92c583d25bb322e6a) ) // palette but in a normal rom?
 
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_COPY( "raw_prom", 0x1000, 0x000, 0x200 )
+	ROM_REGION( 0x200, "proms", ROMREGION_ERASE00 ) // address shuffled, decoded inside PALETTE_INIT
+//  ROM_COPY( "raw_prom", 0x1000, 0x000, 0x200 )
 //  ROM_COPY( "raw_prom", 0x3000, 0x200, 0x200 ) //identical to 0x1000 bank
 
 	ROM_REGION( 0x4000, "pals", 0 ) // all read protected
@@ -1136,5 +1149,5 @@ ROM_END
 
 
 GAME( 1981, kingdrby,  0,             kingdrby,   kingdrby,   0,       ROT0,   "Tazmi",    "King Derby (1981)",   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS| GAME_IMPERFECT_SOUND )
-GAME( 1986, kingdrbb,  kingdrby,      kingdrbb,   kingdrbb,   0,       ROT0,   "bootleg",  "King Derby (1986 Taiwan bootleg)",   GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )
+GAME( 1986, kingdrbb,  kingdrby,      kingdrbb,   kingdrbb,   0,       ROT0,   "bootleg",  "King Derby (1986 Taiwan bootleg)",   GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS )
 GAME( 2000, cowrace,   kingdrby,      cowrace,    kingdrbb,   0,       ROT0,   "bootleg",  "Cow Race (1986 King Derby hack)", GAME_NOT_WORKING | GAME_WRONG_COLORS )

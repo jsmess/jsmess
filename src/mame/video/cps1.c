@@ -1289,12 +1289,14 @@ static const struct CPS1config cps1_config_table[]=
 	{"dinoj",    CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinopic",  CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
 	{"dinopic2", CPS_B_21_QS2, mapper_CD63B },	/* layer enable never used */
+	{"dinohunt", CPS_B_21_DEF, mapper_CD63B },	/* Chinese bootleg */
 	{"punisher", CPS_B_21_QS3, mapper_PS63B },
 	{"punisheru",CPS_B_21_QS3, mapper_PS63B },
 	{"punisherj",CPS_B_21_QS3, mapper_PS63B },
 	{"punipic",  CPS_B_21_QS3, mapper_PS63B },
 	{"punipic2", CPS_B_21_QS3, mapper_PS63B },
 	{"punipic3", CPS_B_21_QS3, mapper_PS63B },
+	{"punisherbz", CPS_B_21_DEF, mapper_PS63B },	/* Chinese bootleg */
 	{"slammast", CPS_B_21_QS4, mapper_MB63B },
 	{"slammastu",CPS_B_21_QS4, mapper_MB63B },
 	{"mbomberj", CPS_B_21_QS4, mapper_MB63B },
@@ -1472,8 +1474,10 @@ WRITE16_HANDLER( cps1_cps_a_w )
 	if (offset == 0x24 / 2 && state->cps_version == 2)
 		return;
 
+#ifdef MAME_DEBUG
 	if (offset > CPS1_VIDEOCONTROL)
 		popmessage("write to CPS-A register %02x contact MAMEDEV", offset * 2);
+#endif
 }
 
 
@@ -1514,9 +1518,9 @@ READ16_HANDLER( cps1_cps_b_r )
 		if (offset == 0x12/2)
 			return state->cps_b_regs[0x12 / 2];
 	}
-
+#ifdef MAME_DEBUG
 	popmessage("CPS-B read port %02x contact MAMEDEV", offset * 2);
-
+#endif
 	return 0xffff;
 }
 
@@ -1567,7 +1571,7 @@ WRITE16_HANDLER( cps1_cps_b_w )
 		}
 	}
 
-
+#ifdef MAME_DEBUG
 	if (offset != state->game_config->cpsb_addr / 2 &&	// only varth writes here
 			offset != state->game_config->mult_factor1 / 2 &&
 			offset != state->game_config->mult_factor2 / 2 &&
@@ -1583,6 +1587,7 @@ WRITE16_HANDLER( cps1_cps_b_w )
 			offset != state->game_config->out2_addr / 2 &&
 			!state->game_config->bootleg_kludge)
 		popmessage("CPS-B write %04x to port %02x contact MAMEDEV", data, offset * 2);
+#endif
 }
 
 
@@ -1769,18 +1774,23 @@ void cps1_get_video_base( running_machine *machine )
 	if (state->game_config->layer_enable_mask[1] == state->game_config->layer_enable_mask[2])
 		enablemask = state->game_config->layer_enable_mask[1];
 
+#ifdef MAME_DEBUG
 	if (enablemask)
 	{
 		if (((layercontrol & enablemask) && (layercontrol & enablemask) != enablemask))
 			popmessage("layer %02x contact MAMEDEV", layercontrol & 0xc03f);
 	}
+#endif
 
 	enablemask = state->game_config->layer_enable_mask[0] | state->game_config->layer_enable_mask[1]
 			| state->game_config->layer_enable_mask[2]
 			| state->game_config->layer_enable_mask[3] | state->game_config->layer_enable_mask[4];
 
+#ifdef MAME_DEBUG
 	if (((layercontrol & ~enablemask) & 0x003e) != 0)
 		popmessage("layer %02x contact MAMEDEV", layercontrol & 0xc03f);
+#endif
+
 }
 
 }
