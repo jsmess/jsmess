@@ -816,10 +816,10 @@ running_device *floppy_get_device_by_type(running_machine *machine,int ftype,int
 int floppy_get_drive(running_device *image)
 {
 	int drive =0;
-	if (strcmp(image->tag, FLOPPY_0) == 0) drive = 0;
-	if (strcmp(image->tag, FLOPPY_1) == 0) drive = 1;
-	if (strcmp(image->tag, FLOPPY_2) == 0) drive = 2;
-	if (strcmp(image->tag, FLOPPY_3) == 0) drive = 3;
+	if (strcmp(image->tag(), FLOPPY_0) == 0) drive = 0;
+	if (strcmp(image->tag(), FLOPPY_1) == 0) drive = 1;
+	if (strcmp(image->tag(), FLOPPY_2) == 0) drive = 2;
+	if (strcmp(image->tag(), FLOPPY_3) == 0) drive = 3;
 	return drive;
 }
 

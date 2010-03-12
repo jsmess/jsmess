@@ -131,7 +131,7 @@ static void set_hrq(running_device *device, int state)
 {
 	i8257_t *i8257 = get_safe_token(device);
 
-	if (LOG) logerror("I8257 '%s' Hold Request: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("I8257 '%s' Hold Request: %u\n", device->tag(), state);
 
 	devcb_call_write_line(&i8257->out_hrq_func, state);
 }
@@ -142,7 +142,7 @@ static void set_tc(running_device *device, int state)
 
 	if (i8257->tc != state)
 	{
-		if (LOG) logerror("I8257 '%s' Terminal Count: %u\n", device->tag.cstr(), state);
+		if (LOG) logerror("I8257 '%s' Terminal Count: %u\n", device->tag(), state);
 		i8257->tc = state;
 		devcb_call_write_line(&i8257->out_tc_func, state);
 	}
@@ -154,7 +154,7 @@ static void set_mark(running_device *device, int state)
 
 	if (i8257->mark != state)
 	{
-		if (LOG) logerror("I8257 '%s' Mark: %u\n", device->tag.cstr(), state);
+		if (LOG) logerror("I8257 '%s' Mark: %u\n", device->tag(), state);
 		i8257->mark = state;
 		devcb_call_write_line(&i8257->out_mark_func, state);
 	}
@@ -169,7 +169,7 @@ static void set_dack(running_device *device, int active_channel)
 	{
 		int state = (ch != active_channel);
 
-		if (LOG) logerror("I8257 '%s' DMA Acknowledge %u: %u\n", device->tag.cstr(), ch, state);
+		if (LOG) logerror("I8257 '%s' DMA Acknowledge %u: %u\n", device->tag(), ch, state);
 
 		devcb_call_write_line(&i8257->out_dack_func[ch], state);
 	}
@@ -222,12 +222,12 @@ static void dma_read(running_device *device)
 
 	case MODE_WRITE:
 		i8257->data = devcb_call_read8(&i8257->in_memr_func[i8257->channel], i8257->address);
-		if (LOG) logerror("I8257 '%s' DMA Memory Read %04x: %02x\n", device->tag.cstr(), i8257->address, i8257->data);
+		if (LOG) logerror("I8257 '%s' DMA Memory Read %04x: %02x\n", device->tag(), i8257->address, i8257->data);
 		break;
 
 	case MODE_READ:
 		i8257->data = devcb_call_read8(&i8257->in_ior_func[i8257->channel], i8257->address);
-		if (LOG) logerror("I8257 '%s' DMA I/O Read %04x: %02x\n", device->tag.cstr(), i8257->address, i8257->data);
+		if (LOG) logerror("I8257 '%s' DMA I/O Read %04x: %02x\n", device->tag(), i8257->address, i8257->data);
 		break;
 
 	case MODE_ILLEGAL:
@@ -246,12 +246,12 @@ static void dma_write(running_device *device)
 
 	case MODE_WRITE:
 		devcb_call_write8(&i8257->out_iow_func[i8257->channel], i8257->address, i8257->data);
-		if (LOG) logerror("I8257 '%s' DMA I/O Write %04x: %02x\n", device->tag.cstr(), i8257->address, i8257->data);
+		if (LOG) logerror("I8257 '%s' DMA I/O Write %04x: %02x\n", device->tag(), i8257->address, i8257->data);
 		break;
 
 	case MODE_READ:
 		devcb_call_write8(&i8257->out_memw_func[i8257->channel], i8257->address, i8257->data);
-		if (LOG) logerror("I8257 '%s' DMA Memory Write %04x: %02x\n", device->tag.cstr(), i8257->address, i8257->data);
+		if (LOG) logerror("I8257 '%s' DMA Memory Write %04x: %02x\n", device->tag(), i8257->address, i8257->data);
 		break;
 
 	case MODE_ILLEGAL:
@@ -378,9 +378,9 @@ static TIMER_CALLBACK( dma_tick )
 
 		if (LOG)
 		{
-			logerror("I8257 '%s' DMA Channel 2 Address Register: %04x\n", device->tag.cstr(), i8257->ar[2]);
-			logerror("I8257 '%s' DMA Channel 2 Count Register: %04x\n", device->tag.cstr(), i8257->cr[2] & 0x3fff);
-			logerror("I8257 '%s' DMA Channel 2 Mode: %u\n", device->tag.cstr(), i8257->cr[2] >> 14);
+			logerror("I8257 '%s' DMA Channel 2 Address Register: %04x\n", device->tag(), i8257->ar[2]);
+			logerror("I8257 '%s' DMA Channel 2 Count Register: %04x\n", device->tag(), i8257->cr[2] & 0x3fff);
+			logerror("I8257 '%s' DMA Channel 2 Mode: %u\n", device->tag(), i8257->cr[2] >> 14);
 		}
 
 		i8257->state = STATE_S4;
@@ -396,7 +396,7 @@ static TIMER_CALLBACK( dma_tick )
 				!((i8257->channel == 2) && (i8257->mr & I8257_MODE_AL)))
 			{
 				i8257->mr &= ~(1 << i8257->channel);
-				if (LOG) logerror("I8257 '%s' DMA Channel %u: disabled\n", device->tag.cstr(), i8257->channel);
+				if (LOG) logerror("I8257 '%s' DMA Channel %u: disabled\n", device->tag(), i8257->channel);
 			}
 
 			if (i8257->mr & I8257_MODE_RP)
@@ -500,7 +500,7 @@ WRITE8_DEVICE_HANDLER( i8257_w )
 		if (i8257->fl)
 		{
 			i8257->ar[ch] = (data << 8) | (i8257->ar[ch] & 0xff);
-			if (LOG) logerror("I8257 '%s' DMA Channel %u Address Register: %04x\n", device->tag.cstr(), ch, i8257->ar[ch]);
+			if (LOG) logerror("I8257 '%s' DMA Channel %u Address Register: %04x\n", device->tag(), ch, i8257->ar[ch]);
 		}
 		else
 		{
@@ -524,8 +524,8 @@ WRITE8_DEVICE_HANDLER( i8257_w )
 		if (i8257->fl)
 		{
 			i8257->cr[ch] = (data << 8) | (i8257->cr[ch] & 0xff);
-			if (LOG) logerror("I8257 '%s' DMA Channel %u Count Register: %04x\n", device->tag.cstr(), ch, i8257->cr[ch] & 0x3fff);
-			if (LOG) logerror("I8257 '%s' DMA Channel %u Mode: %u\n", device->tag.cstr(), ch, i8257->cr[ch] >> 14);
+			if (LOG) logerror("I8257 '%s' DMA Channel %u Count Register: %04x\n", device->tag(), ch, i8257->cr[ch] & 0x3fff);
+			if (LOG) logerror("I8257 '%s' DMA Channel %u Mode: %u\n", device->tag(), ch, i8257->cr[ch] >> 14);
 		}
 		else
 		{
@@ -551,14 +551,14 @@ WRITE8_DEVICE_HANDLER( i8257_w )
 
 		if (LOG)
 		{
-			logerror("I8257 '%s' DMA Channel 0: %s\n", device->tag.cstr(), BIT(i8257->mr, 0) ? "enabled" : "disabled");
-			logerror("I8257 '%s' DMA Channel 1: %s\n", device->tag.cstr(), BIT(i8257->mr, 1) ? "enabled" : "disabled");
-			logerror("I8257 '%s' DMA Channel 2: %s\n", device->tag.cstr(), BIT(i8257->mr, 2) ? "enabled" : "disabled");
-			logerror("I8257 '%s' DMA Channel 3: %s\n", device->tag.cstr(), BIT(i8257->mr, 3) ? "enabled" : "disabled");
-			if (BIT(i8257->mr, 4)) logerror("I8257 '%s' Rotating Priority\n", device->tag.cstr());
-			if (BIT(i8257->mr, 5)) logerror("I8257 '%s' Extended Write\n", device->tag.cstr());
-			if (BIT(i8257->mr, 6)) logerror("I8257 '%s' TC Stop\n", device->tag.cstr());
-			if (BIT(i8257->mr, 7)) logerror("I8257 '%s' Auto Load\n", device->tag.cstr());
+			logerror("I8257 '%s' DMA Channel 0: %s\n", device->tag(), BIT(i8257->mr, 0) ? "enabled" : "disabled");
+			logerror("I8257 '%s' DMA Channel 1: %s\n", device->tag(), BIT(i8257->mr, 1) ? "enabled" : "disabled");
+			logerror("I8257 '%s' DMA Channel 2: %s\n", device->tag(), BIT(i8257->mr, 2) ? "enabled" : "disabled");
+			logerror("I8257 '%s' DMA Channel 3: %s\n", device->tag(), BIT(i8257->mr, 3) ? "enabled" : "disabled");
+			if (BIT(i8257->mr, 4)) logerror("I8257 '%s' Rotating Priority\n", device->tag());
+			if (BIT(i8257->mr, 5)) logerror("I8257 '%s' Extended Write\n", device->tag());
+			if (BIT(i8257->mr, 6)) logerror("I8257 '%s' TC Stop\n", device->tag());
+			if (BIT(i8257->mr, 7)) logerror("I8257 '%s' Auto Load\n", device->tag());
 		}
 		break;
 	}
@@ -570,7 +570,7 @@ WRITE_LINE_DEVICE_HANDLER( i8257_hlda_w )
 
 	i8257->hlda = state;
 
-	if (LOG) logerror("I8257 '%s' Hold Acknowledge: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("I8257 '%s' Hold Acknowledge: %u\n", device->tag(), state);
 }
 
 WRITE_LINE_DEVICE_HANDLER( i8257_ready_w )
@@ -579,7 +579,7 @@ WRITE_LINE_DEVICE_HANDLER( i8257_ready_w )
 
 	i8257->ready = state;
 
-	if (LOG) logerror("I8257 '%s' Ready: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("I8257 '%s' Ready: %u\n", device->tag(), state);
 }
 
 static void drq_w(running_device *device, int ch, int state)
@@ -588,7 +588,7 @@ static void drq_w(running_device *device, int ch, int state)
 
 	i8257->drq[ch] = state;
 
-	if (LOG) logerror("I8257 '%s' Data Request %u: %u\n", device->tag.cstr(), ch, state);
+	if (LOG) logerror("I8257 '%s' Data Request %u: %u\n", device->tag(), ch, state);
 
 	if (state && (i8257->state == STATE_SI))
 	{

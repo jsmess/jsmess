@@ -2301,7 +2301,7 @@ static void common_start(running_device *device, int device_type)
 	// validate arguments
 
 	assert(device != NULL);
-	assert(device->tag != NULL);
+	assert(device->tag() != NULL);
 	assert(device->baseconfig().static_config != NULL);
 
 	fdc->intf = (const upd765_interface*)device->baseconfig().static_config;
@@ -2317,7 +2317,7 @@ static void common_start(running_device *device, int device_type)
 	devcb_resolve_write_line(&fdc->out_int_func, &fdc->intf->out_int_func, device);
 
 	// register for state saving
-	//state_save_register_item(device->machine, "upd765", device->tag, 0, upd765->number);
+	//state_save_register_item(device->machine, "upd765", device->tag(), 0, upd765->number);
 }
 
 static DEVICE_START( upd765a )

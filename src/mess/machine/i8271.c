@@ -1541,7 +1541,7 @@ static DEVICE_START( i8271 )
 	// validate arguments
 
 	assert(device != NULL);
-	assert(device->tag != NULL);
+	assert(device->tag() != NULL);
 	assert(device->baseconfig().static_config != NULL);
 
 	i8271->intf = (const i8271_interface*)device->baseconfig().static_config;
@@ -1552,7 +1552,7 @@ static DEVICE_START( i8271 )
 	i8271->pExecutionPhaseData = auto_alloc_array(device->machine, char, 0x4000);
 
 	// register for state saving
-	//state_save_register_item(device->machine, "i8271", device->tag, 0, i8271->number);
+	//state_save_register_item(device->machine, "i8271", device->tag(), 0, i8271->number);
 }
 
 static DEVICE_RESET( i8271 )

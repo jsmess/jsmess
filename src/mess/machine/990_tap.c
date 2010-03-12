@@ -113,10 +113,10 @@ static const UINT16 w_mask[8] =
 int tape_get_id(running_device *image)
 {
 	int drive =0;
-	if (strcmp(image->tag, "tape0") == 0) drive = 0;
-	if (strcmp(image->tag, "tape1") == 0) drive = 1;
-	if (strcmp(image->tag, "tape2") == 0) drive = 2;
-	if (strcmp(image->tag, "tape3") == 0) drive = 3;
+	if (strcmp(image->tag(), "tape0") == 0) drive = 0;
+	if (strcmp(image->tag(), "tape1") == 0) drive = 1;
+	if (strcmp(image->tag(), "tape2") == 0) drive = 2;
+	if (strcmp(image->tag(), "tape3") == 0) drive = 3;
 	return drive;
 }
 

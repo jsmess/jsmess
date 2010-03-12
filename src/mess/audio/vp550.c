@@ -140,7 +140,7 @@ static WRITE8_DEVICE_HANDLER( vp550_vlmn_w )
 
 //  sound_set_output_gain(device, 0, gain);
 
-	if (LOG) logerror("VP550 '%s' Volume: %u\n", device->tag.cstr(), data & 0x0f);
+	if (LOG) logerror("VP550 '%s' Volume: %u\n", device->tag(), data & 0x0f);
 }
 
 /*-------------------------------------------------

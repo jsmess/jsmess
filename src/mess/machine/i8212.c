@@ -65,7 +65,7 @@ READ8_DEVICE_HANDLER( i8212_r )
 	/* clear interrupt line */
 	devcb_call_write_line(&i8212->out_int_func, CLEAR_LINE);
 
-	if (LOG) logerror("I8212 '%s' INT: %u\n", device->tag.cstr(), CLEAR_LINE);
+	if (LOG) logerror("I8212 '%s' INT: %u\n", device->tag(), CLEAR_LINE);
 
 	return i8212->data;
 }
@@ -94,7 +94,7 @@ WRITE_LINE_DEVICE_HANDLER( i8212_md_w )
 {
 	i8212_t *i8212 = get_safe_token(device);
 
-	if (LOG) logerror("I8212 '%s' Mode: %s\n", device->tag.cstr(), state ? "output" : "input");
+	if (LOG) logerror("I8212 '%s' Mode: %s\n", device->tag(), state ? "output" : "input");
 
 	i8212->md = state;
 }
@@ -108,7 +108,7 @@ WRITE_LINE_DEVICE_HANDLER( i8212_stb_w )
 {
 	i8212_t *i8212 = get_safe_token(device);
 
-	if (LOG) logerror("I8212 '%s' STB: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("I8212 '%s' STB: %u\n", device->tag(), state);
 
 	if (i8212->md == I8212_MODE_INPUT)
 	{
@@ -120,7 +120,7 @@ WRITE_LINE_DEVICE_HANDLER( i8212_stb_w )
 			/* assert interrupt line */
 			devcb_call_write_line(&i8212->out_int_func, ASSERT_LINE);
 
-			if (LOG) logerror("I8212 '%s' INT: %u\n", device->tag.cstr(), ASSERT_LINE);
+			if (LOG) logerror("I8212 '%s' INT: %u\n", device->tag(), ASSERT_LINE);
 		}
 	}
 

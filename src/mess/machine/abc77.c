@@ -412,7 +412,7 @@ static DEVICE_START( abc77 )
 	devcb_resolve_write_line(&abc77->out_keydown_func, &intf->out_keydown_func, device);
 
 	/* find our CPU */
-	astring_printf(&tempstring, "%s:%s", device->tag.cstr(), I8035_TAG);
+	astring_printf(&tempstring, "%s:%s", device->tag(), I8035_TAG);
 	abc77->cpu = devtag_get_device(device->machine, astring_c(&tempstring));
 
 	/* allocate reset timer */

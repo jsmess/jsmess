@@ -139,7 +139,7 @@ static DEVICE_START( lmc1992 )
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(device->tag != NULL);
+	assert(device->tag() != NULL);
 
 	lmc1992->intf = (const lmc1992_interface*)device->baseconfig().static_config;
 

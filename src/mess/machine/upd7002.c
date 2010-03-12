@@ -181,7 +181,7 @@ static DEVICE_START( uPD7002 )
 	// validate arguments
 
 	assert(device != NULL);
-	assert(device->tag != NULL);
+	assert(device->tag() != NULL);
 	assert(device->baseconfig().static_config != NULL);
 
 	uPD7002->intf = (const uPD7002_interface*)device->baseconfig().static_config;
@@ -192,11 +192,11 @@ static DEVICE_START( uPD7002 )
 	uPD7002->conversion_counter = 0;
 
 	// register for state saving
-	state_save_register_item(device->machine, "uPD7002", device->tag, 0, uPD7002->status);
-	state_save_register_item(device->machine, "uPD7002", device->tag, 0, uPD7002->data1);
-	state_save_register_item(device->machine, "uPD7002", device->tag, 0, uPD7002->data0);
-	state_save_register_item(device->machine, "uPD7002", device->tag, 0, uPD7002->digitalvalue);
-	state_save_register_item(device->machine, "uPD7002", device->tag, 0, uPD7002->conversion_counter);
+	state_save_register_item(device->machine, "uPD7002", device->tag(), 0, uPD7002->status);
+	state_save_register_item(device->machine, "uPD7002", device->tag(), 0, uPD7002->data1);
+	state_save_register_item(device->machine, "uPD7002", device->tag(), 0, uPD7002->data0);
+	state_save_register_item(device->machine, "uPD7002", device->tag(), 0, uPD7002->digitalvalue);
+	state_save_register_item(device->machine, "uPD7002", device->tag(), 0, uPD7002->conversion_counter);
 }
 
 static DEVICE_RESET( uPD7002 )

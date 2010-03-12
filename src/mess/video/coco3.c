@@ -402,11 +402,11 @@ VIDEO_UPDATE( coco3 )
 	UINT32 rc = 0;
 
 	/* bad screen */
-	if (!strcmp(screen->tag, "composite"))
+	if (!strcmp(screen->tag(), "composite"))
 	{
 		video->video_type = 0;
 	}
-	else if (!strcmp(screen->tag, "rgb"))
+	else if (!strcmp(screen->tag(), "rgb"))
 	{
 		video->video_type = 1;
 	}

@@ -109,11 +109,11 @@ INLINE void set_signal(running_device *bus, running_device *device, int line, in
 
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		if (!strcmp(daisy->device->tag.cstr(), device->tag.cstr()))
+		if (!strcmp(daisy->device->tag(), device->tag()))
 		{
 			if (daisy->line[line] != state)
 			{
-				if (LOG) logerror("IEEE-488: '%s' %s %u\n", device->tag.cstr(), SIGNAL_NAME[line], state);
+				if (LOG) logerror("IEEE-488: '%s' %s %u\n", device->tag(), SIGNAL_NAME[line], state);
 				daisy->line[line] = state;
 			}
 			break;
@@ -140,9 +140,9 @@ INLINE void set_data(running_device *bus, running_device *device, UINT8 data)
 
 	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		if (!strcmp(daisy->device->tag.cstr(), device->tag.cstr()))
+		if (!strcmp(daisy->device->tag(), device->tag()))
 		{
-			if (LOG) logerror("IEEE-488: '%s' DIO %02x\n", device->tag.cstr(), data);
+			if (LOG) logerror("IEEE-488: '%s' DIO %02x\n", device->tag(), data);
 			daisy->dio = data;
 			break;
 		}

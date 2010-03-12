@@ -177,16 +177,16 @@ WRITE8_DEVICE_HANDLER( msm58321_w )
 		switch(msm58321->latch)
 		{
 		case REGISTER_RESET:
-			if (LOG) logerror("MSM58321 '%s' Reset\n", device->tag.cstr());
+			if (LOG) logerror("MSM58321 '%s' Reset\n", device->tag());
 			break;
 
 		case REGISTER_REF0:
 		case REGISTER_REF1:
-			if (LOG) logerror("MSM58321 '%s' Reference Signal\n", device->tag.cstr());
+			if (LOG) logerror("MSM58321 '%s' Reference Signal\n", device->tag());
 			break;
 
 		default:
-			if (LOG) logerror("MSM58321 '%s' Register %01x = %01x\n", device->tag.cstr(), offset, data & 0x0f);
+			if (LOG) logerror("MSM58321 '%s' Register %01x = %01x\n", device->tag(), offset, data & 0x0f);
 			msm58321->reg[offset] = msm58321->latch & 0x0f;
 			break;
 		}
@@ -201,7 +201,7 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_cs1_w )
 {
 	msm58321_t *msm58321 = get_safe_token(device);
 
-	if (LOG) logerror("MSM58321 '%s' CS1: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("MSM58321 '%s' CS1: %u\n", device->tag(), state);
 
 	msm58321->cs1 = state;
 }
@@ -214,7 +214,7 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_cs2_w )
 {
 	msm58321_t *msm58321 = get_safe_token(device);
 
-	if (LOG) logerror("MSM58321 '%s' CS2: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("MSM58321 '%s' CS2: %u\n", device->tag(), state);
 
 	msm58321->cs2 = state;
 }
@@ -238,7 +238,7 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_read_w )
 {
 	msm58321_t *msm58321 = get_safe_token(device);
 
-	if (LOG) logerror("MSM58321 '%s' READ: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("MSM58321 '%s' READ: %u\n", device->tag(), state);
 
 	msm58321->read = state;
 }
@@ -251,7 +251,7 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_write_w )
 {
 	msm58321_t *msm58321 = get_safe_token(device);
 
-	if (LOG) logerror("MSM58321 '%s' WRITE: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("MSM58321 '%s' WRITE: %u\n", device->tag(), state);
 
 	msm58321->write = state;
 }
@@ -265,7 +265,7 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_address_write_w )
 {
 	msm58321_t *msm58321 = get_safe_token(device);
 
-	if (LOG) logerror("MSM58321 '%s' ADDRESS WRITE: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("MSM58321 '%s' ADDRESS WRITE: %u\n", device->tag(), state);
 
 	msm58321->address_write = state;
 }
@@ -278,7 +278,7 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_stop_w )
 {
 //  msm58321_t *msm58321 = get_safe_token(device);
 
-	if (LOG) logerror("MSM58321 '%s' STOP: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("MSM58321 '%s' STOP: %u\n", device->tag(), state);
 }
 
 /*-------------------------------------------------
@@ -289,7 +289,7 @@ WRITE_LINE_DEVICE_HANDLER( msm58321_test_w )
 {
 //  msm58321_t *msm58321 = get_safe_token(device);
 
-	if (LOG) logerror("MSM58321 '%s' TEST: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("MSM58321 '%s' TEST: %u\n", device->tag(), state);
 }
 
 /*-------------------------------------------------

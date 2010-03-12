@@ -634,7 +634,7 @@ static VIDEO_UPDATE( einstein2 )
 	else if (screen == einstein->crtc_screen)
 		mc6845_update(einstein->mc6845, bitmap, cliprect);
 	else
-		fatalerror("Unknown screen '%s'\n", screen->tag.cstr());
+		fatalerror("Unknown screen '%s'\n", screen->tag());
 
 	return 0;
 }

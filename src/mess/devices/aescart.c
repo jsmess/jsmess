@@ -79,7 +79,7 @@ typedef struct _aes_pcb_t aes_pcb_t;
 */
 static int get_index_from_tagname(running_device *image)
 {
-	const char *tag = image->tag;
+	const char *tag = image->tag();
 	int maxlen = strlen(tag);
 	int i;
 	for (i=maxlen-1; i >=0; i--)
@@ -235,7 +235,7 @@ static void set_pointers(running_device *pcb, int index)
 static DEVICE_START(aes_pcb_none)
 {
 	/* device is aes_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(aes_pcb_none), tag of device=%s\n", device->tag.cstr());
+//  printf("DEVICE_START(aes_pcb_none), tag of device=%s\n", device->tag());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -248,7 +248,7 @@ static DEVICE_START(aes_pcb_none)
 static DEVICE_START(aes_pcb_std)
 {
 	/* device is aes_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(aes_pcb_std), tag of device=%s\n", device->tag.cstr());
+//  printf("DEVICE_START(aes_pcb_std), tag of device=%s\n", device->tag());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 

@@ -138,7 +138,7 @@ static DEVICE_START( adc080x )
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(device->tag != NULL);
+	assert(device->tag() != NULL);
 
 	adc080x->intf = (const adc080x_interface*)device->baseconfig().static_config;
 
@@ -153,14 +153,14 @@ static DEVICE_START( adc080x )
 	timer_adjust_periodic(adc080x->cycle_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock));
 
 	/* register for state saving */
-	state_save_register_item(device->machine, "adc080x", device->tag, 0, adc080x->address);
-	state_save_register_item(device->machine, "adc080x", device->tag, 0, adc080x->ale);
-	state_save_register_item(device->machine, "adc080x", device->tag, 0, adc080x->start);
-	state_save_register_item(device->machine, "adc080x", device->tag, 0, adc080x->eoc);
-	state_save_register_item(device->machine, "adc080x", device->tag, 0, adc080x->next_eoc);
-	state_save_register_item(device->machine, "adc080x", device->tag, 0, adc080x->sar);
-	state_save_register_item(device->machine, "adc080x", device->tag, 0, adc080x->cycle);
-	state_save_register_item(device->machine, "adc080x", device->tag, 0, adc080x->bit);
+	state_save_register_item(device->machine, "adc080x", device->tag(), 0, adc080x->address);
+	state_save_register_item(device->machine, "adc080x", device->tag(), 0, adc080x->ale);
+	state_save_register_item(device->machine, "adc080x", device->tag(), 0, adc080x->start);
+	state_save_register_item(device->machine, "adc080x", device->tag(), 0, adc080x->eoc);
+	state_save_register_item(device->machine, "adc080x", device->tag(), 0, adc080x->next_eoc);
+	state_save_register_item(device->machine, "adc080x", device->tag(), 0, adc080x->sar);
+	state_save_register_item(device->machine, "adc080x", device->tag(), 0, adc080x->cycle);
+	state_save_register_item(device->machine, "adc080x", device->tag(), 0, adc080x->bit);
 }
 
 DEVICE_GET_INFO( adc0808 )

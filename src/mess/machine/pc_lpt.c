@@ -228,7 +228,7 @@ READ8_DEVICE_HANDLER( pc_lpt_r )
 	}
 
 	/* if we reach this its an error */
-	logerror("PC-LPT %s: Read from invalid offset %x\n", device->tag.cstr(), offset);
+	logerror("PC-LPT %s: Read from invalid offset %x\n", device->tag(), offset);
 
 	return 0xff;
 }

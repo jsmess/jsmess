@@ -102,7 +102,7 @@ INLINE void update_irqstate(running_device *device)
 	if (miot->port[1].out_func != NULL)
 		(*miot->port[1].out_func)(device, out, out);
 	else
-		logerror("6530MIOT chip %s: Port B is being written to but has no handler.\n", device->tag.cstr());
+		logerror("6530MIOT chip %s: Port B is being written to but has no handler.\n", device->tag());
 }
 
 
@@ -227,7 +227,7 @@ WRITE8_DEVICE_HANDLER( miot6530_w )
 			if (port->out_func != NULL)
 				(*port->out_func)(device, data, olddata);
 			else
-				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag.cstr(), 'A' + (offset & 1), cpu_get_pc(device->machine->firstcpu), data);
+				logerror("6530MIOT chip %s: Port %c is being written to but has no handler.  PC: %08X - %02X\n", device->tag(), 'A' + (offset & 1), cpu_get_pc(device->machine->firstcpu), data);
 		}
 	}
 }
@@ -289,7 +289,7 @@ READ8_DEVICE_HANDLER( miot6530_r )
 				port->in = (*port->in_func)(device, port->in);
 			}
 			else
-				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag.cstr(), 'A' + (offset & 1), cpu_get_pc(device->machine->firstcpu));
+				logerror("6530MIOT chip %s: Port %c is being read but has no handler.  PC: %08X\n", device->tag(), 'A' + (offset & 1), cpu_get_pc(device->machine->firstcpu));
 
 			/* apply the DDR to the result */
 			val = (out & port->ddr) | (port->in & ~port->ddr);
@@ -381,7 +381,7 @@ static DEVICE_START( miot6530 )
 
 	/* validate arguments */
 	assert(device != NULL);
-	assert(device->tag != NULL);
+	assert(device->tag() != NULL);
 
 	/* set static values */
 	miot->intf = (const miot6530_interface*)device->baseconfig().static_config;

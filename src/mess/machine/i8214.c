@@ -57,7 +57,7 @@ INLINE void trigger_interrupt(running_device *device, int level)
 {
 	i8214_t *i8214 = get_safe_token(device);
 
-	if (LOG) logerror("I8214 '%s' Interrupt Level %u\n", device->tag.cstr(), level);
+	if (LOG) logerror("I8214 '%s' Interrupt Level %u\n", device->tag(), level);
 
 	i8214->a = level;
 
@@ -112,7 +112,7 @@ READ8_DEVICE_HANDLER( i8214_a_r )
 
 	UINT8 a = i8214->a & 0x07;
 
-	if (LOG) logerror("I8214 '%s' A: %01x\n", device->tag.cstr(), a);
+	if (LOG) logerror("I8214 '%s' A: %01x\n", device->tag(), a);
 
 	return a;
 }
@@ -128,8 +128,8 @@ WRITE8_DEVICE_HANDLER( i8214_b_w )
 	i8214->b = data & 0x07;
 	i8214->sgs = BIT(data, 3);
 
-	if (LOG) logerror("I8214 '%s' B: %01x\n", device->tag.cstr(), i8214->b);
-	if (LOG) logerror("I8214 '%s' SGS: %u\n", device->tag.cstr(), i8214->sgs);
+	if (LOG) logerror("I8214 '%s' B: %01x\n", device->tag(), i8214->b);
+	if (LOG) logerror("I8214 '%s' SGS: %u\n", device->tag(), i8214->sgs);
 
 	/* enable interrupts */
 	i8214->int_dis = 0;
@@ -148,7 +148,7 @@ WRITE_LINE_DEVICE_HANDLER( i8214_etlg_w )
 {
 	i8214_t *i8214 = get_safe_token(device);
 
-	if (LOG) logerror("I8214 '%s' ETLG: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("I8214 '%s' ETLG: %u\n", device->tag(), state);
 
 	i8214->etlg = state;
 }
@@ -161,7 +161,7 @@ WRITE_LINE_DEVICE_HANDLER( i8214_inte_w )
 {
 	i8214_t *i8214 = get_safe_token(device);
 
-	if (LOG) logerror("I8214 '%s' INTE: %u\n", device->tag.cstr(), state);
+	if (LOG) logerror("I8214 '%s' INTE: %u\n", device->tag(), state);
 
 	i8214->inte = state;
 }
@@ -174,7 +174,7 @@ WRITE8_DEVICE_HANDLER( i8214_r_w )
 {
 	i8214_t *i8214 = get_safe_token(device);
 
-	if (LOG) logerror("I8214 '%s' R: %02x\n", device->tag.cstr(), data);
+	if (LOG) logerror("I8214 '%s' R: %02x\n", device->tag(), data);
 
 	i8214->r = data;
 

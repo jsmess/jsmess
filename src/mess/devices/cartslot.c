@@ -161,7 +161,7 @@ static int process_cartridge(running_device *image, process_mode mode)
 			{
 				if (ROMENTRY_GETTYPE(roment) == ROMENTRYTYPE_CARTRIDGE)
 				{
-					if (strcmp(roment->_hashdata,image->tag)==0)
+					if (strcmp(roment->_hashdata,image->tag())==0)
 					{
 						result |= load_cartridge(image, romrgn, roment, mode);
 
@@ -399,13 +399,13 @@ static void add_device_with_subdevices(const running_device *_owner, device_type
 		config = machine_config_alloc(tokens);
 		for (config_dev = config->devicelist.first(); config_dev != NULL; config_dev = config_dev->next)
 		{
-			device_config *new_cfg = new device_config(cfg, config_dev->type, config_dev->tag, config_dev->clock);
+			device_config *new_cfg = new device_config(cfg, config_dev->type, config_dev->tag(), config_dev->clock);
 			new_cfg->static_config = config_dev->static_config;
 			memcpy(
 				new_cfg->inline_config,
 				config_dev->inline_config,
 				new_cfg->get_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES));
-			new_dev = devlist->append(dev->subtag(tempstring,config_dev->tag), new running_device(*_owner->machine, *new_cfg));
+			new_dev = devlist->append(dev->subtag(tempstring,config_dev->tag()), new running_device(*_owner->machine, *new_cfg));
 			new_dev->owner = dev;
 		}
 		machine_config_free(config);

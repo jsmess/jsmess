@@ -132,10 +132,10 @@ static DEVICE_IMAGE_LOAD( ti99_4_rs232 )
 {
 	running_device *tms9902 = NULL;
 
-	if (strcmp(image->tag, "rs232:port0")) {
+	if (strcmp(image->tag(), "rs232:port0")) {
 		tms9902 = devtag_get_device(image->machine, "rs232:tms9902_0");
 	}
-	if (strcmp(image->tag, "rs232:port1")) {
+	if (strcmp(image->tag(), "rs232:port1")) {
 		tms9902 = devtag_get_device(image->machine, "rs232:tms9902_1");
 	}
 

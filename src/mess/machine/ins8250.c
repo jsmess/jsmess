@@ -256,7 +256,7 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 			{
 				ins8250->dll = data;
 				tmp = ins8250->dlm * 256 + ins8250->dll;
-				COM_LOG(1,"COM_dll_w",("COM \"%s\" $%02x: [$%04x = %d baud]\n", device->tag.cstr(),
+				COM_LOG(1,"COM_dll_w",("COM \"%s\" $%02x: [$%04x = %d baud]\n", device->tag(),
 					 data, tmp, (tmp)?(int)(ins8250->interface->clockin/16/tmp):0));
 			}
 			else
@@ -279,31 +279,31 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 			{
 				ins8250->dlm = data;
 				tmp = ins8250->dlm * 256 + ins8250->dll;
-                COM_LOG(1,"COM_dlm_w",("COM \"%s\" $%02x: [$%04x = %d baud]\n", device->tag.cstr(),
+                COM_LOG(1,"COM_dlm_w",("COM \"%s\" $%02x: [$%04x = %d baud]\n", device->tag(),
 					data, tmp, (tmp)?(int)(ins8250->interface->clockin/16/tmp):0));
 			}
 			else
 			{
 				ins8250->ier = data;
-				COM_LOG(2,"COM_ier_w",("COM \"%s\" $%02x: enable int on RX %d, THRE %d, RLS %d, MS %d\n", device->tag.cstr(),
+				COM_LOG(2,"COM_ier_w",("COM \"%s\" $%02x: enable int on RX %d, THRE %d, RLS %d, MS %d\n", device->tag(),
 					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1));
-				COM_LOG(2,"COM_ier_w",("COM \"%s\" lsr = $%02x, int_pending = $%02x\n", device->tag.cstr(), ins8250->lsr, ins8250->int_pending ));
+				COM_LOG(2,"COM_ier_w",("COM \"%s\" lsr = $%02x, int_pending = $%02x\n", device->tag(), ins8250->lsr, ins8250->int_pending ));
 				ins8250_update_interrupt(device);
 			}
             break;
 		case 2:
-			COM_LOG(1,"COM_fcr_w",("COM \"%s\" $%02x (16550 only)\n", device->tag.cstr(), data));
+			COM_LOG(1,"COM_fcr_w",("COM \"%s\" $%02x (16550 only)\n", device->tag(), data));
             break;
 		case 3:
 			ins8250->lcr = data;
-			COM_LOG(1,"COM_lcr_w",("COM \"%s\" $%02x word length %d, stop bits %d, parity %c, break %d, DLAB %d\n", device->tag.cstr(),
+			COM_LOG(1,"COM_lcr_w",("COM \"%s\" $%02x word length %d, stop bits %d, parity %c, break %d, DLAB %d\n", device->tag(),
 				data, 5+(data&3), 1+((data>>2)&1), P[(data>>3)&7], (data>>6)&1, (data>>7)&1));
             break;
 		case 4:
 			if ( ( ins8250->mcr & 0x1f ) != ( data & 0x1f ) )
 			{
 				ins8250->mcr = data & 0x1f;
-				COM_LOG(1,"COM_mcr_w",("COM \"%s\" $%02x DTR %d, RTS %d, OUT1 %d, OUT2 %d, loopback %d\n", device->tag.cstr(),
+				COM_LOG(1,"COM_mcr_w",("COM \"%s\" $%02x DTR %d, RTS %d, OUT1 %d, OUT2 %d, loopback %d\n", device->tag(),
 					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1));
 				if (ins8250->interface->handshake_out)
 					ins8250->interface->handshake_out(device,data);
@@ -337,7 +337,7 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
               bits 5 - 0, you could cause an interrupt if the appropriate IER bit
               is set.
             */
-			COM_LOG(1,"COM_lsr_w",("COM \"%s\" $%02x\n", device->tag.cstr(), data ));
+			COM_LOG(1,"COM_lsr_w",("COM \"%s\" $%02x\n", device->tag(), data ));
 
 			ins8250->lsr = data;
 
@@ -354,7 +354,7 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
               bits 3 - 0, you could cause an interrupt if the appropriate IER bit
               is set.
              */
-			COM_LOG(1,"COM_msr_w",("COM \"%s\" $%02x\n", device->tag.cstr(), data ));
+			COM_LOG(1,"COM_msr_w",("COM \"%s\" $%02x\n", device->tag(), data ));
 
 			ins8250->msr = data;
 
@@ -365,7 +365,7 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 			break;
 		case 7:
 			ins8250->scr = data;
-			COM_LOG(2,"COM_scr_w",("COM \"%s\" $%02x\n", device->tag.cstr(), data));
+			COM_LOG(2,"COM_scr_w",("COM \"%s\" $%02x\n", device->tag(), data));
             break;
 	}
 
@@ -386,7 +386,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 			if (ins8250->lcr & 0x80)
 			{
 				data = ins8250->dll;
-				COM_LOG(1,"COM_dll_r",("COM \"%s\" $%02x\n", device->tag.cstr(), data));
+				COM_LOG(1,"COM_dll_r",("COM \"%s\" $%02x\n", device->tag(), data));
 			}
 			else
 			{
@@ -394,7 +394,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 				if( ins8250->lsr & 0x01 )
 				{
 					ins8250->lsr &= ~0x01;		/* clear data ready status */
-					COM_LOG(2,"COM_rbr_r",("COM \"%s\" $%02x\n", device->tag.cstr(), data));
+					COM_LOG(2,"COM_rbr_r",("COM \"%s\" $%02x\n", device->tag(), data));
 				}
 
 				ins8250_clear_int(device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE);
@@ -404,17 +404,17 @@ READ8_DEVICE_HANDLER( ins8250_r )
 			if (ins8250->lcr & 0x80)
 			{
 				data = ins8250->dlm;
-				COM_LOG(1,"COM_dlm_r",("COM \"%s\" $%02x\n", device->tag.cstr(), data));
+				COM_LOG(1,"COM_dlm_r",("COM \"%s\" $%02x\n", device->tag(), data));
 			}
 			else
 			{
 				data = ins8250->ier & 0x0f;
-				COM_LOG(2,"COM_ier_r",("COM \"%s\" $%02x\n", device->tag.cstr(), data));
+				COM_LOG(2,"COM_ier_r",("COM \"%s\" $%02x\n", device->tag(), data));
             }
             break;
 		case 2:
 			data = ins8250->iir;
-			COM_LOG(2,"COM_iir_r",("COM \"%s\" $%02x\n", device->tag.cstr(), data));
+			COM_LOG(2,"COM_iir_r",("COM \"%s\" $%02x\n", device->tag(), data));
 			/* The documentation says that reading this register will
             clear the int if this is the source of the int */
 			if ( ins8250->ier & COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY )
@@ -424,11 +424,11 @@ READ8_DEVICE_HANDLER( ins8250_r )
             break;
 		case 3:
 			data = ins8250->lcr;
-			COM_LOG(2,"COM_lcr_r",("COM \"%s\" $%02x\n", device->tag.cstr(), data));
+			COM_LOG(2,"COM_lcr_r",("COM \"%s\" $%02x\n", device->tag(), data));
             break;
 		case 4:
 			data = ins8250->mcr;
-			COM_LOG(2,"COM_mcr_r",("COM \"%s\" $%02x\n", device->tag.cstr(), data));
+			COM_LOG(2,"COM_mcr_r",("COM \"%s\" $%02x\n", device->tag(), data));
             break;
 		case 5:
 
@@ -450,7 +450,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 			if( ins8250->lsr & 0x1f )
 			{
 				ins8250->lsr &= 0xe1; /* clear FE, PE and OE and BREAK bits */
-				COM_LOG(2,"COM_lsr_r",("COM \"%s\" $%02x, DR %d, OE %d, PE %d, FE %d, BREAK %d, THRE %d, TSRE %d\n", device->tag.cstr(),
+				COM_LOG(2,"COM_lsr_r",("COM \"%s\" $%02x, DR %d, OE %d, PE %d, FE %d, BREAK %d, THRE %d, TSRE %d\n", device->tag(),
 					data, data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1, (data>>4)&1, (data>>5)&1, (data>>6)&1));
 			}
 
@@ -460,7 +460,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 		case 6:
 			data = ins8250->msr;
 			ins8250->msr &= 0xf0; /* reset delta values */
-			COM_LOG(2,"COM_msr_r",("COM \"%s\" $%02x\n", device->tag.cstr(), data));
+			COM_LOG(2,"COM_msr_r",("COM \"%s\" $%02x\n", device->tag(), data));
 
 			/* reading msr clears int */
 			ins8250_clear_int(device, COM_INT_PENDING_MODEM_STATUS_REGISTER);
@@ -468,7 +468,7 @@ READ8_DEVICE_HANDLER( ins8250_r )
 			break;
 		case 7:
 			data = ins8250->scr;
-			COM_LOG(2,"COM_scr_r",("COM \"%s\" $%02x\n", device->tag.cstr(), data));
+			COM_LOG(2,"COM_scr_r",("COM \"%s\" $%02x\n", device->tag(), data));
             break;
 	}
 

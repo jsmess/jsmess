@@ -317,12 +317,12 @@ static DEVICE_START( zx8301 )
 	timer_adjust_periodic(zx8301->flash_timer, ATTOTIME_IN_HZ(2), 0, ATTOTIME_IN_HZ(2));
 
 	/* register for state saving */
-	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->dispoff);
-	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->mode8);
-	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->base);
-	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->flash);
-	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->vsync);
-	state_save_register_item(device->machine, "zx8301", device->tag, 0, zx8301->vda);
+	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->dispoff);
+	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->mode8);
+	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->base);
+	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->flash);
+	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->vsync);
+	state_save_register_item(device->machine, "zx8301", device->tag(), 0, zx8301->vda);
 }
 
 /*-------------------------------------------------

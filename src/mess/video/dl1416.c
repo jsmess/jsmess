@@ -129,10 +129,10 @@ static DEVICE_START( dl1416 )
 	assert(((const dl1416_interface *)(device->baseconfig().inline_config))->type < MAX_DL1416_TYPES);
 
 	/* register for state saving */
-	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->chip_enable);
-	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->cursor_enable);
-	state_save_register_item(device->machine, "dl1416", device->tag, 0, dl1416->write_enable);
-	state_save_register_item_array(device->machine, "dl1416", device->tag, 0, dl1416->cursor_ram);
+	state_save_register_item(device->machine, "dl1416", device->tag(), 0, dl1416->chip_enable);
+	state_save_register_item(device->machine, "dl1416", device->tag(), 0, dl1416->cursor_enable);
+	state_save_register_item(device->machine, "dl1416", device->tag(), 0, dl1416->write_enable);
+	state_save_register_item_array(device->machine, "dl1416", device->tag(), 0, dl1416->cursor_ram);
 }
 
 

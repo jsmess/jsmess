@@ -72,8 +72,8 @@ static void common_start(running_device *device, int device_type)
 	if (config->cpu_endianess != ENDIANNESS_BIG) flash->swap = config->cpu_datawidth / 8; else flash->swap = 0;
 #endif
 
-	state_save_register_item_pointer(device->machine, "sst39vfx", device->tag, 0, flash->data, flash->size);
-	state_save_register_item(device->machine, "sst39vfx", device->tag, 0, flash->swap);
+	state_save_register_item_pointer(device->machine, "sst39vfx", device->tag(), 0, flash->data, flash->size);
+	state_save_register_item(device->machine, "sst39vfx", device->tag(), 0, flash->swap);
 }
 
 

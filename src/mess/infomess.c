@@ -46,8 +46,8 @@ void print_game_device(FILE *out, const game_driver *game, const machine_config 
 			fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(device_typename(info.type)));
 
 			/* does this device have a tag? */
-			if (dev->tag)
-				fprintf(out, " tag=\"%s\"", xml_normalize_string(dev->tag));
+			if (dev->tag())
+				fprintf(out, " tag=\"%s\"", xml_normalize_string(dev->tag()));
 
 			/* is this device mandatory? */
 			if (info.must_be_loaded)

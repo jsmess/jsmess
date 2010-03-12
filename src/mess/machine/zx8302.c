@@ -712,35 +712,35 @@ static DEVICE_START( zx8302 )
 
 	/* register for state saving */
 
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->idr);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->tcr);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->tdr);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->irq);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ctr);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->status);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->idr);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->tcr);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->tdr);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->irq);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ctr);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->status);
 
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->comdata);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->comctl);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ipc_state);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ipc_rx);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ipc_busy);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->baudx4);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->comdata);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->comctl);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ipc_state);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ipc_rx);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ipc_busy);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->baudx4);
 
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->tx_bits);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ser1_rxd);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ser1_cts);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ser2_txd);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->ser2_dtr);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->netout);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->netin);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->tx_bits);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ser1_rxd);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ser1_cts);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ser2_txd);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->ser2_dtr);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->netout);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->netin);
 
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->mdrdw);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->mdselck);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->mdseld);
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->erase);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->mdrdw);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->mdselck);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->mdseld);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->erase);
 
-	state_save_register_item(device->machine, "zx8302", device->tag, 0, zx8302->mdv_motor);
-	state_save_register_item_array(device->machine, "zx8302", device->tag, 0, zx8302->mdv_offset);
+	state_save_register_item(device->machine, "zx8302", device->tag(), 0, zx8302->mdv_motor);
+	state_save_register_item_array(device->machine, "zx8302", device->tag(), 0, zx8302->mdv_offset);
 }
 
 /*-------------------------------------------------

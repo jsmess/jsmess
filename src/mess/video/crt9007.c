@@ -335,8 +335,8 @@ static void recompute_parameters(running_device *device)
 
 	if (LOG)
 	{
-		logerror("CRT9007 '%s' Screen: %u x %u @ %f Hz\n", device->tag.cstr(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
-		logerror("CRT9007 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag.cstr(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
+		logerror("CRT9007 '%s' Screen: %u x %u @ %f Hz\n", device->tag(), horiz_pix_total, vert_pix_total, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
+		logerror("CRT9007 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	}
 
 	video_screen_configure(crt9007->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
@@ -359,12 +359,12 @@ READ8_DEVICE_HANDLER( crt9007_r )
 	{
 	case 0x15:
 		crt9007->disp = 1;
-		if (LOG) logerror("CRT9007 '%s' Start\n", device->tag.cstr());
+		if (LOG) logerror("CRT9007 '%s' Start\n", device->tag());
 		break;
 
 	case 0x16:
 		crt9007->disp = 0;
-		if (LOG) logerror("CRT9007 '%s' Reset\n", device->tag.cstr());
+		if (LOG) logerror("CRT9007 '%s' Reset\n", device->tag());
 		break;
 
 	case 0x38:
@@ -388,7 +388,7 @@ READ8_DEVICE_HANDLER( crt9007_r )
 		break;
 
 	default:
-		logerror("CRT9007 '%s' Read from Invalid Register: %02x!\n", device->tag.cstr(), offset);
+		logerror("CRT9007 '%s' Read from Invalid Register: %02x!\n", device->tag(), offset);
 	}
 
 	return data;
@@ -408,75 +408,75 @@ WRITE8_DEVICE_HANDLER( crt9007_w )
 	{
 	case 0x00:
 		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Characters per Horizontal Period: %u\n", device->tag.cstr(), CHARACTERS_PER_HORIZONTAL_PERIOD);
+		if (LOG) logerror("CRT9007 '%s' Characters per Horizontal Period: %u\n", device->tag(), CHARACTERS_PER_HORIZONTAL_PERIOD);
 		break;
 	
 	case 0x01:
 		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Characters per Data Row: %u\n", device->tag.cstr(), CHARACTERS_PER_DATA_ROW);
+		if (LOG) logerror("CRT9007 '%s' Characters per Data Row: %u\n", device->tag(), CHARACTERS_PER_DATA_ROW);
 		break;
 
 	case 0x02:
 		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Horizontal Delay: %u\n", device->tag.cstr(), HORIZONTAL_DELAY);
+		if (LOG) logerror("CRT9007 '%s' Horizontal Delay: %u\n", device->tag(), HORIZONTAL_DELAY);
 		break;
 
 	case 0x03:
 		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Horizontal Sync Width: %u\n", device->tag.cstr(), HORIZONTAL_SYNC_WIDTH);
+		if (LOG) logerror("CRT9007 '%s' Horizontal Sync Width: %u\n", device->tag(), HORIZONTAL_SYNC_WIDTH);
 		break;
 
 	case 0x04:
 		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Vertical Sync Width: %u\n", device->tag.cstr(), VERTICAL_SYNC_WIDTH);
+		if (LOG) logerror("CRT9007 '%s' Vertical Sync Width: %u\n", device->tag(), VERTICAL_SYNC_WIDTH);
 		break;
 
 	case 0x05:
 		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Vertical Delay: %u\n", device->tag.cstr(), VERTICAL_DELAY);
+		if (LOG) logerror("CRT9007 '%s' Vertical Delay: %u\n", device->tag(), VERTICAL_DELAY);
 		break;
 
 	case 0x06:
 		recompute_parameters(device);
 		if (LOG) 
 		{
-			logerror("CRT9007 '%s' Pin Configuration: %u\n", device->tag.cstr(), PIN_CONFIGURATION);
-			logerror("CRT9007 '%s' Cursor Skew: %u\n", device->tag.cstr(), CURSOR_SKEW);
-			logerror("CRT9007 '%s' Blank Skew: %u\n", device->tag.cstr(), BLANK_SKEW);
+			logerror("CRT9007 '%s' Pin Configuration: %u\n", device->tag(), PIN_CONFIGURATION);
+			logerror("CRT9007 '%s' Cursor Skew: %u\n", device->tag(), CURSOR_SKEW);
+			logerror("CRT9007 '%s' Blank Skew: %u\n", device->tag(), BLANK_SKEW);
 		}
 		break;
 
 	case 0x07:
 		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Visible Data Rows per Frame: %u\n", device->tag.cstr(), VISIBLE_DATA_ROWS_PER_FRAME);
+		if (LOG) logerror("CRT9007 '%s' Visible Data Rows per Frame: %u\n", device->tag(), VISIBLE_DATA_ROWS_PER_FRAME);
 		break;
 
 	case 0x08:
 		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Scan Lines per Data Row: %u\n", device->tag.cstr(), SCAN_LINES_PER_DATA_ROW);
+		if (LOG) logerror("CRT9007 '%s' Scan Lines per Data Row: %u\n", device->tag(), SCAN_LINES_PER_DATA_ROW);
 		break;
 
 	case 0x09:
 		recompute_parameters(device);
-		if (LOG) logerror("CRT9007 '%s' Scan Lines per Frame: %u\n", device->tag.cstr(), SCAN_LINES_PER_FRAME);
+		if (LOG) logerror("CRT9007 '%s' Scan Lines per Frame: %u\n", device->tag(), SCAN_LINES_PER_FRAME);
 		break;
 
 	case 0x0a:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' DMA Burst Count: %u\n", device->tag.cstr(), DMA_BURST_COUNT);
-			logerror("CRT9007 '%s' DMA Burst Delay: %u\n", device->tag.cstr(), DMA_BURST_DELAY);
-			logerror("CRT9007 '%s' DMA Disable: %u\n", device->tag.cstr(), DMA_DISABLE);
+			logerror("CRT9007 '%s' DMA Burst Count: %u\n", device->tag(), DMA_BURST_COUNT);
+			logerror("CRT9007 '%s' DMA Burst Delay: %u\n", device->tag(), DMA_BURST_DELAY);
+			logerror("CRT9007 '%s' DMA Disable: %u\n", device->tag(), DMA_DISABLE);
 		}
 		break;
 
 	case 0x0b:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' %s Height Cursor\n", device->tag.cstr(), SINGLE_HEIGHT_CURSOR ? "Single" : "Double");
-			logerror("CRT9007 '%s' Operation Mode: %u\n", device->tag.cstr(), OPERATION_MODE);
-			logerror("CRT9007 '%s' Interlace Mode: %u\n", device->tag.cstr(), INTERLACE_MODE);
-			logerror("CRT9007 '%s' %s Mechanism\n", device->tag.cstr(), PAGE_BLANK ? "Page Blank" : "Smooth Scroll");
+			logerror("CRT9007 '%s' %s Height Cursor\n", device->tag(), SINGLE_HEIGHT_CURSOR ? "Single" : "Double");
+			logerror("CRT9007 '%s' Operation Mode: %u\n", device->tag(), OPERATION_MODE);
+			logerror("CRT9007 '%s' Interlace Mode: %u\n", device->tag(), INTERLACE_MODE);
+			logerror("CRT9007 '%s' %s Mechanism\n", device->tag(), PAGE_BLANK ? "Page Blank" : "Smooth Scroll");
 		}
 		break;
 
@@ -486,8 +486,8 @@ WRITE8_DEVICE_HANDLER( crt9007_w )
 	case 0x0d:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Table Start Register: %04x\n", device->tag.cstr(), TABLE_START);
-			logerror("CRT9007 '%s' Address Mode: %u\n", device->tag.cstr(), ADDRESS_MODE);
+			logerror("CRT9007 '%s' Table Start Register: %04x\n", device->tag(), TABLE_START);
+			logerror("CRT9007 '%s' Address Mode: %u\n", device->tag(), ADDRESS_MODE);
 		}
 		break;
 
@@ -497,21 +497,21 @@ WRITE8_DEVICE_HANDLER( crt9007_w )
 	case 0x0f:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Auxialiary Address Register 1: %04x\n", device->tag.cstr(), AUXILIARY_ADDRESS_1);
-			logerror("CRT9007 '%s' Row Attributes: %u\n", device->tag.cstr(), ROW_ATTRIBUTES_1);
+			logerror("CRT9007 '%s' Auxialiary Address Register 1: %04x\n", device->tag(), AUXILIARY_ADDRESS_1);
+			logerror("CRT9007 '%s' Row Attributes: %u\n", device->tag(), ROW_ATTRIBUTES_1);
 		}
 		break;
 
 	case 0x10:
-		if (LOG) logerror("CRT9007 '%s' Sequential Break Register 1: %u\n", device->tag.cstr(), SEQUENTIAL_BREAK_1);
+		if (LOG) logerror("CRT9007 '%s' Sequential Break Register 1: %u\n", device->tag(), SEQUENTIAL_BREAK_1);
 		break;
 
 	case 0x11:
-		if (LOG) logerror("CRT9007 '%s' Data Row Start Register: %u\n", device->tag.cstr(), DATA_ROW_START);
+		if (LOG) logerror("CRT9007 '%s' Data Row Start Register: %u\n", device->tag(), DATA_ROW_START);
 		break;
 
 	case 0x12:
-		if (LOG) logerror("CRT9007 '%s' Data Row End/Sequential Break Register 2: %u\n", device->tag.cstr(), SEQUENTIAL_BREAK_2);
+		if (LOG) logerror("CRT9007 '%s' Data Row End/Sequential Break Register 2: %u\n", device->tag(), SEQUENTIAL_BREAK_2);
 		break;
 
 	case 0x13:
@@ -520,48 +520,48 @@ WRITE8_DEVICE_HANDLER( crt9007_w )
 	case 0x14:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Auxiliary Address Register 2: %04x\n", device->tag.cstr(), AUXILIARY_ADDRESS_2);
-			logerror("CRT9007 '%s' Row Attributes: %u\n", device->tag.cstr(), ROW_ATTRIBUTES_2);
+			logerror("CRT9007 '%s' Auxiliary Address Register 2: %04x\n", device->tag(), AUXILIARY_ADDRESS_2);
+			logerror("CRT9007 '%s' Row Attributes: %u\n", device->tag(), ROW_ATTRIBUTES_2);
 		}
 		break;
 
 	case 0x15:
 		crt9007->disp = 1;
-		if (LOG) logerror("CRT9007 '%s' Start\n", device->tag.cstr());
+		if (LOG) logerror("CRT9007 '%s' Start\n", device->tag());
 		break;
 
 	case 0x16:
 		crt9007->disp = 0;
-		if (LOG) logerror("CRT9007 '%s' Reset\n", device->tag.cstr());
+		if (LOG) logerror("CRT9007 '%s' Reset\n", device->tag());
 		break;
 
 	case 0x17:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Smooth Scroll Offset: %u\n", device->tag.cstr(), SMOOTH_SCROLL_OFFSET);
-			logerror("CRT9007 '%s' Smooth Scroll Offset Overflow: %u\n", device->tag.cstr(), SMOOTH_SCROLL_OFFSET_OVERFLOW);
+			logerror("CRT9007 '%s' Smooth Scroll Offset: %u\n", device->tag(), SMOOTH_SCROLL_OFFSET);
+			logerror("CRT9007 '%s' Smooth Scroll Offset Overflow: %u\n", device->tag(), SMOOTH_SCROLL_OFFSET_OVERFLOW);
 		}
 		break;
 
 	case 0x18:
-		if (LOG) logerror("CRT9007 '%s' Vertical Cursor Register: %u\n", device->tag.cstr(), VERTICAL_CURSOR);
+		if (LOG) logerror("CRT9007 '%s' Vertical Cursor Register: %u\n", device->tag(), VERTICAL_CURSOR);
 		break;
 
 	case 0x19:
-		if (LOG) logerror("CRT9007 '%s' Horizontal Cursor Register: %u\n", device->tag.cstr(), HORIZONTAL_CURSOR);
+		if (LOG) logerror("CRT9007 '%s' Horizontal Cursor Register: %u\n", device->tag(), HORIZONTAL_CURSOR);
 		break;
 
 	case 0x1a:
 		if (LOG)
 		{
-			logerror("CRT9007 '%s' Frame Timer: %u\n", device->tag.cstr(), FRAME_TIMER);
-			logerror("CRT9007 '%s' Light Pen Interrupt: %u\n", device->tag.cstr(), LIGHT_PEN_INTERRUPT);
-			logerror("CRT9007 '%s' Vertical Retrace Interrupt: %u\n", device->tag.cstr(), VERTICAL_RETRACE_INTERRUPT);
+			logerror("CRT9007 '%s' Frame Timer: %u\n", device->tag(), FRAME_TIMER);
+			logerror("CRT9007 '%s' Light Pen Interrupt: %u\n", device->tag(), LIGHT_PEN_INTERRUPT);
+			logerror("CRT9007 '%s' Vertical Retrace Interrupt: %u\n", device->tag(), VERTICAL_RETRACE_INTERRUPT);
 		}
 		break;
 
 	default:
-		logerror("CRT9007 '%s' Write to Invalid Register: %02x!\n", device->tag.cstr(), offset);
+		logerror("CRT9007 '%s' Write to Invalid Register: %02x!\n", device->tag(), offset);
 	}
 }
 

@@ -812,22 +812,22 @@ static DEVICE_START( mc6843 )
 
 	mc6843->timer_cont = timer_alloc( device->machine, mc6843_cont, (void*) device) ;
 
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->CTAR );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->CMR );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->ISR );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->SUR );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->STRA );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->STRB );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->SAR );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->GCR );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->CCR );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->LTAR );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->drive );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->side );
-	state_save_register_item_array( device->machine,"mc6843", device->tag, 0, mc6843->data );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->data_size );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->data_idx );
-	state_save_register_item( device->machine,"mc6843", device->tag, 0, mc6843->data_id );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->CTAR );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->CMR );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->ISR );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->SUR );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->STRA );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->STRB );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->SAR );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->GCR );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->CCR );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->LTAR );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->drive );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->side );
+	state_save_register_item_array( device->machine,"mc6843", device->tag(), 0, mc6843->data );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->data_size );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->data_idx );
+	state_save_register_item( device->machine,"mc6843", device->tag(), 0, mc6843->data_id );
 }
 
 

@@ -584,7 +584,7 @@ static DEVICE_START( tms9901 )
 	tms9901_t *tms = get_token(device);
 
 	assert(device != NULL);
-	assert(device->tag != NULL);
+	assert(device->tag() != NULL);
 	assert(device->baseconfig().static_config != NULL);
 
 	tms->intf = (const tms9901_interface*)device->baseconfig().static_config;

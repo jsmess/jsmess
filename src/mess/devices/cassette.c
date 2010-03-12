@@ -345,7 +345,7 @@ static void device_display_cassette(running_device *image)
 
 	device = image->machine->devicelist.first(CASSETTE );
 
-	while ( device && strcmp( device->tag.cstr(), image->tag.cstr() ) )
+	while ( device && strcmp( device->tag(), image->tag() ) )
 	{
 		y += 1;
 		device = device->typenext();

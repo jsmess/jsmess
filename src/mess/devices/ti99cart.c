@@ -291,7 +291,7 @@ UINT8 ti99_cartridge_grom_read(running_device *device, int cart_offset)
 */
 static int get_index_from_tagname(running_device *image)
 {
-	const char *tag = image->tag;
+	const char *tag = image->tag();
 	int maxlen = strlen(tag);
 	int i;
 	for (i=maxlen-1; i >=0; i--)
@@ -409,7 +409,7 @@ static void set_pointers(running_device *pcb, int index)
 static DEVICE_START(ti99_pcb_none)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_none), tag of device=%s\n", device->tag.cstr());
+//  printf("DEVICE_START(ti99_pcb_none), tag of device=%s\n", device->tag());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -422,7 +422,7 @@ static DEVICE_START(ti99_pcb_none)
 static DEVICE_START(ti99_pcb_std)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_std), tag of device=%s\n", device->tag.cstr());
+//  printf("DEVICE_START(ti99_pcb_std), tag of device=%s\n", device->tag());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -556,7 +556,7 @@ static int disassemble_std(running_device *image)
 static DEVICE_START(ti99_pcb_paged)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_paged), tag of device=%s\n", device->tag.cstr());
+//  printf("DEVICE_START(ti99_pcb_paged), tag of device=%s\n", device->tag());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -1196,7 +1196,7 @@ static int assemble_mbx(running_device *image)
 static DEVICE_START(ti99_pcb_paged379i)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag.cstr());
+//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -1373,7 +1373,7 @@ static int assemble_paged379i(running_device *image)
 static DEVICE_START(ti99_pcb_pagedcru)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag.cstr());
+//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 

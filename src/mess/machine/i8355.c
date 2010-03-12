@@ -138,13 +138,13 @@ WRITE8_DEVICE_HANDLER( i8355_w )
 	{
 	case I8355_REGISTER_PORT_A:
 	case I8355_REGISTER_PORT_B:
-		if (LOG) logerror("I8355 '%s' Port %c Write %02x\n", device->tag.cstr(), 'A' + port, data);
+		if (LOG) logerror("I8355 '%s' Port %c Write %02x\n", device->tag(), 'A' + port, data);
 		write_port(i8355, port, data);
 		break;
 
 	case I8355_REGISTER_PORT_A_DDR:
 	case I8355_REGISTER_PORT_B_DDR:
-		if (LOG) logerror("I8355 '%s' Port %c DDR: %02x\n", device->tag.cstr(), 'A' + port, data);
+		if (LOG) logerror("I8355 '%s' Port %c DDR: %02x\n", device->tag(), 'A' + port, data);
 		i8355->ddr[port] = data;
 		write_port(i8355, port, data);
 		break;
@@ -178,7 +178,7 @@ static DEVICE_START( i8355 )
 	devcb_resolve_write8(&i8355->out_port_func[PORT_B], &intf->out_pb_func, device);
 
 	/* find memory region */
-	i8355->rom = memory_region(device->machine, device->tag);
+	i8355->rom = memory_region(device->machine, device->tag());
 	assert(i8355->rom != NULL);
 
 	/* register for state saving */

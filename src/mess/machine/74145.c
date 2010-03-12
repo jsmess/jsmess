@@ -165,7 +165,7 @@ static DEVICE_START( ttl74145 )
 	devcb_resolve_write_line(&ttl74145->output_line_9, &intf->output_line_9, device);
 
 	/* register for state saving */
-	state_save_register_item(device->machine, "ttl74145", device->tag, 0, ttl74145->number);
+	state_save_register_item(device->machine, "ttl74145", device->tag(), 0, ttl74145->number);
 }
 
 

@@ -1442,7 +1442,7 @@ UINT32 image_get_software_region_length(running_device *image, const char *tag)
 {
     char full_tag[256];
 
-    sprintf( full_tag, "%s:%s:%s", image->tag.cstr(), image_software_entry(image)->name, tag );
+    sprintf( full_tag, "%s:%s:%s", image->tag(), image_software_entry(image)->name, tag );
     return memory_region_length( image->machine, full_tag );
 }
 

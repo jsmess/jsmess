@@ -999,25 +999,25 @@ static DEVICE_START( mc6854 )
 
 	mc6854->ttimer = timer_alloc( device->machine, mc6854_tfifo_cb , (void*) device );
 
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->cr1 );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->cr2 );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->cr3 );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->cr4 );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->sr1 );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->sr2 );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->cts );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->dcd );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->tstate );
-	state_save_register_item_array( device->machine, "mc6854", device->tag, 0, mc6854->tfifo );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->tones );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->rstate );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->rreg );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->rones );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->rsize );
-	state_save_register_item_array( device->machine, "mc6854", device->tag, 0, mc6854->rfifo );
-	state_save_register_item_array( device->machine, "mc6854", device->tag, 0, mc6854->frame );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->flen );
-	state_save_register_item( device->machine, "mc6854", device->tag, 0, mc6854->fpos );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->cr1 );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->cr2 );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->cr3 );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->cr4 );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->sr1 );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->sr2 );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->cts );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->dcd );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->tstate );
+	state_save_register_item_array( device->machine, "mc6854", device->tag(), 0, mc6854->tfifo );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->tones );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->rstate );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->rreg );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->rones );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->rsize );
+	state_save_register_item_array( device->machine, "mc6854", device->tag(), 0, mc6854->rfifo );
+	state_save_register_item_array( device->machine, "mc6854", device->tag(), 0, mc6854->frame );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->flen );
+	state_save_register_item( device->machine, "mc6854", device->tag(), 0, mc6854->fpos );
 }
 
 

@@ -123,7 +123,7 @@ static TIMER_CALLBACK( timer_tick )
 		if (mos6530->irq_enabled)
 		{
 			/* interrupt */
-			logerror("MOS6530 '%s' Interrupt\n", device->tag.cstr());
+			logerror("MOS6530 '%s' Interrupt\n", device->tag());
 			devcb_call_write_line(&mos6530->out_irq_func, ASSERT_LINE);
 		}
 	}
@@ -160,7 +160,7 @@ READ8_DEVICE_HANDLER( mos6530_r )
 		case REGISTER_TIMER:
 			data = mos6530->counter;
 			devcb_call_write_line(&mos6530->out_irq_func, CLEAR_LINE);
-			logerror("MOS6530 '%s' Interrupt Cleared\n", device->tag.cstr());
+			logerror("MOS6530 '%s' Interrupt Cleared\n", device->tag());
 			break;
 
 		case REGISTER_INTERRUPT_FLAG:
@@ -184,13 +184,13 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 	{
 	case REGISTER_PORT_A:
 	case REGISTER_PORT_B:
-		if (LOG) logerror("MOS6530 '%s' Port %c Write %02x\n", device->tag.cstr(), 'A' + port, data);
+		if (LOG) logerror("MOS6530 '%s' Port %c Write %02x\n", device->tag(), 'A' + port, data);
 		write_port(mos6530, port, data);
 		break;
 
 	case REGISTER_PORT_A_DDR:
 	case REGISTER_PORT_B_DDR:
-		if (LOG) logerror("MOS6530 '%s' Port %c DDR: %02x\n", device->tag.cstr(), 'A' + port, data);
+		if (LOG) logerror("MOS6530 '%s' Port %c DDR: %02x\n", device->tag(), 'A' + port, data);
 		mos6530->ddr[port] = data;
 		write_port(mos6530, port, data);
 		break;
@@ -199,7 +199,7 @@ WRITE8_DEVICE_HANDLER( mos6530_w )
 	case REGISTER_TIMER_8T:
 	case REGISTER_TIMER_64T:
 	case REGISTER_TIMER_1024T:
-		if (LOG) logerror("MOS6530 '%s' Timer: %02x, %uT, IRQ %s\n", device->tag.cstr(), data, PRESCALER[offset & 0x03], BIT(offset, 3) ? "enabled" : "disabled");
+		if (LOG) logerror("MOS6530 '%s' Timer: %02x, %uT, IRQ %s\n", device->tag(), data, PRESCALER[offset & 0x03], BIT(offset, 3) ? "enabled" : "disabled");
 		mos6530->counter = data;
 		mos6530->irq_enabled = BIT(offset, 3);
 		timer_adjust_periodic(mos6530->timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / PRESCALER[offset & 0x03]));

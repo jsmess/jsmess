@@ -29,7 +29,7 @@
 
 #define DEBUG_TMS5501	0
 
-#define LOG_TMS5501(device, message, data) do { if (DEBUG_TMS5501) logerror ("\nTMS5501 %s: %s %02x", device->tag.cstr(), message, data); } while (0)
+#define LOG_TMS5501(device, message, data) do { if (DEBUG_TMS5501) logerror ("\nTMS5501 %s: %s %02x", device->tag(), message, data); } while (0)
 
 /* status register */
 #define TMS5501_FRAME_ERROR		0x01

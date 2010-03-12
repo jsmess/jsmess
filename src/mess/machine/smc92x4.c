@@ -288,15 +288,15 @@ static int get_id_from_device( running_device *device )
 {
 	int id = -1;
 
-	if ( ! strcmp( "harddisk1", device->tag.cstr() ) )
+	if ( ! strcmp( "harddisk1", device->tag() ) )
 	{
 		id = 0;
 	}
-	else if ( ! strcmp( "harddisk2", device->tag.cstr() ) )
+	else if ( ! strcmp( "harddisk2", device->tag() ) )
 	{
 		id = 1;
 	}
-	else if ( ! strcmp( "harddisk3", device->tag.cstr() ) )
+	else if ( ! strcmp( "harddisk3", device->tag() ) )
 	{
 		id = 2;
 	}

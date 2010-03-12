@@ -70,7 +70,7 @@ WRITE8_DEVICE_HANDLER( com8116_str_w )
 {
 	com8116_t *com8116 = get_safe_token(device);
 
-	if (LOG) logerror("COM8116 '%s' Receiver Divider %01x\n", device->tag.cstr(), data & 0x0f);
+	if (LOG) logerror("COM8116 '%s' Receiver Divider %01x\n", device->tag(), data & 0x0f);
 
 	com8116->fr = data & 0x0f;
 
@@ -85,7 +85,7 @@ WRITE8_DEVICE_HANDLER( com8116_stt_w )
 {
 	com8116_t *com8116 = get_safe_token(device);
 
-	if (LOG) logerror("COM8116 '%s' Transmitter Divider %01x\n", device->tag.cstr(), data & 0x0f);
+	if (LOG) logerror("COM8116 '%s' Transmitter Divider %01x\n", device->tag(), data & 0x0f);
 
 	com8116->ft = data & 0x0f;
 

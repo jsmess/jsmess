@@ -252,7 +252,7 @@ static void common_start(running_device *device, SAM6883_VERSION device_type)
 	sam6883_t *sam = get_safe_token(device);
 	// validate arguments
 	assert(device != NULL);
-	assert(device->tag != NULL);
+	assert(device->tag() != NULL);
 	assert(device->baseconfig().static_config != NULL);
 
 	sam->intf = (const sam6883_interface*)device->baseconfig().static_config;

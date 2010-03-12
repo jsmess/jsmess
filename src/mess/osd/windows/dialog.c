@@ -1071,8 +1071,8 @@ static void seqselect_settext(HWND editwnd)
 
 	// change the text - avoid calls to SetWindowText() if we can
 	win_get_window_text_utf8(editwnd, buffer, ARRAY_LENGTH(buffer));
-	if (strcmp(buffer, seqstring.cstr()))
-		win_set_window_text_utf8(editwnd, seqstring.cstr());
+	if (strcmp(buffer, seqstring))
+		win_set_window_text_utf8(editwnd, seqstring);
 
 	// reset the selection
 	if (GetFocus() == editwnd)

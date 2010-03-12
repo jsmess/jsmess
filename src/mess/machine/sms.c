@@ -1199,38 +1199,38 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	int fname_len = fname ? strlen(fname) : 0;
 	const char *extrainfo = image_extrainfo(image);
 
-	if (strcmp(image->tag,"cart1") == 0)
+	if (strcmp(image->tag(),"cart1") == 0)
 		index = 0;
 
-	if (strcmp(image->tag,"cart2") == 0)
+	if (strcmp(image->tag(),"cart2") == 0)
 		index = 1;
-	if (strcmp(image->tag,"cart3") == 0)
+	if (strcmp(image->tag(),"cart3") == 0)
 		index = 2;
-	if (strcmp(image->tag,"cart4") == 0)
+	if (strcmp(image->tag(),"cart4") == 0)
 		index = 3;
-	if (strcmp(image->tag,"cart5") == 0)
+	if (strcmp(image->tag(),"cart5") == 0)
 		index = 4;
-	if (strcmp(image->tag,"cart6") == 0)
+	if (strcmp(image->tag(),"cart6") == 0)
 		index = 5;
-	if (strcmp(image->tag,"cart7") == 0)
+	if (strcmp(image->tag(),"cart7") == 0)
 		index = 6;
-	if (strcmp(image->tag,"cart8") == 0)
+	if (strcmp(image->tag(),"cart8") == 0)
 		index = 7;
-	if (strcmp(image->tag,"cart9") == 0)
+	if (strcmp(image->tag(),"cart9") == 0)
 		index = 8;
-	if (strcmp(image->tag,"cart10") == 0)
+	if (strcmp(image->tag(),"cart10") == 0)
 		index = 9;
-	if (strcmp(image->tag,"cart11") == 0)
+	if (strcmp(image->tag(),"cart11") == 0)
 		index = 10;
-	if (strcmp(image->tag,"cart12") == 0)
+	if (strcmp(image->tag(),"cart12") == 0)
 		index = 11;
-	if (strcmp(image->tag,"cart13") == 0)
+	if (strcmp(image->tag(),"cart13") == 0)
 		index = 12;
-	if (strcmp(image->tag,"cart14") == 0)
+	if (strcmp(image->tag(),"cart14") == 0)
 		index = 13;
-	if (strcmp(image->tag,"cart15") == 0)
+	if (strcmp(image->tag(),"cart15") == 0)
 		index = 14;
-	if (strcmp(image->tag,"cart16") == 0)
+	if (strcmp(image->tag(),"cart16") == 0)
 		index = 15;
 
 	/* Check for 512-byte header */
