@@ -1999,19 +1999,19 @@ DEVICE_IMAGE_LOAD( bbcb_cart )
 
 	size = image_length (image);
 
-	if (strcmp(image->tag,"cart1") == 0)
+	if (strcmp(image->tag(),"cart1") == 0)
 	{
 		index = 0;
 	}
-	if (strcmp(image->tag,"cart2") == 0)
+	if (strcmp(image->tag(),"cart2") == 0)
 	{
 		index = 1;
 	}
-	if (strcmp(image->tag,"cart3") == 0)
+	if (strcmp(image->tag(),"cart3") == 0)
 	{
 		index = 2;
 	}
-	if (strcmp(image->tag,"cart4") == 0)
+	if (strcmp(image->tag(),"cart4") == 0)
 	{
 		index = 3;
 	}
