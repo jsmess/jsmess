@@ -170,7 +170,7 @@ DEVICE_IMAGE_LOAD( a800_cart )
 	int size;
 
 	/* load an optional (dual) cartridge (e.g. basic.rom) */
-	if( strcmp(image->tag,"cart2") == 0 )
+	if( strcmp(image->tag(),"cart2") == 0 )
 	{
 		size = image_fread(image, &mem[0x12000], 0x2000);
 		a800_cart_is_16k = (size == 0x2000);
@@ -189,7 +189,7 @@ DEVICE_IMAGE_LOAD( a800_cart )
 
 DEVICE_IMAGE_UNLOAD( a800_cart )
 {
-	if( strcmp(image->tag,"cart2") == 0 )
+	if( strcmp(image->tag(),"cart2") == 0 )
 	{
 		a800_cart_is_16k = 0;
 		a800_setbank(image->machine, 1);
