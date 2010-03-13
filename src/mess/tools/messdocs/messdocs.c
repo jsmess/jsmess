@@ -1,3 +1,8 @@
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <ctype.h>
+#include <tchar.h>
+#include <shlwapi.h> 
 #include <stdio.h>
 #include <ctype.h>
 
@@ -5,7 +10,8 @@
 #include "sys/stat.h"
 #include "utils.h"
 #include "osdcore.h"
-
+#include "strconv.h"
+#include "winutf8.h"
 #include "expat.h"
 
 struct messdocs_state
@@ -32,7 +38,122 @@ static void *expat_malloc(size_t size);
 static void *expat_realloc(void *ptr, size_t size);
 static void expat_free(void *ptr);
 
+//============================================================
+//  win_error_to_mame_file_error
+//============================================================
 
+static file_error win_error_to_mame_file_error(DWORD error)
+{
+	file_error filerr;
+
+	// convert a Windows error to a file_error
+	switch (error)
+	{
+		case ERROR_SUCCESS:
+			filerr = FILERR_NONE;
+			break;
+
+		case ERROR_OUTOFMEMORY:
+			filerr = FILERR_OUT_OF_MEMORY;
+			break;
+
+		case ERROR_FILE_NOT_FOUND:
+		case ERROR_PATH_NOT_FOUND:
+			filerr = FILERR_NOT_FOUND;
+			break;
+
+		case ERROR_ACCESS_DENIED:
+			filerr = FILERR_ACCESS_DENIED;
+			break;
+
+		case ERROR_SHARING_VIOLATION:
+			filerr = FILERR_ALREADY_OPEN;
+			break;
+
+		default:
+			filerr = FILERR_FAILURE;
+			break;
+	}
+	return filerr;
+}
+
+//============================================================
+//  osd_is_path_separator
+//============================================================
+
+static int osd_is_path_separator(char c)
+{
+	return (c == '/') || (c == '\\');
+}
+
+//============================================================
+//  osd_mkdir
+//============================================================
+
+file_error osd_mkdir(const char *dir)
+{
+	file_error filerr = FILERR_NONE;
+
+	TCHAR *tempstr = tstring_from_utf8(dir);
+	if (!tempstr)
+	{
+		filerr = FILERR_OUT_OF_MEMORY;
+		goto done;
+	}
+
+	if (!CreateDirectory(tempstr, NULL))
+	{
+		filerr = win_error_to_mame_file_error(GetLastError());
+		goto done;
+	}
+
+done:
+	if (tempstr)
+		free(tempstr);
+	return filerr;
+}
+
+
+//============================================================
+//  osd_rmdir
+//============================================================
+
+file_error osd_rmdir(const char *dir)
+{
+	file_error filerr = FILERR_NONE;
+
+	TCHAR *tempstr = tstring_from_utf8(dir);
+	if (!tempstr)
+	{
+		filerr = FILERR_OUT_OF_MEMORY;
+		goto done;
+	}
+
+	if (!RemoveDirectory(tempstr))
+	{
+		filerr = win_error_to_mame_file_error(GetLastError());
+		goto done;
+	}
+
+done:
+	if (tempstr)
+		free(tempstr);
+	return filerr;
+} 
+
+
+//============================================================
+//  osd_copyfile
+//============================================================
+
+file_error osd_copyfile(const char *destfile, const char *srcfile)
+{
+	// wrapper for win_copy_file_utf8()
+	if (!win_copy_file_utf8(srcfile, destfile, TRUE))
+		return win_error_to_mame_file_error(GetLastError());
+
+	return FILERR_NONE;
+} 
 
 /***************************************************************************
     CORE IMPLEMENTATION
@@ -119,7 +240,7 @@ static char *make_path(const char *dir, const char *filepath)
 	snprintf(buf, ARRAY_LENGTH(buf), "%s", dir);
 	combine_path(buf, ARRAY_LENGTH(buf), filepath);
 
-	path = malloc(strlen(buf) + 1);
+	path = (char*)malloc(strlen(buf) + 1);
 	if (!path)
 		return NULL;
 	strcpy(path, buf);
@@ -243,7 +364,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 
 		title = find_attribute(attributes, "title");
 		if (title)
-			state->title = pool_strdup(state->pool, title);
+			state->title = pool_strdup_lib(state->pool, title);
 	}
 	else if (!strcmp(tagname, "topic"))
 	{
@@ -261,7 +382,7 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 		copy_file_to_dest(state->dest_dir, state->toc_dir, filepath);
 
 		if (!state->default_topic)
-			state->default_topic = pool_strdup(state->pool, filepath);
+			state->default_topic = pool_strdup_lib(state->pool, filepath);
 	}
 	else if (!strcmp(tagname, "folder"))
 	{
@@ -317,10 +438,10 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 					s = strchr(buf, '=');
 					s = s ? s + 1 : &buf[strlen(buf)];
 
-					sysinfo_array = pool_realloc(state->pool, sysinfo_array, sizeof(*sysinfo_array) * (sys_count + 1));
+					sysinfo_array = (system_info*)pool_realloc_lib(state->pool, sysinfo_array, sizeof(*sysinfo_array) * (sys_count + 1));
 					if (!sysinfo_array)
 						goto outofmemory;
-					sysinfo_array[sys_count].name = pool_strdup(state->pool, s);
+					sysinfo_array[sys_count].name = pool_strdup_lib(state->pool, s);
 					sysinfo_array[sys_count].desc = NULL;
 
 					sysname = sysinfo_array[sys_count].name;
@@ -355,21 +476,21 @@ static void start_handler(void *data, const XML_Char *tagname, const XML_Char **
 
 				if (!strncmp(buf, "======", 6) && lineno == 0)
 				{
-					char *heading = malloc(strlen(buf) + 1);
+					char *heading = (char*)malloc(strlen(buf) + 1);
 					memset(heading, 0, strlen(buf) + 1);
 					strncpy(heading, buf + 6, strlen(buf) - 12);
 					fprintf(sysfile, "<h1>%s</h1>\n", heading);
 					fprintf(sysfile, "<p><i>(directory: %s)</i></p>\n", sysname);
 
 					if (!sysinfo_array[sys_count-1].desc)
-						sysinfo_array[sys_count-1].desc = pool_strdup(state->pool, heading);
+						sysinfo_array[sys_count-1].desc = pool_strdup_lib(state->pool, heading);
 
 					free(heading);
 				}
 				else if (buf[0] == '=')
 				{
 					int count;
-					char *heading = malloc(strlen(buf) + 1);
+					char *heading = (char*)malloc(strlen(buf) + 1);
 					memset(heading, 0, strlen(buf) + 1);
 
 					if (ul)
@@ -475,7 +596,7 @@ static int rmdir_recursive(const char *dir_path)
 		{
 			if (strcmp(ent->name, ".") && strcmp(ent->name, ".."))
 			{
-				newpath = malloc(strlen(dir_path) + 1 + strlen(ent->name) + 1);
+				newpath = (char*)malloc(strlen(dir_path) + 1 + strlen(ent->name) + 1);
 				if (!newpath)
 					return -1;
 
@@ -517,7 +638,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	XML_Memory_Handling_Suite memcallbacks;
 
 	memset(&state, 0, sizeof(state));
-	state.pool = pool_alloc(NULL);
+	state.pool = pool_alloc_lib(NULL);
 
 	/* open the DOC */
 	in = fopen(toc_filename, "r");
@@ -528,7 +649,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	}
 
 	/* figure out the TOC directory */
-	state.toc_dir = pool_strdup(state.pool, toc_filename);
+	state.toc_dir = pool_strdup_lib(state.pool, toc_filename);
 	if (!state.toc_dir)
 		goto outofmemory;
 	for (i = strlen(state.toc_dir) - 1; (i > 0) && !osd_is_path_separator(state.toc_dir[i]); i--)
@@ -539,7 +660,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	osd_mkdir(dest_dir);
 
 	/* create the help contents file */
-	s = pool_malloc(state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
+	s = (char*)pool_malloc_lib(state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
 	if (!s)
 		goto outofmemory;
 	strcpy(s, dest_dir);
@@ -595,7 +716,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	fclose(state.chm_toc);
 
 	/* create the help project file */
-	s = pool_malloc(state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
+	s = (char*)pool_malloc_lib(state.pool, strlen(dest_dir) + 1 + strlen(help_project_filename) + 1);
 	if (!s)
 		goto outofmemory;
 	strcpy(s, dest_dir);
@@ -620,7 +741,7 @@ int messdocs(const char *toc_filename, const char *dest_dir, const char *help_pr
 	/* finish up */
 	XML_ParserFree(state.parser);
 	fclose(in);
-	pool_free(state.pool);
+	pool_free_lib(state.pool);
 	return state.error ? -1 : 0;
 
 outofmemory:

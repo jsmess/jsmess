@@ -37,7 +37,7 @@ MESSDOCS_OBJS = \
 # rules to build the messdocs executable
 #-------------------------------------------------
 
-$(OBJ)/build/$(MESSDOCS): $(MESSDOCS_OBJS) $(LIBUTIL) $(LIBOCORE) $(EXPAT)
+$(OBJ)/build/$(MESSDOCS): $(MESSDOCS_OBJS) $(LIBEMU) $(LIBUTIL) $(LIBOCORE) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) $(EXPAT) -o $@
 
