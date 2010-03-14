@@ -1,4 +1,4 @@
-br/*\
+/*\
 * * Linus Akesson's "Craft"
 * *
 * * Skeleton driver by MooglyGuy
