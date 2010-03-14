@@ -1,4 +1,4 @@
-﻿0.137.1
+0.137.1
 
 New System Drivers Supported:
 -----------------------------
@@ -32,8 +32,9 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
-
+- [AMSTRAD CPC Family] Updated Hashes to GoodCPC V3.1415 [Cowering]
+- [Thomson MO5] Added Hashes from GoodMO5 V3.1415 [Cowering]
+- [Sega Pico] Updated Hashes to GoodPico V3.1415 [Cowering]
 
 
 0.137
