@@ -1,4 +1,42 @@
-﻿0.137
+﻿0.137.1
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+
+
+Skeleton drivers:
+-----------------
+(none)
+
+
+
+System Driver Changes:
+----------------------
+(none)
+
+
+
+Imgtool Changes:
+----------------
+(none)
+
+
+
+Source Changes:
+----------------
+(none)
+
+
+
+0.137
 
 New System Drivers Supported:
 -----------------------------
@@ -130,7 +168,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.136u4.  This incorporates all features of the
+- The core is based on MAME 0.137.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Refactored MOS6526 CIA interface, added SP/CNT callbacks, and fixed serial
