@@ -1,0 +1,1217 @@
+<hashfile>
+	<!-- This MESS HASH file was auto-generated from Cowering's GoodMO5 database (V3.1415)  -->
+	<!-- for the exclusive use of MESS.  Keep this notice intact if editing this file  -->
+
+	<hash crc32="21a22390" sha1="ad36270d8e3ad39047882812d6e250609d6608c5" name="1000 Bornes (Free Game Blot)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="956e8360" sha1="1a1b367d99535d77a84c709af5996a091c50d5a3" name="3-D USS (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="b252051a" sha1="2e76c80ab61d353499ecda0344cddd13b9a965e2" name="3D Sub (Loriciels)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="670dbf73" sha1="73a14e6abe1ad2fcc1fcf007fb04e126fc388815" name="3D-Dimensions (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="da89a78c" sha1="656e3eab469675835b7fe47b42f96e1b9de1c052" name="5eme Axe, Le (Loriciels)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="c33e0138" sha1="f9dfd3b737a010cc1d4ee5cb61ee035e7312fc37" name="5eme Axe, Le (Loriciels)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="77be59be" sha1="63fb4d24cf1ae6d1028785311922688f748f000a" name="6809 Language Module v1.0 (Microsoft) (Cart)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1d047ddf" sha1="6835342e7b32a437f7d200f4960c09ba26b92770" name="7 Magiciens, Les (To Tek) (M5)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="fe3e42b8" sha1="cfdfae72561e81a814872e2050854bae380e0bce" name="A Demi Mot (Nathan Ecoles)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="4151bfff" sha1="5fe6c210e413ba85a5d837a6cdce3c5a9cf852f8" name="Addresses Ninaires K7 (Deplombsoft) (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="e10868f3" sha1="8fc1312a2a3ebe39d7304fbda55ff16ef3fa674c" name="Adrbindk (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="7f2faf8a" sha1="f53ea8c63934f2a05cca4076d44e64afd90d17a3" name="Adrdsk (PD)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="ccb21bc1" sha1="b8a56f81a3c8200cda9df14c889a45767bfd68d2" name="Adrto7 (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="e9a2e04d" sha1="bc980a2c16e225f1916f35752df46bd38e0b8fd4" name="Affaire en Or, Une (Free Game Blot)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="b6571254" sha1="5f4aaa180bea37eb1f7b6e5ed0559ba96775755b" name="Affaire Vera Cruz, L' (Infogrames)">
+		<status>Known Bad Image</status>
+		<year>198x</year>
+	</hash>
+	<hash crc32="63de1c17" sha1="13ee8e24528d1aecbd5bc8481f0fc7f179f44ef9" name="Affine (USTL)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="815d8811" sha1="e787286ae949f76d180cded8f3322d1d0b01b314" name="Aigle d'or, L' (Loriciels)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="081bd8c9" sha1="dc2bb411ee0aeca0a5b47c465b0a8d163af67661" name="Aigle d'or, L' (Loriciels)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="721e741c" sha1="a19f999bcc02fa414a01dc6a6290747b734dba97" name="Air Attack (Microids)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="04a61aa5" sha1="3c564c4becc2f60994a39e22832505b44880c9d1" name="Aire (Nathan Ecoles)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="27297d31" sha1="f699ddce0a4ba4b5175b707985c4b2e00d6a7af3" name="Allemand (Sich Vorstellen) (FIL) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="239d78b7" sha1="cbf5bfa6f395eff52cd405c0ad4f9690a383532d" name="Allemand (Sich Vorstellen) (FIL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="8208c043" sha1="69c6b9c50d9808424478947774463e3e41267b8e" name="Amperemetre (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="e43f1253" sha1="651b27edec2a1cc29aad6b3fe44d90e6df466666" name="Androides (Infogrames)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="a220159a" sha1="8c493609f87a31984592b6104c414718f1b51b61" name="Androides (Infogrames)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="e0163b6d" sha1="573083d2b38f2743a72417ff489f97b8493e91c3" name="Androides (Infogrames)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="b81c7f1d" sha1="f9fa511be63c28f07377725409f6ab13c9d5c464" name="Anglais (Vifi-Nathan)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3ff35d7d" sha1="6902b8f581cb3e4bea7fd9ccd92c0b0ea0637711" name="Angles, Les (Vifi-Nathan Ecoles)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="a5ed9f3e" sha1="73673f32151b7436580931ff9d9794ea900b3713" name="Animaux (Infogrames)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="78db2fe3" sha1="3a917432d1e01654a62e2fb9edbf00d8e9454c8f" name="Araignees by Microtom (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="dbb3683e" sha1="6594f562feca732862d533d7932852439d1960e4" name="Arkanoid (FIL) [t1]">
+		<year>1987</year>
+	</hash>
+	<hash crc32="18c86289" sha1="b16b494c8d92769eebb6aff5c40a9a2b2fc95cf5" name="Arkanoid (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="069d4255" sha1="4b2be81db4cf87c21171536444df936dc9b835c4" name="Ascens (Collectif d'Idee Irem)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="916d74de" sha1="1ada057a26fdfc0137d6ecd94b1a709b898a5444" name="Asterix et la Potion Magique (Vifi-Nathan)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="0f4dfb0f" sha1="59ae51daedaa783b681c9b395302257f608bf067" name="Asteroides (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="741b3c57" sha1="92b5655f7e2cacba31417c45575439742ec8adf9" name="Astromus (Logimus) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="bf8a905a" sha1="d5a3f48bd1046b66b975eab6c6e7739142ab9d4a" name="Astromus (Logimus)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="715fe631" sha1="9d6ad879c1404bb5df0a71e001410d5a75ad882b" name="Atomik (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="30515b15" sha1="436ba645018cfce3e720ae33e76196e168953a82" name="Auto-initiation au BASIC MO5 (Cedic-Nathan)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4187026a" sha1="a96685478a82e7f42e88a7d341e192c3749b07d5" name="Avenger (FIL)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="8dc00333" sha1="8e042ac6aa0a49bfd914d1dcecf47a5a8c593f3b" name="Backgammon (Vifi-Nathan)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1e30d915" sha1="45c78f26ff9e69f7326d694f4b054dc4115e953f" name="Baladins (CNDP) (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="9862f766" sha1="2dec8b788b329c0247a27e84638e0dbf0e922297" name="Baladins (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="eb8d52ef" sha1="1fcb6f63627a976e57550280fd25bdf60cf350a3" name="Balthazar (Titus)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="b2527306" sha1="52e39bf4a44bfa0dc2bd8266b9452f178a4bd3f7" name="Banque (PD)">
+		<status>Known Bad Image</status>
+		<year>198x</year>
+	</hash>
+	<hash crc32="8085d757" sha1="bc670d997ff6fc38e2027437b3fcf338d93cb5f8" name="Barry McGuigan Championship Boxing (Microids)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="9a1a11e0" sha1="4e77b5723cd4dc48b37c5d11f94e51cae74b42fb" name="Beachhead (Access Software)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="ffcf0830" sha1="bb210b64fd19b5c6ac6963bc3717437af238215a" name="Black Bart (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="9725c110" sha1="d5b8882708e539f449746c5451054359b1273f3a" name="Blitz (To Tek) (Cart)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="148c5dfc" sha1="281a17443e11dbd61df6d31978149590cf4eb9aa" name="Blitzkrieg (Francis Mallard)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="cb84e6fa" sha1="ef3aba24162a7c04f8acf38ad84573b717bdbcef" name="Bomber (Hebdogiciel) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="7c9a0275" sha1="fce9d946d4d94d92f88c9ebdb700d55f56c19788" name="Bowling Fou by Bruno Laurence (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="fadb00d9" sha1="76d8c8cfb6974fc3b0a1c17917a774c5c7c87e3e" name="Buds 1 2 3 (To Tek)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b5201026" sha1="25c5132904c4d87a4a2288e61d29cf5fbb4929f9" name="Business by Daniel Coulom (PD) [a1]">
+		<year>198x</year>
+	</hash>
+	<hash crc32="cb0bb731" sha1="61ddb7e2d3ef809780a77d0eea453f86ecdf579a" name="Business by Daniel Coulom (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="032aeb7c" sha1="ea53974a2e885e35ed8a85cbcf2d35874d54b620" name="Calcul Algebrique (Edumicro)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="ae9ab28c" sha1="9306f2eef3a2b5484df82691f2e9a8241a455eb6" name="Calcul Mental (CNDP)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="94f6a28a" sha1="dcbd9972305d1c5af77d91dbe655f4724c3146ad" name="Cap Horn (Coktel Vision)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="e244996e" sha1="3433fae662a328d24412f44895d8f65582ccdf62" name="Cap sur Dakar (Coktel Vision)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="e1bd12da" sha1="db77bf57eb968b00bf1c3cce4405be8eb4849bfb" name="Carre Magique (CNDP)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e08f3298" sha1="30a663987d7b1ab37271859690ae084e33617772" name="Carre Magique (Nathan Ecoles) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="70f9326d" sha1="c88afea281a71c2b17666eff999cf0f2556367d5" name="Carre Magique (Nathan Ecoles)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a279d8ef" sha1="c2f3123b6c4ed336d3150b518f6719f62b21b4ee" name="Cartciel (Answare)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f7fffe82" sha1="1111de7bb368bc59199f3e2354c67e863ea89cbc" name="Carte de France, La (Vifi-Nathan)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="465c1413" sha1="45367aec322ae4d92b0ab1af612aab4650189516" name="Cartes du Temps, Les (Les Vagabonds du Temps) (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="707a1fdc" sha1="28b457ccd8e66967d5532fb0e39ef4b003320ff0" name="Cassebrique (Christophe Vaillant) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="3b9fb1b0" sha1="3471ce6641f02c2e417ef992298d976887ee316d" name="Catalog (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="2619447a" sha1="16d0e09b0626546ccb178cca1a70f1f428c083a5" name="Chardata (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="bd94bd4b" sha1="e43463b82085a9bd2216089a042246e33892ccac" name="Chateau des Sphinx, Le (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="9b7d8e91" sha1="af0e2420e9b4d9f6e478461c398e6b9a308cf13e" name="Chateau Noir et Dragon Rouge (Vifi-Nathan)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="92e1fffd" sha1="31ff75aa6d7a0b9e7972f425eea751308dd09b41" name="Chenille (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="7f29764d" sha1="e9f0fe34904d86ef5b9f424783b4f6092b9fb405" name="Chiffres et les Lettres, Les (Vifi-Nathan)">
+		<status>Known Bad Image</status>
+		<year>198x</year>
+	</hash>
+	<hash crc32="7d6246a0" sha1="f472074d4e36fe90d036b8aee5773a22d3aac917" name="Cible (CNDP)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="599cfd41" sha1="093801baaf2d94fe6a8d90d7d9a68a11378a19ca" name="Cocotte (FIL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="54c3738a" sha1="592572d69465b734d4c787bae7ba0e761e3bf6e0" name="Coliseum (Loriciels)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="16142072" sha1="a9f2489ebae1638de7973d38b447a751433c682c" name="Coliseum (Loriciels)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="4dbccd60" sha1="928e45a5ffc1ee3e8fe5879207466cfcee54ddef" name="Colocalc (FIL) (Cart)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="e239e303" sha1="68505d4dc95bbd18f51e35bf86f07f05594fe7ce" name="Compte est rond, Le (Hatier)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="27633ea3" sha1="4fb604acb49dd41aaba999c194509952aace3d6e" name="Concordance des Temps (CNDP) [a1]">
+		<year>198x</year>
+	</hash>
+	<hash crc32="f50ef163" sha1="9c06d7433631bb3dfe0a5f599526cb97039618ac" name="Concordance des Temps (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="dfc92e55" sha1="d3d20b3ec4012746a3838402db2e50c747564b83" name="Concours d'algebre (C &amp; D Missenard)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="e5c01e63" sha1="725c68bfe61c69a7ee36cf573dbe3d3fe915bc50" name="Concours d'geometrie">
+		<year>198x</year>
+	</hash>
+	<hash crc32="e2c998eb" sha1="c5fa35145e31a7c998ad1f6e2ab5a416fb3e85d9" name="Conte (Alain Lambert) (PD) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="fc76d616" sha1="41645e3ab08c0e63636b798dd43c81ccc4b264fc" name="Conte (Alain Lambert) (PD) [h1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="46675110" sha1="4a8dfa2fa9a247e1bac77ac02d8396c6a80d09ae" name="Conte (Alain Lambert) (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="b0d132cf" sha1="db1ac6ab2813f2f702f8a0ab420fd05af303cf67" name="Conversion Images (Edouard Foller)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="b18d4c14" sha1="650fcf550c6954eec67b19a0be499393a2ca0768" name="Copie de Fichier Data (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="3836a66e" sha1="1fec9c768a60d91093a2a6fe5efd562f5c10c622" name="Coq inn (Vifi-Nathan)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d55feaed" sha1="388bef1d3e5b51a1351dfadf2f80d50c79214d13" name="Corps Humain, Le (Infogrames)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="9426ef51" sha1="e8585096863cf7ccf94fbca3e6936d64d7546564" name="Course aux Lettres, La (Loriciels)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="be0ca07f" sha1="aa2490fef1ba8d6e588795fcfd483adc494bb06f" name="Creadata (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="e9676d11" sha1="82a6f679aee2e4bc6cf925d3031b1fd703b73db4" name="Crocky 2 (Loriciels) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="dac3535e" sha1="d2c5b4504c8023f28aeccfd1d3c7c1ce9cc1bc37" name="Crocky 2 (Loriciels)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="52ef42c8" sha1="77d8bf0f23a9dfd0d90326a5b7ba63cab9dfa92a" name="Cube Basique, Le (Infogrames) (Part 1 of 4) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="ae6fa16e" sha1="e43e9ad1f70159f7e4a05d4814d370106a0afbc5" name="Cube Basique, Le (Infogrames) (Part 1 of 4)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="be1a3c31" sha1="5ee8180d8b7a597d958ad4ebc64300dafb13c656" name="Cube Basique, Le (Infogrames) (Part 2 of 4) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="aad9a46a" sha1="d2e4c2d8b15467c78a2c2a3e49e568998377385f" name="Cube Basique, Le (Infogrames) (Part 2 of 4)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="4c401066" sha1="77258c977aad4bfa0d3323d19b240c0aa4696cd1" name="Cube Basique, Le (Infogrames) (Part 3 of 4) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="24735cfe" sha1="5597d3e505bd433def9e85357888acf6f5be8fb1" name="Cube Basique, Le (Infogrames) (Part 3 of 4)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="616bc82d" sha1="53fa6feb62c2b0178b305c40fde365453b2fbcb8" name="Cube Basique, Le (Infogrames) (Part 4 of 4) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="404f0b36" sha1="06cfc87b64f4b0494c7cc5afc6217fe433c30399" name="Cube Basique, Le (Infogrames) (Part 4 of 4)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="165464f6" sha1="cb4f77d55e9bceb9b2a3cdbdf5594c9ec35a2e70" name="Cyprien dans la Course aux Lettres (Loriciels)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="63cb7ecf" sha1="1d3ea4f1ebb8ba81f2282c61267dd2f1c8771849" name="Dakar 4x4 (Coktel Vision)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="2359b8a1" sha1="9a20acf4e86b8e375d6a31097a9fe7fb4c3969af" name="Defi (CNDP)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="477d97f3" sha1="4c2e4f7213fb6f5153b6ff282879ad1155893036" name="Delos Attack (Christopher Lesur)">
+		<year>1989</year>
+	</hash>
+	<hash crc32="6f4b8245" sha1="5d6d4994755f84bbe7cc84904e345562b5b536fd" name="Dep (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="97eb412f" sha1="4b7cf09eb7681c7712e7c8274fbd07263e956bd3" name="Depart (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="14d6b9f9" sha1="7675429741b0556eb9c2f078288b7b254e7ccb2b" name="Departge (Ecole Jules Ferry) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="239eda82" sha1="b06f7a5cc3cfb3e03823904a17d71aaef5c53cb9" name="Deper (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="8a1e85d1" sha1="6361cf30f9fce76dd5d94415a67a6941eaab3b09" name="Desassembleur Dump &amp; Patch v4.0 (Daniel Coulom) (DCDASM4.GET) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="cc2f2cb8" sha1="5b2ad26c83d0e2b329fdbcb24bb674598f6a8228" name="Desassembleur Dump &amp; Patch v4.0 (Daniel Coulom) (DCDASM4.USR) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="7e95d100" sha1="f528a73ba977a9daf610c50efb3a2fdfae7799d3" name="Desassembleur Dump &amp; Patch v4.0 (Daniel Coulom) (PD) [a1]">
+		<year>1986</year>
+	</hash>
+	<hash crc32="85a6bb97" sha1="0d0720075bc879ff331f3345bf77a06cf0588f77" name="Desassembleur Dump &amp; Patch v4.0 (Daniel Coulom) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="0c8ea976" sha1="1476a46bea59cf1f472b91b5fe863d29d26a56ce" name="Destruc (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="7f0a32b4" sha1="1fd766bd9d1d3b729739278947177ec8f1cb9257" name="Devant Derriere (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="93a30388" sha1="3657aff0de0c08cd44185b35db93bb707d5a4a82" name="Devin (CNDP)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b01f54cc" sha1="a0b05c2fbeda995ffe20c8058f2d0dc089dcebb6" name="Dialogue avec une sauterelle (Nathan Ecoles)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="fb724d6d" sha1="d666ca471ae07f67f83eddd915a0aa93fafa8d68" name="Diamant and Fractions (Christopher Lesur)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="38f4d036" sha1="49b9d488e15f41f16d72b4d47f313f7819f457a0" name="Dianne, Mission Rubidiums (Loriciels)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="9c3e5dcd" sha1="46176aeb47d65f3f9321138b7677f7830c24f2bd" name="Dieux du Stade, Les (Infogrames)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="d63d11e9" sha1="9e3a8dca6dee8e012a3e4d69a6b5cc08913d3739" name="Divisibilite (CDDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="eea631e2" sha1="2535d842beb34884b8702faf9fe40bdd1ea052ab" name="Division, Les (Nathan Ecoles)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="c2a4f6dd" sha1="b71b32b307fc6ca1c2f1a38452cf4b86e34c31e0" name="Dossier Boerhaave (Infogrames)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="d3ee417e" sha1="1a27a1b6815e652931cbebb25d74790cda7db00b" name="Dribble (FIL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="e80a25dc" sha1="ee4462e9937c7a0cf19da512ff40c769a8a90e64" name="Duel au Colorado (Chip)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="0e22d2db" sha1="01c04c3c91b807e1e9b07e94aa20725874f6fb00" name="Dump (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="7a58f536" sha1="c5f98e6ba55e6c5114eb40b8a468934061d7524b" name="Echecs v3.7 (Cobra Soft)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="d87adb2c" sha1="167da598a88eb62f4845745923eb505ff52966ea" name="Electricite">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d13b3235" sha1="82d2f65a499df1bada66d398af39f091662c995c" name="Eliminator (Loriciels) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5779c7b7" sha1="78a9a1d809c2f123a7f520132b50ca8ff2f69b0d" name="Eliminator (Loriciels)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="9a380faf" sha1="efa716fa809dd60b114012b4cec6730c17d49a4c" name="Eliminator (Loriciels)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6a7b1a72" sha1="d2ad889c19148490a8368ecd8a7f6482fa88c353" name="EmplMO5 (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="19474090" sha1="9fd6f9b913d7150c5bcbd19613afcdc133c7509a" name="Emploi du Subjonctif (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="05418b66" sha1="8f0973974a8e555dc875255d0acd609e93272199" name="En allant a l'ecole, Cycliste (Cedic) (Part 1 of 2)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="d40ce57a" sha1="3f0d0ea4aeb057edbd7a2cadd8e1e8cb5fd8923b" name="En allant a l'ecole, Cycliste (Cedic) (Part 2 of 2)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="de053935" sha1="eb511a397aa5d57e6c3a23fd8190cdbe5a908b5c" name="Enduro Racer (FIL)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="e4efeacf" sha1="60b5b5070c99bf2f549e3a16e754b72c35786d88" name="Enduro Racer (Sega)">
+		<status>Known Bad Image</status>
+		<year>1988</year>
+	</hash>
+	<hash crc32="7d9efba7" sha1="a86513c0e5e2806aa323c9108e0c4c808c522c00" name="Energic (Guy Dechelette) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="689d6117" sha1="ff0cdc34d82b52ea27667a0e8af5fc1a2184a781" name="Energic (Guy Dechelette)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="0f9034b6" sha1="7160dff3cb1a4e1520f7d30aa55b00df4cfefb0e" name="Ensemble Z">
+		<year>198x</year>
+	</hash>
+	<hash crc32="5f55bb39" sha1="36d796e362d4d9463bcef131be5eecbbd37ce4ed" name="Entrainement au calcul (CNDP) (Part 01 of 10)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="7147efb0" sha1="6d0a5ff113c8e61c04861dc95b13be18af5a21a5" name="Entrainement au calcul (CNDP) (Part 02 of 10)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="69f37ab8" sha1="e06b628b84246b14fce97906bd7ad0604f4b42dd" name="Entrainement au calcul (CNDP) (Part 03 of 10)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="832eb0a4" sha1="22c4c8d55d4434d51cbb3908a812020c0dec4286" name="Entrainement au calcul (CNDP) (Part 04 of 10)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="7d195071" sha1="e91852d736ecb29ed367b294886bbaf9de0a60e9" name="Entrainement au calcul (CNDP) (Part 05 of 10)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="f804e5a0" sha1="0faaa50fa4e8d46d1dd0044fef5ededdd4f7994f" name="Entrainement au calcul (CNDP) (Part 06 of 10)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="de91f730" sha1="64f8209154cacbdae8bad463c4de3a87903cb273" name="Entrainement au calcul (CNDP) (Part 07 of 10)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="0c82adcf" sha1="80bc1ee10a4d8ea360f21ced700355e3b0ef3d9c" name="Entrainement au calcul (CNDP) (Part 08 of 10)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="166e6aa6" sha1="c8df2aa62e268306b4fd6f50f17b778ce8986637" name="Entrainement au calcul (CNDP) (Part 09 of 10)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="c01e10f5" sha1="c3bf70ad9f0acbc77eb84e4208eb8ff321fdf922" name="Entrainement au calcul (CNDP) (Part 10 of 10)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="164d4f12" sha1="2a8dcd300e1b994218a7a126f78b4ac7d068e4d1" name="Equation de droite (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="2e0bd6c0" sha1="6846317f2beb81ded4c364f139a176e0d9f26bc4" name="Equations">
+		<year>198x</year>
+	</hash>
+	<hash crc32="c90d0234" sha1="a8e5a0a8c8357d5f84f5619d37a9b8742fcd9cbf" name="Equations de droites (FIL)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="d594d2af" sha1="6137467f55eadc03c33c99495be15877966c78a7" name="Equichim (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="5c199b72" sha1="cc481b38a145fbe1520b0ed540855de6ecb2665a" name="Escalier pour l'infini (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="4736bc44" sha1="83c0c35421ec12e40e2289be367ae8c9c219c47d" name="Espagnol (Part 1 of 3)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="81b71047" sha1="9101864322d9d4c455e89a4eb0d6cefae0b6908a" name="Espagnol (Part 2 of 3)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="0cc39c4e" sha1="b5f0f3410aa12110c809afa4fb6970a765d6e926" name="Espagnol (Part 3 of 3)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="aac5f591" sha1="29dedaca5a5d594a58e64a2e4871f20ef7b43d84" name="Espagnol">
+		<year>198x</year>
+	</hash>
+	<hash crc32="8de38047" sha1="23fd24e6d64d8bd87c36c8f2d07e23359b5db872" name="Etude de la vitesse instantannee (CNDP)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2f93bfbd" sha1="49d4ffec325c8e72402b15c97f3c43118f90a579" name="Europe Facts (Vifi-Nathan)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="3e8f1bba" sha1="0e1c084269c6695e9c3899b8c411cef6e3b1dd58" name="Extension BASIC MO5 (D.G. Vevy) [a1]">
+		<year>1986</year>
+	</hash>
+	<hash crc32="e77097d0" sha1="fc90b13a3214f075b8c4e9777376fa07894db849" name="Extension BASIC MO5 (D.G. Vevy)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="9caa4e16" sha1="09bdec308f00357b89de078aff7a87c0ad27b70e" name="F-15 Strike Eagle (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="0ca3dd5d" sha1="f140c04ae38d3cb16f881cf46f3d60eccfbc40ec" name="FBI (Infogrames)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="61745d72" sha1="5593a1eafff0dbe3a3b49960a128ad564379363f" name="Felonies (Ere Informatique) [a1]">
+		<year>1986</year>
+	</hash>
+	<hash crc32="e705bae9" sha1="9840aae261ea8df490167445ea0e69633a7214c1" name="Felonies (Ere Informatique)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="ed9b3e27" sha1="2ae8dab0cd8c0189d2c6df0ff01ea022d6593bd6" name="Fichier des Animaux, Le (CNDP) (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="086cee71" sha1="1d14f5bd3b0bacf51296b2a399f594aca9500115" name="Flipper (Loriciels)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="c41cf39b" sha1="2a499eb490c048a418226edd14dd27caceb7af66" name="Formule 1 (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="8a55398a" sha1="17e43edeb3e74e243442455105ccfddbff633d10" name="Fox (CFX)">
+		<status>Known Bad Image</status>
+		<year>198x</year>
+	</hash>
+	<hash crc32="8cd5ea61" sha1="9f790f9c12810d600b10db58131f0930782c01c0" name="Fox (CFX)">
+		<year>1997</year>
+	</hash>
+	<hash crc32="b5a4c4f1" sha1="99865cf7dd639a1d4756bd7ca8a3636fe6c86aa7" name="Frises (Cedic-Nathan)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="fbe181d2" sha1="94da3bd62fb9a7307f45af7e0522888d685baf0f" name="Frontier (CDDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="12d185cf" sha1="489efa465f7773ccb9e0747ec6031f708658ea2d" name="Game Over (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="3fe2dbf3" sha1="de7303824d1d75b387bc87f30fcf5f73f44f5fd4" name="Geodyssee (Coktel Vision)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="8dc36435" sha1="c3f758fdecc4b0799c24b9e8c97a2b6ae2ea1a59" name="Geometrie (Vifi-Nathan)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="4666351a" sha1="bcea01d10d41b2e0b3c098fc92b027068b3b42a9" name="Geste d'Artillac, La (Infogrames) (Part 1 of 3)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="93738eed" sha1="f4a11913d4c094bbbccc12118e141fe20301aeef" name="Geste d'Artillac, La (Infogrames) (Part 2 of 3)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="3bf26f26" sha1="328c8e9a5dd681b3d2e66e9135053e7684396d17" name="Geste d'Artillac, La (Infogrames) (Part 3 of 3)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="d66aea27" sha1="490618148c5bc70d99c2e079736d08bfd0748e07" name="Ghostbuster (Christopher Lesur)">
+		<year>1989</year>
+	</hash>
+	<hash crc32="2ddea0ed" sha1="ad8d81f57a398458ea347c5eb569cb21ffc15bdc" name="Glouton (Patrick Abbati) (PD) (Cart) [a1]">
+		<year>1986</year>
+	</hash>
+	<hash crc32="c4f65bfc" sha1="1090e0acf99b240c5f22e20458464d96e1237eda" name="Glouton (Patrick Abbati) (PD) (Cart)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="68d02f32" sha1="91be61be3f055c65a33e2cca5c743f31770212a3" name="Glouton (Patrick Abbati) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="3b887c4b" sha1="40ea0c508477be65186518875fda4962a91528c6" name="Golf">
+		<year>198x</year>
+	</hash>
+	<hash crc32="0c6ed22d" sha1="632cc9865ad963be54950dd518561877a7cc4285" name="Gravitron (FIL) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="b8e1c174" sha1="893e7da70c13373902b101bfbc00095ff058316e" name="Gravitron (FIL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="4ab433e9" sha1="07f091bebf80e92a22f77c61dc2ce291f0c69cfe" name="Green Beret (FIL) [a1]">
+		<year>1986</year>
+	</hash>
+	<hash crc32="0f93b01f" sha1="30b07f962e703ff461685df47916c80caa13d75c" name="Green Beret (FIL)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="61f0d851" sha1="885e53a5e8a6b490b0f5b190d1a22f03898bddb4" name="Grignote 2, La (Remi Coulom) (PD)">
+		<year>1989</year>
+	</hash>
+	<hash crc32="930d4e3c" sha1="f9a70938f1d2be59866e0746002096d4657f3674" name="Grsang (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="6f367ab2" sha1="d74a5b9471b06d8af26df3e9d1c9de9fb260a05b" name="Histogra (FIL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="4768face" sha1="8973cc4144ba4e1f7865fe8b55f79386ce1a835f" name="Histoire de France (MPS Diffusion)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="2cc96102" sha1="481f09e264792fa5d240b11af498717d48ee15f8" name="HMS Cobra (Cobra Soft)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="e8a2c3b6" sha1="7e22948b0e2216f74dd30238a0797f2867c9e23f" name="Horloge (USTL)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3937a9bd" sha1="99a73867f8d50d1aa5dc85bec47b31b4e3b6b1e4" name="Id (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="72556033" sha1="092138eb2613882ed4b9754b98fdd3edaf84783f" name="Identif (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="a67cdd78" sha1="f9e037f009ddae800485b916b59031e92641ad1d" name="Identite (USTL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="b3845223" sha1="253e72b378b34c84f54f2ae1d8588c3a770bddfc" name="Imperialis (Coktel Vision)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="9cb63e6d" sha1="a3325e57c820ae86ce25851ade156c34540322a9" name="Impri (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="b6a31c35" sha1="57b5fb44208c94d1f3381735b6af938ad1a62f9f" name="Indiana Thom (Sprites)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="98e4c723" sha1="b1d8189f51f8aae5d23aaeb3fe5946f43685a207" name="Inequations">
+		<year>198x</year>
+	</hash>
+	<hash crc32="44c70ab1" sha1="7bfad9a19f3bdf2c1faa69f7972d363011adfe0b" name="Initiation aux Echecs (Vifi-Nathan)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="32895237" sha1="700dfcbb48f348827347058da82ab20a0ed7127a" name="Interieur Exterieur (Francoise Monnet)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="29d8eff5" sha1="4f95959aff95dbbc21cb3090612bce251b2887a6" name="Invasion des chiffres, L' (Nathan Ecoles)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="dacd4a41" sha1="0d5abaf03560f31298b2da1922e114311c776138" name="Isabelle et le Dragon (Hebdogiciel) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="95740fd4" sha1="a99a6f3404710b1e7a88b2a2f0607b806d0ae228" name="Island (Micro Application &amp; Informatics)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6472c89b" sha1="e5bfaf6d14b3914d870049e65d2ce3086ca02d22" name="James Debug - Le Grand Saut (Coktel Vision)">
+		<status>Known Bad Image</status>
+		<year>1986</year>
+	</hash>
+	<hash crc32="25955a0a" sha1="294e9b08be558afa9a7da0a33be2bac2b7b48d7e" name="Jauge (CNDP)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3dac3985" sha1="eab6c7f526b05ee039eddba78157a867e7dc282e" name="Jeu de Boole (Hatier)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="6fbe9e56" sha1="526bb3c616bf8263d86ad41aedb1e4ec6ba95d35" name="Jeu de Dames Americain (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="a916d3ac" sha1="9ef1e03c8083facb46936002aa239fd3ade257b5" name="Jumpman (Alexandre Pukall)">
+		<status>Known Bad Image</status>
+		<year>1997</year>
+	</hash>
+	<hash crc32="8cb49839" sha1="ccec5ece656d490e3292124139cda6de3f26e7b9" name="Jungle Hero (SoftBook)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="b4efadc2" sha1="bdacf13288271e740f186b091370e861cce5a115" name="Kanicula (To Tek)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5557eaa4" sha1="e09f8f22d075ee5a89c77efe5e26f9d5aca2f8c1" name="Karate (Infogrames)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="f9a5b85a" sha1="bf564d54fd836e9fbe87c4871b1eaacc530625a8" name="Karate (Infogrames)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="f8730104" sha1="a16291123b7953b8a3f142d91f4ba8e584ecfd08" name="Khronos (Coktel Vision)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="748c99be" sha1="0af603e6c4522dd5bd01e08ddbbfa229e211782e" name="Krakout (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="83a76d0c" sha1="f0a19c460d2aab3973df2a01a7bdab8f5e6d4b46" name="Labyrinthe (DC) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="3550e148" sha1="52655416d5d0650ea93d789d66b918bbb32eecfb" name="Labyrinthe Survie (Vifi-Nathan)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="faa75cb5" sha1="b3c403e3c75011908898b35e24c9c4b8b4ba3305" name="Liratt (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="55472e7b" sha1="62f6021a9a1f97941b7f3142b142f3075cb0efbc" name="Lirfic (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="0a88a630" sha1="8191a773bfbbb31ed627a7c756a6ff2f05c0daeb" name="Logo v1.0 (Soli) (Cart)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="1c7fd158" sha1="1dc0412a93a175039588e1801316b057897e7285" name="Lorann (Loriciels)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="e5a7e6af" sha1="7e973a9e51809ceb24fd6beffa8cef7879dc93fb" name="Ludo OP1 (Edumicro)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="0eafe078" sha1="6fa3795a5c92bbc296f332f765ae07329f705aba" name="Malediction de Thaar, La (Coktel Vision) [a1]">
+		<year>1986</year>
+	</hash>
+	<hash crc32="4ca7dbfd" sha1="1e7b432a504e3c380908fcf3760bf921276001d1" name="Malediction de Thaar, La (Coktel Vision)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="3622aa86" sha1="6a3adac796ad7003fc2a0ca4f04321a5b58c4ba7" name="Malediction de Thaar, La (Italian Version) (Coktel Vision)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="86ac96b4" sha1="31649049fc523685bd24c157f7e1931f6360bde6" name="Mandragore (Infogrames) (Part 1 of 3)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="35d1b2cd" sha1="fd2ace5302e5285cd989a9b4211dd5f644453bbc" name="Mandragore (Infogrames) (Part 2 of 3)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="f74d8a8b" sha1="7d354ac38954dcbb1640b633bf28ebcbdf667b45" name="Mandragore (Infogrames) (Part 3 of 3)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="f2debb3f" sha1="95278cfe7cc74ca1413abe52e5a1e0e96d62cdfe" name="Marathon Cosmicque (Julien Campagne) (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="59f704a3" sha1="66d5690ad3dd1239b8dc130c94375bd128d1e7b5" name="Mcass (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="b03ea7d5" sha1="711e4accefb890aae8c17246e162b6842b724745" name="Mdsk (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="d2ebf921" sha1="8d462a73e7635a3b0d294124bf0851371c04f9f4" name="Megawatt (EDF) (Part 1 of 2)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="a6281d4e" sha1="e9007225f984219dd7ca2ae87682b1c0843607ad" name="Megawatt (EDF) (Part 2 of 2)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="07f172d0" sha1="d82e7dddaa645dc24544f0c1b2c6cf633632f1a6" name="Melodimus (Logimus) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d2cf4e4f" sha1="10981af3ce5d7090dd7bba2314b07076cc2c4604" name="Melodimus (Logimus)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a966b643" sha1="a91d9b804b9cbbab9783a5567a217d819459b7e6" name="Memo7 by Jean-Yves Le Friec (PD)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="bc853288" sha1="96ce3dd1e9d8c7f3b59b79ba22df03c2d38aad0f" name="Memory (Daniel Coulom) (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="39acbb41" sha1="3f252773b7ca6e80f12782f95c163006484edc48" name="Mes premiers mots croises v1.1 (Vifi-Nathan)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a47eab9a" sha1="f9c2704d776cc142c19d2628944f0c613914af54" name="Mes premiers mots croises v1.2 (Vifi-Nathan) [a1]">
+		<year>1983</year>
+	</hash>
+	<hash crc32="a923a0e2" sha1="f656cd62e4aa26399f85bc1315bbb9ad68e761f1" name="Mes premiers mots croises v1.2 (Vifi-Nathan)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="36d056f7" sha1="5d34d966981df2d84067bddf21ffb8a3e8cdc305" name="Mesure du Temps (Cedic-Nathan)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="71b24444" sha1="9bb0c7c70ce9733782a753ff903569c3dbd97bd0" name="Meteo 7 (Infogrames)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="6e782698" sha1="39029e11d31eecfe4e73b9f80257af930c8bbbef" name="Micro Scrabble (Leisure Genius)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="3b429a24" sha1="9605d4bc7d51d839a1817286edb05284123ad7a3" name="Microscillo (Infogrames)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="f4c549b2" sha1="d8aca34f1687fa062b3d3efa847873402d589763" name="Mine aux Diamants, La (Infogrames)">
+		<status>Known Bad Image</status>
+		<year>198x</year>
+	</hash>
+	<hash crc32="9003cc2e" sha1="49339a044456f86f644118137c439cdfd5ea7f54" name="Miner 2049er (International Computer Group)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="31ddc7b8" sha1="ce7085403da4e723c7b7b4e6fa1e87ca43c0bc8c" name="Minidesa (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="6e6d9bee" sha1="deb43479782d27e31f1ca939b923a17d5c1686aa" name="Minotaure 3D (Loriciels) [f1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="a1c5b72e" sha1="6cd489b3c522f5cb4e770ec73d064d75509b3a09" name="Minotaure 3D (Loriciels)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="af73a382" sha1="bc63c4b8e7ffdfc208d4e8b99454ae2fa9856506" name="Minotaure Educatif (Hatier) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="eca56be7" sha1="52321808b17f8dce5ec1ab9f3ab550a9ff36acb6" name="Minotaure Educatif (Hatier) [a2]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="d5a10e54" sha1="c1c2812dce713a0ecce4bf48a20796d942fbe067" name="Minotaure Educatif (Hatier)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="21f3d27b" sha1="cfe5559f7a6c889b348fbae2cb18034def0527a3" name="Mission en Rafale (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="6913053b" sha1="245583df89886107468ab472e4e6c59f74ba9fe2" name="Mission pas Possible (Infogrames)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="c974f5e7" sha1="eb85334da37a4815f07c06da3adf95f7de99e723" name="Mission U-72 (Hebdogiciel) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="7384116e" sha1="98676d2c345821a57658be6e98a1d6fdac9b7a77" name="Missions en Rafale (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="4f7b87d3" sha1="5a585d6681d87c32678eb66f6f543147c58e814c" name="MO5 Compilation Disk (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="71012d1d" sha1="be707137e66f42660431448f4ff11551d8ed4af6" name="Modifatt (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="265ce965" sha1="df06a23292206190f4ee84819309acc415b1b3c7" name="Mon General (Loriciels)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="329ad3d8" sha1="6c80292c2f165fba4980a4e3fb74d7373a3831d0" name="Mongolfiere (Cedic-Nathan)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="ed06ee0f" sha1="4fd7b46921c40ce1fb4804c33e4e4ea2158d38f2" name="Monopolic (Free Game Blot)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="ab140366" sha1="ad39c056aab4aed005a6cafe142fd1edd0997798" name="Monopoly (Leisure Genius) [a1]">
+		<year>198x</year>
+	</hash>
+	<hash crc32="119a4016" sha1="259cc1050fb79c7def770f2d75f4efe213dfa211" name="Monopoly (Leisure Genius)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="7f14dc07" sha1="57966a88c1655100fe856f9c4cf0fff1cd709143" name="Monster mine (FIL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="331bc6d6" sha1="4f5533f5b8f532b6178e3aff352699d05c9900b6" name="Monte Carlo (Loriciels)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="3ce78dfc" sha1="b416c03e93bde26766445048ece2c2c8b7d18c87" name="Mot pour le compte, Un (Vifi-Nathan)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="bd27b69a" sha1="b16bf7124aac01bfbeaed9a33328ef97c1741d4c" name="Mpendu (CNDP)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2d02db0e" sha1="815e91c44d1b0284df2431190221ea9844956176" name="Multiplication (Cedic-Nathan)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="5b9b7f54" sha1="1c04543a349e81094805bbc9e569c63cf277b21d" name="Multiplications casse-tete (Vifi-Nathan) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="dfca6a0d" sha1="85c2ceb9ef72deedac184610a56256067976ebe7" name="Multiplications casse-tete (Vifi-Nathan)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="cda89980" sha1="e0ae7fb0c9c25af2da2b2290843ea662bee6888d" name="Mystery de Ming-Fonko, Le (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="2621e3c2" sha1="66a2d7b4f74580d43f2cff33573413855b0ff0dc" name="Navire (USTL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="a93cb758" sha1="bf998bd15f7ed091fa58ea2c6dff9a740b1e37e9" name="Nombre cache, Le (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="0fe72a9d" sha1="83062d998afbf567318b3692d4946fba11afb29a" name="Nuit des Templiers, La (Coktel Vision)">
+		<status>Known Bad Image</status>
+		<year>1986</year>
+	</hash>
+	<hash crc32="5358eee1" sha1="511d104dc20d8286e16d7ec6526b0460d7b5cf63" name="Nuit des Templiers, La (Coktel Vision)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="dd32e370" sha1="b306ee9b37cad495c35ba485114fcd1ba498598c" name="Nuit des Templiers, La (FIL)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="879f4f6a" sha1="870b2c1323ace86a53154731e64314beb856c729" name="Numero 10 (FIL) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="1f4e10d1" sha1="192f17f43fb0b47afa604a50c2abebb219b165fe" name="Numero 10 (FIL) [a2]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="382a11bb" sha1="9c0eadfbabd4a69a40de3e30fbfb44a6d6620d77" name="Numero 10 (FIL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="908ffd25" sha1="9a5da1ba8d5617de896aa458a8fa8c18b46550d9" name="Numero 10, Mexico 86 (FIL)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="5a30eb5d" sha1="1808811fdeea045f20c28a5e912d9d5e6b69fdcc" name="Ordidactic (Ere Informatique)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="e2b124c2" sha1="0cd2f285ec0af04861afaabba7a037c9e1650c99" name="Ordre de grandeur (Nathan Ecoles)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="5aa6ab58" sha1="e194ee6aa46f97a573657994b4d7f14e8f9dd684" name="Orthographe Lexicale (CNDP)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="2586c1ae" sha1="553f05238285e087e6e95382bb7dcb19aa421353" name="Pac-Man (Theophile)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="95918135" sha1="387f222d77f3d66a45ee11d7cada57f7a2213bfe" name="Pac-Man 2 (Remi Coulom) (PD)">
+		<year>1985-98 </year>
+	</hash>
+	<hash crc32="c02bb7aa" sha1="e07c0aa88614fe53925316bb32421fef33f7d1fe" name="Panique Atomique chez Novasprite (Novasoft)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="3ba67057" sha1="67f58b470bb4b17f185dd3e28f23277a68e08437" name="Pascal base v1.0 (Free Game Blot)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="618ba2e3" sha1="10770aebe04a83273280b6783f609daca8c3b7a7" name="Pendu, Le (CNDP)">
+		<year>1982</year>
+	</hash>
+	<hash crc32="c900f763" sha1="67fb019685e5820117ebe917b43a051906e07ea3" name="Phone8 (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="844b3f1d" sha1="e355f3f85679660f6b6a02e173b5905151a9e36e" name="Picture Print (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="f6c260df" sha1="e9058b42403e0bc6f4c97cbf994edecb161f18a5" name="Pilot et Pingo (Infogrames)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="9bacee41" sha1="557d5bf952ae078d50d490aaa63f1f17fa56dd04" name="Pingo (Infogrames)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="4ef0d7cb" sha1="6eadb2d46fdccabf98e38941f50958ecbb7916f9" name="Planete Inconnue, La (Coktel Vision)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="63e2792e" sha1="3046be2a4c886a1b903325d0b23c32a48a8f90c8" name="Planete Inconnue, La (FIL)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="6c6ba04d" sha1="75c400dac1f692c877d396556d16d5dcd903d3e0" name="Pluriel des noms simples (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="088cbdb2" sha1="d89a747bf4a71111688b18fd6b0cb142d015e6f5" name="Plus beau puzzle, Le (Cedic-Nathan)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="94924766" sha1="3b75c478f449a7318bef72bf67f8e5683786ea32" name="Poker">
+		<status>Known Bad Image</status>
+		<year>198x</year>
+	</hash>
+	<hash crc32="26123c55" sha1="5ebdae6fd0c091f00f59aa9ce826262580fb1fb9" name="Politique Economique (Answare)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="b45af8b6" sha1="e6fe08ed0c36b31b2306d982b215daf71c53ee50" name="Pong 7300">
+		<status>Known Bad Image</status>
+		<year>198x</year>
+	</hash>
+	<hash crc32="08032eff" sha1="67e184db55a55108cbd1e93d4a1733ac71ec21ad" name="Popeye (Christopher Lesur) (PD)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="3951bd6a" sha1="8b46025f85cfb0f7c7c5351ccac6d0a69ca13b02" name="Poseidon (Coktel Vision)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="8b3a6857" sha1="c9d9c6dcf3dfb2028ee2083d47faf665231ccb35" name="Poseidon (Italian Version) (Coktel Vision)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="437d2474" sha1="575835a9689e6383cb5267abc325c1d11762d005" name="Pour 20 Millions de Dollars (SoftBook) [a1]">
+		<year>198x</year>
+	</hash>
+	<hash crc32="448d6b10" sha1="282b990e47530b854f7178281964e697bde17184" name="Pour 20 Millions de Dollars (SoftBook)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="bc0a3d98" sha1="5fe303ab20394b74d7e6f9c4ca2866cc45aa0923" name="Pourcentages (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="138a5b01" sha1="e6785d4c8dbbc85c1cd52b158ab7f1872bc37792" name="Pr (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="1dda212e" sha1="393726ed7e81eea01da0b1b417477b6cfb11b71f" name="Premier pas vers le BASIC 1 (Vifi-Nathan)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="96856c10" sha1="08a6844764553044d4bb54637ced9c508ae0a186" name="Premier pas vers le BASIC 2 (Vifi-Nathan)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="53fe3906" sha1="6f02625694258047c45b83410fdd0f4ba252c819" name="Preterit star (Hatier)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="83695f82" sha1="e1cb102f9d6ef2beed189ebeb30aee0c2809b32a" name="Pro23 (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="2c60ec93" sha1="be2ec2b3d8769401dc8649c26fba2667a5fe0138" name="Prologic (FIL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="fee5a8de" sha1="da3bd934c8a0b439372f0d262391416cb38d8d67" name="Protege (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="3e4e2c1d" sha1="d7152c7ff730cf1ceda1cc6f2df2cb5f40f3417c" name="Puissance 4 (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="0ddae936" sha1="1b4551dbca7ddf529d3e9a0543e0363723b3e4bb" name="Pulsar (Loriciels)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="1774d373" sha1="9db362c401b3a61aba6ef82ce3cc4beba7836177" name="Pulsar II (Loriciels)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="4cb17b98" sha1="b9a7cfa354f09308a41b2a6d3c536a79edc58bb4" name="Quadrille (Francoise Monnet)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="085eb80f" sha1="924b82edf68ffb8b7af80038cf1edfc36efc542e" name="Quaero (Hebdogiciel) (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="df3c4de6" sha1="4cd0df8a7f4778f113b1adacb2de70b0f31e51a3" name="Quiliquili by Alain Glees (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="31538754" sha1="c46258d66f78c27ac089990fe4b1ff88b0251d56" name="Ranger des Nombres (Cedic-Nathan)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="e10943d0" sha1="7f6faddd6477584396346e9f664103d978a2323a" name="Recherche dans un Dictionnaire (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="e377ccf6" sha1="45c0295bc65ed4115ab100bed758fbfad0559d54" name="Renegade (Ocean) (Part 1 of 2)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="2dbce623" sha1="7773f1a8cecc1bcd45ba676918e4d82776c469e2" name="Renegade (Ocean) (Part 2 of 2)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="96f8d319" sha1="eacdec7ffc9a5e5b1c58b0ed5aa732cb6220b523" name="Repere (USTL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="fb20f885" sha1="4820e6e58ad11b1166f64fd80a232e8c58fbd11e" name="Resolution de systemes d'equations (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="0c721916" sha1="11519777a25ffc4e1b1b584fb03d78520c860a92" name="Reverse by Daniel Coulom (PD)">
+		<status>Known Bad Image</status>
+		<year>198x</year>
+	</hash>
+	<hash crc32="2eb32be5" sha1="ab8e48321bd3671421a0370c294ff990745dde65" name="Reverse by Daniel Coulom (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="92680468" sha1="f8d3c1143c88c3ad026b810a96790ddc285d53e3" name="Roger &amp; Paulo (Infogrames)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="4a61ff24" sha1="33605d562af8c7c4b182f63b5aba7243246abcf1" name="Runway (FIL) [a1]">
+		<year>1986</year>
+	</hash>
+	<hash crc32="52734da0" sha1="a2705561abbc9678aa539310ff2610cf2ce1a807" name="Runway (FIL)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="0db773af" sha1="e82c6160471af0c244612acfd679dba56eae2147" name="Runway 2 (FIL)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="56bd12e7" sha1="1a95d5207ba82479c00ac6b298e70e5d31f15002" name="Rythmamus (Logimus) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="0d714436" sha1="276e3517ab75aa411972e9a425fdd68fa099f1f0" name="Rythmamus (Logimus)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="503e9836" sha1="755c07a9982ad0e156339c0c41ada50e6b376eb1" name="Sapiens (Loriciels)">
+		<status>Known Bad Image</status>
+		<year>1986</year>
+	</hash>
+	<hash crc32="efd8dbde" sha1="e75c456de67c902ece54ad26fdbd90108d449845" name="Satel (CNDP)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="0d71f1d1" sha1="255603570985b1ab381547f792c11c1751c3a07e" name="Sauts (Francoise Monnet)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="bb5ee50b" sha1="96dfa23fde2c614031b5a089c805c4335d12cc5b" name="Scrontch (Vifi-Nathan)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="b9d459d0" sha1="a29b680cb826abca0546085e5989f8a3bb49aa28" name="Scrutdk7 (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="79c7b651" sha1="be5bd3db928b1d31dfc7e40e5fe1bc8ff5273d08" name="ScrutMO5 (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="86a705d1" sha1="afdf13ed806032066733f1fd8dc711bbd94bef1c" name="Securite Sociale en jeu, La (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="4ce1aa84" sha1="57a0403ebdf79242a15b8187e8037b8e9cafe314" name="Signes dans l'espace, Des (Vifi-Nathan)">
+		<year>1983</year>
+	</hash>
+	<hash crc32="90e03f9d" sha1="dbe21619091c0e3805374be5614104889235140c" name="Slap Fight (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="a36f9750" sha1="f6dc9ebaa7dc77939829c2b65881aa04e4d50e4a" name="Sorcery (Virgin Games)">
+		<status>Known Bad Image</status>
+		<year>1986</year>
+	</hash>
+	<hash crc32="f5b532ca" sha1="1a611074d5a6d37817e3041be8ab5e4ec25a9696" name="Sortileges (Infogrames)">
+		<status>Known Bad Image</status>
+		<year>1986</year>
+	</hash>
+	<hash crc32="82469825" sha1="8e992c79e49db77505eb131c2ffc3ecfa6d60a8d" name="Spix (Infogrames)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="bbb4207a" sha1="d55397200b0e75198d1aa3f5acc9fcec9b498fa2" name="Sport d'ete (Wise Owl Software)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="7fc70fd4" sha1="c3b54781cfa41afd107edcde609eafeeecf6cb07" name="Star War (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="6041c841" sha1="01cf5f9dfd961eb165f9ce2604a04159e3f3159c" name="Stone Zone (SoftBook) [a1]">
+		<year>198x</year>
+	</hash>
+	<hash crc32="49cbdc43" sha1="4f856040b1b51c937a69eaca31caa626e8fb6cdc" name="Stone Zone (SoftBook)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="a192c936" sha1="385a55231c599260d88308189e573f2f1cce3bc5" name="Strip 21 by Patrick Lahbib (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="576d1b89" sha1="cc07f4155b96e4687cd8858b4acc24d4c2d96be5" name="Super Tennis (Answare)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="1ecfb660" sha1="eea25d57840f9cc929d23232645bba6dd7b4c30a" name="T2 (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="149174be" sha1="b347eb90e21eab6818c498e8c52b4e7844c5141a" name="Tape Protection Decode (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="86ad5b9f" sha1="85d99b12995f15a31d75f54cdffb0b84874fc222" name="Taquin+ (To Tek)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="a27dfbfc" sha1="205b8c70b2743782bf171e02c0f386e9d4e14a0d" name="Tarot (DC) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="9d03b185" sha1="e3767a3dc87b3429959cc0c019738923853e2b74" name="Teledomino (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="f784116b" sha1="f13ab98fb792f35e17c1b608a3fd7f4b4eb43aa2" name="Temple de Quauthli, Le (Loriciels) (Part 1 of 2)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="f4232a17" sha1="da1b3b8d03ba0748dbae3ab448b6aa6c27c9541c" name="Temple de Quauthli, Le (Loriciels) (Part 2 of 2)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="84a5b2a8" sha1="f3050f1725f876a6a2429d9c3b3ea736ee49e677" name="Temple de Quauthli, Le (Loriciels)">
+		<status>Known Bad Image</status>
+		<year>1986</year>
+	</hash>
+	<hash crc32="8d1dbaea" sha1="a2cdb6c373af9ad1a2e9bcb9342be13f727ea73b" name="Thermometre (USTL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="ec519f11" sha1="1cbaaf71f113a064fa781606bfa72e386530d4bb" name="Third World War (Free Game Blot)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="a6a025f2" sha1="b0f48a6adb344a0c0848b1ac004968b050e63c04" name="Top Chrono (Loriciels) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="0cc96513" sha1="524d179d3f1bfb66b843851a5efa70e418638e83" name="Top Chrono (Loriciels)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="a951b8c7" sha1="e628e5a4e41419188250a44bce4434e0e2064687" name="Top Gun (FIL)">
+		<year>1987</year>
+	</hash>
+	<hash crc32="d9b72731" sha1="acaf497b5cd8035e5cada8691c8826a3a7aed9da" name="Torann Mission Blue 5 (Loriciels)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="f529bb55" sha1="dbd1ad544245aac8a5f7538751b8e2c89e6e832e" name="Toutankhamon (No Man's Land)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="3567168d" sha1="2717d5e11ec122acfab80528ccc5a5372ca6bed5" name="Toutankhamon (No Man's Land)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="9df3fb90" sha1="ec0adeb40ab4954019a19f6b8a5954fad2263f9d" name="Traitement de Texte (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="95582d2c" sha1="babdf940db6730f11e4e068bcd61086a2322a2fb" name="Tresor du Pirate, Le (Free Game Blot)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="cd8857f0" sha1="f83ea4ca2935decc958155c4c8750e64e8b414c9" name="Triangle Quelconque (PD)">
+		<year>198x</year>
+	</hash>
+	<hash crc32="99decafb" sha1="932b015db5e8ea89d84e413daeb56212abdb0877" name="Tyrann (Norsoft)">
+		<status>Known Bad Image</status>
+		<year>1985</year>
+	</hash>
+	<hash crc32="506f00ce" sha1="ce6860fa57ba45ce951be8b14addd91bcd0d2350" name="Vampire (Infogrames)">
+		<status>Known Bad Image</status>
+		<year>1986</year>
+	</hash>
+	<hash crc32="55d6620a" sha1="1dcea5ff2733c8d609997d07694c6b9bd0e16b64" name="Vampire (Infogrames)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="c4a826c4" sha1="566cdc405a1156c38c411011f24ac12c422ad324" name="Vecteurs (USTL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="41db9a2a" sha1="d253c43264ffb5cfb6aa2d1b34bca0b3559a2baa" name="Vision Tester (Part 1 of 2) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="84b3b882" sha1="f539f6c33dd73f8b7a95afe39d9a7322f2e96073" name="Vision Tester (Part 2 of 2) (PD)">
+		<year>1995</year>
+	</hash>
+	<hash crc32="23a1aaaa" sha1="b955649085090cad2737094479947099cef36dd4" name="Vol Solo (FIL)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="bd51f0d3" sha1="8f6fceba282c66227b165ccb77ea49494f1bfc3e" name="Votez Pour Moi (Coktel Vision)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="5c7b83bc" sha1="205fc87aece3314d3fbb6c4de7c1a339aae7fc75" name="Vox Basic (Ere Informatique) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="5187bf2d" sha1="d548a4604b88cd054de5c96deb226ab78c129b62" name="Vox Basic (Ere Informatique)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="48581305" sha1="fdc786827d5fba4fb2e2965ee59702bb89d92bcd" name="Voyage au Centre du MO5 (Hebdogiciel) (PD) [a1]">
+		<year>1985</year>
+	</hash>
+	<hash crc32="7cbae7aa" sha1="594c9cb18b4b1d86db205acb0711e530bf7fe4b8" name="Voyage au Centre du MO5 (Hebdogiciel) (PD)">
+		<year>1985</year>
+	</hash>
+	<hash crc32="5b6aa9f3" sha1="eb82fbead4806be1049a633394696a9de6bac3c6" name="Wizball (FIL)">
+		<year>1988</year>
+	</hash>
+	<hash crc32="cca6d3d0" sha1="23ca2b6b0d08f21c32d446067fa879e07659bc76" name="Yahtzee (Hebdogiciel) (PD)">
+		<year>1986</year>
+	</hash>
+	<hash crc32="c6f07ee0" sha1="224baa4172769608e541e6df7f6c4ecd57291d4c" name="Yeti (Loriciels) [a1]">
+		<year>1984</year>
+	</hash>
+	<hash crc32="ade55ec3" sha1="d891815d277a4e3273b039c0442df20b0491f567" name="Yeti (Loriciels)">
+		<status>Known Bad Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="c0ae8b53" sha1="af3e9fb519076ad8be7db6b88e8b7451b474d872" name="Yeti (Loriciels)">
+		<year>1984</year>
+	</hash>
+	<hash crc32="7ffb03f5" sha1="145d2366facbc95b8b97a7d68dc490579d84bc32" name="Yie Ar Kung Fu 2 (FIL) [a1]">
+		<year>1986</year>
+	</hash>
+	<hash crc32="574d042c" sha1="64ec01fde551fb3ae9b6a5f47ed1b50c89c46a36" name="Yie Ar Kung Fu 2 (FIL)">
+		<year>1986</year>
+	</hash>
+</hashfile>
