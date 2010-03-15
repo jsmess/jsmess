@@ -624,14 +624,13 @@ INPUT_PORTS_END
 DRIVER_INIT( spectrum )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
 
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
 	{
 	    case 48*1024:
-		memory_install_ram(space, 0x8000, 0xffff, 0, 0, ram); // Fall through
+		memory_install_ram(space, 0x8000, 0xffff, 0, 0, NULL); // Fall through
 	    case 16*1024:
-		memory_install_ram(space, 0x5b00, 0x7fff, 0, 0, ram);
+		memory_install_ram(space, 0x5b00, 0x7fff, 0, 0, NULL);
 	}
 }
 
