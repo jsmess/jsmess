@@ -1,5 +1,5 @@
 <hashfile>
-	<!-- This MESS HASH file was auto-generated from Cowering's GoodMTX database (V3.14)  -->
+	<!-- This MESS HASH file was auto-generated from Cowering's GoodMTX database (V3.1415)  -->
 	<!-- for the exclusive use of MESS.  Keep this notice intact if editing this file  -->
 
 	<hash crc32="505195d0" sha1="442a85fdf098886384c9c2affdeb13b8341f9a94" name="3D Tachyon Fighter (Continental Software) [a1]">
@@ -35,10 +35,6 @@
 	<hash crc32="1d283d9d" sha1="4cf70dcdee1a92022b4506269ff04f23997cdc23" name="Arcazions (Chris Sawyer)">
 		<year>1985</year>
 	</hash>
-	<hash crc32="9d7538c3" sha1="d1882c4ea61a68b1715bd634ded5603e18a99c5f" name="Assembler ROM (Memotech)">
-		<status>GoodMTX Verified Image</status>
-		<year>1984</year>
-	</hash>
 	<hash crc32="2ac48022" sha1="d06624f910b3d9e9bbcd7986e6142f2b4b29a1de" name="Astro-Pac (Continental Software) [a1]">
 		<year>1984</year>
 	</hash>
@@ -62,10 +58,6 @@
 	</hash>
 	<hash crc32="07687290" sha1="dcc0ab54a8130bc2abe667ff11fc93e598ff701d" name="Backgammon (Continental Software)">
 		<year>1983</year>
-	</hash>
-	<hash crc32="87b4e59c" sha1="c49782a82a7f068c1195cd967882ba9edd546eaf" name="BASIC ROM (Memotech)">
-		<status>GoodMTX Verified Image</status>
-		<year>1984</year>
 	</hash>
 	<hash crc32="5a462b8f" sha1="9a6132262121c27021333aab42f67ee180fdb6ee" name="Blobbo (Continental Software) [a1]">
 		<year>1984</year>
@@ -172,11 +164,23 @@
 	<hash crc32="2e21228c" sha1="378c7dcb1fe50d439704fd59148004a64843928b" name="Mission Omega (Chris Sawyer-Syntaxsoft)">
 		<year>1985</year>
 	</hash>
+	<hash crc32="9d7538c3" sha1="d1882c4ea61a68b1715bd634ded5603e18a99c5f" name="MTX Assembler ROM (Memotech)">
+		<status>GoodMTX Verified Image</status>
+		<year>1984</year>
+	</hash>
+	<hash crc32="87b4e59c" sha1="c49782a82a7f068c1195cd967882ba9edd546eaf" name="MTX BASIC ROM (Memotech)">
+		<status>GoodMTX Verified Image</status>
+		<year>1984</year>
+	</hash>
 	<hash crc32="29b3c21c" sha1="ac5543e15cc9dcb5eb22110c8ae2327a7edc94c6" name="MTX Chess (Continental Software) [a1]">
 		<year>1983</year>
 	</hash>
 	<hash crc32="9aaba664" sha1="dc61852063a6351fd02db70511ffb3b1960441d7" name="MTX Chess (Continental Software)">
 		<year>1983</year>
+	</hash>
+	<hash crc32="9ca858cc" sha1="3804503a58f0bcdea96bb6488833782ebd03976d" name="MTX OS ROM (Memotech)">
+		<status>GoodMTX Verified Image</status>
+		<year>1984</year>
 	</hash>
 	<hash crc32="0f148a86" sha1="6b40f9877596565971a8093a086995752366775a" name="Nemo (Continental Software) [a1]">
 		<year>1983</year>
@@ -194,10 +198,6 @@
 		<year>1984</year>
 	</hash>
 	<hash crc32="dd49412d" sha1="931a4e2e80f7eb3da73dc7fee82804ba680c5701" name="Obloids (Continental Software)">
-		<year>1984</year>
-	</hash>
-	<hash crc32="9ca858cc" sha1="3804503a58f0bcdea96bb6488833782ebd03976d" name="OS ROM (Memotech)">
-		<status>GoodMTX Verified Image</status>
 		<year>1984</year>
 	</hash>
 	<hash crc32="e29c2bdb" sha1="0864f4cea6b7c989b7ac10e0d9252821b601f9a5" name="Phaid (Continental Software) [a1]">
