@@ -53,6 +53,7 @@ public:
 	int via4_irq;
 	int via5_irq;
 	int via6_irq;
+	int ssda_irq;
 
 	/* floppy state */
 	victor9k_drive_t floppy[2];			/* drive unit */
