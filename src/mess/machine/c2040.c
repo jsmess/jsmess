@@ -11,7 +11,11 @@
 
     TODO:
 
-    - 2040 DOS 1 FDC rom
+    - 2040 DOS 1 FDC rom (jumps to 104d while getting block header)
+
+		FE70: jsr  $104D
+		104D: m6502_brk#$00
+
     - Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
     - error/activity LEDs
 
@@ -1379,7 +1383,7 @@ ROM_START( c2040 ) // schematic 320806
 	ROM_LOAD( "901468-07.uh1", 0x1000, 0x1000, CRC(9b09ae83) SHA1(6a51c7954938439ca8342fc295bda050c06e1791) )
 
 	/* RIOT DOS 1 */
-	ROM_LOAD( "901466-02.uk3", 0x2000, 0x0400, NO_DUMP )
+	ROM_LOAD( "901466-02.uk3", 0x2000, 0x0400, BAD_DUMP /* parsed in from disassembly */ CRC(e1c86c43) SHA1(d8209c66fde3f2937688ba934ba968678a9d2ebb) )
 
 	/* ROM GCR */
 	ROM_LOAD( "901467.uk6",    0x2400, 0x0800, CRC(a23337eb) SHA1(97df576397608455616331f8e837cb3404363fa2) )
