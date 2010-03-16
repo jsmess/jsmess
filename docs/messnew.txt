@@ -36,7 +36,7 @@ Source Changes:
 - [Thomson MO5] Added Hashes from GoodMO5 V3.1415 [Cowering]
 - [Sega Pico] Updated Hashes to GoodPico V3.1415 [Cowering]
 - [MTX512] Updated Hashes to GoodMTX V3.1415 [Cowering]
-
+- [Nintendo Virtual Boy] Added Hashes from GoodVBoy V3.1415 [Cowering]
 
 0.137
 
