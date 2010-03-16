@@ -23,6 +23,9 @@ public:
 
 	tandy2k_state(running_machine &machine) { }
 
+	/* DMA state */
+	UINT8 dma_mux;
+
 	/* keyboard state */
 	int kben;
 	UINT16 keylatch;

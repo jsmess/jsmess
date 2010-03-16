@@ -127,6 +127,27 @@ static WRITE8_HANDLER( dma_mux_w )
 		7		DMA channel 3 select
 
 	*/
+
+	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+
+	state->dma_mux = data;
+
+	/* check for DMA error */
+	int drq0 = 0;
+	int drq1 = 0;
+
+	for (int ch = 0; ch < 4; ch++)
+	{
+		if (BIT(data, ch)) { if (BIT(data, ch + 4)) drq1++; else drq0++; }
+	}
+
+	int dme = (drq0 > 2) || (drq1 > 2);
+	pic8259_ir6_w(state->pic1, dme);
+}
+
+static void dma_request(running_machine *machine, int line, int state)
+{
+
 }
 
 static READ8_DEVICE_HANDLER( fldtc_r )
@@ -714,6 +735,7 @@ static const floppy_config tandy2k_floppy_config =
 
 static UPD765_DMA_REQUEST( busdmarq0_w )
 {
+	dma_request(device->machine, 0, state);
 }
 
 static const struct upd765_interface i8272_intf =
