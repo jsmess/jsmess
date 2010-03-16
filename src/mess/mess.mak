@@ -273,7 +273,6 @@ DRVLIBS = \
 	$(MESSOBJ)/capcom.a \
 	$(MESSOBJ)/casio.a \
 	$(MESSOBJ)/cbm.a \
-	$(MESSOBJ)/cbmshare.a \
 	$(MESSOBJ)/cccp.a \
 	$(MESSOBJ)/cce.a \
 	$(MESSOBJ)/coleco.a \
@@ -724,8 +723,6 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_FORMATS)/g64_dsk.o	\
 	$(MESS_FORMATS)/d81_dsk.o	\
 	$(MESS_DRIVERS)/clcd.o		\
-
-$(MESSOBJ)/cbmshare.a:			\
 	$(MESS_FORMATS)/cbm_tap.o	\
 	$(MESS_MACHINE)/6525tpi.o	\
 	$(MESS_MACHINE)/cbm.o		\
@@ -733,6 +730,7 @@ $(MESSOBJ)/cbmshare.a:			\
 	$(MESS_MACHINE)/c64.o   	\
 	$(MESS_MACHINE)/c65.o		\
 	$(MESS_MACHINE)/c128.o		\
+	$(MESS_MACHINE)/64h156.o	\
 	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_VIDEO)/vic6567.o		\
 	$(MESS_VIDEO)/vic4567.o		\
