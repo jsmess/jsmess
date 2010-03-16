@@ -3,7 +3,7 @@
 ******************************************************************************/
 
 #include "emu.h"
-#include "machine/6530miot.h"
+#include "machine/mos6530.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
 #include "mk2.lh"
@@ -44,7 +44,7 @@ MOS MPS 6332 005 2179
 static ADDRESS_MAP_START(mk2_mem , ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0x1FFF) // m6504
 	AM_RANGE( 0x0000, 0x01ff) AM_RAM // 2 2111, should be mirrored
-	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE("miot", miot6530_r, miot6530_w)
+	AM_RANGE( 0x0b00, 0x0b0f) AM_DEVREADWRITE("miot", mos6530_r, mos6530_w)
 	AM_RANGE( 0x0b80, 0x0bbf) AM_RAM // rriot ram
 	AM_RANGE( 0x0c00, 0x0fff) AM_ROM // rriot rom
 	AM_RANGE( 0x1000, 0x1fff) AM_ROM
@@ -96,13 +96,12 @@ static MACHINE_START( mk2 )
 	timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, update_leds);
 }
 
-
-static UINT8 mk2_read_a(running_device *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER( mk2_read_a )
 {
 	int data=0xff;
 	int help=input_port_read(device->machine, "BLACK")|input_port_read(device->machine, "WHITE"); // looks like white and black keys are the same!
 
-	switch (miot6530_portb_out_get(device)&0x7) {
+	switch (mos6530_portb_out_get(device)&0x7) {
 	case 4:
 		if (help&0x20) data&=~0x1; //F
 		if (help&0x10) data&=~0x2; //E
@@ -129,42 +128,40 @@ static UINT8 mk2_read_a(running_device *device, UINT8 olddata)
 	return data;
 }
 
-
-static void mk2_write_a(running_device *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( mk2_write_a )
 {
-	int temp = miot6530_portb_out_get(device);
+	int temp = mos6530_portb_out_get(device);
 
 	switch(temp&0x3) {
 	case 0: case 1: case 2: case 3:
-		mk2_led[temp&3]|=newdata;
+		mk2_led[temp&3]|=data;
 	}
 }
 
 
-static UINT8 mk2_read_b(running_device *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER( mk2_read_b )
 {
 	return 0xff&~0x40; // chip select mapped to pb6
 }
 
 
-static void mk2_write_b(running_device *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( mk2_write_b )
 {
 	running_device *dac_device = devtag_get_device(device->machine, "dac");
 
-	if ((newdata&0x06)==0x06)
-		dac_data_w(dac_device,newdata&1?80:0);
-	mk2_led[4]|=newdata;
+	if ((data&0x06)==0x06)
+		dac_data_w(dac_device,data&1?80:0);
+	mk2_led[4]|=data;
 
-	cputag_set_input_line( device->machine, "maincpu", M6502_IRQ_LINE, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE );
+	cputag_set_input_line( device->machine, "maincpu", M6502_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE );
 }
 
-
-static const miot6530_interface mk2_miot6530_interface =
+static MOS6530_INTERFACE( mk2_mos6530_interface )
 {
-	mk2_read_a,
-	mk2_read_b,
-	mk2_write_a,
-	mk2_write_b
+	DEVCB_HANDLER(mk2_read_a),
+	DEVCB_HANDLER(mk2_write_a),
+	DEVCB_HANDLER(mk2_read_b),
+	DEVCB_HANDLER(mk2_write_b)
 };
 
 
@@ -179,7 +176,7 @@ static MACHINE_DRIVER_START( mk2 )
     /* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_mk2)
 
-	MDRV_MIOT6530_ADD( "miot", 1000000, mk2_miot6530_interface )
+	MDRV_MOS6530_ADD( "miot", 1000000, mk2_mos6530_interface )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

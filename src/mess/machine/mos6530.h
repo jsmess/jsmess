@@ -30,11 +30,8 @@
 
 **********************************************************************/
 
-#ifndef __MOS6530__
-#define __MOS6530__
-
-#include "emu.h"
-#include "devcb.h"
+#ifndef __MIOT6530_H__
+#define __MIOT6530_H__
 
 /***************************************************************************
     MACROS / CONSTANTS
@@ -56,8 +53,6 @@
 typedef struct _mos6530_interface mos6530_interface;
 struct _mos6530_interface
 {
-	devcb_write_line		out_irq_func;
-
 	devcb_read8				in_pa_func;
 	devcb_write8			out_pa_func;
 
@@ -69,18 +64,18 @@ struct _mos6530_interface
     PROTOTYPES
 ***************************************************************************/
 
-/* device interface */
 DEVICE_GET_INFO( mos6530 );
 
-/* register access */
 READ8_DEVICE_HANDLER( mos6530_r );
 WRITE8_DEVICE_HANDLER( mos6530_w );
 
-/* memory access */
-/*
-READ8_DEVICE_HANDLER( mos6530_ram_r );
-WRITE8_DEVICE_HANDLER( mos6530_ram_w );
+void mos6530_porta_in_set(running_device *device, UINT8 data, UINT8 mask);
+void mos6530_portb_in_set(running_device *device, UINT8 data, UINT8 mask);
 
-READ8_DEVICE_HANDLER( mos6530_rom_r );
-*/
+UINT8 mos6530_porta_in_get(running_device *device);
+UINT8 mos6530_portb_in_get(running_device *device);
+
+UINT8 mos6530_porta_out_get(running_device *device);
+UINT8 mos6530_portb_out_get(running_device *device);
+
 #endif

@@ -435,7 +435,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/pc_dsk.o	\
 	$(MESS_FORMATS)/rk_cas.o	\
 	$(MESS_FORMATS)/wavfile.o	\
-	$(MESS_MACHINE)/6530miot.o	\
 	$(MESS_MACHINE)/6551.o		\
 	$(MESS_MACHINE)/68901mfp.o	\
 	$(MESS_MACHINE)/74145.o		\

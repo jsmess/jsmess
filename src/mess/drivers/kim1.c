@@ -82,7 +82,7 @@ change from 1 to 0.
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/dac.h"
-#include "machine/6530miot.h"
+#include "machine/mos6530.h"
 #include "devices/cassette.h"
 #include "formats/kim1_cas.h"
 #include "kim1.lh"
@@ -96,8 +96,8 @@ static UINT8		kim1_led_time[6];
 
 static ADDRESS_MAP_START ( kim1_map , ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0xe000) AM_RAM
-	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u3", miot6530_r, miot6530_w )
-	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u2", miot6530_r, miot6530_w )
+	AM_RANGE(0x1700, 0x173f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u3", mos6530_r, mos6530_w )
+	AM_RANGE(0x1740, 0x177f) AM_MIRROR(0xe000) AM_DEVREADWRITE("miot_u2", mos6530_r, mos6530_w )
 	AM_RANGE(0x1780, 0x17bf) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x17c0, 0x17ff) AM_MIRROR(0xe000) AM_RAM
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0xe000) AM_ROM
@@ -157,7 +157,7 @@ static INPUT_PORTS_START( kim1 )
 INPUT_PORTS_END
 
 
-static UINT8 kim1_u2_read_a(running_device *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER( kim1_u2_read_a )
 {
 	UINT8	data = 0xff;
 
@@ -177,81 +177,57 @@ static UINT8 kim1_u2_read_a(running_device *device, UINT8 olddata)
 }
 
 
-static void kim1_u2_write_a(running_device *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( kim1_u2_write_a )
 {
 	UINT8 idx = ( kim1_u2_port_b >> 1 ) & 0x0f;
 
 	if ( idx >= 4 && idx < 10 )
 	{
-		if ( newdata & 0x80 )
+		if ( data & 0x80 )
 		{
-			output_set_digit_value( idx-4, newdata & 0x7f );
+			output_set_digit_value( idx-4, data & 0x7f );
 			kim1_led_time[idx - 4] = 15;
 		}
 	}
 }
 
-
-static UINT8 kim1_u2_read_b(running_device *device, UINT8 olddata)
+static READ8_DEVICE_HANDLER( kim1_u2_read_b )
 {
-	if ( miot6530_portb_out_get(device) & 0x20 )
+	if ( mos6530_portb_out_get(device) & 0x20 )
 		return 0xFF;
 
 	return 0x7F | ( kim1_311_output ^ 0x80 );
 }
 
 
-static void kim1_u2_write_b(running_device *device, UINT8 newdata, UINT8 olddata)
+static WRITE8_DEVICE_HANDLER( kim1_u2_write_b )
 {
-	kim1_u2_port_b = newdata;
+	kim1_u2_port_b = data;
 
-	if ( newdata & 0x20 )
+	if ( data & 0x20 )
 	{
 		/* cassette write/speaker update */
-		cassette_output( devtag_get_device(device->machine, "cassette"), ( newdata & 0x80 ) ? -1.0 : 1.0 );
+		cassette_output( devtag_get_device(device->machine, "cassette"), ( data & 0x80 ) ? -1.0 : 1.0 );
 	}
 
 	/* Set IRQ when bit 7 is cleared */
 }
 
 
-static const miot6530_interface kim1_u2_miot6530_interface =
+static MOS6530_INTERFACE( kim1_u2_mos6530_interface )
 {
-	kim1_u2_read_a,
-	kim1_u2_read_b,
-	kim1_u2_write_a,
-	kim1_u2_write_b
+	DEVCB_HANDLER(kim1_u2_read_a),
+	DEVCB_HANDLER(kim1_u2_write_a),
+	DEVCB_HANDLER(kim1_u2_read_b),
+	DEVCB_HANDLER(kim1_u2_write_b)
 };
 
-
-static UINT8 kim1_u3_read_a(running_device *device, UINT8 olddata)
+static MOS6530_INTERFACE( kim1_u3_mos6530_interface )
 {
-	return 0xFF;
-}
-
-
-static void kim1_u3_write_a(running_device *device, UINT8 newdata, UINT8 olddata)
-{
-}
-
-
-static UINT8 kim1_u3_read_b(running_device *device, UINT8 olddata)
-{
-	return 0xFF;
-}
-
-
-static void kim1_u3_write_b(running_device *device, UINT8 newdata, UINT8 olddata)
-{
-}
-
-
-static const miot6530_interface kim1_u3_miot6530_interface =
-{
-	kim1_u3_read_a,
-	kim1_u3_read_b,
-	kim1_u3_write_a,
-	kim1_u3_write_b
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 
@@ -331,8 +307,8 @@ static MACHINE_DRIVER_START( kim1 )
 	MDRV_MACHINE_START( kim1 )
 	MDRV_MACHINE_RESET( kim1 )
 
-	MDRV_MIOT6530_ADD( "miot_u2", 1000000, kim1_u2_miot6530_interface )
-	MDRV_MIOT6530_ADD( "miot_u3", 1000000, kim1_u3_miot6530_interface )
+	MDRV_MOS6530_ADD( "miot_u2", 1000000, kim1_u2_mos6530_interface )
+	MDRV_MOS6530_ADD( "miot_u3", 1000000, kim1_u3_mos6530_interface )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
