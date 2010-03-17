@@ -373,9 +373,15 @@ ROM_START( hobby )
   ROM_LOAD( "hobby.rom", 0x10000, 0x4000, CRC(a25b4b2c) SHA1(0d86e6e4be8d1aa389bfa9dd79e3604a356729f7))
 ROM_END
 
+ROM_START( pk8002 )
+  ROM_REGION( 0x18000, "maincpu", ROMREGION_ERASEFF )
+  ROM_LOAD( "pk8002.rom", 0x10000, 0x4000, CRC(07b9ae71) SHA1(2137a41cc095c7aba58b7b109fce63f30a4568b2))
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
 COMP( 1987, vesta,  0,       0, 	pk8000, 	pk8000, 	 0,   "BP EVM",   "PK8000 Vesta",		0)
 COMP( 1987, hobby,  vesta,   0, 	pk8000, 	pk8000, 	 0,   "BP EVM",   "PK8000 Sura/Hobby",	0)
+COMP( 1987, pk8002, vesta,   0, 	pk8000, 	pk8000, 	 0,   "",   "PK8002 Elf",	GAME_NOT_WORKING)
 
