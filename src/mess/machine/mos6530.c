@@ -82,7 +82,7 @@ INLINE mos6530_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert(device->type == MIOT6530);
+	assert(device->type == MOS6530);
 	return (mos6530_state *)device->token;
 }
 
