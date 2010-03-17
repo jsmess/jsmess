@@ -1105,7 +1105,7 @@ $(MESSOBJ)/nintendo.a:			\
 	$(MESS_FORMATS)/nes_dsk.o	\
 	$(MESS_MACHINE)/nes.o		\
 	$(MESS_DRIVERS)/nes.o		\
-	$(MAME_AUDIO)/snes.o		\
+	$(MAME_AUDIO)/snes_snd.o		\
 	$(MAME_MACHINE)/snes.o		\
 	$(MAME_VIDEO)/snes.o		\
 	$(MESS_MACHINE)/snescart.o	\

@@ -27,7 +27,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/generic.h"
+#include "audio/snes_snd.h"
 #include "cpu/spc700/spc700.h"
 #include "cpu/superfx/superfx.h"
 #include "cpu/g65816/g65816.h"
@@ -43,14 +43,14 @@
  *
  *************************************/
 
-static READ8_HANDLER( spc_ram_100_r )
+static READ8_DEVICE_HANDLER( spc_ram_100_r )
 {
-	return spc_ram_r(space, offset + 0x100);
+	return spc_ram_r(device, offset + 0x100);
 }
 
-static WRITE8_HANDLER( spc_ram_100_w )
+static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 {
-	spc_ram_w(space, offset + 0x100, data);
+	spc_ram_w(device, offset + 0x100, data);
 }
 
 /*************************************
@@ -80,11 +80,11 @@ static ADDRESS_MAP_START( superfx_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spc_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x00ef) AM_READWRITE(spc_ram_r, spc_ram_w) AM_BASE(&spc_ram)   	/* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE(spc_io_r, spc_io_w)   	/* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_WRITE(spc_ram_100_w)
-	AM_RANGE(0x0100, 0xffbf) AM_READ(spc_ram_100_r)
-	AM_RANGE(0xffc0, 0xffff) AM_READ(spc_ipl_r)
+	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)   	/* lower 32k ram */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)   	/* spc io */
+	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE("spc700", spc_ram_100_w)
+	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD("spc700", spc_ram_100_r)
+	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD("spc700", spc_ipl_r)
 ADDRESS_MAP_END
 
 
@@ -697,7 +697,7 @@ static MACHINE_DRIVER_START( snes )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("custom", SNES, 0)
+	MDRV_SOUND_ADD("spc700", SNES, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 

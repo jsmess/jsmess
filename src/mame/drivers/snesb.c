@@ -140,6 +140,7 @@ Iron PCB (same as Final Fight 2?)
 #include "cpu/spc700/spc700.h"
 #include "cpu/g65816/g65816.h"
 #include "includes/snes.h"
+#include "audio/snes_snd.h"
 
 static INT8 *shared_ram;
 static UINT8 ffight2b_coins;
@@ -271,22 +272,22 @@ static ADDRESS_MAP_START( snesb_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( spc_ram_100_r )
+static READ8_DEVICE_HANDLER( spc_ram_100_r )
 {
-	return spc_ram_r(space, offset + 0x100);
+	return spc_ram_r(device, offset + 0x100);
 }
 
-static WRITE8_HANDLER( spc_ram_100_w )
+static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 {
-	spc_ram_w(space, offset + 0x100, data);
+	spc_ram_w(device, offset + 0x100, data);
 }
 
 static ADDRESS_MAP_START( spc_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ef) AM_READWRITE(spc_ram_r, spc_ram_w) AM_BASE(&spc_ram)   	/* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_READWRITE(spc_io_r, spc_io_w)   	/* spc io */
-	AM_RANGE(0x0100, 0xffff) AM_WRITE(spc_ram_100_w)
-	AM_RANGE(0x0100, 0xffbf) AM_READ(spc_ram_100_r)
-	AM_RANGE(0xffc0, 0xffff) AM_READ(spc_ipl_r)
+	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)   	/* lower 32k ram */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)   	/* spc io */
+	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE("spc700", spc_ram_100_w)
+	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD("spc700", spc_ram_100_r)
+	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD("spc700", spc_ipl_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( snes_common )
@@ -331,37 +332,41 @@ static INPUT_PORTS_START( snes_common )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 #ifdef SNES_LAYER_DEBUG
-	PORT_START("INTERNAL")		/* IN 8 : Internal switches */
-	PORT_CONFNAME( 0x1, 0x1, "Enforce 32 sprites/line" )
-	PORT_CONFSETTING(   0x0, DEF_STR( No )  )
-	PORT_CONFSETTING(   0x1, DEF_STR( Yes ) )
+	PORT_START("DEBUG1")
+	PORT_CONFNAME( 0x70, 0x00, "Select OAM" )
+	PORT_CONFSETTING(   0x00, "All" )
+	PORT_CONFSETTING(   0x10, "OAM1 only" )
+	PORT_CONFSETTING(   0x20, "OAM2 only" )
+	PORT_CONFSETTING(   0x30, "OAM3 only" )
+	PORT_CONFSETTING(   0x40, "OAM4 only" )
+	PORT_CONFNAME( 0x80, 0x00, "Draw sprite in reverse order" )
+	PORT_CONFSETTING(   0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(   0x80, DEF_STR( On ) )
 
-	PORT_START("DEBUG1")	/* IN 9 : debug switches */
-	PORT_CONFNAME( 0x3, 0x0, "Browse tiles" )
-	PORT_CONFSETTING(   0x0, DEF_STR( Off ) )
-	PORT_CONFSETTING(   0x1, "2bpl"  )
-	PORT_CONFSETTING(   0x2, "4bpl"  )
-	PORT_CONFSETTING(   0x3, "8bpl"  )
-	PORT_CONFNAME( 0xc, 0x0, "Browse maps" )
-	PORT_CONFSETTING(   0x0, DEF_STR( Off ) )
-	PORT_CONFSETTING(   0x4, "2bpl"  )
-	PORT_CONFSETTING(   0x8, "4bpl"  )
-	PORT_CONFSETTING(   0xc, "8bpl"  )
+	PORT_START("DEBUG2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle BG 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle BG 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle BG 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle BG 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Objects") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Main/Sub") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Back col") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Windows") PORT_CODE(KEYCODE_8_PAD)
 
-	PORT_START("DEBUG2")	/* IN 10 : debug switches */
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Toggle BG 1") PORT_PLAYER(2)
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Toggle BG 2") PORT_PLAYER(2)
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Toggle BG 3") PORT_PLAYER(2)
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Toggle BG 4") PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Toggle Objects") PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Toggle Main/Sub") PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Toggle Back col") PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Toggle Windows") PORT_PLAYER(3)
+	PORT_START("DEBUG3")
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Pal prev") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Pal next") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Transparency") PORT_CODE(KEYCODE_9_PAD)
 
-	PORT_START("DEBUG3")	/* IN 11 : debug input */
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Pal prev")
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("Pal next")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Toggle Transparency") PORT_PLAYER(4)
+	PORT_START("DEBUG4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 0 draw")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 1 draw")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 2 draw")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 3 draw")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 4 draw")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 5 draw")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 6 draw")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 7 draw")
 #endif
 INPUT_PORTS_END
 
@@ -506,8 +511,7 @@ static MACHINE_DRIVER_START( kinstb )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MDRV_SOUND_ADD("snes", SNES, 0)
+	MDRV_SOUND_ADD("spc700", SNES, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 MACHINE_DRIVER_END
@@ -815,9 +819,9 @@ ROM_START( denseib )
 ROM_END
 
 
-GAME( 199?, kinstb,       0,     kinstb,	     kinstb,    kinstb,		ROT0, "bootleg",	"Killer Instinct (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, ffight2b,     0,     kinstb,	     ffight2b,  ffight2b,	ROT0, "bootleg",	"Final Fight 2 (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sblast2b,     0,     kinstb,	     sblast2b,  sblast2b,	ROT0, "bootleg",	"Sonic Blast Man 2 Special Turbo (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
-GAME( 1996, iron,         0,     kinstb,	     iron,      iron,		ROT0, "bootleg",	"Iron (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, denseib,      0,     kinstb,	     denseib,   denseib,	ROT0, "bootleg",	"Ghost Chaser Densei (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, endless,      0,     kinstb,	     iron,      endless,    ROT0, "bootleg",	"Gundam Wing: Endless Duel (SNES bootleg)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 199?, kinstb,       0,     kinstb,	     kinstb,    kinstb,       ROT0, "bootleg",  "Killer Instinct (SNES bootleg)",                 GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, ffight2b,     0,     kinstb,	     ffight2b,  ffight2b,     ROT0, "bootleg",  "Final Fight 2 (SNES bootleg)",                   GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sblast2b,     0,     kinstb,	     sblast2b,  sblast2b,     ROT0, "bootleg",  "Sonic Blast Man 2 Special Turbo (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS)
+GAME( 1996, iron,         0,     kinstb,	     iron,      iron,         ROT0, "bootleg",  "Iron (SNES bootleg)",                            GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, denseib,      0,     kinstb,	     denseib,   denseib,      ROT0, "bootleg",  "Ghost Chaser Densei (SNES bootleg)",             GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, endless,      0,     kinstb,	     iron,      endless,      ROT0, "bootleg",  "Gundam Wing: Endless Duel (SNES bootleg)",       GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
