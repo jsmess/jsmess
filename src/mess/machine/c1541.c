@@ -302,6 +302,17 @@ static void read_current_track(c1541_t *c1541)
 }
 
 /*-------------------------------------------------
+    on_disk_change - disk change handler
+-------------------------------------------------*/
+
+static void on_disk_change(running_device *image)
+{
+	c1541_t *c1541 = get_safe_token(image->owner);
+
+	read_current_track(c1541);
+}
+
+/*-------------------------------------------------
     spindle_motor - spindle motor control
 -------------------------------------------------*/
 
@@ -1138,6 +1149,10 @@ static DEVICE_START( c1541 )
 	c1541->via1 = device->subdevice(M6522_1_TAG);
 	c1541->bus = devtag_get_device(device->machine, config->bus_tag);
 	c1541->image = device->subdevice(FLOPPY_0);
+
+	/* install image callbacks */
+	floppy_install_unload_proc(c1541->image, on_disk_change);
+	floppy_install_load_proc(c1541->image, on_disk_change);
 
 	/* allocate track buffer */
 //  c1541->track_buffer = auto_alloc_array(device->machine, UINT8, G64_BUFFER_SIZE);

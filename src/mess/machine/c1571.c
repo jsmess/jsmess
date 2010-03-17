@@ -221,6 +221,17 @@ static void read_current_track(c1571_t *c1571)
 }
 
 /*-------------------------------------------------
+    on_disk_change - disk change handler
+-------------------------------------------------*/
+
+static void on_disk_change(running_device *image)
+{
+	c1571_t *c1571 = get_safe_token(image->owner);
+
+	read_current_track(c1571);
+}
+
+/*-------------------------------------------------
     set_side - set disk side
 -------------------------------------------------*/
 
@@ -944,6 +955,10 @@ static DEVICE_START( c1571 )
 	c1571->wd1770 = device->subdevice(WD1770_TAG);
 	c1571->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
 	c1571->image = device->subdevice(FLOPPY_0);
+
+	/* install image callbacks */
+	floppy_install_unload_proc(c1571->image, on_disk_change);
+	floppy_install_load_proc(c1571->image, on_disk_change);
 
 	/* allocate data timer */
 	c1571->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);

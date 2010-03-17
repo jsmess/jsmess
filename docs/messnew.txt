@@ -20,7 +20,12 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-(none)
+
+- [MTX] Cleaned up driver and added cassette device. [Curt Coder]
+
+- [TANDY2K] Implemented DMA mux register. [Curt Coder]
+
+- [VICTOR9K] Connected MC6852 device. [Curt Coder]
 
 
 
@@ -32,11 +37,30 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
+
 - [AMSTRAD CPC Family] Updated Hashes to GoodCPC V3.1415 [Cowering]
+
 - [Thomson MO5] Added Hashes from GoodMO5 V3.1415 [Cowering]
+
 - [Sega Pico] Updated Hashes to GoodPico V3.1415 [Cowering]
+
 - [MTX512] Updated Hashes to GoodMTX V3.1415 [Cowering]
+
 - [Nintendo Virtual Boy] Added Hashes from GoodVBoy V3.1415 [Cowering]
+
+- Added preliminary emulation of the MC6852 SSDA. [Curt Coder]
+
+- Added preliminary emulation of the 64H156 gate array device
+  (used in C1541 et al). [Curt Coder]
+
+- Added disk change handlers to the Commodore 1541 and 2040 family
+  disk drives. "Edge of Disgrace" demo now loads on C64. [Curt Coder]
+  
+- [C2040] Added DOS 1 FDC ROM (parsed from disassembly). [Curt Coder]
+  
+- Refactored the MOS6530 device to use devcb. [Curt Coder]
+
+
 
 0.137
 

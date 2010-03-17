@@ -289,6 +289,28 @@ static void read_current_track(c2040_t *c2040, int unit)
 }
 
 /*-------------------------------------------------
+    on_disk_0_change - disk 0 change handler
+-------------------------------------------------*/
+
+static void on_disk_0_change(running_device *image)
+{
+	c2040_t *c2040 = get_safe_token(image->owner);
+
+	read_current_track(c2040, 0);
+}
+
+/*-------------------------------------------------
+    on_disk_1_change - disk 1 change handler
+-------------------------------------------------*/
+
+static void on_disk_1_change(running_device *image)
+{
+	c2040_t *c2040 = get_safe_token(image->owner);
+
+	read_current_track(c2040, 1);
+}
+
+/*-------------------------------------------------
     spindle_motor - spindle motor control
 -------------------------------------------------*/
 
@@ -1494,6 +1516,12 @@ static DEVICE_START( c2040 )
 	c2040->bus = devtag_get_device(device->machine, config->bus_tag);
 	c2040->unit[0].image = device->subdevice(FLOPPY_0);
 	c2040->unit[1].image = device->subdevice(FLOPPY_1);
+
+	/* install image callbacks */
+	floppy_install_unload_proc(c2040->unit[0].image, on_disk_0_change);
+	floppy_install_load_proc(c2040->unit[0].image, on_disk_0_change);
+	floppy_install_unload_proc(c2040->unit[1].image, on_disk_1_change);
+	floppy_install_load_proc(c2040->unit[1].image, on_disk_1_change);
 
 	/* find GCR ROM */
 	const region_info *region = device->subregion(C4040_REGION);
