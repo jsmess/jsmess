@@ -4,32 +4,64 @@
 
 *************************************************************************/
 
-#ifndef __MTX_H__
-#define __MTX_H__
+#ifndef __MTX__
+#define __MTX__
 
 #include "devices/snapquik.h"
 
+#define Z80_TAG			"z80"
+#define Z80CTC_TAG		"z80ctc"
+#define Z80DART_TAG		"z80dart"
+#define FD1793_TAG		"fd1793" // SDX
+#define FD1791_TAG		"fd1791" // FDX
+#define SN76489A_TAG	"sn76489a"
+#define MC6845_TAG		"mc6845"
+#define SCREEN_TAG		"screen"
+#define CASSETTE_TAG	"cassette"
+#define CENTRONICS_TAG	"centronics"
 
-#define MTX_SYSTEM_CLOCK   XTAL_4MHz
+class mtx_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mtx_state(machine)); }
 
+	mtx_state(running_machine &machine) { }
 
-/*----------- defined in drivers/mtx.c -----------*/
+	/* keyboard state */
+	UINT8 key_sense;
 
-extern UINT8 *mtx_ram;
+	/* video state */
+	UINT8 *video_ram;
+	UINT8 *attr_ram;
 
+	/* sound state */
+	UINT8 sound_latch;
+
+	/* devices */
+	running_device *z80ctc;
+	running_device *z80dart;
+	running_device *cassette;
+	running_device *centronics;
+
+	/* timers */
+	running_device *cassette_timer;
+};
 
 /*----------- defined in machine/mtx.c -----------*/
 
-DRIVER_INIT( mtx512 );
-DRIVER_INIT( rs128 );
+MACHINE_START( mtx512 );
+MACHINE_RESET( mtx512 );
 INTERRUPT_GEN( mtx_interrupt );
 SNAPSHOT_LOAD( mtx );
 
 WRITE8_HANDLER( mtx_bankswitch_w );
 
+/* Sound */
+READ8_DEVICE_HANDLER( mtx_sound_strobe_r );
+WRITE8_HANDLER( mtx_sound_latch_w );
+
 /* Cassette */
-READ8_HANDLER( mtx_cst_r );
-WRITE8_HANDLER( mtx_cst_w );
+WRITE8_DEVICE_HANDLER( mtx_cst_w );
 
 /* Printer */
 READ8_DEVICE_HANDLER( mtx_strobe_r );
@@ -40,5 +72,11 @@ WRITE8_HANDLER( mtx_sense_w );
 READ8_HANDLER( mtx_key_lo_r );
 READ8_HANDLER( mtx_key_hi_r );
 
+/* HRX */
+WRITE8_HANDLER( hrx_address_w );
+READ8_HANDLER( hrx_data_r );
+WRITE8_HANDLER( hrx_data_w );
+READ8_HANDLER( hrx_attr_r );
+WRITE8_HANDLER( hrx_attr_w );
 
 #endif /* __MTX_H__ */

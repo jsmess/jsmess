@@ -6,112 +6,25 @@
 
 **************************************************************************/
 
-
 #include "emu.h"
-#include "utils.h"
 #include "includes/mtx.h"
 #include "cpu/z80/z80.h"
+#include "devices/cassette.h"
+#include "devices/messram.h"
+#include "devices/snapquik.h"
+#include "machine/ctronics.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
 #include "video/tms9928a.h"
-#include "machine/ctronics.h"
-#include "devices/snapquik.h"
-#include "devices/messram.h"
+#include "sound/sn76496.h"
 
+/***************************************************************************
+    READ/WRITE HANDLERS
+***************************************************************************/
 
-/*************************************
- *
- *  Global variables
- *
- *************************************/
-
-static UINT8 key_sense;
-
-
-
-/*************************************
- *
- *  TMS9929A video chip
- *
- *************************************/
-
-static void mtx_tms9929a_interrupt(running_machine *machine, int data)
-{
-	z80ctc_trg0_w(devtag_get_device(machine, "z80ctc"), data ? 0 : 1);
-}
-
-static const TMS9928a_interface tms9928a_interface =
-{
-	TMS9929A,
-	0x4000,
-	0, 0,
-	mtx_tms9929a_interrupt
-};
-
-INTERRUPT_GEN( mtx_interrupt )
-{
-	TMS9928A_interrupt(device->machine);
-}
-
-
-
-/*************************************
- *
- *  Snapshots
- *
- *************************************/
-
-SNAPSHOT_LOAD( mtx )
-{
-	UINT8 header[18];
-	UINT16 sys_addr;
-
-	/* get the header */
-	image_fread(image, &header, sizeof(header));
-
-	if (header[0] == 0xff)
-	{
-		/* long header */
-		sys_addr = pick_integer_le(header, 16, 2);
-		image_fread(image, mtx_ram + (sys_addr - 0xc000), 599);
-		image_fread(image, mtx_ram, snapshot_size - 599 - 18);
-	}
-	else
-	{
-		/* short header */
-		sys_addr = pick_integer_le(header, 0, 2);
-		image_fseek(image, 4, SEEK_SET);
-		image_fread(image, mtx_ram + (sys_addr - 0xc000), 599);
-		image_fread(image, mtx_ram, snapshot_size - 599 - 4);
-	}
-
-	return INIT_PASS;
-}
-
-
-
-/*************************************
- *
- *  Cassette
- *
- *************************************/
-
-READ8_HANDLER( mtx_cst_r )
-{
-	return 0xff;
-}
-
-WRITE8_HANDLER( mtx_cst_w )
-{
-}
-
-
-
-/*************************************
- *
- *  Printer
- *
- *************************************/
+/*-------------------------------------------------
+    mtx_strobe_r - centronics strobe
+-------------------------------------------------*/
 
 READ8_DEVICE_HANDLER( mtx_strobe_r )
 {
@@ -121,76 +34,9 @@ READ8_DEVICE_HANDLER( mtx_strobe_r )
 	return 0xff;
 }
 
-
-READ8_DEVICE_HANDLER( mtx_prt_r )
-{
-	UINT8 result = 0;
-
-	/* reset STROBE to high */
-	centronics_strobe_w(device, TRUE);
-
-	/* fill in centronics printer status */
-	result |= centronics_busy_r(device) << 0;
-	result |= centronics_fault_r(device) << 1;
-	result |= !centronics_pe_r(device) << 2;
-	result |= centronics_vcc_r(device) << 3;
-
-	return result;
-}
-
-
-
-
-/*************************************
- *
- *  Keyboard
- *
- *************************************/
-
-WRITE8_HANDLER( mtx_sense_w )
-{
-	key_sense = data;
-}
-
-READ8_HANDLER( mtx_key_lo_r )
-{
-	UINT8 data = 0xff;
-
-	if (!(key_sense & 0x01)) data &= input_port_read(space->machine, "keyboard_low_0");
-	if (!(key_sense & 0x02)) data &= input_port_read(space->machine, "keyboard_low_1");
-	if (!(key_sense & 0x04)) data &= input_port_read(space->machine, "keyboard_low_2");
-	if (!(key_sense & 0x08)) data &= input_port_read(space->machine, "keyboard_low_3");
-	if (!(key_sense & 0x10)) data &= input_port_read(space->machine, "keyboard_low_4");
-	if (!(key_sense & 0x20)) data &= input_port_read(space->machine, "keyboard_low_5");
-	if (!(key_sense & 0x40)) data &= input_port_read(space->machine, "keyboard_low_6");
-	if (!(key_sense & 0x80)) data &= input_port_read(space->machine, "keyboard_low_7");
-
-	return data;
-}
-
-READ8_HANDLER( mtx_key_hi_r )
-{
-	UINT8 data = input_port_read(space->machine, "country_code");
-
-	if (!(key_sense & 0x01)) data &= input_port_read(space->machine, "keyboard_high_0");
-	if (!(key_sense & 0x02)) data &= input_port_read(space->machine, "keyboard_high_1");
-	if (!(key_sense & 0x04)) data &= input_port_read(space->machine, "keyboard_high_2");
-	if (!(key_sense & 0x08)) data &= input_port_read(space->machine, "keyboard_high_3");
-	if (!(key_sense & 0x10)) data &= input_port_read(space->machine, "keyboard_high_4");
-	if (!(key_sense & 0x20)) data &= input_port_read(space->machine, "keyboard_high_5");
-	if (!(key_sense & 0x40)) data &= input_port_read(space->machine, "keyboard_high_6");
-	if (!(key_sense & 0x80)) data &= input_port_read(space->machine, "keyboard_high_7");
-
-	return data;
-}
-
-
-
-/*************************************
- *
- *  Bank switching
- *
- *************************************/
+/*-------------------------------------------------
+    mtx_bankswitch_w - bankswitch
+-------------------------------------------------*/
 
 /*
     There are two memory models on the MTX, the standard one and a
@@ -209,66 +55,377 @@ READ8_HANDLER( mtx_key_hi_r )
     by RAM in this mode.
 */
 
-WRITE8_HANDLER( mtx_bankswitch_w )
+static void bankswitch(running_machine *machine, UINT8 data)
 {
+	/*
+
+		bit		description
+
+		0		P0
+		1		P1
+		2		P2
+		3		P3
+		4		R0
+		5		R1
+		6		R2
+		7		RELCPMH
+
+	*/
+
+	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	running_device *messram = devtag_get_device(machine, "messram");
+
 //  UINT8 cbm_mode = data >> 7 & 0x01;
 	UINT8 rom_page = data >> 4 & 0x07;
 	UINT8 ram_page = data >> 0 & 0x0f;
 
 	/* set rom bank (switches between basic and assembler rom or cartridges) */
-	memory_set_bank(space->machine, "bank2", rom_page);
+	memory_set_bank(machine, "bank2", rom_page);
 
 	/* set ram bank, for invalid pages a nop-handler will be installed */
-	if (ram_page >= messram_get_size(devtag_get_device(space->machine, "messram"))/0x8000)
+	if (ram_page >= messram_get_size(messram)/0x8000)
 	{
-		memory_nop_readwrite(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
-		memory_nop_readwrite(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
+		memory_nop_readwrite(program, 0x4000, 0x7fff, 0, 0);
+		memory_nop_readwrite(program, 0x8000, 0xbfff, 0, 0);
 	}
-	else if (ram_page + 1 == messram_get_size(devtag_get_device(space->machine, "messram"))/0x8000)
+	else if (ram_page + 1 == messram_get_size(messram)/0x8000)
 	{
-		memory_nop_readwrite(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0);
-		memory_install_readwrite_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank4");
-		memory_set_bank(space->machine, "bank4", ram_page);
+		memory_nop_readwrite(program, 0x4000, 0x7fff, 0, 0);
+		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank4");
+		memory_set_bank(machine, "bank4", ram_page);
 	}
 	else
 	{
-		memory_install_readwrite_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank3");
-		memory_install_readwrite_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, "bank4");
-		memory_set_bank(space->machine, "bank3", ram_page);
-		memory_set_bank(space->machine, "bank4", ram_page);
+		memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
+		memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank4");
+		memory_set_bank(machine, "bank3", ram_page);
+		memory_set_bank(machine, "bank4", ram_page);
 	}
 }
 
-
-
-/*************************************
- *
- *  Machine initialization
- *
- *************************************/
-
-DRIVER_INIT( mtx512 )
+WRITE8_HANDLER( mtx_bankswitch_w )
 {
+	bankswitch(space->machine, data);
+}
+
+/*-------------------------------------------------
+    mtx_sound_strobe_r - sound strobe
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
+{
+	mtx_state *state = (mtx_state *)device->machine->driver_data;
+
+	sn76496_w(device, 0, state->sound_latch);
+
+	return 0xff;
+}
+
+/*-------------------------------------------------
+    mtx_sound_latch_w - sound latch write
+-------------------------------------------------*/
+
+WRITE8_HANDLER( mtx_sound_latch_w )
+{
+	mtx_state *state = (mtx_state *)space->machine->driver_data;
+
+	state->sound_latch = data;
+}
+
+/*-------------------------------------------------
+    mtx_cst_w - cassette write
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( mtx_cst_w )
+{
+	cassette_output(device, BIT(data, 0) ? -1 : 1);
+}
+
+/*-------------------------------------------------
+    mtx_prt_r - centronics status
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( mtx_prt_r )
+{
+	/*
+
+		bit		description
+
+		0		BUSY
+		1		ERROR
+		2		PE
+		3		SLCT
+		4		
+		5		
+		6		
+		7		
+
+	*/
+
+	UINT8 data = 0;
+
+	/* reset STROBE to high */
+	centronics_strobe_w(device, TRUE);
+
+	/* busy */
+	data |= centronics_busy_r(device) << 0;
+
+	/* fault */
+	data |= centronics_fault_r(device) << 1;
+
+	/* paper empty */
+	data |= !centronics_pe_r(device) << 2;
+
+	/* select */
+	data |= centronics_vcc_r(device) << 3;
+
+	return data;
+}
+
+/*-------------------------------------------------
+    mtx_sense_w - keyboard sense write
+-------------------------------------------------*/
+
+WRITE8_HANDLER( mtx_sense_w )
+{
+	mtx_state *state = (mtx_state *)space->machine->driver_data;
+
+	state->key_sense = data;
+}
+
+/*-------------------------------------------------
+    mtx_key_lo_r - keyboard low read
+-------------------------------------------------*/
+
+READ8_HANDLER( mtx_key_lo_r )
+{
+	mtx_state *state = (mtx_state *)space->machine->driver_data;
+
+	UINT8 data = 0xff;
+
+	if (!(state->key_sense & 0x01)) data &= input_port_read(space->machine, "ROW0");
+	if (!(state->key_sense & 0x02)) data &= input_port_read(space->machine, "ROW1");
+	if (!(state->key_sense & 0x04)) data &= input_port_read(space->machine, "ROW2");
+	if (!(state->key_sense & 0x08)) data &= input_port_read(space->machine, "ROW3");
+	if (!(state->key_sense & 0x10)) data &= input_port_read(space->machine, "ROW4");
+	if (!(state->key_sense & 0x20)) data &= input_port_read(space->machine, "ROW5");
+	if (!(state->key_sense & 0x40)) data &= input_port_read(space->machine, "ROW6");
+	if (!(state->key_sense & 0x80)) data &= input_port_read(space->machine, "ROW7");
+
+	return data;
+}
+
+/*-------------------------------------------------
+    mtx_key_lo_r - keyboard high read
+-------------------------------------------------*/
+
+READ8_HANDLER( mtx_key_hi_r )
+{
+	mtx_state *state = (mtx_state *)space->machine->driver_data;
+
+	UINT8 data = input_port_read(space->machine, "country_code");
+
+	if (!(state->key_sense & 0x01)) data &= input_port_read(space->machine, "ROW0") >> 8;
+	if (!(state->key_sense & 0x02)) data &= input_port_read(space->machine, "ROW1") >> 8;
+	if (!(state->key_sense & 0x04)) data &= input_port_read(space->machine, "ROW2") >> 8;
+	if (!(state->key_sense & 0x08)) data &= input_port_read(space->machine, "ROW3") >> 8;
+	if (!(state->key_sense & 0x10)) data &= input_port_read(space->machine, "ROW4") >> 8;
+	if (!(state->key_sense & 0x20)) data &= input_port_read(space->machine, "ROW5") >> 8;
+	if (!(state->key_sense & 0x40)) data &= input_port_read(space->machine, "ROW6") >> 8;
+	if (!(state->key_sense & 0x80)) data &= input_port_read(space->machine, "ROW7") >> 8;
+
+	return data;
+}
+
+/*-------------------------------------------------
+    hrx_address_w - HRX video RAM address
+-------------------------------------------------*/
+
+WRITE8_HANDLER( hrx_address_w )
+{
+	if (offset)
+	{
+		/*
+
+			bit		description
+
+			0		A8
+			1		A9
+			2		A10
+			3		
+			4		
+			5		attribute memory write enable
+			6		ASCII memory write enable
+			7		cycle (0=read/1=write)
+
+		*/
+	}
+	else
+	{
+		/*
+
+			bit		description
+
+			0		A0
+			1		A1
+			2		A2
+			3		A3
+			4		A4
+			5		A5
+			6		A6
+			7		A7
+
+		*/
+	}
+}
+
+/*-------------------------------------------------
+    hrx_data_r - HRX data read
+-------------------------------------------------*/
+
+READ8_HANDLER( hrx_data_r )
+{
+	return 0;
+}
+
+/*-------------------------------------------------
+    hrx_data_w - HRX data write
+-------------------------------------------------*/
+
+WRITE8_HANDLER( hrx_data_w )
+{
+}
+
+/*-------------------------------------------------
+    hrx_attr_r - HRX attribute read
+-------------------------------------------------*/
+
+READ8_HANDLER( hrx_attr_r )
+{
+	return 0;
+}
+
+/*-------------------------------------------------
+    hrx_attr_r - HRX attribute write
+-------------------------------------------------*/
+
+WRITE8_HANDLER( hrx_attr_w )
+{
+	/*
+
+		bit		description
+
+		0		
+		1		
+		2		
+		3		
+		4		
+		5		
+		6		
+		7		
+
+	*/
+}
+
+/***************************************************************************
+    DEVICE CONFIGURATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    TMS9928a_interface tms9928a_interface
+-------------------------------------------------*/
+
+static void mtx_tms9929a_interrupt(running_machine *machine, int data)
+{
+	mtx_state *state = (mtx_state *)machine->driver_data;
+
+	z80ctc_trg0_w(state->z80ctc, data ? 0 : 1);
+}
+
+static const TMS9928a_interface tms9928a_interface =
+{
+	TMS9929A,
+	0x4000,
+	0, 0,
+	mtx_tms9929a_interrupt
+};
+
+INTERRUPT_GEN( mtx_interrupt )
+{
+	TMS9928A_interrupt(device->machine);
+}
+
+/***************************************************************************
+    SNAPSHOT
+***************************************************************************/
+
+SNAPSHOT_LOAD( mtx )
+{
+	const address_space *program = cputag_get_address_space(image->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+
+	UINT8 header[18];
+	UINT16 addr;
+
+	/* get the header */
+	image_fread(image, &header, sizeof(header));
+
+	if (header[0] == 0xff)
+	{
+		/* long header */
+		addr = pick_integer_le(header, 16, 2);
+		void *ptr = memory_get_write_ptr(program, addr);
+		image_fread(image, ptr, 599);
+		ptr = memory_get_write_ptr(program, 0xc000);
+		image_fread(image, ptr, snapshot_size - 599 - 18);
+	}
+	else
+	{
+		/* short header */
+		addr = pick_integer_le(header, 0, 2);
+		image_fseek(image, 4, SEEK_SET);
+		void *ptr = memory_get_write_ptr(program, addr);
+		image_fread(image, ptr, 599);
+		ptr = memory_get_write_ptr(program, 0xc000);
+		image_fread(image, ptr, snapshot_size - 599 - 4);
+	}
+
+	return INIT_PASS;
+}
+
+/***************************************************************************
+    MACHINE INITIALIZATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    MACHINE_START( mtx512 )
+-------------------------------------------------*/
+
+MACHINE_START( mtx512 )
+{
+	mtx_state *state = (mtx_state *)machine->driver_data;
+	running_device *messram = devtag_get_device(machine, "messram");
+
+	/* find devices */
+	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
+	state->z80dart = devtag_get_device(machine, Z80DART_TAG);
+	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+
 	/* configure memory */
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));
 	memory_configure_bank(machine, "bank2", 0, 8, memory_region(machine, "user2"), 0x2000);
-	memory_configure_bank(machine, "bank3", 0, messram_get_size(devtag_get_device(machine, "messram"))/0x4000/2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x4000);
-	memory_configure_bank(machine, "bank4", 0, messram_get_size(devtag_get_device(machine, "messram"))/0x4000/2, messram_get_ptr(devtag_get_device(machine, "messram")) + messram_get_size(devtag_get_device(machine, "messram"))/2, 0x4000);
+	memory_configure_bank(machine, "bank3", 0, messram_get_size(messram)/0x4000/2, messram_get_ptr(messram), 0x4000);
+	memory_configure_bank(machine, "bank4", 0, messram_get_size(messram)/0x4000/2, messram_get_ptr(messram) + messram_get_size(messram)/2, 0x4000);
 
 	/* setup tms9928a */
 	TMS9928A_configure(&tms9928a_interface);
 }
 
-DRIVER_INIT( rs128 )
+/*-------------------------------------------------
+    MACHINE_RESET( mtx512 )
+-------------------------------------------------*/
+
+MACHINE_RESET( mtx512 )
 {
-	running_device *device;
-	const address_space *space;
-
-	DRIVER_INIT_CALL(mtx512);
-
-	/* install handlers for dart interface */
-	device = devtag_get_device(machine, "z80dart");
-	space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	memory_install_readwrite8_device_handler(space, device, 0x0c, 0x0d, 0, 0, z80dart_d_r, z80dart_d_w);
-	memory_install_readwrite8_device_handler(space, device, 0x0e, 0x0f, 0, 0, z80dart_c_r, z80dart_c_w);
+	/* bank switching */
+	bankswitch(machine, 0);
 }
