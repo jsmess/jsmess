@@ -1,4 +1,4 @@
-﻿0.137.1
+0.137.1
 
 New System Drivers Supported:
 -----------------------------
@@ -44,9 +44,11 @@ Source Changes:
 
 - [Sega Pico] Updated Hashes to GoodPico V3.1415 [Cowering]
 
-- [MTX512] Updated Hashes to GoodMTX V3.1415 [Cowering]
+- [Memotech MTX512] Updated Hashes to GoodMTX V3.1415 [Cowering]
 
 - [Nintendo Virtual Boy] Added Hashes from GoodVBoy V3.1415 [Cowering]
+
+- [Channel F] Added Hashes from GoodChaF V3.1415 [Cowering]
 
 - Added preliminary emulation of the MC6852 SSDA. [Curt Coder]
 
