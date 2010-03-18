@@ -1,4 +1,4 @@
-0.137.1
+﻿0.137.1
 
 New System Drivers Supported:
 -----------------------------
@@ -55,6 +55,9 @@ Source Changes:
 
 - Added disk change handlers to the Commodore 1541 and 2040 family
   disk drives. "Edge of Disgrace" demo now loads on C64. [Curt Coder]
+
+- Implemented Commodore DOS errors 21, 22, and 23 in D64 images. 
+  "Microsoft Multiplan" now loads on C64. (bug #1932) [Curt Coder]
   
 - [C2040] Added DOS 1 FDC ROM (parsed from disassembly). [Curt Coder]
   
