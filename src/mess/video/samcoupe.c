@@ -16,86 +16,40 @@
 static void draw_mode4_line(running_device *screen, bitmap_t *bitmap, int y)
 {
 	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
-	int x;
 
-	for (x = 0; x < 256;)
+	/* get start address */
+	UINT8 *vram = screen->machine->generic.videoram.u8 + (y * 128);
+
+	for (int x = 0; x < 256/2; x++)
 	{
-		UINT8 tmp = screen->machine->generic.videoram.u8[(x/2) + (y*128)];
+		/* draw 2 pixels (doublewidth) */
+		*BITMAP_ADDR16(bitmap, y, x * 4 + 0) = asic->clut[(*vram >> 4) & 0x0f];
+		*BITMAP_ADDR16(bitmap, y, x * 4 + 1) = asic->clut[(*vram >> 4) & 0x0f];
+		*BITMAP_ADDR16(bitmap, y, x * 4 + 2) = asic->clut[(*vram >> 0) & 0x0f];
+		*BITMAP_ADDR16(bitmap, y, x * 4 + 3) = asic->clut[(*vram >> 0) & 0x0f];
 
-#ifdef MONO
-		if (tmp>>4)
-		{
-			plot_pixel(bitmap, x*2, y, 127);
-			plot_pixel(bitmap, x*2+1, y, 127);
-		}
-		else
-		{
-			plot_pixel(bitmap, x*2, y, 0);
-			plot_pixel(bitmap, x*2+1, y, 0);
-		}
-		x++;
-		if (tmp&0x0F)
-		{
-			plot_pixel(bitmap, x*2, y, 127);
-			plot_pixel(bitmap, x*2+1, y, 127);
-		}
-		else
-		{
-			plot_pixel(bitmap, x*2, y, 0);
-			plot_pixel(bitmap, x*2+1, y, 0);
-		}
-		x++;
-#else
-		*BITMAP_ADDR16(bitmap, y, x*2+0) = asic->clut[tmp >> 4];
-		*BITMAP_ADDR16(bitmap, y, x*2+1) = asic->clut[tmp >> 4];
-		x++;
-		*BITMAP_ADDR16(bitmap, y, x*2+0) = asic->clut[tmp & 0x0f];
-		*BITMAP_ADDR16(bitmap, y, x*2+1) = asic->clut[tmp & 0x0f];
-		x++;
-#endif
+		/* move to next address */
+		vram++;
 	}
 }
 
 static void draw_mode3_line(running_device *screen, bitmap_t *bitmap, int y)
 {
 	coupe_asic *asic = (coupe_asic *)screen->machine->driver_data;
-	int x;
 
-	for (x = 0; x < 512;)
+	/* get start address */
+	UINT8 *vram = screen->machine->generic.videoram.u8 + (y * 128);
+
+	for (int x = 0; x < 512/4; x++)
 	{
-		UINT8 tmp = screen->machine->generic.videoram.u8[(x/4) + (y*128)];
+		/* draw 4 pixels */
+		*BITMAP_ADDR16(bitmap, y, x * 4 + 0) = asic->clut[(*vram >> 6) & 0x03];
+		*BITMAP_ADDR16(bitmap, y, x * 4 + 1) = asic->clut[(*vram >> 4) & 0x03];
+		*BITMAP_ADDR16(bitmap, y, x * 4 + 2) = asic->clut[(*vram >> 2) & 0x03];
+		*BITMAP_ADDR16(bitmap, y, x * 4 + 3) = asic->clut[(*vram >> 0) & 0x03];
 
-#ifdef MONO
-		if (tmp >> 6)
-			plot_pixel(bitmap, x, y, 127);
-		else
-			plot_pixel(bitmap, x, y, 0);
-		x++;
-		if ((tmp >> 4) & 0x03)
-			plot_pixel(bitmap, x, y, 127);
-		else
-			plot_pixel(bitmap, x, y, 0);
-		x++;
-		if ((tmp >> 2) & 0x03)
-			plot_pixel(bitmap, x, y, 127);
-		else
-			plot_pixel(bitmap, x, y, 0);
-		x++;
-		if (tmp & 0x03)
-			plot_pixel(bitmap, x, y, 127);
-		else
-			plot_pixel(bitmap, x, y, 0);
-		x++;
-#else
-		*BITMAP_ADDR16(bitmap, y, x) = asic->clut[tmp >> 6];
-		x++;
-		*BITMAP_ADDR16(bitmap, y, x) = asic->clut[(tmp >> 4) & 0x03];
-		x++;
-		*BITMAP_ADDR16(bitmap, y, x) = asic->clut[(tmp >> 2) & 0x03];
-		x++;
-		*BITMAP_ADDR16(bitmap, y, x) = asic->clut[tmp & 0x03];
-		x++;
-#endif
+		/* move to next address */
+		vram++;
 	}
 }
 
