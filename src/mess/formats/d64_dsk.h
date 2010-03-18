@@ -2,7 +2,7 @@
 
     formats/d64_dsk.h
 
-    Floppy format code for Commodore 2040/8050 type disk images
+    Floppy format code for Commodore 1541/2040/8050 disk images
 
 *********************************************************************/
 
