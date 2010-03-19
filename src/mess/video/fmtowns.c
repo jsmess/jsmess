@@ -125,7 +125,7 @@ extern UINT8* towns_txtvram;
 extern UINT32 towns_mainmem_enable;
 extern UINT32 towns_ankcg_enable;
 
-static UINT32 pshift;  // for debugging
+//static UINT32 pshift;  // for debugging
 
 void towns_crtc_refresh_mode(running_machine* machine)
 {
@@ -682,10 +682,13 @@ WRITE8_HANDLER( towns_spriteram_w)
  */
 void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
-	INT16 xpos,ypos;
+	UINT16 xpos,ypos;
 	UINT16 col,pixel;
 	UINT32 voffset;
-	int xstart,xend,xdir,ystart,yend,ydir;
+	UINT16 xstart,xend,ystart,yend;
+	int xdir,ydir;
+	int width = (towns_crtc_reg[12] - towns_crtc_reg[11]) / (((towns_crtc_reg[27] & 0x0f00) >> 8)+1);
+	int height = (towns_crtc_reg[16] - towns_crtc_reg[15]) / (((towns_crtc_reg[27] & 0xf000) >> 12)+1);
 
 	if(xflip)
 	{
@@ -711,10 +714,15 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 		yend = y+16;
 		ydir = 1;
 	}
+	xstart &= 0x1ff;
+	xend &= 0x1ff;
+	ystart &= 0x1ff;
+	yend &= 0x1ff;
+	poffset &= 0x1ffff;
 
-	for(ypos=ystart;ypos!=yend;ypos+=ydir)
+	for(ypos=ystart;ypos!=yend;ypos+=ydir,ypos&=0x1ff)
 	{
-		for(xpos=xstart;xpos!=xend;xpos+=xdir)
+		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
 			voffset = 0;
 			pixel = (towns_txtvram[poffset] & 0xf0) >> 4;
@@ -723,7 +731,7 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 			voffset += (xpos & 0x1ff) * 2;
 			voffset &= 0x3ffff;
 			voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
-			if(xpos <= rect->max_x && ypos <= rect->max_y && pixel != 0)
+			if(xpos < width && ypos < height && pixel != 0)
 			{
 				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
 				towns_gfxvram[voffset] = col & 0x00ff;
@@ -736,22 +744,26 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 			col = towns_txtvram[coffset+(pixel*2)] | (towns_txtvram[coffset+(pixel*2)+1] << 8);
 			voffset &= 0x3ffff;
 			voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
-			if(xpos <= rect->max_x && ypos <= rect->max_y && pixel != 0)
+			if(xpos < width && ypos < height && pixel != 0)
 			{
 				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
 				towns_gfxvram[voffset] = col & 0x00ff;
 			}
 			poffset++;
+			poffset &= 0x1ffff;
 		}
 	}
 }
 
 void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
-	INT16 xpos,ypos;
+	UINT16 xpos,ypos;
 	UINT16 col;
 	UINT32 voffset;
-	int xstart,ystart,xend,yend,xdir,ydir;
+	UINT16 xstart,ystart,xend,yend;
+	int xdir,ydir;
+	int width = (towns_crtc_reg[12] - towns_crtc_reg[11]) / (((towns_crtc_reg[27] & 0x0f00) >> 8)+1);
+	int height = (towns_crtc_reg[16] - towns_crtc_reg[15]) / (((towns_crtc_reg[27] & 0xf000) >> 12)+1);
 
 	if(xflip)
 	{
@@ -777,22 +789,28 @@ void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 y
 		yend = y+16;
 		ydir = 1;
 	}
+	xstart &= 0x1ff;
+	xend &= 0x1ff;
+	ystart &= 0x1ff;
+	yend &= 0x1ff;
+	poffset &= 0x1ffff;
 
-	for(ypos=ystart;ypos!=yend;ypos+=ydir)
+	for(ypos=ystart;ypos!=yend;ypos+=ydir,ypos&=0x1ff)
 	{
-		for(xpos=xstart;xpos!=xend;xpos+=xdir)
+		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
 			voffset = (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
 			col = towns_txtvram[poffset] | (towns_txtvram[poffset+1] << 8);
 			voffset += (towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
 			voffset &= 0x7ffff;
-			if(xpos <= rect->max_x && ypos <= rect->max_y && col < 0x8000)
+			if(xpos < width && ypos < height && col < 0x8000)
 			{
 				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
 				towns_gfxvram[voffset] = col & 0x00ff;
 			}
 			poffset+=2;
+			poffset &= 0x1ffff;
 		}
 	}
 }
@@ -831,21 +849,22 @@ void draw_sprites(running_machine* machine, const rectangle* rect)
 			poffset = (attr & 0x3ff) << 7;
 			coffset = (colour & 0xfff) << 5;
 #ifdef SPR_DEBUG
-			printf("Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %05x Coff %05x\n",
+			printf("Sprite4 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_4((poffset+pshift)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,rect);
+				render_sprite_4((poffset)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,rect);
 		}
 		else
 		{
 			poffset = (attr & 0x3ff) << 7;
 			coffset = (colour & 0xfff) << 5;
 #ifdef SPR_DEBUG
-			printf("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %05x Coff %05x\n",
+			printf("Sprite16 #%i, X %i Y %i Attr %04x Col %04x Poff %08x Coff %08x\n",
 				n,x,y,attr,colour,poffset,coffset);
 #endif
-			render_sprite_16((poffset+pshift)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
+			if(!(colour & 0x2000))
+				render_sprite_16((poffset)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
 		}
 	}
 }
@@ -1340,13 +1359,13 @@ VIDEO_UPDATE( towns )
 			towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[1],1);
 	}
 
-#ifdef SPR_DEBUG
+/*#ifdef SPR_DEBUG
 	if(input_code_pressed(screen->machine,KEYCODE_O))
 		pshift+=0x80;
 	if(input_code_pressed(screen->machine,KEYCODE_I))
 		pshift-=0x80;
 	popmessage("Pixel shift = %08x",pshift);
-#endif
+#endif*/
 
 #ifdef CRTC_REG_DISP
 	popmessage("CRTC: %i %i %i %i %i %i %i %i %i\n%i %i %i %i | %i %i %i %i\n%i %i %i %i | %i %i %i %i\nZOOM: %04x\nVideo: %02x %02x\nText=%i Spr=%02x",
