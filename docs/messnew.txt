@@ -15,7 +15,7 @@ Systems Promoted from GAME_NOT_WORKING:
 Skeleton drivers:
 -----------------
 - PK8002 Elf
-
+- Elektronika-85 PC-XT card [thanks to Anasana]
 
 
 System Driver Changes:

@@ -3214,6 +3214,16 @@ ROM_START( poisk2 )
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
 	ROM_LOAD( "p2_ecga.rf4", 0x0000, 0x2000, CRC(d537f665) SHA1(d70f085b9b0cbd53df7c3122fbe7592998ba8fed))
 ROM_END
+
+ROM_START( e85pcxt )
+    ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_LOAD( "2764-2.bin", 0xfc000, 0x2000, CRC(fe83ee7) SHA1(0c2b7d15fc0dfbdba520a1601d8554c4d49a91c5))
+	ROM_LOAD( "2764-3.bin", 0xfe000, 0x2000, CRC(e1927a2) SHA1(a7b36cc25a1c3c3e2690a42830e601390ff6076f))
+
+	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
+	ROM_REGION(0x2000,"gfx1", 0)
+	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
+ROM_END
 /***************************************************************************
 
   Game driver(s)
@@ -3257,4 +3267,5 @@ COMP ( 1989,	ec1845,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1845
 COMP ( 1989,	mk88,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "MK-88" , GAME_NOT_WORKING)
 COMP ( 1990,	poisk1,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Poisk-1" , GAME_NOT_WORKING)
 COMP ( 1991,	poisk2,		ibm5150,	0,	poisk2,        pccga,	pccga,	    "",  "Poisk-2" , GAME_NOT_WORKING)
+COMP ( 1990,	e85pcxt,	ibm5150,	0,	pccga,         pccga,	pccga,	    "",  "Elektronika-85 PC-XT card" , GAME_NOT_WORKING)
 

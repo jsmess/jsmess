@@ -597,6 +597,7 @@ const game_driver * const drivers[] =
 	DRIVER( mk88 )
 	DRIVER( poisk1 )
 	DRIVER( poisk2 )
+	DRIVER( e85pcxt )
 
 	/* AT */
 	DRIVER( ibm5170 )   /* 1984 IBM PC/AT 5170, original 6 MHz model    */
