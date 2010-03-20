@@ -876,6 +876,7 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 	UINT16 colour;
 	int hzoom = 1;
 	int linesize;
+	UINT32 scroll;
 
 	if(layer == 0)
 		linesize = towns_crtc_reg[20] * 4;
@@ -888,13 +889,25 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 	{
 		if(!(towns_video_reg[0] & 0x10))
 			return;
-		off += (towns_crtc_reg[21]) << 2;  // initial offset
+		if(!(towns_crtc_reg[28] & 0x10))
+			off += (towns_crtc_reg[21]) << 2;  // initial offset
+		else
+		{
+			scroll = ((towns_crtc_reg[21] & 0xfc00) << 2) | (((towns_crtc_reg[21] & 0x3ff) << 2));
+			off += scroll;
+		}
 		if(towns_crtc_reg[27] & 0x0100)
 			hzoom = 2;
 	}
 	else
 	{
-		off += (towns_crtc_reg[17]) << 2;  // initial offset
+		if(!(towns_crtc_reg[28] & 0x20))
+			off += (towns_crtc_reg[17]) << 2;  // initial offset
+		else
+		{
+			scroll = ((towns_crtc_reg[17] & 0xfc00) << 2) | (((towns_crtc_reg[17] & 0x3ff) << 2));
+			off += scroll;
+		}
 		if(towns_crtc_reg[27] & 0x0001)
 			hzoom = 2;
 	}
@@ -953,6 +966,7 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	UINT8 colour;
 	int hzoom = 1;
 	int linesize;
+	UINT32 scroll;
 
 	if(towns_display_page_sel != 0)
 		off = 0x20000;
@@ -965,13 +979,25 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	{
 		if(!(towns_video_reg[0] & 0x10))
 			return;
-		off += towns_crtc_reg[21];  // initial offset
+		if(!(towns_crtc_reg[28] & 0x10))
+			off += towns_crtc_reg[21];  // initial offset
+		else
+		{
+			scroll = ((towns_crtc_reg[21] & 0xfc00) << 2) | (((towns_crtc_reg[21] & 0x3ff) << 2));
+			off += scroll;
+		}
 		if(towns_crtc_reg[27] & 0x0100)
 			hzoom = 2;
 	}
 	else
 	{
-		off += towns_crtc_reg[17];  // initial offset
+		if(!(towns_crtc_reg[28] & 0x20))
+			off += towns_crtc_reg[17];  // initial offset
+		else
+		{
+			scroll = ((towns_crtc_reg[17] & 0xfc00) << 2) | (((towns_crtc_reg[17] & 0x3ff) << 2));
+			off += scroll;
+		}
 		if(towns_crtc_reg[27] & 0x0001)
 			hzoom = 2;
 	}
@@ -1021,6 +1047,7 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 	UINT8 colour;
 	int hzoom = 1;
 	int linesize;
+	UINT32 scroll;
 
 	if(towns_display_page_sel != 0)
 		off = 0x20000;
@@ -1033,13 +1060,25 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 	{
 		if(!(towns_video_reg[0] & 0x10))
 			return;
-		off += towns_crtc_reg[21];  // initial offset
+		if(!(towns_crtc_reg[28] & 0x10))
+			off += towns_crtc_reg[21];  // initial offset
+		else
+		{
+			scroll = ((towns_crtc_reg[21] & 0xfc00)<<2) | (((towns_crtc_reg[21] & 0x3ff)<<2));
+			off += scroll;
+		}
 		if(towns_crtc_reg[27] & 0x0100)
 			hzoom = 2;
 	}
 	else
 	{
-		off += towns_crtc_reg[17];  // initial offset
+		if(!(towns_crtc_reg[28] & 0x20))
+			off += towns_crtc_reg[17];  // initial offset
+		else
+		{
+			scroll = ((towns_crtc_reg[17] & 0xfc00)<<2) | (((towns_crtc_reg[17] & 0x3ff)<<2));
+			off += scroll;
+		}
 		if(towns_crtc_reg[27] & 0x0001)
 			hzoom = 2;
 	}
@@ -1368,7 +1407,7 @@ VIDEO_UPDATE( towns )
 #endif*/
 
 #ifdef CRTC_REG_DISP
-	popmessage("CRTC: %i %i %i %i %i %i %i %i %i\n%i %i %i %i | %i %i %i %i\n%i %i %i %i | %i %i %i %i\nZOOM: %04x\nVideo: %02x %02x\nText=%i Spr=%02x",
+	popmessage("CRTC: %i %i %i %i %i %i %i %i %i\n%i %i %i %i | %i %i %i %i\n%04x %i %i %i | %04x %i %i %i\nZOOM: %04x\nVideo: %02x %02x\nText=%i Spr=%02x\nReg28=%04x",
 		towns_crtc_reg[0],towns_crtc_reg[1],towns_crtc_reg[2],towns_crtc_reg[3],
 		towns_crtc_reg[4],towns_crtc_reg[5],towns_crtc_reg[6],towns_crtc_reg[7],
 		towns_crtc_reg[8],
@@ -1376,7 +1415,8 @@ VIDEO_UPDATE( towns )
 		towns_crtc_reg[13],towns_crtc_reg[14],towns_crtc_reg[15],towns_crtc_reg[16],
 		towns_crtc_reg[17],towns_crtc_reg[18],towns_crtc_reg[19],towns_crtc_reg[20],
 		towns_crtc_reg[21],towns_crtc_reg[22],towns_crtc_reg[23],towns_crtc_reg[24],
-		towns_crtc_reg[27],towns_video_reg[0],towns_video_reg[1],towns_tvram_enable,towns_sprite_reg[1] & 0x80);
+		towns_crtc_reg[27],towns_video_reg[0],towns_video_reg[1],towns_tvram_enable,towns_sprite_reg[1] & 0x80,
+		towns_crtc_reg[28]);
 #endif
 
     return 0;
