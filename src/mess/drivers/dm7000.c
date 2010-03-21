@@ -4,6 +4,36 @@
 
         20/03/2010 Skeleton driver.
 
+		
+	DM7000 - 	CPU STB04500 at 252 MHz
+				RAM	64MB
+				Flash 8MB
+				1 x DVB-S
+				1 x IDE interface
+				1 x Common Interface (CI)
+				1 x Compact flash
+				2 x Smart card reader
+				1 x USB
+				1 x RS232
+				1 x LAN 100Mbit/s
+				1 x LCD display
+				
+	DM56x0 - 	CPU STB04500 at 252 MHz
+				RAM	64MB
+				Flash 8MB
+				1 x DVB-S
+				2 x Common Interface (CI)
+				1 x Smart card reader
+				1 x LAN 100Mbit/s (just on 5620)
+				1 x LCD display
+				
+	DM500 - 	CPU STBx25xx at 252 MHz
+				RAM	96MB
+				Flash 32MB
+				1 x DVB-S
+				1 x Smart card reader
+				1 x LAN 100Mbit/s 				
+				
 ****************************************************************************/
 
 #include "emu.h"
@@ -36,7 +66,7 @@ static VIDEO_UPDATE( dm7000 )
 
 static MACHINE_DRIVER_START( dm7000 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",PPC603, 66000000)
+    MDRV_CPU_ADD("maincpu",PPC603, 252000000)
     MDRV_CPU_PROGRAM_MAP(dm7000_mem)
 
     MDRV_MACHINE_RESET(dm7000)
@@ -76,7 +106,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( ????, dm7000,  0,       0, 	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 7000",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, dm5620,  dm7000,  0, 	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 5620",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, dm500,   dm7000,  0, 	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 500",			GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2003, dm7000,  0,       0, 	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 7000",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2004, dm5620,  dm7000,  0, 	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 5620",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2006, dm500,   dm7000,  0, 	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 500",			GAME_NOT_WORKING | GAME_NO_SOUND)
 
