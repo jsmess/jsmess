@@ -351,20 +351,13 @@ static void fdc_cru_w(running_machine *machine, int offset, int data)
 static  READ8_HANDLER(fdc_mem_r)
 {
 	running_device *fdc = devtag_get_device(space->machine, "wd179x");
-
-	switch (offset)
-	{
-	case 0x1FF0:					/* Status register */
-		return (wd17xx_status_r(fdc, offset) ^ 0xFF);
-	case 0x1FF2:					/* Track register */
-		return wd17xx_track_r(fdc, offset) ^ 0xFF;
-	case 0x1FF4:					/* Sector register */
-		return wd17xx_sector_r(fdc, offset) ^ 0xFF;
-	case 0x1FF6:					/* Data register */
-		return wd17xx_data_r(fdc, offset) ^ 0xFF;
-	default:						/* DSR ROM */
+	
+	/* only use the even addresses from 1ff0 to 1ff6. 
+	   Note that data is inverted. */
+	if (offset >= 0x1ff0 && (offset & 0x09)==0)
+		return wd17xx_r(fdc, (offset >> 1)&0x03) ^ 0xff;
+	else
 		return ti99_disk_DSR[offset];
-	}
 }
 
 /*
@@ -374,23 +367,10 @@ static WRITE8_HANDLER(fdc_mem_w)
 {
 	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
-	data ^= 0xFF;	/* inverted data bus */
-
-	switch (offset)
-	{
-	case 0x1FF8:					/* Command register */
-		wd17xx_command_w(fdc, offset, data);
-		break;
-	case 0x1FFA:					/* Track register */
-		wd17xx_track_w(fdc, offset, data);
-		break;
-	case 0x1FFC:					/* Sector register */
-		wd17xx_sector_w(fdc, offset, data);
-		break;
-	case 0x1FFE:					/* Data register */
-		wd17xx_data_w(fdc, offset, data);
-		break;
-	}
+	/* only use the even addresses from 1ff8 to 1ffe. 
+	   Note that data is inverted. */
+	if (offset >= 0x1ff0 && (offset & 0x09)==0x08)
+		wd17xx_w(fdc, (offset >> 1)&0x03, data ^ 0xff);
 }
 
 

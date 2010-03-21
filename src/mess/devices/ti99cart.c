@@ -15,6 +15,54 @@
 
 typedef int assmfct(running_device *);
 
+#define TI99_CARTRIDGE_PCB_NONE		DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_none)
+#define TI99_CARTRIDGE_PCB_STD		DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_std)
+#define TI99_CARTRIDGE_PCB_PAGED	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_paged)
+#define TI99_CARTRIDGE_PCB_MINIMEM	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_minimem)
+#define TI99_CARTRIDGE_PCB_SUPER	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_super)
+#define TI99_CARTRIDGE_PCB_MBX		DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_mbx)
+#define TI99_CARTRIDGE_PCB_PAGED379I	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_paged379i)
+#define TI99_CARTRIDGE_PCB_PAGEDCRU	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_pagedcru)
+
+/* Generic TI99 cartridge structure. */
+struct _cartridge_t
+{
+	/* PCB device associated to this cartridge. If NULL, the slot is empty. */
+	running_device *pcb;
+	
+        /* GROM buffer size. */
+        int grom_size;
+        
+        /* ROM page. */
+        int rom_page;
+        /* RAM page. */
+        int ram_page;
+        
+        /* ROM buffer size. All banks have equal sizes. */
+        int rom_size;
+        /* RAM buffer size. All banks have equal sizes. */
+        int ram_size;
+        
+        /* pointer to GROM data. */
+        UINT8 *grom_ptr;
+        
+        /* GROM buffered data output. */
+        /*        UINT8 grom_buffer; */ /* Now handled by the multicart system. */
+        
+        /* ROM buffer. We are using this for both 16 bit (99/4a) and 8 bit
+        (99/8) access. */
+        void *rom_ptr;
+        
+        /* ROM buffer for the second bank of paged cartridges. Other cartridges
+        usually store their ROM in one large file. */
+        void *rom2_ptr;
+        
+        /* RAM buffer. The persistence service is done by the cartridge system.
+        The RAM space is a consecutive space; all banks are in one buffer. */
+        void *ram_ptr;
+};
+typedef struct _cartridge_t cartridge_t;
+
 enum
 {
 	TI99CARTINFO_FCT_6000_R = DEVINFO_FCT_DEVICE_SPECIFIC,		/* read16_device_handler */
@@ -36,40 +84,50 @@ typedef enum _legacy_cart_t
 	LEG_CART_MBX
 } legacy_cart_t;
 
-struct _ti99_multicart_t
+struct _ti99_multicart_state
 {
 	/* Reserves space for all cartridges. This is also used in the legacy
-    cartridge system, but only for slot 0. */
+	cartridge system, but only for slot 0. */
 	cartridge_t cartridge[NUMBER_OF_CARTRIDGE_SLOTS];
-
+	
 	/* Determines which slot is currently active. This value is changed when there
-    are accesses to other GROM base addresses. */
+	are accesses to other GROM base addresses. */
 	int active_slot;
-
+	
 	/* Used in order to enforce a special slot. This value is retrieved
-       from the dipswitch setting. A value of -1 means automatic, that is,
-       the grom base switch is used. Values 0 .. max refer to the
-       respective slot. */
+	from the dipswitch setting. A value of -1 means automatic, that is,
+	the grom base switch is used. Values 0 .. max refer to the
+	respective slot. */
 	int fixed_slot;
-
+	
 	/* Holds the highest index of a cartridge being plugged in plus one.
-       If we only have one cartridge inserted, we don't want to get a
-       selection option, so we just mirror the memory contents. */
+	If we only have one cartridge inserted, we don't want to get a
+	selection option, so we just mirror the memory contents. */
 	int next_free_slot;
-
+	
 	/* Counts the number of slots which currently contain legacy format
-       cartridge images. */
+	cartridge images. */
 	int legacy_slots;
-
+	
 	/* Counts the number of slots which currently contain new format
-       cartridge images. */
+	cartridge images. */
 	int multi_slots;
-
+	
 	/* Legacy mode. Stores the slot number where the cartridge part is mounted.
-       Index is from slotc_type_t. */
+	Index is from slotc_type_t. */
 	int legacy_slotnumber[5];
+	
+	/* current address pointer for the active GROM in port (16 bits) */
+	UINT16 grom_address;
+	/* GROM data buffer */
+	UINT8 grom_buffer;
+
+	/* internal flip-flops that are set after the first access to the GROM
+	address so that next access is mapped to the LSB, and cleared after each
+	data access */
+	char raddr_LSB, waddr_LSB;
 };
-typedef struct _ti99_multicart_t ti99_multicart_t;
+typedef struct _ti99_multicart_state ti99_multicart_state;
 
 #define AUTO -1
 
@@ -84,7 +142,7 @@ typedef enum _slotc_type_t
 } slotc_type_t;
 
 /* Function declaration; the function itself is in the later part of this file. */
-static UINT8 cartridge_grom_read_legacy(running_device *cartsys, int cart_offset);
+static UINT8 cartridge_grom_read_legacy(running_device *cartsys);
 static void unload_legacy(running_device *image);
 static int load_legacy(running_device *image);
 
@@ -122,7 +180,7 @@ typedef struct _ti99_pcb_t ti99_pcb_t;
 
 static int in_legacy_mode(running_device *device)
 {
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
 	if ((cartslots->legacy_slots>0) &&  (cartslots->multi_slots==0))
 		return TRUE;
 	return FALSE;
@@ -164,9 +222,9 @@ static int in_legacy_mode(running_device *device)
     Interestingly, cartridge subroutines are found nevertheless, even when
     the cartridge is plugged into a higher slot.
 */
-void ti99_cartridge_slot_set(running_device *cartsys, int slotnumber)
+static void cartridge_slot_set(running_device *cartsys, int slotnumber)
 {
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
 	assert(slotnumber>=0 && slotnumber<=255);
 //  if (cartslots->active_slot != slotnumber) printf("Setting cartslot to %d\n", slotnumber);
 	if (cartslots->fixed_slot==AUTO)
@@ -175,22 +233,10 @@ void ti99_cartridge_slot_set(running_device *cartsys, int slotnumber)
 		cartslots->active_slot = cartslots->fixed_slot;
 }
 
-/*
-    Allows to manually lock the cartslot system to a specific slot.
-    Called from the machine driver, taking the dipswitch setting.
-    We take slot numbers from 0 (automatic mode) to the maximum.
-*/
-void ti99_lock_cartridge_slot(running_device *cartsys, int slotnumber)
-{
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
-	assert(slotnumber>=0 && slotnumber<=255);
-	cartslots->fixed_slot = slotnumber-1; /* auto = -1 */
-}
-
 static int slot_is_empty(running_device *cartsys, int slotnumber)
 {
 	cartridge_t *cart;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
 
 	cart = &cartslots->cartridge[slotnumber];
 
@@ -202,7 +248,7 @@ static int slot_is_empty(running_device *cartsys, int slotnumber)
 static void clear_slot(running_device *cartsys, int slotnumber)
 {
 	cartridge_t *cart;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
 
 	cart = &cartslots->cartridge[slotnumber];
 
@@ -213,46 +259,123 @@ static void clear_slot(running_device *cartsys, int slotnumber)
 	cart->grom_ptr = NULL;
 }
 
+static void grom_write_address(ti99_multicart_state *cartslots, UINT8 data)
+{
+	/* We are writing; the read states will automatically fall back to default. */
+	cartslots->raddr_LSB = FALSE;
+
+	/* Fore more comments, see machine/ti99_4x.c */
+	if (cartslots->waddr_LSB)
+	{
+		/* Accept low byte (2nd write) */
+		cartslots->grom_address = (cartslots->grom_address & 0xff00) | (data & 0x00ff);
+		cartslots->waddr_LSB = FALSE;
+	}
+	else
+	{
+		/* Accept high byte (1st write) */
+		cartslots->grom_address = ((data<<8) & 0xff00) | (cartslots->grom_address & 0x00ff);
+		cartslots->waddr_LSB = TRUE;
+	}
+}
+
 /*
-    GROM access. Accesses the GROMs in the cartridge. GROM memory is
-    accessed serially via a set of ports. The GRMWA port (bank 0: 0x9c02)
-    takes two consecutive byte writes which represent the high and low byte
-    of the memory address in the GROM space. Once set, bytes can be read
-    by repeated read accesses on the GRMRD port (bank 0: 0x9800). The
-    address pointer advances on each read. The pointer wraps at the end
-    of each GROM chip memory space, i.e. every 8KiB.
-    This function takes the current GROM address minus 0x6000 which is the
-    lowest address for cartridge GROMs. Lower addresses access GROMs in the
-    console only, which appear in all banks.
-    Note that the GROM access mechanism is identical for all cartridge
-    types.
+	Set the address pointer value or write to GRAM (if available).
 */
-UINT8 ti99_cartridge_grom_read(running_device *device, int cart_offset)
+WRITE8_DEVICE_HANDLER(ti99_cartridge_grom_w)
+{
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+
+	/* Set the cart slot. Note that the port must be adjusted for 16-bit
+	   systems, i.e. it should be shifted left by 1.
+		// 1001 1wbb bbbb bbr0
+	*/
+	cartridge_slot_set(device, (offset>>2) & 0x00ff);	
+	
+	if (offset & 0x0002) 
+		grom_write_address(cartslots, data);
+	else
+		cartslots->raddr_LSB = cartslots->waddr_LSB = FALSE;
+		/* TODO: write to GRAM */	
+}
+
+/*
+	Deliver the local address pointer value. Note that this must be
+	in sync with the console.
+*/
+static UINT8 grom_read_address(ti99_multicart_state *cartslots)
+{
+	UINT8 reply;
+	/* When reading, reset the hi/lo flag byte for writing.
+	TODO: Verify this with a real machine. */
+	cartslots->waddr_LSB = FALSE;
+	
+	/* Address reading is done in two steps; first, the high byte
+	is transferred, then the low byte. */
+	if (cartslots->raddr_LSB)
+	{
+		/* second pass */
+		reply = cartslots->grom_address & 0x00ff;
+		cartslots->raddr_LSB = FALSE;
+	}
+	else
+	{
+		/* first pass */
+		reply = (cartslots->grom_address>>8) & 0x00ff;
+		cartslots->raddr_LSB = TRUE;
+	}
+	return reply;
+}
+
+/*
+	GROM access. Accesses the GROMs in the cartridge. GROM memory is
+	accessed serially via a set of ports. The GRMWA port (bank 0: 0x9c02)
+	takes two consecutive byte writes which represent the high and low byte
+	of the memory address in the GROM space. Once set, bytes can be read
+	by repeated read accesses on the GRMRD port (bank 0: 0x9800). The
+	address pointer advances on each read. The pointer wraps at the end
+	of each GROM chip memory space, i.e. every 8KiB.
+	This function takes the current GROM address minus 0x6000 which is the
+	lowest address for cartridge GROMs. Lower addresses access GROMs in the
+	console only, which appear in all banks.
+	Note that the GROM access mechanism is identical for all cartridge
+	types.
+*/
+READ8_DEVICE_HANDLER(ti99_cartridge_grom_r)
 {
 	UINT8 value;
 	int slot;
 	cartridge_t *cartridge;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+
+	/* Set the cart slot. Note that the port must be adjusted for 16-bit
+	   systems, i.e. it should be shifted left by 1.
+		1001 1wbb bbbb bbr0
+	*/
+	cartridge_slot_set(device, (offset>>2) & 0x00ff);	
+	
+	if (offset & 0x0002) 
+		return grom_read_address(cartslots);
 
 	/* Handle the legacy mode. */
 	if (in_legacy_mode(device))
-		return cartridge_grom_read_legacy(device, cart_offset);
+		return cartridge_grom_read_legacy(device);
 
 	slot = cartslots->active_slot;
 	/*
-        This fixes a minor issue: The selection mechanism of the console
-        concludes that there are multiple cartridges plugged in when it
-        checks the different GROM bases and finds different data. Empty
-        slots should return 0 at all addresses, but when we have only
-        one cartridge, this entails that the second cartridge is
-        different (all zeros), and so we get a meaningless selection
-        option between cartridge 1 and 1 and 1 ...
-
-        So if next_free_slot==1, we have one cartridge in slot 0.
-        In that case we trick the OS to believe that the addressed
-        cartridge appears at all locations which causes it to assume a
-        standard single cartslot.
-    */
+		This fixes a minor issue: The selection mechanism of the console
+		concludes that there are multiple cartridges plugged in when it
+		checks the different GROM bases and finds different data. Empty
+		slots should return 0 at all addresses, but when we have only
+		one cartridge, this entails that the second cartridge is
+		different (all zeros), and so we get a meaningless selection
+		option between cartridge 1 and 1 and 1 ...
+		
+		So if next_free_slot==1, we have one cartridge in slot 0.
+		In that case we trick the OS to believe that the addressed
+		cartridge appears at all locations which causes it to assume a
+		standard single cartslot.
+	*/
 	if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
 		slot=0;
 
@@ -261,33 +384,42 @@ UINT8 ti99_cartridge_grom_read(running_device *device, int cart_offset)
 	else
 	{
 		cartridge = &cartslots->cartridge[slot];
-
 		if ((cartridge->grom_size>0) && (cartridge->pcb!=NULL))
 		{
 			/* This is the reason why we need the image size: Read
-               access beyond the image size must be detected. */
-			if (cart_offset > cartridge->grom_size)
-				return 0;
-
-			value = (UINT8)cartridge->grom_buffer;
-			/* read ahead */
-			cartridge->grom_buffer = cartridge->grom_ptr[cart_offset];
+			access beyond the image size must be detected. */
+			/* TODO: replace this using a bitmap of the available GROMs */
+			if ((cartslots->grom_address < 0x6000) || (cartslots->grom_address > (cartridge->grom_size+0x6000)))
+				value = 0;
+			else 
+			{
+				/* Buffered GROM access. We use a (virtual) common buffer to avoid implementing this for each cartridge. */
+				value = (UINT8)cartslots->grom_buffer;
+				/* read ahead */
+				cartslots->grom_buffer = cartridge->grom_ptr[cartslots->grom_address-0x6000];
+			}
 		}
 		else
 		{
 			/* We assume that empty sockets return 0 */
 			value = 0;
-			logerror("Empty socket at address G(%d)>%04x\n", slot, 0x6000 + cart_offset);
+			//printf("Empty socket at address G(%d)>%04x\n", slot, cartslots->grom_address);
 		}
+		//			printf("GROM address (cart) = %04x, reply = %02x\n", cartslots->grom_address, value);
+		/* The program counter wraps at each GROM chip size (8K),
+		so 0x5fff + 1 = 0x4000. */
+		cartslots->grom_address = ((cartslots->grom_address + 1) & 0x1FFF) | (cartslots->grom_address & 0xE000);
+		
+		/* Reset the read and write address flipflops. */
+		cartslots->raddr_LSB = cartslots->waddr_LSB = FALSE;
 	}
-//  printf("grom access(port = %x, address = %04x) = %02x\n", slot,  0x6000 + cart_offset*2, value);
 	return value;
 }
 
 /*
-    Find the index of the cartridge name. We assume the format
-    <name><number>, i.e. the number is the longest string from the right
-    which can be interpreted as a number.
+	Find the index of the cartridge name. We assume the format
+	<name><number>, i.e. the number is the longest string from the right
+	which can be interpreted as a number.
 */
 static int get_index_from_tagname(running_device *image)
 {
@@ -301,31 +433,31 @@ static int get_index_from_tagname(running_device *image)
 }
 
 /*
-    Common routine to assemble cartridges from resources.
+	Common routine to assemble cartridges from resources.
 */
 static cartridge_t *assemble_common(running_device *cartslot)
 {
 	/* Pointer to the cartridge structure. */
 	cartridge_t *cartridge;
 	running_device *cartsys = cartslot->owner;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
-
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	
 	void *socketcont;
 	int reslength;
 	int i;
-
+	
 	int slotnumber = get_index_from_tagname(cartslot)-1;
 	assert(slotnumber>=0 && slotnumber<NUMBER_OF_CARTRIDGE_SLOTS);
-
+	
 	/* There is a cartridge in this slot, check the maximum slot number. */
 	if (cartslots->next_free_slot <= slotnumber)
 	{
 		cartslots->next_free_slot = slotnumber+1;
 	}
 	cartridge = &cartslots->cartridge[slotnumber];
-
+	
 	/* Get the socket which is retrieved by the multicart instance in
-       the state of the cartslot instance. */
+	the state of the cartslot instance. */
 	socketcont = cartslot_get_socket(cartslot, "grom_socket");
 	reslength = cartslot_get_resource_length(cartslot, "grom_socket");
 	if (socketcont != NULL)
@@ -333,7 +465,7 @@ static cartridge_t *assemble_common(running_device *cartslot)
 		cartridge->grom_ptr = (UINT8 *)socketcont;
 		cartridge->grom_size = reslength;
 	}
-
+	
 	socketcont = cartslot_get_socket(cartslot, "rom_socket");
 	reslength = cartslot_get_resource_length(cartslot, "rom_socket");
 	if (socketcont != NULL)
@@ -348,7 +480,7 @@ static cartridge_t *assemble_common(running_device *cartslot)
 				cont16b[i] = BIG_ENDIANIZE_INT16(cont16b[i]);
 		}
 	}
-
+	
 	socketcont = cartslot_get_socket(cartslot, "rom2_socket");
 //  reslength = cartslot_get_resource_length(cartslot, "rom2_socket");  /* cannot differ from rom_socket */
 	if (socketcont != NULL)
@@ -384,7 +516,7 @@ static cartridge_t *assemble_common(running_device *cartslot)
 static void set_pointers(running_device *pcb, int index)
 {
 	running_device *cartsys = pcb->owner->owner;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
 	ti99_pcb_t *pcb_def = (ti99_pcb_t *)pcb->token;
 
 	pcb_def->read = (read16_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_R);
@@ -511,7 +643,7 @@ static int disassemble_std(running_device *image)
 	int i;
 	cartridge_t *cart;
 	running_device *cartsys = image->owner;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
 
 	slotnumber = get_index_from_tagname(image)-1;
 //  printf("Disassemble cartridge %d\n", slotnumber);
@@ -1866,7 +1998,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 {
 	running_device *pcbdev = cartslot_get_pcb(image);
 	running_device *cartsys = image->owner;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
 
 	int result;
 
@@ -1881,24 +2013,24 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 			/* If we are here, we have a multicart. */
 			ti99_pcb_t *pcb = (ti99_pcb_t *)pcbdev->token;
 			cartslot_t *cart = (cartslot_t *)image->token;
-
+			
 			/* try opening this as a multicart */
 			/* This line requires that cartslot_t be included in cartslot.h,
-            otherwise one cannot make use of multicart handling within such a
-            custom LOAD function. */
+			otherwise one cannot make use of multicart handling within such a
+			custom LOAD function. */
 			multicart_open_error me = multicart_open(image_filename(image), image->machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
-
+			
 			/* Now that we have loaded the image files, let the PCB put them all
-            together. This means we put the images in a structure which allows
-            for a quick access by the memory handlers. Every PCB defines an
-            own assembly method. */
+			together. This means we put the images in a structure which allows
+			for a quick access by the memory handlers. Every PCB defines an
+			own assembly method. */
 			if (me == MCERR_NONE)
 				result = pcb->assemble(image);
 			else
 				fatalerror("Error loading multicart: %s\n", multicart_error_text(me));
-
+			
 			/* This is for legacy support. If we have no multicart left
-            but there are still legacy dumps, we switch to legacy mode. */
+			but there are still legacy dumps, we switch to legacy mode. */
 			if (result != INIT_FAIL)
 				cartslots->multi_slots++;
 		}
@@ -1917,7 +2049,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 {
 	running_device *pcbdev;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)image->owner->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)image->owner->token;
 
 	if (image->token == NULL)
 	{
@@ -1977,11 +2109,11 @@ static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
   - Both modes may change on plugging and unplugging.
 ******************************************************************************/
 
-static UINT8 cartridge_grom_read_legacy(running_device *cartsys, int cart_offset)
+static UINT8 cartridge_grom_read_legacy(running_device *cartsys)
 {
 	int slot;
 	cartridge_t *cartridge;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
 
 	UINT8 value;
 
@@ -1996,29 +2128,34 @@ static UINT8 cartridge_grom_read_legacy(running_device *cartsys, int cart_offset
 	if (cartridge->grom_size>0)
 	{
 		/* This is the reason why we need the image size: Read
-        access beyond the image size must be detected. */
-		if (cart_offset > cartridge->grom_size)
+		access beyond the image size must be detected. */
+		if ((cartslots->grom_address < 0x6000) || (cartslots->grom_address > (cartridge->grom_size+0x6000)))
 			return 0;
-
-		value = (UINT8)cartridge->grom_buffer;
+		
+		value =  (UINT8)cartslots->grom_buffer;
 		/* read ahead */
-		cartridge->grom_buffer = cartridge->grom_ptr[cart_offset];
+		cartslots->grom_buffer = cartridge->grom_ptr[cartslots->grom_address-0x6000];
+		//  printf("GROM address = %04x, reply = %02x\n", console_GROMs.addr, reply>>8);
+		/* The program counter wraps at each GROM chip size (8K),
+		so 0x5fff + 1 = 0x4000. */
+		cartslots->grom_address = ((cartslots->grom_address + 1) & 0x1FFF) | (cartslots->grom_address & 0xE000);
+		
+		/* Reset the read and write address flipflops. */
+		cartslots->raddr_LSB = cartslots->waddr_LSB = FALSE;
 	}
 	else
 	{
 		/* We assume that empty sockets return 0 */
 		value = 0;
-		logerror("Empty socket at address G(%d)>%04x\n", slot, 0x6000 + cart_offset);
+		logerror("Empty socket at address G(%d)>%04x\n", slot, cartslots->grom_address);
 	}
-
-	//  printf("grom access(port = %x, address = %04x) = %02x\n", slot,  0x6000 + cart_offset*2, value);
 	return value;
 }
 
 static READ16_DEVICE_HANDLER( ti99_cart_r_legacy )
 {
 	int slotmbx, slotmini, slotebr2, slotrom;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
 
 #if 0
 	if (hsgpl_crdena)
@@ -2063,7 +2200,7 @@ static READ16_DEVICE_HANDLER( ti99_cart_r_legacy )
 static WRITE16_DEVICE_HANDLER( ti99_cart_w_legacy )
 {
 	int slotmbx, slotmini, slotebr2, slotrom;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
 
 #if 0
 	if (hsgpl_crdena)
@@ -2117,7 +2254,7 @@ static WRITE16_DEVICE_HANDLER( ti99_cart_w_legacy )
 static READ8_DEVICE_HANDLER( ti99_cart_r_legacy8 )
 {
 	int slotmbx, slotmini, slotebr2, slotrom;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
 
 #if 0
 	if (hsgpl_crdena)
@@ -2165,7 +2302,7 @@ static READ8_DEVICE_HANDLER( ti99_cart_r_legacy8 )
 static WRITE8_DEVICE_HANDLER( ti99_cart_w_legacy8 )
 {
 	int slotmbx, slotmini, slotebr2, slotrom;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
 
 #if 0
 	if (hsgpl_crdena)
@@ -2217,7 +2354,7 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_w_legacy8 )
 static int load_legacy(running_device *image)
 {
 	running_device *cartsys = image->owner;
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
 
 	/* Some comments originally in machine/ti99_4x.c */
 
@@ -2437,7 +2574,7 @@ static void unload_legacy(running_device *image)
 	int i;
 	running_device *cartsys = image->owner;
 
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
 
 	slotc_type_t type = SLOTC_EMPTY;
 	int slot = get_index_from_tagname(image)-1;
@@ -2534,7 +2671,7 @@ static DEVICE_START(ti99_multicart)
 {
 	int i;
 //  printf("DEVICE_START(ti99_multicart)\n");
-	ti99_multicart_t *cartslots = (ti99_multicart_t *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
 
 	cartslots->active_slot = 0;
 	cartslots->next_free_slot = 0;
@@ -2567,9 +2704,19 @@ static DEVICE_STOP(ti99_multicart)
 static DEVICE_RESET(ti99_multicart)
 {
 	/* Consider to propagate RESET to cartridges.
-       However, schematics do not reveal any pin for resetting a cartridge;
-       the reset line is an input used when plugging in a cartridge. */
-//    printf("DEVICE_RESET(ti99_multicart)\n");
+	However, schematics do not reveal any pin for resetting a cartridge;
+	the reset line is an input used when plugging in a cartridge. */
+
+	/* Allows to manually lock the cartslot system to a specific slot.
+	   We take slot numbers from 0 (automatic mode) to the maximum. */
+	
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	int slotnumber = (input_port_read(device->machine, "CFG") >> config_cartslot_bit) & config_cartslot_mask;
+	assert(slotnumber>=0 && slotnumber<=255);
+	cartslots->fixed_slot = slotnumber-1; /* auto = -1 */
+	cartslots->grom_address = 0x0000;
+	cartslots->grom_buffer = 0x00;
+	cartslots->raddr_LSB = cartslots->waddr_LSB = FALSE;
 }
 
 /*
@@ -2584,68 +2731,68 @@ static DEVICE_RESET(ti99_multicart)
 */
 READ16_DEVICE_HANDLER( ti99_multicart_r )
 {
-	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
 	int slot = cartslots->active_slot;
 	cartridge_t *cart;
-
+	
 	/* Sanity check. Higher slots are always empty. */
 	if (slot >= NUMBER_OF_CARTRIDGE_SLOTS)
 		return 0;
-
+	
 	/* Same as above (GROM read): If there is only one cartridge there
-       is no use of trying other banks. There is one issue with the
-       selection mechanism: When the console probes the GROM banks and
-       we have a ROM-only cartridge plugged in, it checks bank 0 and bank 1,
-       finds no GROM, and then fails to dummy-check bank 0 again which would
-       have set our cartridge expander to slot 0. But in slot 1 there is no
-       ROM cartridge, so nothing shows up in the selection list. We work
-       around this with the following line. */
+	is no use of trying other banks. There is one issue with the
+	selection mechanism: When the console probes the GROM banks and
+	we have a ROM-only cartridge plugged in, it checks bank 0 and bank 1,
+	finds no GROM, and then fails to dummy-check bank 0 again which would
+	have set our cartridge expander to slot 0. But in slot 1 there is no
+	ROM cartridge, so nothing shows up in the selection list. We work
+	around this with the following line. */
 	if (cartslots->fixed_slot==AUTO && cartslots->next_free_slot==1)
 		slot=0;
-
+	
 	cart = &cartslots->cartridge[slot];
-
+	
 	/* Idle the CPU */
         cpu_adjust_icount(devtag_get_device(device->machine, "maincpu"),-4);
-
+        
 	// Alternatively:
 	// cpu_spinuntil_time(device->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
-//  printf("rpk = %d, bin = %d\n", cartslots->multi_slots,cartslots->legacy_slots);
-
+	
+	//  printf("rpk = %d, bin = %d\n", cartslots->multi_slots,cartslots->legacy_slots);
+	
 	/* Handle legacy mode. */
 	if (in_legacy_mode(device))
 	{
 		return ti99_cart_r_legacy(device, offset, mem_mask);
 	}
-
+	
 	if (!slot_is_empty(device, slot))
 	{
-//      printf("accessing cartridge in slot %d\n", slot);
+		//      printf("accessing cartridge in slot %d\n", slot);
 		ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
-//      printf("address=%lx, offset=%lx\n", pcbdef, offset);
+		//      printf("address=%lx, offset=%lx\n", pcbdef, offset);
 		return (*pcbdef->read)(cart->pcb, offset, mem_mask);
 	}
 	else
 	{
-//      printf("No cartridge in slot %d\n", slot);
+		//      printf("No cartridge in slot %d\n", slot);
 		return 0;
 	}
 }
 
 /*
-    Accesses the ROM regions of the cartridge for writing.
-    This is the area from 0x6000 to 0x7fff. Each cartridge is reponsible
-    for all kinds of magic which is done inside this area. Specifically,
-    writing is often used to swap banks for subsequent reads. The actual
-    effect of writing (beyond setting values in a RAM chip) are
-    cartridge-specific and must be handled within the cartridge pcb.
-    The currently set GROM bank determines which cartridge is actually
-    accessed, also for ROM reads.
+	Accesses the ROM regions of the cartridge for writing.
+	This is the area from 0x6000 to 0x7fff. Each cartridge is reponsible
+	for all kinds of magic which is done inside this area. Specifically,
+	writing is often used to swap banks for subsequent reads. The actual
+	effect of writing (beyond setting values in a RAM chip) are
+	cartridge-specific and must be handled within the cartridge pcb.
+	The currently set GROM bank determines which cartridge is actually
+	accessed, also for ROM reads.
 */
 WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 {
-	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
 	int slot = cartslots->active_slot;
 	cartridge_t *cart;
 
@@ -2687,7 +2834,7 @@ WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 */
 READ8_DEVICE_HANDLER( ti99_multicart_cru_r )
 {
-	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
 	cartridge_t *cart;
 
 	int slot = cartslots->active_slot;
@@ -2720,7 +2867,7 @@ READ8_DEVICE_HANDLER( ti99_multicart_cru_r )
 */
 WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w )
 {
-	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
 	cartridge_t *cart;
 
 	int slot = cartslots->active_slot;
@@ -2753,7 +2900,7 @@ WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w )
 */
 READ8_DEVICE_HANDLER(ti99_multicart8_r)
 {
-	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
 	cartridge_t *cart;
 
 	int slot = cartslots->active_slot;
@@ -2792,7 +2939,7 @@ READ8_DEVICE_HANDLER(ti99_multicart8_r)
 
 WRITE8_DEVICE_HANDLER(ti99_multicart8_w)
 {
-	ti99_multicart_t *cartslots = (ti99_multicart_t *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
 	cartridge_t *cart;
 
 	int slot = cartslots->active_slot;
@@ -2824,109 +2971,32 @@ WRITE8_DEVICE_HANDLER(ti99_multicart8_w)
 		}
 	}
 }
+#define TI99_CARTRIDGE_SLOT(p)  MDRV_CARTSLOT_ADD(p) \
+        MDRV_CARTSLOT_EXTENSION_LIST("rpk,bin") \
+        MDRV_CARTSLOT_PCBTYPE(0, "none", TI99_CARTRIDGE_PCB_NONE) \
+        MDRV_CARTSLOT_PCBTYPE(1, "standard", TI99_CARTRIDGE_PCB_STD) \
+        MDRV_CARTSLOT_PCBTYPE(2, "paged", TI99_CARTRIDGE_PCB_PAGED) \
+        MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM) \
+        MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER) \
+        MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX) \
+        MDRV_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I) \
+        MDRV_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU) \
+        MDRV_CARTSLOT_START(ti99_cartridge) \
+        MDRV_CARTSLOT_LOAD(ti99_cartridge) \
+        MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
 
 static MACHINE_DRIVER_START(ti99_multicart)
-	MDRV_CARTSLOT_ADD("cartridge1")
-	MDRV_CARTSLOT_EXTENSION_LIST("rpk,bin")
-	MDRV_CARTSLOT_PCBTYPE(0, "none", TI99_CARTRIDGE_PCB_NONE)
-	MDRV_CARTSLOT_PCBTYPE(1, "standard", TI99_CARTRIDGE_PCB_STD)
-	MDRV_CARTSLOT_PCBTYPE(2, "paged", TI99_CARTRIDGE_PCB_PAGED)
-	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
-	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
-	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
-	MDRV_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I)
-	MDRV_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU)
-
-	MDRV_CARTSLOT_START(ti99_cartridge)
-	MDRV_CARTSLOT_LOAD(ti99_cartridge)
-	MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
-
-	MDRV_CARTSLOT_ADD("cartridge2")
-	MDRV_CARTSLOT_EXTENSION_LIST("rpk,bin")
-	MDRV_CARTSLOT_PCBTYPE(0, "none", TI99_CARTRIDGE_PCB_NONE)
-	MDRV_CARTSLOT_PCBTYPE(1, "standard", TI99_CARTRIDGE_PCB_STD)
-	MDRV_CARTSLOT_PCBTYPE(2, "paged", TI99_CARTRIDGE_PCB_PAGED)
-	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
-	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
-	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
-	MDRV_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I)
-	MDRV_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU)
-
-	MDRV_CARTSLOT_START(ti99_cartridge)
-	MDRV_CARTSLOT_LOAD(ti99_cartridge)
-	MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
-
-	MDRV_CARTSLOT_ADD("cartridge3")
-	MDRV_CARTSLOT_EXTENSION_LIST("rpk,bin")
-	MDRV_CARTSLOT_PCBTYPE(0, "none", TI99_CARTRIDGE_PCB_NONE)
-	MDRV_CARTSLOT_PCBTYPE(1, "standard", TI99_CARTRIDGE_PCB_STD)
-	MDRV_CARTSLOT_PCBTYPE(2, "paged", TI99_CARTRIDGE_PCB_PAGED)
-	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
-	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
-	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
-	MDRV_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I)
-	MDRV_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU)
-
-	MDRV_CARTSLOT_START(ti99_cartridge)
-	MDRV_CARTSLOT_LOAD(ti99_cartridge)
-	MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
-
-	MDRV_CARTSLOT_ADD("cartridge4")
-	MDRV_CARTSLOT_EXTENSION_LIST("rpk,bin")
-	MDRV_CARTSLOT_PCBTYPE(0, "none", TI99_CARTRIDGE_PCB_NONE)
-	MDRV_CARTSLOT_PCBTYPE(1, "standard", TI99_CARTRIDGE_PCB_STD)
-	MDRV_CARTSLOT_PCBTYPE(2, "paged", TI99_CARTRIDGE_PCB_PAGED)
-	MDRV_CARTSLOT_PCBTYPE(3, "minimem", TI99_CARTRIDGE_PCB_MINIMEM)
-	MDRV_CARTSLOT_PCBTYPE(4, "super", TI99_CARTRIDGE_PCB_SUPER)
-	MDRV_CARTSLOT_PCBTYPE(5, "mbx", TI99_CARTRIDGE_PCB_MBX)
-	MDRV_CARTSLOT_PCBTYPE(6, "paged379i", TI99_CARTRIDGE_PCB_PAGED379I)
-	MDRV_CARTSLOT_PCBTYPE(7, "pagedcru", TI99_CARTRIDGE_PCB_PAGEDCRU)
-
-	MDRV_CARTSLOT_START(ti99_cartridge)
-	MDRV_CARTSLOT_LOAD(ti99_cartridge)
-	MDRV_CARTSLOT_UNLOAD(ti99_cartridge)
+        TI99_CARTRIDGE_SLOT("cartridge1")
+        TI99_CARTRIDGE_SLOT("cartridge2")
+        TI99_CARTRIDGE_SLOT("cartridge3")
+        TI99_CARTRIDGE_SLOT("cartridge4")
 MACHINE_DRIVER_END
 
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
-DEVICE_GET_INFO(ti99_multicart)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data --- */
-		case DEVINFO_PTR_MACHINE_CONFIG:
-			info->machine_config = MACHINE_DRIVER_NAME(ti99_multicart); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:
-			strcpy(info->s, "TI99 Multi-Cartridge Extender");
-			break;
-
-		case DEVINFO_INT_TOKEN_BYTES: /* private storage, automatically allocated */
-			info->i = sizeof(ti99_multicart_t);
-			break;
-		case DEVINFO_INT_CLASS:
-			info->i = DEVICE_CLASS_PERIPHERAL;
-			break;
-
-		case DEVINFO_STR_FAMILY:
-			strcpy(info->s, "Multi-cartridge system");
-			break;
-		case DEVINFO_STR_VERSION:
-			strcpy(info->s, "1.0");
-			break;
-		case DEVINFO_STR_SOURCE_FILE:
-			strcpy(info->s, __FILE__);
-			break;
-		/* --- the following bits of info are returned as pointers to functions --- */
-		case DEVINFO_FCT_START:
-			info->start = DEVICE_START_NAME(ti99_multicart);
-			break;
-		case DEVINFO_FCT_STOP:
-			info->stop = DEVICE_STOP_NAME(ti99_multicart);
-			break;
-		case DEVINFO_FCT_RESET:
-			info->reset = DEVICE_RESET_NAME(ti99_multicart);
-			break;
-	}
-}
+#define DEVTEMPLATE_ID(p,s)             p##ti99_multicart##s
+#define DEVTEMPLATE_FEATURES            DT_HAS_START | DT_HAS_STOP | DT_HAS_RESET | DT_HAS_MACHINE_CONFIG
+#define DEVTEMPLATE_NAME                "TI99 Multi-Cartridge Extender"
+#define DEVTEMPLATE_FAMILY              "Multi-cartridge system"
+#include "devtempl.h"
 

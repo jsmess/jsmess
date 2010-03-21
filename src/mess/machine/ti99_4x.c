@@ -425,18 +425,18 @@ void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxpar
 {
 	if (gfxparm != 0)
 		TMS9928A_configure(gfxparm);
-
+	
         /* Initialize all. Actually, at this point, we don't know
-           how the switches are set. Later we use the configuration switches to
-           determine which one to use. */
+        how the switches are set. Later we use the configuration switches to
+        determine which one to use. */
 	ti99_peb_init();
 	ti99_floppy_controllers_init_all(machine);
 	ti99_ide_init(machine);
 	ti99_hsgpl_init(machine);
 	ti99_usbsm_init(machine);
-
+	
 	/* Find the cartslot device and cache it. This is a string search,
-       and we don't want to repeat it on each memory access. */
+	and we don't want to repeat it on each memory access. */
 	cartslots = devtag_get_device(machine, "ti99_multicart");
 	assert(cartslots != NULL);
 }
@@ -542,9 +542,6 @@ MACHINE_RESET( ti99 )
 		memory_install_read16_handler(space, 0x9000, 0x93ff, 0, 0, ti99_nop_8_r);
 		memory_install_write16_handler(space, 0x9400, 0x97ff, 0, 0, ti99_nop_8_w);
 	}
-	/* Check whether we have locked the cartslot. This uses GROM, which the 4p doesn't have. */
-	if (ti99_model != model_99_4p)
-		ti99_lock_cartridge_slot(cartslots, (input_port_read(machine, "CFG") >> config_cartslot_bit) & config_cartslot_mask);
 
 	switch (xRAM_kind)
 	{
@@ -885,7 +882,7 @@ static void speech_kludge_callback(int dummy)
 	if (! tms5220_readyq_r())
 	{
 		/* Weirdly enough, we are always seeing some problems even though
-        everything is working fine. */
+		everything is working fine. */
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
 		logerror("ti99/4a speech says aaargh!\n");
 		logerror("(time to ready: %f -> %d)\n", time_to_ready, (int) ceil(3000000*time_to_ready));
@@ -900,56 +897,64 @@ static void speech_kludge_callback(int dummy)
 static WRITE16_HANDLER ( ti99_wspeech_w )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
-
-#if 1
+	
+	#if 1
 	/* the stupid design of the tms5220 core means that ready is cleared when
-    there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
-    case, we would need to store the value on the bus, which would be more
-    complex. */
+	there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
+	case, we would need to store the value on the bus, which would be more
+	complex. */
 	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
 		int cycles_to_ready = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
-
+		
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
-
+		
 		cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-cycles_to_ready);
 		timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 	}
-#endif
-
+	#endif
+	
 	tms5220_data_w(devtag_get_device(space->machine, "tms5220"), offset, (data >> 8) & 0xff);
 }
 
-static UINT8 GROM_dataread(void)
+static UINT8 GROM_dataread(offs_t offset)
 {
-	UINT8 reply;
-	if (console_GROMs.addr >= 0x6000)
-	{
-		/* Pass the (one and only) program counter for GROMs. The
-           buffer is set and used in the cartridge chip. */
-		reply = ti99_cartridge_grom_read(cartslots, console_GROMs.addr-0x6000);
-	}
-	else
+	UINT8 reply = 0, replycart;
+	int override_console = FALSE; /* for future extension */
+	
+	if (console_GROMs.addr < 0x6000)
 	{
 		/* GROMs are buffered. Data is retrieved from a buffer,
-        while the buffer is replaced with the next cell
-        content. */
+		while the buffer is replaced with the next cell
+		content. */
 		reply = console_GROMs.buf;
-
+		
 		/* Get next value, put it in buffer. Note that the
-        GROM wraps at 8K boundaries. */
+		GROM wraps at 8K boundaries. */
 		console_GROMs.buf = console_GROMs.data_ptr[console_GROMs.addr];
+//		printf("GROM address (cons) = %04x, offset = %04x, reply = %02x\n", console_GROMs.addr, offset, reply);
 	}
 
-//  printf("GROM address = %04x, reply = %02x\n", console_GROMs.addr, reply>>8);
-	/* The program counter wraps at each GROM chip size (8K),
-       so 0x5fff + 1 = 0x4000. */
-	console_GROMs.addr = ((console_GROMs.addr + 1) & 0x1FFF) | (console_GROMs.addr & 0xE000);
+	/* The address pointer in the cartridge system is updated by this call.
+	   We pretend to do a data read, so we mask away the address bit in the
+	   offset. */ 
+	replycart = ti99_cartridge_grom_r(cartslots, offset&0xfffc);
+	
+	if (console_GROMs.addr >= 0x6000 || override_console)
+	{
+		reply = replycart;
+	}
 
+	/* Each GROM chip has its own counter, so we update all of them even 
+	when we do not access them. */
+	/* The program counter wraps at each GROM chip size (8K),
+	so 0x5fff + 1 = 0x4000. */
+	console_GROMs.addr = ((console_GROMs.addr + 1) & 0x1FFF) | (console_GROMs.addr & 0xE000);
+	
 	/* Reset the read and write address flipflops. */
 	console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
-
+	
 	return reply;
 }
 
@@ -958,48 +963,49 @@ static UINT8 GROM_dataread(void)
 */
 READ16_HANDLER ( ti99_grom_r )
 {
-	UINT16 reply;
-
+	UINT16 reply, replycart;
+	
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4 /*20+3*/);		/* from 4 to 23? */
-//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
+	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+	
 	/* This implementation features a multislot cartridge system which
-       is based on multiple GROM base addresses. The standard base
-       is >9800 (slot 0). When we access the port >9804, we switch to
-       slot 1, >9808 is slot 2, ... >983C is slot 15. Although theoretically
-       we could address up to 256 banks, the TI operating system does not
-       check more than 16 banks.
-       Cartridges may also contain ROMs which need to be banked
-       simultaneously. We use the cartridge slot number to swap the ROM at
-       >6000, or RAM if available. I don't know whether this is the way
-       Texas Instruments envisaged it in the OS, but it is the only
-       plausible way to allow for GROM+ROM cartridges.
-       Note that some cartridges may have programming flaws which only
-       appear when the cartridge is used in a higher-numbered slot.
-       Parsec is one example which only runs in slot 0 as the
-       programmers hard-coded an access to GROM port 0. Note: This *may*
-       be worked around if we make sure that switching only occurs
-       when the address is set, not when data is read or written. But
-       it's not clear whether this has unwanted side effects.
-    */
-
-	/* Activates a slot in the multi-cartridge extender. */
-	ti99_cartridge_slot_set(cartslots, (offset & 0x01fe)/2);
-
+	is based on multiple GROM base addresses. The standard base
+	is >9800 (slot 0). When we access the port >9804, we switch to
+	slot 1, >9808 is slot 2, ... >983C is slot 15. Although theoretically
+	we could address up to 256 banks, the TI operating system does not
+	check more than 16 banks.
+	Cartridges may also contain ROMs which need to be banked
+	simultaneously. We use the cartridge slot number to swap the ROM at
+	>6000, or RAM if available. I don't know whether this is the way
+	Texas Instruments envisaged it in the OS, but it is the only
+	plausible way to allow for GROM+ROM cartridges.
+	Note that some cartridges may have programming flaws which only
+	appear when the cartridge is used in a higher-numbered slot.
+	Parsec is one example which only runs in slot 0 as the
+	programmers hard-coded an access to GROM port 0. Note: This *may*
+	be worked around if we make sure that switching only occurs
+	when the address is set, not when data is read or written. But
+	it's not clear whether this has unwanted side effects.
+	*/
+			
 	if (offset & 1)
 	{	/* Read GROM address
-           We only have one GROM program counter for the console GROMs
-           and all cartridge GROMs in all banks(!). Hardware
-           implementations must take this into account as well. Thus,
-           we use a structure here in the console, rather than separate
-           counters in each GROM chip. */
+		We only have one GROM program counter for the console GROMs
+		and all cartridge GROMs in all banks(!). Hardware
+		implementations must take this into account as well. Thus,
+		we use a structure here in the console, rather than separate
+		counters in each GROM chip. */
 
+		/* We call the cartridge system here, but we ignore the
+		   value. This is done to sync the flags. */
+		replycart = ti99_cartridge_grom_r(cartslots, (offset<<1))<<8;
+		
 		/* When reading, reset the hi/lo flag byte for writing.
-           TODO: Verify this with a real machine. */
+		TODO: Verify this with a real machine. */
 		console_GROMs.waddr_LSB = FALSE;
-
+		
 		/* Address reading is done in two steps; first, the high byte
-           is transferred, then the low byte. */
+		is transferred, then the low byte. */
 		if (console_GROMs.raddr_LSB)
 		{
 			/* second pass */
@@ -1012,51 +1018,53 @@ READ16_HANDLER ( ti99_grom_r )
 			reply = console_GROMs.addr & 0xff00;
 			console_GROMs.raddr_LSB = TRUE;
 		}
+		/* GROM address values must be globally unique. */
+		assert (replycart == reply);
 	}
 	else
 	{
 		/* Read GROM data */
-		reply = ((UINT16)GROM_dataread()) << 8;
+		/* Note that we shift the GROM port address to accomodate for
+		   8-bit and 16-bit systems. */
+		reply = ((UINT16)GROM_dataread(offset<<1)) << 8;
 	}
-
+	
 	if (hsgpl_crdena)
 		/* hsgpl buffers are stronger than console GROM buffers */
 		reply = ti99_hsgpl_gpl_r(space, offset, mem_mask);
-
+	
 	return reply;
 }
 
 /*
-    GPL write
+	GPL write
 */
 WRITE16_HANDLER ( ti99_grom_w )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4/*20+3*/);		/* from 4 to 23? */
-//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
-	/* Activates a slot in the multi-cartridge extender. */
-	ti99_cartridge_slot_set(cartslots, (offset & 0x01fe)/2);
-
-	// 1001 1wbb bbbb bbr0
-
+	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+		
 	if (offset & 1)
-	{	/* write GROM address */
+	{
+		ti99_cartridge_grom_w(cartslots, (offset<<1), (data>>8)&0xff);
+
+		/* write GROM address */
 		/* see comments above */
 		console_GROMs.raddr_LSB = FALSE;
-
+			
 		/* Implements the internal flipflop.
-           The Editor/Assembler manuals says that the current address
-           plus one is returned. This effect is properly emulated
-           as we are using a read-ahead buffer.
-        */
+		The Editor/Assembler manuals says that the current address
+		plus one is returned. This effect is properly emulated
+		as we are using a read-ahead buffer.
+		*/
 		if (console_GROMs.waddr_LSB)
 		{
 			/* Accept low byte (2nd write) */
 			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | ((data >> 8) & 0xFF);
-
+			
 			/* Setting the address causes a new read, putting the
-               value into the buffer. We don't need the value here. */
-			GROM_dataread();
+			value into the buffer. We don't need the value here. */
+			GROM_dataread(offset<<1);
 			console_GROMs.waddr_LSB = FALSE;
 		}
 		else
@@ -1065,21 +1073,20 @@ WRITE16_HANDLER ( ti99_grom_w )
 			console_GROMs.addr = (data & 0xFF00) | (console_GROMs.addr & 0xFF);
 			console_GROMs.waddr_LSB = TRUE;
 		}
-
 	}
 	else
 	{
 		/* write GROM data */
 		/* the console GROMs are always affected */
 		/* BTW, console GROMs are never GRAMs, therefore there is no
-           need to actually write anything, so we just read ahead
-           TODO: There could be cartridges with GRAM, so this must be
-           fixed.
-        */
-		GROM_dataread();
+		need to actually write anything, so we just read ahead
+		TODO: There could be cartridges with GRAM, so this must be
+		fixed.
+		*/
+		GROM_dataread(offset<<1);
 		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
 	}
-
+	
 	if (hsgpl_crdena)
 		ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
 }
@@ -1090,16 +1097,13 @@ WRITE16_HANDLER ( ti99_grom_w )
 */
 static READ8_HANDLER ( ti99_grom_r8 )
 {
-	UINT8 reply;
+	UINT8 reply, replycart;
 
 	cpu_adjust_icount(space->machine->firstcpu,-4);
 
-	/* Activates a slot in the multi-cartridge extender. */
-	// 1001 1wbb bbbb bbr0
-	ti99_cartridge_slot_set(cartslots, (offset & 0x03fc)/4);
-
 	if (offset & 2)
 	{
+		replycart = ti99_cartridge_grom_r(cartslots, offset);
 		console_GROMs.waddr_LSB = FALSE;
 
 		if (console_GROMs.raddr_LSB)
@@ -1112,9 +1116,11 @@ static READ8_HANDLER ( ti99_grom_r8 )
 			reply = (console_GROMs.addr>>8) & 0x00ff;
 			console_GROMs.raddr_LSB = TRUE;
 		}
+		/* GROM address values must be globally unique. */
+		assert (replycart == reply);
 	}
 	else
-		reply = GROM_dataread();
+		reply = GROM_dataread(offset);
 
 	return reply;
 }
@@ -1127,17 +1133,15 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 {
 	cpu_adjust_icount(space->machine->firstcpu,-4/*20+3*/);		/* from 4 to 23? */
 
-	/* Activates a slot in the multi-cartridge extender. */
-	ti99_cartridge_slot_set(cartslots, (offset & 0x03fc)/4);
-
 	if (offset & 2)
 	{
+		ti99_cartridge_grom_w(cartslots, offset, data);
 		console_GROMs.raddr_LSB = FALSE;
 		if (console_GROMs.waddr_LSB)
 		{
 			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | (data & 0xFF);
 
-			GROM_dataread();
+			GROM_dataread(offset);
 			console_GROMs.waddr_LSB = FALSE;
 		}
 		else
@@ -1149,7 +1153,7 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 	}
 	else
 	{
-		GROM_dataread();
+		GROM_dataread(offset);
 		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
 	}
 }
@@ -1161,8 +1165,8 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 READ16_HANDLER ( ti99_4p_grom_r )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
-//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
+	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+	
 	return /*hsgpl_crdena ?*/ ti99_hsgpl_gpl_r(space, offset, mem_mask) /*: 0*/;
 }
 
@@ -1172,10 +1176,10 @@ READ16_HANDLER ( ti99_4p_grom_r )
 WRITE16_HANDLER ( ti99_4p_grom_w )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
-//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
+	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+	
 	/*if (hsgpl_crdena)*/
-		ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
+	ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
 }
 
 
@@ -1190,11 +1194,11 @@ READ8_HANDLER( ti99_8_r )
 	int page = offset >> 12;
 	UINT32 mapper_reg;
 	UINT8 reply = 0;
-
+	
 	if (ti99_8_enable_rom_and_ports)
 	{
 		/* This is only important for address access 0000-1fff and
-           8000-9fff. Outside, the mapper mode is used. */
+		8000-9fff. Outside, the mapper mode is used. */
 		if ((offset >= 0x0000) && (offset < 0x2000))
 		{
 			/* ROM */
@@ -1211,14 +1215,14 @@ READ8_HANDLER( ti99_8_r )
 				/* RAM: >8000 - >83ff */
 				reply = sRAM_ptr_8[offset & 0x1fff];
 				break;
-
+				
 			case 1:
 				/* >8400 - >840f: sound (cannot read)
-                   >8410 - >87ff: SRAM */
+				>8410 - >87ff: SRAM */
 				if (offset >= 0x8410)
 					reply = sRAM_ptr_8[offset & 0x1fff];
 				break;
-
+				
 			case 2:
 				/* VDP read + mapper status */
 				if (offset < 0x8810)
@@ -1227,10 +1231,10 @@ READ8_HANDLER( ti99_8_r )
 					{
 						if (offset & 2)
 							/* read VDP status >8802 */
-							reply = TMS9928A_register_r(space, 0);
+						reply = TMS9928A_register_r(space, 0);
 						else
 							/* read VDP RAM >8800 */
-							reply = TMS9928A_vram_r(space, 0);
+						reply = TMS9928A_vram_r(space, 0);
 					}
 				}
 				else
@@ -1240,7 +1244,7 @@ READ8_HANDLER( ti99_8_r )
 					ti99_8_mapper_status = 0;
 				}
 				break;
-
+				
 			case 4:
 				/* speech read: >9000 */
 				if (! (offset & 1))
@@ -1249,13 +1253,13 @@ READ8_HANDLER( ti99_8_r )
 					reply = tms5220_status_r(devtag_get_device(space->machine, "tms5220"), 0);
 				}
 				break;
-
+				
 			case 6:
 				/* GROM read: >9800 */
 				if (! (offset & 1))
 					reply = ti99_grom_r8(space, offset);
 				break;
-
+				
 			default:
 				logerror("unmapped read offs=%d\n", (int) offset);
 				break;
@@ -1263,24 +1267,24 @@ READ8_HANDLER( ti99_8_r )
 			return reply;
 		}
 	}
-
+	
 	mapper_reg = ti99_8_mapper_regs[page];
 	offset = (mapper_reg + (offset & 0x0fff)) & 0x00ffffff;
-
-#if 0
+	
+	#if 0
 	/* test read protect */
 	if (mapper_reg & 0x20000000)
 		;
-
+	
 	/* test execute protect */
 	if (mapper_reg & 0x40000000)
 		;
-#endif
-
+	#endif
+	
 	if (offset < 0x010000)
-		/* Read RAM */
-		reply = xRAM_ptr_8[offset];
-
+	/* Read RAM */
+	reply = xRAM_ptr_8[offset];
+	
 	if (offset >= 0xff0000)
 	{
 		switch ((offset >> 13) & 7)
@@ -1297,33 +1301,33 @@ READ8_HANDLER( ti99_8_r )
 			/* ffe000 - ffffff: ? */
 			logerror("unmapped read page=%d offs=%d\n", (int) page, (int) offset);
 			break;
-
+			
 		case 2:
 			/* ff4000 - ff5fff: DSR space */
 			reply = ti99_8_peb_r(space, offset & 0x1fff);
 			break;
-
+			
 		case 3:
 			/* ff6000 - ff7fff: cartridge ROM space */
 			offset &= 0x1fff;
-
+			
 			/* We do not support hsgpl here because it is a 16 bit
-               system. Just check the cartridges.  */
+			system. Just check the cartridges.  */
 			reply = ti99_multicart8_r(multicart8, offset);
 			break;
-
+			
 		case 5:
 			/* ffa000 - ffbfff: >2000 ROM (ROM1) */
 			reply = ROM1_ptr_8[offset & 0x1fff];
 			break;
-
+			
 		case 6:
 			/* ffc000 - ffdfff: >6000 ROM */
 			reply = ROM3_ptr_8[offset & 0x1fff];
 			break;
 		}
 	}
-
+	
 	return reply;
 }
 
@@ -1407,34 +1411,34 @@ WRITE8_HANDLER ( ti99_8_w )
 				if (! (offset & 1))
 				{
 					cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-48*4);		/* this is just an approx. minimum, it can be much more */
-
+					
 					/* the stupid design of the tms5220 core means that ready is cleared when
-                    there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
-                    case, we would need to store the value on the bus, which would be more
-                    complex. */
+					there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
+					case, we would need to store the value on the bus, which would be more
+					complex. */
 					if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
 					{
 						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
 						double d = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
 						int cycles_to_ready = ((int) (d + 3)) & ~3;
-
+						
 						logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready)
 							, (int) cycles_to_ready);
-
+						
 						cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-cycles_to_ready);
 						timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 					}
-
+					
 					tms5220_data_w(devtag_get_device(space->machine, "tms5220"), offset, data);
 				}
 				break;
-
+				
 			case 7:
 				/* GPL write */
 				if (! (offset & 1))
 					ti99_grom_w8(space, offset, data);
 				break;
-
+				
 			default:
 				logerror("unmapped write offs=%d data=%d\n", (int) offset, (int) data);
 				break;
@@ -1552,10 +1556,10 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 	if (handset_buflen == 1)
 	{
 		/* Unless I am missing something, the third and last nybble of the
-        message is not acknowledged by the DSR in any way, and the first nybble
-        of next message is not requested for either, so we need to decide on
-        our own when we can post a new event.  Currently, we wait for 1000us
-        after the DSR acknowledges the second nybble. */
+		message is not acknowledged by the DSR in any way, and the first nybble
+		of next message is not requested for either, so we need to decide on
+		our own when we can post a new event.  Currently, we wait for 1000us
+		after the DSR acknowledges the second nybble. */
 		timer_set(machine, ATTOTIME_IN_USEC(1000), NULL, 0, ti99_handset_ack_callback);
 	}
 
@@ -1618,20 +1622,20 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 
 	/* read current key state */
 	key_buf = ( input_port_read(machine, keynames[num]) | (input_port_read(machine, keynames[num + 1]) << 16) ) >> (4*num);
-
+	
 	/* If a key was previously pressed, this key was not shift, and this key is
-    still down, then don't change the current key press. */
+	still down, then don't change the current key press. */
 	if (previous_key[num] && (previous_key[num] != 0x24)
-			&& (key_buf & (1 << (previous_key[num] & 0x1f))))
+		&& (key_buf & (1 << (previous_key[num] & 0x1f))))
 	{
 		/* check the shift modifier state */
 		if (((previous_key[num] & 0x20) != 0) == ((key_buf & 0x0008) != 0))
 			/* the shift modifier state has not changed */
-			return FALSE;
+		return FALSE;
 		else
 		{
 			/* the shift modifier state has changed: we need to update the
-            keyboard state */
+			keyboard state */
 			if (key_buf & 0x0008)
 			{	/* shift has been pressed down */
 				previous_key[num] = current_key = previous_key[num] | 0x20;
@@ -1642,12 +1646,12 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 			}
 			/* post message */
 			ti99_handset_post_message(machine, (((unsigned) current_key) << 4) | (num << 1));
-
+			
 			return TRUE;
 		}
-
+		
 	}
-
+	
 	current_key = 0;	/* default value if no key is down */
 	for (i=0; i<20; i++)
 	{
@@ -1659,12 +1663,12 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 
 			if (current_key != 0x24)
 				/* If this is the shift key, any other key we may find will
-                have higher priority; otherwise, we may exit the loop and keep
-                the key we have just found. */
+				have higher priority; otherwise, we may exit the loop and keep
+				the key we have just found. */
 				break;
 		}
 	}
-
+	
 	if (current_key != previous_key[num])
 	{
 		previous_key[num] = current_key;
@@ -1717,7 +1721,7 @@ static int ti99_handset_poll_joystick(running_machine *machine, int num)
 
 		/* set sign */
 		/* note that we set the sign if the joystick position is 0 to work
-        around a bug in the ti99/4 ROMs */
+		around a bug in the ti99/4 ROMs */
 		if (current_joy_x <= 0)
 		{
 			message |= 0x040;
@@ -1796,44 +1800,44 @@ static void ti99_handset_task(running_machine *machine)
 static void mecmouse_select(int selnow, int stick1, int stick2)
 {
 	/* The Mechatronic mouse is connected to the joystick port and occupies
-       both joystick select lines and the switch lines. From these five
-       lines, left/right/down are used for the motion (i.e. 3 motion steps
-       for positive and four for negative motion and one for rest),
-       the fire line is used for the secondary mouse button, and the up
-       line is used for the primary button.
-       The mouse motion is delivered by the same lines for both directions;
-       this requires swapping the axes. According to the source code of
-       the accompanying mouse driver, the readout of the current axis is
-       done by selecting joystick 1, then joystick 2. The axis swapping is
-       achieved by selecting stick 1 again. When selecting stick 2, the
-       second axis is seen on the input lines.
-       Interrupting this sequence will lead to swapped axes. This is
-       prevented by resetting the toggle when the mouse is deselected
-       (neither 1 nor 2 are selected).
-
-       The joystick lines are selected as follows:
-       TI-99/4:  Stick 1: P4=1, P3=0, P2=1 (5)
-                 Stick 2: P4=1, P3=1, P2=0 (6)
-
-       TI-99/4A: Stick 1: P4=1, P3=1, P2=0 (6)
-                 Stick 2: P4=1, P3=1, P2=1 (7)
-
-       TI-99/8:  Stick 1: P3=1, P2=1, P1=1, P0=0 (14)
-                 Stick 2: P3=1, P2=1, P1=1, P0=1 (15)
-
-       Geneve: n/a, has own mouse handling via v9938
-
-       As we can only deliver at max 3 steps positive and 4 steps negative,
-       we split the delta so that subsequent queries add up to the actual
-       delta. That is, one delta of +10 yields a 3+3+3+1.
-
-       mecmouse_x holds the current delta to be counted down for x
-       (y accordingly)
-
-       mecmouse_x_buf is the current step count reported to CRU
-
-       Michael Zapf, 2008-01-22
-    */
+	both joystick select lines and the switch lines. From these five
+	lines, left/right/down are used for the motion (i.e. 3 motion steps
+	for positive and four for negative motion and one for rest),
+	the fire line is used for the secondary mouse button, and the up
+	line is used for the primary button.
+	The mouse motion is delivered by the same lines for both directions;
+	this requires swapping the axes. According to the source code of
+	the accompanying mouse driver, the readout of the current axis is
+	done by selecting joystick 1, then joystick 2. The axis swapping is
+	achieved by selecting stick 1 again. When selecting stick 2, the
+	second axis is seen on the input lines.
+	Interrupting this sequence will lead to swapped axes. This is
+	prevented by resetting the toggle when the mouse is deselected
+	(neither 1 nor 2 are selected).
+	
+	The joystick lines are selected as follows:
+	TI-99/4:  Stick 1: P4=1, P3=0, P2=1 (5)
+	Stick 2: P4=1, P3=1, P2=0 (6)
+	
+	TI-99/4A: Stick 1: P4=1, P3=1, P2=0 (6)
+	Stick 2: P4=1, P3=1, P2=1 (7)
+	
+	TI-99/8:  Stick 1: P3=1, P2=1, P1=1, P0=0 (14)
+	Stick 2: P3=1, P2=1, P1=1, P0=1 (15)
+	
+	Geneve: n/a, has own mouse handling via v9938
+	
+	As we can only deliver at max 3 steps positive and 4 steps negative,
+	we split the delta so that subsequent queries add up to the actual
+	delta. That is, one delta of +10 yields a 3+3+3+1.
+	
+	mecmouse_x holds the current delta to be counted down for x
+	(y accordingly)
+	
+	mecmouse_x_buf is the current step count reported to CRU
+	
+	Michael Zapf, 2008-01-22
+	*/
 
 	if (selnow==stick2) {
 		if (mecmouse_sel==stick1) {
@@ -1997,7 +2001,7 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 	if (intreq)
 	{
 		/* On TI99, TMS9900 IC0-3 lines are not connected to TMS9901,
-         * but hard-wired to force level 1 interrupts */
+		* but hard-wired to force level 1 interrupts */
 		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, ASSERT_LINE, 1);	/* interrupt it, baby */
 	}
 	else
@@ -2546,8 +2550,8 @@ static void ti99_sAMSxram_init(running_machine *machine)
 }
 
 /* write CRU bit:
-    bit0: enable/disable mapper registers in DSR space,
-    bit1: enable/disable address mapping */
+	bit0: enable/disable mapper registers in DSR space,
+	bit1: enable/disable address mapping */
 static void sAMS_cru_w(running_machine *machine, int offset, int data)
 {
 	if (offset == 1)
@@ -2570,8 +2574,8 @@ static WRITE8_HANDLER(sAMS_mapper_w)
 static READ16_HANDLER ( ti99_sAMSxramlow_r )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
-//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
+	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+	
 	if (sAMS_mapper_on)
 		return xRAM_ptr[(offset&0x7ff)+sAMSlookup[(0x1000+offset)>>11]];
 	else
@@ -2648,21 +2652,21 @@ static void ti99_4p_mapper_init(running_machine *machine)
 	/* Not required at run-time */
 #if 0
 	memory_install_read16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
-    memory_install_write16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
-    memory_install_read16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
-    memory_install_write16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
-    memory_install_read16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
-    memory_install_write16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
-    memory_install_read16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
-    memory_install_write16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
-    memory_install_read16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
-    memory_install_write16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
-    memory_install_read16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
-    memory_install_write16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
-    memory_install_read16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
-    memory_install_write16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
-    memory_install_read16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
-    memory_install_write16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
+	memory_install_write16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
+	memory_install_read16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
+	memory_install_write16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
+	memory_install_read16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
+	memory_install_write16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
+	memory_install_read16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
+	memory_install_write16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
+	memory_install_read16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
+	memory_install_write16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
+	memory_install_read16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
+	memory_install_write16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
+	memory_install_read16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
+	memory_install_write16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
+	memory_install_read16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
+	memory_install_write16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
 #endif
 
 	ti99_peb_set_16bit_card_handlers(0x1e00, & ti99_4p_mapper_handlers);

@@ -19,6 +19,8 @@ Skeleton drivers:
 - Scientific Atlanta PowerVu pv9234 STB
 - Dream Multimedia Dreambox 7000/5620/500
 
+
+
 System Driver Changes:
 ----------------------
 
@@ -27,6 +29,8 @@ System Driver Changes:
 - [MTX] Cleaned up driver and added cassette device. [Curt Coder]
 
 - [TANDY2K] Implemented DMA mux register. [Curt Coder]
+
+- [TI99] Cleanups.  [Michael Zapf]
 
 - [VICTOR9K] Connected MC6852 device. [Curt Coder]
 

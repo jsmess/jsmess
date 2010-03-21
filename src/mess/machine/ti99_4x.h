@@ -107,6 +107,23 @@ typedef enum
 #endif
 } fdc_kind_t;
 
+/* GROM_port_t: descriptor for a port of 8 GROMs. Required by ti99_4x, ti99pcod */
+struct _GROM_port_t
+{
+        /* pointer to GROM data */
+        UINT8 *data_ptr;
+        /* current address pointer for the active GROM in port (16 bits) */
+        unsigned int addr;
+        /* GROM data buffer */
+        UINT8 buf;
+        /* internal flip-flops that are set after the first access to the GROM
+        address so that next access is mapped to the LSB, and cleared after each
+        data access */
+        char raddr_LSB, waddr_LSB;
+};
+typedef struct _GROM_port_t GROM_port_t;
+
+
 /* defines for input port "CFG" */
 enum
 {
