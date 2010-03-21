@@ -1169,10 +1169,11 @@ ROM_END
 -------------------------------------------------*/
 
 ROM_START( sx1541 ) // schematic 314001-05
-	ROM_REGION( 0x8000, "sx1541", ROMREGION_LOADBYNAME )
+	ROM_REGION( 0xa000, "sx1541", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "325302-01.uab4",    0x0000, 0x2000, CRC(29ae9752) SHA1(8e0547430135ba462525c224e76356bd3d430f11) )
 	ROM_LOAD( "901229-05 ae.uab5", 0x2000, 0x2000, CRC(361c9f37) SHA1(f5d60777440829e46dc91285e662ba072acd2d8b) )
 	ROM_LOAD( "jiffydos sx1541",   0x4000, 0x4000, CRC(783575f6) SHA1(36ccb9ff60328c4460b68522443ecdb7f002a234) )
+	ROM_LOAD( "1541 flash.uab5",   0x8000, 0x2000, CRC(22f7757e) SHA1(86a1e43d3d22b35677064cca400a6bd06767a3dc) )
 ROM_END
 
 /*-------------------------------------------------

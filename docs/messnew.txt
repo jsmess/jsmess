@@ -26,6 +26,8 @@ System Driver Changes:
 
 - [CBM] Added JiffyDOS BIOSes to VIC-20, C64, C128, Plus/4. [Curt Coder]
 
+- [SX64] Added 1541 FLASH! BIOS. [Guru, Curt Coder]
+
 - [MTX] Cleaned up driver and added cassette device. [Curt Coder]
 
 - [TANDY2K] Implemented DMA mux register. [Curt Coder]
@@ -67,6 +69,8 @@ Source Changes:
 
 - Added JiffyDOS BIOSes to CBM 1541, 1541-II, SX1541, 1571, 1571CR, 1581, 
   and Oceanic OC-118 disk drives. [Curt Coder]
+  
+- Added 1541 FLASH! BIOS to SX1541. [Guru, Curt Coder]
 
 - Implemented Commodore DOS errors 21, 22, and 23 in D64 images. 
   "Microsoft Multiplan" now loads on C64. (bug #1932) [Curt Coder]
