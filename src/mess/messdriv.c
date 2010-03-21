@@ -1674,5 +1674,8 @@ const game_driver * const drivers[] =
 	DRIVER( victor9k )
 	DRIVER( phc25 )
 	DRIVER( pv9234 )
+	DRIVER( dm7000 )
+	DRIVER( dm5620 )
+	DRIVER( dm500 )
 
 #endif /* DRIVER_RECURSIVE */

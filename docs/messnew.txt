@@ -16,7 +16,8 @@ Skeleton drivers:
 -----------------
 - PK8002 Elf
 - MC-1702 [thanks to Anasana]
-
+- Scientific Atlanta PowerVu pv9234 STB
+- Dream Multimedia Dreambox 7000/5620/500
 
 System Driver Changes:
 ----------------------
