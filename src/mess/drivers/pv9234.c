@@ -1,16 +1,28 @@
 /***************************************************************************
 
-        Scientific Atlanta PowerVu pv9234 STB
+PowerVu D9234 STB (c) 1997 Scientific Atlanta
 
-        20/03/2010 Skeleton driver.
+20-mar-2010 skeleton driver
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 
+static UINT32 *powervu_ram;
+
+static WRITE32_HANDLER( debug_w )
+{
+	printf("%02x %c\n",data,data);
+}
+
 static ADDRESS_MAP_START(pv9234_map, ADDRESS_SPACE_PROGRAM, 32)
-	AM_RANGE(0x00000,0x7ffff) AM_ROM
+	AM_RANGE(0x000080cc, 0x000080cf) AM_WRITE(debug_w)
+	AM_RANGE(0x0003e000, 0x0003efff) AM_RAM AM_BASE(&powervu_ram)
+	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM AM_REGION("maincpu",0) //FLASH ROM!
+	AM_RANGE(0x00080000, 0x00087fff) AM_MIRROR(0x78000) AM_RAM AM_SHARE("share1")//mirror is a guess, writes a prg at 0xc0200 then it jumps at b0200 (!)
+	AM_RANGE(0xe0000000, 0xe0007fff) AM_MIRROR(0x0fff8000) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xffffff00, 0xffffffff) AM_RAM //i/o? stack ram?
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -20,6 +32,10 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pv9234)
 {
+	int i;
+
+	for(i=0;i<0x1000/4;i++)
+		powervu_ram[i] = 0;
 }
 
 static VIDEO_START( pv9234 )
@@ -54,7 +70,7 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( pv9234 )
-    ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
+    ROM_REGION32_LE( 0x80000, "maincpu", ROMREGION_ERASE00 )
 	ROM_LOAD16_BYTE( "u19.bin", 0x00000, 0x20000, CRC(1e06b0c8) SHA1(f8047f7127919e73675375578bb9fcc0eed2178e))
 	ROM_LOAD16_BYTE( "u18.bin", 0x00001, 0x20000, CRC(924487dd) SHA1(fb1d7c9a813ded8c820589fa85ae72265a0427c7))
 	ROM_LOAD16_BYTE( "u17.bin", 0x40000, 0x20000, CRC(cac03650) SHA1(edd8aec6fed886d47de39ed4e127de0a93250a45))
