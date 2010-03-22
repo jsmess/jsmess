@@ -39,11 +39,29 @@
 #include "emu.h"
 #include "cpu/powerpc/ppc.h"
 
-static ADDRESS_MAP_START( dm7000_mem, ADDRESS_SPACE_PROGRAM, 64 )
+/*
+ Memory map for the IBM "Redwood-4" STB03xxx evaluation board.
+
+ The  STB03xxx internal i/o addresses don't work for us 1:1,
+ so we need to map them at a well know virtual address.
+
+ 4000 000x   uart1           -> 0xe000 000x
+ 4001 00xx   ppu
+ 4002 00xx   smart card
+ 4003 000x   iic
+ 4004 000x   uart0
+ 4005 0xxx   timer
+ 4006 00xx   gpio
+ 4007 00xx   smart card
+ 400b 000x   iic
+ 400c 000x   scp
+ 400d 000x   modem
+*/
+static ADDRESS_MAP_START( dm7000_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH	
-	AM_RANGE(0x00000000, 0x0000ffff) AM_RAM	 // placed for driver not to crash
-	AM_RANGE(0xa0000000, 0xa000ffff) AM_RAM	 // placed for driver not to crash on real system 64MB of RAM
-	AM_RANGE(0xfff00000, 0xfff1ffff) AM_ROM AM_REGION("user1",0)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM	// RAM page 0 - 32MB
+	AM_RANGE(0x20000000, 0x21ffffff) AM_RAM // RAM page 1 - 32MB
+	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -66,7 +84,7 @@ static VIDEO_UPDATE( dm7000 )
 
 static MACHINE_DRIVER_START( dm7000 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",PPC603, 252000000)
+    MDRV_CPU_ADD("maincpu",PPC403GA, 252000000) // Should be PPC405
     MDRV_CPU_PROGRAM_MAP(dm7000_mem)
 
     MDRV_MACHINE_RESET(dm7000)
@@ -87,17 +105,17 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( dm7000 )
-    ROM_REGION( 0x20000, "user1", ROMREGION_64BIT | ROMREGION_BE )
-	ROM_LOAD( "dm7000.bin", 0x0000, 0x20000, CRC(8a410f67) SHA1(9d6c9e4f5b05b28453d3558e69a207f05c766f54))
+    ROM_REGION( 0x20000, "user1", ROMREGION_32BIT | ROMREGION_BE  )
+	ROMX_LOAD( "dm7000.bin", 0x0000, 0x20000, CRC(8a410f67) SHA1(9d6c9e4f5b05b28453d3558e69a207f05c766f54), ROM_GROUPWORD )
 ROM_END
 
 ROM_START( dm5620 )
-    ROM_REGION( 0x20000, "user1", ROMREGION_64BIT | ROMREGION_BE )
-	ROM_LOAD( "dm5620.bin", 0x0000, 0x20000, CRC(ccddb822) SHA1(3ecf553ced0671599438368f59d8d30df4d13ade))
+    ROM_REGION( 0x20000, "user1", ROMREGION_32BIT | ROMREGION_BE  )
+	ROMX_LOAD( "dm5620.bin", 0x0000, 0x20000, CRC(ccddb822) SHA1(3ecf553ced0671599438368f59d8d30df4d13ade), ROM_GROUPWORD )
 ROM_END
 
 ROM_START( dm500 )
-    ROM_REGION( 0x20000, "user1", ROMREGION_64BIT | ROMREGION_BE )
+    ROM_REGION( 0x20000, "user1", ROMREGION_32BIT | ROMREGION_BE )
 	ROM_SYSTEM_BIOS( 0, "alps", "Alps" )
     ROMX_LOAD( "dm500-alps-boot.bin",   0x0000, 0x20000, CRC(daf2da34) SHA1(68f3734b4589fcb3e73372e258040bc8b83fd739), ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(1))
 	ROM_SYSTEM_BIOS( 1, "phil", "Philips" )
