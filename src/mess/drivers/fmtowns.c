@@ -127,6 +127,16 @@
 #define TOWNS_CD_IRQ_MPU 1
 #define TOWNS_CD_IRQ_DMA 2
 
+enum
+{
+	MOUSE_START,
+	MOUSE_SYNC,
+	MOUSE_X_HIGH,
+	MOUSE_X_LOW,
+	MOUSE_Y_HIGH,
+	MOUSE_Y_LOW
+};
+
 static UINT8 ftimer;
 static UINT8 nmi_mask;
 static UINT8 compat_mode;
@@ -156,11 +166,15 @@ static UINT8 towns_kb_irq1_enable;
 static UINT8 towns_kb_output;  // key output
 static UINT8 towns_kb_extend;  // extended key output
 static emu_timer* towns_kb_timer;
+static emu_timer* towns_mouse_timer;
 static UINT8 towns_fm_irq_flag;
 static UINT8 towns_pcm_irq_flag;
 static UINT8 towns_pcm_channel_flag;
 static UINT8 towns_pcm_channel_mask;
 static UINT8 towns_pad_mask;
+static UINT8 towns_mouse_output;
+static UINT8 towns_mouse_x;
+static UINT8 towns_mouse_y;
 
 static struct towns_cdrom_controller
 {
@@ -748,47 +762,144 @@ static WRITE8_HANDLER(towns_sound_ctrl_w)
 
 // Controller ports
 // Joysticks are multiplexed, with fire buttons available when bits 0 and 1 of port 0x4d6 are high. (bits 2 and 3 for second port?)
+static TIMER_CALLBACK(towns_mouse_timeout)
+{
+	towns_mouse_output = MOUSE_START;  // reset mouse data
+}
+
 static READ32_HANDLER(towns_padport_r)
 {
 	UINT32 ret = 0;
-	UINT8 extra1 = input_port_read(space->machine,"joy1_ex");
-	UINT8 extra2 = input_port_read(space->machine,"joy2_ex");
+	UINT32 porttype = input_port_read(space->machine,"ctrltype");
+	UINT8 extra1;
+	UINT8 extra2;
+	UINT32 state;
 
-	if(towns_pad_mask & 0x10)
-		ret |= (input_port_read(space->machine,"joy1") & 0x3f) | 0x00000040;
-	else
-		ret |= (input_port_read(space->machine,"joy1") & 0x0f) | 0x00000030;
+	if((porttype & 0x0f) == 0x00)
+		ret |= 0x000000ff;
+	if((porttype & 0xf0) == 0x00)
+		ret |= 0x00ff0000;
+	if((porttype & 0x0f) == 0x01)
+	{
+		extra1 = input_port_read(space->machine,"joy1_ex");
+	
+		if(towns_pad_mask & 0x10)
+			ret |= (input_port_read(space->machine,"joy1") & 0x3f) | 0x00000040;
+		else
+			ret |= (input_port_read(space->machine,"joy1") & 0x0f) | 0x00000030;
+	
+		if(extra1 & 0x01) // Run button = left+right
+			ret &= ~0x0000000c;
+		if(extra1 & 0x02) // Select button = up+down
+			ret &= ~0x00000003;
+	
+		if((extra1 & 0x10) && (towns_pad_mask & 0x01))
+			ret &= ~0x00000010;
+		if((extra1 & 0x20) && (towns_pad_mask & 0x02))
+			ret &= ~0x00000020;
+	}
+	if((porttype & 0xf0) == 0x10)
+	{
+		extra2 = input_port_read(space->machine,"joy2_ex");
 
-	if(towns_pad_mask & 0x20)
-		ret |= ((input_port_read(space->machine,"joy2") & 0x3f) << 16) | 0x00400000;
-	else
-		ret |= ((input_port_read(space->machine,"joy2") & 0x0f) << 16) | 0x00300000;
+		if(towns_pad_mask & 0x20)
+			ret |= ((input_port_read(space->machine,"joy2") & 0x3f) << 16) | 0x00400000;
+		else
+			ret |= ((input_port_read(space->machine,"joy2") & 0x0f) << 16) | 0x00300000;
+	
+		if(extra2 & 0x01)
+			ret &= ~0x000c0000;
+		if(extra2 & 0x02)
+			ret &= ~0x00030000;
 
-	if(extra1 & 0x01) // Run button = left+right
-		ret &= ~0x0000000c;
-	if(extra2 & 0x01)
-		ret &= ~0x000c0000;
-	if(extra1 & 0x02) // Select button = up+down
-		ret &= ~0x00000003;
-	if(extra2 & 0x02)
-		ret &= ~0x00030000;
-
-	if((extra1 & 0x10) && (towns_pad_mask & 0x01))
-		ret &= ~0x00000010;
-	if((extra1 & 0x20) && (towns_pad_mask & 0x02))
-		ret &= ~0x00000020;
-	if((extra2 & 0x10) && (towns_pad_mask & 0x04))
-		ret &= ~0x00100000;
-	if((extra2 & 0x20) && (towns_pad_mask & 0x08))
-		ret &= ~0x00200000;
-
+		if((extra2 & 0x10) && (towns_pad_mask & 0x04))
+			ret &= ~0x00100000;
+		if((extra2 & 0x20) && (towns_pad_mask & 0x08))
+			ret &= ~0x00200000;
+	}
+	if((porttype & 0x0f) == 0x02)  // mouse
+	{
+		switch(towns_mouse_output)
+		{
+			case MOUSE_X_HIGH:
+				ret |= ((towns_mouse_x & 0xf0) >> 4);
+				break;
+			case MOUSE_X_LOW:
+				ret |= (towns_mouse_x & 0x0f);
+				break;
+			case MOUSE_Y_HIGH:
+				ret |= ((towns_mouse_y & 0xf0) >> 4);
+				break;
+			case MOUSE_Y_LOW:
+				ret |= (towns_mouse_y & 0x0f);
+				break;
+			case MOUSE_START:
+			case MOUSE_SYNC:
+			default:
+				if(towns_mouse_output < MOUSE_Y_LOW)
+					ret |= 0x0000000f;
+		}
+		
+		//logerror("Mouse: X=%02x Y=%02x state=%i\n",towns_mouse_x,towns_mouse_y,towns_mouse_output);
+		// button states are always visible
+		state = input_port_read(space->machine,"mouse1");
+		if(!(state & 0x01))
+			ret |= 0x00000010;
+		if(!(state & 0x02))
+			ret |= 0x00000020;
+		if(towns_pad_mask & 0x10)
+			ret |= 0x00000040;
+	} 
+	
 	return ret;
 }
 
 static WRITE32_HANDLER(towns_pad_mask_w)
 {
+	static UINT8 prev;
+	static UINT8 prev_x,prev_y;
+	UINT8 current_x,current_y;
+	
 	if(ACCESSING_BITS_16_23)
+	{
 		towns_pad_mask = (data & 0x00ff0000) >> 16;
+		if((input_port_read(space->machine,"ctrltype") & 0x0f) == 0x02)  // mouse
+		{
+			if((towns_pad_mask & 0x10) != 0 && (prev & 0x10) == 0)
+			{
+				if(towns_mouse_output == MOUSE_START)
+				{
+					towns_mouse_output = MOUSE_X_HIGH;
+					current_x = input_port_read(space->machine,"mouse2");
+					current_y = input_port_read(space->machine,"mouse3");
+					towns_mouse_x = prev_x - current_x;
+					towns_mouse_y = prev_y - current_y;
+					prev_x = current_x;
+					prev_y = current_y;
+				}
+				else
+					towns_mouse_output++;
+				timer_adjust_periodic(towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
+			}
+			if((towns_pad_mask & 0x10) == 0 && (prev & 0x10) != 0)
+			{
+				if(towns_mouse_output == MOUSE_START)
+				{
+					towns_mouse_output = MOUSE_SYNC;
+					current_x = input_port_read(space->machine,"mouse2");
+					current_y = input_port_read(space->machine,"mouse3");
+					towns_mouse_x = prev_x - current_x;
+					towns_mouse_y = prev_y - current_y;
+					prev_x = current_x;
+					prev_y = current_y;
+				}
+				else
+					towns_mouse_output++;
+				timer_adjust_periodic(towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
+			}
+			prev = towns_pad_mask;
+		}
+	}
 }
 
 static READ8_HANDLER( towns_cmos8_r )
@@ -1747,6 +1858,15 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( towns )
+  PORT_START("ctrltype")
+    PORT_CATEGORY_CLASS(0x0f,0x01,"Joystick port 1")
+    PORT_CATEGORY_ITEM(0x00,"Nothing",10)
+    PORT_CATEGORY_ITEM(0x01,"Standard 2-button joystick",11)
+    PORT_CATEGORY_ITEM(0x02,"Mouse",12)
+    PORT_CATEGORY_CLASS(0xf0,0x10,"Joystick port 2")
+    PORT_CATEGORY_ITEM(0x00,"Nothing",20)
+    PORT_CATEGORY_ITEM(0x10,"Standard 2-button joystick",21)
+
 // Keyboard
   PORT_START( "key1" )  // scancodes 0x00-0x1f
     PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED)
@@ -1883,44 +2003,55 @@ static INPUT_PORTS_START( towns )
     PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("COPY")
 
   PORT_START("joy1")
-    PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1)
-    PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
-    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
-    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1)
-    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED)
-    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED)
-    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(1) PORT_CATEGORY(11)
+    PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(1) PORT_CATEGORY(11)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(1) PORT_CATEGORY(11)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(1) PORT_CATEGORY(11)
+    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CATEGORY(11)
+    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CATEGORY(11)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(11)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(11)
 
   PORT_START("joy1_ex")
-    PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("1P Run") PORT_PLAYER(1)
-    PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("1P Select") PORT_PLAYER(1)
-    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_UNUSED)
-    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_UNUSED)
-    PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1)
-    PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1)
-    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("1P Run") PORT_PLAYER(1) PORT_CATEGORY(11)
+    PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("1P Select") PORT_PLAYER(1) PORT_CATEGORY(11)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CATEGORY(11)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CATEGORY(11)
+    PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(1) PORT_CATEGORY(11)
+    PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(1) PORT_CATEGORY(11)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(11)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(11)
 
   PORT_START("joy2")
-    PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2)
-    PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2)
-    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
-    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
-    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED)
-    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED)
-    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x00000001,IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_PLAYER(2) PORT_CATEGORY(21)
+    PORT_BIT(0x00000002,IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_PLAYER(2) PORT_CATEGORY(21)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_PLAYER(2) PORT_CATEGORY(21)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2) PORT_CATEGORY(21)
+    PORT_BIT(0x00000010,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CATEGORY(21)
+    PORT_BIT(0x00000020,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CATEGORY(21)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(21)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(21)
 
   PORT_START("joy2_ex")
-    PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("2P Run") PORT_PLAYER(2)
-    PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("2P Select") PORT_PLAYER(2)
-    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_UNUSED)
-    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_UNUSED)
-    PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
-    PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2)
-    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED)
-    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED)
+    PORT_BIT(0x00000001,IP_ACTIVE_HIGH, IPT_START) PORT_NAME("2P Run") PORT_PLAYER(2) PORT_CATEGORY(21)
+    PORT_BIT(0x00000002,IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("2P Select") PORT_PLAYER(2) PORT_CATEGORY(21)
+    PORT_BIT(0x00000004,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CATEGORY(21)
+    PORT_BIT(0x00000008,IP_ACTIVE_LOW, IPT_UNUSED) PORT_CATEGORY(21)
+    PORT_BIT(0x00000010,IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2) PORT_CATEGORY(21)
+    PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2) PORT_CATEGORY(21)
+    PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(21)
+    PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(21)
+    
+  PORT_START("mouse1")  // buttons
+  	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CATEGORY(12)
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CATEGORY(12)
+      
+  PORT_START("mouse2")  // X-axis
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CATEGORY(12)
+
+  PORT_START("mouse3")  // Y-axis
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CATEGORY(12)
+
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( marty )
@@ -1948,6 +2079,7 @@ static DRIVER_INIT( towns )
 	towns_init_rtc();
 	towns_rtc_timer = timer_alloc(machine,rtc_second,NULL);
 	towns_kb_timer = timer_alloc(machine,poll_keyboard,NULL);
+	towns_mouse_timer = timer_alloc(machine,towns_mouse_timeout,NULL);
 
 	// CD-ROM init
 	towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)devtag_get_device(machine,"dma_1"));
@@ -1973,6 +2105,7 @@ static MACHINE_RESET( towns )
 	towns_kb_status = 0x18;
 	towns_kb_irq1_enable = 0;
 	towns_pad_mask = 0x7f;
+	towns_mouse_output = MOUSE_START;
 	towns_cd.status = 0x01;  // CDROM controller ready
 	towns_cd.buffer_ptr = -1;
 	timer_adjust_periodic(towns_rtc_timer,attotime_zero,0,ATTOTIME_IN_HZ(1));
