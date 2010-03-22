@@ -11,6 +11,15 @@
 #ifndef SAMCOUPE_H_
 #define SAMCOUPE_H_
 
+/* screen dimensions */
+#define SAM_TOTAL_WIDTH		768
+#define SAM_TOTAL_HEIGHT	312
+#define SAM_SCREEN_WIDTH	512
+#define SAM_SCREEN_HEIGHT	192
+#define SAM_BORDER_LEFT		32
+#define SAM_BORDER_RIGHT	32
+#define SAM_BORDER_TOP		32
+#define SAM_BORDER_BOTTOM	32
 
 /* interrupt sources */
 #define SAM_LINE_INT	 0x01

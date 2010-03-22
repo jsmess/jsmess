@@ -30,6 +30,8 @@ System Driver Changes:
 
 - [MTX] Cleaned up driver and added cassette device. [Curt Coder]
 
+- [SAMCOUPE] Added border rendering support.  [Dirk Best]
+
 - [TANDY2K] Implemented DMA mux register. [Curt Coder]
 
 - [TI99] Cleanups.  [Michael Zapf]

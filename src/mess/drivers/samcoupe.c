@@ -104,8 +104,13 @@ static READ8_HANDLER( samcoupe_pen_r )
 
 	if (offset & 0x100)
 	{
-		/* return either the current line or 192 for the vblank area */
-		data = video_screen_get_vblank(scr) ? 192 : video_screen_get_vpos(scr);
+		int vpos = video_screen_get_vpos(scr);
+
+		/* return the current screen line or 192 for the border area */
+		if (vpos < SAM_BORDER_TOP || vpos >= SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM)
+			data = 192;
+		else
+			data = vpos - SAM_BORDER_TOP;
 	}
 	else
 	{
@@ -328,11 +333,13 @@ static TIMER_CALLBACK( irq_off )
 {
 	coupe_asic *asic = (coupe_asic *)machine->driver_data;
 
-	/* clear interrupt */
-	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
-
 	/* adjust STATUS register */
 	asic->status |= param;
+
+	/* clear interrupt */
+	if ((asic->status & 0x1f) == 0x1f)
+		cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+
 }
 
 void samcoupe_irq(running_device *device, UINT8 src)
@@ -582,13 +589,13 @@ static MACHINE_DRIVER_START( samcoupe )
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(SAMCOUPE_XTAL_X1/2, 768, 0, 512, 312, 0, 192) /* border area? */
+	MDRV_SCREEN_RAW_PARAMS(SAMCOUPE_XTAL_X1/2, SAM_TOTAL_WIDTH, 0, SAM_BORDER_LEFT + SAM_SCREEN_WIDTH + SAM_BORDER_RIGHT, SAM_TOTAL_HEIGHT, 0, SAM_BORDER_TOP + SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_PALETTE_INIT(samcoupe)
 
 	MDRV_VIDEO_UPDATE(samcoupe)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
 
 	/* devices */
 	MDRV_CENTRONICS_ADD("lpt1", standard_centronics)
