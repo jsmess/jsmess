@@ -119,8 +119,11 @@
 
       This should probably be considdered a minor hack but it does seem to work !
 
-    2009-02-04 Phill Harvey-Smith
+    2010-02-04 Phill Harvey-Smith
     - Added multiple sector write as the RM Nimbus needs it.
+
+	2010-March-22 Curt Coder:
+	- Implemented immediate and index pulse interrupts.
 
     TODO:
         - Multiple record write
@@ -140,7 +143,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define VERBOSE			1	/* General logging */
+#define VERBOSE			0	/* General logging */
 #define VERBOSE_DATA	0	/* Logging of each byte during read and write */
 
 #define DELAY_ERROR		3
@@ -296,6 +299,7 @@ struct _wd1770_state
 	UINT8 sector;
 	UINT8 command;
 	UINT8 status;
+	UINT8 interrupt;
 
 	int stepping_rate[4];  /* track stepping rate in ms */
 
@@ -822,6 +826,9 @@ static void wd17xx_index_pulse_callback(running_device *controller, running_devi
 
 	w->idx = state;
 
+	if (!state && w->idx && BIT(w->interrupt, 2))
+		wd17xx_set_intrq(controller);
+
 	if (w->hld_count)
 		w->hld_count--;
 }
@@ -1231,6 +1238,9 @@ WRITE_LINE_DEVICE_HANDLER( wd17xx_idx_w )
 {
 	wd1770_state *w = get_safe_token(device);
 	w->idx = state;
+
+	if (!state && w->idx && BIT(w->interrupt, 2))
+		wd17xx_set_intrq(device);
 }
 
 /* write protect status */
@@ -1274,7 +1284,10 @@ READ8_DEVICE_HANDLER( wd17xx_status_r )
 	wd1770_state *w = get_safe_token(device);
 	int result;
 
-	wd17xx_clear_intrq(device);
+	if (!BIT(w->interrupt, 3))
+	{
+		wd17xx_clear_intrq(device);
+	}
 
 	/* bit 7, 'not ready' or 'motor on' */
 	if (device->type == WD1770 || device->type == WD1772)
@@ -1438,8 +1451,10 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 
 	floppy_drive_set_ready_state(w->drive, 1,0);
 
-	/* also cleared by writing command */
-	wd17xx_clear_intrq(device);
+	if (!BIT(w->interrupt, 3))
+	{
+		wd17xx_clear_intrq(device);
+	}
 
 	/* clear write protected. On read sector, read track and read dam, write protected bit is clear */
 	w->status &= ~((1<<6) | (1<<5) | (1<<4));
@@ -1456,13 +1471,32 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 
 		wd17xx_clear_drq(device);
 
-		if (data & 0x0f)
+		if (!BIT(w->interrupt, 3) && BIT(data, 3))
 		{
-
-
-
+			/* set immediate interrupt */
+			wd17xx_set_intrq(device);
 		}
 
+		if (BIT(w->interrupt, 3))
+		{
+			if (data == FDC_FORCE_INT)
+			{
+				/* clear immediate interrupt */
+				w->interrupt = data & 0x0f;
+			}
+			else
+			{
+				/* keep immediate interrupt */
+				w->interrupt = 0x08 | (data & 0x07);
+			}
+		}
+		else
+		{
+			w->interrupt = data & 0x0f;
+		}
+
+		/* terminate command */
+		wd17xx_complete_command(device, DELAY_ERROR);
 
 //      w->status_ipl = STA_1_IPL;
 /*      w->status_ipl = 0; */
