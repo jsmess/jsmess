@@ -31,6 +31,7 @@
 #define Z80CTC_TAG		"z80ctc"
 #define Z80SIO_TAG		"z80sio"
 #define Z80DART_TAG		"z80dart"
+#define ABCBUS_TAG		"abcbus"
 #define CASSETTE_TAG	"cassette"
 
 #define ABC800_CHAR_WIDTH	6

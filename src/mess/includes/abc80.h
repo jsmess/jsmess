@@ -48,6 +48,7 @@
 #define Z80_TAG			"ab67"
 #define Z80PIO_TAG		"cd67"
 #define SN76477_TAG		"g8"
+#define ABCBUS_TAG		"abcbus"
 #define CASSETTE_TAG	"cassette"
 
 class abc80_state

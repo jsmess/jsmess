@@ -84,6 +84,8 @@ Source Changes:
   
 - Refactored the MOS6530 device to use devcb. [Curt Coder]
 
+- Refactored the Luxor ABC bus into a device. [Curt Coder]
+
 
 
 0.137

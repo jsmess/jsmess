@@ -451,10 +451,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc800m_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_WRITE(abcbus_channel_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_inp_r, abcbus_utp_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_stat_r, abcbus_cs_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c1_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c2_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c3_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c4_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(abc800_pling_r)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800_hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800_hrc_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_rst_r) AM_WRITE(abc800_hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
@@ -476,10 +481,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc800c_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_WRITE(abcbus_channel_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_inp_r, abcbus_utp_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_stat_r, abcbus_cs_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c1_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c2_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c3_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c4_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_READ(abc800_pling_r)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0x18) AM_WRITE(abc800_hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_READWRITE(abcbus_reset_r, abc800_hrc_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_rst_r) AM_WRITE(abc800_hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x40, 0x43) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80SIO_TAG, z80sio_ba_cd_r, z80sio_ba_cd_w)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x1c) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_r, z80ctc_w)
@@ -496,9 +506,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc802_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x08) AM_WRITE(abcbus_channel_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_inp_r, abcbus_utp_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_stat_r, abcbus_cs_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c1_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c2_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c3_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c4_w)
 	AM_RANGE(0x05, 0x05) AM_MIRROR(0x08) AM_READ(abc802_pling_r)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0x08) AM_READ(abcbus_reset_r)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_rst_r)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0x06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x38, 0x38) AM_MIRROR(0x06) AM_DEVWRITE(MC6845_TAG, mc6845_address_w)
@@ -531,9 +546,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( abc806_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0xff18) AM_WRITE(abcbus_channel_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_inp_r, abcbus_utp_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x18) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_stat_r, abcbus_cs_w)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c1_w)
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c2_w)
+	AM_RANGE(0x04, 0x04) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c3_w)
+	AM_RANGE(0x05, 0x05) AM_MIRROR(0x18) AM_DEVWRITE(ABCBUS_TAG, abcbus_c4_w)
 	AM_RANGE(0x06, 0x06) AM_MIRROR(0xff18) AM_WRITE(abc806_hrs_w)
-	AM_RANGE(0x07, 0x07) AM_MIRROR(0xff18) AM_MASK(0xff00) AM_READWRITE(abcbus_reset_r, abc806_hrc_w)
+	AM_RANGE(0x07, 0x07) AM_MIRROR(0x18) AM_DEVREAD(ABCBUS_TAG, abcbus_rst_r) AM_WRITE(abc806_hrc_w)
 	AM_RANGE(0x20, 0x23) AM_MIRROR(0xff0c) AM_DEVREADWRITE(Z80DART_TAG, z80dart_ba_cd_r, z80dart_ba_cd_w)
 	AM_RANGE(0x31, 0x31) AM_MIRROR(0xff06) AM_DEVREAD(MC6845_TAG, mc6845_register_r)
 	AM_RANGE(0x34, 0x34) AM_MIRROR(0xff00) AM_MASK(0xff00) AM_READWRITE(abc806_mai_r, abc806_mao_w)
@@ -908,15 +928,15 @@ static const z80_daisy_chain abc800_daisy_chain[] =
 
 /* ABC BUS */
 
-static ABCBUS_CONFIG( abcbus_config )
+static ABCBUS_DAISY( abcbus_daisy )
 {
-	{ CONKORT_TAG },
+	{ LUXOR_55_21046_ABCBUS("abc830") },
 	{ NULL }
 };
 
-static ABCBUS_CONFIG( abc802_abcbus_config )
+static ABCBUS_DAISY( abc802_abcbus_daisy )
 {
-//  { CONKORT_TAG }, won't boot with this enabled
+//	{ LUXOR_55_21046_ABCBUS("abc830") }, won't boot with this enabled
 	{ NULL }
 };
 
@@ -932,9 +952,6 @@ static MACHINE_START( abc800 )
 	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
 	state->abc77 = devtag_get_device(machine, ABC77_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-
-	/* initialize the ABC BUS */
-	abcbus_init(machine, Z80_TAG, abcbus_config);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->fetch_charram);
@@ -959,9 +976,6 @@ static MACHINE_START( abc802 )
 	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
 	state->abc77 = devtag_get_device(machine, ABC77_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-
-	/* initialize the ABC BUS */
-	abcbus_init(machine, Z80_TAG, abc802_abcbus_config); // TODO: enable floppy
 
 	/* configure memory */
 	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
@@ -1010,9 +1024,6 @@ static MACHINE_START( abc806 )
 	state->e0516 = devtag_get_device(machine, E0516_TAG);
 	state->abc77 = devtag_get_device(machine, ABC77_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-
-	/* initialize the ABC BUS */
-	abcbus_init(machine, Z80_TAG, abcbus_config);
 
 	/* setup memory banking */
 	state->videoram = auto_alloc_array(machine, UINT8, videoram_size);
@@ -1064,40 +1075,6 @@ static MACHINE_RESET( abc806 )
 	z80dart_ctsb_w(state->z80dart, 0); // 0 = 50Hz, 1 = 60Hz
 }
 
-static DEVICE_IMAGE_LOAD( abc800_serial )
-{
-	/* filename specified */
-	if (device_load_serial(image)==INIT_PASS)
-	{
-		/* setup transmit parameters */
-		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
-
-		/* and start transmit */
-		serial_device_set_transmit_state(image, 1);
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
-
-static DEVICE_GET_INFO( abc800_serial )
-{
-	switch ( state )
-	{
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( abc800_serial );    break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "ABC800 serial port");	                         break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                           break;
-		default:									DEVICE_GET_INFO_CALL(serial);	break;
-	}
-}
-
-#define ABC800_SERIAL	DEVICE_GET_INFO_NAME(abc800_serial)
-
-#define MDRV_ABC800_SERIAL_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, ABC800_SERIAL, 0)
-
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( abc800m )
@@ -1127,9 +1104,12 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
-	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+
+	/* ABC bus */
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
+	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1138,8 +1118,6 @@ static MACHINE_DRIVER_START( abc800m )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
-
-	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc800c )
@@ -1169,9 +1147,12 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc800_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
-	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+
+	/* ABC bus */
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
+	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1180,8 +1161,6 @@ static MACHINE_DRIVER_START( abc800c )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
 	MDRV_RAM_EXTRA_OPTIONS("32K")
-
-	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc802 )
@@ -1211,9 +1190,12 @@ static MACHINE_DRIVER_START( abc802 )
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc802_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
-	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+
+	/* ABC bus */
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abc802_abcbus_daisy)
+	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1221,8 +1203,6 @@ static MACHINE_DRIVER_START( abc802 )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("64K")
-
-	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( abc806 )
@@ -1250,9 +1230,12 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_Z80SIO_ADD(Z80SIO_TAG, ABC800_X01/2/2, sio_intf)
 	MDRV_Z80DART_ADD(Z80DART_TAG, ABC800_X01/2/2, abc806_dart_intf)
 //  MDRV_ABC77_ADD(abc800_abc77_intf)
-	MDRV_LUXOR_55_21046_ADD
 	MDRV_PRINTER_ADD("printer")
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, default_cassette_config)
+
+	/* ABC bus */
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
+	MDRV_LUXOR_55_21046_ADD("abc830")
 
 	/* fake keyboard */
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_tick, USEC(2500))
@@ -1261,8 +1244,6 @@ static MACHINE_DRIVER_START( abc806 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("160K") // 32KB + 128KB
 	MDRV_RAM_EXTRA_OPTIONS("544K") // 32KB + 512KB
-
-	MDRV_ABC800_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 /* ROMs */

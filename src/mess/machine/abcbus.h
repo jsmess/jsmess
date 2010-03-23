@@ -1,3 +1,12 @@
+/**********************************************************************
+
+    Luxor ABC-bus emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
+
 /*
 
                       a     b
@@ -80,43 +89,67 @@
 #ifndef __ABCBUS__
 #define __ABCBUS__
 
-#include "formats/flopimg.h"
+/***************************************************************************
+    MACROS / CONSTANTS
+***************************************************************************/
 
-#define DEVINFO_FCT_ABCBUS_CARD_SELECT	DEVINFO_FCT_DEVICE_SPECIFIC
+#define ABCBUS DEVICE_GET_INFO_NAME( abcbus )
 
-enum
-{
-	ABCBUS_OUT = 0,
-	ABCBUS_INP = 0,
-	ABCBUS_CS = 1,
-	ABCBUS_STAT = 1,
-	ABCBUS_C1,
-	ABCBUS_C2,
-	ABCBUS_C3,
-	ABCBUS_C4,
-	ABCBUS_RST = 7
-};
+#define MDRV_ABCBUS_ADD(_tag, _daisy_chain) \
+	MDRV_DEVICE_ADD(_tag, ABCBUS, 0) \
+	MDRV_DEVICE_CONFIG(_daisy_chain)
 
-/* macros */
-#define ABCBUS_CARD_SELECT_NAME(name)	abcbus_card_select_##name
-#define ABCBUS_CARD_SELECT(name)		void ABCBUS_CARD_SELECT_NAME(name)(running_device *device, UINT8 data)
+#define ABCBUS_DAISY(_name) \
+	const abcbus_daisy_chain (_name)[] =
 
-/* per-device callback functions */
-typedef void (*abcbus_card_select)(running_device *device, UINT8 data);
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
-/* daisy chain structure */
 typedef struct _abcbus_daisy_chain abcbus_daisy_chain;
 struct _abcbus_daisy_chain
 {
-	const char		*tag;	/* device tag */
+	const char *tag;	/* device tag */
+
+	devcb_write8		out_cs_func;
+
+	devcb_read8			in_stat_func;
+
+	devcb_read8			in_inp_func;
+	devcb_write8		out_utp_func;
+
+	devcb_write8		out_c1_func;
+	devcb_write8		out_c2_func;
+	devcb_write8		out_c3_func;
+	devcb_write8		out_c4_func;
+
+	devcb_write_line	out_rst_func;
 };
-#define ABCBUS_CONFIG(name) const abcbus_daisy_chain (name)[] =
 
-void abcbus_init(running_machine *machine, const char *cputag, const abcbus_daisy_chain *daisy);
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
-WRITE8_HANDLER( abcbus_channel_w );
-READ8_HANDLER( abcbus_reset_r );
+/* device interface */
+DEVICE_GET_INFO( abcbus );
 
-FLOPPY_OPTIONS_EXTERN(abc80);
+/* card select */
+WRITE8_DEVICE_HANDLER( abcbus_cs_w );
+
+/* reset */
+READ8_DEVICE_HANDLER( abcbus_rst_r );
+
+/* data */
+READ8_DEVICE_HANDLER( abcbus_inp_r );
+WRITE8_DEVICE_HANDLER( abcbus_utp_w );
+
+/* status */
+READ8_DEVICE_HANDLER( abcbus_stat_r );
+
+/* commands */
+WRITE8_DEVICE_HANDLER( abcbus_c1_w );
+WRITE8_DEVICE_HANDLER( abcbus_c2_w );
+WRITE8_DEVICE_HANDLER( abcbus_c3_w );
+WRITE8_DEVICE_HANDLER( abcbus_c4_w );
 
 #endif

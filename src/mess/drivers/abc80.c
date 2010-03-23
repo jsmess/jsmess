@@ -251,9 +251,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( abc80_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x17)
-	AM_RANGE(0x01, 0x01) AM_WRITE(abcbus_channel_w)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_inp_r, abcbus_utp_w)
+	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE(ABCBUS_TAG, abcbus_stat_r, abcbus_cs_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE(ABCBUS_TAG, abcbus_c1_w)
+	AM_RANGE(0x03, 0x03) AM_DEVWRITE(ABCBUS_TAG, abcbus_c2_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE(ABCBUS_TAG, abcbus_c3_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE(ABCBUS_TAG, abcbus_c4_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE(SN76477_TAG, abc80_sound_w)
-	AM_RANGE(0x07, 0x07) AM_READ(abcbus_reset_r)
+	AM_RANGE(0x07, 0x07) AM_DEVREAD(ABCBUS_TAG, abcbus_rst_r)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0x04) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 ADDRESS_MAP_END
 
@@ -476,9 +481,9 @@ static const z80_daisy_chain abc80_daisy_chain[] =
 
 /* ABC BUS */
 
-static ABCBUS_CONFIG( abcbus_config )
+static ABCBUS_DAISY( abcbus_daisy )
 {
-	{ CONKORT_TAG },
+	{ LUXOR_55_10828_ABCBUS("abc830") },
 	{ NULL }
 };
 
@@ -506,9 +511,6 @@ static MACHINE_START( abc80 )
 	/* find devices */
 	state->z80pio = devtag_get_device(machine, Z80PIO_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-
-	/* initialize the ABC BUS */
-	abcbus_init(machine, Z80_TAG, abcbus_config);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->key_data);
@@ -538,7 +540,8 @@ static MACHINE_DRIVER_START( abc80 )
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, ABC80_XTAL/2/2, abc80_pio_intf)
 
 	/* Luxor Conkort 55-10828 */
-	MDRV_LUXOR_55_10828_ADD
+	MDRV_ABCBUS_ADD(ABCBUS_TAG, abcbus_daisy)
+	MDRV_LUXOR_55_10828_ADD("abc830")
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(abc80_video)

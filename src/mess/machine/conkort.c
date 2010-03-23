@@ -93,7 +93,8 @@ Notes:
 #include "machine/wd17xx.h"
 #include "machine/abcbus.h"
 #include "devices/flopdrv.h"
-
+#include "formats/flopimg.h"
+#include "formats/basicdsk.h"
 
 /***************************************************************************
     PARAMETERS
@@ -113,6 +114,7 @@ Notes:
 typedef struct _slow_t slow_t;
 struct _slow_t
 {
+	int cs;					/* card selected */
 	UINT8 status;			/* ABC BUS status */
 	UINT8 data;				/* ABC BUS data */
 	int fdc_irq;			/* floppy interrupt */
@@ -130,6 +132,7 @@ struct _slow_t
 typedef struct _fast_t fast_t;
 struct _fast_t
 {
+	int cs;					/* card selected */
 	UINT8 status;			/* ABC BUS status */
 	UINT8 data;				/* ABC BUS data */
 	int fdc_irq;			/* FDC interrupt */
@@ -150,6 +153,7 @@ INLINE slow_t *get_safe_token_slow(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
+	assert(device->type == LUXOR_55_10828);
 	return (slow_t *)device->token;
 }
 
@@ -157,19 +161,8 @@ INLINE fast_t *get_safe_token_fast(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
+	assert(device->type == LUXOR_55_21046);
 	return (fast_t *)device->token;
-}
-
-INLINE slow_t *get_safe_token_machine_slow(running_machine *machine)
-{
-	running_device *device = devtag_get_device(machine, CONKORT_TAG);
-	return get_safe_token_slow(device);
-}
-
-INLINE fast_t *get_safe_token_machine_fast(running_machine *machine)
-{
-	running_device *device = devtag_get_device(machine, CONKORT_TAG);
-	return get_safe_token_fast(device);
 }
 
 /***************************************************************************
@@ -178,95 +171,99 @@ INLINE fast_t *get_safe_token_machine_fast(running_machine *machine)
 
 /* Slow Controller */
 
-static READ8_HANDLER( slow_bus_data_r )
+WRITE8_DEVICE_HANDLER( luxor_55_10828_cs_w )
 {
-	slow_t *conkort = get_safe_token_machine_slow(space->machine);
+	slow_t *conkort = get_safe_token_slow(device);
 
+	conkort->cs = (data == 0x2d); // TODO: bit 0 of this is configurable with S1
+}
+
+READ8_DEVICE_HANDLER( luxor_55_10828_inp_r )
+{
+	slow_t *conkort = get_safe_token_slow(device);
 	UINT8 data = 0xff;
 
-	if (!BIT(conkort->status, 6))
+	if (conkort->cs)
 	{
-		data = conkort->data;
+		if (!BIT(conkort->status, 6))
+		{
+			data = conkort->data;
+		}
+
+		z80pio_astb_w(conkort->z80pio, 0);
+		z80pio_astb_w(conkort->z80pio, 1);
 	}
-
-	logerror("INP\n");
-
-	z80pio_astb_w(conkort->z80pio, 0);
-	z80pio_astb_w(conkort->z80pio, 1);
 
 	return data;
 }
 
-static WRITE8_HANDLER( slow_bus_data_w )
+WRITE8_DEVICE_HANDLER( luxor_55_10828_utp_w )
 {
-	slow_t *conkort = get_safe_token_machine_slow(space->machine);
+	slow_t *conkort = get_safe_token_slow(device);
+
+	if (!conkort->cs) return;
 
 	if (BIT(conkort->status, 6))
 	{
 		conkort->data = data;
 	}
 
-	logerror("UTP %02x\n", data);
-
 	z80pio_astb_w(conkort->z80pio, 0);
 	z80pio_astb_w(conkort->z80pio, 1);
 }
 
-static READ8_HANDLER( slow_bus_stat_r )
+READ8_DEVICE_HANDLER( luxor_55_10828_stat_r )
 {
-	slow_t *conkort = get_safe_token_machine_slow(space->machine);
+	slow_t *conkort = get_safe_token_slow(device);
+	UINT8 data = 0xff;
 
-	logerror("STAT\n");
-
-	return (conkort->status & 0xfe) | z80pio_ardy_r(conkort->z80pio);
-}
-
-static WRITE8_HANDLER( slow_bus_c1_w )
-{
-	slow_t *conkort = get_safe_token_machine_slow(space->machine);
-
-	logerror("C1 %02x\n", data);
-
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, ASSERT_LINE);
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-static WRITE8_HANDLER( slow_bus_c3_w )
-{
-	slow_t *conkort = get_safe_token_machine_slow(space->machine);
-
-	logerror("C3 %02x\n", data);
-
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
-}
-
-static ABCBUS_CARD_SELECT( luxor_55_10828 )
-{
-	logerror("CS %02x\n", data);
-
-	if (data == 0x2d) // TODO: bit 0 of this is configurable with S1
+	if (conkort->cs)
 	{
-		const address_space *io = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_IO);
+		data = (conkort->status & 0xfe) | z80pio_ardy_r(conkort->z80pio);
+	}
 
-		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, slow_bus_data_r, slow_bus_data_w);
-		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, slow_bus_stat_r);
-		memory_install_write8_handler(io, ABCBUS_C1, ABCBUS_C1, 0x18, 0, slow_bus_c1_w);
-		memory_nop_write(io, ABCBUS_C2, ABCBUS_C2, 0x18, 0);
-		memory_install_write8_handler(io, ABCBUS_C3, ABCBUS_C3, 0x18, 0, slow_bus_c3_w);
-		memory_nop_write(io, ABCBUS_C4, ABCBUS_C4, 0x18, 0);
+	return data;
+}
+
+WRITE8_DEVICE_HANDLER( luxor_55_10828_c1_w )
+{
+	slow_t *conkort = get_safe_token_slow(device);
+
+	if (conkort->cs)
+	{
+		cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
-static WRITE8_HANDLER( slow_ctrl_w )
+WRITE8_DEVICE_HANDLER( luxor_55_10828_c3_w )
+{
+	slow_t *conkort = get_safe_token_slow(device);
+
+	if (conkort->cs)
+	{
+		cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
+	}
+}
+
+WRITE_LINE_DEVICE_HANDLER( luxor_55_10828_rst_w )
+{
+	if (!state)
+	{
+		device->reset();
+	}
+}
+
+static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
 {
 	/*
 
         bit     signal			description
 
-        0       _SEL 0
-        1       _SEL 1
-        2       _SEL 2
-        3       _MOT ON
+        0       SEL 0
+        1       SEL 1
+        2       SEL 2
+        3       MOT ON
         4       SIDE
         5       _PRECOMP ON
         6       _WAIT ENABLE
@@ -274,12 +271,12 @@ static WRITE8_HANDLER( slow_ctrl_w )
 
     */
 
-	slow_t *conkort = get_safe_token_machine_slow(space->machine);
+	slow_t *conkort = get_safe_token_slow(device->owner);
 
 	/* drive selection */
-	if (BIT(data, 0)) wd17xx_set_drive(conkort->fd1791, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(conkort->fd1791, 1);
-//  if (BIT(data, 2)) wd17xx_set_drive(conkort->fd1791, 2);
+	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
+	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
+//  if (BIT(data, 2)) wd17xx_set_drive(device, 2);
 
 	/* motor enable */
 	floppy_mon_w(conkort->image0, !BIT(data, 3));
@@ -288,16 +285,18 @@ static WRITE8_HANDLER( slow_ctrl_w )
 	floppy_drive_set_ready_state(conkort->image1, 1, 1);
 
 	/* disk side selection */
-	wd17xx_set_side(conkort->fd1791, BIT(data, 4));
+	wd17xx_set_side(device, BIT(data, 4));
 
 	/* wait enable */
 	conkort->wait_enable = BIT(data, 6);
 
 	/* FDC master reset */
-	wd17xx_mr_w(conkort->fd1791, BIT(data, 7));
+	wd17xx_mr_w(device, BIT(data, 7));
+
+	logerror("CTRL %02x\n", data);
 }
 
-static WRITE8_HANDLER( slow_status_w )
+static WRITE8_DEVICE_HANDLER( slow_status_w )
 {
 	/*
 
@@ -314,17 +313,14 @@ static WRITE8_HANDLER( slow_status_w )
 
     */
 
-	slow_t *conkort = get_safe_token_machine_slow(space->machine);
+	slow_t *conkort = get_safe_token_slow(device->owner);
 
 	conkort->status = data;
-
-	/* interrupt to main CPU */
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_IRQ0, BIT(data, 7) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( slow_fdc_r )
 {
-	slow_t *conkort = get_safe_token_machine_slow(device->machine);
+	slow_t *conkort = get_safe_token_slow(device->owner);
 	UINT8 data = 0;
 
 	switch (offset & 0x03)
@@ -347,7 +343,7 @@ static READ8_DEVICE_HANDLER( slow_fdc_r )
 
 static WRITE8_DEVICE_HANDLER( slow_fdc_w )
 {
-	slow_t *conkort = get_safe_token_machine_slow(device->machine);
+	slow_t *conkort = get_safe_token_slow(device->owner);
 
 	switch (offset & 0x03)
 	{
@@ -367,13 +363,34 @@ static WRITE8_DEVICE_HANDLER( slow_fdc_w )
 
 /* Fast Controller */
 
-static READ8_HANDLER( fast_bus_data_r )
+WRITE8_DEVICE_HANDLER( luxor_55_21046_cs_w )
 {
-	fast_t *conkort = get_safe_token_machine_fast(space->machine);
+	fast_t *conkort = get_safe_token_fast(device);
+
+	conkort->cs = (data == input_port_read(device->machine, "SW3"));
+}
+
+READ8_DEVICE_HANDLER( luxor_55_21046_stat_r )
+{
+	fast_t *conkort = get_safe_token_fast(device);
 
 	UINT8 data = 0xff;
 
-	if (!BIT(conkort->status, 6))
+	if (conkort->cs)
+	{
+		data = conkort->status;
+	}
+
+	return data;
+}
+
+READ8_DEVICE_HANDLER( luxor_55_21046_inp_r )
+{
+	fast_t *conkort = get_safe_token_fast(device);
+
+	UINT8 data = 0xff;
+
+	if (conkort->cs && !BIT(conkort->status, 6))
 	{
 		data = conkort->data;
 	}
@@ -381,58 +398,46 @@ static READ8_HANDLER( fast_bus_data_r )
 	return data;
 }
 
-static WRITE8_HANDLER( fast_bus_data_w )
+WRITE8_DEVICE_HANDLER( luxor_55_21046_utp_w )
 {
-	fast_t *conkort = get_safe_token_machine_fast(space->machine);
+	fast_t *conkort = get_safe_token_fast(device);
 
-	if (BIT(conkort->status, 6))
+	if (conkort->cs && BIT(conkort->status, 6))
 	{
 		conkort->data = data;
 	}
 }
 
-static READ8_HANDLER( fast_bus_stat_r )
-{
-	fast_t *conkort = get_safe_token_machine_fast(space->machine);
-
-	return conkort->status;
-}
-
-static WRITE8_HANDLER( fast_bus_c1_w )
-{
-	fast_t *conkort = get_safe_token_machine_fast(space->machine);
-
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, ASSERT_LINE);
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, CLEAR_LINE);
-}
-
-static WRITE8_HANDLER( fast_bus_c3_w )
-{
-	fast_t *conkort = get_safe_token_machine_fast(space->machine);
-
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
-}
-
-static ABCBUS_CARD_SELECT( luxor_55_21046 )
+WRITE8_DEVICE_HANDLER( luxor_55_21046_c1_w )
 {
 	fast_t *conkort = get_safe_token_fast(device);
 
-	if (data == input_port_read(device->machine, "SW3"))
+	if (conkort->cs)
 	{
-		const address_space *io = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_IO);
-
-		memory_install_readwrite8_handler(io, ABCBUS_INP, ABCBUS_OUT, 0x18, 0, fast_bus_data_r, fast_bus_data_w);
-		memory_install_read8_handler(io, ABCBUS_STAT, ABCBUS_STAT, 0x18, 0, fast_bus_stat_r);
-		memory_install_write8_handler(io, ABCBUS_C1, ABCBUS_C1, 0x18, 0, fast_bus_c1_w);
-		memory_nop_write(io, ABCBUS_C2, ABCBUS_C2, 0x18, 0);
-		memory_install_write8_handler(io, ABCBUS_C3, ABCBUS_C3, 0x18, 0, fast_bus_c3_w);
-		memory_nop_write(io, ABCBUS_C4, ABCBUS_C4, 0x18, 0);
+		cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, CLEAR_LINE);
 	}
-
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
-static READ8_HANDLER( fast_ctrl_r )
+WRITE8_DEVICE_HANDLER( luxor_55_21046_c3_w )
+{
+	fast_t *conkort = get_safe_token_fast(device);
+
+	if (conkort->cs)
+	{
+		cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
+	}
+}
+
+WRITE_LINE_DEVICE_HANDLER( luxor_55_21046_rst_w )
+{
+	if (!state)
+	{
+		device->reset();
+	}
+}
+
+static READ8_DEVICE_HANDLER( fast_ctrl_r )
 {
 	/*
 
@@ -452,23 +457,23 @@ static READ8_HANDLER( fast_ctrl_r )
 	return 0x08;
 }
 
-static READ8_HANDLER( fast_data_r )
+static READ8_DEVICE_HANDLER( fast_data_r )
 {
-	fast_t *conkort = get_safe_token_machine_fast(space->machine);
+	fast_t *conkort = get_safe_token_fast(device->owner);
 
 	return conkort->data;
 }
 
-static WRITE8_HANDLER( fast_data_w )
+static WRITE8_DEVICE_HANDLER( fast_data_w )
 {
-	fast_t *conkort = get_safe_token_machine_fast(space->machine);
+	fast_t *conkort = get_safe_token_fast(device->owner);
 
 	conkort->data = data;
 }
 
-static WRITE8_HANDLER( fast_status_w )
+static WRITE8_DEVICE_HANDLER( fast_status_w )
 {
-	fast_t *conkort = get_safe_token_machine_fast(space->machine);
+	fast_t *conkort = get_safe_token_fast(device->owner);
 
 	conkort->status = data;
 }
@@ -487,8 +492,8 @@ static ADDRESS_MAP_START( slow_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
 	AM_RANGE(0xb0, 0xb3) AM_MIRROR(0x0c) AM_DEVREADWRITE(FD1791_TAG, slow_fdc_r, slow_fdc_w)
-	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_WRITE(slow_status_w)
-	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_WRITE(slow_ctrl_w)
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_DEVWRITE(FD1791_TAG, slow_status_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_DEVWRITE(FD1791_TAG, slow_ctrl_w)
 ADDRESS_MAP_END
 
 // Fast Controller
@@ -500,12 +505,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_READ(fast_data_r)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_WRITE(fast_data_w)
-	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_WRITE(fast_status_w)
-//  AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE()
-//  AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_WRITE()
-	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READ(fast_ctrl_r)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x0f) AM_DEVREAD(SAB1793_TAG, fast_data_r)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_data_w)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0x0f) AM_DEVWRITE(SAB1793_TAG, fast_status_w)
+//  AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_DEVWRITE()
+//  AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_DEVWRITE()
+	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_DEVREAD(SAB1793_TAG, fast_ctrl_r)
 	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREAD(SAB1793_TAG, wd17xx_r)
 	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVWRITE(SAB1793_TAG, wd17xx_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_r, z80dma_w)
@@ -566,14 +571,14 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( conkort_pio_port_a_r )
 {
-	slow_t *conkort = get_safe_token_machine_slow(device->machine);
+	slow_t *conkort = get_safe_token_slow(device->owner);
 
 	return conkort->data;
 }
 
 static WRITE8_DEVICE_HANDLER( conkort_pio_port_a_w )
 {
-	slow_t *conkort = get_safe_token_machine_slow(device->machine);
+	slow_t *conkort = get_safe_token_slow(device->owner);
 
 	conkort->data = data;
 }
@@ -595,7 +600,7 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 
     */
 
-	slow_t *conkort = get_safe_token_machine_slow(device->machine);
+	slow_t *conkort = get_safe_token_slow(device->owner);
 
 	UINT8 data = 0;
 
@@ -609,7 +614,7 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 	data |= 0x10;
 
 	/* head load */
-//	data |= wd17xx_hdld_r(conkort->fd1791) << 6;
+//	data |= wd17xx_hdld_r(device) << 6;
 
 	/* FDC interrupt request */
 	data |= conkort->fdc_irq << 7;
@@ -634,7 +639,7 @@ static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 
     */
 
-	slow_t *conkort = get_safe_token_machine_slow(device->machine);
+	slow_t *conkort = get_safe_token_slow(device->owner);
 
 	/* double density enable */
 	wd17xx_dden_w(conkort->fd1791, BIT(data, 3));
@@ -728,7 +733,7 @@ static const z80_daisy_chain fast_daisy_chain[] =
 
 static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_intrq_w )
 {
-	slow_t *conkort = get_safe_token_machine_slow(device->machine);
+	slow_t *conkort = get_safe_token_slow(device->owner);
 
 	conkort->fdc_irq = state;
 
@@ -741,7 +746,7 @@ static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_drq_w )
 {
-	slow_t *conkort = get_safe_token_machine_slow(device->machine);
+	slow_t *conkort = get_safe_token_slow(device->owner);
 
 	conkort->fdc_drq = state;
 
@@ -861,7 +866,7 @@ ROM_END
 
 static DEVICE_START( luxor_55_10828 )
 {
-	slow_t *conkort = (slow_t *)device->token;
+	slow_t *conkort = get_safe_token_slow(device);
 
 	/* find our CPU */
 	conkort->cpu = device->subdevice(Z80_TAG);
@@ -873,6 +878,7 @@ static DEVICE_START( luxor_55_10828 )
 	conkort->image1 = device->subdevice(FLOPPY_1);
 
 	/* register for state saving */
+	state_save_register_device_item(device, 0, conkort->cs);
 	state_save_register_device_item(device, 0, conkort->status);
 	state_save_register_device_item(device, 0, conkort->data);
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
@@ -886,7 +892,11 @@ static DEVICE_START( luxor_55_10828 )
 
 static DEVICE_RESET( luxor_55_10828 )
 {
+	slow_t *conkort = get_safe_token_slow(device);
 
+	conkort->cpu->reset();
+	
+	conkort->cs = 0;
 }
 
 /*-------------------------------------------------
@@ -910,7 +920,6 @@ DEVICE_GET_INFO( luxor_55_10828 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(luxor_55_10828);			break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(luxor_55_10828);			break;
-		case DEVINFO_FCT_ABCBUS_CARD_SELECT:			info->f = (genf *)ABCBUS_CARD_SELECT_NAME(luxor_55_10828);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor 55 10828-01");						break;
@@ -927,7 +936,7 @@ DEVICE_GET_INFO( luxor_55_10828 )
 
 static DEVICE_START( luxor_55_21046 )
 {
-	fast_t *conkort = (fast_t *)device->token;
+	fast_t *conkort = get_safe_token_fast(device);
 
 	/* find our CPU */
 	conkort->cpu = device->subdevice(Z80_TAG);
@@ -939,6 +948,7 @@ static DEVICE_START( luxor_55_21046 )
 	conkort->image1 = device->subdevice(FLOPPY_1);
 
 	/* register for state saving */
+	state_save_register_device_item(device, 0, conkort->cs);
 	state_save_register_device_item(device, 0, conkort->status);
 	state_save_register_device_item(device, 0, conkort->data);
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
@@ -950,10 +960,14 @@ static DEVICE_START( luxor_55_21046 )
 
 static DEVICE_RESET( luxor_55_21046 )
 {
-	fast_t *conkort = (fast_t *)device->token;
+	fast_t *conkort = get_safe_token_fast(device);
 
-	floppy_mon_w(conkort->image0, CLEAR_LINE);
-	floppy_mon_w(conkort->image1, CLEAR_LINE);
+	conkort->cpu->reset();
+
+	conkort->cs = 0;
+
+	floppy_mon_w(conkort->image0, ASSERT_LINE);
+	floppy_mon_w(conkort->image1, ASSERT_LINE);
 	floppy_drive_set_ready_state(conkort->image0, 1, 1);
 	floppy_drive_set_ready_state(conkort->image1, 1, 1);
 }
@@ -979,7 +993,6 @@ DEVICE_GET_INFO( luxor_55_21046 )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(luxor_55_21046);			break;
 		case DEVINFO_FCT_STOP:							/* Nothing */												break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(luxor_55_21046);			break;
-		case DEVINFO_FCT_ABCBUS_CARD_SELECT:			info->f = (genf *)ABCBUS_CARD_SELECT_NAME(luxor_55_21046);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Luxor Conkort 55 21046-xx");				break;
@@ -989,3 +1002,30 @@ DEVICE_GET_INFO( luxor_55_21046 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }
+
+FLOPPY_OPTIONS_START(abc80)
+	FLOPPY_OPTION(abc80, "dsk", "Scandia Metric FD2", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([8])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(abc80, "dsk", "ABC 830", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(abc80, "dsk", "ABC 832/834", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([80])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+	FLOPPY_OPTION(abc80, "dsk", "ABC 838", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([77])
+		SECTORS([26])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([0]))
+FLOPPY_OPTIONS_END
