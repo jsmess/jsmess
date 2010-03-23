@@ -10,6 +10,8 @@
 
     TODO:
 
+	- TRSDOS does not accept any date
+	- CP/M does halts after typing EX
 	- wd17xx.c thinks the drive is always ready
     - keyboard CPU ROM
     - graphics board
@@ -108,7 +110,6 @@ static void trs80m2_keyboard_scan(running_machine *machine)
 			{
 				/* latch key data */
 				state->key_data = trs80m2_keycodes[table][row][col];
-				popmessage("Key %c", state->key_data);
 
 				/* trigger keyboard interrupt */
 				state->kbirq = 0;
@@ -274,7 +275,7 @@ static READ8_HANDLER( nmi_r )
 	data |= state->de << 6;
 
 	/* keyboard interrupt */
-	data |= state->kbirq << 7;
+	data |= !state->kbirq << 7;
 
 	return data;
 }
