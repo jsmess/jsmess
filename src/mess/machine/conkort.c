@@ -101,8 +101,9 @@ Notes:
 
 #define Z80_TAG		"5a"
 #define Z80PIO_TAG	"3a"
+#define FD1791_TAG	"7a"
+
 #define Z80DMA_TAG	"z80dma"
-#define WD1791_TAG	"wd1791"
 #define SAB1793_TAG	"sab1793"
 
 /***************************************************************************
@@ -116,13 +117,12 @@ struct _slow_t
 	UINT8 data;				/* ABC BUS data */
 	int fdc_irq;			/* floppy interrupt */
 	int fdc_drq;			/* floppy data request */
-	int fdc_dden;			/* floppy density */
 	int wait_enable;		/* wait enable */
 
 	/* devices */
 	running_device *cpu;
 	running_device *z80pio;
-	running_device *wd1791;
+	running_device *fd1791;
 	running_device *image0;
 	running_device *image1;
 };
@@ -184,13 +184,14 @@ static READ8_HANDLER( slow_bus_data_r )
 
 	UINT8 data = 0xff;
 
-	z80pio_astb_w(conkort->z80pio, 0);
-
 	if (!BIT(conkort->status, 6))
 	{
 		data = conkort->data;
 	}
 
+	logerror("INP\n");
+
+	z80pio_astb_w(conkort->z80pio, 0);
 	z80pio_astb_w(conkort->z80pio, 1);
 
 	return data;
@@ -200,19 +201,22 @@ static WRITE8_HANDLER( slow_bus_data_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(space->machine);
 
-	z80pio_astb_w(conkort->z80pio, 0);
-
 	if (BIT(conkort->status, 6))
 	{
 		conkort->data = data;
 	}
 
+	logerror("UTP %02x\n", data);
+
+	z80pio_astb_w(conkort->z80pio, 0);
 	z80pio_astb_w(conkort->z80pio, 1);
 }
 
 static READ8_HANDLER( slow_bus_stat_r )
 {
 	slow_t *conkort = get_safe_token_machine_slow(space->machine);
+
+	logerror("STAT\n");
 
 	return (conkort->status & 0xfe) | z80pio_ardy_r(conkort->z80pio);
 }
@@ -221,19 +225,24 @@ static WRITE8_HANDLER( slow_bus_c1_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(space->machine);
 
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, PULSE_LINE);
+	logerror("C1 %02x\n", data);
+
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( slow_bus_c3_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(space->machine);
 
+	logerror("C3 %02x\n", data);
+
 	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static ABCBUS_CARD_SELECT( luxor_55_10828 )
 {
-	slow_t *conkort = get_safe_token_slow(device);
+	logerror("CS %02x\n", data);
 
 	if (data == 0x2d) // TODO: bit 0 of this is configurable with S1
 	{
@@ -246,20 +255,18 @@ static ABCBUS_CARD_SELECT( luxor_55_10828 )
 		memory_install_write8_handler(io, ABCBUS_C3, ABCBUS_C3, 0x18, 0, slow_bus_c3_w);
 		memory_nop_write(io, ABCBUS_C4, ABCBUS_C4, 0x18, 0);
 	}
-
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( slow_ctrl_w )
 {
 	/*
 
-        bit     description
+        bit     signal			description
 
-        0       SEL 0
-        1       SEL 1
-        2       SEL 2
-        3       MOT ON
+        0       _SEL 0
+        1       _SEL 1
+        2       _SEL 2
+        3       _MOT ON
         4       SIDE
         5       _PRECOMP ON
         6       _WAIT ENABLE
@@ -270,9 +277,9 @@ static WRITE8_HANDLER( slow_ctrl_w )
 	slow_t *conkort = get_safe_token_machine_slow(space->machine);
 
 	/* drive selection */
-	if (BIT(data, 0)) wd17xx_set_drive(conkort->wd1791, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(conkort->wd1791, 1);
-//  if (BIT(data, 2)) wd17xx_set_drive(conkort->wd1791, 2);
+	if (BIT(data, 0)) wd17xx_set_drive(conkort->fd1791, 0);
+	if (BIT(data, 1)) wd17xx_set_drive(conkort->fd1791, 1);
+//  if (BIT(data, 2)) wd17xx_set_drive(conkort->fd1791, 2);
 
 	/* motor enable */
 	floppy_mon_w(conkort->image0, !BIT(data, 3));
@@ -281,16 +288,13 @@ static WRITE8_HANDLER( slow_ctrl_w )
 	floppy_drive_set_ready_state(conkort->image1, 1, 1);
 
 	/* disk side selection */
-	wd17xx_set_side(conkort->wd1791, BIT(data, 4));
+	wd17xx_set_side(conkort->fd1791, BIT(data, 4));
 
 	/* wait enable */
 	conkort->wait_enable = BIT(data, 6);
 
-	if (!BIT(data, 7))
-	{
-		/* FDC master reset */
-		wd17xx_reset(conkort->wd1791);
-	}
+	/* FDC master reset */
+	wd17xx_mr_w(conkort->fd1791, BIT(data, 7));
 }
 
 static WRITE8_HANDLER( slow_status_w )
@@ -398,7 +402,8 @@ static WRITE8_HANDLER( fast_bus_c1_w )
 {
 	fast_t *conkort = get_safe_token_machine_fast(space->machine);
 
-	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(conkort->cpu, INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( fast_bus_c3_w )
@@ -473,14 +478,15 @@ static WRITE8_HANDLER( fast_status_w )
 // Slow Controller
 
 static ADDRESS_MAP_START( slow_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM AM_REGION("abc830", 0)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM
+	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
+	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM AM_REGION("abc830", 0)
+	AM_RANGE(0x1000, 0x13ff) AM_MIRROR(0x0c00) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slow_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVREADWRITE(Z80PIO_TAG, z80pio_ba_cd_r, z80pio_ba_cd_w)
-	AM_RANGE(0xb0, 0xb3) AM_MIRROR(0x0c) AM_DEVREADWRITE(WD1791_TAG, wd17xx_r, wd17xx_w)
+	AM_RANGE(0xb0, 0xb3) AM_MIRROR(0x0c) AM_DEVREADWRITE(FD1791_TAG, slow_fdc_r, slow_fdc_w)
 	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0x0f) AM_WRITE(slow_status_w)
 	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0x0f) AM_WRITE(slow_ctrl_w)
 ADDRESS_MAP_END
@@ -500,8 +506,8 @@ static ADDRESS_MAP_START( fast_io_map, ADDRESS_SPACE_IO, 8 )
 //  AM_RANGE(0x30, 0x30) AM_MIRROR(0x0f) AM_WRITE()
 //  AM_RANGE(0x40, 0x40) AM_MIRROR(0x0f) AM_WRITE()
 	AM_RANGE(0x50, 0x50) AM_MIRROR(0x0f) AM_READ(fast_ctrl_r)
-	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREAD(SAB1793_TAG, slow_fdc_r)
-	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVWRITE(SAB1793_TAG, slow_fdc_w)
+	AM_RANGE(0x60, 0x63) AM_MIRROR(0x0c) AM_DEVREAD(SAB1793_TAG, wd17xx_r)
+	AM_RANGE(0x70, 0x73) AM_MIRROR(0x0c) AM_DEVWRITE(SAB1793_TAG, wd17xx_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0f) AM_DEVREADWRITE(Z80DMA_TAG, z80dma_r, z80dma_w)
 ADDRESS_MAP_END
 
@@ -578,44 +584,63 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 
         bit     description
 
-        0       !(_DS0 & _DS1)
-        1       !(_DD0 & _DD1)
+        0       !(_DS0 & _DS1)	single/double sided (0=SS, 1=DS)
+        1       !(_DD0 & _DD1)	single/double density (0=DS, 1=DD)
         2       8B pin 10
-        3       FDC DDEN
-        4       _R/BS
-        5       FDC HLT
-        6       FDC _HDLD
-        7       FDC IRQ
+        3       FDC _DDEN		double density enable
+        4       _R/BS			radial/binary drive select
+        5       FDC HLT			head load timing
+        6       FDC _HDLD		head load
+        7       FDC IRQ			interrupt request
 
     */
 
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
-	return conkort->fdc_irq << 7 | 0x10 | !conkort->fdc_dden << 2;
+	UINT8 data = 0;
+
+	/* single/double sided drive */
+	data |= 0x01;
+
+	/* single/double density drive */
+	data |= 0x02;
+
+	/* radial/binary drive select */
+	data |= 0x10;
+
+	/* head load */
+//	data |= wd17xx_hdld_r(conkort->fd1791) << 6;
+
+	/* FDC interrupt request */
+	data |= conkort->fdc_irq << 7;
+
+	return data;
 }
 
 static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 {
 	/*
 
-        bit     description
+        bit     signal			description
 
-        0       !(_DS0 & _DS1)
-        1       !(_DD0 & _DD1)
+        0       !(_DS0 & _DS1)	single/double sided (0=SS, 1=DS)
+        1       !(_DD0 & _DD1)	single/double density (0=DS, 1=DD)
         2       8B pin 10
-        3       FDC _DDEN
-        4       _R/BS
-        5       FDC HLT
-        6       FDC _HDLD
-        7       FDC IRQ
+        3       FDC _DDEN		double density enable
+        4       _R/BS			radial/binary drive select
+        5       FDC HLT			head load timing
+        6       FDC _HDLD		head load
+        7       FDC IRQ			interrupt request
 
     */
 
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
-	/* disk density */
-	conkort->fdc_dden = BIT(data, 3);
-	wd17xx_dden_w(conkort->wd1791, conkort->fdc_dden);
+	/* double density enable */
+	wd17xx_dden_w(conkort->fd1791, BIT(data, 3));
+
+	/* head load timing */
+//	wd17xx_hlt_w(conkort->fd1791, BIT(data, 5));
 }
 
 static Z80PIO_INTERFACE( conkort_pio_intf )
@@ -701,7 +726,7 @@ static const z80_daisy_chain fast_daisy_chain[] =
 
 /* FD1791 */
 
-static WRITE_LINE_DEVICE_HANDLER( slow_wd1791_intrq_w )
+static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_intrq_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
@@ -714,7 +739,7 @@ static WRITE_LINE_DEVICE_HANDLER( slow_wd1791_intrq_w )
 	}
 }
 
-static WRITE_LINE_DEVICE_HANDLER( slow_wd1791_drq_w )
+static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_drq_w )
 {
 	slow_t *conkort = get_safe_token_machine_slow(device->machine);
 
@@ -730,8 +755,8 @@ static WRITE_LINE_DEVICE_HANDLER( slow_wd1791_drq_w )
 static const wd17xx_interface slow_wd17xx_interface =
 {
 	DEVCB_NULL,
-	DEVCB_LINE(slow_wd1791_intrq_w),
-	DEVCB_LINE(slow_wd1791_drq_w),
+	DEVCB_LINE(slow_fd1791_intrq_w),
+	DEVCB_LINE(slow_fd1791_drq_w),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
@@ -766,7 +791,7 @@ static MACHINE_DRIVER_START( luxor_55_10828 )
 	MDRV_CPU_CONFIG(slow_daisy_chain)
 
 	MDRV_Z80PIO_ADD(Z80PIO_TAG, XTAL_4MHz/2, conkort_pio_intf)
-	MDRV_WD179X_ADD(WD1791_TAG, slow_wd17xx_interface)
+	MDRV_WD179X_ADD(FD1791_TAG, slow_wd17xx_interface)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(abc800_floppy_config)
 MACHINE_DRIVER_END
@@ -843,7 +868,7 @@ static DEVICE_START( luxor_55_10828 )
 
 	/* find devices */
 	conkort->z80pio = device->subdevice(Z80PIO_TAG);
-	conkort->wd1791 = device->subdevice(WD1791_TAG);
+	conkort->fd1791 = device->subdevice(FD1791_TAG);
 	conkort->image0 = device->subdevice(FLOPPY_0);
 	conkort->image1 = device->subdevice(FLOPPY_1);
 
@@ -852,7 +877,6 @@ static DEVICE_START( luxor_55_10828 )
 	state_save_register_device_item(device, 0, conkort->data);
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
 	state_save_register_device_item(device, 0, conkort->fdc_drq);
-	state_save_register_device_item(device, 0, conkort->fdc_dden);
 	state_save_register_device_item(device, 0, conkort->wait_enable);
 }
 
