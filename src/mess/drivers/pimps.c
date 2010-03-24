@@ -40,7 +40,7 @@ static ADDRESS_MAP_START( pimps_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( pimps )
+static INPUT_PORTS_START( pimps )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 

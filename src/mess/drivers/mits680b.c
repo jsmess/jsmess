@@ -19,7 +19,7 @@ static ADDRESS_MAP_START(mits680b_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( mits680b )
+static INPUT_PORTS_START( mits680b )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 

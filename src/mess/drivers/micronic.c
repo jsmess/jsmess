@@ -121,7 +121,7 @@ static ADDRESS_MAP_START(micronic_io, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( micronic )
+static INPUT_PORTS_START( micronic )
 INPUT_PORTS_END
 
 static PALETTE_INIT( micronic )

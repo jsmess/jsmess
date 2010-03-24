@@ -326,7 +326,7 @@ ADDRESS_MAP_END
 /******************************************************************************
  Input Ports
 ******************************************************************************/
-INPUT_PORTS_START( rvoicepc )
+static INPUT_PORTS_START( rvoicepc )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 

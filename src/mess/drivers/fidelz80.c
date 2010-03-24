@@ -231,7 +231,7 @@ ADDRESS_MAP_END
 /******************************************************************************
  Input Ports
 ******************************************************************************/
-INPUT_PORTS_START( fidelz80 )
+static INPUT_PORTS_START( fidelz80 )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 

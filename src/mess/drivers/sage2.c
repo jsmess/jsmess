@@ -26,7 +26,7 @@ static ADDRESS_MAP_START(sage2_mem, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( sage2 )
+static INPUT_PORTS_START( sage2 )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 

@@ -23,7 +23,7 @@ ADDRESS_MAP_END
 
 
 /* Input ports */
-INPUT_PORTS_START( indiana )
+static INPUT_PORTS_START( indiana )
 INPUT_PORTS_END
 
 

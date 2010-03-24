@@ -31,7 +31,7 @@ static ADDRESS_MAP_START(tricep_mem, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( tricep )
+static INPUT_PORTS_START( tricep )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
