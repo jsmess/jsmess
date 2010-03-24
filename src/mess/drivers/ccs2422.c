@@ -30,7 +30,7 @@ static ADDRESS_MAP_START( ccs2422_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( ccs2422 )
+static INPUT_PORTS_START( ccs2422 )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 

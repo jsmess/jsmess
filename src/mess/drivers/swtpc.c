@@ -25,7 +25,7 @@ static ADDRESS_MAP_START(swtpc_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( swtpc )
+static INPUT_PORTS_START( swtpc )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 

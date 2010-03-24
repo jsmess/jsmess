@@ -15,7 +15,7 @@ static ADDRESS_MAP_START(clcd_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( clcd )
+static INPUT_PORTS_START( clcd )
 INPUT_PORTS_END
 
 

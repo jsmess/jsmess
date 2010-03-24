@@ -119,7 +119,7 @@ ADDRESS_MAP_END
 /******************************************************************************
  Input Ports
 ******************************************************************************/
-INPUT_PORTS_START( zexall )
+static INPUT_PORTS_START( zexall )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 

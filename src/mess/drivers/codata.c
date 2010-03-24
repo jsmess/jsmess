@@ -15,7 +15,7 @@ static ADDRESS_MAP_START(codata_mem, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( codata )
+static INPUT_PORTS_START( codata )
 INPUT_PORTS_END
 
 

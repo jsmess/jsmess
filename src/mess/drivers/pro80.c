@@ -22,7 +22,7 @@ static ADDRESS_MAP_START( pro80_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( pro80 )
+static INPUT_PORTS_START( pro80 )
 INPUT_PORTS_END
 
 

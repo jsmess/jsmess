@@ -75,7 +75,7 @@ static ADDRESS_MAP_START( isbc2861_io , ADDRESS_SPACE_IO, 16)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( isbc )
+static INPUT_PORTS_START( isbc )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 

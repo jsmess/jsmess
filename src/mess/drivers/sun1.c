@@ -38,7 +38,7 @@ static ADDRESS_MAP_START(sun1_mem, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( sun1 )
+static INPUT_PORTS_START( sun1 )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 

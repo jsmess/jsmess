@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( mod8_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( mod8 )
+static INPUT_PORTS_START( mod8 )
 	PORT_INCLUDE(generic_teleprinter)
 INPUT_PORTS_END
 

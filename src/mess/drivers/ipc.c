@@ -20,7 +20,7 @@ static ADDRESS_MAP_START( ipc_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( ipc )
+static INPUT_PORTS_START( ipc )
 INPUT_PORTS_END
 
 

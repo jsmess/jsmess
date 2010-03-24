@@ -26,7 +26,7 @@ static ADDRESS_MAP_START(ht68k_mem, ADDRESS_SPACE_PROGRAM, 16)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( ht68k )
+static INPUT_PORTS_START( ht68k )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
 
