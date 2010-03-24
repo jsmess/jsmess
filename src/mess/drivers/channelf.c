@@ -260,6 +260,7 @@ static MACHINE_DRIVER_START( channelf )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,chf")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sabavdpl )
@@ -288,6 +289,7 @@ static MACHINE_DRIVER_START( sabavdpl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,chf")
 MACHINE_DRIVER_END
 
 
@@ -317,6 +319,7 @@ static MACHINE_DRIVER_START( channlf2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,chf")
 MACHINE_DRIVER_END
 
 
@@ -346,6 +349,7 @@ static MACHINE_DRIVER_START( sabavpl2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,chf")
 MACHINE_DRIVER_END
 
 ROM_START( channelf )
@@ -374,10 +378,10 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT     INIT   COMPANY         FULLNAME        FLAGS */
-CONS( 1976, channelf,   0,       0,    channelf,  channelf,   0,      "Fairchild",    "Channel F",                            0)
+CONS( 1976, channelf,  0,        0,    channelf,  channelf,   0,      "Fairchild",    "Channel F",                            0)
 CONS( 1977, sabavdpl,  channelf, 0,    sabavdpl,  channelf,   0,      "SABA",         "SABA Videoplay",                       0)
 CONS( 197?, luxorves,  channelf, 0,    sabavdpl,  channelf,   0,      "Luxor",        "Luxor Video Entertainment System",     0)
-CONS( 1978, channlf2,   0,       0,    channlf2,  channelf,   0,      "Fairchild",    "Channel F II",                         0)
+CONS( 1978, channlf2,  0, channelf,    channlf2,  channelf,   0,      "Fairchild",    "Channel F II",                         0)
 CONS( 1978, sabavpl2,  channlf2, 0,    sabavpl2,  channelf,   0,      "SABA",         "SABA Videoplay 2",                     0)
 CONS( 197?, luxorvec,  channlf2, 0,    sabavpl2,  channelf,   0,      "Luxor",        "Luxor Video Entertainment Computer",   0)
 CONS( 197?, itttelma,  channlf2, 0,    sabavpl2,  channelf,   0,      "ITT",          "ITT Tele-Match Processor",             0)
