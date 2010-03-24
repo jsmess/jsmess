@@ -847,15 +847,15 @@ CONS(1982, dynavisn,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Yamagiwa"
 CONS(1982, ekusera,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"P.I.C",		"Ekusera", GAME_IMPERFECT_SOUND )						/* Japan */
 CONS(1982, hanihac,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Hanimex",		"Hanimex Home Arcade Centre", GAME_IMPERFECT_SOUND )				/* UK */
 CONS(1982, hmg2650,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Hanimex",		"HMG-2650", GAME_IMPERFECT_SOUND )						/* Germany */
-CONS(198?, intmpt03,	0,	   0,        arcadia,	arcadia,  arcadia,	"Intelligent Game",	"Intelligent Game MPT-03", GAME_IMPERFECT_SOUND )				/* U.S.A */
+CONS(198?, intmpt03,	0,	   arcadia,  arcadia,	arcadia,  arcadia,	"Intelligent Game",	"Intelligent Game MPT-03", GAME_IMPERFECT_SOUND )				/* U.S.A */
 CONS(198?, ixl2000,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Intercord",		"Intercord XL 2000 System", GAME_IMPERFECT_SOUND )				/* Germany */
 CONS(198?, intervsn,	ormatu,    0,        arcadia,	arcadia,  arcadia,	"Intervision",		"Intervision 2001", GAME_IMPERFECT_SOUND )					/* Switzerland */
 CONS(198?, itmcmtp3,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"ITMC",			"ITMC MPT-03", GAME_IMPERFECT_SOUND )						/* France */
 CONS(1982, lvision,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Leisure-Dynamics",	"Leisure-Vision", GAME_IMPERFECT_SOUND )					/* Canada */
 CONS(1982, leonardo,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"GiG Electronics",	"Leonardo", GAME_IMPERFECT_SOUND )						/* Italy */
 CONS(1983, mratlus,	plldium,   0,        arcadia,	arcadia,  arcadia,	"H.G.S.",		"Mr. Altus Tele Brain", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )		/* Germany */
-CONS(198?, ormatu,	0,         0,        arcadia,	arcadia,  arcadia,	"Ormatu Electronics",	"Ormatu 2001", GAME_IMPERFECT_SOUND )						/* Netherlands */
-CONS(198?, plldium,	0,         0,        arcadia,	plldium,  arcadia,	"Neckermann",		"Palladium Video-Computer-Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )	/* Germany, 16 keys instead of 12 */
+CONS(198?, ormatu,	0,         arcadia,  arcadia,	arcadia,  arcadia,	"Ormatu Electronics",	"Ormatu 2001", GAME_IMPERFECT_SOUND )						/* Netherlands */
+CONS(198?, plldium,	0,         arcadia,  arcadia,	plldium,  arcadia,	"Neckermann",		"Palladium Video-Computer-Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )	/* Germany, 16 keys instead of 12 */
 CONS(1983, polyvcg,	plldium,   0,        arcadia,	arcadia,  arcadia,	"Polybrain",		"Polybrain Video Computer Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )	/* Germany */
 CONS(198?, poppympt,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Transonic",		"Poppy MPT-03 Tele Computer Spiel", GAME_IMPERFECT_SOUND )			/* Germany */
 CONS(198?, prestige,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Prestige",		"Prestige Video Computer Game MPT-03", GAME_IMPERFECT_SOUND )			/* France */
@@ -869,5 +869,5 @@ CONS(198?, tbbympt3,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Tobby",		
 CONS(198?, trakcvg,	plldium,   0,        arcadia,	arcadia,  arcadia,	"Trakton",		"Trakton Computer Video Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )	/* Australia */
 CONS(1982, tunixha,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Monaco Leisure",	"Tunix Home Arcade", GAME_IMPERFECT_SOUND )					/* New Zealand */
 CONS(198?, tryomvgc,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Tryom",		"Tryom Video Game Center", GAME_IMPERFECT_SOUND )				/* U.S.A */
-CONS(198?, orbituvi,	0,  	   0,        arcadia,	arcadia,  arcadia,	"Orbit Electronics",	"UVI Compu-Game", GAME_IMPERFECT_SOUND )					/* New Zealand */
+CONS(198?, orbituvi,	0,  	   arcadia,  arcadia,	arcadia,  arcadia,	"Orbit Electronics",	"UVI Compu-Game", GAME_IMPERFECT_SOUND )					/* New Zealand */
 CONS(198?, vdmaster,	orbituvi,  0,        arcadia,	arcadia,  arcadia,	"Grandstand",		"Video Master", GAME_IMPERFECT_SOUND )						/* New Zealand */

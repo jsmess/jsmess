@@ -421,7 +421,7 @@ CONS(1978, vc4000,	0,	   0,	     vc4000,	vc4000,	  0,    	"Interton",     	"VC 4
 CONS(197?, spc4000,	vc4000,	   0,	     vc4000,	vc4000,	  0,    	"Grundig",      	"Super Play Computer 4000", GAME_IMPERFECT_GRAPHICS )			/* Germany, Austria */
 CONS(1979, cx3000tc,	vc4000,	   0,	     vc4000,	vc4000,	  0,    	"Palson",   		"CX 3000 Tele Computer", GAME_IMPERFECT_GRAPHICS )			/* Spain */
 CONS(197?, tvc4000,	vc4000,	   0,	     vc4000,	vc4000,	  0,    	"Korting",      	"TVC-4000", GAME_IMPERFECT_GRAPHICS )					/* Argentina */
-CONS(1976, 1292apvs,	0,	   0,	     vc4000,	vc4000,	  0,    	"Radofin",      	"1292 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )	/* Europe */
+CONS(1976, 1292apvs,	0,	   vc4000,   vc4000,	vc4000,	  0,    	"Radofin",      	"1292 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )	/* Europe */
 CONS(1976, 1392apvs,	1292apvs,  0,	     vc4000,	vc4000,	  0,    	"Radofin",      	"1392 Advanced Programmable Video System", GAME_IMPERFECT_GRAPHICS )	/* Europe */
 CONS(1979, mpu1000,	1292apvs,  0,	     vc4000,	vc4000,	  0,    	"Acetronic",    	"MPU-1000", GAME_IMPERFECT_GRAPHICS )					/* Europe */
 CONS(1979, mpu2000,	1292apvs,  0,	     vc4000,	vc4000,	  0,    	"Acetronic",    	"MPU-2000", GAME_IMPERFECT_GRAPHICS )					/* Europe */
@@ -433,13 +433,13 @@ CONS(197?, hmg1292,	1292apvs,  0,	     vc4000,	vc4000,	  0,    	"Hanimex",      
 CONS(197?, hmg1392,	1292apvs,  0,	     vc4000,	vc4000,	  0,    	"Hanimex",      	"HMG 1392", GAME_IMPERFECT_GRAPHICS )					/* Europe */
 CONS(197?, lnsy1392,	1292apvs,  0,	     vc4000,	vc4000,	  0,    	"Lansay",   		"Lansay 1392", GAME_IMPERFECT_GRAPHICS )				/* Europe */
 CONS(197?, vc6000,	1292apvs,  0,	     vc4000,	vc4000,	  0,    	"Prinztronic",      	"VC 6000", GAME_IMPERFECT_GRAPHICS )					/* UK */
-CONS(197?, database,	0,         0,	     vc4000,	vc4000,	  0,    	"Voltmace",     	"Voltmace Database", GAME_IMPERFECT_GRAPHICS )				/* UK */
+CONS(197?, database,	0,         vc4000,   vc4000,	vc4000,	  0,    	"Voltmace",     	"Voltmace Database", GAME_IMPERFECT_GRAPHICS )				/* UK */
 CONS(197?, wvmdtbse,	database,  0,	     vc4000,	vc4000,	  0,    	"Waddington's",     	"Waddington Videomaster Database", GAME_IMPERFECT_GRAPHICS )		/* UK */
-CONS(197?, rwtrntcs,	0,         0,	     vc4000,	vc4000,	  0,    	"Rowtron",      	"Rowtron Television Computer System", GAME_IMPERFECT_GRAPHICS )		/* UK */
+CONS(197?, rwtrntcs,	0,         vc4000,   vc4000,	vc4000,	  0,    	"Rowtron",      	"Rowtron Television Computer System", GAME_IMPERFECT_GRAPHICS )		/* UK */
 CONS(197?, telngtcs,	rwtrntcs,  0,	     vc4000,	vc4000,	  0,    	"Teleng",   		"Teleng Television Computer System", GAME_IMPERFECT_GRAPHICS )		/* UK */
-CONS(197?, krvnjvtv,	0,         0,	     vc4000,	vc4000,	  0,    	"Karvan",   		"Jeu Video TV", GAME_IMPERFECT_GRAPHICS )				/* France */
+CONS(197?, krvnjvtv,	0,         vc4000,   vc4000,	vc4000,	  0,    	"Karvan",   		"Jeu Video TV", GAME_IMPERFECT_GRAPHICS )				/* France */
 CONS(1979, oc2000,	krvnjvtv,  0,	     vc4000,	vc4000,	  0,    	"S.O.E",    		"OC-2000", GAME_IMPERFECT_GRAPHICS )					/* France */
-CONS(197?, mpt05,	0,         0,	     vc4000,	vc4000,	  0,    	"ITMC",     		"MPT-05", GAME_IMPERFECT_GRAPHICS )					/* France */
+CONS(197?, mpt05,	0,         vc4000,   vc4000,	vc4000,	  0,    	"ITMC",     		"MPT-05", GAME_IMPERFECT_GRAPHICS )					/* France */
 
 /*  Game List and Emulation Status
 
