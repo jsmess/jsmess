@@ -71,7 +71,17 @@ Notes:
 
     Slow Controller
     ---------------
-    - FD1791 HLD/HLT callbacks
+
+	- Z80 IN instruction needs to halt in mid air for this controller to ever work (the first data byte of disk sector is read too early)
+
+		wd17xx_command_w $88 READ_SEC
+		wd17xx_data_r: (no new data) $00 (data_count 0)
+		WAIT
+		wd179x: Read Sector callback.
+		sector found! C:$00 H:$00 R:$0b N:$01
+		wd17xx_data_r: $FF (data_count 256)
+		WAIT
+
     - copy protection device (sends sector header bytes to CPU? DDEN is serial clock? code checks for either $b6 or $f7)
 
 		06F8: ld   a,$2F					; SEEK
@@ -100,6 +110,7 @@ Notes:
 		0704: rr   a
 		0706: call $073F
 	 
+    - FD1791 HLD/HLT callbacks
     - DS/DD SS/DS jumpers
     - S1-S5 jumpers
 
@@ -302,7 +313,7 @@ static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
 
 	/* drive selection */
 	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
-//	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
+	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
 //  if (BIT(data, 2)) wd17xx_set_drive(device, 2);
 
 	/* motor enable */
@@ -350,6 +361,12 @@ static READ8_DEVICE_HANDLER( slow_fdc_r )
 	slow_t *conkort = get_safe_token_slow(device->owner);
 	UINT8 data = 0xff;
 
+	if (!conkort->wait_enable && !conkort->fdc_irq && !conkort->fdc_drq)
+	{
+		/* TODO: this is really connected to the Z80 WAIT line */
+		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, ASSERT_LINE);
+	}
+
 	switch (offset & 0x03)
 	{
 	case 0: data = wd17xx_status_r(device, 0);
@@ -358,13 +375,7 @@ static READ8_DEVICE_HANDLER( slow_fdc_r )
 	case 3:	data = wd17xx_data_r(device, 0);
 	}
 
-	if (!conkort->wait_enable && !conkort->fdc_irq && !conkort->fdc_drq)
-	{
-		logerror("WAIT\n");
-		/* TODO: this is really connected to the Z80 _RDY line */
-		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, ASSERT_LINE);
-	}
-
+	/* FD1791 has inverted data lines */
 	return data ^ 0xff;
 }
 
@@ -372,6 +383,14 @@ static WRITE8_DEVICE_HANDLER( slow_fdc_w )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner);
 
+	if (!conkort->wait_enable && !conkort->fdc_irq && !conkort->fdc_drq)
+	{
+		logerror("WAIT\n");
+		/* TODO: this is really connected to the Z80 WAIT line */
+		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, ASSERT_LINE);
+	}
+
+	/* FD1791 has inverted data lines */
 	data ^= 0xff;
 
 	switch (offset & 0x03)
@@ -380,13 +399,6 @@ static WRITE8_DEVICE_HANDLER( slow_fdc_w )
 	case 1:	wd17xx_track_w(device, 0, data);   break;
 	case 2: wd17xx_sector_w(device, 0, data);  break;
 	case 3: wd17xx_data_w(device, 0, data);    break;
-	}
-
-	if (!conkort->wait_enable && !conkort->fdc_irq && !conkort->fdc_drq)
-	{
-		logerror("WAIT\n");
-		/* TODO: this is really connected to the Z80 _RDY line */
-		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -770,7 +782,7 @@ static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_intrq_w )
 
 	if (state)
 	{
-		/* TODO: this is really connected to the Z80 _RDY line */
+		/* TODO: this is really connected to the Z80 WAIT line */
 		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
@@ -783,7 +795,7 @@ static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_drq_w )
 
 	if (state)
 	{
-		/* TODO: this is really connected to the Z80 _RDY line */
+		/* TODO: this is really connected to the Z80 WAIT line */
 		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
