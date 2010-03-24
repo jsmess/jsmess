@@ -72,7 +72,34 @@ Notes:
     Slow Controller
     ---------------
     - FD1791 HLD/HLT callbacks
-    - copy protection device
+    - copy protection device (sends sector header bytes to CPU? DDEN is serial clock? code checks for either $b6 or $f7)
+
+		06F8: ld   a,$2F					; SEEK
+		06FA: out  ($BC),a
+		06FC: push af
+		06FD: push bc
+		06FE: ld   bc,$0724
+		0701: push bc
+		0702: ld   b,$07
+		0704: rr   a
+		0706: call $073F
+		073F: DB 7E         in   a,($7E)	; PIO PORT B
+		0741: EE 08         xor  $08		; DDEN
+		0743: D3 7E         out  ($7E),a
+		0745: EE 08         xor  $08
+		0747: D3 7E         out  ($7E),a
+		0749: DB 7E         in   a,($7E)
+		074B: 1F            rra
+		074C: 1F            rra
+		074D: 1F            rra
+		074E: CB 11         rl   c
+		0750: 79            ld   a,c
+		0751: C9            ret
+		0709: djnz $0703			<-- jumps to middle of instruction!
+		0703: rlca
+		0704: rr   a
+		0706: call $073F
+	 
     - DS/DD SS/DS jumpers
     - S1-S5 jumpers
 
@@ -263,7 +290,7 @@ static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
         0       SEL 0
         1       SEL 1
         2       SEL 2
-        3       MOT ON
+        3       _MOT ON
         4       SIDE
         5       _PRECOMP ON
         6       _WAIT ENABLE
@@ -275,17 +302,17 @@ static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
 
 	/* drive selection */
 	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
-	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
+//	if (BIT(data, 1)) wd17xx_set_drive(device, 1);
 //  if (BIT(data, 2)) wd17xx_set_drive(device, 2);
 
 	/* motor enable */
-	floppy_mon_w(conkort->image0, !BIT(data, 3));
-	floppy_mon_w(conkort->image1, !BIT(data, 3));
+	floppy_mon_w(conkort->image0, BIT(data, 3));
+	floppy_mon_w(conkort->image1, BIT(data, 3));
 	floppy_drive_set_ready_state(conkort->image0, 1, 1);
 	floppy_drive_set_ready_state(conkort->image1, 1, 1);
 
 	/* disk side selection */
-	wd17xx_set_side(device, BIT(data, 4));
+//	wd17xx_set_side(device, BIT(data, 4));
 
 	/* wait enable */
 	conkort->wait_enable = BIT(data, 6);
@@ -321,7 +348,7 @@ static WRITE8_DEVICE_HANDLER( slow_status_w )
 static READ8_DEVICE_HANDLER( slow_fdc_r )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner);
-	UINT8 data = 0;
+	UINT8 data = 0xff;
 
 	switch (offset & 0x03)
 	{
@@ -338,12 +365,14 @@ static READ8_DEVICE_HANDLER( slow_fdc_r )
 		cpu_set_input_line(conkort->cpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
-	return data;
+	return data ^ 0xff;
 }
 
 static WRITE8_DEVICE_HANDLER( slow_fdc_w )
 {
 	slow_t *conkort = get_safe_token_slow(device->owner);
+
+	data ^= 0xff;
 
 	switch (offset & 0x03)
 	{
@@ -602,10 +631,10 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 
 	slow_t *conkort = get_safe_token_slow(device->owner);
 
-	UINT8 data = 0;
+	UINT8 data = 4;
 
 	/* single/double sided drive */
-	data |= 0x01;
+//	data |= 0x01;
 
 	/* single/double density drive */
 	data |= 0x02;
@@ -615,6 +644,7 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 
 	/* head load */
 //	data |= wd17xx_hdld_r(device) << 6;
+	data |= 0x40;
 
 	/* FDC interrupt request */
 	data |= conkort->fdc_irq << 7;
@@ -736,6 +766,7 @@ static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_intrq_w )
 	slow_t *conkort = get_safe_token_slow(device->owner);
 
 	conkort->fdc_irq = state;
+	z80pio_pb_w(conkort->z80pio, 0, state << 7);
 
 	if (state)
 	{
@@ -884,6 +915,15 @@ static DEVICE_START( luxor_55_10828 )
 	state_save_register_device_item(device, 0, conkort->fdc_irq);
 	state_save_register_device_item(device, 0, conkort->fdc_drq);
 	state_save_register_device_item(device, 0, conkort->wait_enable);
+
+	/* patch out protection checks */
+	UINT8 *rom = device->subregion("abc830")->base.u8;
+	rom[0x0718] = 0xff;
+	rom[0x072c] = 0xff;
+	rom[0x0336] = 0xff;
+	rom[0x00fa] = 0xff;
+	rom[0x0771] = 0xff;
+	rom[0x0788] = 0xff;
 }
 
 /*-------------------------------------------------
