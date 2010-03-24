@@ -32,6 +32,8 @@ System Driver Changes:
 
 - [SAMCOUPE] Added border rendering support.  [Dirk Best]
 
+- [SAMCOUPE] Rewrote video rendering to render partial scanlines.  [Dirk Best]
+
 - [TANDY2K] Implemented DMA mux register. [Curt Coder]
 
 - [TI99] Cleanups.  [Michael Zapf]

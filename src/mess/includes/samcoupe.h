@@ -12,14 +12,16 @@
 #define SAMCOUPE_H_
 
 /* screen dimensions */
-#define SAM_TOTAL_WIDTH		768
+#define SAM_BLOCK			8
+
+#define SAM_TOTAL_WIDTH		SAM_BLOCK*96
 #define SAM_TOTAL_HEIGHT	312
-#define SAM_SCREEN_WIDTH	512
+#define SAM_SCREEN_WIDTH	SAM_BLOCK*64
 #define SAM_SCREEN_HEIGHT	192
-#define SAM_BORDER_LEFT		32
-#define SAM_BORDER_RIGHT	32
-#define SAM_BORDER_TOP		32
-#define SAM_BORDER_BOTTOM	32
+#define SAM_BORDER_LEFT		SAM_BLOCK*4
+#define SAM_BORDER_RIGHT	SAM_BLOCK*4
+#define SAM_BORDER_TOP		37
+#define SAM_BORDER_BOTTOM	46
 
 /* interrupt sources */
 #define SAM_LINE_INT	 0x01
@@ -35,6 +37,8 @@ public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, coupe_asic(machine)); }
 
 	coupe_asic(running_machine &machine) { }
+
+	emu_timer *video_update_timer;
 
 	UINT8 lmpr, hmpr, vmpr; /* memory pages */
 	UINT8 lext, hext;       /* extended memory page */
@@ -71,7 +75,7 @@ MACHINE_RESET( samcoupe );
 
 /*----------- defined in video/samcoupe.c -----------*/
 
-VIDEO_UPDATE( samcoupe );
+TIMER_CALLBACK( sam_video_update_callback );
 
 
 #endif /* SAMCOUPE_H_ */

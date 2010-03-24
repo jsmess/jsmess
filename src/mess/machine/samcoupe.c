@@ -230,6 +230,10 @@ MACHINE_START( samcoupe )
 {
 	coupe_asic *asic = (coupe_asic *)machine->driver_data;
 	asic->mouse_reset = timer_alloc(machine, samcoupe_mouse_reset, 0);
+
+	/* schedule our video updates */
+	asic->video_update_timer = timer_alloc(machine, sam_video_update_callback, NULL);
+	timer_adjust_oneshot(asic->video_update_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
 /***************************************************************************

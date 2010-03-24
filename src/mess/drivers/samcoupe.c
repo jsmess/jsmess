@@ -107,7 +107,7 @@ static READ8_HANDLER( samcoupe_pen_r )
 		int vpos = video_screen_get_vpos(scr);
 
 		/* return the current screen line or 192 for the border area */
-		if (vpos < SAM_BORDER_TOP || vpos >= SAM_SCREEN_HEIGHT + SAM_BORDER_BOTTOM)
+		if (vpos < SAM_BORDER_TOP || vpos >= SAM_BORDER_TOP + SAM_SCREEN_HEIGHT)
 			data = 192;
 		else
 			data = vpos - SAM_BORDER_TOP;
@@ -266,11 +266,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 static READ8_HANDLER( samcoupe_attributes_r )
 {
 	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
-
-	if (video_screen_get_vblank(space->machine->primary_screen))
-		return 0xff; /* border areas return 0xff */
-	else
-		return asic->attribute;
+	return asic->attribute;
 }
 
 static READ8_DEVICE_HANDLER( samcoupe_lpt1_busy_r )
@@ -485,27 +481,11 @@ INPUT_PORTS_END
 */
 static PALETTE_INIT( samcoupe )
 {
-	int i;
-
-	for (i = 0; i < 128; i++)
+	for (int i = 0; i < 128; i++)
 	{
-		UINT8 r = 0, g = 0, b = 0;
-
-		/* colors */
-		if (i & 0x01) b += 2;
-		if (i & 0x02) r += 2;
-		if (i & 0x04) g += 2;
-		if (i & 0x10) b += 4;
-		if (i & 0x20) r += 4;
-		if (i & 0x40) g += 4;
-
-		/* intensity bit */
-		if (i & 0x08)
-		{
-			r += 1;
-			g += 1;
-			b += 1;
-		}
+		UINT8 b = BIT(i, 0) * 2 + BIT(i, 4) * 4 + BIT(i, 3);
+		UINT8 r = BIT(i, 1) * 2 + BIT(i, 5) * 4 + BIT(i, 3);
+		UINT8 g = BIT(i, 2) * 2 + BIT(i, 6) * 4 + BIT(i, 3);
 
 		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
@@ -594,8 +574,8 @@ static MACHINE_DRIVER_START( samcoupe )
 	MDRV_PALETTE_LENGTH(128)
 	MDRV_PALETTE_INIT(samcoupe)
 
-	MDRV_VIDEO_UPDATE(samcoupe)
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
+	MDRV_VIDEO_START(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(generic_bitmapped)
 
 	/* devices */
 	MDRV_CENTRONICS_ADD("lpt1", standard_centronics)
