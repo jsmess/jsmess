@@ -293,6 +293,10 @@ static INPUT_PORTS_START( snes )
 	PORT_INCLUDE(snes_mouse)
 	PORT_INCLUDE(snes_superscope)
 
+	PORT_START("OPTIONS")
+	PORT_CONFNAME( 0x01, 0x00, "Hi-Res pixels blurring (TV effect)")
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 
 #ifdef SNES_LAYER_DEBUG
 	PORT_START("DEBUG1")
