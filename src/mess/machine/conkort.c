@@ -48,19 +48,19 @@ Notes:
     SAB1793 - Siemens SAB1793-02P Floppy Disc Controller
     FDC9229 - SMC FDC9229BT Floppy Disc Interface Circuit
     DM8131  - National Semiconductor DM8131N 6-Bit Unified Bus Comparator
-    CON1    -
-    CON2    - AMP4284
-    CON3    -
-    SW1     -
-    SW2     -
-    SW3     -
-    S1      -
-    S3      -
-    S5      -
+    CON1    - ABC bus connector
+    CON2    - 25-pin D sub floppy connector (AMP4284)
+    CON3    - 34-pin header floppy connector
+    SW1     - Disk drive type (SS/DS, SD/DD)
+    SW2     - Disk drive model
+    SW3     - ABC bus address
+    S1      - Interface type (A:? B:ABCBUS)
+    S3      - Interface type (A:? B:ABCBUS)
+    S5      - Interface type (A:? B:ABCBUS)
     S6      - Amount of RAM installed (A:2KB, B:8KB)
-    S7      - Number of drives connected (0:3, 1:?) *located on solder side
-    S8      - 0:8", 1:5.25"
-    S9      - Location of RDY signal (A:P2:6, B:P2:34)
+    S7      - Number of drives connected (0:3, 1:2) *located on solder side
+    S8      - Disk drive type (0:8", 1:5.25")
+    S9      - Location of RDY signal (A:8" P2-6, B:5.25" P2-34)
     LD1     - LED
 
 */
@@ -688,15 +688,21 @@ static const z80_daisy_chain slow_daisy_chain[] =
 /*
 
     DMA Transfer Programs
-    ---------------------
 
-    C3 14 28 95 6B 02 8A CF 01 AF CF 87
+	READ DAM
+	--------
+    7D 45 21 05 00 C3 14 28 95 6B 02 8A CF 01 AF CF 87
 
+	7D  transfer mode, port A -> port B, port A starting address follows, block length follows
+	45  port A starting address low byte = 45
+	21  port A starting address high byte = 21
+	05  block length low byte = 05
+	00  block length high byte = 00
     C3  reset
     14  port A is memory, port A address increments
     28  port B is I/O, port B address fixed
-    95  byte mode, port B starting address low follows, interrupt control byte follows
-    6B  port B starting address 0x006B (FDC DATA read)
+    95  byte mode, port B starting address low byte follows, interrupt control byte follows
+    6B  port B starting address low byte = 6B (FDC DATA read)
     02  interrupt at end of block
     8A  ready active high
     CF  load
@@ -705,6 +711,8 @@ static const z80_daisy_chain slow_daisy_chain[] =
     CF  load
     87  enable DMA
 
+	??
+	--
     C3 14 28 95 7B 02 8A CF 05 AF CF 87
 
     C3  reset
@@ -720,6 +728,8 @@ static const z80_daisy_chain slow_daisy_chain[] =
     CF  load
     87  enable DMA
 
+	??
+	--
     C3 91 40 8A AB
 
     C3  reset
