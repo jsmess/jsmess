@@ -14,6 +14,7 @@ Model   |  SRAM | Language | Branded model
 ES-210N | 128KB | German   | Walther ES-210
 ES-220  | 256KB | English  | NTS DreamWriter T400
 ES-210N | 128KB | Spanish  | Dator 3000
+ES-210N | 128KB | English  | NTS DreamWriter 325
 ES-250  | xxxKB | English  | NTS DreamWriter T200
 
 
@@ -454,7 +455,12 @@ ROM_END
 
 ROM_START(wales210)
 	ROM_REGION( 0x80000, "bios", 0 )
-	ROM_LOAD("wales210.ic303", 0x00000, 0x80000, CRC(a8e8d991) SHA1(9a133b37b2fbf689ae1c7ab5c7f4e97cd33fd596))		/* 27c4001 */
+
+	ROM_SYSTEM_BIOS( 0, "wales210", "Walther ES-210" )
+	ROMX_LOAD("wales210.ic303", 0x00000, 0x80000, CRC(a8e8d991) SHA1(9a133b37b2fbf689ae1c7ab5c7f4e97cd33fd596), ROM_BIOS(1))		/* 27c4001 */
+
+	ROM_SYSTEM_BIOS( 1, "drwrtr325", "NTS DreamWriter 325" )
+	ROMX_LOAD("dr3_1_02uk.ic303", 0x00000, 0x80000, CRC(027db9fe) SHA1(eb52a30510f2e2924c6dae9bc4348cd3572f4997), ROM_BIOS(2))
 ROM_END
 
 
