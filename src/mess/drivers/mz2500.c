@@ -4,10 +4,26 @@
 
     26/03/2010 Skeleton driver.
 
+    memory map:
+
+    0x00000-0x3ffff Work RAM
+    0x40000-0x5ffff CG RAM (bitswapped!)
+    0x60000-0x67fff NOP?
+    0x68000-0x6ffff IPL ROM
+    0x70000-0x71fff TVRAM
+    0x72000-0x73fff PCG / Kanji RAM
+    0x74000-0x75fff Dictionary ROM (banked)
+    0x76000-0x77fff NOP
+    0x78000-0x7ffff Phone ROM
+
+    vblank irq is rst $28?
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+
+static UINT8 bank_val[8],bank_addr;
 
 static VIDEO_START( mz2500 )
 {
@@ -18,12 +34,56 @@ static VIDEO_UPDATE( mz2500 )
     return 0;
 }
 
+static READ8_HANDLER( mz2500_bank_addr_r )
+{
+	return bank_addr;
+}
+
+static WRITE8_HANDLER( mz2500_bank_addr_w )
+{
+	bank_addr = data & 7;
+}
+
+static READ8_HANDLER( mz2500_bank_data_r )
+{
+	static UINT8 res;
+
+	res = bank_val[bank_addr];
+
+	bank_addr++;
+	bank_addr&=7;
+
+	return res;
+}
+
+static WRITE8_HANDLER( mz2500_bank_data_w )
+{
+	UINT8 *ROM = memory_region(space->machine, "maincpu");
+	static const char *const bank_name[] = { "bank0", "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7" };
+
+	bank_val[bank_addr] = data & 0x3f;
+
+	printf("%s %02x\n",bank_name[bank_addr],bank_val[bank_addr]*2);
+
+	memory_set_bankptr(space->machine, bank_name[bank_addr], &ROM[bank_val[bank_addr]*0x2000]);
+
+	bank_addr++;
+	bank_addr&=7;
+}
+
+
 static ADDRESS_MAP_START(mz2500_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_REGION("maincpu",0) //banked!
-	AM_RANGE(0x8000, 0xffff) AM_RAM AM_REGION("maincpu",0)
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank0")
+	AM_RANGE(0x2000, 0x3fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x4000, 0x5fff) AM_RAMBANK("bank2")
+	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x8000, 0x9fff) AM_RAMBANK("bank4")
+	AM_RANGE(0xa000, 0xbfff) AM_RAMBANK("bank5")
+	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank6")
+	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank7")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //	AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //	AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
@@ -35,7 +95,8 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_PROGRAM, 8)
 //	AM_RANGE(0xad, 0xad) AM_READ(emm_r)
 //	AM_RANGE(0xae, 0xae) AM_WRITE(crtc_w)
 //	AM_RANGE(0xb0, 0xb3) AM_READWRITE(sio_r,sio_w)
-//	AM_RANGE(0xb4, 0xb5) AM_READWRITE(memory_r,memory_w)
+	AM_RANGE(0xb4, 0xb4) AM_READWRITE(mz2500_bank_addr_r,mz2500_bank_addr_w)
+	AM_RANGE(0xb5, 0xb5) AM_READWRITE(mz2500_bank_data_r,mz2500_bank_data_w)
 // 	AM_RANGE(0xb8, 0xb9) AM_READWRITE(kanji_r,kanji_w)
 //	AM_RANGE(0xbc, 0xbd) AM_READWRITE(crtc_r,crtc_w)
 //	AM_RANGE(0xc6, 0xc7) AM_WRITE(irq_w)
@@ -61,6 +122,25 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(mz2500)
 {
+	UINT8 *ROM = memory_region(machine, "maincpu");
+
+	bank_val[0] = 0x00;
+	bank_val[1] = 0x01;
+	bank_val[2] = 0x02;
+	bank_val[3] = 0x03;
+	bank_val[4] = 0x04;
+	bank_val[5] = 0x05;
+	bank_val[6] = 0x06;
+	bank_val[7] = 0x07;
+
+	memory_set_bankptr(machine, "bank0", &ROM[bank_val[0]*0x2000]);
+	memory_set_bankptr(machine, "bank1", &ROM[bank_val[1]*0x2000]);
+	memory_set_bankptr(machine, "bank2", &ROM[bank_val[2]*0x2000]);
+	memory_set_bankptr(machine, "bank3", &ROM[bank_val[3]*0x2000]);
+	memory_set_bankptr(machine, "bank4", &ROM[bank_val[4]*0x2000]);
+	memory_set_bankptr(machine, "bank5", &ROM[bank_val[5]*0x2000]);
+	memory_set_bankptr(machine, "bank6", &ROM[bank_val[6]*0x2000]);
+	memory_set_bankptr(machine, "bank7", &ROM[bank_val[7]*0x2000]);
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -128,8 +208,9 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( mz2500 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, CRC(7a659f20) SHA1(ccb3cfdf461feea9db8d8d3a8815f7e345d274f7) )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_LOAD( "ipl.rom", 0x00000, 0x8000, CRC(7a659f20) SHA1(ccb3cfdf461feea9db8d8d3a8815f7e345d274f7) )
+	ROM_RELOAD( 0x68000, 0x8000 )
 
 	ROM_REGION( 0x1000, "cgrom", 0 )
 	ROM_LOAD( "cg.rom", 0x0000, 0x0800, CRC(a082326f) SHA1(dfa1a797b2159838d078650801c7291fa746ad81) )
