@@ -52,32 +52,13 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/metro.h"
 #include "video/konicdev.h"
 
-/* Variables that driver has access to: */
-
-UINT16 *metro_videoregs;
-UINT16 *metro_screenctrl;
-UINT16 *metro_scroll;
-UINT16 *metro_tiletable;
-size_t metro_tiletable_size;
-UINT16 *metro_vram_0,*metro_vram_1,*metro_vram_2;
-UINT16 *metro_window;
-
-static int support_8bpp,support_16x16;
-static int has_zoom;
-
-
-UINT16 *metro_K053936_ram;
-static tilemap_t *metro_K053936_tilemap;
-
-static UINT16 *metro_tiletable_old;
-static UINT8 *dirtyindex;
-
-
-static TILE_GET_INFO( metro_K053936_get_tile_info )
+static TILE_GET_INFO( metro_k053936_get_tile_info )
 {
-	int code = metro_K053936_ram[tile_index];
+	metro_state *state = (metro_state *)machine->driver_data;
+	int code = state->k053936_ram[tile_index];
 
 	SET_TILE_INFO(
 			2,
@@ -86,9 +67,10 @@ static TILE_GET_INFO( metro_K053936_get_tile_info )
 			0);
 }
 
-static TILE_GET_INFO( metro_K053936_gstrik2_get_tile_info )
+static TILE_GET_INFO( metro_k053936_gstrik2_get_tile_info )
 {
-	int code = metro_K053936_ram[tile_index];
+	metro_state *state = (metro_state *)machine->driver_data;
+	int code = state->k053936_ram[tile_index];
 
 	SET_TILE_INFO(
 			2,
@@ -97,10 +79,11 @@ static TILE_GET_INFO( metro_K053936_gstrik2_get_tile_info )
 			0);
 }
 
-WRITE16_HANDLER( metro_K053936_w )
+WRITE16_HANDLER( metro_k053936_w )
 {
-	COMBINE_DATA(&metro_K053936_ram[offset]);
-	tilemap_mark_tile_dirty(metro_K053936_tilemap,offset);
+	metro_state *state = (metro_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->k053936_ram[offset]);
+	tilemap_mark_tile_dirty(state->k053936_tilemap, offset);
 }
 
 static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
@@ -108,30 +91,14 @@ static TILEMAP_MAPPER( tilemap_scan_gstrik2 )
 	/* logical (col,row) -> memory offset */
 	int val;
 
-	val = (row&0x3f)*(256*2) + (col*2);
+	val = (row & 0x3f) * (256 * 2) + (col * 2);
 
-	if (row&0x40) val+=1;
-	if (row&0x80) val+=256;
+	if (row & 0x40) val += 1;
+	if (row & 0x80) val += 256;
 
 	return val;
 }
 
-
-/***************************************************************************
-
-
-                            Palette GGGGGRRRRRBBBBBx
-
-
-***************************************************************************/
-
-#ifdef UNUSED_FUNCTION
-WRITE16_HANDLER( metro_paletteram_w )
-{
-	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
-	palette_set_color_rgb(space->machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
-}
-#endif
 
 
 /***************************************************************************
@@ -163,12 +130,7 @@ WRITE16_HANDLER( metro_paletteram_w )
 
 ***************************************************************************/
 
-static tilemap_t *bg_tilemap[3];
-static tilemap_t *tilemap_16x16[3];
-static UINT8 *empty_tiles;
-
 /* A 2048 x 2048 virtual tilemap */
-
 #define BIG_NX		(0x100)
 #define BIG_NY		(0x100)
 
@@ -176,197 +138,130 @@ static UINT8 *empty_tiles;
 
 #define WIN_NX		(0x40)
 #define WIN_NY		(0x20)
-//#define WIN_NX        (0x40+1)
-//#define WIN_NY        (0x20+1)
 
-
-/* 8x8x4 tiles only */
-INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
+// this looks up a single pixel in a tile, given the code
+// the metro hardware has an indirection table, which is used here
+// returns if to draw the pixel or not, pixel colour is placed in pix
+INLINE UINT8 get_tile_pix( running_machine *machine, UINT16 code, UINT8 x, UINT8 y, int big, UINT16* pix )
 {
-	UINT16 code;
-	int      table_index;
-	UINT32   tile;
+	metro_state *state = (metro_state *)machine->driver_data;
+	int table_index;
+	UINT32 tile;
 
-	/* The actual tile index depends on the window */
-	tile_index	=	((tile_index / WIN_NX + metro_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX +
-					((tile_index % WIN_NX + metro_window[layer * 2 + 1] / 8) % BIG_NX);
-
-	/* Fetch the code */
-	code			=	vram[ tile_index ];
-
-	/* Use it as an index into the tiles set table */
-	table_index		=	( (code & 0x1ff0) >> 4 ) * 2;
-	tile			=	(metro_tiletable[table_index + 0] << 16 ) +
-						 metro_tiletable[table_index + 1];
+	/* Use code as an index into the tiles set table */
+	table_index = ((code & 0x1ff0) >> 4) * 2;
+	tile = (state->tiletable[table_index + 0] << 16) + state->tiletable[table_index + 1];
 
 	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
 	{
-		int _code = code & 0x000f;
-		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
-		tileinfo->flags = 0;
-		tileinfo->group = 0;
+		*pix = (code & 0x0fff)+0x1000;
+
+		if ((*pix & 0xf) != 0xf)
+			return 1;
+		else
+			return 0;
+
+	}
+	else if (((tile & 0x00f00000) == 0x00f00000)	&& (state->support_8bpp)) /* draw tile as 8bpp */
+	{
+		const gfx_element *gfx1 = machine->gfx[big?3:1];
+		UINT32 tile2 = big ? ((tile & 0xfffff) + 8*(code & 0xf)) :
+			                 ((tile & 0xfffff) + 2*(code & 0xf));
+		const UINT8* data;
+		UINT8 flipxy = (code & 0x6000) >> 13;
+
+		if (tile2 < gfx1->total_elements)
+			data = gfx_element_get_data(gfx1, tile2);
+		else
+		{
+			*pix |= 0;
+			return 0;
+		}
+
+		switch (flipxy)
+		{
+			default:
+			case 0x0: *pix = data[(y              * (big?16:8)) + x];              break;
+			case 0x1: *pix = data[(((big?15:7)-y) * (big?16:8)) + x];              break;
+			case 0x2: *pix = data[(y              * (big?16:8)) + ((big?15:7)-x)]; break;
+			case 0x3: *pix = data[(((big?15:7)-y) * (big?16:8)) + ((big?15:7)-x)]; break;
+		}
+
+		*pix |= ((((tile & 0x0f000000) >> 24) + 0x10)*0x100);
+
+		if ((*pix & 0xff) != 0xff)
+			return 1;
+		else
+			return 0;
+
 	}
 	else
 	{
-		tileinfo->group = 0;
-		SET_TILE_INFO(
-				0,
-				(tile & 0xfffff) + (code & 0xf),
-				(((tile & 0x0ff00000) >> 20)) + 0x100,
-				TILE_FLIPXY((code & 0x6000) >> 13));
+		const gfx_element *gfx1 = machine->gfx[big?2:0];
+		UINT32 tile2 = big ? ((tile & 0xfffff) + 4*(code & 0xf)) :
+			                 ((tile & 0xfffff) +   (code & 0xf));
+		const UINT8* data;
+		UINT8 flipxy = (code & 0x6000) >> 13;
+
+		if (tile2 < gfx1->total_elements)
+			data = gfx_element_get_data(gfx1, tile2);
+		else
+		{
+			*pix |= 0;
+			return 0;
+		}
+
+
+		switch (flipxy)
+		{
+			default:
+			case 0x0: *pix = data[(y              * (big?8:4)) + (x>>1)];             break;
+			case 0x1: *pix = data[(((big?15:7)-y) * (big?8:4)) + (x>>1)];             break;
+			case 0x2: *pix = data[(y              * (big?8:4)) + ((big?7:3)-(x>>1))]; break;
+			case 0x3: *pix = data[(((big?15:7)-y) * (big?8:4)) + ((big?7:3)-(x>>1))]; break;
+		}
+
+		if (!(flipxy&2))
+		{
+			if (x&1) *pix >>= 4;
+			else *pix &= 0xf;
+		}
+		else
+		{
+			if (x&1) *pix  &= 0xf;
+			else *pix >>= 4;
+		}
+
+		*pix |= (((((tile & 0x0ff00000) >> 20)) + 0x100)*0x10);
+
+		if ((*pix & 0xf) != 0xf)
+			return 1;
+		else
+			return 0;
 	}
+
+	// shouldn't get here..
+	return 0;
 }
 
 
-/* 8x8x4 or 8x8x8 tiles. It's the tile's color that decides: if its low 4
-   bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
-INLINE void get_tile_info_8bit(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
-{
-	UINT16 code;
-	int      table_index;
-	UINT32   tile;
-
-	/* The actual tile index depends on the window */
-	tile_index	=	((tile_index / WIN_NX + metro_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX +
-					((tile_index % WIN_NX + metro_window[layer * 2 + 1] / 8) % BIG_NX);
-
-	/* Fetch the code */
-	code			=	vram[ tile_index ];
-
-	/* Use it as an index into the tiles set table */
-	table_index		=	( (code & 0x1ff0) >> 4 ) * 2;
-	tile			=	(metro_tiletable[table_index + 0] << 16 ) +
-						 metro_tiletable[table_index + 1];
-
-	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
-	{
-		int _code = code & 0x000f;
-		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
-		tileinfo->flags = 0;
-		tileinfo->group = 0;
-	}
-	else if ((tile & 0x00f00000)==0x00f00000)	/* draw tile as 8bpp */
-	{
-		tileinfo->group = 1;
-		SET_TILE_INFO(
-				1,
-				(tile & 0xfffff) + 2*(code & 0xf),
-				((tile & 0x0f000000) >> 24) + 0x10,
-				TILE_FLIPXY((code & 0x6000) >> 13));
-	}
-	else
-	{
-		tileinfo->group = 0;
-		SET_TILE_INFO(
-				0,
-				(tile & 0xfffff) + (code & 0xf),
-				(((tile & 0x0ff00000) >> 20)) + 0x100,
-				TILE_FLIPXY((code & 0x6000) >> 13));
-	}
-}
-
-/* 16x16x4 or 16x16x8 tiles. It's the tile's color that decides: if its low 4
-   bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
-INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
-{
-	UINT16 code;
-	int      table_index;
-	UINT32   tile;
-
-	/* The actual tile index depends on the window */
-	tile_index	=	((tile_index / WIN_NX + metro_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX +
-					((tile_index % WIN_NX + metro_window[layer * 2 + 1] / 8) % BIG_NX);
-
-	/* Fetch the code */
-	code			=	vram[ tile_index ];
-
-	/* Use it as an index into the tiles set table */
-	table_index		=	( (code & 0x1ff0) >> 4 ) * 2;
-	tile			=	(metro_tiletable[table_index + 0] << 16 ) +
-						 metro_tiletable[table_index + 1];
-
-	if (code & 0x8000) /* Special: draw a tile of a single color (i.e. not from the gfx ROMs) */
-	{
-		int _code = code & 0x000f;
-		tileinfo->pen_data = empty_tiles + _code*16*16;
-		tileinfo->palette_base = ((code & 0x0ff0)) + 0x1000;
-		tileinfo->flags = 0;
-		tileinfo->group = 0;
-	}
-	else if ((tile & 0x00f00000)==0x00f00000)	/* draw tile as 8bpp */
-	{
-		tileinfo->group = 1;
-		SET_TILE_INFO(
-				3,
-				(tile & 0xfffff) + 8*(code & 0xf),
-				((tile & 0x0f000000) >> 24) + 0x10,
-				TILE_FLIPXY((code & 0x6000) >> 13));
-	}
-	else
-	{
-		tileinfo->group = 0;
-		SET_TILE_INFO(
-				2,
-				(tile & 0xfffff) + 4*(code & 0xf),
-				(((tile & 0x0ff00000) >> 20)) + 0x100,
-				TILE_FLIPXY((code & 0x6000) >> 13));
-
-	}
-}
-
-
-INLINE void metro_vram_w(offs_t offset,UINT16 data,UINT16 mem_mask,int layer,UINT16 *vram)
+INLINE void metro_vram_w( running_machine *machine, offs_t offset, UINT16 data, UINT16 mem_mask, int layer, UINT16 *vram )
 {
 	COMBINE_DATA(&vram[offset]);
-	{
-		/* Account for the window */
-		int col		=	(offset % BIG_NX) - ((metro_window[layer * 2 + 1] / 8) % BIG_NX);
-		int row		=	(offset / BIG_NX) - ((metro_window[layer * 2 + 0] / 8) % BIG_NY);
-		if (col < -(BIG_NX-WIN_NX))	col += (BIG_NX-WIN_NX) + WIN_NX;
-		if (row < -(BIG_NY-WIN_NY))	row += (BIG_NY-WIN_NY) + WIN_NY;
-		if	( (col >= 0) && (col < WIN_NX) &&
-			  (row >= 0) && (row < WIN_NY) )
-		{
-			tilemap_mark_tile_dirty(bg_tilemap[layer], row * WIN_NX + col );
-			if (tilemap_16x16[layer])
-				tilemap_mark_tile_dirty(tilemap_16x16[layer], row * WIN_NX + col );
-		}
-	}
 }
 
-
-
-static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info(machine,tileinfo,tile_index,0,metro_vram_0); }
-static TILE_GET_INFO( get_tile_info_1 ) { get_tile_info(machine,tileinfo,tile_index,1,metro_vram_1); }
-static TILE_GET_INFO( get_tile_info_2 ) { get_tile_info(machine,tileinfo,tile_index,2,metro_vram_2); }
-
-static TILE_GET_INFO( get_tile_info_0_8bit ) { get_tile_info_8bit(machine,tileinfo,tile_index,0,metro_vram_0); }
-static TILE_GET_INFO( get_tile_info_1_8bit ) { get_tile_info_8bit(machine,tileinfo,tile_index,1,metro_vram_1); }
-static TILE_GET_INFO( get_tile_info_2_8bit ) { get_tile_info_8bit(machine,tileinfo,tile_index,2,metro_vram_2); }
-
-static TILE_GET_INFO( get_tile_info_0_16x16_8bit ) { get_tile_info_16x16_8bit(machine,tileinfo,tile_index,0,metro_vram_0); }
-static TILE_GET_INFO( get_tile_info_1_16x16_8bit ) { get_tile_info_16x16_8bit(machine,tileinfo,tile_index,1,metro_vram_1); }
-static TILE_GET_INFO( get_tile_info_2_16x16_8bit ) { get_tile_info_16x16_8bit(machine,tileinfo,tile_index,2,metro_vram_2); }
-
-WRITE16_HANDLER( metro_vram_0_w ) { metro_vram_w(offset,data,mem_mask,0,metro_vram_0); }
-WRITE16_HANDLER( metro_vram_1_w ) { metro_vram_w(offset,data,mem_mask,1,metro_vram_1); }
-WRITE16_HANDLER( metro_vram_2_w ) { metro_vram_w(offset,data,mem_mask,2,metro_vram_2); }
+WRITE16_HANDLER( metro_vram_0_w ) { metro_state *state = (metro_state *)space->machine->driver_data;  metro_vram_w(space->machine, offset, data, mem_mask, 0, state->vram_0); }
+WRITE16_HANDLER( metro_vram_1_w ) { metro_state *state = (metro_state *)space->machine->driver_data;  metro_vram_w(space->machine, offset, data, mem_mask, 1, state->vram_1); }
+WRITE16_HANDLER( metro_vram_2_w ) { metro_state *state = (metro_state *)space->machine->driver_data;  metro_vram_w(space->machine, offset, data, mem_mask, 2, state->vram_2); }
 
 
 
 /* Dirty the relevant tilemap when its window changes */
 WRITE16_HANDLER( metro_window_w )
 {
-	UINT16 olddata = metro_window[offset];
-	UINT16 newdata = COMBINE_DATA( &metro_window[offset] );
-	if ( newdata != olddata )
-	{
-		offset /= 2;
-		tilemap_mark_all_tiles_dirty(bg_tilemap[offset]);
-		if (tilemap_16x16[offset]) tilemap_mark_all_tiles_dirty(tilemap_16x16[offset]);
-	}
+	metro_state *state = (metro_state *)space->machine->driver_data;
+	COMBINE_DATA(&state->window[offset]);
+
 }
 
 
@@ -387,144 +282,99 @@ WRITE16_HANDLER( metro_window_w )
  the tile's sizes to be known at startup - which we don't!
 */
 
-static int metro_sprite_xoffs, metro_sprite_yoffs;
-
-
-static void alloc_empty_tiles(running_machine *machine)
-{
-	int code,i;
-
-	empty_tiles = auto_alloc_array(machine, UINT8, 16*16*16);
-
-	for (code = 0;code < 0x10;code++)
-		for (i = 0;i < 16*16;i++)
-			empty_tiles[16*16*code + i] = code;
-}
+/* Dirty tilemaps when the tiles set changes */
 
 VIDEO_START( metro_14100 )
 {
-	support_8bpp = 0;
-	support_16x16 = 0;
-	has_zoom = 0;
+	metro_state *state = (metro_state *)machine->driver_data;
 
-	alloc_empty_tiles(machine);
-	metro_tiletable_old = auto_alloc_array(machine, UINT16, metro_tiletable_size/2);
-	dirtyindex = auto_alloc_array(machine, UINT8, metro_tiletable_size/4);
+	state->support_8bpp = 0;
+	state->support_16x16 = 0;
+	state->has_zoom = 0;
 
-	bg_tilemap[0] = tilemap_create(machine, get_tile_info_0,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
-	bg_tilemap[1] = tilemap_create(machine, get_tile_info_1,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
-	bg_tilemap[2] = tilemap_create(machine, get_tile_info_2,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
+	state->bg_tilemap_enable[0] = 1;
+	state->bg_tilemap_enable[1] = 1;
+	state->bg_tilemap_enable[2] = 1;
 
-	tilemap_16x16[0] = NULL;
-	tilemap_16x16[1] = NULL;
-	tilemap_16x16[2] = NULL;
+	state->bg_tilemap_enable16[0] = 0;
+	state->bg_tilemap_enable16[1] = 0;
+	state->bg_tilemap_enable16[2] = 0;
 
-	tilemap_map_pen_to_layer(bg_tilemap[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(bg_tilemap[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
-	tilemap_map_pen_to_layer(bg_tilemap[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(bg_tilemap[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
-	tilemap_map_pen_to_layer(bg_tilemap[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(bg_tilemap[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
+	state->bg_tilemap_scrolldx[0] = 0;
+	state->bg_tilemap_scrolldx[1] = 0;
+	state->bg_tilemap_scrolldx[2] = 0;
 }
 
 VIDEO_START( metro_14220 )
 {
-	support_8bpp = 1;
-	support_16x16 = 0;
-	has_zoom = 0;
+	metro_state *state = (metro_state *)machine->driver_data;
 
-	alloc_empty_tiles(machine);
-	metro_tiletable_old = auto_alloc_array(machine, UINT16, metro_tiletable_size/2);
-	dirtyindex = auto_alloc_array(machine, UINT8, metro_tiletable_size/4);
+	state->support_8bpp = 1;
+	state->support_16x16 = 0;
+	state->has_zoom = 0;
 
-	bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
-	bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
-	bg_tilemap[2] = tilemap_create(machine, get_tile_info_2_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
+	state->bg_tilemap_enable[0] = 1;
+	state->bg_tilemap_enable[1] = 1;
+	state->bg_tilemap_enable[2] = 1;
 
-	tilemap_16x16[0] = NULL;
-	tilemap_16x16[1] = NULL;
-	tilemap_16x16[2] = NULL;
+	state->bg_tilemap_enable16[0] = 0;
+	state->bg_tilemap_enable16[1] = 0;
+	state->bg_tilemap_enable16[2] = 0;
 
-	tilemap_map_pen_to_layer(bg_tilemap[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(bg_tilemap[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
-	tilemap_map_pen_to_layer(bg_tilemap[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(bg_tilemap[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
-	tilemap_map_pen_to_layer(bg_tilemap[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(bg_tilemap[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
-	tilemap_set_scrolldx(bg_tilemap[0], -2, 2);
-	tilemap_set_scrolldx(bg_tilemap[1], -2, 2);
-	tilemap_set_scrolldx(bg_tilemap[2], -2, 2);
+	state->bg_tilemap_scrolldx[0] = -2;
+	state->bg_tilemap_scrolldx[1] = -2;
+	state->bg_tilemap_scrolldx[2] = -2;
 }
 
 VIDEO_START( metro_14300 )
 {
-	support_8bpp = 1;
-	support_16x16 = 1;
-	has_zoom = 0;
+	metro_state *state = (metro_state *)machine->driver_data;
 
-	alloc_empty_tiles(machine);
-	metro_tiletable_old = auto_alloc_array(machine, UINT16, metro_tiletable_size/2);
-	dirtyindex = auto_alloc_array(machine, UINT8, metro_tiletable_size/4);
+	state->support_8bpp = 1;
+	state->support_16x16 = 1;
+	state->has_zoom = 0;
 
-	bg_tilemap[0] = tilemap_create(machine, get_tile_info_0_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
-	bg_tilemap[1] = tilemap_create(machine, get_tile_info_1_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
-	bg_tilemap[2] = tilemap_create(machine, get_tile_info_2_8bit,tilemap_scan_rows,8,8,WIN_NX,WIN_NY);
+	state->bg_tilemap_enable[0] = 1;
+	state->bg_tilemap_enable[1] = 1;
+	state->bg_tilemap_enable[2] = 1;
 
-	tilemap_16x16[0] = tilemap_create(machine, get_tile_info_0_16x16_8bit,tilemap_scan_rows,16,16,WIN_NX,WIN_NY);
-	tilemap_16x16[1] = tilemap_create(machine, get_tile_info_1_16x16_8bit,tilemap_scan_rows,16,16,WIN_NX,WIN_NY);
-	tilemap_16x16[2] = tilemap_create(machine, get_tile_info_2_16x16_8bit,tilemap_scan_rows,16,16,WIN_NX,WIN_NY);
+	state->bg_tilemap_enable16[0] = 0;
+	state->bg_tilemap_enable16[1] = 0;
+	state->bg_tilemap_enable16[2] = 0;
 
-	tilemap_map_pen_to_layer(bg_tilemap[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(bg_tilemap[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
-	tilemap_map_pen_to_layer(bg_tilemap[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(bg_tilemap[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
-	tilemap_map_pen_to_layer(bg_tilemap[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(bg_tilemap[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
-
-	tilemap_map_pen_to_layer(tilemap_16x16[0], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(tilemap_16x16[0], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
-	tilemap_map_pen_to_layer(tilemap_16x16[1], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(tilemap_16x16[1], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
-	tilemap_map_pen_to_layer(tilemap_16x16[2], 0, 15,  TILEMAP_PIXEL_TRANSPARENT);
-	tilemap_map_pen_to_layer(tilemap_16x16[2], 1, 255, TILEMAP_PIXEL_TRANSPARENT);
-
+	state->bg_tilemap_scrolldx[0] = 0;
+	state->bg_tilemap_scrolldx[1] = 0;
+	state->bg_tilemap_scrolldx[2] = 0;
 }
 
 VIDEO_START( blzntrnd )
 {
+	metro_state *state = (metro_state *)machine->driver_data;
+
 	VIDEO_START_CALL(metro_14220);
 
-	has_zoom = 1;
+	state->has_zoom = 1;
 
-	metro_K053936_tilemap = tilemap_create(machine, metro_K053936_get_tile_info, tilemap_scan_rows, 8,8, 256, 512 );
+	state->k053936_tilemap = tilemap_create(machine, metro_k053936_get_tile_info, tilemap_scan_rows, 8, 8, 256, 512);
 
-	tilemap_set_scrolldx(bg_tilemap[0], 8, -8);
-	tilemap_set_scrolldx(bg_tilemap[1], 8, -8);
-	tilemap_set_scrolldx(bg_tilemap[2], 8, -8);
+	state->bg_tilemap_scrolldx[0] = 8;
+	state->bg_tilemap_scrolldx[1] = 8;
+	state->bg_tilemap_scrolldx[2] = 8;
 }
 
 VIDEO_START( gstrik2 )
 {
+	metro_state *state = (metro_state *)machine->driver_data;
+
 	VIDEO_START_CALL(metro_14220);
 
-	has_zoom = 1;
+	state->has_zoom = 1;
 
-	metro_K053936_tilemap = tilemap_create(machine, metro_K053936_gstrik2_get_tile_info, tilemap_scan_gstrik2, 16,16, 128, 256 );
+	state->k053936_tilemap = tilemap_create(machine, metro_k053936_gstrik2_get_tile_info, tilemap_scan_gstrik2, 16, 16, 128, 256);
 
-	tilemap_set_scrolldx(bg_tilemap[0], 8, -8);
-	tilemap_set_scrolldx(bg_tilemap[1], 0, 0);
-	tilemap_set_scrolldx(bg_tilemap[2], 8, -8);
+	state->bg_tilemap_scrolldx[0] = 8;
+	state->bg_tilemap_scrolldx[1] = 0;
+	state->bg_tilemap_scrolldx[2] = 8;
 }
 
 /***************************************************************************
@@ -589,21 +439,22 @@ VIDEO_START( gstrik2 )
 
 /* Draw sprites */
 
-void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+void metro_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	UINT8 *base_gfx	=	memory_region(machine, "gfx1");
-	UINT8 *gfx_max	=	base_gfx + memory_region_length(machine, "gfx1");
+	metro_state *state = (metro_state *)machine->driver_data;
+	UINT8 *base_gfx = memory_region(machine, "gfx1");
+	UINT8 *gfx_max  = base_gfx + memory_region_length(machine, "gfx1");
 
 	int max_x = video_screen_get_width(machine->primary_screen);
 	int max_y = video_screen_get_height(machine->primary_screen);
 
-	int max_sprites			=	machine->generic.spriteram_size / 8;
-	int sprites				=	metro_videoregs[0x00/2] % max_sprites;
+	int max_sprites = state->spriteram_size / 8;
+	int sprites     = state->videoregs[0x00/2] % max_sprites;
 
-	int color_start			=	((metro_videoregs[0x08/2] & 0xf) << 4 ) + 0x100;
+	int color_start = ((state->videoregs[0x08/2] & 0x0f) << 4) + 0x100;
 
 	int i, j, pri;
-	static const int primask[4] = { 0x0000, 0xff00, 0xff00|0xf0f0, 0xff00|0xf0f0|0xcccc };
+	static const int primask[4] = { 0x0000, 0xff00, 0xff00 | 0xf0f0, 0xff00 | 0xf0f0 | 0xcccc };
 
 	UINT16 *src;
 	int inc;
@@ -611,22 +462,22 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 	if (sprites == 0)
 		return;
 
-	for (i=0; i<0x20; i++)
+	for (i = 0; i < 0x20; i++)
 	{
 		gfx_element gfx;
 
-		if (!(metro_videoregs[0x02/2] & 0x8000))
+		if (!(state->videoregs[0x02/2] & 0x8000))
 		{
-			src = machine->generic.spriteram.u16 + (sprites - 1) * (8/2);
-			inc = -(8/2);
+			src = state->spriteram + (sprites - 1) * (8 / 2);
+			inc = -(8 / 2);
 		} else {
-			src = machine->generic.spriteram.u16;
-			inc = (8/2);
+			src = state->spriteram;
+			inc = (8 / 2);
 		}
 
-		for (j=0; j<sprites; j++)
+		for (j = 0; j < sprites; j++)
 		{
-			int x,y, attr,code,color,flipx,flipy, zoom, curr_pri,width,height;
+			int x, y, attr, code, color, flipx, flipy, zoom, curr_pri, width, height;
 			UINT8 *gfxdata;
 
 			/* Exponential zoom table extracted from daitoride */
@@ -640,8 +491,8 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 				0x0A0,0x09C,0x098,0x094,0x090,0x08C,0x088,0x080,
 				0x078,0x070,0x068,0x060,0x058,0x050,0x048,0x040	};
 
-			x					=	src[ 0 ];
-			curr_pri			=	(x & 0xf800) >> 11;
+			x = src[0];
+			curr_pri = (x & 0xf800) >> 11;
 
 			if ((curr_pri == 0x1f) || (curr_pri != i))
 			{
@@ -649,42 +500,42 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 				continue;
 			}
 
-			pri = (metro_videoregs[0x02/2] & 0x0300) >> 8;
+			pri = (state->videoregs[0x02/2] & 0x0300) >> 8;
 
-			if (!(metro_videoregs[0x02/2] & 0x8000))
+			if (!(state->videoregs[0x02/2] & 0x8000))
 			{
-				if (curr_pri > (metro_videoregs[0x02/2] & 0x1f))
-					pri = (metro_videoregs[0x02/2] & 0x0c00) >> 10;
+				if (curr_pri > (state->videoregs[0x02/2] & 0x1f))
+					pri = (state->videoregs[0x02/2] & 0x0c00) >> 10;
 			}
 
-			y					=	src[ 1 ];
-			attr				=	src[ 2 ];
-			code				=	src[ 3 ];
+			y     = src[1];
+			attr  = src[2];
+			code  = src[3];
 
-			flipx				=	attr & 0x8000;
-			flipy				=	attr & 0x4000;
-			color				=   (attr & 0xf0) >> 4;
+			flipx =  attr & 0x8000;
+			flipy =  attr & 0x4000;
+			color = (attr & 0xf0) >> 4;
 
-			zoom				=	zoomtable[(y & 0xfc00) >> 10] << (16-8);
+			zoom = zoomtable[(y & 0xfc00) >> 10] << (16 - 8);
 
-			x					=	(x & 0x07ff) - metro_sprite_xoffs;
-			y					=	(y & 0x03ff) - metro_sprite_yoffs;
+			x = (x & 0x07ff) - state->sprite_xoffs;
+			y = (y & 0x03ff) - state->sprite_yoffs;
 
-			width				= (( (attr >> 11) & 0x7 ) + 1 ) * 8;
-			height				= (( (attr >>  8) & 0x7 ) + 1 ) * 8;
+			width  = (((attr >> 11) & 0x7) + 1) * 8;
+			height = (((attr >>  8) & 0x7) + 1) * 8;
 
-			gfxdata		=	base_gfx + (8*8*4/8) * (((attr & 0x000f) << 16) + code);
+			gfxdata = base_gfx + (8 * 8 * 4 / 8) * (((attr & 0x000f) << 16) + code);
 
-			if (flip_screen_get(machine))
+			if (state->flip_screen)
 			{
 				flipx = !flipx;		x = max_x - x - width;
 				flipy = !flipy;		y = max_y - y - height;
 			}
 
-			if (support_8bpp && color == 0xf)	/* 8bpp */
+			if (state->support_8bpp && color == 0xf)	/* 8bpp */
 			{
 				/* Bounds checking */
-				if ( (gfxdata + width * height - 1) >= gfx_max )
+				if ((gfxdata + width * height - 1) >= gfx_max)
 					continue;
 
 				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width, 0, 256, 0);
@@ -700,7 +551,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 			else
 			{
 				/* Bounds checking */
-				if ( (gfxdata + width/2 * height - 1) >= gfx_max )
+				if ((gfxdata + width / 2 * height - 1) >= gfx_max)
 					continue;
 
 				gfx_element_build_temporary(&gfx, machine, gfxdata, width, height, width/2, 0, 16, GFX_ELEMENT_PACKED);
@@ -716,7 +567,7 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 #if 0
 {	/* Display priority + zoom on each sprite */
 	char buf[80];
-	sprintf(buf, "%02X %02X",((src[ 0 ] & 0xf800) >> 11)^0x1f,((src[ 1 ] & 0xfc00) >> 10) );
+	sprintf(buf, "%02X %02X", ((src[0] & 0xf800) >> 11) ^ 0x1f, ((src[1] & 0xfc00) >> 10));
 	ui_draw_text(buf, x, y);
 }
 #endif
@@ -735,154 +586,152 @@ void metro_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectan
 
 ***************************************************************************/
 
-static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, tilemap_t *tmap, UINT32 flags, UINT32 priority,
-						 int sx, int sy, int wx, int wy)	// scroll & window values
+/* copy a 'window' from the large 2048x2048 (or 4096x4096 for 16x16 tiles) tilemap */
+
+
+static void draw_tilemap( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32 flags, UINT32 pcode,
+						 int sx, int sy, int wx, int wy, int big, UINT16* tilemapram, int layer )
 {
-#if 1
-		tilemap_set_scrollx(tmap, 0, sx - wx + (wx & 7));
-		tilemap_set_scrolly(tmap, 0, sy - wy + (wy & 7));
-		tilemap_draw(bitmap,cliprect,tmap, flags, priority);
-#else
-	int x,y,i;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	metro_state *state = (metro_state *)machine->driver_data;
+	int y;
 
-	/* sub tile placement */
-//  sx      =   sx - (wx & ~7) + (wx & 7);
-	sx		=	sx - wx;
-	sx		=	( (sx & 0x7fff) - (sx & 0x8000) ) % ((WIN_NX-1)*8);
+	bitmap_t *priority_bitmap = machine->priority_bitmap;
 
-//  sy      =   sy - (wy & ~7) + (wy & 7);
-	sy		=	sy - wy;
-	sy		=	( (sy & 0x7fff) - (sy & 0x8000) ) % ((WIN_NY-1)*8);
+	int width = big ? 4096 : 2048;//pixdata->width;
+	int height = big ? 4096 : 2048;//pixdata->height;
 
-	/* splitting point */
-	x		=	(WIN_NX-1)*8 - sx;
+	int scrwidth = bitmap->width;
+	int scrheight = bitmap->height;
 
-	y		=	(WIN_NY-1)*8 - sy;
+	int windowwidth = width >> 2;
+	int windowheight = height >> 3;
 
-	for ( i = 0; i < 4 ; i++ )
+	if (!big)
 	{
-		rectangle clip;
-
-		tilemap_set_scrollx(tmap, 0, sx + ((i & 1) ? -x : 0));
-		tilemap_set_scrolly(tmap, 0, sy + ((i & 2) ? -y : 0));
-
-		clip.min_x	=	x - ((i & 1) ? 0 : (WIN_NX-1)*8);
-		clip.min_y	=	y - ((i & 2) ? 0 : (WIN_NY-1)*8);
-
-		clip.max_x	=	clip.min_x + (WIN_NX-1)*8 - 1;
-		clip.max_y	=	clip.min_y + (WIN_NY-1)*8 - 1;
-
-		if (clip.min_x > visarea->max_x)	continue;
-		if (clip.min_y > visarea->max_y)	continue;
-
-		if (clip.max_x < visarea->min_x)	continue;
-		if (clip.max_y < visarea->min_y)	continue;
-
-		if (clip.min_x < visarea->min_x)	clip.min_x = visarea->min_x;
-		if (clip.max_x > visarea->max_x)	clip.max_x = visarea->max_x;
-
-		if (clip.min_y < visarea->min_y)	clip.min_y = visarea->min_y;
-		if (clip.max_y > visarea->max_y)	clip.max_y = visarea->max_y;
-
-		/* The clip region's width must be a multiple of 8!
-           This fact renderes the function useless, as far as
-           we are concerned! */
-		tilemap_set_clip(tmap, &clip);
-		tilemap_draw(bitmap,cliprect,tmap, flags, priority);
+		if (!state->bg_tilemap_enable[layer]) return;
 	}
-#endif
+	else
+	{
+		if (!state->bg_tilemap_enable16[layer]) return;
+	}
+
+
+	if (!state->flip_screen)
+	{
+		sx -= state->bg_tilemap_scrolldx[layer];
+	}
+	else
+	{
+		sx += state->bg_tilemap_scrolldx[layer];
+	}
+
+	for (y=0;y<scrheight;y++)
+	{
+		int scrolly = (sy+y-wy)&(windowheight-1);
+		int x;
+		UINT16* dst;
+		UINT8 *priority_baseaddr;
+		int srcline = (wy+scrolly)&(height-1);
+		int srctilerow = srcline >> (big ? 4 : 3);
+
+		if (!state->flip_screen)
+		{
+			dst = BITMAP_ADDR16(bitmap, y, 0);
+			priority_baseaddr = BITMAP_ADDR8(priority_bitmap, y, 0);
+
+			for (x=0;x<scrwidth;x++)
+			{
+				int scrollx = (sx+x-wx)&(windowwidth-1);
+				int srccol = (wx+scrollx)&(width-1);
+				int srctilecol = srccol >> (big ? 4 : 3);
+				int tileoffs = srctilecol + srctilerow * BIG_NX;
+
+				UINT16 dat = 0;
+
+				UINT16 tile = tilemapram[tileoffs];
+				UINT8 draw = get_tile_pix(machine, tile, big ? (srccol&0xf) : (srccol&0x7), big ? (srcline&0xf) : (srcline&0x7), big, &dat);
+
+				if (draw)
+				{
+					dst[x] = dat;
+					priority_baseaddr[x] = (priority_baseaddr[x] & (pcode >> 8)) | pcode;
+				}
+			}
+		}
+		else // flipped case
+		{
+			dst = BITMAP_ADDR16(bitmap, scrheight-y-1, 0);
+			priority_baseaddr = BITMAP_ADDR8(priority_bitmap, scrheight-y-1, 0);
+
+			for (x=0;x<scrwidth;x++)
+			{
+				int scrollx = (sx+x-wx)&(windowwidth-1);
+				int srccol = (wx+scrollx)&(width-1);
+				int srctilecol = srccol >> (big ? 4 : 3);
+				int tileoffs = srctilecol + srctilerow * BIG_NX;
+
+				UINT16 dat = 0;
+
+				UINT16 tile = tilemapram[tileoffs];
+				UINT8 draw = get_tile_pix(machine, tile, big ? (srccol&0xf) : (srccol&0x7), big ? (srcline&0xf) : (srcline&0x7), big, &dat);
+
+				if (draw)
+				{
+					dst[scrwidth-x-1] = dat;
+					priority_baseaddr[scrwidth-x-1] = (priority_baseaddr[scrwidth-x-1] & (pcode >> 8)) | pcode;
+				}
+			}
+		}
+	}
 }
 
-
 /* Draw all the layers that match the given priority */
-static void draw_layers(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int layers_ctrl)
+static void draw_layers( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri, int layers_ctrl )
 {
-	UINT16 layers_pri = metro_videoregs[0x10/2];
+	metro_state *state = (metro_state *)machine->driver_data;
+	UINT16 layers_pri = state->videoregs[0x10 / 2];
 	int layer;
 
 	/* Draw all the layers with priority == pri */
 	for (layer = 2; layer >= 0; layer--)	// tilemap[2] below?
 	{
-		if ( pri == ((layers_pri >> (layer*2)) & 3) )
+		if (pri == ((layers_pri >> (layer * 2)) & 3))
 		{
 			/* Scroll and Window values */
-			UINT16 sy = metro_scroll[layer * 2 + 0];	UINT16 sx = metro_scroll[layer * 2 + 1];
-			UINT16 wy = metro_window[layer * 2 + 0];	UINT16 wx = metro_window[layer * 2 + 1];
+			UINT16 sy = state->scroll[layer * 2 + 0];	UINT16 sx = state->scroll[layer * 2 + 1];
+			UINT16 wy = state->window[layer * 2 + 0];	UINT16 wx = state->window[layer * 2 + 1];
 
-			if (layers_ctrl & (1<<layer))	// for debug
+			if (BIT(layers_ctrl, layer))	// for debug
 			{
-				/* Only *one* of tilemap_16x16 & tilemap is enabled at any given time! */
-				draw_tilemap(machine, bitmap,cliprect,bg_tilemap[layer], 0, 1<<(3-pri), sx, sy, wx, wy);
-				if (tilemap_16x16[layer]) draw_tilemap(machine, bitmap,cliprect,tilemap_16x16[layer], 0, 1<<(3-pri), sx, sy, wx, wy);
+				UINT16* tilemapram = 0;
+
+				if (layer==0) tilemapram = state->vram_0;
+				else if (layer==1) tilemapram = state->vram_1;
+				else if (layer==2) tilemapram = state->vram_2;
+
+				draw_tilemap(machine, bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, 0, tilemapram, layer);
+
+				if (state->support_16x16)
+					draw_tilemap(machine, bitmap, cliprect, 0, 1 << (3 - pri), sx, sy, wx, wy, 1, tilemapram, layer);
 			}
 		}
 	}
 }
 
-
-
-/* Dirty tilemaps when the tiles set changes */
-static void dirty_tiles(int layer,UINT16 *vram)
-{
-	int col,row;
-
-	for (row = 0;row < WIN_NY;row++)
-	{
-		for (col = 0;col < WIN_NX;col++)
-		{
-			int offset = (col + metro_window[layer * 2 + 1] / 8) % BIG_NX +
-						((row + metro_window[layer * 2 + 0] / 8) % BIG_NY) * BIG_NX;
-			UINT16 code = vram[offset];
-
-			if (!(code & 0x8000) && dirtyindex[(code & 0x1ff0) >> 4])
-			{
-				tilemap_mark_tile_dirty(bg_tilemap[layer], row * WIN_NX + col );
-				if (tilemap_16x16[layer])
-					tilemap_mark_tile_dirty(tilemap_16x16[layer], row * WIN_NX + col );
-			}
-		}
-	}
-}
 
 
 VIDEO_UPDATE( metro )
 {
-	running_device *k053936 = devtag_get_device(screen->machine, "k053936");
-	int i,pri,layers_ctrl = -1;
-	UINT16 screenctrl = *metro_screenctrl;
+	metro_state *state = (metro_state *)screen->machine->driver_data;
+	int pri, layers_ctrl = -1;
+	UINT16 screenctrl = *state->screenctrl;
 
-	{
-		int dirty = 0;
-
-		memset(dirtyindex,0,metro_tiletable_size/4);
-		for (i = 0;i < metro_tiletable_size/4;i++)
-		{
-			UINT32 tile_new = (metro_tiletable[2*i + 0] << 16 ) + metro_tiletable[2*i + 1];
-			UINT32 tile_old = (metro_tiletable_old[2*i + 0] << 16 ) + metro_tiletable_old[2*i + 1];
-
-			if ((tile_new ^ tile_old) & 0x0fffffff)
-			{
-				dirtyindex[i] = 1;
-				dirty = 1;
-			}
-		}
-		memcpy(metro_tiletable_old,metro_tiletable,metro_tiletable_size);
-
-		if (dirty)
-		{
-			dirty_tiles(0,metro_vram_0);
-			dirty_tiles(1,metro_vram_1);
-			dirty_tiles(2,metro_vram_2);
-		}
-	}
-
-	metro_sprite_xoffs	=	metro_videoregs[0x06/2] - video_screen_get_width(screen)  / 2;
-	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - video_screen_get_height(screen) / 2;
+	state->sprite_xoffs = state->videoregs[0x06 / 2] - video_screen_get_width(screen)  / 2;
+	state->sprite_yoffs = state->videoregs[0x04 / 2] - video_screen_get_height(screen) / 2;
 
 	/* The background color is selected by a register */
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,((metro_videoregs[0x12/2] & 0x0fff)) + 0x1000);
+	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, ((state->videoregs[0x12/2] & 0x0fff)) + 0x1000);
 
 	/*  Screen Control Register:
 
@@ -895,22 +744,25 @@ VIDEO_UPDATE( metro )
         ---- ---- ---4 32--
         ---- ---- ---- --1-     ? Blank Screen
         ---- ---- ---- ---0     Flip  Screen    */
-	if (screenctrl & 2)	return 0;
-	flip_screen_set(screen->machine, screenctrl & 1);
+	if (screenctrl & 2)
+		return 0;
+
+	//flip_screen_set(screen->machine, screenctrl & 1);
+	state->flip_screen = screenctrl & 1;
 
 	/* If the game supports 16x16 tiles, make sure that the
        16x16 and 8x8 tilemaps of a given layer are not simultaneously
        enabled! */
-	if (support_16x16)
+	if (state->support_16x16)
 	{
 		int layer;
 
-		for (layer = 0;layer < 3;layer++)
+		for (layer = 0; layer < 3; layer++)
 		{
 			int big = screenctrl & (0x0020 << layer);
 
-			tilemap_set_enable(bg_tilemap[layer],!big);
-			tilemap_set_enable(tilemap_16x16[layer],big);
+			state->bg_tilemap_enable[layer] = !big;
+			state->bg_tilemap_enable16[layer] = big;
 		}
 	}
 
@@ -925,24 +777,24 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 	if (input_code_pressed(screen->machine, KEYCODE_A))	msk |= 8;
 	if (msk != 0)
 	{
-		bitmap_fill(bitmap,cliprect,0);
+		bitmap_fill(bitmap, cliprect, 0);
 		layers_ctrl &= msk;
 	}
 
 	popmessage("l %x-%x-%x r %04x %04x %04x",
-				(metro_videoregs[0x10/2]&0x30)>>4,(metro_videoregs[0x10/2]&0xc)>>2,metro_videoregs[0x10/2]&3,
-				metro_videoregs[0x02/2], metro_videoregs[0x12/2],
-				*metro_screenctrl);
+				(state->videoregs[0x10/2] & 0x30) >> 4, (state->videoregs[0x10/2] & 0xc) >> 2, state->videoregs[0x10/2] & 3,
+				state->videoregs[0x02/2], state->videoregs[0x12/2],
+				*state->screenctrl);
 }
 #endif
 
-	if (has_zoom)
-		k053936_zoom_draw(k053936, bitmap, cliprect, metro_K053936_tilemap, 0, 0, 1);
+	if (state->has_zoom)
+		k053936_zoom_draw(state->k053936, bitmap, cliprect, state->k053936_tilemap, 0, 0, 1);
 
 	for (pri = 3; pri >= 0; pri--)
-		draw_layers(screen->machine, bitmap,cliprect,pri,layers_ctrl);
+		draw_layers(screen->machine, bitmap, cliprect, pri, layers_ctrl);
 
 	if (layers_ctrl & 0x08)
-		metro_draw_sprites(screen->machine, bitmap,cliprect);
+		metro_draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

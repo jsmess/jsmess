@@ -102,6 +102,19 @@ WRITE8_HANDLER( threeds_romsel_w )
 	pastelg_gfxrom = (data & 0x3);
 }
 
+WRITE8_HANDLER( threeds_output_w )
+{
+	pastelg_palbank = ((data & 0x10) >> 4);
+
+}
+
+READ8_HANDLER( threeds_rom_readback_r )
+{
+	UINT8 *GFX = memory_region(space->machine, "gfx1");
+
+	return GFX[(blitter_src_addr | (pastelg_gfxrom << 16)) & 0x3ffff];
+}
+
 
 WRITE8_HANDLER( pastelg_romsel_w )
 {
@@ -257,8 +270,11 @@ static void pastelg_gfxdraw(running_machine *machine)
 			}
 			else
 			{
-				color = ((pastelg_palbank * 0x10) + pastelg_clut[color]);
-				pastelg_videoram[(dy * width) + dx] = color;
+				if(pastelg_clut[color] != 0)
+				{
+					color = ((pastelg_palbank * 0x10) + pastelg_clut[color]);
+					pastelg_videoram[(dy * width) + dx] = color;
+				}
 			}
 
 			nb1413m3_busyctr++;

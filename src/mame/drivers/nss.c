@@ -321,8 +321,8 @@ static WRITE8_DEVICE_HANDLER( spc_ram_100_w )
 }
 
 static ADDRESS_MAP_START( spc_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)   	/* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)   	/* spc io */
+	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)  	/* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE("spc700", spc_ram_100_w)
 	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD("spc700", spc_ram_100_r)
 	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD("spc700", spc_ipl_r)
@@ -389,6 +389,58 @@ static INPUT_PORTS_START( snes )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+#ifdef SNES_LAYER_DEBUG
+	PORT_START("DEBUG1")
+	PORT_CONFNAME( 0x03, 0x00, "Select BG1 priority" )
+	PORT_CONFSETTING(    0x00, "All" )
+	PORT_CONFSETTING(    0x01, "BG1B (lower) only" )
+	PORT_CONFSETTING(    0x02, "BG1A (higher) only" )
+	PORT_CONFNAME( 0x0c, 0x00, "Select BG2 priority" )
+	PORT_CONFSETTING(    0x00, "All" )
+	PORT_CONFSETTING(    0x04, "BG2B (lower) only" )
+	PORT_CONFSETTING(    0x08, "BG2A (higher) only" )
+	PORT_CONFNAME( 0x30, 0x00, "Select BG3 priority" )
+	PORT_CONFSETTING(    0x00, "All" )
+	PORT_CONFSETTING(    0x10, "BG3B (lower) only" )
+	PORT_CONFSETTING(    0x20, "BG3A (higher) only" )
+	PORT_CONFNAME( 0xc0, 0x00, "Select BG4 priority" )
+	PORT_CONFSETTING(    0x00, "All" )
+	PORT_CONFSETTING(    0x40, "BG4B (lower) only" )
+	PORT_CONFSETTING(    0x80, "BG4A (higher) only" )
+
+	PORT_START("DEBUG2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle BG 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle BG 2") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle BG 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle BG 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Objects") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Main/Sub") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Color Math") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Windows") PORT_CODE(KEYCODE_8_PAD)
+
+	PORT_START("DEBUG3")
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mosaic") PORT_CODE(KEYCODE_9_PAD)
+	PORT_CONFNAME( 0x70, 0x00, "Select OAM priority" )
+	PORT_CONFSETTING(    0x00, "All" )
+	PORT_CONFSETTING(    0x10, "OAM0 only" )
+	PORT_CONFSETTING(    0x20, "OAM1 only" )
+	PORT_CONFSETTING(    0x30, "OAM2 only" )
+	PORT_CONFSETTING(    0x40, "OAM3 only" )
+	PORT_CONFNAME( 0x80, 0x00, "Draw sprite in reverse order" )
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DEBUG4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 0 draw")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 1 draw")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 2 draw")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 3 draw")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 4 draw")
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 5 draw")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 6 draw")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Toggle Mode 7 draw")
+#endif
 INPUT_PORTS_END
 
 static MACHINE_DRIVER_START( snes )

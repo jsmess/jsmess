@@ -73,6 +73,9 @@
 #define SUBTYPE_TMS5100			1
 #define SUBTYPE_M58817			2
 #define SUBTYPE_TMS5110			4
+#define SUBTYPE_TMS5200			8
+#define SUBTYPE_TMS5220			16
+#define SUBTYPE_TMS5220C		32
 #define FIFO_SIZE				64
 #define MAX_CHIRP_SIZE			51
 
@@ -763,8 +766,10 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 
 static void parse_frame(tms5110_state *tms)
 {
-	int bits, indx, i, rep_flag, ene;
-
+	int bits, indx, i, rep_flag;
+#if (DEBUG_5110)
+	int ene;
+#endif
 
 	/* count the total number of bits available */
 	bits = tms->fifo_count;
@@ -779,7 +784,9 @@ static void parse_frame(tms5110_state *tms)
 	}
 	indx = extract_bits(tms,tms->coeff->energy_bits);
 	tms->new_energy = tms->coeff->energytable[indx];
+#if (DEBUG_5110)
 	ene = indx;
+#endif
 
 	/* if the energy index is 0 or 15, we're done */
 

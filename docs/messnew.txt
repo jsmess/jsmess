@@ -50,6 +50,8 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
+- The core is based on MAME 0.137u1.  This incorporates all features of the
+  update to this core.  [MAME team]
 
 - [AMSTRAD CPC Family] Updated Hashes to GoodCPC V3.1415 [Cowering]
 
@@ -135,7 +137,6 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-
 - [ABC80] Partially fixed keyboard input. [Curt Coder]
 
 - [APEXC] Fixed disassembly in the debugger. [Robbbert]

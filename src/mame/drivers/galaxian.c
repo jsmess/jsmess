@@ -1093,15 +1093,20 @@ static WRITE8_DEVICE_HANDLER( moonwar_port_select_w )
 
 static READ8_DEVICE_HANDLER( moonwar_input_port_0_r )
 {
-	UINT8 sign;
-	UINT8 delta;
-
-	delta = (moonwar_port_select ? input_port_read(device->machine, "IN3") : input_port_read(device->machine, "IN4"));
-
-	sign = (delta & 0x80) >> 3;
-	delta &= 0x0f;
-
-	return ((input_port_read(device->machine, "IN0") & 0xe0) | delta | sign );
+	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
+	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
+	signed char dialread = (moonwar_port_select ? input_port_read(device->machine, "IN3") : input_port_read(device->machine, "IN4"));
+	static int counter_74ls161 = 0;
+	static int direction = 0;
+	UINT8 ret;
+	UINT8 buttons = (input_port_read(device->machine,"IN0")&0xe0);
+	if (dialread < 0) direction = 0;
+	else if (dialread > 0) direction = 0x10;
+	counter_74ls161 += abs(dialread);
+	counter_74ls161 &= 0xf;
+	ret = counter_74ls161 | direction | buttons;
+	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, counter_74ls161, ret);
+	return ret;
 }
 
 

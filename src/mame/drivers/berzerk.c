@@ -15,7 +15,6 @@
 #include "sound/s14001a.h"
 #include "video/resnet.h"
 
-
 #define MONITOR_TYPE_PORT_TAG ("MONITOR_TYPE")
 
 #define MASTER_CLOCK				(XTAL_10MHz)
@@ -97,7 +96,7 @@ static WRITE8_HANDLER( led_off_w )
  *
  *************************************/
 
-static void vpos_to_vysnc_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
+static void vpos_to_vsync_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
 {
 	/* convert from a vertical position to the actual values on the vertical sync counters */
 	*v256 = ((vpos < VBEND) || (vpos >= VBSTART));
@@ -116,7 +115,7 @@ static void vpos_to_vysnc_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
 }
 
 
-static int vysnc_chain_counter_to_vpos(UINT8 counter, UINT8 v256)
+static int vsync_chain_counter_to_vpos(UINT8 counter, UINT8 v256)
 {
 	/* convert from the vertical sync counters to an actual vertical position */
 	int vpos;
@@ -167,7 +166,7 @@ static TIMER_CALLBACK( irq_callback )
 	next_counter = irq_trigger_counts[next_irq_number];
 	next_v256 = irq_trigger_v256s[next_irq_number];
 
-	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
+	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
 	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_irq_number);
 }
 
@@ -180,7 +179,7 @@ static void create_irq_timer(running_machine *machine)
 
 static void start_irq_timer(running_machine *machine)
 {
-	int vpos = vysnc_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
+	int vpos = vsync_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
 	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
@@ -244,7 +243,7 @@ static TIMER_CALLBACK( nmi_callback )
 	next_counter = nmi_trigger_counts[next_nmi_number];
 	next_v256 = nmi_trigger_v256s[next_nmi_number];
 
-	next_vpos = vysnc_chain_counter_to_vpos(next_counter, next_v256);
+	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
 	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_nmi_number);
 }
 
@@ -257,7 +256,7 @@ static void create_nmi_timer(running_machine *machine)
 
 static void start_nmi_timer(running_machine *machine)
 {
-	int vpos = vysnc_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
+	int vpos = vsync_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
 	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
 }
 
@@ -378,7 +377,7 @@ static READ8_HANDLER( intercept_v256_r )
 	UINT8 counter;
 	UINT8 v256;
 
-	vpos_to_vysnc_chain_counter(video_screen_get_vpos(space->machine->primary_screen), &counter, &v256);
+	vpos_to_vsync_chain_counter(video_screen_get_vpos(space->machine->primary_screen), &counter, &v256);
 
 	return (!intercept << 7) | v256;
 }
@@ -526,7 +525,19 @@ static WRITE8_HANDLER( berzerk_audio_w )
 static READ8_HANDLER( berzerk_audio_r )
 {
 	running_device *device = devtag_get_device(space->machine, "speech");
-	return ((offset == 4) && !s14001a_bsy_r(device)) ? 0x40 : 0x00;
+	switch (offset)
+	{
+	/* offset 4 reads from the S14001A */
+	case 4:
+		return (!s14001a_bsy_r(device)) ? 0x40 : 0x00;
+	/* offset 6 is open bus */
+	case 6:
+		logerror("attempted read from berzerk audio reg 6 (sfxctrl)!\n");
+		return 0;
+	/* everything else reads from the 6840 */
+	default:
+		return exidy_sh6840_r(space, offset);
+	}
 }
 
 
@@ -584,9 +595,9 @@ static ADDRESS_MAP_START( berzerk_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x4b, 0x4b) AM_READNOP AM_WRITE(magicram_control_w)
 	AM_RANGE(0x4c, 0x4c) AM_READWRITE(nmi_enable_r, nmi_enable_w)
 	AM_RANGE(0x4d, 0x4d) AM_READWRITE(nmi_disable_r, nmi_disable_w)
-	AM_RANGE(0x4e, 0x4e) AM_READ(intercept_v256_r) AM_WRITENOP
+	AM_RANGE(0x4e, 0x4e) AM_READ(intercept_v256_r) AM_WRITENOP // note reading from here should clear pending frame interrupts, see zfb-1.tiff 74ls74 at 3D pin 13 /CLR
 	AM_RANGE(0x4f, 0x4f) AM_READNOP AM_WRITE(irq_enable_w)
-	AM_RANGE(0x50, 0x57) AM_NOP /* second sound board, but not used */
+	AM_RANGE(0x50, 0x57) AM_NOP /* second sound board, initialized but not used */
 	AM_RANGE(0x58, 0x5f) AM_NOP
 	AM_RANGE(0x60, 0x60) AM_MIRROR(0x18) AM_READ_PORT("F3") AM_WRITENOP
 	AM_RANGE(0x61, 0x61) AM_MIRROR(0x18) AM_READ_PORT("F2") AM_WRITENOP
@@ -624,11 +635,10 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) ) \
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) ) \
 	PORT_DIPSETTING(    0x07, "1 Coin/10 Credits" ) \
-	PORT_DIPSETTING(    0x08, "1 Coin/14 Credits" ) \
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_DIPSETTING(    0x08, "1 Coin/14 Credits" )
 
 
-static INPUT_PORTS_START( common )
+static INPUT_PORTS_START( joystick ) // used on all games except moonwarp
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -636,14 +646,6 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -655,6 +657,16 @@ static INPUT_PORTS_START( common )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( common ) // used on all games
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x1c, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	/* fake port for monitor type */
 	PORT_START(MONITOR_TYPE_PORT_TAG)
@@ -662,9 +674,26 @@ static INPUT_PORTS_START( common )
 	PORT_CONFSETTING(    0x00, "Wells-Gardner" )
 	PORT_CONFSETTING(    0x01, "Electrohome" )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("SW2")
+	/* port for the 'bookkeeping reset' and 'bookkeeping' buttons;
+     * The 'bookkeeping reset' button is an actual button on the zpu-1000 and
+     * zpu-1001 pcbs, labeled 'S2' or 'SW2'. It is wired to bit 0.
+     * * pressing it while high scores are displayed will give a free game
+     *   without adding any coin info to the bookkeeping info in nvram.
+     * The 'bookkeeping' button is wired to the control panel, usually hidden
+     * underneath or only accessible through the coin door. Wired to bit 7.
+     * * It displays various bookkeeping statistics when pressed sequentially.
+     *   Pressing P1 fire (according to the manual) when stats are displayed
+     *   will clear the stat shown on screen.
+     */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Free Game (not logged in bookkeeping)")
+	PORT_BIT( 0x7e, IP_ACTIVE_LOW,  IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE2 ) PORT_NAME("Bookkeeping") PORT_CODE(KEYCODE_F1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( berzerk )
+	PORT_INCLUDE( joystick )
 	PORT_INCLUDE( common )
 
 	PORT_START("F2")
@@ -694,40 +723,53 @@ static INPUT_PORTS_START( berzerk )
 
 	PORT_START("F4")
 	BERZERK_COINAGE(1, F4)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("F5")
 	BERZERK_COINAGE(2, F5)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED )
 
 	PORT_START("F6")
 	BERZERK_COINAGE(3, F6)
-
-	PORT_START("SW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW2:1")
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_BIT( 0x7e, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Stats") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 
+// this set has German speech roms, so default the language to German
+static INPUT_PORTS_START( berzerkg )
+	PORT_INCLUDE( berzerk )
+
+	PORT_MODIFY("F3")
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Language ) ) PORT_DIPLOCATION("F3:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( frenzy )
+	PORT_INCLUDE( joystick )
 	PORT_INCLUDE( common )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) // frenzy lacks coin 3
 
 	PORT_START("F2")
 	/* Bit 0 does some more hardware tests. According to the manual, both bit 0 & 1 must be:
        - ON for Signature Analysis (S.A.)
        - OFF for game operation     */
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )	// F2:1,2
+	//PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )  // F2:1,2
+	PORT_DIPNAME( 0x03, 0x00, "Hardware Tests" ) PORT_DIPLOCATION("F2:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, "Color test" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x03, "Signature Analysis" )
 	PORT_DIPNAME( 0x04, 0x00, "Input Test Mode" ) PORT_CODE(KEYCODE_F2) PORT_TOGGLE PORT_DIPLOCATION("F2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x00, "Crosshair Pattern" ) PORT_CODE(KEYCODE_F4) PORT_TOGGLE PORT_DIPLOCATION("F2:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )		// F2:5,6,7,8
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_DIPLOCATION("F2:5,6,7,8")
 
 	PORT_START("F3")
 	PORT_DIPNAME( 0x0f, 0x03, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("F3:1,2,3,4")
@@ -747,7 +789,7 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0e, "14000" )
 	PORT_DIPSETTING(    0x0f, "15000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )	// F3:5,6
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED ) PORT_DIPLOCATION("F3:5,6")
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("F3:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
@@ -756,7 +798,7 @@ static INPUT_PORTS_START( frenzy )
 
 	/* The following 3 ports use all 8 bits, but I didn't feel like adding all 256 values :-) */
 	PORT_START("F4")
-	PORT_DIPNAME( 0x0f, 0x01, "Coin Multiplier" ) PORT_DIPLOCATION("F4:1,2,3,4")	// F4:1,8
+	PORT_DIPNAME( 0xff, 0x01, "Coin Multiplier" ) PORT_DIPLOCATION("F4:1,2,3,4,5,6,7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
@@ -773,11 +815,11 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0d, "13" )
 	PORT_DIPSETTING(    0x0e, "14" )
 	PORT_DIPSETTING(    0x0f, "15" )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH,  IPT_UNUSED )
+	PORT_DIPSETTING(    0xff, "255" )
 
 	PORT_START("F5")
-	PORT_DIPNAME( 0x0f, 0x01, "Coins/Credit A" ) PORT_DIPLOCATION("F5:1,2,3,4")	// F5:1,8
-	/*PORT_DIPSETTING(    0x00, "0" )    Can't insert coins  */
+	PORT_DIPNAME( 0xff, 0x01, "Coins/Credit A" ) PORT_DIPLOCATION("F5:1,2,3,4,5,6,7,8")
+	PORT_DIPSETTING(    0x00, "0 (invalid)" ) //   Can't insert coins
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -793,11 +835,11 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0d, "13" )
 	PORT_DIPSETTING(    0x0e, "14" )
 	PORT_DIPSETTING(    0x0f, "15" )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH,  IPT_UNUSED )
+	PORT_DIPSETTING(    0xff, "255" )
 
 	PORT_START("F6")
-	PORT_DIPNAME( 0x0f, 0x01, "Coins/Credit B" ) PORT_DIPLOCATION("F6:1,2,3,4")	// F6:1,8
-	/*PORT_DIPSETTING(    0x00, "0" )    Can't insert coins  */
+	PORT_DIPNAME( 0xff, 0x01, "Coins/Credit B" ) PORT_DIPLOCATION("F6:1,2,3,4,5,6,7,8")
+	PORT_DIPSETTING(    0x00, "0 (invalid)" ) //   Can't insert coins
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x03, "3" )
@@ -813,14 +855,168 @@ static INPUT_PORTS_START( frenzy )
 	PORT_DIPSETTING(    0x0d, "13" )
 	PORT_DIPSETTING(    0x0e, "14" )
 	PORT_DIPSETTING(    0x0f, "15" )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH,  IPT_UNUSED )
-
-	PORT_START("SW2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_DIPLOCATION("SW2:1")
-	PORT_BIT( 0x7e, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Stats") PORT_CODE(KEYCODE_F1)
+	PORT_DIPSETTING(    0xff, "255" )
 INPUT_PORTS_END
 
+static READ8_HANDLER( moonwarp_p1_r )
+{
+	// This seems to be the same type of dial as the later 'moon war 2' set uses
+	// see http://www.cityofberwyn.com/schematics/stern/MoonWar_opto.tiff for schematic
+	// I.e. a 74ls161 counts from 0 to 15 which is the absolute number of bars passed on the quadrature
+	// one difference is it lacks the strobe input (does it?), which if not active causes
+	// the dial input to go open bus. This is used in moon war 2 to switch between player 1
+	// and player 2 dials, which share a single port. moonwarp uses separate ports for the dials.
+	signed char dialread = input_port_read(space->machine,"P1_DIAL");
+	static int counter_74ls161 = 0;
+	static int direction = 0;
+	UINT8 ret;
+	UINT8 buttons = (input_port_read(space->machine,"P1")&0xe0);
+	if (dialread < 0) direction = 0;
+	else if (dialread > 0) direction = 0x10;
+	counter_74ls161 += abs(dialread);
+	counter_74ls161 &= 0xf;
+	ret = counter_74ls161 | direction | buttons;
+	//fprintf(stderr, "dialread1: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, counter_74ls161, ret);
+	return ret;
+}
+
+static READ8_HANDLER( moonwarp_p2_r )
+{
+	// same as above, but for player 2 in cocktail mode
+	signed char dialread = input_port_read(space->machine,"P2_DIAL");
+	static int counter_74ls161 = 0;
+	static int direction = 0;
+	UINT8 ret;
+	UINT8 buttons = (input_port_read(space->machine,"P2")&0xe0);
+	if (dialread < 0) direction = 0;
+	else if (dialread > 0) direction = 0x10;
+	counter_74ls161 += abs(dialread);
+	counter_74ls161 &= 0xf;
+	ret = counter_74ls161 | direction | buttons;
+	//fprintf(stderr, "dialread2: %02x, counter_74ls161: %02x, spinner ret is %02x\n", dialread, counter_74ls161, ret);
+	return ret;
+}
+
+static INPUT_PORTS_START( moonwarp )
+	PORT_INCLUDE( common )
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) // is wired high for upright harness, low for cocktail; if high, cocktail dipswitch is ignored.
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) // Hyper flip button is common for both players in cocktail mode.
+
+	PORT_START("P1")
+	//PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) // spinner/dial
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("P1_DIAL")
+    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_RESET
+
+	PORT_START("P2")
+	//PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_COCKTAIL // spinner/dial
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+
+	PORT_START("P2_DIAL")
+    PORT_BIT( 0xff, 0x0, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(4) PORT_COCKTAIL PORT_RESET
+
+	PORT_START("F2")
+	PORT_DIPNAME( 0x03, 0x00, "Hardware Tests" ) PORT_DIPLOCATION("F2:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, "Color test" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x03, "Signature Analysis" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("F3")
+	PORT_DIPNAME( 0x01, 0x00, "Input Test Mode" ) PORT_CODE(KEYCODE_F2) PORT_TOGGLE PORT_DIPLOCATION("F3:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, "Crosshair Pattern" ) PORT_CODE(KEYCODE_F4) PORT_TOGGLE PORT_DIPLOCATION("F3:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F3:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "Spinner Direction" ) PORT_DIPLOCATION("F3:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Reverse ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Standard ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F3:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F3:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Language ) ) PORT_DIPLOCATION("F3:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( French ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Spanish ) )
+
+	PORT_START("F4")
+	BERZERK_COINAGE(1, F4)
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F4:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F4:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F4:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F4:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("F5")
+	BERZERK_COINAGE(2, F5)
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F5:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F5:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F5:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("F5:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("F6")
+	BERZERK_COINAGE(3, F6)
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F6:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F6:6") // enemy spawn rate?
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("F6:7,8") // difficulties might be in the wrong order but 0xc0 is clearly the hardest
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Hard ) )
+
+INPUT_PORTS_END
 
 
 /*************************************
@@ -908,6 +1104,22 @@ ROM_START( berzerk1 )
 	ROM_LOAD( "2c",           0x0800, 0x0800, CRC(d2b6324e) SHA1(20a6611ad6ec19409ac138bdae7bdfaeab6c47cf) )
 ROM_END
 
+ROM_START( berzerkg )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cpu rom 00.bin",      0x0000, 0x0800, CRC(77923a9e) SHA1(3760800b7aa1245f2141897b2406f0f5af5a8d71) )
+	ROM_LOAD( "cpu rom 01.bin",      0x1000, 0x0800, CRC(19bb3aac) SHA1(11341521fd880d55ea01bceb4a321ec571f0b759) )
+	ROM_LOAD( "cpu rom 02.bin",      0x1800, 0x0800, CRC(b0888ff7) SHA1(ac76400482fe37b6c8e309cd9b10855dac86ed24) )
+	ROM_LOAD( "cpu rom 03.bin",      0x2000, 0x0800, CRC(e23239a9) SHA1(a0505efdee4cb1962243638c641e94983673f70f) )
+	ROM_LOAD( "cpu rom 04.bin",      0x2800, 0x0800, CRC(651b31b7) SHA1(890f424a5a73a95af642435c1b0cca78a9413aae) )
+	ROM_LOAD( "cpu rom 05.bin",      0x3000, 0x0800, CRC(8a403bba) SHA1(686a9b58a245df6c947d14991a2e4cbaf511e2ca) )
+	ROM_FILL( 0x3800, 0x0800, 0xff )
+
+	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
+	ROM_LOAD( "snd rom 1c.bin",           0x0000, 0x0800, CRC(fc1da15f) SHA1(f759a017d9e95acf0e1d35b16d8820acee7d7e3d) )	/* VSU-1000 board */
+	ROM_LOAD( "snd rom 2c.bin",           0x0800, 0x0800, CRC(7f6808fb) SHA1(8a9c43597f924221f68d1b31e033f1dc492cddc5) )
+ROM_END
+
+
 
 ROM_START( frenzy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -927,30 +1139,38 @@ ROM_END
 
 
 /*
-   The original / prototype version of moon war appears to run on Frenzy hardware, however the only board found
-   had been stripped for parts, leaving only the sound ROMs.
+   The original / prototype version of moon war runs on Frenzy Hardware.
 
    The more common version of Moon War runs on modified Super Cobra (scobra.c) hardware and is often called
-   'Moon War 2' because it is the second version, and many of the PCBs are labeled as such
+   'Moon War 2' because it is the second version, and many of the PCBs are labeled as such.
+
+   So far only 2 original boards of this have been found, one with only the sound roms on it, and the other
+   with only the program roms on it.  This set is a combination of dumps from those two boards, so there
+   is a small chance they could be mismatched.
 */
 ROM_START( moonwarp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "1c",         0x0000, 0x1000, NO_DUMP )
-	/*ROM_LOAD( "3c",         0x?000, 0x?000, NO_DUMP ) */ /* likely unused */
-	ROM_LOAD( "1d",         0x1000, 0x1000, NO_DUMP )
-	ROM_LOAD( "3d",         0x2000, 0x1000, NO_DUMP )
-	ROM_LOAD( "5d",         0x3000, 0x1000, NO_DUMP )
-	ROM_LOAD( "6d",         0xc000, 0x1000, NO_DUMP )
+	ROM_LOAD( "1d.bin",      0x0000, 0x1000, CRC(75470634) SHA1(1a811fef39724fd227e06b694841d3dad5659622) )
+	ROM_LOAD( "3d.bin",      0x1000, 0x1000, CRC(a9d046dc) SHA1(88afccd09d2809cafd12dd40ab3be77e3707cfc5) )
+	ROM_LOAD( "5d.bin",      0x2000, 0x1000, CRC(bf671737) SHA1(cdfae1eb8995c2251813cc5633fc809aa9e6a36f) )
+	ROM_LOAD( "6d.bin",      0x3000, 0x1000, CRC(cef2d697) SHA1(5c31c6e7002f0d944b3028d1b804480acf3af042) )
+	ROM_LOAD( "5c.bin",      0xc000, 0x1000, CRC(a3d551ab) SHA1(a32352727b5475a6ec6c495c55f01ccd6e024f98) )
 
 	ROM_REGION( 0x01000, "speech", 0 ) /* voice data */
 	ROM_LOAD( "moonwar.1c.bin",           0x0000, 0x0800, CRC(9e9a653f) SHA1(cf49a38ef343ace271ba1e5dde38bd8b9c0bd876) )	/* VSU-1000 board */
 	ROM_LOAD( "moonwar.2c.bin",           0x0800, 0x0800, CRC(73fd988d) SHA1(08a2aeb4d87eee58e38e4e3f749a95f2308aceb0) )    /* ditto */
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom */
+	ROM_LOAD( "n82s123 po. e6 select decoder",      0x0000, 0x0020, CRC(4471ca5d) SHA1(ba8dca2ec076818f8ad8c17b15c77965e36fa05e) ) /* address decoder/rom select prom - from board with prg roms, same as Frenzy*/
+	ROM_LOAD( "prom.6e",        0x0000, 0x0020, CRC(56bffba3) SHA1(c8e24f6361c50bcb4c9d3f39cdaf4172c2a2b318) ) /* address decoder/rom select prom - from the sound rom only set, is it bad? */
 ROM_END
 
-
+static DRIVER_INIT( moonwarp )
+{
+	const address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	memory_install_read8_handler (io, 0x48, 0x48, 0, 0, moonwarp_p1_r);
+	memory_install_read8_handler (io, 0x4a, 0x4a, 0, 0, moonwarp_p2_r);
+}
 
 /*************************************
  *
@@ -960,5 +1180,6 @@ ROM_END
 
 GAME( 1980, berzerk,  0,       berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 1)", 0 )
 GAME( 1980, berzerk1, berzerk, berzerk, berzerk, 0, ROT0, "Stern", "Berzerk (set 2)", 0 )
+GAME( 1980, berzerkg, berzerk, berzerk, berzerkg,0, ROT0, "Stern", "Berzerk (German Speech)", 0 )
 GAME( 1981, frenzy,   0,       frenzy,  frenzy,  0, ROT0, "Stern", "Frenzy", 0 )
-GAME( 1981, moonwarp, 0,       frenzy,  frenzy,  0, ROT0, "Stern", "Moon War (prototype on Frenzy hardware)", GAME_NOT_WORKING )
+GAME( 1981, moonwarp, 0,       frenzy,  moonwarp,moonwarp, ROT0, "Stern", "Moon War (prototype on Frenzy hardware)", 0)
