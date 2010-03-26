@@ -156,6 +156,7 @@ There don't seem to be any JV1 boot disks for Model III/4.
 #include "formats/trs_dsk.h"
 #include "devices/cassette.h"
 #include "formats/trs_cas.h"
+#include "formats/trs_cmd.h"
 
 UINT8 *trs80_gfxram;
 UINT8 trs80_model4;
