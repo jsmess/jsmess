@@ -17,6 +17,7 @@
 #include "sound/wave.h"
 #include "devices/flopdrv.h"
 #include "formats/comx35_dsk.h"
+#include "formats/comx35_comx.h"
 #include "devices/cassette.h"
 #include "devices/printer.h"
 #include "devices/snapquik.h"
@@ -413,7 +414,7 @@ static MACHINE_DRIVER_START( comx35_pal )
 	/* peripheral hardware */
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_PAL / 8)
 	MDRV_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
-	MDRV_QUICKLOAD_ADD("quickload", comx35, "comx", 0)
+	MDRV_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
 	MDRV_PRINTER_ADD("printer")
 
@@ -443,7 +444,7 @@ static MACHINE_DRIVER_START( comx35_ntsc )
 	/* peripheral hardware */
 	MDRV_CDP1871_ADD(CDP1871_TAG, comx35_cdp1871_intf, CDP1869_CPU_CLK_NTSC / 8)
 	MDRV_WD1770_ADD(WD1770_TAG, comx35_wd17xx_interface )
-	MDRV_QUICKLOAD_ADD("quickload", comx35, "comx", 0)
+	MDRV_QUICKLOAD_ADD("quickload", comx35_comx, "comx", 0)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, comx35_cassette_config)
 	MDRV_PRINTER_ADD("printer")
 

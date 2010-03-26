@@ -92,8 +92,6 @@ MACHINE_START( comx35n );
 MACHINE_RESET( comx35 );
 INPUT_CHANGED( comx35_reset );
 
-QUICKLOAD_LOAD( comx35 );
-
 /* ---------- defined in video/comx35.c ---------- */
 
 WRITE8_HANDLER( comx35_videoram_w );

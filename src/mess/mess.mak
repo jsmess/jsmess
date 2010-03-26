@@ -767,6 +767,7 @@ $(MESSOBJ)/coleco.a:			\
 $(MESSOBJ)/comx.a:				\
 	$(MESS_DRIVERS)/comx35.o	\
 	$(MESS_FORMATS)/comx35_dsk.o	\
+	$(MESS_FORMATS)/comx35_comx.o	\
 	$(MESS_DRIVERS)/comxpl80.o	\
 	$(MESS_VIDEO)/comx35.o		\
 	$(MESS_MACHINE)/comx35.o	\
