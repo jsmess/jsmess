@@ -19,10 +19,39 @@ static VIDEO_UPDATE( mz2500 )
 }
 
 static ADDRESS_MAP_START(mz2500_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00000,0x7fff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_REGION("maincpu",0) //banked!
+	AM_RANGE(0x8000, 0xffff) AM_RAM AM_REGION("maincpu",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
+//	AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
+//	AM_RANGE(0xa0, 0xa3) AM_READWRITE(sio_r,sio_w)
+//	AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
+//	AM_RANGE(0xa8, 0xa8) AM_WRITE(rom_w)
+//	AM_RANGE(0xa9, 0xa9) AM_READ(rom_r)
+//	AM_RANGE(0xac, 0xad) AM_WRITE(emm_w)
+//	AM_RANGE(0xad, 0xad) AM_READ(emm_r)
+//	AM_RANGE(0xae, 0xae) AM_WRITE(crtc_w)
+//	AM_RANGE(0xb0, 0xb3) AM_READWRITE(sio_r,sio_w)
+//	AM_RANGE(0xb4, 0xb5) AM_READWRITE(memory_r,memory_w)
+// 	AM_RANGE(0xb8, 0xb9) AM_READWRITE(kanji_r,kanji_w)
+//	AM_RANGE(0xbc, 0xbd) AM_READWRITE(crtc_r,crtc_w)
+//	AM_RANGE(0xc6, 0xc7) AM_WRITE(irq_w)
+//	AM_RANGE(0xc8, 0xc9) AM_READWRITE(opn_r,opn_w)
+//	AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
+//	AM_RANGE(0xcc, 0xcc) AM_READWRITE(calendar_r,calendar_w)
+//	AM_RANGE(0xce, 0xcf) AM_WRITE(memory_w)
+//	AM_RANGE(0xd8, 0xdb) AM_READWRITE(fdc_r,fdc_w)
+//	AM_RANGE(0xdc, 0xdd) AM_WRITE(floppy_w)
+//	AM_RANGE(0xe0, 0xe3) AM_READWRITE(pio0_r,pio0_w)
+//	AM_RANGE(0xe4, 0xe7) AM_READWRITE(pit_r,pit_w)
+//	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pio1_r,pio1_w)
+//	AM_RANGE(0xef, 0xef) AM_READWRITE(joystick_r,joystick_w)
+//	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
+//	AM_RANGE(0xf4, 0xf7) AM_READWRITE(crtc_r,crtc_w)
+//	AM_RANGE(0xf8, 0xf9) AM_READWRITE(extrom_r,extrom_w)
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -78,6 +107,7 @@ static MACHINE_DRIVER_START( mz2500 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 6000000)
     MDRV_CPU_PROGRAM_MAP(mz2500_map)
+    MDRV_CPU_IO_MAP(mz2500_io)
 
     MDRV_MACHINE_RESET(mz2500)
 
@@ -94,9 +124,11 @@ static MACHINE_DRIVER_START( mz2500 )
     MDRV_VIDEO_UPDATE(mz2500)
 MACHINE_DRIVER_END
 
+
+
 /* ROM definition */
 ROM_START( mz2500 )
-	ROM_REGION( 0x8000, "maincpu", 0 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x8000, CRC(7a659f20) SHA1(ccb3cfdf461feea9db8d8d3a8815f7e345d274f7) )
 
 	ROM_REGION( 0x1000, "cgrom", 0 )
