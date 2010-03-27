@@ -2,13 +2,13 @@
 
     Sharp MZ-2500 (c) 1985 Sharp Corporation
 
-    26/03/2010 Skeleton driver.
+	preliminary driver by Angelo Salese
 
     memory map:
 
     0x00000-0x3ffff Work RAM
     0x40000-0x5ffff CG RAM (bitswapped!)
-    0x60000-0x67fff NOP?
+    0x60000-0x67fff "Read modify write" area (related to the CG RAM)
     0x68000-0x6ffff IPL ROM
     0x70000-0x71fff TVRAM
     0x72000-0x73fff PCG / Kanji RAM
@@ -23,7 +23,12 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
+/* machine stuff */
 static UINT8 bank_val[8],bank_addr;
+static UINT8 irq_sel,irq_vector[4];
+
+/* video stuff*/
+static UINT8 text_reg[0x100], text_reg_index;
 
 static VIDEO_START( mz2500 )
 {
@@ -31,6 +36,30 @@ static VIDEO_START( mz2500 )
 
 static VIDEO_UPDATE( mz2500 )
 {
+	UINT8 *vram = memory_region(screen->machine, "maincpu");
+	int x,y,count;
+	const gfx_element *gfx = screen->machine->gfx[0];
+
+	count = 0x70000;
+
+	for (y=0;y<32;y+=2)
+	{
+		for (x=0;x<32;x++)
+		{
+			int tile = vram[count+0x000] & 0xfe;
+			//int attr = vram[count+0x800];
+			int tile_bank = vram[count+0x1000] & 0x3f;
+
+			tile|= tile_bank << 8;
+
+			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,(y)*8);
+			drawgfx_opaque(bitmap,cliprect,gfx,tile+1,0,0,0,x*8,(y+1)*8);
+
+			count++;
+		}
+	}
+
+
     return 0;
 }
 
@@ -63,7 +92,7 @@ static WRITE8_HANDLER( mz2500_bank_data_w )
 
 	bank_val[bank_addr] = data & 0x3f;
 
-	printf("%s %02x\n",bank_name[bank_addr],bank_val[bank_addr]*2);
+//	printf("%s %02x\n",bank_name[bank_addr],bank_val[bank_addr]*2);
 
 	memory_set_bankptr(space->machine, bank_name[bank_addr], &ROM[bank_val[bank_addr]*0x2000]);
 
@@ -71,6 +100,52 @@ static WRITE8_HANDLER( mz2500_bank_data_w )
 	bank_addr&=7;
 }
 
+static READ8_HANDLER( mz2500_crtc_r )
+{
+	static UINT8 vblank_bit, hblank_bit;
+
+	/* TODO */
+	vblank_bit^= 1;//video_screen_get_vblank(space->machine->primary_screen) ? 0 : 1;
+	hblank_bit = video_screen_get_hblank(space->machine->primary_screen) ? 0 : 2;
+
+	return vblank_bit | hblank_bit;
+}
+
+static WRITE8_HANDLER( mz2500_crtc_w )
+{
+	switch(offset)
+	{
+		case 0: text_reg_index = data; break;
+		case 1:
+			text_reg[text_reg_index] = data;
+			//printf("[%02x]<- %02x\n",text_reg[text_reg_index],text_reg_index);
+			break;
+		case 2: /* CG MASK reg */ break;
+		case 3:
+			/* Font size reg */
+			printf("%02x FONT\n",data);
+			break;
+	}
+}
+
+static WRITE8_HANDLER( mz2500_irq_sel_w )
+{
+	irq_sel = data;
+	// FIXME: bit 0-3 are irq masks?
+//	printf("%02x\n",irq_sel);
+}
+
+static WRITE8_HANDLER( mz2500_irq_data_w )
+{
+	if(irq_sel & 0x80)
+		irq_vector[0] = data; //CRTC
+	if(irq_sel & 0x40)
+		irq_vector[1] = data; //i8253
+	if(irq_sel & 0x20)
+		irq_vector[2] = data; //printer
+	if(irq_sel & 0x10)
+		irq_vector[3] = data; //RP5c15
+}
 
 static ADDRESS_MAP_START(mz2500_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank0")
@@ -82,6 +157,14 @@ static ADDRESS_MAP_START(mz2500_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xdfff) AM_RAMBANK("bank6")
 	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank7")
 ADDRESS_MAP_END
+
+#if 0
+
+static READ8_HANDLER( kludge_r )
+{
+	return mame_rand(space->machine);
+}
+#endif
 
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -99,7 +182,8 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xb5, 0xb5) AM_READWRITE(mz2500_bank_data_r,mz2500_bank_data_w)
 // 	AM_RANGE(0xb8, 0xb9) AM_READWRITE(kanji_r,kanji_w)
 //	AM_RANGE(0xbc, 0xbd) AM_READWRITE(crtc_r,crtc_w)
-//	AM_RANGE(0xc6, 0xc7) AM_WRITE(irq_w)
+	AM_RANGE(0xc6, 0xc6) AM_WRITE(mz2500_irq_sel_w)
+	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
 //	AM_RANGE(0xc8, 0xc9) AM_READWRITE(opn_r,opn_w)
 //	AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
 //	AM_RANGE(0xcc, 0xcc) AM_READWRITE(calendar_r,calendar_w)
@@ -111,7 +195,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pio1_r,pio1_w)
 //	AM_RANGE(0xef, 0xef) AM_READWRITE(joystick_r,joystick_w)
 //	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
-//	AM_RANGE(0xf4, 0xf7) AM_READWRITE(crtc_r,crtc_w)
+	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_r) AM_WRITE(mz2500_crtc_w)
 //	AM_RANGE(0xf8, 0xf9) AM_READWRITE(extrom_r,extrom_w)
 ADDRESS_MAP_END
 
@@ -141,12 +225,14 @@ static MACHINE_RESET(mz2500)
 	memory_set_bankptr(machine, "bank5", &ROM[bank_val[5]*0x2000]);
 	memory_set_bankptr(machine, "bank6", &ROM[bank_val[6]*0x2000]);
 	memory_set_bankptr(machine, "bank7", &ROM[bank_val[7]*0x2000]);
+
+	irq_vector[0] = 0xef; /* RST 28h - vblank */
 }
 
 static const gfx_layout mz2500_cg_layout =
 {
 	8, 8,		/* 8 x 8 graphics */
-	256,		/* 512 codes */
+	RGN_FRAC(1,1),		/* 512 codes */
 	1,		/* 1 bit per pixel */
 	{ 0 },		/* no bitplanes */
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
@@ -169,7 +255,7 @@ static const gfx_layout mz2500_8_layout =
 static const gfx_layout mz2500_16_layout =
 {
 	16, 16,		/* 16 x 16 graphics */
-	8192,		/* 8192 codes */
+	RGN_FRAC(1,1),		/* 8192 codes */
 	1,		/* 1 bit per pixel */
 	{ 0 },		/* no bitplanes */
 	{ 0, 1, 2, 3, 4, 5, 6, 7, 128, 129, 130, 131, 132, 133, 134, 135 },
@@ -178,16 +264,22 @@ static const gfx_layout mz2500_16_layout =
 };
 
 static GFXDECODE_START( mz2500 )
-	GFXDECODE_ENTRY("cgrom", 0, mz2500_cg_layout, 0, 256)
+	GFXDECODE_ENTRY("gfx1", 0, mz2500_cg_layout, 0, 256)
 	GFXDECODE_ENTRY("gfx1", 0x4400, mz2500_8_layout, 0, 256)	// for viewer only
 	GFXDECODE_ENTRY("gfx1", 0, mz2500_16_layout, 0, 256)		// for viewer only
 GFXDECODE_END
+
+static INTERRUPT_GEN( mz2500_vbl )
+{
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, irq_vector[0]);
+}
 
 static MACHINE_DRIVER_START( mz2500 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 6000000)
     MDRV_CPU_PROGRAM_MAP(mz2500_map)
     MDRV_CPU_IO_MAP(mz2500_io)
+	MDRV_CPU_VBLANK_INT("screen", mz2500_vbl)
 
     MDRV_MACHINE_RESET(mz2500)
 
@@ -212,6 +304,7 @@ ROM_START( mz2500 )
 	ROM_LOAD( "ipl.rom", 0x00000, 0x8000, CRC(7a659f20) SHA1(ccb3cfdf461feea9db8d8d3a8815f7e345d274f7) )
 	ROM_RELOAD( 0x68000, 0x8000 )
 
+	/* this is probably an hand made ROM, will be removed in the end ...*/
 	ROM_REGION( 0x1000, "cgrom", 0 )
 	ROM_LOAD( "cg.rom", 0x0000, 0x0800, CRC(a082326f) SHA1(dfa1a797b2159838d078650801c7291fa746ad81) )
 
