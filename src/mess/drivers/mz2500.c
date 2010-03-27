@@ -11,12 +11,14 @@
     0x60000-0x67fff "Read modify write" area (related to the CG RAM)
     0x68000-0x6ffff IPL ROM
     0x70000-0x71fff TVRAM
-    0x72000-0x73fff PCG / Kanji RAM
+    0x72000-0x73fff Kanji ROM / PCG RAM (banked)
     0x74000-0x75fff Dictionary ROM (banked)
     0x76000-0x77fff NOP
     0x78000-0x7ffff Phone ROM
 
-    vblank irq is rst $28?
+    start-up vblank irq is rst $28 (0xef), this system has mixed im 0 and im 2 (!)
+
+	after some time, clear work ram [$919] to 0 ... something to do with irqs?
 
 ****************************************************************************/
 
@@ -114,7 +116,8 @@ static WRITE8_HANDLER( mz2500_bank_data_w )
 
 	bank_val[bank_addr] = data & 0x3f;
 
-//	printf("%s %02x\n",bank_name[bank_addr],bank_val[bank_addr]*2);
+	if((data*2) >= 0x70)
+	printf("%s %02x\n",bank_name[bank_addr],bank_val[bank_addr]*2);
 
 	memory_set_bankptr(space->machine, bank_name[bank_addr], &ROM[bank_val[bank_addr]*0x2000]);
 
@@ -180,12 +183,10 @@ static ADDRESS_MAP_START(mz2500_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank7")
 ADDRESS_MAP_END
 
-#if 0
 static READ8_HANDLER( kludge_r )
 {
-	return mame_rand(space->machine);
+	return 0xff; //mame_rand(space->machine);
 }
-#endif
 
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -214,6 +215,7 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0xdc, 0xdd) AM_WRITE(floppy_w)
 	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("z80pio_0",z80pio_cd_ba_r,z80pio_cd_ba_w)
 //	AM_RANGE(0xe4, 0xe7) AM_READWRITE(pit_r,pit_w)
+	AM_RANGE(0xea, 0xea) AM_READ(kludge_r) //pio core bug? this seems to be used as a diagnostic port
 	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1",z80pio_cd_ba_r,z80pio_cd_ba_w)
 //	AM_RANGE(0xef, 0xef) AM_READWRITE(joystick_r,joystick_w)
 //	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
@@ -305,13 +307,33 @@ static WRITE8_DEVICE_HANDLER( mz2500_pio1_porta_w )
 	text_col_size = (data & 0x20) ? 80 : 40;
 }
 
+static READ8_DEVICE_HANDLER( mz2500_pio0_porta_r )
+{
+	return 0xff;
+}
+
+static READ8_DEVICE_HANDLER( mz2500_pio0_portb_r )
+{
+	return 0xff;
+}
+
+static READ8_DEVICE_HANDLER( mz2500_pio1_porta_r )
+{
+	return 0xff;
+}
+
+static READ8_DEVICE_HANDLER( mz2500_pio1_portb_r )
+{
+	return 0xff;
+}
+
 static Z80PIO_INTERFACE( mz2500_pio0_intf )
 {
 	DEVCB_NULL, //irq handler
-	DEVCB_NULL, //port a r
+	DEVCB_HANDLER( mz2500_pio0_porta_r ), //port a r
 	DEVCB_NULL, //port a w
 	DEVCB_NULL, //port a ardy
-	DEVCB_NULL, //port b r
+	DEVCB_HANDLER( mz2500_pio0_portb_r ), //port b r
 	DEVCB_NULL, //port b w
 	DEVCB_NULL  //port b ardy
 };
@@ -319,10 +341,10 @@ static Z80PIO_INTERFACE( mz2500_pio0_intf )
 static Z80PIO_INTERFACE( mz2500_pio1_intf )
 {
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_HANDLER( mz2500_pio1_porta_r ),
 	DEVCB_HANDLER( mz2500_pio1_porta_w ),
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_HANDLER( mz2500_pio1_portb_r ),
 	DEVCB_NULL,
 	DEVCB_NULL
 };
@@ -357,7 +379,7 @@ MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( mz2500 )
-	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASE00 )
+	ROM_REGION( 0x80000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x00000, 0x8000, CRC(7a659f20) SHA1(ccb3cfdf461feea9db8d8d3a8815f7e345d274f7) )
 	ROM_RELOAD( 0x68000, 0x8000 )
 
