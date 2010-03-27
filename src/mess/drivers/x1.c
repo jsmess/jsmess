@@ -1951,7 +1951,7 @@ static const z80_daisy_chain x1turbo_daisy[] =
 {
 	{ "x1kb" },
 	{ "ctc" },
-//  { "dma" },
+  	{ "dma" },
 //  { "sio" },
 	{ NULL }
 };
