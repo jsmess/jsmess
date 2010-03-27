@@ -7,7 +7,7 @@
     memory map:
 
     0x00000-0x3ffff Work RAM
-    0x40000-0x5ffff CG RAM (bitswapped!)
+    0x40000-0x5ffff CG RAM (address bitswapped?)
     0x60000-0x67fff "Read modify write" area (related to the CG RAM)
     0x68000-0x6ffff IPL ROM
     0x70000-0x71fff TVRAM
@@ -22,6 +22,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/z80pio.h"
 
 /* machine stuff */
 static UINT8 bank_val[8],bank_addr;
@@ -29,6 +30,7 @@ static UINT8 irq_sel,irq_vector[4];
 
 /* video stuff*/
 static UINT8 text_reg[0x100], text_reg_index;
+static UINT8 text_col_size, text_font_reg;
 
 static VIDEO_START( mz2500 )
 {
@@ -42,23 +44,43 @@ static VIDEO_UPDATE( mz2500 )
 
 	count = 0x70000;
 
-	for (y=0;y<32;y+=2)
+	if(text_font_reg)
 	{
-		for (x=0;x<32;x++)
+		for (y=0;y<25;y++)
 		{
-			int tile = vram[count+0x000] & 0xfe;
-			//int attr = vram[count+0x800];
-			int tile_bank = vram[count+0x1000] & 0x3f;
+			for (x=0;x<text_col_size;x++)
+			{
+				int tile = vram[count+0x0000] & 0xff;
+				//int attr = vram[count+0x800];
+				int tile_bank = vram[count+0x1000] & 0x3f;
 
-			tile|= tile_bank << 8;
+				tile|= tile_bank << 8;
 
-			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,(y)*8);
-			drawgfx_opaque(bitmap,cliprect,gfx,tile+1,0,0,0,x*8,(y+1)*8);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,(y)*8);
 
-			count++;
+				count++;
+			}
 		}
 	}
+	else
+	{
+		for (y=0;y<25;y+=2)
+		{
+			for (x=0;x<text_col_size;x++)
+			{
+				int tile = vram[count+0x0000] & 0xfe;
+				//int attr = vram[count+0x800];
+				int tile_bank = vram[count+0x1000] & 0x3f;
 
+				tile|= tile_bank << 8;
+
+				drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*8,(y)*8);
+				drawgfx_opaque(bitmap,cliprect,gfx,tile+1,0,0,0,x*8,(y+1)*8);
+
+				count++;
+			}
+		}
+	}
 
     return 0;
 }
@@ -123,7 +145,7 @@ static WRITE8_HANDLER( mz2500_crtc_w )
 		case 2: /* CG MASK reg */ break;
 		case 3:
 			/* Font size reg */
-			printf("%02x FONT\n",data);
+			text_font_reg = data & 1;
 			break;
 	}
 }
@@ -159,7 +181,6 @@ static ADDRESS_MAP_START(mz2500_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 #if 0
-
 static READ8_HANDLER( kludge_r )
 {
 	return mame_rand(space->machine);
@@ -185,14 +206,15 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0xc6, 0xc6) AM_WRITE(mz2500_irq_sel_w)
 	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
 //	AM_RANGE(0xc8, 0xc9) AM_READWRITE(opn_r,opn_w)
+//	AM_RANGE(0xc8, 0xc9) AM_READ(kludge_r)
 //	AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
 //	AM_RANGE(0xcc, 0xcc) AM_READWRITE(calendar_r,calendar_w)
 //	AM_RANGE(0xce, 0xcf) AM_WRITE(memory_w)
 //	AM_RANGE(0xd8, 0xdb) AM_READWRITE(fdc_r,fdc_w)
 //	AM_RANGE(0xdc, 0xdd) AM_WRITE(floppy_w)
-//	AM_RANGE(0xe0, 0xe3) AM_READWRITE(pio0_r,pio0_w)
+	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("z80pio_0",z80pio_cd_ba_r,z80pio_cd_ba_w)
 //	AM_RANGE(0xe4, 0xe7) AM_READWRITE(pit_r,pit_w)
-//	AM_RANGE(0xe8, 0xeb) AM_READWRITE(pio1_r,pio1_w)
+	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1",z80pio_cd_ba_r,z80pio_cd_ba_w)
 //	AM_RANGE(0xef, 0xef) AM_READWRITE(joystick_r,joystick_w)
 //	AM_RANGE(0xf0, 0xf3) AM_WRITE(timer_w)
 	AM_RANGE(0xf4, 0xf7) AM_READ(mz2500_crtc_r) AM_WRITE(mz2500_crtc_w)
@@ -227,6 +249,9 @@ static MACHINE_RESET(mz2500)
 	memory_set_bankptr(machine, "bank7", &ROM[bank_val[7]*0x2000]);
 
 	irq_vector[0] = 0xef; /* RST 28h - vblank */
+
+	text_col_size = 40;
+	text_font_reg = 0;
 }
 
 static const gfx_layout mz2500_cg_layout =
@@ -274,6 +299,35 @@ static INTERRUPT_GEN( mz2500_vbl )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, irq_vector[0]);
 }
 
+static WRITE8_DEVICE_HANDLER( mz2500_pio1_porta_w )
+{
+//	printf("%02x\n",data);
+	text_col_size = (data & 0x20) ? 80 : 40;
+}
+
+static Z80PIO_INTERFACE( mz2500_pio0_intf )
+{
+	DEVCB_NULL, //irq handler
+	DEVCB_NULL, //port a r
+	DEVCB_NULL, //port a w
+	DEVCB_NULL, //port a ardy
+	DEVCB_NULL, //port b r
+	DEVCB_NULL, //port b w
+	DEVCB_NULL  //port b ardy
+};
+
+static Z80PIO_INTERFACE( mz2500_pio1_intf )
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_HANDLER( mz2500_pio1_porta_w ),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
+
+
 static MACHINE_DRIVER_START( mz2500 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, 6000000)
@@ -282,6 +336,9 @@ static MACHINE_DRIVER_START( mz2500 )
 	MDRV_CPU_VBLANK_INT("screen", mz2500_vbl)
 
     MDRV_MACHINE_RESET(mz2500)
+
+	MDRV_Z80PIO_ADD( "z80pio_0", 6000000/4, mz2500_pio0_intf ) // unknown clock / divider
+	MDRV_Z80PIO_ADD( "z80pio_1", 6000000/4, mz2500_pio1_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
