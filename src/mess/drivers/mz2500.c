@@ -28,6 +28,11 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
+#include "machine/wd17xx.h"
+//#include "devices/cassette.h"
+#include "devices/flopdrv.h"
+#include "formats/flopimg.h"
+#include "formats/basicdsk.h"
 
 /* machine stuff */
 static UINT8 bank_val[8],bank_addr;
@@ -267,6 +272,87 @@ static WRITE8_HANDLER( mz2500_irq_data_w )
 		irq_vector[3] = data; //RP5c15
 }
 
+static READ8_HANDLER( mz2500_fdc_r )
+{
+	running_device* dev = devtag_get_device(space->machine,"fdc");
+	//UINT8 ret = 0;
+
+	switch(offset+0xd8)
+	{
+		case 0xd8:
+			return wd17xx_status_r(dev,offset) & 0xff;
+		case 0xd9:
+			return wd17xx_track_r(dev,offset);
+		case 0xda:
+			return wd17xx_sector_r(dev,offset);
+		case 0xdb:
+			return wd17xx_data_r(dev,offset);
+	}
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( mz2500_fdc_w )
+{
+	running_device* dev = devtag_get_device(space->machine,"fdc");
+
+	switch(offset+0xd8)
+	{
+		case 0xd8:
+			wd17xx_command_w(dev,offset,data);
+			break;
+		case 0xd9:
+			wd17xx_track_w(dev,offset,data);
+			break;
+		case 0xda:
+			wd17xx_sector_w(dev,offset,data);
+			break;
+		case 0xdb:
+			wd17xx_data_w(dev,offset,data);
+			break;
+		case 0xdc:
+			wd17xx_set_drive(dev,data & 3);
+			floppy_mon_w(floppy_get_device(space->machine, data & 3), data & 0x80);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, data & 3), data & 0x80,0);
+			break;
+		case 0xdd:
+			wd17xx_set_side(dev,(data & 1));
+			break;
+	}
+}
+
+static const wd17xx_interface mz2500_mb8877a_interface =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	{FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3}
+};
+
+#if 0
+
+static FLOPPY_OPTIONS_START( mz2500 )
+	FLOPPY_OPTION( img2d, "2d", "2D disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([40])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+#endif
+
+static const floppy_config mz2500_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_DS_80,
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY
+};
+
 static ADDRESS_MAP_START(mz2500_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(bank0_r,bank0_w)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(bank1_r,bank1_w)
@@ -309,14 +395,10 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0xcc, 0xcc) AM_READWRITE(calendar_r,calendar_w)
 //	AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
 	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
-//	AM_RANGE(0xd8, 0xdb) AM_READWRITE(fdc_r,fdc_w)
-//	AM_RANGE(0xdc, 0xdd) AM_WRITE(floppy_w)
+	AM_RANGE(0xd8, 0xdd) AM_READWRITE(mz2500_fdc_r,mz2500_fdc_w)
 	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("z80pio_0", z80pio_c_r, z80pio_c_w)
 	AM_RANGE(0xe2, 0xe3) AM_DEVREADWRITE("z80pio_0", z80pio_d_r, z80pio_d_w)
-//	AM_RANGE(0xe0, 0xe3) AM_DEVREADWRITE("z80pio_0",z80pio_cd_ba_r,z80pio_cd_ba_w)
 //	AM_RANGE(0xe4, 0xe7) AM_READWRITE(pit_r,pit_w)
-//	AM_RANGE(0xea, 0xea) AM_READ(kludge_r) //pio core bug? this seems to be used as a diagnostic port
-//	AM_RANGE(0xe8, 0xeb) AM_DEVREADWRITE("z80pio_1",z80pio_cd_ba_r,z80pio_cd_ba_w)
 	AM_RANGE(0xe8, 0xe9) AM_DEVREADWRITE("z80pio_1", z80pio_c_r, z80pio_c_w)
 	AM_RANGE(0xea, 0xeb) AM_DEVREADWRITE("z80pio_1", z80pio_d_r, z80pio_d_w)
 //	AM_RANGE(0xef, 0xef) AM_READWRITE(joystick_r,joystick_w)
@@ -430,7 +512,26 @@ static READ8_DEVICE_HANDLER( mz2500_pio0_portb_r )
 
 static READ8_DEVICE_HANDLER( mz2500_pio1_porta_r )
 {
-	return 0xff;
+	static UINT8 test;
+
+	if(input_code_pressed(device->machine,KEYCODE_Z))
+		test = 9; //'F'
+	else if(input_code_pressed(device->machine,KEYCODE_X))
+		test = 'C';
+	else if(input_code_pressed(device->machine,KEYCODE_C))
+		test = 0x31;
+	else if(input_code_pressed(device->machine,KEYCODE_V))
+		test = 0x32;
+	else if(input_code_pressed(device->machine,KEYCODE_B))
+		test = 0x33;
+	else if(input_code_pressed(device->machine,KEYCODE_N))
+		test = 0x34;
+	else
+		test = 0xff;
+
+	popmessage("%02x",test);
+
+	return test;
 }
 
 static READ8_DEVICE_HANDLER( mz2500_pio1_portb_r )
@@ -472,6 +573,10 @@ static MACHINE_DRIVER_START( mz2500 )
 
 	MDRV_Z80PIO_ADD( "z80pio_0", 6000000/4, mz2500_pio0_intf ) // unknown clock / divider
 	MDRV_Z80PIO_ADD( "z80pio_1", 6000000/4, mz2500_pio1_intf )
+
+	MDRV_MB8877_ADD("fdc",mz2500_mb8877a_interface)
+	MDRV_FLOPPY_4_DRIVES_ADD(mz2500_floppy_config)
+
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
