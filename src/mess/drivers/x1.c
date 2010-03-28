@@ -1588,7 +1588,7 @@ static const mc6845_interface mc6845_intf =
 static Z80DMA_INTERFACE( x1_dma )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
-	DEVCB_NULL,
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
 	DEVCB_NULL,
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_read_byte),
 	DEVCB_MEMORY_HANDLER("maincpu", PROGRAM, memory_write_byte),
