@@ -448,29 +448,45 @@ static DEVICE_IMAGE_LOAD( snes_cart )
          * (actually up to 0x7d, because 0x7e and 0x7f are overwritten by WRAM). The top half (address
          * range 0x8000 - 0xffff) of each bank is also mirrored in banks 0x00 to 0x3f and 0x80 to 0xbf.
          */
-			while (read_blocks < 64 && read_blocks < total_blocks)
+			/* SPC7110 games needs this different loading routine */
+			if ((temp_buffer[0x00ffd6] == 0xf9 || temp_buffer[0x00ffd6] == 0xf5) && (temp_buffer[0x00ffd5] == 0x3a))
 			{
-				/* Loading data */
-				memcpy(&snes_ram[0xc00000 + read_blocks * 0x10000], &ROM[0x000000 + read_blocks * 0x10000], 0x10000);
-				/* Mirroring */
-				memcpy(&snes_ram[0x008000 + read_blocks * 0x10000], &snes_ram[0xc08000 + read_blocks * 0x10000], 0x8000);
-				memcpy(&snes_ram[0x400000 + read_blocks * 0x10000], &snes_ram[0xc00000 + read_blocks * 0x10000], 0x10000);
-				memcpy(&snes_ram[0x808000 + read_blocks * 0x10000], &snes_ram[0xc08000 + read_blocks * 0x10000], 0x8000);
-				read_blocks++;
+				while (read_blocks < 16 && read_blocks < total_blocks)
+				{
+					/* Loading data */
+					memcpy(&snes_ram[0xc00000 + read_blocks * 0x10000], &ROM[0x000000 + read_blocks * 0x10000], 0x10000);
+					/* Mirroring */
+					memcpy(&snes_ram[0x008000 + read_blocks * 0x10000], &snes_ram[0xc08000 + read_blocks * 0x10000], 0x8000);
+					memcpy(&snes_ram[0x808000 + read_blocks * 0x10000], &snes_ram[0xc08000 + read_blocks * 0x10000], 0x8000);
+					read_blocks++;
+				}
 			}
-			/* Filling banks up to 0xff and their mirrors */
-			while (read_blocks % 64)
+			else
 			{
-				int j = 0, repeat_blocks;
-				while ((read_blocks % (64 >> j)) && j < 6)
-					j++;
-				repeat_blocks = read_blocks % (64 >> (j - 1));
+				while (read_blocks < 64 && read_blocks < total_blocks)
+				{
+					/* Loading data */
+					memcpy(&snes_ram[0xc00000 + read_blocks * 0x10000], &ROM[0x000000 + read_blocks * 0x10000], 0x10000);
+					/* Mirroring */
+					memcpy(&snes_ram[0x008000 + read_blocks * 0x10000], &snes_ram[0xc08000 + read_blocks * 0x10000], 0x8000);
+					memcpy(&snes_ram[0x400000 + read_blocks * 0x10000], &snes_ram[0xc00000 + read_blocks * 0x10000], 0x10000);
+					memcpy(&snes_ram[0x808000 + read_blocks * 0x10000], &snes_ram[0xc08000 + read_blocks * 0x10000], 0x8000);
+					read_blocks++;
+				}
+				/* Filling banks up to 0xff and their mirrors */
+				while (read_blocks % 64)
+				{
+					int j = 0, repeat_blocks;
+					while ((read_blocks % (64 >> j)) && j < 6)
+						j++;
+					repeat_blocks = read_blocks % (64 >> (j - 1));
 
-				memcpy(&snes_ram[0xc00000 + read_blocks * 0x10000], &snes_ram[0xc00000 + (read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
-				memcpy(&snes_ram[read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
-				memcpy(&snes_ram[0x400000 + read_blocks * 0x10000], &snes_ram[0x400000 + (read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
-				memcpy(&snes_ram[0x800000 + read_blocks * 0x10000], &snes_ram[0x800000 + (read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
-				read_blocks += repeat_blocks;
+					memcpy(&snes_ram[0xc00000 + read_blocks * 0x10000], &snes_ram[0xc00000 + (read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
+					memcpy(&snes_ram[read_blocks * 0x10000], &snes_ram[(read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
+					memcpy(&snes_ram[0x400000 + read_blocks * 0x10000], &snes_ram[0x400000 + (read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
+					memcpy(&snes_ram[0x800000 + read_blocks * 0x10000], &snes_ram[0x800000 + (read_blocks - repeat_blocks) * 0x10000], repeat_blocks * 0x10000);
+					read_blocks += repeat_blocks;
+				}
 			}
 			break;
 
