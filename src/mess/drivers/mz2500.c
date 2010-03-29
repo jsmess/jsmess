@@ -29,6 +29,8 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80pio.h"
 #include "machine/wd17xx.h"
+#include "sound/2203intf.h"
+
 //#include "devices/cassette.h"
 #include "devices/flopdrv.h"
 #include "formats/flopimg.h"
@@ -272,6 +274,7 @@ static WRITE8_HANDLER( mz2500_irq_data_w )
 		irq_vector[3] = data; //RP5c15
 }
 
+#if 0
 static READ8_HANDLER( mz2500_fdc_r )
 {
 	running_device* dev = devtag_get_device(space->machine,"fdc");
@@ -291,13 +294,15 @@ static READ8_HANDLER( mz2500_fdc_r )
 
 	return 0xff;
 }
+#endif
 
 static WRITE8_HANDLER( mz2500_fdc_w )
 {
-	running_device* dev = devtag_get_device(space->machine,"fdc");
+	running_device* dev = devtag_get_device(space->machine,"mb8877a");
 
-	switch(offset+0xd8)
+	switch(offset+0xdc)
 	{
+		#if 0
 		case 0xd8:
 			wd17xx_command_w(dev,offset,data);
 			break;
@@ -310,10 +315,11 @@ static WRITE8_HANDLER( mz2500_fdc_w )
 		case 0xdb:
 			wd17xx_data_w(dev,offset,data);
 			break;
+		#endif
 		case 0xdc:
 			wd17xx_set_drive(dev,data & 3);
-			floppy_mon_w(floppy_get_device(space->machine, data & 3), data & 0x80);
-			floppy_drive_set_ready_state(floppy_get_device(space->machine, data & 3), data & 0x80,0);
+			floppy_mon_w(floppy_get_device(space->machine, data & 3), (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, data & 3), 1,1);
 			break;
 		case 0xdd:
 			wd17xx_set_side(dev,(data & 1));
@@ -371,14 +377,34 @@ static READ8_HANDLER( kludge_r )
 }
 #endif
 
+static UINT32 rom_index;
+
+static READ8_HANDLER( mz2500_rom_r )
+{
+	UINT8 *rom = memory_region(space->machine, "rom");
+	UINT8 res;
+
+	res = rom[rom_index];
+	rom_index++;
+
+	return res;
+}
+
+static WRITE8_HANDLER( mz2500_rom_w )
+{
+//	printf("%02x\n",data);
+	rom_index = (data << 8) | (rom_index & 0xff00ff);
+	//printf("%02x\n",data);
+}
+
 static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //	AM_RANGE(0x60, 0x63) AM_WRITE(w3100a_w)
 //	AM_RANGE(0x63, 0x63) AM_READ(w3100a_r)
 //	AM_RANGE(0xa0, 0xa3) AM_READWRITE(sio_r,sio_w)
 //	AM_RANGE(0xa4, 0xa5) AM_READWRITE(sasi_r, sasi_w)
-//	AM_RANGE(0xa8, 0xa8) AM_WRITE(rom_w)
-//	AM_RANGE(0xa9, 0xa9) AM_READ(rom_r)
+	AM_RANGE(0xa8, 0xa8) AM_WRITE(mz2500_rom_w)
+	AM_RANGE(0xa9, 0xa9) AM_READ(mz2500_rom_r)
 //	AM_RANGE(0xac, 0xad) AM_WRITE(emm_w)
 //	AM_RANGE(0xad, 0xad) AM_READ(emm_r)
 //	AM_RANGE(0xae, 0xae) AM_WRITE(crtc_w)
@@ -389,13 +415,13 @@ static ADDRESS_MAP_START(mz2500_io, ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0xbc, 0xbd) AM_READWRITE(crtc_r,crtc_w)
 	AM_RANGE(0xc6, 0xc6) AM_WRITE(mz2500_irq_sel_w)
 	AM_RANGE(0xc7, 0xc7) AM_WRITE(mz2500_irq_data_w)
-//	AM_RANGE(0xc8, 0xc9) AM_READWRITE(opn_r,opn_w)
-//	AM_RANGE(0xc8, 0xc9) AM_READ(kludge_r)
+	AM_RANGE(0xc8, 0xc9) AM_DEVREADWRITE("ym", ym2203_r, ym2203_w)
 //	AM_RANGE(0xca, 0xca) AM_READWRITE(voice_r,voice_w)
 //	AM_RANGE(0xcc, 0xcc) AM_READWRITE(calendar_r,calendar_w)
 //	AM_RANGE(0xce, 0xce) AM_WRITE(mz2500_dictionary_bank_w)
 	AM_RANGE(0xcf, 0xcf) AM_WRITE(mz2500_kanji_bank_w)
-	AM_RANGE(0xd8, 0xdd) AM_READWRITE(mz2500_fdc_r,mz2500_fdc_w)
+	AM_RANGE(0xd8, 0xdb) AM_DEVREADWRITE("mb8877a", wd17xx_r, wd17xx_w)
+	AM_RANGE(0xdc, 0xdd) AM_WRITE(mz2500_fdc_w)
 	AM_RANGE(0xe0, 0xe1) AM_DEVREADWRITE("z80pio_0", z80pio_c_r, z80pio_c_w)
 	AM_RANGE(0xe2, 0xe3) AM_DEVREADWRITE("z80pio_0", z80pio_d_r, z80pio_d_w)
 //	AM_RANGE(0xe4, 0xe7) AM_READWRITE(pit_r,pit_w)
@@ -409,6 +435,57 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( mz2500 )
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x00, "DSW0" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "DSW1" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -561,6 +638,18 @@ static Z80PIO_INTERFACE( mz2500_pio1_intf )
 	DEVCB_NULL
 };
 
+static const ym2203_interface ym2203_interface_1 =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_INPUT_PORT("DSW0"),	// read A
+		DEVCB_INPUT_PORT("DSW1"),	// read B
+		DEVCB_NULL,					// write A
+		DEVCB_NULL					// write B
+	},
+	NULL
+};
 
 static MACHINE_DRIVER_START( mz2500 )
     /* basic machine hardware */
@@ -574,7 +663,7 @@ static MACHINE_DRIVER_START( mz2500 )
 	MDRV_Z80PIO_ADD( "z80pio_0", 6000000/4, mz2500_pio0_intf ) // unknown clock / divider
 	MDRV_Z80PIO_ADD( "z80pio_1", 6000000/4, mz2500_pio1_intf )
 
-	MDRV_MB8877_ADD("fdc",mz2500_mb8877a_interface)
+	MDRV_MB8877_ADD("mb8877a",mz2500_mb8877a_interface)
 	MDRV_FLOPPY_4_DRIVES_ADD(mz2500_floppy_config)
 
 
@@ -589,6 +678,12 @@ static MACHINE_DRIVER_START( mz2500 )
 
     MDRV_VIDEO_START(mz2500)
     MDRV_VIDEO_UPDATE(mz2500)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ym", YM2203, 6000000/4) //unknown clock / divider
+	MDRV_SOUND_CONFIG(ym2203_interface_1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
 
@@ -611,6 +706,9 @@ ROM_START( mz2500 )
 	ROM_LOAD( "dict.rom", 0x00000, 0x40000, CRC(aa957c2b) SHA1(19a5ba85055f048a84ed4e8d471aaff70fcf0374) )
 
 	ROM_REGION( 0x2000, "pcg", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x8000, "rom", ROMREGION_ERASEFF )
+	ROM_LOAD( "file.rom", 0x00000, 0x8000, CRC(a7bf39ce) SHA1(3f4a237fc4f34bac6fe2bbda4ce4d16d42400081) ) //optional?
 ROM_END
 
 /* Driver */
