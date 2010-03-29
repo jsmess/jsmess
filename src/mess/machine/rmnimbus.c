@@ -39,16 +39,16 @@
 #define LATCH_INTS          1
 #define LOG_PORTS           0
 #define LOG_INTERRUPTS      0
-#define LOG_INTERRUPTS_EXT  0
+#define LOG_INTERRUPTS_EXT  1
 #define LOG_TIMER           0
 #define LOG_OPTIMIZATION    0
 #define LOG_DMA             0
 #define CPU_RESUME_TRIGGER	7123
 #define LOG_KEYBOARD        0
 #define LOG_SIO             0
-#define LOG_DISK_FDD        0
+#define LOG_DISK_FDD        1
 #define LOG_DISK_HDD        0
-#define LOG_DISK            0
+#define LOG_DISK            1
 #define LOG_PC8031          0
 #define LOG_PC8031_186      0
 #define LOG_PC8031_PORT     0
@@ -58,9 +58,10 @@
 
 /* Debugging */
 
-UINT32  debug_flags;
+static UINT32  debug_flags;
 
 #define DMA_BREAK           0x0000001
+#define DECODE_BIOS         0x0000002
 
 /* 80186 internal stuff */
 struct mem_state
@@ -139,8 +140,6 @@ struct keybord_state
 	UINT8       tail;
 } keyboard;
 
-
-
 /* Floppy drives WD2793 */
 
 static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_intrq_w );
@@ -158,22 +157,15 @@ const wd17xx_interface nimbus_wd17xx_interface =
 // Static data related to Floppy and SCSI hard disks
 static struct _nimbus_drives
 {
-    UINT8           reg400;
-    UINT8           reg410_in;
-    UINT8           reg410_out;
-    UINT8           reg418;
+    UINT8   reg400;
+    UINT8   reg410_in;
+    UINT8   reg410_out;
+    UINT8   reg418;
 
-    UINT8           drq_ff;
+    UINT8   drq_ff;
+    UINT8   int_ff;           
 } nimbus_drives;
 
-
-static const SCSIConfigTable SCSI_dev_table =
-{
-	1,                                      /* 1 SCSI device */
-	{
-		{ SCSI_ID_0, HARDDISK0_TAG, SCSI_DEVICE_HARDDISK },
-	}
-};
 
 /* 8031 Peripheral controler */
 static struct _ipc_interface
@@ -204,7 +196,32 @@ UINT8 iou_reg092;
 /* Sound */
 UINT8 last_playmode;
 
+/* Mouse/Joystick */
+ 
+typedef struct 
+{
+    UINT8   mouse_px;
+    UINT8   mouse_py;
+    
+    UINT8   mouse_x;
+    UINT8   mouse_y;
+    UINT8   mouse_pc;
+    UINT8   mouse_pcx;
+    UINT8   mouse_pcy;
+    
+    UINT8   intstate_x;
+    UINT8   intstate_y;
+    
+    UINT8   reg0a4;
+    
+    emu_timer   *mouse_timer;
+} _mouse_joy_state;
+
+static _mouse_joy_state nimbus_mouse;
+UINT8 ay8910_a;
+
 static void drq_callback(running_machine *machine, int which);
+static void nimbus_recalculate_ints(running_machine *machine);
 
 static void execute_debug_irq(running_machine *machine, int ref, int params, const char *param[]);
 static void execute_debug_intmasks(running_machine *machine, int ref, int params, const char *param[]);
@@ -221,7 +238,7 @@ static void decode_dssi_f_rw_sectors(running_device *device,UINT16  ds, UINT16 s
 static void nimbus_bank_memory(running_machine *machine);
 static void memory_reset(running_machine *machine);
 static void fdc_reset(void);
-static void generate_disk_int(running_machine *machine);
+static void set_disk_int(running_machine *machine, int state);
 static void hdc_reset(running_machine *machine);
 static void hdc_ctrl_write(running_machine *machine, UINT8 data);
 static void hdc_post_rw(running_machine *machine);
@@ -233,6 +250,9 @@ static TIMER_CALLBACK(keyscan_callback);
 static void pc8031_reset(running_machine *machine);
 static void iou_reset(void);
 static void sound_reset(running_machine *machine);
+
+static void mouse_js_reset(running_machine *machine);
+static TIMER_CALLBACK(mouse_callback);
 
 #define num_ioports 0x80
 static UINT16   IOPorts[num_ioports];
@@ -324,7 +344,7 @@ static void update_interrupt_state(running_machine *machine)
 	for (Priority = 0; Priority <= i186.intr.priority_mask; Priority++)
 	{
 		/* note: by checking 4 bits, we also verify that the mask is off */
-		if ((i186.intr.timer & 15) == Priority)
+		if ((i186.intr.timer & 0x0F) == Priority)
 		{
 			/* if we're already servicing something at this level, don't generate anything new */
 			if (i186.intr.in_service & 0x01)
@@ -408,6 +428,7 @@ static void handle_eoi(running_machine *machine,int data)
 {
     int Priority;
     int IntNo;
+    int handled=0;
 
 	/* specific case */
 	if (!(data & 0x8000))
@@ -433,35 +454,36 @@ static void handle_eoi(running_machine *machine,int data)
 	else
 	{
 		/* loop over priorities */
-		for (Priority = 0; Priority <= 7; Priority++)
+		for (Priority = 0; ((Priority <= 7) && !handled); Priority++)
 		{
 			/* check for in-service timers */
 			if ((i186.intr.timer & 0x07) == Priority && (i186.intr.in_service & 0x01))
 			{
 				i186.intr.in_service &= ~0x01;
 				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", attotime_to_double(timer_get_time(machine)));
-				return;
+				handled=1;
 			}
 
 			/* check for in-service DMA interrupts */
-			for (IntNo = 0; IntNo < 2; IntNo++)
+			for (IntNo = 0; ((IntNo < 2) && !handled) ; IntNo++)
 				if ((i186.intr.dma[IntNo] & 0x07) == Priority && (i186.intr.in_service & (0x04 << IntNo)))
 				{
 					i186.intr.in_service &= ~(0x04 << IntNo);
 					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", attotime_to_double(timer_get_time(machine)), IntNo);
-					return;
+					handled=1;
 				}
 
 			/* check external interrupts */
-			for (IntNo = 0; IntNo < 4; IntNo++)
+			for (IntNo = 0; ((IntNo < 4) && !handled) ; IntNo++)
 				if ((i186.intr.ext[IntNo] & 0x07) == Priority && (i186.intr.in_service & (0x10 << IntNo)))
 				{
 					i186.intr.in_service &= ~(0x10 << IntNo);
 					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", attotime_to_double(timer_get_time(machine)), IntNo);
-					return;
+					handled=1;
 				}
 		}
 	}
+    nimbus_recalculate_ints(machine);
 }
 
 /* Trigger an external interupt, optionally supplying the vector to take */
@@ -469,7 +491,7 @@ static void external_int(running_machine *machine, UINT16 intno, UINT8 vector)
 {
 	if (LOG_INTERRUPTS_EXT) logerror("generating external int %02X, vector %02X\n",intno,vector);
 
-   // Only 4 external ints
+    // Only 4 external ints
     if(intno>3)
     {
         logerror("external_int() invalid external interupt no : 0x%02X (can only be 0..3)\n",intno);
@@ -483,12 +505,20 @@ static void external_int(running_machine *machine, UINT16 intno, UINT8 vector)
         if(i186.intr.ext[intno] & EXTINT_CTRL_CASCADE)
             i186.intr.ext_vector[intno]=vector;
     }
-
+    
     // Turn on the requested request bit and handle interrupt
     i186.intr.request |= (0x010 << intno);
     update_interrupt_state(machine);
 }
 
+static void nimbus_recalculate_ints(running_machine *machine)
+{
+    if((iou_reg092 & DISK_INT_ENABLE) && nimbus_drives.int_ff)
+    {
+        nimbus_drives.int_ff=0;
+        external_int(machine,0,EXTERNAL_INT_DISK);
+    }
+}
 
 /*************************************
  *
@@ -750,7 +780,7 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 	}
 
     if (LOG_DMA) logerror("Initiated DMA %d - count = %04X, source = %04X, dest = %04X\n", which, d->count, d->source, d->dest);
-    if (debug_flags & DMA_BREAK)
+    if (DEBUG_SET(DMA_BREAK))
         debugger_break(machine);
 
 	/* set the new control register */
@@ -1290,6 +1320,7 @@ MACHINE_RESET(nimbus)
     pc8031_reset(machine);
     sound_reset(machine);
     memory_reset(machine);
+    mouse_js_reset(machine);
 }
 
 DRIVER_INIT(nimbus)
@@ -1302,7 +1333,8 @@ MACHINE_START( nimbus )
     nimbus_cpu_init(machine);
 
     keyboard.keyscan_timer=timer_alloc(machine, keyscan_callback, NULL);
-
+    nimbus_mouse.mouse_timer=timer_alloc(machine, mouse_callback, NULL);
+    
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -1315,7 +1347,7 @@ MACHINE_START( nimbus )
 
     }
 
-    debug_flags=0;
+    debug_flags=DECODE_BIOS;
 }
 
 static void execute_debug_irq(running_machine *machine, int ref, int params, const char *param[])
@@ -1343,7 +1375,6 @@ static void execute_debug_irq(running_machine *machine, int ref, int params, con
 static void execute_debug_intmasks(running_machine *machine, int ref, int params, const char *param[])
 {
     int IntNo;
-
 
     debug_console_printf(machine,"i186.intr.priority_mask=%4X\n",i186.intr.priority_mask);
     for(IntNo=0; IntNo<4; IntNo++)
@@ -1380,8 +1411,9 @@ static int instruction_hook(running_device *device, offs_t curpc)
 
     addr_ptr = (UINT8*)memory_get_read_ptr(space,curpc);
 
-    if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD) && (addr_ptr[1]==0xF0))
-        decode_subbios(device,curpc);
+    if(DEBUG_SET(DECODE_BIOS))
+        if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD) && (addr_ptr[1]==0xF0))
+            decode_subbios(device,curpc);
 
     return 0;
 }
@@ -2034,7 +2066,6 @@ static void keyboard_reset(void)
 
     // Setup timer to scan keyboard.
     timer_adjust_periodic(keyboard.keyscan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));
-
 }
 
 static void queue_scancode(UINT8 scancode)
@@ -2060,7 +2091,8 @@ static int keyboard_queue_read(void)
 	return data;
 }
 
-static TIMER_CALLBACK(keyscan_callback)
+static void scan_keyboard(running_machine *machine)
+
 {
     UINT8   keyrow;
     UINT8   row;
@@ -2095,6 +2127,10 @@ static TIMER_CALLBACK(keyscan_callback)
     }
 }
 
+static TIMER_CALLBACK(keyscan_callback)
+{
+    scan_keyboard(machine);
+}
 
 /*
 
@@ -2147,23 +2183,26 @@ static void fdc_reset(void)
     nimbus_drives.reg400=0;
     nimbus_drives.reg410_in=0;
     nimbus_drives.reg410_out=0;
+    nimbus_drives.int_ff=0;
 }
 
-static void generate_disk_int(running_machine *machine)
+static void set_disk_int(running_machine *machine, int state)
 {
     if(LOG_DISK)
-        logerror("nimbus_drives_intrq\n");
+        logerror("nimbus_drives_intrq = %d\n",state);
 
     if(iou_reg092 & DISK_INT_ENABLE)
     {
-        external_int(machine,0,EXTERNAL_INT_DISK);
+        nimbus_drives.int_ff=state;
+        
+        if(state)
+            external_int(machine,0,EXTERNAL_INT_DISK);
     }
 }
 
 static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_intrq_w )
 {
-    if (state)
-        generate_disk_int(device->machine);
+    set_disk_int(device->machine,state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_drq_w )
@@ -2333,7 +2372,7 @@ static void hdc_ctrl_write(running_machine *machine, UINT8 data)
     // If we enable the HDC interupt, and an interrupt is pending, go deal with it.
     if(((data & HDC_IRQ_MASK) && (~nimbus_drives.reg410_out & HDC_IRQ_MASK)) &&
        ((~nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
-        generate_disk_int(machine);
+        set_disk_int(machine,1);
 
     nimbus_drives.reg410_out=data;
 
@@ -2381,13 +2420,15 @@ void nimbus_scsi_linechange(running_device *device, UINT8 line, UINT8 state)
         nimbus_drives.reg410_in&=~mask;
 
 
+    if(HDC_IRQ_ENABLED() && ((~nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
+        set_disk_int(device->machine,1);
+    else
+        set_disk_int(device->machine,0);
+
     if(line==SCSI_LINE_REQ)
     {
         if (state==0)
         {
-            if(HDC_IRQ_ENABLED() && ((~nimbus_drives.reg410_in & HDC_INT_TRIGGER)==HDC_INT_TRIGGER))
-                generate_disk_int(device->machine);
-
             if(((nimbus_drives.reg410_in & HDC_CD_MASK)==HDC_CD_MASK) && (last!=0))
             {
                 nimbus_drives.drq_ff=1;
@@ -2632,6 +2673,8 @@ static void sound_reset(running_machine *machine)
 
     last_playmode=MSM5205_S48_4B;
     msm5205_playmode_w(msm5205,last_playmode);
+    
+    ay8910_a=0;
 }
 
 READ8_HANDLER( sound_ay8910_r )
@@ -2666,6 +2709,9 @@ WRITE8_HANDLER( sound_ay8910_porta_w )
     running_device *msm5205 = devtag_get_device(space->machine, MSM5205_TAG);
 
     msm5205_data_w(msm5205, data);
+    
+    // Mouse code needs a copy of this.
+    ay8910_a=data;
 }
 
 WRITE8_HANDLER( sound_ay8910_portb_w )
@@ -2685,4 +2731,198 @@ void nimbus_msm5205_vck(running_device *device)
         external_int(device->machine,0,EXTERNAL_INT_MSM5205);
 }
 
+static const int MOUSE_XYA[3][4] = { { 0, 0, 0, 0 }, { 1, 1, 0, 0 }, { 0, 1, 1, 0 } };
+static const int MOUSE_XYB[3][4] = { { 0, 0, 0, 0 }, { 0, 1, 1, 0 }, { 1, 1, 0, 0 } };
+//static const int MOUSE_XYA[4] = { 1, 1, 0, 0 };
+//static const int MOUSE_XYB[4] = { 0, 1, 1, 0 };
+
+static void mouse_js_reset(running_machine *machine)
+{
+    _mouse_joy_state *state = &nimbus_mouse;
+
+    state->mouse_px=0;
+    state->mouse_py=0;
+    state->mouse_x=128;
+    state->mouse_y=128;
+    state->mouse_pc=0;
+    state->mouse_pcx=0;
+    state->mouse_pcy=0;
+    state->intstate_x=0;
+    state->intstate_y=0;
+    state->reg0a4=0xC0;
+
+    // Setup timer to poll the mouse
+    timer_adjust_periodic(nimbus_mouse.mouse_timer, attotime_zero, 0, ATTOTIME_IN_HZ(1000));
+}
+
+static TIMER_CALLBACK(mouse_callback)
+{
+    UINT8   x = 0;
+    UINT8   y = 0;
+//	int     pc=cpu_get_pc(devtag_get_device(machine,MAINCPU_TAG));
+    
+    UINT8   intstate_x;
+    UINT8   intstate_y;
+    int     xint;
+    int     yint;
+    
+    _mouse_joy_state *state = &nimbus_mouse;
+
+	
+	state->reg0a4 = input_port_read(machine, MOUSE_BUTTON_TAG) | 0xC0;
+	x = input_port_read(machine, MOUSEX_TAG);
+    y = input_port_read(machine, MOUSEY_TAG);
+
+    UINT8   mxa;
+    UINT8   mxb;
+    UINT8   mya;
+    UINT8   myb;
+
+    //logerror("poll_mouse()\n");
+ 
+	if (x == state->mouse_x)
+	{
+		state->mouse_px = MOUSE_PHASE_STATIC;
+	}
+	else if (x > state->mouse_x)
+	{
+		state->mouse_px = MOUSE_PHASE_POSITIVE;
+	}
+	else if (x < state->mouse_x)
+	{
+		state->mouse_px = MOUSE_PHASE_NEGATIVE;
+	}
+
+	if (y == state->mouse_y)
+    {
+		state->mouse_py = MOUSE_PHASE_STATIC;
+	}
+	else if (y > state->mouse_y)
+	{
+		state->mouse_py = MOUSE_PHASE_POSITIVE;
+	}
+	else if (y < state->mouse_y)
+	{
+		state->mouse_py = MOUSE_PHASE_NEGATIVE;
+	}
+
+    switch (state->mouse_px)
+    {
+        case MOUSE_PHASE_STATIC     : break;
+        case MOUSE_PHASE_POSITIVE   : state->mouse_pcx++; break;
+        case MOUSE_PHASE_NEGATIVE   : state->mouse_pcx--; break;
+    }
+    state->mouse_pcx &= 0x03;
+ 
+    switch (state->mouse_py)
+    {
+        case MOUSE_PHASE_STATIC     : break;
+        case MOUSE_PHASE_POSITIVE   : state->mouse_pcy++; break;
+        case MOUSE_PHASE_NEGATIVE   : state->mouse_pcy--; break;
+    }
+    state->mouse_pcy &= 0x03; 
+
+//	mxb = MOUSE_XYB[state->mouse_px][state->mouse_pcx]; // XB
+//    mxa = MOUSE_XYA[state->mouse_px][state->mouse_pcx]; // XA
+//	mya = MOUSE_XYA[state->mouse_py][state->mouse_pcy]; // YA
+//	myb = MOUSE_XYB[state->mouse_py][state->mouse_pcy]; // YB
+    
+	mxb = MOUSE_XYB[1][state->mouse_pcx]; // XB
+	mxa = MOUSE_XYA[1][state->mouse_pcx]; // XA
+	mya = MOUSE_XYA[1][state->mouse_pcy]; // YA
+	myb = MOUSE_XYB[1][state->mouse_pcy]; // YB
+ 
+    if ((state->mouse_py!=MOUSE_PHASE_STATIC) || (state->mouse_px!=MOUSE_PHASE_STATIC))
+    {
+//        logerror("state->mouse_px=%02X, state->mouse_py=%02X, state->mouse_pcx=%02X, state->mouse_pcy=%02X\n",
+//              state->mouse_px,state->mouse_py,state->mouse_pcx,state->mouse_pcy);
+    
+//        logerror("mxb=%02x, mxa=%02X (mxb ^ mxa)=%02X, (ay8910_a & 0xC0)=%02X, (mxb ^ mxa) ^ ((ay8910_a & 0x80) >> 7)=%02X\n",
+//              mxb,mxa, (mxb ^ mxa) , (ay8910_a & 0xC0), (mxb ^ mxa) ^ ((ay8910_a & 0x40) >> 6));
+    }
+    
+    intstate_x = (mxb ^ mxa) ^ ((ay8910_a & 0x40) >> 6);
+    intstate_y = (myb ^ mya) ^ ((ay8910_a & 0x80) >> 7);
+    
+    if (MOUSE_INT_ENABLED())
+    {
+        if ((intstate_x==1) && (state->intstate_x==0))
+//        if (intstate_x!=state->intstate_x)
+        {
+            
+            xint=mxa ? EXTERNAL_INT_MOUSE_XR : EXTERNAL_INT_MOUSE_XL;
+                    
+            external_int(machine,0,xint);
+                
+//            logerror("Xint:%02X, mxb=%02X\n",xint,mxb);
+        }
+
+        if ((intstate_y==1) && (state->intstate_y==0))
+//        if (intstate_y!=state->intstate_y)
+        {
+            yint=myb ? EXTERNAL_INT_MOUSE_YU : EXTERNAL_INT_MOUSE_YD;
+                    
+            external_int(machine,0,yint);
+//            logerror("Yint:%02X, myb=%02X\n",yint,myb);
+        }        
+    }
+    else
+    {    
+        state->reg0a4 &= 0xF0;
+        state->reg0a4 |= ( mxb & 0x01) << 3; // XB
+        state->reg0a4 |= (!mxb & 0x01) << 2; // XA
+        state->reg0a4 |= (!myb & 0x01) << 1; // YA
+        state->reg0a4 |= ( myb & 0x01) << 0; // YB
+    }
+     
+    state->mouse_x = x;
+    state->mouse_y = y;
+        
+    if ((state->mouse_py!=MOUSE_PHASE_STATIC) || (state->mouse_px!=MOUSE_PHASE_STATIC))
+    {
+//        logerror("pc=%05X, reg0a4=%02X, reg092=%02X, ay_a=%02X, x=%02X, y=%02X, px=%02X, py=%02X, intstate_x=%02X, intstate_y=%02X\n",
+//                 pc,state->reg0a4,iou_reg092,ay8910_a,state->mouse_x,state->mouse_y,state->mouse_px,state->mouse_py,intstate_x,intstate_y);
+    }
+    
+    state->intstate_x=intstate_x;
+    state->intstate_y=intstate_y;
+}
+
+READ8_HANDLER( mouse_js_r )
+{
+	/*
+
+        bit     description
+
+        0       JOY 0-Up    or mouse XB
+        1       JOY 0-Down  or mouse XA
+        2       JOY 0-Left  or mouse YA
+        3       JOY 0-Right or mouse YB
+        4       JOY 0-b0    or mouse rbutton
+        5       JOY 0-b1    or mouse lbutton
+        6       ?? always reads 1
+        7       ?? always reads 1
+
+    */
+    UINT8   result;
+//	int     pc=cpu_get_pc(devtag_get_device(space->machine,MAINCPU_TAG));
+  
+    _mouse_joy_state *state = &nimbus_mouse;
+
+	if (input_port_read(space->machine, "config") & 0x01)
+	{
+        result=state->reg0a4;
+        //logerror("mouse_js_r: pc=%05X, result=%02X\n",pc,result);
+    }
+	else
+	{
+		result=input_port_read_safe(space->machine, JOYSTICK0_TAG, 0xff);
+	}
+
+    return result;
+}
+
+WRITE8_HANDLER( mouse_js_w )
+{
+}
 

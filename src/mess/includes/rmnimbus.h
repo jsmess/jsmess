@@ -13,7 +13,7 @@
 #define DEBUG_DB    0x02
 #define DEBUG_PIXEL 0x04
 
-#define DEBUG_SET(flags)    ((debug_on & (flags))==(flags))
+#define DEBUG_SET(flags)    ((debug_flags & (flags))==(flags))
 
 #define MAINCPU_TAG "maincpu"
 #define IOCPU_TAG   "iocpu"
@@ -63,11 +63,16 @@ WRITE16_HANDLER (nimbus_io_w);
 
 /* External int vectors for chained interupts */
 #define EXTERNAL_INT_DISK       0x80
+#define EXTERNAL_INT_MSM5205    0x84
+#define EXTERNAL_INT_MOUSE_YU   0x88
+#define EXTERNAL_INT_MOUSE_YD   0x89
+#define EXTERNAL_INT_MOUSE_XL   0x8A
+#define EXTERNAL_INT_MOUSE_XR   0x8B   
 #define EXTERNAL_INT_PC8031_8C  0x8c
 #define EXTERNAL_INT_PC8031_8E  0x8E
 #define EXTERNAL_INT_PC8031_8F  0x8F
 #define EXTERNAL_INT_Z80SIO     0x9C
-#define EXTERNAL_INT_MSM5205    0x84
+
 
 /* Memory controler */
 #define RAM_BANK00_TAG  "bank0"
@@ -190,6 +195,7 @@ WRITE8_HANDLER( pc8031_port_w );
 
 #define DISK_INT_ENABLE         0x01
 #define MSM5205_INT_ENABLE      0x04
+#define MOUSE_INT_ENABLE        0x08
 #define PC8031_INT_ENABLE       0x10
 
 READ8_HANDLER( iou_r );
@@ -230,6 +236,25 @@ WRITE8_HANDLER( sound_ay8910_portb_w );
 #define MSM5205_TAG             "msm5205"
 
 void nimbus_msm5205_vck(running_device *device);
+
+/* Mouse / Joystick */
+
+#define JOYSTICK0_TAG           "joystick0"
+#define MOUSE_BUTTON_TAG        "mousebtn"
+#define MOUSEX_TAG              "mousex"
+#define MOUSEY_TAG              "mousey"
+
+enum
+{
+	MOUSE_PHASE_STATIC = 0,
+	MOUSE_PHASE_POSITIVE,
+	MOUSE_PHASE_NEGATIVE
+};
+
+READ8_HANDLER( mouse_js_r );
+WRITE8_HANDLER( mouse_js_w );
+
+#define MOUSE_INT_ENABLED()     ((iou_reg092 & MOUSE_INT_ENABLE) ? 1 : 0)
 
 #define LINEAR_ADDR(seg,ofs)    ((seg<<4)+ofs)
 

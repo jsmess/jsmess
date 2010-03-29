@@ -79,7 +79,7 @@ UINT8   bpp;            // Bits / pixel
 UINT16  pixel_mask;
 UINT8   hs_count;
 
-static int debug_on;
+static UINT32 debug_flags;
 
 static UINT8 get_pixel(UINT16 x, UINT16 y);
 static UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 width);
@@ -91,6 +91,7 @@ static void write_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width);
 static void write_pixel_data(UINT16 x, UINT16 y, UINT16    data);
 static void move_pixel_line(UINT16 x, UINT16 y, UINT16    data, UINT8 width);
 static void write_reg_004(void);
+static void write_reg_006(void);
 static void write_reg_010(void);
 static void write_reg_012(void);
 static void write_reg_014(void);
@@ -285,7 +286,7 @@ WRITE16_HANDLER (nimbus_video_io_w)
         case    reg000  : vidregs[reg000]=data; break;
         case    reg002  : vidregs[reg002]=data; break;
         case    reg004  : vidregs[reg004]=data; write_reg_004(); break;
-        case    reg006  : vidregs[reg006]=data; break;
+        case    reg006  : vidregs[reg006]=data; write_reg_006(); break;
         case    reg008  : vidregs[reg008]=data; break;
         case    reg00A  : vidregs[reg00A]=data; break;
         case    reg00C  : vidregs[reg00C]=data; break;
@@ -495,6 +496,12 @@ static void write_reg_004(void)
     vidregs[reg00C]++;
 }
 
+static void write_reg_006(void)
+{
+    vidregs[reg00C]++;
+    vidregs[reg002]=vidregs[reg006];
+}
+
 static void write_reg_010(void)
 {
     write_pixel_data(vidregs[reg002],vidregs[reg00C],vidregs[reg010]);
@@ -580,12 +587,12 @@ static void video_debug(running_machine *machine, int ref, int params, const cha
 {
     if(params>0)
     {
-        sscanf(param[0],"%d",&debug_on);
+        sscanf(param[0],"%d",&debug_flags);
     }
     else
     {
         debug_console_printf(machine,"Error usage : nimbus_vid_debug <debuglevel>\n");
-        debug_console_printf(machine,"Current debuglevel=%02X\n",debug_on);
+        debug_console_printf(machine,"Current debuglevel=%02X\n",debug_flags);
     }
 }
 
@@ -609,7 +616,7 @@ static void video_regdump(running_machine *machine, int ref, int params, const c
 
 VIDEO_START( nimbus )
 {
-    debug_on=0;
+    debug_flags=0;
 
     logerror("VIDEO_START\n");
 
