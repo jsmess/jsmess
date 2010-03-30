@@ -625,15 +625,6 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			break;
 	}
 
-	/* Find the amount of sram */
-	snes_cart.sram = snes_r_bank1(space, 0x00ffd8);
-	if (snes_cart.sram > 0)
-	{
-		snes_cart.sram = ((1 << (snes_cart.sram + 3)) / 8);
-		if (snes_cart.sram > snes_cart.sram_max)
-			snes_cart.sram = snes_cart.sram_max;
-	}
-
 	/* Find the type of cart and detect special chips */
 	/* Info mostly taken from http://snesemu.black-ship.net/misc/-from%20nsrt.edgeemu.com-chipinfo.htm */
 	switch (snes_r_bank1(space, 0x00ffd6))
@@ -750,6 +741,19 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 				snes_has_addon_chip = HAS_UNK;
 				supported_type = 0;
 				break;
+	}
+
+	/* Find the amount of cart ram (even if we call it sram...) */
+	if ((snes_has_addon_chip != HAS_SUPERFX))
+		snes_cart.sram = snes_r_bank1(space, 0x00ffd8);
+	else
+		snes_cart.sram = (snes_r_bank1(space, 0x00ffbd) & 0x07);
+
+	if (snes_cart.sram > 0)
+	{
+		snes_cart.sram = (1024 << snes_cart.sram);
+		if (snes_cart.sram > snes_cart.sram_max)
+			snes_cart.sram = snes_cart.sram_max;
 	}
 
 	/* Log snes_cart information */
