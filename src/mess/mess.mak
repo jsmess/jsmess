@@ -1221,10 +1221,11 @@ $(MESSOBJ)/radio.a:				\
 	$(MESS_DRIVERS)/mikrosha.o	\
 
 $(MESSOBJ)/rca.a:				\
+	$(MESS_DRIVERS)/studio2.o	\
+	$(MESS_FORMATS)/studio2_st2.o	\
 	$(MESS_DRIVERS)/vip.o		\
 	$(MESS_AUDIO)/vp550.o		\
 	$(MESS_AUDIO)/vp595.o		\
-	$(MESS_DRIVERS)/studio2.o	\
 
 $(MESSOBJ)/rm.a:				\
 	$(MESS_DRIVERS)/rmnimbus.o	\

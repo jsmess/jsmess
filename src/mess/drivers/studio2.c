@@ -196,11 +196,12 @@ Notes:
 #include "emu.h"
 #include "includes/studio2.h"
 #include "cpu/cdp1802/cdp1802.h"
-#include "video/cdp1861.h"
-#include "sound/cdp1864.h"
 #include "devices/cartslot.h"
+#include "formats/studio2_st2.h"
 #include "sound/beep.h"
+#include "sound/cdp1864.h"
 #include "sound/discrete.h"
+#include "video/cdp1861.h"
 
 /* Read/Write Handlers */
 
@@ -514,53 +515,14 @@ static MACHINE_RESET( mpt02 )
 	state->cdp1864->reset();
 }
 
-static DEVICE_IMAGE_LOAD( studio2_cart )
-{
-	st2_header header;
-	int block;
-
-	/* check file size */
-	int filesize = image_length(image);
-
-	if (filesize <= ST2_BLOCK_SIZE) {
-		logerror( "Error loading cartridge: Invalid ROM file: %s.\n", image_filename(image));
-		return INIT_FAIL;
-	}
-
-	/* read ST2 header */
-	if (image_fread(image, &header, ST2_BLOCK_SIZE) != ST2_BLOCK_SIZE) {
-		logerror( "Error loading cartridge: Unable to read header from file: %s.\n", image_filename(image));
-		return INIT_FAIL;
-	}
-
-	//logerror("ST2 Catalogue: %s\n", header.catalogue);
-	//logerror("ST2 Title: %s\n", header.title);
-
-	/* read ST2 cartridge into memory */
-	for (block = 0; block < (header.blocks - 1); block++)
-	{
-		UINT16 offset = header.page[block] << 8;
-		UINT8 *ptr = ((UINT8 *) memory_region(image->machine, CDP1802_TAG)) + offset;
-
-		//logerror("ST2 Reading block %u to %04x\n", block, offset);
-
-		if (image_fread(image, ptr, ST2_BLOCK_SIZE) != ST2_BLOCK_SIZE) {
-			logerror( "Error loading cartridge: Unable to read contents from file: %s.\n", image_filename(image));
-			return INIT_FAIL;
-		}
-	}
-
-	return INIT_PASS;
-}
+/* Machine Drivers */
 
 static MACHINE_DRIVER_START( studio2_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("st2")
 	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_LOAD(studio2_cart)
+	MDRV_CARTSLOT_LOAD(st2_cartslot_load)
 MACHINE_DRIVER_END
-
-/* Machine Drivers */
 
 static MACHINE_DRIVER_START( studio2 )
 	MDRV_DRIVER_DATA(studio2_state)
