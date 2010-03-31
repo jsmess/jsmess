@@ -813,6 +813,7 @@ $(MESSOBJ)/dec.a:				\
 	$(MESS_DRIVERS)/vk100.o		\
 	$(MESS_DRIVERS)/vt100.o		\
 	$(MESS_DRIVERS)/vt220.o		\
+	$(MESS_DRIVERS)/vt240.o		\
 	$(MESS_DRIVERS)/vt320.o		\
 	$(MESS_DRIVERS)/vt520.o		\
 	$(MESS_VIDEO)/vtvideo.o		\

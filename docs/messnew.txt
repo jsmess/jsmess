@@ -18,7 +18,7 @@ Skeleton drivers:
 - MC-1702 [thanks to Anasana]
 - Scientific Atlanta PowerVu pv9234 STB
 - Dream Multimedia Dreambox 7000/5620/500
-
+- Elektronika MC7105 [Thanks to Kaldyh]
 
 
 System Driver Changes:
