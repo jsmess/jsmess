@@ -1114,7 +1114,14 @@ $(MESSOBJ)/nintendo.a:			\
 	$(MESS_DRIVERS)/snes.o		\
 	$(MESS_DRIVERS)/n64.o		\
 	$(MAME_MACHINE)/n64.o		\
-	$(MAME_VIDEO)/n64.o			\
+	$(MAME_VIDEO)/n64.o		\
+	$(MAME_VIDEO)/rdpblend.o	\
+	$(MAME_VIDEO)/rdpfb.o		\
+	$(MAME_VIDEO)/rdpfetch.o	\
+	$(MAME_VIDEO)/rdptpipe.o	\
+	$(MAME_VIDEO)/rdpspn16.o	\
+	$(MAME_VIDEO)/rdptrect.o	\
+	$(MAME_VIDEO)/rdpfrect.o	\
 	$(MESS_MACHINE)/pokemini.o	\
 	$(MESS_DRIVERS)/pokemini.o	\
 	$(MESS_DRIVERS)/vboy.o		\
@@ -1621,6 +1628,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/fidelz80.o	\
 	$(MESS_DRIVERS)/pv9234.o 	\
 	$(MESS_DRIVERS)/dm7000.o 	\
+	$(MESS_DRIVERS)/v6741.o		\
 
 
 

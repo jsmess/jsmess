@@ -144,6 +144,9 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 }
 
 static MACHINE_DRIVER_START( n64 )
+
+	MDRV_DRIVER_DATA(_n64_state)
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", VR4300BE, 93750000)
 	MDRV_CPU_CONFIG(config)
