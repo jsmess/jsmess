@@ -1628,7 +1628,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/fidelz80.o	\
 	$(MESS_DRIVERS)/pv9234.o 	\
 	$(MESS_DRIVERS)/dm7000.o 	\
-	$(MESS_DRIVERS)/v6741.o		\
 
 
 
