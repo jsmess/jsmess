@@ -745,16 +745,12 @@ bool Processor::ZCompare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz,
 	{
 		case 0: // Opaque
 			return (max || (overflow ? infront : nearer));
-			break;
 		case 1: // Interpenetrating
 			return (max || (overflow ? infront : nearer));
-			break;
 		case 2: // Transparent
 			return (infront || max);
-			break;
 		case 3: // Decal
 			return (farther && nearer && !max);
-			break;
 		default:
 			fatalerror( "z_mode = %d", m_other_modes.z_mode);
 			break;
@@ -1762,19 +1758,19 @@ void N64::RDP::Processor::CmdTriangleSTZ(UINT32 w1, UINT32 w2)
 
 void N64::RDP::Rectangle::InitFromBuffer(UINT32 *data)
 {
-	m_xl		= ((data[0] >> 12) & 0xfff) >> 2;
-	m_yl		= ((data[0] >>  0) & 0xfff) >> 2;
-	m_xh		= ((data[1] >> 12) & 0xfff) >> 2;
-	m_yh		= ((data[1] >>  0) & 0xfff) >> 2;
+	m_xl		= (data[0] >> 12) & 0xfff;
+	m_yl		= (data[0] >>  0) & 0xfff;
+	m_xh		= (data[1] >> 12) & 0xfff;
+	m_yh		= (data[1] >>  0) & 0xfff;
 }
 
 void N64::RDP::TexRectangle::InitFromBuffer(UINT32 *data)
 {
 	m_tilenum	= (data[1] >> 24) & 0x7;
-	m_xl		= ((data[0] >> 12) & 0xfff) >> 2;
-	m_yl		= ((data[0] >>  0) & 0xfff) >> 2;
-	m_xh		= ((data[1] >> 12) & 0xfff) >> 2;
-	m_yh		= ((data[1] >>  0) & 0xfff) >> 2;
+	m_xl		= (data[0] >> 12) & 0xfff;
+	m_yl		= (data[0] >>  0) & 0xfff;
+	m_xh		= (data[1] >> 12) & 0xfff;
+	m_yh		= (data[1] >>  0) & 0xfff;
 	m_s			= (data[2] >> 16) & 0xffff;
 	m_t			= (data[2] >>  0) & 0xffff;
 	m_dsdx		= (data[3] >> 16) & 0xffff;
