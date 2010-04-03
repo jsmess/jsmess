@@ -928,12 +928,19 @@ void nes_partialhash( char *dest, const unsigned char *data, unsigned long lengt
 
 static void nes_load_proc(running_device *image)
 {
+	int header = 0;
 	nes_fds.sides = 0;
 
+	if (image_length(image) % 65500)
+		header = 0x10;
+
 	image_fseek(image, 0, SEEK_END);
-	nes_fds.sides = (image_ftell(image) - 16) / 65500;
+	nes_fds.sides = (image_ftell(image) - header) / 65500;
 	nes_fds.data = (UINT8*)image_malloc(image, nes_fds.sides * 65500);
-	image_fseek(image, 0x10, SEEK_SET);
+	
+	/* if there is an header, skip it */
+	image_fseek(image, header, SEEK_SET);
+
 	image_fread(image, nes_fds.data, 65500 * nes_fds.sides);
 	return;
 }
@@ -942,10 +949,9 @@ static void nes_unload_proc(running_device *image)
 {
 	/* TODO: should write out changes here as well */
 	nes_fds.sides =  0;
-	image_freeptr(image,nes_fds.data);
 }
 
-DRIVER_INIT( famicom)
+DRIVER_INIT( famicom )
 {
 	/* clear some of the cart variables we don't use */
 	nes.trainer = 0;

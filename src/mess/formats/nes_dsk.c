@@ -24,7 +24,7 @@ static FLOPPY_IDENTIFY( nes_dsk_identify )
 	UINT64 size;
 	UINT8 header[3];
 
-	*vote = 100;
+	*vote = 0;
 
 	/* get first 3 bytes */
 	floppy_image_read(floppy, &header, 0, sizeof(header));
@@ -32,13 +32,19 @@ static FLOPPY_IDENTIFY( nes_dsk_identify )
 	/* first check the size of the image */
 	size = floppy_image_size(floppy);
 
-	if ((size != 65516) && (size != 131016) && (size != 262016))
-		*vote = 0;
+	if ((size == 65516) || (size == 131016) || (size == 262016))
+	{
+		/* the image has an header, hence check the first sector for the magic string */
+		if (!memcmp(header, "FDS", 3))
+			*vote = 100;
+	}
 
-	/* then check the first sector for the magic string */
-	if (memcmp(header, "FDS", 3))
-		*vote = 0;
-
+	if ((size == 65500) || (size == 131000) || (size == 262000))
+	{
+		/* the image has no header, hence let's trust the extension and load the file */
+		*vote = 100;
+	}
+	
 	return FLOPPY_ERROR_SUCCESS;
 }
 
