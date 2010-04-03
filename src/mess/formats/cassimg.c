@@ -280,10 +280,13 @@ void cassette_get_info(cassette_image *cassette, struct CassetteInfo *info)
 
 void cassette_close(cassette_image *cassette)
 {
-	if ((cassette->flags & CASSETTE_FLAG_DIRTY) && (cassette->flags & CASSETTE_FLAG_SAVEONEXIT))
-		cassette_save(cassette);
-	pool_free_lib(cassette->pool);
-	free(cassette);
+	if (cassette)
+	{
+		if ((cassette->flags & CASSETTE_FLAG_DIRTY) && (cassette->flags & CASSETTE_FLAG_SAVEONEXIT))
+			cassette_save(cassette);
+		pool_free_lib(cassette->pool);
+		free(cassette);
+	}
 }
 
 
