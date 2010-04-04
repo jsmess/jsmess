@@ -185,11 +185,11 @@ static UINT32 get_cop0_reg(rsp_state *rsp, int reg)
 {
 	if (reg >= 0 && reg < 8)
 	{
-		return (rsp->config->sp_reg_r)(rsp->program, reg, 0x00000000);
+		return (rsp->config->sp_reg_r)(rsp->device, reg, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		return (rsp->config->dp_reg_r)(rsp->program, reg - 8, 0x00000000);
+		return (rsp->config->dp_reg_r)(rsp->device, reg - 8, 0x00000000);
 	}
 	else
 	{
@@ -201,11 +201,11 @@ static void set_cop0_reg(rsp_state *rsp, int reg, UINT32 data)
 {
 	if (reg >= 0 && reg < 8)
 	{
-		(rsp->config->sp_reg_w)(rsp->program, reg, data, 0x00000000);
+		(rsp->config->sp_reg_w)(rsp->device, reg, data, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(rsp->config->dp_reg_w)(rsp->program, reg - 8, data, 0x00000000);
+		(rsp->config->dp_reg_w)(rsp->device, reg - 8, data, 0x00000000);
 	}
 	else
 	{
