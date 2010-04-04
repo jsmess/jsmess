@@ -1,0 +1,1344 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist [
+	<!ELEMENT softwarelist (software+)>
+		<!ATTLIST softwarelist name CDATA #REQUIRED>
+		<!ATTLIST softwarelist description CDATA #IMPLIED>
+		<!ELEMENT software (description, year?, publisher, part*)>
+			<!ATTLIST software name CDATA #REQUIRED>
+			<!ATTLIST software cloneof CDATA #IMPLIED>
+			<!ATTLIST software supported (yes|partial|no) "yes">
+			<!ELEMENT description (#PCDATA)>
+			<!ELEMENT year (#PCDATA)>
+			<!ELEMENT publisher (#PCDATA)>
+			<!ELEMENT part (dataarea*)>
+				<!ATTLIST part name CDATA #REQUIRED>
+				<!ATTLIST part interface CDATA #REQUIRED>
+				<!-- feature is used to store things like pcb-type, mapper type, etc. Specific values depend on the system. -->
+				<!ATTLIST part feature CDATA #IMPLIED>
+				<!ELEMENT dataarea (rom*)>
+					<!ATTLIST dataarea name CDATA #REQUIRED>
+					<!ATTLIST dataarea size CDATA #REQUIRED>
+					<!ATTLIST dataarea databits (8|16|32|64) "8">
+					<!ATTLIST dataarea endian (big|little) "little">
+					<!ELEMENT rom EMPTY>
+						<!ATTLIST rom name CDATA #IMPLIED>
+						<!ATTLIST rom size CDATA #REQUIRED>
+						<!ATTLIST rom crc CDATA #IMPLIED>
+						<!ATTLIST rom md5 CDATA #IMPLIED>
+						<!ATTLIST rom sha1 CDATA #IMPLIED>
+						<!ATTLIST rom offset CDATA #IMPLIED>
+						<!ATTLIST rom status (baddump|nodump|good) "good">
+						<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload) #IMPLIED>
+]>
+<softwarelist name="pico" description="Sega Pico cartridges">
+	<software name="101dalma">
+		<description>101 Dalmatians (Prototype, 19960817-U)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - aug 17, 1996 - u).bin" size="1048576" crc="602e237a" sha1="915d44cbc0d0f04be485609c1367a1d47f140942" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma1" cloneof="101dalma">
+		<description>101 Dalmatians (Prototype, 19960817-J)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - aug 17, 1996 - j).bin" size="1048576" crc="cdc4dba2" sha1="ee1b794f03ee02124e22c4050f686f4f7b6e06df" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma2" cloneof="101dalma">
+		<description>101 Dalmatians (Prototype, 19960817-B)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - aug 17, 1996 - b).bin" size="1048576" crc="d271f727" sha1="bbbb351396ae9c636092efc6780dd1f80f4ca854" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma3" cloneof="101dalma">
+		<description>101 Dalmatians (Prototype, 19960816)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - aug 16, 1996).bin" size="1048576" crc="f0269662" sha1="7f7186de1a79427078a682aeca222e7df9994ffc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma4" cloneof="101dalma">
+		<description>101 Dalmatians (Prototype, 19960814)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - aug 14, 1996).bin" size="1048576" crc="16d9431c" sha1="e37c7b85b9c57301a9223507457ca0a78f7e4b24" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma5" cloneof="101dalma">
+		<description>101 Dalmatians (Prototype, 19960718)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - jul 18, 1996).bin" size="1048576" crc="849abcb2" sha1="950888fd46a956c93baa3e938ee264b2de58055e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma6" cloneof="101dalma">
+		<description>101 Dalmatians (Prototype, 19960705)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - jul 05, 1996).bin" size="1048576" crc="3d17bfdc" sha1="8aef447eb11567ba3663d89ad417987a6d5b8cbf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma7" cloneof="101dalma">
+		<description>101 Dalmatians (Prototype, 19960703)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - jul 03, 1996).bin" size="1048576" crc="29d31f1e" sha1="7f8cfd2778876dd7ca03fa0a89a0da66bd7cf483" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma8" cloneof="101dalma">
+		<description>101 Dalmatians (Prototype, 19960531)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - may 31, 1996).bin" size="1048576" crc="ea6fe243" sha1="15d9a25c6350640aae1a65b41d293bde436252d9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101dalma9" cloneof="101dalma">
+		<description>101 Dalmatians (Prototype, 19960521)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 dalmatians (prototype - may 21, 1996).bin" size="1048576" crc="2c5eee07" sha1="1a909fb832d2b04d062f5c35f7ab1ed106573a5a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="101pikiw">
+		<description>101 piki wan-chan (Jpn, Prototype, 19960817)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="101 piki wan-chan rev 19960817 (1996)(appaloosa interactive - sega)(jp)(beta).bin" size="1048576" crc="cdc4dba2" sha1="ee1b794f03ee02124e22c4050f686f4f7b6e06df" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19941220)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="berenstain bears' a school day, the rev 19941220 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="2994dcee" sha1="6019bf5829925389b44414697e7329f8c2056437" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstb1" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950106)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="berenstain bears' a school day, the rev 19950106 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="5dac3ecf" sha1="246e18fcbc271798f531944a6291ac6c9bb5840c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstb2" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950113)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048564">
+				<rom name="berenstain bears' a school day, the rev 19950113 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="291aa0bd" sha1="5677d64a2fd2ffa2baa1fd434f419407b5d47b5e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstb3" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950116)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048564">
+				<rom name="berenstain bears' a school day, the rev 19950116 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="56173be7" sha1="ccce25815ccff4468b42f8317025b5b66916645e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstb4" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950126)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048564">
+				<rom name="berenstain bears' a school day, the rev 19950126 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="098c3510" sha1="ab20a8063cd3650158a20572ae08048dc979a3e1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstb5" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950127)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048564">
+				<rom name="berenstain bears' a school day, the rev 19950127 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="4709d1cf" sha1="a6c0f0df6bb69aafcbdb49fd0ff5ef3ca7585cd9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstb6" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950130)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048564">
+				<rom name="berenstain bears' a school day, the rev 19950130 (1995)(realtime associates - sega)(beta).bin" size="1048564" crc="7b53784f" sha1="7128cea20f0695b69d552d5220097f4f4993ebef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berenstb7" cloneof="berenstb">
+		<description>The Berenstain Bears' A School Day (Prototype, 19950131)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="berenstain bears' a school day, the rev 19950131 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="e92af9f1" sha1="f4ae09a8a0e11cd8bec95ec3ac3908ce6da7a30f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crayon">
+		<description>Crayon Shinchan Oekaki Note (Jpn, Prototype 1)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="crayon shinchan oekaki note (1995)(bandai)(jp)(beta).bin" size="1048576" crc="60656906" sha1="1e816a3f775b2bb5a5ae9b432ee026e65dad54d6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crayona" cloneof="crayon">
+		<description>Crayon Shinchan Oekaki Note (Jpn, Prototype 2)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="crayon shinchan oekaki note (1995)(bandai)(jp)(beta)[a].bin" size="524288" crc="843c3af4" sha1="878733ffb5b0464f82f102f8500650bfe0b4add4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crayonb" cloneof="crayon">
+		<description>Crayon Shinchan Oekaki Note (Jpn, Prototype 3)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="crayon shinchan oekaki note (1995)(bandai)(jp)(beta)[a2].bin" size="524288" crc="39d4c64b" sha1="52e115feb9d303993ca46aa36aa94a427f0ee141" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dolucky">
+		<description>Dolucky no Oekaki House (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="dolucky no oekaki house (1995)(-)(jp)(beta).bin" size="524288" crc="4ce7b75d" sha1="aa906392c97cb12792a8cd026fdcb12d61490cf8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gakkoben">
+		<description>Gakken no Obenkyou Soft Tasizan Hikizan (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Gakken</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gakken no obenkyou soft tasizan hikizan (1995)(chips - gakken)(jp)(beta).bin" size="524288" crc="25639a73" sha1="d0a768236e21d05ea1734691ab9031ea7a4b3e47" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heiseiky">
+		<description>Heisei Kyouiku Iinkai Jr. (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="heisei kyouiku iinkai jr. (1995)(-)(jp)(beta).bin" size="524288" crc="6e3e29b9" sha1="93c46585343e48e089ede74896f66b0006896c66" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="heiseite">
+		<description>Heisei Ten Sai Baka Bon Minna de Famiri-Restutoranni-Kun (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="heisei ten sai baka bon minna de famiri-restutoranni-kun (1995)(-)(jp)(beta).bin" size="524288" crc="3656af85" sha1="708cd58d6182a4f2448be3d2db97943c063a04f9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19941004)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048472">
+				<rom name="huckle and lowly's busiest day ever rev 19941004 (1994)(realtime associates - sega)(beta).bin" size="1048472" crc="f0d08ce0" sha1="46213ef731dc66325e824b620e05577b1b4a9718" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowla" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940919)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048472">
+				<rom name="huckle and lowly's busiest day ever rev 19940919 (1994)(realtime associates - sega)(beta).bin" size="1048472" crc="74cadb40" sha1="7a87c09d5827df096ad8572da3a67a3913762589" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlb" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940721, F)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1023740">
+				<rom name="huckle and lowly's busiest day ever (prototype - jul 21, 1994) (f).bin" size="1023740" crc="026ca6f0" sha1="0e2898a56cf47576e68db772639c23a7efcaf026" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlc" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940510-D)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940510 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="42007e92" sha1="ce0b387427226baa4067d6eacebe90cef760a18e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowld" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509-D)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940509 (1994)(realtime associates - sega)(beta)[a3].bin" size="1048576" crc="9a128886" sha1="c28b84f3ea1ada7accbc777683b55c3831c4ec9b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowle" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509-C)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940509 (1994)(realtime associates - sega)(beta)[a2].bin" size="1048576" crc="bdd9c8fb" sha1="99223589cb5117cd8a82d780033545dcf0e53c8a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlf" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509-B)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940509 (1994)(realtime associates - sega)(beta)[a].bin" size="1048576" crc="782ea694" sha1="0f17bdd2747faf6a2c3bfe7846279b6ec02b8f60" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlg" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940509)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940509 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="a6bf6009" sha1="930cebb1af06fff37f0b03a1f5eb695f2581ffa5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlh" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940506-B)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940506 (1994)(realtime associates - sega)(beta)[a].bin" size="1048576" crc="98840154" sha1="73df6e4fbf2f40efd73fa2268833c9a59e9398a1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowli" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940506-A)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940506 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="a271864c" sha1="8acead7e6af488b320d4abb7fce51d2fa0fd49b6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlj" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-D)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940503 (1994)(realtime associates - sega)(beta)[a3].bin" size="1048576" crc="3491bda7" sha1="a8ba90e9f5071e7191c334ba1ce968fcef9d8ff8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlk" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-C)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940503 (1994)(realtime associates - sega)(beta)[a2].bin" size="1048576" crc="828c773f" sha1="9c99abeac92bb7a536ea9c12c4f061ad13201261" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowll" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-B)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940503 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="a79e8c5a" sha1="baf0ec378647144948db072d32f926f188bf69e7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlm" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940503-A)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940503 (1994)(realtime associates - sega)(beta)[a].bin" size="1048576" crc="61b37530" sha1="10ce4256b5843c0323835a760f91d1f176e7db24" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowln" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940427)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940427 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="11f32054" sha1="310683305721f63cd2a50db9464b5cf27fd877ad" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlo" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-E)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940426 (1994)(realtime associates - sega)(beta)[a2].bin" size="1048576" crc="fbc61621" sha1="c6392ccd79f1140739c42e476fd0c878a3680f75" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlp" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-D, Lower Half Broken)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="huckle and lowly's busiest day ever (prototype - apr 26, 1994 - d) (lower half broken).bin" size="524288" crc="5ea4c99c" sha1="86971ce70727fd3d8b52ba37fa9b7fe2d462037d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlq" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-B)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940426 (1994)(realtime associates - sega)(beta)[a].bin" size="1048576" crc="f20535c5" sha1="f2dc08c8b0e4be40fec865e6530ffca7a474b6db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlr" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940426-A)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940426 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="f325ab55" sha1="efaab9cb359acb46034b5e21ce8f5a4c2f8450e5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowls" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940424)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048472">
+				<rom name="huckle and lowly's busiest day ever rev 19940424 (1994)(realtime associates - sega)(beta).bin" size="1048472" crc="4e032111" sha1="7e0966ef8dfd19102a8682f1d8f6ebd41a6903f0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlt" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940422)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="huckle and lowly's busiest day ever rev 19940422 (1994)(realtime associates - sega)(beta).bin" size="1048576" crc="2bfb25ac" sha1="227a2b1c36044ea4141d49eba006e927ecdd3337" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hucklowlu" cloneof="hucklowl">
+		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940302)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="667784">
+				<rom name="huckle and lowly's busiest day ever rev 19940502 (1994)(realtime associates - sega)(beta).bin" size="667784" crc="265ad2d0" sha1="de457d6e1c6037a2c165c0f65037aadd9c73042c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="journee" cloneof="hucklowl">
+		<description>La Journee La Plus Occupee de Huckle et Lowly (France, Prototype, 19940721)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1023740">
+				<rom name="journee la plus occupee de huckle et lowly, la rev 19940721 (1994)(realtime associates - sega)(fr)(beta).bin" size="1023740" crc="026ca6f0" sha1="0e2898a56cf47576e68db772639c23a7efcaf026" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kikansha">
+		<description>Kikansha Thomas Ni Notte (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="kikansha thomas ni notte (1995)(bandai)(jp)(beta).bin" size="524288" crc="32f926ac" sha1="cf7cce404c013c57bfb0e80c5da3213af64dd505" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950419)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lion king, the - adventures at pride rock rev 19950419 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="97effc7b" sha1="9df5d484be194516604b901349dee19fa30ee2f7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking1" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950425)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lion king, the - adventures at pride rock rev 19950425 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="b948be65" sha1="0a7a95ef14997bc617b137e4e7da5cc3762bc516" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking2" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950501)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1042622">
+				<rom name="lion king, the - adventures at pride rock rev 19950501 (1995)(realtime associates - sega)(beta).bin" size="1042622" crc="d5ecd5fd" sha1="29f505bb944cec4b09e6a2baf7dd72427f9d1574" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking3" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950516)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1036340">
+				<rom name="lion king, the - adventures at pride rock rev 19950516 (1995)(realtime associates - sega)(beta).bin" size="1036340" crc="6fbfd61b" sha1="35b1ff9b842271055fea434406eb6d0d2dafcb0f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking4" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950517)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1036340">
+				<rom name="lion king, the - adventures at pride rock rev 19950517 (1995)(realtime associates - sega)(beta).bin" size="1036340" crc="f943083f" sha1="fc2bb183b0aed8ad6134fd345d83d43fef924a27" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking5" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950522)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lion king, the - adventures at pride rock rev 19950522 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="3ad71894" sha1="92f6f45a4f635d42824fb6fb23b34854d47cf82d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking6" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950615)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1036340">
+				<rom name="lion king, the - adventures at pride rock rev 19950615 (1995)(realtime associates - sega)(beta).bin" size="1036340" crc="0588d13c" sha1="0814754b867eb61f1e546910c4fd063960a85e62" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionking7" cloneof="lionking">
+		<description>The Lion King - Adventures At Pride Rock (Prototype, 19950616)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="lion king, the - adventures at pride rock rev 19950616 (1995)(realtime associates - sega)(beta).bin" size="1048576" crc="66d90805" sha1="6f571135acf76fa540b25c1670410d5d9fe016d8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccra">
+		<description>Magic Crayons (Prototype)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magic crayons (1994)(sega)(beta).bin" size="524288" crc="f4ba1e9b" sha1="8d77011f2349eb14b51e76c08474817a0f318f99" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccra1" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19940614)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="514778">
+				<rom name="magic crayons rev 19940614 (1994)(sega)(beta).bin" size="514778" crc="8d4c66f4" sha1="f9f8a87a19ba36e2852f9f5c8a062345f2a4d7a6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccra2" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19940623)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="515290">
+				<rom name="magic crayons rev 19940623 (1994)(sega)(beta).bin" size="515290" crc="d4604e6e" sha1="ea7f41f2e6f0a24c6c06531cb20e40139ae0efb8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccra3" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19940630)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magic crayons rev 19940630 (1994)(sega)(beta).bin" size="524288" crc="51a06b4e" sha1="402cedcc402a72222f2e718493e38bf9a206df84" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccra4" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19940926)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="515222">
+				<rom name="magic crayons rev 19940926 (1994)(sega)(beta).bin" size="515222" crc="579ca72b" sha1="eb755371b32e5c83bb347942e84b3f9e5fb8fd4c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccra5" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19941006)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="515222">
+				<rom name="magic crayons rev 19941006 (1994)(sega)(beta).bin" size="515222" crc="864d2c7c" sha1="718975648c1184954ed2aa6fbefc724fb99b98a5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccra6" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19941011)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magic crayons rev 19941011 (1994)(sega)(beta).bin" size="524288" crc="f9d086fd" sha1="8e22b5d6153da0f5458a5cd38c5169baa82df540" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magiccra7" cloneof="magiccra">
+		<description>Magic Crayons (Prototype, 19941012)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magic crayons rev 19941012 (1994)(sega)(beta).bin" size="524288" crc="efa0da47" sha1="5b234db6399a72c718bc60ff8fa6e39b88420322" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathant">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960703)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="math antics with 101 dalmatians rev 19960703 (1996)(novotrade - sega)(beta).bin" size="1048576" crc="29d31f1e" sha1="7f8cfd2778876dd7ca03fa0a89a0da66bd7cf483" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathant1" cloneof="mathant">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960705)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="math antics with 101 dalmatians rev 19960705 (1996)(novotrade - sega)(beta).bin" size="1048576" crc="3d17bfdc" sha1="8aef447eb11567ba3663d89ad417987a6d5b8cbf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathant2" cloneof="mathant">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960718)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="math antics with 101 dalmatians rev 19960718 (1996)(novotrade - sega)(beta).bin" size="1048576" crc="849abcb2" sha1="950888fd46a956c93baa3e938ee264b2de58055e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathant3" cloneof="mathant">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960814)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="math antics with 101 dalmatians rev 19960814 (1996)(appaloosa interactive - sega)(beta).bin" size="1048576" crc="16d9431c" sha1="e37c7b85b9c57301a9223507457ca0a78f7e4b24" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathant4" cloneof="mathant">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960816)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="math antics with 101 dalmatians rev 19960816 (1996)(appaloosa interactive - sega)(beta).bin" size="1048576" crc="f0269662" sha1="7f7186de1a79427078a682aeca222e7df9994ffc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathant5" cloneof="mathant">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960817)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="math antics with 101 dalmatians rev 19960817 (1996)(appaloosa interactive - sega)(beta).bin" size="1048576" crc="602e237a" sha1="915d44cbc0d0f04be485609c1367a1d47f140942" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathant6" cloneof="mathant">
+		<description>Math Antics With 101 Dalmatians (Prototype, 19960817 Alt)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="math antics with 101 dalmatians rev 19960817 (1996)(appaloosa interactive - sega)(beta)[a].bin" size="1048576" crc="d271f727" sha1="bbbb351396ae9c636092efc6780dd1f80f4ca854" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst">
+		<description>Mickey's Blast Into the Past (USA)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey's blast into the past (1994)(sega)(us).bin" size="524288" crc="2628f6ef" sha1="1d04a40d353f71061b206d893d2d8e7864a2faee" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst1" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940608)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mickey's blast into the past rev 19940608 (1994)(sega)(beta).bin" size="1048576" crc="a9dbf978" sha1="f6fba5c1992a4b5f7109845706f02a76184bf3ba" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst2" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940721)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mickey's blast into the past rev 19940721 (1994)(sega)(beta).bin" size="1048576" crc="a0ae9860" sha1="595c464b9aa104db104a58f9b5d73f006e438c9f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst3" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940723)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mickey's blast into the past rev 19940723 (1994)(sega)(beta).bin" size="1048576" crc="d78baabc" sha1="baf6ccf28557b148f984ed58cafca1c55496e245" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst4" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940725)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey's blast into the past rev 19940725 (1994)(sega)(beta).bin" size="524288" crc="1a2760fe" sha1="d19812e54b2a0c6b086bea861c4209841eb0adac" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst5" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940801)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey's blast into the past rev 19940801 (1994)(sega)(beta).bin" size="524288" crc="90b047f6" sha1="8596cdb62ff03a2f602344a16b61a1f487fa7c96" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mickblst6" cloneof="mickblst">
+		<description>Mickey's Blast Into the Past (Prototype, 19940809)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mickey's blast into the past rev 19940809 (1994)(sega)(beta).bin" size="524288" crc="08f46903" sha1="c0414c1524567fef2ddbff1762b8cce9803b81a0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo">
+		<description>Musical Zoo (Prototype, 19950217-B)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="musical zoo rev 19950217 (1995)(sega)(beta).bin" size="524288" crc="35add3d0" sha1="a9f0f50c0631c4be34b6e71f76d67ef156ac2552" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo1" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19950217)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="519992">
+				<rom name="musical zoo rev 19950217 (1995)(sega)(beta)[a].bin" size="519992" crc="6159cbe2" sha1="16650fa84e5fcb4ffaf9a8ae4abbeb5920ef41c4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo2" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19950209)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="519992">
+				<rom name="musical zoo rev 19950209 (1995)(sega)(beta).bin" size="519992" crc="7fda0399" sha1="62e5e5d86d6e9854c9498af44235f4d205c66f14" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo3" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19950208)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="musical zoo rev 19950208 (1995)(sega)(beta).bin" size="524288" crc="7bb5a2a0" sha1="a0f69509ac85a761b1f52b752608c9ac1806dea8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo4" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19950105)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="519992">
+				<rom name="musical zoo rev 19950105 (1995)(sega)(beta).bin" size="519992" crc="5591682a" sha1="9573036713284a579e3df4506b70f03e9cf224e8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo5" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19950104)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="519992">
+				<rom name="musical zoo rev 19950104 (1995)(sega)(beta).bin" size="519992" crc="1c5ddba2" sha1="e1cdf0b23c09b3ebe74032d533aeb4be4c495a2a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musiczoo6" cloneof="musiczoo">
+		<description>Musical Zoo (Prototype, 19941220)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524238">
+				<rom name="musical zoo rev 19941220 (1995)(sega)(beta).bin" size="524238" crc="f3f402a1" sha1="7be6d664097d8608a3ebb0513d83e6c55692b5f8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nipponmb">
+		<description>Nippon no Mukasi Banasi (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="nippon no mukasi banasi (1994)(-)(jp)(beta).bin" size="524288" crc="b62514d0" sha1="5c128fcc3ce49434e1e3c834a9fcec7b28c5480e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbasebal">
+		<description>Pico Baseball (Jpn, Prototype)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pico baseball (1994)(sega)(jp)(beta).bin" size="1048576" crc="a9802c1e" sha1="e966e16409bfeaa369362625c59aab216b65b6c6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="penguki">
+		<description>Pengin Ukiuki Bi Kkurisuizokukan Meiropazuru (Jpn, Prototype, 19950210)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pengin ukiuki bi kkurisuizokukan meiropazuru rev 19950210 (1994)(sega)(jp)(beta).bin" size="1048576" crc="a4a143cb" sha1="a17a6524f382b771f4f7ac1f46d7e45836300dda" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepepuzl">
+		<description>Pepe's Puzzles (Prototype, 19950224)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="523930">
+				<rom name="pepe's puzzles rev 19950224 (1995)(sega)(beta).bin" size="523930" crc="e72d9d76" sha1="4f91ed645a177d41ff145a9b4b4a7024ea9025e5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepepuzl1" cloneof="pepepuzl">
+		<description>Pepe's Puzzles (Prototype, 19950220)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="544254">
+				<rom name="pepe's puzzles rev 19950220 (1995)(sega)(beta).bin" size="544254" crc="e0618f30" sha1="493e165f8bcf98f98039b9c56d4a8dcf744cb178" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pepepuzl2" cloneof="pepepuzl">
+		<description>Pepe's Puzzles (Prototype, 19950210)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="603388">
+				<rom name="pepe's puzzles rev 19950218 (1995)(sega)(beta).bin" size="603388" crc="f32f45e5" sha1="26900e4f0a7b7c25b6acdc33a1a7c819fe1a543a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picosamp">
+		<description>Pico Storyware Sampler (Prototype, 19960625)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pico storyware sampler rev 19960625 (1996)(novotrade - sega)(beta).bin" size="1048576" crc="85c4f26b" sha1="d3342d20002fed586b43e26b29aefe15138d98ae" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picosamp1" cloneof="picosamp">
+		<description>Pico Storyware Sampler (Prototype, 19960614)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pico storyware sampler rev 19960614 (1996)(novotrade - sega)(beta).bin" size="1048576" crc="fa847f2c" sha1="a18ecc5e20d1f1c076ac76b77e2258e8045968f1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picosamp2" cloneof="picosamp">
+		<description>Pico Storyware Sampler (Prototype, 19960607)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pico storyware sampler rev 19960607 (1996)(novotrade - sega)(beta).bin" size="1048576" crc="3cccf1d5" sha1="9eb71e27714efa060d1d70753376f5e4ba7c203c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940809)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner rev 19940809 (1994)(sega)(beta).bin" size="524288" crc="56ad7b29" sha1="0cdfb0a8b07c9d0169aa70f1f9fa3520d6bd65f7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorn1" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940801)</description>
+		<year>19??</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="year at pooh corner (prototype - aug 01, 1994).bin" size="524288" crc="90b047f6" sha1="8596cdb62ff03a2f602344a16b61a1f487fa7c96" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorn2" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940725)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="514644">
+				<rom name="a year at pooh corner rev 19940725 (1994)(sega)(beta).bin" size="514644" crc="93915a98" sha1="d76c9d3ded9e7374c128569470f9744a9a76e308" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorn3" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940723)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner rev 19940723 (1994)(sega)(beta).bin" size="524288" crc="6379c899" sha1="819bfe1214b0ef9897380b657d264558792c4a43" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorn4" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940721)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner rev 19940721 (1994)(sega)(beta).bin" size="524288" crc="eb81b2d3" sha1="0bec28cd6215c77e389c8d4214ab32255b26aeff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorn5" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940711)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner rev 19940711 (1994)(sega)(beta).bin" size="524288" crc="640feed2" sha1="0eacbc0dcb43de09aaa18764988056a839a3577e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcorn6" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Prototype, 19940608)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="a year at pooh corner rev 19940608 (1994)(sega)(beta).bin" size="1048576" crc="d4881455" sha1="48f104073567c96ccf8451dc5fc9c85bcbebf0ec" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="poohcornj" cloneof="poohcorn">
+		<description>A Year At Pooh Corner (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="a year at pooh corner (1995)(sega)(jp)(beta).bin" size="524288" crc="a47878a1" sha1="16ab6f13bc8da6161f20600434db4111a16044d2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="psoccer">
+		<description>Pico Soccer Mezase Soccer Senshu (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pico soccer mezase soccer senshu (1995)(sega)(jp)(beta).bin" size="524288" crc="d9849eb8" sha1="ba61a1c98aa5d03958ba745282086637680b13b2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snoopy">
+		<description>Snoopy no Gakugeikai (Jpn, Prototype)</description>
+		<year>1995</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="snoopy no gakugeikai (1995)(sega)(jp)(beta).bin" size="524288" crc="b76cd97c" sha1="6d6b49249cd4513d59e1c863fed5f273113d7e9b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (USA)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic the hedgehog's gameworld (1996)(sega)(us).bin" size="524288" crc="e472a795" sha1="839d8be99eabf371bb992166471c877db6f6e265" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicgam1" cloneof="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (USA, Prototype, 19960808, 07.46)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic the hedgehog's gameworld rev 19960808-0746 (1996)(sega)(us)(beta).bin" size="524288" crc="4363a1e2" sha1="935b925c7a6ed36519b756f33aa2ce2240610471" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicgam2" cloneof="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (USA, Prototype, 19960802, 08.08)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic the hedgehog's gameworld rev 19960802-0808 (1996)(sega)(us)(beta).bin" size="524288" crc="c2cbfe99" sha1="c0d0eb5db0d34aa75f9be68d75f3b99d0aa2e193" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicgam3" cloneof="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (USA, Prototype, 19960719, 01.27)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic the hedgehog's gameworld rev 19960719-0127 (1996)(sega)(us)(beta).bin" size="524288" crc="ef774132" sha1="3a6dc10517df2d037f716e59c13675bebf0e4246" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicgam4" cloneof="sonicgam">
+		<description>Sonic the Hedgehog's Gameworld (USA, Prototype, 19960701, 11.05)</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sonic the hedgehog's gameworld rev 19960701-1105 (1996)(sega)(us)(beta).bin" size="524288" crc="ddcdf94b" sha1="7ebab6cd9fc42a598082f2ab442700b414e41d9b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmm">
+		<description>Tails and the Music Maker (Prototype 1004, 19941005, 12.55)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="495190">
+				<rom name="tails and the music maker rev 1004-19941005-1255 (1994)(sega)(beta).bin" size="495190" crc="57714ba7" sha1="3dfb122ab384847712dbd3fd41c6509f7d19c363" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmm1" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0927, 19940927, 14.20)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="495190">
+				<rom name="tails and the music maker rev 0927-19940927-1420 (1994)(sega)(beta).bin" size="495190" crc="beb97cf3" sha1="3b6b392f5845a61f018d8edb5121b293ab1f32c9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- the file below came with the wrong name: it should either be "proto 0725, 19940726" or be "proto 0625, 19940626"... -->
+	<software name="tailsmm2" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0725, 19940626, 10.44)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="495126">
+				<rom name="tails and the music maker rev 0725-19940626-1044 (1994)(sega)(beta).bin" size="495126" crc="ebbae9ce" sha1="02dbbf88a190f6c068d3f4e39488010cd2a2601a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmm3" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0722, 19940722, 21.49)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails and the music maker rev 0722-19940722-2149 (1994)(sega)(beta).bin" size="524288" crc="f8246157" sha1="4f011b6055e484ddfe81acd03da8fff436b824f2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmm4" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 701B, 19940702, 17.16)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails and the music maker rev 701b-19940702-1716 (1994)(sega)(beta).bin" size="524288" crc="982154ab" sha1="807ee1ed88ffdd780754043d836a848864155844" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmm5" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0623, 19940624, 07.55)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails and the music maker rev 0623-19940624-0755 (1994)(sega)(beta).bin" size="524288" crc="17a8af59" sha1="e7e69600262eda55a9be6bde248c6f9401d5833f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmm6" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0608, 19940608, 16.55)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails and the music maker rev 0608-19940608-1655 (1994)(sega)(beta).bin" size="524288" crc="f83ec5e8" sha1="39914965a38350b1bef720d39576d20943e8e4a4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tailsmm7" cloneof="tailsmm">
+		<description>Tails and the Music Maker (Prototype 0601, 19940603, 09.00)</description>
+		<year>1994</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="pico_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tails and the music maker (prototype 0601 - jun 03, 1994, 09.00).bin" size="524288" crc="f4ba1e9b" sha1="8d77011f2349eb14b51e76c08474817a0f318f99" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

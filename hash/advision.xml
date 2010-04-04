@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist [
+	<!ELEMENT softwarelist (software+)>
+		<!ATTLIST softwarelist name CDATA #REQUIRED>
+		<!ATTLIST softwarelist description CDATA #IMPLIED>
+		<!ELEMENT software (description, year?, publisher, part*)>
+			<!ATTLIST software name CDATA #REQUIRED>
+			<!ATTLIST software cloneof CDATA #IMPLIED>
+			<!ATTLIST software supported (yes|partial|no) "yes">
+			<!ELEMENT description (#PCDATA)>
+			<!ELEMENT year (#PCDATA)>
+			<!ELEMENT publisher (#PCDATA)>
+			<!ELEMENT part (dataarea*)>
+				<!ATTLIST part name CDATA #REQUIRED>
+				<!ATTLIST part interface CDATA #REQUIRED>
+				<!-- feature is used to store things like pcb-type, mapper type, etc. Specific values depend on the system. -->
+				<!ATTLIST part feature CDATA #IMPLIED>
+				<!ELEMENT dataarea (rom*)>
+					<!ATTLIST dataarea name CDATA #REQUIRED>
+					<!ATTLIST dataarea size CDATA #REQUIRED>
+					<!ATTLIST dataarea databits (8|16|32|64) "8">
+					<!ATTLIST dataarea endian (big|little) "little">
+					<!ELEMENT rom EMPTY>
+						<!ATTLIST rom name CDATA #IMPLIED>
+						<!ATTLIST rom size CDATA #REQUIRED>
+						<!ATTLIST rom crc CDATA #IMPLIED>
+						<!ATTLIST rom md5 CDATA #IMPLIED>
+						<!ATTLIST rom sha1 CDATA #IMPLIED>
+						<!ATTLIST rom offset CDATA #IMPLIED>
+						<!ATTLIST rom status (baddump|nodump|good) "good">
+						<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload) #IMPLIED>
+]>
+<softwarelist name="advision" description-"Entex AdventureVision cartridges">
+	<software name="defender">
+		<description>Defender</description>
+		<year>1982</year>
+		<publisher>Entex Industries</publisher>
+		<!-- <serial>6075</serial> -->
+		<part name="cart" interface="advision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="defender.bin" size="4096" crc="3e280096" sha1="33e6bc08b3e8a951942e078102e90fbc8ba729a8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turtles">
+		<description>Turtles</description>
+		<year>1982</year>
+		<publisher>Entex Industries</publisher>
+		<!-- <serial>6076</serial> -->
+		<part name="cart" interface="advision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="turtles.bin" size="4096" crc="33a23eba" sha1="88748cf4080646e0a2f115a7f6e6001916314816" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supcobra">
+		<description>Super Cobra</description>
+		<year>1982</year>
+		<publisher>Entex Industries</publisher>
+		<!-- <serial>6077</serial> -->
+		<part name="cart" interface="advision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="supcobra.bin" size="4096" crc="b6045c9e" sha1="fd059081d8d82f51dd1415cc3710f1fa5ebb1336" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spcforce">
+		<description>Space Force</description>
+		<year>1982</year>
+		<publisher>Entex Industries</publisher>
+		<!-- <serial>6078</serial> -->
+		<part name="cart" interface="advision_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="spcforce.bin" size="4096" crc="c70d4028" sha1="86c1a6eb8a5070f4be32bf4e83c0d5951e831d27" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

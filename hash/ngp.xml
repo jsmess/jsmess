@@ -1,0 +1,1348 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist [
+	<!ELEMENT softwarelist (software+)>
+		<!ATTLIST softwarelist name CDATA #REQUIRED>
+		<!ATTLIST softwarelist description CDATA #IMPLIED>
+		<!ELEMENT software (description, year?, publisher, part*)>
+			<!ATTLIST software name CDATA #REQUIRED>
+			<!ATTLIST software cloneof CDATA #IMPLIED>
+			<!ATTLIST software supported (yes|partial|no) "yes">
+			<!ELEMENT description (#PCDATA)>
+			<!ELEMENT year (#PCDATA)>
+			<!ELEMENT publisher (#PCDATA)>
+			<!ELEMENT part (dataarea*)>
+				<!ATTLIST part name CDATA #REQUIRED>
+				<!ATTLIST part interface CDATA #REQUIRED>
+				<!-- feature is used to store things like pcb-type, mapper type, etc. Specific values depend on the system. -->
+				<!ATTLIST part feature CDATA #IMPLIED>
+				<!ELEMENT dataarea (rom*)>
+					<!ATTLIST dataarea name CDATA #REQUIRED>
+					<!ATTLIST dataarea size CDATA #REQUIRED>
+					<!ATTLIST dataarea databits (8|16|32|64) "8">
+					<!ATTLIST dataarea endian (big|little) "little">
+					<!ELEMENT rom EMPTY>
+						<!ATTLIST rom name CDATA #IMPLIED>
+						<!ATTLIST rom size CDATA #REQUIRED>
+						<!ATTLIST rom crc CDATA #IMPLIED>
+						<!ATTLIST rom md5 CDATA #IMPLIED>
+						<!ATTLIST rom sha1 CDATA #IMPLIED>
+						<!ATTLIST rom offset CDATA #IMPLIED>
+						<!ATTLIST rom status (baddump|nodump|good) "good">
+						<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload) #IMPLIED>
+]>
+<softwarelist name="ngp" description="SNK Neo Geo Pocket (Color) cartridges">
+	<!-- Id: NeoP00640 - Developer: SNK - Releases: 2000-03-16 (JPN) -->
+	<software name="bakumats">
+		<description>Bakumatsu Rouman Tokubetsu Hen - Gekka no Kenshi - Tsuki ni Saku Hana, Chiri Yuku Hana (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="bakumatsu rouman tokubetsu hen - gekka no kenshi - tsuki ni saku hana, chiri yuku hana (japan).bin" size="2097152" crc="12afacb0" sha1="aa17bd65849707cf13ca4891df44200f58d13599" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00070 - Developer: SNK - Releases: 1998-11-26 (JPN) -->
+	<software name="baseball">
+		<description>Pocket Sports Series - Baseball Stars (Euro, Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="baseball stars (japan, europe) (en,ja).bin" size="1048576" crc="4781ae84" sha1="8ece00f21ae49ed4777a9c990b2782465ef95380" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00660 - Developer: S-Neo - Releases: 2000-11-23 (JPN) -->
+	<software name="bigbang">
+		<description>Big Bang Pro Wrestling (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="big bang pro wrestling (japan) (en,ja).bin" size="2097152" crc="b783c372" sha1="51b9f5a0b233b0c9782cf522324a3a437c06c26f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00830 - Developer: Sega Toys - Releases: 2000-03-16 (JPN) -->
+	<software name="bikkuri">
+		<description>Bikkuriman 2000 - Viva! Pocket Festiva! (Jpn)</description>
+		<year>2000</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="bikkuriman 2000 - viva! pocket festiva! (japan).bin" size="1048576" crc="7a2d7635" sha1="62898d43cfc9ace86a53520ecf62abc6b0c404f3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="biomotor">
+		<description>BioMotor Unitron (Euro, USA)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="biomotor unitron (usa, europe).bin" size="1048576" crc="3807df4f" sha1="ff74d5877bf58164419710888923e46b9cfb415e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00100 - Developer: Yumekobo - Releases: 1999-04-15 (JPN) -->
+	<software name="biomotorj" cloneof="biomotor">
+		<description>BioMotor Unitron (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="biomotor unitron (japan).bin" size="1048576" crc="ecee99f3" sha1="74ef25a02284ea81dfba00a02098ab46656ed4a9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00250 - Developer: SNK - Releases: 1999-03-19 (JPN) -->
+	<software name="bstarsc">
+		<description>Pocket Sport Series - Baseball Stars Color (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="baseball stars color (world) (en,ja).bin" size="1048576" crc="ffa7e88d" sha1="5a9792d7674ead92c08fb6f2d108b26e47a696bf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bustamove" cloneof="pbobble">
+		<description>Bust-A-Move Pocket (USA)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="bust-a-move pocket (usa).bin" size="1048576" crc="85fe6ae3" sha1="5e8c84b9a4b10aa1c3abbfdea60aef90a8b7db7d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00750 - Developer: UEP Systems - Releases: 2000-02-24 (JPN) -->
+	<software name="coolboar">
+		<description>Cool Boarders Pocket (Euro, Jpn)</description>
+		<year>2000</year>
+		<publisher>UEP Systems</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="cool boarders pocket (japan, europe) (en,ja).bin" size="1048576" crc="833f9c22" sha1="2930551088bc97a407824178f23dfa8d0b6a551f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coolcool">
+		<description>Cool Cool Jam (Euro, USA, Sample)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="cool cool jam (usa, europe) (sample).bin" size="2097152" crc="4d8d27f0" sha1="77d7bb74844d43520dcd6e9cd912560c995c6247" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP01000 - Developer: SNK - Releases: 2000-08-10 (JPN) -->
+	<software name="coolcoolj" cloneof="coolcool">
+		<description>Cool Cool Jam (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="cool cool jam (japan).bin" size="2097152" crc="4fda5d8a" sha1="f0f9fb71be6fde25f9db8dcb8c6d6aa859b21697" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cotton">
+		<description>Fantastic Night Dreams Cotton (Euro)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="fantastic night dreams cotton (europe).bin" size="1048576" crc="1bf412f5" sha1="a9d8be97ab7bab1aaa1bedd2ce6914ec7fb8cb85" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00800 - Developer: Magitec - Releases: 2000-03-23 (JPN) -->
+	<software name="cottonj" cloneof="cotton">
+		<description>Fantastic Night Dreams Cotton (Jpn)</description>
+		<year>2000</year>
+		<publisher>Success</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="fantastic night dreams cotton (japan).bin" size="1048576" crc="b8a12409" sha1="935b9d671df660192d9fc215aa03d90a486e743a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00380 - Developer: ADK - Releases: 1999-04-15 (JPN) -->
+	<software name="crushrol">
+		<description>Crush Roller (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="crush roller (world) (en,ja).bin" size="1048576" crc="6200c65e" sha1="da34a11d3602e249dbc322d6cce823423330c53b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00450 - Developer: SNK - Releases: 1999-10-21 (JPN) -->
+	<software name="darkarms">
+		<description>Dark Arms - Beast Buster 1999 (World) ~ Beast Buster - Yami no Seitai Heiki (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="dark arms - beast buster 1999 (world) (en,ja).bin" size="2097152" crc="6f353f34" sha1="727d8100fa7c4a39a6be9133bd903b868b4cc834" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP01030 - Developer: IOSYS - Releases: 2000-08-10 (JPN) -->
+	<software name="deltawrp">
+		<description>Delta Warp (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="delta warp (japan).bin" size="524288" crc="add4fdff" sha1="4ab8f0b074a1299a0adee3d7ca46d070a9ccae6d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00600 - Developer: Taito - Releases: 1999-10-21 (JPN) -->
+	<software name="dendego2">
+		<description>Densha de Go! 2 on Neo Geo Pocket (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="densha de go! 2 on neo geo pocket (japan).bin" size="4194304" crc="d5ced9e9" sha1="cee5fa9dc0acfba95ee6bd802a0ff80d4ecacc79" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dendego2b" cloneof="dendego2">
+		<description>Densha de Go! 2 on Neo Geo Pocket (Jpn, Prototype)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="densha de go! 2 on neo geo pocket (japan) (beta).bin" size="4194304" crc="2fc4623e" sha1="4934987cd275a013d05d02b1ddd8fd1fb2ded0da" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="divealer">
+		<description>Dive Alert - Matt's Version (Euro, USA)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="dive alert - matt's version (usa, europe).bin" size="2097152" crc="ef75081b" sha1="0abdf64dd402a8192b0af8127a6ee214173dfe3c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="divealer1" cloneof="divealer">
+		<description>Dive Alert - Becky's Version (Euro, USA)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="dive alert - becky's version (usa, europe).bin" size="2097152" crc="83db5772" sha1="64467acf90be6931f9aa532ed8e1fd4dc60946c6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00370 - Developer: Sacnoth - Releases: 1999-08-19 (JPN) -->
+	<software name="divealerj" cloneof="divealer">
+		<description>Dive Alert - Barn Hen (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="dive alert - burn hen (japan).bin" size="2097152" crc="c213941d" sha1="66624028ec986084a95237c74173849a8a729398" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00360 - Developer: Sacnoth - Releases: 1999-08-19 (JPN) -->
+	<software name="divealerj1" cloneof="divealer">
+		<description>Dive Alert - Rebecca Hen (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="dive alert - rebecca hen (japan).bin" size="2097152" crc="3c4af4f5" sha1="ac81de4f9c1473c5ecd761dc449ae5af0e98915f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00330 - Developer: ADK - Releases: 1999-04-29 (JPN) -->
+	<software name="dokodemo">
+		<description>Dokodemo Mahjong (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="dokodemo mahjong (japan).bin" size="524288" crc="78c21b5e" sha1="d7edf6bb3773a5319dfd2a20e204c70e8cc6971e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00710 - Developer: ADK - Releases: 2000-05-25 (JPN) -->
+	<software name="dynaslug">
+		<description>Dynamite Slugger (Euro, Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="dynamite slugger (japan, europe) (en,ja).bin" size="1048576" crc="7f1779cd" sha1="90104d5917db4cacfd1d0ef8b2b01fea09679a93" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="evolutio">
+		<description>Evolution - Eternal Dungeons (Euro)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="evolution - eternal dungeons (europe).bin" size="2097152" crc="be47e531" sha1="9f607095b038ccdbf98e6a8fce2dd67740ae5571" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00820 - Developer: Entertainment Software Publishing - Releases: 2000-02-10 (JPN) -->
+	<software name="evolutioj" cloneof="evolutio">
+		<description>Shinki Sekai Evolution - Hateshinai Dungeon (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="shinki sekai evolution - hateshinai dungeon (japan).bin" size="2097152" crc="e006f42f" sha1="61827b7a13b3efe6a6b60f314fb0589a29c1bfd2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="faselei">
+		<description>Faselei! (Euro)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="faselei! (europe).bin" size="2097152" crc="e705e30e" sha1="48c04c8a261b25a942a9fe68abace8aad9deae23" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00510 - Developer: Sacnoth - Releases: 1999-12-29 (JPN) -->
+	<software name="faseleij" cloneof="faselei">
+		<description>Faselei! (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="faselei! (japan).bin" size="2097152" crc="8f585838" sha1="04a65a7529098bfb2295ab4bc3782ea45ec116ee" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00110 - Developer: SNK - Releases: 1999-05-27 (JPN) -->
+	<software name="fatfury">
+		<description>Pocket Fighting Series - Garou Densetsu First Contact ~ Fatal Fury F-Contact (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="fatal fury f-contact (world) (en,ja).bin" size="2097152" crc="a9119b5a" sha1="ecfccd7e971d8e9d46b97aa05dc7eb61d69e16cd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00970 - Developer: SNK - Releases: 2000-06-08 (JPN) -->
+	<software name="ganbaren">
+		<description>Ganbare Neo Poke-kun (Jpn)</description>
+		<year>19??</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="ganbare neo poke-kun (ka) (japan).bin" size="2097152" crc="6df986a3" sha1="bc8be263618601d5967538d125be1d58103ca7b7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP01090 - Developer: KID - Releases: 2000-11-23 (JPN) -->
+	<software name="infinity">
+		<description>Infinity Cure (Jpn)</description>
+		<year>2000</year>
+		<publisher>KID</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="infinity cure (japan).bin" size="1048576" crc="32dc2aa2" sha1="b0f3f57c5ad084a009631e7e0fa497451415e73b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00500 - Developer: Yumekobo - Releases: 2000-01-20 (JPN) -->
+	<software name="kikousei">
+		<description>Kikou Seiki Unitron - Sono Tsuide. Hikari Umareru Chi Yori. (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="kikou seiki unitron - sono tsuide. hikari umareru chi yori. (japan).bin" size="2097152" crc="84580d66" sha1="b732c22631b05895ed7eebabfc3a59e28b04b364" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kof_mlon">
+		<description>King of Fighters R-1 &amp; Melon-chan no Seichou Nikki (Jpn, Prototype)</description>
+		<year>199?</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="king of fighters r-1 &amp; melon-chan no seichou nikki (japan) (beta).bin" size="2097152" crc="2660bfc4" sha1="a02d1b1113dbeac895832f1501029e40d9aab493" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00920 - Developer: SNK - Releases: 2000-07-06 (JPN) -->
+	<software name="kofpara">
+		<description>The King of Fighters - Battle de Paradise (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="king of fighters, the - battle de paradise (japan).bin" size="2097152" crc="77e37bac" sha1="8aabdd45ba2b9e24bdcd8e51f6653736257d4644" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00010 - Developer: SNK - Releases: 1998-10-28 (JPN) -->
+	<software name="kofr1">
+		<description>Pocket Fighting Series - King of Fighters R-1 (Euro, Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="king of fighters r-1 (japan, europe) (en,ja).bin" size="2097152" crc="dceb7e11" sha1="4a7adbcccb05b6047a38bb861523cbae7d956bfa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00230 - Developer: SNK - Releases: 1999-03-19 (JPN) -->
+	<software name="kofr2">
+		<description>Pocket Fighting Series - King of Fighters R-2 (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="king of fighters r-2 (world) (en,ja).bin" size="2097152" crc="47e490a2" sha1="7f2257fe6f9b90292d0332c06b9d68bfaeb2ed08" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kofr2b" cloneof="kofr2">
+		<description>Pocket Fighting Series - King of Fighters R-2 (World, Prototype)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="king of fighters r-2 (world) (en,ja) (beta).bin" size="2097152" crc="e3ae79c0" sha1="6d138c34f3dc3c7f1b943c1f57f885007edfb12a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00910 - Developer: Visco - Releases: 2000-03-09 (JPN) -->
+	<software name="koikoi">
+		<description>Koi Koi Mahjong (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="koi koi mahjong (japan).bin" size="524288" crc="b51c3eba" sha1="d705dfa87cf26c8232cf4885f8ae326eb690df59" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lastblad">
+		<description>The Last Blade - Beyond the Destiny (Euro)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="last blade, the - beyond the destiny (europe).bin" size="2097152" crc="94fcfd1e" sha1="b7df1e56bc47266b65226413095e38896b38da07" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magdrop">
+		<description>Magical Drop Pocket (Euro, USA)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="magical drop pocket (usa, europe).bin" size="1048576" crc="72184de7" sha1="05ebf0147961eda2ed804dc369cd0a4dee923c9c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00480 - Developer: Sakata SAS - Releases: 1999-06-24 (JPN) -->
+	<software name="magdropj" cloneof="magdrop">
+		<description>Magical Drop Pocket (Jpn)</description>
+		<year>1999</year>
+		<publisher>Data East</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="magical drop pocket (japan).bin" size="1048576" crc="6c465716" sha1="9baa97ef2b825f36ee3d3e894d1b6156ac414c0c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00040 - Developer: ADK - Releases: 1998-10-28 (JPN) -->
+	<software name="melonchn">
+		<description>Melon-chan no Seichou Nikki (Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="melon-chan no seichou nikki (japan).bin" size="1048576" crc="cb42cfa4" sha1="2dbf9c40ab0167ff172f10354d4674e5e6c901d5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00870 - Developer: KID - Releases: 2000-04-27 (JPN) -->
+	<software name="memories">
+		<description>Memories Off - Pure (Jpn)</description>
+		<year>2000</year>
+		<publisher>KID</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="memories off - pure (japan).bin" size="1048576" crc="a7926e90" sha1="17d76b25f97acf0c803e5e30922c950331e4be8b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00630 - Developer: SNK - Releases: 2000-01-20 (JPN) -->
+	<software name="mezase">
+		<description>Mezase! Kanji Ou (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mezase! kanji ou (japan).bin" size="2097152" crc="a52e1c82" sha1="030a59f990e96649001582be2d5acc9af18424fe" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00620 - Developer: Ukiyotei - Releases: 1999-12-29 (JPN) -->
+	<software name="mizuki">
+		<description>Mizuki Shigeru no Youkai Shashinkan (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="mizuki shigeru no youkai shashinkan (japan).bin" size="2097152" crc="dde08335" sha1="8025d09368598951da94f8601729c16972b96830" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00210 - Developer: Ukiyotei - Releases: 1999-05-27 (JPN) -->
+	<software name="mslug1st">
+		<description>Metal Slug - 1st Mission (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="metal slug - 1st mission (world) (en,ja).bin" size="2097152" crc="4ff91807" sha1="3540bb6efbbc4f37992d2a871b8d83b4fca0e76e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00610 - Developer: Ukiyotei - Releases: 2000-03-09 (JPN) -->
+	<software name="mslug2nd">
+		<description>Metal Slug - 2nd Mission (World)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="metal slug - 2nd mission (world) (en,ja).bin" size="4194304" crc="ac549144" sha1="9c1a829d4678dd9c51fdfe30c76b7f9670311bfb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00180 - Developer: Dyna - Releases: 1999-12-29 (JPN) -->
+	<software name="neo21">
+		<description>Pocket Casino Series - Neo 21 (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo 21 - real casino series (world).bin" size="1048576" crc="0a2a2f28" sha1="359dc14577c7b8fb8f2c8cfa63c12bccb30fcc11" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00190 - Developer: Dyna - Releases: 2000-06-22 (JPN) -->
+	<software name="neobacca">
+		<description>Pocket Casino Series - Neo Baccarat (World)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo baccarat - real casino series (world).bin" size="1048576" crc="22aab454" sha1="80218804eb591e50831d098b5bd213a3586849a5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00140 - Developer: Dyna - Releases: 1998-12-25 (JPN) -->
+	<software name="neocher">
+		<description>Pocket Casino Series - Neo Cherry Master (Euro, Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo cherry master - real casino series (japan, europe) (en,ja).bin" size="1048576" crc="5c067579" sha1="c171d8d22d667d713bfc73c2b1c04bc77aacbb5c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00240 - Developer: Dyna - Releases: 1999-03-19 (JPN) -->
+	<software name="neocherc">
+		<description>Pocket Casino Series - Neo Cherry Master Color (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo cherry master color - real casino series (world) (en,ja).bin" size="1048576" crc="a6dca584" sha1="17d51967cf1992b6aa779a2583dac46a6590d50a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neochercb" cloneof="neocherc">
+		<description>Pocket Casino Series - Neo Cherry Master Color (World, Prototype)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo cherry master color - real casino series (world) (en,ja) (beta).bin" size="1048576" crc="939a9912" sha1="9b53e545388d487a2782e5ea7232979ee33e2b4f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00020 - Developer: SNK - Releases: 1998-10-28 (JPN) -->
+	<software name="neocup98">
+		<description>Pocket Sports Series - Neo Geo Cup '98 (Euro, Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo geo cup '98 (japan, europe) (en,ja).bin" size="1048576" crc="33add5bd" sha1="445743119c65a6765a0bdc849a12e9038192840c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00390 - Developer: SNK - Releases: 1999-04-15 (JPN) -->
+	<software name="neocuppl">
+		<description>Pocket Sport Series - Neo Geo Cup '98 Plus (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo geo cup '98 plus (world) (en,ja).bin" size="1048576" crc="c0da4fe9" sha1="a8bb64f093b418a88e674d9fab62a34fc220ea9f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00170 - Developer: Dyna - Releases: 1999-04-22 (JPN) -->
+	<software name="neoderby">
+		<description>Neo Derby Champ Daiyosou (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="neo derby champ daiyosou (japan).bin" size="2097152" crc="5a053559" sha1="b75a0de4eec70c39616dfff92b09f4fb1c1e0881" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00150 - Developer: Dyna - Releases: 1999-03-19 (JPN) -->
+	<software name="neodrag">
+		<description>Pocket Casino Series - Neo Dragon's Wild (World, v1.13)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo dragon's wild - real casino series (world) (en,ja) (v1.13).bin" size="1048576" crc="5d028c99" sha1="b83f713370169e146a1687424ae8ce56b35a23da" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="neodrag1" cloneof="neodrag">
+		<description>Pocket Casino Series - Neo Dragon's Wild (World, v1.11)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo dragon's wild - real casino series (world) (en,ja) (v1.11).bin" size="1048576" crc="225fd7f9" sha1="b80a2ab886c80ad17a6cb0968ea3ad6218922fa1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00160 - Developer: Dyna - Releases: 1999-03-19 (JPN) -->
+	<software name="neomystr">
+		<description>Pocket Casino Series - Neo Mystery Bonus (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo mystery bonus - real casino series (world) (en,ja).bin" size="1048576" crc="e79dc5b3" sha1="0d137a2cac0a03ab55dfeb4dbaf3929477cfb5d0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00260 - Developer: ADK - Releases: 1999-05-27 (JPN) -->
+	<software name="neoproyk">
+		<description>Pocket Sport Series - Neo Poke Pro Yakyuu (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="neo poke pro yakyuu (japan).bin" size="1048576" crc="f4d78f12" sha1="2052929b68092af6d530cbb97ff092805807f381" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00350 - Developer: SNK - Releases: 1999-07-29 (JPN) -->
+	<software name="neoturfm">
+		<description>Pocket Sport Series - Big Tournament Golf ~ Neo Turf Masters (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="neo turf masters (world) (en,ja).bin" size="2097152" crc="317a66d2" sha1="d425bb812290b93a800032925d7be14f75820159" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00960 - Developer: Denno Eizo - Releases: 2000-11-23 (JPN) -->
+	<software name="nigeronp">
+		<description>Nige-ron-pa (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="nigeronpa (japan).bin" size="1048576" crc="3cc3e269" sha1="b5d355ea808dd01cf746daef7704e54d7766bd3b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00810 - Developer: Success - Releases: 2000-04-27 (JPN) -->
+	<software name="oekakip">
+		<description>Oekaki Puzzle (Jpn)</description>
+		<year>2000</year>
+		<publisher>Success</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="oekaki puzzle (japan).bin" size="524288" crc="59ab1e0f" sha1="792a6cbb736526f4518df97b5ac79ecb45e46eec" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00850 - Developer: Quest - Releases: 2000-06-22 (JPN) -->
+	<software name="ogrebatl">
+		<description>Densetsu no Ogre Battle Gaiden - Zenobia no Ouji (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="densetsu no ogre battle gaiden - zenobia no ouji (japan).bin" size="2097152" crc="eeeefd6a" sha1="5ac794c0f125bfb97efe9cd06c2aca3afdf549ea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00460 - Developer: Japan Vistec - Releases: 1999-11-25 (JPN) -->
+	<software name="pachinko">
+		<description>Pachinko Hisshou Guide - Pocket Parlor (Jpn)</description>
+		<year>1999</year>
+		<publisher>Japan Vistec</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pachinko hisshou guide - pocket parlor (japan).bin" size="1048576" crc="c3d6b28b" sha1="941b168ecee1de8dd773464a8754c6c8c736b492" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00550 - Developer: Namco - Releases: 1999-08-26 (JPN) -->
+	<software name="pacworld">
+		<description>Pac-Man (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pac-man (world) (en,ja).bin" size="524288" crc="21e8cc15" sha1="ec64ab4be669f9860c216151094b9eea898c64b9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00200 - Developer: Taito / Ukiyotei - Releases: 1999-03-26 (JPN) -->
+	<software name="pbobble">
+		<description>Puzzle Bobble Mini (Euro, Jpn, v1.10)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="puzzle bobble mini (japan, europe) (v1.10).bin" size="1048576" crc="e69eae3e" sha1="c217bc81012c8011ec268e6a21adf5b26566b4b5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbobblea" cloneof="pbobble">
+		<description>Puzzle Bobble Mini (Euro, Jpn, v1.09)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="puzzle bobble mini (japan, europe) (v1.09).bin" size="1048576" crc="c94b173a" sha1="2cb115d011ffb82ed2b2560697b8f538e298c03f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pbobbleb" cloneof="pbobble">
+		<description>Puzzle Bobble Mini (Euro, Jpn, Prototype)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="puzzle bobble mini (japan, europe) (en,ja) (beta).bin" size="1048576" crc="e3d9f38e" sha1="deccefd50c3d2654f7190bdd629cd1f0ba3c30df" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="picturep">
+		<description>Picture Puzzle (Euro, USA)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="picture puzzle (usa, europe).bin" size="1048576" crc="67e6dc56" sha1="387d37cf60562da4e95ba18440ad6e0a4cccb537" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00440 - Developer: KID - Releases: 1999-10-21 (JPN) -->
+	<software name="pocklove">
+		<description>Pocket Love if (Jpn)</description>
+		<year>1999</year>
+		<publisher>KID</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket love if (japan).bin" size="2097152" crc="c2ee1ee5" sha1="2b5d9628b7b5911f90c28321227d47a527a719ea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pockrev">
+		<description>Pocket Reversi (Euro)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pocket reversi (europe).bin" size="1048576" crc="20f09880" sha1="0405bbf7ab34c818f52793aca80a73ab40788cac" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00790 - Developer: Success - Releases: 2000-01-27 (JPN) -->
+	<software name="pockrevj">
+		<description>Pocket Reversi (Jpn)</description>
+		<year>2000</year>
+		<publisher>Success</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pocket reversi (japan).bin" size="524288" crc="fb0b55b8" sha1="b13159d9944aaa19720d03d17b223d6ff12c1e29" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00320 - Developer: ADK - Releases: 1999-12-22 (JPN) -->
+	<software name="prtymail">
+		<description>Party Mail (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="party mail (japan).bin" size="1048576" crc="4da8a1c0" sha1="b805c908c1bef29c0792a73b6a6a05dd27cc5ff0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00740 - Developer: Aruze - Releases: 2000-02-10 (JPN) -->
+	<software name="pslotazt">
+		<description>Pachi-Slot Aruze Oukoku Pocket - Azteca (Jpn)</description>
+		<year>2000</year>
+		<publisher>Aruze</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pachi-slot aruze oukoku pocket - azteca (japan).bin" size="524288" crc="c56ef8c3" sha1="3f814c84429629d763d6dc62d513013a0cc19a0c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP01080 - Developer: Aruze - Releases: 2001-01-25 (JPN) -->
+	<software name="pslotdk2">
+		<description>Pachi-Slot Aruze Oukoku Pocket - Dekahel 2 (Jpn)</description>
+		<year>2001</year>
+		<publisher>Aruze</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pachi-slot aruze oukoku pocket - dekahel 2 (japan).bin" size="1048576" crc="346f3c46" sha1="7f5446cfe6535db63678d6fc26f598ed3ff73b7f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP01070 - Developer: Aruze - Releases: 2000-10-26 (JPN) -->
+	<software name="pslotds2">
+		<description>Pachi-Slot Aruze Oukoku Pocket - Delsol 2 (Jpn)</description>
+		<year>2000</year>
+		<publisher>Aruze</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pachi-slot aruze oukoku pocket - delsol 2 (japan).bin" size="1048576" crc="1ea69db1" sha1="df3da196c01be73b0dea64b86ab27ec7dde5b594" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP01120 - Developer: Aruze - Releases: 2001-03-09 (JPN) -->
+	<software name="pslotecp">
+		<description>Pachi-Slot Aruze Oukoku Pocket - e-Cup (Jpn)</description>
+		<year>2001</year>
+		<publisher>Aruze</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pachi-slot aruze oukoku pocket - e-cup (japan).bin" size="1048576" crc="0a7c32df" sha1="e46aa1eb7c33c2f71bb236d279ca1d7c5d841e74" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00520 - Developer: Aruze - Releases: 1999-10-21 (JPN) -->
+	<software name="pslothan">
+		<description>Pachi-Slot Aruze Oukoku Pocket - Hanabi (Jpn, v1.04)</description>
+		<year>1999</year>
+		<publisher>Aruze</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pachi-slot aruze oukoku pocket - hanabi (japan) (v1.04).bin" size="524288" crc="a0c26f9b" sha1="9d30e0c67851bc99e4a77e89e3fbc101b358b458" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pslothan1" cloneof="pslothan">
+		<description>Pachi-Slot Aruze Oukoku Pocket - Hanabi (Jpn, v1.02)</description>
+		<year>1999</year>
+		<publisher>Aruze</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pachi-slot aruze oukoku pocket - hanabi (japan) (v1.02).bin" size="524288" crc="cfd1c8f2" sha1="e4b48d1290cd9dcf7a05ea276226ecba10be752e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP01100 - Developer: Aruze - Releases: 2000-12-14 (JPN) -->
+	<software name="pslotooh">
+		<description>Pachi-Slot Aruze Oukoku Pocket - Oohanabi (Jpn)</description>
+		<year>2000</year>
+		<publisher>Aruze</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pachi-slot aruze oukoku pocket - oohanabi (japan).bin" size="1048576" crc="8a88c50f" sha1="a99e8aabefd36a5a297fef59e376cf24f8f619f8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP01020 - Developer: Aruze - Releases: 2000-07-20 (JPN) -->
+	<software name="pslotpc2">
+		<description>Pachi-Slot Aruze Oukoku Pocket - Porcano 2 (Jpn)</description>
+		<year>2000</year>
+		<publisher>Aruze</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="pachi-slot aruze oukoku pocket - porcano 2 (japan).bin" size="1048576" crc="96ddfbe3" sha1="fd51a5a649cebfe5692ee498d11c48fd84661dc4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00840 - Developer: Aruze - Releases: 2000-03-16 (JPN) -->
+	<software name="pslotwrd">
+		<description>Pachi-Slot Aruze Oukoku Pocket - Ward of Lights (Jpn)</description>
+		<year>2000</year>
+		<publisher>Aruze</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pachi-slot aruze oukoku pocket - ward of lights (japan).bin" size="524288" crc="d46cbc54" sha1="c17a535195719e0dafb5de76663c7649d209f0ff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00090 - Developer: Yumekobo - Releases: 1998-10-28 (JPN) -->
+	<software name="ptennis">
+		<description>Pocket Sports Series - Pocket Tennis (Euro, Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pocket tennis - pocket sports series (japan, europe) (en,ja).bin" size="524288" crc="89410850" sha1="59602e44c631a00b2db53196204a4bc22ccd7025" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00280 - Developer: Yumekobo - Releases: 1999-03-19 (JPN) -->
+	<software name="ptennisc">
+		<description>Pocket Sport Series - Pocket Tennis Color (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="pocket tennis color - pocket sports series (world) (en,ja).bin" size="524288" crc="d8590b96" sha1="d14251209ca5da8000643cd5bf6e5196a5e56ee4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00410 - Developer: Sega - Releases: 1999-07-22 (JPN) -->
+	<software name="puyopop">
+		<description>Puyo Pop (World, v1.06) ~ Puyo Pyuo Tsuu (Jpn, v1.06)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="puyo pop (world) (en,ja) (v1.06).bin" size="1048576" crc="5c649d1e" sha1="8971d3d64e47950cf01648d7b341d4b01a2c4eb0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puyopop1" cloneof="puyopop">
+		<description>Puyo Pop (World, v1.05) ~ Puyo Pyuo Tsuu (Jpn, v1.05)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="puyo pop (world) (en,ja) (v1.05).bin" size="1048576" crc="3090b2fd" sha1="27c3250fb17f291832fa7189a35478d017a0ef5e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzzlink">
+		<description>Puzzle Link (Euro)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="puzzle link (europe).bin" size="524288" crc="fe95938c" sha1="6e7b48b59d4df857dd76a964c521b93cb0c4c9a7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="puzzlnk2">
+		<description>Puzzle Link 2 (Euro, USA)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="puzzle link 2 (usa, europe).bin" size="1048576" crc="e2a09bb7" sha1="d4522d1a454968cccd57b03c2aff99616d0b5174" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00290 - Developer: Yumekobo - Releases: 1999-03-19 (JPN) -->
+	<software name="renketsc">
+		<description>Renketsu Puzzle Tsunagete Pon! Color (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="renketsu puzzle tsunagete pon! color (japan).bin" size="524288" crc="615f1f2f" sha1="048b85a8e8e0cbd9324bc373fc875288f81c21db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00120 - Developer: Yumekobo - Releases: 1998-10-28 (JPN) -->
+	<software name="renketsu">
+		<description>Renketsu Puzzle Tsunagete Pon! (Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="renketsu puzzle tsunagete pon! (japan).bin" size="524288" crc="37e79afc" sha1="7a75e3b6874a18b29ba636ff22308d944a7901e6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00940 - Developer: Capcom - Releases: 2000-07-06 (JPN) -->
+	<software name="rockmanb">
+		<description>Rockman - Battle &amp; Fighters (Jpn)</description>
+		<year>2000</year>
+		<publisher>Capcom</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="rockman - battle &amp; fighters (japan).bin" size="2097152" crc="9c861e49" sha1="c0a6cdf9ba6c4e8f227ba52489f15f5053f0889c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00080 - Developer: SNK - Releases: 1998-12-25 (JPN) -->
+	<software name="samsho">
+		<description>Pocket Fighting Series - Samurai Spirit! (Jpn) ~ Samurai Shodown! (Euro)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="samurai shodown! - pocket fighting series (japan, europe) (en,ja).bin" size="2097152" crc="32e4696a" sha1="2c6adfa69e7aeada7d4198b373436eee35b70d01" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00300 - Developer: SNK - Releases: 1999-06-10 (JPN) -->
+	<software name="samsho2">
+		<description>Pocket Fighting Series - Samurai Shodown! 2 (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="samurai shodown! 2 - pocket fighting series (world) (en,ja).bin" size="2097152" crc="4f7fb156" sha1="2ec4da369d3b91af15defa64429bd9daac7ee9b5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00260 - Developer: Activision - Releases: 1999-07-29 (JPN) -->
+	<software name="shanghai">
+		<description>Shanghai Mini (World)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="shanghai mini (world) (en,ja).bin" size="1048576" crc="90732d53" sha1="3e3e625852ac4997d3e3739e59c16e9a74f40f19" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00050 - Developer: ADK - Releases: 1998-11-20 (JPN) -->
+	<software name="shougi">
+		<description>Shougi no Tatsujin (Jpn)</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="shougi no tatsujin (japan).bin" size="524288" crc="f34d0c9b" sha1="ab0c33236f72d2b317d91d034756b56cfca1b0b4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00270 - Developer: ADK - Releases: 1999-03-19 (JPN) -->
+	<software name="shougic">
+		<description>Shougi no Tatsujin Color (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="shougi no tatsujin color (japan).bin" size="524288" crc="1f2872ed" sha1="9f420d0a7cc1115f60bda1c0916247935118ce98" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="snkgals">
+		<description>SNK Gals' Fighters (Euro, USA)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="snk gals' fighters (usa, europe).bin" size="2097152" crc="b02c2be7" sha1="09a74b42ef9b63aca675aead5854512ad0b585a1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00650 - Developer: Yumekobo - Releases: 2000-01-27 (JPN) -->
+	<software name="snkgalsj" cloneof="snkgals">
+		<description>SNK Gals' Fighters (Jpn)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="snk gals' fighters (japan).bin" size="2097152" crc="6a9ffa47" sha1="2f806c926a19b261c42e5a60d1ddd5d132ada942" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00590 - Developer: Sega - Releases: 2000-05-25 (JPN) -->
+	<software name="sonic">
+		<description>Sonic the Hedgehog - Pocket Adventure (World)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="sonic the hedgehog - pocket adventure (world).bin" size="2097152" crc="356f0849" sha1="3fe15d4374c4ca073aa0393fcfcad0055bd345ab" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicb" cloneof="sonic">
+		<description>Sonic the Hedgehog - Pocket Adventure (World, Prototype)</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="sonic the hedgehog - pocket adventure (world) (beta).bin" size="2097152" crc="622176ce" sha1="a11283703fe6007c2e96ce81dfc56081eff6f593" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00780 - Developer: Dyna - Releases: 1999-12-16 (JPN) -->
+	<software name="soreike">
+		<description>Soreike!! Hanafuda Doujou (Jpn)</description>
+		<year>1999</year>
+		<publisher>Dyna</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="soreike!! hanafuda doujou (japan).bin" size="524288" crc="05fa3eb0" sha1="f4a4264eaf1605086ccbc526f21da222aa6341bf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP01110 - Developer: Seta - Releases: 2001-03-09 (JPN) -->
+	<software name="srmp">
+		<description>Super Real Mahjong - Premium Collection (Jpn)</description>
+		<year>2001</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super real mahjong - premium collection (japan).bin" size="2097152" crc="c6e620c3" sha1="c61847bca43c5387d19096a86ef109560d71ca9b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00690 - Developer: SNK - Releases: 1999-12-22 (JPN) -->
+	<software name="svc">
+		<description>SNK vs. Capcom - The Match of the Millennium (World) ~ Choujou Kessen Saikyou Fighters - SNK vs Capcom (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="snk vs. capcom - the match of the millennium (world) (en,ja).bin" size="4194304" crc="b173030a" sha1="7629ea5520d3daee4ef658d4f4b48f45e17217ae" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP01160 - Developer: SNK - Releases: 2001-09-13 (JPN) -->
+	<software name="svccard2">
+		<description>SNK vs. Capcom - Card Fighters 2 - Expand Edition (Jpn)</description>
+		<year>2001</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="snk vs. capcom - card fighters 2 - expand edition (japan).bin" size="2097152" crc="ccbcfda7" sha1="2c4fc8594f8ba2bf39e62fe8bcb79fc2df5a83b6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svccardc" cloneof="svccards">
+		<description>SNK vs. Capcom - Card Fighters' Clash - Capcom Cardfighter's Version (Euro, USA)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="snk vs. capcom - card fighters' clash - capcom version (usa, europe).bin" size="2097152" crc="80ce137b" sha1="2a95ab1fe62b6a9dc30a05131ad212ba2de5c3cd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00570 - Developer: SNK - Releases: 1999-10-21 (JPN) -->
+	<software name="svccardcj" cloneof="svccards">
+		<description>SNK vs. Capcom - Gekitotsu Card Fighters - Capcom Supporters Version (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="snk vs. capcom - gekitotsu card fighters - capcom supporter version (japan).bin" size="2097152" crc="9217159b" sha1="3b1d5ac5b4aaf1aa04479e46961c4d7c458d70fb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svccardj" cloneof="svccards">
+		<description>SNK vs. Capcom - Gekitotsu Card Fighters (Jpn, Prototype)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="snk vs. capcom - gekitotsu card fighters (japan) (beta).bin" size="2097152" crc="4a41a56e" sha1="4b2f613f978cefae8e952a43440d2d395b1012d5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svccards">
+		<description>SNK vs. Capcom - Card Fighters' Clash - SNK Cardfighter's Version (Euro, USA)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="snk vs. capcom - card fighters' clash - snk version (usa, europe).bin" size="2097152" crc="94b63a97" sha1="dfb232a527647337d6274ddf9d8b3d94281fd86d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00560 - Developer: SNK - Releases: 1999-10-21 (JPN) -->
+	<software name="svccardsj" cloneof="svccards">
+		<description>SNK vs. Capcom - Gekitotsu Card Fighters - SNK Supporters Version (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="snk vs. capcom - gekitotsu card fighters - snk supporter version (japan).bin" size="2097152" crc="7065295c" sha1="551ceb97d1e3e6384221be738b11efb5d936ffd6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="svccardsj1" cloneof="svccards">
+		<description>SNK vs. Capcom - Gekitotsu Card Fighters - SNK Supporters Version (Jpn, Prototype)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="snk vs. capcom - gekitotsu card fighters - snk supporter version (japan) (beta).bin" size="2097152" crc="e70e3f1a" sha1="584b30b050c22082dae3abe685f406dbe4decf98" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Id: NeoP00490 - Developer: Yumekobo - Releases: 1999-11-11 (JPN) -->
+	<software name="tsunapn2">
+		<description>Tsunagete Pon! 2 (Jpn)</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="tsunagete pon! 2 (japan).bin" size="1048576" crc="98acc37a" sha1="4912c271a140291dbfc523017844a1afc68bd5e4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wrestmad">
+		<description>Wrestling Madness (Euro, USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="ngp_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="wrestling madness (usa, europe) (beta).bin" size="2097152" crc="16b0be9b" sha1="2dd82db967e2bc8c2d8b569a364793d56176a68e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

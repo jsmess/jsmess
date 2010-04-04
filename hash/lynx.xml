@@ -1,0 +1,1069 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist [
+	<!ELEMENT softwarelist (software+)>
+		<!ATTLIST softwarelist name CDATA #REQUIRED>
+		<!ATTLIST softwarelist description CDATA #IMPLIED>
+		<!ELEMENT software (description, year?, publisher, part*)>
+			<!ATTLIST software name CDATA #REQUIRED>
+			<!ATTLIST software cloneof CDATA #IMPLIED>
+			<!ATTLIST software supported (yes|partial|no) "yes">
+			<!ELEMENT description (#PCDATA)>
+			<!ELEMENT year (#PCDATA)>
+			<!ELEMENT publisher (#PCDATA)>
+			<!ELEMENT part (dataarea*)>
+				<!ATTLIST part name CDATA #REQUIRED>
+				<!ATTLIST part interface CDATA #REQUIRED>
+				<!-- feature is used to store things like pcb-type, mapper type, etc. Specific values depend on the system. -->
+				<!ATTLIST part feature CDATA #IMPLIED>
+				<!ELEMENT dataarea (rom*)>
+					<!ATTLIST dataarea name CDATA #REQUIRED>
+					<!ATTLIST dataarea size CDATA #REQUIRED>
+					<!ATTLIST dataarea databits (8|16|32|64) "8">
+					<!ATTLIST dataarea endian (big|little) "little">
+					<!ELEMENT rom EMPTY>
+						<!ATTLIST rom name CDATA #IMPLIED>
+						<!ATTLIST rom size CDATA #REQUIRED>
+						<!ATTLIST rom crc CDATA #IMPLIED>
+						<!ATTLIST rom md5 CDATA #IMPLIED>
+						<!ATTLIST rom sha1 CDATA #IMPLIED>
+						<!ATTLIST rom offset CDATA #IMPLIED>
+						<!ATTLIST rom status (baddump|nodump|good) "good">
+						<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload) #IMPLIED>
+]>
+<!--
+Undumped games:
+* Hyperdrome (Telegames 1999)
+
+Undumped Self-Published Titles:
+* Alpine Games (R. & J. Graf)
+* CGE 5th (Songbird Productions, CF30B2)
+* Championship Rally (Songbird Productions, CF2006)
+* Crystal Mines II - Buried Treasure (Songbird Productions, CF2008)
+* Cyber Virus (Songbird Productions, CF2007)
+* Cyber Virus - CinciClassic Edition (Songbird Productions, CF20B1)
+* Lynx Othello (H. Dodgson)
+* MegaPak 1 (Songbird Productions, CF2010)	- too new (2008)
+* PokerMania (MW Software)
+* Ponx (Songbird Productions, CF2002)
+* Remnant - Planar Wars 3D (Songbird Productions, CF2005)
+* SFX - The Ultimate Audio Tool (Songbird Productions, CF2001) 
+* S.I.M.I.S. (B. Schick & M. Domin)
+* SokoMania (MW Software)
+* T-tris (B. Schick)
+
+Known undumped prototypes:
+* Cyber Virus (Beyond Games)
+* Dungeon Slayers (Atari)
+* GeoDuel (Atari)
+* Lode Runner
+* Mechtiles (Atari)
+* Pounce (Atari)
+* Relief Pitcher (Atari)
+* Ultra Vortex (Atari)
+* Vindicators (Atari)
+
+-->
+<softwarelist name="lynx" description="Atari Lynx cartridges">
+	<software name="apb">
+		<description>A.P.B. (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="a.p.b. - all points bulletin (Euro, USA).lnx" size="262208" crc="68a0acab" sha1="4abef1bc702319d4347d839ac8513193164a08a0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avsp">
+		<description>Alien vs Predator (USA, Prototype)</description>
+		<year>199?</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="alien vs predator (usa) (prototype).lnx" size="262208" crc="d6843e8e" sha1="860a73b9484c78330d3502a70bb807d699d540dc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awesomeg">
+		<description>Awesome Golf (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="awesome golf (Euro, USA).lnx" size="262208" crc="2b90e818" sha1="c40ac4cc9a4aade0f7eab4283eed46d5882b35a8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- // Bad dump -->
+	<software name="bbheroes">
+		<description>Baseball Heroes (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="baseball heroes (Euro, USA) [b].lnx" size="262208" crc="400989ea" sha1="5e116d56e1642f107e15bb943416655917fbd607" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basketbr">
+		<description>Basketbrawl (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="basketbrawl (Euro, USA).lnx" size="262208" crc="a41b3d47" sha1="cfe4708a881564b1ad75cdbe6da526c06d19a9c1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="batmanrn">
+		<description>Batman Returns (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="batman returns (Euro, USA).lnx" size="262208" crc="68cd6dcb" sha1="45df55597bae86b9184861d64d1a1d770f1e8c40" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bwheels">
+		<description>Battle Wheels (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Beyond Games</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="battle wheels (Euro, USA).lnx" size="131136" crc="fd5ae3db" sha1="42f8a53fdba03358a65e82db81067e8e9aaba30b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bzone2k">
+		<description>Battlezone 2000 (Euro, USA)</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="battlezone 2000 (Euro, USA).lnx" size="262208" crc="414bda9a" sha1="7edfa01096a61f681dd4bf217ab1f0281c3b33b0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="billted">
+		<description>Bill &amp; Ted's Excellent Adventure (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="bill &amp; ted's excellent adventure (Euro, USA).lnx" size="262208" crc="c91aff8a" sha1="f322d28a6311d84edc36b35083acc07a0ba4660a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blockout">
+		<description>Block Out (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="block out (Euro, USA).lnx" size="131136" crc="c96e5bc6" sha1="2efb86ed51e676a6e59cce3b40e56f408fe84605" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluelghtd" cloneof="bluelght">
+		<description>Blue Lightning (USA, Demo)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="blue lightning (usa) (demo).lnx" size="131136" crc="0bd1b69c" sha1="d95653027c1956085a01541e3164ea637b52f100" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bluelght">
+		<description>Blue Lightning (Euro, USA)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="blue lightning (Euro, USA).lnx" size="131136" crc="35af173c" sha1="fd4dfa7b8822229c0e0c5b0f6cde608f8f94bb65" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bubtroub">
+		<description>Bubble Trouble (Euro, USA)</description>
+		<year>1994</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="bubble trouble (Euro, USA).lnx" size="262208" crc="96df6fa0" sha1="b5c4824271e4a86052d65e0dfeb01b0ada1f3600" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="calgames">
+		<description>California Games (Euro, USA)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="california games (Euro, USA).lnx" size="131136" crc="2918ea2e" sha1="9c89db856a1b85afdb0334d2bc5d9dffa1d3cca2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centiped">
+		<description>Centipede (USA, Prototype)</description>
+		<year>199?</year>
+		<publisher>Shadowsoft</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="centipede (usa) (prototype).lnx" size="131136" crc="70cc4ae8" sha1="9954707eeba52904533cef59e5aae6e196434534" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chekflag">
+		<description>Checkered Flag (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="checkered flag (Euro, USA).lnx" size="262208" crc="6687f846" sha1="848694715135979c022561ef9e4da58b8a67c4f3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chipchal">
+		<description>Chip's Challenge (Euro, USA)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="chip's challenge (Euro, USA).lnx" size="131136" crc="f45f784a" sha1="92af2d566c6bbf626a21dbfa41af16d73e0a774d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crystalm">
+		<description>Crystal Mines II (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="crystal mines ii (Euro, USA).lnx" size="262208" crc="58ff6db3" sha1="e8d6a939a202060a76e0417315c7693631116d57" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daemongt">
+		<description>Daemonsgate (USA, Prototype)</description>
+		<year>199?</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="daemonsgate (usa) (prototype).lnx" size="262208" crc="9e6b7645" sha1="9e9bece7b410f909c661aaff44815b09d3d6b5aa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dstrike">
+		<description>Desert Strike - Return to the Gulf (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="desert strike - return to the gulf (Euro, USA).lnx" size="262208" crc="2eaae973" sha1="1e529493866d6485074233458b40c4e7b0f032ef" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinolymp">
+		<description>Dinolympics (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="dinolympics (Euro, USA).lnx" size="262208" crc="0ed9eb06" sha1="8af3a298ddb7ba235b54891c221ef53a2c89e9db" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dirtylar">
+		<description>Dirty Larry - Renegade Cop (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="dirty larry - renegade cop (Euro, USA).lnx" size="262208" crc="c6017733" sha1="c1d62142fc5094252637dbc6a2355e41d0425fc2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ddragon">
+		<description>Double Dragon (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="double dragon (Euro, USA).lnx" size="262208" crc="bcb2e75a" sha1="1227eb28e6bad3c30b38d3dbfa9f929d836300c5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dracula">
+		<description>Dracula the Undead (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="dracula the undead (Euro, USA).lnx" size="262208" crc="0f4b4071" sha1="824f245004a778613c85d40c9a2785a8cefe4181" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="electroc">
+		<description>Electrocop (Euro, USA)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="electrocop (Euro, USA).lnx" size="131136" crc="765d742d" sha1="c06e983638b4466322a15a367cdaeb56fc2486e6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eurosocc">
+		<description>European Soccer Challenge (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="european soccer challenge (Euro, USA).lnx" size="131136" crc="d714546d" sha1="c3b6ed0e72aa6fcfab0ac72ce682fdd304314dff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eyebehol">
+		<description>Eye of the Beholder (USA, Prototype)</description>
+		<year>199?</year>
+		<publisher>NuFX</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="eye of the beholder (usa) (prototype).lnx" size="131136" crc="a0010717" sha1="6c37e1f220e73ff784b90c81846cebe4db0ab3bc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fatbobby">
+		<description>Fat Bobby (Euro, USA)</description>
+		<year>199?</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="fat bobby (Euro, USA).lnx" size="262208" crc="e2f4da44" sha1="c7230ae604bec950522eb13aa549c3b1c603cebf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fidelity">
+		<description>The Fidelity Ultimate Chess Challenge (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="fidelity ultimate chess challenge, the (Euro, USA).lnx" size="131136" crc="96643baa" sha1="051f95a0c5b60e8c517b8df08f449110ed2bca68" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gatezend">
+		<description>Gates of Zendocon (Euro, USA)</description>
+		<year>1989</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="gates of zendocon, the (Euro, USA).lnx" size="131136" crc="d852dba7" sha1="d89985e2e692b335e3eb1e2a269ac2a2e4b3c8ad" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gauntlet">
+		<description>Gauntlet - The Third Encounter (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="gauntlet - the third encounter (Euro, USA).lnx" size="131136" crc="8e0908e5" sha1="7cf7d08b52784e13d8278d249dcd8975d3714da4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gordo106">
+		<description>Gordo 106 - The Mutated Lab Monkey (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="gordo 106 - the mutated lab monkey (Euro, USA).lnx" size="262208" crc="0671acea" sha1="46fd69c68cb0929a2d21ecc5225390b7425ae3f4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="harddriv">
+		<description>Hard Drivin' (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="hard drivin' (Euro, USA).lnx" size="131136" crc="9add0861" sha1="afe1a2b3ed37596378b2d40f54e1635bf15c5600" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hockey">
+		<description>Hockey (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="hockey (Euro, USA).lnx" size="262208" crc="0904a4d9" sha1="2f2d74cfba54360e7f5555d182a9e9e7f74287e8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydra">
+		<description>Hydra (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="hydra (Euro, USA).lnx" size="262208" crc="8980a322" sha1="5ceb3ad748cd42e181067a191e2b0dccc0325057" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ishido">
+		<description>Ishido - The Way of Stones (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="ishido - the way of stones (Euro, USA).lnx" size="262208" crc="7c58aea4" sha1="f7f2fb564c589fc8499f0aafd21ef13a38135947" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jimmycon">
+		<description>Jimmy Connors' Tennis (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="524352">
+				<rom name="jimmy connors' tennis (Euro, USA).lnx" size="524352" crc="fdd6536d" sha1="eb53241c8cac2456684c4b1fe86aa8c90e765d91" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="joust">
+		<description>Joust (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Williams Entertainment</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="joust (Euro, USA).lnx" size="262208" crc="9f7662c2" sha1="9a72b390ce25ffe8400b7abdedd2ca61d3957cc3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="klax">
+		<description>Klax (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="klax (Euro, USA).lnx" size="262208" crc="ec53a878" sha1="66a04e14e07367a59fb979b25915008ac1602233" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="krazyace">
+		<description>Krazy Ace - Miniature Golf (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="krazy ace - miniature golf (Euro, USA).lnx" size="262208" crc="96c5d9b9" sha1="8ddb2fc5898110f4069a47f91016d4ad3d014ac7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kungfood">
+		<description>Kung Food (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="kung food (Euro, USA).lnx" size="262208" crc="3529d2d7" sha1="ba5f63f558f818d4cf69173c9b00f1b0247a9282" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lemmings">
+		<description>Lemmings (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="lemmings (Euro, USA).lnx" size="262208" crc="a77b6b64" sha1="e61c173116eacecf90d0296c03d8c216be57400c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lexis">
+		<description>Lexis (Euro, USA)</description>
+		<year>1999</year>
+		<publisher>Songbird Productions</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="lexis (Euro, USA).lnx" size="262208" crc="57bd4b4c" sha1="86c0bf4dd546426b844b628cd8f847f3e5e2107b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="loopz">
+		<description>Loopz (USA, Prototype)</description>
+		<year>2004</year>
+		<publisher>Songbird Productions</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="loopz (usa) (prototype).lnx" size="262208" crc="93281104" sha1="fa7ce862c1ea15af4ffcf15e0cccc2a8a84b8e6d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lcasino">
+		<description>Lynx Casino (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="lynx casino (Euro, USA).lnx" size="262208" crc="5539baf4" sha1="a5fb943e2eeece25bc3aaf1e9f6ae5c030672193" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="malibu">
+		<description>Malibu Bikini Volleyball (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="malibu bikini volleyball (Euro, USA).lnx" size="262208" crc="aba3e776" sha1="f47f2aed04ba18152347aa2e0858b56c374c5f71" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="marlboro">
+		<description>Marlboro Go! (Euro, Prototype)</description>
+		<year>1993</year>
+		<publisher>Digital Image</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="marlboro go! (Euro) (prototype).lnx" size="262208" crc="8d484e65" sha1="3d0ee922c3572c9a861fc250082e659e6ebd4c8c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mspacman">
+		<description>Ms. Pac-Man (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="ms. pac-man (Euro, USA).lnx" size="131136" crc="fd071dd6" sha1="26687ae97c5014e681f2ea44f401b314ad61c540" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nflfoot">
+		<description>NFL Football (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="nfl football (Euro, USA).lnx" size="262208" crc="c398359e" sha1="22735fcd59eb028a4041027a369602b0bd968eb5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjag">
+		<description>Ninja Gaiden (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="ninja gaiden (Euro, USA).lnx" size="262208" crc="5adf25f0" sha1="e751c35cce6e2e126ce7ccbd32b148dd6e248809" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ninjag3">
+		<description>Ninja Gaiden III - The Ancient Ship of Doom (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="524352">
+				<rom name="ninja gaiden iii - the ancient ship of doom (Euro, USA).lnx" size="524352" crc="cd2ffbcc" sha1="70f4115a92e3fdc4c93339ac801976a7697397ba" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacland">
+		<description>Pac-Land (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="pac-land (Euro, USA).lnx" size="131136" crc="5b57126a" sha1="ca4f651c9955b756a88d3e7714f033c592fa0f6a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="paperboy">
+		<description>Paperboy (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="paperboy (Euro, USA).lnx" size="131136" crc="d6a4c70b" sha1="7b5150cc095c554b0578bdd9a20caec0a7921547" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pinballj">
+		<description>Pinball Jam (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="pinball jam (Euro, USA).lnx" size="262208" crc="8863c28d" sha1="1f1695acbecf39cf6fd7afa71ce5f5e0ec80934d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pitfight">
+		<description>Pit Fighter - The Ultimate Competition (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="524352">
+				<rom name="pit fighter - the ultimate competition (Euro, USA).lnx" size="524352" crc="cbaf54f3" sha1="d87b768ec219ba468e050d4a6c71ef59854adb28" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="powfactr">
+		<description>Power Factor (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="power factor (Euro, USA).lnx" size="262208" crc="5db41679" sha1="858855f42fd24c692859f43df261dbc0e19f0819" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="qix">
+		<description>Qix (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="qix (Euro, USA).lnx" size="131136" crc="5651e1a8" sha1="ab9545de5b867c930afed570668d03b1ee41a9dd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="raiden">
+		<description>Raiden (USA, v3.0)</description>
+		<year>1997</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="raiden (usa) (v3.0).lnx" size="262208" crc="2702ba4f" sha1="752a58e02787afc145f5245aec3577ad4bff954e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rampage">
+		<description>Rampage (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="rampage (Euro, USA).lnx" size="262208" crc="490033c9" sha1="52a0bf6aa79be75c7f97e4f2998469fb8f1c1596" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rampart">
+		<description>Rampart (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="rampart (Euro, USA).lnx" size="262208" crc="adab7883" sha1="d024992d0032bce698273e81d7276fba9a19f75f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadriot">
+		<description>Road Riot 4WD (USA, Prototype)</description>
+		<year>199?</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="road riot 4wd (usa) (prototype).lnx" size="262208" crc="3bebb6d1" sha1="e6102b29727fd76177efd64c26f40dd6beee6888" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="roadblas">
+		<description>RoadBlasters (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="roadblasters (Euro, USA).lnx" size="262208" crc="47f69051" sha1="bc005446fb9e96848823e8baa722c6a7761783e1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robosqua">
+		<description>Robo-Squash (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="robo-squash (Euro, USA).lnx" size="131136" crc="aeed3e7e" sha1="a5a3204508207929b4b4e29d112b1653bb679b91" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="robotron">
+		<description>Robotron 2084 (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Williams Entertainment</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="robotron 2084 (Euro, USA).lnx" size="131136" crc="28c789c8" sha1="ffc7e5a8d1b9226642e09b91d50cc30534e3c609" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rygar">
+		<description>Rygar - Legendary Warrior (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="rygar - legendary warrior (Euro, USA).lnx" size="262208" crc="1dfca564" sha1="24e14920178e3481f161783b73efca0a1594c8cf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="stunrun">
+		<description>S.T.U.N. Runner (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="s.t.u.n. runner (Euro, USA).lnx" size="262208" crc="4b3bf84f" sha1="3ccd01902f07ab06f9c815ac75a4865a82e78599" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="scrapdog">
+		<description>Scrapyard Dog (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="scrapyard dog (Euro, USA).lnx" size="262208" crc="ca0d1bda" sha1="112e6433deca07dd49e2adf1a436cacfe94af7d6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beast">
+		<description>Shadow of the Beast (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="shadow of the beast (Euro, USA).lnx" size="262208" crc="d43a8430" sha1="f4bda927017465cfd417d5ad8a62fa095cc3a101" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shanghai">
+		<description>Shanghai (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="shanghai (Euro, USA).lnx" size="131136" crc="78ba01fd" sha1="dbc5749a30d05c3fbb7e247d80405dd026bc8add" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="steeltal">
+		<description>Steel Talons (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="steel talons (Euro, USA).lnx" size="262208" crc="ab814832" sha1="2d3536b3c5f3b8aa9dd5d952dbd43beac3043f6f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supaster">
+		<description>Super Asteroids - Missile Command (Euro, USA)</description>
+		<year>1995</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="super asteroids, missile command (Euro, USA).lnx" size="131136" crc="7d8a25d1" sha1="3b36e4e256ceabfd8ef8f86731d01bc191f7d5a7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="superoff">
+		<description>Super Off-Road (Euro, USA)</description>
+		<year>1993</year>
+		<publisher>Telegames</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="super off-road (Euro, USA).lnx" size="262208" crc="c51b7a2f" sha1="825540819ec2dfee70b6d189f13c6c07c39d387d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supskwek">
+		<description>Super Skweek (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="super skweek (Euro, USA).lnx" size="262208" crc="11b712f6" sha1="a6185962f6106bad3b20abe5bd724c6ea8c7ba34" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="switchb2">
+		<description>Switchblade II (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="switchblade ii (Euro, USA).lnx" size="262208" crc="63144491" sha1="01fb0609e292d84de23adee31be44605e9d0503c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toddsadv">
+		<description>Todd's Adventures in Slime World (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="todd's adventures in slime world (Euro, USA).lnx" size="131136" crc="39bf3c25" sha1="a1914219cc572c8e41becd61839abac72e811260" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="toki">
+		<description>Toki (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="toki (Euro, USA).lnx" size="262208" crc="52b94a6c" sha1="9a01844c003e7755bd3b219f028fd2bd9eee1640" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tcyberbl">
+		<description>Tournament Cyberball 2072 (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="tournament cyberball 2072 (Euro, USA).lnx" size="262208" crc="70d0c9bf" sha1="e2d5f95b046ec0950cf872413202ec504dbf5338" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="turbosub">
+		<description>Turbo Sub (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="turbo sub (Euro, USA).lnx" size="131136" crc="5247b5f3" sha1="b56ea80870a19ac3436a66c80447a2aa0ff49d83" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viking">
+		<description>Viking Child (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="viking child (Euro, USA).lnx" size="262208" crc="45969eb0" sha1="2a0a1e303da1d8fc2ea1c59a16398946787614a6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="warbirds">
+		<description>Warbirds (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="warbirds (Euro, USA).lnx" size="131136" crc="a6ae2301" sha1="340e76e14d0d1b961d2c2d2b1b7146381dda3a48" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcsoccer">
+		<description>World Class Soccer (Euro, USA)</description>
+		<year>1992</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="world class soccer (Euro, USA).lnx" size="262208" crc="9d929f2c" sha1="cc2e2a4cefbaa3ec6961a4e23b2f37262f9816c8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xenophob">
+		<description>Xenophobe (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="xenophobe (Euro, USA).lnx" size="131136" crc="922a9dd0" sha1="1f8a8e144d8ea19cfb2ec2f198060ba933b94849" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xybots">
+		<description>Xybots (Euro, USA)</description>
+		<year>1991</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="xybots (Euro, USA).lnx" size="262208" crc="cac9a246" sha1="c3c117db6060d2b99d914e96284d4c2da723d033" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zarlor">
+		<description>Zarlor Mercenary (Euro, USA)</description>
+		<year>1990</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="zarlor mercenary (Euro, USA).lnx" size="131136" crc="35bc4ff9" sha1="24397a46e45ae34d7b06b222c56f950976ab44b6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dragnet">
+		<description>Dragnet</description>
+		<year>1995</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="dragnet (1995).lnx" size="262208" crc="7cdc4f1b" sha1="1333d7f43134d01cc6c62cfe66778b6fc7471dac" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="conquest">
+		<description>Conquest of Zow</description>
+		<year>1996</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="conquest of zow (1996).lnx" size="262208" crc="9ccfdcd0" sha1="41af0a1d8e4aa67b162394abf770e4a812f59a9f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tres">
+		<description>T-RES (title unknown) (199x) [b1]</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="131136">
+				<rom name="t-res (title unknown) (199x) [b1].lnx" size="131136" crc="dd0fe131" sha1="a8d97587a5749d19158d1749ee998c520b7c71fe" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris1">
+		<description>Tetris (1996) [b1]</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="tetris (1996) [b1].lnx" size="262208" crc="f8218bb3" sha1="3b8c1b399307cdb1103cbe6ae5d53f25e07a12c9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris2">
+		<description>Tetris (1996) [b2]</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262175">
+				<rom name="tetris (1996) [b2].lnx" size="262175" crc="8c803b33" sha1="df431f2748f54bdd6b77380712b04fc0dea609c0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris3">
+		<description>Tetris (1996) [b3]</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="tetris (1996) [b3].lnx" size="262208" crc="22bfcedf" sha1="a3c8fbb6ecbe989f589313e3a708f1dd674a8f46" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lynx2tst">
+		<description>Lynx II Production Test Program V0.02 (USA, Prototype)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="lynx_cart">
+			<dataarea name="rom" size="262208">
+				<rom name="lynx ii production test program v0.02 (usa) (prototype).lnx" size="262208" crc="93acf1dc" sha1="d56925c596d47b17a4e778ba5d5475da447872d4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
