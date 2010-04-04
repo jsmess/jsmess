@@ -18,7 +18,8 @@
 
 void mess_display_help(void);
 int info_listmedia(core_options *opts, const char *gamename);
-void mess_match_roms(const char *hash, int length, int *found);
+void mess_match_roms(core_options *options, const char *hash, int length, int *found);
+int info_listsoftware(core_options *opts, const char *gamename);
 
 
 #endif	/* __CLIMESS_H__ */

@@ -10,6 +10,7 @@
 #include "climess.h"
 #include "output.h"
 #include "hash.h"
+#include "xmlfile.h"
 
 
 /*-------------------------------------------------
@@ -109,40 +110,172 @@ int info_listmedia(core_options *options, const char *gamename)
 
 
 /*-------------------------------------------------
+    info_listsoftware - output the list of
+    software supported by a given game or set of
+    games
+	TODO: Avoid outputting lists more than once.
+	TODO: Add DTD.
+-------------------------------------------------*/
+
+int info_listsoftware(core_options *options, const char *gamename)
+{
+	FILE *out = stdout;
+
+	fprintf( out,
+			"<?xml version=\"1.0\"?>\n"
+			"<softwarelists>\n"
+	);
+
+	for ( int drvindex = 0; drivers[drvindex] != NULL; drvindex++ )
+	{
+		if ( mame_strwildcmp( gamename, drivers[drvindex]->name ) == 0 )
+		{
+			/* allocate the machine config */
+			machine_config *config = machine_config_alloc( drivers[drvindex]->machine_config );
+
+			for (const device_config *dev = config->devicelist.first(); dev != NULL; dev = dev->next)
+			{
+				if ( ! strcmp( dev->tag(), __SOFTWARE_LIST_TAG ) )
+				{
+					software_list_config *swlist = (software_list_config *)dev->inline_config;
+
+					for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+					{
+						if ( swlist->list_name[i] )
+						{
+							fprintf(out, "\t<softwarelist name=\"%s\">\n", swlist->list_name[i] );
+
+							software_list *list = software_list_open( options, swlist->list_name[i], FALSE, NULL );
+
+							for ( software_info *swinfo = software_list_first( list ); swinfo != NULL; swinfo = software_list_next( list ) )
+							{
+								fprintf( out, "\t\t<software name=\"%s\"", swinfo->shortname );
+								if ( swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL )
+									fprintf( out, " supported=\"partial\"" );
+								if ( swinfo->supported == SOFTWARE_SUPPORTED_NO )
+									fprintf( out, " supported=\"no\"" );
+								fprintf( out, ">\n" );
+								fprintf( out, "\t\t\t<description>%s</description>\n", xml_normalize_string(swinfo->longname) );
+								fprintf( out, "\t\t\t<year>%s</year>\n", xml_normalize_string( swinfo->year ) );
+								fprintf( out, "\t\t\t<publisher>%s</publisher>\n", xml_normalize_string( swinfo->publisher ) );
+
+								for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
+								{
+									fprintf( out, "\t\t\t<part name=\"%s\"", part->name );
+									if ( part->interface )
+										fprintf( out, " interface=\"%s\"", part->interface );
+									if ( part->feature )
+										fprintf( out, " features=\"%s\"", part->feature );
+									fprintf( out, ">\n");
+
+									/* TODO: display rom region information */
+									for ( const rom_entry *region = part->romdata; region; region = rom_next_region( region ) )
+									{
+										fprintf( out, "\t\t\t\t<dataarea name=\"%s\" size=\"%x\">\n", ROMREGION_GETTAG(region), ROMREGION_GETLENGTH(region) );
+
+										for ( const rom_entry *rom = rom_first_file( region ); rom; rom = rom_next_file( rom ) )
+										{
+											if ( ROMENTRY_ISFILE(rom) )
+											{
+												fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", ROM_GETNAME(rom), ROM_GETLENGTH(rom) );
+
+												/* dump checksum information only if there is a known dump */
+												if (!hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
+												{
+													char checksum[HASH_BUF_SIZE];
+													int hashtype;
+
+													/* iterate over hash function types and print out their values */
+													for (hashtype = 0; hashtype < HASH_NUM_FUNCTIONS; hashtype++)
+														if (hash_data_extract_printable_checksum(ROM_GETHASHDATA(rom), 1 << hashtype, checksum))
+															fprintf(out, " %s=\"%s\"", hash_function_name(1 << hashtype), checksum);
+												}
+
+												fprintf( out, " offset=\"%x\" />\n", ROM_GETOFFSET(rom) );
+											}
+										}
+
+										fprintf( out, "\t\t\t\t</datearea>\n" );
+									}
+
+									fprintf( out, "\t\t\t</part>\n" );
+								}
+
+								fprintf( out, "\t\t</software>\n" );
+							}
+
+							software_list_close( list );
+
+							fprintf(out, "\t</softwarelist>\n" );
+						}
+					}
+				}
+			}
+
+			machine_config_free( config );
+		}
+	}
+
+	fprintf( out, "</softwarelists>\n" );
+
+	return MAMERR_NONE;
+}
+
+
+/*-------------------------------------------------
     match_roms - scan for a matching software ROM by hash
 -------------------------------------------------*/
-void mess_match_roms(const char *hash, int length, int *found)
+void mess_match_roms(core_options *options, const char *hash, int length, int *found)
 {
-	int listnum;
+	int drvindex;
 
-	for ( listnum = 0; software_lists[listnum] != NULL; listnum++ )
+	/* iterate over drivers */
+	for (drvindex = 0; drivers[drvindex] != NULL; drvindex++)
 	{
-		const software_list *swlist = software_lists[listnum];
-		int j;
+		machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
 
-		for ( j = 0; swlist->entries[j].name != NULL; j++ )
+		for (const device_config *dev = config->devicelist.first(); dev != NULL; dev = dev->next)
 		{
-			const software_entry *sw = &swlist->entries[j];
-			const rom_entry *region, *rom;
-
-			for (region = &sw->rom_info[0]; region; region = rom_next_region(region))
+			if ( ! strcmp( dev->tag(), __SOFTWARE_LIST_TAG ) )
 			{
-				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
-				{
-					if (hash_data_is_equal(hash, ROM_GETHASHDATA(rom), 0))
-					{
-						int baddump = hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP);
+				software_list_config *swlist = (software_list_config *)dev->inline_config;
 
-						/* output information about the match */
-						if (*found != 0)
-							mame_printf_info("                    ");
-						mame_printf_info("= %s%-20s  %-10s %s [%s]\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), sw->name, sw->fullname, swlist->name);
-						(*found)++;
+				for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+				{
+					if ( swlist->list_name[i] )
+					{
+						software_list *list = software_list_open( options, swlist->list_name[i], FALSE, NULL );
+
+						for ( software_info *swinfo = software_list_first( list ); swinfo != NULL; swinfo = software_list_next( list ) )
+						{
+							for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
+							{
+								for ( const rom_entry *region = part->romdata; region; region = rom_next_region(region) )
+								{
+									for ( const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom) )
+									{
+										if ( hash_data_is_equal(hash, ROM_GETHASHDATA(rom), 0) )
+										{
+											int baddump = hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP);
+
+											/* output information about the match */
+											if (*found != 0)
+												mame_printf_info("                    ");
+											mame_printf_info("= %s%-20s  %s:%s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), swlist->list_name[i], swinfo->shortname, swinfo->longname);
+											(*found)++;
+										}
+									}
+								}
+							}
+						}
+
+						software_list_close( list );
 					}
 				}
 			}
 		}
+
+		machine_config_free(config);
 	}
 }
-
 
