@@ -41,16 +41,14 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 
 static UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
 
-static UINT8 *nvptr;
-static UINT32 nvsize = 0;
-static running_device *nvimage;
-
 static void gba_machine_stop(running_machine *machine)
 {
+	gba_state *state = (gba_state *)machine->driver_data;
+
 	// only do this if the cart loader detected some form of backup
-	if (nvsize > 0)
+	if (state->nvsize > 0)
 	{
-		image_battery_save(nvimage, nvptr, nvsize);
+		image_battery_save(state->nvimage, state->nvptr, state->nvsize);
 	}
 }
 
@@ -2012,7 +2010,7 @@ static MACHINE_RESET( gba )
 
 	memset(state, 0, sizeof(state));
 	state->SOUNDBIAS = 0x0200;
-	state->flash64k_state = FLASH_IDLEBYTE0;
+	state->flash_state = FLASH_IDLEBYTE0;
 	state->eeprom_state = EEP_IDLE;
 	state->SIOMULTI0 = 0xffff;
 	state->SIOMULTI1 = 0xffff;
@@ -2109,10 +2107,11 @@ static WRITE32_HANDLER( sram_w )
 	COMBINE_DATA(&state->gba_sram[offset]);
 }
 
-static READ32_HANDLER( flash64k_r )
+static READ32_HANDLER( flash_r )
 {
 	gba_state *state = (gba_state *)space->machine->driver_data;
-	switch( state->flash64k_state )
+
+	switch (state->flash_state)
 	{
 		case FLASH_IDLEBYTE0:
 		case FLASH_IDLEBYTE1:
@@ -2120,126 +2119,113 @@ static READ32_HANDLER( flash64k_r )
 		case FLASH_ERASEBYTE0:
 		case FLASH_ERASEBYTE1:
 		case FLASH_ERASEBYTE2:
-		        return state->gba_flash64k[offset];
+			return state->gba_flash[offset];
 		case FLASH_IDENT:
-		        if( offset == 0 )
-		        {
-		        return ( state->gba_flash64k[0] & 0xffff0000 ) | 0x00001b32;
-		        }
-		        else
-		        {
-		        return state->gba_flash64k[offset];
-		        }
-		        return 0x00001b32;
+			if (offset == 0)
+				return (state->gba_flash[0] & 0xffff0000) | state->flash_id;
+			else
+				return state->gba_flash[offset];
 		case FLASH_ERASE_ALL:
 		case FLASH_ERASE_4K:
-		        return state->gba_flash64k[offset];
+			return state->gba_flash[offset];
 	}
-	return state->gba_flash64k[offset];
+	return state->gba_flash[offset];
 }
 
-static WRITE32_HANDLER( flash64k_w )
+static WRITE32_HANDLER( flash_w )
 {
 	gba_state *state = (gba_state *)space->machine->driver_data;
 
-	switch( state->flash64k_state )
+	switch (state->flash_state)
 	{
 		case FLASH_IDLEBYTE0:
 		case FLASH_ERASEBYTE0:
-		        if( offset == 0x5555/4 && ~mem_mask == 0xffff00ff )
-		        {
-		        if( ( data & mem_mask ) == 0x0000aa00 )
-		        {
-		                if( state->flash64k_state == FLASH_IDLEBYTE0 )
-		                {
-			                state->flash64k_state = FLASH_IDLEBYTE1;
-		                }
-		                else if( state->flash64k_state == FLASH_ERASEBYTE0 )
-		                {
-			                state->flash64k_state = FLASH_ERASEBYTE1;
-		                }
-		        }
-		        }
-		        break;
+			if (offset == 0x5555/4 && ~mem_mask == 0xffff00ff)
+			{
+				if ((data & mem_mask) == 0x0000aa00)
+				{
+					if (state->flash_state == FLASH_IDLEBYTE0 )
+						state->flash_state = FLASH_IDLEBYTE1;
+					else if (state->flash_state == FLASH_ERASEBYTE0)
+						state->flash_state = FLASH_ERASEBYTE1;
+				}
+			}
+			break;
 		case FLASH_IDLEBYTE1:
 		case FLASH_ERASEBYTE1:
-		        if( offset == 0x2aaa/4 && ~mem_mask == 0xff00ffff )
-		        {
-		        if( ( data & mem_mask ) == 0x00550000 )
-		        {
-		                if( state->flash64k_state == FLASH_IDLEBYTE1 )
-		                {
-			                state->flash64k_state = FLASH_IDLEBYTE2;
-		                }
-		                else if( state->flash64k_state == FLASH_ERASEBYTE1 )
-		                {
-			                state->flash64k_state = FLASH_ERASEBYTE2;
-		                }
-		        }
-		        }
-		        break;
+			if (offset == 0x2aaa/4 && ~mem_mask == 0xff00ffff)
+			{
+				if ((data & mem_mask) == 0x00550000)
+				{
+					if (state->flash_state == FLASH_IDLEBYTE1)
+						state->flash_state = FLASH_IDLEBYTE2;
+					else if (state->flash_state == FLASH_ERASEBYTE1)
+						state->flash_state = FLASH_ERASEBYTE2;
+				}
+			}
+			break;
 		case FLASH_IDLEBYTE2:
 		case FLASH_ERASEBYTE2:
-		        if( offset == 0x5555/4 && ~mem_mask == 0xffff00ff )
-		        {
-			        if( state->flash64k_state == FLASH_IDLEBYTE2 )
-			        {
-			                switch( ( data & mem_mask ) >> 8 )
-			                {
-			                case 0x80:
-			                        state->flash64k_state = FLASH_ERASEBYTE0;
-			                        break;
-			                case 0x90:
-			                        state->flash64k_state = FLASH_IDENT;
-			                        break;
-			                case 0xa0:
-			                        state->flash64k_state = FLASH_WRITE;
-			                        break;
-			                }
-			        }
-			        else if( state->flash64k_state == FLASH_ERASEBYTE2 )
-			        {
-			                if( ( data & mem_mask ) == 0x00001000 )
-			                {
-				                UINT32 flashWord;
-				                for( flashWord = 0; flashWord < 0x10000/4; flashWord++ )
-				                {
-				                        state->gba_flash64k[flashWord] = 0xffffffff;
-				                }
-				                state->flash64k_state = FLASH_ERASE_ALL;
-			                }
-			        }
-		        }
-		        else if( ( offset & 0xffffc3ff ) == 0 && ( data & mem_mask ) == 0x00000030 )
-		        {
-			        UINT32 flashWord;
-			        state->flash64k_page = offset >> 10;
-			        for( flashWord = offset; flashWord < offset + 0x1000/4; flashWord++ )
-			        {
-			                state->gba_flash64k[flashWord] = 0xffffffff;
-			        }
-			        state->flash64k_state = FLASH_ERASE_4K;
-		        }
-		        break;
+			if (offset == 0x5555/4 && ~mem_mask == 0xffff00ff)
+			{
+				if (state->flash_state == FLASH_IDLEBYTE2)
+				{
+					switch ((data & mem_mask) >> 8)
+					{
+					case 0x80:
+						state->flash_state = FLASH_ERASEBYTE0;
+						break;
+					case 0x90:
+						state->flash_state = FLASH_IDENT;
+						break;
+					case 0xa0:
+						state->flash_state = FLASH_WRITE;
+						break;
+					}
+				}
+				else if (state->flash_state == FLASH_ERASEBYTE2)
+				{
+					if ((data & mem_mask) == 0x00001000)
+					{
+						UINT32 flashWord;
+						for (flashWord = 0; flashWord < state->flash_size/4; flashWord++)
+						{
+							state->gba_flash[flashWord] = 0xffffffff;
+						}
+						state->flash_state = FLASH_ERASE_ALL;
+					}
+				}
+			}
+			else if ((offset & 0xffffc3ff) == 0 && (data & mem_mask) == 0x00000030)
+			{
+				UINT32 flashWord;
+				state->flash_page = offset >> 10;
+				for (flashWord = offset; flashWord < offset + 0x1000/4; flashWord++)
+				{
+					state->gba_flash[flashWord] = 0xffffffff;
+				}
+				state->flash_state = FLASH_ERASE_4K;
+			}
+			break;
 		case FLASH_IDENT:
-		        // Hack; any sensibly-written game should follow up with the relevant read, which will reset the state to FLASH_IDLEBYTE0.
-		        state->flash64k_state = FLASH_IDLEBYTE0;
-		        flash64k_w( space, offset, data, ~mem_mask );
-		        break;
+			// Hack; any sensibly-written game should follow up with the relevant read, which will reset the state to FLASH_IDLEBYTE0.
+			state->flash_state = FLASH_IDLEBYTE0;
+			flash_w(space, offset, data, ~mem_mask);
+			break;
 		case FLASH_ERASE_4K:
-		        // Hack; any sensibly-written game should follow up with the relevant read, which will reset the state to FLASH_IDLEBYTE0.
-		        state->flash64k_state = FLASH_IDLEBYTE0;
-		        flash64k_w( space, offset, data, ~mem_mask );
-		        break;
+			// Hack; any sensibly-written game should follow up with the relevant read, which will reset the state to FLASH_IDLEBYTE0.
+			state->flash_state = FLASH_IDLEBYTE0;
+			flash_w(space, offset, data, ~mem_mask);
+			break;
 		case FLASH_ERASE_ALL:
-		        // Hack; any sensibly-written game should follow up with the relevant read, which will reset the state to FLASH_IDLEBYTE0.
-		        state->flash64k_state = FLASH_IDLEBYTE0;
-		        flash64k_w( space, offset, data, ~mem_mask );
-		        break;
+			// Hack; any sensibly-written game should follow up with the relevant read, which will reset the state to FLASH_IDLEBYTE0.
+			state->flash_state = FLASH_IDLEBYTE0;
+			flash_w(space, offset, data, ~mem_mask);
+			break;
 		case FLASH_WRITE:
-		        COMBINE_DATA(&state->gba_flash64k[offset]);
-		        state->flash64k_state = FLASH_IDLEBYTE0;
-		        break;
+			COMBINE_DATA(&state->gba_flash[offset]);
+			state->flash_state = FLASH_IDLEBYTE0;
+			break;
 	}
 }
 
@@ -2393,8 +2379,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	int i;
 	gba_state *state = (gba_state *)image->machine->driver_data;
 
-	nvsize = 0;
-	nvptr = (UINT8 *)NULL;
+	state->nvsize = 0;
+	state->nvptr = (UINT8 *)NULL;
 
 	image_fread(image, ROM, image_length(image));
 
@@ -2402,10 +2388,10 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	{
 		if (!memcmp(&ROM[i], "EEPROM_", 7))
 		{
-			nvptr = (UINT8 *)&state->gba_eeprom;
-			nvsize = 0x2000;
+			state->nvptr = (UINT8 *)&state->gba_eeprom;
+			state->nvsize = 0x2000;
 
-			if (image_length(image) <= (16*1024*1024))
+			if (image_length(image) <= (16 * 1024 * 1024))
 			{
 				memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
 				memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
@@ -2419,8 +2405,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		}
 		else if (!memcmp(&ROM[i], "SRAM_", 5))
 		{
-			nvptr = (UINT8 *)&state->gba_sram;
-			nvsize = 0x10000;
+			state->nvptr = (UINT8 *)&state->gba_sram;
+			state->nvsize = 0x10000;
 
 			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
 			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
@@ -2428,16 +2414,24 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		}
 		else if (!memcmp(&ROM[i], "FLASH1M_", 8))
 		{
-			mame_printf_verbose("game has 1M FLASH\n");
+			state->nvptr = (UINT8 *)&state->gba_flash;
+			state->nvsize = 0x20000;
+			state->flash_size = 0x20000;
+			state->flash_id = 0x1362;
+
+			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_r);
+			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "FLASH", 5))
 		{
-			nvptr = (UINT8 *)&state->gba_flash64k;
-			nvsize = 0x10000;
+			state->nvptr = (UINT8 *)&state->gba_flash;
+			state->nvsize = 0x10000;
+			state->flash_size = 0x10000;
+			state->flash_id = 0x1b32;
 
-			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash64k_r);
-			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash64k_w);
+			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash_r);
+			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe007fff, 0, 0, flash_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
@@ -2448,15 +2442,15 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	}
 
 	// if save media was found, reload it
-	if (nvsize > 0)
+	if (state->nvsize > 0)
 	{
-		image_battery_load(image, nvptr, nvsize);
-		nvimage = image;
+		image_battery_load(image, state->nvptr, state->nvsize);
+		state->nvimage = image;
 	}
 	else
 	{
-		nvimage = NULL;
-		nvsize = 0;
+		state->nvimage = NULL;
+		state->nvsize = 0;
 	}
 
 	// mirror the ROM

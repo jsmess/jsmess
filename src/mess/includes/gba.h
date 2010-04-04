@@ -199,11 +199,18 @@ public:
 
 	UINT32 gba_sram[0x10000/4];
 	UINT8 gba_eeprom[0x2000];
-	UINT32 gba_flash64k[0x10000/4];
-	UINT8 flash64k_state;
-	UINT8 flash64k_page;
+	UINT32 gba_flash[0x20000/4];
+	UINT32 flash_size;	// 64k or 128k
+	UINT8 flash_state;
+	UINT8 flash_page;
+	UINT16 flash_id;
 	int eeprom_state, eeprom_command, eeprom_count, eeprom_addr, eeprom_bits;
 	UINT8 eep_data;
+
+	/* nvram-specific for MESS */
+	UINT8 *nvptr;
+	UINT32 nvsize;
+	running_device *nvimage;
 
 	emu_timer *dma_timer[4], *tmr_timer[4], *irq_timer;
 	emu_timer *scan_timer, *hbl_timer;
