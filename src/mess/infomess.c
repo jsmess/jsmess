@@ -16,6 +16,8 @@
 #include "infomess.h"
 #include "device.h"
 #include "devices/messram.h"
+#include "softlist.h"
+
 
 /*************************************
  *
@@ -28,7 +30,7 @@
     MESS-specific devices
 -------------------------------------------------*/
 
-void print_game_device(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_device(FILE *out, const game_driver *game, const machine_config *config)
 {
 	const device_config *dev;
 	image_device_info info;
@@ -52,6 +54,9 @@ void print_game_device(FILE *out, const game_driver *game, const machine_config 
 			/* is this device mandatory? */
 			if (info.must_be_loaded)
 				fprintf(out, " mandatory=\"1\"");
+
+			if (info.interface_name[0] )
+				fprintf(out, " interface=\"%s\"", xml_normalize_string(info.interface_name));
 
 			/* close the XML tag */
 			fprintf(out, ">\n");
@@ -86,7 +91,7 @@ void print_game_device(FILE *out, const game_driver *game, const machine_config 
     print_game_ramoptions - prints out all RAM
     options for this system
 -------------------------------------------------*/
-void print_game_ramoptions(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_ramoptions(FILE *out, const game_driver *game, const machine_config *config)
 {
 	const device_config *device;
 
@@ -113,3 +118,42 @@ void print_game_ramoptions(FILE *out, const game_driver *game, const machine_con
 		}
 	}
 }
+
+
+/*-------------------------------------------------
+    print_game_software_list - print the information
+    for all known software lists for this system
+-------------------------------------------------*/
+
+static void print_game_software_list(FILE *out, const game_driver *game, const machine_config *config)
+{
+	for (const device_config *dev = config->devicelist.first(); dev != NULL; dev = dev->next)
+	{
+		if ( ! strcmp( dev->tag(), __SOFTWARE_LIST_TAG ) )
+		{
+			software_list_config *swlist = (software_list_config *)dev->inline_config;
+
+			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+			{
+				if ( swlist->list_name[i] )
+				{
+					fprintf(out, "\t\t<softwarelist name=\"%s\" />\n", swlist->list_name[i] );
+				}
+			}
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    print_mess_game_xml - print MESS specific game
+    information.
+-------------------------------------------------*/
+
+void print_mess_game_xml(FILE *out, const game_driver *game, const machine_config *config)
+{
+	print_game_device( out, game, config );
+	print_game_ramoptions( out, game, config );
+	print_game_software_list( out, game, config );
+}
+
