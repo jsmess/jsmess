@@ -66,6 +66,28 @@
 		</part>
 	</software>
 
+	<software name="bouldash">
+		<description>Boulder Dash</description>
+		<year>1985</year>
+		<publisher>Epoch></publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="boulder_dash.bin" size="16384" crc="e045884c" sha1="55942e5b7824314b072b7b40c6b72db0d5404189" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comicirc">
+		<description>Comic Circus</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="comic_circus.bin" size="16384" crc="ea55faed" sha1="2e4ceb2bf68d26c263c3d1c63f7e2143ef2355bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elevfght">
 		<description>Elevator Fight</description>
 		<year>1984</year>
@@ -73,6 +95,17 @@
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="elevfght.bin" size="16384" crc="72dd6031" sha1="8b2c185408309ee1e75d40299c003041db17b133" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="minr2049">
+		<description>Miner 2049er</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="miner_2049er.bin" size="16384" crc="b0ffc6e2" sha1="0414878f4aedade180b273257497c1d11cdccb2f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -88,6 +121,18 @@
 		</part>
 	</software>
 
+	<software name="popchips">
+		<description>Pop and Chips</description>
+		<year>198?</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<!-- 8kb RAM -->
+			<dataarea name="rom" size="32768">
+				<rom name="popchips.bin" size="32768" crc="cc4fb04d" sha1="5979abd6051d531eafe1ea3b37c97ce2e3e97f8e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="punchboy">
 		<description>Punch Boy</description>
 		<year>1984</year>
@@ -95,6 +140,28 @@
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="punchboy.bin" size="16384" crc="4107f03a" sha1="e7391c71ba7deede3db22191ea058ccf429d7bb5" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rgmahjon">
+		<description>Real Graphic Mahjongg</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="real_graphic_mahjong.bin" size="16384" crc="d3d9106c" sha1="7190ff2944c1ffbde6866e720417b86b3844ffa2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sansupyu">
+		<description>Sansupyuta/Super Professor</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sansupyuta.bin" size="32768" crc="6e7e01b5" sha1="dc05257c831cffa5ec66302c88e1d45a92c6dc9c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -148,24 +215,18 @@
 
 <!--
 	/* Basic Nyuumon */
-	/* Boulder Dash */
-	/* Comic Circus */
 	/* Doraemon */
 	/* Dragon Ball */
 	/* Dragon Slayer */
 	/* Lupin III */
 	/* Mappy */
 	/* Milky Princess */
-	/* Miner 2049er */
 	/* Nekketsu Kung Fu Road */
 	/* Pole Position II */
-	/* Pop and Chips */
 	/* Rantou Pro Wrestling */
 	/* Shogi Nyuumon */
 	/* Sky Kid */
 	/* Star Speeder */
-	/* Super Mahjong */
-	/* Super Sansuu-Puter */
 	/* Ton Ton Ball */
 	/* Wai Wai Monster Land */
 -->
