@@ -6,6 +6,20 @@
 
     Brett Selwood, Andrew Davies (technical assistance)
 
+    Various fixes by Robbbert.
+
+    Thanks to The Bee Board (http://microbee.no-ip.com/beeboard), who
+    through a very dedicated community, have provided us with rom dumps,
+    software, technical documents and general information.
+
+    Also thanks to the author of the "ubee512" emulator for his help.
+
+    Floppy Disk types (as used by ubee512)
+    - ss80 - single sided 80 track
+    - ds40 - double-sided 40 track - 400KB
+    - ds80, ds82, ds84 - double sided 80 track - 800KB
+    - dsk - various - 211KB, 421KB, 841KB
+
     Microbee Standard / Plus memory map
 
         0000-7FFF RAM
@@ -52,7 +66,6 @@
     - Printer is working, but with improper code. This needs to be fixed.
     - Other models to be added (64k, 128k, 256k, 512k, PPC85, Teleterm)
     - Roms for mbeepc to be checked (I think they are correct)
-    - Diskette code to be checked and made working
 
     Notes about the printer:
     - When computer turned on, defaults to 1200 baud serial printer
