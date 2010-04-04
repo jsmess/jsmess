@@ -811,9 +811,7 @@ static int image_load_internal(running_device *image, const char *path,
         mame_schedule_hard_reset(machine);
 
 	/* Check if there's a software list defined for this device and use that if we're not creating an image */
-#if 0
 	if ( is_create || !load_software_part( image, path, &slot->software_info_ptr, &slot->software_part_ptr, &slot->full_software_name ) )
-#endif
 	{
 		/* determine open plan */
 		determine_open_plan(slot, is_create, open_plan);

@@ -972,6 +972,7 @@ bool load_software_part(running_device *device, const char *path, software_info 
 		}
 	}
 
+#if 0
 	if ( software_part_ptr )
 	{
 		/* Load the software part */
@@ -999,6 +1000,7 @@ bool load_software_part(running_device *device, const char *path, software_info 
 
 		result = true;
 	}
+#endif
 
 	/* Close the software list if it's still open */
 	if ( software_list_ptr )
