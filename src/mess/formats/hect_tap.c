@@ -280,7 +280,7 @@ static casserr_t hector_k7forth_load(cassette_image *cassette)
 
 static const struct CassetteFormat hector_k7_format =
 {
-	"k7",
+	"k7,cin",
 	hector_k7_identify,
 	hector_k7_load,
 	NULL
