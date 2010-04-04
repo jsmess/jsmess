@@ -372,7 +372,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		UINT16 gcr_track_size;
 		UINT8 *gcr_track_data;
 		UINT64 gcr_pos = G64_DATA_START;
-		int error_offset = 0;
+		//int error_offset = 0;
 
 		/* determine logical track number */
 		int dos_track = get_dos_track(track);
@@ -505,7 +505,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 				gcr_track_data[gcr_pos + i] = 0x55;
 			gcr_pos += 14;
 
-			error_offset++;
+			//error_offset++;
 		}
 
 		/* copy GCR track data to buffer */

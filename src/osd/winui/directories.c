@@ -215,7 +215,6 @@ static void UpdateDirectoryList(HWND hDlg)
 	LV_ITEM Item;
 	HWND	hList  = GetDlgItem(hDlg, IDC_DIR_LIST);
 	HWND	hCombo = GetDlgItem(hDlg, IDC_DIR_COMBO);
-	int		res;
 	BOOL	b_res;
 
 	/* Remove previous */
@@ -231,17 +230,17 @@ static void UpdateDirectoryList(HWND hDlg)
 	if (IsMultiDir(nType))
 	{
 		Item.pszText = (TCHAR*) TEXT(DIRLIST_NEWENTRYTEXT);
-		res = ListView_InsertItem(hList, &Item);
+		(void)ListView_InsertItem(hList, &Item);
 		for (i = DirInfo_NumDir(g_pDirInfo, nType) - 1; 0 <= i; i--)
 		{
 			Item.pszText = DirInfo_Path(g_pDirInfo, nType, i);
-			res = ListView_InsertItem(hList, &Item);
+			(void)ListView_InsertItem(hList, &Item);
 		}
 	}
 	else
 	{
 		Item.pszText = DirInfo_Dir(g_pDirInfo, nType);
-		res = ListView_InsertItem(hList, &Item);
+		(void)ListView_InsertItem(hList, &Item);
 	}
 
 	/* select first one */

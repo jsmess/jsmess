@@ -38,7 +38,6 @@ static int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 	LV_ITEM lvi;
 	TCHAR	buf[80];
 	//int 	nFrom, nTo;
-	int 	res;
 	BOOL 	b_res;
 
 	//nFrom = ListView_GetItemCount(hFrom);
@@ -61,7 +60,7 @@ static int DoExchangeItem(HWND hFrom, HWND hTo, int nMinItem)
 		// Add this item to the Show and delete it from Available
 		b_res = ListView_DeleteItem(hFrom, lvi.iItem);
 		lvi.iItem = ListView_GetItemCount(hTo);
-		res = ListView_InsertItem(hTo, &lvi);
+		(void)ListView_InsertItem(hTo, &lvi);
 		ListView_SetItemState(hTo, lvi.iItem,
 							  LVIS_FOCUSED | LVIS_SELECTED,
 							  LVIS_FOCUSED | LVIS_SELECTED);
@@ -76,7 +75,6 @@ static void DoMoveItem( HWND hWnd, BOOL bDown)
 	LV_ITEM lvi;
 	TCHAR	buf[80];
 	int 	nMaxpos;
-	int		res;
 	BOOL 	b_res;
 	
 	lvi.iItem = ListView_GetNextItem(hWnd, -1, LVIS_SELECTED | LVIS_FOCUSED);
@@ -98,7 +96,7 @@ static void DoMoveItem( HWND hWnd, BOOL bDown)
 		// Add this item to the Show and delete it from Available
 		b_res = ListView_DeleteItem(hWnd, lvi.iItem);
 		lvi.iItem += (bDown) ? 1 : -1;
-		res = ListView_InsertItem(hWnd,&lvi);
+		(void)ListView_InsertItem(hWnd,&lvi);
 		ListView_SetItemState(hWnd, lvi.iItem,
 							  LVIS_FOCUSED | LVIS_SELECTED,
 							  LVIS_FOCUSED | LVIS_SELECTED);
@@ -130,7 +128,6 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 	int         i, nCount = 0;
 	LV_ITEM     lvi;
 	DWORD		dwShowStyle, dwAvailableStyle, dwView;
-	int			res;
 	BOOL		b_res;
 
 	switch (Msg)
@@ -183,13 +180,13 @@ INT_PTR InternalColumnDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lPar
 			if (shown[order[i]])
 			{
 				lvi.iItem = nShown;
-				res = ListView_InsertItem(hShown, &lvi);
+				(void)ListView_InsertItem(hShown, &lvi);
 				nShown++;
 			}
 			else
 			{
 				lvi.iItem = nAvail;
-				res = ListView_InsertItem(hAvailable, &lvi);
+				(void)ListView_InsertItem(hAvailable, &lvi);
 				nAvail++;
 			}
 		}
