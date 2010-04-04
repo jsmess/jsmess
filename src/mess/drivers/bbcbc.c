@@ -141,8 +141,8 @@ static DEVICE_IMAGE_LOAD( bbcbc_cart )
 	}
 	else
 	{
-		UINT8 *reg = image_get_software_region( image, CARTRIDGE_REGION_ROM );
-		int reg_len = image_get_software_region_length( image, CARTRIDGE_REGION_ROM );
+		UINT8 *reg = image_get_software_region( image, "rom" );
+		int reg_len = image_get_software_region_length( image, "rom" );
 
 		memcpy( cart, reg, MIN(reg_len, 0x8000) );
 	}

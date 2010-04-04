@@ -57,7 +57,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 	}
 	else
 	{
-		cart = image_get_software_region( image, CARTRIDGE_REGION_ROM );
+		cart = image_get_software_region( image, "rom" );
 	}
 
 	memory_set_bankptr( image->machine, "bank1", cart );

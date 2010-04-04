@@ -118,12 +118,4 @@ int cartslot_get_resource_length(running_device *device, const char *socket_name
 	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, interface, _interface )
 
 
-/***************************************************************************
-    FREQUENTLY OCCURING REGION NAMES
-***************************************************************************/
-
-#define CARTRIDGE_REGION_ROM	"rom"
-#define CARTRIDGE_REGION_CHR	"chr"
-#define CARTRIDGE_REGION_PRG	"prg"
-
 #endif /* __CARTSLOT_H__ */
