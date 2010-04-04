@@ -162,8 +162,8 @@ int info_listsoftware(core_options *options, const char *gamename)
 								for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
 								{
 									fprintf( out, "\t\t\t<part name=\"%s\"", part->name );
-									if ( part->interface )
-										fprintf( out, " interface=\"%s\"", part->interface );
+									if ( part->interface_ )
+										fprintf( out, " interface=\"%s\"", part->interface_ );
 									if ( part->feature )
 										fprintf( out, " features=\"%s\"", part->feature );
 									fprintf( out, ">\n");

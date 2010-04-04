@@ -19,7 +19,7 @@ typedef struct _software_part software_part;
 struct _software_part
 {
 	const char *name;
-	const char *interface;
+	const char *interface_;
 	const char *feature;
 	struct rom_entry *romdata;
 };
@@ -50,7 +50,7 @@ software_info *software_list_first(software_list *swlist);
 software_info *software_list_find(software_list *swlist, const char *software);
 software_info *software_list_next(software_list *swlist);
 
-software_part *software_find_part(software_info *sw, const char *partname, const char *interface);
+software_part *software_find_part(software_info *sw, const char *partname, const char *interface_);
 software_part *software_part_next(software_part *part);
 
 

@@ -255,7 +255,7 @@ static void add_software_part(software_list *swlist, const char *name, const cha
 	software_part *part = &swlist->softinfo->partdata[swlist->current_part_entry];
 
 	part->name = name;
-	part->interface = interface;
+	part->interface_ = interface;
 	part->feature = feature;
 	part->romdata = NULL;
 
@@ -783,7 +783,7 @@ software_part *software_find_part(software_info *sw, const char *partname, const
 				{
 					if ( interface )
 					{
-						if ( !strcmp(interface, part->interface) )
+						if ( !strcmp(interface, part->interface_) )
 						{
 							break;
 						}
@@ -799,7 +799,7 @@ software_part *software_find_part(software_info *sw, const char *partname, const
 				/* No specific partname supplied, find the first match based on interface */
 				if ( interface )
 				{
-					if ( !strcmp(interface, part->interface) )
+					if ( !strcmp(interface, part->interface_) )
 					{
 						break;
 					}
@@ -989,8 +989,8 @@ bool load_software_part(running_device *device, const char *path, software_info 
 
 		*sw_part = auto_alloc_clear( device->machine, software_part );
 		(*sw_part)->name = auto_strdup( device->machine, software_part_ptr->name );
-		if ( software_part_ptr->interface )
-			(*sw_part)->interface = auto_strdup( device->machine, software_part_ptr->interface );
+		if ( software_part_ptr->interface_ )
+			(*sw_part)->interface_ = auto_strdup( device->machine, software_part_ptr->interface_ );
 		if ( software_part_ptr->feature )
 			(*sw_part)->feature = auto_strdup( device->machine, software_part_ptr->feature );
 
