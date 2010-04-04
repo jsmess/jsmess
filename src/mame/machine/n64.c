@@ -2010,10 +2010,10 @@ MACHINE_START( n64 )
 	/* configure fast RAM regions for DRC */
 	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x007fffff, FALSE, rdram);
 
-	rspdrc_set_options(devtag_get_device(machine, "rsp"), 0);
-	rspdrc_add_imem(devtag_get_device(machine, "rsp"), rsp_imem);
-	rspdrc_add_dmem(devtag_get_device(machine, "rsp"), rsp_dmem);
-	rspdrc_flush_drc_cache(devtag_get_device(machine, "rsp"));
+	//rspdrc_set_options(devtag_get_device(machine, "rsp"), 0);
+	//rspdrc_add_imem(devtag_get_device(machine, "rsp"), rsp_imem);
+	//rspdrc_add_dmem(devtag_get_device(machine, "rsp"), rsp_dmem);
+	//rspdrc_flush_drc_cache(devtag_get_device(machine, "rsp"));
 
 	audio_timer = timer_alloc(machine, audio_timer_callback, NULL);
 }
