@@ -324,7 +324,6 @@ DRVLIBS = \
 	$(MESSOBJ)/mattel.a \
 	$(MESSOBJ)/mchester.a \
 	$(MESSOBJ)/memotech.a \
-	$(MESSOBJ)/messsoft.o \
 	$(MESSOBJ)/mgu.a \
 	$(MESSOBJ)/microkey.a \
 	$(MESSOBJ)/mit.a \
@@ -368,7 +367,6 @@ DRVLIBS = \
 	$(MESSOBJ)/skeleton.a \
 	$(MESSOBJ)/snk.a \
 	$(MESSOBJ)/softlist.o \
-	$(MESSOBJ)/software.a \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
 	$(MESSOBJ)/special.a \
@@ -1718,35 +1716,6 @@ $(MESS_DRIVERS)/z80ne.o:	$(MESS_LAYOUT)/z80ne.lh   \
 							$(MESS_LAYOUT)/z80net.lh  \
 							$(MESS_LAYOUT)/z80netb.lh \
 							$(MESS_LAYOUT)/z80netf.lh
-
-
-#-------------------------------------------------
-# software information
-#-------------------------------------------------
-
-$(MESSOBJ)/software.a:					\
-	$(MESS_SOFTWARE)/32x_cart.o	\
-	$(MESS_SOFTWARE)/advision_cart.o	\
-	$(MESS_SOFTWARE)/bbcbc_cart.o		\
-	$(MESS_SOFTWARE)/crvision_cart.o	\
-	$(MESS_SOFTWARE)/gamecom_cart.o	\
-	$(MESS_SOFTWARE)/gamegear_cart.o	\
-	$(MESS_SOFTWARE)/gamepock_cart.o	\
-	$(MESS_SOFTWARE)/gmaster_cart.o	\
-	$(MESS_SOFTWARE)/jaguar_cart.o	\
-	$(MESS_SOFTWARE)/lynx_cart.o	\
-	$(MESS_SOFTWARE)/megadriv_cart.o	\
-	$(MESS_SOFTWARE)/ngp_cart.o	\
-	$(MESS_SOFTWARE)/pasogo_cart.o	\
-	$(MESS_SOFTWARE)/pico_cart.o	\
-	$(MESS_SOFTWARE)/pokemini_cart.o	\
-	$(MESS_SOFTWARE)/sg1000_cart.o	\
-	$(MESS_SOFTWARE)/sms_cart.o	\
-	$(MESS_SOFTWARE)/spectrum_cart.o	\
-	$(MESS_SOFTWARE)/supracan_cart.o	\
-	$(MESS_SOFTWARE)/svision_cart.o	\
-	$(MESS_SOFTWARE)/vboy_cart.o	\
-	$(MESS_SOFTWARE)/wswan_cart.o	\
 
 
 #-------------------------------------------------

@@ -64,9 +64,10 @@ struct _image_slot_data
     unsigned int created : 1;
     unsigned int is_loading : 1;
 
-	/* Software list and software entry information */
-	const software_list *software_list_ptr;
-	const software_entry *software_entry_ptr;
+	/* Software information */
+	char *full_software_name;
+	software_info *software_info_ptr;
+	software_part *software_part_ptr;
 
     /* info read from the hash file */
     char *longname;
@@ -218,8 +219,9 @@ void image_init(running_machine *machine)
         slot->unload = (device_image_unload_func) slot->dev->get_config_fct(DEVINFO_FCT_IMAGE_UNLOAD);
 
 		/* sodftware list and entry */
-		slot->software_list_ptr = software_list_get_by_name( slot->dev->get_config_string(DEVINFO_STR_SOFTWARE_LIST) );
-		slot->software_entry_ptr = NULL;
+		slot->full_software_name = NULL;
+		slot->software_info_ptr = NULL;
+		slot->software_part_ptr = NULL;
 
         /* creation option guide */
         slot->create_option_guide = (const option_guide *) slot->dev->get_config_ptr(DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE);
@@ -381,43 +383,46 @@ static void get_device_file_extensions(const device_config *device,
 static void get_device_instance_name(const machine_config *config, const device_config *device,
     char *buffer, size_t buffer_len, iodevice_t type, UINT32 state, const char *(*get_dev_typename)(iodevice_t))
 {
-    const char *result;
-    const device_config *that_device;
-    int count, index;
+	const char *result;
+	const device_config *that_device;
+	int count, index;
 
-    /* retrieve info about the device instance */
-    result = device->get_config_string(state);
-    if ((result != NULL) && (result[0] != '\0'))
-    {
-        /* we got info directly */
-        snprintf(buffer, buffer_len, "%s", result);
-    }
-    else
-    {
-        /* not specified? default to device names based on the device type */
-        result = get_dev_typename(type);
-
-        /* are there multiple devices of the same type */
-        count = 0;
-        index = -1;
-
-		for (that_device = config->devicelist.first(); that_device != NULL; that_device = that_device->next)
+	/* retrieve info about the device instance */
+	result = device->get_config_string(state);
+	if ((result != NULL) && (result[0] != '\0'))
+	{
+		/* we got info directly */
+		snprintf(buffer, buffer_len, "%s", result);
+	}
+	else
+	{
+		if ( get_dev_typename )
 		{
-			if (is_image_device(that_device))
-			{
-				if (device == that_device)
-					index = count;
-				if (that_device->get_config_int(DEVINFO_INT_IMAGE_TYPE) == type)
-					count++;
-			}
-        }
+			/* not specified? default to device names based on the device type */
+			result = get_dev_typename(type);
 
-        /* need to number if there is more than one device */
-        if (count > 1)
-            snprintf(buffer, buffer_len, "%s%d", result, index + 1);
-        else
-            snprintf(buffer, buffer_len, "%s", result);
-    }
+			/* are there multiple devices of the same type */
+			count = 0;
+			index = -1;
+
+			for (that_device = config->devicelist.first(); that_device != NULL; that_device = that_device->next)
+			{
+				if (is_image_device(that_device))
+				{
+					if (device == that_device)
+						index = count;
+					if (that_device->get_config_int(DEVINFO_INT_IMAGE_TYPE) == type)
+						count++;
+				}
+   	     }
+
+			/* need to number if there is more than one device */
+			if (count > 1)
+				snprintf(buffer, buffer_len, "%s%d", result, index + 1);
+			else
+				snprintf(buffer, buffer_len, "%s", result);
+		}
+	}
 }
 
 
@@ -457,6 +462,10 @@ image_device_info image_device_getinfo(const machine_config *config, const devic
     /* retrieve brief instance name */
     get_device_instance_name(config, device, info.brief_instance_name, ARRAY_LENGTH(info.brief_instance_name),
         info.type, DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME, device_brieftypename);
+
+	/* retrieve interface name */
+	get_device_instance_name(config, device, info.interface_name, ARRAY_LENGTH(info.interface_name),
+		info.type, DEVINFO_STR_INTERFACE, NULL);
 
     return info;
 }
@@ -658,7 +667,7 @@ static image_error_t set_image_filename(image_slot_data *image, const char *file
 
 static int is_loaded(image_slot_data *image)
 {
-    return (image->file != NULL) || (image->ptr != NULL) || (image->software_entry_ptr != NULL);
+    return (image->file != NULL) || (image->ptr != NULL) || (image->software_info_ptr != NULL);
 }
 
 
@@ -802,57 +811,35 @@ static int image_load_internal(running_device *image, const char *path,
         mame_schedule_hard_reset(machine);
 
 	/* Check if there's a software list defined for this device and use that if we're not creating an image */
-/* This piece below is commented out until load_region_list or something better is available in src/emu/romload */
 #if 0
-	if ( !is_create && slot->software_list_ptr )
+	if ( is_create || !load_software_part( image, path, &slot->software_info_ptr, &slot->software_part_ptr, &slot->full_software_name ) )
+#endif
 	{
-		slot->software_entry = software_get_by_name( slot->software_list_ptr, path );
+		/* determine open plan */
+		determine_open_plan(slot, is_create, open_plan);
 
-		if ( slot->software_entry )
+		/* attempt to open the file in various ways */
+		for (i = 0; !slot->file && open_plan[i]; i++)
 		{
-			char swname[256];
-
-			sprintf( swname, "%s:%s", slot->software_list_ptr->name, slot->software_entry->name );
-
-			load_software_region(slot->dev, swname, slot->software_entry->rom_info );
-
-			/* call device load or create */
-			if (image->token != NULL)
-			{
-				err = image_finish_load(image);
-				if (err)
-					goto done;
-			}
-
-			goto done;
+			/* open the file */
+			slot->err = load_image_by_path(slot, open_plan[i], path);
+			if (slot->err && (slot->err != IMAGE_ERROR_FILENOTFOUND))
+				goto done;
 		}
 	}
-#endif
 
-    /* determine open plan */
-    determine_open_plan(slot, is_create, open_plan);
+	/* did we fail to find the file? */
+	if (!is_loaded(slot))
+	{
+		slot->err = IMAGE_ERROR_FILENOTFOUND;
+		goto done;
+	}
 
-    /* attempt to open the file in various ways */
-    for (i = 0; !slot->file && open_plan[i]; i++)
-    {
-        /* open the file */
-        slot->err = load_image_by_path(slot, open_plan[i], path);
-        if (slot->err && (slot->err != IMAGE_ERROR_FILENOTFOUND))
-            goto done;
-    }
-
-    /* did we fail to find the file? */
-    if (!is_loaded(slot))
-    {
-        slot->err = IMAGE_ERROR_FILENOTFOUND;
-        goto done;
-    }
-
-    /* call device load or create */
-    if (image->token != NULL)
-    {
-        slot->create_format = create_format;
-        slot->create_args = create_args;
+	/* call device load or create */
+	if (image->token != NULL)
+	{
+		slot->create_format = create_format;
+		slot->create_args = create_args;
 
 		if (slot->not_init_phase) {
 			err = (image_error_t)image_finish_load(image);
@@ -1408,11 +1395,11 @@ UINT32 image_crc(running_device *image)
     image_software_entry
 -------------------------------------------------*/
 
-const software_entry *image_software_entry(running_device *image)
+const software_info *image_software_entry(running_device *image)
 {
 	image_slot_data *slot = find_image_slot(image);
 
-	return slot->software_entry_ptr;
+	return slot->software_info_ptr;
 }
 
 
@@ -1426,10 +1413,10 @@ UINT8 *image_get_software_region(running_device *image, const char *tag)
 	image_slot_data *slot = find_image_slot(image);
 	char full_tag[256];
 
-	if ( slot->software_list_ptr == NULL || slot->software_entry_ptr == NULL )
+	if ( slot->software_info_ptr == NULL || slot->software_part_ptr == NULL )
 		return NULL;
 
-	sprintf( full_tag, "%s:%s:%s", slot->software_list_ptr->name, slot->software_entry_ptr->name, tag );
+	sprintf( full_tag, "%s:%s", image->tag(), tag );
 	return memory_region( image->machine, full_tag );
 }
 
@@ -1442,7 +1429,7 @@ UINT32 image_get_software_region_length(running_device *image, const char *tag)
 {
     char full_tag[256];
 
-    sprintf( full_tag, "%s:%s:%s", image->tag(), image_software_entry(image)->name, tag );
+    sprintf( full_tag, "%s:%s:%s", image->tag(), image_software_entry(image)->shortname, tag );
     return memory_region_length( image->machine, full_tag );
 }
 

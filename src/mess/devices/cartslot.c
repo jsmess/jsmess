@@ -476,10 +476,10 @@ DEVICE_GET_INFO( cartslot )
 				strcpy(info->s, "bin");
 			}
 			break;
-		case DEVINFO_STR_SOFTWARE_LIST:
-			if ( device && device->inline_config && get_config_dev(device)->software_list_name )
+		case DEVINFO_STR_INTERFACE:
+			if ( device && device->inline_config && get_config_dev(device)->interface )
 			{
-				strcpy(info->s, get_config_dev(device)->software_list_name );
+				strcpy(info->s, get_config_dev(device)->interface );
 			}
 			break;
 	}

@@ -87,6 +87,7 @@ struct _image_device_info
     char file_extensions[256];
     char instance_name[32];
     char brief_instance_name[16];
+	char interface_name[64];
 };
 
 typedef struct _image_device_format image_device_format;
@@ -141,7 +142,7 @@ enum
     DEVINFO_STR_IMAGE_CREATE_OPTNAME,
     DEVINFO_STR_IMAGE_CREATE_OPTDESC = DEVINFO_STR_IMAGE_CREATE_OPTNAME + DEVINFO_CREATE_OPTMAX,
     DEVINFO_STR_IMAGE_CREATE_OPTEXTS = DEVINFO_STR_IMAGE_CREATE_OPTDESC + DEVINFO_CREATE_OPTMAX,
-	DEVINFO_STR_SOFTWARE_LIST,
+	DEVINFO_STR_INTERFACE,
     DEVINFO_STR_IMAGE_LAST = DEVINFO_STR_IMAGE_FIRST + 0x0fff
 };
 
@@ -263,7 +264,7 @@ void set_init_phase(running_device *device);
 
 UINT8 *image_get_software_region(running_device *image, const char *tag);
 UINT32 image_get_software_region_length(running_device *image, const char *tag);
-const software_entry *image_software_entry(running_device *image);
+const software_info *image_software_entry(running_device *image);
 
 
 

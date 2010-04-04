@@ -53,7 +53,7 @@ typedef struct _cartslot_config cartslot_config;
 struct _cartslot_config
 {
 	const char *					extensions;
-	const char *					software_list_name;
+	const char *					interface;
 	int								must_be_loaded;
 	device_start_func				device_start;
 	device_image_load_func			device_load;
@@ -114,8 +114,8 @@ int cartslot_get_resource_length(running_device *device, const char *socket_name
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(cartslot_config, pcb_types, _index, cartslot_pcb_type, name, _pcb_type_name) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(cartslot_config, pcb_types, _index, cartslot_pcb_type, devtype, _pcb_devtype)
 
-#define MDRV_CARTSLOT_SOFTWARE_LIST(_listname)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, software_list_name, #_listname )
+#define MDRV_CARTSLOT_INTERFACE(_interface)							\
+	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, interface, _interface )
 
 
 /***************************************************************************

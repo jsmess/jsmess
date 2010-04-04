@@ -2,74 +2,103 @@
 
     softlist.h
 
-    Software entry and software list information.
+    Software and software list information.
 
 *********************************************************************/
 
 #ifndef __SOFTLIST_H_
 #define __SOFTLIST_H_
 
-#include "romload.h"
+/*********************************************************************
 
+    Internal structures and XML file handling
 
-/* ----- software typedef ----- */
+*********************************************************************/
 
-typedef struct _software_entry software_entry;
-struct _software_entry
+typedef struct _software_part software_part;
+struct _software_part
 {
-	const char *	name;				/* short name of the software */
-	const char *	parent;				/* parent */
-	const char *	fullname;			/* full name of the software */
-	const char *	release_date;		/* release date */
-	const char *	manufacturer;		/* manufacturer */
-	UINT64			userflags;			/* freely usable flags, can be used to store things like board type or pcb features */
-	UINT32			flags;				/* general flags known to the framework */
-	const rom_entry	*rom_info;			/* rom information for the software */
+	const char *name;
+	const char *interface;
+	const char *feature;
+	struct rom_entry *romdata;
+};
+
+
+/* The software info struct holds basic software information. Additional,
+   optional information like local software names, release dates, serial
+   numbers, etc can be maintained and stored in external recources.
+*/
+typedef struct _software_info software_info;
+struct _software_info
+{
+	const char *shortname;
+	const char *longname;
+	const char *year;			/* Copyright year on title screen, actual release dates can be tracked in external resources */
+	const char *publisher;
+	UINT32 supported;
+	software_part *partdata;
 };
 
 
 typedef struct _software_list software_list;
-struct _software_list
+
+/* Handling a software list */
+software_list *software_list_open(core_options *options, const char *listname, int is_preload, void (*error_proc)(const char *message));
+void software_list_close(software_list *swlist);
+software_info *software_list_first(software_list *swlist);
+software_info *software_list_find(software_list *swlist, const char *software);
+software_info *software_list_next(software_list *swlist);
+
+software_part *software_find_part(software_info *sw, const char *partname, const char *interface);
+software_part *software_part_next(software_part *part);
+
+
+bool load_software_part(running_device *device, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);
+
+
+/*********************************************************************
+
+    Driver software list configuration
+
+*********************************************************************/
+
+#define SOFTWARE_LIST		DEVICE_GET_INFO_NAME( software_list )
+#define __SOFTWARE_LIST_TAG	"software_list"
+
+
+#define SOFTWARE_SUPPORTED_YES		0
+#define SOFTWARE_SUPPORTED_PARTIAL	1
+#define SOFTWARE_SUPPORTED_NO		2
+
+
+#define SOFTWARE_LIST_CONFIG_SIZE	10
+
+DEVICE_GET_INFO( software_list );
+
+
+typedef struct _software_list_config software_list_config;
+struct _software_list_config
 {
-	const char * source_file;
-	const char * name;
-	const char * description;
-	const software_entry *	entries;
+	char *list_name[SOFTWARE_LIST_CONFIG_SIZE];
 };
 
 
-/* ----- software macros ----- */
-
-#define SOFTWARE_LIST_NAME(name)					software_list_##name
-#define SOFTWARE_NAME(name)							software_##name
-#define SOFTWARE_LIST(name,desc)					extern const software_list SOFTWARE_LIST_NAME(name) = { __FILE__, #name, desc, software_##name };
-#define SOFTWARE_LIST_START(name)	\
-	static const software_entry SOFTWARE_NAME(name)[] = {
-
-#define SOFTWARE_LIST_END							{ NULL, NULL, NULL, NULL, NULL, 0, 0, NULL } };
-
-#define SOFTWARE_ROM_NAME(name)						software_rom_##name
-#define SOFTWARE_START(name)						static const rom_entry SOFTWARE_ROM_NAME(name)[] = {
-#define SOFTWARE_END								ROM_END
+#define DEVINFO_STR_SWLIST_0	(DEVINFO_STR_DEVICE_SPECIFIC+0)
+#define DEVINFO_STR_SWLIST_MAX	(DEVINFO_STR_SWLIST_0 + SOFTWARE_LIST_CONFIG_SIZE - 1)
 
 
-#define SOFTWARE(name,parent,year,manufacturer,fullname,userflags,flags) \
-    { #name, #parent, fullname, #year, manufacturer, userflags, flags, SOFTWARE_ROM_NAME(name) },
+#define MDRV_SOFTWARE_LIST_CONFIG(_idx,_list)								\
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(software_list_config, list_name, _idx, _list)
+
+#define MDRV_SOFTWARE_LIST_ADD( _list )										\
+	MDRV_DEVICE_ADD( __SOFTWARE_LIST_TAG, SOFTWARE_LIST, 0 )				\
+	MDRV_SOFTWARE_LIST_CONFIG(0,_list)
 
 
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
+#define MDRV_SOFTWARE_LIST_MODIFY( _list )									\
+	MDRV_DEVICE_MODIFY( __SOFTWARE_LIST_TAG )								\
+	MDRV_SOFTWARE_LIST_CONFIG(0,_list)
 
-extern const software_list * const software_lists[];
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-const software_list* software_list_get_by_name(const char *name);
-const software_entry* software_get_by_name(const software_list* list, const char *name);
-int software_lists_get_count(void);
 
 #endif
