@@ -146,48 +146,56 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( arcadia )
 	PORT_START("panel")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Start")           PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START )    PORT_NAME("Start")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Option")          PORT_CODE(KEYCODE_O)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Select")          PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )   PORT_NAME("Select")
 //  PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Reset")           PORT_CODE(KEYCODE_R)         Not implemented
+	
 	PORT_START("controller1_col1")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("P1 Keypad 1")     PORT_CODE(KEYCODE_1)         PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_NAME("P1 Keypad 4")     PORT_CODE(KEYCODE_4)         PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7  ) PORT_NAME("P1 Keypad 7")     PORT_CODE(KEYCODE_7)         PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("P1 Keypad Clear") PORT_CODE(KEYCODE_DEL)       PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 7") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad Clear") PORT_CODE(KEYCODE_MINUS_PAD)
+
 	PORT_START("controller1_col2")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("P1 Keypad 2 (& Fire Buttons)")     PORT_CODE(KEYCODE_2)         PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_NAME("P1 Keypad 5")     PORT_CODE(KEYCODE_5)         PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8  ) PORT_NAME("P1 Keypad 8")     PORT_CODE(KEYCODE_8)         PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("P1 Keypad 0")     PORT_CODE(KEYCODE_0)         PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 2/Button") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 8") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 0") PORT_CODE(KEYCODE_0_PAD)
+
 	PORT_START("controller1_col3")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_NAME("P1 Keypad 3")     PORT_CODE(KEYCODE_3)         PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6  ) PORT_NAME("P1 Keypad 6")     PORT_CODE(KEYCODE_6)         PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_NAME("P1 Keypad 9")     PORT_CODE(KEYCODE_9)         PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("P1 Keypad Enter") PORT_CODE(KEYCODE_ENTER)     PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 9") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad Enter") PORT_CODE(KEYCODE_PLUS_PAD)
+
 	PORT_START("controller1_extra")
 	PORT_BIT( 0xff, 0xf0, IPT_UNUSED) // used in palladium
+
 	PORT_START("controller2_col1")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("P2 Keypad 1")     PORT_CODE(KEYCODE_1_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_NAME("P2 Keypad 4")     PORT_CODE(KEYCODE_4_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7  ) PORT_NAME("P2 Keypad 7")     PORT_CODE(KEYCODE_7_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("P2 Keypad Clear") PORT_CODE(KEYCODE_DEL_PAD)   PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 4") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 7") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad Clear") PORT_CODE(KEYCODE_V)
+
 	PORT_START("controller2_col2")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("P2 Keypad 2 (& Fire Buttons)")     PORT_CODE(KEYCODE_2_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_NAME("P2 Keypad 5")     PORT_CODE(KEYCODE_5_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8  ) PORT_NAME("P2 Keypad 8")     PORT_CODE(KEYCODE_8_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("P2 Keypad 0")     PORT_CODE(KEYCODE_0_PAD)     PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 2/Button") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 5") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 8") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 0") PORT_CODE(KEYCODE_F)
+
 	PORT_START("controller2_col3")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_NAME("P2 Keypad 3")     PORT_CODE(KEYCODE_3_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6  ) PORT_NAME("P2 Keypad 6")     PORT_CODE(KEYCODE_6_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_NAME("P2 Keypad 9")     PORT_CODE(KEYCODE_9_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("P2 Keypad Enter") PORT_CODE(KEYCODE_ENTER_PAD) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 6") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 9") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad Enter") PORT_CODE(KEYCODE_R)
+
 	PORT_START("controller2_extra")
 	PORT_BIT( 0xff, 0xf0, IPT_UNUSED) // used in palladium
 
@@ -244,14 +252,14 @@ static INPUT_PORTS_START( arcadia )
     PORT_RESET
 #else
 	PORT_START("joysticks")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )		PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )	PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )		PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )		PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )		PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )	PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )		PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )		PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_8WAY
 #endif
 INPUT_PORTS_END
 
@@ -269,58 +277,66 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( plldium )
 	PORT_START("panel")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Start")        PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Selector A")   PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Selector B")   PORT_CODE(KEYCODE_B)
-//  PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Reset")        PORT_CODE(KEYCODE_R)         Not implemented
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START )   PORT_NAME("Start")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SELECT )  PORT_NAME("Selector A")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER )   PORT_NAME("Selector B")    PORT_CODE(KEYCODE_O)
+//  PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Reset")           PORT_CODE(KEYCODE_R)         Not implemented
+
 	PORT_START("controller1_col1")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED) // some bits must be high
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("P1 Keypad 1")  PORT_CODE(KEYCODE_1)         PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_NAME("P1 Keypad 4")  PORT_CODE(KEYCODE_4)         PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7  ) PORT_NAME("P1 Keypad 7")  PORT_CODE(KEYCODE_7)         PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("P1 Keypad 10") PORT_CODE(KEYCODE_DEL)       PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 1") PORT_CODE(KEYCODE_1_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 4") PORT_CODE(KEYCODE_4_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 7") PORT_CODE(KEYCODE_7_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 10") PORT_CODE(KEYCODE_MINUS_PAD)
+
 	PORT_START("controller1_col2")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("P1 Keypad 2")  PORT_CODE(KEYCODE_2)         PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_NAME("P1 Keypad 5")  PORT_CODE(KEYCODE_5)         PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8  ) PORT_NAME("P1 Keypad 8")  PORT_CODE(KEYCODE_8)         PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("P1 Keypad 11") PORT_CODE(KEYCODE_0)         PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 2/Button") PORT_CODE(KEYCODE_2_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 5") PORT_CODE(KEYCODE_5_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 8") PORT_CODE(KEYCODE_8_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 11") PORT_CODE(KEYCODE_0_PAD)
+
 	PORT_START("controller1_col3")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_NAME("P1 Keypad 3")  PORT_CODE(KEYCODE_3)         PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6  ) PORT_NAME("P1 Keypad 6")  PORT_CODE(KEYCODE_6)         PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_NAME("P1 Keypad 9")  PORT_CODE(KEYCODE_9)         PORT_PLAYER(1)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("P1 Keypad 12") PORT_CODE(KEYCODE_ENTER)     PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 3") PORT_CODE(KEYCODE_3_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 6") PORT_CODE(KEYCODE_6_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 9") PORT_CODE(KEYCODE_9_PAD)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 12") PORT_CODE(KEYCODE_PLUS_PAD)
+
 	PORT_START("controller1_extra")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("P1 Keypad 13") PORT_CODE(KEYCODE_U)         PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("P1 Keypad 14") PORT_CODE(KEYCODE_I)         PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("P1 Keypad 15") PORT_CODE(KEYCODE_O)         PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON16 ) PORT_NAME("P1 Keypad 16") PORT_CODE(KEYCODE_K)         PORT_PLAYER(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 13") PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 14") PORT_CODE(KEYCODE_SLASH_PAD)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 15") PORT_CODE(KEYCODE_ASTERISK)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 16") PORT_CODE(KEYCODE_DEL_PAD)
+
 	PORT_START("controller2_col1")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("P2 Keypad 1")  PORT_CODE(KEYCODE_1_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_NAME("P2 Keypad 4")  PORT_CODE(KEYCODE_4_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7  ) PORT_NAME("P2 Keypad 7")  PORT_CODE(KEYCODE_7_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("P2 Keypad 10") PORT_CODE(KEYCODE_DEL_PAD)   PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 4") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 7") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 10") PORT_CODE(KEYCODE_V)
+
 	PORT_START("controller2_col2")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("P2 Keypad 2")  PORT_CODE(KEYCODE_2_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_NAME("P2 Keypad 5")  PORT_CODE(KEYCODE_5_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON8  ) PORT_NAME("P2 Keypad 8")  PORT_CODE(KEYCODE_8_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("P2 Keypad 11") PORT_CODE(KEYCODE_0_PAD)     PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 2/Button") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 5") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 8") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 11") PORT_CODE(KEYCODE_F)
+
 	PORT_START("controller2_col3")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_NAME("P2 Keypad 3")  PORT_CODE(KEYCODE_3_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON6  ) PORT_NAME("P2 Keypad 6")  PORT_CODE(KEYCODE_6_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON9  ) PORT_NAME("P2 Keypad 9")  PORT_CODE(KEYCODE_9_PAD)     PORT_PLAYER(2)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON12 ) PORT_NAME("P2 Keypad 12") PORT_CODE(KEYCODE_ENTER_PAD) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 6") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 9") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 12") PORT_CODE(KEYCODE_R)
+
 	PORT_START("controller2_extra")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON13 ) PORT_NAME("P2 Keypad 13") PORT_CODE(KEYCODE_SLASH_PAD) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON14 ) PORT_NAME("P2 Keypad 14") PORT_CODE(KEYCODE_ASTERISK)  PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("P2 Keypad 15") PORT_CODE(KEYCODE_MINUS_PAD) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON16 ) PORT_NAME("P2 Keypad 16") PORT_CODE(KEYCODE_PLUS_PAD)  PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 13") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 14") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 15") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P2 Keypad 16") PORT_CODE(KEYCODE_H)
 
 /* FIXME: the joystick are analog - the actual definition is merely an hack */
 
@@ -838,36 +854,36 @@ static DRIVER_INIT( arcadia )
 }
 
 
-/*   YEAR  NAME     PARENT     COMPAT    MACHINE    INPUT     INIT      COMPANY         FULLNAME */
-CONS(1983, advsnha,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Advision",		"Advision Home Arcade", GAME_IMPERFECT_SOUND )					/* France */
-CONS(1982, bndarc,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Bandai",		"Arcadia", GAME_IMPERFECT_SOUND )						/* Japan */
-CONS(1982, arcadia,	0,	   0,        arcadia,	arcadia,  arcadia,	"Emerson",		"Arcadia 2001", GAME_IMPERFECT_SOUND )						/* U.S.A. */
-CONS(198?, tccosmos,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Tele-Computer",	"Cosmos", GAME_IMPERFECT_SOUND )						/* Spain */
-CONS(1982, dynavisn,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Yamagiwa",		"Dynavision", GAME_IMPERFECT_SOUND )						/* Japan */
-CONS(1982, ekusera,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"P.I.C",		"Ekusera", GAME_IMPERFECT_SOUND )						/* Japan */
-CONS(1982, hanihac,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Hanimex",		"Hanimex Home Arcade Centre", GAME_IMPERFECT_SOUND )				/* UK */
-CONS(1982, hmg2650,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Hanimex",		"HMG-2650", GAME_IMPERFECT_SOUND )						/* Germany */
-CONS(198?, intmpt03,	0,	   arcadia,  arcadia,	arcadia,  arcadia,	"Intelligent Game",	"Intelligent Game MPT-03", GAME_IMPERFECT_SOUND )				/* U.S.A */
-CONS(198?, ixl2000,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Intercord",		"Intercord XL 2000 System", GAME_IMPERFECT_SOUND )				/* Germany */
-CONS(198?, intervsn,	ormatu,    0,        arcadia,	arcadia,  arcadia,	"Intervision",		"Intervision 2001", GAME_IMPERFECT_SOUND )					/* Switzerland */
-CONS(198?, itmcmtp3,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"ITMC",			"ITMC MPT-03", GAME_IMPERFECT_SOUND )						/* France */
-CONS(1982, lvision,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Leisure-Dynamics",	"Leisure-Vision", GAME_IMPERFECT_SOUND )					/* Canada */
-CONS(1982, leonardo,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"GiG Electronics",	"Leonardo", GAME_IMPERFECT_SOUND )						/* Italy */
-CONS(1983, mratlus,	plldium,   0,        arcadia,	arcadia,  arcadia,	"H.G.S.",		"Mr. Altus Tele Brain", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )		/* Germany */
-CONS(198?, ormatu,	0,         arcadia,  arcadia,	arcadia,  arcadia,	"Ormatu Electronics",	"Ormatu 2001", GAME_IMPERFECT_SOUND )						/* Netherlands */
-CONS(198?, plldium,	0,         arcadia,  arcadia,	plldium,  arcadia,	"Neckermann",		"Palladium Video-Computer-Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )	/* Germany, 16 keys instead of 12 */
-CONS(1983, polyvcg,	plldium,   0,        arcadia,	arcadia,  arcadia,	"Polybrain",		"Polybrain Video Computer Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )	/* Germany */
-CONS(198?, poppympt,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Transonic",		"Poppy MPT-03 Tele Computer Spiel", GAME_IMPERFECT_SOUND )			/* Germany */
-CONS(198?, prestige,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Prestige",		"Prestige Video Computer Game MPT-03", GAME_IMPERFECT_SOUND )			/* France */
-CONS(198?, rowtrn2k,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Rowtron",		"Rowtron 2000", GAME_IMPERFECT_SOUND )						/* UK */
-CONS(1982, tvg2000,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Schmid",		"Schmid TVG 2000", GAME_IMPERFECT_SOUND )					/* Germany */
-CONS(198?, sheenhvc,	ormatu,    0,        arcadia,	arcadia,  arcadia,	"Sheen",		"Sheen Home Video Centre 2001", GAME_IMPERFECT_SOUND )				/* Australia */
-CONS(198?, soundic,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Soundic",		"Soundic MPT-03", GAME_IMPERFECT_SOUND )					/* Finland */
-CONS(198?, telefevr,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Tchibo",		"Tele-Fever", GAME_IMPERFECT_SOUND )						/* Germany */
-CONS(198?, tempest3,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Tempest",		"Tempest MPT-03", GAME_IMPERFECT_SOUND )					/* Australia */
-CONS(198?, tbbympt3,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Tobby",		"Tobby MPT-03", GAME_IMPERFECT_SOUND )						/* ? */
-CONS(198?, trakcvg,	plldium,   0,        arcadia,	arcadia,  arcadia,	"Trakton",		"Trakton Computer Video Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )	/* Australia */
-CONS(1982, tunixha,	arcadia,   0,        arcadia,	arcadia,  arcadia,	"Monaco Leisure",	"Tunix Home Arcade", GAME_IMPERFECT_SOUND )					/* New Zealand */
-CONS(198?, tryomvgc,	intmpt03,  0,        arcadia,	arcadia,  arcadia,	"Tryom",		"Tryom Video Game Center", GAME_IMPERFECT_SOUND )				/* U.S.A */
-CONS(198?, orbituvi,	0,  	   arcadia,  arcadia,	arcadia,  arcadia,	"Orbit Electronics",	"UVI Compu-Game", GAME_IMPERFECT_SOUND )					/* New Zealand */
-CONS(198?, vdmaster,	orbituvi,  0,        arcadia,	arcadia,  arcadia,	"Grandstand",		"Video Master", GAME_IMPERFECT_SOUND )						/* New Zealand */
+/*   YEAR  NAME       PARENT     COMPAT    MACHINE       INPUT     INIT          COMPANY               FULLNAME */
+CONS(1983, advsnha,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Advision",           "Advision Home Arcade", GAME_IMPERFECT_SOUND )    /* France */
+CONS(1982, bndarc,    arcadia,   0,        arcadia,      arcadia,  arcadia,      "Bandai",             "Arcadia", GAME_IMPERFECT_SOUND )                 /* Japan */
+CONS(1982, arcadia,   0,         0,        arcadia,      arcadia,  arcadia,      "Emerson",            "Arcadia 2001", GAME_IMPERFECT_SOUND )            /* U.S.A. */
+CONS(198?, tccosmos,  arcadia,   0,        arcadia,      arcadia,  arcadia,      "Tele-Computer",      "Cosmos", GAME_IMPERFECT_SOUND )                  /* Spain */
+CONS(1982, dynavisn,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Yamagiwa",           "Dynavision", GAME_IMPERFECT_SOUND )              /* Japan */
+CONS(1982, ekusera,   intmpt03,  0,        arcadia,      arcadia,  arcadia,      "P.I.C",              "Ekusera", GAME_IMPERFECT_SOUND )                 /* Japan */
+CONS(1982, hanihac,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Hanimex",            "Hanimex Home Arcade Centre", GAME_IMPERFECT_SOUND )  /* UK */
+CONS(1982, hmg2650,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Hanimex",            "HMG-2650", GAME_IMPERFECT_SOUND )                 /* Germany */
+CONS(198?, intmpt03,  0,         arcadia,  arcadia,      arcadia,  arcadia,      "Intelligent Game",   "Intelligent Game MPT-03", GAME_IMPERFECT_SOUND )  /* U.S.A */
+CONS(198?, ixl2000,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Intercord",          "Intercord XL 2000 System", GAME_IMPERFECT_SOUND ) /* Germany */
+CONS(198?, intervsn,  ormatu,    0,        arcadia,      arcadia,  arcadia,      "Intervision",        "Intervision 2001", GAME_IMPERFECT_SOUND )         /* Switzerland */
+CONS(198?, itmcmtp3,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "ITMC",               "ITMC MPT-03", GAME_IMPERFECT_SOUND )              /* France */
+CONS(1982, lvision,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Leisure-Dynamics",   "Leisure-Vision", GAME_IMPERFECT_SOUND )           /* Canada */
+CONS(1982, leonardo,  arcadia,   0,        arcadia,      arcadia,  arcadia,      "GiG Electronics",    "Leonardo", GAME_IMPERFECT_SOUND )                 /* Italy */
+CONS(1983, mratlus,   plldium,   0,        arcadia,      arcadia,  arcadia,      "H.G.S.",             "Mr. Altus Tele Brain", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )    /* Germany */
+CONS(198?, ormatu,    0,         arcadia,  arcadia,      arcadia,  arcadia,      "Ormatu Electronics", "Ormatu 2001", GAME_IMPERFECT_SOUND )              /* Netherlands */
+CONS(198?, plldium,   0,         arcadia,  arcadia,      plldium,  arcadia,      "Neckermann",         "Palladium Video-Computer-Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )      /* Germany, 16 keys instead of 12 */
+CONS(1983, polyvcg,   plldium,   0,        arcadia,      arcadia,  arcadia,      "Polybrain",          "Polybrain Video Computer Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )      /* Germany */
+CONS(198?, poppympt,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Transonic",          "Poppy MPT-03 Tele Computer Spiel", GAME_IMPERFECT_SOUND )           /* Germany */
+CONS(198?, prestige,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Prestige",           "Prestige Video Computer Game MPT-03", GAME_IMPERFECT_SOUND )        /* France */
+CONS(198?, rowtrn2k,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Rowtron",            "Rowtron 2000", GAME_IMPERFECT_SOUND )               /* UK */
+CONS(1982, tvg2000,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Schmid",             "Schmid TVG 2000", GAME_IMPERFECT_SOUND )            /* Germany */
+CONS(198?, sheenhvc,  ormatu,    0,        arcadia,      arcadia,  arcadia,      "Sheen",              "Sheen Home Video Centre 2001", GAME_IMPERFECT_SOUND )     /* Australia */
+CONS(198?, soundic,   intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Soundic",            "Soundic MPT-03", GAME_IMPERFECT_SOUND )             /* Finland */
+CONS(198?, telefevr,  arcadia,   0,        arcadia,      arcadia,  arcadia,      "Tchibo",             "Tele-Fever", GAME_IMPERFECT_SOUND )                 /* Germany */
+CONS(198?, tempest3,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Tempest",            "Tempest MPT-03", GAME_IMPERFECT_SOUND )             /* Australia */
+CONS(198?, tbbympt3,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Tobby",              "Tobby MPT-03", GAME_IMPERFECT_SOUND )               /* ? */
+CONS(198?, trakcvg,   plldium,   0,        arcadia,      arcadia,  arcadia,      "Trakton",            "Trakton Computer Video Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )      /* Australia */
+CONS(1982, tunixha,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Monaco Leisure",     "Tunix Home Arcade", GAME_IMPERFECT_SOUND )          /* New Zealand */
+CONS(198?, tryomvgc,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Tryom",              "Tryom Video Game Center", GAME_IMPERFECT_SOUND )    /* U.S.A */
+CONS(198?, orbituvi,  0,         arcadia,  arcadia,      arcadia,  arcadia,      "Orbit Electronics",  "UVI Compu-Game", GAME_IMPERFECT_SOUND )             /* New Zealand */
+CONS(198?, vdmaster,  orbituvi,  0,        arcadia,      arcadia,  arcadia,      "Grandstand",         "Video Master", GAME_IMPERFECT_SOUND )               /* New Zealand */
