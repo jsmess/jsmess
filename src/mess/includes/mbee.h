@@ -46,6 +46,7 @@ READ8_HANDLER ( mbee_color_bank_r );
 WRITE8_HANDLER ( mbee_color_bank_w );
 READ8_HANDLER ( mbee_video_bank_r );
 WRITE8_HANDLER ( mbee_video_bank_w );
+READ8_HANDLER ( mbee_netrom_bank_r );
 READ8_HANDLER ( mbee_bank_netrom_r );
 READ8_HANDLER ( mbee_pcg_color_latch_r );
 WRITE8_HANDLER ( mbee_pcg_color_latch_w );

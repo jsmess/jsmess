@@ -132,8 +132,6 @@ static int keyboard_matrix_r(running_machine *machine, int offs)
 
 READ8_HANDLER ( mbee_color_bank_r )
 {
-/* Read of port 0A - set Telcom rom to first half */
-	memory_set_bank(space->machine, "bank5", 0);
 	return m6545_color_bank;
 }
 
@@ -147,6 +145,13 @@ WRITE8_HANDLER ( mbee_0a_w )
 {
 	m6545_color_bank = data;
 	memory_set_bank(space->machine, "bank4", (data&15) >> 1);
+}
+
+READ8_HANDLER ( mbee_netrom_bank_r )
+{
+/* Read of port 0A - set Telcom rom to first half */
+	memory_set_bank(space->machine, "bank5", 0);
+	return m6545_color_bank;
 }
 
 READ8_HANDLER ( mbee_bank_netrom_r )
