@@ -42,14 +42,13 @@
 		</part>
 	</software>
 
-	<!-- bad dump, refuses to work on real h/w -->
 	<software name="astrwrs2">
 		<description>Astro Wars II - Battle in Galaxy</description>
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="astrwrs2.bin" size="8192" crc="19056c71" sha1="7b1073339a4641d4e0f00b284c64fc3c6d385b7c" offset="0000" status="baddump" />
+				<rom name="astrwrs2.bin" size="8192" crc="34781de1" sha1="b419f2fccf3b2fbd360da2833064d2ea8bd6500b" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -99,6 +98,17 @@
 		</part>
 	</software>
 
+	<software name="lupin3" supported="no">
+		<description>Lupin III</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="lupin3.bin" size="16352" crc="5f3feae5" sha1="aabd54f96cb7abaf306c0a2d6d3e2296ef0052f1" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="minr2049">
 		<description>Miner 2049er</description>
 		<year>1985</year>
@@ -121,15 +131,27 @@
 		</part>
 	</software>
 
+	<software name="nebulaa" cloneof="nebula">
+		<description>Nebula (alt)</description>
+		<year>1984</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="nebulaa.bin" size="16384" crc="efb4bdcd" sha1="94a4b9a92d6f9a5f4a68721be4cc35920ca32628" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="popchips">
 		<description>Pop and Chips</description>
 		<year>198?</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<!-- 8kb RAM -->
 			<dataarea name="rom" size="32768">
 				<rom name="popchips.bin" size="32768" crc="cc4fb04d" sha1="5979abd6051d531eafe1ea3b37c97ce2e3e97f8e" offset="0" />
 			</dataarea>
+			<!-- 8KB RAM on cartridge -->
+			<dataarea name="ram" size="8192" />
 		</part>
 	</software>
 
@@ -218,7 +240,7 @@
 	/* Doraemon */
 	/* Dragon Ball */
 	/* Dragon Slayer */
-	/* Lupin III */
+	/* Lupin III - needs redump */
 	/* Mappy */
 	/* Milky Princess */
 	/* Nekketsu Kung Fu Road */
