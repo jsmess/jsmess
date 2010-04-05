@@ -39,7 +39,7 @@
 static ADDRESS_MAP_START (wswan_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x03fff) AM_RAM		/* 16kb RAM / 4 colour tiles */
 	AM_RANGE(0x04000, 0x0ffff) AM_NOP		/* nothing */
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE( wswan_sram_r, wswan_sram_w )	/* SRAM bank */
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(wswan_sram_r, wswan_sram_w)	/* SRAM bank */
 	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank2")	/* ROM bank 1 */
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank3")	/* ROM bank 2 */
 	AM_RANGE(0x40000, 0x4ffff) AM_ROMBANK("bank4")	/* ROM bank 3 */
@@ -58,7 +58,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (wscolor_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM		/* 16kb RAM / 4 colour tiles, 16 colour tiles + palettes */
-	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE( wswan_sram_r, wswan_sram_w )	/* SRAM bank */
+	AM_RANGE(0x10000, 0x1ffff) AM_READWRITE(wswan_sram_r, wswan_sram_w)	/* SRAM bank */
 	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank2")	/* ROM bank 1 */
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank3")	/* ROM bank 2 */
 	AM_RANGE(0x40000, 0x4ffff) AM_ROMBANK("bank4")	/* ROM bank 3 */
@@ -76,26 +76,26 @@ static ADDRESS_MAP_START (wscolor_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START (wswan_io, ADDRESS_SPACE_IO, 8)
-	AM_RANGE(0x00, 0xff) AM_READWRITE( wswan_port_r, wswan_port_w )	/* I/O ports */
+	AM_RANGE(0x00, 0xff) AM_READWRITE(wswan_port_r, wswan_port_w)	/* I/O ports */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wswan )
 	PORT_START("CURSX")		/* Cursors (X1-X4) */
-	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_NAME("X1 - Up")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_NAME("X3 - Down")
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_NAME("X4 - Left")
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_NAME("X2 - Right")
+	PORT_BIT( 0x1, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_NAME("X1 - Up")
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_NAME("X3 - Down")
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_NAME("X4 - Left")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("X2 - Right")
 
 	PORT_START("BUTTONS")	/* Buttons */
-	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start")
-	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Button A")
-	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Button B")
+	PORT_BIT( 0x2, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Start")
+	PORT_BIT( 0x4, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Button A")
+	PORT_BIT( 0x8, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Button B")
 
 	PORT_START("CURSY")		/* Cursors (Y1-Y4) */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y1 - Left") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y3 - Right") PORT_CODE(KEYCODE_D)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y4 - Down") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y2 - Up") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y1 - Left") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y3 - Right") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y4 - Down") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Y2 - Up") PORT_CODE(KEYCODE_W)
 INPUT_PORTS_END
 
 static GFXDECODE_START( wswan )
@@ -105,20 +105,22 @@ GFXDECODE_END
 static PALETTE_INIT( wswan )
 {
 	int ii;
-	for( ii = 0; ii < 16; ii++ )
+	for (ii = 0; ii < 16; ii++)
 	{
 		UINT8 shade = ii * (256 / 16);
-		palette_set_color_rgb(machine,  15 - ii, shade, shade, shade );
+		palette_set_color_rgb(machine,  15 - ii, shade, shade, shade);
 	}
 }
 
-static PALETTE_INIT( wscolor ) {
+static PALETTE_INIT( wscolor ) 
+{
 	int i;
-	for( i = 0; i < 4096; i++ ) {
-		int r = ( i & 0x0F00 ) >> 8;
-		int g = ( i & 0x00F0 ) >> 4;
-		int b = i & 0x000F;
-		palette_set_color_rgb(machine,  i, r << 4, g << 4, b << 4 );
+	for (i = 0; i < 4096; i++) 
+	{
+		int r = (i & 0x0f00) >> 8;
+		int g = (i & 0x00f0) >> 4;
+		int b = i & 0x000f;
+		palette_set_color_rgb(machine,  i, r << 4, g << 4, b << 4);
 	}
 }
 
