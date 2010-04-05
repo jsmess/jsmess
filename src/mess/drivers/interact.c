@@ -3,7 +3,7 @@
         Interact Family Computer
 
         12/05/2009 Skeleton driver - Micko
-    31/05/2009 Added notes and video - Robbbert
+	31/05/2009 Added notes - Robbbert
 
     This was made by Interact Company of Ann Arbor, Michigan. However,
     just after launch, the company collapsed. The liquidator, Protecto,
@@ -41,7 +41,7 @@
                => add the port mapping for keyboard
 
       don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-      (and thank's to Daniel!)
+      (and thanks to Daniel!)
 
     TODO : Add the cartridge function,
            Adjust the one shot and A/D timing (sn76477)
@@ -63,7 +63,7 @@
 
 static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    /* Hardward address mapping*/
+	/* Hardware address mapping*/
 /*  AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)// Bank management not udsed in BR machine*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  /* Color c0/c1*/
 	AM_RANGE(0x1800,0x1800) AM_WRITE( hector_color_b_w)  /* Color c2/c3*/
@@ -72,14 +72,14 @@ static ADDRESS_MAP_START(interact_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x3000,0x3000) AM_READWRITE( hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
 	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
 
-    /* Main ROM page*/
+	/* Main ROM page*/
 	AM_RANGE(0x0000,0x3fff) AM_ROM  /*BANK(2)*/
  /*   AM_RANGE(0x1000,0x3fff) AM_RAM*/
 
 	/* Video br mapping*/
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_GENERIC(videoram)
 	/* continous RAM*/
-    AM_RANGE(0x4A00,0xffff) AM_RAM
+	AM_RANGE(0x4A00,0xffff) AM_RAM
 
 ADDRESS_MAP_END
 
@@ -125,10 +125,10 @@ static MACHINE_DRIVER_START( interact )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", 8080, XTAL_2MHz)
 	MDRV_CPU_PROGRAM_MAP(interact_mem)
-    MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the 8080 irq in Hz*/
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the 8080 irq in Hz*/
 
 	MDRV_MACHINE_RESET(interact)
-    MDRV_MACHINE_START(interact)
+	MDRV_MACHINE_START(interact)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -138,7 +138,6 @@ static MACHINE_DRIVER_START( interact )
 	MDRV_SCREEN_SIZE(256, 79)
 	MDRV_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
 	MDRV_PALETTE_LENGTH(16)				/* 8 colours, but only 4 at a time*/
-	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(interact)
@@ -155,8 +154,7 @@ static MACHINE_DRIVER_START( interact )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    /* Gestion cassette*/
-    MDRV_CASSETTE_ADD( "cassette", interact_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette", interact_cassette_config )
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
@@ -168,10 +166,10 @@ static MACHINE_DRIVER_START( hector1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_1_75MHz)
 	MDRV_CPU_PROGRAM_MAP(interact_mem)
-    MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the 8080 irq in Hz*/
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,50) /*  put on the 8080 irq in Hz*/
 
 	MDRV_MACHINE_RESET(interact)
-    MDRV_MACHINE_START(interact)
+	MDRV_MACHINE_START(interact)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -181,7 +179,6 @@ static MACHINE_DRIVER_START( hector1 )
 	MDRV_SCREEN_SIZE(256, 79)
 	MDRV_SCREEN_VISIBLE_AREA(0, 112, 0, 77)
 	MDRV_PALETTE_LENGTH(16)				/* 8 colours, but only 4 at a time*/
-	MDRV_PALETTE_INIT(black_and_white)
 
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(interact)
@@ -198,8 +195,7 @@ static MACHINE_DRIVER_START( hector1 )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    /* Gestion cassette*/
-    MDRV_CASSETTE_ADD( "cassette", interact_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette", interact_cassette_config )
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")

@@ -7,8 +7,15 @@
         Hector MX40c
         Hector MX80c
 
+	These machines can load and run cassettes for the interact / hector1.
+	hec2hr - press 2 then 1
+	hec2hrp - press 2 then 1
+	hec2hrx - press 5 then 1
+	hec2mx40 - press 5 then 1
+	hec2mx80 - not compatible
+	victor - press R then L
+
         12/05/2009 Skeleton driver - Micko
-        31/06/2009 Video - Robbbert
 
         29/10/2009 Update skeleton to functional machine
                           by yo_fr       (jj.stac@aliceadsl.fr)
@@ -25,9 +32,10 @@
                => add the port mapping for keyboard
 
       don't forget to keep some information about these machine see DChector project : http://dchector.free.fr/ made by DanielCoulom
-      (and thank's to Daniel!)
+      (and thanks to Daniel!)
 
     TODO : Add the cartridge function,
+           Add diskette support,
            Adjust the one shot and A/D timing (sn76477)
 ****************************************************************************/
 /* Joystick 1 :
@@ -47,7 +55,7 @@
 
  Fire <0> on numpad
  Pot => INS /SUPPR
- Cassete : wav file (1 way, 16 bits, 44100hz)
+ Cassette : wav file (1 way, 16 bits, 44100hz)
              K7 file  (For data and games)
            FOR file (for forth screen data)
 */
@@ -70,7 +78,7 @@ static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 /*****************************************************************************/
 	ADDRESS_MAP_UNMAP_HIGH
 
-    /* Hardward address mapping*/
+	/* Hardware address mapping*/
 	AM_RANGE(0x0800,0x0808) AM_WRITE( hector_switch_bank_w)/* Bank management*/
 	AM_RANGE(0x1000,0x1000) AM_WRITE( hector_color_a_w)  /* Color c0/c1*/
 	AM_RANGE(0x1800,0x1800) AM_WRITE( hector_color_b_w)  /* Color c2/c3*/
@@ -79,31 +87,31 @@ static ADDRESS_MAP_START(hec2hrp_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x3000,0x3000) AM_READWRITE( hector_cassette_r, hector_sn_3000_w)/* Write necessary*/
 	AM_RANGE(0x3800,0x3807) AM_READWRITE( hector_keyboard_r, hector_keyboard_w)  /* Keyboard*/
 
-    /* Main ROM page*/
+	/* Main ROM page*/
 	AM_RANGE(0x0000,0x3fff) AM_ROMBANK("bank2")
 
 	/* Video br mapping*/
 	AM_RANGE(0x4000,0x49ff) AM_RAM AM_BASE_GENERIC(videoram)
 	/* continous RAM*/
-    AM_RANGE(0x4A00,0xbfff) AM_RAM
+	AM_RANGE(0x4A00,0xbfff) AM_RAM
 	/* from 0xC000 to 0xFFFF => Bank Ram for video and data !*/
 	AM_RANGE(0xc000,0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2hrp_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2mx40_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000,0x0ff) AM_READWRITE( hector_mx_io_port_r, hector_mx40_io_port_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hec2mx80_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-    ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x000,0x0ff) AM_READWRITE( hector_mx_io_port_r, hector_mx80_io_port_w )
 ADDRESS_MAP_END
 
@@ -202,9 +210,9 @@ INPUT_PORTS_END
 static MACHINE_START( hec2hrp )
 /*****************************************************************************/
 {
-UINT8 *RAM = memory_region(machine, "maincpu"); // pointer to mess ram
-UINT8 *ROM1 = memory_region(machine, "page1"); // pointer to rom page 1
-UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
+	UINT8 *RAM = memory_region(machine, "maincpu"); // pointer to mess ram
+	UINT8 *ROM1 = memory_region(machine, "page1"); // pointer to rom page 1
+	UINT8 *ROM2 = memory_region(machine, "page2"); // pointer to rom page 2
 
     // Memory install for bank switching
 	memory_configure_bank(machine, "bank1", HECTOR_BANK_PROG , 1, &RAM[0xc000]  , 0); // Mess ram
@@ -267,8 +275,7 @@ static MACHINE_DRIVER_START( hec2hr )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 230)
 	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-    MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(hec2hrp)
 
@@ -285,8 +292,7 @@ static MACHINE_DRIVER_START( hec2hr )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    /* Gestion cassette*/
-    MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
@@ -296,7 +302,7 @@ MACHINE_DRIVER_END
 /*****************************************************************************/
 static MACHINE_DRIVER_START( hec2hrp )
 /*****************************************************************************/
-/* basic machine hardware */
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
 	MDRV_CPU_PROGRAM_MAP(hec2hrp_mem)
 	MDRV_CPU_IO_MAP(hec2hrp_io)
@@ -311,8 +317,7 @@ static MACHINE_DRIVER_START( hec2hrp )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 230)
 	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-    MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(hec2hrp)
 
@@ -329,8 +334,7 @@ static MACHINE_DRIVER_START( hec2hrp )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    // Gestion cassette
-    MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
@@ -340,7 +344,7 @@ MACHINE_DRIVER_END
 /*****************************************************************************/
 static MACHINE_DRIVER_START( hec2mx40 )
 /*****************************************************************************/
-/* basic machine hardware */
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
 	MDRV_CPU_PROGRAM_MAP(hec2hrp_mem)
 	MDRV_CPU_IO_MAP(hec2mx40_io)
@@ -355,8 +359,7 @@ static MACHINE_DRIVER_START( hec2mx40 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 230)
 	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-    MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(hec2hrp)
 
@@ -373,8 +376,7 @@ static MACHINE_DRIVER_START( hec2mx40 )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    // Gestion cassette
-    MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
@@ -384,7 +386,7 @@ MACHINE_DRIVER_END
 /*****************************************************************************/
 static MACHINE_DRIVER_START( hec2mx80 )
 /*****************************************************************************/
-/* basic machine hardware */
+	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_5MHz)
 	MDRV_CPU_PROGRAM_MAP(hec2hrp_mem)
 	MDRV_CPU_IO_MAP(hec2mx80_io)
@@ -399,8 +401,7 @@ static MACHINE_DRIVER_START( hec2mx80 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 230)
 	MDRV_SCREEN_VISIBLE_AREA(0, 243, 0, 227)
-    MDRV_PALETTE_LENGTH(16)
-	MDRV_PALETTE_INIT(black_and_white)
+	MDRV_PALETTE_LENGTH(16)
 	MDRV_VIDEO_START(hec2hrp)
 	MDRV_VIDEO_UPDATE(hec2hrp)
 
@@ -417,8 +418,7 @@ static MACHINE_DRIVER_START( hec2mx80 )
 	MDRV_SOUND_CONFIG_DISCRETE( hec2hrp )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-    // Gestion cassette
-    MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette", hector_cassette_config )
 
 	/* printer */
 	MDRV_PRINTER_ADD("printer")
@@ -475,9 +475,9 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP(1983, hec2hrp,  0,       0,     hec2hrp,	hec2hrp, 0, 	 "Micronique",   "Hector 2HR+",	GAME_IMPERFECT_SOUND)
-COMP(????, victor,   hec2hrp, 0,	 hec2hrp,   hec2hrp, 0,      "Micronique",   "Victor",	GAME_IMPERFECT_SOUND)
+COMP(1983, hec2hrp,  0, interact,    hec2hrp,	hec2hrp, 0, 	 "Micronique",   "Hector 2HR+",	GAME_IMPERFECT_SOUND)
+COMP(????, victor,   hec2hrp, 0,     hec2hrp,   hec2hrp, 0,      "Micronique",   "Victor",	GAME_IMPERFECT_SOUND)
 COMP(1983, hec2hr ,  hec2hrp, 0,     hec2hr,	hec2hrp, 0, 	 "Micronique",   "Hector 2HR",	GAME_IMPERFECT_SOUND)
 COMP(1984, hec2hrx,  hec2hrp, 0,     hec2hrp,	hec2hrp, 0, 	 "Micronique",   "Hector HRX",	GAME_IMPERFECT_SOUND)
-COMP(1985, hec2mx80, hec2hrp, 0,    hec2mx80,	hec2hrp, 0, 	 "Micronique",   "Hector MX 80c" ,	GAME_IMPERFECT_SOUND)
-COMP(1985, hec2mx40, hec2hrp, 0,    hec2mx40,	hec2hrp, 0, 	 "Micronique",   "Hector MX 40c" ,	GAME_IMPERFECT_SOUND)
+COMP(1985, hec2mx80, hec2hrp, 0,     hec2mx80,	hec2hrp, 0, 	 "Micronique",   "Hector MX 80c" ,	GAME_IMPERFECT_SOUND)
+COMP(1985, hec2mx40, hec2hrp, 0,     hec2mx40,	hec2hrp, 0, 	 "Micronique",   "Hector MX 40c" ,	GAME_IMPERFECT_SOUND)
