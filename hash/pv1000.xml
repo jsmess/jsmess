@@ -44,13 +44,13 @@
 	</software>
 
 	<!-- GPA-115 -->
-	<software name="exitemah">
+	<software name="excitemj">
 		<description>Excite Mahjong</description>
 		<year>1982</year>
 		<publisher>Casio</publisher>
 		<part name="cart" interface="pv1000_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="exitemah.bin" size="16384" crc="0d2f829c" sha1="6cc9e5d234bc1b483108ae4dc79d644802a64ef0" offset="0000" />
+				<rom name="excitemj.bin" size="16384" crc="0d2f829c" sha1="6cc9e5d234bc1b483108ae4dc79d644802a64ef0" offset="0000" />
 			</dataarea>
 		</part>
 	</software>

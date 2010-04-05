@@ -46,14 +46,14 @@
 		</part>
 	</software>
 
-	<software name="3dsccera" cloneof="3dsoccer">
+	<software name="3dsoccera" cloneof="3dsoccer">
 		<description>3D Soccer (alt)</description>
 		<year>1983</year>
 		<publisher>UA Ltd.</publisher>
 		<!-- <serial>c033</serial> -->
 		<part name="cart" interface="arcadia_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="3dsccera.bin" size="8192" crc="1b5be22a" sha1="d3df9ed4e09bacacde47fa4f1128383fd62ffd6e" offset="0000" />
+				<rom name="3dsoccera.bin" size="8192" crc="1b5be22a" sha1="d3df9ed4e09bacacde47fa4f1128383fd62ffd6e" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -238,13 +238,13 @@
 	</software>
 
 	<!-- Also known as "Crazy Wall" -->
-	<software name="crzycmbr">
+	<software name="cclimber">
 		<description>Crazy Climber</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
 		<part name="cart" interface="arcadia_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="crzycmbr.bin" size="4096" crc="76e773fa" sha1="0c6ce7577a121e7810ec54c5dd180a55dd0ace17" offset="0000" />
+				<rom name="cclimber.bin" size="4096" crc="76e773fa" sha1="0c6ce7577a121e7810ec54c5dd180a55dd0ace17" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -477,13 +477,13 @@
 	</software>
 
 	<!-- Also known as "Devilman the Dot Muncher" or "Super Gobbler" -->
-	<software name="nbblemna" cloneof="nbblemen">
+	<software name="nbblemena" cloneof="nbblemen">
 		<description>Nibblemen (alt)</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
 		<part name="cart" interface="arcadia_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="nbblemna.bin" size="4096" crc="08d8b186" sha1="ca2efbcb1f1f580b7995aa47ab7da09fa4a1b9e2" offset="0000" />
+				<rom name="nbblemena.bin" size="4096" crc="08d8b186" sha1="ca2efbcb1f1f580b7995aa47ab7da09fa4a1b9e2" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -585,25 +585,25 @@
 	</software>
 
 	<!-- Prototype? Also known as "Space War" -->
-	<software name="spaceata" cloneof="spaceatt">
+	<software name="spaceatta" cloneof="spaceatt">
 		<description>Space Attack (alt)</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
 		<part name="cart" interface="arcadia_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="spaceata.bin" size="2048" crc="c91828cb" sha1="9e84d1884a002aafb84682eeb9e1cb2f29944d64" offset="000" />
+				<rom name="spaceatta.bin" size="2048" crc="c91828cb" sha1="9e84d1884a002aafb84682eeb9e1cb2f29944d64" offset="000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<!-- Also known as "Space War" -->
-	<software name="spaceatb" cloneof="spaceatt">
+	<software name="spaceattb" cloneof="spaceatt">
 		<description>Space Attack (alt 2)</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
 		<part name="cart" interface="arcadia_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="spaceata.bin" size="2048" crc="669632ec" sha1="0d96d79d22237312e217d8da8e2185e9245bdf47" offset="000" />
+				<rom name="spaceattb.bin" size="2048" crc="669632ec" sha1="0d96d79d22237312e217d8da8e2185e9245bdf47" offset="000" />
 			</dataarea>
 		</part>
 	</software>
@@ -694,13 +694,13 @@
 		</part>
 	</software>
 
-	<software name="superbga" cloneof="superbug">
+	<software name="superbuga" cloneof="superbug">
 		<description>Super Bug (alt)</description>
 		<year>198?</year>
 		<publisher>UA Ltd.</publisher>
 		<part name="cart" interface="arcadia_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="superbga.bin" size="4096" crc="15436f39" sha1="bf22e0fae67bc3c2147a669b194752e34fe3564d" offset="0000" />
+				<rom name="superbuga.bin" size="4096" crc="15436f39" sha1="bf22e0fae67bc3c2147a669b194752e34fe3564d" offset="0000" />
 			</dataarea>
 		</part>
 	</software>

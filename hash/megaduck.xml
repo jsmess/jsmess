@@ -102,7 +102,7 @@
 		</part>
 	</software>
 
-	<software name="magitowr">
+	<software name="magictwr">
 		<description>Magical Tower</description>
 		<year>1993</year>
 		<publisher>Sachen</publisher>
@@ -138,7 +138,7 @@
 		</part>
 	</software>
 
-	<software name="plewndra" cloneof="pilewndr">
+	<software name="pilewndra" cloneof="pilewndr">
 		<description>Pile Wonder (alt)</description>
 		<year>1993</year>
 		<publisher>Commin</publisher>

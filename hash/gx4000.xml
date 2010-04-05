@@ -65,13 +65,13 @@
 		</part>
 	</software>
 
-	<software name="cptr271">
+	<software name="coptr271">
 		<description>Copter 271</description>
 		<year>1991</year>
 		<publisher>Loriciel Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="cptr271.bin" size="131072" crc="3f9d0682" sha1="4b0a80aa83eaa89f109bad55ae4b067f698faaeb" offset="00000" />
+				<rom name="coptr271.bin" size="131072" crc="3f9d0682" sha1="4b0a80aa83eaa89f109bad55ae4b067f698faaeb" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -159,13 +159,13 @@
 	</software>
 
 	<!-- doesn't boot -->
-	<software name="optndblt">
+	<software name="othunder">
 		<description>Operation Thunderbolt</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="optndblt.bin" size="131072" crc="9d5a4f42" sha1="567a15d8a892a20ba3c0d3184a0b381b58f0c34c" offset="00000" />
+				<rom name="othunder.bin" size="131072" crc="9d5a4f42" sha1="567a15d8a892a20ba3c0d3184a0b381b58f0c34c" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -205,13 +205,13 @@
 		</part>
 	</software>
 
-	<software name="pltting">
+	<software name="plotting">
 		<description>Plotting</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
 		<part name="cart" interface="gx4000_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="pltting.bin" size="131072" crc="f7a73aaa" sha1="7163872123d61bf575d8a766d9b55ecca0901447" offset="00000" />
+				<rom name="plotting.bin" size="131072" crc="f7a73aaa" sha1="7163872123d61bf575d8a766d9b55ecca0901447" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
