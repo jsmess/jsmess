@@ -1678,5 +1678,6 @@ const game_driver * const drivers[] =
 	DRIVER( dm7000 )
 	DRIVER( dm5620 )
 	DRIVER( dm500 )
+	DRIVER( cgc7900 )
 
 #endif /* DRIVER_RECURSIVE */

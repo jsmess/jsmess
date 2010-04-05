@@ -19,6 +19,7 @@ Skeleton drivers:
 - Scientific Atlanta PowerVu pv9234 STB
 - Dream Multimedia Dreambox 7000/5620/500
 - Elektronika MC7105 [Thanks to Kaldyh]
+- Chromatics CGC 7900
 
 
 System Driver Changes:
