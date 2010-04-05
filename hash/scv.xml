@@ -87,6 +87,18 @@
 		</part>
 	</software>
 
+	<software name="doreamon">
+		<description>Doreamon</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="doreamon.0" size="32768" crc="ee0b874d" sha1="425eb6ed31faa2afdecc216145616f577f72db9a" offset="0" />
+				<rom name="doreamon.1" size="32768" crc="d2de91a6" sha1="6aba5ee3d08afad222bec9a176c2607829fa5cc6" offset="8000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elevfght">
 		<description>Elevator Fight</description>
 		<year>1984</year>
@@ -237,7 +249,6 @@
 
 <!--
 	/* Basic Nyuumon */
-	/* Doraemon */
 	/* Dragon Ball */
 	/* Dragon Slayer */
 	/* Lupin III - needs redump */

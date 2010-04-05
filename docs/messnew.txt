@@ -35,6 +35,8 @@ System Driver Changes:
 
 - [SAMCOUPE] Rewrote video rendering to render partial scanlines.  [Dirk Best]
 
+- [SCV] Added support for on-cart RAM and banking.  [Wilbert Pol]
+
 - [TANDY2K] Implemented DMA mux register. [Curt Coder]
 
 - [TI99] Cleanups.  [Michael Zapf]
