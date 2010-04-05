@@ -566,7 +566,14 @@ static void end_handler(void *data, const char *name)
 	switch(swlist->state.pos)
 	{
 		case POS_ROOT:
+			break;
+
 		case POS_SOFT:
+			if ( ! strcmp( name, "part" ) && swlist->softinfo )
+			{
+				/* ROM_END */
+				add_rom_entry( swlist, NULL, NULL, 0, 0, ROMENTRYTYPE_END );
+			}
 			break;
 
 		case POS_MAIN:
@@ -577,11 +584,6 @@ static void end_handler(void *data, const char *name)
 			break;
 
 		case POS_PART:
-			if ( swlist->softinfo )
-			{
-				/* ROM_END */
-				add_rom_entry( swlist, NULL, NULL, 0, 0, ROMENTRYTYPE_END );
-			}
 			break;
 
 		case POS_DATA:
@@ -972,7 +974,6 @@ bool load_software_part(running_device *device, const char *path, software_info 
 		}
 	}
 
-#if 0
 	if ( software_part_ptr )
 	{
 		/* Load the software part */
@@ -1000,7 +1001,6 @@ bool load_software_part(running_device *device, const char *path, software_info 
 
 		result = true;
 	}
-#endif
 
 	/* Close the software list if it's still open */
 	if ( software_list_ptr )
