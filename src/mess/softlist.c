@@ -505,6 +505,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				const char *str_crc = NULL;
 				const char *str_sha1 = NULL;
 				const char *str_offset = NULL;
+				const char *str_status = NULL;
 				const char *str_loadflag = NULL;
 
 				for ( ; attributes[0]; attributes += 2 )
@@ -519,6 +520,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						str_sha1 = attributes[1];
 					if ( !strcmp( attributes[0], "offset" ) )
 						str_offset = attributes[1];
+					if ( !strcmp( attributes[0], "status" ) )
+						str_status = attributes[1];
 					if ( !strcmp( attributes[0], "loadflag" ) )
 						str_loadflag = attributes[1];
 				}
@@ -530,12 +533,14 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						UINT32 offset = strtol( str_offset, NULL, 16 );
 						char *s_name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
 						char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_crc) + strlen(str_sha1) + 7 ) );
+						int baddump = ( !strcmp(str_status,"baddump") ) ? 1 : 0;
+						int nodump = ( !strcmp(str_status,"nodump" ) ) ? 1 : 0;
 
 						if ( !s_name || !hashdata )
 							return;
 
 						strcpy( s_name, str_name );
-						sprintf( hashdata, "c:%s#s:%s#", str_crc, str_sha1 );
+						sprintf( hashdata, "c:%s#s:%s#%s", str_crc, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : 0 ) ) );
 
 						/* ROM_LOAD( name, offset, length, hash ) */
 						add_rom_entry( swlist, s_name, hashdata, offset, length, ROMENTRYTYPE_ROM );

@@ -194,7 +194,14 @@ int info_listsoftware(core_options *options, const char *gamename)
 																fprintf(out, " %s=\"%s\"", hash_function_name(1 << hashtype), checksum);
 													}
 
-													fprintf( out, " offset=\"%x\" />\n", ROM_GETOFFSET(rom) );
+													fprintf( out, " offset=\"%x\"", ROM_GETOFFSET(rom) );
+
+													if ( hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP) )
+														fprintf( out, " status=\"baddump\"" );
+													if ( hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP) )
+														fprintf( out, " status=\"nodump\"" );
+
+													fprintf( out, "/>\n" );
 												}
 											}
 
