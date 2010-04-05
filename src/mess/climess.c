@@ -115,6 +115,7 @@ int info_listmedia(core_options *options, const char *gamename)
     games
 	TODO: Avoid outputting lists more than once.
 	TODO: Add DTD.
+	TODO: Add all information read from the source files
 -------------------------------------------------*/
 
 int info_listsoftware(core_options *options, const char *gamename)
@@ -141,70 +142,73 @@ int info_listsoftware(core_options *options, const char *gamename)
 
 					for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
 					{
-						if ( swlist->list_name[i] )
+						if ( swlist->list_name[i] && *swlist->list_name[i] )
 						{
 							fprintf(out, "\t<softwarelist name=\"%s\">\n", swlist->list_name[i] );
 
 							software_list *list = software_list_open( options, swlist->list_name[i], FALSE, NULL );
 
-							for ( software_info *swinfo = software_list_first( list ); swinfo != NULL; swinfo = software_list_next( list ) )
+							if ( list )
 							{
-								fprintf( out, "\t\t<software name=\"%s\"", swinfo->shortname );
-								if ( swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL )
-									fprintf( out, " supported=\"partial\"" );
-								if ( swinfo->supported == SOFTWARE_SUPPORTED_NO )
-									fprintf( out, " supported=\"no\"" );
-								fprintf( out, ">\n" );
-								fprintf( out, "\t\t\t<description>%s</description>\n", xml_normalize_string(swinfo->longname) );
-								fprintf( out, "\t\t\t<year>%s</year>\n", xml_normalize_string( swinfo->year ) );
-								fprintf( out, "\t\t\t<publisher>%s</publisher>\n", xml_normalize_string( swinfo->publisher ) );
-
-								for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
+								for ( software_info *swinfo = software_list_first( list ); swinfo != NULL; swinfo = software_list_next( list ) )
 								{
-									fprintf( out, "\t\t\t<part name=\"%s\"", part->name );
-									if ( part->interface_ )
-										fprintf( out, " interface=\"%s\"", part->interface_ );
-									if ( part->feature )
-										fprintf( out, " features=\"%s\"", part->feature );
-									fprintf( out, ">\n");
+									fprintf( out, "\t\t<software name=\"%s\"", swinfo->shortname );
+									if ( swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL )
+										fprintf( out, " supported=\"partial\"" );
+									if ( swinfo->supported == SOFTWARE_SUPPORTED_NO )
+										fprintf( out, " supported=\"no\"" );
+									fprintf( out, ">\n" );
+									fprintf( out, "\t\t\t<description>%s</description>\n", xml_normalize_string(swinfo->longname) );
+									fprintf( out, "\t\t\t<year>%s</year>\n", xml_normalize_string( swinfo->year ) );
+									fprintf( out, "\t\t\t<publisher>%s</publisher>\n", xml_normalize_string( swinfo->publisher ) );
 
-									/* TODO: display rom region information */
-									for ( const rom_entry *region = part->romdata; region; region = rom_next_region( region ) )
+									for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
 									{
-										fprintf( out, "\t\t\t\t<dataarea name=\"%s\" size=\"%x\">\n", ROMREGION_GETTAG(region), ROMREGION_GETLENGTH(region) );
+										fprintf( out, "\t\t\t<part name=\"%s\"", part->name );
+										if ( part->interface_ )
+											fprintf( out, " interface=\"%s\"", part->interface_ );
+										if ( part->feature )
+											fprintf( out, " features=\"%s\"", part->feature );
+										fprintf( out, ">\n");
 
-										for ( const rom_entry *rom = rom_first_file( region ); rom; rom = rom_next_file( rom ) )
+										/* TODO: display rom region information */
+										for ( const rom_entry *region = part->romdata; region; region = rom_next_region( region ) )
 										{
-											if ( ROMENTRY_ISFILE(rom) )
+											fprintf( out, "\t\t\t\t<dataarea name=\"%s\" size=\"%x\">\n", ROMREGION_GETTAG(region), ROMREGION_GETLENGTH(region) );
+
+											for ( const rom_entry *rom = rom_first_file( region ); rom; rom = rom_next_file( rom ) )
 											{
-												fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", ROM_GETNAME(rom), ROM_GETLENGTH(rom) );
-
-												/* dump checksum information only if there is a known dump */
-												if (!hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
+												if ( ROMENTRY_ISFILE(rom) )
 												{
-													char checksum[HASH_BUF_SIZE];
-													int hashtype;
+													fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", ROM_GETNAME(rom), ROM_GETLENGTH(rom) );
 
-													/* iterate over hash function types and print out their values */
-													for (hashtype = 0; hashtype < HASH_NUM_FUNCTIONS; hashtype++)
-														if (hash_data_extract_printable_checksum(ROM_GETHASHDATA(rom), 1 << hashtype, checksum))
-															fprintf(out, " %s=\"%s\"", hash_function_name(1 << hashtype), checksum);
+													/* dump checksum information only if there is a known dump */
+													if (!hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
+													{
+														char checksum[HASH_BUF_SIZE];
+														int hashtype;
+
+														/* iterate over hash function types and print out their values */
+														for (hashtype = 0; hashtype < HASH_NUM_FUNCTIONS; hashtype++)
+															if (hash_data_extract_printable_checksum(ROM_GETHASHDATA(rom), 1 << hashtype, checksum))
+																fprintf(out, " %s=\"%s\"", hash_function_name(1 << hashtype), checksum);
+													}
+
+													fprintf( out, " offset=\"%x\" />\n", ROM_GETOFFSET(rom) );
 												}
-
-												fprintf( out, " offset=\"%x\" />\n", ROM_GETOFFSET(rom) );
 											}
+
+											fprintf( out, "\t\t\t\t</datearea>\n" );
 										}
 
-										fprintf( out, "\t\t\t\t</datearea>\n" );
+										fprintf( out, "\t\t\t</part>\n" );
 									}
 
-									fprintf( out, "\t\t\t</part>\n" );
+									fprintf( out, "\t\t</software>\n" );
 								}
 
-								fprintf( out, "\t\t</software>\n" );
+								software_list_close( list );
 							}
-
-							software_list_close( list );
 
 							fprintf(out, "\t</softwarelist>\n" );
 						}
