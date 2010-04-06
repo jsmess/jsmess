@@ -96,7 +96,7 @@ static LPCSTR NormalizePath(LPCSTR pszPath, LPSTR pszBuffer, size_t nBufferSize)
 		pszBuffer[2] = '\0';
 		bChanged = TRUE;
 	}
-	else if (!_istalpha(pszPath[0]) || (pszPath[1] != ':'))
+	else if (!isalpha(pszPath[0]) || (pszPath[1] != ':'))
 	{
 		win_get_current_directory_utf8(nBufferSize, pszBuffer);
 		bChanged = TRUE;
