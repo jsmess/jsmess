@@ -689,6 +689,7 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 	int xdir,ydir;
 	int width = (towns_crtc_reg[12] - towns_crtc_reg[11]) / (((towns_crtc_reg[27] & 0x0f00) >> 8)+1);
 	int height = (towns_crtc_reg[16] - towns_crtc_reg[15]) / (((towns_crtc_reg[27] & 0xf000) >> 12)+1);
+	UINT32 vram_start = (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
 
 	if(xflip)
 	{
@@ -730,11 +731,11 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 			voffset += (towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
 			voffset &= 0x3ffff;
-			voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
+			//voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
 			if(xpos < width && ypos < height && pixel != 0)
 			{
-				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
-				towns_gfxvram[voffset] = col & 0x00ff;
+				towns_gfxvram[voffset+vram_start+1] = (col & 0xff00) >> 8;
+				towns_gfxvram[voffset+vram_start] = col & 0x00ff;
 			}
 			if(xflip)
 				voffset+=2;
@@ -743,11 +744,10 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 			pixel = towns_txtvram[poffset] & 0x0f;
 			col = towns_txtvram[coffset+(pixel*2)] | (towns_txtvram[coffset+(pixel*2)+1] << 8);
 			voffset &= 0x3ffff;
-			voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
 			if(xpos < width && ypos < height && pixel != 0)
 			{
-				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
-				towns_gfxvram[voffset] = col & 0x00ff;
+				towns_gfxvram[voffset+vram_start+1] = (col & 0xff00) >> 8;
+				towns_gfxvram[voffset+vram_start] = col & 0x00ff;
 			}
 			poffset++;
 			poffset &= 0x1ffff;
@@ -828,7 +828,10 @@ void draw_sprites(running_machine* machine, const rectangle* rect)
 		return;
 
 	// clears VRAM for each frame?
-	memset(towns_gfxvram+0x40000,0x80,0x40000);
+	if(towns_sprite_reg[6] & 0x10)
+		memset(towns_gfxvram+0x60000,0x80,0x20000);
+	else
+		memset(towns_gfxvram+0x40000,0x80,0x20000);
 
 	for(n=sprite_limit;n<1024;n++)
 	{

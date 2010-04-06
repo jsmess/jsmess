@@ -1723,9 +1723,11 @@ void towns_pcm_irq(running_device* device, int channel)
 	running_device* pic = devtag_get_device(device->machine,"pic8259_slave");
 
 	towns_pcm_irq_flag = 1;
-	towns_pcm_channel_flag |= (1 << channel);
 	if(towns_pcm_channel_mask & (1 << channel))
+	{
+		towns_pcm_channel_flag |= (1 << channel);
 		pic8259_ir5_w(pic, 1);
+	}
 }
 
 static WRITE_LINE_DEVICE_HANDLER( towns_pic_irq )
@@ -1848,7 +1850,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x0c30,0x0c33) AM_READ8(towns_unknown_r,0x00ff0000)
   // CMOS
   AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
-  // Something (MS-DOS wants this 0x41ff be 1
+  // Something (MS-DOS wants this 0x41ff to be 1)
   AM_RANGE(0x41fc,0x41ff) AM_READ8(towns_41ff_r,0xff000000)
   // CRTC / Video (again)
   AM_RANGE(0xfd90,0xfda3) AM_READWRITE8(towns_video_fd90_r, towns_video_fd90_w, 0xffffffff)
