@@ -46,6 +46,16 @@ static VIDEO_UPDATE( alesis )
     return 0;
 }
 
+static DRIVER_INIT( hr16 )
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	UINT8 *orig = memory_region(machine, "user1");
+	for (i = 0; i < 0x8000; i++)
+	{
+		ROM[BITSWAP16(i,15,14,13,12,11,10,9,8,0,1,2,3,4,5,6,7)] = orig[i];
+	}
+}
 static MACHINE_DRIVER_START( hr16 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8031, XTAL_12MHz)
@@ -92,6 +102,7 @@ MACHINE_DRIVER_END
 /* ROM definition */
 ROM_START( hr16 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
 	// version 1.07
 	ROM_LOAD( "2-19-0256.u11",  0x0000,  0x8000, CRC(2582b6a2) SHA1(f1f135335578c938be63b37ed207e82b7a0e13be))
 	ROM_REGION( 0x100000, "sounddata", ROMREGION_ERASEFF )
@@ -100,7 +111,8 @@ ROM_START( hr16 )
 ROM_END
 
 ROM_START( hr16b )
-    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+    ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
 	// version 2.00
 	ROM_LOAD( "2-19-0256.u11",0x0000,  0x8000, CRC(19cf0fce) SHA1(f8b3786b32d68e3627a654b8b3916befbe9bc540))
 	ROM_REGION( 0x100000, "sounddata", ROMREGION_ERASEFF )
@@ -120,6 +132,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, hr16,  0,       0, 		hr16, 	alesis, 	 0,  	 "Alesis",   "HR-16",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, hr16b, hr16,    0, 		hr16, 	alesis, 	 0,  	 "Alesis",   "HR-16B",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, hr16,  0,       0, 		hr16, 	alesis, 	 hr16, 	 "Alesis",   "HR-16",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( ????, hr16b, hr16,    0, 		hr16, 	alesis, 	 hr16, 	 "Alesis",   "HR-16B",		GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( ????, sr16,  0,       0, 		sr16, 	alesis, 	 0,  	 "Alesis",   "SR-16",		GAME_NOT_WORKING | GAME_NO_SOUND)
