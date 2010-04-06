@@ -356,9 +356,9 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 
 					/* Handle the supported flag */
 					elem->info.supported = SOFTWARE_SUPPORTED_YES;
-					if ( ! strcmp( supported, "partial" ) )
+					if ( supported && ! strcmp( supported, "partial" ) )
 						elem->info.supported = SOFTWARE_SUPPORTED_PARTIAL;
-					if ( ! strcmp( supported, "no" ) )
+					if ( supported && ! strcmp( supported, "no" ) )
 						elem->info.supported = SOFTWARE_SUPPORTED_NO;
 
 					/* Add the entry to the end of the list */
@@ -533,8 +533,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						UINT32 offset = strtol( str_offset, NULL, 16 );
 						char *s_name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
 						char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_crc) + strlen(str_sha1) + 7 ) );
-						int baddump = ( !strcmp(str_status,"baddump") ) ? 1 : 0;
-						int nodump = ( !strcmp(str_status,"nodump" ) ) ? 1 : 0;
+						int baddump = ( str_status && !strcmp(str_status,"baddump") ) ? 1 : 0;
+						int nodump = ( str_status && !strcmp(str_status,"nodump" ) ) ? 1 : 0;
 
 						if ( !s_name || !hashdata )
 							return;
