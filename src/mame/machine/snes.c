@@ -1779,6 +1779,9 @@ INLINE void snes_dma_transfer( const address_space *space, UINT8 dma, UINT32 abu
 {
 	snes_state *state = (snes_state *)space->machine->driver_data;
 
+	/* every byte transfer takes 8 master cycles */
+	cpu_adjust_icount(space->cpu,-8);
+
 	if (state->dma_channel[dma].dmap & 0x80)	/* PPU->CPU */
 	{
 		if (bbus == 0x2180 && ((abus & 0xfe0000) == 0x7e0000 || (abus & 0x40e000) == 0x0000))
@@ -1980,6 +1983,11 @@ static void snes_dma( const address_space *space, UINT8 channels )
 	UINT16 bbus;
 	UINT32 abus, abus_bank, length;
 
+	/* FIXME: we also need to round to the nearest 8 master cycles */
+
+	/* overhead steals 8 master cycles, correct? */
+	cpu_adjust_icount(space->cpu,-8);
+
 	/* Assume priority of the 8 DMA channels is 0-7 */
 	for (i = 0; i < 8; i++)
 	{
@@ -2090,8 +2098,13 @@ static void snes_dma( const address_space *space, UINT8 channels )
 			/* We're done, so write the new abus back to the registers */
 			state->dma_channel[i].src_addr = abus;
 			state->dma_channel[i].trans_size = 0;
+			/* active channel takes 8 master cycles */
+			cpu_adjust_icount(space->cpu,-8);
 		}
 	}
+
+	/* finally, take yet another 8 master cycles for the aforementioned overhead */
+	cpu_adjust_icount(space->cpu,-8);
 }
 
 READ8_HANDLER( superfx_r_bank1 )
