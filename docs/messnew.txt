@@ -20,6 +20,7 @@ Skeleton drivers:
 - Dream Multimedia Dreambox 7000/5620/500
 - Elektronika MC7105 [Thanks to Kaldyh]
 - Chromatics CGC 7900
+- Alesis HR-16,HR-16B and SR-16 drum machines
 
 
 System Driver Changes:
