@@ -116,7 +116,7 @@
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="lupin3.bin" size="16352" crc="5f3feae5" sha1="aabd54f96cb7abaf306c0a2d6d3e2296ef0052f1" offset="0" status="baddump" />
+				<rom name="lupin3.bin" size="16384" crc="16d7eb4a" sha1="62698c7c9d9723f74214626a4211a3c3f34e9dd5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -251,7 +251,6 @@
 	/* Basic Nyuumon */
 	/* Dragon Ball */
 	/* Dragon Slayer */
-	/* Lupin III - needs redump */
 	/* Mappy */
 	/* Milky Princess */
 	/* Nekketsu Kung Fu Road */
