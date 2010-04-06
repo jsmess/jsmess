@@ -1316,7 +1316,7 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT    COMPANY     FULLNAME */
-COMP ( 1984, ibm5170,  0,       ibm5160, ibm5170,   atcga,	atega,	    "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
+COMP ( 1984, ibm5170,  0,       ibm5150, ibm5170,   atcga,	atega,	    "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
 COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,  atega,      "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
 COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,  atcga,      "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	ps2m30286,  "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
