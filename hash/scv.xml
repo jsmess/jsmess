@@ -124,6 +124,19 @@
 		</part>
 	</software>
 
+	<software name="polepos2">
+		<description>Pole Position 2</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="polepos2.bin" size="131072" crc="cb69903d" sha1="472900d7b7fa6cdf30014731dcc925ef5ca65499" offset="0" />
+			</dataarea>
+			<!-- 4KB RAM on cartridge -->
+			<dataarea name="ram" size="4096" />
+		</part>
+	</software>
+
 	<software name="popchips">
 		<description>Pop and Chips</description>
 		<year>198?</year>
@@ -224,7 +237,6 @@
 	/* Mappy */
 	/* Milky Princess */
 	/* Nekketsu Kung Fu Road */
-	/* Pole Position II */
 	/* Rantou Pro Wrestling */
 	/* Shogi Nyuumon */
 	/* Sky Kid */

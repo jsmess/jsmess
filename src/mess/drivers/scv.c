@@ -17,6 +17,7 @@ static READ8_HANDLER( scv_portb_r );
 static READ8_HANDLER( scv_portc_r );
 static WRITE8_HANDLER( scv_portc_w );
 static WRITE8_HANDLER( scv_cart_ram_w );
+static WRITE8_HANDLER( scv_cart_ram2_w );
 
 
 class scv_state
@@ -34,6 +35,7 @@ public:
 	UINT32	cart_rom_size;
 	UINT8	*cart_ram;
 	UINT32	cart_ram_size;
+	bool	cart_ram_enabled;
 };
 
 
@@ -50,7 +52,8 @@ static ADDRESS_MAP_START( scv_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x8000, 0x9fff ) AM_ROMBANK("bank0")
 	AM_RANGE( 0xa000, 0xbfff ) AM_ROMBANK("bank1")
 	AM_RANGE( 0xc000, 0xdfff ) AM_ROMBANK("bank2")
-	AM_RANGE( 0xe000, 0xff7f ) AM_READ_BANK("bank3")	AM_WRITE( scv_cart_ram_w )
+	AM_RANGE( 0xe000, 0xefff ) AM_READ_BANK("bank3")	AM_WRITE( scv_cart_ram_w )
+	AM_RANGE( 0xf000, 0xff7f ) AM_READ_BANK("bank4")	AM_WRITE( scv_cart_ram2_w )
 	AM_RANGE( 0xff80, 0xffff ) AM_RAM		/* upd7801 internal RAM */
 ADDRESS_MAP_END
 
@@ -152,9 +155,24 @@ static WRITE8_HANDLER( scv_cart_ram_w )
 {
 	scv_state *state = (scv_state *)space->machine->driver_data;
 
-	/* Check if cartridge ram is available and enabled */
-	if ( state->cart_ram && state->cart_ram_size && ( state->portc & 0x20 ) )
+	/* Check if cartridge ram is enabled */
+	if ( state->cart_ram_enabled )
 	{
+		state->cart_ram[offset] = data;
+	}
+}
+
+
+static WRITE8_HANDLER( scv_cart_ram2_w )
+{
+	scv_state *state = (scv_state *)space->machine->driver_data;
+
+	/* Check if cartridge ram is enabled */
+	if ( state->cart_ram_enabled )
+	{
+		if ( state->cart_ram_size > 0x1000 )
+			offset += 0x1000;
+
 		state->cart_ram[offset] = data;
 	}
 }
@@ -216,39 +234,64 @@ static void scv_set_banks( running_machine *machine )
 {
 	scv_state *state = (scv_state *)machine->driver_data;
 
+	state->cart_ram_enabled = false;
+
 	switch( state->cart_rom_size )
 	{
+	case 0:
 	case 0x2000:
 		memory_set_bankptr( machine, "bank0", state->cart_rom );
 		memory_set_bankptr( machine, "bank1", state->cart_rom );
 		memory_set_bankptr( machine, "bank2", state->cart_rom );
 		memory_set_bankptr( machine, "bank3", state->cart_rom );
+		memory_set_bankptr( machine, "bank4", state->cart_rom + 0x1000 );
 		break;
 	case 0x4000:
 		memory_set_bankptr( machine, "bank0", state->cart_rom );
 		memory_set_bankptr( machine, "bank1", state->cart_rom + 0x2000 );
 		memory_set_bankptr( machine, "bank2", state->cart_rom );
 		memory_set_bankptr( machine, "bank3", state->cart_rom + 0x2000 );
+		memory_set_bankptr( machine, "bank4", state->cart_rom + 0x3000 );
 		break;
 	case 0x8000:
 		memory_set_bankptr( machine, "bank0", state->cart_rom );
 		memory_set_bankptr( machine, "bank1", state->cart_rom + 0x2000 );
 		memory_set_bankptr( machine, "bank2", state->cart_rom + 0x4000 );
 		memory_set_bankptr( machine, "bank3", state->cart_rom + 0x6000 );
+		memory_set_bankptr( machine, "bank4", state->cart_rom + 0x7000 );
 		break;
 	case 0x10000:
-	case 0x20000:
 		memory_set_bankptr( machine, "bank0", state->cart_rom + ( ( state->portc & 0x20 ) ? 0x8000 : 0 ) );
 		memory_set_bankptr( machine, "bank1", state->cart_rom + ( ( state->portc & 0x20 ) ? 0xa000 : 0x2000 ) );
 		memory_set_bankptr( machine, "bank2", state->cart_rom + ( ( state->portc & 0x20 ) ? 0xc000 : 0x4000 ) );
 		memory_set_bankptr( machine, "bank3", state->cart_rom + ( ( state->portc & 0x20 ) ? 0xe000 : 0x6000 ) );
+		memory_set_bankptr( machine, "bank4", state->cart_rom + ( ( state->portc & 0x20 ) ? 0xf000 : 0x7000 ) );
+		break;
+	case 0x20000:	/* Pole Position 2 */
+		int base = ( ( state->portc >> 5 ) & 0x03 ) * 0x8000 ;
+		memory_set_bankptr( machine, "bank0", state->cart_rom + base + 0 );
+		memory_set_bankptr( machine, "bank1", state->cart_rom + base + 0x2000 );
+		memory_set_bankptr( machine, "bank2", state->cart_rom + base + 0x4000 );
+		memory_set_bankptr( machine, "bank3", state->cart_rom + base + 0x6000 );
+		/* On-cart RAM is always enabled */
+		state->cart_ram_enabled = true;
+		memory_set_bankptr( machine, "bank4", state->cart_ram );
 		break;
 	}
 
 	/* Check if cartridge RAM is available and should be enabled */
-	if ( state->cart_ram && state->cart_ram_size && ( state->portc & 0x20 ) )
+	if ( state->cart_rom_size < 0x20000 && state->cart_ram && state->cart_ram_size && ( state->portc & 0x20 ) )
 	{
-		memory_set_bankptr( machine, "bank3", state->cart_ram );
+		if ( state->cart_ram_size == 0x1000 )
+		{
+			memory_set_bankptr( machine, "bank4", state->cart_ram );
+		}
+		else
+		{
+			memory_set_bankptr( machine, "bank3", state->cart_ram );
+			memory_set_bankptr( machine, "bank4", state->cart_ram + 0x1000 );
+		}
+		state->cart_ram_enabled = true;
 	}
 
 }
@@ -258,7 +301,7 @@ static WRITE8_HANDLER( scv_portc_w )
 {
 	scv_state *state = (scv_state *)space->machine->driver_data;
 
-	logerror("%04x: scv_portc_w: data = 0x%02x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), data );
+	//logerror("%04x: scv_portc_w: data = 0x%02x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), data );
 	state->portc = data;
 
 	scv_set_banks( space->machine );
@@ -270,7 +313,7 @@ static DEVICE_START( scv_cart )
 	scv_state *state = (scv_state *)device->machine->driver_data;
 
 	state->cart_rom = memory_region( device->machine, "cart" );
-	state->cart_rom_size = memory_region_length( device->machine, "cart" );
+	state->cart_rom_size = 0;
 	state->cart_ram = NULL;
 	state->cart_ram_size = 0;
 
