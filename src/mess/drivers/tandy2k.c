@@ -481,16 +481,16 @@ static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 		UINT32 videoram_addr = (state->vram_base | (va << 1)) + sx;
 		UINT8 videoram_data = memory_read_word(program, videoram_addr);
 		UINT16 charram_addr = (videoram_data << 4) | sl;
-		UINT8 data = state->char_ram[charram_addr] & 0xff;
+		UINT8 charram_data = state->char_ram[charram_addr] & 0xff;
 
 		for (int bit = 0; bit < 10; bit++)
 		{
-			if (BIT(data, 7))
+			if (BIT(charram_data, 7))
 			{
 				*BITMAP_ADDR16(bitmap, y, x + (sx * 10) + bit) = 1;
 			}
 
-			data <<= 1;
+			charram_data <<= 1;
 		}
 	}
 }
