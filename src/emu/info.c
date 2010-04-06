@@ -137,7 +137,7 @@ static void print_game_input(FILE *out, const game_driver *game, const ioport_li
 {
 	/* fix me -- this needs to be cleaned up to match the core style */
 
-enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal, ENDCONTROLTYPES};
+enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal, ckeypad, ckeyboard, ENDCONTROLTYPES};
 	int nplayer = 0;
 	int nbutton = 0;
 	int ncoin = 0;
@@ -146,12 +146,13 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	int i;
 	const char* service = 0;
 	const char* tilt = 0;
-	const char* const control_types[] = {"joy", "doublejoy", "stick", "dial", "trackball", "paddle", "lightgun", "pedal"};
+	const char* const control_types[] = {"joy", "doublejoy", "stick", "dial", "trackball", "paddle", "lightgun", "pedal", "keypad", "keyboard"};
 	static struct _input_info
 	{
 		const char *	type;			/* general type of input */
 		const char *	Xway;			/* 2, 4, or 8 way */
 		int				analog;
+		int				keyb;
 		int				min;			/* analog minimum value */
 		int				max;			/* analog maximum value  */
 		int				sensitivity;	/* default analog sensitivity */
@@ -161,11 +162,12 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	const input_port_config *port;
 	const input_field_config *field;
 
-	for (i=0;i<ENDCONTROLTYPES;i++)
+	for (i = 0; i < ENDCONTROLTYPES; i++)
 	{
 		control[i].type = control_types[i];
 		control[i].Xway = NULL;
 		control[i].analog = 0;
+		control[i].keyb = 0;
 		control[i].min = 0;
 		control[i].max = 0;
 		control[i].sensitivity = 0;
@@ -176,8 +178,8 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 	for (port = portlist.first(); port != NULL; port = port->next)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
-			if (nplayer < field->player+1)
-				nplayer = field->player+1;
+			if (nplayer < field->player + 1)
+				nplayer = field->player + 1;
 
 			switch (field->type)
 			{
@@ -322,6 +324,14 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 				case IPT_TILT :
 					tilt = "yes";
 					break;
+
+				case IPT_KEYPAD:
+					control[ckeypad].keyb = 1;
+					break;
+
+				case IPT_KEYBOARD:
+					control[ckeyboard].keyb = 1;
+					break;
 			}
 
 			/* get the analog stats */
@@ -377,6 +387,10 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 				fprintf(out, " reverse=\"yes\"");
 
 			fprintf(out, "/>\n");
+		}
+		if (control[i].keyb)
+		{
+			fprintf(out, "\t\t\t<control type=\"%s\"/>\n", xml_normalize_string(control_types[i]));
 		}
 	}
 	fprintf(out, "\t\t</input>\n");
