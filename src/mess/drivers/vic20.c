@@ -643,7 +643,7 @@ static MACHINE_DRIVER_START( vic20_common )
 	MDRV_VIA6522_ADD(M6522_0_TAG, 0, vic20_via0_intf)
 	MDRV_VIA6522_ADD(M6522_1_TAG, 0, vic20_via1_intf)
 
-	MDRV_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", 0)
+	MDRV_QUICKLOAD_ADD("quickload", cbm_vc20, "p00,prg", 3)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, cbm_cassette_config )
 	MDRV_CBM_IEC_ADD(IEC_TAG, cbm_iec_daisy)
 	MDRV_C1540_ADD(C1540_TAG, IEC_TAG, 8)
