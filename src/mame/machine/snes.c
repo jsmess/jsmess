@@ -955,7 +955,9 @@ READ8_HANDLER( snes_r_bank1 )
 	else
 		value = snes_ram[offset];
 
-	cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+
 	return value;
 }
 
@@ -1012,7 +1014,8 @@ READ8_HANDLER( snes_r_bank2 )
 	else
 		value = snes_ram[0x300000 + offset];
 
-	cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 
 	return value;
 }
@@ -1052,7 +1055,9 @@ READ8_HANDLER( snes_r_bank3 )
 	else											/* Mode 21 & 25 + SuperFX games */
 		value = snes_ram[0x400000 + offset];
 
-	cpu_adjust_icount(space->cpu, -8);
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -8);
+
 	return value;
 }
 
@@ -1088,7 +1093,9 @@ READ8_HANDLER( snes_r_bank4 )
 	else if (snes_cart.mode & 0x0a)					/* Mode 21 & 25 */
 		value = snes_ram[0x600000 + offset];
 
-	cpu_adjust_icount(space->cpu, -8);
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -8);
+
 	return value;
 }
 
@@ -1122,7 +1129,9 @@ READ8_HANDLER( snes_r_bank5 )
 	else
 		value = snes_ram[0x700000 + offset];
 
-	cpu_adjust_icount(space->cpu, -8);
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -8);
+
 	return value;
 }
 
@@ -1168,7 +1177,9 @@ READ8_HANDLER( snes_r_bank6 )
 	else
 		value = snes_ram[0x800000 + offset];
 
-	cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
+
 	return value;
 }
 
@@ -1219,7 +1230,8 @@ READ8_HANDLER( snes_r_bank7 )
 	else								/* Mode 21 & 25 + SuperFX Games */
 		value = snes_ram[0xc00000 + offset];
 
-	cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
 
 	return value;
 }
@@ -1266,7 +1278,8 @@ WRITE8_HANDLER( snes_w_bank1 )
 	else
 		logerror( "(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset );
 
-	cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 }
 
 /* 0x300000 - 0x3fffff */
@@ -1317,7 +1330,8 @@ WRITE8_HANDLER( snes_w_bank2 )
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x300000);
 
-	cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 }
 
 /* 0x600000 - 0x6fffff */
@@ -1341,7 +1355,8 @@ WRITE8_HANDLER( snes_w_bank4 )
 	else if (snes_cart.mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x600000);
 
-	cpu_adjust_icount(space->cpu, -8);
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -8);
 }
 
 /* 0x700000 - 0x7dffff */
@@ -1364,7 +1379,8 @@ WRITE8_HANDLER( snes_w_bank5 )
 	else if (snes_cart.mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x700000);
 
-	cpu_adjust_icount(space->cpu, -8);
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -8);
 }
 
 
@@ -1411,7 +1427,8 @@ WRITE8_HANDLER( snes_w_bank6 )
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x800000);
 
-	cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
 }
 
 
@@ -1449,7 +1466,8 @@ WRITE8_HANDLER( snes_w_bank7 )
 	else if (snes_cart.mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0xc00000);
 
-	cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
+	if(!space->debugger_access)
+		cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
 }
 
 
