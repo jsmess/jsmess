@@ -1682,5 +1682,6 @@ const game_driver * const drivers[] =
 	DRIVER( hr16 )
 	DRIVER( hr16b )
 	DRIVER( sr16 )
+	DRIVER( vidbrain )
 
 #endif /* DRIVER_RECURSIVE */

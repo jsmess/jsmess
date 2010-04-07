@@ -1628,6 +1628,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/dm7000.o 	\
 	$(MESS_DRIVERS)/chromati.o 	\
 	$(MESS_DRIVERS)/alesis.o 	\
+	$(MESS_DRIVERS)/vidbrain.o 	\
 
 
 

@@ -21,6 +21,8 @@ Skeleton drivers:
 - Elektronika MC7105 [Thanks to Kaldyh]
 - Chromatics CGC 7900
 - Alesis HR-16,HR-16B and SR-16 drum machines
+- VideoBrain Family Computer [Curt Coder]
+
 
 
 System Driver Changes:
