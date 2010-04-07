@@ -263,7 +263,10 @@ void wavfile_testload(const char *fname)
 		return;
 
 	if (cassette_open(f, &stdio_ioprocs, &wavfile_format, CASSETTE_FLAG_READONLY, &cassette))
+	{
+		fclose(f);
 		return;
+	}
 
 	offset = 44;
 	freq = 44100;
@@ -279,6 +282,8 @@ void wavfile_testload(const char *fname)
 	}
 
 	cassette_close(cassette);
+	
+	fclose(f);
 }
 #endif
 

@@ -436,6 +436,7 @@ static int nc_card_image_init(const imgtool_module *mod, imgtool_stream *f, imgt
 	/* allocate a big chunk of memory for memcard data - max size will be 1mb! */
 	if (!memcard_init(&nc_card->memcard, stream_size(f)))
 	{
+		free(nc_card);
 		return IMGTOOLERR_OUTOFMEMORY;
 	}
 

@@ -1037,23 +1037,22 @@ void cassette_dump(cassette_image *image, const char *filename)
 	struct io_generic saved_io;
 	const struct CassetteFormat *saved_format;
 
-	memcpy(&saved_io, &image->io, sizeof(saved_io));
-	saved_format = image->format;
-
 	f = fopen(filename, "wb");
 	if (!f)
-		goto done;
+		return;
+
+	memcpy(&saved_io, &image->io, sizeof(saved_io));
+	saved_format = image->format;
 
 	image->io.file = f;
 	image->io.procs = &stdio_ioprocs_noclose;
 	image->format = &wavfile_format;
 	cassette_perform_save(image);
 
-done:
 	memcpy(&image->io, &saved_io, sizeof(saved_io));
 	image->format = saved_format;
-	if (f)
-		fclose(f);
+
+	fclose(f);
 }
 
 
