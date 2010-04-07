@@ -116,6 +116,7 @@ static rectangle towns_crtc_layerscr[2];  // each layer has independent sizes
 static UINT8 towns_display_plane;
 static UINT8 towns_display_page_sel;
 static UINT8 towns_vblank_flag;
+static UINT8 towns_layer_ctrl;
 
 extern UINT32* towns_vram;
 extern UINT8* towns_gfxvram;
@@ -560,6 +561,9 @@ WRITE8_HANDLER(towns_video_fd90_w)
 		case 0x0f:
 			towns_degipal[offset-0x08] = data;
 			towns_dpmd_flag = 1;
+			break;
+		case 0x10:
+			towns_layer_ctrl = data;	
 			break;
 	}
 	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
@@ -1389,16 +1393,28 @@ VIDEO_UPDATE( towns )
 	if(!(towns_video_reg[1] & 0x01))
 	{
 		if(!input_code_pressed(screen->machine,KEYCODE_Q))
-			towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[1],1);
+		{
+			if((towns_layer_ctrl & 0x03) != 0)
+				towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[1],1);
+		}
 		if(!input_code_pressed(screen->machine,KEYCODE_W))
-			towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[0],0);
+		{
+			if((towns_layer_ctrl & 0x0c) != 0)
+				towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[0],0);
+		}
 	}
 	else
 	{
 		if(!input_code_pressed(screen->machine,KEYCODE_Q))
-			towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[0],0);
+		{
+			if((towns_layer_ctrl & 0x0c) != 0)
+				towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[0],0);
+		}
 		if(!input_code_pressed(screen->machine,KEYCODE_W))
-			towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[1],1);
+		{
+			if((towns_layer_ctrl & 0x03) != 0)
+				towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[1],1);
+		}
 	}
 
 /*#ifdef SPR_DEBUG
