@@ -22,7 +22,12 @@ Skeleton drivers:
 - Chromatics CGC 7900
 - Alesis HR-16,HR-16B and SR-16 drum machines
 - VideoBrain Family Computer [Curt Coder]
-
+- Central Data 2650
+- PIPBUG
+- Elektor TV Games Computer
+- Signetics Instructor 50
+- Dolphin
+- Chaos 2
 
 
 System Driver Changes:

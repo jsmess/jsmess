@@ -1629,6 +1629,13 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/chromati.o 	\
 	$(MESS_DRIVERS)/alesis.o 	\
 	$(MESS_DRIVERS)/vidbrain.o 	\
+	$(MESS_DRIVERS)/cd2650.o 	\
+	$(MESS_DRIVERS)/pipbug.o 	\
+	$(MESS_DRIVERS)/elektor.o 	\
+	$(MESS_DRIVERS)/instruct.o 	\
+	$(MESS_DRIVERS)/dolphin.o 	\
+	$(MESS_DRIVERS)/chaos.o 	\
+	
 
 
 
