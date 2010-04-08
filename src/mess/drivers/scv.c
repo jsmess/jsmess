@@ -367,23 +367,53 @@ static DEVICE_IMAGE_LOAD( scv_cart )
 
 static PALETTE_INIT( scv )
 {
-	/* Palette borrowed from eSCV. No idea if this is correct */
-	palette_set_color_rgb( machine,  0,   0,  90, 156 );
-	palette_set_color_rgb( machine,  1,   0,   0,   0 );
-	palette_set_color_rgb( machine,  2,  58, 148, 255 );
-	palette_set_color_rgb( machine,  3,   0,   0, 255 );
-	palette_set_color_rgb( machine,  4,  16, 214,   0 );
-	palette_set_color_rgb( machine,  5,  66, 255,  16 );
-	palette_set_color_rgb( machine,  6, 123, 230, 197 );
-	palette_set_color_rgb( machine,  7,   0, 173,   0 );
-	palette_set_color_rgb( machine,  8, 255,  41, 148 );
-	palette_set_color_rgb( machine,  9, 255,  49,  16 );
-	palette_set_color_rgb( machine, 10, 255,  58, 255 );
-	palette_set_color_rgb( machine, 11, 239, 156, 255 );
-	palette_set_color_rgb( machine, 12, 255, 206,  33 );
-	palette_set_color_rgb( machine, 13,  74, 123,  16 );
-	palette_set_color_rgb( machine, 14, 165, 148, 165 );
-	palette_set_color_rgb( machine, 15, 255, 255, 255 );
+	/*
+      SCV Epoch-1A chip RGB voltage readouts from paused Bios color test:
+
+      (values in millivolts)
+
+            R   G   B
+      0    29  29 325
+      1    29  27  22
+      2    25  24 510
+      3   337  28 508
+      4    29 515  22
+      5   336 512 329
+      6    26 515 511
+      7    29 337  25
+      8   520  24  22
+      9   517 338  21
+      10  520  25 512
+      11  521 336 333
+      12  518 515  21
+      13  342 336  22
+      14  337 336 330
+      15  516 511 508
+
+      Only tree 'bins' of values are obviously captured
+       25 ish
+      330 ish 
+      520 ish.
+
+      Quamtizing/scaling/rounding between 0 and 255 we thus get:
+
+	*/
+	palette_set_color_rgb( machine,   0,   0,   0, 155);
+	palette_set_color_rgb( machine,   1,   0,   0,   0);
+	palette_set_color_rgb( machine,   2,   0,   0, 255);
+	palette_set_color_rgb( machine,   3, 161,   0, 255);
+	palette_set_color_rgb( machine,   4,   0, 255,   0);
+	palette_set_color_rgb( machine,   5, 160, 255, 157);
+	palette_set_color_rgb( machine,   6,   0, 255, 255);
+	palette_set_color_rgb( machine,   7,   0, 161,   0);
+	palette_set_color_rgb( machine,   8, 255,   0,   0);
+	palette_set_color_rgb( machine,   9, 255, 161,   0);
+	palette_set_color_rgb( machine,  10, 255,   0, 255);
+	palette_set_color_rgb( machine,  11, 255, 160, 159);
+	palette_set_color_rgb( machine,  12, 255, 255,   0);
+	palette_set_color_rgb( machine,  13, 163, 160,   0);
+	palette_set_color_rgb( machine,  14, 161, 160, 157);
+	palette_set_color_rgb( machine,  15, 255, 255, 255);
 }
 
 

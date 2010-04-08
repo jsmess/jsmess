@@ -45,6 +45,9 @@ System Driver Changes:
 
 - [SCV] Added support for on-cart RAM and banking.  [Wilbert Pol]
 
+- [SCV] Updated palette values to match the output from
+  a real console.  [plgDavid]
+
 - [TANDY2K] Implemented DMA mux register. [Curt Coder]
 
 - [TI81] Added v1.1K BIOS. [critor]
