@@ -33,5 +33,6 @@ struct _upd1771_interface
 
 DEVICE_GET_INFO( upd1771c );
 WRITE8_DEVICE_HANDLER( upd1771_w );
+WRITE_LINE_DEVICE_HANDLER( upd1771_pcm_w );
 
 #endif /* __UPD1771_H__ */

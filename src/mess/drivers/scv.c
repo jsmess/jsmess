@@ -309,6 +309,7 @@ static WRITE8_HANDLER( scv_portc_w )
 	state->portc = data;
 
 	scv_set_banks( space->machine );
+	upd1771_pcm_w( devtag_get_device( space->machine, "upd1771c" ), state->portc & 0x08 );
 }
 
 

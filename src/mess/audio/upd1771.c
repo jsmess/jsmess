@@ -106,6 +106,7 @@ struct _upd1771_state
     UINT8    expected_bytes;
 
     UINT8   state;//0:silence, 1 noise, 2 tone
+	UINT8	pcm;
 
     //tone
     UINT8    t_timbre; //[0;  7]
@@ -232,6 +233,15 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 }
 
 
+WRITE_LINE_DEVICE_HANDLER( upd1771_pcm_w )
+{
+	upd1771_state *upd1771 = get_safe_token( device );
+
+	logerror( "upd1771_pcm_w: state = %d\n", state );
+	upd1771->pcm = state ? 1 : 0;
+}
+
+
 static STREAM_UPDATE( upd1771c_update )
 {
     upd1771_state *state = get_safe_token( device );
@@ -331,6 +341,7 @@ static DEVICE_RESET( upd1771c )
 
     state->index = 0;
     state->expected_bytes = 0;
+	state->pcm = 0;
 }
 
 
