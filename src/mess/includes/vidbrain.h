@@ -5,7 +5,8 @@
 
 #define F3850_TAG		"cd34"
 #define SCREEN_TAG		"screen"
-#define SPEAKER_TAG		"speaker"
+#define DISCRETE_TAG	"discrete"
+#define CASSETTE_TAG	"cassette"
 
 class vidbrain_state
 {
@@ -14,8 +15,12 @@ public:
 
 	vidbrain_state(running_machine &machine) { }
 
+	/* keyboard state */
+	UINT8 keylatch;
+	int joy_enable;
+
 	/* devices */
-	running_device *speaker;
+	running_device *discrete;
 };
 
 #endif
