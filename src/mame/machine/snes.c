@@ -1721,6 +1721,24 @@ MACHINE_START( snes )
 	snes_ram[WRDIVL] = 0xff;
 	snes_ram[WRDIVH] = 0xff;
 
+	/* init DMA regs to be 0xff */
+	{
+		int i;
+
+		for(i=0;i<8;i++)
+		{
+			state->dma_channel[i].dmap = 0xff;
+			state->dma_channel[i].dest_addr = 0xff;
+			state->dma_channel[i].src_addr = 0xffff;
+			state->dma_channel[i].bank = 0xff;
+			state->dma_channel[i].trans_size = 0xffff;
+			state->dma_channel[i].ibank = 0xff;
+			state->dma_channel[i].hdma_addr = 0xffff;
+			state->dma_channel[i].hdma_line_counter = 0xff;
+			state->dma_channel[i].unk = 0xff;
+		}
+	}
+
 	switch (snes_has_addon_chip)
 	{
 		case HAS_SDD1:
@@ -2052,6 +2070,8 @@ static void snes_hdma( const address_space *space )
 					abus = (state->dma_channel[i].bank << 16) + state->dma_channel[i].hdma_addr;
 
 				bbus = state->dma_channel[i].dest_addr + 0x2100;
+
+
 
 				switch (state->dma_channel[i].dmap & 0x07)
 				{
