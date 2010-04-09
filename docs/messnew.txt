@@ -33,6 +33,9 @@ Skeleton drivers:
 System Driver Changes:
 ----------------------
 
+- [AQUARIUS] Replaced bad char ROM with the newly redumped one.
+  [jaybird3rd, Dirk Best]
+
 - [CBM] Added JiffyDOS BIOSes to VIC-20, C64, C128, Plus/4. [Curt Coder]
 
 - [SX64] Added 1541 FLASH! BIOS. [Guru, Curt Coder]

@@ -485,7 +485,7 @@ ROM_START( aquarius )
 
 	/* charrom */
 	ROM_REGION(0x800, "gfx1", 0)
-	ROM_LOAD("aq2.u5", 0x000, 0x800, BAD_DUMP CRC(0b3edeed) SHA1(d2509839386b852caddcaa89cd376be647ba1492))
+	ROM_LOAD("aq2.u5", 0x000, 0x800, CRC(e117f57c) SHA1(3588c0267c67dfbbda615bcf8dc3d3a5c5bd815a))
 ROM_END
 
 ROM_START( aquarius_qd )
@@ -504,7 +504,7 @@ ROM_START( aquarius_qd )
 
 	/* charrom */
 	ROM_REGION(0x800, "gfx1", 0)
-	ROM_LOAD("aq2.u5", 0x000, 0x800, BAD_DUMP CRC(0b3edeed) SHA1(d2509839386b852caddcaa89cd376be647ba1492))
+	ROM_LOAD("aq2.u5", 0x000, 0x800, CRC(e117f57c) SHA1(3588c0267c67dfbbda615bcf8dc3d3a5c5bd815a))
 ROM_END
 
 
