@@ -19,6 +19,13 @@ public:
 	UINT8 keylatch;
 	int joy_enable;
 
+	/* video state */
+	UINT8 *video_ram;
+
+	/* sound state */
+	int sound_clk;
+	int sound_q[2];
+
 	/* devices */
 	running_device *discrete;
 };
