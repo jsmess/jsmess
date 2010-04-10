@@ -21,13 +21,9 @@
     - Text layer is (almost?) identical to System 22 & Super System 22.
 
     TODO:
-    - Palette is not right.
-
     - Hook up gun inputs (?) via the 2 serial latches at d00004 and d00006.
       Works like this: write to d00004, then read d00004 12 times.  Ditto at
       d00006.  This gives 24 bits of inputs (?) from the I/O board (?) or guns (?)
-
-    - The entire 3D subsystem.  Is there a DSP living down there?
 
     - There are currently no differences seen between System 23 (Time Crisis 2) and
       Super System 23 (GP500, Final Furlong 2).  These will presumably appear when
@@ -36,9 +32,7 @@
     - Serial number data is at offset 0x201 in the BIOS.  Until the games are running
       and displaying it I'm not going to meddle with it though.
 
-    - Ok, it's the "mt" roms, which the game calls data roms.  One pair is
-      at a8000000, the other at aa000000.  Point roms are accessed for
-      checksumming through a port at a200000x:
+    - Point roms are accessed for checksumming through a port at a200000x:
       - reset the port by writing 0000 to a2000006
       - write offset >> 16  to a2000004
       - write offset & ffff to a2000004 (yes, same address, hence the reset)
@@ -1166,6 +1160,8 @@ Notes:
 */
 
 #include "emu.h"
+#include <float.h>
+#include "video/poly.h"
 #include "cpu/mips/mips3.h"
 #include "cpu/h83002/h8.h"
 #include "cpu/sh2/sh2.h"
@@ -1177,7 +1173,6 @@ Notes:
 #define S23_HSYNC	(16666150)
 #define S23_MODECLOCK	(130205)
 
-//static int ss23_vstat = 0, hstat = 0, vstate = 0;
 static tilemap_t *bgtilemap;
 static UINT32 *namcos23_textram, *namcos23_shared_ram, *gmen_sh2_shared;
 static UINT32 *namcos23_charram;
@@ -1190,10 +1185,10 @@ static UINT16 ctl_inp_buffer[2];
 
 static UINT16 c417_ram[0x10000], c417_adr = 0;
 
-static UINT16 c412_sdram_a[0x100000];
+static UINT16 c412_sdram_a[0x100000]; // Framebuffers, probably
 static UINT16 c412_sdram_b[0x100000];
-static UINT16 c412_sram[0x20000];
-static UINT16 c412_pczram[0x200];
+static UINT16 c412_sram[0x20000];     // Ram-based tiles for rendering
+static UINT16 c412_pczram[0x200];     // Ram-based tilemap for rendering, or something else
 static UINT32 c412_adr = 0;
 
 static UINT16 c421_dram_a[0x40000];
@@ -1204,7 +1199,28 @@ static UINT32 c421_adr = 0;
 static INT16 s23_c422_regs[0x10];
 static int s23_subcpu_running;
 
+static emu_timer *c361_timer;
+
 static UINT32 p3d_address, p3d_size;
+
+static const UINT32 *ptrom;
+static const UINT16 *tmlrom;
+static const UINT8  *tmhrom, *texrom;
+static UINT32 tileid_mask, tile_mask, ptrom_limit;
+
+// It may only be 128
+// At 0x1e bytes per slot, rounded up to 0x20, that's 0x1000 to 0x2000 bytes.
+// That fits pretty much anywhere, including inside a IC
+// No idea at that point if it's CPU-reachable.  DMA's probably more efficient anyway.
+
+// Matrices are stored in signed 2.14 fixed point
+// Vectors are stored in signed 10.14 fixed point
+
+static INT16 matrices[256][9];
+static INT32 vectors[256][3];
+static INT32 light_vector[3];
+static UINT16 scaling;
+
 
 static UINT16 nthword( const UINT32 *pSource, int offs )
 {
@@ -1229,25 +1245,6 @@ static WRITE32_HANDLER( namcos23_textram_w )
 	COMBINE_DATA( &namcos23_textram[offset] );
 	tilemap_mark_tile_dirty(bgtilemap, offset*2);
 	tilemap_mark_tile_dirty(bgtilemap, (offset*2)+1);
-}
-
-static VIDEO_START( ss23 )
-{
-	gfx_element_set_source(machine->gfx[0], (UINT8 *)namcos23_charram);
-	bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
-	tilemap_set_transparent_pen(bgtilemap, 0xf);
-}
-
-static VIDEO_UPDATE( ss23 )
-{
-	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
-	bitmap_fill(screen->machine->priority_bitmap, cliprect, 0);
-
-	gfx_element *gfx = screen->machine->gfx[0];
-	memset(gfx->dirty, 1, gfx->total_elements);
-
-	tilemap_draw( bitmap, cliprect, bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
-	return 0;
 }
 
 static WRITE32_HANDLER( s23_txtchar_w )
@@ -1372,7 +1369,7 @@ static WRITE16_HANDLER(s23_c412_w)
     switch(offset) {
 	case 8: c412_adr = (data & mem_mask) | (c412_adr & (0xffffffff ^ mem_mask)); break;
 	case 9: c412_adr = ((data & mem_mask) << 16) | (c412_adr & (0xffffffff ^ (mem_mask << 16))); break;
-	case 10: s23_c412_ram_w(space, c412_adr, data, mem_mask); break;
+	case 10: s23_c412_ram_w(space, c412_adr, data, mem_mask); c412_adr += 2; break;
     default:
         logerror("c412_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
         break;
@@ -1418,7 +1415,7 @@ static READ16_HANDLER(s23_c421_r)
 static WRITE16_HANDLER(s23_c421_w)
 {
     switch(offset) {
-	case 0: s23_c421_ram_w(space, c421_adr & 0xfffff, data, mem_mask); break;
+	case 0: s23_c421_ram_w(space, c421_adr & 0xfffff, data, mem_mask); c421_adr += 2; break;
 	case 2: c421_adr = ((data & mem_mask) << 16) | (c421_adr & (0xffffffff ^ (mem_mask << 16))); break;
 	case 3: c421_adr = (data & mem_mask) | (c421_adr & (0xffffffff ^ mem_mask)); break;
     default:
@@ -1482,23 +1479,38 @@ static READ16_HANDLER(s23_ctl_r)
 	return 0xffff;
 }
 
+// raster timer.  TC2 indicates it's probably one-shot since it resets it each VBL...
+static int c361_scanline;
+static TIMER_CALLBACK( c361_timer_cb )
+{
+	if (c361_scanline != 511)
+	{
+		cputag_set_input_line(machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
+		timer_adjust_oneshot(c361_timer, attotime_never, 0);
+	}
+}
+
 static WRITE16_HANDLER(s23_c361_w)
 {
 	switch(offset) {
+	case 0:
+		tilemap_set_scrollx(bgtilemap, 0, data&0xfff);
+		break;
+
+	case 1:
+		tilemap_set_scrolly(bgtilemap, 0, data&0xfff);
+		break;
+
 	case 4:	// interrupt control
-		if (data == 0xc8)
+		c361_scanline = data;
+		if (data == 0x1ff)
 		{
-			logerror("c361_w: raise IRQ 1\n");
-			cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, ASSERT_LINE);
-		}
-		else if (data == 0x1ff)
-		{
-			logerror("c361_w: ack IRQ 1\n");
 			cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
+			timer_adjust_oneshot(c361_timer, attotime_never, 0);
 		}
 		else
 		{
-			logerror("c361_w %x, %04x @ %04x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+			timer_adjust_oneshot(c361_timer, video_screen_get_time_until_pos(space->machine->primary_screen, c361_scanline, 0), 0);
 		}
 		break;
 
@@ -1510,7 +1522,7 @@ static WRITE16_HANDLER(s23_c361_w)
 static READ16_HANDLER(s23_c361_r)
 {
 	switch(offset) {
-	case 5: return video_screen_get_vpos(space->machine->primary_screen);
+	case 5: return video_screen_get_vpos(space->machine->primary_screen)*2;
 	case 6: return video_screen_get_vblank(space->machine->primary_screen);
 	}
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -1547,15 +1559,6 @@ static WRITE16_HANDLER(s23_c422_w)
 
 	COMBINE_DATA(&s23_c422_regs[offset]);
 }
-
-static INTERRUPT_GEN(s23_interrupt)
-{
-	if(!ctl_vbl_active) {
-		ctl_vbl_active = true;
-		cpu_set_input_line(device, MIPS3_IRQ0, ASSERT_LINE);
-	}
-}
-
 
 // as with System 22, we need to halt the MCU while checking shared RAM
 static WRITE32_HANDLER( s23_mcuen_w )
@@ -1614,9 +1617,330 @@ static READ32_HANDLER( s23_unk_status_r )
 	return 0x00020002;
 }
 
-static void p3d_packet(const address_space *space, UINT32 adr, UINT32 size)
+
+// 3D hardware, to throw at least in part in video/namcos23.c
+
+enum { MODEL, FLUSH };
+
+struct namcos23_render_entry {
+	int type;
+
+	union {
+		struct {
+			UINT16 model;
+			INT16 m[9];
+			INT32 v[3];
+			float scaling;
+		} model;
+	};
+};
+
+struct namcos23_render_data {
+	const pen_t *pens;
+	UINT32 (*texture_lookup)(const pen_t *pens, float x, float y);
+};
+
+struct namcos23_poly_entry {
+	namcos23_render_data rd;
+	float zkey;
+	int front;
+	int vertex_count;
+	poly_vertex pv[16];
+};
+
+enum { RENDER_MAX_ENTRIES = 1000, POLY_MAX_ENTRIES = 10000 };
+static namcos23_render_entry render_entries[2][RENDER_MAX_ENTRIES];
+static namcos23_poly_entry render_polys[POLY_MAX_ENTRIES];
+static int render_poly_order[POLY_MAX_ENTRIES];
+static int render_count[2], render_cur, render_poly_count;
+static poly_manager *polymgr;
+
+static inline INT32 u32_to_s24(UINT32 v)
 {
-	logerror("p3d dma %08x %08x [%08x]\n", adr, size, (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
+  return v & 0x800000 ? v | 0xff000000 : v & 0xffffff;
+}
+
+static inline INT32 u32_to_s10(UINT32 v)
+{
+	return v & 0x200 ? v | 0xfffffe00 : v & 0x1ff;
+}
+
+
+static inline UINT8 light(UINT8 c, float l)
+{
+  if(l < 1)
+    l = l*c;
+  else
+    l = 255 - (255-c)/l;
+  return UINT8(l);
+}
+
+static UINT32 texture_lookup_nocache_point(const pen_t *pens, float x, float y)
+{
+	UINT32 xx = UINT32(x);
+	UINT32 yy = UINT32(y);
+	UINT32 tileid = ((xx >> 4) & 0xff) | ((yy << 4) & tileid_mask);
+	UINT8 attr = tmhrom[tileid >> 1];
+	if(tileid & 1)
+		attr &= 15;
+	else
+		attr >>= 4;
+	UINT32 tile = (tmlrom[tileid] | (attr << 16)) & tile_mask;
+
+	// Probably swapx/swapy to add on bits 2-3 of attr
+	// Bits used by motoxgo at least
+	UINT8 color = texrom[(tile << 8) | ((yy << 4) & 0xf0) | (xx & 0x0f)];
+	return pens[color];
+}
+
+static void render_scanline(void *dest, INT32 scanline, const poly_extent *extent, const void *extradata, int threadid)
+{
+	const namcos23_render_data *rd = (const namcos23_render_data *)extradata;
+
+	float w = extent->param[0].start;
+	float u = extent->param[1].start;
+	float v = extent->param[2].start;
+	float l = extent->param[3].start;
+	float dw = extent->param[0].dpdx;
+	float du = extent->param[1].dpdx;
+	float dv = extent->param[2].dpdx;
+	float dl = extent->param[3].dpdx;
+	bitmap_t *bitmap = (bitmap_t *)dest;
+	UINT32 *img = BITMAP_ADDR32(bitmap, scanline, extent->startx);
+
+	for(int x = extent->startx; x < extent->stopx; x++) {
+		float z = w ? 1/w : 0;
+		UINT32 pcol = rd->texture_lookup(rd->pens, u*z, v*z);
+		float ll = l*z;
+		*img = (light(pcol >> 16, ll) << 16) | (light(pcol >> 8, ll) << 8) | light(pcol, ll);
+
+		w += dw;
+		u += du;
+		v += dv;
+		l += dl;
+		img++;
+	}
+}
+
+static INT32 *p3d_getv(UINT16 id)
+{
+	static INT32 sp[3];
+	if(id == 0x8000)
+		return light_vector;
+	if(id >= 0x100) {
+		memset(sp, 0, sizeof(sp));
+		return sp;
+	}
+	return vectors[id];
+}
+
+static INT16 *p3d_getm(UINT16 id)
+{
+	static INT16 sp[3];
+	if(id >= 0x100) {
+		memset(sp, 0, sizeof(sp));
+		return sp;
+	}
+	return matrices[id];
+}
+
+static void p3d_matrix_set(const UINT16 *p, int size)
+{
+	if(size != 10) {
+		logerror("WARNING: p3d_matrix_set with size %d\n", size);
+		return;
+	}
+	INT16 *t = p3d_getm(*p++);
+	for(int i=0; i<9; i++)
+		t[i] = *p++;
+}
+
+static void p3d_vector_set(const UINT16 *p, int size)
+{
+	if(size != 7) {
+		logerror("WARNING: p3d_vector_set with size %d\n", size);
+		return;
+	}
+	INT32 *t = p3d_getv(*p++);
+	for(int i=0; i<3; i++) {
+		t[i] = u32_to_s24((p[0] << 16) | p[1]);
+		p += 2;
+	}
+}
+
+static void p3d_scaling_set(const UINT16 *p, int size)
+{
+	if(size != 1) {
+		logerror("WARNING: p3d_scaling_set with size %d\n", size);
+		return;
+	}
+	scaling = *p;
+}
+
+static void p3d_vector_matrix_mul(const UINT16 *p, int size)
+{
+	if(size != 4) {
+		logerror("WARNING: p3d_vector_matrix_mul with size %d\n", size);
+		return;
+	}
+	if(p[2] != 0xffff)
+		logerror("WARNING: p3d_vector_matrix_mul with +2=%04x\n", p[2]);
+
+	INT32 *t       = p3d_getv(p[0]);
+	const INT16 *m = p3d_getm(p[1]);
+	const INT32 *v = p3d_getv(p[3]);
+
+	t[0] = INT32((m[0]*INT64(v[0]) + m[3]*INT64(v[1]) + m[6]*INT64(v[2])) >> 14);
+	t[1] = INT32((m[1]*INT64(v[0]) + m[4]*INT64(v[1]) + m[7]*INT64(v[2])) >> 14);
+	t[2] = INT32((m[2]*INT64(v[0]) + m[5]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
+}
+
+static void p3d_matrix_vector_mul(const UINT16 *p, int size)
+{
+	if(size != 4) {
+		logerror("WARNING: p3d_matrix_vector_mul with size %d\n", size);
+		return;
+	}
+	if(p[2] != 0xffff)
+		logerror("WARNING: p3d_matrix_vector_mul with +2=%04x\n", p[2]);
+
+	INT32 *t       = p3d_getv(p[0]);
+	const INT16 *m = p3d_getm(p[1]);
+	const INT32 *v = p3d_getv(p[3]);
+
+	t[0] = INT32((m[0]*INT64(v[0]) + m[1]*INT64(v[1]) + m[2]*INT64(v[2])) >> 14);
+	t[1] = INT32((m[3]*INT64(v[0]) + m[4]*INT64(v[1]) + m[7]*INT64(v[2])) >> 14);
+	t[2] = INT32((m[6]*INT64(v[0]) + m[7]*INT64(v[1]) + m[8]*INT64(v[2])) >> 14);
+}
+
+
+static void p3d_matrix_matrix_mul(const UINT16 *p, int size)
+{
+	if(size != 4) {
+		logerror("WARNING: p3d_matrix_matrix_mul with size %d\n", size);
+		return;
+	}
+	if(p[2] != 0xffff)
+		logerror("WARNING: p3d_matrix_matrix_mul with +2=%04x\n", p[2]);
+
+	INT16 *t        = p3d_getm(p[0]);
+	const INT16 *m1 = p3d_getm(p[1]);
+	const INT16 *m2 = p3d_getm(p[3]);
+
+	t[0] = INT16((m1[0]*m2[0] + m1[1]*m2[3] + m1[2]*m2[6]) >> 14);
+	t[1] = INT16((m1[0]*m2[1] + m1[1]*m2[4] + m1[2]*m2[7]) >> 14);
+	t[2] = INT16((m1[0]*m2[2] + m1[1]*m2[5] + m1[2]*m2[8]) >> 14);
+	t[3] = INT16((m1[3]*m2[0] + m1[4]*m2[3] + m1[5]*m2[6]) >> 14);
+	t[4] = INT16((m1[3]*m2[1] + m1[4]*m2[4] + m1[5]*m2[7]) >> 14);
+	t[5] = INT16((m1[3]*m2[2] + m1[4]*m2[5] + m1[5]*m2[8]) >> 14);
+	t[6] = INT16((m1[6]*m2[0] + m1[7]*m2[3] + m1[8]*m2[6]) >> 14);
+	t[7] = INT16((m1[6]*m2[1] + m1[7]*m2[4] + m1[8]*m2[7]) >> 14);
+	t[8] = INT16((m1[6]*m2[2] + m1[7]*m2[5] + m1[8]*m2[8]) >> 14);
+}
+
+static void p3d_render(const UINT16 *p, int size, bool use_scaling)
+{
+	if(size != 3) {
+		logerror("WARNING: p3d_render with size %d\n", size);
+		return;
+	}
+
+	logerror("render model %x %swith matrix %x and vector %x\n", p[0], use_scaling ? "scaled " : "", p[1], p[2]);
+
+	// Temporary gross hack for timecrs2
+	if(p[0] == 0xd96)
+		return;
+
+	if(render_count[render_cur] >= RENDER_MAX_ENTRIES) {
+		logerror("WARNING: render buffer full\n");
+		return;
+	}
+
+	// Vector and matrix may be inverted
+	const INT16 *m = p3d_getm(p[1]);
+	const INT32 *v = p3d_getv(p[2]);
+
+	namcos23_render_entry *re = render_entries[render_cur] + render_count[render_cur];
+	re->type = MODEL;
+	re->model.model = p[0];
+	re->model.scaling = use_scaling ? scaling / 16384.0 : 1.0;
+	memcpy(re->model.m, m, sizeof(re->model.m));
+	memcpy(re->model.v, v, sizeof(re->model.v));
+	if(0)
+		fprintf(stderr, "Render %04x (%f %f %f %f %f %f %f %f %f) (%f %f %f)\n",
+				re->model.model,
+				re->model.m[0]/16384.0, re->model.m[1]/16384.0, re->model.m[2]/16384.0,
+				re->model.m[3]/16384.0, re->model.m[4]/16384.0, re->model.m[5]/16384.0,
+				re->model.m[6]/16384.0, re->model.m[7]/16384.0, re->model.m[8]/16384.0,
+				re->model.v[0]/16384.0, re->model.v[1]/16384.0, re->model.v[2]/16384.0);
+
+	render_count[render_cur]++;
+}
+
+
+static void p3d_flush(const UINT16 *p, int size)
+{
+	if(size != 0) {
+		logerror("WARNING: p3d_flush with size %d\n", size);
+		return;
+	}
+
+	namcos23_render_entry *re = render_entries[render_cur] + render_count[render_cur];
+	re->type = FLUSH;
+	render_count[render_cur]++;
+}
+
+static void p3d_dma(const address_space *space, UINT32 adr, UINT32 size)
+{
+	adr &= 0x1fffffff;
+	UINT16 buffer[256];
+	int pos = 0;
+	while(pos < size) {
+		UINT16 h = memory_read_word(space, adr+pos);
+
+		pos += 2;
+
+		UINT16 h1;
+		int psize;
+		if(h & 0x4000) {
+			h1 = h & 0xff00;
+			psize = h & 0xff;
+		} else {
+			h1 = h & 0xfff0;
+			psize = h & 0xf;
+		}
+
+		if(size-pos < psize*2) {
+			logerror("WARNING: short packet (header %04x, remaining %x)\n", h, (size-pos)/2);
+			return;
+		}
+
+		for(int i=0; i < psize; i++) {
+			buffer[i] = memory_read_word(space, adr+pos);
+			pos += 2;
+		}
+
+		switch(h1) {
+		case 0x0040: p3d_matrix_set(buffer, psize); break;
+		case 0x0050: p3d_vector_set(buffer, psize); break;
+		case 0x0000: p3d_matrix_matrix_mul(buffer, psize); break;
+		case 0x0810: p3d_matrix_vector_mul(buffer, psize); break;
+		case 0x1010: p3d_vector_matrix_mul(buffer, psize); break;
+		case 0x4400: p3d_scaling_set(buffer, psize); break;
+		case 0x8000: p3d_render(buffer, psize, false); break;
+		case 0x8080: p3d_render(buffer, psize, true); break;
+		case 0xc000: p3d_flush(buffer, psize); break;
+		default: {
+			if(0) {
+				logerror("p3d - [%04x] %04x", h1, h);
+				for(int i=0; i<psize; i++)
+					logerror(" %04x", buffer[i]);
+				logerror("\n");
+			}
+			break;
+		}
+		}
+	}
 }
 
 static READ32_HANDLER( p3d_r )
@@ -1636,13 +1960,245 @@ static WRITE32_HANDLER( p3d_w)
 	case 0x8: COMBINE_DATA(&p3d_size); return;
 	case 0x9:
 		if(data & 1)
-			p3d_packet(space, p3d_address, p3d_size);
+			p3d_dma(space, p3d_address, p3d_size);
 		return;
-	case 0x17: return;
+	case 0x17:
+		cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ1, CLEAR_LINE);
+		timer_adjust_oneshot(c361_timer, attotime_never, 0);
+		return;
 	}
 	logerror("p3d_w %02x, %08x @ %08x (%08x, %08x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 }
 
+static void render_apply_transform(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, poly_vertex &pv)
+{
+	pv.x =    (INT32((re->model.m[0]*INT64(xi) + re->model.m[3]*INT64(yi) + re->model.m[6]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[0])/16384.0;
+	pv.y =    (INT32((re->model.m[1]*INT64(xi) + re->model.m[4]*INT64(yi) + re->model.m[7]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[1])/16384.0;
+	pv.p[0] = (INT32((re->model.m[2]*INT64(xi) + re->model.m[5]*INT64(yi) + re->model.m[8]*INT64(zi)) >> 14)*re->model.scaling + re->model.v[2])/16384.0;
+}
+
+static void render_apply_matrot(INT32 xi, INT32 yi, INT32 zi, const namcos23_render_entry *re, INT32 &x, INT32 &y, INT32 &z)
+{
+	x = (re->model.m[0]*xi + re->model.m[3]*yi + re->model.m[6]*zi) >> 14;
+	y = (re->model.m[1]*xi + re->model.m[4]*yi + re->model.m[7]*zi) >> 14;
+	z = (re->model.m[2]*xi + re->model.m[5]*yi + re->model.m[8]*zi) >> 14;
+}
+
+static void render_project(poly_vertex &pv)
+{
+	// 768 validated by the title screen size on tc2:
+	// texture is 640x480, x range is 3.125, y range is 2.34375, z is 3.75
+	// 640/(3.125/3.75) = 768
+	// 480/(2.34375/3.75) = 768
+
+	float w = pv.p[0] ? 1/pv.p[0] : 0;
+	pv.x = 320 + 768*w*pv.x;
+	pv.y = 240 - 768*w*pv.y;
+	pv.p[0] = w;
+}
+
+static void render_one_model(running_machine *machine, const namcos23_render_entry *re)
+{
+	UINT32 adr = ptrom[re->model.model];
+	if(adr >= ptrom_limit) {
+		logerror("WARNING: model %04x base address %08x out-of-bounds - pointram?\n", re->model.model, adr);
+		return;
+	}
+
+	while(adr < ptrom_limit) {
+		poly_vertex pv[15];
+
+		UINT32 type = ptrom[adr++];
+		UINT32 h    = ptrom[adr++];
+
+
+		float tbase = (type >> 24) << 12;
+		UINT8 color = (h >> 24) & 0x7f;
+		int lmode = (type >> 19) & 3;
+		int ne = (type >> 8) & 15;
+
+		// Something to do with Z-sorting at least?
+		if(type & 0x00001000)
+			adr++;
+
+		UINT32 light = 0;
+		UINT32 extptr = 0;
+
+		if(lmode == 3) {
+			extptr = adr;
+			adr += ne;
+		} else
+			light = ptrom[adr++];
+
+		float minz = FLT_MAX;
+		float maxz = FLT_MIN;
+
+		for(int i=0; i<ne; i++) {
+			UINT32 v1 = ptrom[adr++];
+			UINT32 v2 = ptrom[adr++];
+			UINT32 v3 = ptrom[adr++];
+
+			render_apply_transform(u32_to_s24(v1), u32_to_s24(v2), u32_to_s24(v3), re, pv[i]);
+			pv[i].p[1] = (((v1 >> 20) & 0xf00) | ((v2 >> 24 & 0xff))) + 0.5;
+			pv[i].p[2] = (((v1 >> 16) & 0xf00) | ((v3 >> 24 & 0xff))) + 0.5 + tbase;
+
+			if(pv[i].p[0] > maxz)
+				maxz = pv[i].p[0];
+			if(pv[i].p[0] < minz)
+				minz = pv[i].p[0];
+
+			switch(lmode) {
+			case 0: case 1:
+				pv[i].p[3] = ((light >> (8*(3-i))) & 0xff) / 64.0;
+				break;
+			case 2:
+				pv[i].p[3] = 1.0;
+				break;
+			case 3: {
+				UINT32 norm = ptrom[extptr++];
+				INT32 nx = u32_to_s10(norm >> 20);
+				INT32 ny = u32_to_s10(norm >> 10);
+				INT32 nz = u32_to_s10(norm);
+				INT32 nrx, nry, nrz;
+				render_apply_matrot(nx, ny, nz, re, nrx, nry, nrz);
+
+				float lsi = float(nrx*light_vector[0] + nry*light_vector[1] + nrz*light_vector[2])/4194304.0;
+				if(lsi < 0)
+					lsi = 0;
+
+				// Mapping taken out of a hat
+				pv[i].p[3] = 0.5+lsi;
+				break;
+			}
+			}
+		}
+
+		namcos23_poly_entry *p = render_polys + render_poly_count;
+
+		p->vertex_count = poly_zclip_if_less(ne, pv, p->pv, 4, 0.001);
+
+		if(p->vertex_count >= 3) {
+			for(int i=0; i<p->vertex_count; i++) {
+				render_project(p->pv[i]);
+				float w = p->pv[i].p[0];
+				p->pv[i].p[1] *= w;
+				p->pv[i].p[2] *= w;
+				p->pv[i].p[3] *= w;
+			}
+			p->zkey = 0.5*(minz+maxz);
+			p->front = !(h & 0x00000001);
+			p->rd.texture_lookup = texture_lookup_nocache_point;
+			p->rd.pens = machine->pens + (color << 8);
+			render_poly_count++;
+		}
+
+		if(type & 0x000010000)
+			break;
+	}
+}
+
+static int render_poly_compare(const void *i1, const void *i2)
+{
+	const namcos23_poly_entry *p1 = render_polys + *(const int *)i1;
+	const namcos23_poly_entry *p2 = render_polys + *(const int *)i2;
+
+	if(p1->front != p2->front)
+		return p1->front ? 1 : -1;
+
+	return p1->zkey < p2->zkey ? 1 : p1->zkey > p2->zkey ? -1 : 0;
+}
+
+static void render_flush(running_machine *machine, bitmap_t *bitmap)
+{
+	if(!render_poly_count)
+		return;
+
+	for(int i=0; i<render_poly_count; i++)
+		render_poly_order[i] = i;
+
+	qsort(render_poly_order, render_poly_count, sizeof(int), render_poly_compare);
+
+	const static rectangle scissor = { 0, 639, 0, 479 };
+
+	for(int i=0; i<render_poly_count; i++) {
+		const namcos23_poly_entry *p = render_polys + render_poly_order[i];
+		namcos23_render_data *rd = (namcos23_render_data *)poly_get_extra_data(polymgr);
+		*rd = p->rd;
+		poly_render_triangle_fan(polymgr, bitmap, &scissor, render_scanline, 4, p->vertex_count, p->pv);
+	}
+	render_poly_count = 0;
+}
+
+static void render_run(running_machine *machine, bitmap_t *bitmap)
+{
+	render_poly_count = 0;
+	const namcos23_render_entry *re = render_entries[!render_cur];
+	for(int i=0; i<render_count[!render_cur]; i++) {
+		switch(re->type) {
+		case MODEL:
+			render_one_model(machine, re);
+			break;
+		case FLUSH:
+			render_flush(machine, bitmap);
+			break;
+		}
+		re++;
+	}
+	render_flush(machine, bitmap);
+
+	poly_wait(polymgr, "render_run");
+}
+
+
+static VIDEO_START( ss23 )
+{
+	gfx_element_set_source(machine->gfx[0], (UINT8 *)namcos23_charram);
+	bgtilemap = tilemap_create(machine, TextTilemapGetInfo, tilemap_scan_rows, 16, 16, 64, 64);
+	tilemap_set_transparent_pen(bgtilemap, 0xf);
+
+	// Gorgon's tilemap offset is 0, S23/SS23's is 860
+	if ((!strcmp(machine->gamedrv->name, "rapidrvr")) ||
+	    (!strcmp(machine->gamedrv->name, "rapidrvr2")) ||
+	    (!strcmp(machine->gamedrv->name, "finlflng")))
+	{
+		tilemap_set_scrolldx(bgtilemap, 0, 0);
+	}
+	else
+	{
+		tilemap_set_scrolldx(bgtilemap, 860, 860);
+	}
+	polymgr = poly_alloc(machine, 10000, sizeof(namcos23_render_data), POLYFLAG_NO_WORK_QUEUE);
+}
+
+static VIDEO_UPDATE( ss23 )
+{
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+
+	render_run( screen->machine, bitmap );
+
+	gfx_element *gfx = screen->machine->gfx[0];
+	memset(gfx->dirty, 1, gfx->total_elements);
+
+	tilemap_draw( bitmap, cliprect, bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
+	return 0;
+}
+
+static INTERRUPT_GEN(s23_interrupt)
+{
+	if(!ctl_vbl_active) {
+		ctl_vbl_active = true;
+		cpu_set_input_line(device, MIPS3_IRQ0, ASSERT_LINE);
+	}
+
+	render_cur = !render_cur;
+	render_count[render_cur] = 0;
+}
+
+static MACHINE_START( s23 )
+{
+	c361_timer = timer_alloc(machine, c361_timer_cb, 0);
+	timer_adjust_oneshot(c361_timer, attotime_never, 0);
+}
 static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE( p3d_r, p3d_w )
@@ -2223,6 +2779,15 @@ ADDRESS_MAP_END
 
 static DRIVER_INIT(ss23)
 {
+	ptrom  = (const UINT32 *)memory_region(machine, "pointrom");
+	tmlrom = (const UINT16 *)memory_region(machine, "textilemapl");
+	tmhrom = memory_region(machine, "textilemaph");
+	texrom = memory_region(machine, "textile");
+
+	tileid_mask = (memory_region_length(machine, "textilemapl")/2 - 1) & ~0xff; // Used for y masking
+	tile_mask = memory_region_length(machine, "textile")/256 - 1;
+	ptrom_limit = memory_region_length(machine, "pointrom")/4;
+
 	mi_rd = mi_wr = im_rd = im_wr = 0;
 	namcos23_jvssense = 1;
 	ctl_vbl_active = false;
@@ -2233,6 +2798,8 @@ static DRIVER_INIT(ss23)
 	s23_tssio_port_4 = 0;
 	s23_porta = 0, s23_rtcstate = 0;
 	s23_subcpu_running = 1;
+	render_count[0] = render_count[1] = 0;
+	render_cur = 0;
 
 	if ((!strcmp(machine->gamedrv->name, "motoxgo")) ||
 	    (!strcmp(machine->gamedrv->name, "panicprk")) ||
@@ -2301,7 +2868,7 @@ static MACHINE_DRIVER_START( gorgon )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
@@ -2313,6 +2880,8 @@ static MACHINE_DRIVER_START( gorgon )
 
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
+
+	MDRV_MACHINE_START(s23)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2345,7 +2914,7 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
@@ -2357,6 +2926,8 @@ static MACHINE_DRIVER_START( s23 )
 
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
+
+	MDRV_MACHINE_START(s23)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -2385,7 +2956,7 @@ static MACHINE_DRIVER_START( ss23 )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(S23_VSYNC1)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // Not in any way accurate
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
@@ -2397,6 +2968,8 @@ static MACHINE_DRIVER_START( ss23 )
 
 	MDRV_VIDEO_START(ss23)
 	MDRV_VIDEO_UPDATE(ss23)
+
+	MDRV_MACHINE_START(s23)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

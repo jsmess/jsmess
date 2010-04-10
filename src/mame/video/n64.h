@@ -347,12 +347,12 @@ class Processor
 
 		~Processor() { }
 
-		void 	Dasm(char *buffer);
+		void	Dasm(char *buffer);
 
-		void 	ProcessList();
-		UINT32 	ReadData(UINT32 address);
+		void	ProcessList();
+		UINT32	ReadData(UINT32 address);
 
-		void 	InitInternalState()
+		void	InitInternalState()
 		{
 			if(m_machine)
 			{
@@ -374,16 +374,16 @@ class Processor
 
 		// CPU-visible registers
 		void		SetStartReg(UINT32 val) { m_start = val; }
-		UINT32		GetStartReg() { return m_start; }
+		UINT32		GetStartReg() const { return m_start; }
 
 		void		SetEndReg(UINT32 val) { m_end = val; }
-		UINT32		GetEndReg() { return m_end; }
+		UINT32		GetEndReg() const { return m_end; }
 
 		void		SetCurrentReg(UINT32 val) { m_current = val; }
-		UINT32		GetCurrentReg() { return m_current; }
+		UINT32		GetCurrentReg() const { return m_current; }
 
 		void		SetStatusReg(UINT32 val) { m_status = val; }
-		UINT32		GetStatusReg() { return m_status; }
+		UINT32		GetStatusReg() const { return m_status; }
 
 		// Functional blocks
 		Blender*		GetBlender() { return &m_blender; }
@@ -449,12 +449,12 @@ class Processor
 		void		SetPrimLODFrac(UINT8 prim_lod_frac) { m_prim_lod_frac = prim_lod_frac; }
 
 		// Color Combiner
-		void 		SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
-		void 		SetSubBInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
-		void 		SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
-		void 		SetAddInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
-		void 		SetSubInputAlpha(UINT8 **input, int code);
-		void 		SetMulInputAlpha(UINT8 **input, int code);
+		void		SetSubAInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
+		void		SetSubBInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
+		void		SetMulInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
+		void		SetAddInputRGB(UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, int code);
+		void		SetSubInputAlpha(UINT8 **input, int code);
+		void		SetMulInputAlpha(UINT8 **input, int code);
 
 		// Texture memory
 		UINT8*		GetTMEM() { return m_tmem; }
@@ -464,48 +464,48 @@ class Processor
 		Tile*		GetTiles(){ return m_tiles; }
 
 		// Emulation Accelerators
-		UINT32		LookUp16To32(UINT16 in) { return m_rgb16_to_rgb32_lut[in]; }
-		UINT32		LookUpIA8To32(UINT16 in) { return m_ia8_to_rgb32_lut[in]; }
+		UINT32		LookUp16To32(UINT16 in) const { return m_rgb16_to_rgb32_lut[in]; }
+		UINT32		LookUpIA8To32(UINT16 in) const { return m_ia8_to_rgb32_lut[in]; }
 		UINT16*		GetCCLUT1() { return m_cc_lut1; }
 		UINT8*		GetCCLUT2() { return m_cc_lut2; }
 		UINT8		GetRandom() { return m_misc_state.m_random_seed += 0x13; }
 
 		// YUV Factors
 		void		SetYUVFactors(INT32 k0, INT32 k1, INT32 k2, INT32 k3, INT32 k4, INT32 k5) { m_k0 = k0; m_k1 = k1; m_k2 = k2; m_k3 = k3; m_k4 = k4; m_k5 = k5; }
-		INT32		GetK0() { return m_k0; }
-		INT32		GetK1() { return m_k1; }
-		INT32		GetK2() { return m_k2; }
-		INT32		GetK3() { return m_k3; }
+		INT32		GetK0() const { return m_k0; }
+		INT32		GetK1() const { return m_k1; }
+		INT32		GetK2() const { return m_k2; }
+		INT32		GetK3() const { return m_k3; }
 		INT32*		GetK4() { return &m_k4; }
 		INT32*		GetK5() { return &m_k5; }
 
 		// Blender-related (move into RDP::Blender)
-		void 		SetBlenderInput(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b);
+		void		SetBlenderInput(int cycle, int which, UINT8 **input_r, UINT8 **input_g, UINT8 **input_b, UINT8 **input_a, int a, int b);
 
 		// Render-related (move into eventual drawing-related classes?)
 		Rectangle*		GetScissor() { return &m_scissor; }
-		void 			TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
+		void			TCDiv(INT32 ss, INT32 st, INT32 sw, INT32* sss, INT32* sst);
 		UINT32			GetLog2(UINT32 lod_clamp);
-		void 			RenderSpans(int start, int end, int tilenum, bool shade, bool texture, bool zbuffer, bool flip);
+		void			RenderSpans(int start, int end, int tilenum, bool shade, bool texture, bool zbuffer, bool flip);
 		UINT8*			GetHiddenBits() { return m_hidden_bits; }
 		void			GetAlphaCvg(UINT8 *comb_alpha);
-		const UINT8*	GetBayerMatrix() { return s_bayer_matrix; }
-		const UINT8*	GetMagicMatrix() { return s_magic_matrix; }
+		const UINT8*	GetBayerMatrix() const { return s_bayer_matrix; }
+		const UINT8*	GetMagicMatrix() const { return s_magic_matrix; }
 		Span*			GetSpans() { return m_span; }
-		int				GetCurrFIFOIndex() { return m_cmd_cur; }
-		UINT32			GetFillColor32() { return m_fill_color; }
+		int				GetCurrFIFOIndex() const { return m_cmd_cur; }
+		UINT32			GetFillColor32() const { return m_fill_color; }
 
 		void			ZStore(UINT16* zb, UINT8* zhb, UINT32 z, UINT32 deltaz);
-		UINT32 			DecompressZ(UINT16 *zb);
-		UINT16 			DecompressDZ(UINT16* zb, UINT8* zhb);
-		INT32 			NormalizeDZPix(INT32 sum);
+		UINT32			DecompressZ(UINT16 *zb);
+		UINT16			DecompressDZ(UINT16* zb, UINT8* zhb);
+		INT32			NormalizeDZPix(INT32 sum);
 		bool			ZCompare(void* fb, UINT8* hb, UINT16* zb, UINT8* zhb, UINT32 sz, UINT16 dzpix);
 
 		// Fullscreen update-related
 		void			VideoUpdate(bitmap_t *bitmap);
 
 		// Commands
-		void 		CmdInvalid(UINT32 w1, UINT32 w2);
+		void		CmdInvalid(UINT32 w1, UINT32 w2);
 		void		CmdNoOp(UINT32 w1, UINT32 w2);
 		void		CmdTriangle(UINT32 w1, UINT32 w2);
 		void		CmdTriangleZ(UINT32 w1, UINT32 w2);
@@ -515,37 +515,37 @@ class Processor
 		void		CmdTriangleSZ(UINT32 w1, UINT32 w2);
 		void		CmdTriangleST(UINT32 w1, UINT32 w2);
 		void		CmdTriangleSTZ(UINT32 w1, UINT32 w2);
-		void 		CmdTexRect(UINT32 w1, UINT32 w2);
-		void 		CmdTexRectFlip(UINT32 w1, UINT32 w2);
-		void 		CmdSyncLoad(UINT32 w1, UINT32 w2);
-		void 		CmdSyncPipe(UINT32 w1, UINT32 w2);
-		void 		CmdSyncTile(UINT32 w1, UINT32 w2);
-		void 		CmdSyncFull(UINT32 w1, UINT32 w2);
-		void 		CmdSetKeyGB(UINT32 w1, UINT32 w2);
-		void 		CmdSetKeyR(UINT32 w1, UINT32 w2);
-		void 		CmdSetFillColor32(UINT32 w1, UINT32 w2);
-		void 		CmdSetConvert(UINT32 w1, UINT32 w2);
-		void 		CmdSetScissor(UINT32 w1, UINT32 w2);
-		void 		CmdSetPrimDepth(UINT32 w1, UINT32 w2);
-		void 		CmdSetOtherModes(UINT32 w1, UINT32 w2);
+		void		CmdTexRect(UINT32 w1, UINT32 w2);
+		void		CmdTexRectFlip(UINT32 w1, UINT32 w2);
+		void		CmdSyncLoad(UINT32 w1, UINT32 w2);
+		void		CmdSyncPipe(UINT32 w1, UINT32 w2);
+		void		CmdSyncTile(UINT32 w1, UINT32 w2);
+		void		CmdSyncFull(UINT32 w1, UINT32 w2);
+		void		CmdSetKeyGB(UINT32 w1, UINT32 w2);
+		void		CmdSetKeyR(UINT32 w1, UINT32 w2);
+		void		CmdSetFillColor32(UINT32 w1, UINT32 w2);
+		void		CmdSetConvert(UINT32 w1, UINT32 w2);
+		void		CmdSetScissor(UINT32 w1, UINT32 w2);
+		void		CmdSetPrimDepth(UINT32 w1, UINT32 w2);
+		void		CmdSetOtherModes(UINT32 w1, UINT32 w2);
 		void		CmdLoadTLUT(UINT32 w1, UINT32 w2);
 		void		CmdSetTileSize(UINT32 w1, UINT32 w2);
-		void 		CmdLoadBlock(UINT32 w1, UINT32 w2);
-		void 		CmdLoadTile(UINT32 w1, UINT32 w2);
+		void		CmdLoadBlock(UINT32 w1, UINT32 w2);
+		void		CmdLoadTile(UINT32 w1, UINT32 w2);
 		void		CmdFillRect(UINT32 w1, UINT32 w2);
-		void 		CmdSetTile(UINT32 w1, UINT32 w2);
-		void 		CmdSetFogColor(UINT32 w1, UINT32 w2);
-		void 		CmdSetBlendColor(UINT32 w1, UINT32 w2);
-		void 		CmdSetPrimColor(UINT32 w1, UINT32 w2);
-		void 		CmdSetEnvColor(UINT32 w1, UINT32 w2);
-		void 		CmdSetCombine(UINT32 w1, UINT32 w2);
-		void 		CmdSetTextureImage(UINT32 w1, UINT32 w2);
-		void 		CmdSetMaskImage(UINT32 w1, UINT32 w2);
-		void 		CmdSetColorImage(UINT32 w1, UINT32 w2);
+		void		CmdSetTile(UINT32 w1, UINT32 w2);
+		void		CmdSetFogColor(UINT32 w1, UINT32 w2);
+		void		CmdSetBlendColor(UINT32 w1, UINT32 w2);
+		void		CmdSetPrimColor(UINT32 w1, UINT32 w2);
+		void		CmdSetEnvColor(UINT32 w1, UINT32 w2);
+		void		CmdSetCombine(UINT32 w1, UINT32 w2);
+		void		CmdSetTextureImage(UINT32 w1, UINT32 w2);
+		void		CmdSetMaskImage(UINT32 w1, UINT32 w2);
+		void		CmdSetColorImage(UINT32 w1, UINT32 w2);
 
 		void		Triangle(bool shade, bool texture, bool zbuffer);
-		UINT32 		AddRightCvg(UINT32 x, UINT32 k);
-		UINT32 		AddLeftCvg(UINT32 x, UINT32 k);
+		UINT32		AddRightCvg(UINT32 x, UINT32 k);
+		UINT32		AddLeftCvg(UINT32 x, UINT32 k);
 
 		UINT32*		GetCommandData() { return m_cmd_data; }
 
@@ -554,15 +554,15 @@ class Processor
 		Framebuffer		m_framebuffer;
 		TexturePipe		m_tex_pipe;
 
-		OtherModes 		m_other_modes;
+		OtherModes		m_other_modes;
 		MiscState		m_misc_state;
 		ColorInputs		m_color_inputs;
 		CombineModes	m_combine;
 
-		Color 		m_pixel_color;
-		Color 		m_inv_pixel_color;
-		Color 		m_blended_pixel_color;
-		Color 		m_memory_color;
+		Color		m_pixel_color;
+		Color		m_inv_pixel_color;
+		Color		m_blended_pixel_color;
+		Color		m_memory_color;
 		Color		m_blend_color;
 
 		Color		m_prim_color;
@@ -577,14 +577,14 @@ class Processor
 		UINT8		m_lod_frac;
 		UINT8		m_prim_lod_frac;
 
-		Color 		m_one_color;
-		Color 		m_zero_color;
+		Color		m_one_color;
+		Color		m_zero_color;
 
 		UINT32		m_fill_color;
 
-		UINT16 		m_cc_lut1[(1<<24)];
-		UINT8 		m_cc_lut2[(1<<24)];
-		UINT32 		m_rgb16_to_rgb32_lut[(1 << 16)];
+		UINT16		m_cc_lut1[(1<<24)];
+		UINT8		m_cc_lut2[(1<<24)];
+		UINT32		m_rgb16_to_rgb32_lut[(1 << 16)];
 		UINT32		m_ia8_to_rgb32_lut[(1 << 16)];
 
 		UINT32		m_cmd_data[0x1000];
