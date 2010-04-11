@@ -179,7 +179,7 @@ int image_device_uses_file_extension(running_device *device, const char *file_ex
 int image_device_uses_file_extension(const device_config *device, const char *file_extension);
 
 /* compute a hash, using this device's partial hash if appropriate */
-void image_device_compute_hash(char *dest, running_device *device,
+void image_device_compute_hash(char *dest, const device_config *device,
     const void *data, size_t length, unsigned int functions);
 
 /* ----- creation formats ----- */

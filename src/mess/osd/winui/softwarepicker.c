@@ -226,7 +226,7 @@ static void ComputeFileHash(software_picker_info *pPickerInfo,
 
 	// FIXME
 	// compute the hash
-	//image_device_compute_hash(pFileInfo->hash_string, pFileInfo->device, pBuffer, nLength, functions);
+	image_device_compute_hash(pFileInfo->hash_string, pFileInfo->device, pBuffer, nLength, functions);
 }
 
 

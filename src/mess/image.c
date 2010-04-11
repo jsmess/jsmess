@@ -563,19 +563,19 @@ int image_device_uses_file_extension(const device_config *device, const char *fi
     using this device's partial hash if appropriate
 -------------------------------------------------*/
 
-void image_device_compute_hash(char *dest, running_device *device,
+void image_device_compute_hash(char *dest, const device_config *device,
     const void *data, size_t length, unsigned int functions)
 {
-    device_image_partialhash_func partialhash;
+//	device_image_partialhash_func partialhash;
 
-    /* retrieve the partial hash func */
-    partialhash = (device_image_partialhash_func) device->get_config_string(DEVINFO_FCT_IMAGE_PARTIAL_HASH);
+	/* retrieve the partial hash func */
+//	partialhash = (device_image_partialhash_func) device->get_config_string(DEVINFO_FCT_IMAGE_PARTIAL_HASH);
 
-    /* compute the hash */
-    if (partialhash != NULL)
-        partialhash(dest, (const unsigned char*)data, length, functions);
-    else
-        hash_compute(dest, (const unsigned char*)data, length, functions);
+	/* compute the hash */
+//	if (partialhash)
+//		partialhash(dest, (const unsigned char*)data, length, functions);
+//	else
+		hash_compute(dest, (const unsigned char*)data, length, functions);
 }
 
 
