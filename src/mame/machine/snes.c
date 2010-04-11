@@ -575,7 +575,7 @@ WRITE8_HANDLER( snes_w_io )
 	// APU is mirrored from 2140 to 217f
 	if (offset >= APU00 && offset < WMDATA)
 	{
-//      printf("816: %02x to APU @ %d\n", data, offset & 3);
+//     	printf("816: %02x to APU @ %d (PC=%06x)\n", data, offset & 3,cpu_get_pc(space->cpu));
 		spc_port_in(state->spc700, offset & 0x3, data);
 		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
 		return;
@@ -653,7 +653,7 @@ WRITE8_HANDLER( snes_w_io )
 			}
 			break;
 		case NMITIMEN:	/* Flag for v-blank, timer int. and joy read */
-			if((snes_ram[NMITIMEN] & 0x30) == 0x00)
+			if((data & 0x30) == 0x00)
 			{
 				cpu_set_input_line(state->maincpu, G65816_LINE_IRQ, CLEAR_LINE );
 				snes_ram[TIMEUP] = 0;	// clear pending IRQ if irq is disabled here, 3x3 Eyes - Seima Korin Den behaves on this
