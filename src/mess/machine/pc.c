@@ -1385,46 +1385,54 @@ MACHINE_RESET( pcjr )
 
 DEVICE_IMAGE_LOAD( pcjr_cartridge )
 {
-	unsigned size = image_length(image);
-	UINT8	header[0x200];
 	UINT32	address;
+	UINT32	size;
 
-	/* Check for supported image sizes */
-	switch( size )
+	address = ( ! strcmp( "cart2", image->tag() ) ) ? 0xd0000 : 0xe0000;
+
+	if ( image_software_entry(image) )
 	{
-	case 0x2200:
-	case 0x4200:
-	case 0x8200:
-	case 0x10200:
-		break;
-	default:
-		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
-		return 1;
+		UINT8 *cart = image_get_software_region( image, "rom" );
+
+		size = image_get_software_region_length( image, "rom" );
+
+		memcpy( memory_region(image->machine, "maincpu") + address, cart, size );
+	}
+	else
+	{
+		UINT8	header[0x200];
+
+		unsigned size = image_length(image);
+
+		/* Check for supported image sizes */
+		switch( size )
+		{
+		case 0x2200:
+		case 0x4200:
+		case 0x8200:
+		case 0x10200:
+			break;
+		default:
+			image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
+			return INIT_FAIL;
+		}
+
+		/* Read and verify the header */
+		if ( 512 != image_fread( image, header, 512 ) )
+		{
+			image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unable to read header" );
+			return INIT_FAIL;
+		}
+
+		/* Read the cartridge contents */
+		if ( ( size - 0x200 ) != image_fread( image, memory_region(image->machine, "maincpu") + address, size - 0x200 ) )
+		{
+			image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
+			return INIT_FAIL;
+		}
 	}
 
-	/* Read and verify the header */
-	if ( 512 != image_fread( image, header, 512 ) )
-	{
-		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unable to read header" );
-		return 1;
-	}
-
-	address = header[0x1CF] << 12;
-
-	if ( ( address & ( size - 0x201 ) ) != 0 )
-	{
-		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Invalid header" );
-		return 1;
-	}
-
-	/* Read the cartridge contents */
-	if ( ( size - 0x200 ) != image_fread( image, memory_region(image->machine, "maincpu") + address, size - 0x200 ) )
-	{
-		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
-		return 1;
-	}
-
-	return 0;
+	return INIT_PASS;
 }
 
 
