@@ -525,25 +525,37 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if ( !strcmp( attributes[0], "loadflag" ) )
 						str_loadflag = attributes[1];
 				}
-				if ( str_name && str_size && str_crc && str_sha1 && str_offset )
+				if ( swlist->softinfo )
 				{
-					if ( swlist->softinfo )
+					if ( str_size && str_offset )
 					{
 						UINT32 length = strtol( str_size, NULL, 10 );
 						UINT32 offset = strtol( str_offset, NULL, 16 );
-						char *s_name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
-						char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_crc) + strlen(str_sha1) + 7 ) );
-						int baddump = ( str_status && !strcmp(str_status,"baddump") ) ? 1 : 0;
-						int nodump = ( str_status && !strcmp(str_status,"nodump" ) ) ? 1 : 0;
 
-						if ( !s_name || !hashdata )
-							return;
+						if ( str_loadflag && !strcmp(str_loadflag,"reload") )
+						{
+							/* Handle 'reload' loadflag */
+							add_rom_entry( swlist, NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS );
+						}
+						else
+						{
+							if ( str_name && str_crc && str_sha1 )
+							{
+								char *s_name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
+								char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_crc) + strlen(str_sha1) + 7 ) );
+								int baddump = ( str_status && !strcmp(str_status,"baddump") ) ? 1 : 0;
+								int nodump = ( str_status && !strcmp(str_status,"nodump" ) ) ? 1 : 0;
 
-						strcpy( s_name, str_name );
-						sprintf( hashdata, "c:%s#s:%s#%s", str_crc, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : 0 ) ) );
+								if ( !s_name || !hashdata )
+									return;
 
-						/* ROM_LOAD( name, offset, length, hash ) */
-						add_rom_entry( swlist, s_name, hashdata, offset, length, ROMENTRYTYPE_ROM );
+								strcpy( s_name, str_name );
+								sprintf( hashdata, "c:%s#s:%s#%s", str_crc, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : 0 ) ) );
+
+								/* ROM_LOAD( name, offset, length, hash ) */
+								add_rom_entry( swlist, s_name, hashdata, offset, length, ROMENTRYTYPE_ROM );
+							}
+						}
 					}
 				}
 				else

@@ -252,7 +252,7 @@ int info_listsoftware(core_options *options, const char *gamename)
 											{
 												fprintf( out, "\t\t\t\t<dataarea name=\"%s\" size=\"%x\">\n", ROMREGION_GETTAG(region), ROMREGION_GETLENGTH(region) );
 
-												for ( const rom_entry *rom = rom_first_file( region ); rom; rom = rom_next_file( rom ) )
+												for ( const rom_entry *rom = rom_first_file( region ); !ROMENTRY_ISREGIONEND(rom); rom++ )
 												{
 													if ( ROMENTRY_ISFILE(rom) )
 													{
@@ -278,6 +278,10 @@ int info_listsoftware(core_options *options, const char *gamename)
 															fprintf( out, " status=\"nodump\"" );
 
 														fprintf( out, "/>\n" );
+													}
+													else if ( ROMENTRY_ISRELOAD(rom) )
+													{
+														fprintf( out, "\t\t\t\t\t<rom size=\"%d\" offset=\"%x\" loadflag=\"reload\" />\n", ROM_GETLENGTH(rom), ROM_GETOFFSET(rom) );
 													}
 												}
 
