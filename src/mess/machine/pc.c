@@ -1388,7 +1388,7 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 	UINT32	address;
 	UINT32	size;
 
-	address = ( ! strcmp( "cart2", image->tag() ) ) ? 0xe0000 : 0xd0000;
+	address = ( ! strcmp( "cart2", image->tag() ) ) ? 0xd0000 : 0xe0000;
 
 	if ( image_software_entry(image) )
 	{

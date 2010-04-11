@@ -37,7 +37,7 @@ Fraction Fever (Spinaker)
 
 	<software name="basic">
 		<description>Cartridge BASIC</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>Microsoft</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
@@ -48,9 +48,10 @@ Fraction Fever (Spinaker)
 	</software>
 
 	<software name="colorpnt">
+		<!-- To start boot from a DOS floppy and type G -->
 		<description>ColorPaint</description>
-		<year>19??</year>
-		<publisher>Krepec</publisher>
+		<year>1984</year>
+		<publisher>IBM</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
 				<rom name="colorpnt.bin" size="65536" crc="0dcdef20" sha1="5aeee32a4ec4dd1aeea9a02b3d174a2f294d13b9" offset="0" />
@@ -60,7 +61,7 @@ Fraction Fever (Spinaker)
 
 	<software name="crosfire">
 		<description>CrossFire</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>Sierra On-Line</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="8192">
@@ -70,24 +71,25 @@ Fraction Fever (Spinaker)
 	</software>
 
 	<software name="lotus123">
+		<!-- To start mount both cart1 and cart2, boot from a DOS floppy and type TUTOR -->
 		<description>Lotus 123jr</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>Lotus Development</publisher>
 		<part name="cart1" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="lotus123.a" size="65536" crc="d8f642fd" sha1="a2fcc7e50ed156b3e2cb085329523c7a79696dbe" offset="0" />
+				<rom name="lotus123.b" size="65536" crc="7b2c1f81" sha1="0a47fe8f99a6362d756d0648f0eefbd4d3ca9223" offset="0" />
 			</dataarea>
 		</part>
 		<part name="cart2" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="lotus123.b" size="65536" crc="7b2c1f81" sha1="0a47fe8f99a6362d756d0648f0eefbd4d3ca9223" offset="0" />
+				<rom name="lotus123.a" size="65536" crc="d8f642fd" sha1="a2fcc7e50ed156b3e2cb085329523c7a79696dbe" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="mineshft">
 		<description>Mine Shaft</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>Sierra On-Line</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="8192">
@@ -98,7 +100,7 @@ Fraction Fever (Spinaker)
 
 	<software name="mouser">
 		<description>Mouser</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>Gebelli</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="8192">
@@ -107,7 +109,8 @@ Fraction Fever (Spinaker)
 		</part>
 	</software>
 
-	<software name="pc_id">
+	<!-- This rom acts as a bios replacement, this is not yet supported by the driver -->
+	<software name="pc_id" supported="no">
 		<description>PC ID</description>
 		<year>19??</year>
 		<publisher>Racore</publisher>
@@ -120,7 +123,7 @@ Fraction Fever (Spinaker)
 
 	<software name="pitfall2">
 		<description>Pitfall II</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="16384">
@@ -129,7 +132,8 @@ Fraction Fever (Spinaker)
 		</part>
 	</software>
 
-	<software name="quiksilv">
+	<!-- This rom acts as a bios replacement, this is not yet supported by the driver -->
+	<software name="quiksilv" supported="no">
 		<description>QuickSilver</description>
 		<year>19??</year>
 		<publisher>Synectics</publisher>
@@ -142,7 +146,7 @@ Fraction Fever (Spinaker)
 
 	<software name="rivrraid">
 		<description>River Raid</description>
-		<year>19??</year>
+		<year>1984</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="16384">
@@ -153,7 +157,7 @@ Fraction Fever (Spinaker)
 
 	<software name="scubavnt">
 		<description>ScubaVenture</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>Gebelli</publisher>
 		<part name="cart" interface="ibmpcjr_cart">
 			<dataarea name="rom" size="8192">
