@@ -534,29 +534,6 @@ static void wd17xx_command_restore(running_device *device)
 }
 
 /*
-        Gets the size in bytes of the current track. For real hardware this
-    may vary per system in small degree, and there even for each track
-    and head, so we should not assume a fixed value here.
-    As we are using a buffered track writing, we have to find out how long
-    the track will become. The only object which can tell us is the
-    selected format.
-*/
-static int get_track_size(wd1770_state *w)
-{
-        int size = 0;
-        floppy_image *floppy = flopimg_get_image(w->drive);
-        if (floppy != NULL)
-        {
-                const struct FloppyCallbacks *fmt = floppy_callbacks(floppy);
-                if (fmt != NULL)
-                {
-                        size = fmt->get_track_size(floppy, w->hd, w->track);
-                }
-        }
-        return size;
-}
-
-/*
     Write an entire track. Formats which do not define a write_track
     function pointer will cause a silent return.
     What is written to the image depends on the selected format. Sector
@@ -567,6 +544,7 @@ static int get_track_size(wd1770_state *w)
 static void write_track(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
+	floppy_image *floppy;
 #if 0
 	int i;
 	for (i=0;i+4<w->data_offset;)
@@ -589,9 +567,17 @@ static void write_track(running_device *device)
 	}
 #endif
 
-	/* Determine the track size. We cannot allow different sizes in this
-       design. */
-        w->data_count = get_track_size(w);
+	/* Get the size in bytes of the current track. For real hardware this
+	may vary per system in small degree, and there even for each track
+	and head, so we should not assume a fixed value here.
+	As we are using a buffered track writing, we have to find out how long
+	the track will become. The only object which can tell us is the
+	selected format.
+	*/
+	w->data_count = 0;
+	floppy = flopimg_get_image(w->drive);
+	if (floppy != NULL)
+		w->data_count = floppy_get_track_size(floppy, w->hd, w->track);
 
         if (w->data_count==0)
         {
@@ -619,6 +605,7 @@ static void write_track(running_device *device)
 static void read_track(running_device *device)
 {
 	wd1770_state *w = get_safe_token(device);
+	floppy_image *floppy;
 #if 0
 	UINT8 *psrc;		/* pointer to track format structure */
 	UINT8 *pdst;		/* pointer to track buffer */
@@ -738,8 +725,11 @@ static void read_track(running_device *device)
 	}
 #endif
 	/* Determine the track size. We cannot allow different sizes in this
-       design. */
-        w->data_count = get_track_size(w);
+	design (see above, write_track). */
+	w->data_count = 0;
+	floppy = flopimg_get_image(w->drive);
+	if (floppy != NULL)
+		w->data_count = floppy_get_track_size(floppy, w->hd, w->track);
 
         if (w->data_count==0)
         {
