@@ -762,7 +762,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	}
 
 	/* adjust size for very large carts */
-	if (snes_cart.small_sram == SNES_MODE_20 && ((snes_rom_size - offset) > 0x200000 || snes_cart.sram > (32 * 1024)))
+	if (snes_cart.mode == SNES_MODE_20 && ((snes_rom_size - offset) > 0x200000 || snes_cart.sram > (32 * 1024)))
 		snes_cart.small_sram = 1;
 	else
 		snes_cart.small_sram = 0;
