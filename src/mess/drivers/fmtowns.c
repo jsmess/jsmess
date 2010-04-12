@@ -1207,52 +1207,8 @@ static void towns_cdrom_read(running_device* device)
 	track = cdrom_get_track(mess_cd_get_cdrom_file(device),towns_cd.lba_current);
 	if(track < 2)
 	{  // recalculate LBA
-		if((towns_cd.parameter[6] & 0x0f) < 2)
-		{
-			lba1 = 0;
-			if((towns_cd.parameter[6] & 0xf0) == 0x00)
-			{
-				lba1 |= (((towns_cd.parameter[6] + 8) & 0x0f) << 8);
-				lba1 |= (((towns_cd.parameter[6] + 0x80) & 0xf0) << 8);
-				lba1 |= ((towns_cd.parameter[7] - 1) << 16);
-			}
-			else
-			{
-				lba1 |= (((towns_cd.parameter[6] + 8) & 0x0f) << 8);
-				lba1 |= (((towns_cd.parameter[6] - 0x10) & 0xf0) << 8);
-				lba1 |= ((towns_cd.parameter[7]) << 16);
-			}
-		}
-		else
-		{
-			lba1 = (towns_cd.parameter[7] << 16);
-			lba1 |= ((towns_cd.parameter[6] - 2) << 8);
-		}
-		lba1 |= towns_cd.parameter[5];
-		if((towns_cd.parameter[3] & 0x0f) < 2)
-		{
-			lba2 = 0;
-			if((towns_cd.parameter[3] & 0xf0) == 0x00)
-			{
-				lba2 |= (((towns_cd.parameter[3] + 8) & 0x0f) << 8);
-				lba2 |= (((towns_cd.parameter[3] + 0x80) & 0xf0) << 8);
-				lba2 |= ((towns_cd.parameter[4] - 1) << 16);
-			}
-			else
-			{
-				lba2 |= (((towns_cd.parameter[3] + 8) & 0x0f) << 8);
-				lba2 |= (((towns_cd.parameter[3] - 0x10) & 0xf0) << 8);
-				lba2 |= ((towns_cd.parameter[4]) << 16);
-			}
-		}
-		else
-		{
-			lba2 = (towns_cd.parameter[4] << 16);
-			lba2 |= ((towns_cd.parameter[3] - 2) << 8);
-		}
-		lba2 |= towns_cd.parameter[2];
-		towns_cd.lba_current = msf_to_lba(lba1);
-		towns_cd.lba_last = msf_to_lba(lba2);
+		towns_cd.lba_current -= 150;
+		towns_cd.lba_last -= 150;
 	}
 
 	logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",towns_cd.lba_current,towns_cd.lba_last,track);
@@ -1313,6 +1269,7 @@ static void towns_cdrom_execute_command(running_device* device)
 	}
 	else
 	{
+		towns_cd.status &= ~0x02;
 		switch(towns_cd.command & 0x9f)
 		{
 			case 0x00:  // Seek
@@ -1322,6 +1279,14 @@ static void towns_cdrom_execute_command(running_device* device)
 					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 				}
 				logerror("CD: Command 0x00: SEEK\n");
+				break;
+			case 0x01:  // unknown
+				if(towns_cd.command & 0x20)
+				{
+					towns_cd.extra_status = 0;
+					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
+				}
+				logerror("CD: Command 0x01: unknown\n");
 				break;
 			case 0x02:  // Read (MODE1)
 				logerror("CD: Command 0x02: READ MODE1\n");
@@ -1342,6 +1307,7 @@ static void towns_cdrom_execute_command(running_device* device)
 				towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 				break;
 			case 0x80:  // set state
+				logerror("CD: Command 0x80: set state\n");
 				if(towns_cd.command & 0x20)
 				{
 					towns_cd.extra_status = 0;
@@ -1356,7 +1322,6 @@ static void towns_cdrom_execute_command(running_device* device)
 						towns_cd_set_status(device->machine,0x00,0x01,0x00,0x00);
 
 				}
-				logerror("CD: Command 0x80: set state\n");
 				break;
 			case 0x81:  // set state (CDDASET)
 				if(towns_cd.command & 0x20)
