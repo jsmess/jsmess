@@ -679,6 +679,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 				{
 					snes_has_addon_chip = HAS_SA1;
 					supported_type = 0;
+					fatalerror("This is a SA-1 type game, currently unsupported by the driver");
 				}
 				break;
 
