@@ -705,7 +705,7 @@ static MACHINE_DRIVER_START( snes )
 	MDRV_MACHINE_RESET(snes_mess)
 
 	/* video hardware */
-	MDRV_VIDEO_START(generic_bitmapped)
+	MDRV_VIDEO_START(snes)
 	MDRV_VIDEO_UPDATE(snes)
 
 	MDRV_SCREEN_ADD("screen", RASTER)

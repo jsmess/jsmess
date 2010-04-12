@@ -528,11 +528,10 @@ extern UINT32 snes_rom_size;
 
 extern void snes_latch_counters(running_machine *machine);
 
-/* (PPU) Video related */
-extern UINT8  *snes_vram;			/* Video RAM (Should be 16-bit, but it's easier this way) */
-extern UINT16 *snes_cgram;			/* Colour RAM */
-extern UINT16 *snes_oam;			/* Object Attribute Memory */
 extern UINT8  *snes_ram;			/* Main memory */
+
+
+/* (PPU) Video related */
 struct SNES_PPU_STRUCT	/* once all the regs are saved in this structure, it would be better to reorganize it a bit... */
 {
 	struct
