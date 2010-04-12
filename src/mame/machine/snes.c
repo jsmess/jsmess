@@ -1304,9 +1304,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 		}
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
 		{
-			int mask = (snes_cart.sram - 1);			/* Limit SRAM size to what's actually present */
-			offset -= 0x6000;
-			snes_ram[0x306000 + (offset & mask)] = data;
+			snes_ram[0x300000 + offset] = data;
 		}
 		else
 			logerror("snes_w_bank2: Attempt to write to reserved address: %X = %02x\n", offset + 0x300000, data);
@@ -1401,9 +1399,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 				memory_write_byte(space, offset, data);
 			else if ((offset >= 0x300000) && (snes_cart.sram > 0))
 			{
-				int mask = (snes_cart.sram - 1);			/* Limit SRAM size to what's actually present */
-				offset -= 0x6000;
-				snes_ram[0xb06000 + (offset & mask)] = data;
+				snes_ram[0xb00000 + offset] = data;
 			}
 			else	/* Area in 0x6000-0x8000 && offset < 0x300000 is Reserved! */
 				logerror("snes_w_bank6: Attempt to write to reserved address: %X = %02x\n", offset + 0x800000, data);
