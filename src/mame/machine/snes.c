@@ -994,9 +994,7 @@ READ8_HANDLER( snes_r_bank2 )
 		}
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
 		{
-			int mask = (snes_cart.sram - 1);				/* Limit SRAM size to what's actually present */
-			offset -= 0x6000;
-			value = snes_ram[0x306000 + (offset & mask)];
+			value = snes_ram[0x300000 + offset];
 		}
 		else
 		{
@@ -1157,9 +1155,7 @@ READ8_HANDLER( snes_r_bank6 )
 				value = memory_read_byte(space, offset);
 			else if ((offset >= 0x300000) && (snes_cart.sram > 0))
 			{
-				int mask = (snes_cart.sram - 1);		/* Limit SRAM size to what's actually present */
-				offset -= 0x6000;
-				value = snes_ram[0x806000 + (offset & mask)];	/* SRAM */
+				value = snes_ram[0x800000 + offset];	/* SRAM */
 			}
 			else						/* Area 0x6000-0x8000 with offset < 0x300000 is reserved */
 			{
