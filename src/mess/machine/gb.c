@@ -1926,7 +1926,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	/* Load the saved RAM if this cart has a battery */
 	if( gb_driver_data.CartType & BATTERY && gb_driver_data.RAMBanks )
 	{
-		image_battery_load( image, gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000 );
+		image_battery_load( image, gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000, 0x00 );
 	}
 
 	return INIT_PASS;

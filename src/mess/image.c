@@ -1830,7 +1830,7 @@ static file_error open_battery_file_by_name(const char *filename, UINT32 openfla
     to the function.
 -------------------------------------------------*/
 
-void image_battery_load_by_name(const char *filename, void *buffer, int length)
+void image_battery_load_by_name(const char *filename, void *buffer, int length, int fill)
 {
     file_error filerr;
     mame_file *file;
@@ -1847,7 +1847,7 @@ void image_battery_load_by_name(const char *filename, void *buffer, int length)
     }
 
     /* fill remaining bytes (if necessary) */
-    memset(((char *) buffer) + bytes_read, '\0', length - bytes_read);
+    memset(((char *) buffer) + bytes_read, fill, length - bytes_read);
 }
 
 
@@ -1858,7 +1858,7 @@ void image_battery_load_by_name(const char *filename, void *buffer, int length)
     image name.
 -------------------------------------------------*/
 
-void image_battery_load(running_device *image, void *buffer, int length)
+void image_battery_load(running_device *image, void *buffer, int length, int fill)
 {
     char *basename_noext;
     astring *fname;
@@ -1869,7 +1869,7 @@ void image_battery_load(running_device *image, void *buffer, int length)
 
     fname = astring_assemble_4(astring_alloc(), image->machine->gamedrv->name, PATH_SEPARATOR, basename_noext, ".nv");
 
-    image_battery_load_by_name(astring_c(fname), buffer, length);
+    image_battery_load_by_name(astring_c(fname), buffer, length, fill);
     astring_free(fname);
     free(basename_noext);
 }

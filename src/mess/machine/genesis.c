@@ -578,7 +578,7 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
 static void alloc_sram(running_machine *machine)
 {
 	genesis_sram = auto_alloc_array(machine, UINT16, (genesis_sram_end - genesis_sram_start + 1) / sizeof(UINT16));
-	image_battery_load(devtag_get_device(machine, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start + 1);
+	image_battery_load(devtag_get_device(machine, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start + 1, 0x00);
 	memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start + 1);
 }
 

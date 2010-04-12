@@ -306,10 +306,10 @@ const char *image_extrainfo(running_device *device);
   image; typically for cartridges.
 ****************************************************************************/
 
-void image_battery_load_by_name(const char *filename, void *buffer, int length);
+void image_battery_load_by_name(const char *filename, void *buffer, int length, int fill);
 void image_battery_save_by_name(const char *filename, const void *buffer, int length);
 
-void image_battery_load(running_device *img, void *buffer, int length);
+void image_battery_load(running_device *img, void *buffer, int length, int fill);
 void image_battery_save(running_device *img, const void *buffer, int length);
 
 

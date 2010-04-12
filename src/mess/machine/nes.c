@@ -642,7 +642,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		/* Attempt to load a battery file for this ROM. If successful, we */
 		/* must wait until later to move it to the system memory. */
 		if (nes.battery)
-			image_battery_load(image, battery_data, BATTERY_SIZE);
+			image_battery_load(image, battery_data, BATTERY_SIZE, 0x00);
 
 	}
 	else if ((magic[0] == 'U') && (magic[1] == 'N') && (magic[2] == 'I') && (magic[3] == 'F')) /* If header starts with 'UNIF' it is UNIF */
@@ -937,7 +937,7 @@ static void nes_load_proc(running_device *image)
 	image_fseek(image, 0, SEEK_END);
 	nes_fds.sides = (image_ftell(image) - header) / 65500;
 	nes_fds.data = (UINT8*)image_malloc(image, nes_fds.sides * 65500);
-	
+
 	/* if there is an header, skip it */
 	image_fseek(image, header, SEEK_SET);
 

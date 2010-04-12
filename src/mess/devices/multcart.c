@@ -257,7 +257,7 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 			if (resource->filename == NULL)
 				return MCERR_OUT_OF_MEMORY;
 
-			image_battery_load_by_name(resource->filename, resource->ptr, resource->length);
+			image_battery_load_by_name(resource->filename, resource->ptr, resource->length, 0x00);
 		}
 		/* else this type is volatile, in which case we just have
             a memory expansion */

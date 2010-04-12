@@ -2444,7 +2444,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	// if save media was found, reload it
 	if (state->nvsize > 0)
 	{
-		image_battery_load(image, state->nvptr, state->nvsize);
+		image_battery_load(image, state->nvptr, state->nvsize, 0x00);
 		state->nvimage = image;
 	}
 	else

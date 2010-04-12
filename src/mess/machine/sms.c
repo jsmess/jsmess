@@ -1339,7 +1339,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	}
 
 	/* Load battery backed RAM, if available */
-	image_battery_load(image, sms_state.cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE);
+	image_battery_load(image, sms_state.cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE, 0x00);
 
 	return INIT_PASS;
 }

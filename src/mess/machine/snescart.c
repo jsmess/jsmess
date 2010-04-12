@@ -128,7 +128,7 @@ static void snes_load_sram(running_machine *machine)
 
 	battery_ram = (UINT8*)malloc(snes_cart.sram_max);
 	ptr = battery_ram;
-	image_battery_load(devtag_get_device(machine, "cart"), battery_ram, snes_cart.sram_max);
+	image_battery_load(devtag_get_device(machine, "cart"), battery_ram, snes_cart.sram_max, 0xff);
 
 	if (snes_cart.mode == SNES_MODE_20)
 	{

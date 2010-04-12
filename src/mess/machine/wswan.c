@@ -1433,7 +1433,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	if ( eeprom.size != 0 )
 	{
 		eeprom.data = auto_alloc_array(image->machine, UINT8, eeprom.size );
-		image_battery_load( image, eeprom.data, eeprom.size );
+		image_battery_load( image, eeprom.data, eeprom.size, 0x00 );
 		eeprom.page = eeprom.data;
 	}
 
