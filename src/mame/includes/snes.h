@@ -644,6 +644,7 @@ struct snes_cart_info
 	UINT8  mode;		/* ROM memory mode */
 	UINT32 sram;		/* Amount of sram in cart */
 	UINT32 sram_max;	/* Maximum amount sram in cart (based on ROM mode) */
+	int    small_sram;
 };
 
 extern struct snes_cart_info snes_cart;

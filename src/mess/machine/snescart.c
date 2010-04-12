@@ -132,15 +132,17 @@ static void snes_load_sram(running_machine *machine)
 
 	if (snes_cart.mode == SNES_MODE_20)
 	{
+		UINT32 size = snes_cart.small_sram ? 0x8000 : 0x10000;
+
 		/* There could be some larger image needing banks 0x70 to 0x7f at address 0x8000 for ROM
          * mirroring. These should be treated separately or data would be overwritten by SRAM */
 		for (ii = 0; ii < 16; ii++)
 		{
 			/* loading */
-			memmove(&snes_ram[0x700000 + (ii * 0x010000)], ptr, 0xffff);
+			memmove(&snes_ram[0x700000 + (ii * 0x010000)], ptr, size);
 			/* mirroring */
-			memcpy(&snes_ram[0xf00000 + (ii * 0x010000)], &snes_ram[0x700000 + (ii * 0x010000)], 0xffff);
-			ptr += 0xffff;
+			memcpy(&snes_ram[0xf00000 + (ii * 0x010000)], &snes_ram[0x700000 + (ii * 0x010000)], size);
+			ptr += size;
 		}
 	}
 	else if (snes_cart.mode == SNES_MODE_21)
@@ -148,18 +150,18 @@ static void snes_load_sram(running_machine *machine)
 		for (ii = 0; ii < 16; ii++)
 		{
 			/* loading */
-			memmove(&snes_ram[0x306000 + (ii * 0x010000)], ptr, 0x1fff);
+			memmove(&snes_ram[0x306000 + (ii * 0x010000)], ptr, 0x2000);
 			/* mirroring */
-			memcpy(&snes_ram[0xb06000 + (ii * 0x010000)], &snes_ram[0x306000 + (ii * 0x010000)], 0x1fff);
-			ptr += 0x1fff;
+			memcpy(&snes_ram[0xb06000 + (ii * 0x010000)], &snes_ram[0x306000 + (ii * 0x010000)], 0x2000);
+			ptr += 0x2000;
 		}
 	}
 	else if (snes_cart.mode == SNES_MODE_25)
 	{
 		for (ii = 0; ii < 16; ii++)
 		{
-			memmove(&snes_ram[0xb06000 + (ii * 0x010000)], ptr, 0x1fff);
-			ptr += 0x1fff;
+			memmove(&snes_ram[0xb06000 + (ii * 0x010000)], ptr, 0x2000);
+			ptr += 0x2000;
 		}
 	}
 
@@ -177,10 +179,12 @@ static void snes_save_sram(running_machine *machine)
 
 	if (snes_cart.mode == SNES_MODE_20)
 	{
+		UINT32 size = snes_cart.small_sram ? 0x8000 : 0x10000;
+
 		for (ii = 0; ii < 16; ii++)
 		{
-			memmove(ptr, &snes_ram[0x700000 + (ii * 0x010000)], 0x10000);
-			ptr += 0x10000;
+			memmove(ptr, &snes_ram[0x700000 + (ii * 0x010000)], size);
+			ptr += size;
 		}
 	}
 	else if (snes_cart.mode == SNES_MODE_21)
@@ -675,7 +679,6 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 				{
 					snes_has_addon_chip = HAS_SA1;
 					supported_type = 0;
-					fatalerror("This is a SA-1 type game, currently unsupported by the driver");
 				}
 				break;
 
@@ -756,6 +759,13 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		if (snes_cart.sram > snes_cart.sram_max)
 			snes_cart.sram = snes_cart.sram_max;
 	}
+
+	/* adjust size for very large carts */
+	if (snes_cart.small_sram == SNES_MODE_20 && ((snes_rom_size - offset) > 0x200000 || snes_cart.sram > (32 * 1024)))
+		snes_cart.small_sram = 1;
+	else
+		snes_cart.small_sram = 0;
+
 
 	/* Log snes_cart information */
 	{
