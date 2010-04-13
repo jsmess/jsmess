@@ -275,7 +275,7 @@ static void scv_set_banks( running_machine *machine )
 		memory_set_bankptr( machine, "bank3", state->cart_rom + base + 0x6000 );
 		memory_set_bankptr( machine, "bank4", state->cart_rom + base + 0x7000 );
 		/* On-cart RAM is enabled when PC6 is high */
-		if ( state->portc & 0x40 )
+		if ( state->cart_ram && state->portc & 0x40 )
 		{
 			state->cart_ram_enabled = true;
 			memory_set_bankptr( machine, "bank4", state->cart_ram );

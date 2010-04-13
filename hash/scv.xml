@@ -147,6 +147,17 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
+	<software name="mlkprncs">
+		<description>Milky Princess</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="mlkprncs.bin" size="32768" crc="b2457990" sha1="b6234f99e474abd87a22a4b691b66bcb12e664cb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="minr2049">
 		<description>Miner 2049er</description>
 		<year>1985</year>
@@ -195,7 +206,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 
 	<software name="popchips">
 		<description>Pop and Chips</description>
-		<year>198?</year>
+		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="32768">
@@ -203,6 +214,17 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 			</dataarea>
 			<!-- 8KB RAM on cartridge -->
 			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="prowrest">
+		<description>Professional Wrestling</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="prowrest.bin" size="131072" crc="5b1fb2a8" sha1="55fe356c04ce3db83cb3148d867cc8b8060cbb48" offset="0" />
+			</dataarea>
 		</part>
 	</software>
 
@@ -236,6 +258,19 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 			<dataarea name="rom" size="32768">
 				<rom name="sansupyuta.bin" size="32768" crc="6e7e01b5" sha1="dc05257c831cffa5ec66302c88e1d45a92c6dc9c" offset="0" />
 			</dataarea>
+		</part>
+	</software>
+
+	<software name="shoginyu">
+		<description>Shogi Nyuumon</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="shoginyu.bin" size="32768" crc="84005c4c" sha1="bd6681013dbbae94c03e501932836db07943468e" offset="0" />
+			</dataarea>
+			<!-- 8KB RAM on cartridge -->
+			<dataarea name="ram" size="8192" />
 		</part>
 	</software>
 
@@ -291,10 +326,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	/* Dragon Ball */
 	/* Dragon Slayer */
 	/* Mappy */
-	/* Milky Princess */
 	/* Nekketsu Kung Fu Road */
-	/* Rantou Pro Wrestling */
-	/* Shogi Nyuumon */
 	/* Sky Kid */
 	/* Star Speeder */
 	/* Ton Ton Ball */
