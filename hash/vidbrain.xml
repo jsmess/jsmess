@@ -1,0 +1,176 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+
+  Undumped cartridges:
+
+  Expanders
+  EXP 1   Expander 1
+  EXP 2   Expander 2
+
+  Money Management Series
+  APL/S   The Computational Language
+  VB-59   The Programmable
+  VB-81   The Financier
+  VB-1000 Money Manager
+  VB-1100 Budget System
+  VB-1200 Information Manager
+  
+  Communication Series
+  CM01    Timeshare
+  
+  Education Series
+  ED07    Musicianship 1
+  ED08    Number Cross
+  ED09    Historical Simulation - France in the Old Regime
+  
+  Entertainment Series
+  EN07    Challenge Racer
+  EN08    Music Programmer
+  EN09    Programmable Football
+  EN10    Computer Life
+  
+  Demonstration Series
+  ST01    Demonstration
+
+-->
+<softwarelist name="vidbrain" description="VideoBrain Family Computer cartridges">
+
+  <!-- Education Series -->
+  
+  <software name="musictch">
+    <description>Music Teacher 1</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>ED01</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="2048">
+        <rom name="musicteacher1-ed01.bin" size="2048" crc="c8fee8cd" sha1="1a0a19ecedfb2d918e4e1a4eb604a07dc5e1113f" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+  <software name="mathttr1">
+    <description>Math Tutor 1</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>ED02</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="4096">
+        <rom name="mathtutor1-ed02.bin" size="4096" crc="db47f770" sha1="efe9e5f7ee95e157af892b84de5653c0f85a13b0" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+  <software name="wrdwise1">
+    <description>Wordwise 1</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>ED03</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="2048">
+        <rom name="wordwise1-ed03.bin" size="2048" crc="d1546212" sha1="91594485442e2dfad059e4ce42aa60b7a0519d91" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+  <software name="wrdwise2">
+    <description>Wordwise 2</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>ED04</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="2048">
+        <rom name="wordwise2-ed04.bin" size="2048" crc="4a08e999" sha1="0b17ead29aea643da84d495ebab5220e547abf99" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+  <software name="vidartst">
+    <description>VideoArtist</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>ED05</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="4096">
+        <rom name="videoartist-ed05.bin" size="4096" crc="d68795f8" sha1="dfb118d6bba837aa8e6b7feb19be7de40cd1e4fa" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+  <software name="lemstand">
+    <description>Lemonade Stand</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>ED06</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="4096">
+        <rom name="lemonadestand-ed06.bin" size="4096" crc="27c08d93" sha1="faf47261797692e9081dc24f957f8f38dc1a975d" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+
+  <!-- Entertainment Series -->
+  
+  <software name="gladiatr">
+    <description>Gladiator</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>EN01</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="4096">
+        <rom name="gladiator-en01.bin" size="4096" crc="e6a88a49" sha1="ffdb06a714cc5bafa980db0742d0364ee5658c05" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+  <software name="pinball">
+    <description>Pinball</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>EN02</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="2048">
+        <rom name="pinball-en02.bin" size="2048" crc="484331ff" sha1="0bd04368692a55bf89f8ec7ff1a29cff3a398b9f" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+  <software name="tennis">
+    <description>Tennis</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>EN03</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="4096">
+        <rom name="tennis-en03.bin" size="4096" crc="1942f852" sha1="74e8304d8ad0328655627e21c0305b72c11a5dda" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+  <software name="checkers">
+    <description>Checkers</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>EN04</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="4096">
+        <rom name="checkers-en04.bin" size="4096" crc="24c53410" sha1="f12f448d1f62b56318cb94b8f802180d561e3ee5" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+  <software name="blakjack">
+    <description>Blackjack</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>EN05</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="2048">
+        <rom name="blackjack-en05.bin" size="2048" crc="47f02b92" sha1="23fd10c9674d304f2a0a4ae37e3afb6a25906b1c" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+  <software name="vicevers">
+    <description>Vice Versa</description>
+    <year>1978</year>
+    <publisher>VideoBrain Computer Company</publisher>
+    <!-- <serial>EN06</serial> -->
+    <part name="cart" interface="vidbrain_cart">
+      <dataarea name="rom" size="4096">
+        <rom name="viceversa-en06.bin" size="4096" crc="e23504ee" sha1="c5b4b62c9e0db998c2c4df6f71713a1df35c8bf4" offset="0" />
+      </dataarea>
+    </part>
+  </software>
+</softwarelist>

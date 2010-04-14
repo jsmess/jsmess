@@ -18,9 +18,11 @@ public:
 	/* keyboard state */
 	UINT8 keylatch;
 	int joy_enable;
+	int uv201_31;
 
 	/* video state */
 	UINT8 *video_ram;
+	UINT8 bg_color;
 
 	/* sound state */
 	int sound_clk;

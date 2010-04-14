@@ -1,7 +1,8 @@
 /***************************************************************************
 
-    VideoBrain Family Computer
+    VideoBrain FamilyComputer
 
+	http://www.atariprotos.com/othersystems/videobrain/videobrain.htm
 	http://www.seanriddle.com/vbinfo.html
 	http://www.seanriddle.com/videobrain.html
 
@@ -16,7 +17,6 @@
 	- colors
 	- low resolution mode
 	- discrete sound
-	- keyboard column 8
 	- joystick scan timer 555
 	- reset on cartridge eject
 	- expander 1 (cassette, RS-232)
@@ -37,10 +37,63 @@
 ***************************************************************************/
 
 /*-------------------------------------------------
+    vlsi_r - video VLSI read
+-------------------------------------------------*/
+
+static READ8_HANDLER( vlsi_r )
+{
+	switch (offset)
+	{
+	case 0xfa:
+	case 0xfb:
+		return 0xff;
+	}
+
+	return 0;
+}
+
+/*-------------------------------------------------
+    vlsi_w - video VLSI write
+-------------------------------------------------*/
+
+static WRITE8_HANDLER( vlsi_w )
+{
+	vidbrain_state *state = (vidbrain_state *)space->machine->driver_data;
+
+	switch (offset)
+	{
+	case 0xf5:
+		state->bg_color = data;
+		break;
+
+	case 0xf7:
+		/*
+
+			bit		description
+
+			0		
+			1		
+			2		
+			3		
+			4		keyboard column 8
+			5		
+			6		
+			7		
+
+		*/
+
+		state->uv201_31 = BIT(data, 4);
+		break;
+	}
+
+	logerror("VLSI %02x = %02x\n", offset, data);
+}
+
+/*-------------------------------------------------
     keyboard_w - keyboard column write
 -------------------------------------------------*/
 
-WRITE8_HANDLER( keyboard_w )
+static WRITE8_HANDLER( keyboard_w )
 {
 	/*
 
@@ -66,7 +119,7 @@ WRITE8_HANDLER( keyboard_w )
     keyboard_r - keyboard row read
 -------------------------------------------------*/
 
-READ8_HANDLER( keyboard_r )
+static READ8_HANDLER( keyboard_r )
 {
 	/*
 
@@ -95,7 +148,7 @@ READ8_HANDLER( keyboard_r )
 	if (BIT(state->keylatch, 5)) data |= input_port_read(space->machine, "IO05");
 	if (BIT(state->keylatch, 6)) data |= input_port_read(space->machine, "IO06");
 	if (BIT(state->keylatch, 7)) data |= input_port_read(space->machine, "IO07");
-//	if () data |= input_port_read(space->machine, "UV201-31");
+	if (state->uv201_31)		 data |= input_port_read(space->machine, "UV201-31");
 
 	return data;
 }
@@ -104,7 +157,7 @@ READ8_HANDLER( keyboard_r )
     sound_w - sound clock write
 -------------------------------------------------*/
 
-WRITE8_HANDLER( sound_w )
+static WRITE8_HANDLER( sound_w )
 {
 	/*
 
@@ -150,9 +203,8 @@ WRITE8_HANDLER( sound_w )
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( vidbrain_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0xc000) AM_ROM
-//	AM_RANGE(0x0800, 0x08ff) video chip
+	AM_RANGE(0x0800, 0x08ff) AM_READWRITE(vlsi_r, vlsi_w)
 	AM_RANGE(0x0c00, 0x0fff) AM_MIRROR(0xe000) AM_RAM AM_BASE_MEMBER(vidbrain_state, video_ram)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_MIRROR(0xc000) AM_ROM
@@ -215,25 +267,25 @@ static INPUT_PORTS_START( vidbrain )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E') PORT_CHAR('8')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F') PORT_CHAR('6')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V') PORT_CHAR('+')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SPECIAL ALARM") PORT_CODE(KEYCODE_F4) PORT_CHAR(UCHAR_MAMEKEY(F4))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("SPECIAL ALARM") PORT_CODE(KEYCODE_F4)
 
 	PORT_START("IO06")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W') PORT_CHAR('7')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D') PORT_CHAR('5')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C') PORT_CHAR('3')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NEXT CLOCK") PORT_CODE(KEYCODE_F3) PORT_CHAR(UCHAR_MAMEKEY(F3))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("NEXT CLOCK") PORT_CODE(KEYCODE_F3)
 
 	PORT_START("IO07")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q') PORT_CHAR('%')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S') PORT_CHAR('4')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X') PORT_CHAR('2')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PREVIOUS COLOR") PORT_CODE(KEYCODE_F2) PORT_CHAR(UCHAR_MAMEKEY(F2))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("PREVIOUS COLOR") PORT_CODE(KEYCODE_F2)
 
 	PORT_START("UV201-31")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A') PORT_CHAR('.')
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z') PORT_CHAR('1')
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('?') PORT_CHAR('0')
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BACK TEXT") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("BACK TEXT") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("RESET")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("MASTER CONTROL") PORT_CODE(KEYCODE_F5) PORT_CHAR(UCHAR_MAMEKEY(F5)) PORT_CHANGED(trigger_reset, 0)
@@ -274,6 +326,31 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /*-------------------------------------------------
+    PALETTE_INIT( vidbrain )
+-------------------------------------------------*/
+
+static PALETTE_INIT( vidbrain )
+{
+	palette_set_color_rgb(machine,  0, 0x00, 0x00, 0x00 ); // 
+	palette_set_color_rgb(machine,  1, 0xff, 0x00, 0x00 ); // red
+	palette_set_color_rgb(machine,  2, 0x00, 0xff, 0x00 ); // 
+	palette_set_color_rgb(machine,  3, 0xff, 0xff, 0x00 ); // 
+	palette_set_color_rgb(machine,  4, 0x00, 0x00, 0xff ); // blue
+	palette_set_color_rgb(machine,  5, 0xff, 0x00, 0xff ); // 
+	palette_set_color_rgb(machine,  6, 0x00, 0xff, 0xff ); // 
+	palette_set_color_rgb(machine,  7, 0xff, 0xff, 0xff ); // 
+
+	palette_set_color_rgb(machine,  8, 0x00, 0x00, 0x00 ); // 
+	palette_set_color_rgb(machine,  9, 0x80, 0x00, 0x00 ); // red
+	palette_set_color_rgb(machine, 10, 0x00, 0x80, 0x00 ); // 
+	palette_set_color_rgb(machine, 11, 0x80, 0x80, 0x00 ); // 
+	palette_set_color_rgb(machine, 12, 0x00, 0x00, 0x80 ); // blue
+	palette_set_color_rgb(machine, 13, 0x80, 0x00, 0x80 ); // 
+	palette_set_color_rgb(machine, 14, 0x00, 0x80, 0x80 ); // 
+	palette_set_color_rgb(machine, 15, 0x80, 0x80, 0x80 ); // 
+}
+
+/*-------------------------------------------------
     VIDEO_START( vidbrain )
 -------------------------------------------------*/
 
@@ -299,7 +376,7 @@ static VIDEO_UPDATE( vidbrain )
 
 			for (int x = 0; x < 8; x++)
 			{
-				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = BIT(data, 7);
+				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = BIT(data, 7) ? 7 : state->bg_color;
 				data <<= 1;
 			}
 		}
@@ -380,6 +457,8 @@ static MACHINE_START( vidbrain )
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);
 	state_save_register_global(machine, state->joy_enable);
+	state_save_register_global(machine, state->uv201_31);
+	state_save_register_global(machine, state->bg_color);
 	state_save_register_global(machine, state->sound_clk);
 	state_save_register_global_array(machine, state->sound_q);
 }
@@ -411,6 +490,7 @@ static MACHINE_DRIVER_START( vidbrain )
     MDRV_SCREEN_VISIBLE_AREA(0, 128-1, 0, 49-1)
 	MDRV_GFXDECODE(vidbrain)
     MDRV_PALETTE_LENGTH(16)
+    MDRV_PALETTE_INIT(vidbrain)
 
     MDRV_VIDEO_START(vidbrain)
     MDRV_VIDEO_UPDATE(vidbrain)
@@ -450,4 +530,4 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	COMPANY							FULLNAME						FLAGS */
-COMP( 1977, vidbrain,	0,		0,		vidbrain,	vidbrain,	0,		"VideoBrain Computer Company",	"VideoBrain Family Computer",	GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1977, vidbrain,	0,		0,		vidbrain,	vidbrain,	0,		"VideoBrain Computer Company",	"VideoBrain FamilyComputer",	GAME_NOT_WORKING | GAME_NO_SOUND )
