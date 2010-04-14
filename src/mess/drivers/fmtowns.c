@@ -1,23 +1,24 @@
 /*
 
     Fujitsu FM-Towns
+    driver by Barry Rodewald
 
     Japanese computer system released in 1989.
 
     CPU:  AMD 80386SX(DX?) (80387 available as add-on?)
     Sound:  Yamaha YM3438
             Ricoh RF5c68
-    Video:  VGA + some custom extra video hardware
-            320x200 - 640x480
-            16 - 32768 colours from a possible palette of between 4096 and
-              16.7m colours (depending on video mode)
-            1024 sprites (16x16)
+    Video:  Custom
+            16 or 256 colours from a 24-bit palette, or 15-bit high-colour
+            1024 sprites (16x16), rendered direct to VRAM
+            16 colour text mode, rendered direct to VRAM
 
 
     Fujitsu FM-Towns Marty
 
     Japanese console, based on the FM-Towns computer, using an AMD 80386SX CPU,
     released in 1993
+
 
     Issues: i386 protected mode is far from complete.
             Video emulation is far from complete.
@@ -42,7 +43,7 @@
  * 0x0042   : 8253 PIT counter 1
  * 0x0044   : 8253 PIT counter 2
  * 0x0046   : 8253 PIT mode port
- * 0x0060   : 8253 PIT ???
+ * 0x0060   : 8253 PIT timer control
  * 0x006c RW: returns 0x00? (read) timer? (write)
  * 0x00a0-af: DMA controller 1 (uPD71071)
  * 0x00b0-bf: DMA controller 2 (uPD71071)
@@ -80,8 +81,8 @@
  *      IRQ9 - Built-in CD-ROM controller
  *      IRQ11 - VSync interrupt
  *      IRQ12 - Printer port
- *      IRQ13 - Sound (FM?), Mouse
- *      IRQ15 - PCM
+ *      IRQ13 - Sound (YM3438/RF5c68), Mouse
+ *      IRQ15 - 16-bit PCM (expansion?)
  *
  * Machine ID list (I/O port 0x31)
  *
@@ -645,7 +646,7 @@ static WRITE8_HANDLER(towns_keyboard_w)
  *  Port 0x60 - PIT Timer control
  *  On read:    bit 0: Timer 0 output level
  *              bit 1: Timer 1 output level
- *              bits 4-2: Timer masks (timer 2 = sound)
+ *              bits 4-2: Timer masks (timer 2 = beeper)
  *  On write:   bits 2-0: Timer mask set
  *              bit 7: Timer 0 output reset
  */
@@ -840,7 +841,6 @@ static READ32_HANDLER(towns_padport_r)
 					ret |= 0x0000000f;
 		}
 		
-		//logerror("Mouse: X=%02x Y=%02x state=%i\n",towns_mouse_x,towns_mouse_y,towns_mouse_output);
 		// button states are always visible
 		state = input_port_read(space->machine,"mouse1");
 		if(!(state & 0x01))
@@ -849,6 +849,38 @@ static READ32_HANDLER(towns_padport_r)
 			ret |= 0x00000020;
 		if(towns_pad_mask & 0x10)
 			ret |= 0x00000040;
+	} 
+	if((porttype & 0xf0) == 0x20)  // mouse
+	{
+		switch(towns_mouse_output)
+		{
+			case MOUSE_X_HIGH:
+				ret |= ((towns_mouse_x & 0xf0) << 12);
+				break;
+			case MOUSE_X_LOW:
+				ret |= ((towns_mouse_x & 0x0f) << 16);
+				break;
+			case MOUSE_Y_HIGH:
+				ret |= ((towns_mouse_y & 0xf0) << 12);
+				break;
+			case MOUSE_Y_LOW:
+				ret |= ((towns_mouse_y & 0x0f) << 16);
+				break;
+			case MOUSE_START:
+			case MOUSE_SYNC:
+			default:
+				if(towns_mouse_output < MOUSE_Y_LOW)
+					ret |= 0x000f0000;
+		}
+		
+		// button states are always visible
+		state = input_port_read(space->machine,"mouse1");
+		if(!(state & 0x01))
+			ret |= 0x00100000;
+		if(!(state & 0x02))
+			ret |= 0x00200000;
+		if(towns_pad_mask & 0x20)
+			ret |= 0x00400000;
 	} 
 	
 	return ret;
@@ -859,11 +891,12 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 	static UINT8 prev;
 	static UINT8 prev_x,prev_y;
 	UINT8 current_x,current_y;
+	UINT32 type = input_port_read(space->machine,"ctrltype"); 
 	
 	if(ACCESSING_BITS_16_23)
 	{
 		towns_pad_mask = (data & 0x00ff0000) >> 16;
-		if((input_port_read(space->machine,"ctrltype") & 0x0f) == 0x02)  // mouse
+		if((type & 0x0f) == 0x02)  // mouse
 		{
 			if((towns_pad_mask & 0x10) != 0 && (prev & 0x10) == 0)
 			{
@@ -882,6 +915,42 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 				timer_adjust_periodic(towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
 			}
 			if((towns_pad_mask & 0x10) == 0 && (prev & 0x10) != 0)
+			{
+				if(towns_mouse_output == MOUSE_START)
+				{
+					towns_mouse_output = MOUSE_SYNC;
+					current_x = input_port_read(space->machine,"mouse2");
+					current_y = input_port_read(space->machine,"mouse3");
+					towns_mouse_x = prev_x - current_x;
+					towns_mouse_y = prev_y - current_y;
+					prev_x = current_x;
+					prev_y = current_y;
+				}
+				else
+					towns_mouse_output++;
+				timer_adjust_periodic(towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
+			}
+			prev = towns_pad_mask;
+		}
+		if((type & 0xf0) == 0x20)  // mouse
+		{
+			if((towns_pad_mask & 0x20) != 0 && (prev & 0x20) == 0)
+			{
+				if(towns_mouse_output == MOUSE_START)
+				{
+					towns_mouse_output = MOUSE_X_HIGH;
+					current_x = input_port_read(space->machine,"mouse2");
+					current_y = input_port_read(space->machine,"mouse3");
+					towns_mouse_x = prev_x - current_x;
+					towns_mouse_y = prev_y - current_y;
+					prev_x = current_x;
+					prev_y = current_y;
+				}
+				else
+					towns_mouse_output++;
+				timer_adjust_periodic(towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
+			}
+			if((towns_pad_mask & 0x20) == 0 && (prev & 0x20) != 0)
 			{
 				if(towns_mouse_output == MOUSE_START)
 				{
@@ -1830,9 +1899,10 @@ static INPUT_PORTS_START( towns )
     PORT_CATEGORY_ITEM(0x00,"Nothing",10)
     PORT_CATEGORY_ITEM(0x01,"Standard 2-button joystick",11)
     PORT_CATEGORY_ITEM(0x02,"Mouse",12)
-    PORT_CATEGORY_CLASS(0xf0,0x10,"Joystick port 2")
+    PORT_CATEGORY_CLASS(0xf0,0x20,"Joystick port 2")
     PORT_CATEGORY_ITEM(0x00,"Nothing",20)
     PORT_CATEGORY_ITEM(0x10,"Standard 2-button joystick",21)
+    PORT_CATEGORY_ITEM(0x20,"Mouse",22)
 
 // Keyboard
   PORT_START( "key1" )  // scancodes 0x00-0x1f
@@ -2010,14 +2080,14 @@ static INPUT_PORTS_START( towns )
     PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(21)
     
   PORT_START("mouse1")  // buttons
-  	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CATEGORY(12)
-	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2) PORT_CATEGORY(12)
+  	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
       
   PORT_START("mouse2")  // X-axis
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CATEGORY(12)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
   PORT_START("mouse3")  // Y-axis
-	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1) PORT_CATEGORY(12)
+	PORT_BIT( 0xff, 0x00, IPT_MOUSE_Y) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 
 INPUT_PORTS_END
 
