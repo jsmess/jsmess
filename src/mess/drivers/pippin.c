@@ -7,9 +7,9 @@
     Apple ASICs identified:
     -----------------------
     343S1125    Grand Central (SWIM III, Sound, VIA)
-    341S0060    Cuda (ADB, PRAM)
+    341S0060    Cuda (68HC05 MCU, handles ADB and parameter ("CMOS") RAM)
     343S1146    ??? (likely SCSI due to position on board)
-    343S1191 (x2)   ??? (apparently clock generators)
+    343S1191(x2) Athens Prime PLL Clock Generator
 
 
     Other chips
@@ -18,6 +18,13 @@
     CS4217 audio DAC
     Bt856 video DAC
 
+    PowerMac 6500 partial memory map (Pippin should be similar)
+    These are base addresses; Apple typically mirrors each chip over at least a 0x1000 byte range
+
+    F3010000 : SCSI
+    F3012000 : 8530 SCC
+    F3015000 : SWIM III (Apple custom NEC765 derivative with GCR support, supposedly)
+    F3016000 : 6522 VIA (look at machine/mac.c for Apple's unique register mapping)
 
 ****************************************************************************/
 
