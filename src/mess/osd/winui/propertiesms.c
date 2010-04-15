@@ -434,6 +434,8 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 
 			(void)ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
 			(void)ComboBox_SetItemData(control, i, ram);
+			
+			global_free(t_ramstring);			
 		}
 		if (config->extra_options != NULL)
 		{
@@ -473,6 +475,11 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 
 		// set the combo box
 		(void)ComboBox_SetCurSel(control, current_index);
+	}
+	if (cfg != NULL)
+	{
+		/* Free the structure */
+		machine_config_free(cfg);
 	}
 	return TRUE;
 }
