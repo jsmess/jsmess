@@ -38,6 +38,7 @@
 #include "machine/pf10.h"
 #include "sound/wave.h"
 #include "video/sed1330.h"
+#include "px8.lh"
 
 /***************************************************************************
     CONSTANTS
@@ -56,42 +57,79 @@
 
 enum
 {
-	GAH40_CTLR1 = 0,
-	GAH40_CMDR,
-	GAH40_CTLR2,
-	GAH40_IER = 4,
+	GAH40M_CTLR1 = 0,
+	GAH40M_CMDR,
+	GAH40M_CTLR2,
+	GAH40M_IER = 4,
 };
 
 enum
 {
-	GAH40_ICRL_C = 0,
-	GAH40_ICRH_C,
-	GAH40_ICRL_B,
-	GAH40_ICRH_B,
-	GAH40_ISR,
-	GAH40_STR,
-	GAH40_SIOR,
-	GAH40_IVR
+	GAH40M_ICRL_C = 0,
+	GAH40M_ICRH_C,
+	GAH40M_ICRL_B,
+	GAH40M_ICRH_B,
+	GAH40M_ISR,
+	GAH40M_STR,
+	GAH40M_SIOR,
+	GAH40M_IVR
 };
 
 /***************************************************************************
     READ/WRITE HANDLERS
 ***************************************************************************/
 
+/*-------------------------------------------------
+    bankswitch - memory bankswitching
+-------------------------------------------------*/
+
 static void bankswitch(running_machine *machine)
 {
 	px8_state *state = (px8_state *)machine->driver_data;
-	int bank = (state->bk2 << 1) | state->bank0;
+	const address_space *program = cputag_get_address_space(machine, UPD70008_TAG, ADDRESS_SPACE_PROGRAM);
+	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *ipl_rom = memory_region(machine, UPD70008_TAG);
 
-	memory_set_bank(machine, "bank0", bank);
-	memory_set_bank(machine, "bank1", bank);
+	if (!state->bank0)
+	{
+		/* IPL ROM */
+		memory_install_rom(program, 0x0000, 0x7fff, 0, 0, ipl_rom);
+	}
+	else
+	{
+		if (state->bk2)
+		{
+			/* D-RAM (L) */
+			memory_install_ram(program, 0x0000, 0x7fff, 0, 0, ram);
+		}
+		else
+		{
+			/* OPTION ROM (L) */
+			memory_unmap_readwrite(program, 0x0000, 0x7fff, 0, 0);
+		}
+	}
+
+	if (state->bk2)
+	{
+		/* D-RAM (H) */
+		memory_install_ram(program, 0x8000, 0xffff, 0, 0, ram + 0x8000);
+	}
+	else
+	{
+		/* OPTION ROM (H) */
+		memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
+	}
 }
+
+/*-------------------------------------------------
+    gah40m_r - GAH40M read
+-------------------------------------------------*/
 
 static READ8_HANDLER( gah40m_r )
 {
 	switch (offset)
 	{
-	case GAH40_ICRL_C:
+	case GAH40M_ICRL_C:
 		/*
 
 			bit		signal		description
@@ -108,7 +146,7 @@ static READ8_HANDLER( gah40m_r )
 		*/
 		break;
 
-	case GAH40_ICRH_C:
+	case GAH40M_ICRH_C:
 		/*
 
 			bit		signal		description
@@ -125,7 +163,7 @@ static READ8_HANDLER( gah40m_r )
 		*/
 		break;
 
-	case GAH40_ICRL_B:
+	case GAH40M_ICRL_B:
 		/*
 
 			bit		signal		description
@@ -142,7 +180,7 @@ static READ8_HANDLER( gah40m_r )
 		*/
 		break;
 
-	case GAH40_ICRH_B:
+	case GAH40M_ICRH_B:
 		/*
 
 			bit		signal		description
@@ -159,7 +197,7 @@ static READ8_HANDLER( gah40m_r )
 		*/
 		break;
 
-	case GAH40_ISR:
+	case GAH40M_ISR:
 		/*
 
 			bit		signal		description
@@ -176,7 +214,7 @@ static READ8_HANDLER( gah40m_r )
 		*/
 		break;
 
-	case GAH40_STR:
+	case GAH40M_STR:
 		/*
 
 			bit		signal		description
@@ -193,7 +231,7 @@ static READ8_HANDLER( gah40m_r )
 		*/
 		break;
 
-	case GAH40_SIOR:
+	case GAH40M_SIOR:
 		/*
 
 			bit		signal		description
@@ -210,7 +248,7 @@ static READ8_HANDLER( gah40m_r )
 		*/
 		break;
 
-	case GAH40_IVR:
+	case GAH40M_IVR:
 		/*
 
 			bit		description
@@ -231,13 +269,17 @@ static READ8_HANDLER( gah40m_r )
 	return 0xff;
 }
 
+/*-------------------------------------------------
+    gah40m_w - GAH40M write
+-------------------------------------------------*/
+
 static WRITE8_HANDLER( gah40m_w )
 {
 	px8_state *state = (px8_state *)space->machine->driver_data;
 
 	switch (offset)
 	{
-	case GAH40_CTLR1:
+	case GAH40M_CTLR1:
 		/*
 
 			bit		signal		description
@@ -257,7 +299,7 @@ static WRITE8_HANDLER( gah40m_w )
 		bankswitch(space->machine);
 		break;
 
-	case GAH40_CMDR:
+	case GAH40M_CMDR:
 		/*
 
 			bit		description
@@ -274,7 +316,7 @@ static WRITE8_HANDLER( gah40m_w )
 		*/
 		break;
 
-	case GAH40_CTLR2:
+	case GAH40M_CTLR2:
 		/*
 
 			bit		signal		description
@@ -290,12 +332,12 @@ static WRITE8_HANDLER( gah40m_w )
 
 		*/
 
-/*		output_set_value("led_0", BIT(data, 0));
+		output_set_value("led_0", BIT(data, 0));
 		output_set_value("led_1", BIT(data, 1));
-		output_set_value("led_2", BIT(data, 2));*/
+		output_set_value("led_2", BIT(data, 2));
 		break;
 
-	case GAH40_IER:
+	case GAH40M_IER:
 		/*
 
 			bit		signal		description
@@ -314,7 +356,7 @@ static WRITE8_HANDLER( gah40m_w )
 		state->ier = data;
 		break;
 
-	case GAH40_SIOR:
+	case GAH40M_SIOR:
 		/*
 
 			bit		signal		description
@@ -335,46 +377,87 @@ static WRITE8_HANDLER( gah40m_w )
 	}
 }
 
+/*-------------------------------------------------
+    gah40s_r - GAH40S read
+-------------------------------------------------*/
+
 static READ8_HANDLER( gah40s_r )
 {
+	px8_state *state = (px8_state *)space->machine->driver_data;
+	UINT8 data = 0xff;
+
 	switch (offset)
 	{
-	case 0:
+	case 0: /* counter (upper byte) input */
+		data = (state->cnt >> 8) & 0x1f;
 		break;
 
-	case 1:
+	case 1: /* counter (lower byte) */
+		data = state->cnt & 0xff;
 		break;
 
-	case 2:
-		break;
-
-	case 3:
+	case 3: /* P-ROM read data */
+		data = state->prd;
 		break;
 	}
 
-	return 0xff;
+	return data;
 }
+
+/*-------------------------------------------------
+    gah40s_w - GAH40S write
+-------------------------------------------------*/
 
 static WRITE8_HANDLER( gah40s_w )
 {
+	px8_state *state = (px8_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
-	case 0:
+	case 0: /* counter reset */
+		state->cnt = 0;
 		break;
 
-	case 1:
+	case 1: /* command register */
+		/*
+
+			bit		signal		description
+
+			0		SW PR		PROM power switch
+			1		SW MCT		microcassette power switch
+			2		MTA			microcassette drive motor control signal A
+			3		MTB			microcassette drive motor control signal B
+			4		MTC			microcassette drive motor control signal C
+			5		
+			6		_FAST		
+			7		_STOP CNT	
+
+		*/
+
+		state->swpr = BIT(data, 0);
 		break;
 
-	case 2:
+	case 2: /* P-ROM address (upper 8 byte) */
+		state->pra = (data << 8) | (state->pra & 0xff);
+		state->prd = 0; // TODO read prom!
 		break;
 
-	case 3:
+	case 3: /* P-ROM address (lower 8 byte) */
+		state->pra = (state->pra & 0xff00) | data;
+		state->prd = 0; // TODO read prom!
 		break;
 	}
 }
 
+/*-------------------------------------------------
+    gah40s_ier_w - interrupt enable register write
+-------------------------------------------------*/
+
 static WRITE8_HANDLER( gah40s_ier_w )
 {
+	px8_state *state = (px8_state *)space->machine->driver_data;
+
+	state->ier = data;
 }
 
 /*-------------------------------------------------
@@ -743,19 +826,6 @@ static MACHINE_START( px8 )
 	state->sed1320 = devtag_get_device(machine, SED1320_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
-	/* setup memory banking */
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
-	UINT8 *ipl_rom = memory_region(machine, UPD70008_TAG);
-	UINT8 *option_rom = NULL; // fixme
-
-	memory_configure_bank(machine, "bank0", 0, 1, ipl_rom, 0);
-	memory_configure_bank(machine, "bank0", 1, 1, option_rom, 0);
-	memory_configure_bank(machine, "bank0", 2, 1, ipl_rom, 0);
-	memory_configure_bank(machine, "bank0", 3, 1, ram, 0);
-
-	memory_configure_bank(machine, "bank1", 0, 2, option_rom + 0x8000, 0);
-	memory_configure_bank(machine, "bank1", 2, 2, ram + 0x8000, 0);
-
 	/* register for state saving */
 	state_save_register_global(machine, state->ier);
 	state_save_register_global(machine, state->isr);
@@ -800,6 +870,8 @@ static MACHINE_DRIVER_START( px8 )
 	MDRV_MACHINE_RESET(px8)
 
 	/* video hardware */
+	MDRV_DEFAULT_LAYOUT(layout_px8)
+
 	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
 	MDRV_SCREEN_REFRESH_RATE(72)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

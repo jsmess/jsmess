@@ -19,19 +19,25 @@ public:
 
 	px8_state(running_machine &machine) { }
 
-	/* interrupt state */
-	UINT8 ier;
-	UINT8 isr;
+	/* GAH40M state */
+	UINT16 icr;				/* input capture register */
+	UINT16 frc;				/* free running counter */
+	UINT8 ier;				/* interrupt acknowledge register */
+	UINT8 isr;				/* interrupt status register */
+	UINT8 sio;				/* serial I/O register */
+	int bank0;				/* */
+
+	/* GAH40S state */
+	UINT16 cnt;				/* microcassette tape counter */
+	int swpr;				/* P-ROM power switch */
+	UINT16 pra;				/* P-ROM address */
+	UINT8 prd;				/* P-ROM data */
 
 	/* memory state */
-	int bank0;
-	int bk2;
-
-	/* serial state */
-	UINT8 sio;
+	int bk2;				/* */
 
 	/* keyboard state */
-	int ksc;
+	int ksc;				/* keyboard scan column */
 
 	/* video state */
 	UINT8 *video_ram;		/* LCD video RAM */
