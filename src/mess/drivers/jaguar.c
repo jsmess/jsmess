@@ -225,7 +225,9 @@ static void jaguar_nvram_save(running_machine *machine)
 		{
 			if (nvram_file == NULL)
 				nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			(*nvram)(device, nvram_file, 1);
+			// check nvram_file to avoid crash when no image is mounted or cannot be created
+			if (nvram_file)
+				(*nvram)(device, nvram_file, 1);
 		}
 	}
 
