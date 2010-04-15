@@ -1081,6 +1081,8 @@ imgtoolerr_t wimgtool_open_image(HWND window, const imgtool_module *module,
 			read_or_write = OSD_FOPEN_READ;
 	}
 
+	if (info->filename)
+		osd_free(info->filename);
 	info->filename = mame_strdup(filename);
 	if (!info->filename)
 	{
@@ -1114,7 +1116,7 @@ imgtoolerr_t wimgtool_open_image(HWND window, const imgtool_module *module,
 	info->open_mode = read_or_write;
 	if (info->current_directory)
 	{
-		free(info->current_directory);
+		osd_free(info->current_directory);
 		info->current_directory = NULL;
 	}
 
@@ -1682,6 +1684,8 @@ static void wimgtool_destroy(HWND window)
 
 	if (info)
 	{
+		if (info->filename)
+			osd_free(info->filename);
 		if (info->partition)
 			imgtool_partition_close(info->partition);
 		if (info->image)
@@ -1689,7 +1693,7 @@ static void wimgtool_destroy(HWND window)
 		pile_delete(&info->iconlist_extensions);
 		DestroyIcon(info->readonly_icon);
 		if (info->current_directory)
-			free(info->current_directory);
+			osd_free(info->current_directory);
 		free(info);
 	}
 }
