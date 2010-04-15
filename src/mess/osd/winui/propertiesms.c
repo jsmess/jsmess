@@ -441,19 +441,21 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 		{
 			int j;
 			int size = strlen(config->extra_options);
-			char *s = mame_strdup(config->extra_options);
+			char * const s = mame_strdup(config->extra_options);
+			char * const e = s + size;
+			char *p = s;
 			for (j=0;j<size;j++) {
-				if (s[j]==',') s[j]=0;
+				if (p[j]==',') p[j]=0;
 			}
 			
 			/* try to parse each option */
-			while(*s != '\0')
+			while(p <= e)
 			{
 				i++;
 				// identify this option
-				ram = messram_parse_string(s);
+				ram = messram_parse_string(p);
 
-				this_ram_string = s;
+				this_ram_string = p;
 
 				t_ramstring = tstring_from_utf8(this_ram_string);
 				if( !t_ramstring )
@@ -469,8 +471,14 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 				if (ram == current_ram)
 					current_index = i;
 
-				s += strlen(s) + 1;
+				p+= strlen(p);
+				if (p == e)
+					break;
+				
+				p += 1;
 			}
+
+			osd_free(s);
 		}
 
 		// set the combo box

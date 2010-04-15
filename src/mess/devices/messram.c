@@ -191,27 +191,34 @@ static DEVICE_VALIDITY_CHECK( messram )
 				{
 					int j;
 					int size = strlen(config->extra_options);
-					char *s = mame_strdup(config->extra_options);
+					char * const s = mame_strdup(config->extra_options);
+					char * const e = s + size;
+					char *p = s;
 					for (j=0;j<size;j++) {
-						if (s[j]==',') s[j]=0;
+						if (p[j]==',') p[j]=0;
 					}
 					
 					/* try to parse each option */
-					while(*s != '\0')
+					while(p <= e)
 					{
-						UINT32 option_ram_size = messram_parse_string(s);
+						UINT32 option_ram_size = messram_parse_string(p);
 
 						if (option_ram_size == 0)
 						{
-							mame_printf_error("%s: '%s' has an invalid RAM option: %s\n", driver->source_file, driver->name, s);
+							mame_printf_error("%s: '%s' has an invalid RAM option: %s\n", driver->source_file, driver->name, p);
 							error = TRUE;
 						}
 
 						if (option_ram_size == specified_ram)
 							is_valid = TRUE;
 
-						s += strlen(s) + 1;
+						p += strlen(p);
+						if (p == e)
+							break;
+						p += 1;
 					}
+
+					osd_free(s);
 				}
 
 			} else {

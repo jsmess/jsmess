@@ -103,16 +103,23 @@ static void print_game_ramoptions(FILE *out, const game_driver *game, const mach
 		{
 			int j;
 			int size = strlen(ram->extra_options);
-			char *s = mame_strdup(ram->extra_options);
+			char * const s = mame_strdup(ram->extra_options);
+			char * const e = s + size;
+			char *p = s;
 			for (j=0;j<size;j++) {
-				if (s[j]==',') s[j]=0;
+				if (p[j]==',') p[j]=0;
 			}
 			/* try to parse each option */
-			while(*s != '\0')
+			while(p <= e)
 			{
-				fprintf(out, "\t\t<ramoption>%u</ramoption>\n",  messram_parse_string(s));
-				s += strlen(s) + 1;
+				fprintf(out, "\t\t<ramoption>%u</ramoption>\n",  messram_parse_string(p));
+				p += strlen(p);
+				if (p == e)
+					break;					
+				p += 1;
 			}
+
+			osd_free(s);
 		}
 	}
 }
