@@ -453,6 +453,9 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 				i++;
 				// identify this option
 				ram = messram_parse_string(s);
+				
+				if (ram==0) break;
+				
 				this_ram_string = s;
 
 				t_ramstring = tstring_from_utf8(this_ram_string);
