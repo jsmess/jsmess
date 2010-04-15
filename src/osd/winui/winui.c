@@ -238,6 +238,8 @@ static int MIN_HEIGHT = DBU_MIN_HEIGHT;
 extern const ICONDATA g_iconData[];
 extern const TCHAR g_szPlayGameString[];
 extern const char g_szGameCountString[];
+extern char *g_history_filename;
+extern char *g_mameinfo_filename;
 
 typedef struct _play_options play_options;
 struct _play_options
@@ -1722,8 +1724,6 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 	int i, nSplitterCount;
 	extern const FOLDERDATA g_folderData[];
 	extern const FILTER_ITEM g_filterList[];
-	extern const char *history_filename;
-	extern const char *mameinfo_filename;
 	LONG common_control_version = GetCommonControlVersion();
 	int validity_failed = 0;
 	TCHAR* t_inpdir = NULL;
@@ -1893,8 +1893,8 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 	hTreeView = GetDlgItem(hMain, IDC_TREE);
 	hwndList  = GetDlgItem(hMain, IDC_LIST);
 
-	history_filename = mame_strdup(GetHistoryFileName());
-	mameinfo_filename = mame_strdup(GetMAMEInfoFileName());
+	g_history_filename = mame_strdup(GetHistoryFileName());
+	g_mameinfo_filename = mame_strdup(GetMAMEInfoFileName());
 
 	if (!InitSplitters())
 		return FALSE;
@@ -2158,6 +2158,9 @@ static void Win32UI_exit()
 	OptionsExit();
 
 	HelpExit();
+
+	osd_free(g_mameinfo_filename);
+	osd_free(g_history_filename);
 
 	pool_free_lib(mameui_pool);
 	mameui_pool = NULL;

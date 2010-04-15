@@ -60,8 +60,8 @@ static const char *DATAFILE_TAG_KEY = "$info";
 static const char *DATAFILE_TAG_BIO = "$bio";
 static const char *DATAFILE_TAG_MAME = "$mame";
 
-const char *history_filename = NULL;
-const char *mameinfo_filename = NULL;
+char *g_history_filename = NULL;
+char *g_mameinfo_filename = NULL;
 
 
 /****************************************************************************
@@ -606,11 +606,11 @@ int load_driver_history (const game_driver *drv, char *buffer, int bufsize)
         *buffer = 0;
 
 
-        if (!history_filename || !*history_filename)
-                history_filename = "history.dat";
+        if (!g_history_filename || !*g_history_filename)
+                g_history_filename = mame_strdup("history.dat");
 
         /* try to open history datafile */
-        if (ParseOpen (history_filename))
+        if (ParseOpen (g_history_filename))
         {
                 /* create index if necessary */
                 if (hist_idx)
@@ -638,11 +638,11 @@ int load_driver_history (const game_driver *drv, char *buffer, int bufsize)
                 ParseClose ();
         }
 
-        if (!mameinfo_filename || !*mameinfo_filename)
-                mameinfo_filename = "mameinfo.dat";
+        if (!g_mameinfo_filename || !*g_mameinfo_filename)
+                g_mameinfo_filename = mame_strdup("mameinfo.dat");
 
         /* try to open mameinfo datafile */
-        if (ParseOpen (mameinfo_filename))
+        if (ParseOpen (g_mameinfo_filename))
         {
                 /* create index if necessary */
                 if (mame_idx)
