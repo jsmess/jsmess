@@ -631,7 +631,7 @@ static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 	else
 		rc = SoftwarePicker_InternalAddFile(hwndPicker, pszFilename, FALSE);
 
-		global_free(utf8_FileName);
+	global_free(utf8_FileName);
 	return rc;
 }
 

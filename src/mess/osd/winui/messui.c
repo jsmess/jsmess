@@ -906,6 +906,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 		/* We only want the first path; throw out the rest */
 		i = astring_chr(&as, 0, ';');
 		if (i > 0) astring_substr(&as, 0, i);
+		global_free(s);
 		s = tstring_from_utf8(astring_c(&as));
 
 		/* Make sure a folder was specified in the tab, and that it exists */
@@ -917,6 +918,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 			/* We only want the first path; throw out the rest */
 			i = astring_chr(&as, 0, ';');
 			if (i > 0) astring_substr(&as, 0, i);
+			global_free(s);
 			s = tstring_from_utf8(astring_c(&as));
 
 			/* Make sure a folder was specified in the tab, and that it exists */
@@ -926,11 +928,16 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 
 				osd_get_full_path(&dst,".");
 				/* Default to emu directory */
+				global_free(s);
 				s = tstring_from_utf8(dst);
 
 				/* If software folder exists, use it instead */
 				zippath_combine(&as, dst, "software");
-				if (osd_opendir(astring_c(&as))) s = tstring_from_utf8(astring_c(&as));
+				if (osd_opendir(astring_c(&as))) 
+				{
+					global_free(s);
+					s = tstring_from_utf8(astring_c(&as));
+				}
 				global_free(dst);
 			}
 		}
@@ -939,7 +946,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(s, GetOpenFileName, pszFilename, config, imagetypes);
 	
-	/* TODO: free() calls? */
+	global_free(s);
 
 	return bResult;
 }
@@ -981,6 +988,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 		/* We only want the first path; throw out the rest */
 		i = astring_chr(&as, 0, ';');
 		if (i > 0) astring_substr(&as, 0, i);
+		global_free(s);
 		s = tstring_from_utf8(astring_c(&as));
 
 		/* Make sure a folder was specified in the tab, and that it exists */
@@ -990,11 +998,16 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 
 			osd_get_full_path(&dst,".");
 			/* Default to emu directory */
+			global_free(s);
 			s = tstring_from_utf8(dst);
 
 			/* If software folder exists, use it instead */
 			zippath_combine(&as, dst, "software");
-			if (osd_opendir(astring_c(&as))) s = tstring_from_utf8(astring_c(&as));
+			if (osd_opendir(astring_c(&as))) 
+			{
+				global_free(s);
+				s = tstring_from_utf8(astring_c(&as));
+			}
 			global_free(dst);
 		}
 	}
@@ -1002,7 +1015,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(s, GetSaveFileName, pszFilename, config, imagetypes);
 	
-	/* TODO: free() calls? */
+	global_free(s);
 
 	return bResult;
 }
