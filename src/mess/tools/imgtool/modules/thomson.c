@@ -1344,7 +1344,7 @@ static imgtoolerr_t thomcrypt_read_file(imgtool_partition *part,
   }
   else {
     /* encrypted file */
-    stream_putc( dst, 0xff );
+    stream_putc( dst, '\xff' );
     stream_write( dst, buf+1, 2 );
     thom_decrypt( dst, org );
   }
@@ -1370,7 +1370,7 @@ static imgtoolerr_t thomcrypt_write_file(imgtool_partition *part,
     imgtool_stream *dst = stream_open_mem( NULL, 0 );
     imgtoolerr_t err;
     if ( !dst ) return IMGTOOLERR_OUTOFMEMORY;
-    stream_putc( dst, 0xfe );
+    stream_putc( dst, '\xfe' );
     stream_write( dst, buf+1, 2 );
     thom_encrypt( dst, src );
     stream_seek( dst, 0, SEEK_SET );
