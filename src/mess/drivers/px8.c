@@ -17,6 +17,7 @@
 	- keyboard
 	- cassette
 	- display
+	- jumpers
 	- ROM capsule
 	- uPD7001
 	- RAM disk (64K/128K RAM, Z80, 4K ROM)
@@ -76,6 +77,15 @@ enum
 /***************************************************************************
     READ/WRITE HANDLERS
 ***************************************************************************/
+
+static void bankswitch(running_machine *machine)
+{
+	px8_state *state = (px8_state *)machine->driver_data;
+	int bank = (state->bk2 << 1) | state->bank0;
+
+	memory_set_bank(machine, "bank0", bank);
+	memory_set_bank(machine, "bank1", bank);
+}
 
 static READ8_HANDLER( gah40m_r )
 {
@@ -223,6 +233,8 @@ static READ8_HANDLER( gah40m_r )
 
 static WRITE8_HANDLER( gah40m_w )
 {
+	px8_state *state = (px8_state *)space->machine->driver_data;
+
 	switch (offset)
 	{
 	case GAH40_CTLR1:
@@ -240,6 +252,9 @@ static WRITE8_HANDLER( gah40m_w )
 			7		BRG3		bad rate generator select 3 timer
 
 		*/
+
+		state->bank0 = BIT(data, 0);
+		bankswitch(space->machine);
 		break;
 
 	case GAH40_CMDR:
@@ -274,6 +289,10 @@ static WRITE8_HANDLER( gah40m_w )
 			7		
 
 		*/
+
+/*		output_set_value("led_0", BIT(data, 0));
+		output_set_value("led_1", BIT(data, 1));
+		output_set_value("led_2", BIT(data, 2));*/
 		break;
 
 	case GAH40_IER:
@@ -291,6 +310,8 @@ static WRITE8_HANDLER( gah40m_w )
 			7		
 
 		*/
+
+		state->ier = data;
 		break;
 
 	case GAH40_SIOR:
@@ -308,8 +329,52 @@ static WRITE8_HANDLER( gah40m_w )
 			7		SIO7
 
 		*/
+
+		state->sio = data;
 		break;
 	}
+}
+
+static READ8_HANDLER( gah40s_r )
+{
+	switch (offset)
+	{
+	case 0:
+		break;
+
+	case 1:
+		break;
+
+	case 2:
+		break;
+
+	case 3:
+		break;
+	}
+
+	return 0xff;
+}
+
+static WRITE8_HANDLER( gah40s_w )
+{
+	switch (offset)
+	{
+	case 0:
+		break;
+
+	case 1:
+		break;
+
+	case 2:
+		break;
+
+	case 3:
+		break;
+	}
+}
+
+static WRITE8_HANDLER( gah40s_ier_w )
+{
 }
 
 /*-------------------------------------------------
@@ -377,8 +442,8 @@ static WRITE8_HANDLER( ksc_w )
 
 static ADDRESS_MAP_START( px8_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_RAMBANK("bank0")
+	AM_RANGE(0x8000, 0xffff) AM_RAMBANK("bank1")
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -401,9 +466,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( px8_slave_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x0021, 0x0021) AM_WRITE(capsule_power_w)
-//	AM_RANGE(0x0022, 0x0023) AM_WRITE(capsule_address_w)
-//	AM_RANGE(0x0023, 0x0023) AM_READ(capsule_data_r)
+	AM_RANGE(0x0020, 0x0023) AM_READWRITE(gah40s_r, gah40s_w)
+//	AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE(SED1320_TAG, )
+	AM_RANGE(0x0028, 0x0028) AM_WRITE(gah40s_ier_w)
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_MEMBER(px8_state, video_ram)
 	AM_RANGE(0x9800, 0xefff) AM_NOP
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION(HD6303_TAG, 0) /* internal mask rom */
@@ -532,20 +597,20 @@ static INPUT_PORTS_START( px8 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 
 	PORT_START("SW4")
-	PORT_DIPNAME( 0xef, 0x00, "Character Set" ) PORT_DIPLOCATION("SW4:1,2,3,4,6,7,8")
-	PORT_DIPSETTING(    0x00, "ASCII" )
-	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( German ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x00, "Danish" )
-	PORT_DIPSETTING(    0x00, "Swedish" )
-	PORT_DIPSETTING(    0x00, "Norwegian" )
-	PORT_DIPSETTING(    0x00, "Italy" )
-	PORT_DIPSETTING(    0x00, "Spain" )
-	PORT_DIPSETTING(    0x00, "HASCI" )
-	PORT_DIPSETTING(    0x00, "Japanese (Japanese)" )
+	PORT_DIPNAME( 0xef, 0x2f, "Character Set" ) PORT_DIPLOCATION("SW4:1,2,3,4,6,7,8")
+	PORT_DIPSETTING(    0x2f, "ASCII" )
+	PORT_DIPSETTING(    0x2e, DEF_STR( French ) )
+	PORT_DIPSETTING(    0x2d, DEF_STR( German ) )
+	PORT_DIPSETTING(    0x2c, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x2b, "Danish" )
+	PORT_DIPSETTING(    0x2a, "Swedish" )
+	PORT_DIPSETTING(    0x26, "Norwegian" )
+	PORT_DIPSETTING(    0x29, "Italy" )
+	PORT_DIPSETTING(    0x28, "Spain" )
+	PORT_DIPSETTING(    0x60, "HASCI" )
+	PORT_DIPSETTING(    0x21, "Japanese (Japanese)" )
 	PORT_DIPSETTING(    0x00, "Japanese (JIS)" )
-	PORT_DIPSETTING(    0x00, "Japanese (touch 16)" )
+	PORT_DIPSETTING(    0x01, "Japanese (touch 16)" )
 	PORT_DIPNAME( 0x10, 0x00, "RAM disk check" ) PORT_DIPLOCATION("SW4:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
@@ -670,7 +735,7 @@ static const cassette_config px8_cassette_config =
     MACHINE_START( px8 )
 -------------------------------------------------*/
 
-MACHINE_START( px8 )
+static MACHINE_START( px8 )
 {
 	px8_state *state = (px8_state *)machine->driver_data;
 
@@ -678,8 +743,36 @@ MACHINE_START( px8 )
 	state->sed1320 = devtag_get_device(machine, SED1320_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
+	/* setup memory banking */
+	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *ipl_rom = memory_region(machine, UPD70008_TAG);
+	UINT8 *option_rom = NULL; // fixme
+
+	memory_configure_bank(machine, "bank0", 0, 1, ipl_rom, 0);
+	memory_configure_bank(machine, "bank0", 1, 1, option_rom, 0);
+	memory_configure_bank(machine, "bank0", 2, 1, ipl_rom, 0);
+	memory_configure_bank(machine, "bank0", 3, 1, ram, 0);
+
+	memory_configure_bank(machine, "bank1", 0, 2, option_rom + 0x8000, 0);
+	memory_configure_bank(machine, "bank1", 2, 2, ram + 0x8000, 0);
+
 	/* register for state saving */
+	state_save_register_global(machine, state->ier);
+	state_save_register_global(machine, state->isr);
+	state_save_register_global(machine, state->bank0);
+	state_save_register_global(machine, state->bk2);
+	state_save_register_global(machine, state->sio);
 	state_save_register_global(machine, state->ksc);
+}
+
+static MACHINE_RESET( px8 )
+{
+	px8_state *state = (px8_state *)machine->driver_data;
+
+	state->bank0 = 0;
+	state->bk2 = 1;
+
+	bankswitch(machine);
 }
 
 /***************************************************************************
@@ -704,10 +797,11 @@ static MACHINE_DRIVER_START( px8 )
 //	MDRV_CPU_IO_MAP(px8_sub_io)
 
 	MDRV_MACHINE_START(px8)
+	MDRV_MACHINE_RESET(px8)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MDRV_SCREEN_REFRESH_RATE(72)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(480, 64)
 	MDRV_SCREEN_VISIBLE_AREA(0, 479, 0, 63)
@@ -754,11 +848,9 @@ ROM_START( px8 )
 	ROM_REGION( 0x0800, SED1320_TAG, 0 )
 	ROM_LOAD( "font.rom", 0x0000, 0x0800, CRC(5b52edbd) SHA1(38197edf301bb2843bea040536af545f76b3d44f) )
 
-	ROM_REGION( 0x8000, "10e", 0 )
-	ROM_CART_LOAD( "capsule1", 0x0000, 0x8000, ROM_NOMIRROR )
-
-	ROM_REGION( 0x8000, "9e", 0 )
+	ROM_REGION( 0x10000, "capsule", 0 )
 	ROM_CART_LOAD( "capsule2", 0x0000, 0x8000, ROM_NOMIRROR )
+	ROM_CART_LOAD( "capsule1", 0x8000, 0x8000, ROM_NOMIRROR )
 
 	ROM_REGION( 0x1000, HD6303_TAG, 0 )
 	ROM_LOAD( "hd6303 slave cpu internal rom.13d", 0x0000, 0x1000, NO_DUMP )

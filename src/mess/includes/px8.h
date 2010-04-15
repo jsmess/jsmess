@@ -19,6 +19,17 @@ public:
 
 	px8_state(running_machine &machine) { }
 
+	/* interrupt state */
+	UINT8 ier;
+	UINT8 isr;
+
+	/* memory state */
+	int bank0;
+	int bk2;
+
+	/* serial state */
+	UINT8 sio;
+
 	/* keyboard state */
 	int ksc;
 
