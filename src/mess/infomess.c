@@ -101,14 +101,12 @@ static void print_game_ramoptions(FILE *out, const game_driver *game, const mach
 		fprintf(out, "\t\t<ramoption default=\"1\">%u</ramoption>\n",  messram_parse_string(ram->default_size));
 		if (ram->extra_options != NULL)
 		{
-			const char *s;
-
-			astring buffer;
-			astring_cpyc(&buffer, ram->extra_options);
-			astring_replacechr(&buffer, ',', 0);
-
-			s = astring_c(&buffer);
-
+			int j;
+			int size = strlen(ram->extra_options);
+			char *s = mame_strdup(ram->extra_options);
+			for (j=0;j<size;j++) {
+				if (s[j]==',') s[j]=0;
+			}
 			/* try to parse each option */
 			while(*s != '\0')
 			{

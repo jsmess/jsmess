@@ -439,23 +439,20 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 		}
 		if (config->extra_options != NULL)
 		{
-			const char *s;
-
-			astring buffer;
-			astring_cpyc(&buffer, config->extra_options);
-			astring_replacechr(&buffer, ',', 0);
-
-			s = astring_c(&buffer);
-
+			int j;
+			int size = strlen(config->extra_options);
+			char *s = mame_strdup(config->extra_options);
+			for (j=0;j<size;j++) {
+				if (s[j]==',') s[j]=0;
+			}
+			
 			/* try to parse each option */
 			while(*s != '\0')
 			{
 				i++;
 				// identify this option
 				ram = messram_parse_string(s);
-				
-				if (ram==0) break;
-				
+
 				this_ram_string = s;
 
 				t_ramstring = tstring_from_utf8(this_ram_string);
