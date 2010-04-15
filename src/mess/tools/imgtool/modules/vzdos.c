@@ -295,7 +295,7 @@ static imgtoolerr_t vzdos_toggle_trackmap(imgtool_image *img, int track, int sec
 	ret = vzdos_read_sector_data(img, 0, 15, buffer);
 	if (ret) return (imgtoolerr_t)ret;
 
-	value = (int) (floor((track * 16 + sector) / 8) - 1);
+	value = (int) (floor(((double)track * 16 + sector) / 8) - 1);
 	bit   = 0x01 << ((track * 16 + sector) % 8);
 
 	if (clear)
@@ -331,7 +331,7 @@ static imgtoolerr_t vzdos_get_trackmap(imgtool_image *img, int track, int sector
 	ret = vzdos_read_sector_data(img, 0, 15, buffer);
 	if (ret) return (imgtoolerr_t)ret;
 
-	value = (int) (floor((track * 16 + sector) / 8) - 1);
+	value = (int) (floor(((double)track * 16 + sector) / 8) - 1);
 	bit   = 0x01 << ((track * 16 + sector) % 8);
 
 	if (buffer[value-1] & bit)
