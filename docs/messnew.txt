@@ -28,6 +28,7 @@ Skeleton drivers:
 - Signetics Instructor 50
 - Dolphin
 - Chaos 2
+- EC-1849 [thanks to Anasana]
 
 
 System Driver Changes:

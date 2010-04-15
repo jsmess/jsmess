@@ -612,6 +612,7 @@ const game_driver * const drivers[] =
 	DRIVER( ficvt503 )	/* 1997 FIC VT-503  */
 	DRIVER( megapc )
 	DRIVER( megapcpl )
+	DRIVER( ec1849 )
 
 	/* 3Com / Palm / USRobotics */
 	DRIVER( pilot1k )   /* Pilot 1000 */

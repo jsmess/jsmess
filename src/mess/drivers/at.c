@@ -560,6 +560,10 @@ static MACHINE_DRIVER_START( ibm5170a )
 	MDRV_CPU_REPLACE("maincpu", I80286, 8000000)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( ec1849 )
+	MDRV_IMPORT_FROM( ibm5170 )
+	MDRV_CPU_REPLACE("maincpu", I80286, 12000000)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ibm5162 )
 	MDRV_DRIVER_DATA(at_state)
@@ -954,6 +958,22 @@ ROM_START( ibm5170 )
 	ROM_LOAD("55x8041.82s147.u72", 0x0800, 0x1000, NO_DUMP) /* S N82S147AN 8709 // V-C55X8041 */
 ROM_END
 
+ROM_START( ec1849 )
+	ROM_REGION16_LE(0x1000000,"maincpu", 0)
+	ROM_LOAD16_BYTE( "cpu-card_27c256_015.rom", 0xf0000, 0x8000, CRC(68eadf0a) SHA1(903a7f1c3ebc6b27c31b512b2908c483608b5c13))
+	ROM_LOAD16_BYTE( "cpu-card_27c256_016.rom", 0xf0001, 0x8000, CRC(bc3924d6) SHA1(596be415e6c2bc4ff30a187f146664531565712c))
+	ROM_LOAD16_BYTE( "video-card_573rf6( 2764)_040.rom", 0xc0001, 0x2000, CRC(a3ece315) SHA1(e800e11c3b1b6fcaf41bfb7d4058a9d34fdd2b3f))
+	ROM_LOAD16_BYTE( "video-card_573rf6( 2764)_041.rom", 0xc0000, 0x2000, CRC(b0a2ba7f) SHA1(c8160e8bc97cd391558f1dddd3fd3ec4a19d030c))
+	
+	ROM_REGION(0x08100, "gfx1", 0)
+	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+
+	ROM_REGION(0x50000, "gfx2", ROMREGION_ERASE00)
+	
+	/* 8042 keyboard controller */
+	ROM_REGION( 0x0800, "kbdc8042", 0 )
+	ROM_LOAD("1503033.bin", 0x0000, 0x0800, CRC(5a81c0d2) SHA1(0100f8789fb4de74706ae7f9473a12ec2b9bd729))
+ROM_END
 
 ROM_START( ibm5170a )
 	ROM_REGION(0x100000,"maincpu", 0)
@@ -1318,6 +1338,7 @@ ROM_END
 /*     YEAR  NAME      PARENT   COMPAT   MACHINE    INPUT       INIT    COMPANY     FULLNAME */
 COMP ( 1984, ibm5170,  0,       ibm5150, ibm5170,   atcga,	atega,	    "International Business Machines",  "IBM PC/AT 5170", GAME_NOT_WORKING )
 COMP ( 1985, ibm5170a, ibm5170, 0,       ibm5170a,  atcga,  atega,      "International Business Machines",  "IBM PC/AT 5170 8MHz", GAME_NOT_WORKING )
+COMP ( 1993, ec1849,   ibm5170, 0, 		 ec1849,    atcga,	atcga,	    "",  "EC-1849", GAME_NOT_WORKING )
 COMP ( 1985, ibm5162,  ibm5170, 0,       ibm5162,   atcga,  atcga,      "International Business Machines",  "IBM PC/XT-286 5162", GAME_NOT_WORKING )
 COMP ( 1988, i8530286, ibm5170, 0,       ps2m30286, atvga,	ps2m30286,  "International Business Machines",  "IBM PS2 Model 30 286", GAME_NOT_WORKING )
 COMP ( 1987, at,       ibm5170, 0,       ibm5162,  atcga,	atcga,	    "",  "PC/AT (CGA, MF2 Keyboard)", GAME_NOT_WORKING )
