@@ -612,7 +612,7 @@ core_options * MameUIGlobal(void)
 #if 0
 static void LoadFolderFilter(int folder_index,int filters)
 {
-	//dprintf("loaded folder filter %i %i",folder_index,filters);
+	//dprintf("loaded folder filter %i %i\n",folder_index,filters);
 
 	if (num_folder_filters == size_folder_filters)
 	{
@@ -2370,7 +2370,7 @@ DWORD GetFolderFlags(int folder_index)
 	{
 		if (folder_filters[i].folder_index == folder_index)
 		{
-			//dprintf("found folder filter %i %i",folder_index,folder_filters[i].filters);
+			//dprintf("found folder filter %i %i\n",folder_index,folder_filters[i].filters);
 			return folder_filters[i].filters;
 		}
 	}

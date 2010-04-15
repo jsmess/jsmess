@@ -1313,7 +1313,7 @@ void CreateAllChildFolders(void)
 
 		if (lpFolderData != NULL)
 		{
-			//dprintf("Found built-in-folder id %i %i",i,lpFolder->m_nFolderId);
+			//dprintf("Found built-in-folder id %i %i\n",i,lpFolder->m_nFolderId);
 			if (lpFolderData->m_pfnCreateFolders != NULL)
 				lpFolderData->m_pfnCreateFolders(i);
 		}
@@ -1321,11 +1321,11 @@ void CreateAllChildFolders(void)
 		{
 			if ((lpFolder->m_dwFlags & F_CUSTOM) == 0)
 			{
-				dprintf("Internal inconsistency with non-built-in folder, but not custom");
+				dprintf("Internal inconsistency with non-built-in folder, but not custom\n");
 				continue;
 			}
 
-			//dprintf("Loading custom folder %i %i",i,lpFolder->m_nFolderId);
+			//dprintf("Loading custom folder %i %i\n",i,lpFolder->m_nFolderId);
 
 			// load the extra folder files, which also adds children
 			if (TryAddExtraFolderAndChildren(i) == FALSE)
@@ -1353,7 +1353,7 @@ void ResetTreeViewFolders(void)
 
 	res = TreeView_DeleteAllItems(hTreeView);
 
-	//dprintf("Adding folders to tree ui indices %i to %i",start_index,end_index);
+	//dprintf("Adding folders to tree ui indices %i to %i\n",start_index,end_index);
 
 	tvs.hInsertAfter = TVI_SORT;
 
@@ -1618,7 +1618,7 @@ BOOL InitFolders(void)
 		// OR in the saved folder flags
 		dwFolderFlags = fExData->m_dwFlags | GetFolderFlags(numFolders);
 		// create the folder
-		//dprintf("creating top level custom folder with icon %i",fExData->m_nIconId);
+		//dprintf("creating top level custom folder with icon %i\n",fExData->m_nIconId);
 		AddFolder(NewFolder(fExData->m_szTitle,fExData->m_nFolderId,fExData->m_nParent,
 							fExData->m_nIconId,dwFolderFlags));
 	}
@@ -1642,7 +1642,7 @@ static BOOL CreateTreeIcons()
 	int numIcons = ICON_MAX + numExtraIcons;
 	hTreeSmall = ImageList_Create (16, 16, ILC_COLORDDB | ILC_MASK, numIcons, numIcons);
 
-	//dprintf("Trying to load %i normal icons",ICON_MAX);
+	//dprintf("Trying to load %i normal icons\n",ICON_MAX);
 	for (i = 0; i < ICON_MAX; i++)
 	{
 		hIcon = LoadIconFromFile(treeIconNames[i].lpName);
@@ -1656,7 +1656,7 @@ static BOOL CreateTreeIcons()
 		}
 	}
 
-	//dprintf("Trying to load %i extra custom-folder icons",numExtraIcons);
+	//dprintf("Trying to load %i extra custom-folder icons\n",numExtraIcons);
 	for (i = 0; i < numExtraIcons; i++)
 	{
 		if ((hIcon = LoadIconFromFile(ExtraFolderIcons[i])) == 0)
@@ -2025,7 +2025,7 @@ static int InitExtraFolders(void)
 						ExtraFolderData[count]->m_dwFlags	  = F_CUSTOM;
 						ExtraFolderData[count]->m_nIconId	  = icon[0] ? -icon[0] : IDI_FOLDER;
 						ExtraFolderData[count]->m_nSubIconId  = icon[1] ? -icon[1] : IDI_FOLDER;
-						//dprintf("extra folder with icon %i, subicon %i",
+						//dprintf("extra folder with icon %i, subicon %i\n",
 						//ExtraFolderData[count]->m_nIconId,
 						//ExtraFolderData[count]->m_nSubIconId);
 						count++;

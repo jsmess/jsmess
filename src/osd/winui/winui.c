@@ -1777,7 +1777,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 	InitCommonControls();
 
 	// Are we using an Old comctl32.dll?
-	dprintf("common controlversion %ld %ld",common_control_version >> 16,
+	dprintf("common controlversion %ld %ld\n",common_control_version >> 16,
 			common_control_version & 0xffff);
 
 	oldControl = (common_control_version < PACKVERSION(4,71));
@@ -1809,7 +1809,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 	hMain = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_MAIN), 0, NULL);
 	if (hMain == NULL)
 	{
-		dprintf("error creating main dialog, aborting");
+		dprintf("error creating main dialog, aborting\n");
 		return FALSE;
 	}
 
@@ -1954,9 +1954,9 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 
 	LoadBackgroundBitmap();
 
-	dprintf("about to init tree");
+	dprintf("about to init tree\n");
 	InitTree(g_folderData, g_filterList);
-	dprintf("did init tree");
+	dprintf("did init tree\n");
 
 	/* Initialize listview columns */
 #ifdef MESS
@@ -3668,7 +3668,7 @@ static void KeyboardKeyUp(int syskey, int vk_code, int special)
 	}
 	if (!found)
 	{
-		dprintf("VK_code released not found =  %i",vk_code);
+		dprintf("VK_code released not found =  %i\n",vk_code);
 		//MessageBox(NULL,"keyup message arrived not processed","TitleBox",MB_OK);
 		return;
 	}
@@ -5233,12 +5233,12 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 #ifdef DEBUG
 	if (strcmp(drivers[index1]->name,"1941") == 0 && strcmp(drivers[index2]->name,"1942") == 0)
 	{
-		dprintf("comparing 1941, 1942");
+		dprintf("comparing 1941, 1942\n");
 	}
 
 	if (strcmp(drivers[index1]->name,"1942") == 0 && strcmp(drivers[index2]->name,"1941") == 0)
 	{
-		dprintf("comparing 1942, 1941");
+		dprintf("comparing 1942, 1941\n");
 	}
 #endif
 
@@ -5389,7 +5389,7 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 #ifdef DEBUG
 	if ((strcmp(drivers[index1]->name,"1941") == 0 && strcmp(drivers[index2]->name,"1942") == 0) ||
 		(strcmp(drivers[index1]->name,"1942") == 0 && strcmp(drivers[index2]->name,"1941") == 0))
-		dprintf("result: %i",value);
+		dprintf("result: %i\n",value);
 #endif
 
 	return value;
@@ -6406,13 +6406,13 @@ void InitTreeContextMenu(HMENU hTreeMenu)
 
 	if (GetMenuItemInfo(hMenu,3,TRUE,&mii) == FALSE)
 	{
-		dprintf("can't find show folders context menu");
+		dprintf("can't find show folders context menu\n");
 		return;
 	}
 
 	if (mii.hSubMenu == NULL)
 	{
-		dprintf("can't find submenu for show folders context menu");
+		dprintf("can't find submenu for show folders context menu\n");
 		return;
 	}
 
@@ -6453,7 +6453,7 @@ void InitBodyContextMenu(HMENU hBodyContextMenu)
 
 	if (GetMenuItemInfo(hBodyContextMenu,ID_FOLDER_SOURCEPROPERTIES,FALSE,&mii) == FALSE)
 	{
-		dprintf("can't find show folders context menu");
+		dprintf("can't find show folders context menu\n");
 		return;
 	}
 	lpFolder = GetFolderByName(FOLDER_SOURCE, GetDriverFilename(Picker_GetSelectedItem(hwndList)) );

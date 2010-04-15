@@ -115,7 +115,7 @@ static int TabView_GetTabFromTabIndex(HWND hwndTabView, int tab_index)
 				return i;
 		}
 	}
-	dprintf("invalid tab index %i", tab_index);
+	dprintf("invalid tab index %i\n", tab_index);
 	return 0;
 }
 
