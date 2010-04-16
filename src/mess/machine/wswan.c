@@ -1312,6 +1312,7 @@ WRITE8_HANDLER( wswan_port_w )
 	ws_portram[offset] = data;
 }
 
+#ifdef MAME_DEBUG
 static const char* wswan_determine_sram( UINT8 data )
 {
 	eeprom.write_enabled = 0;
@@ -1332,7 +1333,6 @@ static const char* wswan_determine_sram( UINT8 data )
 	return wswan_sram_str[ eeprom.mode ];
 }
 
-#ifdef MAME_DEBUG
 enum enum_romsize { ROM_4M=0, ROM_8M, ROM_16M, ROM_32M, ROM_64M, ROM_128M, ROM_UNKNOWN };
 static const char *const wswan_romsize_str[] = {
 	"4Mbit", "8Mbit", "16Mbit", "32Mbit", "64Mbit", "128Mbit", "Unknown"
