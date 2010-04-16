@@ -270,7 +270,7 @@ int pak_decode_trailer(UINT8 *rawtrailer, int rawtrailerlen, pak_decodedtrailer 
 	pak_trailer9 p9;
 	pak_trailer11 p11;
 	pcd_info1 *pcd1 = NULL;
-	pcd_info2 *pcd2 = NULL;
+	//pcd_info2 *pcd2 = NULL;
 
 	union {
 		pak_trailer8 p8;
@@ -349,7 +349,7 @@ int pak_decode_trailer(UINT8 *rawtrailer, int rawtrailerlen, pak_decodedtrailer 
 		if ((pcd1->magic1[0] == 0xAB) && (pcd1->magic1[1] == 0xBA)) {
 			/* Yes it is! */
 			/* Note! I should be checking the checksum */
-			pcd2 = (pcd_info2 *) p11.disk_name;
+			//pcd2 = (pcd_info2 *) p11.disk_name;
 		}
 		else {
 			/* No it is not */

@@ -1190,7 +1190,7 @@ static void menu_open(HWND window)
 	object_pool *pool;
 	win_open_file_name ofn;
 	const imgtool_module *module;
-	wimgtool_info *info;
+	//wimgtool_info *info;
 	int read_or_write;
 
 	pool = pool_alloc_lib(NULL);
@@ -1200,7 +1200,7 @@ static void menu_open(HWND window)
 		goto done;
 	}
 
-	info = get_wimgtool_info(window);
+	//info = get_wimgtool_info(window);
 
 	err = setup_openfilename_struct(&ofn, pool, window, FALSE);
 	if (err)
@@ -1241,7 +1241,7 @@ static void menu_insert(HWND window)
 	wimgtool_info *info;
 	option_resolution *opts = NULL;
 	BOOL cancel;
-	const imgtool_module *module;
+	//const imgtool_module *module;
 	const char *fork = NULL;
 	struct transfer_suggestion_info suggestion_info;
 	int use_suggestion_info;
@@ -1270,7 +1270,7 @@ static void menu_insert(HWND window)
 		goto done;
 	}
 
-	module = imgtool_image_module(info->image);
+	//module = imgtool_image_module(info->image);
 
 	/* figure out which filters are appropriate for this file */
 	imgtool_partition_suggest_file_filters(info->partition, NULL, stream, suggestion_info.suggestions,

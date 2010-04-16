@@ -605,12 +605,12 @@ void SoftwarePicker_Clear(HWND hwndPicker)
 static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 	directory_search_info *pSearchInfo)
 {
-	software_picker_info *pPickerInfo;
+	//software_picker_info *pPickerInfo;
 	LPSTR pszFilename;
 	BOOL rc;
 	char* utf8_FileName;
 
-	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
+	//pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
 	utf8_FileName = utf8_from_tstring(pSearchInfo->fd.cFileName);
 	if( !utf8_FileName )

@@ -1131,7 +1131,7 @@ VIDEO_UPDATE( x68000 )
 	int x;
 	tilemap_t* x68k_bg0;
 	tilemap_t* x68k_bg1;
-	UINT8 *rom;
+	//UINT8 *rom;
 
 	if((x68k_spritereg[0x408] & 0x03) == 0x00)  // Sprite/BG H-Res 0=8x8, 1=16x16, 2 or 3 = undefined.
 	{
@@ -1163,7 +1163,7 @@ VIDEO_UPDATE( x68000 )
 		rect.max_y = cliprect->max_y;
 
 	// update tiles
-	rom = memory_region(screen->machine, "user1");
+	//rom = memory_region(screen->machine, "user1");
 	for(x=0;x<256;x++)
 	{
 		if(x68k_sys.video.tile16_dirty[x] != 0)

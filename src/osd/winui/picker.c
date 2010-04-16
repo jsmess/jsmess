@@ -927,12 +927,12 @@ static int CALLBACK Picker_CompareProc(LPARAM index1, LPARAM index2, LPARAM nPar
 void Picker_Sort(HWND hwndPicker)
 {
 	LV_FINDINFO lvfi;
-	struct PickerInfo *pPickerInfo;
+	//struct PickerInfo *pPickerInfo;
 	struct CompareProcParams params;
 	int nItem;
 	BOOL res;
 
-	pPickerInfo = GetPickerInfo(hwndPicker);
+	//pPickerInfo = GetPickerInfo(hwndPicker);
 
 	// populate the CompareProcParams structure
 	Picker_PopulateCompareProcParams(hwndPicker, &params);
@@ -953,14 +953,14 @@ void Picker_Sort(HWND hwndPicker)
 
 int Picker_InsertItemSorted(HWND hwndPicker, int nParam)
 {
-	struct PickerInfo *pPickerInfo;
+	//struct PickerInfo *pPickerInfo;
 	int nHigh, nLow, nMid;
 	struct CompareProcParams params;
 	int nCompareResult;
 	LVITEM lvi;
 	BOOL res;
 
-	pPickerInfo = GetPickerInfo(hwndPicker);
+	//pPickerInfo = GetPickerInfo(hwndPicker);
 
 	nLow = 0;
 	nHigh = ListView_GetItemCount(hwndPicker);

@@ -1376,7 +1376,9 @@ DEVICE_START(wswan_cart)
 DEVICE_IMAGE_LOAD(wswan_cart)
 {
 	UINT32 ii;
+#ifdef MAME_DEBUG
 	const char *sram_str;
+#endif
 
 	ws_ram = (UINT8*) memory_get_read_ptr( cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0 );
 	memset( ws_ram, 0, 0xFFFF );
@@ -1399,7 +1401,9 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 		}
 	}
 
+#ifdef MAME_DEBUG
 	sram_str = wswan_determine_sram( ROMMap[ROMBanks-1][0xfffb] );
+#endif
 
 	rtc.present = ROMMap[ROMBanks-1][0xfffd] ? 1 : 0;
 

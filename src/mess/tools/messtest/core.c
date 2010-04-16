@@ -495,7 +495,7 @@ static void node_tests(xml_data_node *tests_node, int *test_count, int *failure_
 
 int messtest(const struct messtest_options *opts, int *test_count, int *failure_count)
 {
-	char saved_directory[1024];
+	//char saved_directory[1024];
 	file_error filerr;
 	core_file *file;
 	int result = -1;
@@ -517,7 +517,7 @@ int messtest(const struct messtest_options *opts, int *test_count, int *failure_
 	}
 
 	/* save the current working directory, and change to the test directory */
-	saved_directory[0] = '\0';
+	//saved_directory[0] = '\0';
 /*  if (!opts->preserve_directory)
     {
         script_directory = osd_dirname(opts->script_filename);

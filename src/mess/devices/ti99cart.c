@@ -623,9 +623,9 @@ static WRITE8_DEVICE_HANDLER( write_cart_std8 )
 */
 static int assemble_std(running_device *image)
 {
-	cartridge_t *cart;
+//	cartridge_t *cart;
 //  printf("assemble_std, %s\n", image->tag);
-	cart = assemble_common(image);
+	/*cart = */assemble_common(image);
 
 	return INIT_PASS;
 }
@@ -1295,10 +1295,10 @@ static WRITE8_DEVICE_HANDLER( write_cart_mbx8 )
 
 static int assemble_mbx(running_device *image)
 {
-	cartridge_t *cart;
+//	cartridge_t *cart;
 
 //  printf("assemble_mbx, %s\n", image->tag);
-	cart = assemble_common(image);
+	/*cart = */assemble_common(image);
 	return INIT_PASS;
 }
 

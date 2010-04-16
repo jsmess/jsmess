@@ -289,13 +289,13 @@ static fat_partition_info *fat_get_partition_info(imgtool_partition *partition)
 static imgtoolerr_t fat_read_sector(imgtool_partition *partition, UINT32 sector_index,
 	int offset, void *buffer, size_t buffer_len)
 {
-	const fat_partition_info *disk_info;
+	//const fat_partition_info *disk_info;
 	imgtoolerr_t err;
 	UINT8 data[FAT_SECLEN];
 	UINT32 block_size;
 	size_t len;
 
-	disk_info = fat_get_partition_info(partition);
+	//disk_info = fat_get_partition_info(partition);
 
 	/* sanity check */
 	err = imgtool_partition_get_block_size(partition, &block_size);
@@ -324,14 +324,14 @@ static imgtoolerr_t fat_read_sector(imgtool_partition *partition, UINT32 sector_
 static imgtoolerr_t fat_write_sector(imgtool_partition *partition, UINT32 sector_index,
 	int offset, const void *buffer, size_t buffer_len)
 {
-	const fat_partition_info *disk_info;
+	//const fat_partition_info *disk_info;
 	imgtoolerr_t err;
 	UINT8 data[FAT_SECLEN];
 	const void *write_data;
 	UINT32 block_size;
 	size_t len;
 
-	disk_info = fat_get_partition_info(partition);
+	//disk_info = fat_get_partition_info(partition);
 
 	/* sanity check */
 	err = imgtool_partition_get_block_size(partition, &block_size);
@@ -461,7 +461,7 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 	UINT32 boot_sector_offset;
 	UINT64 total_clusters;
 	UINT8 media_descriptor;
-	const char *title;
+	//const char *title;
 	const char *fat_bits_string;
 	UINT8 header[FAT_SECLEN];
 	UINT64 first_fat_entries;
@@ -506,7 +506,7 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 	media_descriptor = known_media[i].media_descriptor;
 
 	/* other miscellaneous settings */
-	title = "";
+	//title = "";
 	fat_count = 2;
 	root_dir_count = 512;
 	hidden_sectors = 0;
@@ -1279,7 +1279,7 @@ static imgtoolerr_t fat_read_dirent(imgtool_partition *partition, fat_file *file
 	fat_dirent *ent, fat_freeentry_info *freeent)
 {
 	imgtoolerr_t err;
-	const fat_partition_info *disk_info;
+	//const fat_partition_info *disk_info;
 	UINT8 entry[FAT_DIRENT_SIZE];
 	size_t bytes_read;
 	int i, j;
@@ -1293,7 +1293,7 @@ static imgtoolerr_t fat_read_dirent(imgtool_partition *partition, fat_file *file
 	assert(file->directory);
 	lfn_buf[0] = '\0';
 	memset(ent, 0, sizeof(*ent));
-	disk_info = fat_get_partition_info(partition);
+	//disk_info = fat_get_partition_info(partition);
 
 	/* The first eight bytes of a FAT directory entry is a blank padded name
      *

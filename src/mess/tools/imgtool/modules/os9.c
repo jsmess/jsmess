@@ -1098,14 +1098,14 @@ static imgtoolerr_t os9_diskimage_delete(imgtool_partition *partition, const cha
 {
 	imgtoolerr_t err;
 	imgtool_image *image = imgtool_partition_image(partition);
-	const os9_diskinfo *disk_info;
+	//const os9_diskinfo *disk_info;
 	struct os9_fileinfo file_info;
 	UINT32 dirent_lsn, dirent_index;
 	UINT32 entry_lsn, entry_index;
 	UINT32 i, j, lsn;
 	UINT8 b;
 
-	disk_info = os9_get_diskinfo(image);
+	//disk_info = os9_get_diskinfo(image);
 
 	err = os9_lookup_path(image, path, CREATE_NONE, &file_info, NULL, &dirent_lsn, &dirent_index);
 	if (err)

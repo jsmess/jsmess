@@ -310,7 +310,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 	if ( vpos < start_vblank )
 	{
 		rectangle rect;
-		int	sprite_width[4] = { 8, 8, 8, 8 };
+		//int	sprite_width[4] = { 8, 8, 8, 8 };
 		int i;
 
 		control_status &= ~ 0x01;
@@ -486,7 +486,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 				if ( o2_vdc.s.sprites[i].color & 4 )
 				{
 					/* Zoomed sprite */
-					sprite_width[i] = 16;
+					//sprite_width[i] = 16;
 					if ( y <= ( vpos - start_vpos ) && ( vpos - start_vpos ) < y + height * 4 )
 					{
 						UINT16 color = 16 + ( ( o2_vdc.s.sprites[i].color >> 3 ) & 0x07 );

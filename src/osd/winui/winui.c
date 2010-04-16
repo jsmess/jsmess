@@ -6300,7 +6300,7 @@ static void UpdateMenu(HMENU hMenu)
 	int 			nGame = Picker_GetSelectedItem(hwndList);
 	LPTREEFOLDER lpFolder = GetCurrentFolder();
 	int i;
-	const char *pParent;
+	//const char *pParent;
 	TCHAR* t_description;
 
 	if (have_selection)
@@ -6348,7 +6348,7 @@ static void UpdateMenu(HMENU hMenu)
 	    EnableMenuItem(hMenu,ID_CONTEXT_REMOVE_CUSTOM,MF_GRAYED);
 		EnableMenuItem(hMenu,ID_CONTEXT_RENAME_CUSTOM,MF_GRAYED);
 	}
-	pParent = GetFolderNameByID(lpFolder->m_nParent+1);
+	//pParent = GetFolderNameByID(lpFolder->m_nParent+1);
 
 	if (lpFolder->m_dwFlags & F_INIEDIT)
 		EnableMenuItem(hMenu,ID_FOLDER_PROPERTIES,MF_ENABLED);

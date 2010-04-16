@@ -258,9 +258,9 @@ static DEVICE_START(aes_pcb_std)
 */
 static int assemble_std(running_machine *machine, running_device *image)
 {
-	aescartridge_t *cart;
+//	aescartridge_t *cart;
 //  printf("assemble_std, %s\n", image->tag);
-	cart = assemble_common(machine, image);
+	/*cart = */assemble_common(machine, image);
 
 	return INIT_PASS;
 }
@@ -274,13 +274,13 @@ static int assemble_std(running_machine *machine, running_device *image)
 */
 static int disassemble_std(running_device *image)
 {
-	int slotnumber;
+//	int slotnumber;
 //  int i;
-	aescartridge_t *cart;
-	running_device *cartsys = image->owner;
-	aes_multicart_t *cartslots = (aes_multicart_t *)cartsys->token;
+//	aescartridge_t *cart;
+//	running_device *cartsys = image->owner;
+//	aes_multicart_t *cartslots = (aes_multicart_t *)cartsys->token;
 
-	slotnumber = get_index_from_tagname(image)-1;
+//	slotnumber = get_index_from_tagname(image)-1;
 //  printf("Disassemble cartridge %d\n", slotnumber);
 #if 0
 	/* Search the highest remaining cartridge. */
@@ -299,7 +299,7 @@ static int disassemble_std(running_device *image)
 	}
 #endif
 	/* Do we have RAM? If so, swap the bytes (undo the BIG_ENDIANIZE) */
-	cart = &cartslots->cartridge[slotnumber];
+//	cart = &cartslots->cartridge[slotnumber];
 
 //  clear_slot(cartsys, slotnumber);
 

@@ -564,15 +564,15 @@ static void vic3_draw_sprite_multi( running_device *device, int nr, int yoff, in
 {
 	vic3_state *vic3 = get_safe_token(device);
 	int y, i, prior, addr, xbegin, collision;
-	int value, value2, value3 = 0, bg, color[2];
+	int value, value2, value3 = 0, bg/*, color[2]*/;
 
 	xbegin = SPRITE_X_POS(nr);
 	addr = vic3->dma_read(device->machine, SPRITE_ADDR(nr)) << 6;
 	vic3->spritemulti[2] = SPRITE_COLOR(nr);
 	prior = SPRITE_PRIORITY(nr);
 	collision = SPRITE_BG_COLLISION(nr);
-	color[0] = 0;
-	color[1] = 1;
+	//color[0] = 0;
+	//color[1] = 1;
 
 	if (SPRITE_X_EXPAND(nr))
 	{
