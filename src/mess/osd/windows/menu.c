@@ -722,7 +722,7 @@ done:
 //  win_dirname
 //============================================================
 
-char *win_dirname(const char *filename)
+static char *win_dirname(const char *filename)
 {
 	char *dirname;
 	char *c;
@@ -805,7 +805,7 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 		mameproc(machine, state_filename);
 	}
 	if (dir)
-		global_free(dir);
+		free(dir);
 }
 
 
