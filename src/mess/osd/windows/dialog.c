@@ -1577,7 +1577,7 @@ void win_dialog_exit(dialog_box *dialog)
 	if (dialog->handle)
 		GlobalFree(dialog->handle);
 	pool_free_lib(dialog->mempool);
-	global_free(dialog);
+	free(dialog);
 }
 
 
