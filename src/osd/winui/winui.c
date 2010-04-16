@@ -4079,7 +4079,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 {
 	int i;
 	LPTREEFOLDER folder;
-	char* t_szFile;
+	char* utf8_szFile;
 	BOOL res;
 
 	switch (id)
@@ -4589,14 +4589,14 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 
 			if (GetOpenFileName(&OpenFileName))
 			{
-				t_szFile = utf8_from_tstring(szFile);
-				if( !t_szFile )
+				utf8_szFile = utf8_from_tstring(szFile);
+				if( !utf8_szFile )
 					return FALSE;
-				ResetBackground(t_szFile);
+				ResetBackground(utf8_szFile);
 				LoadBackgroundBitmap();
 				InvalidateRect(hMain, NULL, TRUE);
 				global_free(t_bgdir);
-				global_free(t_szFile);
+				global_free(utf8_szFile);
 				return TRUE;
 			}
 			global_free(t_bgdir);
