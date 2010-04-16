@@ -501,7 +501,7 @@ INLINE ted7360_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert(device->type == TED7360);
+	assert(device->type == SOUND);
 
 	return (ted7360_state *)device->token;
 }
@@ -509,7 +509,7 @@ INLINE ted7360_state *get_safe_token( running_device *device )
 INLINE const ted7360_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == TED7360));
+	assert(device->type == SOUND);
 	return (const ted7360_interface *) device->baseconfig().static_config;
 }
 
