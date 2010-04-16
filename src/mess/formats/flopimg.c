@@ -324,9 +324,9 @@ static void floppy_close_internal(floppy_image *floppy, int close_file)
 		if (floppy->loaded_track_data)
 			free(floppy->loaded_track_data);
 		pool_free_lib(floppy->tags);
-	}
 
-	free(floppy);
+		free(floppy);
+	}
 }
 
 
