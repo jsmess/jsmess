@@ -2536,7 +2536,7 @@ const char *imgtool_partition_path_concatenate(imgtool_partition *partition, con
 	else
 	{
 		/* append a path */
-		if ((strlen(path1) > 0) && (path1[strlen(path1) - 1] != path_separator))
+		if ((*path1 != 0) && (path1[strlen(path1) - 1] != path_separator))
 			snprintf(buffer, buffer_len, "%s%c%s", path1, path_separator, path2);
 		else
 			snprintf(buffer, buffer_len, "%s%s", path1, path2);

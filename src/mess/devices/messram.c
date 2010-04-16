@@ -180,7 +180,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 				mame_printf_error("%s: '%s' cannot recognize the RAM option %s\n", driver->source_file, driver->name, ramsize_string);
 				error = TRUE;
 			}
-			if (gamename_option!=NULL && strlen(gamename_option) > 0 && strcmp(gamename_option, driver->name) == 0)
+			if (gamename_option != NULL && *gamename_option != 0 && strcmp(gamename_option, driver->name) == 0)
 			{
 				/* compare command line option to default value */
 				if (messram_parse_string(config->default_size) == specified_ram)

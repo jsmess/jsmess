@@ -199,7 +199,7 @@ int CLIB_DECL main(int ac, char *av[])
 			{
 				if( html_system )
 				{
-					if ( strlen(line) == 0 )
+					if ( *line == 0 )
 					{
 						if ( emptycount++ > 1 )
 							fprintf(html_system, "<br>\n");
