@@ -4257,7 +4257,7 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 					win_set_window_text_utf8(hwndCtl, "");
 				break;
 			case EN_KILLFOCUS:
-				if (strlen(buf) == 0)
+				if (*buf == 0)
 					win_set_window_text_utf8(hwndCtl, SEARCH_PROMPT);
 				break;
 			}
@@ -5877,7 +5877,7 @@ static void MameLoadState()
 			char *cPos;
 			cPos = strrchr(bare_fname, '-' );
 			cPos = cPos+1;
-			if( strlen(cPos) >0)
+			if (*cPos != 0)
 			{
 				playopts.state = cPos;
 			}

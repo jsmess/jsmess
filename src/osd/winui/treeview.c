@@ -560,7 +560,7 @@ void CreateManufacturerFolders(int parent_index)
 			const char *s = ParseManufacturer(manufacturer, &iChars);
 			manufacturer += iChars;
 			//shift to next start char
-			if( s != NULL && strlen(s) > 0 )
+			if( s != NULL && *s != 0 )
  			{
 				const char *t = TrimManufacturer(s);
 				for (i=numFolders-1;i>=start_folder;i--)
@@ -914,7 +914,7 @@ static const char* TrimManufacturer(const char *s)
 				break;
 		}
 	}
-	if( strlen(strTemp2) == 0 )
+	if( *strTemp2 == 0 )
 		return s;
 	return strTemp2;
 }
