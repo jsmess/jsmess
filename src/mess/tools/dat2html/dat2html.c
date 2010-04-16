@@ -69,9 +69,9 @@ static void a_href_url(char *line)
 
 
 #ifdef _WIN32
-int CLIB_DECL utf8_main(int ac, char **av)
+int CLIB_DECL utf8_main(int ac, char *av[])
 #else
-int CLIB_DECL main(int ac, char **av)
+int CLIB_DECL main(int ac, char *av[])
 #endif
 {
 	char dat_filename[128] = "sysinfo.dat";
