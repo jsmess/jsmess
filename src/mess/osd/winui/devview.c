@@ -70,7 +70,7 @@ static void DevView_Clear(HWND hwndDevView)
 			DestroyWindow(pDevViewInfo->pEntries[i].hwndEdit);
 			DestroyWindow(pDevViewInfo->pEntries[i].hwndBrowseButton);
 		}
-		global_free(pDevViewInfo->pEntries);
+		free(pDevViewInfo->pEntries);
 		pDevViewInfo->pEntries = NULL;
 	}
 
@@ -188,7 +188,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 	int nStaticPos, nStaticWidth, nEditPos, nEditWidth, nButtonPos, nButtonWidth;
 	HDC hDc;
 	LPTSTR *ppszDevices;
-	LPTSTR s;
+	LPTSTR t_s;
 	SIZE sz;
 	LONG_PTR l;
 
@@ -214,10 +214,10 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 			{
 				image_device_info info = image_device_getinfo(pDevViewInfo->config->mconfig, dev);
 
-				s = tstring_from_utf8(info.name);
-				ppszDevices[i] = (TCHAR*)alloca((_tcslen(s) + 1) * sizeof(TCHAR));
-				_tcscpy(ppszDevices[i], s);
-				global_free(s);
+				t_s = tstring_from_utf8(info.name);
+				ppszDevices[i] = (TCHAR*)alloca((_tcslen(t_s) + 1) * sizeof(TCHAR));
+				_tcscpy(ppszDevices[i], t_s);
+				global_free(t_s);
 				i++;
 			}
 		}
@@ -379,7 +379,7 @@ static void DevView_Free(HWND hwndDevView)
 	DevView_Clear(hwndDevView);
 	pDevViewInfo = GetDevViewInfo(hwndDevView);
 	DeleteObject(pDevViewInfo->hFont);
-	global_free(pDevViewInfo);
+	free(pDevViewInfo);
 }
 
 

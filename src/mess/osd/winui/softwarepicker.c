@@ -277,7 +277,7 @@ static BOOL SoftwarePicker_CalculateHash(HWND hwndPicker, int nIndex)
 							ComputeFileHash(pPickerInfo, pFileInfo, pBuffer, zipent->uncompressed_length);
 							rc = TRUE;
 						}
-						global_free(pBuffer);
+						free(pBuffer);
 					}
 				}
 				zipent = zip_file_next_file(zip);
@@ -429,7 +429,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
 	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));
-	if (pPickerInfo->file_index) global_free(pPickerInfo->file_index);
+	if (pPickerInfo->file_index) free(pPickerInfo->file_index);
 	if (!ppNewIndex)
 		goto error;
 
@@ -446,7 +446,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 error:
 	if (pInfo)
-		global_free(pInfo);
+		free(pInfo);
 	return FALSE;
 }
 
@@ -562,7 +562,7 @@ static void SoftwarePicker_FreeSearchInfo(directory_search_info *pSearchInfo)
 {
 	if (pSearchInfo->find_handle != INVALID_HANDLE_VALUE)
 		FindClose(pSearchInfo->find_handle);
-	global_free(pSearchInfo);
+	free(pSearchInfo);
 }
 
 
@@ -573,7 +573,7 @@ static void SoftwarePicker_InternalClear(software_picker_info *pPickerInfo)
 	int i;
 
 	for (i = 0; i < pPickerInfo->file_index_length; i++)
-		global_free(pPickerInfo->file_index[i]);
+		free(pPickerInfo->file_index[i]);
 
 	while(pPickerInfo->first_search_info)
 	{
@@ -826,7 +826,7 @@ static LRESULT CALLBACK SoftwarePicker_WndProc(HWND hwndPicker, UINT nMessage,
 	{
 		SoftwarePicker_InternalClear(pPickerInfo);
 		SoftwarePicker_SetDriver(hwndPicker, NULL);
-		global_free(pPickerInfo);
+		free(pPickerInfo);
 	}
 
 	return rc;
@@ -857,6 +857,6 @@ BOOL SetupSoftwarePicker(HWND hwndPicker, const struct PickerOptions *pOptions)
 
 error:
 	if (pPickerInfo)
-		global_free(pPickerInfo);
+		free(pPickerInfo);
 	return FALSE;
 }

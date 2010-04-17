@@ -283,7 +283,7 @@ static BOOL DirListReadControl(datamap *map, HWND dialog, HWND control, core_opt
 	int directory_count;
     LV_ITEM lvi;
 	TCHAR buffer[2048];
-	char *dir_list;
+	char *utf8_dir_list;
 	int i, pos, driver_index;
 	BOOL res;
 
@@ -313,12 +313,12 @@ static BOOL DirListReadControl(datamap *map, HWND dialog, HWND control, core_opt
 		pos += _tcslen(&buffer[pos]);
 	}
 
-	dir_list = utf8_from_tstring(buffer);
-	if (dir_list != NULL)
+	utf8_dir_list = utf8_from_tstring(buffer);
+	if (utf8_dir_list != NULL)
 	{
 		driver_index = PropertiesCurrentGame(dialog);
-		SetExtraSoftwarePaths(driver_index, dir_list);
-		global_free(dir_list);
+		SetExtraSoftwarePaths(driver_index, utf8_dir_list);
+		global_free(utf8_dir_list);
 	}
 	return TRUE;
 }
