@@ -131,7 +131,56 @@ WRITE8_DEVICE_HANDLER(apple2_slot_w)
 	}
 }
 
+/*-------------------------------------------------
+    apple2_c800_slot_r - slot read function
+-------------------------------------------------*/
 
+READ8_DEVICE_HANDLER(apple2_c800_slot_r)
+{
+	UINT8 result = 0x00;
+	const apple2_slot_config *config = get_config(device);
+	apple2_slot_token *token = get_token(device);
+
+	/* do we actually have a device, and can we read? */
+	if ((token->slot_device != NULL) && (config->rhc800 != NULL))
+	{
+		result = (*config->rhc800)(token->slot_device, offset);
+	}
+
+	return result;
+}
+
+/*-------------------------------------------------
+    apple2_c800_slot_w - slot write function
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(apple2_c800_slot_w)
+{
+	const apple2_slot_config *config = get_config(device);
+	apple2_slot_token *token = get_token(device);
+
+	/* do we actually have a device, and can we read? */
+	if ((token->slot_device != NULL) && (config->whc800 != NULL))
+	{
+		(*config->whc800)(token->slot_device, offset, data);
+	}
+}
+
+/*-------------------------------------------------
+    apple2_slot_ROM_w - slot write function
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(apple2_slot_ROM_w)
+{
+	const apple2_slot_config *config = get_config(device);
+	apple2_slot_token *token = get_token(device);
+
+	/* do we actually have a device, and can we read? */
+	if ((token->slot_device != NULL) && (config->whcnxx != NULL))
+	{
+		(*config->whcnxx)(token->slot_device, offset, data);
+	}
+}
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(apple2_slot) - device get info

@@ -44,6 +44,7 @@ UINT32 apple2_flags;
 static UINT32 a2_mask;
 static UINT32 a2_set;
 
+static INT32 a2_cnxx_slot;
 
 /* local */
 static int a2_speaker_state;
@@ -73,7 +74,15 @@ static WRITE8_HANDLER ( apple2_c03x_w );
 static WRITE8_HANDLER ( apple2_c05x_w );
 static WRITE8_HANDLER ( apple2_c07x_w );
 
+static READ8_HANDLER ( apple2_c1xx_r );
+static WRITE8_HANDLER ( apple2_c1xx_w );
+static READ8_HANDLER ( apple2_c4xx_r );
+static WRITE8_HANDLER ( apple2_c4xx_w );
 
+static READ8_HANDLER ( apple2_c800_r );
+static WRITE8_HANDLER ( apple2_c800_w );
+static READ8_HANDLER ( apple2_ce00_r );
+static WRITE8_HANDLER ( apple2_ce00_w );
 
 /* -----------------------------------------------------------------------
  * New Apple II memory manager
@@ -173,11 +182,15 @@ void apple2_update_memory(running_machine *machine)
 			}
 			else if ((meminfo.read_mem & 0xC0000000) == APPLE2_MEM_SLOT)
 			{
-				/* slot RAM */
-				if (slot_ram)
-					rbase = &slot_ram[meminfo.read_mem & APPLE2_MEM_MASK];
-				else
-					rh = read_floatingbus;
+				// slots 1-2
+				if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0)
+				{
+					rh = apple2_c1xx_r;
+				}
+				else if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0x300) 
+				{	// slots 4-7
+					rh = apple2_c4xx_r;
+				}
 			}
 			else if ((meminfo.read_mem & 0xC0000000) == APPLE2_MEM_ROM)
 			{
@@ -251,11 +264,17 @@ void apple2_update_memory(running_machine *machine)
 			}
 			else if ((meminfo.write_mem & 0xC0000000) == APPLE2_MEM_SLOT)
 			{
-				/* slot RAM */
-				if (slot_ram)
-					wbase = &slot_ram[meminfo.write_mem & APPLE2_MEM_MASK];
-				else
-					wh_nop = 1;
+				/* slot RAM/ROM */
+
+				// slots 1-2
+				if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0)
+				{
+					wh = apple2_c1xx_w;
+				}
+				else if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0x300) 
+				{	// slots 4-7
+					wh = apple2_c4xx_w;
+				}
 			}
 			else if ((meminfo.write_mem & 0xC0000000) == APPLE2_MEM_ROM)
 			{
@@ -340,6 +359,12 @@ READ8_HANDLER(apple2_c0xx_r)
 
 		if (offset < 0x80)
 		{
+			if (a2_cnxx_slot != -1)
+			{
+				a2_cnxx_slot = -1;
+				apple2_update_memory(space->machine);
+			}
+
 			/* normal handler */
 			if (handlers[offset / 0x10])
 				result = handlers[offset / 0x10](space, offset % 0x10);
@@ -384,6 +409,12 @@ WRITE8_HANDLER(apple2_c0xx_w)
 
 	if (offset < 0x80)
 	{
+		if (a2_cnxx_slot != -1)
+		{
+			a2_cnxx_slot = -1;
+			apple2_update_memory(space->machine);
+		}
+
 		/* normal handler */
 		if (handlers[offset / 0x10])
 			handlers[offset / 0x10](space, offset % 0x10, data);
@@ -402,7 +433,187 @@ WRITE8_HANDLER(apple2_c0xx_w)
 	}
 }
 
+static READ8_HANDLER( apple2_c1xx_r )
+{
+	int slotnum;
+	UINT8 *rom, *slot_ram;
+	UINT32 rom_length, slot_length;
 
+	// find slot_ram if any
+	rom = memory_region(space->machine, "maincpu");
+	rom_length = memory_region_length(space->machine, "maincpu") & ~0xFFF;
+	slot_length = memory_region_length(space->machine, "maincpu") - rom_length;
+	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
+
+	if (slot_ram)
+	{
+		slotnum = ((offset>>8) & 0xf) + 1;
+		if (a2_cnxx_slot != slotnum)
+		{
+			a2_cnxx_slot = slotnum;
+			apple2_update_memory(space->machine);
+		}
+
+		return slot_ram[offset];
+	}
+	// else fall through to floating bus
+
+	return apple2_getfloatingbusvalue(space->machine);
+}
+
+static WRITE8_HANDLER ( apple2_c1xx_w )
+{
+	int slotnum;
+	running_device *slotdevice;
+	UINT8 *rom, *slot_ram;
+	UINT32 rom_length, slot_length;
+
+	// find slot_ram if any
+	rom = memory_region(space->machine, "maincpu");
+	rom_length = memory_region_length(space->machine, "maincpu") & ~0xFFF;
+	slot_length = memory_region_length(space->machine, "maincpu") - rom_length;
+	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
+
+	slotnum = ((offset>>8) & 0xf) + 1;
+
+	slotdevice = apple2_slot(space->machine, slotnum);
+
+	if (slotdevice != NULL)
+	{
+		apple2_slot_ROM_w(slotdevice, offset&0xff, data);
+	}
+	else
+	{
+		if (slot_ram)
+			slot_ram[offset] = data;
+	}
+}
+
+static READ8_HANDLER( apple2_c4xx_r )
+{
+	int slotnum;
+	UINT8 *rom, *slot_ram;
+	UINT32 rom_length, slot_length;
+
+	// find slot_ram if any
+	rom = memory_region(space->machine, "maincpu");
+	rom_length = memory_region_length(space->machine, "maincpu") & ~0xFFF;
+	slot_length = memory_region_length(space->machine, "maincpu") - rom_length;
+	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
+
+	if (slot_ram)
+	{
+		slotnum = ((offset>>8) & 0xf) + 4;
+		if (a2_cnxx_slot != slotnum)
+		{
+			a2_cnxx_slot = slotnum;
+			apple2_update_memory(space->machine);
+		}
+
+		return slot_ram[offset+0x300];
+	}
+	// else fall through to floating bus
+
+	return apple2_getfloatingbusvalue(space->machine);
+}
+
+static WRITE8_HANDLER ( apple2_c4xx_w )
+{
+	int slotnum;
+	running_device *slotdevice;
+	UINT8 *rom, *slot_ram;
+	UINT32 rom_length, slot_length;
+
+	// find slot_ram if any
+	rom = memory_region(space->machine, "maincpu");
+	rom_length = memory_region_length(space->machine, "maincpu") & ~0xFFF;
+	slot_length = memory_region_length(space->machine, "maincpu") - rom_length;
+	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
+
+	slotnum = ((offset>>8) & 0xf) + 4;
+
+	slotdevice = apple2_slot(space->machine, slotnum);
+
+	if (slotdevice != NULL)
+	{
+		apple2_slot_ROM_w(slotdevice, offset&0xff, data);
+	}
+	else
+	{
+		if (slot_ram)
+			slot_ram[offset] = data;
+	}
+}
+
+static READ8_HANDLER(apple2_cfff_r)
+{
+	// debugger guard
+	if(!space->debugger_access)
+	{
+		a2_cnxx_slot = -1;
+		apple2_update_memory(space->machine);
+	}
+
+	return apple2_getfloatingbusvalue(space->machine);
+}
+
+static WRITE8_HANDLER(apple2_cfff_w)
+{
+	a2_cnxx_slot = -1;
+	apple2_update_memory(space->machine);
+}
+
+static READ8_HANDLER ( apple2_c800_r )
+{
+	running_device *slotdevice;
+
+	slotdevice = apple2_slot(space->machine, a2_cnxx_slot);
+
+	if (slotdevice != NULL)
+	{
+		return apple2_c800_slot_r(slotdevice, offset&0xfff);
+	}
+
+	return apple2_getfloatingbusvalue(space->machine);
+}
+
+static WRITE8_HANDLER ( apple2_c800_w )
+{
+	running_device *slotdevice;
+
+	slotdevice = apple2_slot(space->machine, a2_cnxx_slot);
+
+	if (slotdevice != NULL)
+	{
+		apple2_c800_slot_w(slotdevice, offset&0xfff, data);
+	}
+}
+
+static READ8_HANDLER ( apple2_ce00_r )
+{
+	running_device *slotdevice;
+
+	slotdevice = apple2_slot(space->machine, a2_cnxx_slot);
+
+	if (slotdevice != NULL)
+	{
+		return apple2_c800_slot_r(slotdevice, (offset&0xfff) + 0x600);
+	}
+
+	return apple2_getfloatingbusvalue(space->machine);
+}
+
+static WRITE8_HANDLER ( apple2_ce00_w )
+{
+		running_device *slotdevice;
+
+	slotdevice = apple2_slot(space->machine, a2_cnxx_slot);
+
+	if (slotdevice != NULL)
+	{
+		apple2_c800_slot_w(slotdevice, (offset&0xfff)+0x600, data);
+	}
+}
 
 static void apple2_mem_0000(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
@@ -466,6 +677,12 @@ static void apple2_mem_C000(running_machine *machine, offs_t begin, offs_t end, 
 	meminfo->write_handler = apple2_c0xx_w;
 }
 
+static void apple2_mem_CFFF(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
+{
+	meminfo->read_handler = apple2_cfff_r;
+	meminfo->write_handler = apple2_cfff_w;
+}
+
 static void apple2_mem_Cx00(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
 	if (apple2_flags & VAR_INTCXROM)
@@ -496,8 +713,16 @@ static void apple2_mem_C300(running_machine *machine, offs_t begin, offs_t end, 
 
 static void apple2_mem_C800(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
 {
-	meminfo->read_mem			= (begin & 0x0FFF) | (apple2_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
-	meminfo->write_mem			= APPLE2_MEM_FLOATING;
+	if (a2_cnxx_slot == -1)
+	{
+		meminfo->read_mem			= (begin & 0x0FFF) | (apple2_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
+		meminfo->write_mem			= APPLE2_MEM_FLOATING;
+	}
+	else
+	{
+		meminfo->read_handler = apple2_c800_r;
+		meminfo->write_handler = apple2_c800_w;
+	}
 }
 
 static void apple2_mem_CE00(running_machine *machine, offs_t begin, offs_t end, apple2_meminfo *meminfo)
@@ -509,8 +734,16 @@ static void apple2_mem_CE00(running_machine *machine, offs_t begin, offs_t end, 
 	}
 	else
 	{
-		meminfo->read_mem		= (begin & 0x0FFF) | (apple2_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
-		meminfo->write_mem		= APPLE2_MEM_FLOATING;
+		if (a2_cnxx_slot == -1)
+		{
+			meminfo->read_mem		= (begin & 0x0FFF) | (apple2_flags & VAR_ROMSWITCH ? 0x4000 : 0x0000) | APPLE2_MEM_ROM;
+			meminfo->write_mem		= APPLE2_MEM_FLOATING;
+		}
+		else
+		{
+			meminfo->read_handler = apple2_ce00_r;
+			meminfo->write_handler = apple2_ce00_w;
+		}
 	}
 }
 
@@ -579,7 +812,8 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 	{ 0xC300, 0xC3FF, apple2_mem_C300, A2MEM_MONO },
 	{ 0xC400, 0xC7FF, apple2_mem_Cx00, A2MEM_MONO },
 	{ 0xC800, 0xCDFF, apple2_mem_C800, A2MEM_MONO },
-	{ 0xCE00, 0xCFFF, apple2_mem_CE00, A2MEM_MONO },
+	{ 0xCE00, 0xCFFE, apple2_mem_CE00, A2MEM_MONO },
+	{ 0xCFFF, 0xCFFF, apple2_mem_CFFF, A2MEM_IO },
 	{ 0xD000, 0xDFFF, apple2_mem_D000, A2MEM_DUAL },
 	{ 0xE000, 0xFFFF, apple2_mem_E000, A2MEM_DUAL },
 	{ 0 }

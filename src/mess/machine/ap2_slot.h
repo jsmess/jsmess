@@ -30,6 +30,9 @@ struct _apple2_slot_config
 	const char *tag;
 	read8_device_func rh;
 	write8_device_func wh;
+	read8_device_func rhc800;
+	write8_device_func whc800;
+	write8_device_func whcnxx;
 };
 
 
@@ -38,11 +41,14 @@ struct _apple2_slot_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_APPLE2_SLOT_ADD(_slot_number, _slot_device_tag, _rh, _wh)		\
+#define MDRV_APPLE2_SLOT_ADD(_slot_number, _slot_device_tag, _rh, _wh, _rhc800, _whc800, _whcnxx)		\
 	MDRV_DEVICE_ADD("slot_" #_slot_number, APPLE2_SLOT, 0)			\
 	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, tag, _slot_device_tag)	\
 	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, rh, _rh)		\
 	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, wh, _wh)		\
+	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, rhc800, _rhc800)		\
+	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, whc800, _whc800)		\
+	MDRV_DEVICE_CONFIG_DATAPTR(apple2_slot_config, whcnxx, _whcnxx)		\
 
 
 
@@ -58,6 +64,15 @@ READ8_DEVICE_HANDLER(apple2_slot_r);
 
 /* slot write function */
 WRITE8_DEVICE_HANDLER(apple2_slot_w);
+
+/* slot ROM write function */
+WRITE8_DEVICE_HANDLER(apple2_slot_ROM_w);
+
+/* slot extended ROM read function */
+READ8_DEVICE_HANDLER(apple2_c800_slot_r);
+
+/* slot extended ROM write function */
+WRITE8_DEVICE_HANDLER(apple2_c800_slot_w);
 
 /* slot device lookup */
 running_device *apple2_slot(running_machine *machine, int slotnum);
