@@ -105,13 +105,18 @@ DEFS += \
 #####################################################################
 # Linker
 
-ifndef MSVC
+ifndef MSVC_BUILD
+LDFLAGS_UI = $(LDFLAGS)
+else
+
 LIBS += -lkernel32 \
         -lshell32 \
         -lcomctl32 \
         -lcomdlg32 \
-        -ladvapi32 \
+        -ladvapi32\
 
+# workaround to allow linking with MSVC
+LDFLAGS_UI = $(subst /ENTRY:wmainCRTStartup,,$(LDFLAGS))
 endif
 
 
@@ -130,4 +135,4 @@ $(WINUIOBJ)/mamevers.rc: $(OBJ)/build/verinfo$(EXE) $(SRC)/version.c
 
 $(MESSUIEXE): $(WINUIOBJS) $(VERSIONOBJ) $(DRVLIBS) $(LIBOSD) $(LIBEMU) $(LIBCPU) $(LIBDASM) $(LIBSOUND) $(LIBUTIL) $(EXPAT) $(ZLIB) $(SOFTFLOAT) $(LIBOCORE_NOMAIN) $(RESFILEUI)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) -mwindows  $^ $(LIBS) $(EXPAT) -o $@
+	$(LD) $(LDFLAGS_UI) -mwindows $^ $(LIBS) $(EXPAT) -o $@

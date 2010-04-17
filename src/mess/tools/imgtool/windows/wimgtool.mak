@@ -38,6 +38,16 @@ WIMGTOOL_OBJS = \
 	$(MESS_TOOLS)/imgtool/windows/wimgtool.res	\
 
 
+#-------------------------------------------------
+# linker flags
+#-------------------------------------------------
+
+ifdef MSVC_BUILD
+# workaround to allow linking with MSVC
+LDFLAGS_WIN = $(subst /ENTRY:wmainCRTStartup,,$(LDFLAGS))
+else
+LDFLAGS_WIN = $(LDFLAGS)
+endif
 
 #-------------------------------------------------
 # rules to build the wimgtool executable
@@ -49,4 +59,4 @@ $(WIMGTOOLOBJ)/%.res: $(WIMGTOOLSRC)/%.rc | $(OSPREBUILD)
 
 $(WIMGTOOL): $(WIMGTOOL_OBJS) $(LIBIMGTOOL) $(LIBUTIL) $(EXPAT) $(ZLIB) $(LIBOCORE_NOMAIN)
 	@echo Linking $@...
-	$(LD) $(LDFLAGS) -mwindows $^ $(LIBS) -o $@
+	$(LD) $(LDFLAGS_WIN) -mwindows $^ $(LIBS) -o $@
