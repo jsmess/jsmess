@@ -49,7 +49,7 @@ LPBITS NewBits(UINT nLength)
 		}
 		else
 		{
-			global_free(lpBits);
+			free(lpBits);
 			lpBits = 0;
 		}
 	}
@@ -63,9 +63,9 @@ void DeleteBits(LPBITS lpBits)
 		return;
 
 	if (lpBits->m_nSize && lpBits->m_lpBits)
-		global_free(lpBits->m_lpBits);
+		free(lpBits->m_lpBits);
 
-	global_free(lpBits);
+	free(lpBits);
 }
 
 /* Test the 'nBit'th bit */
