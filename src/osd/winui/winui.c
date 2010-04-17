@@ -1018,7 +1018,7 @@ int MameUIMain(HINSTANCE    hInstance,
 		/* free arguments */
 		for (i = 0; i < __argc; i++)
 			global_free(utf8_argv[i]);
-		global_free(utf8_argv);
+		free(utf8_argv);
 		
 		exit(rc);
 	}
@@ -1225,7 +1225,7 @@ HICON LoadIconFromFile(const char *iconname)
 							{
 								hIcon = FormatICOInMemoryToHICON(bufferPtr, entry->uncompressed_length);
 							}
-							global_free(bufferPtr);
+							free(bufferPtr);
 						}
 					}
 					entry = zip_file_next_file(zip);
@@ -1685,7 +1685,7 @@ static void RandomSelectBackground(void)
 		ResetBackground(szFile);
 	}
 
-	global_free(buf);
+	free(buf);
 }
 
 static void SetMainTitle(void)
@@ -3404,7 +3404,7 @@ static BOOL TreeViewNotify(LPNMHDR nm)
 	{
 		TV_DISPINFO *ptvdi = (TV_DISPINFO *)nm;
 		LPTREEFOLDER folder = (LPTREEFOLDER)ptvdi->item.lParam;
-		char* szText;
+		char* utf8_szText;
 		BOOL result;
 
 		g_in_treeview_edit = FALSE;
@@ -3412,13 +3412,13 @@ static BOOL TreeViewNotify(LPNMHDR nm)
 		if (ptvdi->item.pszText == NULL || _tcslen(ptvdi->item.pszText) == 0)
 			return FALSE;
 
-		szText = utf8_from_tstring(ptvdi->item.pszText);
-		if( !szText )
+		utf8_szText = utf8_from_tstring(ptvdi->item.pszText);
+		if( !utf8_szText )
 			return FALSE;
 
-		result = TryRenameCustomFolder(folder,szText);
+		result = TryRenameCustomFolder(folder, utf8_szText);
 
-		global_free(szText);
+		global_free(utf8_szText);
 
 		return result;
 	}

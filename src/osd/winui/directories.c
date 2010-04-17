@@ -54,7 +54,7 @@ typedef struct
 typedef struct
 {
 	tPath	*m_Path;
-	TCHAR	*m_Directory;
+	TCHAR	*m_tDirectory;
 } tDirInfo;
 
 /***************************************************************************
@@ -147,8 +147,8 @@ static BOOL IsMultiDir(int nType)
 
 static void DirInfo_SetDir(tDirInfo *pInfo, int nType, int nItem, LPCTSTR pText)
 {
-	TCHAR *s;
-	TCHAR *pOldText;
+	TCHAR *t_s;
+	TCHAR *t_pOldText;
 
 	if (IsMultiDir(nType))
 	{
@@ -158,20 +158,20 @@ static void DirInfo_SetDir(tDirInfo *pInfo, int nType, int nItem, LPCTSTR pText)
 	}
 	else
 	{
-		s = win_tstring_strdup(pText);
-		if (!s)
+		t_s = win_tstring_strdup(pText);
+		if (!t_s)
 			return;
-		pOldText = pInfo[nType].m_Directory;
-		if (pOldText)
-			global_free(pOldText);
-		pInfo[nType].m_Directory = s;
+		t_pOldText = pInfo[nType].m_tDirectory;
+		if (t_pOldText)
+			global_free(t_pOldText);
+		pInfo[nType].m_tDirectory = t_s;
 	}
 }
 
 static TCHAR* DirInfo_Dir(tDirInfo *pInfo, int nType)
 {
 	assert(!IsMultiDir(nType));
-	return pInfo[nType].m_Directory;
+	return pInfo[nType].m_tDirectory;
 }
 
 static TCHAR* DirInfo_Path(tDirInfo *pInfo, int nType, int nItem)
@@ -366,11 +366,11 @@ static void Directories_OnDestroy(HWND hDlg)
 		for (i = 0; i < nDirInfoCount; i++)
 		{
 			if (g_pDirInfo[i].m_Path)
-				global_free(g_pDirInfo[i].m_Path);
-			if (g_pDirInfo[i].m_Directory)
-				global_free(g_pDirInfo[i].m_Directory);			
+				free(g_pDirInfo[i].m_Path);
+			if (g_pDirInfo[i].m_tDirectory)
+				global_free(g_pDirInfo[i].m_tDirectory);
 		}
-		global_free(g_pDirInfo);
+		free(g_pDirInfo);
 		g_pDirInfo = NULL;
 	}
 }

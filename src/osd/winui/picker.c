@@ -256,10 +256,10 @@ static void Picker_Free(struct PickerInfo *pPickerInfo)
 {
 	// Free up all resources associated with this picker structure
 	if (pPickerInfo->pnColumnsShown)
-		global_free(pPickerInfo->pnColumnsShown);
+		free(pPickerInfo->pnColumnsShown);
 	if (pPickerInfo->pnColumnsOrder)
-		global_free(pPickerInfo->pnColumnsOrder);
-	global_free(pPickerInfo);
+		free(pPickerInfo->pnColumnsOrder);
+	free(pPickerInfo);
 }
 
 
@@ -420,11 +420,11 @@ static void Picker_InternalResetColumnDisplay(HWND hWnd, BOOL bFirstTime)
 
 done:
 	if (widths)
-		global_free(widths);
+		free(widths);
 	if (order)
-		global_free(order);
+		free(order);
 	if (shown)
-		global_free(shown);
+		free(shown);
 }
 
 
@@ -1172,7 +1172,7 @@ int Picker_GetNumColumns(HWND hWnd)
 		}
 	}
 
-	global_free(shown);
+	free(shown);
 	return nColumnCount;
 }
 
@@ -1569,7 +1569,7 @@ void Picker_HandleDrawItem(HWND hWnd, LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	SetTextColor(hDC, clrTextSave);
 	SetBkColor(hDC, clrBkSave);
-	global_free(order);
+	free(order);
 }
 
 
@@ -1669,10 +1669,10 @@ BOOL Picker_SaveColumnWidths(HWND hwndPicker)
 
 done:
 	if (widths)
-		global_free(widths);
+		free(widths);
 	if (order)
-		global_free(order);
+		free(order);
 	if (tmpOrder)
-		global_free(tmpOrder);
+		free(tmpOrder);
 	return bSuccess;
 }

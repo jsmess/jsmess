@@ -489,7 +489,7 @@ void InitDefaultPropertyPage(HINSTANCE hInst, HWND hWnd)
 		win_message_box_utf8(0, temp, "Error", IDOK);
 	}
 
-	global_free(pspage);
+	free(pspage);
 }
 
 /* Initilize the property pages for anything but the Default option set */
@@ -608,7 +608,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 	}
 
 	global_free(t_description);
-	global_free(pspage);
+	free(pspage);
 }
 
 
@@ -2102,7 +2102,7 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	int selected = 0;
 	int index = 0;
 	LPCTSTR t_ctrlr_option = 0;
-	LPTSTR buf = 0;
+	LPTSTR t_buf = 0;
 	const char *ctrlr_option;
 	TCHAR* t_ctrldir;
 
@@ -2110,10 +2110,10 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	ctrlr_option = options_get_string(opts, OPTION_CTRLR);
 	if( ctrlr_option != NULL )
 	{
-		buf = tstring_from_utf8(ctrlr_option);
-		if( !buf )
+		t_buf = tstring_from_utf8(ctrlr_option);
+		if( !t_buf )
 			return FALSE;
-		t_ctrlr_option = buf;
+		t_ctrlr_option = t_buf;
 	}
 	else
 	{
@@ -2129,8 +2129,8 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	t_ctrldir = tstring_from_utf8(GetCtrlrDir());
 	if( !t_ctrldir )
 	{
-		if( buf )
-			global_free(buf);
+		if( t_buf )
+			global_free(t_buf);
 		return FALSE;
 	}
 
@@ -2175,8 +2175,8 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 
 	(void)ComboBox_SetCurSel(control, selected);
 	
-	if( buf )
-		global_free(buf);
+	if( t_buf )
+		global_free(t_buf);
 
 	return FALSE;
 }

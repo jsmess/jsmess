@@ -194,7 +194,7 @@ void FreeFolders(void)
 			treeFolders[i] = NULL;
 			numFolders--;
 		}
-		global_free(treeFolders);
+		free(treeFolders);
 		treeFolders = NULL;
 	}
 	numFolders = 0;
@@ -1518,7 +1518,7 @@ static BOOL AddFolder(LPTREEFOLDER lpFolder)
 		folderArrayLength += 500;
 		tmpTree = (TREEFOLDER **)malloc(sizeof(TREEFOLDER **) * folderArrayLength);
 		memcpy(tmpTree,treeFolders,sizeof(TREEFOLDER **) * oldFolderArrayLength);
-		if (treeFolders) global_free(treeFolders);
+		if (treeFolders) free(treeFolders);
 		treeFolders = tmpTree;
 	}
 
@@ -1561,9 +1561,9 @@ static void DeleteFolder(LPTREEFOLDER lpFolder)
 		}
 		global_free(lpFolder->m_lptTitle);
 		lpFolder->m_lptTitle = 0;
-		global_free(lpFolder->m_lpTitle);
+		free(lpFolder->m_lpTitle);
 		lpFolder->m_lpTitle = 0;
-		global_free(lpFolder);
+		free(lpFolder);
 		lpFolder = 0;
 	}
 }
@@ -2047,14 +2047,14 @@ void FreeExtraFolders(void)
 	{
 		if (ExtraFolderData[i])
 		{
-			global_free(ExtraFolderData[i]);
+			free(ExtraFolderData[i]);
 			ExtraFolderData[i] = NULL;
 		}
 	}
 
 	for (i = 0; i < numExtraIcons; i++)
     {
-		global_free(ExtraFolderIcons[i]);
+		free(ExtraFolderIcons[i]);
     }
 
 	numExtraIcons = 0;
@@ -2252,13 +2252,13 @@ BOOL TryRenameCustomFolder(LPTREEFOLDER lpFolder, const char *new_name)
 		if (TrySaveExtraFolder(lpFolder) == FALSE)
 		{
 			// failed, so free newly allocated title and restore old
-			global_free(lpFolder->m_lpTitle);
+			free(lpFolder->m_lpTitle);
 			lpFolder->m_lpTitle = old_title;
 			return FALSE;
 		}
 		TryRenameCustomFolderIni(lpFolder, old_title, new_name);
 		// successful, so free old title
-		global_free(old_title);
+		free(old_title);
 		return TRUE;
 	}
 	
@@ -2272,7 +2272,7 @@ BOOL TryRenameCustomFolder(LPTREEFOLDER lpFolder, const char *new_name)
 	if (retval)
 	{
 		TryRenameCustomFolderIni(lpFolder, lpFolder->m_lpTitle, new_name);
-		global_free(lpFolder->m_lpTitle);
+		free(lpFolder->m_lpTitle);
 		lpFolder->m_lpTitle = (char *)malloc(strlen(new_name) + 1);
 		strcpy(lpFolder->m_lpTitle,new_name);
 	}

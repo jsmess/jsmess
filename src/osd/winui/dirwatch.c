@@ -96,7 +96,7 @@ static void DirWatcher_FreeEntry(struct DirWatcherEntry *pEntry)
 {
 	if (pEntry->hDir)
 		CloseHandle(pEntry->hDir);
-	global_free(pEntry);
+	free(pEntry);
 }
 
 
@@ -368,7 +368,7 @@ void DirWatcher_Free(PDIRWATCHER pWatcher)
 		CloseHandle(pWatcher->hRequestEvent);
 	if (pWatcher->hResponseEvent)
 		CloseHandle(pWatcher->hResponseEvent);
-	global_free(pWatcher);
+	free(pWatcher);
 }
 
 

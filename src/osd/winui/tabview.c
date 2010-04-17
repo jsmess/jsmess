@@ -75,7 +75,7 @@ static LRESULT CALLBACK TabViewWndProc(HWND hWnd, UINT message, WPARAM wParam, L
 	switch(message)
 	{
 		case WM_DESTROY:
-			global_free(pTabViewInfo);
+			free(pTabViewInfo);
 			SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR) pfnParentWndProc);
 			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR) NULL);
 			break;
