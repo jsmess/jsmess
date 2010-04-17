@@ -4,6 +4,7 @@
 #define __VIDBRAIN__
 
 #define F3850_TAG		"cd34"
+#define F3853_TAG		"cd5"
 #define SCREEN_TAG		"screen"
 #define DISCRETE_TAG	"discrete"
 #define CASSETTE_TAG	"cassette"
@@ -23,6 +24,7 @@ public:
 	/* video state */
 	UINT8 *video_ram;
 	UINT8 bg_color;
+	UINT8 vlsi[0x100];
 
 	/* sound state */
 	int sound_clk;

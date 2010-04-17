@@ -14,6 +14,7 @@
 
 	TODO:
 
+	- SMI 3853
 	- colors
 	- low resolution mode
 	- discrete sound
@@ -45,7 +46,10 @@ static READ8_HANDLER( vlsi_r )
 	switch (offset)
 	{
 	case 0xfa:
+		return 0xff;
+
 	case 0xfb:
+		// alternate this between 0xf5 and 0x34 to make Checkers boot
 		return 0xff;
 	}
 
@@ -85,6 +89,8 @@ static WRITE8_HANDLER( vlsi_w )
 		state->uv201_31 = BIT(data, 4);
 		break;
 	}
+
+	state->vlsi[offset] = data;
 
 	logerror("VLSI %02x = %02x\n", offset, data);
 }
@@ -370,13 +376,15 @@ static VIDEO_UPDATE( vidbrain )
 
 	for (int y = 0; y < 49; y++)
 	{
+		int row = y / 7;
+
 		for (int sx = 0; sx < 16; sx++)
 		{
 			UINT8 data = state->video_ram[addr++];
 
 			for (int x = 0; x < 8; x++)
 			{
-				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = BIT(data, 7) ? 7 : state->bg_color;
+				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = BIT(data, 7) ? (state->vlsi[0x10+row] >> 5) : state->bg_color;
 				data <<= 1;
 			}
 		}
