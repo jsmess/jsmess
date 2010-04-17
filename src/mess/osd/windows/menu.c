@@ -848,7 +848,7 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 	struct file_dialog_params *params;
 	int has_option;
 	TCHAR t_buf1[128];
-	char *buf1;
+	char *utf8_buf1;
 
 	params = (struct file_dialog_params *) changed_param;
 
@@ -873,12 +873,12 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 	{
 		// get label text, removing trailing NULL
 		GetWindowText(wnd, t_buf1, ARRAY_LENGTH(t_buf1));
-		buf1 = utf8_from_tstring(t_buf1);
-		assert(buf1[strlen(buf1)-1] == ':');
-		buf1[strlen(buf1)-1] = '\0';
+		utf8_buf1 = utf8_from_tstring(t_buf1);
+		assert(utf8_buf1[strlen(utf8_buf1)-1] == ':');
+		utf8_buf1[strlen(utf8_buf1)-1] = '\0';
 
 		// find guide entry
-		while(guide->option_type && strcmp(buf1, guide->display_name))
+		while(guide->option_type && strcmp(utf8_buf1, guide->display_name))
 			guide++;
 
 		wnd = GetNextWindow(wnd, GW_HWNDNEXT);
@@ -894,7 +894,7 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 				has_option ? guide : NULL,
 				has_option ? optspec : NULL);
 		}
-		global_free(buf1);
+		global_free(utf8_buf1);
 	}
 }
 
