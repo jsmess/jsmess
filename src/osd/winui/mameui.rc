@@ -695,7 +695,7 @@ BEGIN
     LTEXT           "Title\nDirectory\nExtra",IDC_PROP_TITLE,52,9,161,25,
                     SS_NOPREFIX
     GROUPBOX        "",IDC_STATIC,4,40,211,122
-    CONTROL         "Enable sound and sound CPUs",IDC_USE_SOUND,"Button",
+    CONTROL         "Enable sound output",IDC_USE_SOUND,"Button",
                     BS_AUTOCHECKBOX | WS_TABSTOP,10,40,112,10,0,
                     HIDC_USE_SOUND
     CONTROL         "Use samples",IDC_SAMPLES,"Button",BS_AUTOCHECKBOX | 
