@@ -55,7 +55,7 @@ typedef struct _mess_image_type mess_image_type;
 struct _mess_image_type
 {
 	const device_config *dev;
-    const char *ext;
+    char *ext;
 	const char *dlgname;
 };
 
@@ -769,7 +769,6 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 static void SetupImageTypes(const machine_config *config, mess_image_type *types, int count, BOOL bZip, const device_config *dev)
 {
     int num_extensions = 0;
-	;
 
 	memset(types, 0, sizeof(*types) * count);
     count--;
@@ -777,7 +776,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
     if (bZip)
 	{
 		/* add the ZIP extension */
-		types[num_extensions].ext = "zip";
+		types[num_extensions].ext = mame_strdup("zip");
 		types[num_extensions].dev = NULL;
 		types[num_extensions].dlgname = NULL;
 		num_extensions++;
@@ -810,7 +809,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 				if (num_extensions < count)
 				{
 					types[num_extensions].dev = dev;
-					types[num_extensions].ext = ext;
+					types[num_extensions].ext = mame_strdup(ext);
 					types[num_extensions].dlgname = lookupdevice(info.type)->dlgname;
 					num_extensions++;
 				}
@@ -821,6 +820,16 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 }
 
 
+static void CleanupImageTypes(mess_image_type *types, int count)
+{
+	int i;
+	for (i = 0; i < count; ++i)
+	{
+		if (types[i].ext)
+			osd_free(types[i].ext);
+	}
+}
+
 
 static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *dev)
 {
@@ -830,6 +839,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 	HWND hwndList;
 	char* utf8_filename;
 	machine_config *config;
+	BOOL cfd_res;
 
 //  begin_resource_tracking();
 
@@ -840,8 +850,10 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 	config = machine_config_alloc(drivers[drvindex]->machine_config);
 
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
+	cfd_res = CommonFileImageDialog(last_directory, cfd, filename, config, imagetypes);
+	CleanupImageTypes(imagetypes, ARRAY_LENGTH(imagetypes));
 
-	if (CommonFileImageDialog(last_directory, cfd, filename, config, imagetypes))
+	if (cfd_res)
 	{
 		utf8_filename = utf8_from_tstring(filename);
 		if( !utf8_filename )
@@ -850,7 +862,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 		SoftwarePicker_AddFile(GetDlgItem(GetMainWindow(), IDC_SWLIST), utf8_filename);
 		global_free(utf8_filename);
 	}
-
+	
 	machine_config_free(config);
 }
 
@@ -945,6 +957,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(s, GetOpenFileName, pszFilename, config, imagetypes);
+	CleanupImageTypes(imagetypes, ARRAY_LENGTH(imagetypes));
 	
 	global_free(s);
 
@@ -1014,6 +1027,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(s, GetSaveFileName, pszFilename, config, imagetypes);
+	CleanupImageTypes(imagetypes, ARRAY_LENGTH(imagetypes));
 	
 	global_free(s);
 
