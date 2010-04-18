@@ -542,7 +542,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 							if ( str_name && str_crc && str_sha1 )
 							{
 								char *s_name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
-								char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_crc) + strlen(str_sha1) + 7 ) );
+								char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_crc) + strlen(str_sha1) + 7 + 4 ) );
 								int baddump = ( str_status && !strcmp(str_status,"baddump") ) ? 1 : 0;
 								int nodump = ( str_status && !strcmp(str_status,"nodump" ) ) ? 1 : 0;
 
@@ -550,7 +550,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 									return;
 
 								strcpy( s_name, str_name );
-								sprintf( hashdata, "c:%s#s:%s#%s", str_crc, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : 0 ) ) );
+								sprintf( hashdata, "c:%s#s:%s#%s", str_crc, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
 
 								/* ROM_LOAD( name, offset, length, hash ) */
 								add_rom_entry( swlist, s_name, hashdata, offset, length, ROMENTRYTYPE_ROM );
