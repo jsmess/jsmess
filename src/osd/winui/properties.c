@@ -183,8 +183,6 @@ typedef HANDLE HTHEME;
  * Local function prototypes
  **************************************************************/
 
-static void SetStereoEnabled(HWND hWnd, int nIndex);
-static void SetYM3812Enabled(HWND hWnd, int nIndex);
 static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled);
 static void InitializeOptions(HWND hDlg);
 static void InitializeMisc(HWND hDlg);
