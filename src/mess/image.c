@@ -826,6 +826,15 @@ static int image_load_internal(running_device *image, const char *path,
 		}
 	}
 
+	/* Copy some image information when we have been loaded through a software list */
+	if ( slot->software_info_ptr )
+	{
+		slot->longname = (char *)slot->software_info_ptr->longname;
+		slot->manufacturer = (char *)slot->software_info_ptr->publisher;
+		slot->year = (char *)slot->software_info_ptr->year;
+		//slot->playable = (char *)slot->software_info_ptr->supported;
+	}
+
 	/* did we fail to find the file? */
 	if (!is_loaded(slot))
 	{
@@ -949,6 +958,9 @@ static void image_clear(image_slot_data *image)
     image->extrainfo = NULL;
     image->basename_noext = NULL;
     image->ptr = NULL;
+	image->full_software_name = NULL;
+	image->software_info_ptr = NULL;
+	image->software_part_ptr = NULL;
 }
 
 
@@ -1145,7 +1157,7 @@ static void run_hash(running_device *image,
 
 
 
-static int image_checkhash(image_slot_data *image)
+static void image_checkhash(image_slot_data *image)
 {
     const game_driver *drv;
     char hash_string[HASH_BUF_SIZE];
@@ -1161,11 +1173,11 @@ static int image_checkhash(image_slot_data *image)
         /* do not cause a linear read of 600 megs please */
         /* TODO: use SHA/MD5 in the CHD header as the hash */
         if (image->info.type == IO_CDROM)
-            return FALSE;
+            return;
 
 		/* Skip calculating the hash when we have an image mounted through a software list */
 		if ( image->software_info_ptr )
-			return FALSE;
+			return;
 
         /* retrieve the partial hash func */
         partialhash = (device_image_partialhash_func) image->dev->get_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH);
@@ -1183,7 +1195,7 @@ static int image_checkhash(image_slot_data *image)
         }
         while(rc && (drv != NULL));
     }
-    return TRUE;
+    return;
 }
 
 
