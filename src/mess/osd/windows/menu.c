@@ -763,29 +763,12 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 	running_machine *machine)
 {
 	win_open_file_name ofn;
-	char *dir;
+	char *dir = NULL;
 	int result = 0;
-	char *src;
-	char *dst;
 
 	if (state_filename[0])
 	{
 		dir = win_dirname(state_filename);
-	}
-	else
-	{
-		snprintf(state_filename, ARRAY_LENGTH(state_filename),
-			"%s State.sta", machine->gamedrv->description);
-		dir = NULL;
-
-		src = state_filename;
-		dst = state_filename;
-		do
-		{
-			if ((*src == '\0') || isalnum(*src) || isspace(*src) || strchr("(),.", *src))
-				*(dst++) = *src;
-		}
-		while(*(src++));
 	}
 
 	memset(&ofn, 0, sizeof(ofn));
@@ -795,12 +778,19 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 	ofn.filter = "State Files (*.sta)|*.sta|All Files (*.*)|*.*";
 	ofn.initial_directory = dir;
 
-	snprintf(ofn.filename, ARRAY_LENGTH(ofn.filename), "%s", state_filename);
+	if (!core_filename_ends_with(ofn.filename, "sta"))
+		snprintf(ofn.filename, ARRAY_LENGTH(ofn.filename), "%s.sta", state_filename);
+	else
+		snprintf(ofn.filename, ARRAY_LENGTH(ofn.filename), "%s", state_filename);
 
 	result = win_get_file_name_dialog(&ofn);
 	if (result)
 	{
-		snprintf(state_filename, ARRAY_LENGTH(state_filename), "%s", ofn.filename);
+		// the core doesn't add the extension if it's an absolute path
+		if (osd_is_absolute_path(ofn.filename) && !core_filename_ends_with(ofn.filename, "sta"))
+			snprintf(state_filename, ARRAY_LENGTH(state_filename), "%s.sta", ofn.filename);
+		else
+			snprintf(state_filename, ARRAY_LENGTH(state_filename), "%s", ofn.filename);
 
 		mameproc(machine, state_filename);
 	}
@@ -2251,6 +2241,25 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 	// set the help menu to refer to this machine
 	snprintf(buf, ARRAY_LENGTH(buf), "About %s (%s)...", machine->gamedrv->description, machine->gamedrv->name);
 	set_menu_text(menu_bar, ID_HELP_ABOUTSYSTEM, buf);
+
+	// initialize state_filename for each driver, so we don't carry names in-between them
+	{
+		char *src;
+		char *dst;
+
+		snprintf(state_filename, ARRAY_LENGTH(state_filename),
+			"%s State", machine->gamedrv->description);
+
+		src = state_filename;
+		dst = state_filename;
+		do
+		{
+			if ((*src == '\0') || isalnum(*src) || isspace(*src) || strchr("(),.", *src))
+				*(dst++) = *src;
+		}
+		while(*(src++));
+	}
+
 	return 0;
 }
 
