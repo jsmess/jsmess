@@ -806,10 +806,6 @@ static int image_load_internal(running_device *image, const char *path,
     if (slot->err)
         goto done;
 
-    /* do we need to reset the CPU? */
-    if ((attotime_compare(timer_get_time(machine), attotime_zero) > 0) && slot->info.reset_on_load)
-        mame_schedule_hard_reset(machine);
-
 	/* Check if there's a software list defined for this device and use that if we're not creating an image */
 	if ( is_create || !load_software_part( image, path, &slot->software_info_ptr, &slot->software_part_ptr, &slot->full_software_name ) )
 	{
@@ -860,6 +856,12 @@ static int image_load_internal(running_device *image, const char *path,
 done:
     if (slot->err)
         image_clear(slot);
+	else {
+		/* do we need to reset the CPU? only schedule it if load/create is successful */
+		if ((attotime_compare(timer_get_time(machine), attotime_zero) > 0) && slot->info.reset_on_load)
+			mame_schedule_hard_reset(machine);
+	}
+
     return slot->err ? INIT_FAIL : INIT_PASS;
 }
 
