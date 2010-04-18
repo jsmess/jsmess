@@ -1163,6 +1163,10 @@ static int image_checkhash(image_slot_data *image)
         if (image->info.type == IO_CDROM)
             return FALSE;
 
+		/* Skip calculating the hash when we have an image mounted through a software list */
+		if ( image->software_info_ptr )
+			return FALSE;
+
         /* retrieve the partial hash func */
         partialhash = (device_image_partialhash_func) image->dev->get_config_fct(DEVINFO_FCT_IMAGE_PARTIAL_HASH);
 
