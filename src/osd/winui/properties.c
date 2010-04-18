@@ -1892,8 +1892,6 @@ static void SetPropEnabledControls(HWND hWnd)
 		EnableWindow(GetDlgItem(hWnd,IDC_AUDIO_LATENCY_DISP),sound);
 		EnableWindow(GetDlgItem(hWnd,IDC_AUDIO_LATENCY_TEXT),sound);
 		SetSamplesEnabled(hWnd, nIndex, sound);
-		SetStereoEnabled(hWnd, nIndex);
-		SetYM3812Enabled(hWnd, nIndex);
 	}
     
 	if (Button_GetCheck(GetDlgItem(hWnd, IDC_AUTOFRAMESKIP)))
@@ -2602,63 +2600,6 @@ BOOL IsControlOptionValue(HWND hDlg,HWND hwnd_ctrl, core_options *opts )
 	return TRUE;
 }
 #endif
-
-static void SetStereoEnabled(HWND hWnd, int nIndex)
-{
-	BOOL enabled = FALSE;
-	HWND hCtrl;
-	int num_speakers = 0;
-
-	if ( nIndex > -1)
-	{
-		machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
-		num_speakers = numberOfSpeakers(config);
-		machine_config_free(config);
-	}
-
-	hCtrl = GetDlgItem(hWnd, IDC_STEREO);
-	if (hCtrl)
-	{
-		if (nIndex <= -1 || num_speakers == 2)
-			enabled = TRUE;
-
-		EnableWindow(hCtrl, enabled);
-	}
-}
-
-static void SetYM3812Enabled(HWND hWnd, int nIndex)
-{
-	BOOL enabled;
-	HWND hCtrl;
-	machine_config *config = NULL;
-	const device_config *sound;
-
-	if (nIndex > -1)
-	{
-		config = machine_config_alloc(drivers[nIndex]->machine_config);
-	}
-
-	hCtrl = GetDlgItem(hWnd, IDC_USE_FM_YM3812);
-	if (hCtrl)
-	{
-		enabled = FALSE;
-
-		for (sound = config->devicelist.first(DEVICE_CLASS_SOUND_CHIP); sound != NULL; sound = sound->next)
-		{
-			if (nIndex <= -1
-				||  sound->type == SOUND_YM3812
-				||  sound->type == SOUND_YM2413
-			)
-				enabled = TRUE;
-		}
-    
-		EnableWindow(hCtrl, enabled);
-	}
-	if (nIndex > -1)
-	{
-		machine_config_free(config);
-	}
-}
 
 static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 {

@@ -154,7 +154,6 @@
 #define IDC_SAMPLES_INCORRECT           1049
 #define IDC_SAMPLES_TOTAL               1050
 #define IDC_AUDIT_DETAILS               1051
-#define IDC_USE_FM_YM3812               1052
 #define IDC_DIR_COMBO                   1053
 #define IDC_DIR_LIST                    1054
 #define IDC_DIR_BROWSE                  1055
@@ -202,7 +201,6 @@
 #define IDC_AUTOFRAMESKIP               1097
 #define IDC_TREE                        1098
 #define IDC_WINDOWED                    1099
-#define IDC_STEREO                      1100
 #define IDC_PROP_RESET                  1101
 #define IDC_SPLITTER                    1102
 #define IDC_SPLITTER2                   1103
