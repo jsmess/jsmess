@@ -1734,8 +1734,9 @@ char *image_strdup(running_device *image, const char *src)
 
 void image_freeptr(running_device *image, void *ptr)
 {
-    /* should really do something better here */
-    image_realloc(image, ptr, 0);
+	image_slot_data *slot = find_image_slot(image);
+
+	pool_object_remove(slot->mempool, ptr, 0);
 }
 
 
