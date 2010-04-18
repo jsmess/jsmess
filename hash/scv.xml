@@ -28,7 +28,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
     19 Ton Ton Ball
     20 Super Professor
     21 Japanese Chess
-    22 Doreamon
+    22 Doraemon
     23 Basic
     24 Dragon Slayer
     25 Professional Wrestling
@@ -113,14 +113,14 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="doreamon">
-		<description>Doreamon</description>
+	<software name="doraemon">
+		<description>Doraemon</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="doreamon.0" size="32768" crc="ee0b874d" sha1="425eb6ed31faa2afdecc216145616f577f72db9a" offset="0" />
-				<rom name="doreamon.1" size="32768" crc="d2de91a6" sha1="6aba5ee3d08afad222bec9a176c2607829fa5cc6" offset="8000" />
+				<rom name="doraemon.0" size="32768" crc="ee0b874d" sha1="425eb6ed31faa2afdecc216145616f577f72db9a" offset="0" />
+				<rom name="doraemon.1" size="32768" crc="d2de91a6" sha1="6aba5ee3d08afad222bec9a176c2607829fa5cc6" offset="8000" />
 			</dataarea>
 		</part>
 	</software>
