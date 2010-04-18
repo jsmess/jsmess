@@ -554,13 +554,6 @@ void FlushFileCaches(void)
 	zip_file_cache_clear();
 }
 
-void FreeIfAllocated(char **s)
-{
-	if (*s)
-		global_free(*s);
-	*s = NULL;
-}
-
 BOOL StringIsSuffixedBy(const char *s, const char *suffix)
 {
 	return (strlen(s) > strlen(suffix)) && (strcmp(s + strlen(s) - strlen(suffix), suffix) == 0);

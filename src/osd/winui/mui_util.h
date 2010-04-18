@@ -59,8 +59,6 @@ int numberOfScreens(const machine_config *config);
 
 void FlushFileCaches(void);
 
-void FreeIfAllocated(char **s);
-
 BOOL StringIsSuffixedBy(const char *s, const char *suffix);
 
 BOOL SafeIsAppThemed(void);
