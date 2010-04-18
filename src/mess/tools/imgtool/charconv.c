@@ -27,7 +27,7 @@ static char *utf8_from_latin1(const char *src)
 	}
 
 	/* allocate space for result, twice the source len to be safe */
-	buffer = (char *) malloc(strlen(src) * 2 + 1);
+	buffer = (char *) osd_malloc(strlen(src) * 2 + 1);
 
 	/* point to the start */
 	bufptr = buffer;
@@ -72,7 +72,7 @@ static char *latin1_from_utf8(const char *src)
 	}
 
 	/* allocate space for result */
-	buffer = (char *) malloc(strlen(src) + 1);
+	buffer = (char *) osd_malloc(strlen(src) + 1);
 
 	/* point to the start */
 	bufptr = buffer;

@@ -1474,7 +1474,7 @@ done:
 	if (alloc_path != NULL)
 		free(alloc_path);
 	if (new_fname != NULL)
-		free(new_fname);
+		osd_free(new_fname);
 	return err;
 }
 
@@ -1519,7 +1519,7 @@ done:
 	if (alloc_path != NULL)
 		free(alloc_path);
 	if (new_fname != NULL)
-		free(new_fname);
+		osd_free(new_fname);
 	return err;
 }
 
@@ -1628,7 +1628,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_fname)
-		free(new_fname);
+		osd_free(new_fname);
 	return err;
 }
 
@@ -1847,7 +1847,6 @@ imgtoolerr_t imgtool_partition_get_free_space(imgtool_partition *partition, UINT
 imgtoolerr_t imgtool_partition_read_file(imgtool_partition *partition, const char *filename, const char *fork, imgtool_stream *destf, filter_getinfoproc filter)
 {
 	imgtoolerr_t err;
-	imgtool_stream *newstream = NULL;
 	char *alloc_path = NULL;
 	union filterinfo u;
 
@@ -1895,8 +1894,6 @@ imgtoolerr_t imgtool_partition_read_file(imgtool_partition *partition, const cha
 	}
 
 done:
-	if (newstream)
-		stream_close(newstream);
 	if (alloc_path)
 		free(alloc_path);
 	return err;
@@ -1914,7 +1911,6 @@ imgtoolerr_t imgtool_partition_write_file(imgtool_partition *partition, const ch
 	imgtoolerr_t err;
 	char *buf = NULL;
 	char *s;
-	imgtool_stream *newstream = NULL;
 	option_resolution *alloc_resolution = NULL;
 	char *alloc_path = NULL;
 	UINT64 free_space;
@@ -2017,8 +2013,6 @@ done:
 		free(buf);
 	if (alloc_path)
 		free(alloc_path);
-	if (newstream)
-		stream_close(newstream);
 	if (alloc_resolution)
 		option_resolution_close(alloc_resolution);
 	return err;
@@ -2078,9 +2072,7 @@ imgtoolerr_t imgtool_partition_get_file(imgtool_partition *partition, const char
 		goto done;
 	}
 
-	filename = new_fname;
-
-	err = imgtool_partition_read_file(partition, filename, fork, f, filter);
+	err = imgtool_partition_read_file(partition, new_fname, fork, f, filter);
 	if (err)
 		goto done;
 
@@ -2090,7 +2082,7 @@ done:
 	if (alloc_dest != NULL)
 		free(alloc_dest);
 	if (new_fname != NULL)
-		free(new_fname);
+		osd_free(new_fname);
 	return err;
 }
 
@@ -2137,7 +2129,7 @@ done:
 	if (f != NULL)
 		stream_close(f);
 	if (alloc_newfname != NULL)
-		free(alloc_newfname);
+		osd_free(alloc_newfname);
 	return err;
 }
 
@@ -2185,7 +2177,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_fname)
-		free(new_fname);
+		osd_free(new_fname);
 	return err;
 }
 
@@ -2230,7 +2222,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_fname)
-		free(new_fname);
+		osd_free(new_fname);
 	return err;
 }
 
@@ -2276,7 +2268,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_path)
-		free(new_path);
+		osd_free(new_path);
 	return err;
 }
 
@@ -2322,7 +2314,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_path)
-		free(new_path);
+		osd_free(new_path);
 	return err;
 }
 
@@ -2631,7 +2623,7 @@ done:
 	if (alloc_path != NULL)
 		free(alloc_path);
 	if (new_path != NULL)
-		free(new_path);
+		osd_free(new_path);
 	if (err && (enumeration != NULL))
 	{
 		free(enumeration);
@@ -2690,7 +2682,7 @@ imgtoolerr_t imgtool_directory_get_next(imgtool_directory *directory, imgtool_di
 			return IMGTOOLERR_BADFILENAME;
 
 		strcpy(ent->filename, new_fname);
-		free(new_fname);
+		osd_free(new_fname);
 	}
 
 	/* don't trust the module! */
