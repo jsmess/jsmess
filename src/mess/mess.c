@@ -88,13 +88,14 @@ void mess_predevice_init(running_machine *machine)
 				{
 					/* retrieve image error message */
 					const char *image_err = image_error(image);
+					char *image_basename = auto_strdup(machine, filename_basename((char *)image_name));
 
 					/* unload all images */
 					image_unload_all(machine);
-					/* FIXME: image_name is always empty in this message because of the image_unload_all() call */
+
 					fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
 						info.name,
-						filename_basename((char *) image_name),
+						image_basename,
 						image_err);
 				}
 			}
