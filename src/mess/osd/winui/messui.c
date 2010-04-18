@@ -136,7 +136,6 @@ static void SoftwareTabView_OnMoveSize(void);
 static void SetupSoftwareTabView(void);
 
 static void MessOpenOtherSoftware(const device_config *dev);
-static void MessCreateDevice(const device_config *dev);
 static void MessRefreshPicker(void);
 
 static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem);
@@ -875,12 +874,6 @@ static void MessOpenOtherSoftware(const device_config *dev)
 
 
 
-static void MessCreateDevice(const device_config *dev)
-{
-	MessSetupDevice(GetSaveFileName, dev);
-}
-
-
 /* This is used to Mount an image in the device view of MESSUI. The directory in the dialog box is not
     set, and is thus random.
     2009-10-18 Robbbert:
@@ -1294,10 +1287,6 @@ BOOL MessCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 	{
 		case ID_MESS_OPEN_SOFTWARE:
 			MessOpenOtherSoftware(NULL);
-			break;
-
-		case ID_MESS_CREATE_SOFTWARE:
-			MessCreateDevice(NULL);
 			break;
 
 #ifdef MAME_DEBUG

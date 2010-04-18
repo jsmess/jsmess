@@ -74,7 +74,6 @@ BEGIN
         MENUITEM "&Select Random System",       ID_CONTEXT_SELECT_RANDOM
         MENUITEM SEPARATOR
         MENUITEM "Op&en Other Software...",     ID_MESS_OPEN_SOFTWARE
-        MENUITEM "&Create Image...",			ID_MESS_CREATE_SOFTWARE
 #ifdef MAME_DEBUG
         MENUITEM SEPARATOR
         MENUITEM "Run Tests",					ID_MESS_RUN_TESTS
