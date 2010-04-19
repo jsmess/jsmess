@@ -1,15 +1,22 @@
+#pragma once
+
 #ifndef __ATARI_ST__
 #define __ATARI_ST__
 
-#define SCREEN_TAG	"screen"
-#define M68000_TAG	"m68000"
-#define HD6301_TAG	"hd6301"
-#define COP888_TAG	"u703"
-#define YM3439_TAG	"ym3439"
-#define MC68901_TAG	"mc68901"
-#define LMC1992_TAG "lmc1992"
-#define WD1772_TAG	"wd1772"
+#define M68000_TAG		"m68000"
+#define HD6301_TAG		"hd6301"
+#define YM2149_TAG		"ym2149"
+#define MC6850_0_TAG	"mc6850_0"
+#define MC6850_1_TAG	"mc6850_1"
+#define COP888_TAG		"u703"
+#define RP5C15_TAG		"rp5c15"
+#define YM3439_TAG		"ym3439"
+#define MC68901_TAG		"mc68901"
+#define LMC1992_TAG		"lmc1992"
+#define WD1772_TAG		"wd1772"
+#define SCREEN_TAG		"screen"
 #define CENTRONICS_TAG	"centronics"
+#define RS232_TAG		"rs232"
 
 // Atari ST
 
@@ -137,6 +144,7 @@ public:
 	running_device *lmc1992;
 	running_device *wd1772;
 	running_device *centronics;
+	running_device *rs232;
 
 	/* timers */
 	emu_timer *glue_timer;

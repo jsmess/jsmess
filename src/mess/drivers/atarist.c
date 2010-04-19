@@ -1,27 +1,27 @@
 #include "emu.h"
-#include "video/atarist.h"
+#include "includes/atarist.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6800/m6800.h"
+#include "audio/lmc1992.h"
 #include "formats/atarist_dsk.h"
-#include "devices/flopdrv.h"
 #include "devices/cartslot.h"
-#include "machine/ctronics.h"
-#include "machine/serial.h"
+#include "devices/flopdrv.h"
+#include "devices/messram.h"
 #include "machine/6850acia.h"
 #include "machine/68901mfp.h"
 #include "machine/8530scc.h"
+#include "machine/ctronics.h"
+#include "machine/rescap.h"
 #include "machine/rp5c15.h"
+#include "machine/rs232.h"
 #include "machine/wd17xx.h"
 #include "sound/ay8910.h"
-#include "audio/lmc1992.h"
-#include "includes/atarist.h"
-#include "devices/messram.h"
+#include "video/atarist.h"
 
 /*
 
     TODO:
 
-    - move static variables to driver state
     - fix floppy interface
     - fix mouse
     - MSA disk image support
@@ -84,6 +84,7 @@ static void atarist_fdc_dma_transfer(running_machine *machine)
 static WRITE_LINE_DEVICE_HANDLER( atarist_fdc_intrq_w )
 {
 	atarist_state *driver_state = (atarist_state *)device->machine->driver_data;
+
 	driver_state->fdc_irq = state;
 }
 
@@ -102,12 +103,12 @@ static WRITE_LINE_DEVICE_HANDLER( atarist_fdc_drq_w )
 	}
 }
 
-static const wd17xx_interface atarist_wd17xx_interface =
+static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
 	DEVCB_LINE(atarist_fdc_intrq_w),
 	DEVCB_LINE(atarist_fdc_drq_w),
-	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
 static READ16_HANDLER( atarist_fdc_data_r )
@@ -393,7 +394,7 @@ static READ8_HANDLER( ikbd_port4_r )
 			state->ikbd_mouse_py = IKBD_MOUSE_PHASE_NEGATIVE;
 		}
 
-		data |= IKBD_MOUSE_XYB[state->ikbd_mouse_px][state->ikbd_mouse_pc];	   // XB
+		data |= IKBD_MOUSE_XYB[state->ikbd_mouse_px][state->ikbd_mouse_pc];		 // XB
 		data |= IKBD_MOUSE_XYA[state->ikbd_mouse_px][state->ikbd_mouse_pc] << 1; // XA
 		data |= IKBD_MOUSE_XYA[state->ikbd_mouse_py][state->ikbd_mouse_pc] << 2; // YA
 		data |= IKBD_MOUSE_XYB[state->ikbd_mouse_py][state->ikbd_mouse_pc] << 3; // YB
@@ -831,13 +832,13 @@ static ADDRESS_MAP_START( st_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8("ym2149", ay8910_r, ay8910_data_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8("ym2149", ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM2149_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8("acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8("acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8("acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8("acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -856,8 +857,8 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8("ym2149", ay8910_r, ay8910_data_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8("ym2149", ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM2149_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8a00, 0xff8a1f) AM_READWRITE(atarist_blitter_halftone_r, atarist_blitter_halftone_w)
 	AM_RANGE(0xff8a20, 0xff8a21) AM_READWRITE(atarist_blitter_src_inc_x_r, atarist_blitter_src_inc_x_w)
 	AM_RANGE(0xff8a22, 0xff8a23) AM_READWRITE(atarist_blitter_src_inc_y_r, atarist_blitter_src_inc_y_w)
@@ -872,11 +873,11 @@ static ADDRESS_MAP_START( megast_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8a3c, 0xff8a3d) AM_READWRITE(atarist_blitter_ctrl_r, atarist_blitter_ctrl_w)
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
 //  AM_RANGE(0xfffa40, 0xfffa57) AM_READWRITE(megast_fpu_r, megast_fpu_w)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8("acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8("acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8("acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8("acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE("rp5c15", rp5c15_r, rp5c15_w)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE(RP5C15_TAG, rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -898,8 +899,8 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8("ym2149", ay8910_r, ay8910_data_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8("ym2149", ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM2149_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
 	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
 	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
@@ -928,10 +929,10 @@ static ADDRESS_MAP_START( ste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff9220, 0xff9221) AM_READ_PORT("GUNX")
 	AM_RANGE(0xff9222, 0xff9223) AM_READ_PORT("GUNY")
 	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8("acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8("acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8("acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8("acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -953,8 +954,8 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8604, 0xff8605) AM_READWRITE(atarist_fdc_data_r, atarist_fdc_data_w)
 	AM_RANGE(0xff8606, 0xff8607) AM_READWRITE(atarist_fdc_dma_status_r, atarist_fdc_dma_mode_w)
 	AM_RANGE(0xff8608, 0xff860d) AM_READWRITE(atarist_fdc_dma_base_r, atarist_fdc_dma_base_w)
-	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8("ym2149", ay8910_r, ay8910_data_w, 0xff00)
-	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8("ym2149", ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8800, 0xff8801) AM_DEVREADWRITE8(YM2149_TAG, ay8910_r, ay8910_data_w, 0xff00)
+	AM_RANGE(0xff8802, 0xff8803) AM_DEVWRITE8(YM2149_TAG, ay8910_data_w, 0xff00)
 	AM_RANGE(0xff8900, 0xff8901) AM_READWRITE(atariste_sound_dma_control_r, atariste_sound_dma_control_w)
 	AM_RANGE(0xff8902, 0xff8907) AM_READWRITE(atariste_sound_dma_base_r, atariste_sound_dma_base_w)
 	AM_RANGE(0xff8908, 0xff890d) AM_READ(atariste_sound_dma_counter_r)
@@ -978,11 +979,11 @@ static ADDRESS_MAP_START( megaste_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfffa00, 0xfffa3f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
 //  AM_RANGE(0xfffa40, 0xfffa5f) AM_READWRITE(megast_fpu_r, megast_fpu_w)
 	AM_RANGE(0xff8c80, 0xff8c87) AM_DEVREADWRITE8("scc", scc8530_r, scc8530_w, 0xff00)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8("acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8("acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8("acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8("acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE("rp5c15", rp5c15_r, rp5c15_w)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc20, 0xfffc3f) AM_DEVREADWRITE(RP5C15_TAG, rp5c15_r, rp5c15_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1034,10 +1035,10 @@ static ADDRESS_MAP_START( stbook_map, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0xff9210, 0xff9211) AM_READWRITE(stbook_power_r, stbook_power_w)
     AM_RANGE(0xff9214, 0xff9215) AM_READWRITE(stbook_reference_r, stbook_reference_w)*/
 	AM_RANGE(0xfffa00, 0xfffa2f) AM_DEVREADWRITE8(MC68901_TAG, mc68901_register_r, mc68901_register_w, 0xff)
-	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8("acia_0", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8("acia_0", acia6850_data_r, acia6850_data_w, 0xff00)
-	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8("acia_1", acia6850_stat_r, acia6850_ctrl_w, 0xff00)
-	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8("acia_1", acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc00, 0xfffc01) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc02, 0xfffc03) AM_DEVREADWRITE8(MC6850_0_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
+	AM_RANGE(0xfffc04, 0xfffc05) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_stat_r, acia6850_ctrl_w, 0xff00)
+	AM_RANGE(0xfffc06, 0xfffc07) AM_DEVREADWRITE8(MC6850_1_TAG, acia6850_data_r, acia6850_data_w, 0xff00)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -1277,9 +1278,9 @@ INPUT_PORTS_END
 
 /* Sound Interface */
 
-static WRITE8_HANDLER( ym2149_port_a_w )
+static WRITE8_DEVICE_HANDLER( ym2149_port_a_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = (atarist_state *)device->machine->driver_data;
 
 	wd17xx_set_side(state->wd1772, BIT(data, 0) ? 0 : 1);
 
@@ -1293,8 +1294,8 @@ static WRITE8_HANDLER( ym2149_port_a_w )
 		wd17xx_set_drive(state->wd1772, 1);
 	}
 
-	// 0x08 = RTS
-	// 0x10 = DTR
+	rs232_rts_w(state->rs232, BIT(data, 3));
+	rs232_dtr_w(state->rs232, BIT(data, 4));
 
 	centronics_strobe_w(state->centronics, BIT(data, 5));
 
@@ -1302,20 +1303,14 @@ static WRITE8_HANDLER( ym2149_port_a_w )
 	// 0x80 = Reserved
 }
 
-static WRITE8_HANDLER( ym2149_port_b_w )
+static const ay8910_interface psg_intf =
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
-	centronics_data_w(state->centronics, 0, data);
-}
-
-static const ay8910_interface ym2149_interface =
-{
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
+	AY8910_SINGLE_OUTPUT,
+	{ RES_K(1) },
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER(M68000_TAG, PROGRAM, ym2149_port_a_w),
-	DEVCB_MEMORY_HANDLER(M68000_TAG, PROGRAM, ym2149_port_b_w)
+	DEVCB_HANDLER(ym2149_port_a_w),
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w)
 };
 
 /* Machine Drivers */
@@ -1414,8 +1409,11 @@ static READ8_DEVICE_HANDLER( mfp_gpio_r )
 
 	mc68901_tai_w(device, data & 0x01);
 
+	data |= rs232_dcd_r(state->rs232) << 1;
+	data |= rs232_cts_r(state->rs232) << 2;
 	data |= (state->acia_irq << 4);
 	data |= (state->fdc_irq << 5);
+	data |= rs232_ri_r(state->rs232) << 6;
 	data |= (input_port_read(device->machine, "config") & 0x80);
 
 	return data;
@@ -1427,19 +1425,26 @@ static WRITE8_DEVICE_HANDLER( mfp_tdo_w )
 	mc68901_tx_clock_w(device, data);
 }
 
+static WRITE_LINE_DEVICE_HANDLER( mfp_so_w )
+{
+	atarist_state *driver_state = (atarist_state *)device->machine->driver_data;
+
+	rs232_td_w(driver_state->rs232, device, state);
+}
+
 static MC68901_INTERFACE( mfp_intf )
 {
 	Y1,													/* timer clock */
 	0,													/* receive clock */
 	0,													/* transmit clock */
-	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_gpio_r),	/* GPIO read */
+	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_gpio_r),		/* GPIO read */
 	DEVCB_NULL,											/* GPIO write */
-	DEVCB_NULL,											/* serial input */
-	DEVCB_NULL,											/* serial output */
+	DEVCB_DEVICE_LINE(RS232_TAG, rs232_rd_r),			/* serial input */
+	DEVCB_LINE(mfp_so_w),								/* serial output */
 	DEVCB_NULL,											/* TAO */
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,											/* TCO */
-	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_tdo_w),	/* TDO */
+	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_tdo_w),		/* TDO */
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6)		/* interrupt */
 };
 
@@ -1525,6 +1530,7 @@ static MACHINE_START( atarist )
 	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
 	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->rs232 = devtag_get_device(machine, RS232_TAG);
 
 	/* register for state saving */
 	atarist_state_save(machine);
@@ -1561,8 +1567,11 @@ static READ8_DEVICE_HANDLER( atariste_mfp_gpio_r )
 
 	UINT8 data = centronics_busy_r(state->centronics);
 
+	data |= rs232_dcd_r(state->rs232) << 1;
+	data |= rs232_cts_r(state->rs232) << 2;
 	data |= (state->acia_irq << 4);
 	data |= (state->fdc_irq << 5);
+	data |= rs232_ri_r(state->rs232) << 6;
 	data |= (input_port_read(device->machine, "config") & 0x80) ^ (state->dmasnd_active << 7);
 
 	return data;
@@ -1575,8 +1584,8 @@ static MC68901_INTERFACE( atariste_mfp_intf )
 	0,													/* transmit clock */
 	DEVCB_DEVICE_HANDLER(MC68901_TAG, atariste_mfp_gpio_r),	/* GPIO read */
 	DEVCB_NULL,											/* GPIO write */
-	DEVCB_NULL,											/* serial input */
-	DEVCB_NULL,											/* serial output */
+	DEVCB_DEVICE_LINE(RS232_TAG, rs232_rd_r),			/* serial input */
+	DEVCB_LINE(mfp_so_w),								/* serial output */
 	DEVCB_NULL,											/* TAO */
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,											/* TCO */
@@ -1624,6 +1633,7 @@ static MACHINE_START( atariste )
 	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
 	state->lmc1992 = devtag_get_device(machine, LMC1992_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->rs232 = devtag_get_device(machine, RS232_TAG);
 
 	/* register for state saving */
 	atariste_state_save(machine);
@@ -1667,9 +1677,9 @@ static void stbook_configure_memory(running_machine *machine)
 	memory_set_bank(machine, "bank3", 0);
 }
 
-static WRITE8_HANDLER( stbook_ym2149_port_a_w )
+static WRITE8_DEVICE_HANDLER( stbook_ym2149_port_a_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = (atarist_state *)device->machine->driver_data;
 
 	wd17xx_set_side(state->wd1772, (data & 0x01) ? 0 : 1);
 
@@ -1683,8 +1693,8 @@ static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 		wd17xx_set_drive(state->wd1772, 1);
 	}
 
-	// 0x08 = RTS
-	// 0x10 = DTR
+	rs232_rts_w(state->rs232, BIT(data, 3));
+	rs232_dtr_w(state->rs232, BIT(data, 4));
 
 	centronics_strobe_w(state->centronics, BIT(data, 5));
 
@@ -1692,14 +1702,14 @@ static WRITE8_HANDLER( stbook_ym2149_port_a_w )
 	// 0x80 = FDD_DENSE_SEL
 }
 
-static const ay8910_interface stbook_ym2149_interface =
+static const ay8910_interface stbook_psg_intf =
 {
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
+	AY8910_SINGLE_OUTPUT,
+	{ RES_K(1) },
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_MEMORY_HANDLER(M68000_TAG, PROGRAM, stbook_ym2149_port_a_w),
-	DEVCB_MEMORY_HANDLER(M68000_TAG, PROGRAM, ym2149_port_b_w),
+	DEVCB_HANDLER(stbook_ym2149_port_a_w),
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, centronics_data_w)
 };
 
 static ACIA6850_INTERFACE( stbook_acia_ikbd_intf )
@@ -1735,8 +1745,11 @@ static READ8_DEVICE_HANDLER( stbook_mfp_gpio_r )
 
 	UINT8 data = centronics_busy_r(state->centronics);
 
+	data |= rs232_dcd_r(state->rs232) << 1;
+	data |= rs232_cts_r(state->rs232) << 2;
 	data |= (state->acia_irq << 4);
 	data |= (state->fdc_irq << 5);
+	data |= rs232_ri_r(state->rs232) << 6;
 
 	return data;
 }
@@ -1748,12 +1761,12 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 	0,													/* transmit clock */
 	DEVCB_DEVICE_HANDLER(MC68901_TAG, stbook_mfp_gpio_r),	/* GPIO read */
 	DEVCB_NULL,											/* GPIO write */
-	DEVCB_NULL,											/* serial input */
-	DEVCB_NULL,											/* serial output */
+	DEVCB_DEVICE_LINE(RS232_TAG, rs232_rd_r),			/* serial input */
+	DEVCB_LINE(mfp_so_w),								/* serial output */
 	DEVCB_NULL,											/* TAO */
 	DEVCB_NULL,											/* TBO */
 	DEVCB_NULL,											/* TCO */
-	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_tdo_w),	/* TDO */
+	DEVCB_DEVICE_HANDLER(MC68901_TAG, mfp_tdo_w),		/* TDO */
 	DEVCB_CPU_INPUT_LINE(M68000_TAG, M68K_IRQ_6)		/* interrupt */
 };
 
@@ -1771,6 +1784,7 @@ static MACHINE_START( stbook )
 	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
 	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->rs232 = devtag_get_device(machine, RS232_TAG);
 
 	/* register for state saving */
 	atariste_state_save(machine);
@@ -1795,38 +1809,6 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 	return INIT_FAIL;
 }
 
-static DEVICE_IMAGE_LOAD( atarist_serial )
-{
-	/* filename specified */
-	if (device_load_serial(image)==INIT_PASS)
-	{
-		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
-
-		serial_device_set_transmit_state(image, 1);
-
-		return INIT_PASS;
-	}
-
-	return INIT_FAIL;
-}
-
-
-static DEVICE_GET_INFO( atarist_serial )
-{
-	switch ( state )
-	{
-		case DEVINFO_FCT_IMAGE_LOAD:		        info->f = (genf *) DEVICE_IMAGE_LOAD_NAME( atarist_serial );    break;
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "Atari ST serial port");	                    break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                         break;
-		default:									DEVICE_GET_INFO_CALL(serial);	break;
-	}
-}
-
-#define ATARIST_SERIAL	DEVICE_GET_INFO_NAME(atarist_serial)
-
-#define MDRV_ATARIST_SERIAL_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, ATARIST_SERIAL, 0)
-
 static const floppy_config atarist_floppy_config =
 {
 	DEVCB_NULL,
@@ -1846,6 +1828,12 @@ static MACHINE_DRIVER_START( atarist_cartslot )
 	MDRV_CARTSLOT_LOAD(atarist_cart)
 MACHINE_DRIVER_END
 
+static RS232_INTERFACE( rs232_intf )
+{
+	{ MC68901_TAG },
+	{ NULL }
+};
+
 static MACHINE_DRIVER_START( atarist )
 	MDRV_DRIVER_DATA(atarist_state)
 
@@ -1862,6 +1850,7 @@ static MACHINE_DRIVER_START( atarist )
 	// device hardware
 	MDRV_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
 	MDRV_SCC8530_ADD("scc")
+	MDRV_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// video hardware
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -1874,18 +1863,18 @@ static MACHINE_DRIVER_START( atarist )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ym2149", YM2149, Y2/16)
-	MDRV_SOUND_CONFIG(ym2149_interface)
+	MDRV_SOUND_ADD(YM2149_TAG, YM2149, Y2/16)
+	MDRV_SOUND_CONFIG(psg_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* acia */
-	MDRV_ACIA6850_ADD("acia_0", acia_ikbd_intf)
-	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
+	MDRV_ACIA6850_ADD(MC6850_0_TAG, acia_ikbd_intf)
+	MDRV_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 
-	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
+	MDRV_WD1772_ADD(WD1772_TAG, fdc_intf )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
@@ -1895,8 +1884,6 @@ static MACHINE_DRIVER_START( atarist )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040ST
 	MDRV_RAM_EXTRA_OPTIONS("512K,256K") //  520ST ,260ST
-
-	MDRV_ATARIST_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megast )
@@ -1904,7 +1891,7 @@ static MACHINE_DRIVER_START( megast )
 
 	MDRV_CPU_MODIFY(M68000_TAG)
 	MDRV_CPU_PROGRAM_MAP(megast_map)
-	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
+	MDRV_RP5C15_ADD(RP5C15_TAG, rtc_intf)
 
 	MDRV_MACHINE_START(megast)
 
@@ -1930,6 +1917,7 @@ static MACHINE_DRIVER_START( atariste )
 	// device hardware
 	MDRV_MC68901_ADD(MC68901_TAG, Y2/8, atariste_mfp_intf)
 	MDRV_SCC8530_ADD("scc")
+	MDRV_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// video hardware
 	MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -1943,8 +1931,8 @@ static MACHINE_DRIVER_START( atariste )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym2149", YM2149, Y2/16)
-	MDRV_SOUND_CONFIG(ym2149_interface)
+	MDRV_SOUND_ADD(YM2149_TAG, YM2149, Y2/16)
+	MDRV_SOUND_CONFIG(psg_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.50)
 /*
@@ -1958,10 +1946,10 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* acia */
-	MDRV_ACIA6850_ADD("acia_0", acia_ikbd_intf)
-	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
+	MDRV_ACIA6850_ADD(MC6850_0_TAG, acia_ikbd_intf)
+	MDRV_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 
-	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
+	MDRV_WD1772_ADD(WD1772_TAG, fdc_intf )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
@@ -1971,8 +1959,6 @@ static MACHINE_DRIVER_START( atariste )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("1024K")  // 1040STe
 	MDRV_RAM_EXTRA_OPTIONS("512K") //  520STe
-
-	MDRV_ATARIST_SERIAL_ADD("serial")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaste )
@@ -1980,7 +1966,7 @@ static MACHINE_DRIVER_START( megaste )
 
 	MDRV_CPU_MODIFY(M68000_TAG)
 	MDRV_CPU_PROGRAM_MAP(megaste_map)
-	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
+	MDRV_RP5C15_ADD(RP5C15_TAG, rtc_intf)
 
 	MDRV_MACHINE_START(megaste)
 
@@ -1988,8 +1974,6 @@ static MACHINE_DRIVER_START( megaste )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")  //  Mega STe 4
 	MDRV_RAM_EXTRA_OPTIONS("2M,1M") //  Mega STe 2 ,Mega STe 1
-
-	MDRV_ATARIST_SERIAL_ADD("serial2")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( stbook )
@@ -2005,8 +1989,9 @@ static MACHINE_DRIVER_START( stbook )
 
 	// device hardware
 	MDRV_MC68901_ADD(MC68901_TAG, U517/8, stbook_mfp_intf)
-	MDRV_RP5C15_ADD("rp5c15", rtc_intf)
+	MDRV_RP5C15_ADD(RP5C15_TAG, rtc_intf)
 	MDRV_SCC8530_ADD("scc")
+	MDRV_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// video hardware
 	MDRV_SCREEN_ADD(SCREEN_TAG, LCD)
@@ -2016,24 +2001,24 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 399)
 	MDRV_PALETTE_LENGTH(2)
 
-	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
-	MDRV_PALETTE_INIT( black_and_white )
+	MDRV_VIDEO_START(generic_bitmapped)
+	MDRV_VIDEO_UPDATE(generic_bitmapped)
+	MDRV_PALETTE_INIT(black_and_white)
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD(YM3439_TAG, YM3439, U517/8)
-	MDRV_SOUND_CONFIG(stbook_ym2149_interface)
+	MDRV_SOUND_CONFIG(stbook_psg_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* acia */
-	MDRV_ACIA6850_ADD("acia_0", stbook_acia_ikbd_intf)
-	MDRV_ACIA6850_ADD("acia_1", acia_midi_intf)
+	MDRV_ACIA6850_ADD(MC6850_0_TAG, stbook_acia_ikbd_intf)
+	MDRV_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 
-	MDRV_WD1772_ADD(WD1772_TAG, atarist_wd17xx_interface )
+	MDRV_WD1772_ADD(WD1772_TAG, fdc_intf )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
@@ -2043,9 +2028,6 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("4M")
 	MDRV_RAM_EXTRA_OPTIONS("1M")
-
-	MDRV_ATARIST_SERIAL_ADD("serial")
-	MDRV_ATARIST_SERIAL_ADD("serial2")
 MACHINE_DRIVER_END
 
 /* ROMs */
