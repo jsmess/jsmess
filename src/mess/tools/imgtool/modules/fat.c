@@ -1505,17 +1505,18 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 				case 0:
 				case 32:
 					/* need to grow */
-					if (created_entry) free(created_entry);
 					new_created_entry = (UINT8 *) malloc(created_entry_len + FAT_DIRENT_SIZE);
 					if (!new_created_entry)
 					{
 						err = IMGTOOLERR_OUTOFMEMORY;
 						goto done;
 					}
-					created_entry = new_created_entry;
 
 					/* move existing entries forward */
-					memmove(created_entry + 32, created_entry, created_entry_len);
+					memmove(new_created_entry + 32, created_entry, created_entry_len);
+					
+					if (created_entry) free(created_entry);					
+					created_entry = new_created_entry;
 					created_entry_len += 32;
 
 					/* set up this LFN */
