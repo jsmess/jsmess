@@ -257,9 +257,9 @@ static const centronics_interface atom_centronics_config =
 };
 
 static FLOPPY_OPTIONS_START(atom)
-	FLOPPY_OPTION(atom, "ssd", "Atom disk image", basicdsk_identify_default, basicdsk_construct_default,
+	FLOPPY_OPTION(atom, "dsk,40t", "Atom disk image", basicdsk_identify_default, basicdsk_construct_default,
 		HEADS([1])
-		TRACKS([80])
+		TRACKS([40])
 		SECTORS([10])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
@@ -272,7 +272,7 @@ static const floppy_config atom_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(atom),
 	DO_NOT_KEEP_GEOMETRY
 };
