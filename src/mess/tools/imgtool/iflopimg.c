@@ -98,11 +98,6 @@ struct imgtool_floppy_image
 	floppy_image *floppy;
 };
 
-static floppy_image *get_floppy(imgtool_image *img)
-{
-	struct imgtool_floppy_image *fimg = (struct imgtool_floppy_image *) imgtool_image_extra_bytes(img);
-	return fimg->floppy;
-}
 
 
 
@@ -196,7 +191,7 @@ done:
 
 static void imgtool_floppy_close(imgtool_image *img)
 {
-	floppy_close(get_floppy(img));
+	floppy_close(imgtool_floppy(img));
 }
 
 
@@ -205,7 +200,7 @@ static imgtoolerr_t imgtool_floppy_get_sector_size(imgtool_image *image, UINT32 
 {
 	floperr_t ferr;
 
-	ferr = floppy_get_sector_length(get_floppy(image), head, track, sector, sector_size);
+	ferr = floppy_get_sector_length(imgtool_floppy(image), head, track, sector, sector_size);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -218,7 +213,7 @@ static imgtoolerr_t imgtool_floppy_read_sector(imgtool_image *image, UINT32 trac
 {
 	floperr_t ferr;
 
-	ferr = floppy_read_sector(get_floppy(image), head, track, sector, 0, buffer, len);
+	ferr = floppy_read_sector(imgtool_floppy(image), head, track, sector, 0, buffer, len);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
@@ -231,7 +226,7 @@ static imgtoolerr_t imgtool_floppy_write_sector(imgtool_image *image, UINT32 tra
 {
 	floperr_t ferr;
 
-	ferr = floppy_write_sector(get_floppy(image), head, track, sector, 0, buffer, len, ddam);
+	ferr = floppy_write_sector(imgtool_floppy(image), head, track, sector, 0, buffer, len, ddam);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
 
