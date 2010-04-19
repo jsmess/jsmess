@@ -335,9 +335,10 @@ static INT_PTR CALLBACK win_sectorview_dialog_proc(HWND dialog, UINT message,
 					}
 					break;
 
-				case EN_CHANGE:
-					change_sector(dialog);
-					break;
+				// TODO: this causes an stack overflow since set_sector_text() will trigger this event
+				//case EN_CHANGE:
+				//	change_sector(dialog);
+				//	break;
 			}
 			break;
 
