@@ -255,8 +255,9 @@ static void change_sector(HWND dialog)
 	if ((info->track != new_track) || (info->head != new_head) || (info->sector != new_sector))
 	{
 		err = read_sector_data(dialog, new_track, new_head, new_sector);
-		if (err)
-			set_sector_text(dialog);
+		// TODO: this causes a stack overflow
+		//if (err)
+		//	set_sector_text(dialog);
 	}
 }
 
@@ -335,10 +336,9 @@ static INT_PTR CALLBACK win_sectorview_dialog_proc(HWND dialog, UINT message,
 					}
 					break;
 
-				// TODO: this causes an stack overflow since set_sector_text() will trigger this event
-				//case EN_CHANGE:
-				//	change_sector(dialog);
-				//	break;
+				case EN_CHANGE:
+					change_sector(dialog);
+					break;
 			}
 			break;
 
