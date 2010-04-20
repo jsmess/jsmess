@@ -541,6 +541,7 @@ $(MESSOBJ)/acorn.a:				\
 	$(MESS_VIDEO)/z88.o			\
 	$(MESS_DRIVERS)/atom.o		\
 	$(MESS_MACHINE)/atom.o		\
+	$(MESS_FORMATS)/atom_atm.o	\
 	$(MESS_FORMATS)/uef_cas.o	\
 	$(MESS_FORMATS)/csw_cas.o	\
 	$(MESS_VIDEO)/electron.o	\

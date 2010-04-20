@@ -70,6 +70,7 @@ Hardware:   PPIA 8255
 
 /* Devices */
 #include "devices/flopdrv.h"
+#include "formats/atom_atm.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
@@ -324,7 +325,7 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_CENTRONICS_ADD("centronics", atom_centronics_config)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", atom, "atm", 0)
+	MDRV_QUICKLOAD_ADD("quickload", atom_atm, "atm", 0)
 
 	/* cassette */
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )

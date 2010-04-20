@@ -23,7 +23,6 @@
 #include "machine/6522via.h"
 #include "devices/flopdrv.h"
 #include "devices/cassette.h"
-#include "devices/snapquik.h"
 #include "includes/atom.h"
 #include "sound/speaker.h"
 
@@ -192,80 +191,6 @@ MACHINE_START( atom )
 	memory_region(machine, "maincpu")[0x09] = mame_rand(machine) & 0x0ff;
 	memory_region(machine, "maincpu")[0x0a] = mame_rand(machine) & 0x0ff;
 	memory_region(machine, "maincpu")[0x0b] = mame_rand(machine) & 0x0ff;
-}
-
-struct atm
-{
-	UINT8	atm_name[16];
-	UINT8	atm_start_high;
-	UINT8	atm_start_low;
-	UINT8	atm_exec_high;
-	UINT8	atm_exec_low;
-	UINT8	atm_size_high;
-	UINT8	atm_size_low;
-};
-
-/* this only works if loaded using file-manager. This should work
-for binary files, but will not work with basic files. This also does not support
-.tap files which contain multiple .atm files joined together! */
-QUICKLOAD_LOAD(atom)
-{
-	unsigned char *quickload_data;
-	int i;
-	unsigned char *data;
-	struct atm *atm_header;
-	unsigned long addr;
-	unsigned long exec;
-	unsigned long size;
-
-	quickload_data = (unsigned char *)malloc(quickload_size);
-	if (!quickload_data)
-		return INIT_FAIL;
-
-	if (image_fread(image, quickload_data, quickload_size) != quickload_size)
-	{
-		free(quickload_data);
-		return INIT_FAIL;
-	}
-
-	atm_header = (struct atm *)quickload_data;
-
-	/* calculate data address */
-	data = quickload_data + sizeof(struct atm);
-
-	/* get start address */
-	addr = (
-			(atm_header->atm_start_low & 0x0ff) |
-			((atm_header->atm_start_high & 0x0ff)<<8)
-			);
-
-	/* get size */
-	size = (
-			(atm_header->atm_size_low & 0x0ff) |
-			((atm_header->atm_size_high & 0x0ff)<<8)
-			);
-
-	/* get execute address */
-	exec = (
-		(atm_header->atm_exec_low & 0x0ff)	|
-		((atm_header->atm_exec_high & 0x0ff)<<8)
-		);
-
-	/* copy data into memory */
-	for (i=size-1; i>=0; i--)
-	{
-		memory_write_byte( cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM ), addr, data[0]);
-		addr++;
-		data++;
-	}
-
-
-	/* set new pc address */
-	cpu_set_reg( devtag_get_device(image->machine, "maincpu"), REG_GENPC, exec);
-
-	/* free the data */
-	free(quickload_data);
-	return INIT_PASS;
 }
 
 READ8_DEVICE_HANDLER (atom_8255_porta_r )
