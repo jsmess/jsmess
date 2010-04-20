@@ -47,7 +47,6 @@
 #include "devices/cartslot.h"
 #include "devices/microdrv.h"
 #include "devices/snapquik.h"
-#include "machine/serial.h"
 #include "sound/speaker.h"
 #include "video/zx8301.h"
 #include "machine/zx8302.h"
@@ -658,24 +657,6 @@ static const floppy_config ql_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
-static DEVICE_GET_INFO( ql_serial )
-{
-	switch ( state )
-	{
-		case DEVINFO_STR_NAME:		                strcpy(info->s, "QL serial port");	                    break;
-		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "txt");                                 break;
-		default:									DEVICE_GET_INFO_CALL(serial);	break;
-	}
-}
-
-#define QL_SERIAL	DEVICE_GET_INFO_NAME(ql_serial)
-
-#define MDRV_QL_SERIAL_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, QL_SERIAL, 0)
-
-#define MDRV_QL_SERIAL_REMOVE(_tag)		\
-  MDRV_DEVICE_REMOVE(_tag)
-
 static MACHINE_DRIVER_START( ql )
 	MDRV_DRIVER_DATA(ql_state)
 
@@ -728,9 +709,6 @@ static MACHINE_DRIVER_START( ql )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("192K,256K,384K,640K,896K")
-
-	MDRV_QL_SERIAL_ADD("serial0")
-	MDRV_QL_SERIAL_ADD("serial1")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ql_ntsc )
@@ -749,9 +727,6 @@ static MACHINE_DRIVER_START( opd )
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("256K")
-
-	MDRV_QL_SERIAL_REMOVE("serial0")
-	MDRV_QL_SERIAL_REMOVE("serial1")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaopd )
