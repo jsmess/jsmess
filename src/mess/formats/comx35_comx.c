@@ -30,12 +30,20 @@ enum
     IMPLEMENTATION
 ***************************************************************************/
 
+/*-------------------------------------------------
+    image_fread_memory - read image to memory
+-------------------------------------------------*/
+
 static void image_fread_memory(running_device *image, UINT16 addr, UINT32 count)
 {
 	void *ptr = memory_get_write_ptr(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), addr);
 
 	image_fread(image, ptr, count);
 }
+
+/*-------------------------------------------------
+    QUICKLOAD_LOAD( comx35_comx )
+-------------------------------------------------*/
 
 QUICKLOAD_LOAD( comx35_comx )
 {

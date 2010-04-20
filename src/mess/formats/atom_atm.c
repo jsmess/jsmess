@@ -8,8 +8,6 @@
 
 #include "emu.h"
 #include "formats/atom_atm.h"
-#include "cpu/cdp1802/cdp1802.h"
-#include "devices/messram.h"
 
 /***************************************************************************
     PARAMETERS
@@ -21,19 +19,9 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-/*
-
-	The format for the .ATM files is as follows:
-
-	Offset Size     Description
-	------ -------- -----------------------------------------------------------
-	0000h  16 BYTEs ATOM filename (if less than 16 BYTEs, rest is 00h bytes)
-	0010h  WORD     Start address for load
-	0012h  WORD     Execution address
-	0014h  WORD     Size of data in BYTEs
-	0016h  Size     Data
-
-*/
+/*-------------------------------------------------
+    image_fread_memory - read image to memory
+-------------------------------------------------*/
 
 static void image_fread_memory(running_device *image, UINT16 addr, UINT32 count)
 {
@@ -42,8 +30,26 @@ static void image_fread_memory(running_device *image, UINT16 addr, UINT32 count)
 	image_fread(image, ptr, count);
 }
 
+/*-------------------------------------------------
+    QUICKLOAD_LOAD( atom_atm )
+-------------------------------------------------*/
+
 QUICKLOAD_LOAD( atom_atm )
 {
+	/*
+
+		The format for the .ATM files is as follows:
+
+		Offset Size     Description
+		------ -------- -----------------------------------------------------------
+		0000h  16 BYTEs ATOM filename (if less than 16 BYTEs, rest is 00h bytes)
+		0010h  WORD     Start address for load
+		0012h  WORD     Execution address
+		0014h  WORD     Size of data in BYTEs
+		0016h  Size     Data
+
+	*/
+	
 	UINT8 header[0x16] = { 0 };
 
 	image_fread(image, header, 0x16);

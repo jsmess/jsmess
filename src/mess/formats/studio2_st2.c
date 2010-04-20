@@ -43,6 +43,10 @@ struct _st2_header
     IMPLEMENTATION
 ***************************************************************************/
 
+/*-------------------------------------------------
+    DEVICE_IMAGE_LOAD( st2_cartslot_load )
+-------------------------------------------------*/
+
 DEVICE_IMAGE_LOAD( st2_cartslot_load )
 {
 	st2_header header;
