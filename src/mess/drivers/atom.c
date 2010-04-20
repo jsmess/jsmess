@@ -71,6 +71,7 @@ Hardware:   PPIA 8255
 /* Devices */
 #include "devices/flopdrv.h"
 #include "formats/atom_atm.h"
+#include "formats/atom_tap.h"
 #include "formats/basicdsk.h"
 #include "devices/cassette.h"
 #include "devices/snapquik.h"
@@ -278,6 +279,13 @@ static const floppy_config atom_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static const cassette_config atom_cassette_config =
+{
+	atom_cassette_formats,
+	NULL,
+	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_MUTED)
+};
+
 static const mc6847_interface atom_mc6847_intf =
 {
 	DEVCB_HANDLER(atom_mc6847_videoram_r),
@@ -328,7 +336,7 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_QUICKLOAD_ADD("quickload", atom_atm, "atm", 0)
 
 	/* cassette */
-	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
+	MDRV_CASSETTE_ADD( "cassette", atom_cassette_config )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", X2 / 4, atom_6522_interface)
