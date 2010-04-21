@@ -420,6 +420,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/cqm_dsk.o	\
 	$(MESS_FORMATS)/dsk_dsk.o	\
 	$(MESS_FORMATS)/d88_dsk.o	\
+	$(MESS_FORMATS)/fdi_dsk.o	\
 	$(MESS_DEVICES)/flopdrv.o	\
 	$(MESS_DEVICES)/harddriv.o	\
 	$(MESS_DEVICES)/messram.o	\
@@ -540,7 +541,6 @@ $(MESSOBJ)/acorn.a:				\
 	$(MESS_DRIVERS)/z88.o		\
 	$(MESS_VIDEO)/z88.o			\
 	$(MESS_DRIVERS)/atom.o		\
-	$(MESS_MACHINE)/atom.o		\
 	$(MESS_FORMATS)/atom_atm.o	\
 	$(MESS_FORMATS)/atom_tap.o	\
 	$(MESS_FORMATS)/uef_cas.o	\

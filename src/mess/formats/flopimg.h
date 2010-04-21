@@ -96,6 +96,9 @@ FLOPPY_CONSTRUCT(dsk_dsk_construct);
 FLOPPY_IDENTIFY(d88_dsk_identify);
 FLOPPY_CONSTRUCT(d88_dsk_construct);
 
+FLOPPY_IDENTIFY(fdi_dsk_identify);
+FLOPPY_CONSTRUCT(fdi_dsk_construct);
+
 #define FLOPPY_OPTIONS_NAME(name)	floppyoptions_##name
 
 #define FLOPPY_OPTIONS_START(name)												\
@@ -113,11 +116,12 @@ FLOPPY_CONSTRUCT(d88_dsk_construct);
 	{ #name, extensions_, description_, identify_, construct_, ranges_ },				\
 
 #define FLOPPY_OPTIONS_END														\
+		FLOPPY_OPTION( fdi, "fdi", "Formatted Disk Image", fdi_dsk_identify, fdi_dsk_construct, NULL) \
 		FLOPPY_OPTION( td0, "td0", "Teledisk floppy disk image",	td0_dsk_identify, td0_dsk_construct, NULL) \
 		FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",	imd_dsk_identify, imd_dsk_construct, NULL) \
 		FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",	cqm_dsk_identify, cqm_dsk_construct, NULL) \
 		FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",	dsk_dsk_identify, dsk_dsk_construct, NULL) \
-		FLOPPY_OPTION( d88, "d77,d88",	"D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL)\
+		FLOPPY_OPTION( d88, "d77,d88", "D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL) \
 	FLOPPY_OPTIONS_END0
 
 FLOPPY_OPTIONS_EXTERN(default);
