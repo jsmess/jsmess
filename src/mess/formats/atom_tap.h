@@ -13,6 +13,6 @@
 
 #include "formats/cassimg.h"
 
-CASSETTE_FORMATLIST_EXTERN( atom_cassette_formats );
+extern const struct CassetteFormat atom_tap_format;
 
 #endif

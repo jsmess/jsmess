@@ -1,52 +1,47 @@
-/*****************************************************************************
- *
- * includes/atom.h
- *
- ****************************************************************************/
+#pragma once
 
-#ifndef ATOM_H_
-#define ATOM_H_
+#ifndef __ATOM__
+#define __ATOM__
 
-#include "devices/snapquik.h"
-#include "machine/6522via.h"
-#include "machine/i8255a.h"
-#include "machine/i8271.h"
+#include "emu.h"
 
-/* Motherboard crystals
-
-Source: http://acorn.chriswhy.co.uk/docs/Acorn/Manuals/Acorn_AtomTechnicalManual.pdf
-
-*/
+#define SY6502_TAG		"ic22"
+#define INS8255_TAG		"ic25"
+#define MC6847_TAG		"ic31"
+#define R6522_TAG		"ic1"
+#define I8271_TAG		"ic13"
+#define SCREEN_TAG		"screen"
+#define CENTRONICS_TAG	"centronics"
+#define CASSETTE_TAG	"cassette"
+#define SPEAKER_TAG		"speaker"
 
 #define X1	XTAL_3_579545MHz	// MC6847 Clock
-#define X2	XTAL_4MHz		// CPU Clock - a divider reduces it to 1MHz
+#define X2	XTAL_4MHz			// CPU Clock - a divider reduces it to 1MHz
 
-/*----------- defined in machine/atom.c -----------*/
+class atom_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atom_state(machine)); }
 
-extern UINT8 atom_8255_porta;
-extern UINT8 atom_8255_portc;
+	atom_state(running_machine &machine) { }
 
-extern const i8255a_interface atom_8255_int;
-extern const via6522_interface atom_6522_interface;
-extern const i8271_interface atom_8271_interface;
+	/* eprom state */
+	int eprom;
 
-MACHINE_START( atom );
-QUICKLOAD_LOAD( atom );
-READ8_DEVICE_HANDLER (atom_8255_porta_r);
-READ8_DEVICE_HANDLER (atom_8255_portb_r);
-READ8_DEVICE_HANDLER (atom_8255_portc_r);
-WRITE8_DEVICE_HANDLER (atom_8255_porta_w );
-WRITE8_DEVICE_HANDLER (atom_8255_portb_w );
-WRITE8_DEVICE_HANDLER (atom_8255_portc_w );
+	/* video state */
+	UINT8 *video_ram;
 
-READ8_HANDLER(atom_eprom_box_r);
-WRITE8_HANDLER(atom_eprom_box_w);
-void atom_eprom_box_init(running_machine *machine);
+	/* keyboard state */
+	int keylatch;
 
-MACHINE_START( atomeb );
+	/* cassette state */
+	int hz2400;
+	int pc0;
+	int pc1;
 
-READ8_DEVICE_HANDLER( atom_mc6847_videoram_r );
-VIDEO_UPDATE( atom );
+	/* devices */
+	running_device *mc6847;
+	running_device *cassette;
+};
 
-
-#endif /* ATOM_H_ */
+#endif
