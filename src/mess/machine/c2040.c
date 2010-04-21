@@ -238,7 +238,7 @@ static TIMER_CALLBACK( bit_tick )
 		if (c2040->unit[c2040->drive].buffer_pos >= c2040->unit[c2040->drive].track_len)
 		{
 			/* loop to the start of the track */
-			c2040->unit[c2040->drive].buffer_pos = G64_DATA_START;
+			c2040->unit[c2040->drive].buffer_pos = 0;
 		}
 	}
 
@@ -277,7 +277,7 @@ static TIMER_CALLBACK( bit_tick )
 static void read_current_track(c2040_t *c2040, int unit)
 {
 	c2040->unit[unit].track_len = G64_BUFFER_SIZE;
-	c2040->unit[unit].buffer_pos = G64_DATA_START;
+	c2040->unit[unit].buffer_pos = 0;
 	c2040->unit[unit].bit_pos = 7;
 	c2040->bit_count = 0;
 
@@ -285,7 +285,7 @@ static void read_current_track(c2040_t *c2040, int unit)
 	floppy_drive_read_track_data_info_buffer(c2040->unit[unit].image, c2040->side, c2040->unit[unit].track_buffer, &c2040->unit[unit].track_len);
 
 	/* extract track length */
-	c2040->unit[unit].track_len = G64_DATA_START + ((c2040->unit[unit].track_buffer[1] << 8) | c2040->unit[unit].track_buffer[0]);
+	c2040->unit[unit].track_len = floppy_drive_get_current_track_size(c2040->unit[unit].image, c2040->side);
 }
 
 /*-------------------------------------------------

@@ -113,6 +113,8 @@ Source Changes:
 - Inserts a check whether the get_track_size function is defined in the disk
   format before calling it. (bug #1934) [Michael Zapf]
 
+- Implemented get_track_size function for D64 and G64 formats. [Curt Coder]
+
 
 
 0.137

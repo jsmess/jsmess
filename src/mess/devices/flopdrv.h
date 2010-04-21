@@ -78,6 +78,8 @@ int floppy_drive_get_flag_state(running_device *img, int flag);
 void floppy_drive_set_flag_state(running_device *img, int flag, int state);
 /* get current physical track drive is on */
 int floppy_drive_get_current_track(running_device *img);
+/* get current physical track size */
+UINT64 floppy_drive_get_current_track_size(running_device *img, int head);
 
 /* get next id from track, 1 if got a id, 0 if no id was got */
 int floppy_drive_get_next_id(running_device *img, int side, chrn_id *);

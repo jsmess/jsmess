@@ -607,6 +607,19 @@ int	floppy_drive_get_current_track(running_device *img)
 	return drv->current_track;
 }
 
+UINT64 floppy_drive_get_current_track_size(running_device *img, int head)
+{
+	floppy_drive *drv = get_safe_token( img );
+	int size = 0;
+
+	if (image_exists(img))
+	{
+		size = floppy_get_track_size(drv->floppy, head, drv->current_track);
+	}
+
+	return size;
+}
+
 void floppy_drive_set_rpm(running_device *img, float rpm)
 {
 	floppy_drive *drv = get_safe_token( img );

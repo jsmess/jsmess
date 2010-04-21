@@ -163,10 +163,10 @@ static TIMER_CALLBACK( bit_tick )
 		c1571->bit_pos = 7;
 		c1571->buffer_pos++;
 
-		if (c1571->buffer_pos > c1571->track_len + 1)
+		if (c1571->buffer_pos >= c1571->track_len)
 		{
 			/* loop to the start of the track */
-			c1571->buffer_pos = G64_DATA_START;
+			c1571->buffer_pos = 0;
 		}
 	}
 
@@ -209,7 +209,7 @@ static TIMER_CALLBACK( bit_tick )
 static void read_current_track(c1571_t *c1571)
 {
 	c1571->track_len = G64_BUFFER_SIZE;
-	c1571->buffer_pos = G64_DATA_START;
+	c1571->buffer_pos = 0;
 	c1571->bit_pos = 7;
 	c1571->bit_count = 0;
 
@@ -217,7 +217,7 @@ static void read_current_track(c1571_t *c1571)
 	floppy_drive_read_track_data_info_buffer(c1571->image, c1571->side, c1571->track_buffer, &c1571->track_len);
 
 	/* extract track length */
-	c1571->track_len = G64_DATA_START + ((c1571->track_buffer[1] << 8) | c1571->track_buffer[0]);
+	c1571->track_len = floppy_drive_get_current_track_size(c1571->image, c1571->side);
 }
 
 /*-------------------------------------------------

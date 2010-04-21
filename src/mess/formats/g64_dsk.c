@@ -86,7 +86,7 @@ static int g64_get_tracks_per_disk(floppy_image *floppy)
     the disk image for a given track
 -------------------------------------------------*/
 
-static floperr_t get_track_offset(floppy_image *floppy, int track, UINT64 *offset)
+static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UINT64 *offset)
 {
 	struct g64dsk_tag *tag = get_tag(floppy);
 	UINT64 offs = 0;
@@ -103,6 +103,27 @@ static floperr_t get_track_offset(floppy_image *floppy, int track, UINT64 *offse
 }
 
 /*-------------------------------------------------
+    g64_get_track_size - returns the track size
+-------------------------------------------------*/
+
+static UINT32 g64_get_track_size(floppy_image *floppy, int head, int track)
+{
+	/* get track offset */
+	UINT64 track_offset;
+	floperr_t err = get_track_offset(floppy, head, track, &track_offset);
+
+	if (err)
+		return 0;
+
+	/* read track length */
+	UINT8 size[2];
+	floppy_image_read(floppy, &size, track_offset, 2);
+	UINT32 track_length = (size[1] << 8) | size[0];
+
+	return track_length;
+}
+
+/*-------------------------------------------------
     g64_read_track - reads a full track from the
     disk image
 -------------------------------------------------*/
@@ -115,17 +136,17 @@ static floperr_t g64_read_track(floppy_image *floppy, int head, int track, UINT6
 	UINT16 track_length = 0;
 
 	/* get track offset */
-	err = get_track_offset(floppy, track, &track_offset);
+	err = get_track_offset(floppy, head, track, &track_offset);
 
 	if (err)
 		return err;
 
 	if (!head && track_offset)
 	{
-		if (buflen < (tag->track_size + G64_DATA_START)) fatalerror("G64 track buffer too small: %u!\n", (UINT32)buflen);
+		if (buflen < tag->track_size) fatalerror("G64 track buffer too small: %u!\n", (UINT32)buflen);
 
 		/* read track */
-		floppy_image_read(floppy, buffer, track_offset, tag->track_size + G64_DATA_START);
+		floppy_image_read(floppy, buffer, track_offset + 2, tag->track_size);
 	}
 	else
 	{
@@ -268,6 +289,7 @@ FLOPPY_CONSTRUCT( g64_dsk_construct )
 	callbacks->write_track = g64_write_track;
 	callbacks->get_heads_per_disk = g64_get_heads_per_disk;
 	callbacks->get_tracks_per_disk = g64_get_tracks_per_disk;
+	callbacks->get_track_size = g64_get_track_size;
 
 	return FLOPPY_ERROR_SUCCESS;
 }

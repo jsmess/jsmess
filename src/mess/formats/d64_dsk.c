@@ -10,6 +10,7 @@
 
     TODO:
 
+	- fix MAX_ERROR_SECTORS, it is too small for d80/d82
 	- write to disk
     - disk errors 24, 25, 26, 28, 74
     - variable gaps
@@ -26,11 +27,11 @@
     PARAMETERS
 ***************************************************************************/
 
-#define LOG 0
+#define LOG 1
 
 #define MAX_HEADS			2
 #define MAX_TRACKS			84
-#define MAX_ERROR_SECTORS	802
+#define MAX_ERROR_SECTORS	802 // TODO this is too small for .d80 files
 #define SECTOR_SIZE			256
 #define SECTOR_SIZE_GCR		368
 
@@ -244,6 +245,26 @@ static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UIN
 }
 
 /*-------------------------------------------------
+    d64_get_track_size - returns the track size
+-------------------------------------------------*/
+
+static UINT32 d64_get_track_size(floppy_image *floppy, int head, int track)
+{
+	struct d64dsk_tag *tag = get_tag(floppy);
+
+	if (tag->track_offset[head][track] == INVALID_OFFSET)
+		return 0;
+
+	/* determine number of sectors per track */
+	int sectors_per_track = d64_get_sectors_per_track(floppy, head, track);
+
+	/* allocate temporary GCR track data buffer */
+	UINT32 track_length = sectors_per_track * SECTOR_SIZE_GCR;
+
+	return track_length;
+}
+
+/*-------------------------------------------------
     get_sector_error_code - returns the error
 	code for the given sector
 -------------------------------------------------*/
@@ -251,9 +272,13 @@ static floperr_t get_track_offset(floppy_image *floppy, int head, int track, UIN
 static int get_sector_error_code(floppy_image *floppy, int head, int dos_track, int sector)
 {
 	struct d64dsk_tag *tag = get_tag(floppy);
-	int sector_error = tag->error[tag->error_offset[head][dos_track] + sector];
 
-	if (sector_error)
+	if (!tag->has_errors)
+		return ERROR_00;
+
+	int sector_error = tag->error[tag->error_offset[head][dos_track] + sector]; // TODO index out of bounds!!!
+
+	if (sector_error != ERROR_00)
 	{
 		logerror("D64 error %s head %u track %u sector %u\n", ERROR_CODE[sector_error], head, dos_track, sector);
 	}
@@ -371,8 +396,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		UINT8 *d64_track_data;
 		UINT16 gcr_track_size;
 		UINT8 *gcr_track_data;
-		UINT64 gcr_pos = G64_DATA_START;
-		//int error_offset = 0;
+		UINT64 gcr_pos = 0;
 
 		/* determine logical track number */
 		int dos_track = get_dos_track(track);
@@ -397,10 +421,6 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 		gcr_track_data = (UINT8 *)alloca(gcr_track_size);
 
 		if (buflen < gcr_track_size) fatalerror("D64 track buffer too small: %u!\n", (UINT32)buflen);
-
-		/* prepend GCR track data buffer with GCR track size */
-		gcr_track_data[0] = gcr_track_size & 0xff;
-		gcr_track_data[1] = gcr_track_size >> 8;
 
 		/* read D64 track data */
 		floppy_image_read(floppy, d64_track_data, track_offset, d64_track_size);
@@ -475,7 +495,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 			UINT8 sector_checksum = d64_track_data[d64_pos];
 			for (i = 1; i < 256; i++)
 				sector_checksum ^= d64_track_data[d64_pos + i];
-			
+
 			if (sector_error == ERROR_23)
 				sector_checksum ^= 0xff;
 			
@@ -504,12 +524,10 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 			for (i = 0; i < 14; i++)
 				gcr_track_data[gcr_pos + i] = 0x55;
 			gcr_pos += 14;
-
-			//error_offset++;
 		}
 
 		/* copy GCR track data to buffer */
-		memcpy(buffer, gcr_track_data, gcr_track_size + G64_DATA_START);
+		memcpy(buffer, gcr_track_data, gcr_track_size);
 	}
 	else	/* half tracks */
 	{
@@ -729,7 +747,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 					if (LOG)
 					{
 						logerror("D64 head %u track %u data offset: %04x\n", head, track + 1, tag->track_offset[head][track]);
-						logerror("D64 head %u track %u error offset: %04x\n", head, track + 1, tag->error_offset[head][track]);
+						if (has_errors) logerror("D64 head %u track %u error offset: %04x\n", head, track + 1, tag->error_offset[head][track]);
 					}
 				}
 			}
@@ -762,7 +780,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 					if (LOG)
 					{
 						logerror("D64 head %u track %.1f data offset: %04x\n", head, get_dos_track(track), tag->track_offset[head][track]);
-						logerror("D64 head %u track %.1f error offset: %04x\n", head, get_dos_track(track), tag->error_offset[head][track]);
+						if (has_errors) logerror("D64 head %u track %.1f error offset: %04x\n", head, get_dos_track(track), tag->error_offset[head][track]);
 					}
 				}
 			}
@@ -821,6 +839,7 @@ FLOPPY_CONSTRUCT( d64_dsk_construct )
 	callbacks->write_track = d64_write_track;
 	callbacks->get_heads_per_disk = d64_get_heads_per_disk;
 	callbacks->get_tracks_per_disk = d64_get_tracks_per_disk;
+	callbacks->get_track_size = d64_get_track_size;
 
 	return FLOPPY_ERROR_SUCCESS;
 }
