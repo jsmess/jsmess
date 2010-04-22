@@ -4,6 +4,8 @@
 
         10/12/2009 Skeleton driver.
 
+		http://www.swtpc.com/mholley/swtpc_6800.htm
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -67,5 +69,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT   COMPANY   FULLNAME       FLAGS */
-COMP( ????, swtpc,  0,       0, 		swtpc,	swtpc,	 0, 	"Southwest Technical Products Corporation",   "SWTPC 6800",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 1975, swtpc,  0,       0, 		swtpc,	swtpc,	 0, 	"Southwest Technical Products Corporation",   "SWTPC 6800",		GAME_NOT_WORKING | GAME_NO_SOUND)

@@ -243,5 +243,5 @@ ROM_START(pent1024)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE     INPUT       INIT    COMPANY     FULLNAME */
-COMP( ????, pentagon, spec128,	0,		pentagon,	spec_plus,	0,		"???",		"Pentagon", GAME_NOT_WORKING)
+COMP( 1989, pentagon, spec128,	0,		pentagon,	spec_plus,	0,		"???",		"Pentagon", GAME_NOT_WORKING)
 COMP( ????, pent1024, spec128,	0,		pent1024,	spec_plus,	0,		"???",		"Pentagon 1024", GAME_NOT_WORKING)
