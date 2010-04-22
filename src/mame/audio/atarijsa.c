@@ -28,6 +28,13 @@ Effects                                   2C00-2C0F   R/W  D0-D7
 Banked Program ROM (4 pages)              3000-3FFF   R    D0-D7
 Static Program ROM (48K bytes)            4000-FFFF   R    D0-D7
 
+TODO:
+JSA-i: stereo gating for POKEY/TMS5220C is currently only mono, only looking at ym2151_ct1;
+  the two commented-out lines would be correct if stereo volume-set functions were written.
+ALL: the LPF (low pass filter) bit which selectively places a lowpass filter in the output
+  path for all channels is currently unimplemented; someone who knows analog magic will need
+  to handle this.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -46,9 +53,6 @@ Static Program ROM (48K bytes)            4000-FFFF   R    D0-D7
 static UINT8 *bank_base;
 static UINT8 *bank_source_data;
 
-static UINT8 speech_data;
-static UINT8 last_ctl;
-
 static running_device *jsacpu;
 static const char *test_port;
 static UINT16 test_mask;
@@ -64,6 +68,8 @@ static UINT8 pokey_volume;
 static UINT8 ym2151_volume;
 static UINT8 tms5220_volume;
 static UINT8 oki6295_volume;
+static UINT8 ym2151_ct1;
+static UINT8 ym2151_ct2;
 
 static void update_all_volumes(running_machine *machine);
 
@@ -101,9 +107,6 @@ ADDRESS_MAP_END
 
 static void init_save_state(running_machine *machine)
 {
-	state_save_register_global(machine, speech_data);
-	state_save_register_global(machine, last_ctl);
-
 	state_save_register_global(machine, overall_volume);
 	state_save_register_global(machine, pokey_volume);
 	state_save_register_global(machine, ym2151_volume);
@@ -178,13 +181,13 @@ void atarijsa_reset(void)
 	atarigen_sound_io_reset(jsacpu);
 
 	/* reset the static states */
-	speech_data = 0;
-	last_ctl = 0;
 	overall_volume = 100;
 	pokey_volume = 100;
 	ym2151_volume = 100;
 	tms5220_volume = 100;
 	oki6295_volume = 100;
+	ym2151_ct1 = 0;
+	ym2151_ct2 = 0;
 
 	/* Guardians of the Hood assumes we're reset to bank 0 on startup */
 	memcpy(bank_base, &bank_source_data[0x0000], 0x1000);
@@ -228,7 +231,10 @@ static READ8_HANDLER( jsa1_io_r )
 			if (!(input_port_read(space->machine, test_port) & test_mask)) result ^= 0x80;
 			if (atarigen->cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen->sound_to_cpu_ready) result ^= 0x20;
-			if (tms5220 == NULL || !tms5220_readyq_r(tms5220)) result ^= 0x10;
+			if ((tms5220 != NULL) && (tms5220_readyq_r(tms5220) == 0))
+				result |= 0x10;
+			else
+				result &= ~0x10;
 			break;
 
 		case 0x006:		/* /IRQACK */
@@ -262,7 +268,8 @@ static WRITE8_HANDLER( jsa1_io_w )
 			break;
 
 		case 0x200:		/* /VOICE */
-			speech_data = data;
+			if (tms5220 != NULL)
+				tms5220_data_w(tms5220, 0, data);
 			break;
 
 		case 0x202:		/* /WRP */
@@ -275,7 +282,7 @@ static WRITE8_HANDLER( jsa1_io_w )
                 0x20 = coin counter 2
                 0x10 = coin counter 1
                 0x08 = squeak (tweaks the 5220 frequency)
-                0x04 = TMS5220 reset (active low)
+                0x04 = TMS5220 reset (actually the read strobe) (active low)
                 0x02 = TMS5220 write strobe (active low)
                 0x01 = YM2151 reset (active low)
             */
@@ -284,12 +291,14 @@ static WRITE8_HANDLER( jsa1_io_w )
 			if (tms5220 != NULL)
 			{
 				int count;
-
-				if (((data ^ last_ctl) & 0x02) && (data & 0x02))
-					tms5220_data_w(tms5220, 0, speech_data);
+				tms5220_wsq_w(tms5220, (data&0x02)>>1);
+				tms5220_rsq_w(tms5220, (data&0x04)>>2);
 				count = 5 | ((data >> 2) & 2);
 				tms5220_set_frequency(tms5220, JSA_MASTER_CLOCK*2 / (16 - count));
 			}
+
+			/* reset the YM2151 if needed */
+			if ((data&1) == 0) devtag_reset(space->machine, "ymsnd");
 
 			/* coin counters */
 			coin_counter_w(space->machine, 1, (data >> 5) & 1);
@@ -297,7 +306,6 @@ static WRITE8_HANDLER( jsa1_io_w )
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
-			last_ctl = data;
 			break;
 
 		case 0x206:		/* MIX */
@@ -410,9 +418,11 @@ static WRITE8_HANDLER( jsa2_io_w )
                 0x01 = YM2151 reset (active low)
             */
 
+			/* reset the YM2151 if needed */
+			if ((data&1) == 0) devtag_reset(space->machine, "ymsnd");
+
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
-			last_ctl = data;
 
 			/* coin counters */
 			coin_counter_w(space->machine, 1, (data >> 5) & 1);
@@ -533,13 +543,15 @@ static WRITE8_HANDLER( jsa3_io_w )
                 0x01 = YM2151 reset (active low)
             */
 
+			/* reset the YM2151 if needed */
+			if ((data&1) == 0) devtag_reset(space->machine, "ymsnd");
+
 			/* update the OKI bank */
 			if (oki6295 != NULL)
 				memory_set_bank(space->machine, "bank12", (memory_get_bank(space->machine, "bank12") & 2) | ((data >> 1) & 1));
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
-			last_ctl = data;
 
 			/* coin counters */
 			coin_counter_w(space->machine, 1, (data >> 5) & 1);
@@ -665,12 +677,14 @@ static WRITE8_HANDLER( jsa3s_io_w )
                 0x01 = YM2151 reset (active low)
             */
 
+			/* reset the YM2151 if needed */
+			if ((data&1) == 0) devtag_reset(space->machine, "ymsnd");
+
 			/* update the OKI bank */
 			memory_set_bank(space->machine, "bank12", (memory_get_bank(space->machine, "bank12") & 2) | ((data >> 1) & 1));
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
-			last_ctl = data;
 
 			/* coin counters */
 			coin_counter_w(space->machine, 1, (data >> 5) & 1);
@@ -702,6 +716,12 @@ static WRITE8_HANDLER( jsa3s_io_w )
 	}
 }
 
+static WRITE8_DEVICE_HANDLER( ym2151_ctl_w )
+{
+	ym2151_ct1 = data&0x1;
+	ym2151_ct2 = (data&0x2)>>1;
+	update_all_volumes(device->machine);
+}
 
 
 /*************************************
@@ -712,9 +732,11 @@ static WRITE8_HANDLER( jsa3s_io_w )
 
 static void update_all_volumes(running_machine *machine )
 {
-	if (pokey != NULL) atarigen_set_pokey_vol(machine, overall_volume * pokey_volume / 100);
+	if (pokey != NULL) atarigen_set_pokey_vol(machine, (overall_volume * pokey_volume / 100) * ym2151_ct1);
+	//if (pokey != NULL) atarigen_set_pokey_stereo_vol(machine, (overall_volume * pokey_volume / 100) * ym2151_ct1, (overall_volume * pokey_volume / 100) * ym2151_ct2);
 	if (ym2151 != NULL) atarigen_set_ym2151_vol(machine, overall_volume * ym2151_volume / 100);
-	if (tms5220 != NULL) atarigen_set_tms5220_vol(machine, overall_volume * tms5220_volume / 100);
+	if (tms5220 != NULL) atarigen_set_tms5220_vol(machine, (overall_volume * tms5220_volume / 100) * ym2151_ct1);
+	//if (tms5220 != NULL) atarigen_set_tms5220_stereo_vol(machine, (overall_volume * tms5220_volume / 100) * ym2151_ct1, (overall_volume * tms5220_volume / 100) * ym2151_ct2);
 	if (oki6295 != NULL || oki6295_l != NULL || oki6295_r != NULL) atarigen_set_oki6295_vol(machine, overall_volume * oki6295_volume / 100);
 }
 
@@ -768,7 +790,8 @@ ADDRESS_MAP_END
 
 static const ym2151_interface ym2151_config =
 {
-	atarigen_ym2151_irq_gen
+	atarigen_ym2151_irq_gen,
+	ym2151_ctl_w
 };
 
 

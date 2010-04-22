@@ -153,9 +153,15 @@ UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
 static emu_timer *dc_rtc_timer;
 
-static const UINT32 maple0x82answer[]=
+static const UINT32 maple0x82answer_15kHz[]=
 {
-	0x07200083,0x2d353133,0x39343136,0x20202020,0x59504f43,0x48474952,0x45532054,0x45204147,
+	0x07200083,0x2d353133,0x39343136,0x20202020,0x59504f43,0x48474952,0x45532054,0x45204147,	// 15 kHz
+	0x05200083,0x5245544e,0x53495250,0x43205345,0x544c2c4f,0x20202e44,0x38393931,0x5c525043
+};
+
+static const UINT32 maple0x82answer_31kHz[]=
+{
+	0x07200083,0x2d353133,0x39313136,0x20202020,0x59504f43,0x48474952,0x45532054,0x45204147,	// 31 kHz (req. for Strike Fighter)
 	0x05200083,0x5245544e,0x53495250,0x43205345,0x544c2c4f,0x20202e44,0x38393931,0x5c525043
 };
 
@@ -653,9 +659,7 @@ WRITE64_HANDLER( naomi_maple_w )
 								break;
 							case 0x82: // get license string
 								for (a=0;a < 16;a++)
-								{
-									buff[a]=maple0x82answer[a];
-								}
+									buff[a] = (input_port_read(space->machine, "DSW") & 1) ? maple0x82answer_31kHz[a] : maple0x82answer_15kHz[a];
 								ddtdata.length=16;
 								break;
 							case 0x86:
@@ -738,7 +742,7 @@ WRITE64_HANDLER( naomi_maple_w )
 											case 0xf1: // set address
 												break;
 											case 0x10:
-												strcpy((char *)(maple0x86data2+0x11+10), "SEGA ENTERPRISES,LTD.\nI/O BD JVS\n837-13551"); // name
+												strcpy((char *)(maple0x86data2+0x11+10), "SEGA ENTERPRISES,LTD.;I/O BD JVS;837-13551"); // name
 												maple0x86data2[pos+7]=24+21+2;
 												tocopy += 24+21;
 												break;
@@ -1255,7 +1259,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 
 		default:
 			/* might access the unhandled DMAs, so tell us if this happens. */
-			printf("Unhandled G2 register [%08x] -> %08x\n",reg,dat);
+			//printf("Unhandled G2 register [%08x] -> %08x\n",reg,dat);
 			break;
 	}
 }
