@@ -437,7 +437,7 @@ static DRIVER_INIT( md_jpn )
 
 static DRIVER_INIT( mess_32x )
 {
-	DRIVER_INIT_CALL(_32x);
+	DRIVER_INIT_CALL(x32x);
 	DRIVER_INIT_CALL(mess_md_common);
 }
 

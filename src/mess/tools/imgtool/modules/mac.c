@@ -3268,7 +3268,7 @@ static imgtoolerr_t hfs_cat_open(mac_l2_imgref *l2_img, const char *path, hfs_ca
 static imgtoolerr_t hfs_cat_read(hfs_cat_enumerator *enumerator, hfs_catKey **rec_key, hfs_catData **rec_data)
 {
 	void *rec;
-	int rec_len;
+	int rec_len = 0;
 	imgtoolerr_t err;
 
 

@@ -7,7 +7,7 @@ extern DRIVER_INIT( megadriv_c2 );
 extern DRIVER_INIT( megadrie );
 extern DRIVER_INIT( megadriv );
 extern DRIVER_INIT( megadrij );
-extern DRIVER_INIT( _32x );
+extern DRIVER_INIT( x32x );
 extern DRIVER_INIT( mpnew );
 
 INPUT_PORTS_EXTERN( md_common );

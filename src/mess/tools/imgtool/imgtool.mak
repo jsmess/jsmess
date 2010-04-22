@@ -30,13 +30,13 @@ OBJDIRS += \
 LIBIMGTOOL = $(OBJ)/libimgtool.a
 
 # imgtool lib objects
-IMGTOOL_LIB_OBJS =						\
-	$(OBJ)/version.o					\
+IMGTOOL_LIB_OBJS =					\
+	$(OBJ)/version.o				\
 	$(EMUOBJ)/emualloc.o				\
-	$(EMUOBJ)/emucore.o					\
+	$(EMUOBJ)/emucore.o				\
 	$(EMUOBJ)/emuopts.o 				\
-	$(EMUOBJ)/memory.o					\
-	$(MESSOBJ)/utils.o					\
+	$(EMUOBJ)/memory.o				\
+	$(MESSOBJ)/utils.o				\
 	$(MESSOBJ)/opresolv.o				\
 	$(MESS_FORMATS)/ioprocs.o			\
 	$(MESS_FORMATS)/flopimg.o			\
@@ -54,6 +54,7 @@ IMGTOOL_LIB_OBJS =						\
 	$(MESS_FORMATS)/ap_dsk35.o			\
 	$(MESS_FORMATS)/wavfile.o			\
 	$(MESS_FORMATS)/vt_dsk.o			\
+	$(MESS_FORMATS)/fdi_dsk.o			\
 	$(IMGTOOLOBJ)/stream.o				\
 	$(IMGTOOLOBJ)/library.o				\
 	$(IMGTOOLOBJ)/modules.o				\
@@ -71,27 +72,27 @@ IMGTOOL_LIB_OBJS =						\
 	$(IMGTOOL_MODULES)/os9.o			\
 	$(IMGTOOL_MODULES)/mac.o			\
 	$(IMGTOOL_MODULES)/ti99.o			\
-	$(IMGTOOL_MODULES)/ti990hd.o		\
-	$(IMGTOOL_MODULES)/concept.o		\
+	$(IMGTOOL_MODULES)/ti990hd.o			\
+	$(IMGTOOL_MODULES)/concept.o			\
 	$(IMGTOOL_MODULES)/fat.o			\
-	$(IMGTOOL_MODULES)/pc_flop.o		\
-	$(IMGTOOL_MODULES)/pc_hard.o		\
+	$(IMGTOOL_MODULES)/pc_flop.o			\
+	$(IMGTOOL_MODULES)/pc_hard.o			\
 	$(IMGTOOL_MODULES)/prodos.o			\
 	$(IMGTOOL_MODULES)/vzdos.o			\
-	$(IMGTOOL_MODULES)/thomson.o		\
-	$(IMGTOOL_MODULES)/macutil.o		\
+	$(IMGTOOL_MODULES)/thomson.o			\
+	$(IMGTOOL_MODULES)/macutil.o			\
 	$(IMGTOOL_MODULES)/cybiko.o
 #	$(IMGTOOLOBJ)/tstsuite.o			\
 #	$(MESS_FORMATS)/fmsx_cas.o			\
 #	$(MESS_FORMATS)/svi_cas.o			\
 #	$(MESS_FORMATS)/ti85_ser.o			\
-#	$(IMGTOOL_MODULES)/imgwave.o		\
-#	$(IMGTOOL_MODULES)/cococas.o		\
-#	$(IMGTOOL_MODULES)/vmsx_tap.o		\
-#	$(IMGTOOL_MODULES)/vmsx_gm2.o		\
-#	$(IMGTOOL_MODULES)/fmsx_cas.o		\
-#	$(IMGTOOL_MODULES)/svi_cas.o		\
-#	$(IMGTOOL_MODULES)/msx_dsk.o		\
+#	$(IMGTOOL_MODULES)/imgwave.o			\
+#	$(IMGTOOL_MODULES)/cococas.o			\
+#	$(IMGTOOL_MODULES)/vmsx_tap.o			\
+#	$(IMGTOOL_MODULES)/vmsx_gm2.o			\
+#	$(IMGTOOL_MODULES)/fmsx_cas.o			\
+#	$(IMGTOOL_MODULES)/svi_cas.o			\
+#	$(IMGTOOL_MODULES)/msx_dsk.o			\
 #	$(IMGTOOL_MODULES)/xsa.o			\
 #	$(IMGTOOL_MODULES)/t64.o			\
 #	$(IMGTOOL_MODULES)/lynx.o			\
