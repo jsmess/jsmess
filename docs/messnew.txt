@@ -29,6 +29,7 @@ Skeleton drivers:
 - Dolphin
 - Chaos 2
 - EC-1849 [thanks to Anasana]
+- Z80 development board (unknown)
 
 
 System Driver Changes:

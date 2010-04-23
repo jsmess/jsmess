@@ -1650,6 +1650,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/instruct.o 	\
 	$(MESS_DRIVERS)/dolphin.o 	\
 	$(MESS_DRIVERS)/chaos.o 	\
+	$(MESS_DRIVERS)/z80dev.o 	\
 	
 
 
