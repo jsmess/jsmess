@@ -63,18 +63,21 @@ Hardware:   PPIA 8255
 	TODO:
 
 	- ERROR repeats ad infinitum
-	- break key
+	- display should be monochrome
 	- ram expansion
 	- tap files
 	- mouse
 	- move eprom box roms to software list
-	- add 16 cartslots for eprom box
+	- color card
+	- CP/M card
+	- speech synthesis card (SPO256 connected to VIA)
 
 */
 
 #include "emu.h"
 #include "includes/atom.h"
 #include "cpu/m6502/m6502.h"
+#include "devices/cartslot.h"
 #include "devices/cassette.h"
 #include "devices/flopdrv.h"
 #include "devices/messram.h"
@@ -103,7 +106,7 @@ static void bankswitch(running_machine *machine)
 	atom_state *state = (atom_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, SY6502_TAG, ADDRESS_SPACE_PROGRAM);
 
-	UINT8 *eprom = memory_region(machine, "eprom") + (state->eprom << 12);
+	UINT8 *eprom = memory_region(machine, "a000") + (state->eprom << 12);
 
 	memory_install_rom(program, 0xa000, 0xafff, 0, 0, eprom);
 }
@@ -142,13 +145,14 @@ static WRITE8_HANDLER( eprom_w )
 
 static ADDRESS_MAP_START( atom_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x09ff) AM_RAM
-	AM_RANGE(0x0a00, 0x0a03) AM_DEVREADWRITE(I8271_TAG, i8271_r, i8271_w)
-	AM_RANGE(0x0a04, 0x0a04) AM_DEVREADWRITE(I8271_TAG, i8271_data_r, i8271_data_w)
+	AM_RANGE(0x0a00, 0x0a03) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_r, i8271_w)
+	AM_RANGE(0x0a04, 0x0a04) AM_MIRROR(0x1f8) AM_DEVREADWRITE(I8271_TAG, i8271_data_r, i8271_data_w)
 	AM_RANGE(0x0a05, 0x7fff) AM_RAM
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_MEMBER(atom_state, video_ram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
-	AM_RANGE(0xb000, 0xb003) AM_DEVREADWRITE(INS8255_TAG, i8255a_r, i8255a_w)
-	AM_RANGE(0xb800, 0xbbff) AM_DEVREADWRITE(R6522_TAG, via_r, via_w)
+	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("a000", 0)
+	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255a_r, i8255a_w)
+	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via_r, via_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
 ADDRESS_MAP_END
 
@@ -166,12 +170,12 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    INPUT_CHANGED( trigger_nmi )
+    INPUT_CHANGED( trigger_reset )
 -------------------------------------------------*/
 
-static INPUT_CHANGED( trigger_nmi )
+static INPUT_CHANGED( trigger_reset )
 {
-	cputag_set_input_line(field->port->machine, SY6502_TAG, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(field->port->machine, SY6502_TAG, INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*-------------------------------------------------
@@ -185,7 +189,7 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_MINUS)      PORT_CHAR('-') PORT_CHAR('=')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_G)          PORT_CHAR('g') PORT_CHAR('G')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC")          PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(27)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("ESC")          PORT_CODE(KEYCODE_TILDE)      PORT_CHAR(UCHAR_MAMEKEY(ESC))
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -220,8 +224,8 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("KEY4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LOCK")         PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DEL")          PORT_CODE(KEYCODE_DEL)        PORT_CHAR(8)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LOCK")         PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("DELETE")       PORT_CODE(KEYCODE_DEL)        PORT_CHAR(8)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_9)          PORT_CHAR('9') PORT_CHAR(')')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_C)          PORT_CHAR('c') PORT_CHAR('C')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_M)          PORT_CHAR('m') PORT_CHAR('M')
@@ -241,7 +245,7 @@ static INPUT_PORTS_START( atom )
 
 	PORT_START("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_BACKSLASH)  PORT_CHAR(']')
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RTN")          PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("RETURN")       PORT_CODE(KEYCODE_ENTER)      PORT_CHAR(13)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_7)          PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD )                           PORT_CODE(KEYCODE_K)          PORT_CHAR('k') PORT_CHAR('K')
@@ -286,14 +290,14 @@ static INPUT_PORTS_START( atom )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL")         PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SFT")          PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("CTRL")         PORT_CODE(KEYCODE_LCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("SHIFT")        PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT)     PORT_CHAR(UCHAR_SHIFT_1)
 
 	PORT_START("RPT")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("REPT")         PORT_CODE(KEYCODE_RCONTROL)   PORT_CHAR(UCHAR_MAMEKEY(RCONTROL))
 
 	PORT_START("BRK")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BRK")          PORT_CODE(KEYCODE_ESC)   PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED(trigger_nmi, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_ESC)   PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED(trigger_reset, 0)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -412,7 +416,6 @@ static READ8_DEVICE_HANDLER( ppi_pc_r )
 	data |= state->hz2400 << 4;
 
 	/* cassette input */
-logerror("cassin %f\n", cassette_input(state->cassette));
 	data |= (cassette_input(state->cassette) > 0.0) << 5;
 
 	/* keyboard RPT */
@@ -526,7 +529,7 @@ static const i8271_interface fdc_intf =
 {
 	atom_8271_interrupt_callback,
 	NULL,
-	{FLOPPY_0, FLOPPY_1}
+	{ FLOPPY_0, FLOPPY_1 }
 };
 
 /*-------------------------------------------------
@@ -709,6 +712,15 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, atom_centronics_config)
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, atom_cassette_config)
 	MDRV_QUICKLOAD_ADD("quickload", atom_atm, "atm", 0)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("2K")
+	MDRV_RAM_EXTRA_OPTIONS("4K,6K,8K,10K,12K")
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
@@ -721,6 +733,40 @@ static MACHINE_DRIVER_START( atomeb )
 	MDRV_CPU_PROGRAM_MAP(atomeb_mem)
 
 	MDRV_MACHINE_START(atomeb)
+
+	/* cartridges */
+	MDRV_CARTSLOT_ADD("rom0")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("rom1")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("rom2")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("rom3")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("rom4")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("rom5")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("rom6")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("rom7")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("rom8")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("rom9")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("roma")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("romb")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("romc")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("romd")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("rome")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_ADD("romf")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -737,6 +783,9 @@ ROM_START( atom )
 	ROM_CONTINUE(			 0x3000, 0x1000 )
 	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
+
+	ROM_REGION( 0x1000, "a000", 0 )
+	ROM_CART_LOAD( "cart", 0x0000, 0x1000, ROM_MIRROR )
 ROM_END
 
 /*-------------------------------------------------
@@ -750,7 +799,24 @@ ROM_START( atomeb )
 	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
 	
-	ROM_REGION( 0x10000, "eprom", 0 )
+	ROM_REGION( 0x10000, "a000", 0 )
+	ROM_CART_LOAD( "rom0", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "rom1", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "rom2", 0x2000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "rom3", 0x3000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "rom4", 0x4000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "rom5", 0x5000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "rom6", 0x6000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "rom7", 0x7000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "rom8", 0x8000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "rom9", 0x9000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "roma", 0xa000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "romb", 0xb000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "romc", 0xc000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "romd", 0xd000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "rome", 0xe000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "romf", 0xf000, 0x1000, ROM_MIRROR )
+
 	ROM_LOAD( "axr1.rom",     0x0000, 0x1000, CRC(868fda8b) SHA1(f8417787c28818a7646b9b59d706ef890255049f) ) // Atom Externsion ROM AXR1
 	ROM_LOAD( "pcharme.rom",  0x1000, 0x1000, CRC(9e8bd79f) SHA1(66c57622448b448aa6080911dccb03456d0e3b81) ) // P-Charme
 	ROM_LOAD( "gags.rom",	  0x2000, 0x1000, CRC(35e1d713) SHA1(94cc2887ad9fea1849d1d53c64d0668e77696ef4) ) // GAGS
