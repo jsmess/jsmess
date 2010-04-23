@@ -16,7 +16,7 @@
 
 static UINT16* chrom_ram;
 
-static ADDRESS_MAP_START(cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16)
+static ADDRESS_MAP_START( cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&chrom_ram) // 16 * Buffer card memory
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)	
@@ -26,11 +26,11 @@ static ADDRESS_MAP_START(cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16)
 //	AM_RANGE(0xe20000, 0xe23fff) Raster Processor
 	AM_RANGE(0xe30000, 0xe303ff) AM_RAM AM_BASE_MEMBER(cgc7900_state, clut_ram)
 	AM_RANGE(0xe38000, 0xe3bfff) AM_RAM AM_BASE_MEMBER(cgc7900_state, overlay_ram)
+//	AM_RANGE(0xe40000, 0xe40fff) AM_RAM
 //	AM_RANGE(0xe40000, 0xe40001) Bitmap roll counter
 //	AM_RANGE(0xe40002, 0xe40003) X Pan
 //	AM_RANGE(0xe40004, 0xe40005) Y Pan
-//	AM_RANGE(0xe40006, 0xe40007) X Zoom
-//	AM_RANGE(0xe40008, 0xe40009) Y Zoom
+//	AM_RANGE(0xe40006, 0xe40007) X/Y Zoom
 //	AM_RANGE(0xe4000a, 0xe4000f) Raster Processor
 //	AM_RANGE(0xe40010, 0xe40011) Blink Select
 //	AM_RANGE(0xe40012, 0xe40013) Plane Select
@@ -67,6 +67,9 @@ static ADDRESS_MAP_START(cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xff83c0, 0xff83c1) AM_DEVWRITE8(AY8910_TAG, ay8910_address_w, 0x00ff)
 	AM_RANGE(0xff83c2, 0xff83c3) AM_DEVREAD8(AY8910_TAG, ay8910_r, 0x00ff)
 	AM_RANGE(0xff83c4, 0xff83c5) AM_DEVWRITE8(AY8910_TAG, ay8910_data_w, 0x00ff)
+//	AM_RANGE(0xff8500, 0xff8501) Disk DMA Command Register
+//	AM_RANGE(0xff8502, 0xff8503) Disk DMA Address Register
+//	AM_RANGE(0xff8507, 0xff8507) Disk DMA Control/Status Register
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -83,32 +86,6 @@ static MACHINE_RESET(cgc7900)
 	devtag_get_device(machine, M68000_TAG)->reset();	
 }
 
-static VIDEO_START( cgc7900 )
-{
-}
-
-static VIDEO_UPDATE( cgc7900 )
-{
-    return 0;
-}
-
-/* F4 Character Displayer */
-static const gfx_layout cgc7900_charlayout =
-{
-	8, 8,					/* 8 x 8 characters */
-	256,					/* 256 characters */
-	1,					/* 1 bits per pixel */
-	{ 0 },					/* no bitplanes */
-	/* x offsets */
-	{ 7, 6, 5, 4, 3, 2, 1, 0 },
-	/* y offsets */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8					/* every char takes 8 bytes */
-};
-
-static GFXDECODE_START( cgc7900 )
-	GFXDECODE_ENTRY( "gfx1", 0x0000, cgc7900_charlayout, 0, 1 )
-GFXDECODE_END
 
 static msm8251_interface rs232_intf =
 {
@@ -144,18 +121,7 @@ static MACHINE_DRIVER_START( cgc7900 )
     MDRV_MACHINE_RESET(cgc7900)
 	
     /* video hardware */
-    MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(1024, 768)
-    MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	MDRV_GFXDECODE(cgc7900)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
-
-    MDRV_VIDEO_START(cgc7900)
-    MDRV_VIDEO_UPDATE(cgc7900)
+	MDRV_IMPORT_FROM(cgc7900_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

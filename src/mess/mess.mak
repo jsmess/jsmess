@@ -276,6 +276,7 @@ DRVLIBS = \
 	$(MESSOBJ)/cccp.a \
 	$(MESSOBJ)/cce.a \
 	$(MESSOBJ)/ccs.a \
+	$(MESSOBJ)/chromatics.a \
 	$(MESSOBJ)/coleco.a \
 	$(MESSOBJ)/comx.a \
 	$(MESSOBJ)/concept.a \
@@ -767,6 +768,10 @@ $(MESSOBJ)/cce.a:				\
 $(MESSOBJ)/ccs.a:				\
 	$(MESS_DRIVERS)/ccs2422.o	\
 	$(MESS_DRIVERS)/ccs2810.o	\
+
+$(MESSOBJ)/chromatics.a:		\
+	$(MESS_DRIVERS)/cgc7900.o	\
+	$(MESS_VIDEO)/cgc7900.o		\
 
 $(MESSOBJ)/coleco.a:			\
 	$(MESS_DRIVERS)/coleco.o	\
@@ -1642,7 +1647,6 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/fidelz80.o	\
 	$(MESS_DRIVERS)/pv9234.o 	\
 	$(MESS_DRIVERS)/dm7000.o 	\
-	$(MESS_DRIVERS)/chromati.o 	\
 	$(MESS_DRIVERS)/alesis.o 	\
 	$(MESS_DRIVERS)/vidbrain.o 	\
 	$(MESS_DRIVERS)/cd2650.o 	\

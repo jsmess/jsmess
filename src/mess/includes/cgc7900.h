@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __CGC7900__
 #define __CGC7900__
 
@@ -20,6 +22,11 @@ public:
 	UINT16 *plane_ram;
 	UINT16 *clut_ram;
 	UINT16 *overlay_ram;
+	UINT8 *char_rom;
 };
+
+/*----------- defined in video/cgc7900.c -----------*/
+
+MACHINE_DRIVER_EXTERN(cgc7900_video);
 
 #endif
