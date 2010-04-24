@@ -9,6 +9,8 @@ READ8_HANDLER( towns_gfx_r );
 WRITE8_HANDLER( towns_gfx_w );
 READ8_HANDLER( towns_video_cff80_r );
 WRITE8_HANDLER( towns_video_cff80_w );
+READ8_HANDLER( towns_video_cff80_mem_r );
+WRITE8_HANDLER( towns_video_cff80_mem_w );
 READ8_HANDLER(towns_video_440_r);
 WRITE8_HANDLER(towns_video_440_w);
 READ8_HANDLER(towns_video_5c8_r);

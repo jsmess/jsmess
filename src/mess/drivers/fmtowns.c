@@ -297,7 +297,7 @@ static READ8_HANDLER(towns_system_r)
 			ftimer -= 0x13;
 			return ftimer;
 		case 0x08:
-			logerror("SYS: (0x28) NMI mask read\n");
+			//logerror("SYS: (0x28) NMI mask read\n");
 			return nmi_mask & 0x01;
 		case 0x10:
 			logerror("SYS: (0x30) Machine ID read\n");
@@ -329,7 +329,7 @@ static WRITE8_HANDLER(towns_system_w)
 			logerror("SYS: (0x22) power port write %02x\n",data);
 			break;
 		case 0x08:
-			logerror("SYS: (0x28) NMI mask write %02x\n",data);
+			//logerror("SYS: (0x28) NMI mask write %02x\n",data);
 			nmi_mask = data & 0x01;
 			break;
 		case 0x12:
@@ -404,6 +404,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_irq_w )
 	if(towns_fdc_irq6mask == 0)
 		state = 0;
 	pic8259_ir6_w(device, state);  // IRQ6 = FDC
+	logerror("PIC: IRQ6 (FDC) set to %i\n",state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_drq_w )
@@ -567,7 +568,10 @@ static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int rele
 	}
 	towns_kb_status |= 0x01;
 	if(towns_kb_irq1_enable)
+	{
 		pic8259_ir1_w(dev, 1);
+		logerror("PIC: IRQ1 (keyboard) set high\n");
+	}
 	logerror("KB: sending scancode 0x%02x\n",scancode);
 }
 
@@ -605,8 +609,9 @@ static READ8_HANDLER(towns_keyboard_r)
 	{
 		case 0:  // scancode output
 			ret = towns_kb_output;
-			logerror("KB: read keyboard output port, returning %02x\n",ret);
+			//logerror("KB: read keyboard output port, returning %02x\n",ret);
 			pic8259_ir1_w(devtag_get_device(space->machine,"pic8259_master"), 0);
+			logerror("PIC: IRQ1 (keyboard) set low\n");
 			if(towns_kb_extend != 0xff)
 			{
 				towns_kb_sendcode(space->machine,towns_kb_extend,2);
@@ -742,6 +747,7 @@ static READ8_HANDLER(towns_sound_ctrl_r)
 			towns_pcm_channel_flag = 0;
 			towns_pcm_irq_flag = 0;
 			pic8259_ir5_w(devtag_get_device(space->machine,"pic8259_slave"), 0);
+			logerror("PIC: IRQ13 (PCM) set low\n");
 			break;
 		default:
 			logerror("FM: unimplemented port 0x%04x read\n",offset + 0x4e8);
@@ -1023,7 +1029,6 @@ void towns_update_video_banks(const address_space* space)
 //      memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
 		memory_set_bankptr(space->machine,"bank6",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
 		memory_set_bankptr(space->machine,"bank7",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
-		memory_set_bankptr(space->machine,"bank8",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcc000);
 		if(towns_system_port & 0x02)
 			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
 		else
@@ -1049,7 +1054,6 @@ void towns_update_video_banks(const address_space* space)
 		else
 			memory_set_bankptr(space->machine,"bank6",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
 		memory_set_bankptr(space->machine,"bank7",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
-		memory_set_bankptr(space->machine,"bank8",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcc000);
 		if(towns_system_port & 0x02)
 			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
 		else
@@ -1141,13 +1145,17 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 				{
 					towns_cd.status |= 0x80;
 					if(towns_cd.mpu_irq_enable)
+					{
 						pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 1);
+						logerror("PIC: IRQ9 (CD-ROM) set high\n");
+					}
 				}
 			}
 			else
 			{
 				towns_cd.status &= ~0x80;
 				pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 0);
+				logerror("PIC: IRQ9 (CD-ROM) set low\n");
 			}
 			break;
 		case TOWNS_CD_IRQ_DMA:
@@ -1157,13 +1165,17 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 				{
 					towns_cd.status |= 0x40;
 					if(towns_cd.dma_irq_enable)
+					{
 						pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 1);
+						logerror("PIC: IRQ9 (CD-ROM DMA) set high\n");
+					}
 				}
 			}
 			else
 			{
 				towns_cd.status &= ~0x40;
 				pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 0);
+				logerror("PIC: IRQ9 (CD-ROM DMA) set low\n");
 			}
 			break;
 	}
@@ -1743,11 +1755,13 @@ void towns_fm_irq(running_device* device, int irq)
 	{
 		towns_fm_irq_flag = 1;
 		pic8259_ir5_w(pic, 1);
+		logerror("PIC: IRQ13 (FM) set high\n");
 	}
 	else
 	{
 		towns_fm_irq_flag = 0;
 		pic8259_ir5_w(pic, 0);
+		logerror("PIC: IRQ13 (FM) set low\n");
 	}
 }
 
@@ -1761,6 +1775,7 @@ void towns_pcm_irq(running_device* device, int channel)
 	{
 		towns_pcm_channel_flag |= (1 << channel);
 		pic8259_ir5_w(pic, 1);
+		logerror("PIC: IRQ13 (PCM) set high\n");
 	}
 }
 
@@ -1777,6 +1792,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 	if(towns_timer_mask & 0x01)
 	{
 		pic8259_ir0_w(dev, state);
+		logerror("PIC: IRQ0 (PIT Timer) set to %i\n",state);
 	}
 }
 
@@ -1797,8 +1813,8 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
   AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
   AM_RANGE(0x000cb000, 0x000cbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
-  AM_RANGE(0x000cc000, 0x000cff7f) AM_RAMBANK("bank8")
-  AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
+  AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
+  AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_mem_r,towns_video_cff80_mem_w,0xffffffff)
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
   AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
@@ -1821,7 +1837,7 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000c0000, 0x000c7fff) AM_READWRITE8(towns_gfx_r,towns_gfx_w,0xffffffff)
   AM_RANGE(0x000c8000, 0x000cafff) AM_READWRITE8(towns_spriteram_low_r,towns_spriteram_low_w,0xffffffff)
   AM_RANGE(0x000cb000, 0x000cbfff) AM_READ_BANK("bank6") AM_WRITE_BANK("bank7")
-  AM_RANGE(0x000cc000, 0x000cff7f) AM_RAMBANK("bank8")
+  AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
   AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
   AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) // CMOS? RAM

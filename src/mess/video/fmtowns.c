@@ -283,8 +283,6 @@ static void towns_update_kanji_offset(void)
 READ8_HANDLER( towns_video_cff80_r )
 {
 	UINT8* ROM = memory_region(space->machine,"user");
-	if(towns_mainmem_enable != 0)
-		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xcff80];
 
 	switch(offset)
 	{
@@ -317,12 +315,6 @@ READ8_HANDLER( towns_video_cff80_r )
 
 WRITE8_HANDLER( towns_video_cff80_w )
 {
-	if(towns_mainmem_enable != 0)
-	{
-		messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xcff80] = data;
-		return;
-	}
-
 	switch(offset)
 	{
 		case 0x00:  // mix register
@@ -360,6 +352,23 @@ WRITE8_HANDLER( towns_video_cff80_w )
 	}
 }
 
+READ8_HANDLER( towns_video_cff80_mem_r )
+{
+	if(towns_mainmem_enable != 0)
+		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xcff80];
+	
+	return towns_video_cff80_r(space,offset);
+}
+
+WRITE8_HANDLER( towns_video_cff80_mem_w )
+{
+	if(towns_mainmem_enable != 0)
+	{
+		messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xcff80] = data;
+		return;
+	}
+	towns_video_cff80_w(space,offset,data);
+}
 /*
  *  port 0x440-0x443 - CRTC
  *      0x440 = register select
@@ -378,12 +387,12 @@ READ8_HANDLER(towns_video_440_r)
 		case 0x00:
 			return towns_crtc_sel;
 		case 0x02:
-			logerror("CRTC: reading register %i (0x442) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
+//			logerror("CRTC: reading register %i (0x442) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
 			if(towns_crtc_sel == 30)
 					return 0x00;
 			return towns_crtc_reg[towns_crtc_sel] & 0x00ff;
 		case 0x03:
-			logerror("CRTC: reading register %i (0x443) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
+//			logerror("CRTC: reading register %i (0x443) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
 			if(towns_crtc_sel == 30)
 			{
 				// check video position
@@ -438,13 +447,13 @@ WRITE8_HANDLER(towns_video_440_w)
 			towns_crtc_sel = data;
 			break;
 		case 0x02:
-			logerror("CRTC: writing register %i (0x442) [%02x]\n",towns_crtc_sel,data);
+//			logerror("CRTC: writing register %i (0x442) [%02x]\n",towns_crtc_sel,data);
 			towns_crtc_reg[towns_crtc_sel] =
 				(towns_crtc_reg[towns_crtc_sel] & 0xff00) | data;
 			towns_crtc_refresh_mode(space->machine);
 			break;
 		case 0x03:
-			logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
+//			logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
 			towns_crtc_reg[towns_crtc_sel] =
 				(towns_crtc_reg[towns_crtc_sel] & 0x00ff) | (data << 8);
 			towns_crtc_refresh_mode(space->machine);
@@ -507,6 +516,7 @@ WRITE8_HANDLER(towns_video_5c8_w)
 READ8_HANDLER(towns_video_fd90_r)
 {
 	UINT8 ret = 0;
+	UINT16 xpos;
 	switch(offset)
 	{
 		case 0x00:
@@ -526,7 +536,12 @@ READ8_HANDLER(towns_video_fd90_r)
 		case 0x0e:
 		case 0x0f:
 			return towns_degipal[offset-0x08];
-		case 0x10:  // "sub status register" - bit 0 = vblank, bit 1 = hblank
+		case 0x10:  // "sub status register"
+			// check video position
+			xpos = video_screen_get_hpos(space->machine->primary_screen);
+			
+			if(xpos < towns_crtc_layerscr[0].max_x && xpos > towns_crtc_layerscr[0].min_x)
+				ret |= 0x02;
 			if(towns_vblank_flag)
 				ret |= 0x01;
 			return ret;
@@ -566,7 +581,7 @@ WRITE8_HANDLER(towns_video_fd90_w)
 			towns_layer_ctrl = data;	
 			break;
 	}
-	logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
+	//logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
 }
 
 READ8_HANDLER(towns_video_ff81_r)
