@@ -1691,5 +1691,6 @@ const game_driver * const drivers[] =
 	DRIVER( dolphin )
 	DRIVER( chaos )
 	DRIVER( z80dev )
+	DRIVER( pegasus )
 	
 #endif /* DRIVER_RECURSIVE */
