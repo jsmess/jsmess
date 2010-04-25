@@ -219,7 +219,7 @@ VIDEO_UPDATE( pegasus )
 			}
 			else
 			{
-				for(j = 0; j < 16; j++ )
+				for(j = 0; j < 15; j++ )
 				{
 					l = get_mcm6571a_line(code &0x7f, j);
 					for(b = 0; b < 7; b++ )
