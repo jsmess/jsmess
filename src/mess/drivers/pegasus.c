@@ -11,11 +11,14 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "includes/pegasus.h"
+
 
 static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0xbfff) AM_RAM
+	AM_RANGE(0x2000, 0xbdff) AM_RAM
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram) // Video RAM
 /*	AM-RANGE(0xe200, 0xe3ff) PCG
 	AM-RANGE(0xe400, 0xe5ff) PIA-1
 	AM-RANGE(0xe600, 0xe7ff) PIA-0
@@ -34,15 +37,6 @@ static MACHINE_RESET(pegasus)
 {	
 }
 
-static VIDEO_START( pegasus )
-{
-}
-
-static VIDEO_UPDATE( pegasus )
-{
-	return 0;
-}
-
 static MACHINE_DRIVER_START( pegasus )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, XTAL_4MHz)
@@ -55,12 +49,10 @@ static MACHINE_DRIVER_START( pegasus )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_SIZE(32*10, 16*16)
+	MDRV_SCREEN_VISIBLE_AREA(0, 32*10-1, 0, 16*15-1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
-
-	MDRV_VIDEO_START(pegasus)
 	MDRV_VIDEO_UPDATE(pegasus)
 MACHINE_DRIVER_END
 

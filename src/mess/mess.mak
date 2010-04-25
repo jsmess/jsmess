@@ -1656,6 +1656,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/chaos.o 	\
 	$(MESS_DRIVERS)/z80dev.o 	\
 	$(MESS_DRIVERS)/pegasus.o 	\
+	$(MESS_VIDEO)/pegasus.o 	\
 	
 
 
