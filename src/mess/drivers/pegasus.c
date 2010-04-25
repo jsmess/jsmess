@@ -6,6 +6,9 @@
 
         23/04/2010 Skeleton driver.
 
+	Each copy of the monitor rom was made for an individual machine.
+	Therefore the only way to emulate is to hack out the protection check.
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -18,8 +21,9 @@ static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0xbdff) AM_RAM
-	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram) // Video RAM
-/*	AM-RANGE(0xe200, 0xe3ff) PCG
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram)
+/*	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection)
+	AM-RANGE(0xe200, 0xe3ff) PCG
 	AM-RANGE(0xe400, 0xe5ff) PIA-1
 	AM-RANGE(0xe600, 0xe7ff) PIA-0
 	AM-RANGE(0xe800, 0xe807) Printer Port
@@ -39,7 +43,7 @@ static MACHINE_RESET(pegasus)
 
 static MACHINE_DRIVER_START( pegasus )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809E, XTAL_4MHz)
+	MDRV_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C
 	MDRV_CPU_PROGRAM_MAP(pegasus_mem)
 
 	MDRV_MACHINE_RESET(pegasus)
@@ -60,6 +64,7 @@ MACHINE_DRIVER_END
 ROM_START( pegasus )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "mon1_1_2674.bin", 0xf000, 0x1000, CRC(1640ff7e) SHA1(8199643749fb40fb8be05e9f311c75620ca939b1) )
+	ROM_FILL(0xf09e, 1, 0x20)		// hack out the protection
 ROM_END
 
 /* Driver */
