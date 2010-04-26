@@ -520,7 +520,8 @@ casserr_t cassette_put_samples(cassette_image *cassette, int channel,
 	const UINT8 *source_ptr;
 	double d;
 
-	assert(cassette);
+	if (!cassette)
+		return CASSETTE_ERROR_SUCCESS;
 
 	if (sample_period == 0)
 		return CASSETTE_ERROR_SUCCESS;
