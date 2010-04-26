@@ -85,6 +85,13 @@ struct fdidsk_tag
 	int heads;								/* number of physical heads */
 	int tracks;								/* number of physical tracks */
 	UINT32 track_offset[MAX_TRACKS];		/* offset within data for each track */
+	UINT8 track_type[MAX_TRACKS];
+};
+
+struct fdi_track
+{
+	UINT8 type;
+	UINT8 size;
 };
 
 struct fdi_header
@@ -102,6 +109,20 @@ struct fdi_header
 	UINT8 tpi;
 	UINT8 headwidth;
 	UINT8 reserved[2];
+	struct fdi_track track[MAX_TRACKS];
+};
+
+struct fdi_pulse_track_header
+{
+	UINT8 numpulses[4];
+	UINT8 averagesz[3];
+	UINT8 minsize[3];
+	UINT8 maxsize[3];
+	UINT8 indexsize[3];
+//	UINT8 averagedt[averagesz];
+//	UINT8 mindata[minsize];
+//	UINT8 maxdata[maxsize];
+//	UINT8 indexdata[indexsize];
 };
 
 /***************************************************************************
@@ -234,6 +255,20 @@ FLOPPY_CONSTRUCT( fdi_dsk_construct )
 	}
 
 	/* find track offsets */
+	int offset = sizeof(header);
+
+	for (int track = 0; track < tag->tracks; track++)
+	{
+		UINT8 type = header.track[track].type;
+		int size = header.track[track].size * 256;
+
+		if (LOG) logerror("FDI track %u type %02x size %u offset %u\n", track, type, size, offset);
+
+		tag->track_offset[track] = offset;
+		tag->track_type[track] = type;
+
+		offset += size;
+	}
 
 	/* set callbacks */
 	struct FloppyCallbacks *callbacks = floppy_callbacks(floppy);
