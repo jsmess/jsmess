@@ -14,11 +14,16 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
+#include "devices/cartslot.h"
+#include "devices/cassette.h"
+#include "machine/ctronics.h"
 #include "includes/pegasus.h"
 
 static UINT8 pegasus_kbd_row = 0;
 static UINT8 pegasus_kbd_irq = 1;
 static UINT8 pegasus_control_bits = 0;
+static running_device *pegasus_cass;
+
 
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
@@ -64,10 +69,19 @@ static READ_LINE_DEVICE_HANDLER( pegasus_keyboard_irq )
 	return pegasus_kbd_irq;
 }
 
+static READ_LINE_DEVICE_HANDLER( pegasus_cassette_r )
+{
+	return cassette_input(pegasus_cass);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( pegasus_cassette_w )
+{
+	cassette_output(pegasus_cass, state ? 1 : -1);
+}
+
 static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
-	AM_RANGE(0x2000, 0xbdff) AM_RAM
+	AM_RANGE(0x0000, 0xbdff) AM_RAM
 	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe200, 0xe3ff) AM_RAM		// PCG
@@ -173,15 +187,15 @@ INPUT_PORTS_END
 /* System - for keyboard, video, general housekeeping */
 static const pia6821_interface pegasus_pia_s_intf=
 {
-	DEVCB_NULL,		/* port A input */
-	DEVCB_HANDLER(pegasus_keyboard_r),		/* port B input */	// high nibble from keyboard
-	DEVCB_NULL,		/* CA1 input */		// from cassette
-	DEVCB_NULL,		/* CB1 input */
-	DEVCB_LINE(pegasus_keyboard_irq),		/* CA2 input */		// do a IRQ when a key pressed
-	DEVCB_NULL,		/* CB2 input */
+	DEVCB_NULL,						/* port A input */
+	DEVCB_HANDLER(pegasus_keyboard_r),			/* port B input */
+	DEVCB_LINE(pegasus_cassette_r),				/* CA1 input */
+	DEVCB_NULL,						/* CB1 input */
+	DEVCB_LINE(pegasus_keyboard_irq),			/* CA2 input */
+	DEVCB_NULL,						/* CB2 input */
 	DEVCB_HANDLER(pegasus_keyboard_w),			/* port A output */
-	DEVCB_HANDLER(pegasus_controls),		/* port B output */	// low nibble housekeeping
-	DEVCB_NULL,		/* CA2 output */	// to cassette
+	DEVCB_HANDLER(pegasus_controls),			/* port B output */
+	DEVCB_LINE(pegasus_cassette_w),				/* CA2 output */
 	DEVCB_DEVICE_LINE("maincpu", pegasus_firq_clr),		/* CB2 output */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE),	/* IRQA output */
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)		/* IRQB output */
@@ -204,8 +218,30 @@ static const pia6821_interface pegasus_pia_u_intf=
 	DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
-static MACHINE_RESET(pegasus) 
-{	
+static const cassette_config pegasus_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED)
+};
+
+static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
+{
+	image_fread(image, memory_region(image->machine, "maincpu") + 0xc000, 0x1000);
+
+	return INIT_PASS;
+}
+
+static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
+{
+	image_fread(image, memory_region(image->machine, "maincpu") + 0xd000, 0x1000);
+
+	return INIT_PASS;
+}
+
+static MACHINE_START( pegasus )
+{
+	pegasus_cass = devtag_get_device(machine, "cassette");
 }
 
 static MACHINE_DRIVER_START( pegasus )
@@ -214,8 +250,7 @@ static MACHINE_DRIVER_START( pegasus )
 	MDRV_CPU_PROGRAM_MAP(pegasus_mem)
 
 	MDRV_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, HZ(50))
-	MDRV_MACHINE_RESET(pegasus)
-
+	MDRV_MACHINE_START(pegasus)
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -230,12 +265,19 @@ static MACHINE_DRIVER_START( pegasus )
 	/* devices */
 	MDRV_PIA6821_ADD( "pegasus_pia_s", pegasus_pia_s_intf )
 	MDRV_PIA6821_ADD( "pegasus_pia_u", pegasus_pia_u_intf )
+	MDRV_CARTSLOT_ADD("cart1")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_LOAD(pegasus_cart_1)
+	MDRV_CARTSLOT_ADD("cart2")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_LOAD(pegasus_cart_2)
+	MDRV_CASSETTE_ADD( "cassette", pegasus_cassette_config )
+//	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( pegasus )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-//	ROM_LOAD( "invaders.bin", 0x1000, 0x1000, CRC(e19be9e4) SHA1(77a2a3a7ddf2b30790860be994e9c4bab02c72d6) )
 	ROM_LOAD( "mon11_2674.bin", 0xf000, 0x1000, CRC(1640ff7e) SHA1(8199643749fb40fb8be05e9f311c75620ca939b1) )
 	ROM_FILL(0xf09e, 1, 0x20)		// hack out the protection
 //	ROM_LOAD( "mon23_2601.bin", 0xf000, 0x1000, CRC(7dd451bb) SHA1(7843e9166151570f9c915589dc252feb0cb1cec4) )
