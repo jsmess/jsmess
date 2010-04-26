@@ -326,7 +326,11 @@ static INT_PTR CALLBACK win_sectorview_dialog_proc(HWND dialog, UINT message,
 		case WM_COMMAND:
 			switch(HIWORD(wparam))
 			{
-				case BN_CLICKED:
+				case EN_CHANGE:
+					change_sector(dialog);
+					break;
+
+				default:
 					switch(LOWORD(wparam))
 					{
 						case IDOK:
@@ -334,10 +338,6 @@ static INT_PTR CALLBACK win_sectorview_dialog_proc(HWND dialog, UINT message,
 							EndDialog(dialog, 0);
 							break;
 					}
-					break;
-
-				case EN_CHANGE:
-					change_sector(dialog);
 					break;
 			}
 			break;

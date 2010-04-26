@@ -126,34 +126,32 @@ static INT_PTR CALLBACK win_association_dialog_proc(HWND dialog, UINT message,
 			break;
 
 		case WM_COMMAND:
-			if (HIWORD(wparam) == BN_CLICKED)
+			id = LOWORD(wparam);
+
+			if ((id == IDOK) || (id == IDCANCEL))
 			{
-				l = GetWindowLongPtr(dialog, GWLP_USERDATA);
-				dlginfo = (assocdlg_info *) l;
-				id = LOWORD(wparam);
-
-				if ((id == IDOK) || (id == IDCANCEL))
+				if (id == IDOK)
 				{
-					if (id == IDOK)
+					l = GetWindowLongPtr(dialog, GWLP_USERDATA);
+					dlginfo = (assocdlg_info *)l;
+
+					for (i = 0; i < dlginfo->extension_count; i++)
 					{
-						for (i = 0; i < dlginfo->extension_count; i++)
-						{
-							is_set = SendMessage(GetDlgItem(dialog, CONTROL_START + i), BM_GETCHECK, 0, 0);
+						is_set = SendMessage(GetDlgItem(dialog, CONTROL_START + i), BM_GETCHECK, 0, 0);
 
-							t_extension = tstring_from_utf8(dlginfo->extensions[i]);
-							_sntprintf(buf, ARRAY_LENGTH(buf), TEXT(".%s"), t_extension);
-							free(t_extension);
-							currently_set = win_is_extension_associated(&assoc_info, buf);
+						t_extension = tstring_from_utf8(dlginfo->extensions[i]);
+						_sntprintf(buf, ARRAY_LENGTH(buf), TEXT(".%s"), t_extension);
+						free(t_extension);
+						currently_set = win_is_extension_associated(&assoc_info, buf);
 
-							if (is_set && !currently_set)
-								win_associate_extension(&assoc_info, buf, TRUE);
-							else if (!is_set && currently_set)
-								win_associate_extension(&assoc_info, buf, FALSE);
-						}
+						if (is_set && !currently_set)
+							win_associate_extension(&assoc_info, buf, TRUE);
+						else if (!is_set && currently_set)
+							win_associate_extension(&assoc_info, buf, FALSE);
 					}
-
-					EndDialog(dialog, id);
 				}
+
+				EndDialog(dialog, id);
 			}
 			break;
 	}

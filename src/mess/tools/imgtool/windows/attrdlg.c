@@ -417,9 +417,9 @@ static INT_PTR CALLBACK putfileopt_dialogproc(HWND dialog, UINT message,
 			break;
 
 		case WM_COMMAND:
-			if (HIWORD(wparam) == BN_CLICKED)
+			rc = LOWORD(wparam);
+			if (rc == IDOK || rc == IDCANCEL)
 			{
-				rc = LOWORD(wparam);
 				if (rc == IDOK)
 				{
 					l = GetWindowLongPtr(dialog, GWLP_USERDATA);
