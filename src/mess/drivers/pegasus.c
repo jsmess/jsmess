@@ -81,7 +81,8 @@ static WRITE_LINE_DEVICE_HANDLER( pegasus_cassette_w )
 
 static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0xbdff) AM_RAM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0xb000, 0xbdff) AM_RAM
 	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe200, 0xe3ff) AM_RAM		// PCG
@@ -221,12 +222,26 @@ static const cassette_config pegasus_cassette_config =
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 {
-	image_fread(image, memory_region(image->machine, "maincpu") + 0xc000, 0x1000);
+	image_fread(image, memory_region(image->machine, "maincpu") + 0x0000, 0x1000);
 
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
+{
+	image_fread(image, memory_region(image->machine, "maincpu") + 0x1000, 0x1000);
+
+	return INIT_PASS;
+}
+
+static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
+{
+	image_fread(image, memory_region(image->machine, "maincpu") + 0xc000, 0x1000);
+
+	return INIT_PASS;
+}
+
+static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 {
 	image_fread(image, memory_region(image->machine, "maincpu") + 0xd000, 0x1000);
 
@@ -250,8 +265,8 @@ static MACHINE_DRIVER_START( pegasus )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*10, 16*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*10-1, 0, 16*15-1)
+	MDRV_SCREEN_SIZE(32*8, 16*16)
+	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 16*16-1)
 	MDRV_PALETTE_LENGTH(2)
 	MDRV_PALETTE_INIT(black_and_white)
 	MDRV_VIDEO_UPDATE(pegasus)
@@ -265,6 +280,12 @@ static MACHINE_DRIVER_START( pegasus )
 	MDRV_CARTSLOT_ADD("cart2")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_LOAD(pegasus_cart_2)
+	MDRV_CARTSLOT_ADD("cart3")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_LOAD(pegasus_cart_3)
+	MDRV_CARTSLOT_ADD("cart4")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_LOAD(pegasus_cart_4)
 	MDRV_CASSETTE_ADD( "cassette", pegasus_cassette_config )
 //	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 MACHINE_DRIVER_END

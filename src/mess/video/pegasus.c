@@ -158,18 +158,21 @@ static UINT8 get_mcm6571a_line(UINT8 code, UINT8 line)
 {
 	if (!mcm6571a_shift[code])
 	{
-		if (line < 9)
-			return mcm6571a[code*9 + line];
+		if (line < 1)
+			return 0;
+		else
+		if (line < 10)
+			return mcm6571a[code*9 + line - 1];
 		else
 			return 0;
 	}
 	else
 	{
-		if (line < 3)
+		if (line < 4)
 			return 0;
 		else
-		if (line <12)
-			return mcm6571a[code*9 + line - 3];
+		if (line <13)
+			return mcm6571a[code*9 + line - 4];
 		else
 			return 0;
 	}
@@ -180,56 +183,24 @@ static UINT8 get_mcm6571a_line(UINT8 code, UINT8 line)
 VIDEO_UPDATE( pegasus )
 {
 	UINT16 addr,xpos,x,y;
-	UINT8 b,j,l,r,code;
+	UINT8 b,j,l,code,inv;
 
 	for(y = 0; y < 16; y++ )
 	{
-		addr = y*32;
+		addr = y<<5;
 		xpos = 0;
 		for(x = 0; x < 32; x++ )
 		{
-			code = pegasus_video_ram[addr + x];
-			if (!(code & 0x80))
+			code = pegasus_video_ram[addr|x];
+			inv = (code >> 7) ^ 1;
+			for(j = 0; j < 16; j++ )
 			{
-				for(j = 0; j < 15; j++ )
-				{
-					l = j/5;
-					for(b = 0; b < 10; b++ )
-					{
-						r = b/5;
-						if (l==0 && r==0)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,5) ? 0 : 1;
-						else
-						if (l==0 && r==1)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,2) ? 0 : 1;
-						else
-						if (l==1 && r==0)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,4) ? 0 : 1;
-						else
-						if (l==1 && r==1)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,1) ? 0 : 1;
-						else
-						if (l==2 && r==0)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,3) ? 0 : 1;
-						else
-						if (l==2 && r==1)
-							*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) = BIT(code,0) ? 0 : 1;
-					}
-				}
+				l = get_mcm6571a_line(code &0x7f, j);
+				for(b = 0; b < 7; b++ )
+					*BITMAP_ADDR16(bitmap, (y<<4)|j, xpos+b ) =  inv ^ ((l >> (6-b)) & 1);
+				*BITMAP_ADDR16(bitmap, (y<<4)|j, xpos+7 ) =  inv;
 			}
-			else
-			{
-				for(j = 0; j < 15; j++ )
-				{
-					l = get_mcm6571a_line(code &0x7f, j);
-					for(b = 0; b < 7; b++ )
-						*BITMAP_ADDR16(bitmap, y*15+j, xpos+b ) =  (l >> (6-b)) & 1;
-					*BITMAP_ADDR16(bitmap, y*15+j, xpos+7 ) =  0;
-					*BITMAP_ADDR16(bitmap, y*15+j, xpos+8 ) =  0;
-					*BITMAP_ADDR16(bitmap, y*15+j, xpos+9 ) =  0;
-				}
-			}
-			xpos += 10;
+			xpos +=8;
 		}
 	}
 	return 0;
