@@ -1330,16 +1330,6 @@ static void append_menu_utf8(HMENU menu, UINT flags, UINT_PTR id, const char *st
 
 
 
-//============================================================
-//  append_menu_uistring
-//============================================================
-
-static void append_menu_uistring(HMENU menu, UINT flags, UINT_PTR id, const char *uistring)
-{
-	append_menu_utf8(menu, flags, id, uistring);
-}
-
-
 
 //============================================================
 //  remove_menu_items
@@ -1640,23 +1630,23 @@ static void prepare_menus(HWND wnd)
 				flags_for_writing |= MF_GRAYED;
 
 			sub_menu = CreateMenu();
-			append_menu_uistring(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		"Mount...");
+			append_menu_utf8(sub_menu, MF_STRING,		new_item + DEVOPTION_OPEN,		"Mount...");
 
 			if (info.creatable)
-				append_menu_uistring(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	"Create...");
+				append_menu_utf8(sub_menu, MF_STRING,	new_item + DEVOPTION_CREATE,	"Create...");
 
-			append_menu_uistring(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	"Unmount");
+			append_menu_utf8(sub_menu, flags_for_exists,	new_item + DEVOPTION_CLOSE,	"Unmount");
 
 			if ((img->type == CASSETTE) && !strcmp(info.file_extensions, "wav"))
 			{
 				cassette_state state;
 				state = (cassette_state)(image_exists(img) ? (cassette_get_state(img) & CASSETTE_MASK_UISTATE) : CASSETTE_STOPPED);
-				append_menu_uistring(sub_menu, MF_SEPARATOR, 0, NULL);
-				append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	"Pause/Stop");
-				append_menu_uistring(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			"Play");
-				append_menu_uistring(sub_menu, flags_for_writing	| ((state == CASSETTE_RECORD)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_RECORD,		"Record");
-				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		"Rewind");
-				append_menu_uistring(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	"Fast Forward");
+				append_menu_utf8(sub_menu, MF_SEPARATOR, 0, NULL);
+				append_menu_utf8(sub_menu, flags_for_exists	| ((state == CASSETTE_STOPPED)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_STOPPAUSE,	"Pause/Stop");
+				append_menu_utf8(sub_menu, flags_for_exists	| ((state == CASSETTE_PLAY)		? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_PLAY,			"Play");
+				append_menu_utf8(sub_menu, flags_for_writing	| ((state == CASSETTE_RECORD)	? MF_CHECKED : 0),	new_item + DEVOPTION_CASSETTE_RECORD,		"Record");
+				append_menu_utf8(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_REWIND,		"Rewind");
+				append_menu_utf8(sub_menu, flags_for_exists,														new_item + DEVOPTION_CASSETTE_FASTFORWARD,	"Fast Forward");
 			}
 			s = image_exists(img) ? image_filename(img) : "[empty slot]";
 			flags = MF_POPUP;
