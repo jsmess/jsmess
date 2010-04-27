@@ -5,9 +5,8 @@
 	http://web.mac.com/lord_philip/aamber_pegasus/Aamber_Pegasus.html
 
 	Each copy of the monitor rom was made for an individual machine.
-	Therefore the only way to emulate is to hack out the protection check.
-
-	Protection does not exist in all bios versions.
+	The early bios versions checked that it was running on that
+	particular computer.
 
 	This computer has no sound.
 
@@ -113,13 +112,21 @@ static WRITE8_HANDLER( pegasus_pcg_w )
 	}
 }
 
+/* Must return the A register except when it is doing a rom search */
+static READ8_HANDLER( pegasus_protection_r )
+{
+	UINT8 data = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), M6809_A);
+	if (data == 0x20) data = 0xff;
+	return data;
+}
+
 static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xb000, 0xbdff) AM_RAM
 	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
-	/* AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection) */
+	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
 	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_u", pia6821_r, pia6821_w)
 	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_s", pia6821_r, pia6821_w)
@@ -360,10 +367,23 @@ MACHINE_DRIVER_END
 /* ROM definition */
 ROM_START( pegasus )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "mon11_2674.bin", 0xf000, 0x1000, CRC(1640ff7e) SHA1(8199643749fb40fb8be05e9f311c75620ca939b1) )
-	ROM_FILL(0xf09e, 1, 0x20)		// hack out the protection
-//	ROM_LOAD( "mon23_2601.bin", 0xf000, 0x1000, CRC(7dd451bb) SHA1(7843e9166151570f9c915589dc252feb0cb1cec4) )
-//	ROM_LOAD( "mon23a_2569.bin", 0xf000, 0x1000, CRC(b4c6b352) SHA1(10bb08305a574dab48d0384e35d0781b6bde880f) )
+	ROM_SYSTEM_BIOS(0, "11r2674", "Monitor 1.1 r2674")
+	ROMX_LOAD( "mon11_2674.bin", 0xf000, 0x1000, CRC(1640ff7e) SHA1(8199643749fb40fb8be05e9f311c75620ca939b1), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS(1, "10r2569", "Monitor 1.0 r2569")
+	ROMX_LOAD( "mon10_2569.bin", 0xf000, 0x1000, CRC(910fc930) SHA1(a4f6bbe5def0268cc49ee7045616a39017dd8052), ROM_BIOS(2) )
+	ROM_SYSTEM_BIOS(2, "11r2569", "Monitor 1.1 r2569")
+	ROMX_LOAD( "mon11_2569.bin", 0xf000, 0x1000, CRC(07b92002) SHA1(3c434601120870c888944ecd9ade5186432ddbc2), ROM_BIOS(3) )
+	ROM_SYSTEM_BIOS(3, "11r2669", "Monitor 1.1 r2669")
+	ROMX_LOAD( "mon11_2669.bin", 0xf000, 0x1000, CRC(f3ee23c8) SHA1(3ac96935668f5e53799c90db5140393c2ef9ce36), ROM_BIOS(4) )
+	ROM_SYSTEM_BIOS(4, "22r2856", "Monitor 2.2 r2856")
+	ROMX_LOAD( "mon22_2856.bin", 0xf000, 0x1000, CRC(5f5f688a) SHA1(3719eecc347e158dd027ea7aa8a068cdafc00d9b), ROM_BIOS(5) )
+	ROM_SYSTEM_BIOS(5, "22br2856", "Monitor 2.2B r2856")
+	ROMX_LOAD( "mon22b_2856.bin", 0xf000, 0x1000, CRC(a47b0308) SHA1(f215e51aa8df6aed99c10f3df6a3589cb9f63d46), ROM_BIOS(6) )
+	ROM_SYSTEM_BIOS(6, "23r2601", "Monitor 2.3 r2601")
+	ROMX_LOAD( "mon23_2601.bin", 0xf000, 0x1000, CRC(0e024222) SHA1(9950cba08996931b9d5a3368b44c7309638b4e08), ROM_BIOS(7) )
+	ROM_SYSTEM_BIOS(7, "23ar2569", "Monitor 2.3A r2569")
+	ROMX_LOAD( "mon23a_2569.bin", 0xf000, 0x1000, CRC(248e62c9) SHA1(adbde27e69b38b29ff89bacf28d0240a8e5d90f3), ROM_BIOS(8) )
+
 	ROM_REGION( 0x800, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
