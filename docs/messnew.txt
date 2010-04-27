@@ -30,6 +30,7 @@ Skeleton drivers:
 - Chaos 2
 - EC-1849 [thanks to Anasana]
 - Z80 development board (unknown)
+- Aamber Pegasus [thanks to Lord Philip][Robbbert]
 
 
 System Driver Changes:
@@ -38,11 +39,17 @@ System Driver Changes:
 - [AQUARIUS] Replaced bad char ROM with the newly redumped one.
   [jaybird3rd, Dirk Best]
 
+- [ChannelF] - Added support for CHF extension. [Robbbert]
+
 - [CBM] Added JiffyDOS BIOSes to VIC-20, C64, C128, Plus/4. [Curt Coder]
 
-- [SX64] Added 1541 FLASH! BIOS. [Guru, Curt Coder]
+- [Interact] - Added support for CIN extension. [Robbbert]
+
+- [MBEE] Fixed crash of mbeeic when displaying I/O in debugger. [Robbbert]
 
 - [MTX] Cleaned up driver and added cassette device. [Curt Coder]
+
+- [SX64] Added 1541 FLASH! BIOS. [Guru, Curt Coder]
 
 - [SAMCOUPE] Added border rendering support.  [Dirk Best]
 
@@ -58,6 +65,8 @@ System Driver Changes:
 - [TI81] Added v1.1K BIOS. [critor]
 
 - [TI99] Cleanups.  [Michael Zapf]
+
+- [VIC20] Fixed quick-loading from the commandline, bug 1935. [Robbbert]
 
 - [VICTOR9K] Connected MC6852 device. [Curt Coder]
 
@@ -115,6 +124,14 @@ Source Changes:
   format before calling it. (bug #1934) [Michael Zapf]
 
 - Implemented get_track_size function for D64 and G64 formats. [Curt Coder]
+
+- Fixed display of hash (hsi) details in MESSUI software picker, bug 1841. [Robbbert]
+
+- Fixed 8080/8085 debugger when changing A and F registers. [Robbbert]
+
+- Fixed cassette crash if the premounted image was moved. [Robbbert]
+
+- Fixed cassette crash if the image being recorded was unmounted. [Robbbert]
 
 
 
