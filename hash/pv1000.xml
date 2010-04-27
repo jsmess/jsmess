@@ -1,6 +1,30 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pv1000" description="Casio PV-1000 cartridges">
+	<!-- GPA-101 -->
+	<software name="pooyan">
+		<description>Pooyan</description>
+		<year>1982</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="pooyan.bin" size="8192" crc="bd6edc48" sha1="606b7d603da23e70012b361d7ffb53ea026f88f5" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- GPA-102 -->
+	<software name="scobra">
+		<description>Super Cobra</description>
+		<year>1981</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="scobra.bin" size="8192" crc="cdffc2cd" sha1="9e748050ccb0fa948b06346d241dfcd11868e8e2" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- GPA-104 -->
 	<software name="amidar">
 		<description>Amidar</description>
@@ -9,6 +33,18 @@
 		<part name="cart" interface="pv1000_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="amidar.bin" size="8192" crc="c82628cc" sha1="00322d4025fef19728194442f9e06a4cccd01933" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- GPA-109 -->
+	<software name="pchnkufo">
+		<description>Pachinko-UFO</description>
+		<year>1982</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pv1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pchnkufo.bin" size="16384" crc="9ee981ab" sha1="d6ca45430a34ce0090ba882ade5a2268a862d4f4" offset="0000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25,26 +61,12 @@
 		</part>
 	</software>
 
-	<!-- GPA-101 -->
-	<software name="pooyan">
-		<description>Pooyan</description>
-		<year>1982</year>
-		<publisher>Casio</publisher>
-		<part name="cart" interface="pv1000_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="pooyan.bin" size="8192" crc="bd6edc48" sha1="606b7d603da23e70012b361d7ffb53ea026f88f5" offset="0000" />
-			</dataarea>
-		</part>
-	</software>
-
 <!--
-	/* Super Cobra GPA-102 */
 	/* Tutankham GPA-103 */
 	/* Dig Dug GPA-105 */
 	/* Warp & Warp GPA-106 */
 	/* Turpin GPA-107 */
 	/* GPA-108 */
-	/* Pachinko-UFO GPA-109 */
 	/* Fighting Bug GPA-110 */
 	/* Space Panic GPA-111 */
 	/* Naughty Boy GPA-112 */
