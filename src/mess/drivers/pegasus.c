@@ -1,13 +1,32 @@
 /***************************************************************************
    
-        Aamber Pegasus computer (New Zealand)
+	Aamber Pegasus computer (New Zealand)
 
 	http://web.mac.com/lord_philip/aamber_pegasus/Aamber_Pegasus.html
 
-        23/04/2010 Skeleton driver.
-
 	Each copy of the monitor rom was made for an individual machine.
 	Therefore the only way to emulate is to hack out the protection check.
+
+	Protection does not exist in all bios versions.
+
+	This computer has no sound.
+
+	The usual way of loading a new rom was to plug it into the board.
+	We have replaced this with cartslots, to save having to recompile
+	whenever a new rom is found. Single rom programs will usually work in
+	any slot (if it is going to work at all). A working rom will appear
+	in the menu. Press the first letter to run it.
+
+	If a machine language program is loaded via cassette, do it in the
+	Monitor (L command), when loaded press Enter, and it will be in the
+	menu.
+
+	Basic cassettes are loaded in the usual way, that is, start Basic,
+	type LOAD, press Enter. When done, RUN or LIST as needed.
+
+	TO DO:
+	- Identify which rom slots the multi-rom programs should be fitted to.
+	- Work on the other non-working programs
 
 ****************************************************************************/
 
@@ -16,7 +35,6 @@
 #include "machine/6821pia.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
-#include "machine/ctronics.h"
 #include "includes/pegasus.h"
 
 static UINT8 pegasus_kbd_row = 0;
@@ -55,10 +73,11 @@ static WRITE8_DEVICE_HANDLER( pegasus_keyboard_w )
 
 static WRITE8_DEVICE_HANDLER( pegasus_controls )
 {
-/*	Bit 0 - Blank - Video blanking
-	Bit 1 - Char - select character rom or ram
-	Bit 2 - Page - enables video ram
-	Bit 3 - Asc - Select which half of the keyboard to read
+/*	d0,d2 - not emulated
+	d0 - Blank - Video blanking
+	d1 - Char - select character rom or ram
+	d2 - Page - enables writing to video ram
+	d3 - Asc - Select which half of the keyboard to read
 */
 
 	pegasus_control_bits = data;
@@ -76,7 +95,7 @@ static READ_LINE_DEVICE_HANDLER( pegasus_cassette_r )
 
 static WRITE_LINE_DEVICE_HANDLER( pegasus_cassette_w )
 {
-	cassette_output(pegasus_cass, state ? 1 : -1);
+	cassette_output(pegasus_cass, state ? 0.75 : -0.75);
 }
 
 static READ8_HANDLER( pegasus_pcg_r )
@@ -100,15 +119,11 @@ static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xb000, 0xbdff) AM_RAM
 	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
+	/* AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection) */
 	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
 	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_u", pia6821_r, pia6821_w)
 	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_s", pia6821_r, pia6821_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
-
-/*	AM_RANGE(0xe000, 0xe000) AM_READ(pegasus_protection)
-	AM_RANGE(0xe800, 0xe800) Printer Port
-	AM_RANGE(0xe808, 0xe808) Cassette Interface
-	AM_RANGE(0xe810, 0xe810) General Purpose User Interface */
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -235,9 +250,30 @@ static const cassette_config pegasus_cassette_config =
 	(cassette_state)(CASSETTE_STOPPED|CASSETTE_MOTOR_ENABLED)
 };
 
+/* An encrypted single rom starts with 02, decrypted with 20. Not sure what
+	multipart roms will have. */
+static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
+{
+	UINT8 b, *ROM = memory_region(machine, "maincpu");
+	UINT16 i, j;
+	if (ROM[addr] == 0x02)
+	{
+		for (i = 0; i < 0x1000; i++)
+		{
+			b = ROM[addr|i];
+			j = BITSWAP16( i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7 );
+			b = BITSWAP8( b, 3, 2, 1, 0, 7, 6, 5, 4 );
+			ROM[0x2000|(j&0xfff)] = b;
+		}
+		for (i = 0; i < 0x1000; i++)
+			ROM[addr|i] = ROM[0x2000|i];
+	}
+}
+
 static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 {
 	image_fread(image, memory_region(image->machine, "maincpu") + 0x0000, 0x1000);
+	pegasus_decrypt_rom( image->machine, 0x0000 );
 
 	return INIT_PASS;
 }
@@ -245,6 +281,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 {
 	image_fread(image, memory_region(image->machine, "maincpu") + 0x1000, 0x1000);
+	pegasus_decrypt_rom( image->machine, 0x1000 );
 
 	return INIT_PASS;
 }
@@ -252,6 +289,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 {
 	image_fread(image, memory_region(image->machine, "maincpu") + 0xc000, 0x1000);
+	pegasus_decrypt_rom( image->machine, 0xc000 );
 
 	return INIT_PASS;
 }
@@ -259,6 +297,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 {
 	image_fread(image, memory_region(image->machine, "maincpu") + 0xd000, 0x1000);
+	pegasus_decrypt_rom( image->machine, 0xd000 );
 
 	return INIT_PASS;
 }
@@ -269,6 +308,18 @@ static MACHINE_START( pegasus )
 	FNT = memory_region(machine, "pcg");
 }
 
+static MACHINE_RESET( pegasus )
+{
+	pegasus_kbd_row = 0;
+	pegasus_kbd_irq = 1;
+	pegasus_control_bits = 0;
+}
+
+static DRIVER_INIT( pegasus )
+{
+	pegasus_decrypt_rom( machine, 0xf000 );
+}
+
 static MACHINE_DRIVER_START( pegasus )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C
@@ -276,6 +327,7 @@ static MACHINE_DRIVER_START( pegasus )
 
 	MDRV_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, HZ(400))	// controls accuracy of the clock (ctrl-P)
 	MDRV_MACHINE_START(pegasus)
+	MDRV_MACHINE_RESET(pegasus)
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -303,7 +355,6 @@ static MACHINE_DRIVER_START( pegasus )
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_LOAD(pegasus_cart_4)
 	MDRV_CASSETTE_ADD( "cassette", pegasus_cassette_config )
-//	MDRV_CENTRONICS_ADD("centronics", standard_centronics)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -319,5 +370,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, pegasus,  0,     0, 	pegasus, 	pegasus, 	 0,  "Technosys",   "Aamber Pegasus", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, pegasus,  0,     0,      pegasus, 	pegasus, pegasus, "Technosys",   "Aamber Pegasus", GAME_NO_SOUND )
 
