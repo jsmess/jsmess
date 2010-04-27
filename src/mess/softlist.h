@@ -34,6 +34,7 @@ struct _software_info
 {
 	const char *shortname;
 	const char *longname;
+	const char *parentname;
 	const char *year;			/* Copyright year on title screen, actual release dates can be tracked in external resources */
 	const char *publisher;
 	UINT32 supported;

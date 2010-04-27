@@ -13,6 +13,7 @@
 #include "emuopts.h"
 #include "softlist.h"
 
+#include <ctype.h>
 
 enum softlist_parse_position
 {
@@ -60,6 +61,8 @@ struct _software_list
 	void (*error_proc)(const char *message);
 };
 
+
+typedef tagmap_t<software_info *> softlist_map;
 
 /***************************************************************************
     EXPAT INTERFACES
@@ -315,6 +318,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			if ( !strcmp( tagname, "software" ) )
 			{
 				const char *name = NULL;
+				const char *parent = NULL;
 				const char *supported = NULL;
 
 				for ( ; attributes[0]; attributes += 2 )
@@ -322,6 +326,10 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					if ( !strcmp( attributes[0], "name" ) )
 					{
 						name = attributes[1];
+					}
+					if ( !strcmp( attributes[0], "cloneof" ) )
+					{
+						parent = attributes[1];
 					}
 					if ( !strcmp( attributes[0], "supported" ) )
 					{
@@ -346,6 +354,13 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						return;
 
 					strcpy( (char *)elem->info.shortname, name );
+
+					/* Allocate space to hold the parentname and copy the parent name */
+					if (parent)
+					{
+						elem->info.parentname = (const char*)pool_malloc_lib(swlist->pool, ( strlen(parent) + 1 ) * sizeof(char) );
+						strcpy((char *)elem->info.parentname, parent);
+					}
 
 					/* Allocate initial space to hold part information */
 					swlist->part_entries = 2;
@@ -1043,6 +1058,68 @@ static DEVICE_START( software_list )
 {
 }
 
+static DEVICE_VALIDITY_CHECK( software_list )
+{
+	software_list_config *swlist = (software_list_config *)device->inline_config;
+	int error = FALSE, is_clone = 0;
+	softlist_map names;
+	softlist_map descriptions;
+
+	enum { NAME_LEN_PARENT = 8, NAME_LEN_CLONE = 16 };
+
+	for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
+	{
+		if (swlist->list_name[i])
+		{
+			if (mame_options() == NULL) 
+				return FALSE;
+			
+			software_list *list = software_list_open(mame_options(), swlist->list_name[i], FALSE, NULL);
+			
+			for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
+			{
+				const char *s;
+				
+				/* check for duplicate names */
+				if (names.add(swinfo->shortname, swinfo, FALSE) == TMERR_DUPLICATE)
+				{
+					software_info *match = names.find(swinfo->shortname);
+					mame_printf_error("%s: %s is a duplicate name (%s)\n", swlist->list_name[i], swinfo->shortname, match->shortname);
+					error = TRUE;
+				}
+				
+				/* check for duplicate descriptions */
+				if (descriptions.add(swinfo->longname, swinfo, FALSE) == TMERR_DUPLICATE)
+				{
+					software_info *match = names.find(swinfo->shortname);
+					mame_printf_error("%s: %s is a duplicate description (%s)\n", swlist->list_name[i], swinfo->longname, match->longname);
+					error = TRUE;
+				}
+				
+				if (swinfo->parentname != NULL)
+					is_clone = 1;
+				
+				/* make sure the driver name is 8 chars or less */
+				if ((is_clone && strlen(swinfo->shortname) > NAME_LEN_CLONE) || ((!is_clone) && strlen(swinfo->shortname) > NAME_LEN_PARENT))
+				{
+					mame_printf_error("%s: %s %s driver name must be %d characters or less\n", swlist->list_name[i], swinfo->shortname,
+									  is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
+					error = TRUE;
+				}
+				
+				/* make sure the year is only digits, '?' or '+' */
+				for (s = swinfo->year; *s; s++)
+					if (!isdigit((UINT8)*s) && *s != '?' && *s != '+')
+					{
+						mame_printf_error("%s: %s has an invalid year '%s'\n", swlist->list_name[i], swinfo->shortname, swinfo->year);
+						error = TRUE;
+						break;
+					}
+			}
+		}
+	}
+	return error;
+}	
 
 DEVICE_GET_INFO( software_list )
 {
@@ -1056,6 +1133,7 @@ DEVICE_GET_INFO( software_list )
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( software_list );	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */										break;
+		case DEVINFO_FCT_VALIDITY_CHECK:				info->validity_check = DEVICE_VALIDITY_CHECK_NAME( software_list ); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "Software lists");					break;
