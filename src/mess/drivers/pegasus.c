@@ -21,9 +21,9 @@
 
 static UINT8 pegasus_kbd_row = 0;
 static UINT8 pegasus_kbd_irq = 1;
-static UINT8 pegasus_control_bits = 0;
+UINT8 pegasus_control_bits = 0;
 static running_device *pegasus_cass;
-
+static UINT8 *FNT;
 
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
@@ -57,7 +57,7 @@ static WRITE8_DEVICE_HANDLER( pegasus_controls )
 {
 /*	Bit 0 - Blank - Video blanking
 	Bit 1 - Char - select character rom or ram
-	Bit 2 - Page - ?
+	Bit 2 - Page - enables video ram
 	Bit 3 - Asc - Select which half of the keyboard to read
 */
 
@@ -79,15 +79,30 @@ static WRITE_LINE_DEVICE_HANDLER( pegasus_cassette_w )
 	cassette_output(pegasus_cass, state ? 1 : -1);
 }
 
+static READ8_HANDLER( pegasus_pcg_r )
+{
+	UINT8 code = pegasus_video_ram[offset] & 0x7f;
+	return FNT[(code << 4) | (~pegasus_kbd_row & 15)];
+}
+
+static WRITE8_HANDLER( pegasus_pcg_w )
+{
+//	if (pegasus_control_bits & 2)
+	{
+		UINT8 code = pegasus_video_ram[offset] & 0x7f;
+		FNT[(code << 4) | (~pegasus_kbd_row & 15)] = data;
+	}
+}
+
 static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0xb000, 0xbdff) AM_RAM
 	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram)
-	AM_RANGE(0xc000, 0xdfff) AM_ROM
-	AM_RANGE(0xe200, 0xe3ff) AM_RAM		// PCG
-	AM_RANGE(0xe400, 0xe403) AM_DEVREADWRITE("pegasus_pia_u", pia6821_r, pia6821_w)
-	AM_RANGE(0xe600, 0xe603) AM_DEVREADWRITE("pegasus_pia_s", pia6821_r, pia6821_w)
+	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
+	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
+	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_u", pia6821_r, pia6821_w)
+	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_s", pia6821_r, pia6821_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 
 /*	AM_RANGE(0xe000, 0xe000) AM_READ(pegasus_protection)
@@ -185,8 +200,8 @@ static const pia6821_interface pegasus_pia_s_intf=
 	DEVCB_NULL,						/* port A input */
 	DEVCB_HANDLER(pegasus_keyboard_r),			/* port B input */
 	DEVCB_LINE(pegasus_cassette_r),				/* CA1 input */
-	DEVCB_NULL,						/* CB1 input */
-	DEVCB_LINE(pegasus_keyboard_irq),			/* CA2 input */
+	DEVCB_LINE(pegasus_keyboard_irq),			/* CB1 input */
+	DEVCB_NULL,						/* CA2 input */
 	DEVCB_NULL,						/* CB2 input */
 	DEVCB_HANDLER(pegasus_keyboard_w),			/* port A output */
 	DEVCB_HANDLER(pegasus_controls),			/* port B output */
@@ -251,6 +266,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 static MACHINE_START( pegasus )
 {
 	pegasus_cass = devtag_get_device(machine, "cassette");
+	FNT = memory_region(machine, "pcg");
 }
 
 static MACHINE_DRIVER_START( pegasus )
@@ -258,7 +274,7 @@ static MACHINE_DRIVER_START( pegasus )
 	MDRV_CPU_ADD("maincpu", M6809E, XTAL_4MHz)	// actually a 6809C
 	MDRV_CPU_PROGRAM_MAP(pegasus_mem)
 
-	MDRV_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, HZ(50))
+	MDRV_TIMER_ADD_PERIODIC("pegasus_firq", pegasus_firq, HZ(400))	// controls accuracy of the clock (ctrl-P)
 	MDRV_MACHINE_START(pegasus)
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -297,6 +313,7 @@ ROM_START( pegasus )
 	ROM_FILL(0xf09e, 1, 0x20)		// hack out the protection
 //	ROM_LOAD( "mon23_2601.bin", 0xf000, 0x1000, CRC(7dd451bb) SHA1(7843e9166151570f9c915589dc252feb0cb1cec4) )
 //	ROM_LOAD( "mon23a_2569.bin", 0xf000, 0x1000, CRC(b4c6b352) SHA1(10bb08305a574dab48d0384e35d0781b6bde880f) )
+	ROM_REGION( 0x800, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
