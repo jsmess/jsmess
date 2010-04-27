@@ -95,7 +95,6 @@ enum
 //  LOCAL VARIABLES
 //============================================================
 
-static HICON device_icons[IO_COUNT];
 static int use_input_categories;
 static int joystick_menu_setup;
 static char state_filename[MAX_PATH];
@@ -2188,27 +2187,11 @@ int win_setup_menus(running_machine *machine, HMODULE module, HMENU menu_bar)
 	char buf[256];
 	int i;
 
-	static const int bitmap_ids[][2] =
-	{
-		{ IO_CARTSLOT,	IDI_ICON_CART },
-		{ IO_HARDDISK,	IDI_ICON_HARD },
-		{ IO_CASSETTE,	IDI_ICON_CASS },
-		{ IO_FLOPPY,	IDI_ICON_FLOP },
-		{ IO_PRINTER,	IDI_ICON_PRIN },
-		{ IO_SERIAL,	IDI_ICON_SERL },
-		{ IO_SNAPSHOT,	IDI_ICON_SNAP }
-	};
-
 	// verify that our magic numbers work
 	assert((ID_DEVICE_0 + IO_COUNT * DEVOPTION_MAX) < ID_JOYSTICK_0);
 
 	// initialize critical values
 	joystick_menu_setup = 0;
-
-	// get the device icons
-	memset(device_icons, 0, sizeof(device_icons));
-	for (i = 0; i < ARRAY_LENGTH(bitmap_ids); i++)
-		device_icons[bitmap_ids[i][0]] = LoadIcon(module, MAKEINTRESOURCE(bitmap_ids[i][1]));
 
 	// remove the profiler menu item if it doesn't exist
 #if HAS_PROFILER
