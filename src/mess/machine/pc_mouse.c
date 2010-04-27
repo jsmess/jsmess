@@ -47,7 +47,8 @@ void pc_mouse_set_serial_port(running_device *ins8250)
 static void	pc_mouse_queue_data(int data)
 {
 	pc_mouse.queue[pc_mouse.head] = data;
-	pc_mouse.head = ++pc_mouse.head % 256;
+	pc_mouse.head++;
+	pc_mouse.head %= 256;
 }
 
 /**************************************************************************
@@ -185,7 +186,8 @@ static TIMER_CALLBACK(pc_mouse_scan)
 
 		data = pc_mouse.queue[pc_mouse.tail];
 		ins8250_receive(pc_mouse.ins8250, data);
-		pc_mouse.tail = ++pc_mouse.tail & 255;
+		pc_mouse.tail++;
+		pc_mouse.tail &= 255;
 	}
 }
 
@@ -224,9 +226,11 @@ INS8250_HANDSHAKE_OUT( pc_mouse_handshake_in )
 			{
 				/* Identify as Microsoft 3 Button Mouse */
 				pc_mouse.queue[pc_mouse.head] = 'M';
-				pc_mouse.head = ++pc_mouse.head % 256;
+				pc_mouse.head++;
+				pc_mouse.head %= 256;
 				pc_mouse.queue[pc_mouse.head] = '3';
-				pc_mouse.head = ++pc_mouse.head % 256;
+				pc_mouse.head++;
+				pc_mouse.head %= 256;
 			}
 
 			/* start a timer to scan the mouse input */

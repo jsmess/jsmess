@@ -2512,7 +2512,7 @@ void spectrum_setup_scr(running_machine *machine, UINT8 *quickdata, UINT32 quick
     for (i = 0; i < quicksize; i++)
         memory_write_byte(space, i + BASE_RAM, quickdata[i]);
 
-    log_quickload(quicksize == SCR_SIZE ? "SCREEN$" : "SCREEN$ (Mono)", BASE_RAM, quicksize, NULL, EXEC_NA);
+    log_quickload(quicksize == SCR_SIZE ? "SCREEN$" : "SCREEN$ (Mono)", BASE_RAM, quicksize, 0, EXEC_NA);
 }
 
 /*******************************************************************
@@ -2563,6 +2563,6 @@ void spectrum_setup_raw(running_machine *machine, UINT8 *quickdata, UINT32 quick
     border_force_redraw();
     logerror("Border color:%02X\n", data);
 
-    log_quickload("BYTES", start, len, NULL, EXEC_NA);
+    log_quickload("BYTES", start, len, 0, EXEC_NA);
 }
 
