@@ -206,18 +206,6 @@ static const struct TabViewCallbacks s_softwareTabViewCallbacks =
 
 
 //============================================================
-//  Image types
-//
-//  IO_ZIP is used for ZIP files
-//  IO_UNKNOWN is used for unknown types
-//  IO_BAD is used for bad files
-//============================================================
-
-#define IO_ZIP		(IO_COUNT + 0)
-#define IO_BAD		(IO_COUNT + 1)
-#define IO_UNKNOWN	(IO_COUNT + 2)
-
-//============================================================
 //  IMPLEMENTATION
 //============================================================
 
@@ -1082,18 +1070,9 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 	nIcon = GetMessIcon(drvindex, nType);
 	if (!nIcon)
 	{
-		if (nType == 0)
-			nType = (iodevice_t)IO_BAD;
 		switch(nType)
 		{
 			case IO_UNKNOWN:
-				// Unknowns
-				nIcon = FindIconIndex(IDI_WIN_UNKNOWN);
-				break;
-
-			case IO_BAD:
-			case IO_ZIP:
-				// Bad files
 				nIcon = FindIconIndex(IDI_WIN_REDX);
 				break;
 
@@ -1103,7 +1082,7 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 					icon_name = device_typename(nType);
 				nIcon = FindIconIndexByName(icon_name);
 				if (nIcon < 0)
-					nIcon = FindIconIndexByName("unknown");
+					nIcon = FindIconIndex(IDI_WIN_UNKNOWN);
 				break;
 		}
     }
