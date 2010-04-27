@@ -33,7 +33,7 @@ static void update_clut(running_machine *machine)
 		UINT8 g = (data >> 8) & 0xff;
 		UINT8 r = (data >> 16) & 0xff;
 
-		logerror("CLUT %u : %08x\n", i, data);
+//		logerror("CLUT %u : %08x\n", i, data);
 		
 		palette_set_color_rgb(machine, i + 8, r, g, b);
 	}
