@@ -87,8 +87,11 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("min,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_START(pokemini_cart)
+	MDRV_CARTSLOT_INTERFACE("pokemini_cart")
 	MDRV_CARTSLOT_LOAD(pokemini_cart)
+
+	/* Software lists */
+	MDRV_SOFTWARE_LIST_ADD("pokemini")
 MACHINE_DRIVER_END
 
 

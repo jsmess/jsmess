@@ -59,6 +59,42 @@ static INPUT_PORTS_START( advision )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1) PORT_8WAY
 INPUT_PORTS_END
 
+/* Cartridge (+ Software List) */
+
+static DEVICE_IMAGE_LOAD( advision_cart )
+{
+	UINT8	*cart_rom;
+	UINT32	cart_rom_size;
+	
+	if (image_software_entry(image) == NULL)
+	{
+		cart_rom = memory_region(image->machine, "cart");
+		cart_rom_size = image_length(image);
+
+		if (cart_rom_size > memory_region_length(image->machine, "cart"))
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			return INIT_FAIL;
+		}
+		
+		if (image_fread(image, cart_rom, cart_rom_size) != cart_rom_size)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			return INIT_FAIL;
+		}
+		
+	}
+	else
+	{
+		cart_rom = image_get_software_region(image, "rom");
+		cart_rom_size = image_get_software_region_length(image, "rom");
+	}
+	
+	memcpy(memory_region(image->machine, I8048_TAG), cart_rom, cart_rom_size);
+
+	return INIT_PASS;
+}
+
 /* Machine Driver */
 
 static COP400_INTERFACE( advision_cop411_interface )
@@ -106,19 +142,25 @@ static MACHINE_DRIVER_START( advision )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("advision_cart")
+	MDRV_CARTSLOT_LOAD(advision_cart)
+
+	/* Software lists */
+	MDRV_SOFTWARE_LIST_ADD("advision")
 MACHINE_DRIVER_END
 
 /* ROMs */
 
 ROM_START( advision )
-	ROM_REGION( 0x1000, I8048_TAG, 0 )
-	ROM_CART_LOAD( "cart", 0x0000, 0x1000, ROM_NOMIRROR | ROM_FULLSIZE )
+	ROM_REGION( 0x1000, I8048_TAG, ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x400, "bios", 0 )
     ROM_LOAD( "avbios.u5", 0x000, 0x400, CRC(279e33d1) SHA1(bf7b0663e9125c9bfb950232eab627d9dbda8460) )
 
 	ROM_REGION( 0x200, COP411_TAG, 0 )
 	ROM_LOAD( "avsound.u8", 0x000, 0x200, CRC(81e95975) SHA1(8b6f8c30dd3e9d8e43f1ea20fba2361b383790eb) )
+
+	ROM_REGION( 0x1000, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 /* Game Driver */

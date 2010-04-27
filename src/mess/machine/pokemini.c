@@ -1399,36 +1399,41 @@ READ8_HANDLER( pokemini_hwreg_r )
 	return data;
 }
 
-DEVICE_START( pokemini_cart )
-{
-}
-
 DEVICE_IMAGE_LOAD( pokemini_cart )
 {
-	int	size = image_length( image );
-
-	/* Verify that the image is big enough */
-	if ( size <= 0x2100 )
+	if (image_software_entry(image) == NULL)
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too small" );
-		return INIT_FAIL;
+		int	size = image_length(image);
+
+		/* Verify that the image is big enough */
+		if (size <= 0x2100)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too small");
+			return INIT_FAIL;
+		}
+
+		/* Verify that the image is not too big */
+		if (size > 0x1FFFFF)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too big");
+			return INIT_FAIL;
+		}
+
+		/* Skip the first 0x2100 bytes */
+		image_fseek(image, 0x2100, SEEK_SET);
+		size -= 0x2100;
+
+		if (size != image_fread(image, memory_region(image->machine, "maincpu") + 0x2100, size))
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Error occured while reading ROM image");
+			return INIT_FAIL;
+		}
 	}
-
-	/* Verify that the image is not too big */
-	if ( size > 0x1FFFFF )
+	else
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too big" );
-		return INIT_FAIL;
-	}
-
-	/* Skip the first 0x2100 bytes */
-	image_fseek( image, 0x2100, SEEK_SET );
-	size -= 0x2100;
-
-	if ( size != image_fread( image, memory_region(image->machine, "maincpu") + 0x2100, size ) )
-	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Error occured while reading ROM image" );
-		return INIT_FAIL;
+		UINT8 *cart_rom = image_get_software_region(image, "rom");
+		UINT32 cart_rom_size = image_get_software_region_length(image, "rom");
+		memcpy(memory_region(image->machine, "maincpu") + 0x2100, cart_rom + 0x2100, cart_rom_size - 0x2100);
 	}
 
 	return INIT_PASS;

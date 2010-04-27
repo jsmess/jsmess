@@ -15,7 +15,6 @@ MACHINE_START( pokemini );
 WRITE8_HANDLER( pokemini_hwreg_w );
 READ8_HANDLER( pokemini_hwreg_r );
 
-DEVICE_START( pokemini_cart );
 DEVICE_IMAGE_LOAD( pokemini_cart );
 
 #endif /* POKEMINI_H */

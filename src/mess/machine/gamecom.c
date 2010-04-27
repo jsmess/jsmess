@@ -702,37 +702,45 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 {
 	UINT32 filesize;
 	UINT32 load_offset = 0;
-	UINT32 bytes_read;
 
 	cartridge1 = memory_region(image->machine, "user2");
 
-	filesize = image_length( image );
-	switch( filesize )
+	if (image_software_entry(image) == NULL)
+		filesize = image_length(image);
+	else
+		filesize = image_get_software_region_length(image, "rom");
+
+	switch(filesize)
 	{
-	case 0x008000: load_offset = 0;        break;  /* 32 KB */
-	case 0x040000: load_offset = 0;        break;  /* 256KB */
-	case 0x080000: load_offset = 0;        break;  /* 512KB */
-	case 0x100000: load_offset = 0;        break;  /* 1  MB */
-	case 0x1c0000: load_offset = 0x040000; break;  /* 1.8MB */
-	case 0x200000: load_offset = 0;        break;  /* 2  MB */
-	default:                                       /* otherwise */
-		logerror( "Error loading cartridge: Invalid file size 0x%X\n",filesize );
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unhandled cart size" );
-		return INIT_FAIL;
+		case 0x008000: load_offset = 0;        break;  /* 32 KB */
+		case 0x040000: load_offset = 0;        break;  /* 256KB */
+		case 0x080000: load_offset = 0;        break;  /* 512KB */
+		case 0x100000: load_offset = 0;        break;  /* 1  MB */
+		case 0x1c0000: load_offset = 0x040000; break;  /* 1.8MB */
+		case 0x200000: load_offset = 0;        break;  /* 2  MB */
+		default:                                       /* otherwise */
+			logerror("Error loading cartridge: Invalid file size 0x%X\n", filesize);
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unhandled cart size");
+			return INIT_FAIL;
 	}
-	bytes_read = image_fread( image, cartridge1 + load_offset, filesize );
-	if (bytes_read  != filesize )
+
+	if (image_software_entry(image) == NULL)
 	{
-		logerror( "Error loading cartridge: Read 0x%X, should have been 0x%X\n",bytes_read,filesize );
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart" );
-		return INIT_FAIL;
+		if (image_fread(image, cartridge1 + load_offset, filesize) != filesize)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart");
+			return INIT_FAIL;
+		}
 	}
-	if ( filesize < 0x010000 ) { memcpy( cartridge1 + 0x008000, cartridge1, 0x008000 ); } /* ->64KB */
-	if ( filesize < 0x020000 ) { memcpy( cartridge1 + 0x010000, cartridge1, 0x010000 ); } /* ->128KB */
-	if ( filesize < 0x040000 ) { memcpy( cartridge1 + 0x020000, cartridge1, 0x020000 ); } /* ->256KB */
-	if ( filesize < 0x080000 ) { memcpy( cartridge1 + 0x040000, cartridge1, 0x040000 ); } /* ->512KB */
-	if ( filesize < 0x100000 ) { memcpy( cartridge1 + 0x080000, cartridge1, 0x080000 ); } /* ->1MB */
-	if ( filesize < 0x1c0000 ) { memcpy( cartridge1 + 0x100000, cartridge1, 0x100000 ); } /* -> >=1.8MB */
+	else
+		memcpy(cartridge1 + load_offset, image_get_software_region(image, "rom"), filesize);
+	
+	if (filesize < 0x010000) { memcpy(cartridge1 + 0x008000, cartridge1, 0x008000); } /* ->64KB */
+	if (filesize < 0x020000) { memcpy(cartridge1 + 0x010000, cartridge1, 0x010000); } /* ->128KB */
+	if (filesize < 0x040000) { memcpy(cartridge1 + 0x020000, cartridge1, 0x020000); } /* ->256KB */
+	if (filesize < 0x080000) { memcpy(cartridge1 + 0x040000, cartridge1, 0x040000); } /* ->512KB */
+	if (filesize < 0x100000) { memcpy(cartridge1 + 0x080000, cartridge1, 0x080000); } /* ->1MB */
+	if (filesize < 0x1c0000) { memcpy(cartridge1 + 0x100000, cartridge1, 0x100000); } /* -> >=1.8MB */
 	return INIT_PASS;
 }
 

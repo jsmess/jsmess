@@ -3,7 +3,6 @@
 ******************************************************************************/
 
 #include "emu.h"
-//#include "vidhrdw/generic.h"
 #include "cpu/upd7810/upd7810.h"
 #include "devices/cartslot.h"
 
@@ -180,7 +179,7 @@ static PALETTE_INIT( gmaster )
 {
 	int i;
 
-	for ( i = 0; i < 2; i++ )
+	for (i = 0; i < 2; i++)
 	{
 		palette_set_color_rgb(machine, i, gmaster_palette[i][0], gmaster_palette[i][1], gmaster_palette[i][2]);
 	}
@@ -198,24 +197,58 @@ static VIDEO_UPDATE( gmaster )
 			UINT16 *line;
 
 			line = BITMAP_ADDR16(bitmap, (y * 8), x);
-			line[0] = (d >> 0) & 1;
+			line[0] = BIT(d, 0);
 			line = BITMAP_ADDR16(bitmap, (y * 8 + 1), x);
-			line[0] = (d >> 1) & 1;
+			line[0] = BIT(d, 1);
 			line = BITMAP_ADDR16(bitmap, (y * 8 + 2), x);
-			line[0] = (d >> 2) & 1;
+			line[0] = BIT(d, 2);
 			line = BITMAP_ADDR16(bitmap, (y * 8 + 3), x);
-			line[0] = (d >> 3) & 1;
+			line[0] = BIT(d, 3);
 			line = BITMAP_ADDR16(bitmap, (y * 8 + 4), x);
-			line[0] = (d >> 4) & 1;
+			line[0] = BIT(d, 4);
 			line = BITMAP_ADDR16(bitmap, (y * 8 + 5), x);
-			line[0] = (d >> 5) & 1;
+			line[0] = BIT(d, 5);
 			line = BITMAP_ADDR16(bitmap, (y * 8 + 6), x);
-			line[0] = (d >> 6) & 1;
+			line[0] = BIT(d, 6);
 			line = BITMAP_ADDR16(bitmap, (y * 8 + 7), x);
-			line[0] = (d >> 7) & 1;
+			line[0] = BIT(d, 7);
 		}
     }
     return 0;
+}
+
+static DEVICE_IMAGE_LOAD( gmaster_cart )
+{
+	UINT8 *cart_rom;
+	UINT32 cart_rom_size;
+	
+	if (image_software_entry(image) == NULL)
+	{
+		cart_rom = memory_region(image->machine, "cart");
+		cart_rom_size = image_length(image);
+		
+		if (cart_rom_size > memory_region_length(image->machine, "cart"))
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			return INIT_FAIL;
+		}
+		
+		if (image_fread(image, cart_rom, cart_rom_size) != cart_rom_size)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			return INIT_FAIL;
+		}
+		
+	}
+	else
+	{
+		cart_rom = image_get_software_region(image, "rom");
+		cart_rom_size = image_get_software_region_length(image, "rom");
+	}
+	
+	memcpy(memory_region(image->machine, "maincpu") + 0x8000, cart_rom, cart_rom_size);
+	
+	return INIT_PASS;
 }
 
 static INTERRUPT_GEN( gmaster_interrupt )
@@ -251,6 +284,11 @@ static MACHINE_DRIVER_START( gmaster )
 	MDRV_SOUND_ROUTE(0, "speaker", 0.50)
 
 	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("gmaster_cart")
+	MDRV_CARTSLOT_LOAD(gmaster_cart)
+	MDRV_SOFTWARE_LIST_ADD("gmaster")
 MACHINE_DRIVER_END
 
 
@@ -258,50 +296,14 @@ ROM_START(gmaster)
 	ROM_REGION(0x10000,"maincpu", 0)
 	ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
 //  ROM_CART_LOAD(0, "bin", 0x8000, 0x7f00, 0)
-	ROM_CART_LOAD("cart", 0x8000, 0x8000, 0)
+
+	ROM_REGION( 0x8000, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 static DRIVER_INIT( gmaster )
 {
 	memset(&gmaster_video, 0, sizeof(gmaster_video));
 }
-
-#if 0
-static int gmaster_load_rom(running_machine *machine, int id)
-{
-	FILE *cartfile;
-	UINT8 *rom = memory_region(machine, "maincpu");
-	int size;
-
-	if (device_filename(IO_CARTSLOT, id) == NULL)
-	{
-		printf("%s requires Cartridge!\n", machine->gamedrv->name);
-		return 0;
-	}
-
-	if (!(cartfile = (FILE*)image_fopen(IO_CARTSLOT, id, OSD_FILETYPE_IMAGE_R, 0)))
-	{
-		logerror("%s not found\n",device_filename(IO_CARTSLOT,id));
-		return 1;
-	}
-	size=osd_fsize(cartfile);
-	if (size>0x8000)
-	{
-	    logerror("%s: size %d not yet supported\n",device_filename(IO_CARTSLOT,id), size);
-	    return 1;
-	}
-
-	if (osd_fread(cartfile, rom+0x8000, size)!=size)
-	{
-		logerror("%s load error\n",device_filename(IO_CARTSLOT,id));
-		osd_fclose(cartfile);
-		return 1;
-	}
-//  memcpy(rom+0x0000, rom+0x8000, 0x4000);
-	osd_fclose(cartfile);
-	return 0;
-}
-#endif
 
 /*    YEAR      NAME            PARENT  MACHINE   INPUT     INIT  COMPANY                 FULLNAME */
 CONS( 1990, gmaster,       0,          0, gmaster,  gmaster,    gmaster,    "Hartung", "Game Master", GAME_IMPERFECT_SOUND)
