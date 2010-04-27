@@ -18,7 +18,6 @@ public:
 	cgc7900_state(running_machine &machine) { }
 
 	/* video state */
-	UINT16 *z_ram;
 	UINT16 *plane_ram;
 	UINT16 *clut_ram;
 	UINT16 *overlay_ram;

@@ -39,17 +39,18 @@ static void update_clut(running_machine *machine)
 	}
 }
 
-#define OVERLAY_CUR		0x80000000	/* places a cursor in the cell if SET */
-#define OVERLAY_BLK		0x40000000	/* blinks the foreground character in the cell if SET */
-#define OVERLAY_VF		0x10000000	/* makes the foreground visible if SET (else transparent) */
-#define OVERLAY_VB		0x08000000	/* makes the background visible if SET (else transparent) */
-#define OVERLAY_PL		0x01000000	/* uses bits 0-7 as PLOT DOT descriptor if SET (else ASCII) */
-#define OVERLAY_BR		0x00040000	/* turns on Red in background if SET */
-#define OVERLAY_BG		0x00020000	/* turns on Green in background if SET */
-#define OVERLAY_BB		0x00010000	/* turns on Blue in background if SET */
-#define OVERLAY_FR		0x00000400	/* turns on Red in foreground if SET */
-#define OVERLAY_FG		0x00000200	/* turns on Green in foreground if SET */
-#define OVERLAY_FB		0x00000100	/* turns on Blue in background if SET */
+#define OVERLAY_CUR		BIT(cell, 31)	/* places a cursor in the cell if SET */
+#define OVERLAY_BLK		BIT(cell, 30)	/* blinks the foreground character in the cell if SET */
+#define OVERLAY_VF		BIT(cell, 28)	/* makes the foreground visible if SET (else transparent) */
+#define OVERLAY_VB		BIT(cell, 27)	/* makes the background visible if SET (else transparent) */
+#define OVERLAY_PL		BIT(cell, 24)	/* uses bits 0-7 as PLOT DOT descriptor if SET (else ASCII) */
+#define OVERLAY_BR		BIT(cell, 18)	/* turns on Red in background if SET */
+#define OVERLAY_BG		BIT(cell, 17)	/* turns on Green in background if SET */
+#define OVERLAY_BB		BIT(cell, 16)	/* turns on Blue in background if SET */
+#define OVERLAY_FR		BIT(cell, 10)	/* turns on Red in foreground if SET */
+#define OVERLAY_FG		BIT(cell, 9)	/* turns on Green in foreground if SET */
+#define OVERLAY_FB		BIT(cell, 8)	/* turns on Blue in background if SET */
+#define OVERLAY_DATA	(cell & 0xff)	/* ASCII or Plot Dot character */
 
 static void draw_overlay(running_device *screen, bitmap_t *bitmap)
 {
@@ -58,22 +59,34 @@ static void draw_overlay(running_device *screen, bitmap_t *bitmap)
 	for (int y = 0; y < 768; y++)
 	{
 		int sy = y / 8;
+		int line = y % 8;
 
 		for (int sx = 0; sx < 85; sx++)
 		{
-			UINT16 addr = (sy * 85) + sx;
-			UINT32 cell = (state->overlay_ram[addr + 1] << 16) | state->overlay_ram[addr];
-			UINT8 data = state->char_rom[(cell & 0xff) << 3];
+			UINT16 addr = (sy * 170) + (sx * 2);
+			UINT32 cell = (state->overlay_ram[addr] << 16) | state->overlay_ram[addr + 1];
+			UINT8 data = state->char_rom[(OVERLAY_DATA << 3) | line];
 			int fg = (cell >> 8) & 0x07;
 			int bg = (cell >> 16) & 0x07;
 
 			for (int x = 0; x < 8; x++)
 			{
-				*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = BIT(data, 7) ? fg : bg;
-				data <<= 1;
+				if (OVERLAY_CUR)
+				{
+					*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = 7;
+				}
+				else
+				{
+					if (BIT(data, x))
+					{
+						if (OVERLAY_VF) *BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = fg;
+					}
+					else
+					{
+						if (OVERLAY_VB) *BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = bg;
+					}
+				}
 			}
-
-			addr += 2;
 		}
 	}
 }

@@ -20,7 +20,7 @@ static ADDRESS_MAP_START( cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE(&chrom_ram) // 16 * Buffer card memory
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)	
-	AM_RANGE(0xa00000, 0xbfffff) AM_RAM AM_BASE_MEMBER(cgc7900_state, z_ram)
+//	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(z_mode_r, z_mode_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_BASE_MEMBER(cgc7900_state, plane_ram)
 //	AM_RANGE(0xe00000, 0xe1ffff) AM_WRITE(color_status_w)
 //	AM_RANGE(0xe20000, 0xe23fff) Raster Processor
@@ -76,6 +76,13 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( cgc7900 )
 INPUT_PORTS_END
 
+static MACHINE_START( cgc7900 )
+{
+	cgc7900_state *state = (cgc7900_state *)machine->driver_data;
+
+	/* register for state saving */
+	state_save_register_global_pointer(machine, state->overlay_ram, 0x4000);
+}
 
 static MACHINE_RESET(cgc7900) 
 {
@@ -83,7 +90,7 @@ static MACHINE_RESET(cgc7900)
 
 	memcpy((UINT8*)chrom_ram,user1,0x10000);
 
-	devtag_get_device(machine, M68000_TAG)->reset();	
+	devtag_get_device(machine, M68000_TAG)->reset();
 }
 
 
@@ -118,6 +125,7 @@ static MACHINE_DRIVER_START( cgc7900 )
     MDRV_CPU_ADD(M68000_TAG, M68000, XTAL_8MHz)
     MDRV_CPU_PROGRAM_MAP(cgc7900_mem)
 
+    MDRV_MACHINE_START(cgc7900)
     MDRV_MACHINE_RESET(cgc7900)
 	
     /* video hardware */
