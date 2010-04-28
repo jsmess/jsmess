@@ -464,7 +464,9 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 	//const char *title;
 	const char *fat_bits_string;
 	UINT8 header[FAT_SECLEN];
+#if 0
 	UINT64 first_fat_entries;
+#endif
 
 	/* check for limits */
 	if (block_count > U64(0xFFFFFFFFFFFF))
@@ -574,6 +576,8 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 			return err;
 	}
 
+	// FIXME: this causes a corrupt PC floppy image since it doubles the FAT partition header - works without it though
+#if 0
 	/* set first two FAT entries */
 	first_fat_entries = ((UINT64) media_descriptor) | 0xFFFFFF00;
 	first_fat_entries &= (((UINT64) 1) << fat_bits) - 1;
@@ -586,6 +590,7 @@ static imgtoolerr_t fat_partition_create(imgtool_image *image, UINT64 first_bloc
 		if (err)
 			return err;
 	}
+#endif
 
 	return IMGTOOLERR_SUCCESS;
 }
