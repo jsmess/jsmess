@@ -46,8 +46,18 @@ static READ64_HANDLER( dcus_idle_skip_r )
 {
 	if (cpu_get_pc(space->cpu)==0xc0ba52a)
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(2500));
+	//	cpu_spinuntil_int(space->cpu);
 
 	return dc_ram[0x2303b0/8];
+}
+
+static READ64_HANDLER( dcjp_idle_skip_r )
+{
+	if (cpu_get_pc(space->cpu)==0xc0bac62)
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(2500));
+	//	cpu_spinuntil_int(space->cpu);
+
+	return dc_ram[0x2302f8/8];
 }
 
 static DRIVER_INIT(dc)
@@ -58,6 +68,13 @@ static DRIVER_INIT(dc)
 static DRIVER_INIT(dcus)
 {
 	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2303b0, 0xc2303b7, 0, 0, dcus_idle_skip_r);
+
+	DRIVER_INIT_CALL(dc);
+}
+
+static DRIVER_INIT(dcjp)
+{
+	memory_install_read64_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xc2302f8, 0xc2302ff, 0, 0, dcjp_idle_skip_r);
 
 	DRIVER_INIT_CALL(dc);
 }
@@ -355,7 +372,7 @@ INPUT_PORTS_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT      COMPANY FULLNAME */
 CONS( 1999, dc,		dcjp,	0,	dc,	dc,	dcus,	"Sega", "Dreamcast (US NTSC)", GAME_NOT_WORKING )
-CONS( 1998, dcjp,	0,		0,	dc,	dc,	dc,	"Sega", "Dreamcast (Japan NTSC)", GAME_NOT_WORKING )
-CONS( 1999, dceu,	dcjp,	0,	dc,	dc,	dc,	"Sega", "Dreamcast (European PAL)", GAME_NOT_WORKING )
+CONS( 1998, dcjp,	0,		0,	dc,	dc,	dcjp,	"Sega", "Dreamcast (Japan NTSC)", GAME_NOT_WORKING )
+CONS( 1999, dceu,	dcjp,	0,	dc,	dc,	dcus,	"Sega", "Dreamcast (European PAL)", GAME_NOT_WORKING )
 CONS( 1998, dcdev,	dcjp,	0,	dc,	dc,	dc,	"Sega", "HKT-0120 Sega Dreamcast Development Box", GAME_NOT_WORKING )
 
