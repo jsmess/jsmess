@@ -1004,10 +1004,10 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 		if(!(towns_video_reg[0] & 0x10))
 			return;
 		if(!(towns_crtc_reg[28] & 0x10))
-			off += towns_crtc_reg[21];  // initial offset
+			off += towns_crtc_reg[21] << 3;  // initial offset
 		else
 		{
-			scroll = ((towns_crtc_reg[21] & 0xfc00) << 2) | (((towns_crtc_reg[21] & 0x3ff) << 2));
+			scroll = ((towns_crtc_reg[21] & 0xfc00) << 3) | (((towns_crtc_reg[21] & 0x3ff) << 3));
 			off += scroll;
 		}
 		off += (towns_crtc_reg[11] - towns_crtc_reg[22]);
@@ -1017,10 +1017,10 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	else
 	{
 		if(!(towns_crtc_reg[28] & 0x20))
-			off += towns_crtc_reg[17];  // initial offset
+			off += towns_crtc_reg[17] << 3;  // initial offset
 		else
 		{
-			scroll = ((towns_crtc_reg[17] & 0xfc00) << 2) | (((towns_crtc_reg[17] & 0x3ff) << 2));
+			scroll = ((towns_crtc_reg[17] & 0xfc00) << 3) | (((towns_crtc_reg[17] & 0x3ff) << 3));
 			off += scroll;
 		}
 		off += (towns_crtc_reg[9] - towns_crtc_reg[18]);
