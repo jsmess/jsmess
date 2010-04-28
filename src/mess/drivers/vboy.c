@@ -4,7 +4,8 @@
 
     12/05/2009 Skeleton driver.
 
-    Great info at http://www.goliathindustries.com/vb/ and http://www.vr32.de/modules/dokuwiki/doku.php?
+    Great info at http://www.goliathindustries.com/vb/ 
+    and http://www.vr32.de/modules/dokuwiki/doku.php?
 
 ****************************************************************************/
 
@@ -668,6 +669,26 @@ static PALETTE_INIT( vboy )
 	palette_set_colors(machine, 0, vboy_palette, ARRAY_LENGTH(vboy_palette));
 }
 
+static DEVICE_IMAGE_LOAD( vboy_cart )
+{
+	UINT32 size;
+	UINT8 *ptr = memory_region(image->machine, "user1");
+	
+	if (image_software_entry(image) == NULL)
+	{
+		size = image_length(image);
+		if (image_fread(image, ptr, size) != size)
+			return INIT_FAIL;
+	}
+	else
+	{
+		size = image_get_software_region_length(image, "rom");
+		memcpy(ptr, image_get_software_region(image, "rom"), size);
+	}
+	
+	return INIT_PASS;
+}
+
 static MACHINE_DRIVER_START( vboy )
 
 	MDRV_DRIVER_DATA( vboy_state )
@@ -708,13 +729,18 @@ static MACHINE_DRIVER_START( vboy )
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("vb, bin")
+	MDRV_CARTSLOT_EXTENSION_LIST("vb,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("vboy_cart")
+	MDRV_CARTSLOT_LOAD(vboy_cart)
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("vboy")
 MACHINE_DRIVER_END
 
 /* ROM definition */
 ROM_START( vboy )
-	ROM_REGION( 0x200000, "user1", 0 )
-	ROM_CART_LOAD("cart", 0x0000, 0x200000, ROM_MIRROR)
+	ROM_REGION( 0x200000, "user1", ROMREGION_ERASE00 )
 ROM_END
 
 /* Driver */

@@ -219,21 +219,19 @@ static VIDEO_UPDATE( gmaster )
 
 static DEVICE_IMAGE_LOAD( gmaster_cart )
 {
-	UINT8 *cart_rom;
-	UINT32 cart_rom_size;
+	UINT32 size;
 	
 	if (image_software_entry(image) == NULL)
 	{
-		cart_rom = memory_region(image->machine, "cart");
-		cart_rom_size = image_length(image);
+		size = image_length(image);
 		
-		if (cart_rom_size > memory_region_length(image->machine, "cart"))
+		if (size > (memory_region_length(image->machine, "maincpu") - 0x8000))
 		{
 			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return INIT_FAIL;
 		}
 		
-		if (image_fread(image, cart_rom, cart_rom_size) != cart_rom_size)
+		if (image_fread(image, memory_region(image->machine, "maincpu") + 0x8000, size) != size)
 		{
 			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return INIT_FAIL;
@@ -242,12 +240,10 @@ static DEVICE_IMAGE_LOAD( gmaster_cart )
 	}
 	else
 	{
-		cart_rom = image_get_software_region(image, "rom");
-		cart_rom_size = image_get_software_region_length(image, "rom");
+		size = image_get_software_region_length(image, "rom");
+		memcpy(memory_region(image->machine, "maincpu") + 0x8000, image_get_software_region(image, "rom"), size);
 	}
-	
-	memcpy(memory_region(image->machine, "maincpu") + 0x8000, cart_rom, cart_rom_size);
-	
+
 	return INIT_PASS;
 }
 
@@ -296,8 +292,6 @@ ROM_START(gmaster)
 	ROM_REGION(0x10000,"maincpu", 0)
 	ROM_LOAD("gmaster.bin", 0x0000, 0x1000, CRC(05cc45e5) SHA1(05d73638dea9657ccc2791c0202d9074a4782c1e) )
 //  ROM_CART_LOAD(0, "bin", 0x8000, 0x7f00, 0)
-
-	ROM_REGION( 0x8000, "cart", ROMREGION_ERASE00 )
 ROM_END
 
 static DRIVER_INIT( gmaster )

@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="vboy" description="Nintendo Virtual Boy cartridges">
 	<!-- Id: VUE-VPBE-USA - Developers: T&E Soft -->
-	<software name="3dtetris">
+	<software name="3dtetris" supported="no">
 		<description>3-D Tetris (USA)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -14,7 +14,7 @@
 	</software>
 
 	<!-- Id: VUE-VGPJ-JPN/USA - Developers: Intelligent Systems - Releases: 1995-07-01 (JPN) -->
-	<software name="galactic">
+	<software name="galactic" supported="no">
 		<description>Galactic Pinball (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -26,7 +26,7 @@
 	</software>
 
 	<!-- Id: VUE-VVGE-USA - Developers: T&E Soft -->
-	<software name="golf">
+	<software name="golf" supported="no">
 		<description>Golf (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -38,7 +38,7 @@
 	</software>
 
 	<!-- Id: VUE-VIMJ-JPN - Developers: Betop (I'Max) - Releases: 1995-10-13 (JPN) -->
-	<software name="innsmout">
+	<software name="innsmout" supported="no">
 		<description>Innsmouth no Yakata (Jpn)</description>
 		<year>1995</year>
 		<publisher>I'Max</publisher>
@@ -50,7 +50,7 @@
 	</software>
 
 	<!-- Id: VUE-VJBE-USA - Developers: Atlus -->
-	<software name="jackbros">
+	<software name="jackbros" supported="no">
 		<description>Jack Bros. (USA)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
@@ -62,7 +62,7 @@
 	</software>
 
 	<!-- Id: VUE-VJBJ-JPN - Developers: Atlus - Releases: 1995-09-29 (JPN) -->
-	<software name="jackbrosj" cloneof="jackbros">
+	<software name="jackbrosj" cloneof="jackbros" supported="no">
 		<description>Jack Bros. no Meiro de Hiihoo! (Jpn)</description>
 		<year>1995</year>
 		<publisher>Atlus</publisher>
@@ -74,7 +74,7 @@
 	</software>
 
 	<!-- Id: VUE-VMCJ-JPN/USA - Developers: Nintendo R&D1 - Releases: 1995-09-28 (JPN) -->
-	<software name="mariocla">
+	<software name="mariocla" supported="no">
 		<description>Mario Clash (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -86,7 +86,7 @@
 	</software>
 
 	<!-- Id: VUE-VMTJ-JPN/USA - Developers: Nintendo R&D1 / Tose Software - Releases: 1995-07-21 (JPN) -->
-	<software name="marioten">
+	<software name="marioten" supported="no">
 		<description>Mario's Tennis (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -98,7 +98,7 @@
 	</software>
 
 	<!-- Id: VUE-VNFE-USA - Developers: Nintendo IRD -->
-	<software name="nesterfb">
+	<software name="nesterfb" supported="no">
 		<description>Nester's Funky Bowling (USA)</description>
 		<year>1996</year>
 		<publisher>Nintendo</publisher>
@@ -110,7 +110,7 @@
 	</software>
 
 	<!-- Id: VUE-VH2E-USA - Developers: Raizing -->
-	<software name="panicbom">
+	<software name="panicbom" supported="no">
 		<description>Panic Bomber (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -122,7 +122,7 @@
 	</software>
 
 	<!-- Id: VUE-VREE-USA - Developers: T&E Soft -->
-	<software name="redalarm">
+	<software name="redalarm" supported="no">
 		<description>Red Alarm (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -134,7 +134,7 @@
 	</software>
 
 	<!-- Id: VUE-VREJ-JPN - Developers: T&E Soft - Releases: 1995-07-21 (JPN) -->
-	<software name="redalarmj" cloneof="redalarm">
+	<software name="redalarmj" cloneof="redalarm" supported="no">
 		<description>Red Alarm (Jpn)</description>
 		<year>1995</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -146,7 +146,7 @@
 	</software>
 
 	<!-- Id: VUE-VSDJ-JPN - Developers: Bandai? - Releases: 1995-12-22 (JPN) -->
-	<software name="sdgundam">
+	<software name="sdgundam" supported="no">
 		<description>SD Gundam - Dimension War (Jpn)</description>
 		<year>1995</year>
 		<publisher>Bandai</publisher>
@@ -158,7 +158,7 @@
 	</software>
 
 	<!-- Id: VUE-VSPJ-JPN - Developers: Taito - Releases: 1995-12-01 (JPN) -->
-	<software name="spaceinv">
+	<software name="spaceinv" supported="no">
 		<description>Space Invaders - Virtual Collection (Jpn)</description>
 		<year>1995</year>
 		<publisher>Taito</publisher>
@@ -170,7 +170,7 @@
 	</software>
 
 	<!-- Id: VUE-VSSJ-JPN - Developers: Tomcat System - Releases: 1995-09-29 (JPN) -->
-	<software name="ssquash">
+	<software name="ssquash" supported="no">
 		<description>Space Squash (Jpn)</description>
 		<year>1995</year>
 		<publisher>Coconuts Japan Entertainment</publisher>
@@ -182,7 +182,7 @@
 	</software>
 
 	<!-- Id: VUE-VTBJ-JPN/USA - Developers: Nintendo R&D1 - Releases: 1995-07-21 (JPN) -->
-	<software name="telerobo">
+	<software name="telerobo" supported="no">
 		<description>Teleroboxer (Jpn, USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -194,7 +194,7 @@
 	</software>
 
 	<!-- Id: VUE-VH2J_JPN - Developers: Raizing - Releases: 1995-07-21 (JPN) -->
-	<software name="tobidase">
+	<software name="tobidase" supported="no">
 		<description>Tobidase! Panibon (Jpn)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -206,7 +206,7 @@
 	</software>
 
 	<!-- Id: VUE-VVBJ-JPN - Developers: Athena - Releases: 1995-12-22 (JPN) -->
-	<software name="vbowling">
+	<software name="vbowling" supported="no">
 		<description>Virtual Bowling (Jpn)</description>
 		<year>1995</year>
 		<publisher>Athena</publisher>
@@ -218,7 +218,7 @@
 	</software>
 
 	<!-- Id: VUE-VVFJ-JPN - Developers: Pack-In-Video - Releases: 1995-10-16 (JPN) -->
-	<software name="vfishing">
+	<software name="vfishing" supported="no">
 		<description>Virtual Fishing (Jpn)</description>
 		<year>1995</year>
 		<publisher>Pack-In-Video</publisher>
@@ -230,7 +230,7 @@
 	</software>
 
 	<!-- Id: VUE-VH3E-USA - Developers: Hudson -->
-	<software name="vforce">
+	<software name="vforce" supported="no">
 		<description>Vertical Force (USA)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -242,7 +242,7 @@
 	</software>
 
 	<!-- Id: VUE-VH3J-JPN - Developers: Hudson - Releases: 1995-08-12 (JPN) -->
-	<software name="vforcej" cloneof="vforce">
+	<software name="vforcej" cloneof="vforce" supported="no">
 		<description>Vertical Force (Jpn)</description>
 		<year>1995</year>
 		<publisher>Hudson</publisher>
@@ -254,7 +254,7 @@
 	</software>
 
 	<!-- Id: VUE-VVGJ-JPN - Developers: T&E Soft - Releases: 1995-08-11 (JPN) -->
-	<software name="vgolf">
+	<software name="vgolf" supported="no">
 		<description>T&amp;E Virtual Golf (Jpn)</description>
 		<year>1995</year>
 		<publisher>T&amp;E Soft</publisher>
@@ -266,7 +266,7 @@
 	</software>
 
 	<!-- Id: VUE-VJVJ-JPN - Developers: J-Wing - Releases: 1995-12-08 (JPN) -->
-	<software name="vlab">
+	<software name="vlab" supported="no">
 		<description>Virtual Lab (Jpn)</description>
 		<year>1995</year>
 		<publisher>J-Wing</publisher>
@@ -278,7 +278,7 @@
 	</software>
 
 	<!-- Id: VUE-VVPE-USA - Developers: Kemco -->
-	<software name="vleague">
+	<software name="vleague" supported="no">
 		<description>Virtual League Baseball (USA)</description>
 		<year>1995</year>
 		<publisher>Kemco</publisher>
@@ -290,7 +290,7 @@
 	</software>
 
 	<!-- Id: VUE-VVPJ-JPN - Developers: Kemco - Releases: 1995-08-11 (JPN) -->
-	<software name="vproyak">
+	<software name="vproyak" supported="no">
 		<description>Virtual Pro Yakyuu '95 (Jpn)</description>
 		<year>1995</year>
 		<publisher>Kemco</publisher>
@@ -302,7 +302,7 @@
 	</software>
 
 	<!-- Id: VUE-VTRJ-JPN - Developers: Locomotive - Releases: 1995-08-25 (JPN) -->
-	<software name="vtetris">
+	<software name="vtetris" supported="no">
 		<description>V-Tetris (Jpn)</description>
 		<year>1995</year>
 		<publisher>Bullet-Proof Software</publisher>
@@ -314,7 +314,7 @@
 	</software>
 
 	<!-- Id: VUE-VWCJ-JPN/USA - Developers: Nintendo R&D1 - Releases: 1995-12-01 (JPN) -->
-	<software name="wariolnd">
+	<software name="wariolnd" supported="no">
 		<description>Virtual Boy Wario Land (USA) ~ Virtual Boy Wario Land - Awazon no Hihou (Jpn)</description>
 		<year>1995</year>
 		<publisher>Nintendo</publisher>
@@ -326,7 +326,7 @@
 	</software>
 
 	<!-- Id: VUE-VWEE-USA - Developers: Ocean -->
-	<software name="waterwld">
+	<software name="waterwld" supported="no">
 		<description>Waterworld (USA)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>

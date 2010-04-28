@@ -1,5 +1,5 @@
 /******************************************************************************
-Consolidation and enhancment of documentation by Manfred Schneider based on previous work from
+Consolidation and enhancement of documentation by Manfred Schneider based on previous work from
  PeT mess@utanet.at and Paul Robson (autismuk@aol.com) minor updates by incog
 
  Schematics, manuals and anything you can desire for at http://amigan.classicgaming.gamespy.com/
@@ -463,30 +463,41 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 	int size;
 
 	memset(rom, 0, 0x8000);
-	size = image_length(image);
-
-	if (size > memory_region_length(image->machine, "maincpu"))
-		size = memory_region_length(image->machine, "maincpu");
-
-	if (image_fread(image, rom, size) != size)
-		return INIT_FAIL;
-
+	if (image_software_entry(image) == NULL)
+	{
+		size = image_length(image);
+		
+		if (size > memory_region_length(image->machine, "maincpu"))
+			size = memory_region_length(image->machine, "maincpu");
+		
+		if (image_fread(image, rom, size) != size)
+			return INIT_FAIL;
+	}
+	else
+	{
+		size = image_get_software_region_length(image, "rom");
+		memcpy(rom, image_get_software_region(image, "rom"), size);
+	}
+	
 	if (size > 0x1000)
 		memmove(rom + 0x2000, rom + 0x1000, size - 0x1000);
-        if (size > 0x2000)
-                memmove(rom + 0x4000, rom + 0x3000, size - 0x2000);
+  
+	if (size > 0x2000)
+		memmove(rom + 0x4000, rom + 0x3000, size - 0x2000);
 
 #if 1
 	// golf cartridge support
 	// 4kbyte at 0x0000
 	// 2kbyte at 0x4000
-        if (size<=0x2000) memcpy (rom+0x4000, rom+0x2000, 0x1000);
+	if (size <= 0x2000) 
+		memcpy(rom + 0x4000, rom + 0x2000, 0x1000);
 #else
 	/* this is a testpatch for the golf cartridge
        so it could be burned in a arcadia 2001 cartridge
        activate it and use debugger to save patched version */
 	// not enough yet (some pointers stored as data?)
-	struct { UINT16 address; UINT8 old; UINT8 neu; }
+	struct { UINT16 address; UINT8 old; UINT8 new; }
+	int i:
 	patch[]= {
 		{ 0x0077,0x40,0x20 },
 		{ 0x011e,0x40,0x20 },
@@ -510,9 +521,11 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 		{ 0x0ffb,0x41,0x21 },
 		{ 0x20ec,0x42,0x22 }
 	};
-	for (int i=0; i<ARRAY_LENGTH(patch); i++) {
-	    assert(rom[patch[i].address]==patch[i].old);
-	    rom[patch[i].address]=patch[i].neu;
+
+	for (i = 0; i < ARRAY_LENGTH(patch); i++) 
+	{
+	    assert(rom[patch[i].address] == patch[i].old);
+	    rom[patch[i].address] = patch[i].new;
 	}
 #endif
 	return INIT_PASS;
@@ -549,7 +562,11 @@ static MACHINE_DRIVER_START( arcadia )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("arcadia_cart")
 	MDRV_CARTSLOT_LOAD(arcadia_cart)
+
+	/* Software lists */
+	MDRV_SOFTWARE_LIST_ADD("arcadia")
 MACHINE_DRIVER_END
 
 ROM_START(advsnha)

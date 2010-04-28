@@ -772,12 +772,19 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 static DEVICE_IMAGE_LOAD( sg1000_cart )
 {
 	const address_space *program = cputag_get_address_space(image->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	int size = image_length(image);
+	UINT32 size;
 	UINT8 *ptr = memory_region(image->machine, Z80_TAG);
 
-	if (image_fread(image, ptr, size ) != size)
+	if (image_software_entry(image) == NULL)
 	{
-		return INIT_FAIL;
+		size = image_length(image);
+		if (image_fread(image, ptr, size) != size)
+			return INIT_FAIL;
+	}
+	else
+	{
+		size = image_get_software_region_length(image, "rom");
+		memcpy(ptr, image_get_software_region(image, "rom"), size);
 	}
 
 	/* cartridge ROM banking */
@@ -815,12 +822,19 @@ static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 
 static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
-	int size = image_length(image);
+	UINT32 size;
 	UINT8 *ptr = memory_region(image->machine, Z80_TAG);
-
-	if (image_fread(image, ptr, size) != size)
+	
+	if (image_software_entry(image) == NULL)
 	{
-		return INIT_FAIL;
+		size = image_length(image);
+		if (image_fread(image, ptr, size) != size)
+			return INIT_FAIL;
+	}
+	else
+	{
+		size = image_get_software_region_length(image, "rom");
+		memcpy(ptr, image_get_software_region(image, "rom"), size);
 	}
 
 	/* cartridge ROM and work RAM banking */
@@ -857,7 +871,11 @@ static MACHINE_DRIVER_START( sg1000 )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("sg,bin")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("sg1000_cart")
 	MDRV_CARTSLOT_LOAD(sg1000_cart)
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("sg1000")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -911,7 +929,11 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("sg,sc,bin")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("sg1000_cart")
 	MDRV_CARTSLOT_LOAD(sc3000_cart)
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("sg1000")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

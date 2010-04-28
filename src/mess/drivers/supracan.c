@@ -920,19 +920,29 @@ static WRITE16_HANDLER( supracan_video_w )
 
 static DEVICE_IMAGE_LOAD( supracan_cart )
 {
-	UINT8 *cart = memory_region( image->machine, "cart" );
-	int size = image_length( image );
+	UINT8 *cart = memory_region(image->machine, "cart");
+	UINT32 size;
 
-	if ( size > 0x400000 )
+	if (image_software_entry(image) == NULL)
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size" );
-		return INIT_FAIL;
+		size = image_length(image);
+
+		if (size > 0x400000)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			return INIT_FAIL;
+		}
+
+		if (image_fread(image, cart, size) != size)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			return INIT_FAIL;
+		}
 	}
-
-	if ( image_fread( image, cart, size ) != size )
+	else
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-		return INIT_FAIL;
+		size = image_get_software_region_length(image, "rom");
+		memcpy(cart, image_get_software_region(image, "rom"), size);
 	}
 
 	return INIT_PASS;
@@ -1026,10 +1036,13 @@ static MACHINE_DRIVER_START( supracan )
 	MDRV_PALETTE_INIT( supracan )
 	MDRV_GFXDECODE( supracan )
 
-	MDRV_CARTSLOT_ADD( "cart" )
-	MDRV_CARTSLOT_EXTENSION_LIST( "bin" )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_LOAD( supracan_cart )
+	MDRV_CARTSLOT_INTERFACE("supracan_cart")
+	MDRV_CARTSLOT_LOAD(supracan_cart)
+
+	MDRV_SOFTWARE_LIST_ADD("supracan")
 
 	MDRV_VIDEO_START( supracan )
 	MDRV_VIDEO_UPDATE( supracan )

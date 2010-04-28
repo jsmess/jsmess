@@ -487,14 +487,14 @@ static WRITE8_HANDLER( flash1_w )
 
 
 static ADDRESS_MAP_START( ngp_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE( 0x000080, 0x0000bf )	AM_READWRITE( ngp_io_r, ngp_io_w )								/* ngp/c specific i/o */
-	AM_RANGE( 0x004000, 0x006fff )	AM_RAM															/* work ram */
-	AM_RANGE( 0x007000, 0x007fff )	AM_RAM AM_SHARE("share1")										/* shared with sound cpu */
-	AM_RANGE( 0x008000, 0x0087ff )	AM_DEVREADWRITE( "k1ge", k1ge_r, k1ge_w )						/* video registers */
-	AM_RANGE( 0x008800, 0x00bfff )	AM_RAM AM_REGION("vram", 0x800 )								/* Video RAM area */
-	AM_RANGE( 0x200000, 0x3fffff )	AM_ROM AM_WRITE( flash0_w ) AM_REGION( "cart", 0 )				/* cart area #1 */
-	AM_RANGE( 0x800000, 0x9fffff )	AM_ROM AM_WRITE( flash1_w ) AM_REGION( "cart", 0x200000 )		/* cart area #2 */
-	AM_RANGE( 0xff0000, 0xffffff )	AM_ROM AM_REGION( "maincpu", 0 )								/* system rom */
+	AM_RANGE( 0x000080, 0x0000bf )	AM_READWRITE(ngp_io_r, ngp_io_w)							/* ngp/c specific i/o */
+	AM_RANGE( 0x004000, 0x006fff )	AM_RAM														/* work ram */
+	AM_RANGE( 0x007000, 0x007fff )	AM_RAM AM_SHARE("share1")									/* shared with sound cpu */
+	AM_RANGE( 0x008000, 0x0087ff )	AM_DEVREADWRITE("k1ge", k1ge_r, k1ge_w)						/* video registers */
+	AM_RANGE( 0x008800, 0x00bfff )	AM_RAM AM_REGION("vram", 0x800 )							/* Video RAM area */
+	AM_RANGE( 0x200000, 0x3fffff )	AM_ROM AM_WRITE(flash0_w) AM_REGION("cart", 0)				/* cart area #1 */
+	AM_RANGE( 0x800000, 0x9fffff )	AM_ROM AM_WRITE(flash1_w) AM_REGION("cart", 0x200000)		/* cart area #2 */
+	AM_RANGE( 0xff0000, 0xffffff )	AM_ROM AM_REGION("maincpu", 0)								/* system rom */
 ADDRESS_MAP_END
 
 
@@ -639,7 +639,7 @@ static VIDEO_UPDATE( ngp )
 static DEVICE_START( ngp_cart )
 {
 	ngp_state *state = (ngp_state *)device->machine->driver_data;
-	UINT8 *cart = memory_region( device->machine, "cart" );
+	UINT8 *cart = memory_region(device->machine, "cart");
 
 	state->flash_chip[0].present = 0;
 	state->flash_chip[0].state = F_READ;
@@ -654,20 +654,30 @@ static DEVICE_START( ngp_cart )
 static DEVICE_IMAGE_LOAD( ngp_cart )
 {
 	ngp_state *state = (ngp_state *)image->machine->driver_data;
-	int filesize = image_length( image );
+	UINT32 filesize;
 
-	if ( filesize != 0x80000 && filesize != 0x100000 && filesize != 0x200000 && filesize != 0x400000 )
+	if (image_software_entry(image) == NULL)
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size" );
-		return INIT_FAIL;
-	}
+		filesize = image_length(image);
 
-	if ( image_fread( image, memory_region(image->machine, "cart"), filesize ) != filesize )
+		if (filesize != 0x80000 && filesize != 0x100000 && filesize != 0x200000 && filesize != 0x400000)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
+			return INIT_FAIL;
+		}
+
+		if (image_fread(image, memory_region(image->machine, "cart"), filesize) != filesize)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Error loading file");
+			return INIT_FAIL;
+		}
+	}
+	else
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Error loading file" );
-		return INIT_FAIL;
+		filesize = image_get_software_region_length(image, "rom");
+		memcpy(memory_region(image->machine, "cart"), image_get_software_region(image, "rom"), filesize);
 	}
-
+	
 	state->flash_chip[0].manufacturer_id = 0x98;
 	switch( filesize )
 	{
@@ -790,13 +800,6 @@ static MACHINE_DRIVER_START( ngp_common )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "lspeaker", 0.50 )
 	MDRV_SOUND_ADD( "dac_r", DAC, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 0.50 )
-
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,ngp,npc,ngc")
-	MDRV_CARTSLOT_NOT_MANDATORY
-	MDRV_CARTSLOT_START( ngp_cart )
-	MDRV_CARTSLOT_LOAD( ngp_cart )
-	MDRV_CARTSLOT_UNLOAD( ngp_cart )
 MACHINE_DRIVER_END
 
 
@@ -807,6 +810,14 @@ static MACHINE_DRIVER_START( ngp )
 	MDRV_PALETTE_INIT( k1ge )
 
 	MDRV_K1GE_ADD( "k1ge", XTAL_6_144MHz, ngp_k1ge_interface )
+
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,ngp,npc,ngc")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(ngp_cart)
+	MDRV_CARTSLOT_INTERFACE("ngp_cart")
+	MDRV_CARTSLOT_UNLOAD(ngp_cart)
+	MDRV_SOFTWARE_LIST_ADD("ngp")
 MACHINE_DRIVER_END
 
 
@@ -817,6 +828,15 @@ static MACHINE_DRIVER_START( ngpc )
 	MDRV_PALETTE_INIT( k2ge )
 
 	MDRV_K2GE_ADD( "k1ge", XTAL_6_144MHz, ngp_k1ge_interface )
+
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,ngp,npc,ngc")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_START(ngp_cart)
+	MDRV_CARTSLOT_LOAD(ngp_cart)
+	MDRV_CARTSLOT_INTERFACE("ngp_cart")
+	MDRV_CARTSLOT_UNLOAD(ngp_cart)
+	MDRV_SOFTWARE_LIST_ADD("ngp")
 MACHINE_DRIVER_END
 
 

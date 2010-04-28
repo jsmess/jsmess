@@ -2198,30 +2198,42 @@ WRITE8_HANDLER( megaduck_rom_bank_select_type2 )
 
 DEVICE_IMAGE_LOAD(megaduck_cart)
 {
-	int I, filesize;
+	int I; 
+	UINT32 filesize;
 
 	for (I = 0; I < MAX_ROMBANK; I++)
 		gb_driver_data.ROMMap[I] = NULL;
 	for (I = 0; I < MAX_RAMBANK; I++)
 		gb_driver_data.RAMMap[I] = NULL;
 
-	filesize = image_length(image);
-	gb_driver_data.ROMBanks = filesize / 0x4000;
+	if (image_software_entry(image) == NULL)
+		filesize = image_length(image);
+	else
+		filesize = image_get_software_region_length(image, "rom");
 
-	if ( ( filesize == 0 ) || ( ( filesize % 0x4000 ) != 0 ) )
+	if ((filesize == 0) || ((filesize % 0x4000) != 0))
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size" );
+		image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
 		return INIT_FAIL;
 	}
+	
+	gb_driver_data.ROMBanks = filesize / 0x4000;
 
 	/* Claim memory */
 	gb_driver_data.gb_cart = auto_alloc_array(image->machine, UINT8, filesize);
 
 	/* Read cartridge */
-	if (image_fread (image, gb_driver_data.gb_cart, filesize) != filesize)
+	if (image_software_entry(image) == NULL)
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-		return INIT_FAIL;
+		if (image_fread(image, gb_driver_data.gb_cart, filesize) != filesize)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			return INIT_FAIL;
+		}
+	}
+	else
+	{
+		memcpy(gb_driver_data.gb_cart, image_get_software_region(image, "rom"), filesize);
 	}
 
 	/* Log cart information */
@@ -2232,7 +2244,7 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 
 	for (I = 0; I < gb_driver_data.ROMBanks; I++)
 	{
-		gb_driver_data.ROMMap[I] = gb_driver_data.gb_cart + ( I * 0x4000 );
+		gb_driver_data.ROMMap[I] = gb_driver_data.gb_cart + (I * 0x4000);
 	}
 
 	/* Build rom bank Mask */

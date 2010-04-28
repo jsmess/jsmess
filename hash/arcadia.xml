@@ -4,14 +4,14 @@
 	<!-- 3D Attack 1983 UA Ltd. -->
 
 	<!-- Also known as "Bowling" or "Bowling 3D" -->
-	<software name="3dbwling">
+	<software name="3dbowl">
 		<description>3D Bowling</description>
 		<year>1982</year>
 		<publisher>UA Ltd.</publisher>
 		<!-- <serial>c011</serial> -->
 		<part name="cart" interface="arcadia_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="3dbwling.bin" size="4096" crc="f3c08e19" sha1="edd33cabd3d600e9e3d3c22f326a065ea6ebe32c" offset="0000" />
+				<rom name="3dbowl.bin" size="4096" crc="f3c08e19" sha1="edd33cabd3d600e9e3d3c22f326a065ea6ebe32c" offset="0000" />
 			</dataarea>
 		</part>
 	</software>

@@ -675,7 +675,9 @@ static MACHINE_DRIVER_START( megaduck )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("megaduck_cart")
 	MDRV_CARTSLOT_LOAD(megaduck_cart)
+	MDRV_SOFTWARE_LIST_ADD("megaduck")
 MACHINE_DRIVER_END
 
 /***************************************************************************

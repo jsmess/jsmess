@@ -171,26 +171,36 @@ static PALETTE_INIT( pv1000 )
 
 static DEVICE_IMAGE_LOAD( pv1000_cart )
 {
-	UINT8 *cart = memory_region( image->machine, "cart" );
-	int size = image_length( image );
+	UINT8 *cart = memory_region(image->machine, "cart");
+	UINT32 size;
+	
+	if (image_software_entry(image) == NULL)
+		size = image_length(image);
+	else
+		size = image_get_software_region_length(image, "rom");
+	
 
-	if ( size != 0x2000 && size != 0x4000 )
+	if (size != 0x2000 && size != 0x4000)
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size" );
+		image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return INIT_FAIL;
 	}
 
-	if ( image_fread( image, cart, size ) != size )
+	if (image_software_entry(image) == NULL)
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-		return INIT_FAIL;
+		if (image_fread(image, cart, size) != size)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			return INIT_FAIL;
+		}
 	}
+	else
+		memcpy(cart, image_get_software_region(image, "rom"), size);
+		
 
 	/* Mirror 8KB rom */
-	if ( size == 0x2000 )
-	{
-		memcpy( cart+0x2000, cart, 0x2000 );
-	}
+	if (size == 0x2000)
+		memcpy(cart + 0x2000, cart, 0x2000);
 
 	return INIT_PASS;
 }
@@ -345,10 +355,14 @@ static MACHINE_DRIVER_START( pv1000 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
 	/* Cartridge slot */
-	MDRV_CARTSLOT_ADD( "cart" )
-	MDRV_CARTSLOT_EXTENSION_LIST( "bin" )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_MANDATORY
-	MDRV_CARTSLOT_LOAD( pv1000_cart )
+	MDRV_CARTSLOT_INTERFACE("pv1000_cart")
+	MDRV_CARTSLOT_LOAD(pv1000_cart)
+
+	/* Software lists */
+	MDRV_SOFTWARE_LIST_ADD("pv1000")
 MACHINE_DRIVER_END
 
 

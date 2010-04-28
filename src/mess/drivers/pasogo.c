@@ -506,16 +506,25 @@ static const struct pic8259_interface pasogo_pic8259_config =
 static DEVICE_IMAGE_LOAD( pasogo_cart )
 {
 	UINT8 *user = memory_region(image->machine, "user1");
-	int size;
-	size = image_length(image);
+	UINT32 size;
 
-	if (image_fread(image, user, size) != size)
+	if (image_software_entry(image) == NULL)
 	{
-		logerror("%s load error\n", image_filename(image));
-		return 1;
-	}
+		size = image_length(image);
 
-	return 0;
+		if (image_fread(image, user, size) != size)
+		{
+			logerror("%s load error\n", image_filename(image));
+			return INIT_FAIL;
+		}
+	}
+	else
+	{
+		size = image_get_software_region_length(image, "rom");
+		memcpy(user, image_get_software_region(image, "rom"), size);
+	}
+	
+	return INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( pasogo )
@@ -551,7 +560,9 @@ static MACHINE_DRIVER_START( pasogo )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("pasogo_cart")
 	MDRV_CARTSLOT_LOAD(pasogo_cart)
+	MDRV_SOFTWARE_LIST_ADD("pasogo")
 MACHINE_DRIVER_END
 
 
