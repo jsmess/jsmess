@@ -1303,8 +1303,9 @@ static void menu_insert(HWND window)
 	/* append the current directory, if appropriate */
 	if (info->current_directory != NULL)
 	{
-		s2 = (char *) alloca(strlen(info->current_directory) + strlen(image_filename) + 1);
+		s2 = (char *) alloca(strlen(info->current_directory) + strlen(image_filename) + 1 + 1);
 		strcpy(s2, info->current_directory);
+		strcat(s2, "\\");
 		strcat(s2, image_filename);
 		image_filename = s2;
 	}
@@ -1548,8 +1549,9 @@ static void menu_createdir(HWND window)
 
 	if (info->current_directory)
 	{
-		s = (char *) alloca(strlen(info->current_directory) + strlen(dirname) + 1);
+		s = (char *) alloca(strlen(info->current_directory) + strlen(dirname) + 1 + 1);
 		strcpy(s, info->current_directory);
+		strcat(s, "\\");
 		strcat(s, dirname);
 		free(dirname);
 		dirname = mame_strdup(s);
