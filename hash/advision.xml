@@ -13,7 +13,7 @@
 		</part>
 	</software>
 
-	<software name="turtles">
+	<software name="turtles" supported="no">
 		<description>Turtles</description>
 		<year>1982</year>
 		<publisher>Entex Industries</publisher>
