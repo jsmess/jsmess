@@ -80,7 +80,7 @@ BOOL win_get_file_name_dialog(win_open_file_name *ofn)
 			t_filter[i] = (buffer[i] != '|') ? buffer[i] : '\0';
 		t_filter[i++] = '\0';
 		t_filter[i++] = '\0';
-		free(buffer);
+		osd_free(buffer);
 	}
 
 	// do we need to translate the file parameter?
@@ -93,7 +93,7 @@ BOOL win_get_file_name_dialog(win_open_file_name *ofn)
 		t_file_size = MAX(_tcslen(buffer) + 1, MAX_PATH);
 		t_file = (LPTSTR) alloca(t_file_size * sizeof(*t_file));
 		_tcscpy(t_file, buffer);
-		free(buffer);
+		osd_free(buffer);
 	}
 
 	// do we need to translate the initial directory?
@@ -148,7 +148,7 @@ BOOL win_get_file_name_dialog(win_open_file_name *ofn)
 			goto done;
 
 		snprintf(ofn->filename, ARRAY_LENGTH(ofn->filename), "%s", utf8_file);
-		free(utf8_file);
+		osd_free(utf8_file);
 	}
 
 	// we've completed the process
@@ -156,7 +156,7 @@ BOOL win_get_file_name_dialog(win_open_file_name *ofn)
 
 done:
 	if (t_initial_directory != NULL)
-		free(t_initial_directory);
+		osd_free(t_initial_directory);
 	return result;
 }
 

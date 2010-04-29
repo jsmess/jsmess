@@ -1656,7 +1656,7 @@ static void setup_working_directory(image_slot_data *image)
             gamedrv = driver_get_compatible(gamedrv);
         }
     }
-	global_free(dst);
+	osd_free(dst);
 }
 
 

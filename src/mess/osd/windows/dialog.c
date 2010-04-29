@@ -448,7 +448,7 @@ static int dialog_write_item(dialog_box *di, DWORD style, short x, short y,
 	w_str = str ? wstring_from_utf8(str) : NULL;
 	rc = dialog_write_string(di, w_str);
 	if (w_str)
-		global_free(w_str);
+		osd_free(w_str);
 	if (rc)
 		return 1;
 
@@ -676,7 +676,7 @@ dialog_box *win_dialog_init(const char *title, const struct dialog_layout *layou
 
 	w_title = wstring_from_utf8(title);
 	rc = dialog_write_string(di, w_title);
-	global_free(w_title);
+	osd_free(w_title);
 	if (rc)
 		goto error;
 
@@ -823,7 +823,7 @@ int win_dialog_add_combobox_item(dialog_box *dialog, const char *item_label, int
 		if( !t_tmp )
 			return 1;
 		t_item_label = win_dialog_tcsdup(dialog, t_tmp);
-		global_free(t_tmp);
+		osd_free(t_tmp);
 		if (!t_item_label)
 			return 1;
 	}

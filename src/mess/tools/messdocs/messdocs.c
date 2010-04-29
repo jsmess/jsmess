@@ -109,7 +109,7 @@ file_error osd_mkdir(const char *dir)
 
 done:
 	if (tempstr)
-		free(tempstr);
+		osd_free(tempstr);
 	return filerr;
 }
 
@@ -137,7 +137,7 @@ file_error osd_rmdir(const char *dir)
 
 done:
 	if (tempstr)
-		free(tempstr);
+		osd_free(tempstr);
 	return filerr;
 } 
 

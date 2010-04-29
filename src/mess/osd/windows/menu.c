@@ -883,7 +883,7 @@ static void format_combo_changed(dialog_box *dialog, HWND dlgwnd, NMHDR *notific
 				has_option ? guide : NULL,
 				has_option ? optspec : NULL);
 		}
-		global_free(utf8_buf1);
+		osd_free(utf8_buf1);
 	}
 }
 
@@ -1259,13 +1259,13 @@ static HMENU find_sub_menu(HMENU menu, const char *menutext, int create_sub_menu
 		{
 			if (!get_menu_item_string(menu, ++i, TRUE, &sub_menu, buf, ARRAY_LENGTH(buf)))
 			{
-				global_free(t_menutext);
+				osd_free(t_menutext);
 				return NULL;
 			}
 		}
 		while(_tcscmp(t_menutext, buf));
 
-		global_free(t_menutext);
+		osd_free(t_menutext);
 
 		if (!sub_menu && create_sub_menu)
 		{
@@ -1589,7 +1589,7 @@ static void prepare_menus(HWND wnd)
 		TCHAR *t_view_name = tstring_from_utf8(view_name);
 		InsertMenu(video_menu, i, MF_BYPOSITION | (i == view_index ? MF_CHECKED : 0),
 			ID_VIDEO_VIEW_0 + i, t_view_name);
-		global_free(t_view_name);
+		osd_free(t_view_name);
 		i++;
 	}
 
@@ -1800,7 +1800,7 @@ static void help_display(HWND wnd, const char *chapter)
 	{
 		TCHAR *t_chapter = tstring_from_utf8(chapter);
 		htmlhelp(wnd, t_chapter, 0 /*HH_DISPLAY_TOPIC*/, 0);
-		global_free(t_chapter);
+		osd_free(t_chapter);
 	}
 }
 
@@ -2146,7 +2146,7 @@ static void set_menu_text(HMENU menu_bar, int command, const char *text)
 	SetMenuItemInfo(menu_bar, command, FALSE, &mii);
 
 	// cleanup
-	global_free(t_text);
+	osd_free(t_text);
 }
 
 

@@ -89,7 +89,7 @@ static BOOL prepare_combobox(HWND control, const option_guide *guide,
 						goto unexpected;
 					tempstr = tstring_from_utf8(guide[k].display_name);
 					SendMessage(control, CB_ADDSTRING, 0, (LPARAM) tempstr);
-					free(tempstr);
+					osd_free(tempstr);
 				}
 				else
 					goto unexpected;
