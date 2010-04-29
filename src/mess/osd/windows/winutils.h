@@ -48,6 +48,4 @@ BOOL win_get_file_name_dialog(win_open_file_name *ofn);
 
 void win_scroll_window(HWND window, WPARAM wparam, int scroll_bar, int scroll_delta_line);
 
-BOOL win_append_menu_utf8(HMENU menu, UINT flags, UINT_PTR id, const char *item);
-
 #endif // WINUTILS_H

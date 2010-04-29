@@ -219,29 +219,3 @@ void win_scroll_window(HWND window, WPARAM wparam, int scroll_bar, int scroll_de
 		ScrollWindowEx(window, 0, si.nPos - scroll_pos, NULL, NULL, NULL, NULL, SW_SCROLLCHILDREN | SW_INVALIDATE | SW_ERASE);
 	}
 }
-
-
-
-//============================================================
-//  win_append_menu_utf8
-//============================================================
-
-BOOL win_append_menu_utf8(HMENU menu, UINT flags, UINT_PTR id, const char *item)
-{
-	BOOL result;
-	const TCHAR *t_item = (const TCHAR*)item;
-	TCHAR *t_str = NULL;
-
-	// only convert string when it's no a bitmap
-	if (!(flags & MF_BITMAP) && item) {
-		t_str = tstring_from_utf8(item);
-		t_item = t_str;
-	}
-
-	result = AppendMenu(menu, flags, id, t_item);
-
-	if (t_str)
-		osd_free(t_str);
-
-	return result;
-}
