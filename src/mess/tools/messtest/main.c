@@ -6,9 +6,6 @@
 
 *********************************************************************/
 
-#ifdef WIN32
-#include "winutils.h"
-#endif
 #include <time.h>
 
 #include "core.h"

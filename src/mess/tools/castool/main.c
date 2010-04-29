@@ -8,9 +8,6 @@
 
 ***************************************************************************/
 
-#ifdef WIN32
-#include "winutils.h"
-#endif
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
