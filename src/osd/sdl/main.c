@@ -17,6 +17,7 @@
 #include <stdlib.h>
 
 // MAMEOS headers
+#include "osdcore.h"
 #include "strconv.h"
 
 extern int utf8_main(int argc, char *argv[]);
