@@ -38,7 +38,7 @@
 #include "strconv.h"
 #include "mui_util.h"
 
-#define MAX_DIRS 20
+#define MAX_DIRS 128
 
 /***************************************************************************
     Internal structures

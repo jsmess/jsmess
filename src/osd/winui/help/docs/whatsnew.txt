@@ -1,356 +1,270 @@
-0.135u2
+0.137u3
 -------
 
 
 MAMETesters Bugs Fixed
 ----------------------
-- 03553: [Crash/Freeze] extdwnhl: Game does not start (Phil Bennett)
-- 03544: [DIP/Input] mgdh, sdmg2: The joystick function missed in 
-         mgdh and sdmg2 (Luca Elia)
-- 03547: [Graphics] mgdh,sdmg2: Donden graphics in mgdh and sdmg2 are 
-         inaccurate (Luca Elia)
-- 03546: [Documentation] nkishusp: Black screen after the game start. 
-         (Luca Elia)
-- 03540: [Sound] glpracr3, hvnsgate, raystorm: Missing sound. 
-         (Phil Bennett)
-- 03545: [Graphics] tekken3, tektagt: Tekken games do not proceed 
-         into attract mode after initial screen (Phil Bennett)
-- 03542: [Sound] Sets/Drivers using YM2610: Missing sounds 
-         (Phil Bennett)
+- 03813: [Graphics] shadoww, shadowwa, gaiden, ryukendn, ryukendna: 
+         Lost blending effect (David Haywood)
+- 00803: [Color/Palette] All vsnes.c games: Colors are wrong.
+- 00270: [Graphics] cstlevna, vsgradus, suprmrio, goonies: Black 
+         startup screens are now gray.
+- 00889: [Color/Palette] pc_smb: The colors of the characters, fire 
+         flower, etc. on the top screen are wrong.
+- 01097: [Color/Palette] cstlevna: Colors of the first enemies you 
+         encounter are wrong.
+- 02457: [DIP/Input] tkoboxng: Unable to coin/start game properly.
 
 
 
 Source Changes
 --------------
-Added driver data structs to: [Fabio Priuli]
- - beaminv.c
- - cball.c and capbowl.c
- - changela.c, circus.c and circusc.c
- - crgolf.c and clayshoo.c
- - decocass.c
- - docastle.c, dotrikun.c, cloud9.c and destroyr.c
- - cheekyms.c
- - embargo.c
- - ddragon.c, ddragon3.c and fgoal.c
- - bwing.c
- - dday.c
- - dcheese.c
- - flyball.c
- - freekick.c
+Fixed a bug with un-inited DMA regs in the SNES driver, fixes at least
+a long-standing bug with nss_ssoc dimmed team selection screen
+[Angelo Salese]
 
-Added driver data and save state support to: [Fabio Priuli]
- - blmbycar.c
- - zerozone.c, yunsun16.c, dominob.c, dogfgt.c and bogeyman.c
- - blockout.c and bigevglf.c
- - chaknpop.c
- - albazg.c
- - chinagat.c, esd16.c, f-32.c, fcombat.c, finalizr.c
- - fantland.c and firetrap.c
- - btime.c and scregg.c
- - fitfight.c, flstory.c and funkybee.c
- - fuukifg2.c and fuukifg3.c
+Added the Airline Pilot (USA) Naomi BIOS rom [The Dumping Union]
 
-Added save state support to: [Fabio Priuli]
- - 2mindril.c, ashnojoe.c, bigfghtr.c, bublbobl.c, cchance.c, 
-    champbwl.c, missb2.c
- - compgolf.c, champbas.c, copsnrob.c, cop01.c, cosmic.c, cntsteer.c, 
-    dacholer.c and dec8.c
- - armedf.c, calorie.c, canyon.c, chanbara.c, citycon.c, commando.c, 
-    crospang.c & cultures.c
- - astrocorp.c
- - ddayjlc.c, ddealer.c, deniam.c, discoboy.c, diverboy.c, dorachan.c,
-    dragrace.c, dreamwld.c, dribling.c, drmicro.c, drtomy.c
- - dynadice.c, dwarfd.c, dunhuang.c, enigma2.c, epos.c, drgnmst.c 
-    and egghunt.c
- - equites.c, exedexes.c, exerion.c and exprraid.c
- - funybubl.c, galaxi.c, gaiden.c and rocnrope.c
+sauro, trckydoc, trckydoca (sauro.c)  [stephh] :
+ * Fixed Dip Switches and Inputs (after verification of the Z80 code)
 
-Removed some rogue occurrences of 'x1snd' resulting from device tag 
-mass-change. [Phil Bennett]
+ppu2c0x.c: Removed the bogus "color remap tables" in favor of external
+palettes containing data reverse-engineered (several years ago) from
+original hardware. Each vsnes set, as well as the playch10 bios, now
+requires one of these palettes. [Alex Jackson]
 
-drw80pkr.c updates: [Jim Stolis]
- - Added Save State Support
- - Added Preliminary Dip Switch Settings
- - Corrected CPU Clock Value
- - Corrected Sound (Now Works)
- - Narrowed Down More IO R/W Areas
+vsnes.c improvements: [Alex Jackson]
+ * Moved RC2C05 PPU-based protection into the PPU itself, rather than
+    hacking it in at the driver level.
+ * After exhaustive testing, completely sorted out the "palette"
+    dipswitches (which are actually PPU type selection) on all games
+    that have them.  Added notes about these games in the comments.
+ * Removed GAME_IMPERFECT_COLORS and GAME_WRONG_COLORS from all games,
+    as they should all be 100% correct now.
+ * Fixed coin inputs in tkoboxng. Removed IMPERFECT_GRAPHICS flag
+    since there's no legitimate reason I can see for it. Also, fixed
+    manufacturer and description to match the title screen.
+ * Added a bit more information about the missing sets in the
+    comments.
 
-tms7000: Fixed disassembly of PCREL addressing mode. [Wilbert Pol]
+add partial 6840ptm readback support to exidy.c [Lord Nightmare]
 
-Added device support to the input system. Internally this replaces 
-PORT_CUSTOM/PORT_CHANGED, backward compatibility is achieved with an 
-internal dummy device. Added output lines (IPT_OUTPUT), which can be 
-written using new input_port_write* functions or directly from a 
-memory map using AM_WRITE_PORT converted adc083x to use io lines.
-[smf]
+Convert Atari System 1 to use the 'new' TMS5220 interface.
+[Lord Nightmare]
 
-ADC devices updates: [smf]
- - adc08x chips are all hooked up using input/output ports
- - reversed racing force steering wheel input and gas pedal, which 
-    is enough to get the game to boot.
- - reversed steering wheel input on winding heat, the usa cabinets 
-    are however hooked up the other way.
- - renamed adc0831_interface to adc083x_interface.
- - fixed adc083x gnd input
- - removed stray call logerror from adc083x.c
- - fixed default adc083x sars value
- - adc083x reset only affects outputs
+Switch Escape from the Planet of the Robot Monsters to use the new
+TMS5220 interface. [Lord Nightmare]
 
-Added set name to -romident. [smf]
+snes.c: Fixed clipmasks in hires modes [Fabio Priuli]
 
-Updated ddr 3rd mix plus protection to remove display corruption. 
-[smf]
+Fixed RTL opcode in-bank issue in the G65816 CPU core [Angelo Salese]
 
-RDP Updates: Fixed TMEM size, removed separate tlut, fixed tlut 
-uploads [angrylion]
+sm8500d.c: Fixed disassembly of extended instructions (1A, 1B, 4F). 
+[Oliver Stoeneberg] 
 
-hng64 updates: 
- - Added preliminary hook-up for multi-byte chain mode for sprites, 
-    used by Buriki One and the two Samurai Shodown games 
-    [David Haywood, Angelo Salese]
- - Fixed back plane color, thus giving characteristic blue background 
-    for POST screen [Angelo Salese]
- - Improved Dual Port emulation, fixing the POST errors about it
-    [Angelo Salese]
- - Implemented "simple" scroll register layout [David Haywood]
- - Implemented "complex" scroll register layout [David Haywood]
- - Corrected sprite end boundary, fixes credit messages in Buriki One 
-    [Angelo Salese]
- - Fixed scrolling text in Buriki One attract mode [Angelo Salese]
- - Hooked up global bpp switch for sprites, HW doesn't seem capable 
-    of doing per-sprite bpp switch, fixes coin credit text in Buriki 
-    One [Angelo Salese]
- - Implemented V-Blank register, fixes palette uploading in Samurai 
-    Shodown 1 & 2 [Angelo Salese]
- - Fixed sprite wrap-around [David Haywood]
- - Implemented irq 11, used by the racing games for network check, 
-    currently crashes due to an invalid parameter inside the 3d 
-    packets [Angelo Salese]
- - Added 16x16 / 8x8 tilemap mode select, fixes one scene in Extreme 
-    Rally and transition layer in Fatal Fury WA (squares on title 
-    screen) [David Haywood]
- - Added alt layout for the roz, fixes Roads Edge graphics before the 
-    title screen [David Haywood]
- - Implemented sprite clearance capability, fixes garbage gfxs as 
-    seen in Samurai Shodown 64 1 & 2 [Angelo Salese]
- - Implemented x/y sprite global offsets, used by Samurai Shodown 64 
-    1 ranking screen [David Haywood]
- - Hooked-up backup ram [Angelo Salese]
- - Documented some sprite findings [Angelo Salese]
- - Re-implemented zooming in Fatal Fury WA, and added alternative 
-    zooming mode used by the other games, they have some precision 
-    bugs though [Angelo Salese]
- - Implemented preliminary additive blending [David Haywood]
- - Slight optimization to the tile dirty marking [David Haywood]
- - Better documentation of mosaic and floor modes [David Haywood]
- - Implemented sprite disable bit [David Haywood]
- - Implemented dynamic visible area [Angelo Salese]
- - Start to document 3d / framebuffer video registers, implemented a 
-    quick hook-up that fixes Buriki One 3d model colors minus one 
-    case [Angelo Salese]
- - Implemented screen disable when the visible area regs are equal to 
-    zero and fixed back layer [Angelo Salese]
+lr35902.c: Fixed possible issue when checking for enabled irqs.  
+[Oliver Stoeneberg]
 
-Updated the albazg driver to use hanafuda standard inputs, eeprom 
-device, and memory_set_bank in place of memory_set_bankptr. 
-[Fabio Priuli]
+rf5c68.c: corrected the point at which the sample callbacks are
+triggered, and what channel is returned.  The interrupts are masked or
+enabled based on what PCM memory bank is used, rather than the
+physical channel that was used. [Barry Rodewald]
 
-System 23 update [Naibo Zhang]
- - Corrected memory mapping of palette RAM and handling of palette 
-    data. Power-On Self Test now shows correct colors.
- - Changed Panic Park from SS23 to S23 game.
+Converted Atari System 2 to use the 'new' TMS5220 interface. Switched
+TMS5220 type to 5220C. [Lord Nightmare]
 
-Galaxian3 update [Naibo Zhang]
- - Fleshed out skeleton driver. Each CPU board passes many self-tests
- - Master and slave CPU comms hooked up
+Further refining of the Atari JSA speech and audio modifications.
+Hooked up the reset line for the ym2151. [Lord Nightmare]
 
-Designated Puzzle Bang Bang (vamphalf.c) as Korean version. For this 
-set the title and language cannot be change. [Brian Troha]
+inptport.c: fixed keyboard detection (mainly for MESS) [Fabio Priuli]
 
-Added new module tagmap which is a simple hashed string map. Updated 
-device and input port lists to use the tagmap for tag searches. Also 
-removed the whole "quark" thing from the validity checker in favor of 
-using the tagmaps. [Aaron Giles]
+Hooked up correct proms, corrected gfx rom order and added bank select
+/ enabled for the reels in Treasure Island (Subsino) [David Haywood]
 
-Added Intel 8008 and National Semiconductor SC/MP CPU cores.
-[Miodrag Milanovic]
+updated Star Wars to use proper clocks for the tms5220 and the pokeys.
+[Lord Nightmare]
 
-INS 8060 SC/MP II support (using clock divider 2), main model renamed 
-to INS 8050 SC/MP. [Miodrag Milanovic]
+MASSIVE merge of TMS5110 and TMS5220 cores, TMS5220 side only so far.
+Much code by Jarek Burczynski merged. Lattice Filter, Multiplier, and
+clipping redone. TMS5220C multi-rate feature added. Now using the same
+LPC table file (and format, as created by couriersud) as the TMS51xx
+is. Unvoiced-Voiced transitioning adjusted to match patent. Command
+handling redone to better match patent. Reasonably significant speech
+quality improvements: Separate tables for TMS5200, TMS5220 and
+TMS5220C are implemented, though all still need to be verified from
+hardware. Fixes: Garbled speech in Escape from the Planet of the Robot
+Monster's Canal Mazes is fixed, as well as some other garbled speech
+in game (when saying 'throwing switch' for instance). Known
+Regressions (being worked on): Victory fails its startup self test
+with an error 5, but speech works in-game. [Lord Nightmare]
 
-Updated the astrocorp.c and groundfx.c drivers to use EEPROM device.
-[Fabio Priuli]
+Fixed victory self-test issue (FIFO must NOT be cleared on processing
+of a STOP frame, only on a new speak external command. victory is
+pedantic about this.), and in the process also fixed a bug regarding
+reading /READY state when not in speak external mode (the FIFO being
+full should NOT force /READY inactive in that case!) [Lord Nightmare]
 
-Added support for SCSI command 0x2a (Write w/ 32-bit LBA), upped 
-input buffer size in WD33C93 controller [Harmony]
+Fixed various SNES SRAM issues [Fabio Priuli, Angelo Salese]
 
-Hooked up eepromdev.c using PORT_READ_LINE_DEVICE/
-PORT_WRITE_LINE_DEVICE in groundfx.c. Output ports are now affected 
-by IP_ACTIVE_HIGH/IP_ACTIVE_LOW (eepromdev.c has active low cs).
-The previous value for callbacks in inptport.c is now tracked per 
-field. This saves recalculating it for PORT_CHANGED & conditional 
-fields wouldn't always get updated correctly. Tidied up eepromdev.c 
-interface. [smf]
+Fixed Wai Wai Jockey Gate-In title screen colors [Angelo Salese]
 
-Added sprites list stop to igs017.c. Implemented joystick mode in 
-mgdh and sdmg2 [Luca Elia]
+mk3ghw (aladbl.c driver + megadriv.c) [stephh] :
+ * Fixed Dip Switches and Inputs (after verification of the M68000
+    code) ssgbl (ssgbl.c driver + megadriv.c) [stephh] :
+ * Fixed stack vector so coins are now correctly handled (the game
+    shall be fully playable now)
+ * Fixed Dip Switches and Inputs (after verification of the M68000
+    code)
 
-Fixed audio output lengths in aviio.c. [CDiFan]
+Added makefile PPC64 autodetection [Julian Sikorski]
 
-Added memory_install_write_port_handler & 
-memory_install_readwrite_port_handler to be consistent with 
-installing handlers. [smf]
+6840PTM: Fixed interrupt flag behaviour and now allow fractional input
+clocks. [Phil Bennett]
 
-CDP1869 changes: [Curt Coder]
- - converted page RAM functions to use devcb
- - added pull interface for predisplay
+6850ACIA: Improved handling of /CTS signal and fixed issue with
+transmission parity generation. [Phil Bennett]
 
-Switched from linear interpolation to antialiased point sampling
-when upconverting low-frequency sound streams. This should de-muffle 
-low-frequency streams, treating them has having hard edges at sample 
-boundaries. [Aaron Giles]
+MPU4+Video updates: [Phil Bennett, David Haywood]
+ * Fixed serial comms. As a result, most games actually boot now.
+ * Fixed colours.
+ * Fixed SAA1099 sound.
+ * Added Characteriser tables for all games (a complete implementation
+    is still needed for most games).
 
-Converted the following drivers to use EEPROM device: deco156.c, 
-eolith.c, eolith16.c, limenko.c, taito_f3.c, taito_z.c, taito_b.c, 
-taitojc.c, toaplan2.c and kaneko16.c. [Fabio Priuli]
+Supported the 1555 fb format in the Naomi driver, needed by Cleopatra
+Fortune Plus [David Haywood]
 
-Implemented use of per tile colour lookup ROM in Portraits, colour 
-decode is still wrong [David Haywood]
+Fixed ext latch behaviour in the SNES driver [Angelo Salese]
 
-CF clear after binary operations on Intel 8008 CPU core. 
-[Miodrag Milanovic]
+vmetal, vmetaln (vmetal.c driver) [stephh] :
+ * Fixed Dip Switches and Inputs (after verification of the M68000
+    code)
 
-Improvements to Noraut Poker driver: [Roberto Fresca]
- * A lot of work in memory maps and machine driver stuff.
- * Improved Inputs / DIP switches for some games.
- * Added lamps support / layouts to new working games.
- * Added preliminary support to Kimble hardware.
- * Added support to CGI's Credit Poker 30x games.
- * Added new (and fixed old) technical notes.
- * Renamed norautpn descripion to Noraut Deluxe Poker (bootleg).
- * Added a placeholder for tpoker2's undumped 68705 MCU.
- * Reorganized the driver, plus some clean-ups.
- * Renamed kimblejp to kimbldhl. Changed game description to Kimble 
-    Double Hi-Lo.
- * Added specific memory map & machine driver to Kimble Double Hi-Lo.
- * Fix the Kimble Double Hi-Lo CPU type.
- * Added notes about the code obfuscation and PPI's handling/offsets.
+Fix 5220C pitch table so unvoiced speech actually works. Oops. Should
+be a further quality improvement. [Lord Nightmare]
 
-Added Magic Card Jackpot and Magic Lotto Export to Impera Magic Card 
-driver. Also added PCB layouts, hardware description and technical 
-notes. Changed the bipolar prom dumps to serial I2C bus EEPROM.
-[Roberto Fresca]
+Tentative fix for tms5220 VSM support. [Lord Nightmsre]
 
-Made DEVCB_INPUT_PORT(tag) work for write callbacks. [smf]
+F8 cpu disassembler improvements [Curt Coder]:
+ * fixed branch target PC
+ * added BP,BC,BZ,BR,BM,BNC,BNZ,BNO mnemonics
+- removed extraneous $ from 2 byte hex values
 
-Fixed regression in magicard.c driver [Angelo Salese]
+Implemented various PVR TA registers hook-ups in the Naomi driver
+[Angelo Salese]
 
-Introduced a generic_pointers structure within machine that is 
-designed to hold generic pointers that are commonly used. Moved
-generic_nvram, videoram, colorram, spriteram*, paletteram* pointers
-there. Added AM_BASE_GENERIC and AM_SIZE_GENERIC macros for 
-initializing generic pointers in memory maps. Also added 
-AM_BASE_SIZE_GENERIC to set both base and size in one step.
-[Aaron Giles]
+mpu4drvr.c: Fixed 68000 device resets [Phil Bennett]
 
-Moved global variables out of machine/generic and into a private data 
-structure hanging off of the running_machine. Added newly-needed 
-machine parameters to coin_counter_w, coin_lockout_w, and
-coin_lockout_global_w. Also added machine parameter to 
-set_led_state. [Aaron Giles]
+Naomi: Implemented more regs, test mode now properly sets 640x240 
+resolution. Implemented fb pixel double, Naomi test mode looks now 
+correct. [Angelo Salese]
 
-Added interface functions to get the number of dispensed tickets and 
-to increment the count, to remove the need for direct access to these 
-global variables. Also added functions to get the current count on a 
-particular coin counter and to determine the lockout state. 
-[Aaron Giles]
+i386dasm.c: Corrected display of debug registers (D0-D7) in
+disassembly listings [Barry Rodewald]
 
-Intel 8255A: clear input latch after reading it. [Curt Coder]
+video/nemesis.c: Removed palette gamma hack [Alex Jackson]
 
-Actually use the speaker interface if provided. [Curt Coder]
+Subsino driver improvements: [Roberto Fresca]
+ * Added another Treasure Island set.
+ * Added technical notes about the CPU box.
+ * Minor clean-ups.
+Revision 8866 by robertof
 
-Purged remaining globals from video/generic.c and audio/generic.c.
-[Aaron Giles]
+full schematics made from the real PCB connections. They include Hex
+D-type flip-flops, Bipolar PROM, 3-STATE Octal D-Type latches and
+resnet connections. [Roberto Fresca, Aleksandar Spasojevic]
 
-Fixed i386 REP prefix to use segment:SI when address size is 16-bit 
-(ie: when using OUTSB or OUTSW). [Barry Rodewald]
+Partly implemented 'stereo' gating (using ym2151 ctX lines) to POKEY
+and TMS5220 on Atari JSA-i sound board. (currently it is just 'mono'
+gating). Add TODOs for complete stereo gating and for the low-pass
+filter. [Lord Nightmare]
 
-Removed limited use of spriteram_3 global. [Atari Ace]
+Improvements to Funworld driver: [Roberto Fresca]
+ * Replaced the Fun World Quiz bad ROMs with good ones.
+ * Fixed the Fun World Quiz graphics and colors.
+ * Cleaned-up the flags for non working games.
+ * Modified the default lamps layout to include the bet lamp.
+ * Cleaned-up the Fun World Quiz inputs.
+ * Added 4 new Royal Card sets. Reworked parent/clone relationship.
+    (delete the old .cfg and .nv files to have them working properly).
+ * Splitted the Royal Card machine driver. This is needed to access
+    different halves of the bipolar PROM.
+ * Now principal Royal Card sets have a working bet button.
+ * Added default NVRAM to the new sets.
 
-Added AM_BASE_SIZE_MEMBER() macro for specifying both base and size
-structure members at once. Updated all cases where this could be
-used. [Aaron Giles]
+Improved video rendering in MPU4 [David Haywood]
 
-Cleaned up many driver data structs: [Fabio Priuli]
- * dropped almost completely the use of generic sizes with struct 
-    members 
- * reduced as much as possible accesses to cputag calls during 
-    emulation (they are now mainly concentrated at MACHINE_START & 
-    DRIVER_INIT)
+Implemented 15/31 kHz selector in the Naomi driver, makes Strike
+Fighter and Shootout Pool Prize to be bootable by the common user
+[Angelo Salese]
 
-Joker's Wild: bypassed the rng test [Angelo Salese]
+Clean up interpolation inhibit logic, may sound slightly better now.
+Minor fix to TMS5220C table so zero-energy frames are correctly
+detected. [Lord Nightmare]
 
-Joker's Wild: implemented bare minimum to allow it to go into gameplay 
-and fixed tilemap graphics [Angelo Salese]
+Added driver data class and save states to playmark.c, powerbal.c,
+pushman.c and pzletime.c [Fabio Priuli]
 
-Memory regions now use a tagmap for lookups. [Aaron Giles]
+Improvements to Shark Party (English, Alpha license): [Roberto Fresca]
+ * Created complete inputs from the scratch.
+ * Added coin/keyin/keyout counters.
+ * Added main game and double-up rates DIP switches.
+ * Added minimum bet DIP switches.
+ * Added maximum bet DIP switches.
+ * Added complete coinage and remote credits DIP switches.
+ * Added jokers and demo sounds DIP switches.
+ * Figured out and documented all the game outputs.
+ * Created proper button-lamps layout.
+Now the game is in full-working state.
+
+Added a RAM mirror that fixes The Typing of the Dead booting
+[Angelo Salese]
 
 
 
 New games added or promoted from NOT_WORKING status
 ---------------------------------------------------
-Submarine [Volker Hann, Team Europe, David Haywood, Angelo Salese]
-Noraut Deluxe Poker (console) [Roberto Fresca, ByteMaster]
-Noraut Joker Poker (original) [Roberto Fresca, ByteMaster]
-Noraut Red Hot Joker Poker (alt HW) [Roberto Fresca, ByteMaster]
-Mainline Double Joker Poker [Roberto Fresca, ByteMaster]
-Double Joker Poker (45%-75% payout) [Roberto Fresca, ByteMaster]
-Royal on Ten (Noraut Deluxe hack) [Roberto Fresca, ByteMaster]
-Credit Poker (ver.30c, standard) [Roberto Fresca, ByteMaster]
-Iron (SNES bootleg) [Tomasz Slanina, Volker Hann & Team Europe]
+Senko No Ronde Special (GDL-0038) [tormod, The Dumping Union]
+Guilty Gear XX Accent Core (GDL-0041) [Joerg Hartenberger]
+Cleopatra Fortune Plus (GDL-0012) [Joerg Hartenberger]
+Hammer [Guru, Smitdogg, Luca Elia, The Dumping Union]
+Royal Card (4 new sets) [Roberto Fresca]
+Treasure Bonus
+  [Team Europe, The Dumping Union, David Haywood, Angelo Salese]
 
 
 
 New clones added
 ----------------
-Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game) 
-   [Volker Hann, Team Europe]
-X-Men (4 Players ver EBA) [Irongiant]
-Wizard of Wor (with German Language ROM) [Volker Hann]
-Gorf (program 1, with German Language ROM) [Volker Hann]
-Super Puzzle Fighter II Turbo (Hispanic 960531) 
-   [Artemio Urbina, David Haywood]
+Iron Fortress (Japan) [F205V, The Dumping Union]
+Super Shanghai 2005 (GDL-0031) [tormod, Gerald, The Dumping Union]
+Megatouch IV Tournament Edition (9255-50-01 ROA, Standard version)
+  [Phil Bennett, MikeDX, Smitdogg, The Dumping Union]
+Teenage Mutant Hero Turtles (UK 4 Players, set 2) [porchy]
+Carnival (Head On hardware) [Andrew Welburn, Dumping Union] (2 sets)
+Double Dragon (US Set 3) [Corrado Tomaselli]
+Touchmaster 2000 (v4.00 Standard) [Brian Troha, The Dumping Union]
+Phraze Craze (two sets) [D. Beneke, Smitdogg, The Dumping Union]
+Treasure Island (Subsino, set 2)
+  [Roberto Fresca, Team Europe, 9ofzeven]
+Vs 10-Yard Fight (US, Taito license)
+  [ranger_lennier, W. Belk, Smitdogg, The Dumping Union]
+10-Yard Fight '85 (US, Taito license)
+  [Kevin Eshbach, Smitdogg, The Dumping Union]
 
 
 
 New games marked as GAME_NOT_WORKING
 ------------------------------------
-The King of Fighters Neowave (Japan) [Cah4e3]
-Final Furlong (FF2 Ver. A) [Guru]
-Dragon Chronicles (DC001 Ver. A) [Guru]
-Netchuu Pro Yakyuu 2002 (NPY1 Ver. A) [Guru]
-Soul Calibur II (SC23 Ver. A) [Guru]
-Soul Calibur II (SC21 Ver. A) [Guru]
-Tekken 4 (TEF3 Ver. C) [Guru]
-Tekken 4 (TEF2 Ver. A) [Guru]
-Tekken 4 (TEF1 Ver. A) [Guru]
-Mobile Suit Z-Gundam: A.E.U.G. vs Titans (ZGA1 Ver. A) [Guru]
-Capcom Fighting Jam (JAM1 Ver. A) [Guru]
-Quiz and Veriety Suku Suku Inufuku 2 (IN2 Ver. A) [Guru]
-Mobile Suit Z-Gundam: A.E.U.G. vs Titans DX (ZDX1 Ver. A) [Guru]
-Soul Calibur III (SC31001-NA-A) [Guru]
-Kinnikuman Muscle Grand Prix (KN1 Ver. A) [Guru]
-Taiko No Tatsujin 9 (TK91001-NA-A) [Guru]
-Tekken 5.1 (TE51 Ver. B) [Guru]
-Airline Pilots (Rev. A) [f205v]
-Sega Tetris [Guru]
-Noraut unknown set 1 (console) [Roberto Fresca, ByteMaster]
-Noraut unknown set 2 (console) [Roberto Fresca, ByteMaster]
-Noraut Joker Poker (V3.011a) [Roberto Fresca, Alan Griffin]
-Poker / Black Jack (Model 7521) [Roberto Fresca]
-Kimble Double Hi-Lo [Roberto Fresca, Alan Griffin]
-DRHL Poker (v.2.89) [Roberto Fresca, Siftware]
-Magic Card Jackpot (4.01) 
-   [Roberto Fresca, Team Europe, krick & The Dumping Union]
-Magic Lotto Export (5.03) 
-   [Roberto Fresca, Team Europe, krick & The Dumping Union]
+Adders and Ladders [Phil Bennett, David Haywood]
+Strike it Lucky [4 sets] [Phil Bennett, David Haywood]
+Quiz Grid [4 sets] [Phil Bennett, David Haywood]
+Eyes Down [2 sets] [Phil Bennett, David Haywood]
+Blox [2 sets] [Phil Bennett, David Haywood]
+Prize Space Invaders [2 sets] [Phil Bennett, David Haywood]
+Sega Strike Fighter [f205v, The Dumping Union]
+Derby Owner's Club (Ver. C) [f205v, The Dumping Union] 
+Kick '4' Cash [f205v, The Dumping Union]
+Happy Tour
+  [Guru, jmurjr, JacKc, gingertom, Rene Single, Smitdogg, 
+   The Dumping Union]
