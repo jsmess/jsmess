@@ -5,18 +5,22 @@
     PARAMETERS
 ***************************************************************************/
 
-#define OVERLAY_CUR		BIT(cell, 31)	/* places a cursor in the cell if SET */
-#define OVERLAY_BLK		BIT(cell, 30)	/* blinks the foreground character in the cell if SET */
-#define OVERLAY_VF		BIT(cell, 28)	/* makes the foreground visible if SET (else transparent) */
-#define OVERLAY_VB		BIT(cell, 27)	/* makes the background visible if SET (else transparent) */
-#define OVERLAY_PL		BIT(cell, 24)	/* uses bits 0-7 as PLOT DOT descriptor if SET (else ASCII) */
-#define OVERLAY_BR		BIT(cell, 18)	/* turns on Red in background if SET */
-#define OVERLAY_BG		BIT(cell, 17)	/* turns on Green in background if SET */
-#define OVERLAY_BB		BIT(cell, 16)	/* turns on Blue in background if SET */
-#define OVERLAY_FR		BIT(cell, 10)	/* turns on Red in foreground if SET */
-#define OVERLAY_FG		BIT(cell, 9)	/* turns on Green in foreground if SET */
-#define OVERLAY_FB		BIT(cell, 8)	/* turns on Blue in background if SET */
-#define OVERLAY_DATA	(cell & 0xff)	/* ASCII or Plot Dot character */
+#define OVERLAY_CUR					BIT(cell, 31)	/* places a cursor in the cell if SET */
+#define OVERLAY_BLK					BIT(cell, 30)	/* blinks the foreground character in the cell if SET */
+#define OVERLAY_VF					BIT(cell, 28)	/* makes the foreground visible if SET (else transparent) */
+#define OVERLAY_VB					BIT(cell, 27)	/* makes the background visible if SET (else transparent) */
+#define OVERLAY_PL					BIT(cell, 24)	/* uses bits 0-7 as PLOT DOT descriptor if SET (else ASCII) */
+#define OVERLAY_BR					BIT(cell, 18)	/* turns on Red in background if SET */
+#define OVERLAY_BG					BIT(cell, 17)	/* turns on Green in background if SET */
+#define OVERLAY_BB					BIT(cell, 16)	/* turns on Blue in background if SET */
+#define OVERLAY_FR					BIT(cell, 10)	/* turns on Red in foreground if SET */
+#define OVERLAY_FG					BIT(cell, 9)	/* turns on Green in foreground if SET */
+#define OVERLAY_FB					BIT(cell, 8)	/* turns on Blue in background if SET */
+#define OVERLAY_DATA				(cell & 0xff)	/* ASCII or Plot Dot character */
+
+#define IMAGE_SELECT				BIT(state->roll_overlay, 13)
+#define OVERLAY_CURSOR_BLINK		BIT(state->roll_overlay, 12)
+#define OVERLAY_CHARACTER_BLINK		BIT(state->roll_overlay, 11)
 
 /***************************************************************************
     READ/WRITE HANDLERS
@@ -53,7 +57,30 @@ WRITE16_HANDLER( cgc7900_color_status_w )
 
 READ16_HANDLER( cgc7900_sync_r )
 {
-	return 0;
+	/*
+
+		bit		signal		description
+		
+		 0		_VERT		vertical retrace (0=vblank)
+		 1					interlace (1=first field, 0=second field)
+		 2		_HG			horizontal retrace (0=hblank)
+		 3		1
+		 4		1
+		 5		1
+		 6		1
+		 7		1
+		 8		1
+		 9		1
+		10		1
+		11		1
+		12		1
+		13		1
+		14		1
+		15		1
+
+	*/
+
+	return 0xffff;
 }
 
 /***************************************************************************
@@ -70,7 +97,7 @@ static void update_clut(running_machine *machine)
 
 	for (int i = 0; i < 256; i++)
 	{
-		UINT16 addr = i * 4;
+		UINT16 addr = i * 2;
 		UINT32 data = (state->clut_ram[addr + 1] << 16) | state->clut_ram[addr];
 		UINT8 b = data & 0xff;
 		UINT8 g = (data >> 8) & 0xff;
@@ -81,10 +108,10 @@ static void update_clut(running_machine *machine)
 }
 
 /*-------------------------------------------------
-    draw_image - draw bitmap image
+    draw_bitmap - draw bitmap image
 -------------------------------------------------*/
 
-static void draw_image(running_device *screen, bitmap_t *bitmap)
+static void draw_bitmap(running_device *screen, bitmap_t *bitmap)
 {
 }
 
@@ -113,11 +140,14 @@ static void draw_overlay(running_device *screen, bitmap_t *bitmap)
 			{
 				if (OVERLAY_CUR)
 				{
-					*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = 7;
+					if (!OVERLAY_CURSOR_BLINK || state->blink)
+					{
+						*BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = 7;
+					}
 				}
 				else
 				{
-					if (BIT(data, x))
+					if (BIT(data, x) && (!OVERLAY_CHARACTER_BLINK || state->blink))
 					{
 						if (OVERLAY_VF) *BITMAP_ADDR16(bitmap, y, (sx * 8) + x) = fg;
 					}
@@ -129,6 +159,17 @@ static void draw_overlay(running_device *screen, bitmap_t *bitmap)
 			}
 		}
 	}
+}
+
+/*-------------------------------------------------
+    TIMER_DEVICE_CALLBACK( blink_tick )
+-------------------------------------------------*/
+
+static TIMER_DEVICE_CALLBACK( blink_tick )
+{
+	cgc7900_state *state = (cgc7900_state *)timer->machine->driver_data;
+
+	state->blink = !state->blink;
 }
 
 /*-------------------------------------------------
@@ -166,7 +207,7 @@ static VIDEO_START( cgc7900 )
 static VIDEO_UPDATE( cgc7900 )
 {
 	update_clut(screen->machine);
-	draw_image(screen, bitmap);
+	draw_bitmap(screen, bitmap);
 	draw_overlay(screen, bitmap);
 
     return 0;
@@ -218,4 +259,6 @@ MACHINE_DRIVER_START( cgc7900_video )
 
 	MDRV_VIDEO_START(cgc7900)
     MDRV_VIDEO_UPDATE(cgc7900)
+
+	MDRV_TIMER_ADD_PERIODIC("blink", blink_tick, HZ(XTAL_28_48MHz/7500000))
 MACHINE_DRIVER_END

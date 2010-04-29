@@ -4,11 +4,12 @@
 #define __CGC7900__
 
 #define M68000_TAG		"uh8"
-#define I8035_TAG		"i8035"
 #define INS8251_0_TAG	"uc10"
 #define INS8251_1_TAG	"uc8"
 #define MM58167_TAG		"uc6"
 #define AY8910_TAG		"uc4"
+#define K1135A_TAG		"uc11"
+#define I8035_TAG		"i8035"
 #define SCREEN_TAG		"screen"
 
 class cgc7900_state
@@ -36,6 +37,7 @@ public:
 	UINT16 color_status_fg;
 	UINT16 color_status_bg;
 	UINT16 roll_overlay;
+	int blink;
 };
 
 /*----------- defined in video/cgc7900.c -----------*/

@@ -11,14 +11,15 @@
 	TODO:
 
 	- does not boot
-	- mirror ROM to 000000
+	- interrupts
+	- vsync interrupt
+	- map ROM to 000000-000007 at boot
 	- floppy
 	- bitmap display
 	- Z mode read/write
 	- color status write
 	- bitmap roll
 	- overlay roll
-	- blinking
 	- keyboard
 	- joystick
 	- light pen
@@ -77,6 +78,29 @@ static const int INT_LEVEL[] = { 5, 4, 5, 4, 4, 5, 4, 5, 5, 4, 5, 4, 4, 5, 4, 5 
 
 static READ16_HANDLER( keyboard_r )
 {
+	/*
+
+		bit		description
+		
+		 0		key data bit 0
+		 1		key data bit 1
+		 2		key data bit 2
+		 3		key data bit 3
+		 4		key data bit 4
+		 5		key data bit 5
+		 6		key data bit 6
+		 7		key data bit 7
+		 8		SHIFT key
+		 9		CTRL key
+		10		M1 key
+		11		M2 key
+		12		
+		13		
+		14		
+		15		
+
+	*/
+
 	return 0;
 }
 
@@ -86,6 +110,28 @@ static READ16_HANDLER( keyboard_r )
 
 static WRITE16_HANDLER( keyboard_w )
 {
+	/*
+
+		bit		description
+		
+		 0		LED select bit 0
+		 1		LED select bit 1
+		 2		LED select bit 2
+		 3		LED select bit 3
+		 4		LED select bit 4
+		 5		
+		 6		
+		 7		LED switch (1=on, 0=off)
+		 8		
+		 9		
+		10		
+		11		
+		12		
+		13		
+		14		
+		15		
+
+	*/
 }
 
 /*-------------------------------------------------
@@ -94,9 +140,88 @@ static WRITE16_HANDLER( keyboard_w )
 
 static WRITE16_HANDLER( interrupt_mask_w )
 {
+	/*
+
+		bit		description
+		
+		 0		real time clock
+		 1		RS-449 Tx ready
+		 2		BINT 2
+		 3		RS-232 Tx ready
+		 4		disk
+		 5		BINT 3
+		 6		bezel keys
+		 7		keyboard
+		 8		RS-449 Rx ready
+		 9		light pen
+		10		BINT 4
+		11		joystick
+		12		vertical retrace
+		13		BINT 5
+		14		BINT 1
+		15		RS-232 Rx ready
+
+	*/
+
 	cgc7900_state *state = (cgc7900_state *)space->machine->driver_data;
 
 	state->int_mask = data;
+}
+
+/*-------------------------------------------------
+    disk_data_r - disk data read
+-------------------------------------------------*/
+
+static READ16_HANDLER( disk_data_r )
+{
+	return 0;
+}
+
+/*-------------------------------------------------
+    disk_data_w - disk data write
+-------------------------------------------------*/
+
+static WRITE16_HANDLER( disk_data_w )
+{
+}
+/*-------------------------------------------------
+    disk_status_r - disk status read
+-------------------------------------------------*/
+
+static READ16_HANDLER( disk_status_r )
+{
+	/*
+
+		bit		signal		description
+		
+		 0		_I/O		input/output
+		 1		_REQ		request
+		 2		_BSY		busy
+		 3		C/_D		control/data
+		 4		_MSG		message
+		 5		_RDY		ready
+		 6		
+		 7		
+		 8		
+		 9		
+		10		
+		11		
+		12		
+		13		
+		14		
+		15		
+
+	*/
+
+	return 0xffff - 0x04;
+}
+
+/*-------------------------------------------------
+    disk_command_w - disk command write
+-------------------------------------------------*/
+
+static WRITE16_HANDLER( disk_command_w )
+{
 }
 
 /***************************************************************************
@@ -108,7 +233,7 @@ static WRITE16_HANDLER( interrupt_mask_w )
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16 )
-//	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE(&chrom_ram)
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)	
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cgc7900_z_mode_r, cgc7900_z_mode_w)
@@ -144,10 +269,10 @@ static ADDRESS_MAP_START( cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
 //	AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
 //	AM_RANGE(0xff80cc, 0xff80cd) Joystick Z axis
-//	AM_RANGE(0xff8100, 0xff8101) Disk data port
-//	AM_RANGE(0xff8120, 0xff8121) Disk control/status port
-//	AM_RANGE(0xff8141, 0xff8141) Bezel switches
-//	AM_RANGE(0xff8181, 0xff8181) Baud rate generator
+	AM_RANGE(0xff8100, 0xff8101) AM_READWRITE(disk_data_r, disk_data_w)
+	AM_RANGE(0xff8120, 0xff8121) AM_READWRITE(disk_status_r, disk_command_w)
+	AM_RANGE(0xff8140, 0xff8141) AM_READ_PORT("BEZEL")
+//	AM_RANGE(0xff8180, 0xff8181) AM_DEVWRITE8(K1135A_TAG, k1135a_w, 0xff00) Baud rate generator
 //	AM_RANGE(0xff81c0, 0xff81ff) AM_DEVREADWRITE8(MM58167_TAG, mm58167_r, mm58167_w, 0xff00)
 	AM_RANGE(0xff8200, 0xff8201) AM_WRITE(interrupt_mask_w)
 //	AM_RANGE(0xff8240, 0xff8241) Light Pen enable
@@ -192,6 +317,30 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static INPUT_PORTS_START( cgc7900 )
+	PORT_START("BEZEL")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Bezel 7")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Bezel 8")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Bezel 5")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Bezel 6")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Bezel 3")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Bezel 4")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Bezel 1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_NAME("Bezel 2")
+
+	PORT_START("JOYSTICK_X")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_X ) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
+
+	PORT_START("JOYSTICK_Y")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Y ) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
+
+	PORT_START("JOYSTICK_Z")
+	PORT_BIT( 0x3ff, 0x200, IPT_AD_STICK_Z ) PORT_MINMAX(0x000, 0x3ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(50)
+
+	PORT_START("LIGHT_PEN_X")
+	PORT_BIT( 0x1ff, 0x100, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_MINMAX(0, 511) PORT_SENSITIVITY(20) PORT_KEYDELTA(25)
+
+	PORT_START("LIGHT_PEN_Y")
+	PORT_BIT( 0x1ff, 0x0c0, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0, 383) PORT_SENSITIVITY(20) PORT_KEYDELTA(25)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -275,12 +424,12 @@ static MACHINE_DRIVER_START( cgc7900 )
 	MDRV_DRIVER_DATA(cgc7900_state)
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD(M68000_TAG, M68000, XTAL_8MHz)
+    MDRV_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
     MDRV_CPU_PROGRAM_MAP(cgc7900_mem)
 
-	MDRV_CPU_ADD(I8035_TAG, I8035, 1000000)
+/*	MDRV_CPU_ADD(I8035_TAG, I8035, 1000000)
     MDRV_CPU_PROGRAM_MAP(keyboard_mem)
-	MDRV_CPU_IO_MAP(keyboard_io)
+	MDRV_CPU_IO_MAP(keyboard_io)*/
 
 	MDRV_MACHINE_START(cgc7900)
     MDRV_MACHINE_RESET(cgc7900)
@@ -290,7 +439,7 @@ static MACHINE_DRIVER_START( cgc7900 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(AY8910_TAG, AY8910, 3579545/2)
+	MDRV_SOUND_ADD(AY8910_TAG, AY8910, XTAL_28_48MHz/16)
 	MDRV_SOUND_CONFIG(ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
