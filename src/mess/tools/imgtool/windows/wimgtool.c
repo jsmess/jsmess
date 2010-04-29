@@ -82,7 +82,7 @@ static DWORD win_get_file_attributes_utf8(const char *filename)
 	if (t_filename != NULL)
 	{
 		result = GetFileAttributes(t_filename);
-		free(t_filename);
+		global_free(t_filename);
 	}
 	return result;
 }
@@ -1534,7 +1534,7 @@ static void menu_createdir(HWND window)
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
 	struct createdir_dialog_info cdi;
 	wimgtool_info *info;
-	char *dirname = NULL;
+	char *utf8_dirname = NULL;
 	char *s;
 
 	info = get_wimgtool_info(window);
@@ -1545,19 +1545,19 @@ static void menu_createdir(HWND window)
 
 	if (cdi.buf[0] == '\0')
 		goto done;
-	dirname = utf8_from_tstring(cdi.buf);
+	utf8_dirname = utf8_from_tstring(cdi.buf);
 
 	if (info->current_directory)
 	{
-		s = (char *) alloca(strlen(info->current_directory) + strlen(dirname) + 1 + 1);
+		s = (char *) alloca(strlen(info->current_directory) + strlen(utf8_dirname) + 1 + 1);
 		strcpy(s, info->current_directory);
 		strcat(s, "\\");
-		strcat(s, dirname);
-		free(dirname);
-		dirname = mame_strdup(s);
+		strcat(s, utf8_dirname);
+		global_free(utf8_dirname);
+		utf8_dirname = mame_strdup(s);
 	}
 
-	err = imgtool_partition_create_directory(info->partition, dirname);
+	err = imgtool_partition_create_directory(info->partition, utf8_dirname);
 	if (err)
 		goto done;
 
@@ -1567,9 +1567,9 @@ static void menu_createdir(HWND window)
 
 done:
 	if (err)
-		wimgtool_report_error(window, err, NULL, dirname);
-	if (dirname)
-		free(dirname);
+		wimgtool_report_error(window, err, NULL, utf8_dirname);
+	if (utf8_dirname)
+		global_free(utf8_dirname);
 }
 
 
