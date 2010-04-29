@@ -151,4 +151,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( ????, bob85,  0,       0, 	bob85,	bob85,	 0, 	  "Unknown",   "BOB85",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 19??, bob85,  0,       0, 	bob85,	bob85,	 0, 	  "<unknown>",   "BOB85",		GAME_NOT_WORKING | GAME_NO_SOUND)

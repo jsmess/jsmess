@@ -500,5 +500,5 @@ ROM_END
 COMP( 1994, scorpion, spec128,	 0,	scorpion,	spec_plus,	0,		"Zonov and Co.",		"Scorpion ZS-256", GAME_NOT_WORKING )
 COMP( 1991, profi,    spec128,	 0,	profi,  	spec_plus,	0,		"Kondor and Kramis",		"Profi", GAME_NOT_WORKING )
 COMP( 1998, kay1024,  spec128,	 0,	scorpion,	spec_plus,	0,		"NEMO",		"Kay 1024", GAME_NOT_WORKING )
-COMP( ????, quorum,   spec128,	 0,	quorum, 	spec_plus,	0,		"",		"Quorum", GAME_NOT_WORKING )
-COMP( ????, bestzx,   spec128,	 0,	scorpion,	spec_plus,	0,		"",		"BestZX", GAME_NOT_WORKING )
+COMP( 19??, quorum,   spec128,	 0,	quorum, 	spec_plus,	0,		"<unknown>",		"Quorum", GAME_NOT_WORKING )
+COMP( 19??, bestzx,   spec128,	 0,	scorpion,	spec_plus,	0,		"<unknown>",		"BestZX", GAME_NOT_WORKING )

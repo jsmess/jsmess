@@ -224,5 +224,5 @@ ROM_END
 
 /* Driver */
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT       INIT     COMPANY                  FULLNAME   FLAGS */
-COMP( 1983, mikro80,	 0, 	 0,	mikro80,	mikro80,	mikro80, "", "Mikro-80",	 0)
-COMP( 1993, radio99, mikro80,	 0,	radio99,	mikro80,	radio99, "", "Radio-99DM",	 0)
+COMP( 1983, mikro80,	 0, 	 0,	mikro80,	mikro80,	mikro80, "<unknown>", "Mikro-80",	 0)
+COMP( 1993, radio99, mikro80,	 0,	radio99,	mikro80,	radio99, "<unknown>", "Radio-99DM",	 0)

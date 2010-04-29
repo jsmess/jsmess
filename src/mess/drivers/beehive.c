@@ -74,5 +74,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, beehive,  0,       0,	beehive,	beehive,	 0,  "BeeHive",   "DM3270",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 19??, beehive,  0,       0,	beehive,	beehive,	 0,  "BeeHive",   "DM3270",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

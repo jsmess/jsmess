@@ -90,5 +90,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( ????, unior,  radio86,       0,	unior,	unior,	 0, 	 "",   "Unior",		GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 19??, unior,  radio86,       0,	unior,	unior,	 0, 	 "<unknown>",   "Unior",		GAME_NOT_WORKING | GAME_NO_SOUND)

@@ -2540,49 +2540,49 @@ MACHINE_DRIVER_END
 #if 0
 	//pcjr roms? (incomplete dump, most likely 64 kbyte)
 	// basic c1.20
-    ROM_LOAD("basic.rom", 0xf6000, 0x8000, CRC(0c19c1a8))
+	ROM_LOAD("basic.rom", 0xf6000, 0x8000, CRC(0c19c1a8))
 	// ???
-    ROM_LOAD("bios.rom", 0x??000, 0x2000, CRC(98463f95))
+	ROM_LOAD("bios.rom", 0x??000, 0x2000, CRC(98463f95))
 
 	/* turbo xt */
 	/* basic c1.10 */
-    ROM_LOAD("rom05.bin", 0xf6000, 0x2000, CRC(80d3cf5d))
-    ROM_LOAD("rom04.bin", 0xf8000, 0x2000, CRC(673a4acc))
-    ROM_LOAD("rom03.bin", 0xfa000, 0x2000, CRC(aac3fc37))
-    ROM_LOAD("rom02.bin", 0xfc000, 0x2000, CRC(3062b3fc))
+	ROM_LOAD("rom05.bin", 0xf6000, 0x2000, CRC(80d3cf5d))
+	ROM_LOAD("rom04.bin", 0xf8000, 0x2000, CRC(673a4acc))
+	ROM_LOAD("rom03.bin", 0xfa000, 0x2000, CRC(aac3fc37))
+	ROM_LOAD("rom02.bin", 0xfc000, 0x2000, CRC(3062b3fc))
 	/* sw1 0x60 readback fails write 301 to screen fe3b7 */
 	/* disk problems no disk gives 601 */
 	/* 5000-026 08/16/82 */
-    ROM_LOAD("rom01.bin", 0xfe000, 0x2000, CRC(5c3f0256))
+	ROM_LOAD("rom01.bin", 0xfe000, 0x2000, CRC(5c3f0256))
 
 	/* anonymous works nice */
-    ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad))
+	ROM_LOAD("pcxt.rom",    0xfe000, 0x02000, CRC(031aafad))
 
 	ROM_LOAD("bondwell.bin", 0xfe000, 0x2000, CRC(d435a405))
 
 	/* europc */
-    ROM_LOAD("50145", 0xf8000, 0x8000, CRC(1775a11d)) // V2.07
-//    ROM_LOAD("eurobios.bin", 0xf8000, 0x8000, CRC(52185223)) scrap
+	ROM_LOAD("50145", 0xf8000, 0x8000, CRC(1775a11d)) // V2.07
+//	ROM_LOAD("eurobios.bin", 0xf8000, 0x8000, CRC(52185223)) scrap
 	/* cga, hercules character set */
-    ROM_LOAD("50146", 0x00000, 0x02000, CRC(1305dcf5)) //D1.0
+	ROM_LOAD("50146", 0x00000, 0x02000, CRC(1305dcf5)) //D1.0
 
 	// ibm pc
 	// most likely 8 kbyte chips
-    ROM_LOAD("basicpc.bin", 0xf6000, 0x8000, CRC(ebacb791)) // IBM C1.1
+	ROM_LOAD("basicpc.bin", 0xf6000, 0x8000, CRC(ebacb791)) // IBM C1.1
 	// split into 8 kbyte parts
 	// the same as in the basic c1.10 as in the turboxt
 	// 1501-476 10/27/82
-    ROM_LOAD("biospc.bin", 0xfe000, 0x2000, CRC(e88792b3))
+	ROM_LOAD("biospc.bin", 0xfe000, 0x2000, CRC(e88792b3))
 
 	/* tandy 1000 hx */
-    ROM_LOAD("tandy1t.rom", 0xf0000, 0x10000, CRC(d37a1d5f))
+	ROM_LOAD("tandy1t.rom", 0xf0000, 0x10000, CRC(d37a1d5f))
 
 	// ibm xt
-    ROM_LOAD("xthdd.c8", 0xc8000, 0x2000, CRC(a96317da))
-    ROM_LOAD("biosxt.bin", 0xf0000, 0x10000, CRC(36c32fde)) // BASIC C1.1
+	ROM_LOAD("xthdd.c8", 0xc8000, 0x2000, CRC(a96317da))
+	ROM_LOAD("biosxt.bin", 0xf0000, 0x10000, CRC(36c32fde)) // BASIC C1.1
 	// split into 2 chips for 16 bit access
-    ROM_LOAD_EVEN("ibmxt.0", 0xf0000, 0x8000, CRC(83727c42))
-    ROM_LOAD_ODD("ibmxt.1", 0xf0000, 0x8000, CRC(2a629953))
+	ROM_LOAD_EVEN("ibmxt.0", 0xf0000, 0x8000, CRC(83727c42))
+	ROM_LOAD_ODD("ibmxt.1", 0xf0000, 0x8000, CRC(2a629953))
 
 	/* pc xt mfm controller
        2 harddisks 17 sectors, 4 head, 613 tracks
@@ -2593,7 +2593,7 @@ MACHINE_DRIVER_END
 
 	/* lcs 6210d asic i2.1 09/01/1988 */
 	/* problematic, currently showing menu and calls int21 (hangs)! */
-    ROM_LOAD("xthdd.rom",  0xc8000, 0x02000, CRC(a96317da))
+	ROM_LOAD("xthdd.rom",  0xc8000, 0x02000, CRC(a96317da))
 #endif
 
 ROM_START( ibm5150 )
@@ -2938,8 +2938,8 @@ ROM_START( ibm5160 )
            and trace-marked "|||CIM0286 ECA2466 // 94V-O" on the back.
     */
 //  ROM_REGION(0x4000,"gfx2", 0)
-//      ROM_LOAD("1504161.u11", 0x00000, 0x2000, CRC(d9246cf5) SHA1(2eaed495893a4e6649b04d10dada7b5ef4abd140)) /* silkscreen: "AMI 8613MAJ // 9591-041 // S2364B // 1504161 // PHILIPPINES" - Purpose: Pixels 0 thru 7 of built-in 3270 terminal font*/
-//      ROM_LOAD("1504162.u26", 0x02000, 0x2000, CRC(59e1dc32) SHA1(337b5cced203345a5acfb02532d6b5f526902ee7)) /* silkscreen: "AMI 8607MAH // 9591-042 // S2364B // 1504162 // PHILIPPINES" - Purpose: Pixel 8 of built-in 3270 terminal font*/
+//  	ROM_LOAD("1504161.u11", 0x00000, 0x2000, CRC(d9246cf5) SHA1(2eaed495893a4e6649b04d10dada7b5ef4abd140)) /* silkscreen: "AMI 8613MAJ // 9591-041 // S2364B // 1504161 // PHILIPPINES" - Purpose: Pixels 0 thru 7 of built-in 3270 terminal font*/
+//  	ROM_LOAD("1504162.u26", 0x02000, 0x2000, CRC(59e1dc32) SHA1(337b5cced203345a5acfb02532d6b5f526902ee7)) /* silkscreen: "AMI 8607MAH // 9591-042 // S2364B // 1504162 // PHILIPPINES" - Purpose: Pixel 8 of built-in 3270 terminal font*/
 ROM_END
 
 
@@ -2968,7 +2968,7 @@ Sinclair PC200 ROMs (from a v1.2 PC200):
             V1.2:5EA8       V1.2:A058
 */
 ROM_START( pc200 )
-//    ROM_REGION(0x100000,"maincpu", 0)
+//	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
@@ -2985,7 +2985,7 @@ ROM_END
 
 
 ROM_START( pc20 )
-//    ROM_REGION(0x100000,"maincpu", 0)
+//	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 
@@ -3002,7 +3002,7 @@ ROM_END
 
 
 ROM_START( ppc512 )
-//    ROM_REGION(0x100000,"maincpu", 0)
+//	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
@@ -3015,7 +3015,7 @@ ROM_END
 
 
 ROM_START( ppc640 )
-//    ROM_REGION(0x100000,"maincpu", 0)
+//	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
@@ -3028,7 +3028,7 @@ ROM_END
 
 
 ROM_START( pc1512 )
-//    ROM_REGION(0x100000,"maincpu", 0)
+//	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD16_BYTE("40044.v1", 0xfc001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482)) // v1
@@ -3039,7 +3039,7 @@ ROM_END
 
 
 ROM_START( pc1512v2 )
-//    ROM_REGION(0x100000,"maincpu", 0)
+//	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD16_BYTE("40043.v2", 0xfc001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb)) // v2
@@ -3050,7 +3050,7 @@ ROM_END
 
 
 ROM_START( pc1640 )
-//    ROM_REGION(0x100000,"maincpu", 0)
+//	ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33)) /* Internal Graphics Adapter ROM */
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
@@ -3181,7 +3181,7 @@ ROM_END
 ROM_START( poisk1 )
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD( "b_hd_v11.rf2", 0xc8000, 0x0800, CRC(a19c39b2) SHA1(57faa56b320abf801fedbed578cf97d253e5b777)) // HDD controller ver 1.1
-    ROM_LOAD( "b942_5mb.bin", 0x00000, 0x0800, CRC(a3cfa240) SHA1(0b0aa1ce839a957153bfbbe70310480ca9fe21b6)) // HDD controller ver 1.4
+	ROM_LOAD( "b942_5mb.bin", 0x00000, 0x0800, CRC(a3cfa240) SHA1(0b0aa1ce839a957153bfbbe70310480ca9fe21b6)) // HDD controller ver 1.4
 
 	ROM_LOAD( "b_ngmd_n.rf2", 0x0000, 0x0800, CRC(967e172a) SHA1(95117c40fd9f624fee08ccf37f615b16ff249688)) // Floppy
 	ROM_LOAD( "b_ngmd_t.rf2", 0x0000, 0x0800, CRC(630010b1) SHA1(50876fe4f5f4f32a242faa70f9154574cd315ec4)) // Floppy
@@ -3194,7 +3194,7 @@ ROM_START( poisk1 )
 	ROM_LOAD( "p1_t_ram.rf4", 0x0000, 0x2000, CRC(e42f5a61) SHA1(ce2554eae8f0d2b6d482890dd198cf7e2d29c655))
 
 	ROM_REGION(0x2000,"gfx1", ROMREGION_ERASE00)
-    ROM_LOAD( "poisk.cga", 0x0000, 0x0800, CRC(f6eb39f0) SHA1(0b788d8d7a8e92cc612d044abcb2523ad964c200))
+	ROM_LOAD( "poisk.cga", 0x0000, 0x0800, CRC(f6eb39f0) SHA1(0b788d8d7a8e92cc612d044abcb2523ad964c200))
 ROM_END
 
 ROM_START( poisk2 )
@@ -3222,7 +3222,7 @@ ROM_START( poisk2 )
 ROM_END
 
 ROM_START( mc1702 )
-    ROM_REGION16_LE(0x100000,"maincpu", 0)
+	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD16_BYTE( "2764_2_(573rf4).rom", 0xfc000,  0x2000, CRC(34a0c8fb) SHA1(88dc247f2e417c2848a2fd3e9b52258ad22a2c07))
 	ROM_LOAD16_BYTE( "2764_3_(573rf4).rom", 0xfc001, 0x2000, CRC(68ab212b) SHA1(f3313f77392877d28ce290ffa3432f0a32fc4619))
 	ROM_LOAD( "ba1m_(573rf5).rom", 0x0000, 0x0800, CRC(08d938e8) SHA1(957b6c691dbef75c1c735e8e4e81669d056971e4))
@@ -3238,41 +3238,40 @@ ROM_END
 ***************************************************************************/
 
 /*     YEAR     NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY     FULLNAME */
-COMP(  1981,	ibm5150,	0,		0,	ibm5150,    ibm5150,	ibm5150,    "International Business Machines",  "IBM PC 5150" , 0)
-COMP(  1984,	dgone,		ibm5150,	0,	pccga,      pccga,	pccga,	    "Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
-COMP(  1985,	bw230,		ibm5150,	0,	pccga,	    bondwell,   bondwell,   "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
-COMP(  1988,	europc,		ibm5150,	0,	europc,     europc,	europc,     "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
+COMP(  1981,	ibm5150,    0,		0,	ibm5150,    ibm5150,	ibm5150,    "International Business Machines",  "IBM PC 5150" , 0)
+COMP(  1984,	dgone,      ibm5150,	0,	pccga,      pccga,	pccga,	"Data General",  "Data General/One" , GAME_NOT_WORKING)	/* CGA, 2x 3.5" disk drives */
+COMP(  1985,	bw230,      ibm5150,	0,	pccga,	bondwell,   bondwell,   "Bondwell Holding",  "BW230 (PRO28 Series)", 0 )
+COMP(  1988,	europc,     ibm5150,	0,	europc,     europc,	europc,     "Schneider Rdf. AG",  "EURO PC", GAME_NOT_WORKING)
 
 // pcjr (better graphics, better sound)
-COMP(  1983,	ibmpcjr,	ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_IMPERFECT_COLORS )
+COMP(  1983,	ibmpcjr,    ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_IMPERFECT_COLORS )
 
 // tandy 1000
-COMP(  1987,	t1000hx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000HX", 0)
-COMP(  1987,	t1000sx,	ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000SX", GAME_NOT_WORKING)
-COMP(  1989,    t1000rl,	ibm5150,	0,	t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack",  "Tandy 1000RL", 0)
+COMP(  1987,	t1000hx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000HX", 0)
+COMP(  1987,	t1000sx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000SX", GAME_NOT_WORKING)
+COMP(  1989,	t1000rl,    ibm5150,	0,	t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack",  "Tandy 1000RL", 0)
 
 // xt class (pc but 8086)
-COMP(  1982,	ibm5160,	ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,    "International Business Machines",  "IBM XT 5160" , 0)
-COMP(  1988,	pc200,		ibm5150,	0,	pc200,	    pc200,	pc200,	    "Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
-COMP(  1988,	pc20,		ibm5150,	0,	pc200,	    pc200,	pc200,	    "Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
-COMP(  1987,	ppc512,		ibm5150,	0,	ppc512,	    pc200,	ppc512,	    "Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
-COMP(  1987,	ppc640,		ibm5150,	0,	ppc640,	    pc200,	ppc512,	    "Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
-COMP(  1986,	pc1512,		ibm5150,	0,	pc1512,     pc1512,	pc1512,	    "Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
-COMP(  198?,	pc1512v2,	ibm5150,	0,	pc1512,     pc1512,	pc1512,	    "Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
-COMP(  1987,	pc1640,		ibm5150,	0,	pc1640,     pc1640,	pc1640,	    "Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
+COMP(  1982,	ibm5160,    ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,    "International Business Machines",  "IBM XT 5160" , 0)
+COMP(  1988,	pc200,      ibm5150,	0,	pc200,	pc200,	pc200,	"Sinclair Research",  "PC200 Professional Series", GAME_NOT_WORKING)
+COMP(  1988,	pc20,       ibm5150,	0,	pc200,	pc200,	pc200,	"Amstrad plc",  "Amstrad PC20" , GAME_NOT_WORKING)
+COMP(  1987,	ppc512,     ibm5150,	0,	ppc512,	pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC512", GAME_NOT_WORKING)
+COMP(  1987,	ppc640,     ibm5150,	0,	ppc640,	pc200,	ppc512,	"Amstrad plc",  "Amstrad PPC640", GAME_NOT_WORKING)
+COMP(  1986,	pc1512,     ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 1)", GAME_NOT_WORKING)
+COMP(  198?,	pc1512v2,   ibm5150,	0,	pc1512,     pc1512,	pc1512,	"Amstrad plc",  "Amstrad PC1512 (version 2)", GAME_NOT_WORKING)
+COMP(  1987,	pc1640,     ibm5150,	0,	pc1640,     pc1640,	pc1640,	"Amstrad plc",  "Amstrad PC1640 / PC6400 (US)", GAME_NOT_WORKING )
 // pc2086 pc1512 with vga??
-COMP(  1987,	pc,		ibm5150,	0,	pccga,	    pccga,	pccga,	    "Generic",  "PC (CGA)" , 0)
-COMP ( 1987,	pcmda,		ibm5150,	0,	pcmda,      pcmda,	ibm5150,    "Generic",  "PC (MDA)" , 0)
-COMP ( 1987,    pcherc,		ibm5150,	0,	pcherc,     pcmda,      ibm5150,    "Generic",  "PC (Hercules)" , 0)
-COMP ( 1987,	xtvga,		ibm5150,	0,	xtvga,      xtvga,	pc_vga,	    "Generic",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
+COMP(  1987,	pc,         ibm5150,	0,	pccga,	pccga,	pccga,	"<generic>",  "PC (CGA)" , 0)
+COMP ( 1987,	pcmda,      ibm5150,	0,	pcmda,      pcmda,	ibm5150,    "<generic>",  "PC (MDA)" , 0)
+COMP ( 1987,	pcherc,     ibm5150,	0,	pcherc,     pcmda,      ibm5150,    "<generic>",  "PC (Hercules)" , 0)
+COMP ( 1987,	xtvga,      ibm5150,	0,	xtvga,      xtvga,	pc_vga,	"<generic>",  "PC/XT (VGA, MF2 Keyboard)" , GAME_NOT_WORKING)
 
-COMP ( 1989,	iskr1031,	ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Iskra-1031" , GAME_NOT_WORKING)
-COMP ( 1989,	iskr1030m,	ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Iskra-1030M" , GAME_NOT_WORKING)
-COMP ( 1987,	ec1840,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1840" , GAME_NOT_WORKING)
-COMP ( 1987,	ec1841,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1841" , GAME_NOT_WORKING)
-COMP ( 1989,	ec1845,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "EC-1845" , GAME_NOT_WORKING)
-COMP ( 1989,	mk88,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "MK-88" , GAME_NOT_WORKING)
-COMP ( 1990,	poisk1,		ibm5150,	0,	iskr1031,      pccga,	pccga,	    "",  "Poisk-1" , GAME_NOT_WORKING)
-COMP ( 1991,	poisk2,		ibm5150,	0,	poisk2,        pccga,	pccga,	    "",  "Poisk-2" , GAME_NOT_WORKING)
-COMP ( 1990,	mc1702,		ibm5150,	0,	pccga,         pccga,	pccga,	    "",  "MC-1702" , GAME_NOT_WORKING)
-
+COMP ( 1989,	iskr1031,   ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1031" , GAME_NOT_WORKING)
+COMP ( 1989,	iskr1030m,  ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Iskra-1030M" , GAME_NOT_WORKING)
+COMP ( 1987,	ec1840,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1840" , GAME_NOT_WORKING)
+COMP ( 1987,	ec1841,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1841" , GAME_NOT_WORKING)
+COMP ( 1989,	ec1845,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "EC-1845" , GAME_NOT_WORKING)
+COMP ( 1989,	mk88,       ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "MK-88" , GAME_NOT_WORKING)
+COMP ( 1990,	poisk1,     ibm5150,	0,	iskr1031,	pccga,	pccga,	"<unknown>",  "Poisk-1" , GAME_NOT_WORKING)
+COMP ( 1991,	poisk2,     ibm5150,	0,	poisk2,	pccga,	pccga,	"<unknown>",  "Poisk-2" , GAME_NOT_WORKING)
+COMP ( 1990,	mc1702,     ibm5150,	0,	pccga,	pccga,	pccga,	"<unknown>",  "MC-1702" , GAME_NOT_WORKING)
