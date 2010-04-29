@@ -1,43 +1,9 @@
 #include "emu.h"
 #include "includes/cgc7900.h"
 
-static PALETTE_INIT( cgc7900 )
-{
-	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00 );
-	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff );
-	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00 );
-	palette_set_color_rgb(machine, 3, 0x00, 0xff, 0xff );
-	palette_set_color_rgb(machine, 4, 0xff, 0x00, 0x00 );
-	palette_set_color_rgb(machine, 5, 0xff, 0x00, 0xff );
-	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00 );
-	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff );
-}
-
-static VIDEO_START( cgc7900 )
-{
-	cgc7900_state *state = (cgc7900_state *)machine->driver_data;
-
-	/* find memory regions */
-	state->char_rom = memory_region(machine, "gfx1");
-}
-
-static void update_clut(running_machine *machine)
-{
-	cgc7900_state *state = (cgc7900_state *)machine->driver_data;
-
-	for (int i = 0; i < 256; i++)
-	{
-		UINT16 addr = i * 4;
-		UINT32 data = (state->clut_ram[addr + 1] << 16) | state->clut_ram[addr];
-		UINT8 b = data & 0xff;
-		UINT8 g = (data >> 8) & 0xff;
-		UINT8 r = (data >> 16) & 0xff;
-
-//		logerror("CLUT %u : %08x\n", i, data);
-		
-		palette_set_color_rgb(machine, i + 8, r, g, b);
-	}
-}
+/***************************************************************************
+    PARAMETERS
+***************************************************************************/
 
 #define OVERLAY_CUR		BIT(cell, 31)	/* places a cursor in the cell if SET */
 #define OVERLAY_BLK		BIT(cell, 30)	/* blinks the foreground character in the cell if SET */
@@ -51,6 +17,80 @@ static void update_clut(running_machine *machine)
 #define OVERLAY_FG		BIT(cell, 9)	/* turns on Green in foreground if SET */
 #define OVERLAY_FB		BIT(cell, 8)	/* turns on Blue in background if SET */
 #define OVERLAY_DATA	(cell & 0xff)	/* ASCII or Plot Dot character */
+
+/***************************************************************************
+    READ/WRITE HANDLERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    cgc7900_z_mode_r - Z mode read
+-------------------------------------------------*/
+
+READ16_HANDLER( cgc7900_z_mode_r )
+{
+	return 0;
+}
+
+/*-------------------------------------------------
+    cgc7900_z_mode_w - Z mode write
+-------------------------------------------------*/
+
+WRITE16_HANDLER( cgc7900_z_mode_w )
+{
+}
+
+/*-------------------------------------------------
+    cgc7900_color_status_w - color status write
+-------------------------------------------------*/
+
+WRITE16_HANDLER( cgc7900_color_status_w )
+{
+}
+
+/*-------------------------------------------------
+    cgc7900_sync_r - sync information read
+-------------------------------------------------*/
+
+READ16_HANDLER( cgc7900_sync_r )
+{
+	return 0;
+}
+
+/***************************************************************************
+    VIDEO
+***************************************************************************/
+
+/*-------------------------------------------------
+    update_clut - update color lookup table
+-------------------------------------------------*/
+
+static void update_clut(running_machine *machine)
+{
+	cgc7900_state *state = (cgc7900_state *)machine->driver_data;
+
+	for (int i = 0; i < 256; i++)
+	{
+		UINT16 addr = i * 4;
+		UINT32 data = (state->clut_ram[addr + 1] << 16) | state->clut_ram[addr];
+		UINT8 b = data & 0xff;
+		UINT8 g = (data >> 8) & 0xff;
+		UINT8 r = (data >> 16) & 0xff;
+		
+		palette_set_color_rgb(machine, i + 8, r, g, b);
+	}
+}
+
+/*-------------------------------------------------
+    draw_image - draw bitmap image
+-------------------------------------------------*/
+
+static void draw_image(running_device *screen, bitmap_t *bitmap)
+{
+}
+
+/*-------------------------------------------------
+    draw_overlay - draw text overlay
+-------------------------------------------------*/
 
 static void draw_overlay(running_device *screen, bitmap_t *bitmap)
 {
@@ -91,15 +131,50 @@ static void draw_overlay(running_device *screen, bitmap_t *bitmap)
 	}
 }
 
+/*-------------------------------------------------
+    PALETTE_INIT( cgc7900 )
+-------------------------------------------------*/
+
+static PALETTE_INIT( cgc7900 )
+{
+	palette_set_color_rgb(machine, 0, 0x00, 0x00, 0x00 );
+	palette_set_color_rgb(machine, 1, 0x00, 0x00, 0xff );
+	palette_set_color_rgb(machine, 2, 0x00, 0xff, 0x00 );
+	palette_set_color_rgb(machine, 3, 0x00, 0xff, 0xff );
+	palette_set_color_rgb(machine, 4, 0xff, 0x00, 0x00 );
+	palette_set_color_rgb(machine, 5, 0xff, 0x00, 0xff );
+	palette_set_color_rgb(machine, 6, 0xff, 0xff, 0x00 );
+	palette_set_color_rgb(machine, 7, 0xff, 0xff, 0xff );
+}
+
+/*-------------------------------------------------
+    VIDEO_START( cgc7900 )
+-------------------------------------------------*/
+
+static VIDEO_START( cgc7900 )
+{
+	cgc7900_state *state = (cgc7900_state *)machine->driver_data;
+
+	/* find memory regions */
+	state->char_rom = memory_region(machine, "gfx1");
+}
+
+/*-------------------------------------------------
+    VIDEO_UPDATE( cgc7900 )
+-------------------------------------------------*/
+
 static VIDEO_UPDATE( cgc7900 )
 {
-//	cgc7900_state *state = (cgc7900_state *)screen->machine->driver_data;
-
 	update_clut(screen->machine);
+	draw_image(screen, bitmap);
 	draw_overlay(screen, bitmap);
 
     return 0;
 }
+
+/*-------------------------------------------------
+    gfx_layout cgc7900_charlayout
+-------------------------------------------------*/
 
 static const gfx_layout cgc7900_charlayout =
 {
@@ -112,9 +187,21 @@ static const gfx_layout cgc7900_charlayout =
 	8*8
 };
 
+/*-------------------------------------------------
+    GFXDECODE( cgc7900 )
+-------------------------------------------------*/
+
 static GFXDECODE_START( cgc7900 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, cgc7900_charlayout, 0, 1 )
 GFXDECODE_END
+
+/***************************************************************************
+    MACHINE DRIVERS
+***************************************************************************/
+
+/*-------------------------------------------------
+	MACHINE_DRIVER( cgc7900_video )
+-------------------------------------------------*/
 
 MACHINE_DRIVER_START( cgc7900_video )
     MDRV_SCREEN_ADD(SCREEN_TAG, RASTER)
