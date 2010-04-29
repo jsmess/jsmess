@@ -2,7 +2,7 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="pv1000" description="Casio PV-1000 cartridges">
 	<!-- GPA-101 -->
-	<software name="pooyan">
+	<software name="pooyan" supported="yes">
 		<description>Pooyan</description>
 		<year>1982</year>
 		<publisher>Casio</publisher>
@@ -14,7 +14,7 @@
 	</software>
 
 	<!-- GPA-102 -->
-	<software name="scobra">
+	<software name="scobra" supported="yes">
 		<description>Super Cobra</description>
 		<year>1981</year>
 		<publisher>Casio</publisher>
@@ -26,7 +26,7 @@
 	</software>
 
 	<!-- GPA-104 -->
-	<software name="amidar">
+	<software name="amidar" supported="yes">
 		<description>Amidar</description>
 		<year>1982</year>
 		<publisher>Casio</publisher>
@@ -38,7 +38,7 @@
 	</software>
 
 	<!-- GPA-109 -->
-	<software name="pchnkufo">
+	<software name="pchnkufo" supported="no">
 		<description>Pachinko-UFO</description>
 		<year>1982</year>
 		<publisher>Casio</publisher>
@@ -50,7 +50,7 @@
 	</software>
 
 	<!-- GPA-115 -->
-	<software name="excitemj">
+	<software name="excitemj" supported="yes">
 		<description>Excite Mahjong</description>
 		<year>1982</year>
 		<publisher>Casio</publisher>

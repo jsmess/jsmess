@@ -4,7 +4,7 @@
 	<!-- F001 - Fomosa Duel -->
 	
 	<!-- F002 -->
-	<software name="sangofgt">
+	<software name="sangofgt" supported="yes">
 		<description>Sango Fighter</description>
 		<year>1995</year>
 		<publisher>Panda Entertainment Technology</publisher>
@@ -20,7 +20,7 @@
 	<!-- F004 - Speedy Dragon/Sonic Dragon -->
 
 	<!-- F005 -->
-	<software name="staiwbbl">
+	<software name="staiwbbl" supported="no">
 		<description>Super Taiwanese Baseball League</description>
 		<year>1995</year>
 		<publisher>C&amp;E Soft</publisher>
@@ -34,7 +34,7 @@
 	<!-- F006 - 1995 - Funtech - Journey to the Laugh -->
 
 	<!-- F007 -->
-	<software name="slghtsag">
+	<software name="slghtsag" supported="no">
 		<description>Super Light Saga - Dragon Force</description>
 		<year>1996</year>
 		<publisher>Kingformation</publisher>
@@ -46,14 +46,24 @@
 		</part>
 	</software>
 
-	<!-- F008 - 1995 - Funtech - Monopoly: Adventure in Africa -->
+	<!-- F008 -->
+	<software name="monopoly" supported="yes">
+		<description>Monopoly: Adventure in Africa</description>
+		<year>1995</year>
+		<publisher>Panda Entertainment Technology</publisher>
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="08003.bin" size="1048576" crc="dc3b7b84" sha1="6dcbd7923203da7892915595d65ee668afbf0339" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- F009 - Gambling Lord -->
 
 	<!-- F010 - Magical Pool -->
 
 	<!-- F011 -->
-	<software name="boomzoo">
+	<software name="boomzoo" supported="yes">
 		<description>Boom Zoo</description>
 		<year>1996</year>
 		<publisher>Funtech</publisher>
