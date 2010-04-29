@@ -2377,21 +2377,31 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 {
 	UINT8 *ROM = memory_region(image->machine, "cartridge");
 	int i;
+	UINT32 cart_size;
 	gba_state *state = (gba_state *)image->machine->driver_data;
 
 	state->nvsize = 0;
 	state->nvptr = (UINT8 *)NULL;
 
-	image_fread(image, ROM, image_length(image));
-
-	for (i = 0; i < image_length(image); i++)
+	if (image_software_entry(image) == NULL)
+	{
+		cart_size = image_length(image);
+		image_fread(image, ROM, cart_size);
+	}
+	else
+	{
+		cart_size = image_get_software_region_length(image, "rom");
+		memcpy(ROM, image_get_software_region(image, "rom"), cart_size);
+	}
+	
+	for (i = 0; i < cart_size; i++)
 	{
 		if (!memcmp(&ROM[i], "EEPROM_", 7))
 		{
 			state->nvptr = (UINT8 *)&state->gba_eeprom;
 			state->nvsize = 0x2000;
 
-			if (image_length(image) <= (16 * 1024 * 1024))
+			if (cart_size <= (16 * 1024 * 1024))
 			{
 				memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
 				memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
@@ -2442,7 +2452,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	}
 
 	// if save media was found, reload it
-	if (state->nvsize > 0)
+	if (image_software_entry(image) == NULL && state->nvsize > 0)	// not sure about sram handling with softlists
 	{
 		image_battery_load(image, state->nvptr, state->nvsize, 0x00);
 		state->nvimage = image;
@@ -2454,19 +2464,19 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	}
 
 	// mirror the ROM
-	switch (image_length(image))
+	switch (cart_size)
 	{
-		case 2*1024*1024:
-			memcpy(ROM+0x200000, ROM, 0x200000);
+		case 2 * 1024 * 1024:
+			memcpy(ROM + 0x200000, ROM, 0x200000);
 		// intentional fall-through
-		case 4*1024*1024:
-			memcpy(ROM+0x400000, ROM, 0x400000);
+		case 4 * 1024 * 1024:
+			memcpy(ROM + 0x400000, ROM, 0x400000);
 		// intentional fall-through
-		case 8*1024*1024:
-			memcpy(ROM+0x800000, ROM, 0x800000);
+		case 8 * 1024 * 1024:
+			memcpy(ROM + 0x800000, ROM, 0x800000);
 		// intentional fall-through
-		case 16*1024*1024:
-			memcpy(ROM+0x1000000, ROM, 0x1000000);
+		case 16 * 1024 * 1024:
+			memcpy(ROM + 0x1000000, ROM, 0x1000000);
 			break;
 	}
 
@@ -2507,7 +2517,9 @@ static MACHINE_DRIVER_START( gbadv )
 
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("gba,bin")
+	MDRV_CARTSLOT_INTERFACE("gba_cart")
 	MDRV_CARTSLOT_LOAD(gba_cart)
+	MDRV_SOFTWARE_LIST_ADD("gba")
 MACHINE_DRIVER_END
 
 /* this emulates the GBA's hardware protection: the BIOS returns only zeros when the PC is not in it,

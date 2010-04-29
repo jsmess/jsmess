@@ -644,7 +644,11 @@ static MACHINE_DRIVER_START( jaguar )
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("jag,abs,rom,j64,j01")
+	MDRV_CARTSLOT_INTERFACE("jaguar_cart")
 	MDRV_CARTSLOT_LOAD(jaguar)
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("jaguar")
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
 MACHINE_DRIVER_END
@@ -707,25 +711,40 @@ static QUICKLOAD_LOAD( jaguar )
 
 static DEVICE_IMAGE_LOAD( jaguar )
 {
-	int i,j;
-	image_fread(image, cart_base, image_length(image));
+	int i, j;
+	UINT32 size;
+
+	if (image_software_entry(image) == NULL)
+	{
+		size = image_length(image);
+		image_fread(image, cart_base, size);
+	}
+	else
+	{
+		size = image_get_software_region_length(image, "rom");
+		memcpy(cart_base, image_get_software_region(image, "rom"), size);
+	}
+
 	memset(jaguar_shared_ram, 0, 0x200000);
 	memcpy(jaguar_shared_ram, rom_base, 0x10);
 
-	/* Fix endian-ness */
-	if (!mame_stricmp(image_filetype(image), "j01"))
+	/* Fix endian-ness  */
+	// Note (2010-04, FP): I assume there is no .j01 file in our xml list
+	if (image_software_entry(image) == NULL && !mame_stricmp(image_filetype(image), "j01"))
 	{
-		for (i = 0; i < image_length(image) / 4; i++)
+		for (i = 0; i < size / 4; i++)
 		{
 			j = cart_base[i];
 			cart_base[i] = ((j & 0xff) << 16) | ((j & 0xff00) << 16) | ((j & 0xff0000) >> 16) | ((j & 0xff000000) >> 16);
 		}
 	}
 	else
-	for (i = 0; i < image_length(image) / 4; i++)
 	{
-		j = cart_base[i];
-		cart_base[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
+		for (i = 0; i < size / 4; i++)
+		{
+			j = cart_base[i];
+			cart_base[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
+		}
 	}
 
 	/* Skip the logo */

@@ -3967,7 +3967,7 @@
 	</software>
 
 	<software name="collnp15" cloneof="collnc">
-		<description>College Football's National Championship (Prototype, 19940511-A)</description>
+		<description>College Football's National Championship (Prototype, 19940517-A)</description>
 		<year>199?</year>
 		<publisher>Sega License</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -12403,7 +12403,7 @@
 	</software>
 
 	<software name="nbaplay1" cloneof="nbaplay">
-		<description>NBA Playoffs - Bulls Vs Blazers (Jpn)</description>
+		<description>NBA Playoffs - Bulls Vs Blazers (Jpn, Alt)</description>
 		<year>199?</year>
 		<publisher>Sega License</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -17364,7 +17364,7 @@
 	</software>
 
 	<software name="sonicjam1" cloneof="sonicjam">
-		<description>Sonic Jam 6</description>
+		<description>Sonic Jam 6 (Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">

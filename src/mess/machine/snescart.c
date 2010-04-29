@@ -351,16 +351,22 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	UINT8 *temp_buffer = auto_alloc_array(machine, UINT8, 0x410000);
 	UINT8 valid_mode20, valid_mode21, valid_mode25;
 	unsigned char *ROM;
-	/*int length;*/
 
 	snes_ram = memory_region(machine, "maincpu");
 	memset(snes_ram, 0, 0x1000000);
 
-	snes_rom_size = image_length(image);
-
+	if (image_software_entry(image) == NULL)
+		snes_rom_size = image_length(image);
+	else
+		snes_rom_size = image_get_software_region_length(image, "rom");
+	
 	/* Check for a header (512 bytes) */
 	offset = 512;
-	image_fread(image, header, 512);
+	if (image_software_entry(image) == NULL)
+		image_fread(image, header, 512);
+	else
+		memcpy(header, image_get_software_region(image, "rom"), 512);
+
 	if ((header[8] == 0xaa) && (header[9] == 0xbb) && (header[10] == 0x04))
 	{
 		/* Found an SWC identifier */
@@ -381,13 +387,22 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		/* No header found so go back to the start of the file */
 		logerror("No header found.\n");
 		offset = 0;
-		image_fseek(image, offset, SEEK_SET);
+
+		if (image_software_entry(image) == NULL)
+			image_fseek(image, offset, SEEK_SET);
 	}
 
 	/* We need to take a sample to test what mode we need to be in (the sample has to be quite large to cope with large carts in ExHiRom) */
-	image_fread(image, temp_buffer, 0x40ffff);
-	image_fseek(image, offset, SEEK_SET);	/* Rewind */
-
+	if (image_software_entry(image) == NULL)
+	{
+		image_fread(image, temp_buffer, 0x40ffff);
+		image_fseek(image, offset, SEEK_SET);	/* Rewind */
+	}
+	else
+	{
+		memcpy(temp_buffer, image_get_software_region(image, "rom") + offset, 0x40ffff);
+	}
+	
 	/* Now to determine if this is a lo-ROM, a hi-ROM or an extended lo/hi-ROM */
 	valid_mode20 = snes_validate_infoblock(temp_buffer, 0x007fc0);
 	valid_mode21 = snes_validate_infoblock(temp_buffer, 0x00ffc0);
@@ -422,8 +437,12 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 	/* Loading data */
 	ROM = memory_region(image->machine, "cart");
-	/*length =*/ image_fread(image, ROM, snes_rom_size - offset);
 
+	if (image_software_entry(image) == NULL)
+		image_fread(image, ROM, snes_rom_size - offset);
+	else
+		memcpy(ROM, image_get_software_region(image, "rom") + offset, snes_rom_size - offset);
+	
 	if (SNES_CART_DEBUG) printf("size %08X\n", snes_rom_size - offset);
 
 	/* FIXME: Insert crc check here */
@@ -842,7 +861,8 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	}
 
 	/* Load SRAM */
-	snes_load_sram(space->machine);
+	if (image_software_entry(image) == NULL)	// not sure about how to handle nvram with softlists
+		snes_load_sram(space->machine);
 
 	/* All done */
 	return INIT_PASS;
@@ -852,5 +872,7 @@ MACHINE_DRIVER_START( snes_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("smc,sfc,fig,swc")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("snes_cart")
 	MDRV_CARTSLOT_LOAD(snes_cart)
+	MDRV_SOFTWARE_LIST_ADD("snes")
 MACHINE_DRIVER_END

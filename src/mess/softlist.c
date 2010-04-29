@@ -755,6 +755,9 @@ error:
 
 void software_list_close(software_list *swlist)
 {
+	if (swlist == NULL)
+		return;
+	
 	if (swlist->file)
 		mame_fclose(swlist->file);
 	pool_free_lib(swlist->pool);
@@ -767,6 +770,9 @@ void software_list_close(software_list *swlist)
 
 software_info *software_list_find(software_list *swlist, const char *software)
 {
+	if (swlist == NULL)
+		return NULL;
+
 	swlist->look_for = software;
 	software_list_parse( swlist, swlist->error_proc, NULL );
 
@@ -1075,7 +1081,11 @@ static DEVICE_VALIDITY_CHECK( software_list )
 				return FALSE;
 			
 			software_list *list = software_list_open(mame_options(), swlist->list_name[i], FALSE, NULL);
-			
+
+			/* if no .xml list is found, then return (this happens e.g. if you moved/renamed the xml list) */
+			if (list == NULL) 
+				return FALSE;
+
 			for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
 			{
 				const char *s;

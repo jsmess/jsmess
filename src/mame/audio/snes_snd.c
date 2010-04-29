@@ -125,7 +125,7 @@ static const int gauss[]=
 static const int *const G1 = &gauss[256];
 static const int *const G2 = &gauss[512];
 static const int *const G3 = &gauss[255];
-static const int *const G4 = &gauss[-1];
+static const int *const G4 = &gauss[511];
 
 static const int        mask = 0xFF;
 

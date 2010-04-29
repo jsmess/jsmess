@@ -1312,7 +1312,6 @@ WRITE8_HANDLER( wswan_port_w )
 	ws_portram[offset] = data;
 }
 
-#ifdef MAME_DEBUG
 static const char* wswan_determine_sram( UINT8 data )
 {
 	eeprom.write_enabled = 0;
@@ -1351,7 +1350,6 @@ static const char* wswan_determine_romsize( UINT8 data )
 	}
 	return wswan_romsize_str[ ROM_UNKNOWN ];
 }
-#endif
 
 DEVICE_START(wswan_cart)
 {
@@ -1375,75 +1373,83 @@ DEVICE_START(wswan_cart)
 
 DEVICE_IMAGE_LOAD(wswan_cart)
 {
-	UINT32 ii;
-#ifdef MAME_DEBUG
+	UINT32 ii, size;
 	const char *sram_str;
-#endif
 
-	ws_ram = (UINT8*) memory_get_read_ptr( cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM ), 0 );
-	memset( ws_ram, 0, 0xFFFF );
-	ROMBanks = image_length( image ) / 65536;
+	if (image_software_entry(image) == NULL)
+		size = image_length(image);
+	else
+		size = image_get_software_region_length(image, "rom");
 
-	for( ii = 0; ii < ROMBanks; ii++ )
+	ws_ram = (UINT8*) memory_get_read_ptr(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0);
+	memset(ws_ram, 0, 0xffff);
+	ROMBanks = size / 65536;
+
+	for (ii = 0; ii < ROMBanks; ii++)
 	{
-		if( (ROMMap[ii] = auto_alloc_array(image->machine, UINT8, 0x10000 )) )
+		if ((ROMMap[ii] = auto_alloc_array(image->machine, UINT8, 0x10000)))
 		{
-			if( image_fread( image, ROMMap[ii], 0x10000 ) != 0x10000 )
+			if (image_software_entry(image) == NULL)
 			{
-				logerror( "Error while reading loading rom!\n" );
-				return INIT_FAIL;
+				if (image_fread(image, ROMMap[ii], 0x10000) != 0x10000)
+				{
+					logerror("Error while reading loading rom!\n");
+					return INIT_FAIL;
+				}
 			}
+			else
+				memcpy(ROMMap[ii], image_get_software_region(image, "rom") + ii * 0x10000, 0x10000);
 		}
 		else
 		{
-			logerror( "Memory allocation failed reading rom!\n" );
+			logerror("Memory allocation failed reading rom!\n");
 			return INIT_FAIL;
 		}
 	}
 
-#ifdef MAME_DEBUG
-	sram_str = wswan_determine_sram( ROMMap[ROMBanks-1][0xfffb] );
-#endif
+	sram_str = wswan_determine_sram(ROMMap[ROMBanks - 1][0xfffb]);
 
-	rtc.present = ROMMap[ROMBanks-1][0xfffd] ? 1 : 0;
+	rtc.present = ROMMap[ROMBanks - 1][0xfffd] ? 1 : 0;
 
-#ifdef MAME_DEBUG
 	{
 		int sum = 0;
 		/* Spit out some info */
-		mame_printf_debug( "ROM DETAILS\n" );
-		mame_printf_debug( "\tDeveloper ID: %X\n", ROMMap[ROMBanks-1][0xfff6] );
-		mame_printf_debug( "\tMinimum system: %s\n", ROMMap[ROMBanks-1][0xfff7] ? "WonderSwan Color" : "WonderSwan" );
-		mame_printf_debug( "\tCart ID: %X\n", ROMMap[ROMBanks-1][0xfff8] );
-		mame_printf_debug( "\tROM size: %s\n", wswan_determine_romsize( ROMMap[ROMBanks-1][0xfffa] ) );
-		mame_printf_debug( "\tSRAM size: %s\n", sram_str );
-		mame_printf_debug( "\tFeatures: %X\n", ROMMap[ROMBanks-1][0xfffc] );
-		mame_printf_debug( "\tRTC: %s\n", ( ROMMap[ROMBanks-1][0xfffd] ? "yes" : "no" ) );
-		for( ii = 0; ii < ROMBanks; ii++ )
+		logerror("ROM DETAILS\n" );
+		logerror("\tDeveloper ID: %X\n", ROMMap[ROMBanks - 1][0xfff6]);
+		logerror("\tMinimum system: %s\n", ROMMap[ROMBanks - 1][0xfff7] ? "WonderSwan Color" : "WonderSwan");
+		logerror("\tCart ID: %X\n", ROMMap[ROMBanks - 1][0xfff8]);
+		logerror("\tROM size: %s\n", wswan_determine_romsize(ROMMap[ROMBanks - 1][0xfffa]));
+		logerror("\tSRAM size: %s\n", sram_str);
+		logerror("\tFeatures: %X\n", ROMMap[ROMBanks - 1][0xfffc]);
+		logerror("\tRTC: %s\n", ROMMap[ROMBanks - 1][0xfffd] ? "yes" : "no");
+		for (ii = 0; ii < ROMBanks; ii++)
 		{
 			int count;
-			for( count = 0; count < 0x10000; count++ )
+			for (count = 0; count < 0x10000; count++)
 			{
 				sum += ROMMap[ii][count];
 			}
 		}
-		sum -= ROMMap[ROMBanks-1][0xffff];
-		sum -= ROMMap[ROMBanks-1][0xfffe];
-		sum &= 0xFFFF;
-		mame_printf_debug( "\tChecksum: %X%X (calculated: %04X)\n", ROMMap[ROMBanks-1][0xffff], ROMMap[ROMBanks-1][0xfffe], sum );
+		sum -= ROMMap[ROMBanks - 1][0xffff];
+		sum -= ROMMap[ROMBanks - 1][0xfffe];
+		sum &= 0xffff;
+		logerror("\tChecksum: %X%X (calculated: %04X)\n", ROMMap[ROMBanks - 1][0xffff], ROMMap[ROMBanks - 1][0xfffe], sum);
 	}
-#endif
 
-	if ( eeprom.size != 0 )
+	if (eeprom.size != 0)
 	{
-		eeprom.data = auto_alloc_array(image->machine, UINT8, eeprom.size );
-		image_battery_load( image, eeprom.data, eeprom.size, 0x00 );
+		eeprom.data = auto_alloc_array(image->machine, UINT8, eeprom.size);
+		if (image_software_entry(image) == NULL)	// not sure about how to handle nvram with softlists
+			image_battery_load(image, eeprom.data, eeprom.size, 0x00);
 		eeprom.page = eeprom.data;
 	}
 
-	logerror( "Image Name: %s\n", image_longname( image ) );
-	logerror( "Image Year: %s\n", image_year( image ) );
-	logerror( "Image Manufacturer: %s\n", image_manufacturer( image ) );
+	if (image_software_entry(image) == NULL)
+	{
+		logerror("Image Name: %s\n", image_longname(image));
+		logerror("Image Year: %s\n", image_year(image));
+		logerror("Image Manufacturer: %s\n", image_manufacturer(image));
+	}
 
 	/* All done */
 	return INIT_PASS;

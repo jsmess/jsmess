@@ -344,9 +344,9 @@ void mess_match_roms(core_options *options, const char *hash, int length, int *f
 						{
 							for ( software_part *part = software_find_part( swinfo, NULL, NULL ); part != NULL; part = software_part_next( part ) )
 							{
-								for ( const rom_entry *region = part->romdata; region; region = rom_next_region(region) )
+								for ( const rom_entry *region = part->romdata; region != NULL; region = rom_next_region(region) )
 								{
-									for ( const rom_entry *rom = rom_first_file(region); rom; rom = rom_next_file(rom) )
+									for ( const rom_entry *rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom) )
 									{
 										if ( hash_data_is_equal(hash, ROM_GETHASHDATA(rom), 0) )
 										{

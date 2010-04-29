@@ -9,7 +9,7 @@ Are the following undumped?
 
 -->
 <softwarelist name="jaguar_cart" description="Atari Jaguar cartridges">
-	<software name="aircars">
+	<software name="aircars" supported="no">
 		<description>Air Cars (World)</description>
 		<year>1997</year>
 		<publisher>ICD</publisher>
@@ -20,7 +20,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="avsp">
+	<software name="avsp" supported="no">
 		<description>Alien vs Predator (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -31,7 +31,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="atarikar">
+	<software name="atarikar" supported="no">
 		<description>Atari Karts (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -42,7 +42,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="mutntpng">
+	<software name="mutntpng" supported="no">
 		<description>Attack of the Mutant Penguins (World)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
@@ -53,7 +53,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="battlesp">
+	<software name="battlesp" supported="no">
 		<description>Battle Sphere Gold (World)</description>
 		<year>2002</year>
 		<publisher>ScatoLOGIC</publisher>
@@ -64,7 +64,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="brutalsp">
+	<software name="brutalsp" supported="no">
 		<description>Brutal Sports Football (World)</description>
 		<year>1994</year>
 		<publisher>Telegames</publisher>
@@ -75,7 +75,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="bubsy">
+	<software name="bubsy" supported="no">
 		<description>Bubsy in Fractured Furry Tales (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -86,7 +86,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="cfodder">
+	<software name="cfodder" supported="no">
 		<description>Cannon Fodder (World)</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
@@ -97,7 +97,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="chekflag">
+	<software name="chekflag" supported="no">
 		<description>Checkered Flag (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -108,7 +108,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="clubdriv">
+	<software name="clubdriv" supported="no">
 		<description>Club Drive (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -119,7 +119,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="cybermor1" cloneof="cybermor">
+	<software name="cybermor1" cloneof="cybermor" supported="no">
 		<description>Cybermorph (World, Rev. 1)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
@@ -130,7 +130,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="cybermor">
+	<software name="cybermor" supported="no">
 		<description>Cybermorph (World, Rev. 2)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
@@ -141,7 +141,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="defender">
+	<software name="defender" supported="no">
 		<description>Defender 2000 (World)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
@@ -152,7 +152,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="doom">
+	<software name="doom" supported="no">
 		<description>Doom (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -163,7 +163,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="ddragon5">
+	<software name="ddragon5" supported="no">
 		<description>Double Dragon V - The Shadow Falls (World)</description>
 		<year>1995</year>
 		<publisher>Tradewest</publisher>
@@ -174,7 +174,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="dragon">
+	<software name="dragon" supported="no">
 		<description>Dragon - The Bruce Lee Story (World)</description>
 		<year>1994</year>
 		<publisher>Virgin Interactibe</publisher>
@@ -185,7 +185,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="dinodude">
+	<software name="dinodude" supported="no">
 		<description>Evolution - Dino Dudes (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -196,7 +196,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="feverpit">
+	<software name="feverpit" supported="no">
 		<description>Fever Pitch Soccer (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -207,7 +207,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="fforlife1" cloneof="fforlife">
+	<software name="fforlife1" cloneof="fforlife" supported="no">
 		<description>Fight for Life (World, Alt)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
@@ -218,7 +218,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="fforlife">
+	<software name="fforlife" supported="no">
 		<description>Fight for Life (World)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
@@ -229,7 +229,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="flashbck">
+	<software name="flashbck" supported="no">
 		<description>Flashback - The Quest for Identity (World)</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
@@ -240,7 +240,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="flipout">
+	<software name="flipout" supported="no">
 		<description>Flip Out! (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -251,7 +251,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="hstrike">
+	<software name="hstrike" supported="no">
 		<description>Hover Strike (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -262,7 +262,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="hyperfor">
+	<software name="hyperfor" supported="no">
 		<description>Hyper Force (World)</description>
 		<year>2000</year>
 		<publisher>Songboard Productions</publisher>
@@ -273,7 +273,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="iwar">
+	<software name="iwar" supported="no">
 		<description>I-War (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -284,7 +284,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="ironsold">
+	<software name="ironsold" supported="no">
 		<description>Iron Soldier (World, v1.04)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -295,7 +295,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="ironsol2">
+	<software name="ironsol2" supported="no">
 		<description>Iron Soldier 2 (World)</description>
 		<year>1997</year>
 		<publisher>Telegames</publisher>
@@ -306,7 +306,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="kasumi">
+	<software name="kasumi" supported="no">
 		<description>Kasumi Ninja (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -317,7 +317,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="missilec">
+	<software name="missilec" supported="no">
 		<description>Missile Command 3D (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -328,7 +328,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="nbajamte">
+	<software name="nbajamte" supported="no">
 		<description>NBA Jam T.E. - Tournament Edition (World)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
@@ -339,7 +339,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="pinballf">
+	<software name="pinballf" supported="no">
 		<description>Pinball Fantasies (World)</description>
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
@@ -350,7 +350,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="pitfall">
+	<software name="pitfall" supported="no">
 		<description>Pitfall - The Mayan Adventure (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -361,7 +361,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="pdrive">
+	<software name="pdrive" supported="no">
 		<description>Power Drive Rally (World)</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
@@ -372,7 +372,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="protect">
+	<software name="protect" supported="no">
 		<description>Protector - Special Edition (World)</description>
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
@@ -383,7 +383,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="raiden">
+	<software name="raiden" supported="no">
 		<description>Raiden (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -394,7 +394,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="rayman">
+	<software name="rayman" supported="no">
 		<description>Rayman (World)</description>
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
@@ -405,7 +405,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="ruinerp">
+	<software name="ruinerp" supported="no">
 		<description>Ruiner Pinball (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -416,7 +416,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="sensible">
+	<software name="sensible" supported="no">
 		<description>Sensible Soccer - International Edition (World)</description>
 		<year>199?</year>
 		<publisher>Telegames</publisher>
@@ -427,7 +427,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="skyhamm">
+	<software name="skyhamm" supported="no">
 		<description>Skyhammer (World)</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
@@ -438,7 +438,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="soccerkd">
+	<software name="soccerkd" supported="no">
 		<description>Soccer Kid (World)</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
@@ -449,7 +449,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="spacewar">
+	<software name="spacewar" supported="no">
 		<description>Space War 2000 (World)</description>
 		<year>2001</year>
 		<publisher>B&amp;C Computervisions</publisher>
@@ -460,7 +460,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="sburnout">
+	<software name="sburnout" supported="no">
 		<description>Super Burnout (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -471,7 +471,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="superx3d">
+	<software name="superx3d" supported="no">
 		<description>SuperCross 3D (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -482,7 +482,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="syndicat">
+	<software name="syndicat" supported="no">
 		<description>Syndicate (World)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
@@ -493,7 +493,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="tempst2k">
+	<software name="tempst2k" supported="no">
 		<description>Tempest 2000 (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -504,7 +504,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="themeprk">
+	<software name="themeprk" supported="no">
 		<description>Theme Park (World)</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
@@ -515,7 +515,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="totalcar">
+	<software name="totalcar" supported="no">
 		<description>Total Carnage (World)</description>
 		<year>2005</year>
 		<publisher>Songbird Productions</publisher>
@@ -526,7 +526,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="towers2">
+	<software name="towers2" supported="no">
 		<description>Towers II - Plight of the Stargazer (World)</description>
 		<year>1996</year>
 		<publisher>Telegames</publisher>
@@ -537,7 +537,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="trevmcfr">
+	<software name="trevmcfr" supported="no">
 		<description>Trevor McFur in the Crescent Galaxy (World)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
@@ -548,7 +548,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="troyaik">
+	<software name="troyaik" supported="no">
 		<description>Troy Aikman NFL Football (World)</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
@@ -559,7 +559,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="ultravor1" cloneof="ultravor">
+	<software name="ultravor1" cloneof="ultravor" supported="no">
 		<description>Ultra Vortek (World, v0.94 Prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -570,7 +570,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="ultravor">
+	<software name="ultravor" supported="no">
 		<description>Ultra Vortek (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -581,7 +581,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="valdiser">
+	<software name="valdiser" supported="no">
 		<description>Val d'Is&#232;re Skiing and Snowboarding (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -592,7 +592,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="whitemen">
+	<software name="whitemen" supported="no">
 		<description>White Men Can't Jump (World)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
@@ -603,7 +603,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="wolfn3d">
+	<software name="wolfn3d" supported="no">
 		<description>Wolfenstein 3D (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -614,7 +614,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="worms">
+	<software name="worms" supported="no">
 		<description>Worms (World)</description>
 		<year>1998</year>
 		<publisher>Telegames</publisher>
@@ -625,7 +625,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="zero5">
+	<software name="zero5" supported="no">
 		<description>Zero 5 (World)</description>
 		<year>1997</year>
 		<publisher>Telegames</publisher>
@@ -636,7 +636,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="zool2">
+	<software name="zool2" supported="no">
 		<description>Zool 2 (World)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
@@ -647,7 +647,7 @@ Are the following undumped?
 		</part>
 	</software>
 
-	<software name="zoop">
+	<software name="zoop" supported="no">
 		<description>Zoop! (World)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>

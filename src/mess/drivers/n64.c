@@ -108,34 +108,40 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 	int i, length;
 	UINT8 *cart = memory_region(image->machine, "user2");
 
-	length = image_fread(image, cart, 0x4000000);
-
+	if (image_software_entry(image) == NULL)
+		length = image_fread(image, cart, 0x4000000);
+	else
+	{
+		length = image_get_software_region_length(image, "rom");
+		memcpy(cart, image_get_software_region(image, "rom"), length);
+	}
+	
 	if (cart[0] == 0x37 && cart[1] == 0x80)
 	{
-		for (i=0; i < length; i+=4)
+		for (i = 0; i < length; i += 4)
 		{
-			UINT8 b1 = cart[i+0];
-			UINT8 b2 = cart[i+1];
-			UINT8 b3 = cart[i+2];
-			UINT8 b4 = cart[i+3];
-			cart[i+0] = b3;
-			cart[i+1] = b4;
-			cart[i+2] = b1;
-			cart[i+3] = b2;
+			UINT8 b1 = cart[i + 0];
+			UINT8 b2 = cart[i + 1];
+			UINT8 b3 = cart[i + 2];
+			UINT8 b4 = cart[i + 3];
+			cart[i + 0] = b3;
+			cart[i + 1] = b4;
+			cart[i + 2] = b1;
+			cart[i + 3] = b2;
 		}
 	}
 	else
 	{
-		for (i=0; i < length; i+=4)
+		for (i = 0; i < length; i += 4)
 		{
-			UINT8 b1 = cart[i+0];
-			UINT8 b2 = cart[i+1];
-			UINT8 b3 = cart[i+2];
-			UINT8 b4 = cart[i+3];
-			cart[i+0] = b4;
-			cart[i+1] = b3;
-			cart[i+2] = b2;
-			cart[i+3] = b1;
+			UINT8 b1 = cart[i + 0];
+			UINT8 b2 = cart[i + 1];
+			UINT8 b3 = cart[i + 2];
+			UINT8 b4 = cart[i + 3];
+			cart[i + 0] = b4;
+			cart[i + 1] = b3;
+			cart[i + 2] = b2;
+			cart[i + 3] = b1;
 		}
 	}
 
@@ -184,7 +190,11 @@ static MACHINE_DRIVER_START( n64 )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("v64,z64,rom,n64,bin")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("n64_cart")
 	MDRV_CARTSLOT_LOAD(n64_cart)
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("n64")
 MACHINE_DRIVER_END
 
 ROM_START( n64 )

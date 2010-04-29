@@ -551,7 +551,7 @@ static INPUT_PORTS_START( gameboy )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SELECT) PORT_NAME("Select")
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( gameboy )
+static MACHINE_DRIVER_START( gb_common )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", LR35902, 4194304)			/* 4.194304 MHz */
 	MDRV_CPU_PROGRAM_MAP(gb_map)
@@ -583,12 +583,18 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_SOUND_ADD("custom", GAMEBOY, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( gameboy )
+	MDRV_IMPORT_FROM(gb_common)
 
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("gameboy_cart")
 	MDRV_CARTSLOT_START(gb_cart)
 	MDRV_CARTSLOT_LOAD(gb_cart)
+	MDRV_SOFTWARE_LIST_ADD("gameboy")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supergb )
@@ -625,7 +631,7 @@ static MACHINE_DRIVER_START( gbpocket )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gbcolor )
-	MDRV_IMPORT_FROM(gameboy)
+	MDRV_IMPORT_FROM(gb_common)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP( gbc_map)
 	MDRV_CPU_CONFIG(cgb_cpu_reset)
@@ -639,6 +645,14 @@ static MACHINE_DRIVER_START( gbcolor )
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("48K") /* 2 pages of 8KB VRAM, 8 pages of 4KB RAM */
+
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("gb,gmb,cgb,gbc,sgb,bin")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("gbcolor_cart")
+	MDRV_CARTSLOT_START(gb_cart)
+	MDRV_CARTSLOT_LOAD(gb_cart)
+	MDRV_SOFTWARE_LIST_ADD("gbcolor")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaduck )

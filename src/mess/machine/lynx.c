@@ -1943,9 +1943,13 @@ void lynx_crc_keyword(running_device *image)
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
 	UINT8 *rom = memory_region(image->machine, "user1");
-	int size = image_length(image);
-	const char *filetype;
+	UINT32 size;
 	UINT8 header[0x40];
+	
+	if (image_software_entry(image) == NULL)
+	{
+		const char *filetype;
+		size = image_length(image);
 /* 64 byte header
    LYNX
    intelword lower counter size
@@ -1954,44 +1958,68 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
    22 chars manufacturer
 */
 
-	filetype = image_filetype(image);
+		filetype = image_filetype(image);
 
-	if (!mame_stricmp (filetype, "lnx"))
-	{
-		if (image_fread(image, header, 0x40)!=0x40)
+		if (!mame_stricmp (filetype, "lnx"))
+		{
+			if (image_fread(image, header, 0x40) != 0x40)
+				return INIT_FAIL;
+
+			/* Check the image */
+			if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
+				return INIT_FAIL;
+
+			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
+            it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
+            implement this as well */
+			lynx_granularity = header[4] | (header[5] << 8);
+
+			logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
+					header + 10, size / 1024, lynx_granularity, header + 42);
+
+			size -= 0x40;
+		}
+		else if (!mame_stricmp (filetype, "lyx"))
+		{
+			/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity"
+            (see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
+            These should work with most .lyx files, but we need additional info on raw cart images */
+			if (size == 0x20000)
+				lynx_granularity = 0x0200;
+			else if (size == 0x80000)
+				lynx_granularity = 0x0800;
+			else
+				lynx_granularity = 0x0400;
+		}
+
+		if (image_fread(image, rom, size) != size)
 			return INIT_FAIL;
 
+		lynx_crc_keyword(image);
+	}
+	else
+	{
+		size = image_get_software_region_length(image, "rom");
+
+		/* here we assume images to be in .lnx format and to have an header. 
+		 we should eventually remove them, though! */
+		memcpy(header, image_get_software_region(image, "rom"), 0x40);
+		
 		/* Check the image */
 		if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
 			return INIT_FAIL;
-
+		
 		/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
-        it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
-        implement this as well */
+		 it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
+		 implement this as well */
 		lynx_granularity = header[4] | (header[5] << 8);
-
+		
 		logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
-			  header + 10, size / 1024, lynx_granularity, header + 42);
-
+				  header + 10, size / 1024, lynx_granularity, header + 42);
+		
 		size -= 0x40;
+		memcpy(rom, image_get_software_region(image, "rom") + 0x40, size);
 	}
-	else if (!mame_stricmp (filetype, "lyx"))
-	{
-		/* 2008-10 FP: FIXME: .lyx file don't have an header, hence they miss "lynx_granularity"
-        (see above). What if bank 0 has to be loaded elsewhere? And what about bank 1?
-        These should work with most .lyx files, but we need additional info on raw cart images */
-		if (size == 0x20000)
-			lynx_granularity = 0x0200;
-		else if (size == 0x80000)
-			lynx_granularity = 0x0800;
-		else
-			lynx_granularity = 0x0400;
-	}
-
-	if (image_fread(image, rom, size) != size)
-		return INIT_FAIL;
-
-	lynx_crc_keyword(image);
 
 	return INIT_PASS;
 }
@@ -2000,6 +2028,10 @@ MACHINE_DRIVER_START(lynx_cartslot)
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("lnx,lyx")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("lynx_cart")
 	MDRV_CARTSLOT_LOAD(lynx_cart)
 	MDRV_CARTSLOT_PARTIALHASH(lynx_partialhash)
+
+	/* Software lists */
+	MDRV_SOFTWARE_LIST_ADD("lynx")
 MACHINE_DRIVER_END

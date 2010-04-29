@@ -1193,50 +1193,57 @@ DEVICE_START( sms_cart )
 
 DEVICE_IMAGE_LOAD( sms_cart )
 {
-	int size = image_length(image);
-	int index = 0;
-	const char *fname = image_filename(image);
-	int fname_len = fname ? strlen(fname) : 0;
-	const char *extrainfo = image_extrainfo(image);
+	int size, index = 0, offset = 0;
+	const char *extrainfo;
 
-	if (strcmp(image->tag(),"cart1") == 0)
+	if (strcmp(image->tag(), "cart1") == 0)
 		index = 0;
-
-	if (strcmp(image->tag(),"cart2") == 0)
+	if (strcmp(image->tag(), "cart2") == 0)
 		index = 1;
-	if (strcmp(image->tag(),"cart3") == 0)
+	if (strcmp(image->tag(), "cart3") == 0)
 		index = 2;
-	if (strcmp(image->tag(),"cart4") == 0)
+	if (strcmp(image->tag(), "cart4") == 0)
 		index = 3;
-	if (strcmp(image->tag(),"cart5") == 0)
+	if (strcmp(image->tag(), "cart5") == 0)
 		index = 4;
-	if (strcmp(image->tag(),"cart6") == 0)
+	if (strcmp(image->tag(), "cart6") == 0)
 		index = 5;
-	if (strcmp(image->tag(),"cart7") == 0)
+	if (strcmp(image->tag(), "cart7") == 0)
 		index = 6;
-	if (strcmp(image->tag(),"cart8") == 0)
+	if (strcmp(image->tag(), "cart8") == 0)
 		index = 7;
-	if (strcmp(image->tag(),"cart9") == 0)
+	if (strcmp(image->tag(), "cart9") == 0)
 		index = 8;
-	if (strcmp(image->tag(),"cart10") == 0)
+	if (strcmp(image->tag(), "cart10") == 0)
 		index = 9;
-	if (strcmp(image->tag(),"cart11") == 0)
+	if (strcmp(image->tag(), "cart11") == 0)
 		index = 10;
-	if (strcmp(image->tag(),"cart12") == 0)
+	if (strcmp(image->tag(), "cart12") == 0)
 		index = 11;
-	if (strcmp(image->tag(),"cart13") == 0)
+	if (strcmp(image->tag(), "cart13") == 0)
 		index = 12;
-	if (strcmp(image->tag(),"cart14") == 0)
+	if (strcmp(image->tag(), "cart14") == 0)
 		index = 13;
-	if (strcmp(image->tag(),"cart15") == 0)
+	if (strcmp(image->tag(), "cart15") == 0)
 		index = 14;
-	if (strcmp(image->tag(),"cart16") == 0)
+	if (strcmp(image->tag(), "cart16") == 0)
 		index = 15;
+
+	if (image_software_entry(image) == NULL)
+	{
+		extrainfo = image_extrainfo(image);
+		size = image_length(image);
+	}
+	else
+	{
+		extrainfo = NULL;
+		size = image_get_software_region_length(image, "rom");
+	}
 
 	/* Check for 512-byte header */
 	if ((size / 512) & 1)
 	{
-		image_fseek(image, 512, SEEK_SET);
+		offset = 512;
 		size -= 512;
 	}
 
@@ -1250,11 +1257,18 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	/* Make sure the region holds only complete (0x4000) rom banks */
 	sms_state.cartridge[index].size = (size & 0x3fff) ? (((size >> 14) + 1) << 14) : size;
 	sms_state.cartridge[index].ROM = auto_alloc_array(image->machine, UINT8, sms_state.cartridge[index].size);
-
 	sms_state.cartridge[index].cartSRAM = auto_alloc_array(image->machine, UINT8, NVRAM_SIZE);
 
 	/* Load ROM banks */
-	size = image_fread(image, sms_state.cartridge[index].ROM, size);
+	if (image_software_entry(image) == NULL)
+	{
+		image_fseek(image, offset, SEEK_SET);
+
+		if (image_fread(image, sms_state.cartridge[index].ROM, size) != size)
+			return INIT_FAIL;
+	}
+	else
+		memcpy(sms_state.cartridge[index].ROM, image_get_software_region(image, "rom") + offset, size);
 
 	/* check the image */
 	if (!sms_state.has_bios)
@@ -1310,10 +1324,10 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		}
 
 		/* Check for special SMS Compatibility mode gamegear cartridges */
-		if (sms_state.is_gamegear)
+		if (sms_state.is_gamegear && image_software_entry(image) == NULL)	// not sure about how to handle this with softlists
 		{
 			/* Just in case someone passes us an sms file */
-			if (fname_len > 3 && ! mame_stricmp(fname + fname_len - 3, "sms"))
+			if (!mame_stricmp (image_filetype(image), "sms"))
 				sms_state.cartridge[index].features |= CF_GG_SMS_MODE;
 		}
 	}
@@ -1339,7 +1353,8 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	}
 
 	/* Load battery backed RAM, if available */
-	image_battery_load(image, sms_state.cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE, 0x00);
+	if (image_software_entry(image) == NULL)	// not sure about how to handle nvram with softlists
+		image_battery_load(image, sms_state.cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE, 0x00);
 
 	return INIT_PASS;
 }

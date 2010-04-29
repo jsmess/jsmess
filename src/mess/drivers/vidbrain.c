@@ -447,6 +447,30 @@ static const cassette_config vidbrain_cassette_config =
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
 };
 
+/*-------------------------------------------------
+	cart loading (+ software list)
+ -------------------------------------------------*/
+
+static DEVICE_IMAGE_LOAD( vidbrain_cart )
+{
+	UINT32 size;
+	UINT8 *ptr = memory_region(image->machine, F3850_TAG) + 0x1000;
+	
+	if (image_software_entry(image) == NULL)
+	{
+		size = image_length(image);
+		if (image_fread(image, ptr, size) != size)
+			return INIT_FAIL;
+	}
+	else
+	{
+		size = image_get_software_region_length(image, "rom");
+		memcpy(ptr, image_get_software_region(image, "rom"), size);
+	}
+	
+	return INIT_PASS;
+}
+
 /***************************************************************************
     MACHINE INITIALIZATION
 ***************************************************************************/
@@ -516,6 +540,11 @@ static MACHINE_DRIVER_START( vidbrain )
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_INTERFACE("vidbrain_cart")
+	MDRV_CARTSLOT_LOAD(vidbrain_cart)
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("vidbrain")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -529,7 +558,6 @@ MACHINE_DRIVER_END
 ROM_START( vidbrain )
     ROM_REGION( 0x3000, F3850_TAG, 0 )
 	ROM_LOAD( "uvres 1n.d67", 0x0000, 0x0800, CRC(065fe7c2) SHA1(9776f9b18cd4d7142e58eff45ac5ee4bc1fa5a2a) )
-	ROM_CART_LOAD( "cart", 0x1000, 0x1000, 0 )
 	ROM_LOAD( "resn2.e5", 0x2000, 0x0800, CRC(1d85d7be) SHA1(26c5a25d1289dedf107fa43aa8dfc14692fd9ee6) )
 ROM_END
 

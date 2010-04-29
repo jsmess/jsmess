@@ -999,7 +999,15 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	ROM = rawROM /*+ 512 */;
 
 	genesis_last_loaded_image_length = -1;
-	length = image_fread(image, rawROM + 0x2000, 0x600000);
+
+	if (image_software_entry(image) == NULL)
+		length = image_fread(image, rawROM + 0x2000, 0x600000);
+	else
+	{
+		length = image_get_software_region_length(image, "rom");
+		memcpy(rawROM + 0x2000, image_get_software_region(image, "rom"), length);
+	}
+
 	logerror("image length = 0x%x\n", length);
 
 	/* is this a SMD file? */
@@ -1022,8 +1030,8 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		for (ptr = 0; ptr < length; ptr += 2)
 		{
 			fliptemp = tmpROMnew[ptr];
-			tmpROMnew[ptr] = tmpROMnew[ptr+1];
-			tmpROMnew[ptr+1] = fliptemp;
+			tmpROMnew[ptr] = tmpROMnew[ptr + 1];
+			tmpROMnew[ptr + 1] = fliptemp;
 		}
 #endif
 		genesis_last_loaded_image_length = length - 512;
@@ -1219,58 +1227,61 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	logerror("cart type: %d\n", cart_type);
 
-	genesis_sram = NULL;
-	sram_detected = 0;
-	genesis_sram_start = genesis_sram_end = 0;
-	has_serial_eeprom = 0;
-
-	/* check if cart has battery save */
-
-	/* For games using SRAM, unfortunately there are ROMs without info
-    about it in header. The solution adopted is do the mapping anyway,
-    then active SRAM later if the game will access it. */
-
-	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
+	if (image_software_entry(image) == NULL)	// not sure about how to handle nvram with softlists
 	{
-		/* SRAM info found in header */
-		genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
-		genesis_sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
-
-		if ((genesis_sram_start > genesis_sram_end) || ((genesis_sram_end - genesis_sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
-			genesis_sram_end = genesis_sram_start + 0x0FFFF;
-
-		/* for some games using serial EEPROM, difference between SRAM
-        end to start is 0 or 1. Currently EEPROM is not emulated. */
-		if ((genesis_sram_end - genesis_sram_start) < 2)
-			has_serial_eeprom = 1;
+		genesis_sram = NULL;
+		sram_detected = 0;
+		genesis_sram_start = genesis_sram_end = 0;
+		has_serial_eeprom = 0;
+		
+		/* check if cart has battery save */
+		
+		/* For games using SRAM, unfortunately there are ROMs without info
+		 about it in header. The solution adopted is do the mapping anyway,
+		 then active SRAM later if the game will access it. */
+		
+		if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
+		{
+			/* SRAM info found in header */
+			genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
+			genesis_sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
+			
+			if ((genesis_sram_start > genesis_sram_end) || ((genesis_sram_end - genesis_sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
+				genesis_sram_end = genesis_sram_start + 0x0FFFF;
+			
+			/* for some games using serial EEPROM, difference between SRAM
+			 end to start is 0 or 1. Currently EEPROM is not emulated. */
+			if ((genesis_sram_end - genesis_sram_start) < 2)
+				has_serial_eeprom = 1;
+			else
+				sram_detected = 1;
+		}
 		else
-			sram_detected = 1;
+		{
+			/* set default SRAM positions, with size = 64k */
+			genesis_sram_start = 0x200000;
+			genesis_sram_end = genesis_sram_start + 0xffff;
+		}
+		
+		if (genesis_sram_start & 1)
+			genesis_sram_start -= 1;
+		
+		if (!(genesis_sram_end & 1))
+			genesis_sram_end += 1;
+		
+		/* calculate backup RAM location */
+		megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
+		
+		/* Until serial EEPROM is emulated, clears one byte at beginning of
+		 backup RAM, but only if the value is 0xFFFF, to not break MLBPA Sports
+		 Talk Baseball. With this hack some games at least run (NBA Jam, Evander
+		 Holyfield's Real Deal Boxing, Greatest Heavyweights of the Ring) */
+		if (has_serial_eeprom && megadriv_backupram[0] == 0xffff)
+			megadriv_backupram[0] = 0xff00;
+		
+		if (sram_detected)
+			logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start + 1);
 	}
-	else
-	{
-		/* set default SRAM positions, with size = 64k */
-		genesis_sram_start = 0x200000;
-		genesis_sram_end = genesis_sram_start + 0xffff;
-	}
-
-	if (genesis_sram_start & 1)
-		genesis_sram_start -= 1;
-
-	if (!(genesis_sram_end & 1))
-		genesis_sram_end += 1;
-
-	/* calculate backup RAM location */
-	megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
-
-	/* Until serial EEPROM is emulated, clears one byte at beginning of
-    backup RAM, but only if the value is 0xFFFF, to not break MLBPA Sports
-    Talk Baseball. With this hack some games at least run (NBA Jam, Evander
-    Holyfield's Real Deal Boxing, Greatest Heavyweights of the Ring) */
-	if (has_serial_eeprom && megadriv_backupram[0] == 0xffff)
-		megadriv_backupram[0] = 0xff00;
-
-	if (sram_detected)
-		logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start + 1);
 
 	return INIT_PASS;
 }
@@ -1294,8 +1305,10 @@ MACHINE_DRIVER_START( genesis_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("smd,bin,md,gen")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("megadriv_cart")
 	MDRV_CARTSLOT_LOAD(genesis_cart)
 	MDRV_CARTSLOT_UNLOAD(genesis_cart)
+	MDRV_SOFTWARE_LIST_ADD("megadriv")
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( _32x_cartslot )
@@ -1308,6 +1321,8 @@ MACHINE_DRIVER_START( pico_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("pico_cart")
 	MDRV_CARTSLOT_LOAD(genesis_cart)
 	MDRV_CARTSLOT_UNLOAD(genesis_cart)
+	MDRV_SOFTWARE_LIST_ADD("pico")
 MACHINE_DRIVER_END

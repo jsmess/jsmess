@@ -1479,13 +1479,13 @@ DEVICE_START(gb_cart)
 {
 	int I;
 
-	memset( &gb_driver_data, 0, sizeof(gb_driver_data) );
+	memset(&gb_driver_data, 0, sizeof(gb_driver_data));
 
-	gb_driver_data.gb_dummy_rom_bank = auto_alloc_array( device->machine, UINT8, 0x4000 );
-	memset( gb_driver_data.gb_dummy_rom_bank, 0xFF, 0x4000 );
+	gb_driver_data.gb_dummy_rom_bank = auto_alloc_array(device->machine, UINT8, 0x4000);
+	memset(gb_driver_data.gb_dummy_rom_bank, 0xff, 0x4000);
 
-	gb_driver_data.gb_dummy_ram_bank = auto_alloc_array( device->machine, UINT8, 0x2000 );
-	memset( gb_driver_data.gb_dummy_ram_bank, 0xFF, 0x2000 );
+	gb_driver_data.gb_dummy_ram_bank = auto_alloc_array(device->machine, UINT8, 0x2000);
+	memset(gb_driver_data.gb_dummy_ram_bank, 0xff, 0x2000 );
 
 	for(I = 0; I < MAX_ROMBANK; I++)
 	{
@@ -1632,44 +1632,57 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		{0x0000, NULL}
 	};
 
-	int Checksum, I, J, filesize;
+	int Checksum, I, J, filesize, load_start = 0;
 	UINT16 reported_rom_banks;
-	UINT8	*gb_header;
+	UINT8 *gb_header;
 	static const int rambanks[8] = {0, 1, 1, 4, 16, 8, 0, 0};
 
-	filesize = image_length(image);
+	if (image_software_entry(image) == NULL)
+		filesize = image_length(image);
+	else
+		filesize = image_get_software_region_length(image, "rom");
 
 	/* Check for presence of a header, and skip that header */
 	J = filesize % 0x4000;
-	if ( J == 512 )
+	if (J == 512)
 	{
-		logerror( "Rom-header found, skipping\n" );
-		image_fseek( image, J, SEEK_SET );
+		logerror("Rom-header found, skipping\n");
+		load_start = 512;
 		filesize -= 512;
 	}
 
 	/* Verify that the file contains 16kb blocks */
-	if ( ( filesize == 0 ) || ( ( filesize % 0x4000 ) != 0 ) )
+	if ((filesize == 0) || ((filesize % 0x4000) != 0))
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size" );
+		image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
 		return INIT_FAIL;
 	}
 
 	/* Claim memory */
-	gb_driver_data.gb_cart = auto_alloc_array( image->machine, UINT8, filesize );
+	gb_driver_data.gb_cart = auto_alloc_array(image->machine, UINT8, filesize);
 
-	/* Read cartridge */
-	if ( image_fread( image, gb_driver_data.gb_cart, filesize ) != filesize )
+	if (image_software_entry(image) == NULL)
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-		return INIT_FAIL;
-	}
+		/* Actually skip the header */
+		image_fseek(image, load_start, SEEK_SET);
 
+		/* Read cartridge */
+		if (image_fread(image, gb_driver_data.gb_cart, filesize) != filesize)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			return INIT_FAIL;
+		}
+	}
+	else
+	{
+		memcpy(gb_driver_data.gb_cart, image_get_software_region(image, "rom") + load_start, filesize);
+	}
+	
 	gb_header = gb_driver_data.gb_cart;
 	gb_driver_data.ROMBank00 = 0;
 
 	/* Check for presence of MMM01 mapper */
-	if ( filesize >= 0x8000 )
+	if (filesize >= 0x8000)
 	{
 		static const UINT8 nintendo_logo[0x18] = {
 			0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B,
@@ -1678,16 +1691,16 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		};
 		int	bytes_matched = 0;
 		gb_header = gb_driver_data.gb_cart + filesize - 0x8000;
-		for ( I = 0; I < 0x18; I++ )
+		for (I = 0; I < 0x18; I++)
 		{
-			if ( gb_header[0x0104 + I] == nintendo_logo[I] )
+			if (gb_header[0x0104 + I] == nintendo_logo[I])
 			{
 				bytes_matched++;
 			}
 		}
-		if ( bytes_matched == 0x18 && gb_header[0x0147] >= 0x0B && gb_header[0x0147] <= 0x0D )
+		if (bytes_matched == 0x18 && gb_header[0x0147] >= 0x0B && gb_header[0x0147] <= 0x0D)
 		{
-			gb_driver_data.ROMBank00 = ( filesize / 0x4000 ) - 2;
+			gb_driver_data.ROMBank00 = (filesize / 0x4000) - 2;
 			mmm01_bank_offset = gb_driver_data.ROMBank00;
 		}
 		else
@@ -1697,7 +1710,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* Fill in our cart details */
-	switch( gb_header[0x0147] )
+	switch(gb_header[0x0147])
 	{
 	case 0x00:	gb_driver_data.MBCType = MBC_NONE;	gb_driver_data.CartType = 0;				break;
 	case 0x01:	gb_driver_data.MBCType = MBC_MBC1;	gb_driver_data.CartType = 0;				break;
@@ -1734,53 +1747,53 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* Check whether we're dealing with a (possible) Wisdom Tree game here */
-	if ( gb_header[0x0147] == 0x00 )
+	if (gb_header[0x0147] == 0x00)
 	{
 		int count = 0;
-		for( I = 0x0134; I <= 0x014C; I++ )
+		for (I = 0x0134; I <= 0x014C; I++)
 		{
 			count += gb_header[I];
 		}
-		if ( count == 0 )
+		if (count == 0)
 		{
 			gb_driver_data.MBCType = MBC_WISDOM;
 		}
 	}
 
 	/* Check if we're dealing with a Korean variant of the MBC1 mapper */
-	if ( gb_driver_data.MBCType == MBC_MBC1 )
+	if (gb_driver_data.MBCType == MBC_MBC1)
 	{
-		if ( gb_header[0x13F] == 0x42 && gb_header[0x140] == 0x32 && gb_header[0x141] == 0x43 && gb_header[0x142] == 0x4B )
+		if (gb_header[0x13F] == 0x42 && gb_header[0x140] == 0x32 && gb_header[0x141] == 0x43 && gb_header[0x142] == 0x4B)
 		{
 			gb_driver_data.MBCType = MBC_MBC1_KOR;
 		}
 	}
-	if ( gb_driver_data.MBCType == MBC_UNKNOWN )
+	if (gb_driver_data.MBCType == MBC_UNKNOWN)
 	{
-		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unknown mapper type" );
+		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Unknown mapper type");
 		return INIT_FAIL;
 	}
-	if ( gb_driver_data.MBCType == MBC_MMM01 )
+	if (gb_driver_data.MBCType == MBC_MMM01)
 	{
-//      image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet" );
+//      image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet");
 //      return INIT_FAIL;
 	}
-	if ( gb_driver_data.MBCType == MBC_MBC4 )
+	if (gb_driver_data.MBCType == MBC_MBC4)
 	{
-		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Mapper MBC4 is not supported yet" );
+		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Mapper MBC4 is not supported yet");
 		return INIT_FAIL;
 	}
 	/* MBC7 support is still work-in-progress, so only enable it for debug builds */
 #ifndef MAME_DEBUG
-	if ( gb_driver_data.MBCType == MBC_MBC7 )
+	if (gb_driver_data.MBCType == MBC_MBC7)
 	{
-		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Mapper MBC7 is not supported yet" );
+		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Mapper MBC7 is not supported yet");
 		return INIT_FAIL;
 	}
 #endif
 
 	gb_driver_data.ROMBanks = filesize / 0x4000;
-	switch( gb_header[0x0148] )
+	switch (gb_header[0x0148])
 	{
 	case 0x52:
 		reported_rom_banks = 72;
@@ -1796,35 +1809,35 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		reported_rom_banks = 2 << gb_header[0x0148];
 		break;
 	default:
-		logerror( "Warning loading cartridge: Unknown ROM size in header.\n" );
+		logerror("Warning loading cartridge: Unknown ROM size in header.\n");
 		reported_rom_banks = 256;
 		break;
 	}
-	if ( gb_driver_data.ROMBanks != reported_rom_banks && gb_driver_data.MBCType != MBC_WISDOM )
+	if (gb_driver_data.ROMBanks != reported_rom_banks && gb_driver_data.MBCType != MBC_WISDOM)
 	{
-		logerror( "Warning loading cartridge: Filesize and reported ROM banks don't match.\n" );
+		logerror("Warning loading cartridge: Filesize and reported ROM banks don't match.\n");
 	}
 
-        gb_driver_data.RAMBanks = rambanks[gb_header[0x0149] & 7];
+	gb_driver_data.RAMBanks = rambanks[gb_header[0x0149] & 7];
 
 	/* Calculate and check checksum */
-        Checksum = ((UINT16) gb_header[0x014E] << 8) + gb_header[0x014F];
-        Checksum += gb_header[0x014E] + gb_header[0x014F];
-        for (I = 0; I < filesize; I++)
-        {
-                Checksum -= gb_driver_data.gb_cart[I];
-        }
-        if (Checksum & 0xFFFF)
-        {
-                logerror("Warning loading cartridge: Checksum is wrong.");
-        }
-
+	Checksum = ((UINT16) gb_header[0x014E] << 8) + gb_header[0x014F];
+	Checksum += gb_header[0x014E] + gb_header[0x014F];
+	for (I = 0; I < filesize; I++)
+	{
+		Checksum -= gb_driver_data.gb_cart[I];
+	}
+	if (Checksum & 0xFFFF)
+	{
+		logerror("Warning loading cartridge: Checksum is wrong.");
+	}
+	
 	/* Initialize ROMMap pointers */
-        for (I = 0; I < gb_driver_data.ROMBanks; I++)
-        {
-                gb_driver_data.ROMMap[I] = gb_driver_data.gb_cart + ( I * 0x4000 );
-        }
-
+	for (I = 0; I < gb_driver_data.ROMBanks; I++)
+	{
+		gb_driver_data.ROMMap[I] = gb_driver_data.gb_cart + (I * 0x4000);
+	}
+	
 	/*
       Handle odd-sized cartridges (72,80,96 banks)
       ROMBanks      ROMMask
@@ -1833,27 +1846,27 @@ DEVICE_IMAGE_LOAD(gb_cart)
       96 (1100000)  1011111 (95)
     */
 	gb_driver_data.ROMMask = I - 1;
-	if ( ( gb_driver_data.ROMBanks & gb_driver_data.ROMMask ) != 0 )
+	if ((gb_driver_data.ROMBanks & gb_driver_data.ROMMask) != 0)
 	{
-		for( ; I & gb_driver_data.ROMBanks; I++ )
+		for( ; I & gb_driver_data.ROMBanks; I++)
 		{
-			gb_driver_data.ROMMap[ I ] = gb_driver_data.ROMMap[ I & gb_driver_data.ROMMask ];
+			gb_driver_data.ROMMap[I] = gb_driver_data.ROMMap[I & gb_driver_data.ROMMask];
 		}
 		gb_driver_data.ROMMask = I - 1;
 	}
-
+	
 	/* Fill out the remaining rom bank pointers, if any. */
-	for ( ; I < MAX_ROMBANK; I++ )
+	for ( ; I < MAX_ROMBANK; I++)
 	{
-		gb_driver_data.ROMMap[ I ] = gb_driver_data.ROMMap[ I & gb_driver_data.ROMMask ];
+		gb_driver_data.ROMMap[I] = gb_driver_data.ROMMap[I & gb_driver_data.ROMMask];
 	}
-
+	
 	/* Log cart information */
 	{
 		const char *P;
 		char S[50];
 		static const int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
-
+		
 
 		strncpy (S, (char *)&gb_header[0x0134], 16);
 		S[16] = '\0';
@@ -1880,10 +1893,10 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* MBC2 has 512 * 4bits (8kb) internal RAM */
-	if( gb_driver_data.MBCType == MBC_MBC2 )
+	if(gb_driver_data.MBCType == MBC_MBC2)
 		gb_driver_data.RAMBanks = 1;
 	/* MBC7 has 512 bytes(?) of internal RAM */
-	if ( gb_driver_data.MBCType == MBC_MBC7 )
+	if (gb_driver_data.MBCType == MBC_MBC7)
 	{
 		gb_driver_data.RAMBanks = 1;
 	}
@@ -1891,19 +1904,19 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	if (gb_driver_data.RAMBanks && gb_driver_data.MBCType)
 	{
 		/* Claim memory */
-		gb_driver_data.gb_cart_ram = auto_alloc_array( image->machine, UINT8, gb_driver_data.RAMBanks * 0x2000 );
-		memset( gb_driver_data.gb_cart_ram, 0xFF, gb_driver_data.RAMBank * 0x2000 );
+		gb_driver_data.gb_cart_ram = auto_alloc_array(image->machine, UINT8, gb_driver_data.RAMBanks * 0x2000);
+		memset(gb_driver_data.gb_cart_ram, 0xFF, gb_driver_data.RAMBank * 0x2000);
 
 		for (I = 0; I < gb_driver_data.RAMBanks; I++)
 		{
-			gb_driver_data.RAMMap[I] = gb_driver_data.gb_cart_ram + ( I * 0x2000 );
+			gb_driver_data.RAMMap[I] = gb_driver_data.gb_cart_ram + (I * 0x2000);
 		}
 
 		/* Set up rest of the (mirrored) RAM pages */
 		gb_driver_data.RAMMask = I - 1;
-		for ( ; I < MAX_RAMBANK; I++ )
+		for ( ; I < MAX_RAMBANK; I++)
 		{
-			gb_driver_data.RAMMap[ I ] = gb_driver_data.RAMMap [ I & gb_driver_data.RAMMask ];
+			gb_driver_data.RAMMap[I] = gb_driver_data.RAMMap[I & gb_driver_data.RAMMask];
 		}
 	}
 	else
@@ -1912,21 +1925,25 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 
 	/* If there's an RTC claim memory to store the RTC contents */
-	if ( gb_driver_data.CartType & TIMER )
+	if (gb_driver_data.CartType & TIMER)
 	{
-		gb_driver_data.MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000 );
+		gb_driver_data.MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000);
 	}
 
-	if ( gb_driver_data.MBCType == MBC_TAMA5 )
+	if (gb_driver_data.MBCType == MBC_TAMA5)
 	{
-		gb_driver_data.MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000 );
-		memset( gb_driver_data.gbTama5Memory, 0xFF, sizeof(gb_driver_data.gbTama5Memory) );
+		gb_driver_data.MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000);
+		memset(gb_driver_data.gbTama5Memory, 0xff, sizeof(gb_driver_data.gbTama5Memory));
 	}
+
+// not sure about sram handling with softlists, so we exit here (for the moment)
+	if (image_software_entry(image) == NULL)
+		return INIT_PASS;
 
 	/* Load the saved RAM if this cart has a battery */
-	if( gb_driver_data.CartType & BATTERY && gb_driver_data.RAMBanks )
+	if (gb_driver_data.CartType & BATTERY && gb_driver_data.RAMBanks)
 	{
-		image_battery_load( image, gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000, 0x00 );
+		image_battery_load(image, gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000, 0x00);
 	}
 
 	return INIT_PASS;
