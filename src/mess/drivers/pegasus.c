@@ -390,5 +390,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, pegasus,  0,     0,      pegasus, 	pegasus, pegasus, "Technosys",   "Aamber Pegasus", GAME_NO_SOUND )
+COMP( 1981, pegasus,  0,     0,      pegasus, 	pegasus, pegasus, "Technosys",   "Aamber Pegasus", GAME_NO_SOUND_HW )
 
