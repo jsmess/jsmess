@@ -70,5 +70,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 198?, z80dev,  0,       0, 	z80dev, 	z80dev, 	 0,  "",   "Z80 dev board",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, z80dev,  0,       0, 	z80dev, 	z80dev, 	 0,  "<unknown>",   "Z80 dev board",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

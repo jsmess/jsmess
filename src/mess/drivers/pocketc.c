@@ -989,7 +989,7 @@ COMP( 1982, pc1245,	0,	0,	pc1250,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 124
 COMP( 1982, pc1250,	0,	0,	pc1250,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1250", GAME_NO_SOUND)
 COMP( 1982, pc1251,	pc1250,	0,	pc1251,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1251", GAME_NO_SOUND)
 COMP( 1982, pc1255,	pc1250,	0,	pc1255,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1255", GAME_NO_SOUND)
-COMP( 1983, trs80pc3,   pc1250, 0,	pc1251,	pc1251,	pc1251,	 "Tandy", "TRS-80 Pocket Computer PC-3", GAME_NO_SOUND)
+COMP( 1983, trs80pc3,   pc1250, 0,	pc1251,	pc1251,	pc1251,	 "Tandy Radio Shack", "TRS-80 Pocket Computer PC-3", GAME_NO_SOUND)
 
 COMP( 1982, pc1260,	0,	0,	pc1260,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1260", GAME_NOT_WORKING  | GAME_NO_SOUND )
 COMP( 1982, pc1261,	pc1260,	0,	pc1261,	pc1251,	pc1251,	 "Sharp", "Pocket Computer 1261/1262", GAME_NOT_WORKING  | GAME_NO_SOUND)

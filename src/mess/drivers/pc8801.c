@@ -924,27 +924,27 @@ ROM_END
 /* System Drivers */
 
 /*    YEAR  NAME            PARENT  COMPAT  MACHINE   INPUT   INIT  COMPANY FULLNAME */
-COMP( 1985, pc8001mk2sr,	0,		0,     pc88srl,  pc8001,  0,    "NEC",  "PC-8001mkIISR", GAME_NOT_WORKING )
+COMP( 1985, pc8001mk2sr,    0,		0,     pc88srl,  pc8001,  0,    "Nippon Electronic Company",  "PC-8001mkIISR", GAME_NOT_WORKING )
 
-COMP( 1981, pc8801,			0,		0,     pc88srl,  pc88sr,  0,    "NEC",  "PC-8801", GAME_NOT_WORKING )
-COMP( 1983, pc8801mk2,		pc8801,	0,     pc88srl,  pc88sr,  0,    "NEC",  "PC-8801mkII", GAME_NOT_WORKING )	// not sure about this dump
-COMP( 1985, pc8801mk2sr,	pc8801,	0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801mkIISR", GAME_NOT_WORKING )
-//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801mkIITR", GAME_NOT_WORKING )
-COMP( 1985, pc8801mk2fr,	pc8801,	0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801mkIIFR", GAME_NOT_WORKING )
-COMP( 1985, pc8801mk2mr,	pc8801,	0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801mkIIMR", GAME_NOT_WORKING )
+COMP( 1981, pc8801,         0,		0,     pc88srl,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801", GAME_NOT_WORKING )
+COMP( 1983, pc8801mk2,      pc8801, 0,     pc88srl,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkII", GAME_NOT_WORKING )	// not sure about this dump
+COMP( 1985, pc8801mk2sr,    pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIISR", GAME_NOT_WORKING )
+//COMP( 1985, pc8801mk2tr,  pc8801, 0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIITR", GAME_NOT_WORKING )
+COMP( 1985, pc8801mk2fr,    pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIFR", GAME_NOT_WORKING )
+COMP( 1985, pc8801mk2mr,    pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801mkIIMR", GAME_NOT_WORKING )
 
-//COMP( 1986, pc8801fh,     0,      0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801FH", GAME_NOT_WORKING )
-COMP( 1986, pc8801mh,		pc8801,	0,     pc88srh,  pc88sr,  0,	"NEC",  "PC-8801MH", GAME_NOT_WORKING )
-COMP( 1987, pc8801fa,		pc8801,	0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801FA", GAME_NOT_WORKING )
-COMP( 1987, pc8801ma,		pc8801,	0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801MA", GAME_NOT_WORKING )
-//COMP( 1988, pc8801fe,     pc8801, 0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801FE", GAME_NOT_WORKING )
-COMP( 1988, pc8801ma2,		pc8801,	0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801MA2", GAME_NOT_WORKING )
-//COMP( 1989, pc8801fe2,    pc8801, 0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801FE2", GAME_NOT_WORKING )
-COMP( 1989, pc8801mc,		pc8801,	0,     pc88srh,  pc88sr,  0,    "NEC",  "PC-8801MC", GAME_NOT_WORKING )
+//COMP( 1986, pc8801fh,     0,      0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FH", GAME_NOT_WORKING )
+COMP( 1986, pc8801mh,       pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MH", GAME_NOT_WORKING )
+COMP( 1987, pc8801fa,       pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FA", GAME_NOT_WORKING )
+COMP( 1987, pc8801ma,       pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA", GAME_NOT_WORKING )
+//COMP( 1988, pc8801fe,     pc8801, 0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE", GAME_NOT_WORKING )
+COMP( 1988, pc8801ma2,      pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MA2", GAME_NOT_WORKING )
+//COMP( 1989, pc8801fe2,    pc8801, 0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801FE2", GAME_NOT_WORKING )
+COMP( 1989, pc8801mc,       pc8801,	0,     pc88srh,  pc88sr,  0,    "Nippon Electronic Company",  "PC-8801MC", GAME_NOT_WORKING )
 
-COMP( 1987, pc88va,			0,		0,     pc88va,   pc88sr,  0,    "NEC",  "PC-88VA", GAME_NOT_WORKING | GAME_NO_SOUND)
-//COMP( 1988, pc88va2,      pc88va, 0,     pc88va,   pc88sr,  0,    "NEC",  "PC-88VA2", GAME_NOT_WORKING )
-//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88sr,  0,    "NEC",  "PC-88VA3", GAME_NOT_WORKING )
+COMP( 1987, pc88va,         0,		0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-88VA", GAME_NOT_WORKING | GAME_NO_SOUND)
+//COMP( 1988, pc88va2,      pc88va, 0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-88VA2", GAME_NOT_WORKING )
+//COMP( 1988, pc88va3,      pc88va, 0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-88VA3", GAME_NOT_WORKING )
 
-//COMP( 1989, pc98do,       0,      0,     pc88va,   pc88sr,  0,    "NEC",  "PC-98DO", GAME_NOT_WORKING )
-//COMP( 1990, pc98dop,      0,      0,     pc88va,   pc88sr,  0,    "NEC",  "PC-98DO+", GAME_NOT_WORKING )
+//COMP( 1989, pc98do,       0,      0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-98DO", GAME_NOT_WORKING )
+//COMP( 1990, pc98dop,      0,      0,     pc88va,   pc88sr,  0,    "Nippon Electronic Company",  "PC-98DO+", GAME_NOT_WORKING )
