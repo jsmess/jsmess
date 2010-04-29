@@ -617,7 +617,7 @@ static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 		return FALSE;
 
 	if (!strcmp(utf8_FileName, ".") || !strcmp(utf8_FileName, "..")) {
-		global_free(utf8_FileName);
+		osd_free(utf8_FileName);
 		return TRUE;
 	}
 
@@ -631,7 +631,7 @@ static BOOL SoftwarePicker_AddEntry(HWND hwndPicker,
 	else
 		rc = SoftwarePicker_InternalAddFile(hwndPicker, pszFilename, FALSE);
 
-	global_free(utf8_FileName);
+	osd_free(utf8_FileName);
 	return rc;
 }
 
@@ -752,7 +752,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 				return s;
 			_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 			s = pszBuffer;
-			global_free(t_buf);
+			osd_free(t_buf);
 			break;
 
 		case MESS_COLUMN_GOODNAME:
@@ -783,7 +783,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 						return s;
 					_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 					s = pszBuffer;
-					global_free(t_buf);
+					osd_free(t_buf);
 				}
 			}
 			break;
@@ -804,7 +804,7 @@ LPCTSTR SoftwarePicker_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 					return s;
 				_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 				s = pszBuffer;
-				global_free(t_buf);
+				osd_free(t_buf);
 			}
 			break;
 	}

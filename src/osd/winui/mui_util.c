@@ -203,7 +203,7 @@ void DisplayTextFile(HWND hWnd, const char *cName)
 	hErr = ShellExecute(hWnd, NULL, tName, NULL, NULL, SW_SHOWNORMAL);
 	if ((FPTR)hErr > 32) 
 	{
-		global_free(tName);
+		osd_free(tName);
 		return;
 	}
 
@@ -239,7 +239,7 @@ void DisplayTextFile(HWND hWnd, const char *cName)
  
 	MessageBox(NULL, msg, tName, MB_OK);
 	
-	global_free(tName);
+	osd_free(tName);
 }
 
 char* MyStrStrI(const char* pFirst, const char* pSrch)
@@ -596,7 +596,7 @@ HICON win_extract_icon_utf8(HINSTANCE inst, const char* exefilename, UINT iconin
 	
 	icon = ExtractIcon(inst, t_exefilename, iconindex);
 	
-	global_free(t_exefilename);
+	osd_free(t_exefilename);
 	
 	return icon;
 }
@@ -612,7 +612,7 @@ TCHAR* win_tstring_strdup(LPCTSTR str)
 	TCHAR *cpy = NULL;
 	if (str != NULL)
 	{
-		cpy = (TCHAR*)malloc((_tcslen(str) + 1) * sizeof(TCHAR));
+		cpy = (TCHAR*)osd_malloc((_tcslen(str) + 1) * sizeof(TCHAR));
 		if (cpy != NULL)
 			_tcscpy(cpy, str);
 	}
@@ -635,7 +635,7 @@ HANDLE win_create_file_utf8(const char* filename, DWORD desiredmode, DWORD share
 	result = CreateFile(t_filename, desiredmode, sharemode, securityattributes, creationdisposition,
 						flagsandattributes, templatehandle);
 
-	global_free(t_filename);
+	osd_free(t_filename);
 						
 	return result;
 }
@@ -661,7 +661,7 @@ DWORD win_get_current_directory_utf8(DWORD bufferlength, char* buffer)
 	if( bufferlength > 0 ) {
 		utf8_buffer = utf8_from_tstring(t_buffer);
 		if( !utf8_buffer ) {
-			global_free(t_buffer);
+			osd_free(t_buffer);
 			return result;
 		}
 	}
@@ -669,10 +669,10 @@ DWORD win_get_current_directory_utf8(DWORD bufferlength, char* buffer)
 	strncpy(buffer, utf8_buffer, bufferlength);
 	
 	if( utf8_buffer )
-		global_free(utf8_buffer);
+		osd_free(utf8_buffer);
 	
 	if( t_buffer )
-		global_free(t_buffer);
+		free(t_buffer);
 	
 	return result;
 }
@@ -690,7 +690,7 @@ HANDLE win_find_first_file_utf8(const char* filename, LPWIN32_FIND_DATA findfile
 	
 	result = FindFirstFile(t_filename, findfiledata);
 	
-	global_free(t_filename);
+	osd_free(t_filename);
 	
 	return result;
 }

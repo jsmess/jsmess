@@ -448,7 +448,7 @@ static BOOL CALLBACK DIJoystick_EnumAxisObjectsProc(LPCDIDEVICEOBJECTINSTANCE lp
 	hr = IDirectInputDevice2_SetProperty(joystick->did, DIPROP_RANGE, &diprg.diph);
 	if (FAILED(hr)) /* if this fails, don't use this axis */
 	{
-		global_free(joystick->axes[joystick->num_axes].name);
+		free(joystick->axes[joystick->num_axes].name);
 		joystick->axes[joystick->num_axes].name = NULL;
 		return DIENUM_CONTINUE;
 	}
@@ -649,13 +649,13 @@ static void ExitJoystick(joystick_type *joystick)
 	for (i = 0; i < joystick->num_axes; i++)
 	{
 		if (joystick->axes[i].name)
-			global_free(joystick->axes[i].name);
+			free(joystick->axes[i].name);
 		joystick->axes[i].name = NULL;
 	}
 	
 	if (joystick->name != NULL)
 	{
-		global_free(joystick->name);
+		free(joystick->name);
 		joystick->name = NULL;
 	}
 }

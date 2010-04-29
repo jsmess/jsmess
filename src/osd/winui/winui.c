@@ -1017,7 +1017,7 @@ int MameUIMain(HINSTANCE    hInstance,
 
 		/* free arguments */
 		for (i = 0; i < __argc; i++)
-			global_free(utf8_argv[i]);
+			osd_free(utf8_argv[i]);
 		free(utf8_argv);
 		
 		exit(rc);
@@ -1805,7 +1805,7 @@ static BOOL Win32UI_init(HINSTANCE hInstance, LPWSTR lpCmdLine, int nCmdShow)
 		return FALSE;
 
 	_tcscpy(last_directory,t_inpdir);
-	global_free(t_inpdir);
+	osd_free(t_inpdir);
 	hMain = CreateDialog(hInstance, MAKEINTRESOURCE(IDD_MAIN), 0, NULL);
 	if (hMain == NULL)
 	{
@@ -3018,7 +3018,7 @@ static void CopyToolTipText(LPTOOLTIPTEXT lpttt)
 			if( !t_gameinfostatus )
 				return;
 			_tcscpy(String, t_gameinfostatus);
-			global_free(t_gameinfostatus);
+			osd_free(t_gameinfostatus);
 		}
 	}
 	else
@@ -3271,7 +3271,7 @@ static void EnableSelection(int nGame)
 
 	UpdateScreenShot();
 
-	global_free(t_description);
+	osd_free(t_description);
 }
 
 static void PaintBackgroundImage(HWND hWnd, HRGN hRgn, int x, int y)
@@ -3418,7 +3418,7 @@ static BOOL TreeViewNotify(LPNMHDR nm)
 
 		result = TryRenameCustomFolder(folder, utf8_szText);
 
-		global_free(utf8_szText);
+		osd_free(utf8_szText);
 
 		return result;
 	}
@@ -3787,7 +3787,7 @@ static void PollGUIJoystick()
 				return;
 			CreateProcess(NULL, t_exec_command, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi);
 
-			global_free(t_exec_command);
+			osd_free(t_exec_command);
 
 			// We will not wait for the process to finish cause it might be a background task
 			// The process won't get closed when MAME32 closes either.
@@ -4595,11 +4595,11 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 				ResetBackground(utf8_szFile);
 				LoadBackgroundBitmap();
 				InvalidateRect(hMain, NULL, TRUE);
-				global_free(t_bgdir);
-				global_free(utf8_szFile);
+				osd_free(t_bgdir);
+				osd_free(utf8_szFile);
 				return TRUE;
 			}
-			global_free(t_bgdir);
+			osd_free(t_bgdir);
 		}
 		break;
 
@@ -4919,7 +4919,7 @@ static const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nCo
 			return s;
 
 		_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_s);
-		global_free(t_s);
+		osd_free(t_s);
 
 		s = pszBuffer;
 	}
@@ -4946,7 +4946,7 @@ static void GamePicker_EnteringItem(HWND hwndPicker, int nItem)
 		a = GlobalAddAtom(t_description);
 		SendMessage(HWND_BROADCAST, g_mame32_message, a, a);
 		GlobalDeleteAtom(a);
-		global_free(t_description);
+		osd_free(t_description);
 	}
 
 	EnableSelection(nItem);
@@ -5023,7 +5023,7 @@ static void InitListView()
 
 	// Allow selection to change the default saved game
 	bListReady = TRUE;
-	global_free(t_bgdir);
+	osd_free(t_bgdir);
 }
 
 static void AddDriverIcon(int nItem,int default_icon_index)
@@ -5443,7 +5443,7 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	if (t_filename != NULL)
 	{
 		_sntprintf(t_filename_buffer, ARRAY_LENGTH(t_filename_buffer), TEXT("%s"), t_filename);
-		global_free(t_filename);
+		osd_free(t_filename);
 	}
 
 	of.lStructSize       = sizeof(of);
@@ -5567,17 +5567,17 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	}
 
 	if( t_artdir )
-		global_free(t_artdir);
+		osd_free(t_artdir);
 	if( t_statedir )
-		global_free(t_statedir);
+		osd_free(t_statedir);
 	if( t_snapdir )
-		global_free(t_snapdir);
+		osd_free(t_snapdir);
 
 	utf8_filename = utf8_from_tstring(t_filename_buffer);
 	if (utf8_filename != NULL)
 	{
 		snprintf(filename, MAX_PATH, "%s", utf8_filename);
-		global_free(utf8_filename);
+		osd_free(utf8_filename);
 	}
 
 	return success;
@@ -5659,7 +5659,7 @@ static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, L
 			if( !utf8_LangFile )
 				return FALSE;
 			SetLanguage(utf8_LangFile);
-			global_free(utf8_LangFile);
+			osd_free(utf8_LangFile);
 
 		case IDCANCEL:
 			EndDialog(hDlg, 0);
@@ -5692,7 +5692,7 @@ void SetStatusBarText(int part_index, const char *message)
 	if( !t_message )
 		return;
 	SendMessage(hStatusBar, SB_SETTEXT, (WPARAM) part_index, (LPARAM)(LPCTSTR) win_tstring_strdup(t_message));
-	global_free(t_message);
+	osd_free(t_message);
 }
 
 void SetStatusBarTextF(int part_index, const char *fmt, ...)
@@ -6321,7 +6321,7 @@ static void UpdateMenu(HMENU hMenu)
 
 		EnableMenuItem(hMenu, ID_CONTEXT_SELECT_RANDOM, MF_ENABLED);
 
-		global_free(t_description);
+		osd_free(t_description);
 	}
 	else
 	{
@@ -6439,7 +6439,7 @@ void InitTreeContextMenu(HMENU hTreeMenu)
 		else
 			InsertMenuItem(hMenu,i,FALSE,&mii);
 
-		global_free(t_title);
+		osd_free(t_title);
 	}
 
 }

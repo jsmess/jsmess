@@ -217,7 +217,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 				t_s = tstring_from_utf8(info.name);
 				ppszDevices[i] = (TCHAR*)alloca((_tcslen(t_s) + 1) * sizeof(TCHAR));
 				_tcscpy(ppszDevices[i], t_s);
-				global_free(t_s);
+				osd_free(t_s);
 				i++;
 			}
 		}

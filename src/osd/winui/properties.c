@@ -605,7 +605,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 		win_message_box_utf8(0, temp, "Error", IDOK);
 	}
 
-	global_free(t_description);
+	osd_free(t_description);
 	free(pspage);
 }
 
@@ -1969,7 +1969,7 @@ static BOOL ScreenReadControl(datamap *map, HWND dialog, HWND control, core_opti
 	TCHAR *screen_option_value;
 	int selected_screen;
 	int screen_option_index;
-	const char *op_val;
+	char *op_val;
 
 	selected_screen = GetSelectedScreen(dialog);
 	screen_option_index = ComboBox_GetCurSel(control);
@@ -1977,6 +1977,7 @@ static BOOL ScreenReadControl(datamap *map, HWND dialog, HWND control, core_opti
 	snprintf(screen_option_name, ARRAY_LENGTH(screen_option_name), "screen%d", selected_screen);
 	op_val = utf8_from_tstring(screen_option_value);
 	options_set_string(opts, screen_option_name, op_val, OPTION_PRIORITY_CMDLINE);
+	osd_free(op_val);
 	return FALSE;
 }
 
@@ -2015,7 +2016,7 @@ static BOOL ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 				return FALSE;
 			if (_tcscmp(t_option, dd.DeviceName) == 0)
 				nSelection = i+1;
-			global_free(t_option);
+			osd_free(t_option);
 		}
 	}
 	(void)ComboBox_SetCurSel(control, nSelection);
@@ -2079,12 +2080,13 @@ static BOOL DefaultInputReadControl(datamap *map, HWND dialog, HWND control, cor
 {
 	TCHAR *input_option_value;	
 	int input_option_index;
-	const char *op_val;
+	char *op_val;
 
 	input_option_index = ComboBox_GetCurSel(control);
 	input_option_value = (TCHAR*) ComboBox_GetItemData(control, input_option_index);	
 	op_val = utf8_from_tstring(input_option_value);
 	options_set_string(opts, OPTION_CTRLR, op_val, OPTION_PRIORITY_CMDLINE);
+	osd_free(op_val);
 	return FALSE;
 }
 
@@ -2126,13 +2128,13 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	if( !t_ctrldir )
 	{
 		if( t_buf )
-			global_free(t_buf);
+			osd_free(t_buf);
 		return FALSE;
 	}
 
 	_stprintf (path, TEXT("%s\\*.*"), t_ctrldir);
 	
-	global_free(t_ctrldir);
+	osd_free(t_ctrldir);
 
 	hFind = FindFirstFile(path, &FindFileData);
 
@@ -2172,7 +2174,7 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	(void)ComboBox_SetCurSel(control, selected);
 	
 	if( t_buf )
-		global_free(t_buf);
+		osd_free(t_buf);
 
 	return FALSE;
 }
@@ -2296,7 +2298,7 @@ static BOOL ResolutionPopulateControl(datamap *map, HWND dialog, HWND control_, 
 				}
 			}
 		}
-		global_free(t_screen);
+		osd_free(t_screen);
 
 		(void)ComboBox_SetCurSel(sizes_control, sizes_selection);
 		(void)ComboBox_SetCurSel(refresh_control, refresh_selection);
@@ -2940,7 +2942,7 @@ static void InitializeBIOSUI(HWND hwnd)
 							return;
 						(void)ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
 						(void)ComboBox_SetItemData( hCtrl, i++, biosname);
-						global_free(t_s);
+						osd_free(t_s);
 					}
 				}
 			}
@@ -2969,7 +2971,7 @@ static void InitializeBIOSUI(HWND hwnd)
 						return;
 					(void)ComboBox_InsertString(hCtrl, i, win_tstring_strdup(t_s));
 					(void)ComboBox_SetItemData( hCtrl, i++, biosname);
-					global_free(t_s);
+					osd_free(t_s);
 				}
 			}
 		}

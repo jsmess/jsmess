@@ -318,7 +318,7 @@ static BOOL DirListReadControl(datamap *map, HWND dialog, HWND control, core_opt
 	{
 		driver_index = PropertiesCurrentGame(dialog);
 		SetExtraSoftwarePaths(driver_index, utf8_dir_list);
-		global_free(utf8_dir_list);
+		osd_free(utf8_dir_list);
 	}
 	return TRUE;
 }
@@ -381,7 +381,7 @@ static BOOL DirListPopulateControl(datamap *map, HWND dialog, HWND control, core
 	// finish up
 	AppendList(control, TEXT(DIRLIST_NEWENTRYTEXT), current_item);
 	ListView_SetItemState(control, 0, LVIS_SELECTED, LVIS_SELECTED);
-	global_free(t_dir_list);
+	osd_free(t_dir_list);
 	return TRUE;
 }
 
@@ -435,7 +435,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 			(void)ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
 			(void)ComboBox_SetItemData(control, i, ram);
 			
-			global_free(t_ramstring);			
+			osd_free(t_ramstring);
 		}
 		if (config->extra_options != NULL)
 		{
@@ -465,7 +465,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 				(void)ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
 				(void)ComboBox_SetItemData(control, i, ram);
 
-				global_free(t_ramstring);
+				osd_free(t_ramstring);
 
 				// is this the current option?  record the index if so
 				if (ram == current_ram)

@@ -718,7 +718,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 		t_filter[i] = (t_buffer[i] != '|') ? t_buffer[i] : '\0';
 	t_filter[i++] = '\0';
 	t_filter[i++] = '\0';
-	global_free(t_buffer);
+	osd_free(t_buffer);
 
     of.lStructSize = sizeof(of);
     of.hwndOwner = GetMainWindow();
@@ -847,7 +847,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 			return;
 		// TODO - this should go against InternalSetSelectedSoftware()
 		SoftwarePicker_AddFile(GetDlgItem(GetMainWindow(), IDC_SWLIST), utf8_filename);
-		global_free(utf8_filename);
+		osd_free(utf8_filename);
 	}
 	
 	machine_config_free(config);
@@ -899,7 +899,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 		/* We only want the first path; throw out the rest */
 		i = astring_chr(&as, 0, ';');
 		if (i > 0) astring_substr(&as, 0, i);
-		global_free(t_s);
+		osd_free(t_s);
 		t_s = tstring_from_utf8(astring_c(&as));
 
 		/* Make sure a folder was specified in the tab, and that it exists */
@@ -911,7 +911,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 			/* We only want the first path; throw out the rest */
 			i = astring_chr(&as, 0, ';');
 			if (i > 0) astring_substr(&as, 0, i);
-			global_free(t_s);
+			osd_free(t_s);
 			t_s = tstring_from_utf8(astring_c(&as));
 
 			/* Make sure a folder was specified in the tab, and that it exists */
@@ -921,17 +921,17 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 
 				osd_get_full_path(&dst,".");
 				/* Default to emu directory */
-				global_free(t_s);
+				osd_free(t_s);
 				t_s = tstring_from_utf8(dst);
 
 				/* If software folder exists, use it instead */
 				zippath_combine(&as, dst, "software");
 				if (osd_opendir(astring_c(&as))) 
 				{
-					global_free(t_s);
+					osd_free(t_s);
 					t_s = tstring_from_utf8(astring_c(&as));
 				}
-				global_free(dst);
+				osd_free(dst);
 			}
 		}
 	}
@@ -940,7 +940,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 	bResult = CommonFileImageDialog(t_s, GetOpenFileName, pszFilename, config, imagetypes);
 	CleanupImageTypes(imagetypes, ARRAY_LENGTH(imagetypes));
 	
-	global_free(t_s);
+	osd_free(t_s);
 
 	return bResult;
 }
@@ -982,7 +982,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 		/* We only want the first path; throw out the rest */
 		i = astring_chr(&as, 0, ';');
 		if (i > 0) astring_substr(&as, 0, i);
-		global_free(t_s);
+		osd_free(t_s);
 		t_s = tstring_from_utf8(astring_c(&as));
 
 		/* Make sure a folder was specified in the tab, and that it exists */
@@ -992,17 +992,17 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 
 			osd_get_full_path(&dst,".");
 			/* Default to emu directory */
-			global_free(t_s);
+			osd_free(t_s);
 			t_s = tstring_from_utf8(dst);
 
 			/* If software folder exists, use it instead */
 			zippath_combine(&as, dst, "software");
 			if (osd_opendir(astring_c(&as))) 
 			{
-				global_free(t_s);
+				osd_free(t_s);
 				t_s = tstring_from_utf8(astring_c(&as));
 			}
-			global_free(dst);
+			osd_free(dst);
 		}
 	}
 
@@ -1010,7 +1010,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 	bResult = CommonFileImageDialog(t_s, GetSaveFileName, pszFilename, config, imagetypes);
 	CleanupImageTypes(imagetypes, ARRAY_LENGTH(imagetypes));
 	
-	global_free(t_s);
+	osd_free(t_s);
 
 	return bResult;
 }
@@ -1025,7 +1025,7 @@ static void DevView_SetSelectedSoftware(HWND hwndDevView, int drvindex,
 		return;
 	MessSpecifyImage(drvindex, dev, utf8_filename);
 	MessRefreshPicker();
-	global_free(utf8_filename);
+	osd_free(utf8_filename);
 }
 
 
@@ -1042,7 +1042,7 @@ static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
 		return t_buffer;
 
 	_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_s);
-	global_free(t_s);
+	osd_free(t_s);
 	t_buffer = pszBuffer;
 
 	return t_buffer;

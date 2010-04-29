@@ -1559,7 +1559,7 @@ static void DeleteFolder(LPTREEFOLDER lpFolder)
 			DeleteBits(lpFolder->m_lpGameBits);
 			lpFolder->m_lpGameBits = 0;
 		}
-		global_free(lpFolder->m_lptTitle);
+		osd_free(lpFolder->m_lptTitle);
 		lpFolder->m_lptTitle = 0;
 		free(lpFolder->m_lpTitle);
 		lpFolder->m_lpTitle = 0;

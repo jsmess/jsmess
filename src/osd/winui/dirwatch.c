@@ -191,7 +191,7 @@ static void DirWatcher_Signal(PDIRWATCHER pWatcher, struct DirWatcherEntry *pEnt
 			pWatcher->nMessage,
 			(pEntry->nIndex << 16) | (pEntry->nSubIndex << 0),
 			(LPARAM)(LPCTSTR) win_tstring_strdup(t_filename));
-		global_free(t_filename);
+		osd_free(t_filename);
 	}
 
 	DirWatcher_SetupWatch(pWatcher, pEntry);

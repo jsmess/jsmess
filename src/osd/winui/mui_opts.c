@@ -2179,7 +2179,7 @@ static void FontDecodeString(const char* str, LOGFONT *f)
 		if( !t_ptr )
 			return;
 		_tcscpy(f->lfFaceName, t_ptr);
-		global_free(t_ptr);
+		osd_free(t_ptr);
 	}
 }
 
@@ -2206,7 +2206,7 @@ static void FontEncodeString(const LOGFONT *f, char *str)
 			f->lfPitchAndFamily,
 			utf8_FaceName);
 
-	global_free(utf8_FaceName);
+	osd_free(utf8_FaceName);
 }
 
 static void TabFlagsEncodeString(int data, char *str)
@@ -2907,7 +2907,7 @@ static void remove_all_source_options(void) {
 		astring_free(match);
 		utf8_filename = utf8_from_tstring(findFileData.cFileName);
 		match = astring_assemble_3(astring_alloc(), astring_c(pathname), PATH_SEPARATOR, utf8_filename );
-		free(utf8_filename);
+		osd_free(utf8_filename);
 		osd_rmfile(astring_c(match));
 		astring_free(match);
 
@@ -2915,7 +2915,7 @@ static void remove_all_source_options(void) {
 		{
 			utf8_filename = utf8_from_tstring(findFileData.cFileName);
 			match = astring_assemble_3(astring_alloc(), astring_c(pathname), PATH_SEPARATOR, utf8_filename );
-			free(utf8_filename);
+			osd_free(utf8_filename);
 			osd_rmfile(astring_c(match));
 			astring_free(match);
 		}
