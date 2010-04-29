@@ -240,9 +240,8 @@ BOOL win_append_menu_utf8(HMENU menu, UINT flags, UINT_PTR id, const char *item)
 
 	result = AppendMenu(menu, flags, id, t_item);
 
-	//FIXME: this memory is on purpose for now
-	//if (t_str)
-	//	osd_free(t_str);
+	if (t_str)
+		osd_free(t_str);
 
 	return result;
 }
