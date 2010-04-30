@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Many thanks to Luca Antignano for the help with this software list -->
 <softwarelist name="crvision" description="V-Tech Creativision cartridges">
 	<!-- Id: 8008 -->
 	<software name="airsea">
@@ -84,9 +86,9 @@
 		</part>
 	</software>
 
-	<!-- Id: RAM V1 - Y-2605 -->
+	<!-- Id: 8011 -->
 	<software name="basic">
-		<description>Basic v.1 (1983, Release 2)</description>
+		<description>Basic V.1 (1983, Release 2)</description>
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<part name="cart" interface="crvision_cart">
@@ -133,7 +135,7 @@
 	</software>
 
 	<!-- Id: 8013 -->
-	<software name="deepsea1" cloneof="deepsea">
+	<software name="deepsea">
 		<description>Deep Sea Adventure (6k Cart)</description>
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
@@ -145,7 +147,7 @@
 	</software>
 
 	<!-- Id: 8013 -->
-	<software name="deepsea">
+	<software name="deepsea1" cloneof="deepsea">
 		<description>Deep Sea Adventure (8k Cart)</description>
 		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
@@ -157,7 +159,7 @@
 	</software>
 
 	<!-- Id: 8020 -->
-	<software name="locomot1" cloneof="locomot">
+	<software name="locomot">
 		<description>Locomotive (10k cart)</description>
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
@@ -169,7 +171,7 @@
 	</software>
 
 	<!-- Id: 8020 -->
-	<software name="locomot">
+	<software name="locomot1" cloneof="locomot">
 		<description>Locomotive (12k cart)</description>
 		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
@@ -288,7 +290,7 @@
 	</software>
 
 	<!-- Id: 8002 -->
-	<software name="tankatk1" cloneof="tankatk">
+	<software name="tankatk">
 		<description>Tank Attack (6k Cart)</description>
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
@@ -300,7 +302,7 @@
 	</software>
 
 	<!-- Id: 8002 -->
-	<software name="tankatk">
+	<software name="tankatk1" cloneof="tankatk">
 		<description>Tank Attack (8k Cart)</description>
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
@@ -312,7 +314,7 @@
 	</software>
 
 	<!-- Id: 8004 -->
-	<software name="tennis1" cloneof="tennis">
+	<software name="tennis">
 		<description>Tennis (Wimbledon, 6k Cart)</description>
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
@@ -324,7 +326,7 @@
 	</software>
 
 	<!-- Id: 8004 -->
-	<software name="tennis">
+	<software name="tennis1" cloneof="tennis">
 		<description>Tennis (Wimbledon, 8k Cart)</description>
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
@@ -348,7 +350,7 @@
 	</software>
 
 	<!-- Id: Y-1620 -->
-	<software name="tennisd1" cloneof="tennis">
+	<software name="tennisd" cloneof="tennis">
 		<description>Tennis (Dick Smith, 6k Cart)</description>
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
@@ -360,7 +362,7 @@
 	</software>
 
 	<!-- Id: Y-1620 -->
-	<software name="tennisd" cloneof="tennis">
+	<software name="tennisd1" cloneof="tennis">
 		<description>Tennis (Dick Smith, 8k Cart)</description>
 		<year>1981</year>
 		<publisher>Video Technology Ltd.</publisher>
@@ -371,10 +373,11 @@
 		</part>
 	</software>
 
+    <!-- This was an hombrew cart sold back in the 80s -->
 	<software name="hapmon">
 		<description>Hapmon</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Richard Hayter</publisher>
 		<part name="cart" interface="crvision_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="hapmon.bin" size="4096" crc="15d07b96" sha1="89359dca952bc90644dfd7f546c184a8165faa14" offset="000000" />
@@ -385,7 +388,7 @@
 <!-- These contain the same data as chopper, but in a different order (which is not handled properly by emulators). I'm listing these here to document checksums.
 	<software name="chopper2" cloneof="chopper">
 		<description>Chopper Rescue (Alt 2)</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<part name="cart" interface="crvision_cart">
 			<dataarea name="rom" size="18432">
@@ -396,7 +399,7 @@
 
 	<software name="chopper1" cloneof="chopper">
 		<description>Chopper Rescue (Alt)</description>
-		<year>19??</year>
+		<year>1983</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<part name="cart" interface="crvision_cart">
 			<dataarea name="rom" size="18432">

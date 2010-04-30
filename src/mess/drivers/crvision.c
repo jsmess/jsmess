@@ -446,23 +446,37 @@ static MACHINE_START( pal )
 
 static DEVICE_IMAGE_LOAD( crvision_cart )
 {
-	int size = image_length(image);
+	UINT32 size;
+	UINT8 *temp_copy;
 	running_machine *machine = image->machine;
 	UINT8 *mem = memory_region(machine, M6502_TAG);
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
+	if (image_software_entry(image) == NULL)
+	{
+		size = image_length(image);
+		temp_copy = auto_alloc_array(machine, UINT8, size);
+		image_fread(image, temp_copy, size);
+	}
+	else
+	{
+		size= image_get_software_region_length(image, "rom");
+		temp_copy = auto_alloc_array(machine, UINT8, size);
+		memcpy(temp_copy, image_get_software_region(image, "rom"), size);
+	}
+
 	switch (size)
 	{
 	case 0x1000: // 4K
-		image_fread(image, mem + 0x9000, 0x1000);			// load 4KB at 0x9000
+		memcpy(mem + 0x9000, temp_copy, 0x1000);			// load 4KB at 0x9000
 		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);			// mirror 4KB at 0xb000
 		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
 		break;
 
 	case 0x1800: // 6K
-		image_fread(image, mem + 0x9000, 0x1000);			// load lower 4KB at 0x9000
+		memcpy(mem + 0x9000, temp_copy, 0x1000);			// load lower 4KB at 0x9000
 		memcpy(mem + 0xb000, mem + 0x9000, 0x1000);			// mirror lower 4KB at 0xb000
-		image_fread(image, mem + 0x8000, 0x0800);			// load higher 2KB at 0x8000
+		memcpy(mem + 0x8000, temp_copy + 0x1000, 0x0800);	// load higher 2KB at 0x8000
 		memcpy(mem + 0x8800, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0x8800
 		memcpy(mem + 0xa000, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0xa000
 		memcpy(mem + 0xa800, mem + 0x8000, 0x0800);			// mirror higher 2KB at 0xa800
@@ -470,15 +484,15 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		break;
 
 	case 0x2000: // 8K
-		image_fread(image, mem + 0x8000, 0x2000);			// load 8KB at 0x8000
+		memcpy(mem + 0x8000, temp_copy, 0x2000);			// load 8KB at 0x8000
 		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);			// mirror 8KB at 0xa000
 		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0x2000, BANK_ROM1);
 		break;
 
 	case 0x2800: // 10K
-		image_fread(image, mem + 0x8000, 0x2000);			// load lower 8KB at 0x8000
+		memcpy(mem + 0x8000, temp_copy, 0x2000);			// load lower 8KB at 0x8000
 		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);			// mirror lower 8KB at 0xa000
-		image_fread(image, mem + 0x4000, 0x0800);			// load higher 2KB at 0x4000
+		memcpy(mem + 0x4000, temp_copy + 0x2000, 0x0800);	// load higher 2KB at 0x4000
 		memcpy(mem + 0x4800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x4800
 		memcpy(mem + 0x5000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5000
 		memcpy(mem + 0x5800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5800
@@ -491,9 +505,9 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		break;
 
 	case 0x3000: // 12K
-		image_fread(image, mem + 0x8000, 0x2000);			// load lower 8KB at 0x8000
+		memcpy(mem + 0x8000, temp_copy, 0x2000);			// load lower 8KB at 0x8000
 		memcpy(mem + 0xa000, mem + 0x8000, 0x2000);			// mirror lower 8KB at 0xa000
-		image_fread(image, mem + 0x4000, 0x1000);			// load higher 4KB at 0x4000
+		memcpy(mem + 0x4000, temp_copy + 0x2000, 0x1000);	// load higher 4KB at 0x4000
 		memcpy(mem + 0x5000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x5000
 		memcpy(mem + 0x6000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x6000
 		memcpy(mem + 0x7000, mem + 0x4000, 0x1000);			// mirror higher 4KB at 0x7000
@@ -502,16 +516,16 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		break;
 
 	case 0x4000: // 16K
-		image_fread(image, mem + 0xa000, 0x2000);			// load lower 8KB at 0xa000
-		image_fread(image, mem + 0x8000, 0x2000);			// load higher 8KB at 0x8000
+		memcpy(mem + 0xa000, temp_copy, 0x2000);			// load lower 8KB at 0xa000
+		memcpy(mem + 0x8000, temp_copy + 0x2000, 0x2000);	// load higher 8KB at 0x8000
 		memory_install_read_bank(program, 0x8000, 0xbfff, 0, 0, BANK_ROM1);
 		memory_install_read_bank(program, 0x4000, 0x7fff, 0, 0, BANK_ROM2);
 		break;
 
 	case 0x4800: // 18K
-		image_fread(image, mem + 0xa000, 0x2000);			// load lower 8KB at 0xa000
-		image_fread(image, mem + 0x8000, 0x2000);			// load higher 8KB at 0x8000
-		image_fread(image, mem + 0x4000, 0x0800);			// load higher 2KB at 0x4000
+		memcpy(mem + 0xa000, temp_copy, 0x2000);			// load lower 8KB at 0xa000
+		memcpy(mem + 0x8000, temp_copy + 0x2000, 0x2000);	// load higher 8KB at 0x8000
+		memcpy(mem + 0x4000, temp_copy + 0x4000, 0x0800);	// load higher 2KB at 0x4000
 		memcpy(mem + 0x4800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x4800
 		memcpy(mem + 0x5000, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5000
 		memcpy(mem + 0x5800, mem + 0x4000, 0x0800);			// mirror higher 2KB at 0x5800
@@ -524,6 +538,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 		break;
 
 	default:
+		auto_free(machine, temp_copy);
 		return INIT_FAIL;
 	}
 
@@ -532,6 +547,8 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 
 	memory_configure_bank(machine, "bank2", 0, 1, mem + 0x4000, 0);
 	memory_set_bank(machine, "bank2", 0);
+
+	auto_free(machine, temp_copy);
 
 	return INIT_PASS;
 }
@@ -568,7 +585,11 @@ static MACHINE_DRIVER_START( creativision )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("crvision_cart")
 	MDRV_CARTSLOT_LOAD(crvision_cart)
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("crvision")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_config)

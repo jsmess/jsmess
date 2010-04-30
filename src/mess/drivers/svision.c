@@ -456,6 +456,47 @@ static DRIVER_INIT( svisions )
 	timer_pulse(machine, attotime_mul(ATTOTIME_IN_SEC(8), 256/cputag_get_clock(machine, "maincpu")), NULL, 0, svision_pet_timer);
 }
 
+static DEVICE_IMAGE_LOAD( svision_cart )
+{
+	UINT32 size;
+	UINT8 *temp_copy;
+	int mirror, i;
+	
+	if (image_software_entry(image) == NULL)
+	{
+		size = image_length(image);
+		temp_copy = auto_alloc_array(image->machine, UINT8, size);
+
+		if (size > memory_region_length(image->machine, "user1"))
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			return INIT_FAIL;
+		}
+		
+		if (image_fread(image, temp_copy, size) != size)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			return INIT_FAIL;
+		}
+	}
+	else
+	{
+		size = image_get_software_region_length(image, "rom");
+		temp_copy = auto_alloc_array(image->machine, UINT8, size);
+		memcpy(temp_copy, image_get_software_region(image, "rom"), size);
+	}
+
+	mirror = memory_region_length(image->machine, "user1") / size;
+
+	/* With the following, we mirror the cart in the whole "user1" memory region */
+	for (i = 0; i < mirror; i++)
+		memcpy(memory_region(image->machine, "user1") + i * size, temp_copy, size);
+
+	auto_free(image->machine, temp_copy);
+
+	return INIT_PASS;
+}
+
 static MACHINE_RESET( svision )
 {
 	svision.timer_shot = FALSE;
@@ -510,6 +551,11 @@ static MACHINE_DRIVER_START( svision )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,ws,sv")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("svision_cart")
+	MDRV_CARTSLOT_LOAD(svision_cart)
+
+	/* Software lists */
+	MDRV_SOFTWARE_LIST_ADD("svision")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svisionp )
@@ -542,8 +588,7 @@ static MACHINE_DRIVER_START( tvlinkp )
 MACHINE_DRIVER_END
 
 ROM_START(svision)
-	ROM_REGION(0x20000, "user1", 0)
-	ROM_CART_LOAD("cart", 0x0000, 0x20000, ROM_MIRROR)
+	ROM_REGION(0x20000, "user1", ROMREGION_ERASE00)
 ROM_END
 
 
