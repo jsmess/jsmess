@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- Othello Multivision carts are marked with OM -->
+<!-- Othello Multivision carts are marked with OMV -->
 <softwarelist name="sg1000" description="Sega SG-1000 and SG-1000 MarkII cartridges">
 	<software name="bankpani">
 		<description>Bank Panic (Jpn)</description>
@@ -36,7 +36,7 @@
 	</software>
 
 	<software name="bordrlin">
-		<description>Borderline (Jpn, Euro)</description>
+		<description>Borderline (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -190,7 +190,7 @@
 	</software>
 
 	<software name="chopliftp" cloneof="choplift">
-		<description>Choplifter (Proto) (Jpn)</description>
+		<description>Choplifter (Jpn, Proto)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -212,7 +212,7 @@
 	</software>
 
 	<software name="congo">
-		<description>Congo Bongo (Jpn, Euro)</description>
+		<description>Congo Bongo (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -223,7 +223,7 @@
 	</software>
 
 	<software name="congo1" cloneof="congo">
-		<description>Congo Bongo (Alt - Jpn, Euro)</description>
+		<description>Congo Bongo (Alt - Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -300,7 +300,7 @@
 	</software>
 
 	<software name="exerion">
-		<description>Exerion (Jpn, Euro)</description>
+		<description>Exerion (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega / Jaleco</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -366,7 +366,7 @@
 	</software>
 
 	<software name="guzzler">
-		<description>Guzzler (Jpn) (OM)</description>
+		<description>Guzzler (Jpn, OMV)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -398,8 +398,20 @@
 		</part>
 	</software>
 
+	<software name="homebas">
+	<!-- SC3000 cart -->
+		<description>Home BASIC (Jpn)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="home basic (jp).bin" size="32768" crc="78a37cbc" sha1="f1e1e7e9687cf4f9f498779a44134c2d70bb8d4b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="homemj">
-		<description>Home Mahjong (v1.1) (Jpn)</description>
+		<description>Home Mahjong (Jpn, v1.1)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -410,7 +422,7 @@
 	</software>
 
 	<software name="homemj1" cloneof="homemj">
-		<description>Home Mahjong (v1.0) (Jpn)</description>
+		<description>Home Mahjong (Jpn, v1.0)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -444,7 +456,7 @@
 	</software>
 
 	<software name="jb007">
-		<description>James Bond 007 (v2.7) (Jpn) (OM)</description>
+		<description>James Bond 007 (Jpn, v2.7, OMV)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -455,7 +467,7 @@
 	</software>
 
 	<software name="loderun">
-		<description>Lode Runner (Jpn, Euro)</description>
+		<description>Lode Runner (Euro, Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega / Broderbund Software</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -509,8 +521,30 @@
 		</part>
 	</software>
 
+	<software name="matchpga">
+		<description>Okamoto Ayako no Match Play Golf (Jpn, Rev. A?, OMV)</description>
+		<year>198?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Okamoto Ayako no Match Play Golf [A] (JP).bin" size="32768" crc="547dd7fd" sha1="2fe5e6811aa340f10b67f78ee9ed566a94326bad" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="matchpgb">
+		<description>Okamoto Ayako no Match Play Golf (Jpn, Rev. B?, OMV)</description>
+		<year>198?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Okamoto Ayako no Match Play Golf [B] (JP).bin" size="32768" crc="49d3db2c" sha1="bcb03afd3bbd5dadf00474eac44bb66a5df419cf" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="orguss">
-		<description>Orguss (Jpn, Euro)</description>
+		<description>Orguss (Euro, Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -532,7 +566,7 @@
 	</software>
 
 	<software name="pacar">
-		<description>Pacar (Jpn, Euro)</description>
+		<description>Pacar (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -576,7 +610,7 @@
 	</software>
 
 	<software name="pitfall2a" cloneof="pitfall2">
-		<description>Pitfall II - The Lost Caverns (Alt - Jpn)</description>
+		<description>Pitfall II - The Lost Caverns (Jpn, Alt)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -587,7 +621,7 @@
 	</software>
 
 	<software name="popflame">
-		<description>Pop Flamer (Jpn, Euro)</description>
+		<description>Pop Flamer (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega / Jaleco</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -598,7 +632,7 @@
 	</software>
 
 	<software name="qbert">
-		<description>Q-bert (Jpn) (OM)</description>
+		<description>Q-bert (Jpn, OMV)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -642,7 +676,7 @@
 	</software>
 
 	<software name="segaflip">
-		<description>Sega Flipper (Jpn, Euro)</description>
+		<description>Sega Flipper (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -686,7 +720,7 @@
 	</software>
 
 	<software name="sindbadm">
-		<description>Sindbad Mystery (Jpn, Euro)</description>
+		<description>Sindbad Mystery (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -719,7 +753,7 @@
 	</software>
 
 	<software name="spacemnt">
-		<description>Space Mountain (Jpn) (OM)</description>
+		<description>Space Mountain (Jpn, OMV)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -752,7 +786,7 @@
 	</software>
 
 	<software name="starjack">
-		<description>Star Jacker (v1.2) (Jpn, Euro)</description>
+		<description>Star Jacker (Euro, Jpn, v1.2)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -763,7 +797,7 @@
 	</software>
 
 	<software name="starjack1" cloneof="starjack">
-		<description>Star Jacker (v1.1) (Jpn, Euro)</description>
+		<description>Star Jacker (Euro, Jpn, v1.1)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -774,7 +808,7 @@
 	</software>
 
 	<software name="starjack2" cloneof="starjack">
-		<description>Star Jacker (v1.0) (Jpn)</description>
+		<description>Star Jacker (Jpn, v1.0)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -806,6 +840,18 @@
 		</part>
 	</software>
 
+	<software name="uranaiac">
+	<!-- SC3000 cart -->
+		<description>Uranai Angel Cutie (Jpn)</description>
+		<year>198?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="Uranai Angel Cutie (JP).bin" size="32768" crc="ae4f92cf" sha1="90e32471b68cb60449b30e5d5a19d3a88f9829d3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wboy">
 		<description>Wonder Boy (Jpn)</description>
 		<year>1986</year>
@@ -818,7 +864,7 @@
 	</software>
 
 	<software name="yamato">
-		<description>Yamato (Jpn, Euro)</description>
+		<description>Yamato (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">

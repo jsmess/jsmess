@@ -1,5 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!--
+A few games have been listed as rumored, but they might very well be fake (please let us know if you have any info):
+  - "Power Drive", 
+  - "Jungle Strike", 
+  - "Outrunners", 
+  - "Sports Illustrated Golf",
+  - "Ronald McDonald in Magical World" (European revision of "Donald no Magic World" ??)
+-->
+
 <softwarelist name="gamegear" description="Sega Game Gear cartridges">
 	<software name="5in1fun">
 		<description>5 in 1 Funpak (USA)</description>
@@ -36,7 +45,7 @@
 	</software>
 
 	<software name="advbatmrp1" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype - Apr 27,  1995)</description>
+		<description>The Adventures of Batman &amp; Robin (Prototype, 19950427)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -47,7 +56,7 @@
 	</software>
 
 	<software name="advbatmrp2" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype - Apr 29,  1995 - A)</description>
+		<description>The Adventures of Batman &amp; Robin (Prototype, 19950429-A)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -58,7 +67,7 @@
 	</software>
 
 	<software name="advbatmrp3" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype - Apr 30,  1995)</description>
+		<description>The Adventures of Batman &amp; Robin (Prototype, 19950430)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -69,7 +78,7 @@
 	</software>
 
 	<software name="advbatmrp4" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype - May 02,  1995)</description>
+		<description>The Adventures of Batman &amp; Robin (Prototype, 19950502)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -80,7 +89,7 @@
 	</software>
 
 	<software name="advbatmrp5" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype - May 04,  1995)</description>
+		<description>The Adventures of Batman &amp; Robin (Prototype, 19950504)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -91,7 +100,7 @@
 	</software>
 
 	<software name="advbatmrp6" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype - May 06,  1995 - B)</description>
+		<description>The Adventures of Batman &amp; Robin (Prototype, 19950506-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -102,7 +111,7 @@
 	</software>
 
 	<software name="advbatmrp7" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype - May 06,  1995)</description>
+		<description>The Adventures of Batman &amp; Robin (Prototype, 19950506)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -113,7 +122,7 @@
 	</software>
 
 	<software name="advbatmrp8" cloneof="advbatmr">
-		<description>The Adventures of Batman &amp; Robin (Prototype - May 07,  1995)</description>
+		<description>The Adventures of Batman &amp; Robin (Prototype, 19950507)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -170,7 +179,7 @@
 	</software>
 
 	<software name="aladdinp1" cloneof="aladdin">
-		<description>Disney's Aladdin (Prototype - Dec 29,  1993)</description>
+		<description>Disney's Aladdin (Prototype, 19931229)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -181,7 +190,7 @@
 	</software>
 
 	<software name="aladdinp2" cloneof="aladdin">
-		<description>Disney's Aladdin (Prototype - Jan 11,  1994)</description>
+		<description>Disney's Aladdin (Prototype, 19940111)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -192,7 +201,7 @@
 	</software>
 
 	<software name="aladdinp3" cloneof="aladdin">
-		<description>Disney's Aladdin (Prototype - Jan 13,  1994)</description>
+		<description>Disney's Aladdin (Prototype, 19940113)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -203,7 +212,7 @@
 	</software>
 
 	<software name="aladdinp4" cloneof="aladdin">
-		<description>Disney's Aladdin (Prototype WITH - Jan 23,  1994)</description>
+		<description>Disney's Aladdin (Prototype WITH, 19940123)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -337,7 +346,7 @@
 	</software>
 
 	<software name="asterix">
-		<description>Asterix (Prototype - Feb 16,  1994)</description>
+		<description>Asterix (Prototype, 19940216)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -348,7 +357,7 @@
 	</software>
 
 	<software name="asterixa">
-		<description>Asterix (Prototype - Feb 22,  1994)</description>
+		<description>Asterix (Prototype, 19940222)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -359,7 +368,7 @@
 	</software>
 
 	<software name="asterixb">
-		<description>Asterix (Prototype - Jan 25,  1994)</description>
+		<description>Asterix (Prototype, 19940125)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -370,7 +379,7 @@
 	</software>
 
 	<software name="asterixc">
-		<description>Asterix (Prototype - Mar 13,  1994)</description>
+		<description>Asterix (Prototype, 19940313)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -381,7 +390,7 @@
 	</software>
 
 	<software name="asterixd">
-		<description>Asterix (Prototype - Mar 15,  1994)</description>
+		<description>Asterix (Prototype, 19940315)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -494,7 +503,7 @@
 	</software>
 
 	<software name="barbie">
-		<description>Barbie Super Model (Unknown) (Proto)</description>
+		<description>Barbie Super Model (Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -607,7 +616,7 @@
 	</software>
 
 	<software name="berensp" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 01,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940801)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -618,7 +627,7 @@
 	</software>
 
 	<software name="berensp1" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 11,  1994 - A)</description>
+		<description>Berenstain Bears (Prototype, 19940811-A)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -629,7 +638,7 @@
 	</software>
 
 	<software name="berensp2" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 11,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940811)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -640,7 +649,7 @@
 	</software>
 
 	<software name="berensp3" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 12,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940812)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -651,7 +660,7 @@
 	</software>
 
 	<software name="berensp4" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 13,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940813)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -662,7 +671,7 @@
 	</software>
 
 	<software name="berensp5" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 14,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940814)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -673,7 +682,7 @@
 	</software>
 
 	<software name="berensp6" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 19,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940819)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -684,7 +693,7 @@
 	</software>
 
 	<software name="berensp7" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 20,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940820)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -695,7 +704,7 @@
 	</software>
 
 	<software name="berensp8" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 24,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940824)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -706,7 +715,7 @@
 	</software>
 
 	<software name="berensp9" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 25,  1994 - B)</description>
+		<description>Berenstain Bears (Prototype, 19940825-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -717,7 +726,7 @@
 	</software>
 
 	<software name="beresp10" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 26,  1994 - B)</description>
+		<description>Berenstain Bears (Prototype, 19940826-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -728,7 +737,7 @@
 	</software>
 
 	<software name="beresp11" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Aug 26,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940826)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -739,7 +748,7 @@
 	</software>
 
 	<software name="beresp12" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Jul 15,  1994 - B)</description>
+		<description>Berenstain Bears (Prototype, 19940715-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -750,7 +759,7 @@
 	</software>
 
 	<software name="beresp13" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Jul 21,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940721)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -761,7 +770,7 @@
 	</software>
 
 	<software name="beresp14" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Jul 22,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940722)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -772,7 +781,7 @@
 	</software>
 
 	<software name="beresp15" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Jul 27,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940727)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -783,7 +792,7 @@
 	</software>
 
 	<software name="beresp16" cloneof="berens">
-		<description>Berenstain Bears (Prototype - Jun 28,  1994)</description>
+		<description>Berenstain Bears (Prototype, 19940628)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -829,7 +838,7 @@
 	</software>
 
 	<software name="bonkersp" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Dec 03,  1994)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941203)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -840,7 +849,7 @@
 	</software>
 
 	<software name="bonkersp1" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Dec 05,  1994)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941205)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -851,7 +860,7 @@
 	</software>
 
 	<software name="bonkersp2" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Dec 07,  1994 - C)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941207-C)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -862,7 +871,7 @@
 	</software>
 
 	<software name="bonkersp3" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Dec 08,  1994 - B)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941208-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -873,7 +882,7 @@
 	</software>
 
 	<software name="bonkersp4" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Dec 08,  1994 - C)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941208-C)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -884,7 +893,7 @@
 	</software>
 
 	<software name="bonkersp5" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Dec 11,  1994)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941211)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -895,7 +904,7 @@
 	</software>
 
 	<software name="bonkersp6" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Dec 12,  1994 - B)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941212-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -906,7 +915,7 @@
 	</software>
 
 	<software name="bonkersp7" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Dec 12,  1994 - D)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941212-D)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -917,7 +926,7 @@
 	</software>
 
 	<software name="bonkersp8" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Nov 15,  1994)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941115)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -928,7 +937,7 @@
 	</software>
 
 	<software name="bonkersp9" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Nov 21,  1994)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941121)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -939,7 +948,7 @@
 	</software>
 
 	<software name="bonkrsp10" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Nov 23,  1994)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941123)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -950,7 +959,7 @@
 	</software>
 
 	<software name="bonkrsp11" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Nov 26,  1994)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941126)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -961,7 +970,7 @@
 	</software>
 
 	<software name="bonkrsp12" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Nov 29,  1994)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941129)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -972,7 +981,7 @@
 	</software>
 
 	<software name="bonkrsp13" cloneof="bonkers">
-		<description>Bonkers Wax Up! (Prototype - Oct 31,  1994)</description>
+		<description>Bonkers Wax Up! (Prototype, 19941031)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1151,7 +1160,7 @@
 	</software>
 
 	<software name="chicagop" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jul 03,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19940703)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1162,7 +1171,7 @@
 	</software>
 
 	<software name="chicagop1" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jul 05,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950705)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1173,7 +1182,7 @@
 	</software>
 
 	<software name="chicagop2" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jul 07,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950707)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1184,7 +1193,7 @@
 	</software>
 
 	<software name="chicagop3" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jul 10,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950710)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1195,7 +1204,7 @@
 	</software>
 
 	<software name="chicagop4" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jul 11,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950711)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1206,7 +1215,7 @@
 	</software>
 
 	<software name="chicagop5" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jul 19,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950719)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1217,7 +1226,7 @@
 	</software>
 
 	<software name="chicagop6" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jul 20,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950720)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1228,7 +1237,7 @@
 	</software>
 
 	<software name="chicagop7" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jul 21,  1995 - B)</description>
+		<description>Chicago Syndicate (Prototype, 19950721-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1239,7 +1248,7 @@
 	</software>
 
 	<software name="chicagop8" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jul 21,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950721)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1250,7 +1259,7 @@
 	</software>
 
 	<software name="chicagop9" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 01,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950601)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1261,7 +1270,7 @@
 	</software>
 
 	<software name="chicgop10" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 05,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950605)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1272,7 +1281,7 @@
 	</software>
 
 	<software name="chicgop11" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 07,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950607)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1283,7 +1292,7 @@
 	</software>
 
 	<software name="chicgop12" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 08,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950608)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1294,7 +1303,7 @@
 	</software>
 
 	<software name="chicgop13" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 12,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950612)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1305,7 +1314,7 @@
 	</software>
 
 	<software name="chicgop14" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 14,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950614)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1316,7 +1325,7 @@
 	</software>
 
 	<software name="chicgop15" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 19,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950619)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1327,7 +1336,7 @@
 	</software>
 
 	<software name="chicgop16" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 20,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950620)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1338,7 +1347,7 @@
 	</software>
 
 	<software name="chicgop17" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 22,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950622)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1349,7 +1358,7 @@
 	</software>
 
 	<software name="chicgop18" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 26,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950626)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1360,7 +1369,7 @@
 	</software>
 
 	<software name="chicgop19" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 28,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950628)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1371,7 +1380,7 @@
 	</software>
 
 	<software name="chicgop20" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 29,  1995 - B)</description>
+		<description>Chicago Syndicate (Prototype, 19950629-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1382,7 +1391,7 @@
 	</software>
 
 	<software name="chicgop21" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 29,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950629)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1393,7 +1402,7 @@
 	</software>
 
 	<software name="chicgop22" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - Jun 30,  1995 - B)</description>
+		<description>Chicago Syndicate (Prototype, 19950630-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1404,7 +1413,7 @@
 	</software>
 
 	<software name="chicgop23" cloneof="chicago">
-		<description>Chicago Syndicate (Prototype - May 05,  1995)</description>
+		<description>Chicago Syndicate (Prototype, 19950505)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1856,7 +1865,7 @@
 	</software>
 
 	<software name="dynaheadp1" cloneof="dynahead">
-		<description>Dynamite Headdy (Prototype - Jul 01,  1994)</description>
+		<description>Dynamite Headdy (Prototype, 19940701)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1867,7 +1876,7 @@
 	</software>
 
 	<software name="dynaheadp2" cloneof="dynahead">
-		<description>Dynamite Headdy (Prototype - Jul 05,  1994)</description>
+		<description>Dynamite Headdy (Prototype, 19940705)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1878,7 +1887,7 @@
 	</software>
 
 	<software name="dynaheadp3" cloneof="dynahead">
-		<description>Dynamite Headdy (Prototype - Jun 15,  1994)</description>
+		<description>Dynamite Headdy (Prototype, 19940615)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2001,7 +2010,7 @@
 	</software>
 
 	<software name="excdizzy">
-		<description>The Excellent Dizzy Collection (SMS Mode?) (Euro)</description>
+		<description>The Excellent Dizzy Collection (Euro, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2012,7 +2021,7 @@
 	</software>
 
 	<software name="excdizzyp" cloneof="excdizzy">
-		<description>The Excellent Dizzy Collection (Prototype) (SMS Mode)</description>
+		<description>The Excellent Dizzy Collection (Prototype, SMS Mode)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2216,7 +2225,7 @@
 	</software>
 
 	<software name="frogger">
-		<description>Frogger (Proto) (USA)</description>
+		<description>Frogger (USA, Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2485,7 +2494,7 @@
 	</software>
 
 	<software name="gpriderp" cloneof="gprider">
-		<description>GP Rider (Prototype - Jan 04,  1994)</description>
+		<description>GP Rider (Prototype, 19940104)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3089,7 +3098,7 @@
 	</software>
 
 	<software name="legndillp" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype - Oct 11,  1994)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19941011)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3100,7 +3109,7 @@
 	</software>
 
 	<software name="legndillp1" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype - Oct 14,  1994)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19941014)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3111,7 +3120,7 @@
 	</software>
 
 	<software name="legndillp2" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype - Oct 17,  1994)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19941017)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3122,7 +3131,7 @@
 	</software>
 
 	<software name="legndillp3" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype - Sep 22,  1994)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19940922)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3133,7 +3142,7 @@
 	</software>
 
 	<software name="legndillp4" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype - Sep 30,  1994 - SEL)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19940930-SEL)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3144,7 +3153,7 @@
 	</software>
 
 	<software name="legndillp5" cloneof="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Prototype - Sep 30,  1994)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (Prototype, 19940930)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3211,7 +3220,7 @@
 	</software>
 
 	<software name="lionkingp" cloneof="lionking">
-		<description>The Lion King (Prototype - Aug 03,  1994)</description>
+		<description>The Lion King (Prototype, 19940803)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3222,7 +3231,7 @@
 	</software>
 
 	<software name="lionkingp1" cloneof="lionking">
-		<description>The Lion King (Prototype - Aug 11,  1994)</description>
+		<description>The Lion King (Prototype, 19940811)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3233,7 +3242,7 @@
 	</software>
 
 	<software name="lionkingp2" cloneof="lionking">
-		<description>The Lion King (Prototype - Aug 12,  1994)</description>
+		<description>The Lion King (Prototype, 19940812)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3244,7 +3253,7 @@
 	</software>
 
 	<software name="lionkingp3" cloneof="lionking">
-		<description>The Lion King (Prototype - Aug 13,  1994)</description>
+		<description>The Lion King (Prototype, 19940813)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3255,7 +3264,7 @@
 	</software>
 
 	<software name="lionkingp4" cloneof="lionking">
-		<description>The Lion King (Prototype - Aug 14,  1994)</description>
+		<description>The Lion King (Prototype, 19940814)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3266,7 +3275,7 @@
 	</software>
 
 	<software name="lionkingp5" cloneof="lionking">
-		<description>The Lion King (Prototype - Aug 15,  1994)</description>
+		<description>The Lion King (Prototype, 19940815)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3277,7 +3286,7 @@
 	</software>
 
 	<software name="lionkingp6" cloneof="lionking">
-		<description>The Lion King (Prototype - Aug 16,  1994)</description>
+		<description>The Lion King (Prototype, 19940816)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3288,7 +3297,7 @@
 	</software>
 
 	<software name="lionkingp7" cloneof="lionking">
-		<description>The Lion King (Prototype - Aug 17,  1994 - 2)</description>
+		<description>The Lion King (Prototype, 19940817-2)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3299,7 +3308,7 @@
 	</software>
 
 	<software name="lionkingp8" cloneof="lionking">
-		<description>The Lion King (Prototype - Aug 17,  1994)</description>
+		<description>The Lion King (Prototype, 19940817)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3310,7 +3319,7 @@
 	</software>
 
 	<software name="lionkingp9" cloneof="lionking">
-		<description>The Lion King (Prototype - Aug 20,  1994)</description>
+		<description>The Lion King (Prototype, 19940820)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3677,7 +3686,7 @@
 	</software>
 
 	<software name="mmprp" cloneof="mmpr">
-		<description>Mighty Morphin Power Rangers (Prototype - Jul 16,  1994)</description>
+		<description>Mighty Morphin Power Rangers (Prototype, 19940716)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3699,7 +3708,7 @@
 	</software>
 
 	<software name="mmprtmp" cloneof="mmprtm">
-		<description>Mighty Morphin Power Rangers - The Movie (Prototype - May 30,  1995)</description>
+		<description>Mighty Morphin Power Rangers - The Movie (Prototype, 19950530)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3970,7 +3979,7 @@
 	</software>
 
 	<software name="nbaactnp9" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Dec 01,  1993)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19931201)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3981,7 +3990,7 @@
 	</software>
 
 	<software name="nbaactp10" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 02,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940202)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3992,7 +4001,7 @@
 	</software>
 
 	<software name="nbaactp11" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 03,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940203)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4003,7 +4012,7 @@
 	</software>
 
 	<software name="nbaactp12" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 06,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940206)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4014,7 +4023,7 @@
 	</software>
 
 	<software name="nbaactp13" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 08,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940208)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4025,7 +4034,7 @@
 	</software>
 
 	<software name="nbaactp14" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 12,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940212)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4036,7 +4045,7 @@
 	</software>
 
 	<software name="nbaactp15" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 15,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19941215)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4047,7 +4056,7 @@
 	</software>
 
 	<software name="nbaactp16" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 17,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940217)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4058,7 +4067,7 @@
 	</software>
 
 	<software name="nbaactp17" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 20,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940220)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4069,7 +4078,7 @@
 	</software>
 
 	<software name="nbaactp18" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 21,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940221)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4080,7 +4089,7 @@
 	</software>
 
 	<software name="nbaactp19" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 24,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940224)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4091,7 +4100,7 @@
 	</software>
 
 	<software name="nbaactp20" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 25,  1994 - B)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940225-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4102,7 +4111,7 @@
 	</software>
 
 	<software name="nbaactp21" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 25,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940225)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4113,7 +4122,7 @@
 	</software>
 
 	<software name="nbaactp22" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 26,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940226)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4124,7 +4133,7 @@
 	</software>
 
 	<software name="nbaactp23" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 27,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940227)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4135,7 +4144,7 @@
 	</software>
 
 	<software name="nbaactp24" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Feb 28,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940228)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4146,7 +4155,7 @@
 	</software>
 
 	<software name="nbaactp25" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Jan 04,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940104)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4157,7 +4166,7 @@
 	</software>
 
 	<software name="nbaactp26" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Jan 06,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940106)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4168,7 +4177,7 @@
 	</software>
 
 	<software name="nbaactp27" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Jan 10,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940110)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4179,7 +4188,7 @@
 	</software>
 
 	<software name="nbaactp28" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Jan 24,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940124)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4190,7 +4199,7 @@
 	</software>
 
 	<software name="nbaactp29" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Jan 29,  1994)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19940129)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4201,7 +4210,7 @@
 	</software>
 
 	<software name="nbaactp30" cloneof="nbaactn">
-		<description>NBA Action Starring David Robinson (Prototype - Nov 28,  1993)</description>
+		<description>NBA Action Starring David Robinson (Prototype, 19931128)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4269,7 +4278,7 @@
 	</software>
 
 	<software name="nfl95pa" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Aug 08,  1994)</description>
+		<description>NFL '95 (Prototype, 19940808)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4280,7 +4289,7 @@
 	</software>
 
 	<software name="nfl95pb" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Aug 25,  1994 - A)</description>
+		<description>NFL '95 (Prototype, 19940825-A)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4291,7 +4300,7 @@
 	</software>
 
 	<software name="nfl95pc" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Aug 25,  1994 - B)</description>
+		<description>NFL '95 (Prototype, 19940825-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4302,7 +4311,7 @@
 	</software>
 
 	<software name="nfl95pd" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Aug 25,  1994)</description>
+		<description>NFL '95 (Prototype, 19940825)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4313,7 +4322,7 @@
 	</software>
 
 	<software name="nfl95pe" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Aug 26,  1994)</description>
+		<description>NFL '95 (Prototype, 19940826)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4324,7 +4333,7 @@
 	</software>
 
 	<software name="nfl95pf" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Aug 31,  1994)</description>
+		<description>NFL '95 (Prototype, 19940831)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4335,7 +4344,7 @@
 	</software>
 
 	<software name="nfl95pg" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Sep 02,  1994)</description>
+		<description>NFL '95 (Prototype, 19940902)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4346,7 +4355,7 @@
 	</software>
 
 	<software name="nfl95ph" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Sep 08,  1994)</description>
+		<description>NFL '95 (Prototype, 19940908)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4357,7 +4366,7 @@
 	</software>
 
 	<software name="nfl95pi" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Sep 10,  1994)</description>
+		<description>NFL '95 (PrototypeM 19940910)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4368,7 +4377,7 @@
 	</software>
 
 	<software name="nfl95pj" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Sep 11,  1994 - B)</description>
+		<description>NFL '95 (Prototype, 19940911-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4379,7 +4388,7 @@
 	</software>
 
 	<software name="nfl95pk" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Sep 11,  1994 - C)</description>
+		<description>NFL '95 (Prototype, 19940911-C)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4390,7 +4399,7 @@
 	</software>
 
 	<software name="nfl95pl" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Sep 12,  1994)</description>
+		<description>NFL '95 (Prototype, 19940912)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4401,7 +4410,7 @@
 	</software>
 
 	<software name="nfl95pm" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Sep 14,  1994 - F)</description>
+		<description>NFL '95 (Prototype, 19940914-F)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4412,7 +4421,7 @@
 	</software>
 
 	<software name="nfl95pn" cloneof="nfl95">
-		<description>NFL '95 (Prototype - Sep 14,  1994)</description>
+		<description>NFL '95 (Prototype, 19940914)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4457,7 +4466,7 @@
 	</software>
 
 	<software name="nhlallstpa" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Dec 15,  1994)</description>
+		<description>NHL All-Star Hockey (Prototype, 19941215)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4468,7 +4477,7 @@
 	</software>
 
 	<software name="nhlallstpb" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Dec 22,  1994)</description>
+		<description>NHL All-Star Hockey (Prototype, 19941222)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4479,7 +4488,7 @@
 	</software>
 
 	<software name="nhlallstpc" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Dec 29,  1994)</description>
+		<description>NHL All-Star Hockey (Prototype, 19941229)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4490,7 +4499,7 @@
 	</software>
 
 	<software name="nhlallstpd" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Dec 31,  1994)</description>
+		<description>NHL All-Star Hockey (Prototype, 19941231)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4501,7 +4510,7 @@
 	</software>
 
 	<software name="nhlallstpe" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 02,  1995)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950102)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4512,7 +4521,7 @@
 	</software>
 
 	<software name="nhlallstpf" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 03,  1995)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950103)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4523,7 +4532,7 @@
 	</software>
 
 	<software name="nhlallstpg" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 07,  1995)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950107)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4534,7 +4543,7 @@
 	</software>
 
 	<software name="nhlallstph" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 11,  1995)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950111)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4545,7 +4554,7 @@
 	</software>
 
 	<software name="nhlallstpi" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 13,  1995)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950113)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4556,7 +4565,7 @@
 	</software>
 
 	<software name="nhlallstpj" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 16,  1995)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950116)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4567,7 +4576,7 @@
 	</software>
 
 	<software name="nhlallstpk" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 20 ,1995)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950120)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4578,7 +4587,7 @@
 	</software>
 
 	<software name="nhlallstpl" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 21,  1995)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950121)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4589,7 +4598,7 @@
 	</software>
 
 	<software name="nhlallstpm" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 24,  1995 - A)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950124-A)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4600,7 +4609,7 @@
 	</software>
 
 	<software name="nhlallstpn" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 24,  1995 - B)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950124-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4611,7 +4620,7 @@
 	</software>
 
 	<software name="nhlallstpo" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 24,  1995 - C)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950124-C)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4622,7 +4631,7 @@
 	</software>
 
 	<software name="nhlallstpp" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 24,  1995)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950124)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4633,7 +4642,7 @@
 	</software>
 
 	<software name="nhlallstpq" cloneof="nhlallst">
-		<description>NHL All-Star Hockey (Prototype - Jan 25,  1995)</description>
+		<description>NHL All-Star Hockey (Prototype, 19950125)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4816,7 +4825,7 @@
 	</software>
 
 	<software name="pacintim">
-		<description>Pac-In-Time (Unknown) (Proto)</description>
+		<description>Pac-In-Time (Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5377,7 +5386,7 @@
 	</software>
 
 	<software name="ristarp" cloneof="ristar">
-		<description>Ristar (Prototype - Nov 01,  1994)</description>
+		<description>Ristar (Prototype, 19941101)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5388,7 +5397,7 @@
 	</software>
 
 	<software name="ristarp1" cloneof="ristar">
-		<description>Ristar (Prototype - Nov 02,  1994)</description>
+		<description>Ristar (Prototype, 19941102)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5399,7 +5408,7 @@
 	</software>
 
 	<software name="ristarp2" cloneof="ristar">
-		<description>Ristar (Prototype - Oct 19,  1994)</description>
+		<description>Ristar (Prototype, 19941019)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5410,7 +5419,7 @@
 	</software>
 
 	<software name="ristarp3" cloneof="ristar">
-		<description>Ristar (Prototype - Oct 26,  1994)</description>
+		<description>Ristar (Prototype, 19941026)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5421,7 +5430,7 @@
 	</software>
 
 	<software name="ristarp4" cloneof="ristar">
-		<description>Ristar (Prototype - Sep 09,  1994)</description>
+		<description>Ristar (Prototype, 19940909)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5675,7 +5684,7 @@
 	</software>
 
 	<software name="shinfrc2p1" cloneof="shinfrc2">
-		<description>Shining Force II (Prototype - Apr 27,  1994)</description>
+		<description>Shining Force II (Prototype, 19940427)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5686,7 +5695,7 @@
 	</software>
 
 	<software name="shinfrc2p2" cloneof="shinfrc2">
-		<description>Shining Force II (Prototype - Jul 08,  1994)</description>
+		<description>Shining Force II (Prototype, 19940708)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5697,7 +5706,7 @@
 	</software>
 
 	<software name="shinfrc2p3" cloneof="shinfrc2">
-		<description>Shining Force II (Prototype - Jun 27,  1994)</description>
+		<description>Shining Force II (Prototype, 19940627)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5708,7 +5717,7 @@
 	</software>
 
 	<software name="shinfrc2p4" cloneof="shinfrc2">
-		<description>Shining Force II (Prototype - May 30,  1994)</description>
+		<description>Shining Force II (Prototype, 19940530)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5865,7 +5874,7 @@
 	</software>
 
 	<software name="sonicblsp1" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 611 - May 31,  1996, 13.49)</description>
+		<description>Sonic Blast (Prototype 611, 19960531, 13.49)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5876,7 +5885,7 @@
 	</software>
 
 	<software name="sonicblsp2" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 74 - Jul 17,  1996, 09.11)</description>
+		<description>Sonic Blast (Prototype 74, 19960717, 09.11)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5887,7 +5896,7 @@
 	</software>
 
 	<software name="sonicblsp3" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 806 - Aug 06,  1996, 18.37)</description>
+		<description>Sonic Blast (Prototype 806, 19960806, 18.37)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5898,7 +5907,7 @@
 	</software>
 
 	<software name="sonicblsp4" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 821 - Aug 22,  1996, 09.38)</description>
+		<description>Sonic Blast (Prototype 821, 19960822, 09.38)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5909,7 +5918,7 @@
 	</software>
 
 	<software name="sonicblsp5" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 827 - Aug 28,  1996, 11.13)</description>
+		<description>Sonic Blast (Prototype 827, 19960828, 11.13)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5920,7 +5929,7 @@
 	</software>
 
 	<software name="sonicblsp6" cloneof="sonicbls">
-		<description>Sonic Blast (Prototype 94 - Sep 02,  1996, 17.47)</description>
+		<description>Sonic Blast (Prototype 94, 19960902, 17.47)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6002,7 +6011,7 @@
 	</software>
 
 	<software name="sonicsp" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0307 - Mar 07,  1994, 05.24)</description>
+		<description>Sonic Spinball (Prototype 0307, 19940307, 05.24)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6013,7 +6022,7 @@
 	</software>
 
 	<software name="sonicspa" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 031094 - Mar 10,  1994, 17.41)</description>
+		<description>Sonic Spinball (Prototype 031094, 19940310, 17.41)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6024,7 +6033,7 @@
 	</software>
 
 	<software name="sonicspb" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 031194 - Mar 11,  1994, 12.09)</description>
+		<description>Sonic Spinball (Prototype 031194, 19940311, 12.09)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6035,7 +6044,7 @@
 	</software>
 
 	<software name="sonicspc" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 032194 - Mar 21,  1994, 07.12)</description>
+		<description>Sonic Spinball (Prototype 032194, 19940321, 07.12)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6046,7 +6055,7 @@
 	</software>
 
 	<software name="sonicspd" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0328 - Mar 28,  1994, 06.54)</description>
+		<description>Sonic Spinball (Prototype 0328, 19940328, 06.54)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6057,7 +6066,7 @@
 	</software>
 
 	<software name="sonicspe" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0329 - Mar 29,  1994, 07.35)</description>
+		<description>Sonic Spinball (Prototype 0329, 19940329, 07.35)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6068,7 +6077,7 @@
 	</software>
 
 	<software name="sonicspf" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0330 - Mar 30,  1994, 06.54)</description>
+		<description>Sonic Spinball (Prototype 0330, 19940330, 06.54)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6079,7 +6088,7 @@
 	</software>
 
 	<software name="sonicspg" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0405 - Apr 05,  1994, 18.07)</description>
+		<description>Sonic Spinball (Prototype 0405, 19940405, 18.07)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6090,7 +6099,7 @@
 	</software>
 
 	<software name="sonicsph" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0412 - Apr 12,  1994, 07.26)</description>
+		<description>Sonic Spinball (Prototype 0412, 19940412, 07.26)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6101,7 +6110,7 @@
 	</software>
 
 	<software name="sonicspi" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0413 - Apr 13,  1994, 02.54)</description>
+		<description>Sonic Spinball (Prototype 0413, 19940413, 02.54)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6112,7 +6121,7 @@
 	</software>
 
 	<software name="sonicspj" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0415 - Apr 15,  1994, 17.33)</description>
+		<description>Sonic Spinball (Prototype 0415, 19940415, 17.33)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6123,7 +6132,7 @@
 	</software>
 
 	<software name="sonicspk" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0421 - Apr 21,  1994, 05.30)</description>
+		<description>Sonic Spinball (Prototype 0421, 19940421, 05.30)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6134,7 +6143,7 @@
 	</software>
 
 	<software name="sonicspl" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0427 - Apr 27,  1994, 04.51)</description>
+		<description>Sonic Spinball (Prototype 0427, 19940427, 04.51)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6145,7 +6154,7 @@
 	</software>
 
 	<software name="sonicspm" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0429 - Apr 29,  1994, 06.01)</description>
+		<description>Sonic Spinball (Prototype 0429, 19940429, 06.01)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6156,7 +6165,7 @@
 	</software>
 
 	<software name="sonicspn" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0430 - Apr 29,  1994, 21.48)</description>
+		<description>Sonic Spinball (Prototype 0430, 19940429, 21.48)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6167,7 +6176,7 @@
 	</software>
 
 	<software name="sonicspo" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0505 - May 05,  1994, 04.47)</description>
+		<description>Sonic Spinball (Prototype 0505, 19940505, 04.47)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6178,7 +6187,7 @@
 	</software>
 
 	<software name="sonicspp" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0506 - May 06,  1994, 13.04)</description>
+		<description>Sonic Spinball (Prototype 0506, 19940506, 13.04)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6189,7 +6198,7 @@
 	</software>
 
 	<software name="sonicspq" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0525 - May 25,  1994, 13.24)</description>
+		<description>Sonic Spinball (Prototype 0525, 19940525, 13.24)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6200,7 +6209,7 @@
 	</software>
 
 	<software name="sonicspr" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 0530 - May 30,  1994, 23.25)</description>
+		<description>Sonic Spinball (Prototype 0530, 19940530, 23.25)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6211,7 +6220,7 @@
 	</software>
 
 	<software name="sonicsps" cloneof="sonics">
-		<description>Sonic Spinball (Prototype 503B - May 03,  1994, 19.27)</description>
+		<description>Sonic Spinball (Prototype 503B, 19940503, 19.27)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6245,7 +6254,7 @@
 	</software>
 
 	<software name="sonicp" cloneof="sonic">
-		<description>Sonic The Hedgehog (Proto) (World)</description>
+		<description>Sonic The Hedgehog (World, Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6256,7 +6265,7 @@
 	</software>
 
 	<software name="sonic">
-		<description>Sonic The Hedgehog (v1.1) (World)</description>
+		<description>Sonic The Hedgehog (World, v1.1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6267,7 +6276,7 @@
 	</software>
 
 	<software name="sonictrip" cloneof="sonictri">
-		<description>Sonic The Hedgehog - Triple Trouble (Prototype 0808 - Aug 08,  1994, 18.05)</description>
+		<description>Sonic The Hedgehog - Triple Trouble (Prototype 0808, 19940808, 18.05)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6325,7 +6334,7 @@
 	</software>
 
 	<software name="cheesep1">
-		<description>Speedy Gonzales Cheese Catastrophe (Prototype - Feb 17,  1995)</description>
+		<description>Speedy Gonzales Cheese Catastrophe (Prototype, 19950217)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6336,7 +6345,7 @@
 	</software>
 
 	<software name="cheesep2" cloneof="cheesp1">
-		<description>Speedy Gonzales Cheese Catastrophe (Prototype - Feb 24,  1995)</description>
+		<description>Speedy Gonzales Cheese Catastrophe (Prototype, 19950224)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6380,7 +6389,7 @@
 	</software>
 
 	<software name="spirou">
-		<description>Spirou (Proto) (Euro)</description>
+		<description>Spirou (Euro, Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6402,7 +6411,7 @@
 	</software>
 
 	<software name="sportrvp1" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 03,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950403-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6413,7 +6422,7 @@
 	</software>
 
 	<software name="sportrvp2" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 03,  1995 - QTEST)</description>
+		<description>Sports Trivia (Prototype, 19950403-QTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6424,7 +6433,7 @@
 	</software>
 
 	<software name="sportrvp3" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 04,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950404-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6435,7 +6444,7 @@
 	</software>
 
 	<software name="sportrvp4" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 05,  1995 - 2MEG - B)</description>
+		<description>Sports Trivia (Prototype, 19950405-2MEG-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6446,7 +6455,7 @@
 	</software>
 
 	<software name="sportrvp5" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 05,  1995 - 2MEG - C)</description>
+		<description>Sports Trivia (Prototype, 19950405-2MEG-C)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6457,7 +6466,7 @@
 	</software>
 
 	<software name="sportrvp6" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 05,  1995 - QTEST)</description>
+		<description>Sports Trivia (Prototype, 19950405-QTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6468,7 +6477,7 @@
 	</software>
 
 	<software name="sportrvp7" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 06,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950406-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6479,7 +6488,7 @@
 	</software>
 
 	<software name="sportrvp8" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 07,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950407-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6490,7 +6499,7 @@
 	</software>
 
 	<software name="sportrvp9" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 07,  1995 - QTEST)</description>
+		<description>Sports Trivia (Prototype, 19950407-QTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6501,7 +6510,7 @@
 	</software>
 
 	<software name="sportvp10" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 11,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950411-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6512,7 +6521,7 @@
 	</software>
 
 	<software name="sportvp11" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 12,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950412-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6523,7 +6532,7 @@
 	</software>
 
 	<software name="sportvp12" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 25,  1995 - 1MEG)</description>
+		<description>Sports Trivia (Prototype, 19950425-1MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6534,7 +6543,7 @@
 	</software>
 
 	<software name="sportvp13" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 25,  1995 - QTEST)</description>
+		<description>Sports Trivia (Prototype, 19950425-QTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6545,7 +6554,7 @@
 	</software>
 
 	<software name="sportvp14" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 27,  1995 - 1MEG)</description>
+		<description>Sports Trivia (Prototype, 19950427-1MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6556,7 +6565,7 @@
 	</software>
 
 	<software name="sportvp15" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Apr 28,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950428-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6567,7 +6576,7 @@
 	</software>
 
 	<software name="sportvp16" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 08,  1995)</description>
+		<description>Sports Trivia (Prototype, 19950308)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6578,7 +6587,7 @@
 	</software>
 
 	<software name="sportvp17" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 09,  1995)</description>
+		<description>Sports Trivia (Prototype, 19950309)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6589,7 +6598,7 @@
 	</software>
 
 	<software name="sportvp18" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 13,  1995)</description>
+		<description>Sports Trivia (Prototype, 19950313)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6600,7 +6609,7 @@
 	</software>
 
 	<software name="sportvp19" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 16,  1995 - 1MEG)</description>
+		<description>Sports Trivia (Prototype, 19950316-1MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6611,7 +6620,7 @@
 	</software>
 
 	<software name="sportvp20" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 16,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950316-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6622,7 +6631,7 @@
 	</software>
 
 	<software name="sportvp21" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 17,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950317-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6633,7 +6642,7 @@
 	</software>
 
 	<software name="sportvp22" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 20,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950320-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6644,7 +6653,7 @@
 	</software>
 
 	<software name="sportvp23" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 20,  1995 - QTEST)</description>
+		<description>Sports Trivia (Prototype, 19950320-QTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6655,7 +6664,7 @@
 	</software>
 
 	<software name="sportvp24" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 21,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950321-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6666,7 +6675,7 @@
 	</software>
 
 	<software name="sportvp25" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 23,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950323-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6677,7 +6686,7 @@
 	</software>
 
 	<software name="sportvp26" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 23,  1995 - ALGOTEST)</description>
+		<description>Sports Trivia (Prototype, 19950323-ALGOTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6688,7 +6697,7 @@
 	</software>
 
 	<software name="sportvp27" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 23,  1995 - QTEST)</description>
+		<description>Sports Trivia (Prototype, 19950323-QTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6699,7 +6708,7 @@
 	</software>
 
 	<software name="sportvp28" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 27,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950327-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6710,7 +6719,7 @@
 	</software>
 
 	<software name="sportvp29" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 27,  1995 - ALGOTEST)</description>
+		<description>Sports Trivia (Prototype, 19950327-ALGOTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6721,7 +6730,7 @@
 	</software>
 
 	<software name="sportvp30" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 29,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950329-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6732,7 +6741,7 @@
 	</software>
 
 	<software name="sportvp31" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 29,  1995 - ALGOTEST)</description>
+		<description>Sports Trivia (Prototype, 19950329-ALGOTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6743,7 +6752,7 @@
 	</software>
 
 	<software name="sportvp32" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 29,  1995 - QTEST)</description>
+		<description>Sports Trivia (Prototype, 19950329-QTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6754,7 +6763,7 @@
 	</software>
 
 	<software name="sportvp33" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 30,  1995 - 2MEG - D)</description>
+		<description>Sports Trivia (Prototype, 19950330-2MEG-D)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6765,7 +6774,7 @@
 	</software>
 
 	<software name="sportvp34" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - Mar 30,  1995 - QTEST)</description>
+		<description>Sports Trivia (Prototype, 19950330-QTEST)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6776,7 +6785,7 @@
 	</software>
 
 	<software name="sportvp35" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - May 02,  1995 - 2MEG)</description>
+		<description>Sports Trivia (Prototype, 19950502-2MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6787,7 +6796,7 @@
 	</software>
 
 	<software name="sportvp36" cloneof="sporttrv">
-		<description>Sports Trivia (Prototype - May 04,  1995 - 1MEG)</description>
+		<description>Sports Trivia (Prototype, 19950504-1MEG)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6934,7 +6943,7 @@
 	</software>
 
 	<software name="supercolp" cloneof="supercol">
-		<description>Super Columns (Prototype - Dec 01,  1994)</description>
+		<description>Super Columns (Prototype, 19941201)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6945,7 +6954,7 @@
 	</software>
 
 	<software name="supercolp1" cloneof="supercol">
-		<description>Super Columns (Prototype - Dec 15,  1994)</description>
+		<description>Super Columns (Prototype, 19941215)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6956,7 +6965,7 @@
 	</software>
 
 	<software name="supercolp2" cloneof="supercol">
-		<description>Super Columns (Prototype - Dec 21,  1994)</description>
+		<description>Super Columns (Prototype, 19941221)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6967,7 +6976,7 @@
 	</software>
 
 	<software name="supercolp3" cloneof="supercol">
-		<description>Super Columns (Prototype - Dec 26,  1994)</description>
+		<description>Super Columns (Prototype, 19941226)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6978,7 +6987,7 @@
 	</software>
 
 	<software name="supercolp4" cloneof="supercol">
-		<description>Super Columns (Prototype - Dec 28,  1994)</description>
+		<description>Super Columns (Prototype, 19941228)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6989,7 +6998,7 @@
 	</software>
 
 	<software name="supercolp5" cloneof="supercol">
-		<description>Super Columns (Prototype - Jan 06,  1995)</description>
+		<description>Super Columns (Prototype, 19950106)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7000,7 +7009,7 @@
 	</software>
 
 	<software name="supercolp6" cloneof="supercol">
-		<description>Super Columns (Prototype - Nov 11,  1994)</description>
+		<description>Super Columns (Prototype, 19941111)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7333,7 +7342,7 @@
 	</software>
 
 	<software name="tazmarsp" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Aug 10,  1994)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940810)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7344,7 +7353,7 @@
 	</software>
 
 	<software name="tazmarspa" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Aug 12,  1994)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940812)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7355,7 +7364,7 @@
 	</software>
 
 	<software name="tazmarspb" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Aug 14,  1994)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940814)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7366,7 +7375,7 @@
 	</software>
 
 	<software name="tazmarspc" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Aug 15,  1994)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940815)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7377,7 +7386,7 @@
 	</software>
 
 	<software name="tazmarspd" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Aug 19,  1994)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940819)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7388,7 +7397,7 @@
 	</software>
 
 	<software name="tazmarspe" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Aug 23,  1994)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940823)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7399,7 +7408,7 @@
 	</software>
 
 	<software name="tazmarspf" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Aug 29,  1994 - B)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940829-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7410,7 +7419,7 @@
 	</software>
 
 	<software name="tazmarspg" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Aug 30,  1994)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940830)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7421,7 +7430,7 @@
 	</software>
 
 	<software name="tazmarsph" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - May 11,  1994)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940511)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7432,7 +7441,7 @@
 	</software>
 
 	<software name="tazmarspi" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Sep 02,  1994)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940902)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7443,7 +7452,7 @@
 	</software>
 
 	<software name="tazmarspj" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Sep 05,  1994 - B)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940905-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7454,7 +7463,7 @@
 	</software>
 
 	<software name="tazmarspk" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Sep 05,  1994 - C)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940905-C)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7465,7 +7474,7 @@
 	</software>
 
 	<software name="tazmarspl" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Sep 06,  1994 - D)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940906-D)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7476,7 +7485,7 @@
 	</software>
 
 	<software name="tazmarspm" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Sep 09,  1994 - B)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940909-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7487,7 +7496,7 @@
 	</software>
 
 	<software name="tazmarspn" cloneof="tazmars">
-		<description>Taz in Escape from Mars (Prototype - Sep 10,  1994)</description>
+		<description>Taz in Escape from Mars (Prototype, 19940910)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7520,7 +7529,7 @@
 	</software>
 
 	<software name="tempojrp" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype - Dec 05,  1994)</description>
+		<description>Tempo Jr. (Prototype, 19941205)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7531,7 +7540,7 @@
 	</software>
 
 	<software name="tempojrp1" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype - Dec 12,  1994)</description>
+		<description>Tempo Jr. (Prototype, 19941212)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7542,7 +7551,7 @@
 	</software>
 
 	<software name="tempojrp2" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype - Dec 26,  1994)</description>
+		<description>Tempo Jr. (Prototype, 19941226)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7553,7 +7562,7 @@
 	</software>
 
 	<software name="tempojrp3" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype - Feb 06,  1995)</description>
+		<description>Tempo Jr. (Prototype, 19950206)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7564,7 +7573,7 @@
 	</software>
 
 	<software name="tempojrp4" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype - Feb 15,  1995)</description>
+		<description>Tempo Jr. (Prototype, 19950215)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7575,7 +7584,7 @@
 	</software>
 
 	<software name="tempojrp5" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype - Jan 17,  1995)</description>
+		<description>Tempo Jr. (Prototype, 19950117)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7586,7 +7595,7 @@
 	</software>
 
 	<software name="tempojrp6" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype - Jan 20,  1995)</description>
+		<description>Tempo Jr. (Prototype, 19950120)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7597,7 +7606,7 @@
 	</software>
 
 	<software name="tempojrp7" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype - Jan 31,  1995)</description>
+		<description>Tempo Jr. (Prototype, 19950131)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7608,7 +7617,7 @@
 	</software>
 
 	<software name="tempojrp8" cloneof="tempojr">
-		<description>Tempo Jr. (Prototype - Nov 28,  1994)</description>
+		<description>Tempo Jr. (Prototype, 19941128)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7981,7 +7990,7 @@
 	</software>
 
 	<software name="worlds95p1" cloneof="worlds95">
-		<description>World Series Baseball '95 (Prototype - Jul 09,  1994)</description>
+		<description>World Series Baseball '95 (Prototype, 19940709)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7992,7 +8001,7 @@
 	</software>
 
 	<software name="worlds95p2" cloneof="worlds95">
-		<description>World Series Baseball '95 (Prototype - Jul 19,  1994)</description>
+		<description>World Series Baseball '95 (Prototype, 19940719)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8003,7 +8012,7 @@
 	</software>
 
 	<software name="worlds95p3" cloneof="worlds95">
-		<description>World Series Baseball '95 (Prototype - Jul 22,  1994)</description>
+		<description>World Series Baseball '95 (Prototype, 19940722)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8014,7 +8023,7 @@
 	</software>
 
 	<software name="worlds95p4" cloneof="worlds95">
-		<description>World Series Baseball '95 (Prototype - Jul 28,  1994)</description>
+		<description>World Series Baseball '95 (Prototype, 19940728)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8025,7 +8034,7 @@
 	</software>
 
 	<software name="worlds95p5" cloneof="worlds95">
-		<description>World Series Baseball '95 (Prototype - Jul 29,  1994)</description>
+		<description>World Series Baseball '95 (Prototype, 19940729)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8036,7 +8045,7 @@
 	</software>
 
 	<software name="worlds95p6" cloneof="worlds95">
-		<description>World Series Baseball '95 (Prototype - Jun 29,  1994)</description>
+		<description>World Series Baseball '95 (Prototype, 19940629)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8113,7 +8122,7 @@
 	</software>
 
 	<software name="xmengamlp1" cloneof="xmengaml">
-		<description>X-Men - Gamemaster's Legacy (Prototype - Aug 10,  1994)</description>
+		<description>X-Men - Gamemaster's Legacy (Prototype, 19940810)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8124,7 +8133,7 @@
 	</software>
 
 	<software name="xmengamlp2" cloneof="xmengaml">
-		<description>X-Men - Gamemaster's Legacy (Prototype - Aug 15,  1994)</description>
+		<description>X-Men - Gamemaster's Legacy (Prototype, 19940815)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8135,7 +8144,7 @@
 	</software>
 
 	<software name="xmengamlp3" cloneof="xmengaml">
-		<description>X-Men - Gamemaster's Legacy (Prototype 36 - Aug 31,  1994)</description>
+		<description>X-Men - Gamemaster's Legacy (Prototype 36, 19940831)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8146,7 +8155,7 @@
 	</software>
 
 	<software name="xmengamlp4" cloneof="xmengaml">
-		<description>X-Men - Gamemaster's Legacy (Prototype 51 - Sep 06,  1994)</description>
+		<description>X-Men - Gamemaster's Legacy (Prototype 51, 19940906)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8168,7 +8177,7 @@
 	</software>
 
 	<software name="xmenmojop1" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype - Jun 05,  1996)</description>
+		<description>X-Men - Mojo World (Prototype, 19960605)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8179,7 +8188,7 @@
 	</software>
 
 	<software name="xmenmojop2" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype - Jun 13,  1996)</description>
+		<description>X-Men - Mojo World (Prototype, 19960613)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8190,7 +8199,7 @@
 	</software>
 
 	<software name="xmenmojop3" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype - Jun 24,  1996)</description>
+		<description>X-Men - Mojo World (Prototype, 19960624)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8201,7 +8210,7 @@
 	</software>
 
 	<software name="xmenmojop4" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype - Jun 25,  1996)</description>
+		<description>X-Men - Mojo World (Prototype, 19960625)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8212,7 +8221,7 @@
 	</software>
 
 	<software name="xmenmojop5" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype - Jun 27,  1996)</description>
+		<description>X-Men - Mojo World (Prototype, 19960627)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8223,7 +8232,7 @@
 	</software>
 
 	<software name="xmenmojop6" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype - Jun 28,  1996)</description>
+		<description>X-Men - Mojo World (Prototype, 19960628)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8234,7 +8243,7 @@
 	</software>
 
 	<software name="xmenmojop7" cloneof="xmenmojo">
-		<description>X-Men - Mojo World (Prototype - Jun 29,  1996)</description>
+		<description>X-Men - Mojo World (Prototype, 19960629)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8256,7 +8265,7 @@
 	</software>
 
 	<software name="yogibear">
-		<description>Yogi Bear in Yogi Bear's Goldrush (Unknown) (Proto)</description>
+		<description>Yogi Bear in Yogi Bear's Goldrush (Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">

@@ -10,7 +10,7 @@ Are the following undumped?
 -->
 <softwarelist name="jaguar_cart" description="Atari Jaguar cartridges">
 	<software name="aircars" supported="no">
-		<description>Air Cars (World)</description>
+		<description>Air Cars</description>
 		<year>1997</year>
 		<publisher>ICD</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -21,7 +21,7 @@ Are the following undumped?
 	</software>
 
 	<software name="avsp" supported="no">
-		<description>Alien vs Predator (World)</description>
+		<description>Alien vs Predator</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -32,7 +32,7 @@ Are the following undumped?
 	</software>
 
 	<software name="atarikar" supported="no">
-		<description>Atari Karts (World)</description>
+		<description>Atari Karts</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -43,7 +43,7 @@ Are the following undumped?
 	</software>
 
 	<software name="mutntpng" supported="no">
-		<description>Attack of the Mutant Penguins (World)</description>
+		<description>Attack of the Mutant Penguins</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -54,7 +54,7 @@ Are the following undumped?
 	</software>
 
 	<software name="battlesp" supported="no">
-		<description>Battle Sphere Gold (World)</description>
+		<description>Battle Sphere Gold</description>
 		<year>2002</year>
 		<publisher>ScatoLOGIC</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -65,7 +65,7 @@ Are the following undumped?
 	</software>
 
 	<software name="brutalsp" supported="no">
-		<description>Brutal Sports Football (World)</description>
+		<description>Brutal Sports Football</description>
 		<year>1994</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -76,7 +76,7 @@ Are the following undumped?
 	</software>
 
 	<software name="bubsy" supported="no">
-		<description>Bubsy in Fractured Furry Tales (World)</description>
+		<description>Bubsy in Fractured Furry Tales</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -87,7 +87,7 @@ Are the following undumped?
 	</software>
 
 	<software name="cfodder" supported="no">
-		<description>Cannon Fodder (World)</description>
+		<description>Cannon Fodder</description>
 		<year>1995</year>
 		<publisher>Virgin Interactive</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -98,7 +98,7 @@ Are the following undumped?
 	</software>
 
 	<software name="chekflag" supported="no">
-		<description>Checkered Flag (World)</description>
+		<description>Checkered Flag</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -109,7 +109,7 @@ Are the following undumped?
 	</software>
 
 	<software name="clubdriv" supported="no">
-		<description>Club Drive (World)</description>
+		<description>Club Drive</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -120,7 +120,7 @@ Are the following undumped?
 	</software>
 
 	<software name="cybermor1" cloneof="cybermor" supported="no">
-		<description>Cybermorph (World, Rev. 1)</description>
+		<description>Cybermorph (Rev. 1)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -131,7 +131,7 @@ Are the following undumped?
 	</software>
 
 	<software name="cybermor" supported="no">
-		<description>Cybermorph (World, Rev. 2)</description>
+		<description>Cybermorph (Rev. 2)</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -142,7 +142,7 @@ Are the following undumped?
 	</software>
 
 	<software name="defender" supported="no">
-		<description>Defender 2000 (World)</description>
+		<description>Defender 2000</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -153,7 +153,7 @@ Are the following undumped?
 	</software>
 
 	<software name="doom" supported="no">
-		<description>Doom (World)</description>
+		<description>Doom</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -164,7 +164,7 @@ Are the following undumped?
 	</software>
 
 	<software name="ddragon5" supported="no">
-		<description>Double Dragon V - The Shadow Falls (World)</description>
+		<description>Double Dragon V - The Shadow Falls</description>
 		<year>1995</year>
 		<publisher>Tradewest</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -175,7 +175,7 @@ Are the following undumped?
 	</software>
 
 	<software name="dragon" supported="no">
-		<description>Dragon - The Bruce Lee Story (World)</description>
+		<description>Dragon - The Bruce Lee Story</description>
 		<year>1994</year>
 		<publisher>Virgin Interactibe</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -186,7 +186,7 @@ Are the following undumped?
 	</software>
 
 	<software name="dinodude" supported="no">
-		<description>Evolution - Dino Dudes (World)</description>
+		<description>Evolution - Dino Dudes</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -197,7 +197,7 @@ Are the following undumped?
 	</software>
 
 	<software name="feverpit" supported="no">
-		<description>Fever Pitch Soccer (World)</description>
+		<description>Fever Pitch Soccer</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -208,7 +208,7 @@ Are the following undumped?
 	</software>
 
 	<software name="fforlife1" cloneof="fforlife" supported="no">
-		<description>Fight for Life (World, Alt)</description>
+		<description>Fight for Life (Alt)</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -219,7 +219,7 @@ Are the following undumped?
 	</software>
 
 	<software name="fforlife" supported="no">
-		<description>Fight for Life (World)</description>
+		<description>Fight for Life</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -230,7 +230,7 @@ Are the following undumped?
 	</software>
 
 	<software name="flashbck" supported="no">
-		<description>Flashback - The Quest for Identity (World)</description>
+		<description>Flashback - The Quest for Identity</description>
 		<year>1995</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -241,7 +241,7 @@ Are the following undumped?
 	</software>
 
 	<software name="flipout" supported="no">
-		<description>Flip Out! (World)</description>
+		<description>Flip Out!</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -252,7 +252,7 @@ Are the following undumped?
 	</software>
 
 	<software name="hstrike" supported="no">
-		<description>Hover Strike (World)</description>
+		<description>Hover Strike</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -263,7 +263,7 @@ Are the following undumped?
 	</software>
 
 	<software name="hyperfor" supported="no">
-		<description>Hyper Force (World)</description>
+		<description>Hyper Force</description>
 		<year>2000</year>
 		<publisher>Songboard Productions</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -274,7 +274,7 @@ Are the following undumped?
 	</software>
 
 	<software name="iwar" supported="no">
-		<description>I-War (World)</description>
+		<description>I-War</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -285,7 +285,7 @@ Are the following undumped?
 	</software>
 
 	<software name="ironsold" supported="no">
-		<description>Iron Soldier (World, v1.04)</description>
+		<description>Iron Soldier (v1.04)</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -296,7 +296,7 @@ Are the following undumped?
 	</software>
 
 	<software name="ironsol2" supported="no">
-		<description>Iron Soldier 2 (World)</description>
+		<description>Iron Soldier 2</description>
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -307,7 +307,7 @@ Are the following undumped?
 	</software>
 
 	<software name="kasumi" supported="no">
-		<description>Kasumi Ninja (World)</description>
+		<description>Kasumi Ninja</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -318,7 +318,7 @@ Are the following undumped?
 	</software>
 
 	<software name="missilec" supported="no">
-		<description>Missile Command 3D (World)</description>
+		<description>Missile Command 3D</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -329,7 +329,7 @@ Are the following undumped?
 	</software>
 
 	<software name="nbajamte" supported="no">
-		<description>NBA Jam T.E. - Tournament Edition (World)</description>
+		<description>NBA Jam T.E. - Tournament Edition</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -340,7 +340,7 @@ Are the following undumped?
 	</software>
 
 	<software name="pinballf" supported="no">
-		<description>Pinball Fantasies (World)</description>
+		<description>Pinball Fantasies</description>
 		<year>1995</year>
 		<publisher>21st Century Entertainment</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -351,7 +351,7 @@ Are the following undumped?
 	</software>
 
 	<software name="pitfall" supported="no">
-		<description>Pitfall - The Mayan Adventure (World)</description>
+		<description>Pitfall - The Mayan Adventure</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -362,7 +362,7 @@ Are the following undumped?
 	</software>
 
 	<software name="pdrive" supported="no">
-		<description>Power Drive Rally (World)</description>
+		<description>Power Drive Rally</description>
 		<year>1995</year>
 		<publisher>Time Warner Interactive</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -373,7 +373,7 @@ Are the following undumped?
 	</software>
 
 	<software name="protect" supported="no">
-		<description>Protector - Special Edition (World)</description>
+		<description>Protector - Special Edition</description>
 		<year>2002</year>
 		<publisher>Songbird Productions</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -384,7 +384,7 @@ Are the following undumped?
 	</software>
 
 	<software name="raiden" supported="no">
-		<description>Raiden (World)</description>
+		<description>Raiden</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -395,7 +395,7 @@ Are the following undumped?
 	</software>
 
 	<software name="rayman" supported="no">
-		<description>Rayman (World)</description>
+		<description>Rayman</description>
 		<year>1995</year>
 		<publisher>Ubisoft</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -406,7 +406,7 @@ Are the following undumped?
 	</software>
 
 	<software name="ruinerp" supported="no">
-		<description>Ruiner Pinball (World)</description>
+		<description>Ruiner Pinball</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -417,7 +417,7 @@ Are the following undumped?
 	</software>
 
 	<software name="sensible" supported="no">
-		<description>Sensible Soccer - International Edition (World)</description>
+		<description>Sensible Soccer - International Edition</description>
 		<year>199?</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -428,7 +428,7 @@ Are the following undumped?
 	</software>
 
 	<software name="skyhamm" supported="no">
-		<description>Skyhammer (World)</description>
+		<description>Skyhammer</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -439,7 +439,7 @@ Are the following undumped?
 	</software>
 
 	<software name="soccerkd" supported="no">
-		<description>Soccer Kid (World)</description>
+		<description>Soccer Kid</description>
 		<year>2000</year>
 		<publisher>Songbird Productions</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -450,7 +450,7 @@ Are the following undumped?
 	</software>
 
 	<software name="spacewar" supported="no">
-		<description>Space War 2000 (World)</description>
+		<description>Space War 2000</description>
 		<year>2001</year>
 		<publisher>B&amp;C Computervisions</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -461,7 +461,7 @@ Are the following undumped?
 	</software>
 
 	<software name="sburnout" supported="no">
-		<description>Super Burnout (World)</description>
+		<description>Super Burnout</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -472,7 +472,7 @@ Are the following undumped?
 	</software>
 
 	<software name="superx3d" supported="no">
-		<description>SuperCross 3D (World)</description>
+		<description>SuperCross 3D</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -483,7 +483,7 @@ Are the following undumped?
 	</software>
 
 	<software name="syndicat" supported="no">
-		<description>Syndicate (World)</description>
+		<description>Syndicate</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -494,7 +494,7 @@ Are the following undumped?
 	</software>
 
 	<software name="tempst2k" supported="no">
-		<description>Tempest 2000 (World)</description>
+		<description>Tempest 2000</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -505,7 +505,7 @@ Are the following undumped?
 	</software>
 
 	<software name="themeprk" supported="no">
-		<description>Theme Park (World)</description>
+		<description>Theme Park</description>
 		<year>1995</year>
 		<publisher>Ocean</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -516,7 +516,7 @@ Are the following undumped?
 	</software>
 
 	<software name="totalcar" supported="no">
-		<description>Total Carnage (World)</description>
+		<description>Total Carnage</description>
 		<year>2005</year>
 		<publisher>Songbird Productions</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -527,7 +527,7 @@ Are the following undumped?
 	</software>
 
 	<software name="towers2" supported="no">
-		<description>Towers II - Plight of the Stargazer (World)</description>
+		<description>Towers II - Plight of the Stargazer</description>
 		<year>1996</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -538,7 +538,7 @@ Are the following undumped?
 	</software>
 
 	<software name="trevmcfr" supported="no">
-		<description>Trevor McFur in the Crescent Galaxy (World)</description>
+		<description>Trevor McFur in the Crescent Galaxy</description>
 		<year>1993</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -549,7 +549,7 @@ Are the following undumped?
 	</software>
 
 	<software name="troyaik" supported="no">
-		<description>Troy Aikman NFL Football (World)</description>
+		<description>Troy Aikman NFL Football</description>
 		<year>1995</year>
 		<publisher>Williams Entertainment</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -560,7 +560,7 @@ Are the following undumped?
 	</software>
 
 	<software name="ultravor1" cloneof="ultravor" supported="no">
-		<description>Ultra Vortek (World, v0.94 Prototype)</description>
+		<description>Ultra Vortek (v0.94, Prototype)</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -571,7 +571,7 @@ Are the following undumped?
 	</software>
 
 	<software name="ultravor" supported="no">
-		<description>Ultra Vortek (World)</description>
+		<description>Ultra Vortek</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -582,7 +582,7 @@ Are the following undumped?
 	</software>
 
 	<software name="valdiser" supported="no">
-		<description>Val d'Is&#232;re Skiing and Snowboarding (World)</description>
+		<description>Val d'Is&#232;re Skiing and Snowboarding</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -593,7 +593,7 @@ Are the following undumped?
 	</software>
 
 	<software name="whitemen" supported="no">
-		<description>White Men Can't Jump (World)</description>
+		<description>White Men Can't Jump</description>
 		<year>1995</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -604,7 +604,7 @@ Are the following undumped?
 	</software>
 
 	<software name="wolfn3d" supported="no">
-		<description>Wolfenstein 3D (World)</description>
+		<description>Wolfenstein 3D</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -615,7 +615,7 @@ Are the following undumped?
 	</software>
 
 	<software name="worms" supported="no">
-		<description>Worms (World)</description>
+		<description>Worms</description>
 		<year>1998</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -626,7 +626,7 @@ Are the following undumped?
 	</software>
 
 	<software name="zero5" supported="no">
-		<description>Zero 5 (World)</description>
+		<description>Zero 5</description>
 		<year>1997</year>
 		<publisher>Telegames</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -637,7 +637,7 @@ Are the following undumped?
 	</software>
 
 	<software name="zool2" supported="no">
-		<description>Zool 2 (World)</description>
+		<description>Zool 2</description>
 		<year>1994</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">
@@ -648,7 +648,7 @@ Are the following undumped?
 	</software>
 
 	<software name="zoop" supported="no">
-		<description>Zoop! (World)</description>
+		<description>Zoop!</description>
 		<year>1996</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="jaguar_cart">

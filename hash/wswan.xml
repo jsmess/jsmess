@@ -17,7 +17,7 @@
 	</software>
 
 	<software name="anotherh">
-		<description>Another Heaven - Memory of those Days (Jpn)</description>
+		<description>Another Heaven - Memory of those Days</description>
 		<year>200?</year>
 		<publisher>unknown</publisher>
 		<!-- <serial></serial> -->
@@ -30,7 +30,7 @@
 	</software>
 
 	<software name="arclad">
-		<description>Arc the Lad - Kishin Fukkatsu (Jpn)</description>
+		<description>Arc the Lad - Kishin Fukkatsu</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -69,7 +69,7 @@
 	</software>
 
 	<software name="battlesp">
-		<description>Battle Spirit - Digimon Frontier (Jpn)</description>
+		<description>Battle Spirit - Digimon Frontier</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -218,7 +218,7 @@
 	</software>
 
 	<software name="crshgear">
-		<description>Gekitou! Crash Gear Turbo - Gear Champion League (Jpn)</description>
+		<description>Gekitou! Crash Gear Turbo - Gear Champion League</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -270,7 +270,7 @@
 	</software>
 
 	<software name="dicing">
-		<description>Dicing Knight. (Jpn)</description>
+		<description>Dicing Knight.</description>
 		<year>20??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -309,7 +309,7 @@
 	</software>
 
 	<software name="digianca">
-		<description>Digimon - Anode Tamer &amp; Cathode Tamer (Asia)</description>
+		<description>Digimon - Anode Tamer &amp; Cathode Tamer</description>
 		<year>19??</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<!-- <serial>SWJ-BAN001</serial> -->
@@ -362,7 +362,7 @@
 	</software>
 
 	<software name="digimdp">
-		<description>Digital Monster - D-Project (Jpn)</description>
+		<description>Digital Monster - D-Project</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -504,7 +504,7 @@
 	</software>
 
 	<software name="dragball">
-		<description>Dragon Ball (Jpn)</description>
+		<description>Dragon Ball</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -682,7 +682,7 @@
 	</software>
 
 	<software name="frontmis">
-		<description>Front Mission (Jpn)</description>
+		<description>Front Mission</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -828,7 +828,7 @@
 	</software>
 
 	<software name="gundseed">
-		<description>Kidou Senshi Gundam Seed (Jpn)</description>
+		<description>Kidou Senshi Gundam Seed</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -839,7 +839,7 @@
 	</software>
 
 	<software name="gundtoku">
-		<description>Kidou Senshi Gundam - Giren no Yabou - Tokubetsu Hen - Aoki Hoshi no Hasha (Jpn)</description>
+		<description>Kidou Senshi Gundam - Giren no Yabou - Tokubetsu Hen - Aoki Hoshi no Hasha</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -877,7 +877,7 @@
 	</software>
 
 	<software name="gundvol3">
-		<description>Kidou Senshi Gundam Vol. 3 - A Baoa Qu (Jpn)</description>
+		<description>Kidou Senshi Gundam Vol. 3 - A Baoa Qu</description>
 		<year>20??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -983,7 +983,7 @@
 	</software>
 
 	<software name="hxhgrisl">
-		<description>Hunter X Hunter - Greed Island (Jpn)</description>
+		<description>Hunter X Hunter - Greed Island</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1034,7 +1034,7 @@
 	</software>
 
 	<software name="inuyfema">
-		<description>Inuyasha - Fuuun Emaki (Jpn)</description>
+		<description>Inuyasha - Fuuun Emaki</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1058,7 +1058,7 @@
 	</software>
 
 	<software name="inuykyum">
-		<description>Inuyasha - Kagome no Yume Nikki (Jpn)</description>
+		<description>Inuyasha - Kagome no Yume Nikki</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1082,7 +1082,7 @@
 	</software>
 
 	<software name="jsilver">
-		<description>Judgement Silversword - Rebirth Edition (Jpn, Rev. 4321)</description>
+		<description>Judgement Silversword - Rebirth Edition (Rev. 4321)</description>
 		<year>200?</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1093,7 +1093,7 @@
 	</software>
 
 	<software name="jsilver1" cloneof="jsilver">
-		<description>Judgement Silversword - Rebirth Edition (Jpn, Rev. SC21)</description>
+		<description>Judgement Silversword - Rebirth Edition (Rev. SC21)</description>
 		<year>200?</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1130,7 +1130,7 @@
 	</software>
 
 	<software name="kikuchou">
-		<description>Kinnikuman IIsei - Choujin Seisenshi (Jpn)</description>
+		<description>Kinnikuman IIsei - Choujin Seisenshi</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1474,7 +1474,7 @@
 	</software>
 
 	<software name="mobilewg">
-		<description>MobileWonderGate (Jpn)</description>
+		<description>MobileWonderGate</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1538,7 +1538,7 @@
 	</software>
 
 	<software name="naruto">
-		<description>Naruto - Konoha Ninpouchou (Jpn)</description>
+		<description>Naruto - Konoha Ninpouchou</description>
 		<year>19??</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1605,7 +1605,7 @@
 	</software>
 
 	<software name="onepbatl">
-		<description>From TV Animation One Piece - Grand Battle Swan Colosseum (Jpn)</description>
+		<description>From TV Animation One Piece - Grand Battle Swan Colosseum</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1616,7 +1616,7 @@
 	</software>
 
 	<software name="onepchop">
-		<description>From TV Animation One Piece - Chopper no Daibouken (Jpn)</description>
+		<description>From TV Animation One Piece - Chopper no Daibouken</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1667,7 +1667,7 @@
 	</software>
 
 	<software name="oneptwr2">
-		<description>From TV Animation One Piece - Treasure Wars 2 - Buggy Land e Youkoso (Jpn)</description>
+		<description>From TV Animation One Piece - Treasure Wars 2 - Buggy Land e Youkoso</description>
 		<year>20??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1775,7 +1775,7 @@
 	</software>
 
 	<software name="riviera">
-		<description>Riviera - Yakusoku no Chi Riviera (Jpn)</description>
+		<description>Riviera - Yakusoku no Chi Riviera</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1827,7 +1827,7 @@
 	</software>
 
 	<software name="robotc3">
-		<description>Super Robot Taisen Compact 3 (Jpn, v1.5)</description>
+		<description>Super Robot Taisen Compact 3 (v1.5)</description>
 		<year>20??</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1838,7 +1838,7 @@
 	</software>
 
 	<software name="robotc3a" cloneof="robotc3">
-		<description>Super Robot Taisen Compact 3 (Jpn, v1.6)</description>
+		<description>Super Robot Taisen Compact 3 (v1.6)</description>
 		<year>20??</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1914,7 +1914,7 @@
 	</software>
 
 	<software name="rockmnex">
-		<description>Rockman EXE WS (Jpn)</description>
+		<description>Rockman EXE WS</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -1925,7 +1925,7 @@
 	</software>
 
 	<software name="rockmnxn">
-		<description>Rockman EXE - N1 Battle (Jpn)</description>
+		<description>Rockman EXE - N1 Battle</description>
 		<year>20??</year>
 		<publisher>unknown</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -2044,7 +2044,7 @@
 	</software>
 
 	<software name="sdgundg2">
-		<description>SD Gundam G-Generation - Mono-Eye Gundams (Jpn)</description>
+		<description>SD Gundam G-Generation - Mono-Eye Gundams</description>
 		<year>20??</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -2095,7 +2095,7 @@
 	</software>
 
 	<software name="senkai">
-		<description>Senkaiden - TV Animation Senkaiden Houshin Engi Yori (Jpn)</description>
+		<description>Senkaiden - TV Animation Senkaiden Houshin Engi Yori</description>
 		<!--<release_date>2000-02-24</release_date>-->
 		<year>2000</year>
 		<publisher>Bandai Co., Ltd.</publisher>
@@ -2137,7 +2137,7 @@
 	</software>
 
 	<software name="shamking">
-		<description>Shaman King - Asu e no Ishi (Jpn, v1.1)</description>
+		<description>Shaman King - Asu e no Ishi (v1.1)</description>
 		<year>20??</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -2148,7 +2148,7 @@
 	</software>
 
 	<software name="shamking1" cloneof="shamking">
-		<description>Shaman King - Asu e no Ishi (Jpn)</description>
+		<description>Shaman King - Asu e no Ishi</description>
 		<year>20??</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -2279,7 +2279,7 @@
 	</software>
 
 	<software name="sseiya">
-		<description>Saint Seiya - Ougon Densetsu Hen - Perfect Edition (Jpn)</description>
+		<description>Saint Seiya - Ougon Densetsu Hen - Perfect Edition</description>
 		<year>20??</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -2303,7 +2303,7 @@
 	</software>
 
 	<software name="starheartai" cloneof="starhear">
-		<description>Star Hearts - Hoshi to Daichi no Shisha - Taikenban (Jpn)</description>
+		<description>Star Hearts - Hoshi to Daichi no Shisha - Taikenban</description>
 		<year>2001</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -2327,7 +2327,7 @@
 	</software>
 
 	<software name="suprwars">
-		<description>Namco Super Wars (Jpn)</description>
+		<description>Namco Super Wars</description>
 		<year>19??</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<part name="cart" interface="wswan_cart">
@@ -2406,7 +2406,7 @@
 	</software>
 
 	<software name="tetris">
-		<description>Tetris (Jpn)</description>
+		<description>Tetris</description>
 		<year>19??</year>
 		<publisher>Bandai Co., Ltd.</publisher>
 		<part name="cart" interface="wswan_cart">

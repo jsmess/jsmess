@@ -101,7 +101,7 @@
 	</software>
 
 	<software name="pokezcrd">
-		<description>Pok&#233;mon Zany Cards (France)</description>
+		<description>Pok&#233;mon Zany Cards (Fra)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="pokemini_cart">
@@ -112,7 +112,7 @@
 	</software>
 
 	<software name="pokezcrdg" cloneof="pokezcrd">
-		<description>Pok&#233;mon Zany Cards (Germany)</description>
+		<description>Pok&#233;mon Zany Cards (Ger)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="pokemini_cart">
@@ -310,7 +310,7 @@
 	</software>
 
 	<software name="ppuzzlcfp" cloneof="ppuzzlc">
-		<description>Pok&#233;mon Puzzle Collection (France, GameCube Preview)</description>
+		<description>Pok&#233;mon Puzzle Collection (Fra, GameCube Preview)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="pokemini_cart">
@@ -321,7 +321,7 @@
 	</software>
 
 	<software name="ppuzzlcg" cloneof="ppuzzlc">
-		<description>Pok&#233;mon Puzzle Collection (Germany)</description>
+		<description>Pok&#233;mon Puzzle Collection (Ger)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="pokemini_cart">
@@ -332,7 +332,7 @@
 	</software>
 
 	<software name="ppuzzlcgp" cloneof="ppuzzlc">
-		<description>Pok&#233;mon Puzzle Collection (Germany, GameCube Preview)</description>
+		<description>Pok&#233;mon Puzzle Collection (Ger, GameCube Preview)</description>
 		<year>2001</year>
 		<publisher>Nintendo</publisher>
 		<part name="cart" interface="pokemini_cart">

@@ -3,7 +3,7 @@
 <softwarelist name="sms" description="Sega Master System cartridges">
 	<!-- Id: 0002 -->
 	<software name="20embr">
-		<description>20 em 1 (Brazil)</description>
+		<description>20 em 1 (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -14,7 +14,7 @@
 	</software>
 
 	<software name="3dragon">
-		<description>The Three Dragon Story (Korea)</description>
+		<description>The Three Dragon Story (Kor)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -188,7 +188,7 @@
 	</software>
 
 	<software name="alexkiddb" cloneof="alexkidd">
-		<description>Alex Kidd in Miracle World (Brazil, v1.1, Pirate)</description>
+		<description>Alex Kidd in Miracle World (Bra, v1.1, Pirate)</description>
 		<year>1986</year>
 		<publisher>&lt;pirate&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -355,7 +355,7 @@
 
 	<!-- Id: 026.350 - Releases: 1997 (BRA) -->
 	<software name="arielmer">
-		<description>Ariel - The Little Mermaid (Brazil)</description>
+		<description>Ariel - The Little Mermaid (Bra)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -580,7 +580,7 @@
 
 	<!-- Id: 025470 - Notes: Title screen says "Baku Baku Animal" -->
 	<software name="bakubaku">
-		<description>Baku Baku(Brazil)</description>
+		<description>Baku Baku(Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -663,7 +663,7 @@
 
 	<!-- Id: 027-370 -->
 	<software name="battlem">
-		<description>Battlemaniacs (Brazil)</description>
+		<description>Battlemaniacs (Bra)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -757,7 +757,7 @@
 
 	<!-- Id: 028600 -->
 	<software name="bonkers">
-		<description>Bonkers Wax Up! (Brazil)</description>
+		<description>Bonkers Wax Up! (Bra)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -838,7 +838,7 @@
 	</software>
 
 	<software name="calgame2b" cloneof="calgame2">
-		<description>California Games II (Brazil, Korea)</description>
+		<description>California Games II (Bra, Kor)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -897,7 +897,7 @@
 
 	<!-- Id: 028.720 -->
 	<software name="castelo">
-		<description>Castelo Ra-Tim-Bum (Brazil)</description>
+		<description>Castelo Ra-Tim-Bum (Bra)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -955,7 +955,7 @@
 
 	<!-- Id: 023430 -->
 	<software name="chapolim">
-		<description>Chapolim x Dracula - Um Duelo Assustador (Brazil)</description>
+		<description>Chapolim x Dracula - Um Duelo Assustador (Bra)</description>
 		<year>1990</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1049,7 +1049,7 @@
 	</software>
 
 	<software name="chukrck2b" cloneof="chukrck2">
-		<description>Chuck Rock II - Son of Chuck (Brazil)</description>
+		<description>Chuck Rock II - Son of Chuck (Bra)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1189,7 +1189,7 @@
 	</software>
 
 	<software name="dallye">
-		<description>Dallyeora Pigu-Wang (Korea)</description>
+		<description>Dallyeora Pigu-Wang (Kor)</description>
 		<year>1995</year>
 		<publisher>Game Line</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1283,7 +1283,7 @@
 	</software>
 
 	<software name="dinodool">
-		<description>The Dinosaur Dooley (Korea)</description>
+		<description>The Dinosaur Dooley (Kor)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1301,6 +1301,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="doki doki penguin land - uchuu daibouken (japan).bin" size="131072" crc="2bcdb8fa" sha1="c01cf44eee335d509dc20a165add8514e7fbb7c4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dokidokip" cloneof="penguin">
+		<description>Doki Doki Penguin Land - Uchuu Daibouken (Jpn, Prototype)</description>
+		<year>1987</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="doki doki penguin land - uchuu daibouken (japan).bin" size="131072" crc="56bd2455" sha1="c56417efd78a332a35e4d0e87c7b13c20da85391" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1365,7 +1376,7 @@
 	</software>
 
 	<software name="drhello">
-		<description>Dr. HELLO (Korea)</description>
+		<description>Dr. HELLO (Kor)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1437,7 +1448,7 @@
 
 	<!-- Id: 028.570 -->
 	<software name="dynahead">
-		<description>Dynamite Headdy (Brazil)</description>
+		<description>Dynamite Headdy (Bra)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1461,7 +1472,7 @@
 
 	<!-- Id: 028.630 -->
 	<software name="eccotide">
-		<description>Ecco - The Tides of Time (Brazil)</description>
+		<description>Ecco - The Tides of Time (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1473,7 +1484,7 @@
 
 	<!-- Id: 028.690 -->
 	<software name="ejim">
-		<description>Earthworm Jim (Brazil)</description>
+		<description>Earthworm Jim (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1693,7 +1704,7 @@
 	</software>
 
 	<software name="felipe">
-		<description>Felipe em Acao (Brazil)</description>
+		<description>Felipe em Acao (Bra)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1705,7 +1716,7 @@
 
 	<!-- Id: 028.660 -->
 	<software name="ferias">
-		<description>Ferias Frustradas do Pica Pau (Brazil)</description>
+		<description>Ferias Frustradas do Pica Pau (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1717,7 +1728,7 @@
 
 	<!-- Id: 028.670 -->
 	<software name="fifa">
-		<description>FIFA International Soccer (Brazil)</description>
+		<description>FIFA International Soccer (Bra)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1741,7 +1752,7 @@
 
 	<!-- Id: 027.360 -->
 	<software name="fireice">
-		<description>Fire &amp; Ice (Brazil)</description>
+		<description>Fire &amp; Ice (Bra)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1823,7 +1834,7 @@
 	</software>
 
 	<software name="gaegujan">
-		<description>Gaegujangi Ggachi (Korea)</description>
+		<description>Gaegujangi Ggachi (Kor)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1893,7 +1904,7 @@
 	</software>
 
 	<software name="gamebox">
-		<description>Game Box Serie Esportes Radicais (Brazil)</description>
+		<description>Game Box Serie Esportes Radicais (Bra)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -1952,7 +1963,7 @@
 	</software>
 
 	<software name="gerald" cloneof="teddyboy">
-		<description>Geraldinho (Brazil)</description>
+		<description>Geraldinho (Bra)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2451,7 +2462,7 @@
 	</software>
 
 	<software name="hwaran">
-		<description>Hwarang Ui Geom (Korea)</description>
+		<description>Hwarang Ui Geom (Kor)</description>
 		<year>1988</year>
 		<publisher>Samsung</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2567,7 +2578,7 @@
 	</software>
 
 	<software name="jb007b" cloneof="jb007">
-		<description>James Bond 007 - The Duel (Brazil)</description>
+		<description>James Bond 007 - The Duel (Bra)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -2733,7 +2744,7 @@
 
 	<!-- Id: 028750 -->
 	<software name="legndill">
-		<description>Legend of Illusion Starring Mickey Mouse (Brazil)</description>
+		<description>Legend of Illusion Starring Mickey Mouse (Bra)</description>
 		<year>1994</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3014,7 +3025,7 @@
 
 	<!-- Id: 028.700 -->
 	<software name="mickeyuc">
-		<description>Mickey's Ultimate Challenge (Brazil)</description>
+		<description>Mickey's Ultimate Challenge (Bra)</description>
 		<year>1998</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3108,7 +3119,7 @@
 
 	<!-- Id: 028730 -->
 	<software name="mk3b">
-		<description>Mortal Kombat 3 (Brazil)</description>
+		<description>Mortal Kombat 3 (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3119,7 +3130,7 @@
 	</software>
 
 	<software name="monica">
-		<description>Monica no Castelo do Dragao (Brazil)</description>
+		<description>Monica no Castelo do Dragao (Bra)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3292,7 +3303,7 @@
 	</software>
 
 	<software name="olympik" cloneof="olympi">
-		<description>Olympic Gold (Korea)</description>
+		<description>Olympic Gold (Kor)</description>
 		<year>1992</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3468,7 +3479,7 @@
 	</software>
 
 	<software name="pitfightb" cloneof="pitfight">
-		<description>Pit Fighter (Brazil)</description>
+		<description>Pit Fighter (Bra)</description>
 		<year>1991</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3595,7 +3606,7 @@
 	</software>
 
 	<software name="pstarb" cloneof="pstar">
-		<description>Phantasy Star (Brazil)</description>
+		<description>Phantasy Star (Bra)</description>
 		<year>1987</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3629,7 +3640,7 @@
 	</software>
 
 	<software name="pstark" cloneof="pstar">
-		<description>Phantasy Star (Korea)</description>
+		<description>Phantasy Star (Kor)</description>
 		<year>1987</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3700,7 +3711,7 @@
 
 	<!-- Id: 028.540 -->
 	<software name="questfsy">
-		<description>Quest for the Shaven Yak Starring Ren Hoek &amp; Stimpy (Brazil)</description>
+		<description>Quest for the Shaven Yak Starring Ren Hoek &amp; Stimpy (Bra)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3723,7 +3734,7 @@
 	</software>
 
 	<software name="rainbowb" cloneof="rainbow">
-		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Brazil)</description>
+		<description>Rainbow Islands - The Story of Bubble Bobble 2 (Bra)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3937,7 +3948,7 @@
 	</software>
 
 	<software name="sangok3">
-		<description>Sangokushi 3 (Korea)</description>
+		<description>Sangokushi 3 (Kor)</description>
 		<year>1994</year>
 		<publisher>Game Line</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3948,7 +3959,7 @@
 	</software>
 
 	<software name="sapomestr" cloneof="psychof">
-		<description>Sapo Xul&#233; - O Mestre do Kung Fu (Brazil)</description>
+		<description>Sapo Xul&#233; - O Mestre do Kung Fu (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3959,7 +3970,7 @@
 	</software>
 
 	<software name="saposos" cloneof="astrow">
-		<description>Sapo Xul&#233; - S.O.S Lagoa Poluida (Brazil)</description>
+		<description>Sapo Xul&#233; - S.O.S Lagoa Poluida (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -3970,7 +3981,7 @@
 	</software>
 
 	<software name="sapoxu">
-		<description>Sapo Xul&#233; vs. Os Invasores do Brejo (Brazil)</description>
+		<description>Sapo Xul&#233; vs. Os Invasores do Brejo (Bra)</description>
 		<year>1995</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4145,7 +4156,7 @@
 
 	<!-- Id: 030.010 -->
 	<software name="sf2">
-		<description>Street Fighter II (Brazil)</description>
+		<description>Street Fighter II (Bra)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4273,7 +4284,7 @@
 	</software>
 
 	<software name="sitio">
-		<description>Sitio do Picapau Amarelo (Brazil)</description>
+		<description>Sitio do Picapau Amarelo (Bra)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4285,18 +4296,7 @@
 
 	<!-- Id: 7035 -->
 	<software name="slapshot">
-		<description>Slap Shot (Euro)</description>
-		<year>1990</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sms_cart">
-			<dataarea name="rom" size="262144">
-				<rom name="slap shot (europe).bin" size="262144" crc="d33b296a" sha1="5979ee84570f7c930f20be473e895fc1d2b9e3f4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="slapshotu" cloneof="slapshot">
-		<description>Slap Shot (USA, v1.1)</description>
+		<description>Slap Shot (USA, v1.2)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4306,13 +4306,35 @@
 		</part>
 	</software>
 
-	<software name="slapshotu1" cloneof="slapshot">
+	<software name="slapshota" cloneof="slapshot">
+		<description>Slap Shot (Euro, v1.1)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="slap shot (europe).bin" size="262144" crc="d33b296a" sha1="5979ee84570f7c930f20be473e895fc1d2b9e3f4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slapshotb" cloneof="slapshot">
 		<description>Slap Shot (USA)</description>
 		<year>1990</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="slap shot (usa).bin" size="262144" crc="c93bd0e9" sha1="6327fb7129ecfcebdcd6b9c941703fda15a8a195" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="slapshotp" cloneof="slapshot">
+		<description>Slap Shot (Prototype)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="slap shot (usa).bin" size="262144" crc="fbb0a92a" sha1="44e39176cb012f07844ec3b44244c1197f619ff5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4340,8 +4362,19 @@
 		</part>
 	</software>
 
+	<software name="smgpp" cloneof="smgp">
+		<description>Super Monaco GP (Euro, Prototype)</description>
+		<year>1990</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="super monaco gp (proto).bin" size="262144" crc="a1d6d963" sha1="f748e43d99f86eb8204b7f7b31991a454f12586a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sms3samp">
-		<description>Promocao Especial M. System III Compact (Brazil, Sample)</description>
+		<description>Promocao Especial M. System III Compact (Bra, Sample)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4412,7 +4445,7 @@
 
 	<!-- Id: 030.030 -->
 	<software name="sonicbl">
-		<description>Sonic Blast (Brazil)</description>
+		<description>Sonic Blast (Bra)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4694,7 +4727,7 @@
 	</software>
 
 	<software name="suhocheo">
-		<description>Suho Cheonsha (Korea)</description>
+		<description>Suho Cheonsha (Kor)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4847,7 +4880,7 @@
 
 	<!-- Id: 028.620 -->
 	<software name="tazmars">
-		<description>Taz in Escape from Mars (Brazil)</description>
+		<description>Taz in Escape from Mars (Bra)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -4974,7 +5007,7 @@
 	</software>
 
 	<software name="termntrb">
-		<description>The Terminator (Brazil)</description>
+		<description>The Terminator (Bra)</description>
 		<year>1992</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5055,7 +5088,7 @@
 	</software>
 
 	<software name="totowld3">
-		<description>Toto World 3 (Korea)</description>
+		<description>Toto World 3 (Kor)</description>
 		<year>1993</year>
 		<publisher>Open Corp.</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5077,7 +5110,7 @@
 	</software>
 
 	<software name="treinam">
-		<description>Treinamento Do Mymo (Brazil)</description>
+		<description>Treinamento Do Mymo (Bra)</description>
 		<year>19??</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5100,7 +5133,7 @@
 	</software>
 
 	<software name="ttoriui">
-		<description>Ttoriui Moheom  (Korea)</description>
+		<description>Ttoriui Moheom  (Kor)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5112,7 +5145,7 @@
 
 	<!-- Id: 026.260 -->
 	<software name="turmamon" cloneof="wboy3">
-		<description>Turma da Monica em O Resgate (Brazil)</description>
+		<description>Turma da Monica em O Resgate (Bra)</description>
 		<year>1993</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5123,7 +5156,7 @@
 	</software>
 
 	<software name="tvcolos" cloneof="asterix">
-		<description>As Aventuras da TV Colosso (Brazil)</description>
+		<description>As Aventuras da TV Colosso (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5181,7 +5214,7 @@
 
 	<!-- Id: 030.020 -->
 	<software name="vf">
-		<description>Virtua Fighter Animation (Brazil)</description>
+		<description>Virtua Fighter Animation (Bra)</description>
 		<year>1997</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5403,7 +5436,7 @@
 	</software>
 
 	<software name="winterolb" cloneof="winterol">
-		<description>Winter Olympics - Lillehammer '94 (Brazil)</description>
+		<description>Winter Olympics - Lillehammer '94 (Bra)</description>
 		<year>1993</year>
 		<publisher>U.S. Gold</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5520,7 +5553,7 @@
 	</software>
 
 	<software name="wwrldb" cloneof="wwrld">
-		<description>Where in the World is Carmen Sandiego (Brazil)</description>
+		<description>Where in the World is Carmen Sandiego (Bra)</description>
 		<year>1989</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">
@@ -5555,7 +5588,7 @@
 	</software>
 
 	<software name="xmenmojo">
-		<description>X-Men - Mojo World (Brazil)</description>
+		<description>X-Men - Mojo World (Bra)</description>
 		<year>1996</year>
 		<publisher>Tec Toy</publisher>
 		<part name="cart" interface="sms_cart">

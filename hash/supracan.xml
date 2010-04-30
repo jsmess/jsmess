@@ -4,7 +4,7 @@
 	<!-- F001 - Fomosa Duel -->
 	
 	<!-- F002 -->
-	<software name="sangofgt" supported="yes">
+	<software name="sangofgt">
 		<description>Sango Fighter</description>
 		<year>1995</year>
 		<publisher>Panda Entertainment Technology</publisher>
@@ -47,7 +47,7 @@
 	</software>
 
 	<!-- F008 -->
-	<software name="monopoly" supported="yes">
+	<software name="monopoly">
 		<description>Monopoly: Adventure in Africa</description>
 		<year>1995</year>
 		<publisher>Panda Entertainment Technology</publisher>
@@ -63,7 +63,7 @@
 	<!-- F010 - Magical Pool -->
 
 	<!-- F011 -->
-	<software name="boomzoo" supported="yes">
+	<software name="boomzoo">
 		<description>Boom Zoo</description>
 		<year>1996</year>
 		<publisher>Funtech</publisher>
