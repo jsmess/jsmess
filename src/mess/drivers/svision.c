@@ -470,12 +470,14 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 		if (size > memory_region_length(image->machine, "user1"))
 		{
 			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			auto_free(image->machine, temp_copy);
 			return INIT_FAIL;
 		}
 		
 		if (image_fread(image, temp_copy, size) != size)
 		{
 			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			auto_free(image->machine, temp_copy);
 			return INIT_FAIL;
 		}
 	}

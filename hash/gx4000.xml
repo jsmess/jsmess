@@ -117,7 +117,7 @@
 	</software>
 
 	<!-- doesn't boot -->
-	<software name="noexit">
+	<software name="noexit" supported="no">
 		<description>No Exit</description>
 		<year>1990</year>
 		<publisher>CVS</publisher>
@@ -129,7 +129,7 @@
 	</software>
 
 	<!-- doesn't boot -->
-	<software name="othunder">
+	<software name="othunder" supported="no">
 		<description>Operation Thunderbolt</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>
@@ -198,7 +198,7 @@
 	</software>
 
 	<!-- doesn't boot -->
-	<software name="robocop2">
+	<software name="robocop2" supported="no">>
 		<description>Robocop 2</description>
 		<year>1990</year>
 		<publisher>Ocean Software</publisher>

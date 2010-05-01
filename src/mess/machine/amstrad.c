@@ -3489,109 +3489,127 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 	//                'cb01' represent Cartridge block 1, and is loaded to &4000-&7fff
 	//                ... and so on.
 
-	unsigned char header[12];  // RIFF chunk
-	char chunkid[4];  // chunk ID (4 character code - cb00, cb01, cb02... upto cb31 (max 512kB), other chunks are ignored)
-	char chunklen[4];  // chunk length (always little-endian)
-	int chunksize;  // chunk length, calcaulated from the above
-	int ramblock;  // 16k RAM block chunk is to be loaded in to
-	int result;
-	unsigned int bytes_to_read;  // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
+	UINT32 size, offset = 0;
+	UINT8 *temp_copy;
+	unsigned char header[12];     // RIFF chunk
+	char chunkid[4];              // chunk ID (4 character code - cb00, cb01, cb02... upto cb31 (max 512kB), other chunks are ignored)
+	char chunklen[4];             // chunk length (always little-endian)
+	int chunksize;                // chunk length, calcaulated from the above
+	int ramblock;                 // 16k RAM block chunk is to be loaded in to
+	unsigned int bytes_to_read;   // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
 	unsigned char* mem = memory_region(image->machine, "maincpu");
 
-	logerror("IMG: loading CPC+ cartridge file\n");
-	// load RIFF chunk
-	result = image_fread(image,header,12);
-	if(result != 12)
+	if (image_software_entry(image) == NULL)
 	{
-		logerror("IMG: failed to read from cart image\n");
-		return INIT_FAIL;
-	}
-	if(strncmp((char *)header,"RIFF",4) != 0)
-	{
-		// not an RIFF format file, assume raw binary (*.bin)
-		image_fseek(image,0,SEEK_SET);
-		ramblock = 0;
-		while(!image_feof(image))
+		size = image_length(image);
+		temp_copy = auto_alloc_array(image->machine, UINT8, size);
+		if (image_fread(image, temp_copy, size) != size)
 		{
-			result = image_fread(image,mem+(0x4000*ramblock),0x4000);
-			if(result < 0x4000)
-			{
-				logerror("BIN: block %i loaded is smaller than 16kB in size\n",ramblock);
-				return INIT_FAIL;
-			}
-			ramblock++;
+			logerror("IMG: failed to read from cart image\n");
+			auto_free(image->machine, temp_copy);
+			return INIT_FAIL;
 		}
 	}
 	else
 	{
+		size= image_get_software_region_length(image, "rom");
+		temp_copy = auto_alloc_array(image->machine, UINT8, size);
+		memcpy(temp_copy, image_get_software_region(image, "rom"), size);
+	}
+
+	logerror("IMG: loading CPC+ cartridge file\n");
+	// load RIFF chunk
+	memcpy(header, temp_copy, 12);
+	offset += 12;
+
+	if (strncmp((char *)header, "RIFF", 4) != 0)
+	{
+		logerror("IMG: raw CPC+ cartridge file\n");
+		offset -= 12;	// no header, so we go back to the start of the file
+
+		// not an RIFF format file, assume raw binary (*.bin)
+		while (offset < size)
+		{
+			memcpy(mem + offset, temp_copy + offset, 0x4000);
+
+			if ((size - offset) < 0x4000)
+			{
+				logerror("BIN: block %i loaded is smaller than 16kB in size\n", offset / 0x4000);
+				auto_free(image->machine, temp_copy);
+				return INIT_FAIL;
+			}
+			offset += 0x4000;
+		}
+	}
+	else if (image_software_entry(image) == NULL)	// we have no CPR carts in our gx4000 softlist
+	{
 		// Is RIFF format (*.cpr)
-		if(strncmp((char*)(header+8),"AMS!",4) != 0)
+		if (strncmp((char*)(header + 8), "AMS!", 4) != 0)
 		{
 			logerror("CPR: not an Amstrad CPC cartridge image\n");
+			auto_free(image->machine, temp_copy);
 			return INIT_FAIL;
 		}
 
 		bytes_to_read = header[4] + (header[5] << 8) + (header[6] << 16)+ (header[7] << 24);
 		bytes_to_read -= 4;  // account for AMS! header
-		logerror("CPR: Data to read: %i bytes\n",bytes_to_read);
+		logerror("CPR: Data to read: %i bytes\n", bytes_to_read);
 		// read some chunks
-		while(bytes_to_read > 0)
+		while (bytes_to_read > 0)
 		{
-			result = image_fread(image,chunkid,4);
-			if(result != 4)
-			{
-				logerror("CPR: failed to read from cart image\n");
-				return INIT_FAIL;
-			}
-			bytes_to_read -= result;
-			result = image_fread(image,chunklen,4);
-			if(result != 4)
-			{
-				logerror("CPR: failed to read from cart image\n");
-				return INIT_FAIL;
-			}
-			bytes_to_read -= result;
+			memcpy(chunkid, temp_copy + offset, 4);
+			bytes_to_read -= 4;
+			offset += 4;
+
+			memcpy(chunklen, temp_copy + offset, 4);
+			bytes_to_read -= 4;
+			offset += 4;
+			
 			// calculate little-endian value, just to be sure
 			chunksize = chunklen[0] + (chunklen[1] << 8) + (chunklen[2] << 16) + (chunklen[3] << 24);
-
-			if(strncmp(chunkid,"cb",2) == 0)
+			
+			if (strncmp(chunkid, "cb", 2) == 0)
 			{
 				// load chunk into RAM
 				// find out what block this is
 				ramblock = (chunkid[2] - 0x30) * 10;
 				ramblock += chunkid[3] - 0x30;
-				logerror("CPR: Loading chunk into RAM block %i ['%4s']\n",ramblock,chunkid);
+				logerror("CPR: Loading chunk into RAM block %i ['%4s']\n", ramblock, chunkid);
+
 				if(ramblock >= 0 && ramblock < 32)
 				{
 					// clear RAM block
-					memset(mem+(0x4000*ramblock),0,0x4000);
-
+					memset(mem + 0x4000 * ramblock, 0, 0x4000);
+					
 					// load block into ROM area
-					if(chunksize > 16384)
+					if (chunksize > 16384)
 						chunksize = 16384;
-					result = image_fread(image,mem+(0x4000*ramblock),chunksize);
-					if(result != chunksize)
-					{
-						logerror("CPR: Read %i-byte chunk, expected %i bytes\n",result,chunksize);
-						return INIT_FAIL;
-					}
+
+					memcpy(mem + 0x4000 * ramblock, temp_copy + offset, chunksize);
 					bytes_to_read -= chunksize;
-					logerror("CPR: Loaded %i-byte chunk into RAM block %i\n",result,ramblock);
+					offset += chunksize;
+					logerror("CPR: Loaded %i-byte chunk into RAM block %i\n", chunksize, ramblock);
 				}
 			}
 			else
 			{
-				logerror("CPR: Unknown chunk '%4s', skipping %i bytes\n",chunkid,chunksize);
-				if(chunksize != 0)
+				logerror("CPR: Unknown chunk '%4s', skipping %i bytes\n", chunkid, chunksize);
+				if (chunksize != 0)
 				{
-					image_fseek(image,chunksize,SEEK_CUR);
 					bytes_to_read -= chunksize;
+					offset += chunksize;
 				}
 			}
 		}
 	}
+	else	// CPR carts in our softlist
+	{
+		logerror("Gamelist cart in RIFF format\n");
+		auto_free(image->machine, temp_copy);
+		return INIT_FAIL;
+	}
 
-
+	auto_free(image->machine, temp_copy);
 	return INIT_PASS;
 }
 
