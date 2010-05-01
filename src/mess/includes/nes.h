@@ -17,10 +17,18 @@
 #define NTSC_CLOCK           N2A03_DEFAULTCLOCK     /* 1.789772 MHz */
 #define PAL_CLOCK	           (26601712.0/16)        /* 1.662607 MHz */
 
+#define NES_BATTERY_SIZE 0x2000
+
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+struct nes_input
+{
+	UINT32 shift;
+	UINT32 i0, i1, i2;
+};
 
 class nes_state
 {
@@ -29,12 +37,34 @@ public:
 
 	nes_state(running_machine &machine) { }
 
+	/* input_related - this part has to be cleaned up (e.g. in_2 and in_3 are not really necessary here...) */
+	nes_input in_0, in_1, in_2, in_3;
+
+	/* video-related */
+	int nes_vram_sprite[8]; /* Used only by mmc5 for now */
+	int last_frame_flip;
+	double scanlines_per_frame;
+	
 	/* devices */
 	running_device *ppu;
 	running_device *sound;
 	running_device *cart;
-	
-	/***** NES-related *****/
+
+	/* misc region to be allocated at init */
+	// variables which don't change at run-time
+	UINT8 *rom;
+	UINT8 *vrom;
+	UINT8 *vram;
+	UINT8 *wram;
+	UINT8 *ciram; //PPU nametable RAM - external to PPU!
+	// Variables which can change
+	UINT8 mid_ram_enable;
+
+	/* SRAM-related (we have two elements due to the init order, but it would be better to verify they both are still needed) */
+	UINT8 *battery_ram;
+	UINT8 battery_data[NES_BATTERY_SIZE];
+
+	/***** NES-cart related *****/
 
 	/* load-time cart variables which remain constant */
 	UINT8 trainer;
@@ -52,18 +82,8 @@ public:
 	UINT8 slow_banking;
 	UINT8 crc_hack;	// this is needed to detect different boards sharing the same Mappers (shame on .nes format)
 	
-	UINT8 *rom;
-	UINT8 *vrom;
-	UINT8 *vram;
-	UINT8 *wram;
-	UINT8 *ciram; //PPU nametable RAM - external to PPU!
 	
-	/* Variables which can change */
-	UINT8 mid_ram_enable;
-	
-	
-	
-	/***** FDS-related *****/
+	/***** FDS-floppy related *****/
 
 	UINT8 *fds_data;
 	UINT8 fds_sides;

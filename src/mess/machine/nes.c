@@ -23,29 +23,6 @@
 #define SPLIT_PRG	0
 #define SPLIT_CHR	0
 
-#define BATTERY_SIZE 0x2000
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _nes_input nes_input;
-struct _nes_input
-{
-	UINT32 shift;
-	UINT32 i0, i1, i2;
-};
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-unsigned char *nes_battery_ram;
-static UINT8 battery_data[BATTERY_SIZE];
-
-static nes_input in_0;
-static nes_input in_1;
-
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
@@ -77,7 +54,7 @@ static void init_nes_core( running_machine *machine )
 
 	memory_set_bankptr(machine, "bank10", state->rom);
 
-	nes_battery_ram = state->wram;
+	state->battery_ram = state->wram;
 
 	/* Set up the memory handlers for the mapper */
 	switch (state->mapper)
@@ -174,7 +151,7 @@ static void init_nes_core( running_machine *machine )
 	/* memory subsystem is set up. When this routine is called */
 	/* everything is ready, so we can just copy over the data */
 	/* we loaded before. */
-	memcpy(nes_battery_ram, battery_data, BATTERY_SIZE);
+	memcpy(state->battery_ram, state->battery_data, NES_BATTERY_SIZE);
 }
 
 int nes_ppu_vidaccess( running_device *device, int address, int data )
@@ -211,8 +188,8 @@ MACHINE_RESET( nes )
 		nes_unif_reset(machine, state->board);
 
 	/* Reset the serial input ports */
-	in_0.shift = 0;
-	in_1.shift = 0;
+	state->in_0.shift = 0;
+	state->in_1.shift = 0;
 
 	devtag_get_device(machine, "maincpu")->reset();
 }
@@ -239,7 +216,7 @@ static void nes_machine_stop( running_machine *machine )
 	
 	/* Write out the battery file if necessary */
 	if (state->battery)
-		image_battery_save(state->cart, nes_battery_ram, BATTERY_SIZE);
+		image_battery_save(state->cart, state->battery_ram, NES_BATTERY_SIZE);
 }
 
 
@@ -253,13 +230,13 @@ READ8_HANDLER( nes_IN0_r )
 	/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
 	ret = 0x40;
 
-	ret |= ((in_0.i0 >> in_0.shift) & 0x01);
+	ret |= ((state->in_0.i0 >> state->in_0.shift) & 0x01);
 
 	/* zapper */
 	if ((input_port_read(space->machine, "CTRLSEL") & 0x000f) == 0x0002)
 	{
-		int x = in_0.i1;	/* read Zapper x-position */
-		int y = in_0.i2;	/* read Zapper y-position */
+		int x = state->in_0.i1;	/* read Zapper x-position */
+		int y = state->in_0.i2;	/* read Zapper y-position */
 		UINT32 pix, color_base;
 
 		/* get the pixel at the gun position */
@@ -278,13 +255,13 @@ READ8_HANDLER( nes_IN0_r )
 			ret |= 0x08;  /* no sprite hit */
 
 		/* If button 1 is pressed, indicate the light gun trigger is pressed */
-		ret |= ((in_0.i0 & 0x01) << 4);
+		ret |= ((state->in_0.i0 & 0x01) << 4);
 	}
 
 	if (LOG_JOY)
-		logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), in_0.shift, in_0.i0);
+		logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), state->in_0.shift, state->in_0.i0);
 
-	in_0.shift++;
+	state->in_0.shift++;
 	return ret;
 }
 
@@ -298,13 +275,13 @@ READ8_HANDLER( nes_IN1_r )
 	ret = 0x40;
 
 	/* Handle data line 0's serial output */
-	ret |= ((in_1.i0 >> in_1.shift) & 0x01);
+	ret |= ((state->in_1.i0 >> state->in_1.shift) & 0x01);
 
 	/* zapper */
 	if ((input_port_read(space->machine, "CTRLSEL") & 0x00f0) == 0x0030)
 	{
-		int x = in_1.i1;	/* read Zapper x-position */
-		int y = in_1.i2;	/* read Zapper y-position */
+		int x = state->in_1.i1;	/* read Zapper x-position */
+		int y = state->in_1.i2;	/* read Zapper y-position */
 		UINT32 pix, color_base;
 
 		/* get the pixel at the gun position */
@@ -323,25 +300,25 @@ READ8_HANDLER( nes_IN1_r )
 			ret |= 0x08;  /* no sprite hit */
 
 		/* If button 1 is pressed, indicate the light gun trigger is pressed */
-		ret |= ((in_1.i0 & 0x01) << 4);
+		ret |= ((state->in_1.i0 & 0x01) << 4);
 	}
 
 	/* arkanoid dial */
 	else if ((input_port_read(space->machine, "CTRLSEL") & 0x00f0) == 0x0040)
 	{
 		/* Handle data line 2's serial output */
-		ret |= ((in_1.i2 >> in_1.shift) & 0x01) << 3;
+		ret |= ((state->in_1.i2 >> state->in_1.shift) & 0x01) << 3;
 
 		/* Handle data line 3's serial output - bits are reversed */
 		/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
-		/* ret |= ((in_1[3] >> in_1.shift) & 0x01) << 4; */
-		/* ret |= ((in_1[3] << in_1.shift) & 0x80) >> 3; */
+		/* ret |= ((state->in_1[3] >> state->in_1.shift) & 0x01) << 4; */
+		/* ret |= ((state->in_1[3] << state->in_1.shift) & 0x80) >> 3; */
 	}
 
 	if (LOG_JOY)
-		logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), in_1.shift, in_1.i0);
+		logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), state->in_1.shift, state->in_1.i0);
 
-	in_1.shift++;
+	state->in_1.shift++;
 	return ret;
 }
 
@@ -415,19 +392,18 @@ static TIMER_CALLBACK( lightgun_tick )
 
 WRITE8_HANDLER( nes_IN0_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	int cfg;
-	nes_input in_2;
-	nes_input in_3;
 
 	if (data & 0x01)
 		return;
 
 	if (LOG_JOY)
-		logerror("joy 0 bits read: %d\n", in_0.shift);
+		logerror("joy 0 bits read: %d\n", state->in_0.shift);
 
 	/* Toggling bit 0 high then low resets both controllers */
-	in_0.shift = 0;
-	in_1.shift = 0;
+	state->in_0.shift = 0;
+	state->in_1.shift = 0;
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	timer_set(space->machine, attotime_zero, NULL, 0, lightgun_tick);
@@ -436,15 +412,15 @@ WRITE8_HANDLER( nes_IN0_w )
 	cfg = input_port_read(space->machine, "CTRLSEL");
 
 	/* Read the input devices */
-	nes_read_input_device(space->machine, cfg >>  0, &in_0, 0,  TRUE, -1);
-	nes_read_input_device(space->machine, cfg >>  4, &in_1, 1,  TRUE,  1);
-	nes_read_input_device(space->machine, cfg >>  8, &in_2, 2, FALSE, -1);
-	nes_read_input_device(space->machine, cfg >> 12, &in_3, 3, FALSE, -1);
+	nes_read_input_device(space->machine, cfg >>  0, &state->in_0, 0,  TRUE, -1);
+	nes_read_input_device(space->machine, cfg >>  4, &state->in_1, 1,  TRUE,  1);
+	nes_read_input_device(space->machine, cfg >>  8, &state->in_2, 2, FALSE, -1);
+	nes_read_input_device(space->machine, cfg >> 12, &state->in_3, 3, FALSE, -1);
 
 	if (cfg & 0x0f00)
-		in_0.i0 |= (in_2.i0 << 8) | (0x08 << 16);
+		state->in_0.i0 |= (state->in_2.i0 << 8) | (0x08 << 16);
 	if (cfg & 0xf000)
-		in_1.i0 |= (in_3.i0 << 8) | (0x04 << 16);
+		state->in_1.i0 |= (state->in_3.i0 << 8) | (0x04 << 16);
 }
 
 
@@ -638,7 +614,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		/* Attempt to load a battery file for this ROM. If successful, we */
 		/* must wait until later to move it to the system memory. */
 		if (state->battery)
-			image_battery_load(image, battery_data, BATTERY_SIZE, 0x00);
+			image_battery_load(image, state->battery_data, NES_BATTERY_SIZE, 0x00);
 
 	}
 	else if ((magic[0] == 'U') && (magic[1] == 'N') && (magic[2] == 'I') && (magic[3] == 'F')) /* If header starts with 'UNIF' it is UNIF */

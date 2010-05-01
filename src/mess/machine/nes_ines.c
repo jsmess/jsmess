@@ -507,7 +507,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 			LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
 			memory_set_bankptr(space->machine, "bank5", &state->wram[data * 0x2000]);
 			/* The & 4 is a hack that'll tide us over for now */
-			nes_battery_ram = &state->wram[(data & 4) * 0x2000];
+			state->battery_ram = &state->wram[(data & 4) * 0x2000];
 			break;
 
 		case 0x1014: /* $5114 */
@@ -623,7 +623,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[0] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_0(space->machine, vrom_bank[0], CHRROM);
-//                  nes_vram_sprite[0] = vrom_bank[0] * 64;
+//                  state->nes_vram_sprite[0] = vrom_bank[0] * 64;
 //                  vrom_next[0] = 4;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -643,7 +643,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[1] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_1(space->machine, vrom_bank[1], CHRROM);
-//                  nes_vram_sprite[1] = vrom_bank[0] * 64;
+//                  state->nes_vram_sprite[1] = vrom_bank[0] * 64;
 //                  vrom_next[1] = 5;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -659,7 +659,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[2] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_2(space->machine, vrom_bank[2], CHRROM);
-//                  nes_vram_sprite[2] = vrom_bank[0] * 64;
+//                  state->nes_vram_sprite[2] = vrom_bank[0] * 64;
 //                  vrom_next[2] = 6;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -682,7 +682,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[3] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_3(space->machine, vrom_bank[3], CHRROM);
-//                  nes_vram_sprite[3] = vrom_bank[0] * 64;
+//                  state->nes_vram_sprite[3] = vrom_bank[0] * 64;
 //                  vrom_next[3] = 7;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -698,7 +698,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[4] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_4(space->machine, vrom_bank[4], CHRROM);
-//                  nes_vram_sprite[4] = vrom_bank[0] * 64;
+//                  state->nes_vram_sprite[4] = vrom_bank[0] * 64;
 //                  vrom_next[0] = 0;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -718,7 +718,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[5] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_5(space->machine, vrom_bank[5], CHRROM);
-//                  nes_vram_sprite[5] = vrom_bank[0] * 64;
+//                  state->nes_vram_sprite[5] = vrom_bank[0] * 64;
 //                  vrom_next[1] = 1;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -734,7 +734,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[6] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_6(space->machine, vrom_bank[6], CHRROM);
-//                  nes_vram_sprite[6] = vrom_bank[0] * 64;
+//                  state->nes_vram_sprite[6] = vrom_bank[0] * 64;
 //                  vrom_next[2] = 2;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -762,7 +762,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					vrom_bank[7] = data;
 //                  mapper5_sync_vrom(0);
 					chr1_7(space->machine, vrom_bank[7], CHRROM);
-//                  nes_vram_sprite[7] = vrom_bank[0] * 64;
+//                  state->nes_vram_sprite[7] = vrom_bank[0] * 64;
 //                  vrom_next[3] = 3;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;

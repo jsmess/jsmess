@@ -11,15 +11,11 @@
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
 
-int nes_vram_sprite[8]; /* Used only by mmc5 for now */
-static int last_frame_flip = 0;
-static double nes_scanlines_per_frame;
-
 static void nes_vh_reset( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	ppu2c0x_set_vidaccess_callback(devtag_get_device(machine,"ppu"), nes_ppu_vidaccess);
-	ppu2c0x_set_scanlines_per_frame(devtag_get_device(machine,"ppu"), ceil(nes_scanlines_per_frame));
+	ppu2c0x_set_scanlines_per_frame(devtag_get_device(machine,"ppu"), ceil(state->scanlines_per_frame));
 
 	if (state->four_screen_vram)
 		set_nt_mirroring(machine, PPU_MIRROR_4SCREEN);
@@ -42,13 +38,13 @@ static void nes_vh_reset( running_machine *machine )
 
 static void nes_vh_start(running_machine *machine, double scanlines_per_frame)
 {
-	last_frame_flip =  0;
-	nes_scanlines_per_frame = scanlines_per_frame;
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	state->last_frame_flip =  0;
+	state->scanlines_per_frame = scanlines_per_frame;
 
 	add_reset_callback(machine, nes_vh_reset);
 }
-
-
 
 VIDEO_START( nes_ntsc )
 {
@@ -83,9 +79,9 @@ VIDEO_UPDATE( nes )
 	if (state->mapper == 20)
 	{
 		// latch this input so it doesn't go at warp speed
-		if ((input_port_read(screen->machine, "FLIPDISK") & 0x01) && (!last_frame_flip))
+		if ((input_port_read(screen->machine, "FLIPDISK") & 0x01) && (!state->last_frame_flip))
 		{
-			last_frame_flip = 1;
+			state->last_frame_flip = 1;
 			state->fds_current_side++;
 			if (state->fds_current_side > state->fds_sides)
 				state->fds_current_side = 0;
@@ -97,7 +93,7 @@ VIDEO_UPDATE( nes )
 		}
 
 		if (!(input_port_read(screen->machine, "FLIPDISK") & 0x01))
-			last_frame_flip = 0;
+			state->last_frame_flip = 0;
 	}
 	return 0;
 }

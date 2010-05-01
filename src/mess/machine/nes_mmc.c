@@ -356,7 +356,7 @@ WRITE8_HANDLER( nes_mid_mapper_w )
 	if (mmc_write_mid)
 		(*mmc_write_mid)(space, offset, data);
 	else if (state->mid_ram_enable)
-		nes_battery_ram[offset] = data;
+		state->battery_ram[offset] = data;
 	else
 	{
 		logerror("Unimplemented MID mapper write, offset: %04x, data: %02x\n", offset, data);
@@ -375,7 +375,7 @@ READ8_HANDLER( nes_mid_mapper_r )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 
 	if ((state->mid_ram_enable) || (state->mapper == 5))
-		return nes_battery_ram[offset];
+		return state->battery_ram[offset];
 	else
 		return 0;
 }
