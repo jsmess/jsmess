@@ -102,6 +102,7 @@ Keyboard: Full-sized 102 key QWERTY (19 key numeric keypad!; 4 direction
 #include "machine/6525tpi.h"
 #include "machine/6526cia.h"
 
+#include "formats/cbm_snqk.h"
 #include "includes/cbm.h"
 #include "includes/cbmb.h"
 #include "machine/ieee488.h"

@@ -117,6 +117,7 @@ printers and other devices; most expansion modules; userport; rs232/v.24 interfa
 #include "audio/t6721.h"
 #include "cpu/m6502/m6502.h"
 #include "devices/messram.h"
+#include "formats/cbm_snqk.h"
 #include "includes/cbm.h"
 #include "includes/c16.h"
 #include "machine/c1541.h"

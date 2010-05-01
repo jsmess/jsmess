@@ -61,6 +61,7 @@ bus serial (available in all modes), a Fast and a Burst serial bus
 
 /* devices config */
 #include "includes/cbm.h"
+#include "formats/cbm_snqk.h"
 
 #include "includes/c64.h"
 #include "includes/c65.h"

@@ -186,6 +186,7 @@ to use an EEPROM reader, in order to obtain a dump of the whole content.
 
 /* devices config */
 #include "includes/cbm.h"
+#include "formats/cbm_snqk.h"
 #include "machine/cbmiec.h"
 
 #include "includes/c128.h"

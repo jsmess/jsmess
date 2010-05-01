@@ -392,6 +392,7 @@ normal keyboards?
 
 /* devices config */
 #include "includes/cbm.h"
+#include "formats/cbm_snqk.h"
 #include "machine/ieee488.h"
 
 /*************************************

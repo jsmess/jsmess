@@ -725,11 +725,7 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_MACHINE)/c2040.o		\
 	$(MESS_MACHINE)/c8280.o		\
 	$(MESS_MACHINE)/c9060.o		\
-	$(MESS_FORMATS)/d64_dsk.o	\
-	$(MESS_FORMATS)/g64_dsk.o	\
-	$(MESS_FORMATS)/d81_dsk.o	\
 	$(MESS_DRIVERS)/clcd.o		\
-	$(MESS_FORMATS)/cbm_tap.o	\
 	$(MESS_MACHINE)/6525tpi.o	\
 	$(MESS_MACHINE)/cbm.o		\
 	$(MESS_MACHINE)/cbmipt.o	\
@@ -740,6 +736,11 @@ $(MESSOBJ)/cbm.a:				\
 	$(MESS_VIDEO)/vdc8563.o		\
 	$(MESS_VIDEO)/vic6567.o		\
 	$(MESS_VIDEO)/vic4567.o		\
+	$(MESS_FORMATS)/d64_dsk.o	\
+	$(MESS_FORMATS)/g64_dsk.o	\
+	$(MESS_FORMATS)/d81_dsk.o	\
+	$(MESS_FORMATS)/cbm_tap.o	\
+	$(MESS_FORMATS)/cbm_snqk.o	\
 
 $(MESSOBJ)/cccp.a:				\
 	$(MESS_VIDEO)/lviv.o		\

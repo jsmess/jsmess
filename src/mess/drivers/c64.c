@@ -338,6 +338,7 @@ C64DTV TODO:
 
 /* devices config */
 #include "includes/cbm.h"
+#include "formats/cbm_snqk.h"
 #include "machine/cbmiec.h"
 #include "machine/c1541.h"
 

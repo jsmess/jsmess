@@ -7,7 +7,6 @@
 #ifndef CBM_H_
 #define CBM_H_
 
-#include "devices/snapquik.h"
 #include "devices/cassette.h"
 
 
@@ -21,24 +20,6 @@ void cbm_common_interrupt( running_device *device );
 
 UINT8 cbm_common_cia0_port_a_r( running_device *device, UINT8 output_b );
 UINT8 cbm_common_cia0_port_b_r( running_device *device, UINT8 output_a );
-
-
-/***********************************************
-
-    CBM Quickloads
-
-***********************************************/
-
-QUICKLOAD_LOAD( cbm_pet1 );
-QUICKLOAD_LOAD( cbm_pet );
-QUICKLOAD_LOAD( cbm_c16 );
-QUICKLOAD_LOAD( cbm_c64 );
-QUICKLOAD_LOAD( cbm_vc20 );
-QUICKLOAD_LOAD( cbmb );
-QUICKLOAD_LOAD( p500 );
-QUICKLOAD_LOAD( cbm_c65 );
-
-#define CBM_QUICKLOAD_DELAY_SECONDS 3
 
 
 /***********************************************
