@@ -94,7 +94,7 @@ static READ_LINE_DEVICE_HANDLER( pegasus_cassette_r )
 
 static WRITE_LINE_DEVICE_HANDLER( pegasus_cassette_w )
 {
-	cassette_output(pegasus_cass, state ? 0.75 : -0.75);
+	cassette_output(pegasus_cass, state ? 1 : -1);
 }
 
 static READ8_HANDLER( pegasus_pcg_r )
