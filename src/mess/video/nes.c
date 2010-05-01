@@ -15,27 +15,26 @@ int nes_vram_sprite[8]; /* Used only by mmc5 for now */
 static int last_frame_flip = 0;
 static double nes_scanlines_per_frame;
 
-static void nes_vh_reset(running_machine *machine)
+static void nes_vh_reset( running_machine *machine )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	ppu2c0x_set_vidaccess_callback(devtag_get_device(machine,"ppu"), nes_ppu_vidaccess);
 	ppu2c0x_set_scanlines_per_frame(devtag_get_device(machine,"ppu"), ceil(nes_scanlines_per_frame));
 
-	if (nes.four_screen_vram)
-	{
-		set_nt_mirroring(PPU_MIRROR_4SCREEN);
-	}
+	if (state->four_screen_vram)
+		set_nt_mirroring(machine, PPU_MIRROR_4SCREEN);
 	else
 	{
-		switch(nes.hard_mirroring)
+		switch(state->hard_mirroring)
 		{
 			case 0:
-				set_nt_mirroring(PPU_MIRROR_HORZ);
+				set_nt_mirroring(machine, PPU_MIRROR_HORZ);
 				break;
 			case 1:
-				set_nt_mirroring(PPU_MIRROR_VERT);
+				set_nt_mirroring(machine, PPU_MIRROR_VERT);
 				break;
 			default:
-				set_nt_mirroring(PPU_MIRROR_NONE );
+				set_nt_mirroring(machine, PPU_MIRROR_NONE);
 				break;
 		}
 	}
@@ -78,33 +77,27 @@ VIDEO_UPDATE( nes )
 	nes_state *state = (nes_state *)screen->machine->driver_data;
 
 	/* render the ppu */
-	ppu2c0x_render( state->ppu, bitmap, 0, 0, 0, 0 );
+	ppu2c0x_render(state->ppu, bitmap, 0, 0, 0, 0);
 
 	/* if this is a disk system game, check for the flip-disk key */
-	if (nes.mapper == 20)
+	if (state->mapper == 20)
 	{
 		// latch this input so it doesn't go at warp speed
 		if ((input_port_read(screen->machine, "FLIPDISK") & 0x01) && (!last_frame_flip))
 		{
 			last_frame_flip = 1;
-			nes_fds.current_side++;
-			if (nes_fds.current_side > nes_fds.sides)
-				nes_fds.current_side = 0;
+			state->fds_current_side++;
+			if (state->fds_current_side > state->fds_sides)
+				state->fds_current_side = 0;
 
-			if (nes_fds.current_side == 0)
-			{
+			if (state->fds_current_side == 0)
 				popmessage("No disk inserted.");
-			}
 			else
-			{
-				popmessage("Disk set to side %d", nes_fds.current_side);
-			}
+				popmessage("Disk set to side %d", state->fds_current_side);
 		}
 
 		if (!(input_port_read(screen->machine, "FLIPDISK") & 0x01))
-		{
 			last_frame_flip = 0;
-		}
 	}
 	return 0;
 }

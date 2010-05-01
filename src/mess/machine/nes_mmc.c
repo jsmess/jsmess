@@ -351,9 +351,11 @@ READ8_HANDLER( nes_low_mapper_r )
 
 WRITE8_HANDLER( nes_mid_mapper_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	
 	if (mmc_write_mid)
 		(*mmc_write_mid)(space, offset, data);
-	else if (nes.mid_ram_enable)
+	else if (state->mid_ram_enable)
 		nes_battery_ram[offset] = data;
 	else
 	{
@@ -370,7 +372,9 @@ WRITE8_HANDLER( nes_mid_mapper_w )
 
 READ8_HANDLER( nes_mid_mapper_r )
 {
-	if ((nes.mid_ram_enable) || (nes.mapper == 5))
+	nes_state *state = (nes_state *)space->machine->driver_data;
+
+	if ((state->mid_ram_enable) || (state->mapper == 5))
 		return nes_battery_ram[offset];
 	else
 		return 0;
@@ -404,83 +408,97 @@ WRITE8_HANDLER( nes_mapper_w )
 
 static void prg32( running_machine *machine, int bank )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
+
 	/* assumes that bank references a 32k chunk */
-	bank &= ((nes.prg_chunks >> 1) - 1);
-	if (nes.slow_banking)
-		memcpy(&nes.rom[0x8000], &nes.rom[bank * 0x8000 + 0x10000], 0x8000);
+	bank &= ((state->prg_chunks >> 1) - 1);
+	if (state->slow_banking)
+		memcpy(&state->rom[0x8000], &state->rom[bank * 0x8000 + 0x10000], 0x8000);
 	else
 	{
-		memory_set_bankptr(machine, "bank1", &nes.rom[bank * 0x8000 + 0x10000]);
-		memory_set_bankptr(machine, "bank2", &nes.rom[bank * 0x8000 + 0x12000]);
-		memory_set_bankptr(machine, "bank3", &nes.rom[bank * 0x8000 + 0x14000]);
-		memory_set_bankptr(machine, "bank4", &nes.rom[bank * 0x8000 + 0x16000]);
+		memory_set_bankptr(machine, "bank1", &state->rom[bank * 0x8000 + 0x10000]);
+		memory_set_bankptr(machine, "bank2", &state->rom[bank * 0x8000 + 0x12000]);
+		memory_set_bankptr(machine, "bank3", &state->rom[bank * 0x8000 + 0x14000]);
+		memory_set_bankptr(machine, "bank4", &state->rom[bank * 0x8000 + 0x16000]);
 	}
 }
 
 static void prg16_89ab( running_machine *machine, int bank )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
+
 	/* assumes that bank references a 16k chunk */
-	bank &= (nes.prg_chunks - 1);
-	if (nes.slow_banking)
-		memcpy(&nes.rom[0x8000], &nes.rom[bank * 0x4000 + 0x10000], 0x4000);
+	bank &= (state->prg_chunks - 1);
+	if (state->slow_banking)
+		memcpy(&state->rom[0x8000], &state->rom[bank * 0x4000 + 0x10000], 0x4000);
 	else
 	{
-		memory_set_bankptr(machine, "bank1", &nes.rom[bank * 0x4000 + 0x10000]);
-		memory_set_bankptr(machine, "bank2", &nes.rom[bank * 0x4000 + 0x12000]);
+		memory_set_bankptr(machine, "bank1", &state->rom[bank * 0x4000 + 0x10000]);
+		memory_set_bankptr(machine, "bank2", &state->rom[bank * 0x4000 + 0x12000]);
 	}
 }
 
 static void prg16_cdef( running_machine *machine, int bank )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
+
 	/* assumes that bank references a 16k chunk */
-	bank &= (nes.prg_chunks - 1);
-	if (nes.slow_banking)
-		memcpy(&nes.rom[0xc000], &nes.rom[bank * 0x4000 + 0x10000], 0x4000);
+	bank &= (state->prg_chunks - 1);
+	if (state->slow_banking)
+		memcpy(&state->rom[0xc000], &state->rom[bank * 0x4000 + 0x10000], 0x4000);
 	else
 	{
-		memory_set_bankptr(machine, "bank3", &nes.rom[bank * 0x4000 + 0x10000]);
-		memory_set_bankptr(machine, "bank4", &nes.rom[bank * 0x4000 + 0x12000]);
+		memory_set_bankptr(machine, "bank3", &state->rom[bank * 0x4000 + 0x10000]);
+		memory_set_bankptr(machine, "bank4", &state->rom[bank * 0x4000 + 0x12000]);
 	}
 }
 
 static void prg8_89( running_machine *machine, int bank )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
+
 	/* assumes that bank references an 8k chunk */
-	bank &= ((nes.prg_chunks << 1) - 1);
-	if (nes.slow_banking)
-		memcpy(&nes.rom[0x8000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
+	bank &= ((state->prg_chunks << 1) - 1);
+	if (state->slow_banking)
+		memcpy(&state->rom[0x8000], &state->rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr(machine, "bank1", &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(machine, "bank1", &state->rom[bank * 0x2000 + 0x10000]);
 }
 
 static void prg8_ab( running_machine *machine, int bank )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
+
 	/* assumes that bank references an 8k chunk */
-	bank &= ((nes.prg_chunks << 1) - 1);
-	if (nes.slow_banking)
-		memcpy(&nes.rom[0xa000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
+	bank &= ((state->prg_chunks << 1) - 1);
+	if (state->slow_banking)
+		memcpy(&state->rom[0xa000], &state->rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr(machine, "bank2", &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(machine, "bank2", &state->rom[bank * 0x2000 + 0x10000]);
 }
 
 static void prg8_cd( running_machine *machine, int bank )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
+
 	/* assumes that bank references an 8k chunk */
-	bank &= ((nes.prg_chunks << 1) - 1);
-	if (nes.slow_banking)
-		memcpy(&nes.rom[0xc000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
+	bank &= ((state->prg_chunks << 1) - 1);
+	if (state->slow_banking)
+		memcpy(&state->rom[0xc000], &state->rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr(machine, "bank3", &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(machine, "bank3", &state->rom[bank * 0x2000 + 0x10000]);
 }
 
 static void prg8_ef( running_machine *machine, int bank )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
+
 	/* assumes that bank references an 8k chunk */
-	bank &= ((nes.prg_chunks << 1) - 1);
-	if (nes.slow_banking)
-		memcpy(&nes.rom[0xe000], &nes.rom[bank * 0x2000 + 0x10000], 0x2000);
+	bank &= ((state->prg_chunks << 1) - 1);
+	if (state->slow_banking)
+		memcpy(&state->rom[0xe000], &state->rom[bank * 0x2000 + 0x10000], 0x2000);
 	else
-		memory_set_bankptr(machine, "bank4", &nes.rom[bank * 0x2000 + 0x10000]);
+		memory_set_bankptr(machine, "bank4", &state->rom[bank * 0x2000 + 0x10000]);
 }
 
 /* We define an additional helper to map PRG-ROM to 0x6000-0x7000 */
@@ -488,44 +506,48 @@ static void prg8_ef( running_machine *machine, int bank )
 
 static void prg8_67( running_machine *machine, int bank )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
+
 	/* assumes that bank references an 8k chunk */
-	bank &= ((nes.prg_chunks << 1) - 1);
-	memory_set_bankptr(machine, "bank5", &nes.rom[bank * 0x2000 + 0x10000]);
+	bank &= ((state->prg_chunks << 1) - 1);
+	memory_set_bankptr(machine, "bank5", &state->rom[bank * 0x2000 + 0x10000]);
 }
 
 /* CHR ROM in 1K, 2K, 4K or 8K blocks */
 
 static void chr8( running_machine *machine, int bank, int source )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	int i;
 
-	bank &= (nes.chr_chunks - 1);
+	bank &= (state->chr_chunks - 1);
 	for (i = 0; i < 8; i++)
 	{
 		chr_map[i].source = source;
 		chr_map[i].origin = (bank * 0x2000) + (i * 0x400); // for save state uses!
 
 		if (source == CHRRAM)
-			chr_map[i].access = &nes.vram[chr_map[i].origin];
+			chr_map[i].access = &state->vram[chr_map[i].origin];
 		else
-			chr_map[i].access = &nes.vrom[chr_map[i].origin];
+			chr_map[i].access = &state->vrom[chr_map[i].origin];
 	}
 }
 
 static void chr4_x( running_machine *machine, int start, int bank, int source )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	int i;
 
-	bank &= ((nes.chr_chunks << 1) - 1);
+	bank &= ((state->chr_chunks << 1) - 1);
 	for (i = 0; i < 4; i++)
 	{
 		chr_map[i + start].source = source;
 		chr_map[i + start].origin = (bank * 0x1000) + (i * 0x400); // for save state uses!
 
 		if (source == CHRRAM)
-			chr_map[i+start].access = &nes.vram[chr_map[i + start].origin];
+			chr_map[i + start].access = &state->vram[chr_map[i + start].origin];
 		else
-			chr_map[i+start].access = &nes.vrom[chr_map[i + start].origin];
+			chr_map[i + start].access = &state->vrom[chr_map[i + start].origin];
 	}
 }
 
@@ -541,18 +563,19 @@ static void chr4_4( running_machine *machine, int bank, int source )
 
 static void chr2_x( running_machine *machine, int start, int bank, int source )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	int i;
 
-	bank &= ((nes.chr_chunks << 2) - 1);
+	bank &= ((state->chr_chunks << 2) - 1);
 	for (i = 0; i < 2; i++)
 	{
 		chr_map[i + start].source = source;
 		chr_map[i + start].origin = (bank * 0x800) + (i * 0x400);
 
 		if (source == CHRRAM)
-			chr_map[i + start].access = &nes.vram[chr_map[i + start].origin];
+			chr_map[i + start].access = &state->vram[chr_map[i + start].origin];
 		else
-			chr_map[i + start].access = &nes.vrom[chr_map[i + start].origin];
+			chr_map[i + start].access = &state->vrom[chr_map[i + start].origin];
 	}
 }
 
@@ -578,14 +601,16 @@ static void chr2_6( running_machine *machine, int bank, int source )
 
 static void chr1_x( running_machine *machine, int start, int bank, int source )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
+
 	chr_map[start].source = source;
-	bank &= ((nes.chr_chunks << 3) - 1);
+	bank &= ((state->chr_chunks << 3) - 1);
 	chr_map[start].origin = bank * 0x400;
 
 	if (source == CHRRAM)
-		chr_map[start].access = &nes.vram[chr_map[start].origin];
+		chr_map[start].access = &state->vram[chr_map[start].origin];
 	else
-		chr_map[start].access = &nes.vrom[chr_map[start].origin];
+		chr_map[start].access = &state->vrom[chr_map[start].origin];
 }
 
 static void chr1_0 (running_machine *machine, int bank, int source)
@@ -631,8 +656,9 @@ static void chr1_7( running_machine *machine, int bank, int source )
 
 /* NameTable paging and mirroring */
 
-static void set_nt_page( int page, int source, int bank, int writable )
+static void set_nt_page( running_machine *machine, int page, int source, int bank, int writable )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8* base_ptr;
 
 	switch (source)
@@ -644,14 +670,14 @@ static void set_nt_page( int page, int source, int bank, int writable )
 			base_ptr = NULL;
 			break;
 		case ROM:
-			base_ptr = nes.vrom;
+			base_ptr = state->vrom;
 			break;
 		case EXRAM:
 			base_ptr = nes_mmc5_vram;
 			break;
 		case CIRAM:
 		default:
-			base_ptr = nes.ciram;
+			base_ptr = state->ciram;
 			break;
 	}
 
@@ -665,37 +691,37 @@ static void set_nt_page( int page, int source, int bank, int writable )
 	nt_page[page].writable = writable;
 }
 
-void set_nt_mirroring( int mirroring )
+void set_nt_mirroring( running_machine *machine, int mirroring )
 {
 	/* setup our videomem handlers based on mirroring */
 	switch (mirroring)
 	{
 		case PPU_MIRROR_VERT:
-			set_nt_page(0, CIRAM, 0, 1);
-			set_nt_page(1, CIRAM, 1, 1);
-			set_nt_page(2, CIRAM, 0, 1);
-			set_nt_page(3, CIRAM, 1, 1);
+			set_nt_page(machine, 0, CIRAM, 0, 1);
+			set_nt_page(machine, 1, CIRAM, 1, 1);
+			set_nt_page(machine, 2, CIRAM, 0, 1);
+			set_nt_page(machine, 3, CIRAM, 1, 1);
 			break;
 
 		case PPU_MIRROR_HORZ:
-			set_nt_page(0, CIRAM, 0, 1);
-			set_nt_page(1, CIRAM, 0, 1);
-			set_nt_page(2, CIRAM, 1, 1);
-			set_nt_page(3, CIRAM, 1, 1);
+			set_nt_page(machine, 0, CIRAM, 0, 1);
+			set_nt_page(machine, 1, CIRAM, 0, 1);
+			set_nt_page(machine, 2, CIRAM, 1, 1);
+			set_nt_page(machine, 3, CIRAM, 1, 1);
 			break;
 
 		case PPU_MIRROR_HIGH:
-			set_nt_page(0, CIRAM, 1, 1);
-			set_nt_page(1, CIRAM, 1, 1);
-			set_nt_page(2, CIRAM, 1, 1);
-			set_nt_page(3, CIRAM, 1, 1);
+			set_nt_page(machine, 0, CIRAM, 1, 1);
+			set_nt_page(machine, 1, CIRAM, 1, 1);
+			set_nt_page(machine, 2, CIRAM, 1, 1);
+			set_nt_page(machine, 3, CIRAM, 1, 1);
 			break;
 
 		case PPU_MIRROR_LOW:
-			set_nt_page(0, CIRAM, 0, 1);
-			set_nt_page(1, CIRAM, 0, 1);
-			set_nt_page(2, CIRAM, 0, 1);
-			set_nt_page(3, CIRAM, 0, 1);
+			set_nt_page(machine, 0, CIRAM, 0, 1);
+			set_nt_page(machine, 1, CIRAM, 0, 1);
+			set_nt_page(machine, 2, CIRAM, 0, 1);
+			set_nt_page(machine, 3, CIRAM, 0, 1);
 			break;
 
 		case PPU_MIRROR_NONE:
@@ -707,10 +733,10 @@ void set_nt_mirroring( int mirroring )
 
 			logerror("Mapper set 4-screen mirroring without supplying external nametable memory!\n");
 
-			set_nt_page(0, CIRAM, 0, 1);
-			set_nt_page(1, CIRAM, 0, 1);
-			set_nt_page(2, CIRAM, 1, 1);
-			set_nt_page(3, CIRAM, 1, 1);
+			set_nt_page(machine, 0, CIRAM, 0, 1);
+			set_nt_page(machine, 1, CIRAM, 0, 1);
+			set_nt_page(machine, 2, CIRAM, 1, 1);
+			set_nt_page(machine, 3, CIRAM, 1, 1);
 			break;
 	}
 }
@@ -741,6 +767,7 @@ void set_nt_mirroring( int mirroring )
 
 static int mapper_initialize( running_machine *machine, int mmc_num )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	int err = 0, i;
 
 	switch (mmc_num)
@@ -755,16 +782,16 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_count = 0;
 			MMC1_regs[0] = 0x0f;
 			MMC1_regs[1] = MMC1_regs[2] = MMC1_regs[3] = 0;
-			set_nt_mirroring(PPU_MIRROR_HORZ);
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			MMC1_set_chr(machine);
 			MMC1_set_prg(machine);
 			break;
 		case 2:
 			/* These games don't switch VROM, but some ROMs incorrectly have CHR chunks */
-			nes.chr_chunks = 0;
+			state->chr_chunks = 0;
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 13:
 			chr4_0(machine, 0, CHRRAM);
@@ -779,13 +806,13 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			/* Only MMC3 and clones seem to use 4-screen! */
 			/* hardware uses an 8K RAM chip, but can't address the high 4K! */
 			/* that much is documented for Nintendo Gauntlet boards */
-			if(nes.four_screen_vram)
+			if(state->four_screen_vram)
 			{
-				extended_ntram=auto_alloc_array(machine, UINT8, 0x2000);
-				set_nt_page(0, CART_NTRAM, 0, 1);
-				set_nt_page(1, CART_NTRAM, 1, 1);
-				set_nt_page(2, CART_NTRAM, 2, 1);
-				set_nt_page(3, CART_NTRAM, 3, 1);
+				extended_ntram = auto_alloc_array(machine, UINT8, 0x2000);
+				set_nt_page(machine, 0, CART_NTRAM, 0, 1);
+				set_nt_page(machine, 1, CART_NTRAM, 1, 1);
+				set_nt_page(machine, 2, CART_NTRAM, 2, 1);
+				set_nt_page(machine, 3, CART_NTRAM, 3, 1);
 			}
 		case 12:
 		case 74:
@@ -804,7 +831,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;	// these could be init'ed as xxx_chunks-1 and they would work the same
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -813,21 +840,21 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			MMC5_rom_bank_mode = 3;
 			MMC5_vrom_bank_mode = 0;
 			MMC5_vram_protect = 0;
-			nes.mid_ram_enable = 0;
-			prg16_89ab(machine, nes.prg_chunks - 2);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			state->mid_ram_enable = 0;
+			prg16_89ab(machine, state->prg_chunks - 2);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 6:
 			mmc_cmd1 = 0;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 7);
 			break;
 		case 7:
 			/* Bankswitches 32k at a time */
-			set_nt_mirroring(PPU_MIRROR_LOW);
+			set_nt_mirroring(machine, PPU_MIRROR_LOW);
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 8:
 		case 96:
@@ -839,9 +866,9 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd1 = mmc_cmd2 = 0xfe;
 			prg8_89(machine, 0);
 			//ugly hack to deal with iNES header usage of chunk count.
-			prg8_ab(machine, (nes.prg_chunks << 1) - 3);
-			prg8_cd(machine, (nes.prg_chunks << 1) - 2);
-			prg8_ef(machine, (nes.prg_chunks << 1) - 1);
+			prg8_ab(machine, (state->prg_chunks << 1) - 3);
+			prg8_cd(machine, (state->prg_chunks << 1) - 2);
+			prg8_ef(machine, (state->prg_chunks << 1) - 1);
 			break;
 		case 10:
 			/* Reset VROM latches */
@@ -849,10 +876,10 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			MMC2_regs[1] = MMC2_regs[3] = 0;
 			mmc_cmd1 = mmc_cmd2 = 0xfe;
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 11:
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;	// NINA-07 has no CHRROM
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;	// NINA-07 has no CHRROM
 			prg32(machine, 0);
 			break;
 		case 14:
@@ -867,12 +894,12 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
 		case 15:
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			prg32(machine, 0);
 			break;
 		case 16:
@@ -882,25 +909,25 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 		case 159:
 			mmc_cmd1 = 0;
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			prg16_cdef(machine, state->prg_chunks - 1);
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			break;
 		case 19:
 			mmc_cmd1 = 0;
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case 20:
 			fds_last_side = 0;
 			fds_count = 0;
-			nes_fds.motor_on = 0;
-			nes_fds.door_closed = 0;
-			nes_fds.current_side = 1;
-			nes_fds.head_position = 0;
-			nes_fds.status0 = 0;
-			nes_fds.read_mode = nes_fds.write_reg = 0;
+			state->fds_motor_on = 0;
+			state->fds_door_closed = 0;
+			state->fds_current_side = 1;
+			state->fds_head_position = 0;
+			state->fds_status0 = 0;
+			state->fds_read_mode = state->fds_write_reg = 0;
 			break;
 		case 21:
 		case 22:
@@ -920,16 +947,16 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 		case 207:
 		case 222:
 		case 252:
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 32:
 			mmc_cmd1 = 0;
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
-			if (nes.crc_hack)
-				set_nt_mirroring(PPU_MIRROR_HIGH);  // needed by Major League
+			prg16_cdef(machine, state->prg_chunks - 1);
+			if (state->crc_hack)
+				set_nt_mirroring(machine, PPU_MIRROR_HIGH);  // needed by Major League
 			break;
 		case 34:
 			prg32(machine, 0);
@@ -945,7 +972,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = 0x07;
 			mmc_chr_mask = 0x7f;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -961,11 +988,11 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			prg32(machine, 0);
 			break;
 		case 42:
-			prg32(machine, nes.prg_chunks - 1);
+			prg32(machine, state->prg_chunks - 1);
 			break;
 		case 43:
 			prg32(machine, 0);
-			memset(nes.wram, 0x2000, 0xff);
+			memset(state->wram, 0x2000, 0xff);
 			break;
 		case 44:
 		case 47:
@@ -977,7 +1004,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = 0x0f;
 			mmc_chr_mask = 0x7f;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -986,7 +1013,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			prg_bank[1] = prg_bank[3] = 0xff;
 			mmc_cmd1 = 0;
 			mmc_cmd2 = 0x80;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper45_reg[0] = mapper45_reg[1] = mapper45_reg[2] = mapper45_reg[3] = 0;
 			mmc_prg_base = 0x30;
 			mmc_prg_mask = 0x3f;
@@ -994,7 +1021,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_chr_mask = 0x7f;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
-			memory_set_bankptr(machine, "bank5", nes.wram);
+			memory_set_bankptr(machine, "bank5", state->wram);
 			break;
 		case 46:
 			prg32(machine, 0);
@@ -1003,7 +1030,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 		case 54:
 			prg32(machine, 0);
 			chr8(machine, 0, CHRROM);
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case 50:
 			prg8_67(machine, 0x0f);
@@ -1025,14 +1052,14 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd1 = 0;
 			mmc_cmd2 = 0x80;
 			map52_reg_written = 0;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc_prg_base = 0;
 			mmc_prg_mask = 0x1f;
 			mmc_chr_base = 0;
 			mmc_chr_mask = 0xff;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
-			memory_set_bankptr(machine, "bank5", nes.wram);
+			memory_set_bankptr(machine, "bank5", state->wram);
 			break;
 		case 57:
 			mmc_cmd1 = 0x00;
@@ -1053,8 +1080,8 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 		case 64:
 		case 158:
 			mmc_cmd1 = 0;
-			prg16_89ab(machine, nes.prg_chunks - 1);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_89ab(machine, state->prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 65:
 		case 67:
@@ -1063,27 +1090,27 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 		case 78:
 		case 92:
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 68:
 			m68_mirror = m0 = m1 = 0;
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 70:
-			prg16_89ab(machine, nes.prg_chunks - 2);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_89ab(machine, state->prg_chunks - 2);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 71:
-			set_nt_mirroring(PPU_MIRROR_HORZ);
+			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 76:
 			prg8_89(machine, 0);
 			prg8_ab(machine, 1);
 			//cd is bankable, but this should init all banks just fine.
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			chr2_0(machine, 0, CHRROM);
 			chr2_2(machine, 1, CHRROM);
 			chr2_4(machine, 2, CHRROM);
@@ -1100,7 +1127,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 		case 146:
 			/* Mirroring always horizontal...? */
 //          Mirroring = 1;
-			set_nt_mirroring(PPU_MIRROR_HORZ);
+			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
 			chr8(machine, 0, CHRROM);
 			prg32(machine, 0);
 			break;
@@ -1121,29 +1148,29 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			break;
 		case 89:
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
-			set_nt_mirroring(PPU_MIRROR_LOW);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			set_nt_mirroring(machine, PPU_MIRROR_LOW);
 			break;
 		case 91:
-			set_nt_mirroring(PPU_MIRROR_VERT);
-			prg16_89ab(machine, nes.prg_chunks - 1);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			prg16_89ab(machine, state->prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 93:
 		case 94:
 		case 95:
 		case 101:
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 97:
-			prg16_89ab(machine, nes.prg_chunks - 1);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_89ab(machine, state->prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 112:
 			mmc_cmd1 = 0;
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 36:
 		case 38:
@@ -1167,10 +1194,10 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			prg16_cdef(machine, 0x0f);
 			break;
 		case 106:
-			prg8_89(machine, (nes.prg_chunks << 1) - 1);
+			prg8_89(machine, (state->prg_chunks << 1) - 1);
 			prg8_ab(machine, 0);
 			prg8_cd(machine, 0);
-			prg8_ef(machine, (nes.prg_chunks << 1) - 1);
+			prg8_ef(machine, (state->prg_chunks << 1) - 1);
 			break;
 		case 114:
 			map114_reg = map114_reg_enabled = 0;
@@ -1180,7 +1207,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -1192,7 +1219,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -1204,7 +1231,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -1222,7 +1249,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = 0x1f;
 			mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -1243,17 +1270,17 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 		case 137:
 			mmc_cmd1 = 0;
 			prg32(machine, 0);
-			chr8(machine, nes.chr_chunks - 1, CHRROM);
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			chr8(machine, state->chr_chunks - 1, CHRROM);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case 138:
 		case 139:
 		case 141:
 			mmc_cmd1 = 0;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			prg32(machine, 0);
 			chr8(machine, 0, mmc_chr_source);
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case 143:
 			prg16_89ab(machine, 0);
@@ -1273,41 +1300,41 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd1 = 0;
 			prg32(machine, 0);
 			chr8(machine, 0, CHRROM);
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case 152:
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			chr8(machine, 0, CHRROM);
 			break;
 		case 153:
 			mmc_cmd1 = 0;
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			prg16_cdef(machine, state->prg_chunks - 1);
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			// Famicom Jump II needs also the following!
 			for (i = 0; i < 8; i++)
 				map153_reg[i] = 0;
 
 			map153_bank_latch = 0;
-			if (nes.crc_hack)
+			if (state->crc_hack)
 				mapper153_set_prg(machine);
 			break;
 		case 154:
-			prg16_89ab(machine, nes.prg_chunks - 2);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_89ab(machine, state->prg_chunks - 2);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 156:
-			prg16_89ab(machine, nes.prg_chunks - 2);
-			prg16_cdef(machine, nes.prg_chunks - 1);
-			set_nt_mirroring(PPU_MIRROR_LOW);
+			prg16_89ab(machine, state->prg_chunks - 2);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			set_nt_mirroring(machine, PPU_MIRROR_LOW);
 			break;
 		case 164:
 			prg32(machine, 0xff);
-			nes.mid_ram_enable = 1;
+			state->mid_ram_enable = 1;
 			break;
 		case 176:
-			prg32(machine, (nes.prg_chunks - 1) >> 1);
+			prg32(machine, (state->prg_chunks - 1) >> 1);
 			break;
 		case 178:
 			mmc_cmd1 = 0;
@@ -1318,11 +1345,11 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			prg16_cdef(machine, 0);
 			break;
 		case 182:
-			prg32(machine, (nes.prg_chunks - 1) >> 1);
+			prg32(machine, (state->prg_chunks - 1) >> 1);
 			break;
 		case 188:
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, (nes.prg_chunks - 1) ^ 0x08);
+			prg16_cdef(machine, (state->prg_chunks - 1) ^ 0x08);
 			break;
 		case 187:
 			prg_bank[0] = prg_bank[2] = 0xfe;
@@ -1332,7 +1359,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper187_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper187_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -1341,13 +1368,13 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_chr_base = 0;
 			mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			prg32(machine, 0);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
 		case 193:
-			prg32(machine, (nes.prg_chunks - 1) >> 1);
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			prg32(machine, (state->prg_chunks - 1) >> 1);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case 197:
 			prg_bank[0] = prg_bank[2] = 0xfe;
@@ -1356,7 +1383,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper197_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -1369,7 +1396,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper198_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -1382,13 +1409,13 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper199_set_chr(machine, mmc_chr_base, mmc_chr_mask);
 			break;
 		case 200:
-			prg16_89ab(machine, nes.prg_chunks - 1);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_89ab(machine, state->prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case 201:
 		case 213:
@@ -1412,7 +1439,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_prg_mask = 0x1f;
 			mmc_chr_base = 0;
 			mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -1424,7 +1451,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper4_set_chr(machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -1445,12 +1472,12 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			map215_reg[3] = 0;
 			mmc_prg_base = 0;
 			mmc_prg_mask = 0x1f;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper215_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper215_set_chr(machine, mmc_chr_source);
 			break;
 		case 216:
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			prg32(machine, 0);
 			chr8(machine, 0, mmc_chr_source);
 			break;
@@ -1465,7 +1492,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd2 = 0x80;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper217_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper217_set_chr(machine, mmc_chr_source);
 			break;
@@ -1492,7 +1519,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 1);
 			chr8(machine, 0, CHRROM);
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case 230:
 			prg16_89ab(machine, 0);
@@ -1500,8 +1527,8 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			break;
 		case 231:
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case 232:
 			mmc_cmd1 = 0x18;
@@ -1513,7 +1540,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			mmc_cmd1 = 0;
 			chr8(machine, 3, CHRROM);
 			prg32(machine, 0);
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case 246:
 			prg32(machine, 0xff);
@@ -1526,7 +1553,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			map249_reg = 0;
 			mmc_prg_base = mmc_chr_base = 0;
 			mmc_prg_mask = mmc_chr_mask = 0xff;
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mapper249_set_prg(machine, mmc_prg_base, mmc_prg_mask);
 			mapper249_set_chr(machine, mmc_chr_base, mmc_chr_mask);
 			break;
@@ -1559,7 +1586,7 @@ int nes_mapper_reset( running_machine *machine, int mmc_num )
 	int err = 0, i;
 	const mmc *mapper;
 
-	if (nes.chr_chunks == 0)
+	if (state->chr_chunks == 0)
 		chr8(machine, 0,CHRRAM);
 	else
 		chr8(machine, 0,CHRROM);
@@ -1581,7 +1608,7 @@ int nes_mapper_reset( running_machine *machine, int mmc_num )
 
 	/* Point the WRAM/battery area to the first RAM bank */
 	if (mmc_num != 20)
-		memory_set_bankptr(machine, "bank5", &nes.wram[0x0000]);
+		memory_set_bankptr(machine, "bank5", &state->wram[0x0000]);
 
 	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
 	for (i = 0; i < 4; i++)
@@ -1625,7 +1652,7 @@ int nes_unif_reset( running_machine *machine, const char *board )
 	int err = 0;
 	const unif *unif_board;
 
-	if (nes.chr_chunks == 0)
+	if (state->chr_chunks == 0)
 		chr8(machine, 0,CHRRAM);
 	else
 		chr8(machine, 0,CHRROM);
@@ -1641,7 +1668,7 @@ int nes_unif_reset( running_machine *machine, const char *board )
 
 
 	/* Point the WRAM/battery area to the first RAM bank */
-	memory_set_bankptr(machine, "bank5", &nes.wram[0x0000]);
+	memory_set_bankptr(machine, "bank5", &state->wram[0x0000]);
 
 	switch (unif_board->board_idx)
 	{
@@ -1650,7 +1677,7 @@ int nes_unif_reset( running_machine *machine, const char *board )
 			bmc_64in1nr_reg[1] = 0x43;
 			bmc_64in1nr_reg[2] = bmc_64in1nr_reg[3] = 0;
 			bmc_64in1nr_set_prg(machine);
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			chr8(machine, 0, CHRROM);
 			break;
 		case BMC_190IN1:
@@ -1661,7 +1688,7 @@ int nes_unif_reset( running_machine *machine, const char *board )
 		case BMC_A65AS:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 7);
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case BMC_GS2004:
 		case BMC_GS2013:
@@ -1723,9 +1750,9 @@ int nes_unif_reset( running_machine *machine, const char *board )
 			mapper_initialize(machine, 4);
 			break;
 		case UNL_T230:
-			mmc_chr_source = nes.chr_chunks ? CHRROM : CHRRAM;
+			mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			prg16_89ab(machine, 0);
-			prg16_cdef(machine, nes.prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		/* For the Boards corresponding to a Mapper, fall back to the mapper init */
 		case STD_NROM:
@@ -1902,7 +1929,7 @@ int nes_unif_reset( running_machine *machine, const char *board )
 			mapper_initialize(machine, 71);
 			break;
 		case CAMERICA_9097:
-			nes.crc_hack = 0xf0;
+			state->crc_hack = 0xf0;
 			mapper_initialize(machine, 71);
 			break;
 		case JALECO_JF17:

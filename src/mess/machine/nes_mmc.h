@@ -83,7 +83,7 @@ WRITE8_HANDLER( nes_mapper50_add_w );
 #define PPU_MIRROR_LOW		4
 #define PPU_MIRROR_4SCREEN	5	// Same effect as NONE, but signals that we should never mirror
 
-void set_nt_mirroring(int mirroring);
+void set_nt_mirroring(running_machine *machine, int mirroring);
 
 
 #endif

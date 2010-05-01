@@ -57,7 +57,7 @@ static WRITE8_HANDLER( bmc_64in1nr_l_w )
 		break;
 	}
 	if (offset == 0x1000)	/* reg[0] also sets mirroring */
-		set_nt_mirroring((data & 0x20) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 static WRITE8_HANDLER( bmc_64in1nr_w )
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( bmc_190in1_w )
 {
 	LOG_MMC(("bmc_190in1_w offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	data >>= 2;
 	prg16_89ab(space->machine, data);
 	prg16_cdef(space->machine, data);
@@ -104,9 +104,9 @@ static WRITE8_HANDLER( bmc_a65as_w )
 	LOG_MMC(("bmc_a65as_w offset: %04x, data: %02x\n", offset, data));
 
 	if (data & 0x80)
-		set_nt_mirroring((data & 0x20) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+		set_nt_mirroring(space->machine, BIT(data, 5) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	else
-		set_nt_mirroring((data & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	if (data & 0x40)
 		prg32(space->machine, data >> 1);
@@ -286,7 +286,7 @@ static WRITE8_HANDLER( bmc_t262_w )
 	else
 	{
 		mmc_cmd2 = 1;
-		set_nt_mirroring((offset & 0x02) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		mmc_helper = ((offset >> 3) & 0x20) | ((offset >> 2) & 0x18);
 		mmc_cmd1 = mmc_helper | (mmc_cmd1 & 0x07);
 		prg16_89ab(space->machine, mmc_cmd1);
@@ -317,7 +317,7 @@ static WRITE8_HANDLER( bmc_ws_m_w )
 			if (!mmc_cmd1)
 			{
 				mmc_cmd1 = data & 0x20;
-				set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				mmc_helper = (~data & 0x08) >> 3;
 				prg16_89ab(space->machine, data & ~mmc_helper);
 				prg16_cdef(space->machine, data |  mmc_helper);
@@ -473,7 +473,7 @@ static WRITE8_HANDLER( unl_8237_w )
 
 		case 0x0000:
 		case 0x1000:
-			set_nt_mirroring((data | (data >> 7)) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, (data | (data >> 7)) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x6000:
@@ -515,7 +515,7 @@ static WRITE8_HANDLER( unl_ax5705_w )
 		unl_ax5705_set_prg(space->machine);
 		break;
 	case 0x0008:
-		set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x2000:
 		prg_bank[1] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
@@ -572,7 +572,7 @@ static WRITE8_HANDLER( unl_cc21_w )
 {
 	LOG_MMC(("unl_cc21_w offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((offset & 0x02) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	set_nt_mirroring(space->machine, BIT(data, 1) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	chr8(space->machine, (offset & 0x01), CHRROM);
 }
 

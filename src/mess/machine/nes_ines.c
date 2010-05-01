@@ -120,10 +120,10 @@ static WRITE8_HANDLER( mapper1_w )
 
 			switch (MMC1_regs[0] & 0x03)
 			{
-				case 0: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 1: set_nt_mirroring(PPU_MIRROR_HIGH); break;
-				case 2: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 3: set_nt_mirroring(PPU_MIRROR_HORZ); break;
+				case 0: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+				case 1: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
+				case 2: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+				case 3: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
 			}
 			MMC1_set_chr(space->machine);
 			MMC1_set_prg(space->machine);
@@ -259,6 +259,7 @@ static void mapper4_irq( running_device *device, int scanline, int vblank, int b
 
 static WRITE8_HANDLER( mapper4_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 
 	LOG_MMC(("mapper4_w offset: %04x, data: %02x\n", offset, data));
@@ -296,13 +297,13 @@ static WRITE8_HANDLER( mapper4_w )
 			break;
 
 		case 0x2000:
-			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x2001: /* extra RAM enable/disable */
 			mmc_cmd2 = data;	/* This actually is made of two parts: data&0x80 = WRAM enabled and data&0x40 = WRAM readonly!  */
 						/* We save this twice because we will need mmc_cmd2 in some clone mapper */
-			nes.mid_ram_enable = data;
+			state->mid_ram_enable = data;
 			break;
 
 		case 0x4000:
@@ -357,21 +358,21 @@ static void mapper5_irq( running_device *device, int scanline, int vblank, int b
 	}
 }
 
-static void ppu_mirror_MMC5( int page, int src )
+static void ppu_mirror_MMC5( running_machine *machine, int page, int src )
 {
 	switch (src)
 	{
 	case 0:	/* CIRAM0 */
-		set_nt_page(page, CIRAM, 0, 1);
+		set_nt_page(machine, page, CIRAM, 0, 1);
 		break;
 	case 1:	/* CIRAM1 */
-		set_nt_page(page, CIRAM, 1, 1);
+		set_nt_page(machine, page, CIRAM, 1, 1);
 		break;
 	case 2:	/* ExRAM */
-		set_nt_page(page, EXRAM, 0, 1);	// actually only works during rendering.
+		set_nt_page(machine, page, EXRAM, 0, 1);	// actually only works during rendering.
 		break;
 	case 3: /* Fill Registers */
-		set_nt_page(page, MMC5FILL, 0, 0);
+		set_nt_page(machine, page, MMC5FILL, 0, 0);
 		break;
 	default:
 		fatalerror("This should never happen");
@@ -479,10 +480,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			break;
 
 		case 0x1005: /* $5105 */
-			ppu_mirror_MMC5(0, data & 0x03);
-			ppu_mirror_MMC5(1, (data & 0x0c) >> 2);
-			ppu_mirror_MMC5(2, (data & 0x30) >> 4);
-			ppu_mirror_MMC5(3, (data & 0xc0) >> 6);
+			ppu_mirror_MMC5(space->machine, 0, data & 0x03);
+			ppu_mirror_MMC5(space->machine, 1, (data & 0x0c) >> 2);
+			ppu_mirror_MMC5(space->machine, 2, (data & 0x30) >> 4);
+			ppu_mirror_MMC5(space->machine, 3, (data & 0xc0) >> 6);
 			break;
 
 		/* tile data for MMC5 flood-fill NT mode */
@@ -504,9 +505,9 @@ static WRITE8_HANDLER( mapper5_l_w )
 
 		case 0x1013: /* $5113 */
 			LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
-			memory_set_bankptr(space->machine, "bank5", &nes.wram[data * 0x2000]);
+			memory_set_bankptr(space->machine, "bank5", &state->wram[data * 0x2000]);
 			/* The & 4 is a hack that'll tide us over for now */
-			nes_battery_ram = &nes.wram[(data & 4) * 0x2000];
+			nes_battery_ram = &state->wram[(data & 4) * 0x2000];
 			break;
 
 		case 0x1014: /* $5114 */
@@ -519,15 +520,15 @@ static WRITE8_HANDLER( mapper5_l_w )
 					{
 						/* ROM */
 						LOG_MMC(("\tROM bank select (8k, $8000): %02x\n", data));
-						data &= ((nes.prg_chunks << 1) - 1);
-						memory_set_bankptr(space->machine, "bank1", &nes.rom[data * 0x2000 + 0x10000]);
+						data &= ((state->prg_chunks << 1) - 1);
+						memory_set_bankptr(space->machine, "bank1", &state->rom[data * 0x2000 + 0x10000]);
 					}
 					else
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $8000): %02x\n", data & 0x07));
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, "bank1", &nes.wram[(data & 4) * 0x2000]);
+						memory_set_bankptr(space->machine, "bank1", &state->wram[(data & 4) * 0x2000]);
 					}
 					break;
 			}
@@ -548,8 +549,8 @@ static WRITE8_HANDLER( mapper5_l_w )
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (16k, $8000): %02x\n", data & 0x07));
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, "bank1", &nes.wram[((data & 4) >> 1) * 0x4000]);
-						memory_set_bankptr(space->machine, "bank2", &nes.wram[((data & 4) >> 1) * 0x4000 + 0x2000]);
+						memory_set_bankptr(space->machine, "bank1", &state->wram[((data & 4) >> 1) * 0x4000]);
+						memory_set_bankptr(space->machine, "bank2", &state->wram[((data & 4) >> 1) * 0x4000 + 0x2000]);
 					}
 					break;
 				case 0x03:
@@ -557,15 +558,15 @@ static WRITE8_HANDLER( mapper5_l_w )
 					if (data & 0x80)
 					{
 						/* ROM */
-						data &= ((nes.prg_chunks << 1) - 1);
-						memory_set_bankptr(space->machine, "bank2", &nes.rom[data * 0x2000 + 0x10000]);
+						data &= ((state->prg_chunks << 1) - 1);
+						memory_set_bankptr(space->machine, "bank2", &state->rom[data * 0x2000 + 0x10000]);
 					}
 					else
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $a000): %02x\n", data & 0x07));
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, "bank2", &nes.wram[(data & 4) * 0x2000]);
+						memory_set_bankptr(space->machine, "bank2", &state->wram[(data & 4) * 0x2000]);
 					}
 					break;
 			}
@@ -580,15 +581,15 @@ static WRITE8_HANDLER( mapper5_l_w )
 					if (data & 0x80)
 					{
 						/* ROM */
-						data &= ((nes.prg_chunks << 1) - 1);
-						memory_set_bankptr(space->machine, "bank3", &nes.rom[data * 0x2000 + 0x10000]);
+						data &= ((state->prg_chunks << 1) - 1);
+						memory_set_bankptr(space->machine, "bank3", &state->rom[data * 0x2000 + 0x10000]);
 					}
 					else
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $c000): %02x\n", data & 0x07));
 						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, "bank3", &nes.wram[(data & 4)* 0x2000]);
+						memory_set_bankptr(space->machine, "bank3", &state->wram[(data & 4)* 0x2000]);
 					}
 					break;
 			}
@@ -608,8 +609,8 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x02:
 				case 0x03:
 					/* 8k switch */
-					data &= ((nes.prg_chunks << 1) - 1);
-					memory_set_bankptr(space->machine, "bank4", &nes.rom[data * 0x2000 + 0x10000]);
+					data &= ((state->prg_chunks << 1) - 1);
+					memory_set_bankptr(space->machine, "bank4", &state->rom[data * 0x2000 + 0x10000]);
 					break;
 			}
 			break;
@@ -936,10 +937,10 @@ static WRITE8_HANDLER( mapper6_l_w )
 	{
 		case 0x1fe:
 			mmc_cmd1 = data & 0x80;
-			set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+			set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
 		case 0x1ff:
-			set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x401:
@@ -987,7 +988,7 @@ static WRITE8_HANDLER( mapper7_w )
 {
 	LOG_MMC(("mapper7_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	prg32(space->machine, data);
 }
 
@@ -1078,7 +1079,7 @@ static WRITE8_HANDLER( mapper9_w )
 				chr4_4(space->machine, MMC2_regs[3], CHRROM);
 			break;
 		case 0x7000:
-			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		default:
 			LOG_MMC(("MMC2 uncaught w: %04x:%02x\n", offset, data));
@@ -1307,7 +1308,7 @@ static WRITE8_HANDLER( mapper14_w )
 		mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 
 		if (!(map14_reg[0] & 0x02))
-			set_nt_mirroring(map14_reg[1] & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(map14_reg[1], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	}
 
 	if (map14_reg[0] & 0x02)
@@ -1349,7 +1350,7 @@ static WRITE8_HANDLER( mapper14_w )
 			break;
 
 		case 0x2000:
-			set_nt_mirroring(map14_reg[1] & 0x01 ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+			set_nt_mirroring(space->machine, BIT(map14_reg[1], 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 			break;
 
 		default:
@@ -1377,7 +1378,7 @@ static WRITE8_HANDLER( mapper14_w )
 
 		case 0x1000:
 			map14_reg[1] = data;
-			set_nt_mirroring(map14_reg[1] & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(map14_reg[1], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		}
 	}
@@ -1401,7 +1402,7 @@ static WRITE8_HANDLER( mapper15_w )
 
 	LOG_MMC(("mapper15_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((data & 0x40) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	switch (offset & 0x0fff)
 	{
@@ -1486,10 +1487,10 @@ static WRITE8_HANDLER( mapper16_m_w )
 		case 9:
 			switch (data & 0x03)
 			{
-				case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+				case 0: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+				case 1: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+				case 2: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+				case 3: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 			}
 			break;
 		case 0x0a:
@@ -1533,10 +1534,10 @@ static WRITE8_HANDLER( mapper17_l_w )
 	switch (offset)
 	{
 		case 0x1fe:
-			set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+			set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
 		case 0x1ff:
-			set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x401:
@@ -1708,10 +1709,10 @@ static WRITE8_HANDLER( mapper18_w )
 		case 0x7002:
 			switch (data & 0x03)
 			{
-				case 0: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 1: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+				case 0: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+				case 1: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+				case 2: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+				case 3: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 			}
 			break;
 
@@ -1786,12 +1787,12 @@ static READ8_HANDLER( mapper19_l_r )
 	}
 }
 
-static void mapper19_set_mirror( UINT8 page, UINT8 data )
+static void mapper19_set_mirror( running_machine *machine, UINT8 page, UINT8 data )
 {
 	if (!(data < 0xe0))
-		set_nt_page(page, CIRAM, data & 0x01, 1);
+		set_nt_page(machine, page, CIRAM, data & 0x01, 1);
 	else
-		set_nt_page(page, ROM, data, 0);
+		set_nt_page(machine, page, ROM, data, 0);
 }
 
 static WRITE8_HANDLER( mapper19_w )
@@ -1806,16 +1807,16 @@ static WRITE8_HANDLER( mapper19_w )
 			chr1_x(space->machine, offset / 0x800, data, CHRROM);
 			break;
 		case 0x4000:
-			mapper19_set_mirror(0, data);
+			mapper19_set_mirror(space->machine, 0, data);
 			break;
 		case 0x4800:
-			mapper19_set_mirror(1, data);
+			mapper19_set_mirror(space->machine, 1, data);
 			break;
 		case 0x5000:
-			mapper19_set_mirror(2, data);
+			mapper19_set_mirror(space->machine, 2, data);
 			break;
 		case 0x5800:
-			mapper19_set_mirror(3, data);
+			mapper19_set_mirror(space->machine, 3, data);
 			break;
 		case 0x6000:
 			prg8_89(space->machine, data & 0x3f);
@@ -1846,6 +1847,8 @@ static WRITE8_HANDLER( mapper19_w )
 
 static void fds_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
 	if (IRQ_enable_latch)
 		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 
@@ -1855,7 +1858,7 @@ static void fds_irq( running_device *device, int scanline, int vblank, int blank
 		{
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 			IRQ_enable = 0;
-			nes_fds.status0 |= 0x01;
+			state->fds_status0 |= 0x01;
 		}
 		else
 			IRQ_count -= 114;
@@ -1864,42 +1867,43 @@ static void fds_irq( running_device *device, int scanline, int vblank, int blank
 
 READ8_HANDLER( nes_fds_r )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 ret = 0x00;
 	LOG_MMC(("fds_r, offset: %04x\n", offset));
 
 	switch (offset)
 	{
 		case 0x00: /* $4030 - disk status 0 */
-			ret = nes_fds.status0;
+			ret = state->fds_status0;
 			/* clear the disk IRQ detect flag */
-			nes_fds.status0 &= ~0x01;
+			state->fds_status0 &= ~0x01;
 			break;
 		case 0x01: /* $4031 - data latch */
 			/* don't read data if disk is unloaded */
-			if (nes_fds.data == NULL)
+			if (state->fds_data == NULL)
 				ret = 0;
-			else if (nes_fds.current_side)
-				ret = nes_fds.data[(nes_fds.current_side-1) * 65500 + nes_fds.head_position++];
+			else if (state->fds_current_side)
+				ret = state->fds_data[(state->fds_current_side - 1) * 65500 + state->fds_head_position++];
 			else
 				ret = 0;
 			break;
 		case 0x02: /* $4032 - disk status 1 */
 			/* return "no disk" status if disk is unloaded */
-			if (nes_fds.data == NULL)
+			if (state->fds_data == NULL)
 				ret = 1;
-			else if (fds_last_side != nes_fds.current_side)
+			else if (fds_last_side != state->fds_current_side)
 			{
 				/* If we've switched disks, report "no disk" for a few reads */
 				ret = 1;
 				fds_count ++;
 				if (fds_count == 50)
 				{
-					fds_last_side = nes_fds.current_side;
+					fds_last_side = state->fds_current_side;
 					fds_count = 0;
 				}
 			}
 			else
-				ret = (nes_fds.current_side == 0); /* 0 if a disk is inserted */
+				ret = (state->fds_current_side == 0); /* 0 if a disk is inserted */
 			break;
 		case 0x03: /* $4033 */
 			ret = 0x80;
@@ -1916,6 +1920,7 @@ READ8_HANDLER( nes_fds_r )
 
 WRITE8_HANDLER( nes_fds_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("fds_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
@@ -1938,19 +1943,19 @@ WRITE8_HANDLER( nes_fds_w )
 			/* write data out to disk */
 			break;
 		case 0x05:
-			nes_fds.motor_on = data & 0x01;
+			state->fds_motor_on = BIT(data, 0);
 
-			if (data & 0x02)
-				nes_fds.head_position = 0;
+			if (BIT(data, 1))
+				state->fds_head_position = 0;
 
-			nes_fds.read_mode = data & 0x04;
-			set_nt_mirroring((data & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			state->fds_read_mode = BIT(data, 2);
+			set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-			if ((!(data & 0x40)) && (nes_fds.write_reg & 0x40))
-				nes_fds.head_position -= 2; // ???
+			if ((!(data & 0x40)) && (state->fds_write_reg & 0x40))
+				state->fds_head_position -= 2; // ???
 
-			IRQ_enable_latch = data & 0x80;
-			nes_fds.write_reg = data;
+			IRQ_enable_latch = BIT(data, 7);
+			state->fds_write_reg = data;
 			break;
 	}
 
@@ -2016,10 +2021,10 @@ static WRITE8_HANDLER( konami_vrc4a_w )
 		case 0x1040:
 			switch (data & 0x03)
 			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+				case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+				case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+				case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+				case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 			}
 			break;
 
@@ -2165,10 +2170,10 @@ static WRITE8_HANDLER( konami_vrc4b_w )
 		case 0x1008:
 			switch (data & 0x03)
 			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+				case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+				case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+				case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+				case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 			}
 			break;
 
@@ -2316,10 +2321,10 @@ static WRITE8_HANDLER( konami_vrc2a_w )
 	case 0x1000:
 		switch (data & 0x03)
 		{
-			case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-			case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-			case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-			case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+			case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+			case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+			case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+			case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 		}
 		break;
 	case 0x2000:
@@ -2373,10 +2378,10 @@ static WRITE8_HANDLER( konami_vrc2b_w )
 			case 0x1000:
 				switch (data & 0x03)
 				{
-					case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-					case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-					case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-					case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+					case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+					case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+					case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+					case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 				}
 				break;
 			case 0x2000:
@@ -2472,10 +2477,10 @@ static WRITE8_HANDLER( konami_vrc6a_w )
 		case 0x3003:
 			switch (data & 0x0c)
 			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 0x04: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 0x08: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x0c: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+				case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+				case 0x04: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+				case 0x08: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+				case 0x0c: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 			}
 			break;
 		case 0x4000:
@@ -2546,10 +2551,10 @@ static WRITE8_HANDLER( konami_vrc6b_w )
 		case 0x3003:
 			switch (data & 0x0c)
 			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 0x04: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 0x08: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x0c: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+				case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+				case 0x04: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+				case 0x08: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+				case 0x0c: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 			}
 			break;
 		case 0x4000: case 0x4001: case 0x4002: case 0x4003:
@@ -2658,6 +2663,7 @@ static WRITE8_HANDLER( konami_vrc6b_w )
 
 static WRITE8_HANDLER( mapper32_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper32_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7000)
@@ -2667,8 +2673,8 @@ static WRITE8_HANDLER( mapper32_w )
 			break;
 		case 0x1000:
 			mmc_cmd1 = data & 0x02;
-			if (!nes.crc_hack)	// Major League has hardwired mirroring (it would have required a separate mapper)
-				set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			if (!state->crc_hack)	// Major League has hardwired mirroring (it would have required a separate mapper)
+				set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2000:
 			prg8_ab(space->machine, data);
@@ -2702,7 +2708,7 @@ static WRITE8_HANDLER( mapper33_w )
 	switch (offset & 0x6003)
 	{
 		case 0x0000:
-			set_nt_mirroring((data & 0x40) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			prg8_89(space->machine, data);
 			break;
 		case 0x0001:
@@ -2748,9 +2754,10 @@ static WRITE8_HANDLER( mapper33_w )
 
 static WRITE8_HANDLER( mapper34_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper34_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (nes.crc_hack)	// is it AVE Nina-01?
+	if (state->crc_hack)	// is it AVE Nina-01?
 	{
 		switch (offset)
 		{
@@ -2771,9 +2778,10 @@ static WRITE8_HANDLER( mapper34_w )
 {
 	/* This portion of the mapper is nearly identical to Mapper 7, except no one-screen mirroring */
 	/* Deadly Towers is really a Mapper 34 game - the demo screens look wrong using mapper 7. */
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper34_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (!nes.crc_hack)	// is it plain BxROM?
+	if (!state->crc_hack)	// is it plain BxROM?
 		prg32(space->machine, data);
 }
 
@@ -2841,7 +2849,7 @@ static WRITE8_HANDLER( mapper35_w )
 		IRQ_count = data;
 		break;
 	case 0x5001:
-		set_nt_mirroring(data & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	}
 }
@@ -2994,7 +3002,7 @@ static WRITE8_HANDLER( mapper41_m_w )
 	LOG_MMC(("mapper41_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	mmc_cmd1 = offset & 0xff;
-	set_nt_mirroring((offset & 0x20) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	prg32(space->machine, offset & 0x07);
 }
 
@@ -3031,7 +3039,7 @@ static WRITE8_HANDLER( mapper42_w )
 			prg8_67(space->machine, data);
 			break;
 		case 0x01:
-			set_nt_mirroring((data & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x02:
 			/* Check if IRQ is being enabled */
@@ -3064,20 +3072,21 @@ static WRITE8_HANDLER( mapper42_w )
 
 static WRITE8_HANDLER( mapper43_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	int bank = (((offset >> 8) & 0x03) * 0x20) + (offset & 0x1f);
 
 	LOG_MMC(("mapper43_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((offset& 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, (offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	if (offset & 0x0800)
 	{
 		if (offset & 0x1000)
 		{
-			if (bank * 2 >= nes.prg_chunks)
+			if (bank * 2 >= state->prg_chunks)
 			{
-				memory_set_bankptr(space->machine, "bank3", nes.wram);
-				memory_set_bankptr(space->machine, "bank4", nes.wram);
+				memory_set_bankptr(space->machine, "bank3", state->wram);
+				memory_set_bankptr(space->machine, "bank4", state->wram);
 			}
 			else
 			{
@@ -3087,10 +3096,10 @@ static WRITE8_HANDLER( mapper43_w )
 		}
 		else
 		{
-			if (bank * 2 >= nes.prg_chunks)
+			if (bank * 2 >= state->prg_chunks)
 			{
-				memory_set_bankptr(space->machine, "bank1", nes.wram);
-				memory_set_bankptr(space->machine, "bank2", nes.wram);
+				memory_set_bankptr(space->machine, "bank1", state->wram);
+				memory_set_bankptr(space->machine, "bank2", state->wram);
 			}
 			else
 			{
@@ -3101,12 +3110,12 @@ static WRITE8_HANDLER( mapper43_w )
 	}
 	else
 	{
-		if (bank * 2 >= nes.prg_chunks)
+		if (bank * 2 >= state->prg_chunks)
 		{
-			memory_set_bankptr(space->machine, "bank1", nes.wram);
-			memory_set_bankptr(space->machine, "bank2", nes.wram);
-			memory_set_bankptr(space->machine, "bank3", nes.wram);
-			memory_set_bankptr(space->machine, "bank4", nes.wram);
+			memory_set_bankptr(space->machine, "bank1", state->wram);
+			memory_set_bankptr(space->machine, "bank2", state->wram);
+			memory_set_bankptr(space->machine, "bank3", state->wram);
+			memory_set_bankptr(space->machine, "bank4", state->wram);
 		}
 		else
 		{
@@ -3166,12 +3175,13 @@ static WRITE8_HANDLER( mapper44_w )
 
 static WRITE8_HANDLER( mapper45_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper45_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* This bit is the "register lock". Once register are locked, writes go to WRAM
         and there is no way to unlock them (except by resetting the machine) */
 	if (mapper45_reg[3] & 0x40)
-		nes.wram[offset] = data;
+		state->wram[offset] = data;
 	else
 	{
 		mapper45_reg[mmc_count] = data;
@@ -3307,7 +3317,7 @@ static WRITE8_HANDLER( mapper48_w )
 			IRQ_enable = 0;
 			break;
 		case 0x6000:
-			set_nt_mirroring((data & 0x40) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 	}
 }
@@ -3419,7 +3429,7 @@ WRITE8_HANDLER( nes_mapper50_add_w )
 
 static void mapper51_set_banks( running_machine *machine )
 {
-	set_nt_mirroring((mapper51_reg[0] == 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(machine, (mapper51_reg[0] == 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	if (mapper51_reg[0] & 0x01)
 	{
@@ -3472,6 +3482,7 @@ static WRITE8_HANDLER( mapper51_w )
 
 static WRITE8_HANDLER( mapper52_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map52_helper1, map52_helper2;
 	LOG_MMC(("mapper52_m_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -3493,7 +3504,7 @@ static WRITE8_HANDLER( mapper52_m_w )
 		map52_reg_written = 1;
 	}
 	else
-		nes.wram[offset] = data;
+		state->wram[offset] = data;
 }
 
 /*************************************************************
@@ -3585,7 +3596,7 @@ static WRITE8_HANDLER( mapper57_w )
 		prg16_cdef(space->machine, (mmc_cmd2 >> 5) & 0x03);
 	}
 
-	set_nt_mirroring((mmc_cmd2 & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, (mmc_cmd2 & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	chr8(space->machine, (mmc_cmd1 & 0x03) | (mmc_cmd2 & 0x07) | ((mmc_cmd2 & 0x10) >> 1), CHRROM);
 }
@@ -3609,7 +3620,7 @@ static WRITE8_HANDLER( mapper58_w )
 	prg16_89ab(space->machine, offset & ~bank);
 	prg16_cdef(space->machine, offset | bank);
 	chr8(space->machine, offset >> 3, CHRROM);
-	set_nt_mirroring((data & 0x80) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -3667,7 +3678,7 @@ static WRITE8_HANDLER( mapper61_w )
 		prg16_cdef(space->machine, ((offset & 0x0f) << 1) | ((offset & 0x20) >> 4));
 		break;
 	}
-	set_nt_mirroring((offset & 0x80) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -3697,7 +3708,7 @@ static WRITE8_HANDLER( mapper62_w )
 		prg32(space->machine, ((offset & 0x40) | ((offset >> 8) & 0x3f)) >> 1);
 	}
 
-	set_nt_mirroring((offset & 0x80) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -3859,7 +3870,7 @@ static WRITE8_HANDLER( mapper64_w )
 			break;
 
 		case 0x2000:
-			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x4000:
@@ -3925,7 +3936,7 @@ static WRITE8_HANDLER( mapper65_w )
 			break;
 
 		case 0x1001:
-			set_nt_mirroring((data & 0x80) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x1003:
@@ -4051,10 +4062,10 @@ static WRITE8_HANDLER( mapper67_w )
 	case 0x6800:
 		switch (data & 3)
 		{
-			case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-			case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-			case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-			case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+			case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+			case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+			case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+			case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 		}
 		break;
 	case 0x7800:
@@ -4082,40 +4093,40 @@ static void mapper68_mirror( running_machine *machine, int mirror, int mirr0, in
 	switch (mirror)
 	{
 		case 0x00:
-			set_nt_mirroring(PPU_MIRROR_HORZ);
+			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
 			break;
 		case 0x01:
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case 0x02:
-			set_nt_mirroring(PPU_MIRROR_LOW);
+			set_nt_mirroring(machine, PPU_MIRROR_LOW);
 			break;
 		case 0x03:
-			set_nt_mirroring(PPU_MIRROR_HIGH);
+			set_nt_mirroring(machine, PPU_MIRROR_HIGH);
 			break;
 		case 0x10:
-			set_nt_page(0, ROM, mirr0 | 0x80, 0);
-			set_nt_page(1, ROM, mirr1 | 0x80, 0);
-			set_nt_page(2, ROM, mirr0 | 0x80, 0);
-			set_nt_page(3, ROM, mirr1 | 0x80, 0);
+			set_nt_page(machine, 0, ROM, mirr0 | 0x80, 0);
+			set_nt_page(machine, 1, ROM, mirr1 | 0x80, 0);
+			set_nt_page(machine, 2, ROM, mirr0 | 0x80, 0);
+			set_nt_page(machine, 3, ROM, mirr1 | 0x80, 0);
 			break;
 		case 0x11:
-			set_nt_page(0, ROM, mirr0 | 0x80, 0);
-			set_nt_page(1, ROM, mirr0 | 0x80, 0);
-			set_nt_page(2, ROM, mirr1 | 0x80, 0);
-			set_nt_page(3, ROM, mirr1 | 0x80, 0);
+			set_nt_page(machine, 0, ROM, mirr0 | 0x80, 0);
+			set_nt_page(machine, 1, ROM, mirr0 | 0x80, 0);
+			set_nt_page(machine, 2, ROM, mirr1 | 0x80, 0);
+			set_nt_page(machine, 3, ROM, mirr1 | 0x80, 0);
 			break;
 		case 0x12:
-			set_nt_page(0, ROM, mirr0 | 0x80, 0);
-			set_nt_page(1, ROM, mirr0 | 0x80, 0);
-			set_nt_page(2, ROM, mirr0 | 0x80, 0);
-			set_nt_page(3, ROM, mirr0 | 0x80, 0);
+			set_nt_page(machine, 0, ROM, mirr0 | 0x80, 0);
+			set_nt_page(machine, 1, ROM, mirr0 | 0x80, 0);
+			set_nt_page(machine, 2, ROM, mirr0 | 0x80, 0);
+			set_nt_page(machine, 3, ROM, mirr0 | 0x80, 0);
 			break;
 		case 0x13:
-			set_nt_page(0, ROM, mirr1 | 0x80, 0);
-			set_nt_page(1, ROM, mirr1 | 0x80, 0);
-			set_nt_page(2, ROM, mirr1 | 0x80, 0);
-			set_nt_page(3, ROM, mirr1 | 0x80, 0);
+			set_nt_page(machine, 0, ROM, mirr1 | 0x80, 0);
+			set_nt_page(machine, 1, ROM, mirr1 | 0x80, 0);
+			set_nt_page(machine, 2, ROM, mirr1 | 0x80, 0);
+			set_nt_page(machine, 3, ROM, mirr1 | 0x80, 0);
 			break;
 	}
 }
@@ -4198,6 +4209,7 @@ static void mapper69_irq( running_device *device, int scanline, int vblank, int 
 
 static WRITE8_HANDLER( mapper69_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper69_w, offset %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6000)
@@ -4218,7 +4230,7 @@ static WRITE8_HANDLER( mapper69_w )
 					if (!(data & 0x40))
 						prg8_67(space->machine, data & 0x3f);
 					else if (data & 0x80)
-						memory_set_bankptr(space->machine, "bank5", &nes.wram[(data & 0x3f) * 0x2000]);
+						memory_set_bankptr(space->machine, "bank5", &state->wram[(data & 0x3f) * 0x2000]);
 					break;
 
 				case 9:
@@ -4233,10 +4245,10 @@ static WRITE8_HANDLER( mapper69_w )
 				case 0x0c:
 					switch (data & 0x03)
 					{
-						case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-						case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-						case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-						case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+						case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+						case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+						case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+						case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 					}
 					break;
 				case 0x0d:
@@ -4303,14 +4315,15 @@ static WRITE8_HANDLER( mapper70_w )
 
 static WRITE8_HANDLER( mapper71_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper71_w offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7000)
 	{
 	case 0x0000:
 	case 0x1000:
-		if (nes.crc_hack)
-			set_nt_mirroring((data & 0x10) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+		if (state->crc_hack)
+			set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 		break;
 	case 0x4000:
 	case 0x5000:
@@ -4403,19 +4416,19 @@ static WRITE8_HANDLER( mapper73_w )
 *************************************************************/
 
 /* MIRROR_LOW and MIRROR_HIGH are swapped! */
-static void waixing_set_mirror( UINT8 nt )
+static void waixing_set_mirror( running_machine *machine, UINT8 nt )
 {
 	switch (nt)
 	{
 	case 0:
 	case 1:
-		set_nt_mirroring(nt ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(machine, nt ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 2:
-		set_nt_mirroring(PPU_MIRROR_LOW);
+		set_nt_mirroring(machine, PPU_MIRROR_LOW);
 		break;
 	case 3:
-		set_nt_mirroring(PPU_MIRROR_HIGH);
+		set_nt_mirroring(machine, PPU_MIRROR_HIGH);
 		break;
 	default:
 		LOG_MMC(("Mapper set NT to invalid value %02x", nt));
@@ -4480,7 +4493,7 @@ static WRITE8_HANDLER( mapper74_w )
 		break;
 
 	case 0x2000:
-		waixing_set_mirror(data);	//maybe data & 0x03?
+		waixing_set_mirror(space->machine, data);	//maybe data & 0x03?
 		break;
 
 	case 0x2001:
@@ -4513,7 +4526,7 @@ static WRITE8_HANDLER( mapper75_w )
 			prg8_89(space->machine, data);
 			break;
 		case 0x1000:
-			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, (data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			vrom_bank[0] = (vrom_bank[0] & 0x0f) | ((data & 0x02) << 3);
 			vrom_bank[1] = (vrom_bank[1] & 0x0f) | ((data & 0x04) << 2);
 			chr4_0(space->machine, vrom_bank[0], CHRROM);
@@ -4572,7 +4585,7 @@ static WRITE8_HANDLER( mapper76_w )
 			}
 		}
 	case 0x2000:
-		set_nt_mirroring((data & 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	default:
 		logerror("mapper76 unmapped write, offset: %04x, data: %02x\n", offset, data);
@@ -4616,12 +4629,13 @@ static WRITE8_HANDLER( mapper77_w )
 
 static WRITE8_HANDLER( mapper78_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper78_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (nes.crc_hack)		// Jaleco JF16 board has different mirroring even if uses same mapper number :(
-		set_nt_mirroring((data & 0x08) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	if (state->crc_hack)		// Jaleco JF16 board has different mirroring even if uses same mapper number :(
+		set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	else
-		set_nt_mirroring((data & 0x08) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+		set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 
 	chr8(space->machine, (data & 0xf0) >> 4, CHRROM);
 	prg16_89ab(space->machine, data & 0x07);
@@ -4691,7 +4705,7 @@ static WRITE8_HANDLER( mapper80_m_w )
 			chr1_7(space->machine, data, CHRROM);
 			break;
 		case 0x1ef6:
-			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 			break;
 		case 0x1efa:
 		case 0x1efb:
@@ -4765,7 +4779,7 @@ static WRITE8_HANDLER( mapper82_m_w )
 			chr1_x(space->machine, 7 ^ mmc_cmd1, data, CHRROM);
 			break;
 		case 0x1ef6:
-			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 			mmc_cmd1 = ((data & 0x02) << 1);
 			break;
 
@@ -4842,16 +4856,16 @@ static WRITE8_HANDLER( mapper83_w )
 		switch (data & 0x03)
 		{
 		case 0:
-			set_nt_mirroring(PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, PPU_MIRROR_VERT);
 			break;
 		case 1:
-			set_nt_mirroring(PPU_MIRROR_HORZ);
+			set_nt_mirroring(space->machine, PPU_MIRROR_HORZ);
 			break;
 		case 2:
-			set_nt_mirroring(PPU_MIRROR_LOW);
+			set_nt_mirroring(space->machine, PPU_MIRROR_LOW);
 			break;
 		case 3:
-			set_nt_mirroring(PPU_MIRROR_HIGH);
+			set_nt_mirroring(space->machine, PPU_MIRROR_HIGH);
 			break;
 		}
 		break;
@@ -4956,10 +4970,10 @@ static WRITE8_HANDLER( konami_vrc7_w )
 		case 0x6000:
 			switch (data & 0x03)
 			{
-				case 0x00: set_nt_mirroring(PPU_MIRROR_VERT); break;
-				case 0x01: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-				case 0x02: set_nt_mirroring(PPU_MIRROR_LOW); break;
-				case 0x03: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+				case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+				case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+				case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+				case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 			}
 			break;
 		case 0x6008: case 0x6010: case 0x6018:
@@ -5080,7 +5094,7 @@ static WRITE8_HANDLER( mapper89_w )
 
 	prg16_89ab(space->machine, (data >> 4) & 0x07);
 	chr8(space->machine, map89_helper, CHRROM);
-	set_nt_mirroring((data & 0x08) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 }
 
 /*************************************************************
@@ -5243,13 +5257,13 @@ static WRITE8_HANDLER( mapper95_w )
 					mapper95_reg[mmc_cmd1 - 2] = data & 0x20;
 					if (!(mmc_cmd1 & 0x80))
 					{
-						set_nt_page(0, CIRAM, mapper95_reg[0] ? 1 : 0, 1);
-						set_nt_page(1, CIRAM, mapper95_reg[1] ? 1 : 0, 1);
-						set_nt_page(2, CIRAM, mapper95_reg[2] ? 1 : 0, 1);
-						set_nt_page(3, CIRAM, mapper95_reg[3] ? 1 : 0, 1);
+						set_nt_page(space->machine, 0, CIRAM, mapper95_reg[0] ? 1 : 0, 1);
+						set_nt_page(space->machine, 1, CIRAM, mapper95_reg[1] ? 1 : 0, 1);
+						set_nt_page(space->machine, 2, CIRAM, mapper95_reg[2] ? 1 : 0, 1);
+						set_nt_page(space->machine, 3, CIRAM, mapper95_reg[3] ? 1 : 0, 1);
 					}
 					else
-						set_nt_mirroring(PPU_MIRROR_HORZ);
+						set_nt_mirroring(space->machine, PPU_MIRROR_HORZ);
 					break;
 				case 6:
 					prg8_89(space->machine,data & 0x1f);
@@ -5299,7 +5313,7 @@ static WRITE8_HANDLER( mapper97_w )
 
 	if (offset < 0x4000)
 	{
-		set_nt_mirroring((data & 0x80) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+		set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 		prg16_cdef(space->machine, data & 0x0f);
 	}
 }
@@ -5482,7 +5496,7 @@ static WRITE8_HANDLER( mapper106_w )
 		prg8_ef(space->machine, data | 0x10);
 		break;
 	case 0x0c:
-		set_nt_mirroring((data & 0x01) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x0d:
 		IRQ_count = 0;
@@ -5624,7 +5638,7 @@ static WRITE8_HANDLER( mapper112_w )
 		}
 		break;
 	case 0x6000:
-		set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	}
 }
@@ -5643,14 +5657,15 @@ static WRITE8_HANDLER( mapper112_w )
 
 static WRITE8_HANDLER( mapper113_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper113_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (!(offset & 0x100))
 	{
 		prg32(space->machine, (data & 0x38) >> 3);
 		chr8(space->machine, (data & 0x07) | ((data & 0x40) >> 3), CHRROM);
-		if (nes.crc_hack)	// this breaks AV Soccer but it is needed by HES 6-in-1!
-			set_nt_mirroring((data & 0x80) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+		if (state->crc_hack)	// this breaks AV Soccer but it is needed by HES 6-in-1!
+			set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 	}
 }
 
@@ -5693,7 +5708,7 @@ static WRITE8_HANDLER( mapper114_w )
 		switch (offset & 0x6000)
 		{
 		case 0x0000:
-			set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2000:
 			map114_reg_enabled = 1;
@@ -5872,7 +5887,7 @@ static WRITE8_HANDLER( mapper117_w )
 		break;
 
 	case 0x5000:
-		set_nt_mirroring((data & 0x01) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 
 	case 0x4001:
@@ -5902,21 +5917,21 @@ static WRITE8_HANDLER( mapper117_w )
 
 *************************************************************/
 
-static void mapper118_set_mirror( void )
+static void mapper118_set_mirror( running_machine *machine )
 {
 	if (mmc_cmd1 & 0x80)
 	{
-		set_nt_page(0, CIRAM, (vrom_bank[2] & 0x80) >> 7, 1);
-		set_nt_page(1, CIRAM, (vrom_bank[3] & 0x80) >> 7, 1);
-		set_nt_page(2, CIRAM, (vrom_bank[4] & 0x80) >> 7, 1);
-		set_nt_page(3, CIRAM, (vrom_bank[5] & 0x80) >> 7, 1);
+		set_nt_page(machine, 0, CIRAM, (vrom_bank[2] & 0x80) >> 7, 1);
+		set_nt_page(machine, 1, CIRAM, (vrom_bank[3] & 0x80) >> 7, 1);
+		set_nt_page(machine, 2, CIRAM, (vrom_bank[4] & 0x80) >> 7, 1);
+		set_nt_page(machine, 3, CIRAM, (vrom_bank[5] & 0x80) >> 7, 1);
 	}
 	else
 	{
-		set_nt_page(0, CIRAM, (vrom_bank[0] & 0x80) >> 7, 1);
-		set_nt_page(1, CIRAM, (vrom_bank[0] & 0x80) >> 7, 1);
-		set_nt_page(2, CIRAM, (vrom_bank[1] & 0x80) >> 7, 1);
-		set_nt_page(3, CIRAM, (vrom_bank[1] & 0x80) >> 7, 1);
+		set_nt_page(machine, 0, CIRAM, (vrom_bank[0] & 0x80) >> 7, 1);
+		set_nt_page(machine, 1, CIRAM, (vrom_bank[0] & 0x80) >> 7, 1);
+		set_nt_page(machine, 2, CIRAM, (vrom_bank[1] & 0x80) >> 7, 1);
+		set_nt_page(machine, 3, CIRAM, (vrom_bank[1] & 0x80) >> 7, 1);
 	}
 }
 
@@ -5938,7 +5953,7 @@ static WRITE8_HANDLER( mapper118_w )
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 			{
-				mapper118_set_mirror();
+				mapper118_set_mirror(space->machine);
 				mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 			}
 			break;
@@ -5950,7 +5965,7 @@ static WRITE8_HANDLER( mapper118_w )
 				case 0: case 1:
 				case 2: case 3: case 4: case 5:
 					vrom_bank[cmd] = data;
-					mapper118_set_mirror();
+					mapper118_set_mirror(space->machine);
 					mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
 					break;
 				case 6:
@@ -6212,7 +6227,7 @@ static WRITE8_HANDLER( mapper121_w )
     Mapper 123
 
     Known Boards: Bootleg Board ???
-    Games: [no games in nes.hsi]
+    Games: [no games in state->hsi]
 
     In MESS: Unsupported.
 
@@ -6245,7 +6260,7 @@ static WRITE8_HANDLER( mapper121_w )
     Mapper 126
 
     Known Boards: Unknown Multigame Bootleg Board
-    Games: [no games in nes.hsi]
+    Games: [no games in state->hsi]
 
     In MESS: Unsupported.
 
@@ -6455,22 +6470,22 @@ static READ8_HANDLER( mapper136_l_r )
 
 *************************************************************/
 
-static void sachen_set_mirror( UINT8 nt ) // used by mappers 137, 138, 139, 141
+static void sachen_set_mirror( running_machine *machine, UINT8 nt ) // used by mappers 137, 138, 139, 141
 {
 	switch (nt)
 	{
 	case 0:
 	case 1:
-		set_nt_mirroring(nt ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(machine, nt ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 2:
-		set_nt_page(0, CIRAM, 0, 1);
-		set_nt_page(1, CIRAM, 1, 1);
-		set_nt_page(2, CIRAM, 1, 1);
-		set_nt_page(3, CIRAM, 1, 1);
+		set_nt_page(machine, 0, CIRAM, 0, 1);
+		set_nt_page(machine, 1, CIRAM, 1, 1);
+		set_nt_page(machine, 2, CIRAM, 1, 1);
+		set_nt_page(machine, 3, CIRAM, 1, 1);
 		break;
 	case 3:
-		set_nt_mirroring(PPU_MIRROR_LOW);
+		set_nt_mirroring(machine, PPU_MIRROR_LOW);
 		break;
 	default:
 		LOG_MMC(("Mapper set NT to invalid value %02x", nt));
@@ -6497,7 +6512,7 @@ static WRITE8_HANDLER( mapper137_l_w )
 				prg32(space->machine, data);
 				break;
 			case 0x07:
-				sachen_set_mirror((data & 0x01) ? 0 : (data >> 1) & 0x03);
+				sachen_set_mirror(space->machine, BIT(data, 0) ? 0 : (data >> 1) & 0x03);
 				break;
 			default:
 				if (mmc_chr_source == CHRROM)
@@ -6551,7 +6566,7 @@ static WRITE8_HANDLER( mapper138_l_w )
 				prg32(space->machine, data);
 				break;
 			case 0x07:
-				sachen_set_mirror((data & 0x01) ? 0 : (data >> 1) & 0x03);
+				sachen_set_mirror(space->machine, BIT(data, 0) ? 0 : (data >> 1) & 0x03);
 				break;
 			default:
 				if (mmc_chr_source == CHRROM)
@@ -6607,7 +6622,7 @@ static WRITE8_HANDLER( mapper139_l_w )
 				prg32(space->machine, data);
 				break;
 			case 0x07:
-				sachen_set_mirror((data & 0x01) ? 0 : (data >> 1) & 0x03);
+				sachen_set_mirror(space->machine, BIT(data, 0) ? 0 : (data >> 1) & 0x03);
 				break;
 			default:
 				if (mmc_chr_source == CHRROM)
@@ -6683,7 +6698,7 @@ static WRITE8_HANDLER( mapper141_l_w )
 				prg32(space->machine, data);
 				break;
 			case 0x07:
-				sachen_set_mirror((data & 0x01) ? 0 : (data >> 1) & 0x03);
+				sachen_set_mirror(space->machine, BIT(data, 0) ? 0 : (data >> 1) & 0x03);
 				break;
 			default:
 				if (mmc_chr_source == CHRROM)
@@ -6926,7 +6941,7 @@ static WRITE8_HANDLER( mapper150_l_w )
 				chr8(space->machine, vrom_bank[0], CHRROM);
 				break;
 			case 0x07:
-				sachen_set_mirror((data >> 1) & 0x03);
+				sachen_set_mirror(space->machine, (data >> 1) & 0x03);
 				break;
 			default:
 				break;
@@ -6980,7 +6995,7 @@ static WRITE8_HANDLER( mapper152_w )
 	LOG_MMC(("mapper152_w, offset: %04x, data: %02x\n", offset, data));
 
 	// we lack bus emulation
-	set_nt_mirroring((data & 0x80) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	prg16_89ab(space->machine, (data >> 4) & 0x07);
 	chr8(space->machine, data, CHRROM);
 }
@@ -7020,9 +7035,10 @@ static void mapper153_set_prg( running_machine *machine )
 
 static WRITE8_HANDLER( mapper153_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper153_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (nes.crc_hack)		// Famicom Jump II uses a different board
+	if (state->crc_hack)		// Famicom Jump II uses a different board
 	{
 		switch (offset & 0x0f)	// there is no CHRROM and prg banking works differently
 		{
@@ -7072,7 +7088,7 @@ static WRITE8_HANDLER( mapper154_w )
 	switch (offset & 1)
 	{
 	case 0:
-		set_nt_mirroring((data & 0x40) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+		set_nt_mirroring(space->machine, BIT(data, 6) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 		mmc_cmd1 = data & 7;
 		break;
 	case 1:
@@ -7184,10 +7200,10 @@ static void mapper158_set_mirror( running_machine *machine )
 {
 	UINT8 nt_mode = mmc_cmd1 & 0x80;
 
-	set_nt_page(0, ROM, vrom_bank[nt_mode ? 2 : 0], 0);
-	set_nt_page(1, ROM, vrom_bank[nt_mode ? 3 : 0], 0);
-	set_nt_page(2, ROM, vrom_bank[nt_mode ? 4 : 1], 0);
-	set_nt_page(3, ROM, vrom_bank[nt_mode ? 5 : 1], 0);
+	set_nt_page(machine, 0, ROM, vrom_bank[nt_mode ? 2 : 0], 0);
+	set_nt_page(machine, 1, ROM, vrom_bank[nt_mode ? 3 : 0], 0);
+	set_nt_page(machine, 2, ROM, vrom_bank[nt_mode ? 4 : 1], 0);
+	set_nt_page(machine, 3, ROM, vrom_bank[nt_mode ? 5 : 1], 0);
 }
 
 static WRITE8_HANDLER( mapper158_w )
@@ -7619,7 +7635,7 @@ static WRITE8_HANDLER( mapper177_w )
 	LOG_MMC(("mapper177_w, offset: %04x, data: %02x\n", offset, data));
 
 	prg32(space->machine, data);
-	set_nt_mirroring(((data & 0x20) >> 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -7641,7 +7657,7 @@ static WRITE8_HANDLER( mapper178_l_w )
 	switch (offset)
 	{
 	case 0x700:
-		set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x701:
 		mmc_cmd1 = (mmc_cmd1 & 0x0c) | ((data >> 1) & 0x03);
@@ -7680,7 +7696,7 @@ static WRITE8_HANDLER( mapper179_w )
 {
 	LOG_MMC(("mapper179_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -7734,7 +7750,7 @@ static WRITE8_HANDLER( mapper182_w )
 	switch (offset & 0x7003)
 	{
 	case 0x0001:
-		set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x2000:
 		mmc_cmd1 = data;
@@ -8689,7 +8705,7 @@ static WRITE8_HANDLER( mapper200_w )
 	prg16_cdef(space->machine, offset & 0x07);
 	chr8(space->machine, offset & 0x07, CHRROM);
 
-	set_nt_mirroring((offset & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -8732,7 +8748,7 @@ static WRITE8_HANDLER( mapper202_w )
 	prg16_cdef(space->machine, bank + (((bank & 0x06) == 0x06) ? 1 : 0));
 	chr8(space->machine, bank, CHRROM);
 
-	set_nt_mirroring((offset & 0x01) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -8776,7 +8792,7 @@ static WRITE8_HANDLER( mapper204_w )
 	prg16_cdef(space->machine, offset | bank);
 	chr8(space->machine, offset & ~bank, CHRROM);
 
-	set_nt_mirroring((offset & 0x10) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -8850,14 +8866,14 @@ static WRITE8_HANDLER( mapper207_m_w )
 	switch (offset)
 	{
 		case 0x1ef0:
-			set_nt_page(0, CIRAM, (data & 0x80) ? 1 : 0, 1);
-			set_nt_page(1, CIRAM, (data & 0x80) ? 1 : 0, 1);
+			set_nt_page(space->machine, 0, CIRAM, (data & 0x80) ? 1 : 0, 1);
+			set_nt_page(space->machine, 1, CIRAM, (data & 0x80) ? 1 : 0, 1);
 			/* Switch 2k VROM at $0000 */
 			chr2_0(space->machine, (data & 0x7f) >> 1, CHRROM);
 			break;
 		case 0x1ef1:
-			set_nt_page(2, CIRAM, (data & 0x80) ? 1 : 0, 1);
-			set_nt_page(3, CIRAM, (data & 0x80) ? 1 : 0, 1);
+			set_nt_page(space->machine, 2, CIRAM, (data & 0x80) ? 1 : 0, 1);
+			set_nt_page(space->machine, 3, CIRAM, (data & 0x80) ? 1 : 0, 1);
 			/* Switch 2k VROM at $0000 */
 			chr2_2(space->machine, (data & 0x7f) >> 1, CHRROM);
 			break;
@@ -9047,7 +9063,7 @@ static WRITE8_HANDLER( mapper212_w )
 {
 	LOG_MMC(("mapper212_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((offset & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	chr8(space->machine, offset, CHRROM);
 
 	if (offset < 0x4000)
@@ -9263,7 +9279,7 @@ static WRITE8_HANDLER( mapper215_w )
 //          break;
 
 		case 0x4000:
-			set_nt_mirroring(((data >> 7) | data) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, ((data >> 7) | data) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		case 0x4001:
@@ -9471,7 +9487,7 @@ static WRITE8_HANDLER( mapper217_w )
 
 
 		case 0x2001:
-			set_nt_mirroring(data & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 
 		default:
@@ -9546,7 +9562,7 @@ static WRITE8_HANDLER( mapper221_w )
 
 	if (offset < 0x4000)
 	{
-		set_nt_mirroring(offset & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		offset = (offset >> 1) & 0xff;
 
 		if (mmc_cmd1 != offset)
@@ -9604,7 +9620,7 @@ static WRITE8_HANDLER( mapper222_w )
 		prg8_89(space->machine, data);
 		break;
 	case 0x1000:
-		set_nt_mirroring((data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x2000:
 		prg8_ab(space->machine, data);
@@ -9672,7 +9688,7 @@ static WRITE8_HANDLER( mapper225_w )
 	LOG_MMC(("mapper225_w, offset: %04x, data: %02x\n", offset, data));
 
 	chr8(space->machine, offset, CHRROM);
-	set_nt_mirroring((offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, (offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	hi_bank = offset & 0x40;
 	size_16 = offset & 0x1000;
@@ -9718,7 +9734,7 @@ static WRITE8_HANDLER( mapper226_w )
 		mmc_cmd1 = data;
 	}
 
-	set_nt_mirroring((mmc_cmd1 & 0x40) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(mmc_cmd1, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	hi_bank = mmc_cmd1 & 0x01;
 	size_16 = mmc_cmd1 & 0x20;
@@ -9779,7 +9795,7 @@ static WRITE8_HANDLER( mapper227_w )
 			prg16_cdef(space->machine, ((bank << 1) & 0x38));
 	}
 
-	set_nt_mirroring((offset & 0x02) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
@@ -9799,7 +9815,7 @@ static WRITE8_HANDLER( mapper228_w )
 	UINT8 pmode;
 	LOG_MMC(("mapper228_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, (offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	cbank = (data & 0x03) | ((offset & 0x0f) << 2);
 	chr8(space->machine, cbank, CHRROM);
@@ -9840,7 +9856,7 @@ static WRITE8_HANDLER( mapper229_w )
 {
 	LOG_MMC(("mapper229_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((offset & 0x20) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	chr8(space->machine, offset, CHRROM);
 
 	if ((offset & 0x1e) == 0)
@@ -9887,7 +9903,7 @@ static WRITE8_HANDLER( mapper230_w )
 			prg16_89ab(space->machine, (data & 0x1f) + 8);
 			prg16_cdef(space->machine, (data & 0x1f) + 9);
 		}
-		set_nt_mirroring((data & 0x40) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+		set_nt_mirroring(space->machine, BIT(data, 6) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 	}
 }
 
@@ -9906,7 +9922,7 @@ static WRITE8_HANDLER( mapper231_w )
 {
 	LOG_MMC(("mapper231_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((offset & 0x80) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	prg16_89ab(space->machine, (offset & 0x1e));
 	prg16_cdef(space->machine, (offset & 0x1e) | ((offset & 0x20) ? 1 : 0));
@@ -10102,18 +10118,19 @@ static WRITE8_HANDLER( mapper241_w )
 
 static WRITE8_HANDLER( mapper242_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper242_w, offset: %04x, data: %02x\n", offset, data));
 
 	prg32(space->machine, offset >> 3);
 
-	if (!nes.crc_hack)	// DQ8 board does not have this / Zan Shi does
+	if (!state->crc_hack)	// DQ8 board does not have this / Zan Shi does
 	{
 		switch (data & 0x03)
 		{
-			case 0: set_nt_mirroring(PPU_MIRROR_VERT); break;
-			case 1: set_nt_mirroring(PPU_MIRROR_HORZ); break;
-			case 2: set_nt_mirroring(PPU_MIRROR_LOW); break;
-			case 3: set_nt_mirroring(PPU_MIRROR_HIGH); break;
+			case 0: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+			case 1: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+			case 2: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+			case 3: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 		}
 	}
 }
@@ -10164,7 +10181,7 @@ static WRITE8_HANDLER( mapper243_l_w )
 				chr8(space->machine, vrom_bank[0], CHRROM);
 				break;
 			case 0x07:
-				set_nt_mirroring(data & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
 			default:
 				break;
@@ -10220,6 +10237,7 @@ static WRITE8_HANDLER( mapper244_w )
 
 static WRITE8_HANDLER( mapper245_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 cmd, map245_helper;
 	LOG_MMC(("mapper245_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10235,7 +10253,7 @@ static WRITE8_HANDLER( mapper245_w )
 			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
 		case 1: case 2: case 3: case 4: case 5:
 			vrom_bank[cmd] = data;
-			if (nes.chr_chunks > 0)
+			if (state->chr_chunks > 0)
 				mapper4_set_chr(space->machine, CHRROM, mmc_chr_base, mmc_chr_mask);
 			else	// according to Disch's docs, mmc_cmd1&0x80 swaps 4k CHRRAM banks
 			{
@@ -10279,6 +10297,7 @@ static WRITE8_HANDLER( mapper245_w )
 
 static WRITE8_HANDLER( mapper246_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper246_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset < 0x0800)
@@ -10312,7 +10331,7 @@ static WRITE8_HANDLER( mapper246_m_w )
 		}
 	}
 	else
-		nes.wram[offset] = data;
+		state->wram[offset] = data;
 }
 
 /*************************************************************
@@ -10585,7 +10604,7 @@ static WRITE8_HANDLER( mapper255_w )
 
 	LOG_MMC(("mapper255_w, offset: %04x, data: %02x\n", offset, data));
 
-	set_nt_mirroring((offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, (offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	prg16_89ab(space->machine, map255_helper1 & ~map255_helper2);
 	prg16_cdef(space->machine, map255_helper1 | map255_helper2);
 	chr8(space->machine, ((offset >> 8) & 0x40) | (offset & 0x3f), CHRROM);
@@ -10855,10 +10874,12 @@ static const mmc mmc_list[] =
 const mmc *nes_mapper_lookup( int mapper )
 {
 	int i;
+
 	for (i = 0; i < ARRAY_LENGTH(mmc_list); i++)
 	{
-		if (mmc_list[i].iNesMapper == nes.mapper)
+		if (mmc_list[i].iNesMapper == mapper)
 			return &mmc_list[i];
 	}
+
 	return NULL;
 }
