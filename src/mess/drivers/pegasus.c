@@ -270,10 +270,10 @@ static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
 			b = ROM[addr|i];
 			j = BITSWAP16( i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7 );
 			b = BITSWAP8( b, 3, 2, 1, 0, 7, 6, 5, 4 );
-			ROM[0x2000|(j&0xfff)] = b;
+			ROM[0x5000|(j&0xfff)] = b;
 		}
 		for (i = 0; i < 0x1000; i++)
-			ROM[addr|i] = ROM[0x2000|i];
+			ROM[addr|i] = ROM[0x5000|i];
 	}
 }
 
