@@ -1,16 +1,12 @@
 #include "emu.h"
 #include "crsshair.h"
+#include "hash.h"
 #include "cpu/m6502/m6502.h"
 #include "video/ppu2c0x.h"
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
-#include "sound/nes_apu.h"
 #include "devices/cartslot.h"
 #include "devices/flopdrv.h"
-#include "formats/flopimg.h"
-#include "image.h"
-#include "hash.h"
-
 
 /***************************************************************************
     CONSTANTS
@@ -100,44 +96,43 @@ static void init_nes_core( running_machine *machine )
 	/* Set up the mapper callbacks */
 	if (state->format == 1)
 	{
-		mmc_intf intf = { 0 };
-		const mmc *mapper;
-
-		mapper = nes_mapper_lookup(state->mapper);
+		const mmc *mapper = nes_mapper_lookup(state->mapper);
 		if (mapper)
 		{
-			intf.mmc_write_low = mapper->mmc_write_low;
-			intf.mmc_read_low = mapper->mmc_read_low;
-			intf.mmc_write_mid = mapper->mmc_write_mid;
-			intf.mmc_write = mapper->mmc_write;
-			nes_mapper_init(&intf);
+			state->mmc_write_low = mapper->mmc_write_low;
+			state->mmc_read_low = mapper->mmc_read_low;
+			state->mmc_write_mid = mapper->mmc_write_mid;
+			state->mmc_write = mapper->mmc_write;
 			ppu_latch = mapper->ppu_latch;
 		}
 		else
 		{
 			logerror("Mapper %d is not yet supported, defaulting to no mapper.\n",state->mapper);
-			nes_mapper_init(&intf);
+			state->mmc_write_low = NULL;
+			state->mmc_read_low = NULL;
+			state->mmc_write_mid = NULL;
+			state->mmc_write = NULL;
+			ppu_latch = NULL;
 		}
 	}
 	else if (state->format == 2)
 	{
-		mmc_intf intf = { 0 };
-		const unif *board;
-
-		board = nes_unif_lookup(state->board);
+		const unif *board = nes_unif_lookup(state->board);
 		if (board)
 		{
-			intf.mmc_write_low = board->mmc_write_low;
-			intf.mmc_read_low = board->mmc_read_low;
-			intf.mmc_write_mid = board->mmc_write_mid;
-			intf.mmc_write = board->mmc_write;
-			nes_mapper_init(&intf);
+			state->mmc_write_low = board->mmc_write_low;
+			state->mmc_read_low = board->mmc_read_low;
+			state->mmc_write_mid = board->mmc_write_mid;
+			state->mmc_write = board->mmc_write;
 			ppu_latch = board->ppu_latch;
 		}
 		else
 		{
 			logerror("Board %s is not yet supported, defaulting to no mapper.\n", state->board);
-			nes_mapper_init(&intf);
+			state->mmc_write_low = NULL;
+			state->mmc_read_low = NULL;
+			state->mmc_write_mid = NULL;
+			state->mmc_write = NULL;
 			ppu_latch = NULL;
 		}
 	}

@@ -69,19 +69,21 @@ static void MMC1_set_prg( running_machine *machine )
 
 static void MMC1_set_chr( running_machine *machine )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_mode = MMC1_regs[0] & 0x10;
 
 	if (chr_mode)
 	{
-		chr4_0(machine, MMC1_regs[1] & 0x1f, mmc_chr_source);
-		chr4_4(machine, MMC1_regs[2] & 0x1f, mmc_chr_source);
+		chr4_0(machine, MMC1_regs[1] & 0x1f, state->mmc_chr_source);
+		chr4_4(machine, MMC1_regs[2] & 0x1f, state->mmc_chr_source);
 	}
 	else
-		chr8(machine, (MMC1_regs[1] & 0x1f) >> 1, mmc_chr_source);
+		chr8(machine, (MMC1_regs[1] & 0x1f) >> 1, state->mmc_chr_source);
 }
 
 static WRITE8_HANDLER( mapper1_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	/* Note that there is only one latch and shift counter, shared amongst the 4 regs */
 	/* Space Shuttle will not work if they have independent variables. */
 	LOG_MMC(("mapper1_w offset: %04x, data: %02x\n", offset, data));
@@ -92,8 +94,8 @@ static WRITE8_HANDLER( mapper1_w )
        AD&D Hillsfar and Bill & Ted rely on this behavior!! */
 	if (data & 0x80)
 	{
-		mmc_count = 0;
-		mmc_cmd1 = 0;
+		state->mmc_count = 0;
+		state->mmc_cmd1 = 0;
 
 		/* Set reg at 0x8000 to size 16k and lower half swap - needed for Robocop 3, Dynowars */
 		MMC1_regs[0] |= 0x0c;
@@ -103,20 +105,20 @@ static WRITE8_HANDLER( mapper1_w )
 		return;
 	}
 
-	if (mmc_count < 5)
+	if (state->mmc_count < 5)
 	{
-		if (mmc_count == 0) mmc_cmd1 = 0;
-		mmc_cmd1 >>= 1;
-		mmc_cmd1 |= (data & 0x01) ? 0x10 : 0x00;
-		mmc_count++;
+		if (state->mmc_count == 0) state->mmc_cmd1 = 0;
+		state->mmc_cmd1 >>= 1;
+		state->mmc_cmd1 |= (data & 0x01) ? 0x10 : 0x00;
+		state->mmc_count++;
 	}
 
-	if (mmc_count == 5)
+	if (state->mmc_count == 5)
 	{
 		switch (offset & 0x6000)	/* Which reg shall we write to? */
 		{
 		case 0x0000:
-			MMC1_regs[0] = mmc_cmd1;
+			MMC1_regs[0] = state->mmc_cmd1;
 
 			switch (MMC1_regs[0] & 0x03)
 			{
@@ -129,21 +131,21 @@ static WRITE8_HANDLER( mapper1_w )
 			MMC1_set_prg(space->machine);
 			break;
 		case 0x2000:
-			MMC1_regs[1] = mmc_cmd1;
+			MMC1_regs[1] = state->mmc_cmd1;
 			MMC1_set_chr(space->machine);
 			MMC1_set_prg(space->machine);
 			break;
 		case 0x4000:
-			MMC1_regs[2] = mmc_cmd1;
+			MMC1_regs[2] = state->mmc_cmd1;
 			MMC1_set_chr(space->machine);
 			break;
 		case 0x6000:
-			MMC1_regs[3] = mmc_cmd1;
+			MMC1_regs[3] = state->mmc_cmd1;
 			MMC1_set_prg(space->machine);
 			break;
 		}
 
-		mmc_count = 0;
+		state->mmc_count = 0;
 	}
 }
 
@@ -213,42 +215,46 @@ static WRITE8_HANDLER( mapper3_w )
 
 static void mapper4_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
-	UINT8 prg_flip = (mmc_cmd1 & 0x40) ? 2 : 0;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
 
-	prg8_89(machine, prg_base | (prg_bank[0 ^ prg_flip] & prg_mask));
-	prg8_ab(machine, prg_base | (prg_bank[1] & prg_mask));
-	prg8_cd(machine, prg_base | (prg_bank[2 ^ prg_flip] & prg_mask));
-	prg8_ef(machine, prg_base | (prg_bank[3] & prg_mask));
+	prg8_89(machine, prg_base | (state->prg_bank[0 ^ prg_flip] & prg_mask));
+	prg8_ab(machine, prg_base | (state->prg_bank[1] & prg_mask));
+	prg8_cd(machine, prg_base | (state->prg_bank[2 ^ prg_flip] & prg_mask));
+	prg8_ef(machine, prg_base | (state->prg_bank[3] & prg_mask));
 }
 
 static void mapper4_set_chr( running_machine *machine, UINT8 chr, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr);
 }
 
 /* Here, IRQ counter decrements every scanline. */
 static void mapper4_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		int priorCount = IRQ_count;
-		if ((IRQ_count == 0))
+		int priorCount = state->IRQ_count;
+		if ((state->IRQ_count == 0))
 		{
-			IRQ_count = IRQ_count_latch;
+			state->IRQ_count = state->IRQ_count_latch;
 		}
 		else
-			IRQ_count--;
+			state->IRQ_count--;
 
-		if (IRQ_enable && !blanked && (IRQ_count == 0) && priorCount)
+		if (state->IRQ_enable && !blanked && (state->IRQ_count == 0) && priorCount)
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
@@ -267,31 +273,31 @@ static WRITE8_HANDLER( mapper4_w )
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			MMC3_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			MMC3_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
-				mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
-				mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+				mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					vrom_bank[cmd] = data;
-					mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+					state->vrom_bank[cmd] = data;
+					mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 					break;
 				case 6:
 				case 7:
-					prg_bank[cmd - 6] = data;
-					mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					state->prg_bank[cmd - 6] = data;
+					mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 			}
 			break;
@@ -301,25 +307,25 @@ static WRITE8_HANDLER( mapper4_w )
 			break;
 
 		case 0x2001: /* extra RAM enable/disable */
-			mmc_cmd2 = data;	/* This actually is made of two parts: data&0x80 = WRAM enabled and data&0x40 = WRAM readonly!  */
-						/* We save this twice because we will need mmc_cmd2 in some clone mapper */
+			state->mmc_cmd2 = data;	/* This actually is made of two parts: data&0x80 = WRAM enabled and data&0x40 = WRAM readonly!  */
+						/* We save this twice because we will need state->mmc_cmd2 in some clone mapper */
 			state->mid_ram_enable = data;
 			break;
 
 		case 0x4000:
-			IRQ_count_latch = data;
+			state->IRQ_count_latch = data;
 			break;
 
-		case 0x4001: /* some sources state that here we must have IRQ_count = IRQ_count_latch */
-			IRQ_count = 0;
+		case 0x4001: /* some sources state that here we must have state->IRQ_count = state->IRQ_count_latch */
+			state->IRQ_count = 0;
 			break;
 
 		case 0x6000:
-			IRQ_enable = 0;
+			state->IRQ_enable = 0;
 			break;
 
 		case 0x6001:
-			IRQ_enable = 1;
+			state->IRQ_enable = 1;
 			break;
 
 		default:
@@ -342,19 +348,21 @@ static WRITE8_HANDLER( mapper4_w )
 
 static void mapper5_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
 #if 1
 	if (scanline == 0)
-		IRQ_status |= 0x40;
+		state->IRQ_status |= 0x40;
 	else if (scanline > PPU_BOTTOM_VISIBLE_SCANLINE)
-		IRQ_status &= ~0x40;
+		state->IRQ_status &= ~0x40;
 #endif
 
-	if (scanline == IRQ_count)
+	if (scanline == state->IRQ_count)
 	{
-		if (IRQ_enable)
+		if (state->IRQ_enable)
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 
-		IRQ_status = 0xff;
+		state->IRQ_status = 0xff;
 	}
 }
 
@@ -382,12 +390,13 @@ static void ppu_mirror_MMC5( running_machine *machine, int page, int src )
 
 static READ8_HANDLER( mapper5_l_r )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	int retVal;
 
 	/* $5c00 - $5fff: extended videoram attributes */
 	if ((offset >= 0x1b00) && (offset <= 0x1eff))
 	{
-		return nes_mmc5_vram[offset - 0x1b00];
+		return state->mmc5_vram[offset - 0x1b00];
 	}
 
 	switch (offset)
@@ -399,15 +408,15 @@ static READ8_HANDLER( mapper5_l_r )
 			else
 				return 0x00;
 #else
-			retVal = IRQ_status;
-			IRQ_status &= ~0x80;
+			retVal = state->IRQ_status;
+			state->IRQ_status &= ~0x80;
 			return retVal;
 #endif
 
 		case 0x1105: /* $5205 */
-			return (mult1 * mult2) & 0xff;
+			return (state->mult1 * state->mult2) & 0xff;
 		case 0x1106: /* $5206 */
-			return ((mult1 * mult2) & 0xff00) >> 8;
+			return ((state->mult1 * state->mult2) & 0xff00) >> 8;
 
 		default:
 			logerror("** MMC5 uncaught read, offset: %04x\n", offset + 0x4100);
@@ -420,7 +429,7 @@ static READ8_HANDLER( mapper5_l_r )
 //  int i;
 //
 //  for (i = 0; i < 8; i ++)
-//      nes_vram[i] = vrom_bank[0 + (mode * 8)] * 64;
+//      nes_vram[i] = state->vrom_bank[0 + (mode * 8)] * 64;
 //}
 
 static WRITE8_HANDLER( mapper5_l_w )
@@ -443,7 +452,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 	if ((offset >= 0x1b00) && (offset <= 0x1eff))
 	{
 		if (MMC5_vram_protect == 0x03)
-			nes_mmc5_vram[offset - 0x1b00] = data;
+			state->mmc5_vram[offset - 0x1b00] = data;
 		return;
 	}
 
@@ -475,7 +484,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 			break;
 
 		case 0x1004: /* $5104 - Extra VRAM (EXRAM) control */
-			nes_mmc5_vram_control = data;
+			state->mmc5_vram_control = data;
 			LOG_MMC(("MMC5 exram control: %02x\n", data));
 			break;
 
@@ -488,7 +497,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 
 		/* tile data for MMC5 flood-fill NT mode */
 		case 0x1006:
-			MMC5_floodtile = data;
+			state->MMC5_floodtile = data;
 			break;
 
 		/* attr data for MMC5 flood-fill NT mode */
@@ -496,10 +505,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			switch (data & 3)
 			{
 			default:
-			case 0: MMC5_floodattr = 0x00; break;
-			case 1: MMC5_floodattr = 0x55; break;
-			case 2: MMC5_floodattr = 0xaa; break;
-			case 3: MMC5_floodattr = 0xff; break;
+			case 0: state->MMC5_floodattr = 0x00; break;
+			case 1: state->MMC5_floodattr = 0x55; break;
+			case 2: state->MMC5_floodattr = 0xaa; break;
+			case 3: state->MMC5_floodattr = 0xff; break;
 			}
 			break;
 
@@ -620,10 +629,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[0] = data;
+					state->vrom_bank[0] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_0(space->machine, vrom_bank[0], CHRROM);
-//                  state->nes_vram_sprite[0] = vrom_bank[0] * 64;
+					chr1_0(space->machine, state->vrom_bank[0], CHRROM);
+//                  state->nes_vram_sprite[0] = state->vrom_bank[0] * 64;
 //                  vrom_next[0] = 4;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -640,10 +649,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[1] = data;
+					state->vrom_bank[1] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_1(space->machine, vrom_bank[1], CHRROM);
-//                  state->nes_vram_sprite[1] = vrom_bank[0] * 64;
+					chr1_1(space->machine, state->vrom_bank[1], CHRROM);
+//                  state->nes_vram_sprite[1] = state->vrom_bank[0] * 64;
 //                  vrom_next[1] = 5;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -656,10 +665,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[2] = data;
+					state->vrom_bank[2] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_2(space->machine, vrom_bank[2], CHRROM);
-//                  state->nes_vram_sprite[2] = vrom_bank[0] * 64;
+					chr1_2(space->machine, state->vrom_bank[2], CHRROM);
+//                  state->nes_vram_sprite[2] = state->vrom_bank[0] * 64;
 //                  vrom_next[2] = 6;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -679,10 +688,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[3] = data;
+					state->vrom_bank[3] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_3(space->machine, vrom_bank[3], CHRROM);
-//                  state->nes_vram_sprite[3] = vrom_bank[0] * 64;
+					chr1_3(space->machine, state->vrom_bank[3], CHRROM);
+//                  state->nes_vram_sprite[3] = state->vrom_bank[0] * 64;
 //                  vrom_next[3] = 7;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -695,10 +704,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[4] = data;
+					state->vrom_bank[4] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_4(space->machine, vrom_bank[4], CHRROM);
-//                  state->nes_vram_sprite[4] = vrom_bank[0] * 64;
+					chr1_4(space->machine, state->vrom_bank[4], CHRROM);
+//                  state->nes_vram_sprite[4] = state->vrom_bank[0] * 64;
 //                  vrom_next[0] = 0;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -715,10 +724,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[5] = data;
+					state->vrom_bank[5] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_5(space->machine, vrom_bank[5], CHRROM);
-//                  state->nes_vram_sprite[5] = vrom_bank[0] * 64;
+					chr1_5(space->machine, state->vrom_bank[5], CHRROM);
+//                  state->nes_vram_sprite[5] = state->vrom_bank[0] * 64;
 //                  vrom_next[1] = 1;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -731,10 +740,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[6] = data;
+					state->vrom_bank[6] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_6(space->machine, vrom_bank[6], CHRROM);
-//                  state->nes_vram_sprite[6] = vrom_bank[0] * 64;
+					chr1_6(space->machine, state->vrom_bank[6], CHRROM);
+//                  state->nes_vram_sprite[6] = state->vrom_bank[0] * 64;
 //                  vrom_next[2] = 2;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -759,10 +768,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[7] = data;
+					state->vrom_bank[7] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_7(space->machine, vrom_bank[7], CHRROM);
-//                  state->nes_vram_sprite[7] = vrom_bank[0] * 64;
+					chr1_7(space->machine, state->vrom_bank[7], CHRROM);
+//                  state->nes_vram_sprite[7] = state->vrom_bank[0] * 64;
 //                  vrom_next[3] = 3;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -775,7 +784,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[8] = vrom_bank[12] = data;
+					state->vrom_bank[8] = state->vrom_bank[12] = data;
 //                  nes_vram[vrom_next[0]] = data * 64;
 //                  nes_vram[0 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[0] = data * 64;
@@ -800,7 +809,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[9] = vrom_bank[13] = data;
+					state->vrom_bank[9] = state->vrom_bank[13] = data;
 //                  nes_vram[vrom_next[1]] = data * 64;
 //                  nes_vram[1 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[1] = data * 64;
@@ -820,7 +829,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[10] = vrom_bank[14] = data;
+					state->vrom_bank[10] = state->vrom_bank[14] = data;
 //                  nes_vram[vrom_next[2]] = data * 64;
 //                  nes_vram[2 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[2] = data * 64;
@@ -856,7 +865,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					vrom_bank[11] = vrom_bank[15] = data;
+					state->vrom_bank[11] = state->vrom_bank[15] = data;
 //                  nes_vram[vrom_next[3]] = data * 64;
 //                  nes_vram[3 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[3] = data * 64;
@@ -872,19 +881,19 @@ static WRITE8_HANDLER( mapper5_l_w )
 			break;
 
 		case 0x1103: /* $5203 */
-			IRQ_count = data;
+			state->IRQ_count = data;
 			MMC5_scanline = data;
-			LOG_MMC(("MMC5 irq scanline: %d\n", IRQ_count));
+			LOG_MMC(("MMC5 irq scanline: %d\n", state->IRQ_count));
 			break;
 		case 0x1104: /* $5204 */
-			IRQ_enable = data & 0x80;
+			state->IRQ_enable = data & 0x80;
 			LOG_MMC(("MMC5 irq enable: %02x\n", data));
 			break;
 		case 0x1105: /* $5205 */
-			mult1 = data;
+			state->mult1 = data;
 			break;
 		case 0x1106: /* $5206 */
-			mult2 = data;
+			state->mult2 = data;
 			break;
 
 		default:
@@ -915,28 +924,31 @@ we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void ffe_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
-	if (IRQ_enable)
+	if (state->IRQ_enable)
 	{
-		if ((0xffff - IRQ_count) < 114)
+		if ((0xffff - state->IRQ_count) < 114)
 		{
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-			IRQ_count = 0xffff;
-			IRQ_enable = 0;
+			state->IRQ_count = 0xffff;
+			state->IRQ_enable = 0;
 		}
-		IRQ_count -= 114;
+		state->IRQ_count -= 114;
 	}
 }
 
 static WRITE8_HANDLER( mapper6_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper6_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
 	{
 		case 0x1fe:
-			mmc_cmd1 = data & 0x80;
+			state->mmc_cmd1 = data & 0x80;
 			set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 			break;
 		case 0x1ff:
@@ -944,31 +956,32 @@ static WRITE8_HANDLER( mapper6_l_w )
 			break;
 
 		case 0x401:
-			IRQ_enable = data & 0x01;
+			state->IRQ_enable = data & 0x01;
 			break;
 		case 0x402:
-			IRQ_count = (IRQ_count & 0xff00) | data;
+			state->IRQ_count = (state->IRQ_count & 0xff00) | data;
 			break;
 		case 0x403:
-			IRQ_enable = 1;
-			IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
+			state->IRQ_enable = 1;
+			state->IRQ_count = (state->IRQ_count & 0x00ff) | (data << 8);
 			break;
 	}
 }
 
 static WRITE8_HANDLER( mapper6_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper6_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (!mmc_cmd1)	// when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
+	if (!state->mmc_cmd1)	// when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
 	{
 		prg16_89ab(space->machine, data >> 2);
 		// chr8(space->machine, data & 0x03, ???);
 		// due to lack of info on the exact behavior, we simply act as if mmc_cmd=1
-		if (mmc_chr_source == CHRROM)
+		if (state->mmc_chr_source == CHRROM)
 			chr8(space->machine, data & 0x03, CHRROM);
 	}
-	else if (mmc_chr_source == CHRROM)			// otherwise, we can use CHRROM (when present)
+	else if (state->mmc_chr_source == CHRROM)			// otherwise, we can use CHRROM (when present)
 		chr8(space->machine, data, CHRROM);
 }
 
@@ -1024,34 +1037,36 @@ static WRITE8_HANDLER( mapper8_w )
 
 static void mapper9_latch (running_device *device, offs_t offset)
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
 	if ((offset & 0x3ff0) == 0x0fd0)
 	{
 		LOG_MMC(("mapper9 vrom latch switch (bank 0 low): %02x\n", MMC2_regs[0]));
-		mmc_cmd1 = 0xfd;
+		state->mmc_cmd1 = 0xfd;
 		chr4_0(device->machine, MMC2_regs[0], CHRROM);
 	}
 	else if ((offset & 0x3ff0) == 0x0fe0)
 	{
 		LOG_MMC(("mapper9 vrom latch switch (bank 0 high): %02x\n", MMC2_regs[1]));
-		mmc_cmd1 = 0xfe;
+		state->mmc_cmd1 = 0xfe;
 		chr4_0(device->machine, MMC2_regs[1], CHRROM);
 	}
 	else if ((offset & 0x3ff0) == 0x1fd0)
 	{
 		LOG_MMC(("mapper9 vrom latch switch (bank 1 low): %02x\n", MMC2_regs[2]));
-		mmc_cmd2 = 0xfd;
+		state->mmc_cmd2 = 0xfd;
 		chr4_4(device->machine, MMC2_regs[2], CHRROM);
 	}
 	else if ((offset & 0x3ff0) == 0x1fe0)
 	{
 		LOG_MMC(("mapper9 vrom latch switch (bank 0 high): %02x\n", MMC2_regs[3]));
-		mmc_cmd2 = 0xfe;
+		state->mmc_cmd2 = 0xfe;
 		chr4_4(device->machine, MMC2_regs[3], CHRROM);
 	}
 }
 
 static WRITE8_HANDLER( mapper9_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper9_w, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x7000)
 	{
@@ -1060,22 +1075,22 @@ static WRITE8_HANDLER( mapper9_w )
 			break;
 		case 0x3000:
 			MMC2_regs[0] = data;
-			if (mmc_cmd1 == 0xfd)
+			if (state->mmc_cmd1 == 0xfd)
 				chr4_0(space->machine, MMC2_regs[0], CHRROM);
 			break;
 		case 0x4000:
 			MMC2_regs[1] = data;
-			if (mmc_cmd1 == 0xfe)
+			if (state->mmc_cmd1 == 0xfe)
 				chr4_0(space->machine, MMC2_regs[1], CHRROM);
 			break;
 		case 0x5000:
 			MMC2_regs[2] = data;
-			if (mmc_cmd2 == 0xfd)
+			if (state->mmc_cmd2 == 0xfd)
 				chr4_4(space->machine, MMC2_regs[2], CHRROM);
 			break;
 		case 0x6000:
 			MMC2_regs[3] = data;
-			if (mmc_cmd2 == 0xfe)
+			if (state->mmc_cmd2 == 0xfe)
 				chr4_4(space->machine, MMC2_regs[3], CHRROM);
 			break;
 		case 0x7000:
@@ -1126,9 +1141,10 @@ static WRITE8_HANDLER( mapper10_w )
 
 static WRITE8_HANDLER( mapper11_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper11_w, offset: %04x, data: %02x\n", offset, data));
 
-	chr8(space->machine, data >> 4, mmc_chr_source);
+	chr8(space->machine, data >> 4, state->mmc_chr_source);
 	prg32(space->machine, data & 0x0f);
 }
 
@@ -1161,32 +1177,34 @@ static READ8_HANDLER( mapper12_l_r )
 
 static void mapper12_set_chr( running_machine *machine )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 
-	chr1_x(machine, chr_page ^ 0, ((mapper12_reg & 0x01) << 8) | (vrom_bank[0] & ~0x01), CHRROM);
-	chr1_x(machine, chr_page ^ 1, ((mapper12_reg & 0x01) << 8) | (vrom_bank[0] |  0x01), CHRROM);
-	chr1_x(machine, chr_page ^ 2, ((mapper12_reg & 0x01) << 8) | (vrom_bank[1] & ~0x01), CHRROM);
-	chr1_x(machine, chr_page ^ 3, ((mapper12_reg & 0x01) << 8) | (vrom_bank[1] |  0x01), CHRROM);
-	chr1_x(machine, chr_page ^ 4, ((mapper12_reg & 0x10) << 4) | vrom_bank[2], CHRROM);
-	chr1_x(machine, chr_page ^ 5, ((mapper12_reg & 0x10) << 4) | vrom_bank[3], CHRROM);
-	chr1_x(machine, chr_page ^ 6, ((mapper12_reg & 0x10) << 4) | vrom_bank[4], CHRROM);
-	chr1_x(machine, chr_page ^ 7, ((mapper12_reg & 0x10) << 4) | vrom_bank[5], CHRROM);
+	chr1_x(machine, chr_page ^ 0, ((mapper12_reg & 0x01) << 8) | (state->vrom_bank[0] & ~0x01), CHRROM);
+	chr1_x(machine, chr_page ^ 1, ((mapper12_reg & 0x01) << 8) | (state->vrom_bank[0] |  0x01), CHRROM);
+	chr1_x(machine, chr_page ^ 2, ((mapper12_reg & 0x01) << 8) | (state->vrom_bank[1] & ~0x01), CHRROM);
+	chr1_x(machine, chr_page ^ 3, ((mapper12_reg & 0x01) << 8) | (state->vrom_bank[1] |  0x01), CHRROM);
+	chr1_x(machine, chr_page ^ 4, ((mapper12_reg & 0x10) << 4) | state->vrom_bank[2], CHRROM);
+	chr1_x(machine, chr_page ^ 5, ((mapper12_reg & 0x10) << 4) | state->vrom_bank[3], CHRROM);
+	chr1_x(machine, chr_page ^ 6, ((mapper12_reg & 0x10) << 4) | state->vrom_bank[4], CHRROM);
+	chr1_x(machine, chr_page ^ 7, ((mapper12_reg & 0x10) << 4) | state->vrom_bank[5], CHRROM);
 }
 
 static WRITE8_HANDLER( mapper12_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper12_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
@@ -1194,18 +1212,18 @@ static WRITE8_HANDLER( mapper12_w )
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x07;
+		cmd = state->mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
+			state->vrom_bank[cmd] = data;
 			mapper12_set_chr(space->machine);
 			break;
 		case 6:
 		case 7:
-			prg_bank[cmd - 6] = data;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
 		break;
@@ -1248,23 +1266,26 @@ static WRITE8_HANDLER( mapper13_w )
 
 static void mapper14_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
+
 	if (map14_reg[0] & 0x02)
 	{
 		mapper4_set_prg(machine, prg_base, prg_mask);
 	}
 	else
 	{
-		prg8_89(machine, extra_bank[0]);
-		prg8_ab(machine, extra_bank[1]);
-		prg8_cd(machine, extra_bank[2]);
-		prg8_ef(machine, extra_bank[3]);
+		prg8_89(machine, state->extra_bank[0]);
+		prg8_ab(machine, state->extra_bank[1]);
+		prg8_cd(machine, state->extra_bank[2]);
+		prg8_ef(machine, state->extra_bank[3]);
 	}
 }
 
 static void mapper14_set_chr( running_machine *machine, UINT8 chr, int chr_base, int chr_mask )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	static const UINT8 conv_table[8] = {5, 5, 5, 5, 3, 3, 1, 1};
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 bank[8];
 	UINT8 chr_base2[8];
 	int i;
@@ -1273,7 +1294,7 @@ static void mapper14_set_chr( running_machine *machine, UINT8 chr, int chr_base,
 	{
 		for(i = 0; i < 8; i++)
 		{
-			bank[i] = vrom_bank[i];
+			bank[i] = state->vrom_bank[i];
 			chr_base2[i] = chr_base | ((map14_reg[0] << conv_table[i]) & 0x100);
 		}
 	}
@@ -1281,7 +1302,7 @@ static void mapper14_set_chr( running_machine *machine, UINT8 chr, int chr_base,
 	{
 		for(i = 0; i < 8; i++)
 		{
-			bank[i] = extra_bank[i + 4];	// first 4 extra_banks are PRG
+			bank[i] = state->extra_bank[i + 4];	// first 4 state->extra_banks are PRG
 			chr_base2[i] = chr_base;
 		}
 	}
@@ -1298,14 +1319,15 @@ static void mapper14_set_chr( running_machine *machine, UINT8 chr, int chr_base,
 
 static WRITE8_HANDLER( mapper14_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map14_helper1, map14_helper2, MMC3_helper, cmd;
 	LOG_MMC(("mapper14_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset == 0x2131)
 	{
 		map14_reg[0] = data;
-		mapper14_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-		mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		mapper14_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+		mapper14_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 
 		if (!(map14_reg[0] & 0x02))
 			set_nt_mirroring(space->machine, BIT(map14_reg[1], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -1316,35 +1338,35 @@ static WRITE8_HANDLER( mapper14_w )
 		switch (offset & 0x6001)
 		{
 		case 0x0000:
-			MMC3_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			MMC3_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
-				mapper14_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				mapper14_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
-				mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+				mapper14_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
 				case 0: case 1:	// these have to be changed due to the different way mapper14_set_chr works (it handles 1k banks)!
-					vrom_bank[2 * cmd] = data;
-					vrom_bank[2 * cmd + 1] = data;
-					mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+					state->vrom_bank[2 * cmd] = data;
+					state->vrom_bank[2 * cmd + 1] = data;
+					mapper14_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 					break;
 				case 2: case 3: case 4: case 5:
-					vrom_bank[cmd + 2] = data;
-					mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+					state->vrom_bank[cmd + 2] = data;
+					mapper14_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 					break;
 				case 6:
 				case 7:
-					prg_bank[cmd - 6] = data;
-					mapper14_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					state->prg_bank[cmd - 6] = data;
+					mapper14_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 			}
 			break;
@@ -1362,9 +1384,9 @@ static WRITE8_HANDLER( mapper14_w )
 	{
 		map14_helper1 = (offset & 0x01) << 2;
 		offset = ((offset & 0x02) | (offset >> 10)) >> 1;
-		map14_helper2 = ((offset + 2) & 0x07) + 4; // '+4' because first 4 extra_banks are for PRG!
-		extra_bank[map14_helper2] = (extra_bank[map14_helper2] & (0xf0 >> map14_helper1)) | ((data & 0x0f) << map14_helper1);
-		mapper14_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		map14_helper2 = ((offset + 2) & 0x07) + 4; // '+4' because first 4 state->extra_banks are for PRG!
+		state->extra_bank[map14_helper2] = (state->extra_bank[map14_helper2] & (0xf0 >> map14_helper1)) | ((data & 0x0f) << map14_helper1);
+		mapper14_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 	}
 	else
 	{
@@ -1372,8 +1394,8 @@ static WRITE8_HANDLER( mapper14_w )
 		{
 		case 0x0000:
 		case 0x2000:
-			extra_bank[offset >> 13] = data;
-			mapper14_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->extra_bank[offset >> 13] = data;
+			mapper14_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 
 		case 0x1000:
@@ -1456,21 +1478,24 @@ we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void bandai_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
-	if (IRQ_enable)
+	if (state->IRQ_enable)
 	{
-		if (IRQ_count <= 114)
+		if (state->IRQ_count <= 114)
 		{
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-			IRQ_count = (0xffff - 114 + IRQ_count); 	// wrap around the 16 bits counter
+			state->IRQ_count = (0xffff - 114 + state->IRQ_count); 	// wrap around the 16 bits counter
 		}
-		IRQ_count -= 114;
+		state->IRQ_count -= 114;
 	}
 }
 
 static WRITE8_HANDLER( mapper16_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper16_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x000f)
@@ -1479,7 +1504,7 @@ static WRITE8_HANDLER( mapper16_m_w )
 		case 2: case 3:
 		case 4: case 5:
 		case 6: case 7:
-			chr1_x(space->machine, offset & 0x07, data, mmc_chr_source);
+			chr1_x(space->machine, offset & 0x07, data, state->mmc_chr_source);
 			break;
 		case 8:
 			prg16_89ab(space->machine, data);
@@ -1494,13 +1519,13 @@ static WRITE8_HANDLER( mapper16_m_w )
 			}
 			break;
 		case 0x0a:
-			IRQ_enable = data & 0x01;
+			state->IRQ_enable = data & 0x01;
 			break;
 		case 0x0b:
-			IRQ_count = (IRQ_count & 0xff00) | data;
+			state->IRQ_count = (state->IRQ_count & 0xff00) | data;
 			break;
 		case 0x0c:
-			IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
+			state->IRQ_count = (state->IRQ_count & 0x00ff) | (data << 8);
 			break;
 		default:
 			logerror("** uncaught mapper 16 write, offset: %04x, data: %02x\n", offset, data);
@@ -1529,6 +1554,7 @@ static WRITE8_HANDLER( mapper16_w )
 
 static WRITE8_HANDLER( mapper17_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper17_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
@@ -1541,14 +1567,14 @@ static WRITE8_HANDLER( mapper17_l_w )
 			break;
 
 		case 0x401:
-			IRQ_enable = data & 0x01;
+			state->IRQ_enable = data & 0x01;
 			break;
 		case 0x402:
-			IRQ_count = (IRQ_count & 0xff00) | data;
+			state->IRQ_count = (state->IRQ_count & 0xff00) | data;
 			break;
 		case 0x403:
-			IRQ_enable = 1;
-			IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
+			state->IRQ_enable = 1;
+			state->IRQ_count = (state->IRQ_count & 0x00ff) | (data << 8);
 			break;
 
 		case 0x404:
@@ -1594,79 +1620,82 @@ we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void jaleco_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
 	/* Increment & check the IRQ scanline counter */
-	if (IRQ_enable)
+	if (state->IRQ_enable)
 	{
-		LOG_MMC(("scanline: %d, irq count: %04x\n", scanline, IRQ_count));
-		if (IRQ_mode & 0x08)
+		LOG_MMC(("scanline: %d, irq count: %04x\n", scanline, state->IRQ_count));
+		if (state->IRQ_mode & 0x08)
 		{
-			if ((IRQ_count & 0x000f) < 114)	// always true, but we only update the IRQ once per scanlines so we cannot be more precise :(
+			if ((state->IRQ_count & 0x000f) < 114)	// always true, but we only update the IRQ once per scanlines so we cannot be more precise :(
 			{
 				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-				IRQ_count = (IRQ_count & ~0x000f) | (0x0f - (114 & 0x0f) + (IRQ_count & 0x000f)); // sort of wrap around the counter
+				state->IRQ_count = (state->IRQ_count & ~0x000f) | (0x0f - (114 & 0x0f) + (state->IRQ_count & 0x000f)); // sort of wrap around the counter
 			}
 			// decrements should not affect upper bits, so we don't do anything here (114 > 0x0f)
 		}
-		else if (IRQ_mode & 0x04)
+		else if (state->IRQ_mode & 0x04)
 		{
-			if ((IRQ_count & 0x00ff) < 114)
+			if ((state->IRQ_count & 0x00ff) < 114)
 			{
 				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-				IRQ_count = (IRQ_count & ~0x00ff) | (0xff - 114 + (IRQ_count & 0x00ff));	// wrap around the 8 bits counter
+				state->IRQ_count = (state->IRQ_count & ~0x00ff) | (0xff - 114 + (state->IRQ_count & 0x00ff));	// wrap around the 8 bits counter
 			}
 			else
-				IRQ_count -= 114;
+				state->IRQ_count -= 114;
 		}
-		else if (IRQ_mode & 0x02)
+		else if (state->IRQ_mode & 0x02)
 		{
-			if ((IRQ_count & 0x0fff)  < 114)
+			if ((state->IRQ_count & 0x0fff)  < 114)
 			{
 				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-				IRQ_count = (IRQ_count & ~0x0fff) | (0xfff - 114 + (IRQ_count & 0x0fff));	// wrap around the 12 bits counter
+				state->IRQ_count = (state->IRQ_count & ~0x0fff) | (0xfff - 114 + (state->IRQ_count & 0x0fff));	// wrap around the 12 bits counter
 			}
 			else
-				IRQ_count -= 114;
+				state->IRQ_count -= 114;
 		}
-		else if (IRQ_count < 114)
+		else if (state->IRQ_count < 114)
 		{
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-			IRQ_count = (0xffff - 114 + IRQ_count); 	// wrap around the 16 bits counter
+			state->IRQ_count = (0xffff - 114 + state->IRQ_count); 	// wrap around the 16 bits counter
 		}
 		else
-			IRQ_count -= 114;
+			state->IRQ_count -= 114;
 	}
 }
 
 static WRITE8_HANDLER( mapper18_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("mapper18_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
-			prg_bank[0] = (prg_bank[0] & 0xf0) | (data & 0x0f);
-			prg8_89(space->machine, prg_bank[0]);
+			state->prg_bank[0] = (state->prg_bank[0] & 0xf0) | (data & 0x0f);
+			prg8_89(space->machine, state->prg_bank[0]);
 			break;
 		case 0x0001:
-			prg_bank[0] = (prg_bank[0] & 0x0f) | (data << 4);
-			prg8_89(space->machine, prg_bank[0]);
+			state->prg_bank[0] = (state->prg_bank[0] & 0x0f) | (data << 4);
+			prg8_89(space->machine, state->prg_bank[0]);
 			break;
 		case 0x0002:
-			prg_bank[1] = (prg_bank[1] & 0xf0) | (data & 0x0f);
-			prg8_ab(space->machine, prg_bank[1]);
+			state->prg_bank[1] = (state->prg_bank[1] & 0xf0) | (data & 0x0f);
+			prg8_ab(space->machine, state->prg_bank[1]);
 			break;
 		case 0x0003:
-			prg_bank[1] = (prg_bank[1] & 0x0f) | (data << 4);
-			prg8_ab(space->machine, prg_bank[1]);
+			state->prg_bank[1] = (state->prg_bank[1] & 0x0f) | (data << 4);
+			prg8_ab(space->machine, state->prg_bank[1]);
 			break;
 		case 0x1000:
-			prg_bank[2] = (prg_bank[2] & 0xf0) | (data & 0x0f);
-			prg8_cd(space->machine, prg_bank[2]);
+			state->prg_bank[2] = (state->prg_bank[2] & 0xf0) | (data & 0x0f);
+			prg8_cd(space->machine, state->prg_bank[2]);
 			break;
 		case 0x1001:
-			prg_bank[2] = (prg_bank[2] & 0x0f) | (data << 4);
-			prg8_cd(space->machine, prg_bank[2]);
+			state->prg_bank[2] = (state->prg_bank[2] & 0x0f) | (data << 4);
+			prg8_cd(space->machine, state->prg_bank[2]);
 			break;
 
 		/* $9002, 3 (1002, 3) uncaught = Jaleco Baseball writes 0 */
@@ -1678,32 +1707,32 @@ static WRITE8_HANDLER( mapper18_w )
 		case 0x5000: case 0x5001: case 0x5002: case 0x5003:
 			bank = ((offset & 0x7000) - 0x2000) / 0x0800 + ((offset & 0x0002) >> 1);
 			if (offset & 0x0001)
-				vrom_bank[bank] = (vrom_bank[bank] & 0x0f) | ((data & 0x0f)<< 4);
+				state->vrom_bank[bank] = (state->vrom_bank[bank] & 0x0f) | ((data & 0x0f)<< 4);
 			else
-				vrom_bank[bank] = (vrom_bank[bank] & 0xf0) | (data & 0x0f);
+				state->vrom_bank[bank] = (state->vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
-			chr1_x(space->machine, bank, vrom_bank[bank], CHRROM);
+			chr1_x(space->machine, bank, state->vrom_bank[bank], CHRROM);
 			break;
 
 		case 0x6000:
-			IRQ_count_latch = (IRQ_count_latch & 0xfff0) | (data & 0x0f);
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0xfff0) | (data & 0x0f);
 			break;
 		case 0x6001:
-			IRQ_count_latch = (IRQ_count_latch & 0xff0f) | ((data & 0x0f) << 4);
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0xff0f) | ((data & 0x0f) << 4);
 			break;
 		case 0x6002:
-			IRQ_count_latch = (IRQ_count_latch & 0xf0ff) | ((data & 0x0f) << 8);
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0xf0ff) | ((data & 0x0f) << 8);
 			break;
 		case 0x6003:
-			IRQ_count_latch = (IRQ_count_latch & 0x0fff) | ((data & 0x0f) << 12);
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0x0fff) | ((data & 0x0f) << 12);
 			break;
 
 		case 0x7000:
-			IRQ_count = IRQ_count_latch;
+			state->IRQ_count = state->IRQ_count_latch;
 			break;
 		case 0x7001:
-			IRQ_enable = data & 0x01;
-			IRQ_mode = data & 0x0e;
+			state->IRQ_enable = data & 0x01;
+			state->IRQ_mode = data & 0x0e;
 			break;
 
 		case 0x7002:
@@ -1739,20 +1768,23 @@ we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void namcot_irq( running_device *device, int scanline, int vblank, int blanked )
 {
-	if (IRQ_enable)
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
+	if (state->IRQ_enable)
 	{
-		if (IRQ_count >= (0x7fff - 114))
+		if (state->IRQ_count >= (0x7fff - 114))
 		{
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-			IRQ_count = 0;
+			state->IRQ_count = 0;
 		}
 		else
-			IRQ_count += 114;
+			state->IRQ_count += 114;
 	}
 }
 
 static WRITE8_HANDLER( mapper19_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper19_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 
@@ -1762,26 +1794,27 @@ static WRITE8_HANDLER( mapper19_l_w )
 			LOG_MMC(("Mapper 19 sound port write, data: %02x\n", data));
 			break;
 		case 0x1000: /* low byte of IRQ */
-			IRQ_count = (IRQ_count & 0x7f00) | data;
+			state->IRQ_count = (state->IRQ_count & 0x7f00) | data;
 			break;
 		case 0x1800: /* high byte of IRQ, IRQ enable in high bit */
-			IRQ_count = (IRQ_count & 0xff) | ((data & 0x7f) << 8);
-			IRQ_enable = data & 0x80;
+			state->IRQ_count = (state->IRQ_count & 0xff) | ((data & 0x7f) << 8);
+			state->IRQ_enable = data & 0x80;
 			break;
 	}
 }
 
 static READ8_HANDLER( mapper19_l_r )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper19_l_r, offset: %04x\n", offset));
 	offset += 0x100;
 
 	switch (offset & 0x1800)
 	{
 		case 0x1000:
-			return IRQ_count & 0xff;
+			return state->IRQ_count & 0xff;
 		case 0x1800:
-			return (IRQ_count >> 8) & 0xff;
+			return (state->IRQ_count >> 8) & 0xff;
 		default:
 			return 0x00;
 	}
@@ -1797,6 +1830,7 @@ static void mapper19_set_mirror( running_machine *machine, UINT8 page, UINT8 dat
 
 static WRITE8_HANDLER( mapper19_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper19_w, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x7800)
 	{
@@ -1822,7 +1856,7 @@ static WRITE8_HANDLER( mapper19_w )
 			prg8_89(space->machine, data & 0x3f);
 			break;
 		case 0x6800:
-			mmc_cmd1 = data & 0xc0;		// this should enable High CHRRAM, but we still have to properly implement it!
+			state->mmc_cmd1 = data & 0xc0;		// this should enable High CHRRAM, but we still have to properly implement it!
 			prg8_ab(space->machine, data & 0x3f);
 			break;
 		case 0x7000:
@@ -1849,19 +1883,19 @@ static void fds_irq( running_device *device, int scanline, int vblank, int blank
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
 
-	if (IRQ_enable_latch)
+	if (state->IRQ_enable_latch)
 		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 
-	if (IRQ_enable)
+	if (state->IRQ_enable)
 	{
-		if (IRQ_count <= 114)
+		if (state->IRQ_count <= 114)
 		{
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-			IRQ_enable = 0;
+			state->IRQ_enable = 0;
 			state->fds_status0 |= 0x01;
 		}
 		else
-			IRQ_count -= 114;
+			state->IRQ_count -= 114;
 	}
 }
 
@@ -1891,15 +1925,15 @@ READ8_HANDLER( nes_fds_r )
 			/* return "no disk" status if disk is unloaded */
 			if (state->fds_data == NULL)
 				ret = 1;
-			else if (fds_last_side != state->fds_current_side)
+			else if (state->fds_last_side != state->fds_current_side)
 			{
 				/* If we've switched disks, report "no disk" for a few reads */
 				ret = 1;
-				fds_count ++;
-				if (fds_count == 50)
+				state->fds_count ++;
+				if (state->fds_count == 50)
 				{
-					fds_last_side = state->fds_current_side;
-					fds_count = 0;
+					state->fds_last_side = state->fds_current_side;
+					state->fds_count = 0;
 				}
 			}
 			else
@@ -1926,14 +1960,14 @@ WRITE8_HANDLER( nes_fds_w )
 	switch (offset)
 	{
 		case 0x00:
-			IRQ_count_latch = (IRQ_count_latch & 0xff00) | data;
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0xff00) | data;
 			break;
 		case 0x01:
-			IRQ_count_latch = (IRQ_count_latch & 0x00ff) | (data << 8);
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0x00ff) | (data << 8);
 			break;
 		case 0x02:
-			IRQ_count = IRQ_count_latch;
-			IRQ_enable = data;
+			state->IRQ_count = state->IRQ_count_latch;
+			state->IRQ_enable = data;
 			break;
 		case 0x03:
 			// d0 = sound io (1 = enable)
@@ -1954,7 +1988,7 @@ WRITE8_HANDLER( nes_fds_w )
 			if ((!(data & 0x40)) && (state->fds_write_reg & 0x40))
 				state->fds_head_position -= 2; // ???
 
-			IRQ_enable_latch = BIT(data, 7);
+			state->IRQ_enable_latch = BIT(data, 7);
 			state->fds_write_reg = data;
 			break;
 	}
@@ -1976,31 +2010,34 @@ WRITE8_HANDLER( nes_fds_w )
 
 static void vrc4_set_prg( running_machine *machine )
 {
-	if (mmc_cmd1 & 0x02)
+	nes_state *state = (nes_state *)machine->driver_data;
+	if (state->mmc_cmd1 & 0x02)
 	{
 		prg8_89(machine, 0xfe);
-		prg8_cd(machine, prg_bank[0]);
+		prg8_cd(machine, state->prg_bank[0]);
 	}
 	else
 	{
-		prg8_89(machine, prg_bank[0]);
+		prg8_89(machine, state->prg_bank[0]);
 		prg8_cd(machine, 0xfe);
 	}
 }
 
 static void konami_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
 	/* Increment & check the IRQ scanline counter */
-	if (IRQ_enable && (++IRQ_count == 0x100))
+	if (state->IRQ_enable && (++state->IRQ_count == 0x100))
 	{
-		IRQ_count = IRQ_count_latch;
-		IRQ_enable = IRQ_enable_latch;
+		state->IRQ_count = state->IRQ_count_latch;
+		state->IRQ_enable = state->IRQ_enable_latch;
 		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
 static WRITE8_HANDLER( konami_vrc4a_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("konami_vrc4a_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7fff)
@@ -2012,7 +2049,7 @@ static WRITE8_HANDLER( konami_vrc4a_w )
 		case 0x0040:
 		case 0x0080:
 		case 0x00c0:
-			prg_bank[0] = data;
+			state->prg_bank[0] = data;
 			vrc4_set_prg(space->machine);
 			break;
 
@@ -2032,7 +2069,7 @@ static WRITE8_HANDLER( konami_vrc4a_w )
 		case 0x1006:
 		case 0x1080:
 		case 0x10c0:
-			mmc_cmd1 = data & 0x02;
+			state->mmc_cmd1 = data & 0x02;
 			vrc4_set_prg(space->machine);
 			break;
 
@@ -2047,100 +2084,100 @@ static WRITE8_HANDLER( konami_vrc4a_w )
 			break;
 
 		case 0x3000:
-			vrom_bank[0] = (vrom_bank[0] & 0xf0) | (data & 0x0f);
-			chr1_0(space->machine, vrom_bank[0], CHRROM);
+			state->vrom_bank[0] = (state->vrom_bank[0] & 0xf0) | (data & 0x0f);
+			chr1_0(space->machine, state->vrom_bank[0], CHRROM);
 			break;
 		case 0x3002:
 		case 0x3040:
-			vrom_bank[0] = (vrom_bank[0] & 0x0f) | (data << 4);
-			chr1_0(space->machine, vrom_bank[0], CHRROM);
+			state->vrom_bank[0] = (state->vrom_bank[0] & 0x0f) | (data << 4);
+			chr1_0(space->machine, state->vrom_bank[0], CHRROM);
 			break;
 		case 0x3004:
 		case 0x3080:
-			vrom_bank[1] = (vrom_bank[1] & 0xf0) | (data & 0x0f);
-			chr1_1(space->machine, vrom_bank[1], CHRROM);
+			state->vrom_bank[1] = (state->vrom_bank[1] & 0xf0) | (data & 0x0f);
+			chr1_1(space->machine, state->vrom_bank[1], CHRROM);
 			break;
 		case 0x3006:
 		case 0x30c0:
-			vrom_bank[1] = (vrom_bank[1] & 0x0f) | (data << 4);
-			chr1_1(space->machine, vrom_bank[1], CHRROM);
+			state->vrom_bank[1] = (state->vrom_bank[1] & 0x0f) | (data << 4);
+			chr1_1(space->machine, state->vrom_bank[1], CHRROM);
 			break;
 		case 0x4000:
-			vrom_bank[2] = (vrom_bank[2] & 0xf0) | (data & 0x0f);
-			chr1_2(space->machine, vrom_bank[2], CHRROM);
+			state->vrom_bank[2] = (state->vrom_bank[2] & 0xf0) | (data & 0x0f);
+			chr1_2(space->machine, state->vrom_bank[2], CHRROM);
 			break;
 		case 0x4002:
 		case 0x4040:
-			vrom_bank[2] = (vrom_bank[2] & 0x0f) | (data << 4);
-			chr1_2(space->machine, vrom_bank[2], CHRROM);
+			state->vrom_bank[2] = (state->vrom_bank[2] & 0x0f) | (data << 4);
+			chr1_2(space->machine, state->vrom_bank[2], CHRROM);
 			break;
 		case 0x4004:
 		case 0x4080:
-			vrom_bank[3] = (vrom_bank[3] & 0xf0) | (data & 0x0f);
-			chr1_3(space->machine, vrom_bank[3], CHRROM);
+			state->vrom_bank[3] = (state->vrom_bank[3] & 0xf0) | (data & 0x0f);
+			chr1_3(space->machine, state->vrom_bank[3], CHRROM);
 			break;
 		case 0x4006:
 		case 0x40c0:
-			vrom_bank[3] = (vrom_bank[3] & 0x0f) | (data << 4);
-			chr1_3(space->machine, vrom_bank[3], CHRROM);
+			state->vrom_bank[3] = (state->vrom_bank[3] & 0x0f) | (data << 4);
+			chr1_3(space->machine, state->vrom_bank[3], CHRROM);
 			break;
 		case 0x5000:
-			vrom_bank[4] = (vrom_bank[4] & 0xf0) | (data & 0x0f);
-			chr1_4(space->machine, vrom_bank[4], CHRROM);
+			state->vrom_bank[4] = (state->vrom_bank[4] & 0xf0) | (data & 0x0f);
+			chr1_4(space->machine, state->vrom_bank[4], CHRROM);
 			break;
 		case 0x5002:
 		case 0x5040:
-			vrom_bank[4] = (vrom_bank[4] & 0x0f) | (data << 4);
-			chr1_4(space->machine, vrom_bank[4], CHRROM);
+			state->vrom_bank[4] = (state->vrom_bank[4] & 0x0f) | (data << 4);
+			chr1_4(space->machine, state->vrom_bank[4], CHRROM);
 			break;
 		case 0x5004:
 		case 0x5080:
-			vrom_bank[5] = (vrom_bank[5] & 0xf0) | (data & 0x0f);
-			chr1_5(space->machine, vrom_bank[5], CHRROM);
+			state->vrom_bank[5] = (state->vrom_bank[5] & 0xf0) | (data & 0x0f);
+			chr1_5(space->machine, state->vrom_bank[5], CHRROM);
 			break;
 		case 0x5006:
 		case 0x50c0:
-			vrom_bank[5] = (vrom_bank[5] & 0x0f) | (data << 4);
-			chr1_5(space->machine, vrom_bank[5], CHRROM);
+			state->vrom_bank[5] = (state->vrom_bank[5] & 0x0f) | (data << 4);
+			chr1_5(space->machine, state->vrom_bank[5], CHRROM);
 			break;
 		case 0x6000:
-			vrom_bank[6] = (vrom_bank[6] & 0xf0) | (data & 0x0f);
-			chr1_6(space->machine, vrom_bank[6], CHRROM);
+			state->vrom_bank[6] = (state->vrom_bank[6] & 0xf0) | (data & 0x0f);
+			chr1_6(space->machine, state->vrom_bank[6], CHRROM);
 			break;
 		case 0x6002:
 		case 0x6040:
-			vrom_bank[6] = (vrom_bank[6] & 0x0f) | (data << 4);
-			chr1_6(space->machine, vrom_bank[6], CHRROM);
+			state->vrom_bank[6] = (state->vrom_bank[6] & 0x0f) | (data << 4);
+			chr1_6(space->machine, state->vrom_bank[6], CHRROM);
 			break;
 		case 0x6004:
 		case 0x6080:
-			vrom_bank[7] = (vrom_bank[7] & 0xf0) | (data & 0x0f);
-			chr1_7(space->machine, vrom_bank[7], CHRROM);
+			state->vrom_bank[7] = (state->vrom_bank[7] & 0xf0) | (data & 0x0f);
+			chr1_7(space->machine, state->vrom_bank[7], CHRROM);
 			break;
 		case 0x6006:
 		case 0x60c0:
-			vrom_bank[7] = (vrom_bank[7] & 0x0f) | (data << 4);
-			chr1_7(space->machine, vrom_bank[7], CHRROM);
+			state->vrom_bank[7] = (state->vrom_bank[7] & 0x0f) | (data << 4);
+			chr1_7(space->machine, state->vrom_bank[7], CHRROM);
 			break;
 
 		case 0x7000:
-			IRQ_count_latch = (IRQ_count_latch & 0xf0) | (data & 0x0f);
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0xf0) | (data & 0x0f);
 			break;
 		case 0x7002:
 		case 0x7040:
-			IRQ_count_latch = (IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4 );
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4 );
 			break;
 		case 0x7004:
 		case 0x7080:
-			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
-			IRQ_enable = data & 0x02;
-			IRQ_enable_latch = data & 0x01;
+			state->IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+			state->IRQ_enable = data & 0x02;
+			state->IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
-				IRQ_count = IRQ_count_latch;
+				state->IRQ_count = state->IRQ_count_latch;
 			break;
 		case 0x7006:
 		case 0x70c0:
-			IRQ_enable = IRQ_enable_latch;
+			state->IRQ_enable = state->IRQ_enable_latch;
 			break;
 		default:
 			LOG_MMC(("konami_vrc4a_w uncaught offset: %04x value: %02x\n", offset, data));
@@ -2150,6 +2187,7 @@ static WRITE8_HANDLER( konami_vrc4a_w )
 
 static WRITE8_HANDLER( konami_vrc4b_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("konami_vrc4b_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7fff)
@@ -2161,7 +2199,7 @@ static WRITE8_HANDLER( konami_vrc4b_w )
 		case 0x0004:
 		case 0x0008:
 		case 0x000c:
-			prg_bank[0] = data;
+			state->prg_bank[0] = data;
 			vrc4_set_prg(space->machine);
 			break;
 
@@ -2181,7 +2219,7 @@ static WRITE8_HANDLER( konami_vrc4b_w )
 		case 0x1003:
 		case 0x1004:
 		case 0x100c:
-			mmc_cmd1 = data & 0x02;
+			state->mmc_cmd1 = data & 0x02;
 			vrc4_set_prg(space->machine);
 			break;
 
@@ -2196,100 +2234,100 @@ static WRITE8_HANDLER( konami_vrc4b_w )
 			break;
 
 		case 0x3000:
-			vrom_bank[0] = (vrom_bank[0] & 0xf0) | (data & 0x0f);
-			chr1_0(space->machine, vrom_bank[0], CHRROM);
+			state->vrom_bank[0] = (state->vrom_bank[0] & 0xf0) | (data & 0x0f);
+			chr1_0(space->machine, state->vrom_bank[0], CHRROM);
 			break;
 		case 0x3002:
 		case 0x3008:
-			vrom_bank[0] = (vrom_bank[0] & 0x0f) | (data << 4);
-			chr1_0(space->machine, vrom_bank[0], CHRROM);
+			state->vrom_bank[0] = (state->vrom_bank[0] & 0x0f) | (data << 4);
+			chr1_0(space->machine, state->vrom_bank[0], CHRROM);
 			break;
 		case 0x3001:
 		case 0x3004:
-			vrom_bank[1] = (vrom_bank[1] & 0xf0) | (data & 0x0f);
-			chr1_1(space->machine, vrom_bank[1], CHRROM);
+			state->vrom_bank[1] = (state->vrom_bank[1] & 0xf0) | (data & 0x0f);
+			chr1_1(space->machine, state->vrom_bank[1], CHRROM);
 			break;
 		case 0x3003:
 		case 0x300c:
-			vrom_bank[1] = (vrom_bank[1] & 0x0f) | (data << 4);
-			chr1_1(space->machine, vrom_bank[1], CHRROM);
+			state->vrom_bank[1] = (state->vrom_bank[1] & 0x0f) | (data << 4);
+			chr1_1(space->machine, state->vrom_bank[1], CHRROM);
 			break;
 		case 0x4000:
-			vrom_bank[2] = (vrom_bank[2] & 0xf0) | (data & 0x0f);
-			chr1_2(space->machine, vrom_bank[2], CHRROM);
+			state->vrom_bank[2] = (state->vrom_bank[2] & 0xf0) | (data & 0x0f);
+			chr1_2(space->machine, state->vrom_bank[2], CHRROM);
 			break;
 		case 0x4002:
 		case 0x4008:
-			vrom_bank[2] = (vrom_bank[2] & 0x0f) | (data << 4);
-			chr1_2(space->machine, vrom_bank[2], CHRROM);
+			state->vrom_bank[2] = (state->vrom_bank[2] & 0x0f) | (data << 4);
+			chr1_2(space->machine, state->vrom_bank[2], CHRROM);
 			break;
 		case 0x4001:
 		case 0x4004:
-			vrom_bank[3] = (vrom_bank[3] & 0xf0) | (data & 0x0f);
-			chr1_3(space->machine, vrom_bank[3], CHRROM);
+			state->vrom_bank[3] = (state->vrom_bank[3] & 0xf0) | (data & 0x0f);
+			chr1_3(space->machine, state->vrom_bank[3], CHRROM);
 			break;
 		case 0x4003:
 		case 0x400c:
-			vrom_bank[3] = (vrom_bank[3] & 0x0f) | (data << 4);
-			chr1_3(space->machine, vrom_bank[3], CHRROM);
+			state->vrom_bank[3] = (state->vrom_bank[3] & 0x0f) | (data << 4);
+			chr1_3(space->machine, state->vrom_bank[3], CHRROM);
 			break;
 		case 0x5000:
-			vrom_bank[4] = (vrom_bank[4] & 0xf0) | (data & 0x0f);
-			chr1_4(space->machine, vrom_bank[4], CHRROM);
+			state->vrom_bank[4] = (state->vrom_bank[4] & 0xf0) | (data & 0x0f);
+			chr1_4(space->machine, state->vrom_bank[4], CHRROM);
 			break;
 		case 0x5002:
 		case 0x5008:
-			vrom_bank[4] = (vrom_bank[4] & 0x0f) | (data << 4);
-			chr1_4(space->machine, vrom_bank[4], CHRROM);
+			state->vrom_bank[4] = (state->vrom_bank[4] & 0x0f) | (data << 4);
+			chr1_4(space->machine, state->vrom_bank[4], CHRROM);
 			break;
 		case 0x5001:
 		case 0x5004:
-			vrom_bank[5] = (vrom_bank[5] & 0xf0) | (data & 0x0f);
-			chr1_5(space->machine, vrom_bank[5], CHRROM);
+			state->vrom_bank[5] = (state->vrom_bank[5] & 0xf0) | (data & 0x0f);
+			chr1_5(space->machine, state->vrom_bank[5], CHRROM);
 			break;
 		case 0x5003:
 		case 0x500c:
-			vrom_bank[5] = (vrom_bank[5] & 0x0f) | (data << 4);
-			chr1_5(space->machine, vrom_bank[5], CHRROM);
+			state->vrom_bank[5] = (state->vrom_bank[5] & 0x0f) | (data << 4);
+			chr1_5(space->machine, state->vrom_bank[5], CHRROM);
 			break;
 		case 0x6000:
-			vrom_bank[6] = (vrom_bank[6] & 0xf0) | (data & 0x0f);
-			chr1_6(space->machine, vrom_bank[6], CHRROM);
+			state->vrom_bank[6] = (state->vrom_bank[6] & 0xf0) | (data & 0x0f);
+			chr1_6(space->machine, state->vrom_bank[6], CHRROM);
 			break;
 		case 0x6002:
 		case 0x6008:
-			vrom_bank[6] = (vrom_bank[6] & 0x0f) | (data << 4);
-			chr1_6(space->machine, vrom_bank[6], CHRROM);
+			state->vrom_bank[6] = (state->vrom_bank[6] & 0x0f) | (data << 4);
+			chr1_6(space->machine, state->vrom_bank[6], CHRROM);
 			break;
 		case 0x6001:
 		case 0x6004:
-			vrom_bank[7] = (vrom_bank[7] & 0xf0) | (data & 0x0f);
-			chr1_7(space->machine, vrom_bank[7], CHRROM);
+			state->vrom_bank[7] = (state->vrom_bank[7] & 0xf0) | (data & 0x0f);
+			chr1_7(space->machine, state->vrom_bank[7], CHRROM);
 			break;
 		case 0x6003:
 		case 0x600c:
-			vrom_bank[7] = (vrom_bank[7] & 0x0f) | (data << 4);
-			chr1_7(space->machine, vrom_bank[7], CHRROM);
+			state->vrom_bank[7] = (state->vrom_bank[7] & 0x0f) | (data << 4);
+			chr1_7(space->machine, state->vrom_bank[7], CHRROM);
 			break;
 
 		case 0x7000:
-			IRQ_count_latch = (IRQ_count_latch & 0xf0) | (data & 0x0f);
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0xf0) | (data & 0x0f);
 			break;
 		case 0x7002:
 		case 0x7008:
-			IRQ_count_latch = (IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4 );
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4 );
 			break;
 		case 0x7001:
 		case 0x7004:
-			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
-			IRQ_enable = data & 0x02;
-			IRQ_enable_latch = data & 0x01;
+			state->IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+			state->IRQ_enable = data & 0x02;
+			state->IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
-				IRQ_count = IRQ_count_latch;
+				state->IRQ_count = state->IRQ_count_latch;
 			break;
 		case 0x7003:
 		case 0x700c:
-			IRQ_enable = IRQ_enable_latch;
+			state->IRQ_enable = state->IRQ_enable_latch;
 			break;
 		default:
 			LOG_MMC(("konami_vrc4b_w uncaught offset: %04x value: %02x\n", offset, data));
@@ -2310,6 +2348,7 @@ static WRITE8_HANDLER( konami_vrc4b_w )
 
 static WRITE8_HANDLER( konami_vrc2a_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("konami_vrc2a_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2335,13 +2374,13 @@ static WRITE8_HANDLER( konami_vrc2a_w )
 	case 0x5000:
 	case 0x6000:
 		bank = ((offset & 0x7000) - 0x3000) / 0x0800 + (offset & 0x0001);
-		/* Notice that we store the banks as in other VRC, but then we take vrom_bank>>1 because it's VRC2A!*/
+		/* Notice that we store the banks as in other VRC, but then we take state->vrom_bank>>1 because it's VRC2A!*/
 		if (offset & 0x0002)
-			vrom_bank[bank] = (vrom_bank[bank] & 0x0f) | (data << 4);
+			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0x0f) | (data << 4);
 		else
-			vrom_bank[bank] = (vrom_bank[bank] & 0xf0) | (data & 0x0f);
+			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
-		chr1_x(space->machine, bank, vrom_bank[bank] >> 1, CHRROM);
+		chr1_x(space->machine, bank, state->vrom_bank[bank] >> 1, CHRROM);
 		break;
 
 	default:
@@ -2363,6 +2402,7 @@ static WRITE8_HANDLER( konami_vrc2a_w )
 
 static WRITE8_HANDLER( konami_vrc2b_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT16 select;
 	UINT8 bank;
 
@@ -2417,26 +2457,26 @@ static WRITE8_HANDLER( konami_vrc2b_w )
 	case 0x6003:
 		bank = ((select & 0x7000) - 0x3000) / 0x0800 + ((select & 0x0002) >> 1);
 		if (select & 0x0001)
-			vrom_bank[bank] = (vrom_bank[bank] & 0x0f) | (data << 4);
+			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0x0f) | (data << 4);
 		else
-			vrom_bank[bank] = (vrom_bank[bank] & 0xf0) | (data & 0x0f);
+			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
-		chr1_x(space->machine, bank, vrom_bank[bank], mmc_chr_source);
+		chr1_x(space->machine, bank, state->vrom_bank[bank], state->mmc_chr_source);
 		break;
 	case 0x7000:
-		IRQ_count_latch &= ~0x0f;
-		IRQ_count_latch |= data & 0x0f;
+		state->IRQ_count_latch &= ~0x0f;
+		state->IRQ_count_latch |= data & 0x0f;
 		break;
 	case 0x7001:
-		IRQ_count_latch &= ~0xf0;
-		IRQ_count_latch |= (data << 4) & 0xf0;
+		state->IRQ_count_latch &= ~0xf0;
+		state->IRQ_count_latch |= (data << 4) & 0xf0;
 		break;
 	case 0x7002:
-		IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
-		IRQ_enable = data & 0x02;
-		IRQ_enable_latch = data & 0x01;
+		state->IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+		state->IRQ_enable = data & 0x02;
+		state->IRQ_enable_latch = data & 0x01;
 		if (data & 0x02)
-			IRQ_count = IRQ_count_latch;
+			state->IRQ_count = state->IRQ_count_latch;
 		break;
 
 	default:
@@ -2458,6 +2498,7 @@ static WRITE8_HANDLER( konami_vrc2b_w )
 
 static WRITE8_HANDLER( konami_vrc6a_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("konami_vrc6a_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -2502,17 +2543,17 @@ static WRITE8_HANDLER( konami_vrc6a_w )
 			break;
 
 		case 0x7000:
-			IRQ_count_latch = data;
+			state->IRQ_count_latch = data;
 			break;
 		case 0x7001:
-			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
-			IRQ_enable = data & 0x02;
-			IRQ_enable_latch = data & 0x01;
+			state->IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+			state->IRQ_enable = data & 0x02;
+			state->IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
-				IRQ_count = IRQ_count_latch;
+				state->IRQ_count = state->IRQ_count_latch;
 			break;
 		case 0x7002:
-			IRQ_enable = IRQ_enable_latch;
+			state->IRQ_enable = state->IRQ_enable_latch;
 			break;
 
 		default:
@@ -2534,6 +2575,7 @@ static WRITE8_HANDLER( konami_vrc6a_w )
 
 static WRITE8_HANDLER( konami_vrc6b_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 
 	LOG_MMC(("konami_vrc6b_w, offset: %04x, data: %02x\n", offset, data));
@@ -2572,17 +2614,17 @@ static WRITE8_HANDLER( konami_vrc6b_w )
 			chr1_x(space->machine, bank, data, CHRROM);
 			break;
 		case 0x7000:
-			IRQ_count_latch = data;
+			state->IRQ_count_latch = data;
 			break;
 		case 0x7001:
-			IRQ_enable = IRQ_enable_latch;
+			state->IRQ_enable = state->IRQ_enable_latch;
 			break;
 		case 0x7002:
-			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
-			IRQ_enable = data & 0x02;
-			IRQ_enable_latch = data & 0x01;
+			state->IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+			state->IRQ_enable = data & 0x02;
+			state->IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
-				IRQ_count = IRQ_count_latch;
+				state->IRQ_count = state->IRQ_count_latch;
 			break;
 
 		default:
@@ -2669,10 +2711,10 @@ static WRITE8_HANDLER( mapper32_w )
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
-			mmc_cmd1 ? prg8_cd(space->machine, data) : prg8_89(space->machine, data);
+			state->mmc_cmd1 ? prg8_cd(space->machine, data) : prg8_89(space->machine, data);
 			break;
 		case 0x1000:
-			mmc_cmd1 = data & 0x02;
+			state->mmc_cmd1 = data & 0x02;
 			if (!state->crc_hack)	// Major League has hardwired mirroring (it would have required a separate mapper)
 				set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
@@ -2798,22 +2840,25 @@ static WRITE8_HANDLER( mapper34_w )
 
 static void mapper35_irq( running_device *device, int scanline, int vblank, int blanked )
 {
-	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE && IRQ_enable)
-	{
-		IRQ_count--;
+	nes_state *state = (nes_state *)device->machine->driver_data;
 
-		if (!blanked && (IRQ_count == 0))
+	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE && state->IRQ_enable)
+	{
+		state->IRQ_count--;
+
+		if (!blanked && (state->IRQ_count == 0))
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-			IRQ_enable = 0;
+			state->IRQ_enable = 0;
 		}
 	}
 }
 
 static WRITE8_HANDLER( mapper35_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper35_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
@@ -2825,7 +2870,7 @@ static WRITE8_HANDLER( mapper35_w )
 		prg8_ab(space->machine, data);
 		break;
 	case 0x0002:
-//      prg_bank[offset & 0x02] = data;
+//      state->prg_bank[offset & 0x02] = data;
 		prg8_cd(space->machine, data);
 		break;
 	case 0x1000:
@@ -2836,17 +2881,17 @@ static WRITE8_HANDLER( mapper35_w )
 	case 0x1005:
 	case 0x1006:
 	case 0x1007:
-//      vrom_bank[offset & 0x07] = data;
+//      state->vrom_bank[offset & 0x07] = data;
 		chr1_x(space->machine, offset & 0x07, data, CHRROM);
 		break;
 	case 0x4002:
-		IRQ_enable = 0;
+		state->IRQ_enable = 0;
 		break;
 	case 0x4003:
-		IRQ_enable = 1;
+		state->IRQ_enable = 1;
 		break;
 	case 0x4005:
-		IRQ_count = data;
+		state->IRQ_count = data;
 		break;
 	case 0x5001:
 		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -2891,17 +2936,18 @@ static WRITE8_HANDLER( mapper36_w )
 
 static WRITE8_HANDLER( mapper37_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map37_helper;
 	LOG_MMC(("mapper37_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	map37_helper = (data & 0x06) >> 1;
 
-	mmc_prg_base = map37_helper << 3;
-	mmc_prg_mask = (map37_helper == 2) ? 0x0f : 0x07;
-	mmc_chr_base = map37_helper << 6;
-	mmc_chr_mask = 0x7f;
-	mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-	mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+	state->mmc_prg_base = map37_helper << 3;
+	state->mmc_prg_mask = (map37_helper == 2) ? 0x0f : 0x07;
+	state->mmc_chr_base = map37_helper << 6;
+	state->mmc_chr_mask = 0x7f;
+	mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+	mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 }
 
 /*************************************************************
@@ -2954,31 +3000,34 @@ static WRITE8_HANDLER( mapper39_w )
 
 static void mapper40_irq( running_device *device, int scanline, int vblank, int blanked )
 {
-	if (IRQ_enable)
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
+	if (state->IRQ_enable)
 	{
-		if ((0xfff - IRQ_count) <= 114)
+		if ((0xfff - state->IRQ_count) <= 114)
 		{
-			IRQ_count = (IRQ_count + 1) & 0xfff;
-			IRQ_enable = 0;
+			state->IRQ_count = (state->IRQ_count + 1) & 0xfff;
+			state->IRQ_enable = 0;
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
-			IRQ_count += 114;
+			state->IRQ_count += 114;
 	}
 }
 
 static WRITE8_HANDLER( mapper40_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper40_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6000)
 	{
 		case 0x0000:
-			IRQ_enable = 0;
-			IRQ_count = 0;
+			state->IRQ_enable = 0;
+			state->IRQ_count = 0;
 			break;
 		case 0x2000:
-			IRQ_enable = 1;
+			state->IRQ_enable = 1;
 			break;
 		case 0x6000:
 			prg8_cd(space->machine, data);
@@ -2999,19 +3048,21 @@ static WRITE8_HANDLER( mapper40_w )
 
 static WRITE8_HANDLER( mapper41_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper41_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	mmc_cmd1 = offset & 0xff;
+	state->mmc_cmd1 = offset & 0xff;
 	set_nt_mirroring(space->machine, BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	prg32(space->machine, offset & 0x07);
 }
 
 static WRITE8_HANDLER( mapper41_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper41_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (mmc_cmd1 & 0x04)
-		chr8(space->machine, ((mmc_cmd1 & 0x18) >> 1) | (data & 0x03), CHRROM);
+	if (state->mmc_cmd1 & 0x04)
+		chr8(space->machine, ((state->mmc_cmd1 & 0x18) >> 1) | (data & 0x03), CHRROM);
 }
 
 /*************************************************************
@@ -3029,6 +3080,7 @@ extern emu_timer	*nes_irq_timer;
 
 static WRITE8_HANDLER( mapper42_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper42_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset >= 0x7000)
@@ -3043,14 +3095,14 @@ static WRITE8_HANDLER( mapper42_w )
 			break;
 		case 0x02:
 			/* Check if IRQ is being enabled */
-			if (!IRQ_enable && (data & 0x02))
+			if (!state->IRQ_enable && (data & 0x02))
 			{
-				IRQ_enable = 1;
+				state->IRQ_enable = 1;
 				timer_adjust_oneshot(nes_irq_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 24576), 0);
 			}
 			if (!(data & 0x02))
 			{
-				IRQ_enable = 0;
+				state->IRQ_enable = 0;
 				timer_adjust_oneshot(nes_irq_timer, attotime_never, 0);
 			}
 			break;
@@ -3138,6 +3190,7 @@ static WRITE8_HANDLER( mapper43_w )
 
 static WRITE8_HANDLER( mapper44_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 page;
 	LOG_MMC(("mapper44_w offset: %04x, data: %02x\n", offset, data));
 
@@ -3148,12 +3201,12 @@ static WRITE8_HANDLER( mapper44_w )
 		if (page > 6)
 			page = 6;
 
-		mmc_prg_base = page << 4;
-		mmc_prg_mask = (page > 5) ? 0x1f : 0x0f;
-		mmc_chr_base = page << 7;
-		mmc_chr_mask = (page > 5) ? 0xff : 0x7f;
-		mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-		mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		state->mmc_prg_base = page << 4;
+		state->mmc_prg_mask = (page > 5) ? 0x1f : 0x0f;
+		state->mmc_chr_base = page << 7;
+		state->mmc_chr_mask = (page > 5) ? 0xff : 0x7f;
+		mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+		mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	default:
@@ -3184,20 +3237,20 @@ static WRITE8_HANDLER( mapper45_m_w )
 		state->wram[offset] = data;
 	else
 	{
-		mapper45_reg[mmc_count] = data;
-		mmc_count = (mmc_count + 1) & 0x03;
+		mapper45_reg[state->mmc_count] = data;
+		state->mmc_count = (state->mmc_count + 1) & 0x03;
 
-		if (!mmc_count)
+		if (!state->mmc_count)
 		{
 			LOG_MMC(("mapper45_m_w, command completed %02x %02x %02x %02x\n", mapper45_reg[3],
 				mapper45_reg[2], mapper45_reg[1], mapper45_reg[0]));
 
-			mmc_prg_base = mapper45_reg[1];
-			mmc_prg_mask = 0x3f ^ (mapper45_reg[3] & 0x3f);
-			mmc_chr_base = ((mapper45_reg[2] & 0xf0) << 4) + mapper45_reg[0];
-			mmc_chr_mask = 0xff >> (~mapper45_reg[2] & 0x0f);
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			state->mmc_prg_base = mapper45_reg[1];
+			state->mmc_prg_mask = 0x3f ^ (mapper45_reg[3] & 0x3f);
+			state->mmc_chr_base = ((mapper45_reg[2] & 0xf0) << 4) + mapper45_reg[0];
+			state->mmc_chr_mask = 0xff >> (~mapper45_reg[2] & 0x0f);
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+			mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 		}
 	}
 }
@@ -3215,22 +3268,24 @@ static WRITE8_HANDLER( mapper45_m_w )
 
 static WRITE8_HANDLER( mapper46_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper46_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg_bank[0] = (prg_bank[0] & 0x01) | ((data & 0x0f) << 1);
-	vrom_bank[0] = (vrom_bank[0] & 0x07) | ((data & 0xf0) >> 1);
-	prg32(space->machine, prg_bank[0]);
-	chr8(space->machine, vrom_bank[0], CHRROM);
+	state->prg_bank[0] = (state->prg_bank[0] & 0x01) | ((data & 0x0f) << 1);
+	state->vrom_bank[0] = (state->vrom_bank[0] & 0x07) | ((data & 0xf0) >> 1);
+	prg32(space->machine, state->prg_bank[0]);
+	chr8(space->machine, state->vrom_bank[0], CHRROM);
 }
 
 static WRITE8_HANDLER( mapper46_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper46_w, offset: %04x, data: %02x\n", offset, data));
 
-	prg_bank[0] = (prg_bank[0] & ~0x01) | (data & 0x01);
-	vrom_bank[0] = (vrom_bank[0] & ~0x07) | ((data & 0x70) >> 4);
-	prg32(space->machine, prg_bank[0]);
-	chr8(space->machine, vrom_bank[0], CHRROM);
+	state->prg_bank[0] = (state->prg_bank[0] & ~0x01) | (data & 0x01);
+	state->vrom_bank[0] = (state->vrom_bank[0] & ~0x07) | ((data & 0x70) >> 4);
+	prg32(space->machine, state->prg_bank[0]);
+	chr8(space->machine, state->vrom_bank[0], CHRROM);
 }
 
 /*************************************************************
@@ -3246,14 +3301,15 @@ static WRITE8_HANDLER( mapper46_w )
 
 static WRITE8_HANDLER( mapper47_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper47_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	mmc_prg_base = (data & 0x01) << 4;
-	mmc_prg_mask = 0x0f;
-	mmc_chr_base = (data & 0x01) << 7;
-	mmc_chr_mask = 0x7f;
-	mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-	mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+	state->mmc_prg_base = (data & 0x01) << 4;
+	state->mmc_prg_mask = 0x0f;
+	state->mmc_chr_base = (data & 0x01) << 7;
+	state->mmc_chr_mask = 0x7f;
+	mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+	mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 }
 
 /*************************************************************
@@ -3276,6 +3332,7 @@ static WRITE8_HANDLER( mapper47_m_w )
 
 static WRITE8_HANDLER( mapper48_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper48_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6003)
@@ -3305,16 +3362,16 @@ static WRITE8_HANDLER( mapper48_w )
 			chr1_7(space->machine, data, CHRROM);
 			break;
 		case 0x4000:
-			IRQ_count_latch = (0x100 - data) & 0xff;
+			state->IRQ_count_latch = (0x100 - data) & 0xff;
 			break;
 		case 0x4001:
-			IRQ_count = IRQ_count_latch;
+			state->IRQ_count = state->IRQ_count_latch;
 			break;
 		case 0x4002:
-			IRQ_enable = 1;
+			state->IRQ_enable = 1;
 			break;
 		case 0x4003:
-			IRQ_enable = 0;
+			state->IRQ_enable = 0;
 			break;
 		case 0x6000:
 			set_nt_mirroring(space->machine, BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -3335,25 +3392,26 @@ static WRITE8_HANDLER( mapper48_w )
 
 static WRITE8_HANDLER( mapper49_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper49_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* mid writes only work when WRAM is enabled. not sure if I should
-       change the condition to mmc_cmd2==0x80 (i.e. what is the effect of
+       change the condition to state->mmc_cmd2==0x80 (i.e. what is the effect of
        the read-only bit?) */
-	if (mmc_cmd2 & 0x80)
+	if (state->mmc_cmd2 & 0x80)
 	{
 		if (data & 0x01)	/* if this is 0, then we have 32k PRG blocks */
 		{
-			mmc_prg_base = (data & 0xc0) >> 2;
-			mmc_prg_mask = 0x0f;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->mmc_prg_base = (data & 0xc0) >> 2;
+			state->mmc_prg_mask = 0x0f;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 		}
 		else
 			prg32(space->machine, (data & 0x30) >> 4);
 
-		mmc_chr_base = (data & 0xc0) << 1;
-		mmc_chr_mask = 0x7f;
-		mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		state->mmc_chr_base = (data & 0xc0) << 1;
+		state->mmc_chr_mask = 0x7f;
+		mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 	}
 }
 
@@ -3372,24 +3430,26 @@ static WRITE8_HANDLER( mapper49_m_w )
 
 static void mapper50_irq( running_device *device, int scanline, int vblank, int blanked )
 {
-	if (IRQ_enable)
+	nes_state *state = (nes_state *)device->machine->driver_data;
+	if (state->IRQ_enable)
 	{
-		if (IRQ_count < 0x1000)
+		if (state->IRQ_count < 0x1000)
 		{
-			if ((0x1000 - IRQ_count) <= 114)
+			if ((0x1000 - state->IRQ_count) <= 114)
 				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 			else
-				IRQ_count += 114;
+				state->IRQ_count += 114;
 		}
 		else
-			IRQ_count += 114;
+			state->IRQ_count += 114;
 
-		IRQ_count &= 0xffff;	// according to docs is 16bit counter -> it wraps only after 0xffff
+		state->IRQ_count &= 0xffff;	// according to docs is 16bit counter -> it wraps only after 0xffff
 	}
 }
 
 static WRITE8_HANDLER( mapper50_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 prg;
 	LOG_MMC(("mapper50_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -3401,7 +3461,7 @@ static WRITE8_HANDLER( mapper50_l_w )
 		prg8_cd(space->machine, prg);
 		break;
 	case 0x120:
-		IRQ_enable = data & 0x01;
+		state->IRQ_enable = data & 0x01;
 		break;
 	}
 }
@@ -3487,19 +3547,19 @@ static WRITE8_HANDLER( mapper52_m_w )
 	LOG_MMC(("mapper52_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* mid writes only work when WRAM is enabled. not sure if I should
-       change the condition to mmc_cmd2==0x80 (i.e. what is the effect of
+       change the condition to state->mmc_cmd2==0x80 (i.e. what is the effect of
        the read-only bit?) and it only can happen once! */
-	if ((mmc_cmd2 & 0x80) && !map52_reg_written)
+	if ((state->mmc_cmd2 & 0x80) && !map52_reg_written)
 	{
 		map52_helper1 = (data & 0x08);
 		map52_helper2 = (data & 0x40);
 
-		mmc_prg_base = map52_helper1 ? ((data & 0x07) << 4) : ((data & 0x06) << 4);
-		mmc_prg_mask = map52_helper1 ? 0x0f : 0x1f;
-		mmc_chr_base = ((data & 0x20) << 4) | ((data & 0x04) << 6) | (map52_helper2 ? ((data & 0x10) << 3) : 0);
-		mmc_chr_mask = map52_helper2 ? 0x7f : 0xff;
-		mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-		mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		state->mmc_prg_base = map52_helper1 ? ((data & 0x07) << 4) : ((data & 0x06) << 4);
+		state->mmc_prg_mask = map52_helper1 ? 0x0f : 0x1f;
+		state->mmc_chr_base = ((data & 0x20) << 4) | ((data & 0x04) << 6) | (map52_helper2 ? ((data & 0x10) << 3) : 0);
+		state->mmc_chr_mask = map52_helper2 ? 0x7f : 0xff;
+		mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+		mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 
 		map52_reg_written = 1;
 	}
@@ -3575,30 +3635,25 @@ static WRITE8_HANDLER( mapper54_w )
 
 static WRITE8_HANDLER( mapper57_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper57_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset & 0x0800)
-	{
-		mmc_cmd2 = data;
-	}
+		state->mmc_cmd2 = data;
+	else
+		state->mmc_cmd1 = data;
+
+	if (state->mmc_cmd2 & 0x80)
+		prg32(space->machine, 2 | (state->mmc_cmd2 >> 6));
 	else
 	{
-		mmc_cmd1 = data;
+		prg16_89ab(space->machine, (state->mmc_cmd2 >> 5) & 0x03);
+		prg16_cdef(space->machine, (state->mmc_cmd2 >> 5) & 0x03);
 	}
 
-	if (mmc_cmd2 & 0x80)
-	{
-		prg32(space->machine, 2 | (mmc_cmd2 >> 6));
-	}
-	else
-	{
-		prg16_89ab(space->machine, (mmc_cmd2 >> 5) & 0x03);
-		prg16_cdef(space->machine, (mmc_cmd2 >> 5) & 0x03);
-	}
+	set_nt_mirroring(space->machine, (state->mmc_cmd2 & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	set_nt_mirroring(space->machine, (mmc_cmd2 & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-	chr8(space->machine, (mmc_cmd1 & 0x03) | (mmc_cmd2 & 0x07) | ((mmc_cmd2 & 0x10) >> 1), CHRROM);
+	chr8(space->machine, (state->mmc_cmd1 & 0x03) | (state->mmc_cmd2 & 0x07) | ((state->mmc_cmd2 & 0x10) >> 1), CHRROM);
 }
 
 /*************************************************************
@@ -3736,18 +3791,19 @@ static WRITE8_HANDLER( mapper62_w )
 
 static void mapper64_irq( running_device *device, int scanline, int vblank, int blanked )
 {
-	if (!IRQ_mode)	// we are in scanline mode!
+	nes_state *state = (nes_state *)device->machine->driver_data;
+	if (!state->IRQ_mode)	// we are in scanline mode!
 	{
 		if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 		{
-			if (!IRQ_reset)
+			if (!state->IRQ_reset)
 			{
-				if (!IRQ_count)
-					IRQ_count = IRQ_count_latch;
+				if (!state->IRQ_count)
+					state->IRQ_count = state->IRQ_count_latch;
 				else
 				{
-					IRQ_count--;
-					if (IRQ_enable && !blanked && !IRQ_count)
+					state->IRQ_count--;
+					if (state->IRQ_enable && !blanked && !state->IRQ_count)
 					{
 						LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 								video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
@@ -3757,8 +3813,8 @@ static void mapper64_irq( running_device *device, int scanline, int vblank, int 
 			}
 			else
 			{
-				IRQ_reset = 0;
-				IRQ_count = IRQ_count_latch + 1;
+				state->IRQ_reset = 0;
+				state->IRQ_count = state->IRQ_count_latch + 1;
 			}
 		}
 	}
@@ -3767,14 +3823,14 @@ static void mapper64_irq( running_device *device, int scanline, int vblank, int 
      --> Skulls and Crossbones does not show anything!! */
 	else
 	{
-//      if (!IRQ_reset)
+//      if (!state->IRQ_reset)
 		{
-			if (IRQ_count <= 114)
-				IRQ_count = IRQ_count_latch;
+			if (state->IRQ_count <= 114)
+				state->IRQ_count = state->IRQ_count_latch;
 			else
 			{
-				IRQ_count -= 114;
-				if (IRQ_enable && !blanked && (IRQ_count <= 114))
+				state->IRQ_count -= 114;
+				if (state->IRQ_enable && !blanked && (state->IRQ_count <= 114))
 				{
 					LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 							video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
@@ -3784,56 +3840,59 @@ static void mapper64_irq( running_device *device, int scanline, int vblank, int 
 		}
 //      else
 //      {
-//          IRQ_reset = 0;
-//          IRQ_count = IRQ_count_latch + 1;
+//          state->IRQ_reset = 0;
+//          state->IRQ_count = state->IRQ_count_latch + 1;
 //      }
 	}
 }
 
 static void mapper64_set_prg( running_machine *machine )
 {
-	UINT8 prg_mode = mmc_cmd1 & 0x40;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 prg_mode = state->mmc_cmd1 & 0x40;
 
-	prg8_89(machine, prg_bank[prg_mode ? 2: 0]);
-	prg8_ab(machine, prg_bank[prg_mode ? 0: 1]);
-	prg8_cd(machine, prg_bank[prg_mode ? 1: 2]);
+	prg8_89(machine, state->prg_bank[prg_mode ? 2: 0]);
+	prg8_ab(machine, state->prg_bank[prg_mode ? 0: 1]);
+	prg8_cd(machine, state->prg_bank[prg_mode ? 1: 2]);
 }
 
 static void mapper64_set_chr( running_machine *machine )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 
-	if (mmc_cmd1 & 0x20)
+	if (state->mmc_cmd1 & 0x20)
 	{
-		chr1_x(machine, 0 ^ chr_page, vrom_bank[0], CHRROM);
-		chr1_x(machine, 1 ^ chr_page, vrom_bank[8], CHRROM);
-		chr1_x(machine, 2 ^ chr_page, vrom_bank[1], CHRROM);
-		chr1_x(machine, 3 ^ chr_page, vrom_bank[9], CHRROM);
+		chr1_x(machine, 0 ^ chr_page, state->vrom_bank[0], CHRROM);
+		chr1_x(machine, 1 ^ chr_page, state->vrom_bank[8], CHRROM);
+		chr1_x(machine, 2 ^ chr_page, state->vrom_bank[1], CHRROM);
+		chr1_x(machine, 3 ^ chr_page, state->vrom_bank[9], CHRROM);
 	}
 	else
 	{
-		chr1_x(machine, 0 ^ chr_page, vrom_bank[0] & ~0x01, CHRROM);
-		chr1_x(machine, 1 ^ chr_page, vrom_bank[0] |  0x01, CHRROM);
-		chr1_x(machine, 2 ^ chr_page, vrom_bank[1] & ~0x01, CHRROM);
-		chr1_x(machine, 3 ^ chr_page, vrom_bank[1] |  0x01, CHRROM);
+		chr1_x(machine, 0 ^ chr_page, state->vrom_bank[0] & ~0x01, CHRROM);
+		chr1_x(machine, 1 ^ chr_page, state->vrom_bank[0] |  0x01, CHRROM);
+		chr1_x(machine, 2 ^ chr_page, state->vrom_bank[1] & ~0x01, CHRROM);
+		chr1_x(machine, 3 ^ chr_page, state->vrom_bank[1] |  0x01, CHRROM);
 	}
 
-	chr1_x(machine, 4 ^ chr_page, vrom_bank[2], CHRROM);
-	chr1_x(machine, 5 ^ chr_page, vrom_bank[3], CHRROM);
-	chr1_x(machine, 6 ^ chr_page, vrom_bank[4], CHRROM);
-	chr1_x(machine, 7 ^ chr_page, vrom_bank[5], CHRROM);
+	chr1_x(machine, 4 ^ chr_page, state->vrom_bank[2], CHRROM);
+	chr1_x(machine, 5 ^ chr_page, state->vrom_bank[3], CHRROM);
+	chr1_x(machine, 6 ^ chr_page, state->vrom_bank[4], CHRROM);
+	chr1_x(machine, 7 ^ chr_page, state->vrom_bank[5], CHRROM);
 }
 
 static WRITE8_HANDLER( mapper64_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map64_helper, cmd;
 	LOG_MMC(("mapper64_w offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			map64_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			map64_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (map64_helper & 0x40)
@@ -3845,25 +3904,25 @@ static WRITE8_HANDLER( mapper64_w )
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x0f;
+			cmd = state->mmc_cmd1 & 0x0f;
 			switch (cmd)
 			{
 				case 0: case 1:
 				case 2: case 3:
 				case 4: case 5:
-					vrom_bank[cmd] = data;
+					state->vrom_bank[cmd] = data;
 					mapper64_set_chr(space->machine);
 					break;
 				case 6: case 7:
-					prg_bank[cmd - 6] = data;
+					state->prg_bank[cmd - 6] = data;
 					mapper64_set_prg(space->machine);
 					break;
 				case 8: case 9:
-					vrom_bank[cmd - 2] = data;
+					state->vrom_bank[cmd - 2] = data;
 					mapper64_set_chr(space->machine);
 					break;
 				case 0x0f:
-					prg_bank[2] = data;
+					state->prg_bank[2] = data;
 					mapper64_set_prg(space->machine);
 					break;
 			}
@@ -3874,20 +3933,20 @@ static WRITE8_HANDLER( mapper64_w )
 			break;
 
 		case 0x4000:
-			IRQ_count_latch = data;
+			state->IRQ_count_latch = data;
 			break;
 
 		case 0x4001: /* $c001 - IRQ scanline latch */
-			IRQ_mode = data & 0x01;
-			IRQ_reset = 1;
+			state->IRQ_mode = data & 0x01;
+			state->IRQ_reset = 1;
 			break;
 
 		case 0x6000:
-			IRQ_enable = 0;
+			state->IRQ_enable = 0;
 			break;
 
 		case 0x6001:
-			IRQ_enable = 1;
+			state->IRQ_enable = 1;
 			break;
 
 		default:
@@ -3913,13 +3972,14 @@ we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void irem_irq( running_device *device, int scanline, int vblank, int blanked )
 {
-	if (IRQ_enable)
+	nes_state *state = (nes_state *)device->machine->driver_data;
+	if (state->IRQ_enable)
 	{
-		IRQ_count -= 114;
+		state->IRQ_count -= 114;
 
-		if (IRQ_count <= 114)
+		if (state->IRQ_count <= 114)
 		{
-			IRQ_enable = 0;
+			state->IRQ_enable = 0;
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
@@ -3927,6 +3987,7 @@ static void irem_irq( running_device *device, int scanline, int vblank, int blan
 
 static WRITE8_HANDLER( mapper65_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper65_w, offset %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7fff)
@@ -3940,19 +4001,19 @@ static WRITE8_HANDLER( mapper65_w )
 			break;
 
 		case 0x1003:
-			IRQ_enable = data & 0x80;
+			state->IRQ_enable = data & 0x80;
 			break;
 
 		case 0x1004:
-			IRQ_count = IRQ_count_latch;
+			state->IRQ_count = state->IRQ_count_latch;
 			break;
 
 		case 0x1005:
-			IRQ_count_latch = (IRQ_count_latch & 0x00ff) | (data << 8);
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0x00ff) | (data << 8);
 			break;
 
 		case 0x1006:
-			IRQ_count_latch = (IRQ_count_latch & 0xff00) | data;
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0xff00) | data;
 			break;
 
 		case 0x2000:
@@ -4015,24 +4076,28 @@ we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void mapper67_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
 	/* TODO: change to reflect the actual number of cycles spent: both using 114 or cycling 114,114,113
     produces a 1-line glitch in Fantasy Zone 2: it really requires the counter to be updated each CPU cycle! */
-	if (IRQ_enable)
+	if (state->IRQ_enable)
 	{
-		if (IRQ_count <= 114)
+		if (state->IRQ_count <= 114)
 		{
-			IRQ_enable = 0;
-			IRQ_count = 0xffff;
+			state->IRQ_enable = 0;
+			state->IRQ_count = 0xffff;
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
-			IRQ_count -= 114;
+			state->IRQ_count -= 114;
 	}
 }
 
 static WRITE8_HANDLER( mapper67_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper67_w, offset %04x, data: %02x\n", offset, data));
+
 	switch (offset & 0x7800)
 	{
 	case 0x0800:
@@ -4049,15 +4114,15 @@ static WRITE8_HANDLER( mapper67_w )
 		break;
 	case 0x4000:
 	case 0x4800:
-		IRQ_toggle ^= 1;
-		if (IRQ_toggle)
-			IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
+		state->IRQ_toggle ^= 1;
+		if (state->IRQ_toggle)
+			state->IRQ_count = (state->IRQ_count & 0x00ff) | (data << 8);
 		else
-			IRQ_count = (IRQ_count & 0xff00) | data;
+			state->IRQ_count = (state->IRQ_count & 0xff00) | data;
 		break;
 	case 0x5800:
-		IRQ_enable = data & 0x10;
-		IRQ_toggle = 0;
+		state->IRQ_enable = data & 0x10;
+		state->IRQ_toggle = 0;
 		break;
 	case 0x6800:
 		switch (data & 3)
@@ -4187,23 +4252,25 @@ we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void mapper69_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
 	/* TODO: change to reflect the actual number of cycles spent */
-	if ((IRQ_enable & 0x80) && (IRQ_enable & 0x01))
+	if ((state->IRQ_enable & 0x80) && (state->IRQ_enable & 0x01))
 	{
-		if (IRQ_count <= 114)
+		if (state->IRQ_count <= 114)
 		{
-			IRQ_count = 0xffff;
+			state->IRQ_count = 0xffff;
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
-			IRQ_count -= 114;
+			state->IRQ_count -= 114;
 	}
-	else if (IRQ_enable & 0x01)	// if enable bit is not set, only decrement the counter!
+	else if (state->IRQ_enable & 0x01)	// if enable bit is not set, only decrement the counter!
 	{
-		if (IRQ_count <= 114)
-			IRQ_count = 0xffff;
+		if (state->IRQ_count <= 114)
+			state->IRQ_count = 0xffff;
 		else
-			IRQ_count -= 114;
+			state->IRQ_count -= 114;
 	}
 }
 
@@ -4215,14 +4282,14 @@ static WRITE8_HANDLER( mapper69_w )
 	switch (offset & 0x6000)
 	{
 		case 0x0000:
-			mmc_cmd1 = data & 0x0f;
+			state->mmc_cmd1 = data & 0x0f;
 			break;
 
 		case 0x2000:
-			switch (mmc_cmd1)
+			switch (state->mmc_cmd1)
 			{
 				case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
-					chr1_x(space->machine, mmc_cmd1, data, CHRROM);
+					chr1_x(space->machine, state->mmc_cmd1, data, CHRROM);
 					break;
 
 				/* TODO: deal properly with bankswitching/write-protecting the mid-mapper area */
@@ -4252,13 +4319,13 @@ static WRITE8_HANDLER( mapper69_w )
 					}
 					break;
 				case 0x0d:
-					IRQ_enable = data;
+					state->IRQ_enable = data;
 					break;
 				case 0x0e:
-					IRQ_count = (IRQ_count & 0xff00) | data;
+					state->IRQ_count = (state->IRQ_count & 0xff00) | data;
 					break;
 				case 0x0f:
-					IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
+					state->IRQ_count = (state->IRQ_count & 0x00ff) | (data << 8);
 					break;
 			}
 			break;
@@ -4370,24 +4437,26 @@ static WRITE8_HANDLER( mapper72_w )
 
 static WRITE8_HANDLER( mapper73_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
+
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
 		case 0x1000:
 			/* dunno which address controls these */
-			IRQ_count_latch = data;
-			IRQ_enable_latch = data;
+			state->IRQ_count_latch = data;
+			state->IRQ_enable_latch = data;
 			break;
 		case 0x2000:
-			IRQ_enable = data;
+			state->IRQ_enable = data;
 			break;
 		case 0x3000:
-			IRQ_count &= ~0x0f;
-			IRQ_count |= data & 0x0f;
+			state->IRQ_count &= ~0x0f;
+			state->IRQ_count |= data & 0x0f;
 			break;
 		case 0x4000:
-			IRQ_count &= ~0xf0;
-			IRQ_count |= (data & 0x0f) << 4;
+			state->IRQ_count &= ~0xf0;
+			state->IRQ_count |= (data & 0x0f) << 4;
 			break;
 		case 0x7000:
 			prg16_89ab(space->machine, data);
@@ -4438,56 +4507,58 @@ static void waixing_set_mirror( running_machine *machine, UINT8 nt )
 
 static void mapper74_set_chr( running_machine *machine, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
 
 	for (i = 0; i < 6; i++)
-		chr_src[i] = ((vrom_bank[i] == 8) || (vrom_bank[i] == 9)) ? CHRRAM : CHRROM;
+		chr_src[i] = ((state->vrom_bank[i] == 8) || (state->vrom_bank[i] == 9)) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper74_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper74_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper74_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			mapper74_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x07;
+		cmd = state->mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
-			mapper74_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd] = data;
+			mapper74_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			prg_bank[cmd - 6] = data;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
 		break;
@@ -4518,6 +4589,7 @@ static WRITE8_HANDLER( mapper74_w )
 
 static WRITE8_HANDLER( mapper75_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper75_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7000)
@@ -4527,10 +4599,10 @@ static WRITE8_HANDLER( mapper75_w )
 			break;
 		case 0x1000:
 			set_nt_mirroring(space->machine, (data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			vrom_bank[0] = (vrom_bank[0] & 0x0f) | ((data & 0x02) << 3);
-			vrom_bank[1] = (vrom_bank[1] & 0x0f) | ((data & 0x04) << 2);
-			chr4_0(space->machine, vrom_bank[0], CHRROM);
-			chr4_4(space->machine, vrom_bank[1], CHRROM);
+			state->vrom_bank[0] = (state->vrom_bank[0] & 0x0f) | ((data & 0x02) << 3);
+			state->vrom_bank[1] = (state->vrom_bank[1] & 0x0f) | ((data & 0x04) << 2);
+			chr4_0(space->machine, state->vrom_bank[0], CHRROM);
+			chr4_4(space->machine, state->vrom_bank[1], CHRROM);
 			break;
 		case 0x2000:
 			prg8_ab(space->machine, data);
@@ -4539,12 +4611,12 @@ static WRITE8_HANDLER( mapper75_w )
 			prg8_cd(space->machine, data);
 			break;
 		case 0x6000:
-			vrom_bank[0] = (vrom_bank[0] & 0x10) | (data & 0x0f);
-			chr4_0(space->machine, vrom_bank[0], CHRROM);
+			state->vrom_bank[0] = (state->vrom_bank[0] & 0x10) | (data & 0x0f);
+			chr4_0(space->machine, state->vrom_bank[0], CHRROM);
 			break;
 		case 0x7000:
-			vrom_bank[1] = (vrom_bank[1] & 0x10) | (data & 0x0f);
-			chr4_4(space->machine, vrom_bank[1], CHRROM);
+			state->vrom_bank[1] = (state->vrom_bank[1] & 0x10) | (data & 0x0f);
+			chr4_4(space->machine, state->vrom_bank[1], CHRROM);
 			break;
 	}
 }
@@ -4562,26 +4634,27 @@ static WRITE8_HANDLER( mapper75_w )
 
 static WRITE8_HANDLER( mapper76_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper76_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7001)
 	{
 	case 0:
-		mmc_cmd1 = data;
+		state->mmc_cmd1 = data;
 		break;
 	case 1:
 		{
-			switch (mmc_cmd1 & 0x07)
+			switch (state->mmc_cmd1 & 0x07)
 			{
 			case 2: chr2_0(space->machine, data, CHRROM); break;
 			case 3: chr2_2(space->machine, data, CHRROM); break;
 			case 4: chr2_4(space->machine, data, CHRROM); break;
 			case 5: chr2_6(space->machine, data, CHRROM); break;
 			case 6:
-				(mmc_cmd1 & 0x40) ? prg8_cd(space->machine, data) : prg8_89(space->machine, data);
+				(state->mmc_cmd1 & 0x40) ? prg8_cd(space->machine, data) : prg8_89(space->machine, data);
 				break;
 			case 7: prg8_ab(space->machine, data); break;
-			default: logerror("mapper76 unsupported command: %02x, data: %02x\n", mmc_cmd1, data); break;
+			default: logerror("mapper76 unsupported command: %02x, data: %02x\n", state->mmc_cmd1, data); break;
 			}
 		}
 	case 0x2000:
@@ -4750,37 +4823,38 @@ static WRITE8_HANDLER( mapper80_m_w )
 
 static WRITE8_HANDLER( mapper82_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper82_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
 	{
 		case 0x1ef0:
-			if (mmc_cmd1)
+			if (state->mmc_cmd1)
 				chr2_4(space->machine, data >> 1, CHRROM);
 			else
 				chr2_0(space->machine, data >> 1, CHRROM);
 			break;
 		case 0x1ef1:
-			if (mmc_cmd1)
+			if (state->mmc_cmd1)
 				chr2_6(space->machine, data, CHRROM);
 			else
 				chr2_2(space->machine, data, CHRROM);
 			break;
 		case 0x1ef2:
-			chr1_x(space->machine, 4 ^ mmc_cmd1, data, CHRROM);
+			chr1_x(space->machine, 4 ^ state->mmc_cmd1, data, CHRROM);
 			break;
 		case 0x1ef3:
-			chr1_x(space->machine, 5 ^ mmc_cmd1, data, CHRROM);
+			chr1_x(space->machine, 5 ^ state->mmc_cmd1, data, CHRROM);
 			break;
 		case 0x1ef4:
-			chr1_x(space->machine, 6 ^ mmc_cmd1, data, CHRROM);
+			chr1_x(space->machine, 6 ^ state->mmc_cmd1, data, CHRROM);
 			break;
 		case 0x1ef5:
-			chr1_x(space->machine, 7 ^ mmc_cmd1, data, CHRROM);
+			chr1_x(space->machine, 7 ^ state->mmc_cmd1, data, CHRROM);
 			break;
 		case 0x1ef6:
 			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-			mmc_cmd1 = ((data & 0x02) << 1);
+			state->mmc_cmd1 = ((data & 0x02) << 1);
 			break;
 
 		case 0x1efa:
@@ -4840,6 +4914,7 @@ static void mapper83_set_chr( running_machine *machine )
 
 static WRITE8_HANDLER( mapper83_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper83_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
@@ -4870,11 +4945,11 @@ static WRITE8_HANDLER( mapper83_w )
 		}
 		break;
 	case 0x0200:
-		IRQ_count = (IRQ_count & 0xff00) | data;
+		state->IRQ_count = (state->IRQ_count & 0xff00) | data;
 		break;
 	case 0x0201:
-		IRQ_enable = 1;
-		IRQ_count = (data << 8) | (IRQ_count & 0xff);
+		state->IRQ_enable = 1;
+		state->IRQ_count = (data << 8) | (state->IRQ_count & 0xff);
 		break;
 	case 0x0300:
 		prg8_89(space->machine, data);
@@ -4927,6 +5002,7 @@ static WRITE8_HANDLER( mapper83_w )
 
 static WRITE8_HANDLER( konami_vrc7_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("konami_vrc7_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -4964,7 +5040,7 @@ static WRITE8_HANDLER( konami_vrc7_w )
 		case 0x5010:
 		case 0x5018:
 			bank = ((offset & 0x7000) - 0x2000) / 0x0800 + ((offset & 0x0018) ? 1 : 0);
-			chr1_x(space->machine, bank, data, mmc_chr_source);
+			chr1_x(space->machine, bank, data, state->mmc_chr_source);
 			break;
 
 		case 0x6000:
@@ -4977,17 +5053,17 @@ static WRITE8_HANDLER( konami_vrc7_w )
 			}
 			break;
 		case 0x6008: case 0x6010: case 0x6018:
-			IRQ_count_latch = data;
+			state->IRQ_count_latch = data;
 			break;
 		case 0x7000:
-			IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
-			IRQ_enable = data & 0x02;
-			IRQ_enable_latch = data & 0x01;
+			state->IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+			state->IRQ_enable = data & 0x02;
+			state->IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
-				IRQ_count = IRQ_count_latch;
+				state->IRQ_count = state->IRQ_count_latch;
 			break;
 		case 0x7008: case 0x7010: case 0x7018:
-			IRQ_enable = IRQ_enable_latch;
+			state->IRQ_enable = state->IRQ_enable_latch;
 			break;
 
 		default:
@@ -5051,15 +5127,16 @@ static WRITE8_HANDLER( mapper87_m_w )
 
 static WRITE8_HANDLER( mapper88_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper88_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 1)
 	{
 	case 0:
-		mmc_cmd1 = data & 7;
+		state->mmc_cmd1 = data & 7;
 		break;
 	case 1:
-		switch (mmc_cmd1)
+		switch (state->mmc_cmd1)
 		{
 			case 0: chr2_0(space->machine, data >> 1, CHRROM); break;
 			case 1: chr2_2(space->machine, data >> 1, CHRROM); break;
@@ -5125,6 +5202,7 @@ static WRITE8_HANDLER( mapper89_w )
 
 static WRITE8_HANDLER( mapper91_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper91_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x1000)
@@ -5143,8 +5221,8 @@ static WRITE8_HANDLER( mapper91_m_w )
 			{
 				case 0x00: prg8_89(space->machine, data); break;
 				case 0x01: prg8_ab(space->machine, data); break;
-				case 0x02: IRQ_enable = 0; IRQ_count = 0; break;
-				case 0x03: IRQ_enable = 1; IRQ_count = 7; break;
+				case 0x02: state->IRQ_enable = 0; state->IRQ_count = 0; break;
+				case 0x03: state->IRQ_enable = 1; state->IRQ_count = 7; break;
 			}
 			break;
 		default:
@@ -5232,30 +5310,31 @@ static WRITE8_HANDLER( mapper94_w )
 
 static WRITE8_HANDLER( mapper95_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper95_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 1)
 	{
 	case 0:
 		{
-			mmc_cmd1 = data;
+			state->mmc_cmd1 = data;
 			break;
 		}
 	case 1:
 		{
-			switch (mmc_cmd1 & 0x07)
+			switch (state->mmc_cmd1 & 0x07)
 			{
 				case 0:
 				case 1:
-					chr2_x(space->machine, mmc_cmd1 ? 2 : 0, (data >> 1) & 0x1f, CHRROM);
+					chr2_x(space->machine, state->mmc_cmd1 ? 2 : 0, (data >> 1) & 0x1f, CHRROM);
 					break;
 				case 2:
 				case 3:
 				case 4:
 				case 5:
-					chr1_x(space->machine, 2 + mmc_cmd1, data & 0x1f, CHRROM);
-					mapper95_reg[mmc_cmd1 - 2] = data & 0x20;
-					if (!(mmc_cmd1 & 0x80))
+					chr1_x(space->machine, 2 + state->mmc_cmd1, data & 0x1f, CHRROM);
+					mapper95_reg[state->mmc_cmd1 - 2] = data & 0x20;
+					if (!(state->mmc_cmd1 & 0x80))
 					{
 						set_nt_page(space->machine, 0, CIRAM, mapper95_reg[0] ? 1 : 0, 1);
 						set_nt_page(space->machine, 1, CIRAM, mapper95_reg[1] ? 1 : 0, 1);
@@ -5411,22 +5490,23 @@ static WRITE8_HANDLER( mapper101_w )
 
 static WRITE8_HANDLER( mapper104_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper104_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset < 0x4000)
 	{
 		if (data & 0x08)
 		{
-			prg_bank[0] = ((data & 0x07) << 4) | (prg_bank[0] & 0x0f);
-			prg16_89ab(space->machine, prg_bank[0]);
+			state->prg_bank[0] = ((data & 0x07) << 4) | (state->prg_bank[0] & 0x0f);
+			prg16_89ab(space->machine, state->prg_bank[0]);
 			prg16_cdef(space->machine, ((data & 0x07) << 4) | 0x0f);
 		}
 
 	}
 	else
 	{
-			prg_bank[0] = (prg_bank[0] & 0x70) | (data & 0x0f);
-			prg16_89ab(space->machine, prg_bank[0]);
+			state->prg_bank[0] = (state->prg_bank[0] & 0x70) | (data & 0x0f);
+			prg16_89ab(space->machine, state->prg_bank[0]);
 	}
 }
 
@@ -5454,20 +5534,23 @@ static WRITE8_HANDLER( mapper104_w )
 
 static void mapper106_irq( running_device *device, int scanline, int vblank, int blanked )
 {
-	if (IRQ_enable)
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
+	if (state->IRQ_enable)
 	{
-		if ((0xffff - IRQ_count) < 114)
+		if ((0xffff - state->IRQ_count) < 114)
 		{
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
-			IRQ_enable = 0;
+			state->IRQ_enable = 0;
 		}
 
-		IRQ_count = (IRQ_count + 114) & 0xffff;
+		state->IRQ_count = (state->IRQ_count + 114) & 0xffff;
 	}
 }
 
 static WRITE8_HANDLER( mapper106_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper106_w, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 0x0f)
 	{
@@ -5499,15 +5582,15 @@ static WRITE8_HANDLER( mapper106_w )
 		set_nt_mirroring(space->machine, BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x0d:
-		IRQ_count = 0;
-		IRQ_enable = 0;
+		state->IRQ_count = 0;
+		state->IRQ_enable = 0;
 		break;
 	case 0x0e:
-		IRQ_count = (IRQ_count & 0xff00) | data;
+		state->IRQ_count = (state->IRQ_count & 0xff00) | data;
 		break;
 	case 0x0f:
-		IRQ_count = (IRQ_count & 0x00ff) | (data << 8);
-		IRQ_enable = 1;
+		state->IRQ_count = (state->IRQ_count & 0x00ff) | (data << 8);
+		state->IRQ_enable = 1;
 		break;
 	}
 }
@@ -5597,15 +5680,16 @@ static WRITE8_HANDLER( mapper107_w )
 
 static WRITE8_HANDLER( mapper112_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper112_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
 	{
 	case 0x0000:
-		mmc_cmd1 = data & 0x07;
+		state->mmc_cmd1 = data & 0x07;
 		break;
 	case 0x2000:
-		switch (mmc_cmd1)
+		switch (state->mmc_cmd1)
 		{
 		case 0:
 			prg8_89(space->machine, data);
@@ -5684,6 +5768,7 @@ static WRITE8_HANDLER( mapper113_l_w )
 
 static WRITE8_HANDLER( mapper114_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper114_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	map114_reg = data;
@@ -5694,7 +5779,7 @@ static WRITE8_HANDLER( mapper114_m_w )
 		prg16_cdef(space->machine, data & 0x1f);
 	}
 	else
-		mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 }
 
@@ -5764,54 +5849,56 @@ static void mapper115_set_prg( running_machine *machine, int prg_base, int prg_m
 
 static WRITE8_HANDLER( mapper115_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper115_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x01)
 	{
 	case 0x00:
 		mapper115_reg[0] = data;
-		mapper115_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		mapper115_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 		break;
 	case 0x01:
-		mmc_chr_base = (data & 0x01) ? 0x100 : 0x000;
-		mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		state->mmc_chr_base = (data & 0x01) ? 0x100 : 0x000;
+		mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 	}
 }
 
 static WRITE8_HANDLER( mapper115_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map115_helper, cmd;
 	LOG_MMC(("mapper115_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			map115_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			map115_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (map115_helper & 0x40)
-				mapper115_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				mapper115_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 			/* Has CHR Mode changed? */
 			if (map115_helper & 0x80)
-				mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+				mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					vrom_bank[cmd] = data;
-					mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+					state->vrom_bank[cmd] = data;
+					mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 					break;
 				case 6:
 				case 7:
-					prg_bank[cmd - 6] = data;
-					mapper115_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					state->prg_bank[cmd - 6] = data;
+					mapper115_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 			}
 			break;
@@ -5846,12 +5933,13 @@ static WRITE8_HANDLER( mapper115_w )
 
 static void mapper117_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
 //  if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		if (IRQ_enable && IRQ_count)
+		if (state->IRQ_enable && state->IRQ_count)
 		{
-			IRQ_count--;
-			if (!IRQ_count)
+			state->IRQ_count--;
+			if (!state->IRQ_count)
 				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
@@ -5859,6 +5947,7 @@ static void mapper117_irq( running_device *device, int scanline, int vblank, int
 
 static WRITE8_HANDLER( mapper117_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper117_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
@@ -5891,16 +5980,16 @@ static WRITE8_HANDLER( mapper117_w )
 		break;
 
 	case 0x4001:
-		IRQ_count_latch = data;
+		state->IRQ_count_latch = data;
 		break;
 	case 0x4002:
 		// IRQ cleared
 		break;
 	case 0x4003:
-		IRQ_count = IRQ_count_latch;
+		state->IRQ_count = state->IRQ_count_latch;
 		break;
 	case 0x6000:
-		IRQ_enable = data & 0x01;
+		state->IRQ_enable = data & 0x01;
 		break;
 	}
 }
@@ -5919,59 +6008,61 @@ static WRITE8_HANDLER( mapper117_w )
 
 static void mapper118_set_mirror( running_machine *machine )
 {
-	if (mmc_cmd1 & 0x80)
+	nes_state *state = (nes_state *)machine->driver_data;
+	if (state->mmc_cmd1 & 0x80)
 	{
-		set_nt_page(machine, 0, CIRAM, (vrom_bank[2] & 0x80) >> 7, 1);
-		set_nt_page(machine, 1, CIRAM, (vrom_bank[3] & 0x80) >> 7, 1);
-		set_nt_page(machine, 2, CIRAM, (vrom_bank[4] & 0x80) >> 7, 1);
-		set_nt_page(machine, 3, CIRAM, (vrom_bank[5] & 0x80) >> 7, 1);
+		set_nt_page(machine, 0, CIRAM, (state->vrom_bank[2] & 0x80) >> 7, 1);
+		set_nt_page(machine, 1, CIRAM, (state->vrom_bank[3] & 0x80) >> 7, 1);
+		set_nt_page(machine, 2, CIRAM, (state->vrom_bank[4] & 0x80) >> 7, 1);
+		set_nt_page(machine, 3, CIRAM, (state->vrom_bank[5] & 0x80) >> 7, 1);
 	}
 	else
 	{
-		set_nt_page(machine, 0, CIRAM, (vrom_bank[0] & 0x80) >> 7, 1);
-		set_nt_page(machine, 1, CIRAM, (vrom_bank[0] & 0x80) >> 7, 1);
-		set_nt_page(machine, 2, CIRAM, (vrom_bank[1] & 0x80) >> 7, 1);
-		set_nt_page(machine, 3, CIRAM, (vrom_bank[1] & 0x80) >> 7, 1);
+		set_nt_page(machine, 0, CIRAM, (state->vrom_bank[0] & 0x80) >> 7, 1);
+		set_nt_page(machine, 1, CIRAM, (state->vrom_bank[0] & 0x80) >> 7, 1);
+		set_nt_page(machine, 2, CIRAM, (state->vrom_bank[1] & 0x80) >> 7, 1);
+		set_nt_page(machine, 3, CIRAM, (state->vrom_bank[1] & 0x80) >> 7, 1);
 	}
 }
 
 static WRITE8_HANDLER( mapper118_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper118_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			MMC3_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			MMC3_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
-				mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 			{
 				mapper118_set_mirror(space->machine);
-				mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+				mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			}
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
 				case 0: case 1:
 				case 2: case 3: case 4: case 5:
-					vrom_bank[cmd] = data;
+					state->vrom_bank[cmd] = data;
 					mapper118_set_mirror(space->machine);
-					mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+					mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 					break;
 				case 6:
 				case 7:
-					prg_bank[cmd - 6] = data;
-					mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					state->prg_bank[cmd - 6] = data;
+					mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 			}
 			break;
@@ -5998,58 +6089,60 @@ static WRITE8_HANDLER( mapper118_w )
 
 static void mapper119_set_chr( running_machine *machine )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 chr_src[6], chr_mask[6];
 	int i;
 
 	for (i = 0; i < 6; i++)
 	{
-		chr_src[i] = (vrom_bank[i] & 0x40) ? CHRRAM : CHRROM;
-		chr_mask[i] =  (vrom_bank[i] & 0x40) ? 0x07 : 0x3f;
+		chr_src[i] = (state->vrom_bank[i] & 0x40) ? CHRRAM : CHRROM;
+		chr_mask[i] =  (state->vrom_bank[i] & 0x40) ? 0x07 : 0x3f;
 	}
 
-	chr1_x(machine, chr_page ^ 0, ((vrom_bank[0] & ~0x01) & chr_mask[0]), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, ((vrom_bank[0] |  0x01) & chr_mask[0]), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, ((vrom_bank[1] & ~0x01) & chr_mask[1]), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, ((vrom_bank[1] |  0x01) & chr_mask[1]), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, (vrom_bank[2] & chr_mask[2]), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, (vrom_bank[3] & chr_mask[3]), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, (vrom_bank[4] & chr_mask[4]), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, (vrom_bank[5] & chr_mask[5]), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, ((state->vrom_bank[0] & ~0x01) & chr_mask[0]), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, ((state->vrom_bank[0] |  0x01) & chr_mask[0]), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, ((state->vrom_bank[1] & ~0x01) & chr_mask[1]), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, ((state->vrom_bank[1] |  0x01) & chr_mask[1]), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, (state->vrom_bank[2] & chr_mask[2]), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, (state->vrom_bank[3] & chr_mask[3]), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, (state->vrom_bank[4] & chr_mask[4]), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, (state->vrom_bank[5] & chr_mask[5]), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper119_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper119_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			MMC3_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			MMC3_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
-				mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				mapper119_set_chr(space->machine);
 			break;
 		case 0x0001: /* $8001 */
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					vrom_bank[cmd] = data;
+					state->vrom_bank[cmd] = data;
 					mapper119_set_chr(space->machine);
 					break;
 				case 6:
 				case 7:
-					prg_bank[cmd - 6] = data;
-					mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					state->prg_bank[cmd - 6] = data;
+					mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 			}
 			break;
@@ -6120,20 +6213,22 @@ static READ8_HANDLER( mapper121_l_r )
 
 static void mapper121_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
-	UINT8 prg_flip = (mmc_cmd1 & 0x40) ? 2 : 0;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
 	UINT8 new_bank2, new_bank3;
 
-	new_bank2 = mapper121_reg[0] ? mapper121_reg[0] : prg_bank[2 ^ prg_flip];
-	new_bank3 = mapper121_reg[1] ? mapper121_reg[1] : prg_bank[3];
+	new_bank2 = mapper121_reg[0] ? mapper121_reg[0] : state->prg_bank[2 ^ prg_flip];
+	new_bank3 = mapper121_reg[1] ? mapper121_reg[1] : state->prg_bank[3];
 
-	prg8_89(machine, prg_base | (prg_bank[0 ^ prg_flip] & prg_mask));
-	prg8_ab(machine, prg_base | (prg_bank[1] & prg_mask));
+	prg8_89(machine, prg_base | (state->prg_bank[0 ^ prg_flip] & prg_mask));
+	prg8_ab(machine, prg_base | (state->prg_bank[1] & prg_mask));
 	prg8_cd(machine, prg_base | (new_bank2 & prg_mask));
 	prg8_ef(machine, prg_base | (new_bank3 & prg_mask));
 }
 
 static WRITE8_HANDLER( mapper121_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper121_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6174,31 +6269,31 @@ static WRITE8_HANDLER( mapper121_w )
 		switch (offset & 0x6001)
 		{
 		case 0x0000:
-			MMC3_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			MMC3_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
-				mapper121_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				mapper121_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
-				mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+				mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
 			case 0: case 1:
 			case 2: case 3: case 4: case 5:
-				vrom_bank[cmd] = data;
-				mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+				state->vrom_bank[cmd] = data;
+				mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 				break;
 			case 6:
 			case 7:
-				prg_bank[cmd - 6] = data;
-				mapper121_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				state->prg_bank[cmd - 6] = data;
+				mapper121_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 				break;
 			}
 			break;
@@ -6208,7 +6303,7 @@ static WRITE8_HANDLER( mapper121_w )
 			break;
 		}
 	}
-	mapper121_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+	mapper121_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 }
 
 /*************************************************************
@@ -6403,16 +6498,17 @@ static WRITE8_HANDLER( mapper133_m_w )
 
 static WRITE8_HANDLER( mapper134_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper134_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset == 0x01)
 	{
-		mmc_prg_base = (data & 0x02) << 4;
-		mmc_prg_mask = 0x1f;
-		mmc_chr_base = (data & 0x20) << 3;
-		mmc_chr_mask = 0xff;
-		mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-		mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		state->mmc_prg_base = (data & 0x02) << 4;
+		state->mmc_prg_mask = 0x1f;
+		state->mmc_chr_base = (data & 0x20) << 3;
+		state->mmc_chr_mask = 0xff;
+		mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+		mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 	}
 }
 
@@ -6440,21 +6536,23 @@ static WRITE8_HANDLER( mapper134_m_w )
 
 static WRITE8_HANDLER( mapper136_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper136_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	if ((offset & 0x103) == 0x002)
 	{
-		mmc_cmd1 = (data & 0x30) | ((data + 3) & 0x0f);
-		chr8(space->machine, mmc_cmd1, CHRROM);
+		state->mmc_cmd1 = (data & 0x30) | ((data + 3) & 0x0f);
+		chr8(space->machine, state->mmc_cmd1, CHRROM);
 	}
 }
 
 static READ8_HANDLER( mapper136_l_r )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper136_l_r, offset: %04x\n", offset));
 
 	if ((offset & 0x103) == 0x000)
-		return mmc_cmd1 | 0x40;
+		return state->mmc_cmd1 | 0x40;
 	else
 		return 0x00;
 }
@@ -6495,18 +6593,19 @@ static void sachen_set_mirror( running_machine *machine, UINT8 nt ) // used by m
 
 static WRITE8_HANDLER( mapper137_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper137_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
-			mmc_cmd1 = data & 0x07;
+			state->mmc_cmd1 = data & 0x07;
 		else
 		{
-			sachen_reg[mmc_cmd1] = data;
+			sachen_reg[state->mmc_cmd1] = data;
 
-			switch (mmc_cmd1)
+			switch (state->mmc_cmd1)
 			{
 			case 0x05:
 				prg32(space->machine, data);
@@ -6515,7 +6614,7 @@ static WRITE8_HANDLER( mapper137_l_w )
 				sachen_set_mirror(space->machine, BIT(data, 0) ? 0 : (data >> 1) & 0x03);
 				break;
 			default:
-				if (mmc_chr_source == CHRROM)
+				if (state->mmc_chr_source == CHRROM)
 				{
 					chr1_0(space->machine, (sachen_reg[0] & 0x07), CHRROM);
 					chr1_1(space->machine, (sachen_reg[1] & 0x07) | (sachen_reg[4] << 4 & 0x10), CHRROM);
@@ -6548,6 +6647,7 @@ static WRITE8_HANDLER( mapper137_m_w )
 
 static WRITE8_HANDLER( mapper138_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank_helper1 = 0, bank_helper2 = 0;
 	LOG_MMC(("mapper138_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6555,12 +6655,12 @@ static WRITE8_HANDLER( mapper138_l_w )
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
-			mmc_cmd1 = data & 0x07;
+			state->mmc_cmd1 = data & 0x07;
 		else
 		{
-			sachen_reg[mmc_cmd1] = data;
+			sachen_reg[state->mmc_cmd1] = data;
 
-			switch (mmc_cmd1)
+			switch (state->mmc_cmd1)
 			{
 			case 0x05:
 				prg32(space->machine, data);
@@ -6569,7 +6669,7 @@ static WRITE8_HANDLER( mapper138_l_w )
 				sachen_set_mirror(space->machine, BIT(data, 0) ? 0 : (data >> 1) & 0x03);
 				break;
 			default:
-				if (mmc_chr_source == CHRROM)
+				if (state->mmc_chr_source == CHRROM)
 				{
 					bank_helper1 = sachen_reg[7] & 0x01;
 					bank_helper2 = (sachen_reg[4] & 0x07) << 3;
@@ -6604,6 +6704,7 @@ static WRITE8_HANDLER( mapper138_m_w )
 
 static WRITE8_HANDLER( mapper139_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank_helper1 = 0, bank_helper2 = 0;
 	LOG_MMC(("mapper139_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6611,12 +6712,12 @@ static WRITE8_HANDLER( mapper139_l_w )
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
-			mmc_cmd1 = data & 0x07;
+			state->mmc_cmd1 = data & 0x07;
 		else
 		{
-			sachen_reg[mmc_cmd1] = data;
+			sachen_reg[state->mmc_cmd1] = data;
 
-			switch (mmc_cmd1)
+			switch (state->mmc_cmd1)
 			{
 			case 0x05:
 				prg32(space->machine, data);
@@ -6625,7 +6726,7 @@ static WRITE8_HANDLER( mapper139_l_w )
 				sachen_set_mirror(space->machine, BIT(data, 0) ? 0 : (data >> 1) & 0x03);
 				break;
 			default:
-				if (mmc_chr_source == CHRROM)
+				if (state->mmc_chr_source == CHRROM)
 				{
 					bank_helper1 = sachen_reg[7] & 0x01;
 					bank_helper2 = (sachen_reg[4] & 0x07) << 3;
@@ -6680,6 +6781,7 @@ static WRITE8_HANDLER( mapper_140_m_w )
 
 static WRITE8_HANDLER( mapper141_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank_helper1 = 0, bank_helper2 = 0;
 	LOG_MMC(("mapper141_l_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -6687,12 +6789,12 @@ static WRITE8_HANDLER( mapper141_l_w )
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
-			mmc_cmd1 = data & 0x07;
+			state->mmc_cmd1 = data & 0x07;
 		else
 		{
-			sachen_reg[mmc_cmd1] = data;
+			sachen_reg[state->mmc_cmd1] = data;
 
-			switch (mmc_cmd1)
+			switch (state->mmc_cmd1)
 			{
 			case 0x05:
 				prg32(space->machine, data);
@@ -6701,14 +6803,14 @@ static WRITE8_HANDLER( mapper141_l_w )
 				sachen_set_mirror(space->machine, BIT(data, 0) ? 0 : (data >> 1) & 0x03);
 				break;
 			default:
-				if (mmc_chr_source == CHRROM)
+				if (state->mmc_chr_source == CHRROM)
 				{
 					bank_helper1 = sachen_reg[7] & 0x01;
 					bank_helper2 = (sachen_reg[4] & 0x07) << 3;
-					chr2_0(space->machine, ((sachen_reg[bank_helper1 ? 0 : 0] & 0x07) | bank_helper2) << 1, mmc_chr_source);
-					chr2_2(space->machine, ((sachen_reg[bank_helper1 ? 0 : 1] & 0x07) | bank_helper2) << 1 | 0x01, mmc_chr_source);
-					chr2_4(space->machine, ((sachen_reg[bank_helper1 ? 0 : 2] & 0x07) | bank_helper2) << 1, mmc_chr_source);
-					chr2_6(space->machine, ((sachen_reg[bank_helper1 ? 0 : 3] & 0x07) | bank_helper2) << 1 | 0x01, mmc_chr_source);
+					chr2_0(space->machine, ((sachen_reg[bank_helper1 ? 0 : 0] & 0x07) | bank_helper2) << 1, state->mmc_chr_source);
+					chr2_2(space->machine, ((sachen_reg[bank_helper1 ? 0 : 1] & 0x07) | bank_helper2) << 1 | 0x01, state->mmc_chr_source);
+					chr2_4(space->machine, ((sachen_reg[bank_helper1 ? 0 : 2] & 0x07) | bank_helper2) << 1, state->mmc_chr_source);
+					chr2_6(space->machine, ((sachen_reg[bank_helper1 ? 0 : 3] & 0x07) | bank_helper2) << 1 | 0x01, state->mmc_chr_source);
 				}
 				break;
 			}
@@ -6913,32 +7015,33 @@ static WRITE8_HANDLER( mapper149_w )
 
 static WRITE8_HANDLER( mapper150_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper150_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
-			mmc_cmd1 = data & 0x07;
+			state->mmc_cmd1 = data & 0x07;
 		else
 		{
-			switch (mmc_cmd1)
+			switch (state->mmc_cmd1)
 			{
 			case 0x02:
-				vrom_bank[0] = (vrom_bank[0] & ~0x08) | ((data << 3) & 0x08);
-				chr8(space->machine, vrom_bank[0], CHRROM);
+				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x08) | ((data << 3) & 0x08);
+				chr8(space->machine, state->vrom_bank[0], CHRROM);
 				prg32(space->machine, data & 0x01);
 				break;
 			case 0x04:
-				vrom_bank[0] = (vrom_bank[0] & ~0x04) | ((data << 2) & 0x04);
-				chr8(space->machine, vrom_bank[0], CHRROM);
+				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x04) | ((data << 2) & 0x04);
+				chr8(space->machine, state->vrom_bank[0], CHRROM);
 				break;
 			case 0x05:
 				prg32(space->machine, data & 0x07);
 				break;
 			case 0x06:
-				vrom_bank[0] = (vrom_bank[0] & ~0x03) | (data << 0 & 0x03);
-				chr8(space->machine, vrom_bank[0], CHRROM);
+				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x03) | (data << 0 & 0x03);
+				chr8(space->machine, state->vrom_bank[0], CHRROM);
 				break;
 			case 0x07:
 				sachen_set_mirror(space->machine, (data >> 1) & 0x03);
@@ -6952,11 +7055,12 @@ static WRITE8_HANDLER( mapper150_l_w )
 
 static READ8_HANDLER( mapper150_l_r )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper150_l_r, offset: %04x", offset));
 
 	/* read  happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
-		return (~mmc_cmd1 & 0x3f) /* ^ dips*/;	// we would need to check the Dips here
+		return (~state->mmc_cmd1 & 0x3f) /* ^ dips*/;	// we would need to check the Dips here
 	else
 		return 0;
 }
@@ -7084,15 +7188,16 @@ static WRITE8_HANDLER( mapper153_w )
 
 static WRITE8_HANDLER( mapper154_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper154_w, offset: %04x, data: %02x\n", offset, data));
 	switch (offset & 1)
 	{
 	case 0:
 		set_nt_mirroring(space->machine, BIT(data, 6) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-		mmc_cmd1 = data & 7;
+		state->mmc_cmd1 = data & 7;
 		break;
 	case 1:
-		switch (mmc_cmd1)
+		switch (state->mmc_cmd1)
 		{
 			case 0: chr2_0(space->machine, data >> 1, CHRROM); break;
 			case 1: chr2_2(space->machine, data >> 1, CHRROM); break;
@@ -7198,24 +7303,26 @@ static WRITE8_HANDLER( mapper156_w )
 // probably wrong...
 static void mapper158_set_mirror( running_machine *machine )
 {
-	UINT8 nt_mode = mmc_cmd1 & 0x80;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 nt_mode = state->mmc_cmd1 & 0x80;
 
-	set_nt_page(machine, 0, ROM, vrom_bank[nt_mode ? 2 : 0], 0);
-	set_nt_page(machine, 1, ROM, vrom_bank[nt_mode ? 3 : 0], 0);
-	set_nt_page(machine, 2, ROM, vrom_bank[nt_mode ? 4 : 1], 0);
-	set_nt_page(machine, 3, ROM, vrom_bank[nt_mode ? 5 : 1], 0);
+	set_nt_page(machine, 0, ROM, state->vrom_bank[nt_mode ? 2 : 0], 0);
+	set_nt_page(machine, 1, ROM, state->vrom_bank[nt_mode ? 3 : 0], 0);
+	set_nt_page(machine, 2, ROM, state->vrom_bank[nt_mode ? 4 : 1], 0);
+	set_nt_page(machine, 3, ROM, state->vrom_bank[nt_mode ? 5 : 1], 0);
 }
 
 static WRITE8_HANDLER( mapper158_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map158_helper, cmd;
 	LOG_MMC(("mapper158_w offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			map158_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			map158_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (map158_helper & 0x40)
@@ -7230,27 +7337,27 @@ static WRITE8_HANDLER( mapper158_w )
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x0f;
+			cmd = state->mmc_cmd1 & 0x0f;
 			switch (cmd)
 			{
 				case 0: case 1:
 				case 2: case 3:
 				case 4: case 5:
-					vrom_bank[cmd] = data;
+					state->vrom_bank[cmd] = data;
 					mapper64_set_chr(space->machine);
 					mapper158_set_mirror(space->machine);
 					break;
 				case 6: case 7:
-					prg_bank[cmd - 6] = data;
+					state->prg_bank[cmd - 6] = data;
 					mapper64_set_prg(space->machine);
 					break;
 				case 8: case 9:
-					vrom_bank[cmd - 2] = data;
+					state->vrom_bank[cmd - 2] = data;
 					mapper64_set_chr(space->machine);
 					mapper158_set_mirror(space->machine);
 					break;
 				case 0x0f:
-					prg_bank[2] = data;
+					state->prg_bank[2] = data;
 					mapper64_set_prg(space->machine);
 					break;
 			}
@@ -7652,6 +7759,7 @@ static WRITE8_HANDLER( mapper177_w )
 
 static WRITE8_HANDLER( mapper178_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper178_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
@@ -7660,11 +7768,11 @@ static WRITE8_HANDLER( mapper178_l_w )
 		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x701:
-		mmc_cmd1 = (mmc_cmd1 & 0x0c) | ((data >> 1) & 0x03);
-		prg32(space->machine, mmc_cmd1);
+		state->mmc_cmd1 = (state->mmc_cmd1 & 0x0c) | ((data >> 1) & 0x03);
+		prg32(space->machine, state->mmc_cmd1);
 		break;
 	case 0x702:
-		mmc_cmd1 = (mmc_cmd1 & 0x03) | ((data << 2) & 0x0c);
+		state->mmc_cmd1 = (state->mmc_cmd1 & 0x03) | ((data << 2) & 0x0c);
 		break;
 	}
 }
@@ -7745,6 +7853,7 @@ static WRITE8_HANDLER( mapper180_w )
 
 static WRITE8_HANDLER( mapper182_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper182_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7003)
@@ -7753,10 +7862,10 @@ static WRITE8_HANDLER( mapper182_w )
 		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x2000:
-		mmc_cmd1 = data;
+		state->mmc_cmd1 = data;
 		break;
 	case 0x4000:
-		switch (mmc_cmd1)
+		switch (state->mmc_cmd1)
 		{
 		case 0:
 			chr2_0(space->machine, data >> 1, CHRROM);
@@ -7787,11 +7896,11 @@ static WRITE8_HANDLER( mapper182_w )
 	case 0x6003:
 		if (data)
 		{
-			IRQ_count = data;
-			IRQ_enable = 1;
+			state->IRQ_count = data;
+			state->IRQ_enable = 1;
 		}
 		else
-			IRQ_enable = 0;
+			state->IRQ_enable = 0;
 		break;
 	}
 }
@@ -7876,38 +7985,41 @@ static WRITE8_HANDLER( mapper185_w )
 
 static void mapper187_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
-	UINT8 prg_flip = (mmc_cmd1 & 0x40) ? 2 : 0;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
 
 	if (!(mapper187_reg[0] & 0x80))
 	{
-		prg8_89(machine, prg_base | (prg_bank[0 ^ prg_flip] & prg_mask));
-		prg8_ab(machine, prg_base | (prg_bank[1] & prg_mask));
-		prg8_cd(machine, prg_base | (prg_bank[2 ^ prg_flip] & prg_mask));
-		prg8_ef(machine, prg_base | (prg_bank[3] & prg_mask));
+		prg8_89(machine, prg_base | (state->prg_bank[0 ^ prg_flip] & prg_mask));
+		prg8_ab(machine, prg_base | (state->prg_bank[1] & prg_mask));
+		prg8_cd(machine, prg_base | (state->prg_bank[2 ^ prg_flip] & prg_mask));
+		prg8_ef(machine, prg_base | (state->prg_bank[3] & prg_mask));
 	}
 }
 
 static void mapper187_set_chr( running_machine *machine, UINT8 chr, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 new_base[8];
 	int i;
 
 	for (i = 0; i < 8; i++)
 		new_base[i] = ((i & 0x04) == chr_page)? (chr_base | 0x100) : chr_base;
 
-	chr1_x(machine, chr_page ^ 0, new_base[0] | ((vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, new_base[1] | ((vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, new_base[2] | ((vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, new_base[3] | ((vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, new_base[4] | (vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, new_base[5] | (vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, new_base[6] | (vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, new_base[7] | (vrom_bank[5] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 0, new_base[0] | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, new_base[1] | ((state->vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, new_base[2] | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, new_base[3] | ((state->vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, new_base[4] | (state->vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, new_base[5] | (state->vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, new_base[6] | (state->vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, new_base[7] | (state->vrom_bank[5] & chr_mask), chr);
 }
 
 static WRITE8_HANDLER( mapper187_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 new_bank;
 	LOG_MMC(("mapper187_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -7946,7 +8058,7 @@ static WRITE8_HANDLER( mapper187_l_w )
 			}
 		}
 		else
-			mapper187_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper187_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 	}
 }
 
@@ -7963,6 +8075,7 @@ static READ8_HANDLER( mapper187_l_r )
 
 static WRITE8_HANDLER( mapper187_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper187_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -7970,33 +8083,33 @@ static WRITE8_HANDLER( mapper187_w )
 	{
 	case 0x0000:
 		mapper187_reg[2] = 1;
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper187_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper187_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper187_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			mapper187_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
 		if (mapper187_reg[2])
 		{
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
 			case 0: case 1:
 			case 2: case 3: case 4: case 5:
-				vrom_bank[cmd] = data;
-				mapper187_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+				state->vrom_bank[cmd] = data;
+				mapper187_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 				break;
 			case 6:
 			case 7:
-				prg_bank[cmd - 6] = data;
-				mapper187_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				state->prg_bank[cmd - 6] = data;
+				mapper187_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 				break;
 			}
 		}
@@ -8068,28 +8181,29 @@ static WRITE8_HANDLER( mapper189_m_w )
 /* This is like mapper4 but with no PRG bankswitch (beacuse it is handled by low writes) */
 static WRITE8_HANDLER( mapper189_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper189_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x07;
+		cmd = state->mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
 		case 0: case 1:
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
-			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd] = data;
+			mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		}
 		break;
@@ -8128,56 +8242,58 @@ static WRITE8_HANDLER( mapper189_w )
 
 static void mapper191_set_chr( running_machine *machine, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
 
 	for (i = 0; i < 6; i++)
-		chr_src[i] = (vrom_bank[i] & 0x80) ? CHRRAM : CHRROM;
+		chr_src[i] = (state->vrom_bank[i] & 0x80) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper191_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper191_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper191_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			mapper191_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x07;
+		cmd = state->mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
-			mapper191_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd] = data;
+			mapper191_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			prg_bank[cmd - 6] = data;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
 		break;
@@ -8205,56 +8321,58 @@ static WRITE8_HANDLER( mapper191_w )
 
 static void mapper192_set_chr( running_machine *machine, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
 
 	for (i = 0; i < 6; i++)
-		chr_src[i] = ((vrom_bank[i] == 0x08) || (vrom_bank[i] == 0x09) || (vrom_bank[i] == 0x0a) || (vrom_bank[i] == 0x0b)) ? CHRRAM : CHRROM;
+		chr_src[i] = ((state->vrom_bank[i] == 0x08) || (state->vrom_bank[i] == 0x09) || (state->vrom_bank[i] == 0x0a) || (state->vrom_bank[i] == 0x0b)) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper192_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper192_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper192_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			mapper192_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x07;
+		cmd = state->mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
-			mapper192_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd] = data;
+			mapper192_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			prg_bank[cmd - 6] = data;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
 		break;
@@ -8317,56 +8435,58 @@ static WRITE8_HANDLER( mapper193_m_w )
 
 static void mapper194_set_chr( running_machine *machine, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
 
 	for (i = 0; i < 6; i++)
-		chr_src[i] = (vrom_bank[i] < 0x02) ? CHRRAM : CHRROM;
+		chr_src[i] = (state->vrom_bank[i] < 0x02) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper194_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper194_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper194_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			mapper194_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x07;
+		cmd = state->mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
-			mapper194_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd] = data;
+			mapper194_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			prg_bank[cmd - 6] = data;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
 		break;
@@ -8395,56 +8515,58 @@ static WRITE8_HANDLER( mapper194_w )
 
 static void mapper195_set_chr( running_machine *machine, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
 
 	for (i = 0; i < 6; i++)
-		chr_src[i] = (vrom_bank[i] < 0x04) ? CHRRAM : CHRROM;
+		chr_src[i] = (state->vrom_bank[i] < 0x04) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper195_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper195_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper195_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			mapper195_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x07;
+		cmd = state->mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
-			mapper195_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd] = data;
+			mapper195_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			prg_bank[cmd - 6] = data;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
 		break;
@@ -8491,43 +8613,45 @@ static WRITE8_HANDLER( mapper196_w )
 
 static void mapper197_set_chr( running_machine *machine, UINT8 chr_source, int chr_base, int chr_mask )
 {
-	chr4_0(machine, chr_base | ((vrom_bank[0] >> 1) & chr_mask), chr_source);
-	chr2_4(machine, chr_base | (vrom_bank[1] & chr_mask), chr_source);
-	chr2_6(machine, chr_base | (vrom_bank[2] & chr_mask), chr_source);
+	nes_state *state = (nes_state *)machine->driver_data;
+	chr4_0(machine, chr_base | ((state->vrom_bank[0] >> 1) & chr_mask), chr_source);
+	chr2_4(machine, chr_base | (state->vrom_bank[1] & chr_mask), chr_source);
+	chr2_6(machine, chr_base | (state->vrom_bank[2] & chr_mask), chr_source);
 }
 
 static WRITE8_HANDLER( mapper197_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper197_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper197_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			mapper197_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x0f;
+		cmd = state->mmc_cmd1 & 0x0f;
 		switch (cmd)
 		{
 		case 0: case 2: case 4:
-			vrom_bank[cmd >> 1] = data;
-			mapper197_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd >> 1] = data;
+			mapper197_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			prg_bank[cmd - 6] = data;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
 		break;
@@ -8553,47 +8677,49 @@ static WRITE8_HANDLER( mapper197_w )
 
 static void mapper198_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
-	UINT8 prg_flip = (mmc_cmd1 & 0x40) ? 2 : 0;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
 
-	prg8_89(machine, prg_base | (prg_bank[0 ^ prg_flip] & prg_mask));
-	prg8_ab(machine, prg_base | (prg_bank[1] & prg_mask));
-	prg8_cd(machine, prg_base | (prg_bank[2 ^ prg_flip] & prg_mask));
-	prg8_ef(machine, prg_base | (prg_bank[3] & prg_mask));
+	prg8_89(machine, prg_base | (state->prg_bank[0 ^ prg_flip] & prg_mask));
+	prg8_ab(machine, prg_base | (state->prg_bank[1] & prg_mask));
+	prg8_cd(machine, prg_base | (state->prg_bank[2 ^ prg_flip] & prg_mask));
+	prg8_ef(machine, prg_base | (state->prg_bank[3] & prg_mask));
 }
 
 static WRITE8_HANDLER( mapper198_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper198_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper198_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper198_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x07;
+		cmd = state->mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
-			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd] = data;
+			mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			prg_bank[cmd - 6] = data & ((data > 0x3f) ? 0x4f : 0x3f);
-			mapper198_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data & ((data > 0x3f) ? 0x4f : 0x3f);
+			mapper198_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
 		break;
@@ -8620,62 +8746,64 @@ static WRITE8_HANDLER( mapper198_w )
 
 static void mapper199_set_chr( running_machine *machine, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 chr_src[8];
 	int i;
 
 	for (i = 0; i < 8; i++)
-		chr_src[i] = (vrom_bank[i] < 0x08) ? CHRRAM : CHRROM;
+		chr_src[i] = (state->vrom_bank[i] < 0x08) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | (vrom_bank[0] & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | (vrom_bank[6] & chr_mask), chr_src[6]);
-	chr1_x(machine, chr_page ^ 2, chr_base | (vrom_bank[1] & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | (vrom_bank[7] & chr_mask), chr_src[7]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | (state->vrom_bank[0] & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | (state->vrom_bank[6] & chr_mask), chr_src[6]);
+	chr1_x(machine, chr_page ^ 2, chr_base | (state->vrom_bank[1] & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | (state->vrom_bank[7] & chr_mask), chr_src[7]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper199_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper199_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper199_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			mapper199_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x0f;
+		cmd = state->mmc_cmd1 & 0x0f;
 		switch (cmd)
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
-			mapper199_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd] = data;
+			mapper199_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
 		case 8:
 		case 9:
-			prg_bank[cmd - 6] = data;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		case 0x0a: case 0x0b:
-			vrom_bank[cmd - 4] = data;
-			mapper199_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd - 4] = data;
+			mapper199_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		}
 		break;
@@ -8810,16 +8938,17 @@ static WRITE8_HANDLER( mapper204_w )
 
 static WRITE8_HANDLER( mapper205_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper205_m_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset & 0x0800)
 	{
-		mmc_prg_base = (data & 0x03) << 4;
-		mmc_prg_mask = (data & 0x02) ? 0x0f : 0x1f;
-		mmc_chr_base = (data & 0x03) << 7;
-		mmc_chr_mask = (data & 0x02) ? 0x7f : 0xff;
-		mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-		mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+		state->mmc_prg_base = (data & 0x03) << 4;
+		state->mmc_prg_mask = (data & 0x02) ? 0x0f : 0x1f;
+		state->mmc_chr_base = (data & 0x03) << 7;
+		state->mmc_chr_mask = (data & 0x02) ? 0x7f : 0xff;
+		mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+		mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 	}
 }
 
@@ -8973,28 +9102,29 @@ static READ8_HANDLER( mapper208_l_r )
 // replace with map189_w... they are the same!!
 static WRITE8_HANDLER( mapper208_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper208_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x07;
+		cmd = state->mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
 		case 0: case 1:
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
-			mapper4_set_chr(space->machine, mmc_chr_source, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd] = data;
+			mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		}
 		break;
@@ -9131,6 +9261,7 @@ static WRITE8_HANDLER( mapper214_w )
 // remove mask & base parameters!
 static void mapper215_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	if (map215_reg[0] & 0x80)
 	{
 		prg16_89ab(machine, (map215_reg[0] & 0xf0) | (map215_reg[1] & 0x10));
@@ -9138,55 +9269,58 @@ static void mapper215_set_prg( running_machine *machine, int prg_base, int prg_m
 	}
 	else
 	{
-		mmc_prg_base = (map215_reg[1] & 0x08) ? 0x20 : (map215_reg[1] & 0x10);
-		mmc_prg_mask = (map215_reg[1] & 0x08) ? 0x1f : 0x0f;
+		state->mmc_prg_base = (map215_reg[1] & 0x08) ? 0x20 : (map215_reg[1] & 0x10);
+		state->mmc_prg_mask = (map215_reg[1] & 0x08) ? 0x1f : 0x0f;
 
-		mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
+		mapper4_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 	}
 }
 
 static void mapper215_set_chr( running_machine *machine, UINT8 chr )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	int chr_base = (map215_reg[1] & 0x04) ? 0x100 : ((map215_reg[1] & 0x10) << 3);
 	int chr_mask = (map215_reg[1] & 0x04) ? 0xff : 0x7f;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr);
 }
 
 static WRITE8_HANDLER( mapper215_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper215_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 
 	if (offset == 0x1000)
 	{
 		map215_reg[0] = data;
-		mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		mapper215_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 	}
 	else if (offset == 0x1001)
 	{
 		map215_reg[1] = data;
-		mapper215_set_chr(space->machine, mmc_chr_source);
+		mapper215_set_chr(space->machine, state->mmc_chr_source);
 	}
 	else if (offset == 0x1007)
 	{
-		mmc_cmd1 = 0;
+		state->mmc_cmd1 = 0;
 		map215_reg[2] = data;
-		mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-		mapper215_set_chr(space->machine, mmc_chr_source);
+		mapper215_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+		mapper215_set_chr(space->machine, state->mmc_chr_source);
 	}
 }
 
 static WRITE8_HANDLER( mapper215_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	static const UINT8 conv_table[8] = {0,2,5,3,6,1,7,4};
 	LOG_MMC(("mapper215_w, offset: %04x, data: %02x\n", offset, data));
@@ -9196,31 +9330,31 @@ static WRITE8_HANDLER( mapper215_w )
 		switch (offset & 0x6001)
 		{
 		case 0x0000:
-			MMC3_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			MMC3_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
-				mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				mapper215_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
-				mapper215_set_chr(space->machine, mmc_chr_source);
+				mapper215_set_chr(space->machine, state->mmc_chr_source);
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
 			case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 			case 2: case 3: case 4: case 5:
-				vrom_bank[cmd] = data;
-				mapper215_set_chr(space->machine, mmc_chr_source);
+				state->vrom_bank[cmd] = data;
+				mapper215_set_chr(space->machine, state->mmc_chr_source);
 				break;
 			case 6:
 			case 7:
-				prg_bank[cmd - 6] = data;
-				mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				state->prg_bank[cmd - 6] = data;
+				mapper215_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 				break;
 			}
 			break;
@@ -9238,7 +9372,7 @@ static WRITE8_HANDLER( mapper215_w )
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			if (map215_reg[3] && ((map215_reg[0] & 0x80) == 0 || cmd < 6))	// if we use the prg16 banks and cmd=6,7 DON'T enter!
 			{
 				map215_reg[3] = 0;
@@ -9246,13 +9380,13 @@ static WRITE8_HANDLER( mapper215_w )
 				{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					vrom_bank[cmd] = data;
-					mapper215_set_chr(space->machine, mmc_chr_source);
+					state->vrom_bank[cmd] = data;
+					mapper215_set_chr(space->machine, state->mmc_chr_source);
 					break;
 				case 6:
 				case 7:
-					prg_bank[cmd - 6] = data;
-					mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					state->prg_bank[cmd - 6] = data;
+					mapper215_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 				}
 			}
@@ -9260,16 +9394,16 @@ static WRITE8_HANDLER( mapper215_w )
 
 		case 0x2000:
 			data = (data & 0xc0) | conv_table[data & 0x07];
-			MMC3_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			MMC3_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
-				mapper215_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				mapper215_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
-				mapper215_set_chr(space->machine, mmc_chr_source);
+				mapper215_set_chr(space->machine, state->mmc_chr_source);
 
 			map215_reg[3] = 1;
 			break;
@@ -9318,10 +9452,11 @@ static WRITE8_HANDLER( mapper215_w )
 
 static WRITE8_HANDLER( mapper216_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper216_w, offset: %04x, data: %02x\n", offset, data));
 
 	prg32(space->machine, offset);
-	chr8(space->machine, offset >> 1, mmc_chr_source);
+	chr8(space->machine, offset >> 1, state->mmc_chr_source);
 }
 
 /*************************************************************
@@ -9340,34 +9475,37 @@ static WRITE8_HANDLER( mapper216_w )
 // remove mask & base parameters!
 static void mapper217_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
-	mmc_prg_base = (map217_reg[1] & 0x08) ? 0 : (map217_reg[1] & 0x10);
-	mmc_prg_mask = (map217_reg[1] & 0x08) ? 0x1f : 0x0f;
+	nes_state *state = (nes_state *)machine->driver_data;
+	state->mmc_prg_base = (map217_reg[1] & 0x08) ? 0 : (map217_reg[1] & 0x10);
+	state->mmc_prg_mask = (map217_reg[1] & 0x08) ? 0x1f : 0x0f;
 
-	mmc_prg_base |= ((map217_reg[1] & 0x03) << 5);
+	state->mmc_prg_base |= ((map217_reg[1] & 0x03) << 5);
 
-	mapper4_set_prg(machine, mmc_prg_base, mmc_prg_mask);
+	mapper4_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 }
 
 static void mapper217_set_chr( running_machine *machine, UINT8 chr )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	int chr_base = (map217_reg[1] & 0x08) ? 0x00 : ((map217_reg[1] & 0x10) << 3);
 	int chr_mask = (map217_reg[1] & 0x08) ? 0xff : 0x7f;
 
 	chr_base |= ((map217_reg[1] & 0x03) << 8);
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr);
 }
 
 static WRITE8_HANDLER( mapper217_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("mapper217_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
@@ -9382,12 +9520,12 @@ static WRITE8_HANDLER( mapper217_l_w )
 			prg16_cdef(space->machine, bank);
 		}
 		else
-			mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper217_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 	}
 	else if (offset == 0x1001)
 	{
 		map217_reg[1] = data;
-		mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		mapper217_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 	}
 	else if (offset == 0x1007)
 	{
@@ -9397,6 +9535,7 @@ static WRITE8_HANDLER( mapper217_l_w )
 
 static WRITE8_HANDLER( mapper217_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	static const UINT8 conv_table[8] = {0, 6, 3, 7, 5, 2, 4, 1};
 	LOG_MMC(("mapper217_w, offset: %04x, data: %02x\n", offset, data));
@@ -9406,31 +9545,31 @@ static WRITE8_HANDLER( mapper217_w )
 		switch (offset & 0x6001)
 		{
 		case 0x0000:
-			MMC3_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			MMC3_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
-				mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				mapper217_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
-				mapper217_set_chr(space->machine, mmc_chr_source);
+				mapper217_set_chr(space->machine, state->mmc_chr_source);
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
 			case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 			case 2: case 3: case 4: case 5:
-				vrom_bank[cmd] = data;
-				mapper217_set_chr(space->machine, mmc_chr_source);
+				state->vrom_bank[cmd] = data;
+				mapper217_set_chr(space->machine, state->mmc_chr_source);
 				break;
 			case 6:
 			case 7:
-				prg_bank[cmd - 6] = data;
-				mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				state->prg_bank[cmd - 6] = data;
+				mapper217_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 				break;
 			}
 			break;
@@ -9450,22 +9589,22 @@ static WRITE8_HANDLER( mapper217_w )
 
 		case 0x0001:
 			data = (data & 0xc0) | conv_table[data & 0x07];
-			MMC3_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			MMC3_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
-				mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+				mapper217_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
-				mapper217_set_chr(space->machine, mmc_chr_source);
+				mapper217_set_chr(space->machine, state->mmc_chr_source);
 
 			map217_reg[3] = 1;
 			break;
 
 		case 0x2000:
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			if (map217_reg[3])
 			{
 				map217_reg[3] = 0;
@@ -9473,13 +9612,13 @@ static WRITE8_HANDLER( mapper217_w )
 				{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					vrom_bank[cmd] = data;
-					mapper217_set_chr(space->machine, mmc_chr_source);
+					state->vrom_bank[cmd] = data;
+					mapper217_set_chr(space->machine, state->mmc_chr_source);
 					break;
 				case 6:
 				case 7:
-					prg_bank[cmd - 6] = data;
-					mapper217_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+					state->prg_bank[cmd - 6] = data;
+					mapper217_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 				}
 			}
@@ -9558,6 +9697,7 @@ static void mapper221_set_prg( running_machine *machine, UINT8 reg1, UINT8 reg2 
 
 static WRITE8_HANDLER( mapper221_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper221_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset < 0x4000)
@@ -9565,20 +9705,20 @@ static WRITE8_HANDLER( mapper221_w )
 		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		offset = (offset >> 1) & 0xff;
 
-		if (mmc_cmd1 != offset)
+		if (state->mmc_cmd1 != offset)
 		{
-			mmc_cmd1 = offset;
-			mapper221_set_prg(space->machine, mmc_cmd1, mmc_cmd2);
+			state->mmc_cmd1 = offset;
+			mapper221_set_prg(space->machine, state->mmc_cmd1, state->mmc_cmd2);
 		}
 	}
 	else
 	{
 		offset &= 0x07;
 
-		if (mmc_cmd2 != offset)
+		if (state->mmc_cmd2 != offset)
 		{
-			mmc_cmd2 = offset;
-			mapper221_set_prg(space->machine, mmc_cmd1, mmc_cmd2);
+			state->mmc_cmd2 = offset;
+			mapper221_set_prg(space->machine, state->mmc_cmd1, state->mmc_cmd2);
 		}
 	}
 }
@@ -9597,12 +9737,13 @@ static WRITE8_HANDLER( mapper221_w )
 /* Scanline based IRQ ? */
 static void mapper222_irq( running_device *device, int scanline, int vblank, int blanked )
 {
+	nes_state *state = (nes_state *)device->machine->driver_data;
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
-		if (!IRQ_count || ++IRQ_count < 240)
+		if (!state->IRQ_count || ++state->IRQ_count < 240)
 			return;
 
-		IRQ_count = 0;
+		state->IRQ_count = 0;
 		LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 				video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
 		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
@@ -9611,6 +9752,7 @@ static void mapper222_irq( running_device *device, int scanline, int vblank, int
 
 static WRITE8_HANDLER( mapper222_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("mapper222_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -9637,7 +9779,7 @@ static WRITE8_HANDLER( mapper222_w )
 		chr1_x(space->machine, bank, data, CHRROM);
 		break;
 	case 0x7000:
-		IRQ_count = data;
+		state->IRQ_count = data;
 		break;
 	}
 }
@@ -9719,6 +9861,7 @@ static WRITE8_HANDLER( mapper225_w )
 
 static WRITE8_HANDLER( mapper226_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	int hi_bank;
 	int size_16;
 	int bank;
@@ -9726,19 +9869,15 @@ static WRITE8_HANDLER( mapper226_w )
 	LOG_MMC(("mapper226_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset & 0x01)
-	{
-		mmc_cmd2 = data;
-	}
+		state->mmc_cmd2 = data;
 	else
-	{
-		mmc_cmd1 = data;
-	}
+		state->mmc_cmd1 = data;
 
-	set_nt_mirroring(space->machine, BIT(mmc_cmd1, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	set_nt_mirroring(space->machine, BIT(state->mmc_cmd1, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
-	hi_bank = mmc_cmd1 & 0x01;
-	size_16 = mmc_cmd1 & 0x20;
-	bank = ((mmc_cmd1 & 0x1e) >> 1) | ((mmc_cmd1 & 0x80) >> 3) | ((mmc_cmd2 & 0x01) << 5);
+	hi_bank = state->mmc_cmd1 & 0x01;
+	size_16 = state->mmc_cmd1 & 0x20;
+	bank = ((state->mmc_cmd1 & 0x1e) >> 1) | ((state->mmc_cmd1 & 0x80) >> 3) | ((state->mmc_cmd2 & 0x01) << 5);
 
 	if (size_16)
 	{
@@ -9947,18 +10086,20 @@ static WRITE8_HANDLER( mapper231_w )
 
 static void mapper232_set_prg( running_machine *machine )
 {
-	prg16_89ab(machine, (mmc_cmd2 & 0x03) | ((mmc_cmd1 & 0x18) >> 1));
-	prg16_cdef(machine, 0x03 | ((mmc_cmd1 & 0x18) >> 1));
+	nes_state *state = (nes_state *)machine->driver_data;
+	prg16_89ab(machine, (state->mmc_cmd2 & 0x03) | ((state->mmc_cmd1 & 0x18) >> 1));
+	prg16_cdef(machine, 0x03 | ((state->mmc_cmd1 & 0x18) >> 1));
 }
 
 static WRITE8_HANDLER( mapper232_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper232_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset < 0x2000)
-		mmc_cmd1 = data;
+		state->mmc_cmd1 = data;
 	else
-		mmc_cmd2 = data;
+		state->mmc_cmd2 = data;
 
 	mapper232_set_prg(space->machine);
 }
@@ -10150,35 +10291,36 @@ static WRITE8_HANDLER( mapper242_w )
 
 static WRITE8_HANDLER( mapper243_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper243_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
 		if (!(offset & 0x01))
-			mmc_cmd1 = data;
+			state->mmc_cmd1 = data;
 		else
 		{
-			switch (mmc_cmd1 & 0x07)
+			switch (state->mmc_cmd1 & 0x07)
 			{
 			case 0x00:
 				prg32(space->machine, 0);
 				chr8(space->machine, 3, CHRROM);
 				break;
 			case 0x02:
-				vrom_bank[0] = (vrom_bank[0] & ~0x08) | (data << 3 & 0x08);
-				chr8(space->machine, vrom_bank[0], CHRROM);
+				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x08) | (data << 3 & 0x08);
+				chr8(space->machine, state->vrom_bank[0], CHRROM);
 				break;
 			case 0x04:
-				vrom_bank[0] = (vrom_bank[0] & ~0x01) | (data << 0 & 0x01);
-				chr8(space->machine, vrom_bank[0], CHRROM);
+				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x01) | (data << 0 & 0x01);
+				chr8(space->machine, state->vrom_bank[0], CHRROM);
 				break;
 			case 0x05:
 				prg32(space->machine, data & 0x01);
 				break;
 			case 0x06:
-				vrom_bank[0] = (vrom_bank[0] & ~0x06) | (data << 1 & 0x06);
-				chr8(space->machine, vrom_bank[0], CHRROM);
+				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x06) | (data << 1 & 0x06);
+				chr8(space->machine, state->vrom_bank[0], CHRROM);
 				break;
 			case 0x07:
 				set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -10244,28 +10386,28 @@ static WRITE8_HANDLER( mapper245_w )
 	switch (offset & 0x6001)
 	{
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x0f;
+		cmd = state->mmc_cmd1 & 0x0f;
 		switch (cmd)
 		{
-		case 0: 	// in this case we set prg_base in addition to vrom_bank!
-			mmc_prg_base = (data << 5) & 0x40;
-			mmc_prg_mask = 0x3f;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+		case 0: 	// in this case we set prg_base in addition to state->vrom_bank!
+			state->mmc_prg_base = (data << 5) & 0x40;
+			state->mmc_prg_mask = 0x3f;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 		case 1: case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
+			state->vrom_bank[cmd] = data;
 			if (state->chr_chunks > 0)
-				mapper4_set_chr(space->machine, CHRROM, mmc_chr_base, mmc_chr_mask);
-			else	// according to Disch's docs, mmc_cmd1&0x80 swaps 4k CHRRAM banks
+				mapper4_set_chr(space->machine, CHRROM, state->mmc_chr_base, state->mmc_chr_mask);
+			else	// according to Disch's docs, state->mmc_cmd1&0x80 swaps 4k CHRRAM banks
 			{
-				map245_helper = /*(mmc_cmd1 & 0x80) ? 1 : */0;
+				map245_helper = /*(state->mmc_cmd1 & 0x80) ? 1 : */0;
 				chr4_0(space->machine, 0 ^ map245_helper, CHRRAM);
 				chr4_4(space->machine, 1 ^ map245_helper, CHRRAM);
 			}
 			break;
 		case 6:
 		case 7:
-			prg_bank[cmd - 6] = data;
-			mapper4_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data;
+			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
 		break;
@@ -10372,14 +10514,15 @@ static WRITE8_HANDLER( mapper246_m_w )
 
 static void mapper249_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	int i;
 
 	if (map249_reg)
 	{
 		for (i = 0; i < 4; i ++)	// should this apply only to bank[0],bank[1]?
 		{
-			prg_bank[i] = ((prg_bank[i] & 0x01)) | ((prg_bank[i] >> 3) & 0x02) |
-					((prg_bank[i] >> 1) & 0x04) | ((prg_bank[i] << 2) & 0x18);
+			state->prg_bank[i] = ((state->prg_bank[i] & 0x01)) | ((state->prg_bank[i] >> 3) & 0x02) |
+					((state->prg_bank[i] >> 1) & 0x04) | ((state->prg_bank[i] << 2) & 0x18);
 		}
 	}
 
@@ -10388,31 +10531,33 @@ static void mapper249_set_prg( running_machine *machine, int prg_base, int prg_m
 
 static void mapper249_set_chr( running_machine *machine, int chr_base, int chr_mask )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	int i;
 
 	if (map249_reg)
 	{
 		for (i = 0; i < 6; i ++)
 		{
-			vrom_bank[i] = ((vrom_bank[i] & 0x03)) | ((vrom_bank[i] >> 1) & 0x04) |
-						((vrom_bank[i] >> 4) & 0x08) | ((vrom_bank[i] >> 2) & 0x10) |
-						((vrom_bank[i] << 3) & 0x20) | ((vrom_bank[i] << 2) & 0xc0);
+			state->vrom_bank[i] = ((state->vrom_bank[i] & 0x03)) | ((state->vrom_bank[i] >> 1) & 0x04) |
+						((state->vrom_bank[i] >> 4) & 0x08) | ((state->vrom_bank[i] >> 2) & 0x10) |
+						((state->vrom_bank[i] << 3) & 0x20) | ((state->vrom_bank[i] << 2) & 0xc0);
 		}
 	}
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((vrom_bank[0] & ~0x01) & chr_mask), mmc_chr_source);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((vrom_bank[0] |  0x01) & chr_mask), mmc_chr_source);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((vrom_bank[1] & ~0x01) & chr_mask), mmc_chr_source);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((vrom_bank[1] |  0x01) & chr_mask), mmc_chr_source);
-	chr1_x(machine, chr_page ^ 4, chr_base | (vrom_bank[2] & chr_mask), mmc_chr_source);
-	chr1_x(machine, chr_page ^ 5, chr_base | (vrom_bank[3] & chr_mask), mmc_chr_source);
-	chr1_x(machine, chr_page ^ 6, chr_base | (vrom_bank[4] & chr_mask), mmc_chr_source);
-	chr1_x(machine, chr_page ^ 7, chr_base | (vrom_bank[5] & chr_mask), mmc_chr_source);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), state->mmc_chr_source);
 }
 
 static WRITE8_HANDLER( mapper249_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper249_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	offset += 0x100;
@@ -10420,44 +10565,45 @@ static WRITE8_HANDLER( mapper249_l_w )
 	if (offset == 0x1000)
 	{
 		map249_reg = data & 0x02;
-		mapper249_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
-		mapper249_set_chr(space->machine, mmc_prg_base, mmc_prg_mask);
+		mapper249_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+		mapper249_set_chr(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 	}
 }
 
 static WRITE8_HANDLER( mapper249_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper249_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 	case 0x0000:
-		MMC3_helper = mmc_cmd1 ^ data;
-		mmc_cmd1 = data;
+		MMC3_helper = state->mmc_cmd1 ^ data;
+		state->mmc_cmd1 = data;
 
 		/* Has PRG Mode changed? */
 		if (MMC3_helper & 0x40)
-			mapper249_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			mapper249_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 
 		/* Has CHR Mode changed? */
 		if (MMC3_helper & 0x80)
-			mapper249_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			mapper249_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 		break;
 
 	case 0x0001:
-		cmd = mmc_cmd1 & 0x07;
+		cmd = state->mmc_cmd1 & 0x07;
 		switch (cmd)
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			vrom_bank[cmd] = data;
-			mapper249_set_chr(space->machine, mmc_chr_base, mmc_chr_mask);
+			state->vrom_bank[cmd] = data;
+			mapper249_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			prg_bank[cmd - 6] = data;
-			mapper249_set_prg(space->machine, mmc_prg_base, mmc_prg_mask);
+			state->prg_bank[cmd - 6] = data;
+			mapper249_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
 		break;
@@ -10515,6 +10661,7 @@ static WRITE8_HANDLER( mapper250_w )
 
 static WRITE8_HANDLER( mapper252_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 mmc_helper, bank;
 	LOG_MMC(("mapper252_w, offset: %04x, data: %02x\n", offset, data));
 
@@ -10533,28 +10680,28 @@ static WRITE8_HANDLER( mapper252_w )
 		bank = ((offset & 0x7000) - 0x3000) / 0x0800 + ((offset & 0x0008) >> 3);
 		mmc_helper = offset & 0x04;
 		if (mmc_helper)
-			vrom_bank[bank] = (vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
+			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
 		else
-			vrom_bank[bank] = (vrom_bank[bank] & 0xf0) | (data & 0x0f);
-		chr1_x(space->machine, bank, vrom_bank[bank], CHRROM);
+			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0xf0) | (data & 0x0f);
+		chr1_x(space->machine, bank, state->vrom_bank[bank], CHRROM);
 		break;
 	case 0x7000:
 		switch (offset & 0x0c)
 		{
 		case 0x00:
-			IRQ_count_latch = (IRQ_count_latch & 0xf0) | (data & 0x0f);
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0xf0) | (data & 0x0f);
 			break;
 		case 0x04:
-			IRQ_count_latch = (IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4);
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4);
 			break;
 		case 0x08:
-			IRQ_enable = data & 0x02;
-			IRQ_enable_latch = data & 0x01;
+			state->IRQ_enable = data & 0x02;
+			state->IRQ_enable_latch = data & 0x01;
 			if (data & 0x02)
-				IRQ_count = IRQ_count_latch;
+				state->IRQ_count = state->IRQ_count_latch;
 			break;
 		case 0x0c:
-			IRQ_enable = IRQ_enable_latch;
+			state->IRQ_enable = state->IRQ_enable_latch;
 			break;
 		}
 		break;

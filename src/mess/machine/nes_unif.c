@@ -168,31 +168,33 @@ static WRITE8_HANDLER( bmc_gs2013_w )
 
 static void bmc_s24in1sc03_set_prg( running_machine *machine )
 {
+	nes_state *state = (nes_state *)machine->driver_data;
 	static const UINT8 masks[8] = {0x3f, 0x1f, 0x0f, 0x01, 0x03, 0x00, 0x00, 0x00};
-	UINT8 prg_flip = (mmc_cmd1 & 0x40) ? 2 : 0;
+	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
 	int prg_base = bmc_s24in1sc03_reg[1] << 1;
 	int prg_mask = masks[bmc_s24in1sc03_reg[0] & 0x07];
 
-	prg8_89(machine, prg_base | (prg_bank[0 ^ prg_flip] & prg_mask));
-	prg8_ab(machine, prg_base | (prg_bank[1] & prg_mask));
-	prg8_cd(machine, prg_base | (prg_bank[2 ^ prg_flip] & prg_mask));
-	prg8_ef(machine, prg_base | (prg_bank[3] & prg_mask));
+	prg8_89(machine, prg_base | (state->prg_bank[0 ^ prg_flip] & prg_mask));
+	prg8_ab(machine, prg_base | (state->prg_bank[1] & prg_mask));
+	prg8_cd(machine, prg_base | (state->prg_bank[2 ^ prg_flip] & prg_mask));
+	prg8_ef(machine, prg_base | (state->prg_bank[3] & prg_mask));
 }
 
 static void bmc_s24in1sc03_set_chr( running_machine *machine )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 chr = (bmc_s24in1sc03_reg[0] & 0x20) ? CHRRAM : CHRROM;
 	int chr_base = (bmc_s24in1sc03_reg[2] << 3) & 0xf00;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | (vrom_bank[0] & ~0x01), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base | (vrom_bank[0] |  0x01), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base | (vrom_bank[1] & ~0x01), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base | (vrom_bank[1] |  0x01), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base | vrom_bank[2], chr);
-	chr1_x(machine, chr_page ^ 5, chr_base | vrom_bank[3], chr);
-	chr1_x(machine, chr_page ^ 6, chr_base | vrom_bank[4], chr);
-	chr1_x(machine, chr_page ^ 7, chr_base | vrom_bank[5], chr);
+	chr1_x(machine, chr_page ^ 0, chr_base | (state->vrom_bank[0] & ~0x01), chr);
+	chr1_x(machine, chr_page ^ 1, chr_base | (state->vrom_bank[0] |  0x01), chr);
+	chr1_x(machine, chr_page ^ 2, chr_base | (state->vrom_bank[1] & ~0x01), chr);
+	chr1_x(machine, chr_page ^ 3, chr_base | (state->vrom_bank[1] |  0x01), chr);
+	chr1_x(machine, chr_page ^ 4, chr_base | state->vrom_bank[2], chr);
+	chr1_x(machine, chr_page ^ 5, chr_base | state->vrom_bank[3], chr);
+	chr1_x(machine, chr_page ^ 6, chr_base | state->vrom_bank[4], chr);
+	chr1_x(machine, chr_page ^ 7, chr_base | state->vrom_bank[5], chr);
 }
 
 static WRITE8_HANDLER( bmc_s24in1sc03_l_w )
@@ -222,14 +224,15 @@ static WRITE8_HANDLER( bmc_s24in1sc03_l_w )
 
 static WRITE8_HANDLER( bmc_s24in1sc03_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 cmd, bmc_s24in1sc03_helper;
 	LOG_MMC(("bmc_s24in1sc03_w offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			bmc_s24in1sc03_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			bmc_s24in1sc03_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (bmc_s24in1sc03_helper & 0x40)
@@ -241,17 +244,17 @@ static WRITE8_HANDLER( bmc_s24in1sc03_w )
 			break;
 
 		case 0x0001:
-			cmd = mmc_cmd1 & 0x07;
+			cmd = state->mmc_cmd1 & 0x07;
 			switch (cmd)
 			{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					vrom_bank[cmd] = data;
+					state->vrom_bank[cmd] = data;
 					bmc_s24in1sc03_set_chr(space->machine);
 					break;
 				case 6:
 				case 7:
-					prg_bank[cmd - 6] = data;
+					state->prg_bank[cmd - 6] = data;
 					bmc_s24in1sc03_set_prg(space->machine);
 					break;
 			}
@@ -275,21 +278,22 @@ static WRITE8_HANDLER( bmc_s24in1sc03_w )
 
 static WRITE8_HANDLER( bmc_t262_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 mmc_helper;
 	LOG_MMC(("bmc_t262_w offset: %04x, data: %02x\n", offset, data));
 
-	if (mmc_cmd2 || offset == 0)
+	if (state->mmc_cmd2 || offset == 0)
 	{
-		mmc_cmd1 = (mmc_cmd1 & 0x38) | (data & 0x07);
-		prg16_89ab(space->machine, mmc_cmd1);
+		state->mmc_cmd1 = (state->mmc_cmd1 & 0x38) | (data & 0x07);
+		prg16_89ab(space->machine, state->mmc_cmd1);
 	}
 	else
 	{
-		mmc_cmd2 = 1;
+		state->mmc_cmd2 = 1;
 		set_nt_mirroring(space->machine, BIT(data, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		mmc_helper = ((offset >> 3) & 0x20) | ((offset >> 2) & 0x18);
-		mmc_cmd1 = mmc_helper | (mmc_cmd1 & 0x07);
-		prg16_89ab(space->machine, mmc_cmd1);
+		state->mmc_cmd1 = mmc_helper | (state->mmc_cmd1 & 0x07);
+		prg16_89ab(space->machine, state->mmc_cmd1);
 		prg16_cdef(space->machine, mmc_helper | 0x07);
 	}
 }
@@ -306,6 +310,7 @@ static WRITE8_HANDLER( bmc_t262_w )
 
 static WRITE8_HANDLER( bmc_ws_m_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 mmc_helper;
 	LOG_MMC(("bmc_ws_m_w offset: %04x, data: %02x\n", offset, data));
 
@@ -314,9 +319,9 @@ static WRITE8_HANDLER( bmc_ws_m_w )
 		switch (offset & 0x01)
 		{
 		case 0:
-			if (!mmc_cmd1)
+			if (!state->mmc_cmd1)
 			{
-				mmc_cmd1 = data & 0x20;
+				state->mmc_cmd1 = data & 0x20;
 				set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				mmc_helper = (~data & 0x08) >> 3;
 				prg16_89ab(space->machine, data & ~mmc_helper);
@@ -324,7 +329,7 @@ static WRITE8_HANDLER( bmc_ws_m_w )
 			}
 			break;
 		case 1:
-			if (!mmc_cmd1)
+			if (!state->mmc_cmd1)
 			{
 				chr8(space->machine, data, CHRROM);
 			}
@@ -366,25 +371,27 @@ static WRITE8_HANDLER( dreamtech_l_w )
 
 static void unl_8237_set_prg( running_machine *machine )
 {
-	UINT8 prg_flip = (mmc_cmd1 & 0x40) ? 2 : 0;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
 
 	if (!(unl_8237_reg[0] & 0x80))
 	{
-		prg8_89(machine, prg_bank[0 ^ prg_flip]);
-		prg8_ab(machine, prg_bank[1]);
-		prg8_cd(machine, prg_bank[2 ^ prg_flip]);
-		prg8_ef(machine, prg_bank[3]);
+		prg8_89(machine, state->prg_bank[0 ^ prg_flip]);
+		prg8_ab(machine, state->prg_bank[1]);
+		prg8_cd(machine, state->prg_bank[2 ^ prg_flip]);
+		prg8_ef(machine, state->prg_bank[3]);
 	}
 }
 
 static void unl_8237_set_chr( running_machine *machine )
 {
-	UINT8 chr_page = (mmc_cmd1 & 0x80) >> 5;
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 	UINT8 bank[8];
 	int i;
 
 	for(i = 0; i < 6; i++)
-		bank[i] = vrom_bank[i] | ((unl_8237_reg[1] << 6) & 0x100);
+		bank[i] = state->vrom_bank[i] | ((unl_8237_reg[1] << 6) & 0x100);
 
 	chr1_x(machine, chr_page ^ 0, (bank[0] & ~0x01), CHRROM);
 	chr1_x(machine, chr_page ^ 1, (bank[0] |  0x01), CHRROM);
@@ -427,6 +434,7 @@ static WRITE8_HANDLER( unl_8237_l_w )
 
 static WRITE8_HANDLER( unl_8237_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 unl_8237_helper, cmd;
 	static const UINT8 conv_table[8] = {0,2,6,1,7,3,4,5};
 	LOG_MMC(("unl_8237_w offset: %04x, data: %02x\n", offset, data));
@@ -437,8 +445,8 @@ static WRITE8_HANDLER( unl_8237_w )
 		case 0x3000:
 			unl_8237_reg[2] = 1;
 			data = (data & 0xc0) | conv_table[data & 0x07];
-			unl_8237_helper = mmc_cmd1 ^ data;
-			mmc_cmd1 = data;
+			unl_8237_helper = state->mmc_cmd1 ^ data;
+			state->mmc_cmd1 = data;
 
 			/* Has PRG Mode changed? */
 			if (unl_8237_helper & 0x40)
@@ -454,17 +462,17 @@ static WRITE8_HANDLER( unl_8237_w )
 			if (unl_8237_reg[2])
 			{
 				unl_8237_reg[2] = 0;
-				cmd = mmc_cmd1 & 0x07;
+				cmd = state->mmc_cmd1 & 0x07;
 				switch (cmd)
 				{
 					case 0: case 1:
 					case 2: case 3: case 4: case 5:
-						vrom_bank[cmd] = data;
+						state->vrom_bank[cmd] = data;
 						unl_8237_set_chr(space->machine);
 						break;
 					case 6:
 					case 7:
-						prg_bank[cmd - 6] = data;
+						state->prg_bank[cmd - 6] = data;
 						unl_8237_set_prg(space->machine);
 						break;
 				}
@@ -499,26 +507,28 @@ static WRITE8_HANDLER( unl_8237_w )
 
 static void unl_ax5705_set_prg( running_machine *machine )
 {
-	prg8_89(machine, prg_bank[0]);
-	prg8_ab(machine, prg_bank[1]);
+	nes_state *state = (nes_state *)machine->driver_data;
+	prg8_89(machine, state->prg_bank[0]);
+	prg8_ab(machine, state->prg_bank[1]);
 }
 
 static WRITE8_HANDLER( unl_ax5705_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("unl_ax5705_w offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x700f)
 	{
 	case 0x0000:
-		prg_bank[0] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
+		state->prg_bank[0] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
 		unl_ax5705_set_prg(space->machine);
 		break;
 	case 0x0008:
 		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		break;
 	case 0x2000:
-		prg_bank[1] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
+		state->prg_bank[1] = (data & 0x05) | ((data & 0x08) >> 2) | ((data & 0x02) << 2);
 		unl_ax5705_set_prg(space->machine);
 		break;
 	/* CHR banks 0, 1, 4, 5 */
@@ -527,16 +537,16 @@ static WRITE8_HANDLER( unl_ax5705_w )
 	case 0x4008:
 	case 0x400a:
 		bank = ((offset & 0x4000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-		vrom_bank[bank] = (vrom_bank[bank] & 0xf0) | (data & 0x0f);
-		chr1_x(space->machine, bank, vrom_bank[bank], CHRROM);
+		state->vrom_bank[bank] = (state->vrom_bank[bank] & 0xf0) | (data & 0x0f);
+		chr1_x(space->machine, bank, state->vrom_bank[bank], CHRROM);
 		break;
 	case 0x2009:
 	case 0x200b:
 	case 0x4009:
 	case 0x400b:
 		bank = ((offset & 0x4000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-		vrom_bank[bank] = (vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
-		chr1_x(space->machine, bank, vrom_bank[bank], CHRROM);
+		state->vrom_bank[bank] = (state->vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
+		chr1_x(space->machine, bank, state->vrom_bank[bank], CHRROM);
 		break;
 	/* CHR banks 2, 3, 6, 7 */
 	case 0x4000:
@@ -544,16 +554,16 @@ static WRITE8_HANDLER( unl_ax5705_w )
 	case 0x6000:
 	case 0x6002:
 		bank = 2 + ((offset & 0x2000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-		vrom_bank[bank] = (vrom_bank[bank] & 0xf0) | (data & 0x0f);
-		chr1_x(space->machine, bank, vrom_bank[bank], CHRROM);
+		state->vrom_bank[bank] = (state->vrom_bank[bank] & 0xf0) | (data & 0x0f);
+		chr1_x(space->machine, bank, state->vrom_bank[bank], CHRROM);
 		break;
 	case 0x4001:
 	case 0x4003:
 	case 0x6001:
 	case 0x6003:
 		bank = 2 + ((offset & 0x2000) ? 4 : 0) + ((offset & 0x0002) ? 1 : 0);
-		vrom_bank[bank] = (vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
-		chr1_x(space->machine, bank, vrom_bank[bank], CHRROM);
+		state->vrom_bank[bank] = (state->vrom_bank[bank] & 0x0f) | ((data & 0x04) << 3) | ((data & 0x02) << 5) | ((data & 0x09) << 4);
+		chr1_x(space->machine, bank, state->vrom_bank[bank], CHRROM);
 		break;
 	}
 }
