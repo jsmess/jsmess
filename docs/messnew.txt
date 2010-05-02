@@ -2,7 +2,7 @@
 
 New System Drivers Supported:
 -----------------------------
-(none)
+- Aamber Pegasus [thanks to Lord Philip][Robbbert]
 
 
 
@@ -30,7 +30,6 @@ Skeleton drivers:
 - Chaos 2
 - EC-1849 [thanks to Anasana]
 - Z80 development board (unknown)
-- Aamber Pegasus [thanks to Lord Philip][Robbbert]
 
 
 System Driver Changes:
@@ -48,6 +47,8 @@ System Driver Changes:
 - [MBEE] Fixed crash of mbeeic when displaying I/O in debugger. [Robbbert]
 
 - [MTX] Cleaned up driver and added cassette device. [Curt Coder]
+
+- [PEGASUS] Fixed natural keyboard mappings. [Justin Kerk]
 
 - [SX64] Added 1541 FLASH! BIOS. [Guru, Curt Coder]
 
