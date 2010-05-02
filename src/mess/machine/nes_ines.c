@@ -258,7 +258,7 @@ static void mapper4_irq( running_device *device, int scanline, int vblank, int b
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -360,7 +360,7 @@ static void mapper5_irq( running_device *device, int scanline, int vblank, int b
 	if (scanline == state->IRQ_count)
 	{
 		if (state->IRQ_enable)
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 
 		state->IRQ_status = 0xff;
 	}
@@ -932,7 +932,7 @@ static void ffe_irq( running_device *device, int scanline, int vblank, int blank
 	{
 		if ((0xffff - state->IRQ_count) < 114)
 		{
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_count = 0xffff;
 			state->IRQ_enable = 0;
 		}
@@ -1486,7 +1486,7 @@ static void bandai_irq( running_device *device, int scanline, int vblank, int bl
 	{
 		if (state->IRQ_count <= 114)
 		{
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_count = (0xffff - 114 + state->IRQ_count); 	// wrap around the 16 bits counter
 		}
 		state->IRQ_count -= 114;
@@ -1630,7 +1630,7 @@ static void jaleco_irq( running_device *device, int scanline, int vblank, int bl
 		{
 			if ((state->IRQ_count & 0x000f) < 114)	// always true, but we only update the IRQ once per scanlines so we cannot be more precise :(
 			{
-				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+				cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 				state->IRQ_count = (state->IRQ_count & ~0x000f) | (0x0f - (114 & 0x0f) + (state->IRQ_count & 0x000f)); // sort of wrap around the counter
 			}
 			// decrements should not affect upper bits, so we don't do anything here (114 > 0x0f)
@@ -1639,7 +1639,7 @@ static void jaleco_irq( running_device *device, int scanline, int vblank, int bl
 		{
 			if ((state->IRQ_count & 0x00ff) < 114)
 			{
-				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+				cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 				state->IRQ_count = (state->IRQ_count & ~0x00ff) | (0xff - 114 + (state->IRQ_count & 0x00ff));	// wrap around the 8 bits counter
 			}
 			else
@@ -1649,7 +1649,7 @@ static void jaleco_irq( running_device *device, int scanline, int vblank, int bl
 		{
 			if ((state->IRQ_count & 0x0fff)  < 114)
 			{
-				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+				cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 				state->IRQ_count = (state->IRQ_count & ~0x0fff) | (0xfff - 114 + (state->IRQ_count & 0x0fff));	// wrap around the 12 bits counter
 			}
 			else
@@ -1657,7 +1657,7 @@ static void jaleco_irq( running_device *device, int scanline, int vblank, int bl
 		}
 		else if (state->IRQ_count < 114)
 		{
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_count = (0xffff - 114 + state->IRQ_count); 	// wrap around the 16 bits counter
 		}
 		else
@@ -1774,7 +1774,7 @@ static void namcot_irq( running_device *device, int scanline, int vblank, int bl
 	{
 		if (state->IRQ_count >= (0x7fff - 114))
 		{
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_count = 0;
 		}
 		else
@@ -1884,13 +1884,13 @@ static void fds_irq( running_device *device, int scanline, int vblank, int blank
 	nes_state *state = (nes_state *)device->machine->driver_data;
 
 	if (state->IRQ_enable_latch)
-		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 
 	if (state->IRQ_enable)
 	{
 		if (state->IRQ_count <= 114)
 		{
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_enable = 0;
 			state->fds_status0 |= 0x01;
 		}
@@ -2031,7 +2031,7 @@ static void konami_irq( running_device *device, int scanline, int vblank, int bl
 	{
 		state->IRQ_count = state->IRQ_count_latch;
 		state->IRQ_enable = state->IRQ_enable_latch;
-		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -2850,7 +2850,7 @@ static void mapper35_irq( running_device *device, int scanline, int vblank, int 
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_enable = 0;
 		}
 	}
@@ -3008,7 +3008,7 @@ static void mapper40_irq( running_device *device, int scanline, int vblank, int 
 		{
 			state->IRQ_count = (state->IRQ_count + 1) & 0xfff;
 			state->IRQ_enable = 0;
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
 			state->IRQ_count += 114;
@@ -3076,8 +3076,6 @@ static WRITE8_HANDLER( mapper41_w )
 
 *************************************************************/
 
-extern emu_timer	*nes_irq_timer;
-
 static WRITE8_HANDLER( mapper42_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
@@ -3098,12 +3096,12 @@ static WRITE8_HANDLER( mapper42_w )
 			if (!state->IRQ_enable && (data & 0x02))
 			{
 				state->IRQ_enable = 1;
-				timer_adjust_oneshot(nes_irq_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 24576), 0);
+				timer_adjust_oneshot(state->irq_timer, cpu_clocks_to_attotime(state->maincpu, 24576), 0);
 			}
 			if (!(data & 0x02))
 			{
 				state->IRQ_enable = 0;
-				timer_adjust_oneshot(nes_irq_timer, attotime_never, 0);
+				timer_adjust_oneshot(state->irq_timer, attotime_never, 0);
 			}
 			break;
 		}
@@ -3436,7 +3434,7 @@ static void mapper50_irq( running_device *device, int scanline, int vblank, int 
 		if (state->IRQ_count < 0x1000)
 		{
 			if ((0x1000 - state->IRQ_count) <= 114)
-				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+				cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			else
 				state->IRQ_count += 114;
 		}
@@ -3807,7 +3805,7 @@ static void mapper64_irq( running_device *device, int scanline, int vblank, int 
 					{
 						LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 								video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
-						cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+						cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 					}
 				}
 			}
@@ -3834,7 +3832,7 @@ static void mapper64_irq( running_device *device, int scanline, int vblank, int 
 				{
 					LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 							video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
-					cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+					cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 				}
 			}
 		}
@@ -3980,7 +3978,7 @@ static void irem_irq( running_device *device, int scanline, int vblank, int blan
 		if (state->IRQ_count <= 114)
 		{
 			state->IRQ_enable = 0;
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -4086,7 +4084,7 @@ static void mapper67_irq( running_device *device, int scanline, int vblank, int 
 		{
 			state->IRQ_enable = 0;
 			state->IRQ_count = 0xffff;
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
 			state->IRQ_count -= 114;
@@ -4260,7 +4258,7 @@ static void mapper69_irq( running_device *device, int scanline, int vblank, int 
 		if (state->IRQ_count <= 114)
 		{
 			state->IRQ_count = 0xffff;
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 		else
 			state->IRQ_count -= 114;
@@ -5540,7 +5538,7 @@ static void mapper106_irq( running_device *device, int scanline, int vblank, int
 	{
 		if ((0xffff - state->IRQ_count) < 114)
 		{
-			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_enable = 0;
 		}
 
@@ -5940,7 +5938,7 @@ static void mapper117_irq( running_device *device, int scanline, int vblank, int
 		{
 			state->IRQ_count--;
 			if (!state->IRQ_count)
-				cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+				cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
 }
@@ -9746,7 +9744,7 @@ static void mapper222_irq( running_device *device, int scanline, int vblank, int
 		state->IRQ_count = 0;
 		LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 				video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
-		cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 

@@ -748,6 +748,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			if (state->four_screen_vram)
 			{
 				state->extended_ntram = auto_alloc_array(machine, UINT8, 0x2000);
+				state_save_register_global_pointer(machine, state->extended_ntram, 0x2000);
 				set_nt_page(machine, 0, CART_NTRAM, 0, 1);
 				set_nt_page(machine, 1, CART_NTRAM, 1, 1);
 				set_nt_page(machine, 2, CART_NTRAM, 2, 1);

@@ -82,11 +82,19 @@ public:
 	int nes_vram_sprite[8]; /* Used only by mmc5 for now */
 	int last_frame_flip;
 	double scanlines_per_frame;
-	
+
+	/* misc */
+	write8_space_func   mmc_write_low;
+	read8_space_func    mmc_read_low;
+	write8_space_func   mmc_write_mid;
+	write8_space_func   mmc_write;
+	emu_timer	        *irq_timer;
+
 	/* devices */
-	running_device *ppu;
-	running_device *sound;
-	running_device *cart;
+	running_device      *maincpu;
+	running_device      *ppu;
+	running_device      *sound;
+	running_device      *cart;
 
 	/* misc region to be allocated at init */
 	// variables which don't change at run-time
@@ -165,12 +173,6 @@ public:
 	/* these are used in the mapper 20 handlers */
 	int     fds_last_side;
 	int     fds_count;
-
-	// misc
-	write8_space_func   mmc_write_low;
-	read8_space_func    mmc_read_low;
-	write8_space_func   mmc_write_mid;
-	write8_space_func   mmc_write;
 };
 
 
