@@ -218,11 +218,6 @@ static const aica_interface dc_aica_interface =
 	aica_irq
 };
 
-static INTERRUPT_GEN( dc_dispatch_vblank )
-{
-	dc_vblank(device->machine);
-}
-
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
 static MACHINE_DRIVER_START( dc )
@@ -231,7 +226,6 @@ static MACHINE_DRIVER_START( dc )
 	MDRV_CPU_CONFIG(sh4cpu_config)
 	MDRV_CPU_PROGRAM_MAP(dc_map)
 	MDRV_CPU_IO_MAP(dc_port)
-	MDRV_CPU_VBLANK_INT("screen", dc_dispatch_vblank)
 
 	MDRV_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
 	MDRV_CPU_PROGRAM_MAP(dc_audio_map)
