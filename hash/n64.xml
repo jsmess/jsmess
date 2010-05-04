@@ -1035,7 +1035,7 @@
 		</part>
 	</software>
 
-	<software name="bugslife" cloneof="bugslife">
+	<software name="bugslife">
 		<description>A Bug's Life (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2047,7 +2047,7 @@
 		</part>
 	</software>
 
-	<software name="dukenkzh" cloneof="dukenkzh">
+	<software name="dukenkzh">
 		<description>Duke Nukem - Zero Hour (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4280,7 +4280,7 @@
 		</part>
 	</software>
 
-	<software name="lylatwara">
+	<software name="lylatwara" cloneof="lylatwar">
 		<description>Lylat Wars (Aus)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4291,7 +4291,7 @@
 		</part>
 	</software>
 
-	<software name="lylatwar" cloneof="lylatwar">
+	<software name="lylatwar">
 		<description>Lylat Wars (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5105,7 +5105,7 @@
 		</part>
 	</software>
 
-	<software name="mktrilgyu1" cloneof="mk4trlgy">
+	<software name="mktrilgyu1" cloneof="mktrilgy">
 		<description>Mortal Kombat Trilogy (USA, Rev. A)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5116,7 +5116,7 @@
 		</part>
 	</software>
 
-	<software name="mktrilgyu" cloneof="mk4trlgy">
+	<software name="mktrilgyu" cloneof="mktrilgy">
 		<description>Mortal Kombat Trilogy (USA, Rev. B)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5127,7 +5127,7 @@
 		</part>
 	</software>
 
-	<software name="mktrilgyu2" cloneof="mk4trlgy">
+	<software name="mktrilgyu2" cloneof="mktrilgy">
 		<description>Mortal Kombat Trilogy (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5314,7 +5314,7 @@
 		</part>
 	</software>
 
-	<software name="nbazon98j">
+	<software name="nbazon98j" cloneof="nbazon98">
 		<description>NBA in the Zone '98 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5325,7 +5325,7 @@
 		</part>
 	</software>
 
-	<software name="nbazon98" cloneof="nbazon98">
+	<software name="nbazon98">
 		<description>NBA in the Zone '98 (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7173,7 +7173,7 @@
 		</part>
 	</software>
 
-	<software name="rush2u" cloneof="rush">
+	<software name="rush2u" cloneof="rush2">
 		<description>Rush 2 - Extreme Racing USA (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8779,7 +8779,7 @@
 		</part>
 	</software>
 
-	<software name="turok2b">
+	<software name="turok2b" cloneof="turok2">
 		<description>Turok 2 - Seeds of Evil (Euro, Demo Kiosk)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8801,7 +8801,7 @@
 		</part>
 	</software>
 
-	<software name="turok2" cloneof="turok2">
+	<software name="turok2">
 		<description>Turok 2 - Seeds of Evil (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

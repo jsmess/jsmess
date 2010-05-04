@@ -3026,7 +3026,7 @@
 		</part>
 	</software>
 
-	<software name="doraqzba" cloneof="doraqzba">
+	<software name="doraqzba" cloneof="doraqzb">
 		<description>Doraemon no Quiz Boy (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12156,7 +12156,7 @@
 		</part>
 	</software>
 
-	<software name="smurfsniu" cloneof="smufrsni">
+	<software name="smurfsniu" cloneof="smurfsni">
 		<description>The Smurfs Nightmare (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

@@ -3622,7 +3622,7 @@
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="chinese fighter iii (unl).bin" size="2097152" crc="6f98247d" sha1="cc212b1564dc7c73ffdc55f9fde3269a83fee399" offset="000000" />
+				<rom name="chinese fighter iii (unl, alt).bin" size="2097152" crc="6f98247d" sha1="cc212b1564dc7c73ffdc55f9fde3269a83fee399" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5757,7 +5757,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2621440">
-				<rom name="dyna brothers 2 (jpn).bin" size="2621440" crc="ba3554bc" sha1="8e10298dfff521397f0e82d1787e701d6928750b" offset="000000" />
+				<rom name="dyna brothers 2 - sega channel special (jpn).bin" size="2621440" crc="ba3554bc" sha1="8e10298dfff521397f0e82d1787e701d6928750b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6010,7 +6010,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="ecco - the tides of time (beta).bin" size="2097152" crc="1d1470ea" sha1="364523cd30615ce4a94793ebbc189c0db6adc38f" offset="000000" />
+				<rom name="ecco - the tides of time (beta, alt).bin" size="2097152" crc="1d1470ea" sha1="364523cd30615ce4a94793ebbc189c0db6adc38f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

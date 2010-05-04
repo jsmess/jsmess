@@ -12376,7 +12376,7 @@
 		</part>
 	</software>
 
-	<software name="hpotqwcj" cloneof="hpotterq">
+	<software name="hpotqwcj" cloneof="hpotqwc">
 		<description>Harry Potter - Quidditch World Cup (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -17277,7 +17277,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="medabots - rokusho version (europe) [b].bin" size="8388608" crc="e144ded2" sha1="c4572428ea97b302f699a3b4eba2a1f0e87c1c9c" offset="000000" />
+				<rom name="medabots - rokusho version (usa).bin" size="8388608" crc="e144ded2" sha1="c4572428ea97b302f699a3b4eba2a1f0e87c1c9c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17568,7 +17568,7 @@
 		</part>
 	</software>
 
-	<software name="megmnt3bu" cloneof="megamnt3b">
+	<software name="megmnt3bu" cloneof="megmnt3b">
 		<description>Mega Man Battle Network 3 Blue (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -17590,7 +17590,7 @@
 		</part>
 	</software>
 
-	<software name="megmnt3wu" cloneof="megamnt3w">
+	<software name="megmnt3wu" cloneof="megmnt3w">
 		<description>Mega Man Battle Network 3 White (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21594,7 +21594,7 @@
 		</part>
 	</software>
 
-	<software name="pokemysd" cloneof="pokemysd">
+	<software name="pokemysd">
 		<description>Pokemon Mystery Dungeon - Red Rescue Team (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23145,7 +23145,7 @@
 		</part>
 	</software>
 
-	<software name="rcktpwdsp">
+	<software name="rcktpwdsp" cloneof="rcktpwds">
 		<description>Rocket Power - Dream Scheme (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23156,7 +23156,7 @@
 		</part>
 	</software>
 
-	<software name="rcktpwds" cloneof="rcktpwds">
+	<software name="rcktpwds">
 		<description>Rocket Power - Dream Scheme (Euro, USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23662,7 +23662,7 @@
 		</part>
 	</software>
 
-	<software name="scooby" cloneof="scooby">
+	<software name="scooby">
 		<description>Scooby-Doo (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26913,7 +26913,7 @@
 		</part>
 	</software>
 
-	<software name="smad" cloneof="dma">
+	<software name="smad" cloneof="sma">
 		<description>Super Mario Advance (USA, Demo Kiosk)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

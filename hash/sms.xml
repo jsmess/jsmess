@@ -1311,7 +1311,7 @@
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="doki doki penguin land - uchuu daibouken (japan).bin" size="131072" crc="56bd2455" sha1="c56417efd78a332a35e4d0e87c7b13c20da85391" offset="000000" />
+				<rom name="doki doki penguin land - uchuu daibouken (japan, proto).bin" size="131072" crc="56bd2455" sha1="c56417efd78a332a35e4d0e87c7b13c20da85391" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4301,7 +4301,7 @@
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="slap shot (usa) (v1.1).bin" size="262144" crc="702c3e98" sha1="2259dcf3ce702b5ddc8d0a5ed335263f45ecd2ce" offset="000000" />
+				<rom name="slap shot (usa) (v1.2).bin" size="262144" crc="702c3e98" sha1="2259dcf3ce702b5ddc8d0a5ed335263f45ecd2ce" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4312,7 +4312,7 @@
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="slap shot (europe).bin" size="262144" crc="d33b296a" sha1="5979ee84570f7c930f20be473e895fc1d2b9e3f4" offset="000000" />
+				<rom name="slap shot (europe) (v1.1).bin" size="262144" crc="d33b296a" sha1="5979ee84570f7c930f20be473e895fc1d2b9e3f4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4334,7 +4334,7 @@
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="slap shot (usa).bin" size="262144" crc="fbb0a92a" sha1="44e39176cb012f07844ec3b44244c1197f619ff5" offset="000000" />
+				<rom name="slap shot (proto).bin" size="262144" crc="fbb0a92a" sha1="44e39176cb012f07844ec3b44244c1197f619ff5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -309,7 +309,7 @@
 		</part>
 	</software>
 
-	<software name="alfredchj" cloneof="alfrech">
+	<software name="alfredchj" cloneof="alfredch">
 		<description>Alfred Chicken (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -320,7 +320,7 @@
 		</part>
 	</software>
 
-	<software name="alfredchu" cloneof="alfrech">
+	<software name="alfredchu" cloneof="alfredch">
 		<description>Alfred Chicken (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8251,7 +8251,7 @@
 		</part>
 	</software>
 
-	<software name="megalitj" cloneof="medalit">
+	<software name="megalitj" cloneof="megalit">
 		<description>Megalit (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12800,7 +12800,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="samurai shodown (usa, europe).bin" size="524288" crc="90d51289" sha1="1ddb05f7237e792dda9924ac0c525d8d1950cb44" offset="000000" />
+				<rom name="samurai shodown (usa, europe, proto).bin" size="524288" crc="90d51289" sha1="1ddb05f7237e792dda9924ac0c525d8d1950cb44" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -13916,7 +13916,7 @@
 		</part>
 	</software>
 
-	<software name="spotj" cloneof="spotj">
+	<software name="spotj" cloneof="spot">
 		<description>Spot (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13927,7 +13927,7 @@
 		</part>
 	</software>
 
-	<software name="spotu" cloneof="spotu">
+	<software name="spotu" cloneof="spot">
 		<description>Spot (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
