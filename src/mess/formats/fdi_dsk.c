@@ -236,7 +236,7 @@ FLOPPY_CONSTRUCT( fdi_dsk_construct )
 	floppy_image_read(floppy, &header, 0, sizeof(header));
 
 	tag->version = header.version[0];
-	tag->tracks = ((header.ltrack[0] << 8) | header.ltrack[1]) + 1;
+	tag->tracks = pick_integer_be(header.ltrack, 0, 2) + 1;
 	tag->heads = header.lhead + 1;
 	
 	if (LOG)

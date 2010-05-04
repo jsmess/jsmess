@@ -85,9 +85,9 @@ QUICKLOAD_LOAD( comx35_comx )
 
 			image_fread(image, header, 6);
 
-			start_address = header[0] << 8 | header[1];
-			end_address = header[2] << 8 | header[3];
-			run_address = header[4] << 8 | header[5];
+			start_address = pick_integer_be(header, 0, 2);
+			end_address = pick_integer_be(header, 2, 2);
+			run_address = pick_integer_be(header, 4, 2);
 
 			image_fread_memory(image, start_address, end_address - start_address);
 
@@ -171,7 +171,7 @@ QUICKLOAD_LOAD( comx35_comx )
 
 			image_fread(image, header, 2);
 
-			array_length = (header[0] << 8) | header[1];
+			array_length = pick_integer_be(header, 0, 2);
 			start_array = (memory_read_byte(program, 0x4295) << 8) | memory_read_byte(program, 0x4296);
 			end_array = start_array + (size - 7);
 

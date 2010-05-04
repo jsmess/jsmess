@@ -54,9 +54,9 @@ QUICKLOAD_LOAD( atom_atm )
 
 	image_fread(image, header, 0x16);
 
-	UINT16 start_address = header[0x10] << 8 | header[0x11];
-	UINT16 run_address = header[0x12] << 8 | header[0x13];
-	UINT16 size = header[0x14] << 8 | header[0x15];
+	UINT16 start_address = pick_integer_le(header, 0x10, 2);
+	UINT16 run_address = pick_integer_le(header, 0x12, 2);
+	UINT16 size = pick_integer_le(header, 0x14, 2);
 
 	if (LOG)
 	{
