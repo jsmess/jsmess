@@ -449,8 +449,8 @@ static VIDEO_UPDATE( supracan )
 	if(state->video_flags & 8)
 		draw_sprites(screen->machine,bitmap,cliprect);
 
-	if(state->video_flags & 4)
-		draw_roz(screen->machine,bitmap,cliprect);
+//	if(state->video_flags & 4)
+//		draw_roz(screen->machine,bitmap,cliprect);
 
 	return 0;
 }
@@ -524,7 +524,7 @@ static WRITE16_HANDLER( supracan_dma_w )
 					}
 				}
 			}
-			else
+			else if(data != 0x0000) // fake DMA, used by C.U.G.
 			{
 				verboselog(space->machine, 0, "supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)\n", data, acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1);
 				fatalerror("supracan_dma_w: Unknown DMA kickoff value of %04x (other regs %08x, %08x, %d)",data, acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1);
