@@ -18,14 +18,19 @@ Known unemulated graphical effects:
 - Unemulated 1bpp ROZ mode, used by the Super A'Can BIOS logo;
 - Priorities;
 - Boom Zoo: missing window effect applied on sprites;
+- C.U.G.: gameplay backgrounds are broken (wrong tile bank);
+- C.U.G.: roz paging is wrong;
 - Sango Fighter: Missing rowscroll effect;
 - Sango Fighter: sprites have some bad gaps of black;
 - Sango Fighter: Missing black masking on the top-down edges of the screen on gameplay?
 - Sango Fighter: intro looks bogus, dunno what's supposed to draw...
+- Speedy Dragon: backgrounds are broken (wrong tile bank)
 - Super Taiwanese Baseball League: Missing window effect applied on a tilemap;
 - Super Taiwanese Baseball League: Unemulated paging mode;
 - Super Dragon Force: priority issues with the text;
 - Super Dragon Force: wrong ysize on character select screen;
+- The Son of Evil: has problems with irq mask
+- The Son of Evil: has many gfx artifacts
 
 baseball game debug trick:
 wpset e90020,1f,w
@@ -158,7 +163,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 	switch(gfx_mode)
 	{
 		case 7:  region = 2; tile_bank = 0x1c00; pal_bank = 0x00; break;
-		case 4:  region = 0; tile_bank = 0x400;  pal_bank = 0x00; break;
+		case 4:  region = 1; tile_bank = 0x800;  pal_bank = 0x00; break;
 		case 2:  region = 1; tile_bank = 0x400;  pal_bank = 0x00; break;
 		case 0:  region = 1; tile_bank = 0;      pal_bank = 0x00; break;
 		default: region = 1; tile_bank = 0;      pal_bank = 0x00; break;
@@ -449,8 +454,8 @@ static VIDEO_UPDATE( supracan )
 	if(state->video_flags & 8)
 		draw_sprites(screen->machine,bitmap,cliprect);
 
-//	if(state->video_flags & 4)
-//		draw_roz(screen->machine,bitmap,cliprect);
+	if(state->video_flags & 4)
+		draw_roz(screen->machine,bitmap,cliprect);
 
 	return 0;
 }
