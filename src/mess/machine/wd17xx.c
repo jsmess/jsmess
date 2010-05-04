@@ -313,6 +313,7 @@ struct _wd1770_state
 	UINT8	read_cmd;				/* last read command issued */
 	UINT8	write_cmd;				/* last write command issued */
 	INT8	direction;				/* last step direction */
+	UINT8   last_command_data;		/* last command data */
 
 	UINT8	status_drq; 			/* status register data request bit */
 	UINT8	busy_count; 			/* how long to keep busy bit set */
@@ -464,7 +465,12 @@ static void	wd17xx_set_intrq(running_device *device)
 static TIMER_CALLBACK( wd17xx_command_callback )
 {
 	running_device *device = (running_device *)ptr;
-	wd17xx_set_intrq(device);
+	wd1770_state *w = get_safe_token(device);
+
+	if (w->last_command_data != FDC_FORCE_INT)
+	{
+		wd17xx_set_intrq(device);
+	}
 }
 
 /* set drq after delay */
@@ -1424,6 +1430,7 @@ READ8_DEVICE_HANDLER( wd17xx_data_r )
 	{
 		logerror("wd17xx_data_r: (no new data) $%02X (data_count %d)\n", w->data, w->data_count);
 	}
+
 	return w->data;
 }
 
@@ -1431,6 +1438,8 @@ READ8_DEVICE_HANDLER( wd17xx_data_r )
 WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 {
 	wd1770_state *w = get_safe_token(device);
+
+	w->last_command_data = data;
 
 	/* only the WD1770 and WD1772 have a 'motor on' line */
 	if (device->type == WD1770 || device->type == WD1772)

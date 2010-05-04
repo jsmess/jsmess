@@ -111,6 +111,7 @@ Source Changes:
 
 - Changes to the wd17xx implementation:
   - Added support for immediate/index pulse interrupts. [Curt Coder]
+  - Suppressed extra interrupt after FORCE INTERRUPT ($D0) command. [Barry Nelson]
 
 - Implemented Commodore DOS errors 21, 22, and 23 in D64 images. 
   "Microsoft Multiplan" now loads on C64. (bug #1932) [Curt Coder]
