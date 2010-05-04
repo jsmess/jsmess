@@ -211,7 +211,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="aladdinp4" cloneof="aladdin">
+    <!-- same as jan 13 proto. was a mistake by drx? -->
+	<!--software name="aladdinp4" cloneof="aladdin">
 		<description>Disney's Aladdin (Prototype WITH, 19940123)</description>
 		<year>1994</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -220,7 +221,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 				<rom name="aladdin (prototype with - jan 23,  1994).bin" size="524288" crc="75a7f142" sha1="a968ee77938233a4ff94c73266c7fb36fa25657d" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="aladdin">
 		<description>Disney's Aladdin (Euro, USA)</description>
@@ -903,7 +904,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="bonkersp6" cloneof="bonkers">
+    <!-- same as dec 11 proto. was a mistake by drx? -->
+	<!-- software name="bonkersp6" cloneof="bonkers">
 		<description>Bonkers Wax Up! (Prototype, 19941212-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -912,7 +914,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 				<rom name="bonkers wax up! (prototype - dec 12,  1994 - b).bin" size="524288" crc="9a405d0d" sha1="e797640e2363f517fb83ee42903f5d13a1ffad73" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="bonkersp7" cloneof="bonkers">
 		<description>Bonkers Wax Up! (Prototype, 19941212-D)</description>
@@ -3274,7 +3276,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="lionkingp5" cloneof="lionking">
+    <!-- same as aug 14 proto. was a mistake by drx? -->
+	<!--software name="lionkingp5" cloneof="lionking">
 		<description>The Lion King (Prototype, 19940815)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3283,7 +3286,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 				<rom name="lion king, the (prototype - aug 15,  1994).bin" size="514486" crc="eb10a2d4" sha1="cdce953f16e4db6e9137ea8d523588b3469a544d" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="lionkingp6" cloneof="lionking">
 		<description>The Lion King (Prototype, 19940816)</description>
@@ -4299,7 +4302,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="nfl95pc" cloneof="nfl95">
+    <!-- same as aug 25 proto. was a mistake by drx? -->
+	<!--software name="nfl95pc" cloneof="nfl95">
 		<description>NFL '95 (Prototype, 19940825-B)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4308,7 +4312,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 				<rom name="nfl '95 (prototype - aug 25,  1994 - b).bin" size="524288" crc="fe140eaa" sha1="b79af203bc01ea1c59563e34105cb36cad158cca" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="nfl95pd" cloneof="nfl95">
 		<description>NFL '95 (Prototype, 19940825)</description>
@@ -4882,7 +4886,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
-	<software name="pengoj">
+	<software name="pengoj" cloneof="pengo">
 		<description>Pengo (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4893,7 +4897,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="pengo" cloneof="pengo">
+	<software name="pengo">
 		<description>Pengo (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6230,7 +6234,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="sonics" cloneof="sonics">
+	<software name="sonics">
 		<description>Sonic Spinball (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6344,7 +6348,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="cheesep2" cloneof="cheesp1">
+    <!-- same as feb 17 proto. was a mistake by drx? -->
+	<!--software name="cheesep2" cloneof="cheesep1">
 		<description>Speedy Gonzales Cheese Catastrophe (Prototype, 19950224)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6353,7 +6358,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 				<rom name="speedy gonzales cheese catastrophe (prototype - feb 24,  1995).bin" size="524288" crc="4e78fd36" sha1="8897ba5aa76d0e17251b2765fafbdb0df41030a6" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="spidsin6">
 		<description>Spider-Man - Return of the Sinister Six (Euro, USA)</description>
@@ -7374,7 +7379,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="tazmarspc" cloneof="tazmars">
+    <!-- same as aug 14 proto. was a mistake by drx? -->
+	<!--software name="tazmarspc" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940815)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7383,7 +7389,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 				<rom name="taz in escape from mars (prototype - aug 15,  1994).bin" size="524288" crc="9267d968" sha1="8800da06ea2aa3982cf2e294b165f5e1a9cab63c" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="tazmarspd" cloneof="tazmars">
 		<description>Taz in Escape from Mars (Prototype, 19940819)</description>
@@ -8132,7 +8138,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="xmengamlp2" cloneof="xmengaml">
+    <!-- same as aug 10 proto. was a mistake by drx? -->
+	<!--software name="xmengamlp2" cloneof="xmengaml">
 		<description>X-Men - Gamemaster's Legacy (Prototype, 19940815)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8141,7 +8148,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 				<rom name="x-men - gamemaster's legacy (prototype - aug 15,  1994).bin" size="524288" crc="66cc4034" sha1="46237cf1c2810a8f2e5c31907a1ae04b647256c8" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="xmengamlp3" cloneof="xmengaml">
 		<description>X-Men - Gamemaster's Legacy (Prototype 36, 19940831)</description>

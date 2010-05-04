@@ -1602,7 +1602,8 @@
 		</part>
 	</software>
 
-	<software name="atptourp6" cloneof="atptour">
+    <!-- same as jul 23 proto... was a mistake by drx? -->
+	<!--software name="atptourp6" cloneof="atptour">
 		<description>ATP Tour Championship Tennis (Prototype, 19940725)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1611,7 +1612,7 @@
 				<rom name="atp tour championship tennis (prototype - jul 25, 1994).bin" size="2097152" crc="a15d5051" sha1="88005e79f325e20c804e04a7a310a6d19b7f7cce" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="atptourp7" cloneof="atptour">
 		<description>ATP Tour Championship Tennis (Prototype, 19940509)</description>
@@ -2680,7 +2681,8 @@
 		</part>
 	</software>
 
-	<software name="bodycop1" cloneof="bodyco">
+    <!-- same as feb 08 proto... was a mistake by drx? -->
+	<!--software name="bodycop1" cloneof="bodyco">
 		<description>Body Count (Prototype, 19940228-U)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2689,7 +2691,7 @@
 				<rom name="body count (prototype - feb 28, 1994 - u).bin" size="1046784" crc="c5fed897" sha1="1c13134c32dc620dd663f33150c82d12cc69d442" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="bodycop2" cloneof="bodyco">
 		<description>Body Count (Prototype, 19940127)</description>
@@ -2713,7 +2715,8 @@
 		</part>
 	</software>
 
-	<software name="bodycop4" cloneof="bodyco">
+    <!-- same as mar 08 proto... was a mistake by drx? -->
+	<!--software name="bodycop4" cloneof="bodyco">
 		<description>Body Count (Prototype, 19940308-A)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2722,7 +2725,7 @@
 				<rom name="body count (prototype - mar 08, 1994 - a).bin" size="1048576" crc="8965213f" sha1="dbd4fec001f61c6a8414b2035e884ebfbf48b899" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="bodycop5" cloneof="bodyco">
 		<description>Body Count (Prototype, 19940308)</description>
@@ -2878,7 +2881,7 @@
 		</part>
 	</software>
 
-	<software name="chavez" cloneof="boxing">
+	<software name="chavez" cloneof="boxlgnd">
 		<description>Chavez II (USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3638,7 +3641,7 @@
 		</part>
 	</software>
 
-	<software name="chuckrcku" cloneof="chuckr">
+	<software name="chuckrcku" cloneof="chuckrck">
 		<description>Chuck Rock (USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4155,7 +4158,8 @@
 		</part>
 	</software>
 
-	<software name="comixp1" cloneof="comix">
+    <!-- same as jul 12 proto... was a mistake by drx? -->
+	<!--software name="comixp1" cloneof="comix">
 		<description>Comix Zone (Prototype, 19950712-FULSCR)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4164,7 +4168,7 @@
 				<rom name="comix zone (prototype - jul 12, 1995 - fulscr).bin" size="2097152" crc="e28c89c1" sha1="4cf1fb69c8184257664caacaf7bc7a1b4e802b8b" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="comixp2" cloneof="comix">
 		<description>Comix Zone (Prototype, 19950712)</description>
@@ -5828,7 +5832,8 @@
 		</part>
 	</software>
 
-	<software name="dheadp2" cloneof="dhead">
+    <!-- same as jun 14 proto... was a mistake by drx? -->
+	<!--software name="dheadp2" cloneof="dhead">
 		<description>Dynamite Headdy (Prototype, 19940615)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5837,7 +5842,7 @@
 				<rom name="dynamite headdy (prototype - jun 15, 1994).bin" size="2097152" crc="971ef24c" sha1="c90417bd43bea29a58fcacacb48b2602ecb65cc3" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="dheadp3" cloneof="dhead">
 		<description>Dynamite Headdy (Prototype, 19940616)</description>
@@ -13636,7 +13641,7 @@
 		</part>
 	</software>
 
-	<software name="junker" cloneof="o2019">
+	<software name="junker" cloneof="outr2019">
 		<description>Junker's High (Jpn, Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18433,7 +18438,8 @@
 		</part>
 	</software>
 
-	<software name="beyoasisp" cloneof="storytho">
+    <!-- released also as Story of Thor proto... was a mistake by drx? -->
+	<!--software name="beyoasisp" cloneof="storytho">
 		<description>Beyond Oasis (Prototype, 19941101)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18442,7 +18448,7 @@
 				<rom name="beyond oasis (prototype - nov 01, 1994).bin" size="3145728" crc="fa59f847" sha1="cb0606faeab0398244d4721d71cf7e1c5724a9ef" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="sf2">
 		<description>Street Fighter II' - Special Champion Edition (Euro)</description>
@@ -22005,7 +22011,8 @@
 		</part>
 	</software>
 
-	<software name="wcs2c" cloneof="wcs2">
+    <!-- same as U proto... was a mistake by drx? -->
+	<!--software name="wcs2c" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940314)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22014,7 +22021,7 @@
 				<rom name="world championship soccer ii (prototype - mar 14, 1994).bin" size="1048576" crc="43ec107c" sha1="9226eb23e1a91856300b310cb2b8263a832ba231" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="wcs2d" cloneof="wcs2">
 		<description>World Championship Soccer II (Prototype, 19940323)</description>
@@ -22401,7 +22408,8 @@
 		</part>
 	</software>
 
-	<software name="wheroj" cloneof="whero">
+    <!-- same as jun 23 proto... was a mistake by drx? -->
+	<!--software name="wheroj" cloneof="whero">
 		<description>World Heroes (USA, Prototype, 19940224)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22410,7 +22418,7 @@
 				<rom name="world heroes (usa) (prototype - feb 24, 1994).bin" size="2097152" crc="f5db477e" sha1="154d8b2415bcbce62656eef63e4fad026ee2d8d0" offset="000000" />
 			</dataarea>
 		</part>
-	</software>
+	</software-->
 
 	<software name="wherok" cloneof="whero">
 		<description>World Heroes (USA, Prototype, 19940303)</description>

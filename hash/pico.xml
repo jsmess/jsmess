@@ -12,17 +12,6 @@
 		</part>
 	</software>
 
-	<software name="101dalma1" cloneof="101dalma">
-		<description>Math Antics With 101 Dalmatians (Prototype, 19960817-J)</description>
-		<year>1996</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="101 dalmatians (prototype - aug 17, 1996 - j).bin" size="1048576" crc="cdc4dba2" sha1="ee1b794f03ee02124e22c4050f686f4f7b6e06df" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="101dalma2" cloneof="101dalma">
 	<!-- is this the released version too? -->
 		<description>Math Antics With 101 Dalmatians (Prototype, 19960817-B)</description>
@@ -112,8 +101,8 @@
 		</part>
 	</software>
 
-	<software name="101pikiw">
-		<description>101 piki wan-chan (Jpn, Prototype, 19960817)</description>
+	<software name="101pikiwp" cloneof="101dalma">
+		<description>101 Piki Wan-chan (Jpn, Prototype, 19960817)</description> <!-- aka Math Antics With 101 Dalmatians (Prototype, 19960817-J) -->
 		<year>1996</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
@@ -312,7 +301,7 @@
 	</software>
 
 	<software name="hucklowlb" cloneof="hucklowl">
-		<description>Huckle and Lowly's Busiest Day Ever (Prototype, 19940721, F)</description>
+		<description>La Journee La Plus Occupee de Huckle et Lowly (Fra, Prototype, 19940721)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="pico_cart">
@@ -528,17 +517,6 @@
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="667784">
 				<rom name="huckle and lowly's busiest day ever rev 19940502 (1994)(realtime associates - sega)(beta).bin" size="667784" crc="265ad2d0" sha1="de457d6e1c6037a2c165c0f65037aadd9c73042c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="journee" cloneof="hucklowl">
-		<description>La Journee La Plus Occupee de Huckle et Lowly (France, Prototype, 19940721)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="1023740">
-				<rom name="journee la plus occupee de huckle et lowly, la rev 19940721 (1994)(realtime associates - sega)(fr)(beta).bin" size="1023740" crc="026ca6f0" sha1="0e2898a56cf47576e68db772639c23a7efcaf026" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -997,17 +975,6 @@
 	</software>
 
 	<software name="poohcorn1" cloneof="poohcorn">
-		<description>A Year At Pooh Corner (Prototype, 19940801)</description>
-		<year>19??</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="year at pooh corner (prototype - aug 01, 1994).bin" size="524288" crc="90b047f6" sha1="8596cdb62ff03a2f602344a16b61a1f487fa7c96" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="poohcorn2" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940725)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1018,7 +985,7 @@
 		</part>
 	</software>
 
-	<software name="poohcorn3" cloneof="poohcorn">
+	<software name="poohcorn2" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940723)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1029,7 +996,7 @@
 		</part>
 	</software>
 
-	<software name="poohcorn4" cloneof="poohcorn">
+	<software name="poohcorn3" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940721)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1040,7 +1007,7 @@
 		</part>
 	</software>
 
-	<software name="poohcorn5" cloneof="poohcorn">
+	<software name="poohcorn4" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940711)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1051,7 +1018,7 @@
 		</part>
 	</software>
 
-	<software name="poohcorn6" cloneof="poohcorn">
+	<software name="poohcorn5" cloneof="poohcorn">
 		<description>A Year At Pooh Corner (Prototype, 19940608)</description>
 		<year>1994</year>
 		<publisher>Sega</publisher>
@@ -1225,17 +1192,6 @@
 		<part name="cart" interface="pico_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="tails and the music maker rev 0608-19940608-1655 (1994)(sega)(beta).bin" size="524288" crc="f83ec5e8" sha1="39914965a38350b1bef720d39576d20943e8e4a4" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tailsmm7" cloneof="tailsmm">
-		<description>Tails and the Music Maker (Prototype 0601, 19940603, 09.00)</description>
-		<year>1994</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="pico_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="tails and the music maker (prototype 0601 - jun 03, 1994, 09.00).bin" size="524288" crc="f4ba1e9b" sha1="8d77011f2349eb14b51e76c08474817a0f318f99" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

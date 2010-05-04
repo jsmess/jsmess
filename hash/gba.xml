@@ -17321,7 +17321,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="medabots ax - rokusho version (europe) (en,fr,de,es,it).bin" size="8388608" crc="f5801bd8" sha1="35e35139e4d8d91ca52983097f3ce8fe090e3598" offset="000000" />
+				<rom name="medabots ax - rokusho version (usa).bin" size="8388608" crc="92fdb8d6" sha1="ef47f8c675f1f541a0fe4bd37c8882efc539b1c7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17464,7 +17464,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="meet the robinsons (europe) (en,fr,de,es,it,nl).bin" size="8388608" crc="df3e58d3" sha1="1b5376d0c0b64973d74434a3a7388eeba3005aab" offset="000000" />
+				<rom name="meet the robinsons (usa).bin" size="8388608" crc="3787c93c" sha1="d3754a54ab51c85caedc639a1084814970574963" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

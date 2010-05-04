@@ -597,7 +597,7 @@
 		</part>
 	</software>
 
-	<software name="aero2u" cloneof="aero2u">
+	<software name="aero2u" cloneof="aero2">
 		<description>Aero the Acro-Bat 2 (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2196,7 +2196,7 @@
 		</part>
 	</software>
 
-	<software name="battlety1">
+	<software name="battlety1" cloneof="battlety">
 		<description>Battle Tycoon - Flash Hiders SFX (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2207,7 +2207,7 @@
 		</part>
 	</software>
 
-	<software name="battlety" cloneof="battlety">
+	<software name="battlety">
 		<description>Battle Tycoon - Flash Hiders SFX (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6090,7 +6090,7 @@
 		</part>
 	</software>
 
-	<software name="demonblzs">
+	<software name="demonblzs" cloneof="demonblz">
 		<description>Demon's Blazon - Makaimura Monshou Hen (Jpn, Sample)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6101,7 +6101,7 @@
 		</part>
 	</software>
 
-	<software name="demonblz" cloneof="demonblz">
+	<software name="demonblz">
 		<description>Demon's Blazon - Makaimura Monshou Hen (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15323,7 +15323,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="kodomo chousadan mighty pockets - chousa 3 - kyakusen queen patra no nazo (japan) (bs).sfc" size="1048576" crc="35634c30" sha1="fc222418dba4730ef5f49a6621f9b3addff8c6ad" offset="000000" />
+				<rom name="kodomo chousadan mighty pockets - chousa 2 - hanzai toshi big apple (japan) (bs).sfc" size="1048576" crc="188c9acb" sha1="408ac8d9c78dad14f109562fbd3149fe0114fc57" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17162,7 +17162,7 @@
 		</part>
 	</software>
 
-	<software name="manchestb" cloneof="machest">
+	<software name="manchestp" cloneof="manchest">
 		<description>Manchester United Championship Soccer (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -17714,7 +17714,7 @@
 		</part>
 	</software>
 
-	<software name="megalob" cloneof="megalo">
+	<software name="megalop" cloneof="megalo">
 		<description>Mega lo Mania (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -17725,7 +17725,7 @@
 		</part>
 	</software>
 
-	<software name="megalo" cloneof="megalo">
+	<software name="megalo">
 		<description>Mega lo Mania (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -17901,7 +17901,7 @@
 		</part>
 	</software>
 
-	<software name="metalmaru" cloneof="matalmar">
+	<software name="metalmaru" cloneof="metalmar">
 		<description>Metal Marines (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -20675,7 +20675,7 @@
 		</part>
 	</software>
 
-	<software name="oplogicbu" cloneof="oplogic">
+	<software name="oplogicbu" cloneof="oplogicb">
 		<description>Operation Logic Bomb (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21969,7 +21969,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
-				<rom name="pinocchio (europe).sfc" size="3145728" crc="2832c824" sha1="0f7d84215e21f8778199bd8fe3b8a55a056e029f" offset="000000" />
+				<rom name="pinocchio (japan).sfc" size="3145728" crc="d9f5a47a" sha1="f643355b3e05b25d54b0e6f73d07a2d14c02831d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21980,7 +21980,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="3145728">
-				<rom name="pinocchio (europe).sfc" size="3145728" crc="2832c824" sha1="0f7d84215e21f8778199bd8fe3b8a55a056e029f" offset="000000" />
+				<rom name="pinocchio (usa).sfc" size="3145728" crc="00fad8fd" sha1="31382104e7f6a80ea6bab82314ba74b518ce4b3c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23153,7 +23153,7 @@
 		</part>
 	</software>
 
-	<software name="racedrivu" cloneof="racediv">
+	<software name="racedrivu" cloneof="racedriv">
 		<description>Race Drivin' (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31274,8 +31274,8 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="super real mahjong piv (japan).sfc" size="2097152" crc="85555436" sha1="638a33a95a97360408f71cdbddcbc82452d52ed8" offset="000000" />
+			<dataarea name="rom" size="1572864">
+				<rom name="super real mahjong pv paradise (japan).sfc" size="1572864" crc="f9df0081" sha1="343a6e422b8c84b5b6266364804c951168da6bcb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
