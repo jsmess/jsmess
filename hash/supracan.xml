@@ -31,7 +31,7 @@
 	<software name="speedydgn" supported="no">
 		<description>Speedy Dragon</description>
 		<year>1995</year>
-		<publisher>Funtech</publisher>
+		<publisher>AV Artisan Corp.</publisher>
 		<part name="cart" interface="supracan_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="speedydgn.bin" size="2097152" crc="f631383c" sha1="fbd62b5d287aa82ef27f400ab2a6b3da0308192a" offset="0" />
