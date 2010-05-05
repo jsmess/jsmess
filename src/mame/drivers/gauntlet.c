@@ -213,6 +213,15 @@ static WRITE16_HANDLER( sound_reset_w )
 		{
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_RESET, (state->sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
 			atarigen_sound_reset(space->machine);
+			if (state->sound_reset_val & 1)
+			{
+				devtag_reset(space->machine, "ymsnd");
+				devtag_reset(space->machine, "tms");
+				tms5220_set_frequency(devtag_get_device(space->machine, "tms"), ATARI_CLOCK_14MHz/2 / 11);
+				atarigen_set_ym2151_vol(space->machine, 0);
+				atarigen_set_pokey_vol(space->machine, 0);
+				atarigen_set_tms5220_vol(space->machine, 0);
+			}
 		}
 	}
 }
@@ -251,6 +260,7 @@ static WRITE8_HANDLER( sound_ctl_w )
 	switch (offset & 7)
 	{
 		case 0:	/* music reset, bit D7, low reset */
+			if (((data>>7)&1) == 0) devtag_reset(space->machine, "ymsnd");
 			break;
 
 		case 1:	/* speech write, bit D7, active low */
@@ -536,8 +546,8 @@ static MACHINE_DRIVER_START( gauntlet )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.48)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.48)
+	MDRV_SOUND_ROUTE(1, "lspeaker", 0.48)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.48)
 
 	MDRV_SOUND_ADD("pokey", POKEY, ATARI_CLOCK_14MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.32)

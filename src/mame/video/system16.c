@@ -121,7 +121,7 @@ WRITE16_HANDLER( sys16_paletteram_w )
 	/*  sBGR BBBB GGGG RRRR */
 	/*  x000 4321 4321 4321 */
 	{
-		int r, g, b, rs, gs, bs, rh, gh, bh;
+		int r, g, b, rs, gs, bs/*, rh, gh, bh*/;
 		int r0 = (newword >> 12) & 1;
 		int r1 = (newword >>  0) & 1;
 		int r2 = (newword >>  1) & 1;
@@ -149,9 +149,9 @@ WRITE16_HANDLER( sys16_paletteram_w )
 		bs = combine_6_weights(state->weights[1][2], b0, b1, b2, b3, b4, 0);
 
 		/* Highlight colors */
-		rh = combine_6_weights(state->weights[1][0], r0, r1, r2, r3, r4, 1);
-		gh = combine_6_weights(state->weights[1][1], g0, g1, g2, g3, g4, 1);
-		bh = combine_6_weights(state->weights[1][2], b0, b1, b2, b3, b4, 1);
+		//rh = combine_6_weights(state->weights[1][0], r0, r1, r2, r3, r4, 1);
+		//gh = combine_6_weights(state->weights[1][1], g0, g1, g2, g3, g4, 1);
+		//bh = combine_6_weights(state->weights[1][2], b0, b1, b2, b3, b4, 1);
 
 		palette_set_color(space->machine, offset, MAKE_RGB(r, g, b) );
 
@@ -435,7 +435,6 @@ VIDEO_START( system16 )
 	}
 
 	segaic16_palette_init(0x800);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16B, 0x400, state->sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 
 
@@ -613,28 +612,19 @@ VIDEO_START( s16a_bootleg )
 
 VIDEO_START( s16a_bootleg_wb3bl )
 {
-	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-
 	VIDEO_START_CALL(s16a_bootleg);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_WB3BL, 0x400, state->sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 }
 
 VIDEO_START( s16a_bootleg_shinobi )
 {
-	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-
 	VIDEO_START_CALL(s16a_bootleg);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_SHINOBLD, 0x400, state->sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 }
 
 VIDEO_START( s16a_bootleg_passsht )
 {
-	segas1x_bootleg_state *state = (segas1x_bootleg_state *)machine->driver_data;
-
 	VIDEO_START_CALL(s16a_bootleg);
-	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_16A_BOOTLEG_PASSHTBL, 0x400, state->sprite_xoffs);
 	setup_system16_bootleg_spritebanking(machine);
 }
 

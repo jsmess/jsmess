@@ -1234,6 +1234,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2ja",    CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2jc",    CPS_B_12,     mapper_STF29,  0x36 },
 	{"sf2qp1",   CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2thndr", CPS_B_17,     mapper_STF29,  0x36 },
 	/* from here onwards the CPS-B board has suicide battery and multiply protection */
 	{"3wonders", CPS_B_21_BT1, mapper_RT24B },
 	{"3wondersu",CPS_B_21_BT1, mapper_RT24B },
@@ -1761,7 +1762,7 @@ void cps1_get_video_base( running_machine *machine )
 	state->stars_enabled[0] = layercontrol & state->game_config->layer_enable_mask[3];
 	state->stars_enabled[1] = layercontrol & state->game_config->layer_enable_mask[4];
 
-
+#ifdef MAME_DEBUG
 {
 	int enablemask = 0;
 
@@ -1774,24 +1775,20 @@ void cps1_get_video_base( running_machine *machine )
 	if (state->game_config->layer_enable_mask[1] == state->game_config->layer_enable_mask[2])
 		enablemask = state->game_config->layer_enable_mask[1];
 
-#ifdef MAME_DEBUG
 	if (enablemask)
 	{
 		if (((layercontrol & enablemask) && (layercontrol & enablemask) != enablemask))
 			popmessage("layer %02x contact MAMEDEV", layercontrol & 0xc03f);
 	}
-#endif
 
 	enablemask = state->game_config->layer_enable_mask[0] | state->game_config->layer_enable_mask[1]
 			| state->game_config->layer_enable_mask[2]
 			| state->game_config->layer_enable_mask[3] | state->game_config->layer_enable_mask[4];
 
-#ifdef MAME_DEBUG
 	if (((layercontrol & ~enablemask) & 0x003e) != 0)
 		popmessage("layer %02x contact MAMEDEV", layercontrol & 0xc03f);
-#endif
-
 }
+#endif
 
 }
 

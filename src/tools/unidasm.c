@@ -345,7 +345,6 @@ void free_file_line(void *memory, const char *file, int line)
 	free(memory);
 }
 
-
 void CLIB_DECL logerror(const char *format, ...)
 {
 	/* silent logerrors are allowed in disassemblers */

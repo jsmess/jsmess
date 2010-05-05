@@ -170,6 +170,7 @@ const game_driver * const drivers[] =
 	DRIVER( skyraidr )	/* bootleg */
 	DRIVER( batman2 )	/* bootleg */
 	DRIVER( warofbug )	/* (c) 1981 Armenia */
+	DRIVER( warofbugg )	/* German Version */
 	DRIVER( redufo )	/* bootleg - original should be (c) Artic / Arcade TV Game List (P.104, Left, 25 from top) */
 	DRIVER( exodus )	/* Subelectro - bootleg? */
 	DRIVER( streakng )	/* [1980] Shoei */
@@ -955,6 +956,7 @@ const game_driver * const drivers[] =
 	DRIVER( tekken4 )
 	DRIVER( tekken4a )
 	DRIVER( tekken4b )
+	DRIVER( timecrs3 )
 	DRIVER( zgundm )
 	DRIVER( fghtjam )
 	DRIVER( sukuinuf )
@@ -1304,6 +1306,7 @@ const game_driver * const drivers[] =
 	DRIVER( spcewarl )	/* (c) 1979 Leijac Corporation (Konami) */
 	DRIVER( polaris )	/* PS  (c) 1980 Taito */
 	DRIVER( polarisa )	/* PS  (c) 1980 Taito */
+	DRIVER( polariso )	/* PS  (c) 1980 Taito */
 	DRIVER( ballbomb )	/* TN  (c) 1980 Taito */
 	DRIVER( indianbt )	/* (c) 1980 Taito */
 	DRIVER( steelwkr )	/* (c) 1980 Taito */
@@ -1708,6 +1711,7 @@ const game_driver * const drivers[] =
 	DRIVER( grchamp )	/* GM  (c) 1981 Taito Corporation */
 	DRIVER( marinedt )	/* MG  (c) 1981 Taito Corporation */
 	DRIVER( changela )	/* ??? (c) 1983 Taito Corporation */
+	DRIVER( fspiderb )	/* bootleg */
 	DRIVER( jollyjgr )	/* KD  (c) 1982 Taito Corporation */
 	DRIVER( bking )		/* DM  (c) 1982 Taito Corporation */
 	DRIVER( bking2 )	/* AD6 (c) 1983 Taito Corporation */
@@ -2668,6 +2672,7 @@ V-V                           TP-027
 	DRIVER( sf2ja )		/* 14/02/1991 (c) 1991 (Japan) */
 	DRIVER( sf2jc )		/* 06/03/1991 (c) 1991 (Japan) */
 	DRIVER( sf2qp1 )	/* hack */
+	DRIVER( sf2thndr )	/* hack */
 	DRIVER( 3wonders )	/* 20/05/1991 (c) 1991 (World) */
 	DRIVER( 3wondersu )	/* 20/05/1991 (c) 1991 (US)    */
 	DRIVER( wonder3 )	/* 20/05/1991 (c) 1991 (Japan) */
@@ -3353,6 +3358,7 @@ V-V                           TP-027
 	DRIVER( ddr4mp )	/* 2000 - Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA) */
 	DRIVER( ddr4mps )	/* 2000 - Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA) */
 	DRIVER( dmx2m )		/* 2000 - Dance Maniax 2nd Mix (G*A39 VER. JAA) */
+	DRIVER( fmania )	/* 2000 - Fighting Mania (918 xx B02) */
 	DRIVER( gtrfrk5m )	/* 2001 - Guitar Freaks 5th Mix (G*A26 VER. JAA) */
 	DRIVER( ddr5m )		/* 2001 - Dance Dance Revolution 5th Mix (G*A27 VER. JAA) */
 	DRIVER( dmx2majp )	/* 2001 - Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA ) */
@@ -3993,9 +3999,9 @@ DokiDoki Penguin Land *not confirmed
 						/* 1989.04 Turbo Outrun (US) */
 						/* 1989.?? Turbo Outrun (World) */
 	DRIVER( toutrun )	/* 1987 (FD1094, decrypted) */
-	DRIVER( toutrun2 )	/* 1987 (FD1094, decrypted) */
-	DRIVER( toutrun1 )	/* 1987 (protected) */
-	DRIVER( toutrunu )	/* 1987 (FD1094, decrypted) */
+	DRIVER( toutrun3 )	/* 1987 (FD1094, decrypted) */
+	DRIVER( toutrun2 )	/* 1987 (protected) */
+	DRIVER( toutrun1 )	/* 1987 (FD1094, decrypted) */
 
 	/* X Board */
 	DRIVER( aburner )	/* 1987.07 After Burner (Japan) */
@@ -4496,6 +4502,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	DRIVER( hod2bios )	/* 1998.11 The House of the Dead 2 */
 	DRIVER( hotd2 )		/* 1998.11 The House of the Dead 2 */
+	DRIVER( hotd2o )    	/* 1998.11 The House of the Dead 2 */
 	DRIVER( dybbnao )	/* 1998.12 Dynamite Baseball NAOMI */
 	DRIVER( smlg99 )        /* 1999.?? Super Major League '99 */
 	DRIVER( pstone )	/* 1999.02 Power Stone */
@@ -4518,8 +4525,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jambo )		/* 1999.09 Jambo! Safari */
 						/* 1999.09 Super Major League 99 */
 	DRIVER( sgtetris )	/* 1999.10 Sega Tetris */
-	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club (Ver. C) */
-	DRIVER( derbyocb )	/* 1999.10 Derby Owners Club (Ver. B) */
+	DRIVER( derbyoc )	/* 1999.10 Derby Owners Club */
 	DRIVER( doa2 )		/* 1999.11 Dead or Alive 2 */
 	DRIVER( otrigger )	/* 1999.11 Out Trigger */
 	DRIVER( dybb99 )	/* 1999.11 Dynamite Baseball '99 */
@@ -4564,6 +4570,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sprtjam )	/* 2000.12 Sports Jam */
 						/* 2000.12 Derby Owners Club 2000 ver.2 */
 						/* 2000.?? World Kicks New ver. */
+	DRIVER( derbyocw )	/* 2001.?? Derby Owners Club World Edition (Rev. C) */
 	DRIVER( f355twn2 )	/* 2001.01 F355 Challenge 2 */
 	DRIVER( gwing2 )	/* 2001.01 Giga Wing 2 */
 	DRIVER( csmash )	/* 2001.01 Cosmic Smash */
@@ -7152,6 +7159,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Photon hardware games */
 	DRIVER( phtetris )
 	DRIVER( phpython )
+	DRIVER( phklad )
 
 	/* Photon IK2 hardware */
 	DRIVER( kok )
@@ -7320,6 +7328,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( cupsocs )	/* (c) 1992 Seibu */
 	DRIVER( cupsocs2 )	/* (c) 1992 Seibu */
 	DRIVER( cupsocsb )	/* bootleg */
+	DRIVER( cupsocsb2 )	/* bootleg */
 	DRIVER( olysoc92 )	/* (c) 1992 Seibu */
 	DRIVER( goal92 )	/* bootleg */
 
@@ -8375,7 +8384,8 @@ Other Sun games
 	DRIVER( drgw2c )		/* (c) 1997 */
 	DRIVER( drgw2j )		/* (c) 1997 */
 	DRIVER( drgw3 )			/* (c) 1998 */
-	DRIVER( drgw3k )		/* (c) 1998 */
+	DRIVER( drgw3105 )		/* (c) 1998 */
+	DRIVER( drgw3100 )		/* (c) 1998 */
 	DRIVER( kov )			/* (c) 1999 */
 	DRIVER( kovplus )		/* (c) 1999 */
 	DRIVER( kovplusa )		/* (c) 1999 */
@@ -8827,6 +8837,7 @@ Other Sun games
 	DRIVER( gt103aa )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( gt103asx )	/* (c) 1984 Greyhound Electronics */
 	DRIVER( reelfun )	/* (c) 1986 Grayhound Electronics */
+	DRIVER( reelfun1 )	/* (c) 1986 Grayhound Electronics */
 	DRIVER( findout )	/* (c) 1987 [Elettronolo] */
 	DRIVER( quizvid )   /* (c) 1986 Greyhound Electronics */
 	DRIVER( quiz )		/* (c) 1986 Italian bootleg */
@@ -9008,6 +9019,7 @@ Other Sun games
 	DRIVER( f15se )		/* (c) 1991 Microprose Games Inc. */
 	DRIVER( f15se21 )	/* (c) 1991 Microprose Games Inc. */
 	DRIVER( botss )		/* (c) 1992 Microprose Games Inc. */
+	DRIVER( botssa )	/* (c) 1992 Microprose Games Inc. */
 	DRIVER( tankbatl )	/* (c) 1992 Microprose Games Inc. */
 	DRIVER( dynadice )	/* ? */
 	DRIVER( atamanot )	/* (c) 1983 Yachiyo Denki / Uni Enterprize */
@@ -9101,6 +9113,7 @@ Other Sun games
 	DRIVER( spaceg )	/* (c) 19?? */
 	DRIVER( wldarrow )	/* (c) 1982 */
 	DRIVER( mdrawpkr )	/* (c) 19?? */
+	DRIVER( mdrawpkra )	/* (c) 19?? */
 	DRIVER( laserbas )	/* (c) 1981 Amstar/HOEI */
 	DRIVER( laserbasa )	/* (c) 1981 Amstar/HOEI */
 	DRIVER( futflash )	/* (c) 1981 HOEI (Arcade TV Game List - P.96, Right, 18 from top) */

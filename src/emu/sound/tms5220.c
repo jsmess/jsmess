@@ -14,6 +14,7 @@
      Preliminary MASSIVE merge of tms5110 and tms5220 cores by Lord Nightmare
      Lattice Filter, Multiplier, and clipping redone by Lord Nightmare
      TMS5220C multi-rate feature added by Lord Nightmare
+     Massive rewrite and reorganization by Lord Nightmare
 
      Much information regarding these lpc encoding comes from US patent 4,209,844
      US patent 4,331,836 describes the complete 51xx chip
@@ -42,31 +43,48 @@ Note the standard naming for d* data bits with 7 as MSB and 0 as LSB is in lower
 TI's naming has D7 as LSB and D0 as MSB and is in uppercase
 
 TODO:
-    Implement a ready callback for pc interfaces
+    * Implement a ready callback for pc interfaces
     - this will be quite a challenge since for it to be really accurate
       the whole emulation has to run in sync (lots of timers) with the
       cpu cores.
-    If a command is still executing, /READY will be kept high until the command has
-    finished if the next command is written.
-    tomcat has a 5220 which is not hooked up at all
+    * If a command is still executing, /READY will be kept high until the command has
+      finished if the next command is written.
+    * tomcat has a 5220 which is not hooked up at all
+    * documentation is inconsistent in the patents about what data is returned for chirp rom addresses (base 0) 41 to 51; the patent says the 'rom returns zeroes for locations beyond 40', but at the same time the rom stores the complement of the actual chirp rom value, so are locations beyond 40 = 0x00(0) or = 0xFF(-1)? The latter seems more likely to me, and that is how it is currently implemented. (LN).
+    * Is the TS=0 forcing energy to 0 for next frame in the interpolator actually correct?
+
+Pedantic detail from observation of real chip:
+The 5200 and 5220 chips outputs the following coefficients over PROMOUT while
+'idle' and not speaking, in this order:
+e[0 or f] p[0] k1[0] k2[0] k3[0] k4[0] k5[f] k6[f] k7[f] k8[7] k9[7] k10[7]
+
+Driver specific notes:
+
+    Looping has the tms5220 hookep up directly to the cpu. However currently the
+    tms9900 cpu core does not support a ready line.
+
+    Victory's initial audio selftest is pretty brutal to the FIFO: it sends a
+    sequence of bytes to the FIFO and checks the status bits after each one; if
+    even one bit is in the wrong state (i.e. speech starts one byte too early or
+    late), the test fails!
+    The sample in Victory 'Shields up!' after you activate shields, the 'up' part
+    of the sample is missing the STOP frame at the end of it; this causes the
+    speech core to run out of bits to parse from the FIFO, cutting the sample off
+    by one frame. This appears to be an original game code bug.
 
 Progress list for drivers using old vs new interface:
 starwars: uses new interface (couriersud)
-gauntlet: uses new interface (couriersud
+gauntlet: uses new interface (couriersud)
 atarisy1: uses new interface (Lord Nightmare)
 atarisy2: uses new interface (Lord Nightmare)
 atarijsa: uses new interface (Lord Nightmare)
 firefox: uses new interface (couriersud)
 mhavoc: uses old interface, and is in the machine file instead of the driver.
-monymony(zaccaria.c): uses new interface (couriersud)
+monymony/jackrabt(zaccaria.c): uses new interface (couriersud)
 victory(audio/exidy.c): uses new interface (couriersud)
 looping: uses old interface
 portraits: uses *NO* interface; the i/o cpu hasn't been hooked to anything!
 dotron and midwayfb(mcr.c): uses old interface
-
-Notes:
-    Looping has the tms5220 hookep up directly to the cpu. However currently the
-    tms9900 cpu core does not support a ready line.
 
     Email from Lord Nightmare having a lot more detail follows:
 
@@ -175,18 +193,19 @@ device), PES Speech adapter (serial port connection)
    between current and target to the current each frame */
 #undef OVERRIDE_INTERPOLATION
 
-/* defines how many times to leftshift the chirp rom before feeding to the lattice filter. default is 0 */
-#define CHIRPROM_LEFTSHIFT 0
-
 /* *****debugging defines***** */
 #undef VERBOSE
-// above is general, somewhat obsolete
+// above is general, somewhat obsolete, catch all for debugs which don't fit elsewhere
+#undef DEBUG_DUMP_INPUT_DATA
+// above dumps the data input to the tms52xx to stdout, useful for making logged data dumps for real hardware tests
 #undef DEBUG_FIFO
 // above debugs fifo stuff: writes, reads and flag updates
-#undef DEBUG_FRAME_DUMP
-// above dumps the contents of each decoded speech frame as hex
-#undef DEBUG_FRAME_INFO
-// above dumps information about each decoded speech frame
+#undef DEBUG_PARSE_FRAME_DUMP
+// above dumps each frame to stderr: be sure to select one of the options below if you define it!
+#undef DEBUG_PARSE_FRAME_DUMP_BIN
+// dumps each speech frame as binary
+#undef DEBUG_PARSE_FRAME_DUMP_HEX
+// dumps each speech frame as hex
 #undef DEBUG_FRAME_ERRORS
 // above dumps info if a frame ran out of data
 #undef DEBUG_COMMAND_DUMP
@@ -195,6 +214,10 @@ device), PES Speech adapter (serial port connection)
 // above spams the errorlog with i/o ready messages whenever the ready or irq pin is read
 #undef DEBUG_GENERATION
 // above dumps some debug information related to the sample generation loop, i.e. when ramp frames happen
+#undef DEBUG_GENERATION_VERBOSE
+// above dumps MUCH MORE debug information related to the sample generation loop, namely the k, pitch and energy values for EVERY SINGLE SAMPLE.
+#undef DEBUG_CLIP_WRAP
+// above dumps info to stderr whenever the clip/wrap hardware is (or would be) clipping the signal.
 #undef DEBUG_IO_READY
 // above debugs the io ready callback
 #undef DEBUG_RS_WS
@@ -234,49 +257,42 @@ struct _tms5220_state
 
 
 	/* these contain global status bits */
-	/*
-        R Nabet : speak_external is only set when a speak external command is going on.
-        speaking_now is set whenever a speak or speak external command is going on.
-        Note that we really need to do anything in tms5220_process and play samples only when
-        speaking_now is true.  Else, we can play nothing as well, which is a
-        speed-up...
-    */
-	UINT8 speaking_now;		/* Speak or Speak External command in progress */
-	UINT8 speak_external;	/* Speak External command in progress, writes go to FIFO. */
-	UINT8 talk_status;		/* TS status bit is 1, i.e. speak or speak external is in progress and we have not encountered a stop frame yet; talk_status differs from speaking_now in that speaking_now is set as soon as a speak or speak external command is started; talk_status does NOT go active until after 8 bytes are written to the fifo on a speak external command, otherwise the two are the same. TS is cleared when a STOP command has just been processed in the speech stream, and a new command is about to be processed. */
+	UINT8 speaking_now;		/* True only if actual speech is being generated right now. Is set when a speak vsm command happens OR when speak external happens and buffer low becomes nontrue; Is cleared when speech halts after the last stop frame or the last frame after talk status is otherwise cleared.*/
+	UINT8 speak_external;	/* DDIS is 1, i.e. Speak External command in progress, writes go to FIFO. */
+	UINT8 talk_status;		/* TS status bit is 1 i.e. speak or speak external is in progress and we have not encountered a stop frame yet; talk_status differs from speaking_now in that speaking_now is set as soon as a speak or speak external command is started; talk_status does NOT go active until after 8 bytes are written to the fifo on a speak external command, otherwise the two are the same. TS is cleared by 3 things: 1. when a STOP command has just been processed as a new frame in the speech stream; 2. if the fifo runs out in speak external mode; 3. on power-up/during a reset command; When it gets cleared, speak_external is also cleared, an interrupt is generated, and speaking_now will be cleared when the next frame starts. */
 	UINT8 buffer_low;		/* FIFO has less than 8 bytes in it */
 	UINT8 buffer_empty;		/* FIFO is empty*/
 	UINT8 irq_pin;			/* state of the IRQ pin (output) */
 
 	/* these contain data describing the current and previous voice frames */
-#define OLD_FRAME_STOP_FLAG (tms->old_frame_energy == COEFF_ENERGY_SENTINEL) // 1 if this was a stop (E = 0xF) frame
-#define OLD_FRAME_SILENCE_FLAG (tms->old_frame_energy == 0) // 1 if this was a silence (E=0) frame
-#define OLD_FRAME_UNVOICED_FLAG (tms->old_frame_pitch == 0) // 1 if unvoiced, 0 if voiced
-	UINT16 old_frame_energy;
-	UINT16 old_frame_pitch;
-	INT32 old_frame_k[10];
+#define OLD_FRAME_SILENCE_FLAG (tms->old_frame_energy_idx == 0) // 1 if E=0, 0 otherwise.
+#define OLD_FRAME_UNVOICED_FLAG (tms->old_frame_pitch_idx == 0) // 1 if P=0 (unvoiced), 0 if voiced
+	UINT8 old_frame_energy_idx;
+	UINT8 old_frame_pitch_idx;
+	UINT8 old_frame_k_idx[10];
 
-#define NEW_FRAME_STOP_FLAG (tms->new_frame_energy == COEFF_ENERGY_SENTINEL)  // ditto as above
-#define NEW_FRAME_SILENCE_FLAG (tms->new_frame_energy == 0) // ditto as above
-#define NEW_FRAME_UNVOICED_FLAG (tms->new_frame_pitch == 0) // ditto as above
-	UINT16 new_frame_energy;
-	UINT16 new_frame_pitch;
-	INT32 new_frame_k[10];
+#define NEW_FRAME_STOP_FLAG (tms->new_frame_energy_idx == 0xF) // 1 if this is a stop (Energy = 0xF) frame
+#define NEW_FRAME_SILENCE_FLAG (tms->new_frame_energy_idx == 0) // ditto as above
+#define NEW_FRAME_UNVOICED_FLAG (tms->new_frame_pitch_idx == 0) // ditto as above
+	UINT8 new_frame_energy_idx;
+	UINT8 new_frame_pitch_idx;
+	UINT8 new_frame_k_idx[10];
 
 
 	/* these are all used to contain the current state of the sound generation */
 	UINT16 current_energy;
 	UINT16 current_pitch;
-	INT32 current_k[10];
+	INT16 current_k[10];
 
 	UINT16 target_energy;
 	UINT16 target_pitch;
-	INT32 target_k[10];
+	INT16 target_k[10];
 
 	UINT16 previous_energy;         /* needed for lattice filter to match patent */
 
 	//UINT8 interp_period; /* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
 	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24 */
+	//UINT8 spkslow_delay;  /* delay counter for interp count, only used on tms51xx */
 	UINT8 sample_count;		/* number of samples within the ENTIRE interpolation period, ranges from 0-199 */
 	UINT8 tms5220c_rate; /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
 	UINT16 pitch_count;		/* pitch counter; provides chirp rom address */
@@ -358,6 +374,7 @@ void tms5220_set_variant(tms5220_state *tms, int variant)
 			break;
 		case TMS5220_IS_5200:
 			tms->coeff = &tms5200_coeff;
+			//tms->coeff = &pat4335277_coeff;
 			break;
 		case TMS5220_IS_5220:
 			tms->coeff = &tms5220_coeff;
@@ -385,13 +402,13 @@ static void register_for_save_states(tms5220_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->buffer_empty);
 	state_save_register_device_item(tms->device, 0, tms->irq_pin);
 
-	state_save_register_device_item(tms->device, 0, tms->old_frame_energy);
-	state_save_register_device_item(tms->device, 0, tms->old_frame_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->old_frame_k);
+	state_save_register_device_item(tms->device, 0, tms->old_frame_energy_idx);
+	state_save_register_device_item(tms->device, 0, tms->old_frame_pitch_idx);
+	state_save_register_device_item_array(tms->device, 0, tms->old_frame_k_idx);
 
-	state_save_register_device_item(tms->device, 0, tms->new_frame_energy);
-	state_save_register_device_item(tms->device, 0, tms->new_frame_pitch);
-	state_save_register_device_item_array(tms->device, 0, tms->new_frame_k);
+	state_save_register_device_item(tms->device, 0, tms->new_frame_energy_idx);
+	state_save_register_device_item(tms->device, 0, tms->new_frame_pitch_idx);
+	state_save_register_device_item_array(tms->device, 0, tms->new_frame_k_idx);
 
 	state_save_register_device_item(tms->device, 0, tms->current_energy);
 	state_save_register_device_item(tms->device, 0, tms->current_pitch);
@@ -425,12 +442,53 @@ static void register_for_save_states(tms5220_state *tms)
 
 /**********************************************************************************************
 
+      printbits helper function: takes a long int input and prints the resulting bits to stderr
+
+ **********************************************************************************************/
+
+#ifdef DEBUG_PARSE_FRAME_DUMP_BIN
+static void printbits(long data, int num)
+{
+	int i;
+	for (i=(num-1); i>=0; i--)
+		fprintf(stderr,"%0ld", (data>>i)&1);
+}
+#endif
+#ifdef DEBUG_PARSE_FRAME_DUMP_HEX
+static void printbits(long data, int num)
+{
+	switch((num-1)&0xFC)
+	{
+		case 0:
+			fprintf(stderr,"%0lx", data);
+			break;
+		case 4:
+			fprintf(stderr,"%02lx", data);
+			break;
+		case 8:
+			fprintf(stderr,"%03lx", data);
+			break;
+		case 12:
+			fprintf(stderr,"%04lx", data);
+			break;
+		default:
+			fprintf(stderr,"%04lx", data);
+			break;
+	}
+}
+#endif
+
+/**********************************************************************************************
+
      tms5220_data_write -- handle a write to the TMS5220
 
 ***********************************************************************************************/
 
 static void tms5220_data_write(tms5220_state *tms, int data)
 {
+#ifdef DEBUG_DUMP_INPUT_DATA
+	fprintf(stdout, "%c",data);
+#endif
 	if (tms->speak_external) // If we're in speak external mode
 	{
 		/* add this byte to the FIFO */
@@ -439,22 +497,33 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 			tms->fifo[tms->fifo_tail] = data;
 			tms->fifo_tail = (tms->fifo_tail + 1) % FIFO_SIZE;
 			tms->fifo_count++;
-
-			/* if we were speaking, then we're no longer empty */
-			if (tms->speak_external)
-				tms->buffer_empty = 0;
 #ifdef DEBUG_FIFO
 			logerror("data_write: Added byte to FIFO (current count=%2d)\n", tms->fifo_count);
+#endif
+			update_status_and_ints(tms);
+			if ((tms->talk_status == 0) && (tms->buffer_low == 0)) // we just unset buffer low with that last write, and talk status *was* zero...
+			{
+			int i;
+#ifdef DEBUG_FIFO
+			logerror("data_write triggered talk status to go active!\n");
+#endif
+				/* ...then we now have enough bytes to start talking; clear out the new frame parameters (it will become old frame just before the first call to parse_frame() ) */
+				tms->new_frame_energy_idx = 0;
+				tms->new_frame_pitch_idx = 0;
+				for (i = 0; i < tms->coeff->num_k; i++)
+					tms->new_frame_k_idx[i] = 0;
+				tms->talk_status = tms->speaking_now = 1;
+			}
 		}
 		else
 		{
-
-			logerror("data_write: Ran out of room in the FIFO!\n");
+#ifdef DEBUG_FIFO
+			logerror("data_write: Ran out of room in the tms52xx FIFO! this should never happen!\n");
 			// at this point, /READY should remain HIGH/inactive until the fifo has at least one byte open in it.
 #endif
 		}
 
-		update_status_and_ints(tms);
+
 	}
 	else //(! tms->speak_external)
 		/* R Nabet : we parse commands at once.  It is necessary for such commands as read. */
@@ -500,10 +569,12 @@ static void update_status_and_ints(tms5220_state *tms)
     mode, it is immediately unset here. */
 	if ((tms->speak_external == 1) && (tms->buffer_empty == 1))
 	{
-		/* generate an interrupt if necessary; if /TS was active and is now inactive, set int. */
-        if (tms->talk_status == 1)
-            set_interrupt_state(tms, 1);
-		tms->talk_status = 0;
+		/* generate an interrupt: /TS was active, and is now inactive. */
+		if (tms->talk_status == 1)
+		{
+			tms->talk_status = tms->speak_external = 0;
+			set_interrupt_state(tms, 1);
+		}
 	}
 	/* Note that TS being unset will also generate an interrupt when a STOP
     frame is encountered; this is handled in the sample generator code and not here */
@@ -672,7 +743,7 @@ static int tms5220_int_read(tms5220_state *tms)
 static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size)
 {
     int buf_count=0;
-    int i, interp_period, bitout;
+    int i, interp_period, bitout, zpar;
 
 //tryagain:
 
@@ -682,92 +753,67 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
     /* if speak external is set, but talk status is not (yet) set,
     wait for buffer low to clear */
-	if (!tms->talk_status && tms->speak_external)
-    {
-        if (tms->buffer_low == 1)
+	if (!tms->talk_status && tms->speak_external && (tms->buffer_low == 1))
            goto empty;
 
-		/* we now have enough bytes; clear out the new frame parameters (it will become old frame just before the first call to parse_frame() ) */
-		tms->new_frame_energy = 0;
-		tms->new_frame_pitch = 0;
-		for (i = 0; i < tms->coeff->num_k; i++)
-			tms->new_frame_k[i] = 0;
-
-        tms->talk_status = 1;
-	}
-
     /* loop until the buffer is full or we've stopped speaking */
-	while ((size > 0) && tms->talk_status)
+	while ((size > 0) && tms->speaking_now)
     {
 
         /* if we're ready for a new frame */
         if ((tms->interp_count == 0) && (tms->sample_count == 0))
         {
+			/* appropriately override the initial sample count */
+			tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
 
 			/* remember previous frame energy, pitch, and coefficients */
-			tms->old_frame_energy = tms->new_frame_energy;
-			tms->old_frame_pitch = tms->new_frame_pitch;
+			tms->old_frame_energy_idx = tms->new_frame_energy_idx;
+			tms->old_frame_pitch_idx = tms->new_frame_pitch_idx;
 			for (i = 0; i < tms->coeff->num_k; i++)
-				tms->old_frame_k[i] = tms->new_frame_k[i];
+				tms->old_frame_k_idx[i] = tms->new_frame_k_idx[i];
 
-			/* if the old frame was a stop frame, exit and do not process any more frames */
-			if (OLD_FRAME_STOP_FLAG)
+			/* if the talk status was clear last frame, halt speech now. */
+			if (tms->talk_status == 0)
 			{
 #ifdef DEBUG_GENERATION
-				logerror("tms5220_process: processing frame: stop frame\n");
+				fprintf(stderr,"tms5220_process: processing frame: talk status = 0 caused by stop frame or buffer empty, halting speech.\n");
 #endif
-				tms->speaking_now = tms->talk_status = tms->speak_external = 0;
-				set_interrupt_state(tms, 1); // TS went inactive, so int is raised
-				tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
-				update_status_and_ints(tms);
+				tms->speaking_now = 0; // finally halt speech
 				goto empty;
 			}
 
 
 			/* Parse a new frame into the new_target_energy, new_target_pitch and new_target_k[] */
 			parse_frame(tms);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+			fprintf(stderr,"\n");
+#endif
 
-
-			/* Set old frame targets as starting point of new frame */
-			tms->current_energy = tms->old_frame_energy;
-			tms->current_pitch = tms->old_frame_pitch;
-			for (i = 0; i < tms->coeff->num_k; i++)
-				tms->current_k[i] = tms->old_frame_k[i];
-
+			/* if the new frame is a stop frame, set an interrupt and set talk status to 0 */
+			if (NEW_FRAME_STOP_FLAG == 1)
+				{
+					tms->talk_status = tms->speak_external = 0;
+					set_interrupt_state(tms, 1);
+					update_status_and_ints(tms);
+				}
 
 			/* in all cases where interpolation would be inhibited, set the target
                value equal to the current value.
                Interpolation inhibit cases:
                * Old frame was voiced, new is unvoiced
-               * Old frame was silence/zero energy, new is unvoiced
+               * Old frame was silence/zero energy, new has nonzero energy
                * Old frame was unvoiced, new is voiced
-               * New frame is a silence/zero energy frame - ? not sure
-               * New frame is a stop frame - ? not sure
             */
-			if ( ((NEW_FRAME_SILENCE_FLAG == 0) && (NEW_FRAME_STOP_FLAG == 0))
-			&& ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
-				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 1))
-				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0)) )
-				)
+			if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
+				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
+				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) )
 			{
 #ifdef DEBUG_GENERATION
-				logerror("processing frame: interpolation inhibited\n");
-				logerror("*** current Energy = %d\n",tms->current_energy);
-				logerror("*** next frame Energy = %d\n",tms->new_frame_energy);
+				fprintf(stderr,"processing frame: interpolation inhibited\n");
+				fprintf(stderr,"*** current Energy = %d\n",tms->current_energy);
+				fprintf(stderr,"*** next frame Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
 #endif
 				tms->target_energy = tms->current_energy;
-				tms->target_pitch = tms->current_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i];
-			}
-			/* in cases where the new frame is a STOP or SILENCE frame,
-               ramp the energy down to 0, leaving everything else alone. */
-			else if ((NEW_FRAME_SILENCE_FLAG == 1) || (NEW_FRAME_STOP_FLAG == 1))
-			{
-#ifdef DEBUG_GENERATION
-				logerror("processing frame: ramp-down (energy = 0 or STOP)\n";
-#endif
-				tms->target_energy = 0;
 				tms->target_pitch = tms->current_pitch;
 				for (i = 0; i < tms->coeff->num_k; i++)
 					tms->target_k[i] = tms->current_k[i];
@@ -775,15 +821,27 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			else // normal frame, normal interpolation
 			{
 #ifdef DEBUG_GENERATION
-				logerror("processing frame: Normal\n");
-				logerror("*** current Energy = %d\n",tms->current_energy);
-				logerror("*** new (target) Energy = %d\n",tms->new_frame_energy);
+				fprintf(stderr,"processing frame: Normal\n");
+				fprintf(stderr,"*** current Energy = %d\n",tms->current_energy);
+				fprintf(stderr,"*** new (target) Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
 #endif
 
-				tms->target_energy = tms->new_frame_energy;
-				tms->target_pitch = tms->new_frame_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->new_frame_k[i];
+				tms->target_energy = tms->coeff->energytable[tms->new_frame_energy_idx];
+				tms->target_pitch = tms->coeff->pitchtable[tms->new_frame_pitch_idx];
+				zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
+				for (i = 0; i < 4; i++)
+					tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
+				for (i = 4; i < tms->coeff->num_k; i++)
+						tms->target_k[i] = (tms->coeff->ktable[i][tms->new_frame_k_idx[i]] * (1-zpar));
+			}
+
+			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
+			if ( (tms->talk_status == 0))
+			{
+#ifdef DEBUG_GENERATION
+				fprintf(stderr,"Talk status is 0, forcing target energy to 0\n");
+#endif
+				tms->target_energy = 0;
 			}
 		}
 		else // Not a new frame, just interpolate the existing frame.
@@ -793,6 +851,8 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 #else
 			interp_period = tms->sample_count / 25;
 #endif
+#define PC_COUNT_LOAD 0
+		zpar = OLD_FRAME_UNVOICED_FLAG;
 		switch(tms->interp_count)
 			{
 				/*         PC=X  X cycle, rendering change (change for next cycle which chip is actually doing) */
@@ -801,61 +861,85 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				case 1: /* PC=0, B cycle, nothing happens (update energy) */
 				break;
 				case 2: /* PC=1, A cycle, update energy (calc pitch) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
 				tms->current_energy += ((tms->target_energy - tms->current_energy) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 3: /* PC=1, B cycle, nothing happens (update pitch) */
 				break;
 				case 4: /* PC=2, A cycle, update pitch (calc K1) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
 				tms->current_pitch += ((tms->target_pitch - tms->current_pitch) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 5: /* PC=2, B cycle, nothing happens (update K1) */
 				break;
 				case 6: /* PC=3, A cycle, update K1 (calc K2) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[0] = tms->coeff->ktable[0][tms->old_frame_k_idx[0]];
 				tms->current_k[0] += ((tms->target_k[0] - tms->current_k[0]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 7: /* PC=3, B cycle, nothing happens (update K2) */
 				break;
 				case 8: /* PC=4, A cycle, update K2 (calc K3) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[1] = tms->coeff->ktable[1][tms->old_frame_k_idx[1]];
 				tms->current_k[1] += ((tms->target_k[1] - tms->current_k[1]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 9: /* PC=4, B cycle, nothing happens (update K3) */
 				break;
 				case 10: /* PC=5, A cycle, update K3 (calc K4) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[2] = tms->coeff->ktable[2][tms->old_frame_k_idx[2]];
 				tms->current_k[2] += ((tms->target_k[2] - tms->current_k[2]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 11: /* PC=5, B cycle, nothing happens (update K4) */
 				break;
 				case 12: /* PC=6, A cycle, update K4 (calc K5) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[3] = tms->coeff->ktable[3][tms->old_frame_k_idx[3]];
 				tms->current_k[3] += ((tms->target_k[3] - tms->current_k[3]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 13: /* PC=6, B cycle, nothing happens (update K5) */
 				break;
 				case 14: /* PC=7, A cycle, update K5 (calc K6) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[4] = (tms->coeff->ktable[4][tms->old_frame_k_idx[4]] * (1-zpar));
 				tms->current_k[4] += ((tms->target_k[4] - tms->current_k[4]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 15: /* PC=7, B cycle, nothing happens (update K6) */
 				break;
 				case 16: /* PC=8, A cycle, update K6 (calc K7) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[5] = (tms->coeff->ktable[5][tms->old_frame_k_idx[5]] * (1-zpar));
 				tms->current_k[5] += ((tms->target_k[5] - tms->current_k[5]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 17: /* PC=8, B cycle, nothing happens (update K7) */
 				break;
 				case 18: /* PC=9, A cycle, update K7 (calc K8) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[6] = (tms->coeff->ktable[6][tms->old_frame_k_idx[6]] * (1-zpar));
 				tms->current_k[6] += ((tms->target_k[6] - tms->current_k[6]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 19: /* PC=9, B cycle, nothing happens (update K8) */
 				break;
 				case 20: /* PC=10, A cycle, update K8 (calc K9) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[7] = (tms->coeff->ktable[7][tms->old_frame_k_idx[7]] * (1-zpar));
 				tms->current_k[7] += ((tms->target_k[7] - tms->current_k[7]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 21: /* PC=10, B cycle, nothing happens (update K9) */
 				break;
 				case 22: /* PC=11, A cycle, update K9 (calc K10) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[8] = (tms->coeff->ktable[8][tms->old_frame_k_idx[8]] * (1-zpar));
 				tms->current_k[8] += ((tms->target_k[8] - tms->current_k[8]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 				case 23: /* PC=11, B cycle, nothing happens (update K10) */
 				break;
 				case 24: /* PC=12, A cycle, update K10 (do nothing) */
+				if (interp_period == PC_COUNT_LOAD)
+					tms->current_k[9] = (tms->coeff->ktable[9][tms->old_frame_k_idx[9]] * (1-zpar));
 				tms->current_k[9] += ((tms->target_k[9] - tms->current_k[9]) >> tms->coeff->interp_coeff[interp_period]);
 				break;
 			}
@@ -865,28 +949,38 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 		if (OLD_FRAME_UNVOICED_FLAG == 1)
 		{
 			/* generate unvoiced samples here */
+#ifdef NORMALMODE
 			if (tms->RNG & 1)
-				tms->excitation_data = -0x40; /* according to the patent it is (either + or -) half of the maximum value in the chirp table, so +-64 */
+				tms->excitation_data = ~0x3F; /* according to the patent it is (either + or -) half of the maximum value in the chirp table, so either 01000000(0x40) or 11000000(0xC0)*/
 			else
 				tms->excitation_data = 0x40;
+#else
+			if (tms->RNG & 1)
+				tms->excitation_data = ~0x7F;
+			else
+				tms->excitation_data = 0x80;
+#endif
         }
         else
         {
             /* generate voiced samples here */
             /* US patent 4331836 Figure 14B shows, and logic would hold, that a pitch based chirp
              * function has a chirp/peak and then a long chain of zeroes.
-             * The last entry of the chirp rom is at address 0b110011 (50d), the 51st sample,
+             * The last entry of the chirp rom is at address 0b110011 (51d), the 52nd sample,
              * and if the address reaches that point the ADDRESS incrementer is
-             * disabled, forcing all samples beyond 50d to be == 50d
-             * (address 50d holds zeroes)
+             * disabled, forcing all samples beyond 51d to be == 51d
+             * (address 51d holds zeroes, which may or may not be inverted to -1)
              */
 #ifdef NORMALMODE
-          if (tms->pitch_count > 50)
-              tms->excitation_data = tms->coeff->chirptable[50]<<CHIRPROM_LEFTSHIFT;
-          else /*tms->pitch_count <= 50*/
-              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]<<CHIRPROM_LEFTSHIFT;
+          if (tms->pitch_count >= 51)
+              tms->excitation_data = tms->coeff->chirptable[51];
+          else /*tms->pitch_count < 51*/
+              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
 #else
-			 tms->excitation_data = tms->pitch_count - 64;
+          if (tms->pitch_count >= 51)
+              tms->excitation_data = tms->coeff->chirptable[51]^0xFF;
+          else /*tms->pitch_count < 51*/
+              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]^0xFF;
 #endif
         }
 
@@ -900,7 +994,12 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
             tms->RNG >>= 1;
             tms->RNG |= bitout << 12;
 	}
-
+#ifdef DEBUG_GENERATION_VERBOSE
+		fprintf(stderr,"X:%04d; E:%04d; P:%04d; Pc:%04d ",tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
+		for (i=0; i<10; i++)
+			fprintf(stderr,"K%d:%04d ", i+1, tms->current_k[i]);
+		fprintf(stderr,"\n");
+#endif
 		buffer[buf_count] = clip_and_wrap(lattice_filter(tms)); /* execute lattice filter and clipping/wrapping */
 
         //if (tms->digital_select == 0) /* if digital is NOT selected... */
@@ -910,14 +1009,8 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 
         size--;
         tms->sample_count = (tms->sample_count + 1) % 200;
-#ifdef NORMALMODE
-        if (tms->current_pitch != 0)
-            tms->pitch_count = (tms->pitch_count + 1) % tms->current_pitch;
-        else
-            tms->pitch_count = 51; // blank spot in the chirp rom
-#else
-		    tms->pitch_count = (tms->pitch_count + 1) % 128;
-#endif
+        tms->pitch_count++;
+        if (tms->pitch_count >= tms->current_pitch) tms->pitch_count = 0;
 
         tms->interp_count = (tms->interp_count + 1) % 25;
         buf_count++;
@@ -929,7 +1022,7 @@ empty:
     {
 		tms->sample_count = (tms->sample_count + 1) % 200;
 		tms->interp_count = (tms->interp_count + 1) % 25;
-		buffer[buf_count] = 0x00;	/* should be (-1 << 8) ??? (cf note in data sheet, p 10, table 4) */
+		buffer[buf_count] = -1<<4;	/* should be (-1 << 8) ??? (cf note in data sheet, p 10, table 4) */
         buf_count++;
         size--;
     }
@@ -955,9 +1048,13 @@ static INT16 clip_and_wrap(INT16 cliptemp)
        00 0bcd efgh xxxx -> 0b0bcdefgh
        0x xxxx xxxx xxxx -> 0b01111111
        */
+#ifdef DEBUG_CLIP_WRAP
+	if ((cliptemp > 2047) || (cliptemp < -2048)) fprintf(stderr,"clipping cliptemp to range; was %d\n", cliptemp);
+#endif
 #ifdef DO_CLIP_AND_WRAP
 	if (cliptemp > 2047) cliptemp = 2047;
 	else if (cliptemp < -2048) cliptemp = -2048;
+	//cliptemp &= 0xFFF0;
 	/* at this point the analog output is tapped*/
 	return cliptemp << 4;
 #else
@@ -971,7 +1068,7 @@ static INT16 clip_and_wrap(INT16 cliptemp)
      ti_matrix_multiply -- does the proper multiply and shift as the TI chips do.
      a is the k coefficient and is clamped to 10 bits (9 bits plus a sign)
      b is the running result and is clamped to 14 bits.
-     output is 14 bits, but note the result LSB bit is always 1.
+     output is 14 bits, but note the result LSB bit is always 1. (or is it?)
 
 **********************************************************************************************/
 static INT16 matrix_multiply(INT16 a, INT16 b)
@@ -981,7 +1078,11 @@ static INT16 matrix_multiply(INT16 a, INT16 b)
 	while (a<-512) { a+=1024; }
 	while (b>16383) { b-=32768; }
 	while (b<-16384) { b+=32768; }
+#ifdef NORMALMODE
 	result = ((a*b)>>9)|1;
+#else
+	result = (a*b)>>9;
+#endif
 #ifdef VERBOSE
 	if (result>16383) fprintf(stderr,"matrix multiplier overflowed! a: %x, b: %x", a, b);
 	if (result<-16384) fprintf(stderr,"matrix multiplier underflowed! a: %x, b: %x", a, b);
@@ -1007,7 +1108,7 @@ static INT16 lattice_filter(tms5220_state *tms)
       Kn = tms->current_k[n-1]
       bn = tms->x[n-1]
     */
-		tms->u[10] = matrix_multiply(tms->current_energy, (tms->excitation_data*64));  //Y(11)
+		tms->u[10] = matrix_multiply(tms->previous_energy, (tms->excitation_data*64));  //Y(11)
 		//tms->u[10] = matrix_multiply((tms->excitation_data*64), tms->current_energy); // wrong but sounds better
         tms->u[9] = tms->u[10] - matrix_multiply(tms->current_k[9], tms->x[9]);
         tms->u[8] = tms->u[9] - matrix_multiply(tms->current_k[8], tms->x[8]);
@@ -1110,7 +1211,7 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
 			{
 				//SPKEXT going active activates SPKEE which clears the fifo
 				tms->fifo_head = tms->fifo_tail = tms->fifo_count = tms->fifo_bits_taken = 0;
-				tms->speaking_now = tms->speak_external = 1;
+				tms->speak_external = 1;
 				tms->RDB_flag = FALSE;
 			}
 			break;
@@ -1138,117 +1239,90 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
 
 static void parse_frame(tms5220_state *tms)
 {
-	int bits, indx, i, rep_flag;
-#ifdef DEBUG_FRAME_DUMP
-	int ene;
-#endif
+	int indx, i, rep_flag;
 
-	// todo: we actually don't care how many bits are left in the fifo here; the frame subpart will be processed normally, and any bits extracted 'past the end' of the fifo will be read as zeroes; the fifo being emptied will set the /BE latch which will halt speech exactly as if a stop frame had been encountered (instead of whatever partial frame was read); the same exact circuitry is used for both on the real chip, see us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS (decode disable) which is active during speak external).
-	if (tms->speak_external)
-	{
-		/* count the total number of bits available */
-		bits = ((tms->fifo_count)*8)-tms->fifo_bits_taken;
-	}
-	else
-	{
-		/* we're talking out of a vsm rom, hence we have an effectively infinite number of bits which are pullable. extract_bits will toggle M0 for us and grab what bits are needed */
-		bits = 131072; // == arbitrary large number
-	}
+	// We actually don't care how many bits are left in the fifo here; the frame subpart will be processed normally, and any bits extracted 'past the end' of the fifo will be read as zeroes; the fifo being emptied will set the /BE latch which will halt speech exactly as if a stop frame had been encountered (instead of whatever partial frame was read); the same exact circuitry is used for both on the real chip, see us patent 4335277 sheet 16, gates 232a (decode stop frame) and 232b (decode /BE plus DDIS (decode disable) which is active during speak external).
+
 	/* if the chip is a tms5220C, and the rate mode is set to that each frame (0x04 bit set)
     has a 2 bit rate preceeding it, grab two bits here and store them as the rate; */
 	if ((tms->variant == SUBTYPE_TMS5220C) && (tms->tms5220c_rate & 0x04))
 	{
-		bits -= 2;
-		if (bits < 0) goto ranout;
 		indx = extract_bits(tms, 2);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(indx,2);
+		fprintf(stderr," ");
+#endif
 		tms->sample_count = reload_table[indx];
 	}
 	else // non-5220C and 5220C in fixed rate mode
 	tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
 
+	update_status_and_ints(tms);
+	if (!tms->talk_status) goto ranout;
+
 	/* attempt to extract the energy index */
-	bits -= tms->coeff->energy_bits;
-	if (bits < 0) goto ranout;
-	indx = extract_bits(tms,tms->coeff->energy_bits);
-	tms->new_frame_energy = tms->coeff->energytable[indx];
-#ifdef DEBUG_FRAME_DUMP
-	ene = indx;
+	tms->new_frame_energy_idx = extract_bits(tms,tms->coeff->energy_bits);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(tms->new_frame_energy_idx,tms->coeff->energy_bits);
+	fprintf(stderr," ");
 #endif
-
+	update_status_and_ints(tms);
+	if (!tms->talk_status) goto ranout;
 	/* if the energy index is 0 or 15, we're done */
-
-	if ((indx == 0) || (indx == 15))
-	{
-#ifdef DEBUG_FRAME_INFO
-		logerror("  (4-bit energy=%d frame)\n",tms->new_frame_energy);
-#endif
+	if ((tms->new_frame_energy_idx == 0) || (tms->new_frame_energy_idx == 15))
 		return;
-	}
+
 
 	/* attempt to extract the repeat flag */
-	bits -= 1;
-	if (bits < 0) goto ranout;
 	rep_flag = extract_bits(tms,1);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(rep_flag, 1);
+	fprintf(stderr," ");
+#endif
 
 	/* attempt to extract the pitch */
-	bits -= tms->coeff->pitch_bits;
-	if (bits < 0) goto ranout;
-	indx = extract_bits(tms,tms->coeff->pitch_bits);
-	tms->new_frame_pitch = tms->coeff->pitchtable[indx];
-
+	tms->new_frame_pitch_idx = extract_bits(tms,tms->coeff->pitch_bits);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+	printbits(tms->new_frame_pitch_idx,tms->coeff->pitch_bits);
+	fprintf(stderr," ");
+#endif
+	update_status_and_ints(tms);
+	if (!tms->talk_status) goto ranout;
 	/* if this is a repeat frame, just copy the k's */
 	if (rep_flag)
-	{
-	//actually, we do nothing because the k's were already loaded (on parsing the previous frame)
+		return;
 
-#ifdef DEBUG_FRAME_INFO
-		logerror("  (10-bit energy=%d pitch=%d rep=%d frame)\n", tms->new_frame_energy, tms->new_frame_pitch, rep_flag);
+	/* extract first 4 K coefficients */
+	for (i = 0; i < 4; i++)
+	{
+		tms->new_frame_k_idx[i] = extract_bits(tms,tms->coeff->kbits[i]);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(tms->new_frame_k_idx[i],tms->coeff->kbits[i]);
+		fprintf(stderr," ");
 #endif
+		update_status_and_ints(tms);
+		if (!tms->talk_status) goto ranout;
+	}
+
+	/* if the pitch index was zero, we only need 4 K's... */
+	if (tms->new_frame_pitch_idx == 0)
+	{
+		/* and the rest of the coefficients are zeroed, but that's done in the generator code */
 		return;
 	}
 
-
-	/* if the pitch index was zero, we need 4 k's */
-	if (indx == 0)
+	/* If we got here, we need the remaining 6 K's */
+	for (i = 4; i < tms->coeff->num_k; i++)
 	{
-		/* attempt to extract 4 K's */
-		bits -= 18;
-		if (bits < 0) goto ranout;
-		for (i = 0; i < 4; i++)
-			tms->new_frame_k[i] = tms->coeff->ktable[i][extract_bits(tms,tms->coeff->kbits[i])];
-
-	/* and clear the rest of the new_frame_k[] */
-		for (i = 4; i < tms->coeff->num_k; i++)
-			tms->new_frame_k[i] = 0;
-#ifdef DEBUG_FRAME_INFO
-		logerror("  (29-bit energy=%d pitch=%d rep=%d 4K frame)\n", tms->new_frame_energy, tms->new_frame_pitch, rep_flag);
+		tms->new_frame_k_idx[i] = extract_bits(tms, tms->coeff->kbits[i]);
+#ifdef DEBUG_PARSE_FRAME_DUMP
+		printbits(tms->new_frame_k_idx[i],tms->coeff->kbits[i]);
+		fprintf(stderr," ");
 #endif
-		return;
+		update_status_and_ints(tms);
+		if (!tms->talk_status) goto ranout;
 	}
-
-	/* else we need 10 K's */
-	bits -= 39;
-	if (bits < 0) goto ranout;
-#ifdef DEBUG_FRAME_DUMP
-	logerror("FrameDump %02d ", ene);
-	for (i = 0; i < tms->coeff->num_k; i++)
-	{
-		int x;
-		x = extract_bits(tms, tms->coeff->kbits[i]);
-		tms->new_frame_k[i] = tms->coeff->ktable[i][x];
-		logerror("%02d ", x);
-	}
-	logerror("\n");
-#else
-	for (i = 0; i < tms->coeff->num_k; i++)
-	{
-		int x;
-		x = extract_bits(tms, tms->coeff->kbits[i]);
-		tms->new_frame_k[i] = tms->coeff->ktable[i][x];
-	}
-#endif
-#ifdef DEBUG_FRAME_INFO
-	logerror("  (50-bit energy=%d pitch=%d rep=%d 10K frame))\n", tms->new_frame_energy, tms->new_frame_pitch, rep_flag);
+#ifdef VERBOSE
 	if (tms->speak_external)
 		logerror("Parsed a frame successfully in FIFO - %d bits remaining\n", bits);
 	else
@@ -1260,17 +1334,7 @@ static void parse_frame(tms5220_state *tms)
 #ifdef DEBUG_FRAME_ERRORS
     logerror("Ran out of bits on a parse!\n");
 #endif
-    /* this is an error condition; mark the buffer empty and turn off speaking */
-    tms->buffer_empty = 1;
-	tms->talk_status = tms->speak_external = tms->speaking_now = 0;
-    tms->fifo_count = tms->fifo_head = tms->fifo_tail = 0;
-
-	tms->RDB_flag = FALSE;
-
-    /* generate an interrupt since TS went low */
-    set_interrupt_state(tms, 1);
-    return;
-
+	return;
 }
 
 /**********************************************************************************************
@@ -1376,10 +1440,10 @@ static DEVICE_RESET( tms5220 )
 	tms->RDB_flag = FALSE;
 
 	/* initialize the energy/pitch/k states */
-	tms->old_frame_energy = tms->new_frame_energy = tms->current_energy = tms->target_energy = 0;
-	tms->old_frame_pitch = tms->new_frame_pitch = tms->current_pitch = tms->target_pitch = 0;
-	memset(tms->old_frame_k, 0, sizeof(tms->old_frame_k));
-	memset(tms->new_frame_k, 0, sizeof(tms->new_frame_k));
+	tms->old_frame_energy_idx = tms->new_frame_energy_idx = tms->current_energy = tms->target_energy = 0;
+	tms->old_frame_pitch_idx = tms->new_frame_pitch_idx = tms->current_pitch = tms->target_pitch = 0;
+	memset(tms->old_frame_k_idx, 0, sizeof(tms->old_frame_k_idx));
+	memset(tms->new_frame_k_idx, 0, sizeof(tms->new_frame_k_idx));
 	memset(tms->current_k, 0, sizeof(tms->current_k));
 	memset(tms->target_k, 0, sizeof(tms->target_k));
 
@@ -1477,11 +1541,12 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 			logerror("Schedule write ready\n");
 #endif
 			//tms->io_ready = 1;
-			///* 100 nsec from data sheet */
-			//timer_set(tms->device->machine, ATTOTIME_IN_NSEC(100), tms, 0, io_ready_cb);
+			/* 100 nsec from data sheet, through 3 asynchronous gates on patent */
+			//timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // /READY goes inactive immediately, within one clock... for that matter, what do we even need a timer for then?
 			tms->io_ready = 0;
-			/* 25 usec in datasheet, but zaccaria won't work */
-			timer_set(tms->device->machine, ATTOTIME_IN_USEC(100), tms, 1, io_ready_cb);
+			/* 25 usec (16 clocks) in datasheet, but zaccaria games glitch or fail to talk if that value is used. The zaccaria glitching may be buggy game code or may be a bug with the MAME 6821 PIA code which interfaces with the tms5200, particularly its handling of updates of the CA1 and CA2 lines? */
+			//timer_set(tms->device->machine, ATTOTIME_IN_USEC(100), tms, 1, io_ready_cb);
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11?) cycles to complete
 		}
 	}
 }
@@ -1525,9 +1590,10 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 		{
 			///* high to low - schedule ready cycle*/
 			//tms->io_ready = 1;
-			//timer_set(tms->device->machine, ATTOTIME_IN_NSEC(100), tms, 0, io_ready_cb);
+			/* 100 nsec from data sheet, through 3 asynchronous gates on patent */
+			//timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // /READY goes inactive immediately, within one clock... for that matter, what do we even need a timer for then?
 			tms->io_ready = 0;
-			timer_set(tms->device->machine, ATTOTIME_IN_USEC(25), tms, 1, io_ready_cb);
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete
 		}
 	}
 }

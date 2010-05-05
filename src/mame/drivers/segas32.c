@@ -10,6 +10,7 @@
 
 ****************************************************************************
 
+
 Slip Stream (950515 HISPANIC)
 Sega, 1995
 
@@ -312,7 +313,20 @@ Cheers,
 
 MIB.42
 
-***************************************************************************/
+***************************************************************************
+Output Notes:
+All outputs are hooked up properly with the following exceptions:
+radm:  Motors aren't hooked up, as the board isn't emulated. Also the 2nd and 3rd lamps "die" when the cabinet dip is set to deluxe.
+    They probably get moved over to the motor driver board.
+
+radr:  See radm
+
+kokoroj: This driver isn't finished enough to flesh out the outputs, but a space has been reserved in the output functions.
+
+jpark:  Since the piston driver board isn't fully emulated, they aren't hooked up.  offset 0c of the common chip function seems to have something to do with it.
+
+orunners:  Interleaved with the dj and << >> buttons is the data the drives the lcd display.
+****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -383,6 +397,7 @@ static UINT8 sound_irq_input;
 static UINT8 sound_dummy_value;
 static UINT16 sound_bank;
 
+
 /* I/O chips and custom I/O */
 static UINT8 misc_io_data[2][0x10];
 static read16_space_func custom_io_r[2];
@@ -391,8 +406,11 @@ static UINT8 analog_bank;
 static UINT8 analog_value[4];
 static UINT8 sonic_last[6];
 
-static void (*system32_prot_vblank)(running_device *device);
+/* callbacks to handle output */
+typedef void (*sys32_output_callback)(int which, UINT16 data);
+static sys32_output_callback segas32_sw1_output, segas32_sw2_output, segas32_sw3_output;
 
+static void (*system32_prot_vblank)(running_device *device);
 
 
 /*************************************
@@ -683,10 +701,15 @@ static void common_io_chip_w(const address_space *space, int which, offs_t offse
 		case 0x08/2:
 		case 0x0a/2:
 		case 0x0c/2:
+			if (segas32_sw2_output)
+				segas32_sw2_output(which, data);
 			break;
 
 		/* miscellaneous output */
 		case 0x06/2:
+			if (segas32_sw1_output)
+				segas32_sw1_output(which, data);
+
 			if (which == 0)
 			{
 				running_device *device = devtag_get_device(space->machine, "eeprom");
@@ -789,7 +812,7 @@ static WRITE16_HANDLER( io_expansion_w )
 {
 	/* only LSB matters */
 	if (!ACCESSING_BITS_0_7)
-		return;
+	return;
 
 	if (custom_io_w[0])
 		(*custom_io_w[0])(space, offset, data, mem_mask);
@@ -812,12 +835,19 @@ static READ32_HANDLER( io_expansion_0_r )
 static WRITE32_HANDLER( io_expansion_0_w )
 {
 	/* only LSB matters */
+
+
 	if (ACCESSING_BITS_0_7)
 	{
+		/* harddunk uses bits 4,5 for output lamps */
+		if (segas32_sw3_output)
+			segas32_sw3_output(0, data & 0xff);
+
 		if (custom_io_w[0])
 			(*custom_io_w[0])(space, offset*2+0, data, mem_mask);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
+
 	}
 	if (ACCESSING_BITS_16_23)
 	{
@@ -3771,9 +3801,187 @@ static void segas32_common_init(read16_space_func custom_r, write16_space_func c
 	custom_io_r[0] = custom_r;
 	custom_io_w[0] = custom_w;
 	system32_prot_vblank = NULL;
+	segas32_sw1_output = NULL;
+	segas32_sw2_output = NULL;
+	segas32_sw3_output = NULL;
 }
 
 
+/*************************************
+ *
+ *  Output callbacks
+ *
+ *  TODO: kokoroj2 and jpark (SW2)
+ *
+ *  Additional notes:
+ *    - about jpark: the compression switch is broken/inoperative
+ *      and because of that all piston data, which is in this
+ *      section is frozen. bits x01, x04 and x10 when which == 0
+ *      (IO chip 0), seem to have something to do with the sensor
+ *      switches we need to fix
+ *************************************/
+
+static void radm_sw1_output( int which, UINT16 data )
+{
+	if (which == 0)
+		output_set_value("Start_lamp", BIT(data, 2));
+}
+
+static void radm_sw2_output( int which, UINT16 data )
+{
+	if (which == 0)
+	{
+		output_set_value("Wiper_lamp", BIT(data, 0));
+		output_set_value("Lights_lamp", BIT(data, 1));
+	}
+}
+
+static void radr_sw2_output( int which, UINT16 data )
+{
+	if (which == 0)
+	{
+		output_set_value("Entry_lamp", BIT(data, 0));
+		output_set_value("Winner_lamp", BIT(data, 1));
+	}
+}
+
+static void alien3_sw1_output( int which, UINT16 data )
+{
+	if (which == 0)
+	{
+		output_set_value("Player1_Gun_Recoil", BIT(data, 2));
+		output_set_value("Player2_Gun_Recoil", BIT(data, 3));
+	}
+}
+
+static void arescue_sw1_output( int which, UINT16 data )
+{
+	if (which == 0)
+	{
+		output_set_value("Start_lamp", BIT(data, 2));
+		output_set_value("Back_lamp", BIT(data, 4));
+	}
+}
+
+static void f1lap_sw1_output( int which, UINT16 data )
+{
+	if (which == 0)
+	{
+		output_set_value("lamp0", BIT(data, 2));
+		output_set_value("lamp1", BIT(data, 3));
+	}
+}
+
+static void jpark_sw1_output( int which, UINT16 data )
+{
+	if (which == 0)
+	{
+		output_set_value("Left_lamp", BIT(data, 2));
+		output_set_value("Right_lamp", BIT(data, 3));
+	}
+}
+
+static void orunners_sw1_output( int which, UINT16 data )
+{
+	/* note ma = monitor A and mb = Monitor B */
+	if (which == 0)
+	{
+		output_set_value("MA_Check_Point_lamp", BIT(data, 1));
+		output_set_value("MA_Race_Leader_lamp", BIT(data, 3));
+		output_set_value("MA_Steering_Wheel_lamp", BIT(data, 4));
+	}
+	else
+	{
+		output_set_value("MB_Check_Point_lamp", BIT(data, 1));
+		output_set_value("MB_Race_Leader_lamp", BIT(data, 3));
+		output_set_value("MB_Steering_Wheel_lamp", BIT(data, 4));
+	}
+}
+
+static void orunners_sw2_output( int which, UINT16 data )
+{
+	/* note ma = monitor A and mb = Monitor B */
+	/* also note that the remaining bits are for the game's lcd display */
+	/* the bijokkoy driver might be used as an example for handling these outputs */
+	if (which == 0)
+	{
+		output_set_value("MA_DJ_Music_lamp", BIT(data, 0));
+		output_set_value("MA_<<_>>_lamp", BIT(data, 1));
+	}
+	else
+	{
+		output_set_value("MB_DJ_Music_lamp", BIT(data, 0));
+		output_set_value("MB_<<_>>_lamp", BIT(data, 1));
+	}
+}
+
+static void harddunk_sw1_output( int which, UINT16 data )
+{
+	if (which == 0)
+	{
+		output_set_value("1P_Start_lamp", BIT(data, 2));
+		output_set_value("2P_Start_lamp", BIT(data, 3));
+	}
+	else
+	{
+		output_set_value("4P_Start_lamp", BIT(data, 2));
+		output_set_value("5P_Start_lamp", BIT(data, 3));
+	}
+}
+
+static void harddunk_sw2_output( int which, UINT16 data )
+{
+	if (which == 0)
+		output_set_value("Left_Winner_lamp", BIT(data, 0));
+	else
+		output_set_value("Right_Winner_lamp", BIT(data, 0));
+}
+
+static void harddunk_sw3_output( int which, UINT16 data )
+{
+	output_set_value("3P_Start_lamp", BIT(data, 4));
+	output_set_value("6P_Start_lamp", BIT(data, 5));
+}
+
+static void titlef_sw1_output( int which, UINT16 data )
+{
+	if (which == 0)
+	{
+		output_set_value("Blue_Button_1P_lamp", BIT(data, 2));
+		output_set_value("Blue_Button_2P_lamp", BIT(data, 3));
+	}
+	else
+	{
+		output_set_value("Red_Button_1P_lamp", BIT(data, 2));
+		output_set_value("Red_Button_2P_lamp", BIT(data, 3));
+	}
+}
+
+static void titlef_sw2_output( int which, UINT16 data )
+{
+	if (which == 0)
+		output_set_value("Blue_Corner_lamp", BIT(data, 0));
+	else
+		output_set_value("Red_Corner_lamp", BIT(data, 0));
+}
+
+static void scross_sw1_output( int which, UINT16 data )
+{
+	/* note ma = monitor A and mb = Monitor B */
+	if (which == 0)
+		output_set_value("MA_Start_lamp", BIT(data, 2));
+	else
+		output_set_value("MB_Start_lamp", BIT(data, 2));
+}
+
+static void scross_sw2_output( int which, UINT16 data )
+{
+	/* Note:  I'm not an expert on digits, so I didn't know the right map to use, I just added it manually and it seems to work fine. */
+	if (which == 0)
+		output_set_value("MA_Digit", data);
+	else
+		output_set_value("MB_Digit", data);
+}
 
 /*************************************
  *
@@ -3784,6 +3992,7 @@ static void segas32_common_init(read16_space_func custom_r, write16_space_func c
 static DRIVER_INIT( alien3 )
 {
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w);
+	segas32_sw1_output = alien3_sw1_output;
 }
 
 static READ16_HANDLER( arescue_handshake_r )
@@ -3807,6 +4016,8 @@ static DRIVER_INIT( arescue )
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x810000, 0x810001, 0, 0, arescue_handshake_r);
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x81000e, 0x81000f, 0, 0, arescue_slavebusy_r);
+
+	segas32_sw1_output = arescue_sw1_output;
 }
 
 
@@ -3864,12 +4075,15 @@ static DRIVER_INIT( f1en )
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x818000, 0x818003, 0, 0, dual_pcb_masterslave);
 
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x810048, 0x810049, 0, 0, f1en_comms_echo_w);
+
+	segas32_sw1_output = radm_sw1_output;
 }
 
 
 static DRIVER_INIT( f1lap )
 {
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w);
+	segas32_sw1_output = f1lap_sw1_output;
 }
 
 
@@ -3885,6 +4099,9 @@ static DRIVER_INIT( ga2 )
 static DRIVER_INIT( harddunk )
 {
 	segas32_common_init(extra_custom_io_r, NULL);
+	segas32_sw1_output = harddunk_sw1_output;
+	segas32_sw2_output = harddunk_sw2_output;
+	segas32_sw3_output = harddunk_sw3_output;
 }
 
 
@@ -3903,24 +4120,32 @@ static DRIVER_INIT( jpark )
 
 	pROM[0xC15A8/2] = 0xCD70;
 	pROM[0xC15AA/2] = 0xD8CD;
+
+	segas32_sw1_output = jpark_sw1_output;
 }
 
 
 static DRIVER_INIT( orunners )
 {
 	segas32_common_init(analog_custom_io_r, orunners_custom_io_w);
+	segas32_sw1_output = orunners_sw1_output;
+	segas32_sw2_output = orunners_sw2_output;
 }
 
 
 static DRIVER_INIT( radm )
 {
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w);
+	segas32_sw1_output = radm_sw1_output;
+	segas32_sw2_output = radm_sw2_output;
 }
 
 
 static DRIVER_INIT( radr )
 {
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w);
+	segas32_sw1_output = radm_sw1_output;
+	segas32_sw2_output = radr_sw2_output;
 }
 
 
@@ -3929,6 +4154,9 @@ static DRIVER_INIT( scross )
 	running_device *multipcm = devtag_get_device(machine, "sega");
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w);
 	memory_install_write8_device_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), multipcm, 0xb0, 0xbf, 0, 0, scross_bank_w);
+
+	segas32_sw1_output = scross_sw1_output;
+	segas32_sw2_output = scross_sw2_output;
 }
 
 
@@ -3975,6 +4203,8 @@ static DRIVER_INIT( jleague )
 static DRIVER_INIT( titlef )
 {
 	segas32_common_init(NULL, NULL);
+	segas32_sw1_output = titlef_sw1_output;
+	segas32_sw2_output = titlef_sw2_output;
 }
 
 

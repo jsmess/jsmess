@@ -32,13 +32,6 @@
     - Serial number data is at offset 0x201 in the BIOS.  Until the games are running
       and displaying it I'm not going to meddle with it though.
 
-    - Point roms are accessed for checksumming through a port at a200000x:
-      - reset the port by writing 0000 to a2000006
-      - write offset >> 16  to a2000004
-      - write offset & ffff to a2000004 (yes, same address, hence the reset)
-      - read 2 bytes from one rom at a200000a
-      - read 2 bytes from one rom at a200000c
-
     - Add the sh2 in Gunmen Wars (no rom, controls the camera)
 
     - Super System 23 tests irqs in the post.  timecrs2c's code can
@@ -1184,6 +1177,7 @@ static UINT8 ctl_led;
 static UINT16 ctl_inp_buffer[2];
 
 static UINT16 c417_ram[0x10000], c417_adr = 0;
+static UINT32 c417_pointrom_adr = 0;
 
 static UINT16 c412_sdram_a[0x100000]; // Framebuffers, probably
 static UINT16 c412_sdram_b[0x100000];
@@ -1285,11 +1279,34 @@ static WRITE32_HANDLER( namcos23_paletteram_w )
 static READ16_HANDLER(s23_c417_r)
 {
 	switch(offset) {
+		/* According to timecrs2c, +0 is the status word with bits being:
+           15: test mode flag (huh?)
+           10: fifo data ready
+           9:  cmd ram data ready
+           8:  matrix busy
+           7:  output unit busy (inverted)
+           6:  hokan/tenso unit busy
+           5:  point unit busy
+           4:  access unit busy
+           3:  c403 busy (inverted)
+           2:  2nd c435 busy (inverted)
+           1:  1st c435 busy (inverted)
+           0:  xcpreq
+         */
 	case 0: return 0x8e | (video_screen_get_vblank(space->machine->primary_screen) ? 0x0000 : 0x8000);
 	case 1: return c417_adr;
 	case 4:
 		//      logerror("c417_r %04x = %04x (%08x, %08x)\n", c417_adr, c417_ram[c417_adr], cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
 		return c417_ram[c417_adr];
+	case 5:
+		if(c417_pointrom_adr >= ptrom_limit)
+			return 0xffff;
+		return ptrom[c417_pointrom_adr] >> 16;
+	case 6:
+		if(c417_pointrom_adr >= ptrom_limit)
+			return 0xffff;
+		return ptrom[c417_pointrom_adr];
+
 	}
 
 	logerror("c417_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -1300,16 +1317,17 @@ static WRITE16_HANDLER(s23_c417_w)
 {
     switch(offset) {
     case 0:
-    	if (data == 1)
-	{
-		logerror("c417_w: raise IRQ 2\n");
-		cputag_set_input_line(space->machine, "maincpu", MIPS3_IRQ2, ASSERT_LINE);
-	}
-    	break;
+		logerror("p3d PIO %04x\n", data);
+		break;
     case 1:
         COMBINE_DATA(&c417_adr);
         break;
-
+	case 2:
+		c417_pointrom_adr = (c417_pointrom_adr << 16) | data;
+		break;
+	case 3:
+		c417_pointrom_adr = 0;
+		break;
     case 4:
 		//        logerror("c417_w %04x = %04x (%08x, %08x)\n", c417_adr, data, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
         COMBINE_DATA(c417_ram + c417_adr);
@@ -1355,6 +1373,9 @@ static WRITE16_HANDLER(s23_c412_ram_w)
 static READ16_HANDLER(s23_c412_r)
 {
 	switch(offset) {
+	case 3:
+		// 0001 = busy, 0002 = game uploads things
+		return 0x0002;
 	case 8: return c412_adr;
 	case 9: return c412_adr >> 16;
 	case 10: return s23_c412_ram_r(space, c412_adr, mem_mask);
@@ -1522,7 +1543,7 @@ static WRITE16_HANDLER(s23_c361_w)
 static READ16_HANDLER(s23_c361_r)
 {
 	switch(offset) {
-	case 5: return video_screen_get_vpos(space->machine->primary_screen)*2;
+	case 5: return video_screen_get_vpos(space->machine->primary_screen)*2 | (video_screen_get_vblank(space->machine->primary_screen) ? 1 : 0);
 	case 6: return video_screen_get_vblank(space->machine->primary_screen);
 	}
 	logerror("c361_r %x @ %04x (%08x, %08x)\n", offset, mem_mask, cpu_get_pc(space->cpu), (unsigned int)cpu_get_reg(space->cpu, MIPS3_R31));
@@ -2075,7 +2096,7 @@ static void render_one_model(running_machine *machine, const namcos23_render_ent
 
 		namcos23_poly_entry *p = render_polys + render_poly_count;
 
-		p->vertex_count = poly_zclip_if_less(ne, pv, p->pv, 4, 0.001);
+		p->vertex_count = poly_zclip_if_less(ne, pv, p->pv, 4, 0.001f);
 
 		if(p->vertex_count >= 3) {
 			for(int i=0; i<p->vertex_count; i++) {
@@ -2199,7 +2220,9 @@ static MACHINE_START( s23 )
 	c361_timer = timer_alloc(machine, c361_timer_cb, 0);
 	timer_adjust_oneshot(c361_timer, attotime_never, 0);
 }
+
 static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
+	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE( p3d_r, p3d_w )
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16( s23_c417_r, s23_c417_w, 0xffffffff )
@@ -2227,11 +2250,11 @@ static ADDRESS_MAP_START( gorgon_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0f200000, 0x0f201fff) AM_RAM
 
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM
+	ADDRESS_MAP_GLOBAL_MASK(0xfffffff)
+	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM
 	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE( p3d_r, p3d_w )
 	AM_RANGE(0x02000000, 0x0200000f) AM_READWRITE16( s23_c417_r, s23_c417_w, 0xffffffff )
 	AM_RANGE(0x04400000, 0x0440ffff) AM_RAM AM_BASE(&namcos23_shared_ram)
@@ -2239,22 +2262,20 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04c3ff0c, 0x04c3ff0f) AM_RAM
 	AM_RANGE(0x06000000, 0x0600ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // Backup
 	AM_RANGE(0x06200000, 0x06203fff) AM_RAM                             // C422
-	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16( s23_c422_r, s23_c422_w, 0xffffffff )	// C422 registers
-	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram)	// text layer characters (shown as CGRAM in POST)
+	AM_RANGE(0x06400000, 0x0640000f) AM_READWRITE16( s23_c422_r, s23_c422_w, 0xffffffff ) // C422 registers
+	AM_RANGE(0x06800000, 0x06807fff) AM_RAM_WRITE( s23_txtchar_w ) AM_BASE(&namcos23_charram) // text layer characters (shown as CGRAM in POST)
 	AM_RANGE(0x06804000, 0x0681dfff) AM_RAM
 	AM_RANGE(0x0681e000, 0x0681ffff) AM_RAM_WRITE( namcos23_textram_w ) AM_BASE(&namcos23_textram)
-	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16( s23_c361_r, s23_c361_w, 0xffffffff )	// C361
-	AM_RANGE(0x06a08000, 0x06a081ff) AM_RAM	// Blending control (C404 too?)
-	AM_RANGE(0x06a08200, 0x06a087ff) AM_RAM	// GAMMA (C404)
+	AM_RANGE(0x06820000, 0x0682000f) AM_READWRITE16( s23_c361_r, s23_c361_w, 0xffffffff ) // C361
+	AM_RANGE(0x06a08000, 0x06a087ff) AM_RAM // Blending control & GAMMA (C404)
 	AM_RANGE(0x06a10000, 0x06a3ffff) AM_RAM_WRITE( namcos23_paletteram_w ) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x01000000)	// data ROMs
-	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x01000000)
+	AM_RANGE(0x08000000, 0x08ffffff) AM_ROM AM_REGION("data", 0x0000000) AM_MIRROR(0x1000000) // data ROMs
+	AM_RANGE(0x0a000000, 0x0affffff) AM_ROM AM_REGION("data", 0x1000000) AM_MIRROR(0x1000000)
 	AM_RANGE(0x0c000000, 0x0c00001f) AM_READWRITE16( s23_c412_r, s23_c412_w, 0xffffffff )
 	AM_RANGE(0x0c400000, 0x0c400007) AM_READWRITE16( s23_c421_r, s23_c421_w, 0xffffffff )
 	AM_RANGE(0x0d000000, 0x0d00000f) AM_READWRITE16( s23_ctl_r, s23_ctl_w, 0xffffffff )
 	AM_RANGE(0x0e800000, 0x0e800003) AM_READ( s23_unk_status_r )
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
 static READ32_HANDLER( gmen_trigger_sh2 )
@@ -2602,13 +2623,17 @@ static INPUT_PORTS_START( ss23 )
 	PORT_START("H8PORT")
 
 	// No idea if start is actually there, but we need buttons to pass error screens
-	// You can go to the pcb test mode by pressing start, but it crashes...
+	// You can go to the pcb test mode by pressing start, and it doesn't crash anymore somehow
+	// Use start1 to select, start1+start2 to exit, up/down to navigate
 	PORT_START("P1")
 	PORT_BIT( 0x008, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0xff7, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0xd07, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xfff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("TC2P0")
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN1 )

@@ -58,6 +58,7 @@
  *************************************/
 
 static UINT16 *workram;
+static UINT16 has_guns;
 
 
 /*************************************
@@ -293,6 +294,14 @@ static WRITE16_HANDLER( io_chip_w )
 		case 0x08/2:
 		case 0x0a/2:
 		case 0x0c/2:
+		if (has_guns == 1)
+		/* outputs for lghost only */
+		{
+		output_set_value("P1_Gun_Recoil",(~data & 0x01));
+		output_set_value("P2_Gun_Recoil",(~data & 0x02)>>1);
+		output_set_value("P3_Gun_Recoil",(~data & 0x04)>>2);
+		}
+
 			break;
 
 		/* miscellaneous output */
@@ -1309,6 +1318,8 @@ static MACHINE_DRIVER_START( system18 )
 	MDRV_VIDEO_START(system18)
 	MDRV_VIDEO_UPDATE(system18)
 
+	MDRV_SEGA16SP_ADD_16B("segaspr1")
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -2248,6 +2259,7 @@ static DRIVER_INIT( ddcrew )
 
 static DRIVER_INIT( lghost )
 {
+	has_guns=1;
 	segas1x_state *state = (segas1x_state *)machine->driver_data;
 
 	DRIVER_INIT_CALL(generic_5987);

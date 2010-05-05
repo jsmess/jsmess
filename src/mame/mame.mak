@@ -1163,6 +1163,7 @@ $(MAMEOBJ)/sega.a: \
 	$(AUDIO)/pulsar.o \
 	$(AUDIO)/segasnd.o \
 	$(VIDEO)/segaic16.o \
+	$(VIDEO)/sega16sp.o \
 	$(VIDEO)/segaic24.o \
 	$(VIDEO)/stvvdp1.o $(VIDEO)/stvvdp2.o \
 
@@ -1818,9 +1819,12 @@ $(DRIVERS)/stactics.o:	$(LAYOUT)/stactics.lh
 
 $(DRIVERS)/stepstag.o:	$(LAYOUT)/stepstag.lh
 
+$(DRIVERS)/sstrangr.o:	$(LAYOUT)/sstrangr.lh
+
 $(DRIVERS)/subsino.o:	$(LAYOUT)/victor5.lh \
 						$(LAYOUT)/victor21.lh \
 						$(LAYOUT)/tisub.lh \
+						$(LAYOUT)/stisub.lh \
 						$(LAYOUT)/crsbingo.lh \
 						$(LAYOUT)/sharkpy.lh \
 						$(LAYOUT)/sharkpye.lh \

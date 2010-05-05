@@ -6574,7 +6574,7 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine, const
 
 
 
-DRIVER_INIT( x32x )
+DRIVER_INIT( _32x )
 {
 
 
