@@ -15,9 +15,29 @@
 		</part>
 	</software>
 
-	<!-- F003 - 1995 - Funtech - The Son of Evil -->
+	<!-- F003 -->
+	<software name="sonevil" supported="no">
+		<description>The Son of Evil</description>
+		<year>1995</year>
+		<publisher>Funtech</publisher>
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="sonevil.bin" size="2097152" crc="9f6119a7" sha1="67ae9e7f99e1c3054ea54d53dbbba7792ef45134" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
-	<!-- F004 - Speedy Dragon/Sonic Dragon -->
+	<!-- F004 -->
+	<software name="speedydgn" supported="no">
+		<description>Speedy Dragon</description>
+		<year>1995</year>
+		<publisher>Funtech</publisher>
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="speedydgn.bin" size="2097152" crc="f631383c" sha1="fbd62b5d287aa82ef27f400ab2a6b3da0308192a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- F005 -->
 	<software name="staiwbbl" supported="no">
@@ -31,7 +51,17 @@
 		</part>
 	</software>
 
-	<!-- F006 - 1995 - Funtech - Journey to the Laugh -->
+	<!-- F006 -->
+	<software name="jttlaugh" supported="no">
+		<description>Journey to the Laugh</description>
+		<year>1995</year>
+		<publisher>Funtech</publisher>
+		<part name="cart" interface="supracan_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="jttlaugh.bin" size="2097152" crc="cee25eea" sha1="fc82fc3a7d55571494cd62d8807160e22cf437bc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 
 	<!-- F007 -->
 	<software name="slghtsag" supported="no">
