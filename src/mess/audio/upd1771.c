@@ -24,7 +24,7 @@
      NC           3        26        ACK
     !WR           4        25        D7
     !CS           5        24        D6
-     PCM          6        23        D5
+     RESET        6        23        D5
      NC           7        22        D4
      VCC          8        21        D3
      6Mhz XIN     9        20        D2
@@ -37,7 +37,6 @@
     In the SCV:
     pin  5 is tied to the !SCPU pin on the Epoch TV chip pin 29 (0x3600 writes)
     pin  6 is tied to the   PC3 pin of the upD7801 CPU
-    and according to the Enri is used for 1 bit PCM injection.
     pin 26 is tied to the  INT1 pin of the upD7801 (CPU pin 12),
 
     1,2,3,28,27 dont generate any digital signals
@@ -54,7 +53,7 @@
 
     All NC pins are unknown, maybe some are  "test" pins.
 
-    All non PCM writes are made through adress 0x3600 on the upD7801
+    All non PCM writes are made through address 0x3600 on the upD7801
     Instead of useing register=value, this chip require sending multiple
     bytes for each command, one after the other.
 
@@ -67,10 +66,10 @@
 
 #define LOG 0
 
-#define MAX_PACKET_SIZE 16 //protection/padding max is really 10
+#define MAX_PACKET_SIZE 0x8000 
 
 
-
+size_t g_count = 0;
 /*
   Each of the 8 waveforms have been sampled at 192Khz using period 0xFF,
   filtered, and each of the 32 levels have been calculated with averages on around 10 samples
@@ -101,12 +100,12 @@ struct _upd1771_state
     devcb_resolved_write_line ack_out_func;
     emu_timer *timer;
 
-    UINT8    packet[MAX_PACKET_SIZE];
-    UINT8    index;
-    UINT8    expected_bytes;
+    UINT8   packet[MAX_PACKET_SIZE];
+    UINT32  index;
+    UINT8   expected_bytes;
 
     UINT8   state;//0:silence, 1 noise, 2 tone
-	UINT8	pcm;
+	UINT8	pc3;
 
     //tone
     UINT8    t_timbre; //[0;  7]
@@ -175,7 +174,12 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 
     devcb_call_write_line( &state->ack_out_func, 0 );
 
-    state->packet[state->index++]=data;
+	if (state->index < MAX_PACKET_SIZE)
+		state->packet[state->index++]=data;
+	else{
+		logerror( "upd1771_w: received byte 0x%02x overload!\n", data );
+		return;
+	}
 
     switch(state->packet[0]){
 
@@ -187,6 +191,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
         }break;
 
         case 1:
+		{
             if (state->index == 10){
                 state->state = STATE_NOISE;
                 state->index = 0;
@@ -204,9 +209,10 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
             }
             else
                 timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock ), 0 );
-        break;
+		}break;
 
         case 2:
+		{
             if (state->index == 4){
                 //logerror( "upd1771_w: ----------------tone  state reset\n");
                 state->t_timbre = (state->packet[1] & 0xE0) >> 5;
@@ -223,11 +229,27 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
             else
                 timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock ), 0 );
 
-        break;
+		}break;
+
+		case 0x1F:
+		{	
+			//6Khz(ish) DIGI playback
+			
+			//end capture
+			if (state->packet[state->index-2] == 0xFE &&
+				state->packet[state->index-1] == 0x00){
+                //TODO play capture!
+				state->index = 0;
+				state->packet[0]=0;
+			}
+			else
+				timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock ), 0 );
+
+		}break;
 
         //garbage: wipe stack
-        default:
-            state->index = 0;
+        default:	
+			state->index = 0;
         break;
     }
 }
@@ -237,8 +259,14 @@ WRITE_LINE_DEVICE_HANDLER( upd1771_pcm_w )
 {
 	upd1771_state *upd1771 = get_safe_token( device );
 
-	logerror( "upd1771_pcm_w: state = %d\n", state );
-	upd1771->pcm = state ? 1 : 0;
+	//RESET upon HIGH
+	if (state != upd1771->pc3){
+  		logerror( "upd1771_pc3 change!: state = %d\n", state );
+		upd1771->index = 0;
+		upd1771->packet[0]=0;
+	}
+
+	upd1771->pc3 = state;
 }
 
 
@@ -341,7 +369,7 @@ static DEVICE_RESET( upd1771c )
 
     state->index = 0;
     state->expected_bytes = 0;
-	state->pcm = 0;
+	state->pc3 = 0;
 }
 
 

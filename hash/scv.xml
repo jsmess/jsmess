@@ -136,6 +136,18 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
+	<software name="kungfurd" supported="no">
+		<description>Kung Fu Road</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+                       <dataarea name="rom" size="40960">
+                               <rom name="kungfurd.0" size="32768" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce" offset="0" />
+                               <rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="8000" />
+                       </dataarea>
+		</part>
+	</software>
+
 	<software name="lupin3" supported="no">
 		<description>Lupin III</description>
 		<year>1984</year>
@@ -246,6 +258,17 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="real_graphic_mahjong.bin" size="16384" crc="d3d9106c" sha1="7190ff2944c1ffbde6866e720417b86b3844ffa2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ttball">
+		<description>Ton Ton Ball</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ttball.bin" size="16384" crc="7f873bfa" sha1="093235ac2234c4c4e78a2addaab780d7a2cbe004" offset="0" />
 			</dataarea>
 		</part>
 	</software>
