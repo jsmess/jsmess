@@ -28,7 +28,7 @@
 	</software>
 
 	<!-- F004 -->
-	<software name="speedydgn" supported="no">
+	<software name="spedydgn" supported="no">
 		<description>Speedy Dragon</description>
 		<year>1995</year>
 		<publisher>AV Artisan Corp.</publisher>
