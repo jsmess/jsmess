@@ -10,6 +10,7 @@
 #define AY8910_TAG		"uc4"
 #define K1135A_TAG		"uc11"
 #define I8035_TAG		"i8035"
+#define AM2910_TAG		"11d"
 #define SCREEN_TAG		"screen"
 
 class cgc7900_state

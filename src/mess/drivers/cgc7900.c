@@ -29,6 +29,7 @@
 	- PIO DMA
 	- serial port controller
 	- HVG
+	- OMTI Series 10 SCSI controller (8" Winchester HD)
 
 */
 
@@ -234,7 +235,7 @@ static WRITE16_HANDLER( disk_command_w )
 
 static ADDRESS_MAP_START( cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE(&chrom_ram)
+	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&chrom_ram)
 	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)	
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cgc7900_z_mode_r, cgc7900_z_mode_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_BASE_MEMBER(cgc7900_state, plane_ram)
@@ -407,7 +408,7 @@ static MACHINE_RESET(cgc7900)
 {
 	UINT8* user1 = memory_region(machine, M68000_TAG);
 
-	memcpy((UINT8*)chrom_ram,user1,0x10000);
+	memcpy((UINT8*)chrom_ram,user1,8);
 
 	devtag_get_device(machine, M68000_TAG)->reset();
 }
@@ -430,6 +431,9 @@ static MACHINE_DRIVER_START( cgc7900 )
 /*	MDRV_CPU_ADD(I8035_TAG, I8035, 1000000)
     MDRV_CPU_PROGRAM_MAP(keyboard_mem)
 	MDRV_CPU_IO_MAP(keyboard_io)*/
+
+/*	MDRV_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)
+    MDRV_CPU_PROGRAM_MAP(omti10_mem)*/
 
 	MDRV_MACHINE_START(cgc7900)
     MDRV_MACHINE_RESET(cgc7900)
@@ -485,11 +489,19 @@ ROM_START( cgc7900 )
 	ROM_LOAD( "ha-5.ub1",  0x0000, 0x0020, NO_DUMP )
 	ROM_LOAD( "03c0.ua16", 0x0000, 0x0020, NO_DUMP )
 	ROM_LOAD( "03c0.ua11", 0x0000, 0x0020, NO_DUMP )
+
+	/* OMTI Series 10 SCSI controller */
+	ROM_REGION( 0x1400, AM2910_TAG, 0 )
+	ROM_LOAD( "35 1.7b", 0x0000, 0x0400, NO_DUMP ) /* 82S137N */
+	ROM_LOAD( "35 2.7b", 0x0400, 0x0400, NO_DUMP ) /* 82S137N */
+	ROM_LOAD( "35 3.7b", 0x0800, 0x0400, NO_DUMP ) /* 82S137N */
+	ROM_LOAD( "35 4.7b", 0x0c00, 0x0400, NO_DUMP ) /* 82S137N */
+	ROM_LOAD( "35 5.7b", 0x1000, 0x0400, NO_DUMP ) /* 82S137N */
 ROM_END
 
 /***************************************************************************
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1980, cgc7900,  0,       0, 	cgc7900, 	cgc7900, 	 0,   "Chromatics",   "CGC 7900",		GAME_NOT_WORKING)
+/*    YEAR  NAME		PARENT  COMPAT	MACHINE		INPUT		INIT	COMPANY			FULLNAME	FLAGS */
+COMP( 1980, cgc7900,	0,		0,		cgc7900,	cgc7900,	0,		"Chromatics",	"CGC 7900",	GAME_NOT_WORKING)
