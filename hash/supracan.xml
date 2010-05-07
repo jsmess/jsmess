@@ -5,7 +5,7 @@
 	
 	<!-- F002 -->
 	<software name="sangofgt">
-		<description>Sango Fighter</description>
+		<description>Sango Fighter ~ Wu Jiang Zheng Ba - San Guo Zhi</description>
 		<year>1995</year>
 		<publisher>Panda Entertainment Technology</publisher>
 		<part name="cart" interface="supracan_cart">
@@ -17,7 +17,7 @@
 
 	<!-- F003 -->
 	<software name="sonevil" supported="no">
-		<description>The Son of Evil</description>
+		<description>The Son of Evil ~ Xie E Zhi Zi</description>
 		<year>1995</year>
 		<publisher>Funtech</publisher>
 		<part name="cart" interface="supracan_cart">
@@ -28,8 +28,8 @@
 	</software>
 
 	<!-- F004 -->
-	<software name="spedydgn" supported="no">
-		<description>Speedy Dragon</description>
+	<software name="speedyd" supported="no">
+		<description>Speedy Dragon ~ Yin Su Fei Long</description>
 		<year>1995</year>
 		<publisher>AV Artisan Corp.</publisher>
 		<part name="cart" interface="supracan_cart">
@@ -41,7 +41,7 @@
 
 	<!-- F005 -->
 	<software name="staiwbbl" supported="no">
-		<description>Super Taiwanese Baseball League</description>
+		<description>Super Taiwanese Baseball League ~ Chao Ji Zhong Hua Zhi Bang Lian Meng</description>
 		<year>1995</year>
 		<publisher>C&amp;E Soft</publisher>
 		<part name="cart" interface="supracan_cart">
@@ -53,7 +53,7 @@
 
 	<!-- F006 -->
 	<software name="jttlaugh" supported="no">
-		<description>Journey to the Laugh</description>
+		<description>Journey to the Laugh ~ Xi You Ji</description>
 		<year>1995</year>
 		<publisher>Funtech</publisher>
 		<part name="cart" interface="supracan_cart">
@@ -65,7 +65,7 @@
 
 	<!-- F007 -->
 	<software name="slghtsag" supported="no">
-		<description>Super Light Saga - Dragon Force</description>
+		<description>Super Light Saga - Dragon Force ~ Chao Ji Guang Ming Zhan Shi</description>
 		<year>1996</year>
 		<publisher>Kingformation</publisher>
 		<part name="cart" interface="supracan_cart">
@@ -78,7 +78,7 @@
 
 	<!-- F008 -->
 	<software name="monopoly">
-		<description>Monopoly: Adventure in Africa</description>
+		<description>Monopoly: Adventure in Africa ~ Fei Zhou Tan Xian Da Fu Weng</description>
 		<year>1995</year>
 		<publisher>Panda Entertainment Technology</publisher>
 		<part name="cart" interface="supracan_cart">
@@ -94,7 +94,7 @@
 
 	<!-- F011 -->
 	<software name="boomzoo">
-		<description>Boom Zoo</description>
+		<description>Boom Zoo ~ Bao Bao Dong Wu Yuan</description>
 		<year>1996</year>
 		<publisher>Funtech</publisher>
 		<part name="cart" interface="supracan_cart">

@@ -26,7 +26,7 @@
 	</software>
 
 	<!-- Id: NeoP00660 - Developer: S-Neo - Releases: 2000-11-23 (JPN) -->
-	<software name="bigbang">
+	<software name="bigbang" cloneof="wrestmad">
 		<description>Big Bang Pro Wrestling (Jpn)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
@@ -282,7 +282,7 @@
 		</part>
 	</software>
 
-	<software name="evolutio">
+	<software name="evolutn">
 		<description>Evolution - Eternal Dungeons (Euro)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
@@ -294,7 +294,7 @@
 	</software>
 
 	<!-- Id: NeoP00820 - Developer: Entertainment Software Publishing - Releases: 2000-02-10 (JPN) -->
-	<software name="evolutioj" cloneof="evolutio">
+	<software name="evolutnj" cloneof="evolutn">
 		<description>Shinki Sekai Evolution - Hateshinai Dungeon (Jpn)</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
@@ -1035,7 +1035,7 @@
 	</software>
 
 	<!-- Id: NeoP00290 - Developer: Yumekobo - Releases: 1999-03-19 (JPN) -->
-	<software name="renketsc">
+	<software name="tsunapnc" cloneof="puzzlink">
 		<description>Renketsu Puzzle Tsunagete Pon! Color (Jpn)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
@@ -1047,7 +1047,7 @@
 	</software>
 
 	<!-- Id: NeoP00120 - Developer: Yumekobo - Releases: 1998-10-28 (JPN) -->
-	<software name="renketsu">
+	<software name="tsunapn2">
 		<description>Renketsu Puzzle Tsunagete Pon! (Jpn)</description>
 		<year>1998</year>
 		<publisher>SNK</publisher>
@@ -1293,7 +1293,7 @@
 	</software>
 
 	<!-- Id: NeoP00490 - Developer: Yumekobo - Releases: 1999-11-11 (JPN) -->
-	<software name="tsunapn2">
+	<software name="tsunapn2" cloneof="puzzlnk2">
 		<description>Tsunagete Pon! 2 (Jpn)</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>

@@ -161,11 +161,23 @@ static MACHINE_DRIVER_START( pce_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("pce,bin")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("pce_cart")
 	MDRV_CARTSLOT_LOAD(pce_cart)
 	MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
+	MDRV_SOFTWARE_LIST_ADD("pce")
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( pce )
+static MACHINE_DRIVER_START( tg16_cartslot )
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("pce,bin")
+	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("tg16_cart")
+	MDRV_CARTSLOT_LOAD(pce_cart)
+	MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
+	MDRV_SOFTWARE_LIST_ADD("tg16")
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( pce_common )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(pce_mem)
@@ -205,8 +217,16 @@ static MACHINE_DRIVER_START( pce )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
 	MDRV_CDROM_ADD( "cdrom" )
+MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( pce )
+	MDRV_IMPORT_FROM( pce_common )
 	MDRV_IMPORT_FROM( pce_cartslot )
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( tg16 )
+	MDRV_IMPORT_FROM( pce_common )
+	MDRV_IMPORT_FROM( tg16_cartslot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgx )
@@ -266,5 +286,5 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT    INIT   COMPANY  FULLNAME */
 CONS( 1987, pce,    0,      0,      pce,    pce,     pce,   "Nippon Electronic Company", "PC Engine", GAME_IMPERFECT_SOUND)
-CONS( 1989, tg16,   pce,    0,      pce,    pce,     tg16,  "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
+CONS( 1989, tg16,   pce,    0,      tg16,   pce,     tg16,  "Nippon Electronic Company", "TurboGrafx 16", GAME_IMPERFECT_SOUND)
 CONS( 1989, sgx,    pce,    0,      sgx,    pce,     sgx,   "Nippon Electronic Company", "SuperGrafx", GAME_IMPERFECT_SOUND)

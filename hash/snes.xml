@@ -113,7 +113,7 @@
 		</part>
 	</software>
 
-	<software name="46okunen">
+	<software name="46okunen" cloneof="evo">
 		<description>46 Okunen Monogatari - Harukanaru Eden e (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -157,7 +157,7 @@
 		</part>
 	</software>
 
-	<software name="asp">
+	<software name="asp" cloneof="desertf">
 		<description>A.S.P. - Air Strike Patrol (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -685,7 +685,7 @@
 		</part>
 	</software>
 
-	<software name="airmanag">
+	<software name="airmanag" cloneof="aerobiz">
 		<description>Air Management - Oozora ni Kakeru (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -696,7 +696,7 @@
 		</part>
 	</software>
 
-	<software name="airmanaga" cloneof="airmanag">
+	<software name="airmanaga" cloneof="aerobiz">
 		<description>Air Management - Oozora ni Kakeru (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -707,7 +707,7 @@
 		</part>
 	</software>
 
-	<software name="airmang2">
+	<software name="airmang2" cloneof="aerobizs">
 		<description>Air Management II - Koukuu Ou o Mezase (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -950,7 +950,7 @@
 		</part>
 	</software>
 
-	<software name="alien3ub" cloneof="alien3">
+	<software name="alien3up" cloneof="alien3">
 		<description>Alien 3 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1225,7 +1225,7 @@
 		</part>
 	</software>
 
-	<software name="aqutal">
+	<software name="aqutal" cloneof="secretst">
 		<description>Aqutallion (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1346,7 +1346,7 @@
 		</part>
 	</software>
 
-	<software name="ardyligtjb" cloneof="ardyligt">
+	<software name="ardyligtjp" cloneof="ardyligt">
 		<description>Ardy Lightfoot (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1379,7 +1379,7 @@
 		</part>
 	</software>
 
-	<software name="area88">
+	<software name="area88" cloneof="unsquad">
 		<description>Area 88 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1545,7 +1545,7 @@
 		</part>
 	</software>
 
-	<software name="assaults">
+	<software name="assaults" cloneof="cybernat">
 		<description>Assault Suits Valken (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -1987,7 +1987,7 @@
 		</part>
 	</software>
 
-	<software name="batblazb" cloneof="batblaz">
+	<software name="batblazp" cloneof="batblaz">
 		<description>Battle Blaze (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2229,7 +2229,7 @@
 		</part>
 	</software>
 
-	<software name="batltech">
+	<software name="batltech" cloneof="mechwarr">
 		<description>BattleTech (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2240,7 +2240,7 @@
 		</part>
 	</software>
 
-	<software name="batl3050">
+	<software name="batl3050" cloneof="mech3050">
 		<description>BattleTech 3050 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2295,7 +2295,7 @@
 		</part>
 	</software>
 
-	<software name="btoadsub" cloneof="btoads">
+	<software name="btoadsup" cloneof="btoads">
 		<description>Battletoads in Battlemaniacs (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2339,7 +2339,7 @@
 		</part>
 	</software>
 
-	<software name="beautyb" cloneof="beauty">
+	<software name="beautyp" cloneof="beauty">
 		<description>Beauty and the Beast (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2438,7 +2438,7 @@
 		</part>
 	</software>
 
-	<software name="bestbestp" cloneof="bestbest">
+	<software name="bestofp" cloneof="bestof">
 		<description>Best of the Best - Championship Karate (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2449,7 +2449,7 @@
 		</part>
 	</software>
 
-	<software name="bestbest">
+	<software name="bestof">
 		<description>Best of the Best - Championship Karate (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2460,7 +2460,7 @@
 		</part>
 	</software>
 
-	<software name="bestbestu" cloneof="bestbest">
+	<software name="bestofu" cloneof="bestof">
 		<description>Best of the Best - Championship Karate (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2515,7 +2515,7 @@
 		</part>
 	</software>
 
-	<software name="bigskyub" cloneof="bigsky">
+	<software name="bigskyup" cloneof="bigsky">
 		<description>Big Sky Trooper (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2802,7 +2802,7 @@
 		</part>
 	</software>
 
-	<software name="blackthob" cloneof="blacktho">
+	<software name="blackthop" cloneof="blackhwk">
 		<description>Blackthorne (USA, Prototype CES Version)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2813,7 +2813,7 @@
 		</part>
 	</software>
 
-	<software name="blacktho">
+	<software name="blacktho" cloneof="blackhwk">
 		<description>Blackthorne (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2824,7 +2824,7 @@
 		</part>
 	</software>
 
-	<software name="blackthoj" cloneof="blacktho">
+	<software name="blackthoj" cloneof="blackhwk">
 		<description>Blackthorne - Fukushuu no Kuroki Toge (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2890,7 +2890,7 @@
 		</part>
 	</software>
 
-	<software name="bluesbb" cloneof="bluesb">
+	<software name="bluesbp" cloneof="bluesb">
 		<description>The Blues Brothers (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2945,7 +2945,7 @@
 		</part>
 	</software>
 
-	<software name="bokujom1" cloneof="bokujom">
+	<software name="bokujom1" cloneof="harvmoon">
 		<description>Bokujou Monogatari (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2956,7 +2956,7 @@
 		</part>
 	</software>
 
-	<software name="bokujom">
+	<software name="bokujom" cloneof="harvmoon">
 		<description>Bokujou Monogatari (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2978,7 +2978,7 @@
 		</part>
 	</software>
 
-	<software name="bombuzal">
+	<software name="bombuzal" cloneof="kablooey">
 		<description>Bombuzal (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3264,7 +3264,7 @@
 		</part>
 	</software>
 
-	<software name="bof2ub" cloneof="bof2">
+	<software name="bof2up" cloneof="bof2">
 		<description>Breath of Fire II (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3374,7 +3374,7 @@
 		</part>
 	</software>
 
-	<software name="brutalub" cloneof="brutal">
+	<software name="brutalup" cloneof="brutal">
 		<description>Brutal - Paws of Fury (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3977,7 +3977,7 @@
 		</part>
 	</software>
 
-	<software name="bubsyub" cloneof="bubsy">
+	<software name="bubsyup" cloneof="bubsy">
 		<description>Bubsy in Claws Encounters of the Furred Kind (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3999,7 +3999,7 @@
 		</part>
 	</software>
 
-	<software name="bugsbhac">
+	<software name="bugsbhac" cloneof="bugsbrab">
 		<description>Bugs Bunny - Hachamecha Daibouken (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4032,7 +4032,7 @@
 		</part>
 	</software>
 
-	<software name="bullsvsb1" cloneof="bullsvsb">
+	<software name="bullsvsb">
 		<description>Bulls vs Blazers and the NBA Playoffs (Euro, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4043,7 +4043,7 @@
 		</part>
 	</software>
 
-	<software name="bullsvsb">
+	<software name="bullsvsb1" cloneof="bullsvsb">
 		<description>Bulls vs Blazers and the NBA Playoffs (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4054,7 +4054,7 @@
 		</part>
 	</software>
 
-	<software name="bullsvsbu1" cloneof="bullsvsb">
+	<software name="bullsvsbu" cloneof="bullsvsb">
 		<description>Bulls vs Blazers and the NBA Playoffs (USA, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4065,7 +4065,7 @@
 		</part>
 	</software>
 
-	<software name="bullsvsbu" cloneof="bullsvsb">
+	<software name="bullsvsbu1" cloneof="bullsvsb">
 		<description>Bulls vs Blazers and the NBA Playoffs (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4142,7 +4142,7 @@
 		</part>
 	</software>
 
-	<software name="calripknub" cloneof="calripkn">
+	<software name="calripknup" cloneof="calripkn">
 		<description>Cal Ripken Jr. Baseball (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4197,7 +4197,7 @@
 		</part>
 	</software>
 
-	<software name="cameltry">
+	<software name="cameltry" cloneof="onthebal">
 		<description>Cameltry (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4241,7 +4241,7 @@
 		</part>
 	</software>
 
-	<software name="capcomssb" cloneof="capcomss">
+	<software name="capcomssp" cloneof="sshotout">
 		<description>Capcom's Soccer Shootout (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4252,7 +4252,7 @@
 		</part>
 	</software>
 
-	<software name="capcomss">
+	<software name="capcomss" cloneof="sshotout">
 		<description>Capcom's Soccer Shootout (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4384,7 +4384,7 @@
 		</part>
 	</software>
 
-	<software name="cardmstr">
+	<software name="cardmstr" cloneof="arcana">
 		<description>Card Master - Rimusaria no Fuuin (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4671,7 +4671,7 @@
 		</part>
 	</software>
 
-	<software name="chesterwb" cloneof="chesterw">
+	<software name="chesterwp" cloneof="chesterw">
 		<description>Chester Cheetah - Wild Wild Quest (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4748,7 +4748,7 @@
 		</part>
 	</software>
 
-	<software name="choplft3ub" cloneof="choplft3">
+	<software name="choplft3up" cloneof="choplft3">
 		<description>Choplifter III - Rescue &amp; Survive (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4792,7 +4792,7 @@
 		</part>
 	</software>
 
-	<software name="chodorab" cloneof="chodora">
+	<software name="chodorap" cloneof="mcfang">
 		<description>Chou Makai Taisen! Dorabocchan (Jpn, Prototype 19921221)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4803,7 +4803,7 @@
 		</part>
 	</software>
 
-	<software name="chodora">
+	<software name="chodora" cloneof="mcfang">
 		<description>Chou Makai Taisen! Dorabocchan (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4814,7 +4814,7 @@
 		</part>
 	</software>
 
-	<software name="chomakai" cloneof="supergng">
+	<software name="chomakai" cloneof="sgng">
 		<description>Chou Makaimura (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4927,7 +4927,7 @@
 		</part>
 	</software>
 
-	<software name="chuckrckub" cloneof="chuckrck">
+	<software name="chuckrckup" cloneof="chuckrck">
 		<description>Chuck Rock (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4949,7 +4949,7 @@
 		</part>
 	</software>
 
-	<software name="circuit">
+	<software name="circuit" cloneof="kylepett">
 		<description>Circuit USA (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -4960,7 +4960,7 @@
 		</part>
 	</software>
 
-	<software name="civilizb" cloneof="civiliz">
+	<software name="civilizp" cloneof="civiliz">
 		<description>Civilization (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5293,7 +5293,7 @@
 		</part>
 	</software>
 
-	<software name="contra3">
+	<software name="contra3" cloneof="sprobot">
 		<description>Contra III - The Alien Wars (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5304,7 +5304,7 @@
 		</part>
 	</software>
 
-	<software name="contrasp">
+	<software name="contrasp" cloneof="sprobot">
 		<description>Contra Spirits (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5348,7 +5348,7 @@
 		</part>
 	</software>
 
-	<software name="coolspotub" cloneof="coolspot">
+	<software name="coolspotup" cloneof="coolspot">
 		<description>Cool Spot (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5493,7 +5493,7 @@
 	</software>
 
 	<software name="bscuonpa" supported="no">
-		<description>Cu-On-Pa SFC (Jpn, BS)</description>
+		<description>Cu-On-Pa SFC (Jpn, BS, 0531)</description>
 		<!-- BS -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5581,7 +5581,7 @@
 		</part>
 	</software>
 
-	<software name="cybernatub" cloneof="cybernat">
+	<software name="cybernatup" cloneof="cybernat">
 		<description>Cybernator (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5603,7 +5603,7 @@
 		</part>
 	</software>
 
-	<software name="cyborg9b" cloneof="cyborg9">
+	<software name="cyborg9p" cloneof="cyborg9">
 		<description>Cyborg 009 (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5802,7 +5802,7 @@
 		</part>
 	</software>
 
-	<software name="daikjid2">
+	<software name="daikjid2" cloneof="newhoriz">
 		<description>Daikoukai Jidai II (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -5859,7 +5859,7 @@
 		</part>
 	</software>
 
-	<software name="dariusfc">
+	<software name="dariusfc" cloneof="snova">
 		<description>Darius Force (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6090,7 +6090,7 @@
 		</part>
 	</software>
 
-	<software name="demonblzs" cloneof="demonblz">
+	<software name="demonblzs" cloneof="demoncrt">
 		<description>Demon's Blazon - Makaimura Monshou Hen (Jpn, Sample)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6101,7 +6101,7 @@
 		</part>
 	</software>
 
-	<software name="demonblz">
+	<software name="demonblz" cloneof="demoncrt">
 		<description>Demon's Blazon - Makaimura Monshou Hen (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6288,7 +6288,7 @@
 		</part>
 	</software>
 
-	<software name="desertfb" cloneof="desertf">
+	<software name="desertfp" cloneof="desertf">
 		<description>Desert Fighter (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6354,7 +6354,7 @@
 		</part>
 	</software>
 
-	<software name="destruct">
+	<software name="destruct" cloneof="bazooka">
 		<description>Destructive (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6435,7 +6435,7 @@
 		</part>
 	</software>
 
-	<software name="dimensfc">
+	<software name="dimensfc" cloneof="dforce">
 		<description>Dimension-Force (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -6479,7 +6479,7 @@
 		</part>
 	</software>
 
-	<software name="dinowars">
+	<software name="dinowars" cloneof="dinocity">
 		<description>Dinowars - Kyouryuu Oukoku e no Daibouken (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7099,7 +7099,7 @@
 		</part>
 	</software>
 
-	<software name="dbzbuto2">
+	<software name="dbzbuto2" cloneof="dbzsaiya">
 		<description>Dragon Ball Z - Super Butouden 2 (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7110,7 +7110,7 @@
 		</part>
 	</software>
 
-	<software name="dbzbuto2a">
+	<software name="dbzbuto2a" cloneof="dbzsaiya">
 		<description>Dragon Ball Z - Super Butouden 2 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7121,7 +7121,7 @@
 		</part>
 	</software>
 
-	<software name="dbzbuto3">
+	<software name="dbzbuto3" cloneof="dbzmenac">
 		<description>Dragon Ball Z - Super Butouden 3 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7309,7 +7309,7 @@
 		</part>
 	</software>
 
-	<software name="dlairb" cloneof="dlair">
+	<software name="dlairp" cloneof="dlair">
 		<description>Dragon's Lair (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7342,7 +7342,7 @@
 		</part>
 	</software>
 
-	<software name="dmagic">
+	<software name="dmagic" cloneof="dlair">
 		<description>Dragon's Magic (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7430,7 +7430,7 @@
 		</part>
 	</software>
 
-	<software name="dreamtvb" cloneof="dreamtv">
+	<software name="dreamtvp" cloneof="dreamtv">
 		<description>Dream TV (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7728,7 +7728,7 @@
 		</part>
 	</software>
 
-	<software name="ejim2ub" cloneof="ejim2">
+	<software name="ejim2up" cloneof="ejim2">
 		<description>Earthworm Jim 2 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7827,7 +7827,7 @@
 		</part>
 	</software>
 
-	<software name="elnard">
+	<software name="elnard" cloneof="7thsaga">
 		<description>Elnard (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7915,7 +7915,7 @@
 		</part>
 	</software>
 
-	<software name="equinoxub" cloneof="equinox">
+	<software name="equinoxup" cloneof="equinox">
 		<description>Equinox (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7970,7 +7970,7 @@
 		</part>
 	</software>
 
-	<software name="espnbbub" cloneof="espnbb">
+	<software name="espnbbup" cloneof="espnbb">
 		<description>ESPN Baseball Tonight (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8003,7 +8003,7 @@
 		</part>
 	</software>
 
-	<software name="espnspedb" cloneof="espnsped">
+	<software name="espnspedp" cloneof="espnsped">
 		<description>ESPN Speedworld (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8036,7 +8036,7 @@
 		</part>
 	</software>
 
-	<software name="estpolis">
+	<software name="estpolis" cloneof="lufia">
 		<description>Estpolis Denki (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8047,7 +8047,7 @@
 		</part>
 	</software>
 
-	<software name="estpoli2">
+	<software name="estpoli2" cloneof="lufia2">
 		<description>Estpolis Denki II (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8350,7 +8350,7 @@
 		</part>
 	</software>
 
-	<software name="f1polepoub" cloneof="f1polepo">
+	<software name="f1polepoup" cloneof="f1polepo">
 		<description>F1 Pole Position (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8383,7 +8383,7 @@
 		</part>
 	</software>
 
-	<software name="f1roc">
+	<software name="f1roc" cloneof="exhaust">
 		<description>F1 ROC - Race of Champions (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8394,7 +8394,7 @@
 		</part>
 	</software>
 
-	<software name="f1roc2">
+	<software name="f1roc2" cloneof="exhaust2">
 		<description>F1 ROC II - Race of Champions (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8570,7 +8570,7 @@
 		</part>
 	</software>
 
-	<software name="fatfurspb" cloneof="fatfursp">
+	<software name="fatfurspp" cloneof="fatfursp">
 		<description>Fatal Fury Special (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8603,7 +8603,7 @@
 		</part>
 	</software>
 
-	<software name="fedab" cloneof="feda">
+	<software name="fedap" cloneof="feda">
 		<description>Feda - The Emblem of Justice (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8637,7 +8637,7 @@
 		</part>
 	</software>
 
-	<software name="feverpb" cloneof="feverp">
+	<software name="feverpp" cloneof="feverp">
 		<description>Fever Pitch Soccer (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8758,7 +8758,7 @@
 		</part>
 	</software>
 
-	<software name="fighthb" cloneof="fighth">
+	<software name="fighthp" cloneof="fighth">
 		<description>Fighter's History (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8791,7 +8791,7 @@
 		</part>
 	</software>
 
-	<software name="fightbb">
+	<software name="fightbb" cloneof="mlbpa">
 		<description>Fighting Baseball (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8802,7 +8802,7 @@
 		</part>
 	</software>
 
-	<software name="ffantmq">
+	<software name="ffantmq" cloneof="mquest">
 		<description>Final Fantasy - Mystic Quest (USA, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8813,7 +8813,7 @@
 		</part>
 	</software>
 
-	<software name="ffantmqa" cloneof="ffantmq">
+	<software name="ffantmqa" cloneof="mquest">
 		<description>Final Fantasy - Mystic Quest (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8868,7 +8868,7 @@
 		</part>
 	</software>
 
-	<software name="ffant4j">
+	<software name="ffant4j" cloneof="ffant2">
 		<description>Final Fantasy IV (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8879,7 +8879,7 @@
 		</part>
 	</software>
 
-	<software name="ffant4ja" cloneof="ffant4j">
+	<software name="ffant4ja" cloneof="ffant2">
 		<description>Final Fantasy IV (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8890,7 +8890,7 @@
 		</part>
 	</software>
 
-	<software name="ffant4je" cloneof="ffant4j">
+	<software name="ffant4je" cloneof="ffant2">
 		<description>Final Fantasy IV - Easy Type (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8901,7 +8901,7 @@
 		</part>
 	</software>
 
-	<software name="ffantmqj" cloneof="ffantmq">
+	<software name="ffantmqj" cloneof="mquest">
 		<description>Final Fantasy USA - Mystic Quest (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8923,7 +8923,7 @@
 		</part>
 	</software>
 
-	<software name="ffant6">
+	<software name="ffant6" cloneof="ffant3">
 		<description>Final Fantasy VI (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9011,7 +9011,7 @@
 		</part>
 	</software>
 
-	<software name="ffight3ub" cloneof="ffight3">
+	<software name="ffight3up" cloneof="ffight3">
 		<description>Final Fight 3 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9055,7 +9055,7 @@
 		</part>
 	</software>
 
-	<software name="ffightt">
+	<software name="ffightt" cloneof="ffight3">
 		<description>Final Fight Tough (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9165,7 +9165,7 @@
 		</part>
 	</software>
 
-	<software name="firefght">
+	<software name="firefght" cloneof="ignition">
 		<description>Fire Fighting (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9187,7 +9187,7 @@
 		</part>
 	</software>
 
-	<software name="fstrikerb" cloneof="fstriker">
+	<software name="fstrikerp" cloneof="fstriker">
 		<description>Fire Striker (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9254,7 +9254,7 @@
 		</part>
 	</software>
 
-	<software name="firepowr">
+	<software name="firepowr" cloneof="sswiv">
 		<description>Firepower 2000 (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9287,7 +9287,7 @@
 		</part>
 	</software>
 
-	<software name="firstsamb" cloneof="firstsam">
+	<software name="firstsamp" cloneof="firstsam">
 		<description>First Samurai (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9386,7 +9386,7 @@
 		</part>
 	</software>
 
-	<software name="flintb" cloneof="flint">
+	<software name="flintp" cloneof="flint">
 		<description>The Flintstones (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9408,7 +9408,7 @@
 		</part>
 	</software>
 
-	<software name="flintub" cloneof="flint">
+	<software name="flintup" cloneof="flint">
 		<description>The Flintstones (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9562,7 +9562,7 @@
 		</part>
 	</software>
 
-	<software name="franticb" cloneof="frantic">
+	<software name="franticp" cloneof="frantic">
 		<description>Frantic Flea (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9755,7 +9755,7 @@
 		</part>
 	</software>
 
-	<software name="fullpowr">
+	<software name="fullpowr" cloneof="fullthrt">
 		<description>Full Power (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9777,7 +9777,7 @@
 		</part>
 	</software>
 
-	<software name="fullthrtub" cloneof="fullthrt">
+	<software name="fullthrtup" cloneof="fullthrt">
 		<description>Full Throttle - All-American Racing (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -9887,7 +9887,7 @@
 		</part>
 	</software>
 
-	<software name="gaiagens">
+	<software name="gaiagens" cloneof="illtime">
 		<description>Gaia Gensouki (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10332,7 +10332,7 @@
 		</part>
 	</software>
 
-	<software name="genocid2b" cloneof="genocid2">
+	<software name="genocid2p" cloneof="genocid2">
 		<description>Genocide 2 (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10629,7 +10629,7 @@
 		</part>
 	</software>
 
-	<software name="gokuparob" cloneof="gokuparo">
+	<software name="gokuparop" cloneof="gokuparo">
 		<description>Gokujou Parodius (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10787,7 +10787,7 @@
 		</part>
 	</software>
 
-	<software name="gousouji">
+	<software name="gousouji" cloneof="musya">
 		<description>Gousou Jinrai Densetsu - Musha (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10842,7 +10842,7 @@
 		</part>
 	</software>
 
-	<software name="gp1rs">
+	<software name="gp1rs" cloneof="gp1part2">
 		<description>GP-1 RS - Rapid Stream (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11051,7 +11051,7 @@
 		</part>
 	</software>
 
-	<software name="haganejb" cloneof="hagane">
+	<software name="haganejp" cloneof="hagane">
 		<description>Hagane (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11128,7 +11128,7 @@
 		</part>
 	</software>
 
-	<software name="hakprogl">
+	<software name="hakprogl" cloneof="extrainn">
 		<description>Hakunetsu Pro Yakyuu - Ganba League (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11139,7 +11139,7 @@
 		</part>
 	</software>
 
-	<software name="hakprogla" cloneof="hakprogl">
+	<software name="hakprogla" cloneof="extrainn">
 		<description>Hakunetsu Pro Yakyuu - Ganba League (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11271,7 +11271,7 @@
 		</part>
 	</software>
 
-	<software name="harapeko">
+	<software name="harapeko" cloneof="hungryd">
 		<description>Harapeko Bakka (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11304,7 +11304,7 @@
 		</part>
 	</software>
 
-	<software name="harleyub" cloneof="harley">
+	<software name="harleyup" cloneof="harley">
 		<description>Harley's Humongous Adventure (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11370,7 +11370,7 @@
 		</part>
 	</software>
 
-	<software name="hattrick">
+	<software name="hattrick" cloneof="eurofoot">
 		<description>Hat Trick Hero (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11425,7 +11425,7 @@
 		</part>
 	</software>
 
-	<software name="headon">
+	<software name="headon" cloneof="feverp">
 		<description>Head-On Soccer (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11591,7 +11591,7 @@
 		</part>
 	</software>
 
-	<software name="hellopac">
+	<software name="hellopac" cloneof="pacman2">
 		<description>Hello! Pac-Man (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -11822,7 +11822,7 @@
 		</part>
 	</software>
 
-	<software name="hstriker">
+	<software name="hstriker" cloneof="fstriker">
 		<description>Holy Striker (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12031,7 +12031,7 @@
 		</part>
 	</software>
 
-	<software name="hookub" cloneof="hook">
+	<software name="hookup" cloneof="hook">
 		<description>Hook (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12130,7 +12130,7 @@
 		</part>
 	</software>
 
-	<software name="humangp">
+	<software name="humangp" cloneof="f1polepo">
 		<description>Human Grand Prix (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12141,7 +12141,7 @@
 		</part>
 	</software>
 
-	<software name="humangp2">
+	<software name="humangp2" cloneof="f1polep2">
 		<description>Human Grand Prix II (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12207,7 +12207,7 @@
 		</part>
 	</software>
 
-	<software name="huntredb" cloneof="huntred">
+	<software name="huntredp" cloneof="huntred">
 		<description>The Hunt for Red October (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12251,7 +12251,7 @@
 		</part>
 	</software>
 
-	<software name="hurricanb" cloneof="hurrican">
+	<software name="hurricanp" cloneof="hurrican">
 		<description>Hurricanes (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12406,7 +12406,7 @@
 		</part>
 	</software>
 
-	<software name="ikariyou">
+	<software name="ikariyou" cloneof="oplogicb">
 		<description>Ikari no Yousai (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12417,7 +12417,7 @@
 		</part>
 	</software>
 
-	<software name="illgaiab" cloneof="illgaia">
+	<software name="illgaiap" cloneof="illtime">
 		<description>Illusion of Gaia (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12428,7 +12428,7 @@
 		</part>
 	</software>
 
-	<software name="illgaia">
+	<software name="illgaia" cloneof="illtime">
 		<description>Illusion of Gaia (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12560,7 +12560,7 @@
 		</part>
 	</software>
 
-	<software name="incredub" cloneof="incred">
+	<software name="incredup" cloneof="incred">
 		<description>The Incredible Crash Dummies (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12670,7 +12670,7 @@
 		</part>
 	</software>
 
-	<software name="isswc">
+	<software name="intsensb">
 		<description>International Sensible Soccer - World Champions Limited Edition (Euro, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12791,7 +12791,7 @@
 		</part>
 	</software>
 
-	<software name="iremskin">
+	<software name="iremskin" cloneof="mtitle">
 		<description>The Irem Skins Game (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12912,7 +12912,7 @@
 		</part>
 	</software>
 
-	<software name="izzyqstub" cloneof="izzyqst">
+	<software name="izzyqstup" cloneof="izzyqst">
 		<description>Izzy's Quest for the Olympic Rings (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12945,7 +12945,7 @@
 		</part>
 	</software>
 
-	<software name="jlexct94">
+	<software name="jlexct94" cloneof="sshotout">
 		<description>J.League Excite Stage '94 (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12956,7 +12956,7 @@
 		</part>
 	</software>
 
-	<software name="jlexct94a" cloneof="jlexct94">
+	<software name="jlexct94a" cloneof="sshotout">
 		<description>J.League Excite Stage '94 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13033,7 +13033,7 @@
 		</part>
 	</software>
 
-	<software name="jlprime3">
+	<software name="jlprime3" cloneof="90minute">
 		<description>J.League Soccer Prime Goal 3 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13297,7 +13297,7 @@
 		</part>
 	</software>
 
-	<software name="jerryboy">
+	<software name="jerryboy" cloneof="smartbal">
 		<description>Jerry Boy (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13319,7 +13319,7 @@
 		</part>
 	</software>
 
-	<software name="jigsaw">
+	<software name="jigsaw" cloneof="pieces">
 		<description>Jigsaw Party (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13473,7 +13473,7 @@
 		</part>
 	</software>
 
-	<software name="jwsoccr2b" cloneof="jwsoccr2">
+	<software name="jwsoccr2p" cloneof="jwsoccr2">
 		<description>Jikkyou World Soccer 2 - Fighting Eleven (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13594,7 +13594,7 @@
 		</part>
 	</software>
 
-	<software name="bassusa">
+	<software name="bassusa" cloneof="jimmyhou">
 		<description>Jissen Bass Fishing Hisshouhou in USA (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13715,7 +13715,7 @@
 		</part>
 	</software>
 
-	<software name="joemacb" cloneof="joemac">
+	<software name="joemacp" cloneof="joemac">
 		<description>Joe &amp; Mac - Caveman Ninja (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13748,7 +13748,7 @@
 		</part>
 	</software>
 
-	<software name="joemac2ub" cloneof="joemac3">
+	<software name="joemac2up" cloneof="joemac3">
 		<description>Joe &amp; Mac 2 - Lost in the Tropics (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13770,7 +13770,7 @@
 		</part>
 	</software>
 
-	<software name="joemac3b" cloneof="joemac3">
+	<software name="joemac3p" cloneof="joemac3">
 		<description>Joe &amp; Mac 3 - Lost in the Tropics (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13946,7 +13946,7 @@
 		</part>
 	</software>
 
-	<software name="jumbo">
+	<software name="jumbo" cloneof="holein1">
 		<description>Jumbo Ozaki no Hole in One (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -13990,7 +13990,7 @@
 		</part>
 	</software>
 
-	<software name="jungleub" cloneof="jungle">
+	<software name="jungleup" cloneof="jungle">
 		<description>The Jungle Book (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14221,7 +14221,7 @@
 		</part>
 	</software>
 
-	<software name="justicelub" cloneof="justicel">
+	<software name="justicelup" cloneof="justicel">
 		<description>Justice League Task Force (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14342,7 +14342,7 @@
 		</part>
 	</software>
 
-	<software name="kagaharl">
+	<software name="kagaharl" cloneof="harley">
 		<description>Kagakusha Harley no Haran Banjou (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14420,7 +14420,7 @@
 		</part>
 	</software>
 
-	<software name="karuraou">
+	<software name="karuraou" cloneof="skyblazr">
 		<description>Karura Ou (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14585,7 +14585,7 @@
 		</part>
 	</software>
 
-	<software name="kentouou">
+	<software name="kentouou" cloneof="tko">
 		<description>Kentou Ou World Champion (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14651,7 +14651,7 @@
 		</part>
 	</software>
 
-	<software name="kickoff3b" cloneof="kickoff3">
+	<software name="kickoff3p" cloneof="kickoff3">
 		<description>Kick Off 3 - European Challenge (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14761,7 +14761,7 @@
 		</part>
 	</software>
 
-	<software name="dion">
+	<software name="dion" cloneof="imperium">
 		<description>Kidou Soukou Dion (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14783,8 +14783,8 @@
 		</part>
 	</software>
 
-	<software name="kikikain">
-		<description>Kikikaikai - Nazo no Kuro Manteau (Jpn)</description>
+	<software name="kikikain" cloneof="pocky">
+		<description>Kiki KaiKai - Nazo no Kuro Manteau (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14794,8 +14794,8 @@
 		</part>
 	</software>
 
-	<software name="kikikait">
-		<description>Kikikaikai - Tsukiyo Soushi (Jpn)</description>
+	<software name="kikikait" cloneof="pocky2">
+		<description>Kiki KaiKai - Tsukiyo Soushi (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -14849,7 +14849,7 @@
 		</part>
 	</software>
 
-	<software name="kinstub" cloneof="kinst">
+	<software name="kinstup" cloneof="kinst">
 		<description>Killer Instinct (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -14915,7 +14915,7 @@
 		</part>
 	</software>
 
-	<software name="kingartwub" cloneof="kingartw">
+	<software name="kingartwup" cloneof="kingartw">
 		<description>King Arthur's World (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15238,7 +15238,7 @@
 		</part>
 	</software>
 
-	<software name="kishinkob" cloneof="kishinko">
+	<software name="kishinkop" cloneof="kishinko">
 		<description>Kishin Kourinden Oni (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15408,7 +15408,7 @@
 		</part>
 	</software>
 
-	<software name="kouryuuk">
+	<software name="kouryuuk" cloneof="risephnx">
 		<description>Kouryuuki (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15738,7 +15738,7 @@
 		</part>
 	</software>
 
-	<software name="larrynix">
+	<software name="larrynix" cloneof="tnnbass">
 		<description>Larry Nixon's Super Bass Fishing (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15749,7 +15749,7 @@
 		</part>
 	</software>
 
-	<software name="larrynix1" cloneof="larrynix">
+	<software name="larrynix1" cloneof="tnnbass">
 		<description>Larry Nixon's Super Bass Fishing (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15760,7 +15760,7 @@
 		</part>
 	</software>
 
-	<software name="lasvegas">
+	<software name="lasvegas" cloneof="vegastak">
 		<description>Las Vegas Dream in Golden Paradise (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15826,7 +15826,7 @@
 		</part>
 	</software>
 
-	<software name="lawnmowrub" cloneof="lawnmowr">
+	<software name="lawnmowrup" cloneof="lawnmowr">
 		<description>The Lawnmower Man (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15892,7 +15892,7 @@
 		</part>
 	</software>
 
-	<software name="legendub" cloneof="legend">
+	<software name="legendup" cloneof="legend">
 		<description>Legend (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16079,7 +16079,7 @@
 		</part>
 	</software>
 
-	<software name="lennus">
+	<software name="lennus" cloneof="paladin">
 		<description>Lennus - Kodai Kikai no Kioku (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16149,7 +16149,7 @@
 	</software>
 
 	<software name="bspachi4" supported="no">
-		<description>Let's Pachinko Nante Gindama 4 (Jpn)</description>
+		<description>Let's Pachinko Nante Gindama 4 (Jpn, 0321)</description>
 		<!-- BS -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16303,7 +16303,7 @@
 		</part>
 	</software>
 
-	<software name="litlemagjb" cloneof="litlemag">
+	<software name="litlemagjp" cloneof="litlemag">
 		<description>Little Magic (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16347,7 +16347,7 @@
 		</part>
 	</software>
 
-	<software name="lockon">
+	<software name="lockon" cloneof="airdiver">
 		<description>Lock On (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16502,7 +16502,7 @@
 		</part>
 	</software>
 
-	<software name="lostvikub" cloneof="lostvik">
+	<software name="lostvikup" cloneof="lostvik">
 		<description>The Lost Vikings (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16524,7 +16524,7 @@
 		</part>
 	</software>
 
-	<software name="lotharss">
+	<software name="lotharss" cloneof="manchest">
 		<description>Lothar Matthaeus Super Soccer (Ger)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16920,7 +16920,7 @@
 		</part>
 	</software>
 
-	<software name="mickeymqub" cloneof="mickeymq">
+	<software name="mickeymqup" cloneof="mickeymq">
 		<description>The Magical Quest Starring Mickey Mouse (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -17140,7 +17140,7 @@
 		</part>
 	</software>
 
-	<software name="makeruma">
+	<software name="makeruma" cloneof="kendo">
 		<description>Makeruna! Makendou (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -17417,7 +17417,7 @@
 		</part>
 	</software>
 
-	<software name="mshub" cloneof="msh">
+	<software name="mshup" cloneof="msh">
 		<description>Marvel Super Heroes - War of the Gems (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -17450,7 +17450,7 @@
 		</part>
 	</software>
 
-	<software name="maryshb" cloneof="marysh">
+	<software name="maryshp" cloneof="marysh">
 		<description>Mary Shelley's Frankenstein (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -17494,7 +17494,7 @@
 		</part>
 	</software>
 
-	<software name="maskub" cloneof="mask">
+	<software name="maskup" cloneof="mask">
 		<description>The Mask (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18055,7 +18055,7 @@
 		</part>
 	</software>
 
-	<software name="mickeyma">
+	<software name="mickeyma" cloneof="mickeymq">
 		<description>Mickey no Magical Adventure (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18066,7 +18066,7 @@
 		</part>
 	</software>
 
-	<software name="mickeyma1" cloneof="mickeyma">
+	<software name="mickeyma1" cloneof="mickeymq">
 		<description>Mickey no Magical Adventure (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18099,7 +18099,7 @@
 		</part>
 	</software>
 
-	<software name="mickeym2s" cloneof="mickeym2">
+	<software name="mickeym2s" cloneof="mickeycm">
 		<description>Mickey to Minnie - Magical Adventure 2 (Jpn, Sample)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18110,7 +18110,7 @@
 		</part>
 	</software>
 
-	<software name="mickeym2">
+	<software name="mickeym2" cloneof="mickeycm">
 		<description>Mickey to Minnie - Magical Adventure 2 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18209,7 +18209,7 @@
 		</part>
 	</software>
 
-	<software name="mightm3b" cloneof="mightm3">
+	<software name="mightm3p" cloneof="mightm3">
 		<description>Might and Magic III - Isles of Terra (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18242,7 +18242,7 @@
 		</part>
 	</software>
 
-	<software name="mightmaxub" cloneof="mightmax">
+	<software name="mightmaxup" cloneof="mightmax">
 		<description>Mighty Max (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18352,7 +18352,7 @@
 		</part>
 	</software>
 
-	<software name="militia">
+	<software name="militia" cloneof="metalmar">
 		<description>Militia (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18561,7 +18561,7 @@
 		</part>
 	</software>
 
-	<software name="mkb" cloneof="mk">
+	<software name="mkp" cloneof="mk">
 		<description>Mortal Kombat (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18616,7 +18616,7 @@
 		</part>
 	</software>
 
-	<software name="mk3b" cloneof="mk3">
+	<software name="mk3p" cloneof="mk3">
 		<description>Mortal Kombat 3 (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18638,7 +18638,7 @@
 		</part>
 	</software>
 
-	<software name="mk3ub" cloneof="mk3">
+	<software name="mk3up" cloneof="mk3">
 		<description>Mortal Kombat 3 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18715,7 +18715,7 @@
 		</part>
 	</software>
 
-	<software name="mother2">
+	<software name="mother2" cloneof="earthbnd">
 		<description>Mother 2 - Gyiyg no Gyakushuu (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18781,7 +18781,7 @@
 		</part>
 	</software>
 
-	<software name="mrnutzub" cloneof="mrnutz">
+	<software name="mrnutzup" cloneof="mrnutz">
 		<description>Mr Nutz (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -18957,7 +18957,7 @@
 		</part>
 	</software>
 
-	<software name="mbomber">
+	<software name="mbomber" cloneof="slammast">
 		<description>Muscle Bomber - The Body Explosion (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19298,7 +19298,7 @@
 		</part>
 	</software>
 
-	<software name="nbajamteub" cloneof="nbajamte">
+	<software name="nbajamteup" cloneof="nbajamte">
 		<description>NBA Jam - Tournament Edition (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19320,7 +19320,7 @@
 		</part>
 	</software>
 
-	<software name="nbawinnd">
+	<software name="nbawinnd" cloneof="nbagivgo">
 		<description>NBA Jikkyou Basket - Winning Dunk (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19419,7 +19419,7 @@
 		</part>
 	</software>
 
-	<software name="nbapro94">
+	<software name="nbapro94" cloneof="nbashowb">
 		<description>NBA Pro Basketball '94 - Bulls vs Suns (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19430,7 +19430,7 @@
 		</part>
 	</software>
 
-	<software name="nbapro">
+	<software name="nbapro" cloneof="bullsvsb">
 		<description>NBA Pro Basketball - Bulls vs Blazers (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19441,7 +19441,7 @@
 		</part>
 	</software>
 
-	<software name="nbashowb" cloneof="nbashow">
+	<software name="nbashowp" cloneof="nbashow">
 		<description>NBA Showdown (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19463,7 +19463,7 @@
 		</part>
 	</software>
 
-	<software name="ncaabaskb" cloneof="ncaabask">
+	<software name="ncaabaskp" cloneof="wlbasket">
 		<description>NCAA Basketball (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19474,7 +19474,7 @@
 		</part>
 	</software>
 
-	<software name="ncaabask">
+	<software name="ncaabask" cloneof="wlbasket">
 		<description>NCAA Basketball (USA, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19485,7 +19485,7 @@
 		</part>
 	</software>
 
-	<software name="ncaabaska" cloneof="ncaabask">
+	<software name="ncaabaska" cloneof="wlbasket">
 		<description>NCAA Basketball (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19551,7 +19551,7 @@
 		</part>
 	</software>
 
-	<software name="new3ddevs" cloneof="new3ddev">
+	<software name="new3ddevs" cloneof="truewick">
 		<description>New 3D Golf Simulation - Devil's Course (Jpn, Sample)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19562,7 +19562,7 @@
 		</part>
 	</software>
 
-	<software name="new3ddev">
+	<software name="new3ddev" cloneof="truewick">
 		<description>New 3D Golf Simulation - Devil's Course (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19595,7 +19595,7 @@
 		</part>
 	</software>
 
-	<software name="new3dpeb">
+	<software name="new3dpeb" cloneof="truepebl">
 		<description>New 3D Golf Simulation - Pebble Beach no Hatou (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19606,7 +19606,7 @@
 		</part>
 	</software>
 
-	<software name="new3dwai">
+	<software name="new3dwai" cloneof="truewaia">
 		<description>New 3D Golf Simulation - Waialae no Kiseki (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19705,7 +19705,7 @@
 		</part>
 	</software>
 
-	<software name="nflpro94">
+	<software name="nflpro94" cloneof="madden94">
 		<description>NFL Pro Football '94 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19738,7 +19738,7 @@
 		</part>
 	</software>
 
-	<software name="nflqbub" cloneof="nflqb">
+	<software name="nflqbup" cloneof="nflqb">
 		<description>NFL Quarterback Club (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19782,7 +19782,7 @@
 		</part>
 	</software>
 
-	<software name="nflqb96ub" cloneof="nflqb96">
+	<software name="nflqb96up" cloneof="nflqb96">
 		<description>NFL Quarterback Club 96 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19815,7 +19815,7 @@
 		</part>
 	</software>
 
-	<software name="nhl94ub" cloneof="nhl94">
+	<software name="nhl94up" cloneof="nhl94">
 		<description>NHL '94 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19903,7 +19903,7 @@
 		</part>
 	</software>
 
-	<software name="nhl97ub" cloneof="nhl97">
+	<software name="nhl97up" cloneof="nhl97">
 		<description>NHL '97 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19936,7 +19936,7 @@
 		</part>
 	</software>
 
-	<software name="nhlpro94">
+	<software name="nhlpro94" cloneof="nhl94">
 		<description>NHL Pro Hockey '94 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -19947,7 +19947,7 @@
 		</part>
 	</software>
 
-	<software name="nhlstanc">
+	<software name="nhlstanc" cloneof="shockey">
 		<description>NHL Stanley Cup (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -20058,7 +20058,7 @@
 	</software>
 
 	<software name="nigelmgr" cloneof="nigelm">
-		<description>Nigel Mansell's World Championship Racing (Euro) (Gremlin Graphics)</description>
+		<description>Nigel Mansell's World Championship Racing (Gremlin Graphics) (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -20123,7 +20123,7 @@
 		</part>
 	</software>
 
-	<software name="ninjaryu">
+	<software name="ninjaryu" cloneof="ninjag">
 		<description>Ninja Ryuukenden Tomoe (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -20301,7 +20301,7 @@
 		</part>
 	</software>
 
-	<software name="nitropnk">
+	<software name="nitropnk" cloneof="rockyrod">
 		<description>Nitropunks - Might Heads (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -20477,7 +20477,7 @@
 		</part>
 	</software>
 
-	<software name="odekake">
+	<software name="odekake" cloneof="lester">
 		<description>Odekake Lester - Lelele no Le (^^; (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -20609,7 +20609,7 @@
 		</part>
 	</software>
 
-	<software name="oomonobb">
+	<software name="oomonobb" cloneof="fishmast">
 		<description>Oomono Black Bass Fishing - Jinzouko Hen (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -20785,7 +20785,7 @@
 		</part>
 	</software>
 
-	<software name="ootwb" cloneof="anotherw">
+	<software name="ootwp" cloneof="anotherw">
 		<description>Out of This World (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -20829,7 +20829,7 @@
 		</part>
 	</software>
 
-	<software name="outerw">
+	<software name="outerw" cloneof="anotherw">
 		<description>Outer World (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -20862,7 +20862,7 @@
 		</part>
 	</software>
 
-	<software name="pman">
+	<software name="pman" cloneof="prehiman">
 		<description>P-Man (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -20917,7 +20917,7 @@
 		</part>
 	</software>
 
-	<software name="pacintimb" cloneof="pacintim">
+	<software name="pacintimp" cloneof="pacintim">
 		<description>Pac-in-Time (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21236,7 +21236,7 @@
 		</part>
 	</software>
 
-	<software name="pagemstrub" cloneof="pagemstr">
+	<software name="pagemstrup" cloneof="pagemstr">
 		<description>The Pagemaster (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21269,7 +21269,7 @@
 		</part>
 	</software>
 
-	<software name="panepon">
+	<software name="panepon" cloneof="tetrisat">
 		<description>Panel de Pon (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21281,7 +21281,7 @@
 	</software>
 
 	<software name="bspanepn" supported="no">
-		<description>Panel de Pon - Event '98 (Jpn)</description>
+		<description>Panel de Pon - Event '98 (Jpn, 0111)</description>
 		<!-- BS -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21633,7 +21633,7 @@
 		</part>
 	</software>
 
-	<software name="phalanxub" cloneof="phalanx">
+	<software name="phalanxup" cloneof="phalanx">
 		<description>Phalanx - The Enforce Fighter A-144 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21666,7 +21666,7 @@
 		</part>
 	</software>
 
-	<software name="phantomub" cloneof="phantom">
+	<software name="phantomup" cloneof="phantom">
 		<description>Phantom 2040 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21853,7 +21853,7 @@
 		</part>
 	</software>
 
-	<software name="pinballdb" cloneof="pinballd">
+	<software name="pinballdp" cloneof="pinballd">
 		<description>Pinball Dreams (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21908,7 +21908,7 @@
 		</part>
 	</software>
 
-	<software name="pinballp">
+	<software name="pinballp" cloneof="pinballd">
 		<description>Pinball Pinball (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22007,7 +22007,7 @@
 		</part>
 	</software>
 
-	<software name="piratedwub" cloneof="piratedw">
+	<software name="piratedwup" cloneof="piratedw">
 		<description>The Pirates of Dark Water (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22073,7 +22073,7 @@
 		</part>
 	</software>
 
-	<software name="pitfallub" cloneof="pitfall">
+	<software name="pitfallup" cloneof="pitfall">
 		<description>Pitfall - The Mayan Adventure (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22205,7 +22205,7 @@
 		</part>
 	</software>
 
-	<software name="pocky2ub" cloneof="pocky2">
+	<software name="pocky2up" cloneof="pocky2">
 		<description>Pocky &amp; Rocky 2 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22350,7 +22350,7 @@
 		</part>
 	</software>
 
-	<software name="popoitto">
+	<software name="popoitto" cloneof="hebepopt">
 		<description>Popoitto Hebereke (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22460,7 +22460,7 @@
 		</part>
 	</software>
 
-	<software name="powerath">
+	<software name="powerath" cloneof="powermov">
 		<description>Power Athlete (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22482,7 +22482,7 @@
 		</part>
 	</software>
 
-	<software name="powerinsb" cloneof="powerins">
+	<software name="powerinsp" cloneof="powerins">
 		<description>Power Instinct (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22537,7 +22537,7 @@
 		</part>
 	</software>
 
-	<software name="powerpigb" cloneof="powerpig">
+	<software name="powerpigp" cloneof="powerpig">
 		<description>Power Piggs of the Dark Age (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22669,7 +22669,7 @@
 		</part>
 	</software>
 
-	<software name="primalub" cloneof="primal">
+	<software name="primalup" cloneof="primal">
 		<description>Primal Rage (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22779,7 +22779,7 @@
 		</part>
 	</software>
 
-	<software name="profot93">
+	<software name="profot93" cloneof="madden93">
 		<description>Pro Football '93 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22790,7 +22790,7 @@
 		</part>
 	</software>
 
-	<software name="profoot">
+	<software name="profoot" cloneof="madden">
 		<description>Pro Football (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22889,7 +22889,7 @@
 		</part>
 	</software>
 
-	<software name="prosoccr">
+	<software name="prosoccr" cloneof="wlsoccer">
 		<description>Pro Soccer (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22911,7 +22911,7 @@
 		</part>
 	</software>
 
-	<software name="proyakpzb" cloneof="proyakpz">
+	<software name="proyakpzp" cloneof="proyakpz">
 		<description>Pro Yakyuu Nettou Puzzle Stadium (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22966,7 +22966,7 @@
 		</part>
 	</software>
 
-	<software name="pushoverub" cloneof="pushover">
+	<software name="pushoverup" cloneof="pushover">
 		<description>Push-Over (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -22988,7 +22988,7 @@
 		</part>
 	</software>
 
-	<software name="puttmoon">
+	<software name="puttmoon" cloneof="suprputt">
 		<description>Putty Moon (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23076,7 +23076,7 @@
 		</part>
 	</software>
 
-	<software name="rtype3b" cloneof="rtype3">
+	<software name="rtype3p" cloneof="rtype3">
 		<description>R-Type III - The Third Lightning (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23187,7 +23187,7 @@
 		</part>
 	</software>
 
-	<software name="radrexub" cloneof="radrex">
+	<software name="radrexup" cloneof="radrex">
 		<description>Radical Rex (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23231,7 +23231,7 @@
 		</part>
 	</software>
 
-	<software name="ramosruy">
+	<software name="ramosruy" cloneof="worldsoc">
 		<description>Ramos Ruy no World Wide Soccer (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23253,7 +23253,7 @@
 		</part>
 	</software>
 
-	<software name="ranmab" cloneof="ranma">
+	<software name="ranmap" cloneof="ranma">
 		<description>Ranma 1-2 (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23319,7 +23319,7 @@
 		</part>
 	</software>
 
-	<software name="ranmagek">
+	<software name="ranmagek" cloneof="scombat">
 		<description>Ranma 1-2 - Chounai Gekitou Hen (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23396,7 +23396,7 @@
 		</part>
 	</software>
 
-	<software name="redline">
+	<software name="redline" cloneof="suzukif1">
 		<description>Redline F-1 Racer (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23418,7 +23418,7 @@
 		</part>
 	</software>
 
-	<software name="reliefb" cloneof="relief">
+	<software name="reliefp" cloneof="relief">
 		<description>Relief Pitcher (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23528,7 +23528,7 @@
 		</part>
 	</software>
 
-	<software name="returndd">
+	<software name="returndd" cloneof="sddragon">
 		<description>Return of Double Dragon (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23693,7 +23693,7 @@
 		</part>
 	</software>
 
-	<software name="riseroboub" cloneof="riserobo">
+	<software name="riseroboup" cloneof="riserobo">
 		<description>Rise of the Robots (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23748,7 +23748,7 @@
 		</part>
 	</software>
 
-	<software name="roadriotub" cloneof="roadriot">
+	<software name="roadriotup" cloneof="roadriot">
 		<description>Road Riot 4WD (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23770,7 +23770,7 @@
 		</part>
 	</software>
 
-	<software name="roadrunnb" cloneof="roadrunn">
+	<software name="roadrunnp" cloneof="roadrunn">
 		<description>Road Runner (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23891,7 +23891,7 @@
 		</part>
 	</software>
 
-	<software name="rnrracinub" cloneof="rnrracin">
+	<software name="rnrracinup" cloneof="rnrracin">
 		<description>Rock n' Roll Racing (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24199,7 +24199,7 @@
 		</part>
 	</software>
 
-	<software name="royalcnq">
+	<software name="royalcnq" cloneof="kingartw">
 		<description>Royal Conquest (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24276,7 +24276,7 @@
 		</part>
 	</software>
 
-	<software name="rushbeat">
+	<software name="rushbeat" cloneof="rivaltrf">
 		<description>Rushing Beat (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24298,7 +24298,7 @@
 		</part>
 	</software>
 
-	<software name="rushbets">
+	<software name="rushbets" cloneof="peacekep">
 		<description>Rushing Beat Shura (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24320,7 +24320,7 @@
 		</part>
 	</software>
 
-	<software name="ryukoken">
+	<software name="ryukoken" cloneof="aof">
 		<description>Ryuuko no Ken (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24463,7 +24463,7 @@
 		</part>
 	</software>
 
-	<software name="samspirb" cloneof="samsho">
+	<software name="samspirp" cloneof="samsho">
 		<description>Samurai Spirits (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24496,7 +24496,7 @@
 		</part>
 	</software>
 
-	<software name="sangoku3h">
+	<software name="sangoku3h" cloneof="roman3k3">
 		<description>Sangokushi III (HK)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24507,7 +24507,7 @@
 		</part>
 	</software>
 
-	<software name="sangoku3">
+	<software name="sangoku3" cloneof="roman3k3">
 		<description>Sangokushi III (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24518,7 +24518,7 @@
 		</part>
 	</software>
 
-	<software name="sangoku3a">
+	<software name="sangoku3a" cloneof="roman3k3">
 		<description>Sangokushi III (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24529,7 +24529,7 @@
 		</part>
 	</software>
 
-	<software name="sangoku4">
+	<software name="sangoku4" cloneof="roman3k4">
 		<description>Sangokushi IV (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24540,7 +24540,7 @@
 		</part>
 	</software>
 
-	<software name="sangoku4a" cloneof="sangoku4">
+	<software name="sangoku4a" cloneof="roman3k4">
 		<description>Sangokushi IV (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25055,7 +25055,7 @@
 		</part>
 	</software>
 
-	<software name="seikndn2">
+	<software name="seikndn2" cloneof="mana">
 		<description>Seiken Densetsu 2 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25110,7 +25110,7 @@
 		</part>
 	</software>
 
-	<software name="sensibleb" cloneof="sensible">
+	<software name="sensiblep" cloneof="sensible">
 		<description>Sensible Soccer - European Champions (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25132,7 +25132,7 @@
 		</part>
 	</software>
 
-	<software name="septentr">
+	<software name="septentr" cloneof="sos">
 		<description>Septentrion (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25143,7 +25143,7 @@
 		</part>
 	</software>
 
-	<software name="serizawa">
+	<software name="serizawa" cloneof="mecarobo">
 		<description>Serizawa Nobuo no Birdie Try (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25231,7 +25231,7 @@
 		</part>
 	</software>
 
-	<software name="shadowrnub" cloneof="shadowrn">
+	<software name="shadowrnup" cloneof="shadowrn">
 		<description>Shadowrun (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25331,7 +25331,7 @@
 		</part>
 	</software>
 
-	<software name="shaqfuub" cloneof="shaqfu">
+	<software name="shaqfuup" cloneof="shaqfu">
 		<description>Shaq Fu (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25364,7 +25364,7 @@
 		</part>
 	</software>
 
-	<software name="shien">
+	<software name="shienj" cloneof="shien">
 		<description>Shien - The Blade Chaser (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25375,7 +25375,7 @@
 		</part>
 	</software>
 
-	<software name="shienrevb" cloneof="shienrev">
+	<software name="shienp" cloneof="shien">
 		<description>Shien's Revenge (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25386,7 +25386,7 @@
 		</part>
 	</software>
 
-	<software name="shienrev">
+	<software name="shien">
 		<description>Shien's Revenge (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25892,7 +25892,7 @@
 		</part>
 	</software>
 
-	<software name="simantb" cloneof="simant">
+	<software name="simantp" cloneof="simant">
 		<description>SimAnt (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26112,7 +26112,7 @@
 		</part>
 	</software>
 
-	<software name="skiparad">
+	<software name="skiparad" cloneof="valdiser">
 		<description>Ski Paradise with Snowboard (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26123,7 +26123,7 @@
 		</part>
 	</software>
 
-	<software name="skuljaggb" cloneof="skuljagg">
+	<software name="skuljaggp" cloneof="skuljagg">
 		<description>Skuljagger - Revolt of the Westicans (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26145,7 +26145,7 @@
 		</part>
 	</software>
 
-	<software name="skymiss">
+	<software name="skymiss" cloneof="blazsky">
 		<description>Sky Mission (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26178,7 +26178,7 @@
 		</part>
 	</software>
 
-	<software name="skyblazrub" cloneof="skyblazr">
+	<software name="skyblazrup" cloneof="skyblazr">
 		<description>Skyblazer (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26200,7 +26200,7 @@
 		</part>
 	</software>
 
-	<software name="slapstic">
+	<software name="slapstic" cloneof="robotrek">
 		<description>Slap Stick (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26354,7 +26354,7 @@
 		</part>
 	</software>
 
-	<software name="smashtenb" cloneof="smashten">
+	<software name="smashtenp" cloneof="smashten">
 		<description>Smash Tennis (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26431,7 +26431,7 @@
 		</part>
 	</software>
 
-	<software name="soccerkdjb" cloneof="soccerkd">
+	<software name="soccerkdjp" cloneof="soccerkd">
 		<description>Soccer Kid (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26464,7 +26464,7 @@
 		</part>
 	</software>
 
-	<software name="soldfort">
+	<software name="soldfort" cloneof="chaose">
 		<description>Soldiers of Fortune (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26486,8 +26486,8 @@
 		</part>
 	</software>
 
-	<software name="solstic2b">
-		<description>Solstice II (Jpn, Prototype) (1993-03-03)</description>
+	<software name="solstic2p" cloneof="equinox">
+		<description>Solstice II (Jpn, Prototype, 19930303)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -26497,7 +26497,7 @@
 		</part>
 	</software>
 
-	<software name="solstic2">
+	<software name="solstic2" cloneof="equinox">
 		<description>Solstice II (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26695,7 +26695,7 @@
 		</part>
 	</software>
 
-	<software name="soulbldr">
+	<software name="soulbldr" cloneof="soulblzr">
 		<description>Soul Blader (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26819,7 +26819,7 @@
 		</part>
 	</software>
 
-	<software name="spaceaceub" cloneof="spaceace">
+	<software name="spaceaceup" cloneof="spaceace">
 		<description>Space Ace (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26841,7 +26841,7 @@
 		</part>
 	</software>
 
-	<software name="spacebaz">
+	<software name="spacebaz" cloneof="batlclsh">
 		<description>Space Bazooka (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26863,7 +26863,7 @@
 		</part>
 	</software>
 
-	<software name="spacebob">
+	<software name="spacebob" cloneof="bob">
 		<description>Space Funky B.O.B. (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26907,7 +26907,7 @@
 		</part>
 	</software>
 
-	<software name="spacemeg">
+	<software name="spacemeg" cloneof="aleste">
 		<description>Space Megaforce (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27062,7 +27062,7 @@
 		</part>
 	</software>
 
-	<software name="speedyub" cloneof="speedy">
+	<software name="speedyup" cloneof="speedy">
 		<description>Speedy Gonzales in Los Gatos Bandidos (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27139,7 +27139,7 @@
 		</part>
 	</software>
 
-	<software name="spidermnub" cloneof="spidermn">
+	<software name="spidermnup" cloneof="spidermn">
 		<description>Spider-Man (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27172,7 +27172,7 @@
 		</part>
 	</software>
 
-	<software name="spidxmenub" cloneof="spidxmen">
+	<software name="spidxmenup" cloneof="spidxmen">
 		<description>Spider-Man and the X-Men in Arcade's Revenge (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27249,7 +27249,7 @@
 		</part>
 	</software>
 
-	<software name="sillcfbb" cloneof="sillcfb">
+	<software name="sillcfbp" cloneof="sillcfb">
 		<description>Sports Illustrated Championship Football &amp; Baseball (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27327,7 +27327,7 @@
 		</part>
 	</software>
 
-	<software name="starfoxj" cloneof="starfox">
+	<software name="starfoxj" cloneof="starwing">
 		<description>Star Fox (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27338,7 +27338,7 @@
 		</part>
 	</software>
 
-	<software name="starfox">
+	<software name="starfox" cloneof="starwing">
 		<description>Star Fox (USA, Rev. 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27349,7 +27349,7 @@
 		</part>
 	</software>
 
-	<software name="starfoxswc" cloneof="starfox">
+	<software name="starfoxswc" cloneof="starwing">
 		<description>Star Fox (USA, Super Weekend Competition)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27360,7 +27360,7 @@
 		</part>
 	</software>
 
-	<software name="starfoxa" cloneof="starfox">
+	<software name="starfoxa" cloneof="starwing">
 		<description>Star Fox (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27415,7 +27415,7 @@
 		</part>
 	</software>
 
-	<software name="stdsnub" cloneof="stdsn">
+	<software name="stdsnup" cloneof="stdsn">
 		<description>Star Trek - Deep Space Nine - Crossroads of Time (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27525,7 +27525,7 @@
 		</part>
 	</software>
 
-	<software name="stargateub" cloneof="stargate">
+	<software name="stargateup" cloneof="stargate">
 		<description>Stargate (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27811,7 +27811,7 @@
 		</part>
 	</software>
 
-	<software name="street95b" cloneof="street95">
+	<software name="street95p" cloneof="street95">
 		<description>Street Hockey '95 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27866,7 +27866,7 @@
 		</part>
 	</software>
 
-	<software name="sracerub" cloneof="sracer">
+	<software name="sracerup" cloneof="sracer">
 		<description>Street Racer (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -27910,7 +27910,7 @@
 		</part>
 	</software>
 
-	<software name="strikerb" cloneof="striker">
+	<software name="strikerp" cloneof="striker">
 		<description>Striker (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28031,7 +28031,7 @@
 		</part>
 	</software>
 
-	<software name="super3db">
+	<software name="super3db" cloneof="baselod2">
 		<description>Super 3D Baseball (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28042,7 +28042,7 @@
 		</part>
 	</software>
 
-	<software name="super4wd">
+	<software name="super4wd" cloneof="suprbaja">
 		<description>Super 4WD - The Baja (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28174,7 +28174,7 @@
 		</part>
 	</software>
 
-	<software name="supraoki">
+	<software name="supraoki" cloneof="genghis2">
 		<description>Super Aoki Ookami to Shiroki Mejika - Genchou Hishi (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28185,7 +28185,7 @@
 		</part>
 	</software>
 
-	<software name="aquagameb" cloneof="aquagame">
+	<software name="aquagamep" cloneof="jpondcs">
 		<description>The Super Aquatic Games Starring the Aquabats (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28196,7 +28196,7 @@
 		</part>
 	</software>
 
-	<software name="aquagame">
+	<software name="aquagame" cloneof="jpondcs">
 		<description>The Super Aquatic Games Starring the Aquabats (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28427,7 +28427,7 @@
 		</part>
 	</software>
 
-	<software name="sbillard">
+	<software name="sbillard" cloneof="champl">
 		<description>Super Billiard - Championship Pool (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28471,7 +28471,7 @@
 		</part>
 	</software>
 
-	<software name="sblkbas2">
+	<software name="sblkbas2" cloneof="blackbas">
 		<description>Super Black Bass 2 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28603,7 +28603,7 @@
 		</part>
 	</software>
 
-	<software name="sbombmn3jb" cloneof="sbombmn3">
+	<software name="sbombmn3jp" cloneof="sbombmn3">
 		<description>Super Bomberman 3 (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28669,7 +28669,7 @@
 		</part>
 	</software>
 
-	<software name="sbonk">
+	<software name="sbonk" cloneof="superbc">
 		<description>Super Bonk (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28702,7 +28702,7 @@
 		</part>
 	</software>
 
-	<software name="sbbrosb" cloneof="sbbros">
+	<software name="sbbrosp" cloneof="spang">
 		<description>Super Buster Bros. (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28713,7 +28713,7 @@
 		</part>
 	</software>
 
-	<software name="sbbros">
+	<software name="sbbros" cloneof="spang">
 		<description>Super Buster Bros. (USA, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28735,7 +28735,7 @@
 		</part>
 	</software>
 
-	<software name="scaesarb" cloneof="scaesar">
+	<software name="scaesarp" cloneof="scaesar">
 		<description>Super Caesars Palace (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28856,7 +28856,7 @@
 		</part>
 	</software>
 
-	<software name="schinwld">
+	<software name="schinwld" cloneof="ninjaboy">
 		<description>Super Chinese World (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28933,7 +28933,7 @@
 		</part>
 	</software>
 
-	<software name="supercup">
+	<software name="supercup" cloneof="sgoal">
 		<description>Super Cup Soccer (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28944,7 +28944,7 @@
 		</part>
 	</software>
 
-	<software name="sdaikouj">
+	<software name="sdaikouj" cloneof="unchartd">
 		<description>Super Daikoukai Jidai (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28955,7 +28955,7 @@
 		</part>
 	</software>
 
-	<software name="sdanyb" cloneof="sdany">
+	<software name="sdanyp" cloneof="sdany">
 		<description>Super Dany (Fra, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28977,7 +28977,7 @@
 		</part>
 	</software>
 
-	<software name="sdogfght">
+	<software name="sdogfght" cloneof="turnburn">
 		<description>Super Dogfight (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29054,7 +29054,7 @@
 		</part>
 	</software>
 
-	<software name="sddragonb" cloneof="sddragon">
+	<software name="sddragonp" cloneof="sddragon">
 		<description>Super Double Dragon (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29109,7 +29109,7 @@
 		</part>
 	</software>
 
-	<software name="sdrakkhn">
+	<software name="sdrakkhn" cloneof="dview">
 		<description>Super Drakkhen (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29287,7 +29287,7 @@
 		</part>
 	</software>
 
-	<software name="famitenn">
+	<software name="famitenn" cloneof="smashten">
 		<description>Super Family Tennis (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29298,7 +29298,7 @@
 		</part>
 	</software>
 
-	<software name="sfamista">
+	<software name="sfamista" cloneof="batterup">
 		<description>Super Famista (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29496,7 +29496,7 @@
 		</part>
 	</software>
 
-	<software name="formsocr">
+	<software name="formsocr" cloneof="ssoccer">
 		<description>Super Formation Soccer (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29595,7 +29595,7 @@
 		</part>
 	</software>
 
-	<software name="sgenjin">
+	<software name="sgenjin" cloneof="superbc">
 		<description>Super Genjin (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29617,7 +29617,7 @@
 		</part>
 	</software>
 
-	<software name="supergng">
+	<software name="sgng">
 		<description>Super Ghouls'n Ghosts (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29793,7 +29793,7 @@
 		</part>
 	</software>
 
-	<software name="shimpactb" cloneof="shimpact">
+	<software name="shimpactp" cloneof="shimpact">
 		<description>Super High Impact (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29815,7 +29815,7 @@
 		</part>
 	</software>
 
-	<software name="shocke94">
+	<software name="shocke94" cloneof="superice">
 		<description>Super Hockey '94 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29892,7 +29892,7 @@
 		</part>
 	</software>
 
-	<software name="suprinin">
+	<software name="suprinin" cloneof="inindo">
 		<description>Super Inindou - Datou Nobunaga (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29903,7 +29903,7 @@
 		</part>
 	</software>
 
-	<software name="sicricktb" cloneof="sicrickt">
+	<software name="sicricktp" cloneof="sicrickt">
 		<description>Super International Cricket (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29925,7 +29925,7 @@
 		</part>
 	</software>
 
-	<software name="sjpondb" cloneof="sjpond">
+	<software name="sjpondp" cloneof="sjpond2">
 		<description>Super James Pond (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29936,7 +29936,7 @@
 		</part>
 	</software>
 
-	<software name="sjpond">
+	<software name="sjpond" cloneof="sjpond2">
 		<description>Super James Pond (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -30057,7 +30057,7 @@
 		</part>
 	</software>
 
-	<software name="skickbox">
+	<software name="skickbox" cloneof="bestof">
 		<description>Super Kick Boxing - Best of the Best (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -30068,7 +30068,7 @@
 		</part>
 	</software>
 
-	<software name="skickoff">
+	<software name="skickoff" cloneof="kickoff">
 		<description>Super Kick Off (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -30156,7 +30156,7 @@
 		</part>
 	</software>
 
-	<software name="slinearb">
+	<software name="slinearp" cloneof="spacefoo">
 		<description>Super Linearball (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -30763,7 +30763,7 @@
 		</part>
 	</software>
 
-	<software name="snobu">
+	<software name="snobu" cloneof="nobunaga">
 		<description>Super Nobunaga no Yabou - Bushou Fuuunroku (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -30774,7 +30774,7 @@
 		</part>
 	</software>
 
-	<software name="snobua" cloneof="snobu">
+	<software name="snobua" cloneof="nobunaga">
 		<description>Super Nobunaga no Yabou - Bushou Fuuunroku (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -30840,7 +30840,7 @@
 		</part>
 	</software>
 
-	<software name="suprbajab" cloneof="suprbaja">
+	<software name="suprbajap" cloneof="suprbaja">
 		<description>Super Off Road - The Baja (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -30939,7 +30939,7 @@
 		</part>
 	</software>
 
-	<software name="spinbaljb" cloneof="spinbal">
+	<software name="spinbaljp" cloneof="spinbal">
 		<description>Super Pinball - Behind the Mask (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31071,7 +31071,7 @@
 		</part>
 	</software>
 
-	<software name="spbaseb">
+	<software name="spbaseb" cloneof="baselod">
 		<description>Super Professional Baseball (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31126,7 +31126,7 @@
 		</part>
 	</software>
 
-	<software name="suprputtb" cloneof="suprputt">
+	<software name="suprputtp" cloneof="suprputt">
 		<description>Super Putty (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31302,7 +31302,7 @@
 		</part>
 	</software>
 
-	<software name="sroyalbl">
+	<software name="sroyalbl" cloneof="gemfire">
 		<description>Super Royal Blood (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31335,7 +31335,7 @@
 		</part>
 	</software>
 
-	<software name="ssango2">
+	<software name="ssango2" cloneof="roman3k2">
 		<description>Super Sangokushi II (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31346,7 +31346,7 @@
 		</part>
 	</software>
 
-	<software name="ssango2a" cloneof="ssango2">
+	<software name="ssango2a" cloneof="roman3k2">
 		<description>Super Sangokushi II (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31390,7 +31390,7 @@
 		</part>
 	</software>
 
-	<software name="sshangha">
+	<software name="sshangha" cloneof="shangha2">
 		<description>Super Shanghai - Dragon's Eye (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31489,7 +31489,7 @@
 		</part>
 	</software>
 
-	<software name="ssnakey">
+	<software name="ssnakey" cloneof="wildsnak">
 		<description>Super Snakey (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31522,7 +31522,7 @@
 		</part>
 	</software>
 
-	<software name="ssoccerc">
+	<software name="ssoccerc" cloneof="eurofoot">
 		<description>Super Soccer Champ (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31566,7 +31566,7 @@
 		</part>
 	</software>
 
-	<software name="suprstad">
+	<software name="suprstad" cloneof="nolan">
 		<description>Super Stadium (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31610,7 +31610,7 @@
 		</part>
 	</software>
 
-	<software name="superswub" cloneof="supersw">
+	<software name="superswup" cloneof="supersw">
 		<description>Super Star Wars (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31709,7 +31709,7 @@
 		</part>
 	</software>
 
-	<software name="superesbb" cloneof="superesb">
+	<software name="superesbp" cloneof="superesb">
 		<description>Super Star Wars - The Empire Strikes Back (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31962,7 +31962,7 @@
 		</part>
 	</software>
 
-	<software name="strollub" cloneof="stroll">
+	<software name="strollup" cloneof="stroll">
 		<description>Super Troll Islands (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32095,7 +32095,7 @@
 		</part>
 	</software>
 
-	<software name="sturric2ub" cloneof="sturric2">
+	<software name="sturric2up" cloneof="sturric2">
 		<description>Super Turrican 2 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32117,7 +32117,7 @@
 		</part>
 	</software>
 
-	<software name="ultrabb">
+	<software name="ultrabb" cloneof="bbsim1k">
 		<description>Super Ultra Baseball (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32206,7 +32206,7 @@
 		</part>
 	</software>
 
-	<software name="svolley2">
+	<software name="svolley2" cloneof="hyprvbal">
 		<description>Super Volley II (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32441,7 +32441,7 @@
 		</part>
 	</software>
 
-	<software name="swordman">
+	<software name="swordman" cloneof="xkaliber">
 		<description>Sword Maniac (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32485,7 +32485,7 @@
 		</part>
 	</software>
 
-	<software name="syndicatb" cloneof="syndicat">
+	<software name="syndicatp" cloneof="syndicat">
 		<description>Syndicate (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32529,7 +32529,7 @@
 		</part>
 	</software>
 
-	<software name="syvalionb" cloneof="syvalion">
+	<software name="syvalionp" cloneof="syvalion">
 		<description>Syvalion (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32683,7 +32683,7 @@
 		</part>
 	</software>
 
-	<software name="brassnum">
+	<software name="brassnum" cloneof="doomsday">
 		<description>Taiketsu!! Brass Numbers (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32738,7 +32738,7 @@
 		</part>
 	</software>
 
-	<software name="takameij">
+	<software name="takameij" cloneof="advisl">
 		<description>Takahashi Meijin no Daiboukenjima (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32749,7 +32749,7 @@
 		</part>
 	</software>
 
-	<software name="takamei2">
+	<software name="takamei2" cloneof="advisl2">
 		<description>Takahashi Meijin no Daiboukenjima II (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32771,7 +32771,7 @@
 		</part>
 	</software>
 
-	<software name="takedasc">
+	<software name="takedasc" cloneof="sgoal2">
 		<description>Takeda Nobuhiro no Super Cup Soccer (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32837,7 +32837,7 @@
 		</part>
 	</software>
 
-	<software name="tatkgen2">
+	<software name="tatkgen2" cloneof="congocap">
 		<description>Tatakae Genshijin 2 - Rookie no Bouken (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32848,7 +32848,7 @@
 		</part>
 	</software>
 
-	<software name="tatkgen3">
+	<software name="tatkgen3" cloneof="joemac3">
 		<description>Tatakae Genshijin 3 - Shuyaku wa Yappari Joe &amp; Mac (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32870,7 +32870,7 @@
 		</part>
 	</software>
 
-	<software name="tazmaniaub" cloneof="tazmania">
+	<software name="tazmaniaup" cloneof="tazmania">
 		<description>Taz-Mania (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32903,7 +32903,7 @@
 		</part>
 	</software>
 
-	<software name="secretstb" cloneof="secretst">
+	<software name="secretstp" cloneof="secretst">
 		<description>Tecmo Secret of the Stars (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32936,7 +32936,7 @@
 		</part>
 	</software>
 
-	<software name="tecmobbb" cloneof="tecmobb">
+	<software name="tecmobbp" cloneof="tecmobb">
 		<description>Tecmo Super Baseball (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32969,7 +32969,7 @@
 		</part>
 	</software>
 
-	<software name="tecmobwlb" cloneof="tecmobwl">
+	<software name="tecmobwlp" cloneof="tecmobwl">
 		<description>Tecmo Super Bowl (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33134,7 +33134,7 @@
 		</part>
 	</software>
 
-	<software name="tmnttfub" cloneof="tmnttf">
+	<software name="tmnttfup" cloneof="tmnttf">
 		<description>Teenage Mutant Ninja Turtles - Tournament Fighters (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33178,7 +33178,7 @@
 		</part>
 	</software>
 
-	<software name="tmnt4ub" cloneof="tmnt4">
+	<software name="tmnt4up" cloneof="tmnt4">
 		<description>Teenage Mutant Ninja Turtles IV - Turtles in Time (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33200,7 +33200,7 @@
 		</part>
 	</software>
 
-	<software name="teiketsu">
+	<software name="teiketsu" cloneof="pto">
 		<description>Teitoku no Ketsudan (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33211,7 +33211,7 @@
 		</part>
 	</software>
 
-	<software name="teiketsua" cloneof="teiketsu">
+	<software name="teiketsua" cloneof="pto">
 		<description>Teitoku no Ketsudan (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33222,7 +33222,7 @@
 		</part>
 	</software>
 
-	<software name="teikets2">
+	<software name="teikets2" cloneof="pto2">
 		<description>Teitoku no Ketsudan II (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33233,7 +33233,7 @@
 		</part>
 	</software>
 
-	<software name="teikets2a" cloneof="teikets2">
+	<software name="teikets2a" cloneof="pto2">
 		<description>Teitoku no Ketsudan II (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33288,7 +33288,7 @@
 		</part>
 	</software>
 
-	<software name="tenchiso">
+	<software name="tenchiso" cloneof="terranig">
 		<description>Tenchi Souzou (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33321,7 +33321,7 @@
 		</part>
 	</software>
 
-	<software name="prowrevo">
+	<software name="prowrevo" cloneof="hammerlk">
 		<description>Tenryuu Genichirou no Pro Wrestling Revolution (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33343,7 +33343,7 @@
 		</part>
 	</software>
 
-	<software name="t2judgeb" cloneof="t2judge">
+	<software name="t2judgep" cloneof="t2judge">
 		<description>Terminator 2 - Judgment Day (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33376,7 +33376,7 @@
 		</part>
 	</software>
 
-	<software name="termintrb" cloneof="termintr">
+	<software name="termintrp" cloneof="termintr">
 		<description>The Terminator (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33552,7 +33552,7 @@
 		</part>
 	</software>
 
-	<software name="tetrisfl">
+	<software name="tetrisfl" cloneof="tetris2">
 		<description>Tetris Flash (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33695,7 +33695,7 @@
 		</part>
 	</software>
 
-	<software name="timeslipb" cloneof="timeslip">
+	<software name="timeslipp" cloneof="timeslip">
 		<description>Time Slip (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33739,7 +33739,7 @@
 		</part>
 	</software>
 
-	<software name="timetraxub" cloneof="timetrax">
+	<software name="timetraxup" cloneof="timetrax">
 		<description>Time Trax (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33893,7 +33893,7 @@
 		</part>
 	</software>
 
-	<software name="ttoonbblub" cloneof="ttoonbbl">
+	<software name="ttoonbblup" cloneof="ttoonbbl">
 		<description>Tiny Toon Adventures - Buster Busts Loose! (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33915,7 +33915,7 @@
 		</part>
 	</software>
 
-	<software name="ttoondd">
+	<software name="ttoondd" cloneof="ttoonwak">
 		<description>Tiny Toon Adventures - Dotabata Daiundoukai (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -33937,7 +33937,7 @@
 		</part>
 	</software>
 
-	<software name="ttoonwakb" cloneof="ttoonwak">
+	<software name="ttoonwakp" cloneof="ttoonwak">
 		<description>Tiny Toon Adventures - Wild &amp; Wacky Sports (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34069,7 +34069,7 @@
 		</part>
 	</software>
 
-	<software name="tomjerryub" cloneof="tomjerry">
+	<software name="tomjerryup" cloneof="tomjerry">
 		<description>Tom &amp; Jerry (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34091,7 +34091,7 @@
 		</part>
 	</software>
 
-	<software name="tommymoe">
+	<software name="tommymoe" cloneof="valdiser">
 		<description>Tommy Moe's Winter Extreme - Skiing and Snowboarding (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34102,7 +34102,7 @@
 		</part>
 	</software>
 
-	<software name="tonymeol">
+	<software name="tonymeol" cloneof="worldsoc">
 		<description>Tony Meola's Sidekicks Soccer (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34190,7 +34190,7 @@
 		</part>
 	</software>
 
-	<software name="topracer">
+	<software name="topracer" cloneof="topgear">
 		<description>Top Racer (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34201,7 +34201,7 @@
 		</part>
 	</software>
 
-	<software name="topracr2">
+	<software name="topracr2" cloneof="topgear2">
 		<description>Top Racer 2 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34267,7 +34267,7 @@
 		</part>
 	</software>
 
-	<software name="totalcarub" cloneof="totalcar">
+	<software name="totalcarup" cloneof="totalcar">
 		<description>Total Carnage (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34433,7 +34433,7 @@
 		</part>
 	</software>
 
-	<software name="troddlerb" cloneof="troddler">
+	<software name="troddlerp" cloneof="troddler">
 		<description>Troddlers (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34565,7 +34565,7 @@
 		</part>
 	</software>
 
-	<software name="trueliesub" cloneof="truelies">
+	<software name="trueliesup" cloneof="truelies">
 		<description>True Lies (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34587,7 +34587,7 @@
 		</part>
 	</software>
 
-	<software name="trumpisl">
+	<software name="trumpisl" cloneof="supersol">
 		<description>Trump Island (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34741,7 +34741,7 @@
 		</part>
 	</software>
 
-	<software name="twisted">
+	<software name="mcfang">
 		<description>The Twisted Tales of Spike McFang (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34796,7 +34796,7 @@
 		</part>
 	</software>
 
-	<software name="tekkamnb" cloneof="tekkamn">
+	<software name="tekkamnp" cloneof="tekkamn">
 		<description>Uchuu no Kishi Tekkaman Blade (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34840,7 +34840,7 @@
 		</part>
 	</software>
 
-	<software name="ultimar2b" cloneof="ultimar2">
+	<software name="ultimar2p" cloneof="ultimar2">
 		<description>Ultima - Runes of Virtue II (USA, Prototype, 19930730)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34873,7 +34873,7 @@
 		</part>
 	</software>
 
-	<software name="ultimag">
+	<software name="ultimag" cloneof="ultimar2">
 		<description>Ultima Gaiden - Kuro Kishi no Inbou (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34884,7 +34884,7 @@
 		</part>
 	</software>
 
-	<software name="ultima6jb" cloneof="ultima6">
+	<software name="ultima6jp" cloneof="ultima6">
 		<description>Ultima VI - Itsuwari no Yogensha (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34928,7 +34928,7 @@
 		</part>
 	</software>
 
-	<software name="ultima7b" cloneof="ultima7">
+	<software name="ultima7p" cloneof="ultima7">
 		<description>Ultima VII - The Black Gate (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -34961,7 +34961,7 @@
 		</part>
 	</software>
 
-	<software name="ultfoot">
+	<software name="ultfoot" cloneof="footfury">
 		<description>Ultimate Football (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35181,7 +35181,7 @@
 		</part>
 	</software>
 
-	<software name="unirally">
+	<software name="unirally" cloneof="uniracer">
 		<description>Unirally (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35236,7 +35236,7 @@
 		</part>
 	</software>
 
-	<software name="usaiceh">
+	<software name="usaiceh" cloneof="prosport">
 		<description>USA Ice Hockey (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35247,7 +35247,7 @@
 		</part>
 	</software>
 
-	<software name="usaiceha" cloneof="usaiceh">
+	<software name="usaiceha" cloneof="prosport">
 		<description>USA Ice Hockey (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35302,7 +35302,7 @@
 		</part>
 	</software>
 
-	<software name="utopiaub" cloneof="utopia">
+	<software name="utopiaup" cloneof="utopia">
 		<description>Utopia - The Creation of a Nation (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35335,8 +35335,8 @@
 		</part>
 	</software>
 
-	<software name="valdiserfb" cloneof="valdiser">
-		<description>Val d'Isere Championship (Fra, Prototype 19931027)</description>
+	<software name="valdiserfp" cloneof="valdiser">
+		<description>Val d'Isere Championship (Fra, Prototype, 19931027)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35412,7 +35412,7 @@
 		</part>
 	</software>
 
-	<software name="vikingd">
+	<software name="vikingd" cloneof="lostvik">
 		<description>Viking no Daimeiwaku (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35445,7 +35445,7 @@
 		</part>
 	</software>
 
-	<software name="vbartub" cloneof="vbart">
+	<software name="vbartup" cloneof="vbart">
 		<description>Virtual Bart (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35489,7 +35489,7 @@
 		</part>
 	</software>
 
-	<software name="virtwars">
+	<software name="virtwars" cloneof="lawnmowr">
 		<description>Virtual Wars (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35500,7 +35500,7 @@
 		</part>
 	</software>
 
-	<software name="volleytw">
+	<software name="volleytw" cloneof="digspike">
 		<description>Volleyball Twin (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35710,7 +35710,7 @@
 		</part>
 	</software>
 
-	<software name="warlockub" cloneof="warlock">
+	<software name="warlockup" cloneof="warlock">
 		<description>Warlock (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35765,7 +35765,7 @@
 		</part>
 	</software>
 
-	<software name="wgnhlpab" cloneof="wgnhlpa">
+	<software name="wgnhlpap" cloneof="wgnhlpa">
 		<description>Wayne Gretzky and the NHLPA All-Stars (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35974,7 +35974,7 @@
 		</part>
 	</software>
 
-	<software name="wildgunsjb" cloneof="wildguns">
+	<software name="wildgunsjp" cloneof="wildguns">
 		<description>Wild Guns (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36018,7 +36018,7 @@
 		</part>
 	</software>
 
-	<software name="wildtrax">
+	<software name="wildtrax" cloneof="stuntfx">
 		<description>Wild Trax (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36095,7 +36095,7 @@
 		</part>
 	</software>
 
-	<software name="wingscrtb" cloneof="wingscrt">
+	<software name="wingscrtp" cloneof="wingscrt">
 		<description>Wing Commander - The Secret Missions (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36128,7 +36128,7 @@
 		</part>
 	</software>
 
-	<software name="wings2b" cloneof="wings2">
+	<software name="wings2p" cloneof="blazsky">
 		<description>Wings 2 - Aces High (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36139,7 +36139,7 @@
 		</part>
 	</software>
 
-	<software name="wings2">
+	<software name="wings2" cloneof="blazsky">
 		<description>Wings 2 - Aces High (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36238,7 +36238,7 @@
 		</part>
 	</software>
 
-	<software name="wizapb" cloneof="wizap">
+	<software name="wizapp" cloneof="wizap">
 		<description>Wizap! - Ankoku no Ou (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36371,7 +36371,7 @@
 		</part>
 	</software>
 
-	<software name="wolfn3dub" cloneof="wolfn3d">
+	<software name="wolfn3dup" cloneof="wolfn3d">
 		<description>Wolfenstein 3D (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36437,7 +36437,7 @@
 		</part>
 	</software>
 
-	<software name="wolverinub" cloneof="wolverin">
+	<software name="wolverinup" cloneof="wolverin">
 		<description>Wolverine - Adamantium Rage (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36536,7 +36536,7 @@
 		</part>
 	</software>
 
-	<software name="wcstrikrb" cloneof="wcstrikr">
+	<software name="wcstrikrp" cloneof="wcstrikr">
 		<description>World Cup Striker (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36646,7 +36646,7 @@
 		</part>
 	</software>
 
-	<software name="wh2b" cloneof="wh2">
+	<software name="wh2p" cloneof="wh2">
 		<description>World Heroes 2 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36921,7 +36921,7 @@
 		</part>
 	</software>
 
-	<software name="xkaliberub" cloneof="xkaliber">
+	<software name="xkaliberup" cloneof="xkaliber">
 		<description>X-Kaliber 2097 (USA, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -36998,7 +36998,7 @@
 		</part>
 	</software>
 
-	<software name="xandra">
+	<software name="xandra" cloneof="whirlo">
 		<description>Xandra no Daibouken - Valkyrie to no Deai (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -37252,7 +37252,7 @@
 		</part>
 	</software>
 
-	<software name="youkaib">
+	<software name="youkaib" cloneof="jetsons">
 		<description>Youkai Buster - Ruka no Daibouken (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -37508,7 +37508,7 @@
 	</software>
 
 	<software name="bszelda3" supported="no">
-		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, BS)</description>
+		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, BS, 0528)</description>
 		<!-- BS -->
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -37717,7 +37717,7 @@
 		</part>
 	</software>
 
-	<software name="zombiesb" cloneof="zombies">
+	<software name="zombiesp" cloneof="zombies">
 		<description>Zombies (Euro, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -38050,4 +38050,442 @@
 		</part>
 	</software>
 -->
+
+	<software name="bsaklive" supported="no">
+    <!-- this game has a corrupted header, and requires to be patched in order to work -->
+		<description>AK LIVE Hit Gang (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="AK LIVE Hit Gang.sfc" size="524288" crc="9905d4c3" sha1="bd742cbd788439e021cd101d935451ba34a8116e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsgamb19" supported="no">
+		<description>Gambler Jikochuushinha 2 - Dorapon Quest (Jpn, BS, 1219)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Gambler Jiko Chuushinha 2 - Dorapon Quest (BS) (Japan) (Dec 19).sfc" size="1048576" crc="11b8e93a" sha1="10ed890794c969654fccc8b15e92d4cef5d13382" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsgamb20" supported="no">
+		<description>Gambler Jikochuushinha 2 - Dorapon Quest (Jpn, BS, 1220)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Gambler Jiko Chuushinha 2 - Dorapon Quest (BS) (Japan) (Dec 20).sfc" size="1048576" crc="f9e8a8ee" sha1="a4999b026cd05ae71b6f0a8ede1ce1bf86215d08" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbomb2" supported="no">
+		<description>Super Bomberman 2 (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Super Bomberman 2 (BS).sfc" size="1048576" crc="095f2969" sha1="9fc6d3df4c35f1a1ee1e1c825ad76e07126c383a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssfpw" supported="no">
+		<description>Super Fire Pro Wrestling (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Super Fire Pro Wrestling (BS).sfc" size="1048576" crc="dfd7b14d" sha1="1ff3eb2cc71abd5a0f00f6ddae24f494273adf28" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsnazo" supported="no">
+		<description>Super Nazo Puyo - Lulu no Luu (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Super Nazo Puyo (BS) (Japan).sfc" size="1048576" crc="6b36b2af" sha1="a013f8453c7dbfd228d592340c08161f019d15bd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbokud2" supported="no">
+		<description>BS Bokujo Monogatari Dai-2-wa (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="BS Bokujo  Monogatari Da-2-wa (Japan).sfc" size="1048576" crc="0bf62746" sha1="2f15cf736d7370646cfbd825e6d66efa0e6deb04" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscasino" supported="no">
+    <!-- this was dumped from a memory pack containing data for both games. split dumps are also available, but they seem to have issues -->
+		<description>Kouryaku Casino Bar Roulette (Jpn) &amp; Game Tora no Ooana Special (Jpn, 0224)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Kouryaku Casino Bar Roulette + Game Tora no Ooana Special 2-24 (BS).sfc" size="1048576" crc="4b881535" sha1="ae574eae616f30accb2a000d6d480fac9845dbc2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bstamopc" supported="no">
+		<description>Tamori no Picross (Jpn, 0613)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Tamori_no_Picross_6-13.sfc" size="1048576" crc="bf6cab42" sha1="9573a7e1a2151b05302a9ea2e5b7f1ab1f195593" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssndlov" supported="no">
+		<description>BS Sound Journal for Lovers - Valentine Special Vol. 1 (Jpn)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="BS Sound Journal for Lovers - Valentine Special Vol. 1.sfc" size="1048576" crc="0bb960c9" sha1="ca1020f1b2a5339669e36037a8ac3fa25701fd82" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbig2">
+		<description>Super Big 2 (Chi)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Super Big 2 (China) (Unlicensed).sfc" size="1048576" crc="f33c710d" sha1="a789c63ca0f4723c2224e890f7d367f23cebc0ff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="shadowrns" cloneof="shadowrn">
+		<description>Shadowrun (Euro, Sample)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Shadowrun (Europe) (Sample).sfc" size="1048576" crc="d2ed4220" sha1="1f7a3d0a00772f84c6a6516e6f71cb0796012241" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspachi4a" cloneof="bspachi4" supported="no">
+		<description>Let's Pachinko Nante Gindama 4 (Jpn, 1124)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Lets Pachinko Nante Gindama 4 (BS) (11-24).sfc" size="1048576" crc="aa934596" sha1="5883b8e0e3409f78a1ae1d9e471ef4678cb23b88" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspanepna" cloneof="bspanepn" supported="no">
+		<description>Panel de Pon - Event '98 (Jpn, 1228)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Panel de Pon '98 Event Version (BS) (12-28).sfc" size="1048576" crc="720a850c" sha1="cfbefc41406679c8bc906da6ed9db16f46c6beff" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bszelda3a" cloneof="bszelda3" supported="no">
+		<description>Zelda no Densetsu - Kamigami no Triforce (Jpn, BS, 1130, Locked)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Zelda no Densetsu - Kamigami no Triforce (BS) (11-30).sfc" size="1048576" crc="97a68e79" sha1="2453d475a26077be0b4c259325e90d2aa0a5a0f8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bscuonpaa" cloneof="bscuonpa" supported="no">
+		<description>Cu-On-Pa SFC (Jpn, BS, 0615)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Cu On Pa (BS) (6-15).sfc" size="1048576" crc="844fc3dc" sha1="f09dc86eccae64e54ab71cd051e9cdcd77edaeac" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfzgp2a" cloneof="bsfzgp2" supported="no">
+		<description>BS F-Zero Grand Prix 2 - Practice (Jpn, Bad?)</description>
+		<year>19??</year>
+		<!-- BS -->
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ZERO2.sfc" size="1048576" crc="3d31659d" sha1="ee3aaf2975ab383768ab88cdb7d7beddf64ddc34" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyoshi1" cloneof="bsyoshi" supported="no">
+		<description>Yoshi no Panepon - BS Ban (Jpn, 0102)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Yoshi no Panepon - BS Ban (BS) (1-2).sfc" size="1048576" crc="6775b6ca" sha1="0e13049e2f0e5fd3e65d36bdad790e1312392476" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyoshi2" cloneof="bsyoshi" supported="no">
+		<description>Yoshi no Panepon - BS Ban (Jpn, 0614)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Yoshi no Panepon - BS Ban (BS) (6-14).sfc" size="1048576" crc="2b8deb64" sha1="29cf1a5b24e949e73409c3923549f2963901c971" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyoshi3" cloneof="bsyoshi" supported="no">
+		<description>Yoshi no Panepon - BS Ban (Jpn, 0705)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Yoshi no Panepon - BS Ban (BS) (7-5).sfc" size="1048576" crc="a35f7c27" sha1="f769165fd0ff2f885580f9f61ee55e9a29b1f6ea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssuttv2b" cloneof="bssuttv2" supported="no">
+		<description>Sutte Hakkun - BS Version 2 (Jpn, 1019)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Sutte Hakkun - BS Version 2 (BS-d) (10-19).sfc" size="1048576" crc="a01abfbd" sha1="cb6b47fedc1296bbae53a34a844d30c19d3ab883" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bssuttv2c" cloneof="bssuttv2" supported="no">
+		<description>Sutte Hakkun - BS Version 2 (Jpn, 1125)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Sutte Hakkun - BS Version 2 (BS-d) (11-25).sfc" size="1048576" crc="c2f2ad15" sha1="f9c3397cb9f047aa3278a6d082276ae080cdd447" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bskirkuza" cloneof="bskirkuz" supported="no">
+		<description>Kirby no Omochabako - Hoshi Kuzushi (Jpn, 0226)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="Kirby no Omochabako - Hoshi Kuzushi (BS) (2-26) (!).sfc" size="524288" crc="3dbbd86a" sha1="b6cda98a2a6a7a6aa9a64aec7f346039a608b093" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsbaku" supported="no">
+		<description>Bakusho Mondai no Shirikon Chounaikai (Jpn, 0622)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Bakusho Mondai no Shirikon Chounaikai 6-22 (BS).sfc" size="1048576" crc="b86e7ab1" sha1="3cfa8bc8d6ec36e46d7a434b5e5fa835c90bc4f0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsyuki" supported="no">
+		<description>BS Yuuki Nae no GE-MU no Tsubo (Jpn)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="BS Yuuki Nae no GE-MU no Tsubo (Japan).sfc" size="524288" crc="2c889959" sha1="ce70937945e84db5d5e0cf1d9bd622d2c69adff3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsactr" supported="no">
+		<description>ActRaiser (Jpn, BS)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="ActRaiser (Japan).bs.sfc" size="1048576" crc="b9a968ff" sha1="1d94b555e3a5a018dabf5fe2ea62ba73c2927a82" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Dumps below have to be verified -->
+
+	<software name="supcopa" cloneof="worldsoc">
+		<description>Super Copa (Bra)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Super Copa (B) [!].sfc" size="1048576" crc="b9a968ff" sha1="1d94b555e3a5a018dabf5fe2ea62ba73c2927a82" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="banpija" cloneof="chester">
+		<description>Bananas de Pijamas</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Bananas de Pijamas (Unl) [!].sfc" size="1048576" crc="52b0d84b" sha1="149e916dfd4058f8de97d7bc8f74d5e630853ffb" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="futbras" cloneof="issdx">
+		<description>Futebol Brasileiro '96</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="Futebol Brasileiro '96 (Unl).sfc" size="2097152" crc="65545e88" sha1="4e09a35b9404eee49fe56b86d15e82feb004cd36" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This game has to be redumped without the intro!!!!  -->
+	<software name="futarg" cloneof="issdx">
+		<description>Futbol Argentino '96</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="Futbol Argentino '96 (Unl) [!].sfc" size="2097152" crc="552737c1" sha1="a91310125846680dc95bc22e168a75ca5a13032f" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="revkids">
+		<description>Reversi Kids</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="Riverse Kids (Unl).sfc" size="524288" crc="3a426a4a" sha1="8b534317c0da7a8c8d2e35074feafde33548e038" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinho97" cloneof="issdx">
+		<description>Ronaldinho Soccer 97</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="Ronaldinho Soccer 97 (Unl) [!].sfc" size="2097152" crc="d209fe59" sha1="7e9ff7dff0ff8e8d8e7ce448148a71a3fa103897" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dinho98" cloneof="issdx">
+		<description>Ronaldinho Soccer 98</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="Ronaldinho Soccer 98 (Hack).sfc" size="2097152" crc="46c126af" sha1="e7e30a0b3ab7b5e9a0bf314d86827508edd11286" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wcf98" cloneof="issdx">
+		<description>World Cup France 98</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="World Cup France 98 (Hack).sfc" size="2097152" crc="d0c34a45" sha1="3b299533799f3e5633a48ef8e0ee56346c6bd18b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonic">
+		<description>Sonic the Hedgehog</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Sonic the Hedgehog (Unl).sfc" size="1048576" crc="6b9c71a9" sha1="a227f032f138a78e4779a5cc87a37c9068d99019" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonica" cloneof="sonic">
+		<description>Sonic the Hedgehog (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Sonic the Hedgehog (Unl) [a1].sfc" size="1048576" crc="4543dd75" sha1="e7553ec4558fa96da1c8f5338aec547158776d8f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tai16mj2">
+		<description>Taiwan 16 Mahjong II - Horoscope Girls Edition</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="Taiwan 16 Mahjong II - Horoscope Girls Edition (Unl).sfc" size="524288" crc="561bbd96" sha1="7d22466ebf2d3a33e4567d6f23756a286ddcf9c7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 </softwarelist>

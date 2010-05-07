@@ -107,13 +107,13 @@ static WRITE8_HANDLER( pce_sf2_banking_w )
 
 static WRITE8_HANDLER( pce_cartridge_ram_w )
 {
-	cartridge_ram[ offset ] = data;
+	cartridge_ram[offset] = data;
 }
 
 DEVICE_IMAGE_LOAD(pce_cart)
 {
-	int size;
-	int split_rom = 0;
+	UINT32 size;
+	int split_rom = 0, offset = 0;
 	const char *extrainfo;
 	unsigned char *ROM;
 	logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : %s\n", image_filename(image));
@@ -121,29 +121,42 @@ DEVICE_IMAGE_LOAD(pce_cart)
 	/* open file to get size */
 	ROM = memory_region(image->machine, "user1");
 
-	size = image_length( image );
-
+	if (image_software_entry(image) == NULL)
+		size = image_length(image);
+	else
+		size = image_get_software_region_length(image, "rom");
+	
 	/* handle header accordingly */
-	if((size/512)&1)
+	if ((size / 512) & 1)
 	{
 		logerror("*** DEVICE_IMAGE_LOAD(pce_cart) : Header present\n");
 		size -= 512;
-		image_fseek(image, 512, SEEK_SET);
+		offset = 512;
 	}
-	if ( size > PCE_ROM_MAXSIZE )
+
+	if (size > PCE_ROM_MAXSIZE)
 		size = PCE_ROM_MAXSIZE;
 
-	image_fread(image, ROM, size);
-
-	extrainfo = image_extrainfo( image );
-	if ( extrainfo )
+	if (image_software_entry(image) == NULL)
 	{
-		logerror( "extrainfo: %s\n", extrainfo );
-		if ( strstr( extrainfo, "ROM_SPLIT" ) )
+		image_fseek(image, offset, SEEK_SET);
+		image_fread(image, ROM, size);
+		extrainfo = image_extrainfo(image);
+	}
+	else
+	{
+		memcpy(ROM, image_get_software_region(image, "rom") + offset, size);
+		extrainfo = NULL;
+	}
+	
+	if (extrainfo)
+	{
+		logerror("extrainfo: %s\n", extrainfo);
+		if (strstr(extrainfo, "ROM_SPLIT"))
 			split_rom = 1;
 	}
 
-	if ( ROM[0x1FFF] < 0xE0 )
+	if (ROM[0x1fff] < 0xe0)
 	{
 		int i;
 		UINT8 decrypted[256];
@@ -151,76 +164,76 @@ DEVICE_IMAGE_LOAD(pce_cart)
 		logerror( "*** DEVICE_IMAGE_LOAD(pce_cart) : ROM image seems encrypted, decrypting...\n" );
 
 		/* Initialize decryption table */
-		for( i = 0; i < 256; i++ )
-			decrypted[i] = ( ( i & 0x01 ) << 7 ) | ( ( i & 0x02 ) << 5 ) | ( ( i & 0x04 ) << 3 ) | ( ( i & 0x08 ) << 1 ) | ( ( i & 0x10 ) >> 1 ) | ( ( i & 0x20 ) >> 3 ) | ( ( i & 0x40 ) >> 5 ) | ( ( i & 0x80 ) >> 7 );
+		for (i = 0; i < 256; i++)
+			decrypted[i] = ((i & 0x01) << 7) | ((i & 0x02) << 5) | ((i & 0x04) << 3) | ((i & 0x08) << 1) | ((i & 0x10) >> 1) | ((i & 0x20 ) >> 3) | ((i & 0x40) >> 5) | ((i & 0x80) >> 7);
 
 		/* Decrypt ROM image */
-		for( i = 0; i < size; i++ )
+		for (i = 0; i < size; i++)
 			ROM[i] = decrypted[ROM[i]];
 	}
 
 	/* check if we're dealing with a split rom image */
-	if ( size == 384 * 1024 )
+	if (size == 384 * 1024)
 	{
 		split_rom = 1;
 		/* Mirror the upper 128KB part of the image */
-		memcpy( ROM + 0x060000, ROM + 0x040000, 0x020000 );	/* Set up 060000 - 07FFFF mirror */
+		memcpy(ROM + 0x060000, ROM + 0x040000, 0x020000);	/* Set up 060000 - 07FFFF mirror */
 	}
 
 	/* set up the memory for a split rom image */
-	if ( split_rom )
+	if (split_rom)
 	{
-		logerror( "Split rom detected, setting up memory accordingly\n" );
+		logerror("Split rom detected, setting up memory accordingly\n");
 		/* Set up ROM address space as follows:          */
 		/* 000000 - 03FFFF : ROM data 000000 - 03FFFF    */
 		/* 040000 - 07FFFF : ROM data 000000 - 03FFFF    */
 		/* 080000 - 0BFFFF : ROM data 040000 - 07FFFF    */
 		/* 0C0000 - 0FFFFF : ROM data 040000 - 07FFFF    */
-		memcpy( ROM + 0x080000, ROM + 0x040000, 0x040000 );	/* Set up 080000 - 0BFFFF region */
-		memcpy( ROM + 0x0C0000, ROM + 0x040000, 0x040000 );	/* Set up 0C0000 - 0FFFFF region */
-		memcpy( ROM + 0x040000, ROM, 0x040000 );		/* Set up 040000 - 07FFFF region */
+		memcpy(ROM + 0x080000, ROM + 0x040000, 0x040000);	/* Set up 080000 - 0BFFFF region */
+		memcpy(ROM + 0x0C0000, ROM + 0x040000, 0x040000);	/* Set up 0C0000 - 0FFFFF region */
+		memcpy(ROM + 0x040000, ROM, 0x040000);		/* Set up 040000 - 07FFFF region */
 	}
 	else
 	{
 		/* mirror 256KB rom data */
-		if ( size <= 0x040000 )
-			memcpy( ROM + 0x040000, ROM, 0x040000 );
+		if (size <= 0x040000)
+			memcpy(ROM + 0x040000, ROM, 0x040000);
 
 		/* mirror 512KB rom data */
-		if ( size <= 0x080000 )
-			memcpy( ROM + 0x080000, ROM, 0x080000 );
+		if (size <= 0x080000)
+			memcpy(ROM + 0x080000, ROM, 0x080000);
 	}
 
-	memory_set_bankptr( image->machine, "bank1", ROM );
-	memory_set_bankptr( image->machine, "bank2", ROM + 0x080000 );
-	memory_set_bankptr( image->machine, "bank3", ROM + 0x088000 );
-	memory_set_bankptr( image->machine, "bank4", ROM + 0x0D0000 );
+	memory_set_bankptr(image->machine, "bank1", ROM);
+	memory_set_bankptr(image->machine, "bank2", ROM + 0x080000);
+	memory_set_bankptr(image->machine, "bank3", ROM + 0x088000);
+	memory_set_bankptr(image->machine, "bank4", ROM + 0x0d0000);
 
 	/* Check for Street fighter 2 */
-	if ( size == PCE_ROM_MAXSIZE )
+	if (size == PCE_ROM_MAXSIZE)
 	{
-		memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w );
+		memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x01ff0, 0x01ff3, 0, 0, pce_sf2_banking_w);
 	}
 
 	/* Check for Populous */
-	if ( ! memcmp( ROM + 0x1F26, "POPULOUS", 8 ) )
+	if (!memcmp(ROM + 0x1F26, "POPULOUS", 8))
 	{
-		cartridge_ram = auto_alloc_array(image->machine, UINT8, 0x8000 );
-		memory_set_bankptr( image->machine, "bank2", cartridge_ram );
-		memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w );
+		cartridge_ram = auto_alloc_array(image->machine, UINT8, 0x8000);
+		memory_set_bankptr(image->machine, "bank2", cartridge_ram);
+		memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x080000, 0x087FFF, 0, 0, pce_cartridge_ram_w);
 	}
 
 	/* Check for CD system card */
 	pce_sys3_card = 0;
-	if ( ! memcmp( ROM + 0x3FFB6, "PC Engine CD-ROM SYSTEM", 23 ) )
+	if (!memcmp(ROM + 0x3FFB6, "PC Engine CD-ROM SYSTEM", 23))
 	{
 		/* Check if 192KB additional system card ram should be used */
-		if ( ! memcmp( ROM + 0x29D1, "VER. 3.", 7 ) || ! memcmp( ROM + 0x29C4, "VER. 3.", 7 ) )
+		if (!memcmp(ROM + 0x29D1, "VER. 3.", 7) || !memcmp(ROM + 0x29C4, "VER. 3.", 7 ))
 		{
 			pce_sys3_card = 1;
-			cartridge_ram = auto_alloc_array(image->machine, UINT8, 0x30000 );
-			memory_set_bankptr( image->machine, "bank4", cartridge_ram );
-			memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w );
+			cartridge_ram = auto_alloc_array(image->machine, UINT8, 0x30000);
+			memory_set_bankptr(image->machine, "bank4", cartridge_ram);
+			memory_install_write8_handler(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0D0000, 0x0FFFFF, 0, 0, pce_cartridge_ram_w);
 		}
 	}
 	return 0;
