@@ -1126,6 +1126,8 @@ static DEVICE_VALIDITY_CHECK( software_list )
 						break;
 					}
 			}
+
+			software_list_close(list);
 		}
 	}
 	return error;
