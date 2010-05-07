@@ -711,23 +711,35 @@ static QUICKLOAD_LOAD( jaguar )
 
 static DEVICE_IMAGE_LOAD( jaguar )
 {
-	int i, j;
+	int i, j, offset = 0;
 	UINT32 size;
 	UINT8 header[512];
-
-	/* skip header*/
-	if((image_length(image) & 0x200) == 0x200)
-		image_fread(image, header, 0x200);
 
 	if (image_software_entry(image) == NULL)
 	{
 		size = image_length(image);
-		image_fread(image, cart_base, size);
+
+		/* skip header, if any */
+		if ((size & 0x200) == 0x200)
+		{
+			offset = 0x200;
+			image_fread(image, header, 0x200);
+		}
+		
+		image_fread(image, cart_base, size - offset);
 	}
 	else
 	{
 		size = image_get_software_region_length(image, "rom");
-		memcpy(cart_base, image_get_software_region(image, "rom"), size);
+
+		/* skip header, if any */
+		if ((size & 0x200) == 0x200)
+		{
+			offset = 0x200;
+			memcpy(header, image_get_software_region(image, "rom") , 0x200);
+		}
+		
+		memcpy(cart_base, image_get_software_region(image, "rom") + offset, size - offset);
 	}
 
 	memset(jaguar_shared_ram, 0, 0x200000);
