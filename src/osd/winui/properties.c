@@ -140,12 +140,8 @@ b) Exit the dialog.
 #include "winmain.h"
 #include "strconv.h"
 #include "winutf8.h"
-#include "sound/2413intf.h"
-#include "sound/3812intf.h"
 #include "sound/samples.h"
 #include "sound/vlm5030.h"
-
-typedef HANDLE HTHEME;
 
 #ifdef _MSC_VER
 #define snprintf _snprintf
@@ -156,17 +152,6 @@ typedef HANDLE HTHEME;
 #include "messopts.h"
 #include "resourcems.h"
 #include "propertiesms.h"
-#endif
-
-// missing win32 api defines
-#ifndef TBCD_TICS
-#define TBCD_TICS 1
-#endif
-#ifndef TBCD_THUMB
-#define TBCD_THUMB 2
-#endif
-#ifndef TBCD_CHANNEL
-#define TBCD_CHANNEL 3
 #endif
 
 #if defined(__GNUC__)
@@ -196,7 +181,6 @@ static void UpdateSelectScreenUI(HWND hwnd);
 static void InitializeSelectScreenUI(HWND hwnd);
 static void InitializeD3DVersionUI(HWND hwnd);
 static void InitializeVideoUI(HWND hwnd);
-static void InitializeEffectUI(HWND hWnd);
 static void InitializeBIOSUI(HWND hwnd);
 static void InitializeControllerMappingUI(HWND hwnd);
 static void UpdateOptions(HWND hDlg, datamap *map, core_options *opts);
@@ -2645,7 +2629,6 @@ static void InitializeOptions(HWND hDlg)
 	InitializeSkippingUI(hDlg);
 	InitializeRotateUI(hDlg);
 	InitializeSelectScreenUI(hDlg);
-	InitializeEffectUI(hDlg);
 	InitializeBIOSUI(hDlg);
 	InitializeControllerMappingUI(hDlg);
 	InitializeD3DVersionUI(hDlg);
@@ -2798,7 +2781,7 @@ static void UpdateSelectScreenUI(HWND hwnd)
 		curSel = ComboBox_GetCurSel(hCtrl);
 		if ((curSel < 0) || (curSel >= MAX_SCREENS))
 			curSel = 0;
-		(void)ComboBox_ResetContent(hCtrl );
+		(void)ComboBox_ResetContent(hCtrl);
 		for (i = 0; i < NUMSELECTSCREEN && i < options_get_int(pCurrentOpts, WINOPTION_NUMSCREENS) ; i++)
 		{
 			(void)ComboBox_InsertString(hCtrl, i, g_ComboBoxSelectScreen[i].m_pText);
@@ -2806,9 +2789,9 @@ static void UpdateSelectScreenUI(HWND hwnd)
 		}
 		// Smaller Amount of screens was selected, so use 0
 		if( i< curSel )
-			(void)ComboBox_SetCurSel(hCtrl, 0 );
+			(void)ComboBox_SetCurSel(hCtrl, 0);
 		else
-			(void)ComboBox_SetCurSel(hCtrl, curSel );
+			(void)ComboBox_SetCurSel(hCtrl, curSel);
 	}
 }
 
@@ -2816,10 +2799,6 @@ static void UpdateSelectScreenUI(HWND hwnd)
 static void InitializeSelectScreenUI(HWND hwnd)
 {
 	UpdateSelectScreenUI(hwnd);
-}
-
-static void InitializeEffectUI(HWND hwnd)
-{
 }
 
 static void InitializeControllerMappingUI(HWND hwnd)
