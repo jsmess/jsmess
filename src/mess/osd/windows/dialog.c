@@ -1298,7 +1298,7 @@ static int dialog_add_single_seqselect(struct _dialog_box *di, short x, short y,
 //  win_dialog_add_seqselect
 //============================================================
 
-int win_dialog_add_portselect(dialog_box *dialog, const input_field_config *field, const RECT *r)
+int win_dialog_add_portselect(dialog_box *dialog, const input_field_config *field)
 {
 	dialog_box *di = dialog;
 	short x;
@@ -1356,42 +1356,21 @@ int win_dialog_add_portselect(dialog_box *dialog, const input_field_config *fiel
 			strcpy(s + len, port_suffix[seq]);
 		this_port_name = s;
 
-		if (!r)
-		{
-			// no positions specified
-			dialog_new_control(di, &x, &y);
+		// no positions specified
+		dialog_new_control(di, &x, &y);
 
-			if (dialog_write_item(di, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOPREFIX, x, y,
-					dialog->layout->label_width, DIM_NORMAL_ROW_HEIGHT, this_port_name, DLGITEM_STATIC, NULL))
-				return 1;
-			x += dialog->layout->label_width + DIM_HORIZONTAL_SPACING;
+		if (dialog_write_item(di, WS_CHILD | WS_VISIBLE | SS_LEFT | SS_NOPREFIX, x, y,
+				dialog->layout->label_width, DIM_NORMAL_ROW_HEIGHT, this_port_name, DLGITEM_STATIC, NULL))
+			return 1;
+		x += dialog->layout->label_width + DIM_HORIZONTAL_SPACING;
 
-			if (dialog_add_single_seqselect(di, x, y, DIM_EDIT_WIDTH, DIM_NORMAL_ROW_HEIGHT,
-					field, is_analog[seq], seq_types[seq]))
-				return 1;
-			y += DIM_VERTICAL_SPACING + DIM_NORMAL_ROW_HEIGHT;
-			x += DIM_EDIT_WIDTH + DIM_HORIZONTAL_SPACING;
+		if (dialog_add_single_seqselect(di, x, y, DIM_EDIT_WIDTH, DIM_NORMAL_ROW_HEIGHT,
+				field, is_analog[seq], seq_types[seq]))
+			return 1;
+		y += DIM_VERTICAL_SPACING + DIM_NORMAL_ROW_HEIGHT;
+		x += DIM_EDIT_WIDTH + DIM_HORIZONTAL_SPACING;
 
-			dialog_finish_control(di, x, y);
-		}
-		else
-		{
-			// positions specified
-			x = r[seq].left;
-			y = r[seq].top;
-			width = r[seq].right - r[seq].left;
-			height = r[seq].bottom - r[seq].top;
-
-			calc_dlgunits_multiple();
-			x		/= pixels_to_xdlgunits;
-			y		/= pixels_to_ydlgunits;
-			width	/= pixels_to_xdlgunits;
-			height	/= pixels_to_ydlgunits;
-
-			if (dialog_add_single_seqselect(di, x, y, width, height,
-					field, is_analog[seq], seq_types[seq]))
-				return 1;
-		}
+		dialog_finish_control(di, x, y);
 	}
 	return 0;
 }

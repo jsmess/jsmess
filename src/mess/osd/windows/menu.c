@@ -100,51 +100,6 @@ static char state_filename[MAX_PATH];
 
 static int add_filter_entry(char *dest, size_t dest_len, const char *description, const char *extensions);
 
-/***************************************************************************
-
-    Constants
-
-***************************************************************************/
-
-typedef enum
-{
-	ARTWORK_CUSTTYPE_JOYSTICK = 0,
-	ARTWORK_CUSTTYPE_KEYBOARD,
-	ARTWORK_CUSTTYPE_MISC,
-	ARTWORK_CUSTTYPE_INVALID
-} artwork_cust_type;
-
-
-
-/***************************************************************************
-
-    Type definitions
-
-***************************************************************************/
-
-struct inputform_customization
-{
-	UINT32 ipt;
-	int x, y;
-	int width, height;
-};
-
-
-//============================================================
-//  artwork_get_inputscreen_customizations
-//============================================================
-
-int artwork_get_inputscreen_customizations(struct inputform_customization *customizations,	int customizations_length)
-{
-	/* terminate list */
-	customizations->ipt = IPT_END;
-	customizations->x = -1;
-	customizations->y = -1;
-	customizations->width = -1;
-	customizations->height = -1;
-
-	return 0;
-}
 
 
 //============================================================
@@ -237,22 +192,12 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 	dialog_box *dlg;
 	const input_port_config *port;
 	const input_field_config *field;
-	struct inputform_customization customizations[128];
-	RECT *pr;
-	int this_inputclass, this_player, portslot_count, i;
+	int this_inputclass, this_player, portslot_count = 0, i;
 
 	struct
 	{
 		const input_field_config *field;
-		const RECT *pr;
 	} portslots[256];
-
-	/* check to see if there is any custom artwork for this configure dialog,
-     * and if so, retrieve the info */
-	portslot_count = artwork_get_inputscreen_customizations(customizations, ARRAY_LENGTH(customizations));
-
-	/* zero out the portslots that correspond to customizations */
-	memset(portslots, 0, sizeof(portslots[0]) * portslot_count);
 
 	/* create the dialog */
 	dlg = win_dialog_init(title, NULL);
@@ -276,32 +221,14 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 
 				if (this_player == player)
 				{
-					/* check to see if the custom artwork for this configure dialog
-                     * says anything about this input */
-					pr = NULL;
-					for (i = 0; customizations[i].ipt != IPT_END; i++)
-					{
-						if (field->type == customizations[i].ipt)
-						{
-							pr = (RECT *) alloca(sizeof(*pr));
-							pr->left = customizations[i].x;
-							pr->top = customizations[i].y;
-							pr->right = pr->left + customizations[i].width;
-							pr->bottom = pr->top + customizations[i].height;
-							break;
-						}
-					}
-
 					/* store this InputPort/RECT combo in our list.  we do not
                      * necessarily want to add it yet because we the INI might
                      * want to reorder the tab order */
-					if (customizations[i].ipt == IPT_END)
-						i = portslot_count++;
-					if (i < ARRAY_LENGTH(portslots))
+					if (portslot_count < ARRAY_LENGTH(portslots))
 					{
-						portslots[i].field = field;
-						portslots[i].pr = pr;
+						portslots[portslot_count].field = field;
 					}
+					portslot_count++;
 				}
 			}
 		}
@@ -314,7 +241,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 	{
 		if (portslots[i].field)
 		{
-			if (win_dialog_add_portselect(dlg, portslots[i].field, portslots[i].pr))
+			if (win_dialog_add_portselect(dlg, portslots[i].field))
 				goto done;
 		}
 	}
