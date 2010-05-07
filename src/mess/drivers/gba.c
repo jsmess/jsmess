@@ -2393,7 +2393,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 		cart_size = image_get_software_region_length(image, "rom");
 		memcpy(ROM, image_get_software_region(image, "rom"), cart_size);
 	}
-	
+
 	for (i = 0; i < cart_size; i++)
 	{
 		if (!memcmp(&ROM[i], "EEPROM_", 7))
@@ -2413,7 +2413,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			}
 			break;
 		}
-		else if (!memcmp(&ROM[i], "SRAM_", 5))
+		else if ((!memcmp(&ROM[i], "SRAM_", 5)) || (!memcmp(&ROM[i], "ADVANCEWARS", 11))) //advance wars 1 & 2 has SRAM, but no "SRAM_" string can be found inside the ROM space
 		{
 			state->nvptr = (UINT8 *)&state->gba_sram;
 			state->nvsize = 0x10000;
