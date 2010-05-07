@@ -3,7 +3,6 @@
 // Used by mameui.rc
 //
 #define IDPAUSE                         3
-#define IDAPPLY                         4
 #define IDS_UI_FILE                     61
 #define IDS_UI_VIEW                     62
 #define IDS_UI_OPTIONS                  63
@@ -37,7 +36,6 @@
 #define IDD_ABOUT                       108
 #define IDR_MAIN_MENU                   109
 #define IDR_UI_MENU                     110
-#define IDW_STATUS                      112
 #define IDB_ABOUT                       113
 #define IDD_DIRECTX                     114
 #define IDD_AUDIT                       115
@@ -82,40 +80,26 @@
 #define IDI_CHECKMARK                   164
 #define IDC_CURSOR_HSPLIT               165
 #define IDB_TOOLBAR                     166
-#define IDB_PROP_DISPLAY                167
 #define IDR_CONTEXT_TREE                168
 #define IDD_FILTERS                     169
 #define IDD_RESET                       170
 #define IDD_LOAD_PROGRESS               171
 #define IDD_INTERFACE_OPTIONS           173
-#define IDD_PROP_HISTORY                176
-#define IDD_ROM_ERROR                   177
 #define IDD_LANGUAGE                    178
-#define IDD_ERROR                       179
 #define IDR_CONTEXT_SCREENSHOT          181
 #define IDI_HEADER_UP                   182
 #define IDI_HEADER_DOWN                 183
-#define IDD_PROP_DIRECT3D               184
 #define IDD_PROP_CONTROLLER             185
 #define IDD_PROP_SCREEN                 187
 #define IDD_PROP_DEBUG                  188
 #define IDI_SOUNDTAB                    666
 #define IDC_LIST                        1000
-#define IDC_PLAY                        1001
-#define IDC_DISPLAYS                    1002
 #define IDC_JOYSTICK                    1003
-#define IDC_VECTORTEXT                  1004
 #define IDC_SIZES                       1005
-#define IDC_USE_TRAK                    1006
-#define IDC_DISPLAYTYPE                 1007
-#define IDC_TRAK_SENSITIVITY            1008
 #define IDC_FRAMESKIP                   1009
 #define IDC_ROTATE                      1010
-#define IDC_HELP_TEXT                   1011
 #define IDC_SCREEN                      1012
-#define IDC_TAB                         1013
 #define IDC_VIEW                        1014
-#define IDC_SCREEN2                     1015
 #define IDC_SCREENSELECT                1015
 #define IDC_CHEAT                       1016
 #define IDC_LOG                         1017
@@ -162,14 +146,9 @@
 #define IDC_FLICKERTEXT                 1058
 #define IDC_SSFRAME                     1059
 #define IDC_PRESCALE                    1060
-#define IDC_SSNONE                      1061
 #define IDC_SSPICTURE                   1062
 #define IDC_BEAMTEXT                    1063
-#define IDC_COLORSTEXT                  1064
 #define IDC_MULTIKEYBOARD               1065
-#define IDC_SIZETEXT                    1066
-#define IDC_TRACKSPINTEXT               1067
-#define IDC_INPUTDEVTEXT                1068
 #define IDC_RATETEXT                    1069
 #define IDC_LISTAVAILABLECOLUMNS        1070
 #define IDC_LISTSHOWCOLUMNS             1071
@@ -188,9 +167,7 @@
 #define IDC_PROP_SAMPLES                1084
 #define IDC_PROP_CLONEOF_TEXT           1085
 #define IDC_PROP_CLONEOF                1086
-#define IDC_DEPTH                       1087
 #define IDC_VERSION                     1088
-#define IDC_ARTWORK                     1089
 #define IDC_FSGAMMA                     1090
 #define IDC_GAMMADISP                   1091
 #define IDC_FSBRIGHTNESS                1092
@@ -218,15 +195,11 @@
 #define IDC_FILTER_ORIGINALS            1115
 #define IDC_FILTER_WORKING              1116
 #define IDC_FILTER_AVAILABLE            1117
-#define IDC_CONFIGURETEXT               1118
-#define IDC_JOYMAPTEXT                  1119
 #define IDC_START_GAME_CHECK            1120
 #define IDC_VOLUME                      1121
 #define IDC_VOLUMEDISP                  1122
-#define IDC_PROP_HISTORY                1123
 #define IDC_HISTORY                     1124
 #define IDC_SAMPLES                     1125
-#define IDC_ERROR_DETAILS               1126
 #define IDC_TRIPLE_BUFFER               1127
 #define IDC_LOAD_ROMNAME                1128
 #define IDC_DEFAULT_INPUT               1129
@@ -235,7 +208,6 @@
 #define IDC_LANGUAGEEDIT                1132
 #define IDC_FILTER_EDIT                 1133
 #define IDC_ABOUT                       1134
-#define IDC_PROP_DISPLAY                1135
 #define IDC_USE_SOUND                   1136
 #define IDC_WAITVSYNC                   1137
 #define IDC_HWSTRETCH                   1138
@@ -251,7 +223,6 @@
 #define IDC_EFFECT                      1150
 #define IDC_FSGAMMATEXT                 1151
 #define IDC_STEADYKEY                   1152
-#define IDC_ASPECTRATIO                 1153
 #define IDC_ASPECTRATION                1154
 #define IDC_ASPECTRATIOD                1155
 #define IDC_ASPECTRATIOTEXT             1156
@@ -270,7 +241,6 @@
 #define IDC_GAME_ICON                   1169
 #define IDC_RANDOM_BG                   1170
 #define IDC_CUSTOM_TREE                 1171
-#define IDC_CUSTOMFILEBROWSE            1172
 #define IDC_CUSTOMFILE_GAME             1173
 #define IDC_LOAD_STATUS                 1174
 #define IDC_ERROR_TEXT                  1175
@@ -287,7 +257,6 @@
 #define IDC_AUDIO_LATENCY               1186
 #define IDC_D3D_VERSION                 1187
 #define IDC_AUDIT_DETAILS_PROP          1188
-#define IDC_CYCLETIME                   1189
 #define IDC_CYCLETIMESEC                1190
 #define IDC_AUDIO_LATENCY_TEXT          1191
 #define IDC_STRETCH_SCREENSHOT_LARGER   1192
@@ -301,7 +270,6 @@
 #define IDC_NOOFFSET_CLONES             1200
 #define IDC_BIOS                        1201
 #define IDC_HISTORY_TAB                 1202
-#define IDC_BIOS2                       1202
 #define IDC_SNAPVIEW                    1202
 #define IDC_SCREENSHOT_BORDERSIZE       1204
 #define IDC_SCREENSHOT_BORDERCOLOR      1205
@@ -315,19 +283,16 @@
 #define IDC_LIGHTGUNDEVICE              1213
 #define IDC_MOUSE                       1214
 #define IDC_POSITIONAL                  1215
-#define IDC_POSITIONALDEVICE            1215
 #define IDC_HIGH_PRIORITY_TEXT          1216
 #define IDC_HIGH_PRIORITYTXT            1217
 #define IDC_SELECT_EFFECT               1218
 #define IDC_MULTITHREAD_RENDERING       1219
 #define IDC_ASPECT                      1220
-#define IDC_RESOLUTION                  1221
 #define IDC_LOAD_PROGRESS               1223
 #define IDC_FSBRIGHTNESSTEXT            1224
 #define IDC_FSCONTRASTTEXT              1225
 #define IDC_VIDEO_MODE                  1226
 #define IDC_SCREENSELECTTEXT            1227
-#define IDC_CHECK2                      1229
 #define IDC_MULTIMOUSE                  1230
 #define IDC_DEBUG                       1231
 #define IDC_REFRESHSPEED                1232
@@ -441,7 +406,6 @@
 #define ID_FILE_LOADSTATE               40095
 #define ID_FOLDER_SOURCEPROPERTIES      40096
 #define ID_FOLDER_VECTORPROPERTIES      40097
-#define ID_ARRANGE_ICONS                40098
 #define ID_OPTIONS_CHEAT                40099
 #define ID_OPTIONS_MAMEINFO             40100
 #define ID_OPTIONS_HISTORY              40101
@@ -453,7 +417,7 @@
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
 #define _APS_3D_CONTROLS                     1
-#define _APS_NEXT_RESOURCE_VALUE        189
+#define _APS_NEXT_RESOURCE_VALUE        192
 #define _APS_NEXT_COMMAND_VALUE         40102
 #define _APS_NEXT_CONTROL_VALUE         1254
 #define _APS_NEXT_SYMED_VALUE           93
