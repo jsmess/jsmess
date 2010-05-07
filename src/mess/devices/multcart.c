@@ -254,6 +254,7 @@ static multicart_open_error load_ram_resource(multicart_load_state *state, xml_d
 			/* Save the file name so that we can write the contents on unloading.
                If the RAM resource has no filename, we know that it was volatile only. */
 			resource->filename = pool_strdup_lib(state->multicart->data->pool, astring_c(ram_pathname));
+			astring_free(ram_pathname);
 			if (resource->filename == NULL)
 				return MCERR_OUT_OF_MEMORY;
 
