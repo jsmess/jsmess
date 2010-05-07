@@ -1983,7 +1983,6 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_pagedcru)
 static DEVICE_START( ti99_cartridge )
 {
 	cartslot_t *cart = (cartslot_t *)device->token;
-	astring tempstring;
 
 	/* find the PCB device */
 	cart->pcb_device = device->subdevice(TAG_PCB);

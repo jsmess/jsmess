@@ -84,7 +84,6 @@ static DEVICE_START(coco_cartridge)
 	running_device *cartslot;
 	coco_cartridge_t *cococart = get_token(device);
 	const cococart_config *config = (const cococart_config *) device->baseconfig().inline_config;
-	astring tempstring;
 
 	/* initialize */
 	memset(cococart, 0, sizeof(*cococart));

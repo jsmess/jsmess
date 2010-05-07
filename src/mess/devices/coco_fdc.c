@@ -228,7 +228,6 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 static DEVICE_START(fdc)
 {
 	fdc_t *fdc = get_token(device);
-	astring tempstring;
 	const fdc_hardware_type *hwtype = (const fdc_hardware_type *)device->get_config_ptr(FDCINFO_PTR_HWTYPE);
 
 	/* initialize variables */

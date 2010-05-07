@@ -397,7 +397,6 @@ DEVICE_GET_INFO(aes_cartridge_pcb_std)
 static DEVICE_START( aes_cartridge )
 {
 	cartslot_t *cart = (cartslot_t *)device->token;
-	astring tempstring;
 
 	/* find the PCB device */
 	cart->pcb_device = device->subdevice(TAG_PCB);

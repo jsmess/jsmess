@@ -54,7 +54,6 @@ INLINE coco_rs232_pcb_t *get_token(running_device *device)
 static DEVICE_START(coco_rs232)
 {
 	coco_rs232_pcb_t *pak_pcb = get_token(device);
-	astring tempstring;
 
 	memset(pak_pcb, 0, sizeof(*pak_pcb));
 	pak_pcb->cococart = device->owner->owner;

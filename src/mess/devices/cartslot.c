@@ -253,7 +253,6 @@ static DEVICE_START( cartslot )
 {
 	cartslot_t *cart = get_token(device);
 	const cartslot_config *config = get_config(device);
-	astring tempstring;
 
 	/* if this cartridge has a custom DEVICE_START, use it */
 	if (config->device_start != NULL)
