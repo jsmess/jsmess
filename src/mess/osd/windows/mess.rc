@@ -84,7 +84,7 @@ BEGIN
         MENUITEM "Show &FPS",                   ID_OPTIONS_TOGGLEFPS
         MENUITEM SEPARATOR
         MENUITEM "&Hide Menubar",        		ID_OPTIONS_TOGGLEMENUBAR
-        MENUITEM "&Full Screen\tAlt+Enter",     ID_OPTIONS_FULLSCREEN
+        MENUITEM "&Full Screen",     			ID_OPTIONS_FULLSCREEN
         MENUITEM "Show P&rofiler",              ID_OPTIONS_PROFILER, GRAYED
         MENUITEM "&Debugger...",                ID_OPTIONS_DEBUGGER
     END
