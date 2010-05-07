@@ -212,7 +212,7 @@ static HBRUSH hBkBrush;
 /* No longer used by the core, but we need it to predefine configurable screens for all games. */
 #ifndef MAX_SCREENS
 /* maximum number of screens for one game */
-#define MAX_SCREENS					8
+#define MAX_SCREENS					4
 #endif
 
 static core_options *pOrigOpts, *pDefaultOpts;
@@ -226,7 +226,7 @@ static int  g_nFolderGame      = 0;
 static int  g_nPropertyMode    = 0;
 static BOOL g_bUseDefaults     = FALSE;
 static BOOL g_bReset           = FALSE;
-static BOOL  g_bAutoAspect[MAX_SCREENS] = {FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE};
+static BOOL  g_bAutoAspect[MAX_SCREENS] = {FALSE, FALSE, FALSE, FALSE};
 static BOOL  g_bAutoSnapSize = FALSE;
 static HICON g_hIcon = NULL;
 
@@ -357,7 +357,7 @@ static int GetSelectedScreen(HWND hWnd)
 	HWND hCtrl = GetDlgItem(hWnd, IDC_SCREENSELECT);
 	if (hCtrl)
 		nSelectedScreen = ComboBox_GetCurSel(hCtrl);
-	if ((nSelectedScreen < 0) || (nSelectedScreen >= MAX_SCREENS))
+	if ((nSelectedScreen < 0) || (nSelectedScreen >= NUMSELECTSCREEN))
 		nSelectedScreen = 0;
 	return nSelectedScreen;
 
@@ -1782,16 +1782,15 @@ static void SetPropEnabledControls(HWND hWnd)
 	EnableWindow(GetDlgItem(hWnd, IDC_SNAPSIZEWIDTH), !g_bAutoSnapSize);
 	EnableWindow(GetDlgItem(hWnd, IDC_SNAPSIZEX), !g_bAutoSnapSize);
 
-
 	EnableWindow(GetDlgItem(hWnd,IDC_D3D_FILTER),d3d);
 	EnableWindow(GetDlgItem(hWnd,IDC_D3D_VERSION),d3d);
 	
 	//Switchres and D3D or ddraw enable the per screen parameters
 
-	EnableWindow(GetDlgItem(hWnd, IDC_NUMSCREENS),                 (ddraw || d3d) && multimon);
-	EnableWindow(GetDlgItem(hWnd, IDC_NUMSCREENSDISP),             (ddraw || d3d) && multimon);
-	EnableWindow(GetDlgItem(hWnd, IDC_SCREENSELECT),               (ddraw || d3d) && multimon);
-	EnableWindow(GetDlgItem(hWnd, IDC_SCREENSELECTTEXT),           (ddraw || d3d) && multimon);
+	EnableWindow(GetDlgItem(hWnd, IDC_NUMSCREENS),                 (ddraw || d3d));
+	EnableWindow(GetDlgItem(hWnd, IDC_NUMSCREENSDISP),             (ddraw || d3d));
+	EnableWindow(GetDlgItem(hWnd, IDC_SCREENSELECT),               (ddraw || d3d));
+	EnableWindow(GetDlgItem(hWnd, IDC_SCREENSELECTTEXT),           (ddraw || d3d));
 
 	EnableWindow(GetDlgItem(hWnd, IDC_ARTWORK_CROP),	useart);
 	EnableWindow(GetDlgItem(hWnd, IDC_BACKDROPS),		useart);
@@ -1978,7 +1977,7 @@ static BOOL ScreenPopulateControl(datamap *map, HWND dialog, HWND control, core_
 	/* Remove all items in the list. */
 	(void)ComboBox_ResetContent(control);
 	(void)ComboBox_InsertString(control, 0, TEXT("Auto"));
-	(void)ComboBox_SetItemData(control, 0, (const char*)mame_strdup("auto"));
+	(void)ComboBox_SetItemData(control, 0, (void*)tstring_from_utf8("auto"));
 
 	//Dynamically populate it, by enumerating the Monitors
 	//iMonitors = GetSystemMetrics(SM_CMONITORS); // this gets the count of monitors attached
@@ -2779,7 +2778,7 @@ static void UpdateSelectScreenUI(HWND hwnd)
 	{
 		int i, curSel;
 		curSel = ComboBox_GetCurSel(hCtrl);
-		if ((curSel < 0) || (curSel >= MAX_SCREENS))
+		if ((curSel < 0) || (curSel >= NUMSELECTSCREEN))
 			curSel = 0;
 		(void)ComboBox_ResetContent(hCtrl);
 		for (i = 0; i < NUMSELECTSCREEN && i < options_get_int(pCurrentOpts, WINOPTION_NUMSCREENS) ; i++)
@@ -2788,7 +2787,7 @@ static void UpdateSelectScreenUI(HWND hwnd)
 			(void)ComboBox_SetItemData( hCtrl, i, g_ComboBoxSelectScreen[i].m_pData);
 		}
 		// Smaller Amount of screens was selected, so use 0
-		if( i< curSel )
+		if( i < curSel )
 			(void)ComboBox_SetCurSel(hCtrl, 0);
 		else
 			(void)ComboBox_SetCurSel(hCtrl, curSel);
