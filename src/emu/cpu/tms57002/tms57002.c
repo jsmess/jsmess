@@ -1280,7 +1280,7 @@ static CPU_EXECUTE(tms57002)
 	int initial_cycles = cycles;
 	int ipc = -1;
 
-	while(cycles > 0 && !(s->sti & (S_IDLE | IN_PLOAD | IN_CLOAD))) {
+	while((cycles > 0) && (!(s->sti & (S_IDLE | IN_PLOAD | IN_CLOAD)))) {
 		int iipc;
 
 		debugger_instruction_hook(device, s->pc);

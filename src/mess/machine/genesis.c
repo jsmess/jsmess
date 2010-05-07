@@ -859,7 +859,7 @@ static void setup_megadriv_custom_mappers(running_machine *machine)
 	{
 		/* Info from DGen: If SRAM does not overlap main ROM, set it active by
         default since a few games can't manage to properly switch it on/off. */
-		if (genesis_last_loaded_image_length <= genesis_sram_start)
+		if (genesis_last_loaded_image_length < genesis_sram_start)
 			genesis_sram_active = 1;
 
 		memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa130f0, 0xa130f1, 0, 0, genesis_sram_toggle);

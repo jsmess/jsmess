@@ -4,11 +4,32 @@
     video hardware
     Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
 
+	Tests of keyboard. Start mbeeic.
+
+	1. Load ASTEROIDS PLUS, stay in attract mode, hold down spacebar,
+		it should only fire bullets. If it sometimes starts turning,
+		thrusting or using the shield, then there is a problem.
+
+	2. Load SCAVENGER and make sure it doesn't go to the next level
+		until you find the Exit.
+
+	3. At the Basic prompt, type in EDASM press enter. At the memory size
+		prompt press enter. Now, make sure the keyboard	works properly.
+
+
+	The keyboard can be accessed either by using the transparent-mode
+	registers, or by monitoring the lightpen registers, or by monitoring
+	the lightpen strobe bit in the status register.
+
+	Edasm is an example of the latter; it is therefore necessary to do a
+	keyboard scan whenever the status is read.
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "includes/mbee.h"
 
+#define MBEE_WAIT_TIME 5000
 
 typedef struct {		 // CRTC 6545
 	UINT8 horizontal_total;
@@ -43,6 +64,7 @@ static UINT8 framecnt = 0;
 static UINT8 m6545_color_bank = 0;
 static UINT8 m6545_video_bank = 0;
 static UINT8 mbee_pcg_color_latch = 0;
+static int mbee_wait_time = 0;
 
 UINT8 *mbee_pcgram;
 static UINT8 *colorram;
@@ -85,7 +107,7 @@ WRITE8_HANDLER ( mbee_pcg_color_w )
 static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7" };
 
 /* The direction keys are used by the pc85 menu. Do not know what uses the "insert" key. */
-static int keyboard_matrix_r(running_machine *machine, int offs)
+static void keyboard_matrix_r(running_machine *machine, int offs)
 {
 	int port = (offs >> 7) & 7;
 	int bit = (offs >> 4) & 7;
@@ -125,9 +147,7 @@ static int keyboard_matrix_r(running_machine *machine, int offs)
 		crt.lpen_lo = offs & 0xff;
 		crt.lpen_hi = (offs >> 8) & 0x03;
 		crt.lpen_strobe = 1;
-//      logerror("mbee keyboard_matrix_r $%03X (port:%d bit:%d) = %d\n", offs, port, bit, data);
 	}
-	return data;
 }
 
 READ8_HANDLER ( mbee_color_bank_r )
@@ -187,10 +207,8 @@ WRITE8_HANDLER ( mbee_video_bank_w )
 
 static void m6545_update_strobe(running_machine *machine, int param)
 {
-	/*int data = */keyboard_matrix_r(machine, param);
+	keyboard_matrix_r(machine, param);
 	crt.update_strobe = 1;
-//  if( data )
-//      logerror("6545 update_strobe_cb $%04X = $%02X\n", param, data);
 }
 
 READ8_HANDLER ( m6545_status_r )
@@ -199,6 +217,10 @@ READ8_HANDLER ( m6545_status_r )
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
 	int data = 0, y = video_screen_get_vpos(space->machine->primary_screen);
+	int x = video_screen_get_hpos(space->machine->primary_screen);
+
+	if (!mbee_wait_time)
+		m6545_update_strobe(space->machine, x+y*64);
 
 	if( y < visarea->min_y ||
 		y > visarea->max_y )
@@ -207,7 +229,7 @@ READ8_HANDLER ( m6545_status_r )
 		data |= 0x40;	/* lpen register full */
 	if( crt.update_strobe )
 		data |= 0x80;	/* update strobe has occured */
-//  logerror("6545 status_r $%02X\n", data);
+
 	return data;
 }
 
@@ -255,29 +277,24 @@ READ8_HANDLER ( m6545_status_r )
 		data = crt.cursor_address_lo;
 		break;
 	case 16:
-//      logerror("6545 lpen_hi_r $%02X (lpen:%d upd:%d)\n", crt.lpen_hi, crt.lpen_strobe, crt.update_strobe);
 		crt.lpen_strobe = 0;
 		crt.update_strobe = 0;
 		data = crt.lpen_hi;
 		break;
 	case 17:
-//      logerror("6545 lpen_lo_r $%02X (lpen:%d upd:%d)\n", crt.lpen_lo, crt.lpen_strobe, crt.update_strobe);
 		crt.lpen_strobe = 0;
 		crt.update_strobe = 0;
 		data = crt.lpen_lo;
 		break;
 	case 18:
-//      logerror("6545 transp_hi_r $%02X\n", crt.transp_hi);
 		data = crt.transp_hi;
 		break;
 	case 19:
-//      logerror("6545 transp_lo_r $%02X\n", crt.transp_lo);
 		data = crt.transp_lo;
 		break;
 	case 31:
 		/* shared memory latch */
 		addr = (crt.transp_hi << 8) | crt.transp_lo;
-//      logerror("6545 transp_latch $%04X\n", addr);
 		m6545_update_strobe(space->machine, addr);
 		break;
 	default:
@@ -388,16 +405,14 @@ WRITE8_HANDLER ( m6545_data_w )
 	case 18:
 		data &= 63;
 		crt.transp_hi = data;
-//      logerror("6545 transp_hi_w $%02X\n", data);
 		break;
 	case 19:
 		crt.transp_lo = data;
-//      logerror("6545 transp_lo_w $%02X\n", data);
+		mbee_wait_time = MBEE_WAIT_TIME;
 		break;
 	case 31:
 		/* shared memory latch */
 		addr = (crt.transp_hi << 8) | crt.transp_lo;
-//      logerror("6545 transp_latch $%04X\n", addr);
 		m6545_update_strobe(space->machine, addr);
 		break;
 	default:
@@ -497,7 +512,15 @@ VIDEO_UPDATE( mbee )
 				UINT8 inv=0;
 				mem = (x + screen_home) & 0x7ff;
 				chr = screen->machine->generic.videoram.u8[mem];
-				if ((x & 15) == 0) keyboard_matrix_r(screen->machine, x);	// actually happens for every scanline of every character, but imposes too much unnecessary overhead */
+
+				if ((x & 15) == 0)
+				{
+					if (mbee_wait_time)
+						mbee_wait_time--;
+					else
+						m6545_update_strobe(screen->machine, x);
+				}
+
 				/* process cursor */
 				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always
 					((flash) && (speed) && (framecnt & 0x10)) ||		// (5,6)=(1,1) = cycle per 32 frames
@@ -547,7 +570,14 @@ VIDEO_UPDATE( mbeeic )
 				mem = (x + screen_home) & 0x7ff;
 				chr = screen->machine->generic.videoram.u8[mem];
 				col = colorram[mem] | colourm;					// read a byte of colour
-				if ((x & 15) == 0) keyboard_matrix_r(screen->machine, x);	// actually happens for every scanline of every character, but imposes too much unnecessary overhead */
+
+				if ((x & 15) == 0)
+				{
+					if (mbee_wait_time)
+						mbee_wait_time--;
+					else
+						m6545_update_strobe(screen->machine, x);
+				}
 
 				/* process cursor */
 				if ((((!flash) && (!speed)) ||					// (5,6)=(0,0) = cursor on always

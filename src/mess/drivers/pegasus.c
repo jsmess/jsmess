@@ -296,7 +296,23 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 {
 	image_fread(image, memory_region(image->machine, "maincpu") + 0x2000, 0x1000);
+	pegasus_decrypt_rom( image->machine, 0x2000 );
+
+	return INIT_PASS;
+}
+
+static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
+{
+	image_fread(image, memory_region(image->machine, "maincpu") + 0xc000, 0x1000);
 	pegasus_decrypt_rom( image->machine, 0xc000 );
+
+	return INIT_PASS;
+}
+
+static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
+{
+	image_fread(image, memory_region(image->machine, "maincpu") + 0xd000, 0x1000);
+	pegasus_decrypt_rom( image->machine, 0xd000 );
 
 	return INIT_PASS;
 }
@@ -350,6 +366,12 @@ static MACHINE_DRIVER_START( pegasus )
 	MDRV_CARTSLOT_ADD("cart3")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_LOAD(pegasus_cart_3)
+	MDRV_CARTSLOT_ADD("cart4")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_LOAD(pegasus_cart_4)
+	MDRV_CARTSLOT_ADD("cart5")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_LOAD(pegasus_cart_5)
 	MDRV_CASSETTE_ADD( "cassette", pegasus_cassette_config )
 MACHINE_DRIVER_END
 

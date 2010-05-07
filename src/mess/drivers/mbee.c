@@ -52,9 +52,6 @@
         (by reading port 0A) to swap between the two halves.
 
     EDASM - Jump to C000, usually the editor/Assembler package.
-        Currently this works properly only on the Standard model,
-        there appears to be some sort of core issue causing it to
-        freeze on the other models.
 
     MENU - Do a rombank switch to bank 5 and jump to C000 to start the Shell
 
@@ -66,6 +63,7 @@
     - Printer is working, but with improper code. This needs to be fixed.
     - Other models to be added (64k, 128k, 256k, 512k, PPC85, Teleterm)
     - Roms for mbeepc to be checked (I think they are correct)
+    - Fix Paste (it loses most of the characters)
 
     Notes about the printer:
     - When computer turned on, defaults to 1200 baud serial printer
