@@ -75,8 +75,15 @@ System Driver Changes:
 
 Imgtool Changes:
 ----------------
-(none)
+- Sector View in Windows version is working again [Oliver Stoeneberg]
 
+- Fixed adding of files to FAT filesystem (filenames still show garbage in WinImage show) [Oliver Stoeneberg]
+
+- Fixed insertion of files inside of folders with Windows version [Oliver Stoeneberg]
+
+- Increased default width of Sector View in Windows version to 16 rows (fixes bug 1124) [Oliver Stoeneberg]
+
+- Fixed reading of command-line parameter in Windows version (fixes bug 1908) [Oliver Stoeneberg]
 
 
 Source Changes:
@@ -135,7 +142,25 @@ Source Changes:
 
 - Fixed cassette crash if the image being recorded was unmounted. [Robbbert]
 
+- [JAGUAR] Fixed crash on exit when no image is mounted [Oliver Stoeneberg]
 
+- Several compilation and linking fixes for Visual Studio (fixes bug 1852) [Oliver Stoeneberg]
+
+- Fixed several memory leaks [Oliver Stoeneberg]
+
+- [NEWUI] Avoid duplicated extension when using "Save State As..." and don't carry the default savestate name in-between drivers when using the built-in menu [Oliver Stoeneberg]
+
+- Only schedule a hard reset when the image could be loaded [Oliver Stoeneberg]
+
+- Fixed hang when accessing unaccessible drive in File Manager (e.g. CD-ROM drive with no disc inserted) [Oliver Stoeneberg]
+
+- Fixed assert on shutdown after an image load error [Oliver Stoeneberg]
+
+- [MESSUI] Removed "File->Create Image...". It never worked and offered invalid image types. Use Device View to create images (not working either at the moment) [Oliver Stoeneberg]
+
+- [MESSEUI] Configuration of screens is working again [Oliver Stoeneberg]
+
+- [NEWUI] Removed non-working input configuration artwork support [Oliver Stoeneberg]
 
 0.137
 
