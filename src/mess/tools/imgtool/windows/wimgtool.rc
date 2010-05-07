@@ -13,7 +13,7 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// English (U.S.) resources
+// English (United States) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
@@ -27,18 +27,18 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE
+1 TEXTINCLUDE 
 BEGIN
     "wimgres.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#include <windows.h>\r\n"
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
@@ -113,8 +113,7 @@ END
 //
 
 IDD_FILETEMPLATE DIALOGEX 0, 0, 186, 28
-STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS |
-    WS_CAPTION | WS_SYSMENU
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -122,8 +121,7 @@ BEGIN
 END
 
 IDD_FILEOPTIONS DIALOGEX 0, 0, 186, 29
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION |
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "File Options"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -132,8 +130,7 @@ BEGIN
 END
 
 IDD_ASSOCIATIONS DIALOGEX 0, 0, 186, 28
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION |
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "File Associations"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -142,8 +139,7 @@ BEGIN
 END
 
 IDD_CREATEDIR DIALOGEX 0, 0, 186, 47
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION |
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "New Directory"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -166,17 +162,13 @@ BEGIN
     LTEXT           "Sector:",IDC_SECTORLABEL,135,108,23,11
     EDITTEXT        IDC_SECTOREDIT,161,106,26,13,ES_AUTOHSCROLL | ES_NUMBER
     CONTROL         "",IDC_HEXVIEW,"hexview_class",0x0,7,6,330,96,0x200000L
-    CONTROL         "",IDC_TRACKSPIN,"msctls_updown32",UDS_SETBUDDYINT |
-                    UDS_ARROWKEYS,59,106,9,12
-    CONTROL         "",IDC_HEADSPIN,"msctls_updown32",UDS_SETBUDDYINT |
-                    UDS_ARROWKEYS,121,106,9,12
-    CONTROL         "",IDC_SECTORSPIN,"msctls_updown32",UDS_SETBUDDYINT |
-                    UDS_ARROWKEYS,187,106,9,12
+    CONTROL         "",IDC_TRACKSPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ARROWKEYS,59,106,9,12
+    CONTROL         "",IDC_HEADSPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ARROWKEYS,121,106,9,12
+    CONTROL         "",IDC_SECTORSPIN,"msctls_updown32",UDS_SETBUDDYINT | UDS_ARROWKEYS,187,106,9,12
 END
 
 IDD_EXTRACTOPTIONS DIALOG 0, 0, 182, 22
-STYLE DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS | WS_CAPTION |
-    WS_SYSMENU
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_CLIPSIBLINGS | WS_CAPTION | WS_SYSMENU
 CAPTION "Dialog"
 FONT 8, "MS Sans Serif"
 BEGIN
@@ -256,7 +248,7 @@ IDI_IMGTOOL             ICON                    "res/imgtool.ico"
 IDI_DOC                 ICON                    "res/doc.ico"
 IDI_READONLY            ICON                    "res/readonly.ico"
 IDI_DIRECTORY           ICON                    "res/dir.ico"
-#endif    // English (U.S.) resources
+#endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
