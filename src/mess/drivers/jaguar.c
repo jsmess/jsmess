@@ -713,6 +713,11 @@ static DEVICE_IMAGE_LOAD( jaguar )
 {
 	int i, j;
 	UINT32 size;
+	UINT8 header[512];
+
+	/* skip header*/
+	if((image_length(image) & 0x200) == 0x200)
+		image_fread(image, header, 0x200);
 
 	if (image_software_entry(image) == NULL)
 	{
