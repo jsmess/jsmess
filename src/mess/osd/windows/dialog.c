@@ -1303,8 +1303,6 @@ int win_dialog_add_portselect(dialog_box *dialog, const input_field_config *fiel
 	dialog_box *di = dialog;
 	short x;
 	short y;
-	short height;
-	short width;
 	const char *port_name;
 	const char *this_port_name;
 	char *s;
