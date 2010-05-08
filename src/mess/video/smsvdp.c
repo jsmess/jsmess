@@ -886,7 +886,7 @@ static void sms_refresh_tms9918_sprites( running_machine *machine, smsvdp_t *sms
 {
 	int pixel_plot_x;
 	int sprite_col_occurred, sprite_col_x;
-	int sprite_height, sprite_buffer_count, sprite_index, sprite_buffer[4], sprite_buffer_index;
+	int sprite_height, sprite_buffer_count, sprite_index, sprite_buffer[5], sprite_buffer_index;
 	UINT8 *sprite_table, *sprite_pattern_table;
 
 	/* Draw sprite layer */
