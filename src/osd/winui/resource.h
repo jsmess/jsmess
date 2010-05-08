@@ -85,7 +85,6 @@
 #define IDD_RESET                       170
 #define IDD_LOAD_PROGRESS               171
 #define IDD_INTERFACE_OPTIONS           173
-#define IDD_LANGUAGE                    178
 #define IDR_CONTEXT_SCREENSHOT          181
 #define IDI_HEADER_UP                   182
 #define IDI_HEADER_DOWN                 183
@@ -369,7 +368,6 @@
 #define ID_CONTEXT_REMOVE_CUSTOM        40058
 #define ID_GAME_AUDIT                   40059
 #define ID_CONTEXT_SELECT_RANDOM        40060
-#define ID_OPTIONS_LANGUAGE             40061
 #define ID_VIEW_TAB_SCREENSHOT          40062
 #define ID_VIEW_TAB_FLYER               40063
 #define ID_VIEW_TAB_CABINET             40064

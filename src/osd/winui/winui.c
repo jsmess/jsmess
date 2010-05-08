@@ -301,9 +301,7 @@ static HICON			GetSelectedFolderIcon(void);
 static LRESULT CALLBACK HistoryWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK PictureFrameWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 static LRESULT CALLBACK PictureWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam);
 
-static BOOL             SelectLanguageFile(HWND hWnd, TCHAR* filename);
 static void             MamePlayRecordGame(void);
 static void             MamePlayBackGame(void);
 static void             MamePlayRecordWave(void);
@@ -4602,14 +4600,6 @@ static BOOL MameCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 			osd_free(t_bgdir);
 		}
 		break;
-
-	case ID_OPTIONS_LANGUAGE:
-		DialogBox(GetModuleHandle(NULL),
-				  MAKEINTRESOURCE(IDD_LANGUAGE),
-				  hMain,
-				  LanguageDialogProc);
-		return TRUE;
-
 	case ID_OPTIONS_HISTORY:
 		{
 			char filename[MAX_PATH];
@@ -5581,109 +5571,6 @@ BOOL CommonFileDialog(common_file_dialog_proc cfd, char *filename, int filetype)
 	}
 
 	return success;
-}
-
-static BOOL SelectLanguageFile(HWND hWnd, TCHAR* filename)
-{
-	OPENFILENAME of;
-
-	of.lStructSize       = sizeof(of);
-	of.hwndOwner         = hWnd;
-	of.hInstance         = NULL;
-	of.lpstrFilter       = TEXT(MAMENAME) TEXT(" Language files (*.lng)\0*.lng\0");
-	of.lpstrCustomFilter = NULL;
-	of.nMaxCustFilter    = 0;
-	of.nFilterIndex      = 1;
-	of.lpstrFile         = filename;
-	of.nMaxFile          = MAX_PATH;
-	of.lpstrFileTitle    = NULL;
-	of.nMaxFileTitle     = 0;
-	of.lpstrInitialDir   = NULL;
-	of.lpstrTitle        = NULL;
-	of.Flags             = OFN_EXPLORER | OFN_NOCHANGEDIR | OFN_PATHMUSTEXIST | OFN_HIDEREADONLY | OFN_FILEMUSTEXIST;
-	of.nFileOffset       = 0;
-	of.nFileExtension    = 0;
-	of.lpstrDefExt       = TEXT("lng");
-	of.lCustData         = 0;
-	of.lpfnHook          = NULL;
-	of.lpTemplateName    = NULL;
-
-	return GetOpenFileName(&of);
-}
-
-static INT_PTR CALLBACK LanguageDialogProc(HWND hDlg, UINT Msg, WPARAM wParam, LPARAM lParam)
-{
-	TCHAR pLangFile[MAX_PATH];
-	DWORD dwHelpIDs[] = { IDC_LANGUAGECHECK, HIDC_LANGUAGECHECK,
-						  IDC_LANGUAGEEDIT,  HIDC_LANGUAGEEDIT,
-						  0, 0};
-	char* utf8_LangFile;
-
-	switch (Msg)
-	{
-	case WM_INITDIALOG:
-		{
-			const char* pLang = GetLanguage();
-			if (pLang == NULL || *pLang == '\0')
-			{
-				win_set_window_text_utf8(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), "");
-				Button_SetCheck(GetDlgItem(hDlg, IDC_LANGUAGECHECK), FALSE);
-				EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEEDIT),   FALSE);
-				EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEBROWSE), FALSE);
-			}
-			else
-			{
-				win_set_window_text_utf8(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), pLang);
-				Button_SetCheck(GetDlgItem(hDlg, IDC_LANGUAGECHECK), TRUE);
-				EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEEDIT),   TRUE);
-				EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEBROWSE), TRUE);
-			}
-
-			return TRUE;
-		}
-
-	case WM_HELP:
-		HelpFunction((HWND)((LPHELPINFO)lParam)->hItemHandle, MAMEUICONTEXTHELP, HH_TP_HELP_WM_HELP, (DWORD_PTR)dwHelpIDs);
-		break;
-
-	case WM_CONTEXTMENU:
-		HelpFunction((HWND)wParam, MAMEUICONTEXTHELP, HH_TP_HELP_CONTEXTMENU, (DWORD_PTR)dwHelpIDs);
-		break;
-
-	case WM_COMMAND:
-		switch (GET_WM_COMMAND_ID(wParam, lParam))
-		{
-		case IDOK:
-			Edit_GetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), pLangFile, MAX_PATH);
-			utf8_LangFile = utf8_from_tstring(pLangFile);
-			if( !utf8_LangFile )
-				return FALSE;
-			SetLanguage(utf8_LangFile);
-			osd_free(utf8_LangFile);
-
-		case IDCANCEL:
-			EndDialog(hDlg, 0);
-			return TRUE;
-
-		case IDC_LANGUAGECHECK:
-		{
-			BOOL bCheck = Button_GetCheck(GetDlgItem(hDlg, IDC_LANGUAGECHECK));
-			EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEEDIT),   bCheck);
-			EnableWindow(GetDlgItem(hDlg, IDC_LANGUAGEBROWSE), bCheck);
-			if (bCheck == FALSE)
-				Edit_SetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), TEXT(""));
-			return TRUE;
-		}
-
-		case IDC_LANGUAGEBROWSE:
-			Edit_GetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), pLangFile, MAX_PATH);
-			if (SelectLanguageFile(hDlg, pLangFile) == TRUE)
-				Edit_SetText(GetDlgItem(hDlg, IDC_LANGUAGEEDIT), pLangFile);
-			break;
-		}
-		break;
-	}
-	return 0;
 }
 
 void SetStatusBarText(int part_index, const char *message)
