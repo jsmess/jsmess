@@ -136,7 +136,7 @@ static MACHINE_RESET( jaguar )
 	protection_check = 0;
 
 	/* Set up pointers for Jaguar logo */
-	memcpy(jaguar_shared_ram, rom_base, 0x10);
+	memcpy(jaguar_shared_ram, rom_base, 0x200000);
 	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, rom_base[1]);
 
 #if 0
@@ -725,7 +725,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 			offset = 0x200;
 			image_fread(image, header, 0x200);
 		}
-		
+
 		image_fread(image, cart_base, size - offset);
 	}
 	else
@@ -738,7 +738,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 			offset = 0x200;
 			memcpy(header, image_get_software_region(image, "rom") , 0x200);
 		}
-		
+
 		memcpy(cart_base, image_get_software_region(image, "rom") + offset, size - offset);
 	}
 
