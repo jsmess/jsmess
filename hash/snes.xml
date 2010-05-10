@@ -19419,7 +19419,7 @@
 		</part>
 	</software>
 
-	<software name="nbapro94" cloneof="nbashowb">
+	<software name="nbapro94" cloneof="nbashow">
 		<description>NBA Pro Basketball '94 - Bulls vs Suns (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -28724,7 +28724,7 @@
 		</part>
 	</software>
 
-	<software name="sbbrosa" cloneof="sbbros">
+	<software name="sbbrosa" cloneof="spang">
 		<description>Super Buster Bros. (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -29628,7 +29628,7 @@
 		</part>
 	</software>
 
-	<software name="supergngu" cloneof="supergng">
+	<software name="sgngu" cloneof="sgng">
 		<description>Super Ghouls'n Ghosts (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

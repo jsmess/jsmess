@@ -145,7 +145,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id: G-3219 - Developers: Sega - Releases: 1992-06-05 (Jpn) -->
 	<software name="aerialasj" cloneof="aerialas">
-		<description>Aerial Assault (v1.1) (Jpn)</description>
+		<description>Aerial Assault (Jpn, v1.1)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -402,7 +402,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="astergre">
-		<description>Asterix and the Great Rescue (En, Fr, De, Es, It) (Euro)</description>
+		<description>Asterix and the Great Rescue (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -424,7 +424,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="astermis">
-		<description>Asterix and the Secret Mission (En, Fr, De) (Euro)</description>
+		<description>Asterix and the Secret Mission (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -435,7 +435,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="axbattlr">
-		<description>Ax Battler - A Legend of Golden Axe (v2.4) (Euro, USA)</description>
+		<description>Ax Battler - A Legend of Golden Axe (Euro, USA, v2.4)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -447,7 +447,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id: G-3306 - Developers: Aspect - Releases: 1991-11-01 (Jpn) -->
 	<software name="axbattlrj" cloneof="axbattlr">
-		<description>Ax Battler - Golden Axe Densetsu (v1.5) (Jpn)</description>
+		<description>Ax Battler - Golden Axe Densetsu (Jpn, v1.5)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1129,7 +1129,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="castlill">
-		<description>Castle of Illusion Starring Mickey Mouse (USA, Europe) (SMS Mode?)</description>
+		<description>Castle of Illusion Starring Mickey Mouse (USA, Europe, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1606,7 +1606,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="daffy">
-		<description>Daffy Duck in Hollywood (En, Fr, De, Es, It) (Euro)</description>
+		<description>Daffy Duck in Hollywood (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1639,7 +1639,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="desert">
-		<description>Desert Speedtrap (En, Fr, De, Es, It) (Euro)</description>
+		<description>Desert Speedtrap (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1731,7 +1731,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="donaldmw">
-		<description>Donald no Magical World (En, Ja) (Jpn)</description>
+		<description>Donald no Magical World (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1753,8 +1753,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="ddragonb" cloneof="ddragon">
-		<description>Double Dragon (Beta) (Euro, USA)</description>
+	<software name="ddragonp" cloneof="ddragon">
+		<description>Double Dragon (Euro, USA, Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -1978,7 +1978,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="ernieeg">
-		<description>Ernie Els Golf (En, Fr, De, Es, It) (Euro)</description>
+		<description>Ernie Els Golf (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2079,7 +2079,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="fantdizz">
-		<description>Fantastic Dizzy (En, Fr, De, Es, It) (SMS Mode?) (Euro)</description>
+		<description>Fantastic Dizzy (Euro, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2102,7 +2102,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="fantzone1" cloneof="fantzone">
-		<description>Fantasy Zone Gear (Alt) (Jpn, USA)</description>
+		<description>Fantasy Zone Gear (Jpn, USA, Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2158,7 +2158,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="fifa96">
-		<description>FIFA Soccer 96 (En, Fr, De, Es) (Euro, USA)</description>
+		<description>FIFA Soccer 96 (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2251,12 +2251,12 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="glocairj" cloneof="glocair">
-		<description>G-LOC Air Battle (v1.1) (Jpn)</description>
+		<description>G-LOC Air Battle (Jpn, v1.1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="g-loc air battle (japan) (v1.1).bin" size="131072" crc="33237f50" sha1="033c65e52011fd6b9be86ecb0f5d8209dbbdbbca" offset="000000" />
+				<rom name="g-loc air battle (japanv1.1).bin" size="131072" crc="33237f50" sha1="033c65e52011fd6b9be86ecb0f5d8209dbbdbbca" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2715,7 +2715,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="indycrus1" cloneof="indycrus">
-		<description>Indiana Jones and the Last Crusade (Alt) (USA)</description>
+		<description>Indiana Jones and the Last Crusade (USA, Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2737,7 +2737,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="ironman1" cloneof="ironman">
-		<description>Iron Man X-O Manowar in Heavy Metal (Alt) (USA)</description>
+		<description>Iron Man X-O Manowar in Heavy Metal (USA, Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -2827,7 +2827,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="jangpun2">
-		<description>Jang Pung II (SMS Mode) (Korea)</description>
+		<description>Jang Pung II (Korea, SMS Mode)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3176,8 +3176,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="lemmingsb" cloneof="lemmings">
-		<description>Lemmings (Beta) (World)</description>
+	<software name="lemmingsp" cloneof="lemmings">
+		<description>Lemmings (World, Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3200,7 +3200,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="lionkingt" cloneof="lionking">
-		<description>The Lion King (Trainer?) (Euro)</description>
+		<description>The Lion King (Euro, Trainer?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3333,7 +3333,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="lionkingu" cloneof="lionking">
-		<description>The Lion King (Trainer?) (USA)</description>
+		<description>The Lion King (USA, Trainer?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3459,7 +3459,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="madoumn3">
-		<description>Madou Monogatari III - Kyuukyoku Joou-sama (v1.1) (Jpn)</description>
+		<description>Madou Monogatari III - Kyuukyoku Joou-sama (Jpn, v1.1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3506,7 +3506,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="magiclpp">
-		<description>Magical Puzzle Popils (En, Ja) (World)</description>
+		<description>Magical Puzzle Popils (World)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3563,7 +3563,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="marko">
-		<description>Marko's Magic Football (En, Fr, De, Es) (Euro)</description>
+		<description>Marko's Magic Football (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3633,7 +3633,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="castlillj" cloneof="castlill">
-		<description>Mickey Mouse no Castle Illusion (SMS Mode?) (Jpn)</description>
+		<description>Mickey Mouse no Castle Illusion (Jpn, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3780,7 +3780,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="mkj" cloneof="mk">
-		<description>Mortal Kombat (v3.3) (Jpn)</description>
+		<description>Mortal Kombat (Jpn, v3.3)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -3791,7 +3791,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="mk">
-		<description>Mortal Kombat (v2.6) (Euro, USA)</description>
+		<description>Mortal Kombat (Euro, USA, v2.6)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4236,7 +4236,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="nbajam">
-		<description>NBA Jam (v1.1) (USA)</description>
+		<description>NBA Jam (USA, v1.1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4750,7 +4750,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="olympi">
-		<description>Olympic Gold (En, Fr, De, Es, It, Nl, Pt, Sv) (v1.1) (SMS Mode?) (Euro)</description>
+		<description>Olympic Gold (Euro, v1.1, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4762,7 +4762,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="olympiju" cloneof="olympi">
-		<description>Olympic Gold (En, Fr, De, Es, It, Nl, Pt, Sv) (SMS Mode?) (Jpn, USA)</description>
+		<description>Olympic Gold (Jpn, USA, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4773,7 +4773,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="ottifant">
-		<description>The Ottifants (En, Fr, De, Es, It) (Euro)</description>
+		<description>The Ottifants (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4796,7 +4796,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="outruneu">
-		<description>Out Run Europa (SMS Mode?) (Euro, USA)</description>
+		<description>Out Run Europa (Euro, USA, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -4943,7 +4943,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="pgatour">
-		<description>PGA Tour Golf (v1.1) (USA)</description>
+		<description>PGA Tour Golf (USA, v1.1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5114,7 +5114,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="predator">
-		<description>Predator 2 (SMS Mode?) (Euro, USA)</description>
+		<description>Predator 2 (Euro, USA, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5135,8 +5135,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="ppersiab" cloneof="ppersia">
-		<description>Prince of Persia (Beta) (SMS Mode?) (Euro, USA)</description>
+	<software name="ppersiap" cloneof="ppersia">
+		<description>Prince of Persia (Euro, USA, Prototype, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5147,7 +5147,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="ppersia">
-		<description>Prince of Persia (SMS Mode?) (Euro, USA)</description>
+		<description>Prince of Persia (Euro, USA, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5206,7 +5206,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="psychicw">
-		<description>Psychic World (v1.1) (Euro, USA)</description>
+		<description>Psychic World (Euro, USA, v1.1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5322,7 +5322,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="rcgp">
-		<description>R.C. Grand Prix (SMS Mode?) (Euro, USA)</description>
+		<description>R.C. Grand Prix (Euro, USA, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5334,7 +5334,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="rastansg">
-		<description>Rastan Saga (SMS Mode?) (Jpn)</description>
+		<description>Rastan Saga (Jpn, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5821,7 +5821,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="smurfs">
-		<description>The Smurfs (Europe) (En,Fr,De,Es)</description>
+		<description>The Smurfs (Europe)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -5968,7 +5968,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="sonicdrs" cloneof="sonicdr">
-		<description>Sonic Drift (Sample) (Jpn)</description>
+		<description>Sonic Drift (Jpn, Sample)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -6914,7 +6914,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="striker">
-		<description>Striker (En, Fr, De, Es, It) (Euro)</description>
+		<description>Striker (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7049,7 +7049,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="suprkick">
-		<description>Super Kick Off (SMS Mode?) (Jpn)</description>
+		<description>Super Kick Off (Jpn, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7106,7 +7106,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="superoffu" cloneof="superoff">
-		<description>Super Off-Road (Alt) (USA)</description>
+		<description>Super Off-Road (USA, Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7150,7 +7150,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="stetris">
-		<description>Super Tetris (SMS Mode?) (Korea)</description>
+		<description>Super Tetris (Korea, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7207,7 +7207,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="tailsadv">
-		<description>Tails Adventures (En, Ja) (World)</description>
+		<description>Tails Adventures (World)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7267,7 +7267,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="chasehq">
-		<description>Taito Chase H.Q. (SMS Mode) (Jpn)</description>
+		<description>Taito Chase H.Q. (Jpn, SMS Mode)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7278,7 +7278,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="chasehq1" cloneof="chasehq">
-		<description>Taito Chase H.Q. (Alt, SMS Mode?) (Jpn)</description>
+		<description>Taito Chase H.Q. (Jpn, Alt, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7690,7 +7690,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="tintin">
-		<description>Tintin in Tibet (En, Fr, De, Es, Nl, Sv) (Euro)</description>
+		<description>Tintin in Tibet (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7737,7 +7737,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="ultimate">
-		<description>Ultimate Soccer (En, Fr, De, Es, It) (Euro, Jpn)</description>
+		<description>Ultimate Soccer (Euro, Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7816,7 +7816,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="waganlnd1" cloneof="waganlnd">
-		<description>Wagan Land (Alt) (Jpn)</description>
+		<description>Wagan Land (Jpn, Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7851,7 +7851,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="winterolj" cloneof="winterol">
-		<description>Winter Olympics - Lillehammer '94 (En, Fr, De, Es, It, Pt, Sv, No) (Jpn)</description>
+		<description>Winter Olympics - Lillehammer '94 (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7862,7 +7862,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="winterol">
-		<description>Winter Olympics - Lillehammer '94 (En, Fr, De, Es, It, Pt, Sv, No) (Euro, USA)</description>
+		<description>Winter Olympics - Lillehammer '94 (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7917,7 +7917,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="wboydtrap">
+	<software name="wboydtrp">
 		<description>Wonder Boy III - The Dragon's Trap (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7928,8 +7928,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="wboydtrapb" cloneof="wboydtrap">
-		<description>Wonder Boy III - The Dragon's Trap (Beta) (Euro)</description>
+	<software name="wboydtrpp" cloneof="wboydtrp">
+		<description>Wonder Boy III - The Dragon's Trap (Euro, Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7940,7 +7940,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="woodypop">
-		<description>Woody Pop (v1.1) (Euro, USA)</description>
+		<description>Woody Pop (Euro, USA, v1.1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -7973,7 +7973,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="wcup94">
-		<description>World Cup USA 94 (En, Fr, De, Es, It, Nl, Pt, Sv) (Euro, USA)</description>
+		<description>World Cup USA 94 (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8073,7 +8073,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="worldsb">
-		<description>World Series Baseball (v1.1) (USA)</description>
+		<description>World Series Baseball (USA, v1.1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8106,7 +8106,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<software name="wwfwre">
-		<description>WWF Wrestlemania Steel Cage Challenge (SMS Mode?) (Euro)</description>
+		<description>WWF Wrestlemania Steel Cage Challenge (Euro, SMS Mode?)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gamegear_cart">
@@ -8127,7 +8127,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="xmengamlp1" cloneof="xmengaml">
+	<software name="xmenglp1" cloneof="xmengl">
 		<description>X-Men - Gamemaster's Legacy (Prototype, 19940810)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8138,8 +8138,8 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-    <!-- same as aug 10 proto. was a mistake by drx? -->
-	<!--software name="xmengamlp2" cloneof="xmengaml">
+	<!-- same as aug 10 proto. was a mistake by drx? -->
+	<!--software name="xmenglp2" cloneof="xmengl">
 		<description>X-Men - Gamemaster's Legacy (Prototype, 19940815)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8150,7 +8150,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software-->
 
-	<software name="xmengamlp3" cloneof="xmengaml">
+	<software name="xmenglp3" cloneof="xmengl">
 		<description>X-Men - Gamemaster's Legacy (Prototype 36, 19940831)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8161,7 +8161,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="xmengamlp4" cloneof="xmengaml">
+	<software name="xmenglp4" cloneof="xmengl">
 		<description>X-Men - Gamemaster's Legacy (Prototype 51, 19940906)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -8172,7 +8172,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="xmengaml">
+	<software name="xmengl">
 		<description>X-Men - Gamemaster's Legacy (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>

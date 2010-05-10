@@ -1871,7 +1871,7 @@
 		</part>
 	</software>
 
-	<software name="motorod2a" cloneof="motorod">
+	<software name="motorod2a" cloneof="motorod2">
 		<description>Moto Roader II (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -2311,7 +2311,7 @@
 		</part>
 	</software>
 
-	<software name="populous1" cloneof="popolous">
+	<software name="populous1" cloneof="populous">
 		<description>Populous (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

@@ -223,7 +223,7 @@
 	</software>
 
 	<software name="congo1" cloneof="congo">
-		<description>Congo Bongo (Alt - Euro, Jpn)</description>
+		<description>Congo Bongo (Euro, Jpn, Alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -267,7 +267,7 @@
 	</software>
 
 	<software name="dragwang1" cloneof="dragwang">
-		<description>Dragon Wang (Alt - Jpn)</description>
+		<description>Dragon Wang (Jpn, Alt)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">

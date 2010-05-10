@@ -156,7 +156,8 @@ int info_listsoftware(core_options *options, const char *gamename)
 
 	fprintf( out,
 			"<?xml version=\"1.0\"?>\n"
-			"<!ELEMENT softwarelists (softwarelist*)\n"
+			"<!DOCTYPE softwarelist [\n"
+			"<!ELEMENT softwarelists (softwarelist*)>\n"
 			"\t<!ELEMENT softwarelist (software+)>\n"
 			"\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
 			"\t\t<!ATTLIST softwarelist description CDATA #IMPLIED>\n"
@@ -185,6 +186,7 @@ int info_listsoftware(core_options *options, const char *gamename)
 			"\t\t\t\t\t\t<!ATTLIST rom offset CDATA #IMPLIED>\n"
 			"\t\t\t\t\t\t<!ATTLIST rom status (baddump|nodump|good) \"good\">\n"
 			"\t\t\t\t\t\t<!ATTLIST rom loadflag (load16_byte|load16_word|load16_word_swap|load32_byte|load32_word|load32_word_swap|load32_dword|load64_word|load64_word_swap|reload) #IMPLIED>\n"
+			"]>\n\n"
 			"<softwarelists>\n"
 	);
 
@@ -229,6 +231,8 @@ int info_listsoftware(core_options *options, const char *gamename)
 									for ( software_info *swinfo = software_list_first( list ); swinfo != NULL; swinfo = software_list_next( list ) )
 									{
 										fprintf( out, "\t\t<software name=\"%s\"", swinfo->shortname );
+										if ( swinfo->parentname != NULL )
+											fprintf( out, " cloneof=\"%s\"", swinfo->parentname );
 										if ( swinfo->supported == SOFTWARE_SUPPORTED_PARTIAL )
 											fprintf( out, " supported=\"partial\"" );
 										if ( swinfo->supported == SOFTWARE_SUPPORTED_NO )
@@ -285,7 +289,7 @@ int info_listsoftware(core_options *options, const char *gamename)
 													}
 												}
 
-												fprintf( out, "\t\t\t\t</datearea>\n" );
+												fprintf( out, "\t\t\t\t</dataarea>\n" );
 											}
 
 											fprintf( out, "\t\t\t</part>\n" );
