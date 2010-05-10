@@ -277,7 +277,7 @@
 	</software>
 
 	<software name="bombmn93">
-		<description>Bomberman &apos;93</description>
+		<description>Bomberman '93</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -288,7 +288,7 @@
 	</software>
 
 	<software name="bombmn93s" cloneof="bombmn93">
-		<description>Bomberman &apos;93 (Special Version)</description>
+		<description>Bomberman '93 (Special Version)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -299,7 +299,7 @@
 	</software>
 
 	<software name="bombmn94">
-		<description>Bomberman &apos;94</description>
+		<description>Bomberman '94</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -838,7 +838,7 @@
 	</software>
 
 	<software name="f1pilot">
-		<description>F-1 Pilot - You&apos;re King of Kings</description>
+		<description>F-1 Pilot - You're King of Kings</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -849,7 +849,7 @@
 	</software>
 
 	<software name="f1circ91">
-		<description>F1 Circus &apos;91 - World Championship</description>
+		<description>F1 Circus '91 - World Championship</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -860,7 +860,7 @@
 	</software>
 
 	<software name="f1circ92">
-		<description>F1 Circus &apos;92 - The Speed of Sound</description>
+		<description>F1 Circus '92 - The Speed of Sound</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -1014,7 +1014,7 @@
 	</software>
 
 	<software name="fsoccr90">
-		<description>Formation Soccer - Human Cup &apos;90</description>
+		<description>Formation Soccer - Human Cup '90</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -1069,7 +1069,7 @@
 	</software>
 
 	<software name="galaga88">
-		<description>Galaga &apos;88</description>
+		<description>Galaga '88</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -1311,7 +1311,7 @@
 	</software>
 
 	<software name="jn18hole">
-		<description>Jack Nicklaus&apos; Greatest 18 Holes of Major Championship Golf</description>
+		<description>Jack Nicklaus' Greatest 18 Holes of Major Championship Golf</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -1487,7 +1487,7 @@
 	</software>
 
 	<software name="proyak89">
-		<description>Kore Ga Pro Yakyuu &apos;89</description>
+		<description>Kore Ga Pro Yakyuu '89</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -1498,7 +1498,7 @@
 	</software>
 
 	<software name="proyak90">
-		<description>Kore Ga Pro Yakyuu &apos;90</description>
+		<description>Kore Ga Pro Yakyuu '90</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -1663,7 +1663,7 @@
 	</software>
 
 	<software name="mjkaiser">
-		<description>Mahjong Haou Den - Kaiser&apos;s Quest</description>
+		<description>Mahjong Haou Den - Kaiser's Quest</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -2378,7 +2378,7 @@
 	</software>
 
 	<software name="pleag93">
-		<description>Power League &apos;93</description>
+		<description>Power League '93</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -2488,7 +2488,7 @@
 	</software>
 
 	<software name="proyak91">
-		<description>Pro Yakyuu World Stadium &apos;91</description>
+		<description>Pro Yakyuu World Stadium '91</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">
@@ -2917,7 +2917,7 @@
 	</software>
 
 	<software name="sf2ce">
-		<description>Street Fighter II&apos; - Champion Edition</description>
+		<description>Street Fighter II' - Champion Edition</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="pce_cart">

@@ -79,7 +79,7 @@
 	</software>
 
 	<software name="bombmn93">
-		<description>Bomberman &apos;93</description>
+		<description>Bomberman '93</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="tg16_cart">
@@ -101,7 +101,7 @@
 	</software>
 
 	<software name="bonk3">
-		<description>Bonk III - Bonk&apos;s Big Adventure</description>
+		<description>Bonk III - Bonk's Big Adventure</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="tg16_cart">
@@ -112,7 +112,7 @@
 	</software>
 
 	<software name="bonk">
-		<description>Bonk&apos;s Adventure</description>
+		<description>Bonk's Adventure</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="tg16_cart">
@@ -123,7 +123,7 @@
 	</software>
 
 	<software name="bonk2">
-		<description>Bonk&apos;s Revenge</description>
+		<description>Bonk's Revenge</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="tg16_cart">
@@ -266,7 +266,7 @@
 	</software>
 
 	<software name="devlcrsh">
-		<description>Devil&apos;s Crush - Naxat Pinball</description>
+		<description>Devil's Crush - Naxat Pinball</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="tg16_cart">
@@ -299,7 +299,7 @@
 	</software>
 
 	<software name="dragcrse">
-		<description>Dragon&apos;s Curse</description>
+		<description>Dragon's Curse</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="tg16_cart">
@@ -365,7 +365,7 @@
 	</software>
 
 	<software name="galaga90">
-		<description>Galaga &apos;90</description>
+		<description>Galaga '90</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="tg16_cart">
@@ -431,7 +431,7 @@
 	</software>
 
 	<software name="turboglf">
-		<description>Jack Nicklaus&apos; Turbo Golf</description>
+		<description>Jack Nicklaus' Turbo Golf</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="tg16_cart">
@@ -442,7 +442,7 @@
 	</software>
 
 	<software name="jchan">
-		<description>Jackie Chan&apos;s Action Kung Fu</description>
+		<description>Jackie Chan's Action Kung Fu</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="tg16_cart">
@@ -849,7 +849,7 @@
 	</software>
 
 	<software name="taknhoop">
-		<description>Takin&apos; It to the Hoop</description>
+		<description>Takin' It to the Hoop</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="tg16_cart">
