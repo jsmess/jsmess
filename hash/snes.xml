@@ -1401,8 +1401,8 @@
 		</part>
 	</software>
 
-	<software name="aretha2p2" cloneof="aretha2">
-		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, Prototype, Alt)</description>
+	<software name="aretha2p1" cloneof="aretha2">
+		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -1412,8 +1412,8 @@
 		</part>
 	</software>
 
-	<software name="aretha2p1" cloneof="aretha2">
-		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, Prototype)</description>
+	<software name="aretha2p2" cloneof="aretha2">
+		<description>Aretha II - Ariel no Fushigi na Tabi (Jpn, Earlier Prototype)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -22593,7 +22593,7 @@
 	</software>
 
 	<software name="powrslid">
-		<description>Power Slide (Euro, Prototype 19940412)</description>
+		<description>Power Slide (Euro, ECTS Demo, 19940412)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -30565,7 +30565,7 @@
 	</software>
 
 	<software name="smomodxa" cloneof="smomodx">
-		<description>Super Momotarou Dentetsu DX (Jpn, Jr Nishi-Nihon Presents)</description>
+		<description>Super Momotarou Dentetsu DX - Jr Nishi-Nihon Presents (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -38359,6 +38359,54 @@
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="ActRaiser (Japan).bs.sfc" size="1048576" crc="b9a968ff" sha1="1d94b555e3a5a018dabf5fe2ea62ba73c2927a82" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bspuyo" supported="no">
+		<description>Puyo Puyo Tsuu BS Ban (Jpn)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="puyob.sfc" size="1048576" crc="e63ee3b1" sha1="2fa77c709294da3a0ae5a918a574b49302a0bf17" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsfami" supported="no">
+		<description>BS Famitsu Magazine Karara Ban 4/27 (Jpn)</description>
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="Weekly Famitsu Express 4-27.sfc" size="1048576" crc="d8bc7bea" sha1="57c14d389b216b01616caad704a998d7d03dc155" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bsdoki1" cloneof="bsdoki" supported="no">
+		<description>Konae-chan no Dokidoki Penguin Kazoku (Jpn, Alt)</description>
+		<!-- same game as the other dump, but taken from a different broadcast in the same week -->
+		<!-- BS -->
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="BS Konae Chan no Dokidoki Pengin Kazoku (Japan) (Alt).sfc" size="262144" crc="33cb8a80" sha1="9c2500e5ab9c46cd32a6366fcb3df811888191b4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenchis" cloneof="tenchi">
+		<description>Tenchi Muyou! - Game Hen (Jpn, Sample)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="Tenchi Muyou! Game Hen (Japan) (Sample).sfc" size="2097152" crc="f0e82b14" sha1="54adc1ad028394b55c991e1e17ed414abde44eb0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

@@ -177,6 +177,16 @@ static MACHINE_DRIVER_START( tg16_cartslot )
 	MDRV_SOFTWARE_LIST_ADD("tg16")
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( sgx_cartslot )
+MDRV_CARTSLOT_ADD("cart")
+MDRV_CARTSLOT_EXTENSION_LIST("pce,bin")
+MDRV_CARTSLOT_MANDATORY
+MDRV_CARTSLOT_INTERFACE("pce_cart")
+MDRV_CARTSLOT_LOAD(pce_cart)
+MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
+MDRV_SOFTWARE_LIST_ADD("sgx")
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( pce_common )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, MAIN_CLOCK/3)
@@ -267,7 +277,7 @@ static MACHINE_DRIVER_START( sgx )
 	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MDRV_IMPORT_FROM( pce_cartslot )
+	MDRV_IMPORT_FROM( sgx_cartslot )
 MACHINE_DRIVER_END
 
 /***************************************************************************
