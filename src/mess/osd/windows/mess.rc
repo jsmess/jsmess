@@ -154,6 +154,15 @@ END
 // DESIGNINFO
 //
 
+IDI_ICON_MESS           ICON    DISCARDABLE     "../../osd/winui/res/mess.ico"
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
