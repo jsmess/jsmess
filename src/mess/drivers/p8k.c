@@ -537,7 +537,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( p8k_16 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z8000, XTAL_4MHz )	// actually z8001, appropriate changes pending
+	MDRV_CPU_ADD("maincpu", Z8001, XTAL_4MHz )	// actually z8001, appropriate changes pending
 	MDRV_CPU_CONFIG(p8k_16_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(p8k_16_memmap)
 //  MDRV_CPU_IO_MAP(p8k_16_iomap)

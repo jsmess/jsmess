@@ -98,7 +98,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( m20 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z8000, MAIN_CLOCK)
+    MDRV_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
     MDRV_CPU_PROGRAM_MAP(m20_mem)
     MDRV_CPU_IO_MAP(m20_io)
 
