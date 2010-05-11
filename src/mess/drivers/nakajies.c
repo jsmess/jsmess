@@ -12,6 +12,7 @@ support).
 Model   |  SRAM | Language | Branded model
 --------+-------+----------+----------------------
 ES-210N | 128KB | German   | Walther ES-210
+ES-220  | 128KB | English  | NTS DreamWriter T100
 ES-220  | 256KB | English  | NTS DreamWriter T400
 ES-210N | 128KB | Spanish  | Dator 3000
 ES-210N | 128KB | English  | NTS DreamWriter 325
@@ -449,7 +450,12 @@ MACHINE_DRIVER_END
 
 ROM_START(drwrt400)
 	ROM_REGION( 0x80000, "bios", 0 )
-	ROM_LOAD("t4_ir_2.1.ic303", 0x00000, 0x80000, CRC(f0f45fd2) SHA1(3b4d5722b3e32e202551a1be8ae36f34ad705ddd))
+
+	ROM_SYSTEM_BIOS( 0, "drwrt400", "DreamWriter T400" )
+	ROMX_LOAD("t4_ir_2.1.ic303", 0x00000, 0x80000, CRC(f0f45fd2) SHA1(3b4d5722b3e32e202551a1be8ae36f34ad705ddd), ROM_BIOS(1))
+
+	ROM_SYSTEM_BIOS( 1, "drwrt100", "DreamWriter T100" )
+	ROMX_LOAD("t100_2.3.ic303", 0x00000, 0x80000, CRC(8a16f12f) SHA1(0a907186db3d1756566d767ee847a7ecf694e74b), ROM_BIOS(2))	/* Checksum 01F5 on label */
 ROM_END
 
 
