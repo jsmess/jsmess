@@ -32117,7 +32117,7 @@
 		</part>
 	</software>
 
-	<software name="ultrabb" cloneof="bbsim1k">
+	<software name="subaseb" cloneof="bbsim1k">
 		<description>Super Ultra Baseball (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -32128,7 +32128,7 @@
 		</part>
 	</software>
 
-	<software name="ultrabb2">
+	<software name="subaseb2">
 		<description>Super Ultra Baseball 2 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -35005,7 +35005,7 @@
 		</part>
 	</software>
 
-	<software name="ultrabb2j">
+	<software name="ultrabb2">
 		<description>Ultra Baseball Jitsumei Ban 2 (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -38381,8 +38381,8 @@
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="Weekly Famitsu Express 4-27.sfc" size="1048576" crc="d8bc7bea" sha1="57c14d389b216b01616caad704a998d7d03dc155" offset="000000" />
+			<dataarea name="rom" size="524288">
+				<rom name="Weekly Famitsu Express 4-27.sfc" size="524288" crc="d8bc7bea" sha1="57c14d389b216b01616caad704a998d7d03dc155" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

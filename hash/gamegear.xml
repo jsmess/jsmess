@@ -492,7 +492,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Id: G-3378 - Developers: Sega AM3 / SIMS / Minato Giken - Releases: 1996-01-26 (Jpn) -->
-	<software name="bakubakuj">
+	<software name="bakubakuj" cloneof="bakubaku">
 		<description>Baku Baku Animal - Sekai Shiikugakari Senshu-ken (Jpn)</description>
 		<year>1996</year>
 		<publisher>Sega</publisher>
@@ -3410,7 +3410,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="madden96a">
+	<software name="madden96a" cloneof="madden96">
 		<description>Madden NFL '96 (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -3767,7 +3767,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
-	<software name="monstwld2">
+	<software name="mnstwld2">
 		<description>Monster World II - Dragon no Wana (Jpn)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -7950,7 +7950,7 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 		</part>
 	</software>
 
-	<software name="woodypop1">
+	<software name="woodypop1" cloneof="woodypop">
 		<description>Woody Pop (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>

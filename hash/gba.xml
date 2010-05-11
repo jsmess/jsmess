@@ -7096,7 +7096,7 @@
 		</part>
 	</software>
 
-	<software name="princessg">
+	<software name="princessg" cloneof="princess">
 		<description>Disneys Prinzessinnen (Ger)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -12893,7 +12893,7 @@
 		</part>
 	</software>
 
-	<software name="homerangu">
+	<software name="homerangu" cloneof="homerang">
 		<description>Home on the Range (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16666,7 +16666,7 @@
 		</part>
 	</software>
 
-	<software name="mangakada">
+	<software name="mangakada" cloneof="mangakad">
 		<description>Manga-ka Debut Monogatari (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21638,7 +21638,7 @@
 		</part>
 	</software>
 
-	<software name="pokepinbj">
+	<software name="pokepinbj" cloneof="pokepinb">
 		<description>Pokemon Pinball - Ruby &amp; Sapphire (Jpn, Rev. 1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -21660,7 +21660,7 @@
 		</part>
 	</software>
 
-	<software name="pokepinbu">
+	<software name="pokepinbu" cloneof="pokepinb">
 		<description>Pokemon Pinball - Ruby &amp; Sapphire (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -23739,7 +23739,7 @@
 		</part>
 	</software>
 
-	<software name="scoobyccfg">
+	<software name="scoobyccfg" cloneof="scoobycc">
 		<description>Scooby-Doo and the Cyber Chase (Euro, English / French / German)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24520,7 +24520,7 @@
 		</part>
 	</software>
 
-	<software name="shinfrcej">
+	<software name="shinfrcej" cloneof="shinfrce">
 		<description>Shining Force - Kuroki Ryuu no Fukkatsu (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24542,7 +24542,7 @@
 		</part>
 	</software>
 
-	<software name="shinfrceu">
+	<software name="shinfrceu" cloneof="shinfrce">
 		<description>Shining Force - Resurrection of the Dark Dragon (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -25455,7 +25455,7 @@
 		</part>
 	</software>
 
-	<software name="spacech5u">
+	<software name="spacech5u" cloneof="spacech5">
 		<description>Space Channel 5 - Ulala's Cosmic Attack (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -26583,7 +26583,7 @@
 		</part>
 	</software>
 
-	<software name="stuntmanu">
+	<software name="stuntmanu" cloneof="stuntman">
 		<description>Stuntman (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

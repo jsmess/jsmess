@@ -573,7 +573,7 @@
 		</part>
 	</software>
 
-	<software name="animaniau">
+	<software name="animaniau" cloneof="animania">
 		<description>Animaniacs (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16589,7 +16589,7 @@
 		</part>
 	</software>
 
-	<software name="wcupstrik">
+	<software name="wcupstrk">
 		<description>World Cup Striker (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

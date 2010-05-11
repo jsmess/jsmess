@@ -1067,7 +1067,7 @@ static DEVICE_START( software_list )
 static DEVICE_VALIDITY_CHECK( software_list )
 {
 	software_list_config *swlist = (software_list_config *)device->inline_config;
-	int error = FALSE, is_clone = 0;
+	int error = FALSE;
 	softlist_map names;
 	softlist_map descriptions;
 
@@ -1089,6 +1089,7 @@ static DEVICE_VALIDITY_CHECK( software_list )
 			for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
 			{
 				const char *s;
+				int is_clone = 0;
 				
 				/* check for duplicate names */
 				if (names.add(swinfo->shortname, swinfo, FALSE) == TMERR_DUPLICATE)
