@@ -116,7 +116,7 @@ static UINT32 *cart_base;
 static size_t cart_size;
 static UINT8 eeprom_bit_count;
 static UINT8 protection_check = 0;	/* 0 = check hasn't started yet; 1= check in progress; 2 = check is finished. */
-
+extern UINT8 blitter_status;
 
 static IRQ_CALLBACK(jaguar_irq_callback)
 {
@@ -164,6 +164,7 @@ static MACHINE_RESET( jaguar )
 
 	joystick_data = 0xffffffff;
 	eeprom_bit_count = 0;
+	blitter_status = 1;
 }
 
 
