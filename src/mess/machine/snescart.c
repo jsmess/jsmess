@@ -861,8 +861,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	}
 
 	/* Load SRAM */
-	if (image_software_entry(image) == NULL)	// not sure about how to handle nvram with softlists
-		snes_load_sram(space->machine);
+	snes_load_sram(space->machine);
 
 	/* All done */
 	return INIT_PASS;

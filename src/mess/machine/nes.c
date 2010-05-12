@@ -944,6 +944,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		// but we should simply reload it in the .xml and use here the proper prg_size!!
 		memory_region_alloc(image->machine, "maincpu", 0x10000 + prg_size + 0x4000, 0);
 
+		// validate the xml fields
+		if (!prg_size)
+			fatalerror("No PRG entry for this software! Please check if the xml list got corrupted\n");
+		if (prg_size < 0x4000)
+			fatalerror("PRG entry is too small! Please check if the xml list got corrupted\n");
+
 		if (chr_size)
 			memory_region_alloc(image->machine, "gfx1", chr_size, 0);
 		
@@ -963,8 +969,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->prg_chunks = prg_size / 0x4000;
 		state->chr_chunks = chr_size / 0x2000;
 
-		state->format = 1; // temporarily treat this as a ines file
-		state->mapper = 4; // this should depend on the 'feature' field of the .xml file
+		state->format = 1;	// temporarily treat this as a ines file
+		state->mapper = 4;	// this should depend on the 'feature' field of the .xml file
+		state->battery = 0;	// presence of a battery should be read from .xml feature
+
 		// FIXME: we need to handle the remaining variables. on the short term, we might 
 		// create a table for the various mappers (based on the 'feature' value in xml), 
 		// but on the long term we need to rework the whole emulation to first use the
@@ -973,9 +981,13 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		//state->crc_hack = ;
 		//state->hard_mirroring = ;
-		//state->battery = ;
 		//state->trainer = ;
 		//state->four_screen_vram = ;
+		
+		/* Attempt to load a battery file for this ROM. If successful, we */
+		/* must wait until later to move it to the system memory. */
+		if (state->battery)
+			image_battery_load(image, state->battery_data, NES_BATTERY_SIZE, 0x00);
 	}
 	
 	return INIT_PASS;

@@ -1674,9 +1674,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		}
 	}
 	else
-	{
 		memcpy(gb_driver_data.gb_cart, image_get_software_region(image, "rom") + load_start, filesize);
-	}
 	
 	gb_header = gb_driver_data.gb_cart;
 	gb_driver_data.ROMBank00 = 0;
@@ -1698,6 +1696,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 				bytes_matched++;
 			}
 		}
+
 		if (bytes_matched == 0x18 && gb_header[0x0147] >= 0x0B && gb_header[0x0147] <= 0x0D)
 		{
 			gb_driver_data.ROMBank00 = (filesize / 0x4000) - 2;
@@ -1935,10 +1934,6 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		gb_driver_data.MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000);
 		memset(gb_driver_data.gbTama5Memory, 0xff, sizeof(gb_driver_data.gbTama5Memory));
 	}
-
-// not sure about sram handling with softlists, so we exit here (for the moment)
-	if (image_software_entry(image) == NULL)
-		return INIT_PASS;
 
 	/* Load the saved RAM if this cart has a battery */
 	if (gb_driver_data.CartType & BATTERY && gb_driver_data.RAMBanks)
@@ -2270,7 +2265,7 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 	else
 	{
 		for (I = 1; I < gb_driver_data.ROMBanks; I <<= 1) ;
-		gb_driver_data.ROMMask = I - 1;
+			gb_driver_data.ROMMask = I - 1;
 	}
 
 	gb_driver_data.MBCType = MBC_MEGADUCK;

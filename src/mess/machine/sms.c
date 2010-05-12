@@ -1353,8 +1353,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	}
 
 	/* Load battery backed RAM, if available */
-	if (image_software_entry(image) == NULL)	// not sure about how to handle nvram with softlists
-		image_battery_load(image, sms_state.cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE, 0x00);
+	image_battery_load(image, sms_state.cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE, 0x00);
 
 	return INIT_PASS;
 }

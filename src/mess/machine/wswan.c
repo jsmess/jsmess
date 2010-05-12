@@ -1439,8 +1439,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	if (eeprom.size != 0)
 	{
 		eeprom.data = auto_alloc_array(image->machine, UINT8, eeprom.size);
-		if (image_software_entry(image) == NULL)	// not sure about how to handle nvram with softlists
-			image_battery_load(image, eeprom.data, eeprom.size, 0x00);
+		image_battery_load(image, eeprom.data, eeprom.size, 0x00);
 		eeprom.page = eeprom.data;
 	}
 

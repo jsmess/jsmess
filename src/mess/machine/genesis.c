@@ -1227,62 +1227,59 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 
 	logerror("cart type: %d\n", cart_type);
 
-	if (image_software_entry(image) == NULL)	// not sure about how to handle nvram with softlists
+	genesis_sram = NULL;
+	sram_detected = 0;
+	genesis_sram_start = genesis_sram_end = 0;
+	has_serial_eeprom = 0;
+	
+	/* check if cart has battery save */
+	
+	/* For games using SRAM, unfortunately there are ROMs without info
+	 about it in header. The solution adopted is do the mapping anyway,
+	 then active SRAM later if the game will access it. */
+	
+	if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
 	{
-		genesis_sram = NULL;
-		sram_detected = 0;
-		genesis_sram_start = genesis_sram_end = 0;
-		has_serial_eeprom = 0;
+		/* SRAM info found in header */
+		genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
+		genesis_sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
 		
-		/* check if cart has battery save */
+		if ((genesis_sram_start > genesis_sram_end) || ((genesis_sram_end - genesis_sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
+			genesis_sram_end = genesis_sram_start + 0x0FFFF;
 		
-		/* For games using SRAM, unfortunately there are ROMs without info
-		 about it in header. The solution adopted is do the mapping anyway,
-		 then active SRAM later if the game will access it. */
-		
-		if (ROM[0x1b1] == 'R' && ROM[0x1b0] == 'A')
-		{
-			/* SRAM info found in header */
-			genesis_sram_start = (ROM[0x1b5] << 24 | ROM[0x1b4] << 16 | ROM[0x1b7] << 8 | ROM[0x1b6]);
-			genesis_sram_end = (ROM[0x1b9] << 24 | ROM[0x1b8] << 16 | ROM[0x1bb] << 8 | ROM[0x1ba]);
-			
-			if ((genesis_sram_start > genesis_sram_end) || ((genesis_sram_end - genesis_sram_start) >= 0x10000))	// we assume at most 64k of SRAM (HazeMD uses at most 64k). is this correct?
-				genesis_sram_end = genesis_sram_start + 0x0FFFF;
-			
-			/* for some games using serial EEPROM, difference between SRAM
-			 end to start is 0 or 1. Currently EEPROM is not emulated. */
-			if ((genesis_sram_end - genesis_sram_start) < 2)
-				has_serial_eeprom = 1;
-			else
-				sram_detected = 1;
-		}
+		/* for some games using serial EEPROM, difference between SRAM
+		 end to start is 0 or 1. Currently EEPROM is not emulated. */
+		if ((genesis_sram_end - genesis_sram_start) < 2)
+			has_serial_eeprom = 1;
 		else
-		{
-			/* set default SRAM positions, with size = 64k */
-			genesis_sram_start = 0x200000;
-			genesis_sram_end = genesis_sram_start + 0xffff;
-		}
-		
-		if (genesis_sram_start & 1)
-			genesis_sram_start -= 1;
-		
-		if (!(genesis_sram_end & 1))
-			genesis_sram_end += 1;
-		
-		/* calculate backup RAM location */
-		megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
-		
-		/* Until serial EEPROM is emulated, clears one byte at beginning of
-		 backup RAM, but only if the value is 0xFFFF, to not break MLBPA Sports
-		 Talk Baseball. With this hack some games at least run (NBA Jam, Evander
-		 Holyfield's Real Deal Boxing, Greatest Heavyweights of the Ring) */
-		if (has_serial_eeprom && megadriv_backupram[0] == 0xffff)
-			megadriv_backupram[0] = 0xff00;
-		
-		if (sram_detected)
-			logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start + 1);
+			sram_detected = 1;
 	}
-
+	else
+	{
+		/* set default SRAM positions, with size = 64k */
+		genesis_sram_start = 0x200000;
+		genesis_sram_end = genesis_sram_start + 0xffff;
+	}
+	
+	if (genesis_sram_start & 1)
+		genesis_sram_start -= 1;
+	
+	if (!(genesis_sram_end & 1))
+		genesis_sram_end += 1;
+	
+	/* calculate backup RAM location */
+	megadriv_backupram = (UINT16*) (ROM + (genesis_sram_start & 0x3fffff));
+	
+	/* Until serial EEPROM is emulated, clears one byte at beginning of
+	 backup RAM, but only if the value is 0xFFFF, to not break MLBPA Sports
+	 Talk Baseball. With this hack some games at least run (NBA Jam, Evander
+	 Holyfield's Real Deal Boxing, Greatest Heavyweights of the Ring) */
+	if (has_serial_eeprom && megadriv_backupram[0] == 0xffff)
+		megadriv_backupram[0] = 0xff00;
+	
+	if (sram_detected)
+		logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start + 1);
+	
 	return INIT_PASS;
 }
 

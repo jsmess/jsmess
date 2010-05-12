@@ -2452,7 +2452,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	}
 
 	// if save media was found, reload it
-	if (image_software_entry(image) == NULL && state->nvsize > 0)	// not sure about sram handling with softlists
+	if (state->nvsize > 0)
 	{
 		image_battery_load(image, state->nvptr, state->nvsize, 0x00);
 		state->nvimage = image;
