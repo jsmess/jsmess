@@ -136,7 +136,7 @@ static MACHINE_RESET( jaguar )
 	protection_check = 0;
 
 	/* Set up pointers for Jaguar logo */
-	memcpy(jaguar_shared_ram, rom_base, 0x200000);
+	memcpy(jaguar_shared_ram, rom_base, 0x400);	// do not increase, or Doom breaks
 	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, rom_base[1]);
 
 #if 0
