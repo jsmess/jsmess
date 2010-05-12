@@ -43,7 +43,6 @@
  *
  *     TODO:
  *     - make the z8001 opcodes to be dynamic (i.e. to take segmented mode flag into account and use the non-segmented mode)
- *     - dissassembler doesn't work at all with the z8001
  *
  *****************************************************************************/
 
@@ -95,7 +94,7 @@ INLINE z8000_state *get_safe_token(running_device *device)
 	assert(device != NULL);
 	assert(device->token != NULL);
 	assert(device->type == CPU);
-	assert(cpu_get_type(device) == CPU_Z8000);
+	assert(cpu_get_type(device) == CPU_Z8001 || cpu_get_type(device) == CPU_Z8002);
 	return (z8000_state *)device->token;
 }
 
