@@ -22,13 +22,46 @@ APB notes:
 #define MAIN_CLOCK 4000000 /* 4 MHz */
 #define PIXEL_CLOCK XTAL_4_433619MHz
 
+static UINT16 *m20_vram;
+
+static VIDEO_START( m20 )
+{
+}
+
+static VIDEO_UPDATE( m20 )
+{
+	int x,y,i;
+	UINT8 pen;
+	UINT32 count;
+
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+
+	count = (0);
+
+	for(y=0;y<256;y++)
+	{
+		for(x=0;x<256;x+=16)
+		{
+			for (i = 0; i < 16; i++)
+			{
+				pen = (m20_vram[count]) >> (15 - i) & 1;
+
+				if ((x + i) <= video_screen_get_visible_area(screen)->max_x && (y + 0) < video_screen_get_visible_area(screen)->max_y)
+					*BITMAP_ADDR32(bitmap, y, x + i) = screen->machine->pens[pen];
+			}
+
+			count++;
+		}
+	}
+    return 0;
+}
 
 static ADDRESS_MAP_START(m20_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x00000, 0x01fff ) AM_ROM AM_REGION("maincpu",0x10000)
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu",0x10000) //mirror
 
-//	AM_RANGE( 0x30000, 0x33fff ) AM_RAM //base vram
+	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_BASE(&m20_vram)//base vram
 //	AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for bitmap mode
 //	AM_RANGE( 0x20000, 0x2???? ) //work RAM?
 //
@@ -71,15 +104,6 @@ static DRIVER_INIT( m20 )
 
 static MACHINE_RESET( m20 )
 {
-}
-
-static VIDEO_START( m20 )
-{
-}
-
-static VIDEO_UPDATE( m20 )
-{
-    return 0;
 }
 
 /* unknown decoding */
