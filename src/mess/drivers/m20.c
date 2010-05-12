@@ -17,14 +17,16 @@ APB notes:
 #include "emu.h"
 #include "cpu/z8000/z8000.h"
 #include "cpu/i86/i86.h"
+#include "video/mc6845.h"
 
 #define MAIN_CLOCK 4000000 /* 4 MHz */
+#define PIXEL_CLOCK XTAL_4_433619MHz
 
 
 static ADDRESS_MAP_START(m20_mem, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x1fff ) AM_ROM AM_REGION("maincpu",0x10000)
-	AM_RANGE( 0x8000, 0x9fff ) AM_ROM AM_REGION("maincpu",0x10000)
+	AM_RANGE( 0x00000, 0x01fff ) AM_ROM AM_REGION("maincpu",0x10000)
+	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu",0x10000) //mirror
 
 //	AM_RANGE( 0x30000, 0x33fff ) AM_RAM //base vram
 //	AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for bitmap mode
@@ -32,10 +34,10 @@ static ADDRESS_MAP_START(m20_mem, ADDRESS_SPACE_PROGRAM, 16)
 //
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m20_io , ADDRESS_SPACE_IO, 16)
+static ADDRESS_MAP_START( m20_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	// 0x61 - crtc address
-	// 0x63 - crtc data
+	AM_RANGE(0x61, 0x61) AM_DEVWRITE8("crtc", mc6845_address_w, 0x00ff)
+	AM_RANGE(0x63, 0x63) AM_DEVWRITE8("crtc", mc6845_register_w, 0x00ff)
 	// 0x81 / 0x87 - i8255A
 	// 0xa1 - i8251 keyboard data
 	// 0xa3 - i8251 keyboard status / control
@@ -43,7 +45,7 @@ static ADDRESS_MAP_START( m20_io , ADDRESS_SPACE_IO, 16)
 	// 0xc3 - i8251 TTY / printer status / control
 	// 0x121 / 0x127 - pit8253 (TTY/printer, keyboard, RTC/NVI)
 
-	// 0x21?? / 0x21? - fdc
+	// 0x21?? / 0x21? - fdc ... seems to control the screen colors???
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(m20_apb_mem, ADDRESS_SPACE_PROGRAM, 16)
@@ -96,6 +98,20 @@ static GFXDECODE_START( m20 )
 	GFXDECODE_ENTRY( "maincpu",   0x11614, m20_chars_8x8,    0x000, 1 )
 GFXDECODE_END
 
+static const mc6845_interface mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
 static MACHINE_DRIVER_START( m20 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z8001, MAIN_CLOCK)
@@ -108,6 +124,8 @@ static MACHINE_DRIVER_START( m20 )
     MDRV_CPU_FLAGS(CPU_DISABLE)
 
 	MDRV_MACHINE_RESET(m20)
+
+	MDRV_MC6845_ADD("crtc", MC6845, PIXEL_CLOCK/8, mc6845_intf)	/* hand tuned to get ~50 fps */
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
