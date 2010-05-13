@@ -640,11 +640,11 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", jaguar, "bin,prg,cof", 0)
+	MDRV_QUICKLOAD_ADD("quickload", jaguar, "bin,prg,cof,abs", 0)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("jag,abs,rom,j64,j01")
+	MDRV_CARTSLOT_EXTENSION_LIST("jag,rom,j64,j01")
 	MDRV_CARTSLOT_INTERFACE("jaguar_cart")
 	MDRV_CARTSLOT_LOAD(jaguar)
 
@@ -685,6 +685,24 @@ ROM_END
  *
  *************************************/
 
+static void jaguar_fix_endian( running_machine *machine, UINT32 addr, UINT32 size )
+{
+	UINT8 j[4], *RAM = memory_region(machine, "maincpu");
+	UINT32 i;
+	size += addr;
+	for (i = addr; i < size; i+=4)
+	{
+		j[0] = RAM[i];
+		j[1] = RAM[i+1];
+		j[2] = RAM[i+2];
+		j[3] = RAM[i+3];
+		RAM[i] = j[3];
+		RAM[i+1] = j[2];
+		RAM[i+2] = j[1];
+		RAM[i+3] = j[0];
+	} 
+}
+
 static DRIVER_INIT( jaguar )
 {
 	state_save_register_global(machine, joystick_data);
@@ -692,59 +710,48 @@ static DRIVER_INIT( jaguar )
 
 static QUICKLOAD_LOAD( jaguar )
 {
-	int i,j;
 	offs_t quickload_begin = 0x4000;
 	memset(jaguar_shared_ram, 0, 0x200000);
 	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
 
 	image_fread(image, &memory_region(image->machine, "maincpu")[quickload_begin], quickload_size);
 
-	/* Fix endian-ness */
-	for (i = quickload_begin / 4; i < quickload_size / 4; i++)
-	{
-		j = jaguar_shared_ram[i];
-		jaguar_shared_ram[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
-	}
+	jaguar_fix_endian(image->machine, quickload_begin, quickload_size);
 
-	if (!mame_stricmp(image_filetype(image), "prg"))
+	if (((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x601A0000) && (jaguar_shared_ram[0x1007] == 0x4A414752))
 	{
-		if (((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x601A0000) && (jaguar_shared_ram[0x1007] == 0x4A414752))
-		{
-			UINT32 type = jaguar_shared_ram[0x1008] >> 16;
-			UINT32 start = ((jaguar_shared_ram[0x1008] & 0xffff) << 16) | (jaguar_shared_ram[0x1009] >> 16);
-			UINT32 skip = 28;
-			if (type == 2) skip = 42;
-			if (type == 3) skip = 46;
-			memset(jaguar_shared_ram, 0, 0x200000);
-			image_fseek(image, 0, SEEK_SET);
-			image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
-			quickload_begin = start;
-			/* Fix endian-ness */
-			for (i = quickload_begin / 4; i < quickload_size / 4; i++)
-			{
-				j = jaguar_shared_ram[i];
-				jaguar_shared_ram[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
-			}
-		}
+		UINT32 type = jaguar_shared_ram[0x1008] >> 16;
+		UINT32 start = ((jaguar_shared_ram[0x1008] & 0xffff) << 16) | (jaguar_shared_ram[0x1009] >> 16);
+		UINT32 skip = 28;
+		if (type == 2) skip = 42;
+		if (type == 3) skip = 46;
+		memset(jaguar_shared_ram, 0, 0x200000);
+		image_fseek(image, 0, SEEK_SET);
+		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
+		quickload_begin = start;
+		jaguar_fix_endian(image->machine, quickload_begin, quickload_size);
 	}
 	else
-	if (!mame_stricmp(image_filetype(image), "cof"))
+	if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x01500000)
 	{
-		if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x01500000)
-		{
-			UINT32 start = jaguar_shared_ram[0x100e];
-			UINT32 skip = jaguar_shared_ram[0x1011];
-			memset(jaguar_shared_ram, 0, 0x200000);
-			image_fseek(image, 0, SEEK_SET);
-			image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
-			quickload_begin = start;
-			/* Fix endian-ness */
-			for (i = quickload_begin / 4; i < quickload_size / 4; i++)
-			{
-				j = jaguar_shared_ram[i];
-				jaguar_shared_ram[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
-			}
-		}
+		UINT32 start = jaguar_shared_ram[0x100e];
+		UINT32 skip = jaguar_shared_ram[0x1011];
+		memset(jaguar_shared_ram, 0, 0x200000);
+		image_fseek(image, 0, SEEK_SET);
+		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
+		quickload_begin = start;
+		jaguar_fix_endian(image->machine, quickload_begin, quickload_size);
+	}
+	else
+	if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x601B0000)
+	{
+		UINT32 start = ((jaguar_shared_ram[0x1005] & 0xffff) << 16) | (jaguar_shared_ram[0x1006] >> 16);
+		UINT32 skip = 0xd0;
+		memset(jaguar_shared_ram, 0, 0x200000);
+		image_fseek(image, 0, SEEK_SET);
+		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
+		quickload_begin = start;
+		jaguar_fix_endian(image->machine, quickload_begin, quickload_size);
 	}
 
 
@@ -812,13 +819,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 		}
 	}
 	else
-	{
-		for (i = 0; i < size / 4; i++)
-		{
-			j = cart_base[i];
-			cart_base[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
-		}
-	}
+		jaguar_fix_endian(image->machine, 0x800000, size);
 
 	/* Skip the logo */
 	cart_base[0x102] = 1;
