@@ -1692,5 +1692,6 @@ const game_driver * const drivers[] =
 	DRIVER( chaos )
 	DRIVER( z80dev )
 	DRIVER( pegasus )
+	DRIVER( pegasusm )
 	
 #endif /* DRIVER_RECURSIVE */
