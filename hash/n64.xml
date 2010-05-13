@@ -1987,7 +1987,7 @@
 		<publisher>Interactive Studios / Blitzgames</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="9448848" layout="region32_be">
-				<rom name="dr. mario 64 (usa).bin" size="9448848" crc="dcea9210" sha1="efbdbcb499a3d8a37613ca1d94528016bdbf5735" offset="000000" />
+				<rom name="dragonsword.n64" size="9448848" crc="dcea9210" sha1="efbdbcb499a3d8a37613ca1d94528016bdbf5735" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
