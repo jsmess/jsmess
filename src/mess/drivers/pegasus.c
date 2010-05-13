@@ -133,6 +133,19 @@ static ADDRESS_MAP_START(pegasus_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START(pegasusm_mem, ADDRESS_SPACE_PROGRAM, 8)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x2fff) AM_ROM
+	AM_RANGE(0x5000, 0xbdff) AM_RAM
+	AM_RANGE(0xbe00, 0xbfff) AM_RAM AM_BASE(&pegasus_video_ram)
+	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_WRITENOP
+	AM_RANGE(0xe000, 0xe1ff) AM_READ(pegasus_protection_r)
+	AM_RANGE(0xe200, 0xe3ff) AM_READWRITE(pegasus_pcg_r,pegasus_pcg_w)
+	AM_RANGE(0xe400, 0xe403) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_u", pia6821_r, pia6821_w)
+	AM_RANGE(0xe600, 0xe603) AM_MIRROR(0x1fc) AM_DEVREADWRITE("pegasus_pia_s", pia6821_r, pia6821_w)
+	AM_RANGE(0xf000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
 /* Input ports */
 static INPUT_PORTS_START( pegasus )
 	PORT_START("X0")
@@ -263,6 +276,7 @@ static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
 {
 	UINT8 b, *ROM = memory_region(machine, "maincpu");
 	UINT16 i, j;
+	UINT8 buff[0x1000];
 	if (ROM[addr] == 0x02)
 	{
 		for (i = 0; i < 0x1000; i++)
@@ -270,10 +284,10 @@ static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
 			b = ROM[addr|i];
 			j = BITSWAP16( i, 15, 14, 13, 12, 11, 10, 9, 8, 0, 1, 2, 3, 4, 5, 6, 7 );
 			b = BITSWAP8( b, 3, 2, 1, 0, 7, 6, 5, 4 );
-			ROM[0x5000|(j&0xfff)] = b;
+			buff[j&0xfff] = b;
 		}
 		for (i = 0; i < 0x1000; i++)
-			ROM[addr|i] = ROM[0x5000|i];
+			ROM[addr|i] = buff[i];
 	}
 }
 
@@ -375,6 +389,13 @@ static MACHINE_DRIVER_START( pegasus )
 	MDRV_CASSETTE_ADD( "cassette", pegasus_cassette_config )
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( pegasusm )
+	MDRV_IMPORT_FROM(pegasus)
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_PROGRAM_MAP(pegasusm_mem)
+MACHINE_DRIVER_END
+
+
 /* ROM definition */
 ROM_START( pegasus )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
@@ -398,8 +419,11 @@ ROM_START( pegasus )
 	ROM_REGION( 0x800, "pcg", ROMREGION_ERASEFF )
 ROM_END
 
+#define rom_pegasusm rom_pegasus
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1981, pegasus,  0,     0,      pegasus, 	pegasus, pegasus, "Technosys",   "Aamber Pegasus", GAME_NO_SOUND_HW )
+COMP( 1981, pegasusm, pegasus, 0,    pegasusm, 	pegasus, pegasus, "Technosys",   "Aamber Pegasus with RAM expansion unit", GAME_NO_SOUND_HW )
 
