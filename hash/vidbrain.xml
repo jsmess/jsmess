@@ -88,8 +88,8 @@
     <publisher>VideoBrain Computer Company</publisher>
     <!-- <serial>ED05</serial> -->
     <part name="cart" interface="vidbrain_cart">
-      <dataarea name="rom" size="4096">
-        <rom name="videoartist-ed05.bin" size="4096" crc="d68795f8" sha1="dfb118d6bba837aa8e6b7feb19be7de40cd1e4fa" offset="0" />
+      <dataarea name="rom" size="2048">
+        <rom name="videoartist-ed05.bin" size="2048" crc="d68795f8" sha1="dfb118d6bba837aa8e6b7feb19be7de40cd1e4fa" offset="0" />
       </dataarea>
     </part>
   </software>
