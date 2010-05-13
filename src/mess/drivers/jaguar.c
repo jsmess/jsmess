@@ -640,7 +640,7 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", jaguar, "bin", 0)
+	MDRV_QUICKLOAD_ADD("quickload", jaguar, "bin,prg,cof", 0)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
@@ -696,6 +696,7 @@ static QUICKLOAD_LOAD( jaguar )
 	offs_t quickload_begin = 0x4000;
 	memset(jaguar_shared_ram, 0, 0x200000);
 	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
+
 	image_fread(image, &memory_region(image->machine, "maincpu")[quickload_begin], quickload_size);
 
 	/* Fix endian-ness */
@@ -705,6 +706,48 @@ static QUICKLOAD_LOAD( jaguar )
 		jaguar_shared_ram[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
 	}
 
+	if (!mame_stricmp(image_filetype(image), "prg"))
+	{
+		if (((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x601A0000) && (jaguar_shared_ram[0x1007] == 0x4A414752))
+		{
+			UINT32 type = jaguar_shared_ram[0x1008] >> 16;
+			UINT32 start = ((jaguar_shared_ram[0x1008] & 0xffff) << 16) | (jaguar_shared_ram[0x1009] >> 16);
+			UINT32 skip = 28;
+			if (type == 2) skip = 42;
+			if (type == 3) skip = 46;
+			memset(jaguar_shared_ram, 0, 0x200000);
+			image_fseek(image, 0, SEEK_SET);
+			image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
+			quickload_begin = start;
+			/* Fix endian-ness */
+			for (i = quickload_begin / 4; i < quickload_size / 4; i++)
+			{
+				j = jaguar_shared_ram[i];
+				jaguar_shared_ram[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
+			}
+		}
+	}
+	else
+	if (!mame_stricmp(image_filetype(image), "cof"))
+	{
+		if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x01500000)
+		{
+			UINT32 start = jaguar_shared_ram[0x100e];
+			UINT32 skip = jaguar_shared_ram[0x1011];
+			memset(jaguar_shared_ram, 0, 0x200000);
+			image_fseek(image, 0, SEEK_SET);
+			image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
+			quickload_begin = start;
+			/* Fix endian-ness */
+			for (i = quickload_begin / 4; i < quickload_size / 4; i++)
+			{
+				j = jaguar_shared_ram[i];
+				jaguar_shared_ram[i] = ((j & 0xff) << 24) | ((j & 0xff00) << 8) | ((j & 0xff0000) >> 8) | ((j & 0xff000000) >> 24);
+			}
+		}
+	}
+
+
 	/* Transfer control to image */
 	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, quickload_begin);
 	return INIT_PASS;
@@ -712,22 +755,33 @@ static QUICKLOAD_LOAD( jaguar )
 
 static DEVICE_IMAGE_LOAD( jaguar )
 {
-	int i, j, offset = 0;
-	UINT32 size;
+	int i, j, load_skip = 0;
+	UINT32 size, load_offset = 0;
 	UINT8 header[512];
 
 	if (image_software_entry(image) == NULL)
 	{
 		size = image_length(image);
 
-		/* skip header, if any */
-		if ((size & 0x200) == 0x200)
+		/* .rom files load & run at 802000 */
+		if (!mame_stricmp(image_filetype(image), "rom"))	
 		{
-			offset = 0x200;
-			image_fread(image, header, 0x200);
+			load_offset = 0x2000;
+			cart_base[0x101]=0x208000;	// becomes 802000 after endian adjustment below
+			/* more may be needed as no .rom files run yet */
 		}
+		else
 
-		image_fread(image, cart_base, size - offset);
+		/* see if we are loading Brutal Sports Football with CRC 0FDCEB66 */
+		if ((size & 0x200) == 0x200)
+			load_skip = 0x200;
+
+		/* Skip any header */
+		if (load_skip)
+			image_fread(image, header, load_skip);
+
+		/* Load cart into memory */
+		image_fread(image, cart_base + load_offset, size - load_skip);
 	}
 	else
 	{
@@ -736,18 +790,19 @@ static DEVICE_IMAGE_LOAD( jaguar )
 		/* skip header, if any */
 		if ((size & 0x200) == 0x200)
 		{
-			offset = 0x200;
-			memcpy(header, image_get_software_region(image, "rom") , 0x200);
+			load_skip = 0x200;
+			memcpy(header, image_get_software_region(image, "rom") , load_skip);
 		}
 
-		memcpy(cart_base, image_get_software_region(image, "rom") + offset, size - offset);
+		memcpy(cart_base, image_get_software_region(image, "rom") + load_skip, size - load_skip);
 	}
 
 	memset(jaguar_shared_ram, 0, 0x200000);
 	memcpy(jaguar_shared_ram, rom_base, 0x10);
 
 	/* Fix endian-ness  */
-	// Note (2010-04, FP): I assume there is no .j01 file in our xml list
+	/* Air Cars is scrambled, it needs to be made the same as an ordinary cart,
+		but in the meantime, this enables it to load */
 	if (image_software_entry(image) == NULL && !mame_stricmp(image_filetype(image), "j01"))
 	{
 		for (i = 0; i < size / 4; i++)
