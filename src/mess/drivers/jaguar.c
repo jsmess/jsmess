@@ -755,8 +755,8 @@ static QUICKLOAD_LOAD( jaguar )
 
 static DEVICE_IMAGE_LOAD( jaguar )
 {
-	int i, j, load_skip = 0;
-	UINT32 size, load_offset = 0;
+	int i, j;
+	UINT32 size, load_offset = 0, load_skip = 0;
 	UINT8 header[512];
 
 	if (image_software_entry(image) == NULL)
@@ -781,7 +781,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 			image_fread(image, header, load_skip);
 
 		/* Load cart into memory */
-		image_fread(image, cart_base + load_offset, size - load_skip);
+		image_fread(image, &memory_region(image->machine, "maincpu")[0x800000+load_offset], size - load_skip);
 	}
 	else
 	{
