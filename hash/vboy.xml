@@ -1,5 +1,18 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+According to Planet Virtual Boy, the following undumped protos exist
+
+  - Dragon Hopper, 
+  - Faceball, 
+  - Mansion of Insmouse (USA), 
+  - Polygo Block, 
+  - Virtual Block, 
+  - Virtual Fishing (USA), 
+  - Zero Racers
+
+-->
 <softwarelist name="vboy" description="Nintendo Virtual Boy cartridges">
 	<!-- Id: VUE-VPBE-USA - Developers: T&E Soft - Release Date: 1996-03-22 -->
 	<software name="3dtetris" supported="no">
@@ -14,6 +27,7 @@
 	</software>
 
     <!-- This was built from the final source code using the official compiler VUCC and converted from ISX to ROM.  -->
+	<!-- Id: VUE-VBHE-JPN/USA - Developers: Japan System Supply - (Planned) Releases: 1996-02-23 (JPN), 1996-08-26 (USA), but the game never got actually released -->
 	<software name="boundh" supported="no">
 		<description>Bound High! (Jpn, USA, Prototype)</description>
 		<year>1996</year>

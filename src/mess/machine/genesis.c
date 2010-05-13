@@ -1296,6 +1296,48 @@ static DEVICE_IMAGE_UNLOAD( genesis_cart )
 }
 
 
+/******* 32X image loading *******/
+
+// FIXME: non-softlist loading should keep using ROM_CART_LOAD in the ROM definitions,
+// once we better integrate softlist with the old loading procedures
+static DEVICE_IMAGE_LOAD( _32x_cart )
+{
+	UINT32 length;
+	UINT8 *temp_copy;
+	UINT16 *ROM16;
+	UINT32 *ROM32;
+	int i;
+	
+	if (image_software_entry(image) == NULL)
+	{
+		length = image_length(image);
+		temp_copy = auto_alloc_array(image->machine, UINT8, length);
+		image_fread(image, temp_copy, length);
+	}
+	else
+	{
+		length = image_get_software_region_length(image, "rom");
+		temp_copy = auto_alloc_array(image->machine, UINT8, length);
+		memcpy(temp_copy, image_get_software_region(image, "rom"), length);
+	}
+
+	/* Copy the cart image in the locations the driver expects */
+	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
+	ROM16 = (UINT16 *) memory_region(image->machine, "gamecart");
+	for (i = 0; i < length; i += 2)
+		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
+	
+	ROM32 = (UINT32 *) memory_region(image->machine, "gamecart_sh2");
+	for (i = 0; i < length; i += 4)
+		ROM32[i / 4] = pick_integer_be(temp_copy, i, 4);
+	
+	ROM16 = (UINT16 *) memory_region(image->machine, "maincpu");
+	for (i = 0x100; i < length; i += 2)
+		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
+	
+	return INIT_PASS;
+}
+
 /******* Cart getinfo *******/
 
 MACHINE_DRIVER_START( genesis_cartslot )
@@ -1312,6 +1354,9 @@ MACHINE_DRIVER_START( _32x_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("32x,bin")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("_32x_cart")
+	MDRV_CARTSLOT_LOAD(_32x_cart)
+	MDRV_SOFTWARE_LIST_ADD("32x")
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( pico_cartslot )

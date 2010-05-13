@@ -255,6 +255,17 @@
 		</part>
 	</software>
 
+	<software name="dokidokip" cloneof="dokidoki">
+		<description>Dokidoki Penguin Land (Pirate)</description>
+		<year>1985?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="doki doki penguin land (19xx)(-)(hk)[p].bin" size="32768" crc="fdc095bc" sha1="176e2d2648b20e6fac823021697138803ef38b27" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dragwang">
 		<description>Dragon Wang (Jpn)</description>
 		<year>1985</year>

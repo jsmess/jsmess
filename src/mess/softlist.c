@@ -1090,7 +1090,32 @@ static DEVICE_VALIDITY_CHECK( software_list )
 			{
 				const char *s;
 				int is_clone = 0;
+
+				/* First, check if the xml got corrupted: */
+
+				/* Did we lost any description? */
+				if (swinfo->longname == NULL)
+				{
+					mame_printf_error("%s: %s has no description\n", swlist->list_name[i], swinfo->shortname);
+					return TRUE;
+				}
 				
+				/* Did we lost any year? */
+				if (swinfo->year == NULL)
+				{
+					mame_printf_error("%s: %s has no year\n", swlist->list_name[i], swinfo->shortname);
+					return TRUE;
+				}
+				
+				/* Did we lost any publisher? */
+				if (swinfo->publisher == NULL)
+				{
+					mame_printf_error("%s: %s has no publisher\n", swlist->list_name[i], swinfo->shortname);
+					return TRUE;
+				}
+				
+				/* Second, since the xml is fine, run additional checks: */
+
 				/* check for duplicate names */
 				if (names.add(swinfo->shortname, swinfo, FALSE) == TMERR_DUPLICATE)
 				{
@@ -1126,6 +1151,8 @@ static DEVICE_VALIDITY_CHECK( software_list )
 						error = TRUE;
 						break;
 					}
+
+				// TODO: shall we verify that all parts have some dataarea? and what about checking that a shortname is really present?
 			}
 
 			software_list_close(list);

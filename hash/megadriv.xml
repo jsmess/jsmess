@@ -3025,7 +3025,7 @@
 	</software>
 
 	<software name="bubble">
-		<description>Bubble and Squeak (Euro)</description>
+		<description>Bubble and Squeak (Euro, Prototype)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
@@ -5678,7 +5678,7 @@
 		</part>
 	</software>
 
-	<software name="dukenu3d">
+	<software name="dukenk3d">
 		<description>Duke Nukem 3D (Bra)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -10220,8 +10220,8 @@
 
 	<software name="lobo">
 		<description>Lobo (USA, Prototype)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1996</year>
+		<publisher>Ocean</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="3145728">
 				<rom name="lobo (usa) (prototype).bin" size="3145728" crc="b5e09338" sha1="749fe1f7581352562a38997cb7323019b6ff1d93" offset="000000" />
@@ -11791,13 +11791,13 @@
 		</part>
 	</software>
 
-	<software name="mspacmanu" cloneof="mspacman">
-		<description>Ms. Pac-Man (USA, Pirate)</description>
+	<software name="mspacman1" cloneof="mspacman">
+		<description>Ms. Pac-Man (Pirate, Ripped from Golden 10-in-1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="ms. pac-man (usa) (pirate).bin" size="131072" crc="39b51b26" sha1="7f163f9dd6d8ab6a0f4a33d3073f9ca520abf271" offset="000000" />
+				<rom name="ms. pac-man (usa) (pirate).bin" size="131072" crc="39b51b26" sha1="7f163f9dd6d8ab6a0f4a33d3073f9ca520abf271" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -15710,6 +15710,7 @@
 	</software>
 
 	<software name="rrash3">
+        <!-- the same checksum is shared by the Beta 3 prototype (19950106), released by drx -->
 		<description>Road Rash 3 (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -16669,7 +16670,7 @@
 	<software name="ship">
 		<description>Ship (Prototype)</description>
 		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Technopop</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="ship (prototype).bin" size="131072" crc="4cdc9f16" sha1="95bab798ecd769567300e1dddfbed3aeee206e87" offset="000000" />
@@ -17547,12 +17548,12 @@
 	</software>
 
 	<software name="sonicpir" cloneof="sonic">
-		<description>Sonic the Hedgehog (Euro, USA, Pirate)</description>
+		<description>Sonic the Hedgehog (Pirate, Ripped from Golden 10-in-1)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sonic the hedgehog (euro, usa) (pirate).bin" size="524288" crc="7a093f0b" sha1="ad7502fa15b1819eeb4089783b4a850d898bc71e" offset="000000" />
+				<rom name="sonic the hedgehog (euro, usa) (pirate).bin" size="524288" crc="7a093f0b" sha1="ad7502fa15b1819eeb4089783b4a850d898bc71e" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -23934,6 +23935,108 @@
 			</dataarea>
 		</part>
 	</software>
+	
+<!-- pirate dumps to be sorted out (recently dumped by drx) -->
+
+	<software name="unknown2">
+		<description>Unknown Game 2 (Rockman-related?)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="xxx3.bin" size="2097152" crc="188da9f0" sha1="808d29751b572ada0780dc35d587d99c08ba95b0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ultsoccrp" cloneof="ultsoccr">
+		<description>Ultimate Soccer (Euro, Prototype)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="World Soccer (Prototype).bin" size="1048576" crc="9d451f72" sha1="892747034876a7f587bbf0e3f21c9f35237bb1ea" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dukenk3da" cloneof="dukenk3d" supported="no">
+		<description>Duke Nukem 3D (Pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="duke_nukem_3d.bin" size="2097152" crc="13e93c0d" sha1="14ce7438a379973c8d66b0cc365d05a04d94f7dd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="lionkin3a" cloneof="lionkin3">
+		<description>Lion King 3 (Alt?)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="20971520">
+				<rom name="lion_king_3.bin" size="2097152" crc="87e86943" sha1="0ef55dc45536963c8748192a4cb4864a87b03102" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mbubble" supported="no">
+		<description>Magic Bubble (Pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="magic_bubble.bin" size="524288" crc="ce4a0c46" sha1="d7e3a79064f12b953b2dec9db4d14f8bc9b2a441" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonicjam2" cloneof="sonicjam">
+		<description>Sonic Jam 6 (Alt 2)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="sonic_6.bin" size="2097152" crc="87d86501" sha1="100b7ff9c8182365748de7c74c537e39abcb22da" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="smario2a" cloneof="smario2" supported="no">
+		<description>Super Mario 2 (Alt?)</description>
+		<year>199?</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="super_mario_2.bin" size="2097152" crc="0da6dc4b" sha1="f6808fff565f96c0d2f619be890052c7dba3019e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tetris1" supported="no">
+		<description>Tetris (Pirate?)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="tetris.bin" size="524288" crc="eb024ab2" sha1="44340cd021ab9cfb0536f78d6f0d59ea0f409a40" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="virak" supported="no">
+		<description>Voina Irak (Pirate)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="voina_irak.bin" size="2097152" crc="c7177e93" sha1="017af15b93a7f2e3c9f6310fe01c234f49c47b13" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!--
 	<software name="actrepl">

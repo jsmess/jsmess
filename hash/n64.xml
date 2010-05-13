@@ -1,5 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+There appear to exist at least two undumped N64 protos
+
+  - Star Soldier Vanishing Earth (Europe)
+  - Echo Delta
+
+-->
 <softwarelist name="n64" description="Nintendo 64 cartridges">
 	<software name="007goldn">
 		<description>007 - GoldenEye (Euro)</description>
@@ -1987,7 +1995,10 @@
 		<publisher>Interactive Studios / Blitzgames</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="9448848" layout="region32_be">
-				<rom name="dragonsword.n64" size="9448848" crc="dcea9210" sha1="efbdbcb499a3d8a37613ca1d94528016bdbf5735" offset="000000" />
+                <!-- Original release, in .z64 format -->
+				<!-- rom name="dragonsword.n64" size="9448848" crc="dcea9210" sha1="efbdbcb499a3d8a37613ca1d94528016bdbf5735" offset="000000" /-->
+                <!-- .v64 version -->
+				<rom name="dragonsword.bin" size="9448848" crc="c16b220f" sha1="72e2c2261c7c4031b7b27137cb092d40a0e45e02" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4126,6 +4137,20 @@
 		</part>
 	</software>
 
+	<software name="zeldamajd" cloneof="zeldamaj">
+		<description>The Legend of Zelda - Majora's Mask (Euro, Debug Build, 20000929)</description>
+		<year>2000</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864" layout="region32_be">
+                <!-- Original release, in .z64 format -->
+				<!-- rom name="mm_debug.rom" size="67108864" crc="687d8395" sha1="b38b71d2961dffb523020a67f4807a4b704e347a" offset="000000" /-->
+                <!-- .v64 version -->
+				<rom name="mm_debug.bin" size="67108864" crc="ea2e7abb" sha1="c790b3de31196645034c76e326640ccf3b8c91dd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zeldamaju1" cloneof="zeldamaj">
 		<description>The Legend of Zelda - Majora's Mask (USA, Demo)</description>
 		<year>2000</year>
@@ -4199,17 +4224,6 @@
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="33554432" layout="region32_be">
 				<rom name="legend of zelda, the - ocarina of time (usa).bin" size="33554432" crc="ec95702d" sha1="79a4f053d34018e59279e6d4b83c7daccd985c87" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zeldaootmq" cloneof="zeldaoot">
-		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Debug Edition, Ripped from GameCube disc)</description>
-		<year>2003</year>
-		<publisher>Nintendo</publisher>
-		<part name="cart" interface="n64_cart">
-			<dataarea name="rom" size="67108864" layout="region32_be">
-				<rom name="legend of zelda, the - ocarina of time - master quest (usa) (debug edition).bin" size="67108864" crc="2ee3e247" sha1="973bc6fe56010a8d646166a1182a81b4f13b8cf9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8429,7 +8443,7 @@
 
 	<software name="toonpan">
 		<description>Toon Panic (Jpn, Prototype)</description>
-		<year>19??</year>
+		<year>2000</year>
 		<publisher>Bottom Up</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912" layout="region32_be">
@@ -9878,6 +9892,53 @@
 			</dataarea>
 		</part>
 	</software>
+
+    <!-- to be verified -->
+	<software name="zeldaootmq" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time - Master Quest (USA, Debug Edition, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="67108864" layout="region32_be">
+				<rom name="legend of zelda, the - ocarina of time - master quest (usa) (debug edition).bin" size="67108864" crc="2ee3e247" sha1="973bc6fe56010a8d646166a1182a81b4f13b8cf9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaootmq1" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time - Master Quest (Euro, Debug Edition?, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432" layout="region32_be">
+				<rom name="legend of zelda, the - ocarina of time - master quest (2003)(nintendo)[gamecube version].bin" size="33554432" crc="177fa73a" sha1="8ebf2e29313f44f2d49e5b4191971d09919e8e48" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldaootu3" cloneof="zeldaoot">
+		<description>The Legend of Zelda - Ocarina of Time (Euro, Ripped from GC)</description>
+		<year>2003</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432" layout="region32_be">
+				<rom name="Legend of Zelda, The - Ocarina of Time (2003)(Nintendo)(PAL)[Gamecube version].v64" size="33554432" crc="6e658036" sha1="580dd0bd1b6d2c51cc20a764eece84dba558964c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zeldamaju2" cloneof="zeldamaj">
+		<description>The Legend of Zelda - Majora's Mask (USA, Ripped from GC)</description>
+		<year>2003?</year>
+		<publisher>Nintendo</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="33554432" layout="region32_be">
+				<rom name="Legend of Zelda, The - Majora's Mask (2003)(Nintendo)(US)[Gamecube version].v64" size="33554432" crc="52245acb" sha1="8c378b87c83b3f4de20b14accf91e7590399f5dc" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 
 <!--
 	<software name="actionre">
