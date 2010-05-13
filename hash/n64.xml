@@ -1981,6 +1981,17 @@
 		</part>
 	</software>
 
+	<software name="dsword">
+		<description>Dragon Sword (Prototype)</description>
+		<year>1998</year>
+		<publisher>Interactive Studios / Blitzgames</publisher>
+		<part name="cart" interface="n64_cart">
+			<dataarea name="rom" size="9448848" layout="region32_be">
+				<rom name="dr. mario 64 (usa).bin" size="9448848" crc="dcea9210" sha1="efbdbcb499a3d8a37613ca1d94528016bdbf5735" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="dualhero">
 		<description>Dual Heroes (Euro)</description>
 		<year>1998</year>
@@ -5834,7 +5845,7 @@
 	<software name="odt">
 		<description>O.D.T. (Euro, Prototype)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Psygnosis</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="16777216" layout="region32_be">
 				<rom name="o.d.t. (europe) (en,fr,de,es,it) (proto).bin" size="16777216" crc="6e79473e" sha1="93dc2adb08c209fdc0bf2f007824fde79f79a638" offset="000000" />
@@ -8419,7 +8430,7 @@
 	<software name="toonpan">
 		<description>Toon Panic (Jpn, Prototype)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Bottom Up</publisher>
 		<part name="cart" interface="n64_cart">
 			<dataarea name="rom" size="12582912" layout="region32_be">
 				<rom name="toon panic (japan) (proto).bin" size="12582912" crc="55c88f04" sha1="56a59924c9a4125f7ca7cc1cf51c06ac383e3d7c" offset="000000" />

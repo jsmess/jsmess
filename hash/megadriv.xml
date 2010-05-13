@@ -6020,6 +6020,17 @@
 		</part>
 	</software>
 
+	<software name="ecco2p2" cloneof="ecco2">
+		<description>Ecco - The Tides of Time (Prototype, 19940429)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="ecco ii - the tides of time (prototype - apr 29, 1994).bin" size="2097152" crc="5af83ecb" sha1="3c653329c897e369198425e99e76ff53688d245b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="ecco2j" cloneof="ecco2">
 		<description>Ecco the Dolphin II (Jpn)</description>
 		<year>199?</year>
