@@ -640,11 +640,11 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", jaguar, "bin,bjl,prg,cof,abs", 0)
+	MDRV_QUICKLOAD_ADD("quickload", jaguar, "abs,bin,cof,jag,prg", 0)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("jag,rom,j64")
+	MDRV_CARTSLOT_EXTENSION_LIST("j64,jag,rom")
 	MDRV_CARTSLOT_INTERFACE("jaguar_cart")
 	MDRV_CARTSLOT_LOAD(jaguar)
 
@@ -690,6 +690,7 @@ static void jaguar_fix_endian( running_machine *machine, UINT32 addr, UINT32 siz
 	UINT8 j[4], *RAM = memory_region(machine, "maincpu");
 	UINT32 i;
 	size += addr;
+	logerror("File Loaded to address range %X to %X\n",addr,size-1);
 	for (i = addr; i < size; i+=4)
 	{
 		j[0] = RAM[i];
@@ -710,7 +711,7 @@ static DRIVER_INIT( jaguar )
 
 static QUICKLOAD_LOAD( jaguar )
 {
-	offs_t quickload_begin = 0x4000;
+	offs_t quickload_begin = 0x4000, start = quickload_begin, skip = 0;
 	memset(jaguar_shared_ram, 0, 0x200000);
 	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
 
@@ -722,33 +723,40 @@ static QUICKLOAD_LOAD( jaguar )
 		/* COF */
 	if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x01500000)
 	{
-		UINT32 start = jaguar_shared_ram[0x100e];
-		UINT32 skip = jaguar_shared_ram[0x1011];
-		memset(jaguar_shared_ram, 0, 0x200000);
-		image_fseek(image, 0, SEEK_SET);
-		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
-		quickload_begin = start;
-		jaguar_fix_endian(image->machine, (start-skip)&0xfffffc, quickload_size);
+		start = jaguar_shared_ram[0x100e];
+		skip = jaguar_shared_ram[0x1011];
 	}
 	else	/* PRG */
 	if (((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x601A0000) && (jaguar_shared_ram[0x1007] == 0x4A414752))
 	{
 		UINT32 type = jaguar_shared_ram[0x1008] >> 16;
-		UINT32 start = ((jaguar_shared_ram[0x1008] & 0xffff) << 16) | (jaguar_shared_ram[0x1009] >> 16);
-		UINT32 skip = 28;
+		start = ((jaguar_shared_ram[0x1008] & 0xffff) << 16) | (jaguar_shared_ram[0x1009] >> 16);
+		skip = 28;
 		if (type == 2) skip = 42;
-		if (type == 3) skip = 46;
-		memset(jaguar_shared_ram, 0, 0x200000);
-		image_fseek(image, 0, SEEK_SET);
-		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
-		quickload_begin = start;
-		jaguar_fix_endian(image->machine, (start-skip)&0xfffffc, quickload_size);
+		else if (type == 3) skip = 46;
 	}
-	else	/* ABS */
+	else	/* ABS with header */
 	if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x601B0000)
 	{
-		UINT32 start = ((jaguar_shared_ram[0x1005] & 0xffff) << 16) | (jaguar_shared_ram[0x1006] >> 16);
-		UINT32 skip = 0xd0;
+		start = ((jaguar_shared_ram[0x1005] & 0xffff) << 16) | (jaguar_shared_ram[0x1006] >> 16);
+		skip = 36;
+	}
+
+	else	/* ABS binary */
+	if (!mame_stricmp(image_filetype(image), "abs"))
+		start = 0xc000;
+
+	else	/* 0x5000 binary */
+	if (!mame_stricmp(image_filetype(image), "jag"))
+		start = 0x5000;
+
+	else	/* A header used by Badcoder */
+	if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x72000000)
+		skip = 96;
+
+	/* Now that we have the info, reload the file */
+	if ((start != quickload_begin) || (skip))
+	{
 		memset(jaguar_shared_ram, 0, 0x200000);
 		image_fseek(image, 0, SEEK_SET);
 		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
@@ -756,9 +764,14 @@ static QUICKLOAD_LOAD( jaguar )
 		jaguar_fix_endian(image->machine, (start-skip)&0xfffffc, quickload_size);
 	}
 
+
+	/* Some programs are too lazy to set a stack pointer */
+	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENSP, 0x1000);
+	jaguar_shared_ram[0]=0x1000;
 
 	/* Transfer control to image */
 	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, quickload_begin);
+	jaguar_shared_ram[1]=quickload_begin;
 	return INIT_PASS;
 }
 
