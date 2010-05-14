@@ -3852,6 +3852,17 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
 	<software name="nazpuyo">
+		<description>Nazo Puyo (Jpn, 1.1)</description>
+		<year>1993</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="nazo puyo (japan)(v1.1).bin" size="131072" crc="d8d11f8d" sha1="7b19e92a85564b166c364d990d9d44f7e1113541" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nazpuyo1" cloneof="nazpuyo">
 		<description>Nazo Puyo (Jpn)</description>
 		<year>1993</year>
 		<publisher>Sega</publisher>
@@ -4856,13 +4867,24 @@ A few games have been listed as rumored, but they might very well be fake (pleas
 	</software>
 
 	<!-- Id:  - Developers:  - Releases:  (Jpn) -->
-	<software name="pacman">
+	<software name="pacmanj" cloneof="pacman">
 		<description>Pac-Man (Jpn)</description>
 		<year>1991</year>
 		<publisher>Namco</publisher>
 		<part name="cart" interface="gamegear_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="pac-man (japan).bin" size="131072" crc="a16c5e58" sha1="d78b6aac927692f1b67e6a4b7494e2c7e709ae17" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pacman">
+		<description>Pac-Man (USA)</description>
+		<year>1991</year>
+		<publisher>Namco</publisher>
+		<part name="cart" interface="gamegear_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="pac-man (usa).bin" size="131072" crc="b318dd37" sha1="ed27bae791e2b24966c282ad307a1b8d2140f55c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

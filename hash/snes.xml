@@ -25311,9 +25311,9 @@
 		</part>
 	</software>
 
-	<software name="reversek">
+	<software name="revkids">
 		<!-- Serial:  - Release Date:  -->
-		<description>Reverse Kids (Jpn)</description>
+		<description>Reversi Kids</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
@@ -35327,14 +35327,14 @@
 		</part>
 	</software>
 
-	<software name="taiwanmj">
+	<software name="tai16mj2">
 		<!-- Serial:  - Release Date:  -->
 		<description>Taiwan 16 Mahjong II - Horoscope Girls Edition (HK)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="taiwan 16 mahjong ii - horoscope girls edition (hong kong) (unl) [b].sfc" size="524288" crc="561bbd96" sha1="7d22466ebf2d3a33e4567d6f23756a286ddcf9c7" offset="000000" status="baddump"/>
+				<rom name="Taiwan 16 Mahjong II - Horoscope Girls Edition (Unl).sfc" size="524288" crc="561bbd96" sha1="7d22466ebf2d3a33e4567d6f23756a286ddcf9c7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -41556,18 +41556,6 @@
 		</part>
 	</software>
 
-	<software name="revkids">
-		<!-- Serial:  - Release Date:  -->
-		<description>Reversi Kids</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="Riverse Kids (Unl).sfc" size="524288" crc="3a426a4a" sha1="8b534317c0da7a8c8d2e35074feafde33548e038" offset="000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="dinho97" cloneof="issdx">
 		<!-- Serial:  - Release Date:  -->
 		<description>Ronaldinho Soccer 97</description>
@@ -41604,19 +41592,7 @@
 		</part>
 	</software>
 
-	<software name="sonic">
-		<!-- Serial:  - Release Date:  -->
-		<description>Sonic the Hedgehog</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="1048576">
-				<rom name="Sonic the Hedgehog (Unl).sfc" size="1048576" crc="6b9c71a9" sha1="a227f032f138a78e4779a5cc87a37c9068d99019" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sonica" cloneof="sonic">
+	<software name="sonic4a" cloneof="sonic4">
 		<!-- Serial:  - Release Date:  -->
 		<description>Sonic the Hedgehog (Alt)</description>
 		<year>19??</year>
@@ -41624,18 +41600,6 @@
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="Sonic the Hedgehog (Unl) [a1].sfc" size="1048576" crc="4543dd75" sha1="e7553ec4558fa96da1c8f5338aec547158776d8f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="tai16mj2">
-		<!-- Serial:  - Release Date:  -->
-		<description>Taiwan 16 Mahjong II - Horoscope Girls Edition</description>
-		<year>19??</year>
-		<publisher>&lt;unlicensed&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="Taiwan 16 Mahjong II - Horoscope Girls Edition (Unl).sfc" size="524288" crc="561bbd96" sha1="7d22466ebf2d3a33e4567d6f23756a286ddcf9c7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

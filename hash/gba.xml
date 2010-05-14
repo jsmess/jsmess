@@ -25604,7 +25604,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="16777216">
-				<rom name="spider-man 2 (usa, europe).bin" size="16777216" crc="0145f3f4" sha1="bb4a913f73139754dda95eb6b63d3b07501da970" offset="000000" />
+				<rom name="spider-man 2 (europe) (en,fr,de,es).bin" size="16777216" crc="821838bc" sha1="042CBC4C7F720A4B0C9A2CB3E77B2339DB346A1E" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25624,6 +25624,11 @@
 		<description>Spider-Man 2 (Euro, USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="16777216">
+				<rom name="spider-man 2 (usa, europe).bin" size="16777216" crc="0145f3f4" sha1="bb4a913f73139754dda95eb6b63d3b07501da970" offset="000000" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="spiderm3">
@@ -27524,7 +27529,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="tak - the great juju challenge (usa, europe).bin" size="8388608" crc="881c8416" sha1="0999a8ee2bae78a223c992408e987422ba0c0af9" offset="000000" />
+				<rom name="tak - the great juju challenge (europe) (en,fr,de,nl).bin" size="8388608" crc="4AD90EC1" sha1="EC460CADC74A0ED81838355797AFE53DC7010845" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -27533,6 +27538,11 @@
 		<description>Tak - The Great Juju Challenge (Euro, USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="tak - the great juju challenge (usa, europe).bin" size="8388608" crc="881c8416" sha1="0999a8ee2bae78a223c992408e987422ba0c0af9" offset="000000" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="tak2">
@@ -28179,7 +28189,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="tiger woods pga tour golf (usa, europe).bin" size="8388608" crc="f3f26acc" sha1="88b204b7b51995e41459b532580b3956d7db55ad" offset="000000" />
+				<rom name="tiger woods prg tour golf (europe) (en,fr,de,es,it).bin" size="8388608" crc="38934732" sha1="9D77F693C141D97A9E659997744C50087BF1FE4F" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28188,6 +28198,11 @@
 		<description>Tiger Woods PGA Tour Golf (Euro, USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="8388608">
+				<rom name="tiger woods pga tour golf (usa, europe).bin" size="8388608" crc="f3f26acc" sha1="88b204b7b51995e41459b532580b3956d7db55ad" offset="000000" />
+			</dataarea>
+		</part>
 	</software>
 
 	<software name="nightmbcj" cloneof="nightmbc">

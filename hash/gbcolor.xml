@@ -8581,6 +8581,17 @@
 		</part>
 	</software>
 
+	<software name="mrnutzu" cloneof="mrnutz">
+		<description>Mr Nutz (USA)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="mr nutz (usa) (en,fr,es).bin" size="1048576" crc="59f67529" sha1="43bb8621e3d05e81a7faa63cd76b0757f3954ba1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="mrdrill">
 		<description>Mr. Driller (Euro)</description>
 		<year>19??</year>

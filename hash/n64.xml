@@ -2,12 +2,18 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
 <!--
-There appear to exist at least two undumped N64 protos
 
-  - Star Soldier Vanishing Earth (Europe)
-  - Echo Delta
+There appear to exist some undumped N64 protos
+
+  - Air Boardin' USA,
+  - Echo Delta,
+  - Mini Racers, 
+  - Ohcouchi Gengorou Ikka",
+  - Star Soldier Vanishing Earth (Europe),
+  - Wild Waters
 
 -->
+
 <softwarelist name="n64" description="Nintendo 64 cartridges">
 	<software name="007goldn">
 		<description>007 - GoldenEye (Euro)</description>

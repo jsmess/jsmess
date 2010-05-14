@@ -54,6 +54,17 @@
 		</part>
 	</software>
 
+	<software name="alchemst">
+		<description>Alchemist Marie &amp; Elie - Futari no Atelier</description>
+		<year>19??</year>
+		<publisher>unknown</publisher>
+		<part name="cart" interface="wswan_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="swj-htrc01.bin" size="4194304" crc="b18cdc0d" sha1="99d9d7f951ae589059f34e76aea7489ae4cd79f1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bakusoud">
 		<description>Bakusou Dekotora Densetsu for WonderSwan</description>
 		<!--<release_date>1999-12-29</release_date>-->

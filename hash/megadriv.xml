@@ -306,7 +306,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="zetsg_hi_7500-00033a.u1" size="2097152" crc="af362b8c" sha1="2e5c1e4809d763513fa5bb8dc72c97a873fc732b" offset="000000" loadflag="load16_word_swap" />
+				<rom name="zetsg_hi_7500-00033a.u1" size="1048576" crc="af362b8c" sha1="2e5c1e4809d763513fa5bb8dc72c97a873fc732b" offset="000000" loadflag="load16_word_swap" />
 				<rom name="zetsg_lo_7500-00034a.u2" size="1048576" crc="b9c2d518" sha1="e5e7c36746233f441af5e03d0e2b63c6d916df24" offset="200000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
@@ -8674,17 +8674,6 @@
 		</part>
 	</software>
 
-	<software name="indy">
-		<description>Indiana Jones' Greatest Adventures (Release Candidate)</description>
-		<year>199?</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="megadriv_cart">
-			<dataarea name="rom" size="2097152">
-				<rom name="indiana jones' greatest adventures (release candidate).bin" size="2097152" crc="9a01974e" sha1="d59bb77b83cf912e3cb8a7598cabcf87a273e429" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="insectx">
 		<description>Insector X (USA)</description>
 		<year>199?</year>
@@ -15038,13 +15027,41 @@
 		</part>
 	</software>
 
-	<software name="quacksht">
+<!--Path:	D:\misc\tosectemp\
+Name:	QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World) (v1.1).md
+-->
+
+	<!-- According to Elbarto:
+		On the Quackshot PCB there is a 512Kb rom.
+		Normally all the address lines from A1 to A19 (the whole 512Kb range) tied to the chip in the right order.
+		But here we have the megadrive A18 line tied to the A20 pin of the rom.
+		This means that the Megadrive sees the first 256Kb of the rom followed by 0xc0000 lenght range of mirrored/zero-ed data 
+		then again the last 256Kb of the game.
+		I think they did that for a crappy (really crappy) copy protection.
+	-->
+
+	<!-- quacksht is the proper dump of the 512KKb rom, which requires emulation of the different wiring to work.
+	since this is not yet implemented in MESS, we also temporarily include the "hacked" version quackshth with the
+	second half of the data at 0x100000. The latter will be removed as soon as we properly implement the mirroring. -->
+
+	<software name="quacksht" supported="no">
 		<description>QuackShot Starring Donald Duck / QuackShot - Guruzia Ou no Hihou (World)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-14371.bin" size="524288" crc="5dd28dd7" sha1="ca02845fa49cd46ccb0a4023b91b10695573668e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="quackshth" cloneof="quacksht">
+		<description>QuackShot Starring Donald Duck / QuackShot - Guruzia Ou no Hihou (World, Hacked)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="524288">
+			<rom name="mpr-14371 (hacked).bin" size="1310720" crc="1801098b" sha1="7b1bd16fb817cc5e2af238cebe8521aaca8f6195" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24164,6 +24181,21 @@
 			</dataarea>
 		</part>
 	</software>
+-->
+
+<!-- This is here for documentation purposes, but it's not available.
+	
+	<software name="indy">
+		<description>Indiana Jones' Greatest Adventures (Release Candidate)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="indiana jones' greatest adventures (release candidate).bin" size="2097152" crc="9a01974e" sha1="d59bb77b83cf912e3cb8a7598cabcf87a273e429" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 -->
 
 </softwarelist>
