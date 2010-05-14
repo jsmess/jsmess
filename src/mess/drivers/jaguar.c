@@ -742,17 +742,18 @@ static QUICKLOAD_LOAD( jaguar )
 		skip = 36;
 	}
 
+	else	/* A header used by Badcoder */
+	if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x72000000)
+		skip = 96;
+
 	else	/* ABS binary */
 	if (!mame_stricmp(image_filetype(image), "abs"))
 		start = 0xc000;
 
-	else	/* 0x5000 binary */
+	else	/* JAG binary */
 	if (!mame_stricmp(image_filetype(image), "jag"))
 		start = 0x5000;
 
-	else	/* A header used by Badcoder */
-	if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x72000000)
-		skip = 96;
 
 	/* Now that we have the info, reload the file */
 	if ((start != quickload_begin) || (skip))
