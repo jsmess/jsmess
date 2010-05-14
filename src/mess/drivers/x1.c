@@ -39,6 +39,12 @@
       Any i/o read disables this extended bitmap ram.
     - I/O port $700 bit 7 of X1 Turbo is a sound (dip-)switch / jumper setting. I don't know yet what is for,
       but King's Knight needs it to be active otherwise it refuses to boot.
+    - ROM format is:
+      0x00 ROM id (must be 0x01)
+      0x01 - 0x0e ROM header
+      0xff16 - 0xff17 start-up vector
+      In theory, you can convert your tape / floppy games into ROM format easily, provided that you know what's the pinout of the
+      cartridge slot and it doesn't exceed 64k (0x10000) of size.
 
 =================================================================================================
 
@@ -191,6 +197,7 @@
 #include "formats/flopimg.h"
 #include "formats/basicdsk.h"
 #include "formats/x1_tap.h"
+#include "devices/cartslot.h"
 //#include <ctype.h>
 
 #define MAIN_CLOCK XTAL_16MHz
@@ -868,11 +875,11 @@ static UINT8 rom_index[3];
 
 static READ8_HANDLER( x1_rom_r )
 {
-	//UINT8 *ROM = memory_region(space->machine, "rom");
+	UINT8 *rom = memory_region(space->machine, "cart_img");
 
-//  popmessage("%06x",rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0);
+//	printf("%06x\n",rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0);
 
-	return 0; //ROM[rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0];
+	return rom[rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0];
 }
 
 static WRITE8_HANDLER( x1_rom_w )
@@ -2175,6 +2182,10 @@ static MACHINE_DRIVER_START( x1 )
 
 	MDRV_MB8877_ADD("fdc",x1_mb8877a_interface)
 
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, MAIN_CLOCK/8)
@@ -2232,6 +2243,9 @@ MACHINE_DRIVER_END
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x1000000, "cart_img", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
 ROM_START( x1ck )
@@ -2257,6 +2271,9 @@ ROM_START( x1ck )
 	ROM_REGION(0x20000, "kanji", ROMREGION_ERASEFF)
 
 	ROM_REGION(0x20000, "raw_kanji", ROMREGION_ERASEFF)
+
+	ROM_REGION( 0x1000000, "cart_img", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
 ROM_START( x1turbo )
@@ -2283,6 +2300,9 @@ ROM_START( x1turbo )
 	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
 	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
+
+	ROM_REGION( 0x1000000, "cart_img", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
 ROM_START( x1turbo40 )
@@ -2309,6 +2329,9 @@ ROM_START( x1turbo40 )
 	ROM_LOAD("kanji2.rom", 0x08000, 0x8000, CRC(e710628a) SHA1(103bbe459dc8da27a9400aa45b385255c18fcc75) )
 	ROM_LOAD("kanji3.rom", 0x10000, 0x8000, CRC(8cae13ae) SHA1(273f3329c70b332f6a49a3a95e906bbfe3e9f0a1) )
 	ROM_LOAD("kanji1.rom", 0x18000, 0x8000, CRC(5874f70b) SHA1(dad7ada1b70c45f1e9db11db273ef7b385ef4f17) )
+
+	ROM_REGION( 0x1000000, "cart_img", ROMREGION_ERASE00 )
+	ROM_CART_LOAD("cart", 0x0000, 0xffffff, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
 
