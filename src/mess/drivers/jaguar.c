@@ -640,11 +640,11 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	/* quickload */
-	MDRV_QUICKLOAD_ADD("quickload", jaguar, "bin,prg,cof,abs", 0)
+	MDRV_QUICKLOAD_ADD("quickload", jaguar, "bin,bjl,prg,cof,abs", 0)
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("jag,rom,j64,j01")
+	MDRV_CARTSLOT_EXTENSION_LIST("jag,rom,j64")
 	MDRV_CARTSLOT_INTERFACE("jaguar_cart")
 	MDRV_CARTSLOT_LOAD(jaguar)
 
@@ -718,6 +718,19 @@ static QUICKLOAD_LOAD( jaguar )
 
 	jaguar_fix_endian(image->machine, quickload_begin, quickload_size);
 
+	/* Deal with some of the numerous homebrew header systems */
+		/* COF */
+	if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x01500000)
+	{
+		UINT32 start = jaguar_shared_ram[0x100e];
+		UINT32 skip = jaguar_shared_ram[0x1011];
+		memset(jaguar_shared_ram, 0, 0x200000);
+		image_fseek(image, 0, SEEK_SET);
+		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
+		quickload_begin = start;
+		jaguar_fix_endian(image->machine, (start-skip)&0xfffffc, quickload_size);
+	}
+	else	/* PRG */
 	if (((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x601A0000) && (jaguar_shared_ram[0x1007] == 0x4A414752))
 	{
 		UINT32 type = jaguar_shared_ram[0x1008] >> 16;
@@ -729,20 +742,9 @@ static QUICKLOAD_LOAD( jaguar )
 		image_fseek(image, 0, SEEK_SET);
 		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
 		quickload_begin = start;
-		jaguar_fix_endian(image->machine, quickload_begin, quickload_size);
+		jaguar_fix_endian(image->machine, (start-skip)&0xfffffc, quickload_size);
 	}
-	else
-	if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x01500000)
-	{
-		UINT32 start = jaguar_shared_ram[0x100e];
-		UINT32 skip = jaguar_shared_ram[0x1011];
-		memset(jaguar_shared_ram, 0, 0x200000);
-		image_fseek(image, 0, SEEK_SET);
-		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
-		quickload_begin = start;
-		jaguar_fix_endian(image->machine, quickload_begin, quickload_size);
-	}
-	else
+	else	/* ABS */
 	if ((jaguar_shared_ram[0x1000] & 0xffff0000) == 0x601B0000)
 	{
 		UINT32 start = ((jaguar_shared_ram[0x1005] & 0xffff) << 16) | (jaguar_shared_ram[0x1006] >> 16);
@@ -751,7 +753,7 @@ static QUICKLOAD_LOAD( jaguar )
 		image_fseek(image, 0, SEEK_SET);
 		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
 		quickload_begin = start;
-		jaguar_fix_endian(image->machine, quickload_begin, quickload_size);
+		jaguar_fix_endian(image->machine, (start-skip)&0xfffffc, quickload_size);
 	}
 
 
@@ -762,9 +764,7 @@ static QUICKLOAD_LOAD( jaguar )
 
 static DEVICE_IMAGE_LOAD( jaguar )
 {
-	int i, j;
 	UINT32 size, load_offset = 0, load_skip = 0;
-	UINT8 header[512];
 
 	if (image_software_entry(image) == NULL)
 	{
@@ -773,9 +773,8 @@ static DEVICE_IMAGE_LOAD( jaguar )
 		/* .rom files load & run at 802000 */
 		if (!mame_stricmp(image_filetype(image), "rom"))	
 		{
-			load_offset = 0x2000;
-			cart_base[0x101]=0x208000;	// becomes 802000 after endian adjustment below
-			/* more may be needed as no .rom files run yet */
+			load_offset = 0x2000;		// fix load address
+			cart_base[0x101]=0x802000;	// fix exec address
 		}
 		else
 
@@ -785,7 +784,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 
 		/* Skip any header */
 		if (load_skip)
-			image_fread(image, header, load_skip);
+			image_fseek(image, load_skip, SEEK_SET);
 
 		/* Load cart into memory */
 		image_fread(image, &memory_region(image->machine, "maincpu")[0x800000+load_offset], size - load_skip);
@@ -795,11 +794,11 @@ static DEVICE_IMAGE_LOAD( jaguar )
 		size = image_get_software_region_length(image, "rom");
 
 		/* skip header, if any */
-		if ((size & 0x200) == 0x200)
-		{
-			load_skip = 0x200;
-			memcpy(header, image_get_software_region(image, "rom") , load_skip);
-		}
+//		if ((size & 0x200) == 0x200)
+//		{
+//			load_skip = 0x200;
+//			memcpy(header, image_get_software_region(image, "rom") , load_skip);
+//		}
 
 		memcpy(cart_base, image_get_software_region(image, "rom") + load_skip, size - load_skip);
 	}
@@ -807,19 +806,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 	memset(jaguar_shared_ram, 0, 0x200000);
 	memcpy(jaguar_shared_ram, rom_base, 0x10);
 
-	/* Fix endian-ness  */
-	/* Air Cars is scrambled, it needs to be made the same as an ordinary cart,
-		but in the meantime, this enables it to load */
-	if (image_software_entry(image) == NULL && !mame_stricmp(image_filetype(image), "j01"))
-	{
-		for (i = 0; i < size / 4; i++)
-		{
-			j = cart_base[i];
-			cart_base[i] = ((j & 0xff) << 16) | ((j & 0xff00) << 16) | ((j & 0xff0000) >> 16) | ((j & 0xff000000) >> 16);
-		}
-	}
-	else
-		jaguar_fix_endian(image->machine, 0x800000, size);
+	jaguar_fix_endian(image->machine, 0x800000+load_offset, size-load_skip);
 
 	/* Skip the logo */
 	cart_base[0x102] = 1;
