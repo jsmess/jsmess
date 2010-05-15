@@ -990,7 +990,7 @@ static void data_transfer_write(running_device *device, chrn_id_hd id, int delda
 
 	if (write_long)
 	{
-		logerror("smc92x4 write sector: Write_long not supported. Performing a normal write.\n");
+		logerror("smc92x4 warn: write sector: Write_long not supported. Performing a normal write.\n");
 	}
 
 	if (w->selected_drive_type & TYPE_FLOPPY)
@@ -1387,7 +1387,7 @@ static void seek_read_id(running_device *device)
 		else
 		{
 			if (wait)
-				logerror("smc92x4:seed_read_id: Waiting for seek_complete not implemented.\n");
+				logerror("smc92x4 warn: seed_read_id: Waiting for seek_complete not implemented.\n");
 
 			if (verify_id)
 			{
@@ -1808,7 +1808,7 @@ static void read_floppy_track(running_device *device, int transfer_only_ids)
 
 	if (transfer_only_ids)
 	{
-		logerror("smc92x4 read track: Ignoring transfer-only-ids. Reading complete track.\n");
+		logerror("smc92x4 warn: read track: Ignoring transfer-only-ids. Reading complete track.\n");
 	}
 
 	smc92x4_set_dip(device, TRUE);
@@ -1837,13 +1837,19 @@ static void read_harddisk_track(running_device *device, int transfer_only_ids)
 	(*w->intf->mfmhd_read_track)(w->register_w[DESIRED_HEAD]&0x0f, &buffer, &data_count);
 	sync_status_in(device);
 
+	if (!(w->register_r[DRIVE_STATUS] & DS_READY))
+	{
+		logerror("smc92x4 error: read harddisk track failed.\n");
+		/* no buffer was allocated */
+	}
+
 	/* Transfer the buffer to the external memory. We assume the memory
     pointer has been set appropriately in the registers. */
 	set_dma_address(device, DMA23_16, DMA15_8, DMA7_0);
 
 	if (transfer_only_ids)
 	{
-		logerror("smc92x4 read track: Ignoring transfer-only-ids. Reading complete track.\n");
+		logerror("smc92x4 warn: read track: Ignoring transfer-only-ids. Reading complete track.\n");
 	}
 
 	smc92x4_set_dip(device, TRUE);
@@ -1978,7 +1984,7 @@ static void smc92x4_process_command(running_device *device, UINT8 opcode)
 	{
 		/* DESELECT DRIVE */
 		/* done when no drive is in use */
-		logerror("smc92x4 drdeselect command\n");
+		logerror("smc92x4 info: drdeselect command\n");
 		w->output1 &= ~(OUT1_DRVSEL3|OUT1_DRVSEL2|OUT1_DRVSEL1|OUT1_DRVSEL0);
 		w->output2 |= OUT2_DRVSEL3_;
 		/* sync the latches on the PCB */
@@ -1990,13 +1996,13 @@ static void smc92x4_process_command(running_device *device, UINT8 opcode)
 		/* RESTORE DRIVE */
 		/* bit 0: 0 -> command ends after last seek pulse, 1 -> command
         ends when the drive asserts the seek complete pin */
-		logerror("smc92x4 restore command %X\n", opcode);
+		logerror("smc92x4 info: restore command %X\n", opcode);
 		restore_drive(device);
 	}
 	else if (opcode >= 0x04 && opcode <= 0x07)
 	{
 		/* STEP IN/OUT ONE CYLINDER */
-		logerror("smc92x4 step in/out command %X\n", opcode);
+		logerror("smc92x4 info: step in/out command %X\n", opcode);
 		step_in_out(device);
 	}
 	else if (opcode >= 0x08 && opcode <= 0x0f)
@@ -2007,19 +2013,19 @@ static void smc92x4_process_command(running_device *device, UINT8 opcode)
 	else if (opcode >= 0x10 && opcode <= 0x1f)
 	{
 		/* POLLDRIVE */
-		logerror("smc92x4 polldrive command %X\n", opcode);
+		logerror("smc92x4 info: polldrive command %X\n", opcode);
 		poll_drives(device);
 	}
 	else if (opcode >= 0x20 && opcode <= 0x3f)
 	{
 		/* DRIVE SELECT */
-		logerror("smc92x4 drselect command %X\n", opcode);
+		logerror("smc92x4 info: drselect command %X\n", opcode);
 		drive_select(device, opcode&0x1f);
 	}
 	else if (opcode >= 0x40 && opcode <= 0x4f)
 	{
 		/* SETREGPTR */
-		logerror("smc92x4 setregptr command %X\n", opcode);
+		logerror("smc92x4 info: setregptr command %X\n", opcode);
 		w->register_pointer = opcode & 0xf;
 		/* Spec does not say anything about the effect of setting an
         invalid value (only "care should be taken") */
@@ -2040,19 +2046,19 @@ static void smc92x4_process_command(running_device *device, UINT8 opcode)
 		|| (opcode >= 0x80))
 	{
 		/* READ/WRITE SECTORS PHYSICAL/LOGICAL */
-		logerror("smc92x4 read/write sector command %X\n", opcode);
+		logerror("smc92x4 info: read/write sector command %X\n", opcode);
 		read_write_sectors(device);
 	}
 	else if (opcode >= 0x5A && opcode <= 0x5b)
 	{
 		/* READ TRACK */
-		logerror("smc92x4 read track command %X\n", opcode);
+		logerror("smc92x4 info: read track command %X\n", opcode);
 		read_track(device);
 	}
 	else if (opcode >= 0x60 && opcode <= 0x7f)
 	{
 		/* FORMAT TRACK */
-		logerror("smc92x4 format track command %X\n", opcode);
+		logerror("smc92x4 info: format track command %X\n", opcode);
 		format_track(device);
 	}
 	else

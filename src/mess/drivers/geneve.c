@@ -290,9 +290,9 @@ static INPUT_PORTS_START(geneve)
 		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
 
 	PORT_START( "DRVSPD" )
-	PORT_DIPNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
-		PORT_DIPSETTING( 0x00, "No delay")
-		PORT_DIPSETTING( 0x01, "Realistic")
+	PORT_CONFNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
+		PORT_CONFSETTING( 0x00, "No delay")
+		PORT_CONFSETTING( 0x01, "Realistic")
 
 	PORT_START("JOY")	/* col 1: "wired handset 1" (= joystick 1) */
 		PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP/*, "(1UP)", CODE_NONE, OSD_JOY_UP*/) PORT_PLAYER(1)

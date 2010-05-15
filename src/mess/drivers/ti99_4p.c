@@ -149,9 +149,9 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
 
 	PORT_START( "DRVSPD" )
-	PORT_DIPNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
-		PORT_DIPSETTING( 0x00, "No delay")
-		PORT_DIPSETTING( 0x01, "Realistic")
+	PORT_CONFNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
+		PORT_CONFSETTING( 0x00, "No delay")
+		PORT_CONFSETTING( 0x01, "Realistic")
 
 	/* 3 ports for mouse */
 	PORT_START("MOUSEX") /* Mouse - X AXIS */

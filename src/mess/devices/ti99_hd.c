@@ -279,10 +279,13 @@ void ti99_mfm_harddisk_read_track(running_device *harddisk, int head, UINT8 **pb
 	memset(&trackdata[position], 0x4e, gap4);
 	position += gap4;
 
+	hd->status |= MFMHD_READY;
+
 	*pbuffer = trackdata;
 
 	/* Remember to free the buffer! Except when an error has occured,
-       the function returns a newly allocated buffer. */
+    the function returns a newly allocated buffer.
+    Errors are indicated by READY=FALSE. */
 }
 
 /*
@@ -320,8 +323,9 @@ void ti99_mfm_harddisk_write_track(running_device *harddisk, int head, UINT8 *tr
     may lead to sectors not being written. */
 	if (current_pos==TI99HD_BLOCKNOTFOUND)
 	{
-		logerror("ti99_hd Cannot find gap1 for cylinder %d, head %d.\n", hd->current_cylinder, head);
+		logerror("ti99_hd error: write track: Cannot find gap1 for cylinder %d, head %d.\n", hd->current_cylinder, head);
 		/* What now? The track data are illegal, so we refuse to continue. */
+		hd->status |= MFMHD_WRFAULT;
 		return;
 	}
 
@@ -337,7 +341,8 @@ void ti99_mfm_harddisk_write_track(running_device *harddisk, int head, UINT8 *tr
 		{
 			/* Forget about the rest; we're done. */
 			if (found) break;  /* we were already successful, so all ok */
-			logerror("ti99_hd Cannot find sync for track %d, head %d.\n", hd->current_cylinder, head);
+			logerror("ti99_hd error: write track: Cannot find sync for track %d, head %d.\n", hd->current_cylinder, head);
+			hd->status |= MFMHD_WRFAULT;
 			return;
 		}
 		found = TRUE;
@@ -358,7 +363,6 @@ void ti99_mfm_harddisk_write_track(running_device *harddisk, int head, UINT8 *tr
 			{
 				if (!harddisk_chs_to_lba(file, wcyl, whead, wsector, &lba))
 				{
-					hd->status &= ~MFMHD_READY;
 					hd->status |= MFMHD_WRFAULT;
 					return;
 				}
@@ -372,8 +376,7 @@ void ti99_mfm_harddisk_write_track(running_device *harddisk, int head, UINT8 *tr
 					state = hard_disk_write(file, lba, track_image+current_pos);
 					if (state==0)
 					{
-						logerror("ti99_hd Write error during formatting cylinder %d, head %d\n", wcyl, whead);
-						hd->status &= ~MFMHD_READY;
+						logerror("ti99_hd error: write track: Write error during formatting cylinder %d, head %d\n", wcyl, whead);
 						hd->status |= MFMHD_WRFAULT;
 						return;
 					}
@@ -381,18 +384,21 @@ void ti99_mfm_harddisk_write_track(running_device *harddisk, int head, UINT8 *tr
 				}
 				else
 				{
-					logerror("ti99_hd Cannot find DAM for cylinder %d, head %d, sector %d.\n", wcyl, whead, wsector);
+					logerror("ti99_hd error: write track: Cannot find DAM for cylinder %d, head %d, sector %d.\n", wcyl, whead, wsector);
+					hd->status |= MFMHD_WRFAULT;
 					return;
 				}
 			}
 			else
 			{
-				logerror("ti99_hd cylinder/head mismatch. Drive is on cyl=%d, head=%d, track data say cyl=%d, head=%d\n", hd->current_cylinder, head, wcyl, whead);
+				logerror("ti99_hd error: write track: Cylinder/head mismatch. Drive is on cyl=%d, head=%d, track data say cyl=%d, head=%d\n", hd->current_cylinder, head, wcyl, whead);
+				hd->status |= MFMHD_WRFAULT;
 			}
 		}
 		else
 		{
-			printf("ti99_hd Cannot find IDAM for cylinder %d, head %d, sector %d.\n", wcyl, whead, wsector);
+			logerror("ti99_hd error: write track: Invalid track image for cyl=%d, head=%d. Cannot find any IDAM in track data.\n",  hd->current_cylinder, head);
+			hd->status |= MFMHD_WRFAULT;
 			return;
 		}
 	}
