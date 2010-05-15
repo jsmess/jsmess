@@ -105,12 +105,10 @@ static enum
 	model_99_8,
 	model_99_4p
 } ti99_model;
-/* memory extension type */
-static xRAM_kind_t xRAM_kind;
+
 /* TRUE if speech synthesizer present */
 static char has_speech;
-/* floppy disk controller type */
-static fdc_kind_t fdc_kind;
+
 /* TRUE if ide card present */
 static char has_ide;
 /* TRUE if evpc card present */
@@ -134,6 +132,10 @@ static int handset_buf;
 static int handset_buflen;
 static int handset_clock;
 static int handset_ack;
+
+/* Expansion RAM type */
+static int xRAM_kind;
+
 enum
 {
 	max_handsets = 4
@@ -498,22 +500,32 @@ MACHINE_RESET( ti99 )
 
 	/* read config */
 	if (ti99_model == model_99_8)
-		xRAM_kind = xRAM_kind_99_8;			/* hack */
+		xRAM_kind = RAM_99_8;
 	else if (ti99_model == model_99_4p)
-		xRAM_kind = xRAM_kind_99_4p_1Mb;	/* hack */
+		xRAM_kind = RAM_99_4P;
 	else
-		xRAM_kind = (xRAM_kind_t)((input_port_read(machine, "CFG") >> config_xRAM_bit) & config_xRAM_mask);
+		xRAM_kind = input_port_read(machine, "RAM");
+	
 	if (ti99_model == model_99_8)
 		has_speech = TRUE;
 	else
-		has_speech = (input_port_read(machine, "CFG") >> config_speech_bit) & config_speech_mask;
-	fdc_kind = (fdc_kind_t)((input_port_read(machine, "CFG") >> config_fdc_bit) & config_fdc_mask);
-	has_ide = (input_port_read(machine, "CFG") >> config_ide_bit) & config_ide_mask;
-	has_rs232 = (input_port_read(machine, "CFG") >> config_rs232_bit) & config_rs232_mask;
-	has_handset = (ti99_model == model_99_4) && ((input_port_read(machine, "CFG") >> config_handsets_bit) & config_handsets_mask);
-	has_hsgpl = ((ti99_model == model_99_4p) || (input_port_read(machine, "CFG") >> config_hsgpl_bit) & config_hsgpl_mask);
-	has_usb_sm = (input_port_read(machine, "CFG") >> config_usbsm_bit) & config_usbsm_mask;
-	has_pcode = (input_port_read(machine, "CFG") >> config_pcode_bit) & config_pcode_mask;
+		has_speech = input_port_read(machine, "SPEECH");
+	
+	has_ide = input_port_read(machine, "HDCTRL") & HD_IDE;
+	has_rs232 = input_port_read(machine, "SERIAL") & SERIAL_TI;
+
+	if (ti99_model == model_99_4)
+		has_handset = input_port_read(machine, "HCI") & HCI_IR;
+	else
+		has_handset = FALSE;
+	
+	if (ti99_model == model_99_4p)
+		has_hsgpl = TRUE;
+	else
+		has_hsgpl = input_port_read(machine, "EXTCARD") & EXT_HSGPL;
+
+	has_usb_sm = input_port_read(machine, "HDCTRL") & HD_USB;
+	has_pcode = input_port_read(machine, "EXTCARD") & EXT_PCODE;
 
 	/* set up optional expansion hardware */
 	ti99_peb_reset(ti99_model == model_99_4p, tms9901_set_int1, NULL);
@@ -545,49 +557,49 @@ MACHINE_RESET( ti99 )
 
 	switch (xRAM_kind)
 	{
-	case xRAM_kind_none:
+	case RAM_NONE:
 	default:
 		memory_install_read16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_nop_8_r);
 		memory_install_write16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_nop_8_w);
 		memory_install_read16_handler(space, 0xa000, 0xffff, 0, 0, ti99_nop_8_r);
 		memory_install_write16_handler(space, 0xa000, 0xffff, 0, 0, ti99_nop_8_w);
 		break;
-	case xRAM_kind_TI:
+	case RAM_TI32:
 		ti99_TIxram_init(machine);
 		break;
-	case xRAM_kind_super_AMS:
+	case RAM_SUPERAMS1024:
 		ti99_sAMSxram_init(machine);
 		break;
-	case xRAM_kind_99_4p_1Mb:
+	case RAM_99_4P:
 		ti99_4p_mapper_init(machine);
 		break;
-	case xRAM_kind_foundation_128k:
-	case xRAM_kind_foundation_512k:
-	case xRAM_kind_myarc_128k:
-	case xRAM_kind_myarc_512k:
+	case RAM_FOUNDATION128:
+	case RAM_FOUNDATION512:
+	case RAM_MYARC128:
+	case RAM_MYARC512:
 		ti99_myarcxram_init(machine);
 		break;
-	case xRAM_kind_99_8:
+	case RAM_99_8:
 		break;
 	}
 
-	switch (fdc_kind)
+	switch (input_port_read(machine, "DISKCTRL"))
 	{
-	case fdc_kind_TI:
+	case DISK_TIFDC:
 		ti99_fdc_reset(machine);
 		break;
 #if HAS_99CCFDC
-	case fdc_kind_CC:
+	case DISK_CC:
 		ti99_ccfdc_reset(machine);
 		break;
 #endif
-	case fdc_kind_BwG:
+	case DISK_BWG:
 		ti99_bwg_reset(machine);
 		break;
-	case fdc_kind_hfdc:
+	case DISK_HFDC:
 		ti99_hfdc_reset(machine);
 		break;
-	case fdc_kind_none:
+	case DISK_NONE:
 		break;
 	}
 
@@ -650,7 +662,7 @@ INTERRUPT_GEN( ti99_vblank_interrupt )
 	TMS9928A_interrupt(device->machine);
 	if (has_handset)
 		ti99_handset_task(device->machine);
-	has_mecmouse = (input_port_read(device->machine, "CFG") >> config_mecmouse_bit) & config_mecmouse_mask;
+	has_mecmouse = input_port_read(device->machine, "HCI") & HCI_MECMOUSE;
 	if (has_mecmouse)
 		mecmouse_poll(device->machine);
 }
@@ -662,7 +674,7 @@ INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
 	if (++line_count == 262)
 	{
 		line_count = 0;
-		has_mecmouse = (input_port_read(device->machine, "CFG") >> config_mecmouse_bit) & config_mecmouse_mask;
+		has_mecmouse = input_port_read(device->machine, "HCI") & HCI_MECMOUSE;
 		if (has_mecmouse)
 			mecmouse_poll(device->machine);
 	}
@@ -2819,12 +2831,12 @@ static void ti99_myarcxram_init(running_machine *machine)
 
 	switch (xRAM_kind)
 	{
-	case xRAM_kind_foundation_128k:	/* 128kb foundation */
-	case xRAM_kind_myarc_128k:		/* 128kb myarc clone */
+	case RAM_FOUNDATION128:	/* 128kb foundation */
+	case RAM_MYARC128:		/* 128kb myarc clone */
 		myarc_page_offset_mask = 0x0c000;
 		break;
-	case xRAM_kind_foundation_512k:	/* 512kb foundation */
-	case xRAM_kind_myarc_512k:		/* 512kb myarc clone */
+	case RAM_FOUNDATION512:	/* 512kb foundation */
+	case RAM_MYARC512:		/* 512kb myarc clone */
 		myarc_page_offset_mask = 0x3c000;
 		break;
 	default:
@@ -2833,12 +2845,12 @@ static void ti99_myarcxram_init(running_machine *machine)
 
 	switch (xRAM_kind)
 	{
-	case xRAM_kind_foundation_128k:	/* 128kb foundation */
-	case xRAM_kind_foundation_512k:	/* 512kb foundation */
+	case RAM_FOUNDATION128:	/* 128kb foundation */
+	case RAM_FOUNDATION512:	/* 512kb foundation */
 		ti99_peb_set_card_handlers(0x1e00, & myarc_expansion_handlers);
 		break;
-	case xRAM_kind_myarc_128k:		/* 128kb myarc clone */
-	case xRAM_kind_myarc_512k:		/* 512kb myarc clone */
+	case RAM_MYARC128:		/* 128kb myarc clone */
+	case RAM_MYARC512:		/* 512kb myarc clone */
 		ti99_peb_set_card_handlers(0x1000, & myarc_expansion_handlers);
 		ti99_peb_set_card_handlers(0x1900, & myarc_expansion_handlers);
 		break;

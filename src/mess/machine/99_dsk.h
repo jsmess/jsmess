@@ -1,7 +1,8 @@
 #ifndef TI99_DSK_H_
 #define TI99_DSK_H_
 
-#include "machine/wd17xx.h"
+#include "wd17xx.h"
+#include "smc92x4.h"
 #include "formats/flopimg.h"
 
 /* Note: this currently mirrors the flag in ti99_4x.h */
@@ -18,4 +19,6 @@ void ti99_hfdc_reset(running_machine *machine);
 int ti99_image_in_80_track_drive(void);
 
 extern const wd17xx_interface ti99_wd17xx_interface;
+extern const smc92x4_interface ti99_smc92x4_interface;
+
 #endif /* TI99_DSK_H_ */

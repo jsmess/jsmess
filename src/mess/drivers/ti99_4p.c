@@ -56,10 +56,12 @@
 #include "devices/cassette.h"
 #include "machine/smartmed.h"
 #include "devices/harddriv.h"
+#include "devices/ti99_hd.h"
 #include "machine/idectrl.h"
 #include "machine/smc92x4.h"
 #include "machine/rtc65271.h"
 #include "formats/ti99_dsk.h"
+
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")								/*system ROM*/
@@ -102,32 +104,54 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START(ti99_4p)
 
-	/* 1 port for config */
-	PORT_START("CFG")	/* config */
-		PORT_DIPNAME( config_speech_mask << config_speech_bit, 1 << config_speech_bit, "Speech synthesis")
-			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
-			PORT_DIPSETTING( 1 << config_speech_bit, DEF_STR( On ) )
-		PORT_DIPNAME( config_fdc_mask << config_fdc_bit, fdc_kind_hfdc << config_fdc_bit, "Floppy disk controller")
-			PORT_DIPSETTING( fdc_kind_none << config_fdc_bit, DEF_STR( None ) )
-			PORT_DIPSETTING( fdc_kind_TI << config_fdc_bit, "Texas Instruments SD" )
-#if HAS_99CCFDC
-			PORT_DIPSETTING( fdc_kind_CC << config_fdc_bit, "CorComp" )
-#endif
-			PORT_DIPSETTING( fdc_kind_BwG << config_fdc_bit, "SNUG's BwG" )
-			PORT_DIPSETTING( fdc_kind_hfdc << config_fdc_bit, "Myarc's HFDC" )
-		/*PORT_DIPNAME( config_ide_mask << config_ide_bit, 1 << config_ide_bit, IPT_DIPSWITCH_NAME) PORT_NAME("Nouspickel's IDE card")
-            PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
-            PORT_DIPSETTING( 1 << config_ide_bit, DEF_STR( On ) )*/
-		PORT_DIPNAME( config_rs232_mask << config_rs232_bit, /*1 << config_rs232_bit*/0, "TI RS232 card")
-			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
-			PORT_DIPSETTING( 1 << config_rs232_bit, DEF_STR( On ) )
-		PORT_DIPNAME( config_mecmouse_mask << config_mecmouse_bit, 0, "Mechatronics Mouse")
-			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
-			PORT_DIPSETTING( 1 << config_mecmouse_bit, DEF_STR( On ) )
-		PORT_DIPNAME( config_usbsm_mask << config_usbsm_bit, 1 << config_usbsm_bit, "Nouspickel's USB-SM card")
-			PORT_DIPSETTING( 0x0000, DEF_STR( Off ) )
-			PORT_DIPSETTING( 1 << config_usbsm_bit, DEF_STR( On ) )
+	PORT_START( "SPEECH" )
+	PORT_CONFNAME( 0x01, 0x00, "Speech synthesizer" )
+		PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 
+	PORT_START( "DISKCTRL" )
+	PORT_CONFNAME( 0x07, 0x00, "Disk controller" )
+		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
+		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
+		PORT_CONFSETTING(    0x03, "Myarc HFDC" )
+//		PORT_CONFSETTING(    0x04, "Corcomp" )
+
+	PORT_START( "HDCTRL" )
+	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
+		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+//		PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
+	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
+		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING(    0x08, DEF_STR( On ) )
+
+	PORT_START( "SERIAL" )
+	PORT_CONFNAME( 0x03, 0x00, "Serial/Parallel interface" )
+		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
+		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
+	
+	PORT_START( "EXTCARD" )
+	PORT_CONFNAME( 0x02, 0x00, "P-Code card" )
+		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+
+	PORT_START( "HCI" )
+	PORT_CONFNAME( 0x01, 0x00, "Mouse support" )
+		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING(    0x01, "Mechatronics Mouse" )
+
+	PORT_START( "HFDCDIP" )
+	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
+		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
+		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
+		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
+		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")		
+
+	PORT_START( "DRVSPD" )
+	PORT_DIPNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
+		PORT_DIPSETTING( 0x00, "No delay")
+		PORT_DIPSETTING( 0x01, "Realistic")
 
 	/* 3 ports for mouse */
 	PORT_START("MOUSEX") /* Mouse - X AXIS */
@@ -296,9 +320,6 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
 
-	MDRV_IMPORT_FROM( smc92x4_hd )
-
-	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	/* MDRV_CASSETTE_ADD( "cassette", default_cassette_config ) */
@@ -306,7 +327,11 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)
 
+	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
+	MDRV_SMC92X4_ADD("smc92x4", ti99_smc92x4_interface )
+
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4p_floppy_config)
+	MDRV_MFMHD_3_DRIVES_ADD()
 
 	MDRV_SMARTMEDIA_ADD("smartmedia")
 

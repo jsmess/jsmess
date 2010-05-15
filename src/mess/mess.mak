@@ -429,6 +429,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_DEVICES)/multcart.o	\
 	$(MESS_DEVICES)/printer.o	\
 	$(MESS_DEVICES)/snapquik.o	\
+	$(MESS_DEVICES)/ti99_hd.o 	\
 	$(MESS_DEVICES)/z80bin.o	\
 	$(MESS_FORMATS)/basicdsk.o	\
 	$(MESS_FORMATS)/cassimg.o	\

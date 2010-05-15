@@ -77,36 +77,6 @@ enum
 	region_hsgpl_len  = /*0x240000*/0x230000
 };
 
-/* enum for RAM config */
-typedef enum
-{
-	xRAM_kind_none = 0,
-	xRAM_kind_TI,				/* 32kb TI and clones */
-	xRAM_kind_super_AMS,		/* 1Mb super AMS */
-	xRAM_kind_foundation_128k,	/* 128kb foundation */
-	xRAM_kind_foundation_512k,	/* 512kb foundation */
-	xRAM_kind_myarc_128k,		/* 128kb myarc clone (no ROM) */
-	xRAM_kind_myarc_512k,		/* 512kb myarc clone (no ROM) */
-
-	xRAM_kind_99_4p_1Mb,		/* ti99/4p super AMS clone */
-	xRAM_kind_99_8				/* ti99/8 memory mapper */
-} xRAM_kind_t;
-
-/* enum for fdc config */
-typedef enum
-{
-	fdc_kind_none = 0,
-	fdc_kind_TI,				/* TI fdc */
-	fdc_kind_BwG,				/* SNUG's BwG fdc */
-	fdc_kind_hfdc				/* Myarc's HFDC (handles SD and DD floppies (I
-                                    think an HD update existed) and prehistoric
-                                    MFM hard disks) */
-#if HAS_99CCFDC
-	,
-	fdc_kind_CC = 0x100			/* CorComp fdc */
-#endif
-} fdc_kind_t;
-
 /* GROM_port_t: descriptor for a port of 8 GROMs. Required by ti99_4x, ti99pcod */
 struct _GROM_port_t
 {
@@ -124,6 +94,7 @@ struct _GROM_port_t
 typedef struct _GROM_port_t GROM_port_t;
 
 
+#if 0
 /* defines for input port "CFG" */
 enum
 {
@@ -153,8 +124,75 @@ enum
 	config_pcode_bit	= 18,
 	config_pcode_mask	= 0x1
 };
+#endif
 
-enum {
+/*
+	Configuration values
+*/
+enum
+{
+	RAM_NONE = 0,
+	RAM_TI32,
+	RAM_SUPERAMS1024,
+	RAM_FOUNDATION128,
+	RAM_FOUNDATION512,
+	RAM_MYARC128,
+	RAM_MYARC512,
+	RAM_99_4P,
+	RAM_99_8
+};
+
+enum
+{
+	DISK_NONE = 0,
+	DISK_TIFDC,
+	DISK_BWG,	
+	DISK_HFDC,
+	DISK_CC
+};
+
+enum
+{
+	HD_NONE = 0,
+	HD_IDE,
+	HD_WHTECH,
+	HD_USB = 4
+};
+
+enum
+{
+	SERIAL_NONE = 0,
+	SERIAL_TI
+};
+
+enum
+{
+	EXT_NONE = 0,
+	EXT_HSGPL,
+	EXT_PCODE
+};
+
+enum
+{
+	HCI_NONE = 0,
+	HCI_MECMOUSE = 1,
+	HCI_IR = 4
+};
+
+enum
+{
+	CART_AUTO = 0,
+	CART_1,
+	CART_2,
+	CART_3,
+	CART_4,
+	CART_GK
+};
+
+
+/* Cartridge types */
+enum 
+{
 	STANDARD,
 	EXBAS,
 	MINIMEM,

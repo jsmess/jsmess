@@ -14,4 +14,6 @@
 
 FLOPPY_OPTIONS_EXTERN(ti99);
 
+void ti99_set_80_track_drives(int use80);
+
 #endif /* TI99_DSK_H */

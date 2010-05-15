@@ -2710,7 +2710,7 @@ static DEVICE_RESET(ti99_multicart)
 	   We take slot numbers from 0 (automatic mode) to the maximum. */
 
 	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
-	int slotnumber = (input_port_read(device->machine, "CFG") >> config_cartslot_bit) & config_cartslot_mask;
+	int slotnumber = input_port_read(device->machine, "CARTSLOT");
 	assert(slotnumber>=0 && slotnumber<=255);
 	cartslots->fixed_slot = slotnumber-1; /* auto = -1 */
 	cartslots->grom_address = 0x0000;

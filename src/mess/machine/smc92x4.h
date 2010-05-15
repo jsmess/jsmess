@@ -1,53 +1,124 @@
+/* Interface */
+
+#ifndef SMC92X4
+#define SMC92X4		DEVICE_GET_INFO_NAME(smc92x4)
+
+#define INPUT_STATUS 	0x00
+#define OUTPUT_DMA_ADDR 0x01
+#define OUTPUT_OUTPUT1 	0x02
+#define OUTPUT_OUTPUT2 	0x03
+
+#define MFMHD_TRACK00 	0x80
+#define MFMHD_SEEKCOMP	0x40
+#define MFMHD_WRFAULT	0x20
+#define MFMHD_READY	0x10
+#define MFMHD_INDEX	0x08
+
+#define BAD_SECTOR 	0x1000
+#define BAD_CRC		0x2000
+
 /*
-    smc92x4.h: header file for smc92x4.c
-
-    Raphael Nabet
+    Definition of bits in the Disk-Status register
 */
+#define DS_ECCERR	0x80		/* ECC error */
+#define DS_INDEX	0x40		/* index point */
+#define DS_SKCOM	0x20		/* seek complete */
+#define DS_TRK00	0x10		/* track 0 */
+#define DS_UDEF		0x08		/* user-defined */
+#define DS_WRPROT	0x04		/* write protect */
+#define DS_READY	0x02		/* drive ready bit */
+#define DS_WRFAULT	0x01		/* write fault */
 
-/* this enum matches the possible values for bits 3-2 of the select register */
-typedef enum select_mode_t
+/*
+	Needed to adapt to higher cylinder numbers. Floppies do not have such
+	high numbers.
+*/
+typedef struct chrn_id_hd
 {
-	sm_undefined = -1,		/* value after reset and drive deselect(right?) */
-	sm_at_harddisk = 0,		/* hard disk in PC-AT compatible harddisk format */
-	sm_harddisk,			/* hard disk */
-	sm_floppy_slow,			/* 8" drive (and 5.25" and 3.5" HD disks?) */
-	sm_floppy_fast			/* 5.25" and 3.5" drive */
-} select_mode_t;
+	UINT16 C;
+	UINT8 H;
+	UINT8 R;
+	UINT8 N;
+	int data_id;			// id for read/write data command
+	unsigned long flags;
+} chrn_id_hd;
 
-typedef struct smc92x4_intf
+typedef struct _smc92x4_interface
 {
-	/* select_callback serves 2 purposes:
-    a) the emulated system may use other lines than the normal smc92x4 select
-      lines
-    b) if there is more than one smc92x4 controller, we need to have different
-      drive numbers for each controller
-    which: smc92x4 controller concerned
-    select_mode: any of sm_harddisk, sm_floppy_slow or sm_floppy_fast
-    select_line: state smc92x4 select lines (0: no line active, 1, 2, 3: first,
-      second or third line active)
-    gpos: state of 4 general prurpose outputs that are used as floppy select
-      lines by the (4 LSBits of smc99x4 retry count register)
-    return -1 if no drive is selected, or index of image in MESS IO_FLOPPY
-      IO_HARDDISK device array. */
-	int (*select_callback)(int which, select_mode_t select_mode, int select_line, int gpos);
-	/* dma_read_callback will be called by the smc99x4 core to read the sector
-    buffer */
-	UINT8 (*dma_read_callback)(int which, offs_t offset);
-	/* dma_read_callback will be called by the smc99x4 core to write the sector
-    buffer */
-	void (*dma_write_callback)(int which, offs_t offset, UINT8 data);
-	/* int_callback will be called by the smc99x4 core whenever the state of
-    the interrupt lien changes */
-	void (*int_callback)(int which, int state);
-} smc92x4_intf;
+	/* Disk format support. This flag allows to choose between the full
+	   FM/MFM format and an abbreviated track layout. The difference results
+	   from legal variations of the layout. This is not part of
+	   the smc92x4 specification, but it allows to keep the image format
+	   simple without too much case checking. Should be removed as soon as
+	   the respective disk formats support the full format. */
+	int full_track_layout;
 
+	/* Interrupt line. To be connected with the controller PCB. */ 
+	devcb_write_line out_intrq_func;
 
-void smc92x4_init(int which, const smc92x4_intf *intf);
-void smc92x4_reset(int which);
-int smc92x4_r(running_machine *machine,int which, int offset);
-void smc92x4_w(running_machine *machine,int which, int offset, int data);
- READ8_HANDLER(smc92x4_0_r);
-WRITE8_HANDLER(smc92x4_0_w);
+	/* DMA in progress line. To be connected with the controller PCB. */ 
+	devcb_write_line out_dip_func;
 
-MACHINE_DRIVER_EXTERN( smc92x4_hd );
+	/* Auxiliary Bus. These 8 lines need to be connected to external latches
+	and to a counter circuitry which works together with the external RAM.
+	We use the S0/S1 lines as address lines. 
+	*/
+	devcb_write8 out_auxbus_func;
+	
+	/* Auxiliary Bus. This is only used for S0=S1=0, so we need no address 
+	lines and consider this line just as a line with 256 states. */
+	devcb_read_line in_auxbus_func;
 
+	/* Get the currently selected floppy disk. This is determined by the
+	   circuitry on the controller board, not within the controller itself. 
+	*/ 
+	running_device *(*current_floppy)(void);
+
+	/* Callback to read the contents of the external RAM via the data bus.
+	   Note that the address must be set and automatically increased 
+	   by external circuitry. */
+	UINT8 (*dma_read_callback)(void);
+	
+	/* Callback to write the contents of the external RAM via the data bus.
+	   Note that the address must be set and automatically increased 
+	   by external circuitry. */
+	void (*dma_write_callback)(UINT8 data);
+
+	/* Preliminary MFM hard disk interface. Gets next id. */
+	void (*mfmhd_get_next_id)(int head, chrn_id_hd *id);
+
+	/* Preliminary MFM hard disk interface. Performs a seek. */
+	void (*mfmhd_seek)(int direction);	
+
+	/* Preliminary MFM hard disk interface. Reads a sector. */
+	void (*mfmhd_read_sector)(int cylinder, int head, int sector, UINT8 **buf, int *sector_length);	
+
+	/* Preliminary MFM hard disk interface. Writes a sector. */
+	void (*mfmhd_write_sector)(int cylinder, int head, int sector, UINT8 *buf, int sector_length);	
+
+	/* Preliminary MFM hard disk interface. Reads a track. */
+	void (*mfmhd_read_track)(int head, UINT8 **buffer, int *data_count);	
+
+	/* Preliminary MFM hard disk interface. Writes a track. */
+	void (*mfmhd_write_track)(int head, UINT8 *buffer, int data_count);		
+} smc92x4_interface;
+
+/* device interface */
+extern DEVICE_GET_INFO(smc92x4);
+
+void smc92x4_reset(running_device *device);
+
+/* Used to turn off the delays. */
+void smc92x4_set_timing(running_device *device, int realistic);
+
+/* Generic function to translate between cylinders and idents */
+UINT8 cylinder_to_ident(int cylinder);
+
+READ8_DEVICE_HANDLER( smc92x4_r );
+WRITE8_DEVICE_HANDLER( smc92x4_w );
+
+#define MDRV_SMC92X4_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, SMC92X4, 0) \
+	MDRV_DEVICE_CONFIG(_intrf)
+	
+#endif
