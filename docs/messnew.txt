@@ -2,7 +2,7 @@
 
 New System Drivers Supported:
 -----------------------------
-- Aamber Pegasus [thanks to Lord Philip][Robbbert]
+- Aamber Pegasus (thanks to Lord Philip)[Robbbert]
 
 
 
@@ -20,10 +20,10 @@ Skeleton drivers:
 - Chromatics CGC 7900
 - Dolphin
 - Dream Multimedia Dreambox 7000/5620/500
-- EC-1849 [thanks to Anasana]
+- EC-1849 (thanks to Anasana)
 - Elektor TV Games Computer
-- Elektronika MC7105 [Thanks to Kaldyh]
-- MC-1702 [thanks to Anasana]
+- Elektronika MC7105 (Thanks to Kaldyh)
+- MC-1702 (thanks to Anasana)
 - PIPBUG
 - PK8002 Elf
 - Scientific Atlanta PowerVu pv9234 STB
@@ -37,8 +37,12 @@ System Driver Changes:
 
 - [AMSTRAD] Updated .hsi file with hashes to GoodCPC V3.1415 [Cowering]
 
+- [APPLE2] Give expansion cards more of their actual capabilities. [R. Belmont]
+
 - [AQUARIUS] Replaced bad char ROM with the newly redumped one.
   [jaybird3rd, Dirk Best]
+
+- [ATOM] Fixed disk loading [Curt Coder]
 
 - [ChannelF] Added .hsi file with hashes from GoodChaF V3.1415 [Cowering]
 
@@ -46,17 +50,50 @@ System Driver Changes:
 
 - [CBM] Added JiffyDOS BIOSes to VIC-20, C64, C128, Plus/4. [Curt Coder]
 
+- [FAMICOM] Fixed .fds format problems: headerless disks are now recognized, but 
+  the system still has problems when loading data. [Fabio Priuli]
+
+- [FMTOWNS] Various improvements: [Barry Rodewald]
+  * Added mouse support for joystick port 2, made it the port 2 default
+  * Added CRTC HSync Adjust, fixing offset backgrounds and scrolling in some games 
+  * Added HSync output to sub-status register and fixed memory maps: this fixes 
+    lockups in Gunship and Tatsujin Oh, and makes a few more games start to run
+  * Greatly simplified first track hack. Fixes sound issues with SSF2 and 
+    fixes High-C.
+  * Improved address offsets for 256-colour layers, Flashback is now playable.
+
+- [GBA] improvements to EEPROM & FLASH1M support (now Advance Wars 1 & 2 and 
+  Super Mario Advance 4 boot). [Fabio Priuli, Angelo Salese]
+
 - [Interact] Added support for CIN extension. [Robbbert]
 
 - [JAGUAR] Fixed crash on exit when no image is mounted [Oliver Stoeneberg]
 
+- [JAGUAR] Some improvements to the video emulation (timing for the blitter 
+  status, RGB VARMOD mode, UART status, etc.). [Angelo Salese]
+
+- [JAGUAR] Sorted out file extensions support for homebrew software: .abs, .bin, 
+  .cof, .jag and .prg programs now load fine in the quickload device. Also, 
+  improved loading routines for cart dumps in .j64, .jag and .rom formats in the
+  cartslot device) [Robbbert]
+
+- [M20] Some very preliminary work on the CPU and the video controller [Angelo
+  Salese]
+
 - [MBEE] Fixed crash of mbeeic when displaying I/O in debugger. [Robbbert]
+
+- [MBEE] Fixed keyboard in Asteroids Plus, Scavenger Hunt and Edasm. [Robbbert]
 
 - [MO5] Added .hsi file with hashes from GoodMO5 V3.1415 [Cowering]
 
 - [MTX512] Updated .hsi file with hashes to GoodMTX V3.1415 [Cowering]
 
 - [MTX] Cleaned up driver and added cassette device. [Curt Coder]
+
+- [MZ2500] Implemented basic video and irq system [Angelo Salese]
+
+- [N64] Almost completely re-wrote the RDP implementation to be class-based. 
+  Import from MAME. [Harmony]
 
 - [PEGASUS] Fixed natural keyboard mappings. [Justin Kerk]
 
@@ -68,8 +105,31 @@ System Driver Changes:
 
 - [SCV] Added support for on-cart RAM and banking.  [Wilbert Pol]
 
-- [SCV] Updated palette values to match the output from
-  a real console.  [plgDavid]
+- [SCV] Updated palette values to match the output from a real console. [plgDavid]
+
+- [SNES] SNES video wip, part 3: [Fabio Priuli]
+  * reworked OAM drawing routines
+  * implemented correct range over and time over flags (sprite limits)
+  * implemented FirstSprite priority
+  * improved sprite overlap
+  * fixed sprite blend exception
+  * implemented pseudo hi-res graphics.
+
+- [SNES] Fixed a few G65816 CPU core (as a result Iso Zuri Ritou Hen, Shaq Fu 
+  and Kishin Douji Zenki 3 work). [Angelo Salese]
+
+- [SNES] Improved DMA/HDMA handling to match Anomie's and byuu's discoveries.
+  [Fabio Priuli]
+
+- [SNES]: Fixed a bug with un-inited DMA regs, fixes at least a long-standing 
+  bug with Super Soccer dimmed team selection screen. [Angelo Salese]
+
+- [SNES] Implemented preliminary CPU cycle stealing: most games boot now (even 
+  if a few graphical regressions have been introduced, but these require more
+  CPU changes to be properly fixed). [Angelo Salese]
+
+- [SNES] Fixed rom mapping: now Tokimeki Memorial and Wizardry Gaiden work fine
+  [Fabio Priuli]
 
 - [SX64] Added 1541 FLASH! BIOS. [Guru, Curt Coder]
 
@@ -120,6 +180,16 @@ Source Changes:
 - The core is based on MAME 0.137u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
+- Added core support for loading images with shortnames which are recognized
+  by .xml software lists (stored in the hash/ directory). This is currently 
+  supported only from command line (eventually, newui and MESSUI support will 
+  be added). 
+  For more info and instructions, please check the User Manual at MESS Wiki 
+  ( http://mess.redump.net/mess:howto ) [Wilbert Pol]
+
+- Added software lists in .xml format for several systems [incog nito, 
+  Justin Kerk, Wilbert Pol, Fabio Priuli]
+
 - Added preliminary emulation of the MC6852 SSDA. [Curt Coder]
 
 - Added preliminary emulation of the 64H156 gate array device
@@ -134,17 +204,19 @@ Source Changes:
 - Added 1541 FLASH! BIOS to SX1541. [Guru, Curt Coder]
 
 - Changes to the wd17xx implementation:
-  - Added support for immediate/index pulse interrupts. [Curt Coder]
-  - Suppressed extra interrupt after FORCE INTERRUPT ($D0) command. [Barry Nelson]
+  * Added support for immediate/index pulse interrupts. [Curt Coder]
+  * Suppressed extra interrupt after FORCE INTERRUPT ($D0) command. [Barry Nelson]
 
 - Implemented Commodore DOS errors 21, 22, and 23 in D64 images. 
   "Microsoft Multiplan" now loads on C64. (bug #1932) [Curt Coder]
   
-- [C2040] Added DOS 1 FDC ROM (parsed from disassembly). [Curt Coder]
-  
 - Refactored the MOS6530 device to use devcb. [Curt Coder]
 
 - Refactored the Luxor ABC bus into a device. [Curt Coder]
+
+- Added preliminary support for disk images in FDI format. [Curt Coder]
+
+- Added preliminary RS-232 interface device. [Curt Coder]
 
 - Inserts a check whether the get_track_size function is defined in the disk
   format before calling it. (bug #1934) [Michael Zapf]
@@ -171,6 +243,8 @@ Source Changes:
   drive with no disc inserted) [Oliver Stoeneberg]
 
 - Fixed assert on shutdown after an image load error [Oliver Stoeneberg]
+
+- [C2040] Added DOS 1 FDC ROM (parsed from disassembly). [Curt Coder]
 
 - [MESSUI] Removed "File->Create Image...". It never worked and offered invalid 
   image types. Use Device View to create images (not working either at the moment)
