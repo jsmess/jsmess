@@ -112,6 +112,7 @@ PALETTE_INIT( apple2 );
 /*----------- defined in machine/apple2.c -----------*/
 
 extern UINT32 apple2_flags;
+extern INT32 a2_cnxx_slot;
 
 extern const applefdc_interface apple2_fdc_interface;
 
@@ -125,6 +126,8 @@ READ8_HANDLER( apple2_c0xx_r );
 WRITE8_HANDLER( apple2_c0xx_w );
 
 INTERRUPT_GEN( apple2_interrupt );
+
+INT8 apple2_slotram_r(running_machine *machine, int slotnum, int offset);
 
 void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask);
 

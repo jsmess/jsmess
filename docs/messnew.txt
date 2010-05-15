@@ -37,7 +37,8 @@ System Driver Changes:
 
 - [AMSTRAD] Updated .hsi file with hashes to GoodCPC V3.1415 [Cowering]
 
-- [APPLE2] Give expansion cards more of their actual capabilities. [R. Belmont]
+- [APPLE2] Expansion cards now have full capabilities including C800 
+  arbitration (not yet on IIgs) [R. Belmont]
 
 - [AQUARIUS] Replaced bad char ROM with the newly redumped one.
   [jaybird3rd, Dirk Best]
