@@ -259,6 +259,9 @@ Source Changes:
   carry the default savestate name in-between drivers when using the built-in 
   menu [Oliver Stoeneberg]
 
+- [SYSINFO] Updated sysinfo.dat to latest MESS Wiki contents [Dirk Best, 
+  Fabio Priuli, Robbbert, Shideravan]
+
 
 
 0.137
