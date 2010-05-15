@@ -44,7 +44,7 @@ UINT32 apple2_flags;
 static UINT32 a2_mask;
 static UINT32 a2_set;
 
-static INT32 a2_cnxx_slot;
+INT32 a2_cnxx_slot;
 
 /* local */
 static int a2_speaker_state;
@@ -433,31 +433,57 @@ WRITE8_HANDLER(apple2_c0xx_w)
 	}
 }
 
-static READ8_HANDLER( apple2_c1xx_r )
+/* returns default CnXX slotram for a slot space */
+INT8 apple2_slotram_r(running_machine *machine, int slotnum, int offset)
 {
-	int slotnum;
 	UINT8 *rom, *slot_ram;
 	UINT32 rom_length, slot_length;
 
 	// find slot_ram if any
-	rom = memory_region(space->machine, "maincpu");
-	rom_length = memory_region_length(space->machine, "maincpu") & ~0xFFF;
-	slot_length = memory_region_length(space->machine, "maincpu") - rom_length;
+	rom = memory_region(machine, "maincpu");
+	rom_length = memory_region_length(machine, "maincpu") & ~0xFFF;
+	slot_length = memory_region_length(machine, "maincpu") - rom_length;
 	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	if (slot_ram)
 	{
-		slotnum = ((offset>>8) & 0xf) + 1;
-		if (a2_cnxx_slot != slotnum)
+		if (a2_cnxx_slot == -1)
 		{
 			a2_cnxx_slot = slotnum;
-			apple2_update_memory(space->machine);
+			apple2_update_memory(machine);
 		}
 
 		return slot_ram[offset];
 	}
-	// else fall through to floating bus
 
+	// else fall through to floating bus
+	return apple2_getfloatingbusvalue(machine);
+}
+
+static READ8_HANDLER( apple2_c1xx_r )
+{
+	int slotnum;
+	running_device *slotdevice;
+
+	slotnum = ((offset>>8) & 0xf) + 1;
+	slotdevice = apple2_slot(space->machine, slotnum);
+
+	if (a2_cnxx_slot == -1)
+	{
+		a2_cnxx_slot = slotnum;
+		apple2_update_memory(space->machine);
+	}
+
+	if (slotdevice != NULL)
+	{
+		return apple2_slot_ROM_r(slotdevice, offset&0xff);
+	}
+	else
+	{
+		return apple2_slotram_r(space->machine, slotnum, offset);
+	}
+
+	// else fall through to floating bus
 	return apple2_getfloatingbusvalue(space->machine);
 }
 
@@ -492,28 +518,28 @@ static WRITE8_HANDLER ( apple2_c1xx_w )
 static READ8_HANDLER( apple2_c4xx_r )
 {
 	int slotnum;
-	UINT8 *rom, *slot_ram;
-	UINT32 rom_length, slot_length;
+	running_device *slotdevice;
 
-	// find slot_ram if any
-	rom = memory_region(space->machine, "maincpu");
-	rom_length = memory_region_length(space->machine, "maincpu") & ~0xFFF;
-	slot_length = memory_region_length(space->machine, "maincpu") - rom_length;
-	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
+	slotnum = ((offset>>8) & 0xf) + 4;
+	slotdevice = apple2_slot(space->machine, slotnum);
 
-	if (slot_ram)
+	if (a2_cnxx_slot == -1)
 	{
-		slotnum = ((offset>>8) & 0xf) + 4;
-		if (a2_cnxx_slot != slotnum)
-		{
-			a2_cnxx_slot = slotnum;
-			apple2_update_memory(space->machine);
-		}
-
-		return slot_ram[offset+0x300];
+		a2_cnxx_slot = slotnum;
+		apple2_update_memory(space->machine);
 	}
-	// else fall through to floating bus
 
+	// is a card installed in this slot?
+	if (slotdevice != NULL)
+	{
+		return apple2_slot_ROM_r(slotdevice, offset&0xff);
+	}
+	else
+	{
+		return apple2_slotram_r(space->machine, slotnum, offset);
+	}
+
+	// else fall through to floating bus
 	return apple2_getfloatingbusvalue(space->machine);
 }
 
@@ -531,8 +557,13 @@ static WRITE8_HANDLER ( apple2_c4xx_w )
 	slot_ram = (slot_length > 0) ? &rom[rom_length] : NULL;
 
 	slotnum = ((offset>>8) & 0xf) + 4;
-
 	slotdevice = apple2_slot(space->machine, slotnum);
+
+	if (a2_cnxx_slot == -1)
+	{
+		a2_cnxx_slot = slotnum;
+		apple2_update_memory(space->machine);
+	}
 
 	if (slotdevice != NULL)
 	{

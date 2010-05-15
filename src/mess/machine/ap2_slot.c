@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include "ap2_slot.h"
-
+#include "includes/apple2.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -167,7 +167,29 @@ WRITE8_DEVICE_HANDLER(apple2_c800_slot_w)
 }
 
 /*-------------------------------------------------
-    apple2_slot_ROM_w - slot write function
+    apple2_slot_ROM_w - slot ROM read function
+-------------------------------------------------*/
+READ8_DEVICE_HANDLER(apple2_slot_ROM_r)
+{
+	const apple2_slot_config *config = get_config(device);
+	apple2_slot_token *token = get_token(device);
+
+	/* do we actually have a device, and can we read? */
+	if ((token->slot_device != NULL) && (config->rhcnxx != NULL))
+	{
+		return (*config->rhcnxx)(token->slot_device, offset); 
+	}
+
+	if (config->slotnum > 0)
+	{
+		return apple2_slotram_r(device->machine, config->slotnum, offset + ((config->slotnum-1)<<8));
+	}
+
+	return apple2_getfloatingbusvalue(device->machine);
+}
+
+/*-------------------------------------------------
+    apple2_slot_ROM_w - slot ROM write function
 -------------------------------------------------*/
 
 WRITE8_DEVICE_HANDLER(apple2_slot_ROM_w)
@@ -175,7 +197,7 @@ WRITE8_DEVICE_HANDLER(apple2_slot_ROM_w)
 	const apple2_slot_config *config = get_config(device);
 	apple2_slot_token *token = get_token(device);
 
-	/* do we actually have a device, and can we read? */
+	/* do we actually have a device, and can we write? */
 	if ((token->slot_device != NULL) && (config->whcnxx != NULL))
 	{
 		(*config->whcnxx)(token->slot_device, offset, data);

@@ -627,9 +627,9 @@ static MACHINE_DRIVER_START( apple2_common )
 	MDRV_APPLEFDC_ADD("fdc", apple2_fdc_interface)
 
 	/* slots */
-	MDRV_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w, 0, 0, 0)
-	MDRV_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w, 0, 0, 0)
-	MDRV_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0)
+	MDRV_APPLE2_SLOT_ADD(0, "langcard", apple2_langcard_r, apple2_langcard_w, 0, 0, 0, 0)
+	MDRV_APPLE2_SLOT_ADD(4, "mockingboard", mockingboard_r, mockingboard_w, 0, 0, 0, 0)
+	MDRV_APPLE2_SLOT_ADD(6, "fdc", applefdc_r, applefdc_w, 0, 0, 0, 0)
 
 	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2_floppy_config,15,16)
 MACHINE_DRIVER_END
@@ -666,7 +666,7 @@ ROM_START(las3000)
 
 	ROM_REGION(0x8700,"maincpu",0)
 	ROM_LOAD ( "las3000.rom", 0x0000, 0x8000, CRC(9C7AEB09) SHA1(3302ADF41E258CF50210C19736948C8FA65E91DE))
-	ROM_LOAD ( "l3kdisk.rom", 0x0500, 0x0100, CRC(2D4B1584) SHA1(989780B77E100598124DF7B72663E5A31A3339C0))
+	ROM_LOAD ( "l3kdisk.rom", 0x8500, 0x0100, CRC(2D4B1584) SHA1(989780B77E100598124DF7B72663E5A31A3339C0))
 ROM_END
 
 MACHINE_DRIVER_START( apple2e )
