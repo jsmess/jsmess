@@ -778,7 +778,7 @@ static QUICKLOAD_LOAD( jaguar )
 
 static DEVICE_IMAGE_LOAD( jaguar )
 {
-	UINT32 size, load_offset = 0, load_skip = 0;
+	UINT32 size, load_offset = 0;
 
 	if (image_software_entry(image) == NULL)
 	{
@@ -790,37 +790,21 @@ static DEVICE_IMAGE_LOAD( jaguar )
 			load_offset = 0x2000;		// fix load address
 			cart_base[0x101]=0x802000;	// fix exec address
 		}
-		else
-
-		/* see if we are loading Brutal Sports Football with CRC 0FDCEB66 */
-		if ((size & 0x200) == 0x200)
-			load_skip = 0x200;
-
-		/* Skip any header */
-		if (load_skip)
-			image_fseek(image, load_skip, SEEK_SET);
 
 		/* Load cart into memory */
-		image_fread(image, &memory_region(image->machine, "maincpu")[0x800000+load_offset], size - load_skip);
+		image_fread(image, &memory_region(image->machine, "maincpu")[0x800000+load_offset], size);
 	}
 	else
 	{
 		size = image_get_software_region_length(image, "rom");
 
-		/* skip header, if any */
-//		if ((size & 0x200) == 0x200)
-//		{
-//			load_skip = 0x200;
-//			memcpy(header, image_get_software_region(image, "rom") , load_skip);
-//		}
-
-		memcpy(cart_base, image_get_software_region(image, "rom") + load_skip, size - load_skip);
+		memcpy(cart_base, image_get_software_region(image, "rom"), size);
 	}
 
 	memset(jaguar_shared_ram, 0, 0x200000);
 	memcpy(jaguar_shared_ram, rom_base, 0x10);
 
-	jaguar_fix_endian(image->machine, 0x800000+load_offset, size-load_skip);
+	jaguar_fix_endian(image->machine, 0x800000+load_offset, size);
 
 	/* Skip the logo */
 	cart_base[0x102] = 1;
