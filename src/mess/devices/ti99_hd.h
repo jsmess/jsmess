@@ -13,9 +13,9 @@
 /* typedef struct _mfmhd_config mfmhd_config;
 struct _mfmhd_config
 {
-	device_start_func			device_start;
-	device_image_load_func			device_load;
-	device_image_unload_func		device_unload;
+    device_start_func           device_start;
+    device_image_load_func          device_load;
+    device_image_unload_func        device_unload;
 }; */
 
 /* Accessor functions */
@@ -42,7 +42,7 @@ DEVICE_GET_INFO( idehd );
 
 
 /*
-	MDRV_MFMHD_START(mfmhd)				\
-	MDRV_MFMHD_LOAD(mfmhd)				\
-	MDRV_MFMHD_UNLOAD(mfmhd)			
+    MDRV_MFMHD_START(mfmhd)             \
+    MDRV_MFMHD_LOAD(mfmhd)              \
+    MDRV_MFMHD_UNLOAD(mfmhd)
 */

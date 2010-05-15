@@ -36,7 +36,7 @@ typedef enum
 	IRQ_B_EXT
 } SCCIRQType;
 
-typedef struct 
+typedef struct
 {
 	int txIRQEnable;
 	int rxIRQEnable;
@@ -133,7 +133,7 @@ static DEVICE_RESET( scc8530 )
 	scc->IRQType = IRQ_NONE;
 	scc->MasterIRQEnable = 0;
 	scc->IRQV = 0;
-	
+
 	scc8530_initchannel(scc, 0);
 	scc8530_initchannel(scc, 1);
 	scc8530_resetchannel(scc, 0);
@@ -199,8 +199,8 @@ static void scc_updateirqs(running_device *device)
 		scc->IRQType = IRQ_NONE;
 	}
 
-//	printf("SCC: irqstat %d, last %d\n", irqstat, scc->lastIRQStat);
-//	printf("ch0: en %d pd %d  ch1: en %d pd %d\n", scc->channel[0].txIRQEnable, scc->channel[0].txIRQPending, scc->channel[1].txIRQEnable, scc->channel[1].txIRQPending);
+//  printf("SCC: irqstat %d, last %d\n", irqstat, scc->lastIRQStat);
+//  printf("ch0: en %d pd %d  ch1: en %d pd %d\n", scc->channel[0].txIRQEnable, scc->channel[0].txIRQPending, scc->channel[1].txIRQEnable, scc->channel[1].txIRQPending);
 
 	// don't spam the driver with unnecessary transitions
 	if (irqstat != scc->lastIRQStat)
@@ -321,7 +321,7 @@ static void scc_putreg(running_device *device, int ch, int data)
 			break;
 
 		case 5: // Tx parameters and controls
-//			printf("ch %d TxEnable = %d [%02x]\n", ch, data & 8, data);
+//          printf("ch %d TxEnable = %d [%02x]\n", ch, data & 8, data);
 			pChan->txEnable = data & 8;
 			break;
 
@@ -352,7 +352,7 @@ static void scc_putreg(running_device *device, int ch, int data)
 					scc->IRQType = IRQ_NONE;
 					scc->MasterIRQEnable = 0;
 					scc->IRQV = 0;
-	
+
 					scc8530_initchannel(scc, 0);
 					scc8530_initchannel(scc, 1);
 					scc8530_resetchannel(scc, 0);
@@ -361,13 +361,13 @@ static void scc_putreg(running_device *device, int ch, int data)
 					// make sure we stop yanking the IRQ line if we were
 					scc_updateirqs(device);
 					break;
-					
+
 			}
 			break;
 
 		case 10:	// misc transmitter/receiver control bits
-		case 11: 	// clock mode control
-		case 12: 	// lower byte of baud rate gen
+		case 11:	// clock mode control
+		case 12:	// lower byte of baud rate gen
 		case 13:	// upper byte of baud rate gen
 			break;
 

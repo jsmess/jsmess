@@ -1,8 +1,8 @@
 /**********************************************************************
 
     Commodore 64H165 Gate Array emulation
-	
-	Used in 1541B/1541C/1541-II/1571
+
+    Used in 1541B/1541C/1541-II/1571
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -30,7 +30,7 @@
                     OE  19 |             | 22  ATNA
                  _ACCL  20 |_____________| 21  OSC
 
-							_____   _____
+                            _____   _____
                   TEST   1 |*    \_/     | 42  _BYTE
                    YB0   2 |             | 41  SOE
                    YB1   3 |             | 40  B

@@ -68,16 +68,16 @@ struct _crt9007_interface
 
 	devcb_write_line		out_hs_func;
 	devcb_write_line		out_vs_func;
-/*	
-	devcb_write_line		out_cblank_func;
-	devcb_write_line		out_vblank_func;
+/*
+    devcb_write_line        out_cblank_func;
+    devcb_write_line        out_vblank_func;
 
-	devcb_write_line		out_vlt_func;
-	devcb_write_line		out_curs_func;
-	devcb_write_line		out_drb_func;
+    devcb_write_line        out_vlt_func;
+    devcb_write_line        out_curs_func;
+    devcb_write_line        out_drb_func;
 
-	devcb_write_line		out_slg_func;
-	devcb_write_line		out_sld_func;
+    devcb_write_line        out_slg_func;
+    devcb_write_line        out_sld_func;
 */
 	devcb_read8				in_vd_func;
 	devcb_write8			out_vd_func;

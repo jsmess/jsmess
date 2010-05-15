@@ -734,7 +734,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 	}
 	else
 		memcpy(cartridge1 + load_offset, image_get_software_region(image, "rom"), filesize);
-	
+
 	if (filesize < 0x010000) { memcpy(cartridge1 + 0x008000, cartridge1, 0x008000); } /* ->64KB */
 	if (filesize < 0x020000) { memcpy(cartridge1 + 0x010000, cartridge1, 0x010000); } /* ->128KB */
 	if (filesize < 0x040000) { memcpy(cartridge1 + 0x020000, cartridge1, 0x020000); } /* ->256KB */

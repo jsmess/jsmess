@@ -383,7 +383,7 @@ static MACHINE_DRIVER_START( radiorom )
 	MDRV_CPU_PROGRAM_MAP(radio86rom_mem)
 
 	MDRV_I8255A_ADD( "ppi8255_2", radio86_ppi8255_interface_2 )
-	
+
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MDRV_CARTSLOT_NOT_MANDATORY

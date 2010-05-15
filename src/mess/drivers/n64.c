@@ -115,7 +115,7 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 		length = image_get_software_region_length(image, "rom");
 		memcpy(cart, image_get_software_region(image, "rom"), length);
 	}
-	
+
 	if (cart[0] == 0x37 && cart[1] == 0x80)
 	{
 		for (i = 0; i < length; i += 4)

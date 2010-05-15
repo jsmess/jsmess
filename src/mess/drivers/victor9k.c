@@ -2,8 +2,8 @@
 
     Victor 9000
 
-	- very exciting hardware, disk controller is a direct descendant
-	  of the Commodore drives (designed by Chuck Peddle)
+    - very exciting hardware, disk controller is a direct descendant
+      of the Commodore drives (designed by Chuck Peddle)
 
     Skeleton driver
 
@@ -11,16 +11,16 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- floppy 8048
-	- keyboard
-	- add HD46505S variant to mc6845.c
-	- hires graphics
-	- character attributes
-	- brightness/contrast
-	- MC6852
-	- codec sound
+    - floppy 8048
+    - keyboard
+    - add HD46505S variant to mc6845.c
+    - hires graphics
+    - character attributes
+    - brightness/contrast
+    - MC6852
+    - codec sound
 
 */
 
@@ -43,7 +43,7 @@
 /* Memory Maps */
 
 static ADDRESS_MAP_START( victor9k_mem, ADDRESS_SPACE_PROGRAM, 8 )
-//	AM_RANGE(0x00000, 0xdffff) AM_RAM
+//  AM_RANGE(0x00000, 0xdffff) AM_RAM
 	AM_RANGE(0xe0000, 0xe0001) AM_DEVREADWRITE(I8259A_TAG, pic8259_r, pic8259_w)
 	AM_RANGE(0xe0020, 0xe0023) AM_DEVREADWRITE(I8253_TAG, pit8253_r, pit8253_w)
 	AM_RANGE(0xe0040, 0xe0043) AM_DEVREADWRITE(UPD7201_TAG, upd7201_cd_ba_r, upd7201_cd_ba_w)
@@ -192,16 +192,16 @@ static const struct pit8253_config pit_intf =
 
 /*
 
-	pin		signal		description
+    pin     signal      description
 
-	IR0		SYN			sync detect
-	IR1		COMM		serial communications (7201)
-	IR2		TIMER		8253 timer
-	IR3		PARALLEL	all 6522 IRQ (including disk)
-	IR4		IR4			expansion IR4
-	IR5		IR5			expansion IR5
-	IR6		KBINT		keyboard data ready
-	IR7		VINT		vertical sync or nonspecific interrupt
+    IR0     SYN         sync detect
+    IR1     COMM        serial communications (7201)
+    IR2     TIMER       8253 timer
+    IR3     PARALLEL    all 6522 IRQ (including disk)
+    IR4     IR4         expansion IR4
+    IR5     IR5         expansion IR5
+    IR6     KBINT       keyboard data ready
+    IR7     VINT        vertical sync or nonspecific interrupt
 
 */
 
@@ -676,7 +676,7 @@ static WRITE8_DEVICE_HANDLER( via4_pb_w )
         PB0     L1MS0
         PB1     L1MS1
         PB2     L1MS2
-        PB3		L1MS3
+        PB3     L1MS3
         PB4     ST1A
         PB5     ST1B
         PB6     ST1C
@@ -1006,8 +1006,8 @@ static MACHINE_DRIVER_START( victor9k )
 	MDRV_CPU_ADD(I8048_TAG, I8048, XTAL_30MHz/6)
 	MDRV_CPU_IO_MAP(floppy_io)
 
-//	MDRV_CPU_ADD(I8022_TAG, I8022, 100000)
-//	MDRV_CPU_IO_MAP(keyboard_io)
+//  MDRV_CPU_ADD(I8022_TAG, I8022, 100000)
+//  MDRV_CPU_IO_MAP(keyboard_io)
 
 	MDRV_MACHINE_START(victor9k)
 
@@ -1076,5 +1076,5 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY						FULLNAME		FLAGS */
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT  COMPANY                     FULLNAME        FLAGS */
 COMP( 1982, victor9k, 0,      0,      victor9k, victor9k, 0,    "Victor Business Products", "Victor 9000",	GAME_NOT_WORKING )

@@ -310,7 +310,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 	if ( vpos < start_vblank )
 	{
 		rectangle rect;
-		//int	sprite_width[4] = { 8, 8, 8, 8 };
+		//int   sprite_width[4] = { 8, 8, 8, 8 };
 		int i;
 
 		control_status &= ~ 0x01;

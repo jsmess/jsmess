@@ -8,18 +8,18 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- 80186
-	- CRT9007
-	- keyboard ROM
-	- hires graphics board
-	- floppy 720K DSQD
-	- DMA
-	- WD1010
-	- hard disk
-	- mouse
-	- save state
+    - 80186
+    - CRT9007
+    - keyboard ROM
+    - hires graphics board
+    - floppy 720K DSQD
+    - DMA
+    - WD1010
+    - hard disk
+    - mouse
+    - save state
 
 */
 
@@ -51,18 +51,18 @@ static READ8_HANDLER( enable_r )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0					RS-232 ring indicator
-		1					RS-232 carrier detect
-		2
-		3
-		4
-		5
-		6
-		7		_ACLOW
+        0                   RS-232 ring indicator
+        1                   RS-232 carrier detect
+        2
+        3
+        4
+        5
+        6
+        7       _ACLOW
 
-	*/
+    */
 
 	return 0x80;
 }
@@ -71,18 +71,18 @@ static WRITE8_HANDLER( enable_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		0		KBEN		keyboard enable
-		1		EXTCLK		external baud rate clock
-		2		SPKRGATE	enable periodic speaker output
-		3		SPKRDATA	direct output to speaker
-		4		RFRQGATE	enable refresh and baud rate clocks
-		5		_FDCRESET	reset 8272
-		6		TMRIN0		enable 80186 timer 0
-		7		TMRIN1		enable 80186 timer 1
+        0       KBEN        keyboard enable
+        1       EXTCLK      external baud rate clock
+        2       SPKRGATE    enable periodic speaker output
+        3       SPKRDATA    direct output to speaker
+        4       RFRQGATE    enable refresh and baud rate clocks
+        5       _FDCRESET   reset 8272
+        6       TMRIN0      enable 80186 timer 0
+        7       TMRIN1      enable 80186 timer 1
 
-	*/
+    */
 
 	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
 
@@ -115,18 +115,18 @@ static WRITE8_HANDLER( dma_mux_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		DMA channel 0 enable
-		1		DMA channel 1 enable
-		2		DMA channel 2 enable
-		3		DMA channel 3 enable
-		4		DMA channel 0 select
-		5		DMA channel 1 select
-		6		DMA channel 2 select
-		7		DMA channel 3 select
+        0       DMA channel 0 enable
+        1       DMA channel 1 enable
+        2       DMA channel 2 enable
+        3       DMA channel 3 enable
+        4       DMA channel 0 select
+        5       DMA channel 1 select
+        6       DMA channel 2 select
+        7       DMA channel 3 select
 
-	*/
+    */
 
 	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
 
@@ -168,18 +168,18 @@ static WRITE8_HANDLER( addr_ctrl_w )
 {
 	/*
 
-		bit		signal		description
+        bit     signal      description
 
-		8		A15			A15 of video access
-		9		A16			A16 of video access
-		10		A17			A17 of video access
-		11		A18			A18 of video access
-		12		A19			A19 of video access
-		13		CLKSPD		clock speed (0 = 22.4 MHz, 1 = 28 MHz)
-		14		CLKCNT		dots/char (0 = 10 [800x400], 1 = 8 [640x400])
-		15		VIDOUTS		selects the video source for display on monochrome monitor
+        8       A15         A15 of video access
+        9       A16         A16 of video access
+        10      A17         A17 of video access
+        11      A18         A18 of video access
+        12      A19         A19 of video access
+        13      CLKSPD      clock speed (0 = 22.4 MHz, 1 = 28 MHz)
+        14      CLKCNT      dots/char (0 = 10 [800x400], 1 = 8 [640x400])
+        15      VIDOUTS     selects the video source for display on monochrome monitor
 
-	*/
+    */
 
 	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
 
@@ -202,18 +202,18 @@ static READ8_HANDLER( keyboard_x0_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		X0
-		1		X1
-		2		X2
-		3		X3
-		4		X4
-		5		X5
-		6		X6
-		7		X7
+        0       X0
+        1       X1
+        2       X2
+        3       X3
+        4       X4
+        5       X5
+        6       X6
+        7       X7
 
-	*/
+    */
 
 	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
 
@@ -239,18 +239,18 @@ static WRITE8_HANDLER( keyboard_y0_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Y0
-		1		Y1
-		2		Y2
-		3		Y3
-		4		Y4
-		5		Y5
-		6		Y6
-		7		Y7
+        0       Y0
+        1       Y1
+        2       Y2
+        3       Y3
+        4       Y4
+        5       Y5
+        6       Y6
+        7       Y7
 
-	*/
+    */
 
 	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
 
@@ -262,18 +262,18 @@ static WRITE8_HANDLER( keyboard_y8_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		Y8
-		1		Y9
-		2		Y10
-		3		Y11
-		4		LED 2
-		5		LED 1
-		6
-		7
+        0       Y8
+        1       Y9
+        2       Y10
+        3       Y11
+        4       LED 2
+        5       LED 1
+        6
+        7
 
-	*/
+    */
 
 	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
 
@@ -285,8 +285,8 @@ static WRITE8_HANDLER( keyboard_y8_w )
 
 static ADDRESS_MAP_START( tandy2k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(0x00000, 0xdffff) AM_RAM
-//	AM_RANGE(0xe0000, 0xf7fff) AM_RAM // hires graphics
+//  AM_RANGE(0x00000, 0xdffff) AM_RAM
+//  AM_RANGE(0xe0000, 0xf7fff) AM_RAM // hires graphics
 	AM_RANGE(0xf8000, 0xfbfff) AM_RAM AM_BASE_MEMBER(tandy2k_state, char_ram)
 	AM_RANGE(0xfc000, 0xfdfff) AM_MIRROR(0x2000) AM_ROM AM_REGION(I80186_TAG, 0)
 ADDRESS_MAP_END
@@ -306,17 +306,17 @@ static ADDRESS_MAP_START( tandy2k_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x00080, 0x00081) AM_DEVREADWRITE8(I8272A_TAG, upd765_dack_r, upd765_dack_w, 0x00ff)
 	AM_RANGE(0x00100, 0x0017f) AM_DEVREADWRITE8(CRT9007_TAG, crt9007_r, crt9007_w, 0x00ff)
 	AM_RANGE(0x00100, 0x0017f) AM_WRITE8(addr_ctrl_w, 0xff00)
-//	AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
-//	AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
-//	AM_RANGE(0x001a0, 0x001a0) AM_READ8(hires_plane_w, 0x00ff)
-//	AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(i186_internal_port_r, i186_internal_port_w)
+//  AM_RANGE(0x00180, 0x00180) AM_READ8(hires_status_r, 0x00ff)
+//  AM_RANGE(0x00180, 0x001bf) AM_WRITE(hires_palette_w)
+//  AM_RANGE(0x001a0, 0x001a0) AM_READ8(hires_plane_w, 0x00ff)
+//  AM_RANGE(0x0ff00, 0x0ffff) AM_READWRITE(i186_internal_port_r, i186_internal_port_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tandy2k_hd_io, ADDRESS_SPACE_IO, 16 )
 	AM_IMPORT_FROM(tandy2k_io)
-//	AM_RANGE(0x000e0, 0x000ff) AM_WRITE8(hdc_dack_w, 0x00ff)
-//	AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8(WD1010_TAG, hdc_reset_r, hdc_reset_w, 0x00ff)
-//	AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_r, wd1010_w, 0x00ff)
+//  AM_RANGE(0x000e0, 0x000ff) AM_WRITE8(hdc_dack_w, 0x00ff)
+//  AM_RANGE(0x0026c, 0x0026d) AM_DEVREADWRITE8(WD1010_TAG, hdc_reset_r, hdc_reset_w, 0x00ff)
+//  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_r, wd1010_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
@@ -590,18 +590,18 @@ static READ8_DEVICE_HANDLER( ppi_pb_r )
 {
 	/*
 
-		bit		signal			description
+        bit     signal          description
 
-		0		LPRIN0			auxiliary input 0
-		1		LPRIN1			auxiliary input 1
-		2		LPRIN2			auxiliary input 2
-		3		_LPRACK			acknowledge
-		4		_LPRFLT			fault
-		5		_LPRSEL			select
-		6		LPRPAEM			paper empty
-		7		LPRBSY			busy
+        0       LPRIN0          auxiliary input 0
+        1       LPRIN1          auxiliary input 1
+        2       LPRIN2          auxiliary input 2
+        3       _LPRACK         acknowledge
+        4       _LPRFLT         fault
+        5       _LPRSEL         select
+        6       LPRPAEM         paper empty
+        7       LPRBSY          busy
 
-	*/
+    */
 
 	tandy2k_state *state = (tandy2k_state *)device->machine->driver_data;
 
@@ -643,18 +643,18 @@ static WRITE8_DEVICE_HANDLER( ppi_pc_w )
 {
 	/*
 
-		bit		signal			description
+        bit     signal          description
 
-		0						port A direction
-		1						port B input select bit 0
-		2						port B input select bit 1
-		3		LPRINT13		interrupt
-		4		STROBE IN
-		5		INBUFFULL
-		6		_LPRACK
-		7		_LPRDATSTB
+        0                       port A direction
+        1                       port B input select bit 0
+        2                       port B input select bit 1
+        3       LPRINT13        interrupt
+        4       STROBE IN
+        5       INBUFFULL
+        6       _LPRACK
+        7       _LPRDATSTB
 
-	*/
+    */
 
 	tandy2k_state *state = (tandy2k_state *)device->machine->driver_data;
 
@@ -682,14 +682,14 @@ static I8255A_INTERFACE( i8255_intf )
 
 /*
 
-	IR0		MEMINT00
-	IR1		TMOINT01
-	IR2		SERINT02
-	IR3		BUSINT03
-	IR4		FLDINT04
-	IR5		BUSINT05
-	IR6		HDCINT06
-	IR7		BUSINT07
+    IR0     MEMINT00
+    IR1     TMOINT01
+    IR2     SERINT02
+    IR3     BUSINT03
+    IR4     FLDINT04
+    IR5     BUSINT05
+    IR6     HDCINT06
+    IR7     BUSINT07
 
 */
 
@@ -700,14 +700,14 @@ static const struct pic8259_interface i8259_0_intf =
 
 /*
 
-	IR0		KBDINT10
-	IR1		VIDINT11
-	IR2		RATINT12
-	IR3		LPRINT13
-	IR4		MCPINT14
-	IR5		MEMINT15
-	IR6		DMEINT16
-	IR7		BUSINT17
+    IR0     KBDINT10
+    IR1     VIDINT11
+    IR2     RATINT12
+    IR3     LPRINT13
+    IR4     MCPINT14
+    IR5     MEMINT15
+    IR6     DMEINT16
+    IR7     BUSINT17
 
 */
 
@@ -785,7 +785,7 @@ static MACHINE_START( tandy2k )
 	rom[0x1f17] = 0x90;
 
 	/* register for state saving */
-//	state_save_register_global(machine, state->);
+//  state_save_register_global(machine, state->);
 }
 
 static MACHINE_RESET( tandy2k )
@@ -802,8 +802,8 @@ static MACHINE_DRIVER_START( tandy2k )
     MDRV_CPU_PROGRAM_MAP(tandy2k_mem)
     MDRV_CPU_IO_MAP(tandy2k_io)
 
-//	MDRV_CPU_ADD(I8048_TAG, I8048, 1000000) // ?
-//	MDRV_CPU_IO_MAP(keyboard_io)
+//  MDRV_CPU_ADD(I8048_TAG, I8048, 1000000) // ?
+//  MDRV_CPU_IO_MAP(keyboard_io)
 
     MDRV_MACHINE_START(tandy2k)
     MDRV_MACHINE_RESET(tandy2k)
@@ -869,6 +869,6 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT		COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME		FLAGS */
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                 FULLNAME        FLAGS */
 COMP( 1983, tandy2k,	0,			0,		tandy2k,	tandy2k,	0,		"Tandy Radio Shack",	"Tandy 2000",	GAME_NOT_WORKING)
 COMP( 1983, tandy2khd,	tandy2k,	0,		tandy2k_hd,	tandy2k,	0,		"Tandy Radio Shack",	"Tandy 2000HD",	GAME_NOT_WORKING)

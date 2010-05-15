@@ -434,7 +434,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 
 			(void)ComboBox_InsertString(control, i, win_tstring_strdup(t_ramstring));
 			(void)ComboBox_SetItemData(control, i, ram);
-			
+
 			osd_free(t_ramstring);
 		}
 		if (config->extra_options != NULL)
@@ -447,7 +447,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 			for (j=0;j<size;j++) {
 				if (p[j]==',') p[j]=0;
 			}
-			
+
 			/* try to parse each option */
 			while(p <= e)
 			{
@@ -474,7 +474,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 				p+= strlen(p);
 				if (p == e)
 					break;
-				
+
 				p += 1;
 			}
 

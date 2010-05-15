@@ -64,7 +64,7 @@ INPUT_PORTS_END
 static DEVICE_IMAGE_LOAD( advision_cart )
 {
 	UINT32 size;
-	
+
 	if (image_software_entry(image) == NULL)
 	{
 		size = image_length(image);
@@ -74,13 +74,13 @@ static DEVICE_IMAGE_LOAD( advision_cart )
 			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return INIT_FAIL;
 		}
-		
+
 		if (image_fread(image, memory_region(image->machine, I8048_TAG), size) != size)
 		{
 			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return INIT_FAIL;
 		}
-		
+
 	}
 	else
 	{

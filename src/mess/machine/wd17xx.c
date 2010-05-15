@@ -122,8 +122,8 @@
     2010-02-04 Phill Harvey-Smith
     - Added multiple sector write as the RM Nimbus needs it.
 
-	2010-March-22 Curt Coder:
-	- Implemented immediate and index pulse interrupts.
+    2010-March-22 Curt Coder:
+    - Implemented immediate and index pulse interrupts.
 
     TODO:
         - Multiple record write
@@ -574,12 +574,12 @@ static void write_track(running_device *device)
 #endif
 
 	/* Get the size in bytes of the current track. For real hardware this
-	may vary per system in small degree, and there even for each track
-	and head, so we should not assume a fixed value here.
-	As we are using a buffered track writing, we have to find out how long
-	the track will become. The only object which can tell us is the
-	selected format.
-	*/
+    may vary per system in small degree, and there even for each track
+    and head, so we should not assume a fixed value here.
+    As we are using a buffered track writing, we have to find out how long
+    the track will become. The only object which can tell us is the
+    selected format.
+    */
 	w->data_count = 0;
 	floppy = flopimg_get_image(w->drive);
 	if (floppy != NULL)
@@ -731,7 +731,7 @@ static void read_track(running_device *device)
 	}
 #endif
 	/* Determine the track size. We cannot allow different sizes in this
-	design (see above, write_track). */
+    design (see above, write_track). */
 	w->data_count = 0;
 	floppy = flopimg_get_image(w->drive);
 	if (floppy != NULL)

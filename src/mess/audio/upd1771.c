@@ -11,10 +11,10 @@
     Ive seen mentions of a 006, 011 and 015 on part miner sites.
     Since the chip generates tones using embeded wavetables,
     it is probable other sounds are possible and were made for other embeded systems.
-    Its anyone's guess at this point in which products. 
-    
+    Its anyone's guess at this point in which products.
+
     upd17XXX devices are typically 4bit NEC MCUs, so it wouldnt be a stretch to
-    say that this chip is part of that lot. 
+    say that this chip is part of that lot.
     Maybe mask roms 006,011 and 015 dont generate audio at all.
 
      Used pinout in the SCV:
@@ -66,7 +66,7 @@
 
 #define LOG 0
 
-#define MAX_PACKET_SIZE 0x8000 
+#define MAX_PACKET_SIZE 0x8000
 
 
 size_t g_count = 0;
@@ -232,9 +232,9 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 		}break;
 
 		case 0x1F:
-		{	
+		{
 			//6Khz(ish) DIGI playback
-			
+
 			//end capture
 			if (state->packet[state->index-2] == 0xFE &&
 				state->packet[state->index-1] == 0x00){
@@ -248,7 +248,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 		}break;
 
         //garbage: wipe stack
-        default:	
+        default:
 			state->index = 0;
         break;
     }
@@ -261,7 +261,7 @@ WRITE_LINE_DEVICE_HANDLER( upd1771_pcm_w )
 
 	//RESET upon HIGH
 	if (state != upd1771->pc3){
-  		logerror( "upd1771_pc3 change!: state = %d\n", state );
+		logerror( "upd1771_pc3 change!: state = %d\n", state );
 		upd1771->index = 0;
 		upd1771->packet[0]=0;
 	}

@@ -127,7 +127,7 @@ enum
 #endif
 
 /*
-	Configuration values
+    Configuration values
 */
 enum
 {
@@ -146,7 +146,7 @@ enum
 {
 	DISK_NONE = 0,
 	DISK_TIFDC,
-	DISK_BWG,	
+	DISK_BWG,
 	DISK_HFDC,
 	DISK_CC
 };
@@ -191,7 +191,7 @@ enum
 
 
 /* Cartridge types */
-enum 
+enum
 {
 	STANDARD,
 	EXBAS,

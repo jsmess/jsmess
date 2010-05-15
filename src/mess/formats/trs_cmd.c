@@ -36,7 +36,7 @@
 QUICKLOAD_LOAD( trs80_cmd )
 {
     const address_space *program = cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	
+
 	UINT8 type, length;
 	UINT8 data[0x100];
 	UINT8 addr[2];

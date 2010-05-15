@@ -50,9 +50,9 @@
  * 0x0200-0f: Floppy controller (MB8877A)
  * 0x0400   : Video / CRTC (unknown)
  * 0x0404   : Disable VRAM, CMOS, memory-mapped I/O (everything in low memory except the BIOS)
- * 0x0440-5f: Video / CRTC 
+ * 0x0440-5f: Video / CRTC
  * 0x0480 RW: bit 1 = disable BIOS ROM
- * 0x04c0-cf: CD-ROM controller 
+ * 0x04c0-cf: CD-ROM controller
  * 0x04d5   : Sound mute
  * 0x04d8   : YM3438 control port A / status
  * 0x04da   : YM3438 data port A / status
@@ -789,17 +789,17 @@ static READ32_HANDLER(towns_padport_r)
 	if((porttype & 0x0f) == 0x01)
 	{
 		extra1 = input_port_read(space->machine,"joy1_ex");
-	
+
 		if(towns_pad_mask & 0x10)
 			ret |= (input_port_read(space->machine,"joy1") & 0x3f) | 0x00000040;
 		else
 			ret |= (input_port_read(space->machine,"joy1") & 0x0f) | 0x00000030;
-	
+
 		if(extra1 & 0x01) // Run button = left+right
 			ret &= ~0x0000000c;
 		if(extra1 & 0x02) // Select button = up+down
 			ret &= ~0x00000003;
-	
+
 		if((extra1 & 0x10) && (towns_pad_mask & 0x01))
 			ret &= ~0x00000010;
 		if((extra1 & 0x20) && (towns_pad_mask & 0x02))
@@ -813,7 +813,7 @@ static READ32_HANDLER(towns_padport_r)
 			ret |= ((input_port_read(space->machine,"joy2") & 0x3f) << 16) | 0x00400000;
 		else
 			ret |= ((input_port_read(space->machine,"joy2") & 0x0f) << 16) | 0x00300000;
-	
+
 		if(extra2 & 0x01)
 			ret &= ~0x000c0000;
 		if(extra2 & 0x02)
@@ -846,7 +846,7 @@ static READ32_HANDLER(towns_padport_r)
 				if(towns_mouse_output < MOUSE_Y_LOW)
 					ret |= 0x0000000f;
 		}
-		
+
 		// button states are always visible
 		state = input_port_read(space->machine,"mouse1");
 		if(!(state & 0x01))
@@ -855,7 +855,7 @@ static READ32_HANDLER(towns_padport_r)
 			ret |= 0x00000020;
 		if(towns_pad_mask & 0x10)
 			ret |= 0x00000040;
-	} 
+	}
 	if((porttype & 0xf0) == 0x20)  // mouse
 	{
 		switch(towns_mouse_output)
@@ -878,7 +878,7 @@ static READ32_HANDLER(towns_padport_r)
 				if(towns_mouse_output < MOUSE_Y_LOW)
 					ret |= 0x000f0000;
 		}
-		
+
 		// button states are always visible
 		state = input_port_read(space->machine,"mouse1");
 		if(!(state & 0x01))
@@ -887,8 +887,8 @@ static READ32_HANDLER(towns_padport_r)
 			ret |= 0x00200000;
 		if(towns_pad_mask & 0x20)
 			ret |= 0x00400000;
-	} 
-	
+	}
+
 	return ret;
 }
 
@@ -897,8 +897,8 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 	static UINT8 prev;
 	static UINT8 prev_x,prev_y;
 	UINT8 current_x,current_y;
-	UINT32 type = input_port_read(space->machine,"ctrltype"); 
-	
+	UINT32 type = input_port_read(space->machine,"ctrltype");
+
 	if(ACCESSING_BITS_16_23)
 	{
 		towns_pad_mask = (data & 0x00ff0000) >> 16;
@@ -2094,11 +2094,11 @@ static INPUT_PORTS_START( towns )
     PORT_BIT(0x00000020,IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2) PORT_CATEGORY(21)
     PORT_BIT(0x00000040,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(21)
     PORT_BIT(0x00000080,IP_ACTIVE_HIGH, IPT_UNUSED) PORT_CATEGORY(21)
-    
+
   PORT_START("mouse1")  // buttons
-  	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
+	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Left mouse button") PORT_CODE(MOUSECODE_BUTTON1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_NAME("Right mouse button") PORT_CODE(MOUSECODE_BUTTON2)
-      
+
   PORT_START("mouse2")  // X-axis
 	PORT_BIT( 0xff, 0x00, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
 

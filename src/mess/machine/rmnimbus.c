@@ -163,7 +163,7 @@ static struct _nimbus_drives
     UINT8   reg418;
 
     UINT8   drq_ff;
-    UINT8   int_ff;           
+    UINT8   int_ff;
 } nimbus_drives;
 
 
@@ -197,23 +197,23 @@ UINT8 iou_reg092;
 UINT8 last_playmode;
 
 /* Mouse/Joystick */
- 
-typedef struct 
+
+typedef struct
 {
     UINT8   mouse_px;
     UINT8   mouse_py;
-    
+
     UINT8   mouse_x;
     UINT8   mouse_y;
     UINT8   mouse_pc;
     UINT8   mouse_pcx;
     UINT8   mouse_pcy;
-    
+
     UINT8   intstate_x;
     UINT8   intstate_y;
-    
+
     UINT8   reg0a4;
-    
+
     emu_timer   *mouse_timer;
 } _mouse_joy_state;
 
@@ -505,7 +505,7 @@ static void external_int(running_machine *machine, UINT16 intno, UINT8 vector)
         if(i186.intr.ext[intno] & EXTINT_CTRL_CASCADE)
             i186.intr.ext_vector[intno]=vector;
     }
-    
+
     // Turn on the requested request bit and handle interrupt
     i186.intr.request |= (0x010 << intno);
     update_interrupt_state(machine);
@@ -1334,7 +1334,7 @@ MACHINE_START( nimbus )
 
     keyboard.keyscan_timer=timer_alloc(machine, keyscan_callback, NULL);
     nimbus_mouse.mouse_timer=timer_alloc(machine, mouse_callback, NULL);
-    
+
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -2194,7 +2194,7 @@ static void set_disk_int(running_machine *machine, int state)
     if(iou_reg092 & DISK_INT_ENABLE)
     {
         nimbus_drives.int_ff=state;
-        
+
         if(state)
             external_int(machine,0,EXTERNAL_INT_DISK);
     }
@@ -2673,7 +2673,7 @@ static void sound_reset(running_machine *machine)
 
     last_playmode=MSM5205_S48_4B;
     msm5205_playmode_w(msm5205,last_playmode);
-    
+
     ay8910_a=0;
 }
 
@@ -2709,7 +2709,7 @@ WRITE8_HANDLER( sound_ay8910_porta_w )
     running_device *msm5205 = devtag_get_device(space->machine, MSM5205_TAG);
 
     msm5205_data_w(msm5205, data);
-    
+
     // Mouse code needs a copy of this.
     ay8910_a=data;
 }
@@ -2759,16 +2759,16 @@ static TIMER_CALLBACK(mouse_callback)
 {
     UINT8   x = 0;
     UINT8   y = 0;
-//	int     pc=cpu_get_pc(devtag_get_device(machine,MAINCPU_TAG));
-    
+//  int     pc=cpu_get_pc(devtag_get_device(machine,MAINCPU_TAG));
+
     UINT8   intstate_x;
     UINT8   intstate_y;
     int     xint;
     int     yint;
-    
+
     _mouse_joy_state *state = &nimbus_mouse;
 
-	
+
 	state->reg0a4 = input_port_read(machine, MOUSE_BUTTON_TAG) | 0xC0;
 	x = input_port_read(machine, MOUSEX_TAG);
     y = input_port_read(machine, MOUSEY_TAG);
@@ -2779,7 +2779,7 @@ static TIMER_CALLBACK(mouse_callback)
     UINT8   myb;
 
     //logerror("poll_mouse()\n");
- 
+
 	if (x == state->mouse_x)
 	{
 		state->mouse_px = MOUSE_PHASE_STATIC;
@@ -2813,47 +2813,47 @@ static TIMER_CALLBACK(mouse_callback)
         case MOUSE_PHASE_NEGATIVE   : state->mouse_pcx--; break;
     }
     state->mouse_pcx &= 0x03;
- 
+
     switch (state->mouse_py)
     {
         case MOUSE_PHASE_STATIC     : break;
         case MOUSE_PHASE_POSITIVE   : state->mouse_pcy++; break;
         case MOUSE_PHASE_NEGATIVE   : state->mouse_pcy--; break;
     }
-    state->mouse_pcy &= 0x03; 
+    state->mouse_pcy &= 0x03;
 
-//	mxb = MOUSE_XYB[state->mouse_px][state->mouse_pcx]; // XB
+//  mxb = MOUSE_XYB[state->mouse_px][state->mouse_pcx]; // XB
 //    mxa = MOUSE_XYA[state->mouse_px][state->mouse_pcx]; // XA
-//	mya = MOUSE_XYA[state->mouse_py][state->mouse_pcy]; // YA
-//	myb = MOUSE_XYB[state->mouse_py][state->mouse_pcy]; // YB
-    
+//  mya = MOUSE_XYA[state->mouse_py][state->mouse_pcy]; // YA
+//  myb = MOUSE_XYB[state->mouse_py][state->mouse_pcy]; // YB
+
 	mxb = MOUSE_XYB[1][state->mouse_pcx]; // XB
 	mxa = MOUSE_XYA[1][state->mouse_pcx]; // XA
 	mya = MOUSE_XYA[1][state->mouse_pcy]; // YA
 	myb = MOUSE_XYB[1][state->mouse_pcy]; // YB
- 
+
     if ((state->mouse_py!=MOUSE_PHASE_STATIC) || (state->mouse_px!=MOUSE_PHASE_STATIC))
     {
 //        logerror("state->mouse_px=%02X, state->mouse_py=%02X, state->mouse_pcx=%02X, state->mouse_pcy=%02X\n",
 //              state->mouse_px,state->mouse_py,state->mouse_pcx,state->mouse_pcy);
-    
+
 //        logerror("mxb=%02x, mxa=%02X (mxb ^ mxa)=%02X, (ay8910_a & 0xC0)=%02X, (mxb ^ mxa) ^ ((ay8910_a & 0x80) >> 7)=%02X\n",
 //              mxb,mxa, (mxb ^ mxa) , (ay8910_a & 0xC0), (mxb ^ mxa) ^ ((ay8910_a & 0x40) >> 6));
     }
-    
+
     intstate_x = (mxb ^ mxa) ^ ((ay8910_a & 0x40) >> 6);
     intstate_y = (myb ^ mya) ^ ((ay8910_a & 0x80) >> 7);
-    
+
     if (MOUSE_INT_ENABLED())
     {
         if ((intstate_x==1) && (state->intstate_x==0))
 //        if (intstate_x!=state->intstate_x)
         {
-            
+
             xint=mxa ? EXTERNAL_INT_MOUSE_XR : EXTERNAL_INT_MOUSE_XL;
-                    
+
             external_int(machine,0,xint);
-                
+
 //            logerror("Xint:%02X, mxb=%02X\n",xint,mxb);
         }
 
@@ -2861,29 +2861,29 @@ static TIMER_CALLBACK(mouse_callback)
 //        if (intstate_y!=state->intstate_y)
         {
             yint=myb ? EXTERNAL_INT_MOUSE_YU : EXTERNAL_INT_MOUSE_YD;
-                    
+
             external_int(machine,0,yint);
 //            logerror("Yint:%02X, myb=%02X\n",yint,myb);
-        }        
+        }
     }
     else
-    {    
+    {
         state->reg0a4 &= 0xF0;
         state->reg0a4 |= ( mxb & 0x01) << 3; // XB
         state->reg0a4 |= (!mxb & 0x01) << 2; // XA
         state->reg0a4 |= (!myb & 0x01) << 1; // YA
         state->reg0a4 |= ( myb & 0x01) << 0; // YB
     }
-     
+
     state->mouse_x = x;
     state->mouse_y = y;
-        
+
     if ((state->mouse_py!=MOUSE_PHASE_STATIC) || (state->mouse_px!=MOUSE_PHASE_STATIC))
     {
 //        logerror("pc=%05X, reg0a4=%02X, reg092=%02X, ay_a=%02X, x=%02X, y=%02X, px=%02X, py=%02X, intstate_x=%02X, intstate_y=%02X\n",
 //                 pc,state->reg0a4,iou_reg092,ay8910_a,state->mouse_x,state->mouse_y,state->mouse_px,state->mouse_py,intstate_x,intstate_y);
     }
-    
+
     state->intstate_x=intstate_x;
     state->intstate_y=intstate_y;
 }
@@ -2905,8 +2905,8 @@ READ8_HANDLER( mouse_js_r )
 
     */
     UINT8   result;
-//	int     pc=cpu_get_pc(devtag_get_device(space->machine,MAINCPU_TAG));
-  
+//  int     pc=cpu_get_pc(devtag_get_device(space->machine,MAINCPU_TAG));
+
     _mouse_joy_state *state = &nimbus_mouse;
 
 	if (input_port_read(space->machine, "config") & 0x01)

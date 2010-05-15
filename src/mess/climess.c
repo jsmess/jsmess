@@ -113,7 +113,7 @@ int info_listmedia(core_options *options, const char *gamename)
     info_listsoftware - output the list of
     software supported by a given game or set of
     games
-	TODO: Add all information read from the source files
+    TODO: Add all information read from the source files
     Possible improvement: use a sorted list for
         identifying duplicate lists.
 -------------------------------------------------*/

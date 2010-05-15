@@ -1,39 +1,39 @@
 /***************************************************************************
-   
+
         Dream Multimedia Dreambox 7000/5620/500
 
         20/03/2010 Skeleton driver.
 
-		
-	DM7000 - 	CPU STB04500 at 252 MHz
-				RAM	64MB
-				Flash 8MB
-				1 x DVB-S
-				1 x IDE interface
-				1 x Common Interface (CI)
-				1 x Compact flash
-				2 x Smart card reader
-				1 x USB
-				1 x RS232
-				1 x LAN 100Mbit/s
-				1 x LCD display
-				
-	DM56x0 - 	CPU STB04500 at 252 MHz
-				RAM	64MB
-				Flash 8MB
-				1 x DVB-S
-				2 x Common Interface (CI)
-				1 x Smart card reader
-				1 x LAN 100Mbit/s (just on 5620)
-				1 x LCD display
-				
-	DM500 - 	CPU STBx25xx at 252 MHz
-				RAM	96MB
-				Flash 32MB
-				1 x DVB-S
-				1 x Smart card reader
-				1 x LAN 100Mbit/s 				
-				
+
+    DM7000 -    CPU STB04500 at 252 MHz
+                RAM 64MB
+                Flash 8MB
+                1 x DVB-S
+                1 x IDE interface
+                1 x Common Interface (CI)
+                1 x Compact flash
+                2 x Smart card reader
+                1 x USB
+                1 x RS232
+                1 x LAN 100Mbit/s
+                1 x LCD display
+
+    DM56x0 -    CPU STB04500 at 252 MHz
+                RAM 64MB
+                Flash 8MB
+                1 x DVB-S
+                2 x Common Interface (CI)
+                1 x Smart card reader
+                1 x LAN 100Mbit/s (just on 5620)
+                1 x LCD display
+
+    DM500 -     CPU STBx25xx at 252 MHz
+                RAM 96MB
+                Flash 32MB
+                1 x DVB-S
+                1 x Smart card reader
+                1 x LAN 100Mbit/s
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -58,7 +58,7 @@
  400d 000x   modem
 */
 static ADDRESS_MAP_START( dm7000_mem, ADDRESS_SPACE_PROGRAM, 32 )
-	ADDRESS_MAP_UNMAP_HIGH	
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x01ffffff) AM_RAM	// RAM page 0 - 32MB
 	AM_RANGE(0x20000000, 0x21ffffff) AM_RAM // RAM page 1 - 32MB
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROM AM_REGION("user1",0)
@@ -69,8 +69,8 @@ static INPUT_PORTS_START( dm7000 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dm7000) 
-{	
+static MACHINE_RESET(dm7000)
+{
 }
 
 static VIDEO_START( dm7000 )
@@ -88,7 +88,7 @@ static MACHINE_DRIVER_START( dm7000 )
     MDRV_CPU_PROGRAM_MAP(dm7000_mem)
 
     MDRV_MACHINE_RESET(dm7000)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -124,7 +124,7 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 2003, dm7000,  0,       0, 	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 7000",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 2004, dm5620,  dm7000,  0, 	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 5620",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 2006, dm500,   dm7000,  0, 	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 500",			GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2003, dm7000,  0,       0,	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 7000",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2004, dm5620,  dm7000,  0,	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 5620",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 2006, dm500,   dm7000,  0,	dm7000, 	dm7000, 	 0,   "Dream Multimedia",   "Dreambox 500",			GAME_NOT_WORKING | GAME_NO_SOUND)
 

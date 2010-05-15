@@ -1,31 +1,31 @@
 /***************************************************************************
-   
-	Aamber Pegasus computer (New Zealand)
 
-	http://web.mac.com/lord_philip/aamber_pegasus/Aamber_Pegasus.html
+    Aamber Pegasus computer (New Zealand)
 
-	Each copy of the monitor rom was made for an individual machine.
-	The early bios versions checked that it was running on that
-	particular computer.
+    http://web.mac.com/lord_philip/aamber_pegasus/Aamber_Pegasus.html
 
-	This computer has no sound.
+    Each copy of the monitor rom was made for an individual machine.
+    The early bios versions checked that it was running on that
+    particular computer.
 
-	The usual way of loading a new rom was to plug it into the board.
-	We have replaced this with cartslots, to save having to recompile
-	whenever a new rom is found. Single rom programs will usually work in
-	any slot (if it is going to work at all). A working rom will appear
-	in the menu. Press the first letter to run it.
+    This computer has no sound.
 
-	If a machine language program is loaded via cassette, do it in the
-	Monitor (L command), when loaded press Enter, and it will be in the
-	menu.
+    The usual way of loading a new rom was to plug it into the board.
+    We have replaced this with cartslots, to save having to recompile
+    whenever a new rom is found. Single rom programs will usually work in
+    any slot (if it is going to work at all). A working rom will appear
+    in the menu. Press the first letter to run it.
 
-	Basic cassettes are loaded in the usual way, that is, start Basic,
-	type LOAD, press Enter. When done, RUN or LIST as needed.
+    If a machine language program is loaded via cassette, do it in the
+    Monitor (L command), when loaded press Enter, and it will be in the
+    menu.
 
-	TO DO:
-	- Identify which rom slots the multi-rom programs should be fitted to.
-	- Work on the other non-working programs
+    Basic cassettes are loaded in the usual way, that is, start Basic,
+    type LOAD, press Enter. When done, RUN or LIST as needed.
+
+    TO DO:
+    - Identify which rom slots the multi-rom programs should be fitted to.
+    - Work on the other non-working programs
 
 ****************************************************************************/
 
@@ -72,11 +72,11 @@ static WRITE8_DEVICE_HANDLER( pegasus_keyboard_w )
 
 static WRITE8_DEVICE_HANDLER( pegasus_controls )
 {
-/*	d0,d2 - not emulated
-	d0 - Blank - Video blanking
-	d1 - Char - select character rom or ram
-	d2 - Page - enables writing to video ram
-	d3 - Asc - Select which half of the keyboard to read
+/*  d0,d2 - not emulated
+    d0 - Blank - Video blanking
+    d1 - Char - select character rom or ram
+    d2 - Page - enables writing to video ram
+    d3 - Asc - Select which half of the keyboard to read
 */
 
 	pegasus_control_bits = data;
@@ -105,7 +105,7 @@ static READ8_HANDLER( pegasus_pcg_r )
 
 static WRITE8_HANDLER( pegasus_pcg_w )
 {
-//	if (pegasus_control_bits & 2)
+//  if (pegasus_control_bits & 2)
 	{
 		UINT8 code = pegasus_video_ram[offset] & 0x7f;
 		FNT[(code << 4) | (~pegasus_kbd_row & 15)] = data;
@@ -271,7 +271,7 @@ static const cassette_config pegasus_cassette_config =
 };
 
 /* An encrypted single rom starts with 02, decrypted with 20. Not sure what
-	multipart roms will have. */
+    multipart roms will have. */
 static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
 {
 	UINT8 b, *ROM = memory_region(machine, "maincpu");
@@ -424,6 +424,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1981, pegasus,  0,     0,      pegasus, 	pegasus, pegasus, "Technosys",   "Aamber Pegasus", GAME_NO_SOUND_HW )
-COMP( 1981, pegasusm, pegasus, 0,    pegasusm, 	pegasus, pegasus, "Technosys",   "Aamber Pegasus with RAM expansion unit", GAME_NO_SOUND_HW )
+COMP( 1981, pegasus,  0,     0,      pegasus,	pegasus, pegasus, "Technosys",   "Aamber Pegasus", GAME_NO_SOUND_HW )
+COMP( 1981, pegasusm, pegasus, 0,    pegasusm,	pegasus, pegasus, "Technosys",   "Aamber Pegasus with RAM expansion unit", GAME_NO_SOUND_HW )
 

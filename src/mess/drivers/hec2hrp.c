@@ -7,13 +7,13 @@
         Hector MX40c
         Hector MX80c
 
-	These machines can load and run cassettes for the interact / hector1.
-	hec2hr - press 2 then 1
-	hec2hrp - press 2 then 1
-	hec2hrx - press 5 then 1
-	hec2mx40 - press 5 then 1
-	hec2mx80 - not compatible
-	victor - press R then L
+    These machines can load and run cassettes for the interact / hector1.
+    hec2hr - press 2 then 1
+    hec2hrp - press 2 then 1
+    hec2hrx - press 5 then 1
+    hec2mx40 - press 5 then 1
+    hec2mx80 - not compatible
+    victor - press R then L
 
         12/05/2009 Skeleton driver - Micko
 

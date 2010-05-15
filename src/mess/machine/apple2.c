@@ -187,7 +187,7 @@ void apple2_update_memory(running_machine *machine)
 				{
 					rh = apple2_c1xx_r;
 				}
-				else if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0x300) 
+				else if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0x300)
 				{	// slots 4-7
 					rh = apple2_c4xx_r;
 				}
@@ -271,7 +271,7 @@ void apple2_update_memory(running_machine *machine)
 				{
 					wh = apple2_c1xx_w;
 				}
-				else if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0x300) 
+				else if ((meminfo.write_mem & APPLE2_MEM_MASK) == 0x300)
 				{	// slots 4-7
 					wh = apple2_c4xx_w;
 				}

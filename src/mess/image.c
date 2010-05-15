@@ -414,7 +414,7 @@ static void get_device_instance_name(const machine_config *config, const device_
 					if (that_device->get_config_int(DEVINFO_INT_IMAGE_TYPE) == type)
 						count++;
 				}
-   	     }
+	     }
 
 			/* need to number if there is more than one device */
 			if (count > 1)

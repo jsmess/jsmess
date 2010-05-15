@@ -4,7 +4,7 @@
 
         10/12/2009 Skeleton driver.
 
-		http://www.swtpc.com/mholley/swtpc_6800.htm
+        http://www.swtpc.com/mholley/swtpc_6800.htm
 
 ****************************************************************************/
 

@@ -461,7 +461,7 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 	UINT32 size;
 	UINT8 *temp_copy;
 	int mirror, i;
-	
+
 	if (image_software_entry(image) == NULL)
 	{
 		size = image_length(image);
@@ -473,7 +473,7 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 			auto_free(image->machine, temp_copy);
 			return INIT_FAIL;
 		}
-		
+
 		if (image_fread(image, temp_copy, size) != size)
 		{
 			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");

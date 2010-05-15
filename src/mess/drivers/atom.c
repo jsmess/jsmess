@@ -54,23 +54,23 @@ Hardware:   PPIA 8255
     The atom driver in MESS uses the original memory area.
 
 
-	http://www.xs4all.nl/~fjkraan/comp/atom/index.html
+    http://www.xs4all.nl/~fjkraan/comp/atom/index.html
 
 ***************************************************************************/
 
 /*
 
-	TODO:
+    TODO:
 
-	- ERROR repeats ad infinitum
-	- display should be monochrome
-	- ram expansion
-	- tap files
-	- mouse
-	- move eprom box roms to software list
-	- color card
-	- CP/M card
-	- speech synthesis card (SPO256 connected to VIA)
+    - ERROR repeats ad infinitum
+    - display should be monochrome
+    - ram expansion
+    - tap files
+    - mouse
+    - move eprom box roms to software list
+    - color card
+    - CP/M card
+    - speech synthesis card (SPO256 connected to VIA)
 
 */
 
@@ -327,18 +327,18 @@ static WRITE8_DEVICE_HANDLER( ppi_pa_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		keyboard column 0
-		1		keyboard column 1
-		2		keyboard column 2
-		3		keyboard column 3
-		4		MC6847 A/G
-		5		MC6847 GM0
-		6		MC6847 GM1
-		7		MC6847 GM2
+        0       keyboard column 0
+        1       keyboard column 1
+        2       keyboard column 2
+        3       keyboard column 3
+        4       MC6847 A/G
+        5       MC6847 GM0
+        6       MC6847 GM1
+        7       MC6847 GM2
 
-	*/
+    */
 
 	atom_state *state = (atom_state *)device->machine->driver_data;
 
@@ -356,18 +356,18 @@ static READ8_DEVICE_HANDLER( ppi_pb_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		keyboard row 0
-		1		keyboard row 1
-		2		keyboard row 2
-		3		keyboard row 3
-		4		keyboard row 4
-		5		keyboard row 5
-		6		keyboard CTRL
-		7		keyboard SFT
+        0       keyboard row 0
+        1       keyboard row 1
+        2       keyboard row 2
+        3       keyboard row 3
+        4       keyboard row 4
+        5       keyboard row 5
+        6       keyboard CTRL
+        7       keyboard SFT
 
-	*/
+    */
 
 	atom_state *state = (atom_state *)device->machine->driver_data;
 	UINT8 data = 0xff;
@@ -395,18 +395,18 @@ static READ8_DEVICE_HANDLER( ppi_pc_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		O/P 1, cassette output 0
-		1		O/P 2, cassette output 1
-		2		O/P 3, speaker output
-		3		O/P 4, MC6847 CSS
-		4		2400 Hz input
-		5		cassette input
-		6		keyboard RPT
-		7		MC6847 FS
+        0       O/P 1, cassette output 0
+        1       O/P 2, cassette output 1
+        2       O/P 3, speaker output
+        3       O/P 4, MC6847 CSS
+        4       2400 Hz input
+        5       cassette input
+        6       keyboard RPT
+        7       MC6847 FS
 
-	*/
+    */
 
 	atom_state *state = (atom_state *)device->machine->driver_data;
 
@@ -431,18 +431,18 @@ static WRITE8_DEVICE_HANDLER( ppi_pc_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		O/P 1, cassette output 0
-		1		O/P 2, cassette output 1
-		2		O/P 3, speaker output
-		3		O/P 4, MC6847 CSS
-		4		2400 Hz input
-		5		cassette input
-		6		keyboard RPT
-		7		MC6847 FS
+        0       O/P 1, cassette output 0
+        1       O/P 2, cassette output 1
+        2       O/P 3, speaker output
+        3       O/P 4, MC6847 CSS
+        4       2400 Hz input
+        5       cassette input
+        6       keyboard RPT
+        7       MC6847 FS
 
-	*/
+    */
 
 	atom_state *state = (atom_state *)device->machine->driver_data;
 
@@ -798,7 +798,7 @@ ROM_START( atomeb )
 	ROM_CONTINUE(			 0x3000, 0x1000 )
 	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
-	
+
 	ROM_REGION( 0x10000, "a000", 0 )
 	ROM_CART_LOAD( "rom0", 0x0000, 0x1000, ROM_MIRROR )
 	ROM_CART_LOAD( "rom1", 0x1000, 0x1000, ROM_MIRROR )

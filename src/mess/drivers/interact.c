@@ -3,7 +3,7 @@
         Interact Family Computer
 
         12/05/2009 Skeleton driver - Micko
-	31/05/2009 Added notes - Robbbert
+    31/05/2009 Added notes - Robbbert
 
     This was made by Interact Company of Ann Arbor, Michigan. However,
     just after launch, the company collapsed. The liquidator, Protecto,

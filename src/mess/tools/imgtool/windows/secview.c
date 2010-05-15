@@ -257,7 +257,7 @@ static void change_sector(HWND dialog)
 		err = read_sector_data(dialog, new_track, new_head, new_sector);
 		// TODO: this causes a stack overflow
 		//if (err)
-		//	set_sector_text(dialog);
+		//  set_sector_text(dialog);
 	}
 }
 

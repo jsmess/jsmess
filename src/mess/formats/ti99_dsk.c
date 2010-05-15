@@ -84,9 +84,9 @@
 #define TI99_IDAM_LENGTH 7
 
 /*
-	Determines whether we are using 80 track drives. This variable is 
-	necessary unless we get information about the dip
-	switch settings. It is set from 99_dsk.c, currenly the only client.
+    Determines whether we are using 80 track drives. This variable is
+    necessary unless we get information about the dip
+    switch settings. It is set from 99_dsk.c, currenly the only client.
 */
 static int use_80_track_drives = FALSE;
 
@@ -110,11 +110,11 @@ struct ti99dsk_tag
 };
 
 /*
-	Parametrizes the format to use 80 track drives. For TI systems we 
-	need to be able to emulate 40 track drives and 80 track drives.
-	This is set in the configuration, but the format has no direct access.
-	So as a preliminary solution we use this global function which sets the
-	flag. This function is called by the controllers defined in 99_dsk.
+    Parametrizes the format to use 80 track drives. For TI systems we
+    need to be able to emulate 40 track drives and 80 track drives.
+    This is set in the configuration, but the format has no direct access.
+    So as a preliminary solution we use this global function which sets the
+    flag. This function is called by the controllers defined in 99_dsk.
 */
 void ti99_set_80_track_drives(int use80)
 {
@@ -645,12 +645,12 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 	int imgtrack = track;
 
 	/* Find out if we are going to write an FM or MFM track. Caution: The
-	original TI controller is known to have a bug in the formatting
-	routine (using a MOVB instead of a MOV instruction when setting the
-	pointer to the track data), outputting false bytes at the
-	beginning of the track. So we don't rely on absolute positions
-	(neither does the controller).
-	*/
+    original TI controller is known to have a bug in the formatting
+    routine (using a MOVB instead of a MOV instruction when setting the
+    pointer to the track data), outputting false bytes at the
+    beginning of the track. So we don't rely on absolute positions
+    (neither does the controller).
+    */
 	track_image = (UINT8*)buffer;
 
 	if (use_80_track_drives && tag->tracks<=40)
@@ -663,11 +663,11 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 	gap1 = 10;
 	gap2 = 12;
 	is_fm = FALSE;
-	
+
 	current_pos = find_block(track_image, 0, 100, 0x4e, leadin);
-	
+
 	/* In case of defect formats, we continue as far as possible. This
-	may lead to sectors not being written. */
+    may lead to sectors not being written. */
 	if (current_pos==TI99DSK_BLOCKNOTFOUND)
 	{
 		/* Not MFM, possibly FM image */
@@ -740,7 +740,7 @@ static floperr_t ti99_sdf_write_track(floppy_image *floppy, int head, int track,
 			else
 			{
 				/* else the sector head data do not match the
-				current track and head. Ignore the sector. */
+                current track and head. Ignore the sector. */
 				logerror("Wrong track: wtrack=%d, imgtrack=%d, whead=%d, imghead=%d\n",wtrack,imgtrack, whead,head);
 			}
 		}
@@ -1273,11 +1273,11 @@ static floperr_t ti99_tdf_read_track_internal(floppy_image *floppy, int head, in
 	floppy_image_read(floppy, buffer, track_offset, buflen);
 
 	/* Rebuild the CRCs. PC99 did not store the CRC but put
-	F7F7 in its place.
-	The first CRC is at position IDAM + 5
-	The second CRC is at position IDAM + 0x119 (FM) or +0x12d (MFM)
-	All this is repeated for each sector in the track
-	*/
+    F7F7 in its place.
+    The first CRC is at position IDAM + 5
+    The second CRC is at position IDAM + 0x119 (FM) or +0x12d (MFM)
+    All this is repeated for each sector in the track
+    */
 	if (determine_offset(tag->format, track_data, &first_idam)==FLOPPY_ERROR_SEEKERROR)
 		return FLOPPY_ERROR_SEEKERROR;
 
@@ -1288,8 +1288,8 @@ static floperr_t ti99_tdf_read_track_internal(floppy_image *floppy, int head, in
 		if (byte == TI99_IDAM)
 		{
 			/* Do we have a valid CRCs already? Then this image
-			already contains proper CRCs handling. Do not
-			recreate them. */
+            already contains proper CRCs handling. Do not
+            recreate them. */
 			if (track_data[i+5] != 0xf7 || track_data[i+6] != 0xf7)
 				return FLOPPY_ERROR_SUCCESS;
 
@@ -1348,8 +1348,8 @@ static floperr_t ti99_tdf_write_track(floppy_image *floppy, int head, int track,
 		return err;
 
 	/* According to the TDF format, we don't need the CRC but replace it
-	with F7F7. For now we keep it and see whether PC99 can cope with
-	that. (Otherwise we would have to copy the const buffer). */
+    with F7F7. For now we keep it and see whether PC99 can cope with
+    that. (Otherwise we would have to copy the const buffer). */
 	floppy_image_write(floppy, buffer, offset + track_offset, buflen);
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -1370,15 +1370,15 @@ static floperr_t ti99_tdf_format_track(floppy_image *floppy, int head, int track
 */
 
 /*
-	Get a sector from a track. This function takes a complete track,
-	searches for the sector, and passes a pointer to the sector contents
-	back.
-	As the original TI controller creates bad bytes at the start of a track
-	we do *not* assume a simple layout. The strategy is to search the
-	lead-in of the track, and from this offset, step through the track
-	in search for the sector. Since we do not have index marks (we cannot
-	distinguish them from ordinary data, as we do not store the clock), we
-	do not attempt to detect IDAM or DAM.
+    Get a sector from a track. This function takes a complete track,
+    searches for the sector, and passes a pointer to the sector contents
+    back.
+    As the original TI controller creates bad bytes at the start of a track
+    we do *not* assume a simple layout. The strategy is to search the
+    lead-in of the track, and from this offset, step through the track
+    in search for the sector. Since we do not have index marks (we cannot
+    distinguish them from ordinary data, as we do not store the clock), we
+    do not attempt to detect IDAM or DAM.
 */
 static floperr_t ti99_tdf_seek_sector_in_track(floppy_image *floppy, int head, int track, int sector, UINT8 *track_data, UINT8 **sector_data)
 {
@@ -1457,9 +1457,9 @@ static floperr_t ti99_tdf_read_sector(floppy_image *floppy, int head, int track,
 }
 
 /*
-	Writes a sector into the track. Note that the indexed_write method
-	may be used instead of this method, according to the implementation
-	of flopimg/flopdrv.
+    Writes a sector into the track. Note that the indexed_write method
+    may be used instead of this method, according to the implementation
+    of flopimg/flopdrv.
 */
 static floperr_t ti99_tdf_write_sector(floppy_image *floppy, int head, int track, int sector, const void *buffer, size_t buflen, int ddam)
 {
@@ -1709,9 +1709,9 @@ static floperr_t ti99_tdf_find_indexed_sector(floppy_image *floppy, int head, in
 }
 
 /*
-	Required for ReadAddress command. This function gets the 1st, 2nd, 3rd,
-	sector (and so on) from the track, not sector 1, 2, 3. That is, the
-	returned sector info depends on the interleave and the start sector.
+    Required for ReadAddress command. This function gets the 1st, 2nd, 3rd,
+    sector (and so on) from the track, not sector 1, 2, 3. That is, the
+    returned sector info depends on the interleave and the start sector.
 */
 static floperr_t ti99_tdf_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
 {

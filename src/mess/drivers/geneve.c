@@ -266,13 +266,13 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
 		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
 		PORT_CONFSETTING(    0x03, "Myarc HFDC" )
-//		PORT_CONFSETTING(    0x04, "Corcomp" )
+//      PORT_CONFSETTING(    0x04, "Corcomp" )
 
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
-//		PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
+//      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x08, DEF_STR( On ) )
@@ -288,12 +288,12 @@ static INPUT_PORTS_START(geneve)
 		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
 		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
 		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
-		
+
 	PORT_START( "DRVSPD" )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
 		PORT_DIPSETTING( 0x00, "No delay")
 		PORT_DIPSETTING( 0x01, "Realistic")
-			
+
 	PORT_START("JOY")	/* col 1: "wired handset 1" (= joystick 1) */
 		PORT_BIT(0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_UP/*, "(1UP)", CODE_NONE, OSD_JOY_UP*/) PORT_PLAYER(1)
 		PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN/*, "(1DOWN)", CODE_NONE, OSD_JOY_DOWN, 0*/) PORT_PLAYER(1)

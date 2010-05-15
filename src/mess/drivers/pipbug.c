@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         pipbug
 
         08/04/2010 Skeleton driver.
@@ -12,11 +12,11 @@
 static ADDRESS_MAP_START(pipbug_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x03ff) AM_ROM
-	AM_RANGE( 0x0400, 0x7fff) AM_RAM	
+	AM_RANGE( 0x0400, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pipbug_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH	
+	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -24,8 +24,8 @@ static INPUT_PORTS_START( pipbug )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pipbug) 
-{	
+static MACHINE_RESET(pipbug)
+{
 }
 
 static VIDEO_START( pipbug )
@@ -41,10 +41,10 @@ static MACHINE_DRIVER_START( pipbug )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(pipbug_mem)
-    MDRV_CPU_IO_MAP(pipbug_io)	
+    MDRV_CPU_IO_MAP(pipbug_io)
 
     MDRV_MACHINE_RESET(pipbug)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -68,5 +68,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1979, pipbug,  0,       0, 	pipbug, 	pipbug, 	 0,  "<unknown>",   "PIPBUG",		GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1979, pipbug,  0,       0,	pipbug, 	pipbug, 	 0,  "<unknown>",   "PIPBUG",		GAME_NOT_WORKING | GAME_NO_SOUND )
 

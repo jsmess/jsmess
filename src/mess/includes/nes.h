@@ -111,7 +111,7 @@ public:
 	UINT8      battery_data[NES_BATTERY_SIZE];
 
 	/***** Mapper-related variables *****/
-	
+
 	// common ones
 	int        IRQ_enable, IRQ_enable_latch;
 	UINT16     IRQ_count, IRQ_count_latch;
@@ -120,22 +120,22 @@ public:
 	UINT8      IRQ_status;
 	UINT8      IRQ_mode;
 	int        mult1, mult2;
-	
+
 	UINT8 mmc_chr_source;			// This is set at init to CHRROM or CHRRAM. a few mappers can swap between
 									// the two (this is done in the specific handlers).
-	
+
 	UINT8 mmc_cmd1, mmc_cmd2;		// These represent registers where the mapper writes important values
 	UINT8 mmc_count;				// This is used as counter in mappers like 1 and 45
-	
+
 	int mmc_prg_base, mmc_prg_mask;	// MMC3 based multigame carts select a block of banks by using these (and then act like normal MMC3),
 	int mmc_chr_base, mmc_chr_mask;	// while MMC3 and clones (mapper 118 & 119) simply set them as 0 and 0xff resp.
-	
+
 	UINT8 prg_bank[4];				// Many mappers writes only some bits of the selected bank (for both PRG and CHR),
 	UINT8 vrom_bank[16];			// hence these are handy to latch bank values.
 
 	UINT8 extra_bank[16];			// some MMC3 clone have 2 series of PRG/CHR banks...
 									// we collect them all here: first 4 elements PRG banks, then 6/8 CHR banks
-	
+
 	/***** NES-cart related *****/
 
 	/* load-time cart variables which remain constant */
@@ -143,9 +143,9 @@ public:
 	UINT8 battery;
 	UINT16 prg_chunks;	// a recently dumped multigame cart has 256 chunks of both PRG & CHR!
 	UINT16 chr_chunks;
-	
+
 	UINT8 format;	// 1 = iNES, 2 = UNIF
-	
+
 	/* system variables which don't change at run-time */
 	UINT16 mapper;		// for iNES
 	const char *board;	// for UNIF
@@ -153,14 +153,14 @@ public:
 	UINT8 hard_mirroring;
 	UINT8 slow_banking;
 	UINT8 crc_hack;	// this is needed to detect different boards sharing the same Mappers (shame on .nes format)
-	
-	
+
+
 	/***** FDS-floppy related *****/
 
 	UINT8   *fds_data;
 	UINT8   fds_sides;
 	UINT8   *fds_ram;
-	
+
 	/* Variables which can change */
 	UINT8   fds_motor_on;
 	UINT8   fds_door_closed;

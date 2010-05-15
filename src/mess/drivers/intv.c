@@ -178,9 +178,9 @@ static INPUT_PORTS_START( intv )
 
 	PORT_START("IN3") /* Left Player Controller Starts Here */
 
-	PORT_START("IN4") 
+	PORT_START("IN4")
 
-	PORT_START("IN5") 
+	PORT_START("IN5")
 INPUT_PORTS_END
 
 /*

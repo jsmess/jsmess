@@ -4,32 +4,32 @@
 
     12/05/2009 Skeleton driver.
 
-	The system contains 4 S100 boards, 2 8" floppies, enormous power supply, 
-	1/4" thick mother board, 4 RS232 I/F boards, and an Australian made 
-	"Computer Patch Board". 
-	The S100 boards that make up the unit are: 
-			CPU board - Model CPC2810 Rev D 
-					The board has a Z80A CPU, CTC, PIO, DART and SIO. 
-					U16 (24 pin) is missing (boot EPROM?). 
-					It has a lot of jumpers and an 8 way DIP switch. 
-			Memory board - Model HDM2800 Rev B 
-					This contains 18 4164's and a lot of logic. 
-					Again, a lot of jumpers, and several banks of links. 
-					Also contains 2 Motorola chips I cannot identify, 
-					MC3480P (24 pin) and MC3242AP (28 pin). 
-					(I have searched the Motorola site and the Chip 
-					 Directory; nothing even close.) 
-			Disk Controller board - Model FDC2800 Rev D 
-					This board is damaged. The small voltage regulators 
-					for +/- 12V have been fried. 
-					Also, 3 sockets are empty - U1 and U38 (16 pin) 
-					appear to be spares, and U10 (14 pin). 
-			8 port Serial I/O board - Model INO2808 Rev C 
-					Room for 8 8251 USART's. 
-					I have traced out this board and managed to get it 
-					working in another S100 system. 
-	The "Computer Patch Board" seems to provide some sort of watch dog 
-	facility.
+    The system contains 4 S100 boards, 2 8" floppies, enormous power supply,
+    1/4" thick mother board, 4 RS232 I/F boards, and an Australian made
+    "Computer Patch Board".
+    The S100 boards that make up the unit are:
+            CPU board - Model CPC2810 Rev D
+                    The board has a Z80A CPU, CTC, PIO, DART and SIO.
+                    U16 (24 pin) is missing (boot EPROM?).
+                    It has a lot of jumpers and an 8 way DIP switch.
+            Memory board - Model HDM2800 Rev B
+                    This contains 18 4164's and a lot of logic.
+                    Again, a lot of jumpers, and several banks of links.
+                    Also contains 2 Motorola chips I cannot identify,
+                    MC3480P (24 pin) and MC3242AP (28 pin).
+                    (I have searched the Motorola site and the Chip
+                     Directory; nothing even close.)
+            Disk Controller board - Model FDC2800 Rev D
+                    This board is damaged. The small voltage regulators
+                    for +/- 12V have been fried.
+                    Also, 3 sockets are empty - U1 and U38 (16 pin)
+                    appear to be spares, and U10 (14 pin).
+            8 port Serial I/O board - Model INO2808 Rev C
+                    Room for 8 8251 USART's.
+                    I have traced out this board and managed to get it
+                    working in another S100 system.
+    The "Computer Patch Board" seems to provide some sort of watch dog
+    facility.
 
 ****************************************************************************/
 

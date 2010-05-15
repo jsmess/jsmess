@@ -210,7 +210,7 @@ static int mapper_warning;
 
 WRITE8_HANDLER( nes_chr_w )
 {
-	nes_state *state = (nes_state *)space->machine->driver_data;	
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	int bank = offset >> 10;
 
 	if (state->chr_map[bank].source == CHRRAM)
@@ -287,7 +287,7 @@ READ8_HANDLER( nes_low_mapper_r )
 WRITE8_HANDLER( nes_mid_mapper_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	
+
 	if (state->mmc_write_mid)
 		(*state->mmc_write_mid)(space, offset, data);
 	else if (state->mid_ram_enable)

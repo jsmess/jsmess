@@ -62,8 +62,8 @@ static ADDRESS_MAP_START(m20_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE( 0x40000, 0x41fff ) AM_ROM AM_REGION("maincpu",0x10000) //mirror
 
 	AM_RANGE( 0x30000, 0x33fff ) AM_RAM AM_BASE(&m20_vram)//base vram
-//	AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for bitmap mode
-//	AM_RANGE( 0x20000, 0x2???? ) //work RAM?
+//  AM_RANGE( 0x34000, 0x37fff ) AM_RAM //extra vram for bitmap mode
+//  AM_RANGE( 0x20000, 0x2???? ) //work RAM?
 //
 ADDRESS_MAP_END
 

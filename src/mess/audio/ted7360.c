@@ -512,7 +512,7 @@ INLINE const ted7360_interface *get_interface( running_device *device )
 	assert(device != NULL);
 	assert(device->type == SOUND);
 	assert(sound_get_type(device) == TED7360);
-	
+
 	return (const ted7360_interface *) device->baseconfig().static_config;
 }
 
@@ -1286,12 +1286,12 @@ static STREAM_UPDATE( ted7360_update )
 
 		if (TONE1_ON)
 		{
-			if (ted7360->tone1pos <= ted7360->tone1samples / 2 || !TONE_ON) 
+			if (ted7360->tone1pos <= ted7360->tone1samples / 2 || !TONE_ON)
 				v += 0x2ff; // depends on the volume between sound and noise
 
 			ted7360->tone1pos++;
 
-			if (ted7360->tone1pos > ted7360->tone1samples) 
+			if (ted7360->tone1pos > ted7360->tone1samples)
 				ted7360->tone1pos = 0;
 		}
 
@@ -1299,12 +1299,12 @@ static STREAM_UPDATE( ted7360_update )
 		{
 			if (TONE2_ON)
 			{						   /*higher priority ?! */
-				if (ted7360->tone2pos <= ted7360->tone2samples / 2 || !TONE_ON) 
+				if (ted7360->tone2pos <= ted7360->tone2samples / 2 || !TONE_ON)
 					v += 0x2ff;
 
 				ted7360->tone2pos++;
 
-				if (ted7360->tone2pos > ted7360->tone2samples) 
+				if (ted7360->tone2pos > ted7360->tone2samples)
 					ted7360->tone2pos = 0;
 			}
 			else

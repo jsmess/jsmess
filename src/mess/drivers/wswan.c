@@ -112,10 +112,10 @@ static PALETTE_INIT( wswan )
 	}
 }
 
-static PALETTE_INIT( wscolor ) 
+static PALETTE_INIT( wscolor )
 {
 	int i;
-	for (i = 0; i < 4096; i++) 
+	for (i = 0; i < 4096; i++)
 	{
 		int r = (i & 0x0f00) >> 8;
 		int g = (i & 0x00f0) >> 4;

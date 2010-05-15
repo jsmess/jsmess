@@ -115,14 +115,14 @@ static TIMER_CALLBACK( t6721_speech_timer )
 {
 	t6721_state *t6721 = (t6721_state *)ptr;
 
-	if (!t6721->playing) 
+	if (!t6721->playing)
 		return;
 
-	if (t6721->sample_timeindex < 8000 / 50) 
+	if (t6721->sample_timeindex < 8000 / 50)
 	{
 		t6721->sample_timeindex++;
-	} 
-	else 
+	}
+	else
 	{
 		t6721->end_of_sample = (memcmp(t6721->sample_data, "\xff\xff\xff\xff\xff\xff", 6) == 0);
 
@@ -137,15 +137,15 @@ WRITE8_DEVICE_HANDLER( t6721_speech_w )
 
 	DBG_LOG(2, "364", ("port write %.2x %.2x\n", offset, data));
 
-	switch (offset) 
+	switch (offset)
 	{
 	case 0:
-		if (data & 0x80) 
+		if (data & 0x80)
 		{
-			switch (t6721->command_state) 
+			switch (t6721->command_state)
 			{
 			case 0:
-				switch (t6721->command_data) 
+				switch (t6721->command_data)
 				{
 				case 9: case 0xb:
 					t6721->playing = 0;
@@ -178,8 +178,8 @@ WRITE8_DEVICE_HANDLER( t6721_speech_w )
 				t6721->command_state = 0;
 				break;
 			}
-		} 
-		else 
+		}
+		else
 		{
 			t6721->command_data = data;
 		}
@@ -212,15 +212,15 @@ READ8_DEVICE_HANDLER( t6721_speech_r )
 	t6721_state *t6721 = get_safe_token(device);
 
 	int data = 0xff;
-	switch (offset) 
+	switch (offset)
 	{
 	case 1:
 		data = t6721->state;
 		data = 1;
-		if (!t6721->end_of_sample) 
+		if (!t6721->end_of_sample)
 		{
 				data |= 0x41;
-				if (!t6721->busy) 
+				if (!t6721->busy)
 					data |= 0x81;
 		}
 		break;

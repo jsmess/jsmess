@@ -8,33 +8,33 @@
 
 /*
 
-	http://beebwiki.jonripley.com/Acorn_cassette_format#Atom
+    http://beebwiki.jonripley.com/Acorn_cassette_format#Atom
 
-	The Atom supports the System series format (as a 'nameless file') and its own format. The data consists of files separated 
-	by carrier breaks and the appropriate leaders and trailers, and further subdivided into blocks separated by inter-block gaps. 
-	An Atom block consists of the following sequence of bytes:
+    The Atom supports the System series format (as a 'nameless file') and its own format. The data consists of files separated
+    by carrier breaks and the appropriate leaders and trailers, and further subdivided into blocks separated by inter-block gaps.
+    An Atom block consists of the following sequence of bytes:
 
-		Four synchronisation bytes (&2A).
-		File name (one to thirteen characters).
-		One end of file name marker byte (&0D).
-		Block flag, one byte.
-		Block number, two bytes, high byte first.
-		Data block length ? 1, one byte.
-		Execution address, two bytes, high byte first.
-		Load address, two bytes, high byte first.
-		Data, 0 to 256 bytes.
-		Checksum, one byte.
+        Four synchronisation bytes (&2A).
+        File name (one to thirteen characters).
+        One end of file name marker byte (&0D).
+        Block flag, one byte.
+        Block number, two bytes, high byte first.
+        Data block length ? 1, one byte.
+        Execution address, two bytes, high byte first.
+        Load address, two bytes, high byte first.
+        Data, 0 to 256 bytes.
+        Checksum, one byte.
 
-	The block flag is set as follows:
+    The block flag is set as follows:
 
-		Bit 7 is set if this block is not the last block of a file.
-		Bit 6 is set if the block contains data. If clear then the 'data block length' field is invalid.
-		Bit 5 is set if this block is not the first block of a file.
-		Bits 4 to 0 are undefined. Normally their contents are:
-		in the first block, bits 15 to 11 of the end address (=1 + the last address saved in the file);
-		in subsequent blocks, bits 6 to 2 of the previous block flag.
-	
-	The checksum is a simple sum (modulo 256) of all bytes from the start of the filename to the end of the data.
+        Bit 7 is set if this block is not the last block of a file.
+        Bit 6 is set if the block contains data. If clear then the 'data block length' field is invalid.
+        Bit 5 is set if this block is not the first block of a file.
+        Bits 4 to 0 are undefined. Normally their contents are:
+        in the first block, bits 15 to 11 of the end address (=1 + the last address saved in the file);
+        in subsequent blocks, bits 6 to 2 of the previous block flag.
+
+    The checksum is a simple sum (modulo 256) of all bytes from the start of the filename to the end of the data.
 
 */
 
@@ -128,7 +128,7 @@ static casserr_t atom_tap_load(cassette_image *cassette)
     CassetteFormat atom_tap_cassette_format
 -------------------------------------------------*/
 
-const struct CassetteFormat atom_tap_format = 
+const struct CassetteFormat atom_tap_format =
 {
 	"tap",
 	atom_tap_identify,

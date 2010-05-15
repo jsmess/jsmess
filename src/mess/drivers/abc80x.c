@@ -936,7 +936,7 @@ static ABCBUS_DAISY( abcbus_daisy )
 
 static ABCBUS_DAISY( abc802_abcbus_daisy )
 {
-//	{ LUXOR_55_21046_ABCBUS("abc830") }, won't boot with this enabled
+//  { LUXOR_55_21046_ABCBUS("abc830") }, won't boot with this enabled
 	{ NULL }
 };
 

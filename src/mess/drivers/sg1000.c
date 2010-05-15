@@ -824,7 +824,7 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
 	UINT32 size;
 	UINT8 *ptr = memory_region(image->machine, Z80_TAG);
-	
+
 	if (image_software_entry(image) == NULL)
 	{
 		size = image_length(image);

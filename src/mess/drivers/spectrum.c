@@ -182,62 +182,62 @@ Mass storage controllers
 ------------------------
 
 ZX Interface 1
-	up to 8 Microdrives
-	1 RS-232 port
-	2 ZX Network ports - http://scratchpad.wikia.com/wiki/ZX_Net
+    up to 8 Microdrives
+    1 RS-232 port
+    2 ZX Network ports - http://scratchpad.wikia.com/wiki/ZX_Net
 
 Opus Discovery
-	up to 2 Disk drives
-	1 Centronics port
-	1 Joystick port (Kempston)
+    up to 2 Disk drives
+    1 Centronics port
+    1 Joystick port (Kempston)
 
 DISCiPLE Interface
-	up to 2 Disk drives
-	1 Centronics port
-	2 Joystick ports (RH: Sinclair/Kempston, LH: Sinclair)
-	2 ZX Network ports
+    up to 2 Disk drives
+    1 Centronics port
+    2 Joystick ports (RH: Sinclair/Kempston, LH: Sinclair)
+    2 ZX Network ports
 
 Plus D Interface
-	up to 2 Disk drives
-	1 Centronics port
+    up to 2 Disk drives
+    1 Centronics port
 
 Rotronics Wafadrive
-	2 "Stringy" drives
-	1 RS-232 port
-	1 Centronics port
+    2 "Stringy" drives
+    1 RS-232 port
+    1 Centronics port
 
 Kempston Disc Interface
-	up to 4 Disk drives (KDOS)
+    up to 4 Disk drives (KDOS)
 
 Beta 128 Disk Interface
-	up to 4 Disk drives (TR-DOS)
+    up to 4 Disk drives (TR-DOS)
 
 Philips Disc ROM
-	???
+    ???
 
 ----------------
 Game controllers
 ----------------
 
 ZX Interface 2
-	2 Joystick ports (Sinclair)
-	1 ROM slot
+    2 Joystick ports (Sinclair)
+    1 ROM slot
 
 Kempston Interface
-	1 Joystick port (Kempston)
+    1 Joystick port (Kempston)
 
 Protek/AGF/Cursor Interface
-	1 Joystick port (Protek)
+    1 Joystick port (Protek)
 
 Fuller Box
-	1 Joystick port (Fuller)
-	1 G1-AY-3-8912 sound chip - the chip is identical to the one present on the 128 model,
-	                            but the I/O ports are different: http://scratchpad.wikia.com/wiki/AY-3-8912(a) and
-	                            http://scratchpad.wikia.com/wiki/Timex_2000_series#Sound_Chip
+    1 Joystick port (Fuller)
+    1 G1-AY-3-8912 sound chip - the chip is identical to the one present on the 128 model,
+                                but the I/O ports are different: http://scratchpad.wikia.com/wiki/AY-3-8912(a) and
+                                http://scratchpad.wikia.com/wiki/Timex_2000_series#Sound_Chip
 
 Mikro-Plus Interface
-	1 Joystick port (Mikrogen)
-	1 ROM slot - http://www.worldofspectrum.org/showmag.cgi?mag=Crash/Issue19/Pages/Crash1900020.jpg
+    1 Joystick port (Mikrogen)
+    1 ROM slot - http://www.worldofspectrum.org/showmag.cgi?mag=Crash/Issue19/Pages/Crash1900020.jpg
 
 ------------
 Misc devices
@@ -255,7 +255,7 @@ Currah uSpeech
     Speech synthesis thru allophones (SP0256-AL2)
 
 MGT Messenger
-    Allows connection between ZX Spectrum and SAM Coupé
+    Allows connection between ZX Spectrum and SAM Coup??
 
 Soft-ROM
     A development system board - http://www.wearmouth.demon.co.uk/softrom.htm
@@ -437,8 +437,8 @@ static READ8_HANDLER ( spectrum_port_ula_r )
 static ADDRESS_MAP_START (spectrum_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5aff) AM_RAM AM_BASE_MEMBER(spectrum_state,video_ram)
-//	AM_RANGE(0x5b00, 0x7fff) AM_RAM
-//	AM_RANGE(0x8000, 0xffff) AM_RAM
+//  AM_RANGE(0x5b00, 0x7fff) AM_RAM
+//  AM_RANGE(0x8000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 /* ports are not decoded full.

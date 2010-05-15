@@ -2,9 +2,9 @@
 
     VideoBrain FamilyComputer
 
-	http://www.atariprotos.com/othersystems/videobrain/videobrain.htm
-	http://www.seanriddle.com/vbinfo.html
-	http://www.seanriddle.com/videobrain.html
+    http://www.atariprotos.com/othersystems/videobrain/videobrain.htm
+    http://www.seanriddle.com/vbinfo.html
+    http://www.seanriddle.com/videobrain.html
 
     07/04/2009 Skeleton driver.
 
@@ -12,16 +12,16 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- SMI 3853
-	- colors
-	- low resolution mode
-	- discrete sound
-	- joystick scan timer 555
-	- reset on cartridge eject
-	- expander 1 (cassette, RS-232)
-	- expander 2 (modem)
+    - SMI 3853
+    - colors
+    - low resolution mode
+    - discrete sound
+    - joystick scan timer 555
+    - reset on cartridge eject
+    - expander 1 (cassette, RS-232)
+    - expander 2 (modem)
 
 */
 
@@ -73,18 +73,18 @@ static WRITE8_HANDLER( vlsi_w )
 	case 0xf7:
 		/*
 
-			bit		description
+            bit     description
 
-			0		
-			1		
-			2		
-			3		
-			4		keyboard column 8
-			5		
-			6		
-			7		
+            0
+            1
+            2
+            3
+            4       keyboard column 8
+            5
+            6
+            7
 
-		*/
+        */
 
 		state->uv201_31 = BIT(data, 4);
 		break;
@@ -103,18 +103,18 @@ static WRITE8_HANDLER( keyboard_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		keyboard column 0, sound data 0
-		1		keyboard column 1, sound data 1
-		2		keyboard column 2
-		3		keyboard column 3
-		4		keyboard column 4
-		5		keyboard column 5
-		6		keyboard column 6
-		7		keyboard column 7
+        0       keyboard column 0, sound data 0
+        1       keyboard column 1, sound data 1
+        2       keyboard column 2
+        3       keyboard column 3
+        4       keyboard column 4
+        5       keyboard column 5
+        6       keyboard column 6
+        7       keyboard column 7
 
-	*/
+    */
 
 	vidbrain_state *state = (vidbrain_state *)space->machine->driver_data;
 
@@ -129,18 +129,18 @@ static READ8_HANDLER( keyboard_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		keyboard row 0
-		1		keyboard row 1
-		2		keyboard row 2
-		3		keyboard row 3
-		4		
-		5		
-		6		
-		7		
+        0       keyboard row 0
+        1       keyboard row 1
+        2       keyboard row 2
+        3       keyboard row 3
+        4
+        5
+        6
+        7
 
-	*/
+    */
 
 	vidbrain_state *state = (vidbrain_state *)space->machine->driver_data;
 
@@ -167,18 +167,18 @@ static WRITE8_HANDLER( sound_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		
-		2		
-		3		
-		4		sound clock
-		5		
-		6		
-		7		joystick enable
+        0
+        1
+        2
+        3
+        4       sound clock
+        5
+        6
+        7       joystick enable
 
-	*/
+    */
 
 	vidbrain_state *state = (vidbrain_state *)space->machine->driver_data;
 
@@ -337,23 +337,23 @@ INPUT_PORTS_END
 
 static PALETTE_INIT( vidbrain )
 {
-	palette_set_color_rgb(machine,  0, 0x00, 0x00, 0x00 ); // 
+	palette_set_color_rgb(machine,  0, 0x00, 0x00, 0x00 ); //
 	palette_set_color_rgb(machine,  1, 0xff, 0x00, 0x00 ); // red
-	palette_set_color_rgb(machine,  2, 0x00, 0xff, 0x00 ); // 
-	palette_set_color_rgb(machine,  3, 0xff, 0xff, 0x00 ); // 
+	palette_set_color_rgb(machine,  2, 0x00, 0xff, 0x00 ); //
+	palette_set_color_rgb(machine,  3, 0xff, 0xff, 0x00 ); //
 	palette_set_color_rgb(machine,  4, 0x00, 0x00, 0xff ); // blue
-	palette_set_color_rgb(machine,  5, 0xff, 0x00, 0xff ); // 
-	palette_set_color_rgb(machine,  6, 0x00, 0xff, 0xff ); // 
-	palette_set_color_rgb(machine,  7, 0xff, 0xff, 0xff ); // 
+	palette_set_color_rgb(machine,  5, 0xff, 0x00, 0xff ); //
+	palette_set_color_rgb(machine,  6, 0x00, 0xff, 0xff ); //
+	palette_set_color_rgb(machine,  7, 0xff, 0xff, 0xff ); //
 
-	palette_set_color_rgb(machine,  8, 0x00, 0x00, 0x00 ); // 
+	palette_set_color_rgb(machine,  8, 0x00, 0x00, 0x00 ); //
 	palette_set_color_rgb(machine,  9, 0x80, 0x00, 0x00 ); // red
-	palette_set_color_rgb(machine, 10, 0x00, 0x80, 0x00 ); // 
-	palette_set_color_rgb(machine, 11, 0x80, 0x80, 0x00 ); // 
+	palette_set_color_rgb(machine, 10, 0x00, 0x80, 0x00 ); //
+	palette_set_color_rgb(machine, 11, 0x80, 0x80, 0x00 ); //
 	palette_set_color_rgb(machine, 12, 0x00, 0x00, 0x80 ); // blue
-	palette_set_color_rgb(machine, 13, 0x80, 0x00, 0x80 ); // 
-	palette_set_color_rgb(machine, 14, 0x00, 0x80, 0x80 ); // 
-	palette_set_color_rgb(machine, 15, 0x80, 0x80, 0x80 ); // 
+	palette_set_color_rgb(machine, 13, 0x80, 0x00, 0x80 ); //
+	palette_set_color_rgb(machine, 14, 0x00, 0x80, 0x80 ); //
+	palette_set_color_rgb(machine, 15, 0x80, 0x80, 0x80 ); //
 }
 
 /*-------------------------------------------------
@@ -448,14 +448,14 @@ static const cassette_config vidbrain_cassette_config =
 };
 
 /*-------------------------------------------------
-	cart loading (+ software list)
+    cart loading (+ software list)
  -------------------------------------------------*/
 
 static DEVICE_IMAGE_LOAD( vidbrain_cart )
 {
 	UINT32 size;
 	UINT8 *ptr = memory_region(image->machine, F3850_TAG) + 0x1000;
-	
+
 	if (image_software_entry(image) == NULL)
 	{
 		size = image_length(image);
@@ -467,7 +467,7 @@ static DEVICE_IMAGE_LOAD( vidbrain_cart )
 		size = image_get_software_region_length(image, "rom");
 		memcpy(ptr, image_get_software_region(image, "rom"), size);
 	}
-	
+
 	return INIT_PASS;
 }
 
@@ -565,5 +565,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME		PARENT	COMPAT	MACHINE		INPUT		INIT	COMPANY							FULLNAME						FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY                         FULLNAME                        FLAGS */
 COMP( 1977, vidbrain,	0,		0,		vidbrain,	vidbrain,	0,		"VideoBrain Computer Company",	"VideoBrain FamilyComputer",	GAME_NOT_WORKING | GAME_NO_SOUND )

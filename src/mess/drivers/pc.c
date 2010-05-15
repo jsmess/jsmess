@@ -2562,7 +2562,7 @@ MACHINE_DRIVER_END
 
 	/* europc */
 	ROM_LOAD("50145", 0xf8000, 0x8000, CRC(1775a11d)) // V2.07
-//	ROM_LOAD("eurobios.bin", 0xf8000, 0x8000, CRC(52185223)) scrap
+//  ROM_LOAD("eurobios.bin", 0xf8000, 0x8000, CRC(52185223)) scrap
 	/* cga, hercules character set */
 	ROM_LOAD("50146", 0x00000, 0x02000, CRC(1305dcf5)) //D1.0
 
@@ -2938,8 +2938,8 @@ ROM_START( ibm5160 )
            and trace-marked "|||CIM0286 ECA2466 // 94V-O" on the back.
     */
 //  ROM_REGION(0x4000,"gfx2", 0)
-//  	ROM_LOAD("1504161.u11", 0x00000, 0x2000, CRC(d9246cf5) SHA1(2eaed495893a4e6649b04d10dada7b5ef4abd140)) /* silkscreen: "AMI 8613MAJ // 9591-041 // S2364B // 1504161 // PHILIPPINES" - Purpose: Pixels 0 thru 7 of built-in 3270 terminal font*/
-//  	ROM_LOAD("1504162.u26", 0x02000, 0x2000, CRC(59e1dc32) SHA1(337b5cced203345a5acfb02532d6b5f526902ee7)) /* silkscreen: "AMI 8607MAH // 9591-042 // S2364B // 1504162 // PHILIPPINES" - Purpose: Pixel 8 of built-in 3270 terminal font*/
+//      ROM_LOAD("1504161.u11", 0x00000, 0x2000, CRC(d9246cf5) SHA1(2eaed495893a4e6649b04d10dada7b5ef4abd140)) /* silkscreen: "AMI 8613MAJ // 9591-041 // S2364B // 1504161 // PHILIPPINES" - Purpose: Pixels 0 thru 7 of built-in 3270 terminal font*/
+//      ROM_LOAD("1504162.u26", 0x02000, 0x2000, CRC(59e1dc32) SHA1(337b5cced203345a5acfb02532d6b5f526902ee7)) /* silkscreen: "AMI 8607MAH // 9591-042 // S2364B // 1504162 // PHILIPPINES" - Purpose: Pixel 8 of built-in 3270 terminal font*/
 ROM_END
 
 
@@ -2968,7 +2968,7 @@ Sinclair PC200 ROMs (from a v1.2 PC200):
             V1.2:5EA8       V1.2:A058
 */
 ROM_START( pc200 )
-//	ROM_REGION(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
@@ -2985,7 +2985,7 @@ ROM_END
 
 
 ROM_START( pc20 )
-//	ROM_REGION(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 
@@ -3002,7 +3002,7 @@ ROM_END
 
 
 ROM_START( ppc512 )
-//	ROM_REGION(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
@@ -3015,7 +3015,7 @@ ROM_END
 
 
 ROM_START( ppc640 )
-//	ROM_REGION(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	// special bios at 0xe0000 !?
@@ -3028,7 +3028,7 @@ ROM_END
 
 
 ROM_START( pc1512 )
-//	ROM_REGION(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD16_BYTE("40044.v1", 0xfc001, 0x2000, CRC(668fcc94) SHA1(74002f5cc542df442eec9e2e7a18db3598d8c482)) // v1
@@ -3039,7 +3039,7 @@ ROM_END
 
 
 ROM_START( pc1512v2 )
-//	ROM_REGION(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */
 	ROM_LOAD16_BYTE("40043.v2", 0xfc001, 0x2000, CRC(d2d4d2de) SHA1(c376fd1ad23025081ae16c7949e88eea7f56e1bb)) // v2
@@ -3050,7 +3050,7 @@ ROM_END
 
 
 ROM_START( pc1640 )
-//	ROM_REGION(0x100000,"maincpu", 0)
+//  ROM_REGION(0x100000,"maincpu", 0)
 	ROM_REGION16_LE(0x100000,"maincpu", 0)
 	ROM_LOAD("40100", 0xc0000, 0x8000, CRC(d2d1f1ae) SHA1(98302006ee38a17c09bd75504cc18c0649174e33)) /* Internal Graphics Adapter ROM */
 	ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */

@@ -282,7 +282,7 @@ void wavfile_testload(const char *fname)
 	}
 
 	cassette_close(cassette);
-	
+
 	fclose(f);
 }
 #endif

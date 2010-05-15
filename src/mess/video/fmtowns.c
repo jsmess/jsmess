@@ -356,7 +356,7 @@ READ8_HANDLER( towns_video_cff80_mem_r )
 {
 	if(towns_mainmem_enable != 0)
 		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xcff80];
-	
+
 	return towns_video_cff80_r(space,offset);
 }
 
@@ -381,24 +381,24 @@ READ8_HANDLER(towns_video_440_r)
 {
 	UINT8 ret = 0;
 	UINT16 xpos,ypos;
-	
+
 	switch(offset)
 	{
 		case 0x00:
 			return towns_crtc_sel;
 		case 0x02:
-//			logerror("CRTC: reading register %i (0x442) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
+//          logerror("CRTC: reading register %i (0x442) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
 			if(towns_crtc_sel == 30)
 					return 0x00;
 			return towns_crtc_reg[towns_crtc_sel] & 0x00ff;
 		case 0x03:
-//			logerror("CRTC: reading register %i (0x443) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
+//          logerror("CRTC: reading register %i (0x443) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
 			if(towns_crtc_sel == 30)
 			{
 				// check video position
 				xpos = video_screen_get_hpos(space->machine->primary_screen);
 				ypos = video_screen_get_vpos(space->machine->primary_screen);
-				
+
 				if(xpos < (towns_crtc_reg[0] & 0xfe))
 					ret |= 0x02;
 				if(ypos < (towns_crtc_reg[6] & 0x1f))
@@ -411,7 +411,7 @@ READ8_HANDLER(towns_video_440_r)
 					ret |= 0x40;
 				if(ypos < towns_crtc_layerscr[1].max_y && ypos > towns_crtc_layerscr[1].min_y)
 					ret |= 0x80;
-					
+
 				return ret;
 			}
 			return (towns_crtc_reg[towns_crtc_sel] & 0xff00) >> 8;
@@ -426,7 +426,7 @@ READ8_HANDLER(towns_video_440_r)
 				towns_dpmd_flag = 0;
 				ret |= 0x80;
 			}
-			ret |= (towns_vblank_flag ? 0x02 : 0x00);  // TODO: figure out just what this bit is...			
+			ret |= (towns_vblank_flag ? 0x02 : 0x00);  // TODO: figure out just what this bit is...
 			return ret;
 		case 0x10:
 			return towns_sprite_sel;
@@ -447,13 +447,13 @@ WRITE8_HANDLER(towns_video_440_w)
 			towns_crtc_sel = data;
 			break;
 		case 0x02:
-//			logerror("CRTC: writing register %i (0x442) [%02x]\n",towns_crtc_sel,data);
+//          logerror("CRTC: writing register %i (0x442) [%02x]\n",towns_crtc_sel,data);
 			towns_crtc_reg[towns_crtc_sel] =
 				(towns_crtc_reg[towns_crtc_sel] & 0xff00) | data;
 			towns_crtc_refresh_mode(space->machine);
 			break;
 		case 0x03:
-//			logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
+//          logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
 			towns_crtc_reg[towns_crtc_sel] =
 				(towns_crtc_reg[towns_crtc_sel] & 0x00ff) | (data << 8);
 			towns_crtc_refresh_mode(space->machine);
@@ -539,7 +539,7 @@ READ8_HANDLER(towns_video_fd90_r)
 		case 0x10:  // "sub status register"
 			// check video position
 			xpos = video_screen_get_hpos(space->machine->primary_screen);
-			
+
 			if(xpos < towns_crtc_layerscr[0].max_x && xpos > towns_crtc_layerscr[0].min_x)
 				ret |= 0x02;
 			if(towns_vblank_flag)
@@ -578,7 +578,7 @@ WRITE8_HANDLER(towns_video_fd90_w)
 			towns_dpmd_flag = 1;
 			break;
 		case 0x10:
-			towns_layer_ctrl = data;	
+			towns_layer_ctrl = data;
 			break;
 	}
 	//logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
@@ -1439,11 +1439,11 @@ VIDEO_UPDATE( towns )
 	}
 
 /*#ifdef SPR_DEBUG
-	if(input_code_pressed(screen->machine,KEYCODE_O))
-		pshift+=0x80;
-	if(input_code_pressed(screen->machine,KEYCODE_I))
-		pshift-=0x80;
-	popmessage("Pixel shift = %08x",pshift);
+    if(input_code_pressed(screen->machine,KEYCODE_O))
+        pshift+=0x80;
+    if(input_code_pressed(screen->machine,KEYCODE_I))
+        pshift-=0x80;
+    popmessage("Pixel shift = %08x",pshift);
 #endif*/
 
 #ifdef CRTC_REG_DISP

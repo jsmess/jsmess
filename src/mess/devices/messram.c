@@ -197,7 +197,7 @@ static DEVICE_VALIDITY_CHECK( messram )
 					for (j=0;j<size;j++) {
 						if (p[j]==',') p[j]=0;
 					}
-					
+
 					/* try to parse each option */
 					while(p <= e)
 					{

@@ -542,13 +542,13 @@ READ8_HANDLER ( geneve_r )
 	offset &= 0x1fff;
 
 	/* Although we could have 128K boot ROM (page f0...ff), the stock
-	Geneve only has 16K. The address is incompletely decoded, so page
-	f0 is mirrored on all even pages up to fe, and f1 is mirrored on
-	f3, f5, ... ff.
-	Currently, MESS is delivered with the 16K ROM only. So for the time
-	being, we won't lose much if we mask the page bits.
-	Michael Zapf, 2008-01-23
-	*/
+    Geneve only has 16K. The address is incompletely decoded, so page
+    f0 is mirrored on all even pages up to fe, and f1 is mirrored on
+    f3, f5, ... ff.
+    Currently, MESS is delivered with the 16K ROM only. So for the time
+    being, we won't lose much if we mask the page bits.
+    Michael Zapf, 2008-01-23
+    */
 	if (page > 0xf1) page &= 0xf1;
 
 	switch (page)
@@ -556,9 +556,9 @@ READ8_HANDLER ( geneve_r )
 	case 0xf0:
 	case 0xf1:
 		/* Boot ROM */
-		if (input_port_read(space->machine, "BOOTROM")==BOOT_V09) 
+		if (input_port_read(space->machine, "BOOTROM")==BOOT_V09)
 			return AROM_ptr[(page-0xf0)*0x2000 + offset];
-		else 
+		else
 			return ROM_ptr[(page-0xf0)*0x2000 + offset];
 
 	case 0xe8:

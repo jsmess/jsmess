@@ -115,7 +115,7 @@ static void print_game_ramoptions(FILE *out, const game_driver *game, const mach
 				fprintf(out, "\t\t<ramoption>%u</ramoption>\n",  messram_parse_string(p));
 				p += strlen(p);
 				if (p == e)
-					break;					
+					break;
 				p += 1;
 			}
 

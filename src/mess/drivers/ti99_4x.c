@@ -127,13 +127,13 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
 		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
 		PORT_CONFSETTING(    0x03, "Myarc HFDC" )
-//		PORT_CONFSETTING(    0x04, "Corcomp" )
+//      PORT_CONFSETTING(    0x04, "Corcomp" )
 
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
-//		PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
+//      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x04, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x04, DEF_STR( On ) )
@@ -142,7 +142,7 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_CONFNAME( 0x03, 0x00, "Serial/Parallel interface" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
-	
+
 	PORT_START( "EXTCARD" )
 	PORT_CONFNAME( 0x01, 0x00, "HSGPL extension" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -155,7 +155,7 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_CONFNAME( 0x01, 0x00, "Mouse support" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x01, "Mechatronics Mouse" )
-		
+
 	PORT_START( "CARTSLOT" )
 	PORT_CONFNAME( 0x07, 0x00, "Cartridge slot" )
 		PORT_CONFSETTING(    0x00, "Auto" )
@@ -163,14 +163,14 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_CONFSETTING(    0x02, "Slot 2" )
 		PORT_CONFSETTING(    0x03, "Slot 3" )
 		PORT_CONFSETTING(    0x04, "Slot 4" )
-//		PORT_CONFSETTING(    0x05, "GRAM Kracker" )
+//      PORT_CONFSETTING(    0x05, "GRAM Kracker" )
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
 		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
 		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
-		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")		
+		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
 
 	PORT_START( "DRVSPD" )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
@@ -300,13 +300,13 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
 		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
 		PORT_CONFSETTING(    0x03, "Myarc HFDC" )
-//		PORT_CONFSETTING(    0x04, "Corcomp" )
+//      PORT_CONFSETTING(    0x04, "Corcomp" )
 
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
-//		PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
+//      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x08, DEF_STR( On ) )
@@ -315,7 +315,7 @@ static INPUT_PORTS_START(ti99_4)
 	PORT_CONFNAME( 0x03, 0x00, "Serial/Parallel interface" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
-	
+
 	PORT_START( "EXTCARD" )
 	PORT_CONFNAME( 0x01, 0x00, "HSGPL extension" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -330,8 +330,8 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_CONFSETTING(    0x01, "Mechatronics Mouse" )
 	PORT_CONFNAME( 0x04, 0x00, "IR Handset" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x04, DEF_STR( On ) )	
-		
+		PORT_CONFSETTING(    0x04, DEF_STR( On ) )
+
 	PORT_START( "CARTSLOT" )
 	PORT_CONFNAME( 0x07, 0x00, "Cartridge slot" )
 		PORT_CONFSETTING(    0x00, "Auto" )
@@ -339,20 +339,20 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_CONFSETTING(    0x02, "Slot 2" )
 		PORT_CONFSETTING(    0x03, "Slot 3" )
 		PORT_CONFSETTING(    0x04, "Slot 4" )
-//		PORT_CONFSETTING(    0x05, "GRAM Kracker" )
+//      PORT_CONFSETTING(    0x05, "GRAM Kracker" )
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
 		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
 		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
-		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")		
+		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
 
 	PORT_START( "DRVSPD" )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
 		PORT_DIPSETTING( 0x00, "No delay")
 		PORT_DIPSETTING( 0x01, "Realistic")
-		
+
 	/* 3 ports for mouse */
 	PORT_START("MOUSEX") /* Mouse - X AXIS */
 		PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X) PORT_SENSITIVITY(100) PORT_KEYDELTA(0) PORT_PLAYER(1)
@@ -719,7 +719,7 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
 	MDRV_MFMHD_3_DRIVES_ADD()
-	
+
 	MDRV_TI99_CARTRIDGE_ADD("ti99_multicart")
 
 	MDRV_SMARTMEDIA_ADD("smartmedia")
@@ -888,7 +888,7 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 
 	MDRV_SMARTMEDIA_ADD("smartmedia")
 
-	MDRV_TI99_4_RS232_CARD_ADD("rs232")	
+	MDRV_TI99_4_RS232_CARD_ADD("rs232")
 MACHINE_DRIVER_END
 
 
@@ -943,7 +943,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	/* to be moved to controller */
 	MDRV_WD179X_ADD("wd179x", ti99_wd17xx_interface )
 	MDRV_SMC92X4_ADD("smc92x4", ti99_smc92x4_interface )
-	
+
 	MDRV_FLOPPY_4_DRIVES_ADD(ti99_4_floppy_config)
 	MDRV_MFMHD_3_DRIVES_ADD()
 

@@ -1945,7 +1945,7 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	UINT8 *rom = memory_region(image->machine, "user1");
 	UINT32 size;
 	UINT8 header[0x40];
-	
+
 	if (image_software_entry(image) == NULL)
 	{
 		const char *filetype;
@@ -2001,22 +2001,22 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 	{
 		size = image_get_software_region_length(image, "rom");
 
-		/* here we assume images to be in .lnx format and to have an header. 
-		 we should eventually remove them, though! */
+		/* here we assume images to be in .lnx format and to have an header.
+         we should eventually remove them, though! */
 		memcpy(header, image_get_software_region(image, "rom"), 0x40);
-		
+
 		/* Check the image */
 		if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
 			return INIT_FAIL;
-		
+
 		/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
-		 it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
-		 implement this as well */
+         it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
+         implement this as well */
 		lynx_granularity = header[4] | (header[5] << 8);
-		
+
 		logerror ("%s %dkb cartridge with %dbyte granularity from %s\n",
 				  header + 10, size / 1024, lynx_granularity, header + 42);
-		
+
 		size -= 0x40;
 		memcpy(rom, image_get_software_region(image, "rom") + 0x40, size);
 	}

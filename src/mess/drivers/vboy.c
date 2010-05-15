@@ -4,7 +4,7 @@
 
     12/05/2009 Skeleton driver.
 
-    Great info at http://www.goliathindustries.com/vb/ 
+    Great info at http://www.goliathindustries.com/vb/
     and http://www.vr32.de/modules/dokuwiki/doku.php?
 
 ****************************************************************************/
@@ -673,7 +673,7 @@ static DEVICE_IMAGE_LOAD( vboy_cart )
 {
 	UINT32 size;
 	UINT8 *ptr = memory_region(image->machine, "user1");
-	
+
 	if (image_software_entry(image) == NULL)
 	{
 		size = image_length(image);
@@ -685,7 +685,7 @@ static DEVICE_IMAGE_LOAD( vboy_cart )
 		size = image_get_software_region_length(image, "rom");
 		memcpy(ptr, image_get_software_region(image, "rom"), size);
 	}
-	
+
 	return INIT_PASS;
 }
 

@@ -11,11 +11,11 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- MSA format
-	- STT format
-	- DIM format
+    - MSA format
+    - STT format
+    - DIM format
 
 */
 
@@ -68,7 +68,7 @@ static FLOPPY_CONSTRUCT( atarist_st_construct )
 
 FLOPPY_OPTIONS_START( atarist )
 	FLOPPY_OPTION( atarist, "st", "Atari ST floppy disk image", atarist_st_identify, atarist_st_construct, NULL )
-/*	FLOPPY_OPTION( atarist, "stt", "Atari ST floppy disk image", atarist_stt_identify, atarist_stt_construct, NULL )
-	FLOPPY_OPTION( atarist, "msa", "Atari ST floppy disk image", atarist_msa_identify, atarist_msa_construct, NULL )
-	FLOPPY_OPTION( atarist, "dim", "Atari ST floppy disk image", atarist_dim_identify, atarist_dim_construct, NULL )*/
+/*  FLOPPY_OPTION( atarist, "stt", "Atari ST floppy disk image", atarist_stt_identify, atarist_stt_construct, NULL )
+    FLOPPY_OPTION( atarist, "msa", "Atari ST floppy disk image", atarist_msa_identify, atarist_msa_construct, NULL )
+    FLOPPY_OPTION( atarist, "dim", "Atari ST floppy disk image", atarist_dim_identify, atarist_dim_construct, NULL )*/
 FLOPPY_OPTIONS_END

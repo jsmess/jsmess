@@ -44,7 +44,7 @@ static FLOPPY_IDENTIFY( nes_dsk_identify )
 		/* the image has no header, hence let's trust the extension and load the file */
 		*vote = 100;
 	}
-	
+
 	return FLOPPY_ERROR_SUCCESS;
 }
 

@@ -1,8 +1,8 @@
 /***************************************************************************
-   
+
         Z80 dev board (uknown)
-		
-		http://retro.hansotten.nl/index.php?page=z80-dev-kit
+
+        http://retro.hansotten.nl/index.php?page=z80-dev-kit
 
         23/04/2010 Skeleton driver.
 
@@ -26,8 +26,8 @@ INPUT_PORTS_START( z80dev )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(z80dev) 
-{	
+static MACHINE_RESET(z80dev)
+{
 }
 
 static VIDEO_START( z80dev )
@@ -43,10 +43,10 @@ static MACHINE_DRIVER_START( z80dev )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(z80dev_mem)
-    MDRV_CPU_IO_MAP(z80dev_io)	
+    MDRV_CPU_IO_MAP(z80dev_io)
 
     MDRV_MACHINE_RESET(z80dev)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -70,5 +70,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 198?, z80dev,  0,       0, 	z80dev, 	z80dev, 	 0,  "<unknown>",   "Z80 dev board",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, z80dev,  0,       0,	z80dev, 	z80dev, 	 0,  "<unknown>",   "Z80 dev board",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

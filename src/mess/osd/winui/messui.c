@@ -849,7 +849,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 		SoftwarePicker_AddFile(GetDlgItem(GetMainWindow(), IDC_SWLIST), utf8_filename);
 		osd_free(utf8_filename);
 	}
-	
+
 	machine_config_free(config);
 }
 
@@ -926,7 +926,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 
 				/* If software folder exists, use it instead */
 				zippath_combine(&as, dst, "software");
-				if (osd_opendir(astring_c(&as))) 
+				if (osd_opendir(astring_c(&as)))
 				{
 					osd_free(t_s);
 					t_s = tstring_from_utf8(astring_c(&as));
@@ -939,7 +939,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(t_s, GetOpenFileName, pszFilename, config, imagetypes);
 	CleanupImageTypes(imagetypes, ARRAY_LENGTH(imagetypes));
-	
+
 	osd_free(t_s);
 
 	return bResult;
@@ -997,7 +997,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 
 			/* If software folder exists, use it instead */
 			zippath_combine(&as, dst, "software");
-			if (osd_opendir(astring_c(&as))) 
+			if (osd_opendir(astring_c(&as)))
 			{
 				osd_free(t_s);
 				t_s = tstring_from_utf8(astring_c(&as));
@@ -1009,7 +1009,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	bResult = CommonFileImageDialog(t_s, GetSaveFileName, pszFilename, config, imagetypes);
 	CleanupImageTypes(imagetypes, ARRAY_LENGTH(imagetypes));
-	
+
 	osd_free(t_s);
 
 	return bResult;

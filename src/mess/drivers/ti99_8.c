@@ -228,13 +228,13 @@ static INPUT_PORTS_START(ti99_8)
 		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
 		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
 		PORT_CONFSETTING(    0x03, "Myarc HFDC" )
-//		PORT_CONFSETTING(    0x04, "Corcomp" )
+//      PORT_CONFSETTING(    0x04, "Corcomp" )
 
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
-//		PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
+//      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x08, DEF_STR( On ) )
@@ -243,7 +243,7 @@ static INPUT_PORTS_START(ti99_8)
 	PORT_CONFNAME( 0x03, 0x00, "Serial/Parallel interface" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
-	
+
 	PORT_START( "EXTCARD" )
 	PORT_CONFNAME( 0x01, 0x00, "HSGPL extension" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -256,7 +256,7 @@ static INPUT_PORTS_START(ti99_8)
 	PORT_CONFNAME( 0x01, 0x00, "Mouse support" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING(    0x01, "Mechatronics Mouse" )
-		
+
 	PORT_START( "CARTSLOT" )
 	PORT_CONFNAME( 0x07, 0x00, "Cartridge slot" )
 		PORT_CONFSETTING(    0x00, "Auto" )
@@ -264,14 +264,14 @@ static INPUT_PORTS_START(ti99_8)
 		PORT_CONFSETTING(    0x02, "Slot 2" )
 		PORT_CONFSETTING(    0x03, "Slot 3" )
 		PORT_CONFSETTING(    0x04, "Slot 4" )
-//		PORT_CONFSETTING(    0x05, "GRAM Kracker" )
+//      PORT_CONFSETTING(    0x05, "GRAM Kracker" )
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0x03, 0x02, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
 		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
 		PORT_DIPSETTING( 0x01, "40 track, 8 ms")
 		PORT_DIPSETTING( 0x02, "80 track, 2 ms")
-		PORT_DIPSETTING( 0x03, "80 track HD, 2 ms")		
+		PORT_DIPSETTING( 0x03, "80 track HD, 2 ms")
 
 	PORT_START( "DRVSPD" )
 	PORT_DIPNAME( 0x01, 0x01, "Floppy and HD speed" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
@@ -562,7 +562,7 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
 
-//	MDRV_IMPORT_FROM( smc92x4_hd )
+//  MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
@@ -617,7 +617,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	/* devices */
 	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
 
-//	MDRV_IMPORT_FROM( smc92x4_hd )
+//  MDRV_IMPORT_FROM( smc92x4_hd )
 
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)

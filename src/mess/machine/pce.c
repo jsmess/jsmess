@@ -125,7 +125,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 		size = image_length(image);
 	else
 		size = image_get_software_region_length(image, "rom");
-	
+
 	/* handle header accordingly */
 	if ((size / 512) & 1)
 	{
@@ -148,7 +148,7 @@ DEVICE_IMAGE_LOAD(pce_cart)
 		memcpy(ROM, image_get_software_region(image, "rom") + offset, size);
 		extrainfo = NULL;
 	}
-	
+
 	if (extrainfo)
 	{
 		logerror("extrainfo: %s\n", extrainfo);

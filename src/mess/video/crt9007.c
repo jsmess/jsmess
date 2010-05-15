@@ -9,24 +9,24 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- interrupts
-	- status register
-	- reset
-	- DMA mode (currently forcing to non-DMA mode)
-	- cursor/blank skew
-	- sequential breaks
-	- interlaced mode
-	- smooth scroll
-	- page blank
-	- double height cursor
-	- row attributes
-	- pin configuration
-	- operation modes 0,4,7
-	- address modes 1,2,3
-	- light pen
-	- state saving
+    - interrupts
+    - status register
+    - reset
+    - DMA mode (currently forcing to non-DMA mode)
+    - cursor/blank skew
+    - sequential breaks
+    - interlaced mode
+    - smooth scroll
+    - page blank
+    - double height cursor
+    - row attributes
+    - pin configuration
+    - operation modes 0,4,7
+    - address modes 1,2,3
+    - light pen
+    - state saving
 
 */
 
@@ -183,7 +183,7 @@ enum
 #define STATUS_VERTICAL_RETRACE		0x40
 #define STATUS_LIGHT_PEN_UPDATE		0x20
 #define STATUS_ODD_EVEN				0x04
-#define STATUS_FRAME_TIMER_OCCURRED	0x01	
+#define STATUS_FRAME_TIMER_OCCURRED	0x01
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -308,7 +308,7 @@ static TIMER_CALLBACK( hsync_tick )
 static void recompute_parameters(running_device *device)
 {
 	crt9007_t *crt9007 = get_safe_token(device);
-	
+
 	/* check that necessary registers have been loaded */
 	if (!HAS_VALID_PARAMETERS) return;
 
@@ -410,7 +410,7 @@ WRITE8_DEVICE_HANDLER( crt9007_w )
 		recompute_parameters(device);
 		if (LOG) logerror("CRT9007 '%s' Characters per Horizontal Period: %u\n", device->tag(), CHARACTERS_PER_HORIZONTAL_PERIOD);
 		break;
-	
+
 	case 0x01:
 		recompute_parameters(device);
 		if (LOG) logerror("CRT9007 '%s' Characters per Data Row: %u\n", device->tag(), CHARACTERS_PER_DATA_ROW);
@@ -438,7 +438,7 @@ WRITE8_DEVICE_HANDLER( crt9007_w )
 
 	case 0x06:
 		recompute_parameters(device);
-		if (LOG) 
+		if (LOG)
 		{
 			logerror("CRT9007 '%s' Pin Configuration: %u\n", device->tag(), PIN_CONFIGURATION);
 			logerror("CRT9007 '%s' Cursor Skew: %u\n", device->tag(), CURSOR_SKEW);
@@ -622,8 +622,8 @@ void crt9007_update(running_device *device, bitmap_t *bitmap, const rectangle *c
 			int sy = (y - min_y) / SCAN_LINES_PER_DATA_ROW;
 			int cursor_x = (sy == VERTICAL_CURSOR) ? HORIZONTAL_CURSOR : -1;
 			UINT16 addr = TABLE_START + (sy * CHARACTERS_PER_DATA_ROW);
-//			UINT8 data = devcb_call_read8(&crt9007->in_vd_func, addr);
-			
+//          UINT8 data = devcb_call_read8(&crt9007->in_vd_func, addr);
+
 			crt9007->draw_scanline_func(device, bitmap, cliprect, addr, sl, 0, y, crt9007->hfp, CHARACTERS_PER_DATA_ROW, cursor_x);
 
 			addr++;
@@ -666,7 +666,7 @@ static DEVICE_START( crt9007 )
 	crt9007->hsync_timer = timer_alloc(device->machine, hsync_tick, (void *)device);
 
 	/* register for state saving */
-//	state_save_register_device_item(device, 0, crt9007->);
+//  state_save_register_device_item(device, 0, crt9007->);
 }
 
 /*-------------------------------------------------
@@ -675,7 +675,7 @@ static DEVICE_START( crt9007 )
 
 static DEVICE_RESET( crt9007 )
 {
-//	crt9007_t *crt9007 = (crt9007_t *)device->token;
+//  crt9007_t *crt9007 = (crt9007_t *)device->token;
 }
 
 /*-------------------------------------------------

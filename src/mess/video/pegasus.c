@@ -1,11 +1,11 @@
 /***************************************************************************
 
-	The Aamber Pegasus uses a MCM66710P, which is functionally
-	equivalent to the MCM6571. Some code here is copied from poly88.
+    The Aamber Pegasus uses a MCM66710P, which is functionally
+    equivalent to the MCM6571. Some code here is copied from poly88.
 
-	Note that datasheet is incorrect for the number "9", line 57 below.
-	The first byte is really 0x3E rather than 0x3F, confirmed on real
-	hardware.
+    Note that datasheet is incorrect for the number "9", line 57 below.
+    The first byte is really 0x3E rather than 0x3F, confirmed on real
+    hardware.
 
 
 ****************************************************************************/

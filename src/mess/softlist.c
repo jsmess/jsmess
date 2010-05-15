@@ -154,14 +154,14 @@ INLINE void unknown_attribute_value(parse_state *state,
 
 
 /*-------------------------------------------------
-	software_name_split
-	helper; splits a software_list:software:part
+    software_name_split
+    helper; splits a software_list:software:part
     string into seperate software_list, software,
     and part strings.
 
     str1:str2:str3  => swlist_name - str1, swname - str2, swpart - str3
-	str1:str2		=> swlist_name - NULL, swname - str1, swpart - str2
-    str1			=> swlist_name - NULL, swname - str1, swpart - NULL
+    str1:str2       => swlist_name - NULL, swname - str1, swpart - str2
+    str1            => swlist_name - NULL, swname - str1, swpart - NULL
 
     swlist_namem, swnane and swpart will be global_alloc'ed
     from the global pool. So they should be global_free'ed
@@ -737,8 +737,8 @@ software_list *software_list_open(core_options *options, const char *listname, i
 	if (filerr != FILERR_NONE)
 		goto error;
 
-//	if (is_preload)
-//		software_list_parse(swlist, swlist->error_proc, NULL);
+//  if (is_preload)
+//      software_list_parse(swlist, swlist->error_proc, NULL);
 
 	return swlist;
 
@@ -757,7 +757,7 @@ void software_list_close(software_list *swlist)
 {
 	if (swlist == NULL)
 		return;
-	
+
 	if (swlist->file)
 		mame_fclose(swlist->file);
 	pool_free_lib(swlist->pool);
@@ -973,7 +973,7 @@ bool load_software_part(running_device *device, const char *path, software_info 
 				software_info_ptr = software_list_find( software_list_ptr, swname );
 
 				if ( software_info_ptr )
-				{   
+				{
 					software_part_ptr = software_find_part( software_info_ptr, swpart, interface );
 				}
 			}
@@ -1077,13 +1077,13 @@ static DEVICE_VALIDITY_CHECK( software_list )
 	{
 		if (swlist->list_name[i])
 		{
-			if (mame_options() == NULL) 
+			if (mame_options() == NULL)
 				return FALSE;
-			
+
 			software_list *list = software_list_open(mame_options(), swlist->list_name[i], FALSE, NULL);
 
 			/* if no .xml list is found, then return (this happens e.g. if you moved/renamed the xml list) */
-			if (list == NULL) 
+			if (list == NULL)
 				return FALSE;
 
 			for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
@@ -1099,21 +1099,21 @@ static DEVICE_VALIDITY_CHECK( software_list )
 					mame_printf_error("%s: %s has no description\n", swlist->list_name[i], swinfo->shortname);
 					return TRUE;
 				}
-				
+
 				/* Did we lost any year? */
 				if (swinfo->year == NULL)
 				{
 					mame_printf_error("%s: %s has no year\n", swlist->list_name[i], swinfo->shortname);
 					return TRUE;
 				}
-				
+
 				/* Did we lost any publisher? */
 				if (swinfo->publisher == NULL)
 				{
 					mame_printf_error("%s: %s has no publisher\n", swlist->list_name[i], swinfo->shortname);
 					return TRUE;
 				}
-				
+
 				/* Second, since the xml is fine, run additional checks: */
 
 				/* check for duplicate names */
@@ -1123,7 +1123,7 @@ static DEVICE_VALIDITY_CHECK( software_list )
 					mame_printf_error("%s: %s is a duplicate name (%s)\n", swlist->list_name[i], swinfo->shortname, match->shortname);
 					error = TRUE;
 				}
-				
+
 				/* check for duplicate descriptions */
 				if (descriptions.add(swinfo->longname, swinfo, FALSE) == TMERR_DUPLICATE)
 				{
@@ -1131,10 +1131,10 @@ static DEVICE_VALIDITY_CHECK( software_list )
 					mame_printf_error("%s: %s is a duplicate description (%s)\n", swlist->list_name[i], swinfo->longname, match->longname);
 					error = TRUE;
 				}
-				
+
 				if (swinfo->parentname != NULL)
 					is_clone = 1;
-				
+
 				/* make sure the driver name is 8 chars or less */
 				if ((is_clone && strlen(swinfo->shortname) > NAME_LEN_CLONE) || ((!is_clone) && strlen(swinfo->shortname) > NAME_LEN_PARENT))
 				{
@@ -1142,7 +1142,7 @@ static DEVICE_VALIDITY_CHECK( software_list )
 									  is_clone ? "clone" : "parent", is_clone ? NAME_LEN_CLONE : NAME_LEN_PARENT);
 					error = TRUE;
 				}
-				
+
 				/* make sure the year is only digits, '?' or '+' */
 				for (s = swinfo->year; *s; s++)
 					if (!isdigit((UINT8)*s) && *s != '?' && *s != '+')
@@ -1159,7 +1159,7 @@ static DEVICE_VALIDITY_CHECK( software_list )
 		}
 	}
 	return error;
-}	
+}
 
 DEVICE_GET_INFO( software_list )
 {

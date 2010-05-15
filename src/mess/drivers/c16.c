@@ -292,7 +292,7 @@ static INPUT_PORTS_START( c16sid )
 	PORT_CONFNAME( 0x01, 0x00, "SID Card Address")
 	PORT_CONFSETTING(	0x00, "0xfd40" )
 	PORT_CONFSETTING(	0x01, "0xfe80" )
-#if 0	
+#if 0
 	PORT_CONFNAME( 0x02, 0x00, "Enable SID writes to 0xd400")
 	PORT_CONFSETTING(	0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(	0x02, DEF_STR( Yes ) )
@@ -307,7 +307,7 @@ static INPUT_PORTS_START( plus4sid )
 	PORT_CONFNAME( 0x01, 0x00, "SID Card Address")
 	PORT_CONFSETTING(	0x00, "0xfd40" )
 	PORT_CONFSETTING(	0x01, "0xfe80" )
-#if 0	
+#if 0
 	PORT_CONFNAME( 0x02, 0x00, "Enable SID writes to 0xd400")
 	PORT_CONFSETTING(	0x00, DEF_STR( No ) )
 	PORT_CONFSETTING(	0x02, DEF_STR( Yes ) )
@@ -374,7 +374,7 @@ static PALETTE_INIT( c16 )
 {
 	int i;
 
-	for (i = 0; i < sizeof(ted7360_palette) / 3; i++) 
+	for (i = 0; i < sizeof(ted7360_palette) / 3; i++)
 		palette_set_color_rgb(machine, i, ted7360_palette[i * 3], ted7360_palette[i * 3 + 1], ted7360_palette[i * 3 + 2]);
 }
 

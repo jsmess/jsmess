@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         chaos
 
         08/04/2010 Skeleton driver.
@@ -25,8 +25,8 @@ static INPUT_PORTS_START( chaos )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(chaos) 
-{	
+static MACHINE_RESET(chaos)
+{
 }
 
 static VIDEO_START( chaos )
@@ -42,10 +42,10 @@ static MACHINE_DRIVER_START( chaos )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(chaos_mem)
-    MDRV_CPU_IO_MAP(chaos_io)	
+    MDRV_CPU_IO_MAP(chaos_io)
 
     MDRV_MACHINE_RESET(chaos)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -72,5 +72,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, chaos,  0,       0, 	chaos, 		chaos, 	 0,  	  "<unknown>",   "Chaos 2",		GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1983, chaos,  0,       0, 	chaos,		chaos,	 0, 	  "<unknown>",   "Chaos 2",		GAME_NOT_WORKING | GAME_NO_SOUND )
 

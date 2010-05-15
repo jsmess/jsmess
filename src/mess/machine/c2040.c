@@ -13,8 +13,8 @@
 
     - 2040 DOS 1 FDC rom (jumps to 104d while getting block header)
 
-		FE70: jsr  $104D
-		104D: m6502_brk#$00
+        FE70: jsr  $104D
+        104D: m6502_brk#$00
 
     - Micropolis 8x50 stepper motor is same as 4040, except it takes 4 pulses to step a track instead of 1
     - error/activity LEDs

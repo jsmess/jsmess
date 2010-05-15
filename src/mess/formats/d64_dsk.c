@@ -10,8 +10,8 @@
 
     TODO:
 
-	- fix MAX_ERROR_SECTORS, it is too small for d80/d82
-	- write to disk
+    - fix MAX_ERROR_SECTORS, it is too small for d80/d82
+    - write to disk
     - disk errors 24, 25, 26, 28, 74
     - variable gaps
 
@@ -266,7 +266,7 @@ static UINT32 d64_get_track_size(floppy_image *floppy, int head, int track)
 
 /*-------------------------------------------------
     get_sector_error_code - returns the error
-	code for the given sector
+    code for the given sector
 -------------------------------------------------*/
 
 static int get_sector_error_code(floppy_image *floppy, int head, int dos_track, int sector)
@@ -498,7 +498,7 @@ static floperr_t d64_read_track(floppy_image *floppy, int head, int track, UINT6
 
 			if (sector_error == ERROR_23)
 				sector_checksum ^= 0xff;
-			
+
 			/*
                 $00      - data block ID ($07)
                 $01-100  - 256 bytes sector data

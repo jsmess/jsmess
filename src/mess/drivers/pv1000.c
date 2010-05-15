@@ -173,12 +173,12 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 {
 	UINT8 *cart = memory_region(image->machine, "cart");
 	UINT32 size;
-	
+
 	if (image_software_entry(image) == NULL)
 		size = image_length(image);
 	else
 		size = image_get_software_region_length(image, "rom");
-	
+
 
 	if (size != 0x2000 && size != 0x4000)
 	{
@@ -196,7 +196,7 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 	}
 	else
 		memcpy(cart, image_get_software_region(image, "rom"), size);
-		
+
 
 	/* Mirror 8KB rom */
 	if (size == 0x2000)

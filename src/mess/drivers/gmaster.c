@@ -220,23 +220,23 @@ static VIDEO_UPDATE( gmaster )
 static DEVICE_IMAGE_LOAD( gmaster_cart )
 {
 	UINT32 size;
-	
+
 	if (image_software_entry(image) == NULL)
 	{
 		size = image_length(image);
-		
+
 		if (size > (memory_region_length(image->machine, "maincpu") - 0x8000))
 		{
 			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return INIT_FAIL;
 		}
-		
+
 		if (image_fread(image, memory_region(image->machine, "maincpu") + 0x8000, size) != size)
 		{
 			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return INIT_FAIL;
 		}
-		
+
 	}
 	else
 	{

@@ -9,16 +9,16 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- FIFO
-	- receive
-	- transmit
-	- parity
-	- 1-sync-character mode
-	- 2-sync-character mode
-	- external sync mode
-	- interrupts
+    - FIFO
+    - receive
+    - transmit
+    - parity
+    - 1-sync-character mode
+    - 2-sync-character mode
+    - external sync mode
+    - interrupts
 
 */
 
@@ -229,10 +229,10 @@ WRITE8_DEVICE_HANDLER( mc6852_w )
 		if (data & C1_RX_RS)
 		{
 			/* When Rx Rs is set, it clears the receiver
-			control logic, sync logic, error logic, Rx Data FIFO Control,
-			Parity Error status bit, and DCD interrupt. The Receiver Shift
-			Register is set to ones.
-			*/
+            control logic, sync logic, error logic, Rx Data FIFO Control,
+            Parity Error status bit, and DCD interrupt. The Receiver Shift
+            Register is set to ones.
+            */
 
 			if (LOG) logerror("MC6852 '%s' Receiver Reset\n", device->tag());
 
@@ -244,11 +244,11 @@ WRITE8_DEVICE_HANDLER( mc6852_w )
 		if (data & C1_TX_RS)
 		{
 			/* When Tx Rs is set, it clears the transmitter
-			control section, Transmitter Shift Register, Tx Data FIFO
-			Control (the Tx Data FIFO can be reloaded after one E clock
-			pulse), the Transmitter Underflow status bit, and the CTS interrupt,
-			and inhibits the TDRA status bit (in the one-sync-character
-			and two-sync-character modes).*/
+            control section, Transmitter Shift Register, Tx Data FIFO
+            Control (the Tx Data FIFO can be reloaded after one E clock
+            pulse), the Transmitter Underflow status bit, and the CTS interrupt,
+            and inhibits the TDRA status bit (in the one-sync-character
+            and two-sync-character modes).*/
 
 			if (LOG) logerror("MC6852 '%s' Transmitter Reset\n", device->tag());
 
@@ -307,7 +307,7 @@ WRITE_LINE_DEVICE_HANDLER( mc6852_dcd_w )
 
 /*-------------------------------------------------
     mc685mc6852_sm_dtr_r2_dcd_w - sync match /
-	data terminal ready
+    data terminal ready
 -------------------------------------------------*/
 
 READ_LINE_DEVICE_HANDLER( mc6852_sm_dtr_r )

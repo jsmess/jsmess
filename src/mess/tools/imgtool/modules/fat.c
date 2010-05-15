@@ -1519,8 +1519,8 @@ static imgtoolerr_t fat_construct_dirent(const char *filename, creation_policy_t
 
 					/* move existing entries forward */
 					memmove(new_created_entry + 32, created_entry, created_entry_len);
-					
-					if (created_entry) free(created_entry);					
+
+					if (created_entry) free(created_entry);
 					created_entry = new_created_entry;
 					created_entry_len += 32;
 

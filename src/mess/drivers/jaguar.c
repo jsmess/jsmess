@@ -701,7 +701,7 @@ static void jaguar_fix_endian( running_machine *machine, UINT32 addr, UINT32 siz
 		RAM[i+1] = j[2];
 		RAM[i+2] = j[1];
 		RAM[i+3] = j[0];
-	} 
+	}
 }
 
 static DRIVER_INIT( jaguar )
@@ -785,7 +785,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 		size = image_length(image);
 
 		/* .rom files load & run at 802000 */
-		if (!mame_stricmp(image_filetype(image), "rom"))	
+		if (!mame_stricmp(image_filetype(image), "rom"))
 		{
 			load_offset = 0x2000;		// fix load address
 			cart_base[0x101]=0x802000;	// fix exec address

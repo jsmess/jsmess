@@ -4,25 +4,25 @@
     video hardware
     Juergen Buchmueller <pullmoll@t-online.de>, Dec 1999
 
-	Tests of keyboard. Start mbeeic.
+    Tests of keyboard. Start mbeeic.
 
-	1. Load ASTEROIDS PLUS, stay in attract mode, hold down spacebar,
-		it should only fire bullets. If it sometimes starts turning,
-		thrusting or using the shield, then there is a problem.
+    1. Load ASTEROIDS PLUS, stay in attract mode, hold down spacebar,
+        it should only fire bullets. If it sometimes starts turning,
+        thrusting or using the shield, then there is a problem.
 
-	2. Load SCAVENGER and make sure it doesn't go to the next level
-		until you find the Exit.
+    2. Load SCAVENGER and make sure it doesn't go to the next level
+        until you find the Exit.
 
-	3. At the Basic prompt, type in EDASM press enter. At the memory size
-		prompt press enter. Now, make sure the keyboard	works properly.
+    3. At the Basic prompt, type in EDASM press enter. At the memory size
+        prompt press enter. Now, make sure the keyboard works properly.
 
 
-	The keyboard can be accessed either by using the transparent-mode
-	registers, or by monitoring the lightpen registers, or by monitoring
-	the lightpen strobe bit in the status register.
+    The keyboard can be accessed either by using the transparent-mode
+    registers, or by monitoring the lightpen registers, or by monitoring
+    the lightpen strobe bit in the status register.
 
-	Edasm is an example of the latter; it is therefore necessary to do a
-	keyboard scan whenever the status is read.
+    Edasm is an example of the latter; it is therefore necessary to do a
+    keyboard scan whenever the status is read.
 
 ****************************************************************************/
 

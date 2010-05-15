@@ -10,20 +10,20 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- dumps of the internal ROMs
-	- uPD7508 CPU core
-	- keyboard
-	- cassette
-	- display
-	- jumpers
-	- ROM capsule
-	- uPD7001
-	- RAM disk (64K/128K RAM, Z80, 4K ROM)
-	- modem (82C55)
-	- Multi-Unit (60K RAM, ROM capsule, modem, 82C55)
-	- attach PF-10s
+    - dumps of the internal ROMs
+    - uPD7508 CPU core
+    - keyboard
+    - cassette
+    - display
+    - jumpers
+    - ROM capsule
+    - uPD7001
+    - RAM disk (64K/128K RAM, Z80, 4K ROM)
+    - modem (82C55)
+    - Multi-Unit (60K RAM, ROM capsule, modem, 82C55)
+    - attach PF-10s
 
 */
 
@@ -132,137 +132,137 @@ static READ8_HANDLER( gah40m_r )
 	case GAH40M_ICRL_C:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		ICR0
-			1		ICR1
-			2		ICR2
-			3		ICR3
-			4		ICR4
-			5		ICR5
-			6		ICR6
-			7		ICR7
+            0       ICR0
+            1       ICR1
+            2       ICR2
+            3       ICR3
+            4       ICR4
+            5       ICR5
+            6       ICR6
+            7       ICR7
 
-		*/
+        */
 		break;
 
 	case GAH40M_ICRH_C:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		ICR8
-			1		ICR9
-			2		ICR10
-			3		ICR11
-			4		ICR12
-			5		ICR13
-			6		ICR14
-			7		ICR15
+            0       ICR8
+            1       ICR9
+            2       ICR10
+            3       ICR11
+            4       ICR12
+            5       ICR13
+            6       ICR14
+            7       ICR15
 
-		*/
+        */
 		break;
 
 	case GAH40M_ICRL_B:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		ICR0
-			1		ICR1
-			2		ICR2
-			3		ICR3
-			4		ICR4
-			5		ICR5
-			6		ICR6
-			7		ICR7
+            0       ICR0
+            1       ICR1
+            2       ICR2
+            3       ICR3
+            4       ICR4
+            5       ICR5
+            6       ICR6
+            7       ICR7
 
-		*/
+        */
 		break;
 
 	case GAH40M_ICRH_B:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		ICR8
-			1		ICR9
-			2		ICR10
-			3		ICR11
-			4		ICR12
-			5		ICR13
-			6		ICR14
-			7		ICR15
+            0       ICR8
+            1       ICR9
+            2       ICR10
+            3       ICR11
+            4       ICR12
+            5       ICR13
+            6       ICR14
+            7       ICR15
 
-		*/
+        */
 		break;
 
 	case GAH40M_ISR:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		INT0		7508 interrupt (INT 7508)
-			1		INT1		82C51 interrupt (INT 82C51)
-			2		INT2		6303 interrupt (INT 6303)
-			3		INT3		input capture flag timer (CF)
-			4		INT4		overflow flag timer (OVF)
-			5		INT5		external interrupt (INTEXT)
-			6		
-			7		
+            0       INT0        7508 interrupt (INT 7508)
+            1       INT1        82C51 interrupt (INT 82C51)
+            2       INT2        6303 interrupt (INT 6303)
+            3       INT3        input capture flag timer (CF)
+            4       INT4        overflow flag timer (OVF)
+            5       INT5        external interrupt (INTEXT)
+            6
+            7
 
-		*/
+        */
 		break;
 
 	case GAH40M_STR:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		_BANK0		
-			1		BRDT		barcode reader data timer
-			2		RDY			ready (SIO)
-			3		RDYSIO		SIO ready (SIO)
-			4		
-			5		
-			6		
-			7		
+            0       _BANK0
+            1       BRDT        barcode reader data timer
+            2       RDY         ready (SIO)
+            3       RDYSIO      SIO ready (SIO)
+            4
+            5
+            6
+            7
 
-		*/
+        */
 		break;
 
 	case GAH40M_SIOR:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		SIO0
-			1		SIO1
-			2		SIO2
-			3		SIO3
-			4		SIO4
-			5		SIO5
-			6		SIO6
-			7		SIO7
+            0       SIO0
+            1       SIO1
+            2       SIO2
+            3       SIO3
+            4       SIO4
+            5       SIO5
+            6       SIO6
+            7       SIO7
 
-		*/
+        */
 		break;
 
 	case GAH40M_IVR:
 		/*
 
-			bit		description
+            bit     description
 
-			0		0
-			1		vect 1
-			2		vect 2
-			3		vect 3
-			4		1
-			5		1
-			6		1
-			7		1
+            0       0
+            1       vect 1
+            2       vect 2
+            3       vect 3
+            4       1
+            5       1
+            6       1
+            7       1
 
-		*/
+        */
 		break;
 	}
 
@@ -282,18 +282,18 @@ static WRITE8_HANDLER( gah40m_w )
 	case GAH40M_CTLR1:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		_BANK0		bank switching
-			1		BCK0		barcode mode select 0 timer (down)
-			2		BCK1		barcode mode select 1 timer (up)
-			3		SWBCD		barcode reader switch timer
-			4		BRG0		bad rate generator select 0 timer
-			5		BRG1		bad rate generator select 1 timer
-			6		BRG2		bad rate generator select 2 timer
-			7		BRG3		bad rate generator select 3 timer
+            0       _BANK0      bank switching
+            1       BCK0        barcode mode select 0 timer (down)
+            2       BCK1        barcode mode select 1 timer (up)
+            3       SWBCD       barcode reader switch timer
+            4       BRG0        bad rate generator select 0 timer
+            5       BRG1        bad rate generator select 1 timer
+            6       BRG2        bad rate generator select 2 timer
+            7       BRG3        bad rate generator select 3 timer
 
-		*/
+        */
 
 		state->bank0 = BIT(data, 0);
 		bankswitch(space->machine);
@@ -302,35 +302,35 @@ static WRITE8_HANDLER( gah40m_w )
 	case GAH40M_CMDR:
 		/*
 
-			bit		description
+            bit     description
 
-			0		set RDYSIOFF (pulse)
-			1		reset RDYSIOFF (pulse)
-			2		reset OVF (pulse)
-			3		
-			4		
-			5		
-			6		
-			7		
+            0       set RDYSIOFF (pulse)
+            1       reset RDYSIOFF (pulse)
+            2       reset OVF (pulse)
+            3
+            4
+            5
+            6
+            7
 
-		*/
+        */
 		break;
 
 	case GAH40M_CTLR2:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		LED0		LED
-			1		LED1		LED
-			2		LED2		LED
-			3		SWRS		RS-232C switch
-			4		INHRS		inhibit RS-232C
-			5		AUX			external auxiliary output
-			6		
-			7		
+            0       LED0        LED
+            1       LED1        LED
+            2       LED2        LED
+            3       SWRS        RS-232C switch
+            4       INHRS       inhibit RS-232C
+            5       AUX         external auxiliary output
+            6
+            7
 
-		*/
+        */
 
 		output_set_value("led_0", BIT(data, 0));
 		output_set_value("led_1", BIT(data, 1));
@@ -340,18 +340,18 @@ static WRITE8_HANDLER( gah40m_w )
 	case GAH40M_IER:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		IER0		INT 7508 enable
-			1		IER1		INT 82C51 enable
-			2		IER2		INT 6303 enable
-			3		IER3		INTICF enable
-			4		IER4		INTOVF enable
-			5		IER5		INTEXT enable
-			6		
-			7		
+            0       IER0        INT 7508 enable
+            1       IER1        INT 82C51 enable
+            2       IER2        INT 6303 enable
+            3       IER3        INTICF enable
+            4       IER4        INTOVF enable
+            5       IER5        INTEXT enable
+            6
+            7
 
-		*/
+        */
 
 		state->ier = data;
 		break;
@@ -359,18 +359,18 @@ static WRITE8_HANDLER( gah40m_w )
 	case GAH40M_SIOR:
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		SIO0
-			1		SIO1
-			2		SIO2
-			3		SIO3
-			4		SIO4
-			5		SIO5
-			6		SIO6
-			7		SIO7
+            0       SIO0
+            1       SIO1
+            2       SIO2
+            3       SIO3
+            4       SIO4
+            5       SIO5
+            6       SIO6
+            7       SIO7
 
-		*/
+        */
 
 		state->sio = data;
 		break;
@@ -421,18 +421,18 @@ static WRITE8_HANDLER( gah40s_w )
 	case 1: /* command register */
 		/*
 
-			bit		signal		description
+            bit     signal      description
 
-			0		SW PR		PROM power switch
-			1		SW MCT		microcassette power switch
-			2		MTA			microcassette drive motor control signal A
-			3		MTB			microcassette drive motor control signal B
-			4		MTC			microcassette drive motor control signal C
-			5		
-			6		_FAST		
-			7		_STOP CNT	
+            0       SW PR       PROM power switch
+            1       SW MCT      microcassette power switch
+            2       MTA         microcassette drive motor control signal A
+            3       MTB         microcassette drive motor control signal B
+            4       MTC         microcassette drive motor control signal C
+            5
+            6       _FAST
+            7       _STOP CNT
 
-		*/
+        */
 
 		state->swpr = BIT(data, 0);
 		break;
@@ -550,7 +550,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( px8_slave_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0020, 0x0023) AM_READWRITE(gah40s_r, gah40s_w)
-//	AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE(SED1320_TAG, )
+//  AM_RANGE(0x0024, 0x0027) AM_DEVREADWRITE(SED1320_TAG, )
 	AM_RANGE(0x0028, 0x0028) AM_WRITE(gah40s_ier_w)
 	AM_RANGE(0x8000, 0x97ff) AM_RAM AM_BASE_MEMBER(px8_state, video_ram)
 	AM_RANGE(0x9800, 0xefff) AM_NOP
@@ -563,10 +563,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( px8_slave_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
-//	AM_RANGE(M6803_PORT1, M6803_PORT1)
-//	AM_RANGE(M6803_PORT2, M6803_PORT2)
-//	AM_RANGE(M6803_PORT3, M6803_PORT3)
-//	AM_RANGE(M6803_PORT4, M6803_PORT4)
+//  AM_RANGE(M6803_PORT1, M6803_PORT1)
+//  AM_RANGE(M6803_PORT2, M6803_PORT2)
+//  AM_RANGE(M6803_PORT3, M6803_PORT3)
+//  AM_RANGE(M6803_PORT4, M6803_PORT4)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -574,14 +574,14 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( px8_sub_io, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(0x00, 0x00) AM_READWRITE()
+//  AM_RANGE(0x00, 0x00) AM_READWRITE()
 	AM_RANGE(0x01, 0x01) AM_READ(krtn_0_3_r)
-//	AM_RANGE(0x02, 0x02) AM_WRITE()
+//  AM_RANGE(0x02, 0x02) AM_WRITE()
 	AM_RANGE(0x03, 0x03) AM_WRITE(ksc_w)
-//	AM_RANGE(0x04, 0x04) AM_WRITE()
+//  AM_RANGE(0x04, 0x04) AM_WRITE()
 	AM_RANGE(0x05, 0x05) AM_READ(krtn_4_7_r)
-//	AM_RANGE(0x06, 0x06) AM_READ()
-//	AM_RANGE(0x07, 0x07) AM_WRITE()
+//  AM_RANGE(0x06, 0x06) AM_READ()
+//  AM_RANGE(0x07, 0x07) AM_WRITE()
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -865,8 +865,8 @@ static MACHINE_DRIVER_START( px8 )
 
     /* sub CPU (uPD7508) */
 //  MDRV_CPU_ADD(UPD7508_TAG, UPD7508, 200000) /* 200 kHz */
-//	MDRV_CPU_IO_MAP(px8_sub_io)
-//	MDRV_CPU_FLAGS(CPU_DISABLE)
+//  MDRV_CPU_IO_MAP(px8_sub_io)
+//  MDRV_CPU_FLAGS(CPU_DISABLE)
 
 	MDRV_MACHINE_START(px8)
 	MDRV_MACHINE_RESET(px8)
@@ -937,5 +937,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME	PARENT	COMPAT	MACHINE	INPUT	INIT	COMPANY		FULLNAME	FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME    FLAGS */
 COMP( 1984, px8,	0,		0,		px8,	px8,	0,		"Epson",	"PX-8",		GAME_NOT_WORKING )

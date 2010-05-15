@@ -10,9 +10,9 @@
 
     TODO:
 
-	- TRSDOS does not accept any date
-	- CP/M does halts after typing EX
-	- wd17xx.c thinks the drive is always ready
+    - TRSDOS does not accept any date
+    - CP/M does halts after typing EX
+    - wd17xx.c thinks the drive is always ready
     - keyboard CPU ROM
     - graphics board
 
@@ -1051,8 +1051,8 @@ static MACHINE_DRIVER_START( trs80m16 )
 	MDRV_IMPORT_FROM(trs80m2)
 
 	/* basic machine hardware */
-//	MDRV_CPU_ADD(M68000_TAG, M68000, 6000000)
-//	MDRV_CPU_PROGRAM_MAP(m68000_mem)
+//  MDRV_CPU_ADD(M68000_TAG, M68000, 6000000)
+//  MDRV_CPU_PROGRAM_MAP(m68000_mem)
 
 	/* video hardware */
 	MDRV_PALETTE_INIT(monochrome_green)

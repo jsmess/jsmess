@@ -1,7 +1,7 @@
 /***********************************************
- 
+
  CBM Quickloads
- 
+
  ***********************************************/
 
 #include "emu.h"
@@ -16,10 +16,10 @@ static int general_cbm_loadsnap( running_device *image, const char *file_type, i
 	UINT16 address = 0;
 	int i;
 	const address_space *space = cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	
+
 	if (!file_type)
 		goto error;
-	
+
 	if (!mame_stricmp(file_type, "prg"))
 	{
 		/* prg files */
@@ -48,28 +48,28 @@ static int general_cbm_loadsnap( running_device *image, const char *file_type, i
 	{
 		goto error;
 	}
-	
+
 	image_fread(image, &address, 2);
 	address = LITTLE_ENDIANIZE_INT16(address);
 	if (!mame_stricmp(file_type, "t64"))
 		address = 2049;
 	snapshot_size -= 2;
-	
+
 	data = (UINT8*)malloc(snapshot_size);
 	if (!data)
 		goto error;
-	
+
 	bytesread = image_fread(image, data, snapshot_size);
 	if (bytesread != snapshot_size)
 		goto error;
-	
+
 	for (i = 0; i < snapshot_size; i++)
 		memory_write_byte(space, address + i + offset, data[i]);
-	
+
 	cbm_sethiaddress(image->machine, address + snapshot_size);
 	free(data);
 	return INIT_PASS;
-	
+
 error:
 	if (data)
 		free(data);
@@ -79,7 +79,7 @@ error:
 static void cbm_quick_sethiaddress( running_machine *machine, UINT16 hiaddress )
 {
 	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_write_byte(space, 0x31, hiaddress & 0xff);
 	memory_write_byte(space, 0x2f, hiaddress & 0xff);
 	memory_write_byte(space, 0x2d, hiaddress & 0xff);
@@ -106,7 +106,7 @@ QUICKLOAD_LOAD( cbm_vc20 )
 static void cbm_pet_quick_sethiaddress( running_machine *machine, UINT16 hiaddress )
 {
 	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_write_byte(space, 0x2e, hiaddress & 0xff);
 	memory_write_byte(space, 0x2c, hiaddress & 0xff);
 	memory_write_byte(space, 0x2a, hiaddress & 0xff);
@@ -123,7 +123,7 @@ QUICKLOAD_LOAD( cbm_pet )
 static void cbm_pet1_quick_sethiaddress(running_machine *machine, UINT16 hiaddress)
 {
 	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_write_byte(space, 0x80, hiaddress & 0xff);
 	memory_write_byte(space, 0x7e, hiaddress & 0xff);
 	memory_write_byte(space, 0x7c, hiaddress & 0xff);
@@ -140,7 +140,7 @@ QUICKLOAD_LOAD( cbm_pet1 )
 static void cbmb_quick_sethiaddress(running_machine *machine, UINT16 hiaddress)
 {
 	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_write_byte(space, 0xf0046, hiaddress & 0xff);
 	memory_write_byte(space, 0xf0047, hiaddress >> 8);
 }
@@ -158,7 +158,7 @@ QUICKLOAD_LOAD( p500 )
 static void cbm_c65_quick_sethiaddress( running_machine *machine, UINT16 hiaddress )
 {
 	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_write_byte(space, 0x82, hiaddress & 0xff);
 	memory_write_byte(space, 0x83, hiaddress >> 8);
 }

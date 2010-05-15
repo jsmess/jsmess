@@ -1487,7 +1487,7 @@ static void bandai_irq( running_device *device, int scanline, int vblank, int bl
 		if (state->IRQ_count <= 114)
 		{
 			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
-			state->IRQ_count = (0xffff - 114 + state->IRQ_count); 	// wrap around the 16 bits counter
+			state->IRQ_count = (0xffff - 114 + state->IRQ_count);	// wrap around the 16 bits counter
 		}
 		state->IRQ_count -= 114;
 	}
@@ -1658,7 +1658,7 @@ static void jaleco_irq( running_device *device, int scanline, int vblank, int bl
 		else if (state->IRQ_count < 114)
 		{
 			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
-			state->IRQ_count = (0xffff - 114 + state->IRQ_count); 	// wrap around the 16 bits counter
+			state->IRQ_count = (0xffff - 114 + state->IRQ_count);	// wrap around the 16 bits counter
 		}
 		else
 			state->IRQ_count -= 114;

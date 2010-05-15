@@ -59,26 +59,26 @@ READ16_HANDLER( cgc7900_sync_r )
 {
 	/*
 
-		bit		signal		description
-		
-		 0		_VERT		vertical retrace (0=vblank)
-		 1					interlace (1=first field, 0=second field)
-		 2		_HG			horizontal retrace (0=hblank)
-		 3		1
-		 4		1
-		 5		1
-		 6		1
-		 7		1
-		 8		1
-		 9		1
-		10		1
-		11		1
-		12		1
-		13		1
-		14		1
-		15		1
+        bit     signal      description
 
-	*/
+         0      _VERT       vertical retrace (0=vblank)
+         1                  interlace (1=first field, 0=second field)
+         2      _HG         horizontal retrace (0=hblank)
+         3      1
+         4      1
+         5      1
+         6      1
+         7      1
+         8      1
+         9      1
+        10      1
+        11      1
+        12      1
+        13      1
+        14      1
+        15      1
+
+    */
 
 	return 0xffff;
 }
@@ -102,7 +102,7 @@ static void update_clut(running_machine *machine)
 		UINT8 b = data & 0xff;
 		UINT8 g = (data >> 8) & 0xff;
 		UINT8 r = (data >> 16) & 0xff;
-		
+
 		palette_set_color_rgb(machine, i + 8, r, g, b);
 	}
 }
@@ -241,7 +241,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-	MACHINE_DRIVER( cgc7900_video )
+    MACHINE_DRIVER( cgc7900_video )
 -------------------------------------------------*/
 
 MACHINE_DRIVER_START( cgc7900_video )
@@ -251,7 +251,7 @@ MACHINE_DRIVER_START( cgc7900_video )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(1024, 768)
     MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
-	
+
 	MDRV_GFXDECODE(cgc7900)
 
 	MDRV_PALETTE_LENGTH(8+256) /* 8 overlay colors + 256 bitmap colors */

@@ -677,7 +677,7 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 		filesize = image_get_software_region_length(image, "rom");
 		memcpy(memory_region(image->machine, "cart"), image_get_software_region(image, "rom"), filesize);
 	}
-	
+
 	state->flash_chip[0].manufacturer_id = 0x98;
 	switch( filesize )
 	{

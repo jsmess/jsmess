@@ -877,7 +877,7 @@ static READ8_HANDLER( x1_rom_r )
 {
 	UINT8 *rom = memory_region(space->machine, "cart_img");
 
-//	printf("%06x\n",rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0);
+//  printf("%06x\n",rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0);
 
 	return rom[rom_index[0]<<16|rom_index[1]<<8|rom_index[2]<<0];
 }
@@ -1958,7 +1958,7 @@ static const z80_daisy_chain x1turbo_daisy[] =
 {
 	{ "x1kb" },
 	{ "ctc" },
-  	{ "dma" },
+	{ "dma" },
 //  { "sio" },
 	{ NULL }
 };

@@ -75,18 +75,18 @@ static WRITE8_DEVICE_HANDLER (ac1_port_b_w)
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0
-		1		RTTY receive
-		2		RTTY transmit
-		3		RTTY PTT
-		4
-		5
-		6		cassette out
-		7		cassette in
+        0
+        1       RTTY receive
+        2       RTTY transmit
+        3       RTTY PTT
+        4
+        5
+        6       cassette out
+        7       cassette in
 
-	*/
+    */
 }
 
 Z80PIO_INTERFACE( ac1_z80pio_intf )

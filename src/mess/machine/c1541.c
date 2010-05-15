@@ -210,7 +210,7 @@ INLINE c1541_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
 	assert(device->token != NULL);
-	assert((device->type == C1540) || (device->type == C1541) || (device->type == C1541C) || (device->type == C1541II) || 
+	assert((device->type == C1540) || (device->type == C1541) || (device->type == C1541C) || (device->type == C1541II) ||
 		(device->type == SX1541) || (device->type == OC118) || (device->type == C2031));
 	return (c1541_t *)device->token;
 }
@@ -218,7 +218,7 @@ INLINE c1541_t *get_safe_token(running_device *device)
 INLINE c1541_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == C1540) || (device->type == C1541) || (device->type == C1541C) || (device->type == C1541II) || 
+	assert((device->type == C1540) || (device->type == C1541) || (device->type == C1541C) || (device->type == C1541II) ||
 		(device->type == SX1541) || (device->type == OC118) || (device->type == C2031));
 	return (c1541_config *)device->baseconfig().inline_config;
 }

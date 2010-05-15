@@ -114,7 +114,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_dcd_w )
 	rs232->dcd = state;
 
 	if (LOG) logerror("RS232 '%s' DCD %u\n", device->tag(), state);
-	
+
 	//devcb_call_write_line(&rs232->dte.out_dcd_func, state);
 }
 
@@ -130,7 +130,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_dtr_w )
 	rs232_t *rs232 = get_safe_token(device);
 
 	rs232->dtr = state;
-	
+
 	if (LOG) logerror("RS232 '%s' DTR %u\n", device->tag(), state);
 
 	//devcb_call_write_line(&rs232->dce.out_dtr_func, state);
@@ -148,7 +148,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_dsr_w )
 	rs232_t *rs232 = get_safe_token(device);
 
 	rs232->dsr = state;
-	
+
 	if (LOG) logerror("RS232 '%s' DSR %u\n", device->tag(), state);
 
 	//devcb_call_write_line(&rs232->dte.out_dsr_func, state);
@@ -166,7 +166,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_rts_w )
 	rs232_t *rs232 = get_safe_token(device);
 
 	rs232->rts = state;
-	
+
 	if (LOG) logerror("RS232 '%s' RTS %u\n", device->tag(), state);
 
 	//devcb_call_write_line(&rs232->dce.out_rts_func, state);
@@ -186,7 +186,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_cts_w )
 	rs232->cts = state;
 
 	if (LOG) logerror("RS232 '%s' CTS %u\n", device->tag(), state);
-	
+
 	//devcb_call_write_line(&rs232->dte.out_cts_func, state);
 }
 
@@ -204,7 +204,7 @@ WRITE_LINE_DEVICE_HANDLER( rs232_ri_w )
 	rs232->ri = state;
 
 	if (LOG) logerror("RS232 '%s' RI %u\n", device->tag(), state);
-	
+
 	//devcb_call_write_line(&rs232->dte.out_ri_func, state);
 }
 

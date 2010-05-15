@@ -72,51 +72,51 @@ Notes:
     Slow Controller
     ---------------
 
-	- Z80 IN instruction needs to halt in mid air for this controller to ever work (the first data byte of disk sector is read too early)
+    - Z80 IN instruction needs to halt in mid air for this controller to ever work (the first data byte of disk sector is read too early)
 
-		wd17xx_command_w $88 READ_SEC
-		wd17xx_data_r: (no new data) $00 (data_count 0)
-		WAIT
-		wd179x: Read Sector callback.
-		sector found! C:$00 H:$00 R:$0b N:$01
-		wd17xx_data_r: $FF (data_count 256)
-		WAIT
+        wd17xx_command_w $88 READ_SEC
+        wd17xx_data_r: (no new data) $00 (data_count 0)
+        WAIT
+        wd179x: Read Sector callback.
+        sector found! C:$00 H:$00 R:$0b N:$01
+        wd17xx_data_r: $FF (data_count 256)
+        WAIT
 
     - copy protection device (sends sector header bytes to CPU? DDEN is serial clock? code checks for either $b6 or $f7)
 
-		06F8: ld   a,$2F					; SEEK
-		06FA: out  ($BC),a
-		06FC: push af
-		06FD: push bc
-		06FE: ld   bc,$0724
-		0701: push bc
-		0702: ld   b,$07
-		0704: rr   a
-		0706: call $073F
-		073F: DB 7E         in   a,($7E)	; PIO PORT B
-		0741: EE 08         xor  $08		; DDEN
-		0743: D3 7E         out  ($7E),a
-		0745: EE 08         xor  $08
-		0747: D3 7E         out  ($7E),a
-		0749: DB 7E         in   a,($7E)
-		074B: 1F            rra
-		074C: 1F            rra
-		074D: 1F            rra
-		074E: CB 11         rl   c
-		0750: 79            ld   a,c
-		0751: C9            ret
-		0709: djnz $0703			<-- jumps to middle of instruction!
-		0703: rlca
-		0704: rr   a
-		0706: call $073F
-	 
+        06F8: ld   a,$2F                    ; SEEK
+        06FA: out  ($BC),a
+        06FC: push af
+        06FD: push bc
+        06FE: ld   bc,$0724
+        0701: push bc
+        0702: ld   b,$07
+        0704: rr   a
+        0706: call $073F
+        073F: DB 7E         in   a,($7E)    ; PIO PORT B
+        0741: EE 08         xor  $08        ; DDEN
+        0743: D3 7E         out  ($7E),a
+        0745: EE 08         xor  $08
+        0747: D3 7E         out  ($7E),a
+        0749: DB 7E         in   a,($7E)
+        074B: 1F            rra
+        074C: 1F            rra
+        074D: 1F            rra
+        074E: CB 11         rl   c
+        0750: 79            ld   a,c
+        0751: C9            ret
+        0709: djnz $0703            <-- jumps to middle of instruction!
+        0703: rlca
+        0704: rr   a
+        0706: call $073F
+
     - FD1791 HLD/HLT callbacks
     - DS/DD SS/DS jumpers
     - S1-S5 jumpers
 
     Fast Controller
     ---------------
-	- CPU is in HALT waiting for the FDC interrupt after commands
+    - CPU is in HALT waiting for the FDC interrupt after commands
 
 */
 
@@ -294,7 +294,7 @@ static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
 {
 	/*
 
-        bit     signal			description
+        bit     signal          description
 
         0       SEL 0
         1       SEL 1
@@ -321,7 +321,7 @@ static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
 	floppy_drive_set_ready_state(conkort->image1, 1, 1);
 
 	/* disk side selection */
-//	wd17xx_set_side(device, BIT(data, 4));
+//  wd17xx_set_side(device, BIT(data, 4));
 
 	/* wait enable */
 	conkort->wait_enable = BIT(data, 6);
@@ -606,14 +606,14 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 
         bit     description
 
-        0       !(_DS0 & _DS1)	single/double sided (0=SS, 1=DS)
-        1       !(_DD0 & _DD1)	single/double density (0=DS, 1=DD)
+        0       !(_DS0 & _DS1)  single/double sided (0=SS, 1=DS)
+        1       !(_DD0 & _DD1)  single/double density (0=DS, 1=DD)
         2       8B pin 10
-        3       FDC _DDEN		double density enable
-        4       _R/BS			radial/binary drive select
-        5       FDC HLT			head load timing
-        6       FDC _HDLD		head load
-        7       FDC IRQ			interrupt request
+        3       FDC _DDEN       double density enable
+        4       _R/BS           radial/binary drive select
+        5       FDC HLT         head load timing
+        6       FDC _HDLD       head load
+        7       FDC IRQ         interrupt request
 
     */
 
@@ -622,7 +622,7 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 	UINT8 data = 4;
 
 	/* single/double sided drive */
-//	data |= 0x01;
+//  data |= 0x01;
 
 	/* single/double density drive */
 	data |= 0x02;
@@ -631,7 +631,7 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 	data |= 0x10;
 
 	/* head load */
-//	data |= wd17xx_hdld_r(device) << 6;
+//  data |= wd17xx_hdld_r(device) << 6;
 	data |= 0x40;
 
 	/* FDC interrupt request */
@@ -644,16 +644,16 @@ static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 {
 	/*
 
-        bit     signal			description
+        bit     signal          description
 
-        0       !(_DS0 & _DS1)	single/double sided (0=SS, 1=DS)
-        1       !(_DD0 & _DD1)	single/double density (0=DS, 1=DD)
+        0       !(_DS0 & _DS1)  single/double sided (0=SS, 1=DS)
+        1       !(_DD0 & _DD1)  single/double density (0=DS, 1=DD)
         2       8B pin 10
-        3       FDC _DDEN		double density enable
-        4       _R/BS			radial/binary drive select
-        5       FDC HLT			head load timing
-        6       FDC _HDLD		head load
-        7       FDC IRQ			interrupt request
+        3       FDC _DDEN       double density enable
+        4       _R/BS           radial/binary drive select
+        5       FDC HLT         head load timing
+        6       FDC _HDLD       head load
+        7       FDC IRQ         interrupt request
 
     */
 
@@ -663,7 +663,7 @@ static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 	wd17xx_dden_w(conkort->fd1791, BIT(data, 3));
 
 	/* head load timing */
-//	wd17xx_hlt_w(conkort->fd1791, BIT(data, 5));
+//  wd17xx_hlt_w(conkort->fd1791, BIT(data, 5));
 }
 
 static Z80PIO_INTERFACE( conkort_pio_intf )
@@ -689,15 +689,15 @@ static const z80_daisy_chain slow_daisy_chain[] =
 
     DMA Transfer Programs
 
-	READ DAM
-	--------
+    READ DAM
+    --------
     7D 45 21 05 00 C3 14 28 95 6B 02 8A CF 01 AF CF 87
 
-	7D  transfer mode, port A -> port B, port A starting address follows, block length follows
-	45  port A starting address low byte = 45
-	21  port A starting address high byte = 21
-	05  block length low byte = 05
-	00  block length high byte = 00
+    7D  transfer mode, port A -> port B, port A starting address follows, block length follows
+    45  port A starting address low byte = 45
+    21  port A starting address high byte = 21
+    05  block length low byte = 05
+    00  block length high byte = 00
     C3  reset
     14  port A is memory, port A address increments
     28  port B is I/O, port B address fixed
@@ -711,8 +711,8 @@ static const z80_daisy_chain slow_daisy_chain[] =
     CF  load
     87  enable DMA
 
-	??
-	--
+    ??
+    --
     C3 14 28 95 7B 02 8A CF 05 AF CF 87
 
     C3  reset
@@ -728,8 +728,8 @@ static const z80_daisy_chain slow_daisy_chain[] =
     CF  load
     87  enable DMA
 
-	??
-	--
+    ??
+    --
     C3 91 40 8A AB
 
     C3  reset
@@ -933,7 +933,7 @@ static DEVICE_RESET( luxor_55_10828 )
 	slow_t *conkort = get_safe_token_slow(device);
 
 	conkort->cpu->reset();
-	
+
 	conkort->cs = 0;
 }
 

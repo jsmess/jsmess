@@ -3,18 +3,18 @@
 #ifndef SMC92X4
 #define SMC92X4		DEVICE_GET_INFO_NAME(smc92x4)
 
-#define INPUT_STATUS 	0x00
+#define INPUT_STATUS	0x00
 #define OUTPUT_DMA_ADDR 0x01
-#define OUTPUT_OUTPUT1 	0x02
-#define OUTPUT_OUTPUT2 	0x03
+#define OUTPUT_OUTPUT1	0x02
+#define OUTPUT_OUTPUT2	0x03
 
-#define MFMHD_TRACK00 	0x80
+#define MFMHD_TRACK00	0x80
 #define MFMHD_SEEKCOMP	0x40
 #define MFMHD_WRFAULT	0x20
 #define MFMHD_READY	0x10
 #define MFMHD_INDEX	0x08
 
-#define BAD_SECTOR 	0x1000
+#define BAD_SECTOR	0x1000
 #define BAD_CRC		0x2000
 
 /*
@@ -30,8 +30,8 @@
 #define DS_WRFAULT	0x01		/* write fault */
 
 /*
-	Needed to adapt to higher cylinder numbers. Floppies do not have such
-	high numbers.
+    Needed to adapt to higher cylinder numbers. Floppies do not have such
+    high numbers.
 */
 typedef struct chrn_id_hd
 {
@@ -46,61 +46,61 @@ typedef struct chrn_id_hd
 typedef struct _smc92x4_interface
 {
 	/* Disk format support. This flag allows to choose between the full
-	   FM/MFM format and an abbreviated track layout. The difference results
-	   from legal variations of the layout. This is not part of
-	   the smc92x4 specification, but it allows to keep the image format
-	   simple without too much case checking. Should be removed as soon as
-	   the respective disk formats support the full format. */
+       FM/MFM format and an abbreviated track layout. The difference results
+       from legal variations of the layout. This is not part of
+       the smc92x4 specification, but it allows to keep the image format
+       simple without too much case checking. Should be removed as soon as
+       the respective disk formats support the full format. */
 	int full_track_layout;
 
-	/* Interrupt line. To be connected with the controller PCB. */ 
+	/* Interrupt line. To be connected with the controller PCB. */
 	devcb_write_line out_intrq_func;
 
-	/* DMA in progress line. To be connected with the controller PCB. */ 
+	/* DMA in progress line. To be connected with the controller PCB. */
 	devcb_write_line out_dip_func;
 
 	/* Auxiliary Bus. These 8 lines need to be connected to external latches
-	and to a counter circuitry which works together with the external RAM.
-	We use the S0/S1 lines as address lines. 
-	*/
+    and to a counter circuitry which works together with the external RAM.
+    We use the S0/S1 lines as address lines.
+    */
 	devcb_write8 out_auxbus_func;
-	
-	/* Auxiliary Bus. This is only used for S0=S1=0, so we need no address 
-	lines and consider this line just as a line with 256 states. */
+
+	/* Auxiliary Bus. This is only used for S0=S1=0, so we need no address
+    lines and consider this line just as a line with 256 states. */
 	devcb_read_line in_auxbus_func;
 
 	/* Get the currently selected floppy disk. This is determined by the
-	   circuitry on the controller board, not within the controller itself. 
-	*/ 
+       circuitry on the controller board, not within the controller itself.
+    */
 	running_device *(*current_floppy)(void);
 
 	/* Callback to read the contents of the external RAM via the data bus.
-	   Note that the address must be set and automatically increased 
-	   by external circuitry. */
+       Note that the address must be set and automatically increased
+       by external circuitry. */
 	UINT8 (*dma_read_callback)(void);
-	
+
 	/* Callback to write the contents of the external RAM via the data bus.
-	   Note that the address must be set and automatically increased 
-	   by external circuitry. */
+       Note that the address must be set and automatically increased
+       by external circuitry. */
 	void (*dma_write_callback)(UINT8 data);
 
 	/* Preliminary MFM hard disk interface. Gets next id. */
 	void (*mfmhd_get_next_id)(int head, chrn_id_hd *id);
 
 	/* Preliminary MFM hard disk interface. Performs a seek. */
-	void (*mfmhd_seek)(int direction);	
+	void (*mfmhd_seek)(int direction);
 
 	/* Preliminary MFM hard disk interface. Reads a sector. */
-	void (*mfmhd_read_sector)(int cylinder, int head, int sector, UINT8 **buf, int *sector_length);	
+	void (*mfmhd_read_sector)(int cylinder, int head, int sector, UINT8 **buf, int *sector_length);
 
 	/* Preliminary MFM hard disk interface. Writes a sector. */
-	void (*mfmhd_write_sector)(int cylinder, int head, int sector, UINT8 *buf, int sector_length);	
+	void (*mfmhd_write_sector)(int cylinder, int head, int sector, UINT8 *buf, int sector_length);
 
 	/* Preliminary MFM hard disk interface. Reads a track. */
-	void (*mfmhd_read_track)(int head, UINT8 **buffer, int *data_count);	
+	void (*mfmhd_read_track)(int head, UINT8 **buffer, int *data_count);
 
 	/* Preliminary MFM hard disk interface. Writes a track. */
-	void (*mfmhd_write_track)(int head, UINT8 *buffer, int data_count);		
+	void (*mfmhd_write_track)(int head, UINT8 *buffer, int data_count);
 } smc92x4_interface;
 
 /* device interface */
@@ -120,5 +120,5 @@ WRITE8_DEVICE_HANDLER( smc92x4_w );
 #define MDRV_SMC92X4_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, SMC92X4, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
-	
+
 #endif

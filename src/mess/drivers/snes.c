@@ -80,8 +80,8 @@ static ADDRESS_MAP_START( superfx_map, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spc_map, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)   	/* lower 32k ram */
-	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)   	/* spc io */
+	AM_RANGE(0x0000, 0x00ef) AM_DEVREADWRITE("spc700", spc_ram_r, spc_ram_w)	/* lower 32k ram */
+	AM_RANGE(0x00f0, 0x00ff) AM_DEVREADWRITE("spc700", spc_io_r, spc_io_w)  	/* spc io */
 	AM_RANGE(0x0100, 0xffff) AM_DEVWRITE("spc700", spc_ram_100_w)
 	AM_RANGE(0x0100, 0xffbf) AM_DEVREAD("spc700", spc_ram_100_r)
 	AM_RANGE(0xffc0, 0xffff) AM_DEVREAD("spc700", spc_ipl_r)
@@ -279,15 +279,15 @@ static INPUT_PORTS_START( snes )
 	PORT_CATEGORY_ITEM(  0x01, "Gamepad",		11 )
 	PORT_CATEGORY_ITEM(  0x02, "Mouse",			12 )
 	PORT_CATEGORY_ITEM(  0x03, "Superscope",		13 )
-//	PORT_CATEGORY_ITEM(  0x04, "Justfier",		14 )
-//	PORT_CATEGORY_ITEM(  0x05, "Multitap",		15 )
+//  PORT_CATEGORY_ITEM(  0x04, "Justfier",      14 )
+//  PORT_CATEGORY_ITEM(  0x05, "Multitap",      15 )
 	PORT_CATEGORY_CLASS( 0xf0, 0x10, "P2 Controller")
 	PORT_CATEGORY_ITEM(  0x00, "Unconnected",		20 )
 	PORT_CATEGORY_ITEM(  0x10, "Gamepad",		21 )
 	PORT_CATEGORY_ITEM(  0x20, "Mouse",			22 )
 	PORT_CATEGORY_ITEM(  0x30, "Superscope",		23 )
-//	PORT_CATEGORY_ITEM(  0x40, "Justfier",		24 )
-//	PORT_CATEGORY_ITEM(  0x50, "Multitap",		25 )
+//  PORT_CATEGORY_ITEM(  0x40, "Justfier",      24 )
+//  PORT_CATEGORY_ITEM(  0x50, "Multitap",      25 )
 
 	PORT_INCLUDE(snes_joypads)
 	PORT_INCLUDE(snes_mouse)
@@ -514,9 +514,9 @@ static void snes_input_read_superscope( running_machine *machine, int port )
 		state->scope[port].pause_lock = 0;
 
 	/* If we have pressed fire or cursor and we are on-screen and SuperScope is in Port2, then latch video signal.
-	Notice that we only latch Port2 because its IOBit pin is connected to bit7 of the IO Port, while Port1 has
-	IOBit pin connected to bit6 of the IO Port, and the latter is not detected by the H/V Counters. In other
-	words, you can connect SuperScope to Port1, but there is no way SNES could detect its on-screen position */
+    Notice that we only latch Port2 because its IOBit pin is connected to bit7 of the IO Port, while Port1 has
+    IOBit pin connected to bit6 of the IO Port, and the latter is not detected by the H/V Counters. In other
+    words, you can connect SuperScope to Port1, but there is no way SNES could detect its on-screen position */
 	if ((state->scope[port].buttons & 0xc0) && !(state->scope[port].buttons & 0x02) && port == 1)
 		snes_gun_latch(machine, state->scope[port].x, state->scope[port].y);
 

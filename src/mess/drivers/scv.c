@@ -393,12 +393,12 @@ static PALETTE_INIT( scv )
 
       Only tree 'bins' of values are obviously captured
        25 ish
-      330 ish 
+      330 ish
       520 ish.
 
       Quamtizing/scaling/rounding between 0 and 255 we thus get:
 
-	*/
+    */
 	palette_set_color_rgb( machine,   0,   0,   0, 155);
 	palette_set_color_rgb( machine,   1,   0,   0,   0);
 	palette_set_color_rgb( machine,   2,   0,   0, 255);

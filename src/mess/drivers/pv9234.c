@@ -80,5 +80,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1997, pv9234,  0,       0, 	pv9234,	pv9234,	 0, 		 "Scientific Atlanta",   "PowerVu D9234",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1997, pv9234,  0,       0,	pv9234,	pv9234,	 0, 		 "Scientific Atlanta",   "PowerVu D9234",		GAME_NOT_WORKING | GAME_NO_SOUND)
 

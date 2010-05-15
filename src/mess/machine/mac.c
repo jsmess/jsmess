@@ -2212,8 +2212,8 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 	{
 		case MODEL_MAC_PORTABLE:
 		case MODEL_MAC_PB100:
-//			printf("Read PM data %x\n", mac->pm_data_recv);
-			return mac->pm_data_recv; 	
+//          printf("Read PM data %x\n", mac->pm_data_recv);
+			return mac->pm_data_recv;
 
 		case MODEL_MAC_CLASSIC:
 		case MODEL_MAC_II:
@@ -2257,7 +2257,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 	// portable/PB100 is pretty different
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
-//		printf("Read VIA B: PM_ACK %x\n", mac->pm_ack);
+//      printf("Read VIA B: PM_ACK %x\n", mac->pm_ack);
 		val = 0x80 | mac->pm_ack;	// SCC wait/request
 	}
 	else
@@ -2353,7 +2353,7 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 		mac_enable_sound(sound, (data & 0x80) == 0);
 		sony_set_sel_line(fdc,(data & 0x20) >> 5);
 		mac->mac_drive_select = ((data & 0x10) >> 4);
-//		printf("PM_REQ = %x, was %x\n", data & 1, mac->pm_req);
+//      printf("PM_REQ = %x, was %x\n", data & 1, mac->pm_req);
 		mac->pm_req = data & 1;
 		return;
 	}

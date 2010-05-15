@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Chromatics CGC 7900
 
         05/04/2010 Skeleton driver.
@@ -8,28 +8,28 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- does not boot
-	- interrupts
-	- vsync interrupt
-	- map ROM to 000000-000007 at boot
-	- floppy
-	- bitmap display
-	- Z mode read/write
-	- color status write
-	- bitmap roll
-	- overlay roll
-	- keyboard
-	- joystick
-	- light pen
-	- memory parity
-	- sync
-	- disk DMA
-	- PIO DMA
-	- serial port controller
-	- HVG
-	- OMTI Series 10 SCSI controller (8" Winchester HD)
+    - does not boot
+    - interrupts
+    - vsync interrupt
+    - map ROM to 000000-000007 at boot
+    - floppy
+    - bitmap display
+    - Z mode read/write
+    - color status write
+    - bitmap roll
+    - overlay roll
+    - keyboard
+    - joystick
+    - light pen
+    - memory parity
+    - sync
+    - disk DMA
+    - PIO DMA
+    - serial port controller
+    - HVG
+    - OMTI Series 10 SCSI controller (8" Winchester HD)
 
 */
 
@@ -81,26 +81,26 @@ static READ16_HANDLER( keyboard_r )
 {
 	/*
 
-		bit		description
-		
-		 0		key data bit 0
-		 1		key data bit 1
-		 2		key data bit 2
-		 3		key data bit 3
-		 4		key data bit 4
-		 5		key data bit 5
-		 6		key data bit 6
-		 7		key data bit 7
-		 8		SHIFT key
-		 9		CTRL key
-		10		M1 key
-		11		M2 key
-		12		
-		13		
-		14		
-		15		
+        bit     description
 
-	*/
+         0      key data bit 0
+         1      key data bit 1
+         2      key data bit 2
+         3      key data bit 3
+         4      key data bit 4
+         5      key data bit 5
+         6      key data bit 6
+         7      key data bit 7
+         8      SHIFT key
+         9      CTRL key
+        10      M1 key
+        11      M2 key
+        12
+        13
+        14
+        15
+
+    */
 
 	return 0;
 }
@@ -113,26 +113,26 @@ static WRITE16_HANDLER( keyboard_w )
 {
 	/*
 
-		bit		description
-		
-		 0		LED select bit 0
-		 1		LED select bit 1
-		 2		LED select bit 2
-		 3		LED select bit 3
-		 4		LED select bit 4
-		 5		
-		 6		
-		 7		LED switch (1=on, 0=off)
-		 8		
-		 9		
-		10		
-		11		
-		12		
-		13		
-		14		
-		15		
+        bit     description
 
-	*/
+         0      LED select bit 0
+         1      LED select bit 1
+         2      LED select bit 2
+         3      LED select bit 3
+         4      LED select bit 4
+         5
+         6
+         7      LED switch (1=on, 0=off)
+         8
+         9
+        10
+        11
+        12
+        13
+        14
+        15
+
+    */
 }
 
 /*-------------------------------------------------
@@ -143,26 +143,26 @@ static WRITE16_HANDLER( interrupt_mask_w )
 {
 	/*
 
-		bit		description
-		
-		 0		real time clock
-		 1		RS-449 Tx ready
-		 2		BINT 2
-		 3		RS-232 Tx ready
-		 4		disk
-		 5		BINT 3
-		 6		bezel keys
-		 7		keyboard
-		 8		RS-449 Rx ready
-		 9		light pen
-		10		BINT 4
-		11		joystick
-		12		vertical retrace
-		13		BINT 5
-		14		BINT 1
-		15		RS-232 Rx ready
+        bit     description
 
-	*/
+         0      real time clock
+         1      RS-449 Tx ready
+         2      BINT 2
+         3      RS-232 Tx ready
+         4      disk
+         5      BINT 3
+         6      bezel keys
+         7      keyboard
+         8      RS-449 Rx ready
+         9      light pen
+        10      BINT 4
+        11      joystick
+        12      vertical retrace
+        13      BINT 5
+        14      BINT 1
+        15      RS-232 Rx ready
+
+    */
 
 	cgc7900_state *state = (cgc7900_state *)space->machine->driver_data;
 
@@ -193,26 +193,26 @@ static READ16_HANDLER( disk_status_r )
 {
 	/*
 
-		bit		signal		description
-		
-		 0		_I/O		input/output
-		 1		_REQ		request
-		 2		_BSY		busy
-		 3		C/_D		control/data
-		 4		_MSG		message
-		 5		_RDY		ready
-		 6		
-		 7		
-		 8		
-		 9		
-		10		
-		11		
-		12		
-		13		
-		14		
-		15		
+        bit     signal      description
 
-	*/
+         0      _I/O        input/output
+         1      _REQ        request
+         2      _BSY        busy
+         3      C/_D        control/data
+         4      _MSG        message
+         5      _RDY        ready
+         6
+         7
+         8
+         9
+        10
+        11
+        12
+        13
+        14
+        15
+
+    */
 
 	return 0xffff - 0x04;
 }
@@ -236,11 +236,11 @@ static WRITE16_HANDLER( disk_command_w )
 static ADDRESS_MAP_START( cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_BASE(&chrom_ram)
-	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)	
+	AM_RANGE(0x800000, 0x80ffff) AM_ROM AM_REGION(M68000_TAG, 0)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(cgc7900_z_mode_r, cgc7900_z_mode_w)
 	AM_RANGE(0xc00000, 0xdfffff) AM_RAM AM_BASE_MEMBER(cgc7900_state, plane_ram)
 	AM_RANGE(0xe00000, 0xe1ffff) AM_WRITE(cgc7900_color_status_w)
-//	AM_RANGE(0xe20000, 0xe23fff) Raster Processor
+//  AM_RANGE(0xe20000, 0xe23fff) Raster Processor
 	AM_RANGE(0xe30000, 0xe303ff) AM_RAM AM_BASE_MEMBER(cgc7900_state, clut_ram)
 	AM_RANGE(0xe38000, 0xe3bfff) AM_RAM AM_BASE_MEMBER(cgc7900_state, overlay_ram)
 	AM_RANGE(0xe40000, 0xe40001) AM_RAM AM_BASE_MEMBER(cgc7900_state, roll_bitmap)
@@ -256,38 +256,38 @@ static ADDRESS_MAP_START( cgc7900_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe40018, 0xe40019) AM_RAM AM_BASE_MEMBER(cgc7900_state, color_status_bg)
 	AM_RANGE(0xe4001a, 0xe4001b) AM_RAM AM_BASE_MEMBER(cgc7900_state, roll_overlay)
 	AM_RANGE(0xe4001c, 0xe40fff) AM_RAM
-//	AM_RANGE(0xefc440, 0xefc441) HVG Load X
-//	AM_RANGE(0xefc442, 0xefc443) HVG Load Y
-//	AM_RANGE(0xefc444, 0xefc445) HVG Load dX
-//	AM_RANGE(0xefc446, 0xefc447) HVG Load dY
-//	AM_RANGE(0xefc448, 0xefc449) HVG Load Pixel Color
-//	AM_RANGE(0xefc44a, 0xefc44b) HVG Load Trip
+//  AM_RANGE(0xefc440, 0xefc441) HVG Load X
+//  AM_RANGE(0xefc442, 0xefc443) HVG Load Y
+//  AM_RANGE(0xefc444, 0xefc445) HVG Load dX
+//  AM_RANGE(0xefc446, 0xefc447) HVG Load dY
+//  AM_RANGE(0xefc448, 0xefc449) HVG Load Pixel Color
+//  AM_RANGE(0xefc44a, 0xefc44b) HVG Load Trip
 	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8(INS8251_0_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
 	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8(INS8251_0_TAG, msm8251_status_r, msm8251_control_w, 0xff00)
 	AM_RANGE(0xff8040, 0xff8041) AM_DEVREADWRITE8(INS8251_1_TAG, msm8251_data_r, msm8251_data_w, 0xff00)
 	AM_RANGE(0xff8042, 0xff8043) AM_DEVREADWRITE8(INS8251_1_TAG, msm8251_status_r, msm8251_control_w, 0xff00)
 	AM_RANGE(0xff8080, 0xff8081) AM_READWRITE(keyboard_r, keyboard_w)
-//	AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
-//	AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
-//	AM_RANGE(0xff80cc, 0xff80cd) Joystick Z axis
+//  AM_RANGE(0xff80c6, 0xff80c7) Joystick X axis
+//  AM_RANGE(0xff80ca, 0xff80cb) Joystick Y axis
+//  AM_RANGE(0xff80cc, 0xff80cd) Joystick Z axis
 	AM_RANGE(0xff8100, 0xff8101) AM_READWRITE(disk_data_r, disk_data_w)
 	AM_RANGE(0xff8120, 0xff8121) AM_READWRITE(disk_status_r, disk_command_w)
 	AM_RANGE(0xff8140, 0xff8141) AM_READ_PORT("BEZEL")
-//	AM_RANGE(0xff8180, 0xff8181) AM_DEVWRITE8(K1135A_TAG, k1135a_w, 0xff00) Baud rate generator
-//	AM_RANGE(0xff81c0, 0xff81ff) AM_DEVREADWRITE8(MM58167_TAG, mm58167_r, mm58167_w, 0xff00)
+//  AM_RANGE(0xff8180, 0xff8181) AM_DEVWRITE8(K1135A_TAG, k1135a_w, 0xff00) Baud rate generator
+//  AM_RANGE(0xff81c0, 0xff81ff) AM_DEVREADWRITE8(MM58167_TAG, mm58167_r, mm58167_w, 0xff00)
 	AM_RANGE(0xff8200, 0xff8201) AM_WRITE(interrupt_mask_w)
-//	AM_RANGE(0xff8240, 0xff8241) Light Pen enable
-//	AM_RANGE(0xff8242, 0xff8243) Light Pen X value
-//	AM_RANGE(0xff8244, 0xff8245) Light Pen Y value
-//	AM_RANGE(0xff8246, 0xff8247) Buffer memory parity check
-//	AM_RANGE(0xff8248, 0xff8249) Buffer memory parity set/reset
+//  AM_RANGE(0xff8240, 0xff8241) Light Pen enable
+//  AM_RANGE(0xff8242, 0xff8243) Light Pen X value
+//  AM_RANGE(0xff8244, 0xff8245) Light Pen Y value
+//  AM_RANGE(0xff8246, 0xff8247) Buffer memory parity check
+//  AM_RANGE(0xff8248, 0xff8249) Buffer memory parity set/reset
 	AM_RANGE(0xff824a, 0xff824b) AM_READ(cgc7900_sync_r)
 	AM_RANGE(0xff83c0, 0xff83c1) AM_DEVWRITE8(AY8910_TAG, ay8910_address_w, 0xff00)
 	AM_RANGE(0xff83c2, 0xff83c3) AM_DEVREAD8(AY8910_TAG, ay8910_r, 0xff00)
 	AM_RANGE(0xff83c4, 0xff83c5) AM_DEVWRITE8(AY8910_TAG, ay8910_data_w, 0xff00)
-//	AM_RANGE(0xff8500, 0xff8501) Disk DMA Command Register
-//	AM_RANGE(0xff8502, 0xff8503) Disk DMA Address Register
-//	AM_RANGE(0xff8507, 0xff8507) Disk DMA Control/Status Register
+//  AM_RANGE(0xff8500, 0xff8501) Disk DMA Command Register
+//  AM_RANGE(0xff8502, 0xff8503) Disk DMA Address Register
+//  AM_RANGE(0xff8507, 0xff8507) Disk DMA Control/Status Register
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -303,10 +303,10 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
-/*	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)*/
+/*  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
+    AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
+    AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
+    AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)*/
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -404,7 +404,7 @@ static MACHINE_START( cgc7900 )
     MACHINE_RESET( cgc7900 )
 -------------------------------------------------*/
 
-static MACHINE_RESET(cgc7900) 
+static MACHINE_RESET(cgc7900)
 {
 	UINT8* user1 = memory_region(machine, M68000_TAG);
 
@@ -428,16 +428,16 @@ static MACHINE_DRIVER_START( cgc7900 )
     MDRV_CPU_ADD(M68000_TAG, M68000, XTAL_28_48MHz/4)
     MDRV_CPU_PROGRAM_MAP(cgc7900_mem)
 
-/*	MDRV_CPU_ADD(I8035_TAG, I8035, 1000000)
+/*  MDRV_CPU_ADD(I8035_TAG, I8035, 1000000)
     MDRV_CPU_PROGRAM_MAP(keyboard_mem)
-	MDRV_CPU_IO_MAP(keyboard_io)*/
+    MDRV_CPU_IO_MAP(keyboard_io)*/
 
-/*	MDRV_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)
+/*  MDRV_CPU_ADD(AM2910_TAG, AM2910, XTAL_17_36MHz)
     MDRV_CPU_PROGRAM_MAP(omti10_mem)*/
 
 	MDRV_MACHINE_START(cgc7900)
     MDRV_MACHINE_RESET(cgc7900)
-	
+
     /* video hardware */
 	MDRV_IMPORT_FROM(cgc7900_video)
 
@@ -471,13 +471,13 @@ ROM_START( cgc7900 )
 	ROM_LOAD16_BYTE( "210258 80ak even b2f6 mon 1.3.ue15",						0xa000, 0x1000, CRC(ec5a1250) SHA1(ffef73d35f172ac610b35bdf729d51eb6f9346ba) )
 	ROM_LOAD16_BYTE( "210259 80ak odd cd66 mon 1.3.uf15",						0xa001, 0x1000, CRC(61eb43c6) SHA1(baaae0b787798147da453aac1f815589ea4ed921) )
 	ROM_LOAD16_BYTE( "210244 80c even ce40 dos 1.6b.ue13",						0xc000, 0x1000, CRC(3b64e4cb) SHA1(71b28d160b101ea6165e602ff1c54272b7b30ece) )
-	ROM_LOAD16_BYTE( "210245 80c odd 1ac3 dos 1.6b.uf13",						0xc001, 0x1000, CRC(0b6539ca) SHA1(d49e6d3307e5d634a412fd80b59492f31e29f7e0) )		
+	ROM_LOAD16_BYTE( "210245 80c odd 1ac3 dos 1.6b.uf13",						0xc001, 0x1000, CRC(0b6539ca) SHA1(d49e6d3307e5d634a412fd80b59492f31e29f7e0) )
 	ROM_LOAD16_BYTE( "210290 idris even rel3 sum 0cce.ue12",					0xe000, 0x1000, CRC(07065772) SHA1(620ea5d55021e5c38efc010722ddbd852cd49e39) )
 	ROM_LOAD16_BYTE( "210291 idris odd rel3 sum 5d11.uf12",						0xe001, 0x1000, CRC(d81b30da) SHA1(228f9b4e39d430ce4aaa81ea63f4516a51e6d001) )
 
 	ROM_REGION( 0x800, "i8035", 0 )
 	ROM_LOAD( "keyboard controller i8035", 0x0000, 0x0800, NO_DUMP )
-	
+
 	ROM_REGION( 0x800, "gfx1", 0 )
 	ROM_LOAD( "norm chrset 4b40.ua13",	0x0000, 0x0400, CRC(55eb7b87) SHA1(768cea80597e7396d9e26f8cd09e6b480a526fce) )
 	ROM_LOAD( "alt 46a7.ua14",			0x0400, 0x0400, CRC(be22b7e4) SHA1(83ef252c7fab33b4d3821a3049b89d044df35de8) )
@@ -503,5 +503,5 @@ ROM_END
     SYSTEM DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME		PARENT  COMPAT	MACHINE		INPUT		INIT	COMPANY			FULLNAME	FLAGS */
+/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY         FULLNAME    FLAGS */
 COMP( 1980, cgc7900,	0,		0,		cgc7900,	cgc7900,	0,		"Chromatics",	"CGC 7900",	GAME_NOT_WORKING)

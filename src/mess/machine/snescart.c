@@ -359,7 +359,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		snes_rom_size = image_length(image);
 	else
 		snes_rom_size = image_get_software_region_length(image, "rom");
-	
+
 	/* Check for a header (512 bytes) */
 	offset = 512;
 	if (image_software_entry(image) == NULL)
@@ -402,7 +402,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	{
 		memcpy(temp_buffer, image_get_software_region(image, "rom") + offset, 0x40ffff);
 	}
-	
+
 	/* Now to determine if this is a lo-ROM, a hi-ROM or an extended lo/hi-ROM */
 	valid_mode20 = snes_validate_infoblock(temp_buffer, 0x007fc0);
 	valid_mode21 = snes_validate_infoblock(temp_buffer, 0x00ffc0);
@@ -442,7 +442,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 		image_fread(image, ROM, snes_rom_size - offset);
 	else
 		memcpy(ROM, image_get_software_region(image, "rom") + offset, snes_rom_size - offset);
-	
+
 	if (SNES_CART_DEBUG) printf("size %08X\n", snes_rom_size - offset);
 
 	/* FIXME: Insert crc check here */

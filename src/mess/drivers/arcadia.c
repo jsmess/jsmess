@@ -150,7 +150,7 @@ static INPUT_PORTS_START( arcadia )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Option")          PORT_CODE(KEYCODE_O)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SELECT )   PORT_NAME("Select")
 //  PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER )    PORT_NAME("Reset")           PORT_CODE(KEYCODE_R)         Not implemented
-	
+
 	PORT_START("controller1_col1")
 	PORT_BIT( 0xf0, 0xf0, IPT_UNUSED)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("P1 Keypad 1") PORT_CODE(KEYCODE_1_PAD)
@@ -466,10 +466,10 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 	if (image_software_entry(image) == NULL)
 	{
 		size = image_length(image);
-		
+
 		if (size > memory_region_length(image->machine, "maincpu"))
 			size = memory_region_length(image->machine, "maincpu");
-		
+
 		if (image_fread(image, rom, size) != size)
 			return INIT_FAIL;
 	}
@@ -478,10 +478,10 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 		size = image_get_software_region_length(image, "rom");
 		memcpy(rom, image_get_software_region(image, "rom"), size);
 	}
-	
+
 	if (size > 0x1000)
 		memmove(rom + 0x2000, rom + 0x1000, size - 0x1000);
-  
+
 	if (size > 0x2000)
 		memmove(rom + 0x4000, rom + 0x3000, size - 0x2000);
 
@@ -489,7 +489,7 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 	// golf cartridge support
 	// 4kbyte at 0x0000
 	// 2kbyte at 0x4000
-	if (size <= 0x2000) 
+	if (size <= 0x2000)
 		memcpy(rom + 0x4000, rom + 0x2000, 0x1000);
 #else
 	/* this is a testpatch for the golf cartridge
@@ -522,7 +522,7 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 		{ 0x20ec,0x42,0x22 }
 	};
 
-	for (i = 0; i < ARRAY_LENGTH(patch); i++) 
+	for (i = 0; i < ARRAY_LENGTH(patch); i++)
 	{
 	    assert(rom[patch[i].address] == patch[i].old);
 	    rom[patch[i].address] = patch[i].new;

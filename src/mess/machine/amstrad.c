@@ -3564,10 +3564,10 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 			memcpy(chunklen, temp_copy + offset, 4);
 			bytes_to_read -= 4;
 			offset += 4;
-			
+
 			// calculate little-endian value, just to be sure
 			chunksize = chunklen[0] + (chunklen[1] << 8) + (chunklen[2] << 16) + (chunklen[3] << 24);
-			
+
 			if (strncmp(chunkid, "cb", 2) == 0)
 			{
 				// load chunk into RAM
@@ -3580,7 +3580,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 				{
 					// clear RAM block
 					memset(mem + 0x4000 * ramblock, 0, 0x4000);
-					
+
 					// load block into ROM area
 					if (chunksize > 16384)
 						chunksize = 16384;

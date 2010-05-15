@@ -744,7 +744,7 @@ UINT32 floppy_get_track_size(floppy_image *floppy, int head, int track)
 	fmt = floppy_callbacks(floppy);
 	if (!fmt->get_track_size)
 		return 0;
-	
+
 	return fmt->get_track_size(floppy, head, track);
 }
 

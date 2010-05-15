@@ -162,7 +162,7 @@ static QUICKLOAD_LOAD( lynx )
 
 	if (image_fread(image, data, length) != length)
 	{
-		free(data);	
+		free(data);
 		return INIT_FAIL;
 	}
 

@@ -119,10 +119,10 @@ struct fdi_pulse_track_header
 	UINT8 minsize[3];
 	UINT8 maxsize[3];
 	UINT8 indexsize[3];
-//	UINT8 averagedt[averagesz];
-//	UINT8 mindata[minsize];
-//	UINT8 maxdata[maxsize];
-//	UINT8 indexdata[indexsize];
+//  UINT8 averagedt[averagesz];
+//  UINT8 mindata[minsize];
+//  UINT8 maxdata[maxsize];
+//  UINT8 indexdata[indexsize];
 };
 
 /***************************************************************************
@@ -160,7 +160,7 @@ static floperr_t fdi_get_sector_length(floppy_image *floppy, int head, int track
 /*
 static UINT32 fdi_get_sector_offset(floppy_image* floppy, int head, int track, int sector)
 {
-	return 0;
+    return 0;
 }
 */
 static floperr_t fdi_get_indexed_sector_info(floppy_image *floppy, int head, int track, int sector_index, int *cylinder, int *side, int *sector, UINT32 *sector_length, unsigned long *flags)
@@ -238,7 +238,7 @@ FLOPPY_CONSTRUCT( fdi_dsk_construct )
 	tag->version = header.version[0];
 	tag->tracks = pick_integer_be(header.ltrack, 0, 2) + 1;
 	tag->heads = header.lhead + 1;
-	
+
 	if (LOG)
 	{
 		logerror("FDI creator: %s\n", header.creator);
@@ -279,7 +279,7 @@ FLOPPY_CONSTRUCT( fdi_dsk_construct )
 	callbacks->get_sector_length = fdi_get_sector_length;
 	callbacks->read_sector = fdi_read_sector;
 	callbacks->read_indexed_sector = fdi_read_indexed_sector;
-//	callbacks->write_track = fdi_write_track;
+//  callbacks->write_track = fdi_write_track;
 	callbacks->write_sector = fdi_write_sector;
 	callbacks->write_indexed_sector = fdi_write_indexed_sector;
 	callbacks->get_indexed_sector_info = fdi_get_indexed_sector_info;

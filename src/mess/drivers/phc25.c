@@ -8,24 +8,24 @@
 
 /*
 
-	http://www.geocities.jp/sanyo_phc_25/
+    http://www.geocities.jp/sanyo_phc_25/
 
-	Z80 @ 4 MHz
-	MC6847 video
-	3x 8KB bios ROM
-	1x 4KB chargen ROM
-	16KB RAM
-	6KB video RAM
+    Z80 @ 4 MHz
+    MC6847 video
+    3x 8KB bios ROM
+    1x 4KB chargen ROM
+    16KB RAM
+    6KB video RAM
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- MC6847 mode selection lines
-	- tune cassette trigger level
-	- accurate video timing
+    - MC6847 mode selection lines
+    - tune cassette trigger level
+    - accurate video timing
 
 */
 
@@ -44,18 +44,18 @@ static READ8_HANDLER( port40_r )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		
-		1		
-		2		
-		3		
-		4		vertical sync
-		5		cassette read
-		6		centronics busy
-		7		horizontal sync
+        0
+        1
+        2
+        3
+        4       vertical sync
+        5       cassette read
+        6       centronics busy
+        7       horizontal sync
 
-	*/
+    */
 
 	phc25_state *state = (phc25_state *)space->machine->driver_data;
 
@@ -80,18 +80,18 @@ static WRITE8_HANDLER( port40_w )
 {
 	/*
 
-		bit		description
+        bit     description
 
-		0		cassette output
-		1		cassette motor
-		2		MC6847 INT/EXT
-		3		centronics strobe
-		4		
-		5		MC6847 
-		6		MC6847 
-		7		MC6847 A/G
+        0       cassette output
+        1       cassette motor
+        2       MC6847 INT/EXT
+        3       centronics strobe
+        4
+        5       MC6847
+        6       MC6847
+        7       MC6847 A/G
 
-	*/
+    */
 
 	phc25_state *state = (phc25_state *)space->machine->driver_data;
 
@@ -146,7 +146,7 @@ static INPUT_PORTS_START( phc25 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('w') PORT_CHAR('W')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('s') PORT_CHAR('S')
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('x') PORT_CHAR('X')
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))	
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("\xE2\x86\x91") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("INS DEL") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':') PORT_CHAR('*')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) // unlabeled key
@@ -215,7 +215,7 @@ static INPUT_PORTS_START( phc25 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('i') PORT_CHAR('I')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('k') PORT_CHAR('K')
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<') 
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',') PORT_CHAR('<')
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("F1") PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(F1))
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8') PORT_CHAR('(')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('l') PORT_CHAR('L')
@@ -344,7 +344,7 @@ static MACHINE_START( phc25 )
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
 
 	/* register for state saving */
-//	state_save_register_global(machine, state->);
+//  state_save_register_global(machine, state->);
 }
 
 /* Machine Driver */
@@ -371,7 +371,7 @@ static MACHINE_DRIVER_START( phc25 )
 	/* devices */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, phc25_cassette_config)
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
-	
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
@@ -438,6 +438,6 @@ ROM_END
 
 /* Driver */
 
-/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME			FLAGS */
+/*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME            FLAGS */
 COMP( 1983, phc25,	0,		0,		pal,	phc25,	0,		"Sanyo",	"PHC-25 (Europe)",	GAME_NOT_WORKING )
 COMP( 1983, phc25j,	phc25,	0,		ntsc,	phc25j,	0,		"Sanyo",	"PHC-25 (Japan)",	GAME_NOT_WORKING )

@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         dolphin
 
         08/04/2010 Skeleton driver.
@@ -12,7 +12,7 @@
 static ADDRESS_MAP_START(dolphin_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x00ff) AM_ROM
-	AM_RANGE( 0x0100, 0x7fff) AM_RAM	
+	AM_RANGE( 0x0100, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dolphin_io , ADDRESS_SPACE_IO, 8)
@@ -24,8 +24,8 @@ static INPUT_PORTS_START( dolphin )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(dolphin) 
-{	
+static MACHINE_RESET(dolphin)
+{
 }
 
 static VIDEO_START( dolphin )
@@ -41,10 +41,10 @@ static MACHINE_DRIVER_START( dolphin )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",S2650, XTAL_1MHz)
     MDRV_CPU_PROGRAM_MAP(dolphin_mem)
-    MDRV_CPU_IO_MAP(dolphin_io)	
+    MDRV_CPU_IO_MAP(dolphin_io)
 
     MDRV_MACHINE_RESET(dolphin)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
@@ -68,5 +68,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1979, dolphin,  0,       0, 	dolphin, 	dolphin, 	 0,   "<unknown>",   "Dolphin",		GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1979, dolphin,  0,       0,	dolphin,	dolphin,	 0,   "<unknown>",   "Dolphin",		GAME_NOT_WORKING | GAME_NO_SOUND )
 

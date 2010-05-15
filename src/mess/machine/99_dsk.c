@@ -154,7 +154,7 @@ const wd17xx_interface ti99_wd17xx_interface =
     init state of the emulator. During the normal operation, only the
     reset routines are used.
 */
-// TODO: Check that: 	floppy_mon_w(w->drive, CLEAR_LINE);
+// TODO: Check that:    floppy_mon_w(w->drive, CLEAR_LINE);
 
 void ti99_floppy_controllers_init_all(running_machine *machine)
 {
@@ -199,9 +199,9 @@ void ti99_fdc_reset(running_machine *machine)
 	motor_on = 0;
 
 	ti99_set_80_track_drives(FALSE);
-	
+
 	set_all_geometries(machine, FLOPPY_DRIVE_DS_40);
-	
+
 	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
 	if (fdc) {
 		wd17xx_reset(fdc);		/* resets the fdc */
@@ -329,9 +329,9 @@ static void fdc_cru_w(running_machine *machine, int offset, int data)
 static  READ8_HANDLER(fdc_mem_r)
 {
 	running_device *fdc = devtag_get_device(space->machine, "wd179x");
-	
-	/* only use the even addresses from 1ff0 to 1ff6. 
-	   Note that data is inverted. */
+
+	/* only use the even addresses from 1ff0 to 1ff6.
+       Note that data is inverted. */
 	if (offset >= 0x1ff0 && (offset & 0x09)==0)
 		return wd17xx_r(fdc, (offset >> 1)&0x03) ^ 0xff;
 	else
@@ -345,8 +345,8 @@ static WRITE8_HANDLER(fdc_mem_w)
 {
 	running_device *fdc = devtag_get_device(space->machine, "wd179x");
 
-	/* only use the even addresses from 1ff8 to 1ffe. 
-	   Note that data is inverted. */
+	/* only use the even addresses from 1ff8 to 1ffe.
+       Note that data is inverted. */
 	if (offset >= 0x1ff0 && (offset & 0x09)==0x08)
 		wd17xx_w(fdc, (offset >> 1)&0x03, data ^ 0xff);
 }
@@ -393,7 +393,7 @@ void ti99_ccfdc_reset(running_machine *machine)
 	motor_on = 0;
 
 	ti99_set_80_track_drives(FALSE);
-	
+
 	set_all_geometries(machine, FLOPPY_DRIVE_DS_40);
 
 	ti99_peb_set_card_handlers(0x1100, & ccfdc_handlers);
@@ -615,7 +615,7 @@ void ti99_bwg_reset(running_machine *machine)
 	motor_on = 0;
 
 	ti99_set_80_track_drives(FALSE);
-	
+
 	set_all_geometries(machine, FLOPPY_DRIVE_DS_40);
 
 	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
@@ -932,14 +932,14 @@ static int line_to_index(UINT8 line, int max)
 }
 
 /*
-	Select the HFDC hard disk unit
-	This function implements the selection logic on the PCB (outside the
-	controller chip)
-	The HDC9234 allows up to four drives to be selected by the select lines.
-	This is not enough for controlling four floppy drives and three hard 
-	drives, so the user programmable outputs are used to select the floppy
-	drives. This selection happens completely outside of the controller,
-	so we must implement it here.
+    Select the HFDC hard disk unit
+    This function implements the selection logic on the PCB (outside the
+    controller chip)
+    The HDC9234 allows up to four drives to be selected by the select lines.
+    This is not enough for controlling four floppy drives and three hard
+    drives, so the user programmable outputs are used to select the floppy
+    drives. This selection happens completely outside of the controller,
+    so we must implement it here.
 */
 
 static running_device *hfdc_current_harddisk(void)
@@ -948,32 +948,32 @@ static running_device *hfdc_current_harddisk(void)
 	disk_unit = line_to_index((output1_latch>>4)&0x0f, HFDC_MAX_HARD);
 
 	/* The HFDC does not use disk_unit=0. The first HD has index 1. */
-/*	if (disk_unit>=0) printf("Select hard disk %d\n", disk_unit);
-	else printf("No hard disk selected\n");
+/*  if (disk_unit>=0) printf("Select hard disk %d\n", disk_unit);
+    else printf("No hard disk selected\n");
 */
 	return harddisk_unit[disk_unit];
 }
 
 /*
-	Select the HFDC floppy disk unit
-	This function implements the selection logic on the PCB (outside the
-	controller chip)
+    Select the HFDC floppy disk unit
+    This function implements the selection logic on the PCB (outside the
+    controller chip)
 */
 
 static running_device *hfdc_current_floppy(void)
-{	
+{
 	int disk_unit = -1;
 	disk_unit = line_to_index(output1_latch & 0x0f, HFDC_MAX_FLOPPY);
 
 	if (disk_unit<0)
 	{
-	//	printf("No unit selected\n");
+	//  printf("No unit selected\n");
 		return NULL;
 	}
 
-	// printf("Select floppy disk %d (output1=%02x)\n", index, output1_latch);	
+	// printf("Select floppy disk %d (output1=%02x)\n", index, output1_latch);
 	return floppy_unit[disk_unit];
-}	
+}
 
 /*
     Called whenever the state of the sms9234 interrupt pin changes.
@@ -1050,7 +1050,7 @@ static READ_LINE_DEVICE_HANDLER( ti99_hfdc_auxbus_in )
 		if (floppy_wpt_r(drive) == CLEAR_LINE)
 			reply |= DS_WRPROT;
 
-		/* if (image_exists(disk_img)) */  
+		/* if (image_exists(disk_img)) */
 
 		reply |= DS_READY;  /* Floppies don't have a READY line; line is pulled up */
 		reply |= DS_SKCOM;  /* Same here. */
@@ -1060,7 +1060,7 @@ static READ_LINE_DEVICE_HANDLER( ti99_hfdc_auxbus_in )
 		UINT8 state;
 		drive = hfdc_current_harddisk();
 		state = ti99_mfm_harddisk_status(drive);
-		if (state & MFMHD_TRACK00) 
+		if (state & MFMHD_TRACK00)
 			reply |= DS_TRK00;
 		if (state & MFMHD_SEEKCOMP)
 			reply |= DS_SKCOM;
@@ -1080,7 +1080,7 @@ static READ_LINE_DEVICE_HANDLER( ti99_hfdc_auxbus_in )
 static UINT8 hfdc_dma_read_callback(void)
 {
 	UINT8 value = hfdc_ram[dma_address & 0x7fff];
-	dma_address++;	
+	dma_address++;
 	return value;
 }
 
@@ -1093,8 +1093,8 @@ static void hfdc_dma_write_callback(UINT8 data)
 	dma_address++;
 }
 
-/* 
-	Preliminary MFM harddisk interface.
+/*
+    Preliminary MFM harddisk interface.
 */
 static void hfdc_harddisk_get_next_id(int head, chrn_id_hd *id)
 {
@@ -1119,7 +1119,7 @@ static void hfdc_harddisk_write_sector(int cylinder, int head, int sector, UINT8
 {
 	running_device *harddisk = hfdc_current_harddisk();
 	if (harddisk != NULL)
-		ti99_mfm_harddisk_write_sector(harddisk, cylinder, head, sector, buf, sector_length);	
+		ti99_mfm_harddisk_write_sector(harddisk, cylinder, head, sector, buf, sector_length);
 }
 
 static void hfdc_harddisk_read_track(int head, UINT8 **buffer, int *data_count)
@@ -1144,9 +1144,9 @@ void ti99_hfdc_reset(running_machine *machine)
 	running_device *device = devtag_get_device(machine, "smc92x4");
 	const char *flopname[] = {FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3};
 	const char *hardname[] = {MFMHD_0, MFMHD_1, MFMHD_2};
-	
+
 	int i;
-	
+
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_hfdc_dsr;
 	hfdc_ram = memory_region(machine, region_dsr) + offset_hfdc_ram;
 	hfdc_ram_offset[0] = hfdc_ram_offset[1] = hfdc_ram_offset[2] = 0;
@@ -1162,22 +1162,22 @@ void ti99_hfdc_reset(running_machine *machine)
 
 	ti99_peb_set_card_handlers(0x1100, & hfdc_handlers);
 
-	if ((input_port_read(machine, "DISKCTRL") & DISK_HFDC) 
-		&& (input_port_read(machine, "HFDCDIP")&0x55)) 
+	if ((input_port_read(machine, "DISKCTRL") & DISK_HFDC)
+		&& (input_port_read(machine, "HFDCDIP")&0x55))
 		ti99_set_80_track_drives(TRUE);
 	else
 		ti99_set_80_track_drives(FALSE);
-	
+
 	smc92x4_set_timing(device, input_port_read(machine, "DRVSPD"));
-	
+
 	set_all_geometries(machine, FLOPPY_DRIVE_DS_80);
 
-	/* Connect floppy drives to controller. Note that *this* is the 
-	   controller, not the controller chip. The pcb contains a select
-	   logic.
-	   TODO: Turn this implementation into a device so that this is 
-	   correctly modelled.
-	*/
+	/* Connect floppy drives to controller. Note that *this* is the
+       controller, not the controller chip. The pcb contains a select
+       logic.
+       TODO: Turn this implementation into a device so that this is
+       correctly modelled.
+    */
 	for (i = 0; i < 4; i++)
 	{
 		if (device->owner != NULL)
@@ -1185,21 +1185,21 @@ void ti99_hfdc_reset(running_machine *machine)
 			floppy_unit[i] = device->owner->subdevice(flopname[i]);
 			if (floppy_unit[i]==NULL)
 			{
-				floppy_unit[i] = devtag_get_device(device->machine, flopname[i]); 
+				floppy_unit[i] = devtag_get_device(device->machine, flopname[i]);
 			}
 		}
 		else
 		{
-			floppy_unit[i] = devtag_get_device(device->machine, flopname[i]); 
+			floppy_unit[i] = devtag_get_device(device->machine, flopname[i]);
 		}
 
-		if (floppy_unit[i]!=NULL) 
+		if (floppy_unit[i]!=NULL)
 		{
 			floppy_drive_set_controller(floppy_unit[i], device);
-//			floppy_drive_set_index_pulse_callback(floppy_unit[i], smc92x4_index_pulse_callback);
+//          floppy_drive_set_index_pulse_callback(floppy_unit[i], smc92x4_index_pulse_callback);
 			floppy_drive_set_rpm(floppy_unit[i], 300.);
 		}
-		else 
+		else
 		{
 			logerror("99_dsk: Image %s is null\n", flopname[i]);
 		}
@@ -1211,7 +1211,7 @@ void ti99_hfdc_reset(running_machine *machine)
 		harddisk_unit[i] = devtag_get_device(device->machine, hardname[i-1]);
 	}
 	harddisk_unit[0] = NULL;
-	
+
 	if (device) {
 		smc92x4_reset(device);
 	}
@@ -1224,7 +1224,7 @@ const smc92x4_interface ti99_smc92x4_interface =
 	DEVCB_LINE(ti99_hfdc_dip_w),
 	DEVCB_HANDLER(ti99_hfdc_auxbus_out),
 	DEVCB_LINE(ti99_hfdc_auxbus_in),
-	
+
 	hfdc_current_floppy,
 	hfdc_dma_read_callback,
 	hfdc_dma_write_callback,
@@ -1241,34 +1241,34 @@ const smc92x4_interface ti99_smc92x4_interface =
 int mycheck = 0;
 
 /*
-	Read disk CRU interface
-	HFDC manual p. 44
-	
-	CRU Select=0
-	CRU rel. address	Definition
-	00			Disk controller interrupt
-	02			Motor status
-	04			DMA in progress
-	
-	Note that the cru line settings on the board do not match the
-	description. 02 and 04 switch positions. Similarly, the dip switches
-	for the drive configurations are not correctly enumerated in the manual.
-	
-	CRU Select=1
-	CRU rel. address	Definition
-	00			Switch 4 status \_ drive 2 config
-	02			Switch 3 status /
-	04			Switch 2 status \_ drive 1 config
-	06			Switch 1 status /
-	08			Switch 8 status \_ drive 4 config
-	0A			Switch 7 status /
-	0C			Switch 6 status \_ drive 3 config
-	0E			Switch 5 status /
-	
-	config: 00 = 9/16/18 sectors, 40 tracks, 16 msec
-		10 = 9/16/18 sectors, 40 tracks, 8 msec
-		01 = 9/16/18 sectors, 80 tracks, 2 msec
-		11 = 36 sectors, 80 tracks, 2 msec
+    Read disk CRU interface
+    HFDC manual p. 44
+
+    CRU Select=0
+    CRU rel. address    Definition
+    00          Disk controller interrupt
+    02          Motor status
+    04          DMA in progress
+
+    Note that the cru line settings on the board do not match the
+    description. 02 and 04 switch positions. Similarly, the dip switches
+    for the drive configurations are not correctly enumerated in the manual.
+
+    CRU Select=1
+    CRU rel. address    Definition
+    00          Switch 4 status \_ drive 2 config
+    02          Switch 3 status /
+    04          Switch 2 status \_ drive 1 config
+    06          Switch 1 status /
+    08          Switch 8 status \_ drive 4 config
+    0A          Switch 7 status /
+    0C          Switch 6 status \_ drive 3 config
+    0E          Switch 5 status /
+
+    config: 00 = 9/16/18 sectors, 40 tracks, 16 msec
+        10 = 9/16/18 sectors, 40 tracks, 8 msec
+        01 = 9/16/18 sectors, 80 tracks, 2 msec
+        11 = 36 sectors, 80 tracks, 2 msec
 */
 static int hfdc_cru_r(running_machine *machine, int offset)
 {
@@ -1279,62 +1279,62 @@ static int hfdc_cru_r(running_machine *machine, int offset)
 		if (cru_sel)
 		{
 			/* DIP switches.  Logic levels are inverted (on->0, off->1).  CRU
-			bit order is the reverse of DIP-switch order, too (dip 1 -> bit 7,
-			dip 8 -> bit 0). 
-			
-			MZ: 00 should not be used since there is a bug in the
-			DSR of the HFDC which causes problems with SD disks
-			(controller tries DD and then fails to fall back to SD) */
-				
+            bit order is the reverse of DIP-switch order, too (dip 1 -> bit 7,
+            dip 8 -> bit 0).
+
+            MZ: 00 should not be used since there is a bug in the
+            DSR of the HFDC which causes problems with SD disks
+            (controller tries DD and then fails to fall back to SD) */
+
 			reply = ~(input_port_read(machine, "HFDCDIP"));
-//			printf("hfdc cru read 7-0 = %02x\n", reply);
+//          printf("hfdc cru read 7-0 = %02x\n", reply);
 		}
 		else
 		{
 			reply = 0;
-/*			if (hfdc_irq_state)
-				reply |= 1;
-			if (motor_on)
-				reply |= 2;
-			if (hfdc_dma_in_progress)
-				reply |= 4;*/
-				
+/*          if (hfdc_irq_state)
+                reply |= 1;
+            if (motor_on)
+                reply |= 2;
+            if (hfdc_dma_in_progress)
+                reply |= 4;*/
+
 			if (hfdc_irq_state)
 				reply |= 0x01;
 			if (hfdc_dip_state)
-				reply |= 0x02; 
+				reply |= 0x02;
 			if (motor_on)
 				reply |= 0x04;
-//			printf("hfdc cru read 7-0 = %02x\n", reply);
+//          printf("hfdc cru read 7-0 = %02x\n", reply);
 
 		}
 	}
 	else /* CRU bits 8+ */
 		reply = 0;
-//	printf("hfdc cru read %d = %d\n", offset, reply);
+//  printf("hfdc cru read %d = %d\n", offset, reply);
 
 	return reply;
 }
 
 
 /*
-	Write disk CRU interface
-	HFDC manual p. 43
-	
-	CRU rel. address	Definition				Active
-	00			Device Service Routine Select		HIGH
-	02			Reset to controller chip		LOW
-	04			Floppy Motor on / CD0			HIGH
-	06			ROM page select 0 / CD1
-	08			ROM page select 1 / CRU input select
-	12/4/6/8/A		RAM page select at 0x5400
-	1C/E/0/2/4		RAM page select at 0x5800
-	26/8/A/C/E		RAM page select at 0x5C00    
-	
-	CD0 and CD1 are Clock Divider selections for the Floppy Data Separator (FDC9216) 
+    Write disk CRU interface
+    HFDC manual p. 43
+
+    CRU rel. address    Definition              Active
+    00          Device Service Routine Select       HIGH
+    02          Reset to controller chip        LOW
+    04          Floppy Motor on / CD0           HIGH
+    06          ROM page select 0 / CD1
+    08          ROM page select 1 / CRU input select
+    12/4/6/8/A      RAM page select at 0x5400
+    1C/E/0/2/4      RAM page select at 0x5800
+    26/8/A/C/E      RAM page select at 0x5C00
+
+    CD0 and CD1 are Clock Divider selections for the Floppy Data Separator (FDC9216)
 */
 static void hfdc_cru_w(running_machine *machine, int offset, int data)
-{	
+{
 	switch (offset)
 	{
 	case 0:
@@ -1403,24 +1403,24 @@ static void hfdc_cru_w(running_machine *machine, int offset, int data)
 			hfdc_ram_offset[(offset-9)/5] &= ~(0x400 << ((offset-9)%5));
 		break;
 	}
-//	printf("hfdc cru write bit %d = %d\n", offset, data);
+//  printf("hfdc cru write bit %d = %d\n", offset, data);
 }
 
 
 /*
-	read a byte in disk DSR space
-	HFDC manual, p. 44
-	Memory map as seen by the 99/4A PEB
-	
-	0x4000 - 0x4fbf	one of four possible ROM pages
-	0x4fc0 - 0x4fcf	tape select
-	0x4fd0 - 0x4fdf	disk controller select
-	0x4fe0 - 0x4fff	time chip select
-	
-	0x5000 - 0x53ff	static RAM page 0x10
-	0x5400 - 0x57ff	static RAM page any of 32 pages
-	0x5800 - 0x5bff	static RAM page any of 32 pages
-	0x5c00 - 0x5fff	static RAM page any of 32 pages    
+    read a byte in disk DSR space
+    HFDC manual, p. 44
+    Memory map as seen by the 99/4A PEB
+
+    0x4000 - 0x4fbf one of four possible ROM pages
+    0x4fc0 - 0x4fcf tape select
+    0x4fd0 - 0x4fdf disk controller select
+    0x4fe0 - 0x4fff time chip select
+
+    0x5000 - 0x53ff static RAM page 0x10
+    0x5400 - 0x57ff static RAM page any of 32 pages
+    0x5800 - 0x5bff static RAM page any of 32 pages
+    0x5c00 - 0x5fff static RAM page any of 32 pages
 */
 static  READ8_HANDLER(hfdc_mem_r)
 {
@@ -1431,7 +1431,7 @@ static  READ8_HANDLER(hfdc_mem_r)
 		/* dsr ROM */
 		return ti99_disk_DSR[hfdc_rom_offset+offset];
 	}
-	
+
 	if (offset >= 0xfc0 && offset <= 0x0fcf)
 	{
 		/* tape controller */
@@ -1443,12 +1443,12 @@ static  READ8_HANDLER(hfdc_mem_r)
         {
                 /* Disk controller. Note that the odd addresses are ignored and
                    the addresses used for the write ports are also masked away
-                   since the write operations in the ti99 system are always 
+                   since the write operations in the ti99 system are always
                    accompanied by read operations before.
                 */
-                if ((offset & 3) == 0x00) 
+                if ((offset & 3) == 0x00)
                 {
-               		return smc92x4_r(device, (offset>>2)&1);
+            		return smc92x4_r(device, (offset>>2)&1);
                 }
                 else return 0;
         }
@@ -1468,11 +1468,11 @@ static  READ8_HANDLER(hfdc_mem_r)
 		/* ram page >08 (hfdc manual says >10) */
 		return hfdc_ram[0x2000+(offset-0x1000)];
 	}
-	
+
 	/* The remaining space is ram with mapper:
-	   1400, 1800, 1c00 are the three banks; get the pointer
-	   plus the offset within the bank
-	*/
+       1400, 1800, 1c00 are the three banks; get the pointer
+       plus the offset within the bank
+    */
 	return hfdc_ram[hfdc_ram_offset[(offset-0x1400) >> 10] + (offset & 0x3ff)];
 }
 
@@ -1489,7 +1489,7 @@ static WRITE8_HANDLER(hfdc_mem_w)
 		logerror("99_dsk: Writing to HFDC ROM ignored (access to offset %04x)\n", offset);
 		return;
 	}
-	
+
 	if (offset >= 0xfc0 && offset <= 0x0fcf)
 	{
 		/* tape controller */
@@ -1502,7 +1502,7 @@ static WRITE8_HANDLER(hfdc_mem_w)
                 /* Disk controller. Note that the odd addresses are ignored. */
                 if ((offset & 3) == 0x02)   /* 0x0fd2 and 0x0fd6 */
                 {
-               		smc92x4_w(diskcnt, (offset>>2)&1, data);
+            		smc92x4_w(diskcnt, (offset>>2)&1, data);
                 }
                 return;
         }
@@ -1524,13 +1524,13 @@ static WRITE8_HANDLER(hfdc_mem_w)
 		hfdc_ram[0x2000+(offset-0x1000)] = data;
 		return;
 	}
-	
+
 	/* The remaining space is ram with mapper:
-	   1400, 1800, 1c00 are the three banks; get the pointer
-	   plus the offset within the bank
-	*/	
-//	if ((offset&0x0f)==0) printf("\n");
-//	printf("%02x ", data);
-		
+       1400, 1800, 1c00 are the three banks; get the pointer
+       plus the offset within the bank
+    */
+//  if ((offset&0x0f)==0) printf("\n");
+//  printf("%02x ", data);
+
 	hfdc_ram[hfdc_ram_offset[(offset-0x1400) >> 10] + (offset & 0x3ff)] = data;
 }

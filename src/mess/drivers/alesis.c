@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
     Alesis HR-16 and SR-16 drum machines
 
     06/04/2010 Skeleton driver.
@@ -36,8 +36,8 @@ static INPUT_PORTS_START( alesis )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(alesis) 
-{	
+static MACHINE_RESET(alesis)
+{
 }
 
 static VIDEO_START( alesis )
@@ -53,10 +53,10 @@ static MACHINE_DRIVER_START( hr16 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8031, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(hr16_mem)
-	MDRV_CPU_IO_MAP(hr16_io)	
+	MDRV_CPU_IO_MAP(hr16_io)
 
 	MDRV_MACHINE_RESET(alesis)
-	
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -75,10 +75,10 @@ static MACHINE_DRIVER_START( sr16 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8031, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sr16_mem)
-	MDRV_CPU_IO_MAP(sr16_io)	
+	MDRV_CPU_IO_MAP(sr16_io)
 
 	MDRV_MACHINE_RESET(alesis)
-	
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)
@@ -109,7 +109,7 @@ ROM_START( hr16 )
 ROM_END
 
 ROM_START( hr16b )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )	
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
 	// version 2.00
@@ -127,7 +127,7 @@ ROM_START( sr16 )
 
 	ROM_REGION( 0x100000, "sounddata", ROMREGION_ERASEFF )
 	ROM_LOAD( "sr16.u5", 0x00000, 0x80000, CRC(8bb25cfa) SHA1(273ad59d017b54a7e8d5e1ec61c8cd807a0e4af3))
-	ROM_LOAD( "sr16.u6", 0x80000, 0x80000, CRC(6da96987) SHA1(3ec8627d440bc73841e1408a19def09a8b0b77f7))	
+	ROM_LOAD( "sr16.u6", 0x80000, 0x80000, CRC(6da96987) SHA1(3ec8627d440bc73841e1408a19def09a8b0b77f7))
 ROM_END
 
 

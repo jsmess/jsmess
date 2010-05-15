@@ -483,7 +483,7 @@ MACHINE_RESET( c16 )
 
 #if 0
 // FIXME
-// in very old MESS versions, we had these handlers to enable SID writes to 0xd400. 
+// in very old MESS versions, we had these handlers to enable SID writes to 0xd400.
 // would a real SID Card allow for this? If not, this should be removed completely
 static WRITE8_HANDLER( c16_sidcart_16k )
 {

@@ -523,7 +523,7 @@ static DEVICE_IMAGE_LOAD( pasogo_cart )
 		size = image_get_software_region_length(image, "rom");
 		memcpy(user, image_get_software_region(image, "rom"), size);
 	}
-	
+
 	return INIT_PASS;
 }
 
