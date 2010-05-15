@@ -1335,6 +1335,8 @@ static DEVICE_IMAGE_LOAD( _32x_cart )
 	for (i = 0x100; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
 	
+	auto_free(image->machine, temp_copy);
+
 	return INIT_PASS;
 }
 

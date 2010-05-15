@@ -15027,10 +15027,6 @@
 		</part>
 	</software>
 
-<!--Path:	D:\misc\tosectemp\
-Name:	QuackShot Starring Donald Duck ~ QuackShot - Guruzia Ou no Hihou (World) (v1.1).md
--->
-
 	<!-- According to Elbarto:
 		On the Quackshot PCB there is a 512Kb rom.
 		Normally all the address lines from A1 to A19 (the whole 512Kb range) tied to the chip in the right order.
