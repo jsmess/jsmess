@@ -14,43 +14,53 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers:
 -----------------
-- PK8002 Elf
-- MC-1702 [thanks to Anasana]
-- Scientific Atlanta PowerVu pv9234 STB
-- Dream Multimedia Dreambox 7000/5620/500
-- Elektronika MC7105 [Thanks to Kaldyh]
-- Chromatics CGC 7900
 - Alesis HR-16,HR-16B and SR-16 drum machines
-- VideoBrain Family Computer [Curt Coder]
 - Central Data 2650
-- PIPBUG
-- Elektor TV Games Computer
-- Signetics Instructor 50
-- Dolphin
 - Chaos 2
+- Chromatics CGC 7900
+- Dolphin
+- Dream Multimedia Dreambox 7000/5620/500
 - EC-1849 [thanks to Anasana]
+- Elektor TV Games Computer
+- Elektronika MC7105 [Thanks to Kaldyh]
+- MC-1702 [thanks to Anasana]
+- PIPBUG
+- PK8002 Elf
+- Scientific Atlanta PowerVu pv9234 STB
+- Signetics Instructor 50
+- VideoBrain Family Computer [Curt Coder]
 - Z80 development board (unknown)
 
 
 System Driver Changes:
 ----------------------
 
+- [AMSTRAD] Updated .hsi file with hashes to GoodCPC V3.1415 [Cowering]
+
 - [AQUARIUS] Replaced bad char ROM with the newly redumped one.
   [jaybird3rd, Dirk Best]
 
-- [ChannelF] - Added support for CHF extension. [Robbbert]
+- [ChannelF] Added .hsi file with hashes from GoodChaF V3.1415 [Cowering]
+
+- [ChannelF] Added support for CHF extension. [Robbbert]
 
 - [CBM] Added JiffyDOS BIOSes to VIC-20, C64, C128, Plus/4. [Curt Coder]
 
-- [Interact] - Added support for CIN extension. [Robbbert]
+- [Interact] Added support for CIN extension. [Robbbert]
+
+- [JAGUAR] Fixed crash on exit when no image is mounted [Oliver Stoeneberg]
 
 - [MBEE] Fixed crash of mbeeic when displaying I/O in debugger. [Robbbert]
+
+- [MO5] Added .hsi file with hashes from GoodMO5 V3.1415 [Cowering]
+
+- [MTX512] Updated .hsi file with hashes to GoodMTX V3.1415 [Cowering]
 
 - [MTX] Cleaned up driver and added cassette device. [Curt Coder]
 
 - [PEGASUS] Fixed natural keyboard mappings. [Justin Kerk]
 
-- [SX64] Added 1541 FLASH! BIOS. [Guru, Curt Coder]
+- [PICO] Updated .hsi file with hashes to GoodPico V3.1415 [Cowering]
 
 - [SAMCOUPE] Added border rendering support.  [Dirk Best]
 
@@ -61,13 +71,26 @@ System Driver Changes:
 - [SCV] Updated palette values to match the output from
   a real console.  [plgDavid]
 
+- [SX64] Added 1541 FLASH! BIOS. [Guru, Curt Coder]
+
 - [TANDY2K] Implemented DMA mux register. [Curt Coder]
 
 - [TI81] Added v1.1K BIOS. [critor]
 
 - [TI99] Cleanups.  [Michael Zapf]
 
-- [VIC20] Fixed quick-loading from the commandline, bug 1935. [Robbbert]
+- [TI99] Reimplementation of HDC9234 chip (smc92x4) for the HFDC controller. 
+  Now supports all functions according to specifications (except tape functions), 
+  including formatting and real timings. Introduced DIP switches for configuring 
+  the attached drives. Implemented MFM hard disk (ti99_hd) device, wrapping the 
+  plain hard disk image. This also resolves segfualt when formatting floppy disk 
+  with HFDC (bug #1257).  [Michael Zapf]
+
+- [TI99] Replaced DIP switches by Configuration switches.  [Michael Zapf]
+
+- [VBOY] Added .hsi file with hashes from GoodVBoy V3.1415 [Cowering]
+
+- [VIC20] Fixed quick-loading from the commandline (bug #1935). [Robbbert]
 
 - [VICTOR9K] Connected MC6852 device. [Curt Coder]
 
@@ -75,33 +98,27 @@ System Driver Changes:
 
 Imgtool Changes:
 ----------------
+
 - Sector View in Windows version is working again [Oliver Stoeneberg]
 
-- Fixed adding of files to FAT filesystem (filenames still show garbage in WinImage show) [Oliver Stoeneberg]
+- Fixed adding of files to FAT filesystem (filenames still show garbage in 
+  WinImage show) [Oliver Stoeneberg]
 
-- Fixed insertion of files inside of folders with Windows version [Oliver Stoeneberg]
+- Fixed insertion of files inside of folders with Windows version [Oliver 
+  Stoeneberg]
 
-- Increased default width of Sector View in Windows version to 16 rows (fixes bug 1124) [Oliver Stoeneberg]
+- Increased default width of Sector View in Windows version to 16 rows (bug #1124)
+  [Oliver Stoeneberg]
 
-- Fixed reading of command-line parameter in Windows version (fixes bug 1908) [Oliver Stoeneberg]
+- Fixed reading of command-line parameter in Windows version (bug #1908) [Oliver 
+  Stoeneberg]
 
 
 Source Changes:
 ----------------
+
 - The core is based on MAME 0.137u4.  This incorporates all features of the
   update to this core.  [MAME team]
-
-- [AMSTRAD CPC Family] Updated Hashes to GoodCPC V3.1415 [Cowering]
-
-- [Thomson MO5] Added Hashes from GoodMO5 V3.1415 [Cowering]
-
-- [Sega Pico] Updated Hashes to GoodPico V3.1415 [Cowering]
-
-- [Memotech MTX512] Updated Hashes to GoodMTX V3.1415 [Cowering]
-
-- [Nintendo Virtual Boy] Added Hashes from GoodVBoy V3.1415 [Cowering]
-
-- [Channel F] Added Hashes from GoodChaF V3.1415 [Cowering]
 
 - Added preliminary emulation of the MC6852 SSDA. [Curt Coder]
 
@@ -134,7 +151,8 @@ Source Changes:
 
 - Implemented get_track_size function for D64 and G64 formats. [Curt Coder]
 
-- Fixed display of hash (hsi) details in MESSUI software picker, bug 1841. [Robbbert]
+- Fixed display of hash (hsi) details in MESSUI software picker (bug #1841). 
+  [Robbbert]
 
 - Fixed 8080/8085 debugger when changing A and F registers. [Robbbert]
 
@@ -142,25 +160,32 @@ Source Changes:
 
 - Fixed cassette crash if the image being recorded was unmounted. [Robbbert]
 
-- [JAGUAR] Fixed crash on exit when no image is mounted [Oliver Stoeneberg]
-
-- Several compilation and linking fixes for Visual Studio (fixes bug 1852) [Oliver Stoeneberg]
+- Several compilation and linking fixes for Visual Studio (bug #1852) 
+  [Oliver Stoeneberg]
 
 - Fixed several memory leaks [Oliver Stoeneberg]
 
-- [NEWUI] Avoid duplicated extension when using "Save State As..." and don't carry the default savestate name in-between drivers when using the built-in menu [Oliver Stoeneberg]
-
 - Only schedule a hard reset when the image could be loaded [Oliver Stoeneberg]
 
-- Fixed hang when accessing unaccessible drive in File Manager (e.g. CD-ROM drive with no disc inserted) [Oliver Stoeneberg]
+- Fixed hang when accessing unaccessible drive in File Manager (e.g. CD-ROM 
+  drive with no disc inserted) [Oliver Stoeneberg]
 
 - Fixed assert on shutdown after an image load error [Oliver Stoeneberg]
 
-- [MESSUI] Removed "File->Create Image...". It never worked and offered invalid image types. Use Device View to create images (not working either at the moment) [Oliver Stoeneberg]
+- [MESSUI] Removed "File->Create Image...". It never worked and offered invalid 
+  image types. Use Device View to create images (not working either at the moment)
+  [Oliver Stoeneberg]
 
-- [MESSEUI] Configuration of screens is working again [Oliver Stoeneberg]
+- [MESSUI] Configuration of screens is working again [Oliver Stoeneberg]
 
-- [NEWUI] Removed non-working input configuration artwork support [Oliver Stoeneberg]
+- [NEWUI] Removed non-working input configuration artwork support [Oliver 
+  Stoeneberg]
+
+- [NEWUI] Avoid duplicated extension when using "Save State As..." and don't 
+  carry the default savestate name in-between drivers when using the built-in 
+  menu [Oliver Stoeneberg]
+
+
 
 0.137
 
@@ -282,6 +307,8 @@ System Driver Changes:
 - [SPECTRUM] Added .raw quickload support. Converted to use messram device.
 
 - [TX0] Fixed disassembly in the debugger. [Robbbert]
+
+- [TI99] Added support for Track dump format images (aka PC99) [Michael Zapf]
 
 
 
