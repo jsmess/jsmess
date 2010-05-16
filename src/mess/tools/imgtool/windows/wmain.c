@@ -23,7 +23,12 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance,
 	int pos, rc = -1;
 	imgtoolerr_t err;
 	HACCEL accel = NULL;
+	// workaround for MinGW bug - command_line_w actually contains a LPSTR
+#ifdef _MSC_VER
 	LPSTR utf8_command_line = utf8_from_wstring(command_line_w);
+#else
+	LPSTR utf8_command_line = (LPSTR)command_line_w;
+#endif
 	// initialize Windows classes
 	InitCommonControls();
 	if (!wimgtool_registerclass())
@@ -68,7 +73,9 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance,
 			wimgtool_report_error(window, err, utf8_command_line + pos, NULL);
 	}
 
+#ifdef _MSC_VER
 	osd_free(utf8_command_line);
+#endif
 	utf8_command_line = NULL;
 
 	accel = LoadAccelerators(NULL, MAKEINTRESOURCE(IDA_WIMGTOOL_MENU));
