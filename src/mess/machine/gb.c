@@ -338,6 +338,8 @@ MACHINE_START( sgb )
 {
 	sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 
+	add_exit_callback(machine, gb_machine_stop);
+	
 	/* Allocate the serial timer, and disable it */
 	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
 	timer_enable( gb_driver_data.gb_serial_timer, 0 );
@@ -425,13 +427,13 @@ MACHINE_RESET( gbc )
 static void gb_machine_stop(running_machine *machine)
 {
 	/* Don't save if there was no battery */
-	if( !(gb_driver_data.CartType & BATTERY) || ! gb_driver_data.RAMBanks )
+	if(!(gb_driver_data.CartType & BATTERY) || !gb_driver_data.RAMBanks)
 		return;
 
 	/* NOTE: The reason we save the carts RAM this way instead of using MAME's
        built in macros is because they force the filename to be the name of
        the machine.  We need to have a separate name for each game. */
-	image_battery_save(devtag_get_device(machine, "cart"), gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000 );
+	image_battery_save(devtag_get_device(machine, "cart"), gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000);
 }
 
 static void gb_set_mbc1_banks( running_machine *machine )
