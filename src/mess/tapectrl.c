@@ -155,7 +155,6 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 {
 	tape_control_menu_state *menustate;
 	const ui_menu_event *event;
-	double t0, t1;
 
 	/* if no state, allocate some */
 	if (state == NULL)
@@ -219,13 +218,10 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 						cassette_change_state(menustate->device, CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
 					}
 					else if (event->itemref==TAPECMD_REWIND) {
-						t0 = cassette_get_position(menustate->device);
-						cassette_seek(menustate->device, ((int) t0 > 0 ? -1 : 0), SEEK_CUR);
+						cassette_seek(menustate->device, -60, SEEK_CUR);
 					}
 					else if (event->itemref==TAPECMD_FAST_FORWARD) {
-						t0 = cassette_get_position(menustate->device);
-						t1 = cassette_get_length(menustate->device);
-						cassette_seek(menustate->device, ((int) t0 < (int) t1 ? +1 : 0), SEEK_CUR);
+						cassette_seek(menustate->device, +60, SEEK_CUR);
 					}
 				}
 				break;
