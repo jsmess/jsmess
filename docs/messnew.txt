@@ -1,4 +1,4 @@
-﻿0.138
+0.138
 
 New System Drivers Supported:
 -----------------------------
@@ -129,8 +129,10 @@ System Driver Changes:
   if a few graphical regressions have been introduced, but these require more
   CPU changes to be properly fixed). [Angelo Salese]
 
-- [SNES] Fixed rom mapping: now Tokimeki Memorial and Wizardry Gaiden work fine
+- [SNES] Fixed rom mapping: now Tokimeki Memorial and Wizardry Gaiden work fine.
   [Fabio Priuli]
+
+- [SUPERGB] Added cart SRAM saving (bug #1949).  [Fabio Priuli]
 
 - [SX64] Added 1541 FLASH! BIOS. [Guru, Curt Coder]
 
