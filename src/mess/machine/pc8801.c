@@ -32,7 +32,8 @@ int pc88sr_is_highspeed;
 static int port32_save;
 static int text_window;
 static int extmem_mode=-1;
-static unsigned char *extRAM=NULL;
+static UINT8 *extRAM;
+static int extRAM_size;
 static void *ext_bank_80[4],*ext_bank_88[256];
 static UINT8 extmem_ctrl[2];
 
@@ -486,6 +487,7 @@ WRITE8_HANDLER( pc88sr_outport_71 )
   pc8801_update_bank(space->machine);
 }
 
+// FIXME: shouldn't we use ram device in place of the below code?
 static void pc8801_init_bank(running_machine *machine, int hireso)
 {
 	int i,j;
@@ -500,97 +502,117 @@ static void pc8801_init_bank(running_machine *machine, int hireso)
 	port71_save=0xff;
 	port32_save=0x80;
 	mainROM = memory_region(machine, "maincpu");
-	pc8801_mainRAM = auto_alloc_array(machine, UINT8, 0x10000);
-	memset(pc8801_mainRAM, 0, 0x10000);
+	pc8801_mainRAM = auto_alloc_array_clear(machine, UINT8, 0x10000);
 
 	extmem_ctrl[0]=extmem_ctrl[1]=0;
 	pc8801_update_bank(machine);
 	pc8801_video_init(machine, hireso);
 
-  if(extmem_mode!=input_port_read(machine, "MEM")) {
-    extmem_mode=input_port_read(machine, "MEM");
-    if(extRAM!=NULL) {
-      free(extRAM);
-      extRAM=NULL;
-    }
-    for(i=0;i<4;i++) ext_bank_80[i]=NULL;
-    for(i=0;i<256;i++) ext_bank_88[i]=NULL;
-    num80=num88=numIO=0;
-    switch(extmem_mode) {
-    case 0x00: /* none */
-      break;
-    case 0x01: /* 32KB(PC-8012-02 x 1) */
-      num80=1;
-      break;
-    case 0x02: /* 64KB(PC-8012-02 x 2) */
-      num80=2;
-      break;
-    case 0x03: /* 128KB(PC-8012-02 x 4) */
-      num80=4;
-      break;
-    case 0x04: /* 128KB(PC-8801-02N x 1) */
-      num88=1;
-      break;
-    case 0x05: /* 256KB(PC-8801-02N x 2) */
-      num88=2;
-      break;
-    case 0x06: /* 512KB(PC-8801-02N x 4) */
-      num88=4;
-      break;
-    case 0x07: /* 1M(PIO-8234H-1M x 1) */
-      numIO=1;
-      break;
-    case 0x08: /* 2M(PIO-8234H-2M x 1) */
-      numIO=2;
-      break;
-    case 0x09: /* 4M(PIO-8234H-2M x 2) */
-      numIO=4;
-      break;
-    case 0x0a: /* 8M(PIO-8234H-2M x 4) */
-      numIO=8;
-      break;
-    case 0x0b: /* 1.1M(PIO-8234H-1M x 1 + PC-8801-02N x 1) */
-      num88=1;
-      numIO=1;
-      break;
-    case 0x0c: /* 2.1M(PIO-8234H-2M x 1 + PC-8801-02N x 1) */
-      num88=1;
-      numIO=2;
-      break;
-    case 0x0d: /* 4.1M(PIO-8234H-2M x 2 + PC-8801-02N x 1) */
-      num88=1;
-      numIO=4;
-      break;
-    default:
-      logerror("pc8801 : illegal extension memory mode.\n");
-      return;
-    }
-    if(num80!=0 || num88!=0 || numIO!=0) {
-      extRAM=(UINT8*)malloc(num80*0x8000+num88*0x20000+numIO*0x100000);
-      e=extRAM;
-      for(i=0;i<num80;i++) {
-	ext_bank_80[i]=e;
-	e+=0x8000;
-      }
-      for(i=0;i<num88*4;i++) {
-	for(j=i;j<256;j+=16) {
-	  ext_bank_88[j]=e;
+	if (extmem_mode != input_port_read(machine, "MEM")) 
+	{
+		extmem_mode = input_port_read(machine, "MEM");
+
+		// reset all the bank-related quantities
+		memset(extRAM, 0, extRAM_size);
+
+		for (i = 0; i < 4; i++) 
+			ext_bank_80[i] = NULL;
+
+		for (i = 0; i < 256; i++) 
+			ext_bank_88[i] = NULL;
+
+		num80 = num88 = numIO = 0;
+
+		// set up the required number of banks
+		switch (extmem_mode) 
+		{
+			case 0x00: /* none */
+				break;
+			case 0x01: /* 32KB(PC-8012-02 x 1) */
+				num80 = 1;
+				break;
+			case 0x02: /* 64KB(PC-8012-02 x 2) */
+				num80 = 2;
+				break;
+			case 0x03: /* 128KB(PC-8012-02 x 4) */
+				num80 = 4;
+				break;
+			case 0x04: /* 128KB(PC-8801-02N x 1) */
+				num88 = 1;
+				break;
+			case 0x05: /* 256KB(PC-8801-02N x 2) */
+				num88 = 2;
+				break;
+			case 0x06: /* 512KB(PC-8801-02N x 4) */
+				num88 = 4;
+				break;
+			case 0x07: /* 1M(PIO-8234H-1M x 1) */
+				numIO = 1;
+				break;
+			case 0x08: /* 2M(PIO-8234H-2M x 1) */
+				numIO = 2;
+				break;
+			case 0x09: /* 4M(PIO-8234H-2M x 2) */
+				numIO = 4;
+				break;
+			case 0x0a: /* 8M(PIO-8234H-2M x 4) */
+				numIO = 8;
+				break;
+			case 0x0b: /* 1.1M(PIO-8234H-1M x 1 + PC-8801-02N x 1) */
+				num88 = 1;
+				numIO = 1;
+				break;
+			case 0x0c: /* 2.1M(PIO-8234H-2M x 1 + PC-8801-02N x 1) */
+				num88 = 1;
+				numIO = 2;
+				break;
+			case 0x0d: /* 4.1M(PIO-8234H-2M x 2 + PC-8801-02N x 1) */
+				num88 = 1;
+				numIO = 4;
+				break;
+			default:
+				logerror("pc8801 : illegal extension memory mode.\n");
+				return;
+		}
+
+		// point the banks to the correct memory
+		if (num80 != 0 || num88 != 0 || numIO != 0) 
+		{
+			e = extRAM;
+
+			for (i = 0; i < num80; i++) 
+			{
+				ext_bank_80[i] = e;
+				e += 0x8000;
+			}
+ 
+			for (i = 0; i < num88 * 4; i++) 
+			{
+				for (j = i; j < 256; j += 16) 
+				{
+					ext_bank_88[j] = e;
+				}
+				e += 0x8000;
+			}
+
+			if (num88 == 0) 
+			{
+				for (i = 0; i < numIO * 32; i++) 
+				{
+					ext_bank_88[(i & 0x07) | ((i & 0x18) << 1) | ((i & 0x20) >> 2) | (i & 0xc0)] = e;
+					e += 0x8000;
+				}
+			} 
+			else 
+			{
+				for (i = 0; i < numIO * 32; i++) 
+				{
+					ext_bank_88[(i & 0x07) | ((i & 0x78) << 1) | 0x08] = e;
+					e += 0x8000;
+				}
+			}
+		}
 	}
-	e+=0x8000;
-      }
-      if(num88==0) {
-	for(i=0;i<numIO*32;i++) {
-	  ext_bank_88[(i&0x07)|((i&0x18)<<1)|((i&0x20)>>2)|(i&0xc0)]=e;
-	  e+=0x8000;
-	}
-      } else {
-	for(i=0;i<numIO*32;i++) {
-	  ext_bank_88[(i&0x07)|((i&0x78)<<1)|0x08]=e;
-	  e+=0x8000;
-	}
-      }
-    }
-  }
 }
 
 static void fix_V1V2(void)
@@ -632,7 +654,14 @@ static void pc88sr_ch_reset(running_machine *machine, int hireso)
 	running_device *speaker = devtag_get_device(machine, "beep");
 	int a;
 
-	a=input_port_read(machine, "CFG");
+	// old code was allocating/freeing a smaller region depending on the "MEM" config,
+	// but I guess this was the reason of bug #1952. So we now allocate the maximum
+	// possible amount of extended RAM, and then we only use the amount we need.
+	// eventually, we should convert the driver to use the ram device, imho.
+	extRAM_size = 4 * 0x8000 + 4 * 0x20000 + 8 * 0x100000;
+	extRAM = auto_alloc_array_clear(machine, UINT8, extRAM_size);
+
+	a = input_port_read(machine, "CFG");
 	is_Nbasic = ((a&0x01)==0x00);
 	is_V2mode = ((a&0x02)==0x00);
 	pc88sr_is_highspeed = ((a&0x04)!=0x00);
