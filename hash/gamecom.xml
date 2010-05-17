@@ -248,7 +248,7 @@
 		<publisher>Tiger Electronics</publisher>
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="internet (1997)(tiger electronics).zip" size="262144" crc="7e721a84" sha1="4c6b5b91a70397cb5e1add4ab53afe3ec0fe2072" offset="000000" />
+				<rom name="internet (1997)(tiger electronics).bin" size="262144" crc="7e721a84" sha1="4c6b5b91a70397cb5e1add4ab53afe3ec0fe2072" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -260,7 +260,7 @@
 		<publisher>Tiger Electronics</publisher>
 		<part name="cart" interface="gamecom_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="web link (1997)(tiger electronics).zip" size="262144" crc="4c13e65b" sha1="d4e08fc050c006ed6c1a177a1f4c41b4a68c26bb" offset="000000" />
+				<rom name="web link (1997)(tiger electronics).bin" size="262144" crc="4c13e65b" sha1="d4e08fc050c006ed6c1a177a1f4c41b4a68c26bb" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
