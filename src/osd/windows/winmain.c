@@ -463,7 +463,7 @@ static void soft_link_functions(void)
 	{
 		image_nt_header = (image_nt_header_ptr)GetProcAddress(library, "ImageNtHeader");
 		stack_walk_64 = (stack_walk_64_ptr)GetProcAddress(library, "StackWalk64");
-		sym_initialize = (sym_initialize_ptr)GetProcAddress(library, "SymInitialize" UNICODE_POSTFIX);
+		sym_initialize = (sym_initialize_ptr)GetProcAddress(library, "SymInitialize");
 		sym_function_table_access_64 = (sym_function_table_access_64_ptr)GetProcAddress(library, "SymFunctionTableAccess64");
 		sym_get_module_base_64 = (sym_get_module_base_64_ptr)GetProcAddress(library, "SymGetModuleBase64");
 		sym_from_addr = (sym_from_addr_ptr)GetProcAddress(library, "SymFromAddr");
