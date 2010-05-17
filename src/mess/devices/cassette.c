@@ -74,9 +74,7 @@ INLINE int cassette_is_motor_on(running_device *device)
 static void cassette_update(running_device *device)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
-	double cur_time;
-
-	cur_time = attotime_to_double(timer_get_time(device->machine));
+	double cur_time = attotime_to_double(timer_get_time(device->machine));
 
 	if (cassette_is_motor_on(device))
 	{
@@ -89,7 +87,16 @@ static void cassette_update(running_device *device)
 
 		case CASSETTE_PLAY:
 			if ( cassette->cassette )
+			{
 				cassette_get_sample(cassette->cassette, 0, new_position, 0.0, &cassette->value);
+				/* See if reached end of tape */
+				double length = cassette_get_length(device);
+				if (new_position > length)
+				{
+					cassette->state = (cassette_state)(CASSETTE_MASK_DRVSTATE);
+					new_position = length;
+				}
+			}
 			break;
 		}
 		cassette->position = new_position;
@@ -204,14 +211,18 @@ void cassette_seek(running_device *device, double time, int origin)
 {
 	dev_cassette_t	*cassette = get_safe_token( device );
 
+	double length;
+
 	cassette_update(device);
+
+	length = cassette_get_length(device);	
 
 	switch(origin) {
 	case SEEK_SET:
 		break;
 
 	case SEEK_END:
-		time += cassette_get_length(device);
+		time += length;
 		break;
 
 	case SEEK_CUR:
@@ -220,6 +231,12 @@ void cassette_seek(running_device *device, double time, int origin)
 	}
 
 	/* clip position into legal bounds */
+	if (time < 0)
+		time = 0;
+	else
+	if (time > length)
+		time = length;
+
 	cassette->position = time;
 }
 

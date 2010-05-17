@@ -1565,11 +1565,11 @@ static void device_command(HWND wnd, running_device *img, int devoption)
 						break;
 
 					case DEVOPTION_CASSETTE_REWIND:
-						cassette_seek(img, -1.0, SEEK_CUR);
+						cassette_seek(img, -60.0, SEEK_CUR);
 						break;
 
 					case DEVOPTION_CASSETTE_FASTFORWARD:
-						cassette_seek(img, +1.0, SEEK_CUR);
+						cassette_seek(img, +60.0, SEEK_CUR);
 						break;
 				}
 			}
