@@ -255,18 +255,16 @@ do																					\
 	if (entry != DRAWMODE_NONE)														\
 	{																				\
 		UINT8 pridata = (PRIORITY);													\
-		if (((1 << (pridata & 0x1f)) & pmask) == 0)									\
+		if (entry == DRAWMODE_SOURCE)												\
 		{																			\
-			if (entry == DRAWMODE_SOURCE)											\
-			{																		\
+			if (((1 << (pridata & 0x1f)) & pmask) == 0)								\
 				(DEST) = paldata[srcdata];											\
-				(PRIORITY) = 31;													\
-			}																		\
-			else if ((pridata & 0x80) == 0)											\
-			{																		\
-				(DEST) = shadowtable[DEST];											\
-				(PRIORITY) = pridata | 0x80;										\
-			}																		\
+			(PRIORITY) = 31;														\
+		}																			\
+		else if ((pridata & 0x80) == 0 && ((1 << (pridata & 0x1f)) & pmask) == 0)	\
+		{																			\
+			(DEST) = shadowtable[DEST];												\
+			(PRIORITY) = pridata | 0x80;											\
 		}																			\
 	}																				\
 }																					\
@@ -280,18 +278,16 @@ do																					\
 	if (entry != DRAWMODE_NONE)														\
 	{																				\
 		UINT8 pridata = (PRIORITY);													\
-		if (((1 << (pridata & 0x1f)) & pmask) == 0)									\
+		if (entry == DRAWMODE_SOURCE)												\
 		{																			\
-			if (entry == DRAWMODE_SOURCE)											\
-			{																		\
+			if (((1 << (pridata & 0x1f)) & pmask) == 0)								\
 				(DEST) = paldata[srcdata];											\
-				(PRIORITY) = 31;													\
-			}																		\
-			else if ((pridata & 0x80) == 0)											\
-			{																		\
-				(DEST) = shadowtable[rgb_to_rgb15(DEST)];							\
-				(PRIORITY) = pridata | 0x80;										\
-			}																		\
+			(PRIORITY) = 31;														\
+		}																			\
+		else if ((pridata & 0x80) == 0 && ((1 << (pridata & 0x1f)) & pmask) == 0)	\
+		{																			\
+			(DEST) = shadowtable[rgb_to_rgb15(DEST)];								\
+			(PRIORITY) = pridata | 0x80;											\
 		}																			\
 	}																				\
 }																					\

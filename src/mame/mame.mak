@@ -905,6 +905,7 @@ $(MAMEOBJ)/midway.a: \
 	$(AUDIO)/wow.o \
 
 $(MAMEOBJ)/msx.a: \
+	$(DRIVERS)/big10.o \
 	$(DRIVERS)/forte2.o \
 	$(DRIVERS)/pengadvb.o \
 	$(DRIVERS)/sangho.o \
@@ -1491,7 +1492,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/attckufo.o \
 	$(DRIVERS)/aztarac.o $(AUDIO)/aztarac.o $(VIDEO)/aztarac.o \
 	$(DRIVERS)/beaminv.o \
-	$(DRIVERS)/big10.o \
 	$(DRIVERS)/bingor.o \
 	$(DRIVERS)/blackt96.o \
 	$(DRIVERS)/buster.o \
@@ -1734,6 +1734,8 @@ $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 
 $(DRIVERS)/goldnpkr.o:	$(LAYOUT)/goldnpkr.lh \
 						$(LAYOUT)/pmpoker.lh \
+
+$(DRIVERS)/goldstar.o:	$(LAYOUT)/lucky8.lh
 
 $(DRIVERS)/grchamp.o:	$(LAYOUT)/grchamp.lh
 

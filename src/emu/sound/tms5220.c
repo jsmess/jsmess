@@ -60,7 +60,7 @@ e[0 or f] p[0] k1[0] k2[0] k3[0] k4[0] k5[f] k6[f] k7[f] k8[7] k9[7] k10[7]
 
 Driver specific notes:
 
-    Looping has the tms5220 hookep up directly to the cpu. However currently the
+    Looping has the tms5220 hooked up directly to the cpu. However currently the
     tms9900 cpu core does not support a ready line.
 
     Victory's initial audio selftest is pretty brutal to the FIFO: it sends a
@@ -182,15 +182,29 @@ device), PES Speech adapter (serial port connection)
 
 /* *****optional defines***** */
 
-/* this ignores pitch, and uses a sawtooth wave for the voiced and unvoiced waveforms as a test, if not set */
+/* this define controls the interpolation shift logic. one of the following two lines should be used, and the other commented; the second line is more accurate mathematically but less accurate to hardware (Unless I (LN) misunderstand the way the shifter works, which is quite likely) */
+#define INTERP_SHIFT >> tms->coeff->interp_coeff[interp_period]
+//#define INTERP_SHIFT / (1<<tms->coeff->interp_coeff[interp_period])
+
+/* this define controls whether the excitation waveform for a new frame is activated on IP=7/interp_period = 0 (the first period of the next frame) or IP=0/interp_period = 7 (the last period of this frame) when interpolation is inhibited for this frame. The patent is unclear on this point and either way could be correct. if undefined it does the latter case, if defined it does the former case. */
+#undef INTERP_INHIBIT_EXCITE_DELAY
+
+/* if undefined, various hacky improvements are used, such as inverting excitation waveform, and increasing the magnitude of unvoiced speech excitation */
 #define NORMALMODE 1
 
-/* if not defined, output the waveform as if it was tapped on the i/o pin */
-#define DO_CLIP_AND_WRAP 1
+/* must be defined; if 0, output the waveform as if it was tapped on the speaker pin as usual, if 1, output the waveform as if it was tapped on the i/o pin (volume is much lower in the latter case) */
+#define FORCE_DIGITAL 0
+
+/* if defined, outputs the low 4 bits of the lattice filter to the i/o or clip logic, even though the real hardware doesn't do this */
+#undef ALLOW_4_LSB
+
+/* if defined, uses impossibly perfect 'straight line' interpolation */
+#undef PERFECT_INTERPOLATION_HACK
 
 /* if defined, interpolation is only using the said slot of the 8,8,8,4,4,4,2,1 slots
    i.e. setting to 7 effectively disables interpolation, as it adds 1/1 of the difference
-   between current and target to the current each frame */
+   between current and target to the current each frame;
+   ***Be warned that setting this will mess up the inhibit logic!*** */
 #undef OVERRIDE_INTERPOLATION
 
 /* *****debugging defines***** */
@@ -216,8 +230,10 @@ device), PES Speech adapter (serial port connection)
 // above dumps some debug information related to the sample generation loop, i.e. when ramp frames happen
 #undef DEBUG_GENERATION_VERBOSE
 // above dumps MUCH MORE debug information related to the sample generation loop, namely the k, pitch and energy values for EVERY SINGLE SAMPLE.
-#undef DEBUG_CLIP_WRAP
-// above dumps info to stderr whenever the clip/wrap hardware is (or would be) clipping the signal.
+#undef DEBUG_LATTICE
+// above dumps the lattice filter state data each sample.
+#undef DEBUG_CLIP
+// above dumps info to stderr whenever the analog clip hardware is (or would be) clipping the signal.
 #undef DEBUG_IO_READY
 // above debugs the io ready callback
 #undef DEBUG_RS_WS
@@ -280,18 +296,29 @@ struct _tms5220_state
 
 
 	/* these are all used to contain the current state of the sound generation */
-	UINT16 current_energy;
-	UINT16 current_pitch;
+#ifndef PERFECT_INTERPOLATION_HACK
+	INT16 current_energy;
+	INT16 current_pitch;
 	INT16 current_k[10];
 
-	UINT16 target_energy;
-	UINT16 target_pitch;
+	INT16 target_energy;
+	INT16 target_pitch;
 	INT16 target_k[10];
+#else
+	INT32 current_energy;
+	INT32 current_pitch;
+	INT32 current_k[10];
+
+	INT32 target_energy;
+	INT32 target_pitch;
+	INT32 target_k[10];
+#endif
 
 	UINT16 previous_energy;         /* needed for lattice filter to match patent */
 
 	//UINT8 interp_period; /* TODO: the current interpolation period, counts 1,2,3,4,5,6,7,0 for divide by 8,8,8,4,4,4,2,1 */
 	UINT8 interp_count;		/* number of samples within each sub-interpolation period, ranges from 0-24 */
+	UINT8 inhibit;			/* interpolation is inhibited until the DIV1 period */
 	//UINT8 spkslow_delay;  /* delay counter for interp count, only used on tms51xx */
 	UINT8 sample_count;		/* number of samples within the ENTIRE interpolation period, ranges from 0-199 */
 	UINT8 tms5220c_rate; /* only relevant for tms5220C's multi frame rate feature; is the actual 4 bit value written on a 0x2* or 0x0* command */
@@ -330,6 +357,7 @@ struct _tms5220_state
        The internal DAC used to feed the analog pin is only 8 bits, and has the
        funny clipping/clamping logic, while the digital pin gives full 12? bit
        resolution of the output data.
+       TODO: add a way to set/reset this other than the FORCE_DIGITAL define
      */
 	UINT8 digital_select;
 	running_device *device;
@@ -361,8 +389,8 @@ static void process_command(tms5220_state *tms, unsigned char data);
 static void parse_frame(tms5220_state *tms);
 static void update_status_and_ints(tms5220_state *tms);
 static void set_interrupt_state(tms5220_state *tms, int state);
-static INT16 lattice_filter(tms5220_state *tms);
-static INT16 clip_and_wrap(INT16 cliptemp);
+static INT32 lattice_filter(tms5220_state *tms);
+static INT16 clip_analog(INT16 clip);
 static STREAM_UPDATE( tms5220_update );
 
 void tms5220_set_variant(tms5220_state *tms, int variant)
@@ -421,6 +449,7 @@ static void register_for_save_states(tms5220_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->previous_energy);
 
 	state_save_register_device_item(tms->device, 0, tms->interp_count);
+	state_save_register_device_item(tms->device, 0, tms->inhibit);
 	state_save_register_device_item(tms->device, 0, tms->sample_count);
 	state_save_register_device_item(tms->device, 0, tms->tms5220c_rate);
 	state_save_register_device_item(tms->device, 0, tms->pitch_count);
@@ -510,8 +539,12 @@ static void tms5220_data_write(tms5220_state *tms, int data)
 				/* ...then we now have enough bytes to start talking; clear out the new frame parameters (it will become old frame just before the first call to parse_frame() ) */
 				tms->new_frame_energy_idx = 0;
 				tms->new_frame_pitch_idx = 0;
-				for (i = 0; i < tms->coeff->num_k; i++)
+				for (i = 0; i < 4; i++)
 					tms->new_frame_k_idx[i] = 0;
+				for (i = 4; i < 7; i++)
+					tms->new_frame_k_idx[i] = 0xF;
+				for (i = 7; i < tms->coeff->num_k; i++)
+					tms->new_frame_k_idx[i] = 0x7;
 				tms->talk_status = tms->speaking_now = 1;
 			}
 		}
@@ -744,6 +777,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 {
     int buf_count=0;
     int i, interp_period, bitout, zpar;
+    INT32 this_sample;
 
 //tryagain:
 
@@ -797,8 +831,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 					update_status_and_ints(tms);
 				}
 
-			/* in all cases where interpolation would be inhibited, set the target
-               value equal to the current value.
+			/* in all cases where interpolation would be inhibited, set the inhibit flag; otherwise clear it.
                Interpolation inhibit cases:
                * Old frame was voiced, new is unvoiced
                * Old frame was silence/zero energy, new has nonzero energy
@@ -807,33 +840,27 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 			if ( ((OLD_FRAME_UNVOICED_FLAG == 0) && (NEW_FRAME_UNVOICED_FLAG == 1))
 				|| ((OLD_FRAME_UNVOICED_FLAG == 1) && (NEW_FRAME_UNVOICED_FLAG == 0))
 				|| ((OLD_FRAME_SILENCE_FLAG == 1) && (NEW_FRAME_SILENCE_FLAG == 0)) )
-			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"processing frame: interpolation inhibited\n");
-				fprintf(stderr,"*** current Energy = %d\n",tms->current_energy);
-				fprintf(stderr,"*** next frame Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
-#endif
-				tms->target_energy = tms->current_energy;
-				tms->target_pitch = tms->current_pitch;
-				for (i = 0; i < tms->coeff->num_k; i++)
-					tms->target_k[i] = tms->current_k[i];
-			}
+				tms->inhibit = 1;
 			else // normal frame, normal interpolation
-			{
-#ifdef DEBUG_GENERATION
-				fprintf(stderr,"processing frame: Normal\n");
-				fprintf(stderr,"*** current Energy = %d\n",tms->current_energy);
-				fprintf(stderr,"*** new (target) Energy = %d(index: %x)\n",tms->coeff->energytable[tms->new_frame_energy_idx],tms->new_frame_energy_idx);
-#endif
+				tms->inhibit = 0;
 
-				tms->target_energy = tms->coeff->energytable[tms->new_frame_energy_idx];
-				tms->target_pitch = tms->coeff->pitchtable[tms->new_frame_pitch_idx];
-				zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
-				for (i = 0; i < 4; i++)
-					tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
-				for (i = 4; i < tms->coeff->num_k; i++)
-						tms->target_k[i] = (tms->coeff->ktable[i][tms->new_frame_k_idx[i]] * (1-zpar));
-			}
+			tms->target_energy = tms->coeff->energytable[tms->new_frame_energy_idx];
+			tms->target_pitch = tms->coeff->pitchtable[tms->new_frame_pitch_idx];
+			zpar = NEW_FRAME_UNVOICED_FLAG; // find out if parameters k5-k10 should be zeroed
+			for (i = 0; i < 4; i++)
+				tms->target_k[i] = tms->coeff->ktable[i][tms->new_frame_k_idx[i]];
+			for (i = 4; i < tms->coeff->num_k; i++)
+				tms->target_k[i] = (tms->coeff->ktable[i][tms->new_frame_k_idx[i]] * (1-zpar));
+
+#ifdef DEBUG_GENERATION
+				fprintf(stderr,"Processing frame: ");
+				if (tms->inhibit == 0)
+					fprintf(stderr, "Normal Frame\n");
+				else
+					fprintf(stderr,"Interpolation Inhibited\n");
+				fprintf(stderr,"*** current Energy, Pitch and Ks =      %04d,   %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",tms->current_energy, tms->current_pitch, tms->current_k[0], tms->current_k[1], tms->current_k[2], tms->current_k[3], tms->current_k[4], tms->current_k[5], tms->current_k[6], tms->current_k[7], tms->current_k[8], tms->current_k[9]);
+				fprintf(stderr,"*** target Energy(idx), Pitch, and Ks = %04d(%x),%04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d, %04d\n",tms->target_energy, tms->new_frame_energy_idx, tms->target_pitch, tms->target_k[0], tms->target_k[1], tms->target_k[2], tms->target_k[3], tms->target_k[4], tms->target_k[5], tms->target_k[6], tms->target_k[7], tms->target_k[8], tms->target_k[9]);
+#endif
 
 			/* if TS is now 0, ramp the energy down to 0. Is this really correct to hardware? */
 			if ( (tms->talk_status == 0))
@@ -851,8 +878,22 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 #else
 			interp_period = tms->sample_count / 25;
 #endif
-#define PC_COUNT_LOAD 0
+		if (interp_period == 7) tms->inhibit = 0; // disable inhibit when reaching the last interp period
+#ifdef PERFECT_INTERPOLATION_HACK
 		zpar = OLD_FRAME_UNVOICED_FLAG;
+		// reset the current energy, pitch, etc to what it was at frame start
+		tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
+		tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
+		for (i = 0; i < 4; i++)
+			tms->current_k[i] = tms->coeff->ktable[i][tms->old_frame_k_idx[i]];
+		for (i = 4; i < tms->coeff->num_k; i++)
+			tms->current_k[i] = (tms->coeff->ktable[i][tms->old_frame_k_idx[i]] * (1-zpar));
+		// now adjust each value to be exactly correct for each of the 200 samples per frsme
+		tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit))*tms->sample_count)/200;
+		tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit))*tms->sample_count)/200;
+		for (i = 0; i < tms->coeff->num_k; i++)
+			tms->current_k[i] += (((tms->target_k[i] - tms->current_k[i])*(1-tms->inhibit))*tms->sample_count)/200;
+#else
 		switch(tms->interp_count)
 			{
 				/*         PC=X  X cycle, rendering change (change for next cycle which chip is actually doing) */
@@ -861,88 +902,68 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
 				case 1: /* PC=0, B cycle, nothing happens (update energy) */
 				break;
 				case 2: /* PC=1, A cycle, update energy (calc pitch) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_energy = tms->coeff->energytable[tms->old_frame_energy_idx];
-				tms->current_energy += ((tms->target_energy - tms->current_energy) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_energy += (((tms->target_energy - tms->current_energy)*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 3: /* PC=1, B cycle, nothing happens (update pitch) */
 				break;
 				case 4: /* PC=2, A cycle, update pitch (calc K1) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_pitch = tms->coeff->pitchtable[tms->old_frame_pitch_idx];
-				tms->current_pitch += ((tms->target_pitch - tms->current_pitch) >> tms->coeff->interp_coeff[interp_period]);
+#ifndef INTERP_INHIBIT_EXCITE_DELAY
+				if (interp_period == 7) tms->old_frame_pitch_idx = tms->new_frame_pitch_idx; // this is to make it so the voiced/unvoiced select during interpolation takes effect at the same time as inhibit stops.
+#endif
+				tms->current_pitch += (((tms->target_pitch - tms->current_pitch)*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 5: /* PC=2, B cycle, nothing happens (update K1) */
 				break;
 				case 6: /* PC=3, A cycle, update K1 (calc K2) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_k[0] = tms->coeff->ktable[0][tms->old_frame_k_idx[0]];
-				tms->current_k[0] += ((tms->target_k[0] - tms->current_k[0]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[0] += (((tms->target_k[0] - tms->current_k[0])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 7: /* PC=3, B cycle, nothing happens (update K2) */
 				break;
 				case 8: /* PC=4, A cycle, update K2 (calc K3) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_k[1] = tms->coeff->ktable[1][tms->old_frame_k_idx[1]];
-				tms->current_k[1] += ((tms->target_k[1] - tms->current_k[1]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[1] += (((tms->target_k[1] - tms->current_k[1])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 9: /* PC=4, B cycle, nothing happens (update K3) */
 				break;
 				case 10: /* PC=5, A cycle, update K3 (calc K4) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_k[2] = tms->coeff->ktable[2][tms->old_frame_k_idx[2]];
-				tms->current_k[2] += ((tms->target_k[2] - tms->current_k[2]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[2] += (((tms->target_k[2] - tms->current_k[2])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 11: /* PC=5, B cycle, nothing happens (update K4) */
 				break;
 				case 12: /* PC=6, A cycle, update K4 (calc K5) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_k[3] = tms->coeff->ktable[3][tms->old_frame_k_idx[3]];
-				tms->current_k[3] += ((tms->target_k[3] - tms->current_k[3]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[3] += (((tms->target_k[3] - tms->current_k[3])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 13: /* PC=6, B cycle, nothing happens (update K5) */
 				break;
 				case 14: /* PC=7, A cycle, update K5 (calc K6) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_k[4] = (tms->coeff->ktable[4][tms->old_frame_k_idx[4]] * (1-zpar));
-				tms->current_k[4] += ((tms->target_k[4] - tms->current_k[4]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[4] += (((tms->target_k[4] - tms->current_k[4])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 15: /* PC=7, B cycle, nothing happens (update K6) */
 				break;
 				case 16: /* PC=8, A cycle, update K6 (calc K7) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_k[5] = (tms->coeff->ktable[5][tms->old_frame_k_idx[5]] * (1-zpar));
-				tms->current_k[5] += ((tms->target_k[5] - tms->current_k[5]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[5] += (((tms->target_k[5] - tms->current_k[5])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 17: /* PC=8, B cycle, nothing happens (update K7) */
 				break;
 				case 18: /* PC=9, A cycle, update K7 (calc K8) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_k[6] = (tms->coeff->ktable[6][tms->old_frame_k_idx[6]] * (1-zpar));
-				tms->current_k[6] += ((tms->target_k[6] - tms->current_k[6]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[6] += (((tms->target_k[6] - tms->current_k[6])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 19: /* PC=9, B cycle, nothing happens (update K8) */
 				break;
 				case 20: /* PC=10, A cycle, update K8 (calc K9) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_k[7] = (tms->coeff->ktable[7][tms->old_frame_k_idx[7]] * (1-zpar));
-				tms->current_k[7] += ((tms->target_k[7] - tms->current_k[7]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[7] += (((tms->target_k[7] - tms->current_k[7])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 21: /* PC=10, B cycle, nothing happens (update K9) */
 				break;
 				case 22: /* PC=11, A cycle, update K9 (calc K10) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_k[8] = (tms->coeff->ktable[8][tms->old_frame_k_idx[8]] * (1-zpar));
-				tms->current_k[8] += ((tms->target_k[8] - tms->current_k[8]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[8] += (((tms->target_k[8] - tms->current_k[8])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 				case 23: /* PC=11, B cycle, nothing happens (update K10) */
 				break;
 				case 24: /* PC=12, A cycle, update K10 (do nothing) */
-				if (interp_period == PC_COUNT_LOAD)
-					tms->current_k[9] = (tms->coeff->ktable[9][tms->old_frame_k_idx[9]] * (1-zpar));
-				tms->current_k[9] += ((tms->target_k[9] - tms->current_k[9]) >> tms->coeff->interp_coeff[interp_period]);
+				tms->current_k[9] += (((tms->target_k[9] - tms->current_k[9])*(1-tms->inhibit)) INTERP_SHIFT);
 				break;
 			}
+#endif
         }
 
         /* calculate the output */
@@ -978,9 +999,9 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
 #else
           if (tms->pitch_count >= 51)
-              tms->excitation_data = tms->coeff->chirptable[51]^0xFF;
+              tms->excitation_data = tms->coeff->chirptable[51]^~0x0;
           else /*tms->pitch_count < 51*/
-              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]^0xFF;
+              tms->excitation_data = tms->coeff->chirptable[tms->pitch_count]^~0x0;
 #endif
         }
 
@@ -994,17 +1015,34 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
             tms->RNG >>= 1;
             tms->RNG |= bitout << 12;
 	}
+		this_sample = lattice_filter(tms); /* execute lattice filter */
 #ifdef DEBUG_GENERATION_VERBOSE
 		fprintf(stderr,"X:%04d; E:%04d; P:%04d; Pc:%04d ",tms->excitation_data, tms->current_energy, tms->current_pitch, tms->pitch_count);
 		for (i=0; i<10; i++)
 			fprintf(stderr,"K%d:%04d ", i+1, tms->current_k[i]);
+		fprintf(stderr,"Out:%06d", this_sample);
 		fprintf(stderr,"\n");
 #endif
-		buffer[buf_count] = clip_and_wrap(lattice_filter(tms)); /* execute lattice filter and clipping/wrapping */
-
-        //if (tms->digital_select == 0) /* if digital is NOT selected... */
-		//  buffer[buf_count] &= 0xff00; /* mask out all but the 8 dac bits */
-
+		/* next, force result to 14 bits (since its possible that the addition at the final (k1) stage of the lattice overflowed) */
+		while (this_sample > 16383) this_sample -= 32768;
+		while (this_sample < -16384) this_sample += 32768;
+		if (tms->digital_select == 0) // analog SPK pin output is only 8 bits, with clipping
+			buffer[buf_count] = clip_analog(this_sample);
+		else // digital I/O pin output is 12 bits
+		{
+#ifdef ALLOW_4_LSB
+			// input:  ssss ssss ssss ssss ssnn nnnn nnnn nnnn
+			// N taps:                       ^                 = 0x2000;
+			// output: ssss ssss ssss ssss snnn nnnn nnnn nnnN
+			buffer[buf_count] = (this_sample<<1)|((this_sample&0x2000)>>13);
+#else
+			this_sample &= ~0xF;
+			// input:  ssss ssss ssss ssss ssnn nnnn nnnn 0000
+			// N taps:                       ^^ ^^^            = 0x3E00;
+			// output: ssss ssss ssss ssss snnn nnnn nnnN NNNN
+			buffer[buf_count] = (this_sample<<1)|((this_sample&0x3E00)>>9);
+#endif
+		}
         /* Update all counts */
 
         size--;
@@ -1022,7 +1060,7 @@ empty:
     {
 		tms->sample_count = (tms->sample_count + 1) % 200;
 		tms->interp_count = (tms->interp_count + 1) % 25;
-		buffer[buf_count] = -1<<4;	/* should be (-1 << 8) ??? (cf note in data sheet, p 10, table 4) */
+		buffer[buf_count] = -1;	/* should be just -1; actual chip outputs -1 every idle sample; (cf note in data sheet, p 10, table 4) */
         buf_count++;
         size--;
     }
@@ -1030,35 +1068,38 @@ empty:
 
 /**********************************************************************************************
 
-     clip_and_wrap -- clips and wraps the 14 bit return value from the lattice filter to its final 10 bit value (-512 to 511), and upshifts this to 16 bits
+     clip_analog -- clips the 14 bit return value from the lattice filter to its final 10 bit value (-512 to 511), and upshifts/range extends this to 16 bits
 
 ***********************************************************************************************/
 
-static INT16 clip_and_wrap(INT16 cliptemp)
+static INT16 clip_analog(INT16 cliptemp)
 {
-    /* clipping & wrapping, just like the patent shows:
-       first of all the result should be clamped to 14 bits, between -16384 and 16383
-    */
-	while (cliptemp > 16383) cliptemp -= 32768;
-	while (cliptemp < -16384) cliptemp += 32768;
-	/* the top 10 bits of this result are visible on the digital output IO pin.
+    /* clipping, just like the patent shows:
+       the top 10 bits of this result are visible on the digital output IO pin.
        next, if the top 3 bits of the 14 bit result are all the same, the lowest of those 3 bits plus the next 7 bits are the signed analog output, otherwise the low bits are all forced to match the inverse of the topmost bit, i.e.:
        1x xxxx xxxx xxxx -> 0b10000000
        11 1bcd efgh xxxx -> 0b1bcdefgh
        00 0bcd efgh xxxx -> 0b0bcdefgh
        0x xxxx xxxx xxxx -> 0b01111111
        */
-#ifdef DEBUG_CLIP_WRAP
+#ifdef DEBUG_CLIP
 	if ((cliptemp > 2047) || (cliptemp < -2048)) fprintf(stderr,"clipping cliptemp to range; was %d\n", cliptemp);
 #endif
-#ifdef DO_CLIP_AND_WRAP
 	if (cliptemp > 2047) cliptemp = 2047;
 	else if (cliptemp < -2048) cliptemp = -2048;
-	//cliptemp &= 0xFFF0;
-	/* at this point the analog output is tapped*/
-	return cliptemp << 4;
+	/* at this point the analog output is tapped */
+#ifdef ALLOW_4_LSB
+	// input:  ssss snnn nnnn nnnn
+	// N taps:       ^^^ ^         = 0x0780
+	// output: snnn nnnn nnnn NNNN
+	return (cliptemp << 4)|((cliptemp&0x780)>>7); // upshift and range adjust
 #else
-	return cliptemp << 1;
+	cliptemp &= ~0xF;
+	// input:  ssss snnn nnnn 0000
+	// N taps:       ^^^ ^^^^      = 0x07F0
+	// P taps:       ^             = 0x0400
+	// output: snnn nnnn NNNN NNNP
+	return (cliptemp << 4)|((cliptemp&0x7F0)>>3)|((cliptemp&0x400)>>10); // upshift and range adjust
 #endif
 }
 
@@ -1071,21 +1112,17 @@ static INT16 clip_and_wrap(INT16 cliptemp)
      output is 14 bits, but note the result LSB bit is always 1. (or is it?)
 
 **********************************************************************************************/
-static INT16 matrix_multiply(INT16 a, INT16 b)
+static INT32 matrix_multiply(INT32 a, INT32 b)
 {
-	INT16 result;
+	INT32 result;
 	while (a>511) { a-=1024; }
 	while (a<-512) { a+=1024; }
 	while (b>16383) { b-=32768; }
 	while (b<-16384) { b+=32768; }
-#ifdef NORMALMODE
 	result = ((a*b)>>9)|1;
-#else
-	result = (a*b)>>9;
-#endif
 #ifdef VERBOSE
-	if (result>16383) fprintf(stderr,"matrix multiplier overflowed! a: %x, b: %x", a, b);
-	if (result<-16384) fprintf(stderr,"matrix multiplier underflowed! a: %x, b: %x", a, b);
+	if (result>16383) fprintf(stderr,"matrix multiplier overflowed! a: %x, b: %x, result: %x", a, b, result);
+	if (result<-16384) fprintf(stderr,"matrix multiplier underflowed! a: %x, b: %x, result: %x", a, b, result);
 #endif
 	return result;
 }
@@ -1098,7 +1135,7 @@ static INT16 matrix_multiply(INT16 a, INT16 b)
 
 ***********************************************************************************************/
 
-static INT16 lattice_filter(tms5220_state *tms)
+static INT32 lattice_filter(tms5220_state *tms)
 {
    /* Lattice filter here */
    /* Aug/05/07: redone as unrolled loop, for clarity - LN*/
@@ -1108,8 +1145,7 @@ static INT16 lattice_filter(tms5220_state *tms)
       Kn = tms->current_k[n-1]
       bn = tms->x[n-1]
     */
-		tms->u[10] = matrix_multiply(tms->previous_energy, (tms->excitation_data*64));  //Y(11)
-		//tms->u[10] = matrix_multiply((tms->excitation_data*64), tms->current_energy); // wrong but sounds better
+        tms->u[10] = matrix_multiply(tms->previous_energy, (tms->excitation_data*64));  //Y(11)
         tms->u[9] = tms->u[10] - matrix_multiply(tms->current_k[9], tms->x[9]);
         tms->u[8] = tms->u[9] - matrix_multiply(tms->current_k[8], tms->x[8]);
         tms->x[9] = tms->x[8] + matrix_multiply(tms->current_k[8], tms->u[8]);
@@ -1131,6 +1167,16 @@ static INT16 lattice_filter(tms5220_state *tms)
         tms->x[1] = tms->x[0] + matrix_multiply(tms->current_k[0], tms->u[0]);
         tms->x[0] = tms->u[0];
         tms->previous_energy = tms->current_energy;
+#ifdef DEBUG_LATTICE
+		int i;
+		fprintf(stderr,"V:%04d ", tms->u[10]);
+		for (i = 9; i >= 0; i--)
+		{
+			fprintf(stderr,"Y%d:%04d ", i+1, tms->u[i]);
+			fprintf(stderr,"b%d:%04d ", i+1, tms->x[i]);
+			if ((i % 5) == 0) fprintf(stderr,"\n");
+		}
+#endif
         return tms->u[0];
 }
 
@@ -1144,7 +1190,7 @@ static INT16 lattice_filter(tms5220_state *tms)
 static void process_command(tms5220_state *tms, unsigned char cmd)
 {
 #ifdef DEBUG_COMMAND_DUMP
-		logerror("process_command called with parameter %02X\n",cmd);
+		fprintf(stderr,"process_command called with parameter %02X\n",cmd);
 #endif
 		/* parse the command */
 		switch (cmd & 0x70)
@@ -1204,6 +1250,16 @@ static void process_command(tms5220_state *tms, unsigned char cmd)
 			tms->speaking_now = 1;
 			tms->speak_external = 0;
 			tms->talk_status = 1;  /* start immediately */
+			/* clear out variables before speaking */
+			tms->new_frame_energy_idx = 0;
+			tms->new_frame_pitch_idx = 0;
+			int i;
+			for (i = 0; i < 4; i++)
+				tms->new_frame_k_idx[i] = 0;
+			for (i = 4; i < 7; i++)
+				tms->new_frame_k_idx[i] = 0xF;
+			for (i = 7; i < tms->coeff->num_k; i++)
+				tms->new_frame_k_idx[i] = 0x7;
 			break;
 
 		case 0x60 : /* speak external */
@@ -1427,6 +1483,7 @@ static DEVICE_RESET( tms5220 )
 {
 	tms5220_state *tms = get_safe_token(device);
 
+	tms->digital_select = FORCE_DIGITAL; // assume analog output
 	/* initialize the FIFO */
 	/*memset(tms->fifo, 0, sizeof(tms->fifo));*/
 	tms->fifo_head = tms->fifo_tail = tms->fifo_count = tms->fifo_bits_taken = 0;
@@ -1448,6 +1505,7 @@ static DEVICE_RESET( tms5220 )
 	memset(tms->target_k, 0, sizeof(tms->target_k));
 
 	/* initialize the sample generators */
+	tms->inhibit = 1;
 	tms->interp_count = tms->tms5220c_rate = tms->pitch_count = 0;
 	tms->sample_count = reload_table[tms->tms5220c_rate&0x3];
     tms->RNG = 0x1FFF;

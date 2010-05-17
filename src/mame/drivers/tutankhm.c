@@ -18,6 +18,34 @@
     * Discrete filters
     * Starfield
 
+
+    Custom Chip 084 (Starfield generation)
+
+    * Inputs:
+    *
+    *      NE555 ==> 10 (approx 1 HZ)
+    *       401  ==>  1  (crystal clock, most likely around 6 MHz)
+    *       109  ==>  2  (Video related)
+    *       403  ==>  3  (Video related)
+    *       403  ==>  4  (Video related)
+    *       405  ==>  5  (Video related)
+    *       406  ==>  6  (Video related)
+    *       420  ==> 20  (Video related)
+    *       421  ==> 21  (Video related)
+    *       422  ==> 22  (Video related)
+    *       423  ==> 23  (Video horizontal signal H1)
+    *0x8206 HFF  ==>  7 (Horizontal flip)
+    *0x8204 407  ==>  8  (Enable ???)
+    *
+    *Outputs:
+    *   13      Red
+    *   14      Red
+    *   15      Green
+    *   16      Green
+    *   17      Blue
+    *   18      Blue
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -101,6 +129,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x81e0, 0x81e0) AM_MIRROR(0x000f) AM_READ_PORT("DSW1")	/* DSW1 (inverted bits) */
 	AM_RANGE(0x8200, 0x8200) AM_MIRROR(0x00f8) AM_READNOP AM_WRITE(irq_enable_w)
 	AM_RANGE(0x8202, 0x8203) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_coin_counter_w)
+	AM_RANGE(0x8204, 0x8204) AM_MIRROR(0x00f8) AM_WRITENOP // starfield?
 	AM_RANGE(0x8205, 0x8205) AM_MIRROR(0x00f8) AM_WRITE(sound_mute_w)
 	AM_RANGE(0x8206, 0x8206) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_flip_screen_x_w)
 	AM_RANGE(0x8207, 0x8207) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_flip_screen_y_w)
@@ -195,7 +224,7 @@ static MACHINE_DRIVER_START( tutankhm )
 	MDRV_DRIVER_DATA(timeplt_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ??? */
+	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* 1.5 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", tutankhm_interrupt)
 

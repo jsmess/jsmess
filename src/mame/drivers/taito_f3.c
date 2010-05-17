@@ -366,8 +366,9 @@ static INTERRUPT_GEN( f3_interrupt2 )
 	timer_set(device->machine, cpu_clocks_to_attotime(device,10000), NULL, 0, f3_interrupt3);
 }
 
-static MACHINE_RESET( f3 )
+static SOUND_RESET( f3 )
 {
+	SOUND_RESET_CALL( taito_f3_soundsystem_reset );
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
@@ -391,12 +392,11 @@ static MACHINE_START(f3)
 static MACHINE_DRIVER_START( f3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
+	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(f3_map)
 	MDRV_CPU_VBLANK_INT("screen", f3_interrupt2)
 
 	MDRV_MACHINE_START(f3)
-	MDRV_MACHINE_RESET(f3)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
 
@@ -417,6 +417,7 @@ static MACHINE_DRIVER_START( f3 )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(taito_f3_sound)
+	MDRV_SOUND_RESET(f3)
 MACHINE_DRIVER_END
 
 /* These games reprogram the video output registers to display different scanlines,
@@ -491,12 +492,11 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( bubsympb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
+	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(f3_map)
 	MDRV_CPU_VBLANK_INT("screen", f3_interrupt2)
 
 	MDRV_MACHINE_START(f3)
-	//MDRV_MACHINE_RESET(f3)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
 
