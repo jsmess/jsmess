@@ -479,11 +479,11 @@ void AddOptions(core_options *opts, const options_entry *entrylist, BOOL is_glob
 				}
 			}
 		}
-
+#ifndef MESS
 		// if is_global is FALSE, blacklist global options
 		if (entrylist->name && !is_global && IsGlobalOption(entrylist->name))
 			good_option = FALSE;
-
+#endif
 		if (good_option)
 		{
 			memcpy(entries, entrylist, sizeof(options_entry));
@@ -2289,7 +2289,7 @@ static file_error SaveSettingsFile(core_options *opts, core_options *baseopts, c
 	{
 		filerr = core_fopen(filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 		if (filerr == FILERR_NONE)
-		{	
+		{
 			#ifdef MESS
 			options_output_ini_file(opts, file);	/* required for MESS */
 			#else
@@ -2734,6 +2734,7 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 	/* if we have a valid game driver, parse game-specific INI files */
 	if (driver != NULL)
 	{
+#ifndef MESS
 		const game_driver *parent = driver_get_clone(driver);
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
 
@@ -2793,7 +2794,7 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 		{
 			return opts;
 		}
-
+#endif
 		ui_parse_ini_file(opts, driver->name);
 
 		if (opt_type == OPTIONS_GAME)
