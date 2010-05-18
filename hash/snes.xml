@@ -64,7 +64,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="3-ji no wide shou - 5 gatsugou (japan) (bs).sfc" size="524288" crc="78ce2bf6" sha1="d9821b56e5837818875ef99734cd208aa368d23c" offset="000000" />
+				<rom name="3-ji no wide shou - 5 gatsugou (japan) (bs).bs" size="524288" crc="78ce2bf6" sha1="d9821b56e5837818875ef99734cd208aa368d23c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -77,7 +77,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="3-ji no wide shou - 6 gatsugou (japan) (bs).sfc" size="524288" crc="dbe754c6" sha1="8016d1d9db9af87d59edba7a4be39f46f7561253" offset="000000" />
+				<rom name="3-ji no wide shou - 6 gatsugou (japan) (bs).bs" size="524288" crc="dbe754c6" sha1="8016d1d9db9af87d59edba7a4be39f46f7561253" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -929,7 +929,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="albert odyssey (japan) (bs).sfc" size="1048576" crc="d5f6ad68" sha1="a1a682f723573254046a8af06b92fe408fc4207a" offset="000000" />
+				<rom name="albert odyssey (japan) (bs).bs" size="1048576" crc="d5f6ad68" sha1="a1a682f723573254046a8af06b92fe408fc4207a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1552,7 +1552,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="arkanoid - doh it again (japan) (bs).sfc" size="524288" crc="ded48e0a" sha1="699c4aa1045118cdc83a1cb88416f11732e69a11" offset="000000" />
+				<rom name="arkanoid - doh it again (japan) (bs).bs" size="524288" crc="ded48e0a" sha1="699c4aa1045118cdc83a1cb88416f11732e69a11" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1752,7 +1752,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="b dash - 2 gatsugou (japan) (bs).sfc" size="1048576" crc="6b16f32b" sha1="60aaee780b290dd1b4ad9a339b00d76fb00f0ced" offset="000000" />
+				<rom name="b dash - 2 gatsugou (japan) (bs).bs" size="1048576" crc="6b16f32b" sha1="60aaee780b290dd1b4ad9a339b00d76fb00f0ced" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1765,7 +1765,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="b dash - 3 gatsugou (japan) (bs).sfc" size="1048576" crc="f2630bed" sha1="be0f839f619cbd226f1499ef80fcb91ec950e74d" offset="000000" />
+				<rom name="b dash - 3 gatsugou (japan) (bs).bs" size="1048576" crc="f2630bed" sha1="be0f839f619cbd226f1499ef80fcb91ec950e74d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -2945,7 +2945,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bishoujo senshi sailormoon sailorstars - fuwafuwa panic 2 (japan) (st).sfc" size="1048576" crc="bb5c4238" sha1="f72ea67468cf34360042bdd7974fd588a2407566" offset="000000" />
+				<rom name="bishoujo senshi sailormoon sailorstars - fuwafuwa panic 2 (japan) .st" size="1048576" crc="bb5c4238" sha1="f72ea67468cf34360042bdd7974fd588a2407566" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3638,7 +3638,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs dragon quest i (japan) (bs) [b].sfc" size="1048576" crc="577f6d20" sha1="aed921ff60c7c01a80e7e8f2d24d6684465a941e" offset="000000" status="baddump" />
+				<rom name="bs dragon quest i (japan) (bs) [b].bs" size="1048576" crc="577f6d20" sha1="aed921ff60c7c01a80e7e8f2d24d6684465a941e" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -3651,7 +3651,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs f-zero grand prix - ace league - dai-4-shuu (japan) (bs).sfc" size="1048576" crc="f57d28dc" sha1="2c29ebf2fece378fc4d1186d0b60fdb6db3beef0" offset="000000" />
+				<rom name="bs f-zero grand prix - ace league - dai-4-shuu (japan) (bs).bs" size="1048576" crc="f57d28dc" sha1="2c29ebf2fece378fc4d1186d0b60fdb6db3beef0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3664,7 +3664,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs f-zero grand prix - king league - dai-3-shuu (japan) (bs).sfc" size="1048576" crc="f75713db" sha1="72ce3866ce9b7edd856515b033a69ad6fa3d96ba" offset="000000" />
+				<rom name="bs f-zero grand prix - king league - dai-3-shuu (japan) (bs).bs" size="1048576" crc="f75713db" sha1="72ce3866ce9b7edd856515b033a69ad6fa3d96ba" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3677,7 +3677,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs f-zero grand prix - knight league - dai-1-shuu (japan) (bs).sfc" size="1048576" crc="dbacf9f0" sha1="c5197d43eb637e537ad358f7b2aa01fb6acb774a" offset="000000" />
+				<rom name="bs f-zero grand prix - knight league - dai-1-shuu (japan) (bs).bs" size="1048576" crc="dbacf9f0" sha1="c5197d43eb637e537ad358f7b2aa01fb6acb774a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3690,7 +3690,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs f-zero grand prix - queen league - dai-2-shuu (japan) (bs).sfc" size="1048576" crc="ee6c9473" sha1="15050b25916eb39caf16b5f4cc3e391693251580" offset="000000" />
+				<rom name="bs f-zero grand prix - queen league - dai-2-shuu (japan) (bs).bs" size="1048576" crc="ee6c9473" sha1="15050b25916eb39caf16b5f4cc3e391693251580" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3703,7 +3703,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs f-zero grand prix 2 - practice (japan) (bs).sfc" size="1048576" crc="c4808858" sha1="881ef90e6dca67895a6096db20c5cea13de13baa" offset="000000" />
+				<rom name="bs f-zero grand prix 2 - practice (japan) (bs).bs" size="1048576" crc="c4808858" sha1="881ef90e6dca67895a6096db20c5cea13de13baa" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3716,7 +3716,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs fire emblem - akaneia senki hen - dai-1-wa - palace kanraku (japan) (bs).sfc" size="1048576" crc="14915411" sha1="0b22231d4d4a18183d5b8ce90510efab6456ca3d" offset="000000" />
+				<rom name="bs fire emblem - akaneia senki hen - dai-1-wa - palace kanraku (japan) (bs).bs" size="1048576" crc="14915411" sha1="0b22231d4d4a18183d5b8ce90510efab6456ca3d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3729,7 +3729,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs fire emblem - akaneia senki hen - dai-2-wa - akai ryuu kishi (japan) (bs).sfc" size="1048576" crc="bb73aadf" sha1="e400fe6080809fd4909091f9af42ae5413b8415f" offset="000000" />
+				<rom name="bs fire emblem - akaneia senki hen - dai-2-wa - akai ryuu kishi (japan) (bs).bs" size="1048576" crc="bb73aadf" sha1="e400fe6080809fd4909091f9af42ae5413b8415f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3742,7 +3742,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs fire emblem - akaneia senki hen - dai-3-wa - seigi no touzokudan (japan) (bs).sfc" size="1048576" crc="4ac9d49c" sha1="5e0996433e0384d7d209a9e11a7671ff4dea9cf1" offset="000000" />
+				<rom name="bs fire emblem - akaneia senki hen - dai-3-wa - seigi no touzokudan (japan) (bs).bs" size="1048576" crc="4ac9d49c" sha1="5e0996433e0384d7d209a9e11a7671ff4dea9cf1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3755,7 +3755,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs fire emblem - akaneia senki hen - dai-4-wa - hajimari no toki (japan) (bs).sfc" size="1048576" crc="0b4b6c1f" sha1="3b0568bb44e3ac728fe4723c6d2e2de1ee8f7bb4" offset="000000" />
+				<rom name="bs fire emblem - akaneia senki hen - dai-4-wa - hajimari no toki (japan) (bs).bs" size="1048576" crc="0b4b6c1f" sha1="3b0568bb44e3ac728fe4723c6d2e2de1ee8f7bb4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3768,7 +3768,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs fuurai no shiren - surara o sukue - dai-2-shuu (japan) (bs).sfc" size="1048576" crc="882bf819" sha1="dfdd964e323e677fcc3e3807fff8c98ee3aca4b4" offset="000000" />
+				<rom name="bs fuurai no shiren - surara o sukue - dai-2-shuu (japan) (bs).bs" size="1048576" crc="882bf819" sha1="dfdd964e323e677fcc3e3807fff8c98ee3aca4b4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3781,7 +3781,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs marvelous - camp arnold course - dai-1-shuu (japan) (bs).sfc" size="1048576" crc="6b90c767" sha1="8d15078191f7b7b49b7dda602207456a7caf3b12" offset="000000" />
+				<rom name="bs marvelous - camp arnold course - dai-1-shuu (japan) (bs).bs" size="1048576" crc="6b90c767" sha1="8d15078191f7b7b49b7dda602207456a7caf3b12" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3794,7 +3794,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs marvelous - camp arnold course - dai-2-shuu (japan) (bs).sfc" size="1048576" crc="f5357704" sha1="fc3d84ad42ebda1f81ea5620f313675076b2f80b" offset="000000" />
+				<rom name="bs marvelous - camp arnold course - dai-2-shuu (japan) (bs).bs" size="1048576" crc="f5357704" sha1="fc3d84ad42ebda1f81ea5620f313675076b2f80b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3807,7 +3807,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs marvelous - camp arnold course - dai-3-shuu (japan) (bs).sfc" size="1048576" crc="2b87dbaa" sha1="c89632aec2699e3adbb449b841ec7c582aac58b2" offset="000000" />
+				<rom name="bs marvelous - camp arnold course - dai-3-shuu (japan) (bs).bs" size="1048576" crc="2b87dbaa" sha1="c89632aec2699e3adbb449b841ec7c582aac58b2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3820,7 +3820,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs marvelous - camp arnold course - dai-4-shuu (japan) (bs).sfc" size="1048576" crc="6986937e" sha1="4a7336cd58e5da4256bb7ac64716bd9fac445be4" offset="000000" />
+				<rom name="bs marvelous - camp arnold course - dai-4-shuu (japan) (bs).bs" size="1048576" crc="6986937e" sha1="4a7336cd58e5da4256bb7ac64716bd9fac445be4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3833,7 +3833,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs marvelous - time athletic course - dai-1-shuu (japan) (bs).sfc" size="1048576" crc="1639db9d" sha1="4d63a2457303bb55b5f647614c321881155dedaa" offset="000000" />
+				<rom name="bs marvelous - time athletic course - dai-1-shuu (japan) (bs).bs" size="1048576" crc="1639db9d" sha1="4d63a2457303bb55b5f647614c321881155dedaa" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3845,7 +3845,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs marvelous - time athletic course - dai-2-shuu (japan) (bs).sfc" size="1048576" crc="27d62709" sha1="f9347676f342a3d692f1af799ea0b7f84711e80b" offset="000000" />
+				<rom name="bs marvelous - time athletic course - dai-2-shuu (japan) (bs).bs" size="1048576" crc="27d62709" sha1="f9347676f342a3d692f1af799ea0b7f84711e80b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3858,7 +3858,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs marvelous - time athletic course - dai-3-shuu (japan) (bs).sfc" size="1048576" crc="5a88e3fb" sha1="6025b65a0aa2b0be7ee6e6b50b09a9295137d85a" offset="000000" />
+				<rom name="bs marvelous - time athletic course - dai-3-shuu (japan) (bs).bs" size="1048576" crc="5a88e3fb" sha1="6025b65a0aa2b0be7ee6e6b50b09a9295137d85a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3871,7 +3871,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs marvelous - time athletic course - dai-4-shuu (japan) (bs).sfc" size="1048576" crc="fba7789e" sha1="374b3edc9e0b0d2438f4457481cbc8095a566cce" offset="000000" />
+				<rom name="bs marvelous - time athletic course - dai-4-shuu (japan) (bs).bs" size="1048576" crc="fba7789e" sha1="374b3edc9e0b0d2438f4457481cbc8095a566cce" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3884,7 +3884,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs nichibutsu mahjong - mahjong taikai (japan) (bs).sfc" size="1048576" crc="f10028b1" sha1="9a46696609186336a4cdc380569f01e6af7050ec" offset="000000" />
+				<rom name="bs nichibutsu mahjong - mahjong taikai (japan) (bs).bs" size="1048576" crc="f10028b1" sha1="9a46696609186336a4cdc380569f01e6af7050ec" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3897,7 +3897,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs nichibutsu mahjong - renshuu mahjong - ichimantou (japan) (bs).sfc" size="1048576" crc="a0b0e5ca" sha1="67a6db29af61b94c1918daaa77022feca82bb4fe" offset="000000" />
+				<rom name="bs nichibutsu mahjong - renshuu mahjong - ichimantou (japan) (bs).bs" size="1048576" crc="a0b0e5ca" sha1="67a6db29af61b94c1918daaa77022feca82bb4fe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3910,7 +3910,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs nichibutsu mahjong - renshuu mahjong - nimantou (japan) (bs).sfc" size="1048576" crc="3cec7861" sha1="57e1a364268ef180ed517e13fea63ee89c607a18" offset="000000" />
+				<rom name="bs nichibutsu mahjong - renshuu mahjong - nimantou (japan) (bs).bs" size="1048576" crc="3cec7861" sha1="57e1a364268ef180ed517e13fea63ee89c607a18" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3923,7 +3923,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs nintendo hp - 5-17 gou (japan) (bs).sfc" size="1048576" crc="768f50f4" sha1="cb1c842f74eb3869e765feb196644708987ff051" offset="000000" />
+				<rom name="bs nintendo hp - 5-17 gou (japan) (bs).bs" size="1048576" crc="768f50f4" sha1="cb1c842f74eb3869e765feb196644708987ff051" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3936,7 +3936,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs nintendo hp - 5-31 gou (japan) (bs).sfc" size="1048576" crc="c9b05ce4" sha1="71642ccce9f133e4566c36b64e098b1db737ad0c" offset="000000" />
+				<rom name="bs nintendo hp - 5-31 gou (japan) (bs).bs" size="1048576" crc="c9b05ce4" sha1="71642ccce9f133e4566c36b64e098b1db737ad0c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3949,7 +3949,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs parlor! parlor! - dai-2-shuu (japan) (bs).sfc" size="1048576" crc="3ed9a005" sha1="235499d1922646dde43c6aa93f595fc2fa09ed64" offset="000000" />
+				<rom name="bs parlor! parlor! - dai-2-shuu (japan) (bs).bs" size="1048576" crc="3ed9a005" sha1="235499d1922646dde43c6aa93f595fc2fa09ed64" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3962,7 +3962,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs shin onigashima - dai-1-wa - kataribe no koya (japan) (bs).sfc" size="1048576" crc="514eb6c8" sha1="a8c132c0c8323b740603b3b61bcb4082ce473e2a" offset="000000" />
+				<rom name="bs shin onigashima - dai-1-wa - kataribe no koya (japan) (bs).bs" size="1048576" crc="514eb6c8" sha1="a8c132c0c8323b740603b3b61bcb4082ce473e2a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3975,7 +3975,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs shin onigashima - dai-2-wa - kataribe no koya (japan) (bs).sfc" size="1048576" crc="67a5b7c4" sha1="05403e4829f8481b212864079286cac91d2b7761" offset="000000" />
+				<rom name="bs shin onigashima - dai-2-wa - kataribe no koya (japan) (bs).bs" size="1048576" crc="67a5b7c4" sha1="05403e4829f8481b212864079286cac91d2b7761" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -3988,7 +3988,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs shin onigashima - dai-3-wa - kataribe no koya (japan) (bs).sfc" size="1048576" crc="abe60813" sha1="1ef184e69a7cb23d2062286cf71af186311393dd" offset="000000" />
+				<rom name="bs shin onigashima - dai-3-wa - kataribe no koya (japan) (bs).bs" size="1048576" crc="abe60813" sha1="1ef184e69a7cb23d2062286cf71af186311393dd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4001,7 +4001,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs shin onigashima - dai-4-wa - kataribe no koya (japan) (bs).sfc" size="1048576" crc="f9ab3b92" sha1="93dd095f3e32e5749663ce5418cc6e194d46b281" offset="000000" />
+				<rom name="bs shin onigashima - dai-4-wa - kataribe no koya (japan) (bs).bs" size="1048576" crc="f9ab3b92" sha1="93dd095f3e32e5749663ce5418cc6e194d46b281" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4014,7 +4014,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs st. giga pg - 10 gatsugou (japan) (bs).sfc" size="1048576" crc="8dabd48a" sha1="572018f28976681013aad5428ebab00c4c9ec794" offset="000000" />
+				<rom name="bs st. giga pg - 10 gatsugou (japan) (bs).bs" size="1048576" crc="8dabd48a" sha1="572018f28976681013aad5428ebab00c4c9ec794" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4027,7 +4027,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs super mario collection - dai-3-shuu (japan) (bs).sfc" size="1048576" crc="a40a3089" sha1="06c58882acf1e62e54cc0c51515448b40f057e6e" offset="000000" />
+				<rom name="bs super mario collection - dai-3-shuu (japan) (bs).bs" size="1048576" crc="a40a3089" sha1="06c58882acf1e62e54cc0c51515448b40f057e6e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4040,7 +4040,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs super mario usa - power challenge - dai-1-kai (japan) (bs).sfc" size="1048576" crc="8f85a235" sha1="07d5d7f097b3999bb12cdcac40909a064bb69548" offset="000000" />
+				<rom name="bs super mario usa - power challenge - dai-1-kai (japan) (bs).bs" size="1048576" crc="8f85a235" sha1="07d5d7f097b3999bb12cdcac40909a064bb69548" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4053,7 +4053,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs super mario usa - power challenge - dai-2-kai (japan) (bs).sfc" size="1048576" crc="b967025a" sha1="ab1e8db79e207f136e58989a5c0302da25fb19e5" offset="000000" />
+				<rom name="bs super mario usa - power challenge - dai-2-kai (japan) (bs).bs" size="1048576" crc="b967025a" sha1="ab1e8db79e207f136e58989a5c0302da25fb19e5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4066,7 +4066,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs super mario usa - power challenge - dai-3-kai (japan) (bs).sfc" size="1048576" crc="8b22a708" sha1="1c92e890f95b222c22d4bb8beb08124087c48641" offset="000000" />
+				<rom name="bs super mario usa - power challenge - dai-3-kai (japan) (bs).bs" size="1048576" crc="8b22a708" sha1="1c92e890f95b222c22d4bb8beb08124087c48641" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4078,7 +4078,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs super mario usa - power challenge - dai-4-kai (japan) (bs).sfc" size="1048576" crc="ff1ded46" sha1="5f2f794c410dc7bf6d7600c9e79545a6739662d1" offset="000000" />
+				<rom name="bs super mario usa - power challenge - dai-4-kai (japan) (bs).bs" size="1048576" crc="ff1ded46" sha1="5f2f794c410dc7bf6d7600c9e79545a6739662d1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4091,7 +4091,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs tantei club - yuki ni kieta kako - chuuhen (japan) (bs).sfc" size="1048576" crc="7947abd1" sha1="db8cfcfe668ca1afb88fa8183227e154f2c421f0" offset="000000" />
+				<rom name="bs tantei club - yuki ni kieta kako - chuuhen (japan) (bs).bs" size="1048576" crc="7947abd1" sha1="db8cfcfe668ca1afb88fa8183227e154f2c421f0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4104,7 +4104,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs tantei club - yuki ni kieta kako - kouhen (japan) (bs).sfc" size="1048576" crc="0cd818cf" sha1="f271b67a713b96e66cbad0461e752e27c22e6c61" offset="000000" />
+				<rom name="bs tantei club - yuki ni kieta kako - kouhen (japan) (bs).bs" size="1048576" crc="0cd818cf" sha1="f271b67a713b96e66cbad0461e752e27c22e6c61" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4117,7 +4117,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs tantei club - yuki ni kieta kako - zenpen (japan) (bs).sfc" size="1048576" crc="f26300c8" sha1="db0efaa48fa0b1ab1147791cca7a032e3ca113f5" offset="000000" />
+				<rom name="bs tantei club - yuki ni kieta kako - zenpen (japan) (bs).bs" size="1048576" crc="f26300c8" sha1="db0efaa48fa0b1ab1147791cca7a032e3ca113f5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4130,7 +4130,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs zelda no densetsu - dai-3-wa (japan) (bs).sfc" size="1048576" crc="ddc54398" sha1="4a2280a33785e89aecaa4141ac29f3dd1bdcf40c" offset="000000" />
+				<rom name="bs zelda no densetsu - dai-3-wa (japan) (bs).bs" size="1048576" crc="ddc54398" sha1="4a2280a33785e89aecaa4141ac29f3dd1bdcf40c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4143,7 +4143,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs zelda no densetsu - kodai no sekiban - dai-1-wa (japan) (bs).sfc" size="1048576" crc="0d2b95a8" sha1="e784f04736f354a05a19a0e86efd8a1f40589aa4" offset="000000" />
+				<rom name="bs zelda no densetsu - kodai no sekiban - dai-1-wa (japan) (bs).bs" size="1048576" crc="0d2b95a8" sha1="e784f04736f354a05a19a0e86efd8a1f40589aa4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4156,7 +4156,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs zelda no densetsu - kodai no sekiban - dai-2-wa (japan) (bs).sfc" size="1048576" crc="1b71a609" sha1="0877f63d8d096e7a35a5721ec1e4ce2cb86a7211" offset="000000" />
+				<rom name="bs zelda no densetsu - kodai no sekiban - dai-2-wa (japan) (bs).bs" size="1048576" crc="1b71a609" sha1="0877f63d8d096e7a35a5721ec1e4ce2cb86a7211" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4169,7 +4169,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs zelda no densetsu - kodai no sekiban - dai-3-wa (japan) (bs).sfc" size="1048576" crc="c251d4fa" sha1="25efee5199c9da0805306edac3367d60253ea828" offset="000000" />
+				<rom name="bs zelda no densetsu - kodai no sekiban - dai-3-wa (japan) (bs).bs" size="1048576" crc="c251d4fa" sha1="25efee5199c9da0805306edac3367d60253ea828" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4182,7 +4182,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs zelda no densetsu - kodai no sekiban - dai-4-wa (japan) (bs).sfc" size="1048576" crc="8385bbf4" sha1="63c1110e32d4b3b2d6525919e10e50abcc7677a3" offset="000000" />
+				<rom name="bs zelda no densetsu - kodai no sekiban - dai-4-wa (japan) (bs).bs" size="1048576" crc="8385bbf4" sha1="63c1110e32d4b3b2d6525919e10e50abcc7677a3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4195,7 +4195,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="bs zelda no densetsu map 2 - dai-4-wa (japan) (bs) [b].sfc" size="1048576" crc="670b51ca" sha1="4a53e22e2b01f55245112da5bdd24aed7a9f7c10" offset="000000" status="baddump" />
+				<rom name="bs zelda no densetsu map 2 - dai-4-wa (japan) (bs) [b].bs" size="1048576" crc="670b51ca" sha1="4a53e22e2b01f55245112da5bdd24aed7a9f7c10" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -4943,7 +4943,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="cheap de gorgeous vol. 1 (japan) (bs).sfc" size="1048576" crc="ee02126e" sha1="62e98832c90321ecd9ea7cb1c6dbb3c68d3e8ee0" offset="000000" />
+				<rom name="cheap de gorgeous vol. 1 (japan) (bs).bs" size="1048576" crc="ee02126e" sha1="62e98832c90321ecd9ea7cb1c6dbb3c68d3e8ee0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5226,7 +5226,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="chrono trigger - character zukan (japan) (bs).sfc" size="1048576" crc="6d46f88b" sha1="602136761415a010b691299a8ab6f61c5efbf197" offset="000000" />
+				<rom name="chrono trigger - character zukan (japan) (bs).bs" size="1048576" crc="6d46f88b" sha1="602136761415a010b691299a8ab6f61c5efbf197" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5239,7 +5239,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="chrono trigger - jet bike special (japan) (bs).sfc" size="262144" crc="9dfb3014" sha1="1f916454d4a9cedbd66babe4bb9eebc446410335" offset="000000" />
+				<rom name="chrono trigger - jet bike special (japan) (bs).bs" size="262144" crc="9dfb3014" sha1="1f916454d4a9cedbd66babe4bb9eebc446410335" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5252,7 +5252,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="chrono trigger - music library (japan) (bs).sfc" size="524288" crc="027b726b" sha1="a21e00ee5e13722e57abeac58df57f12aacfd63b" offset="000000" />
+				<rom name="chrono trigger - music library (japan) (bs).bs" size="524288" crc="027b726b" sha1="a21e00ee5e13722e57abeac58df57f12aacfd63b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5545,7 +5545,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="columbus no tamagoyaki - dai-1-kai (japan) (bs).sfc" size="1048576" crc="2289c65f" sha1="a2c91755d52d5c5b230e665920e01b584934a27b" offset="000000" />
+				<rom name="columbus no tamagoyaki - dai-1-kai (japan) (bs).bs" size="1048576" crc="2289c65f" sha1="a2c91755d52d5c5b230e665920e01b584934a27b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5558,7 +5558,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="columbus no tamagoyaki - dai-2-kai (japan) (bs).sfc" size="1048576" crc="ec69ee76" sha1="30569601d3f15a586547b18702b5cf54981d0e7d" offset="000000" />
+				<rom name="columbus no tamagoyaki - dai-2-kai (japan) (bs).bs" size="1048576" crc="ec69ee76" sha1="30569601d3f15a586547b18702b5cf54981d0e7d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5571,7 +5571,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="columbus no tamagoyaki - dai-3-kai (japan) (bs).sfc" size="1048576" crc="00d3a32b" sha1="43a29a10a21b26e495bab35000bfc695abcca83e" offset="000000" />
+				<rom name="columbus no tamagoyaki - dai-3-kai (japan) (bs).bs" size="1048576" crc="00d3a32b" sha1="43a29a10a21b26e495bab35000bfc695abcca83e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5844,7 +5844,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="crayon shin-chan - nagagutsu dobon!! (japan) (st).sfc" size="524288" crc="8eb753f3" sha1="98a99807a958c1175a2b257166d7b08b2be6d442" offset="000000" />
+				<rom name="crayon shin-chan - nagagutsu dobon!! (japan) .st" size="524288" crc="8eb753f3" sha1="98a99807a958c1175a2b257166d7b08b2be6d442" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -5881,7 +5881,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="cu-on-pa sfc (japan) (bs).sfc" size="1048576" crc="5f31e1d8" sha1="b09b45a7c2cb4ab50b5c364bb989e90caa036629" offset="000000" />
+				<rom name="cu-on-pa sfc (japan) (bs).bs" size="1048576" crc="5f31e1d8" sha1="b09b45a7c2cb4ab50b5c364bb989e90caa036629" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6117,7 +6117,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="daibakushou jinsei gekijou (japan) (bs).sfc" size="1048576" crc="93c4df65" sha1="07a873bb6753694e9914a270b760f810efc04525" offset="000000" />
+				<rom name="daibakushou jinsei gekijou (japan) (bs).bs" size="1048576" crc="93c4df65" sha1="07a873bb6753694e9914a270b760f810efc04525" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6250,7 +6250,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="dandan belt conveyor - gyuunyuu no maki (japan) (bs).sfc" size="1048576" crc="380c8c79" sha1="343e5607d62d7962a04c090cd003495fc344deee" offset="000000" />
+				<rom name="dandan belt conveyor - gyuunyuu no maki (japan) (bs).bs" size="1048576" crc="380c8c79" sha1="343e5607d62d7962a04c090cd003495fc344deee" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6263,7 +6263,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="dandan belt conveyor - ukulele no maki (japan) (bs) [b].sfc" size="1048576" crc="10205b4b" sha1="da3c4c0bb0c36b7605a93fed9ff220e46d71f6d6" offset="000000" status="baddump" />
+				<rom name="dandan belt conveyor - ukulele no maki (japan) (bs) [b].bs" size="1048576" crc="10205b4b" sha1="da3c4c0bb0c36b7605a93fed9ff220e46d71f6d6" offset="000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -6840,7 +6840,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="digital magazine busters bs - 4-12 gou (japan) (bs).sfc" size="1048576" crc="1976866a" sha1="98bd19065df8b65268e61457acb306f96b531a7e" offset="000000" />
+				<rom name="digital magazine busters bs - 4-12 gou (japan) (bs).bs" size="1048576" crc="1976866a" sha1="98bd19065df8b65268e61457acb306f96b531a7e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6853,7 +6853,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="digital magazine busters bs - 5-10 gou (japan) (bs).sfc" size="1048576" crc="3f3f4608" sha1="61f225571e547ca9ed6c523babe1476d5f0e3e68" offset="000000" />
+				<rom name="digital magazine busters bs - 5-10 gou (japan) (bs).bs" size="1048576" crc="3f3f4608" sha1="61f225571e547ca9ed6c523babe1476d5f0e3e68" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6866,7 +6866,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="digital magazine busters bs - 5-24 gou (japan) (bs).sfc" size="1048576" crc="8e8f27e9" sha1="7161e77985a6c21edcf7a2ea319ef83054e9cf74" offset="000000" />
+				<rom name="digital magazine busters bs - 5-24 gou (japan) (bs).bs" size="1048576" crc="8e8f27e9" sha1="7161e77985a6c21edcf7a2ea319ef83054e9cf74" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6879,7 +6879,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="digital magazine busters bs - 8-23 gou (japan) (bs).sfc" size="1048576" crc="6f7f6c5d" sha1="9c0b854ff8f63a548d5e694461444a1eae77a418" offset="000000" />
+				<rom name="digital magazine busters bs - 8-23 gou (japan) (bs).bs" size="1048576" crc="6f7f6c5d" sha1="9c0b854ff8f63a548d5e694461444a1eae77a418" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6984,7 +6984,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="do-re-mi de faa 2~! - 5-10 gou (japan) (bs).sfc" size="1048576" crc="25401316" sha1="1c25723597a55ab94cf7289cf36b6b8941a3d5ab" offset="000000" />
+				<rom name="do-re-mi de faa 2~! - 5-10 gou (japan) (bs).bs" size="1048576" crc="25401316" sha1="1c25723597a55ab94cf7289cf36b6b8941a3d5ab" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -6997,7 +6997,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="do-re-mi de faa 2~! - 5-25 gou (japan) (bs).sfc" size="1048576" crc="f8b048f5" sha1="d9af942b657a0ab2fd9979a708e10f4c3e75fcab" offset="000000" />
+				<rom name="do-re-mi de faa 2~! - 5-25 gou (japan) (bs).bs" size="1048576" crc="f8b048f5" sha1="d9af942b657a0ab2fd9979a708e10f4c3e75fcab" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7034,7 +7034,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="dokapon gaiden - honoo no audition (japan) (bs).sfc" size="1048576" crc="09457f9e" sha1="cda1ae3c721ff0fd94f9b321becfbe90cb4c0910" offset="000000" />
+				<rom name="dokapon gaiden - honoo no audition (japan) (bs).bs" size="1048576" crc="09457f9e" sha1="cda1ae3c721ff0fd94f9b321becfbe90cb4c0910" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7469,7 +7469,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="dr. mario (japan) (bs).sfc" size="1048576" crc="6ea452a4" sha1="9cf6c9b5c6d4e7c33bf040b058c9baf760bb44e9" offset="000000" />
+				<rom name="dr. mario (japan) (bs).bs" size="1048576" crc="6ea452a4" sha1="9cf6c9b5c6d4e7c33bf040b058c9baf760bb44e9" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7752,7 +7752,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="dragon slayer - eiyuu densetsu (japan) (bs).sfc" size="1048576" crc="a6fc28cb" sha1="b9fc80d0e9fc92594669dbbb0e1970b40c36b55f" offset="000000" />
+				<rom name="dragon slayer - eiyuu densetsu (japan) (bs).bs" size="1048576" crc="a6fc28cb" sha1="b9fc80d0e9fc92594669dbbb0e1970b40c36b55f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8116,7 +8116,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="dynami tracer (japan) (bs).sfc" size="1048576" crc="41dae33c" sha1="2ff4bc75b88480a35f42db0a2468eb3f6f8e53e5" offset="000000" />
+				<rom name="dynami tracer (japan) (bs).bs" size="1048576" crc="41dae33c" sha1="2ff4bc75b88480a35f42db0a2468eb3f6f8e53e5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8656,7 +8656,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="excitebike - bunbun mario battle - stadium 1 (japan) (bs).sfc" size="1048576" crc="cf37df6c" sha1="8cb5406e7c136ea8779f793f052c60cfcdfa024a" offset="000000" />
+				<rom name="excitebike - bunbun mario battle - stadium 1 (japan) (bs).bs" size="1048576" crc="cf37df6c" sha1="8cb5406e7c136ea8779f793f052c60cfcdfa024a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8669,7 +8669,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="excitebike - bunbun mario battle - stadium 2 (japan) (bs).sfc" size="1048576" crc="3576a0a9" sha1="127a8e792f377c368f73ae002bc81f9aa464893b" offset="000000" />
+				<rom name="excitebike - bunbun mario battle - stadium 2 (japan) (bs).bs" size="1048576" crc="3576a0a9" sha1="127a8e792f377c368f73ae002bc81f9aa464893b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8682,7 +8682,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="excitebike - bunbun mario battle - stadium 3 (japan) (1998-01-11 - 1998-01-17) (bs).sfc" size="1048576" crc="763c2ee4" sha1="7c0a2963d7767c254a132814eb9dcb00f148350e" offset="000000" />
+				<rom name="excitebike - bunbun mario battle - stadium 3 (japan) (1998-01-11 - 1998-01-17) (bs).bs" size="1048576" crc="763c2ee4" sha1="7c0a2963d7767c254a132814eb9dcb00f148350e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8695,7 +8695,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="excitebike - bunbun mario battle - stadium 3 (japan) (xxxx-02-08) (bs).sfc" size="1048576" crc="e5206656" sha1="23663ef5bc1b7098ab230856fa96ea18ff4ec4a7" offset="000000" />
+				<rom name="excitebike - bunbun mario battle - stadium 3 (japan) (xxxx-02-08) (bs).bs" size="1048576" crc="e5206656" sha1="23663ef5bc1b7098ab230856fa96ea18ff4ec4a7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8708,7 +8708,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="excitebike - bunbun mario battle - stadium 4 (japan) (bs).sfc" size="1048576" crc="c9a77643" sha1="27a22ed0b6219c29bcf4a5475e2156607ebf4f1d" offset="000000" />
+				<rom name="excitebike - bunbun mario battle - stadium 4 (japan) (bs).bs" size="1048576" crc="c9a77643" sha1="27a22ed0b6219c29bcf4a5475e2156607ebf4f1d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -8886,7 +8886,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="f-zero (japan) (bs).sfc" size="524288" crc="6ff86710" sha1="b143f71aef36cb4a5634aa4a8cca6e1938e5355d" offset="000000" />
+				<rom name="f-zero (japan) (bs).bs" size="524288" crc="6ff86710" sha1="b143f71aef36cb4a5634aa4a8cca6e1938e5355d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9226,7 +9226,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="fenek - 6 gatsugou (japan) (bs).sfc" size="524288" crc="5c26c3b2" sha1="f7e80add2fe9e6ccfda30cca64d6ed9ba14384ad" offset="000000" />
+				<rom name="fenek - 6 gatsugou (japan) (bs).bs" size="524288" crc="5c26c3b2" sha1="f7e80add2fe9e6ccfda30cca64d6ed9ba14384ad" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -9862,7 +9862,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="firemen, the (japan) (bs).sfc" size="1048576" crc="927ba7c2" sha1="90f419d52667201097edc0928f0853f55ecf83cd" offset="000000" />
+				<rom name="firemen, the (japan) (bs).bs" size="1048576" crc="927ba7c2" sha1="90f419d52667201097edc0928f0853f55ecf83cd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10258,7 +10258,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="freud no chousenjou - dai-1-gou (japan) (bs).sfc" size="1048576" crc="8d78d0d7" sha1="08cdc6e6915baea5f8e4f5c393798e5364d8c5df" offset="000000" />
+				<rom name="freud no chousenjou - dai-1-gou (japan) (bs).bs" size="1048576" crc="8d78d0d7" sha1="08cdc6e6915baea5f8e4f5c393798e5364d8c5df" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10271,7 +10271,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="freud no chousenjou - dai-2-gou (japan) (bs).sfc" size="1048576" crc="c99282d6" sha1="d7da2c9c9520a5368d6d4ea2d99e645b7a0c391a" offset="000000" />
+				<rom name="freud no chousenjou - dai-2-gou (japan) (bs).bs" size="1048576" crc="c99282d6" sha1="d7da2c9c9520a5368d6d4ea2d99e645b7a0c391a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10284,7 +10284,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="freud no chousenjou - dai-3-gou (japan) (bs).sfc" size="1048576" crc="f938ebc3" sha1="b867361b9e4655adfb7ad8853700c107de766924" offset="000000" />
+				<rom name="freud no chousenjou - dai-3-gou (japan) (bs).bs" size="1048576" crc="f938ebc3" sha1="b867361b9e4655adfb7ad8853700c107de766924" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10297,7 +10297,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="freud no chousenjou - dai-4-gou (japan) (bs).sfc" size="1048576" crc="12e3a8ee" sha1="79d600d9548e376cc29fbfb5f1216d7c68e0c013" offset="000000" />
+				<rom name="freud no chousenjou - dai-4-gou (japan) (bs).bs" size="1048576" crc="12e3a8ee" sha1="79d600d9548e376cc29fbfb5f1216d7c68e0c013" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10310,7 +10310,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="freud no chousenjou - dai-5-gou (japan) (bs).sfc" size="1048576" crc="4d0af6f3" sha1="6f6daf1946ec21140398b18cb1b5b320fcb558be" offset="000000" />
+				<rom name="freud no chousenjou - dai-5-gou (japan) (bs).bs" size="1048576" crc="4d0af6f3" sha1="6f6daf1946ec21140398b18cb1b5b320fcb558be" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10323,7 +10323,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="freud no chousenjou - dai-6-gou (japan) (bs).sfc" size="1048576" crc="167f3ab1" sha1="a4f6ccffd38c02354d746503150438a5b132379e" offset="000000" />
+				<rom name="freud no chousenjou - dai-6-gou (japan) (bs).bs" size="1048576" crc="167f3ab1" sha1="a4f6ccffd38c02354d746503150438a5b132379e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10694,7 +10694,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="game tora no taikoban - 5-17 gou (japan) (bs).sfc" size="524288" crc="4cf3e14f" sha1="d9a3b68473e75d99ec84b95f421be0fefab1bfd7" offset="000000" />
+				<rom name="game tora no taikoban - 5-17 gou (japan) (bs).bs" size="524288" crc="4cf3e14f" sha1="d9a3b68473e75d99ec84b95f421be0fefab1bfd7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10707,7 +10707,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="game tora no taikoban - 5-31 gou (japan) (bs).sfc" size="524288" crc="393e9715" sha1="5d374621784c4a3e57008febf59564fd352630da" offset="000000" />
+				<rom name="game tora no taikoban - 5-31 gou (japan) (bs).bs" size="524288" crc="393e9715" sha1="5d374621784c4a3e57008febf59564fd352630da" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10960,7 +10960,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="gegege no kitarou - youkai donjara (japan) (st).sfc" size="524288" crc="4296500d" sha1="965b2582b13ee361eca93937b1b093049bc8d958" offset="000000" />
+				<rom name="gegege no kitarou - youkai donjara (japan) .st" size="524288" crc="4296500d" sha1="965b2582b13ee361eca93937b1b093049bc8d958" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -10973,7 +10973,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="gekisou sentai carranger - zenkai! racer senshi (japan) (st).sfc" size="524288" crc="14c66fca" sha1="50b9d6ebf0e3f4b9dad5d0660d6c834820cbe391" offset="000000" />
+				<rom name="gekisou sentai carranger - zenkai! racer senshi (japan) .st" size="524288" crc="14c66fca" sha1="50b9d6ebf0e3f4b9dad5d0660d6c834820cbe391" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11010,7 +11010,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="gekkan coin toss - deck 1 (japan) (bs).sfc" size="1048576" crc="d2d7c3e5" sha1="75a9d2a75e66f73e5b25f4bed800d73f0e33f67e" offset="000000" />
+				<rom name="gekkan coin toss - deck 1 (japan) (bs).bs" size="1048576" crc="d2d7c3e5" sha1="75a9d2a75e66f73e5b25f4bed800d73f0e33f67e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11401,7 +11401,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="golf daisuki! o.b. club (japan) (bs).sfc" size="1048576" crc="dc00efeb" sha1="e97c6c4a5e530815cb449b7aa5a8b1d156f850b7" offset="000000" />
+				<rom name="golf daisuki! o.b. club (japan) (bs).bs" size="1048576" crc="dc00efeb" sha1="e97c6c4a5e530815cb449b7aa5a8b1d156f850b7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11426,7 +11426,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="goodspress - 3 gatsugou (japan) (bs).sfc" size="1048576" crc="e328adee" sha1="11228f9c890f64a844a1277d5c945683f08453ac" offset="000000" />
+				<rom name="goodspress - 3 gatsugou (japan) (bs).bs" size="1048576" crc="e328adee" sha1="11228f9c890f64a844a1277d5c945683f08453ac" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11439,7 +11439,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="goodspress - 6 gatsugou (japan) (bs).sfc" size="524288" crc="fba1273b" sha1="9e2620f76a2b68036140cd265c27b116daf7853a" offset="000000" />
+				<rom name="goodspress - 6 gatsugou (japan) (bs).bs" size="524288" crc="fba1273b" sha1="9e2620f76a2b68036140cd265c27b116daf7853a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -11452,7 +11452,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="goodspress - 7 gatsugou (japan) (bs).sfc" size="1048576" crc="83611a0c" sha1="ed401c2d6e77292567f9fc58570cc2ced4caf512" offset="000000" />
+				<rom name="goodspress - 7 gatsugou (japan) (bs).bs" size="1048576" crc="83611a0c" sha1="ed401c2d6e77292567f9fc58570cc2ced4caf512" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -12301,7 +12301,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="heisei gunjin shougi (japan) (bs).sfc" size="524288" crc="63f948db" sha1="dd3cff98cd69168f1a6c5dcef7940b6dc9172dd3" offset="000000" />
+				<rom name="heisei gunjin shougi (japan) (bs).bs" size="524288" crc="63f948db" sha1="dd3cff98cd69168f1a6c5dcef7940b6dc9172dd3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -13274,7 +13274,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="ikari no yousai (japan) (bs).sfc" size="1048576" crc="c69a81ea" sha1="f7123f96292398380f75b67c70c242fa58f21dd5" offset="000000" />
+				<rom name="ikari no yousai (japan) (bs).bs" size="1048576" crc="c69a81ea" sha1="f7123f96292398380f75b67c70c242fa58f21dd5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -15369,7 +15369,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="kaizou chounin shubibinman zero (japan) (bs).sfc" size="1048576" crc="5e5ba3f0" sha1="5b6a4d0740183703f35a349afb6088a8603d8966" offset="000000" />
+				<rom name="kaizou chounin shubibinman zero (japan) (bs).bs" size="1048576" crc="5e5ba3f0" sha1="5b6a4d0740183703f35a349afb6088a8603d8966" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16138,7 +16138,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="kirby no omochabako - baseball (japan) (bs).sfc" size="524288" crc="7ac28567" sha1="2e3c7ed1a590847ab6e1a0ddfd430bc7cc7d79dd" offset="000000" />
+				<rom name="kirby no omochabako - baseball (japan) (bs).bs" size="524288" crc="7ac28567" sha1="2e3c7ed1a590847ab6e1a0ddfd430bc7cc7d79dd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16151,7 +16151,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="kirby no omochabako - guruguru ball (japan) (bs).sfc" size="1048576" crc="8247a684" sha1="e3b4b1b05edc6c5f6ad3ce4da002aa3fd6f26a6a" offset="000000" />
+				<rom name="kirby no omochabako - guruguru ball (japan) (bs).bs" size="1048576" crc="8247a684" sha1="e3b4b1b05edc6c5f6ad3ce4da002aa3fd6f26a6a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16164,7 +16164,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="kirby no omochabako - hoshi kuzushi (japan) (bs).sfc" size="1048576" crc="a78abd76" sha1="e1b259a29ab756ee3f333006d6eeb4fdbeb5f814" offset="000000" />
+				<rom name="kirby no omochabako - hoshi kuzushi (japan) (bs).bs" size="1048576" crc="a78abd76" sha1="e1b259a29ab756ee3f333006d6eeb4fdbeb5f814" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16177,7 +16177,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="kirby no omochabako - pinball (japan) (bs).sfc" size="524288" crc="9d9bbd09" sha1="53faf45fd03937f663dd2e8047badb162922f896" offset="000000" />
+				<rom name="kirby no omochabako - pinball (japan) (bs).bs" size="524288" crc="9d9bbd09" sha1="53faf45fd03937f663dd2e8047badb162922f896" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16378,7 +16378,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="kodomo chousadan mighty pockets - chousa 1 - junk-ya black no ie (japan) (bs).sfc" size="1048576" crc="85ebb7cc" sha1="cc81070dd4c7b6a527eab5ecc65a1c1433eebe5f" offset="000000" />
+				<rom name="kodomo chousadan mighty pockets - chousa 1 - junk-ya black no ie (japan) (bs).bs" size="1048576" crc="85ebb7cc" sha1="cc81070dd4c7b6a527eab5ecc65a1c1433eebe5f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16391,7 +16391,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="kodomo chousadan mighty pockets - chousa 2 - hanzai toshi big apple (japan) (bs).sfc" size="1048576" crc="188c9acb" sha1="408ac8d9c78dad14f109562fbd3149fe0114fc57" offset="000000" />
+				<rom name="kodomo chousadan mighty pockets - chousa 2 - hanzai toshi big apple (japan) (bs).bs" size="1048576" crc="188c9acb" sha1="408ac8d9c78dad14f109562fbd3149fe0114fc57" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16404,12 +16404,12 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="kodomo chousadan mighty pockets - chousa 3 - kyakusen queen patra no nazo (japan) (bs).sfc" size="1048576" crc="35634c30" sha1="fc222418dba4730ef5f49a6621f9b3addff8c6ad" offset="000000" />
+				<rom name="kodomo chousadan mighty pockets - chousa 3 - kyakusen queen patra no nazo (japan) (bs).bs" size="1048576" crc="35634c30" sha1="fc222418dba4730ef5f49a6621f9b3addff8c6ad" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="koiwabal" supported="no">
+	<software name="bskoiwab" supported="no">
 		<!-- Serial:  - Release Date:  -->
 		<description>Koi wa Balance - Tatoeba K-kun no Tabou na Ichinichi Hen (Jpn)</description>
 		<!-- BS -->
@@ -16417,7 +16417,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="koi wa balance - tatoeba k-kun no tabou na ichinichi hen (japan) (bs).sfc" size="1048576" crc="d931df60" sha1="7c65ebc51b71f235710ee1935b84ea88236b8d48" offset="000000" />
+				<rom name="koi wa balance - tatoeba k-kun no tabou na ichinichi hen (japan) (bs).bs" size="1048576" crc="d931df60" sha1="7c65ebc51b71f235710ee1935b84ea88236b8d48" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -16430,7 +16430,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="konae-chan no dokidoki penguin kazoku (japan) (bs).sfc" size="262144" crc="218b11f8" sha1="6193ad723ba3d2434bfe8fc70a593d1eabe821de" offset="000000" />
+				<rom name="konae-chan no dokidoki penguin kazoku (japan) (bs).bs" size="262144" crc="218b11f8" sha1="6193ad723ba3d2434bfe8fc70a593d1eabe821de" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17241,7 +17241,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="let's pachinko nante gindama 1 (japan) (bs).sfc" size="1048576" crc="330aad41" sha1="3b98b182ea492ac35264776829fe773cfa8fb937" offset="000000" />
+				<rom name="let's pachinko nante gindama 1 (japan) (bs).bs" size="1048576" crc="330aad41" sha1="3b98b182ea492ac35264776829fe773cfa8fb937" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17254,7 +17254,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="let's pachinko nante gindama 2 (japan) (bs).sfc" size="1048576" crc="8561ad51" sha1="f979554674df78e0ff28ca6df183dab33a1793b3" offset="000000" />
+				<rom name="let's pachinko nante gindama 2 (japan) (bs).bs" size="1048576" crc="8561ad51" sha1="f979554674df78e0ff28ca6df183dab33a1793b3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17267,7 +17267,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="let's pachinko nante gindama 3 (japan) (bs).sfc" size="1048576" crc="8f24b267" sha1="5f838668c7dc0092f3e6e92e9ea078c4b93fd1ab" offset="000000" />
+				<rom name="let's pachinko nante gindama 3 (japan) (bs).bs" size="1048576" crc="8f24b267" sha1="5f838668c7dc0092f3e6e92e9ea078c4b93fd1ab" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17280,7 +17280,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="let's pachinko nante gindama 4 (japan) (bs).sfc" size="1048576" crc="75bc56bd" sha1="82dcebfbfe6019f4dbf0fc1bebf168d3a33feb14" offset="000000" />
+				<rom name="let's pachinko nante gindama 4 (japan) (bs).bs" size="1048576" crc="75bc56bd" sha1="82dcebfbfe6019f4dbf0fc1bebf168d3a33feb14" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -17563,7 +17563,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="lord monarch (japan) (bs).sfc" size="524288" crc="75e906fe" sha1="583a0bf064518a8f739653c3d09c21485dcb8c74" offset="000000" />
+				<rom name="lord monarch (japan) (bs).bs" size="524288" crc="75e906fe" sha1="583a0bf064518a8f739653c3d09c21485dcb8c74" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -18461,7 +18461,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="mario paint - bs ban (japan) (bs).sfc" size="1048576" crc="4049e234" sha1="3a74179a49e433b7f743b37e84faee96399306e7" offset="000000" />
+				<rom name="mario paint - bs ban (japan) (bs).bs" size="1048576" crc="4049e234" sha1="3a74179a49e433b7f743b37e84faee96399306e7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -18474,7 +18474,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="mario paint - yuushou naizou ban (japan) (bs).sfc" size="1048576" crc="91cae9e2" sha1="5e8363db63c245fd7ed6f64b1a105dc808f9ce55" offset="000000" />
+				<rom name="mario paint - yuushou naizou ban (japan) (bs).bs" size="1048576" crc="91cae9e2" sha1="5e8363db63c245fd7ed6f64b1a105dc808f9ce55" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21559,7 +21559,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="nintama rantarou 2 (japan) (bs).sfc" size="1048576" crc="dc9db257" sha1="ac2d779fe97cd01419df0d6ac89443a01d0e7d0f" offset="000000" />
+				<rom name="nintama rantarou 2 (japan) (bs).bs" size="1048576" crc="dc9db257" sha1="ac2d779fe97cd01419df0d6ac89443a01d0e7d0f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -21608,7 +21608,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="nintendo power magazine 107 (japan) (bs).sfc" size="524288" crc="1622eb2d" sha1="dd8f214872a71da328c31a967765e27ad9f4239c" offset="000000" />
+				<rom name="nintendo power magazine 107 (japan) (bs).bs" size="524288" crc="1622eb2d" sha1="dd8f214872a71da328c31a967765e27ad9f4239c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -22745,7 +22745,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="panel de pon - event '98 (japan) (bs).sfc" size="1048576" crc="36b0cf6c" sha1="b59061561a3aeac13e46735582f29826e7310141" offset="000000" />
+				<rom name="panel de pon - event '98 (japan) (bs).bs" size="1048576" crc="36b0cf6c" sha1="b59061561a3aeac13e46735582f29826e7310141" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23751,7 +23751,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="poi poi ninja world (japan) (st).sfc" size="524288" crc="32b2b3dd" sha1="ae7421b87a9f4cc7c189680dfbb39453905aa5e6" offset="000000" />
+				<rom name="poi poi ninja world (japan) .st" size="524288" crc="32b2b3dd" sha1="ae7421b87a9f4cc7c189680dfbb39453905aa5e6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -23764,7 +23764,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="pokekame magazine (japan) (bs).sfc" size="1048576" crc="2a6c5ec6" sha1="35fc0d9789ef324dc27c5d041114631606862ca5" offset="000000" />
+				<rom name="pokekame magazine (japan) (bs).bs" size="1048576" crc="2a6c5ec6" sha1="35fc0d9789ef324dc27c5d041114631606862ca5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -24745,7 +24745,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="radical dreamers - nusume nai houseki (japan) (bs).sfc" size="1048576" crc="be3048b6" sha1="7d724ee3473d68c5fb856a0ffc9ba5d1fc17efa5" offset="000000" />
+				<rom name="radical dreamers - nusume nai houseki (japan) (bs).bs" size="1048576" crc="be3048b6" sha1="7d724ee3473d68c5fb856a0ffc9ba5d1fc17efa5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26073,7 +26073,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="same game - chara cassette (japan) (bsrom).sfc" size="524288" crc="4c3439c2" sha1="c974673e0365dadc54afcf8dd2e6b41b512c6fe7" offset="000000" />
+				<rom name="same game - chara cassette (japan) (bsrom).bs" size="524288" crc="4c3439c2" sha1="c974673e0365dadc54afcf8dd2e6b41b512c6fe7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26085,7 +26085,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="same game - chara data shuu (japan) (bsrom).sfc" size="524288" crc="12a80829" sha1="ff3e6b558aaa9c36a35460ba61821e09aef50a9e" offset="000000" />
+				<rom name="same game - chara data shuu (japan) (bsrom).bs" size="524288" crc="12a80829" sha1="ff3e6b558aaa9c36a35460ba61821e09aef50a9e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26287,7 +26287,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="satella walker 2 - sate bou o sukuidase! (japan) (bs).sfc" size="1048576" crc="7c8d211c" sha1="80bb866deb7141963e1ecf9b1f538ee0c28b11ed" offset="000000" />
+				<rom name="satella walker 2 - sate bou o sukuidase! (japan) (bs).bs" size="1048576" crc="7c8d211c" sha1="80bb866deb7141963e1ecf9b1f538ee0c28b11ed" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26381,7 +26381,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sd gundam g next - unit &amp; map collection (japan) (bsrom).sfc" size="524288" crc="60b1b7e0" sha1="81a75b1a19907e831b3b80d2067108a61c4bae40" offset="000000" />
+				<rom name="sd gundam g next - unit &amp; map collection (japan) (bsrom).bs" size="524288" crc="60b1b7e0" sha1="81a75b1a19907e831b3b80d2067108a61c4bae40" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26430,7 +26430,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sd gundam generation - axis senki (japan) (st).sfc" size="524288" crc="72b4235f" sha1="6f5be110a606f34bb797a30c1f07b84b2ff38425" offset="000000" />
+				<rom name="sd gundam generation - axis senki (japan) .st" size="524288" crc="72b4235f" sha1="6f5be110a606f34bb797a30c1f07b84b2ff38425" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26443,7 +26443,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sd gundam generation - babylonia kenkoku senki (japan) (st).sfc" size="524288" crc="792d884c" sha1="f18f680b981077cfa025161cfe6c9594b6d18078" offset="000000" />
+				<rom name="sd gundam generation - babylonia kenkoku senki (japan) .st" size="524288" crc="792d884c" sha1="f18f680b981077cfa025161cfe6c9594b6d18078" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26456,7 +26456,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sd gundam generation - colony kakutouki (japan) (st).sfc" size="524288" crc="c5dfa8fd" sha1="0a335ef645d058c2da5389ad622c62d0bffce944" offset="000000" />
+				<rom name="sd gundam generation - colony kakutouki (japan) .st" size="524288" crc="c5dfa8fd" sha1="0a335ef645d058c2da5389ad622c62d0bffce944" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26469,7 +26469,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sd gundam generation - gryps senki (japan) (st).sfc" size="524288" crc="48ecae44" sha1="f280004dd92b70b1bf4518e054b4181a9bbba245" offset="000000" />
+				<rom name="sd gundam generation - gryps senki (japan) .st" size="524288" crc="48ecae44" sha1="f280004dd92b70b1bf4518e054b4181a9bbba245" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26482,7 +26482,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sd gundam generation - ichinen sensouki (japan) (st).sfc" size="524288" crc="afd74dcb" sha1="adc7716a4b081aba5cde3525881c51ee6d600396" offset="000000" />
+				<rom name="sd gundam generation - ichinen sensouki (japan) .st" size="524288" crc="afd74dcb" sha1="adc7716a4b081aba5cde3525881c51ee6d600396" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26495,7 +26495,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sd gundam generation - zanscare senki (japan) (st).sfc" size="524288" crc="efd3a865" sha1="d0ebe3cfcc76ec275151c3b9392fc2ff5d3b50da" offset="000000" />
+				<rom name="sd gundam generation - zanscare senki (japan) .st" size="524288" crc="efd3a865" sha1="d0ebe3cfcc76ec275151c3b9392fc2ff5d3b50da" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26568,7 +26568,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sd ultra battle - seven densetsu (japan) (st).sfc" size="524288" crc="43ad5a45" sha1="bfe85a6e6e8c24584ed5983dbf56048c4c8f2287" offset="000000" />
+				<rom name="sd ultra battle - seven densetsu (japan) .st" size="524288" crc="43ad5a45" sha1="bfe85a6e6e8c24584ed5983dbf56048c4c8f2287" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26581,7 +26581,7 @@ Among undumped protos & special release
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="sd ultra battle - ultraman densetsu (japan) (st).sfc" size="524288" crc="04939d14" sha1="5527fcc136ff0c0ef53a1c9c2756d4a27afa1526" offset="000000" />
+				<rom name="sd ultra battle - ultraman densetsu (japan) .st" size="524288" crc="04939d14" sha1="5527fcc136ff0c0ef53a1c9c2756d4a27afa1526" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -26973,7 +26973,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="shanghai - banri no choujou (japan) (bs).sfc" size="1048576" crc="60017697" sha1="94c365cddfa62eea1a56fb7f0dbcd2ad6812ddc8" offset="000000" />
+				<rom name="shanghai - banri no choujou (japan) (bs).bs" size="1048576" crc="60017697" sha1="94c365cddfa62eea1a56fb7f0dbcd2ad6812ddc8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28591,7 +28591,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sousa sentai wappers - mission 01 (japan) (bs).sfc" size="1048576" crc="fec3d721" sha1="a96f2321a9ecf0261bd04d5aa0f15cafbe9ec30f" offset="000000" />
+				<rom name="sousa sentai wappers - mission 01 (japan) (bs).bs" size="1048576" crc="fec3d721" sha1="a96f2321a9ecf0261bd04d5aa0f15cafbe9ec30f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28604,7 +28604,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sousa sentai wappers - mission 02 (japan) (bs).sfc" size="1048576" crc="a619c58d" sha1="067fd06286e3fd363b17f39876dc9dd53418038e" offset="000000" />
+				<rom name="sousa sentai wappers - mission 02 (japan) (bs).bs" size="1048576" crc="a619c58d" sha1="067fd06286e3fd363b17f39876dc9dd53418038e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28617,7 +28617,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sousa sentai wappers - soushuuhen (japan) (bs).sfc" size="1048576" crc="0b423023" sha1="9ae3ee6edea0c5b348b6195b301092da06f9b409" offset="000000" />
+				<rom name="sousa sentai wappers - soushuuhen (japan) (bs).bs" size="1048576" crc="0b423023" sha1="9ae3ee6edea0c5b348b6195b301092da06f9b409" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -28852,7 +28852,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="special tee shot (japan) (bs).sfc" size="1048576" crc="2703f38e" sha1="8e7e08654a067c703c10d8a0858e2b55fac55170" offset="000000" />
+				<rom name="special tee shot (japan) (bs).bs" size="1048576" crc="2703f38e" sha1="8e7e08654a067c703c10d8a0858e2b55fac55170" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -29142,7 +29142,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="spriggan powered bs - prelude (japan) (bs).sfc" size="1048576" crc="29b7cf34" sha1="fcd0258debc13e2651a96684ae95cf3d2c7f172f" offset="000000" />
+				<rom name="spriggan powered bs - prelude (japan) (bs).bs" size="1048576" crc="29b7cf34" sha1="fcd0258debc13e2651a96684ae95cf3d2c7f172f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31142,7 +31142,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="super e.d.f. (japan) (bs).sfc" size="1048576" crc="f6aa6c8d" sha1="bd85da4175beef68bfff4dd39e979ecb23fc5c78" offset="000000" />
+				<rom name="super e.d.f. (japan) (bs).bs" size="1048576" crc="f6aa6c8d" sha1="bd85da4175beef68bfff4dd39e979ecb23fc5c78" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -31239,7 +31239,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="super famicom wars - bs ban - tsukinowajima (japan) (bs).sfc" size="1048576" crc="00513e71" sha1="3cdd2685ac91be55fb16f41a671af6c81a61f26a" offset="000000" />
+				<rom name="super famicom wars - bs ban - tsukinowajima (japan) (bs).bs" size="1048576" crc="00513e71" sha1="3cdd2685ac91be55fb16f41a671af6c81a61f26a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32297,7 +32297,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="super mahjong taikai (japan) (bs).sfc" size="524288" crc="8eb00b71" sha1="36f73508f4c1e6d65f9b857edff03ce11312ffb4" offset="000000" />
+				<rom name="super mahjong taikai (japan) (bs).bs" size="524288" crc="8eb00b71" sha1="36f73508f4c1e6d65f9b857edff03ce11312ffb4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -32828,7 +32828,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="super ninja-kun (japan) (bs).sfc" size="1048576" crc="bb06514e" sha1="fe69c4d4191387db3cc68d2492a633e3ad426bec" offset="000000" />
+				<rom name="super ninja-kun (japan) (bs).bs" size="1048576" crc="bb06514e" sha1="fe69c4d4191387db3cc68d2492a633e3ad426bec" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -34204,7 +34204,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="super tsumeshougi 1000 (japan) (bs).sfc" size="524288" crc="6ba3738c" sha1="56adc0a17c82529787c616319145fbc055d1ec5e" offset="000000" />
+				<rom name="super tsumeshougi 1000 (japan) (bs).bs" size="524288" crc="6ba3738c" sha1="56adc0a17c82529787c616319145fbc055d1ec5e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -34393,7 +34393,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="super volley ii (japan) (bs).sfc" size="1048576" crc="515588a0" sha1="d293af5439b0d569a75e27aa9c0dcf03e561a31b" offset="000000" />
+				<rom name="super volley ii (japan) (bs).bs" size="1048576" crc="515588a0" sha1="d293af5439b0d569a75e27aa9c0dcf03e561a31b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -34561,7 +34561,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sutte hakkun - 98 event version (japan) (bs).sfc" size="1048576" crc="948b7f8e" sha1="07d341a77a21b9bdda04cb0f0d0d29b7e0efb143" offset="000000" />
+				<rom name="sutte hakkun - 98 event version (japan) (bs).bs" size="1048576" crc="948b7f8e" sha1="07d341a77a21b9bdda04cb0f0d0d29b7e0efb143" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -34574,7 +34574,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sutte hakkun - bs version 2 (japan) (xxxx-06-03) (bs).sfc" size="1048576" crc="a387fe08" sha1="e7566cf5dd4cde20479c58e5b153507ef8c4d662" offset="000000" />
+				<rom name="sutte hakkun - bs version 2 (japan) (xxxx-06-03) (bs).bs" size="1048576" crc="a387fe08" sha1="e7566cf5dd4cde20479c58e5b153507ef8c4d662" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -34587,7 +34587,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sutte hakkun - bs version 2 (japan) (xxxx-10-08) (bs).sfc" size="1048576" crc="a224c713" sha1="8926559a716edffed10609dbb5355f1951a0c1e7" offset="000000" />
+				<rom name="sutte hakkun - bs version 2 (japan) (xxxx-10-08) (bs).bs" size="1048576" crc="a224c713" sha1="8926559a716edffed10609dbb5355f1951a0c1e7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -34600,7 +34600,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="sutte hakkun - event version (japan) (bs).sfc" size="1048576" crc="4f6c48d1" sha1="415804504016ae03a3830f62e3917d1d4b918651" offset="000000" />
+				<rom name="sutte hakkun - event version (japan) (bs).bs" size="1048576" crc="4f6c48d1" sha1="415804504016ae03a3830f62e3917d1d4b918651" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -36727,7 +36727,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="treasure conflix (japan) (bs).sfc" size="1048576" crc="57a070e2" sha1="eaeceb99fe7caedb01c2e137669cb05aefb60944" offset="000000" />
+				<rom name="treasure conflix (japan) (bs).bs" size="1048576" crc="57a070e2" sha1="eaeceb99fe7caedb01c2e137669cb05aefb60944" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -37979,7 +37979,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="waiwai check - 3-7 gou (japan) (bs).sfc" size="1048576" crc="34fb38cb" sha1="a10c55aee93144449bca432cb5318d8e096118bc" offset="000000" />
+				<rom name="waiwai check - 3-7 gou (japan) (bs).bs" size="1048576" crc="34fb38cb" sha1="a10c55aee93144449bca432cb5318d8e096118bc" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38064,7 +38064,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="wario no mori - futatabi (japan).sfc" size="1048576" crc="e80783e5" sha1="8bf9312013f62cf8631a80f3f532db461a5c0a14" offset="000000" />
+				<rom name="wario no mori - futatabi (japan).bs" size="1048576" crc="e80783e5" sha1="8bf9312013f62cf8631a80f3f532db461a5c0a14" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -38773,7 +38773,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="wizardry v - saika no chuushin (japan) (bs).sfc" size="1048576" crc="49ef7aa9" sha1="9d4854c06fdfb7447496568cfbd1d7dda3183e32" offset="000000" />
+				<rom name="wizardry v - saika no chuushin (japan) (bs).bs" size="1048576" crc="49ef7aa9" sha1="9d4854c06fdfb7447496568cfbd1d7dda3183e32" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -39686,7 +39686,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="yoshi no panepon - bs ban (japan) (en,ja) (bs).sfc" size="1048576" crc="7a633bc6" sha1="d3bcea66a3fd1d6518c006cd906b3b8f898a2c74" offset="000000" />
+				<rom name="yoshi no panepon - bs ban (japan) (en,ja) (bs).bs" size="1048576" crc="7a633bc6" sha1="d3bcea66a3fd1d6518c006cd906b3b8f898a2c74" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -39876,7 +39876,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="yung hakase no shinsatsushitsu - dai-1-gou (japan) (bs).sfc" size="1048576" crc="27326da6" sha1="db12d90bdfcca54b1641d3ebd298f2ba230c74cf" offset="000000" />
+				<rom name="yung hakase no shinsatsushitsu - dai-1-gou (japan) (bs).bs" size="1048576" crc="27326da6" sha1="db12d90bdfcca54b1641d3ebd298f2ba230c74cf" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -39889,7 +39889,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="yung hakase no shinsatsushitsu - dai-2-gou (japan) (bs).sfc" size="1048576" crc="66ea357f" sha1="b532b5bd160208e90753f2798366893a0e8b7c70" offset="000000" />
+				<rom name="yung hakase no shinsatsushitsu - dai-2-gou (japan) (bs).bs" size="1048576" crc="66ea357f" sha1="b532b5bd160208e90753f2798366893a0e8b7c70" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40046,7 +40046,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="zelda no densetsu - kamigami no triforce (japan) (bs).sfc" size="1048576" crc="1e1cc639" sha1="5ecc217abfa1d8483002407cdaab3c7415f29c4f" offset="000000" />
+				<rom name="zelda no densetsu - kamigami no triforce (japan) (bs).bs" size="1048576" crc="1e1cc639" sha1="5ecc217abfa1d8483002407cdaab3c7415f29c4f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40388,7 +40388,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="zootto mahjong! - event version (japan) (bs).sfc" size="1048576" crc="7aca6cf0" sha1="2ee76761e023f0c51fbbf4797c175a7c752e788c" offset="000000" />
+				<rom name="zootto mahjong! - event version (japan) (bs).bs" size="1048576" crc="7aca6cf0" sha1="2ee76761e023f0c51fbbf4797c175a7c752e788c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40401,7 +40401,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="zootto mahjong! - preview ban (japan) (bs).sfc" size="1048576" crc="e8a0758d" sha1="8ec66c5dcda3392c27bc532a06d726783c3a1565" offset="000000" />
+				<rom name="zootto mahjong! - preview ban (japan) (bs).bs" size="1048576" crc="e8a0758d" sha1="8ec66c5dcda3392c27bc532a06d726783c3a1565" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40629,7 +40629,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="AK LIVE Hit Gang.sfc" size="524288" crc="9905d4c3" sha1="bd742cbd788439e021cd101d935451ba34a8116e" offset="000000" />
+				<rom name="AK LIVE Hit Gang.bs" size="524288" crc="9905d4c3" sha1="bd742cbd788439e021cd101d935451ba34a8116e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40642,7 +40642,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Gambler Jiko Chuushinha 2 - Dorapon Quest (BS) (Japan) (Dec 19).sfc" size="1048576" crc="11b8e93a" sha1="10ed890794c969654fccc8b15e92d4cef5d13382" offset="000000" />
+				<rom name="Gambler Jiko Chuushinha 2 - Dorapon Quest (BS) (Japan) (Dec 19).bs" size="1048576" crc="11b8e93a" sha1="10ed890794c969654fccc8b15e92d4cef5d13382" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40655,7 +40655,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Gambler Jiko Chuushinha 2 - Dorapon Quest (BS) (Japan) (Dec 20).sfc" size="1048576" crc="f9e8a8ee" sha1="a4999b026cd05ae71b6f0a8ede1ce1bf86215d08" offset="000000" />
+				<rom name="Gambler Jiko Chuushinha 2 - Dorapon Quest (BS) (Japan) (Dec 20).bs" size="1048576" crc="f9e8a8ee" sha1="a4999b026cd05ae71b6f0a8ede1ce1bf86215d08" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40668,7 +40668,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Super Bomberman 2 (BS).sfc" size="1048576" crc="095f2969" sha1="9fc6d3df4c35f1a1ee1e1c825ad76e07126c383a" offset="000000" />
+				<rom name="Super Bomberman 2 (bs).bs" size="1048576" crc="095f2969" sha1="9fc6d3df4c35f1a1ee1e1c825ad76e07126c383a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40681,7 +40681,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Super Fire Pro Wrestling (BS).sfc" size="1048576" crc="dfd7b14d" sha1="1ff3eb2cc71abd5a0f00f6ddae24f494273adf28" offset="000000" />
+				<rom name="Super Fire Pro Wrestling (bs).bs" size="1048576" crc="dfd7b14d" sha1="1ff3eb2cc71abd5a0f00f6ddae24f494273adf28" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40694,7 +40694,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Super Nazo Puyo (BS) (Japan).sfc" size="1048576" crc="6b36b2af" sha1="a013f8453c7dbfd228d592340c08161f019d15bd" offset="000000" />
+				<rom name="Super Nazo Puyo (BS) (Japan).bs" size="1048576" crc="6b36b2af" sha1="a013f8453c7dbfd228d592340c08161f019d15bd" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40707,7 +40707,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="BS Bokujo  Monogatari Da-2-wa (Japan).sfc" size="1048576" crc="0bf62746" sha1="2f15cf736d7370646cfbd825e6d66efa0e6deb04" offset="000000" />
+				<rom name="BS Bokujo  Monogatari Da-2-wa (Japan).bs" size="1048576" crc="0bf62746" sha1="2f15cf736d7370646cfbd825e6d66efa0e6deb04" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40721,7 +40721,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Kouryaku Casino Bar Roulette + Game Tora no Ooana Special 2-24 (BS).sfc" size="1048576" crc="4b881535" sha1="ae574eae616f30accb2a000d6d480fac9845dbc2" offset="000000" />
+				<rom name="Kouryaku Casino Bar Roulette + Game Tora no Ooana Special 2-24 (bs).bs" size="1048576" crc="4b881535" sha1="ae574eae616f30accb2a000d6d480fac9845dbc2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40734,7 +40734,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Tamori_no_Picross_6-13.sfc" size="1048576" crc="bf6cab42" sha1="9573a7e1a2151b05302a9ea2e5b7f1ab1f195593" offset="000000" />
+				<rom name="Tamori_no_Picross_6-13.bs" size="1048576" crc="bf6cab42" sha1="9573a7e1a2151b05302a9ea2e5b7f1ab1f195593" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40747,7 +40747,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="BS Sound Journal for Lovers - Valentine Special Vol. 1.sfc" size="1048576" crc="0bb960c9" sha1="ca1020f1b2a5339669e36037a8ac3fa25701fd82" offset="000000" />
+				<rom name="BS Sound Journal for Lovers - Valentine Special Vol. 1.bs" size="1048576" crc="0bb960c9" sha1="ca1020f1b2a5339669e36037a8ac3fa25701fd82" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40784,7 +40784,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Lets Pachinko Nante Gindama 4 (BS) (11-24).sfc" size="1048576" crc="aa934596" sha1="5883b8e0e3409f78a1ae1d9e471ef4678cb23b88" offset="000000" />
+				<rom name="Lets Pachinko Nante Gindama 4 (BS) (11-24).bs" size="1048576" crc="aa934596" sha1="5883b8e0e3409f78a1ae1d9e471ef4678cb23b88" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40797,7 +40797,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Panel de Pon '98 Event Version (BS) (12-28).sfc" size="1048576" crc="720a850c" sha1="cfbefc41406679c8bc906da6ed9db16f46c6beff" offset="000000" />
+				<rom name="Panel de Pon '98 Event Version (BS) (12-28).bs" size="1048576" crc="720a850c" sha1="cfbefc41406679c8bc906da6ed9db16f46c6beff" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40810,7 +40810,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Zelda no Densetsu - Kamigami no Triforce (BS) (11-30).sfc" size="1048576" crc="97a68e79" sha1="2453d475a26077be0b4c259325e90d2aa0a5a0f8" offset="000000" />
+				<rom name="Zelda no Densetsu - Kamigami no Triforce (BS) (11-30).bs" size="1048576" crc="97a68e79" sha1="2453d475a26077be0b4c259325e90d2aa0a5a0f8" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40823,7 +40823,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Cu On Pa (BS) (6-15).sfc" size="1048576" crc="844fc3dc" sha1="f09dc86eccae64e54ab71cd051e9cdcd77edaeac" offset="000000" />
+				<rom name="Cu On Pa (BS) (6-15).bs" size="1048576" crc="844fc3dc" sha1="f09dc86eccae64e54ab71cd051e9cdcd77edaeac" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40836,7 +40836,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="ZERO2.sfc" size="1048576" crc="3d31659d" sha1="ee3aaf2975ab383768ab88cdb7d7beddf64ddc34" offset="000000" />
+				<rom name="ZERO2.bs" size="1048576" crc="3d31659d" sha1="ee3aaf2975ab383768ab88cdb7d7beddf64ddc34" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40849,7 +40849,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Yoshi no Panepon - BS Ban (BS) (1-2).sfc" size="1048576" crc="6775b6ca" sha1="0e13049e2f0e5fd3e65d36bdad790e1312392476" offset="000000" />
+				<rom name="Yoshi no Panepon - BS Ban (BS) (1-2).bs" size="1048576" crc="6775b6ca" sha1="0e13049e2f0e5fd3e65d36bdad790e1312392476" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40875,7 +40875,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Yoshi no Panepon - BS Ban (BS) (7-5).sfc" size="1048576" crc="a35f7c27" sha1="f769165fd0ff2f885580f9f61ee55e9a29b1f6ea" offset="000000" />
+				<rom name="Yoshi no Panepon - BS Ban (BS) (7-5).bs" size="1048576" crc="a35f7c27" sha1="f769165fd0ff2f885580f9f61ee55e9a29b1f6ea" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40888,7 +40888,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Sutte Hakkun - BS Version 2 (BS-d) (10-19).sfc" size="1048576" crc="a01abfbd" sha1="cb6b47fedc1296bbae53a34a844d30c19d3ab883" offset="000000" />
+				<rom name="Sutte Hakkun - BS Version 2 (BS-d) (10-19).bs" size="1048576" crc="a01abfbd" sha1="cb6b47fedc1296bbae53a34a844d30c19d3ab883" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40901,7 +40901,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Sutte Hakkun - BS Version 2 (BS-d) (11-25).sfc" size="1048576" crc="c2f2ad15" sha1="f9c3397cb9f047aa3278a6d082276ae080cdd447" offset="000000" />
+				<rom name="Sutte Hakkun - BS Version 2 (BS-d) (11-25).bs" size="1048576" crc="c2f2ad15" sha1="f9c3397cb9f047aa3278a6d082276ae080cdd447" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40914,7 +40914,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="Kirby no Omochabako - Hoshi Kuzushi (BS) (2-26) (!).sfc" size="524288" crc="3dbbd86a" sha1="b6cda98a2a6a7a6aa9a64aec7f346039a608b093" offset="000000" />
+				<rom name="Kirby no Omochabako - Hoshi Kuzushi (BS) (2-26) (!).bs" size="524288" crc="3dbbd86a" sha1="b6cda98a2a6a7a6aa9a64aec7f346039a608b093" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40927,7 +40927,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="Bakusho Mondai no Shirikon Chounaikai 6-22 (BS).sfc" size="1048576" crc="b86e7ab1" sha1="3cfa8bc8d6ec36e46d7a434b5e5fa835c90bc4f0" offset="000000" />
+				<rom name="Bakusho Mondai no Shirikon Chounaikai 6-22 (bs).bs" size="1048576" crc="b86e7ab1" sha1="3cfa8bc8d6ec36e46d7a434b5e5fa835c90bc4f0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40940,7 +40940,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="BS Yuuki Nae no GE-MU no Tsubo (Japan).sfc" size="524288" crc="2c889959" sha1="ce70937945e84db5d5e0cf1d9bd622d2c69adff3" offset="000000" />
+				<rom name="BS Yuuki Nae no GE-MU no Tsubo (Japan).bs" size="524288" crc="2c889959" sha1="ce70937945e84db5d5e0cf1d9bd622d2c69adff3" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40953,7 +40953,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="ActRaiser (Japan).bs.sfc" size="1048576" crc="b9a968ff" sha1="1d94b555e3a5a018dabf5fe2ea62ba73c2927a82" offset="000000" />
+				<rom name="ActRaiser (Japan).bs" size="1048576" crc="b9a968ff" sha1="1d94b555e3a5a018dabf5fe2ea62ba73c2927a82" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40966,7 +40966,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="puyob.sfc" size="1048576" crc="e63ee3b1" sha1="2fa77c709294da3a0ae5a918a574b49302a0bf17" offset="000000" />
+				<rom name="puyob.bs" size="1048576" crc="e63ee3b1" sha1="2fa77c709294da3a0ae5a918a574b49302a0bf17" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40979,7 +40979,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
-				<rom name="Weekly Famitsu Express 4-27.sfc" size="524288" crc="d8bc7bea" sha1="57c14d389b216b01616caad704a998d7d03dc155" offset="000000" />
+				<rom name="Weekly Famitsu Express 4-27.bs" size="524288" crc="d8bc7bea" sha1="57c14d389b216b01616caad704a998d7d03dc155" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -40993,7 +40993,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="262144">
-				<rom name="BS Konae Chan no Dokidoki Pengin Kazoku (Japan) (Alt).sfc" size="262144" crc="33cb8a80" sha1="9c2500e5ab9c46cd32a6366fcb3df811888191b4" offset="000000" />
+				<rom name="BS Konae Chan no Dokidoki Pengin Kazoku (Japan) (Alt).bs" size="262144" crc="33cb8a80" sha1="9c2500e5ab9c46cd32a6366fcb3df811888191b4" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
