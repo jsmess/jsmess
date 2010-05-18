@@ -854,12 +854,24 @@ static int image_load_internal(running_device *image, const char *path,
     /* success! */
 
 done:
-    if (slot->err)
-        image_clear(slot);
+    if (slot->err) {
+		if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
+			popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, image_error(image));
+		else
+			mame_printf_error("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, image_error(image));
+		image_clear(slot);
+	}
 	else {
 		/* do we need to reset the CPU? only schedule it if load/create is successful */
 		if ((attotime_compare(timer_get_time(machine), attotime_zero) > 0) && slot->info.reset_on_load)
 			mame_schedule_hard_reset(machine);
+		else
+		{
+			if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
+				popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
+			else
+				mame_printf_info("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
+		}
 	}
 
     return slot->err ? INIT_FAIL : INIT_PASS;
