@@ -858,7 +858,7 @@ done:
 		if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
 			popmessage("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, image_error(image));
 		else
-			mame_printf_error("Error: Unable to %s image '%s': %s", is_create ? "create" : "load", path, image_error(image));
+			mame_printf_error("Error: Unable to %s image '%s': %s\n", is_create ? "create" : "load", path, image_error(image));
 		image_clear(slot);
 	}
 	else {
@@ -870,7 +870,7 @@ done:
 			if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
 				popmessage("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
 			else
-				mame_printf_info("Image '%s' was successfully %s.", path, is_create ? "created" : "loaded");
+				mame_printf_info("Image '%s' was successfully %s.\n", path, is_create ? "created" : "loaded");
 		}
 	}
 
