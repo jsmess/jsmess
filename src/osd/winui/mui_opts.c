@@ -2734,7 +2734,6 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 	/* if we have a valid game driver, parse game-specific INI files */
 	if (driver != NULL)
 	{
-#ifndef MESS
 		const game_driver *parent = driver_get_clone(driver);
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
 
@@ -2794,7 +2793,7 @@ core_options * load_options(OPTIONS_TYPE opt_type, int game_num)
 		{
 			return opts;
 		}
-#endif
+
 		ui_parse_ini_file(opts, driver->name);
 
 		if (opt_type == OPTIONS_GAME)
