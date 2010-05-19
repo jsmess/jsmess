@@ -262,6 +262,8 @@ Source Changes:
 - Check image loading result in device post-init - will now bail out on any image
   loading error and not just missing/inaccessible files (fixes bug 1955) [Oliver 
   Stoeneberg]
+  
+- Fixed Visual Studio specific linker errors with tiny build [Oliver Stoeneberg]
 
 - [C2040] Added DOS 1 FDC ROM (parsed from disassembly). [Curt Coder]
 
