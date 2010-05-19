@@ -426,7 +426,7 @@ VIDEO_UPDATE( svi328_806 )
 	}
 	else
 	{
-		fatalerror("Unknown screen '%s'\n", screen->tag());
+		fatalerror("Unknown screen '%s'", screen->tag());
 	}
 	return 0;
 }

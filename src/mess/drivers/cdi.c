@@ -593,7 +593,7 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
 			timer_adjust_oneshot(scc68070->timers.timer0_timer, period, 0);
 			break;
 		default:
-			fatalerror( "Unsupported timer channel to scc68070_set_timer_callback!\n" );
+			fatalerror( "Unsupported timer channel to scc68070_set_timer_callback!" );
 	}
 }
 
@@ -1627,7 +1627,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 			break;
 
 		default:
-			fatalerror("play_xa: unhandled xa mode %08x\n",hdr[2]);
+			fatalerror("play_xa: unhandled xa mode %08x",hdr[2]);
 			return;
 	}
 

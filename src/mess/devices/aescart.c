@@ -415,7 +415,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 	multicart_open_error me;
 
 	if (pcbdev == NULL)
-		fatalerror("Error loading multicart: no pcb found.\n");
+		fatalerror("Error loading multicart: no pcb found.");
 
 	/* If we are here, we have a multicart. */
 	pcb = (aes_pcb_t *)pcbdev->token;
@@ -432,7 +432,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
     for a quick access by the memory handlers. Every PCB defines an
     own assembly method. */
     if (me != MCERR_NONE)
-		fatalerror("Error loading multicart: %s\n", multicart_error_text(me));
+		fatalerror("Error loading multicart: %s", multicart_error_text(me));
 
 	return pcb->assemble(pcbdev->machine, image);
 }
@@ -472,7 +472,7 @@ static DEVICE_IMAGE_UNLOAD( aes_cartridge )
 			cart->mc = NULL;
 		}
 //      else
-//          fatalerror("Lost pointer to multicart in cartridge. Report bug.\n");
+//          fatalerror("Lost pointer to multicart in cartridge. Report bug.");
 	}
 }
 

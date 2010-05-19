@@ -95,7 +95,7 @@ static UINT64 avr8_get_timer_1_frequency(craft_state *state)
 
         default:
         	frequency = 0;
-            fatalerror( "&state->tccr1b & 0x07 returned a value not in the range of 0 to 7.\n" );
+            fatalerror( "&state->tccr1b & 0x07 returned a value not in the range of 0 to 7." );
             break;
     }
 

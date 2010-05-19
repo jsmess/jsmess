@@ -93,7 +93,7 @@ void mess_predevice_init(running_machine *machine)
 					/* unload all images */
 					image_unload_all(machine);
 
-					fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s\n",
+					fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
 						info.name,
 						image_basename,
 						image_err);
@@ -104,7 +104,7 @@ void mess_predevice_init(running_machine *machine)
 				/* no image... must this device be loaded? */
 				if (info.must_be_loaded)
 				{
-					fatalerror_exitcode(machine, MAMERR_DEVICE, "Driver requires that device \"%s\" must have an image to load\n", info.instance_name);
+					fatalerror_exitcode(machine, MAMERR_DEVICE, "Driver requires that device \"%s\" must have an image to load", info.instance_name);
 				}
 			}
 

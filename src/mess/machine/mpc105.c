@@ -204,7 +204,7 @@ void mpc105_pci_write(running_device *busdevice, running_device *device, int fun
 			break;
 
 		case 0xA8:	/* processor interface configuration 1 */
-			//fatalerror("mpc105_pci_write(): Unexpected PCI write 0x%02X <-- 0x%08X\n", offset, data);
+			//fatalerror("mpc105_pci_write(): Unexpected PCI write 0x%02X <-- 0x%08X", offset, data);
 			break;
 	}
 }

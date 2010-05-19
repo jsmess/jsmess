@@ -709,7 +709,7 @@ static void vga_cpu_interface(running_machine *machine)
 				break;
 
 			default:
-				fatalerror("VGA:  Bus width %d not supported\n", buswidth);
+				fatalerror("VGA: Bus width %d not supported", buswidth);
 				break;
 		}
 	}

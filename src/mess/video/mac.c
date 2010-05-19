@@ -235,7 +235,7 @@ VIDEO_UPDATE( mac_cb264 )
 			break;
 
 		default:
-			fatalerror("cb264: unknown video mode %d\n", cb264_mode);
+			fatalerror("cb264: unknown video mode %d", cb264_mode);
 			break;
 
 	}

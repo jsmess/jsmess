@@ -655,7 +655,7 @@ static VIDEO_START( pc_ega )
 			break;
 
 		default:
-			fatalerror("EGA:  Bus width %d not supported\n", buswidth);
+			fatalerror("EGA: Bus width %d not supported", buswidth);
 			break;
 	}
 

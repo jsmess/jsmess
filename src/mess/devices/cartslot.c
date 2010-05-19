@@ -348,7 +348,7 @@ static const cartslot_pcb_type *identify_pcb(running_device *device)
 		else
 		{
 			if (me != MCERR_NOT_MULTICART)
-				fatalerror("multicart error: %s\n", multicart_error_text(me));
+				fatalerror("multicart error: %s", multicart_error_text(me));
 			if (image_pcb(device) != NULL)
 			{
 				/* read from hash file */
@@ -368,7 +368,7 @@ static const cartslot_pcb_type *identify_pcb(running_device *device)
 
 		/* check for unknown PCB type */
 		if ((mc != NULL) && (pcb_type == NULL))
-			fatalerror("Unknown PCB type \"%s\"\n", astring_c(&pcb_name));
+			fatalerror("Unknown PCB type \"%s\"", astring_c(&pcb_name));
 	}
 	else
 	{

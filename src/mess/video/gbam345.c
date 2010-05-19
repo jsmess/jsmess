@@ -15,7 +15,7 @@ static void draw_roz_bitmap_mode_scanline(running_machine *machine, gba_state *s
 
 	if(bpp == 4)
 	{
-		fatalerror( "Screen mode 5 is not fully supported yet, contact MESSdev!\n" );
+		fatalerror( "Screen mode 5 is not fully supported yet, contact MESSdev!" );
 	}
 
 	draw_roz_bitmap_scanline(state, line2, y, DISPCNT_BG2_EN, state->BG2CNT, state->BG2X, state->BG2Y, state->BG2PA, state->BG2PB, state->BG2PC, state->BG2PD, &state->gfxBG2X, &state->gfxBG2Y, state->gfxBG2Changed, bpp);
@@ -86,7 +86,7 @@ static void draw_roz_bitmap_mode_scanline_nowindow(running_machine *machine, gba
 
 	if(bpp == 4)
 	{
-		fatalerror( "Screen mode 5 is not fully supported yet, contact MESSdev!\n" );
+		fatalerror( "Screen mode 5 is not fully supported yet, contact MESSdev!" );
 	}
 
 	draw_roz_bitmap_scanline(state, line2, y, DISPCNT_BG2_EN, state->BG2CNT, state->BG2X, state->BG2Y, state->BG2PA, state->BG2PB, state->BG2PC, state->BG2PD, &state->gfxBG2X, &state->gfxBG2Y, state->gfxBG2Changed, bpp);
@@ -210,7 +210,7 @@ static void draw_roz_bitmap_mode_scanline_all(running_machine *machine, gba_stat
 
 	if(bpp == 4)
 	{
-		fatalerror( "Screen mode 5 is not fully supported yet, contact MESSdev!\n" );
+		fatalerror( "Screen mode 5 is not fully supported yet, contact MESSdev!" );
 	}
 
 	if(state->DISPCNT & DISPCNT_WIN0_EN)

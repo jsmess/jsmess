@@ -2026,7 +2026,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 			if (me == MCERR_NONE)
 				result = pcb->assemble(image);
 			else
-				fatalerror("Error loading multicart: %s\n", multicart_error_text(me));
+				fatalerror("Error loading multicart: %s", multicart_error_text(me));
 
 			/* This is for legacy support. If we have no multicart left
             but there are still legacy dumps, we switch to legacy mode. */
@@ -2035,7 +2035,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 		}
 		else
 		{
-			fatalerror("Error loading multicart: no pcb found.\n");
+			fatalerror("Error loading multicart: no pcb found.");
 		}
 	}
 	return result;
@@ -2079,7 +2079,7 @@ static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 			cartslots->multi_slots--;
 		}
 //      else
-//          fatalerror("Lost pointer to multicart in cartridge. Report bug.\n");
+//          fatalerror("Lost pointer to multicart in cartridge. Report bug.");
 	}
 	else
 	{

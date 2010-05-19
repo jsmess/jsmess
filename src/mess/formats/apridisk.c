@@ -189,7 +189,7 @@ FLOPPY_CONSTRUCT( apridisk_construct )
 
 				/* not sure if this is possible */
 				if (length != 512)
-					fatalerror("Compression unsupported\n");
+					fatalerror("Compression unsupported");
 
 				memset(&tag->sectors[cur_sector].data, value, length);
 			}

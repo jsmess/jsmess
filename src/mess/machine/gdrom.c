@@ -135,7 +135,7 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 		case 0x30: // CD_READ
 			if (command[1] & 1)
 			{
-				fatalerror("GDROM: MSF mode used for CD_READ, unsupported\n");
+				fatalerror("GDROM: MSF mode used for CD_READ, unsupported");
 				return 0;
 			}
 			else
@@ -148,12 +148,12 @@ static int scsicd_exec_command( SCSIInstance *scsiInstance, UINT8 *statusCode )
 
 				if (our_this->read_type != 2)	// mode 1
 				{
-					fatalerror("GDROM: Unhandled read_type %d\n", our_this->read_type);
+					fatalerror("GDROM: Unhandled read_type %d", our_this->read_type);
 				}
 
 				if (our_this->data_select != 2)	// just sector data
 				{
-					fatalerror("GDROM: Unhandled data_select %d\n", our_this->data_select);
+					fatalerror("GDROM: Unhandled data_select %d", our_this->data_select);
 				}
 
 				printf("GDROM: CD_READ at LBA %x for %d blocks (%d bytes, read type %d, data select %d)\n", our_this->lba, our_this->blocks, our_this->blocks * our_this->bytes_per_sector, our_this->read_type, our_this->data_select);

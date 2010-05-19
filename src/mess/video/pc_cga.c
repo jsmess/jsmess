@@ -490,7 +490,7 @@ static VIDEO_START( pc_cga )
 			break;
 
 		default:
-			fatalerror("CGA:  Bus width %d not supported\n", buswidth);
+			fatalerror("CGA: Bus width %d not supported", buswidth);
 			break;
 	}
 
@@ -1302,7 +1302,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 					break;
 
 				default:
-					fatalerror("CGA:  Bus width %d not supported\n", buswidth);
+					fatalerror("CGA: Bus width %d not supported", buswidth);
 					break;
 			}
 		} else {
@@ -1322,7 +1322,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 					break;
 
 				default:
-					fatalerror("CGA:  Bus width %d not supported\n", buswidth);
+					fatalerror("CGA: Bus width %d not supported", buswidth);
 					break;
 			}
 

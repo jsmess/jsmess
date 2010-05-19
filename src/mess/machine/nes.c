@@ -697,11 +697,11 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				// unfortunately, the MAPR chunk is not always the first chunk (see Super 24-in-1)
 				/* Preliminary checks: the first chunk MUST be MAPR! */
 				if (read_length == 0x20 && ((magic2[0] != 'M') || (magic2[1] != 'A') || (magic2[2] != 'P') || (magic2[3] != 'R')))
-					fatalerror("First chunk of data in UNIF should be [MAPR]. Check if your image has been corrupted\n");
+					fatalerror("First chunk of data in UNIF should be [MAPR]. Check if your image has been corrupted");
 
 				/* Preliminary checks: multiple MAPR chunks are FORBIDDEN! */
 				if (read_length > 0x20 && ((magic2[0] == 'M') && (magic2[1] == 'A') && (magic2[2] == 'P') && (magic2[3] == 'R')))
-					fatalerror("UNIF should not have multiple [MAPR] chunks. Check if your image has been corrupted\n");
+					fatalerror("UNIF should not have multiple [MAPR] chunks. Check if your image has been corrupted");
 #endif
 
 				/* we first run through the whole image to find a [MAPR] chunk */
@@ -723,7 +723,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 						if (unif_board == NULL)
 						{
-							fatalerror("Unsupported UNIF board %s.\n", unif_mapr);
+							fatalerror("Unsupported UNIF board %s.", unif_mapr);
 							// logerror("Unsupported UNIF board %s.\n", unif_mapr);
 						}
 
@@ -877,7 +877,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						/* Validation */
 						prg_left -= chunk_length;
 						if (prg_left < 0)
-							fatalerror("PRG chunks larger than expected by board %s!\n", unif_mapr);
+							fatalerror("PRG chunks larger than expected by board %s!", unif_mapr);
 
 						/* Read in the program chunks */
 						if (state->prg_chunks == 1)
@@ -902,7 +902,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						/* validation */
 						chr_left -= chunk_length;
 						if (chr_left < 0)
-							fatalerror("CHR chunks larger than expected by board %s!\n", unif_mapr);
+							fatalerror("CHR chunks larger than expected by board %s!", unif_mapr);
 
 						/* Read in the vrom chunks */
 						image_fread(image, state->vrom + chr_start, chunk_length);
@@ -919,7 +919,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			} while (size > read_length);
 
 			if (!mapr_chunk_found )
-				fatalerror("UNIF should have a [MAPR] chunk to work. Check if your image has been corrupted\n");
+				fatalerror("UNIF should have a [MAPR] chunk to work. Check if your image has been corrupted");
 
 			logerror("UNIF support is only very preliminary.\n");
 		}
@@ -946,9 +946,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		// validate the xml fields
 		if (!prg_size)
-			fatalerror("No PRG entry for this software! Please check if the xml list got corrupted\n");
+			fatalerror("No PRG entry for this software! Please check if the xml list got corrupted");
 		if (prg_size < 0x4000)
-			fatalerror("PRG entry is too small! Please check if the xml list got corrupted\n");
+			fatalerror("PRG entry is too small! Please check if the xml list got corrupted");
 
 		if (chr_size)
 			memory_region_alloc(image->machine, "gfx1", chr_size, 0);

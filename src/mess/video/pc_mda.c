@@ -114,7 +114,7 @@ VIDEO_START( pc_mda )
 			break;
 
 		default:
-			fatalerror("MDA:  Bus width %d not supported\n", buswidth);
+			fatalerror("MDA: Bus width %d not supported", buswidth);
 			break;
 	}
 
@@ -466,7 +466,7 @@ static VIDEO_START( pc_hercules )
 		break;
 
 	default:
-		fatalerror("Hercules:  Bus width %d not supported\n", buswidth);
+		fatalerror("Hercules: Bus width %d not supported", buswidth);
 		break;
 	}
 
