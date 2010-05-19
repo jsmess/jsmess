@@ -132,7 +132,23 @@ void mess_postdevice_init(running_machine *machine)
     {
         if (is_image_device(device))
 		{
-			image_finish_load(device);
+			int result = image_finish_load(device);
+			/* did the image load fail? */
+			if (result)
+			{
+				/* retrieve image error message */
+				const char *image_err = image_error(device);
+				char *image_basename_str = auto_strdup(machine, image_basename(device));
+				image_device_info info = image_device_getinfo(machine->config, device);
+
+				/* unload all images */
+				image_unload_all(machine);
+
+				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
+					info.name,
+					image_basename_str,
+					image_err);
+			}
 		}
 	}
 

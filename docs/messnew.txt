@@ -251,6 +251,10 @@ Source Changes:
   (or print to console when specified on command-line / fixes bug 1031) [Oliver 
   Stoeneberg]
 
+- Check image loading result in device post-init - will now bail out on any image
+  loading error and not just missing/inaccessible files (fixes bug 1955) [Oliver 
+  Stoeneberg]
+
 - [C2040] Added DOS 1 FDC ROM (parsed from disassembly). [Curt Coder]
 
 - [MESSUI] Removed "File->Create Image...". It never worked and offered invalid 
