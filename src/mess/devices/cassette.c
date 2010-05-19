@@ -20,7 +20,8 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-/* from devices/mflopimg.c */
+// FIXME: try to put this somewhere else - cassette code should not be dependent on floppy code
+/* from devices/flopdrv.c */
 extern struct io_procs mess_ioprocs;
 
 
