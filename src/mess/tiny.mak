@@ -13,6 +13,8 @@
 #
 ###########################################################################
 
+# disable messui for tiny build
+MESSUI = 0
 
 # include MESS core defines
 include $(SRC)/mess/messcore.mak
@@ -25,6 +27,7 @@ include $(SRC)/mess/osd/$(OSD)/$(OSD).mak
 #-------------------------------------------------
 
 CPUS += Z80
+CPUS += MCS48
 
 
 
@@ -45,10 +48,15 @@ SOUNDS += SN76496
 
 DRVLIBS = \
 	$(MESSOBJ)/tiny.o \
-	$(MESS_MACHINE)/coleco.o \
 	$(MESS_DRIVERS)/coleco.o \
 	$(EMU_VIDEO)/tms9928a.o \
 	$(MESS_DEVICES)/cartslot.o \
+	$(MESS_DEVICES)/cassette.o	\
+	$(MESS_DEVICES)/messram.o	\
+	$(MESS_DEVICES)/multcart.o	\
+	$(MESS_FORMATS)/cassimg.o	\
+	$(MESS_FORMATS)/ioprocs.o	\
+	$(MESS_FORMATS)/wavfile.o	\
 
 
 
@@ -56,6 +64,8 @@ DRVLIBS = \
 # layout dependencies
 #-------------------------------------------------
 
+$(MESSOBJ)/mess.o:	$(MESS_LAYOUT)/lcd.lh
+$(MESSOBJ)/mess.o:	$(MESS_LAYOUT)/lcd_rot.lh
 
 
 #-------------------------------------------------
