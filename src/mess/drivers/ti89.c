@@ -1,69 +1,672 @@
 /***************************************************************************
 
-        TI-89
+    TI-89, TI-92 and TI-92 plus driver by Sandro Ronco
 
-        12/05/2009 Skeleton driver.
+    NVRAM works only if the calculator is turned off (2nd + ON) before closing of MESS
 
+	TODO:
+	 -Link
+	 -HW 3 I/O port
+	 -RTC
+	 -LCD contrast
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "includes/ti89.h"
+
+static UINT8 ti_68k_keypad_r (running_machine *machine);
+
+class t68k_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, t68k_state(machine)); }
+
+	t68k_state(running_machine &machine) { }
+
+	/* HW specifications */
+	UINT8 hw_version;
+	UINT8 mem_type;
+	UINT32 initial_pc;
+	UINT16 *ram;
+	UINT32 ram_size;
+
+	/* keyboard */
+	UINT16 kb_mask;
+	UINT8 on_key;
+
+	/* LCD */
+	UINT8 lcd_on;
+	UINT32 lcd_base;
+	UINT8 lcd_width;
+	UINT8 lcd_height;
+	UINT8 lcd_contrast;
+
+	/* Flash */
+	UINT8 flash_protect;
+	UINT8 flash_state;
+	UINT8 flash_wait;
+	UINT8 flash_ready;
+
+	/* I/O */
+	UINT16 io_hw1[0x10];
+	UINT16 io_hw2[0x80];
+
+	/* Timer */
+	UINT8 timer_on;
+	UINT8 timer_val;
+	UINT16 timer_mask;
+};
+
+
+static UINT8 ti_68k_keypad_r (running_machine *machine)
+{
+	t68k_state *state = (t68k_state *)machine->driver_data;
+	UINT8 port, bit, data = 0xff;
+	static const char *const bitnames[] = {"BIT0", "BIT1", "BIT2", "BIT3", "BIT4", "BIT5", "BIT6", "BIT7"};
+
+	for (bit = 0; bit < 10; bit++)
+		if (~state->kb_mask & (0x01 << bit))
+			for (port = 0; port < 8; port++)
+				data ^= input_port_read(machine, bitnames[port]) & (0x01 << bit) ? 0x01 << port : 0x00;
+	return data;
+}
+
+
+WRITE16_HANDLER ( ti68k_io_w )
+{
+	t68k_state *state = (t68k_state *)space->machine->driver_data;
+
+	switch(offset & 0x0f)
+	{
+		case 0x00:
+			state->lcd_contrast=(state->lcd_contrast & 0xfe) | BIT(data, 5);
+			break;
+		case 0x02:
+			if (!(data & 0x10) && data != state->io_hw1[offset])
+				cputag_suspend(space->machine, "maincpu", SUSPEND_REASON_DISABLE, 1);
+			break;
+		case 0x08:
+				state->lcd_base = data << 3;
+			break;
+		case 0x09:
+				state->lcd_width = (0x40 - ((data >> 8) & 0xff)) * 0x10;
+				state->lcd_height = 0x100 - (data & 0xff);
+			break;
+		case 0x0a:
+			state->timer_on = BIT(data ,1);
+			switch((data >> 4) & 0x03)
+			{
+				case 0:		state->timer_mask = 0x0000;	break;
+				case 1:		state->timer_mask = 0x000f;	break;
+				case 2:		state->timer_mask = 0x007f;	break;
+				case 3:		state->timer_mask = 0x1fff;	break;
+			}
+			break;
+		case 0x0b:
+			state->timer_val = data & 0xff;
+		case 0x0c:
+			state->kb_mask = data & 0x03ff;
+			break;
+		case 0x0e:
+			state->lcd_on = (((data >> 8) & 0x3c) == 0x3c) ? 0 : 1;
+			state->lcd_contrast = (state->lcd_contrast & 0x01) | ((data & 0x0f) << 1);
+			break;
+		default: break;
+	}
+	state->io_hw1[offset & 0x0f] = data;
+}
+
+
+READ16_HANDLER ( ti68k_io_r )
+{
+	t68k_state *state = (t68k_state *)space->machine->driver_data;
+	UINT16 data;
+
+	switch (offset & 0x0f)
+	{
+		case 0x00:
+			data = 0x0400 | ((state->lcd_contrast & 1) << 13);
+			break;
+		case 0x0b:
+			data = state->timer_val;
+			break;
+		case 0x0d:
+			data = ((!state->on_key) << 9) | ti_68k_keypad_r(space->machine);
+			break;
+		default:
+			data= state->io_hw1[offset & 0x0f];
+	}
+	return data;
+}
+
+
+WRITE16_HANDLER ( ti68k_io2_w )
+{
+	t68k_state *state = (t68k_state *)space->machine->driver_data;
+	switch(offset & 0x7f)
+	{
+		case 0x0b:
+			state->lcd_base = 0x4c00 + 0x1000 * (data & 0x03);
+			break;
+		case 0x0e:
+			state->lcd_on = (data & 0x02) ? 1 : 0;
+			break;
+		default: break;
+	}
+	state->io_hw2[offset & 0x7f] = data;
+}
+
+
+READ16_HANDLER ( ti68k_io2_r )
+{
+	t68k_state *state = (t68k_state *)space->machine->driver_data;
+	UINT16 data;
+
+	switch (offset & 0x7f)
+	{
+		default:
+			data= state->io_hw2[offset & 0x7f];
+	}
+	return data;
+}
+
+
+WRITE16_HANDLER ( flash_w )
+{
+	t68k_state *state = (t68k_state *)space->machine->driver_data;
+	UINT16 *flash_base = (UINT16 *)memory_region(space->machine, "maincpu");
+
+	/* verification if it is flash memory */
+	if (state->mem_type != FLASH)
+		return;
+
+	if (state->flash_ready)
+	{
+		flash_base[offset] &= data;
+		state->flash_ready = 0;
+		state->flash_wait = 1;
+	}
+	else if (data == 0x5050)
+		state->flash_state = 0x50;
+	else if (data == 0x1010)
+	{
+		state->flash_ready = 1;
+		state->flash_state = 0x50;
+	}
+	else if (data == 0x2020 && state->flash_state == 0x50)
+		state->flash_state = 0x20;
+	else if (data == 0xd0d0 && state->flash_state == 0x20)
+	{
+		state->flash_state = 0xd0;
+		state->flash_wait = 1;
+		memset(&flash_base[offset & 0xff0000], 0xff, 64 * 1024);
+	}
+	else if (data == 0xffff && state->flash_state == 0x50)
+	{
+		state->flash_ready = 0;
+		state->flash_wait = 0;
+	}
+	else if (data == 0x9090)
+		state->flash_state = 0x90;
+}
+
+
+READ16_HANDLER ( rom_r )
+{
+	t68k_state *state = (t68k_state *)space->machine->driver_data;
+	UINT16 *rom_base = (UINT16 *)memory_region(space->machine, "maincpu");
+
+	if (state->mem_type == FLASH)
+	{
+		if (state->flash_state == 0x90 )
+			switch(offset & 0xffff)
+			{
+				case 0:
+					return 0x8900;
+				case 2:
+					return 0xb500;
+				default:
+					return 0xffff;
+			}
+		else if (state->flash_wait)
+			return 0xffff;
+		else
+			return rom_base[offset];
+	}
+	else
+		return rom_base[offset];
+}
+
+
+static TIMER_CALLBACK( ti68k_timer_callback )
+ {
+	t68k_state *state = (t68k_state *)machine->driver_data;
+	static UINT64 timer;
+
+	timer++;
+
+	if (state->timer_on)
+	{
+		if (!(timer & state->timer_mask) && BIT(state->io_hw1[0x0a], 3))
+		{
+			if (state->timer_val)
+				state->timer_val++;
+			else
+				state->timer_val = (state->io_hw1[0x0b]) & 0xff;
+		}
+
+		if (!BIT(state->io_hw1[0x0a], 7) && ((state->hw_version == HW1) || (!BIT(state->io_hw1[0x0f], 2) && !BIT(state->io_hw1[0x0f], 1))))
+		{
+			if (!(timer & 0x003f))
+				cputag_set_input_line(machine, "maincpu", M68K_IRQ_1, HOLD_LINE);
+
+			if (!(timer & 0x3fff) && !BIT(state->io_hw1[0x0a], 3))
+				cputag_set_input_line(machine, "maincpu", M68K_IRQ_3, HOLD_LINE);
+
+			if (!(timer & state->timer_mask) && BIT(state->io_hw1[0x0a], 3) && state->timer_val == 0)
+				cputag_set_input_line(machine, "maincpu", M68K_IRQ_5, HOLD_LINE);
+		}
+	}
+
+	if (ti_68k_keypad_r(machine) != 0xff)
+		cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, HOLD_LINE);
+}
+
+
+static ADDRESS_MAP_START(ti92_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE_SIZE_MEMBER(t68k_state, ram, ram_size)
+	AM_RANGE(0x200000, 0x5fffff) AM_UNMAP	// ROM
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START(ti89_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x2fffff) AM_RAM
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE_SIZE_MEMBER(t68k_state, ram, ram_size)
+	AM_RANGE(0x200000, 0x3fffff) AM_READWRITE(rom_r, flash_w)
+	AM_RANGE(0x400000, 0x5fffff) AM_NOP
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
+	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(ti68k_io2_r, ti68k_io2_w)
 ADDRESS_MAP_END
 
-/* Input ports */
-static INPUT_PORTS_START( ti89 )
+
+static ADDRESS_MAP_START(ti92p_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE_SIZE_MEMBER(t68k_state, ram, ram_size)
+	AM_RANGE(0x200000, 0x3fffff) AM_NOP
+	AM_RANGE(0x400000, 0x5fffff) AM_READWRITE(rom_r, flash_w)
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
+	AM_RANGE(0x700000, 0x7fffff) AM_READWRITE(ti68k_io2_r, ti68k_io2_w)
+ADDRESS_MAP_END
+
+
+static INPUT_CHANGED( ti68k_on_key )
+{
+	t68k_state *state = (t68k_state *)field->port->machine->driver_data;
+
+	state->on_key = newval;
+
+	if (state->on_key)
+	{
+		if (cputag_is_suspended(field->port->machine, "maincpu", SUSPEND_REASON_DISABLE))
+			cputag_resume(field->port->machine, "maincpu", SUSPEND_REASON_DISABLE);
+
+		cputag_set_input_line(field->port->machine, "maincpu", M68K_IRQ_6, HOLD_LINE);
+	}
+}
+
+
+/* Input ports for TI-89 and TI-89 Titanium*/
+static INPUT_PORTS_START (ti8x)
+	PORT_START("BIT0")   /* bit 0 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER  (ENTRY)") PORT_CODE(KEYCODE_ENTER)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(-)") PORT_CODE(KEYCODE_M)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("APPS") PORT_CODE(KEYCODE_F11)
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
+	PORT_START("BIT1")   /* bit 1 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_BACKSLASH)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("STORE") PORT_CODE(KEYCODE_TAB)
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON") PORT_CODE(KEYCODE_F10) PORT_CHANGED(ti68k_on_key, 0)
+	PORT_START("BIT2")   /* bit 2 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("EE") PORT_CODE(KEYCODE_E)
+	PORT_START("BIT3")   /* bit 3 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_L)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("|") PORT_CODE(KEYCODE_COLON)
+	PORT_START("BIT4")   /* bit 4 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2nd") PORT_CODE(KEYCODE_LALT)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(")") PORT_CODE(KEYCODE_CLOSEBRACE)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(") PORT_CODE(KEYCODE_OPENBRACE)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS)
+	PORT_START("BIT5")   /* bit 5 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_P)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)
+	PORT_START("BIT6")   /* bit 6 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3nd") PORT_CODE(KEYCODE_LCONTROL)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_DEL)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("<--") PORT_CODE(KEYCODE_BACKSPACE)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CATALOG") PORT_CODE(KEYCODE_F8)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Mode") PORT_CODE(KEYCODE_F12)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("HOME") PORT_CODE(KEYCODE_HOME)
+	PORT_START("BIT7")   /* bit 7 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ALPHA") PORT_CODE(KEYCODE_CAPSLOCK)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
+INPUT_PORTS_END
+
+/* Input ports for TI-92 and TI92 Plus*/
+static INPUT_PORTS_START (ti9x)
+	PORT_START("BIT0")   /* bit 0 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2nd") PORT_CODE(KEYCODE_LALT)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_UNUSED
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_UNUSED
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("STORE") PORT_CODE(KEYCODE_TAB)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH)
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_COLON)
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("=") PORT_CODE(KEYCODE_EQUALS)
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("<--") PORT_CODE(KEYCODE_BACKSPACE)
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS)
+	PORT_START("BIT1")   /* bit 1 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3nd") PORT_CODE(KEYCODE_LCONTROL)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B)
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N)
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M)
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("o") PORT_CODE(KEYCODE_BACKSLASH)
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_START("BIT2")   /* bit 2 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H)
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
+	PORT_START("BIT3")   /* bit 3 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Clock") PORT_CODE(KEYCODE_F11)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y)
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U)
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I)
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O)
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
+	PORT_START("BIT4")   /* bit 4 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F8") PORT_CODE(KEYCODE_F8)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F3") PORT_CODE(KEYCODE_F3)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F7") PORT_CODE(KEYCODE_F7)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F2") PORT_CODE(KEYCODE_F2)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F6") PORT_CODE(KEYCODE_F6)
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F1") PORT_CODE(KEYCODE_F1)
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F5") PORT_CODE(KEYCODE_F5)
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("+") PORT_CODE(KEYCODE_PLUS_PAD)
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("F4") PORT_CODE(KEYCODE_F4)
+	PORT_START("BIT5")   /* bit 5 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Up") PORT_CODE(KEYCODE_UP)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(") PORT_CODE(KEYCODE_OPENBRACE)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("SIN") PORT_CODE(KEYCODE_PGUP)
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("LN") PORT_CODE(KEYCODE_PGDN)
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("CLEAR") PORT_CODE(KEYCODE_DEL)
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("MODE") PORT_CODE(KEYCODE_F12)
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0)
+	PORT_START("BIT6")   /* bit 6 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(")") PORT_CODE(KEYCODE_CLOSEBRACE)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("COS") PORT_CODE(KEYCODE_END)
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER)
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("APPS") PORT_CODE(KEYCODE_HOME)
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_ESC)
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP)
+	PORT_START("BIT7")   /* bit 7 */
+		PORT_BIT(0x0001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
+		PORT_BIT(0x0002, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
+		PORT_BIT(0x0004, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
+		PORT_BIT(0x0008, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
+		PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA)
+		PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("TAN") PORT_CODE(KEYCODE_INSERT)
+		PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P)
+		PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_ASTERISK)
+		PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("ON") PORT_CODE(KEYCODE_F10) PORT_CHANGED(ti68k_on_key, 0)
+		PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_NAME("(-)") PORT_CODE(KEYCODE_MINUS_PAD)
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(ti89)
+NVRAM_HANDLER( ti68k )
 {
+	t68k_state *state = (t68k_state *)machine->driver_data;
+	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
+
+	if (read_or_write)
+	{
+		mame_fwrite(file, state->ram, state->ram_size);
+
+		/* if the memory is flash saves the content */
+		if (state->mem_type == FLASH)
+			mame_fwrite(file, rom, 0x200000);
+	}
+	else
+	{
+		if (file)
+		{
+			mame_fread(file, state->ram, state->ram_size);
+			if (state->mem_type == FLASH)
+				mame_fread(file, rom, 0x200000);
+		}
+		else
+			memset(state->ram, 0, sizeof(state->ram));
+	}
 }
 
-static VIDEO_START( ti89 )
+
+static MACHINE_RESET(ti68k)
 {
+	t68k_state *state = (t68k_state *)machine->driver_data;
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), M68K_PC, state->initial_pc);
+
+	state->kb_mask = 0xff;
+	state->on_key = 0;
+	state->lcd_base = 0;
+	state->lcd_width = 0;
+	state->lcd_height = 0;
+	state->lcd_on = 0;
+	state->lcd_contrast = 0;
+	state->flash_protect = 0;
+	state->flash_state = 0;
+	state->flash_wait = 0;
+	state->flash_ready = 0;
+	memset(state->io_hw1, 0, sizeof(state->io_hw1));
+	memset(state->io_hw2, 0, sizeof(state->io_hw2));
+	state->timer_on = 0;
+	state->timer_mask = 0xf;
+	state->timer_val = 0;
 }
 
-static VIDEO_UPDATE( ti89 )
+/* video */
+
+static VIDEO_START( ti68k )
 {
-    return 0;
+
 }
+
+static VIDEO_UPDATE( ti68k )
+{
+	/* preliminary implementation, doesn't use the contrast value */
+	t68k_state *state = (t68k_state *)screen->machine->driver_data;
+	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 width = video_screen_get_width(screen);
+	UINT8 height = video_screen_get_height(screen);
+	UINT8 x, y, b;
+
+	if (!state->lcd_on || !state->lcd_base)
+		bitmap_fill(bitmap, NULL, 1);
+	else
+		for (y = 0; y < height; y++)
+			for (x = 0; x < width / 8; x++)
+			{
+				UINT8 s_byte= memory_read_byte(space, state->lcd_base + y * (width/8) + x);
+				for (b = 0; b<8; b++)
+					*BITMAP_ADDR16(bitmap, y, x * 8 + (7 - b)) = (BIT(s_byte, b) > 0) ? 0 : 1;
+			}
+
+	return 0;
+}
+
+
+MACHINE_START( ti68k )
+{
+	t68k_state *state = (t68k_state *)machine->driver_data;
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT16 *rom = (UINT16 *)memory_region(space->machine, "maincpu");
+	int i;
+
+	state->mem_type= (rom[0x32] & 0x0f) ? EPROM : FLASH;
+
+	if (state->mem_type == FLASH)
+	{
+		UINT32 base = ((((rom[0x82]) << 16) | rom[0x83]) & 0xffff)>>1;
+
+		if (rom[base] >= 8)
+			state->hw_version = ((rom[base + 0x0b]) << 16) | rom[base + 0x0c];
+
+		if (!state->hw_version)
+			state->hw_version = HW1;
+
+		for (i = 0x9000; i < 0x100000; i++)
+			if (rom[i] == 0xcccc && rom[i + 1] == 0xcccc)
+				break;
+
+		state->initial_pc = ((rom[i + 4]) << 16) | rom[i + 5];
+	}
+	else
+	{
+		state->hw_version = HW1;
+		state->initial_pc = ((rom[2]) << 16) | rom[3];
+
+		memory_unmap_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x5fffff, 0, 0);
+
+		if (state->initial_pc > 0x400000)
+			memory_install_read16_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x5fffff, 0, 0, rom_r );
+		else
+			memory_install_read16_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x3fffff, 0, 0, rom_r );
+
+	}
+
+	timer_pulse(machine, ATTOTIME_IN_HZ(1<<14), NULL, 0, ti68k_timer_callback);
+}
+
 
 static MACHINE_DRIVER_START( ti89 )
+
+	MDRV_DRIVER_DATA(t68k_state)
+
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M68000, XTAL_10MHz)
     MDRV_CPU_PROGRAM_MAP(ti89_mem)
 
-    MDRV_MACHINE_RESET(ti89)
+    MDRV_MACHINE_RESET(ti68k)
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_SCREEN_SIZE(240, 128)
+    MDRV_SCREEN_VISIBLE_AREA(0, 160-1, 0, 100-1)
     MDRV_PALETTE_LENGTH(2)
+	MDRV_DEFAULT_LAYOUT(layout_lcd)
     MDRV_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(ti89)
-    MDRV_VIDEO_UPDATE(ti89)
+    MDRV_VIDEO_START(ti68k)
+    MDRV_VIDEO_UPDATE(ti68k)
+
+	MDRV_MACHINE_START( ti68k )
+
+	MDRV_NVRAM_HANDLER(ti68k)
+
 MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( ti92 )
+
+	MDRV_IMPORT_FROM( ti89 )
+
+    MDRV_CPU_MODIFY("maincpu")
+    MDRV_CPU_PROGRAM_MAP(ti92_mem)
+
+    /* video hardware */
+    MDRV_SCREEN_MODIFY("screen")
+    MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
+
+
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( ti92p )
+
+	MDRV_IMPORT_FROM( ti89 )
+
+    MDRV_CPU_REPLACE("maincpu",M68000, XTAL_12MHz)
+    MDRV_CPU_PROGRAM_MAP(ti92p_mem)
+
+    /* video hardware */
+    MDRV_SCREEN_MODIFY("screen")
+    MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
+
+MACHINE_DRIVER_END
+
 
 /* ROM definition */
 ROM_START( ti89 )
   ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
   ROM_SYSTEM_BIOS( 0, "v100", "V 1.00 - HW1" )
   ROMX_LOAD( "ti89v100.rom",   0x000000, 0x200000, CRC(264b34ad) SHA1(c87586a7e9b6d49fbe908fbb6f3c0038f3498573), ROM_BIOS(1))
-  ROM_SYSTEM_BIOS( 1, "v100", "V 1.00 [a] - HW1" )
+  ROM_SYSTEM_BIOS( 1, "v100a", "V 1.00 [a] - HW1" )
   ROMX_LOAD( "ti89v100a.rom",  0x000000, 0x200000, CRC(95199934) SHA1(b8e3cdeb4705b0c7e0a15ab6c6f62bcde14a3a55), ROM_BIOS(2))
-  ROM_SYSTEM_BIOS( 2, "v100", "V 1.00 [m] - HW1" )
+  ROM_SYSTEM_BIOS( 2, "v100m", "V 1.00 [m] - HW1" )
   ROMX_LOAD( "ti89v100m.rom",  0x000000, 0x200000, CRC(b9059e06) SHA1(b33a7c2935eb9f73b210bcf6e7c7f32d1548a9d5), ROM_BIOS(3))
-  ROM_SYSTEM_BIOS( 3, "v100", "V 1.00 [m2] - HW1" )
+  ROM_SYSTEM_BIOS( 3, "v100m2", "V 1.00 [m2] - HW1" )
   ROMX_LOAD( "ti89v100m2.rom", 0x000000, 0x200000, CRC(cdd69d34) SHA1(1686362b0997bb9597f39b443490d4d8d85b56cc), ROM_BIOS(4))
   ROM_SYSTEM_BIOS( 4, "v105", "V 1.05 - HW1" )
   ROMX_LOAD( "ti89v105.rom",   0x000000, 0x200000, CRC(3bc0b474) SHA1(46fe0cd511eb81d53dc12cc4bdacec8a5bba5171), ROM_BIOS(5))
@@ -92,22 +695,21 @@ ROM_START( ti89 )
 ROM_END
 
 ROM_START( ti92 )
-  ROM_REGION( 0x300000, "maincpu", ROMREGION_ERASEFF )
-  // Internal ROM
-  ROM_LOAD( "ti92v111.rom",   0x000000, 0x100000, CRC(67878d52) SHA1(c0fdf162961922a76f286c93fd9b861ce20f23a3))
-  // External ROM
-  ROM_SYSTEM_BIOS( 0, "v13", "V 1.3" )
-  ROMX_LOAD( "ti92v13e.rom",  0x100000, 0x100000, CRC(316c8196) SHA1(82c8cd484c6aebe36f814a2023d2afad6d87f840), ROM_BIOS(1))
-  ROM_SYSTEM_BIOS( 1, "v14", "V 1.4" )
-  ROMX_LOAD( "ti92v14e.rom",  0x100000, 0x100000, CRC(239e9405) SHA1(df2f1ab17d490fda43a02f5851b5a15052361b28), ROM_BIOS(2))
-  ROM_SYSTEM_BIOS( 2, "v17", "V 1.7" )
-  ROMX_LOAD( "ti92v17e.rom",  0x100000, 0x100000, CRC(83e27cc5) SHA1(aec5a6a6157ff94a4e665fa3fe747bacb6688cd4), ROM_BIOS(3))
-  ROM_SYSTEM_BIOS( 3, "v111", "V 1.11" )
-  ROMX_LOAD( "ti92v111e.rom", 0x100000, 0x100000, CRC(4a343833) SHA1(ab4eaacc8c83a861c8d37df5c10e532d0d580460), ROM_BIOS(4))
-  ROM_SYSTEM_BIOS( 4, "v112", "V 1.12" )
-  ROMX_LOAD( "ti92v112e.rom", 0x100000, 0x100000, CRC(9a6947a0) SHA1(8bb0538ca98711e9ad46c56e4dfd609d4699be30), ROM_BIOS(5))
-  ROM_SYSTEM_BIOS( 5, "v21", "V 2.1" )
-  ROMX_LOAD( "ti92v21e.rom",  0x100000, 0x200000, CRC(5afb5863) SHA1(bf7b260d37d1502cc4b08dea5e1d55b523f27925), ROM_BIOS(6))
+  ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+  ROM_SYSTEM_BIOS( 0, "v111", "V 1.11" )
+  ROMX_LOAD( "ti92v111.rom",  0x000000, 0x100000, CRC(67878d52) SHA1(c0fdf162961922a76f286c93fd9b861ce20f23a3), ROM_BIOS(1))
+  ROM_SYSTEM_BIOS( 1, "v13", "V 1.3" )
+  ROMX_LOAD( "ti92v13e.rom",  0x000000, 0x100000, CRC(316c8196) SHA1(82c8cd484c6aebe36f814a2023d2afad6d87f840), ROM_BIOS(2))
+  ROM_SYSTEM_BIOS( 2, "v14", "V 1.4" )
+  ROMX_LOAD( "ti92v14e.rom",  0x000000, 0x100000, CRC(239e9405) SHA1(df2f1ab17d490fda43a02f5851b5a15052361b28), ROM_BIOS(3))
+  ROM_SYSTEM_BIOS( 3, "v17", "V 1.7" )
+  ROMX_LOAD( "ti92v17e.rom",  0x000000, 0x100000, CRC(83e27cc5) SHA1(aec5a6a6157ff94a4e665fa3fe747bacb6688cd4), ROM_BIOS(4))
+  ROM_SYSTEM_BIOS( 4, "v111", "V 1.11" )
+  ROMX_LOAD( "ti92v111e.rom", 0x000000, 0x100000, CRC(4a343833) SHA1(ab4eaacc8c83a861c8d37df5c10e532d0d580460), ROM_BIOS(5))
+  ROM_SYSTEM_BIOS( 5, "v112", "V 1.12" )
+  ROMX_LOAD( "ti92v112e.rom", 0x000000, 0x100000, CRC(9a6947a0) SHA1(8bb0538ca98711e9ad46c56e4dfd609d4699be30), ROM_BIOS(6))
+  ROM_SYSTEM_BIOS( 6, "v21", "V 2.1" )
+  ROMX_LOAD( "ti92v21e.rom",  0x000000, 0x200000, CRC(5afb5863) SHA1(bf7b260d37d1502cc4b08dea5e1d55b523f27925), ROM_BIOS(7))
 
 ROM_END
 
@@ -140,7 +742,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1998, ti89,  0,       0,		ti89,	ti89,	 0, 		"Texas Instruments",	"TI-89",		 GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1995, ti92,  0,       0,		ti89,	ti89,	 0, 		"Texas Instruments",	"TI-92",		 GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( 1999, ti92p, 0,       0,		ti89,	ti89,	 0, 		"Texas Instruments",	"TI-92 Plus", GAME_NOT_WORKING | GAME_NO_SOUND)
-
+COMP( 1998, ti89,  0,       0,		ti89,	ti8x,	 0, 		"Texas Instruments",	"TI-89",		 GAME_NO_SOUND)
+COMP( 1995, ti92,  0,       0,		ti92,	ti9x,	 0, 		"Texas Instruments",	"TI-92",		 GAME_NO_SOUND)
+COMP( 1999, ti92p, 0,       0,		ti92p,	ti9x,	 0, 		"Texas Instruments",	"TI-92 Plus",    GAME_NO_SOUND)

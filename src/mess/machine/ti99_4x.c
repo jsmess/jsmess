@@ -884,7 +884,7 @@ static READ16_HANDLER ( ti99_rspeech_r )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-(18+3));		/* this is just a minimum, it can be more */
 
-	return ((int) tms5220_status_r(devtag_get_device(space->machine, "tms5220"), offset)) << 8;
+	return ((int) tms5220_status_r(devtag_get_device(space->machine, "tmc0285"), offset)) << 8;
 }
 
 #if 0
@@ -915,9 +915,9 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
     there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
     case, we would need to store the value on the bus, which would be more
     complex. */
-	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
+	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tmc0285")))
 	{
-		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
+		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tmc0285")));
 		int cycles_to_ready = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
@@ -927,7 +927,7 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	}
 	#endif
 
-	tms5220_data_w(devtag_get_device(space->machine, "tms5220"), offset, (data >> 8) & 0xff);
+	tms5220_data_w(devtag_get_device(space->machine, "tmc0285"), offset, (data >> 8) & 0xff);
 }
 
 static UINT8 GROM_dataread(offs_t offset)
@@ -1262,7 +1262,7 @@ READ8_HANDLER( ti99_8_r )
 				if (! (offset & 1))
 				{
 					cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-16*4);		/* this is just a minimum, it can be more */
-					reply = tms5220_status_r(devtag_get_device(space->machine, "tms5220"), 0);
+					reply = tms5220_status_r(devtag_get_device(space->machine, "tmc0285"), 0);
 				}
 				break;
 
@@ -1428,9 +1428,9 @@ WRITE8_HANDLER ( ti99_8_w )
                     there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
                     case, we would need to store the value on the bus, which would be more
                     complex. */
-					if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
+					if (! tms5220_readyq_r(devtag_get_device(space->machine, "tmc0285")))
 					{
-						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
+						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tmc0285")));
 						double d = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
 						int cycles_to_ready = ((int) (d + 3)) & ~3;
 
@@ -1441,7 +1441,7 @@ WRITE8_HANDLER ( ti99_8_w )
 						timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
 					}
 
-					tms5220_data_w(devtag_get_device(space->machine, "tms5220"), offset, data);
+					tms5220_data_w(devtag_get_device(space->machine, "tmc0285"), offset, data);
 				}
 				break;
 

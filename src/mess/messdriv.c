@@ -64,10 +64,12 @@ const game_driver * const drivers[] =
 	DRIVER( gbpocket )  /* Nintendo Game Boy Pocket Handheld    */
 	DRIVER( gblight )   /* Nintendo Game Boy Light Handheld  */
 	DRIVER( gbcolor )   /* Nintendo Game Boy Color Handheld  */
-	DRIVER( snes )	  /* Nintendo Super Nintendo NTSC    */
-	DRIVER( snessfx )	/* Nintendo Super Nintendo NTSC, SuperFX    */
+	DRIVER( snes )		/* Nintendo Super Nintendo NTSC    */
 	DRIVER( snespal )   /* Nintendo Super Nintendo PAL    */
-	DRIVER( snespsfx )	/* Nintendo Super Nintendo PAL, SuperFX  */
+	DRIVER( snessfx )	/* Nintendo Super Nintendo NTSC w/SuperFX CPU*/
+	DRIVER( snespsfx )	/* Nintendo Super Nintendo PAL w/SuperFX CPU */
+	DRIVER( snesst )	/* Nintendo Super Nintendo NTSC w/Sufami Turbo base cart */
+	DRIVER( snesbsx )	/* Nintendo Super Nintendo NTSC w/BS-X compatible cart  */
 	DRIVER( sfcbox )	/* Nintendo Super Famicom Box      */
 	DRIVER( n64 )	   /* Nintendo N64   */
 	DRIVER( pokemini )  /* Nintendo Pokemon Mini    */

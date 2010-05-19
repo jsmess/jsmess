@@ -8,7 +8,7 @@ New System Drivers Supported:
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
-(none)
+- TI-89, TI-92, TI-92+ [Sandro Ronco]
 
 
 
@@ -132,6 +132,11 @@ System Driver Changes:
 - [SNES] Fixed rom mapping: now Tokimeki Memorial and Wizardry Gaiden work fine.
   [Fabio Priuli]
 
+- [SNES] Added preliminary support for Sufami Turbo (2 slots): you can use 
+  the 'snesst' driver which emulates a SNES with Sufami Turbo cart inserted,
+  and use -cart1 and -cart2 slots to mount the ST carts. Notice that some 
+  games and some linking functionalities are not working yet. [Fabio Priuli]
+
 - [SUPERGB] Added cart SRAM saving (bug #1949).  [Fabio Priuli]
 
 - [SX64] Added 1541 FLASH! BIOS. [Guru, Curt Coder]
@@ -150,6 +155,9 @@ System Driver Changes:
   with HFDC (bug #1257).  [Michael Zapf]
 
 - [TI99] Replaced DIP switches by Configuration switches.  [Michael Zapf]
+
+- [TI99] Updated to use TMC0285 voice synthesis processor instead of TMS5220.  
+  [Michael Zapf]
 
 - [VBOY] Added .hsi file with hashes from GoodVBoy V3.1415 [Cowering]
 

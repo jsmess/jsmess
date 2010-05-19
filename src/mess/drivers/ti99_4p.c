@@ -168,13 +168,11 @@ static INPUT_PORTS_START(ti99_4p)
 	/* 4 ports for keyboard and joystick */
 	PORT_START("KEY0")	/* col 0 */
 		PORT_BIT(0x0088, IP_ACTIVE_LOW, IPT_UNUSED)
-		/* The original control key is located on the left, but we accept the
-        right control key as well */
+		/* The original control key is located on the left, but we accept the right control key as well */
 		PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 		/* TI99/4a has a second shift key which maps the same */
 		PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-		/* The original control key is located on the right, but we accept the
-        left function key as well */
+		/* The original control key is located on the right, but we accept the left function key as well */
 		PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FCTN") PORT_CODE(KEYCODE_RALT) PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_SHIFT_2)
 		PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("ENTER") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 		PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(SPACE)") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -262,7 +260,7 @@ static const tms5220_interface ti99_4p_tms5220interface =
 };
 
 /*
-    we use a DAC to emulate "audio gate", even thought
+    We use a DAC to emulate "audio gate", even though
     a) there was no DAC in an actual TI99
     b) this is a 2-level output (whereas a DAC provides a 256-level output...)
 */
@@ -278,8 +276,9 @@ static const floppy_config ti99_4p_floppy_config =
 	FLOPPY_OPTIONS_NAME(ti99),
 	DO_NOT_KEEP_GEOMETRY
 };
+
 /*
-    machine description.
+    Machine description.
 */
 static MACHINE_DRIVER_START(ti99_4p_60hz)
 	/* basic machine hardware */
@@ -313,7 +312,7 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
+	MDRV_SOUND_ADD("tmc0285", TMC0285, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4p_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -359,7 +358,7 @@ ROM_START(ti99_4p)
 	/* HSGPL memory space */
 	ROM_REGION(region_hsgpl_len, region_hsgpl, ROMREGION_ERASEFF)
 
-	/*TMS5220 ROM space*/
+	/*TMC0285 ROM space*/
 	ROM_REGION(0x8000, region_speech_rom, 0)
 	ROM_LOAD_OPTIONAL("spchrom.bin", 0x0000, 0x8000, CRC(58b155f7) SHA1(382292295c00dff348d7e17c5ce4da12a1d87763)) /* system speech ROM */
 ROM_END

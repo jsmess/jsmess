@@ -300,14 +300,14 @@ static  READ8_HANDLER ( geneve_speech_r )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-8);		/* this is just a minimum, it can be more */
 
-	return tms5220_status_r(devtag_get_device(space->machine, "tms5220"), offset);
+	return tms5220_status_r(devtag_get_device(space->machine, "tmc0285"), offset);
 }
 
 #if 0
 
 static void speech_kludge_callback(int dummy)
 {
-	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
+	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tmc0285")))
 	{
 		/* Weirdly enough, we are always seeing some problems even though
         everything is working fine. */
@@ -333,9 +333,9 @@ static WRITE8_HANDLER ( geneve_speech_w )
     there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
     case, we would need to store the value on the bus, which would be more
     complex. */
-	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
+	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tmc0285")))
 	{
-		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
+		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tmc0285")));
 		int cycles_to_ready = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
@@ -345,7 +345,7 @@ static WRITE8_HANDLER ( geneve_speech_w )
 	}
 #endif
 
-	tms5220_data_w(devtag_get_device(space->machine, "tms5220"), offset, data);
+	tms5220_data_w(devtag_get_device(space->machine, "tmc0285"), offset, data);
 }
 
 READ8_HANDLER ( geneve_r )

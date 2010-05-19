@@ -686,7 +686,7 @@ static MACHINE_RESET( snes_mess )
 	state->oldjoy2_read = snes_oldjoy2_read;
 }
 
-static MACHINE_DRIVER_START( snes )
+static MACHINE_DRIVER_START( snes_base )
 
 	/* driver data */
 	MDRV_DRIVER_DATA(snes_state)
@@ -718,6 +718,10 @@ static MACHINE_DRIVER_START( snes )
 	MDRV_SOUND_ADD("spc700", SNES, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( snes )
+	MDRV_IMPORT_FROM(snes_base)
 
 	MDRV_IMPORT_FROM(snes_cartslot)
 MACHINE_DRIVER_END
@@ -750,6 +754,21 @@ static MACHINE_DRIVER_START( snespsfx )
 	MDRV_CPU_PROGRAM_MAP(superfx_map)
 	MDRV_CPU_CONFIG(snes_superfx_config)
 MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( snesst )
+	MDRV_IMPORT_FROM(snes_base)
+
+	MDRV_MACHINE_START(snesst)
+
+	MDRV_IMPORT_FROM(sufami_cartslot)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( snesbsx )
+	MDRV_IMPORT_FROM(snes_base)
+
+	MDRV_IMPORT_FROM(bsx_cartslot)
+MACHINE_DRIVER_END
+
 
 /*************************************
  *
@@ -825,15 +844,56 @@ ROM_START( sfcbox )
 	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( snesst )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
+	ROM_REGION( 0x1000, "addons", ROMREGION_ERASE00 )		/* add-on chip ROMs (DSP, SFX, etc) */
+
+	ROM_REGION( 0x40000, "sufami", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_LOAD( "shvc-qh-0.bin", 0,	0x40000, CRC(9b4ca911) SHA1(ef86ea192eed03d5c413fdbbfd46043be1d7a127) )
+
+	ROM_REGION( MAX_SNES_CART_SIZE, "slot_a", ROMREGION_ERASE00 )
+	ROM_REGION( MAX_SNES_CART_SIZE, "slot_b", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( snesbsx )
+	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x100, "user5", 0 )		/* IPL ROM */
+	ROM_LOAD( "spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )	/* boot rom */
+
+	ROM_REGION( 0x1000, "addons", 0 )		/* add-on chip ROMs (DSP, SFX, etc) */
+	ROM_LOAD( "dsp1data.bin", 0x000000, 0x000800, CRC(4b02d66d) SHA1(1534f4403d2a0f68ba6e35186fe7595d33de34b1) )
+	ROM_LOAD( "dsp3data.bin", 0x000800, 0x000800, CRC(4a1c5453) SHA1(2f69c652109938cde21df5eb89890bf090256dbb) )
+
+	ROM_REGION( MAX_SNES_CART_SIZE, "cart", ROMREGION_ERASE00 )
+	ROM_REGION( MAX_SNES_CART_SIZE, "flash", ROMREGION_ERASE00 )
+ROM_END
+
+
+
 /*************************************
  *
  *  Game driver(s)
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  INIT  COMPANY     FULLNAME                                      FLAGS */
-CONS( 1989, snes,     0,      0,      snes,     snes,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-CONS( 1989, snessfx,  snes,   0,      snessfx,  snes,  0,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/SuperFX)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-CONS( 1991, snespal,  snes,   0,      snespal,  snes,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-CONS( 1991, snespsfx, snes,   0,      snespsfx, snes,  0,    "Nintendo", "Super Nintendo Entertainment System (PAL, w/SuperFX)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-CONS( 199?, sfcbox,   snes,   0,      snes,     snes,  0,    "Nintendo", "Super Famicom Box (NTSC)", GAME_NOT_WORKING )
+/*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT  INIT          COMPANY     FULLNAME                                      FLAGS */
+CONS( 1989, snes,     0,      0,      snes,     snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1991, snespal,  snes,   0,      snespal,  snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System (PAL)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 199?, sfcbox,   snes,   0,      snes,     snes,  snes_mess,    "Nintendo", "Super Famicom Box (NTSC)", GAME_NOT_WORKING )
+
+// FIXME: the "hacked" drivers below, currently needed due to limitations in the core device design, should eventually be removed
+
+// These would require CPU to be added/removed depending on the cart which is loaded
+CONS( 1989, snessfx,  snes,   0,      snessfx,  snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/SuperFX)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+CONS( 1991, snespsfx, snes,   0,      snespsfx, snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System (PAL, w/SuperFX)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+//CONS( 1989, snessa1,  snes,   0,      snessa1,  snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/SA-1)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+//CONS( 1991, snespsa1, snes,   0,      snespsa1, snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System (PAL, w/SA-1)",  GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+
+// These would require cartslot to be added/removed depending on the cart which is loaded
+CONS( 1989, snesst,   snes,   0,      snesst,  snes,  snesst,       "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/Sufami Turbo)", GAME_NOT_WORKING )
+CONS( 1989, snesbsx,  snes,   0,      snesbsx, snes,  snes_mess,    "Nintendo", "Super Nintendo Entertainment System / Super Famicom (NTSC, w/BS-X Satellaview slotted cart)",  GAME_NOT_WORKING )

@@ -5577,10 +5577,10 @@ Among undumped protos & special release
 	</software>
 
 	<software name="columns">
-		<!-- Serial:  - Release Date:  -->
+		<!-- Serial:  - Release Date: 1999-08-01 -->
 		<description>Columns (Jpn, NP)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1999</year>
+		<publisher>Media Factory</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="columns (japan) (np).sfc" size="524288" crc="005c77f5" sha1="cc1259497606ba73617d5a277b23cb5dc5e6fd27" offset="000000" />
@@ -25256,7 +25256,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="ringkake">
-		<!-- Serial:  - Release Date: 1988-06-01 -->
+		<!-- Serial:  - Release Date: 1998-06-01 -->
 		<description>Ring ni Kakero (Jpn, NP)</description>
 		<year>1998</year>
 		<publisher>NCS</publisher>

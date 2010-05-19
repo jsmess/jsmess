@@ -8,12 +8,12 @@
 /*
     TI99/4 info:
 
-Similar to TI99/4a, except for the following:
+    Similar to TI99/4a, except for the following:
     * tms9918/9928 has no bitmap mode
     * smaller, 40-key keyboard
     * many small differences in the contents of system ROMs
 
-Historical notes: TI made several last minute design changes.
+    Historical notes: TI made several last minute design changes.
     * TI99/4 prototypes had an extra port for an I/R joystick and keypad interface.
     * early TI99/4 prototypes were designed for a tms9985, not a tms9900.
 */
@@ -47,7 +47,7 @@ Historical notes: TI made several last minute design changes.
 #include "devices/ti99_hd.h"
 
 /*
-    memory map
+    Memory map
 */
 
 static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
@@ -90,13 +90,13 @@ ADDRESS_MAP_END
 */
 
 static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
-        AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
-        AM_RANGE(0x0080, 0x00ff) AM_DEVREAD("ti99_multicart", ti99_multicart_cru_r)	/* SuperSpace */
-        AM_RANGE(0x0100, 0x01ff) AM_READ(ti99_4x_peb_cru_r)
+	AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
+	AM_RANGE(0x0080, 0x00ff) AM_DEVREAD("ti99_multicart", ti99_multicart_cru_r)	/* SuperSpace */
+	AM_RANGE(0x0100, 0x01ff) AM_READ(ti99_4x_peb_cru_r)
 
 	AM_RANGE(0x0000, 0x03ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-        AM_RANGE(0x0400, 0x07ff) AM_DEVWRITE("ti99_multicart", ti99_multicart_cru_w)	/* SuperSpace */
-        AM_RANGE(0x0800, 0x0fff) AM_WRITE(ti99_4x_peb_cru_w)
+	AM_RANGE(0x0400, 0x07ff) AM_DEVWRITE("ti99_multicart", ti99_multicart_cru_w)	/* SuperSpace */
+	AM_RANGE(0x0800, 0x0fff) AM_WRITE(ti99_4x_peb_cru_w)
 ADDRESS_MAP_END
 
 /*
@@ -157,13 +157,13 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_CONFSETTING(    0x01, "Mechatronics Mouse" )
 
 	PORT_START( "CARTSLOT" )
-	PORT_CONFNAME( 0x07, 0x00, "Cartridge slot" )
-		PORT_CONFSETTING(    0x00, "Auto" )
-		PORT_CONFSETTING(    0x01, "Slot 1" )
-		PORT_CONFSETTING(    0x02, "Slot 2" )
-		PORT_CONFSETTING(    0x03, "Slot 3" )
-		PORT_CONFSETTING(    0x04, "Slot 4" )
-//      PORT_CONFSETTING(    0x05, "GRAM Kracker" )
+	PORT_DIPNAME( 0x07, 0x00, "Cartridge slot" )
+		PORT_DIPSETTING(    0x00, "Auto" )
+		PORT_DIPSETTING(    0x01, "Slot 1" )
+		PORT_DIPSETTING(    0x02, "Slot 2" )
+		PORT_DIPSETTING(    0x03, "Slot 3" )
+		PORT_DIPSETTING(    0x04, "Slot 4" )
+//      PORT_DIPSETTING(    0x05, "GRAM Kracker" )
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
@@ -192,13 +192,11 @@ static INPUT_PORTS_START(ti99_4a)
 	/* 4 ports for keyboard and joystick */
 	PORT_START("KEY0")	/* col 0 */
 		PORT_BIT(0x0088, IP_ACTIVE_LOW, IPT_UNUSED)
-		/* The original control key is located on the left, but we accept the
-        right control key as well */
+		/* The original control key is located on the left, but we accept the right control key as well */
 		PORT_BIT(0x0040, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("CTRL")      PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_RCONTROL)
 		/* TI99/4a has a second shift key which maps the same */
 		PORT_BIT(0x0020, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
-		/* The original function key is located on the right, but we accept the
-        left alt key as well */
+		/* The original function key is located on the right, but we accept the left alt key as well */
 		PORT_BIT(0x0010, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("FCTN")      PORT_CODE(KEYCODE_RALT) PORT_CODE(KEYCODE_LALT) PORT_CHAR(UCHAR_SHIFT_2)
 		PORT_BIT(0x0004, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
 		PORT_BIT(0x0002, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -333,13 +331,13 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 
 	PORT_START( "CARTSLOT" )
-	PORT_CONFNAME( 0x07, 0x00, "Cartridge slot" )
-		PORT_CONFSETTING(    0x00, "Auto" )
-		PORT_CONFSETTING(    0x01, "Slot 1" )
-		PORT_CONFSETTING(    0x02, "Slot 2" )
-		PORT_CONFSETTING(    0x03, "Slot 3" )
-		PORT_CONFSETTING(    0x04, "Slot 4" )
-//      PORT_CONFSETTING(    0x05, "GRAM Kracker" )
+	PORT_DIPNAME( 0x07, 0x00, "Cartridge slot" )
+		PORT_DIPSETTING(    0x00, "Auto" )
+		PORT_DIPSETTING(    0x01, "Slot 1" )
+		PORT_DIPSETTING(    0x02, "Slot 2" )
+		PORT_DIPSETTING(    0x03, "Slot 3" )
+		PORT_DIPSETTING(    0x04, "Slot 4" )
+//      PORT_DIPSETTING(    0x05, "GRAM Kracker" )
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
@@ -642,7 +640,8 @@ GFXDECODE_END
 
 
 /*
-    TMS0285 speech synthesizer
+    TMS5220 speech synthesizer
+    Note that in the real hardware, the predecessor TMC0285 was used.
 */
 static const tms5220_interface ti99_4x_tms5220interface =
 {
@@ -697,7 +696,7 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MDRV_SOUND_ADD("sn76496", SN94624, 3579545/8)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
+	MDRV_SOUND_ADD("tmc0285", TMC0285, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -749,7 +748,7 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76496", SN94624, 3579545/8)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
+	MDRV_SOUND_ADD("tmc0285", TMC0285, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_WAVE_ADD("wave.1", "cassette1")
@@ -803,7 +802,7 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76496", SN94624, 3579545/8)	/* 3.579545 MHz SN94624N */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
+	MDRV_SOUND_ADD("tmc0285", TMC0285, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_WAVE_ADD("wave.1", "cassette1")
@@ -859,7 +858,7 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76496", SN94624, 3579545/8)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
+	MDRV_SOUND_ADD("tmc0285", TMC0285, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_WAVE_ADD("wave.1", "cassette1")
@@ -922,7 +921,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76496", SN94624, 3579545/8)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("tms5220", TMS5220, 680000L)
+	MDRV_SOUND_ADD("tmc0285", TMC0285, 680000L)
 	MDRV_SOUND_CONFIG(ti99_4x_tms5220interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_SOUND_WAVE_ADD("wave.1", "cassette1")
@@ -956,7 +955,6 @@ MACHINE_DRIVER_END
 
 /*
     ROM loading
-
     Note that we use the same ROMset for 50Hz and 60Hz versions.
 */
 
