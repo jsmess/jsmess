@@ -370,7 +370,6 @@ DRVLIBS = \
 	$(MESSOBJ)/sinclair.a \
 	$(MESSOBJ)/skeleton.a \
 	$(MESSOBJ)/snk.a \
-	$(MESSOBJ)/softlist.o \
 	$(MESSOBJ)/sony.a \
 	$(MESSOBJ)/sord.a \
 	$(MESSOBJ)/special.a \
