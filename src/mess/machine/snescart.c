@@ -1084,7 +1084,7 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 	running_machine *machine = image->machine;
 	snes_state *state = (snes_state *)machine->driver_data;
 	int total_blocks, read_blocks; 
-	int st_bios = 0, slot_id;
+	int st_bios = 0, slot_id = 0;
 	UINT32 offset, st_data_offset = 0;
 	UINT8 *temp_buffer = auto_alloc_array(machine, UINT8, 0x410000);
 	UINT8 *ROM;
