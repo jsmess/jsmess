@@ -1,11 +1,11 @@
 #####################################################################
-# make SUFFIX=32
+# winui.mak
 #####################################################################
 
 #-------------------------------------------------
 # object and source roots
 #-------------------------------------------------
-# messtest executable name
+# messui executable name
 MESSUINAME = messui
 MESSUIEXE = $(PREFIX)$(PREFIXSDL)$(MESSUINAME)$(SUFFIX)$(SUFFIX64)$(SUFFIXDEBUG)$(EXE)
 BUILD += $(MESSUIEXE)
