@@ -302,6 +302,25 @@ static ADDRESS_MAP_START(ti92p_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START(v200_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_BASE_SIZE_MEMBER(t68k_state, ram, ram_size)
+	AM_RANGE(0x200000, 0x5fffff) AM_READWRITE(rom_r, flash_w)
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
+	AM_RANGE(0x700000, 0x70ffff) AM_READWRITE(ti68k_io2_r, ti68k_io2_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START(ti89t_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x0fffff) AM_RAM AM_MIRROR(0x200000) AM_BASE_SIZE_MEMBER(t68k_state, ram, ram_size)
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ti68k_io_r, ti68k_io_w)
+	AM_RANGE(0x700000, 0x70ffff) AM_READWRITE(ti68k_io2_r, ti68k_io2_w)
+	AM_RANGE(0x800000, 0xbfffff) AM_READWRITE(rom_r, flash_w)
+	AM_RANGE(0xbf0000, 0xffffff) AM_NOP
+ADDRESS_MAP_END
+
+
 static INPUT_CHANGED( ti68k_on_key )
 {
 	t68k_state *state = (t68k_state *)field->port->machine->driver_data;
@@ -657,6 +676,30 @@ static MACHINE_DRIVER_START( ti92p )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( v200 )
+
+	MDRV_IMPORT_FROM( ti89 )
+
+    MDRV_CPU_REPLACE("maincpu",M68000, XTAL_12MHz)
+    MDRV_CPU_PROGRAM_MAP(v200_mem)
+
+    /* video hardware */
+    MDRV_SCREEN_MODIFY("screen")
+    MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 128-1)
+
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( ti89t )
+
+	MDRV_IMPORT_FROM( ti89 )
+
+    MDRV_CPU_REPLACE("maincpu",M68000, XTAL_16MHz)
+    MDRV_CPU_PROGRAM_MAP(ti89t_mem)
+
+MACHINE_DRIVER_END
+
+
 /* ROM definition */
 ROM_START( ti89 )
   ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
@@ -739,9 +782,27 @@ ROM_START( ti92p )
   ROMX_LOAD( "ti92pv209.rom",  0x000000, 0x200000, CRC(4851ad52) SHA1(10e6c2cdc60623bf0be7ea72a9ec840259fb37c3), ROM_BIOS(11))
 ROM_END
 
+ROM_START( v200 )
+  ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+  ROM_SYSTEM_BIOS( 0, "v209", "V 2.09" )
+  ROMX_LOAD( "voyage200v209.rom", 0x0000, 0x400000, CRC(f805c7a6) SHA1(818b919058ba3bd7d15604f11fff6740010d07fc), ROM_BIOS(1))
+  ROM_SYSTEM_BIOS( 1, "v310", "V 3.10" )
+  ROMX_LOAD( "voyage200v310.rom", 0x0000, 0x400000, CRC(ed4cbfd2) SHA1(39cdb9932f314ff792b1cc5e3fe041d98b9fd101), ROM_BIOS(2))
+ROM_END
+
+ROM_START( ti89t )
+  ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF )
+  ROM_SYSTEM_BIOS( 0, "v300", "V 3.00" )
+  ROMX_LOAD( "ti89tv300.rom", 0x0000, 0x400000, CRC(55eb4f5a) SHA1(4f919d7752caf2559a79883ec8711a9701d19513), ROM_BIOS(1))
+  ROM_SYSTEM_BIOS( 1, "v310", "V 3.10" )
+  ROMX_LOAD( "ti89tv310.rom", 0x0000, 0x400000, CRC(b6967cca) SHA1(fb4f09e5c4500dee651b8de537e502ab97cb8328), ROM_BIOS(2))
+ROM_END
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
 COMP( 1998, ti89,  0,       0,		ti89,	ti8x,	 0, 		"Texas Instruments",	"TI-89",		 GAME_NO_SOUND)
 COMP( 1995, ti92,  0,       0,		ti92,	ti9x,	 0, 		"Texas Instruments",	"TI-92",		 GAME_NO_SOUND)
 COMP( 1999, ti92p, 0,       0,		ti92p,	ti9x,	 0, 		"Texas Instruments",	"TI-92 Plus",    GAME_NO_SOUND)
+COMP( 2002, v200,  0,       0,		v200,	ti9x,	 0, 		"Texas Instruments",	"Voyage 200 PLT",GAME_NO_SOUND)
+COMP( 2004, ti89t, 0,       0,		ti89t,	ti8x,	 0, 		"Texas Instruments",	"TI-89 Titanium",GAME_NO_SOUND)

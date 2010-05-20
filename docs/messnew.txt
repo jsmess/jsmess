@@ -3,7 +3,8 @@
 New System Drivers Supported:
 -----------------------------
 - Aamber Pegasus (thanks to Lord Philip)[Robbbert]
-
+- TI-89 Titanium [Sandro Ronco]
+- Voyage 200 PLT [Sandro Ronco]
 
 
 Systems Promoted from GAME_NOT_WORKING:

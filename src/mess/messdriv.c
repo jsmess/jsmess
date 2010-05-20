@@ -774,6 +774,8 @@ const game_driver * const drivers[] =
 	DRIVER( ti89 )	  /* 1998 TI-89    */
 	DRIVER( ti92 )	  /* 1995 TI-92    */
 	DRIVER( ti92p )	 /* 1999 TI-92 Plus   */
+	DRIVER( v200 )	  /* 2002 Voyage 200 PLT    */
+	DRIVER( ti89t )	 /* 2004 TI-89 Titanium   */
 
 	/* NEC */
 	DRIVER( pc6001 )
