@@ -1658,6 +1658,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/z80dev.o 	\
 	$(MESS_DRIVERS)/pegasus.o 	\
 	$(MESS_VIDEO)/pegasus.o 	\
+	$(MESS_DRIVERS)/e01.o 		\
 	
 
 

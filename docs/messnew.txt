@@ -15,6 +15,7 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers:
 -----------------
+- Acorn FileStore E01/E01S [Curt Coder]
 - Alesis HR-16,HR-16B and SR-16 drum machines
 - Central Data 2650
 - Chaos 2
@@ -44,7 +45,7 @@ System Driver Changes:
 - [AQUARIUS] Replaced bad char ROM with the newly redumped one.
   [jaybird3rd, Dirk Best]
 
-- [ATOM] Fixed disk loading [Curt Coder]
+- [ATOM] Fixed disk loading. [Curt Coder]
 
 - [ChannelF] Added .hsi file with hashes from GoodChaF V3.1415 [Cowering]
 
