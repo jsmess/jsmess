@@ -117,6 +117,7 @@ static size_t cart_size;
 static UINT8 eeprom_bit_count;
 static UINT8 protection_check = 0;	/* 0 = check hasn't started yet; 1= check in progress; 2 = check is finished. */
 extern UINT8 blitter_status;
+static UINT8 using_cart = 0;
 
 static IRQ_CALLBACK(jaguar_irq_callback)
 {
@@ -165,6 +166,11 @@ static MACHINE_RESET( jaguar )
 	joystick_data = 0xffffffff;
 	eeprom_bit_count = 0;
 	blitter_status = 1;
+	if ((using_cart) && (input_port_read(machine, "CONFIG") & 2))
+	{
+		cart_base[0x102] = 1;
+		using_cart = 0;
+	}
 }
 
 
@@ -575,9 +581,9 @@ static INPUT_PORTS_START( jaguar )
 	PORT_BIT( 0xfffc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("CONFIG")
-//  PORT_CONFNAME( 0x02, 0x02, "Show Logo")
-//  PORT_CONFSETTING(    0x00, "Yes")
-//  PORT_CONFSETTING(    0x02, "No")
+	PORT_CONFNAME( 0x02, 0x02, "Show Logo")
+	PORT_CONFSETTING(    0x00, "Yes")
+	PORT_CONFSETTING(    0x02, "No")
 	PORT_CONFNAME( 0x10, 0x10, "TV System")
 	PORT_CONFSETTING(    0x00, "PAL")
 	PORT_CONFSETTING(    0x10, "NTSC")
@@ -644,7 +650,7 @@ static MACHINE_DRIVER_START( jaguar )
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("j64,jag,rom")
+	MDRV_CARTSLOT_EXTENSION_LIST("j64,rom")
 	MDRV_CARTSLOT_INTERFACE("jaguar_cart")
 	MDRV_CARTSLOT_LOAD(jaguar)
 
@@ -707,6 +713,7 @@ static void jaguar_fix_endian( running_machine *machine, UINT32 addr, UINT32 siz
 static DRIVER_INIT( jaguar )
 {
 	state_save_register_global(machine, joystick_data);
+	using_cart = 0;
 }
 
 static QUICKLOAD_LOAD( jaguar )
@@ -807,7 +814,8 @@ static DEVICE_IMAGE_LOAD( jaguar )
 	jaguar_fix_endian(image->machine, 0x800000+load_offset, size);
 
 	/* Skip the logo */
-	cart_base[0x102] = 1;
+	using_cart = 1;
+//	cart_base[0x102] = 1;
 
 	/* Transfer control to the bios */
 	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, rom_base[1]);
