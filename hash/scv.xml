@@ -126,7 +126,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
        <software name="dragonba">
-               <description>Dragon Ball</description>
+               <description>Dragon Dai Hikyou</description>
                <year>1986</year>
                <publisher>Epoch</publisher>
                <part name="cart" interface="scv_cart">
