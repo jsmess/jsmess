@@ -10,6 +10,7 @@
 #define MC6847_TAG		"ic31"
 #define R6522_TAG		"ic1"
 #define I8271_TAG		"ic13"
+#define MC6854_TAG		"econet_ic1"
 #define SCREEN_TAG		"screen"
 #define CENTRONICS_TAG	"centronics"
 #define CASSETTE_TAG	"cassette"

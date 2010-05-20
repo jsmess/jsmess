@@ -56,6 +56,28 @@ Hardware:   PPIA 8255
 
     http://www.xs4all.nl/~fjkraan/comp/atom/index.html
 
+	---
+
+	The Econet card for the ATOM is decoded on the ATOM PCB at memory address B400 (hex). The Econet Eurocard has decoding circuits on it which select memory address 1940 (hex).
+	There are then five significant addresses above these bases which contain the following registers: -
+
+				ATOM card	Eurocard
+	6854	register 1	B400		1940
+	6854	register 2	B401		1941
+	6854	register 3	B402		1942
+	6854	Tx/Rx Data reg.	B403		1943
+	Station	identification	B404		1944
+
+	Station identification
+
+	The identity number of each station is set up in hardware by links to IC 8. IC 8 is an octal buffer which when enabled feeds the cards station ID to the computer bus. 
+	Each link codes a bit in an eight bit binary number allowing any station ID in the range 0 to 255 to be set up. if a link is left open then the bit is a one, when a 
+	link is made the bit is a zero. Hence all links open corresponds to station ID 255, and all links made to station ID 0. Each station must have a unique identity and
+	some indentities are associated with specific functions on the network. Station ID zero is reserved for broadcast signals and should not be used. Station ID 255 is 
+	reserved at present for the file server, and 235 for the printer server. Wire links must be soldered to each network station card during installation, a sugested 
+	scheme for number allocation is to number normal user stations from one upwards and to number special stations and servers from 255 downwards.
+
+
 ***************************************************************************/
 
 /*
@@ -71,6 +93,8 @@ Hardware:   PPIA 8255
     - color card
     - CP/M card
     - speech synthesis card (SPO256 connected to VIA)
+	- econet
+	- teletext card
 
 */
 
@@ -152,6 +176,8 @@ static ADDRESS_MAP_START( atom_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("a000", 0)
 	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255a_r, i8255a_w)
+//	AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_r, mc6854_w)
+//	AM_RANGE(0xb404, 0xb404) Econet station identification
 	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via_r, via_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
 ADDRESS_MAP_END
