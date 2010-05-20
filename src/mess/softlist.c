@@ -520,6 +520,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				const char *str_crc = NULL;
 				const char *str_sha1 = NULL;
 				const char *str_offset = NULL;
+				const char *str_value = NULL;
 				const char *str_status = NULL;
 				const char *str_loadflag = NULL;
 
@@ -535,6 +536,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						str_sha1 = attributes[1];
 					if ( !strcmp( attributes[0], "offset" ) )
 						str_offset = attributes[1];
+					if ( !strcmp( attributes[0], "value" ) )
+						str_value = attributes[1];
 					if ( !strcmp( attributes[0], "status" ) )
 						str_status = attributes[1];
 					if ( !strcmp( attributes[0], "loadflag" ) )
@@ -547,10 +550,20 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						UINT32 length = strtol( str_size, NULL, 10 );
 						UINT32 offset = strtol( str_offset, NULL, 16 );
 
-						if ( str_loadflag && !strcmp(str_loadflag,"reload") )
+						if ( str_loadflag && !strcmp(str_loadflag, "reload") )
 						{
 							/* Handle 'reload' loadflag */
 							add_rom_entry( swlist, NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS );
+						}
+						else if ( str_loadflag && !strcmp(str_loadflag, "continue") )
+						{
+							/* Handle 'continue' loadflag */
+							add_rom_entry( swlist, NULL, NULL, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS );
+						}
+						else if ( str_loadflag && !strcmp(str_loadflag, "fill") )
+						{
+							/* Handle 'fill' loadflag */
+							add_rom_entry( swlist, NULL, (const char*)atoi(str_value), offset, length, ROMENTRYTYPE_FILL );
 						}
 						else
 						{
@@ -558,8 +571,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 							{
 								char *s_name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
 								char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_crc) + strlen(str_sha1) + 7 + 4 ) );
-								int baddump = ( str_status && !strcmp(str_status,"baddump") ) ? 1 : 0;
-								int nodump = ( str_status && !strcmp(str_status,"nodump" ) ) ? 1 : 0;
+								int baddump = ( str_status && !strcmp(str_status, "baddump") ) ? 1 : 0;
+								int nodump = ( str_status && !strcmp(str_status, "nodump" ) ) ? 1 : 0;
 								int romflags = 0;
 
 								if ( !s_name || !hashdata )
@@ -569,10 +582,12 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 								sprintf( hashdata, "c:%s#s:%s#%s", str_crc, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
 
 								/* Handle loadflag attribute */
-								if ( str_loadflag && !strcmp(str_loadflag,"load16_word_swap") )
+								if ( str_loadflag && !strcmp(str_loadflag, "load16_word_swap") )
 									romflags = ROM_GROUPWORD | ROM_REVERSE;
-								else if ( str_loadflag && !strcmp(str_loadflag,"load16_byte") )
+								else if ( str_loadflag && !strcmp(str_loadflag, "load16_byte") )
 									romflags = ROM_SKIP(1);
+								else if ( str_loadflag && !strcmp(str_loadflag, "load32_word_swap") )
+									romflags = ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2);
 
 								/* ROM_LOAD( name, offset, length, hash ) */
 								add_rom_entry( swlist, s_name, hashdata, offset, length, ROMENTRYTYPE_ROM | romflags );
