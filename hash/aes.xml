@@ -39,8 +39,41 @@
 		</part>
 	</software>
 
-<!-- ID 007 -->
+<!-- ID 005 -->
+	<software name="maglord">
+		<description>Magician Lord</description>
+		<year>1990</year>
+		<publisher>Alpha Denshi</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="005-p1.bin" size="524288" crc="bd0a492d" sha1="d043d3710cf2b0d2b3798008e65e4c7c3ead1af3" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="005-s1.bin" size="131072" crc="1c5369a2" sha1="db0dba0a7dced6c9ca929c5abda491b05d84199c" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="327680">
+				<rom name="005-m1.bin" size="262144" crc="26259f0f" sha1="4f3e500093d61585048767dbd9fa09b3911a05d6" offset="000000" />
+				<rom size="262144" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="524288">
+				<rom name="005-v11.bin" size="524288" crc="cc0455fd" sha1="a8ff4270e7705e263d25ff0b301f503bccea7e59" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd.deltat" size="1048576">
+				<rom name="005-v21.bin" size="524288" crc="f94ab5b7" sha1="2c16985102e3585e08622d8c54ac5c60425b9ff8" offset="000000" />
+				<rom name="005-v22.bin" size="524288" crc="232cfd04" sha1="61b66a9decbbd1f500a8c186615e7fd077c6861e" offset="080000" />
+			</dataarea>
+			<dataarea name="sprites" size="3145728">
+				<rom name="005-c1.bin" size="524288" crc="806aee34" sha1="3c32a0edbbddb694495b510c13979c44b83de8bc" offset="000000" loadflag="load16_byte" />
+				<rom name="005-c2.bin" size="524288" crc="34aa9a86" sha1="cec97e1ff7f91158040c629ba75742db82c4ae5e" offset="000001" loadflag="load16_byte" />
+				<rom name="005-c3.bin" size="524288" crc="c4c2b926" sha1="478bfafca21f5a1338808251a06ab405e6a9e65f" offset="100000" loadflag="load16_byte" />
+				<rom name="005-c4.bin" size="524288" crc="9c46dcf4" sha1="4c05f3dc25777a87578ce09a6cefb3a4cebf3266" offset="100001" loadflag="load16_byte" />
+				<rom name="005-c5.bin" size="524288" crc="69086dec" sha1="7fa47f4a765948813ebf366168275dcc3c42e951" offset="200000" loadflag="load16_byte" />
+				<rom name="005-c6.bin" size="524288" crc="ab7ac142" sha1="e6ad2843947d35d8e913d2666f87946c1ba7944f" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
 
+<!-- ID 007 -->
 	<software name="alpham2">
 		<description>Alpha Mission II / ASO II</description>
 		<year>1990</year>
@@ -193,6 +226,57 @@
 				<rom name="016-c2.bin" size="1048576" crc="320db048" sha1="d6b43834de6f5442e23ca8fb26b3a36e96790d8d" offset="000001" loadflag="load16_byte" />
 				<rom name="016-c3.bin" size="1048576" crc="98de7995" sha1="e33edf4d36c82196d2b474e37be180a05976f558" offset="200000" loadflag="load16_byte" />
 				<rom name="016-c4.bin" size="1048576" crc="070506e2" sha1="3a2ec365e1d87a9c5ce1ee9bea88402a8eef4ed7" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 017 -->
+<!--
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "017-hp1.bin", 0x000000, 0x080000, CRC(33eccae0" sha1="000ccf9a9c73df75eeba3f2c367c3a1a9e0a3a6b) )
+	ROM_LOAD16_WORD_SWAP( "017-p2.bin",  0x080000, 0x020000, CRC(3024bbb3" sha1="88892e1292dd60f35a76f9a22e623d4f0f9693cc) )
+
+	NEO_SFIX_128K( "017-s1.bin", CRC(b246204d" sha1="73dce64c61fb5bb7e836a8e60f081bb77d80d281) )
+
+	NEO_BIOS_AUDIO_128K( "017-m1.bin", CRC(9b4f34c6" sha1="7f3a51f47fcbaa598f5c76bc66e2c53c8dfd852d) )
+
+	ROM_REGION( 0x200000, "ymsnd", 0 )
+	ROM_LOAD( "017-v1.bin", 0x000000, 0x100000, CRC(23663295" sha1="9374a5d9f3de8e6a97c11f07d8b4485ac9d55edb) )
+	ROM_LOAD( "017-v2.bin", 0x100000, 0x100000, CRC(f61e6765" sha1="1c9b287996947319eb3d288c3d82932cf01039db) )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "017-c1.bin", 0x000000, 0x100000, CRC(b4eb82a1" sha1="79879e2ea78c07d04c88dc9a1ad59604b7a078be) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "017-c2.bin", 0x000001, 0x100000, CRC(d55c550d" sha1="6110f693aa23710939c04153cf5af26493e4a03f) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "017-c3.bin", 0x200000, 0x100000, CRC(ed51ef65" sha1="e8a8d86e24454948e51a75c883bc6e4091cbf820) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "017-c4.bin", 0x200001, 0x100000, CRC(f4f3c9cb" sha1="8faafa89dbd0345218f71f891419d2e4e7578200) ) /* Plane 2,3 */
+-->
+	<software name="sengoku">
+		<description>Sengoku / Sengoku Denshou</description>
+		<year>1990</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="017-hp1.bin" size="524288" crc="33eccae0" sha1="000ccf9a9c73df75eeba3f2c367c3a1a9e0a3a6b" offset="000000" />
+				<rom name="017-p2.bin" size="131072" crc="3024bbb3" sha1="88892e1292dd60f35a76f9a22e623d4f0f9693cc" offset="080000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="017-s1.bin" size="131072" crc="b246204d" sha1="73dce64c61fb5bb7e836a8e60f081bb77d80d281" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="017-m1.bin" size="131072" crc="9b4f34c6" sha1="7f3a51f47fcbaa598f5c76bc66e2c53c8dfd852d" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+				<rom name="017-v1.bin" size="1048576" crc="23663295" sha1="9374a5d9f3de8e6a97c11f07d8b4485ac9d55edb" offset="000000" />
+				<rom name="017-v2.bin" size="1048576" crc="f61e6765" sha1="1c9b287996947319eb3d288c3d82932cf01039db" offset="100000" />
+			</dataarea>
+			<dataarea name="sprites" size="4194304">
+				<rom name="017-c1.bin" size="1048576" crc="b4eb82a1" sha1="79879e2ea78c07d04c88dc9a1ad59604b7a078be" offset="000000" loadflag="load16_byte" />
+				<rom name="017-c2.bin" size="1048576" crc="d55c550d" sha1="6110f693aa23710939c04153cf5af26493e4a03f" offset="000001" loadflag="load16_byte" />
+				<rom name="017-c3.bin" size="1048576" crc="ed51ef65" sha1="e8a8d86e24454948e51a75c883bc6e4091cbf820" offset="200000" loadflag="load16_byte" />
+				<rom name="017-c4.bin" size="1048576" crc="f4f3c9cb" sha1="8faafa89dbd0345218f71f891419d2e4e7578200" offset="200001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
