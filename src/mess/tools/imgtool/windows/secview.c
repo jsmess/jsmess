@@ -263,13 +263,13 @@ static void change_sector(HWND dialog)
 
 
 
-static void setup_spin_control(HWND dialog, int spin_item, int edit_item)
+static void setup_spin_control(HWND dialog, int spin_item, int edit_item, int range_start, int range_end)
 {
 	HWND spin_control, edit_control;
 	spin_control = GetDlgItem(dialog, spin_item);
 	edit_control = GetDlgItem(dialog, edit_item);
 	SendMessage(spin_control, UDM_SETBUDDY, (WPARAM) edit_control, 0);
-	SendMessage(spin_control, UDM_SETRANGE, 0, MAKELONG(32767, 0));
+	SendMessage(spin_control, UDM_SETRANGE, range_start, MAKELONG(range_end, 0));
 }
 
 
@@ -285,6 +285,13 @@ static INT_PTR CALLBACK win_sectorview_dialog_proc(HWND dialog, UINT message,
 	switch(message)
 	{
 		case WM_INITDIALOG:
+		{
+			int tracks = 32768;
+			int heads = 32768;
+			int sectors = 32768;
+
+			// TODO: get actual tracks, heads, sectors from image
+
 			info = (struct sectorview_info *) lparam;
 			info->font = create_font();
 
@@ -298,16 +305,18 @@ static INT_PTR CALLBACK win_sectorview_dialog_proc(HWND dialog, UINT message,
 			SendMessage(GetDlgItem(dialog, IDC_HEXVIEW), WM_SETFONT, (WPARAM) info->font, (LPARAM) TRUE);
 			SetWindowLongPtr(dialog, GWLP_USERDATA, lparam);
 
-			setup_spin_control(dialog, IDC_TRACKSPIN, IDC_TRACKEDIT);
-			setup_spin_control(dialog, IDC_HEADSPIN, IDC_HEADEDIT);
-			setup_spin_control(dialog, IDC_SECTORSPIN, IDC_SECTOREDIT);
+			setup_spin_control(dialog, IDC_TRACKSPIN, IDC_TRACKEDIT, 0, tracks-1);
+			setup_spin_control(dialog, IDC_HEADSPIN, IDC_HEADEDIT, 0, heads-1);
+			setup_spin_control(dialog, IDC_SECTORSPIN, IDC_SECTOREDIT, 0, sectors-1);
 
+			// TODO: get first sector id instead of try and error
 			err = read_sector_data(dialog, 0, 0, 0);
 			if (err == IMGTOOLERR_SEEKERROR)
 				err = read_sector_data(dialog, 0, 0, 1);
 			if (!err)
 				set_sector_text(dialog);
 			break;
+		}
 
 		case WM_DESTROY:
 			info = get_sectorview_info(dialog);
