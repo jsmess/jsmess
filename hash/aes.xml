@@ -105,6 +105,98 @@
 		</part>
 	</software>
 
+<!-- ID 011 -->
+	<software name="superspy">
+		<description>The Super Spy</description>
+		<year>1990</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="011-p1.bin" size="524288" crc="c7f944b5" sha1="da7560e09187c68f1d9f7656218497b4464c56c9" offset="000000" />
+				<rom name="011-sp2.bin" size="131072" crc="811a4faf" sha1="8169dfaf79f52d80ecec402ce1b1ab9cafb7ebdd" offset="080000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="011-s1.bin" size="131072" crc="ec5fdb96" sha1="8003028025ac7bf531e568add6ba66c02d0b7e84" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="327680">
+				<rom name="011-m1.bin" size="262144" crc="ca661f1b" sha1="4e3cb57db716ec48487c1b070c3a55a5faf40856" offset="000000" />
+				<rom size="262144" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="1572864">
+				<rom name="011-v11.bin" size="1048576" crc="5c674d5c" sha1="d7b9beddeb247b584cea9ca6c43ec6869809b673" offset="000000" />
+				<rom name="011-v12.bin" size="524288" crc="9f513d5a" sha1="37b04962f0b8e2a74abd35c407337a6151dc4e95" offset="100000" />
+			</dataarea>
+			<dataarea name="ymsnd.deltat" size="524288">
+				<rom name="011-v21.bin" size="524288" crc="426cd040" sha1="b2b45189837c8287223c2b8bd4df9525b72a3f16" offset="000000" />
+			</dataarea>
+			<dataarea name="sprites" size="4194304">
+				<rom name="009-c1.bin" size="1048576" crc="cae7be57" sha1="43b35b349594535689c358d9f324adda55e5281a" offset="000000" loadflag="load16_byte" />
+				<rom name="009-c2.bin" size="1048576" crc="9e29d986" sha1="b417763bad1acf76116cd56f4203c2d2677e22e5" offset="000001" loadflag="load16_byte" />
+				<rom name="009-c3.bin" size="1048576" crc="14832ff2" sha1="1179792d773d97d5e45e7d8f009051d362d72e24" offset="200000" loadflag="load16_byte" />
+				<rom name="009-c4.bin" size="1048576" crc="b7f63162" sha1="077a81b2bb0a8f17c9df6945078608f74432877a" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 014 -->
+	<software name="mutnat">
+		<description>Mutation Nation</description>
+		<year>1990</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="014-p1.bin" size="524288" crc="6f1699c8" sha1="87206f67a619dede7959230f9ff3701b8b78957a" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="014-s1.bin" size="131072" crc="99419733" sha1="b2524af8704941acc72282aa1d62fd4c93e3e822" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="014-m1.bin" size="131072" crc="b6683092" sha1="623ec7ec2915fb077bf65b4a16c815e071c25259" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+				<rom name="014-v1.bin" size="1048576" crc="25419296" sha1="c9fc04987c4e0875d276e1a0fb671740b6f548ad" offset="000000" />
+				<rom name="014-v2.bin" size="1048576" crc="0de53d5e" sha1="467f6040da3dfb1974785e95e14c3f608a93720a" offset="100000" />
+			</dataarea>
+			<dataarea name="sprites" size="4194304">
+				<rom name="014-c1.bin" size="1048576" crc="5e4381bf" sha1="d429a5e09dafd2fb99495658b3652eecbf58f91b" offset="000000" loadflag="load16_byte" />
+				<rom name="014-c2.bin" size="1048576" crc="69ba4e18" sha1="b3369190c47771a790c7adffa958ff55d90e758b" offset="000001" loadflag="load16_byte" />
+				<rom name="014-c3.bin" size="1048576" crc="890327d5" sha1="47f97bf120a8480758e1f3bb8982be4c5325c036" offset="200000" loadflag="load16_byte" />
+				<rom name="014-c4.bin" size="1048576" crc="e4002651" sha1="17e53a5f4708866a120415bf24f3b89621ad0bcc" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+	
+<!-- ID 016 -->
+	<software name="kotm">
+		<description>King of the Monsters</description>
+		<year>1990</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="016-hp1.bin" size="524288" crc="b774621e" sha1="7684b2e07163aec68cd083ef1d8900f855f6cb42" offset="000000" />
+				<rom name="016-p2.bin" size="131072" crc="12afdc2b" sha1="3a95f5910cbb9f17e63ddece995c6e120fa2f622" offset="080000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="016-s1.bin" size="131072" crc="1a2eeeb3" sha1="8d2b96d395020197bc59294b6b0c8d62b1d8d4dd" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="016-m1.bin" size="131072" crc="9da9ca10" sha1="88b915827d529f39c365d3e41197d5461e07a085" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+				<rom name="016-v1.bin" size="1048576" crc="86c0a502" sha1="7fe2db0c64aefdd14d6c36f7fcd6442591e9a014" offset="000000" />
+				<rom name="016-v2.bin" size="1048576" crc="5bc23ec5" sha1="f4ff5d20587469daa026d5c812739335ce53cfdf" offset="100000" />
+			</dataarea>
+			<dataarea name="sprites" size="4194304">
+				<rom name="016-c1.bin" size="1048576" crc="71471c25" sha1="bc8e3fee56b33ef2bac5b4b852339d2fbcd09b7c" offset="000000" loadflag="load16_byte" />
+				<rom name="016-c2.bin" size="1048576" crc="320db048" sha1="d6b43834de6f5442e23ca8fb26b3a36e96790d8d" offset="000001" loadflag="load16_byte" />
+				<rom name="016-c3.bin" size="1048576" crc="98de7995" sha1="e33edf4d36c82196d2b474e37be180a05976f558" offset="200000" loadflag="load16_byte" />
+				<rom name="016-c4.bin" size="1048576" crc="070506e2" sha1="3a2ec365e1d87a9c5ce1ee9bea88402a8eef4ed7" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 022 -->
 	<software name="bjourney">
 		<description>Blue's Journey / Raguy</description>
