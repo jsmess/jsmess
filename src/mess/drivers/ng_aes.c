@@ -35,14 +35,15 @@
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "devices/aescart.h"
+#include "devices/cartslot.h"
 
 #include "neogeo.lh"
 
 
 #define LOG_VIDEO_SYSTEM		(0)
 #define LOG_CPU_COMM			(0)
-#define LOG_MAIN_CPU_BANKING	(0)
-#define LOG_AUDIO_CPU_BANKING	(0)
+#define LOG_MAIN_CPU_BANKING	(1)
+#define LOG_AUDIO_CPU_BANKING	(1)
 
 
 
@@ -863,7 +864,13 @@ static MACHINE_START( neogeo )
 	state_save_register_postload(machine, aes_postload, NULL);
 }
 
-
+//static DEVICE_IMAGE_LOAD(aes_cart)
+//{
+//	else
+//		return INIT_FAIL;
+	
+//	return INIT_PASS;
+//}
 
 /*************************************
  *
@@ -958,7 +965,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_io_map, ADDRESS_SPACE_IO, 8 )
   /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r)
-	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ym", ym2610_r, ym2610_w)
+	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
 	AM_RANGE(0x09, 0x09) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_e000_efff_r)
@@ -1255,7 +1262,7 @@ static MACHINE_DRIVER_START( neogeo )
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym", YM2610, NEOGEO_YM2610_CLOCK)
+	MDRV_SOUND_ADD("ymsnd", YM2610, NEOGEO_YM2610_CLOCK)
 	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker",  0.60)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.60)
@@ -1269,6 +1276,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( aes )
 	MDRV_IMPORT_FROM(neogeo)
 	MDRV_AES_CARTRIDGE_ADD("aes_multicart")
+//	MDRV_CARTSLOT_ADD("cart")
+//	MDRV_CARTSLOT_MANDATORY
+	
+//	MDRV_CARTSLOT_LOAD(aes_cart)
+	
+	MDRV_SOFTWARE_LIST_ADD("aes")
 MACHINE_DRIVER_END
 
 /*************************************
@@ -1304,9 +1317,9 @@ ROM_START( aes )
 
 	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x400000, "ym", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "ymsnd", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x200000, "ym.deltat", ROMREGION_ERASEFF )
+	ROM_REGION( 0x1000000, "ymsnd.deltat", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x900000, "sprites", ROMREGION_ERASEFF )
 ROM_END

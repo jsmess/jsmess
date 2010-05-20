@@ -141,7 +141,7 @@ static aescartridge_t *assemble_common(running_machine *machine, running_device 
 	}
 
 	// up to 8 YM sample ROMs
-	romrgn = (UINT8 *)memory_region(machine, "ym");
+	romrgn = (UINT8 *)memory_region(machine, "ymsnd");
 	blockofs = 0;
 	for (i = 0; i < 8; i++)
 	{
@@ -158,7 +158,7 @@ static aescartridge_t *assemble_common(running_machine *machine, running_device 
 	}
 
 	// up to 8 YM delta-T sample ROMs
-	romrgn = (UINT8 *)memory_region(machine, "ym.deltat");
+	romrgn = (UINT8 *)memory_region(machine, "ymsnd.deltat");
 	blockofs = 0;
 	for (i = 0; i < 8; i++)
 	{
@@ -413,6 +413,46 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 	aes_pcb_t *pcb;
 	cartslot_t *cart;
 	multicart_open_error me;
+	UINT32 size;
+
+	// first check software list
+	if(image_software_entry(image) != NULL)
+	{
+		// create memory regions
+		size = image_get_software_region_length(image,"maincpu");
+		memory_region_free(image->machine,"maincpu");
+		memory_region_alloc(image->machine,"maincpu",size,0);
+		memcpy(memory_region(image->machine,"maincpu"),image_get_software_region(image,"maincpu"),size);
+		size = image_get_software_region_length(image,"fixed");
+		memory_region_free(image->machine,"fixed");
+		memory_region_alloc(image->machine,"fixed",size,ROMREGION_ERASEFF);
+		memcpy(memory_region(image->machine,"fixed"),image_get_software_region(image,"fixed"),size);
+		size = image_get_software_region_length(image,"audiocpu");
+		memory_region_free(image->machine,"audiocpu");
+		memory_region_alloc(image->machine,"audiocpu",size,ROMREGION_ERASEFF);
+		memcpy(memory_region(image->machine,"audiocpu"),image_get_software_region(image,"audiocpu"),size);
+		size = image_get_software_region_length(image,"ymsnd");
+//		memory_region_free(image->machine,"ymsnd");
+//		memory_region_alloc(image->machine,"ymsnd",size,ROMREGION_ERASEFF);
+		memcpy(memory_region(image->machine,"ymsnd"),image_get_software_region(image,"ymsnd"),size);
+		if(image_get_software_region(image,"ymsnd.deltat") != NULL)
+		{
+			size = image_get_software_region_length(image,"ymsnd.deltat");
+//			memory_region_free(image->machine,"ymsnd.deltat");
+//			memory_region_alloc(image->machine,"ymsnd.deltat",size,ROMREGION_ERASEFF);
+			memcpy(memory_region(image->machine,"ymsnd.deltat"),image_get_software_region(image,"ymsnd.deltat"),size);
+		}
+		size = image_get_software_region_length(image,"sprites");
+		memory_region_free(image->machine,"sprites");
+		memory_region_alloc(image->machine,"sprites",size,ROMREGION_ERASEFF);
+		memcpy(memory_region(image->machine,"sprites"),image_get_software_region(image,"sprites"),size);
+		
+		// setup cartridge ROM area
+		memory_install_read_bank(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM),0x000080,0x0fffff,0,0,"cart_rom");
+		memory_set_bankptr(image->machine,"cart_rom",&memory_region(image->machine,"maincpu")[0x80]);
+		
+		return INIT_PASS;
+	}
 
 	if (pcbdev == NULL)
 		fatalerror("Error loading multicart: no pcb found.");
@@ -528,6 +568,7 @@ static MACHINE_DRIVER_START(aes_multicart)
 	MDRV_CARTSLOT_START(aes_cartridge)
 	MDRV_CARTSLOT_LOAD(aes_cartridge)
 	MDRV_CARTSLOT_UNLOAD(aes_cartridge)
+	MDRV_CARTSLOT_INTERFACE("aes_cart")
 	MDRV_CARTSLOT_MANDATORY
 MACHINE_DRIVER_END
 

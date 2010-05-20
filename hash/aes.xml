@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- Based of MAME 0.138 Neo Geo driver -->
+
+<softwarelist name="aes" description="SNK Neo Geo AES cartridges">
+<!-- ID 001 -->
+	<software name="nam1975">
+		<description>NAM-1975</description>
+		<year>1990</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="001-p1.bin" size="524288" crc="cc9fc951" sha1="92f4e6ddeeb825077d92dbb70b50afea985f15c0" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="001-s1.bin" size="131072" crc="7988ba51" sha1="bc2f661f381b06b34ac2fa215dd5689d3bf84832" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="327680">
+				<rom name="001-m1.bin" size="262144" crc="ba874463" sha1="a83514f4b20301f84a98699900e2593f1c1b8846" offset="000000" />
+				<rom size="262144" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="524288">
+				<rom name="001-v1.bin" size="524288" crc="a7c3d5e5" sha1="e3efc86940f91c53b7724c4566cfc21ea1a7a465" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd.deltat" size="1572864">
+				<rom name="001-v2.bin" size="524288" crc="55e670b3" sha1="a047049646a90b6db2d1882264df9256aa5a85e5" offset="000000" />
+				<rom name="001-v22.bin" size="524288" crc="ab0d8368" sha1="404114db9f3295929080b87a5d0106b40da6223a" offset="080000" />
+				<rom name="001-v23.bin" size="524288" crc="df468e28" sha1="4e5d4a709a4737a87bba4083aeb788f657862f1a" offset="100000" />
+			</dataarea>
+			<dataarea name="sprites" size="3145728">
+				<rom name="001-c1.bin" size="524288" crc="32ea98e1" sha1="c2fb3fb7dd14523a4b4b7fbdb81f44cb4cc48239" offset="000000" loadflag="load16_byte" />
+				<rom name="001-c2.bin" size="524288" crc="cbc4064c" sha1="224c970fd060d841fd430c946ef609bb57b6d78c" offset="000001" loadflag="load16_byte" />
+				<rom name="001-c3.bin" size="524288" crc="0151054c" sha1="f24fb501a7845f64833f4e5a461bcf9dc3262557" offset="100000" loadflag="load16_byte" />
+				<rom name="001-c4.bin" size="524288" crc="0a32570d" sha1="f108446ec7844fde25f7a4ab454f76d384bf5e52" offset="100001" loadflag="load16_byte" />
+				<rom name="001-c5.bin" size="524288" crc="90b74cc2" sha1="89898da36db259180e5261ed45eafc99ca13e504" offset="200000" loadflag="load16_byte" />
+				<rom name="001-c6.bin" size="524288" crc="e62bed58" sha1="d05b2903b212a51ee131e52c761b714cb787683e" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 007 -->
+
+	<software name="alpham2">
+		<description>Alpha Mission II / ASO II</description>
+		<year>1990</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="007-p1.bin" size="524288" crc="5b266f47" sha1="8afbf995989f47ad93fea1f31a884afc7228b53a" offset="000000" />
+				<rom name="007-p2.bin" size="131072" crc="eb9c1044" sha1="65d3416dcd96663bc4e7cefe90ecb7c1eafb2dda" offset="080000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="007-s1.bin" size="131072" crc="85ec9acf" sha1="39a11974438ad36a2cc84307151b31474c3c5518" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="007-m1.bin" size="131072" crc="28dfe2cd" sha1="1a1a99fb917c6c8db591e3be695ce03f843ee1df" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+				<rom name="007-v1.bin" size="1048576" crc="cd5db931" sha1="b59f9f2df29f49470312a6cd20f5669b6aaf51ff" offset="000000" />
+				<rom name="007-v2.bin" size="1048576" crc="63e9b574" sha1="1ade4cd0b15c84dd4a0fb7f7abf0885eef3a3f71" offset="100000" />
+			</dataarea>
+			<dataarea name="sprites" size="3145728">
+				<rom name="007-c1.bin" size="1048576" crc="8fba8ff3" sha1="1a682292e99eb91b0edb9771c44bc5e762867e98" offset="000000" loadflag="load16_byte" />
+				<rom name="007-c2.bin" size="1048576" crc="4dad2945" sha1="ac85a146276537fed124bda892bb93ff549f1d93" offset="000001" loadflag="load16_byte" />
+				<rom name="007-c3.bin" size="524288" crc="68c2994e" sha1="4f8dfc6e5188942e03b853a2c9f0ea6138dec791" offset="200000" loadflag="load16_byte" />
+				<rom name="007-c4.bin" size="524288" crc="7d588349" sha1="a5ed789d7bbc25be5c5b2d99883b64d379c103a2" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 009 -->
+	<software name="ncombat">
+		<description>Ninja Combat</description>
+		<year>1990</year>
+		<publisher>Alpha Denshi</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="009-pg1.bin" size="524288" crc="8e9f0add" sha1="d0b908a86a58f2537eea73a431038f1cd74a5a2f" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="009-s1.bin" size="131072" crc="d49afee8" sha1="77615f12edf08ae8f1353f7a056a8f3a50d3ebdc" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+				<rom name="009-m1.bin" size="131072" crc="b5819863" sha1="6f2309d51531052dbf7d712993c9e35649db0d84" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="1572864">
+				<rom name="009-v11.bin" size="524288" crc="cf32a59c" sha1="af5b7fcd8a4aff1307c0a1d937e5f0460c32de79" offset="000000" />
+				<rom name="009-v12.bin" size="524288" crc="7b3588b7" sha1="a4e6d9d4113ff4ce48b371f65e9187d551821d3b" offset="080000" />
+				<rom name="009-v13.bin" size="524288" crc="505a01b5" sha1="9426a4f5b31e16f74e72e61951c189a878f211c5" offset="100000" />
+			</dataarea>
+			<dataarea name="ymsnd.deltat" size="524288">
+				<rom name="009-v21.bin" size="524288" crc="365f9011" sha1="aebd292214ab280b05ee9e759b7e9a681a099c4a" offset="000000" />
+			</dataarea>
+			<dataarea name="sprites" size="3145728">
+				<rom name="009-c1.bin" size="524288" crc="33cc838e" sha1="c445c891c0ba4190aa0b472786150620e76df5b4" offset="000000" loadflag="load16_byte" />
+				<rom name="009-c2.bin" size="524288" crc="26877feb" sha1="8f48097fb8e4757f50b6d86219122fbf4b6f87ef" offset="000001" loadflag="load16_byte" />
+				<rom name="009-c3.bin" size="524288" crc="3b60a05d" sha1="0a165a17af4834876fcd634599cd2208adc9248f" offset="100000" loadflag="load16_byte" />
+				<rom name="009-c4.bin" size="524288" crc="39c2d039" sha1="8ca6c3f977c43c7abba2a00a0e70f02e2a49f5f2" offset="100001" loadflag="load16_byte" />
+				<rom name="009-c5.bin" size="524288" crc="67a4344e" sha1="b325f152c7b2388fc92c5826e1dc99094b9ea749" offset="200000" loadflag="load16_byte" />
+				<rom name="009-c6.bin" size="524288" crc="2eca8b19" sha1="16764ef10e404325ba0a1a2ad3a4c0af287be21f" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 022 -->
+	<software name="bjourney">
+		<description>Blue's Journey / Raguy</description>
+		<year>1990</year>
+		<publisher>Alpha Denshi</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+                <rom name="022-p1.bin" size="1048576" crc="6a2f6d4a" sha1="b8ca548e56f1c7abcdce415ba7329e0cf698ee13" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="022-s1.bin" size="131072" crc="843c3624" sha1="dbdf86c193b7c1d795f8c21f2c103c1d3e18abbe" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="022-m1.bin" size="131072" crc="8e1d4ab6" sha1="deabc11ab81e7e68a3e041c03a127ae28d0d7264" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+                <rom name="022-v11.bin" size="1048576" crc="2cb4ad91" sha1="169ec7303c4275155a66a88cc08270c24132bb36" offset="000000" />
+                <rom name="022-v22.bin" size="1048576" crc="65a54d13" sha1="a591fbcedca8f679dacbebcd554e3aa3fd163e92" offset="100000" />
+			</dataarea>
+			<dataarea name="sprites" size="3145728">
+                <rom name="022-c1.bin" size="1048576" crc="4d47a48c" sha1="6e282285be72583d828e7765b1c1695ecdc44777" offset="000000" loadflag="load16_byte" />
+                <rom name="022-c2.bin" size="1048576" crc="e8c1491a" sha1="c468d2556b3de095aaa05edd1bc16d71303e9478" offset="000001" loadflag="load16_byte" />
+                <rom name="022-c3.bin" size="524288" crc="66e69753" sha1="974b823fc62236fbc23e727f25b61a805a707a9e" offset="200000" loadflag="load16_byte" />
+                <rom name="022-c4.bin" size="524288" crc="71bfd48a" sha1="47288be69e6992d09ebef108b4de9ffab6293dc8" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
