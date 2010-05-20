@@ -84,17 +84,26 @@ Hardware:   PPIA 8255
 
     TODO:
 
+	- connect to softwarelist
+	- e000 EPROM switching
     - ERROR repeats ad infinitum
     - display should be monochrome
     - ram expansion
     - tap files
     - mouse
-    - move eprom box roms to software list
     - color card
     - CP/M card
     - speech synthesis card (SPO256 connected to VIA)
 	- econet
 	- teletext card
+	- Busicomputers Prophet 2
+		* The Shift and Return keys are orange and the Return key is large,
+		* There is a MODE switch to the top right of the keyboard,
+		* There is a VIDEO port in addition to the TV output,
+		* An Acorn AtomCalc ROM PCB is installed (is this standard on the Prophet2 or an upgrade?),
+		* An Acorn 32K dynamic RAM card is installed,
+		* A 5v DC input is added in addition to the standard power in (but this may be a later upgrade),
+		* The Utility ROM is labelled P2/FP is installed
 
 */
 
@@ -152,9 +161,27 @@ static READ8_HANDLER( eprom_r )
 
 static WRITE8_HANDLER( eprom_w )
 {
+	/*
+
+		bit		description
+
+		0		block A bit 0
+		1		block A bit 1
+		2		block A bit 2
+		3		block A bit 3
+		4		
+		5		
+		6		
+		7		block E
+
+	*/
+
 	atom_state *state = (atom_state *)space->machine->driver_data;
 
+	/* block A */
 	state->eprom = data & 0x0f;
+
+	/* TODO block E */
 
 	bankswitch(space->machine);
 }
@@ -177,7 +204,7 @@ static ADDRESS_MAP_START( atom_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xafff) AM_ROM AM_REGION("a000", 0)
 	AM_RANGE(0xb000, 0xb003) AM_MIRROR(0x3fc) AM_DEVREADWRITE(INS8255_TAG, i8255a_r, i8255a_w)
 //	AM_RANGE(0xb400, 0xb403) AM_DEVREADWRITE(MC6854_TAG, mc6854_r, mc6854_w)
-//	AM_RANGE(0xb404, 0xb404) Econet station identification
+//	AM_RANGE(0xb404, 0xb404) AM_READ_PORT("ECONET")
 	AM_RANGE(0xb800, 0xb80f) AM_MIRROR(0x3f0) AM_DEVREADWRITE(R6522_TAG, via_r, via_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SY6502_TAG, 0)
 ADDRESS_MAP_END
@@ -324,6 +351,9 @@ static INPUT_PORTS_START( atom )
 
 	PORT_START("BRK")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("BREAK")        PORT_CODE(KEYCODE_ESC)   PORT_CHAR(UCHAR_MAMEKEY(ESC)) PORT_CHANGED(trigger_reset, 0)
+
+	PORT_START("ECONET")
+	// station ID (0-255)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -703,6 +733,10 @@ static MACHINE_START( atomeb )
     MACHINE_DRIVER( atom )
 -------------------------------------------------*/
 
+#define MDRV_ATOM_CARTSLOT_ADD(_tag) \
+	MDRV_CARTSLOT_ADD(_tag) \
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+
 static MACHINE_DRIVER_START( atom )
 	MDRV_DRIVER_DATA(atom_state)
 
@@ -740,8 +774,7 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_QUICKLOAD_ADD("quickload", atom_atm, "atm", 0)
 
 	/* cartridge */
-	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_ATOM_CARTSLOT_ADD("cart")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -761,38 +794,25 @@ static MACHINE_DRIVER_START( atomeb )
 	MDRV_MACHINE_START(atomeb)
 
 	/* cartridges */
-	MDRV_CARTSLOT_ADD("rom0")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("rom1")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("rom2")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("rom3")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("rom4")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("rom5")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("rom6")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("rom7")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("rom8")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("rom9")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("roma")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("romb")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("romc")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("romd")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("rome")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
-	MDRV_CARTSLOT_ADD("romf")
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_ATOM_CARTSLOT_ADD("a0")
+	MDRV_ATOM_CARTSLOT_ADD("a1")
+	MDRV_ATOM_CARTSLOT_ADD("a2")
+	MDRV_ATOM_CARTSLOT_ADD("a3")
+	MDRV_ATOM_CARTSLOT_ADD("a4")
+	MDRV_ATOM_CARTSLOT_ADD("a5")
+	MDRV_ATOM_CARTSLOT_ADD("a6")
+	MDRV_ATOM_CARTSLOT_ADD("a7")
+	MDRV_ATOM_CARTSLOT_ADD("a8")
+	MDRV_ATOM_CARTSLOT_ADD("a9")
+	MDRV_ATOM_CARTSLOT_ADD("aa")
+	MDRV_ATOM_CARTSLOT_ADD("an")
+	MDRV_ATOM_CARTSLOT_ADD("ac")
+	MDRV_ATOM_CARTSLOT_ADD("ad")
+	MDRV_ATOM_CARTSLOT_ADD("ae")
+	MDRV_ATOM_CARTSLOT_ADD("af")
+
+	MDRV_ATOM_CARTSLOT_ADD("e0")
+	MDRV_ATOM_CARTSLOT_ADD("e1")
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -826,32 +846,26 @@ ROM_START( atomeb )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
 
 	ROM_REGION( 0x10000, "a000", 0 )
-	ROM_CART_LOAD( "rom0", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "rom1", 0x1000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "rom2", 0x2000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "rom3", 0x3000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "rom4", 0x4000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "rom5", 0x5000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "rom6", 0x6000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "rom7", 0x7000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "rom8", 0x8000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "rom9", 0x9000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "roma", 0xa000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "romb", 0xb000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "romc", 0xc000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "romd", 0xd000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "rome", 0xe000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "romf", 0xf000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a0", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a1", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a2", 0x2000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a3", 0x3000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a4", 0x4000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a5", 0x5000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a6", 0x6000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a7", 0x7000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a8", 0x8000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "a9", 0x9000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "aa", 0xa000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "ab", 0xb000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "ac", 0xc000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "ad", 0xd000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "ae", 0xe000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "af", 0xf000, 0x1000, ROM_MIRROR )
 
-	ROM_LOAD( "axr1.rom",     0x0000, 0x1000, CRC(868fda8b) SHA1(f8417787c28818a7646b9b59d706ef890255049f) ) // Atom Externsion ROM AXR1
-	ROM_LOAD( "pcharme.rom",  0x1000, 0x1000, CRC(9e8bd79f) SHA1(66c57622448b448aa6080911dccb03456d0e3b81) ) // P-Charme
-	ROM_LOAD( "gags.rom",	  0x2000, 0x1000, CRC(35e1d713) SHA1(94cc2887ad9fea1849d1d53c64d0668e77696ef4) ) // GAGS
-	ROM_LOAD( "werom.rom",    0x3000, 0x1000, CRC(dfcb3bf8) SHA1(85a19146844da2d6f03e1cde37ee17429eedeb0d) ) // WE-ROM
-	ROM_LOAD( "utilikit.rom", 0x4000, 0x1000, CRC(013b8f93) SHA1(b4341f116a6d1e0cbcd39d64e0b5d14a90dc0356) ) // A&F Utility Kit
-	ROM_LOAD( "combox.rom",   0x5000, 0x1000, CRC(9c8210ab) SHA1(ea293f49a98721cdbdf985d6f2fe636290ef0e75) ) // ComBox
-	ROM_LOAD( "salfaa.rom",   0x6000, 0x1000, CRC(ef857b25) SHA1(b3812427233060972fa01faf3ce381a21576a5ed) ) // SALFAA
-	ROM_LOAD( "mousebox.rom", 0x7000, 0x1000, CRC(0dff30e4) SHA1(b7c0b9c23fcc5cfdc06cb2d2a9e7c2658e248ef7) ) // Mouse-Dos Box
-	ROM_LOAD( "atomicw.rom",  0x8000, 0x1000, CRC(a3fd737d) SHA1(d418d9322c69c49106ed2c268ad0864c0f2c4c1b) ) // Atomic Windows
+	ROM_REGION( 0x2000, "e000", 0)
+	ROM_CART_LOAD( "e0", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_CART_LOAD( "e1", 0x1000, 0x1000, ROM_MIRROR )
 ROM_END
 
 /***************************************************************************
@@ -861,3 +875,4 @@ ROM_END
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT      COMPANY   FULLNAME */
 COMP( 1979, atom,     0,        0,		atom,     atom,     0,        "Acorn",  "Atom" , 0)
 COMP( 1979, atomeb,   atom,     0,		atomeb,   atom,     0,        "Acorn",  "Atom with Eprom Box" , 0)
+//COMP( 1983, prophet2, atom,     0,		atom,	  atom,     0,        "Busicomputers",  "Prophet 2" , 0)
