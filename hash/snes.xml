@@ -40437,7 +40437,7 @@ Among undumped protos & special release
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="world class service super nintendo tester (usa).sfc" size="1048576" crc="d4553100" sha1="89eea825c1d434a62cba9867001eec6aac75c469" offset="000000" />
+				<rom name="snes test program.sfc" size="1048576" crc="d4553100" sha1="89eea825c1d434a62cba9867001eec6aac75c469" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
