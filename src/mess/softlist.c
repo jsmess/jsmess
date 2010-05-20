@@ -560,6 +560,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 								char *hashdata = (char *)pool_malloc_lib( swlist->pool, sizeof(char) * ( strlen(str_crc) + strlen(str_sha1) + 7 + 4 ) );
 								int baddump = ( str_status && !strcmp(str_status,"baddump") ) ? 1 : 0;
 								int nodump = ( str_status && !strcmp(str_status,"nodump" ) ) ? 1 : 0;
+								int romflags = 0;
 
 								if ( !s_name || !hashdata )
 									return;
@@ -567,8 +568,14 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 								strcpy( s_name, str_name );
 								sprintf( hashdata, "c:%s#s:%s#%s", str_crc, str_sha1, ( nodump ? NO_DUMP : ( baddump ? BAD_DUMP : "" ) ) );
 
+								/* Handle loadflag attribute */
+								if ( str_loadflag && !strcmp(str_loadflag,"load16_word_swap") )
+									romflags = ROM_GROUPWORD | ROM_REVERSE;
+								else if ( str_loadflag && !strcmp(str_loadflag,"load16_byte") )
+									romflags = ROM_SKIP(1);
+
 								/* ROM_LOAD( name, offset, length, hash ) */
-								add_rom_entry( swlist, s_name, hashdata, offset, length, ROMENTRYTYPE_ROM );
+								add_rom_entry( swlist, s_name, hashdata, offset, length, ROMENTRYTYPE_ROM | romflags );
 							}
 						}
 					}
