@@ -177,7 +177,7 @@ MACHINE_RESET( nes )
 
 	if (state->format == 2)
 		nes_unif_reset(machine, state->board);
-
+	
 	/* Reset the serial input ports */
 	state->in_0.shift = 0;
 	state->in_1.shift = 0;
@@ -939,10 +939,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		memory_region_free(image->machine, "gfx1");
 
 		/* Allocate them again with the proper size */
-
-		// FIXME: here we have a +0x4000 to handle games with a single 16k prg chunk,
-		// but we should simply reload it in the .xml and use here the proper prg_size!!
-		memory_region_alloc(image->machine, "maincpu", 0x10000 + prg_size + 0x4000, 0);
+		memory_region_alloc(image->machine, "maincpu", 0x10000 + prg_size, 0);
 
 		// validate the xml fields
 		if (!prg_size)
@@ -959,9 +956,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->wram = memory_region(image->machine, "user1");
 
 		memcpy(state->rom + 0x10000, image_get_software_region(image, "prg"), prg_size);
-		// FIXME: as above, we should reload the single prg chunk in the .xml, not copying it here
-		if (prg_size == 0x4000)
-			memcpy(state->rom + 0x14000, image_get_software_region(image, "prg"), prg_size);
 
 		if (chr_size)
 			memcpy(state->vrom, image_get_software_region(image, "chr"), chr_size);
@@ -969,8 +963,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->prg_chunks = prg_size / 0x4000;
 		state->chr_chunks = chr_size / 0x2000;
 
-		state->format = 1;	// temporarily treat this as a ines file
-		state->mapper = 4;	// this should depend on the 'feature' field of the .xml file
+		state->format = 2;	// temporarily treat this as a ines file
+		state->board = image_get_feature(image);	// this should depend on the 'feature' field of the .xml file
 		state->battery = 0;	// presence of a battery should be read from .xml feature
 
 		// FIXME: we need to handle the remaining variables. on the short term, we might

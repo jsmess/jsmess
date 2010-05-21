@@ -1578,31 +1578,12 @@ int nes_mapper_reset( running_machine *machine, int mmc_num )
 #include "machine/nes_unif.c"
 
 // WIP code
-int nes_unif_reset( running_machine *machine, const char *board )
+static int unif_initialize( running_machine *machine, int idx )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	int err = 0;
-	const unif *unif_board;
-
-	if (state->chr_chunks == 0)
-		chr8(machine, 0,CHRRAM);
-	else
-		chr8(machine, 0,CHRROM);
-
-	/* Set the mapper irq callback */
-	unif_board = nes_unif_lookup(board);
-
-	if (unif_board == NULL)
-		fatalerror("Unimplemented UNIF Board");
-
-	ppu2c0x_set_scanline_callback(state->ppu, unif_board ? unif_board->mmc_scanline : NULL);
-	ppu2c0x_set_hblank_callback(state->ppu, unif_board ? unif_board->mmc_hblank : NULL);
-
-
-	/* Point the WRAM/battery area to the first RAM bank */
-	memory_set_bankptr(machine, "bank5", &state->wram[0x0000]);
-
-	switch (unif_board->board_idx)
+	
+	switch (idx)
 	{
 		case BMC_64IN1NR:
 			bmc_64in1nr_reg[0] = 0x80;
@@ -1686,7 +1667,7 @@ int nes_unif_reset( running_machine *machine, const char *board )
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
-		/* For the Boards corresponding to a Mapper, fall back to the mapper init */
+			/* For the Boards corresponding to a Mapper, fall back to the mapper init */
 		case STD_NROM:
 		case HVC_FAMBASIC:
 		case JALECO_JF01:
@@ -2017,11 +1998,41 @@ int nes_unif_reset( running_machine *machine, const char *board )
 		case CAMERICA_9096:
 			mapper_initialize(machine, 232);
 			break;
-
+			
 		default:
 			/* Mapper not supported */
 			err = 2;
 			break;
 	}
+
+	return err;
+}
+
+int nes_unif_reset( running_machine *machine, const char *board )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	int err = 0;
+	const unif *unif_board;
+
+	if (state->chr_chunks == 0)
+		chr8(machine, 0,CHRRAM);
+	else
+		chr8(machine, 0,CHRROM);
+
+	/* Set the mapper irq callback */
+	unif_board = nes_unif_lookup(board);
+
+	if (unif_board == NULL)
+		fatalerror("Unimplemented UNIF Board");
+
+	ppu2c0x_set_scanline_callback(state->ppu, unif_board ? unif_board->mmc_scanline : NULL);
+	ppu2c0x_set_hblank_callback(state->ppu, unif_board ? unif_board->mmc_hblank : NULL);
+
+
+	/* Point the WRAM/battery area to the first RAM bank */
+	memory_set_bankptr(machine, "bank5", &state->wram[0x0000]);
+
+	err = unif_initialize(machine, unif_board->board_idx);
+
 	return err;
 }
