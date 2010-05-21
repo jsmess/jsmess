@@ -183,7 +183,8 @@ Imgtool Changes:
 - Increased default width of Sector View in Windows version to 16 rows (bug #1124)
   [Oliver Stoeneberg]
 
-- Fixed reading of command-line parameter in Windows version (bug #1908) [Oliver 
+- Fixed reading of command-line parameter in Windows version (bug #1908 / bug #1950 
+  - needs updated toolchain - please check bugzilla entry for bug #1950) [Oliver 
   Stoeneberg]
 
 
@@ -258,11 +259,11 @@ Source Changes:
 - Fixed assert on shutdown after an image load error [Oliver Stoeneberg]
 
 - Show message about success/failure when loading/creating image during run-time 
-  (or print to console when specified on command-line / fixes bug 1031) [Oliver 
+  (or print to console when specified on command-line / bug #1031) [Oliver 
   Stoeneberg]
 
 - Check image loading result in device post-init - will now bail out on any image
-  loading error and not just missing/inaccessible files (fixes bug 1955) [Oliver 
+  loading error and not just missing/inaccessible files (bug #1955) [Oliver 
   Stoeneberg]
   
 - Fixed Visual Studio specific linker errors with tiny build [Oliver Stoeneberg]
