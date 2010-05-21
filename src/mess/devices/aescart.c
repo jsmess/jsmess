@@ -16,6 +16,7 @@
 #include "cartslot.h"
 #include "machine/ti99_4x.h"
 #include "multcart.h"
+#include "includes/neogeo.h"
 
 typedef int assmfct(running_machine *machine, running_device *);
 
@@ -402,6 +403,16 @@ static DEVICE_START( aes_cartridge )
 	cart->pcb_device = device->subdevice(TAG_PCB);
 }
 
+// handle protected carts
+static void install_protection(running_machine* machine, const software_info* softinfo)
+{
+	if(strcmp(softinfo->shortname,"fatfury2") == 0)
+	{
+		fatfury2_install_protection(machine);
+		logerror("Installed Fatal Fury 2 protection\n");
+	}
+}
+
 /*
     Load the cartridge image files. Apart from reading, we set pointers
     to the image files so that during runtime we do not need search
@@ -450,6 +461,9 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 		// setup cartridge ROM area
 		memory_install_read_bank(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM),0x000080,0x0fffff,0,0,"cart_rom");
 		memory_set_bankptr(image->machine,"cart_rom",&memory_region(image->machine,"maincpu")[0x80]);
+		
+		// handle possible protection
+		install_protection(image->machine,image_software_entry(image));
 		
 		return INIT_PASS;
 	}

@@ -380,4 +380,106 @@
 		</part>
 	</software>
 
+<!-- ID 045 -->
+	<software name="samsho">
+		<description>Samurai Shodown / Samurai Spirits</description>
+		<year>1993</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1572864">
+                <rom name="045-p1.bin" size="1048576" crc="dfe51bf0" sha1="2243af3770a516ae698b69bcd9daf53632d9128d" offset="000000" />
+                <rom name="045-p2.bin" size="524288" crc="38ee9ba9" sha1="48190699a6be83cb6257365ae81f93fdd23abe09" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="045-s1.bin" size="131072" crc="9142a4d3" sha1="54088e99fcfd75fd0f94852890a56350066a05a3" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="045-m1.bin" size="131072" crc="95170640" sha1="125c502db0693e8d11cef619b090081c14a9a300" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="4194304">
+                <rom name="045-v1.bin" size="2097152" crc="37f78a9b" sha1="6279b497d12fa90b49ab5ac3aae20fb302ec8b81" offset="000000" />
+                <rom name="045-v2.bin" size="2097152" crc="568b20cf" sha1="61af858685472a1fad608e230cccc2b108509ddb" offset="200000" />
+			</dataarea>
+			<dataarea name="sprites" size="9437184">
+                <rom name="045-c1.bin" size="2097152" crc="2e5873a4" sha1="65c74c1e2d34390666bbb630df7d1f4c9570c3db" offset="000000" loadflag="load16_byte" />
+                <rom name="045-c2.bin" size="2097152" crc="04febb10" sha1="16a8cbf0fd9468e81bf9eab6dbe7a8e3623a843e" offset="000001" loadflag="load16_byte" />
+                <rom name="045-c3.bin" size="2097152" crc="f3dabd1e" sha1="c80e52df42be9f8b2e89b467b11ab140a480cee8" offset="400000" loadflag="load16_byte" />
+                <rom name="045-c4.bin" size="2097152" crc="935c62f0" sha1="0053d40085fac14096b683f4341f65e543b71dc1" offset="400001" loadflag="load16_byte" />
+                <rom name="045-c5.bin" size="524288" crc="a2bb8284" sha1="aa118e3b8c062daa219b36758b9a3814c08c69dc" offset="800000" loadflag="load16_byte" />
+                <rom name="045-c6.bin" size="524288" crc="4fa71252" sha1="afe374a9d1f2d955a59efe7b6196b89e021b164c" offset="800001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 046 -->
+	<software name="tophuntr">
+		<description>Top Hunter - Roddy and Cathy</description>
+		<year>1993</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="2097152">
+                <rom name="046-pg1.bin" size="1048576" crc="771e39bc" sha1="c0e05fd1ca81926438bb75e2fa6894e40ab6521e" offset="000000" />
+                <rom name="046-p2.bin" size="1048576" crc="f182cb3e" sha1="6b4e0af5d4e623f0682f37ff5c69e5b705e20028" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="046-s1.bin" size="131072" crc="92e9ac8c" sha1="cab5c77c091e8d12d9c3a2cc8d741b74e4386efb" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="046-m1.bin" size="131072" crc="3f84bb9f" sha1="07446040871d11da3c2217ee9d1faf8c3cae7420" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="4194304">
+                <rom name="046-v1.bin" size="1048576" crc="c1f9c2db" sha1="bed95a76afefa46503a12e0f0a9787c4c967ac50" offset="000000" />
+                <rom name="046-v2.bin" size="1048576" crc="56254a64" sha1="1cf049cb4c414419859d2c8ee714317a35a85251" offset="100000" />
+                <rom name="046-v3.bin" size="1048576" crc="58113fb1" sha1="40972982a63c7adecef840f9882f4165da723ab6" offset="200000" />
+                <rom name="046-v4.bin" size="1048576" crc="4f54c187" sha1="63a76949301b83bdd44aa1a4462f642ab9ca3c0b" offset="300000" />
+			</dataarea>
+			<dataarea name="sprites" size="8388608">
+                <rom name="046-c1.bin" size="1048576" crc="fa720a4a" sha1="364913b9fa40d46e4e39ae3cdae914cfd0de137d" offset="000000" loadflag="load16_byte" />
+                <rom name="046-c2.bin" size="1048576" crc="c900c205" sha1="50274e79aa26f334eb806288688b30720bade883" offset="000001" loadflag="load16_byte" />
+                <rom name="046-c3.bin" size="1048576" crc="880e3c25" sha1="b6974af0c833b766866919b6f15b6f8cef82530d" offset="200000" loadflag="load16_byte" />
+                <rom name="046-c4.bin" size="1048576" crc="7a2248aa" sha1="8af0b26025a54e3b91604dd24a3c1c518fbd8536" offset="200001" loadflag="load16_byte" />
+                <rom name="046-c5.bin" size="1048576" crc="4b735e45" sha1="2f8b46388c4696aee6a97e1e21cdadf6b142b01a" offset="400000" loadflag="load16_byte" />
+                <rom name="046-c6.bin" size="1048576" crc="273171df" sha1="9c35832221e016c12ef1ed71da167f565daaf86c" offset="400001" loadflag="load16_byte" />
+                <rom name="046-c7.bin" size="1048576" crc="12829c4c" sha1="ac5f3d848d7116fc35c97f53a72c85e049dd3a2f" offset="600000" loadflag="load16_byte" />
+                <rom name="046-c8.bin" size="1048576" crc="c944e03d" sha1="be23999b8ce09ee15ba500ce4d5e2a82a4f58d9b" offset="600001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 047 -->
+	<software name="fatfury2">
+		<description>Fatal Fury 2 / Garou Densetsu 2 - arata-naru tatakai</description>
+		<year>1992</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart" feature="fatfury2_prot">
+			<dataarea name="maincpu" size="1048576">
+                <rom name="047-p1.bin" size="524288" crc="be40ea92" sha1="958b891bb8beb6af122d5467257ab20cbc6cf574" offset="000000" />
+                <rom name="047-p2.bin" size="524288" crc="2a9beac5" sha1="61378f89d64fef4c172825694f83229c2ab1a7af" offset="080000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="047-s1.bin" size="131072" crc="d7dbbf39" sha1="29253e596f475ebd41a6e3bb53952e3a0ccd2eed" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="047-m1.bin" size="131072" crc="820b0ba7" sha1="5708248d89446e49184eaadb52f7c61b2b6c13c5" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="4194304">
+                <rom name="047-v1.bin" size="2097152" crc="d9d00784" sha1="f6a91eada8c23aa4518c4b82eeebca69f79d845c" offset="000000" />
+                <rom name="047-v2.bin" size="2097152" crc="2c9a4b33" sha1="d4a1c0951c02c8919b3ec32ed96933634ff9e54c" offset="200000" />
+			</dataarea>
+			<dataarea name="sprites" size="8388608">
+                <rom name="047-c1.bin" size="1048576" crc="f72a939e" sha1="67fc398ec28061adca0d3be82bbe7297015800da" offset="000000" loadflag="load16_byte" />
+                <rom size="1048576" offset="400000" loadflag="continue" />
+                <rom name="047-c2.bin" size="1048576" crc="05119a0d" sha1="c2f100b73eb04f65b6ba6089d49aceb51b470ec6" offset="000001" loadflag="load16_byte" />
+                <rom size="1048576" offset="400001" loadflag="continue" />
+                <rom name="047-c3.bin" size="1048576" crc="01e00738" sha1="79654f24d777dd5eb68bafc3b8cb9db71d5822e2" offset="200000" loadflag="load16_byte" />
+                <rom size="1048576" offset="600000" loadflag="continue" />
+                <rom name="047-c4.bin" size="1048576" crc="9fe27432" sha1="89d22d77ba8bc6d1f6c974195c34ad61b9010de7" offset="200001" loadflag="load16_byte" />
+                <rom size="1048576" offset="600001" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
