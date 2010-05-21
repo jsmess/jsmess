@@ -404,11 +404,14 @@ static DEVICE_START( aes_cartridge )
 }
 
 // handle protected carts
-static void install_protection(running_machine* machine, const software_info* softinfo)
+static void install_protection(running_device* image)
 {
-	if(strcmp(softinfo->shortname,"fatfury2") == 0)
+	if(image_get_feature(image) == NULL)
+		return;
+		
+	if(strcmp(image_get_feature(image),"fatfury2_prot") == 0)
 	{
-		fatfury2_install_protection(machine);
+		fatfury2_install_protection(image->machine);
 		logerror("Installed Fatal Fury 2 protection\n");
 	}
 }
@@ -463,7 +466,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 		memory_set_bankptr(image->machine,"cart_rom",&memory_region(image->machine,"maincpu")[0x80]);
 		
 		// handle possible protection
-		install_protection(image->machine,image_software_entry(image));
+		install_protection(image);
 		
 		return INIT_PASS;
 	}
