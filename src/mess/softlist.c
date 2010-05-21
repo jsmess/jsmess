@@ -168,7 +168,7 @@ INLINE void unknown_attribute_value(parse_state *state,
     from the global pool. So they should be global_free'ed
     when they are not used anymore.
 -------------------------------------------------*/
-static void software_name_split(const char *swlist_swname, char **swlist_name, char **swname, char **swpart )
+static void software_name_split(running_machine* machine, const char *swlist_swname, char **swlist_name, char **swname, char **swpart )
 {
 	const char *split_1st_loc = strchr( swlist_swname, ':' );
 	const char *split_2nd_loc = ( split_1st_loc ) ? strchr( split_1st_loc + 1, ':' ) : NULL;
@@ -182,33 +182,31 @@ static void software_name_split(const char *swlist_swname, char **swlist_name, c
 		if ( split_2nd_loc )
 		{
 			int size = split_1st_loc - swlist_swname;
-			*swlist_name = global_alloc_array_clear(char,size+1);
+			*swlist_name = auto_alloc_array_clear(machine,char,size+1);
 			memcpy( *swlist_name, swlist_swname, size );
 
 			size = split_2nd_loc - ( split_1st_loc + 1 );
-			*swname = global_alloc_array_clear(char,size+1);
+			*swname = auto_alloc_array_clear(machine,char,size+1);
 			memcpy( *swname, split_1st_loc + 1, size );
 
 			size = strlen( swlist_swname ) - ( split_2nd_loc + 1 - swlist_swname );
-			*swpart = global_alloc_array_clear(char,size+1);
+			*swpart = auto_alloc_array_clear(machine,char,size+1);
 			memcpy( *swpart, split_2nd_loc + 1, size );
 		}
 		else
 		{
 			int size = split_1st_loc - swlist_swname;
-			*swname = global_alloc_array_clear(char,size+1);
+			*swname = auto_alloc_array_clear(machine,char,size+1);
 			memcpy( *swname, swlist_swname, size );
 
 			size = strlen( swlist_swname ) - ( split_1st_loc + 1 - swlist_swname );
-			*swpart = global_alloc_array_clear(char,size+1);
+			*swpart = auto_alloc_array_clear(machine,char,size+1);
 			memcpy( *swpart, split_1st_loc + 1, size );
 		}
 	}
 	else
 	{
-		int size = strlen( swlist_swname );
-		*swname = global_alloc_array_clear(char,size+1);
-		memcpy( *swname, swlist_swname, size );
+		*swname = auto_strdup(machine,swlist_swname);
 	}
 }
 
@@ -928,7 +926,7 @@ bool load_software_part(running_device *device, const char *path, software_info 
 	*sw_part = NULL;
 
 	/* Split full software name into software list name and short software name */
-	software_name_split( path, &swlist_name, &swname, &swpart );
+	software_name_split( device->machine, path, &swlist_name, &swname, &swpart );
 
 	interface = device->get_config_string(DEVINFO_STR_INTERFACE);
 
@@ -1043,7 +1041,14 @@ bool load_software_part(running_device *device, const char *path, software_info 
 	if ( software_part_ptr )
 	{
 		/* Load the software part */
-		load_software_part_region( device, (char *)swlist_name, (char *)software_info_ptr->shortname, software_part_ptr->romdata );
+		try {
+			load_software_part_region( device, (char *)swlist_name, (char *)software_info_ptr->shortname, software_part_ptr->romdata );
+		}
+		catch (emu_fatalerror &fatal)
+		{
+			software_list_close( software_list_ptr );
+			throw fatal;
+		}
 
 		/* Create a copy of the software and part information */
 		*sw_info = auto_alloc_clear( device->machine, software_info );
@@ -1075,9 +1080,9 @@ bool load_software_part(running_device *device, const char *path, software_info 
 		software_info_ptr = NULL;
 		software_list_ptr = NULL;
 	}
-	global_free( swlist_name );
-	global_free( swname );
-	global_free( swpart );
+	auto_free( device->machine, swlist_name );
+	auto_free( device->machine, swname );
+	auto_free( device->machine, swpart );
 
 	return result;
 }
