@@ -50,6 +50,7 @@ struct _software_list
 	mame_file	*file;
 	object_pool	*pool;
 	parse_state	state;
+	const char *description;
 	struct software_info_list	*software_info_list;
 	struct software_info_list	*current_software_info;
 	software_info	*softinfo;
@@ -305,6 +306,11 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					}
 					if ( ! strcmp(attributes[0], "description" ) )
 					{
+						swlist->description =  (const char *)pool_malloc_lib(swlist->pool, (strlen(attributes[1])  + 1) * sizeof(char));
+						if (!swlist->description)
+							return;
+
+						strcpy((char *)swlist->description, attributes[1]);
 					}
 				}
 			}
@@ -1214,3 +1220,134 @@ DEVICE_GET_INFO( software_list )
 	}
 }
 
+
+/***************************************************************************
+    MENU SUPPORT
+***************************************************************************/
+
+/* state of the software menu */
+typedef struct _software_menu_state software_menu_state;
+struct _software_menu_state
+{
+	char *list_name;	/* currently selected list */
+};
+
+/* state of a software entry */
+typedef struct _software_entry_state software_entry_state;
+struct _software_entry_state
+{
+	const char *short_name;
+	const char *interface;
+};
+
+
+/* populate a specific list */
+static void ui_mess_menu_populate_software_entries(running_machine *machine, ui_menu *menu, char *list_name)
+{
+	software_list *list = software_list_open(mame_options(), list_name, FALSE, NULL);
+
+	if (list)
+	{
+		for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
+		{
+			software_entry_state *entry = (software_entry_state *) ui_menu_pool_alloc(menu, sizeof(*entry));
+			entry->short_name = ui_menu_pool_strdup(menu, swinfo->shortname);
+
+			software_part *part = software_find_part(swinfo, NULL, NULL);
+			entry->interface = ui_menu_pool_strdup(menu, part->interface_);
+
+			ui_menu_item_append(menu, swinfo->shortname, swinfo->longname, 0, entry);
+		}
+
+		software_list_close(list);
+	}
+}
+
+void ui_mess_menu_software_list(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+{
+	const ui_menu_event *event;
+	software_menu_state *sw_state = (software_menu_state *)state;
+
+	if (!ui_menu_populated(menu))
+		ui_mess_menu_populate_software_entries(machine, menu, sw_state->list_name);
+
+	/* process the menu */
+	event = ui_menu_process(machine, menu, 0);
+
+	if (event != NULL && event->iptkey == IPT_UI_SELECT && event->itemref != NULL)
+	{
+		running_device *image = NULL;
+		software_entry_state *entry = (software_entry_state *) event->itemref;
+
+		/* search for a device with the right interface */
+		for (running_device *dev = machine->devicelist.first(); dev != NULL; dev = dev->next)
+		{
+			const char *interface = dev->get_config_string(DEVINFO_STR_INTERFACE);
+
+			if (interface != NULL)
+			{
+				if (!strcmp(interface, entry->interface))
+				{
+					image = dev;
+					break;
+				}
+			}
+		}
+
+		if (image != NULL)
+			image_load(image, entry->short_name);
+		else
+			popmessage("No matching device found for interface '%s'!", entry->interface);
+	}
+}
+
+/* list of available software lists - i.e. cartridges, floppies */
+static void ui_mess_menu_populate_software_list(running_machine *machine, ui_menu *menu)
+{
+	for (const device_config *dev = machine->config->devicelist.first(); dev != NULL; dev = dev->next)
+	{
+		if (!strcmp(dev->tag(), __SOFTWARE_LIST_TAG))
+		{
+			software_list_config *swlist = (software_list_config *)dev->inline_config;
+
+			for (int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++)
+			{
+				if (swlist->list_name[i])
+				{
+					software_list *list = software_list_open(mame_options(), swlist->list_name[i], FALSE, NULL);
+
+					if (list)
+					{
+						/* todo: fix this */
+						for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
+						{
+						}
+
+						ui_menu_item_append(menu, list->description, NULL, 0, swlist->list_name[i]);
+
+						software_list_close(list);
+					}
+				}
+			}
+		}
+	}
+}
+
+void ui_mess_menu_software(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+{
+	const ui_menu_event *event;
+
+	if (!ui_menu_populated(menu))
+		ui_mess_menu_populate_software_list(machine, menu);
+
+	/* process the menu */
+	event = ui_menu_process(machine, menu, 0);
+
+	if (event != NULL && event->iptkey == IPT_UI_SELECT)
+	{
+		ui_menu *child_menu = ui_menu_alloc(machine, render_container_get_ui(), ui_mess_menu_software_list, NULL);
+		software_menu_state *child_menustate = (software_menu_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
+		child_menustate->list_name = (char *)event->itemref;
+		ui_menu_stack_push(child_menu);
+	}
+}

@@ -11,6 +11,7 @@
 #include "uimess.h"
 #include "uiinput.h"
 #include "input.h"
+#include "softlist.h"
 #include "devices/cassette.h"
 
 
@@ -149,8 +150,11 @@ void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
 	/* add image info menu */
 	ui_menu_item_append(menu, "Image Information", NULL, 0, (void*)ui_mess_menu_image_info);
 
-	/* add image info menu */
+	/* add file manager menu */
 	ui_menu_item_append(menu, "File Manager", NULL, 0, (void*)ui_mess_menu_file_manager);
+
+	/* add software menu */
+	ui_menu_item_append(menu, "Software", NULL, 0, (void*)ui_mess_menu_software);
 
 	/* add tape control menu */
 	if (machine->devicelist.first(CASSETTE))

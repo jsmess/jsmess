@@ -9,6 +9,9 @@
 #ifndef __SOFTLIST_H_
 #define __SOFTLIST_H_
 
+#include "uimenu.h"
+
+
 /*********************************************************************
 
     Internal structures and XML file handling
@@ -56,6 +59,8 @@ software_part *software_part_next(software_part *part);
 
 
 bool load_software_part(running_device *device, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);
+
+void ui_mess_menu_software(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 
 
 /*********************************************************************

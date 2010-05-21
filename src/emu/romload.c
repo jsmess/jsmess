@@ -1299,6 +1299,10 @@ void load_software_part_region(running_device *device, char *swlist, char *swnam
 		if (devtag_get_device(romdata->machine, astring_c(regiontag)) != NULL)
 			regionflags = normalize_flags_for_device(romdata->machine, regionflags, astring_c(regiontag));
 
+		/* clear old region (todo: should be moved to an image unload function) */
+		if (memory_region(romdata->machine, astring_c(regiontag)) != NULL)
+			memory_region_free(romdata->machine, astring_c(regiontag));
+
 		/* remember the base and length */
 		romdata->region = memory_region_alloc(romdata->machine, astring_c(regiontag), regionlength, regionflags);
 		LOG(("Allocated %X bytes @ %p\n", romdata->region->length, romdata->region->base.v));
