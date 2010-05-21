@@ -512,4 +512,40 @@
 			</dataarea>
 		</part>
 	</software>
+<!-- ID 063 -->
+	<software name="samsho2">
+		<description>Samurai Shodown II / Shin Samurai Spirits - Haohmaru jigokuhen</description>
+		<year>1994</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="2097152">
+                <rom name="063-p1.bin" size="1048576" crc="22368892" sha1="0997f8284aa0f57a333be8a0fdea777d0d01afd6" offset="100000" />
+                <rom size="1048576" offset="000000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="063-s1.bin" size="131072" crc="64a5cd66" sha1="12cdfb27bf9ccd5a8df6ddd4628ef7cf2c6d4964" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="063-m1.bin" size="131072" crc="56675098" sha1="90429fc40d056d480d0e2bbefbc691d9fa260fc4" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="7340032">
+                <rom name="063-v1.bin" size="2097152" crc="37703f91" sha1="a373ebef4c33ba1d8340e826981a58769aada238" offset="000000" />
+                <rom name="063-v2.bin" size="2097152" crc="0142bde8" sha1="0be6c53acac44802bf70b6925452f70289a139d9" offset="200000" />
+                <rom name="063-v3.bin" size="2097152" crc="d07fa5ca" sha1="1da7f081f8b8fc86a91feacf900f573218d82676" offset="400000" />
+                <rom name="063-v4.bin" size="1048576" crc="24aab4bb" sha1="10ee4c5b3579865b93dcc1e4079963276aa700a6" offset="600000" />
+			</dataarea>
+			<dataarea name="sprites" size="16777216">
+                <rom name="063-c1.bin" size="2097152" crc="86cd307c" sha1="0d04336f7c436d74638d8c1cd8651faf436a6bec" offset="000000" loadflag="load16_byte" />
+                <rom name="063-c2.bin" size="2097152" crc="cdfcc4ca" sha1="179dc81432424d68cefedd20cc1c4b2a95deb891" offset="000001" loadflag="load16_byte" />
+                <rom name="063-c3.bin" size="2097152" crc="7a63ccc7" sha1="49d97c543bc2860d493a353ab0d059088c6fbd21" offset="400000" loadflag="load16_byte" />
+                <rom name="063-c4.bin" size="2097152" crc="751025ce" sha1="e1bbaa7cd67fd04e4aab7f7ea77f63ae1cbc90d0" offset="400001" loadflag="load16_byte" />
+                <rom name="063-c5.bin" size="2097152" crc="20d3a475" sha1="28da44a136bd14c73c62c147c3f6e6bcfa1066de" offset="800000" loadflag="load16_byte" />
+                <rom name="063-c6.bin" size="2097152" crc="ae4c0a88" sha1="cc8a7d11daa3821f83a6fd0942534706f939e576" offset="800001" loadflag="load16_byte" />
+                <rom name="063-c7.bin" size="2097152" crc="2df3cbcf" sha1="e54f9022359963711451c2025825b862d36c6975" offset="c00000" loadflag="load16_byte" />
+                <rom name="063-c8.bin" size="2097152" crc="1ffc6dfa" sha1="acea18aca76c072e0bac2a364fc96d49cfc86e77" offset="c00001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
