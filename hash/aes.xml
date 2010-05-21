@@ -75,8 +75,8 @@
 
 <!-- ID 007 -->
 	<software name="alpham2">
-		<description>Alpha Mission II / ASO II</description>
-		<year>1990</year>
+		<description>Alpha Mission II / ASO II - Last Guardian</description>
+		<year>1991</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
@@ -203,7 +203,7 @@
 <!-- ID 016 -->
 	<software name="kotm">
 		<description>King of the Monsters</description>
-		<year>1990</year>
+		<year>1991</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
@@ -233,7 +233,7 @@
 <!-- ID 017 -->
 	<software name="sengoku">
 		<description>Sengoku / Sengoku Denshou</description>
-		<year>1990</year>
+		<year>1991</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
 			<dataarea name="maincpu" size="1048576">
@@ -317,4 +317,67 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!-- ID 030 -->
+	<software name="2020bb">
+		<description>2020 Super Baseball</description>
+		<year>1991</year>
+		<publisher>SNK / Pallas</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+                <rom name="030-p1h.bin" size="524288" crc="12d048d7" sha1="ee0d03a565b11ca3bee2d24f62ff46a85ef18d90" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="030-s1.bin" size="131072" crc="7015b8fc" sha1="8c09bc3e6c62e0f7c9557c1e10c901be325bae7f" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="030-m1.bin" size="131072" crc="4cf466ec" sha1="6a003b53c7a4af9d7529e2c10f27ffc4e58dcda5" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+                <rom name="030-v1.bin" size="1048576" crc="d4ca364e" sha1="b0573744b0ea2ef1e2167a225f0d254883f5af04" offset="000000" />
+                <rom name="030-v2.bin" size="1048576" crc="54994455" sha1="76eb62b86e8ed51a77f44313d5cc8091b3f58d57" offset="100000" />
+			</dataarea>
+			<dataarea name="sprites" size="4194304">
+                <rom name="030-c1.bin" size="1048576" crc="4f5e19bd" sha1="ef7975c4b33a7aea4a25a385f604799f054d3200" offset="000000" loadflag="load16_byte" />
+                <rom name="030-c2.bin" size="1048576" crc="d6314bf0" sha1="0920cc580d7997fcb0170dd619af2f305d635577" offset="000001" loadflag="load16_byte" />
+                <rom name="030-c3.bin" size="1048576" crc="47fddfee" sha1="297c505a63448c999a2510c27bf4549102134db8" offset="200000" loadflag="load16_byte" />
+                <rom name="030-c4.bin" size="1048576" crc="780d1c4e" sha1="2e2cf9de828e3b48642dd2203637103438c62142" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 044 -->
+	<software name="aof">
+		<description>Art of Fighting / Ryuuko no Ken</description>
+		<year>1992</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+                <rom name="044-p1.bin" size="524288" crc="ca9f7a6d" sha1="4d28ef86696f7e832510a66d3e8eb6c93b5b91a1" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="044-s1.bin" size="131072" crc="89903f39" sha1="a04a0c244a5d5c7a595fcf649107969635a6a8b6" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="044-m1.bin" size="131072" crc="0987e4bb" sha1="8fae4b7fac09d46d4727928e609ed9d3711dbded" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="4194304">
+                <rom name="044-v2.bin" size="2097152" crc="3ec632ea" sha1="e3f413f580b57f70d2dae16dbdacb797884d3fce" offset="000000" />
+                <rom name="044-v4.bin" size="2097152" crc="4b0f8e23" sha1="105da0cc5ba19869c7147fba8b177500758c232b" offset="200000" />
+			</dataarea>
+			<dataarea name="sprites" size="8388608">
+                <rom name="044-c1.bin" size="1048576" crc="ddab98a7" sha1="f20eb81ec431268798c142c482146c1545af1c24" offset="000000" loadflag="load16_byte" />
+                <rom size="1048576" offset="400000" loadflag="continue" />
+                <rom name="044-c2.bin" size="1048576" crc="d8ccd575" sha1="f697263fe92164e274bf34c55327b3d4a158b332" offset="000001" loadflag="load16_byte" />
+                <rom size="1048576" offset="400001" loadflag="continue" />
+                <rom name="044-c3.bin" size="1048576" crc="403e898a" sha1="dd5888f8b24a33b2c1f483316fe80c17849ccfc4" offset="200000" loadflag="load16_byte" />
+                <rom size="1048576" offset="600000" loadflag="continue" />
+                <rom name="044-c4.bin" size="1048576" crc="6235fbaa" sha1="9090e337d7beed25ba81ae0708d0aeb57e6cf405" offset="200001" loadflag="load16_byte" />
+                <rom size="1048576" offset="600001" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
