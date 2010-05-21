@@ -1469,6 +1469,18 @@ UINT32 image_get_software_region_length(running_device *image, const char *tag)
 
 
 /*-------------------------------------------------
+ image_get_feature
+ -------------------------------------------------*/
+
+const char *image_get_feature(running_device *image)
+{
+	image_slot_data *slot = find_image_slot(image);
+	
+	return slot->software_part_ptr->feature;
+}
+
+
+/*-------------------------------------------------
     image_is_writable
 -------------------------------------------------*/
 
