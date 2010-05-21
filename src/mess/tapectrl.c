@@ -22,7 +22,9 @@
 #define TAPECMD_PLAY			((void *) 0x0002)
 #define TAPECMD_RECORD			((void *) 0x0003)
 #define TAPECMD_REWIND			((void *) 0x0004)
-#define TAPECMD_FAST_FORWARD	((void *) 0x0005)
+#define TAPECMD_FAST_FORWARD		((void *) 0x0005)
+#define TAPECMD_SLIDER			((void *) 0x0006)
+#define TAPECMD_SELECT			((void *) 0x0007)
 
 
 
@@ -106,8 +108,22 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 
 	if (image_exists(menustate->device))
 	{
+		double t0, t1;
+		UINT32 tapeflags = 0;
+
+		t0 = cassette_get_position(menustate->device);
+		t1 = cassette_get_length(menustate->device);
+
+		if (t1 > 0)
+		{
+			if (t0 > 0)
+				tapeflags |= MENU_FLAG_LEFT_ARROW;
+			if (t0 < t1)
+				tapeflags |= MENU_FLAG_RIGHT_ARROW;
+		}				
+
 		/* name of tape */
-		ui_menu_item_append(menu, image_typename_id(menustate->device), image_filename(menustate->device), flags, NULL);
+		ui_menu_item_append(menu, image_typename_id(menustate->device), image_filename(menustate->device), flags, TAPECMD_SELECT);
 
 		/* state */
 		tapecontrol_gettime(&timepos, menustate->device, NULL, NULL);
@@ -121,8 +137,8 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 					: ((state & CASSETTE_MASK_MOTOR) == CASSETTE_MOTOR_ENABLED ? "recording" : "(recording)")
 					),
 			astring_c(&timepos),
-			0,
-			NULL);
+			tapeflags,
+			TAPECMD_SLIDER);
 
 		/* pause or stop */
 		ui_menu_item_append(menu, "Pause/Stop", NULL, 0, TAPECMD_STOP);
@@ -181,48 +197,60 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 	menu_tape_control_populate(machine, menu, (tape_control_menu_state*)state);
 
 	/* process the menu */
-	event = ui_menu_process(machine, menu, 0);
+	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
 	if (event != NULL)
 	{
 		switch(event->iptkey)
 		{
 			case IPT_UI_LEFT:
-				/* left arrow - rotate left through cassette devices */
-				if (menustate->index > 0)
-					menustate->index--;
+				if (event->itemref==TAPECMD_SLIDER)
+					cassette_seek(menustate->device, -1, SEEK_CUR);
 				else
-					menustate->index = cassette_count(machine) - 1;
-				menustate->device = NULL;
+				if (event->itemref==TAPECMD_SELECT)
+				{
+					/* left arrow - rotate left through cassette devices */
+					if (menustate->index > 0)
+						menustate->index--;
+					else
+						menustate->index = cassette_count(machine) - 1;
+					menustate->device = NULL;
+				}
 				break;
 
 			case IPT_UI_RIGHT:
-				/* right arrow - rotate right through cassette devices */
-				if (menustate->index < cassette_count(machine) - 1)
-					menustate->index++;
+				if (event->itemref==TAPECMD_SLIDER)
+					cassette_seek(menustate->device, +1, SEEK_CUR);
 				else
-					menustate->index = 0;
-				menustate->device = NULL;
+				if (event->itemref==TAPECMD_SELECT)
+				{
+					/* right arrow - rotate right through cassette devices */
+					if (menustate->index < cassette_count(machine) - 1)
+						menustate->index++;
+					else
+						menustate->index = 0;
+					menustate->device = NULL;
+				}
 				break;
 
 			case IPT_UI_SELECT:
 				{
-					if (event->itemref==TAPECMD_NULL) {
-					}
-					else if (event->itemref==TAPECMD_STOP) {
+					if (event->itemref==TAPECMD_STOP)
 						cassette_change_state(menustate->device, CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
-					}
-					else if (event->itemref==TAPECMD_PLAY) {
+					else
+					if (event->itemref==TAPECMD_PLAY)
 						cassette_change_state(menustate->device, CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
-					}
-					else if (event->itemref==TAPECMD_RECORD) {
+					else
+					if (event->itemref==TAPECMD_RECORD)
 						cassette_change_state(menustate->device, CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
-					}
-					else if (event->itemref==TAPECMD_REWIND) {
-						cassette_seek(menustate->device, -60, SEEK_CUR);
-					}
-					else if (event->itemref==TAPECMD_FAST_FORWARD) {
-						cassette_seek(menustate->device, +60, SEEK_CUR);
-					}
+					else
+					if (event->itemref==TAPECMD_REWIND)
+						cassette_seek(menustate->device, -30, SEEK_CUR);
+					else
+					if (event->itemref==TAPECMD_FAST_FORWARD)
+						cassette_seek(menustate->device, 30, SEEK_CUR);
+					else
+					if (event->itemref==TAPECMD_SLIDER)
+						cassette_seek(menustate->device, 0, SEEK_SET);
 				}
 				break;
 		}
