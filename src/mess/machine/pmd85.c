@@ -291,7 +291,7 @@ static  READ8_DEVICE_HANDLER ( mato_ppi_0_portb_r )
 
 	for (i = 0; i < 8; i++)
 	{
-		if (!(pmd85_ppi_port_outputs[0][0] & (1 << i)))
+		if (!BIT(pmd85_ppi_port_outputs[0][0], i))
 			data &= input_port_read(device->machine, keynames[i]);
 	}
 	return data;
@@ -305,8 +305,8 @@ static  READ8_DEVICE_HANDLER ( mato_ppi_0_portc_r )
 static WRITE8_DEVICE_HANDLER ( mato_ppi_0_portc_w )
 {
 	pmd85_ppi_port_outputs[0][2] = data;
-	set_led_status(device->machine, PMD85_LED_2, (data & 0x08) ? 1 : 0);
-	set_led_status(device->machine, PMD85_LED_3, (data & 0x04) ? 1 : 0);
+	set_led_status(device->machine, PMD85_LED_2, BIT(data, 3));
+	set_led_status(device->machine, PMD85_LED_3, BIT(data, 2));
 }
 
 /*******************************************************************************
@@ -446,7 +446,10 @@ const struct pit8253_config pmd85_pit8253_interface =
 
 static READ8_DEVICE_HANDLER ( pmd85_ppi_3_porta_r )
 {
-	return memory_region(device->machine, "user1")[pmd85_ppi_port_outputs[3][1]|(pmd85_ppi_port_outputs[3][2]<<8)];
+	if (memory_region(device->machine, "user1") != NULL)
+		return memory_region(device->machine, "user1")[pmd85_ppi_port_outputs[3][1] | (pmd85_ppi_port_outputs[3][2] << 8)];
+	else
+		return 0;
 }
 
 static READ8_DEVICE_HANDLER ( pmd85_ppi_3_portb_r )
@@ -526,7 +529,8 @@ READ8_HANDLER ( pmd85_io_r )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										return i8255a_r(devtag_get_device(space->machine, "ppi8255_3"), offset & 0x03);
+//										return i8255a_r(devtag_get_device(space->machine, "ppi8255_3"), offset & 0x03);
+									break;
 							}
 						}
 						break;
@@ -915,26 +919,32 @@ static TIMER_CALLBACK( setup_machine_state )
 
 MACHINE_RESET( pmd85 )
 {
+	int i, j;
+
 	/* checking for Rom Module */
 	switch (pmd85_model)
 	{
 		case PMD85_1:
 		case PMD85_2A:
 		case PMD85_3:
-	  case C2717:
+		case C2717:
 			pmd85_rom_module_present = (input_port_read(machine, "DSW0") & 0x01) ? 1 : 0;
 			break;
 		case ALFA:
 		case MATO:
 			break;
 	}
+	
+	for (i = 0; i < 4; i++)
+		for (j = 0; j < 3; j++)
+			pmd85_ppi_port_outputs[i][j] = 0;
 
 	/* memory initialization */
 	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, sizeof(unsigned char)*0x10000);
 	pmd85_startup_mem_map = 1;
 	pmd85_update_memory(machine);
 
-	timer_set(machine,  attotime_zero, NULL, 0, setup_machine_state );
+	timer_set(machine, attotime_zero, NULL, 0, setup_machine_state);
 
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), pmd85_opbaseoverride);
 }
