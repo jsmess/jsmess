@@ -482,29 +482,6 @@
 		</part>
 	</software>
 <!-- ID 053 -->
-<!--
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "053-p1.bin", 0x000000, 0x080000, CRC(95b574cb" sha1="b7b7af6a04c3d902e7f8852897741ecaf0b1062c) )
-	ROM_LOAD16_WORD_SWAP( "053-p2.bin", 0x080000, 0x080000, CRC(f198ed45" sha1="24ccc091e97f63796562bb5b30df51f39bd504ef) )
-
-	NEO_SFIX_128K( "053-s1.bin", CRC(8c2c2d6b" sha1="87fa79611c6f8886dcc8766814829c669c65b40f) )
-
-	NEO_BIOS_AUDIO_128K( "053-m1.bin", CRC(1bd9d04b" sha1="65cd7b002123ed1a3111e3d942608d0082799ff3) )
-
-	ROM_REGION( 0x300000, "ymsnd", 0 )
-	ROM_LOAD( "053-v2.bin", 0x000000, 0x200000, CRC(a68df485" sha1="007fa715423fba72c899cd3db3f4bec13281cf7a) )
-	ROM_LOAD( "053-v4.bin", 0x200000, 0x100000, CRC(7bea8f66" sha1="428e8721bd87f7faa756adb1e12672219be46c1d) )
-
-	NO_DELTAT_REGION
-
-	ROM_REGION( 0x600000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "053-c1.bin", 0x000000, 0x100000, CRC(85eb5bce" sha1="3d03d29296ca6e6b5106aac4aaeec9d4b4ed1313) ) /* Plane 0,1 */
-	ROM_CONTINUE( 0x400000, 0x100000 )
-	ROM_LOAD16_BYTE( "053-c2.bin", 0x000001, 0x100000, CRC(ec93b048" sha1="d4159210df94e259f874a4671d271ec27be13451) ) /* Plane 2,3 */
-	ROM_CONTINUE( 0x400001, 0x100000 )
-	ROM_LOAD16_BYTE( "053-c3.bin", 0x200000, 0x100000, CRC(0dd64965" sha1="e97b3b8a461da5e8861b3dfdacb25e007ced37a1) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "053-c4.bin", 0x200001, 0x100000, CRC(9270d954" sha1="a2ef909868f6b06cdcc22a63ddf6c96be12b999c) ) /* Plane 2,3 */
--->
 	<software name="wh1">
 		<description>World Heroes</description>
 		<year>1992</year>
