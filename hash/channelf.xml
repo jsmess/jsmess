@@ -20,7 +20,7 @@
 		<publisher>Fairchild</publisher>
 		<part name="cart" interface="channelf_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="democrt1.bin" size="2048" crc="44cf1d89" sha1="13a5ca0471e6f4a7a5a2fc4d2b8f881516a28ec4" offset="0" />
+				<rom name="democrt2.bin" size="2048" crc="44cf1d89" sha1="13a5ca0471e6f4a7a5a2fc4d2b8f881516a28ec4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -37,14 +37,14 @@
 		</part>
 	</software>
 
-	<software name="tktactoe">
+	<software name="tctactoe">
 		<description>Tic-Tac-Toe / Shooting Gallery / Doodle / Quadra-Doodle</description>
 		<!-- <cart number>Videocart 1</cart number> -->
 		<year>1976</year>
 		<publisher>Fairchild</publisher>
 		<part name="cart" interface="channelf_cart">
 			<dataarea name="rom" size="2048">
-				<rom name="tktactoe.bin" size="2048" crc="ff4768b0" sha1="8edfb668b3eb759f8597fb13b1aeaf43aaf53680" offset="0" />
+				<rom name="tctactoe.bin" size="2048" crc="ff4768b0" sha1="8edfb668b3eb759f8597fb13b1aeaf43aaf53680" offset="0" />
 			</dataarea>
 		</part>
 	</software>
