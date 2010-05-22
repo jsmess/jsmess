@@ -70,7 +70,6 @@ const game_driver * const drivers[] =
 	DRIVER( snespsfx )	/* Nintendo Super Nintendo PAL w/SuperFX CPU */
 	DRIVER( snesst )	/* Nintendo Super Nintendo NTSC w/Sufami Turbo base cart */
 	DRIVER( snesbsx )	/* Nintendo Super Nintendo NTSC w/BS-X compatible cart  */
-	DRIVER( sfcbox )	/* Nintendo Super Famicom Box      */
 	DRIVER( n64 )	   /* Nintendo N64   */
 	DRIVER( pokemini )  /* Nintendo Pokemon Mini    */
 	DRIVER( gba )	/* Nintendo Game Boy Advance Handheld      */
