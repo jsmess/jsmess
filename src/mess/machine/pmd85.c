@@ -529,8 +529,7 @@ READ8_HANDLER ( pmd85_io_r )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-//										return i8255a_r(devtag_get_device(space->machine, "ppi8255_3"), offset & 0x03);
-									break;
+									return i8255a_r(devtag_get_device(space->machine, "ppi8255_3"), offset & 0x03);
 							}
 						}
 						break;
