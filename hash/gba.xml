@@ -31450,8 +31450,9 @@
 		</part>
 	</software>
 
-<!--
-	<software name="carderea">
+<!-- Non game cartridges -->
+
+	<software name="ereaderj" cloneof="ereader" supported="no">
 		<description>Card e-Reader (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31462,7 +31463,7 @@
 		</part>
 	</software>
 
-	<software name="cardere1">
+	<software name="ereaderp" supported="no">
 		<description>Card e-Reader+ (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31473,7 +31474,7 @@
 		</part>
 	</software>
 
-	<software name="ereaderu">
+	<software name="ereader" supported="no">
 		<description>e-Reader (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31484,7 +31485,7 @@
 		</part>
 	</software>
 
-	<software name="actionre">
+	<software name="ar" supported="no">
 		<description>Action Replay (Euro, v3.3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31495,7 +31496,7 @@
 		</part>
 	</software>
 
-	<software name="actionr1">
+	<software name="argbxa" cloneof="argbx" supported="no">
 		<description>Action Replay GBX (Euro, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31506,7 +31507,7 @@
 		</part>
 	</software>
 
-	<software name="actionr2">
+	<software name="argbx" supported="no">
 		<description>Action Replay GBX (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31517,7 +31518,7 @@
 		</part>
 	</software>
 
-	<software name="actionr3">
+	<software name="argbx31" cloneof="argbx" supported="no">
 		<description>Action Replay GBX (Euro, v3.1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31528,7 +31529,7 @@
 		</part>
 	</software>
 
-	<software name="actionr4">
+	<software name="argbxb" cloneof="argbx" supported="no">
 		<description>Action Replay GBX (Euro, Alt 2)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31539,7 +31540,7 @@
 		</part>
 	</software>
 
-	<software name="actionr5">
+	<software name="armax" supported="no">
 		<description>Action Replay MAX (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31550,8 +31551,8 @@
 		</part>
 	</software>
 
-	<software name="codebrea">
-		<description>CodeBreaker (USA) (Unl)</description>
+	<software name="codebrkr" supported="no">
+		<description>CodeBreaker (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31561,8 +31562,8 @@
 		</part>
 	</software>
 
-	<software name="gameshar">
-		<description>GameShark GBA (USA) (Alt) (Unl)</description>
+	<software name="gsharka" cloneof="gshark" supported="no">
+		<description>GameShark GBA (USA, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31572,8 +31573,8 @@
 		</part>
 	</software>
 
-	<software name="gamesha1">
-		<description>GameShark GBA (USA) (Unl)</description>
+	<software name="gshark" supported="no">
+		<description>GameShark GBA (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31583,8 +31584,8 @@
 		</part>
 	</software>
 
-	<software name="gbaavada">
-		<description>GBA AV Adapter (Chi) (Unl)</description>
+	<software name="gbaav" supported="no">
+		<description>GBA AV Adapter (Chi)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31594,8 +31595,8 @@
 		</part>
 	</software>
 
-	<software name="gbamovie">
-		<description>GBA Movie Player 2 CF (Spa) (Unl)</description>
+	<software name="gbamovie" supported="no">
+		<description>GBA Movie Player 2 CF (Spa)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31605,8 +31606,8 @@
 		</part>
 	</software>
 
-	<software name="gbaperso">
-		<description>GBA Personal Organizer (USA) (Unl)</description>
+	<software name="gbapo" supported="no">
+		<description>GBA Personal Organizer (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31616,8 +31617,8 @@
 		</part>
 	</software>
 
-	<software name="gbatvtun">
-		<description>GBA TV Tuner PAL (Chi) (v1.3) (Unl)</description>
+	<software name="gbatva" cloneof="gbatv" supported="no">
+		<description>GBA TV Tuner PAL (Chi, v1.3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31627,7 +31628,7 @@
 		</part>
 	</software>
 
-	<software name="gbatvtu1">
+	<software name="gbatv" supported="no">
 		<description>GBA TV Tuner PAL (Chi) (v2.0) (Unl)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31638,8 +31639,8 @@
 		</part>
 	</software>
 
-	<software name="proactio">
-		<description>Pro Action Replay (Jpn) (Unl)</description>
+	<software name="par" supported="no">
+		<description>Pro Action Replay (Jpn)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31649,8 +31650,8 @@
 		</part>
 	</software>
 
-	<software name="xplodera">
-		<description>Xploder Advance (Euro) (Alt) (Unl)</description>
+	<software name="xplodera" cloneof="xploder" supported="no">
+		<description>Xploder Advance (Euro, Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31660,8 +31661,8 @@
 		</part>
 	</software>
 
-	<software name="xploder1">
-		<description>Xploder Advance (Euro) (Unl)</description>
+	<software name="xploder" supported="no">
+		<description>Xploder Advance (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
@@ -31670,5 +31671,5 @@
 			</dataarea>
 		</part>
 	</software>
--->
+
 </softwarelist>

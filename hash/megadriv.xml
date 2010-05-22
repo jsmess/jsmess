@@ -24050,9 +24050,9 @@
 		</part>
 	</software>
 
+<!-- Non game cartridge -->
 
-<!--
-	<software name="actrepl">
+	<software name="ar" supported="no">
 		<description>Action Replay (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24063,7 +24063,7 @@
 		</part>
 	</software>
 
-	<software name="gamege">
+	<software name="ggenie" supported="no">
 		<description>Game Genie (Euro, USA, Rev. A)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24074,7 +24074,7 @@
 		</part>
 	</software>
 
-	<software name="gamege1" cloneof="gamege">
+	<software name="ggenie1" cloneof="ggenie" supported="no">
 		<description>Game Genie (Euro, USA)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24085,7 +24085,7 @@
 		</part>
 	</software>
 
-	<software name="proact">
+	<software name="par" supported="no">
 		<description>Pro Action Replay (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24096,7 +24096,7 @@
 		</part>
 	</software>
 
-	<software name="proact2">
+	<software name="par2" supported="no">
 		<description>Pro Action Replay 2 (Euro)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24107,7 +24107,7 @@
 		</part>
 	</software>
 
-	<software name="proact2a" cloneof="proact2">
+	<software name="par2a" cloneof="par2" supported="no">
 		<description>Pro Action Replay 2 (Euro, Alt)</description>
 		<year>199?</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -24117,7 +24117,6 @@
 			</dataarea>
 		</part>
 	</software>
--->
 
 	<software name="vr">
 		<!-- With SVP -->

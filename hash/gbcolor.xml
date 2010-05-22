@@ -15170,7 +15170,9 @@
 		</part>
 	</software>
 
-	<software name="actionre">
+<!-- Non game cartridges -->
+
+	<software name="ar" supported="no">
 		<description>Action Replay Online BIOS (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -15181,7 +15183,7 @@
 		</part>
 	</software>
 
-	<software name="gameshrk">
+	<software name="gshark" supported="no">
 		<description>GameShark Online BIOS (USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>

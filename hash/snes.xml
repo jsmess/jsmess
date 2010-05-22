@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
 <!--
 Among undumped protos & special release
 
@@ -6,7 +8,6 @@ Among undumped protos & special release
 
 -->
 
-<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="snes" description="Nintendo SNES cartridges">
 	<software name="96zenko">
 		<!-- Serial:  - Release Date: 1996-03-22 -->
@@ -40519,108 +40520,6 @@ Among undumped protos & special release
 		</part>
 	</software>
 
-<!--
-	<software name="gamegen1">
-		<description>Game Genie (USA) (Alt 1) (Unl) [b]</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="65536">
-				<rom name="game genie (usa) (alt 1) (unl) [b].sfc" size="65536" crc="58cbf2fe" sha1="81a5c4667e3021094edf3c82b2e9d1e453f547b3" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gamegen2">
-		<description>Game Genie (USA) (Unl) [b]</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="game genie (usa) (unl) [b].sfc" size="32768" crc="f8d4c303" sha1="6d96c3556b8eef50d5a49a807f246cba1ff48b6b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gamegen">
-		<description>Game Genie (USA) (v2.0) (Unl)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="game genie (usa) (v2.0) (unl).sfc" size="32768" crc="ac94f94a" sha1="58dd143049c5a1527975d64c9773b605aca307c3" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gamesav1">
-		<description>Game Saver (Euro) (v1.6) (Unl)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="game saver (europe) (v1.6) (unl).sfc" size="32768" crc="9da23b4a" sha1="e9004aa7a4fc8913420d05ed3e671d5d0931b54a" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="gamesav">
-		<description>Game Saver (Euro) (v1.7) (Unl)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="game saver (europe) (v1.7) (unl).sfc" size="32768" crc="f2225203" sha1="eb4bda191200e8bd4a1d6aa29d00b9afb0c92c1d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="par">
-		<description>Pro Action Replay (Euro) (Unl) [b]</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="pro action replay (europe) (unl) [b].sfc" size="32768" crc="81a67556" sha1="bdc945a9dc3cecc372110bdafc1beac8ce899ae8" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="parmk2a" cloneof="parmk2">
-		<description>Pro Action Replay MK2 (Euro) (Unl) [b]</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="pro action replay mk2 (europe) (unl) [b].sfc" size="32768" crc="83b1d39e" sha1="7ca6a6dccf7470a1d0c9b66536f439d9868aa0ef" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="parmk2">
-		<description>Pro Action Replay MK2 (Euro) (v1.1) (Unl) [b]</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="pro action replay mk2 (europe) (v1.1) (unl) [b].sfc" size="32768" crc="70d6b036" sha1="9fc8e45dbddb7cbdd54ba3232adb23160c7a480d" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="parmk3">
-		<description>Pro Action Replay MK3 (Euro) (Unl)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="cart" interface="snes_cart">
-			<dataarea name="rom" size="131072">
-				<rom name="pro action replay mk3 (europe) (unl).sfc" size="131072" crc="0d7f770a" sha1="896d1edd00def92023d7f3a6c2e46ad737c44698" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-
--->
 
 	<software name="bsaklive" supported="no">
 	<!-- this game has a corrupted header, and requires to be patched in order to work -->
@@ -40715,7 +40614,7 @@ Among undumped protos & special release
 	</software>
 
 	<software name="bscasino" supported="no">
-    <!-- this was dumped from a memory pack containing data for both games. split dumps are also available, but they seem to have issues -->
+	<!-- this was dumped from a memory pack containing data for both games. split dumps are also available, but they seem to have issues -->
 		<!-- Serial:  - Release Date:  -->
 		<description>Kouryaku Casino Bar Roulette (Jpn) &amp; Game Tora no Ooana Special (Jpn, 0224)</description>
 		<!-- BS -->
@@ -41011,6 +40910,108 @@ Among undumped protos & special release
 			</dataarea>
 		</part>
 	</software>
+
+<!-- Non game cartridges -->
+
+	<software name="ggenie2" cloneof="ggenie" supported="no">
+		<description>Game Genie (USA, Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="game genie (usa) (alt 1) (unl) [b].sfc" size="65536" crc="58cbf2fe" sha1="81a5c4667e3021094edf3c82b2e9d1e453f547b3" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggenie1" cloneof="ggenie" supported="no">
+		<description>Game Genie (USA)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="game genie (usa) (unl) [b].sfc" size="32768" crc="f8d4c303" sha1="6d96c3556b8eef50d5a49a807f246cba1ff48b6b" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ggenie" supported="no">
+		<description>Game Genie (USA, v2.0)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="game genie (usa) (v2.0) (unl).sfc" size="32768" crc="ac94f94a" sha1="58dd143049c5a1527975d64c9773b605aca307c3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gsaver1" cloneof="gsaver" supported="no">
+		<description>Game Saver (Euro, v1.6)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="game saver (europe) (v1.6) (unl).sfc" size="32768" crc="9da23b4a" sha1="e9004aa7a4fc8913420d05ed3e671d5d0931b54a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gsaver" supported="no">
+		<description>Game Saver (Euro, v1.7)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="game saver (europe) (v1.7) (unl).sfc" size="32768" crc="f2225203" sha1="eb4bda191200e8bd4a1d6aa29d00b9afb0c92c1d" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="par" supported="no">
+		<description>Pro Action Replay (Euro)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pro action replay (europe) (unl) [b].sfc" size="32768" crc="81a67556" sha1="bdc945a9dc3cecc372110bdafc1beac8ce899ae8" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="parmk2a" cloneof="parmk2" supported="no">
+		<description>Pro Action Replay MK2 (Euro)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pro action replay mk2 (europe) (unl) [b].sfc" size="32768" crc="83b1d39e" sha1="7ca6a6dccf7470a1d0c9b66536f439d9868aa0ef" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="parmk2" supported="no">
+		<description>Pro Action Replay MK2 (Euro, v1.1)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="pro action replay mk2 (europe) (v1.1) (unl) [b].sfc" size="32768" crc="70d6b036" sha1="9fc8e45dbddb7cbdd54ba3232adb23160c7a480d" offset="000000" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="parmk3" supported="no">
+		<description>Pro Action Replay MK3 (Euro)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="pro action replay mk3 (europe) (unl).sfc" size="131072" crc="0d7f770a" sha1="896d1edd00def92023d7f3a6c2e46ad737c44698" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- Dumps below have to be verified -->
 

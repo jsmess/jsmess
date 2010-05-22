@@ -17161,9 +17161,10 @@
 		</part>
 	</software>
 
-<!--
-	<software name="par">
-		<description>Pro Action Replay BIOS (Euro) (Unl)</description>
+<!-- Non game cartridges -->
+
+	<software name="par" supported="no">
+		<description>Pro Action Replay BIOS (Euro)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gameboy_cart">
@@ -17172,5 +17173,5 @@
 			</dataarea>
 		</part>
 	</software>
--->
+
 </softwarelist>

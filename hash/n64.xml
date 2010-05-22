@@ -9945,10 +9945,10 @@ There appear to exist some undumped N64 protos
 	</software>
 
 
+<!-- Non game cartridges -->
 
-<!--
-	<software name="actionre">
-		<description>Action Replay Pro 64 (Euro) (v3.0) (Unl)</description>
+	<software name="arp64a" cloneof="arp64" supported="no">
+		<description>Action Replay Pro 64 (Euro, v3.0)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="n64_cart">
@@ -9958,8 +9958,8 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="actionr1">
-		<description>Action Replay Pro 64 (Euro) (v3.3) (Unl)</description>
+	<software name="arp64" supported="no">
+		<description>Action Replay Pro 64 (Euro, v3.3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="n64_cart">
@@ -9969,8 +9969,8 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="gameboos">
-		<description>GameBooster 64 (Euro) (v1.1) (Unl)</description>
+	<software name="gboost" supported="no">
+		<description>GameBooster 64 (Euro, v1.1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="n64_cart">
@@ -9980,8 +9980,8 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="gameboo1">
-		<description>GameBooster 64 (USA) (v1.1) (Unl)</description>
+	<software name="gboostu" cloneof="gboost" supported="no">
+		<description>GameBooster 64 (USA, v1.1)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="n64_cart">
@@ -9991,8 +9991,8 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="gameshar">
-		<description>GameShark Pro (USA) (v2.0) (Unl)</description>
+	<software name="gsharka" cloneof="gshark" supported="no">
+		<description>GameShark Pro (USA, v2.0)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="n64_cart">
@@ -10002,8 +10002,8 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="gamesha1">
-		<description>GameShark Pro (USA) (v3.3) (Unl)</description>
+	<software name="gshark" supported="no">
+		<description>GameShark Pro (USA, v3.3)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="n64_cart">
@@ -10013,8 +10013,8 @@ There appear to exist some undumped N64 protos
 		</part>
 	</software>
 
-	<software name="xplorerg">
-		<description>Xplorer 64 (Ger) (v1.067) (Unl)</description>
+	<software name="xplor64" supported="no">
+		<description>Xplorer 64 (Ger, v1.067)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="n64_cart">
@@ -10023,5 +10023,5 @@ There appear to exist some undumped N64 protos
 			</dataarea>
 		</part>
 	</software>
--->
+
 </softwarelist>
