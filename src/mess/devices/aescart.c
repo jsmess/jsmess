@@ -428,6 +428,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 	cartslot_t *cart;
 	multicart_open_error me;
 	UINT32 size;
+	running_device* ym = devtag_get_device(image->machine,"ymsnd");
 
 	// first check software list
 	if(image_software_entry(image) != NULL)
@@ -446,16 +447,20 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 		memory_region_alloc(image->machine,"audiocpu",size,ROMREGION_ERASEFF);
 		memcpy(memory_region(image->machine,"audiocpu"),image_get_software_region(image,"audiocpu"),size);
 		size = image_get_software_region_length(image,"ymsnd");
-//		memory_region_free(image->machine,"ymsnd");
-//		memory_region_alloc(image->machine,"ymsnd",size,ROMREGION_ERASEFF);
+		memory_region_free(image->machine,"ymsnd");
+		memory_region_alloc(image->machine,"ymsnd",size,ROMREGION_ERASEFF);
 		memcpy(memory_region(image->machine,"ymsnd"),image_get_software_region(image,"ymsnd"),size);
 		if(image_get_software_region(image,"ymsnd.deltat") != NULL)
 		{
 			size = image_get_software_region_length(image,"ymsnd.deltat");
-//			memory_region_free(image->machine,"ymsnd.deltat");
-//			memory_region_alloc(image->machine,"ymsnd.deltat",size,ROMREGION_ERASEFF);
+			memory_region_free(image->machine,"ymsnd.deltat");
+			memory_region_alloc(image->machine,"ymsnd.deltat",size,ROMREGION_ERASEFF);
 			memcpy(memory_region(image->machine,"ymsnd.deltat"),image_get_software_region(image,"ymsnd.deltat"),size);
 		}
+		else
+			memory_region_free(image->machine,"ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
+		
+		ym->reset();
 		size = image_get_software_region_length(image,"sprites");
 		memory_region_free(image->machine,"sprites");
 		memory_region_alloc(image->machine,"sprites",size,ROMREGION_ERASEFF);
