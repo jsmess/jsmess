@@ -260,7 +260,7 @@ int info_listsoftware(core_options *options, const char *gamename)
 												{
 													if ( ROMENTRY_ISFILE(rom) )
 													{
-														fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", xml_normalize_string(ROM_GETNAME(rom)), ROM_GETLENGTH(rom) );
+														fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", xml_normalize_string(ROM_GETNAME(rom)), rom_file_size(rom) );
 
 														/* dump checksum information only if there is a known dump */
 														if (!hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
