@@ -2107,53 +2107,65 @@ static WRITE32_HANDLER( sram_w )
 	COMBINE_DATA(&state->gba_sram[offset]);
 }
 
+/*static const char *flash_states[] =
+{
+	"IDLEBYTE0", "IDLEBYTE1", "IDLEBYTE2", "IDENT",
+	"ERASEBYTE0", "ERASEBYTE1", "ERASEBYTE2", "ERASE_ALL", "ERASE_4K", "WRITE"
+};*/
+
 static READ32_HANDLER( flash_r )
 {
+	UINT32 rv;
+	
 	gba_state *state = (gba_state *)space->machine->driver_data;
 
 	switch (state->flash_state)
 	{
-		case FLASH_IDLEBYTE0:
-		case FLASH_IDLEBYTE1:
-		case FLASH_IDLEBYTE2:
-		case FLASH_ERASEBYTE0:
-		case FLASH_ERASEBYTE1:
-		case FLASH_ERASEBYTE2:
-			return state->gba_flash[offset];
 		case FLASH_IDENT:
 			if (offset == 0)
-				return (state->gba_flash[0] & 0xffff0000) | state->flash_id;
+				rv = (state->gba_flash[0] & 0xffff0000) | state->flash_id;
 			else
-				return state->gba_flash[offset];
-		case FLASH_ERASE_ALL:
-		case FLASH_ERASE_4K:
-			return state->gba_flash[offset];
+				rv = state->gba_flash[offset];
+				break;
+
+		default:
+			rv = state->gba_flash[offset];
+			break;
 	}
-	return state->gba_flash[offset];
+
+//	printf("flash_r: @ %x (mask %x) (state %s) (PC=%x) = %x\n", offset, mem_mask, flash_states[state->flash_state], cpu_get_pc(space->cpu), rv&mem_mask);
+
+	return rv;
 }
 
 static WRITE32_HANDLER( flash_w )
 {
 	gba_state *state = (gba_state *)space->machine->driver_data;
 
+//	printf("flash_w: %x @ %x (mask %x) (state=%s) (PC=%x)\n", data, offset, mem_mask, flash_states[state->flash_state], cpu_get_pc(space->cpu));
+
 	switch (state->flash_state)
 	{
 		case FLASH_IDLEBYTE0:
 		case FLASH_ERASEBYTE0:
-			if (offset == 0x5555/4 && ~mem_mask == 0xffff00ff)
+			if (offset == 0x5555/4 && mem_mask == 0xff00)
 			{
 				if ((data & mem_mask) == 0x0000aa00)
 				{
-					if (state->flash_state == FLASH_IDLEBYTE0 )
-						state->flash_state = FLASH_IDLEBYTE1;
-					else if (state->flash_state == FLASH_ERASEBYTE0)
+					if (state->flash_state == FLASH_ERASEBYTE0)
+					{
 						state->flash_state = FLASH_ERASEBYTE1;
+					}
+					else
+					{
+						state->flash_state = FLASH_IDLEBYTE1;
+					}
 				}
 			}
 			break;
 		case FLASH_IDLEBYTE1:
 		case FLASH_ERASEBYTE1:
-			if (offset == 0x2aaa/4 && ~mem_mask == 0xff00ffff)
+			if (offset == 0x2aaa/4 && mem_mask == 0xff0000)
 			{
 				if ((data & mem_mask) == 0x00550000)
 				{
@@ -2166,7 +2178,7 @@ static WRITE32_HANDLER( flash_w )
 			break;
 		case FLASH_IDLEBYTE2:
 		case FLASH_ERASEBYTE2:
-			if (offset == 0x5555/4 && ~mem_mask == 0xffff00ff)
+			if (offset == 0x5555/4 && mem_mask == 0xff00)
 			{
 				if (state->flash_state == FLASH_IDLEBYTE2)
 				{
@@ -2178,7 +2190,7 @@ static WRITE32_HANDLER( flash_w )
 					case 0x90:
 						state->flash_state = FLASH_IDENT;
 						break;
-					case 0xa0:
+ 					case 0xa0:
 						state->flash_state = FLASH_WRITE;
 						break;
 					}
@@ -2210,17 +2222,17 @@ static WRITE32_HANDLER( flash_w )
 		case FLASH_IDENT:
 			// Hack; any sensibly-written game should follow up with the relevant read, which will reset the state to FLASH_IDLEBYTE0.
 			state->flash_state = FLASH_IDLEBYTE0;
-			flash_w(space, offset, data, ~mem_mask);
+			flash_w(space, offset, data, mem_mask);
 			break;
 		case FLASH_ERASE_4K:
 			// Hack; any sensibly-written game should follow up with the relevant read, which will reset the state to FLASH_IDLEBYTE0.
 			state->flash_state = FLASH_IDLEBYTE0;
-			flash_w(space, offset, data, ~mem_mask);
+			flash_w(space, offset, data, mem_mask);
 			break;
 		case FLASH_ERASE_ALL:
 			// Hack; any sensibly-written game should follow up with the relevant read, which will reset the state to FLASH_IDLEBYTE0.
 			state->flash_state = FLASH_IDLEBYTE0;
-			flash_w(space, offset, data, ~mem_mask);
+			flash_w(space, offset, data, mem_mask);
 			break;
 		case FLASH_WRITE:
 			COMBINE_DATA(&state->gba_flash[offset]);
@@ -2276,7 +2288,7 @@ static READ32_HANDLER( eeprom_r )
 //          printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %08x\n", offset, ~mem_mask, state->eeprom_state, activecpu_get_pc(), out);
 			return out;
 	}
-//  printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, state->eeprom_state, activecpu_get_pc(), 0);
+//  printf("eeprom_r: @ %x, mask %08x (state %d) (PC=%x) = %d\n", offset, ~mem_mask, state->eeprom_state, cpu_get_pc(space->cpu), 0);
 	return 0;
 }
 
@@ -2289,7 +2301,7 @@ static WRITE32_HANDLER( eeprom_w )
 		data >>= 16;
 	}
 
-//  printf("eeprom_w: %x @ %x (state %d) (PC=%x)\n", data, offset, state->eeprom_state, activecpu_get_pc());
+//	printf("eeprom_w: %x @ %x (state %d) (PC=%x)\n", data, offset, state->eeprom_state, cpu_get_pc(space->cpu));
 
 	switch (state->eeprom_state)
 	{

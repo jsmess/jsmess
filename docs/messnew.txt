@@ -19,7 +19,7 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-(none)
+[GBA] Improved flash saving in games such as Sword of Mana [R. Belmont]
 
 
 
