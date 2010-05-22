@@ -548,4 +548,71 @@
 		</part>
 	</software>
 
+<!-- ID 069 -->
+	<software name="fatfury3">
+		<description>Fatal Fury 3 - Road to the Final Victory / Garou Densetsu 3 - haruka-naru tatakai</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="3145728">
+                <rom name="069-p1.bin" size="1048576" crc="a8bcfbbc" sha1="519c4861151797e5f4d4f33432b83dfabed8e7c4" offset="000000" />
+                <rom name="069-sp2.bin" size="2097152" crc="dbe963ed" sha1="8ece7f663cfe8e563576a397e41161d392cee67e" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="069-s1.bin" size="131072" crc="0b33a800" sha1="b7d2cc97da4f30ddebc7b801f5e1d17d2306b2db" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="069-m1.bin" size="131072" crc="fce72926" sha1="a40c74f793900b8542f0b8383ce4bf46fca112d4" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="10485760">
+                <rom name="069-v1.bin" size="4194304" crc="2bdbd4db" sha1="5f4fecf69c2329d699cbd45829c19303b1e2a80e" offset="000000" />
+                <rom name="069-v2.bin" size="4194304" crc="a698a487" sha1="11b8bc53bc26a51f4a408e900e3769958625c4ed" offset="400000" />
+                <rom name="069-v3.bin" size="2097152" crc="581c5304" sha1="e9550ec547b4f605afed996b22d711f49b48fa92" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="20971520">
+                <rom name="069-c1.bin" size="4194304" crc="e302f93c" sha1="d8610b14900b2b8fe691b67ca9b1abb335dbff74" offset="000000" loadflag="load16_byte" />
+                <rom name="069-c2.bin" size="4194304" crc="1053a455" sha1="69501bfac68739e63d798045b812badd251d57b8" offset="000001" loadflag="load16_byte" />
+                <rom name="069-c3.bin" size="4194304" crc="1c0fde2f" sha1="cf6c2ef56c03a861de3b0b6dc0d7c9204d947f9d" offset="800000" loadflag="load16_byte" />
+                <rom name="069-c4.bin" size="4194304" crc="a25fc3d0" sha1="83cb349e2f1032652060b233e741fb893be5af16" offset="800001" loadflag="load16_byte" />
+                <rom name="069-c5.bin" size="2097152" crc="b3ec6fa6" sha1="7e4c8ee9dd8d9a25ff183d9d8b05f38769348bc7" offset="1000000" loadflag="load16_byte" />
+                <rom name="069-c6.bin" size="2097152" crc="69210441" sha1="6d496c549dba65caabeaffe5b762e86f9d648a26" offset="1000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 087 -->
+	<software name="samsho3">
+		<description>Samurai Showdown III / Samurai Spirits - Zankurou Musouken</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="3145728">
+                <rom name="087-pg1.bin" size="1048576" crc="282a336e" sha1="e062f1939d36a45f185b5dbd726cdd833dc7c28c" offset="000000" />
+                <rom name="087-p2.bin" size="2097152" crc="9bbe27e0" sha1="b18117102159903c8e8f4e4226e1cc91a400e816" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="087-s1.bin" size="131072" crc="74ec7d9f" sha1="d79c479838a7ca51735a44f91f1968ec5b3c6b91" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="087-m1.bin" size="131072" crc="8e6440eb" sha1="e3f72150af4e326543b29df71cda27d73ec087c1" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="6291456">
+                <rom name="087-v1.bin" size="4194304" crc="84bdd9a0" sha1="adceceb00569eca13fcc2e0f0d9f0d9b06a06851" offset="000000" />
+                <rom name="087-v2.bin" size="2097152" crc="ac0f261a" sha1="5411bdff24cba7fdbc3397d45a70fb468d7a44b3" offset="400000" />
+			</dataarea>
+			<dataarea name="sprites" size="27262976">
+                <rom name="087-c1.bin" size="4194304" crc="07a233bc" sha1="654cb56cfd6eeebe6745c0b8b730317fb8ccd3d9" offset="000000" loadflag="load16_byte" />
+                <rom name="087-c2.bin" size="4194304" crc="7a413592" sha1="b8c7a2d0d7a8b14d6cab94d7a5f347e73c6ab7a4" offset="000001" loadflag="load16_byte" />
+                <rom name="087-c3.bin" size="4194304" crc="8b793796" sha1="053acc129ea56691607a5d255845703e61fd3ada" offset="800000" loadflag="load16_byte" />
+                <rom name="087-c4.bin" size="4194304" crc="728fbf11" sha1="daa319d455f759bfc08a37b43218bdb48dc1c9e5" offset="800001" loadflag="load16_byte" />
+                <rom name="087-c5.bin" size="4194304" crc="172ab180" sha1="a6122f683bdb78d0079e1e360c1b96ba28def7b7" offset="1000000" loadflag="load16_byte" />
+                <rom name="087-c6.bin" size="4194304" crc="002ff8f3" sha1="3a378708697d727796c4f702dd5bbf1c9eb4daec" offset="1000001" loadflag="load16_byte" />
+                <rom name="087-c7.bin" size="1048576" crc="ae450e3d" sha1="ec482632cc347ec3f9e68df0ebcaa16ebe41b9f9" offset="1800000" loadflag="load16_byte" />
+                <rom name="087-c8.bin" size="1048576" crc="a9e82717" sha1="e39ee15d5140dbe7f06eea945cce9984a5e8b06a" offset="1800001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
