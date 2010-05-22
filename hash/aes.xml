@@ -615,4 +615,38 @@
 		</part>
 	</software>
 
+<!-- ID 234 -->
+	<software name="lastblad">
+		<description>The Last Blade / Bakumatsu Roman - Gekka no Kenshi</description>
+		<year>1997</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="5242880">
+                <rom name="234-pg1.bin" size="1048576" crc="cd01c06d" sha1="d66142571afe07c6191b52f319f1bc8bc8541c14" offset="000000" />
+                <rom name="234-p2.bin" size="4194304" crc="0fdc289e" sha1="1ff31c0b0f4f9ddbedaf4bcf927faaae81892ec7" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="234-s1.bin" size="131072" crc="95561412" sha1="995de272f572fd08d909d3d0af4251b9957b3640" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="234-m1.bin" size="131072" crc="087628ea" sha1="48dcf739bb16699af4ab8ed632b7dcb25e470e06" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="234-v1.bin" size="4194304" crc="ed66b76f" sha1="8a05ff06d9b6f01c6c16b3026282eaabb0e25b44" offset="000000" />
+                <rom name="234-v2.bin" size="4194304" crc="a0e7f6e2" sha1="753ff74fa9294f695aae511ae01ead119b114a57" offset="400000" />
+                <rom name="234-v3.bin" size="4194304" crc="a506e1e2" sha1="b3e04ba1a5cb50b77c6fbe9fe353b9b64b6f3f74" offset="800000" />
+                <rom name="234-v4.bin" size="4194304" crc="0e34157f" sha1="20A1F4833E5E29BA0073C1712D7A17AB7A2A035C" offset="c00000" />
+			</dataarea>
+			<dataarea name="sprites" size="41943040">
+                <rom name="234-c1.bin" size="8388608" crc="9f7e2bd3" sha1="2828aca0c0f5802110f10453c1cf640f69736554" offset="000000" loadflag="load16_byte" />
+                <rom name="234-c2.bin" size="8388608" crc="80623d3c" sha1="ad460615115ec8fb25206f012da59ecfc8059b64" offset="000001" loadflag="load16_byte" />
+                <rom name="234-c3.bin" size="8388608" crc="91ab1a30" sha1="e3cf9133784bef2c8f1bfe45f277ccf82cc6f6a1" offset="1000000" loadflag="load16_byte" />
+                <rom name="234-c4.bin" size="8388608" crc="3d60b037" sha1="78a50233bcd19e92c7b6f7ee1a53417d9db21f6a" offset="1000001" loadflag="load16_byte" />
+                <rom name="234-c5.bin" size="4194304" crc="1ba80cee" sha1="0c59057183b5279b747e73213b4cd3c6d7ad9eb1" offset="2000000" loadflag="load16_byte" />
+                <rom name="234-c6.bin" size="4194304" crc="beafd091" sha1="55df9cc128eb0f00856de3996c946e3efe8f09a5" offset="2000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 </softwarelist>
