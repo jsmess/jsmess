@@ -4,7 +4,7 @@
 	<software name="280zzap">
 		<description>280 Zzzap / Dodgem</description>
 		<year>1978</year>
-		<publisher>Bally Manufacturing>
+		<publisher>Bally Manufacturing</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="280zzap.bin" size="2048" crc="e4d285e5" sha1="0de670d6f78e3011e84fefc65f70544cdad3320e" offset="0" />
