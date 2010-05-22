@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="astrocde" description="Bally Professional Arcade">
+<softwarelist name="astrocde" description="Bally Professional Arcade cartridges">
 	<software name="280zzap">
 		<description>280 Zzzap / Dodgem</description>
 		<year>1978</year>
