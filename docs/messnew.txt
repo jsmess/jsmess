@@ -1,4 +1,41 @@
-﻿0.138
+﻿0.138.1
+
+New System Drivers Supported:
+-----------------------------
+(none)
+
+
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+
+
+Skeleton drivers:
+-----------------
+(none)
+
+
+System Driver Changes:
+----------------------
+(none)
+
+
+
+Imgtool Changes:
+----------------
+(none)
+
+
+
+Source Changes:
+----------------
+(none)
+
+
+
+0.138
 
 New System Drivers Supported:
 -----------------------------
