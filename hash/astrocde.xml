@@ -111,8 +111,8 @@
 		</part>
 	</software>
 
-	<software name="conquerr">
-		<description>Conqueror (Proto)</description>
+	<software name="sconquer">
+		<description>Solar Conqueror (Proto)</description>
 		<year>1983</year>
 		<publisher>Astrocade Inc.</publisher>
 		<part name="cart" interface="astrocde_cart">
@@ -265,7 +265,7 @@
 		</part>
 	</software>
 
-	<software name="thewizrd">
+	<software name="wizard">
 		<description>The Wizard</description>
 		<year>1982</year>
 		<publisher>Astrocade Inc.</publisher>

@@ -169,7 +169,7 @@
 		</part>
 	</software>
 
-	<software name="mazealt">
+	<software name="mazea" cloneof="maze">
 		<description>Maze / Jailbreak / Blind-man's-bluff / Trailblazer (Alt)</description>
 		<!-- <cart number>Videocart 10a</cart number> -->
 		<year>1977</year>
@@ -229,8 +229,8 @@
 		</part>
 	</software>
 
-	<software name="mmrymtch">
-		<description>Memory Match 1 & 2</description>
+	<software name="memory">
+		<description>Memory Match 1 &amp; 2</description>
 		<!-- <cart number>Videocart 15</cart number> -->
 		<year>1978</year>
 		<publisher>Fairchild</publisher>
@@ -277,7 +277,7 @@
 		</part>
 	</software>
 
-	<software name="pinballa">
+	<software name="pinballa" cloneof="pinball">
 		<description>Pinball Challenge (Alt)</description>
 		<!-- <cart number>Videocart 17a</cart number> -->
 		<year>1978</year>
@@ -313,7 +313,7 @@
 		</part>
 	</software>
 
-	<software name="vwhzball">
+	<software name="whizball">
 		<description>Video Whizball</description>
 		<!-- <cart number>Videocart 20</cart number> -->
 		<year>197?</year>
