@@ -300,10 +300,10 @@ ROM_END
 ROM_START( e01s )
     ROM_REGION( 0x10000, R65C102_TAG, 0 )
 	ROM_DEFAULT_BIOS("v140")
-	ROM_SYSTEM_BIOS( 0, "v133", "V 1.33" )
-	ROMX_LOAD( "0282,008-xx e01s rom",  0x0000, 0x10000, CRC(2a4a0032) SHA1(54ad68ceae44992293ccdd64ec88ad8520deec22), ROM_BIOS(1) ) // which label?
+	ROM_SYSTEM_BIOS( 0, "v133", "V 1.33" ) // 0282,008-02 e01s rom
+	ROMX_LOAD( "e01sv133.rom",  0x0000, 0x10000, CRC(2a4a0032) SHA1(54ad68ceae44992293ccdd64ec88ad8520deec22), ROM_BIOS(1) ) // which label?
 	ROM_SYSTEM_BIOS( 1, "v140", "V 1.40" )
-	ROMX_LOAD( "0282,008-xx e01s rom",  0x0000, 0x10000, CRC(5068fe86) SHA1(9b8740face15b5541e2375b3054988af00757931), ROM_BIOS(2) ) // which label?
+	ROMX_LOAD( "e01sv140.rom",  0x0000, 0x10000, CRC(5068fe86) SHA1(9b8740face15b5541e2375b3054988af00757931), ROM_BIOS(2) ) // which label?
 ROM_END
 
 /***************************************************************************
