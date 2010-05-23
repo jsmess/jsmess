@@ -428,11 +428,13 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 					{
 						memset( &flash_memory[ address & ~0xfff ], 0xff, 4 * 1024 );
 						c->erase_sector = address & ~0xfff;
+						timer_adjust_oneshot( c->timer, ATTOTIME_IN_MSEC( 125 ), 0 );
 					}
 					else
 					{
 						memset( &flash_memory[ address & ~0xffff ], 0xff, 64 * 1024 );
 						c->erase_sector = address & ~0xffff;
+						timer_adjust_oneshot( c->timer, ATTOTIME_IN_SEC( 1 ), 0 );
 					}
 				}
 				break;
@@ -443,11 +445,13 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 					{
 				 		memset( &flash_memory[ address & ~0x7ff ], 0xff, 4 * 1024 );
 						c->erase_sector = address & ~0x7ff;
+						timer_adjust_oneshot( c->timer, ATTOTIME_IN_MSEC( 125 ), 0 );
 					}
 					else
 					{
 				 		memset( &flash_memory[ address & ~0x7fff ], 0xff, 64 * 1024 );
 						c->erase_sector = address & ~0x7fff;
+						timer_adjust_oneshot( c->timer, ATTOTIME_IN_SEC( 1 ), 0 );
 					}
 				}
 				break;
@@ -455,8 +459,6 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 
 			c->status = 1 << 3;
 			c->flash_mode = FM_ERASEAMD4;
-
-			timer_adjust_oneshot( c->timer, ATTOTIME_IN_SEC( 1 ), 0 );
 		}
 		else
 		{
