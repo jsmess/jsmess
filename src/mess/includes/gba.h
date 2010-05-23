@@ -118,21 +118,6 @@
 #define TILEOBJ_VFLIP			0x0800
 #define TILEOBJ_PALETTE			0xf000
 
-// states for carts with flash saves
-enum
-{
-    FLASH_IDLEBYTE0,
-    FLASH_IDLEBYTE1,
-    FLASH_IDLEBYTE2,
-    FLASH_IDENT,
-    FLASH_ERASEBYTE0,
-    FLASH_ERASEBYTE1,
-    FLASH_ERASEBYTE2,
-    FLASH_ERASE_ALL,
-    FLASH_ERASE_4K,
-    FLASH_WRITE
-};
-
 enum
 {
 	EEP_IDLE,
@@ -200,10 +185,8 @@ public:
 	UINT32 gba_sram[0x10000/4];
 	UINT8 gba_eeprom[0x2000];
 	UINT32 gba_flash[0x20000/4];
-	UINT32 flash_size;	// 64k or 128k
-	UINT8 flash_state;
-	UINT8 flash_page;
-	UINT16 flash_id;
+	UINT32 flash_size;
+	UINT32 flash_mask;
 	int eeprom_state, eeprom_command, eeprom_count, eeprom_addr, eeprom_bits;
 	UINT8 eep_data;
 
