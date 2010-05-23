@@ -47,7 +47,7 @@
 
 	<software name="bbasic" supported="no">
 		<description>Bally Basic</description>
-		<year>19??</year>
+		<year>1978</year>
 		<publisher>Bally Manufacturing</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
@@ -89,6 +89,18 @@
 		</part>
 	</software>
 
+	<software name="brbasic1">
+		<description>Blue RAM BASIC 1.0</description>
+		<!-- <note>Requires RAM expansion</note> -->
+		<year>1981</year>
+		<publisher>Perkins Eng.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="brbasic1.bin" size="8192" crc="50112e64" sha1="8e7f0ba7a7f37f09f1c808b50647af3a04e1a92e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bstdroid">
 		<description>Blast Droids</description>
 		<year>1983</year>
@@ -122,6 +134,17 @@
 		</part>
 	</software>
 
+	<software name="conanp">
+		<description>Conan The Barbarian! (Proto)</description>
+		<year>1982</year>
+		<publisher>Astrocade Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="conanp.bin" size="8192" crc="15b1afea" sha1="bc4f757271fca69e0de3973f43d363c4474e2fb7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="cosmicrd">
 		<description>Cosmic Raider</description>
 		<year>1983</year>
@@ -129,6 +152,17 @@
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="cosmicrd.bin" size="8192" crc="2a77b3fb" sha1="09ae145e3dbfd132f5130a0cbb508f4fbcf35bee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmicrp">
+		<description>Cosmic Raider (Proto)</description>
+		<year>1983</year>
+		<publisher>Astrocade Inc.</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="cosmicrp.bin" size="8192" crc="e3d723a0" sha1="337cdffe2260dc6d36d674fa35047cb5a3598bf9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -283,6 +317,18 @@
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="treasure.bin" size="8192" crc="1447f854" sha1="3c2a01b0b73664be5b332db2a0d7a91bdee2fdab" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="viperbp">
+		<description>VIPERSoft BASIC (Proto)</description>
+		<!-- <note>Requires RAM expansion</note> -->
+		<year>198?</year>
+		<publisher>VIPERSoft</publisher>
+		<part name="cart" interface="astrocde_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="viperbp.bin" size="8192" crc="4cd1ee10" sha1="1d0d0ebf38b89ab9da95540d8c797c05388777e7" offset="0" />
 			</dataarea>
 		</part>
 	</software>
