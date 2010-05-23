@@ -4,7 +4,7 @@
 	<software name="280zzap">
 		<description>280 Zzzap / Dodgem</description>
 		<year>1978</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="280zzap.bin" size="2048" crc="e4d285e5" sha1="0de670d6f78e3011e84fefc65f70544cdad3320e" offset="0" />
@@ -15,7 +15,7 @@
 	<software name="amazmaze">
 		<description>Amazing Maze / Tic-Tac-Toe</description>
 		<year>1979</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="amazmaze.bin" size="2048" crc="cd57c485" sha1="8c833f077830db847caad91a3f040ac7ddcd33f8" offset="0" />
@@ -35,12 +35,12 @@
 	</software>
 
 	<software name="astrobat">
-		<description>Astro Battle (Overdump?)</description>
-		<year>1981</year>
-		<publisher>Astrovision</publisher>
+		<description>Astro Battle</description>
+		<year>1979</year>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="astrobat.bin" size="8192" crc="1a050094" sha1="ae453708c8929af2fe6e8517b1d7106c4c5ac9b4" offset="0" status="baddump" />
+			<dataarea name="rom" size="4096">
+				<rom name="astrobat.bin" size="4096" crc="0b5298bc" sha1="cdf7a2a8608c3e90d0cc8a4b751276b76de72f8c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -48,7 +48,7 @@
 	<software name="bbasic" supported="no">
 		<description>Bally Basic</description>
 		<year>1978</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="bbasic.bin" size="4096" crc="70514687" sha1="a2ac8995a6217b7190aa9b18f49261c0ed3c6b5a" offset="0" />
@@ -57,12 +57,12 @@
 	</software>
 
 	<software name="ballypin">
-		<description>Bally Pin 1 / Bally Pin 2 (Overdump?)</description>
+		<description>Bally Pin 1 / Bally Pin 2</description>
 		<year>1981</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="ballypin.bin" size="8192" crc="fb652bac" sha1="2b30b62e8e33d9fd524e77cbca13b30994725d64" offset="0" status="baddump" />
+				<rom name="ballypin.bin" size="8192" crc="3f431613" sha1="05b680777aa9639620c790f0590d96416d49bf94" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -70,7 +70,7 @@
 	<software name="baseball">
 		<description>Baseball / Handball / Hockey / Tennis</description>
 		<year>1978</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="baseball.bin" size="4096" crc="5be548cc" sha1="4dda98d6cf257652fd179eca137b69b67e38b8c6" offset="0" />
@@ -81,7 +81,7 @@
 	<software name="blckjack">
 		<description>Blackjack / Acey Duecy / Poker</description>
 		<year>1979</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="blckjack.bin" size="4096" crc="78d45a11" sha1="7b92e3ad161e31926a730780d1f28015310dd7d7" offset="0" />
@@ -115,7 +115,7 @@
 	<software name="brckyard">
 		<description>Brickyard / Clowns</description>
 		<year>1978</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="brckyard.bin" size="4096" crc="28f9e502" sha1="4c1a9efcd4435f6a79dc2212c4d0d17ea753809c" offset="0" />
@@ -181,7 +181,7 @@
 	<software name="football">
 		<description>Football</description>
 		<year>1978</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="football.bin" size="4096" crc="fc8998a9" sha1="1d07b45162fab5497fe0a3d4ccb1b33bfd47177a" offset="0" />
@@ -225,7 +225,7 @@
 	<software name="lttrmtch">
 		<description>Letter Match / Spell'n Score / Crosswords</description>
 		<year>1978</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="lttrmtch.bin" size="4096" crc="2cf68f93" sha1="266f6978b8f9e6bad36dc21031193ca93cd55be4" offset="0" />
@@ -258,7 +258,7 @@
 	<software name="redbaron">
 		<description>Red Baron / Panzer Attack</description>
 		<year>1978</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="4096">
 				<rom name="redbaron.bin" size="4096" crc="a1c7e129" sha1="e0602c7485f511d6aa29d669967b101de79ddb15" offset="0" />
@@ -267,9 +267,9 @@
 	</software>
 
 	<software name="seawolf">
-		<description>Seawolf / Missile (Overdumped?)</description>
+		<description>Seawolf / Missile</description>
 		<year>1977</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="seawolf.bin" size="8192" crc="ee3489ea" sha1="a0bfee170d0e8dc0b6fec60713e3bdf11d589527" offset="0" status="baddump" />
@@ -291,7 +291,7 @@
 	<software name="spedmath">
 		<description>Speed Math / Bingo Math</description>
 		<year>1978</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="2048">
 				<rom name="spedmath.bin" size="2048" crc="7d30312a" sha1="8f500f1e2144169bb94214eaa2863dcf6590b926" offset="0" />
@@ -302,7 +302,7 @@
 	<software name="starbttl">
 		<description>Star Battle (Overdumped?)</description>
 		<year>1979</year>
-		<publisher>Bally Manufacturing</publisher>
+		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="starbttl.bin" size="8192" crc="ce15563b" sha1="8e10074e03169ce88327ace728f2718e90438be0" offset="0" status="baddump" />
