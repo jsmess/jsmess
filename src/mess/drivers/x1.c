@@ -516,7 +516,7 @@ static VIDEO_EOF( x1 )
 
 static UINT8 sub_cmd;//,key_flag;
 static UINT8 sub_cmd_length;
-static UINT8 sub_val[4];
+static UINT8 sub_val[8];
 
 static UINT8 check_keyboard_press(running_machine *machine)
 {
@@ -767,6 +767,17 @@ static WRITE8_HANDLER( sub_io_w )
 
 	if(sub_cmd == 0xe9)
 		cmt_command(space->machine,data);
+
+	if((data & 0xf0) == 0xd0) //reads here tv recording timer data.
+	{
+		sub_val[0] = 0;
+		sub_val[1] = 0;
+		sub_val[2] = 0;
+		sub_val[3] = 0;
+		sub_val[4] = 0;
+		sub_val[5] = 0;
+		sub_cmd_length = 6;
+	}
 
 	switch(data)
 	{
@@ -2100,6 +2111,7 @@ static MACHINE_START( x1 )
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(16), NULL, 0, cmt_wind_timer);
 }
+
 static PALETTE_INIT(x1)
 {
 	int i;
