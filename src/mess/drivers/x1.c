@@ -233,6 +233,13 @@ static struct
 	UINT8 txt_disp;
 }turbo_reg;
 
+static struct
+{
+	UINT8 sec, min, hour, day, wday, month, year;
+}x1_rtc;
+
+static emu_timer *x1_rtc_timer;
+
 static UINT8 pcg_write_addr;
 
 static DEVICE_START(x1_daisy){}
@@ -750,8 +757,6 @@ static TIMER_CALLBACK( cmt_wind_timer )
 
 static WRITE8_HANDLER( sub_io_w )
 {
-	mame_system_time systime;
-	mame_get_base_datetime(space->machine, &systime);
 	/* TODO: check sub-routine at $10e */
 	/* $17a -> floppy? */
 	/* $094 -> ROM */
@@ -812,15 +817,15 @@ static WRITE8_HANDLER( sub_io_w )
 			logerror("CMT: Command 0xEB received, returning 0x%02x.\n",sub_val[0]);
 			break;
 		case 0xed: //get date
-			sub_val[0] = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
-			sub_val[1] = ((systime.local_time.month+1)<<4) | ((systime.local_time.weekday % 10) & 0xf);
-			sub_val[2] = (((systime.local_time.year % 100)/10)<<4) | ((systime.local_time.year % 10) & 0xf);
+			sub_val[0] = x1_rtc.day;
+			sub_val[1] = (x1_rtc.month<<4) | (x1_rtc.wday & 0xf);
+			sub_val[2] = x1_rtc.year;
 			sub_cmd_length = 3;
 			break;
 		case 0xef: //get time
-			sub_val[0] = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
-			sub_val[1] = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
-			sub_val[2] = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
+			sub_val[0] = x1_rtc.hour;
+			sub_val[1] = x1_rtc.min;
+			sub_val[2] = x1_rtc.sec;
 			sub_cmd_length = 3;
 			break;
 		#if 0
@@ -2064,6 +2069,33 @@ static TIMER_CALLBACK(keyboard_callback)
 	}
 }
 
+static TIMER_CALLBACK(x1_rtc_increment)
+{
+	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+
+	x1_rtc.sec++;
+
+	if((x1_rtc.sec & 0x0f) >= 0x0a) 				{ x1_rtc.sec+=0x10; x1_rtc.sec&=0xf0; }
+	if((x1_rtc.sec & 0xf0) >= 0x60) 				{ x1_rtc.min++; x1_rtc.sec = 0; }
+	if((x1_rtc.min & 0x0f) >= 0x0a) 				{ x1_rtc.min+=0x10; x1_rtc.min&=0xf0; }
+	if((x1_rtc.min & 0xf0) >= 0x60) 				{ x1_rtc.hour++; x1_rtc.min = 0; }
+	if((x1_rtc.hour & 0x0f) >= 0x0a) 				{ x1_rtc.hour+=0x10; x1_rtc.hour&=0xf0; }
+	if((x1_rtc.hour & 0xff) >= 0x24)				{ x1_rtc.day++; x1_rtc.wday++; x1_rtc.hour = 0; }
+	if((x1_rtc.wday & 0x0f) >= 0x07)				{ x1_rtc.wday = 0; }
+	if((x1_rtc.day & 0x0f) >= 0x0a)					{ x1_rtc.day+=0x10; x1_rtc.day&=0xf0; }
+	/* FIXME: very crude leap year support (i.e. it treats the RTC to be with a 2000-2099 timeline), dunno how the real x1 supports this,
+	   maybe it just have a 1980-1999 timeline since year 0x00 shows as a XX on display */
+	if(((x1_rtc.year % 4) == 0) && x1_rtc.month == 2)
+	{
+		if((x1_rtc.day & 0xff) >= dpm[x1_rtc.month-1]+1+1)
+			{ x1_rtc.month++; x1_rtc.day = 0x01; }
+	}
+	else if((x1_rtc.day & 0xff) >= dpm[x1_rtc.month-1]+1){ x1_rtc.month++; x1_rtc.day = 0x01; }
+	if(x1_rtc.month > 12)							{ x1_rtc.year++;  x1_rtc.month = 0x01; }
+	if((x1_rtc.year & 0x0f) >= 0x0a)				{ x1_rtc.year+=0x10; x1_rtc.year&=0xf0; }
+	if((x1_rtc.year & 0xf0) >= 0xa0)				{ x1_rtc.year = 0; } //roll over
+}
+
 static MACHINE_RESET( x1 )
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
@@ -2104,12 +2136,30 @@ static MACHINE_RESET( x1 )
 		palette_set_color_rgb(machine, i+0x000, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 		palette_set_color_rgb(machine, i+0x100, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 	}
+
+	timer_adjust_periodic(x1_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 }
 
 static MACHINE_START( x1 )
 {
 	timer_pulse(machine, ATTOTIME_IN_HZ(240), NULL, 0, keyboard_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(16), NULL, 0, cmt_wind_timer);
+
+	/* set up RTC */
+	{
+		mame_system_time systime;
+		mame_get_base_datetime(machine, &systime);
+
+		x1_rtc.day = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
+		x1_rtc.month = ((systime.local_time.month+1));
+		x1_rtc.wday = ((systime.local_time.weekday % 10) & 0xf);
+		x1_rtc.year = (((systime.local_time.year % 100)/10)<<4) | ((systime.local_time.year % 10) & 0xf);
+		x1_rtc.hour = ((systime.local_time.hour / 10)<<4) | ((systime.local_time.hour % 10) & 0xf);
+		x1_rtc.min = ((systime.local_time.minute / 10)<<4) | ((systime.local_time.minute % 10) & 0xf);
+		x1_rtc.sec = ((systime.local_time.second / 10)<<4) | ((systime.local_time.second % 10) & 0xf);
+
+		x1_rtc_timer = timer_alloc(machine, x1_rtc_increment, 0);
+	}
 }
 
 static PALETTE_INIT(x1)
