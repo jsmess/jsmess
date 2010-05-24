@@ -1929,7 +1929,7 @@ READ8_HANDLER( nes_fds_r )
 			{
 				/* If we've switched disks, report "no disk" for a few reads */
 				ret = 1;
-				state->fds_count ++;
+				state->fds_count++;
 				if (state->fds_count == 50)
 				{
 					state->fds_last_side = state->fds_current_side;

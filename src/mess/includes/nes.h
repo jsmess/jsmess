@@ -157,9 +157,9 @@ public:
 
 	/***** FDS-floppy related *****/
 
-	UINT8   *fds_data;
 	UINT8   fds_sides;
-	UINT8   *fds_ram;
+	UINT8   *fds_data;	// here, we store a copy of the disk
+	UINT8   *fds_ram;	// here, we emulate the RAM adapter
 
 	/* Variables which can change */
 	UINT8   fds_motor_on;

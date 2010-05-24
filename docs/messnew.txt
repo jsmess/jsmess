@@ -1,4 +1,4 @@
-﻿0.138.1
+0.138.1
 
 New System Drivers Supported:
 -----------------------------
@@ -19,7 +19,11 @@ Skeleton drivers:
 
 System Driver Changes:
 ----------------------
-[GBA] Improved flash saving in games such as Sword of Mana [R. Belmont]
+
+- [FAMICOM] Fixed long standing problems (present at least since MESS 0.122) 
+  with disks not loading correctly. Many games are playable again. [Fabio Priuli]
+
+- [GBA] Improved flash saving in games such as Sword of Mana [R. Belmont]
 
 
 

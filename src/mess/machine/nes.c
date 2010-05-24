@@ -59,9 +59,16 @@ static void init_nes_core( running_machine *machine )
 			state->slow_banking = 0;
 			/* If we are loading a disk we have already filled state->fds_data and we don't want to overwrite it,
             if we are loading a cart image identified as mapper 20 (probably wrong mapper...) we need to alloc
-            memory for the bank 2 pointer */
+            memory for use in nes_fds_r/nes_fds_w. Same goes for allocation of fds_ram (used for bank2)  */
 			if (state->fds_data == NULL)
-				state->fds_data = auto_alloc_array(machine, UINT8, 0x8000);
+			{
+				UINT32 size = memory_region_length(machine, "maincpu") - 0x10000;
+				state->fds_data = auto_alloc_array_clear(machine, UINT8, size);
+				memcpy(state->fds_data, state->rom, size);	// copy in fds_data the cart PRG
+			}
+			if (state->fds_ram == NULL)
+				state->fds_ram = auto_alloc_array(machine, UINT8, 0x8000);
+
 			memory_install_read8_handler(space, 0x4030, 0x403f, 0, 0, nes_fds_r);
 			memory_install_read_bank(space, 0x6000, 0xdfff, 0, 0, "bank2");
 			memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank1");
@@ -70,7 +77,7 @@ static void init_nes_core( running_machine *machine )
 			memory_install_write_bank(space, 0x6000, 0xdfff, 0, 0, "bank2");
 
 			memory_set_bankptr(machine, "bank1", &state->rom[0xe000]);
-			memory_set_bankptr(machine, "bank2", state->fds_data);
+			memory_set_bankptr(machine, "bank2", state->fds_ram);
 			break;
 		case 50:
 			memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, nes_mapper50_add_w);
@@ -496,6 +503,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		if ((magic[0] == 'N') && (magic[1] == 'E') && (magic[2] == 'S'))	/* If header starts with 'NES' it is iNES */
 		{
+			UINT32 prg_size;
+
 			state->format = 1;	// we use this to select between mapper_reset / unif_reset
 
 			mapinfo = image_extrainfo(image);
@@ -577,7 +586,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			memory_region_free(image->machine, "gfx1");
 
 			/* Allocate them again with the proper size */
-			memory_region_alloc(image->machine, "maincpu", 0x10000 + (state->prg_chunks + 1) * 0x4000, 0);
+			prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
+			memory_region_alloc(image->machine, "maincpu", 0x10000 + prg_size, 0);
 			if (state->chr_chunks)
 				memory_region_alloc(image->machine, "gfx1", state->chr_chunks * 0x2000, 0);
 
@@ -598,7 +608,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			{
 				image_fread(image, &state->rom[0x14000], 0x4000);
 				/* Mirror this bank into $8000 */
-				memcpy(&state->rom[0x10000], &state->rom [0x14000], 0x4000);
+				memcpy(&state->rom[0x10000], &state->rom[0x14000], 0x4000);
 			}
 			else
 				image_fread(image, &state->rom[0x10000], 0x4000 * state->prg_chunks);
@@ -635,6 +645,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 
 #if SPLIT_CHR
+			if (state->chr_chunks > 0)
 			{
 				FILE *chrout;
 				char outname[255];
@@ -667,7 +678,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			char magic2[4];
 			UINT8 buffer[4];
 			UINT32 chunk_length = 0, read_length = 0x20;
-			UINT32 prg_start = 0, chr_start = 0;
+			UINT32 prg_start = 0, chr_start = 0, prg_size;
 			int prg_left = 0, chr_left = 0;	// used to verify integrity of our unif image
 			char unif_mapr[32];	// here we should store MAPR chunks
 			UINT32 size = image_length(image);
@@ -732,15 +743,16 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						state->prg_chunks = unif_board->prgrom;
 						state->chr_chunks = unif_board->chrrom;
 						state->battery = unif_board->wram;	// we should implement WRAM banks...
-						//                  state->hard_mirroring = unif_board->nt;
-						//                      state->four_screen_vram = ;
+						// state->hard_mirroring = unif_board->nt;
+						// state->four_screen_vram = ;
 
 						/* Free the regions that were allocated by the ROM loader */
 						memory_region_free(image->machine, "maincpu");
 						memory_region_free(image->machine, "gfx1");
 
 						/* Allocate them again with the proper size */
-						memory_region_alloc(image->machine, "maincpu", 0x10000 + (state->prg_chunks + 1) * 0x4000, 0);
+						prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
+						memory_region_alloc(image->machine, "maincpu", 0x10000 + prg_size, 0);
 						if (state->chr_chunks)
 							memory_region_alloc(image->machine, "gfx1", state->chr_chunks * 0x2000, 0);
 
@@ -918,9 +930,43 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				}
 			} while (size > read_length);
 
-			if (!mapr_chunk_found )
+			if (!mapr_chunk_found)
 				fatalerror("UNIF should have a [MAPR] chunk to work. Check if your image has been corrupted");
 
+#if SPLIT_PRG
+			{
+				FILE *prgout;
+				char outname[255];
+				
+				sprintf(outname, "%s.prg", image_filename(image));
+				prgout = fopen(outname, "wb");
+				if (prgout)
+				{
+					fwrite(&state->rom[0x10000], 1, 0x4000 * state->prg_chunks, prgout);
+					printf("Created PRG chunk\n");
+				}
+				
+				fclose(prgout);
+			}
+#endif
+			
+#if SPLIT_CHR
+			if (state->chr_chunks > 0)
+			{
+				FILE *chrout;
+				char outname[255];
+				
+				sprintf(outname, "%s.chr", image_filename(image));
+				chrout= fopen(outname, "wb");
+				if (chrout)
+				{
+					fwrite(state->vrom, 1, 0x2000 * state->chr_chunks, chrout);
+					printf("Created CHR chunk\n");
+				}
+				fclose(chrout);
+			}
+#endif
+			
 			logerror("UNIF support is only very preliminary.\n");
 		}
 		else
@@ -944,7 +990,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		// validate the xml fields
 		if (!prg_size)
 			fatalerror("No PRG entry for this software! Please check if the xml list got corrupted");
-		if (prg_size < 0x4000)
+		if (prg_size < 0x8000)
 			fatalerror("PRG entry is too small! Please check if the xml list got corrupted");
 
 		if (chr_size)
@@ -1006,9 +1052,10 @@ static void nes_load_proc( running_device *image )
 	if (image_length(image) % 65500)
 		header = 0x10;
 
-	image_fseek(image, 0, SEEK_END);
-	state->fds_sides = (image_ftell(image) - header) / 65500;
-	state->fds_data = (UINT8*)image_malloc(image, state->fds_sides * 65500);
+	state->fds_sides = (image_length(image) - header) / 65500;
+
+	if (state->fds_data == NULL)
+		state->fds_data = (UINT8*)image_malloc(image, state->fds_sides * 65500);	// I don't think we can arrive here ever, probably it can be removed...
 
 	/* if there is an header, skip it */
 	image_fseek(image, header, SEEK_SET);
@@ -1042,6 +1089,10 @@ DRIVER_INIT( famicom )
 
 	state->fds_sides = 0;
 	state->fds_data = NULL;
+
+	state->fds_data = auto_alloc_array_clear(machine, UINT8, 65500 * 2);
+	state->fds_ram = auto_alloc_array_clear(machine, UINT8, 0x8000);
+	state_save_register_global_pointer(machine, state->fds_ram, 0x8000);
 
 	floppy_install_load_proc(floppy_get_device(machine, 0), nes_load_proc);
 	floppy_install_unload_proc(floppy_get_device(machine, 0), nes_unload_proc);
