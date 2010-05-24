@@ -1,4 +1,4 @@
-0.138.1
+﻿0.138.1
 
 New System Drivers Supported:
 -----------------------------
@@ -232,7 +232,7 @@ Imgtool Changes:
 Source Changes:
 ----------------
 
-- The core is based on MAME 0.137u4.  This incorporates all features of the
+- The core is based on MAME 0.138.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Added core support for loading images with shortnames which are recognized
