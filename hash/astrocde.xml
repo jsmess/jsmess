@@ -61,8 +61,8 @@
 		<year>1981</year>
 		<publisher>Bally Mfg. Corp.</publisher>
 		<part name="cart" interface="astrocde_cart">
-			<dataarea name="rom" size="8192">
-				<rom name="ballypin.bin" size="8192" crc="3f431613" sha1="05b680777aa9639620c790f0590d96416d49bf94" offset="0" />
+			<dataarea name="rom" size="4096">
+				<rom name="ballypin.bin" size="4096" crc="3f431613" sha1="05b680777aa9639620c790f0590d96416d49bf94" offset="0" />
 			</dataarea>
 		</part>
 	</software>
