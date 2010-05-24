@@ -531,6 +531,7 @@ static UINT8 check_keyboard_press(running_machine *machine)
 	int i,port_i,scancode;
 	UINT8 keymod = input_port_read(machine,"key_modifiers") & 0x1f;
 	UINT32 pad = input_port_read(machine,"tenkey");
+	UINT32 f_key = input_port_read(machine, "f_keys");
 	scancode = 0;
 
 	for(port_i=0;port_i<3;port_i++)
@@ -565,6 +566,17 @@ static UINT8 check_keyboard_press(running_machine *machine)
 	for(i=0;i<10;i++)
 	{
 		if((pad >> i) & 0x01)
+		{
+			return scancode;
+		}
+		scancode++;
+	}
+
+	// check function keys
+	scancode = 0x71;
+	for(i=0;i<5;i++)
+	{
+		if((f_key >> i) & 0x01)
 		{
 			return scancode;
 		}
@@ -622,7 +634,7 @@ static UINT8 get_game_key(running_machine *machine, int port)
 			if(pad & 0x00000008) ret |= 0x01;  // Tenkey 3
 			break;
 		case 2:
-			if(key1 & 0x10000000) ret |= 0x80;  // ESC
+			if(key1 & 0x08000000) ret |= 0x80;  // ESC
 			if(key2 & 0x00020000) ret |= 0x40;  // 1
 			if(pad & 0x00000400) ret |= 0x20;  // Tenkey -
 			if(pad & 0x00000800) ret |= 0x10;  // Tenkey +
@@ -1732,8 +1744,8 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x18 etb
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x19 cancel
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1a em
-	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1b sub
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(27)
+	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CHAR(27)
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1c ???
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1d fs
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1e gs
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1f us
@@ -1807,6 +1819,13 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
 
+	PORT_START("f_keys")
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF1") PORT_CODE(KEYCODE_F1)
+	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF2") PORT_CODE(KEYCODE_F2)
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF3") PORT_CODE(KEYCODE_F3)
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF4") PORT_CODE(KEYCODE_F4)
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF5") PORT_CODE(KEYCODE_F5)
+
 	PORT_START("tenkey")
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 0") PORT_CODE(KEYCODE_0_PAD)
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tenkey 1") PORT_CODE(KEYCODE_1_PAD)
@@ -1866,11 +1885,6 @@ static INPUT_PORTS_START( x1 )
 	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Down") PORT_CODE(KEYCODE_DOWN)
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("BREAK") PORT_CODE(KEYCODE_ESC)
-	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF1") PORT_CODE(KEYCODE_F1)
-	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF2") PORT_CODE(KEYCODE_F2)
-	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF3") PORT_CODE(KEYCODE_F3)
-	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF4") PORT_CODE(KEYCODE_F4)
-	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF5") PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF6") PORT_CODE(KEYCODE_F6)
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF7") PORT_CODE(KEYCODE_F7)
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("PF8") PORT_CODE(KEYCODE_F8)
@@ -2050,11 +2064,12 @@ static TIMER_CALLBACK(keyboard_callback)
 	UINT32 key2 = input_port_read(machine,"key2");
 	UINT32 key3 = input_port_read(machine,"key3");
 	UINT32 key4 = input_port_read(machine,"tenkey");
-	static UINT32 old_key1,old_key2,old_key3,old_key4;
+	UINT32 f_key = input_port_read(machine, "f_keys");
+	static UINT32 old_key1,old_key2,old_key3,old_key4,old_fkey;
 
 	if(key_irq_vector)
 	{
-		if((key1 != old_key1) || (key2 != old_key2) || (key3 != old_key3) || (key4 != old_key4))
+		if((key1 != old_key1) || (key2 != old_key2) || (key3 != old_key3) || (key4 != old_key4) || (f_key != old_fkey))
 		{
 			// generate keyboard IRQ
 			sub_io_w(space,0,0xe6);
@@ -2065,6 +2080,7 @@ static TIMER_CALLBACK(keyboard_callback)
 			old_key2 = key2;
 			old_key3 = key3;
 			old_key4 = key4;
+			old_fkey = f_key;
 		}
 	}
 }
