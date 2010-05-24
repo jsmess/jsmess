@@ -273,20 +273,20 @@ static running_device *cartslots;
 
 static void create_grom_high2k(int first, int last)
 {
-        /* Generate missing chunk of each console GROMs. Although a GROM
-           occupies 8 KiB of address space, it only has 6 KiB capacity, and
-           the last 2 KiB mirror previous content as shown above. */
-        int base;
-        for (base=(first&0xe000); base<((last+1)&0xe000); base+=0x2000)
-        {
-                int j;
-                for (j=0; j<0x800; j++)
-                {
-                        console_GROMs.data_ptr[base+0x1800+j] =
-                                  console_GROMs.data_ptr[base+0x0800+j]
-                                | console_GROMs.data_ptr[base+0x1000+j];
-                }
-        }
+	/* Generate missing chunk of each console GROMs. Although a GROM */
+	/* occupies 8 KiB of address space, it only has 6 KiB capacity, and */
+	/* the last 2 KiB mirror previous content as shown above. */
+	int base;
+	for (base=(first&0xe000); base<((last+1)&0xe000); base+=0x2000)
+	{
+		int j;
+		for (j=0; j<0x800; j++)
+		{
+			console_GROMs.data_ptr[base+0x1800+j] =
+				  console_GROMs.data_ptr[base+0x0800+j]
+				| console_GROMs.data_ptr[base+0x1000+j];
+		}
+	}
 }
 
 int ti99_is_99_8()
@@ -375,7 +375,7 @@ static const TMS9928a_interface tms9918_interface =
 
 MACHINE_START( ti99_4_60hz )
 {
-    ti99_common_init(machine, &tms9918_interface);
+	ti99_common_init(machine, &tms9918_interface);
 }
 
 static const TMS9928a_interface tms9929_interface =
@@ -388,7 +388,7 @@ static const TMS9928a_interface tms9929_interface =
 
 MACHINE_START( ti99_4_50hz )
 {
-    ti99_common_init(machine, &tms9929_interface);
+	ti99_common_init(machine, &tms9929_interface);
 }
 
 static const TMS9928a_interface tms9918a_interface =
@@ -414,7 +414,7 @@ static const TMS9928a_interface tms9929a_interface =
 
 MACHINE_START( ti99_4a_50hz )
 {
-    ti99_common_init(machine, &tms9929a_interface);
+	ti99_common_init(machine, &tms9929a_interface);
 }
 
 MACHINE_START( ti99_4ev_60hz)
@@ -428,17 +428,17 @@ void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxpar
 	if (gfxparm != 0)
 		TMS9928A_configure(gfxparm);
 
-        /* Initialize all. Actually, at this point, we don't know
-        how the switches are set. Later we use the configuration switches to
-        determine which one to use. */
+	/* Initialize all. Actually, at this point, we don't know */
+	/* how the switches are set. Later we use the configuration switches */
+	/* to determine which one to use. */
 	ti99_peb_init();
 	ti99_floppy_controllers_init_all(machine);
 	ti99_ide_init(machine);
 	ti99_hsgpl_init(machine);
 	ti99_usbsm_init(machine);
 
-	/* Find the cartslot device and cache it. This is a string search,
-    and we don't want to repeat it on each memory access. */
+	/* Find the cartslot device and cache it. This is a string search, */
+	/* and we don't want to repeat it on each memory access. */
 	cartslots = devtag_get_device(machine, "ti99_multicart");
 	assert(cartslots != NULL);
 }
@@ -485,7 +485,7 @@ MACHINE_RESET( ti99 )
 #endif
 
 	if (!has_evpc) TMS9928A_reset();
-        else v9938_reset(0);
+	else v9938_reset(0);
 
 	/* clear keyboard interface state (probably overkill, but can't harm) */
 	KeyCol = 0;
@@ -536,7 +536,7 @@ MACHINE_RESET( ti99 )
 	if (ti99_model == model_99_4p)
 		ti99_4p_internal_dsr_reset(machine);
 
-        if (has_speech)
+	if (has_speech)
 	{
 		static const spchroms_interface speech_intf = { region_speech_rom };
 
@@ -893,8 +893,8 @@ static void speech_kludge_callback(int dummy)
 {
 	if (! tms5220_readyq_r())
 	{
-		/* Weirdly enough, we are always seeing some problems even though
-        everything is working fine. */
+		/* Weirdly enough, we are always seeing some problems even */
+		/* though everything is working fine. */
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready());
 		logerror("ti99/4a speech says aaargh!\n");
 		logerror("(time to ready: %f -> %d)\n", time_to_ready, (int) ceil(3000000*time_to_ready));
@@ -911,10 +911,10 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-(54+3));		/* this is just an approx. minimum, it can be much more */
 
 	#if 1
-	/* the stupid design of the tms5220 core means that ready is cleared when
-    there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
-    case, we would need to store the value on the bus, which would be more
-    complex. */
+	/* the stupid design of the tms5220 core means that ready is cleared */
+	/* when there are 15 bytes in FIFO.  It should be 16.  Of course, if */
+	/* it were the case, we would need to store the value on the bus, */
+	/* which would be more complex. */
 	if (! tms5220_readyq_r(devtag_get_device(space->machine, "tmc0285")))
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tmc0285")));
@@ -937,20 +937,19 @@ static UINT8 GROM_dataread(offs_t offset)
 
 	if (console_GROMs.addr < 0x6000)
 	{
-		/* GROMs are buffered. Data is retrieved from a buffer,
-        while the buffer is replaced with the next cell
-        content. */
+		/* GROMs are buffered. Data is retrieved from a buffer, */
+		/* while the buffer is replaced with the next cell content. */
 		reply = console_GROMs.buf;
 
-		/* Get next value, put it in buffer. Note that the
-        GROM wraps at 8K boundaries. */
+		/* Get next value, put it in buffer. Note that the GROM */
+		/* wraps at 8K boundaries. */
 		console_GROMs.buf = console_GROMs.data_ptr[console_GROMs.addr];
 //      printf("GROM address (cons) = %04x, offset = %04x, reply = %02x\n", console_GROMs.addr, offset, reply);
 	}
 
-	/* The address pointer in the cartridge system is updated by this call.
-       We pretend to do a data read, so we mask away the address bit in the
-       offset. */
+	/* The address pointer in the cartridge system is updated by this */
+	/* call. We pretend to do a data read, so we mask away the address */
+	/* bit in the offset. */
 	replycart = ti99_cartridge_grom_r(cartslots, offset&0xfffc);
 
 	if (console_GROMs.addr >= 0x6000 || override_console)
@@ -958,10 +957,10 @@ static UINT8 GROM_dataread(offs_t offset)
 		reply = replycart;
 	}
 
-	/* Each GROM chip has its own counter, so we update all of them even
-    when we do not access them. */
-	/* The program counter wraps at each GROM chip size (8K),
-    so 0x5fff + 1 = 0x4000. */
+	/* Each GROM chip has its own counter, so we update all of them even */
+	/* when we do not access them. */
+	/* The program counter wraps at each GROM chip size (8K), */
+	/* so 0x5fff + 1 = 0x4000. */
 	console_GROMs.addr = ((console_GROMs.addr + 1) & 0x1FFF) | (console_GROMs.addr & 0xE000);
 
 	/* Reset the read and write address flipflops. */
@@ -980,25 +979,24 @@ READ16_HANDLER ( ti99_grom_r )
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4 /*20+3*/);		/* from 4 to 23? */
 	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
-	/* This implementation features a multislot cartridge system which
-    is based on multiple GROM base addresses. The standard base
-    is >9800 (slot 0). When we access the port >9804, we switch to
-    slot 1, >9808 is slot 2, ... >983C is slot 15. Although theoretically
-    we could address up to 256 banks, the TI operating system does not
-    check more than 16 banks.
-    Cartridges may also contain ROMs which need to be banked
-    simultaneously. We use the cartridge slot number to swap the ROM at
-    >6000, or RAM if available. I don't know whether this is the way
-    Texas Instruments envisaged it in the OS, but it is the only
-    plausible way to allow for GROM+ROM cartridges.
-    Note that some cartridges may have programming flaws which only
-    appear when the cartridge is used in a higher-numbered slot.
-    Parsec is one example which only runs in slot 0 as the
-    programmers hard-coded an access to GROM port 0. Note: This *may*
-    be worked around if we make sure that switching only occurs
-    when the address is set, not when data is read or written. But
-    it's not clear whether this has unwanted side effects.
-    */
+	/* This implementation features a multislot cartridge system which    */
+	/* is based on multiple GROM base addresses. The standard base        */
+	/* is >9800 (slot 0). When we access the port >9804, we switch to     */
+	/* slot 1, >9808 is slot 2, ... >983C is slot 15. Although            */
+	/* theoretically we could address up to 256 banks, the TI operating   */
+	/* system does not check more than 16 banks.                          */
+	/* Cartridges may also contain ROMs which need to be banked           */
+	/* simultaneously. We use the cartridge slot number to swap the ROM   */
+	/* at >6000, or RAM if available. I don't know whether this is the    */
+	/* way Texas Instruments envisaged it in the OS, but it is the only   */
+	/* plausible way to allow for GROM+ROM cartridges.                    */
+	/* Note that some cartridges may have programming flaws which only    */
+	/* appear when the cartridge is used in a higher-numbered slot.       */
+	/* Parsec is one example which only runs in slot 0 as the             */
+	/* programmers hard-coded an access to GROM port 0. Note: This *may*  */
+	/* be worked around if we make sure that switching only occurs        */
+	/* when the address is set, not when data is read or written. But     */
+	/* it's not clear whether this has unwanted side effects.             */
 
 	if (offset & 1)
 	{	/* Read GROM address
