@@ -18,6 +18,9 @@ public:
 
 	e01_state(running_machine &machine) { }
 
+	/* ECONET state */
+	bool network_irq_enabled;
+
 	/* devices */
 	running_device *fdc;
 };
