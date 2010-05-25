@@ -8,7 +8,7 @@ New System Drivers Supported:
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
-(none)
+- X07 [Sandro Ronco]
 
 
 
