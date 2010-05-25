@@ -5,9 +5,11 @@
 
     Japanese computer system released in 1989.
 
-    CPU:  AMD 80386SX(DX?) (80387 available as add-on?)
+    CPU:  various AMD x86 CPUs, originally 80386DX (80387 available as an add-on).
+          later models use 80386SX, 80486 and Pentium CPUs
     Sound:  Yamaha YM3438
             Ricoh RF5c68
+            CD-DA
     Video:  Custom
             16 or 256 colours from a 24-bit palette, or 15-bit high-colour
             1024 sprites (16x16), rendered direct to VRAM
@@ -1721,11 +1723,16 @@ static TIMER_CALLBACK(rtc_second)
 	}
 }
 
-static READ8_HANDLER(towns_unknown_r)
+// SCSI controller - I/O ports 0xc30 and 0xc32
+static READ8_HANDLER(towns_scsi_r)
 {
-	return 0x08;
+	logerror("scsi_r (offset %i) read\n",offset);
+	if(offset == 2)
+		return 0x08;
+	return 0x00;
 }
 
+// some unknown ports...
 static READ8_HANDLER(towns_41ff_r)
 {
 	logerror("I/O port 0x41ff read\n");
@@ -1848,8 +1855,9 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x00600000, 0x0067ffff) AM_ROM AM_REGION("user",0x000000)  // OS
   AM_RANGE(0x00680000, 0x0087ffff) AM_ROM AM_REGION("user",0x280000)  // EX ROM
   AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
+  AM_RANGE(0x00b00000, 0x00b7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
   AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
-  AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // ?? - used by ssf2
+  //AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // ?? - used by ssf2
   AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
   AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
@@ -1882,7 +1890,7 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x0480,0x0483) AM_READWRITE8(towns_sys480_r,towns_sys480_w,0x000000ff)  // R/W (0x480)
   // CD-ROM
   AM_RANGE(0x04c0,0x04cf) AM_READWRITE8(towns_cdrom_r,towns_cdrom_w,0x00ff00ff)
-  // Joystick / Mouse ports(?)
+  // Joystick / Mouse ports
   AM_RANGE(0x04d0,0x04d3) AM_READ(towns_padport_r)
   // Sound (YM3438 [FM], RF5c68 [PCM])
   AM_RANGE(0x04d4,0x04d7) AM_WRITE(towns_pad_mask_w)
@@ -1896,8 +1904,8 @@ static ADDRESS_MAP_START( towns_io , ADDRESS_SPACE_IO, 32)
   AM_RANGE(0x05e8,0x05ef) AM_READWRITE(towns_sys5e8_r, towns_sys5e8_w)
   // Keyboard (8042 MCU)
   AM_RANGE(0x0600,0x0607) AM_READWRITE8(towns_keyboard_r, towns_keyboard_w,0x00ff00ff)
-  // No idea what this is currently...
-  AM_RANGE(0x0c30,0x0c33) AM_READ8(towns_unknown_r,0x00ff0000)
+  // SCSI controller
+  AM_RANGE(0x0c30,0x0c33) AM_READ8(towns_scsi_r,0xffffffff)
   // CMOS
   AM_RANGE(0x3000,0x3fff) AM_READWRITE8(towns_cmos8_r, towns_cmos8_w,0x00ff00ff)
   // Something (MS-DOS wants this 0x41ff to be 1)
