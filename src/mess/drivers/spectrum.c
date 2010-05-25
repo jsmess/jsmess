@@ -675,6 +675,35 @@ static const cassette_config spectrum_cassette_config =
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
 };
 
+static DEVICE_IMAGE_LOAD( spectrum_cart )
+{
+	UINT32 filesize;
+
+	if (image_software_entry(image) == NULL)
+	{
+		filesize = image_length(image);
+
+		if (filesize != 0x4000 )
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
+			return INIT_FAIL;
+		}
+
+		if (image_fread(image, memory_region(image->machine, "maincpu"), filesize) != filesize)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Error loading file");
+			return INIT_FAIL;
+		}
+	}
+	else
+	{
+		filesize = image_get_software_region_length(image, "rom");
+		memcpy(memory_region(image->machine, "maincpu"), image_get_software_region(image, "rom"), filesize);
+	}
+	
+	return INIT_PASS;
+}
+
 MACHINE_DRIVER_START( spectrum_common )
 
 	MDRV_DRIVER_DATA( spectrum_state )
@@ -718,6 +747,9 @@ MACHINE_DRIVER_START( spectrum_common )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(spectrum_cart)
+	MDRV_CARTSLOT_INTERFACE("spectrum_cart")
+	MDRV_SOFTWARE_LIST_ADD("spectrum")	
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( spectrum )

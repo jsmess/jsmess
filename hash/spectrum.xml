@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="spectrum" description="ZX Spectrum cartridges">
+	<software name="cookie">
+		<description>Cookie</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="cookie.rom" size="16384" crc="7108e9a8" sha1="fa5753133daa2a6b122948adf604c12ab70e2ce9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="jetpac">
+		<description>Jet Pac</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="jetpac.rom" size="16384" crc="1d194e5b" sha1="9745d1ee713b2c6d319752aee523105905cbf562" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="pssst">
+		<description>Pssst</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pssst.rom" size="16384" crc="464cd4f6" sha1="cebafa93c110eabb4b343e7a34175d77d0fd0797" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="tranzam">
+		<description>Tranz Am</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="tranzam.rom" size="16384" crc="03da9be7" sha1="caf4441730a7032375d82edf385d5ac7f65c1dcd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
