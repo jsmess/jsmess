@@ -1,8 +1,12 @@
 /***************************************************************************
 
-        Sharp PC-E220
+    Sharp PC-E220
 
-        16/11/2009 Skeleton driver.
+    preliminary driver by Angelo Salese
+
+    Notes:
+    - checks for a "machine language" string at some point, nothing in the
+      current dump match it
 
 ****************************************************************************/
 
@@ -10,16 +14,83 @@
 #include "cpu/z80/z80.h"
 #include "devices/messram.h"
 
-static WRITE8_HANDLER( rom_bank_w)
+static UINT8 bank_num;
+static UINT16 lcd_index_row,lcd_index_col;
+
+static VIDEO_START( pce220 )
+{
+}
+
+static VIDEO_UPDATE( pce220 )
+{
+	int x, y, xi,yi;
+	int count = 0;
+//	static int test_x,test_y;
+	static UINT8 *vram = memory_region(screen->machine, "lcd_vram");
+
+	for (y = 0; y < 4; y++)
+	{
+		for (x = 0; x < 24; x++)
+		{
+			int color;
+
+			for (xi = 0; xi < 5; xi++)
+			{
+				for (yi = 0; yi < 8; yi++)
+				{
+					color = (vram[count]) >> (yi) & 1;
+
+					//if ((x + xi) <= video_screen_get_visible_area(screen)->max_x && (y + 0) < video_screen_get_visible_area(screen)->max_y)
+						*BITMAP_ADDR32(bitmap, y*8 + yi, x*5 + xi) = screen->machine->pens[color ^ 1];
+				}
+
+				count++;
+			}
+		}
+	}
+    return 0;
+}
+
+static READ8_HANDLER( lcd_status_r )
+{
+	return 0; //bit 7 lcd busy
+}
+
+static WRITE8_HANDLER( lcd_control_w )
+{
+	if((data & 0xb8) == 0xb8)
+		lcd_index_row = (data & 0x07);
+	if((data & 0x40) == 0x40)
+		lcd_index_col = (data & 0x3f);
+}
+
+static WRITE8_HANDLER( lcd_data_w )
+{
+	static UINT8 *vram = memory_region(space->machine, "lcd_vram");
+
+	vram[lcd_index_row*0x40|lcd_index_col] = data;
+
+	gfx_element_mark_dirty(space->machine->gfx[0], (lcd_index_row*0x40|lcd_index_col)/5);
+	lcd_index_col++;
+}
+
+static READ8_HANDLER( rom_bank_r )
+{
+	return bank_num;
+}
+
+static WRITE8_HANDLER( rom_bank_w )
 {
 	UINT8 bank2 = data & 0x07; // bits 0,1,2
-	UINT8 bank1 = data & 0x70; // bits 4,5,6
+	UINT8 bank1 = (data & 0x70) >> 4; // bits 4,5,6
+
+	bank_num = data;
 
 	memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, "user1") + 0x4000 * bank1);
 	memory_set_bankptr(space->machine, "bank4", memory_region(space->machine, "user1") + 0x4000 * bank2);
 }
 
-static WRITE8_HANDLER( ram_bank_w)
+static WRITE8_HANDLER( ram_bank_w )
 {
 	const address_space *space_prg = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 bank = BIT(data,2);
@@ -36,11 +107,77 @@ static ADDRESS_MAP_START(pce220_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank4")
 ADDRESS_MAP_END
 
+static READ8_HANDLER( battery_status_r )
+{
+	return 0; //if bit 0 is active, battery is low
+}
+
+/* TODO */
+static UINT8 lcd_timer;
+
+static READ8_HANDLER( timer_lcd_r )
+{
+	return mame_rand(space->machine) & 1;
+}
+
+static WRITE8_HANDLER( timer_lcd_w )
+{
+	lcd_timer = data & 1;
+}
+
+static READ8_HANDLER( port15_r )
+{
+	/*
+	x--- ---- XIN input enabled
+	---- ---0
+	*/
+	return 0;
+}
+
+static READ8_HANDLER( port18_r )
+{
+	/*
+	x--- ---- XOUT/TXD
+	---- --x- DOUT
+	---- ---x BUSY/CTS
+	*/
+	return 0;
+}
+
+static READ8_HANDLER( port1f_r )
+{
+	/*
+	x--- ---- ON - resp. break key status (?)
+	---- -x-- XIN/RXD
+	---- --x- ACK/RTS
+	---- ---x DIN
+	*/
+
+	return 0;
+}
+
 static ADDRESS_MAP_START( pce220_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x19, 0x19) AM_WRITE(rom_bank_w)
+	AM_RANGE(0x10, 0x10) AM_READNOP //key matrix r
+	AM_RANGE(0x11, 0x12) AM_WRITENOP //key matrix mux
+	AM_RANGE(0x13, 0x13) AM_READNOP //bit 0 = shift key
+	AM_RANGE(0x14, 0x14) AM_READ(timer_lcd_r) AM_WRITE(timer_lcd_w)
+	AM_RANGE(0x15, 0x15) AM_READ(port15_r) AM_WRITENOP
+	AM_RANGE(0x16, 0x16) AM_NOP // irq status / acks
+	AM_RANGE(0x17, 0x17) AM_WRITENOP // irq mask
+	AM_RANGE(0x18, 0x18) AM_READ(port18_r) AM_WRITENOP
+	AM_RANGE(0x19, 0x19) AM_READ(rom_bank_r) AM_WRITE(rom_bank_w)
+	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //cleared on BASIC init
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(ram_bank_w)
+	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //peripheral reset
+	AM_RANGE(0x1d, 0x1d) AM_READ(battery_status_r)
+	AM_RANGE(0x1e, 0x1e) AM_WRITENOP //???
+	AM_RANGE(0x1f, 0x1f) AM_READ(port1f_r) AM_WRITENOP
+	AM_RANGE(0x58, 0x58) AM_WRITE(lcd_control_w)
+	AM_RANGE(0x59, 0x59) AM_READ(lcd_status_r)
+	AM_RANGE(0x5a, 0x5a) AM_WRITE(lcd_data_w)
+
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -55,14 +192,21 @@ static MACHINE_RESET(pce220)
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0x0000);
 }
 
-static VIDEO_START( pce220 )
+static const gfx_layout test_decode =
 {
-}
+	5,7,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8 },
+	{ 7, 6, 5, 4, 3, 2, 1 },
+	5*8
+};
 
-static VIDEO_UPDATE( pce220 )
-{
-    return 0;
-}
+/* decoded for debugging purpose, this will be nuked in the end... */
+static GFXDECODE_START( pce220 )
+	GFXDECODE_ENTRY( "lcd_vram",   0x00000, test_decode,    0, 1 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( pce220 )
     /* basic machine hardware */
@@ -77,11 +221,12 @@ static MACHINE_DRIVER_START( pce220 )
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(144, 32)
-    MDRV_SCREEN_VISIBLE_AREA(0, 144-1, 0, 32-1)
+    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+    MDRV_SCREEN_SIZE(32*8, 32*8)
+    MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 32*8-1)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
+	MDRV_GFXDECODE(pce220)
 
     MDRV_VIDEO_START(pce220)
     MDRV_VIDEO_UPDATE(pce220)
@@ -108,6 +253,8 @@ ROM_START( pce220 )
 	ROMX_LOAD( "bank6_0.1.bin", 0x18000, 0x4000, CRC(e2cda7a6) SHA1(01b1796d9485fde6994cb5afbe97514b54cfbb3a),ROM_BIOS(1))
 	ROMX_LOAD( "bank7.bin",     0x1c000, 0x4000, CRC(5e98b5b6) SHA1(f22d74d6a24f5929efaf2983caabd33859232a94),ROM_BIOS(2))
 	ROMX_LOAD( "bank7_0.1.bin", 0x1c000, 0x4000, CRC(d8e821b2) SHA1(18245a75529d2f496cdbdc28cdf40def157b20c0),ROM_BIOS(1))
+
+	ROM_REGION( 0x1000, "lcd_vram", ROMREGION_ERASE00)
 ROM_END
 
 /* Driver */
