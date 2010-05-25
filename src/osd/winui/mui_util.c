@@ -582,6 +582,15 @@ BOOL SafeIsAppThemed(void)
 }
 
 
+void GetSystemErrorMessage(DWORD dwErrorId, TCHAR **tErrorMessage)
+{
+	if( FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM, NULL, dwErrorId, 0, (LPTSTR)tErrorMessage, 0, NULL) == 0 )
+	{
+		*tErrorMessage = (LPTSTR)LocalAlloc(LPTR, MAX_PATH * sizeof(TCHAR));
+		_tcscpy(*tErrorMessage, TEXT("Unknown Error"));
+	}
+}
+
 
 //============================================================
 //  win_extract_icon_utf8
@@ -694,3 +703,4 @@ HANDLE win_find_first_file_utf8(const char* filename, LPWIN32_FIND_DATA findfile
 	
 	return result;
 }
+

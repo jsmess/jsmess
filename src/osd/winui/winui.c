@@ -5108,14 +5108,33 @@ static void ReloadIcons(void)
 
 static DWORD GetShellLargeIconSize(void)
 {
-	DWORD  dwSize, dwLength = 512, dwType = REG_SZ;
+	DWORD  dwSize = 32, dwLength = 512, dwType = REG_SZ;
 	TCHAR  szBuffer[512];
 	HKEY   hKey;
+	LONG   lRes;
+	LPTSTR tErrorMessage = NULL;
 
 	/* Get the Key */
-	RegOpenKey(HKEY_CURRENT_USER, TEXT("Control Panel\\desktop\\WindowMetrics"), &hKey);
+	lRes = RegOpenKey(HKEY_CURRENT_USER, TEXT("Controlanel\\Desktop\\WindowMetrics"), &hKey);
+	if( lRes != ERROR_SUCCESS )
+	{
+		GetSystemErrorMessage(lRes, &tErrorMessage);
+		MessageBox(GetMainWindow(), tErrorMessage, TEXT("Large shell icon size registry access"), MB_OK | MB_ICONERROR);
+		LocalFree(tErrorMessage);
+		return dwSize;
+	}
+
 	/* Save the last size */
-	RegQueryValueEx(hKey, TEXT("Shell Icon Size"), NULL, &dwType, (LPBYTE)szBuffer, &dwLength);
+	lRes = RegQueryValueEx(hKey, TEXT("Shell Icon Size"), NULL, &dwType, (LPBYTE)szBuffer, &dwLength);
+	if( lRes != ERROR_SUCCESS )
+	{
+		GetSystemErrorMessage(lRes, &tErrorMessage);
+		MessageBox(GetMainWindow(), tErrorMessage, TEXT("Large shell icon size registry query"), MB_OK | MB_ICONERROR);
+		LocalFree(tErrorMessage);
+		RegCloseKey(hKey);
+		return dwSize;
+	}
+
 	dwSize = _ttol(szBuffer);
 	if (dwSize < 32)
 		dwSize = 32;
@@ -5149,6 +5168,7 @@ static DWORD GetShellSmallIconSize(void)
 // create iconlist for Listview control
 static void CreateIcons(void)
 {
+	DWORD dwSmallIconSize = GetShellSmallIconSize();
 	DWORD dwLargeIconSize = GetShellLargeIconSize();
 	HICON hIcon;
 	int icon_count;
@@ -5175,13 +5195,19 @@ static void CreateIcons(void)
 	dwStyle = GetWindowLong(hwndList,GWL_STYLE);
 	SetWindowLong(hwndList,GWL_STYLE,(dwStyle & ~LVS_TYPEMASK) | LVS_ICON);
 
-	hSmall = ImageList_Create(GetShellSmallIconSize(),GetShellSmallIconSize(),
+	hSmall = ImageList_Create(dwSmallIconSize, dwSmallIconSize,
 							  ILC_COLORDDB | ILC_MASK, icon_count, icon_count + grow);
+
+	if (NULL == hSmall) {
+		win_message_box_utf8(hwndList, "Cannot allocate small icon image list", "Allocation error - Exiting", IDOK);
+		PostQuitMessage(0);
+	}
+	
 	hLarge = ImageList_Create(dwLargeIconSize, dwLargeIconSize,
 							  ILC_COLORDDB | ILC_MASK, icon_count, icon_count + grow);
 
-	if (NULL == hSmall || NULL == hLarge) {
-		win_message_box_utf8(hwndList, "Cannot allocate Icon lists", "Allocation error - Exiting", IDOK);
+	if (NULL == hLarge) {
+		win_message_box_utf8(hwndList, "Cannot allocate large icon image list", "Allocation error - Exiting", IDOK);
 		PostQuitMessage(0);
 	}
 

@@ -63,6 +63,10 @@ BOOL StringIsSuffixedBy(const char *s, const char *suffix);
 
 BOOL SafeIsAppThemed(void);
 
+// provides result of FormatMessage()
+// resulting buffer must be free'd with LocalFree()
+void GetSystemErrorMessage(DWORD dwErrorId, TCHAR **tErrorMessage);
+
 HICON win_extract_icon_utf8(HINSTANCE inst, const char* exefilename, UINT iconindex);
 TCHAR* win_tstring_strdup(LPCTSTR str);
 HANDLE win_create_file_utf8(const char* filename, DWORD desiredmode, DWORD sharemode, 
