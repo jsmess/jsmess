@@ -5115,7 +5115,7 @@ static DWORD GetShellLargeIconSize(void)
 	LPTSTR tErrorMessage = NULL;
 
 	/* Get the Key */
-	lRes = RegOpenKey(HKEY_CURRENT_USER, TEXT("Controlanel\\Desktop\\WindowMetrics"), &hKey);
+	lRes = RegOpenKey(HKEY_CURRENT_USER, TEXT("Control Panel\\Desktop\\WindowMetrics"), &hKey);
 	if( lRes != ERROR_SUCCESS )
 	{
 		GetSystemErrorMessage(lRes, &tErrorMessage);
