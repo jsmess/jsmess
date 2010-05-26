@@ -18,8 +18,15 @@ public:
 
 	e01_state(running_machine &machine) { }
 
-	/* ECONET state */
-	bool network_irq_enabled;
+	/* interrupt state */
+	int adlc_ie;
+	int hdc_ie;
+
+	int rtc_irq;
+	int via_irq;
+	int hdc_irq;
+	int fdc_drq;
+	int adlc_irq;
 
 	/* devices */
 	running_device *fdc;

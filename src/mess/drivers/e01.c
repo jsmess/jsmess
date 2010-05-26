@@ -37,10 +37,11 @@
 
 	TODO:
 
-	- front flap status
-	- artwork
 	- RTC interrupts (rewrite mc146818)
-	- ECONET
+	- ADLC interrupts
+	- ECONET device
+	- printer
+	- artwork
 	- hard disk
 
 */
@@ -58,28 +59,50 @@
 #include "e01.lh"
 
 /***************************************************************************
-    READ/WRITE HANDLERS
+    INTERRUPT HANDLING
 ***************************************************************************/
 
-static READ8_HANDLER( rtc_address_r )
+/*-------------------------------------------------
+    update_interrupts - update interrupt state
+-------------------------------------------------*/
+
+static void update_interrupts(running_machine *machine)
 {
-	return mc146818_port_r(space, 0);
+	e01_state *state = (e01_state *)machine->driver_data;
+
+	cputag_set_input_line(machine, R65C102_TAG, INPUT_LINE_IRQ0, (state->via_irq || (state->hdc_ie & state->hdc_irq) || state->rtc_irq) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, R65C102_TAG, INPUT_LINE_NMI, (state->fdc_drq || (state->adlc_ie & state->adlc_irq)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_HANDLER( rtc_address_w )
+/*-------------------------------------------------
+     network_irq_enable - network interrupt enable
+-------------------------------------------------*/
+
+static void network_irq_enable(running_machine *machine, int enabled)
 {
-	mc146818_port_w(space, 0, data);
+	e01_state *state = (e01_state *)machine->driver_data;
+
+	state->adlc_ie = enabled;
+
+	update_interrupts(machine);
 }
 
-static READ8_HANDLER( rtc_data_r )
+/*-------------------------------------------------
+     hdc_irq_enable - hard disk interrupt enable
+-------------------------------------------------*/
+
+static void hdc_irq_enable(running_machine *machine, int enabled)
 {
-	return mc146818_port_r(space, 1);
+	e01_state *state = (e01_state *)machine->driver_data;
+
+	state->hdc_ie = enabled;
+
+	update_interrupts(machine);
 }
 
-static WRITE8_HANDLER( rtc_data_w )
-{
-	mc146818_port_w(space, 1, data);
-}
+/***************************************************************************
+    READ/WRITE HANDLERS
+***************************************************************************/
 
 /*-------------------------------------------------
      eprom_r - ROM/RAM select read
@@ -147,35 +170,50 @@ static WRITE8_DEVICE_HANDLER( floppy_w )
 
 static READ8_HANDLER( network_irq_disable_r )
 {
-	e01_state *state = (e01_state *)space->machine->driver_data;
-
-	state->network_irq_enabled = false;
+	network_irq_enable(space->machine, 0);
 
 	return 0;
 }
 
 static WRITE8_HANDLER( network_irq_disable_w )
 {
-	e01_state *state = (e01_state *)space->machine->driver_data;
-
-	state->network_irq_enabled = false;
+	network_irq_enable(space->machine, 0);
 }
 
 static READ8_HANDLER( network_irq_enable_r )
 {
-	e01_state *state = (e01_state *)space->machine->driver_data;
-
-	state->network_irq_enabled = true;
+	network_irq_enable(space->machine, 1);
 
 	return 0;
 }
 
 static WRITE8_HANDLER( network_irq_enable_w )
 {
-	e01_state *state = (e01_state *)space->machine->driver_data;
+	network_irq_enable(space->machine, 1);
+}
 
-	state->network_irq_enabled = true;
+static WRITE8_HANDLER( hdc_irq_enable_w )
+{
+	hdc_irq_enable(space->machine, BIT(data, 0));
+}
 
+static READ8_HANDLER( rtc_address_r )
+{
+	return mc146818_port_r(space, 0);
+}
+
+static WRITE8_HANDLER( rtc_address_w )
+{
+	mc146818_port_w(space, 0, data);
+}
+
+static READ8_HANDLER( rtc_data_r )
+{
+	return mc146818_port_r(space, 1);
+}
+
+static WRITE8_HANDLER( rtc_data_w )
+{
 	mc146818_port_w(space, 1, data);
 }
 
@@ -197,11 +235,11 @@ static ADDRESS_MAP_START( e01_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc20, 0xfc23) AM_MIRROR(0x00c0) AM_DEVREADWRITE(MC6854_TAG, mc6854_r, mc6854_w)
 	AM_RANGE(0xfc24, 0xfc24) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_disable_r, network_irq_disable_w)
 	AM_RANGE(0xfc28, 0xfc28) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_enable_r, network_irq_enable_w)
-//	AM_RANGE(0xfc2c, 0xfc2c) AM_MIRROR(0x00c3) front flap status, SW3
+	AM_RANGE(0xfc2c, 0xfc2c) AM_MIRROR(0x00c3) AM_READ_PORT("FLAP")
 //	AM_RANGE(0xfc30, 0xfc30) AM_MIRROR(0x00c0) HD data
 //	AM_RANGE(0xfc31, 0xfc31) AM_MIRROR(0x00c0) HD status
 //	AM_RANGE(0xfc32, 0xfc32) AM_MIRROR(0x00c0) HD select
-//	AM_RANGE(0xfc33, 0xfc33) AM_MIRROR(0x00c0) HD interrupt enable
+	AM_RANGE(0xfc33, 0xfc33) AM_MIRROR(0x00c0) AM_WRITE(hdc_irq_enable_w)
 	AM_RANGE(0xfd00, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
 ADDRESS_MAP_END
 
@@ -214,12 +252,33 @@ ADDRESS_MAP_END
 -------------------------------------------------*/
 
 static INPUT_PORTS_START( e01 )
+	PORT_START("FLAP")
+	PORT_BIT( 0x3f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_CONFNAME( 0x40, 0x00, "Front Flap")
+	PORT_CONFSETTING( 0x00, "Closed" )
+	PORT_CONFSETTING( 0x40, "Open" )
+	PORT_DIPNAME( 0x80, 0x00, "SW3")
+	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /***************************************************************************
     DEVICE CONFIGURATION
 ***************************************************************************/
 
+/*-------------------------------------------------
+    mc6854_interface adlc_intf
+-------------------------------------------------*/
+/*
+static WRITE_LINE_DEVICE_HANDLER( adlc_irq_w )
+{
+	e01_state *driver_state = (e01_state *)device->machine->driver_data;
+
+	driver_state->adlc_irq = state;
+
+	update_interrupts(device->machine);
+}
+*/
 static const mc6854_interface adlc_intf = 
 {
 	NULL,
@@ -231,6 +290,15 @@ static const mc6854_interface adlc_intf =
 /*-------------------------------------------------
     via6522_interface via_intf
 -------------------------------------------------*/
+
+static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
+{
+	e01_state *driver_state = (e01_state *)device->machine->driver_data;
+
+	driver_state->via_irq = state;
+
+	update_interrupts(device->machine);
+}
 
 static const via6522_interface via_intf =
 {
@@ -246,7 +314,7 @@ static const via6522_interface via_intf =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_LINE(via_irq_w)
 };
 
 /*-------------------------------------------------
@@ -269,11 +337,20 @@ static const floppy_config e01_floppy_config =
     wd17xx_interface fdc_intf
 -------------------------------------------------*/
 
+static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
+{
+	e01_state *driver_state = (e01_state *)device->machine->driver_data;
+
+	driver_state->fdc_drq = state;
+
+	update_interrupts(device->machine);
+}
+
 static const wd17xx_interface fdc_intf =
 {
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_NULL,
+	DEVCB_LINE( fdc_drq_w ),
 	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
 };
 
@@ -311,7 +388,13 @@ static MACHINE_START( e01 )
 	mc146818_init(machine, MC146818_STANDARD);
 
 	/* register for state saving */
-	state_save_register_global(machine, state->network_irq_enabled);
+	state_save_register_global(machine, state->adlc_ie);
+	state_save_register_global(machine, state->hdc_ie);
+	state_save_register_global(machine, state->rtc_irq);
+	state_save_register_global(machine, state->via_irq);
+	state_save_register_global(machine, state->hdc_irq);
+	state_save_register_global(machine, state->fdc_drq);
+	state_save_register_global(machine, state->adlc_irq);
 }
 
 /*-------------------------------------------------
@@ -322,6 +405,13 @@ static MACHINE_RESET( e01 )
 {
 	memory_set_bank(machine, "bank1", 1);
 	memory_set_bank(machine, "bank3", 1);
+}
+
+static int irq;
+static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
+{
+	cputag_set_input_line(timer->machine, R65C102_TAG, INPUT_LINE_IRQ0, irq ? CLEAR_LINE : ASSERT_LINE);
+	irq = !irq;
 }
 
 /***************************************************************************
@@ -343,6 +433,8 @@ static MACHINE_DRIVER_START( e01 )
     MDRV_MACHINE_RESET(e01)
 
 	MDRV_NVRAM_HANDLER(mc146818)
+
+	MDRV_TIMER_ADD_PERIODIC("rtc", rtc_irq_hack, HZ(2)) // HACK!
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT( layout_e01 )
