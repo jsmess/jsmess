@@ -729,13 +729,103 @@ static MACHINE_START( atomeb )
     MACHINE DRIVERS
 ***************************************************************************/
 
+struct atom_cart_range
+{
+	const char *tag;
+	int offset;
+	const char *region;
+};
+
+static const struct atom_cart_range atom_cart_table[] =
+{
+	{ "cart", 0x0000, "a000" },
+	{ "a0",   0x0000, "a000" },
+	{ "a1",   0x1000, "a000" },
+	{ "a2",   0x2000, "a000" },
+	{ "a3",   0x3000, "a000" },
+	{ "a4",   0x4000, "a000" },
+	{ "a5",   0x5000, "a000" },
+	{ "a6",   0x6000, "a000" },
+	{ "a7",   0x7000, "a000" },
+	{ "a8",   0x8000, "a000" },
+	{ "a9",   0x9000, "a000" },
+	{ "aa",   0xa000, "a000" },
+	{ "ab",   0xb000, "a000" },
+	{ "ac",   0xc000, "a000" },
+	{ "ad",   0xd000, "a000" },
+	{ "ae",   0xe000, "a000" },
+	{ "af",   0xf000, "a000" },
+	{ "e0",   0x0000, "e000" },
+	{ "e1",   0x1000, "e000" },
+	{ 0 }
+};
+
+static DEVICE_IMAGE_LOAD( atom_cart )
+{
+	UINT32 size;
+	UINT8 *temp_copy;
+	int mirror, i;
+	const struct atom_cart_range *atom_cart = &atom_cart_table[0], *this_cart;
+	
+	/* First, determine where this cart has to be loaded */
+	while (atom_cart->tag)
+	{
+		if (strcmp(atom_cart->tag, image->tag()) == 0)
+			break;
+		
+		atom_cart++;
+	}
+	
+	this_cart = atom_cart;
+		
+	if (image_software_entry(image) == NULL)
+	{
+		size = image_length(image);
+		temp_copy = auto_alloc_array(image->machine, UINT8, size);
+		
+		if (size > 0x1000)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			auto_free(image->machine, temp_copy);
+			return INIT_FAIL;
+		}
+		
+		if (image_fread(image, temp_copy, size) != size)
+		{
+			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			auto_free(image->machine, temp_copy);
+			return INIT_FAIL;
+		}
+	}
+	else
+	{
+		size = image_get_software_region_length(image, "rom");
+		temp_copy = auto_alloc_array(image->machine, UINT8, size);
+		memcpy(temp_copy, image_get_software_region(image, "rom"), size);
+	}
+	
+	mirror = 0x1000 / size;
+	
+	/* With the following, we mirror the cart in the whole memory region */
+	for (i = 0; i < mirror; i++)
+		memcpy(memory_region(image->machine, this_cart->region) + this_cart->offset + i * size, temp_copy, size);
+	
+	auto_free(image->machine, temp_copy);
+	
+	return INIT_PASS;
+}
+
+
 /*-------------------------------------------------
     MACHINE_DRIVER( atom )
 -------------------------------------------------*/
 
 #define MDRV_ATOM_CARTSLOT_ADD(_tag) \
 	MDRV_CARTSLOT_ADD(_tag) \
-	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom") \
+	MDRV_CARTSLOT_INTERFACE("atom_cart") \
+	MDRV_CARTSLOT_LOAD(atom_cart)
+
 
 static MACHINE_DRIVER_START( atom )
 	MDRV_DRIVER_DATA(atom_state)
@@ -780,6 +870,9 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("2K")
 	MDRV_RAM_EXTRA_OPTIONS("4K,6K,8K,10K,12K")
+
+	/* Software lists */
+	MDRV_SOFTWARE_LIST_ADD("atom")
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------
@@ -794,6 +887,7 @@ static MACHINE_DRIVER_START( atomeb )
 	MDRV_MACHINE_START(atomeb)
 
 	/* cartridges */
+	MDRV_DEVICE_REMOVE("cart")
 	MDRV_ATOM_CARTSLOT_ADD("a0")
 	MDRV_ATOM_CARTSLOT_ADD("a1")
 	MDRV_ATOM_CARTSLOT_ADD("a2")
@@ -805,7 +899,7 @@ static MACHINE_DRIVER_START( atomeb )
 	MDRV_ATOM_CARTSLOT_ADD("a8")
 	MDRV_ATOM_CARTSLOT_ADD("a9")
 	MDRV_ATOM_CARTSLOT_ADD("aa")
-	MDRV_ATOM_CARTSLOT_ADD("an")
+	MDRV_ATOM_CARTSLOT_ADD("ab")
 	MDRV_ATOM_CARTSLOT_ADD("ac")
 	MDRV_ATOM_CARTSLOT_ADD("ad")
 	MDRV_ATOM_CARTSLOT_ADD("ae")
@@ -830,8 +924,7 @@ ROM_START( atom )
 	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
 
-	ROM_REGION( 0x1000, "a000", 0 )
-	ROM_CART_LOAD( "cart", 0x0000, 0x1000, ROM_MIRROR )
+	ROM_REGION( 0x1000, "a000", ROMREGION_ERASEFF )
 ROM_END
 
 /*-------------------------------------------------
@@ -845,27 +938,9 @@ ROM_START( atomeb )
 	ROM_LOAD( "afloat.ic21", 0x1000, 0x1000, CRC(81d86af7) SHA1(ebcde5b36cb3a3344567cbba4c7b9fde015f4802) )
 	ROM_LOAD( "dosrom.u15",  0x2000, 0x1000, CRC(c431a9b7) SHA1(71ea0a4b8d9c3caf9718fc7cc279f4306a23b39c) )
 
-	ROM_REGION( 0x10000, "a000", 0 )
-	ROM_CART_LOAD( "a0", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a1", 0x1000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a2", 0x2000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a3", 0x3000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a4", 0x4000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a5", 0x5000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a6", 0x6000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a7", 0x7000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a8", 0x8000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "a9", 0x9000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "aa", 0xa000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "ab", 0xb000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "ac", 0xc000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "ad", 0xd000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "ae", 0xe000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "af", 0xf000, 0x1000, ROM_MIRROR )
+	ROM_REGION( 0x10000, "a000", ROMREGION_ERASEFF )
 
-	ROM_REGION( 0x2000, "e000", 0)
-	ROM_CART_LOAD( "e0", 0x0000, 0x1000, ROM_MIRROR )
-	ROM_CART_LOAD( "e1", 0x1000, 0x1000, ROM_MIRROR )
+	ROM_REGION( 0x2000, "e000", ROMREGION_ERASEFF )
 ROM_END
 
 /***************************************************************************
