@@ -290,11 +290,11 @@ static void t6834_cmd (running_machine *machine, UINT8 cmd)
 		p2 = state->in_data[state->in_pos++];
 		p3 = state->in_data[state->in_pos++];
 
-		for(int x = 0, y = p3; x <= sqrt((p3 * p3) / 2) ; x++)
+		for(int x = 0, y = p3; x <= sqrt((double)(p3 * p3) / 2) ; x++)
 		{
 			UINT32 d1 = (x * x + y * y) - p3 * p3;
 			UINT32 d2 = (x * x + (y - 1) * (y - 1)) - p3 * p3;
-			if(abs(d1) > abs(d2))
+			if(abs((double)d1) > abs((double)d2))
 				y--;
 			draw_point(machine, x + p1, y + p2, 0x01);
 			draw_point(machine, x + p1, -y + p2, 0x01);
