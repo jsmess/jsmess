@@ -56,7 +56,7 @@
   <software name="afuk">
     <description>A&amp;F Utility Kit</description>
     <year>198?</year>
-    <publisher></publisher>
+    <publisher>&lt;unknown&gt;</publisher>
     <part name="cart" interface="atom_cart">
       <dataarea name="rom" size="4096">
         <rom name="utilikit.rom" size="4096" crc="013b8f93" sha1="b4341f116a6d1e0cbcd39d64e0b5d14a90dc0356" offset="0" />
@@ -89,7 +89,7 @@
   <software name="mousebox">
     <description>Mouse-Dos Box v1.01</description>
     <year>198?</year>
-    <publisher></publisher>
+    <publisher>&lt;unknown&gt;</publisher>
     <part name="cart" interface="atom_cart">
       <dataarea name="rom" size="4096">
         <rom name="mousebox.rom" size="4096" crc="0dff30e4" sha1="b7c0b9c23fcc5cfdc06cb2d2a9e7c2658e248ef7" offset="0" />
@@ -100,7 +100,7 @@
   <software name="windows">
     <description>Atomic Windows v1.0</description>
     <year>198?</year>
-    <publisher></publisher>
+    <publisher>&lt;unknown&gt;</publisher>
     <part name="cart" interface="atom_cart">
       <dataarea name="rom" size="4096">
         <rom name="atomicw.rom" size="4096" crc="a3fd737d" sha1="d418d9322c69c49106ed2c268ad0864c0f2c4c1b" offset="0" />
@@ -111,7 +111,7 @@
   <software name="toolkit">
     <description>Programmer's Toolkit</description>
     <year>198?</year>
-    <publisher></publisher>
+    <publisher>&lt;unknown&gt;</publisher>
     <part name="cart" interface="atom_cart">
       <dataarea name="rom" size="4096">
         <rom name="toolkit.rom" size="4096" crc="9661561c" sha1="faa0394232caf7626499c9bc57c6af36017fe852" offset="0" />
