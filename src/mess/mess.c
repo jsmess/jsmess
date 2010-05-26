@@ -30,23 +30,6 @@ const char mess_disclaimer[] =
 		"with these files is a violation of copyright law and should be promptly\n"
 		"reported to the authors so that appropriate legal action can be taken.\n\n";
 
-static char *filename_basename(char *filename)
-{
-	char *c;
-
-	// NULL begets NULL
-	if (!filename)
-		return NULL;
-
-	// start at the end and return when we hit a slash or colon
-	for (c = filename + strlen(filename) - 1; c >= filename; c--)
-		if (*c == '\\' || *c == '/' || *c == ':')
-			return c + 1;
-
-	// otherwise, return the whole thing
-	return filename;
-}
-
 /*-------------------------------------------------
     mess_predevice_init - initialize devices for a specific
     running_machine
@@ -88,7 +71,7 @@ void mess_predevice_init(running_machine *machine)
 				{
 					/* retrieve image error message */
 					const char *image_err = image_error(image);
-					char *image_basename = auto_strdup(machine, filename_basename((char *)image_name));
+					char *image_basename = auto_strdup(machine, filename_basename(image_name));
 
 					/* unload all images */
 					image_unload_all(machine);

@@ -200,4 +200,6 @@ void specify_extension(char *buffer, size_t buffer_len, const char *extension);
 /* validity checks */
 int utils_validitychecks(void);
 
+const char *filename_basename(const char *filename);
+
 #endif /* UTILS_H */

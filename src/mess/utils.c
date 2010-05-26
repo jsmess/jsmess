@@ -364,3 +364,24 @@ int utils_validitychecks(void)
 
 	return error;
 }
+
+//============================================================
+//  filename_basename
+//============================================================
+
+const char *filename_basename(const char *filename)
+{
+	const char *c;
+
+	// NULL begets NULL
+	if (!filename)
+		return NULL;
+
+	// start at the end and return when we hit a slash or colon
+	for (c = filename + strlen(filename) - 1; c >= filename; c--)
+		if (*c == '\\' || *c == '/' || *c == ':')
+			return c + 1;
+
+	// otherwise, return the whole thing
+	return filename;
+}
