@@ -42,7 +42,6 @@
 #define ID_DEVICES                      3138
 #define ID_HELP_ABOUT_NEWUI             3139
 #define ID_HELP_ABOUTSYSTEM             3140
-#define IDD_TAPEDIALOG                  3500
 #define IDI_ICON_CART                   3200
 #define IDI_ICON_HARD                   3201
 #define IDI_ICON_CASS                   3202
@@ -51,12 +50,6 @@
 #define IDI_ICON_SERL                   3205
 #define IDI_ICON_SNAP                   3206
 #define IDR_RUNTIME_MENU                3300
-#define IDC_SLIDER                      3300
-#define IDC_PLAY_NEWUI                  3301
-#define IDC_STOP                        3302
-#define IDC_PAUSE                       3303
-#define IDC_CAPTION                     3304
-#define IDC_STATUS                      3305
 
 // Next default values for new objects
 //

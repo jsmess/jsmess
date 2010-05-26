@@ -125,29 +125,6 @@ END
 #endif    // APSTUDIO_INVOKED
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-#ifndef UNDER_CE
-IDD_TAPEDIALOG DIALOGEX 0, 0, 172, 65
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION |
-    WS_SYSMENU
-CAPTION "Tape Control"
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    CONTROL         "",IDC_SLIDER,"msctls_trackbar32",TBS_BOTH |
-                    TBS_NOTICKS | WS_TABSTOP,6,24,162,15
-    PUSHBUTTON      "Play",IDC_PLAY_NEWUI,6,41,35,17
-    PUSHBUTTON      "Stop",IDC_STOP,72,41,35,17
-    PUSHBUTTON      "Pause",IDC_PAUSE,132,41,35,17
-    LTEXT           "",IDC_CAPTION,12,6,102,12
-    LTEXT           "",IDC_STATUS,126,6,42,12
-END
-#endif
-
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
