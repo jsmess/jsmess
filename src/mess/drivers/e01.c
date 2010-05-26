@@ -267,6 +267,28 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 /*-------------------------------------------------
+    MC146818_INTERFACE( rtc_intf )
+-------------------------------------------------*/
+/*
+static WRITE_LINE_DEVICE_HANDLER( rtc_irq_w )
+{
+	e01_state *driver_state = (e01_state *)device->machine->driver_data;
+
+	driver_state->rtc_irq = state;
+
+	update_interrupts(device->machine);
+}
+*/
+static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
+{
+	e01_state *state = (e01_state *)timer->machine->driver_data;
+
+	state->rtc_irq = !state->rtc_irq;
+
+	update_interrupts(timer->machine);
+}
+
+/*-------------------------------------------------
     mc6854_interface adlc_intf
 -------------------------------------------------*/
 /*
@@ -405,13 +427,6 @@ static MACHINE_RESET( e01 )
 {
 	memory_set_bank(machine, "bank1", 1);
 	memory_set_bank(machine, "bank3", 1);
-}
-
-static int irq;
-static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
-{
-	cputag_set_input_line(timer->machine, R65C102_TAG, INPUT_LINE_IRQ0, irq ? CLEAR_LINE : ASSERT_LINE);
-	irq = !irq;
 }
 
 /***************************************************************************
