@@ -17464,7 +17464,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="meet the robinsons (usa).bin" size="8388608" crc="3787c93c" sha1="d3754a54ab51c85caedc639a1084814970574963" offset="000000" />
+				<rom name="meet the robinsons (usa).bin" size="8388608" crc="3787c93c" sha1="58ad2756f1985430e1ef605bdcba82564099a030" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -20522,7 +20522,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="petz vet (usa).bin" size="8388608" crc="1dbf4d3d" sha1="5c4d99f9d8589a2d49bfb01c77395fb4ffb1eb5c" offset="000000" />
+				<rom name="petz vet (usa).bin" size="8388608" crc="1dbf4d3d" sha1="9755a6eaf65d10131e591c4c75b9c77554cd1dad" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
