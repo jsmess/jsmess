@@ -2011,7 +2011,7 @@ GAME( 1980, centtime, centiped, centiped, centtime, 0,        ROT270, "Atari",  
 GAME( 1980, centipdb, centiped, centipdb, centiped, 0,        ROT270, "bootleg", "Centipede (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1980, centipdd, centiped, centiped, centiped, 0,        ROT270, "hack",    "Centipede Dux (hack)", GAME_SUPPORTS_SAVE )
 GAME( 1980, caterplr, centiped, caterplr, caterplr, caterplr, ROT270, "bootleg", "Caterpillar", GAME_SUPPORTS_SAVE )
-GAME( 1980, millpac,  centiped, centipdb, centiped, 0,        ROT270, "Valadon Automation", "Millpac", GAME_SUPPORTS_SAVE )
+GAME( 1980, millpac,  centiped, centipdb, centiped, 0,        ROT270, "bootleg? (Valadon Automation)", "Millpac", GAME_SUPPORTS_SAVE )
 GAME( 1980, magworm,  centiped, magworm,  magworm,  magworm,  ROT270, "bootleg", "Magic Worm (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1982, milliped, 0,        milliped, milliped, 0,        ROT270, "Atari",   "Millipede", GAME_SUPPORTS_SAVE )
 GAME( 1982, millipdd, milliped, milliped, milliped, 0,        ROT270, "hack",    "Millipede Dux (hack)", GAME_SUPPORTS_SAVE )
@@ -2019,4 +2019,4 @@ GAME( 1982, millipdd, milliped, milliped, milliped, 0,        ROT270, "hack",   
 GAME( 1980, warlords, 0,        warlords, warlords, 0,        ROT0,   "Atari",   "Warlords", GAME_SUPPORTS_SAVE )
 GAME( 1981, mazeinv,  0,        mazeinv,  mazeinv,  0,        ROT270, "Atari",   "Maze Invaders (prototype)", 0 )
 
-GAME( 1985, bullsdrt, 0,        bullsdrt, bullsdrt, bullsdrt, ROT270, "Shinkai Inc. (Magic Eletronics Inc. licence)", "Bulls Eye Darts", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1985, bullsdrt, 0,        bullsdrt, bullsdrt, bullsdrt, ROT270, "Shinkai Inc. (Magic Eletronics Inc. license)", "Bulls Eye Darts", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )

@@ -110,7 +110,7 @@ Stephh's additional notes (based on the games M68000 code and some tests) :
     undumped ! Set the SBASEBAL_HACK to 1 and you'll notice the following
     differences :
 
-      * different manufacturer (no more SNK licence)
+      * different manufacturer (no more SNK license)
       * different coinage (check code at 0x00035c) and additional COIN2
       * different game time (check code at 0x001d20)
       * different table for "Unknown" Dip Switch
@@ -3396,15 +3396,15 @@ static DRIVER_INIT( tnextspc )
 /******************************************************************************/
 
 GAME( 1986, sstingry,  0,        sstingry,       sstingry, sstingry, ROT90, "Alpha Denshi Co.",   "Super Stingray", GAME_SUPPORTS_SAVE )
-GAME( 1987, kyros,     0,        kyros,          kyros,    kyros,    ROT90, "World Games Inc",    "Kyros", GAME_SUPPORTS_SAVE )
+GAME( 1987, kyros,     0,        kyros,          kyros,    kyros,    ROT90, "Alpha Denshi Co. (World Games Inc. license)", "Kyros", GAME_SUPPORTS_SAVE )
 GAME( 1986, kyrosj,    kyros,    kyros,          kyros,    kyros,    ROT90, "Alpha Denshi Co.",   "Kyros No Yakata (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, jongbou,   0,        jongbou,        jongbou,  jongbou,  ROT90, "SNK",                "Mahjong Block Jongbou (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1988, paddlema,  0,        alpha68k_I,     paddlema, paddlema, ROT90, "SNK",                "Paddle Mania", GAME_SUPPORTS_SAVE )
-GAME( 1987, timesold,  0,        alpha68k_II,    timesold, timesold, ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 3)", GAME_SUPPORTS_SAVE )
-GAME( 1987, timesold1, timesold, alpha68k_II,    timesold, timesold1,ROT90, "[Alpha Denshi Co.] (SNK/Romstar license)", "Time Soldiers (US Rev 1)", GAME_SUPPORTS_SAVE )
-GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield, btlfield, ROT90, "[Alpha Denshi Co.] (SNK license)", "Battle Field (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1987, timesold,  0,        alpha68k_II,    timesold, timesold, ROT90, "Alpha Denshi Co. (SNK/Romstar license)", "Time Soldiers (US Rev 3)", GAME_SUPPORTS_SAVE )
+GAME( 1987, timesold1, timesold, alpha68k_II,    timesold, timesold1,ROT90, "Alpha Denshi Co. (SNK/Romstar license)", "Time Soldiers (US Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1987, btlfield,  timesold, alpha68k_II,    btlfield, btlfield, ROT90, "Alpha Denshi Co. (SNK license)", "Battle Field (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, btlfieldb, timesold, btlfieldb,      btlfieldb,btlfieldb,ROT90, "bootleg",            "Battle Field (bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr, skysoldr, ROT90, "[Alpha Denshi Co.] (SNK of America/Romstar license)", "Sky Soldiers (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, skysoldr,  0,        alpha68k_II,    skysoldr, skysoldr, ROT90, "Alpha Denshi Co. (SNK of America/Romstar license)", "Sky Soldiers (US)", GAME_SUPPORTS_SAVE )
 GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl, goldmedl, ROT0,  "SNK",                "Gold Medalist", GAME_SUPPORTS_SAVE )
 GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, goldmedla,ROT0,  "SNK",                "Gold Medalist (alt)", GAME_SUPPORTS_SAVE )
 GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl, goldmedla,ROT0,  "bootleg",            "Gold Medalist (bootleg)", GAME_NOT_WORKING )

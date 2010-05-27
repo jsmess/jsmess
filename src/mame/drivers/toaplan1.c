@@ -733,7 +733,7 @@ static INPUT_PORTS_START( rallybik )
 	PORT_DIPNAME( 0x30, 0x20, "Territory" )                 /* bits 4 and 5 listed as unused in the Dip Switches screen */
 	PORT_DIPSETTING(    0x20, DEF_STR( Europe ) )           /* Taito Corp. Japan */
 	PORT_DIPSETTING(    0x10, DEF_STR( USA ) )              /* Taito America Corp. */
-	PORT_DIPSETTING(    0x30, "USA (Romstar licence)" )     /* Taito America Corp. */
+	PORT_DIPSETTING(    0x30, "USA (Romstar license)" )     /* Taito America Corp. */
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */
 	PORT_DIPNAME( 0x40, 0x00, "Show Dip Switches Settings" )
 	PORT_DIPSETTING(	0x00, DEF_STR( No ) )
@@ -794,7 +794,7 @@ static INPUT_PORTS_START( truxton )
 //  PORT_DIPSETTING(    0x07, DEF_STR( Europe ) )           /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPSETTING(    0x04, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
 //  PORT_DIPSETTING(    0x05, DEF_STR( USA ) )              /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
-	PORT_DIPSETTING(    0x01, "USA (Romstar licence)" )     /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
+	PORT_DIPSETTING(    0x01, "USA (Romstar license)" )     /* Taito America Corp. */     /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPSETTING(    0x00, DEF_STR( Japan ) )            /* Taito Corporation */       /* TOAPLAN_COINAGE_JAPAN_OLD */
 	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -2568,16 +2568,16 @@ static DRIVER_INIT( vimana )
 
 
 
-GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1, ROT270, "[Toaplan] Taito Corporation", "Rally Bike / Dash Yarou", 0 )
-GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1, ROT270, "[Toaplan] Taito Corporation", "Truxton / Tatsujin", 0 )
+GAME( 1988, rallybik,   0,        rallybik, rallybik,  toaplan1, ROT270, "Toaplan / Taito Corporation", "Rally Bike / Dash Yarou", 0 )
+GAME( 1988, truxton,    0,        truxton,  truxton,   toaplan1, ROT270, "Toaplan / Taito Corporation", "Truxton / Tatsujin", 0 )
 GAME( 1989, hellfire,   0,        hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver.)", 0 )
 GAME( 1989, hellfire1,  hellfire, hellfire, hellfire1, toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver.)", 0 )
 GAME( 1989, hellfire2,  hellfire, hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (2P Ver., first edition)", 0 )
 GAME( 1989, hellfire3,  hellfire, hellfire, hellfire,  toaplan1, ROT0,   "Toaplan (Taito license)", "Hellfire (1P Ver., alt)", 0 )
 GAME( 1989, zerowing,   0,        zerowing, zerowing,  toaplan1, ROT0,   "Toaplan", "Zero Wing (single players)", 0 )
-GAME( 1989, zerowing2,  zerowing, zerowing, zerowing2, toaplan1, ROT0,   "[Toaplan] Williams Electronics Games, Inc", "Zero Wing (dual players)", 0 )
+GAME( 1989, zerowing2,  zerowing, zerowing, zerowing2, toaplan1, ROT0,   "Toaplan (Williams license)", "Zero Wing (dual players)", 0 )
 GAME( 1990, demonwld,   0,        demonwld, demonwld,  demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 1)", 0 )
-GAME( 1989, demonwld1,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (Taito license, set 2)", 0 )
+GAME( 1989, demonwld1,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan (Taito license)", "Demon's World / Horror Story (Taito license, set 2)", 0 )
 GAME( 1989, demonwld2,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 3)", 0 )
 GAME( 1989, demonwld3,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 4)", 0 )
 GAME( 1989, demonwld4,  demonwld, demonwld, demonwld1, demonwld, ROT0,   "Toaplan", "Demon's World / Horror Story (set 5)", 0 )
@@ -2592,5 +2592,5 @@ GAME( 1990, outzoneb,   outzone,  outzone,  outzoneb,  toaplan1, ROT270, "Toapla
 GAME( 1990, outzonec,   outzone,  outzone,  outzonec,  toaplan1, ROT270, "Toaplan", "Out Zone (set 4)", 0 )
 GAME( 1990, outzoned,   outzone,  outzone,  outzonec,  toaplan1, ROT270, "Toaplan", "Out Zone (set 5)", 0 )
 GAME( 1991, vimana,     0,        vimana,   vimana,    vimana,   ROT270, "Toaplan", "Vimana", GAME_NO_SOUND )
-GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   vimana,   ROT270, "Toaplan", "Vimana (Nova Apparate GMBH & Co)", GAME_NO_SOUND )
+GAME( 1991, vimanan,    vimana,   vimana,   vimanan,   vimana,   ROT270, "Toaplan (Nova Apparate GmbH license)", "Vimana (Nova Apparate GmbH)", GAME_NO_SOUND )
 GAME( 1991, vimana1,    vimana,   vimana,   vimana1,   vimana,   ROT270, "Toaplan", "Vimana (Japan)", GAME_NO_SOUND )

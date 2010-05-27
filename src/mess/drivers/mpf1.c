@@ -339,6 +339,7 @@ static const cassette_config mpf1_cassette_config =
 static const tms5220_interface mpf1_tms5220_intf =
 {
 	DEVCB_NULL,					/* no IRQ callback */
+	DEVCB_NULL,					/* no Ready callback */
 #if 1
 	spchroms_read,				/* speech ROM read handler */
 	spchroms_load_address,		/* speech ROM load address handler */

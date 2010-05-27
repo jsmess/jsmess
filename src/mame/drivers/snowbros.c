@@ -2751,7 +2751,7 @@ GAME( 1990, snowbrosb, snowbros, snowbros, snowbros, 0, ROT0, "Toaplan", "Snow B
 GAME( 1990, snowbrosc, snowbros, snowbros, snowbros, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (set 4)", 0 )
 GAME( 1990, snowbrosj, snowbros, snowbros, snowbroj, 0, ROT0, "Toaplan", "Snow Bros. - Nick & Tom (Japan)", 0 )
 GAME( 1990, snowbrosd, snowbros, snowbros, snowbroj, 0, ROT0, "Toaplan (Dooyong license)", "Snow Bros. - Nick & Tom (Dooyong license)", 0 )
-GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, 0, ROT0, "[Toaplan] (Sakowa Project Korea bootleg)", "The Winter Bobble (bootleg of Snow Bros.)", 0 )
+GAME( 1990, wintbob,   snowbros, wintbob,  snowbros, 0, ROT0, "bootleg (Sakowa Project Korea)", "The Winter Bobble (bootleg of Snow Bros.)", 0 )
 
 GAME( 1995, honeydol, 0,        honeydol, honeydol, 0, ROT0, "Barko Corp.", "Honey Dolls", 0 ) // based on snowbros code..
 GAME( 1995, twinadv,  0,        twinadv,  twinadv,  0, ROT0, "Barko Corp.", "Twin Adventure (World)", 0 )
@@ -2766,5 +2766,5 @@ GAME( 1997, twinkle,  0,        semiprot, moremore, 0,        ROT0, "SemiCom", "
 GAME( 1999, moremore, 0,        semiprot, moremore, moremorp, ROT0, "SemiCom / Exit", "More More", 0 )
 GAME( 1999, moremorp, 0,        semiprot, moremore, moremorp, ROT0, "SemiCom / Exit", "More More Plus", 0 )
 GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, 4in1boot, ROT0, "K1 Soft", "Puzzle King (includes bootleg of Snow Bros.)" , 0)
-GAME( 2002, snowbros3,snowbros, snowbro3, snowbroj, snowbro3, ROT0, "Syrmex (bootleg/hack)", "Snow Brothers 3 - Magical Adventure", GAME_IMPERFECT_SOUND ) // its basically snowbros code?...
+GAME( 2002, snowbros3,snowbros, snowbro3, snowbroj, snowbro3, ROT0, "hack", "Snow Brothers 3 - Magical Adventure", GAME_IMPERFECT_SOUND ) // its basically snowbros code?...
 GAME( 1993, finalttr, 0,        finalttr, finalttr, 0,        ROT0, "Jeil Computer System", "Final Tetris", 0 )

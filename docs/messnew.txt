@@ -35,7 +35,8 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-(none)
+- The core is based on MAME 0.138u1.  This incorporates all features of the
+  update to this core.  [MAME team]
 
 
 

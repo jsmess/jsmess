@@ -7118,7 +7118,7 @@ GAME( 1990, sbsgomo,  bioship,  bioship,  bioship,  0,        ROT0,   "UPL",    
 GAME( 1990, vandyke,    0,       vandyke,  vandyke, 0,        ROT270, "UPL",                          "Vandyke (Japan)",  GAME_IMPERFECT_SOUND )
 GAME( 1990, vandykejal, vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, Set 1)",  GAME_IMPERFECT_SOUND )
 GAME( 1990, vandykejal2,vandyke, vandyke,  vandyke, 0,        ROT270, "UPL (Jaleco license)",         "Vandyke (Jaleco, Set 2)",  GAME_IMPERFECT_SOUND )
-GAME( 1990, vandykeb,  vandyke, vandykeb, vandykeb, vandykeb, ROT270, "[UPL] (bootleg)",              "Vandyke (bootleg with PIC16c57)",  GAME_NO_SOUND )
+GAME( 1990, vandykeb,  vandyke, vandykeb, vandykeb, vandykeb, ROT270, "bootleg",                      "Vandyke (bootleg with PIC16c57)",  GAME_NO_SOUND )
 
 GAME( 1991, blkheart, 0,        blkheart,  blkheart, 0,       ROT0,   "UPL",                          "Black Heart", GAME_IMPERFECT_SOUND  )
 GAME( 1991, blkheartj,blkheart, blkheart,  blkheart, 0,       ROT0,   "UPL",                          "Black Heart (Japan)", GAME_IMPERFECT_SOUND )
@@ -7156,8 +7156,8 @@ GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk,      ROT0,   "Tecmo",  
 
 // these use the seibu sound system (sound / music stolen from Raiden) rather than the bootleggers copying the nmk004
 GAME( 1990, mustangb, mustang,  mustangb, mustang,  0,        ROT0,   "bootleg",                       "US AAF Mustang (bootleg)", 0 )
-GAME( 1990, mustangb2,mustang,  mustangb, mustang,  0,        ROT0,   "bootleg",                       "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and roms have TAB Austria stickers
-GAME( 1991, tdragonb, tdragon,  tdragonb, tdragonb, tdragonb, ROT270, "bootleg",	               "Thunder Dragon (bootleg)", 0 )
+GAME( 1990, mustangb2,mustang,  mustangb, mustang,  0,        ROT0,   "bootleg (TAB Austria)",         "US AAF Mustang (TAB Austria bootleg)", 0 ) // PCB and roms have TAB Austria stickers
+GAME( 1991, tdragonb, tdragon,  tdragonb, tdragonb, tdragonb, ROT270, "bootleg",	                   "Thunder Dragon (bootleg)", 0 )
 
 // these are from Comad, based on the Thunder Dragon code?
 GAME( 1992, ssmissin, 0,        ssmissin, ssmissin, ssmissin, ROT270, "Comad",                         "S.S. Mission", GAME_NO_COCKTAIL )
@@ -7171,14 +7171,14 @@ GAME( 1997, redhawk,  stagger1, stagger1, stagger1, redhawk,  ROT270, "Afega (Ne
 GAME( 1997, redhawki, stagger1, redhawki, stagger1, 0,        ROT0,   "Afega (Hea Dong Corp license)",     "Red Hawk (Italy)", 0 ) // bootleg? strange scroll regs
 GAME( 1997, redhawke, stagger1, stagger1, stagger1, 0,        ROT270, "Afega (Excellent Co. license)",     "Red Hawk (Excellent Co., Ltd)", 0 )
 GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,   "bootleg",                           "Red Hawk (bootleg)", 0 )
-GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, 0,        ORIENTATION_FLIP_Y,   "Afega (Apples Industries license)", "Guardian Storm", 0 )
+GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, 0,        ORIENTATION_FLIP_Y, "Afega (Apples Industries license)", "Guardian Storm", 0 )
 GAME( 1998, grdnstrmk,grdnstrm, grdnstrmk,grdnstrk, grdnstrm, ROT270, "Afega",                             "Sen Jin - Guardian Storm (Korea)", 0 )
 GAME( 1998, bubl2000, 0,        popspops, bubl2000, bubl2000, ROT0,   "Tuning",                            "Bubble 2000", 0 ) // on a tuning board (bootleg?)
 GAME( 1998, hotbubl,  bubl2000, popspops, bubl2000, bubl2000, ROT0,   "Pandora",                           "Hot Bubble" , 0 ) // on an afega board ..
 GAME( 1999, popspops, 0,        popspops, popspops, grdnstrm, ROT0,   "Afega",                             "Pop's Pop's", 0 )
 GAME( 2000, mangchi,  0,        popspops, mangchi,  bubl2000, ROT0,   "Afega",                             "Mang-Chi", 0 )
-GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "YONA Tech",             "Spectrum 2000 (Euro)", 0 )
+GAME( 2000, spec2k,   0,        firehawk, spec2k,   spec2k,   ORIENTATION_FLIP_Y, "Yona Tech",             "Spectrum 2000 (Euro)", 0 )
 GAME( 2001, firehawk, 0,        firehawk, firehawk, 0,        ORIENTATION_FLIP_Y, "ESD",                   "Fire Hawk", 0 )
 
 // bee-oh board - different display / interrupt timing to others?
-GAME( 1991, manybloc, 0,        manybloc, manybloc, 0,        ROT270,             "Bee-Oh",            "Many Block", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+GAME( 1991, manybloc, 0,        manybloc, manybloc, 0,        ROT270,             "Bee-Oh",                "Many Block", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )

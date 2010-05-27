@@ -252,6 +252,7 @@ GFXDECODE_END
 static const tms5220_interface ti99_4p_tms5220interface =
 {
 	DEVCB_NULL,					/* no IRQ callback */
+	DEVCB_NULL,					/* no Ready callback */
 #if 1
 	spchroms_read,				/* speech ROM read handler */
 	spchroms_load_address,		/* speech ROM load address handler */

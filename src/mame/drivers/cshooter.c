@@ -501,7 +501,7 @@ Notes:   LB - CPU board        S-0086-002-0B
          TB - GFX board        S-0087-807
 
          The PCB looks like a prototype, due to the modifications
-         to the PCB. The game is probably licenced from Seibu.
+         to the PCB. The game is probably licensed from Seibu.
 
          The bipolar PROMs are not used for colour.
 
@@ -698,7 +698,7 @@ static DRIVER_INIT( cshootere )
 
 
 
-GAME( 1987, cshooter,  0,       cshooter, cshooter, cshooter,  ROT270, "[Seibu Kaihatsu] (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1987, cshootere, cshooter, airraid, cshooter, cshootere, ROT270, "[Seibu Kaihatsu] (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 1987, airraid,   cshooter, airraid, cshooter, cshootere, ROT270, "Seibu Kaihatsu",                    "Air Raid (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, cshooter,  0,       cshooter, cshooter, cshooter,  ROT270, "Seibu Kaihatsu (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, cshootere, cshooter, airraid, cshooter, cshootere, ROT270, "Seibu Kaihatsu (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 1987, airraid,   cshooter, airraid, cshooter, cshootere, ROT270, "Seibu Kaihatsu",                  "Air Raid (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
 

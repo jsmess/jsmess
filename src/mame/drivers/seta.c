@@ -43,14 +43,14 @@ P0-068-B (M6100723A)    92 Block Carnival                       Visco
 P0-072-2 (prototype)    92 Blandia (prototype)                  Allumer
 P0-077-A (BP922)        92 Ultraman Club                        Banpresto
 PO-078-A                92 Blandia                              Allumer
-P0-079-A                92 Zing Zing Zip                        Allumer + Tecmo
+P0-079-A                92 Zing Zing Zip                        Allumer / Tecmo
 P0-079-A                94 Eight Forces                         Tecmo
 PO-080-A (BP923)        92 SD Gundam Neo Battling (3)           Banpresto
 ?                       93 Athena no Hatena?                    Athena
 ?                       93 J.J.Squawkers                        Athena / Able
 ?        (93111A)       93 War Of Aero                          Yang Cheng
-P0-081-A                93 Mobile Suit Gundam                   Banpresto
-PO-083-A (BP931)        93 Ultra Toukon Densetsu                Banpresto + Tsuburaya Prod.
+P0-081-A (BP933KA)      93 Mobile Suit Gundam                   Banpresto
+PO-083-A (BP931)        93 Ultra Toukon Densetsu                Banpresto / Tsuburaya Prod.
 PO-092-A                93 Daioh                                Athena
 PO-096-A (BP934KA)      93 Kamen Rider                          Banpresto
 P0-097-A                93 Oishii Puzzle ..                     Sunsoft + Atlus
@@ -10041,8 +10041,8 @@ static DRIVER_INIT( inttootea )
 ***************************************************************************/
 
 /* 68000 + 65C02 */
-GAME( 1987, tndrcade, 0,        tndrcade, tndrcade, 0,        ROT270, "[Seta] (Taito license)", "Thundercade / Twin Formation" , 0) // Title/License: DSW
-GAME( 1987, tndrcadej,tndrcade, tndrcade, tndrcadj, 0,        ROT270, "[Seta] (Taito license)", "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
+GAME( 1987, tndrcade, 0,        tndrcade, tndrcade, 0,        ROT270, "Seta (Taito license)",   "Thundercade / Twin Formation" , 0) // Title/License: DSW
+GAME( 1987, tndrcadej,tndrcade, tndrcade, tndrcadj, 0,        ROT270, "Seta (Taito license)",   "Tokusyu Butai U.A.G. (Japan)" , 0) // License: DSW
 GAME( 1988, twineagl, 0,        twineagl, twineagl, twineagl, ROT270, "Seta (Taito license)",   "Twin Eagle - Revenge Joe's Brother" , 0) // Country/License: DSW
 GAME( 1989, downtown, 0,        downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (Set 1)" , 0) // Country/License: DSW
 GAME( 1989, downtown2,downtown, downtown, downtown, downtown, ROT270, "Seta",                   "DownTown / Mokugeki (Set 2)" , 0) // Country/License: DSW
@@ -10060,7 +10060,7 @@ GAME( 1989, wits,     0,        wits,     wits,     0,        ROT0,   "Athena (V
 GAME( 1990, thunderl, 0,        thunderl, thunderl, 0,        ROT270, "Seta",                   "Thunder & Lightning" , 0) // Country/License: DSW
 GAME( 1994, wiggie,   0,        wiggie,   thunderl, wiggie,   ROT270, "Promat",                 "Wiggie Waggie", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
 GAME( 1994, superbar, wiggie,   superbar, thunderl, wiggie,   ROT270, "Promat",                 "Super Bar", GAME_IMPERFECT_GRAPHICS ) // hack of Thunder & Lightning
-GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc,  0,        ROT0,   "[Seta] (Visco license)", "Jockey Club", 0 )
+GAME( 1990, jockeyc,  0,        jockeyc,  jockeyc,  0,        ROT0,   "Seta (Visco license)",   "Jockey Club", 0 )
 GAME( 1998, inttoote, jockeyc,  inttoote, inttoote, inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1993, inttootea,jockeyc,  inttoote, inttoote, inttootea,ROT0,   "Coinmaster",             "International Toote II (World?)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1991, rezon,    0,        rezon,    rezon,    rezon,    ROT0,   "Allumer",                "Rezon", 0 )
@@ -10072,20 +10072,20 @@ GAME( 1992, blandiap, blandia,  blandiap, blandia,  0,        ROT0,   "Allumer",
 GAME( 1992, blockcar, 0,        blockcar, blockcar, 0,        ROT90,  "Visco",                  "Block Carnival / Thunder & Lightning 2" , 0) // Title: DSW
 GAME( 1992, qzkklogy, 0,        drgnunit, qzkklogy, 0,        ROT0,   "Tecmo",                  "Quiz Kokology", 0 )
 GAME( 1992, neobattl, 0,        umanclub, neobattl, 0,        ROT270, "Banpresto / Sotsu Agency. Sunrise", "SD Gundam Neo Battling (Japan)", 0 )
-GAME( 1992, umanclub, 0,        umanclub, umanclub, 0,        ROT0,   "Tsuburaya Prod. / Banpresto", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
-GAME( 1992, zingzip,  0,        zingzip,  zingzip,  0,        ROT270, "Allumer + Tecmo",        "Zing Zing Zip", 0 )
+GAME( 1992, umanclub, 0,        umanclub, umanclub, 0,        ROT0,   "Banpresto / Tsuburaya Productions", "Ultraman Club - Tatakae! Ultraman Kyoudai!!", 0 )
+GAME( 1992, zingzip,  0,        zingzip,  zingzip,  0,        ROT270, "Allumer / Tecmo",        "Zing Zing Zip", 0 )
 GAME( 1993, atehate,  0,        atehate,  atehate,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
 GAME( 1993, daioh,    0,        daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh", 0 )
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", GAME_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_IMPERFECT_SOUND )
-GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, 0,        ROT0,   "Toei / Banpresto",       "Masked Riders Club Battle Race", 0 )
+GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, 0,        ROT0,   "Banpresto / Toei",       "Masked Riders Club Battle Race", 0 )
 GAME( 1993, madshark, 0,        madshark, madshark, 0,        ROT270, "Allumer",                "Mad Shark", 0 )
 GAME( 1993, msgundam, 0,        msgundam, msgundam, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam", 0 )
 GAME( 1993, msgundam1,msgundam, msgundam, msgunda1, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam (Japan)", 0 )
-GAME( 1993, oisipuzl, 0,        oisipuzl, oisipuzl, 0,        ROT0,   "Sunsoft + Atlus",        "Oishii Puzzle Ha Irimasenka", 0 )
+GAME( 1993, oisipuzl, 0,        oisipuzl, oisipuzl, 0,        ROT0,   "Sunsoft / Atlus",        "Oishii Puzzle Ha Irimasenka", 0 )
 GAME( 1993, qzkklgy2, 0,        qzkklgy2, qzkklgy2, 0,        ROT0,   "Tecmo",                  "Quiz Kokology 2", 0 )
 GAME( 1993, triplfun, oisipuzl, triplfun, oisipuzl, 0,        ROT0,   "bootleg",                "Triple Fun", 0 )
-GAME( 1993, utoukond, 0,        utoukond, utoukond, 0,        ROT0,   "Banpresto + Tsuburaya Prod.", "Ultra Toukon Densetsu (Japan)", 0 )
+GAME( 1993, utoukond, 0,        utoukond, utoukond, 0,        ROT0,   "Banpresto / Tsuburaya Productions", "Ultra Toukon Densetsu (Japan)", 0 )
 GAME( 1993, wrofaero, 0,        wrofaero, wrofaero, 0,        ROT270, "Yang Cheng",             "War of Aero - Project MEIOU", 0 )
 GAME( 1994, eightfrc, 0,        eightfrc, eightfrc, eightfrc, ROT90,  "Tecmo",                  "Eight Forces", 0 )
 GAME( 1994, kiwame,   0,        kiwame,   kiwame,   kiwame,   ROT0,   "Athena",                 "Pro Mahjong Kiwame", 0 )

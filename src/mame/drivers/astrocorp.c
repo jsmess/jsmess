@@ -1,21 +1,31 @@
-/***************************************************************************
+/*************************************************************************************************************
 
-                      -= Astro Corp. Hardware =-
+                                            -= Astro Corp. CGA Hardware =-
 
-                driver by   Luca Elia (l.elia@tin.it)
+                                       driver by   Luca Elia (l.elia@tin.it)
 
 CPU:    68000
-GFX:    ASTRO V01 0005 or ASTRO V02 0022
+GFX:    ASTRO V01 or V02 or V06
 SOUND:  OKI M6295 (AD-65)
 OTHER:  EEPROM, Battery
 
  512 sprites, each made of N x M tiles. Tiles are 16x16x8
 
+-------------------------------------------------------------------------------------------------------------------
+Year + Game          PCB ID         CPU                Video      Chips                                   Notes
+-------------------------------------------------------------------------------------------------------------------
+00  Show Hand        CHE-B50-4002A  68000              ASTRO V01  ASTRO 0001B   (28 pins), pLSI1016-60LJ
+00  Wang Pai Dui J.  CHE-B50-4002A  68000              ASTRO V01  MDT2020AP MCU (28 pins), pLSI1016
+02  Skill Drop GA    None           JX-1689F1028N      ASTRO V02  pLSI1016-60LJ
+05? Zoo              M1.1           ASTRO V102PX-005?  ASTRO V06  ASTRO F02 2005-02-18                    Encrypted
+05? Win Win Bingo    M1.2           ASTRO V102PX-006?  ASTRO V06  ASTRO F02 2005-09-17                    Encrypted
+-------------------------------------------------------------------------------------------------------------------
+
 To do:
 
 - Find source of level 2 interrupt
 
-***************************************************************************/
+*************************************************************************************************************/
 
 #include "emu.h"
 #include "deprecat.h"
@@ -62,16 +72,18 @@ static VIDEO_START( astrocorp )
 
     Offset:    Bits:                  Value:
 
-        0.w    f--- ---- ---- ----    Show This Sprite
+    0          f--- ---- ---- ----    Show This Sprite
                -edc ba98 7654 3210    X
 
-        1.w                           Code
+    1                                 Code
 
-        2.w    f--- ---- ---- ----    -
+    2          f--- ---- ---- ----    -
                -edc ba98 7654 3210    Y
 
-        3.w    fedc ba98 ---- ----    X Size
+    3          fedc ba98 ---- ----    X Size
                ---- ---- 7654 3210    Y Size
+
+    If the first two words are zero, the sprite list ends
 
 ***************************************************************************/
 
@@ -529,7 +541,7 @@ MACHINE_DRIVER_END
 /***************************************************************************
 
 Show Hand
-(C) 1999? Astro Corp.
+(C) 2000? Astro Corp.
 
 PCB CHE-B50-4002A 88 94V-0 0002
 
@@ -630,14 +642,14 @@ No specific PCB model or numer....
  OKI 6295 clone chip (AD-65 or U6295)
 
 EEPROM Atmel 93C46
-Batery 3.6V
+Battery 3.6V
 OSC    24.000MHz
 
 PC1 is a push button for test mode
 VR1 is for sound volume
 
       +---------+   +----------------------------+ +----+
-  +---+Connector+---+         Connector          +-+    |
+  +---+Connector+---+   28 Pin Edge  Connector   +-+    |
   |                                                  VR1|
   |                                                     |
 +-+             +------+                                |
@@ -687,6 +699,181 @@ ROM_START( skilldrp )
 	ROM_LOAD( "skilldrp.u6", 0x00, 0x80, CRC(57886a3d) SHA1(bad8fa2ec2262ccb5ef8ec50959aec3f3bf8b90b) )
 ROM_END
 
+/***************************************************************************
+
+Win Win Bingo
+
+ASTRO M1.2 PCB:
+ Astro V06 0430 160pin PQFP ("ASTRO02" silkscreened under chip)
+   Boards are known to have either Astro V06 0430 or Astro V07 0610
+ Astro V102PX-006 at U10 (68K core, has direct connection to program roms)
+ Astro F02 2005-09-17 socketted FPGA type chip (used for encryption?)
+ OKI 6295 clone chip (AD-65 or U6295)
+
+RAM:
+ 2 x HMI HM62C64P-70
+ 4 x HMI HM6116P-70
+ 2 x BSI BS62LV1023SC-70
+
+EEPROM 93C46
+Battery 3.6V
+OSC    24MHz
+
+PC1 is a push button for test mode
+VR1 is for sound volume
+
+      +---------+   +----------------------------+ +----+
+  +---+Connector+---+   28 Pin Edge  Connector   +-+    |
+  |                                                  VR1|
+  |                    24MHz        +---------+         |
++-+          +-------+              |ROM#4 U30|         |
+|            | Astro |   HM62C64P   +---------+         |
+|            |  F2   | +----------+ +---------+         |
+|8           |       | |ROM#2  U25| |ROM#3 U26|         |
+|   ULN2003A +-------+ +----------+ +---------+         |
+|L                                                      |
+|i  ULN2003A +------+                                   |
+|n           |Astro |      ROM#7*                 +----+|
+|e           |V102PX|                             |6295||
+|r           +------+                             +----+|
+|                                    +----------+       |
+|C                     +----------+  |          |   +---+
+|o                     |ROM#1  U26|  |  Astro   |   |   |
+|n                     +----------+  |  V06     |   | R |
+|n                                   |  0430    |   | O |
+|e                                   +----------+   | M |
+|c                       HM62C64P                   | # |
+|t                                               J1 | 5 |
+|o            93C46                                 |   |
+|r                        6116      6116      RAM1  +---+
+|                                                       |
++-+ BAT1 PC1              6116      6116      RAM1      |
+  +-----------------------------------------------------+
+
+ROM#7 at U16 is an unpopulated 40pin socket
+ROM#1 & ROM#2 are SYNCMOS F29C51001T
+ROM#3 is a 29F1610MC flash rom
+ROM#4 is a 29F1610MC flash rom (optionally populated based on game)
+ROM#5 is a MX 27C4000PC-12
+
+RAM1 are BSI BS62LV1023SC-70 RAM chips
+
+J1 is an 2 pin connector, unknown purpose
+
+***************************************************************************/
+
+ROM_START( winbingo )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "f29c51001t.u31", 0x00000, 0x20000, CRC(964cfdb5) SHA1(01109466e07f5e906be300bc69310171d34f2e6c) )
+	ROM_LOAD16_BYTE( "f29c51001t.u25", 0x00001, 0x20000, CRC(4ebeec72) SHA1(c603265e6319cff94a0c75017a12c6d86787f906) )
+
+	ROM_REGION( 0x400000, "sprites", ROMREGION_ERASE )
+	ROM_LOAD( "mxf291610mc.u26",          0x000000, 0x200000, CRC(ad1f61e7) SHA1(845aa01d49c50bcadaed16d76c0dd9131a425b46) )
+	ROM_LOAD( "mx29f1610mc.u30.bad.dump", 0x200000, 0x0a0000, BAD_DUMP CRC(6da439c5) SHA1(6afc0c800fe57b9b34ca317f4d1c040b11d3d988) ) /* Should be same as U30 below?? */
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "mx27c4000pc.u35", 0x00000, 0x80000, CRC(445d81c0) SHA1(cacb9c262740c31ea42f406e9f960a1edd1b3ead) )
+ROM_END
+
+ROM_START( winbingoa )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "f29c51001t.u31", 0x00000, 0x20000, CRC(c33676c3) SHA1(9f5b7d05d187cf59948a572f80c55cb8fa1f656f) )
+	ROM_LOAD16_BYTE( "f29c51001t.u25", 0x00001, 0x20000, CRC(43c7b2d8) SHA1(16ee79c34b7c485dfccecdf3e0ae9f18f8a20150) )
+
+	ROM_REGION( 0x400000, "sprites", 0 )
+	ROM_LOAD( "mx29f1610mc.u26", 0x000000, 0x200000, CRC(ad1f61e7) SHA1(845aa01d49c50bcadaed16d76c0dd9131a425b46) )
+	ROM_LOAD( "mx29f1610mc.u30", 0x200000, 0x200000, CRC(31613d99) SHA1(1c720f8d981c3e9cb9d9b3b27eb95e7f72ccfc93) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "mx27c4000pc.u35", 0x00000, 0x80000, CRC(e48ed57d) SHA1(11995b90e70e010b292ba9db2da0af4ebf795c1a) )
+ROM_END
+
+/***************************************************************************
+
+Zoo by Astro
+
+ZOO Z0.02.D at both U25 & U26 are Winbond W27C512 roms and are program code
+5 ZOO is a MX 27C4000 rom and is the sample rom
+29F1610mc at U26 (yes "U26" is present twice on the PCB) are the graphics
+
+ASTRO M1.1 PCB:
+ Astro V06 0430 160pin PQFP ("ASTRO02" silkscreened under chip)
+ Astro V102PX-005 T042652846 at U10 (68K core, has direct connection to program roms)
+ Astro F02 2005-02-18 socketted FPGA type chip (used for encryption?)
+ OKI 6295 clone chip (AD-65 or U6295)
+
+RAM:
+ 2 x KTC KT76C88-70LL
+ 4 x HM6116L-70
+ 2 x BSI BS62LV1025SC-70
+
+EEPROM 93C46
+Battery 3.6V
+OSC    26.824MHz
+
+PC1 is a push button for test mode
+VR1 is for sound volume
+
+
+ZOO Z0.02.D at both U25 & U26 are Winbond W27C512 roms and are program code
+5 ZOO is a MX 27C4000 rom and is the sample rom
+29F1610mc at U26 (yes "U26" is present twice on the PCB) are the graphics
+
+      +---------+   +----------------------------+ +----+
+  +---+Connector+---+   28 Pin Edge  Connector   +-+    |
+  |                                                  VR1|
+  |                   26.824MHz     +---------+         |
++-+          +-------+              |ROM#4 U30|         |
+|            | Astro |   KT76C88    +---------+         |
+|            |  F2   | +----------+ +---------+         |
+|8           |       | |ROM#2  U25| |ROM#3 U26|         |
+|   ULN2003A +-------+ +----------+ +---------+         |
+|L                                                      |
+|i  ULN2003A +------+                                   |
+|n           |Astro |      ROM#7*                 +----+|
+|e           |V102PX|                             |6295||
+|r           +------+                             +----+|
+|                                    +----------+       |
+|C                     +----------+  |          |   +---+
+|o                     |ROM#1  U26|  |  Astro   |   |   |
+|n                     +----------+  |  V06     |   | R |
+|n                                   |  0430    |   | O |
+|e                                   +----------+   | M |
+|c                       KT76C88                    | # |
+|t                                               J1 | 5 |
+|o            93C46                                 |   |
+|r                        6116      6116      RAM1  +---+
+|                                                       |
++-+ BAT1 PC1              6116      6116      RAM1      |
+  +-----------------------------------------------------+
+
+ROM#7 at U16 is an unpopulated 40pin socket
+ROM#3 is a 29F1610MC flash rom
+ROM#4 is a 29F1610MC flash rom (optionally populated based on game)
+
+RAM1 are BSI BS62LV1025SC-70 RAM chips
+
+J1 is an 2 pin connector, unknown purpose
+
+***************************************************************************/
+
+ROM_START( zoo )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "zoo_zo.02.d.u25", 0x00000, 0x10000, CRC(8566aa21) SHA1(319192e2074f3bdda6001d8e9a4b97e98826d7ce) )
+	ROM_LOAD16_BYTE( "zoo_zo.02.d.u26", 0x00001, 0x10000, CRC(1a3be45a) SHA1(877be4c9e8d5e7c4644e7bcb9a6729443ed772a4) )
+
+	ROM_REGION( 0x200000, "sprites", 0 )
+	ROM_LOAD( "29f1610mc.u26", 0x000000, 0x200000, CRC(f5cfd915) SHA1(ec869b47d0762102509dcfc1349d94340037fad5) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "5_zoo", 0x00000, 0x80000, CRC(b0c9f7aa) SHA1(99345ba0f8da3907f26c9bd29d70135f3ab7cd60) )
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD( "zoo_93c46", 0x00, 0x80, CRC(0053fcc4) SHA1(e67a495f9586dd3946f79d50506fba1ae913f6ec) )
+ROM_END
+
+
+
 static DRIVER_INIT( showhand )
 {
 #if 0
@@ -716,6 +903,9 @@ static DRIVER_INIT( showhanc )
 #endif
 }
 
-GAME( 1999?, showhand, 0,        showhand, showhand, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)",  GAME_SUPPORTS_SAVE )
-GAME( 1999?, showhanc, showhand, showhanc, showhanc, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue",   GAME_SUPPORTS_SAVE )
-GAME( 2002,  skilldrp, 0,        skilldrp, skilldrp, 0,        ROT0, "Astro Corp.", "Skill Drop Georgia", GAME_SUPPORTS_SAVE )
+GAME( 2000,  showhand,  0,        showhand, showhand, showhand, ROT0, "Astro Corp.", "Show Hand (Italy)",     GAME_SUPPORTS_SAVE )
+GAME( 2000,  showhanc,  showhand, showhanc, showhanc, showhanc, ROT0, "Astro Corp.", "Wang Pai Dui Jue",      GAME_SUPPORTS_SAVE )
+GAME( 2002,  skilldrp,  0,        skilldrp, skilldrp, 0,        ROT0, "Astro Corp.", "Skill Drop Georgia",    GAME_SUPPORTS_SAVE )
+GAME( 2005?, winbingo,  0,        showhand, showhand, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 1)", GAME_NOT_WORKING )
+GAME( 2005?, winbingoa, winbingo, showhand, showhand, 0,        ROT0, "Astro Corp.", "Win Win Bingo (set 2)", GAME_NOT_WORKING )
+GAME( 2005?, zoo,       0,        showhand, showhand, 0,        ROT0, "Astro Corp.", "Zoo",                   GAME_NOT_WORKING )

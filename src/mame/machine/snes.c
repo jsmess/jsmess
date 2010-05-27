@@ -999,7 +999,7 @@ READ8_HANDLER( snes_r_bank2 )
 		}
 		else if ((state->cart[0].mode == SNES_MODE_21) && (state->cart[0].sram > 0))
 		{
-//			int mask = state->cart[0].sram - 1;	/* Limit SRAM size to what's actually present */
+//          int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
 			value = snes_ram[0x300000 + offset];
 		}
 		else
@@ -1162,7 +1162,7 @@ READ8_HANDLER( snes_r_bank6 )
 				value = memory_read_byte(space, offset);
 			else if ((offset >= 0x300000) && (state->cart[0].sram > 0))
 			{
-//				int mask = state->cart[0].sram - 1;	/* Limit SRAM size to what's actually present */
+//              int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
 				value = snes_ram[0x800000 + offset];
 			}
 			else						/* Area 0x6000-0x8000 with offset < 0x300000 is reserved */
@@ -1324,7 +1324,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 		}
 		else if ((state->cart[0].mode == SNES_MODE_21) && (state->cart[0].sram > 0))
 		{
-//			int mask = state->cart[0].sram - 1;	/* Limit SRAM size to what's actually present */
+//          int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
 			snes_ram[0x300000 + offset] = data;
 		}
 		else
@@ -1423,7 +1423,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 				memory_write_byte(space, offset, data);
 			else if ((offset >= 0x300000) && (state->cart[0].sram > 0))
 			{
-//				int mask = state->cart[0].sram - 1;	/* Limit SRAM size to what's actually present */
+//              int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
 				snes_ram[0x800000 + offset] = data;
 			}
 			else	/* Area in 0x6000-0x8000 && offset < 0x300000 is Reserved! */

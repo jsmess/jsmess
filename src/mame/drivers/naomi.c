@@ -4,6 +4,7 @@
 
   Driver by Samuele Zannoli, R. Belmont, ElSemi,
             David Haywood, Angelo Salese and Olivier Galibert
+  Special thanks to CaH4e3, Deunan Knute, drkIIRaziel, Guru, Psyman and ZeZu for the help given.
 
  Notes:
   Several early Naomi games are running on an earlier revision mainboard (HOTD2 etc.) which appears to have an earlier
@@ -1594,6 +1595,9 @@ ADDRESS_MAP_END
 	PORT_DIPNAME( 0x01, 0x00, "Bilinear Filtering" ) \
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) ) \
+	PORT_DIPNAME( 0x02, 0x00, "Disable Render Calls" ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) ) \
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) ) \
 
 #define NAOMI_DIP_SW \
 	PORT_START("DSW") \
@@ -5805,8 +5809,8 @@ GAME( 2002, azumanga,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Moss (Tai
 //GDL-0019 Guilty Gear XX #Reload
 GAME( 2003, ggxxrl,    naomigd,  naomigd,  naomi,    ggxxrl,  ROT0,   "Arc System Works",       "Guilty Gear XX #Reload (Rev A) (GDL-0019A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, tetkiwam,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Success",                "Tetris Kiwamemichi (GDL-0020)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "Alpha System",           "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2003, usagui,    naomigd,  naomigd,  naomi_mp, naomi_mp,ROT0,   "Warashi / Taito / Mahjong Kobo", "Usagi - Yamashiro Mahjong Hen (GDL-0022)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2003, shikgam2,  naomigd,  naomigd,  naomi,    naomi,   ROT270, "Alfa System",            "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2003, usagui,    naomigd,  naomigd,  naomi_mp, naomi_mp,ROT0,   "Warashi / Mahjong Kobo / Taito", "Usagi - Yamashiro Mahjong Hen (GDL-0022)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0023 Border Down
 GAME( 2004, bdrdown,   naomigd,  naomigd,  naomi,    naomi,   ROT0,   "G-Rev",                  "Border Down (Rev A) (GDL-0023A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2003, psyvar2,   naomigd,  naomigd,  naomi,    naomi,   ROT270, "G-Rev",                  "Psyvariar 2 - The Will To Fabricate (GDL-0024)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

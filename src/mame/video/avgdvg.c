@@ -510,7 +510,7 @@ static int avg_latch0(vgdata *vg)
 static int quantum_st2st3(vgdata *vg)
 {
 	/* Quantum doesn't decode latch0 or latch2 but ST2 and ST3 are fed
-     * into the address controller which incremets the PC
+     * into the address controller which increments the PC
      */
 	vg->pc++;
 	return 0;
@@ -548,7 +548,7 @@ static int bzone_latch1(vgdata *vg)
 	/*
      * Battle Zone has clipping hardware. We need to remember the
      * position of the beam when the analog switches hst or lst get
-     * turened off.
+     * turned off.
      */
 
 	if (vg->hst == 0)
@@ -834,6 +834,8 @@ static int tempest_strobe2(vgdata *vg)
 {
 	if ((OP2 == 0) && (vg->dvy12 == 0))
 	{
+		/* Contrary to previous documentation in MAME,
+        Tempest does not have the vg->enspkl bit. */
 		if (vg->dvy & 0x800)
 			vg->color = vg->dvy & 0xf;
 		else

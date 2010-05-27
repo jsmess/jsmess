@@ -87,7 +87,6 @@ static READ8_HANDLER( zaccaria_dsw_r )
 }
 
 
-
 static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 {
 	/* bits 0-2 go to a 74LS156 with open collector outputs
@@ -164,7 +163,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
 	running_device *pia0 = devtag_get_device(device->machine, "pia0");
-	static int toggle;
+	static int toggle = 0;
 
 	pia6821_cb1_w(pia0,0, toggle & 1);
 	toggle ^= 1;
@@ -185,56 +184,6 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 	// bit 4 = led (for testing?)
 	set_led_status(device->machine, 0,~data & 0x10);
 }
-
-static READ_LINE_DEVICE_HANDLER( zaccaria_ca2_r )
-{
-	return tms5220_readyq_r(device);
-}
-
-
-static const pia6821_interface pia_0_intf =
-{
-	DEVCB_HANDLER(zaccaria_port0a_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_NULL,		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_HANDLER(zaccaria_port0a_w),		/* port A out */
-	DEVCB_HANDLER(zaccaria_port0b_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_LINE(zaccaria_irq0a),		/* IRQA */
-	DEVCB_LINE(zaccaria_irq0b)		/* IRQB */
-};
-
-
-static const pia6821_interface pia_1_intf =
-{
-	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),		/* port A in */
-	DEVCB_NULL,		/* port B in */
-	DEVCB_NULL,		/* line CA1 in */
-	DEVCB_NULL,		/* line CB1 in */
-	DEVCB_DEVICE_LINE("tms", zaccaria_ca2_r),		/* line CA2 in */
-	DEVCB_NULL,		/* line CB2 in */
-	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),		/* port A out */
-	DEVCB_HANDLER(zaccaria_port1b_w),		/* port B out */
-	DEVCB_NULL,		/* line CA2 out */
-	DEVCB_NULL,		/* port CB2 out */
-	DEVCB_NULL,		/* IRQA */
-	DEVCB_NULL		/* IRQB */
-};
-
-
-static const ppi8255_interface ppi8255_intf =
-{
-	DEVCB_INPUT_PORT("P1"),				/* Port A read */
-	DEVCB_INPUT_PORT("P2"),				/* Port B read */
-	DEVCB_INPUT_PORT("SYSTEM"),			/* Port C read */
-	DEVCB_NULL,							/* Port A write */
-	DEVCB_NULL,							/* Port B write */
-	DEVCB_HANDLER(zaccaria_dsw_sel_w)	/* Port C write */
-};
 
 
 static WRITE8_HANDLER( sound_command_w )
@@ -318,8 +267,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6400, 0x6407) AM_READ(zaccaria_prot1_r)
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(zaccaria_videoram_w) AM_BASE(&zaccaria_videoram)	/* 6400-67ff is 4 bits wide */
 	AM_RANGE(0x6800, 0x683f) AM_WRITE(zaccaria_attributes_w) AM_BASE(&zaccaria_attributesram)
-	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x6881, 0x68bc) AM_RAM AM_BASE_SIZE_GENERIC(spriteram2)
+	AM_RANGE(0x6840, 0x685f) AM_RAM AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x6881, 0x68c0) AM_RAM AM_BASE_GENERIC(spriteram2)
 	AM_RANGE(0x6c00, 0x6c00) AM_WRITE(zaccaria_flip_screen_x_w)
 	AM_RANGE(0x6c01, 0x6c01) AM_WRITE(zaccaria_flip_screen_y_w)
 	AM_RANGE(0x6c02, 0x6c02) AM_WRITENOP    /* sound reset */
@@ -358,60 +307,60 @@ static CUSTOM_INPUT( acs_r )
 
 static INPUT_PORTS_START( monymony )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW 5I:1,2")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_DIPSETTING(    0x03, "5" )
-	PORT_DIPNAME( 0x04, 0x00, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x04, 0x00, "Infinite Lives (Cheat)")		PORT_DIPLOCATION("SW 5I:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW 5I:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW 5I:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x20, 0x00, "Freeze" )
+	PORT_DIPNAME( 0x20, 0x00, "Freeze" )					PORT_DIPLOCATION("SW 5I:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Cross Hatch Pattern" )
+	PORT_DIPNAME( 0x40, 0x00, "Cross Hatch Pattern" )		PORT_DIPLOCATION("SW 5I:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )  /* random high scores? */
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW 5I:8")	/* random high scores? */
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW 4I:1,2")
 	PORT_DIPSETTING(    0x01, "200000" )
 	PORT_DIPSETTING(    0x02, "300000" )
 	PORT_DIPSETTING(    0x03, "400000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x04, 0x00, "Table Title" )
+	PORT_DIPNAME( 0x04, 0x00, "Table Title" )				PORT_DIPLOCATION("SW 4I:3")
 	PORT_DIPSETTING(    0x00, "Todays High Scores" )
 	PORT_DIPSETTING(    0x04, "High Scores" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW 4I:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW 4I:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW 4I:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )			PORT_DIPLOCATION("SW 4I:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
+	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )					PORT_DIPLOCATION("SW 4I:8")
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW 3I:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x8c, 0x84, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x8c, 0x84, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("SW 3I:3,4,5")
 	PORT_DIPSETTING(    0x8c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x88, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x84, DEF_STR( 1C_1C ) )
@@ -420,7 +369,7 @@ static INPUT_PORTS_START( monymony )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x70, 0x50, "Coin C" )
+	PORT_DIPNAME( 0x70, 0x50, "Coin C" )					PORT_DIPLOCATION("SW 3I:6,7,8")
 	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 1C_1C ) )
@@ -469,33 +418,32 @@ static INPUT_PORTS_START( jackrabt )
 	PORT_INCLUDE( monymony )
 
 	PORT_MODIFY("IN0")
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW 5I:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW0")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW 4I:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW 4I:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "Table Title" )
+	PORT_DIPNAME( 0x04, 0x00, "Table Title" )				PORT_DIPLOCATION("SW 4I:3")
 	PORT_DIPSETTING(    0x00, "Todays High Scores" )
 	PORT_DIPSETTING(    0x04, "High Scores" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW 4I:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW 4I:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW 4I:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )			PORT_DIPLOCATION("SW 4I:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 INPUT_PORTS_END
 
 
@@ -530,6 +478,16 @@ static GFXDECODE_START( zaccaria )
 GFXDECODE_END
 
 
+static const ppi8255_interface ppi8255_config =
+{
+	DEVCB_INPUT_PORT("P1"),				/* Port A read */
+	DEVCB_INPUT_PORT("P2"),				/* Port B read */
+	DEVCB_INPUT_PORT("SYSTEM"),			/* Port C read */
+	DEVCB_NULL,							/* Port A write */
+	DEVCB_NULL,							/* Port B write */
+	DEVCB_HANDLER(zaccaria_dsw_sel_w)	/* Port C write */
+};
+
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -540,9 +498,42 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
+static const pia6821_interface pia_0_config =
+{
+	DEVCB_HANDLER(zaccaria_port0a_r),	/* port A in */
+	DEVCB_NULL,							/* port B in */
+	DEVCB_NULL,							/* line CA1 in */
+	DEVCB_NULL,							/* line CB1 in */
+	DEVCB_NULL,							/* line CA2 in */
+	DEVCB_NULL,							/* line CB2 in */
+	DEVCB_HANDLER(zaccaria_port0a_w),	/* port A out */
+	DEVCB_HANDLER(zaccaria_port0b_w),	/* port B out */
+	DEVCB_NULL,							/* line CA2 out */
+	DEVCB_NULL,							/* port CB2 out */
+	DEVCB_LINE(zaccaria_irq0a),			/* IRQA */
+	DEVCB_LINE(zaccaria_irq0b)			/* IRQB */
+};
+
+static const pia6821_interface pia_1_config =
+{
+	DEVCB_DEVICE_HANDLER("tms", tms5220_status_r),	/* port A in */
+	DEVCB_NULL,										/* port B in */
+	DEVCB_NULL,										/* line CA1 in */
+	DEVCB_NULL,										/* line CB1 in */	// tms5220_intq_r, handled below in tms5220_config
+	DEVCB_NULL,										/* line CA2 in */	// tms5220_readyq_r, "
+	DEVCB_NULL,										/* line CB2 in */
+	DEVCB_DEVICE_HANDLER("tms", tms5220_data_w),	/* port A out */
+	DEVCB_HANDLER(zaccaria_port1b_w),				/* port B out */
+	DEVCB_NULL,										/* line CA2 out */
+	DEVCB_NULL,										/* port CB2 out */
+	DEVCB_NULL,										/* IRQA */
+	DEVCB_NULL										/* IRQB */
+};
+
 static const tms5220_interface tms5220_config =
 {
-	DEVCB_DEVICE_HANDLER("pia1", pia6821_cb1_w)	/* IRQ handler */
+	DEVCB_DEVICE_HANDLER("pia1", pia6821_cb1_w),	/* IRQ handler */
+	DEVCB_DEVICE_HANDLER("pia1", pia6821_ca2_w)		/* READYQ handler */
 };
 
 
@@ -557,21 +548,20 @@ static MACHINE_DRIVER_START( zaccaria )
 
 	MDRV_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map_1)
-	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle,(double)3580000/4096)
+	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle,(double)XTAL_3_579545MHz/4096)
 	MDRV_QUANTUM_TIME(HZ(1000000))
 
 	MDRV_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map_2)
 	MDRV_QUANTUM_TIME(HZ(1000000))
 
-
-	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
-	MDRV_PIA6821_ADD( "pia0", pia_0_intf )
-	MDRV_PIA6821_ADD( "pia1", pia_1_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_config )
+	MDRV_PIA6821_ADD( "pia0", pia_0_config )
+	MDRV_PIA6821_ADD( "pia1", pia_1_config )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(60.57) /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
@@ -599,7 +589,7 @@ static MACHINE_DRIVER_START( zaccaria )
 
 	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */
 	/* 162kHz measured on pin 3 20 minutesa fter power on. Clock would then be 162*4=648kHz. */
-	MDRV_SOUND_ADD("tms", TMS5200, 640000)
+	MDRV_SOUND_ADD("tms", TMS5200, 649200) /* ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that) */
 	MDRV_SOUND_CONFIG(tms5220_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END

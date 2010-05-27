@@ -918,7 +918,7 @@ Note
 1x 8 switches dip
 
 This is a strange thing: the PCB is marked "Valadon Automation (C) 1983" and "Fabrique
-sous licence par GECAS/MILANO" (manufactured under license from GECAS/MILANO)
+sous license par GECAS/MILANO" (manufactured under license from GECAS/MILANO)
 
 But if you look in rom 7 with an hex editor you can see the following: "(C) 1984 ITISA"
 and "UN BONJOUR A JACQUES DE PEPE PETIT ET HENK" (a good morning to Jacques from Pepe
@@ -928,7 +928,7 @@ Morillas, the very same 3 persons working on BOTANIC (1984)(ITISA).
 Game writings in the eprom are in English and Spanish.
 
 So we have an English/Spanish game with a French easter egg on a French PCB manufactured
-under licence from an Italian company! Let's call it melting pot!
+under license from an Italian company! Let's call it melting pot!
 
 */
 
@@ -960,10 +960,10 @@ static DRIVER_INIT( bagnarda )
 GAME( 1982, bagman,	   0,  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Bagman", 0 )
 GAME( 1982, bagnard,  bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation", "Le Bagnard (set 1)", 0 )
 GAME( 1982, bagnarda, bagman,  bagman,  bagman,  bagnarda, ROT270, "Valadon Automation", "Le Bagnard (set 2)", 0 )
-GAME( 1982, bagmans,  bagman,  bagman,  bagmans, 0,        ROT270, "Valadon Automation (Stern license)", "Bagman (Stern set 1)", 0 )
-GAME( 1982, bagmans2, bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation (Stern license)", "Bagman (Stern set 2)", 0 )
+GAME( 1982, bagmans,  bagman,  bagman,  bagmans, 0,        ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 1)", 0 )
+GAME( 1982, bagmans2, bagman,  bagman,  bagman,  0,        ROT270, "Valadon Automation (Stern Electronics license)", "Bagman (Stern Electronics, set 2)", 0 )
 GAME( 1984, sbagman,       0,  bagman,  sbagman, 0,        ROT270, "Valadon Automation", "Super Bagman", 0 )
-GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern license)", "Super Bagman (Stern)", 0 )
+GAME( 1984, sbagmans, sbagman, bagman,  sbagman, 0,        ROT270, "Valadon Automation (Stern Electronics license)", "Super Bagman (Stern Electronics)", 0 )
 GAME( 1983, pickin,	   0,  pickin,  pickin,  0,        ROT270, "Valadon Automation", "Pickin'", 0 )
 GAME( 1984, botanic,       0,  botanic, botanic, 0,        ROT270, "Valadon Automation (Itisa license)", "Botanic", 0 )
 GAME( 1984, squaitsa,      0,  squaitsa,squaitsa,0,        ROT0,   "Itisa",              "Squash (Itisa)", 0 )
