@@ -79,6 +79,17 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
+	<software name="basic">
+		<description>BASIC Nyu-mon</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="basic.bin" size="32768" crc="ca965c2b" sha1="c68e2b81dec2c83e2aa5626c8df4011eada45245" offset="0000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- name taken from boxart -->
 	<software name="baseball">
 		<description>Super Baseball</description>
@@ -166,6 +177,17 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="lupin3.bin" size="16384" crc="16d7eb4a" sha1="62698c7c9d9723f74214626a4211a3c3f34e9dd5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mappy">
+		<description>Mappy</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="mappy.bin" size="32768" crc="605829bb" sha1="70dc025ab3f32e18fd6f373dc47c9aa7fb9d48f0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -273,14 +295,26 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="ttball">
-		<description>Ton Ton Ball</description>
+	<software name="skykid">
+		<description>Sky Kid</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="skykid.bin" size="65536" crc="f49f2085" sha1="7342fe10d38c79ed12fbfa94b5fd4bf1266c2571" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starspdr">
+		<description>Star Speeder</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="ttball.bin" size="16384" crc="7f873bfa" sha1="093235ac2234c4c4e78a2addaab780d7a2cbe004" offset="0" />
-			</dataarea>
+                       <dataarea name="rom" size="40960">
+                               <rom name="starspeeder.0" size="32768" crc="511576ee" sha1="1b61132af26dc8d5c1b5e0f72c2e96192bba7e20" offset="0" />
+                               <rom name="starspeeder.1" size="8192"  crc="7978c4a6" sha1="6BB5FF3946867FA7ADB6561DC084EF5A7A92C507" offset="8000" />
+                       </dataarea>
 		</part>
 	</software>
 
@@ -344,6 +378,17 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
+	<software name="ttball">
+		<description>Ton Ton Ball</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ttball.bin" size="16384" crc="7f873bfa" sha1="093235ac2234c4c4e78a2addaab780d7a2cbe004" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wheelrcr">
 		<description>Wheelie Racer</description>
 		<year>1985</year>
@@ -356,12 +401,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
 <!--
-	/* Basic Nyuumon */
 	/* Dragon Slayer */
-	/* Mappy */
-	/* Nekketsu Kung Fu Road */
-	/* Sky Kid */
-	/* Star Speeder */
 	/* Wai Wai Monster Land */
 -->
 
