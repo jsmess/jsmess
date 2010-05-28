@@ -137,7 +137,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
     <software name="dragondh">
-        <description>Dragon Dai Hikyou</description>
+        <description>Dragon Ball - Dragon Dai Hikyou</description>
         <year>1986</year>
         <publisher>Epoch</publisher>
         <part name="cart" interface="scv_cart">
@@ -251,7 +251,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
 	<software name="popchips">
-		<description>Pop and Chips</description>
+		<description>Pop &amp; Chips</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
