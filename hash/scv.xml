@@ -80,7 +80,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
 	<software name="basic">
-		<description>BASIC Nyu-mon</description>
+		<description>BASIC Nyuumon</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
@@ -136,16 +136,16 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-       <software name="dragondh">
-               <description>Dragon Dai Hikyou</description>
-               <year>1986</year>
-               <publisher>Epoch</publisher>
-               <part name="cart" interface="scv_cart">
-                       <dataarea name="rom" size="131072">
-                               <rom name="dragonba.bin" size="131072" crc="ea251664" sha1="bd3791ed43a2019a255152e3fc0d8a663cb9567a" offset="0" />
-                       </dataarea>
-               </part>
-       </software>
+    <software name="dragondh">
+        <description>Dragon Dai Hikyou</description>
+        <year>1986</year>
+        <publisher>Epoch</publisher>
+        <part name="cart" interface="scv_cart">
+            <dataarea name="rom" size="131072">
+                <rom name="dragonba.bin" size="131072" crc="ea251664" sha1="bd3791ed43a2019a255152e3fc0d8a663cb9567a" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 
 	<software name="elevfght">
 		<description>Elevator Fight</description>
@@ -158,15 +158,16 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
+    <!-- unknown whether the rom differs between Japan and Euro versions and which this is if so -->
 	<software name="kungfurd" supported="no">
-		<description>Kung Fu Road</description>
+		<description>Nekketsu Kung Fu Road / Kung Fu Road</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
-                       <dataarea name="rom" size="40960">
-                               <rom name="kungfurd.0" size="32768" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce" offset="0" />
-                               <rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="8000" />
-                       </dataarea>
+            <dataarea name="rom" size="40960">
+                <rom name="kungfurd.0" size="32768" crc="9cfc5a67" sha1="1c34470c1f389db7be755e130db298f6b475c7ce" offset="0" />
+                <rom name="kungfurd.1" size="8192"  crc="a895375a" sha1="644ab7c7fb85d0d80aa3a416b0a5359d395e48a3" offset="8000" />
+            </dataarea>
 		</part>
 	</software>
 
@@ -237,7 +238,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 	</software>
 
 	<software name="polepos2">
-		<description>Pole Position 2</description>
+		<description>Pole Position II</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
@@ -318,19 +319,8 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		</part>
 	</software>
 
-	<software name="sansupyu">
-		<description>Sansupyuta/Super Professor</description>
-		<year>1985</year>
-		<publisher>Epoch</publisher>
-		<part name="cart" interface="scv_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="sansupyuta.bin" size="32768" crc="6e7e01b5" sha1="dc05257c831cffa5ec66302c88e1d45a92c6dc9c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="shoginyu">
-		<description>Shogi Nyuumon</description>
+		<description>Shougi Nyuumon</description>
 		<year>1985</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
@@ -339,6 +329,17 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 			</dataarea>
 			<!-- 8KB RAM on cartridge -->
 			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
+	<software name="sansupyu">
+		<description>Super Sansuu Puter</description>
+		<year>1985</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="sansupyuta.bin" size="32768" crc="6e7e01b5" sha1="dc05257c831cffa5ec66302c88e1d45a92c6dc9c" offset="0" />
+			</dataarea>
 		</part>
 	</software>
 
