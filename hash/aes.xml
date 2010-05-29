@@ -583,7 +583,7 @@
 
 <!-- ID 087 -->
 	<software name="samsho3">
-		<description>Samurai Showdown III / Samurai Spirits - Zankurou Musouken</description>
+		<description>Samurai Showdown III / Samurai Spirits - Zankurou Musouken / Fighters Swords</description>
 		<year>1995</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
