@@ -561,7 +561,7 @@ static UINT8 adb_read_datareg(void)
 			break;
 
 		default:
-			result = adb_latent_result;
+			result = adb_latent_result & 0x7f;
 			break;
 	}
 
