@@ -106,6 +106,17 @@
 		</part>
 	</software>
 
+	<software name="agidooly" cloneof="dinodool">
+		<description>Agigongnyong Dooly (Kor)</description>
+		<year>1991</year>
+		<publisher>Daou Infosys</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="agigongnyong dooly (kr).bin" size="131072" crc="4f1be9fa" sha1="19a82099f0277264ce518bd9dd86235016f7abf7" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Id: 7102 -->
 	<software name="airresc">
 		<description>Air Rescue (Euro)</description>
@@ -2584,6 +2595,17 @@
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="262144">
 				<rom name="james bond 007 - the duel (brazil).bin" size="262144" crc="8feff688" sha1="cc3eec4da3758fe9e407ab80fa88dc952d33cdd5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jangpun3">
+		<description>Jang Pung 3 (Kor)</description>
+		<year>1994</year>
+		<publisher>Sanghun</publisher>
+		<part name="cart" interface="sms_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="jang pung 3 (kr).bin" size="1048576" crc="18fb98a3" sha1="1b2b525ef2ab2d7ea3f934f0c229dab33af56d90" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

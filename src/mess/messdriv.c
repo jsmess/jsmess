@@ -82,8 +82,8 @@ const game_driver * const drivers[] =
 	DRIVER( sc3000 )	/* Sega SC-3000 (Japan)  */
 	DRIVER( sc3000h )   /* Sega SC-3000H (Japan)    */
 	DRIVER( sf7000 )	/* Sega SC-3000 w/ SF-7000 (Japan)    */
-//  DRIVER( omv1000 )   /* Tsukuda Original Othello Multivision FG-1000  */
-//  DRIVER( omv2000 )   /* Tsukuda Original Othello Multivision FG-2000  */
+	DRIVER( omv1000 )   /* Tsukuda Original Othello Multivision FG-1000  */
+	DRIVER( omv2000 )   /* Tsukuda Original Othello Multivision FG-2000  */
 
 	DRIVER( gamegear )  /* Sega GameGear    */
 	DRIVER( gamegeaj )  /* Sega GameGear (Japan)    */

@@ -1002,43 +1002,43 @@ MACHINE_DRIVER_END
 /* ROMs */
 
 ROM_START( sg1000 )
-    ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( sg1000m2 )
-    ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( omv1000 )
-    ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
-	ROM_LOAD( "omvbios.bin", 0x0000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
+	ROM_LOAD( "omvbios.bin", 0x0000, 0x4000, CRC(c5a67b95) SHA1(6d7c64dd60dee4a33061d3d3a7c2ed190d895cdb) )
 ROM_END
 
 ROM_START( omv2000 )
-    ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
-	ROM_LOAD( "omvbios.bin", 0x0000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
+	ROM_LOAD( "omvbios.bin", 0x0000, 0x4000, CRC(c5a67b95) SHA1(6d7c64dd60dee4a33061d3d3a7c2ed190d895cdb) )
 ROM_END
 
 ROM_START( sc3000 )
-    ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( sc3000h )
-    ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
+	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( sf7000 )
-    ROM_REGION( 0x10000, Z80_TAG, 0 )
-    ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(d76810b8) SHA1(77339a6db2593aadc638bed77b8e9bed5d9d87e3) )
+	ROM_REGION( 0x10000, Z80_TAG, 0 )
+	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(d76810b8) SHA1(77339a6db2593aadc638bed77b8e9bed5d9d87e3) )
 ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT       INIT    COMPANY             FULLNAME                                    FLAGS */
-CONS( 1983,	sg1000,		0,		0,		sg1000,		sg1000,		0,		"Sega",				"SG-1000",									GAME_SUPPORTS_SAVE )
-CONS( 1984,	sg1000m2,	sg1000,	0,		sc3000,		sc3000,		0,		"Sega",				"SG-1000 II",								GAME_SUPPORTS_SAVE )
-COMP( 1983,	sc3000,		0, sg1000,		sc3000,		sc3000,		0,		"Sega",				"SC-3000",									GAME_SUPPORTS_SAVE )
-COMP( 1983,	sc3000h,	sc3000,	0,		sc3000,		sc3000,		0,		"Sega",				"SC-3000H",									GAME_SUPPORTS_SAVE )
-COMP( 1983,	sf7000,		sc3000, 0,		sf7000,		sf7000,		0,		"Sega",				"SC-3000/Super Control Station SF-7000",	GAME_SUPPORTS_SAVE )
-CONS( 1984,	omv1000,    sg1000,	0,      omv,        omv,        0,      "Tsukuda Original", "Othello Multivision FG-1000",				GAME_NOT_WORKING )
-CONS( 1984,	omv2000,    sg1000,	0,      omv,        omv,        0,      "Tsukuda Original", "Othello Multivision FG-2000",				GAME_NOT_WORKING )
+/*    YEAR  NAME        PARENT      COMPAT      MACHINE     INPUT       INIT    COMPANY             FULLNAME                                    FLAGS */
+CONS( 1983,	sg1000,     0,          0,          sg1000,     sg1000,     0,      "Sega",             "SG-1000",                                  GAME_SUPPORTS_SAVE )
+CONS( 1984,	sg1000m2,   sg1000,     0,          sc3000,     sc3000,     0,      "Sega",             "SG-1000 II",                               GAME_SUPPORTS_SAVE )
+COMP( 1983,	sc3000,     0,          sg1000,     sc3000,     sc3000,     0,      "Sega",             "SC-3000",                                  GAME_SUPPORTS_SAVE )
+COMP( 1983,	sc3000h,    sc3000,     0,          sc3000,     sc3000,     0,      "Sega",             "SC-3000H",                                 GAME_SUPPORTS_SAVE )
+COMP( 1983,	sf7000,     sc3000,     0,          sf7000,     sf7000,     0,      "Sega",             "SC-3000/Super Control Station SF-7000",    GAME_SUPPORTS_SAVE )
+CONS( 1984,	omv1000,    sg1000,     0,          omv,        omv,        0,      "Tsukuda Original", "Othello Multivision FG-1000",              GAME_NOT_WORKING )
+CONS( 1984,	omv2000,    sg1000,     0,          omv,        omv,        0,      "Tsukuda Original", "Othello Multivision FG-2000",              GAME_NOT_WORKING )
