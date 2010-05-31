@@ -182,6 +182,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "devices/appldriv.h"
 #include "devices/flopdrv.h"
@@ -192,9 +193,13 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "machine/ap2_lang.h"
 #include "machine/applefdc.h"
 #include "machine/mockngbd.h"
+//#include "machine/a2z80.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "devices/messram.h"
+#include "machine/a2cffa.h"
+#include "machine/idectrl.h"
+#include "devices/harddriv.h"
 
 
 /***************************************************************************
@@ -678,7 +683,26 @@ MACHINE_DRIVER_START( apple2e )
 	MDRV_RAM_EXTRA_OPTIONS("64K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
 MACHINE_DRIVER_END
+#if 0
+MACHINE_DRIVER_START( apple2e_z80 )
+	MDRV_IMPORT_FROM( apple2_common )
+	MDRV_VIDEO_START(apple2e)
 
+	MDRV_CPU_ADD("softcard", Z80, 1021800*2)	// softcard Z80 runs at twice the 6502 clock
+	MDRV_CPU_PROGRAM_MAP(a2z80_map)
+
+	MDRV_A2Z80_ADD("a2z80")
+	MDRV_APPLE2_SLOT_ADD(7, "a2z80", 0, 0, 0, 0, 0, a2z80_cnxx_w)
+
+	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("128K")
+	MDRV_RAM_EXTRA_OPTIONS("64K")
+	MDRV_RAM_DEFAULT_VALUE(0x00)
+MACHINE_DRIVER_END
+#endif
 static MACHINE_DRIVER_START( mprof3 )
 	MDRV_IMPORT_FROM( apple2e )
 
@@ -690,6 +714,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( apple2ee )
 	MDRV_IMPORT_FROM( apple2e )
 	MDRV_CPU_REPLACE("maincpu", M65C02, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
+
+	/* CFFA stuff */
+	MDRV_HARDDISK_ADD("harddisk")
+	MDRV_IDE_CONTROLLER_ADD("ide", NULL)
+	MDRV_IDE_CONTROLLER_REGIONS("harddisk", NULL)
+	MDRV_A2CFFA_ADD("cffa")
+	MDRV_APPLE2_SLOT_ADD(7, "cffa", a2cffa_r, a2cffa_w, a2cffa_c800_r, a2cffa_c800_w, a2cffa_cnxx_r, a2cffa_cnxx_w)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apple2c )
@@ -841,6 +872,17 @@ ROM_START(apple2e)
 	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 ROM_END
 
+ROM_START(apple2ez)
+	ROM_REGION(0x2000,"gfx1",0)
+	ROM_LOAD ( "342-0133-a.chr", 0x0000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
+	ROM_LOAD ( "342-0133-a.chr", 0x1000, 0x1000,CRC(b081df66) SHA1(7060de104046736529c1e8a687a0dd7b84f8c51b))
+
+	ROM_REGION(0x4700,"maincpu",0)
+	ROM_LOAD ( "342-0135-b.64", 0x0000, 0x2000, CRC(e248835e) SHA1(523838c19c79f481fa02df56856da1ec3816d16e))
+	ROM_LOAD ( "342-0134-a.64", 0x2000, 0x2000, CRC(fc3d59d8) SHA1(8895a4b703f2184b673078f411f4089889b61c54))
+	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
+ROM_END
+
 ROM_START(mprof3)
 	ROM_REGION(0x2000,"gfx1",0)
 	ROM_LOAD ( "mpf3.chr", 0x0000, 0x1000,CRC(2597bc19) SHA1(e114dcbb512ec24fb457248c1b53cbd78039ed20))
@@ -862,6 +904,9 @@ ROM_START(apple2ee)
 	ROM_LOAD ( "342-0304-a.64", 0x0000, 0x2000, CRC(443aa7c4) SHA1(3aecc56a26134df51e65e17f33ae80c1f1ac93e6))
 	ROM_LOAD ( "342-0303-a.64", 0x2000, 0x2000, CRC(95e10034) SHA1(afb09bb96038232dc757d40c0605623cae38088e))
 	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
+
+	ROM_REGION(0x1000, "cffa", 0)
+        ROM_LOAD( "cffa20eec02.bin", 0x000000, 0x001000, CRC(fb3726f8) SHA1(080ff88f19de22328e162954ee2b51ee65f9d5cd) ) 
 ROM_END
 
 ROM_START(apple2ep)
@@ -967,6 +1012,7 @@ COMP( 1985, prav8m,   apple2,   0,        apple2p,	   apple2p,  0,        "Prave
 COMP( 1980, apple2jp, apple2,   0,        apple2p,	   apple2p,  0,        "Apple Computer",    "Apple ][j+", GAME_SUPPORTS_SAVE )
 COMP( 1982, ace100,   apple2,   0,        apple2,	   apple2e,  0,        "Franklin Computer", "Franklin Ace 100", GAME_SUPPORTS_SAVE )
 COMP( 1983, apple2e,  0,        apple2,	  apple2e,	   apple2e,  0,        "Apple Computer",    "Apple //e", GAME_SUPPORTS_SAVE )
+//COMP( 1983, apple2ez, apple2e,  0,	  apple2e_z80,	   apple2e,  0,        "Apple Computer",    "Apple //e (with Z80 SoftCard)", GAME_SUPPORTS_SAVE )
 COMP( 1983, mprof3,   apple2e,  0,        mprof3,	   apple2e,  0,        "Multitech",         "Microprofessor III", GAME_SUPPORTS_SAVE )
 COMP( 1985, apple2ee, apple2e,  0,        apple2ee,	   apple2e,  0,        "Apple Computer",    "Apple //e (enhanced)", GAME_SUPPORTS_SAVE )
 COMP( 1987, apple2ep, apple2e,  0,        apple2ee,	   apple2ep, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )

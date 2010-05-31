@@ -20,6 +20,9 @@ Skeleton drivers:
 System Driver Changes:
 ----------------------
 
+- [APPLE2] Support for Rich Dreher's Compact Flash/IDE adaptor on the
+  enhanced IIe driver (apple2ee). [R. Belmont]
+
 - [FAMICOM] Fixed long standing problems (present at least since MESS 0.122) 
   with disks not loading correctly. Many games are playable again. [Fabio Priuli]
 

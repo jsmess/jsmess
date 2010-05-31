@@ -598,6 +598,7 @@ $(MESSOBJ)/apple.a:				\
 	$(MESS_MACHINE)/ap2_slot.o	\
 	$(MESS_MACHINE)/ap2_lang.o	\
 	$(MESS_MACHINE)/mockngbd.o	\
+	$(MESS_MACHINE)/a2cffa.o	\
 	$(MESS_MACHINE)/lisa.o		\
 	$(MESS_DRIVERS)/lisa.o		\
 	$(MESS_AUDIO)/mac.o			\
