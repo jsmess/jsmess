@@ -8,6 +8,7 @@ New System Drivers Supported:
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
+- Othello Multivision FG-1000/FG-2000 [Curt Coder, Fabio Priuli]
 - X07 [Sandro Ronco]
 
 
