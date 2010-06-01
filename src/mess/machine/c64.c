@@ -1024,13 +1024,13 @@ enum {
 
 static UINT8 c64_mapper = GENERIC_CRT;
 
-static DEVICE_IMAGE_LOAD( c64_cart )
+static int c64_common_cart_load( running_device *image )
 {
 	int size = image_length(image), test, i = 0, n_banks;
 	const char *filetype;
 	int address = 0, new_start = 0;
 	// int lbank_end_addr = 0, hbank_end_addr = 0;
-	UINT8 *cart = memory_region(image->machine, "cart");
+	UINT8 *cart = memory_region(image->machine, "user1");
 
 	filetype = image_filetype(image);
 
@@ -1232,6 +1232,47 @@ static DEVICE_IMAGE_LOAD( c64_cart )
 	return INIT_PASS;
 }
 
+static DEVICE_IMAGE_LOAD( c64_cart )
+{
+	return c64_common_cart_load(image);
+}
+
+static DEVICE_IMAGE_LOAD( max_cart )
+{
+	int result = INIT_PASS;
+
+	if (image_software_entry(image) == NULL)
+	{
+		result = c64_common_cart_load(image);
+	}
+	else
+	{
+		UINT32 size;
+
+		// setup Ultimax mode
+		c64_exrom = 1;
+		c64_game  = 0;
+		
+		roml = c64_roml;
+		romh = c64_romh;
+		
+		memset(roml, 0, 0x2000);
+		memset(romh, 0, 0x2000);
+
+		// is there anything to load at 0x8000?
+		size = image_get_software_region_length(image, "roml");
+		if (size)
+			memcpy(roml, image_get_software_region(image, "roml"), size);
+
+		// is there anything to load at 0xe000?
+		size = image_get_software_region_length(image, "romh");
+		if (size)
+			memcpy(romh, image_get_software_region(image, "romh"), size);		
+	}
+
+	return result;
+}
+
 
 static WRITE8_HANDLER( fc3_bank_w )
 {
@@ -1240,7 +1281,7 @@ static WRITE8_HANDLER( fc3_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x3f;
-	UINT8 *cart = memory_region(space->machine, "cart");
+	UINT8 *cart = memory_region(space->machine, "user1");
 
 	if (data & 0x40)
 	{
@@ -1269,7 +1310,7 @@ static WRITE8_HANDLER( ocean1_bank_w )
 	// not working: Pang, Robocop 2, Toki
 
 	UINT8 bank = data & 0x3f;
-	UINT8 *cart = memory_region(space->machine, "cart");
+	UINT8 *cart = memory_region(space->machine, "user1");
 
 	if (c64_cart_n_banks != 64)								// all carts except Terminator II
 	{
@@ -1299,7 +1340,7 @@ static WRITE8_HANDLER( funplay_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x39, real_bank = 0;
-	UINT8 *cart = memory_region(space->machine, "cart");
+	UINT8 *cart = memory_region(space->machine, "user1");
 
 	/* This should be written after the bankswitch has happened. We log it to see if it is really working */
 	if (data == 0x86)
@@ -1328,7 +1369,7 @@ static WRITE8_HANDLER( supergames_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x03, bit2 = data & 0x04;
-	UINT8 *cart = memory_region(space->machine, "cart");
+	UINT8 *cart = memory_region(space->machine, "user1");
 
 	if (data & 0x04)
 	{
@@ -1366,7 +1407,7 @@ static WRITE8_HANDLER( c64gs_bank_w )
 	// not working: The Last Ninja Remix
 
 	UINT8 bank = offset & 0xff;
-	UINT8 *cart = memory_region(space->machine, "cart");
+	UINT8 *cart = memory_region(space->machine, "user1");
 
 	if (bank > 0x3f)
 		logerror("Warning: This cart type should have at most 64 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
@@ -1389,7 +1430,7 @@ static READ8_HANDLER( dinamic_bank_r )
 	// not working:
 
 	UINT8 bank = offset & 0xff;
-	UINT8 *cart = memory_region(space->machine, "cart");
+	UINT8 *cart = memory_region(space->machine, "user1");
 
 	if (bank > 0xf)
 		logerror("Warning: This cart type should have 16 banks and the cart looked for bank %d... Something strange is going on!\n", bank);
@@ -1413,7 +1454,7 @@ static READ8_HANDLER( zaxxon_bank_r )
 	// not working:
 
 	UINT8 bank;
-	UINT8 *cart = memory_region(space->machine, "cart");
+	UINT8 *cart = memory_region(space->machine, "user1");
 
 	if (offset < 0x1000)
 		bank = 0;
@@ -1435,7 +1476,7 @@ static WRITE8_HANDLER( domark_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x7f;
-	UINT8 *cart = memory_region(space->machine, "cart");
+	UINT8 *cart = memory_region(space->machine, "user1");
 
 	if (data & 0x80)
 	{
@@ -1457,7 +1498,7 @@ static WRITE8_HANDLER( comal80_bank_w )
 	// not working:
 
 	UINT8 bank = data & 0x83;
-	UINT8 *cart = memory_region(space->machine, "cart");
+	UINT8 *cart = memory_region(space->machine, "user1");
 
 	/* only valid values 0x80, 0x81, 0x82, 0x83 */
 	if (!(bank & 0x80))
@@ -1567,7 +1608,11 @@ MACHINE_DRIVER_START( ultimax_cartslot )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("crt,e0,f0")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("ultimax_cart")
 	MDRV_CARTSLOT_START(c64_cart)
-	MDRV_CARTSLOT_LOAD(c64_cart)
+	MDRV_CARTSLOT_LOAD(max_cart)
 	MDRV_CARTSLOT_UNLOAD(c64_cart)
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("max")
 MACHINE_DRIVER_END
