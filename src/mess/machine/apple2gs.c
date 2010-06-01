@@ -38,11 +38,11 @@
         bit 0 - shift key pressed
 
     C027 - KMSTATUS
-        bit 7 - set if mouse register full
+        bit 7 - set if mouse register full	   
         bit 6 - mouse interupt enable flag
         bit 5 - set if data register full
-        bit 4 - data interrupt enabled
-        bit 3 - set if key data full
+        bit 4 - data interrupt enabled		   
+        bit 3 - set if key data full		   
         bit 2 - key data interurpt enabled
         bit 1 - clear if horizontal mouse data, set if vertical
         bit 0 - command register full
@@ -117,6 +117,7 @@
 #include "cpu/g65816/g65816.h"
 #include "sound/es5503.h"
 #include "devices/messram.h"
+#include "debugger.h"
 
 #define LOG_C0XX			0
 #define LOG_ADB				0
@@ -307,8 +308,6 @@ static const char *apple2gs_irq_name(UINT8 irq_mask)
 	}
 	return NULL;
 }
-
-
 
 static void apple2gs_add_irq(running_machine *machine, UINT8 irq_mask)
 {
@@ -556,17 +555,18 @@ static UINT8 adb_read_datareg(void)
 			{
 				adb_state = ADBSTATE_IDLE;
 				adb_latent_result = result;
-				adb_kmstatus &= ~0x20;
 			}
 			break;
 
 		default:
-			result = adb_latent_result & 0x7f;
+			result = 0; //adb_latent_result & 0x7f;
 			break;
 	}
 
 	if (LOG_ADB)
 		logerror("adb_read_datareg(): result=0x%02x\n", result);
+
+	adb_kmstatus &= ~0x20;
 
 	return result;
 }
@@ -681,7 +681,8 @@ static void adb_write_datareg(running_machine *machine, UINT8 data)
 }
 
 
-
+// real rom 3 h/w reads 0x90 when idle, 0x98 when key pressed
+// current MESS reads back 0xb0 when idle
 static UINT8 adb_read_kmstatus(void)
 {
 	return adb_kmstatus;
@@ -703,9 +704,9 @@ static UINT8 adb_read_mousedata(running_machine *machine)
 	UINT8 absolute;
 	INT8 delta;
 
-	if (adb_kmstatus & 0x80)
+	if (adb_kmstatus & 0x80)	// mouse register full
 	{
-		if (adb_kmstatus & 0x02)
+		if (adb_kmstatus & 0x02)	// H/V mouse data select
 		{
 			absolute = apple2gs_mouse_y;
 			delta = apple2gs_mouse_dy;
