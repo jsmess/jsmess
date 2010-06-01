@@ -1228,10 +1228,13 @@ ROM_END
 
 ROM_START( omv1000 )
 	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
-	ROM_LOAD( "omvbios.bin", 0x0000, 0x4000, CRC(c5a67b95) SHA1(6d7c64dd60dee4a33061d3d3a7c2ed190d895cdb) )
+	ROM_LOAD( "omvbios.bin", 0x0000, 0x4000, BAD_DUMP CRC(c5a67b95) SHA1(6d7c64dd60dee4a33061d3d3a7c2ed190d895cdb) )	// The BIOS comes from a Multivision FG-2000. It is still unknown if the FG-1000 BIOS differs
 ROM_END
 
-#define rom_omv2000 rom_omv1000
+ROM_START( omv2000 )
+	ROM_REGION( 0x10000, Z80_TAG, ROMREGION_ERASE00 )
+	ROM_LOAD( "omvbios.bin", 0x0000, 0x4000, CRC(c5a67b95) SHA1(6d7c64dd60dee4a33061d3d3a7c2ed190d895cdb) )
+ROM_END
 
 ROM_START( sf7000 )
 	ROM_REGION( 0x10000, Z80_TAG, 0 )
