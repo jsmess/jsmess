@@ -349,7 +349,8 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	const game_driver *drv;
 	HWND hwndSoftwarePicker;
 	HWND hwndSoftwareDevView;
-
+	char softListDir[256];
+	
 	// do we have to do anything?
 	if (!bForce)
 	{
@@ -389,6 +390,27 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 		drv = driver_get_compatible(drv);
 	}
 	AddSoftwarePickerDirs(hwndSoftwarePicker, GetExtraSoftwarePaths(drvindex), NULL);
+	
+	/* allocate the machine config */
+	machine_config *config = machine_config_alloc( drivers[drvindex]->machine_config );
+
+	for (const device_config *dev = config->devicelist.first(); dev != NULL; dev = dev->next)
+	{
+		if ( ! strcmp( dev->tag(), __SOFTWARE_LIST_TAG ) )
+		{
+			software_list_config *swlist = (software_list_config *)dev->inline_config;
+
+			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+			{
+				if ( swlist->list_name[i] && *swlist->list_name[i] )
+					sprintf(softListDir,"roms\\%s",swlist->list_name[i]);
+					AddSoftwarePickerDirs(hwndSoftwarePicker, softListDir, NULL);
+			}
+		}
+	}
+
+	/* free the machine config */
+	machine_config_free( config );	
 }
 
 
