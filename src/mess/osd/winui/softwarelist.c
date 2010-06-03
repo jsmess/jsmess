@@ -46,8 +46,11 @@ struct _file_info
 	const hash_info *hashinfo;
 
 	const char *zip_entry_name;
-	const char *base_name;
-	char file_name[1];
+	char list_name[256];
+	char description[256];
+	char file_name[256];
+	char publisher[256];
+	char year[10];
 };
 
 typedef struct _directory_search_info directory_search_info;
@@ -80,48 +83,6 @@ struct _software_list_info
 
 static const TCHAR software_list_property_name[] = TEXT("SWLIST");
 
-
-
-//============================================================
-
-static LPCSTR NormalizePath(LPCSTR pszPath, LPSTR pszBuffer, size_t nBufferSize)
-{
-	BOOL bChanged = FALSE;
-	LPSTR s;
-	int i, j;
-
-	if (pszPath[0] == '\\')
-	{
-		win_get_current_directory_utf8(nBufferSize, pszBuffer);
-		pszBuffer[2] = '\0';
-		bChanged = TRUE;
-	}
-	else if (!isalpha(pszPath[0]) || (pszPath[1] != ':'))
-	{
-		win_get_current_directory_utf8(nBufferSize, pszBuffer);
-		bChanged = TRUE;
-	}
-
-	if (bChanged)
-	{
-		s = (LPSTR) alloca(strlen(pszBuffer) + 1);
-		strcpy(s, pszBuffer);
-		snprintf(pszBuffer, nBufferSize, "%s\\%s", s, pszPath);
-		pszPath = pszBuffer;
-
-		// Remove double path separators
-		i = 0;
-		j = 0;
-		while(pszBuffer[i])
-		{
-			while ((pszBuffer[i] == '\\') && (pszBuffer[i+1] == '\\'))
-				i++;
-			pszBuffer[j++] = pszBuffer[i++];
-		}
-		pszBuffer[j] = '\0';
-	}
-	return pszPath;
-}
 
 
 
@@ -363,70 +324,40 @@ static void SoftwareList_RealizeHash(HWND hwndPicker, int nIndex)
 }
 
 
-
-static BOOL SoftwareList_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
-	UINT nZipEntryNameLength, UINT32 nCrc, BOOL bForce)
+BOOL SoftwareList_AddFile(HWND hwndPicker,LPCSTR pszName, LPCSTR pszListname, LPCSTR pszDescription, LPCSTR pszPublisher, LPCSTR pszYear)
 {
+	Picker_ResetIdle(hwndPicker);
+	
 	software_list_info *pPickerInfo;
 	file_info **ppNewIndex;
 	file_info *pInfo;
 	int nIndex, nSize;
-	LPCSTR pszExtension = NULL;
+//	LPCSTR pszExtension = NULL;
 	const device_config *device = NULL;
 
 	// first check to see if it is already here
-	if (SoftwareList_LookupIndex(hwndPicker, pszFilename) >= 0)
+	if (SoftwareList_LookupIndex(hwndPicker, pszName) >= 0)
 		return TRUE;
 
 	pPickerInfo = GetSoftwareListInfo(hwndPicker);
 
-	// look up the device
-	if (strrchr(pszFilename, '.'))
-		pszExtension = strrchr(pszFilename, '.');
-	if ((pszExtension != NULL) && (pPickerInfo->config != NULL))
-	{
-		for (device = pPickerInfo->config->mconfig->devicelist.first(); device != NULL;device = device->next)
-		{
-			if (is_image_device(device))
-			{
-				if (image_device_uses_file_extension(device, pszExtension))
-					break;
-			}
-		}
-	}
-
-	// no device?  cop out unless bForce is on
-	if ((device == NULL) && !bForce)
-		return TRUE;
-
 	// create the FileInfo structure
-	nSize = sizeof(file_info) + strlen(pszFilename);
+	nSize = sizeof(file_info);
 	pInfo = (file_info *) malloc(nSize);
 	if (!pInfo)
 		goto error;
 	memset(pInfo, 0, nSize);
 
 	// copy the filename
-	strcpy(pInfo->file_name, pszFilename);
+	strcpy(pInfo->file_name, pszName);
+	strcpy(pInfo->list_name, pszListname);
+	strcpy(pInfo->description, pszDescription);
+	strcpy(pInfo->publisher, pszPublisher);
+	strcpy(pInfo->year, pszYear);
 
 	// set up device and CRC, if specified
 	pInfo->device = device;
-	if ((device != NULL) && (image_device_getinfo(pPickerInfo->config->mconfig, device).has_partial_hash != 0))
-		nCrc = 0;
-	if (nCrc != 0)
-		snprintf(pInfo->hash_string, ARRAY_LENGTH(pInfo->hash_string), "c:%08x#", nCrc);
-
-	// set up zip entry name length, if specified
-	if (nZipEntryNameLength > 0)
-		pInfo->zip_entry_name = pInfo->file_name + strlen(pInfo->file_name) - nZipEntryNameLength;
-
-	// calculate the subname
-	pInfo->base_name = strrchr(pInfo->file_name, '\\');
-	if (pInfo->base_name)
-		pInfo->base_name++;
-	else
-		pInfo->base_name = pInfo->file_name;
-
+	
 	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
 	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));
 	if (pPickerInfo->file_index) free(pPickerInfo->file_index);
@@ -447,115 +378,8 @@ static BOOL SoftwareList_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 error:
 	if (pInfo)
 		free(pInfo);
-	return FALSE;
+	return FALSE;	
 }
-
-
-
-static BOOL SoftwareList_AddZipEntFile(HWND hwndPicker, LPCSTR pszZipPath,
-	BOOL bForce, zip_file *pZip, const zip_file_header *pZipEnt)
-{
-	LPSTR s;
-	LPCSTR temp = pZipEnt->filename;
-	int nLength;
-	int nZipEntryNameLength;
-
-	// special case; skip first two characters if they are './'
-	if ((pZipEnt->filename[0] == '.') && (pZipEnt->filename[1] == '/'))
-	{
-		while(*(++temp) == '/')
-			;
-	}
-
-	nZipEntryNameLength = strlen(pZipEnt->filename);
-	nLength = strlen(pszZipPath) + 1 + nZipEntryNameLength + 1;
-	s = (LPSTR) alloca(nLength);
-	snprintf(s, nLength, "%s\\%s", pszZipPath, pZipEnt->filename);
-
-	return SoftwareList_AddFileEntry(hwndPicker, s,
-		nZipEntryNameLength, pZipEnt->crc, bForce);
-}
-
-static BOOL SoftwareList_InternalAddFile(HWND hwndPicker, LPCSTR pszFilename,
-	BOOL bForce)
-{
-	LPCSTR s;
-	BOOL rc = TRUE;
-	zip_error ziperr;
-	zip_file *pZip;
-	const zip_file_header *pZipEnt;
-
-	s = strrchr(pszFilename, '.');
-	if (s && !mame_stricmp(s, ".zip"))
-	{
-		ziperr = zip_file_open(pszFilename, &pZip);
-		if (ziperr  == ZIPERR_NONE)
-		{
-			pZipEnt = zip_file_first_file(pZip);
-			while(rc && pZipEnt)
-			{
-				rc = SoftwareList_AddZipEntFile(hwndPicker, pszFilename,
-					bForce, pZip, pZipEnt);
-				pZipEnt = zip_file_next_file(pZip);
-			}
-			zip_file_close(pZip);
-		}
-	}
-	else
-	{
-		rc = SoftwareList_AddFileEntry(hwndPicker, pszFilename, 0, 0, bForce);
-	}
-	return rc;
-}
-
-
-
-BOOL SoftwareList_AddFile(HWND hwndPicker, LPCSTR pszFilename)
-{
-	char szBuffer[MAX_PATH];
-
-	Picker_ResetIdle(hwndPicker);
-	pszFilename = NormalizePath(pszFilename, szBuffer, sizeof(szBuffer)
-		/ sizeof(szBuffer[0]));
-
-	return SoftwareList_InternalAddFile(hwndPicker, pszFilename, TRUE);
-}
-
-
-
-BOOL SoftwareList_AddDirectory(HWND hwndPicker, LPCSTR pszDirectory)
-{
-	software_list_info *pPickerInfo;
-	directory_search_info *pSearchInfo;
-	directory_search_info **ppLast;
-	size_t nSearchInfoSize;
-	char szBuffer[MAX_PATH];
-
-	pszDirectory = NormalizePath(pszDirectory, szBuffer, sizeof(szBuffer)
-		/ sizeof(szBuffer[0]));
-
-	Picker_ResetIdle(hwndPicker);
-	pPickerInfo = GetSoftwareListInfo(hwndPicker);
-
-	nSearchInfoSize = sizeof(directory_search_info) + strlen(pszDirectory);
-	pSearchInfo = (directory_search_info *)malloc(nSearchInfoSize);
-	if (!pSearchInfo)
-		return FALSE;
-	memset(pSearchInfo, 0, nSearchInfoSize);
-	pSearchInfo->find_handle = INVALID_HANDLE_VALUE;
-
-	strcpy(pSearchInfo->directory_name, pszDirectory);
-
-	// insert into linked list
-	if (pPickerInfo->last_search_info)
-		ppLast = &pPickerInfo->last_search_info->next;
-	else
-		ppLast = &pPickerInfo->first_search_info;
-	*ppLast = pSearchInfo;
-	pPickerInfo->last_search_info = pSearchInfo;
-	return TRUE;
-}
-
 
 
 static void SoftwareList_FreeSearchInfo(directory_search_info *pSearchInfo)
@@ -601,42 +425,6 @@ void SoftwareList_Clear(HWND hwndPicker)
 }
 
 
-
-static BOOL SoftwareList_AddEntry(HWND hwndPicker,
-	directory_search_info *pSearchInfo)
-{
-	//software_list_info *pPickerInfo;
-	LPSTR pszFilename;
-	BOOL rc;
-	char* utf8_FileName;
-
-	//pPickerInfo = GetSoftwareListInfo(hwndPicker);
-
-	utf8_FileName = utf8_from_tstring(pSearchInfo->fd.cFileName);
-	if( !utf8_FileName )
-		return FALSE;
-
-	if (!strcmp(utf8_FileName, ".") || !strcmp(utf8_FileName, "..")) {
-		osd_free(utf8_FileName);
-		return TRUE;
-	}
-
-	pszFilename = (LPSTR)alloca(strlen(pSearchInfo->directory_name) + 1 + strlen(utf8_FileName) + 1);
-	strcpy(pszFilename, pSearchInfo->directory_name);
-	strcat(pszFilename, "\\");
-	strcat(pszFilename, utf8_FileName);
-
-	if (pSearchInfo->fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-		rc = SoftwareList_AddDirectory(hwndPicker, pszFilename);
-	else
-		rc = SoftwareList_InternalAddFile(hwndPicker, pszFilename, FALSE);
-
-	osd_free(utf8_FileName);
-	return rc;
-}
-
-
-
 BOOL SoftwareList_Idle(HWND hwndPicker)
 {
 	software_list_info *pPickerInfo;
@@ -671,7 +459,7 @@ BOOL SoftwareList_Idle(HWND hwndPicker)
 
 		if (bSuccess)
 		{
-			SoftwareList_AddEntry(hwndPicker, pSearchInfo);
+			//SoftwareList_AddEntry(hwndPicker, pSearchInfo);
 		}
 		else
 		{
@@ -733,9 +521,6 @@ LPCTSTR SoftwareList_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 	software_list_info *pPickerInfo;
 	const file_info *pFileInfo;
 	LPCTSTR s = NULL;
-	const char *pszUtf8 = NULL;
-	unsigned int nHashFunction = 0;
-	char szBuffer[256];
 	TCHAR* t_buf;
 
 	pPickerInfo = GetSoftwareListInfo(hwndPicker);
@@ -747,66 +532,46 @@ LPCTSTR SoftwareList_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 	switch(nColumn)
 	{
 		case MESS_COLUMN_IMAGES:
-			t_buf = tstring_from_utf8(pFileInfo->base_name);
+			t_buf = tstring_from_utf8(pFileInfo->file_name);
 			if( !t_buf )
 				return s;
 			_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
 			s = pszBuffer;
 			osd_free(t_buf);
 			break;
-
-		case MESS_COLUMN_GOODNAME:
-		case MESS_COLUMN_MANUFACTURER:
-		case MESS_COLUMN_YEAR:
-		case MESS_COLUMN_PLAYABLE:
-			if (pFileInfo->hashinfo)
-			{
-				switch(nColumn)
-				{
-					case MESS_COLUMN_GOODNAME:
-						pszUtf8 = pFileInfo->hashinfo->longname;
-						break;
-					case MESS_COLUMN_MANUFACTURER:
-						pszUtf8 = pFileInfo->hashinfo->manufacturer;
-						break;
-					case MESS_COLUMN_YEAR:
-						pszUtf8 = pFileInfo->hashinfo->year;
-						break;
-					case MESS_COLUMN_PLAYABLE:
-						pszUtf8 = pFileInfo->hashinfo->playable;
-						break;
-				}
-				if (pszUtf8)
-				{
-					t_buf = tstring_from_utf8(pszUtf8);
-					if( !t_buf )
-						return s;
-					_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
-					s = pszBuffer;
-					osd_free(t_buf);
-				}
-			}
+		case 1:
+			t_buf = tstring_from_utf8(pFileInfo->list_name);
+			if( !t_buf )
+				return s;
+			_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
+			s = pszBuffer;
+			osd_free(t_buf);
 			break;
-
-		case MESS_COLUMN_CRC:
-		case MESS_COLUMN_MD5:
-		case MESS_COLUMN_SHA1:
-		switch (nColumn)
-			{
-				case MESS_COLUMN_CRC:	nHashFunction = HASH_CRC;	break;
-				case MESS_COLUMN_MD5:	nHashFunction = HASH_MD5;	break;
-				case MESS_COLUMN_SHA1:	nHashFunction = HASH_SHA1;	break;
-			}
-			if (hash_data_extract_printable_checksum(pFileInfo->hash_string, nHashFunction, szBuffer))
-			{
-				t_buf = tstring_from_utf8(szBuffer);
-				if( !t_buf )
-					return s;
-				_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
-				s = pszBuffer;
-				osd_free(t_buf);
-			}
+		case 2:
+			t_buf = tstring_from_utf8(pFileInfo->description);
+			if( !t_buf )
+				return s;
+			_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
+			s = pszBuffer;
+			osd_free(t_buf);
 			break;
+		case 3:
+			t_buf = tstring_from_utf8(pFileInfo->year);
+			if( !t_buf )
+				return s;
+			_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
+			s = pszBuffer;
+			osd_free(t_buf);
+			break;
+		case 4:
+			t_buf = tstring_from_utf8(pFileInfo->publisher);
+			if( !t_buf )
+				return s;
+			_sntprintf(pszBuffer, nBufferLength, TEXT("%s"), t_buf);
+			s = pszBuffer;
+			osd_free(t_buf);
+			break;
+		
 	}
 	return s;
 }

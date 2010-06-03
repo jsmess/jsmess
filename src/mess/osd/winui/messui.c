@@ -39,6 +39,7 @@
 #include "swconfig.h"
 #include "device.h"
 #include "zippath.h"
+#include "emuopts.h"
 
 
 //============================================================
@@ -393,7 +394,8 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	BOOL is_same;
 	const game_driver *drv;
 	HWND hwndSoftwarePicker;
-	HWND hwndSoftwareDevView;
+	HWND hwndSoftwareList;
+	HWND hwndSoftwareDevView;	
 
 	// do we have to do anything?
 	if (!bForce)
@@ -417,6 +419,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 
 	// locate key widgets
 	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
+	hwndSoftwareList = GetDlgItem(GetMainWindow(), IDC_SOFTLIST);
 	hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
 
 	// set up the device view
@@ -434,6 +437,43 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 		drv = driver_get_compatible(drv);
 	}
 	AddSoftwarePickerDirs(hwndSoftwarePicker, GetExtraSoftwarePaths(drvindex), NULL);
+	
+	// set up the software picker
+	SoftwareList_Clear(hwndSoftwareList);
+	SoftwareList_SetDriver(hwndSoftwareList, s_config);
+
+	/* allocate the machine config */
+	machine_config *config = machine_config_alloc( drivers[drvindex]->machine_config );
+
+	core_options *options = mame_options_init(NULL);
+	for (const device_config *dev = config->devicelist.first(); dev != NULL; dev = dev->next)
+	{
+		if ( ! strcmp( dev->tag(), __SOFTWARE_LIST_TAG ) )
+		{
+			software_list_config *swlist = (software_list_config *)dev->inline_config;
+
+			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+			{
+				if (swlist->list_name[i])
+				{
+					software_list *list = software_list_open(options, swlist->list_name[i], FALSE, NULL);
+
+					if (list)
+					{
+						for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
+						{							
+							SoftwareList_AddFile(hwndSoftwareList, core_strdup(swinfo->shortname), core_strdup(swlist->list_name[i]), core_strdup(swinfo->longname), core_strdup(swinfo->publisher), core_strdup(swinfo->year));
+						}
+
+						software_list_close(list);
+					}						
+				}
+			}
+		}
+	}
+
+	/* free the machine config */
+	machine_config_free( config );		
 }
 
 
