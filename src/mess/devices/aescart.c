@@ -406,13 +406,21 @@ static DEVICE_START( aes_cartridge )
 // handle protected carts
 static void install_protection(running_device* image)
 {
+	neogeo_state *state = (neogeo_state *)image->machine->driver_data;
+
 	if(image_get_feature(image) == NULL)
 		return;
-		
+
 	if(strcmp(image_get_feature(image),"fatfury2_prot") == 0)
 	{
 		fatfury2_install_protection(image->machine);
 		logerror("Installed Fatal Fury 2 protection\n");
+	}
+	if(strcmp(image_get_feature(image),"mslug3_gfx_crypt") == 0)
+	{
+		state->fixed_layer_bank_type = 1;
+		kof99_neogeo_gfx_decrypt(image->machine, 0xad);
+		logerror("Decrypted Metal Slug 3 graphics\n");
 	}
 }
 

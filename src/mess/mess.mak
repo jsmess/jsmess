@@ -1394,6 +1394,7 @@ $(MESSOBJ)/snk.a:				\
 	$(MESS_DRIVERS)/ng_aes.o	\
 	$(MAME_VIDEO)/neogeo.o		\
 	$(MAME_MACHINE)/neoprot.o	\
+	$(MAME_MACHINE)/neocrypt.o	\
 
 $(MESSOBJ)/sony.a:				\
 	$(MESS_DRIVERS)/psx.o		\

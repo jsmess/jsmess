@@ -648,5 +648,76 @@
 			</dataarea>
 		</part>
 	</software>
+<!-- ID 256 -->
+<!--
+ROM_START( mslug3h ) /* Original Version - Encrypted GFX */ /* MVS AND AES VERSION */
+	ROM_REGION( 0x500000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "256-ph1.bin", 0x000000, 0x100000, CRC(9c42ca85" sha1="7a8f77a89867b889295ae9b9dfd4ba28f02d234d) )
+	ROM_LOAD16_WORD_SWAP( "256-ph2.bin", 0x100000, 0x400000, CRC(1f3d8ce8" sha1="08b05a8abfb86ec09a5e758d6273acf1489961f9) )
+
+	ROM_Y_ZOOM
+
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
+	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
+	ROM_FILL( 0x000000, 0x20000, 0 )
+	ROM_REGION( 0x20000, "fixedbios", 0 )
+	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd" sha1="fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) )
+
+	NEO_BIOS_AUDIO_512K( "256-m1.bin", CRC(eaeec116" sha1="54419dbb21edc8c4b37eaac2e7ad9496d2de037a) )
+
+	ROM_REGION( 0x1000000, "ymsnd", 0 )
+	ROM_LOAD( "256-v1.bin", 0x000000, 0x400000, CRC(f2690241" sha1="fd56babc1934d10e0d27c32f032f9edda7ca8ce9) )
+	ROM_LOAD( "256-v2.bin", 0x400000, 0x400000, CRC(7e2a10bd" sha1="0d587fb9f64cba0315ce2d8a03e2b8fe34936dff) )
+	ROM_LOAD( "256-v3.bin", 0x800000, 0x400000, CRC(0eaec17c" sha1="c3ed613cc6993edd6fc0d62a90bcd85de8e21915) )
+	ROM_LOAD( "256-v4.bin", 0xc00000, 0x400000, CRC(9b4b22d4" sha1="9764fbf8453e52f80aa97a46fb9cf5937ef15a31) )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x4000000, "sprites", 0 )
+	/* Encrypted */
+	ROM_LOAD16_BYTE( "256-c1.bin", 0x0000000, 0x800000, CRC(5a79c34e" sha1="b8aa51fa50935cae62ab3d125b723ab888691e60) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "256-c2.bin", 0x0000001, 0x800000, CRC(944c362c" sha1="3843ab300f956280475469caee70135658f67089) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "256-c3.bin", 0x1000000, 0x800000, CRC(6e69d36f" sha1="94e8cf42e999114b4bd8b30e0aa2f365578c4c9a) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "256-c4.bin", 0x1000001, 0x800000, CRC(b755b4eb" sha1="804700a0966a48f130c434ede3f970792ea74fa5) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "256-c5.bin", 0x2000000, 0x800000, CRC(7aacab47" sha1="312c1c9846175fe1a3cad51d5ae230cf674fc93d) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "256-c6.bin", 0x2000001, 0x800000, CRC(c698fd5d" sha1="16818883b06849ba2f8d61bdd5e21aaf99bd8408) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "256-c7.bin", 0x3000000, 0x800000, CRC(cfceddd2" sha1="7def666adf8bd1703f40c61f182fc040b6362dc9) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "256-c8.bin", 0x3000001, 0x800000, CRC(4d9be34c" sha1="a737bdfa2b815aea7067e7af2636e83a9409c414) ) /* Plane 2,3 */
+ROM_END
+-->
+	<software name="mslug3">
+		<description>Metal Slug 3</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart" feature="mslug3_gfx_crypt">
+			<dataarea name="maincpu" size="5242880">
+                <rom name="256-ph1.bin" size="1048576" crc="9c42ca85" sha1="7a8f77a89867b889295ae9b9dfd4ba28f02d234d" offset="000000" />
+                <rom name="256-ph2.bin" size="4194304" crc="1f3d8ce8" sha1="08b05a8abfb86ec09a5e758d6273acf1489961f9" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="524288">
+                <rom value="0" length="524288" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="589824">
+                <rom name="256-m1.bin" size="524288" crc="eaeec116" sha1="54419dbb21edc8c4b37eaac2e7ad9496d2de037a" offset="000000" />
+				<rom size="524288" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="256-v1.bin" size="4194304" crc="f2690241" sha1="fd56babc1934d10e0d27c32f032f9edda7ca8ce9" offset="000000" />
+                <rom name="256-v2.bin" size="4194304" crc="7e2a10bd" sha1="0d587fb9f64cba0315ce2d8a03e2b8fe34936dff" offset="400000" />
+                <rom name="256-v3.bin" size="4194304" crc="0eaec17c" sha1="c3ed613cc6993edd6fc0d62a90bcd85de8e21915" offset="800000" />
+                <rom name="256-v4.bin" size="4194304" crc="9b4b22d4" sha1="9764fbf8453e52f80aa97a46fb9cf5937ef15a31" offset="c00000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="256-c1.bin" size="8388608" crc="5a79c34e" sha1="b8aa51fa50935cae62ab3d125b723ab888691e60" offset="000000" loadflag="load16_byte" />
+                <rom name="256-c2.bin" size="8388608" crc="944c362c" sha1="3843ab300f956280475469caee70135658f67089" offset="000001" loadflag="load16_byte" />
+                <rom name="256-c3.bin" size="8388608" crc="6e69d36f" sha1="94e8cf42e999114b4bd8b30e0aa2f365578c4c9a" offset="1000000" loadflag="load16_byte" />
+                <rom name="256-c4.bin" size="8388608" crc="b755b4eb" sha1="804700a0966a48f130c434ede3f970792ea74fa5" offset="1000001" loadflag="load16_byte" />
+                <rom name="256-c5.bin" size="8388608" crc="7aacab47" sha1="312c1c9846175fe1a3cad51d5ae230cf674fc93d" offset="2000000" loadflag="load16_byte" />
+                <rom name="256-c6.bin" size="8388608" crc="c698fd5d" sha1="16818883b06849ba2f8d61bdd5e21aaf99bd8408" offset="2000001" loadflag="load16_byte" />
+                <rom name="256-c7.bin" size="8388608" crc="cfceddd2" sha1="7def666adf8bd1703f40c61f182fc040b6362dc9" offset="3000000" loadflag="load16_byte" />
+                <rom name="256-c8.bin" size="8388608" crc="4d9be34c" sha1="a737bdfa2b815aea7067e7af2636e83a9409c414" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
