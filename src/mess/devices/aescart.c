@@ -416,11 +416,20 @@ static void install_protection(running_device* image)
 		fatfury2_install_protection(image->machine);
 		logerror("Installed Fatal Fury 2 protection\n");
 	}
-	if(strcmp(image_get_feature(image),"mslug3_gfx_crypt") == 0)
+	if(strcmp(image_get_feature(image),"mslug3_crypt") == 0)
 	{
 		state->fixed_layer_bank_type = 1;
 		kof99_neogeo_gfx_decrypt(image->machine, 0xad);
 		logerror("Decrypted Metal Slug 3 graphics\n");
+	}
+	if(strcmp(image_get_feature(image),"matrim_crypt") == 0)
+	{
+		matrim_decrypt_68k(image->machine);
+		neo_pcm2_swap(image->machine, 1);
+		state->fixed_layer_bank_type = 2;
+		neogeo_cmc50_m1_decrypt(image->machine);
+		kof2000_neogeo_gfx_decrypt(image->machine, 0x6a);
+		logerror("Decrypted Matrimelee code, sound and graphics\n");
 	}
 }
 
@@ -467,12 +476,17 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 		}
 		else
 			memory_region_free(image->machine,"ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
-		
 		ym->reset();
 		size = image_get_software_region_length(image,"sprites");
 		memory_region_free(image->machine,"sprites");
 		memory_region_alloc(image->machine,"sprites",size,ROMREGION_ERASEFF);
 		memcpy(memory_region(image->machine,"sprites"),image_get_software_region(image,"sprites"),size);
+		if(image_get_software_region(image,"audiocrypt") != NULL)  // encrypted Z80 code
+		{
+			size = image_get_software_region_length(image,"audiocrypt");
+			memory_region_alloc(image->machine,"audiocrypt",size,ROMREGION_ERASEFF);
+			memcpy(memory_region(image->machine,"audiocrypt"),image_get_software_region(image,"audiocrypt"),size);
+		}
 		
 		// setup cartridge ROM area
 		memory_install_read_bank(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM),0x000080,0x0fffff,0,0,"cart_rom");

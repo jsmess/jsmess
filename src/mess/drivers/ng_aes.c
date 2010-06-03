@@ -1030,7 +1030,7 @@ static const ym2610_interface ym2610_config =
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )   												\
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_8)	\
 	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_memcard_status, NULL)			\
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )  /* Matrimelee expects this bit to be high when on an AES */
 
 
 #define STANDARD_IN3																				\
