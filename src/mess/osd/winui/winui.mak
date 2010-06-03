@@ -57,6 +57,7 @@ WINUIOBJS += \
 	$(MESS_WINUIOBJ)/propertiesms.o \
 	$(MESS_WINUIOBJ)/swconfig.o \
 	$(MESS_WINUIOBJ)/softwarepicker.o \
+	$(MESS_WINUIOBJ)/softwarelist.o \
 	$(MESS_WINUIOBJ)/devview.o
 
 

@@ -763,6 +763,7 @@ static const int s_nPickers[] =
 	IDC_LIST
 #ifdef MESS
 	,IDC_SWLIST
+	,IDC_SOFTLIST
 #endif
 };
 
@@ -792,6 +793,7 @@ static ResizeItem main_resize_items[] =
 	{ RA_ID,   { IDC_SSTAB },    FALSE,	RA_RIGHT | RA_TOP,                 NULL },
 #ifdef MESS
 	{ RA_ID,   { IDC_SWLIST },    TRUE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
+	{ RA_ID,   { IDC_SOFTLIST },  TRUE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
 	{ RA_ID,   { IDC_SPLITTER3 },FALSE,	RA_RIGHT | RA_BOTTOM | RA_TOP,     NULL },
 #endif /* MESS */
 	{ RA_END,  { 0 },            FALSE, 0,                                 NULL }

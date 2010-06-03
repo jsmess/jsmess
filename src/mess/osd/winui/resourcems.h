@@ -15,6 +15,7 @@
 #define IDC_USE_NEW_UI                  2007
 #define IDC_RAM_COMBOBOX				2008
 #define IDC_RAM_CAPTION					2009
+#define IDC_SOFTLIST					2010
 #define IDC_SKIP_WARNINGS               2013
 #define IDI_WIN_NOROMSNEEDED			2100
 #define IDI_WIN_MISSINGOPTROM			2101

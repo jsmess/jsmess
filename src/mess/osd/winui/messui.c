@@ -29,6 +29,7 @@
 #include "mess.h"
 #include "configms.h"
 #include "softwarepicker.h"
+#include "softwarelist.h"
 #include "devview.h"
 #include "windows/window.h"
 #include "utils.h"
@@ -121,6 +122,17 @@ static const LPCTSTR mess_column_names[] =
 	TEXT("MD5")
 };
 
+static const LPCTSTR softlist_column_names[] =
+{
+	TEXT("Name"),
+	TEXT("List"),
+	TEXT("Description"),
+	TEXT("Year"),
+	TEXT("Publisher"),
+	TEXT("CRC"),
+	TEXT("SHA-1"),
+	TEXT("MD5")};
+
 
 
 //============================================================
@@ -128,6 +140,7 @@ static const LPCTSTR mess_column_names[] =
 //============================================================
 
 static void SoftwarePicker_OnHeaderContextMenu(POINT pt, int nColumn);
+static void SoftwareList_OnHeaderContextMenu(POINT pt, int nColumn);
 
 static LPCSTR SoftwareTabView_GetTabShortName(int tab);
 static LPCSTR SoftwareTabView_GetTabLongName(int tab);
@@ -141,6 +154,10 @@ static void MessRefreshPicker(void);
 static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem);
 static void SoftwarePicker_LeavingItem(HWND hwndSoftwarePicker, int nItem);
 static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem);
+
+static int SoftwareList_GetItemImage(HWND hwndPicker, int nItem);
+static void SoftwareList_LeavingItem(HWND hwndSoftwareList, int nItem);
+static void SoftwareList_EnteringItem(HWND hwndSoftwareList, int nItem);
 
 static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength);
 static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength);
@@ -157,7 +174,7 @@ static void MessTestsBegin(void);
 //  PICKER/TABVIEW CALLBACKS
 //============================================================
 
-static const struct PickerCallbacks s_softwareListCallbacks =
+static const struct PickerCallbacks s_softwarePickerCallbacks =
 {
 	SetMessSortColumn,					// pfnSetSortColumn
 	GetMessSortColumn,					// pfnGetSortColumn
@@ -186,6 +203,34 @@ static const struct PickerCallbacks s_softwareListCallbacks =
 	NULL								// pfnOnBodyContextMenu
 };
 
+static const struct PickerCallbacks s_softwareListCallbacks =
+{
+	SetMessSortColumn,					// pfnSetSortColumn
+	GetMessSortColumn,					// pfnGetSortColumn
+	SetMessSortReverse,					// pfnSetSortReverse
+	GetMessSortReverse,					// pfnGetSortReverse
+	NULL,								// pfnSetViewMode
+	GetViewMode,						// pfnGetViewMode
+	SetMessColumnWidths,				// pfnSetColumnWidths
+	GetMessColumnWidths,				// pfnGetColumnWidths
+	SetMessColumnOrder,					// pfnSetColumnOrder
+	GetMessColumnOrder,					// pfnGetColumnOrder
+	SetMessColumnShown,					// pfnSetColumnShown
+	GetMessColumnShown,					// pfnGetColumnShown
+	NULL,								// pfnGetOffsetChildren
+
+	NULL,								// pfnCompare
+	MamePlayGame,						// pfnDoubleClick
+	SoftwareList_GetItemString,			// pfnGetItemString
+	SoftwareList_GetItemImage,			// pfnGetItemImage
+	SoftwareList_LeavingItem,			// pfnLeavingItem
+	SoftwareList_EnteringItem,			// pfnEnteringItem
+	NULL,								// pfnBeginListViewDrag
+	NULL,								// pfnFindItemParent
+	SoftwareList_Idle,					// pfnIdle
+	SoftwareList_OnHeaderContextMenu,	// pfnOnHeaderContextMenu
+	NULL								// pfnOnBodyContextMenu
+};
 
 
 static const struct TabViewCallbacks s_softwareTabViewCallbacks =
@@ -620,7 +665,7 @@ void InitMessPicker(void)
 	hwndSoftware = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 
 	memset(&opts, 0, sizeof(opts));
-	opts.pCallbacks = &s_softwareListCallbacks;
+	opts.pCallbacks = &s_softwarePickerCallbacks;
 	opts.nColumnCount = MESS_COLUMN_MAX;
 	opts.ppszColumnNames = mess_column_names;
 	SetupSoftwarePicker(hwndSoftware, &opts);
@@ -640,6 +685,20 @@ void InitMessPicker(void)
 		};
 		DevView_SetCallbacks(GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW), &s_devViewCallbacks);
 	}
+	
+	HWND hwndSoftwareList;
+
+	hwndSoftwareList = GetDlgItem(GetMainWindow(), IDC_SOFTLIST);
+
+	memset(&opts, 0, sizeof(opts));
+	opts.pCallbacks = &s_softwareListCallbacks;
+	opts.nColumnCount = MESS_COLUMN_MAX;
+	opts.ppszColumnNames = softlist_column_names;
+	SetupSoftwareList(hwndSoftwareList, &opts);
+
+	SetWindowLong(hwndSoftwareList, GWL_STYLE, GetWindowLong(hwndSoftwareList, GWL_STYLE)
+		| LVS_REPORT | LVS_SHOWSELALWAYS | LVS_OWNERDRAWFIXED);
+
 }
 
 
@@ -1051,7 +1110,7 @@ static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
 
 
 // ------------------------------------------------------------------------
-// Software List Class
+// Software Picker Class
 // ------------------------------------------------------------------------
 
 static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
@@ -1142,6 +1201,98 @@ static void SoftwarePicker_EnteringItem(HWND hwndSoftwarePicker, int nItem)
 	}
 }
 
+
+// ------------------------------------------------------------------------
+// Software List Class
+// ------------------------------------------------------------------------
+
+static int SoftwareList_GetItemImage(HWND hwndPicker, int nItem)
+{
+	iodevice_t nType;
+	int nIcon;
+	int drvindex;
+	const char *icon_name;
+	HWND hwndGamePicker;
+	HWND hwndSoftwareList;
+
+	hwndGamePicker = GetDlgItem(GetMainWindow(), IDC_LIST);
+	hwndSoftwareList = GetDlgItem(GetMainWindow(), IDC_SOFTLIST);
+	drvindex = Picker_GetSelectedItem(hwndGamePicker);
+	nType = SoftwareList_GetImageType(hwndSoftwareList, nItem);
+	nIcon = GetMessIcon(drvindex, nType);
+	if (!nIcon)
+	{
+		switch(nType)
+		{
+			case IO_UNKNOWN:
+				nIcon = FindIconIndex(IDI_WIN_REDX);
+				break;
+
+			default:
+				icon_name = lookupdevice(nType)->icon_name;
+				if (!icon_name)
+					icon_name = device_typename(nType);
+				nIcon = FindIconIndexByName(icon_name);
+				if (nIcon < 0)
+					nIcon = FindIconIndex(IDI_WIN_UNKNOWN);
+				break;
+		}
+    }
+    return nIcon;
+}
+
+
+
+static void SoftwareList_LeavingItem(HWND hwndSoftwareList, int nItem)
+{
+	int drvindex;
+	const char *pszFullName;
+	HWND hwndList;
+
+	if (!s_bIgnoreSoftwarePickerNotifies)
+	{
+		hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
+		drvindex = Picker_GetSelectedItem(hwndList);
+		pszFullName = SoftwareList_LookupFilename(hwndSoftwareList, nItem);
+
+		MessRemoveImage(drvindex, pszFullName);
+	}
+}
+
+
+
+static void SoftwareList_EnteringItem(HWND hwndSoftwareList, int nItem)
+{
+	LPCSTR pszFullName;
+	LPCSTR pszName;
+	const char* tmp;
+	LPSTR s;
+	int drvindex;
+	HWND hwndList;
+
+	hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
+
+	if (!s_bIgnoreSoftwarePickerNotifies)
+	{
+		drvindex = Picker_GetSelectedItem(hwndList);
+
+		// Get the fullname and partialname for this file
+		pszFullName = SoftwareList_LookupFilename(hwndSoftwareList, nItem);
+		tmp = strchr(pszFullName, '\\');
+		pszName = tmp ? tmp + 1 : pszFullName;
+
+		// Do the dirty work
+		MessSpecifyImage(drvindex, NULL, pszFullName);
+
+		// Set up s_szSelecteItem, for the benefit of UpdateScreenShot()
+		strncpyz(g_szSelectedItem, pszName, ARRAY_LENGTH(g_szSelectedItem));
+		s = strrchr(g_szSelectedItem, '.');
+		if (s)
+			*s = '\0';
+
+		UpdateScreenShot();
+	}
+}
 
 
 // ------------------------------------------------------------------------
@@ -1254,6 +1405,47 @@ static void SoftwarePicker_OnHeaderContextMenu(POINT pt, int nColumn)
 	}
 }
 
+static void SoftwareList_OnHeaderContextMenu(POINT pt, int nColumn)
+{
+	HMENU hMenu;
+	HMENU hMenuLoad;
+	HWND hwndPicker;
+	int nMenuItem;
+
+	hMenuLoad = LoadMenu(NULL, MAKEINTRESOURCE(IDR_CONTEXT_HEADER));
+	hMenu = GetSubMenu(hMenuLoad, 0);
+
+	nMenuItem = (int) TrackPopupMenu(hMenu,
+		TPM_LEFTALIGN | TPM_RIGHTBUTTON | TPM_RETURNCMD,
+		pt.x,
+		pt.y,
+		0,
+		GetMainWindow(),
+		NULL);
+
+	DestroyMenu(hMenuLoad);
+
+	hwndPicker = GetDlgItem(GetMainWindow(), IDC_SOFTLIST);
+
+	switch(nMenuItem) {
+	case ID_SORT_ASCENDING:
+		SetMessSortReverse(FALSE);
+		SetMessSortColumn(Picker_GetRealColumnFromViewColumn(hwndPicker, nColumn));
+		Picker_Sort(hwndPicker);
+		break;
+
+	case ID_SORT_DESCENDING:
+		SetMessSortReverse(TRUE);
+		SetMessSortColumn(Picker_GetRealColumnFromViewColumn(hwndPicker, nColumn));
+		Picker_Sort(hwndPicker);
+		break;
+
+	case ID_CUSTOMIZE_FIELDS:
+		if (RunColumnDialog(hwndPicker))
+			Picker_ResetColumnDisplay(hwndPicker);
+		break;
+	}
+}
 
 
 // ------------------------------------------------------------------------
@@ -1286,7 +1478,8 @@ BOOL MessCommand(HWND hwnd,int id, HWND hwndCtl, UINT codeNotify)
 static LPCSTR s_tabs[] =
 {
 	"picker\0Picker",
-	"devview\0Device View"
+	"devview\0Device View",
+	"softlist\0Software",
 };
 
 
@@ -1310,9 +1503,11 @@ static void SoftwareTabView_OnSelectionChanged(void)
 	int nTab;
 	HWND hwndSoftwarePicker;
 	HWND hwndSoftwareDevView;
+	HWND hwndSoftwareList;
 
 	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 	hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
+	hwndSoftwareList = GetDlgItem(GetMainWindow(), IDC_SOFTLIST);
 
 	nTab = TabView_GetCurrentTab(GetDlgItem(GetMainWindow(), IDC_SWTAB));
 
@@ -1321,11 +1516,18 @@ static void SoftwareTabView_OnSelectionChanged(void)
 		case 0:
 			ShowWindow(hwndSoftwarePicker, SW_SHOW);
 			ShowWindow(hwndSoftwareDevView, SW_HIDE);
+			ShowWindow(hwndSoftwareList, SW_HIDE);
 			break;
 
 		case 1:
 			ShowWindow(hwndSoftwarePicker, SW_HIDE);
 			ShowWindow(hwndSoftwareDevView, SW_SHOW);
+			ShowWindow(hwndSoftwareList, SW_HIDE);
+			break;
+		case 2:
+			ShowWindow(hwndSoftwarePicker, SW_HIDE);
+			ShowWindow(hwndSoftwareDevView, SW_HIDE);
+			ShowWindow(hwndSoftwareList, SW_SHOW);
 			break;
 	}
 }
@@ -1337,12 +1539,14 @@ static void SoftwareTabView_OnMoveSize(void)
 	HWND hwndSoftwareTabView;
 	HWND hwndSoftwarePicker;
 	HWND hwndSoftwareDevView;
+	HWND hwndSoftwareList;
 	RECT rMain, rSoftwareTabView, rClient, rTab;
 	BOOL res;
 
 	hwndSoftwareTabView = GetDlgItem(GetMainWindow(), IDC_SWTAB);
 	hwndSoftwarePicker = GetDlgItem(GetMainWindow(), IDC_SWLIST);
 	hwndSoftwareDevView = GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW);
+	hwndSoftwareList = GetDlgItem(GetMainWindow(), IDC_SOFTLIST);
 
 	GetWindowRect(hwndSoftwareTabView, &rSoftwareTabView);
 	GetClientRect(GetMainWindow(), &rMain);
@@ -1368,6 +1572,9 @@ static void SoftwareTabView_OnMoveSize(void)
 		rClient.right - rClient.left, rClient.bottom - rClient.top,
 		TRUE);
 	MoveWindow(hwndSoftwareDevView, rClient.left, rClient.top,
+		rClient.right - rClient.left, rClient.bottom - rClient.top,
+		TRUE);
+	MoveWindow(hwndSoftwareList, rClient.left, rClient.top,
 		rClient.right - rClient.left, rClient.bottom - rClient.top,
 		TRUE);
 }
