@@ -723,6 +723,11 @@ static MACHINE_DRIVER_START( apple2ee )
 	MDRV_APPLE2_SLOT_ADD(7, "cffa", a2cffa_r, a2cffa_w, a2cffa_c800_r, a2cffa_c800_w, a2cffa_cnxx_r, a2cffa_cnxx_w)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( apple2ep )
+	MDRV_IMPORT_FROM( apple2e )
+	MDRV_CPU_REPLACE("maincpu", M65C02, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( apple2c )
 	MDRV_IMPORT_FROM( apple2ee )
 MACHINE_DRIVER_END
@@ -1015,7 +1020,7 @@ COMP( 1983, apple2e,  0,        apple2,	  apple2e,	   apple2e,  0,        "Apple
 //COMP( 1983, apple2ez, apple2e,  0,	  apple2e_z80,	   apple2e,  0,        "Apple Computer",    "Apple //e (with Z80 SoftCard)", GAME_SUPPORTS_SAVE )
 COMP( 1983, mprof3,   apple2e,  0,        mprof3,	   apple2e,  0,        "Multitech",         "Microprofessor III", GAME_SUPPORTS_SAVE )
 COMP( 1985, apple2ee, apple2e,  0,        apple2ee,	   apple2e,  0,        "Apple Computer",    "Apple //e (enhanced)", GAME_SUPPORTS_SAVE )
-COMP( 1987, apple2ep, apple2e,  0,        apple2ee,	   apple2ep, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )
+COMP( 1987, apple2ep, apple2e,  0,        apple2ep,	   apple2ep, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )
 COMP( 1984, apple2c,  0,        apple2,	  apple2c,	   apple2e,  0,        "Apple Computer",    "Apple //c" , GAME_SUPPORTS_SAVE )
 COMP( 1989, prav8c,   apple2c,  0,        apple2c,	   apple2e,  0,        "Pravetz",           "Pravetz 8C", GAME_SUPPORTS_SAVE )
 COMP( 1983, las3000,  apple2,   0,        apple2p,	   apple2p,  0,        "Video Technology",  "Laser 3000",	GAME_NOT_WORKING )
