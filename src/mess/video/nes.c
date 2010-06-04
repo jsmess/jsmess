@@ -15,7 +15,6 @@ static void nes_vh_reset( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	ppu2c0x_set_vidaccess_callback(devtag_get_device(machine,"ppu"), nes_ppu_vidaccess);
-	ppu2c0x_set_scanlines_per_frame(devtag_get_device(machine,"ppu"), ceil(state->scanlines_per_frame));
 
 	if (state->four_screen_vram)
 		set_nt_mirroring(machine, PPU_MIRROR_4SCREEN);
@@ -36,24 +35,13 @@ static void nes_vh_reset( running_machine *machine )
 	}
 }
 
-static void nes_vh_start(running_machine *machine, double scanlines_per_frame)
+VIDEO_START( nes )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
-
+	
 	state->last_frame_flip =  0;
-	state->scanlines_per_frame = scanlines_per_frame;
-
+	
 	add_reset_callback(machine, nes_vh_reset);
-}
-
-VIDEO_START( nes_ntsc )
-{
-	nes_vh_start(machine, PPU_NTSC_SCANLINES_PER_FRAME);
-}
-
-VIDEO_START( nes_pal )
-{
-	nes_vh_start(machine, PPU_PAL_SCANLINES_PER_FRAME);
 }
 
 PALETTE_INIT( nes )

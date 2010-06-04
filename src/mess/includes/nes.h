@@ -69,6 +69,7 @@ public:
 	/* input_related - this part has to be cleaned up (e.g. in_2 and in_3 are not really necessary here...) */
 	nes_input in_0, in_1, in_2, in_3;
 
+	int           prg_bank[5];
 	chr_bank      chr_map[8];  //quick banking structure, because some of this changes multiple times per scanline!
 	name_table    nt_page[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
@@ -81,7 +82,6 @@ public:
 	/* video-related */
 	int nes_vram_sprite[8]; /* Used only by mmc5 for now */
 	int last_frame_flip;
-	double scanlines_per_frame;
 
 	/* misc */
 	write8_space_func   mmc_write_low;
@@ -207,8 +207,7 @@ void nes_partialhash(char *dest, const unsigned char *data, unsigned long length
 extern int nes_vram_sprite[8];
 
 PALETTE_INIT( nes );
-VIDEO_START( nes_ntsc );
-VIDEO_START( nes_pal );
+VIDEO_START( nes );
 VIDEO_UPDATE( nes );
 
 

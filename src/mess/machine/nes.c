@@ -34,6 +34,9 @@ static void init_nes_core( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	static const char *const bank_names[] = { "bank1", "bank2", "bank3", "bank4" };
+	int prg_banks = (state->prg_chunks == 1) ? (2 * 2) : (state->prg_chunks * 2);
+	int i;
 
 	/* We set these here in case they weren't set in the cart loader */
 	state->rom = memory_region(machine, "maincpu");
@@ -89,11 +92,19 @@ static void init_nes_core( running_machine *machine )
 			memory_install_read_bank(space, 0xa000, 0xbfff, 0, 0, "bank2");
 			memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank3");
 			memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank4");
-			memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x6000);
-			memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x8000);
-			memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu") + 0xa000);
-			memory_set_bankptr(machine, "bank4", memory_region(machine, "maincpu") + 0xc000);
-			memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xe000);
+
+			// initially setup banks to maincpu 0x8000-0xffff
+			for (i = 0; i < 4; i++)
+			{
+				memory_configure_bank(machine, bank_names[i], 0, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+				memory_set_bank(machine, bank_names[i], i);
+				state->prg_bank[i] = i;
+			}
+
+			memory_configure_bank(machine, "bank5", 0, 1, memory_region(machine, "maincpu") + 0x6000, 0x2000);
+			memory_configure_bank(machine, "bank5", 1, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+			memory_set_bank(machine, "bank5", 0);
+			state->prg_bank[4] = 0;
 
 			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
 //			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_r);
@@ -168,16 +179,16 @@ static void init_nes_core( running_machine *machine )
 
 int nes_ppu_vidaccess( running_device *device, int address, int data )
 {
-	nes_state *state = (nes_state *)device->machine->driver_data;
+//	nes_state *state = (nes_state *)device->machine->driver_data;
 
 	/* TODO: this is a bit of a hack, needed to get Argus, ASO, etc to work */
 	/* but, B-Wings, submath (j) seem to use this location differently... */
-	if (state->chr_chunks && (address & 0x3fff) < 0x2000)
-	{
+//	if (state->chr_chunks && (address & 0x3fff) < 0x2000)
+//	{
 //      int vrom_loc;
 //      vrom_loc = (nes_vram[(address & 0x1fff) >> 10] * 16) + (address & 0x3ff);
 //      data = state->vrom [vrom_loc];
-	}
+//	}
 	return data;
 }
 
@@ -209,9 +220,22 @@ static TIMER_CALLBACK( nes_irq_callback )
 	timer_adjust_oneshot(state->irq_timer, attotime_never, 0);
 }
 
+static STATE_POSTLOAD( nes_banks_restore )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	memory_set_bank(machine, "bank1", state->prg_bank[0]);
+	memory_set_bank(machine, "bank2", state->prg_bank[1]);
+	memory_set_bank(machine, "bank3", state->prg_bank[2]);
+	memory_set_bank(machine, "bank4", state->prg_bank[3]);
+	memory_set_bank(machine, "bank5", state->prg_bank[4]);
+}
+
 static void nes_state_register( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
+
+	state_save_register_global_array(machine, state->prg_bank);
 
 	state_save_register_global(machine, state->MMC5_floodtile);
 	state_save_register_global(machine, state->MMC5_floodattr);
@@ -220,7 +244,6 @@ static void nes_state_register( running_machine *machine )
 
 	state_save_register_global_array(machine, state->nes_vram_sprite);
 	state_save_register_global(machine, state->last_frame_flip);
-	state_save_register_global(machine, state->scanlines_per_frame);
 	state_save_register_global(machine, state->mid_ram_enable);
 
 	// shared mapper variables
@@ -255,6 +278,8 @@ static void nes_state_register( running_machine *machine )
 	state_save_register_global(machine, state->fds_write_reg);
 	state_save_register_global(machine, state->fds_last_side);
 	state_save_register_global(machine, state->fds_count);
+
+	state_save_register_postload(machine, nes_banks_restore, NULL);
 }
 
 MACHINE_START( nes )
