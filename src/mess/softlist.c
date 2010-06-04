@@ -592,6 +592,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 									romflags = ROM_SKIP(1);
 								else if ( str_loadflag && !strcmp(str_loadflag, "load32_word_swap") )
 									romflags = ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2);
+								else if ( str_loadflag && !strcmp(str_loadflag, "load32_word") )
+									romflags = ROM_GROUPWORD | ROM_SKIP(2);
 
 								/* ROM_LOAD( name, offset, length, hash ) */
 								add_rom_entry( swlist, s_name, hashdata, offset, length, ROMENTRYTYPE_ROM | romflags );
