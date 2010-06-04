@@ -879,6 +879,41 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!-- ID 243 -->
+	<software name="lastbld2">
+		<description>The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="5242880">
+                <rom name="243-pg1.bin" size="1048576" crc="af1e6554" sha1="bd8526f60c2472937728a5d933fbd19d899f2cba" offset="000000" />
+                <rom name="243-pg2.bin" size="4194304" crc="add4a30b" sha1="7db62564db49fe0218cbb35b119d62582a24d658" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="243-s1.bin" size="131072" crc="c9cd2298" sha1="a9a18b5347f9dbe29a2ccb63fd4c8fd19537bf8b" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="243-m1.bin" size="131072" crc="acf12d10" sha1="6e6b98cc1fa44f24a5168877559b0055e6957b60" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="243-v1.bin" size="4194304" crc="f7ee6fbb" sha1="55137bcabeeb590e40a9b8a7c07dd106e4d12a90" offset="000000" />
+                <rom name="243-v2.bin" size="4194304" crc="aa9e4df6" sha1="a0b91f63e2552a8ad9e0d1af00e2c38288637161" offset="400000" />
+                <rom name="243-v3.bin" size="4194304" crc="4ac750b2" sha1="585a154acc67bd84ea5b944686b78ed082b768d9" offset="800000" />
+                <rom name="243-v4.bin" size="4194304" crc="f5c64ba6" sha1="2eac455def8c27090862cc042f65a3a8aad88283" offset="c00000" />
+			</dataarea>
+			<dataarea name="sprites" size="50331648">
+                <rom name="243-c1.bin" size="8388608" crc="5839444d" sha1="0616921c4cce20422563578bd0e806d359508599" offset="0000000" loadflag="load16_byte" />
+                <rom name="243-c2.bin" size="8388608" crc="dd087428" sha1="ca27fdb60425664956a18c021ea465f452fb1527" offset="0000001" loadflag="load16_byte" />
+                <rom name="243-c3.bin" size="8388608" crc="6054cbe0" sha1="ec2f65e9c930250ee25fd064ee5ae76a7a9c61d9" offset="1000000" loadflag="load16_byte" />
+                <rom name="243-c4.bin" size="8388608" crc="8bd2a9d2" sha1="0935df65cd2b0891a708bcc0f1c188148058d4b5" offset="1000001" loadflag="load16_byte" />
+                <rom name="243-c5.bin" size="8388608" crc="6a503dcf" sha1="23241b16d7e20f923d41186b29487ab922c7f530" offset="2000000" loadflag="load16_byte" />
+                <rom name="243-c6.bin" size="8388608" crc="ec9c36d0" sha1="e145e9e359000dda6e1dfe95a996bc6d29cfca21" offset="2000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 256 -->
 	<software name="mslug3">
 		<description>Metal Slug 3</description>
