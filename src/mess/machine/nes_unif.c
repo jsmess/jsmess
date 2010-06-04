@@ -1186,7 +1186,7 @@ static const unif unif_list[] =
 	{ "VIRGIN-SNROM",               NULL, NULL, NULL, mapper1_w, NULL, NULL, NULL,               16,    0,   8,    0, CHRRAM_8,  NT_HORZ,  STD_SNROM},
 	// below are boards we need for the new PCB-based code (and by list support): no unif file is known to use them, but they are needed to handle iNES file like PCBs.
 	{ "DAOU-306",    NULL, NULL, NULL, mapper156_w, NULL, NULL, NULL,   256,    128,   0,    0, 0,  0,  OPENCORP_DAOU306},	// mapper 156
-	{ "IREM-H-3001",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, 0,  0,  IREM_H3001},	// mapper 65
+	{ "IREM-H-3001",    NULL, NULL, NULL, mapper65_w, NULL, NULL, irem_irq,   256,    128,   0,    0, 0,  0,  IREM_H3001},	// mapper 65
 	{ "BANDAI-DATACH",    NULL, NULL, mapper16_m_w, mapper16_w, NULL, NULL,  bandai_irq,   256,    128,   0,    0, 0,  0,  BANDAI_DATACH},	// mapper 157
 	{ "BANDAI-KARAOKE",    NULL, NULL, NULL, mapper188_w, NULL, NULL, NULL,   256,    128,   0,    0, 0,  0,  BANDAI_KARAOKE},	// mapper 188
 	{ "BANDAI-OEKAKIDS",    NULL, NULL, NULL, mapper96_w, NULL, NULL, NULL,   256,    128,   0,    0, 0,  0,  BANDAI_OEKAKIDS},	// mapper 96

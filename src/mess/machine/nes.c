@@ -174,21 +174,12 @@ static void init_nes_core( running_machine *machine )
 	/* memory subsystem is set up. When this routine is called */
 	/* everything is ready, so we can just copy over the data */
 	/* we loaded before. */
-	memcpy(state->battery_ram, state->battery_data, NES_BATTERY_SIZE);
+	memcpy(state->battery_ram, state->battery_data, state->battery_size);
 }
 
+// to be probably removed (it does nothing since a long time)
 int nes_ppu_vidaccess( running_device *device, int address, int data )
 {
-//	nes_state *state = (nes_state *)device->machine->driver_data;
-
-	/* TODO: this is a bit of a hack, needed to get Argus, ASO, etc to work */
-	/* but, B-Wings, submath (j) seem to use this location differently... */
-//	if (state->chr_chunks && (address & 0x3fff) < 0x2000)
-//	{
-//      int vrom_loc;
-//      vrom_loc = (nes_vram[(address & 0x1fff) >> 10] * 16) + (address & 0x3ff);
-//      data = state->vrom [vrom_loc];
-//	}
 	return data;
 }
 
@@ -304,7 +295,7 @@ static void nes_machine_stop( running_machine *machine )
 
 	/* Write out the battery file if necessary */
 	if (state->battery)
-		image_battery_save(state->cart, state->battery_ram, NES_BATTERY_SIZE);
+		image_battery_save(state->cart, state->battery_ram, state->battery_size);
 }
 
 
@@ -521,16 +512,15 @@ WRITE8_HANDLER( nes_IN1_w )
 DEVICE_IMAGE_LOAD( nes_cart )
 {
 	nes_state *state = (nes_state *)image->machine->driver_data;
-	const char *mapinfo;
-	int mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0, goodcrcinfo = 0;
-	char magic[4];
-	char skank[8];
-	int local_options = 0;
-	char m;
-	int i;
 
 	if (image_software_entry(image) == NULL)
 	{
+		const char *mapinfo;
+		int mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0, goodcrcinfo = 0;
+		char magic[4], extend[5];
+		int local_options = 0;
+		char m;
+
 		/* Check first 4 bytes of the image to decide if it is UNIF or iNES */
 		/* Unfortunately, many .unf files have been released as .nes, so we cannot rely on extensions only */
 		memset(magic, '\0', sizeof(magic));
@@ -539,15 +529,49 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if ((magic[0] == 'N') && (magic[1] == 'E') && (magic[2] == 'S'))	/* If header starts with 'NES' it is iNES */
 		{
 			UINT32 prg_size;
-
 			state->format = 1;	// we use this to select between mapper_reset / unif_reset
+			state->ines20 = 0;
+			state->battery_size = NES_BATTERY_SIZE; // with iNES we can only support 8K WRAM battery (iNES 2.0 might fix this)
 
+			// check if the image is recognized by nes.hsi
 			mapinfo = image_extrainfo(image);
 
-			if (mapinfo)
+			// image_extrainfo() resets the file position back to start.
+			// Let's skip past the magic header once again.
+			image_fseek(image, 4, SEEK_SET);
+			
+			image_fread(image, &state->prg_chunks, 1);
+			image_fread(image, &state->chr_chunks, 1);
+			/* Read the first ROM option byte (offset 6) */
+			image_fread(image, &m, 1);
+			
+			/* Interpret the iNES header flags */
+			state->mapper = (m & 0xf0) >> 4;
+			local_options = m & 0x0f;
+			
+			/* Read the second ROM option byte (offset 7) */
+			image_fread(image, &m, 1);
+			
+			switch (m & 0xc)
+			{
+				case 0x4:
+				case 0xc:	
+					// probably the header got corrupted: don't trust upper bits for mapper
+					break;
+
+				case 0x8:	// it's iNES 2.0 format
+					state->ines20 = 1;
+				case 0x0:
+				default:
+					state->mapper = state->mapper | (m & 0xf0);
+					break;
+			}
+
+			if (mapinfo /* && !state->ines20 */)
 			{
 				if (4 == sscanf(mapinfo,"%d %d %d %d", &mapint1, &mapint2, &mapint3, &mapint4))
 				{
+					/* image is present in nes.hsi: overwrite the header settings with these */
 					state->mapper = mapint1;
 					local_options = mapint2 & 0x0f;
 					state->crc_hack = mapint2 & 0xf0;	// this is used to differentiate among variants of the same Mapper (see nes_mmc.c)
@@ -555,6 +579,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 					state->chr_chunks = mapint4;
 					logerror("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
 					goodcrcinfo = 1;
+					state->ines20 = 0;
 				}
 				else
 				{
@@ -564,42 +589,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			else
 			{
 				logerror("NES: No extrainfo found\n");
-			}
-
-			if (!goodcrcinfo)
-			{
-				// image_extrainfo() resets the file position back to start.
-				// Let's skip past the magic header once again.
-				image_fseek(image, 4, SEEK_SET);
-
-				image_fread(image, &state->prg_chunks, 1);
-				image_fread(image, &state->chr_chunks, 1);
-				/* Read the first ROM option byte (offset 6) */
-				image_fread(image, &m, 1);
-
-				/* Interpret the iNES header flags */
-				state->mapper = (m & 0xf0) >> 4;
-				local_options = m & 0x0f;
-
-				/* Read the second ROM option byte (offset 7) */
-				image_fread(image, &m, 1);
-
-				/* Check for skanky headers */
-				image_fread(image, &skank, 8);
-
-				/* If the header has junk in the unused bytes, assume the extra mapper byte is also invalid */
-				/* We only check the first 4 unused bytes for now */
-				for (i = 0; i < 4; i ++)
-				{
-					logerror("%02x ", skank[i]);
-					if (skank[i] != 0x00)
-					{
-						logerror("(skank: %d)", i);
-					}
-				}
-				logerror("\n");
-
-				state->mapper = state->mapper | (m & 0xf0);
 			}
 
 			state->hard_mirroring = local_options & 0x01;
@@ -615,6 +604,24 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 			if (state->four_screen_vram)
 				logerror("-- 4-screen VRAM\n");
+
+			if (state->ines20)
+			{
+				logerror("Extended iNES format:\n");
+				image_fread(image, &extend, 5);
+				state->mapper |= (extend[0] & 0x0f) << 8;
+				logerror("-- mapper: %d\n", state->mapper);
+				logerror("-- submapper: %d\n", (extend[0] & 0xf0) >> 4);
+				state->prg_chunks |= ((extend[1] & 0x0f) << 8);
+				state->chr_chunks |= ((extend[1] & 0xf0) << 4);
+				logerror("-- PRG chunks: %d\n", state->prg_chunks);
+				logerror("-- CHR chunks: %d\n", state->chr_chunks);
+				logerror("-- PRG NVWRAM: %d\n", extend[2] & 0x0f);
+				logerror("-- PRG WRAM: %d\n", (extend[2] & 0xf0) >> 4);
+				logerror("-- CHR NVWRAM: %d\n", extend[3] & 0x0f);
+				logerror("-- CHR WRAM: %d\n", (extend[3] & 0xf0) >> 4);
+				logerror("-- TV System: %d\n", extend[4] & 3);
+			}
 
 			/* Free the regions that were allocated by the ROM loader */
 			memory_region_free(image->machine, "maincpu");
@@ -639,14 +646,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				image_fread(image, &state->wram[0x1000], 0x200);
 
 			/* Read in the program chunks */
+			image_fread(image, &state->rom[0x10000], 0x4000 * state->prg_chunks);
 			if (state->prg_chunks == 1)
-			{
-				image_fread(image, &state->rom[0x14000], 0x4000);
-				/* Mirror this bank into $8000 */
-				memcpy(&state->rom[0x10000], &state->rom[0x14000], 0x4000);
-			}
-			else
-				image_fread(image, &state->rom[0x10000], 0x4000 * state->prg_chunks);
+				memcpy(&state->rom[0x14000], &state->rom[0x10000], 0x4000);
 
 #if SPLIT_PRG
 			{
@@ -700,12 +702,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			logerror("**\n");
 			// printf("CHR chunks: %02x, size: %06x\n", state->chr_chunks, 0x4000 * state->chr_chunks);
 			// printf("**\n");
-
-			/* Attempt to load a battery file for this ROM. If successful, we */
-			/* must wait until later to move it to the system memory. */
-			if (state->battery)
-				image_battery_load(image, state->battery_data, NES_BATTERY_SIZE, 0x00);
-
 		}
 		else if ((magic[0] == 'U') && (magic[1] == 'N') && (magic[2] == 'I') && (magic[3] == 'F')) /* If header starts with 'UNIF' it is UNIF */
 		{
@@ -763,6 +759,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						state->mapper = 0;	// this allows us to set up memory handlers without duplicating code (for the moment)
 						state->board = unif_board->board;
 						state->battery = unif_board->wram;	// we should implement WRAM banks...
+						state->battery_size = NES_BATTERY_SIZE; // FIXME: we should allow for smaller battery!
 						// state->hard_mirroring = unif_board->nt;
 						// state->four_screen_vram = ;
 
@@ -1028,8 +1025,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		state->format = 2;	// temporarily treat this as a unif file
 		state->board = image_get_feature(image);
-		state->battery = 0;	// presence of a battery should be read from .xml
 		state->mapper = 0;		// this allows us to set up memory handlers without duplicating code (for the moment)
+
+		state->battery = (image_get_software_region(image, "bwram") != NULL) ? 1 : 0;
+		state->battery_size = image_get_software_region_length(image, "bwram");
 
 		// FIXME: we need to handle the remaining variables. on the short term, we might
 		// create a table for the various mappers (based on the 'feature' value in xml),
@@ -1041,13 +1040,13 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		//state->hard_mirroring = ;
 		//state->trainer = ;
 		//state->four_screen_vram = ;
-
-		/* Attempt to load a battery file for this ROM. If successful, we */
-		/* must wait until later to move it to the system memory. */
-		if (state->battery)
-			image_battery_load(image, state->battery_data, NES_BATTERY_SIZE, 0x00);
 	}
 
+	/* Attempt to load a battery file for this ROM. If successful, we */
+	/* must wait until later to move it to the system memory. */
+	if (state->battery)
+		image_battery_load(image, state->battery_data, state->battery_size, 0x00);
+	
 	return INIT_PASS;
 }
 

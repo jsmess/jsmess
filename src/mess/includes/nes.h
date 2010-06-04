@@ -141,12 +141,13 @@ public:
 	/***** NES-cart related *****/
 
 	/* load-time cart variables which remain constant */
-	UINT8 trainer;
-	UINT8 battery;
 	UINT16 prg_chunks;	// a recently dumped multigame cart has 256 chunks of both PRG & CHR!
 	UINT16 chr_chunks;
+	UINT8 trainer;
+	UINT8 battery;
+	UINT32 battery_size;
 
-	UINT8 format;	// 1 = iNES, 2 = UNIF
+	int format;	// 1 = iNES, 2 = UNIF
 
 	/* system variables which don't change at run-time */
 	UINT16 mapper;		// for iNES
@@ -155,7 +156,7 @@ public:
 	UINT8 hard_mirroring;
 	UINT8 slow_banking;
 	UINT8 crc_hack;	// this is needed to detect different boards sharing the same Mappers (shame on .nes format)
-
+	UINT8 ines20;
 
 	/***** FDS-floppy related *****/
 
