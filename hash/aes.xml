@@ -38,7 +38,79 @@
 			</dataarea>
 		</part>
 	</software>
-
+<!-- ID 002 -->
+	<software name="bstars">
+		<description>Baseball Stars Professional</description>
+		<year>1990</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="002-p1.bin" size="524288" crc="3bc7790e" sha1="50b2fffb1278151bb4849fbe1f8cb23916019815" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="002-s1.bin" size="131072" crc="1a7fd0c6" sha1="3fc701b7afddab369ddf9dedfbc5e1aaf80b8af3" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="327680">
+				<rom name="002-m1.bin" size="262144" crc="4ecaa4ee" sha1="50abfb8eed6cb4887393089f9ccc76f306ef69b5" offset="000000" />
+				<rom size="262144" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+				<rom name="002-v11.bin" size="524288" crc="b7b925bd" sha1="644c92fa90e74998e73714f74b1e0680ee372a07" offset="000000" />
+				<rom name="002-v12.bin" size="524288" crc="329f26fc" sha1="2c8009edc88c6b26f7be5beb2b8d260aac394ee1" offset="080000" />
+				<rom name="002-v13.bin" size="524288" crc="0c39f3c8" sha1="db8f8670639601215707d918d4fb93221460446a" offset="100000" />
+				<rom name="002-v14.bin" size="524288" crc="c7e11c38" sha1="5abf2a7877e0162c758a4dcf09f183930fa7ef24" offset="180000" />
+			</dataarea>
+			<dataarea name="ymsnd.deltat" size="524288">
+				<rom name="002-v21.bin" size="524288" crc="04a733d1" sha1="84159368c0f6de2c3b8121227201cd3422455cf6" offset="000000" />
+			</dataarea>
+			<dataarea name="sprites" size="3145728">
+				<rom name="002-c1.bin" size="524288" crc="aaff2a45" sha1="c91ee72d1d74514df8ec44fca703409d92158ae3" offset="000000" loadflag="load16_byte" />
+				<rom name="002-c2.bin" size="524288" crc="3ba0f7e4" sha1="f023b134b9c7994f477867307d2732026033501d" offset="000001" loadflag="load16_byte" />
+				<rom name="002-c3.bin" size="524288" crc="96f0fdfa" sha1="9f779a1ae46aeda54d69382b074392ade687f62f" offset="100000" loadflag="load16_byte" />
+				<rom name="002-c4.bin" size="524288" crc="5fd87f2f" sha1="a5dd6f26f9485f216c2428ae1792c182beb10dbc" offset="100001" loadflag="load16_byte" />
+				<rom name="002-c5.bin" size="524288" crc="807ed83b" sha1="3268e7d4602c3f55f1e0da2c80653d5ae461ef67" offset="200000" loadflag="load16_byte" />
+				<rom name="002-c6.bin" size="524288" crc="5a3cad41" sha1="c620d18f4ff32ed5489c941dfc641030a54f1c14" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+<!-- ID 003 -->
+	<software name="tpgolf">
+		<description>Top Player's Golf</description>
+		<year>1990</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="003-p1.bin" size="524288" crc="f75549ba" sha1="3f7bdf5e2964e921fe1dd87c51a79a1a501fc73f" offset="000000" />
+				<rom name="003-p2.bin" size="524288" crc="b7809a8f" sha1="1604c889592c9610668bff296de48a0d6906156d" offset="080000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="003-s1.bin" size="131072" crc="7b3eb9b1" sha1="39cd8bad9f8bfdeb8ac681b5b79ae5aa81c8dd5f" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+				<rom name="003-m1.bin" size="131072" crc="4cc545e6" sha1="8e014b8cab3e5b3995756a4ea52ce49c36866377" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="524288">
+				<rom name="003-v1.bin" size="524288" crc="ff97f1cb" sha1="defa249d46ae220f7bfa70746f5202bbbcc3e5fe" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd.deltat" size="2097152">
+				<rom name="003-v2.bin" size="524288" crc="d34960c6" sha1="36d5877d5e42aab943f4d693159f4f3ad8b0addc" offset="000000" />
+				<rom name="003-v22.bin" size="524288" crc="9a5f58d4" sha1="2b580595e1820430a36f06fd3e0e0b8f7d686889" offset="080000" />
+				<rom name="003-v23.bin" size="524288" crc="30f53e54" sha1="22461f88a56d272b78dbc23204c0c6816200532b" offset="100000" />
+				<rom name="003-v24.bin" size="524288" crc="5ba0f501" sha1="ca02937a611a2c50c9e4b54f8fd4eaea09259894" offset="180000" />
+			</dataarea>
+			<dataarea name="sprites" size="4194304">
+				<rom name="003-c1.bin" size="524288" crc="0315fbaf" sha1="583c9253219c1026d81ee5e0cf5568683adc2633" offset="000000" loadflag="load16_byte" />
+				<rom name="003-c2.bin" size="524288" crc="b4c15d59" sha1="b0d8ec967f9b8e5216301c10b2d36912abce6515" offset="000001" loadflag="load16_byte" />
+				<rom name="003-c3.bin" size="524288" crc="8ce3e8da" sha1="bc6c49b27d498f75a0d1a8c4d0cca75e140b9efc" offset="100000" loadflag="load16_byte" />
+				<rom name="003-c4.bin" size="524288" crc="29725969" sha1="f1407da84919c2b3fe0e8f1fca65934b147c86c7" offset="100001" loadflag="load16_byte" />
+				<rom name="003-c5.bin" size="524288" crc="9a7146da" sha1="2fc83d13e3e9565919aab01bf2a1b028f433b547" offset="200000" loadflag="load16_byte" />
+				<rom name="003-c6.bin" size="524288" crc="1e63411a" sha1="ee397e2f679042e87b37d95837af62bb95a72af9" offset="200001" loadflag="load16_byte" />
+				<rom name="003-c5.bin" size="524288" crc="2886710c" sha1="1533dd935f0a8f92a0a3c47d1d2bc6d035454244" offset="300000" loadflag="load16_byte" />
+				<rom name="003-c6.bin" size="524288" crc="422af22d" sha1="f67c844c34545de6ea187f5bfdf440dec8518532" offset="300001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
 <!-- ID 005 -->
 	<software name="maglord">
 		<description>Magician Lord</description>
