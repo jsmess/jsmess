@@ -85,9 +85,11 @@ public:
 
 	/* misc */
 	write8_space_func   mmc_write_low;
-	read8_space_func    mmc_read_low;
 	write8_space_func   mmc_write_mid;
 	write8_space_func   mmc_write;
+	read8_space_func    mmc_read_low;
+	read8_space_func    mmc_read_mid;
+	read8_space_func    mmc_read;
 	emu_timer	        *irq_timer;
 
 	/* devices */
@@ -130,11 +132,11 @@ public:
 	int mmc_prg_base, mmc_prg_mask;	// MMC3 based multigame carts select a block of banks by using these (and then act like normal MMC3),
 	int mmc_chr_base, mmc_chr_mask;	// while MMC3 and clones (mapper 118 & 119) simply set them as 0 and 0xff resp.
 
-	UINT8 prg_bank[4];				// Many mappers writes only some bits of the selected bank (for both PRG and CHR),
-	UINT8 vrom_bank[16];			// hence these are handy to latch bank values.
+	UINT8 mmc_prg_bank[4];				// Many mappers writes only some bits of the selected bank (for both PRG and CHR),
+	UINT8 mmc_vrom_bank[16];			// hence these are handy to latch bank values.
 
-	UINT8 extra_bank[16];			// some MMC3 clone have 2 series of PRG/CHR banks...
-									// we collect them all here: first 4 elements PRG banks, then 6/8 CHR banks
+	UINT8 mmc_extra_bank[16];			// some MMC3 clone have 2 series of PRG/CHR banks...
+										// we collect them all here: first 4 elements PRG banks, then 6/8 CHR banks
 
 	/***** NES-cart related *****/
 

@@ -96,7 +96,9 @@ static void init_nes_core( running_machine *machine )
 			memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xe000);
 
 			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
+//			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_r);
 			memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, nes_mapper_w);
+//			memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, nes_mapper_r);
 			break;
 	}
 
@@ -107,18 +109,22 @@ static void init_nes_core( running_machine *machine )
 		if (mapper)
 		{
 			state->mmc_write_low = mapper->mmc_write_low;
-			state->mmc_read_low = mapper->mmc_read_low;
 			state->mmc_write_mid = mapper->mmc_write_mid;
 			state->mmc_write = mapper->mmc_write;
+			state->mmc_read_low = mapper->mmc_read_low;
+			state->mmc_read_mid = NULL;	// in progress
+			state->mmc_read = NULL;	// in progress
 			ppu_latch = mapper->ppu_latch;
 		}
 		else
 		{
 			logerror("Mapper %d is not yet supported, defaulting to no mapper.\n",state->mapper);
 			state->mmc_write_low = NULL;
-			state->mmc_read_low = NULL;
 			state->mmc_write_mid = NULL;
 			state->mmc_write = NULL;
+			state->mmc_read_low = NULL;
+			state->mmc_read_mid = NULL;	// in progress
+			state->mmc_read = NULL;	// in progress
 			ppu_latch = NULL;
 		}
 	}
@@ -128,18 +134,22 @@ static void init_nes_core( running_machine *machine )
 		if (board)
 		{
 			state->mmc_write_low = board->mmc_write_low;
-			state->mmc_read_low = board->mmc_read_low;
 			state->mmc_write_mid = board->mmc_write_mid;
 			state->mmc_write = board->mmc_write;
+			state->mmc_read_low = board->mmc_read_low;
+			state->mmc_read_mid = NULL;	// in progress
+			state->mmc_read = NULL;	// in progress
 			ppu_latch = board->ppu_latch;
 		}
 		else
 		{
 			logerror("Board %s is not yet supported, defaulting to no mapper.\n", state->board);
 			state->mmc_write_low = NULL;
-			state->mmc_read_low = NULL;
 			state->mmc_write_mid = NULL;
 			state->mmc_write = NULL;
+			state->mmc_read_low = NULL;
+			state->mmc_read_mid = NULL;	// in progress
+			state->mmc_read = NULL;	// in progress
 			ppu_latch = NULL;
 		}
 	}
@@ -232,9 +242,9 @@ static void nes_state_register( running_machine *machine )
 	state_save_register_global(machine, state->mmc_prg_mask);
 	state_save_register_global(machine, state->mmc_chr_base);
 	state_save_register_global(machine, state->mmc_chr_mask);
-	state_save_register_global_array(machine, state->prg_bank);
-	state_save_register_global_array(machine, state->vrom_bank);
-	state_save_register_global_array(machine, state->extra_bank);
+	state_save_register_global_array(machine, state->mmc_prg_bank);
+	state_save_register_global_array(machine, state->mmc_vrom_bank);
+	state_save_register_global_array(machine, state->mmc_extra_bank);
 
 	state_save_register_global(machine, state->fds_motor_on);
 	state_save_register_global(machine, state->fds_door_closed);
@@ -679,7 +689,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			UINT8 buffer[4];
 			UINT32 chunk_length = 0, read_length = 0x20;
 			UINT32 prg_start = 0, chr_start = 0, prg_size;
-			int prg_left = 0, chr_left = 0;	// used to verify integrity of our unif image
 			char unif_mapr[32];	// here we should store MAPR chunks
 			UINT32 size = image_length(image);
 			const unif *unif_board;
@@ -704,19 +713,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				memset(magic2, '\0', sizeof(magic2));
 				image_fread(image, &magic2, 4);
 
-#if 0
-				// unfortunately, the MAPR chunk is not always the first chunk (see Super 24-in-1)
-				/* Preliminary checks: the first chunk MUST be MAPR! */
-				if (read_length == 0x20 && ((magic2[0] != 'M') || (magic2[1] != 'A') || (magic2[2] != 'P') || (magic2[3] != 'R')))
-					fatalerror("First chunk of data in UNIF should be [MAPR]. Check if your image has been corrupted");
-
-				/* Preliminary checks: multiple MAPR chunks are FORBIDDEN! */
-				if (read_length > 0x20 && ((magic2[0] == 'M') && (magic2[1] == 'A') && (magic2[2] == 'P') && (magic2[3] == 'R')))
-					fatalerror("UNIF should not have multiple [MAPR] chunks. Check if your image has been corrupted");
-#endif
-
-				/* we first run through the whole image to find a [MAPR] chunk */
-				/* when found, we set mapr_chunk_found=1 and we go back to load other chunks! */
+				/* We first run through the whole image to find a [MAPR] chunk. This is needed 
+				 because, unfortunately, the MAPR chunk is not always the first chunk (see 
+				 Super 24-in-1). When such a chunk is found, we set mapr_chunk_found=1 and 
+				 we go back to load other chunks! */
 				if (!mapr_chunk_found)
 				{
 					if ((magic2[0] == 'M') && (magic2[1] == 'A') && (magic2[2] == 'P') && (magic2[3] == 'R'))
@@ -733,15 +733,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						logerror("%s\n", unif_mapr);
 
 						if (unif_board == NULL)
-						{
-							fatalerror("Unsupported UNIF board %s.", unif_mapr);
-							// logerror("Unsupported UNIF board %s.\n", unif_mapr);
-						}
+							fatalerror("Unknown UNIF board %s.", unif_mapr);
 
 						state->mapper = 0;	// this allows us to set up memory handlers without duplicating code (for the moment)
 						state->board = unif_board->board;
-						state->prg_chunks = unif_board->prgrom;
-						state->chr_chunks = unif_board->chrrom;
 						state->battery = unif_board->wram;	// we should implement WRAM banks...
 						// state->hard_mirroring = unif_board->nt;
 						// state->four_screen_vram = ;
@@ -750,20 +745,20 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						memory_region_free(image->machine, "maincpu");
 						memory_region_free(image->machine, "gfx1");
 
-						/* Allocate them again with the proper size */
-						prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
+						/* Allocate them again with the large enough size */
+						prg_size = (unif_board->prgrom == 1) ? 2 * 0x4000 : unif_board->prgrom * 0x4000;
 						memory_region_alloc(image->machine, "maincpu", 0x10000 + prg_size, 0);
-						if (state->chr_chunks)
-							memory_region_alloc(image->machine, "gfx1", state->chr_chunks * 0x2000, 0);
+						if (unif_board->chrrom)
+							memory_region_alloc(image->machine, "gfx1", unif_board->chrrom * 0x2000, 0);
 
 						state->rom = memory_region(image->machine, "maincpu");
 						state->vrom = memory_region(image->machine, "gfx1");
 						state->vram = memory_region(image->machine, "gfx2");
 						state->wram = memory_region(image->machine, "user1");
 
-						/* for validation purposes */
-						prg_left = unif_board->prgrom * 0x4000;
-						chr_left = unif_board->chrrom * 0x2000;
+						/* the exact number of chunks will be determined while reading the file */
+						state->prg_chunks = 0;
+						state->chr_chunks = 0;
 
 						/* now that we found the MAPR chunk, we can go back to load other chunks */
 						image_fseek(image, 0x20, SEEK_SET);
@@ -885,21 +880,16 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						image_fread(image, &buffer, 4);
 						chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
 
-						logerror("It consists of %d 16K-blocks.\n", chunk_length / 0x4000);
-						/* Validation */
-						prg_left -= chunk_length;
-						if (prg_left < 0)
-							fatalerror("PRG chunks larger than expected by board %s!", unif_mapr);
+						// FIXME: we currently don't support PRG chunks smaller than 16K!
+						state->prg_chunks += (chunk_length / 0x4000);
+
+						if (chunk_length / 0x4000)
+							logerror("It consists of %d 16K-blocks.\n", chunk_length / 0x4000);
+						else
+							logerror("This chunk is smaller than 16K: the emulation might have issues. Please report this file to the MESS forums.\n");
 
 						/* Read in the program chunks */
-						if (state->prg_chunks == 1)
-						{
-							image_fread(image, &state->rom[0x14000], chunk_length);
-							/* Mirror the only bank into $8000 */
-							memcpy(&state->rom[0x10000], &state->rom[0x14000], chunk_length);
-						}
-						else
-							image_fread(image, &state->rom[0x10000 + prg_start], chunk_length);
+						image_fread(image, &state->rom[0x10000 + prg_start], chunk_length);
 
 						prg_start += chunk_length;
 						read_length += (chunk_length + 8);
@@ -910,11 +900,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						image_fread(image, &buffer, 4);
 						chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
 
+						state->chr_chunks += (chunk_length / 0x2000);
+
 						logerror("It consists of %d 8K-blocks.\n", chunk_length / 0x2000);
-						/* validation */
-						chr_left -= chunk_length;
-						if (chr_left < 0)
-							fatalerror("CHR chunks larger than expected by board %s!", unif_mapr);
 
 						/* Read in the vrom chunks */
 						image_fread(image, state->vrom + chr_start, chunk_length);
@@ -933,6 +921,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			if (!mapr_chunk_found)
 				fatalerror("UNIF should have a [MAPR] chunk to work. Check if your image has been corrupted");
 
+			/* If only a single 16K PRG chunk is present, mirror it! */
+			if (state->prg_chunks == 1)
+				memcpy(&state->rom[0x14000], &state->rom[0x10000], 0x4000);
+				
 #if SPLIT_PRG
 			{
 				FILE *prgout;
@@ -1009,9 +1001,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->prg_chunks = prg_size / 0x4000;
 		state->chr_chunks = chr_size / 0x2000;
 
-		state->format = 2;	// temporarily treat this as a ines file
-		state->board = image_get_feature(image);	// this should depend on the 'feature' field of the .xml file
-		state->battery = 0;	// presence of a battery should be read from .xml feature
+		state->format = 2;	// temporarily treat this as a unif file
+		state->board = image_get_feature(image);
+		state->battery = 0;	// presence of a battery should be read from .xml
+		state->mapper = 0;		// this allows us to set up memory handlers without duplicating code (for the moment)
 
 		// FIXME: we need to handle the remaining variables. on the short term, we might
 		// create a table for the various mappers (based on the 'feature' value in xml),

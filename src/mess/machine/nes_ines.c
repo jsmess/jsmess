@@ -218,10 +218,10 @@ static void mapper4_set_prg( running_machine *machine, int prg_base, int prg_mas
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
 
-	prg8_89(machine, prg_base | (state->prg_bank[0 ^ prg_flip] & prg_mask));
-	prg8_ab(machine, prg_base | (state->prg_bank[1] & prg_mask));
-	prg8_cd(machine, prg_base | (state->prg_bank[2 ^ prg_flip] & prg_mask));
-	prg8_ef(machine, prg_base | (state->prg_bank[3] & prg_mask));
+	prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
+	prg8_ab(machine, prg_base | (state->mmc_prg_bank[1] & prg_mask));
+	prg8_cd(machine, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
+	prg8_ef(machine, prg_base | (state->mmc_prg_bank[3] & prg_mask));
 }
 
 static void mapper4_set_chr( running_machine *machine, UINT8 chr, int chr_base, int chr_mask )
@@ -229,14 +229,14 @@ static void mapper4_set_chr( running_machine *machine, UINT8 chr, int chr_base, 
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr);
 }
 
 /* Here, IRQ counter decrements every scanline. */
@@ -291,12 +291,12 @@ static WRITE8_HANDLER( mapper4_w )
 			{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					state->vrom_bank[cmd] = data;
+					state->mmc_vrom_bank[cmd] = data;
 					mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 					break;
 				case 6:
 				case 7:
-					state->prg_bank[cmd - 6] = data;
+					state->mmc_prg_bank[cmd - 6] = data;
 					mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 			}
@@ -429,7 +429,7 @@ static READ8_HANDLER( mapper5_l_r )
 //  int i;
 //
 //  for (i = 0; i < 8; i ++)
-//      nes_vram[i] = state->vrom_bank[0 + (mode * 8)] * 64;
+//      nes_vram[i] = state->mmc_vrom_bank[0 + (mode * 8)] * 64;
 //}
 
 static WRITE8_HANDLER( mapper5_l_w )
@@ -629,10 +629,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[0] = data;
+					state->mmc_vrom_bank[0] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_0(space->machine, state->vrom_bank[0], CHRROM);
-//                  state->nes_vram_sprite[0] = state->vrom_bank[0] * 64;
+					chr1_0(space->machine, state->mmc_vrom_bank[0], CHRROM);
+//                  state->nes_vram_sprite[0] = state->mmc_vrom_bank[0] * 64;
 //                  vrom_next[0] = 4;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -649,10 +649,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[1] = data;
+					state->mmc_vrom_bank[1] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_1(space->machine, state->vrom_bank[1], CHRROM);
-//                  state->nes_vram_sprite[1] = state->vrom_bank[0] * 64;
+					chr1_1(space->machine, state->mmc_vrom_bank[1], CHRROM);
+//                  state->nes_vram_sprite[1] = state->mmc_vrom_bank[0] * 64;
 //                  vrom_next[1] = 5;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -665,10 +665,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[2] = data;
+					state->mmc_vrom_bank[2] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_2(space->machine, state->vrom_bank[2], CHRROM);
-//                  state->nes_vram_sprite[2] = state->vrom_bank[0] * 64;
+					chr1_2(space->machine, state->mmc_vrom_bank[2], CHRROM);
+//                  state->nes_vram_sprite[2] = state->mmc_vrom_bank[0] * 64;
 //                  vrom_next[2] = 6;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -688,10 +688,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[3] = data;
+					state->mmc_vrom_bank[3] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_3(space->machine, state->vrom_bank[3], CHRROM);
-//                  state->nes_vram_sprite[3] = state->vrom_bank[0] * 64;
+					chr1_3(space->machine, state->mmc_vrom_bank[3], CHRROM);
+//                  state->nes_vram_sprite[3] = state->mmc_vrom_bank[0] * 64;
 //                  vrom_next[3] = 7;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -704,10 +704,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[4] = data;
+					state->mmc_vrom_bank[4] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_4(space->machine, state->vrom_bank[4], CHRROM);
-//                  state->nes_vram_sprite[4] = state->vrom_bank[0] * 64;
+					chr1_4(space->machine, state->mmc_vrom_bank[4], CHRROM);
+//                  state->nes_vram_sprite[4] = state->mmc_vrom_bank[0] * 64;
 //                  vrom_next[0] = 0;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -724,10 +724,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[5] = data;
+					state->mmc_vrom_bank[5] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_5(space->machine, state->vrom_bank[5], CHRROM);
-//                  state->nes_vram_sprite[5] = state->vrom_bank[0] * 64;
+					chr1_5(space->machine, state->mmc_vrom_bank[5], CHRROM);
+//                  state->nes_vram_sprite[5] = state->mmc_vrom_bank[0] * 64;
 //                  vrom_next[1] = 1;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -740,10 +740,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[6] = data;
+					state->mmc_vrom_bank[6] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_6(space->machine, state->vrom_bank[6], CHRROM);
-//                  state->nes_vram_sprite[6] = state->vrom_bank[0] * 64;
+					chr1_6(space->machine, state->mmc_vrom_bank[6], CHRROM);
+//                  state->nes_vram_sprite[6] = state->mmc_vrom_bank[0] * 64;
 //                  vrom_next[2] = 2;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -768,10 +768,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[7] = data;
+					state->mmc_vrom_bank[7] = data;
 //                  mapper5_sync_vrom(0);
-					chr1_7(space->machine, state->vrom_bank[7], CHRROM);
-//                  state->nes_vram_sprite[7] = state->vrom_bank[0] * 64;
+					chr1_7(space->machine, state->mmc_vrom_bank[7], CHRROM);
+//                  state->nes_vram_sprite[7] = state->mmc_vrom_bank[0] * 64;
 //                  vrom_next[3] = 3;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -784,7 +784,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[8] = state->vrom_bank[12] = data;
+					state->mmc_vrom_bank[8] = state->mmc_vrom_bank[12] = data;
 //                  nes_vram[vrom_next[0]] = data * 64;
 //                  nes_vram[0 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[0] = data * 64;
@@ -809,7 +809,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[9] = state->vrom_bank[13] = data;
+					state->mmc_vrom_bank[9] = state->mmc_vrom_bank[13] = data;
 //                  nes_vram[vrom_next[1]] = data * 64;
 //                  nes_vram[1 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[1] = data * 64;
@@ -829,7 +829,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[10] = state->vrom_bank[14] = data;
+					state->mmc_vrom_bank[10] = state->mmc_vrom_bank[14] = data;
 //                  nes_vram[vrom_next[2]] = data * 64;
 //                  nes_vram[2 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[2] = data * 64;
@@ -865,7 +865,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->vrom_bank[11] = state->vrom_bank[15] = data;
+					state->mmc_vrom_bank[11] = state->mmc_vrom_bank[15] = data;
 //                  nes_vram[vrom_next[3]] = data * 64;
 //                  nes_vram[3 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[3] = data * 64;
@@ -1180,14 +1180,14 @@ static void mapper12_set_chr( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
 
-	chr1_x(machine, chr_page ^ 0, ((mapper12_reg & 0x01) << 8) | (state->vrom_bank[0] & ~0x01), CHRROM);
-	chr1_x(machine, chr_page ^ 1, ((mapper12_reg & 0x01) << 8) | (state->vrom_bank[0] |  0x01), CHRROM);
-	chr1_x(machine, chr_page ^ 2, ((mapper12_reg & 0x01) << 8) | (state->vrom_bank[1] & ~0x01), CHRROM);
-	chr1_x(machine, chr_page ^ 3, ((mapper12_reg & 0x01) << 8) | (state->vrom_bank[1] |  0x01), CHRROM);
-	chr1_x(machine, chr_page ^ 4, ((mapper12_reg & 0x10) << 4) | state->vrom_bank[2], CHRROM);
-	chr1_x(machine, chr_page ^ 5, ((mapper12_reg & 0x10) << 4) | state->vrom_bank[3], CHRROM);
-	chr1_x(machine, chr_page ^ 6, ((mapper12_reg & 0x10) << 4) | state->vrom_bank[4], CHRROM);
-	chr1_x(machine, chr_page ^ 7, ((mapper12_reg & 0x10) << 4) | state->vrom_bank[5], CHRROM);
+	chr1_x(machine, chr_page ^ 0, ((mapper12_reg & 0x01) << 8) | (state->mmc_vrom_bank[0] & ~0x01), CHRROM);
+	chr1_x(machine, chr_page ^ 1, ((mapper12_reg & 0x01) << 8) | (state->mmc_vrom_bank[0] |  0x01), CHRROM);
+	chr1_x(machine, chr_page ^ 2, ((mapper12_reg & 0x01) << 8) | (state->mmc_vrom_bank[1] & ~0x01), CHRROM);
+	chr1_x(machine, chr_page ^ 3, ((mapper12_reg & 0x01) << 8) | (state->mmc_vrom_bank[1] |  0x01), CHRROM);
+	chr1_x(machine, chr_page ^ 4, ((mapper12_reg & 0x10) << 4) | state->mmc_vrom_bank[2], CHRROM);
+	chr1_x(machine, chr_page ^ 5, ((mapper12_reg & 0x10) << 4) | state->mmc_vrom_bank[3], CHRROM);
+	chr1_x(machine, chr_page ^ 6, ((mapper12_reg & 0x10) << 4) | state->mmc_vrom_bank[4], CHRROM);
+	chr1_x(machine, chr_page ^ 7, ((mapper12_reg & 0x10) << 4) | state->mmc_vrom_bank[5], CHRROM);
 }
 
 static WRITE8_HANDLER( mapper12_w )
@@ -1217,12 +1217,12 @@ static WRITE8_HANDLER( mapper12_w )
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper12_set_chr(space->machine);
 			break;
 		case 6:
 		case 7:
-			state->prg_bank[cmd - 6] = data;
+			state->mmc_prg_bank[cmd - 6] = data;
 			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
@@ -1274,10 +1274,10 @@ static void mapper14_set_prg( running_machine *machine, int prg_base, int prg_ma
 	}
 	else
 	{
-		prg8_89(machine, state->extra_bank[0]);
-		prg8_ab(machine, state->extra_bank[1]);
-		prg8_cd(machine, state->extra_bank[2]);
-		prg8_ef(machine, state->extra_bank[3]);
+		prg8_89(machine, state->mmc_extra_bank[0]);
+		prg8_ab(machine, state->mmc_extra_bank[1]);
+		prg8_cd(machine, state->mmc_extra_bank[2]);
+		prg8_ef(machine, state->mmc_extra_bank[3]);
 	}
 }
 
@@ -1294,7 +1294,7 @@ static void mapper14_set_chr( running_machine *machine, UINT8 chr, int chr_base,
 	{
 		for(i = 0; i < 8; i++)
 		{
-			bank[i] = state->vrom_bank[i];
+			bank[i] = state->mmc_vrom_bank[i];
 			chr_base2[i] = chr_base | ((map14_reg[0] << conv_table[i]) & 0x100);
 		}
 	}
@@ -1302,7 +1302,7 @@ static void mapper14_set_chr( running_machine *machine, UINT8 chr, int chr_base,
 	{
 		for(i = 0; i < 8; i++)
 		{
-			bank[i] = state->extra_bank[i + 4];	// first 4 state->extra_banks are PRG
+			bank[i] = state->mmc_extra_bank[i + 4];	// first 4 state->mmc_extra_banks are PRG
 			chr_base2[i] = chr_base;
 		}
 	}
@@ -1355,17 +1355,17 @@ static WRITE8_HANDLER( mapper14_w )
 			switch (cmd)
 			{
 				case 0: case 1:	// these have to be changed due to the different way mapper14_set_chr works (it handles 1k banks)!
-					state->vrom_bank[2 * cmd] = data;
-					state->vrom_bank[2 * cmd + 1] = data;
+					state->mmc_vrom_bank[2 * cmd] = data;
+					state->mmc_vrom_bank[2 * cmd + 1] = data;
 					mapper14_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 					break;
 				case 2: case 3: case 4: case 5:
-					state->vrom_bank[cmd + 2] = data;
+					state->mmc_vrom_bank[cmd + 2] = data;
 					mapper14_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 					break;
 				case 6:
 				case 7:
-					state->prg_bank[cmd - 6] = data;
+					state->mmc_prg_bank[cmd - 6] = data;
 					mapper14_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 			}
@@ -1384,8 +1384,8 @@ static WRITE8_HANDLER( mapper14_w )
 	{
 		map14_helper1 = (offset & 0x01) << 2;
 		offset = ((offset & 0x02) | (offset >> 10)) >> 1;
-		map14_helper2 = ((offset + 2) & 0x07) + 4; // '+4' because first 4 state->extra_banks are for PRG!
-		state->extra_bank[map14_helper2] = (state->extra_bank[map14_helper2] & (0xf0 >> map14_helper1)) | ((data & 0x0f) << map14_helper1);
+		map14_helper2 = ((offset + 2) & 0x07) + 4; // '+4' because first 4 state->mmc_extra_banks are for PRG!
+		state->mmc_extra_bank[map14_helper2] = (state->mmc_extra_bank[map14_helper2] & (0xf0 >> map14_helper1)) | ((data & 0x0f) << map14_helper1);
 		mapper14_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 	}
 	else
@@ -1394,7 +1394,7 @@ static WRITE8_HANDLER( mapper14_w )
 		{
 		case 0x0000:
 		case 0x2000:
-			state->extra_bank[offset >> 13] = data;
+			state->mmc_extra_bank[offset >> 13] = data;
 			mapper14_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 
@@ -1674,28 +1674,28 @@ static WRITE8_HANDLER( mapper18_w )
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
-			state->prg_bank[0] = (state->prg_bank[0] & 0xf0) | (data & 0x0f);
-			prg8_89(space->machine, state->prg_bank[0]);
+			state->mmc_prg_bank[0] = (state->mmc_prg_bank[0] & 0xf0) | (data & 0x0f);
+			prg8_89(space->machine, state->mmc_prg_bank[0]);
 			break;
 		case 0x0001:
-			state->prg_bank[0] = (state->prg_bank[0] & 0x0f) | (data << 4);
-			prg8_89(space->machine, state->prg_bank[0]);
+			state->mmc_prg_bank[0] = (state->mmc_prg_bank[0] & 0x0f) | (data << 4);
+			prg8_89(space->machine, state->mmc_prg_bank[0]);
 			break;
 		case 0x0002:
-			state->prg_bank[1] = (state->prg_bank[1] & 0xf0) | (data & 0x0f);
-			prg8_ab(space->machine, state->prg_bank[1]);
+			state->mmc_prg_bank[1] = (state->mmc_prg_bank[1] & 0xf0) | (data & 0x0f);
+			prg8_ab(space->machine, state->mmc_prg_bank[1]);
 			break;
 		case 0x0003:
-			state->prg_bank[1] = (state->prg_bank[1] & 0x0f) | (data << 4);
-			prg8_ab(space->machine, state->prg_bank[1]);
+			state->mmc_prg_bank[1] = (state->mmc_prg_bank[1] & 0x0f) | (data << 4);
+			prg8_ab(space->machine, state->mmc_prg_bank[1]);
 			break;
 		case 0x1000:
-			state->prg_bank[2] = (state->prg_bank[2] & 0xf0) | (data & 0x0f);
-			prg8_cd(space->machine, state->prg_bank[2]);
+			state->mmc_prg_bank[2] = (state->mmc_prg_bank[2] & 0xf0) | (data & 0x0f);
+			prg8_cd(space->machine, state->mmc_prg_bank[2]);
 			break;
 		case 0x1001:
-			state->prg_bank[2] = (state->prg_bank[2] & 0x0f) | (data << 4);
-			prg8_cd(space->machine, state->prg_bank[2]);
+			state->mmc_prg_bank[2] = (state->mmc_prg_bank[2] & 0x0f) | (data << 4);
+			prg8_cd(space->machine, state->mmc_prg_bank[2]);
 			break;
 
 		/* $9002, 3 (1002, 3) uncaught = Jaleco Baseball writes 0 */
@@ -1707,11 +1707,11 @@ static WRITE8_HANDLER( mapper18_w )
 		case 0x5000: case 0x5001: case 0x5002: case 0x5003:
 			bank = ((offset & 0x7000) - 0x2000) / 0x0800 + ((offset & 0x0002) >> 1);
 			if (offset & 0x0001)
-				state->vrom_bank[bank] = (state->vrom_bank[bank] & 0x0f) | ((data & 0x0f)<< 4);
+				state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f)<< 4);
 			else
-				state->vrom_bank[bank] = (state->vrom_bank[bank] & 0xf0) | (data & 0x0f);
+				state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
-			chr1_x(space->machine, bank, state->vrom_bank[bank], CHRROM);
+			chr1_x(space->machine, bank, state->mmc_vrom_bank[bank], CHRROM);
 			break;
 
 		case 0x6000:
@@ -2014,11 +2014,11 @@ static void vrc4_set_prg( running_machine *machine )
 	if (state->mmc_cmd1 & 0x02)
 	{
 		prg8_89(machine, 0xfe);
-		prg8_cd(machine, state->prg_bank[0]);
+		prg8_cd(machine, state->mmc_prg_bank[0]);
 	}
 	else
 	{
-		prg8_89(machine, state->prg_bank[0]);
+		prg8_89(machine, state->mmc_prg_bank[0]);
 		prg8_cd(machine, 0xfe);
 	}
 }
@@ -2049,7 +2049,7 @@ static WRITE8_HANDLER( konami_vrc4a_w )
 		case 0x0040:
 		case 0x0080:
 		case 0x00c0:
-			state->prg_bank[0] = data;
+			state->mmc_prg_bank[0] = data;
 			vrc4_set_prg(space->machine);
 			break;
 
@@ -2084,80 +2084,80 @@ static WRITE8_HANDLER( konami_vrc4a_w )
 			break;
 
 		case 0x3000:
-			state->vrom_bank[0] = (state->vrom_bank[0] & 0xf0) | (data & 0x0f);
-			chr1_0(space->machine, state->vrom_bank[0], CHRROM);
+			state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & 0xf0) | (data & 0x0f);
+			chr1_0(space->machine, state->mmc_vrom_bank[0], CHRROM);
 			break;
 		case 0x3002:
 		case 0x3040:
-			state->vrom_bank[0] = (state->vrom_bank[0] & 0x0f) | (data << 4);
-			chr1_0(space->machine, state->vrom_bank[0], CHRROM);
+			state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & 0x0f) | (data << 4);
+			chr1_0(space->machine, state->mmc_vrom_bank[0], CHRROM);
 			break;
 		case 0x3004:
 		case 0x3080:
-			state->vrom_bank[1] = (state->vrom_bank[1] & 0xf0) | (data & 0x0f);
-			chr1_1(space->machine, state->vrom_bank[1], CHRROM);
+			state->mmc_vrom_bank[1] = (state->mmc_vrom_bank[1] & 0xf0) | (data & 0x0f);
+			chr1_1(space->machine, state->mmc_vrom_bank[1], CHRROM);
 			break;
 		case 0x3006:
 		case 0x30c0:
-			state->vrom_bank[1] = (state->vrom_bank[1] & 0x0f) | (data << 4);
-			chr1_1(space->machine, state->vrom_bank[1], CHRROM);
+			state->mmc_vrom_bank[1] = (state->mmc_vrom_bank[1] & 0x0f) | (data << 4);
+			chr1_1(space->machine, state->mmc_vrom_bank[1], CHRROM);
 			break;
 		case 0x4000:
-			state->vrom_bank[2] = (state->vrom_bank[2] & 0xf0) | (data & 0x0f);
-			chr1_2(space->machine, state->vrom_bank[2], CHRROM);
+			state->mmc_vrom_bank[2] = (state->mmc_vrom_bank[2] & 0xf0) | (data & 0x0f);
+			chr1_2(space->machine, state->mmc_vrom_bank[2], CHRROM);
 			break;
 		case 0x4002:
 		case 0x4040:
-			state->vrom_bank[2] = (state->vrom_bank[2] & 0x0f) | (data << 4);
-			chr1_2(space->machine, state->vrom_bank[2], CHRROM);
+			state->mmc_vrom_bank[2] = (state->mmc_vrom_bank[2] & 0x0f) | (data << 4);
+			chr1_2(space->machine, state->mmc_vrom_bank[2], CHRROM);
 			break;
 		case 0x4004:
 		case 0x4080:
-			state->vrom_bank[3] = (state->vrom_bank[3] & 0xf0) | (data & 0x0f);
-			chr1_3(space->machine, state->vrom_bank[3], CHRROM);
+			state->mmc_vrom_bank[3] = (state->mmc_vrom_bank[3] & 0xf0) | (data & 0x0f);
+			chr1_3(space->machine, state->mmc_vrom_bank[3], CHRROM);
 			break;
 		case 0x4006:
 		case 0x40c0:
-			state->vrom_bank[3] = (state->vrom_bank[3] & 0x0f) | (data << 4);
-			chr1_3(space->machine, state->vrom_bank[3], CHRROM);
+			state->mmc_vrom_bank[3] = (state->mmc_vrom_bank[3] & 0x0f) | (data << 4);
+			chr1_3(space->machine, state->mmc_vrom_bank[3], CHRROM);
 			break;
 		case 0x5000:
-			state->vrom_bank[4] = (state->vrom_bank[4] & 0xf0) | (data & 0x0f);
-			chr1_4(space->machine, state->vrom_bank[4], CHRROM);
+			state->mmc_vrom_bank[4] = (state->mmc_vrom_bank[4] & 0xf0) | (data & 0x0f);
+			chr1_4(space->machine, state->mmc_vrom_bank[4], CHRROM);
 			break;
 		case 0x5002:
 		case 0x5040:
-			state->vrom_bank[4] = (state->vrom_bank[4] & 0x0f) | (data << 4);
-			chr1_4(space->machine, state->vrom_bank[4], CHRROM);
+			state->mmc_vrom_bank[4] = (state->mmc_vrom_bank[4] & 0x0f) | (data << 4);
+			chr1_4(space->machine, state->mmc_vrom_bank[4], CHRROM);
 			break;
 		case 0x5004:
 		case 0x5080:
-			state->vrom_bank[5] = (state->vrom_bank[5] & 0xf0) | (data & 0x0f);
-			chr1_5(space->machine, state->vrom_bank[5], CHRROM);
+			state->mmc_vrom_bank[5] = (state->mmc_vrom_bank[5] & 0xf0) | (data & 0x0f);
+			chr1_5(space->machine, state->mmc_vrom_bank[5], CHRROM);
 			break;
 		case 0x5006:
 		case 0x50c0:
-			state->vrom_bank[5] = (state->vrom_bank[5] & 0x0f) | (data << 4);
-			chr1_5(space->machine, state->vrom_bank[5], CHRROM);
+			state->mmc_vrom_bank[5] = (state->mmc_vrom_bank[5] & 0x0f) | (data << 4);
+			chr1_5(space->machine, state->mmc_vrom_bank[5], CHRROM);
 			break;
 		case 0x6000:
-			state->vrom_bank[6] = (state->vrom_bank[6] & 0xf0) | (data & 0x0f);
-			chr1_6(space->machine, state->vrom_bank[6], CHRROM);
+			state->mmc_vrom_bank[6] = (state->mmc_vrom_bank[6] & 0xf0) | (data & 0x0f);
+			chr1_6(space->machine, state->mmc_vrom_bank[6], CHRROM);
 			break;
 		case 0x6002:
 		case 0x6040:
-			state->vrom_bank[6] = (state->vrom_bank[6] & 0x0f) | (data << 4);
-			chr1_6(space->machine, state->vrom_bank[6], CHRROM);
+			state->mmc_vrom_bank[6] = (state->mmc_vrom_bank[6] & 0x0f) | (data << 4);
+			chr1_6(space->machine, state->mmc_vrom_bank[6], CHRROM);
 			break;
 		case 0x6004:
 		case 0x6080:
-			state->vrom_bank[7] = (state->vrom_bank[7] & 0xf0) | (data & 0x0f);
-			chr1_7(space->machine, state->vrom_bank[7], CHRROM);
+			state->mmc_vrom_bank[7] = (state->mmc_vrom_bank[7] & 0xf0) | (data & 0x0f);
+			chr1_7(space->machine, state->mmc_vrom_bank[7], CHRROM);
 			break;
 		case 0x6006:
 		case 0x60c0:
-			state->vrom_bank[7] = (state->vrom_bank[7] & 0x0f) | (data << 4);
-			chr1_7(space->machine, state->vrom_bank[7], CHRROM);
+			state->mmc_vrom_bank[7] = (state->mmc_vrom_bank[7] & 0x0f) | (data << 4);
+			chr1_7(space->machine, state->mmc_vrom_bank[7], CHRROM);
 			break;
 
 		case 0x7000:
@@ -2199,7 +2199,7 @@ static WRITE8_HANDLER( konami_vrc4b_w )
 		case 0x0004:
 		case 0x0008:
 		case 0x000c:
-			state->prg_bank[0] = data;
+			state->mmc_prg_bank[0] = data;
 			vrc4_set_prg(space->machine);
 			break;
 
@@ -2234,80 +2234,80 @@ static WRITE8_HANDLER( konami_vrc4b_w )
 			break;
 
 		case 0x3000:
-			state->vrom_bank[0] = (state->vrom_bank[0] & 0xf0) | (data & 0x0f);
-			chr1_0(space->machine, state->vrom_bank[0], CHRROM);
+			state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & 0xf0) | (data & 0x0f);
+			chr1_0(space->machine, state->mmc_vrom_bank[0], CHRROM);
 			break;
 		case 0x3002:
 		case 0x3008:
-			state->vrom_bank[0] = (state->vrom_bank[0] & 0x0f) | (data << 4);
-			chr1_0(space->machine, state->vrom_bank[0], CHRROM);
+			state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & 0x0f) | (data << 4);
+			chr1_0(space->machine, state->mmc_vrom_bank[0], CHRROM);
 			break;
 		case 0x3001:
 		case 0x3004:
-			state->vrom_bank[1] = (state->vrom_bank[1] & 0xf0) | (data & 0x0f);
-			chr1_1(space->machine, state->vrom_bank[1], CHRROM);
+			state->mmc_vrom_bank[1] = (state->mmc_vrom_bank[1] & 0xf0) | (data & 0x0f);
+			chr1_1(space->machine, state->mmc_vrom_bank[1], CHRROM);
 			break;
 		case 0x3003:
 		case 0x300c:
-			state->vrom_bank[1] = (state->vrom_bank[1] & 0x0f) | (data << 4);
-			chr1_1(space->machine, state->vrom_bank[1], CHRROM);
+			state->mmc_vrom_bank[1] = (state->mmc_vrom_bank[1] & 0x0f) | (data << 4);
+			chr1_1(space->machine, state->mmc_vrom_bank[1], CHRROM);
 			break;
 		case 0x4000:
-			state->vrom_bank[2] = (state->vrom_bank[2] & 0xf0) | (data & 0x0f);
-			chr1_2(space->machine, state->vrom_bank[2], CHRROM);
+			state->mmc_vrom_bank[2] = (state->mmc_vrom_bank[2] & 0xf0) | (data & 0x0f);
+			chr1_2(space->machine, state->mmc_vrom_bank[2], CHRROM);
 			break;
 		case 0x4002:
 		case 0x4008:
-			state->vrom_bank[2] = (state->vrom_bank[2] & 0x0f) | (data << 4);
-			chr1_2(space->machine, state->vrom_bank[2], CHRROM);
+			state->mmc_vrom_bank[2] = (state->mmc_vrom_bank[2] & 0x0f) | (data << 4);
+			chr1_2(space->machine, state->mmc_vrom_bank[2], CHRROM);
 			break;
 		case 0x4001:
 		case 0x4004:
-			state->vrom_bank[3] = (state->vrom_bank[3] & 0xf0) | (data & 0x0f);
-			chr1_3(space->machine, state->vrom_bank[3], CHRROM);
+			state->mmc_vrom_bank[3] = (state->mmc_vrom_bank[3] & 0xf0) | (data & 0x0f);
+			chr1_3(space->machine, state->mmc_vrom_bank[3], CHRROM);
 			break;
 		case 0x4003:
 		case 0x400c:
-			state->vrom_bank[3] = (state->vrom_bank[3] & 0x0f) | (data << 4);
-			chr1_3(space->machine, state->vrom_bank[3], CHRROM);
+			state->mmc_vrom_bank[3] = (state->mmc_vrom_bank[3] & 0x0f) | (data << 4);
+			chr1_3(space->machine, state->mmc_vrom_bank[3], CHRROM);
 			break;
 		case 0x5000:
-			state->vrom_bank[4] = (state->vrom_bank[4] & 0xf0) | (data & 0x0f);
-			chr1_4(space->machine, state->vrom_bank[4], CHRROM);
+			state->mmc_vrom_bank[4] = (state->mmc_vrom_bank[4] & 0xf0) | (data & 0x0f);
+			chr1_4(space->machine, state->mmc_vrom_bank[4], CHRROM);
 			break;
 		case 0x5002:
 		case 0x5008:
-			state->vrom_bank[4] = (state->vrom_bank[4] & 0x0f) | (data << 4);
-			chr1_4(space->machine, state->vrom_bank[4], CHRROM);
+			state->mmc_vrom_bank[4] = (state->mmc_vrom_bank[4] & 0x0f) | (data << 4);
+			chr1_4(space->machine, state->mmc_vrom_bank[4], CHRROM);
 			break;
 		case 0x5001:
 		case 0x5004:
-			state->vrom_bank[5] = (state->vrom_bank[5] & 0xf0) | (data & 0x0f);
-			chr1_5(space->machine, state->vrom_bank[5], CHRROM);
+			state->mmc_vrom_bank[5] = (state->mmc_vrom_bank[5] & 0xf0) | (data & 0x0f);
+			chr1_5(space->machine, state->mmc_vrom_bank[5], CHRROM);
 			break;
 		case 0x5003:
 		case 0x500c:
-			state->vrom_bank[5] = (state->vrom_bank[5] & 0x0f) | (data << 4);
-			chr1_5(space->machine, state->vrom_bank[5], CHRROM);
+			state->mmc_vrom_bank[5] = (state->mmc_vrom_bank[5] & 0x0f) | (data << 4);
+			chr1_5(space->machine, state->mmc_vrom_bank[5], CHRROM);
 			break;
 		case 0x6000:
-			state->vrom_bank[6] = (state->vrom_bank[6] & 0xf0) | (data & 0x0f);
-			chr1_6(space->machine, state->vrom_bank[6], CHRROM);
+			state->mmc_vrom_bank[6] = (state->mmc_vrom_bank[6] & 0xf0) | (data & 0x0f);
+			chr1_6(space->machine, state->mmc_vrom_bank[6], CHRROM);
 			break;
 		case 0x6002:
 		case 0x6008:
-			state->vrom_bank[6] = (state->vrom_bank[6] & 0x0f) | (data << 4);
-			chr1_6(space->machine, state->vrom_bank[6], CHRROM);
+			state->mmc_vrom_bank[6] = (state->mmc_vrom_bank[6] & 0x0f) | (data << 4);
+			chr1_6(space->machine, state->mmc_vrom_bank[6], CHRROM);
 			break;
 		case 0x6001:
 		case 0x6004:
-			state->vrom_bank[7] = (state->vrom_bank[7] & 0xf0) | (data & 0x0f);
-			chr1_7(space->machine, state->vrom_bank[7], CHRROM);
+			state->mmc_vrom_bank[7] = (state->mmc_vrom_bank[7] & 0xf0) | (data & 0x0f);
+			chr1_7(space->machine, state->mmc_vrom_bank[7], CHRROM);
 			break;
 		case 0x6003:
 		case 0x600c:
-			state->vrom_bank[7] = (state->vrom_bank[7] & 0x0f) | (data << 4);
-			chr1_7(space->machine, state->vrom_bank[7], CHRROM);
+			state->mmc_vrom_bank[7] = (state->mmc_vrom_bank[7] & 0x0f) | (data << 4);
+			chr1_7(space->machine, state->mmc_vrom_bank[7], CHRROM);
 			break;
 
 		case 0x7000:
@@ -2374,13 +2374,13 @@ static WRITE8_HANDLER( konami_vrc2a_w )
 	case 0x5000:
 	case 0x6000:
 		bank = ((offset & 0x7000) - 0x3000) / 0x0800 + (offset & 0x0001);
-		/* Notice that we store the banks as in other VRC, but then we take state->vrom_bank>>1 because it's VRC2A!*/
+		/* Notice that we store the banks as in other VRC, but then we take state->mmc_vrom_bank>>1 because it's VRC2A!*/
 		if (offset & 0x0002)
-			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0x0f) | (data << 4);
+			state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0x0f) | (data << 4);
 		else
-			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0xf0) | (data & 0x0f);
+			state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
-		chr1_x(space->machine, bank, state->vrom_bank[bank] >> 1, CHRROM);
+		chr1_x(space->machine, bank, state->mmc_vrom_bank[bank] >> 1, CHRROM);
 		break;
 
 	default:
@@ -2457,11 +2457,11 @@ static WRITE8_HANDLER( konami_vrc2b_w )
 	case 0x6003:
 		bank = ((select & 0x7000) - 0x3000) / 0x0800 + ((select & 0x0002) >> 1);
 		if (select & 0x0001)
-			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0x0f) | (data << 4);
+			state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0x0f) | (data << 4);
 		else
-			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0xf0) | (data & 0x0f);
+			state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
 
-		chr1_x(space->machine, bank, state->vrom_bank[bank], state->mmc_chr_source);
+		chr1_x(space->machine, bank, state->mmc_vrom_bank[bank], state->mmc_chr_source);
 		break;
 	case 0x7000:
 		state->IRQ_count_latch &= ~0x0f;
@@ -2870,7 +2870,7 @@ static WRITE8_HANDLER( mapper35_w )
 		prg8_ab(space->machine, data);
 		break;
 	case 0x0002:
-//      state->prg_bank[offset & 0x02] = data;
+//      state->mmc_prg_bank[offset & 0x02] = data;
 		prg8_cd(space->machine, data);
 		break;
 	case 0x1000:
@@ -2881,7 +2881,7 @@ static WRITE8_HANDLER( mapper35_w )
 	case 0x1005:
 	case 0x1006:
 	case 0x1007:
-//      state->vrom_bank[offset & 0x07] = data;
+//      state->mmc_vrom_bank[offset & 0x07] = data;
 		chr1_x(space->machine, offset & 0x07, data, CHRROM);
 		break;
 	case 0x4002:
@@ -3269,10 +3269,10 @@ static WRITE8_HANDLER( mapper46_m_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper46_m_w, offset: %04x, data: %02x\n", offset, data));
 
-	state->prg_bank[0] = (state->prg_bank[0] & 0x01) | ((data & 0x0f) << 1);
-	state->vrom_bank[0] = (state->vrom_bank[0] & 0x07) | ((data & 0xf0) >> 1);
-	prg32(space->machine, state->prg_bank[0]);
-	chr8(space->machine, state->vrom_bank[0], CHRROM);
+	state->mmc_prg_bank[0] = (state->mmc_prg_bank[0] & 0x01) | ((data & 0x0f) << 1);
+	state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & 0x07) | ((data & 0xf0) >> 1);
+	prg32(space->machine, state->mmc_prg_bank[0]);
+	chr8(space->machine, state->mmc_vrom_bank[0], CHRROM);
 }
 
 static WRITE8_HANDLER( mapper46_w )
@@ -3280,10 +3280,10 @@ static WRITE8_HANDLER( mapper46_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mapper46_w, offset: %04x, data: %02x\n", offset, data));
 
-	state->prg_bank[0] = (state->prg_bank[0] & ~0x01) | (data & 0x01);
-	state->vrom_bank[0] = (state->vrom_bank[0] & ~0x07) | ((data & 0x70) >> 4);
-	prg32(space->machine, state->prg_bank[0]);
-	chr8(space->machine, state->vrom_bank[0], CHRROM);
+	state->mmc_prg_bank[0] = (state->mmc_prg_bank[0] & ~0x01) | (data & 0x01);
+	state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & ~0x07) | ((data & 0x70) >> 4);
+	prg32(space->machine, state->mmc_prg_bank[0]);
+	chr8(space->machine, state->mmc_vrom_bank[0], CHRROM);
 }
 
 /*************************************************************
@@ -3849,9 +3849,9 @@ static void mapper64_set_prg( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_mode = state->mmc_cmd1 & 0x40;
 
-	prg8_89(machine, state->prg_bank[prg_mode ? 2: 0]);
-	prg8_ab(machine, state->prg_bank[prg_mode ? 0: 1]);
-	prg8_cd(machine, state->prg_bank[prg_mode ? 1: 2]);
+	prg8_89(machine, state->mmc_prg_bank[prg_mode ? 2: 0]);
+	prg8_ab(machine, state->mmc_prg_bank[prg_mode ? 0: 1]);
+	prg8_cd(machine, state->mmc_prg_bank[prg_mode ? 1: 2]);
 }
 
 static void mapper64_set_chr( running_machine *machine )
@@ -3861,23 +3861,23 @@ static void mapper64_set_chr( running_machine *machine )
 
 	if (state->mmc_cmd1 & 0x20)
 	{
-		chr1_x(machine, 0 ^ chr_page, state->vrom_bank[0], CHRROM);
-		chr1_x(machine, 1 ^ chr_page, state->vrom_bank[8], CHRROM);
-		chr1_x(machine, 2 ^ chr_page, state->vrom_bank[1], CHRROM);
-		chr1_x(machine, 3 ^ chr_page, state->vrom_bank[9], CHRROM);
+		chr1_x(machine, 0 ^ chr_page, state->mmc_vrom_bank[0], CHRROM);
+		chr1_x(machine, 1 ^ chr_page, state->mmc_vrom_bank[8], CHRROM);
+		chr1_x(machine, 2 ^ chr_page, state->mmc_vrom_bank[1], CHRROM);
+		chr1_x(machine, 3 ^ chr_page, state->mmc_vrom_bank[9], CHRROM);
 	}
 	else
 	{
-		chr1_x(machine, 0 ^ chr_page, state->vrom_bank[0] & ~0x01, CHRROM);
-		chr1_x(machine, 1 ^ chr_page, state->vrom_bank[0] |  0x01, CHRROM);
-		chr1_x(machine, 2 ^ chr_page, state->vrom_bank[1] & ~0x01, CHRROM);
-		chr1_x(machine, 3 ^ chr_page, state->vrom_bank[1] |  0x01, CHRROM);
+		chr1_x(machine, 0 ^ chr_page, state->mmc_vrom_bank[0] & ~0x01, CHRROM);
+		chr1_x(machine, 1 ^ chr_page, state->mmc_vrom_bank[0] |  0x01, CHRROM);
+		chr1_x(machine, 2 ^ chr_page, state->mmc_vrom_bank[1] & ~0x01, CHRROM);
+		chr1_x(machine, 3 ^ chr_page, state->mmc_vrom_bank[1] |  0x01, CHRROM);
 	}
 
-	chr1_x(machine, 4 ^ chr_page, state->vrom_bank[2], CHRROM);
-	chr1_x(machine, 5 ^ chr_page, state->vrom_bank[3], CHRROM);
-	chr1_x(machine, 6 ^ chr_page, state->vrom_bank[4], CHRROM);
-	chr1_x(machine, 7 ^ chr_page, state->vrom_bank[5], CHRROM);
+	chr1_x(machine, 4 ^ chr_page, state->mmc_vrom_bank[2], CHRROM);
+	chr1_x(machine, 5 ^ chr_page, state->mmc_vrom_bank[3], CHRROM);
+	chr1_x(machine, 6 ^ chr_page, state->mmc_vrom_bank[4], CHRROM);
+	chr1_x(machine, 7 ^ chr_page, state->mmc_vrom_bank[5], CHRROM);
 }
 
 static WRITE8_HANDLER( mapper64_w )
@@ -3908,19 +3908,19 @@ static WRITE8_HANDLER( mapper64_w )
 				case 0: case 1:
 				case 2: case 3:
 				case 4: case 5:
-					state->vrom_bank[cmd] = data;
+					state->mmc_vrom_bank[cmd] = data;
 					mapper64_set_chr(space->machine);
 					break;
 				case 6: case 7:
-					state->prg_bank[cmd - 6] = data;
+					state->mmc_prg_bank[cmd - 6] = data;
 					mapper64_set_prg(space->machine);
 					break;
 				case 8: case 9:
-					state->vrom_bank[cmd - 2] = data;
+					state->mmc_vrom_bank[cmd - 2] = data;
 					mapper64_set_chr(space->machine);
 					break;
 				case 0x0f:
-					state->prg_bank[2] = data;
+					state->mmc_prg_bank[2] = data;
 					mapper64_set_prg(space->machine);
 					break;
 			}
@@ -4511,16 +4511,16 @@ static void mapper74_set_chr( running_machine *machine, int chr_base, int chr_ma
 	int i;
 
 	for (i = 0; i < 6; i++)
-		chr_src[i] = ((state->vrom_bank[i] == 8) || (state->vrom_bank[i] == 9)) ? CHRRAM : CHRROM;
+		chr_src[i] = ((state->mmc_vrom_bank[i] == 8) || (state->mmc_vrom_bank[i] == 9)) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper74_w )
@@ -4550,12 +4550,12 @@ static WRITE8_HANDLER( mapper74_w )
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper74_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			state->prg_bank[cmd - 6] = data;
+			state->mmc_prg_bank[cmd - 6] = data;
 			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
@@ -4597,10 +4597,10 @@ static WRITE8_HANDLER( mapper75_w )
 			break;
 		case 0x1000:
 			set_nt_mirroring(space->machine, (data & 0x01) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			state->vrom_bank[0] = (state->vrom_bank[0] & 0x0f) | ((data & 0x02) << 3);
-			state->vrom_bank[1] = (state->vrom_bank[1] & 0x0f) | ((data & 0x04) << 2);
-			chr4_0(space->machine, state->vrom_bank[0], CHRROM);
-			chr4_4(space->machine, state->vrom_bank[1], CHRROM);
+			state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & 0x0f) | ((data & 0x02) << 3);
+			state->mmc_vrom_bank[1] = (state->mmc_vrom_bank[1] & 0x0f) | ((data & 0x04) << 2);
+			chr4_0(space->machine, state->mmc_vrom_bank[0], CHRROM);
+			chr4_4(space->machine, state->mmc_vrom_bank[1], CHRROM);
 			break;
 		case 0x2000:
 			prg8_ab(space->machine, data);
@@ -4609,12 +4609,12 @@ static WRITE8_HANDLER( mapper75_w )
 			prg8_cd(space->machine, data);
 			break;
 		case 0x6000:
-			state->vrom_bank[0] = (state->vrom_bank[0] & 0x10) | (data & 0x0f);
-			chr4_0(space->machine, state->vrom_bank[0], CHRROM);
+			state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & 0x10) | (data & 0x0f);
+			chr4_0(space->machine, state->mmc_vrom_bank[0], CHRROM);
 			break;
 		case 0x7000:
-			state->vrom_bank[1] = (state->vrom_bank[1] & 0x10) | (data & 0x0f);
-			chr4_4(space->machine, state->vrom_bank[1], CHRROM);
+			state->mmc_vrom_bank[1] = (state->mmc_vrom_bank[1] & 0x10) | (data & 0x0f);
+			chr4_4(space->machine, state->mmc_vrom_bank[1], CHRROM);
 			break;
 	}
 }
@@ -5495,16 +5495,16 @@ static WRITE8_HANDLER( mapper104_w )
 	{
 		if (data & 0x08)
 		{
-			state->prg_bank[0] = ((data & 0x07) << 4) | (state->prg_bank[0] & 0x0f);
-			prg16_89ab(space->machine, state->prg_bank[0]);
+			state->mmc_prg_bank[0] = ((data & 0x07) << 4) | (state->mmc_prg_bank[0] & 0x0f);
+			prg16_89ab(space->machine, state->mmc_prg_bank[0]);
 			prg16_cdef(space->machine, ((data & 0x07) << 4) | 0x0f);
 		}
 
 	}
 	else
 	{
-			state->prg_bank[0] = (state->prg_bank[0] & 0x70) | (data & 0x0f);
-			prg16_89ab(space->machine, state->prg_bank[0]);
+			state->mmc_prg_bank[0] = (state->mmc_prg_bank[0] & 0x70) | (data & 0x0f);
+			prg16_89ab(space->machine, state->mmc_prg_bank[0]);
 	}
 }
 
@@ -5890,12 +5890,12 @@ static WRITE8_HANDLER( mapper115_w )
 			{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					state->vrom_bank[cmd] = data;
+					state->mmc_vrom_bank[cmd] = data;
 					mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 					break;
 				case 6:
 				case 7:
-					state->prg_bank[cmd - 6] = data;
+					state->mmc_prg_bank[cmd - 6] = data;
 					mapper115_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 			}
@@ -6009,17 +6009,17 @@ static void mapper118_set_mirror( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	if (state->mmc_cmd1 & 0x80)
 	{
-		set_nt_page(machine, 0, CIRAM, (state->vrom_bank[2] & 0x80) >> 7, 1);
-		set_nt_page(machine, 1, CIRAM, (state->vrom_bank[3] & 0x80) >> 7, 1);
-		set_nt_page(machine, 2, CIRAM, (state->vrom_bank[4] & 0x80) >> 7, 1);
-		set_nt_page(machine, 3, CIRAM, (state->vrom_bank[5] & 0x80) >> 7, 1);
+		set_nt_page(machine, 0, CIRAM, (state->mmc_vrom_bank[2] & 0x80) >> 7, 1);
+		set_nt_page(machine, 1, CIRAM, (state->mmc_vrom_bank[3] & 0x80) >> 7, 1);
+		set_nt_page(machine, 2, CIRAM, (state->mmc_vrom_bank[4] & 0x80) >> 7, 1);
+		set_nt_page(machine, 3, CIRAM, (state->mmc_vrom_bank[5] & 0x80) >> 7, 1);
 	}
 	else
 	{
-		set_nt_page(machine, 0, CIRAM, (state->vrom_bank[0] & 0x80) >> 7, 1);
-		set_nt_page(machine, 1, CIRAM, (state->vrom_bank[0] & 0x80) >> 7, 1);
-		set_nt_page(machine, 2, CIRAM, (state->vrom_bank[1] & 0x80) >> 7, 1);
-		set_nt_page(machine, 3, CIRAM, (state->vrom_bank[1] & 0x80) >> 7, 1);
+		set_nt_page(machine, 0, CIRAM, (state->mmc_vrom_bank[0] & 0x80) >> 7, 1);
+		set_nt_page(machine, 1, CIRAM, (state->mmc_vrom_bank[0] & 0x80) >> 7, 1);
+		set_nt_page(machine, 2, CIRAM, (state->mmc_vrom_bank[1] & 0x80) >> 7, 1);
+		set_nt_page(machine, 3, CIRAM, (state->mmc_vrom_bank[1] & 0x80) >> 7, 1);
 	}
 }
 
@@ -6053,13 +6053,13 @@ static WRITE8_HANDLER( mapper118_w )
 			{
 				case 0: case 1:
 				case 2: case 3: case 4: case 5:
-					state->vrom_bank[cmd] = data;
+					state->mmc_vrom_bank[cmd] = data;
 					mapper118_set_mirror(space->machine);
 					mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 					break;
 				case 6:
 				case 7:
-					state->prg_bank[cmd - 6] = data;
+					state->mmc_prg_bank[cmd - 6] = data;
 					mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 			}
@@ -6094,18 +6094,18 @@ static void mapper119_set_chr( running_machine *machine )
 
 	for (i = 0; i < 6; i++)
 	{
-		chr_src[i] = (state->vrom_bank[i] & 0x40) ? CHRRAM : CHRROM;
-		chr_mask[i] =  (state->vrom_bank[i] & 0x40) ? 0x07 : 0x3f;
+		chr_src[i] = (state->mmc_vrom_bank[i] & 0x40) ? CHRRAM : CHRROM;
+		chr_mask[i] =  (state->mmc_vrom_bank[i] & 0x40) ? 0x07 : 0x3f;
 	}
 
-	chr1_x(machine, chr_page ^ 0, ((state->vrom_bank[0] & ~0x01) & chr_mask[0]), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, ((state->vrom_bank[0] |  0x01) & chr_mask[0]), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, ((state->vrom_bank[1] & ~0x01) & chr_mask[1]), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, ((state->vrom_bank[1] |  0x01) & chr_mask[1]), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, (state->vrom_bank[2] & chr_mask[2]), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, (state->vrom_bank[3] & chr_mask[3]), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, (state->vrom_bank[4] & chr_mask[4]), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, (state->vrom_bank[5] & chr_mask[5]), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask[0]), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, ((state->mmc_vrom_bank[0] |  0x01) & chr_mask[0]), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask[1]), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, ((state->mmc_vrom_bank[1] |  0x01) & chr_mask[1]), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, (state->mmc_vrom_bank[2] & chr_mask[2]), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, (state->mmc_vrom_bank[3] & chr_mask[3]), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, (state->mmc_vrom_bank[4] & chr_mask[4]), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, (state->mmc_vrom_bank[5] & chr_mask[5]), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper119_w )
@@ -6134,12 +6134,12 @@ static WRITE8_HANDLER( mapper119_w )
 			{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					state->vrom_bank[cmd] = data;
+					state->mmc_vrom_bank[cmd] = data;
 					mapper119_set_chr(space->machine);
 					break;
 				case 6:
 				case 7:
-					state->prg_bank[cmd - 6] = data;
+					state->mmc_prg_bank[cmd - 6] = data;
 					mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 			}
@@ -6215,11 +6215,11 @@ static void mapper121_set_prg( running_machine *machine, int prg_base, int prg_m
 	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
 	UINT8 new_bank2, new_bank3;
 
-	new_bank2 = mapper121_reg[0] ? mapper121_reg[0] : state->prg_bank[2 ^ prg_flip];
-	new_bank3 = mapper121_reg[1] ? mapper121_reg[1] : state->prg_bank[3];
+	new_bank2 = mapper121_reg[0] ? mapper121_reg[0] : state->mmc_prg_bank[2 ^ prg_flip];
+	new_bank3 = mapper121_reg[1] ? mapper121_reg[1] : state->mmc_prg_bank[3];
 
-	prg8_89(machine, prg_base | (state->prg_bank[0 ^ prg_flip] & prg_mask));
-	prg8_ab(machine, prg_base | (state->prg_bank[1] & prg_mask));
+	prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
+	prg8_ab(machine, prg_base | (state->mmc_prg_bank[1] & prg_mask));
 	prg8_cd(machine, prg_base | (new_bank2 & prg_mask));
 	prg8_ef(machine, prg_base | (new_bank3 & prg_mask));
 }
@@ -6285,12 +6285,12 @@ static WRITE8_HANDLER( mapper121_w )
 			{
 			case 0: case 1:
 			case 2: case 3: case 4: case 5:
-				state->vrom_bank[cmd] = data;
+				state->mmc_vrom_bank[cmd] = data;
 				mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 				break;
 			case 6:
 			case 7:
-				state->prg_bank[cmd - 6] = data;
+				state->mmc_prg_bank[cmd - 6] = data;
 				mapper121_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 				break;
 			}
@@ -7026,20 +7026,20 @@ static WRITE8_HANDLER( mapper150_l_w )
 			switch (state->mmc_cmd1)
 			{
 			case 0x02:
-				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x08) | ((data << 3) & 0x08);
-				chr8(space->machine, state->vrom_bank[0], CHRROM);
+				state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & ~0x08) | ((data << 3) & 0x08);
+				chr8(space->machine, state->mmc_vrom_bank[0], CHRROM);
 				prg32(space->machine, data & 0x01);
 				break;
 			case 0x04:
-				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x04) | ((data << 2) & 0x04);
-				chr8(space->machine, state->vrom_bank[0], CHRROM);
+				state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & ~0x04) | ((data << 2) & 0x04);
+				chr8(space->machine, state->mmc_vrom_bank[0], CHRROM);
 				break;
 			case 0x05:
 				prg32(space->machine, data & 0x07);
 				break;
 			case 0x06:
-				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x03) | (data << 0 & 0x03);
-				chr8(space->machine, state->vrom_bank[0], CHRROM);
+				state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & ~0x03) | (data << 0 & 0x03);
+				chr8(space->machine, state->mmc_vrom_bank[0], CHRROM);
 				break;
 			case 0x07:
 				sachen_set_mirror(space->machine, (data >> 1) & 0x03);
@@ -7304,10 +7304,10 @@ static void mapper158_set_mirror( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 nt_mode = state->mmc_cmd1 & 0x80;
 
-	set_nt_page(machine, 0, ROM, state->vrom_bank[nt_mode ? 2 : 0], 0);
-	set_nt_page(machine, 1, ROM, state->vrom_bank[nt_mode ? 3 : 0], 0);
-	set_nt_page(machine, 2, ROM, state->vrom_bank[nt_mode ? 4 : 1], 0);
-	set_nt_page(machine, 3, ROM, state->vrom_bank[nt_mode ? 5 : 1], 0);
+	set_nt_page(machine, 0, ROM, state->mmc_vrom_bank[nt_mode ? 2 : 0], 0);
+	set_nt_page(machine, 1, ROM, state->mmc_vrom_bank[nt_mode ? 3 : 0], 0);
+	set_nt_page(machine, 2, ROM, state->mmc_vrom_bank[nt_mode ? 4 : 1], 0);
+	set_nt_page(machine, 3, ROM, state->mmc_vrom_bank[nt_mode ? 5 : 1], 0);
 }
 
 static WRITE8_HANDLER( mapper158_w )
@@ -7341,21 +7341,21 @@ static WRITE8_HANDLER( mapper158_w )
 				case 0: case 1:
 				case 2: case 3:
 				case 4: case 5:
-					state->vrom_bank[cmd] = data;
+					state->mmc_vrom_bank[cmd] = data;
 					mapper64_set_chr(space->machine);
 					mapper158_set_mirror(space->machine);
 					break;
 				case 6: case 7:
-					state->prg_bank[cmd - 6] = data;
+					state->mmc_prg_bank[cmd - 6] = data;
 					mapper64_set_prg(space->machine);
 					break;
 				case 8: case 9:
-					state->vrom_bank[cmd - 2] = data;
+					state->mmc_vrom_bank[cmd - 2] = data;
 					mapper64_set_chr(space->machine);
 					mapper158_set_mirror(space->machine);
 					break;
 				case 0x0f:
-					state->prg_bank[2] = data;
+					state->mmc_prg_bank[2] = data;
 					mapper64_set_prg(space->machine);
 					break;
 			}
@@ -7988,10 +7988,10 @@ static void mapper187_set_prg( running_machine *machine, int prg_base, int prg_m
 
 	if (!(mapper187_reg[0] & 0x80))
 	{
-		prg8_89(machine, prg_base | (state->prg_bank[0 ^ prg_flip] & prg_mask));
-		prg8_ab(machine, prg_base | (state->prg_bank[1] & prg_mask));
-		prg8_cd(machine, prg_base | (state->prg_bank[2 ^ prg_flip] & prg_mask));
-		prg8_ef(machine, prg_base | (state->prg_bank[3] & prg_mask));
+		prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
+		prg8_ab(machine, prg_base | (state->mmc_prg_bank[1] & prg_mask));
+		prg8_cd(machine, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
+		prg8_ef(machine, prg_base | (state->mmc_prg_bank[3] & prg_mask));
 	}
 }
 
@@ -8005,14 +8005,14 @@ static void mapper187_set_chr( running_machine *machine, UINT8 chr, int chr_base
 	for (i = 0; i < 8; i++)
 		new_base[i] = ((i & 0x04) == chr_page)? (chr_base | 0x100) : chr_base;
 
-	chr1_x(machine, chr_page ^ 0, new_base[0] | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, new_base[1] | ((state->vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, new_base[2] | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, new_base[3] | ((state->vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, new_base[4] | (state->vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, new_base[5] | (state->vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, new_base[6] | (state->vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, new_base[7] | (state->vrom_bank[5] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 0, new_base[0] | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, new_base[1] | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, new_base[2] | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, new_base[3] | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, new_base[4] | (state->mmc_vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, new_base[5] | (state->mmc_vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, new_base[6] | (state->mmc_vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, new_base[7] | (state->mmc_vrom_bank[5] & chr_mask), chr);
 }
 
 static WRITE8_HANDLER( mapper187_l_w )
@@ -8101,12 +8101,12 @@ static WRITE8_HANDLER( mapper187_w )
 			{
 			case 0: case 1:
 			case 2: case 3: case 4: case 5:
-				state->vrom_bank[cmd] = data;
+				state->mmc_vrom_bank[cmd] = data;
 				mapper187_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 				break;
 			case 6:
 			case 7:
-				state->prg_bank[cmd - 6] = data;
+				state->mmc_prg_bank[cmd - 6] = data;
 				mapper187_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 				break;
 			}
@@ -8200,7 +8200,7 @@ static WRITE8_HANDLER( mapper189_w )
 		{
 		case 0: case 1:
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		}
@@ -8246,16 +8246,16 @@ static void mapper191_set_chr( running_machine *machine, int chr_base, int chr_m
 	int i;
 
 	for (i = 0; i < 6; i++)
-		chr_src[i] = (state->vrom_bank[i] & 0x80) ? CHRRAM : CHRROM;
+		chr_src[i] = (state->mmc_vrom_bank[i] & 0x80) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper191_w )
@@ -8285,12 +8285,12 @@ static WRITE8_HANDLER( mapper191_w )
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper191_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			state->prg_bank[cmd - 6] = data;
+			state->mmc_prg_bank[cmd - 6] = data;
 			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
@@ -8325,16 +8325,16 @@ static void mapper192_set_chr( running_machine *machine, int chr_base, int chr_m
 	int i;
 
 	for (i = 0; i < 6; i++)
-		chr_src[i] = ((state->vrom_bank[i] == 0x08) || (state->vrom_bank[i] == 0x09) || (state->vrom_bank[i] == 0x0a) || (state->vrom_bank[i] == 0x0b)) ? CHRRAM : CHRROM;
+		chr_src[i] = ((state->mmc_vrom_bank[i] == 0x08) || (state->mmc_vrom_bank[i] == 0x09) || (state->mmc_vrom_bank[i] == 0x0a) || (state->mmc_vrom_bank[i] == 0x0b)) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper192_w )
@@ -8364,12 +8364,12 @@ static WRITE8_HANDLER( mapper192_w )
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper192_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			state->prg_bank[cmd - 6] = data;
+			state->mmc_prg_bank[cmd - 6] = data;
 			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
@@ -8439,16 +8439,16 @@ static void mapper194_set_chr( running_machine *machine, int chr_base, int chr_m
 	int i;
 
 	for (i = 0; i < 6; i++)
-		chr_src[i] = (state->vrom_bank[i] < 0x02) ? CHRRAM : CHRROM;
+		chr_src[i] = (state->mmc_vrom_bank[i] < 0x02) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper194_w )
@@ -8478,12 +8478,12 @@ static WRITE8_HANDLER( mapper194_w )
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper194_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			state->prg_bank[cmd - 6] = data;
+			state->mmc_prg_bank[cmd - 6] = data;
 			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
@@ -8519,16 +8519,16 @@ static void mapper195_set_chr( running_machine *machine, int chr_base, int chr_m
 	int i;
 
 	for (i = 0; i < 6; i++)
-		chr_src[i] = (state->vrom_bank[i] < 0x04) ? CHRRAM : CHRROM;
+		chr_src[i] = (state->mmc_vrom_bank[i] < 0x04) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper195_w )
@@ -8558,12 +8558,12 @@ static WRITE8_HANDLER( mapper195_w )
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper195_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			state->prg_bank[cmd - 6] = data;
+			state->mmc_prg_bank[cmd - 6] = data;
 			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
@@ -8612,9 +8612,9 @@ static WRITE8_HANDLER( mapper196_w )
 static void mapper197_set_chr( running_machine *machine, UINT8 chr_source, int chr_base, int chr_mask )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
-	chr4_0(machine, chr_base | ((state->vrom_bank[0] >> 1) & chr_mask), chr_source);
-	chr2_4(machine, chr_base | (state->vrom_bank[1] & chr_mask), chr_source);
-	chr2_6(machine, chr_base | (state->vrom_bank[2] & chr_mask), chr_source);
+	chr4_0(machine, chr_base | ((state->mmc_vrom_bank[0] >> 1) & chr_mask), chr_source);
+	chr2_4(machine, chr_base | (state->mmc_vrom_bank[1] & chr_mask), chr_source);
+	chr2_6(machine, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr_source);
 }
 
 static WRITE8_HANDLER( mapper197_w )
@@ -8643,12 +8643,12 @@ static WRITE8_HANDLER( mapper197_w )
 		switch (cmd)
 		{
 		case 0: case 2: case 4:
-			state->vrom_bank[cmd >> 1] = data;
+			state->mmc_vrom_bank[cmd >> 1] = data;
 			mapper197_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			state->prg_bank[cmd - 6] = data;
+			state->mmc_prg_bank[cmd - 6] = data;
 			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
@@ -8678,10 +8678,10 @@ static void mapper198_set_prg( running_machine *machine, int prg_base, int prg_m
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
 
-	prg8_89(machine, prg_base | (state->prg_bank[0 ^ prg_flip] & prg_mask));
-	prg8_ab(machine, prg_base | (state->prg_bank[1] & prg_mask));
-	prg8_cd(machine, prg_base | (state->prg_bank[2 ^ prg_flip] & prg_mask));
-	prg8_ef(machine, prg_base | (state->prg_bank[3] & prg_mask));
+	prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
+	prg8_ab(machine, prg_base | (state->mmc_prg_bank[1] & prg_mask));
+	prg8_cd(machine, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
+	prg8_ef(machine, prg_base | (state->mmc_prg_bank[3] & prg_mask));
 }
 
 static WRITE8_HANDLER( mapper198_w )
@@ -8711,12 +8711,12 @@ static WRITE8_HANDLER( mapper198_w )
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			state->prg_bank[cmd - 6] = data & ((data > 0x3f) ? 0x4f : 0x3f);
+			state->mmc_prg_bank[cmd - 6] = data & ((data > 0x3f) ? 0x4f : 0x3f);
 			mapper198_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
@@ -8750,16 +8750,16 @@ static void mapper199_set_chr( running_machine *machine, int chr_base, int chr_m
 	int i;
 
 	for (i = 0; i < 8; i++)
-		chr_src[i] = (state->vrom_bank[i] < 0x08) ? CHRRAM : CHRROM;
+		chr_src[i] = (state->mmc_vrom_bank[i] < 0x08) ? CHRRAM : CHRROM;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | (state->vrom_bank[0] & chr_mask), chr_src[0]);
-	chr1_x(machine, chr_page ^ 1, chr_base | (state->vrom_bank[6] & chr_mask), chr_src[6]);
-	chr1_x(machine, chr_page ^ 2, chr_base | (state->vrom_bank[1] & chr_mask), chr_src[1]);
-	chr1_x(machine, chr_page ^ 3, chr_base | (state->vrom_bank[7] & chr_mask), chr_src[7]);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr_src[2]);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr_src[3]);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr_src[4]);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr_src[5]);
+	chr1_x(machine, chr_page ^ 0, chr_base | (state->mmc_vrom_bank[0] & chr_mask), chr_src[0]);
+	chr1_x(machine, chr_page ^ 1, chr_base | (state->mmc_vrom_bank[6] & chr_mask), chr_src[6]);
+	chr1_x(machine, chr_page ^ 2, chr_base | (state->mmc_vrom_bank[1] & chr_mask), chr_src[1]);
+	chr1_x(machine, chr_page ^ 3, chr_base | (state->mmc_vrom_bank[7] & chr_mask), chr_src[7]);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr_src[2]);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr_src[3]);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr_src[4]);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr_src[5]);
 }
 
 static WRITE8_HANDLER( mapper199_w )
@@ -8789,18 +8789,18 @@ static WRITE8_HANDLER( mapper199_w )
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper199_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
 		case 8:
 		case 9:
-			state->prg_bank[cmd - 6] = data;
+			state->mmc_prg_bank[cmd - 6] = data;
 			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		case 0x0a: case 0x0b:
-			state->vrom_bank[cmd - 4] = data;
+			state->mmc_vrom_bank[cmd - 4] = data;
 			mapper199_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		}
@@ -9121,7 +9121,7 @@ static WRITE8_HANDLER( mapper208_w )
 		{
 		case 0: case 1:
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper4_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		}
@@ -9281,14 +9281,14 @@ static void mapper215_set_chr( running_machine *machine, UINT8 chr )
 	int chr_base = (map215_reg[1] & 0x04) ? 0x100 : ((map215_reg[1] & 0x10) << 3);
 	int chr_mask = (map215_reg[1] & 0x04) ? 0xff : 0x7f;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr);
 }
 
 static WRITE8_HANDLER( mapper215_l_w )
@@ -9346,12 +9346,12 @@ static WRITE8_HANDLER( mapper215_w )
 			{
 			case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 			case 2: case 3: case 4: case 5:
-				state->vrom_bank[cmd] = data;
+				state->mmc_vrom_bank[cmd] = data;
 				mapper215_set_chr(space->machine, state->mmc_chr_source);
 				break;
 			case 6:
 			case 7:
-				state->prg_bank[cmd - 6] = data;
+				state->mmc_prg_bank[cmd - 6] = data;
 				mapper215_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 				break;
 			}
@@ -9378,12 +9378,12 @@ static WRITE8_HANDLER( mapper215_w )
 				{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					state->vrom_bank[cmd] = data;
+					state->mmc_vrom_bank[cmd] = data;
 					mapper215_set_chr(space->machine, state->mmc_chr_source);
 					break;
 				case 6:
 				case 7:
-					state->prg_bank[cmd - 6] = data;
+					state->mmc_prg_bank[cmd - 6] = data;
 					mapper215_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 				}
@@ -9491,14 +9491,14 @@ static void mapper217_set_chr( running_machine *machine, UINT8 chr )
 
 	chr_base |= ((map217_reg[1] & 0x03) << 8);
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr);
 }
 
 static WRITE8_HANDLER( mapper217_l_w )
@@ -9561,12 +9561,12 @@ static WRITE8_HANDLER( mapper217_w )
 			{
 			case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 			case 2: case 3: case 4: case 5:
-				state->vrom_bank[cmd] = data;
+				state->mmc_vrom_bank[cmd] = data;
 				mapper217_set_chr(space->machine, state->mmc_chr_source);
 				break;
 			case 6:
 			case 7:
-				state->prg_bank[cmd - 6] = data;
+				state->mmc_prg_bank[cmd - 6] = data;
 				mapper217_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 				break;
 			}
@@ -9610,12 +9610,12 @@ static WRITE8_HANDLER( mapper217_w )
 				{
 				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 				case 2: case 3: case 4: case 5:
-					state->vrom_bank[cmd] = data;
+					state->mmc_vrom_bank[cmd] = data;
 					mapper217_set_chr(space->machine, state->mmc_chr_source);
 					break;
 				case 6:
 				case 7:
-					state->prg_bank[cmd - 6] = data;
+					state->mmc_prg_bank[cmd - 6] = data;
 					mapper217_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 					break;
 				}
@@ -10306,19 +10306,19 @@ static WRITE8_HANDLER( mapper243_l_w )
 				chr8(space->machine, 3, CHRROM);
 				break;
 			case 0x02:
-				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x08) | (data << 3 & 0x08);
-				chr8(space->machine, state->vrom_bank[0], CHRROM);
+				state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & ~0x08) | (data << 3 & 0x08);
+				chr8(space->machine, state->mmc_vrom_bank[0], CHRROM);
 				break;
 			case 0x04:
-				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x01) | (data << 0 & 0x01);
-				chr8(space->machine, state->vrom_bank[0], CHRROM);
+				state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & ~0x01) | (data << 0 & 0x01);
+				chr8(space->machine, state->mmc_vrom_bank[0], CHRROM);
 				break;
 			case 0x05:
 				prg32(space->machine, data & 0x01);
 				break;
 			case 0x06:
-				state->vrom_bank[0] = (state->vrom_bank[0] & ~0x06) | (data << 1 & 0x06);
-				chr8(space->machine, state->vrom_bank[0], CHRROM);
+				state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & ~0x06) | (data << 1 & 0x06);
+				chr8(space->machine, state->mmc_vrom_bank[0], CHRROM);
 				break;
 			case 0x07:
 				set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -10387,12 +10387,12 @@ static WRITE8_HANDLER( mapper245_w )
 		cmd = state->mmc_cmd1 & 0x0f;
 		switch (cmd)
 		{
-		case 0: 	// in this case we set prg_base in addition to state->vrom_bank!
+		case 0: 	// in this case we set prg_base in addition to state->mmc_vrom_bank!
 			state->mmc_prg_base = (data << 5) & 0x40;
 			state->mmc_prg_mask = 0x3f;
 			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 		case 1: case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			if (state->chr_chunks > 0)
 				mapper4_set_chr(space->machine, CHRROM, state->mmc_chr_base, state->mmc_chr_mask);
 			else	// according to Disch's docs, state->mmc_cmd1&0x80 swaps 4k CHRRAM banks
@@ -10404,7 +10404,7 @@ static WRITE8_HANDLER( mapper245_w )
 			break;
 		case 6:
 		case 7:
-			state->prg_bank[cmd - 6] = data;
+			state->mmc_prg_bank[cmd - 6] = data;
 			mapper4_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
@@ -10519,8 +10519,8 @@ static void mapper249_set_prg( running_machine *machine, int prg_base, int prg_m
 	{
 		for (i = 0; i < 4; i ++)	// should this apply only to bank[0],bank[1]?
 		{
-			state->prg_bank[i] = ((state->prg_bank[i] & 0x01)) | ((state->prg_bank[i] >> 3) & 0x02) |
-					((state->prg_bank[i] >> 1) & 0x04) | ((state->prg_bank[i] << 2) & 0x18);
+			state->mmc_prg_bank[i] = ((state->mmc_prg_bank[i] & 0x01)) | ((state->mmc_prg_bank[i] >> 3) & 0x02) |
+					((state->mmc_prg_bank[i] >> 1) & 0x04) | ((state->mmc_prg_bank[i] << 2) & 0x18);
 		}
 	}
 
@@ -10537,20 +10537,20 @@ static void mapper249_set_chr( running_machine *machine, int chr_base, int chr_m
 	{
 		for (i = 0; i < 6; i ++)
 		{
-			state->vrom_bank[i] = ((state->vrom_bank[i] & 0x03)) | ((state->vrom_bank[i] >> 1) & 0x04) |
-						((state->vrom_bank[i] >> 4) & 0x08) | ((state->vrom_bank[i] >> 2) & 0x10) |
-						((state->vrom_bank[i] << 3) & 0x20) | ((state->vrom_bank[i] << 2) & 0xc0);
+			state->mmc_vrom_bank[i] = ((state->mmc_vrom_bank[i] & 0x03)) | ((state->mmc_vrom_bank[i] >> 1) & 0x04) |
+						((state->mmc_vrom_bank[i] >> 4) & 0x08) | ((state->mmc_vrom_bank[i] >> 2) & 0x10) |
+						((state->mmc_vrom_bank[i] << 3) & 0x20) | ((state->mmc_vrom_bank[i] << 2) & 0xc0);
 		}
 	}
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->vrom_bank[0] & ~0x01) & chr_mask), state->mmc_chr_source);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->vrom_bank[0] |  0x01) & chr_mask), state->mmc_chr_source);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->vrom_bank[1] & ~0x01) & chr_mask), state->mmc_chr_source);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->vrom_bank[1] |  0x01) & chr_mask), state->mmc_chr_source);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->vrom_bank[2] & chr_mask), state->mmc_chr_source);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->vrom_bank[3] & chr_mask), state->mmc_chr_source);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->vrom_bank[4] & chr_mask), state->mmc_chr_source);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->vrom_bank[5] & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), state->mmc_chr_source);
+	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), state->mmc_chr_source);
 }
 
 static WRITE8_HANDLER( mapper249_l_w )
@@ -10595,12 +10595,12 @@ static WRITE8_HANDLER( mapper249_w )
 		{
 		case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
 		case 2: case 3: case 4: case 5:
-			state->vrom_bank[cmd] = data;
+			state->mmc_vrom_bank[cmd] = data;
 			mapper249_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case 6:
 		case 7:
-			state->prg_bank[cmd - 6] = data;
+			state->mmc_prg_bank[cmd - 6] = data;
 			mapper249_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 		}
@@ -10678,10 +10678,10 @@ static WRITE8_HANDLER( mapper252_w )
 		bank = ((offset & 0x7000) - 0x3000) / 0x0800 + ((offset & 0x0008) >> 3);
 		mmc_helper = offset & 0x04;
 		if (mmc_helper)
-			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
+			state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f) << 4);
 		else
-			state->vrom_bank[bank] = (state->vrom_bank[bank] & 0xf0) | (data & 0x0f);
-		chr1_x(space->machine, bank, state->vrom_bank[bank], CHRROM);
+			state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
+		chr1_x(space->machine, bank, state->mmc_vrom_bank[bank], CHRROM);
 		break;
 	case 0x7000:
 		switch (offset & 0x0c)
