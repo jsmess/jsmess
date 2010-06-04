@@ -959,6 +959,14 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 			options_set_string(mame_opts, OPTION_AVIWRITE, playopts->aviwrite, OPTION_PRIORITY_CMDLINE);
 	}
 
+	#ifdef MESS
+	if (g_szSelectedSoftware[0] && g_szSelectedDevice[0]) {
+			options_set_string(mame_opts, g_szSelectedDevice, g_szSelectedSoftware, OPTION_PRIORITY_CMDLINE);
+			// Add params and clear so next start of driver is without parameters			
+			g_szSelectedSoftware[0] = 0;
+			g_szSelectedDevice[0] = 0;
+	}
+	#endif	
 	// Mame will parse all the needed .ini files.
 
 	// prepare MAME32 to run the game

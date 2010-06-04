@@ -7,6 +7,8 @@
 #include "options.h"
 
 extern char g_szSelectedItem[MAX_PATH];
+extern char g_szSelectedSoftware[MAX_PATH];
+extern char g_szSelectedDevice[MAX_PATH];
 
 void InitMessPicker(void);
 void MessUpdateSoftwareList(void);

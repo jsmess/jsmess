@@ -78,7 +78,9 @@ struct _device_entry
 
 char g_szSelectedItem[MAX_PATH];
 
+char g_szSelectedSoftware[MAX_PATH];
 
+char g_szSelectedDevice[MAX_PATH];
 
 //============================================================
 //  LOCAL VARIABLES
@@ -462,7 +464,27 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 					{
 						for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
 						{							
-							SoftwareList_AddFile(hwndSoftwareList, swinfo->shortname, swlist->list_name[i], swinfo->longname, swinfo->publisher, swinfo->year);
+							const device_config *selimage = NULL;
+							software_part *part = software_find_part(swinfo, NULL, NULL);			
+
+							/* search for a device with the right interface */
+							for (const device_config *image = config->devicelist.first(); image != NULL; image = image->next)
+							{
+								const char *interface = image->get_config_string(DEVINFO_STR_INTERFACE);
+
+								if (interface != NULL)
+								{
+									if (!strcmp(interface, part->interface_))
+									{
+										selimage = image;
+										break;
+									}
+								}
+							}
+							if (selimage) {
+								image_device_info info = image_device_getinfo(config, selimage);
+								SoftwareList_AddFile(hwndSoftwareList, swinfo->shortname, swlist->list_name[i], swinfo->longname, swinfo->publisher, swinfo->year, info.brief_instance_name);
+							}
 						}
 
 						software_list_close(list);
@@ -495,6 +517,9 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	LPCSTR pszSoftware;
 	BOOL bResult = FALSE;
 
+	if (g_szSelectedSoftware[0] && g_szSelectedDevice[0]) {
+		return TRUE;
+	}
 //  begin_resource_tracking();
 
 	// allocate the machine config
@@ -1285,17 +1310,10 @@ static int SoftwareList_GetItemImage(HWND hwndPicker, int nItem)
 
 static void SoftwareList_LeavingItem(HWND hwndSoftwareList, int nItem)
 {
-	int drvindex;
-	const char *pszFullName;
-	HWND hwndList;
-
 	if (!s_bIgnoreSoftwarePickerNotifies)
 	{
-		hwndList = GetDlgItem(GetMainWindow(), IDC_LIST);
-		drvindex = Picker_GetSelectedItem(hwndList);
-		pszFullName = SoftwareList_LookupFilename(hwndSoftwareList, nItem);
-
-		MessRemoveImage(drvindex, pszFullName);
+		g_szSelectedSoftware[0] = 0;
+		g_szSelectedDevice[0] = 0;
 	}
 }
 
@@ -1304,9 +1322,6 @@ static void SoftwareList_LeavingItem(HWND hwndSoftwareList, int nItem)
 static void SoftwareList_EnteringItem(HWND hwndSoftwareList, int nItem)
 {
 	LPCSTR pszFullName;
-	LPCSTR pszName;
-	const char* tmp;
-	LPSTR s;
 	int drvindex;
 	HWND hwndList;
 
@@ -1318,17 +1333,13 @@ static void SoftwareList_EnteringItem(HWND hwndSoftwareList, int nItem)
 
 		// Get the fullname and partialname for this file
 		pszFullName = SoftwareList_LookupFilename(hwndSoftwareList, nItem);
-		tmp = strchr(pszFullName, '\\');
-		pszName = tmp ? tmp + 1 : pszFullName;
 
-		// Do the dirty work
-		MessSpecifyImage(drvindex, NULL, pszFullName);
-
+		strncpyz(g_szSelectedSoftware, pszFullName, ARRAY_LENGTH(g_szSelectedSoftware));
+		
+		strncpyz(g_szSelectedDevice, SoftwareList_LookupDevice(hwndSoftwareList, nItem), ARRAY_LENGTH(g_szSelectedDevice));
+		
 		// Set up s_szSelecteItem, for the benefit of UpdateScreenShot()
-		strncpyz(g_szSelectedItem, pszName, ARRAY_LENGTH(g_szSelectedItem));
-		s = strrchr(g_szSelectedItem, '.');
-		if (s)
-			*s = '\0';
+		strncpyz(g_szSelectedItem, pszFullName, ARRAY_LENGTH(g_szSelectedItem));
 
 		UpdateScreenShot();
 	}

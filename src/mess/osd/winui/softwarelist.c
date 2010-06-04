@@ -38,11 +38,13 @@
 typedef struct _file_info file_info;
 struct _file_info
 {
-	char list_name[256];
-	char description[256];
-	char file_name[256];
-	char publisher[256];
+	char list_name[MAX_PATH];
+	char description[MAX_PATH];
+	char file_name[MAX_PATH];
+	char publisher[MAX_PATH];
 	char year[10];
+	
+	char device[MAX_PATH];
 };
 
 typedef struct _software_list_info software_list_info;
@@ -84,6 +86,14 @@ LPCSTR SoftwareList_LookupFilename(HWND hwndPicker, int nIndex)
 	return pPickerInfo->file_index[nIndex]->file_name;
 }
 
+LPCSTR SoftwareList_LookupDevice(HWND hwndPicker, int nIndex)
+{
+	software_list_info *pPickerInfo;
+	pPickerInfo = GetSoftwareListInfo(hwndPicker);
+	if ((nIndex < 0) || (nIndex >= pPickerInfo->file_index_length))
+		return NULL;
+	return pPickerInfo->file_index[nIndex]->device;
+}
 
 
 int SoftwareList_LookupIndex(HWND hwndPicker, LPCSTR pszFilename)
@@ -118,7 +128,7 @@ void SoftwareList_SetDriver(HWND hwndPicker, const software_config *config)
 }
 
 
-BOOL SoftwareList_AddFile(HWND hwndPicker,LPCSTR pszName, LPCSTR pszListname, LPCSTR pszDescription, LPCSTR pszPublisher, LPCSTR pszYear)
+BOOL SoftwareList_AddFile(HWND hwndPicker,LPCSTR pszName, LPCSTR pszListname, LPCSTR pszDescription, LPCSTR pszPublisher, LPCSTR pszYear, LPCSTR pszDevice)
 {
 	Picker_ResetIdle(hwndPicker);
 	
@@ -146,6 +156,7 @@ BOOL SoftwareList_AddFile(HWND hwndPicker,LPCSTR pszName, LPCSTR pszListname, LP
 	strcpy(pInfo->description, pszDescription);
 	strcpy(pInfo->publisher, pszPublisher);
 	strcpy(pInfo->year, pszYear);
+	strcpy(pInfo->device, pszDevice);
 	
 	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
 	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));
