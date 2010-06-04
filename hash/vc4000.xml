@@ -285,7 +285,7 @@
 	<!-- Cassette 24 -->
 	<software name="soccer">
 		<description>Fussball / Soccer / Football</description>
-		<year>19??</year>
+		<year>1979</year>
 		<publisher>Interton</publisher>
 		<part name="cart" interface="vc4000_cart">
 			<dataarea name="rom" size="2048">
