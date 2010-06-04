@@ -431,6 +431,23 @@ static void install_protection(running_device* image)
 		kof2000_neogeo_gfx_decrypt(image->machine, 0x6a);
 		logerror("Decrypted Matrimelee code, sound and graphics\n");
 	}
+	if(strcmp(image_get_feature(image),"svc_crypt") == 0)
+	{
+		svc_px_decrypt(image->machine);
+		neo_pcm2_swap(image->machine, 3);
+		state->fixed_layer_bank_type = 2;
+		neogeo_cmc50_m1_decrypt(image->machine);
+		kof2000_neogeo_gfx_decrypt(image->machine, 0x57);
+		install_pvc_protection(image->machine);
+	}
+	if(strcmp(image_get_feature(image),"samsho5_crypt") == 0)
+	{
+		samsho5_decrypt_68k(image->machine);
+		neo_pcm2_swap(image->machine, 4);
+		state->fixed_layer_bank_type = 1;
+		neogeo_cmc50_m1_decrypt(image->machine);
+		kof2000_neogeo_gfx_decrypt(image->machine, 0x0f);
+	}
 }
 
 /*

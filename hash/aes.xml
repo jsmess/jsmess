@@ -718,5 +718,75 @@
 			</dataarea>
 		</part>
 	</software>
+<!-- ID 269 -->
+	<software name="svc">
+		<description>SNK vs CAPCOM SVC CHAOS</description>
+		<year>2003</year>
+		<publisher>SNK Playmore</publisher>
+		<part name="cart" interface="aes_cart" feature="svc_crypt">
+			<dataarea name="maincpu" size="8388608">
+                <rom name="269-p1.bin" size="4194304" crc="38e2005e" sha1="1b902905916a30969282f1399a756e32ff069097" offset="000000" loadflag="load32_word" />
+                <rom name="269-p2.bin" size="4194304" crc="6d13797c" sha1="3cb71a95cea6b006b44cac0f547df88aec0007b7" offset="000002" loadflag="load32_word" />
+			</dataarea>
+			<dataarea name="fixed" size="524288">
+                <rom value="0" length="524288" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="589824">
+                <rom value="ff" length="589824" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocrypt" size="524288">
+                <rom name="269-m1.bin" size="524288" crc="f6819d00" sha1="d3bbe09df502464f104e53501708ac6e2c1832c6" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="269-v1.bin" size="8388608" crc="c659b34c" sha1="1931e8111ef43946f68699f8707334c96f753a1e" offset="000000" />
+                <rom name="269-v2.bin" size="8388608" crc="dd903835" sha1="e58d38950a7a8697bb22a1cc7a371ae6664ae8f9" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="269-c1.bin" size="8388608" crc="887b4068" sha1="227cdcf7a10a415f1e3afe7ae97acc9afc2cc8e1" offset="000000" loadflag="load16_byte" />
+                <rom name="269-c2.bin" size="8388608" crc="4e8903e4" sha1="31daaa4fd6c23e8f0a8428931c513d97d2eee1bd" offset="000001" loadflag="load16_byte" />
+                <rom name="269-c3.bin" size="8388608" crc="7d9c55b0" sha1="1f94a948b3e3c31b3ff05518ef525031a3cb2c62" offset="1000000" loadflag="load16_byte" />
+                <rom name="269-c4.bin" size="8388608" crc="8acb5bb6" sha1="2c27d6e309646d7b84da85f78c06e4aaa74e844b" offset="1000001" loadflag="load16_byte" />
+                <rom name="269-c5.bin" size="8388608" crc="097a4157" sha1="54d839f55d27f68c704a94ea3c63c644ffc22ca4" offset="2000000" loadflag="load16_byte" />
+                <rom name="269-c6.bin" size="8388608" crc="e19df344" sha1="20448add53ab25dd3a8f0b681131ad3b9c68acc9" offset="2000001" loadflag="load16_byte" />
+                <rom name="269-c7.bin" size="8388608" crc="d8f0340b" sha1="43114af7557361a8903bb8cf8553f602946a9220" offset="3000000" loadflag="load16_byte" />
+                <rom name="269-c8.bin" size="8388608" crc="2570b71b" sha1="99266e1c2ffcf324793fb5c55325fbc7e6265ac0" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+<!-- ID 270 -->
+	<software name="samsho5">
+		<description>Samurai Shodown V / Samurai Spirits Zero</description>
+		<year>2003</year>
+		<publisher>Yuki Enterprise / SNK Playmore</publisher>
+		<part name="cart" interface="aes_cart" feature="samsho5_crypt">
+			<dataarea name="maincpu" size="8388608">
+                <rom name="270-p1c.bin" size="4194304" crc="bf956089" sha1="c538289069bf338b9fa7ecc5c9143763dbb776a8" offset="000000" />
+                <rom name="270-p2c.bin" size="4194304" crc="943a6b1d" sha1="12bd02fc197456da6ee86f066086094cef0f4bf9" offset="400000" />
+			</dataarea>
+			<dataarea name="fixed" size="524288">
+                <rom value="0" length="524288" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="589824">
+                <rom value="ff" length="589824" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocrypt" size="524288">
+                <rom name="270-m1.bin" size="524288" crc="49c9901a" sha1="2623e9765a0eba58fee2de72851e9dc502344a3d" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="270-v1.bin" size="8388608" crc="62e434eb" sha1="1985f5e88f8e866f9683b6cea901aa28c04b80bf" offset="000000" />
+                <rom name="270-v2.bin" size="8388608" crc="180f3c9a" sha1="6d7dc2605ead6e78704efa127e7e0dfe621e2c54" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="270-c1.bin" size="8388608" crc="14ffffac" sha1="2ccebfdd0c7907679ae95bf6eca85b8d322441e2" offset="000000" loadflag="load16_byte" />
+                <rom name="270-c2.bin" size="8388608" crc="401f7299" sha1="94e48cdf1682b1250f53c59f3f71d995e928d17b" offset="000001" loadflag="load16_byte" />
+                <rom name="270-c3.bin" size="8388608" crc="838f0260" sha1="d5c8d3c6e7221d04e0b20882a847752e5ba95635" offset="1000000" loadflag="load16_byte" />
+                <rom name="270-c4.bin" size="8388608" crc="041560a5" sha1="d165e533699f15b1e079c82f97db3542b3a7dd66" offset="1000001" loadflag="load16_byte" />
+                <rom name="270-c5.bin" size="8388608" crc="bd30b52d" sha1="9f8282e684415b4045218cf764ef7d75a70e3240" offset="2000000" loadflag="load16_byte" />
+                <rom name="270-c6.bin" size="8388608" crc="86a69c70" sha1="526732cdb408cf680af9da39057bce6a4dfb5e13" offset="2000001" loadflag="load16_byte" />
+                <rom name="270-c7.bin" size="8388608" crc="d28fbc3c" sha1="a82a6ba6760fad14d9309f9147cb7d80bd6f70fc" offset="3000000" loadflag="load16_byte" />
+                <rom name="270-c8.bin" size="8388608" crc="02c530a6" sha1="7a3fafa6075506c6ef78cc4ec2cb72118ec83cb9" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>
