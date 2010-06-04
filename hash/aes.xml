@@ -106,8 +106,8 @@
 				<rom name="003-c4.bin" size="524288" crc="29725969" sha1="f1407da84919c2b3fe0e8f1fca65934b147c86c7" offset="100001" loadflag="load16_byte" />
 				<rom name="003-c5.bin" size="524288" crc="9a7146da" sha1="2fc83d13e3e9565919aab01bf2a1b028f433b547" offset="200000" loadflag="load16_byte" />
 				<rom name="003-c6.bin" size="524288" crc="1e63411a" sha1="ee397e2f679042e87b37d95837af62bb95a72af9" offset="200001" loadflag="load16_byte" />
-				<rom name="003-c5.bin" size="524288" crc="2886710c" sha1="1533dd935f0a8f92a0a3c47d1d2bc6d035454244" offset="300000" loadflag="load16_byte" />
-				<rom name="003-c6.bin" size="524288" crc="422af22d" sha1="f67c844c34545de6ea187f5bfdf440dec8518532" offset="300001" loadflag="load16_byte" />
+				<rom name="003-c7.bin" size="524288" crc="2886710c" sha1="1533dd935f0a8f92a0a3c47d1d2bc6d035454244" offset="300000" loadflag="load16_byte" />
+				<rom name="003-c8.bin" size="524288" crc="422af22d" sha1="f67c844c34545de6ea187f5bfdf440dec8518532" offset="300001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
