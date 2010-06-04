@@ -745,6 +745,40 @@
 		</part>
 	</software>
 
+<!-- ID 064 -->
+	<software name="wh2j">
+		<description>World Heroes 2 Jet</description>
+		<year>1994</year>
+		<publisher>ADK / SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="2097152">
+                <rom name="064-p1.bin" size="1048576" crc="385a2e86" sha1="cfde4a1aeae038a3d6ca9946065624f097682d3d" offset="100000" />
+                <rom size="1048576" offset="000000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="064-s1.bin" size="131072" crc="2a03998a" sha1="5e33f469982f12d4622a06d323a345f192bf88e6" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="064-m1.bin" size="131072" crc="d2eec9d3" sha1="09478787045f1448d19d064dd3d540d1741fd619" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="7340032">
+                <rom name="064-v1.bin" size="2097152" crc="aa277109" sha1="35c22b15bb0a4d0ab118cb22a2d450d03995a17c" offset="000000" />
+                <rom name="064-v2.bin" size="2097152" crc="b6527edd" sha1="2bcf5bfa6e117cf4a3728a5e5f5771313c93f22a" offset="200000" />
+			</dataarea>
+			<dataarea name="sprites" size="16777216">
+                <rom name="064-c1.bin" size="2097152" crc="2ec87cea" sha1="e713ec7839a7665edee6ee3f82a6e530b3b4bd7c" offset="000000" loadflag="load16_byte" />
+                <rom name="064-c2.bin" size="2097152" crc="526b81ab" sha1="b5f0a2f04489539ed6b9d0810b12787356c64b23" offset="000001" loadflag="load16_byte" />
+                <rom name="064-c3.bin" size="2097152" crc="436d1b31" sha1="059776d77b91377ed0bcfc278802d659c917fc0f" offset="400000" loadflag="load16_byte" />
+                <rom name="064-c4.bin" size="2097152" crc="f9c8dd26" sha1="25a9eea1d49b21b4a988beb32c25bf2f7796f227" offset="400001" loadflag="load16_byte" />
+                <rom name="064-c5.bin" size="2097152" crc="8e34a9f4" sha1="67b839b426ef3fad0a85d951fdd44c0a45c55226" offset="800000" loadflag="load16_byte" />
+                <rom name="064-c6.bin" size="2097152" crc="a43e4766" sha1="54f282f2b1ff2934cca7acbb4386a2b99a29df3a" offset="800001" loadflag="load16_byte" />
+                <rom name="064-c7.bin" size="2097152" crc="59d97215" sha1="85a960dc7f364df13ee0c2f99a4c53aefb081486" offset="c00000" loadflag="load16_byte" />
+                <rom name="064-c8.bin" size="2097152" crc="fc092367" sha1="69ff4ae909dd857de3ca8645d63f8b4bde117448" offset="c00001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 069 -->
 	<software name="fatfury3">
 		<description>Fatal Fury 3 - Road to the Final Victory / Garou Densetsu 3 - haruka-naru tatakai</description>
