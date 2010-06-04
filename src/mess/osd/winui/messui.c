@@ -462,7 +462,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 					{
 						for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
 						{							
-							SoftwareList_AddFile(hwndSoftwareList, core_strdup(swinfo->shortname), core_strdup(swlist->list_name[i]), core_strdup(swinfo->longname), core_strdup(swinfo->publisher), core_strdup(swinfo->year));
+							SoftwareList_AddFile(hwndSoftwareList, swinfo->shortname, swlist->list_name[i], swinfo->longname, swinfo->publisher, swinfo->year);
 						}
 
 						software_list_close(list);
