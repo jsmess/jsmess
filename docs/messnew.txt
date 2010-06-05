@@ -1,4 +1,4 @@
-﻿0.138.1
+0.138.1
 
 New System Drivers Supported:
 -----------------------------
@@ -8,14 +8,16 @@ New System Drivers Supported:
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
+- Canon X07 [Sandro Ronco]
 - Othello Multivision FG-1000/FG-2000 [Enri, Curt Coder]
-- X07 [Sandro Ronco]
+- Philips VG5000 [Daniel Coulom, Sandro Ronco]
 
 
 
 Skeleton drivers:
 -----------------
 (none)
+
 
 
 System Driver Changes:
@@ -29,6 +31,8 @@ System Driver Changes:
 
 - [GBA] Improved flash saving in games such as Sword of Mana [R. Belmont]
 
+- [VG5K] Added emulation for the EF9345 video chip, based on 
+  Daniel Coulom's implementation in DCVG5K [Sandro Ronco]
 
 
 Imgtool Changes:

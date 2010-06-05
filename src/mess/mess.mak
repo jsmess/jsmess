@@ -301,6 +301,7 @@ DRVLIBS = \
 	$(MESSOBJ)/exidy.a \
 	$(MESSOBJ)/fairch.a \
 	$(MESSOBJ)/fujitsu.a \
+	$(MESSOBJ)/funtech.a \
 	$(MESSOBJ)/galaxy.a \
 	$(MESSOBJ)/gamepark.a \
 	$(MESSOBJ)/gce.a \
@@ -482,7 +483,7 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/rp5c01a.o	\
 	$(MESS_MACHINE)/rp5c15.o	\
 	$(MESS_MACHINE)/rs232.o		\
-    $(MESS_MACHINE)/scsibus.o   \
+	$(MESS_MACHINE)/scsibus.o   \
 	$(MESS_MACHINE)/serial.o	\
 	$(MESS_MACHINE)/smartmed.o	\
 	$(MESS_MACHINE)/smc92x4.o	\
@@ -924,6 +925,9 @@ $(MESSOBJ)/fujitsu.a:			\
 	$(MESS_VIDEO)/fm7.o			\
 	$(MESS_FORMATS)/fm7_cas.o	\
 
+$(MESSOBJ)/funtech.a:			\
+	$(MESS_DRIVERS)/supracan.o	\
+
 $(MESSOBJ)/galaxy.a:			\
 	$(MESS_VIDEO)/galaxy.o		\
 	$(MESS_DRIVERS)/galaxy.o	\
@@ -958,6 +962,7 @@ $(MESSOBJ)/hegener.a:			\
 	$(MESS_DRIVERS)/mephisto.o	\
 
 $(MESSOBJ)/homebrew.a:			\
+	$(MESS_DRIVERS)/4004clk.o	\
 	$(MESS_DRIVERS)/craft.o		\
 
 $(MESSOBJ)/homelab.a:			\
@@ -1242,6 +1247,7 @@ $(MESSOBJ)/philips.a:			\
 	$(MESS_DRIVERS)/p2000t.o	\
 	$(MESS_MACHINE)/p2000t.o	\
 	$(MESS_DRIVERS)/vg5k.o		\
+	$(MESS_VIDEO)/ef9345.o		\
 
 $(MESSOBJ)/poly88.a:			\
 	$(MESS_DRIVERS)/poly88.o	\
@@ -1601,66 +1607,64 @@ $(MESSOBJ)/zvt.a:				\
 	$(MESS_VIDEO)/pp01.o		\
 
 $(MESSOBJ)/skeleton.a:			\
-	$(MESS_DRIVERS)/4004clk.o	\
+	$(MESS_DRIVERS)/alesis.o 	\
 	$(MESS_DRIVERS)/amico2k.o	\
+	$(MESS_DRIVERS)/beehive.o	\
 	$(MESS_DRIVERS)/bob85.o		\
 	$(MESS_DRIVERS)/busicom.o	\
 	$(MESS_VIDEO)/busicom.o		\
-	$(MESS_DRIVERS)/d6809.o		\
-	$(MESS_DRIVERS)/elwro800.o	\
-	$(MESS_DRIVERS)/fk1.o		\
-	$(MESS_DRIVERS)/sys2900.o	\
-	$(MESS_DRIVERS)/xor100.o	\
-	$(MESS_DRIVERS)/iq151.o		\
-	$(MESS_DRIVERS)/pyl601.o	\
-	$(MESS_DRIVERS)/nanos.o		\
-	$(MESS_DRIVERS)/beehive.o	\
-	$(MESS_DRIVERS)/unior.o		\
-	$(MESS_DRIVERS)/tvc.o		\
-	$(MESS_DRIVERS)/mmd1.o		\
-	$(MESS_DRIVERS)/ptcsol.o	\
-	$(MESS_DRIVERS)/p8k.o		\
-	$(MESS_DRIVERS)/cosmicos.o	\
-	$(MESS_DRIVERS)/next.o		\
-	$(MESS_DRIVERS)/mod8.o		\
-	$(MESS_DRIVERS)/mk14.o		\
-	$(MESS_DRIVERS)/ht68k.o		\
-	$(MESS_DRIVERS)/micronic.o	\
-	$(MESS_DRIVERS)/plan80.o	\
-	$(MESS_DRIVERS)/pro80.o		\
-	$(MESS_DRIVERS)/pimps.o		\
-	$(MESS_DRIVERS)/sage2.o		\
-	$(MESS_DRIVERS)/zexall.o	\
-	$(MESS_DRIVERS)/horizon.o	\
-	$(MESS_DRIVERS)/tricep.o	\
-	$(MESS_DRIVERS)/indiana.o	\
-	$(MESS_DRIVERS)/vector4.o	\
-	$(MESS_DRIVERS)/unistar.o	\
-	$(MESS_DRIVERS)/dual68.o	\
-	$(MESS_DRIVERS)/swtpc.o		\
-	$(MESS_DRIVERS)/microdec.o	\
-	$(MESS_DRIVERS)/qtsbc.o		\
-	$(MESS_DRIVERS)/msbc1.o		\
-	$(MESS_DRIVERS)/sbc6510.o	\
-	$(MESS_DRIVERS)/supracan.o	\
-	$(MESS_DRIVERS)/vii.o		\
-	$(MESS_DRIVERS)/codata.o	\
-	$(MESS_DRIVERS)/eti660.o	\
-	$(MESS_DRIVERS)/rvoice.o	\
-	$(MESS_DRIVERS)/fidelz80.o	\
-	$(MESS_DRIVERS)/pv9234.o 	\
-	$(MESS_DRIVERS)/dm7000.o 	\
-	$(MESS_DRIVERS)/alesis.o 	\
-	$(MESS_DRIVERS)/vidbrain.o 	\
-	$(MESS_DRIVERS)/cd2650.o 	\
-	$(MESS_DRIVERS)/pipbug.o 	\
-	$(MESS_DRIVERS)/instruct.o 	\
-	$(MESS_DRIVERS)/dolphin.o 	\
 	$(MESS_DRIVERS)/chaos.o 	\
-	$(MESS_DRIVERS)/z80dev.o 	\
+	$(MESS_DRIVERS)/cd2650.o 	\
+	$(MESS_DRIVERS)/codata.o	\
+	$(MESS_DRIVERS)/cosmicos.o	\
+	$(MESS_DRIVERS)/d6809.o		\
+	$(MESS_DRIVERS)/dm7000.o 	\
+	$(MESS_DRIVERS)/dolphin.o 	\
+	$(MESS_DRIVERS)/dual68.o	\
+	$(MESS_DRIVERS)/e01.o 		\
+	$(MESS_DRIVERS)/elwro800.o	\
+	$(MESS_DRIVERS)/eti660.o	\
+	$(MESS_DRIVERS)/fk1.o		\
+	$(MESS_DRIVERS)/fidelz80.o	\
+	$(MESS_DRIVERS)/horizon.o	\
+	$(MESS_DRIVERS)/ht68k.o		\
+	$(MESS_DRIVERS)/iq151.o		\
+	$(MESS_DRIVERS)/indiana.o	\
+	$(MESS_DRIVERS)/instruct.o 	\
+	$(MESS_DRIVERS)/microdec.o	\
+	$(MESS_DRIVERS)/micronic.o	\
+	$(MESS_DRIVERS)/mk14.o		\
+	$(MESS_DRIVERS)/mmd1.o		\
+	$(MESS_DRIVERS)/mod8.o		\
+	$(MESS_DRIVERS)/msbc1.o		\
+	$(MESS_DRIVERS)/nanos.o		\
+	$(MESS_DRIVERS)/next.o		\
+	$(MESS_DRIVERS)/p8k.o		\
 	$(MESS_DRIVERS)/pegasus.o 	\
 	$(MESS_VIDEO)/pegasus.o 	\
-	$(MESS_DRIVERS)/e01.o 		\
+	$(MESS_DRIVERS)/pimps.o		\
+	$(MESS_DRIVERS)/pipbug.o 	\
+	$(MESS_DRIVERS)/plan80.o	\
+	$(MESS_DRIVERS)/pro80.o		\
+	$(MESS_DRIVERS)/ptcsol.o	\
+	$(MESS_DRIVERS)/pv9234.o 	\
+	$(MESS_DRIVERS)/pyl601.o	\
+	$(MESS_DRIVERS)/qtsbc.o		\
+	$(MESS_DRIVERS)/rvoice.o	\
+	$(MESS_DRIVERS)/sage2.o		\
+	$(MESS_DRIVERS)/sbc6510.o	\
+	$(MESS_DRIVERS)/swtpc.o		\
+	$(MESS_DRIVERS)/sys2900.o	\
+	$(MESS_DRIVERS)/tricep.o	\
+	$(MESS_DRIVERS)/tvc.o		\
+	$(MESS_DRIVERS)/unior.o		\
+	$(MESS_DRIVERS)/unistar.o	\
+	$(MESS_DRIVERS)/vector4.o	\
+	$(MESS_DRIVERS)/vidbrain.o 	\
+	$(MESS_DRIVERS)/vii.o		\
+	$(MESS_DRIVERS)/xor100.o	\
+	$(MESS_DRIVERS)/z80dev.o 	\
+	$(MESS_DRIVERS)/zexall.o	\
 	
 
 
