@@ -533,7 +533,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $8000): %02x\n", data & 0x07));
-						state->prg_bank[0] = state->prg_chunks + data & 0x07;
+						state->prg_bank[0] = state->prg_chunks + (data & 0x07);
 						memory_set_bank(space->machine, "bank1", state->prg_bank[0]);
 					}
 					break;
@@ -573,7 +573,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $a000): %02x\n", data & 0x07));
-						state->prg_bank[1] = state->prg_chunks + data & 0x07;
+						state->prg_bank[1] = state->prg_chunks + (data & 0x07);
 						memory_set_bank(space->machine, "bank2", state->prg_bank[1]);
 					}
 					break;
@@ -596,7 +596,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $c000): %02x\n", data & 0x07));
-						state->prg_bank[2] = state->prg_chunks + data & 0x07;
+						state->prg_bank[2] = state->prg_chunks + (data & 0x07);
 						memory_set_bank(space->machine, "bank3", state->prg_bank[2]);
 					}
 					break;
