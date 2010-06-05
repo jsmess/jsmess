@@ -281,17 +281,28 @@ WRITE8_HANDLER( nes_mid_mapper_w )
 	if (state->mmc_write_mid)
 		(*state->mmc_write_mid)(space, offset, data);
 	else if (state->mid_ram_enable)
-		state->battery_ram[offset] = data;
+	{
+		if (state->battery && !state->trainer)
+			state->battery_ram[offset] = data;
+		else
+			state->wram[state->prg_bank[4] * 0x2000 + offset] = data;
+	}
 	else
 		logerror("Unimplemented MID mapper write, offset: %04x, data: %02x\n", offset + 0x6000, data);
 }
 
+// currently, this is not used (but it might become handy for some pirate mapper)
 READ8_HANDLER( nes_mid_mapper_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 
 	if ((state->mid_ram_enable) || (state->mapper == 5))
-		return state->battery_ram[offset];
+	{
+		if (state->battery && !state->trainer)
+			return state->battery_ram[offset];
+		else
+			return state->wram[state->prg_bank[4] * 0x2000 + offset];
+	}
 	else
 		logerror("Unimplemented LOW mapper read, offset: %04x\n", offset + 0x6000);
 
@@ -452,7 +463,7 @@ static void prg8_67( running_machine *machine, int bank )
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
-	state->prg_bank[4] = bank + 1;	// we have an additional 0x2000 bank at start (pointing to 0x6000), followed by usual banks
+	state->prg_bank[4] = bank;
 	memory_set_bank(machine, "bank5", state->prg_bank[4]);
 }
 
@@ -938,7 +949,10 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			break;
 		case 43:
 			prg32(machine, 0);
-			memset(state->wram, 0x2000, 0xff);
+			if (state->battery)
+				memset(state->battery_ram, 0x2000, 0xff);
+			else if (state->prg_ram)
+				memset(state->wram, 0x2000, 0xff);
 			break;
 		case 44:
 		case 47:
@@ -967,7 +981,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			state->mmc_chr_mask = 0x7f;
 			mapper4_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mapper4_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
-			memory_set_bankptr(machine, "bank5", state->wram);
+//			memory_set_bankptr(machine, "bank5", state->wram);
 			break;
 		case 46:
 			prg32(machine, 0);
@@ -1005,7 +1019,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			state->mmc_chr_mask = 0xff;
 			mapper4_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mapper4_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
-			memory_set_bankptr(machine, "bank5", state->wram);
+//			memory_set_bankptr(machine, "bank5", state->wram);
 			break;
 		case 57:
 			state->mmc_cmd1 = 0x00;
@@ -1544,15 +1558,10 @@ int nes_mapper_reset( running_machine *machine, int mmc_num )
 		fatalerror("Unimplemented Mapper %d", mmc_num);
 //      logerror("Mapper %d is not yet supported, defaulting to no mapper.\n", mmc_num);    // this one would be a better output
 
-
 	ppu2c0x_set_scanline_callback(state->ppu, mapper ? mapper->mmc_scanline : NULL);
 	ppu2c0x_set_hblank_callback(state->ppu, mapper ? mapper->mmc_hblank : NULL);
 
 	state->mmc5_vram_control = 0;
-
-	/* Point the WRAM/battery area to the first RAM bank */
-	if (mmc_num != 20)
-		memory_set_bankptr(machine, "bank5", &state->wram[0x0000]);
 
 	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
 	for (i = 0; i < 4; i++)
@@ -2284,10 +2293,6 @@ int nes_unif_reset( running_machine *machine, const char *board )
 
 	ppu2c0x_set_scanline_callback(state->ppu, unif_board ? unif_board->mmc_scanline : NULL);
 	ppu2c0x_set_hblank_callback(state->ppu, unif_board ? unif_board->mmc_hblank : NULL);
-
-
-	/* Point the WRAM/battery area to the first RAM bank */
-	memory_set_bankptr(machine, "bank5", &state->wram[0x0000]);
 
 	err = unif_initialize(machine, unif_board->board_idx);
 

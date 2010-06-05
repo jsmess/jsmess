@@ -43,7 +43,12 @@ static void init_nes_core( running_machine *machine )
 	state->vrom = memory_region(machine, "gfx1");
 	state->vram = memory_region(machine, "gfx2");
 	state->ciram = memory_region(machine, "gfx3");
-	state->wram = memory_region(machine, "user1");
+	// FIXME: this should only be allocated if there is actual wram in the cart!
+	if (state->wram == NULL)
+	{
+		state->wram_size = 0x10000;
+		state->wram = auto_alloc_array(machine, UINT8, state->wram_size);
+	}
 
 	/* Brutal hack put in as a consequence of the new memory system; we really need to fix the NES code */
 	memory_install_readwrite_bank(space, 0x0000, 0x07ff, 0, 0x1800, "bank10");
@@ -52,8 +57,6 @@ static void init_nes_core( running_machine *machine )
 	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nes_nt_r, nes_nt_w);
 
 	memory_set_bankptr(machine, "bank10", state->rom);
-
-	state->battery_ram = state->wram;
 
 	/* Set up the memory handlers for the mapper */
 	switch (state->mapper)
@@ -101,10 +104,25 @@ static void init_nes_core( running_machine *machine )
 				state->prg_bank[i] = i;
 			}
 
-			memory_configure_bank(machine, "bank5", 0, 1, memory_region(machine, "maincpu") + 0x6000, 0x2000);
-			memory_configure_bank(machine, "bank5", 1, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
-			memory_set_bank(machine, "bank5", 0);
-			state->prg_bank[4] = 0;
+			state->prgram_bank_start = prg_banks;
+			/* bank 5 configuration is more delicate, since it can have PRG RAM, PRG ROM or SRAM mapped to it */
+			/* we first map PRG ROM banks, then the battery bank (if a battery is present), and finally PRG RAM (state->wram) */
+			memory_configure_bank(machine, "bank5", 0, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+			/* add battery ram, but only if there's no trainer since they share overlapping memory. */
+			if (state->battery && !state->trainer)
+			{
+				memory_configure_bank(machine, "bank5", prg_banks, 1, state->battery_ram, state->battery_size);
+				state->prgram_bank_start += 1;
+			}
+			/* add prg ram. */
+			if (state->prg_ram)
+				memory_configure_bank(machine, "bank5", state->prgram_bank_start, 8, state->wram, 0x2000);
+
+			/* if we have any additional PRG RAM, point bank5 to its first bank */
+			if (state->battery || state->prg_ram)
+				state->prg_bank[4] = prg_banks;
+
+			memory_set_bank(machine, "bank5", state->prg_bank[4]);
 
 			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
 //			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_r);
@@ -164,17 +182,6 @@ static void init_nes_core( running_machine *machine )
 			ppu_latch = NULL;
 		}
 	}
-
-	/* Load a battery file, but only if there's no trainer since they share */
-	/* overlapping memory. */
-	if (state->trainer)
-		return;
-
-	/* We need this because battery ram is loaded before the */
-	/* memory subsystem is set up. When this routine is called */
-	/* everything is ready, so we can just copy over the data */
-	/* we loaded before. */
-	memcpy(state->battery_ram, state->battery_data, state->battery_size);
 }
 
 // to be probably removed (it does nothing since a long time)
@@ -269,6 +276,10 @@ static void nes_state_register( running_machine *machine )
 	state_save_register_global(machine, state->fds_write_reg);
 	state_save_register_global(machine, state->fds_last_side);
 	state_save_register_global(machine, state->fds_count);
+
+	state_save_register_global_pointer(machine, state->wram, state->wram_size);
+	if (state->battery)
+		state_save_register_global_pointer(machine, state->battery_ram, state->battery_size);
 
 	state_save_register_postload(machine, nes_banks_restore, NULL);
 }
@@ -532,6 +543,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			state->format = 1;	// we use this to select between mapper_reset / unif_reset
 			state->ines20 = 0;
 			state->battery_size = NES_BATTERY_SIZE; // with iNES we can only support 8K WRAM battery (iNES 2.0 might fix this)
+			state->prg_ram = 1;	// always map state->wram in bank5 (eventually, this should be enabled only for some mappers) 
 
 			// check if the image is recognized by nes.hsi
 			mapinfo = image_extrainfo(image);
@@ -636,8 +648,11 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			state->rom = memory_region(image->machine, "maincpu");
 			state->vrom = memory_region(image->machine, "gfx1");
 			state->vram = memory_region(image->machine, "gfx2");
-			state->wram = memory_region(image->machine, "user1");
-
+			// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->prg_ram = 1)!
+			// or if there is a trainer, I think
+			state->wram_size = 0x10000;
+			state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
+			
 			/* Position past the header */
 			image_fseek(image, 16, SEEK_SET);
 
@@ -758,8 +773,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 						state->mapper = 0;	// this allows us to set up memory handlers without duplicating code (for the moment)
 						state->board = unif_board->board;
-						state->battery = unif_board->wram;	// we should implement WRAM banks...
+						state->battery = unif_board->nvwram;	// we should implement WRAM banks based on the size of this...
 						state->battery_size = NES_BATTERY_SIZE; // FIXME: we should allow for smaller battery!
+						state->prg_ram = unif_board->wram;	// we should implement WRAM banks based on the size of this...
 						// state->hard_mirroring = unif_board->nt;
 						// state->four_screen_vram = ;
 
@@ -776,7 +792,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						state->rom = memory_region(image->machine, "maincpu");
 						state->vrom = memory_region(image->machine, "gfx1");
 						state->vram = memory_region(image->machine, "gfx2");
-						state->wram = memory_region(image->machine, "user1");
+						// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->prg_ram = 1)!
+						state->wram_size = 0x10000;
+						state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
 
 						/* the exact number of chunks will be determined while reading the file */
 						state->prg_chunks = 0;
@@ -1013,7 +1031,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->rom = memory_region(image->machine, "maincpu");
 		state->vrom = memory_region(image->machine, "gfx1");
 		state->vram = memory_region(image->machine, "gfx2");
-		state->wram = memory_region(image->machine, "user1");
 
 		memcpy(state->rom + 0x10000, image_get_software_region(image, "prg"), prg_size);
 
@@ -1023,12 +1040,17 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->prg_chunks = prg_size / 0x4000;
 		state->chr_chunks = chr_size / 0x2000;
 
-		state->format = 2;	// temporarily treat this as a unif file
-		state->board = image_get_feature(image);
+		state->format = 2;		// temporarily treat this as a unif file
 		state->mapper = 0;		// this allows us to set up memory handlers without duplicating code (for the moment)
+		state->board = image_get_feature(image);
 
 		state->battery = (image_get_software_region(image, "bwram") != NULL) ? 1 : 0;
 		state->battery_size = image_get_software_region_length(image, "bwram");
+
+		state->prg_ram = (image_get_software_region(image, "wram") != NULL) ? 1 : 0;
+		state->wram_size = image_get_software_region_length(image, "wram");
+		if (state->prg_ram)
+			state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
 
 		// FIXME: we need to handle the remaining variables. on the short term, we might
 		// create a table for the various mappers (based on the 'feature' value in xml),
@@ -1045,8 +1067,11 @@ DEVICE_IMAGE_LOAD( nes_cart )
 	/* Attempt to load a battery file for this ROM. If successful, we */
 	/* must wait until later to move it to the system memory. */
 	if (state->battery)
-		image_battery_load(image, state->battery_data, state->battery_size, 0x00);
-	
+	{
+		state->battery_ram = auto_alloc_array(image->machine, UINT8, state->battery_size);
+		image_battery_load(image, state->battery_ram, state->battery_size, 0x00);
+	}
+
 	return INIT_PASS;
 }
 
@@ -1096,6 +1121,7 @@ DRIVER_INIT( famicom )
 	/* clear some of the cart variables we don't use */
 	state->trainer = 0;
 	state->battery = 0;
+	state->prg_ram = 0;
 	state->prg_chunks = state->chr_chunks = 0;
 
 	/* initialize the system as if using a mapper 20 cart */

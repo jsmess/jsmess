@@ -435,7 +435,6 @@ static READ8_HANDLER( mapper5_l_r )
 static WRITE8_HANDLER( mapper5_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-
 //  static int vrom_next[4];
 	static int vrom_page_a;
 	static int vrom_page_b;
@@ -514,9 +513,8 @@ static WRITE8_HANDLER( mapper5_l_w )
 
 		case 0x1013: /* $5113 */
 			LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
-			memory_set_bankptr(space->machine, "bank5", &state->wram[data * 0x2000]);
-			/* The & 4 is a hack that'll tide us over for now */
-			state->battery_ram = &state->wram[(data & 4) * 0x2000];
+			state->prg_bank[4] = state->prgram_bank_start + (data & 0x07);
+			memory_set_bank(space->machine, "bank5", state->prg_bank[4]);
 			break;
 
 		case 0x1014: /* $5114 */
@@ -4293,9 +4291,16 @@ static WRITE8_HANDLER( mapper69_w )
 				/* TODO: deal properly with bankswitching/write-protecting the mid-mapper area */
 				case 8:
 					if (!(data & 0x40))
+					{
+						state->mid_ram_enable = 0;	// is PRG ROM
 						prg8_67(space->machine, data & 0x3f);
+					}
 					else if (data & 0x80)
-						memory_set_bankptr(space->machine, "bank5", &state->wram[(data & 0x3f) * 0x2000]);
+					{
+						state->mid_ram_enable = 1;	// is PRG RAM
+						state->prg_bank[4] = state->prg_chunks + (data & 0x3f);
+						memory_set_bank(space->machine, "bank5", state->prg_bank[4]);
+					}
 					break;
 
 				case 9:

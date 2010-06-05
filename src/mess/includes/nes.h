@@ -73,6 +73,7 @@ public:
 	chr_bank      chr_map[8];  //quick banking structure, because some of this changes multiple times per scanline!
 	name_table    nt_page[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
+	int prgram_bank_start;
 	int MMC5_floodtile;
 	int MMC5_floodattr;
 	UINT8 mmc5_vram[0x400];
@@ -110,7 +111,6 @@ public:
 
 	/* SRAM-related (we have two elements due to the init order, but it would be better to verify they both are still needed) */
 	UINT8      *battery_ram;
-	UINT8      battery_data[NES_BATTERY_SIZE];
 
 	/***** Mapper-related variables *****/
 
@@ -141,11 +141,13 @@ public:
 	/***** NES-cart related *****/
 
 	/* load-time cart variables which remain constant */
-	UINT16 prg_chunks;	// a recently dumped multigame cart has 256 chunks of both PRG & CHR!
+	UINT16 prg_chunks;		// iNES 2.0 allows for more chunks (a recently dumped multigame cart has 256 chunks of both PRG & CHR!)
 	UINT16 chr_chunks;
 	UINT8 trainer;
-	UINT8 battery;
+	UINT8 battery;			// if there is PRG RAM with battery backup
 	UINT32 battery_size;
+	UINT8 prg_ram;			// if there is PRG RAM with no backup
+	UINT32 wram_size;
 
 	int format;	// 1 = iNES, 2 = UNIF
 

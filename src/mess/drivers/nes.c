@@ -295,58 +295,37 @@ static MACHINE_DRIVER_START( famicom )
 MACHINE_DRIVER_END
 
 
+/* rom regions are just place-holders: they get removed and re-allocated when a cart is loaded */
 ROM_START( nes )
-	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x4000, 0x00 )
-	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
-	ROM_FILL( 0x0000, 0x800, 0x00 )
-	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM + program banks */
+	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
+	ROM_REGION( 0x4000,  "gfx2", ROMREGION_ERASE00 )  /* VRAM */
+	ROM_REGION( 0x800,   "gfx3", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( nespal )
-	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x4000, 0x00 )
-	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
-	ROM_FILL( 0x0000, 0x800, 0x00 )
-	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM + program banks */
+	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
+	ROM_REGION( 0x4000,  "gfx2", ROMREGION_ERASE00 )  /* VRAM */
+	ROM_REGION( 0x800,   "gfx3", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( famicom )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
 	ROM_LOAD_OPTIONAL( "disksys.rom", 0xe000, 0x2000, CRC(5e607dcf) SHA1(57fe1bdee955bb48d357e463ccbf129496930b62) )
 
-	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x4000, 0x00 )
-	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
-	ROM_FILL( 0x0000, 0x800, 0x00 )
-	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
+	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
+	ROM_REGION( 0x4000,  "gfx2", ROMREGION_ERASE00 )  /* VRAM */
+	ROM_REGION( 0x800,   "gfx3", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( famitwin )
 	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
 	ROM_LOAD_OPTIONAL( "disksyst.rom", 0xe000, 0x2000, CRC(4df24a6c) SHA1(e4e41472c454f928e53eb10e0509bf7d1146ecc1) )
 
-	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x4000, 0x00 )
-	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
-	ROM_FILL( 0x0000, 0x800, 0x00 )
-	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
+	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
+	ROM_REGION( 0x4000,  "gfx2", ROMREGION_ERASE00 )  /* VRAM */
+	ROM_REGION( 0x800,   "gfx3", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( m82 )
@@ -354,14 +333,9 @@ ROM_START( m82 )
 	/* Banks to be mapped at 0xe000? More investigations needed... */
 	ROM_LOAD( "m82_v1_0.bin", 0x10000, 0x4000, CRC(7d56840a) SHA1(cbd2d14fa073273ba58367758f40d67fd8a9106d) )
 
-	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x4000, 0x00 )
-	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
-	ROM_FILL( 0x0000, 0x800, 0x00 )
-	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
+	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
+	ROM_REGION( 0x4000,  "gfx2", ROMREGION_ERASE00 )  /* VRAM */
+	ROM_REGION( 0x800,   "gfx3", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 // see http://www.disgruntleddesigner.com/chrisc/drpcjr/index.html
@@ -374,27 +348,16 @@ ROM_START( drpcjr )
 	// Not sure if we should support this: hacked version 1.5a by Chris Covell with bugfixes and GameGenie support
 //  ROM_LOAD("drpcjr_v1_5_gg.bin", 0x10000, 0x8000, CRC(98f2033b) SHA1(93c114da787a19279d1a46667c2f69b49e25d4f1) )
 
-	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x4000, 0x00 )
-	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
-	ROM_FILL( 0x0000, 0x800, 0x00 )
-	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
+	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
+	ROM_REGION( 0x4000,  "gfx2", ROMREGION_ERASE00 )  /* VRAM */
+	ROM_REGION( 0x800,   "gfx3", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 ROM_START( dendy )
-	ROM_REGION( 0x10000, "maincpu", 0 )  /* Main RAM + program banks */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
-	ROM_REGION( 0x2000,  "gfx1", 0 )  /* VROM */
-	ROM_FILL( 0x0000, 0x2000, 0x00 )
-	ROM_REGION( 0x4000,  "gfx2", 0 )  /* VRAM */
-	ROM_FILL( 0x0000, 0x4000, 0x00 )
-	ROM_REGION( 0x800,  "gfx3", 0 )  /* CI RAM */
-	ROM_FILL( 0x0000, 0x800, 0x00 )
-	ROM_REGION( 0x10000, "user1", 0 ) /* WRAM */
-	ROM_FILL( 0x0000, 0x10000, 0x00 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )  /* Main RAM + program banks */
+	ROM_REGION( 0x2000,  "gfx1", ROMREGION_ERASE00 )  /* VROM */
+	ROM_REGION( 0x4000,  "gfx2", ROMREGION_ERASE00 )  /* VRAM */
+	ROM_REGION( 0x800,   "gfx3", ROMREGION_ERASE00 )  /* CI RAM */
 ROM_END
 
 /***************************************************************************
