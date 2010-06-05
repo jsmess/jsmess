@@ -28,6 +28,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/beep.h"
 #include "includes/x07.h"
+#include "devices/printer.h"
 
 static void t6834_cmd (running_machine *machine, UINT8 cmd);
 static void receive_from_t6834 (running_machine *machine);
@@ -94,6 +95,13 @@ public:
 	UINT8 kb_data[20];
 	UINT8 kb_size;
 	emu_timer *kb_clear;
+
+	/* Printer */
+	running_device *printer;
+	UINT8 send_bit;
+	UINT8 char_code;
+	UINT8 printer_buffer[0xff];
+	UINT8 printer_size;
 };
 
 
@@ -583,28 +591,70 @@ static void send_to_t6834 (running_machine *machine)
 	}
 }
 
-
-static void send_to_printer (running_machine *machine)
+/****************************************************
+	this function emulate the color printer X-710
+	only the text functions are emulated
+****************************************************/
+static void send_to_printer(running_machine *machine)
 {
 	t6834_state *state = (t6834_state *)machine->driver_data;
-	static UINT8 send_bit = 0;
-	static UINT8 char_code = 0;
+	UINT16 char_pos = 0;
+	UINT16 text_color = 0;
+	UINT16 text_size = 1;
 
 	if (state->regs_r[4] & 0x20)
-		char_code |= 1;
+		state->char_code |= 1;
 
-	send_bit++;
+	state->send_bit++;
 
-	if (send_bit == 8)
+	if (state->send_bit == 8)
 	{
-		if (char_code)
-			popmessage("Print 0x%02x\n", char_code);
-		send_bit = 0;
-		char_code = 0;
+		if (state->char_code)
+		{
+			//printf("Print char %x (%c)\n", state->char_code,printer_charcode[state->char_code]);
+			state->printer_buffer[state->printer_size++] = state->char_code;
+
+			if (state->printer_buffer[state->printer_size - 2] == 0x4f && state->printer_buffer[state->printer_size - 1] == 0xaf)
+			{
+				if (state->printer_buffer[0] == 0xff && state->printer_buffer[1] == 0xb7)
+				{
+					for (int i = 2; i < state->printer_size - 2; i++)
+					{
+						if (state->printer_buffer[i - 1] == 0x4f && state->printer_buffer[i] == 0x3d)
+							text_color = printer_charcode[state->printer_buffer[i + 1]] - 0x30;
+
+						if (state->printer_buffer[i - 1] == 0x4f && state->printer_buffer[i] == 0x35)
+						{
+							if (state->printer_buffer[i + 2] == 0x4f)
+								text_size = printer_charcode[state->printer_buffer[i + 1]] - 0x2f;
+							else
+								text_size = 0x0a + (printer_charcode[state->printer_buffer[i + 2]] - 0x2f);
+						}
+
+						if (state->printer_buffer[i - 1] == 0x4f && state->printer_buffer[i] == 0x77)
+						{
+							char_pos = i + 1 ;
+							break;
+						}
+					}
+				}
+
+				//send the chars to the printer, color and size are not used
+				for (int i = char_pos ;i < state->printer_size ; i++)
+					printer_output(state->printer, printer_charcode[state->printer_buffer[i]]);
+
+				//clears the print buffer
+				memset(state->printer_buffer, 0, sizeof(state->printer_buffer));
+				state->printer_size = 0;
+			}
+		}
+
+		state->send_bit = 0;
+		state->char_code = 0;
 		state->regs_r[2] |= 0x80;
 	}
 	else
-		char_code <<= 1;
+		state->char_code <<= 1;
 }
 
 
@@ -1134,9 +1184,10 @@ static MACHINE_START( x07 )
 {
 	t6834_state *state = (t6834_state *)machine->driver_data;
 
-	state ->irq_clear = timer_alloc(machine, irq_clear, 0);
-	state ->beep_clear = timer_alloc(machine, beep_stop, 0);
-	state ->kb_clear = timer_alloc(machine, keyboard_clear, 0);
+	state->irq_clear = timer_alloc(machine, irq_clear, 0);
+	state->beep_clear = timer_alloc(machine, beep_stop, 0);
+	state->kb_clear = timer_alloc(machine, keyboard_clear, 0);
+	state->printer = devtag_get_device(machine, "printer");
 
 	/* Save State */
 
@@ -1177,6 +1228,10 @@ static MACHINE_START( x07 )
 	state_save_register_global(machine, state->kb_wait);
 	state_save_register_global_array(machine, state->kb_data);
 	state_save_register_global(machine, state->kb_size);
+	state_save_register_global(machine, state->send_bit);
+	state_save_register_global(machine, state->char_code);
+	state_save_register_global_array(machine, state->printer_buffer);
+	state_save_register_global(machine, state->printer_size);
 }
 
 static MACHINE_RESET( x07 )
@@ -1192,6 +1247,7 @@ static MACHINE_RESET( x07 )
 	memset(state->out_data, 0, sizeof(state->out_data));
 	memset(state->lcd_map, 0, sizeof(state->lcd_map));
 	memset(state->kb_data, 0, sizeof(state->kb_data));
+	memset(state->printer_buffer, 0, sizeof(state->printer_buffer));
 
 	state->enable_k7 = 	0;
 	state->udk = 		0;
@@ -1221,6 +1277,9 @@ static MACHINE_RESET( x07 )
 	state->kb_brk = 	0;
 	state->kb_wait = 	0;
 	state->kb_size = 	0;
+	state->send_bit =	0;
+	state->char_code =	0;
+	state->printer_size = 0;
 
 	state->regs_r[2] = input_port_read(machine, "CARDBATTERY");
 }
@@ -1250,10 +1309,13 @@ static MACHINE_DRIVER_START( x07 )
 	MDRV_GFXDECODE(x07)
 	MDRV_VIDEO_UPDATE(x07)
 
-
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+
+	/* printer */
+	MDRV_PRINTER_ADD("printer")
 
 	MDRV_TIMER_ADD_PERIODIC("keyboard", keyboard_poll, USEC(2500))
 
