@@ -399,7 +399,7 @@
 
 	<!-- Bandai Arcadia exclusive, Also known as "Super Dimension Fortress Macross" -->
 	<software name="macross">
-		<description>Macross</description>
+		<description>Chou Jikuu Yousai Macross</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="arcadia_cart">
@@ -411,7 +411,7 @@
 
 	<!-- Bandai Arcadia exclusive -->
 	<software name="msgundam">
-		<description>Mobile Soldier Gundam</description>
+		<description>Kidou Senshi Gundam</description>
 		<year>1983</year>
 		<publisher>Bandai</publisher>
 		<part name="cart" interface="arcadia_cart">

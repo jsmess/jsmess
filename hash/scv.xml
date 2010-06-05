@@ -58,7 +58,7 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 -->
 <softwarelist name="scv" description="Epoch Super Cassette Vision cartridges">
 	<software name="astrwrs">
-		<description>Astro Wars - Invaders from Space</description>
+		<description>Astro Wars - Invader from Space</description>
 		<year>1984</year>
 		<publisher>Epoch</publisher>
 		<part name="cart" interface="scv_cart">
