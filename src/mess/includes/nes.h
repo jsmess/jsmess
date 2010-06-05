@@ -74,10 +74,12 @@ public:
 	name_table    nt_page[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
 	int prgram_bank5_start;
+
 	int MMC5_floodtile;
 	int MMC5_floodattr;
 	UINT8 mmc5_vram[0x400];
 	int mmc5_vram_control;
+	UINT8 mmc5_high_chr;
 	UINT8 *extended_ntram;
 
 	/* video-related */
@@ -135,6 +137,7 @@ public:
 	UINT8 mmc_prg_bank[4];				// Many mappers writes only some bits of the selected bank (for both PRG and CHR),
 	UINT8 mmc_vrom_bank[16];			// hence these are handy to latch bank values.
 
+	UINT16 MMC5_vrom_bank[12];			// MMC5 has 10bit wide VROM regs!
 	UINT8 mmc_extra_bank[16];			// some MMC3 clone have 2 series of PRG/CHR banks...
 										// we collect them all here: first 4 elements PRG banks, then 6/8 CHR banks
 

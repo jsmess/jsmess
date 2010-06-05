@@ -424,13 +424,6 @@ static READ8_HANDLER( mapper5_l_r )
 	}
 }
 
-//static void mapper5_sync_vrom (int mode)
-//{
-//  int i;
-//
-//  for (i = 0; i < 8; i ++)
-//      nes_vram[i] = state->mmc_vrom_bank[0 + (mode * 8)] * 64;
-//}
 
 static WRITE8_HANDLER( mapper5_l_w )
 {
@@ -483,7 +476,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 			break;
 
 		case 0x1004: /* $5104 - Extra VRAM (EXRAM) control */
-			state->mmc5_vram_control = data;
+			state->mmc5_vram_control = data & 0x03;
 			LOG_MMC(("MMC5 exram control: %02x\n", data));
 			break;
 
@@ -630,10 +623,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[0] = data;
+					state->MMC5_vrom_bank[0] = data | (state->mmc5_high_chr << 8);
 //                  mapper5_sync_vrom(0);
-					chr1_0(space->machine, state->mmc_vrom_bank[0], CHRROM);
-//                  state->nes_vram_sprite[0] = state->mmc_vrom_bank[0] * 64;
+					chr1_0(space->machine, state->MMC5_vrom_bank[0], CHRROM);
+//                  state->nes_vram_sprite[0] = state->MMC5_vrom_bank[0] * 64;
 //                  vrom_next[0] = 4;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -646,14 +639,14 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x02:
 					/* 2k switch */
-					chr2_0 (space->machine, data, CHRROM);
+					chr2_0(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[1] = data;
+					state->MMC5_vrom_bank[1] = data | (state->mmc5_high_chr << 8);
 //                  mapper5_sync_vrom(0);
-					chr1_1(space->machine, state->mmc_vrom_bank[1], CHRROM);
-//                  state->nes_vram_sprite[1] = state->mmc_vrom_bank[0] * 64;
+					chr1_1(space->machine, state->MMC5_vrom_bank[1], CHRROM);
+//                  state->nes_vram_sprite[1] = state->MMC5_vrom_bank[0] * 64;
 //                  vrom_next[1] = 5;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -666,10 +659,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[2] = data;
+					state->MMC5_vrom_bank[2] = data | (state->mmc5_high_chr << 8);
 //                  mapper5_sync_vrom(0);
-					chr1_2(space->machine, state->mmc_vrom_bank[2], CHRROM);
-//                  state->nes_vram_sprite[2] = state->mmc_vrom_bank[0] * 64;
+					chr1_2(space->machine, state->MMC5_vrom_bank[2], CHRROM);
+//                  state->nes_vram_sprite[2] = state->MMC5_vrom_bank[0] * 64;
 //                  vrom_next[2] = 6;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -681,18 +674,18 @@ static WRITE8_HANDLER( mapper5_l_w )
 			switch (MMC5_vrom_bank_mode)
 			{
 				case 0x01:
-					chr4_0 (space->machine, data, CHRROM);
+					chr4_0(space->machine, data, CHRROM);
 					break;
 				case 0x02:
 					/* 2k switch */
-					chr2_2 (space->machine, data, CHRROM);
+					chr2_2(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[3] = data;
+					state->MMC5_vrom_bank[3] = data | (state->mmc5_high_chr << 8);
 //                  mapper5_sync_vrom(0);
-					chr1_3(space->machine, state->mmc_vrom_bank[3], CHRROM);
-//                  state->nes_vram_sprite[3] = state->mmc_vrom_bank[0] * 64;
+					chr1_3(space->machine, state->MMC5_vrom_bank[3], CHRROM);
+//                  state->nes_vram_sprite[3] = state->MMC5_vrom_bank[0] * 64;
 //                  vrom_next[3] = 7;
 //                  vrom_page_a = 1;
 //                  vrom_page_b = 0;
@@ -705,10 +698,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[4] = data;
+					state->MMC5_vrom_bank[4] = data | (state->mmc5_high_chr << 8);
 //                  mapper5_sync_vrom(0);
-					chr1_4(space->machine, state->mmc_vrom_bank[4], CHRROM);
-//                  state->nes_vram_sprite[4] = state->mmc_vrom_bank[0] * 64;
+					chr1_4(space->machine, state->MMC5_vrom_bank[4], CHRROM);
+//                  state->nes_vram_sprite[4] = state->MMC5_vrom_bank[0] * 64;
 //                  vrom_next[0] = 0;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -721,14 +714,14 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x02:
 					/* 2k switch */
-					chr2_4 (space->machine, data, CHRROM);
+					chr2_4(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[5] = data;
+					state->MMC5_vrom_bank[5] = data | (state->mmc5_high_chr << 8);
 //                  mapper5_sync_vrom(0);
-					chr1_5(space->machine, state->mmc_vrom_bank[5], CHRROM);
-//                  state->nes_vram_sprite[5] = state->mmc_vrom_bank[0] * 64;
+					chr1_5(space->machine, state->MMC5_vrom_bank[5], CHRROM);
+//                  state->nes_vram_sprite[5] = state->MMC5_vrom_bank[0] * 64;
 //                  vrom_next[1] = 1;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -741,10 +734,10 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[6] = data;
+					state->MMC5_vrom_bank[6] = data | (state->mmc5_high_chr << 8);
 //                  mapper5_sync_vrom(0);
-					chr1_6(space->machine, state->mmc_vrom_bank[6], CHRROM);
-//                  state->nes_vram_sprite[6] = state->mmc_vrom_bank[0] * 64;
+					chr1_6(space->machine, state->MMC5_vrom_bank[6], CHRROM);
+//                  state->nes_vram_sprite[6] = state->MMC5_vrom_bank[0] * 64;
 //                  vrom_next[2] = 2;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -761,18 +754,18 @@ static WRITE8_HANDLER( mapper5_l_w )
 					break;
 				case 0x01:
 					/* 4k switch */
-					chr4_4 (space->machine, data, CHRROM);
+					chr4_4(space->machine, data, CHRROM);
 					break;
 				case 0x02:
 					/* 2k switch */
-					chr2_6 (space->machine, data, CHRROM);
+					chr2_6(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[7] = data;
+					state->MMC5_vrom_bank[7] = data | (state->mmc5_high_chr << 8);
 //                  mapper5_sync_vrom(0);
-					chr1_7(space->machine, state->mmc_vrom_bank[7], CHRROM);
-//                  state->nes_vram_sprite[7] = state->mmc_vrom_bank[0] * 64;
+					chr1_7(space->machine, state->MMC5_vrom_bank[7], CHRROM);
+//                  state->nes_vram_sprite[7] = state->MMC5_vrom_bank[0] * 64;
 //                  vrom_next[3] = 3;
 //                  vrom_page_a = 0;
 //                  vrom_page_b = 0;
@@ -785,11 +778,11 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[8] = state->mmc_vrom_bank[12] = data;
+					state->MMC5_vrom_bank[8] = data | (state->mmc5_high_chr << 8);
 //                  nes_vram[vrom_next[0]] = data * 64;
 //                  nes_vram[0 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[0] = data * 64;
-					chr1_4(space->machine, data, CHRROM);
+					chr1_4(space->machine, state->MMC5_vrom_bank[8], CHRROM);
 //                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
@@ -805,16 +798,16 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x02:
 					/* 2k switch */
-					chr2_0 (space->machine, data, CHRROM);
-					chr2_4 (space->machine, data, CHRROM);
+					chr2_0(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
+					chr2_4(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[9] = state->mmc_vrom_bank[13] = data;
+					state->MMC5_vrom_bank[9] = data | (state->mmc5_high_chr << 8);
 //                  nes_vram[vrom_next[1]] = data * 64;
 //                  nes_vram[1 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[1] = data * 64;
-					chr1_5(space->machine, data, CHRROM);
+					chr1_5(space->machine, state->MMC5_vrom_bank[9], CHRROM);
 //                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
@@ -830,11 +823,11 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[10] = state->mmc_vrom_bank[14] = data;
+					state->MMC5_vrom_bank[10] = data | (state->mmc5_high_chr << 8);
 //                  nes_vram[vrom_next[2]] = data * 64;
 //                  nes_vram[2 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[2] = data * 64;
-					chr1_6(space->machine, data, CHRROM);
+					chr1_6(space->machine, state->MMC5_vrom_bank[10], CHRROM);
 //                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
@@ -851,26 +844,26 @@ static WRITE8_HANDLER( mapper5_l_w )
 				case 0x00:
 					/* 8k switch */
 					/* switches in first half of an 8K bank!) */
-					chr4_0 (space->machine, data << 1, CHRROM);
-					chr4_4 (space->machine, data << 1, CHRROM);
+					chr4_0(space->machine, data << 1, CHRROM);
+					chr4_4(space->machine, data << 1, CHRROM);
 					break;
 				case 0x01:
 					/* 4k switch */
-					chr4_0 (space->machine, data, CHRROM);
-					chr4_4 (space->machine, data, CHRROM);
+					chr4_0(space->machine, data, CHRROM);
+					chr4_4(space->machine, data, CHRROM);
 					break;
 				case 0x02:
 					/* 2k switch */
-					chr2_2 (space->machine, data, CHRROM);
-					chr2_6 (space->machine, data, CHRROM);
+					chr2_2(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
+					chr2_6(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
 					break;
 				case 0x03:
 					/* 1k switch */
-					state->mmc_vrom_bank[11] = state->mmc_vrom_bank[15] = data;
+					state->MMC5_vrom_bank[11] = data | (state->mmc5_high_chr << 8);
 //                  nes_vram[vrom_next[3]] = data * 64;
 //                  nes_vram[3 + (vrom_page_a*4)] = data * 64;
 //                  nes_vram[3] = data * 64;
-					chr1_7(space->machine, data, CHRROM);
+					chr1_7(space->machine, state->MMC5_vrom_bank[11], CHRROM);
 //                  mapper5_sync_vrom(1);
 					if (!vrom_page_b)
 					{
@@ -878,6 +871,15 @@ static WRITE8_HANDLER( mapper5_l_w )
 						vrom_page_b = 1;
 					}
 					break;
+			}
+			break;
+
+		case 0x1030: /* $5130 */
+			state->mmc5_high_chr = data & 0x03;
+			if (state->mmc5_vram_control == 1)
+			{
+				// in this case state->mmc5_high_chr selects which 256KB of CHR ROM 
+				// is to be used for all background tiles on the screen.
 			}
 			break;
 

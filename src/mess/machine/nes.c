@@ -1056,6 +1056,13 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if (state->prg_ram)
 			state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
 
+#if 1
+		printf("PCB Feature: %s\n", state->board);
+		printf("PRG chunks: %d\n", state->prg_chunks);
+		printf("CHR chunks: %d\n", state->prg_chunks);
+		printf("NVWRAM: Present %s, size: %d\n", state->battery ? "Yes" : "No", state->battery_size);
+		printf("WRAM:   Present %s, size: %d\n", state->prg_ram ? "Yes" : "No", state->wram_size);
+#endif
 		// FIXME: we need to handle the remaining variables. on the short term, we might
 		// create a table for the various mappers (based on the 'feature' value in xml),
 		// but on the long term we need to rework the whole emulation to first use the

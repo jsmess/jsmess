@@ -797,6 +797,9 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			MMC5_rom_bank_mode = 3;
 			MMC5_vrom_bank_mode = 0;
 			MMC5_vram_protect = 0;
+			state->mmc5_high_chr = 0;
+			state->mmc5_vram_control = 0;
+			memset(state->MMC5_vrom_bank, 0, ARRAY_LENGTH(state->MMC5_vrom_bank));
 			state->mid_ram_enable = 0;
 			prg16_89ab(machine, state->prg_chunks - 2);
 			prg16_cdef(machine, state->prg_chunks - 1);
