@@ -454,7 +454,7 @@
 
 <!-- ID 034 -->
 	<software name="fbfrenzy">
-		<description>Footbal Frenzy</description>
+		<description>Football Frenzy</description>
 		<year>1992</year>
 		<publisher>SNK</publisher>
 		<part name="cart" interface="aes_cart">
@@ -808,6 +808,43 @@
                 <rom name="069-c4.bin" size="4194304" crc="a25fc3d0" sha1="83cb349e2f1032652060b233e741fb893be5af16" offset="800001" loadflag="load16_byte" />
                 <rom name="069-c5.bin" size="2097152" crc="b3ec6fa6" sha1="7e4c8ee9dd8d9a25ff183d9d8b05f38769348bc7" offset="1000000" loadflag="load16_byte" />
                 <rom name="069-c6.bin" size="2097152" crc="69210441" sha1="6d496c549dba65caabeaffe5b762e86f9d648a26" offset="1000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 084 -->
+	<software name="kof95">
+		<description>The King of Fighters '95</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="2097152">
+                <rom name="084-pg1.bin" size="1048576" crc="5e54cf95" sha1="41abe2042fdbb1526e92a0789976a9b1ac5e60f0" offset="100000" />
+                <rom size="1048576" offset="000000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="084-s1.bin" size="131072" crc="de716f8a" sha1="f7386454a943ed5caf625f67ee1d0197b1c6fa13" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="084-m1.bin" size="131072" crc="6f2d7429" sha1="6f8462e4f07af82a5ca3197895d5dcbb67bdaa61" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="9437184">
+                <rom name="084-v1.bin" size="4194304" crc="84861b56" sha1="1b6c91ddaed01f45eb9b7e49d9c2b9b479d50da6" offset="000000" />
+                <rom name="084-v2.bin" size="2097152" crc="b38a2803" sha1="dbc2c8606ca09ed7ff20906b022da3cf053b2f09" offset="400000" />
+                <!-- 0x600000 - 0x7fffff empty -->
+                <rom name="084-v3.bin" size="1048576" crc="d683a338" sha1="eb9866b4b286edc09963cb96c43ce0a8fb09adbb" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="27262976">
+                <rom name="084-c1.bin" size="4194304" crc="fe087e32" sha1="e8e89faa616027e4fb9b8a865c1a67f409c93bdf" offset="000000" loadflag="load16_byte" />
+                <rom name="084-c2.bin" size="4194304" crc="07864e09" sha1="0817fcfd75d0735fd8ff27561eaec371e4ff5829" offset="000001" loadflag="load16_byte" />
+                <rom name="084-c3.bin" size="4194304" crc="a4e65d1b" sha1="740a405b40b3a4b324697d2652cae29ffe0ac0bd" offset="800000" loadflag="load16_byte" />
+                <rom name="084-c4.bin" size="4194304" crc="c1ace468" sha1="74ea2a3cfd7b744f0988a05baaff10016ca8f625" offset="800001" loadflag="load16_byte" />
+                <rom name="084-c5.bin" size="2097152" crc="8a2c1edc" sha1="67866651bc0ce27122285a66b0aab108acf3d065" offset="1000000" loadflag="load16_byte" />
+                <rom name="084-c6.bin" size="2097152" crc="f593ac35" sha1="302c92c63f092a8d49429c3331e5e5678f0ea48d" offset="1000001" loadflag="load16_byte" />
+				<!-- 0x1400000-0x17fffff empty -->
+                <rom name="084-c7.bin" size="1048576" crc="9904025f" sha1="eec770746a0ad073f7d353ab16a2cc3a5278d307" offset="1800000" loadflag="load16_byte" />
+                <rom name="084-c8.bin" size="1048576" crc="78eb0f9b" sha1="2925ea21ed2ce167f08a25589e94f28643379034" offset="1800001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
