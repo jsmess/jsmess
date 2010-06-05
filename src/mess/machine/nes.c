@@ -96,27 +96,31 @@ static void init_nes_core( running_machine *machine )
 			memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank3");
 			memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank4");
 
-			// initially setup banks to maincpu 0x8000-0xffff
+			/* configure banks 1-4 */
 			for (i = 0; i < 4; i++)
 			{
 				memory_configure_bank(machine, bank_names[i], 0, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+				// some mappers (e.g. MMC5) can map PRG RAM in  0x8000-0xffff as well
+				if (state->prg_ram)
+					memory_configure_bank(machine, bank_names[i], prg_banks, state->wram_size / 0x2000, state->wram, 0x2000);
+				// however, at start we point to PRG ROM
 				memory_set_bank(machine, bank_names[i], i);
 				state->prg_bank[i] = i;
 			}
 
-			state->prgram_bank_start = prg_banks;
 			/* bank 5 configuration is more delicate, since it can have PRG RAM, PRG ROM or SRAM mapped to it */
 			/* we first map PRG ROM banks, then the battery bank (if a battery is present), and finally PRG RAM (state->wram) */
 			memory_configure_bank(machine, "bank5", 0, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+			state->prgram_bank5_start = prg_banks;
 			/* add battery ram, but only if there's no trainer since they share overlapping memory. */
 			if (state->battery && !state->trainer)
 			{
 				memory_configure_bank(machine, "bank5", prg_banks, 1, state->battery_ram, state->battery_size);
-				state->prgram_bank_start += 1;
+				state->prgram_bank5_start += 1;
 			}
 			/* add prg ram. */
 			if (state->prg_ram)
-				memory_configure_bank(machine, "bank5", state->prgram_bank_start, 8, state->wram, 0x2000);
+				memory_configure_bank(machine, "bank5", state->prgram_bank5_start, state->wram_size / 0x2000, state->wram, 0x2000);
 
 			/* if we have any additional PRG RAM, point bank5 to its first bank */
 			if (state->battery || state->prg_ram)

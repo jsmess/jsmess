@@ -513,7 +513,7 @@ static WRITE8_HANDLER( mapper5_l_w )
 
 		case 0x1013: /* $5113 */
 			LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
-			state->prg_bank[4] = state->prgram_bank_start + (data & 0x07);
+			state->prg_bank[4] = state->prgram_bank5_start + (data & 0x07);
 			memory_set_bank(space->machine, "bank5", state->prg_bank[4]);
 			break;
 
@@ -526,16 +526,15 @@ static WRITE8_HANDLER( mapper5_l_w )
 					if (data & 0x80)
 					{
 						/* ROM */
-						LOG_MMC(("\tROM bank select (8k, $8000): %02x\n", data));
-						data &= ((state->prg_chunks << 1) - 1);
-						memory_set_bankptr(space->machine, "bank1", &state->rom[data * 0x2000 + 0x10000]);
+						LOG_MMC(("\tROM bank select (8k, $8000): %02x\n", data & 0x7f));
+						prg8_89(space->machine, data & 0x7f);
 					}
 					else
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $8000): %02x\n", data & 0x07));
-						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, "bank1", &state->wram[(data & 4) * 0x2000]);
+						state->prg_bank[0] = state->prg_chunks + data & 0x07;
+						memory_set_bank(space->machine, "bank1", state->prg_bank[0]);
 					}
 					break;
 			}
@@ -549,15 +548,17 @@ static WRITE8_HANDLER( mapper5_l_w )
 					if (data & 0x80)
 					{
 						/* 16k switch - ROM only */
+						LOG_MMC(("\tROM bank select (16k, $8000): %02x\n", (data & 0x7f) >> 1));
 						prg16_89ab(space->machine, (data & 0x7f) >> 1);
 					}
 					else
 					{
 						/* RAM */
-						LOG_MMC(("\tRAM bank select (16k, $8000): %02x\n", data & 0x07));
-						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, "bank1", &state->wram[((data & 4) >> 1) * 0x4000]);
-						memory_set_bankptr(space->machine, "bank2", &state->wram[((data & 4) >> 1) * 0x4000 + 0x2000]);
+						LOG_MMC(("\tRAM bank select (16k, $8000): %02x\n", (data & 0x07) >> 1));
+						state->prg_bank[0] = state->prg_chunks + (data & 0x06);
+						state->prg_bank[1] = state->prg_chunks + (data & 0x06) + 1;
+						memory_set_bank(space->machine, "bank1", state->prg_bank[0]);
+						memory_set_bank(space->machine, "bank2", state->prg_bank[1]);
 					}
 					break;
 				case 0x03:
@@ -565,15 +566,15 @@ static WRITE8_HANDLER( mapper5_l_w )
 					if (data & 0x80)
 					{
 						/* ROM */
-						data &= ((state->prg_chunks << 1) - 1);
-						memory_set_bankptr(space->machine, "bank2", &state->rom[data * 0x2000 + 0x10000]);
+						LOG_MMC(("\tROM bank select (8k, $a000): %02x\n", data & 0x7f));
+						prg8_ab(space->machine, data & 0x7f);
 					}
 					else
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $a000): %02x\n", data & 0x07));
-						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, "bank2", &state->wram[(data & 4) * 0x2000]);
+						state->prg_bank[1] = state->prg_chunks + data & 0x07;
+						memory_set_bank(space->machine, "bank2", state->prg_bank[1]);
 					}
 					break;
 			}
@@ -588,15 +589,15 @@ static WRITE8_HANDLER( mapper5_l_w )
 					if (data & 0x80)
 					{
 						/* ROM */
-						data &= ((state->prg_chunks << 1) - 1);
-						memory_set_bankptr(space->machine, "bank3", &state->rom[data * 0x2000 + 0x10000]);
+						LOG_MMC(("\tROM bank select (8k, $c000): %02x\n", data & 0x7f));
+						prg8_cd(space->machine, data & 0x7f);
 					}
 					else
 					{
 						/* RAM */
 						LOG_MMC(("\tRAM bank select (8k, $c000): %02x\n", data & 0x07));
-						/* The & 4 is a hack that'll tide us over for now */
-						memory_set_bankptr(space->machine, "bank3", &state->wram[(data & 4)* 0x2000]);
+						state->prg_bank[2] = state->prg_chunks + data & 0x07;
+						memory_set_bank(space->machine, "bank3", state->prg_bank[2]);
 					}
 					break;
 			}
@@ -607,17 +608,19 @@ static WRITE8_HANDLER( mapper5_l_w )
 			{
 				case 0x00:
 					/* 32k switch - ROM only */
+					LOG_MMC(("\tROM bank select (32k, $8000): %02x\n", (data & 0x7f) >> 2));
 					prg32(space->machine, data >> 2);
 					break;
 				case 0x01:
 					/* 16k switch - ROM only */
+					LOG_MMC(("\tROM bank select (16k, $c000): %02x\n", (data & 0x7f) >> 1));
 					prg16_cdef(space->machine, data >> 1);
 					break;
 				case 0x02:
 				case 0x03:
 					/* 8k switch */
-					data &= ((state->prg_chunks << 1) - 1);
-					memory_set_bankptr(space->machine, "bank4", &state->rom[data * 0x2000 + 0x10000]);
+					LOG_MMC(("\tROM bank select (8k, $e000): %02x\n", data & 0x7f));
+					prg8_ef(space->machine, data & 0x7f);
 					break;
 			}
 			break;

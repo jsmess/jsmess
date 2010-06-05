@@ -73,7 +73,7 @@ public:
 	chr_bank      chr_map[8];  //quick banking structure, because some of this changes multiple times per scanline!
 	name_table    nt_page[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
-	int prgram_bank_start;
+	int prgram_bank5_start;
 	int MMC5_floodtile;
 	int MMC5_floodattr;
 	UINT8 mmc5_vram[0x400];
