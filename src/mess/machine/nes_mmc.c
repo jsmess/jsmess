@@ -285,7 +285,7 @@ WRITE8_HANDLER( nes_mid_mapper_w )
 		if (state->battery && !state->trainer)
 			state->battery_ram[offset] = data;
 		else
-			state->wram[(state->prg_bank[4] - state->prgram_bank_start) * 0x2000 + offset] = data;
+			state->wram[(state->prg_bank[4] - state->prgram_bank5_start) * 0x2000 + offset] = data;
 	}
 	else
 		logerror("Unimplemented MID mapper write, offset: %04x, data: %02x\n", offset + 0x6000, data);
@@ -301,7 +301,7 @@ READ8_HANDLER( nes_mid_mapper_r )
 		if (state->battery && !state->trainer)
 			return state->battery_ram[offset];
 		else
-			return state->wram[(state->prg_bank[4] - state->prgram_bank_start) * 0x2000 + offset];
+			return state->wram[(state->prg_bank[4] - state->prgram_bank5_start) * 0x2000 + offset];
 	}
 	else
 		logerror("Unimplemented LOW mapper read, offset: %04x\n", offset + 0x6000);
