@@ -1,8 +1,8 @@
-0.138.1
+﻿0.138.1
 
 New System Drivers Supported:
 -----------------------------
-(none)
+- Bally Home Library Computer [ranger_lennier]
 
 
 
