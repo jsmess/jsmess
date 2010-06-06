@@ -125,6 +125,8 @@ static void init_nes_core( running_machine *machine )
 			/* if we have any additional PRG RAM, point bank5 to its first bank */
 			if (state->battery || state->prg_ram)
 				state->prg_bank[4] = prg_banks;
+			else
+				state->prg_bank[4] = 0; // or shall we point to "maincpu" region at 0x6000? point is that we should never access this region if no sram or wram is present!
 
 			memory_set_bank(machine, "bank5", state->prg_bank[4]);
 
