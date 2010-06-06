@@ -883,6 +883,41 @@
 		</part>
 	</software>
 
+<!-- ID 095 -->
+	<software name="rbff1">
+		<description>Real Bout Fatal Fury / Real Bout Garou Densetsu</description>
+		<year>1995</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="3145728">
+                <rom name="095-p1.bin" size="1048576" crc="63b4d8ae" sha1="03aa9f6bab6aee685d1b57a52823797704eea845" offset="000000" />
+                <rom name="095-p2.bin" size="2097152" crc="cc15826e" sha1="44d6ac6c0ca697a6f367dcfd809b1e1771cb0635" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="095-s1.bin" size="131072" crc="b6bf5e08" sha1="b527355c35ea097f3448676f2ffa65b8e56ae30c" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="095-m1.bin" size="131072" crc="653492a7" sha1="39e511fb9ed5d2135dc8428a31d0baafb2ab36e0" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="12582912">
+                <rom name="069-v1.bin" size="4194304" crc="2bdbd4db" sha1="5f4fecf69c2329d699cbd45829c19303b1e2a80e" offset="000000" />
+                <rom name="069-v2.bin" size="4194304" crc="a698a487" sha1="11b8bc53bc26a51f4a408e900e3769958625c4ed" offset="400000" />
+                <rom name="095-v3.bin" size="4194304" crc="189d1c6c" sha1="f0b8cd1ee40ea3feeb2800f0723b451ec8240203" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="29360128">
+                <rom name="069-c1.bin" size="4194304" crc="e302f93c" sha1="d8610b14900b2b8fe691b67ca9b1abb335dbff74" offset="000000" loadflag="load16_byte" />
+                <rom name="069-c2.bin" size="4194304" crc="1053a455" sha1="69501bfac68739e63d798045b812badd251d57b8" offset="000001" loadflag="load16_byte" />
+                <rom name="069-c3.bin" size="4194304" crc="1c0fde2f" sha1="cf6c2ef56c03a861de3b0b6dc0d7c9204d947f9d" offset="800000" loadflag="load16_byte" />
+                <rom name="069-c4.bin" size="4194304" crc="a25fc3d0" sha1="83cb349e2f1032652060b233e741fb893be5af16" offset="800001" loadflag="load16_byte" />
+                <rom name="095-c5.bin" size="4194304" crc="8b9b65df" sha1="e2a7e20855501f240bcd22f5cc92fcb4a9806abe" offset="1000000" loadflag="load16_byte" />
+                <rom name="095-c6.bin" size="4194304" crc="3e164718" sha1="53217f938c8964c1ca68a6fd5249c4169a5ac8e6" offset="1000001" loadflag="load16_byte" />
+                <rom name="095-c7.bin" size="2097152" crc="ca605e12" sha1="5150b835247fd705bc1dece97d423d9c20a51416" offset="1800000" loadflag="load16_byte" />
+                <rom name="095-c8.bin" size="2097152" crc="4e6beb6c" sha1="c0ac7cfc832ace6ad52c58f5da3a8101baead749" offset="1800001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 234 -->
 	<software name="lastblad">
 		<description>The Last Blade / Bakumatsu Roman - Gekka no Kenshi</description>
@@ -913,6 +948,40 @@
                 <rom name="234-c4.bin" size="8388608" crc="3d60b037" sha1="78a50233bcd19e92c7b6f7ee1a53417d9db21f6a" offset="1000001" loadflag="load16_byte" />
                 <rom name="234-c5.bin" size="4194304" crc="1ba80cee" sha1="0c59057183b5279b747e73213b4cd3c6d7ad9eb1" offset="2000000" loadflag="load16_byte" />
                 <rom name="234-c6.bin" size="4194304" crc="beafd091" sha1="55df9cc128eb0f00856de3996c946e3efe8f09a5" offset="2000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 240 -->
+	<software name="rbff2">
+		<description>Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - The Newcomers</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="5242880">
+                <rom name="240-pg1.bin" size="1048576" crc="b6969780" sha1="e3373d18e0f0724d69efb8024a27cca121f1b5b2" offset="000000" />
+                <rom name="240-p2.bin" size="4194304" crc="960aa88d" sha1="3d9e785891871af90313f178dca2724633406674" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="240-s1.bin" size="131072" crc="da3b40de" sha1="e6bf74e057ac6fe1f249a7547f13ba7fbc694561" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="327680">
+				<rom name="240-m1.bin" size="262144" crc="ed482791" sha1="1f54a45967cb7842c33aa24be322c9f33ff75ac3" offset="000000" />
+				<rom size="262144" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="14680064">
+                <rom name="240-v1.bin" size="4194304" crc="f796265a" sha1="736dff37eb91fc856b4d189249fb0de9b6c0813a" offset="000000" />
+                <rom name="240-v2.bin" size="4194304" crc="2cb3f3bb" sha1="697e677890892f4b028c9a27c66809ca0a8a9b18" offset="400000" />
+                <rom name="240-v3.bin" size="4194304" crc="8fe1367a" sha1="093d7a4ac2b54ad7ffb2dc316fe29415f7a99535" offset="800000" />
+                <rom name="240-v4.bin" size="2097152" crc="996704d8" sha1="0bf7a1d0660199dedf3c25be757eeab75cc6147e" offset="c00000" />
+			</dataarea>
+			<dataarea name="sprites" size="50331648">
+                <rom name="240-c1.bin" size="8388608" crc="effac504" sha1="e36a96e7369b02c7e839b5abf3c6799453ba1927" offset="000000" loadflag="load16_byte" />
+                <rom name="240-c2.bin" size="8388608" crc="ed182d44" sha1="a9fc0a3a786bf067c129ec7220df65953dff804f" offset="000001" loadflag="load16_byte" />
+                <rom name="240-c3.bin" size="8388608" crc="22e0330a" sha1="0fe7f6a8aeba7f17dbb278e85003969ff10d3cd2" offset="1000000" loadflag="load16_byte" />
+                <rom name="240-c4.bin" size="8388608" crc="c19a07eb" sha1="139eac8b51cadf328dd42d8109f4e2463f57230c" offset="1000001" loadflag="load16_byte" />
+                <rom name="240-c5.bin" size="8388608" crc="244dff5a" sha1="156548156d3ceaa808d0053d0749af2526a3943e" offset="2000000" loadflag="load16_byte" />
+                <rom name="240-c6.bin" size="8388608" crc="4609e507" sha1="bb17f50a377dddb77c1eeda5944a7bcbf0cca5f7" offset="2000001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
