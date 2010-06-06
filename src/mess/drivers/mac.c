@@ -60,14 +60,23 @@
 
     Registers:
     0x800: VERSION
-    0x801: MODE
-    0x802: CONTROL
-    0x803: FIFO MODE (bit 0 = half, bit 1 = full?)
-    0x804: FIFO IRQ STATUS
-    0x805: WAVETABLE CONTROL
-    0x806: VOLUME
-    0x807: CLOCK RATE (0 = 22 kHz)
+    0x801: MODE (1=FIFO mode, 2=wavetable mode)
+    0x802: CONTROL (bit 0=analog or PWM output, 1=stereo/mono, 7=processing time exceeded)
+    0x803: FIFO MODE (bit 7=clear FIFO, bit 1="non-ROM companding", bit 0="ROM companding")
+    0x804: FIFO IRQ STATUS (bit 0=ch A 1/2 full, 1=ch A full, 2=ch B 1/2 full, 3=ch B full)
+    0x805: WAVETABLE CONTROL (bits 0-3 wavetables 0-3 start)
+    0x806: VOLUME (bits 2-4 = 3 bit internal ASC volume, bits 5-7 = volume control sent to Sony sound chip)
+    0x807: CLOCK RATE (0 = Mac 22257 Hz, 1 = undefined, 2 = 22050 Hz, 3 = 44100 Hz)
     0x80a: PLAY REC A
+    0x80f: TEST (bits 6-7 = digital test, bits 4-5 = analog test)
+    0x810: WAVETABLE 0 PHASE (big-endian, only 24 bits valid)
+    0x814: WAVETABLE 0 INCREMENT (big-endian, only 24 bits valid)
+    0x818: WAVETABLE 1 PHASE
+    0x81C: WAVETABLE 1 INCREMENT
+    0x820: WAVETABLE 2 PHASE
+    0x824: WAVETABLE 2 INCREMENT
+    0x828: WAVETABLE 3 PHASE
+    0x82C: WAVETABLE 3 INCREMENT
 
     Should become it's own device.
 */
@@ -76,7 +85,7 @@ static READ8_HANDLER(mac_asc_r)
 {
 	mac_state *mac = (mac_state *)space->machine->driver_data;
 
-//  logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
+//	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
 
 	switch (offset)
 	{
@@ -96,7 +105,7 @@ static WRITE8_HANDLER(mac_asc_w)
 	INT32 i;
 	mac_state *mac = (mac_state *)space->machine->driver_data;
 
-//  logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
+//	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
 
 	mac->mac_asc_regs[offset] = data;
 
@@ -252,7 +261,7 @@ static READ16_HANDLER ( mac_v8_r )
 	int data, viaoffs;
 	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 
-	printf("v8_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
+//	printf("v8_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
 
 	viaoffs = (offset >> 8) & 0x0f;
 
@@ -274,7 +283,7 @@ static WRITE16_HANDLER ( mac_v8_w )
 	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 	int viaoffs;
 
-	printf("v8_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
+//	printf("v8_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
 
 	viaoffs = (offset >> 8) & 0x0f;
 
@@ -344,7 +353,7 @@ static READ16_HANDLER ( mac_sonora_r )
 	int data, viaoffs;
 	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 
-	printf("sonora_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
+//	printf("sonora_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
 
 	viaoffs = (offset >> 8) & 0x0f;
 
@@ -366,7 +375,7 @@ static WRITE16_HANDLER ( mac_sonora_w )
 	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 	int viaoffs;
 
-	printf("sonora_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
+//	printf("sonora_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
 
 	viaoffs = (offset >> 8) & 0x0f;
 
@@ -427,7 +436,7 @@ static VIDEO_UPDATE( macsonora )
 
 static READ32_HANDLER(mac_lc3_id)
 {
-	printf("Sonora ID register read, PC=%x\n", cpu_get_pc(space->cpu));
+//	printf("Sonora ID register read, PC=%x\n", cpu_get_pc(space->cpu));
 
 	return 0xa55a0001;	// 25 MHz LC III
 }
@@ -680,7 +689,7 @@ static MACHINE_DRIVER_START( mac512ke )
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac128512_floppy_config)
 
-	MDRV_SCC8530_ADD("scc")
+	MDRV_SCC8530_ADD("scc", 7833600)
 	MDRV_SCC8530_IRQ(mac_scc_irq)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
@@ -802,7 +811,7 @@ static MACHINE_DRIVER_START( macii )
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
-	MDRV_SCC8530_ADD("scc")
+	MDRV_SCC8530_ADD("scc", 7833600)
 	MDRV_SCC8530_IRQ(mac_scc_irq)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
@@ -914,7 +923,7 @@ static MACHINE_DRIVER_START( macse30 )
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
-	MDRV_SCC8530_ADD("scc")
+	MDRV_SCC8530_ADD("scc", 7833600)
 	MDRV_SCC8530_IRQ(mac_scc_irq)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 
@@ -1017,7 +1026,7 @@ static MACHINE_DRIVER_START( pwrmac )
 	MDRV_IWM_ADD("fdc", mac_iwm_interface)
 	MDRV_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_config)
 
-	MDRV_SCC8530_ADD("scc")
+	MDRV_SCC8530_ADD("scc", 7833600)
 	MDRV_SCC8530_IRQ(mac_scc_irq)
 	MDRV_VIA6522_ADD("via6522_0", 1000000, mac_via6522_intf)
 

@@ -2605,7 +2605,7 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_X68KHDC_ADD( "x68k_hdc" )
 
-	MDRV_SCC8530_ADD( "scc" )
+	MDRV_SCC8530_ADD( "scc", 7000000 )
 
 	MDRV_RP5C15_ADD( "rp5c15" , rtc_intf)
 

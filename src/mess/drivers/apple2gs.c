@@ -247,7 +247,7 @@ static MACHINE_DRIVER_START( apple2gs )
 	MDRV_DEVICE_REMOVE("fdc")
 	MDRV_IWM_ADD("fdc", apple2_fdc_interface)
 	/* SCC */
-	MDRV_SCC8530_ADD("scc")
+	MDRV_SCC8530_ADD("scc", APPLE2GS_14M/2)
 
 	MDRV_FLOPPY_APPLE_2_DRIVES_REMOVE()
 	MDRV_FLOPPY_APPLE_2_DRIVES_ADD(apple2gs_floppy525_floppy_config,15,16)

@@ -34,8 +34,8 @@ struct _scc8530_interface
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_SCC8530_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, SCC8530, 0)
+#define MDRV_SCC8530_ADD(_tag, _clock) \
+	MDRV_DEVICE_ADD(_tag, SCC8530, _clock)
 
 #define MDRV_SCC8530_IRQ(_irq) \
 	MDRV_DEVICE_CONFIG_DATAPTR(scc8530_interface, irq, _irq)

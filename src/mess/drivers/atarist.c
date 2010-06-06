@@ -1849,7 +1849,7 @@ static MACHINE_DRIVER_START( atarist )
 
 	// device hardware
 	MDRV_MC68901_ADD(MC68901_TAG, Y2/8, mfp_intf)
-	MDRV_SCC8530_ADD("scc")
+	MDRV_SCC8530_ADD("scc", Y2/4)
 	MDRV_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// video hardware
@@ -1916,7 +1916,7 @@ static MACHINE_DRIVER_START( atariste )
 
 	// device hardware
 	MDRV_MC68901_ADD(MC68901_TAG, Y2/8, atariste_mfp_intf)
-	MDRV_SCC8530_ADD("scc")
+	MDRV_SCC8530_ADD("scc", Y2/4)
 	MDRV_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// video hardware
@@ -1990,7 +1990,7 @@ static MACHINE_DRIVER_START( stbook )
 	// device hardware
 	MDRV_MC68901_ADD(MC68901_TAG, U517/8, stbook_mfp_intf)
 	MDRV_RP5C15_ADD(RP5C15_TAG, rtc_intf)
-	MDRV_SCC8530_ADD("scc")
+	MDRV_SCC8530_ADD("scc", U517/2)
 	MDRV_RS232_ADD(RS232_TAG, rs232_intf)
 
 	// video hardware
