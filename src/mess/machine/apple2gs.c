@@ -555,6 +555,7 @@ static UINT8 adb_read_datareg(void)
 			{
 				adb_state = ADBSTATE_IDLE;
 				adb_latent_result = result;
+				adb_kmstatus &= ~0x20;
 			}
 			break;
 
@@ -565,8 +566,6 @@ static UINT8 adb_read_datareg(void)
 
 	if (LOG_ADB)
 		logerror("adb_read_datareg(): result=0x%02x\n", result);
-
-	adb_kmstatus &= ~0x20;
 
 	return result;
 }
