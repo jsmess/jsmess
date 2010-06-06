@@ -137,8 +137,9 @@ const game_driver * const drivers[] =
 	DRIVER( pockstat )  /* 1999 Sony PocketStation    */
 
 	/* Bally */
-	DRIVER( astrocde )  /* Bally Astrocade    */
-	DRIVER( astrocdw )  /* Bally Astrocade (white case)  */
+	DRIVER( astrocde )	/* Bally Professional Arcade / Astrocade    */
+	DRIVER( astrocdl )	/* Bally Home Library Computer    */
+	DRIVER( astrocdw )	/* Bally Computer System (white case)  */
 
 	/* RCA */
 	DRIVER( vip )	   /* 1977 Cosmac VIP VP-711       */

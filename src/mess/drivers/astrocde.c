@@ -207,13 +207,18 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( astrocde )
-    ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "astro.bin",  0x0000, 0x2000, CRC(ebc77f3a) SHA1(b902c941997c9d150a560435bf517c6a28137ecc))
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "astro.bin",  0x0000, 0x2000, CRC(ebc77f3a) SHA1(b902c941997c9d150a560435bf517c6a28137ecc) )
+ROM_END
+
+ROM_START( astrocdl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ballyhlc.bin",  0x0000, 0x2000, CRC(d7c517ba) SHA1(6b2bef5d970e54ed204549f58ba6d197a8bfd3cc) )
 ROM_END
 
 ROM_START( astrocdw )
-    ROM_REGION( 0x10000, "maincpu", 0 )
-    ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf))
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bioswhit.bin",  0x0000, 0x2000, CRC(6eb53e79) SHA1(d84341feec1a0a0e8aa6151b649bc3cf6ef69fbf) )
 ROM_END
 
 /*************************************
@@ -236,4 +241,5 @@ static DRIVER_INIT( astrocde )
 
 /*    YEAR  NAME      PARENT    COMPAT    MACHINE   INPUT     INIT      COMPANY                FULLNAME                     FLAGS */
 CONS( 1978, astrocde, 0,        0,        astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Professional Arcade", GAME_SUPPORTS_SAVE )
-CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Computer System",     GAME_SUPPORTS_SAVE )
+CONS( 1977, astrocdl, astrocde, 0,        astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Home Library Computer", GAME_SUPPORTS_SAVE )
+CONS( 1977, astrocdw, astrocde, 0,        astrocde, astrocde, astrocde, "Bally Manufacturing", "Bally Computer System", GAME_SUPPORTS_SAVE )
