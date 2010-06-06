@@ -140,53 +140,11 @@ static void init_nes_core( running_machine *machine )
 	/* Set up the mapper callbacks */
 	if (state->format == 1)
 	{
-		const mmc *mapper = nes_mapper_lookup(state->mapper);
-		if (mapper)
-		{
-			state->mmc_write_low = mapper->mmc_write_low;
-			state->mmc_write_mid = mapper->mmc_write_mid;
-			state->mmc_write = mapper->mmc_write;
-			state->mmc_read_low = mapper->mmc_read_low;
-			state->mmc_read_mid = NULL;	// in progress
-			state->mmc_read = NULL;	// in progress
-			ppu_latch = mapper->ppu_latch;
-		}
-		else
-		{
-			logerror("Mapper %d is not yet supported, defaulting to no mapper.\n",state->mapper);
-			state->mmc_write_low = NULL;
-			state->mmc_write_mid = NULL;
-			state->mmc_write = NULL;
-			state->mmc_read_low = NULL;
-			state->mmc_read_mid = NULL;	// in progress
-			state->mmc_read = NULL;	// in progress
-			ppu_latch = NULL;
-		}
+		mapper_handlers_setup(machine);
 	}
 	else if (state->format == 2)
 	{
-		const unif *board = nes_unif_lookup(state->board);
-		if (board)
-		{
-			state->mmc_write_low = board->mmc_write_low;
-			state->mmc_write_mid = board->mmc_write_mid;
-			state->mmc_write = board->mmc_write;
-			state->mmc_read_low = board->mmc_read_low;
-			state->mmc_read_mid = NULL;	// in progress
-			state->mmc_read = NULL;	// in progress
-			ppu_latch = board->ppu_latch;
-		}
-		else
-		{
-			logerror("Board %s is not yet supported, defaulting to no mapper.\n", state->board);
-			state->mmc_write_low = NULL;
-			state->mmc_write_mid = NULL;
-			state->mmc_write = NULL;
-			state->mmc_read_low = NULL;
-			state->mmc_read_mid = NULL;	// in progress
-			state->mmc_read = NULL;	// in progress
-			ppu_latch = NULL;
-		}
+		unif_handlers_setup(machine);
 	}
 }
 
@@ -205,10 +163,10 @@ MACHINE_RESET( nes )
 
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	if (state->format == 1)
-		nes_mapper_reset(machine, state->mapper);
+		nes_mapper_reset(machine);
 
 	if (state->format == 2)
-		nes_unif_reset(machine, state->board);
+		nes_unif_reset(machine);
 	
 	/* Reset the serial input ports */
 	state->in_0.shift = 0;
@@ -733,7 +691,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			UINT32 prg_start = 0, chr_start = 0, prg_size;
 			char unif_mapr[32];	// here we should store MAPR chunks
 			UINT32 size = image_length(image);
-			const unif *unif_board;
 			int mapr_chunk_found = 0;
 
 			state->format = 2;	// we use this to select between mapper_reset / unif_reset
@@ -771,29 +728,18 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						if (chunk_length <= 0x20)
 							image_fread(image, &unif_mapr, chunk_length);
 
-						unif_board = nes_unif_lookup(unif_mapr);
-						logerror("%s\n", unif_mapr);
-
-						if (unif_board == NULL)
-							fatalerror("Unknown UNIF board %s.", unif_mapr);
-
-						state->mapper = 0;	// this allows us to set up memory handlers without duplicating code (for the moment)
-						state->board = unif_board->board;
-						state->battery = unif_board->nvwram;	// we should implement WRAM banks based on the size of this...
-						state->battery_size = NES_BATTERY_SIZE; // FIXME: we should allow for smaller battery!
-						state->prg_ram = unif_board->wram;	// we should implement WRAM banks based on the size of this...
-						// state->hard_mirroring = unif_board->nt;
-						// state->four_screen_vram = ;
+						// find out prg/chr size, battery, wram, etc.
+						unif_mapr_setup(image->machine, unif_mapr);
 
 						/* Free the regions that were allocated by the ROM loader */
 						memory_region_free(image->machine, "maincpu");
 						memory_region_free(image->machine, "gfx1");
 
 						/* Allocate them again with the large enough size */
-						prg_size = (unif_board->prgrom == 1) ? 2 * 0x4000 : unif_board->prgrom * 0x4000;
+						prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
 						memory_region_alloc(image->machine, "maincpu", 0x10000 + prg_size, 0);
-						if (unif_board->chrrom)
-							memory_region_alloc(image->machine, "gfx1", unif_board->chrrom * 0x2000, 0);
+						if (state->chr_chunks)
+							memory_region_alloc(image->machine, "gfx1", state->chr_chunks * 0x2000, 0);
 
 						state->rom = memory_region(image->machine, "maincpu");
 						state->vrom = memory_region(image->machine, "gfx1");
@@ -802,7 +748,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						state->wram_size = 0x10000;
 						state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
 
-						/* the exact number of chunks will be determined while reading the file */
+						/* reset prg/chr chunks: the exact number of chunks will be determined while reading the file */
 						state->prg_chunks = 0;
 						state->chr_chunks = 0;
 

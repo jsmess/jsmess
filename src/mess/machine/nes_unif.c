@@ -23,12 +23,13 @@
 
 static void bmc_64in1nr_set_prg( running_machine *machine )
 {
-	UINT8 helper1 = (bmc_64in1nr_reg[1] & 0x1f);
-	UINT8 helper2 = (helper1 << 1) | ((bmc_64in1nr_reg[1] & 0x40) >> 6);
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 helper1 = (state->bmc_64in1nr_reg[1] & 0x1f);
+	UINT8 helper2 = (helper1 << 1) | ((state->bmc_64in1nr_reg[1] & 0x40) >> 6);
 
-	if (bmc_64in1nr_reg[0] & 0x80)
+	if (state->bmc_64in1nr_reg[0] & 0x80)
 	{
-		if (bmc_64in1nr_reg[1] & 0x80)
+		if (state->bmc_64in1nr_reg[1] & 0x80)
 			prg32(machine, helper1);
 		else
 		{
@@ -42,6 +43,7 @@ static void bmc_64in1nr_set_prg( running_machine *machine )
 
 static WRITE8_HANDLER( bmc_64in1nr_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_64in1nr_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 
@@ -51,9 +53,9 @@ static WRITE8_HANDLER( bmc_64in1nr_l_w )
 	case 0x1001:
 	case 0x1002:
 	case 0x1003:
-		bmc_64in1nr_reg[offset & 0x03] = data;
+		state->bmc_64in1nr_reg[offset & 0x03] = data;
 		bmc_64in1nr_set_prg(space->machine);
-		chr8(space->machine, ((bmc_64in1nr_reg[0] >> 1) & 0x03) | (bmc_64in1nr_reg[2] << 2), CHRROM);
+		chr8(space->machine, ((state->bmc_64in1nr_reg[0] >> 1) & 0x03) | (state->bmc_64in1nr_reg[2] << 2), CHRROM);
 		break;
 	}
 	if (offset == 0x1000)	/* reg[0] also sets mirroring */
@@ -62,9 +64,10 @@ static WRITE8_HANDLER( bmc_64in1nr_l_w )
 
 static WRITE8_HANDLER( bmc_64in1nr_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_64in1nr_w offset: %04x, data: %02x\n", offset, data));
 
-	bmc_64in1nr_reg[3] = data;	// reg[3] is currently unused?!?
+	state->bmc_64in1nr_reg[3] = data;	// reg[3] is currently unused?!?
 }
 
 /*************************************************************
@@ -171,8 +174,8 @@ static void bmc_s24in1sc03_set_prg( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	static const UINT8 masks[8] = {0x3f, 0x1f, 0x0f, 0x01, 0x03, 0x00, 0x00, 0x00};
 	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
-	int prg_base = bmc_s24in1sc03_reg[1] << 1;
-	int prg_mask = masks[bmc_s24in1sc03_reg[0] & 0x07];
+	int prg_base = state->bmc_s24in1sc03_reg[1] << 1;
+	int prg_mask = masks[state->bmc_s24in1sc03_reg[0] & 0x07];
 
 	prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
 	prg8_ab(machine, prg_base | (state->mmc_prg_bank[1] & prg_mask));
@@ -184,8 +187,8 @@ static void bmc_s24in1sc03_set_chr( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_page = (state->mmc_cmd1 & 0x80) >> 5;
-	UINT8 chr = (bmc_s24in1sc03_reg[0] & 0x20) ? CHRRAM : CHRROM;
-	int chr_base = (bmc_s24in1sc03_reg[2] << 3) & 0xf00;
+	UINT8 chr = (state->bmc_s24in1sc03_reg[0] & 0x20) ? CHRRAM : CHRROM;
+	int chr_base = (state->bmc_s24in1sc03_reg[2] << 3) & 0xf00;
 
 	chr1_x(machine, chr_page ^ 0, chr_base | (state->mmc_vrom_bank[0] & ~0x01), chr);
 	chr1_x(machine, chr_page ^ 1, chr_base | (state->mmc_vrom_bank[0] |  0x01), chr);
@@ -199,25 +202,26 @@ static void bmc_s24in1sc03_set_chr( running_machine *machine )
 
 static WRITE8_HANDLER( bmc_s24in1sc03_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_s24in1sc03_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 
 	if (offset == 0x1ff0)
 	{
-		bmc_s24in1sc03_reg[0] = data;
+		state->bmc_s24in1sc03_reg[0] = data;
 		bmc_s24in1sc03_set_prg(space->machine);
 		bmc_s24in1sc03_set_chr(space->machine);
 	}
 
 	if (offset == 0x1ff1)
 	{
-		bmc_s24in1sc03_reg[1] = data;
+		state->bmc_s24in1sc03_reg[1] = data;
 		bmc_s24in1sc03_set_prg(space->machine);
 	}
 
 	if (offset == 0x1ff2)
 	{
-		bmc_s24in1sc03_reg[2] = data;
+		state->bmc_s24in1sc03_reg[2] = data;
 		bmc_s24in1sc03_set_chr(space->machine);
 	}
 }
@@ -374,7 +378,7 @@ static void unl_8237_set_prg( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_flip = (state->mmc_cmd1 & 0x40) ? 2 : 0;
 
-	if (!(unl_8237_reg[0] & 0x80))
+	if (!(state->unl_8237_reg[0] & 0x80))
 	{
 		prg8_89(machine, state->mmc_prg_bank[0 ^ prg_flip]);
 		prg8_ab(machine, state->mmc_prg_bank[1]);
@@ -391,7 +395,7 @@ static void unl_8237_set_chr( running_machine *machine )
 	int i;
 
 	for(i = 0; i < 6; i++)
-		bank[i] = state->mmc_vrom_bank[i] | ((unl_8237_reg[1] << 6) & 0x100);
+		bank[i] = state->mmc_vrom_bank[i] | ((state->unl_8237_reg[1] << 6) & 0x100);
 
 	chr1_x(machine, chr_page ^ 0, (bank[0] & ~0x01), CHRROM);
 	chr1_x(machine, chr_page ^ 1, (bank[0] |  0x01), CHRROM);
@@ -405,20 +409,21 @@ static void unl_8237_set_chr( running_machine *machine )
 
 static WRITE8_HANDLER( unl_8237_l_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("unl_8237_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
 
 	if (offset == 0x1000)
 	{
-		unl_8237_reg[0] = data;
-		if (unl_8237_reg[0] & 0x80)
+		state->unl_8237_reg[0] = data;
+		if (state->unl_8237_reg[0] & 0x80)
 		{
-			if (unl_8237_reg[0] & 0x20)
-				prg32(space->machine, (unl_8237_reg[0] & 0x0f) >> 1);
+			if (state->unl_8237_reg[0] & 0x20)
+				prg32(space->machine, (state->unl_8237_reg[0] & 0x0f) >> 1);
 			else
 			{
-				prg16_89ab(space->machine, unl_8237_reg[0] & 0x1f);
-				prg16_cdef(space->machine, unl_8237_reg[0] & 0x1f);
+				prg16_89ab(space->machine, state->unl_8237_reg[0] & 0x1f);
+				prg16_cdef(space->machine, state->unl_8237_reg[0] & 0x1f);
 			}
 		}
 		else
@@ -427,7 +432,7 @@ static WRITE8_HANDLER( unl_8237_l_w )
 
 	if (offset == 0x1001)
 	{
-		unl_8237_reg[1] = data;
+		state->unl_8237_reg[1] = data;
 		unl_8237_set_chr(space->machine);
 	}
 }
@@ -443,7 +448,7 @@ static WRITE8_HANDLER( unl_8237_w )
 	{
 		case 0x2000:
 		case 0x3000:
-			unl_8237_reg[2] = 1;
+			state->unl_8237_reg[2] = 1;
 			data = (data & 0xc0) | conv_table[data & 0x07];
 			unl_8237_helper = state->mmc_cmd1 ^ data;
 			state->mmc_cmd1 = data;
@@ -459,9 +464,9 @@ static WRITE8_HANDLER( unl_8237_w )
 
 		case 0x4000:
 		case 0x5000:
-			if (unl_8237_reg[2])
+			if (state->unl_8237_reg[2])
 			{
-				unl_8237_reg[2] = 0;
+				state->unl_8237_reg[2] = 0;
 				cmd = state->mmc_cmd1 & 0x07;
 				switch (cmd)
 				{
@@ -1346,4 +1351,727 @@ const unif *nes_unif_lookup( const char *board )
 			return &unif_list[i];
 	}
 	return NULL;
+}
+
+// WIP code
+static int unif_initialize( running_machine *machine, int idx )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	int err = 0;
+	
+	switch (idx)
+	{
+		case BMC_64IN1NR:
+			state->bmc_64in1nr_reg[0] = 0x80;
+			state->bmc_64in1nr_reg[1] = 0x43;
+			state->bmc_64in1nr_reg[2] = state->bmc_64in1nr_reg[3] = 0;
+			bmc_64in1nr_set_prg(machine);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			chr8(machine, 0, CHRROM);
+			break;
+		case BMC_190IN1:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0);
+			chr8(machine, 0, CHRROM);
+			break;
+		case BMC_A65AS:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 7);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+		case BMC_GS2004:
+		case BMC_GS2013:
+			prg32(machine, 0xff);
+			chr8(machine, 0, CHRRAM);
+			break;
+		case BMC_S24IN1SC03:
+			state->bmc_s24in1sc03_reg[0] = 0x24;
+			state->bmc_s24in1sc03_reg[1] = 0x9f;
+			state->bmc_s24in1sc03_reg[2] = 0;
+			state->mmc_prg_bank[0] = 0xfe;
+			state->mmc_prg_bank[1] = 0xff;
+			state->mmc_prg_bank[2] = 0xfe;
+			state->mmc_prg_bank[3] = 0xff;
+			state->mmc_cmd1 = 0;
+			state->mmc_cmd2 = 0x80;
+			bmc_s24in1sc03_set_prg(machine);
+			bmc_s24in1sc03_set_chr(machine);
+			break;
+		case BMC_T262:
+			state->mmc_cmd1 = 0;
+			state->mmc_cmd2 = 0;
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 7);
+			break;
+		case BMC_WS:
+			state->mmc_cmd1 = 0;
+			prg32(machine, 0);
+			break;
+		case DREAMTECH:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 8);
+			chr8(machine, 0, CHRRAM);
+			break;
+		case UNL_8237:
+			state->unl_8237_reg[0] = state->unl_8237_reg[1] = state->unl_8237_reg[2] = 0;
+			state->mmc_prg_bank[0] = 0x00;
+			state->mmc_prg_bank[1] = 0x01;
+			state->mmc_prg_bank[2] = 0xfe;
+			state->mmc_prg_bank[3] = 0xff;
+			state->mmc_cmd1 = 0;
+			state->mmc_cmd2 = 0x80;
+			unl_8237_set_prg(machine);
+			unl_8237_set_chr(machine);
+			break;
+		case UNL_AX5705:
+			state->mmc_prg_bank[0] = 0;
+			state->mmc_prg_bank[1] = 1;
+			prg8_89(machine, state->mmc_prg_bank[0]);
+			prg8_ab(machine, state->mmc_prg_bank[1]);
+			prg8_cd(machine, 0xfe);
+			prg8_ef(machine, 0xff);
+			break;
+		case UNL_CC21:
+			prg32(machine, 0);
+			chr8(machine, 0, CHRROM);
+			break;
+		case UNL_KOF97:
+			mapper_initialize(machine, 4);
+			break;
+		case UNL_T230:
+			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+			/* For the Boards corresponding to a Mapper, fall back to the mapper init */
+		case STD_NROM:
+		case HVC_FAMBASIC:
+		case JALECO_JF01:
+		case JALECO_JF02:
+		case JALECO_JF03:
+		case JALECO_JF04:
+			mapper_initialize(machine, 0);
+			break;
+		case STD_SAROM:
+		case STD_SBROM:
+		case STD_SCROM:
+		case STD_SEROM:
+		case STD_SFROM:
+		case STD_SGROM:
+		case STD_SHROM:
+		case STD_SJROM:
+		case STD_SKROM:
+		case STD_SLROM:
+		case STD_SNROM:
+		case STD_SOROM:
+		case STD_SUROM:
+		case STD_SXROM:
+			mapper_initialize(machine, 1);
+			break;
+		case STD_UNROM:
+		case STD_UOROM:
+		case UNL_UXROM:
+		case JALECO_JF15:
+		case JALECO_JF18:
+		case JALECO_JF39:
+			mapper_initialize(machine, 2);
+			break;
+		case AVE_74161:
+		case BANDAI_PT554:
+		case STD_CNROM:
+		case NTDEC_N715062:
+		case TENGEN_800008:
+			mapper_initialize(machine, 3);
+			break;
+		case STD_HKROM:
+		case STD_TEROM:
+		case STD_TBROM:
+		case STD_TFROM:
+		case STD_TGROM:
+		case STD_TKROM:
+		case STD_TLROM:
+		case STD_TNROM:
+		case STD_TR1ROM:
+		case STD_TSROM:
+		case STD_TVROM:
+			mapper_initialize(machine, 4);
+			break;
+		case STD_EKROM:
+		case STD_ELROM:
+		case STD_ETROM:
+		case STD_EWROM:
+			mapper_initialize(machine, 5);
+			break;
+		case STD_AMROM:
+		case STD_ANROM:
+		case STD_AN1ROM:
+		case STD_AOROM:
+			mapper_initialize(machine, 7);
+			break;
+		case STD_FJROM:
+		case STD_FKROM:
+			mapper_initialize(machine, 10);
+			break;
+		case AGCI_47516:
+		case AVE_NINA07:
+		case COLORDREAMS:
+			mapper_initialize(machine, 11);
+			break;
+		case REXSOFT_DBZ5:
+			mapper_initialize(machine, 12);
+			break;
+		case REXSOFT_SL1632:
+			mapper_initialize(machine, 14);
+			break;
+		case WAIXING_PS2:
+			mapper_initialize(machine, 15);
+			break;
+		case BANDAI_LZ93D50_A:
+		case BANDAI_LZ93D50_B:
+			mapper_initialize(machine, 16);
+			break;
+		case JALECO_JF23:
+		case JALECO_JF24:
+		case JALECO_JF25:
+		case JALECO_JF27:
+		case JALECO_JF29:
+		case JALECO_JF30:
+		case JALECO_JF31:
+		case JALECO_JF32:
+		case JALECO_JF33:
+		case JALECO_JF34:
+		case JALECO_JF35:
+		case JALECO_JF36:
+		case JALECO_JF37:
+		case JALECO_JF38:
+		case JALECO_JF40:
+		case JALECO_JF41:
+			mapper_initialize(machine, 18);
+			break;
+		case NAMCOT_163:
+			mapper_initialize(machine, 19);
+			break;
+		case KONAMI_VRC4:
+			mapper_initialize(machine, 21);
+			break;
+		case KONAMI_VRC2:
+			mapper_initialize(machine, 22);
+			break;
+		case KONAMI_VRC6:
+			mapper_initialize(machine, 24);
+			break;
+		case IREM_G101:
+		case IREM_G101A:
+		case IREM_G101B:
+			mapper_initialize(machine, 32);
+			break;
+		case TAITO_TC0190FMC:
+			mapper_initialize(machine, 33);
+			break;
+		case STD_BNROM:
+		case AVE_NINA01:
+		case AVE_NINA02:
+			mapper_initialize(machine, 34);
+			break;
+		case UNL_SC127:
+			mapper_initialize(machine, 35);
+			break;
+		case NES_ZZ:
+			mapper_initialize(machine, 37);
+			break;
+		case DISCRETE_74_161_138:
+			mapper_initialize(machine, 38);
+			break;
+		case BTL_SMB2_A:
+			mapper_initialize(machine, 40);
+			break;
+		case CALTRON_6IN1:
+			mapper_initialize(machine, 41);
+			break;
+		case BTL_MARIOBABY:
+		case BTL_AISENSHINICOL:
+			mapper_initialize(machine, 42);
+			break;
+		case UNL_SMB2J:
+			mapper_initialize(machine, 43);
+			break;
+		case BMC_SUPERBIG_7IN1:
+			mapper_initialize(machine, 44);
+			break;
+		case CUSTOM_RUMBLESTATION:
+			mapper_initialize(machine, 46);
+			break;
+		case NES_QJ:
+			mapper_initialize(machine, 47);
+			break;
+		case TAITO_TC0190FMCP:
+			mapper_initialize(machine, 48);
+			break;
+		case BMC_SUPERHIK_4IN1:
+			mapper_initialize(machine, 49);
+			break;
+		case BTL_SMB2_B:
+			mapper_initialize(machine, 50);
+			break;
+		case BMC_BALLGAMES_11IN1:
+			mapper_initialize(machine, 51);
+			break;
+		case BMC_MARIOPARTY_7IN1:
+			mapper_initialize(machine, 52);
+			break;
+		case BMC_NOVELDIAMOND:
+			mapper_initialize(machine, 54);
+			break;
+		case BMC_GKA:
+			mapper_initialize(machine, 57);
+			break;
+		case BMC_GKB:
+			mapper_initialize(machine, 58);
+			break;
+		case RCM_TETRISFAMILY:
+			mapper_initialize(machine, 61);
+			break;
+		case BMC_SUPER_700IN1:
+			mapper_initialize(machine, 62);
+			break;
+		case TENGEN_800032:
+			mapper_initialize(machine, 64);
+			break;
+		case IREM_H3001:
+			mapper_initialize(machine, 65);
+			break;
+		case STD_GNROM:
+		case STD_MHROM:
+			mapper_initialize(machine, 66);
+			break;
+		case SUNSOFT_3:
+			mapper_initialize(machine, 67);
+			break;
+		case STD_NTBROM:
+		case SUNSOFT_4:
+		case TENGEN_800042:
+			mapper_initialize(machine, 68);
+			break;
+		case STD_JLROM:
+		case STD_JSROM:
+		case NES_BTR:
+		case SUNSOFT_5B:
+		case SUNSOFT_FME7:
+			mapper_initialize(machine, 69);
+			break;
+		case BANDAI_74161:
+		case TAITO_74161:
+			mapper_initialize(machine, 70);
+			break;
+		case CAMERICA_ALGN:
+		case CAMERICA_9093:
+			mapper_initialize(machine, 71);
+			break;
+		case CAMERICA_9097:
+			state->crc_hack = 0xf0;
+			mapper_initialize(machine, 71);
+			break;
+		case JALECO_JF17:
+		case JALECO_JF26:
+		case JALECO_JF28:
+			mapper_initialize(machine, 72);
+			break;
+		case KONAMI_VRC3:
+			mapper_initialize(machine, 73);
+			break;
+		case WAIXING_TYPE_A:
+			mapper_initialize(machine, 74);
+			break;
+		case KONAMI_VRC1:
+		case JALECO_JF20:
+		case JALECO_JF22:
+			mapper_initialize(machine, 75);
+			break;
+		case NAMCOT_3446:
+			mapper_initialize(machine, 76);
+			break;
+		case IREM_74161:
+			mapper_initialize(machine, 77);
+			break;
+		case IREM_HOLYDIV:
+		case JALECO_JF16:
+			mapper_initialize(machine, 78);
+			break;
+		case AVE_NINA03:
+		case AVE_NINA06:
+		case AVE_MB91:
+			mapper_initialize(machine, 79);
+			break;
+		case TAITO_X1005:
+			mapper_initialize(machine, 80);
+			break;
+		case TAITO_X1017:
+			mapper_initialize(machine, 82);
+			break;
+		case CONY_STD:
+			mapper_initialize(machine, 83);
+			break;
+		case KONAMI_VRC7:
+			mapper_initialize(machine, 85);
+			break;
+		case JALECO_JF13:
+			mapper_initialize(machine, 86);
+			break;
+		case TAITO_74139:
+		case KONAMI_74139:
+		case JALECO_JF05:
+		case JALECO_JF06:
+		case JALECO_JF07:
+		case JALECO_JF08:
+		case JALECO_JF09:
+		case JALECO_JF10:
+			mapper_initialize(machine, 87);
+			break;
+		case NAMCOT_3443:
+		case NAMCOT_3433:
+			mapper_initialize(machine, 88);
+			break;
+		case SUNSOFT_2B:
+			mapper_initialize(machine, 89);
+			break;
+		case UNL_MORTALKOMBAT2:
+			mapper_initialize(machine, 91);
+			break;
+		case JALECO_JF19:
+		case JALECO_JF21:
+			mapper_initialize(machine, 92);
+			break;
+		case STD_UN1ROM:
+			mapper_initialize(machine, 94);
+			break;
+		case NAMCOT_3425:
+			mapper_initialize(machine, 95);
+			break;
+		case BANDAI_OEKAKIDS:
+			mapper_initialize(machine, 96);
+			break;
+		case CAMERICA_GOLDENFIVE:
+			mapper_initialize(machine, 104);
+			break;
+		case BTL_SMB3:
+			mapper_initialize(machine, 106);
+			break;
+		case MAGICSERIES_MAGICDRAGON:
+			mapper_initialize(machine, 107);
+			break;
+		case NTDEC_ASDER:
+			mapper_initialize(machine, 112);
+			break;
+		case HES_STD:
+			mapper_initialize(machine, 113);
+			break;
+		case SUPERGAME_LIONKING:
+			mapper_initialize(machine, 114);
+			break;
+		case KASING_STD:
+			mapper_initialize(machine, 115);
+			break;
+		case SOMERITEAM_SL12:
+			mapper_initialize(machine, 116);
+			break;
+		case FUTUREMEDIA_STD:
+			mapper_initialize(machine, 117);
+			break;
+		case STD_TKSROM:
+		case STD_TLSROM:
+			mapper_initialize(machine, 118);
+			break;
+		case STD_TQROM:
+			mapper_initialize(machine, 119);
+			break;
+		case KAY_PANDAPRINCE:
+			mapper_initialize(machine, 121);
+			break;
+		case TXC_22211A:
+			mapper_initialize(machine, 132);
+			break;
+		case SACHEN_SA72008:
+			mapper_initialize(machine, 133);
+			break;
+		case BMC_FAMILY_4646B:
+			mapper_initialize(machine, 134);
+			break;
+		case SACHEN_TCU02:
+			mapper_initialize(machine, 136);
+			break;
+		case SACHEN_8259D:
+			mapper_initialize(machine, 137);
+			break;
+		case SACHEN_8259B:
+			mapper_initialize(machine, 138);
+			break;
+		case SACHEN_8259C:
+			mapper_initialize(machine, 139);
+			break;
+		case JALECO_JF11:
+		case JALECO_JF12:
+		case JALECO_JF14:
+			mapper_initialize(machine, 140);
+			break;
+		case SACHEN_8259A:
+			mapper_initialize(machine, 141);
+			break;
+		case SACHEN_TCA01:
+			mapper_initialize(machine, 143);
+			break;
+		case AGCI_50282:
+			mapper_initialize(machine, 144);
+			break;
+		case SACHEN_SA72007:
+			mapper_initialize(machine, 145);
+			break;
+		case SACHEN_SA0161M:
+			mapper_initialize(machine, 146);
+			break;
+		case SACHEN_TCU01:
+			mapper_initialize(machine, 147);
+			break;
+		case SACHEN_SA0037:
+			mapper_initialize(machine, 148);
+			break;
+		case SACHEN_SA0036:
+			mapper_initialize(machine, 149);
+			break;
+		case SACHEN_74LS374:
+			mapper_initialize(machine, 150);
+			break;
+		case BANDAI_FCG1:
+		case BANDAI_FCG2:
+		case BANDAI_JUMP2:
+			mapper_initialize(machine, 153);
+			break;
+		case OPENCORP_DAOU306:
+			mapper_initialize(machine, 156);
+			break;
+		case BANDAI_DATACH:
+			mapper_initialize(machine, 157);
+			break;
+		case TENGEN_800037:
+			mapper_initialize(machine, 158);
+			break;
+		case WAIXING_FFV:
+			mapper_initialize(machine, 164);
+			break;
+		case SUBOR_TYPE1:
+			mapper_initialize(machine, 166);
+			break;
+		case SUBOR_TYPE0:
+			mapper_initialize(machine, 167);
+			break;
+		case KAISER_KS7058:
+			mapper_initialize(machine, 171);
+			break;
+		case UNL_XZY:
+			mapper_initialize(machine, 176);
+			break;
+		case HENGEDIANZI_STD:
+			mapper_initialize(machine, 177);
+			break;
+		case WAIXING_SGZLZ:
+			mapper_initialize(machine, 178);
+			break;
+		case HOSENKAN_STD:
+			mapper_initialize(machine, 182);
+			break;
+		case SUNSOFT_1:
+			mapper_initialize(machine, 184);
+			break;
+		case UNL_KINGOFFIGHTERS96:
+			mapper_initialize(machine, 187);
+			break;
+		case BANDAI_KARAOKE:
+			mapper_initialize(machine, 188);
+			break;
+		case TXC_TW:
+			mapper_initialize(machine, 189);
+			break;
+		case WAIXING_TYPE_B:
+			mapper_initialize(machine, 191);
+			break;
+		case WAIXING_TYPE_C:
+			mapper_initialize(machine, 192);
+			break;
+		case NTDEC_FIGHTINGHERO:
+			mapper_initialize(machine, 193);
+			break;
+		case WAIXING_TYPE_D:
+			mapper_initialize(machine, 194);
+			break;
+		case WAIXING_TYPE_E:
+			mapper_initialize(machine, 195);
+			break;
+		case BTL_SUPERBROS11:
+			mapper_initialize(machine, 196);
+			break;
+		case UNL_SUPERFIGHTER3:
+			mapper_initialize(machine, 197);
+			break;
+		case WAIXING_TYPE_F:
+			mapper_initialize(machine, 198);
+			break;
+		case WAIXING_TYPE_G:
+			mapper_initialize(machine, 199);
+			break;
+		case BMC_36IN1:
+			mapper_initialize(machine, 200);
+			break;
+		case BMC_21IN1:
+			mapper_initialize(machine, 201);
+			break;
+		case BMC_150IN1:
+			mapper_initialize(machine, 202);
+			break;
+		case BMC_35IN1:
+			mapper_initialize(machine, 203);
+			break;
+		case BMC_64IN1:
+			mapper_initialize(machine, 204);
+			break;
+		case BMC_15IN1:
+			mapper_initialize(machine, 205);
+			break;
+		case STD_DEROM:
+		case STD_DE1ROM:
+		case STD_DRROM:
+		case TENGEN_800002:
+		case TENGEN_800004:
+		case TENGEN_800030:
+			mapper_initialize(machine, 206);
+			break;
+		case GOUDER_37017:
+			mapper_initialize(machine, 208);
+			break;
+		case BMC_SUPERHIK_300IN1:
+			mapper_initialize(machine, 212);
+			break;
+		case BMC_9999999IN1:
+			mapper_initialize(machine, 213);
+			break;
+		case BMC_SUPERGUN_20IN1:
+			mapper_initialize(machine, 214);
+			break;
+		case SUPERGAME_BOOGERMAN:
+			mapper_initialize(machine, 215);
+			break;
+		case RCM_GS2015:
+			mapper_initialize(machine, 216);
+			break;
+		case BMC_GOLDENCARD_6IN1:
+			mapper_initialize(machine, 217);
+			break;
+		case UNL_N625092:
+			mapper_initialize(machine, 221);
+			break;
+		case BTL_DRAGONNINJA:
+			mapper_initialize(machine, 222);
+			break;
+		case BMC_72IN1:
+			mapper_initialize(machine, 225);
+			break;
+		case BMC_76IN1:
+		case BMC_SUPER_42IN1:
+			mapper_initialize(machine, 226);
+			break;
+		case BMC_1200IN1:
+			mapper_initialize(machine, 227);
+			break;
+		case ACTENT_ACT52:
+			mapper_initialize(machine, 228);
+			break;
+		case BMC_31IN1:
+			mapper_initialize(machine, 229);
+			break;
+		case BMC_22GAMES:
+			mapper_initialize(machine, 230);
+			break;
+		case BMC_20IN1:
+			mapper_initialize(machine, 231);
+			break;
+		case CAMERICA_ALGQ:
+		case CAMERICA_9096:
+			mapper_initialize(machine, 232);
+			break;
+		case CNE_SHLZ:
+			mapper_initialize(machine, 240);
+			break;
+		case TXC_MXMDHTWO:
+			mapper_initialize(machine, 241);
+			break;
+		case WAIXING_ZS:
+			mapper_initialize(machine, 242);
+			break;
+		case CNE_DECATHLON:
+			mapper_initialize(machine, 244);
+			break;
+		case WAIXING_TYPE_H:
+			mapper_initialize(machine, 245);
+			break;
+		case CNE_PSB:
+			mapper_initialize(machine, 246);
+			break;
+		case WAIXING_SECURITY:
+			mapper_initialize(machine, 249);
+			break;
+		case NITRA_TDA:
+			mapper_initialize(machine, 250);
+			break;
+		case WAIXING_SGZ:
+			mapper_initialize(machine, 252);
+			break;
+		case BMC_110IN1:
+			mapper_initialize(machine, 255);
+			break;
+			
+		case UNSUPPORTED_BOARD:
+		default:
+			/* Mapper not supported */
+			err = 2;
+			break;
+	}
+	
+	return err;
+}
+
+/*************************************************************
+ 
+ nes_unif_reset
+ 
+ Resets the mapper bankswitch areas to their defaults.
+ It returns a value "err" that indicates if it was
+ successful. Possible values for err are:
+ 
+ 0 = success
+ 1 = no mapper found
+ 2 = mapper not supported
+ 
+ *************************************************************/
+
+int nes_unif_reset( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	int err = 0;
+	const unif *unif_board;
+	
+	if (state->chr_chunks == 0)
+		chr8(machine, 0,CHRRAM);
+	else
+		chr8(machine, 0,CHRROM);
+	
+	/* Set the mapper irq callback */
+	unif_board = nes_unif_lookup(state->board);
+	
+	if (unif_board == NULL)
+		fatalerror("Unimplemented UNIF Board");
+	
+	ppu2c0x_set_scanline_callback(state->ppu, unif_board ? unif_board->mmc_scanline : NULL);
+	ppu2c0x_set_hblank_callback(state->ppu, unif_board ? unif_board->mmc_hblank : NULL);
+	
+	err = unif_initialize(machine, unif_board->board_idx);
+	
+	return err;
 }

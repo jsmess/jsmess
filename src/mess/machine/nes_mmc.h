@@ -1,60 +1,16 @@
 #ifndef __MMC_H
 #define __MMC_H
 
-typedef struct __mmc_intf
-{
-	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
-	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
-	write8_space_func mmc_write_mid; /* $6000-$7fff write routine */
-	write8_space_func mmc_write; /* $8000-$ffff write routine */
-} mmc_intf;
-
-typedef struct __mmc
-{
-	int iNesMapper; /* iNES Mapper # */
-
-	const char *desc;     /* Mapper description */
-	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
-	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
-	write8_space_func mmc_write_mid; /* $6000-$7fff write routine */
-	write8_space_func mmc_write; /* $8000-$ffff write routine */
-	void (*ppu_latch)(running_device *device, offs_t offset);
-	ppu2c0x_scanline_cb		mmc_scanline;
-	ppu2c0x_hblank_cb		mmc_hblank;
-} mmc;
-
-const mmc *nes_mapper_lookup(int mapper);
-
-typedef struct __unif
-{
-	const char *board; /* UNIF board */
-
-	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
-	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
-	write8_space_func mmc_write_mid; /* $6000-$7fff write routine */
-	write8_space_func mmc_write; /* $8000-$ffff write routine */
-	void (*ppu_latch)(running_device *device, offs_t offset);
-	ppu2c0x_scanline_cb		mmc_scanline;
-	ppu2c0x_hblank_cb		mmc_hblank;
-
-	int prgrom;
-	int chrrom;
-	int nvwram;
-	int wram;
-	int chrram;
-	int nt;
-	int board_idx;
-} unif;
-
-const unif *nes_unif_lookup(const char *board);
-
 //extern int MMC1_extended; /* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
 
 #define MMC5_VRAM
 
-void nes_mapper_init( const mmc_intf *intf );
-int nes_mapper_reset( running_machine *machine, int mapperNum );
-int nes_unif_reset( running_machine *machine, const char *board );
+int nes_mapper_reset(running_machine *machine);
+int nes_unif_reset(running_machine *machine);
+
+void mapper_handlers_setup(running_machine *machine);
+void unif_handlers_setup(running_machine *machine);
+void unif_mapr_setup(running_machine *machine, const char *board);
 
 WRITE8_HANDLER( nes_low_mapper_w );
 WRITE8_HANDLER( nes_mid_mapper_w );
