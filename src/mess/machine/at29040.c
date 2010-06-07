@@ -269,12 +269,16 @@ UINT8 at29c040a_r(int id, offs_t offset)
 }
 
 /*
-    write a byte to FEEPROM
+    Write a byte to FEEPROM
 */
 void at29c040a_w(int id, offs_t offset, UINT8 data)
 {
 	offset &= ADDRESS_MASK;
-
+	
+	/* The special CFI commands assume a smaller address space according */
+	/* to the specification ("address format A14-A0") */
+	offs_t cfi_offset = offset & 0x7fff;
+	
 	if (at29c040a[id].s_enabling_bbl)
 	{
 		at29c040a[id].s_enabling_bbl = FALSE;
@@ -296,7 +300,7 @@ void at29c040a_w(int id, offs_t offset, UINT8 data)
 	switch (at29c040a[id].s_cmd)
 	{
 	case s_cmd_0:
-		if ((offset == 0x5555) && (data == 0xaa))
+		if ((cfi_offset == 0x5555) && (data == 0xaa))
 			at29c040a[id].s_cmd = s_cmd_1;
 		else
 		{
@@ -306,7 +310,7 @@ void at29c040a_w(int id, offs_t offset, UINT8 data)
 		break;
 
 	case s_cmd_1:
-		if ((offset == 0x2aaa) && (data == 0x55))
+		if ((cfi_offset == 0x2aaa) && (data == 0x55))
 			at29c040a[id].s_cmd = s_cmd_2;
 		else
 		{
@@ -316,7 +320,7 @@ void at29c040a_w(int id, offs_t offset, UINT8 data)
 		break;
 
 	case s_cmd_2:
-		if (offset == 0x5555)
+		if (cfi_offset == 0x5555)
 		{
 			/* exit programming mode */
 			at29c040a[id].s_pgm = s_pgm_0;
