@@ -216,7 +216,7 @@ ADDRESS_MAP_END
 /* ti99/8 : 54-key keyboard */
 static INPUT_PORTS_START(ti99_8)
 	PORT_START( "SPEECH" )
-	PORT_CONFNAME( 0x01, 0x00, "Speech synthesizer" )
+	PORT_CONFNAME( 0x01, 0x01, "Speech synthesizer" )
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 

@@ -106,12 +106,12 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START(ti99_4p)
 
 	PORT_START( "SPEECH" )
-	PORT_CONFNAME( 0x01, 0x00, "Speech synthesizer" )
+	PORT_CONFNAME( 0x01, 0x01, "Speech synthesizer" )
 		PORT_CONFSETTING( 0x00, DEF_STR( Off ) )
 		PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 
 	PORT_START( "DISKCTRL" )
-	PORT_CONFNAME( 0x07, 0x00, "Disk controller" )
+	PORT_CONFNAME( 0x07, 0x03, "Disk controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
 		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
@@ -133,9 +133,9 @@ static INPUT_PORTS_START(ti99_4p)
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
 
 	PORT_START( "EXTCARD" )
-	PORT_CONFNAME( 0x02, 0x00, "P-Code card" )
+	PORT_CONFNAME( 0x04, 0x00, "P-Code card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+		PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 
 	PORT_START( "HCI" )
 	PORT_CONFNAME( 0x01, 0x00, "Mouse support" )

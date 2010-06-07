@@ -261,7 +261,7 @@ static INPUT_PORTS_START(geneve)
 		PORT_CONFSETTING( 0x01, DEF_STR( On ) )
 
 	PORT_START( "DISKCTRL" )
-	PORT_CONFNAME( 0x07, 0x00, "Disk controller" )
+	PORT_CONFNAME( 0x07, 0x03, "Disk controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI SD Floppy Controller" )
 		PORT_CONFSETTING(    0x02, "SNUG BwG Controller" )
