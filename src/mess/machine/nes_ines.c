@@ -11927,11 +11927,6 @@ int nes_mapper_reset( running_machine *machine )
 	int err = 0, i;
 	const mmc *mapper;
 	
-	if (state->chr_chunks == 0)
-		chr8(machine, 0, CHRRAM);
-	else
-		chr8(machine, 0, CHRROM);
-	
 	/* Set the mapper irq callback */
 	mapper = nes_mapper_lookup(state->mapper);
 	
@@ -11941,6 +11936,11 @@ int nes_mapper_reset( running_machine *machine )
 	
 	ppu2c0x_set_scanline_callback(state->ppu, mapper ? mapper->mmc_scanline : NULL);
 	ppu2c0x_set_hblank_callback(state->ppu, mapper ? mapper->mmc_hblank : NULL);
+	
+	if (state->chr_chunks == 0)
+		chr8(machine, 0, CHRRAM);
+	else
+		chr8(machine, 0, CHRROM);
 	
 	state->mmc5_vram_control = 0;
 	

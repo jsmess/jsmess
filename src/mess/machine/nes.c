@@ -142,11 +142,7 @@ static void init_nes_core( running_machine *machine )
 	{
 		mapper_handlers_setup(machine);
 	}
-	else if (state->format == 2)
-	{
-		unif_handlers_setup(machine);
-	}
-	else if (state->format == 3)
+	else if (state->format == 3 || state->format == 2)
 	{
 		pcb_handlers_setup(machine);
 	}
@@ -164,15 +160,12 @@ MACHINE_RESET( nes )
 
 	/* Some carts have extra RAM and require it on at startup, e.g. Metroid */
 	state->mid_ram_enable = 1;
-
+	
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	if (state->format == 1)
 		nes_mapper_reset(machine);
 
-	if (state->format == 2)
-		nes_unif_reset(machine);
-	
-	if (state->format == 3)
+	if (state->format == 2 || state->format == 3)
 		nes_pcb_reset(machine);
 
 	/* Reset the serial input ports */
@@ -699,6 +692,13 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			char unif_mapr[32];	// here we should store MAPR chunks
 			UINT32 size = image_length(image);
 			int mapr_chunk_found = 0;
+			// allocate space to temporarily store PRG & CHR banks
+			UINT8 *temp_prg = auto_alloc_array(image->machine, UINT8, 256 * 0x4000);
+			UINT8 *temp_chr = auto_alloc_array(image->machine, UINT8, 256 * 0x2000);
+
+			/* init prg/chr chunks to 0: the exact number of chunks will be determined while reading the file */
+			state->prg_chunks = 0;
+			state->chr_chunks = 0;
 
 			state->format = 2;	// we use this to select between mapper_reset / unif_reset
 
@@ -737,27 +737,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 						// find out prg/chr size, battery, wram, etc.
 						unif_mapr_setup(image->machine, unif_mapr);
-
-						/* Free the regions that were allocated by the ROM loader */
-						memory_region_free(image->machine, "maincpu");
-						memory_region_free(image->machine, "gfx1");
-
-						/* Allocate them again with the large enough size */
-						prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
-						memory_region_alloc(image->machine, "maincpu", 0x10000 + prg_size, 0);
-						if (state->chr_chunks)
-							memory_region_alloc(image->machine, "gfx1", state->chr_chunks * 0x2000, 0);
-
-						state->rom = memory_region(image->machine, "maincpu");
-						state->vrom = memory_region(image->machine, "gfx1");
-						state->vram = memory_region(image->machine, "gfx2");
-						// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->prg_ram = 1)!
-						state->wram_size = 0x10000;
-						state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
-
-						/* reset prg/chr chunks: the exact number of chunks will be determined while reading the file */
-						state->prg_chunks = 0;
-						state->chr_chunks = 0;
 
 						/* now that we found the MAPR chunk, we can go back to load other chunks */
 						image_fseek(image, 0x20, SEEK_SET);
@@ -888,7 +867,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 							logerror("This chunk is smaller than 16K: the emulation might have issues. Please report this file to the MESS forums.\n");
 
 						/* Read in the program chunks */
-						image_fread(image, &state->rom[0x10000 + prg_start], chunk_length);
+						image_fread(image, &temp_prg[prg_start], chunk_length);
 
 						prg_start += chunk_length;
 						read_length += (chunk_length + 8);
@@ -904,7 +883,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 						logerror("It consists of %d 8K-blocks.\n", chunk_length / 0x2000);
 
 						/* Read in the vrom chunks */
-						image_fread(image, state->vrom + chr_start, chunk_length);
+						image_fread(image, &temp_chr[chr_start], chunk_length);
 
 						chr_start += chunk_length;
 						read_length += (chunk_length + 8);
@@ -918,11 +897,38 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			} while (size > read_length);
 
 			if (!mapr_chunk_found)
+			{
+				auto_free(image->machine, temp_prg);
+				auto_free(image->machine, temp_chr);
 				fatalerror("UNIF should have a [MAPR] chunk to work. Check if your image has been corrupted");
+			}
 
+			/* Free the regions that were allocated by the ROM loader */
+			memory_region_free(image->machine, "maincpu");
+			memory_region_free(image->machine, "gfx1");
+			
+			/* Allocate them again, and copy PRG/CHR from temp buffers */
+			/* Take care of PRG */
+			prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
+			memory_region_alloc(image->machine, "maincpu", 0x10000 + prg_size, 0);
+			state->rom = memory_region(image->machine, "maincpu");
+			memcpy(&state->rom[0x10000], &temp_prg[0x00000], state->prg_chunks * 0x4000);
 			/* If only a single 16K PRG chunk is present, mirror it! */
 			if (state->prg_chunks == 1)
 				memcpy(&state->rom[0x14000], &state->rom[0x10000], 0x4000);
+
+			/* Take care of CHR */
+			if (state->chr_chunks)
+			{
+				memory_region_alloc(image->machine, "gfx1", state->chr_chunks * 0x2000, 0);
+				state->vrom = memory_region(image->machine, "gfx1");
+				memcpy(&state->vrom[0x00000], &temp_prg[0x00000], state->chr_chunks * 0x2000);
+			}
+
+			state->vram = memory_region(image->machine, "gfx2");
+			// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->prg_ram = 1)!
+			state->wram_size = 0x10000;
+			state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
 				
 #if SPLIT_PRG
 			{
@@ -957,7 +963,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				fclose(chrout);
 			}
 #endif
-			
+			// free the temporary copy of PRG/CHR
+			auto_free(image->machine, temp_prg);
+			auto_free(image->machine, temp_chr);			
 			logerror("UNIF support is only very preliminary.\n");
 		}
 		else
@@ -999,9 +1007,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->prg_chunks = prg_size / 0x4000;
 		state->chr_chunks = chr_size / 0x2000;
 
-		state->format = 3;		// temporarily treat this as a unif file
+		state->format = 3;
 		state->mapper = 0;		// this allows us to set up memory handlers without duplicating code (for the moment)
-		state->board = image_get_feature(image);
+		state->pcb_id = nes_get_pcb_id(image->machine, image_get_feature(image));
 
 		state->battery = (image_get_software_region(image, "bwram") != NULL) ? 1 : 0;
 		state->battery_size = image_get_software_region_length(image, "bwram");
@@ -1012,7 +1020,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
 
 #if 1
-		printf("PCB Feature: %s\n", state->board);
+		printf("PCB Feature: %s\n", image_get_feature(image));
 		printf("PRG chunks: %d\n", state->prg_chunks);
 		printf("CHR chunks: %d\n", state->chr_chunks);
 		printf("NVWRAM: Present %s, size: %d\n", state->battery ? "Yes" : "No", state->battery_size);

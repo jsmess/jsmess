@@ -204,7 +204,7 @@ public:
 
 	/* system variables which don't change at run-time */
 	UINT16 mapper;		// for iNES
-	const char *board;	// for UNIF
+	UINT16 pcb_id;		// for UNIF & xml
 	UINT8 four_screen_vram;
 	UINT8 hard_mirroring;
 	UINT8 slow_banking;

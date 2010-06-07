@@ -15,16 +15,6 @@ typedef struct __unif
 {
 	const char *board; /* UNIF board */
 	
-	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
-	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
-	write8_space_func mmc_write_mid; /* $6000-$7fff write routine */
-	write8_space_func mmc_write; /* $8000-$ffff write routine */
-	void (*ppu_latch)(running_device *device, offs_t offset);
-	ppu2c0x_scanline_cb		mmc_scanline;
-	ppu2c0x_hblank_cb		mmc_hblank;
-	
-	int prgrom;
-	int chrrom;
 	int nvwram;
 	int wram;
 	int chrram;
@@ -836,80 +826,80 @@ enum
 static const unif unif_list[] =
 {
 /*       UNIF                       LOW_W, LOW_R, MED_W, HIGH_W, PPU_latch, scanline CB, hblank CB     PRG  CHR  NVW  WRAM  CRAM       NMT    IDX*/
-	{ "DREAMTECH01",                dreamtech_l_w, NULL, NULL, NULL, NULL, NULL, NULL,            16,    0,   0,   0,  CHRRAM_8, NT_X,  DREAMTECH_BOARD},		//UNIF only!
-	{ "NES-ANROM",                  NULL, NULL, NULL, mapper7_w, NULL, NULL, NULL,                 8,    0,   0,    0, CHRRAM_8,  NT_Y,  STD_AXROM},
-	{ "NES-AOROM",                  NULL, NULL, NULL, mapper7_w, NULL, NULL, NULL,                16,    0,   0,    0, CHRRAM_8,  NT_Y,  STD_AXROM},
-	{ "NES-CNROM",                  NULL, NULL, NULL, mapper3_w, NULL, NULL, NULL,        2,    4,   0,    0, CHRRAM_0,  NT_X,  STD_CNROM},
-	{ "NES-NROM",                   NULL, NULL, NULL, NULL, NULL, NULL, NULL,                            2,    1,   0,    0, CHRRAM_0,  NT_X,  STD_NROM},
-	{ "NES-NROM-128",               NULL, NULL, NULL, NULL, NULL, NULL, NULL,                            2,    1,   0,    0, CHRRAM_0,  NT_X,  STD_NROM},
-	{ "NES-NROM-256",               NULL, NULL, NULL, NULL, NULL, NULL, NULL,                            2,    1,   0,    0, CHRRAM_0,  NT_X,  STD_NROM},
-	{ "NES-NTBROM",                 NULL, NULL, NULL, mapper68_w, NULL, NULL, NULL,                     16,   16,   8,    0, CHRRAM_0,  NT_VERT,  STD_NXROM},
-	{ "NES-SLROM",                  NULL, NULL, NULL, mapper1_w, NULL, NULL, NULL,               16,   16,   0,    0, CHRRAM_0,  NT_HORZ,  STD_SXROM},
-	{ "NES-TBROM",                  NULL, NULL, NULL, mapper4_w, NULL, NULL, mapper4_irq,        4,    8,   0,    0, CHRRAM_0,  NT_X,  STD_TXROM},
-	{ "NES-TFROM",                  NULL, NULL, NULL, mapper4_w, NULL, NULL, mapper4_irq,       32,    8,   0,    0, CHRRAM_0,  NT_X,  STD_TXROM},
-	{ "NES-TKROM",                  NULL, NULL, NULL, mapper4_w, NULL, NULL, mapper4_irq,       32,   32,   8,    0, CHRRAM_0,  NT_X,  STD_TXROM},
-	{ "NES-TLROM",                  NULL, NULL, NULL, mapper4_w, NULL, NULL, mapper4_irq,       32,   32,   0,    0, CHRRAM_0,  NT_X,  STD_TXROM},
-	{ "NES-UOROM",                  NULL, NULL, NULL, mapper2_w, NULL, NULL, NULL,              16,    0,    0,   0, CHRRAM_8,  NT_X,  STD_UXROM},
-	{ "UNL-22211",                  mapper132_l_w, mapper132_l_r, NULL, mapper132_w, NULL, NULL, NULL,  4,   4,    0,    0, CHRRAM_0,  NT_X,  TXC_22211A},
+	{ "DREAMTECH01",                0,    0, CHRRAM_8,  NT_X,  DREAMTECH_BOARD},		//UNIF only!
+	{ "NES-ANROM",                  0,    0, CHRRAM_8,  NT_Y,  STD_AXROM},
+	{ "NES-AOROM",                  0,    0, CHRRAM_8,  NT_Y,  STD_AXROM},
+	{ "NES-CNROM",                  0,    0, CHRRAM_0,  NT_X,  STD_CNROM},
+	{ "NES-NROM",                   0,    0, CHRRAM_0,  NT_X,  STD_NROM},
+	{ "NES-NROM-128",               0,    0, CHRRAM_0,  NT_X,  STD_NROM},
+	{ "NES-NROM-256",               0,    0, CHRRAM_0,  NT_X,  STD_NROM},
+	{ "NES-NTBROM",                 8,    0, CHRRAM_0,  NT_VERT,  STD_NXROM},
+	{ "NES-SLROM",                  0,    0, CHRRAM_0,  NT_HORZ,  STD_SXROM},
+	{ "NES-TBROM",                  0,    0, CHRRAM_0,  NT_X,  STD_TXROM},
+	{ "NES-TFROM",                  0,    0, CHRRAM_0,  NT_X,  STD_TXROM},
+	{ "NES-TKROM",                  8,    0, CHRRAM_0,  NT_X,  STD_TXROM},
+	{ "NES-TLROM",                  0,    0, CHRRAM_0,  NT_X,  STD_TXROM},
+	{ "NES-UOROM",                  0,    0, CHRRAM_8,  NT_X,  STD_UXROM},
+	{ "UNL-22211",                  0,    0, CHRRAM_0,  NT_X,  TXC_22211A},
 	// mapper 172 & 173 are variant of this one... no UNIF?
-	{ "UNL-KOF97",                  NULL, NULL, NULL, unl_kof97_w, NULL, NULL, mapper4_irq,       32, 32,   0,   0,  CHRRAM_0, NT_X,  UNL_KOF97},
-	{ "UNL-SA-NROM",                NULL, mapper143_l_r, NULL, NULL, NULL, NULL, NULL,                  2,    1,   0,    0, CHRRAM_0,  NT_X,  SACHEN_TCA01},
-	{ "UNL-VRC7",                   NULL, NULL, NULL, konami_vrc7_w, NULL, NULL, konami_irq,           32,   32,   0,    0, CHRRAM_0,  NT_VERT,  KONAMI_VRC7},
-	{ "UNL-T-230",                  NULL, NULL, NULL, unl_t230_w, NULL, NULL, konami_irq,              16,    0,   0,    0, CHRRAM_8,  NT_VERT,  UNL_T230},
-	{ "UNL-CC-21",                  NULL, NULL, NULL, unl_cc21_w, NULL, NULL, NULL,                     2,  2,   0,   0,  CHRRAM_0, NT_Y,  UNL_CC21},
-	{ "UNL-AX5705",                 NULL, NULL, NULL, unl_ax5705_w, NULL, NULL, NULL,                   8, 32,   0,   0,  CHRRAM_0, NT_X,  UNL_AX5705},
-	{ "UNL-SMB2J",                  NULL, NULL, NULL, mapper43_w, NULL, NULL, NULL,                     8,    1,   8,    8, CHRRAM_0,  NT_X,  UNL_SMB2J},
-	{ "UNL-8237",                   unl_8237_l_w, NULL, NULL, unl_8237_w, NULL, NULL, mapper4_irq,     32, 64,   0,   0,  CHRRAM_0, NT_X,  UNL_8237},
-	{ "UNL-SL1632",                 NULL, NULL, NULL, mapper14_w, NULL, NULL, mapper4_irq,             16,   64,   0,    0, CHRRAM_0,  NT_VERT,  REXSOFT_SL1632},
-	{ "UNL-SACHEN-74LS374N",        mapper150_l_w, mapper150_l_r, mapper150_m_w, NULL, NULL, NULL, NULL,4,   16,   0,    0, CHRRAM_0,  NT_X,  SACHEN_74LS374},
+	{ "UNL-KOF97",                  0,    0, CHRRAM_0,  NT_X,  UNL_KOF97},
+	{ "UNL-SA-NROM",                0,    0, CHRRAM_0,  NT_X,  SACHEN_TCA01},
+	{ "UNL-VRC7",                   0,    0, CHRRAM_0,  NT_VERT,  KONAMI_VRC7},
+	{ "UNL-T-230",                  0,    0, CHRRAM_8,  NT_VERT,  UNL_T230},
+	{ "UNL-CC-21",                  0,    0, CHRRAM_0,  NT_Y,  UNL_CC21},
+	{ "UNL-AX5705",                 0,    0, CHRRAM_0,  NT_X,  UNL_AX5705},
+	{ "UNL-SMB2J",                  8,    8, CHRRAM_0,  NT_X,  UNL_SMB2J},
+	{ "UNL-8237",                   0,    0, CHRRAM_0,  NT_X,  UNL_8237},
+	{ "UNL-SL1632",                 0,    0, CHRRAM_0,  NT_VERT,  REXSOFT_SL1632},
+	{ "UNL-SACHEN-74LS374N",        0,    0, CHRRAM_0,  NT_X,  SACHEN_74LS374},
 	// mapper 243 variant exists! how to distinguish?!?  mapper243_l_w, NULL, NULL, NULL, NULL, NULL, NULL (also uses NT_VERT!)
-	{ "UNL-TC-U01-1.5M",            mapper147_l_w, NULL, mapper147_m_w, mapper147_w, NULL, NULL, NULL,  8,   16,   0,    0, CHRRAM_0,  NT_X,  SACHEN_TCU01},
-	{ "UNL-SACHEN-8259C",           mapper139_l_w, NULL, mapper139_m_w, NULL, NULL, NULL, NULL,        16,   32,   0,    0, CHRRAM_0,  NT_X,  SACHEN_8259C},
-	{ "UNL-SA-016-1M",              mapper79_l_w, NULL, NULL, NULL, NULL, NULL, NULL,                   4,    8,   0,    0, CHRRAM_0,  NT_X,  AVE_NINA06},	// actually this is Mapper 146, but works like 79!
-	{ "UNL-SACHEN-8259D",           mapper137_l_w, NULL, mapper137_m_w, NULL, NULL, NULL, NULL,        16,   32,   0,    0, CHRRAM_0,  NT_X,  SACHEN_8259D},
-	{ "UNL-SA-72007",               mapper145_l_w, NULL, NULL, NULL, NULL, NULL, NULL,                  1,    2,   0,    0, CHRRAM_0,  NT_X,  SACHEN_SA72007},
-	{ "UNL-SA-72008",               mapper133_l_w, NULL, mapper133_m_w, NULL, NULL, NULL, NULL,         4,    4,   0,    0, CHRRAM_0,  NT_X,  SACHEN_SA72008},
-	{ "UNL-SA-0037",                NULL, NULL, NULL, mapper148_w, NULL, NULL, NULL,                    4,    8,   0,    0, CHRRAM_0,  NT_X,  SACHEN_SA0037},
-	{ "UNL-SA-0036",                NULL, NULL, NULL, mapper149_w, NULL, NULL, NULL,                    2,    2,   0,    0, CHRRAM_0,  NT_X,  SACHEN_SA0036},
-	{ "UNL-SACHEN-8259A",           mapper141_l_w, NULL, mapper141_m_w, NULL, NULL, NULL, NULL,        16,   32,   0,    0, CHRRAM_0,  NT_X,  SACHEN_8259A},
-	{ "UNL-SACHEN-8259B",           mapper138_l_w, NULL, mapper138_m_w, NULL, NULL, NULL, NULL,        16,   32,   0,    0, CHRRAM_0,  NT_X,  SACHEN_8259B},
-	{ "BMC-190IN1",                 NULL, NULL, NULL, bmc_190in1_w, NULL, NULL, NULL,        8,   8,   0,   0,  CHRRAM_0, NT_VERT,  BMC_190IN1},
-	{ "BMC-64IN1NOREPEAT",          bmc_64in1nr_l_w, NULL, NULL, bmc_64in1nr_w, NULL, NULL, NULL,        64,  64,   0,   0,  CHRRAM_0, NT_VERT,  BMC_64IN1NR},		//UNIF only!
-	{ "BMC-A65AS",                  NULL, NULL, NULL, bmc_a65as_w, NULL, NULL, NULL,        32,   0,   0,   0,  CHRRAM_8, NT_VERT,  BMC_A65AS},		//UNIF only!
-	{ "BMC-GS-2004",                NULL, NULL, NULL, bmc_gs2004_w, NULL, NULL, NULL,        32,   0,   0,   0,  CHRRAM_8, NT_X,  BMC_GS2004},		//UNIF only!
-	{ "BMC-GS-2013",                NULL, NULL, NULL, bmc_gs2013_w, NULL, NULL, NULL,        32,   0,   0,   0,  CHRRAM_8, NT_X,  BMC_GS2013},		//UNIF only!
-	{ "BMC-NOVELDIAMOND9999999IN1", NULL, NULL, NULL, mapper54_w, NULL, NULL, NULL,           8,   8,   0,   0,  CHRRAM_0, NT_X,  BMC_NOVELDIAMOND},
-	{ "BMC-SUPER24IN1SC03",         bmc_s24in1sc03_l_w, NULL, NULL, bmc_s24in1sc03_w, NULL, NULL, mapper4_irq,     256, 256,   8,   0,  CHRRAM_8, NT_X,  BMC_S24IN1SC03},
-	{ "BMC-SUPERHIK8IN1",           NULL, NULL, mapper45_m_w, mapper4_w, NULL, NULL, mapper4_irq, 256,  256,   8,    0, CHRRAM_0,  NT_X,  BMC_HIK8IN1},
-	{ "BMC-T-262",                  NULL, NULL, NULL, bmc_t262_w, NULL, NULL, NULL,        64,   0,   0,   0,  CHRRAM_8, NT_VERT,  BMC_T262},		//UNIF only!
-	{ "BMC-WS",                     NULL, NULL, bmc_ws_m_w, NULL, NULL, NULL, NULL,         8,   8,   0,   0,  CHRRAM_0, NT_VERT,  BMC_WS},		//UNIF only!	
-	{ "BMC-N625092",                NULL, NULL, NULL, mapper221_w, NULL, NULL, NULL,                   64,    1,   0,    0, CHRRAM_0,  NT_VERT,  UNL_N625092},
+	{ "UNL-TC-U01-1.5M",            0,    0, CHRRAM_0,  NT_X,  SACHEN_TCU01},
+	{ "UNL-SACHEN-8259C",           0,    0, CHRRAM_0,  NT_X,  SACHEN_8259C},
+	{ "UNL-SA-016-1M",              0,    0, CHRRAM_0,  NT_X,  AVE_NINA06},	// actually this is Mapper 146, but works like 79!
+	{ "UNL-SACHEN-8259D",           0,    0, CHRRAM_0,  NT_X,  SACHEN_8259D},
+	{ "UNL-SA-72007",               0,    0, CHRRAM_0,  NT_X,  SACHEN_SA72007},
+	{ "UNL-SA-72008",               0,    0, CHRRAM_0,  NT_X,  SACHEN_SA72008},
+	{ "UNL-SA-0037",                0,    0, CHRRAM_0,  NT_X,  SACHEN_SA0037},
+	{ "UNL-SA-0036",                0,    0, CHRRAM_0,  NT_X,  SACHEN_SA0036},
+	{ "UNL-SACHEN-8259A",           0,    0, CHRRAM_0,  NT_X,  SACHEN_8259A},
+	{ "UNL-SACHEN-8259B",           0,    0, CHRRAM_0,  NT_X,  SACHEN_8259B},
+	{ "BMC-190IN1",                 0,    0, CHRRAM_0,  NT_VERT,  BMC_190IN1},
+	{ "BMC-64IN1NOREPEAT",          0,    0, CHRRAM_0,  NT_VERT,  BMC_64IN1NR},		//UNIF only!
+	{ "BMC-A65AS",                  0,    0, CHRRAM_8,  NT_VERT,  BMC_A65AS},		//UNIF only!
+	{ "BMC-GS-2004",                0,    0, CHRRAM_8,  NT_X,  BMC_GS2004},		//UNIF only!
+	{ "BMC-GS-2013",                0,    0, CHRRAM_8,  NT_X,  BMC_GS2013},		//UNIF only!
+	{ "BMC-NOVELDIAMOND9999999IN1", 0,    0, CHRRAM_0,  NT_X,  BMC_NOVELDIAMOND},
+	{ "BMC-SUPER24IN1SC03",         8,    0, CHRRAM_8,  NT_X,  BMC_S24IN1SC03},
+	{ "BMC-SUPERHIK8IN1",           8,    0, CHRRAM_0,  NT_X,  BMC_HIK8IN1},
+	{ "BMC-T-262",                  0,    0, CHRRAM_8,  NT_VERT,  BMC_T262},		//UNIF only!
+	{ "BMC-WS",                     0,    0, CHRRAM_0,  NT_VERT,  BMC_WS},		//UNIF only!	
+	{ "BMC-N625092",                0,    0, CHRRAM_0,  NT_VERT,  UNL_N625092},
 	// below are boards which are not yet supported, but are used by some UNIF files. they are here as a reminder to what is missing to be added
-	{ "UNL-TEK90",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// related to JY Company? (i.e. mappers 90, 209, 211?)
-	{ "UNL-KS7017",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
-	{ "UNL-KS7032",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, //  mapper 142
-	{ "UNL-DANCE",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
-	{ "UNL-603-5052",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, 0,  0,  UNSUPPORTED_BOARD}, // mapper 238?
-	{ "UNL-EDU2000",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   64,  0,  32,   0,  CHRRAM_8, NT_Y, UNSUPPORTED_BOARD /*UNL_EDU2K*/},
-	{ "UNL-H2288",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 123
-	{ "UNL-SHERO",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   32,  64,   0,   0,  CHRRAM_8, NT_4SCR_2K, UNSUPPORTED_BOARD /*SACHEN_SHERO*/},
-	{ "UNL-TF1201",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   16,  32,   0,   0,  CHRRAM_0, NT_VERT, UNSUPPORTED_BOARD /*UNL_TF1201*/},
-	{ "UNL-DRIPGAME",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, // [by Quietust - we need more info]}
-	{ "BTL-MARIO1-MALEE2",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 55?
-	{ "BMC-FK23C",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   64, 128,   0,   0,  CHRRAM_0, NT_X, UNSUPPORTED_BOARD /*BMC_FK23C*/},
-	{ "BMC-FK23CA",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   64, 128,   0,   0,  CHRRAM_0, NT_X, UNSUPPORTED_BOARD /*BMC_FK23C*/},	// diff reg init
-	{ "BMC-GHOSTBUSTERS63IN1",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   128,   0,   0,   0,  CHRRAM_8, NT_HORZ, UNSUPPORTED_BOARD /*BMC_G63IN1*/},
-	{ "BMC-BS-5",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   8,   8,   0,   0,  CHRRAM_0, NT_VERT, UNSUPPORTED_BOARD /*BENSHENG_BS5*/},
-	{ "BMC-810544-C-A1",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
-	{ "BMC-411120-C",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
-	{ "BMC-8157",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   32,   0,   0,   0,  CHRRAM_8, NT_VERT, UNSUPPORTED_BOARD /*BMC_8157*/},
-	{ "BMC-42IN1RESETSWITCH",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 60?
-	{ "BMC-830118C",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
-	{ "BMC-D1038",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, // mapper 60?
-	{ "BMC-12-IN-1",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
-	{ "BMC-70IN1",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 236?
-	{ "BMC-70IN1B",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 236?
-	{ "BMC-SUPERVISION16IN1",    NULL, NULL, NULL, NULL, NULL, NULL, NULL,   256,    128,   0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 53
+	{ "UNL-TEK90",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// related to JY Company? (i.e. mappers 90, 209, 211?)
+	{ "UNL-KS7017",                 0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
+	{ "UNL-KS7032",                 0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, //  mapper 142
+	{ "UNL-DANCE",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
+	{ "UNL-603-5052",               0,    0, 0,         0,     UNSUPPORTED_BOARD}, // mapper 238?
+	{ "UNL-EDU2000",               32,    0, CHRRAM_8,  NT_Y,  UNSUPPORTED_BOARD /*UNL_EDU2K*/},
+	{ "UNL-H2288",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 123
+	{ "UNL-SHERO",                  0,    0, CHRRAM_8,  NT_4SCR_2K, UNSUPPORTED_BOARD /*SACHEN_SHERO*/},
+	{ "UNL-TF1201",                 0,    0, CHRRAM_0,  NT_VERT, UNSUPPORTED_BOARD /*UNL_TF1201*/},
+	{ "UNL-DRIPGAME",               0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, // [by Quietust - we need more info]}
+	{ "BTL-MARIO1-MALEE2",          0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 55?
+	{ "BMC-FK23C",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD /*BMC_FK23C*/},
+	{ "BMC-FK23CA",                 0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD /*BMC_FK23C*/},	// diff reg init
+	{ "BMC-GHOSTBUSTERS63IN1",      0,    0, CHRRAM_8,  NT_HORZ, UNSUPPORTED_BOARD /*BMC_G63IN1*/},
+	{ "BMC-BS-5",                   0,    0, CHRRAM_0,  NT_VERT, UNSUPPORTED_BOARD /*BENSHENG_BS5*/},
+	{ "BMC-810544-C-A1",            0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
+	{ "BMC-411120-C",               0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
+	{ "BMC-8157",                   0,    0, CHRRAM_8,  NT_VERT, UNSUPPORTED_BOARD /*BMC_8157*/},
+	{ "BMC-42IN1RESETSWITCH",       0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 60?
+	{ "BMC-830118C",                0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
+	{ "BMC-D1038",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, // mapper 60?
+	{ "BMC-12-IN-1",                0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
+	{ "BMC-70IN1",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 236?
+	{ "BMC-70IN1B",                 0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 236?
+	{ "BMC-SUPERVISION16IN1",       0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 53
 };
 
 const unif *nes_unif_lookup( const char *board )
@@ -1514,68 +1504,12 @@ static int unif_initialize( running_machine *machine, int idx )
 
 /*************************************************************
  
- nes_unif_reset
- 
- Resets the mapper bankswitch areas to their defaults.
- It returns a value "err" that indicates if it was
- successful. Possible values for err are:
- 
- 0 = success
- 1 = no mapper found
- 2 = mapper not supported
- 
+ unif_mapr_setup
+
+ setup the board specific variables (wram, nvwram, pcb_id etc.)
+ for a given board (after reading the MAPR chunk of the UNIF file)
+
  *************************************************************/
-
-int nes_unif_reset( running_machine *machine )
-{
-	nes_state *state = (nes_state *)machine->driver_data;
-	int err = 0;
-	const unif *unif_board = nes_unif_lookup(state->board);
-	
-	if (unif_board == NULL)
-		fatalerror("Unimplemented UNIF Board\n");
-	
-	if (state->chr_chunks == 0)
-		chr8(machine, 0, CHRRAM);
-	else
-		chr8(machine, 0, CHRROM);
-	
-	/* Set the mapper irq callback */
-	ppu2c0x_set_scanline_callback(state->ppu, unif_board ? unif_board->mmc_scanline : NULL);
-	ppu2c0x_set_hblank_callback(state->ppu, unif_board ? unif_board->mmc_hblank : NULL);
-	
-	err = unif_initialize(machine, unif_board->board_idx);
-	
-	return err;
-}
-
-void unif_handlers_setup( running_machine *machine )
-{
-	nes_state *state = (nes_state *)machine->driver_data;
-	const unif *board = nes_unif_lookup(state->board);
-	
-	if (board)
-	{
-		state->mmc_write_low = board->mmc_write_low;
-		state->mmc_write_mid = board->mmc_write_mid;
-		state->mmc_write = board->mmc_write;
-		state->mmc_read_low = board->mmc_read_low;
-		state->mmc_read_mid = NULL;	// in progress
-		state->mmc_read = NULL;	// in progress
-		ppu_latch = board->ppu_latch;
-	}
-	else
-	{
-		logerror("Board %s is not yet supported, defaulting to no mapper.\n", state->board);
-		state->mmc_write_low = NULL;
-		state->mmc_write_mid = NULL;
-		state->mmc_write = NULL;
-		state->mmc_read_low = NULL;
-		state->mmc_read_mid = NULL;	// in progress
-		state->mmc_read = NULL;	// in progress
-		ppu_latch = NULL;
-	}
-}
 
 void unif_mapr_setup( running_machine *machine, const char *board )
 {
@@ -1588,15 +1522,10 @@ void unif_mapr_setup( running_machine *machine, const char *board )
 		fatalerror("Unknown UNIF board %s.", board);
 	
 	state->mapper = 0;	// this allows us to set up memory handlers without duplicating code (for the moment)
-	state->board = unif_board->board;
+	state->pcb_id = unif_board->board_idx;
 	state->battery = unif_board->nvwram;	// we should implement WRAM banks based on the size of this...
 	state->battery_size = NES_BATTERY_SIZE; // FIXME: we should allow for smaller battery!
 	state->prg_ram = unif_board->wram;	// we should implement WRAM banks based on the size of this...
 	// state->hard_mirroring = unif_board->nt;
 	// state->four_screen_vram = ;
-	
-	// these are just "large enough" values, needed to allocate sufficient amount of memory regions
-	// the real values will be determined by PRG and CHR chunks loading!
-	state->prg_chunks = unif_board->prgrom;
-	state->chr_chunks = unif_board->chrrom;
 }
