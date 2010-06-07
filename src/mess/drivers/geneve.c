@@ -271,7 +271,7 @@ static INPUT_PORTS_START(geneve)
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+//		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
 //      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -526,9 +526,9 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
+/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
 
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
 
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", geneve_mm58274c_interface)

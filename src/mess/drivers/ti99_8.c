@@ -231,7 +231,7 @@ static INPUT_PORTS_START(ti99_8)
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+//		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
 //      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -242,13 +242,15 @@ static INPUT_PORTS_START(ti99_8)
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
 
+	/* Flash setting is used to flash an empty HSGPL DSR ROM */ 
 	PORT_START( "EXTCARD" )
-	PORT_CONFNAME( 0x01, 0x00, "HSGPL extension" )
+	PORT_CONFNAME( 0x03, 0x00, "HSGPL extension" ) PORT_CHANGED( hsgpl_changed, NULL)
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x00, "P-Code card" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING(    0x01, "Flash" )
 		PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x00, "P-Code card" )
+		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 
 	PORT_START( "HCI" )
 	PORT_CONFNAME( 0x01, 0x00, "Mouse support" )
@@ -541,6 +543,9 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_MACHINE_START( ti99_8_60hz )
 	MDRV_MACHINE_RESET( ti99 )
 
+	/* For HSGPL */
+	MDRV_NVRAM_HANDLER( ti99 )
+
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
@@ -559,8 +564,8 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
+/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
@@ -612,10 +617,9 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
-	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
-
+/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
 	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)  */
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
