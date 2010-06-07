@@ -25,7 +25,8 @@
     * 000 F1 Race requires more precise PPU timing. It currently has plenty of 1-line glitches.
     * 001 AD&D Hillsfar and Bill & Ted are broken. We need to ignore the case of writes happening on 2
           consecutive CPU cycles because these games use dirty tricks to reset counters (see note in mapper1_w)
-    * 001 Yoshi flashes in-game. Zombie Hunter regressed. Rocket Ranger and Back to the Future have heavily corrupted graphics
+    * 001 Yoshi flashes in-game. Zombie Hunter regressed. Rocket Ranger and Back to the Future have heavily 
+          corrupted graphics (since forever) and Snow Bros. (J) has never worked.
     * 001, 155 We don't handle (yet) WRAM enable/disable bit
     * 002, 003, 094, 097, 152 Bus conflict?
     * 004 Mendel Palace has never worked properly
@@ -135,43 +136,6 @@
 
 #define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG_FDS(x) do { if (VERBOSE) logerror x; } while (0)
-
-
-typedef struct __mmc
-{
-	int iNesMapper; /* iNES Mapper # */
-	
-	const char *desc;     /* Mapper description */
-	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
-	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
-	write8_space_func mmc_write_mid; /* $6000-$7fff write routine */
-	write8_space_func mmc_write; /* $8000-$ffff write routine */
-	void (*ppu_latch)(running_device *device, offs_t offset);
-	ppu2c0x_scanline_cb		mmc_scanline;
-	ppu2c0x_hblank_cb		mmc_hblank;
-} mmc;
-
-typedef struct __unif
-{
-	const char *board; /* UNIF board */
-	
-	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
-	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
-	write8_space_func mmc_write_mid; /* $6000-$7fff write routine */
-	write8_space_func mmc_write; /* $8000-$ffff write routine */
-	void (*ppu_latch)(running_device *device, offs_t offset);
-	ppu2c0x_scanline_cb		mmc_scanline;
-	ppu2c0x_hblank_cb		mmc_hblank;
-	
-	int prgrom;
-	int chrrom;
-	int nvwram;
-	int wram;
-	int chrram;
-	int nt;
-	int board_idx;
-} unif;
-
 
 /*************************************************************
 
@@ -711,86 +675,10 @@ void set_nt_mirroring( running_machine *machine, int mirroring )
 
 /*************************************************************
  
-    Setting up memory handlers
+ Support for xml list
  
  *************************************************************/
 
-void mapper_handlers_setup( running_machine *machine )
-{
-	nes_state *state = (nes_state *)machine->driver_data;
-	const mmc *mapper = nes_mapper_lookup(state->mapper);
+/* Include emulation of NES PCBs for softlist */
+#include "machine/nes_pcb.c"
 
-	if (mapper)
-	{
-		state->mmc_write_low = mapper->mmc_write_low;
-		state->mmc_write_mid = mapper->mmc_write_mid;
-		state->mmc_write = mapper->mmc_write;
-		state->mmc_read_low = mapper->mmc_read_low;
-		state->mmc_read_mid = NULL;	// in progress
-		state->mmc_read = NULL;	// in progress
-		ppu_latch = mapper->ppu_latch;
-	}
-	else
-	{
-		logerror("Mapper %d is not yet supported, defaulting to no mapper.\n",state->mapper);
-		state->mmc_write_low = NULL;
-		state->mmc_write_mid = NULL;
-		state->mmc_write = NULL;
-		state->mmc_read_low = NULL;
-		state->mmc_read_mid = NULL;	// in progress
-		state->mmc_read = NULL;	// in progress
-		ppu_latch = NULL;
-	}
-}
-
-void unif_handlers_setup( running_machine *machine )
-{
-	nes_state *state = (nes_state *)machine->driver_data;
-	const unif *board = nes_unif_lookup(state->board);
-
-	if (board)
-	{
-		state->mmc_write_low = board->mmc_write_low;
-		state->mmc_write_mid = board->mmc_write_mid;
-		state->mmc_write = board->mmc_write;
-		state->mmc_read_low = board->mmc_read_low;
-		state->mmc_read_mid = NULL;	// in progress
-		state->mmc_read = NULL;	// in progress
-		ppu_latch = board->ppu_latch;
-	}
-	else
-	{
-		logerror("Board %s is not yet supported, defaulting to no mapper.\n", state->board);
-		state->mmc_write_low = NULL;
-		state->mmc_write_mid = NULL;
-		state->mmc_write = NULL;
-		state->mmc_read_low = NULL;
-		state->mmc_read_mid = NULL;	// in progress
-		state->mmc_read = NULL;	// in progress
-		ppu_latch = NULL;
-	}
-}
-
-void unif_mapr_setup( running_machine *machine, const char *board )
-{
-	nes_state *state = (nes_state *)machine->driver_data;
-	const unif *unif_board = nes_unif_lookup(board);
-
-	logerror("%s\n", board);
-	
-	if (unif_board == NULL)
-		fatalerror("Unknown UNIF board %s.", board);
-	
-	state->mapper = 0;	// this allows us to set up memory handlers without duplicating code (for the moment)
-	state->board = unif_board->board;
-	state->battery = unif_board->nvwram;	// we should implement WRAM banks based on the size of this...
-	state->battery_size = NES_BATTERY_SIZE; // FIXME: we should allow for smaller battery!
-	state->prg_ram = unif_board->wram;	// we should implement WRAM banks based on the size of this...
-	// state->hard_mirroring = unif_board->nt;
-	// state->four_screen_vram = ;
-	
-	// these are just "large enough" values, needed to allocate sufficient amount of memory regions
-	// the real values will be determined by PRG and CHR chunks loading!
-	state->prg_chunks = unif_board->prgrom;
-	state->chr_chunks = unif_board->chrrom;
-}

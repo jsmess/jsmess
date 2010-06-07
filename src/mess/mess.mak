@@ -1695,6 +1695,7 @@ $(MESS_VIDEO)/gba.o:		$(MESSSRC)/video/gbamode0.c \
 				$(MESSSRC)/video/gbam345.c
 
 $(MESS_MACHINE)/nes_mmc.o:	$(MESSSRC)/machine/nes_ines.c \
+				$(MESSSRC)/machine/nes_pcb.c \
 				$(MESSSRC)/machine/nes_unif.c \
 
 

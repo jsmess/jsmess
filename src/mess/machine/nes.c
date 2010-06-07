@@ -146,6 +146,10 @@ static void init_nes_core( running_machine *machine )
 	{
 		unif_handlers_setup(machine);
 	}
+	else if (state->format == 3)
+	{
+		pcb_handlers_setup(machine);
+	}
 }
 
 // to be probably removed (it does nothing since a long time)
@@ -168,6 +172,9 @@ MACHINE_RESET( nes )
 	if (state->format == 2)
 		nes_unif_reset(machine);
 	
+	if (state->format == 3)
+		nes_pcb_reset(machine);
+
 	/* Reset the serial input ports */
 	state->in_0.shift = 0;
 	state->in_1.shift = 0;
@@ -992,7 +999,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->prg_chunks = prg_size / 0x4000;
 		state->chr_chunks = chr_size / 0x2000;
 
-		state->format = 2;		// temporarily treat this as a unif file
+		state->format = 3;		// temporarily treat this as a unif file
 		state->mapper = 0;		// this allows us to set up memory handlers without duplicating code (for the moment)
 		state->board = image_get_feature(image);
 
@@ -1007,7 +1014,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 #if 1
 		printf("PCB Feature: %s\n", state->board);
 		printf("PRG chunks: %d\n", state->prg_chunks);
-		printf("CHR chunks: %d\n", state->prg_chunks);
+		printf("CHR chunks: %d\n", state->chr_chunks);
 		printf("NVWRAM: Present %s, size: %d\n", state->battery ? "Yes" : "No", state->battery_size);
 		printf("WRAM:   Present %s, size: %d\n", state->prg_ram ? "Yes" : "No", state->wram_size);
 #endif

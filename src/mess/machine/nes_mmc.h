@@ -7,10 +7,12 @@
 
 int nes_mapper_reset(running_machine *machine);
 int nes_unif_reset(running_machine *machine);
+int nes_pcb_reset(running_machine *machine);
 
 void mapper_handlers_setup(running_machine *machine);
 void unif_handlers_setup(running_machine *machine);
 void unif_mapr_setup(running_machine *machine, const char *board);
+void pcb_handlers_setup(running_machine *machine);
 
 WRITE8_HANDLER( nes_low_mapper_w );
 WRITE8_HANDLER( nes_mid_mapper_w );

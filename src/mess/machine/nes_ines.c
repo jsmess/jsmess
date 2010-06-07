@@ -6,6 +6,20 @@
 
 ****************************************************************************************/
 
+typedef struct __mmc
+{
+	int iNesMapper; /* iNES Mapper # */
+	
+	const char *desc;     /* Mapper description */
+	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
+	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
+	write8_space_func mmc_write_mid; /* $6000-$7fff write routine */
+	write8_space_func mmc_write; /* $8000-$ffff write routine */
+	void (*ppu_latch)(running_device *device, offs_t offset);
+	ppu2c0x_scanline_cb		mmc_scanline;
+	ppu2c0x_hblank_cb		mmc_hblank;
+} mmc;
+
 /*************************************************************
 
     Mapper 0
@@ -11914,9 +11928,9 @@ int nes_mapper_reset( running_machine *machine )
 	const mmc *mapper;
 	
 	if (state->chr_chunks == 0)
-		chr8(machine, 0,CHRRAM);
+		chr8(machine, 0, CHRRAM);
 	else
-		chr8(machine, 0,CHRROM);
+		chr8(machine, 0, CHRROM);
 	
 	/* Set the mapper irq callback */
 	mapper = nes_mapper_lookup(state->mapper);
@@ -11948,3 +11962,30 @@ int nes_mapper_reset( running_machine *machine )
 	return err;
 }
 
+void mapper_handlers_setup( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	const mmc *mapper = nes_mapper_lookup(state->mapper);
+	
+	if (mapper)
+	{
+		state->mmc_write_low = mapper->mmc_write_low;
+		state->mmc_write_mid = mapper->mmc_write_mid;
+		state->mmc_write = mapper->mmc_write;
+		state->mmc_read_low = mapper->mmc_read_low;
+		state->mmc_read_mid = NULL;	// in progress
+		state->mmc_read = NULL;	// in progress
+		ppu_latch = mapper->ppu_latch;
+	}
+	else
+	{
+		logerror("Mapper %d is not yet supported, defaulting to no mapper.\n",state->mapper);
+		state->mmc_write_low = NULL;
+		state->mmc_write_mid = NULL;
+		state->mmc_write = NULL;
+		state->mmc_read_low = NULL;
+		state->mmc_read_mid = NULL;	// in progress
+		state->mmc_read = NULL;	// in progress
+		ppu_latch = NULL;
+	}
+}
