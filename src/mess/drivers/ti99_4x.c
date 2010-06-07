@@ -55,8 +55,8 @@ static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM										/*system ROM*/
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*lower 8kb of RAM extension - installed dynamically*/
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
-//  AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_cart_r, ti99_cart_w)     /*cartridge memory*/
-	AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE("ti99_multicart", ti99_multicart_r, ti99_multicart_w)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_cart_r, ti99_cart_w)     /*cartridge memory*/
+//	AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE("ti99_multicart", ti99_multicart_r, ti99_multicart_w)
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAMBANK("bank1")			/*RAM PAD, mirrored 4 times*/
 	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(ti99_nop_8_r, ti99_wsnd_w)	/*soundchip write*/
 	AM_RANGE(0x8800, 0x8bff) AM_READWRITE(ti99_rvdp_r, ti99_nop_8_w)	/*vdp read*/
@@ -70,10 +70,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(memmap_4ev, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x1fff) AM_ROM										/*system ROM*/
+	AM_RANGE(0x0000, 0x1fff) AM_ROM						/*system ROM*/
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*lower 8kb of RAM extension - installed dynamically*/
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
-	AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE("ti99_multicart", ti99_multicart_r, ti99_multicart_w)
+	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_cart_r, ti99_cart_w)     /*cartridge memory*/
+//	AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE("ti99_multicart", ti99_multicart_r, ti99_multicart_w)
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAMBANK("bank1")			/*RAM PAD, mirrored 4 times*/
 	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(ti99_nop_8_r, ti99_wsnd_w)	/*soundchip write*/
 	AM_RANGE(0x8800, 0x8bff) AM_READWRITE(ti99_rv38_r, ti99_nop_8_w)	/*vdp read*/
@@ -132,7 +133,7 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+//		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
 //      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x04, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -143,13 +144,15 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
 
+	/* Flash setting is used to flash an empty HSGPL DSR ROM */ 
 	PORT_START( "EXTCARD" )
-	PORT_CONFNAME( 0x01, 0x00, "HSGPL extension" )
+	PORT_CONFNAME( 0x03, 0x00, "HSGPL extension" ) PORT_CHANGED( hsgpl_changed, NULL)
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-		PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x00, "P-Code card" )
-		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING(    0x01, "Flash" )
 		PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_CONFNAME( 0x04, 0x00, "P-Code card" )
+		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+		PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 
 	PORT_START( "HCI" )
 	PORT_CONFNAME( 0x01, 0x00, "Mouse support" )
@@ -303,7 +306,7 @@ static INPUT_PORTS_START(ti99_4)
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+//		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
 //      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -682,6 +685,9 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_MACHINE_START( ti99_4_60hz )
 	MDRV_MACHINE_RESET( ti99 )
 
+	/* For HSGPL */
+	MDRV_NVRAM_HANDLER( ti99 )
+	
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
@@ -702,8 +708,8 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
+/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)   */
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -738,6 +744,9 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_MACHINE_START( ti99_4_50hz )
 	MDRV_MACHINE_RESET( ti99 )
 
+	/* For HSGPL */
+	MDRV_NVRAM_HANDLER( ti99 )
+	
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
@@ -756,8 +765,8 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
-	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
+/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)  */
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -792,6 +801,9 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_MACHINE_START( ti99_4a_60hz )
 	MDRV_MACHINE_RESET( ti99 )
 
+	/* For HSGPL */
+	MDRV_NVRAM_HANDLER( ti99 )
+	
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
@@ -810,8 +822,8 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
-	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
+/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -848,6 +860,9 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_MACHINE_START( ti99_4a_50hz )
 	MDRV_MACHINE_RESET( ti99 )
 
+	/* For HSGPL */
+	MDRV_NVRAM_HANDLER( ti99 )
+	
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
@@ -866,8 +881,8 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
-	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
+/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -903,6 +918,9 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_MACHINE_START( ti99_4ev_60hz )
 	MDRV_MACHINE_RESET( ti99 )
 
+	/* For HSGPL */
+	MDRV_NVRAM_HANDLER( ti99 )
+	
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)	/* or 50Hz */
@@ -929,8 +947,8 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
-	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
+/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)  */
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )

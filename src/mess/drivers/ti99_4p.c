@@ -39,6 +39,7 @@
 #include "emu.h"
 #include "deprecat.h"
 #include "cpu/tms9900/tms9900.h"
+#include "sound/wave.h"
 #include "sound/dac.h"
 #include "sound/sn76496.h"
 #include "sound/tms5220.h"
@@ -120,7 +121,7 @@ static INPUT_PORTS_START(ti99_4p)
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+//		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
 //      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -289,7 +290,11 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_CPU_IO_MAP(cru_map)
 	MDRV_CPU_VBLANK_INT_HACK(ti99_4ev_hblank_interrupt, 263)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
+	MDRV_MACHINE_START( ti99_4p )
 	MDRV_MACHINE_RESET( ti99 )
+
+	/* For HSGPL */
+	MDRV_NVRAM_HANDLER( ti99 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -309,8 +314,8 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-//  MDRV_SOUND_WAVE_ADD("wave", "cassette")
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MDRV_SOUND_WAVE_ADD("wave", "cassette")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 	MDRV_SOUND_ADD("sn76496", SN76496, 3579545)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MDRV_SOUND_ADD("tmc0285", TMC0285, 680000L)
@@ -318,11 +323,10 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	/* FIXME */
+/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
 
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
-
-	/* MDRV_CASSETTE_ADD( "cassette", default_cassette_config ) */
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* tms9901 */
 	MDRV_TMS9901_ADD("tms9901", tms9901reset_param_ti99_4x)

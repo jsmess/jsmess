@@ -168,8 +168,9 @@ enum
 enum
 {
 	EXT_NONE = 0,
-	EXT_HSGPL,
-	EXT_PCODE
+	EXT_HSGPL_FLASH = 1,
+	EXT_HSGPL_ON = 2,
+	EXT_PCODE = 4
 };
 
 enum
@@ -213,11 +214,13 @@ MACHINE_START( ti99_4_50hz );
 MACHINE_START( ti99_4a_60hz );
 MACHINE_START( ti99_4a_50hz );
 MACHINE_START( ti99_4ev_60hz );
+MACHINE_START( ti99_4p );
+
 MACHINE_RESET( ti99 );
 
-// DEVICE_START( ti99_cart );
-// DEVICE_IMAGE_LOAD( ti99_cart );
-// DEVICE_IMAGE_UNLOAD( ti99_cart );
+/* For HSGPL */
+NVRAM_HANDLER( ti99 );
+INPUT_CHANGED( hsgpl_changed );
 
 VIDEO_START( ti99_4ev );
 INTERRUPT_GEN( ti99_vblank_interrupt );
@@ -227,23 +230,25 @@ void ti99_set_hsgpl_crdena(int data);
 void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm);
 int ti99_is_99_8(void);
 
-READ16_HANDLER ( ti99_nop_8_r );
-WRITE16_HANDLER ( ti99_nop_8_w );
+READ16_HANDLER( ti99_nop_8_r );
+WRITE16_HANDLER( ti99_nop_8_w );
 
-READ16_HANDLER ( ti99_4p_cart_r );
-WRITE16_HANDLER ( ti99_4p_cart_w );
+READ16_HANDLER( ti99_cart_r );
+WRITE16_HANDLER( ti99_cart_w );
+READ16_HANDLER( ti99_4p_cart_r );
+WRITE16_HANDLER( ti99_4p_cart_w );
 
 WRITE16_HANDLER( ti99_wsnd_w );
 
-READ16_HANDLER ( ti99_rvdp_r );
-WRITE16_HANDLER ( ti99_wvdp_w );
-READ16_HANDLER ( ti99_rv38_r );
-WRITE16_HANDLER ( ti99_wv38_w );
+READ16_HANDLER( ti99_rvdp_r );
+WRITE16_HANDLER( ti99_wvdp_w );
+READ16_HANDLER( ti99_rv38_r );
+WRITE16_HANDLER( ti99_wv38_w );
 
-READ16_HANDLER ( ti99_grom_r );
+READ16_HANDLER( ti99_grom_r );
 WRITE16_HANDLER( ti99_grom_w );
-READ16_HANDLER ( ti99_4p_grom_r );
-WRITE16_HANDLER ( ti99_4p_grom_w );
+READ16_HANDLER( ti99_4p_grom_r );
+WRITE16_HANDLER( ti99_4p_grom_w );
 
 extern void tms9901_set_int2(running_machine *machine, int state);
 

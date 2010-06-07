@@ -1,6 +1,5 @@
 /*
     SNUG HSGPL card emulation.
-
     Raphael Nabet, 2003.
 */
 
@@ -89,13 +88,15 @@ static struct
 	UINT16 addr;
 	char raddr_LSB, waddr_LSB;
 
+	/* Holds the current GROM base */
 	int cur_port;
 
+	/* Holds the current ROM6 bank */
 	int cur_bank;
 
+	/* Latches the setting of the 16 CRU bits. Also contains the */
+	/* current DSR bank (PG0...) */
 	int cru_reg;
-
-	int is_image_writable;
 } hsgpl;
 
 enum
@@ -103,10 +104,10 @@ enum
 	cr_grmena  = 0x0002,
 	cr_bnkinh  = 0x0004,
 	cr_pg      = 0x01f8,
-		cr_pg_mask = 0x3f,
-		cr_pg_shift= 3,
+	cr_pg_mask = 0x3f,
+	cr_pg_shift= 3,
 	cr_crdena  = 0x0200,
-		cr_crdena_bit = 9,
+	cr_crdena_bit = 9,
 	cr_wriena  = 0x0400,
 	cr_scena   = 0x0800,
 	cr_ledena  = 0x1000,
@@ -139,7 +140,6 @@ static int ti99_hsgpl_file_load(running_machine *machine, mame_file *file)
 {
 	UINT8 version;
 	UINT8 *rgn;
-
 
 	/* version flag */
 	if (mame_fread(file, & version, 1) != 1)
@@ -176,7 +176,6 @@ static int ti99_hsgpl_file_save(mame_file *file)
 {
 	UINT8 version;
 
-
 	/* version flag */
 	version = 0;
 	if (mame_fwrite(file, & version, 1) != 1)
@@ -211,14 +210,14 @@ static int ti99_hsgpl_get_dirty_flag(void)
 
 
 
-int ti99_hsgpl_load_memcard(running_machine *machine)
+int ti99_hsgpl_load_flashroms(running_machine *machine, const char *name)
 {
 	file_error filerr;
 	mame_file *file;
 
-	filerr = mame_fopen(SEARCHPATH_MEMCARD, "hsgpl.nv", OPEN_FLAG_READ, &file);
+	filerr = mame_fopen(SEARCHPATH_NVRAM, name, OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
-		return /*1*/0;
+		return 0;
 	if (ti99_hsgpl_file_load(machine, file))
 	{
 		mame_fclose(file);
@@ -229,14 +228,16 @@ int ti99_hsgpl_load_memcard(running_machine *machine)
 	return 0;
 }
 
-int ti99_hsgpl_save_memcard(running_machine *machine)
+int ti99_hsgpl_save_flashroms(running_machine *machine, const char *name)
 {
 	file_error filerr;
 	mame_file *file;
 
 	if (ti99_hsgpl_get_dirty_flag())
 	{
-		filerr = mame_fopen(SEARCHPATH_MEMCARD, "hsgpl.nv", OPEN_FLAG_WRITE, &file);
+		filerr = mame_fopen(SEARCHPATH_NVRAM, name, 
+			OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+
 		if (filerr != FILERR_NONE)
 			return 1;
 		if (ti99_hsgpl_file_save(file))
@@ -281,9 +282,11 @@ void ti99_hsgpl_reset(running_machine *machine)
 	hsgpl.cur_port = 0;
 	hsgpl.cur_bank = 0;
 	hsgpl.cru_reg = 0;
-	ti99_set_hsgpl_crdena(/*0*/1);
 
-	ti99_peb_set_card_handlers(0x1b00, & hsgpl_handlers);
+	/* Card is enabled on startup. */
+	ti99_set_hsgpl_crdena(1);
+
+	ti99_peb_set_card_handlers(0x1b00, &hsgpl_handlers);
 }
 
 
@@ -298,13 +301,13 @@ static void hsgpl_cru_w(running_machine *machine, int offset, int data)
 		hsgpl.cru_reg |= 1 << offset;
 	else
 		hsgpl.cru_reg &= ~ (1 << offset);
-
+	
 	if (offset == cr_crdena_bit)
 		ti99_set_hsgpl_crdena(data);
 }
 
 /*
-    read a byte in hsgpl DSR space
+    read a byte in hsgpl DSR space (4000-5fff)
 */
 static  READ8_HANDLER(hsgpl_dsr_r)
 {
@@ -398,13 +401,13 @@ READ16_HANDLER ( ti99_hsgpl_gpl_r )
 
 		case 32:
 		case 33:
-			/* This has been verified */
+			/* GRAM access */
 			reply = hsgpl.GRAM_ptr[hsgpl.addr + 0x10000*(port-32)];
 			break;
 
 		case 48:
-		case 49:		/* this mirror is mistakenly used by the hsgpl DSR */
-			/* This has been verified. */
+		case 49:
+			/* RAM6 access */
 			reply = hsgpl.RAM6_ptr[hsgpl.addr];
 			break;
 
@@ -432,7 +435,6 @@ WRITE16_HANDLER ( ti99_hsgpl_gpl_w )
 {
 	int port;
 
-
 	//activecpu_adjust_icount(-4);
 
 	port = hsgpl.cur_port = (offset & 0x1FE) >> 1;
@@ -444,7 +446,6 @@ WRITE16_HANDLER ( ti99_hsgpl_gpl_w )
 		if (hsgpl.waddr_LSB)
 		{
 			hsgpl.addr = (hsgpl.addr & 0xFF00) | ((data >> 8) & 0xFF);
-
 			hsgpl.waddr_LSB = FALSE;
 		}
 		else
@@ -514,13 +515,13 @@ WRITE16_HANDLER ( ti99_hsgpl_gpl_w )
 
 			case 32:
 			case 33:
-				/* This has been verified */
+				/* GRAM access */
 				hsgpl.GRAM_ptr[hsgpl.addr + 0x10000*(port-32)] = data;
 				break;
 
 			case 48:
-			case 49:		/* this mirror is mistakenly used by the hsgpl DSR */
-				/* This has been verified. */
+			case 49:
+				/* RAM6 access */
 				hsgpl.RAM6_ptr[hsgpl.addr] = data;
 				break;
 

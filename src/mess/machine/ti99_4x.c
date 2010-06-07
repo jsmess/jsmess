@@ -119,6 +119,8 @@ static char has_rs232;
 static char has_handset;
 /* TRUE if hsgpl card present */
 static char has_hsgpl;
+static char hsgpl_flash_mode;
+
 /* TRUE if mechatronics mouse present */
 static char has_mecmouse;
 /* TRUE if usb-sm card present */
@@ -423,6 +425,24 @@ MACHINE_START( ti99_4ev_60hz)
     ti99_common_init(machine, 0);
 }
 
+MACHINE_START( ti99_4p )
+{
+	UINT8* mem = memory_region(machine, "maincpu");
+	
+	/* Set up system ROM and scratch pad pointers. Must be set up here */
+	/* so that the system can successfully reset (otherwise the reset  */
+	/* vector would be missing in 0x0000). */
+	memory_set_bankptr(machine, "bank1", mem + offset_rom0_4p);	/* system ROM */
+	memory_set_bankptr(machine, "bank2", mem + offset_sram_4p);	/* scratch pad */
+	memory_set_bankptr(machine, "bank11", mem + offset_dram_4p);	/* extra RAM for debugger */
+
+	ti99_peb_init();
+	ti99_floppy_controllers_init_all(machine);
+	ti99_ide_init(machine);
+	ti99_hsgpl_init(machine);
+	ti99_usbsm_init(machine);
+}
+
 void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm)
 {
 	if (gfxparm != 0)
@@ -474,16 +494,6 @@ MACHINE_RESET( ti99 )
 		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + offset_sram);
 	}
 
-#if 0
-	if (ti99_model != model_99_4p)
-	{
-		if (ti99_model == model_99_8)
-			current_page_ptr_8 = cartridge_pages_8[0];
-		else
-			current_page_ptr = cartridge_pages[0];
-	}
-#endif
-
 	if (!has_evpc) TMS9928A_reset();
 	else v9938_reset(0);
 
@@ -522,7 +532,9 @@ MACHINE_RESET( ti99 )
 	if (ti99_model == model_99_4p)
 		has_hsgpl = TRUE;
 	else
-		has_hsgpl = input_port_read(machine, "EXTCARD") & EXT_HSGPL;
+		has_hsgpl = input_port_read(machine, "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH);
+
+	hsgpl_flash_mode = input_port_read(machine, "EXTCARD") & EXT_HSGPL_FLASH;
 
 	has_usb_sm = input_port_read(machine, "HDCTRL") & HD_USB;
 	has_pcode = input_port_read(machine, "EXTCARD") & EXT_PCODE;
@@ -603,14 +615,11 @@ MACHINE_RESET( ti99 )
 		break;
 	}
 
-	if (has_ide) {
+	if (has_ide)
 		ti99_ide_reset(machine, ti99_model == model_99_8);
-	}
 
-	if (has_hsgpl)	{
+	if (has_hsgpl)
 		ti99_hsgpl_reset(machine);
-		ti99_hsgpl_load_memcard(machine);
-	}
 	else
 		hsgpl_crdena = 0;
 
@@ -643,6 +652,34 @@ void machine_stop_ti99(void)
 }
 #endif
 
+NVRAM_HANDLER( ti99 )
+{
+	const char *filename;
+	
+	/* We may have different HSGPL settings for 80 column and traditional */
+	/* 40 column display. For convenience, we use two different nvram files. */
+	if (has_evpc)
+		filename = "hsgpl80.nv";
+	else
+		filename = "hsgpl40.nv";
+	
+	if ((ti99_model == model_99_4p) || (input_port_read(machine, "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH)))
+	{
+		if (read_or_write==0)
+		{
+			ti99_hsgpl_load_flashroms(machine, filename);
+		}
+		else
+		{
+			ti99_hsgpl_save_flashroms(machine, filename);
+		}
+	}
+}
+
+INPUT_CHANGED( hsgpl_changed )
+{
+	hsgpl_flash_mode = newval & EXT_HSGPL_FLASH;
+}
 
 /*
     video initialization.
@@ -650,7 +687,8 @@ void machine_stop_ti99(void)
 VIDEO_START( ti99_4ev )
 {
 	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init(machine, 0, machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, 0x20000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
+	v9938_init(machine, 0, machine->primary_screen, machine->generic.tmpbitmap, 
+		MODEL_V9938, 0x20000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
 }
 
 /*
@@ -683,6 +721,7 @@ INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
 /*
     Backdoor function that is called by hsgpl, so that the machine code knows
     whether hsgpl or console GROMs are active
+    Called from 99_hsgpl.c
 */
 void ti99_set_hsgpl_crdena(int data)
 {
@@ -720,6 +759,32 @@ WRITE16_HANDLER ( ti99_nop_8_w )
 }
 
 /*
+    Cartridge space (>6000->7FFF). This is usually connected to the cartridge
+    port, but is also used by the HSGPL. So we need to check this here and then
+    delegate to the respective component.
+*/
+READ16_HANDLER ( ti99_cart_r )
+{
+	if (hsgpl_crdena && !hsgpl_flash_mode)
+		/* hsgpl is enabled */
+		return ti99_hsgpl_rom6_r(space, offset, mem_mask);
+	return ti99_multicart_r(cartslots, offset, mem_mask);
+}
+
+/*
+    Cartridge space (>6000->7FFF). This is usually connected to the cartridge
+    port, but is also used by the HSGPL. So we need to check this here and then
+    delegate to the respective component.
+*/
+WRITE16_HANDLER ( ti99_cart_w )
+{
+	ti99_multicart_w(cartslots, offset, data, mem_mask);
+	if (hsgpl_crdena && !hsgpl_flash_mode)
+		/* hsgpl is enabled */
+		ti99_hsgpl_rom6_w(space, offset, data, mem_mask);
+}
+
+/*
     99/4p cartridge space: mapped either to internal ROM6 or to HSGPL.
 */
 READ16_HANDLER ( ti99_4p_cart_r )
@@ -730,7 +795,7 @@ READ16_HANDLER ( ti99_4p_cart_r )
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
-	if (hsgpl_crdena)
+	if (hsgpl_crdena && !hsgpl_flash_mode)
 		/* hsgpl is enabled */
 		return ti99_hsgpl_rom6_r(space, offset, mem_mask);
 
@@ -748,7 +813,7 @@ WRITE16_HANDLER ( ti99_4p_cart_w )
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
-	if (hsgpl_crdena)
+	if (hsgpl_crdena && !hsgpl_flash_mode)
 		/* hsgpl is enabled */
 		ti99_hsgpl_rom6_w(space, offset, data, mem_mask);
 }
@@ -944,7 +1009,6 @@ static UINT8 GROM_dataread(offs_t offset)
 		/* Get next value, put it in buffer. Note that the GROM */
 		/* wraps at 8K boundaries. */
 		console_GROMs.buf = console_GROMs.data_ptr[console_GROMs.addr];
-//      printf("GROM address (cons) = %04x, offset = %04x, reply = %02x\n", console_GROMs.addr, offset, reply);
 	}
 
 	/* The address pointer in the cartridge system is updated by this */
@@ -999,23 +1063,23 @@ READ16_HANDLER ( ti99_grom_r )
 	/* it's not clear whether this has unwanted side effects.             */
 
 	if (offset & 1)
-	{	/* Read GROM address
-        We only have one GROM program counter for the console GROMs
-        and all cartridge GROMs in all banks(!). Hardware
-        implementations must take this into account as well. Thus,
-        we use a structure here in the console, rather than separate
-        counters in each GROM chip. */
+	{	/* Read GROM address */
+		/* We only have one GROM program counter for the console */
+		/* GROMs and all cartridge GROMs in all banks(!). Hardware */
+		/* implementations must take this into account as well. Thus, */
+		/* we use a structure here in the console, rather than */
+		/* separate counters in each GROM chip. */
 
-		/* We call the cartridge system here, but we ignore the
-           value. This is done to sync the flags. */
+		/* We call the cartridge system here, but we ignore the */
+		/* value. This is done to sync the flags. */
 		replycart = ti99_cartridge_grom_r(cartslots, (offset<<1))<<8;
 
-		/* When reading, reset the hi/lo flag byte for writing.
-        TODO: Verify this with a real machine. */
+		/* When reading, reset the hi/lo flag byte for writing. */
+		/* TODO: Verify this with a real machine. */
 		console_GROMs.waddr_LSB = FALSE;
 
-		/* Address reading is done in two steps; first, the high byte
-        is transferred, then the low byte. */
+		/* Address reading is done in two steps; first, the high byte */
+		/* is transferred, then the low byte. */
 		if (console_GROMs.raddr_LSB)
 		{
 			/* second pass */
@@ -1034,14 +1098,24 @@ READ16_HANDLER ( ti99_grom_r )
 	else
 	{
 		/* Read GROM data */
-		/* Note that we shift the GROM port address to accomodate for
-           8-bit and 16-bit systems. */
+		/* Note that we shift the GROM port address to accomodate for */
+		/* 8-bit and 16-bit systems. */
 		reply = ((UINT16)GROM_dataread(offset<<1)) << 8;
 	}
 
 	if (hsgpl_crdena)
-		/* hsgpl buffers are stronger than console GROM buffers */
-		reply = ti99_hsgpl_gpl_r(space, offset, mem_mask);
+	{
+		/* We must prevent the HSGPL to override the console GROMs */
+		/* when it is not yet set up - or the console will get stuck */
+		/* in a black screen. The "flash mode" allows to read GROMs */
+		/* only in higher banks; writing is enabled for all banks. */
+		int bank = (offset>>1)&0xff;
+		if (!hsgpl_flash_mode || (bank>=16))
+		{
+			/* hsgpl buffers always override console GROM buffers */
+			reply = ti99_hsgpl_gpl_r(space, offset, mem_mask);
+		}
+	}
 
 	return reply;
 }
@@ -1062,18 +1136,16 @@ WRITE16_HANDLER ( ti99_grom_w )
 		/* see comments above */
 		console_GROMs.raddr_LSB = FALSE;
 
-		/* Implements the internal flipflop.
-        The Editor/Assembler manuals says that the current address
-        plus one is returned. This effect is properly emulated
-        as we are using a read-ahead buffer.
-        */
+		/* Implements the internal flipflop. */
+		/* The Editor/Assembler manuals says that the current address */
+		/* plus one is returned. This effect is properly emulated */
+		/* by using a read-ahead buffer. */
 		if (console_GROMs.waddr_LSB)
 		{
 			/* Accept low byte (2nd write) */
 			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | ((data >> 8) & 0xFF);
-
-			/* Setting the address causes a new read, putting the
-            value into the buffer. We don't need the value here. */
+			/* Setting the address causes a new read, putting the */
+			/* value into the buffer. We don't need the value here. */
 			GROM_dataread(offset<<1);
 			console_GROMs.waddr_LSB = FALSE;
 		}
@@ -1088,17 +1160,21 @@ WRITE16_HANDLER ( ti99_grom_w )
 	{
 		/* write GROM data */
 		/* the console GROMs are always affected */
-		/* BTW, console GROMs are never GRAMs, therefore there is no
-        need to actually write anything, so we just read ahead
-        TODO: There could be cartridges with GRAM, so this must be
-        fixed.
-        */
+		/* BTW, console GROMs are never GRAMs, therefore there is no */
+		/* need to actually write anything, so we just read ahead */
+		/* TODO: There could be cartridges with GRAM, so this must be */
+		/* fixed.         */
 		GROM_dataread(offset<<1);
 		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
 	}
 
 	if (hsgpl_crdena)
+	{
+		/* If the HSGPL card is used, we always attempt to write to */
+		/* its memory, even in flash mode. Writing does no harm to */
+		/* the internal GROMs. */
 		ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
+	}
 }
 
 /*
@@ -1177,7 +1253,7 @@ READ16_HANDLER ( ti99_4p_grom_r )
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
 	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
-	return /*hsgpl_crdena ?*/ ti99_hsgpl_gpl_r(space, offset, mem_mask) /*: 0*/;
+	return hsgpl_crdena? ti99_hsgpl_gpl_r(space, offset, mem_mask) : 0;
 }
 
 /*
@@ -1188,8 +1264,8 @@ WRITE16_HANDLER ( ti99_4p_grom_w )
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
 	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
-	/*if (hsgpl_crdena)*/
-	ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
+	if (hsgpl_crdena)
+		ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
 }
 
 
@@ -2118,7 +2194,7 @@ static READ8_DEVICE_HANDLER( ti99_R9901_3 )
 		answer = 4;	/* on systems without handset, the pin is pulled up to avoid spurious interrupts */
 
 	/* we don't take CS2 into account, as CS2 is a write-only unit */
-	if ( ti99_model != model_99_8 )
+	if ( (ti99_model != model_99_8) && (ti99_model != model_99_4p))
 	{
 		if (cassette_input(devtag_get_device(device->machine, "cassette1")) > 0)
 			answer |= 8;
@@ -2265,7 +2341,7 @@ static WRITE8_DEVICE_HANDLER( ti99_CS_motor )
 {
 	running_device *img;
 
-	if ( ti99_model != model_99_8 )
+	if ( (ti99_model != model_99_8) && (ti99_model != model_99_4p))
 	{
 		img = devtag_get_device(device->machine, (offset-6 ) ? "cassette2" :  "cassette1" );
 	}
@@ -2295,7 +2371,7 @@ static WRITE8_DEVICE_HANDLER( ti99_audio_gate )
 */
 static WRITE8_DEVICE_HANDLER( ti99_CS_output )
 {
-	if (ti99_model != model_99_8)	/* 99/8 only has one tape port!!! */
+	if ((ti99_model != model_99_8) && (ti99_model != model_99_4p))	/* 99/8 only has one tape port!!! */
 	{
 		cassette_output(devtag_get_device(device->machine, "cassette1"), data ? +1 : -1);
 		cassette_output(devtag_get_device(device->machine, "cassette2"), data ? +1 : -1);
@@ -2485,7 +2561,6 @@ static WRITE16_HANDLER ( ti99_TIxramlow_w )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
 	COMBINE_DATA(xRAM_ptr + offset);
 }
 
@@ -2494,7 +2569,6 @@ static READ16_HANDLER ( ti99_TIxramhigh_r )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
 //  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
 	return xRAM_ptr[offset+0x1000];
 }
 

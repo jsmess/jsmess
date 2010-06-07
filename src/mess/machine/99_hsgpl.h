@@ -1,9 +1,10 @@
-#if 0
-DEVICE_IMAGE_LOAD(ti99_hsgpl);
-DEVICE_IMAGE_UNLOAD(ti99_hsgpl);
-#endif
-int ti99_hsgpl_load_memcard(running_machine *machine);
-int ti99_hsgpl_save_memcard(running_machine *machine);
+/*
+    SNUG HSGPL card emulation.
+    Raphael Nabet, 2003.
+*/
+
+int ti99_hsgpl_load_flashroms(running_machine *machine, const char *filename);
+int ti99_hsgpl_save_flashroms(running_machine *machine, const char *filename);
 
 void ti99_hsgpl_init(running_machine *machine);
 void ti99_hsgpl_reset(running_machine *machine);

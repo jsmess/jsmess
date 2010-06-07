@@ -30,36 +30,36 @@ struct _cartridge_t
 	/* PCB device associated to this cartridge. If NULL, the slot is empty. */
 	running_device *pcb;
 
-        /* GROM buffer size. */
-        int grom_size;
-
-        /* ROM page. */
-        int rom_page;
-        /* RAM page. */
-        int ram_page;
-
-        /* ROM buffer size. All banks have equal sizes. */
-        int rom_size;
-        /* RAM buffer size. All banks have equal sizes. */
-        int ram_size;
-
-        /* pointer to GROM data. */
-        UINT8 *grom_ptr;
-
-        /* GROM buffered data output. */
-        /*        UINT8 grom_buffer; */ /* Now handled by the multicart system. */
-
-        /* ROM buffer. We are using this for both 16 bit (99/4a) and 8 bit
-        (99/8) access. */
-        void *rom_ptr;
-
-        /* ROM buffer for the second bank of paged cartridges. Other cartridges
-        usually store their ROM in one large file. */
-        void *rom2_ptr;
-
-        /* RAM buffer. The persistence service is done by the cartridge system.
-        The RAM space is a consecutive space; all banks are in one buffer. */
-        void *ram_ptr;
+	/* GROM buffer size. */
+	int grom_size;
+	
+	/* ROM page. */
+	int rom_page;
+	/* RAM page. */
+	int ram_page;
+	
+	/* ROM buffer size. All banks have equal sizes. */
+	int rom_size;
+	/* RAM buffer size. All banks have equal sizes. */
+	int ram_size;
+	
+	/* pointer to GROM data. */
+	UINT8 *grom_ptr;
+	
+	/* GROM buffered data output. */
+	/*        UINT8 grom_buffer; */ /* Now handled by the multicart system. */
+	
+	/* ROM buffer. We are using this for both 16 bit (99/4a) and 8 bit
+	(99/8) access. */
+	void *rom_ptr;
+	
+	/* ROM buffer for the second bank of paged cartridges. Other cartridges
+	usually store their ROM in one large file. */
+	void *rom2_ptr;
+	
+	/* RAM buffer. The persistence service is done by the cartridge system.
+	The RAM space is a consecutive space; all banks are in one buffer. */
+	void *ram_ptr;
 };
 typedef struct _cartridge_t cartridge_t;
 
@@ -405,14 +405,16 @@ READ8_DEVICE_HANDLER(ti99_cartridge_grom_r)
 			value = 0;
 			//printf("Empty socket at address G(%d)>%04x\n", slot, cartslots->grom_address);
 		}
-		//          printf("GROM address (cart) = %04x, reply = %02x\n", cartslots->grom_address, value);
-		/* The program counter wraps at each GROM chip size (8K),
-        so 0x5fff + 1 = 0x4000. */
-		cartslots->grom_address = ((cartslots->grom_address + 1) & 0x1FFF) | (cartslots->grom_address & 0xE000);
-
-		/* Reset the read and write address flipflops. */
-		cartslots->raddr_LSB = cartslots->waddr_LSB = FALSE;
 	}
+	//          printf("GROM address (cart) = %04x, reply = %02x\n", cartslots->grom_address, value);
+	/* The program counter wraps at each GROM chip size (8K), */
+	/* so 0x5fff + 1 = 0x4000. */
+	/* The address must be increased even if there is no cartridge slot */
+	cartslots->grom_address = ((cartslots->grom_address + 1) & 0x1FFF) | (cartslots->grom_address & 0xE000);
+	
+	/* Reset the read and write address flipflops. */
+	cartslots->raddr_LSB = cartslots->waddr_LSB = FALSE;
+
 	return value;
 }
 
@@ -1621,7 +1623,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_cru_paged )
 		if (data != 0)
 		{
 			cartridge->rom_page = (offset-1)/2;
-			printf("Setting bit %4x of CRU base >0800\n", offset);
+			// printf("Setting bit %4x of CRU base >0800\n", offset);
 		}
 	}
 //  printf("setting rompage to %d\n", cartridge->rom_page);
