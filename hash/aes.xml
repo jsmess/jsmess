@@ -918,6 +918,39 @@
 		</part>
 	</software>
 
+<!-- ID 232 -->
+	<software name="kof97">
+		<description>The King of Fighters '97</description>
+		<year>1997</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="5242880">
+                <rom name="232-pg1.bin" size="1048576" crc="5c2400b7" sha1="49e23f80c012c62146a1bb8f254a7597823de430" offset="000000" />
+                <rom name="232-p2.bin" size="4194304" crc="158b23f6" sha1="9744620a70513490aaf9c5eda33e5ec31222be19" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="232-s1.bin" size="131072" crc="8514ecf5" sha1="18d8e7feb51ea88816f1c786932a53655b0de6a0" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="232-m1.bin" size="131072" crc="45348747" sha1="ed77cbae2b208d1177a9f5f6e8cd57070e90b65b" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="12582912">
+                <rom name="232-v1.bin" size="4194304" crc="22a2b5b5" sha1="ebdbc977332e6d93e266755000b43857e0082965" offset="000000" />
+                <rom name="232-v2.bin" size="4194304" crc="2304e744" sha1="98d283e2bcc9291a53f52afd35ef76dfb0828432" offset="400000" />
+                <rom name="232-v3.bin" size="4194304" crc="759eb954" sha1="54e77c4e9e6b89458e59824e478ddc33a9c72655" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="41943040">
+                <rom name="232-c1.bin" size="8388608" crc="5f8bf0a1" sha1="e8b63bbc814de171fd18c5864a7fc639970c1ecf" offset="000000" loadflag="load16_byte" />
+                <rom name="232-c2.bin" size="8388608" crc="e4d45c81" sha1="fdb2b9326362e27b1c7a5beb977e0bc537488186" offset="000001" loadflag="load16_byte" />
+                <rom name="232-c3.bin" size="8388608" crc="581d6618" sha1="14d3124a08ded59f86932c6b28e1a4e48c564ccd" offset="1000000" loadflag="load16_byte" />
+                <rom name="232-c4.bin" size="8388608" crc="49bb1e68" sha1="f769c1bd1b019521111ff3f0d22c63cb1f2640ef" offset="1000001" loadflag="load16_byte" />
+                <rom name="232-c5.bin" size="4194304" crc="34fc4e51" sha1="b39c65f27873f71a6f5a5d1d04e5435f874472ee" offset="2000000" loadflag="load16_byte" />
+                <rom name="232-c6.bin" size="4194304" crc="4ff4d47b" sha1="4d5689ede24a5fe4330bd85d4d3f4eb2795308bb" offset="2000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 234 -->
 	<software name="lastblad">
 		<description>The Last Blade / Bakumatsu Roman - Gekka no Kenshi</description>
