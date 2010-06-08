@@ -1306,24 +1306,32 @@ static int assemble_mbx(running_device *image)
 
 /*****************************************************************************
   Cartridge type: paged379i
-    This cartridge consists of one 16 KiB, 32 KiB, or 64 KiB EEPROM which is
-    organised in 2, 4, or 8 pages of 8 KiB each. We assume there is only one
-    dump file of the respective size.
+    This cartridge consists of one 16 KiB, 32 KiB, 64 KiB, or 128 KiB EEPROM 
+    which is organised in 2, 4, 8, or 16 pages of 8 KiB each. The complete 
+    memory contents must be stored in one dump file.
     The pages are selected by writing a value to some memory locations. Due to
     using the inverted outputs of the LS379 latch, setting the inputs of the
     latch to all 0 selects the highest bank, while setting to all 1 selects the
-    lowest.There are some cartridges (16 KiB) which are using this scheme, and
+    lowest. There are some cartridges (16 KiB) which are using this scheme, and
     there are new hardware developments mainly relying on this scheme.
 
-    Writing to       selects page (16K/32K/64K)
-    >6000            1 / 3 / 7
-    >6002            0 / 2 / 6
-    >6004            1 / 1 / 5
-    >6006            0 / 0 / 4
-    >6008            1 / 3 / 3
-    >600A            0 / 2 / 2
-    >600C            1 / 1 / 1
-    >600E            0 / 0 / 0
+    Writing to       selects page (16K/32K/64K/128K)
+    >6000            1 / 3 / 7 / 15
+    >6002            0 / 2 / 6 / 14
+    >6004            1 / 1 / 5 / 13
+    >6006            0 / 0 / 4 / 12
+    >6008            1 / 3 / 3 / 11
+    >600A            0 / 2 / 2 / 10
+    >600C            1 / 1 / 1 / 9
+    >600E            0 / 0 / 0 / 8
+    >6010            1 / 3 / 7 / 7
+    >6012            0 / 2 / 6 / 6
+    >6014            1 / 1 / 5 / 5
+    >6016            0 / 0 / 4 / 4
+    >6018            1 / 3 / 3 / 3
+    >601A            0 / 2 / 2 / 2
+    >601C            1 / 1 / 1 / 1
+    >601E            0 / 0 / 0 / 0
 
 ******************************************************************************/
 
@@ -1370,7 +1378,12 @@ static void set_paged379i_bank(cartridge_t *cartridge, int rompage)
 	if (cartridge->rom_size > 16384)
 	{
 		if (cartridge->rom_size > 32768)
-			mask = 7;
+		{
+			if (cartridge->rom_size > 65536)
+				mask = 15;
+			else
+				mask = 7;
+		}
 		else
 			mask = 3;
 	}
@@ -1394,20 +1407,11 @@ static WRITE16_DEVICE_HANDLER( write_cart_paged379i )
 	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
 	cartridge_t *cartridge = pcb->cartridge;
 /*
-    >6000            1 / 3 / 7
-    >6002            0 / 2 / 6
-    >6004            1 / 1 / 5
-    >6006            0 / 0 / 4
-    >6008            1 / 3 / 3
-    >600A            0 / 2 / 2
-    >600C            1 / 1 / 1
-    >600E            0 / 0 / 0
-
-    Bits: 011x xxxx xxxx bbbx
-    x = don't care, bbb = bank
+    Bits: 011x xxxx xxxb bbbx
+    x = don't care, bbbb = bank
     16bit access -> drop rightmost bit
 */
-	set_paged379i_bank(cartridge, 7 - (offset & 7));
+	set_paged379i_bank(cartridge, 15 - (offset & 15));
 }
 
 /*
@@ -1449,20 +1453,10 @@ static WRITE8_DEVICE_HANDLER( write_cart_paged379i8 )
 	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
 	cartridge_t *cartridge = pcb->cartridge;
 /*
-    >6000            1 / 3 / 7
-    >6002            0 / 2 / 6
-    >6004            1 / 1 / 5
-    >6006            0 / 0 / 4
-    >6008            1 / 3 / 3
-    >600A            0 / 2 / 2
-    >600C            1 / 1 / 1
-    >600E            0 / 0 / 0
-
-    Bits: 011x xxxx xxxx bbbx
-    x = don't care, bbb = bank
-    16bit access -> drop rightmost bit
+    Bits: 011x xxxx xxxb bbbx
+    x = don't care, bbbb = bank
 */
-	set_paged379i_bank(cartridge, 7 - ((offset>>1) & 7));
+	set_paged379i_bank(cartridge, 15 - ((offset>>1) & 15));
 }
 
 /*
@@ -1507,7 +1501,7 @@ static int assemble_paged379i(running_device *image)
 static DEVICE_START(ti99_pcb_pagedcru)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-//  printf("DEVICE_START(ti99_pcb_paged379i), tag of device=%s\n", device->tag());
+//  printf("DEVICE_START(ti99_pcb_pagedcru), tag of device=%s\n", device->tag());
 	set_pointers(device, get_index_from_tagname(device->owner)-1);
 }
 
@@ -1636,7 +1630,7 @@ static int assemble_pagedcru(running_device *image)
 {
 	cartridge_t *cart;
 
-//  printf("assemble_paged379i, %s\n", image->tag);
+//  printf("assemble_pagedcru, %s\n", image->tag);
 	cart = assemble_common(image);
 	if (cart->rom_ptr==NULL)
 	{
