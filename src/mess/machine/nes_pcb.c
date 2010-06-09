@@ -662,11 +662,12 @@ static WRITE8_HANDLER( cnrom_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("cnrom_w, offset: %04x, data: %02x\n", offset, data));
 
+//	printf("%x\n", data);
 	if (state->ce_mask)
 	{
 		chr8(space->machine, data & ~state->ce_mask, CHRROM);
 
-		if ((data & state->ce_mask) != state->ce_state)
+		if ((data & state->ce_mask) == state->ce_state)
 			state->chr_open_bus = 0;
 		else
 			state->chr_open_bus = 1;

@@ -239,15 +239,6 @@ WRITE8_HANDLER( nes_mid_mapper_w )
 
 	if (state->mmc_write_mid)
 		(*state->mmc_write_mid)(space, offset, data);
-	else if (state->mid_ram_enable)
-	{
-		if (state->battery && !state->trainer)
-			state->battery_ram[offset] = data;
-		else
-			state->wram[(state->prg_bank[4] - state->prgram_bank5_start) * 0x2000 + offset] = data;
-	}
-//	else
-//		logerror("Unimplemented MID mapper write, offset: %04x, data: %02x\n", offset + 0x6000, data);
 }
 
 // currently, this is not used (but it might become handy for some pirate mapper)

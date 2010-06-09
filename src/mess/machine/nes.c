@@ -131,7 +131,6 @@ static void init_nes_core( running_machine *machine )
 			if (state->prg_ram)
 				memory_configure_bank(machine, "bank5", state->prgram_bank5_start, state->wram_size / 0x2000, state->wram, 0x2000);
 
-			printf("%d %d\n", state->battery_bank5_start, state->prgram_bank5_start);
 			/* if we have any additional PRG RAM, point bank5 to its first bank */
 			if (state->battery || state->prg_ram)
 				state->prg_bank[4] = state->battery_bank5_start;
@@ -1035,10 +1034,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if (image_get_software_region(image, "pin27") != NULL)
 		{
 			state->ce_mask |= 0x02;
-			state->ce_state |= (image_get_software_region_length(image, "pin26") == 2) ? 0 : 0x02;
+			state->ce_state |= (image_get_software_region_length(image, "pin27") == 2) ? 0 : 0x02;
 		}
 		state->chr_open_bus = 0;
-		printf("Pin mask: %d state %d\n", state->ce_mask, state->ce_state);
+
 #if 1
 		printf("PCB Feature: %s\n", image_get_feature(image));
 		printf("PRG chunks: %d\n", state->prg_chunks);
