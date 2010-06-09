@@ -59,7 +59,7 @@ struct _cartslot_config
 	device_image_load_func			device_load;
 	device_image_unload_func		device_unload;
 	device_image_partialhash_func	device_partialhash;
-	cartslot_pcb_type				pcb_types[8];
+	cartslot_pcb_type				pcb_types[16];
 };
 
 
