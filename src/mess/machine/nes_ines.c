@@ -101,7 +101,7 @@ static WRITE8_HANDLER( mapper1_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	/* Note that there is only one latch and shift counter, shared amongst the 4 regs */
 	/* Space Shuttle will not work if they have independent variables. */
-	LOG_MMC(("mapper1_w offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("mapper1_w, offset: %04x, data: %02x\n", offset, data));
 
 
 	/* here we would need to add an if(cpu_cycles_passed>1) test, and
@@ -177,7 +177,7 @@ static WRITE8_HANDLER( mapper1_w )
 
 static WRITE8_HANDLER( mapper2_w )
 {
-	LOG_MMC(("mapper2_w offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("mapper2_w, offset: %04x, data: %02x\n", offset, data));
 
 	prg16_89ab(space->machine, data);
 }
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( mapper2_w )
 
 static WRITE8_HANDLER( mapper3_w )
 {
-	LOG_MMC(("mapper3_w offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("mapper3_w, offset: %04x, data: %02x\n", offset, data));
 
 	chr8(space->machine, data, CHRROM);
 }
@@ -283,7 +283,7 @@ static WRITE8_HANDLER( mapper4_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 
-	LOG_MMC(("mapper4_w offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("mapper4_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
@@ -324,7 +324,10 @@ static WRITE8_HANDLER( mapper4_w )
 		case 0x2001: /* extra RAM enable/disable */
 			state->mmc_cmd2 = data;	/* This actually is made of two parts: data&0x80 = WRAM enabled and data&0x40 = WRAM readonly!  */
 						/* We save this twice because we will need state->mmc_cmd2 in some clone mapper */
-			state->mid_ram_enable = data;
+			if (data)
+				memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+			else
+				memory_unmap_write(space, 0x6000, 0x7fff, 0, 0);
 			break;
 
 		case 0x4000:
@@ -2453,7 +2456,7 @@ static WRITE8_HANDLER( konami_vrc2b_w )
 				prg8_ab(space->machine, data);
 				break;
 			default:
-				LOG_MMC(("konami_vrc2b_w offset: %04x value: %02x\n", offset, data));
+				LOG_MMC(("konami_vrc2b_w, offset: %04x value: %02x\n", offset, data));
 				break;
 		}
 		return;
@@ -3215,7 +3218,7 @@ static WRITE8_HANDLER( mapper44_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 page;
-	LOG_MMC(("mapper44_w offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("mapper44_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
@@ -3914,7 +3917,7 @@ static WRITE8_HANDLER( mapper64_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map64_helper, cmd;
-	LOG_MMC(("mapper64_w offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("mapper64_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
@@ -4326,12 +4329,14 @@ static WRITE8_HANDLER( mapper69_w )
 				case 8:
 					if (!(data & 0x40))
 					{
-						state->mid_ram_enable = 0;	// is PRG ROM
+						// is PRG ROM
+						memory_unmap_write(space, 0x6000, 0x7fff, 0, 0);
 						prg8_67(space->machine, data & 0x3f);
 					}
 					else if (data & 0x80)
 					{
-						state->mid_ram_enable = 1;	// is PRG RAM
+						// is PRG RAM
+						memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
 						state->prg_bank[4] = state->prg_chunks + (data & 0x3f);
 						memory_set_bank(space->machine, "bank5", state->prg_bank[4]);
 					}
@@ -4420,7 +4425,7 @@ static WRITE8_HANDLER( mapper70_w )
 static WRITE8_HANDLER( mapper71_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	LOG_MMC(("mapper71_w offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("mapper71_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x7000)
 	{
@@ -5309,7 +5314,7 @@ static WRITE8_HANDLER( mapper92_w )
 
 static WRITE8_HANDLER( mapper93_w )
 {
-	LOG_MMC(("mapper93_w %04x:%02x\n", offset, data));
+	LOG_MMC(("mapper93_w, offset %04x, data: %02x\n", offset, data));
 
 	prg16_89ab(space->machine, data >> 4);
 }
@@ -5330,7 +5335,7 @@ static WRITE8_HANDLER( mapper93_w )
 
 static WRITE8_HANDLER( mapper94_w )
 {
-	LOG_MMC(("mapper94_w %04x:%02x\n", offset, data));
+	LOG_MMC(("mapper94_w, offset %04x, data: %02x\n", offset, data));
 
 	prg16_89ab(space->machine, data >> 2);
 }
@@ -7365,7 +7370,7 @@ static WRITE8_HANDLER( mapper158_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map158_helper, cmd;
-	LOG_MMC(("mapper158_w offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("mapper158_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6001)
 	{
@@ -8006,7 +8011,7 @@ static WRITE8_HANDLER( mapper184_m_w )
 
 static WRITE8_HANDLER( mapper185_w )
 {
-	LOG_MMC(("mapper3_w offset: %04x, data: %02x\n", offset, data));
+	LOG_MMC(("mapper3_w, offset: %04x, data: %02x\n", offset, data));
 
 	chr8(space->machine, data, CHRROM);
 }
@@ -9022,6 +9027,8 @@ static WRITE8_HANDLER( mapper205_m_w )
 
 static WRITE8_HANDLER( mapper206_w )
 {
+	LOG_MMC(("mapper206_w, offset: %04x, data: %02x\n", offset, data));
+
 	if ((offset & 0x6001) == 0x2000)
 		return;
 

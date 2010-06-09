@@ -174,6 +174,13 @@ READ8_HANDLER( nes_chr_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	int bank = offset >> 10;
+	
+	// a few CNROM boards contained copy protection schemes through
+	// suitably configured diodes, so that subsequent CHR reads can
+	// give actual VROM content or open bus values. 
+	// For most boards, chr_open_bus remains always zero.
+	if (state->chr_open_bus)
+		return 0xff;
 
 	return state->chr_map[bank].access[offset & 0x3ff];
 }
@@ -239,8 +246,8 @@ WRITE8_HANDLER( nes_mid_mapper_w )
 		else
 			state->wram[(state->prg_bank[4] - state->prgram_bank5_start) * 0x2000 + offset] = data;
 	}
-	else
-		logerror("Unimplemented MID mapper write, offset: %04x, data: %02x\n", offset + 0x6000, data);
+//	else
+//		logerror("Unimplemented MID mapper write, offset: %04x, data: %02x\n", offset + 0x6000, data);
 }
 
 // currently, this is not used (but it might become handy for some pirate mapper)
@@ -284,6 +291,24 @@ READ8_HANDLER( nes_mapper_r )
     Helpers to handle MMC
 
 *************************************************************/
+
+static void wram_bank( running_machine *machine, int bank, int source )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	assert(state->battery || state->prg_ram);
+	if (source == NES_BATTERY)
+	{
+		bank &= (state->battery_size / 0x2000) - 1;
+		state->prg_bank[4] = state->battery_bank5_start + bank;
+	}
+	else 
+	{
+		bank &= (state->wram_size / 0x2000) - 1;
+		state->prg_bank[4] = state->prgram_bank5_start + bank;
+	}
+	memory_set_bank(machine, "bank5", state->prg_bank[4]);
+}
 
 INLINE void prg_bank_refresh( running_machine *machine )
 {

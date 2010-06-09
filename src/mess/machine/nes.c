@@ -58,6 +58,12 @@ static void init_nes_core( running_machine *machine )
 
 	memory_set_bankptr(machine, "bank10", state->rom);
 
+	/* Set up the mapper callbacks */
+	if (state->format == 1)
+		mapper_handlers_setup(machine);
+	else if (state->format == 3 || state->format == 2)
+		pcb_handlers_setup(machine);
+
 	/* Set up the memory handlers for the mapper */
 	switch (state->mapper)
 	{
@@ -90,11 +96,11 @@ static void init_nes_core( running_machine *machine )
 			memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, nes_mapper50_add_w);
 		default:
 			state->slow_banking = 0;
-			memory_install_read_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
 			memory_install_read_bank(space, 0x8000, 0x9fff, 0, 0, "bank1");
 			memory_install_read_bank(space, 0xa000, 0xbfff, 0, 0, "bank2");
 			memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank3");
 			memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank4");
+			memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
 
 			/* configure banks 1-4 */
 			for (i = 0; i < 4; i++)
@@ -111,41 +117,38 @@ static void init_nes_core( running_machine *machine )
 			/* bank 5 configuration is more delicate, since it can have PRG RAM, PRG ROM or SRAM mapped to it */
 			/* we first map PRG ROM banks, then the battery bank (if a battery is present), and finally PRG RAM (state->wram) */
 			memory_configure_bank(machine, "bank5", 0, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+			state->battery_bank5_start = prg_banks;
 			state->prgram_bank5_start = prg_banks;
 			/* add battery ram, but only if there's no trainer since they share overlapping memory. */
 			if (state->battery && !state->trainer)
 			{
-				memory_configure_bank(machine, "bank5", prg_banks, 1, state->battery_ram, state->battery_size);
-				state->prgram_bank5_start += 1;
+				UINT32 bank_size = (state->battery_size > 0x2000) ? 0x2000 : state->battery_size;
+				int bank_num = (state->battery_size > 0x2000) ? state->battery_size / 0x2000 : 1;
+				memory_configure_bank(machine, "bank5", prg_banks, bank_num, state->battery_ram, bank_size);
+				state->prgram_bank5_start += bank_num;
 			}
 			/* add prg ram. */
 			if (state->prg_ram)
 				memory_configure_bank(machine, "bank5", state->prgram_bank5_start, state->wram_size / 0x2000, state->wram, 0x2000);
 
+			printf("%d %d\n", state->battery_bank5_start, state->prgram_bank5_start);
 			/* if we have any additional PRG RAM, point bank5 to its first bank */
 			if (state->battery || state->prg_ram)
-				state->prg_bank[4] = prg_banks;
+				state->prg_bank[4] = state->battery_bank5_start;
 			else
 				state->prg_bank[4] = 0; // or shall we point to "maincpu" region at 0x6000? point is that we should never access this region if no sram or wram is present!
 
 			memory_set_bank(machine, "bank5", state->prg_bank[4]);
 
-			memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
+			// there are still some quirk about writes to bank5... I hope to fix them soon. (mappers 34,45,52,246 have both mid_w and WRAM-->check)
+			if (state->mmc_write_mid)
+				memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
 //			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_r);
 			memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, nes_mapper_w);
 //			memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, nes_mapper_r);
 			break;
 	}
 
-	/* Set up the mapper callbacks */
-	if (state->format == 1)
-	{
-		mapper_handlers_setup(machine);
-	}
-	else if (state->format == 3 || state->format == 2)
-	{
-		pcb_handlers_setup(machine);
-	}
 }
 
 // to be probably removed (it does nothing since a long time)
@@ -1019,6 +1022,23 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if (state->prg_ram)
 			state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
 
+		state->ce_mask = 0;
+		state->ce_state = 0;
+
+		/* Check for pins */
+		// FIXME: this is hacky. it would be better to include these in some feature attribute
+		if (image_get_software_region(image, "pin26") != NULL)
+		{
+			state->ce_mask |= 0x01;
+			state->ce_state |= (image_get_software_region_length(image, "pin26") == 2) ? 0 : 0x01;
+		}
+		if (image_get_software_region(image, "pin27") != NULL)
+		{
+			state->ce_mask |= 0x02;
+			state->ce_state |= (image_get_software_region_length(image, "pin26") == 2) ? 0 : 0x02;
+		}
+		state->chr_open_bus = 0;
+		printf("Pin mask: %d state %d\n", state->ce_mask, state->ce_state);
 #if 1
 		printf("PCB Feature: %s\n", image_get_feature(image));
 		printf("PRG chunks: %d\n", state->prg_chunks);

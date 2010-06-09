@@ -734,7 +734,8 @@ enum
 	STD_HKROM, STD_JXROM, STD_MXROM, STD_NXROM, 
 	STD_PXROM, STD_SXROM, STD_TXROM, STD_TXSROM, 
 	STD_TQROM, STD_UN1ROM, STD_UXROM,
-	HVC_FAMBASIC, NES_QJ, NES_ZZ,
+	HVC_FAMBASIC, NES_QJ, PAL_ZZ,
+	STD_SXROM_A, STD_SOROM,
 	/* Discrete components boards (by various manufacturer */
 	DIS_74X161X138, 
 	DIS_74X139X74, DIS_74X377, DIS_74X161X161X32,
@@ -1010,6 +1011,8 @@ static int unif_initialize( running_machine *machine, int idx )
 			mapper_initialize(machine, 0);
 			break;
 		case STD_SXROM:
+		case STD_SOROM:
+		case STD_SXROM_A:
 			mapper_initialize(machine, 1);
 			break;
 		case STD_UXROM:
@@ -1029,6 +1032,9 @@ static int unif_initialize( running_machine *machine, int idx )
 			break;
 		case STD_AXROM:
 			mapper_initialize(machine, 7);
+			break;
+		case STD_PXROM:
+			mapper_initialize(machine, 9);
 			break;
 		case STD_FXROM:
 			mapper_initialize(machine, 10);
@@ -1075,7 +1081,7 @@ static int unif_initialize( running_machine *machine, int idx )
 		case UNL_SC127:
 			mapper_initialize(machine, 35);
 			break;
-		case NES_ZZ:
+		case PAL_ZZ:
 			mapper_initialize(machine, 37);
 			break;
 		case DIS_74X161X138:
