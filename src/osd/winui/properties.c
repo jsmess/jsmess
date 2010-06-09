@@ -484,7 +484,7 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 {
 	PROPSHEETHEADER pshead;
 	PROPSHEETPAGE   *pspage;
-	TCHAR*          t_description = 0;
+	TCHAR*          t_description = NULL;
 	OPTIONS_TYPE    default_type = opt_type;
 	
 	if (highlight_brush == NULL)
@@ -547,7 +547,6 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 	if (!pspage)
 		return;
 
-
 	// Get the description use as the dialog caption.
 	switch( opt_type )
 	{
@@ -563,12 +562,12 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 	case OPTIONS_GLOBAL:
 		t_description = tstring_from_utf8("Default Settings");
 		break;
-	default:
-		return;
 	}
 	// If we have no descrption, return.
-	if( !t_description )
+	if( !t_description ) {
+		free(pspage);
 		return;
+	}
 
 	/* Fill in the property sheet header */
 	pshead.pszCaption = t_description;
