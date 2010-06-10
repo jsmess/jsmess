@@ -41,9 +41,11 @@ typedef struct
 	int txIRQEnable;
 	int rxIRQEnable;
 	int extIRQEnable;
+	int baudIRQEnable;
 	int txIRQPending;
 	int rxIRQPending;
 	int extIRQPending;
+	int baudIRQPending;
 	int txEnable;
 	int rxEnable;
 	int txUnderrun;
@@ -51,6 +53,10 @@ typedef struct
 	int syncHunt;
 	int DCDEnable;
 	int CTSEnable;
+	int rxData;
+	int txData;
+
+	emu_timer *baudtimer;
 
 	UINT8 reg_val[16];
 } sccChan;
@@ -63,8 +69,8 @@ struct _scc8530_t
 	int status;
 	int IRQV;
 	int MasterIRQEnable;
-	int ExtStatusIRQEnable;
 	int lastIRQStat;
+	int clock;
 	SCCIRQType IRQType;
 
 	sccChan channel[2];
@@ -75,7 +81,7 @@ struct _scc8530_t
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
-
+	       
 INLINE scc8530_t *get_token(running_device *device)
 {
 	assert(device->type == SCC8530);
@@ -95,6 +101,65 @@ INLINE const scc8530_interface *get_interface(running_device *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    scc_updateirqs
+-------------------------------------------------*/
+
+static void scc_updateirqs(running_device *device)
+{
+	scc8530_t *scc = get_token(device);
+	int irqstat;
+
+	irqstat = 0;
+	if (scc->MasterIRQEnable)
+	{
+		if ((scc->channel[0].txIRQEnable) && (scc->channel[0].txIRQPending))
+		{
+			scc->IRQType = IRQ_B_TX;
+			irqstat = 1;
+		}
+		else if ((scc->channel[1].txIRQEnable) && (scc->channel[1].txIRQPending))
+		{
+			scc->IRQType = IRQ_A_TX;
+			irqstat = 1;
+		}
+		else if ((scc->channel[0].extIRQEnable) && (scc->channel[0].extIRQPending))
+		{
+			scc->IRQType = IRQ_B_EXT;
+			irqstat = 1;
+		}
+		else if ((scc->channel[1].extIRQEnable) && (scc->channel[1].extIRQPending))
+		{
+			scc->IRQType = IRQ_A_EXT;
+			irqstat = 1;
+		}
+	}
+	else
+	{
+		scc->IRQType = IRQ_NONE;
+	}
+
+//	printf("SCC: irqstat %d, last %d\n", irqstat, scc->lastIRQStat);
+//	printf("ch0: en %d pd %d  ch1: en %d pd %d\n", scc->channel[0].txIRQEnable, scc->channel[0].txIRQPending, scc->channel[1].txIRQEnable, scc->channel[1].txIRQPending);
+
+	// don't spam the driver with unnecessary transitions
+	if (irqstat != scc->lastIRQStat)
+	{
+		const scc8530_interface *intf = get_interface(device);
+
+		scc->lastIRQStat = irqstat;
+
+		// tell the driver the new IRQ line status if possible
+		if ((intf != NULL) && (intf->irq != NULL))
+		{
+			#if LOG_SCC
+			printf("SCC8530 IRQ status => %d\n", irqstat);
+			#endif
+			(*intf->irq)(device, irqstat);
+		}
+	}
+}
+
+/*-------------------------------------------------
     scc_initchannel
 -------------------------------------------------*/
 static void scc8530_initchannel(scc8530_t *scc, int ch)
@@ -107,9 +172,43 @@ static void scc8530_initchannel(scc8530_t *scc, int ch)
 -------------------------------------------------*/
 static void scc8530_resetchannel(scc8530_t *scc, int ch)
 {
+	emu_timer *timersave = scc->channel[ch].baudtimer;
+
 	memset(&scc->channel[ch], 0, sizeof(sccChan));
 
 	scc->channel[ch].txUnderrun = 1;
+	scc->channel[ch].baudtimer = timersave;
+
+	timer_adjust_oneshot(scc->channel[ch].baudtimer, attotime_never, ch);
+}
+
+/*-------------------------------------------------
+    scc8530_baud_expire - baud rate timer expiry
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( scc8530_baud_expire )
+{
+	running_device *device = (running_device *)ptr;
+	scc8530_t *scc = get_token(device);
+	sccChan *pChan = &scc->channel[param];
+	int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
+	int rate = scc->clock / brconst;
+
+	// is baud counter IRQ enabled on this channel?
+	// always flag pending in case it's enabled after this
+	pChan->baudIRQPending = 1;
+	if (pChan->baudIRQEnable)
+	{
+		if (pChan->extIRQEnable)
+		{
+			pChan->extIRQPending = 1;
+			pChan->baudIRQPending = 0;
+ 			scc_updateirqs(device);
+		}
+	}
+
+	// reset timer according to current register values
+	timer_adjust_periodic(pChan->baudtimer, ATTOTIME_IN_HZ(rate), param, ATTOTIME_IN_HZ(rate));
 }
 
 /*-------------------------------------------------
@@ -120,6 +219,10 @@ static DEVICE_START( scc8530 )
 {
 	scc8530_t *scc = get_token(device);
 	memset(scc, 0, sizeof(*scc));
+	scc->clock = device->clock;
+
+	scc->channel[0].baudtimer = timer_alloc(device->machine, scc8530_baud_expire, (void *)device);
+	scc->channel[1].baudtimer = timer_alloc(device->machine, scc8530_baud_expire, (void *)device);
 }
 
 
@@ -162,62 +265,6 @@ static void scc_acknowledge(running_device *device)
 }
 
 /*-------------------------------------------------
-    scc_updateirqs
--------------------------------------------------*/
-
-static void scc_updateirqs(running_device *device)
-{
-	scc8530_t *scc = get_token(device);
-	int irqstat;
-
-	irqstat = 0;
-	if (scc->MasterIRQEnable)
-	{
-		if ((scc->channel[0].txIRQEnable) && (scc->channel[0].txIRQPending))
-		{
-			scc->IRQType = IRQ_B_TX;
-			irqstat = 1;
-		}
-		else if ((scc->channel[1].txIRQEnable) && (scc->channel[1].txIRQPending))
-		{
-			scc->IRQType = IRQ_A_TX;
-			irqstat = 1;
-		}
-		else if ((scc->channel[0].extIRQEnable) && (scc->channel[0].extIRQPending))
-		{
-			scc->IRQType = IRQ_B_EXT;
-			irqstat = 1;
-		}
-		else if ((scc->channel[1].extIRQEnable) && (scc->channel[1].extIRQPending))
-		{
-			scc->IRQType = IRQ_A_EXT;
-			irqstat = 1;
-		}
-	}
-	else
-	{
-		scc->IRQType = IRQ_NONE;
-	}
-
-//  printf("SCC: irqstat %d, last %d\n", irqstat, scc->lastIRQStat);
-//  printf("ch0: en %d pd %d  ch1: en %d pd %d\n", scc->channel[0].txIRQEnable, scc->channel[0].txIRQPending, scc->channel[1].txIRQEnable, scc->channel[1].txIRQPending);
-
-	// don't spam the driver with unnecessary transitions
-	if (irqstat != scc->lastIRQStat)
-	{
-		const scc8530_interface *intf = get_interface(device);
-
-		scc->lastIRQStat = irqstat;
-
-		// tell the driver the new IRQ line status if possible
-		if ((intf != NULL) && (intf->irq != NULL))
-		{
-			(*intf->irq)(device, irqstat);
-		}
-	}
-}
-
-/*-------------------------------------------------
     scc_getareg
 -------------------------------------------------*/
 
@@ -226,7 +273,9 @@ static int scc_getareg(running_device *device)
 	scc8530_t *scc = get_token(device);
 
 	/* Not yet implemented */
-	logerror("SCC: port A reg %i read 0x%02x\n", scc->reg, scc->channel[0].reg_val[scc->reg]);
+	#if LOG_SCC
+	printf("SCC: port A reg %d read 0x%02x\n", scc->reg, scc->channel[0].reg_val[scc->reg]);
+	#endif
 	return scc->channel[0].reg_val[scc->reg];
 }
 
@@ -240,7 +289,9 @@ static int scc_getbreg(running_device *device)
 {
 	scc8530_t *scc = get_token(device);
 
-	logerror("SCC: port B reg %i read 0x%02x\n", scc->reg, scc->channel[1].reg_val[scc->reg]);
+	#if LOG_SCC
+	printf("SCC: port B reg %i read 0x%02x\n", scc->reg, scc->channel[1].reg_val[scc->reg]);
+	#endif
 
 	if (scc->reg == 2)
 	{
@@ -265,16 +316,9 @@ static void scc_putreg(running_device *device, int ch, int data)
 	sccChan *pChan = &scc->channel[ch];
 
 	scc->channel[ch].reg_val[scc->reg] = data;
-	logerror("SCC: port %c reg %i write 0x%02x\n", 'A'+ch, scc->reg, data);
-
-	// temporary hack
-	if ((ch == 1) && (scc->reg == 0))
-	{
-		if (data & 0x10)
-			scc_acknowledge(device);
-
-		return;
-	}
+	#if LOG_SCC
+	printf("SCC: port %c reg %d write 0x%02x\n", 'A'+ch, scc->reg, data);
+	#endif
 
 	switch (scc->reg)
 	{
@@ -305,7 +349,7 @@ static void scc_putreg(running_device *device, int ch, int data)
 			break;
 
 		case 1:	// Tx/Rx IRQ and data transfer mode defintion
-			scc->ExtStatusIRQEnable = (data & 1);
+			pChan->extIRQEnable = (data & 1);
 			pChan->txIRQEnable = (data & 2) ? 1 : 0;
 			pChan->rxIRQEnable = (data >> 3) & 3;
 			scc_updateirqs(device);
@@ -323,6 +367,11 @@ static void scc_putreg(running_device *device, int ch, int data)
 		case 5: // Tx parameters and controls
 //          printf("ch %d TxEnable = %d [%02x]\n", ch, data & 8, data);
 			pChan->txEnable = data & 8;
+
+			if (pChan->txEnable)
+			{
+				pChan->reg_val[0] |= 0x04;	// Tx empty
+			}
 			break;
 
 		case 4: // Tx/Rx misc parameters and modes
@@ -372,10 +421,17 @@ static void scc_putreg(running_device *device, int ch, int data)
 			break;
 
 		case 14:	// misc control bits
-			if (data & 0x10) logerror("SCC8530 ch %d: Loopback mode enabled, not supported!\n", ch);
+			if (data & 0x01)	// baud rate generator enable?
+			{
+				int brconst = pChan->reg_val[13]<<8 | pChan->reg_val[14];
+				int rate = scc->clock / brconst;
+
+				timer_adjust_periodic(pChan->baudtimer, ATTOTIME_IN_HZ(rate), ch, ATTOTIME_IN_HZ(rate));
+			}
 			break;
 
 		case 15:	// external/status interrupt control
+			pChan->baudIRQEnable = (data & 2) ? 1 : 0;
 			pChan->DCDEnable = (data & 8) ? 1 : 0;
 			pChan->CTSEnable = (data & 0x20) ? 1 : 0;
 			pChan->txUnderrunEnable = (data & 0x40) ? 1 : 0;
@@ -442,9 +498,6 @@ READ8_DEVICE_HANDLER(scc8530_r)
 
 	offset %= 4;
 
-	if (LOG_SCC)
-		logerror("scc_r: offset=%u\n", (unsigned int) offset);
-
 	switch(offset)
 	{
 		case 0:
@@ -469,12 +522,12 @@ READ8_DEVICE_HANDLER(scc8530_r)
 
 		case 2:
 			/* Channel B (Printer Port) Data */
-			/* Not yet implemented */
+			return scc->channel[1].rxData;
 			break;
 
 		case 3:
 			/* Channel A (Modem Port) Data */
-			/* Not yet implemented */
+			return scc->channel[0].rxData;
 			break;
 	}
 	return result;
@@ -493,6 +546,8 @@ WRITE8_DEVICE_HANDLER(scc8530_w)
 
 	offset &= 3;
 
+//	printf("SCC: mode %d data %x offset %d\n", scc->mode, data, offset);
+
 	switch(offset)
 	{
 		case 0:
@@ -503,8 +558,15 @@ WRITE8_DEVICE_HANDLER(scc8530_w)
 				{
 					scc->mode = 1;
 					scc->reg = data & 0x0f;
-					logerror("SCC: Port B Reg select - %i\n",scc->reg);
-//                  scc_putbreg(device, data & 0xf0);
+//					scc_putbreg(device, data & 0xf0);
+				}
+				else if (data == 0x10)
+				{
+					pChan = &scc->channel[1];
+					// clear ext. interrupts
+					pChan->extIRQPending = 0;
+					pChan->baudIRQPending = 0;
+					scc_updateirqs(device);
 				}
 			}
 			else
@@ -522,8 +584,15 @@ WRITE8_DEVICE_HANDLER(scc8530_w)
 				{
 					scc->mode = 1;
 					scc->reg = data & 0x0f;
-					logerror("SCC: Port A Reg select - %i\n", scc->reg);
-//                  scc_putareg(device, data & 0xf0);
+//					scc_putareg(device, data & 0xf0);
+				}
+				else if (data == 0x10)
+				{
+					pChan = &scc->channel[0];
+					// clear ext. interrupts
+					pChan->extIRQPending = 0;
+					pChan->baudIRQPending = 0;
+					scc_updateirqs(device);
 				}
 			}
 			else
@@ -539,6 +608,15 @@ WRITE8_DEVICE_HANDLER(scc8530_w)
 
 			if (pChan->txEnable)
 			{
+				pChan->txData = data;
+				// local loopback?
+				if (pChan->reg_val[14] & 0x10)
+				{
+					pChan->rxData = data;
+					pChan->reg_val[0] |= 0x01;	// Rx character available
+				}
+				pChan->reg_val[1] |= 0x01;	// All sent
+				pChan->reg_val[0] |= 0x04;	// Tx empty
 				pChan->txUnderrun = 1;
 				pChan->txIRQPending = 1;
 				scc_updateirqs(device);
@@ -551,6 +629,15 @@ WRITE8_DEVICE_HANDLER(scc8530_w)
 
 			if (pChan->txEnable)
 			{
+				pChan->txData = data;
+				// local loopback?
+				if (pChan->reg_val[14] & 0x10)
+				{
+					pChan->rxData = data;
+					pChan->reg_val[0] |= 0x01;	// Rx character available
+				}
+				pChan->reg_val[1] |= 0x01;	// All sent
+				pChan->reg_val[0] |= 0x04;	// Tx empty
 				pChan->txUnderrun = 1;
 				pChan->txIRQPending = 1;
 				scc_updateirqs(device);
@@ -587,3 +674,4 @@ DEVICE_GET_INFO( scc8530 )
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
+
