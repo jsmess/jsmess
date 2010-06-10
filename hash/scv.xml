@@ -147,6 +147,19 @@ Information found at http://www.rhod.fr/yeno_epoch.html
         </part>
     </software>
 
+	<software name="dragonsl">
+		<description>Dragonslayer</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="dragonsl.bin" size="32768" crc="5971940f" sha1="c6e67e05d365fa81d3d9a3ad66d41bfeb1c3dd0d" offset="0" />
+			</dataarea>
+			<!-- 8KB? RAM on cartridge -->
+			<dataarea name="ram" size="8192" />
+		</part>
+	</software>
+
 	<software name="elevfght">
 		<description>Elevator Fight</description>
 		<year>1984</year>
@@ -211,6 +224,17 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 		<part name="cart" interface="scv_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="miner_2049er.bin" size="16384" crc="b0ffc6e2" sha1="0414878f4aedade180b273257497c1d11cdccb2f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="y2mnstld">
+		<description>Y2 Monster Land</description>
+		<year>1986</year>
+		<publisher>Epoch</publisher>
+		<part name="cart" interface="scv_cart">
+			<dataarea name="rom" size="131072">
+				<rom name="y2mnstld.bin" size="131072" crc="3ac28fe0" sha1="5ae7796ad35a7c537de11ebd3cfe3868d67235a1" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -400,10 +424,5 @@ Information found at http://www.rhod.fr/yeno_epoch.html
 			</dataarea>
 		</part>
 	</software>
-
-<!--
-	/* Dragon Slayer */
-	/* Wai Wai Monster Land */
--->
 
 </softwarelist>
