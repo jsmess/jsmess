@@ -288,13 +288,13 @@ static void audio_tick(running_machine *machine, int ref)
 				state->fifo_a_ptr = 0;
 			}
 
-			if (state->SOUNDCNT_H & 0x100)
+			if (state->SOUNDCNT_H & 0x200)
 			{
 				running_device *dac_device = devtag_get_device(machine, "direct_a_left");
 
 				dac_signed_data_w(dac_device, state->fifo_a[state->fifo_a_ptr]^0x80);
 			}
-			if (state->SOUNDCNT_H & 0x200)
+			if (state->SOUNDCNT_H & 0x100)
 			{
 				running_device *dac_device = devtag_get_device(machine, "direct_a_right");
 
@@ -328,13 +328,13 @@ static void audio_tick(running_machine *machine, int ref)
 				state->fifo_b_ptr = 0;
 			}
 
-			if (state->SOUNDCNT_H & 0x1000)
+			if (state->SOUNDCNT_H & 0x2000)
 			{
 				running_device *dac_device = devtag_get_device(machine, "direct_b_left");
 
 				dac_signed_data_w(dac_device, state->fifo_b[state->fifo_b_ptr]^0x80);
 			}
-			if (state->SOUNDCNT_H & 0x2000)
+			if (state->SOUNDCNT_H & 0x1000)
 			{
 				running_device *dac_device = devtag_get_device(machine, "direct_b_right");
 
