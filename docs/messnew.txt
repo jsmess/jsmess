@@ -46,7 +46,7 @@ Source Changes:
 - The core is based on MAME 0.138u1.  This incorporates all features of the
   update to this core.  [MAME team]
 
-- Fixed setting of tpae flags when reaching end of tape. This prevented
+- Fixed setting of tape flags when reaching end of tape. This prevented
   the user from using any other tape beyond the first mounted tape image
   on certain systems.  [Wilbert Pol]
 
