@@ -13,7 +13,7 @@
 
 
 #define CASSETTE_TAG		"cassette"
-#define ANIMATION_FPS		4
+#define ANIMATION_FPS		1
 #define ANIMATION_FRAMES	4
 
 #define VERBOSE				0
@@ -94,7 +94,7 @@ static void cassette_update(running_device *device)
 				double length = cassette_get_length(device);
 				if (new_position > length)
 				{
-					cassette->state = (cassette_state)(CASSETTE_MASK_DRVSTATE);
+					cassette->state = (cassette_state)(( cassette->state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
 					new_position = length;
 				}
 			}

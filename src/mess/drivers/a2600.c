@@ -834,16 +834,6 @@ static READ8_HANDLER(modeSS_r)
 		}
 		memory_set_bankptr(space->machine, "bank1", bank_base[1] );
 		memory_set_bankptr(space->machine, "bank2", bank_base[2] );
-
-		/* Check if we should stop the tape */
-		if ( cpu_get_pc(devtag_get_device(space->machine, "maincpu")) == 0x00FD )
-		{
-			running_device *img = devtag_get_device(space->machine, "cassette");
-			if ( img )
-			{
-				cassette_change_state(img, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-			}
-		}
 	}
 	else if ( offset == 0xFF9 )
 	{
@@ -1882,7 +1872,7 @@ static MACHINE_RESET( a2600 )
 		modeSS_write_enabled = 0;
 		modeSS_byte_started = 0;
 		memory_set_direct_update_handler(space, modeSS_opbase );
-		/* Already start the motor of the cassette for the user */
+		/* The Supercharger has no motor control so just enable it */
 		cassette_change_state( devtag_get_device(machine, "cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
 
