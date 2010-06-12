@@ -1053,6 +1053,43 @@
 		</part>
 	</software>
 
+<!-- ID 251 -->
+	<software name="kof99">
+		<description>The King of Fighters '99 - Millennium Battle</description>
+		<year>1999</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart" feature="kof99_crypt">
+			<dataarea name="maincpu" size="9437184">
+                <rom name="251-sma.kc" size="262144" crc="6c9d0647" sha1="2a0ce62ca6c18007e8fbe1b60475c7874ab79389" offset="0c0000" />
+                <rom name="251-p1.bin" size="4194304" crc="006e4532" sha1="47791ab4044ad55988b1d3412d95b65b91a163c8" offset="100000" />
+                <rom name="251-pg2.bin" size="4194304" crc="d9057f51" sha1="8d365b4dd40351495df99d6c765df1434b0b0548" offset="500000" />
+			</dataarea>
+			<dataarea name="fixed" size="131072">
+                <rom value="0" length="131072" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="251-m1.bin" size="131072" crc="5e74539c" sha1="6f49a9343cbd026b2c6720ff3fa2e5b1f85e80da" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="14680064">
+                <rom name="251-v1.bin" size="4194304" crc="ef2eecc8" sha1="8ed13b9db92dba3124bc5ba66e3e275885ece24a" offset="000000" />
+                <rom name="251-v2.bin" size="4194304" crc="73e211ca" sha1="0e60fa64cab6255d9721e2b4bc22e3de64c874c5" offset="400000" />
+                <rom name="251-v3.bin" size="4194304" crc="821901da" sha1="c6d4975bfaa19a62ed59126cadf2578c0a5c257f" offset="800000" />
+                <rom name="251-v4.bin" size="2097152" crc="b49e6178" sha1="dde6f76e958841e8c99b693e13ced9aa9ef316dc" offset="c00000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="251-c1.bin" size="8388608" crc="0f9e93fe" sha1="c7d77f0833c6f526f632e4f2dce59e302f6b9a15" offset="000000" loadflag="load16_byte" />
+                <rom name="251-c2.bin" size="8388608" crc="e71e2ea3" sha1="39c7a326fddbcca3b29c68cdc96aad4d62295c0f" offset="000001" loadflag="load16_byte" />
+                <rom name="251-c3.bin" size="8388608" crc="238755d2" sha1="01125b5c7a28e350f091280b041954fd1ac7c98f" offset="1000000" loadflag="load16_byte" />
+                <rom name="251-c4.bin" size="8388608" crc="438c8b22" sha1="ffbc643f5b27dd00f2f95d4ef4c5f29ee814722b" offset="1000001" loadflag="load16_byte" />
+                <rom name="251-c5.bin" size="8388608" crc="0b0abd0a" sha1="d5ad324fe523bdc6f09209d236cc4932524a48f1" offset="2000000" loadflag="load16_byte" />
+                <rom name="251-c6.bin" size="8388608" crc="65bbf281" sha1="79ae174667a23dabcfe865b6cd6133c86098452e" offset="2000001" loadflag="load16_byte" />
+                <rom name="251-c7.bin" size="8388608" crc="ff65f62e" sha1="7cd335fede05b56e15db90ce407c1183a78da4e9" offset="3000000" loadflag="load16_byte" />
+                <rom name="251-c8.bin" size="8388608" crc="8d921c68" sha1="42acf1d27d52a8e3b6262eb7df50693c0b135565" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 256 -->
 	<software name="mslug3">
 		<description>Metal Slug 3</description>

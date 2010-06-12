@@ -416,6 +416,14 @@ static void install_protection(running_device* image)
 		fatfury2_install_protection(image->machine);
 		logerror("Installed Fatal Fury 2 protection\n");
 	}
+	if(strcmp(image_get_feature(image),"kof99_crypt") == 0)
+	{
+		kof99_decrypt_68k(image->machine);
+		state->fixed_layer_bank_type = 1;
+		kof99_neogeo_gfx_decrypt(image->machine, 0x00);
+		kof99_install_protection(image->machine);
+		logerror("Decrypted KOF99 code and graphics.\n");
+	}
 	if(strcmp(image_get_feature(image),"mslug3_crypt") == 0)
 	{
 		state->fixed_layer_bank_type = 1;
@@ -439,6 +447,7 @@ static void install_protection(running_device* image)
 		neogeo_cmc50_m1_decrypt(image->machine);
 		kof2000_neogeo_gfx_decrypt(image->machine, 0x57);
 		install_pvc_protection(image->machine);
+		logerror("Decrypted SvC code, sound and graphics.\n");
 	}
 	if(strcmp(image_get_feature(image),"samsho5_crypt") == 0)
 	{
@@ -447,6 +456,40 @@ static void install_protection(running_device* image)
 		state->fixed_layer_bank_type = 1;
 		neogeo_cmc50_m1_decrypt(image->machine);
 		kof2000_neogeo_gfx_decrypt(image->machine, 0x0f);
+		logerror("Decrypted Samurai Shodown V code, sound and graphics.\n");
+	}
+	if(strcmp(image_get_feature(image),"kof2001_crypt") == 0)
+	{
+		state->fixed_layer_bank_type = 1;
+		kof2000_neogeo_gfx_decrypt(image->machine, 0x1e);
+		neogeo_cmc50_m1_decrypt(image->machine);
+		logerror("Decrypted KOF2001 code and graphics.\n");
+	}
+	if(strcmp(image_get_feature(image),"kof2002_crypt") == 0)
+	{
+		kof2002_decrypt_68k(image->machine);
+		neo_pcm2_swap(image->machine, 0);
+		neogeo_cmc50_m1_decrypt(image->machine);
+		kof2000_neogeo_gfx_decrypt(image->machine, 0xec);
+		logerror("Decrypted KOF2002 code, sound and graphics.\n");
+	}
+	if(strcmp(image_get_feature(image),"mslug4_crypt") == 0)
+	{
+		state->fixed_layer_bank_type = 1; /* USA violent content screen is wrong -- not a bug, confirmed on real hardware! */
+		neogeo_cmc50_m1_decrypt(image->machine);
+		kof2000_neogeo_gfx_decrypt(image->machine, 0x31);
+		neo_pcm2_snk_1999(image->machine, 8);
+		logerror("Decrypted Metal Slug 4 code, sound and graphics.\n");
+	}
+	if(strcmp(image_get_feature(image),"mslug5_crypt") == 0)
+	{
+		mslug5_decrypt_68k(image->machine);
+		neo_pcm2_swap(image->machine, 2);
+		state->fixed_layer_bank_type = 1;
+		neogeo_cmc50_m1_decrypt(image->machine);
+		kof2000_neogeo_gfx_decrypt(image->machine, 0x19);
+		install_pvc_protection(image->machine);
+		logerror("Decrypted Metal Slug 5 code and graphics, and installed protection routines.\n");
 	}
 }
 
