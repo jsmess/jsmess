@@ -1125,6 +1125,116 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!-- ID 262 -->
+	<software name="kof2001">
+		<description>The King of Fighters 2001</description>
+		<year>2001</year>
+		<publisher>Eolith / SNK</publisher>
+		<part name="cart" interface="aes_cart" feature="kof2001_crypt">
+			<dataarea name="maincpu" size="5242880">
+                <rom name="262-pg1.bin" size="1048576" crc="2af7e741" sha1="e41282d73ed6d521da056f1a16573bb61bfa3826" offset="000000" />
+                <rom name="262-pg2.bin" size="4194304" crc="91eea062" sha1="82bae42bbeedb9f3aa0c7c0b0a7a69be499cf98f" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="524288">
+                <rom value="0" length="524288" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="589824">
+                <rom value="ff" length="589824" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocrypt" size="524288">
+                <rom name="265-262-m1.bin" size="262144" crc="a7f8119f" sha1="71805b39b8b09c32425cf39f9de59b2f755976c2" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="262-v1-08-e0.bin" size="4194304" crc="83d49ecf" sha1="2f2c116e45397652e77fcf5d951fa5f71b639572" offset="000000" />
+                <rom name="262-v2-08-e0.bin" size="4194304" crc="003f1843" sha1="bdd58837ad542548bd4053c262f558af88e3b989" offset="400000" />
+                <rom name="262-v3-08-e0.bin" size="4194304" crc="2ae38dbe" sha1="4e82b7dd3b899d61907620517a5a27bdaba0725d" offset="800000" />
+                <rom name="262-v4-08-e0.bin" size="4194304" crc="26ec4dd9" sha1="8bd68d95a2d913be41a51f51e48dbe3bff5924fb" offset="c00000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="262-c1-08-e0.bin" size="8388608" crc="99cc785a" sha1="374f0674871d0196fa274aa6c5956d7b3848d5da" offset="000000" loadflag="load16_byte" />
+                <rom name="262-c2-08-e0.bin" size="8388608" crc="50368cbf" sha1="5d9e206e98e0b0c7735b72ea46b45058fdec2352" offset="000001" loadflag="load16_byte" />
+                <rom name="262-c3-08-e0.bin" size="8388608" crc="fb14ff87" sha1="445a8db2fc69eff54a252700f2d3a89244c58e75" offset="1000000" loadflag="load16_byte" />
+                <rom name="262-c4-08-e0.bin" size="8388608" crc="4397faf8" sha1="6752b394f6647502a649a3e62bd3442f936b733e" offset="1000001" loadflag="load16_byte" />
+                <rom name="262-c5-08-e0.bin" size="8388608" crc="91f24be4" sha1="88190c41f7d4a0f4b1982149fc9acfc640af498d" offset="2000000" loadflag="load16_byte" />
+                <rom name="262-c6-08-e0.bin" size="8388608" crc="a31e4403" sha1="5cd1a14703aa58810e2377dfb7353c61e9dc9c1f" offset="2000001" loadflag="load16_byte" />
+                <rom name="262-c7-08-e0.bin" size="8388608" crc="54d9d1ec" sha1="80c3a8ec39130dd5d3da561f287709da6b8abcf4" offset="3000000" loadflag="load16_byte" />
+                <rom name="262-c8-08-e0.bin" size="8388608" crc="59289a6b" sha1="ddfce7c85b2a144975db5bb14b4b51aaf881880e" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 263 -->
+	<software name="mslug4">
+		<description>Metal Slug 4</description>
+		<year>2002</year>
+		<publisher>Mega / Playmore</publisher>
+		<part name="cart" interface="aes_cart" feature="mslug4_crypt">
+			<dataarea name="maincpu" size="5242880">
+                <rom name="263-ph1.bin" size="1048576" crc="c67f5c8d" sha1="12af74964843f103520d9f0825069ea2f67eeb2f" offset="000000" />
+                <rom name="263-ph2.bin" size="4194304" crc="bc3ec89e" sha1="2cb0626bc4fa57e1d25f208e04532b570d87b3fb" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="524288">
+                <rom value="0" length="524288" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="589824">
+                <rom value="ff" length="589824" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocrypt" size="524288">
+                <rom name="263-m1.bin" size="131072" crc="46ac8228" sha1="5aeea221050c98e4bb0f16489ce772bf1c80f787" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="263-v1.bin" size="8388608" crc="01e9b9cd" sha1="0b045c2999449f7dab5ae8a42e957d5b6650431e" offset="000000" />
+                <rom name="263-v2.bin" size="8388608" crc="4ab2bf81" sha1="77ccfa48f7e3daddef5fe5229a0093eb2f803742" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="50331648">
+                <rom name="263-c1.bin" size="8388608" crc="84865f8a" sha1="34467ada896eb7c7ca58658bf2a932936d8b632c" offset="000000" loadflag="load16_byte" />
+                <rom name="263-c2.bin" size="8388608" crc="81df97f2" sha1="2b74493b8ec8fd49216a627aeb3db493f76124e3" offset="000001" loadflag="load16_byte" />
+                <rom name="263-c3.bin" size="8388608" crc="1a343323" sha1="bbbb5232bba538c277ce2ee02e2956ca2243b787" offset="1000000" loadflag="load16_byte" />
+                <rom name="263-c4.bin" size="8388608" crc="942cfb44" sha1="d9b46c71726383c4581fb042e63897e5a3c92d1b" offset="1000001" loadflag="load16_byte" />
+                <rom name="263-c5.bin" size="8388608" crc="a748854f" sha1="2611bbedf9b5d8e82c6b2c99b88f842c46434d41" offset="2000000" loadflag="load16_byte" />
+                <rom name="263-c6.bin" size="8388608" crc="5c8ba116" sha1="6034db09c8706d4ddbcefc053efbc47a0953eb92" offset="2000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 265 -->
+	<software name="kof2002">
+		<description>The King of Fighters 2002</description>
+		<year>2002</year>
+		<publisher>Eolith / Playmore</publisher>
+		<part name="cart" interface="aes_cart" feature="kof2002_crypt">
+			<dataarea name="maincpu" size="5242880">
+                <rom name="265-p1.bin" size="1048576" crc="9ede7323" sha1="ad9d45498777fda9fa58e75781f48e09aee705a6" offset="000000" />
+                <rom name="265-p2.bin" size="4194304" crc="327266b8" sha1="98f445cc0a94f8744d74bca71cb420277622b034" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="524288">
+                <rom value="0" length="524288" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="589824">
+                <rom value="ff" length="589824" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocrypt" size="524288">
+                <rom name="265-m1.bin" size="131072" crc="85aaa632" sha1="744fba4ca3bc3a5873838af886efb97a8a316104" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="265-v1.bin" size="8388608" crc="15e8f3f5" sha1="7c9e6426b9fa6db0158baa17a6485ffce057d889" offset="000000" />
+                <rom name="265-v2.bin" size="8388608" crc="da41d6f9" sha1="a43021f1e58947dcbe3c8ca5283b20b649f0409d" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="265-c1.bin" size="8388608" crc="2b65a656" sha1="9c46d8cf5b1ef322db442ac6a9b9406ab49206c5" offset="000000" loadflag="load16_byte" />
+                <rom name="265-c2.bin" size="8388608" crc="adf18983" sha1="150cd4a5e51e9df88688469d2ea7675c2cf3658a" offset="000001" loadflag="load16_byte" />
+                <rom name="265-c3.bin" size="8388608" crc="875e9fd7" sha1="28f52d56192d48bbc5dc3c97abf456bd34a58cbd" offset="1000000" loadflag="load16_byte" />
+                <rom name="265-c4.bin" size="8388608" crc="2da13947" sha1="f8d79ec2c236aa3d3648a4f715676899602122c1" offset="1000001" loadflag="load16_byte" />
+                <rom name="265-c5.bin" size="8388608" crc="61bd165d" sha1="b3424db84bc683d858fb635bc42728f9cdd89caf" offset="2000000" loadflag="load16_byte" />
+                <rom name="265-c6.bin" size="8388608" crc="03fdd1eb" sha1="6155c7e802062f4eafa27e414c4e73ee59b868bf" offset="2000001" loadflag="load16_byte" />
+                <rom name="265-c7.bin" size="8388608" crc="1a2749d8" sha1="af7d9ec1d576209826fa568f676bbff92f6d6ddd" offset="3000000" loadflag="load16_byte" />
+                <rom name="265-c8.bin" size="8388608" crc="ab0bb549" sha1="d23afb60b7f831f7d4a98ad3c4a00ee19877a1ce" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- ID 266 -->
 	<software name="matrim">
 		<description>Matrimelee / Shin Gouketsuji Ichizoku Toukon</description>
@@ -1160,6 +1270,43 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!-- ID 268 -->
+	<software name="mslug5">
+		<description>Metal Slug 5</description>
+		<year>2003</year>
+		<publisher>SNK Playmore</publisher>
+		<part name="cart" interface="aes_cart" feature="mslug5_crypt">
+			<dataarea name="maincpu" size="8388608">
+                <rom name="268-p1cr2.bin" size="4194304" crc="3636690a" sha1="e0da714b4bdc6efffe1250ded02ebddb3ab6d7b3" offset="000000" loadflag="load32_word" />
+                <rom name="268-p2cr2.bin" size="4194304" crc="8dfc47a2" sha1="27d618cfbd0107a4d2a836797e967b39d2eb4851" offset="000002" loadflag="load32_word" />
+			</dataarea>
+			<dataarea name="fixed" size="524288">
+                <rom value="0" length="524288" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="589824">
+                <rom value="ff" length="589824" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocrypt" size="524288">
+                <rom name="268-m1h.bin" size="524288" crc="4a5a6e0e" sha1="df0f660f2465e1db7be5adfcaf5e88ad61a74a42" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="268-v1c.bin" size="8388608" crc="ae31d60c" sha1="c42285cf4e52fea74247860813e826df5aa7600a" offset="000000" />
+                <rom name="268-v2c.bin" size="8388608" crc="c40613ed" sha1="af889570304e2867d7dfea1e94e388c06249fb67" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="268-c1c.bin" size="8388608" crc="ab7c389a" sha1="025a188de589500bf7637fa8e7a37ab24bf4312e" offset="000000" loadflag="load16_byte" />
+                <rom name="268-c2c.bin" size="8388608" crc="3560881b" sha1="493d218c92290b4770024d6ee2917c4022753b07" offset="000001" loadflag="load16_byte" />
+                <rom name="268-c3c.bin" size="8388608" crc="3af955ea" sha1="cf36b6ae9b0d12744b17cb7a928399214de894be" offset="1000000" loadflag="load16_byte" />
+                <rom name="268-c4c.bin" size="8388608" crc="c329c373" sha1="5073d4079958a0ef5426885af2c9e3178f37d5e0" offset="1000001" loadflag="load16_byte" />
+                <rom name="268-c5c.bin" size="8388608" crc="959c8177" sha1="889bda7c65d71172e7d89194d1269561888fe789" offset="2000000" loadflag="load16_byte" />
+                <rom name="268-c6c.bin" size="8388608" crc="010a831b" sha1="aec140661e3ae35d264df416478ba15188544d91" offset="2000001" loadflag="load16_byte" />
+                <rom name="268-c7c.bin" size="8388608" crc="6d72a969" sha1="968dd9a4d1209b770b9b85ea6532fa24d262a262" offset="3000000" loadflag="load16_byte" />
+                <rom name="268-c8c.bin" size="8388608" crc="551d720e" sha1="ebf69e334fcaba0fda6fd432fd0970283a365d12" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 269 -->
 	<software name="svc">
 		<description>SNK vs CAPCOM SVC CHAOS</description>
