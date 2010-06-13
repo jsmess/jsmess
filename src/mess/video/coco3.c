@@ -649,7 +649,7 @@ UINT32 coco3_get_video_base(UINT8 ff9d_mask, UINT8 ff9e_mask)
      */
 	return	((offs_t) (coco3_gimereg[14] & ff9e_mask)	* 0x00008)
 		|	((offs_t) (coco3_gimereg[13] & ff9d_mask)	* 0x00800)
-		|	((offs_t) (coco3_gimereg[11] & 0x03)		* 0x80000);
+		|	((offs_t) (coco3_gimereg[11] & 0x0F)		* 0x80000);
 }
 
 
