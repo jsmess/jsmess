@@ -122,7 +122,7 @@ extern const SPLITTERINFO g_splitterInfo[] =
 
 extern const MAMEHELPINFO g_helpInfo[] =
 {
-	{ ID_HELP_CONTENTS,		TRUE,	"mess.chm::/html/mess_overview.htm" },
+	{ ID_HELP_CONTENTS,		TRUE,	"mess.chm::/windows/main.htm" },
 	{ ID_HELP_RELEASE,		TRUE,	"mess.chm" },
 	{ ID_HELP_WHATS_NEW,	TRUE,	"mess.chm::/messnew.txt" },
 	{ -1 }
