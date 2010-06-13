@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <help title="MESS Help">
 	<topic		filepath="windows/main.htm"		text="Overview"/>
-	<topic		filepath="messnew.txt"			text="Whats new?"/>
+	<topic		filepath="messnew.txt"			text="What's new?"/>
 	<topic		filepath="windows/install.htm"	text="Installing MESS"/>
 	<topic		filepath="windows/choice.htm"	text="Choosing which MESS"/>
 	<topic		filepath="windows/update.htm"	text="Updating MESS"/>
