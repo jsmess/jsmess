@@ -34694,7 +34694,7 @@ Among undumped protos & special release
 		<!-- Serial:  - Release Date:  -->
 		<description>Sylvester and Tweety (USA, Prototype)</description>
 		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Sunsoft</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="sylvester and tweety (usa) (proto).sfc" size="2097152" crc="8556f5a2" sha1="34fc79d0545a84754cf0fe11a8276f67fe6eea97" offset="000000" />
@@ -40907,6 +40907,30 @@ Among undumped protos & special release
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="tenchi muyou! game hen (japan) (sample).sfc" size="2097152" crc="f0e82b14" sha1="54adc1ad028394b55c991e1e17ed414abde44eb0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sylvestr1" cloneof="sylvestr">
+		<!-- Serial:  - Release Date:  -->
+		<description>Sylvester and Tweety (USA, Prototype 1993-12-15)</description>
+		<year>1993</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sylvester and tweety (proto dec 15th 1993).sfc" size="524288" crc="3127c85b" sha1="b9f6d52a625f508fbd681b0c7ca72e26516094f3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sylvestr2" cloneof="sylvestr">
+		<!-- Serial:  - Release Date:  -->
+		<description>Sylvester and Tweety (USA, Prototype 1993-10-11)</description>
+		<year>1993</year>
+		<publisher>Sunsoft</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="sylvester and tweety (proto oct 11th 1993).sfc" size="524288" crc="cbe02df3" sha1="ebf556057c1951a70ed036f915e96aff7846321a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

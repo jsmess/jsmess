@@ -1,5 +1,15 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+  Undumped games
+
+  - Game de check! Koutsuu Anzen
+  - Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or 131 games)
+  - a few other pirate multigame carts (4 Pak All Action + two versions of 4 in 1 carts)
+
+-->
+
 <softwarelist name="sms" description="Sega Master System cartridges">
 	<!-- Id: 0002 -->
 	<software name="20embr">
