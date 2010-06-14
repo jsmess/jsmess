@@ -1248,6 +1248,7 @@ $(MESSOBJ)/philips.a:			\
 	$(MESS_MACHINE)/p2000t.o	\
 	$(MESS_DRIVERS)/vg5k.o		\
 	$(MESS_VIDEO)/ef9345.o		\
+	$(MESS_FORMATS)/vg5k_cas.o	\
 
 $(MESSOBJ)/poly88.a:			\
 	$(MESS_DRIVERS)/poly88.o	\

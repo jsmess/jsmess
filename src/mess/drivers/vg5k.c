@@ -47,6 +47,7 @@
 #include "sound/dac.h"
 #include "devices/cassette.h"
 #include "sound/wave.h"
+#include "formats/vg5k_cas.h"
 
 
 class vg5k_state
@@ -371,7 +372,7 @@ static const struct CassetteOptions vg5kr_cassette_options =
 
 static const cassette_config vg5k_cassette_config =
 {
-	cassette_default_formats,
+	vg5k_cassette_formats,
 	&vg5kr_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
 };
