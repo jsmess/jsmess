@@ -151,11 +151,12 @@ typedef struct _smc92x4_state
 	UINT8 output2;		/* UDC-internal register "output2" */
 
 	int	selected_drive_type;
-	/* We need to store the types, although this is not the case in the
-    real hardware. The reason is that poll_drives wants to select the drives
-    without knowing their kinds. In reality this does not matter, since we
-    only check for the seek_complete line, but in our case, floppy and
-    harddrive are pretty different, and we need to know which one to check. */
+	// We need to store the types, although this is not the case in the
+	// real hardware. The reason is that poll_drives wants to select the
+	// drives without knowing their kinds. In reality this does not matter,
+	// since we only check for the seek_complete line, but in our case,
+	// floppy and harddrive are pretty different, and we need to know which
+	// one to check.
 	int	types[4];
 	int	head_load_delay_enable;
 	int	register_pointer;
@@ -248,14 +249,14 @@ static void data_transfer_write(running_device *device, chrn_id_hd id, int delda
 #if 0
 static void dump_contents(UINT8 *buffer, int length)
 {
-        for (int i=0; i < length; i+=16)
-        {
-                for (int j=0; j < 16; j+=2)
-                {
-                        printf("%02x%02x ", buffer[i+j], buffer[i+j+1]);
-                }
-                printf("\n");
-        }
+	for (int i=0; i < length; i+=16)
+	{
+		for (int j=0; j < 16; j+=2)
+		{
+			printf("%02x%02x ", buffer[i+j], buffer[i+j+1]);
+		}
+		printf("\n");
+	}
 }
 #endif
 
@@ -269,7 +270,7 @@ INLINE smc92x4_state *get_safe_token(running_device *device)
 
 static int image_is_single_density(running_device *current_floppy)
 {
-        floppy_image *image = flopimg_get_image(current_floppy);
+	floppy_image *image = flopimg_get_image(current_floppy);
 	return (floppy_get_track_size(image, 0, 0)<4000);
 }
 
@@ -650,9 +651,9 @@ static int ident_to_cylinder(UINT8 ident)
 */
 static void update_id_regs(running_device *device, chrn_id_hd id)
 {
-	/* Flags for current head register. Note that the sizes are not in
-       sequence (128, 256, 512, 1024). This is only interesting for AT
-       mode. */
+	// Flags for current head register. Note that the sizes are not in
+	// sequence (128, 256, 512, 1024). This is only interesting for AT
+	// mode.
 	UINT8 sizeflag[] = { 0x60, 0x00, 0x20, 0x40 };
 	smc92x4_state *w = get_safe_token(device);
 
@@ -682,8 +683,8 @@ static void read_id_field(running_device *device, int *steps, int *direction, ch
 	sync_latches_out(device);
 	sync_status_in(device);
 
-	/* Set command termination code. The error code is set first, and
-       on success, it is cleared. */
+	// Set command termination code. The error code is set first, and
+	// on success, it is cleared.
 	w->register_r[INT_STATUS] |= ST_TC_RDIDERR;
 
 	/* Try to find an ID field. */
@@ -784,8 +785,8 @@ static int verify(running_device *device, chrn_id_hd *id, int check_sector)
 	int foundsect = FALSE;
 	int des_cylinder = 0;
 
-	/* Set command termination code. The error code is set first, and
-       on success, it is cleared. */
+	// Set command termination code. The error code is set first, and
+	// on success, it is cleared.
 	w->register_r[INT_STATUS] |= ST_TC_SEEKERR;
 
 	while (pass < maxtry && !foundsect)
@@ -865,13 +866,13 @@ static void data_transfer_read(running_device *device, chrn_id_hd id, int transf
 
 	current_floppy = (*w->intf->current_floppy)();
 
-	/* Set command termination code. The error code is set first, and
-       on success, it is cleared. */
+	// Set command termination code. The error code is set first, and
+	// on success, it is cleared.
 	w->register_r[INT_STATUS] |= ST_TC_DATAERR;
 
-	/* Save the value. Note that the retry count is only in the first four
-    bits, and it is stored in one's complement. In this implementation
-    we don't work with it. */
+	// Save the value. Note that the retry count is only in the first four
+	// bits, and it is stored in one's complement. In this implementation
+	// we don't work with it.
 	retry = w->register_w[RETRY_COUNT];
 
 	/* We are already at the correct sector (found by the verify sequence) */
@@ -961,13 +962,13 @@ static void data_transfer_write(running_device *device, chrn_id_hd id, int delda
 
 	current_floppy = (*w->intf->current_floppy)();
 
-	/* Set command termination code. The error code is set first, and
-       on success, it is cleared. */
+	// Set command termination code. The error code is set first, and
+	// on success, it is cleared.
 	w->register_r[INT_STATUS] |= ST_TC_DATAERR;
 
-	/* Save the value. Note that the retry count is only in the first four
-    bits, and it is stored in one's complement. In this implementation
-    we don't work with it. */
+	// Save the value. Note that the retry count is only in the first four
+	// bits, and it is stored in one's complement. In this implementation
+	// we don't work with it.
 	retry = w->register_w[RETRY_COUNT];
 
 	/* Initiate the DMA. We assume the DMARQ is positive. */
@@ -1147,13 +1148,6 @@ static void read_sectors_continue(running_device *device)
 		}
 		else
 		{
-/*      printf("smc92x4 read sectors CYL=%02x, HEA=%02x, SEC=%02x, MOD=%02x, CNT=%02x, TRY=%02x\n",
-            w->register_w[DESIRED_CYLINDER],
-            w->register_w[DESIRED_HEAD],
-            w->register_w[DESIRED_SECTOR],
-            w->register_w[MODE],
-            w->register_w[SECTOR_COUNT],
-            w->register_w[RETRY_COUNT]); */
 			smc92x4_timed_sector_read_request(device);
 		}
 	}
@@ -1284,8 +1278,8 @@ static void step_in_out(running_device *device)
 {
 	smc92x4_state *w = get_safe_token(device);
 	int direction = (w->command & 0x02)? -1 : +1;
-	/* bit 0: 0 -> command ends after last seek pulse, 1 -> command
-    ends when the drive asserts the seek complete pin */
+	// bit 0: 0 -> command ends after last seek pulse, 1 -> command
+	// ends when the drive asserts the seek complete pin
 	int buffered = w->command & 0x01;
 
 	w->step_direction = direction;
@@ -1343,13 +1337,13 @@ static void drive_select(running_device *device, int driveparm)
 	w->selected_drive_type = (driveparm>>2) & 0x03;
 	w->head_load_delay_enable = (driveparm>>4)&0x01;
 
-	/* We need to store the type of the drive for the poll_drives command
-       to be able to correctly select the device (floppy or hard disk). */
+	// We need to store the type of the drive for the poll_drives command
+	// to be able to correctly select the device (floppy or hard disk).
 	w->types[driveparm&0x03] = w->selected_drive_type;
 
-	/* Copy the DMA registers to registers CURRENT_HEAD, CURRENT_CYLINDER,
-    and CURRENT_IDENT. This is required during formatting (p. 14) as the
-    format command reuses the registers for formatting parameters. */
+	// Copy the DMA registers to registers CURRENT_HEAD, CURRENT_CYLINDER,
+	// and CURRENT_IDENT. This is required during formatting (p. 14) as the
+	// format command reuses the registers for formatting parameters.
 	w->register_r[CURRENT_HEAD] = w->register_r[DMA7_0];
 	w->register_r[CURRENT_CYLINDER] = w->register_r[DMA15_8];
 	w->register_r[CURRENT_IDENT] = w->register_r[DMA23_16];
@@ -1499,28 +1493,27 @@ static void format_floppy_track(running_device *device, int flags)
 
 	UINT8 *buffer;
 
-	/* Determine the track size. We cannot allow different sizes in this
-    design. */
+	/* Determine the track size. We cannot allow different sizes in this design. */
 	int data_count = 0;
 
 	sync_status_in(device);
 
 	current_floppy = (*w->intf->current_floppy)();
-        floppy = flopimg_get_image(current_floppy);
+	floppy = flopimg_get_image(current_floppy);
 
 	if (floppy != NULL)
 		data_count = floppy_get_track_size(floppy, 0, 0);
 
-        if (data_count==0)
-        {
-                if (controller_set_to_single_density(device))
-                        data_count = TRKSIZE_SD;
-                else
-                	data_count = TRKSIZE_DD;
-        }
+	if (data_count==0)
+	{
+		if (controller_set_to_single_density(device))
+			data_count = TRKSIZE_SD;
+		else
+			data_count = TRKSIZE_DD;
+	}
 
-        /* Build buffer */
-        buffer = (UINT8*)malloc(data_count);
+	/* Build buffer */
+	buffer = (UINT8*)malloc(data_count);
 
 	fm = controller_set_to_single_density(device);
 
@@ -1539,7 +1532,7 @@ static void format_floppy_track(running_device *device, int flags)
 		gap4 = (fm)? 247 : 598;
 		pre_gap = gap_byte;
 		sync1 = sync2;
-		inam = sync2 + (fm)? 1 : 4;
+		inam = sync2 + ((fm)? 1 : 4);
 	}
 	else
 	{
@@ -1672,12 +1665,12 @@ static void format_harddisk_track(running_device *device, int flags)
 
 	sync_status_in(device);
 
-        /* Build buffer */
-        gap0 = (-w->register_w[DMA7_0])&0xff;
-        gap1 = (-w->register_w[DMA15_8])&0xff;
-        gap2 = (-w->register_w[DMA23_16])&0xff;
-        gap3 = (-w->register_w[DESIRED_SECTOR])&0xff;
-        gap4 = 340;
+	/* Build buffer */
+	gap0 = (-w->register_w[DMA7_0])&0xff;
+	gap1 = (-w->register_w[DMA15_8])&0xff;
+	gap2 = (-w->register_w[DMA23_16])&0xff;
+	gap3 = (-w->register_w[DESIRED_SECTOR])&0xff;
+	gap4 = 340;
 
 	sync = (~w->register_w[DESIRED_CYLINDER])&0xff;
 	count = (~w->register_w[SECTOR_COUNT])&0xff;
@@ -1685,7 +1678,7 @@ static void format_harddisk_track(running_device *device, int flags)
 
 	data_count = gap1 + count*(sync+12+gap2+sync+size*128+gap3)+gap4;
 
-        buffer = (UINT8*)malloc(data_count);
+	buffer = (UINT8*)malloc(data_count);
 
 	index = 0;
 	fm = controller_set_to_single_density(device);
@@ -1774,36 +1767,34 @@ static void read_floppy_track(running_device *device, int transfer_only_ids)
 	running_device *current_floppy = (*w->intf->current_floppy)();
 
 	floppy_image *floppy;
-	/* Determine the track size. We cannot allow different sizes in this
-    design. */
+	/* Determine the track size. We cannot allow different sizes in this design. */
 	int data_count = 0;
 	int i;
 	UINT8 *buffer;
 
 	sync_latches_out(device);
 
-        floppy = flopimg_get_image(current_floppy);
+	floppy = flopimg_get_image(current_floppy);
 
-	/* Determine the track size. We cannot allow different sizes in this
-    design. */
+	/* Determine the track size. We cannot allow different sizes in this design. */
 	if (floppy != NULL)
 		data_count = floppy_get_track_size(floppy, 0, 0);
 
-        if (data_count==0)
-        {
-                if (controller_set_to_single_density(device))
-                        data_count = TRKSIZE_SD;
-                else
-                	data_count = TRKSIZE_DD;
-        }
+	if (data_count==0)
+	{
+		if (controller_set_to_single_density(device))
+			data_count = TRKSIZE_SD;
+		else
+			data_count = TRKSIZE_DD;
+	}
 
 	buffer = (UINT8*)malloc(data_count);
 
 	floppy_drive_read_track_data_info_buffer( current_floppy, w->register_w[DESIRED_HEAD]&0x0f, (char *)buffer, &data_count);
 	sync_status_in(device);
 
-	/* Transfer the buffer to the external memory. We assume the memory
-    pointer has been set appropriately in the registers. */
+	// Transfer the buffer to the external memory. We assume the memory
+	// pointer has been set appropriately in the registers.
 	set_dma_address(device, DMA23_16, DMA15_8, DMA7_0);
 
 	if (transfer_only_ids)
@@ -1825,8 +1816,7 @@ static void read_harddisk_track(running_device *device, int transfer_only_ids)
 {
 	smc92x4_state *w = get_safe_token(device);
 
-	/* Determine the track size. We cannot allow different sizes in this
-    design. */
+	/* Determine the track size. We cannot allow different sizes in this design. */
 	int i;
 	UINT8 *buffer;
 	int data_count=0;
@@ -1843,8 +1833,8 @@ static void read_harddisk_track(running_device *device, int transfer_only_ids)
 		/* no buffer was allocated */
 	}
 
-	/* Transfer the buffer to the external memory. We assume the memory
-    pointer has been set appropriately in the registers. */
+	// Transfer the buffer to the external memory. We assume the memory
+	// pointer has been set appropriately in the registers.
 	set_dma_address(device, DMA23_16, DMA15_8, DMA7_0);
 
 	if (transfer_only_ids)
@@ -1994,8 +1984,8 @@ static void smc92x4_process_command(running_device *device, UINT8 opcode)
 	else if (opcode >= 0x02 && opcode <= 0x03)
 	{
 		/* RESTORE DRIVE */
-		/* bit 0: 0 -> command ends after last seek pulse, 1 -> command
-        ends when the drive asserts the seek complete pin */
+		// bit 0: 0 -> command ends after last seek pulse, 1 -> command
+		// ends when the drive asserts the seek complete pin
 		logerror("smc92x4 info: restore command %X\n", opcode);
 		restore_drive(device);
 	}
@@ -2027,8 +2017,8 @@ static void smc92x4_process_command(running_device *device, UINT8 opcode)
 		/* SETREGPTR */
 		logerror("smc92x4 info: setregptr command %X\n", opcode);
 		w->register_pointer = opcode & 0xf;
-		/* Spec does not say anything about the effect of setting an
-        invalid value (only "care should be taken") */
+		// Spec does not say anything about the effect of setting an
+		// invalid value (only "care should be taken")
 		if (w->register_pointer > 10)
 		{
 			logerror("smc92x4 error: set register pointer: Invalid register number: %d. Setting to 10.\n", w->register_pointer);
@@ -2097,8 +2087,8 @@ READ8_DEVICE_HANDLER( smc92x4_r )
 	{
 		/* status register */
 		reply = w->register_r[INT_STATUS];
-		/* Spec (p.3) : The interrupt pin is reset to its inactive state
-             when the UDC interrupt status register is read. */
+		// Spec (p.3) : The interrupt pin is reset to its inactive state
+		// when the UDC interrupt status register is read.
 		// printf("smc92x4 interrupt status read = %02x\n", reply);
 		smc92x4_clear_interrupt(device);
 		/* Clear the bits due to int status register read. */
@@ -2122,8 +2112,8 @@ WRITE8_DEVICE_HANDLER( smc92x4_w )
 		// printf("smc92x4 register_w[%d] <- %X\n", w->register_pointer, data);
 		w->register_w[w->register_pointer] = data;
 
-		/* The DMA registers and the sector register for read and
-           write are identical. */
+		// The DMA registers and the sector register for read and
+		// write are identical.
 		if (w->register_pointer < DESIRED_HEAD)
 			w->register_r[w->register_pointer] = data;
 
@@ -2156,8 +2146,7 @@ static DEVICE_START( smc92x4 )
 	devcb_resolve_read_line(&w->in_auxbus_func, &w->intf->in_auxbus_func, device);
 
 	/* allocate timers */
-	/*
-    w->timer_data = timer_alloc(device->machine, smc92x4_data_callback, (void *)device); */
+	/* w->timer_data = timer_alloc(device->machine, smc92x4_data_callback, (void *)device); */
 	w->timer_rs = timer_alloc(device->machine, smc92x4_read_sector_callback, (void *)device);
 	w->timer_ws = timer_alloc(device->machine, smc92x4_write_sector_callback, (void *)device);
 	w->timer_track = timer_alloc(device->machine, smc92x4_track_callback, (void *)device);
