@@ -56,7 +56,7 @@ static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*lower 8kb of RAM extension - installed dynamically*/
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_cart_r, ti99_cart_w)     /*cartridge memory*/
-//	AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE("ti99_multicart", ti99_multicart_r, ti99_multicart_w)
+//  AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE("ti99_multicart", ti99_multicart_r, ti99_multicart_w)
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAMBANK("bank1")			/*RAM PAD, mirrored 4 times*/
 	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(ti99_nop_8_r, ti99_wsnd_w)	/*soundchip write*/
 	AM_RANGE(0x8800, 0x8bff) AM_READWRITE(ti99_rvdp_r, ti99_nop_8_w)	/*vdp read*/
@@ -74,7 +74,7 @@ static ADDRESS_MAP_START(memmap_4ev, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*lower 8kb of RAM extension - installed dynamically*/
 	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_cart_r, ti99_cart_w)     /*cartridge memory*/
-//	AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE("ti99_multicart", ti99_multicart_r, ti99_multicart_w)
+//  AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE("ti99_multicart", ti99_multicart_r, ti99_multicart_w)
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAMBANK("bank1")			/*RAM PAD, mirrored 4 times*/
 	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(ti99_nop_8_r, ti99_wsnd_w)	/*soundchip write*/
 	AM_RANGE(0x8800, 0x8bff) AM_READWRITE(ti99_rv38_r, ti99_nop_8_w)	/*vdp read*/
@@ -133,7 +133,7 @@ static INPUT_PORTS_START(ti99_4a)
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-//		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+//      PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
 //      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x04, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -144,7 +144,7 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
 
-	/* Flash setting is used to flash an empty HSGPL DSR ROM */ 
+	/* Flash setting is used to flash an empty HSGPL DSR ROM */
 	PORT_START( "EXTCARD" )
 	PORT_CONFNAME( 0x03, 0x00, "HSGPL extension" ) PORT_CHANGED( hsgpl_changed, NULL)
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -160,13 +160,40 @@ static INPUT_PORTS_START(ti99_4a)
 		PORT_CONFSETTING(    0x01, "Mechatronics Mouse" )
 
 	PORT_START( "CARTSLOT" )
-	PORT_DIPNAME( 0x07, 0x00, "Cartridge slot" )
+	PORT_DIPNAME( 0x0f, 0x00, "Cartridge slot" )
 		PORT_DIPSETTING(    0x00, "Auto" )
 		PORT_DIPSETTING(    0x01, "Slot 1" )
 		PORT_DIPSETTING(    0x02, "Slot 2" )
 		PORT_DIPSETTING(    0x03, "Slot 3" )
 		PORT_DIPSETTING(    0x04, "Slot 4" )
-//      PORT_DIPSETTING(    0x05, "GRAM Kracker" )
+		PORT_DIPSETTING(    0x0f, "GRAM Kracker" )
+
+	/* GRAM Kracker Support */
+	PORT_START( "GKSWITCH1" )
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 1" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)1)
+		PORT_DIPSETTING(    0x00, "GK Off" )
+		PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
+
+	PORT_START( "GKSWITCH2" )
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 2" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)2)
+		PORT_DIPSETTING(    0x00, "GRAM 0" )
+		PORT_DIPSETTING(    0x01, "Op Sys" )
+
+	PORT_START( "GKSWITCH3" )
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 3" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)3)
+		PORT_DIPSETTING(    0x00, "GRAM 1-2" )
+		PORT_DIPSETTING(    0x01, "TI BASIC" )
+
+	PORT_START( "GKSWITCH4" )
+	PORT_DIPNAME( 0x03, 0x01, "GK switch 4" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)4)
+		PORT_DIPSETTING(    0x00, "Bank 1" )
+		PORT_DIPSETTING(    0x01, "W/P" )
+		PORT_DIPSETTING(    0x02, "Bank 2" )
+
+	PORT_START( "GKSWITCH5" )
+	PORT_DIPNAME( 0x01, 0x00, "GK switch 5" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)5)
+		PORT_DIPSETTING(    0x00, "Loader On" )
+		PORT_DIPSETTING(    0x01, "Loader Off" )
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
@@ -306,7 +333,7 @@ static INPUT_PORTS_START(ti99_4)
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-//		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+//      PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
 //      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -335,13 +362,40 @@ static INPUT_PORTS_START(ti99_4)
 		PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 
 	PORT_START( "CARTSLOT" )
-	PORT_DIPNAME( 0x07, 0x00, "Cartridge slot" )
+	PORT_DIPNAME( 0x0f, 0x00, "Cartridge slot" )
 		PORT_DIPSETTING(    0x00, "Auto" )
 		PORT_DIPSETTING(    0x01, "Slot 1" )
 		PORT_DIPSETTING(    0x02, "Slot 2" )
 		PORT_DIPSETTING(    0x03, "Slot 3" )
 		PORT_DIPSETTING(    0x04, "Slot 4" )
-//      PORT_DIPSETTING(    0x05, "GRAM Kracker" )
+		PORT_DIPSETTING(    0x0f, "GRAM Kracker" )
+
+	/* GRAM Kracker Support */
+	PORT_START( "GKSWITCH1" )
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 1" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED( gk_changed, (void *)1)
+		PORT_DIPSETTING(    0x00, "GK Off" )
+		PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
+
+	PORT_START( "GKSWITCH2" )
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 2" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED( gk_changed, (void *)2)
+		PORT_DIPSETTING(    0x00, "GRAM 0" )
+		PORT_DIPSETTING(    0x01, "Op Sys" )
+
+	PORT_START( "GKSWITCH3" )
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 3" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED( gk_changed, (void *)3)
+		PORT_DIPSETTING(    0x00, "GRAM 1-2" )
+		PORT_DIPSETTING(    0x01, "TI BASIC" )
+
+	PORT_START( "GKSWITCH4" )
+	PORT_DIPNAME( 0x03, 0x01, "GK switch 4" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED( gk_changed, (void *)4)
+		PORT_DIPSETTING(    0x00, "Bank 1" )
+		PORT_DIPSETTING(    0x01, "W/P" )
+		PORT_DIPSETTING(    0x02, "Bank 2" )
+
+	PORT_START( "GKSWITCH5" )
+	PORT_DIPNAME( 0x01, 0x00, "GK switch 5" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f ) PORT_CHANGED( gk_changed, (void *)5)
+		PORT_DIPSETTING(    0x00, "Loader On" )
+		PORT_DIPSETTING(    0x01, "Loader Off" )
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
@@ -688,7 +742,7 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 
 	/* For HSGPL */
 	MDRV_NVRAM_HANDLER( ti99 )
-	
+
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
@@ -709,8 +763,8 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)   */
+	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -747,7 +801,7 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 
 	/* For HSGPL */
 	MDRV_NVRAM_HANDLER( ti99 )
-	
+
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
@@ -766,8 +820,8 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
-/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)  */
+	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt
+	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -804,7 +858,7 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 
 	/* For HSGPL */
 	MDRV_NVRAM_HANDLER( ti99 )
-	
+
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
@@ -823,8 +877,8 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
-/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
+	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -863,7 +917,7 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 
 	/* For HSGPL */
 	MDRV_NVRAM_HANDLER( ti99 )
-	
+
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
@@ -882,8 +936,8 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
-/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
+	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )
@@ -921,7 +975,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 
 	/* For HSGPL */
 	MDRV_NVRAM_HANDLER( ti99 )
-	
+
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)	/* or 50Hz */
@@ -948,8 +1002,8 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
-/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )	
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)  */
+	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)  */
 
 	MDRV_CASSETTE_ADD( "cassette1", default_cassette_config )
 	MDRV_CASSETTE_ADD( "cassette2", default_cassette_config )

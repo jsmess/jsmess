@@ -239,6 +239,9 @@ static GROM_port_t console_GROMs;
 set) */
 static char hsgpl_crdena;
 
+/* Used to cache the switch settings. */
+static UINT8 gk_switch[8];
+
 /* true if 99/4p rom6 is enabled */
 static int ti99_4p_internal_rom6_enable;
 /* pointer to the ROM6 data */
@@ -428,7 +431,7 @@ MACHINE_START( ti99_4ev_60hz)
 MACHINE_START( ti99_4p )
 {
 	UINT8* mem = memory_region(machine, "maincpu");
-	
+
 	/* Set up system ROM and scratch pad pointers. Must be set up here */
 	/* so that the system can successfully reset (otherwise the reset  */
 	/* vector would be missing in 0x0000). */
@@ -538,6 +541,13 @@ MACHINE_RESET( ti99 )
 
 	has_usb_sm = input_port_read(machine, "HDCTRL") & HD_USB;
 	has_pcode = input_port_read(machine, "EXTCARD") & EXT_PCODE;
+
+	/* Get the GK settings once */
+	gk_switch[1] = input_port_read(machine, "GKSWITCH1");
+	gk_switch[2] = input_port_read(machine, "GKSWITCH2");
+	gk_switch[3] = input_port_read(machine, "GKSWITCH3");
+	gk_switch[4] = input_port_read(machine, "GKSWITCH4");
+	gk_switch[5] = input_port_read(machine, "GKSWITCH5");
 
 	/* set up optional expansion hardware */
 	ti99_peb_reset(ti99_model == model_99_4p, tms9901_set_int1, NULL);
@@ -655,14 +665,14 @@ void machine_stop_ti99(void)
 NVRAM_HANDLER( ti99 )
 {
 	const char *filename;
-	
+
 	/* We may have different HSGPL settings for 80 column and traditional */
 	/* 40 column display. For convenience, we use two different nvram files. */
 	if (has_evpc)
 		filename = "hsgpl80.nv";
 	else
 		filename = "hsgpl40.nv";
-	
+
 	if ((ti99_model == model_99_4p) || (input_port_read(machine, "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH)))
 	{
 		if (read_or_write==0)
@@ -681,13 +691,23 @@ INPUT_CHANGED( hsgpl_changed )
 	hsgpl_flash_mode = newval & EXT_HSGPL_FLASH;
 }
 
+INPUT_CHANGED( gk_changed )
+{
+	gk_switch[(long)param&0x07] = newval;
+}
+
+UINT8 get_gk_switch(int index)
+{
+	return gk_switch[index];
+}
+
 /*
     video initialization.
 */
 VIDEO_START( ti99_4ev )
 {
 	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init(machine, 0, machine->primary_screen, machine->generic.tmpbitmap, 
+	v9938_init(machine, 0, machine->primary_screen, machine->generic.tmpbitmap,
 		MODEL_V9938, 0x20000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
 }
 
@@ -995,10 +1015,23 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	tms5220_data_w(devtag_get_device(space->machine, "tmc0285"), offset, (data >> 8) & 0xff);
 }
 
-static UINT8 GROM_dataread(offs_t offset)
+static UINT8 GROM_dataread(running_machine *machine, offs_t offset)
 {
 	UINT8 reply = 0, replycart;
-	int override_console = FALSE; /* for future extension */
+	int override_console = FALSE;
+
+	// Operation of GRAMKracker
+	if (input_port_read(machine, "CARTSLOT")==CART_GK)
+	{
+		if (((console_GROMs.addr < 0x2000) && (gk_switch[2]==GK_GRAM0))
+			|| ((console_GROMs.addr >= 0x2000) && (console_GROMs.addr < 0x4000) &&
+				((gk_switch[3]==GK_GRAM12) || (gk_switch[5]==GK_LDON)))
+			|| ((console_GROMs.addr >= 0x4000) && (console_GROMs.addr < 0x6000) &&
+				(gk_switch[3]==GK_GRAM12)))
+		{
+			override_console = TRUE;
+		}
+	}
 
 	if (console_GROMs.addr < 0x6000)
 	{
@@ -1011,10 +1044,8 @@ static UINT8 GROM_dataread(offs_t offset)
 		console_GROMs.buf = console_GROMs.data_ptr[console_GROMs.addr];
 	}
 
-	/* The address pointer in the cartridge system is updated by this */
-	/* call. We pretend to do a data read, so we mask away the address */
-	/* bit in the offset. */
-	replycart = ti99_cartridge_grom_r(cartslots, offset&0xfffc);
+	// The address pointer in the cartridge system is updated by this call.
+	replycart = ti99_cartridge_grom_r(cartslots, offset);
 
 	if (console_GROMs.addr >= 0x6000 || override_console)
 	{
@@ -1032,6 +1063,23 @@ static UINT8 GROM_dataread(offs_t offset)
 
 	return reply;
 }
+
+static void GRAM_datawrite(offs_t offset, UINT8 data)
+{
+	// The console does not contain RAM at these locations.
+	// Writing has only effect when there is a GRAM Kracker
+	ti99_cartridge_grom_w(cartslots, offset, data);
+
+	/* Each GROM chip has its own counter, so we update all of them even */
+	/* when we do not access them. */
+	/* The program counter wraps at each GROM chip size (8K), */
+	/* so 0x5fff + 1 = 0x4000. */
+	console_GROMs.addr = ((console_GROMs.addr + 1) & 0x1FFF) | (console_GROMs.addr & 0xE000);
+
+	/* Reset the read and write address flipflops. */
+	console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
+}
+
 
 /*
     GPL read
@@ -1093,6 +1141,12 @@ READ16_HANDLER ( ti99_grom_r )
 			console_GROMs.raddr_LSB = TRUE;
 		}
 		/* GROM address values must be globally unique. */
+		// FIXME: Parsec in slot 2 asserts here (bug in Parsec, but
+		//     should never bring the emulation into trouble)
+		//     last actions were invalid reads from 99fa
+		// FIXME: HSGPL asserts here when switched on during runtime
+		//     You should not do that, but again the emulation should
+		//     not assert either
 		assert (replycart == reply);
 	}
 	else
@@ -1100,7 +1154,7 @@ READ16_HANDLER ( ti99_grom_r )
 		/* Read GROM data */
 		/* Note that we shift the GROM port address to accomodate for */
 		/* 8-bit and 16-bit systems. */
-		reply = ((UINT16)GROM_dataread(offset<<1)) << 8;
+		reply = ((UINT16)GROM_dataread(space->machine, offset<<1)) << 8;
 	}
 
 	if (hsgpl_crdena)
@@ -1146,7 +1200,7 @@ WRITE16_HANDLER ( ti99_grom_w )
 			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | ((data >> 8) & 0xFF);
 			/* Setting the address causes a new read, putting the */
 			/* value into the buffer. We don't need the value here. */
-			GROM_dataread(offset<<1);
+			GROM_dataread(space->machine, (offset<<1)&0xfffc);
 			console_GROMs.waddr_LSB = FALSE;
 		}
 		else
@@ -1158,13 +1212,8 @@ WRITE16_HANDLER ( ti99_grom_w )
 	}
 	else
 	{
-		/* write GROM data */
-		/* the console GROMs are always affected */
-		/* BTW, console GROMs are never GRAMs, therefore there is no */
-		/* need to actually write anything, so we just read ahead */
-		/* TODO: There could be cartridges with GRAM, so this must be */
-		/* fixed.         */
-		GROM_dataread(offset<<1);
+		/* write GRAM data */
+		GRAM_datawrite(offset<<1, (data>>8)&0xff);
 		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
 	}
 
@@ -1206,7 +1255,7 @@ static READ8_HANDLER ( ti99_grom_r8 )
 		assert (replycart == reply);
 	}
 	else
-		reply = GROM_dataread(offset);
+		reply = GROM_dataread(space->machine, offset);
 
 	return reply;
 }
@@ -1227,7 +1276,7 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 		{
 			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | (data & 0xFF);
 
-			GROM_dataread(offset);
+			GROM_dataread(space->machine, offset);
 			console_GROMs.waddr_LSB = FALSE;
 		}
 		else
@@ -1239,7 +1288,7 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 	}
 	else
 	{
-		GROM_dataread(offset);
+		GRAM_datawrite(offset, (data>>8)&0xff);
 		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
 	}
 }

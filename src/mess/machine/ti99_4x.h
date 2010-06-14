@@ -93,39 +93,6 @@ struct _GROM_port_t
 };
 typedef struct _GROM_port_t GROM_port_t;
 
-
-#if 0
-/* defines for input port "CFG" */
-enum
-{
-	config_xRAM_bit		= 0,
-	config_xRAM_mask	= 0x7,	/* 3 bits */
-	config_speech_bit	= 3,
-	config_speech_mask	= 0x1,
-	config_fdc_bit		= 4,
-	config_fdc_mask		= 0x103,/* 3 bits (4, 5 and 12) */
-	config_rs232_bit	= 6,
-	config_rs232_mask	= 0x1,
-	/* next option only makes sense for ti99/4 */
-	config_handsets_bit	= 7,
-	config_handsets_mask= 0x1,
-	config_ide_bit		= 8,
-	config_ide_mask		= 0x1,
-	config_hsgpl_bit	= 9,
-	config_hsgpl_mask	= 0x1,
-	config_mecmouse_bit	= 10,
-	config_mecmouse_mask	= 0x1,
-	config_usbsm_bit	= 11,
-	config_usbsm_mask	= 0x1,
-	config_boot_bit		= 13,
-	config_boot_mask	= 0x1,
-	config_cartslot_bit	= 14,
-	config_cartslot_mask	= 0xf, /* need four bits: covers all current and possibly future cartslots, and one auto mode */
-	config_pcode_bit	= 18,
-	config_pcode_mask	= 0x1
-};
-#endif
-
 /*
     Configuration values
 */
@@ -187,7 +154,22 @@ enum
 	CART_2,
 	CART_3,
 	CART_4,
-	CART_GK
+	CART_GK = 15
+};
+
+enum
+{
+	GK_OFF = 0,
+	GK_NORMAL = 1,
+	GK_GRAM0 = 0,
+	GK_OPSYS = 1,
+	GK_GRAM12 = 0,
+	GK_TIBASIC = 1,
+	GK_BANK1 = 0,
+	GK_WP = 1,
+	GK_BANK2 = 2,
+	GK_LDON = 0,
+	GK_LDOFF = 1
 };
 
 
@@ -222,6 +204,9 @@ MACHINE_RESET( ti99 );
 NVRAM_HANDLER( ti99 );
 INPUT_CHANGED( hsgpl_changed );
 
+/* For GRAM Kracker */
+INPUT_CHANGED( gk_changed );
+
 VIDEO_START( ti99_4ev );
 INTERRUPT_GEN( ti99_vblank_interrupt );
 INTERRUPT_GEN( ti99_4ev_hblank_interrupt );
@@ -229,6 +214,8 @@ INTERRUPT_GEN( ti99_4ev_hblank_interrupt );
 void ti99_set_hsgpl_crdena(int data);
 void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm);
 int ti99_is_99_8(void);
+
+UINT8 get_gk_switch(int index);
 
 READ16_HANDLER( ti99_nop_8_r );
 WRITE16_HANDLER( ti99_nop_8_w );

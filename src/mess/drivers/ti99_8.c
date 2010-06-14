@@ -231,7 +231,7 @@ static INPUT_PORTS_START(ti99_8)
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-//		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+//      PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
 //      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -242,7 +242,7 @@ static INPUT_PORTS_START(ti99_8)
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
 		PORT_CONFSETTING(    0x01, "TI RS-232 card" )
 
-	/* Flash setting is used to flash an empty HSGPL DSR ROM */ 
+	/* Flash setting is used to flash an empty HSGPL DSR ROM */
 	PORT_START( "EXTCARD" )
 	PORT_CONFNAME( 0x03, 0x00, "HSGPL extension" ) PORT_CHANGED( hsgpl_changed, NULL)
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -258,13 +258,47 @@ static INPUT_PORTS_START(ti99_8)
 		PORT_CONFSETTING(    0x01, "Mechatronics Mouse" )
 
 	PORT_START( "CARTSLOT" )
-	PORT_DIPNAME( 0x07, 0x00, "Cartridge slot" )
+	PORT_DIPNAME( 0x0f, 0x00, "Cartridge slot" )
 		PORT_DIPSETTING(    0x00, "Auto" )
 		PORT_DIPSETTING(    0x01, "Slot 1" )
 		PORT_DIPSETTING(    0x02, "Slot 2" )
 		PORT_DIPSETTING(    0x03, "Slot 3" )
 		PORT_DIPSETTING(    0x04, "Slot 4" )
-//      PORT_CONFSETTING(    0x05, "GRAM Kracker" )
+		PORT_DIPSETTING(    0x0f, "GRAM Kracker" )
+
+	/* GRAM Kracker Support */
+	PORT_START( "GKSWITCH1" )
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 1" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)1)
+		PORT_DIPSETTING(    0x00, "GK Off" )
+		PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
+
+	PORT_START( "GKSWITCH2" )
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 2" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)2)
+		PORT_DIPSETTING(    0x00, "GRAM 0" )
+		PORT_DIPSETTING(    0x01, "Op Sys" )
+
+	PORT_START( "GKSWITCH3" )
+	PORT_DIPNAME( 0x01, 0x01, "GK switch 3" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)3)
+		PORT_DIPSETTING(    0x00, "GRAM 1-2" )
+		PORT_DIPSETTING(    0x01, "TI BASIC" )
+
+	PORT_START( "GKSWITCH4" )
+	PORT_DIPNAME( 0x03, 0x01, "GK switch 4" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)4)
+		PORT_DIPSETTING(    0x00, "Bank 1" )
+		PORT_DIPSETTING(    0x01, "W/P" )
+		PORT_DIPSETTING(    0x02, "Bank 2" )
+
+	PORT_START( "GKSWITCH5" )
+	PORT_DIPNAME( 0x01, 0x00, "GK switch 5" ) PORT_CONDITION( "CARTSLOT", 0x0f, PORTCOND_EQUALS, 0x0f )  PORT_CHANGED( gk_changed, (void *)5)
+		PORT_DIPSETTING(    0x00, "Loader On" )
+		PORT_DIPSETTING(    0x01, "Loader Off" )
+
+	PORT_START( "HFDCDIP" )
+	PORT_DIPNAME( 0xff, 0x55, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
+		PORT_DIPSETTING( 0x00, "40 track, 16 ms")
+		PORT_DIPSETTING( 0xaa, "40 track, 8 ms")
+		PORT_DIPSETTING( 0x55, "80 track, 2 ms")
+		PORT_DIPSETTING( 0xff, "80 track HD, 2 ms")
 
 	PORT_START( "HFDCDIP" )
 	PORT_DIPNAME( 0x03, 0x02, "HFDC drive config" ) PORT_CONDITION( "DISKCTRL", 0x07, PORTCOND_EQUALS, 0x03 )
@@ -564,8 +598,8 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
+	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt
+	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
@@ -617,9 +651,9 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
-/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
-	MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)  */
+	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	// MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
+	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
