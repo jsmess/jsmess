@@ -2079,7 +2079,7 @@ static BOOL DefaultInputPopulateControl(datamap *map, HWND dialog, HWND control,
 	WIN32_FIND_DATA FindFileData;
 	HANDLE hFind;
 	TCHAR *ext;
-	TCHAR root[256];
+	TCHAR root[MAX_PATH];
 	TCHAR path[256];
 	int selected = 0;
 	int index = 0;

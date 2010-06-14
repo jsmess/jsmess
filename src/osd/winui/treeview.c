@@ -1927,7 +1927,7 @@ static int InitExtraFolders(void)
 	int             i, count = 0;
 	long            hLong;
 	char*           ext;
-	char            buf[256];
+	char            buf[MAX_PATH];
 	char            curdir[MAX_PATH];
 	const char*     dir = GetFolderDir();
 
@@ -1970,7 +1970,7 @@ static int InitExtraFolders(void)
 				int icon[2] = { 0, 0 };
 				char *p, *name;
 
-				while (fgets(buf, 256, fp))
+				while (fgets(buf, MAX_PATH, fp))
 				{
 					if (buf[0] == '[')
 					{
@@ -1982,7 +1982,7 @@ static int InitExtraFolders(void)
 						name = &buf[1];
 						if (!strcmp(name, "FOLDER_SETTINGS"))
 						{
-							while (fgets(buf, 256, fp))
+							while (fgets(buf, MAX_PATH, fp))
 							{
 								name = strtok(buf, " =\r\n");
 								if (name == NULL)
