@@ -258,11 +258,12 @@ void generic_terminal_update(running_device *device, bitmap_t *bitmap, const rec
 			for (x = 0; x < TERMINAL_WIDTH; x++)
 			{
 				code = terminal_font[term->buffer[y*TERMINAL_WIDTH + x] *16 + c];
-				for (b = 7; b >= 0; b--)
+				*BITMAP_ADDR16(bitmap, y*10 + c, horpos++) =  (code >> 7) & 0x01;
+				for (b = 6; b >= 0; b--)
 				{
-					*BITMAP_ADDR16(bitmap, y*10 + c, horpos++) =  (code >> b) & 0x01;
+					*BITMAP_ADDR16(bitmap, y*10 + c, horpos++) =  ((code >> b) | (code >> (b+1))) & 0x01;
 				}
-				*BITMAP_ADDR16(bitmap, y*10 + c, horpos++) =  0;
+				*BITMAP_ADDR16(bitmap, y*10 + c, horpos++) =  code & 0x01;
 				*BITMAP_ADDR16(bitmap, y*10 + c, horpos++) =  0;
 			}
 		}
