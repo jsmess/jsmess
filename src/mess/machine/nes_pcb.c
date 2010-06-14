@@ -2616,7 +2616,7 @@ static WRITE8_HANDLER( bandai_ok_w )
 	prg32(space->machine, data);
 
 	state->mmc_latch1 = data;
-	mmc_helper = (state->mmc_latch1 & 0x03) | data & 0x04;
+	mmc_helper = (state->mmc_latch1 & 0x03) | (data & 0x04);
 	chr4_0(space->machine, mmc_helper, state->mmc_chr_source);
 	chr4_4(space->machine, 0x03 | (data & 0x04), state->mmc_chr_source);
 }
