@@ -77,7 +77,7 @@ public:
 	name_table    nt_page[4];  //quick banking structure for a maximum of 4K of RAM/ROM/ExRAM
 
 	int chr_open_bus;
-	int prgram_bank5_start, battery_bank5_start;
+	int prgram_bank5_start, battery_bank5_start, empty_bank5_start;
 
 	UINT8 ce_mask, ce_state;
 

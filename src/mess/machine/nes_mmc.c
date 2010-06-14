@@ -137,6 +137,8 @@
 #define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG_FDS(x) do { if (VERBOSE) logerror x; } while (0)
 
+static int unif_initialize( running_machine *machine, int idx );
+
 /*************************************************************
 
     Base emulation (see drivers/nes.c):
@@ -239,6 +241,8 @@ WRITE8_HANDLER( nes_mid_mapper_w )
 
 	if (state->mmc_write_mid)
 		(*state->mmc_write_mid)(space, offset, data);
+	else
+		logerror("Unimplemented MID mapper write, offset: %04x, data: %02x\n", offset + 0x6000, data);
 }
 
 // currently, this is not used (but it might become handy for some pirate mapper)
@@ -246,15 +250,10 @@ READ8_HANDLER( nes_mid_mapper_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 
-	if ((state->mid_ram_enable) || (state->mapper == 5))
-	{
-		if (state->battery && !state->trainer)
-			return state->battery_ram[offset];
-		else
-			return state->wram[(state->prg_bank[4] - state->prgram_bank5_start) * 0x2000 + offset];
-	}
+	if (state->mmc_read_mid)
+		(*state->mmc_read_mid)(space, offset);
 	else
-		logerror("Unimplemented LOW mapper read, offset: %04x\n", offset + 0x6000);
+		logerror("Unimplemented MID mapper read, offset: %04x\n", offset + 0x6000);
 
 	return 0;
 }
@@ -269,10 +268,16 @@ WRITE8_HANDLER( nes_mapper_w )
 		logerror("Unimplemented mapper write, offset: %04x, data: %02x\n", offset + 0x8000, data);
 }
 
-// apparently, a few pirate mappers also reads from here!
+// currently, this is not used (but it might become handy for some pirate mapper)
 READ8_HANDLER( nes_mapper_r )
 {
-	logerror("Unimplemented mapper read, offset: %04x\n", offset + 0x8000);
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	
+	if (state->mmc_read)
+		(*state->mmc_read)(space, offset);
+	else
+		logerror("Unimplemented mapper read, offset: %04x\n", offset + 0x8000);
+	
 	return 0;
 }
 
@@ -680,6 +685,16 @@ void set_nt_mirroring( running_machine *machine, int mirroring )
 
 
 /*************************************************************
+ 
+ Support for xml list
+ 
+ *************************************************************/
+
+/* Include emulation of NES PCBs for softlist */
+#include "machine/nes_pcb.c"
+
+
+/*************************************************************
 
     Support for .unf Files
 
@@ -688,13 +703,4 @@ void set_nt_mirroring( running_machine *machine, int mirroring )
 /* Include emulation of UNIF Boards for .unf files */
 #include "machine/nes_unif.c"
 
-
-/*************************************************************
- 
- Support for xml list
- 
- *************************************************************/
-
-/* Include emulation of NES PCBs for softlist */
-#include "machine/nes_pcb.c"
 

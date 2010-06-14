@@ -6814,7 +6814,7 @@ static WRITE8_HANDLER( mapper139_m_w )
 
 *************************************************************/
 
-static WRITE8_HANDLER( mapper_140_m_w )
+static WRITE8_HANDLER( mapper140_m_w )
 {
        chr8(space->machine, data & 0x0f, CHRROM);
        prg32(space->machine, (data >> 4) & 0x03);
@@ -10965,7 +10965,7 @@ static const mmc mmc_list[] =
 	{ 137, "Sachen 8259D",             mapper137_l_w, NULL, mapper137_m_w, NULL, NULL, NULL, NULL },
 	{ 138, "Sachen 8259B",             mapper138_l_w, NULL, mapper138_m_w, NULL, NULL, NULL, NULL },
 	{ 139, "Sachen 8259C",             mapper139_l_w, NULL, mapper139_m_w, NULL, NULL, NULL, NULL },
-	{ 140, "Jaleco JF11",              NULL, NULL, mapper_140_m_w, NULL, NULL, NULL, NULL },
+	{ 140, "Jaleco JF11",              NULL, NULL, mapper140_m_w, NULL, NULL, NULL, NULL },
 	{ 141, "Sachen 8259A",             mapper141_l_w, NULL, mapper141_m_w, NULL, NULL, NULL, NULL },
 // 142 Kaiser KS7032
 	{ 143, "Sachen TCA01",             NULL, mapper143_l_r, NULL, NULL, NULL, NULL, NULL },
@@ -11148,8 +11148,6 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			/* that much is documented for Nintendo Gauntlet boards */
 			if (state->four_screen_vram)
 			{
-				state->extended_ntram = auto_alloc_array(machine, UINT8, 0x2000);
-				state_save_register_global_pointer(machine, state->extended_ntram, 0x2000);
 				set_nt_page(machine, 0, CART_NTRAM, 0, 1);
 				set_nt_page(machine, 1, CART_NTRAM, 1, 1);
 				set_nt_page(machine, 2, CART_NTRAM, 2, 1);
