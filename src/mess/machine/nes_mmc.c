@@ -442,21 +442,44 @@ static void prg8_67( running_machine *machine, int bank )
 
 /* CHR ROM in 1K, 2K, 4K or 8K blocks */
 
+// this can be probably removed later, but it is useful while testing xml and unf handling with VRAM & VROM
+INLINE void chr_sanity_check( running_machine *machine, int source )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	if (source == CHRRAM && state->vram == NULL)
+		fatalerror("CHRRAM bankswitch with no VRAM");
+	
+	if (source == CHRROM && state->vrom == NULL)
+		fatalerror("CHRROM bankswitch with no VROM");
+}
+
 static void chr8( running_machine *machine, int bank, int source )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	int i;
 
-	bank &= (state->chr_chunks - 1);
-	for (i = 0; i < 8; i++)
-	{
-		state->chr_map[i].source = source;
-		state->chr_map[i].origin = (bank * 0x2000) + (i * 0x400); // for save state uses!
+	chr_sanity_check(machine, source);
 
-		if (source == CHRRAM)
+	if (source == CHRRAM)
+	{
+		bank &= (state->vram_chunks - 1);
+		for (i = 0; i < 8; i++)
+		{
+			state->chr_map[i].source = source;
+			state->chr_map[i].origin = (bank * 0x2000) + (i * 0x400); // for save state uses!
 			state->chr_map[i].access = &state->vram[state->chr_map[i].origin];
-		else
+		}
+	}
+	else
+	{
+		bank &= (state->chr_chunks - 1);
+		for (i = 0; i < 8; i++)
+		{
+			state->chr_map[i].source = source;
+			state->chr_map[i].origin = (bank * 0x2000) + (i * 0x400); // for save state uses!
 			state->chr_map[i].access = &state->vrom[state->chr_map[i].origin];
+		}
 	}
 }
 
@@ -465,16 +488,27 @@ static void chr4_x( running_machine *machine, int start, int bank, int source )
 	nes_state *state = (nes_state *)machine->driver_data;
 	int i;
 
-	bank &= ((state->chr_chunks << 1) - 1);
-	for (i = 0; i < 4; i++)
+	chr_sanity_check(machine, source);
+	
+	if (source == CHRRAM)
 	{
-		state->chr_map[i + start].source = source;
-		state->chr_map[i + start].origin = (bank * 0x1000) + (i * 0x400); // for save state uses!
-
-		if (source == CHRRAM)
+		bank &= ((state->vram_chunks << 1) - 1);
+		for (i = 0; i < 4; i++)
+		{
+			state->chr_map[i + start].source = source;
+			state->chr_map[i + start].origin = (bank * 0x1000) + (i * 0x400); // for save state uses!
 			state->chr_map[i + start].access = &state->vram[state->chr_map[i + start].origin];
-		else
+		}
+	}
+	else
+	{
+		bank &= ((state->chr_chunks << 1) - 1);
+		for (i = 0; i < 4; i++)
+		{
+			state->chr_map[i + start].source = source;
+			state->chr_map[i + start].origin = (bank * 0x1000) + (i * 0x400); // for save state uses!
 			state->chr_map[i + start].access = &state->vrom[state->chr_map[i + start].origin];
+		}
 	}
 }
 
@@ -493,16 +527,27 @@ static void chr2_x( running_machine *machine, int start, int bank, int source )
 	nes_state *state = (nes_state *)machine->driver_data;
 	int i;
 
-	bank &= ((state->chr_chunks << 2) - 1);
-	for (i = 0; i < 2; i++)
+	chr_sanity_check(machine, source);
+	
+	if (source == CHRRAM)
 	{
-		state->chr_map[i + start].source = source;
-		state->chr_map[i + start].origin = (bank * 0x800) + (i * 0x400);
-
-		if (source == CHRRAM)
+		bank &= ((state->vram_chunks << 2) - 1);
+		for (i = 0; i < 2; i++)
+		{
+			state->chr_map[i + start].source = source;
+			state->chr_map[i + start].origin = (bank * 0x800) + (i * 0x400); // for save state uses!
 			state->chr_map[i + start].access = &state->vram[state->chr_map[i + start].origin];
-		else
+		}
+	}
+	else
+	{
+		bank &= ((state->chr_chunks << 2) - 1);
+		for (i = 0; i < 2; i++)
+		{
+			state->chr_map[i + start].source = source;
+			state->chr_map[i + start].origin = (bank * 0x800) + (i * 0x400); // for save state uses!
 			state->chr_map[i + start].access = &state->vrom[state->chr_map[i + start].origin];
+		}
 	}
 }
 
@@ -530,14 +575,22 @@ static void chr1_x( running_machine *machine, int start, int bank, int source )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 
-	state->chr_map[start].source = source;
-	bank &= ((state->chr_chunks << 3) - 1);
-	state->chr_map[start].origin = bank * 0x400;
-
+	chr_sanity_check(machine, source);
+	
 	if (source == CHRRAM)
+	{
+		bank &= ((state->vram_chunks << 3) - 1);
+		state->chr_map[start].source = source;
+		state->chr_map[start].origin = (bank * 0x400); // for save state uses!
 		state->chr_map[start].access = &state->vram[state->chr_map[start].origin];
+	}
 	else
+	{
+		bank &= ((state->chr_chunks << 3) - 1);
+		state->chr_map[start].source = source;
+		state->chr_map[start].origin = (bank * 0x400); // for save state uses!
 		state->chr_map[start].access = &state->vrom[state->chr_map[start].origin];
+	}
 }
 
 static void chr1_0 (running_machine *machine, int bank, int source)

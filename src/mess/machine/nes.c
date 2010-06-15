@@ -147,7 +147,6 @@ static void init_nes_core( running_machine *machine )
 				state_save_register_global_pointer(machine, state->extended_ntram, 0x2000);
 			}
 
-			printf("SRAM %d PRGRAM %d bank5 %d\n", state->battery_bank5_start, state->prgram_bank5_start, state->prg_bank[4]);
 			// there are still some quirk about writes to bank5... I hope to fix them soon. (mappers 34,45,52,246 have both mid_w and WRAM-->check)
 			if (state->mmc_write_mid)
 				memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
@@ -622,6 +621,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 			state->rom = memory_region(image->machine, "maincpu");
 			state->vrom = memory_region(image->machine, "gfx1");
+			
+			state->vram_chunks = memory_region_length(image->machine, "gfx2") / 0x2000;
 			state->vram = memory_region(image->machine, "gfx2");
 			// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->prg_ram = 1)!
 			// or if there is a trainer, I think
@@ -917,6 +918,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			/* Free the regions that were allocated by the ROM loader */
 			memory_region_free(image->machine, "maincpu");
 			memory_region_free(image->machine, "gfx1");
+			memory_region_free(image->machine, "gfx2");
 			
 			/* Allocate them again, and copy PRG/CHR from temp buffers */
 			/* Take care of PRG */
@@ -928,15 +930,21 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			if (state->prg_chunks == 1)
 				memcpy(&state->rom[0x14000], &state->rom[0x10000], 0x4000);
 
-			/* Take care of CHR */
+			/* Take care of CHR ROM */
 			if (state->chr_chunks)
 			{
 				memory_region_alloc(image->machine, "gfx1", state->chr_chunks * 0x2000, 0);
 				state->vrom = memory_region(image->machine, "gfx1");
-				memcpy(&state->vrom[0x00000], &temp_prg[0x00000], state->chr_chunks * 0x2000);
+				memcpy(&state->vrom[0x00000], &temp_chr[0x00000], state->chr_chunks * 0x2000);
 			}
 
-			state->vram = memory_region(image->machine, "gfx2");
+			/* Take care of CHR RAM */
+			if (state->vram_chunks)
+			{
+				memory_region_alloc(image->machine, "gfx2", state->vram_chunks * 0x2000, 0);
+				state->vram = memory_region(image->machine, "gfx2");
+			}
+
 			// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->prg_ram = 1)!
 			state->wram_size = 0x10000;
 			state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
@@ -989,10 +997,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 	{
 		UINT32 prg_size = image_get_software_region_length(image, "prg");
 		UINT32 chr_size = image_get_software_region_length(image, "chr");
+		UINT32 vram_size = image_get_software_region_length(image, "vram");
 
 		/* Free the regions that were allocated by the ROM loader */
 		memory_region_free(image->machine, "maincpu");
 		memory_region_free(image->machine, "gfx1");
+		memory_region_free(image->machine, "gfx2");
 
 		/* Allocate them again with the proper size */
 		memory_region_alloc(image->machine, "maincpu", 0x10000 + prg_size, 0);
@@ -1006,6 +1016,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if (chr_size)
 			memory_region_alloc(image->machine, "gfx1", chr_size, 0);
 
+		if (vram_size)
+			memory_region_alloc(image->machine, "gfx2", vram_size, 0);
+
 		state->rom = memory_region(image->machine, "maincpu");
 		state->vrom = memory_region(image->machine, "gfx1");
 		state->vram = memory_region(image->machine, "gfx2");
@@ -1017,6 +1030,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		state->prg_chunks = prg_size / 0x4000;
 		state->chr_chunks = chr_size / 0x2000;
+		state->vram_chunks = vram_size / 0x2000;
 
 		state->format = 3;
 		state->mapper = 0;		// this allows us to set up memory handlers without duplicating code (for the moment)
@@ -1054,6 +1068,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		printf("PCB Feature: %s\n", image_get_feature(image));
 		printf("PRG chunks: %d\n", state->prg_chunks);
 		printf("CHR chunks: %d\n", state->chr_chunks);
+		printf("VRAM: Present %s, size: %d\n", state->vram_chunks ? "Yes" : "No", vram_size);
 		printf("NVWRAM: Present %s, size: %d\n", state->battery ? "Yes" : "No", state->battery_size);
 		printf("WRAM:   Present %s, size: %d\n", state->prg_ram ? "Yes" : "No", state->wram_size);
 #endif

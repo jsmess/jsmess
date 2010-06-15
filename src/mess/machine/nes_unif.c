@@ -118,7 +118,7 @@ static const unif unif_list[] =
 	{ "UNL-KS7017",                 0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
 	{ "UNL-KS7032",                 0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, //  mapper 142
 	{ "UNL-DANCE",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
-	{ "UNL-603-5052",               0,    0, 0,         0,     UNSUPPORTED_BOARD}, // mapper 238?
+	{ "UNL-603-5052",               0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, // mapper 238?
 	{ "UNL-EDU2000",               32,    0, CHRRAM_8,  NT_Y,  UNSUPPORTED_BOARD /*UNL_EDU2K*/},
 	{ "UNL-H2288",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 123
 	{ "UNL-SHERO",                  0,    0, CHRRAM_8,  NT_4SCR_2K, UNSUPPORTED_BOARD /*SACHEN_SHERO*/},
@@ -1312,9 +1312,16 @@ void unif_mapr_setup( running_machine *machine, const char *board )
 	
 	state->mapper = 0;	// this allows us to set up memory handlers without duplicating code (for the moment)
 	state->pcb_id = unif_board->board_idx;
-	state->battery = unif_board->nvwram;	// we should implement WRAM banks based on the size of this...
+	state->battery = unif_board->nvwram;	// we should implement battery banks based on the size of this...
 	state->battery_size = NES_BATTERY_SIZE; // FIXME: we should allow for smaller battery!
 	state->prg_ram = unif_board->wram;	// we should implement WRAM banks based on the size of this...
 	// state->hard_mirroring = unif_board->nt;
 	state->four_screen_vram = (unif_board->nt == NT_4SCR_2K || unif_board->nt == NT_4SCR_4K) ? 1 : 0;
+
+	if (unif_board->chrram <= CHRRAM_8)
+		state->vram_chunks = 1;
+	else if (unif_board->chrram == CHRRAM_16)
+		state->vram_chunks = 2;
+	else if (unif_board->chrram == CHRRAM_32)
+		state->vram_chunks = 4;
 }

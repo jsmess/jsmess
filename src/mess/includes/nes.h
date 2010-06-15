@@ -203,6 +203,7 @@ public:
 	/* load-time cart variables which remain constant */
 	UINT16 prg_chunks;		// iNES 2.0 allows for more chunks (a recently dumped multigame cart has 256 chunks of both PRG & CHR!)
 	UINT16 chr_chunks;
+	UINT16 vram_chunks;
 	UINT8 trainer;
 	UINT8 battery;			// if there is PRG RAM with battery backup
 	UINT32 battery_size;
