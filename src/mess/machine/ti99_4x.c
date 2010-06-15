@@ -454,7 +454,6 @@ void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxpar
 	/* Initialize all. Actually, at this point, we don't know */
 	/* how the switches are set. Later we use the configuration switches */
 	/* to determine which one to use. */
-	ti99_peb_init();
 	ti99_floppy_controllers_init_all(machine);
 	ti99_ide_init(machine);
 	ti99_hsgpl_init(machine);
@@ -475,6 +474,9 @@ MACHINE_RESET( ti99 )
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/*console_GROMs.data_ptr = memory_region(machine, region_grom);*/
 	console_GROMs.addr = 0;
+	console_GROMs.buf = 0;
+	console_GROMs.raddr_LSB = FALSE;
+	console_GROMs.waddr_LSB = FALSE;
 
 	if (ti99_model == model_99_8)
 	{
@@ -543,13 +545,19 @@ MACHINE_RESET( ti99 )
 	has_pcode = input_port_read(machine, "EXTCARD") & EXT_PCODE;
 
 	/* Get the GK settings once */
-	gk_switch[1] = input_port_read(machine, "GKSWITCH1");
-	gk_switch[2] = input_port_read(machine, "GKSWITCH2");
-	gk_switch[3] = input_port_read(machine, "GKSWITCH3");
-	gk_switch[4] = input_port_read(machine, "GKSWITCH4");
-	gk_switch[5] = input_port_read(machine, "GKSWITCH5");
+	if (ti99_model != model_99_4p)
+	{
+		gk_switch[1] = input_port_read(machine, "GKSWITCH1");
+		gk_switch[2] = input_port_read(machine, "GKSWITCH2");
+		gk_switch[3] = input_port_read(machine, "GKSWITCH3");
+		gk_switch[4] = input_port_read(machine, "GKSWITCH4");
+		gk_switch[5] = input_port_read(machine, "GKSWITCH5");
+	}
 
-	/* set up optional expansion hardware */
+	// Removes all card handlers
+	ti99_peb_init();
+
+	// set up optional expansion hardware
 	ti99_peb_reset(ti99_model == model_99_4p, tms9901_set_int1, NULL);
 
 	if (ti99_model == model_99_8)
@@ -673,16 +681,18 @@ NVRAM_HANDLER( ti99 )
 	else
 		filename = "hsgpl40.nv";
 
-	if ((ti99_model == model_99_4p) || (input_port_read(machine, "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH)))
+	// We always try to read the HSGPL, even when the config switch is
+	// set to off. Otherwise, when the system is started without HSGPL
+	// and we later switch on the card and do a reset, the console locks
+	// up as it does not find any content. Likewise, we save the contents
+	// even when the card has been turned off during runtime.
+	if (read_or_write==0)
 	{
-		if (read_or_write==0)
-		{
-			ti99_hsgpl_load_flashroms(machine, filename);
-		}
-		else
-		{
-			ti99_hsgpl_save_flashroms(machine, filename);
-		}
+		ti99_hsgpl_load_flashroms(machine, filename);
+	}
+	else
+	{
+		ti99_hsgpl_save_flashroms(machine, filename);
 	}
 }
 
@@ -1044,7 +1054,7 @@ static UINT8 GROM_dataread(running_machine *machine, offs_t offset)
 		console_GROMs.buf = console_GROMs.data_ptr[console_GROMs.addr];
 	}
 
-	// The address pointer in the cartridge system is updated by this call.
+	// The address pointer in the cartridge system is updated by this call
 	replycart = ti99_cartridge_grom_r(cartslots, offset);
 
 	if (console_GROMs.addr >= 0x6000 || override_console)
@@ -1141,9 +1151,6 @@ READ16_HANDLER ( ti99_grom_r )
 			console_GROMs.raddr_LSB = TRUE;
 		}
 		/* GROM address values must be globally unique. */
-		// FIXME: Parsec in slot 2 asserts here (bug in Parsec, but
-		//     should never bring the emulation into trouble)
-		//     last actions were invalid reads from 99fa
 		// FIXME: HSGPL asserts here when switched on during runtime
 		//     You should not do that, but again the emulation should
 		//     not assert either
@@ -1255,8 +1262,9 @@ static READ8_HANDLER ( ti99_grom_r8 )
 		assert (replycart == reply);
 	}
 	else
+	{
 		reply = GROM_dataread(space->machine, offset);
-
+	}
 	return reply;
 }
 
@@ -1276,7 +1284,7 @@ static WRITE8_HANDLER ( ti99_grom_w8 )
 		{
 			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | (data & 0xFF);
 
-			GROM_dataread(space->machine, offset);
+			GROM_dataread(space->machine, offset&0xfffc);
 			console_GROMs.waddr_LSB = FALSE;
 		}
 		else

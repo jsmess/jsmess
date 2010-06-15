@@ -320,6 +320,11 @@ WRITE8_DEVICE_HANDLER(ti99_cartridge_grom_w)
 		// Handle the GRAM Kracker
 		if ((cartslots->gk_slot != -1) && (input_port_read(device->machine, "CARTSLOT")==CART_GK))
 			cartridge_gram_kracker_writeg(device,data);
+
+		cartslots->grom_address = ((cartslots->grom_address + 1) & 0x1FFF) | (cartslots->grom_address & 0xE000);
+
+		/* Reset the read and write address flipflops. */
+		cartslots->raddr_LSB = cartslots->waddr_LSB = FALSE;
 	}
 }
 
@@ -434,7 +439,6 @@ READ8_DEVICE_HANDLER(ti99_cartridge_grom_r)
 			//printf("Empty socket at address G(%d)>%04x\n", slot, cartslots->grom_address);
 		}
 	}
-	//          printf("GROM address (cart) = %04x, reply = %02x\n", cartslots->grom_address, value);
 	/* The program counter wraps at each GROM chip size (8K), */
 	/* so 0x5fff + 1 = 0x4000. */
 	/* The address must be increased even if there is no cartridge slot */
@@ -2217,7 +2221,6 @@ static UINT8 cartridge_grom_read_legacy(running_device *cartsys)
 		value =  (UINT8)cartslots->grom_buffer;
 		/* read ahead */
 		cartslots->grom_buffer = cartridge->grom_ptr[cartslots->grom_address-0x6000];
-		//  printf("GROM address = %04x, reply = %02x\n", console_GROMs.addr, reply>>8);
 		// The program counter wraps at each GROM chip size (8K),
 		// so 0x5fff + 1 = 0x4000.
 		cartslots->grom_address = ((cartslots->grom_address + 1) & 0x1FFF) | (cartslots->grom_address & 0xE000);
@@ -2550,7 +2553,6 @@ static int load_legacy(running_device *image)
 				cartslots->cartridge[id].rom_ptr = cartrom;
 				cartslots->cartridge[id].rom_size = filesize;
 			}
-			// printf("loaded ROM, size = %d\n", filesize);
 			break;
 
 		case SLOTC_MINIMEM:
@@ -2570,7 +2572,6 @@ static int load_legacy(running_device *image)
 				cartslots->cartridge[id].ram_ptr = (UINT16 *)cartrom +  0x800;
 			}
 			cartslots->cartridge[id].ram_size = 0x1000;
-			// printf("loaded NVRAM\n");
 			break;
 
 		case SLOTC_MBX:
@@ -2608,7 +2609,6 @@ static int load_legacy(running_device *image)
 				cartslots->cartridge[id].rom2_ptr = cartrom2;
 			}
 			cartslots->cartridge[id].rom_size = filesize;
-			// printf("loaded second ROM, size = %d\n", filesize);
 			break;
 	}
 	return INIT_PASS;
@@ -2725,7 +2725,6 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_w_gk8 );
 static DEVICE_START(ti99_multicart)
 {
 	int i;
-//  printf("DEVICE_START(ti99_multicart)\n");
 	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
 
 	cartslots->active_slot = 0;
@@ -2882,7 +2881,6 @@ WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 	{
 		if (!slot_is_empty(device, slot))
 		{
-//          printf("writing to cartridge in slot %d\n", slot);
 			ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
 			(*pcbdef->write)(cart->pcb, offset, data, mem_mask);
 		}
@@ -3000,13 +2998,11 @@ READ8_DEVICE_HANDLER(ti99_multicart8_r)
 
 	if (!slot_is_empty(device, slot))
 	{
-//      printf("accessing cartridge in slot %d\n", slot);
 		ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
 		return (*pcbdef->read8)(cart->pcb, offset);
 	}
 	else
 	{
-//      printf("No cartridge in slot %d\n", slot);
 		return 0;
 	}
 }
@@ -3164,25 +3160,20 @@ static void cartridge_gram_kracker_writeg(running_device *cartsys, UINT8 data)
 	if (get_gk_switch(4)!=GK_WP)
 	{
 		// Write protection off
-		if (((cartslots->grom_address < 0x2000)
+		if (((write_addr < 0x2000)
 				&& (get_gk_switch(2)==GK_GRAM0))
-			|| ((cartslots->grom_address >= 0x2000) && (cartslots->grom_address < 0x4000)
+			|| ((write_addr >= 0x2000) && (write_addr < 0x4000)
 				&& (get_gk_switch(3)==GK_GRAM12)
 				&& (get_gk_switch(5)==GK_LDOFF))
-			|| ((cartslots->grom_address >= 0x4000) && (cartslots->grom_address < 0x6000)
+			|| ((write_addr >= 0x4000) && (write_addr < 0x6000)
 				&& (get_gk_switch(3)==GK_GRAM12))
-			|| ((cartslots->grom_address >= 0x6000) && (cartslots->gk_guest_slot==-1)
+			|| ((write_addr >= 0x6000) && (cartslots->gk_guest_slot==-1)
 				&& (get_gk_switch(1)==GK_NORMAL)))
 		{
 			((UINT8 *)gkcartridge->ram_ptr)[write_addr] = data;
 		}
 		// There is no GRAM in cartridges
-
 	}
-	cartslots->grom_address = ((cartslots->grom_address + 1) & 0x1FFF) | (cartslots->grom_address & 0xE000);
-
-	/* Reset the read and write address flipflops. */
-	cartslots->raddr_LSB = cartslots->waddr_LSB = FALSE;
 }
 
 /*
