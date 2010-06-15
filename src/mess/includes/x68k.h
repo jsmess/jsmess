@@ -43,6 +43,7 @@ struct x68k_system
 		int monitor;
 		int contrast;
 		int keyctrl;
+		UINT16 cputype;
 	} sysport;
 	struct
 	{

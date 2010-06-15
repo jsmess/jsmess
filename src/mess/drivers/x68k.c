@@ -1255,7 +1255,7 @@ static READ16_HANDLER( x68k_sysport_r )
 	case 0x03:  // bit 3 = key control (is 1 if keyboard is connected)
 		return 0x08;
 	case 0x05:  // CPU type and speed
-		return 0xff;  // 68000, 10MHz.  Technically, the port doesn't exist on the X68000, only the X68000 XVI and X68030
+		return x68k_sys.sysport.cputype;
 	default:
 		logerror("Read from invalid or unimplemented system port %04x\n",offset);
 		return 0xff;
@@ -2579,11 +2579,20 @@ static DRIVER_INIT( x68000 )
 
 	// Initialise timers for 6-button MD controllers
 	md_6button_init(machine);
+
+	x68k_sys.sysport.cputype = 0xff;  // 68000, 10MHz
+}
+
+static DRIVER_INIT( x68kxvi )
+{
+	DRIVER_INIT_CALL( x68000 );
+	x68k_sys.sysport.cputype = 0xfe; // 68000, 16MHz
 }
 
 static DRIVER_INIT( x68030 )
 {
 	DRIVER_INIT_CALL( x68000 );
+	x68k_sys.sysport.cputype = 0xdc; // 68030, 25MHz
 }
 
 static MACHINE_DRIVER_START( x68000 )
@@ -2597,7 +2606,7 @@ static MACHINE_DRIVER_START( x68000 )
 	MDRV_MACHINE_RESET( x68000 )
 
 	/* device hardware */
-	MDRV_MC68901_ADD(MC68901_TAG, 2000000, mfp_interface)
+	MDRV_MC68901_ADD(MC68901_TAG, 4000000, mfp_interface)
 
 	MDRV_I8255A_ADD( "ppi8255",  ppi_interface )
 
@@ -2605,7 +2614,7 @@ static MACHINE_DRIVER_START( x68000 )
 
 	MDRV_X68KHDC_ADD( "x68k_hdc" )
 
-	MDRV_SCC8530_ADD( "scc", 7000000 )
+	MDRV_SCC8530_ADD( "scc", 5000000 )
 
 	MDRV_RP5C15_ADD( "rp5c15" , rtc_intf)
 
@@ -2724,5 +2733,5 @@ ROM_END
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE INPUT   INIT    COMPANY     FULLNAME        FLAGS */
 COMP( 1987, x68000, 0,      0,      x68000, x68000, x68000, "Sharp",    "X68000", GAME_IMPERFECT_GRAPHICS )
-COMP( 1991, x68kxvi,x68000, 0,      x68kxvi,x68000, x68000, "Sharp",    "X68000 XVI", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+COMP( 1991, x68kxvi,x68000, 0,      x68kxvi,x68000, x68kxvi, "Sharp",    "X68000 XVI", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
 COMP( 1993, x68030, x68000, 0,      x68030, x68000, x68030, "Sharp",    "X68030", GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
