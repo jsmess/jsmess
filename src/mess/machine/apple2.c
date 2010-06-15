@@ -20,6 +20,8 @@
 #include "devices/sonydriv.h"
 #include "devices/appldriv.h"
 #include "devices/flopdrv.h"
+#include "image.h"
+#include "devices/cassette.h"
 #include "devices/messram.h"
 #include "sound/speaker.h"
 #include "profiler.h"
@@ -1328,6 +1330,11 @@ WRITE8_HANDLER ( apple2_c05x_w )
   apple2_c06x_r
 ***************************************************************************/
 
+static running_device *cassette_device_image(running_machine *machine)
+{
+	return devtag_get_device(machine, "cassette");
+}
+
 READ8_HANDLER ( apple2_c06x_r )
 {
 	int result = 0;
@@ -1335,6 +1342,10 @@ READ8_HANDLER ( apple2_c06x_r )
 	{
 		switch (offset & 0x0F)
 		{
+			case 0x00:
+				/* Cassette input */
+				result = cassette_input(cassette_device_image(space->machine)) > 0.0 ? 0x80 : 0;
+				break;
 			case 0x01:
 				/* Open-Apple/Joystick button 0 */
 				result = apple2_pressed_specialkey(space->machine, SPECIALKEY_BUTTON0);

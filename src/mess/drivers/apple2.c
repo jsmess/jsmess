@@ -186,6 +186,7 @@ Apple 3.5 and Apple 5.25 drives - up to three devices
 #include "deprecat.h"
 #include "devices/appldriv.h"
 #include "devices/flopdrv.h"
+#include "devices/cassette.h"
 #include "formats/ap2_dsk.h"
 #include "includes/apple2.h"
 #include "machine/ay3600.h"
@@ -594,6 +595,13 @@ static const floppy_config apple2_floppy_config =
 	DO_NOT_KEEP_GEOMETRY
 };
 
+static const cassette_config apple2_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED)
+};
+
 static MACHINE_DRIVER_START( apple2_common )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1021800)		/* close to actual CPU frequency of 1.020484 MHz */
@@ -649,6 +657,7 @@ static MACHINE_DRIVER_START( apple2 )
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
+	MDRV_CASSETTE_ADD( "cassette", apple2_cassette_config )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( apple2p )
@@ -663,6 +672,7 @@ static MACHINE_DRIVER_START( apple2p )
 	/* At the moment the RAM bank $C000-$FFFF is available only if you choose   */
 	/* default configuration: on real machine is present also in configurations */
 	/* with less memory, provided that the language card is installed           */
+	MDRV_CASSETTE_ADD( "cassette", apple2_cassette_config )
 MACHINE_DRIVER_END
 
 ROM_START(las3000)
@@ -682,6 +692,7 @@ MACHINE_DRIVER_START( apple2e )
 	MDRV_RAM_DEFAULT_SIZE("128K")
 	MDRV_RAM_EXTRA_OPTIONS("64K")
 	MDRV_RAM_DEFAULT_VALUE(0x00)
+	MDRV_CASSETTE_ADD( "cassette", apple2_cassette_config )
 MACHINE_DRIVER_END
 #if 0
 MACHINE_DRIVER_START( apple2e_z80 )

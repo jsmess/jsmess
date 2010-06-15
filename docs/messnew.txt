@@ -25,6 +25,9 @@ System Driver Changes:
 - [APPLE2] Support for Rich Dreher's Compact Flash/IDE adaptor on the
   enhanced IIe driver (apple2ee). [R. Belmont]
 
+- [APPLE2] Preliminary cassette support - many Applesoft tapes load
+  fine. [R. Belmont]
+
 - [COCO3] Extended video to support 8MB of RAM. (bug #1963) [Robert Gault]
 
 - [FAMICOM] Fixed long standing problems (present at least since MESS 0.122) 
