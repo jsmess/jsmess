@@ -644,7 +644,7 @@ static WRITE8_HANDLER( uxrom_w )
 
 /*************************************************************
  
- Nihon Bussan UNROM
+ Nihon Bussan UNROM M5
 
  Games: Crazy Climber Jpn
  
@@ -662,7 +662,7 @@ static WRITE8_HANDLER( uxrom_cc_w )
 {
 	LOG_MMC(("uxrom_cc_w, offset: %04x, data: %02x\n", offset, data));
 	
-	prg16_cdef(space->machine, data & 0x07);
+	prg16_cdef(space->machine, data);
 }
 
 /*************************************************************
@@ -831,7 +831,7 @@ static void mmc1_set_wram( const address_space *space, int board )
 {
 	running_machine *machine = space->machine;
 	nes_state *state = (nes_state *)machine->driver_data;
-	UINT8 bank = BIT(state->mmc_reg[0], 4) ? BIT(state->mmc_reg[1], 4) : BIT(state->mmc_reg[0], 3);
+	UINT8 bank = BIT(state->mmc_reg[0], 4) ? BIT(state->mmc_reg[1], 4) : BIT(state->mmc_reg[1], 3);
 
 	switch (board)
 	{
@@ -2103,7 +2103,7 @@ static WRITE8_HANDLER( ntbrom_w )
 			prg16_89ab(space->machine, data);
 			break;
 		default:
-			LOG_MMC(("ntbrom_w uncaught offset: %04x, data: %02x\n", offset, data));
+			LOG_MMC(("ntbrom_w uncaught write, offset: %04x, data: %02x\n", offset, data));
 			break;
 	}
 }
@@ -2669,7 +2669,7 @@ static WRITE8_HANDLER( tam_s1_w )
 	if (offset < 0x4000)
 	{
 		set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
-		prg16_cdef(space->machine, data & 0x0f);
+		prg16_cdef(space->machine, data);
 	}
 }
 
@@ -6077,6 +6077,24 @@ static WRITE8_HANDLER( sgame_lion_w )
 				break;
 		}
 	}
+}
+
+/*************************************************************
+ 
+ Tengen 800008 Board
+  
+ iNES: mapper 3?
+ 
+ In MESS: Supported.
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( tengen_800008_w )
+{
+	LOG_MMC(("tengen_800008_w, offset: %04x, data: %02x\n", offset, data));
+	
+	prg32(space->machine, data >> 3);
+	chr8(space->machine, data, CHRROM);
 }
 
 /*************************************************************
@@ -9987,7 +10005,8 @@ struct _nes_pcb_intf
 #define NES_WRITEONLY(a) \
 {a, NULL}
 
-// further review needed for: TXROM, PXROM, FXROM, all multicart pcb, many unl/btl pcbs
+// further review needed for: TXROM, PXROM, FXROM, Bandai LZ93D50, Irem G-101, Konami VRC3
+// all multicart pcb, many unl/btl pcbs
 static const nes_pcb_intf nes_intf_list[] =
 {
 	{ STD_NROM,             NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
@@ -9997,7 +10016,6 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ STD_UN1ROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(un1rom_w),              NULL, NULL, NULL },
 	{ STD_CPROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(cprom_w),               NULL, NULL, NULL },
 	{ STD_CNROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(cnrom_w),               NULL, NULL, NULL },
-	{ TENGEN_800008,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(cnrom_w),               NULL, NULL, NULL },
 	{ BANDAI_PT554,         NES_NOACCESS, NES_WRITEONLY(bandai_pt554_m_w), NES_WRITEONLY(cnrom_w), NULL, NULL, NULL },	
 	{ STD_AXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(axrom_w),               NULL, NULL, NULL },
 	{ STD_PXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(pxrom_w),               mmc2_latch, NULL, NULL },
@@ -10113,6 +10131,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ RUMBLESTATION_BOARD,  NES_NOACCESS, NES_WRITEONLY(rumblestation_m_w), NES_WRITEONLY(rumblestation_w),      NULL, NULL, NULL },
 	{ SUPERGAME_BOOGERMAN,  NES_WRITEONLY(sgame_boog_l_w), NES_NOACCESS, NES_WRITEONLY(sgame_boog_w), NULL, NULL, mmc3_irq },
 	{ SUPERGAME_LIONKING,   NES_NOACCESS, NES_WRITEONLY(sgame_lion_m_w), NES_WRITEONLY(sgame_lion_w), NULL, NULL, mmc3_irq },
+	{ TENGEN_800008,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800008_w),       NULL, NULL, NULL },
 	{ TENGEN_800032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800032_w),       NULL, NULL, tengen_800032_irq },
 	{ TENGEN_800037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800037_w),       NULL, NULL, tengen_800032_irq },
 	{ TXC_22211A,           {txc_22211_l_w, txc_22211_l_r}, NES_NOACCESS, NES_WRITEONLY(txc_22211_w), NULL, NULL, NULL }, 
