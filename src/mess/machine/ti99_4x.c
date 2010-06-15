@@ -693,7 +693,7 @@ INPUT_CHANGED( hsgpl_changed )
 
 INPUT_CHANGED( gk_changed )
 {
-	gk_switch[(long)param&0x07] = newval;
+	gk_switch[(UINT64)param&0x07] = newval;
 }
 
 UINT8 get_gk_switch(int index)
