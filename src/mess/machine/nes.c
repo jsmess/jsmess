@@ -291,7 +291,7 @@ READ8_HANDLER( nes_IN0_r )
 	int cfg = input_port_read(space->machine, "CTRLSEL");
 	int ret;
 
-	if ((cfg & 0x000f) == 0x04)	// for now we treat the FC keyboard separately from other inputs!
+	if ((cfg & 0x000f) >= 0x04)	// for now we treat the FC keyboard separately from other inputs!
 	{
 		// here we should have the tape input
 		ret = 0;
@@ -342,8 +342,15 @@ READ8_HANDLER( nes_IN0_r )
 // row of the keyboard matrix are read 4-bits at time, and gets returned as bit1->bit4
 static UINT8 nes_read_fc_keyboard_line( running_machine *machine, UINT8 scan, UINT8 mode )
 {
-	static const char *const keyport_names[] = { "FCKEY0", "FCKEY1", "FCKEY2", "FCKEY3", "FCKEY4", "FCKEY5", "FCKEY6", "FCKEY7", "FCKEY8" };
-	return ((input_port_read(machine, keyport_names[scan]) >> (mode * 4)) & 0x0f) << 1;
+	static const char *const fc_keyport_names[] = { "FCKEY0", "FCKEY1", "FCKEY2", "FCKEY3", "FCKEY4", "FCKEY5", "FCKEY6", "FCKEY7", "FCKEY8" };
+	return ((input_port_read(machine, fc_keyport_names[scan]) >> (mode * 4)) & 0x0f) << 1;
+}
+
+static UINT8 nes_read_subor_keyboard_line( running_machine *machine, UINT8 scan, UINT8 mode )
+{
+	static const char *const sub_keyport_names[] = { "SUBKEY0", "SUBKEY1", "SUBKEY2", "SUBKEY3", "SUBKEY4", 
+		"SUBKEY5", "SUBKEY6", "SUBKEY7", "SUBKEY8", "SUBKEY9", "SUBKEY10", "SUBKEY11", "SUBKEY12" };
+	return ((input_port_read(machine, sub_keyport_names[scan]) >> (mode * 4)) & 0x0f) << 1;
 }
 
 READ8_HANDLER( nes_IN1_r )
@@ -356,6 +363,13 @@ READ8_HANDLER( nes_IN1_r )
 	{
 		if (state->fck_scan < 9)
 			ret = ~nes_read_fc_keyboard_line(space->machine, state->fck_scan, state->fck_mode) & 0x1e;
+		else
+			ret = 0x1e;
+	}
+	else if ((cfg & 0x000f) == 0x08)	// for now we treat the Subor keyboard separately from other inputs!
+	{
+		if (state->fck_scan < 12)
+			ret = ~nes_read_subor_keyboard_line(space->machine, state->fck_scan, state->fck_mode) & 0x1e;
 		else
 			ret = 0x1e;
 	}
@@ -491,15 +505,16 @@ WRITE8_HANDLER( nes_IN0_w )
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	timer_set(space->machine, attotime_zero, NULL, 0, lightgun_tick);
 	
-	if ((cfg & 0x000f) == 0x04)	// for now we treat the FC keyboard separately from other inputs!
+	if ((cfg & 0x000f) >= 0x04)	// for now we treat the FC keyboard separately from other inputs!
 	{
 		// here we should also have the tape output
 
 		if (BIT(data, 2))	// keyboard active
 		{
+			int lines = ((cfg & 0x000f) == 0x04) ? 9 : 12;
 			UINT8 out = BIT(data, 1);	// scan
 			
-			if (state->fck_mode && !out && ++state->fck_scan > 9)
+			if (state->fck_mode && !out && ++state->fck_scan > lines)
 				state->fck_scan = 0;
 			
 			state->fck_mode = out;	// access lower or upper 4 bits
