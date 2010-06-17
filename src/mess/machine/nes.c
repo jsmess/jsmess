@@ -1114,12 +1114,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		/* Check for mirroring */
 		// FIXME: this is hacky. it would be better to include these in some feature attribute
-		if (image_get_software_region(image, "mirror") != NULL)
+		if (image_get_feature(image, "mirroring") != NULL)
 		{
-			int value = image_get_software_region_length(image, "mirror");
-			if (value == 2)
+			const char *mirroring = image_get_feature(image, "mirroring");
+			if (strcmp(mirroring, "horizontal") == 0)
 				state->hard_mirroring = 0;
-			if (value == 4)
+			if (strcmp(mirroring, "vertical") == 0)
 				state->hard_mirroring = 1;
 		}
 		/* Check for pins */

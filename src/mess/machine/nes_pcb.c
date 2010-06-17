@@ -136,6 +136,7 @@ static const nes_pcb pcb_list[] =
 	{ "NES-NTBROM",       STD_NXROM },
 	/* NxROM boards by other manufacturer (this board was mainly used by Sunsoft?) */
 	{ "SUNSOFT-4",        STD_NXROM },
+	{ "SUNSOFT-DCS",      STD_NXROM },
 	{ "TENGEN-800042",    STD_NXROM },
 //
 	/* Nintendo JxROM */
