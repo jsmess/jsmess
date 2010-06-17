@@ -71,6 +71,7 @@ public:
 
 	/* input_related - this part has to be cleaned up (e.g. in_2 and in_3 are not really necessary here...) */
 	nes_input in_0, in_1, in_2, in_3;
+	UINT8 fck_scan, fck_mode;
 
 	int           prg_bank[5];
 	chr_bank      chr_map[8];  //quick banking structure, because some of this changes multiple times per scanline!

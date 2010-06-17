@@ -52,27 +52,28 @@ const game_driver * const drivers[] =
 	DRIVER( jaguarcd )  /* Atari Jaguar CD    */
 
 	/* Nintendo */
-	DRIVER( nes )	   /* Nintendo Entertainment System */
-	DRIVER( nespal )	/* Nintendo Entertainment System    */
-	DRIVER( m82 )	   /* Nintendo M82 Display Unit */
-	DRIVER( famicom )
-	DRIVER( famitwin )  /* Sharp Famicom Twin System    */
-	DRIVER( drpcjr )	/* Bung Doctor PC Jr    */
-	DRIVER( dendy )	 /* Dendy Classic russian famiclone   */
-	DRIVER( gameboy )   /* Nintendo Game Boy Handheld      */
-	DRIVER( supergb )   /* Nintendo Super Game Boy SNES Cartridge      */
-	DRIVER( gbpocket )  /* Nintendo Game Boy Pocket Handheld    */
-	DRIVER( gblight )   /* Nintendo Game Boy Light Handheld  */
-	DRIVER( gbcolor )   /* Nintendo Game Boy Color Handheld  */
-	DRIVER( snes )		/* Nintendo Super Nintendo NTSC    */
-	DRIVER( snespal )   /* Nintendo Super Nintendo PAL    */
-	DRIVER( snessfx )	/* Nintendo Super Nintendo NTSC w/SuperFX CPU*/
-	DRIVER( snespsfx )	/* Nintendo Super Nintendo PAL w/SuperFX CPU */
-	DRIVER( snesst )	/* Nintendo Super Nintendo NTSC w/Sufami Turbo base cart */
-	DRIVER( snesbsx )	/* Nintendo Super Nintendo NTSC w/BS-X compatible cart  */
-	DRIVER( n64 )	   /* Nintendo N64   */
-	DRIVER( pokemini )  /* Nintendo Pokemon Mini    */
-	DRIVER( gba )	/* Nintendo Game Boy Advance Handheld      */
+	DRIVER( nes )       /* Nintendo Entertainment System */
+	DRIVER( nespal )	/* Nintendo Entertainment System PAL */
+	DRIVER( m82 )       /* Nintendo M82 Display Unit */
+	DRIVER( famicom )   /* Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on */
+	DRIVER( fami_key )  /* Nintendo Family Computer (a.k.a. Famicom) + Disk System add-on + Keyboard add-on */
+	DRIVER( famitwin )  /* Sharp Famicom Twin System */
+	DRIVER( drpcjr )    /* Bung Doctor PC Jr */
+	DRIVER( dendy )     /* Dendy (Classic russian famiclone) */
+	DRIVER( gameboy )   /* Nintendo Game Boy Handheld */
+	DRIVER( supergb )   /* Nintendo Super Game Boy SNES Cartridge */
+	DRIVER( gbpocket )  /* Nintendo Game Boy Pocket Handheld */
+	DRIVER( gblight )   /* Nintendo Game Boy Light Handheld */
+	DRIVER( gbcolor )   /* Nintendo Game Boy Color Handheld */
+	DRIVER( gba )       /* Nintendo Game Boy Advance Handheld */
+	DRIVER( snes )      /* Nintendo Super Nintendo NTSC */
+	DRIVER( snespal )   /* Nintendo Super Nintendo PAL */
+	DRIVER( snessfx )   /* Nintendo Super Nintendo NTSC w/SuperFX CPU*/
+	DRIVER( snespsfx )  /* Nintendo Super Nintendo PAL w/SuperFX CPU */
+	DRIVER( snesst )    /* Nintendo Super Nintendo NTSC w/Sufami Turbo base cart */
+	DRIVER( snesbsx )   /* Nintendo Super Nintendo NTSC w/BS-X compatible cart  */
+	DRIVER( n64 )       /* Nintendo N64   */
+	DRIVER( pokemini )  /* Nintendo Pokemon Mini */
 
 	DRIVER( megaduck )  /* Megaduck  */
 

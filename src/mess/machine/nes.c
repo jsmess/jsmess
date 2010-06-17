@@ -288,101 +288,130 @@ static void nes_machine_stop( running_machine *machine )
 READ8_HANDLER( nes_IN0_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
+	int cfg = input_port_read(space->machine, "CTRLSEL");
 	int ret;
 
-	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
-	/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
-	ret = 0x40;
-
-	ret |= ((state->in_0.i0 >> state->in_0.shift) & 0x01);
-
-	/* zapper */
-	if ((input_port_read(space->machine, "CTRLSEL") & 0x000f) == 0x0002)
+	if ((cfg & 0x000f) == 0x04)	// for now we treat the FC keyboard separately from other inputs!
 	{
-		int x = state->in_0.i1;	/* read Zapper x-position */
-		int y = state->in_0.i2;	/* read Zapper y-position */
-		UINT32 pix, color_base;
-
-		/* get the pixel at the gun position */
-		pix = ppu2c0x_get_pixel(state->ppu, x, y);
-
-		/* get the color base from the ppu */
-		color_base = ppu2c0x_get_colorbase(state->ppu);
-
-		/* look at the screen and see if the cursor is over a bright pixel */
-		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
-			(pix == color_base + 0x33) || (pix == color_base + 0x34))
+		// here we should have the tape input
+		ret = 0;
+	}
+	else
+	{
+		/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
+		/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
+		ret = 0x40;
+		
+		ret |= ((state->in_0.i0 >> state->in_0.shift) & 0x01);
+		
+		/* zapper */
+		if ((cfg & 0x000f) == 0x0002)
 		{
-			ret &= ~0x08; /* sprite hit */
+			int x = state->in_0.i1;	/* read Zapper x-position */
+			int y = state->in_0.i2;	/* read Zapper y-position */
+			UINT32 pix, color_base;
+			
+			/* get the pixel at the gun position */
+			pix = ppu2c0x_get_pixel(state->ppu, x, y);
+			
+			/* get the color base from the ppu */
+			color_base = ppu2c0x_get_colorbase(state->ppu);
+			
+			/* look at the screen and see if the cursor is over a bright pixel */
+			if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
+				(pix == color_base + 0x33) || (pix == color_base + 0x34))
+			{
+				ret &= ~0x08; /* sprite hit */
+			}
+			else
+				ret |= 0x08;  /* no sprite hit */
+			
+			/* If button 1 is pressed, indicate the light gun trigger is pressed */
+			ret |= ((state->in_0.i0 & 0x01) << 4);
 		}
-		else
-			ret |= 0x08;  /* no sprite hit */
-
-		/* If button 1 is pressed, indicate the light gun trigger is pressed */
-		ret |= ((state->in_0.i0 & 0x01) << 4);
+		
+		if (LOG_JOY)
+			logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), state->in_0.shift, state->in_0.i0);
+		
+		state->in_0.shift++;
 	}
 
-	if (LOG_JOY)
-		logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), state->in_0.shift, state->in_0.i0);
-
-	state->in_0.shift++;
 	return ret;
+}
+
+// row of the keyboard matrix are read 4-bits at time, and gets returned as bit1->bit4
+static UINT8 nes_read_fc_keyboard_line( running_machine *machine, UINT8 scan, UINT8 mode )
+{
+	static const char *const keyport_names[] = { "FCKEY0", "FCKEY1", "FCKEY2", "FCKEY3", "FCKEY4", "FCKEY5", "FCKEY6", "FCKEY7", "FCKEY8" };
+	return ((input_port_read(machine, keyport_names[scan]) >> (mode * 4)) & 0x0f) << 1;
 }
 
 READ8_HANDLER( nes_IN1_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
+	int cfg = input_port_read(space->machine, "CTRLSEL");
 	int ret;
 
-	/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
-	/* in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there. */
-	ret = 0x40;
-
-	/* Handle data line 0's serial output */
-	ret |= ((state->in_1.i0 >> state->in_1.shift) & 0x01);
-
-	/* zapper */
-	if ((input_port_read(space->machine, "CTRLSEL") & 0x00f0) == 0x0030)
+	if ((cfg & 0x000f) == 0x04)	// for now we treat the FC keyboard separately from other inputs!
 	{
-		int x = state->in_1.i1;	/* read Zapper x-position */
-		int y = state->in_1.i2;	/* read Zapper y-position */
-		UINT32 pix, color_base;
-
-		/* get the pixel at the gun position */
-		pix = ppu2c0x_get_pixel(state->ppu, x, y);
-
-		/* get the color base from the ppu */
-		color_base = ppu2c0x_get_colorbase(state->ppu);
-
-		/* look at the screen and see if the cursor is over a bright pixel */
-		if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
-			(pix == color_base + 0x33) || (pix == color_base + 0x34))
-		{
-			ret &= ~0x08; /* sprite hit */
-		}
+		if (state->fck_scan < 9)
+			ret = ~nes_read_fc_keyboard_line(space->machine, state->fck_scan, state->fck_mode) & 0x1e;
 		else
-			ret |= 0x08;  /* no sprite hit */
-
-		/* If button 1 is pressed, indicate the light gun trigger is pressed */
-		ret |= ((state->in_1.i0 & 0x01) << 4);
+			ret = 0x1e;
 	}
-
-	/* arkanoid dial */
-	else if ((input_port_read(space->machine, "CTRLSEL") & 0x00f0) == 0x0040)
+	else
 	{
-		/* Handle data line 2's serial output */
-		ret |= ((state->in_1.i2 >> state->in_1.shift) & 0x01) << 3;
-
-		/* Handle data line 3's serial output - bits are reversed */
-		/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
-		/* ret |= ((state->in_1[3] >> state->in_1.shift) & 0x01) << 4; */
-		/* ret |= ((state->in_1[3] << state->in_1.shift) & 0x80) >> 3; */
+		/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
+		/* in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there. */
+		ret = 0x40;
+		
+		/* Handle data line 0's serial output */
+		ret |= ((state->in_1.i0 >> state->in_1.shift) & 0x01);
+		
+		/* zapper */
+		if ((cfg & 0x00f0) == 0x0030)
+		{
+			int x = state->in_1.i1;	/* read Zapper x-position */
+			int y = state->in_1.i2;	/* read Zapper y-position */
+			UINT32 pix, color_base;
+			
+			/* get the pixel at the gun position */
+			pix = ppu2c0x_get_pixel(state->ppu, x, y);
+			
+			/* get the color base from the ppu */
+			color_base = ppu2c0x_get_colorbase(state->ppu);
+			
+			/* look at the screen and see if the cursor is over a bright pixel */
+			if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
+				(pix == color_base + 0x33) || (pix == color_base + 0x34))
+			{
+				ret &= ~0x08; /* sprite hit */
+			}
+			else
+				ret |= 0x08;  /* no sprite hit */
+			
+			/* If button 1 is pressed, indicate the light gun trigger is pressed */
+			ret |= ((state->in_1.i0 & 0x01) << 4);
+		}
+		
+		/* arkanoid dial */
+		else if ((cfg & 0x00f0) == 0x0040)
+		{
+			/* Handle data line 2's serial output */
+			ret |= ((state->in_1.i2 >> state->in_1.shift) & 0x01) << 3;
+			
+			/* Handle data line 3's serial output - bits are reversed */
+			/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
+			/* ret |= ((state->in_1[3] >> state->in_1.shift) & 0x01) << 4; */
+			/* ret |= ((state->in_1[3] << state->in_1.shift) & 0x80) >> 3; */
+		}
+		
+		if (LOG_JOY)
+			logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), state->in_1.shift, state->in_1.i0);
+		
+		state->in_1.shift++;
 	}
 
-	if (LOG_JOY)
-		logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), state->in_1.shift, state->in_1.i0);
-
-	state->in_1.shift++;
 	return ret;
 }
 
@@ -457,35 +486,52 @@ static TIMER_CALLBACK( lightgun_tick )
 WRITE8_HANDLER( nes_IN0_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	int cfg;
-
-	if (data & 0x01)
-		return;
-
-	if (LOG_JOY)
-		logerror("joy 0 bits read: %d\n", state->in_0.shift);
-
-	/* Toggling bit 0 high then low resets both controllers */
-	state->in_0.shift = 0;
-	state->in_1.shift = 0;
+	int cfg = input_port_read(space->machine, "CTRLSEL");
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	timer_set(space->machine, attotime_zero, NULL, 0, lightgun_tick);
+	
+	if ((cfg & 0x000f) == 0x04)	// for now we treat the FC keyboard separately from other inputs!
+	{
+		// here we should also have the tape output
 
-	/* Check the configuration to see what's connected */
-	cfg = input_port_read(space->machine, "CTRLSEL");
-
-	/* Read the input devices */
-	nes_read_input_device(space->machine, cfg >>  0, &state->in_0, 0,  TRUE, -1);
-	nes_read_input_device(space->machine, cfg >>  4, &state->in_1, 1,  TRUE,  1);
-	nes_read_input_device(space->machine, cfg >>  8, &state->in_2, 2, FALSE, -1);
-	nes_read_input_device(space->machine, cfg >> 12, &state->in_3, 3, FALSE, -1);
-
-	if (cfg & 0x0f00)
-		state->in_0.i0 |= (state->in_2.i0 << 8) | (0x08 << 16);
-
-	if (cfg & 0xf000)
-		state->in_1.i0 |= (state->in_3.i0 << 8) | (0x04 << 16);
+		if (BIT(data, 2))	// keyboard active
+		{
+			UINT8 out = BIT(data, 1);	// scan
+			
+			if (state->fck_mode && !out && ++state->fck_scan > 9)
+				state->fck_scan = 0;
+			
+			state->fck_mode = out;	// access lower or upper 4 bits
+			
+			if (BIT(data, 0))	// reset
+				state->fck_scan = 0;
+		}
+	}
+	else
+	{
+		if (data & 0x01)
+			return;
+		
+		if (LOG_JOY)
+			logerror("joy 0 bits read: %d\n", state->in_0.shift);
+		
+		/* Toggling bit 0 high then low resets both controllers */
+		state->in_0.shift = 0;
+		state->in_1.shift = 0;
+		
+		/* Read the input devices */
+		nes_read_input_device(space->machine, cfg >>  0, &state->in_0, 0,  TRUE, -1);
+		nes_read_input_device(space->machine, cfg >>  4, &state->in_1, 1,  TRUE,  1);
+		nes_read_input_device(space->machine, cfg >>  8, &state->in_2, 2, FALSE, -1);
+		nes_read_input_device(space->machine, cfg >> 12, &state->in_3, 3, FALSE, -1);
+		
+		if (cfg & 0x0f00)
+			state->in_0.i0 |= (state->in_2.i0 << 8) | (0x08 << 16);
+		
+		if (cfg & 0xf000)
+			state->in_1.i0 |= (state->in_3.i0 << 8) | (0x04 << 16);
+	}
 }
 
 
