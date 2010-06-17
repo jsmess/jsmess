@@ -1096,7 +1096,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 		state->format = 3;
 		state->mapper = 0;		// this allows us to set up memory handlers without duplicating code (for the moment)
-		state->pcb_id = nes_get_pcb_id(image->machine, image_get_feature(image));
+		state->pcb_id = nes_get_pcb_id(image->machine, image_get_feature(image, "pcb"));
 		
 		// setup NMT etc.
 		nes_pcb_setup(image->machine, state->pcb_id);
@@ -1137,7 +1137,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->chr_open_bus = 0;
 
 #if 1
-		printf("PCB Feature: %s\n", image_get_feature(image));
+		printf("PCB Feature: %s\n", image_get_feature(image, "pcb"));
 		printf("PRG chunks: %d\n", state->prg_chunks);
 		printf("CHR chunks: %d\n", state->chr_chunks);
 		printf("VRAM: Present %s, size: %d\n", state->vram_chunks ? "Yes" : "No", vram_size);

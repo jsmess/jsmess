@@ -264,7 +264,7 @@ void set_init_phase(running_device *device);
 
 UINT8 *image_get_software_region(running_device *image, const char *tag);
 UINT32 image_get_software_region_length(running_device *image, const char *tag);
-const char *image_get_feature(running_device *image);
+const char *image_get_feature(running_device *image, const char *feature_name);
 const software_info *image_software_entry(running_device *image);
 
 

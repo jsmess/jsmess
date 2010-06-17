@@ -1452,11 +1452,21 @@ UINT32 image_get_software_region_length(running_device *image, const char *tag)
  image_get_feature
  -------------------------------------------------*/
 
-const char *image_get_feature(running_device *image)
+const char *image_get_feature(running_device *image, const char *feature_name)
 {
 	image_slot_data *slot = find_image_slot(image);
-	
-	return slot->software_part_ptr->feature;
+	feature_list *feature;
+
+	if ( ! slot->software_part_ptr->featurelist )
+		return NULL;
+
+	for ( feature = slot->software_part_ptr->featurelist; feature; feature = feature->next )
+	{
+		if ( ! strcmp( feature->name, feature_name ) )
+			return feature->value;
+	}
+
+	return NULL;
 }
 
 

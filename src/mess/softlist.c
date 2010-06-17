@@ -247,18 +247,56 @@ static void add_rom_entry(software_list *swlist, const char *name, const char *h
 	}
 }
 
+/*-------------------------------------------------
+    add_feature
+-------------------------------------------------*/
+
+static void add_feature(software_list *swlist, char *feature_name, char *feature_value)
+{
+	software_part *part = &swlist->softinfo->partdata[swlist->current_part_entry-1];
+	feature_list *new_entry;
+
+	/* First allocate the new entry */
+	new_entry = (feature_list *)pool_malloc_lib(swlist->pool, sizeof(feature_list) );
+
+	if ( new_entry )
+	{
+		new_entry->next = NULL;
+		new_entry->name = feature_name;
+		new_entry->value = feature_value ? feature_value : feature_name;
+
+		/* Add new feature to end of feature list */
+		if ( part->featurelist )
+		{
+			feature_list *list = part->featurelist;
+			while ( list->next != NULL )
+			{
+				list = list->next;
+			}
+			list->next = new_entry;
+		}
+		else
+		{
+			part->featurelist = new_entry;
+		}
+	}
+	else
+	{
+		/* Unable to allocate memory */
+	}
+}
 
 /*-------------------------------------------------
     add_software_part
 -------------------------------------------------*/
 
-static void add_software_part(software_list *swlist, const char *name, const char *interface, const char *feature)
+static void add_software_part(software_list *swlist, const char *name, const char *interface)
 {
 	software_part *part = &swlist->softinfo->partdata[swlist->current_part_entry];
 
 	part->name = name;
 	part->interface_ = interface;
-	part->feature = feature;
+	part->featurelist = NULL;
 	part->romdata = NULL;
 
 	swlist->current_part_entry += 1;
@@ -419,7 +457,6 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 			{
 				const char *str_name = NULL;
 				const char *str_interface = NULL;
-				const char *str_feature = NULL;
 
 				for ( ; attributes[0]; attributes += 2 )
 				{
@@ -428,9 +465,6 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 
 					if ( !strcmp( attributes[0], "interface" ) )
 						str_interface = attributes[1];
-
-					if ( !strcmp( attributes[0], "feature" ) )
-						str_feature = attributes[1];
 				}
 
 				if ( str_name && str_interface )
@@ -439,7 +473,6 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					{
 						char *name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
 						char *interface = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_interface ) + 1 ) * sizeof(char) );
-						char *feature = NULL;
 
 						if ( !name || !interface )
 							return;
@@ -447,15 +480,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 						strcpy( name, str_name );
 						strcpy( interface, str_interface );
 
-						if ( str_feature )
-						{
-							feature = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_feature ) + 1 ) * sizeof(char) );
-							if ( !feature )
-								return;
-							strcpy( feature, str_feature );
-						}
-
-						add_software_part( swlist, name, interface, feature );
+						add_software_part( swlist, name, interface );
 
 						/* Allocate initial space to hold the rom information */
 						swlist->rom_entries = 3;
@@ -510,6 +535,44 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				else
 				{
 					/* Missing dataarea name or size */
+				}
+			}
+			else if ( !strcmp(tagname, "feature") )
+			{
+				const char *str_feature_name = NULL;
+				const char *str_feature_value = NULL;
+
+				for ( ; attributes[0]; attributes += 2 )
+				{
+					if ( !strcmp( attributes[0], "name" ) )
+						str_feature_name = attributes[1];
+
+					if ( !strcmp( attributes[0], "value" ) )
+						str_feature_value = attributes[1];
+				}
+
+				/* Prepare for adding feature to feature list */
+				if ( str_feature_name && swlist->softinfo )
+				{
+					char *name = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_feature_name ) + 1 ) * sizeof(char) );
+					char *value = NULL;
+
+					if ( !name )
+						return;
+
+					strcpy( name, str_feature_name );
+
+					if ( str_feature_value )
+					{
+						value = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_feature_value ) + 1 ) * sizeof(char) );
+
+						if ( !value )
+							return;
+
+						strcpy( value, str_feature_value );
+					}
+
+					add_feature( swlist, name, value );
 				}
 			}
 			else
@@ -639,7 +702,7 @@ static void end_handler(void *data, const char *name)
 		case POS_MAIN:
 			if ( swlist->softinfo )
 			{
-				add_software_part( swlist, NULL, NULL, NULL );
+				add_software_part( swlist, NULL, NULL );
 			}
 			break;
 
@@ -1065,8 +1128,31 @@ bool load_software_part(running_device *device, const char *path, software_info 
 		(*sw_part)->name = auto_strdup( device->machine, software_part_ptr->name );
 		if ( software_part_ptr->interface_ )
 			(*sw_part)->interface_ = auto_strdup( device->machine, software_part_ptr->interface_ );
-		if ( software_part_ptr->feature )
-			(*sw_part)->feature = auto_strdup( device->machine, software_part_ptr->feature );
+
+		if ( software_part_ptr->featurelist )
+		{
+			feature_list *list = software_part_ptr->featurelist;
+			feature_list *new_list = auto_alloc_clear( device->machine, feature_list );
+
+			(*sw_part)->featurelist = new_list;
+
+			new_list->name = auto_strdup( device->machine, list->name );
+			new_list->value = auto_strdup( device->machine, list->value );
+
+			list = list->next;
+
+			while( list )
+			{
+				new_list->next = auto_alloc_clear( device->machine, feature_list );
+				new_list = new_list->next;
+				new_list->name = auto_strdup( device->machine, list->name );
+				new_list->value = auto_strdup( device->machine, list->value );
+
+				list = list->next;
+			}
+
+			new_list->next = NULL;
+		}
 
 		/* Tell the world which part we actually loaded */
 		*full_sw_name = auto_alloc_array( device->machine, char, strlen(swlist_name) + strlen(software_info_ptr->shortname) + strlen(software_part_ptr->name) + 3 );

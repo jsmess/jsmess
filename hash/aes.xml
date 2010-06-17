@@ -650,7 +650,8 @@
 		<description>Fatal Fury 2 / Garou Densetsu 2 - arata-naru tatakai</description>
 		<year>1992</year>
 		<publisher>SNK</publisher>
-		<part name="cart" interface="aes_cart" feature="fatfury2_prot">
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="fatfury2_prot" />
 			<dataarea name="maincpu" size="1048576">
                 <rom name="047-p1.bin" size="524288" crc="be40ea92" sha1="958b891bb8beb6af122d5467257ab20cbc6cf574" offset="000000" />
                 <rom name="047-p2.bin" size="524288" crc="2a9beac5" sha1="61378f89d64fef4c172825694f83229c2ab1a7af" offset="080000" />
@@ -1058,7 +1059,8 @@
 		<description>The King of Fighters '99 - Millennium Battle</description>
 		<year>1999</year>
 		<publisher>SNK</publisher>
-		<part name="cart" interface="aes_cart" feature="kof99_crypt">
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="kof99_crypt" />
 			<dataarea name="maincpu" size="9437184">
                 <rom name="251-sma.kc" size="262144" crc="6c9d0647" sha1="2a0ce62ca6c18007e8fbe1b60475c7874ab79389" offset="0c0000" />
                 <rom name="251-p1.bin" size="4194304" crc="006e4532" sha1="47791ab4044ad55988b1d3412d95b65b91a163c8" offset="100000" />
@@ -1095,7 +1097,8 @@
 		<description>Metal Slug 3</description>
 		<year>2000</year>
 		<publisher>SNK</publisher>
-		<part name="cart" interface="aes_cart" feature="mslug3_crypt">
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="mslug3_crypt" />
 			<dataarea name="maincpu" size="5242880">
                 <rom name="256-ph1.bin" size="1048576" crc="9c42ca85" sha1="7a8f77a89867b889295ae9b9dfd4ba28f02d234d" offset="000000" />
                 <rom name="256-ph2.bin" size="4194304" crc="1f3d8ce8" sha1="08b05a8abfb86ec09a5e758d6273acf1489961f9" offset="100000" />
@@ -1131,7 +1134,8 @@
 		<description>The King of Fighters 2001</description>
 		<year>2001</year>
 		<publisher>Eolith / SNK</publisher>
-		<part name="cart" interface="aes_cart" feature="kof2001_crypt">
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="kof2001_crypt" />
 			<dataarea name="maincpu" size="5242880">
                 <rom name="262-pg1.bin" size="1048576" crc="2af7e741" sha1="e41282d73ed6d521da056f1a16573bb61bfa3826" offset="000000" />
                 <rom name="262-pg2.bin" size="4194304" crc="91eea062" sha1="82bae42bbeedb9f3aa0c7c0b0a7a69be499cf98f" offset="100000" />
@@ -1169,7 +1173,8 @@
 		<description>Metal Slug 4</description>
 		<year>2002</year>
 		<publisher>Mega / Playmore</publisher>
-		<part name="cart" interface="aes_cart" feature="mslug4_crypt">
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="mslug4_crypt" />
 			<dataarea name="maincpu" size="5242880">
                 <rom name="263-ph1.bin" size="1048576" crc="c67f5c8d" sha1="12af74964843f103520d9f0825069ea2f67eeb2f" offset="000000" />
                 <rom name="263-ph2.bin" size="4194304" crc="bc3ec89e" sha1="2cb0626bc4fa57e1d25f208e04532b570d87b3fb" offset="100000" />
@@ -1203,7 +1208,8 @@
 		<description>The King of Fighters 2002</description>
 		<year>2002</year>
 		<publisher>Eolith / Playmore</publisher>
-		<part name="cart" interface="aes_cart" feature="kof2002_crypt">
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="kof2002_crypt" />
 			<dataarea name="maincpu" size="5242880">
                 <rom name="265-p1.bin" size="1048576" crc="9ede7323" sha1="ad9d45498777fda9fa58e75781f48e09aee705a6" offset="000000" />
                 <rom name="265-p2.bin" size="4194304" crc="327266b8" sha1="98f445cc0a94f8744d74bca71cb420277622b034" offset="100000" />
@@ -1240,7 +1246,8 @@
 		<description>Matrimelee / Shin Gouketsuji Ichizoku Toukon</description>
 		<year>2002</year>
 		<publisher>Noise Factory / Atlus</publisher>
-		<part name="cart" interface="aes_cart" feature="matrim_crypt">
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="matrim_crypt" />
 			<dataarea name="maincpu" size="5242880">
                 <rom name="266-p1.bin" size="1048576" crc="5d4c2dc7" sha1="8d723b0d28ec344eef26009b361a2b97d300dd51" offset="000000" />
                 <rom name="266-p2.bin" size="4194304" crc="a14b1906" sha1="1daa14d73512f760ef569b06f9facb279437d1db" offset="100000" />
@@ -1276,7 +1283,8 @@
 		<description>Metal Slug 5</description>
 		<year>2003</year>
 		<publisher>SNK Playmore</publisher>
-		<part name="cart" interface="aes_cart" feature="mslug5_crypt">
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="mslug5_crypt" />
 			<dataarea name="maincpu" size="8388608">
                 <rom name="268-p1cr2.bin" size="4194304" crc="3636690a" sha1="e0da714b4bdc6efffe1250ded02ebddb3ab6d7b3" offset="000000" loadflag="load32_word" />
                 <rom name="268-p2cr2.bin" size="4194304" crc="8dfc47a2" sha1="27d618cfbd0107a4d2a836797e967b39d2eb4851" offset="000002" loadflag="load32_word" />
@@ -1312,7 +1320,8 @@
 		<description>SNK vs CAPCOM SVC CHAOS</description>
 		<year>2003</year>
 		<publisher>SNK Playmore</publisher>
-		<part name="cart" interface="aes_cart" feature="svc_crypt">
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="svc_crypt" />
 			<dataarea name="maincpu" size="8388608">
                 <rom name="269-p1.bin" size="4194304" crc="38e2005e" sha1="1b902905916a30969282f1399a756e32ff069097" offset="000000" loadflag="load32_word" />
                 <rom name="269-p2.bin" size="4194304" crc="6d13797c" sha1="3cb71a95cea6b006b44cac0f547df88aec0007b7" offset="000002" loadflag="load32_word" />
@@ -1347,7 +1356,8 @@
 		<description>Samurai Shodown V / Samurai Spirits Zero</description>
 		<year>2003</year>
 		<publisher>Yuki Enterprise / SNK Playmore</publisher>
-		<part name="cart" interface="aes_cart" feature="samsho5_crypt">
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="samsho5_crypt" />
 			<dataarea name="maincpu" size="8388608">
                 <rom name="270-p1c.bin" size="4194304" crc="bf956089" sha1="c538289069bf338b9fa7ecc5c9143763dbb776a8" offset="000000" />
                 <rom name="270-p2c.bin" size="4194304" crc="943a6b1d" sha1="12bd02fc197456da6ee86f066086094cef0f4bf9" offset="400000" />

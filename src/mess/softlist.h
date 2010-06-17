@@ -18,12 +18,21 @@
 
 *********************************************************************/
 
+/* Replace this with list<string>? */
+typedef struct _feature_list feature_list;
+struct _feature_list
+{
+	feature_list	*next;
+	char			*name;
+	char			*value;
+};
+
 typedef struct _software_part software_part;
 struct _software_part
 {
 	const char *name;
 	const char *interface_;
-	const char *feature;
+	feature_list *featurelist;
 	struct rom_entry *romdata;
 };
 

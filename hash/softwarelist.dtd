@@ -8,11 +8,13 @@
 <!ELEMENT description (#PCDATA)>
 <!ELEMENT year (#PCDATA)>
 <!ELEMENT publisher (#PCDATA)>
-<!ELEMENT part (dataarea*)>
+<!ELEMENT part (feature*, dataarea*)>
 <!ATTLIST part name CDATA #REQUIRED>
 <!ATTLIST part interface CDATA #REQUIRED>
 <!-- feature is used to store things like pcb-type, mapper type, etc. Specific values depend on the system. -->
-<!ATTLIST part feature CDATA #IMPLIED>
+<!ELEMENT feature EMPTY>
+<!ATTLIST feature name CDATA #REQUIRED>
+<!ATTLIST feature value CDATA #IMPLIED>
 <!ELEMENT dataarea (rom*)>
 <!ATTLIST dataarea name CDATA #REQUIRED>
 <!ATTLIST dataarea size CDATA #REQUIRED>
@@ -20,7 +22,7 @@
 <!ATTLIST dataarea endian (big|little) "little">
 <!ELEMENT rom EMPTY>
 <!ATTLIST rom name CDATA #IMPLIED>
-<!ATTLIST rom size CDATA #REQUIRED>
+<!ATTLIST rom size CDATA #IMPLIED>
 <!ATTLIST rom crc CDATA #IMPLIED>
 <!ATTLIST rom md5 CDATA #IMPLIED>
 <!ATTLIST rom sha1 CDATA #IMPLIED>
