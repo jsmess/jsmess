@@ -247,8 +247,8 @@ int info_listsoftware(core_options *options, const char *gamename)
 											fprintf( out, "\t\t\t<part name=\"%s\"", part->name );
 											if ( part->interface_ )
 												fprintf( out, " interface=\"%s\"", part->interface_ );
-											if ( part->feature )
-												fprintf( out, " features=\"%s\"", part->feature );
+//											if ( part->feature )
+//												fprintf( out, " features=\"%s\"", part->feature );
 											fprintf( out, ">\n");
 
 											/* TODO: display rom region information */
