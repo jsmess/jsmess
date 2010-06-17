@@ -46,8 +46,8 @@ enum
 enum
 {
 	NT_X = 0,
-	NT_HORZ,	// not hardwired, horizontal at start
-	NT_VERT,	// not hardwired, vertical at start
+	NT_HORZ,
+	NT_VERT,
 	NT_Y,
 	NT_1SCREEN,
 	NT_4SCR_2K,
@@ -167,7 +167,8 @@ static int unif_initialize( running_machine *machine, int idx )
 			break;
 		case STD_UXROM:	// mapper 2
 		case STD_UN1ROM:	// mapper 94
-			prg32(machine, 0);
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case UXROM_CC:	// mapper 180
 			prg32(machine, 0);
@@ -1265,8 +1266,12 @@ void unif_mapr_setup( running_machine *machine, const char *board )
 	state->battery = unif_board->nvwram;	// we should implement battery banks based on the size of this...
 	state->battery_size = NES_BATTERY_SIZE; // FIXME: we should allow for smaller battery!
 	state->prg_ram = unif_board->wram;	// we should implement WRAM banks based on the size of this...
-	// state->hard_mirroring = unif_board->nt;
 	state->four_screen_vram = (unif_board->nt == NT_4SCR_2K || unif_board->nt == NT_4SCR_4K) ? 1 : 0;
+
+	if (unif_board->nt == NT_VERT)
+		state->hard_mirroring = 1;
+	else if (unif_board->nt == NT_HORZ)
+		state->hard_mirroring = 0;
 
 	if (unif_board->chrram <= CHRRAM_8)
 		state->vram_chunks = 1;

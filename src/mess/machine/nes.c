@@ -578,6 +578,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 
 			state->hard_mirroring = local_options & 0x01;
+//			printf("%d\n", state->hard_mirroring);
 			state->battery = local_options & 0x02;
 			state->trainer = local_options & 0x04;
 			state->four_screen_vram = local_options & 0x08;
@@ -1050,6 +1051,16 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->ce_mask = 0;
 		state->ce_state = 0;
 
+		/* Check for mirroring */
+		// FIXME: this is hacky. it would be better to include these in some feature attribute
+		if (image_get_software_region(image, "mirror") != NULL)
+		{
+			int value = image_get_software_region_length(image, "mirror");
+			if (value == 2)
+				state->hard_mirroring = 0;
+			if (value == 4)
+				state->hard_mirroring = 1;
+		}
 		/* Check for pins */
 		// FIXME: this is hacky. it would be better to include these in some feature attribute
 		if (image_get_software_region(image, "pin26") != NULL)

@@ -578,6 +578,7 @@ static const nes_pcb pcb_list[] =
 	{ "BMC-70IN1",           UNSUPPORTED_BOARD },	// mapper 236?
 	{ "BMC-70IN1B",          UNSUPPORTED_BOARD },	// mapper 236?
 	{ "BMC-SUPERHIK-KOF",    UNSUPPORTED_BOARD },// mapper 251
+	{ "BMC-POWERJOY",    UNSUPPORTED_BOARD },// mapper 126
 // are there dumps of games with these boards?
 	{ "WAIXING-I",        UNSUPPORTED_BOARD }, // [supported by NEStopia - we need more info]
 	{ "WAIXING-J",        UNSUPPORTED_BOARD }, // [supported by NEStopia - we need more info]
@@ -1603,11 +1604,9 @@ static WRITE8_HANDLER( exrom_l_w )
 			LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
 			// FIXME: a few Koei games have both WRAM & BWRAM but here we don't support this (yet)
 			if (state->battery)
-				state->prg_bank[4] = state->battery_bank5_start + (data & 0x07);
+				wram_bank(space->machine, data, NES_BATTERY);
 			else
-				state->prg_bank[4] = state->prgram_bank5_start + (data & 0x07);
-			memory_set_bank(space->machine, "bank5", state->prg_bank[4]);
-			//wram_bank(space->machine, data & 0x07, NES_WRAM);
+				wram_bank(space->machine, data, NES_WRAM);
 			break;
 			
 		case 0x1014: /* $5114 */
