@@ -56,7 +56,7 @@ enum
 	SACHEN_74LS374, SACHEN_74LS374_A,
 	/* Sunsoft */
 	SUNSOFT_1, SUNSOFT_2_A, SUNSOFT_2_B, SUNSOFT_3, 
-	SUNSOFT_4, SUNSOFT_5B, SUNSOFT_FME7,
+	SUNSOFT_4, SUNSOFT_DCS, SUNSOFT_5B, SUNSOFT_FME7,
 	/* Taito */
 	TAITO_TC0190FMC, TAITO_TC0190FMCP, 
 	TAITO_X1_005, TAITO_X1_005_A, TAITO_X1_017,
@@ -107,7 +107,6 @@ void mapper_handlers_setup(running_machine *machine);
 void pcb_handlers_setup(running_machine *machine);
 void unif_mapr_setup(running_machine *machine, const char *board);
 int nes_get_pcb_id(running_machine *machine, const char *feature);
-void nes_pcb_setup(running_machine *machine, int ID);
 
 WRITE8_HANDLER( nes_low_mapper_w );
 WRITE8_HANDLER( nes_mid_mapper_w );

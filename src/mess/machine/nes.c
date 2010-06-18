@@ -554,6 +554,48 @@ WRITE8_HANDLER( nes_IN1_w )
 {
 }
 
+struct nes_cart_lines
+{
+	const char *tag;
+	int line;
+};
+
+static const struct nes_cart_lines nes_cart_lines_table[] =
+{
+	{ "PRG A0",    0 },
+	{ "PRG A1",    1 },
+	{ "PRG A2",    2 },
+	{ "PRG A3",    3 },
+	{ "PRG A4",    4 },
+	{ "PRG A5",    5 },
+	{ "PRG A6",    6 },
+	{ "PRG A7",    7 },
+	{ "CHR A10",  10 },
+	{ "CHR A11",  11 },
+	{ "CHR A12",  12 },
+	{ "CHR A13",  13 },
+	{ "CHR A14",  14 },
+	{ "CHR A15",  15 },
+	{ "CHR A16",  16 },
+	{ "CHR A17",  17 },
+	{ "NC",      128 },
+	{ 0 }
+};
+
+static int nes_cart_get_line( const char *feature )
+{
+	const struct nes_cart_lines *nes_line = &nes_cart_lines_table[0];
+	
+	while (nes_line->tag)
+	{
+		if (strcmp(nes_line->tag, feature) == 0)
+			break;
+		
+		nes_line++;
+	}
+
+	return nes_line->line;
+}
 
 DEVICE_IMAGE_LOAD( nes_cart )
 {
@@ -1097,9 +1139,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->format = 3;
 		state->mapper = 0;		// this allows us to set up memory handlers without duplicating code (for the moment)
 		state->pcb_id = nes_get_pcb_id(image->machine, image_get_feature(image, "pcb"));
-		
-		// setup NMT etc.
-		nes_pcb_setup(image->machine, state->pcb_id);
+
+		if (state->pcb_id == UNSUPPORTED_BOARD)
+			printf("This board (%s) is currently not supported by MESS\n", image_get_feature(image, "pcb"));
+
+		if (state->pcb_id == STD_TVROM || state->pcb_id == STD_DRROM || state->pcb_id == IREM_LROG017)
+			state->four_screen_vram = 1;
 
 		state->battery = (image_get_software_region(image, "bwram") != NULL) ? 1 : 0;
 		state->battery_size = image_get_software_region_length(image, "bwram");
@@ -1109,11 +1154,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if (state->prg_ram)
 			state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
 
-		state->ce_mask = 0;
-		state->ce_state = 0;
-
 		/* Check for mirroring */
-		// FIXME: this is hacky. it would be better to include these in some feature attribute
 		if (image_get_feature(image, "mirroring") != NULL)
 		{
 			const char *mirroring = image_get_feature(image, "mirroring");
@@ -1122,20 +1163,74 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			if (strcmp(mirroring, "vertical") == 0)
 				state->hard_mirroring = 1;
 		}
-		/* Check for pins */
-		// FIXME: this is hacky. it would be better to include these in some feature attribute
-		if (image_get_software_region(image, "pin26") != NULL)
-		{
-			state->ce_mask |= 0x01;
-			state->ce_state |= (image_get_software_region_length(image, "pin26") == 2) ? 0 : 0x01;
-		}
-		if (image_get_software_region(image, "pin27") != NULL)
-		{
-			state->ce_mask |= 0x02;
-			state->ce_state |= (image_get_software_region_length(image, "pin27") == 2) ? 0 : 0x02;
-		}
-		state->chr_open_bus = 0;
 
+		state->chr_open_bus = 0;
+		state->ce_mask = 0;
+		state->ce_state = 0;
+		state->vrc_ls_prg_a = 0;
+		state->vrc_ls_prg_b = 0;
+		state->vrc_ls_chr = 0;
+
+		/* Check for pins in specific boards which require them */
+		if (state->pcb_id == STD_CNROM)
+		{
+			if (image_get_feature(image, "chr-pin26") != NULL)
+			{
+				state->ce_mask |= 0x01;
+				state->ce_state |= !strcmp(image_get_feature(image, "chr-pin26"), "CE") ? 0x01 : 0;
+			}
+			if (image_get_feature(image, "chr-pin27") != NULL)
+			{
+				state->ce_mask |= 0x02;
+				state->ce_state |= !strcmp(image_get_feature(image, "chr-pin27"), "CE") ? 0x02 : 0;
+			}
+		}
+
+		if (state->pcb_id == TAITO_X1_005)
+		{
+			if (!strcmp(image_get_feature(image, "x1-pin17"), "CIRAM A10") && !strcmp(image_get_feature(image, "x1-pin31"), "NC"))
+				state->pcb_id = TAITO_X1_005_A;
+		}
+
+		if (state->pcb_id == KONAMI_VRC2)
+		{
+			state->vrc_ls_prg_a = nes_cart_get_line(image_get_feature(image, "vrc2-pin3"));
+			state->vrc_ls_prg_b = nes_cart_get_line(image_get_feature(image, "vrc2-pin3"));
+			state->vrc_ls_chr = (nes_cart_get_line(image_get_feature(image, "vrc2-pin21")) != 10) ? 1 : 0;
+			printf("VRC-2, pin3: A%d, pin4: A%d, pin21: %s\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b, state->vrc_ls_chr ? "NC" : "A10");
+		}
+
+		if (state->pcb_id == KONAMI_VRC4)
+		{
+			state->vrc_ls_prg_a = nes_cart_get_line(image_get_feature(image, "vrc4-pin3"));
+			state->vrc_ls_prg_b = nes_cart_get_line(image_get_feature(image, "vrc4-pin4"));
+			printf("VRC-4, pin3: A%d, pin4: A%d\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b);
+		}
+		
+		if (state->pcb_id == KONAMI_VRC6)
+		{
+			state->vrc_ls_prg_a = nes_cart_get_line(image_get_feature(image, "vrc6-pin9"));
+			state->vrc_ls_prg_b = nes_cart_get_line(image_get_feature(image, "vrc6-pin10"));
+			printf("VRC-6, pin9: A%d, pin10: A%d\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b);
+		}
+
+		/* Check for other misc board variants */
+		if (state->pcb_id == STD_SXROM || state->pcb_id == STD_SOROM)
+		{
+			if (!strcmp(image_get_feature(image, "mmc1_type"), "MMC1A"))	// in MMC1-A PRG RAM is always enabled
+				state->pcb_id = STD_SXROM_A;
+		}
+		
+		if (state->pcb_id == STD_NXROM || state->pcb_id == SUNSOFT_DCS)
+		{
+			if (image_get_software_region(image, "minicart") != NULL)	// check for dual minicart
+			{
+				state->pcb_id = SUNSOFT_DCS;
+				// we shall load somewhere the minicart, but we still do not support this
+			}
+		}
+		
+		
 #if 1
 		printf("PCB Feature: %s\n", image_get_feature(image, "pcb"));
 		printf("PRG chunks: %d\n", state->prg_chunks);

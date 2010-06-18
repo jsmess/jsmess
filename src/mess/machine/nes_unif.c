@@ -291,6 +291,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case STD_NXROM:		// mapper 68
+		case SUNSOFT_DCS:		// mapper 68
 			state->mmc_reg[0] = state->mmc_latch1 = state->mmc_latch2 = 0;
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
@@ -426,11 +427,10 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg32(machine, 0);
 			break;
 		case KONAMI_VRC1:	// mapper 75
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
+		case KONAMI_VRC2:
 		case KONAMI_VRC3:	// mapper 73
+		case KONAMI_VRC4:
+		case KONAMI_VRC6:
 			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
@@ -1220,16 +1220,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-
-		case KONAMI_VRC4:
-			mapper_initialize(machine, 21);
-			break;
-		case KONAMI_VRC2:
-			mapper_initialize(machine, 22);
-			break;
-		case KONAMI_VRC6:
-			mapper_initialize(machine, 24);
 			break;
 
 		case UNSUPPORTED_BOARD:

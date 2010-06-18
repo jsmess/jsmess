@@ -136,7 +136,7 @@ static const nes_pcb pcb_list[] =
 	{ "NES-NTBROM",       STD_NXROM },
 	/* NxROM boards by other manufacturer (this board was mainly used by Sunsoft?) */
 	{ "SUNSOFT-4",        STD_NXROM },
-	{ "SUNSOFT-DCS",      STD_NXROM },
+	{ "SUNSOFT-DCS",      SUNSOFT_DCS },
 	{ "TENGEN-800042",    STD_NXROM },
 //
 	/* Nintendo JxROM */
@@ -201,9 +201,6 @@ static const nes_pcb pcb_list[] =
 	/* SxROM boards by other manufacturer */
 	{ "KONAMI-SLROM",     STD_SXROM },
 	{ "VIRGIN-SNROM",     STD_SXROM },
-	/* FIXME: Made up board for 2 MMC1A games (i.e. no WRAM disable bit) */
-	{ "HVC-SJROM-A",      STD_SXROM_A },
-	{ "HVC-SKROM-A",      STD_SXROM_A },
 //
 	/* Nintendo TxROM */
 	{ "HVC-TBROM",        STD_TXROM },
@@ -379,10 +376,8 @@ static const nes_pcb pcb_list[] =
 	//
 	{ "TAITO-TC0190FMC",  TAITO_TC0190FMC },
 	{ "TAITO-TC0190FMC+PAL16R4", TAITO_TC0190FMCP },
-	{ "TAITO-X1-005",     TAITO_X1_005 },
+	{ "TAITO-X1-005",     TAITO_X1_005 },	// two variants exist, depending on pin17 & pin31 connections
 	{ "TAITO-X1-017",     TAITO_X1_017 },
-	/* FIXME: Made up boards the different mirroring handling */
-	{ "TAITO-X1-005-A",   TAITO_X1_005_A },
 //
 	{ "AGCI-50282",       AGCI_50282 },
 	{ "AVE-NINA-01",      AVE_NINA01 },
@@ -3093,6 +3088,49 @@ static WRITE8_HANDLER( konami_vrc1_w )
 
 /*************************************************************
  
+ Konami VRC-2 
+ 
+ In MESS: Supported.
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( konami_vrc2_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	UINT8 bank, shift;
+	UINT32 shifted_offs = (offset & 0x7000)
+						| ((offset << (9 - state->vrc_ls_prg_a)) & 0x200)
+						| ((offset << (8 - state->vrc_ls_prg_b)) & 0x100);
+	LOG_MMC(("konami_vrc2_w, offset: %04x, data: %02x\n", offset, data));
+	
+	if (offset < 0x1000)
+		prg8_89(space->machine, data);
+	else if (offset < 0x2000)
+	{
+		switch (data & 0x03)
+		{
+			case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+			case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+			case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+			case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
+		}
+	}
+	else if (offset < 0x3000)
+		prg8_ab(space->machine, data);
+	else if (offset < 0x7000)
+	{
+		shift = BIT(shifted_offs, 8) * 4;
+		bank = ((shifted_offs & 0x7000) - 0x3000) / 0x0800 + BIT(shifted_offs, 9);
+		state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & (0xf0 >> shift)) 
+		| ((data >> state->vrc_ls_chr) << shift);
+		chr1_x(space->machine, bank, state->mmc_vrom_bank[bank], CHRROM);
+	}
+	else
+		logerror("konami_vrc2_w uncaught write, addr: %04x value: %02x\n", offset + 0x8000, data);
+}
+
+/*************************************************************
+ 
  Konami VRC3
 
  Games: Salamander
@@ -3133,6 +3171,198 @@ static WRITE8_HANDLER( konami_vrc3_w )
 		default:
 			logerror("konami_vrc3_w uncaught write, offset %04x, data: %02x\n", offset, data);
 			break;
+	}
+}
+
+/*************************************************************
+ 
+ Konami VRC-4
+ 
+ In MESS: Supported
+ 
+ *************************************************************/
+
+#if 0
+static void vrc4_set_prg( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	if (state->mmc_cmd1 & 0x02)
+	{
+		prg8_89(machine, 0xfe);
+		prg8_cd(machine, state->mmc_prg_bank[0]);
+	}
+	else
+	{
+		prg8_89(machine, state->mmc_prg_bank[0]);
+		prg8_cd(machine, 0xfe);
+	}
+}
+
+static void konami_irq( running_device *device, int scanline, int vblank, int blanked )
+{
+	nes_state *state = (nes_state *)device->machine->driver_data;
+	/* Increment & check the IRQ scanline counter */
+	if (state->IRQ_enable && (++state->IRQ_count == 0x100))
+	{
+		state->IRQ_count = state->IRQ_count_latch;
+		state->IRQ_enable = state->IRQ_enable_latch;
+		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+	}
+}
+#endif
+
+static WRITE8_HANDLER( konami_vrc4_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	UINT8 bank, shift;
+	UINT32 shifted_offs = (offset & 0x7000)
+						| ((offset << (9 - state->vrc_ls_prg_a)) & 0x200)
+						| ((offset << (8 - state->vrc_ls_prg_b)) & 0x100);
+	LOG_MMC(("konami_vrc4_w, offset: %04x, data: %02x\n", offset, data));
+	
+	if (offset < 0x1000)
+	{
+		state->mmc_prg_bank[0] = data;
+		vrc4_set_prg(space->machine);
+	}
+	else if (offset >= 0x2000 && offset < 0x3000)
+		prg8_cd(space->machine, data);
+	else
+	{
+		switch (shifted_offs & 0x7300)
+		{
+			case 0x1000:
+			case 0x1100:
+				switch (data & 0x03)
+			{
+				case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+				case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+				case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+				case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
+			}
+				break;
+			case 0x1200:
+			case 0x1300:
+				state->mmc_cmd1 = data & 0x02;
+				vrc4_set_prg(space->machine);
+				break;
+			case 0x3000:
+			case 0x3100:
+			case 0x3200:
+			case 0x3300:
+			case 0x4000:
+			case 0x4100:
+			case 0x4200:
+			case 0x4300:
+			case 0x5000:
+			case 0x5100:
+			case 0x5200:
+			case 0x5300:
+			case 0x6000:
+			case 0x6100:
+			case 0x6200:
+			case 0x6300:
+				shift = BIT(shifted_offs, 8) * 4;
+				bank = ((shifted_offs & 0x7000) - 0x3000) / 0x0800 + BIT(shifted_offs, 9);
+				state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & (0xf0 >> shift)) | (data << shift);
+				chr1_x(space->machine, bank, state->mmc_vrom_bank[bank], CHRROM);
+				break;
+			case 0x7000:
+				state->IRQ_count_latch = (state->IRQ_count_latch & 0xf0) | (data & 0x0f);
+				break;
+			case 0x7100:
+				state->IRQ_count_latch = (state->IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4);
+				break;
+			case 0x7200:
+				state->IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+				state->IRQ_enable = data & 0x02;
+				state->IRQ_enable_latch = data & 0x01;
+				if (data & 0x02)
+					state->IRQ_count = state->IRQ_count_latch;
+				break;
+			case 0x7300:
+				state->IRQ_enable = state->IRQ_enable_latch;
+				break;
+			default:
+				logerror("konami_vrc4_w uncaught write, addr: %04x value: %02x\n", shifted_offs + 0x8000, data);
+				break;
+		}
+	}
+}
+
+/*************************************************************
+ 
+ Konami VRC-6
+ 
+ In MESS: Supported. It also uses konami_irq.
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( konami_vrc6_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	UINT8 bank;
+	UINT32 shifted_offs = (offset & 0x7000)
+						| ((offset << (9 - state->vrc_ls_prg_a)) & 0x200)
+						| ((offset << (8 - state->vrc_ls_prg_b)) & 0x100);
+	LOG_MMC(("konami_vrc6_w, offset: %04x, data: %02x\n", offset, data));
+	
+	if (offset < 0x1000)
+		prg16_89ab(space->machine, data);
+	else if (offset >= 0x4000 && offset < 0x5000)
+		prg8_cd(space->machine, data);
+	else
+	{
+		switch (shifted_offs & 0x7300)
+		{
+			case 0x1000:
+			case 0x1100:
+			case 0x1200:
+			case 0x2000:
+			case 0x2100:
+			case 0x2200:
+			case 0x3000:
+			case 0x3100:
+			case 0x3200:
+				LOG_MMC(("Konami VRC-6 Sound write, offset: %04x, data: %02x\n", shifted_offs & 0x7300, data));
+				break;
+			case 0x3300:
+				switch (data & 0x0c)
+			{
+				case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+				case 0x04: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+				case 0x08: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+				case 0x0c: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
+			}
+				break;
+			case 0x5000:
+			case 0x5100:
+			case 0x5200:
+			case 0x5300:
+			case 0x6000:
+			case 0x6100:
+			case 0x6200:
+			case 0x6300:
+				bank = ((shifted_offs & 0x7000) - 0x5000) / 0x0400 + ((shifted_offs & 0x0300) >> 8);
+				chr1_x(space->machine, bank, data, CHRROM);
+				break;
+			case 0x7000:
+				state->IRQ_count_latch = data;
+				break;
+			case 0x7100:
+				state->IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+				state->IRQ_enable = data & 0x02;
+				state->IRQ_enable_latch = data & 0x01;
+				if (data & 0x02)
+					state->IRQ_count = state->IRQ_count_latch;
+				break;
+			case 0x7200:
+				state->IRQ_enable = state->IRQ_enable_latch;
+				break;
+			default:
+				logerror("konami_vrc6_w uncaught write, addr: %04x value: %02x\n", shifted_offs + 0x8000, data);
+				break;
+		}
 	}
 }
 
@@ -3222,6 +3452,7 @@ static WRITE8_HANDLER( konami_vrc7_w )
 }
 
 #endif
+
 /*************************************************************
  
  Namcot-163 board emulation
@@ -10024,6 +10255,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ STD_GXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(gxrom_w),               NULL, NULL, NULL },
 	{ STD_MXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(gxrom_w),               NULL, NULL, NULL },
 	{ STD_NXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ntbrom_w),              NULL, NULL, NULL },
+	{ SUNSOFT_DCS,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ntbrom_w),              NULL, NULL, NULL },
 	{ STD_JXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(jxrom_w),               NULL, NULL, jxrom_irq },
 	{ STD_SXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sxrom_w),               NULL, NULL, NULL },
 	{ STD_SXROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sxrom_a_w),             NULL, NULL, NULL },
@@ -10067,7 +10299,10 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ JALECO_JF17,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(jf17_w),                NULL, NULL, NULL },
 	{ JALECO_JF19,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(jf19_w),                NULL, NULL, NULL },
 	{ KONAMI_VRC1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc1_w),         NULL, NULL, NULL },
+	{ KONAMI_VRC2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc2_w),         NULL, NULL, NULL },
 	{ KONAMI_VRC3,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc3_w),         NULL, NULL, konami_irq },
+	{ KONAMI_VRC4,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc4_w),         NULL, NULL, konami_irq },
+	{ KONAMI_VRC6,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc6_w),         NULL, NULL, konami_irq },
 	{ KONAMI_VRC7,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc7_w),         NULL, NULL, konami_irq },
 	{ NAMCOT_163,           {namcot163_l_w, namcot163_l_r}, NES_NOACCESS, NES_WRITEONLY(namcot163_w), NULL, NULL, namcot163_irq },
 	{ SUNSOFT_1,            NES_NOACCESS, NES_WRITEONLY(sunsoft1_m_w), NES_NOACCESS,          NULL, NULL, NULL },
@@ -10212,9 +10447,6 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BMC_GOLDENCARD_6IN1,  NES_WRITEONLY(bmc_gc6in1_l_w), NES_NOACCESS, NES_WRITEONLY(bmc_gc6in1_w), NULL, NULL, mmc3_irq },
 	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	//
-	//	{ KONAMI_VRC2,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc2a_w),        NULL, NULL, NULL },
-	//	{ KONAMI_VRC4,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc4a_w),        NULL, NULL, konami_irq },
-	//	{ KONAMI_VRC6,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc6a_w),        NULL, NULL, konami_irq },
 	//	{ BTL_SMB2B,            NES_WRITEONLY(mapper50_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, mapper50_irq },
 };
 
@@ -10258,19 +10490,11 @@ int nes_get_pcb_id( running_machine *machine, const char *feature )
 	const nes_pcb *pcb = nes_pcb_lookup(feature);
 
 	if (pcb == NULL)
-		fatalerror("Unimplemented PCB\n");
+		fatalerror("Unimplemented PCB type %s\n", feature);
 	
 	return pcb->pcb_id;
 }
 
-void nes_pcb_setup( running_machine *machine, int ID )
-{
-	nes_state *state = (nes_state *)machine->driver_data;
-
-	if (ID == STD_TVROM || ID == STD_DRROM || ID == IREM_LROG017)
-		state->four_screen_vram = 1;
-}
-	
 void pcb_handlers_setup( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;

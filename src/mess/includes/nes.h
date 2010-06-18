@@ -81,6 +81,7 @@ public:
 	int prgram_bank5_start, battery_bank5_start, empty_bank5_start;
 
 	UINT8 ce_mask, ce_state;
+	UINT8 vrc_ls_prg_a, vrc_ls_prg_b, vrc_ls_chr;
 
 	int MMC5_floodtile;
 	int MMC5_floodattr;
