@@ -6,6 +6,11 @@
     Functions to handle loading, creation, recording and playback
     of wave samples for IO_CASSETTE
 
+    2010-06-19 - Found that since 0.132, the right channel is badly out of
+    sync on a mono system, causing bad sound. Added code to disable
+    the second channel on a mono system.
+
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -23,6 +28,7 @@ static STREAM_UPDATE( wave_sound_update )
 {
 #ifdef MESS
 	running_device *image = (running_device *)param;
+	int speakers = speaker_output_count(image->machine->config);
 	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
@@ -42,18 +48,21 @@ static STREAM_UPDATE( wave_sound_update )
 		duration = ((double) samples) / image->machine->sample_rate;
 
 		cassette_get_samples(cassette, 0, time_index, duration, samples, 2, left_buffer, CASSETTE_WAVEFORM_16BIT);
-		cassette_get_samples(cassette, 1, time_index, duration, samples, 2, right_buffer, CASSETTE_WAVEFORM_16BIT);
+		if (speakers > 1)
+			cassette_get_samples(cassette, 1, time_index, duration, samples, 2, right_buffer, CASSETTE_WAVEFORM_16BIT);
 
 		for (i = samples - 1; i >= 0; i--)
 		{
 			left_buffer[i] = ((INT16 *) left_buffer)[i];
-			right_buffer[i] = ((INT16 *) right_buffer)[i];
+			if (speakers > 1)
+				right_buffer[i] = ((INT16 *) right_buffer)[i];
 		}
 	}
 	else
 	{
 		memset(left_buffer, 0, sizeof(*left_buffer) * samples);
-		memset(right_buffer, 0, sizeof(*right_buffer) * samples);
+		if (speakers > 1)
+			memset(right_buffer, 0, sizeof(*right_buffer) * samples);
 	}
 #endif
 }
@@ -66,11 +75,14 @@ static DEVICE_START( wave )
 
 	assert( device != NULL );
 	assert( device->baseconfig().static_config != NULL );
-
+	int speakers = speaker_output_count(device->machine->config);
 #ifdef MESS
 	image = device->machine->device( (const char *)device->baseconfig().static_config );
 #endif
-	stream_create(device, 0, 2, device->machine->sample_rate, (void *)image, wave_sound_update);
+	if (speakers > 1)
+		stream_create(device, 0, 2, device->machine->sample_rate, (void *)image, wave_sound_update);
+	else
+		stream_create(device, 0, 1, device->machine->sample_rate, (void *)image, wave_sound_update);
 }
 
 
