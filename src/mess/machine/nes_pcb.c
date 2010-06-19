@@ -320,8 +320,6 @@ static const nes_pcb pcb_list[] =
 	{ "IREM-H-3001",      IREM_H3001 },
 	{ "IREM-HOLYDIVER",   IREM_HOLYDIV },
 	{ "IREM-TAM-S1",      IREM_TAM_S1 },
-	/* FIXME: Made up boards the different mirroring handling */
-	{ "IREM-G101-A",      IREM_G101_A },
 //
 	{ "JALECO-JF-23",     JALECO_SS88006 },
 	{ "JALECO-JF-24",     JALECO_SS88006 },
@@ -832,23 +830,30 @@ static void mmc1_set_wram( const address_space *space, int board )
 
 	switch (board)
 	{
-		case STD_SOROM:		// there are 2 WRAM banks only and battery is bank 2 for the cart (hence, we invert bank, because we have battery first)
-			if (!BIT(state->mmc_reg[3], 4))
-				memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
-			else
-				memory_unmap_readwrite(space, 0x6000, 0x7fff, 0, 0);
-			wram_bank(machine, 0, bank ? NES_BATTERY : NES_WRAM);
-			break;
 		case STD_SXROM:		// here also reads are disabled!
 			if (!BIT(state->mmc_reg[3], 4))
 				memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
 			else
+			{
 				memory_unmap_readwrite(space, 0x6000, 0x7fff, 0, 0);
+				break;
+			}
 		case STD_SXROM_A:	// ignore WRAM enable bit
 			if (state->battery_size > 0x2000)
 				wram_bank(machine, ((state->mmc_reg[1] & 3) >> 2), NES_BATTERY);
 			else
 				wram_bank(machine, 0, NES_BATTERY);
+			break;
+		case STD_SOROM:		// there are 2 WRAM banks only and battery is bank 2 for the cart (hence, we invert bank, because we have battery first)
+			if (!BIT(state->mmc_reg[3], 4))
+				memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+			else
+			{
+				memory_unmap_readwrite(space, 0x6000, 0x7fff, 0, 0);
+				break;
+			}
+		case STD_SOROM_A:	// ignore WRAM enable bit
+			wram_bank(machine, 0, bank ? NES_BATTERY : NES_WRAM);
 			break;
 	}
 }
@@ -973,20 +978,10 @@ static void common_sxrom_write_handler( const address_space *space, offs_t offse
 
 static WRITE8_HANDLER( sxrom_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
+
 	LOG_MMC(("sxrom_w, offset: %04x, data: %02x\n", offset, data));
-	common_sxrom_write_handler(space, offset, data, STD_SXROM);
-}
-
-static WRITE8_HANDLER( sxrom_a_w )
-{
-	LOG_MMC(("sxrom_a_w, offset: %04x, data: %02x\n", offset, data));
-	common_sxrom_write_handler(space, offset, data, STD_SXROM_A);
-}
-
-static WRITE8_HANDLER( sorom_w )
-{
-	LOG_MMC(("sorom_w, offset: %04x, data: %02x\n", offset, data));
-	common_sxrom_write_handler(space, offset, data, STD_SOROM);
+	common_sxrom_write_handler(space, offset, data, state->pcb_id);
 }
 
 /*************************************************************
@@ -1094,6 +1089,30 @@ static WRITE8_HANDLER( fxrom_w )
  
  *************************************************************/
 
+static void mmc3_set_wram( const address_space *space )
+{
+	running_machine *machine = space->machine;
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	if (BIT(state->mmc_latch2, 7))
+			memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+	else
+	{
+		memory_unmap_readwrite(space, 0x6000, 0x7fff, 0, 0);
+		return;
+	}
+
+	if (BIT(state->mmc_latch2, 6))
+		memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+	else
+	{
+		memory_unmap_write(space, 0x6000, 0x7fff, 0, 0);
+		return;
+	}
+	
+	wram_bank(machine, 0, state->battery_size ? NES_BATTERY : NES_WRAM);
+}
+
 static void mmc3_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
@@ -1128,41 +1147,40 @@ static void mmc3_irq( running_device *device, int scanline, int vblank, int blan
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
 		int priorCount = state->IRQ_count;
-		if ((state->IRQ_count == 0))
-		{
+		if ((state->IRQ_count == 0) || state->IRQ_clear)
 			state->IRQ_count = state->IRQ_count_latch;
-		}
 		else
 			state->IRQ_count--;
 		
-		if (state->IRQ_enable && !blanked && (state->IRQ_count == 0) && priorCount)
+		if (state->IRQ_enable && !blanked && (state->IRQ_count == 0) && (priorCount || state->IRQ_clear || !state->mmc3_alt_irq))
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 					 video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
 			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
+	state->IRQ_clear = 0;
 }
 
 static WRITE8_HANDLER( txrom_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	UINT8 MMC3_helper, cmd;
+	UINT8 mmc3_helper, cmd;
 	
 	LOG_MMC(("txrom_w, offset: %04x, data: %02x\n", offset, data));
 	
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			MMC3_helper = state->mmc_latch1 ^ data;
+			mmc3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
 			
 			/* Has PRG Mode changed? */
-			if (MMC3_helper & 0x40)
+			if (mmc3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			
 			/* Has CHR Mode changed? */
-			if (MMC3_helper & 0x80)
+			if (mmc3_helper & 0x80)
 				mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 			
@@ -1187,19 +1205,16 @@ static WRITE8_HANDLER( txrom_w )
 			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 			
-		case 0x2001: /* extra RAM enable/disable */
-			state->mmc_latch2 = data;	/* This actually is made of two parts: data&0x80 = WRAM enabled and data&0x40 = WRAM readonly!  */
-			if (data)
-				memory_install_write_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
-			else
-				memory_unmap_write(space, 0x6000, 0x7fff, 0, 0);
+		case 0x2001:
+			state->mmc_latch2 = data;
+			mmc3_set_wram(space);
 			break;
 			
 		case 0x4000:
 			state->IRQ_count_latch = data;
 			break;
 			
-		case 0x4001: /* some sources state that here we must have state->IRQ_count = state->IRQ_count_latch */
+		case 0x4001:
 			state->IRQ_count = 0;
 			break;
 			
@@ -1225,11 +1240,88 @@ static WRITE8_HANDLER( txrom_w )
  
  *************************************************************/
 
+static WRITE8_HANDLER( hkrom_m_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	UINT8 write_hi, write_lo;
+	LOG_MMC(("hkrom_m_w, offset: %04x, data: %02x\n", offset, data));
+	
+	if (offset < 0x1000)
+		return;	
+
+	offset &= 0x3ff;
+	// banks can be written only if both read & write is enabled!
+	write_hi = ((state->mmc6_reg & 0xc0) == 0xc0);
+	write_lo = ((state->mmc6_reg & 0x60) == 0x60);
+
+	if (BIT(offset, 9) && write_hi)	// access to upper 1k
+		state->battery_ram[offset] = data;
+	
+	if (!BIT(offset, 9) && write_lo)	// access to lower 1k
+		state->battery_ram[offset] = data;
+}
+
+static READ8_HANDLER( hkrom_m_r )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("hkrom_m_r, offset: %04x\n", offset));
+	
+	if (offset < 0x1000)
+		return 0xff;	// here it should be open bus
+
+	if (!(state->mmc6_reg & 0xa0))
+		return 0xff;	// here it should be open bus
+	
+	offset &= 0x3ff;
+
+	if (BIT(offset, 9) && BIT(state->mmc6_reg, 7))	// access to upper 1k when upper read is enabled
+		return state->battery_ram[offset];
+
+	if (!BIT(offset, 9) && BIT(state->mmc6_reg, 5))	// access to lower 1k when lower read is enabled
+		return state->battery_ram[offset];
+
+	// If only one bank is enabled for reading, the other reads back as zero
+	return 0x00;
+}
+
 static WRITE8_HANDLER( hkrom_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	UINT8 mmc6_helper;
 	LOG_MMC(("hkrom_w, offset: %04x, data: %02x\n", offset, data));
-	/* what are the differences MMC6 vs. MMC3? */
-	txrom_w(space, offset, data);
+
+	switch (offset & 0x6001)
+	{
+		case 0x0000:
+			mmc6_helper = state->mmc_cmd1 ^ data;
+			state->mmc_latch1 = data;
+
+			if (!state->mmc_latch2 && BIT(data, 5))	// if WRAM is disabled and has to be enabled, write
+				state->mmc_latch2 = BIT(data, 5);	// (once WRAM has been enabled, it cannot be disabled without resetting the game)
+			
+			/* Has PRG Mode changed? */
+			if (BIT(mmc6_helper, 6))
+				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+			
+			/* Has CHR Mode changed? */
+			if (BIT(mmc6_helper, 7))
+				mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			break;
+
+		case 0x2001:
+			if (state->mmc_latch2)
+				state->mmc6_reg = data;
+			break;
+
+		case 0x4001:
+			state->IRQ_count = 0;
+			state->IRQ_clear = 1;
+			break;
+			
+		default:
+			txrom_w(space, offset, data);
+			break;
+	}
 }
 
 /*************************************************************
@@ -1286,7 +1378,7 @@ static WRITE8_HANDLER( txsrom_w )
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
-		{
+			{
 			case 0: case 1:
 			case 2: case 3: case 4: case 5:
 				state->mmc_vrom_bank[cmd] = data;
@@ -1298,7 +1390,7 @@ static WRITE8_HANDLER( txsrom_w )
 				state->mmc_prg_bank[cmd - 6] = data;
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 				break;
-		}
+			}
 			break;
 			
 		case 0x2000:
@@ -10258,10 +10350,11 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ SUNSOFT_DCS,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ntbrom_w),              NULL, NULL, NULL },
 	{ STD_JXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(jxrom_w),               NULL, NULL, jxrom_irq },
 	{ STD_SXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sxrom_w),               NULL, NULL, NULL },
-	{ STD_SXROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sxrom_a_w),             NULL, NULL, NULL },
-	{ STD_SOROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sorom_w),               NULL, NULL, NULL },
+	{ STD_SOROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sxrom_w),               NULL, NULL, NULL },
+	{ STD_SXROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sxrom_w),               NULL, NULL, NULL },
+	{ STD_SOROM_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sxrom_w),               NULL, NULL, NULL },
 	{ STD_TXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(txrom_w),               NULL, NULL, mmc3_irq },
-	{ STD_HKROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(hkrom_w),               NULL, NULL, mmc3_irq },
+	{ STD_HKROM,            NES_NOACCESS, {hkrom_m_w, hkrom_m_r}, NES_WRITEONLY(hkrom_w),     NULL, NULL, mmc3_irq },
 	{ STD_TQROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tqrom_w),               NULL, NULL, mmc3_irq },
 	{ STD_TXSROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(txsrom_w),              NULL, NULL, mmc3_irq },
 	{ STD_DXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(dxrom_w),               NULL, NULL, NULL },

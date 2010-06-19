@@ -132,6 +132,7 @@ public:
 	UINT8      IRQ_reset;
 	UINT8      IRQ_status;
 	UINT8      IRQ_mode;
+	UINT8      IRQ_clear;
 	int        mult1, mult2;
 
 	UINT8 mmc_chr_source;			// This is set at init to CHRROM or CHRRAM. a few mappers can swap between
@@ -156,7 +157,9 @@ public:
 	// misc mapper related variables which should be merged with the above one, where possible
 	UINT8 MMC1_regs[4];
 	UINT8 MMC2_regs[4];	// these replace bank0/bank0_hi/bank1/bank1_hi
-	
+
+	UINT8 mmc3_alt_irq;
+
 	int MMC5_rom_bank_mode;
 	int MMC5_vrom_bank_mode;
 	int MMC5_vram_protect;
@@ -164,7 +167,9 @@ public:
 	int vrom_page_a;
 	int vrom_page_b;
 	// int vrom_next[4];
-	
+
+	UINT8 mmc6_reg;
+
 	// these might be unified in single mmc_reg[] array, together with state->mmc_cmd1 & state->mmc_cmd2
 	// but be careful that MMC3 clones often use state->mmc_cmd1/state->mmc_cmd2 (from base MMC3) AND additional regs below!
 	UINT8 mapper45_reg[4];

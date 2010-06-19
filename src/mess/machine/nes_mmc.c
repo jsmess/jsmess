@@ -146,15 +146,16 @@ static int unif_initialize( running_machine *machine, int idx );
            0x2000-0x3fff PPU
            0x4000-0x4017 APU
            0x4018-0x5fff Expansion Area
-           0x6000-0x7fff SRAM
+           0x6000-0x7fff PRG RAM
            0x8000-0xffff PRG ROM
 
     nes_chr_r/w take care of RAM, nes_nt_r/w take care of PPU.
     for mapper specific emulation, we generically setup the
     following handlers:
     - nes_low_mapper_r/w take care of accesses to 0x4100-0x5fff
-    - nes_mid_mapper_r/w take care of accesses to 0x6000-0x7fff
-    - nes_mapper_r/w takes care of accesses to 0x8000-0xffff
+      (calling state->mmc_write_low/state->mmc_read_low)
+    - state->mmc_write/read_mid take care of 0x6000-0x7fff
+    - state->mmc_write/read take care of access to 0x8000-0xffff
       (most mappers only writes in this area)
     some mappers may access 0x4018-0x4100: this must be taken
     care separately in init_nes_core
@@ -234,53 +235,6 @@ READ8_HANDLER( nes_low_mapper_r )
 
 	return 0;
 }
-
-WRITE8_HANDLER( nes_mid_mapper_w )
-{
-	nes_state *state = (nes_state *)space->machine->driver_data;
-
-	if (state->mmc_write_mid)
-		(*state->mmc_write_mid)(space, offset, data);
-	else
-		logerror("Unimplemented MID mapper write, offset: %04x, data: %02x\n", offset + 0x6000, data);
-}
-
-// currently, this is not used (but it might become handy for some pirate mapper)
-READ8_HANDLER( nes_mid_mapper_r )
-{
-	nes_state *state = (nes_state *)space->machine->driver_data;
-
-	if (state->mmc_read_mid)
-		(*state->mmc_read_mid)(space, offset);
-	else
-		logerror("Unimplemented MID mapper read, offset: %04x\n", offset + 0x6000);
-
-	return 0;
-}
-
-WRITE8_HANDLER( nes_mapper_w )
-{
-	nes_state *state = (nes_state *)space->machine->driver_data;
-
-	if (state->mmc_write)
-		(*state->mmc_write)(space, offset, data);
-	else
-		logerror("Unimplemented mapper write, offset: %04x, data: %02x\n", offset + 0x8000, data);
-}
-
-// currently, this is not used (but it might become handy for some pirate mapper)
-READ8_HANDLER( nes_mapper_r )
-{
-	nes_state *state = (nes_state *)space->machine->driver_data;
-	
-	if (state->mmc_read)
-		(*state->mmc_read)(space, offset);
-	else
-		logerror("Unimplemented mapper read, offset: %04x\n", offset + 0x8000);
-	
-	return 0;
-}
-
 
 /*************************************************************
 

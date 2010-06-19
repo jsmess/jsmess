@@ -9,9 +9,9 @@ enum
 	STD_DXROM, STD_EXROM, STD_FXROM, STD_GXROM, 
 	STD_HKROM, STD_JXROM, STD_MXROM, STD_NXROM, 
 	STD_PXROM, STD_SXROM, STD_TXROM, STD_TXSROM, 
-	STD_TQROM, STD_UN1ROM, STD_UXROM,
+	STD_TQROM, STD_TVROM, STD_UN1ROM, STD_UXROM,
 	HVC_FAMBASIC, NES_QJ, PAL_ZZ, UXROM_CC,
-	STD_DRROM, STD_SXROM_A, STD_SOROM, STD_TVROM,
+	STD_DRROM, STD_SXROM_A, STD_SOROM, STD_SOROM_A,
 	/* Discrete components boards (by various manufacturer */
 	DIS_74X161X138, DIS_74X139X74, DIS_74X377, 
 	DIS_74X161X161X32, DIS_74X161X161X32_A,
@@ -109,11 +109,7 @@ void unif_mapr_setup(running_machine *machine, const char *board);
 int nes_get_pcb_id(running_machine *machine, const char *feature);
 
 WRITE8_HANDLER( nes_low_mapper_w );
-WRITE8_HANDLER( nes_mid_mapper_w );
-WRITE8_HANDLER( nes_mapper_w );
 READ8_HANDLER( nes_low_mapper_r );
-READ8_HANDLER( nes_mid_mapper_r );
-READ8_HANDLER( nes_mapper_r );
 WRITE8_HANDLER( nes_chr_w );
 READ8_HANDLER( nes_chr_r );
 WRITE8_HANDLER( nes_nt_w );

@@ -149,10 +149,17 @@ static void init_nes_core( running_machine *machine )
 
 			// there are still some quirk about writes to bank5... I hope to fix them soon. (mappers 34,45,52,246 have both mid_w and WRAM-->check)
 			if (state->mmc_write_mid)
-				memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_w);
-//			memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, nes_mid_mapper_r);
-			memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, nes_mapper_w);
-//			memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, nes_mapper_r);
+				memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, state->mmc_write_mid);
+			if (state->mmc_write)
+				memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, state->mmc_write);
+
+			// In fact, we also allow single pcbs to overwrite the bank read handlers defined above,
+			// because some pcbs (mainly pirate ones) require protection values to be read instead of
+			// the expected ROM banks: these handlers, though, must take care of the ROM access as well
+			if (state->mmc_read_mid)
+				memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, state->mmc_read_mid);
+			if (state->mmc_read)
+				memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, state->mmc_read);
 			break;
 	}
 
@@ -680,7 +687,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				logerror("NES: No extrainfo found\n");
 			}
 
-			state->hard_mirroring = local_options & 0x01;
+			state->hard_mirroring = (local_options & 0x01) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ;
 //			printf("%d\n", state->hard_mirroring);
 			state->battery = local_options & 0x02;
 			state->trainer = local_options & 0x04;
@@ -1158,10 +1165,14 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if (image_get_feature(image, "mirroring") != NULL)
 		{
 			const char *mirroring = image_get_feature(image, "mirroring");
-			if (strcmp(mirroring, "horizontal") == 0)
-				state->hard_mirroring = 0;
-			if (strcmp(mirroring, "vertical") == 0)
-				state->hard_mirroring = 1;
+			if (!strcmp(mirroring, "horizontal"))
+				state->hard_mirroring = PPU_MIRROR_HORZ;
+			if (!strcmp(mirroring, "vertical"))
+				state->hard_mirroring = PPU_MIRROR_VERT;
+			if (!strcmp(mirroring, "high"))
+				state->hard_mirroring = PPU_MIRROR_HIGH;
+			if (!strcmp(mirroring, "low"))
+				state->hard_mirroring = PPU_MIRROR_LOW;
 		}
 
 		state->chr_open_bus = 0;
@@ -1215,11 +1226,14 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		}
 
 		/* Check for other misc board variants */
-		if (state->pcb_id == STD_SXROM || state->pcb_id == STD_SOROM)
-		{
-			if (!strcmp(image_get_feature(image, "mmc1_type"), "MMC1A"))	// in MMC1-A PRG RAM is always enabled
-				state->pcb_id = STD_SXROM_A;
-		}
+		if (state->pcb_id == STD_SOROM && !strcmp(image_get_feature(image, "mmc1_type"), "MMC1A"))
+			state->pcb_id = STD_SOROM_A;	// in MMC1-A PRG RAM is always enabled
+		
+		if (state->pcb_id == STD_SXROM && !strcmp(image_get_feature(image, "mmc1_type"), "MMC1A"))
+			state->pcb_id = STD_SXROM_A;	// in MMC1-A PRG RAM is always enabled
+		
+		if (state->pcb_id == IREM_G101 && !strcmp(image_get_feature(image, "mirroring"), "high"))
+			state->pcb_id = IREM_G101_A;
 		
 		if (state->pcb_id == STD_NXROM || state->pcb_id == SUNSOFT_DCS)
 		{
@@ -1229,7 +1243,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				// we shall load somewhere the minicart, but we still do not support this
 			}
 		}
-		
 		
 #if 1
 		printf("PCB Feature: %s\n", image_get_feature(image, "pcb"));

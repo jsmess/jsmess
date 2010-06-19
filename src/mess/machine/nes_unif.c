@@ -197,6 +197,7 @@ static int unif_initialize( running_machine *machine, int idx )
 		case STD_SXROM:	// mapper 1, 155
 		case STD_SOROM:
 		case STD_SXROM_A:
+		case STD_SOROM_A:
 			state->mmc_latch1 = 0;
 			state->mmc_count = 0;
 			state->mmc_reg[0] = 0x0f;
@@ -225,7 +226,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			break;
 		case STD_TXROM:	// mapper 4
 		case STD_TVROM:
-		case STD_HKROM:	// MMC6
 		case REXSOFT_DBZ5:	// mapper 12
 		case WAIXING_TYPE_A:	// mapper 74
 		case STD_TXSROM:	// mapper 118
@@ -244,6 +244,7 @@ static int unif_initialize( running_machine *machine, int idx )
 				set_nt_page(machine, 2, CART_NTRAM, 2, 1);
 				set_nt_page(machine, 3, CART_NTRAM, 3, 1);
 			}
+			state->mmc3_alt_irq = 0;	// in fact, later MMC3 boards seem to use MMC6-type IRQ... more investigations are in progress at NESDev...
 			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;	// prg_bank[2] & prg_bank[3] remain always the same in most MMC3 variants
 			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;	// but some pirate clone mappers change them after writing certain registers
 			state->mmc_latch1 = 0;
@@ -254,7 +255,20 @@ static int unif_initialize( running_machine *machine, int idx )
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
+		case STD_HKROM:	// MMC6 (basically the same as TxROM, but alt IRQ behaviour)
+			state->mmc3_alt_irq = 1;
+			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;	// prg_bank[2] & prg_bank[3] remain always the same in most MMC3 variants
+			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;	// but some pirate clone mappers change them after writing certain registers
+			state->mmc_latch1 = 0;
+			state->mmc_latch2 = 0x80;
+			state->mmc_prg_base = state->mmc_chr_base = 0;
+			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;	// these could be init'ed as xxx_chunks-1 and they would work the same
+			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
+			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			break;			
 		case PAL_ZZ:	// mapper 37
+			state->mmc3_alt_irq = 0;
 			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
 			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
 			state->mmc_latch1 = 0;
@@ -267,6 +281,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 		case NES_QJ:	// mapper 47
+			state->mmc3_alt_irq = 0;
 			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
 			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
 			state->mmc_latch1 = 0;
@@ -1259,9 +1274,9 @@ void unif_mapr_setup( running_machine *machine, const char *board )
 	state->four_screen_vram = (unif_board->nt == NT_4SCR_2K || unif_board->nt == NT_4SCR_4K) ? 1 : 0;
 
 	if (unif_board->nt == NT_VERT)
-		state->hard_mirroring = 1;
+		state->hard_mirroring = PPU_MIRROR_VERT;
 	else if (unif_board->nt == NT_HORZ)
-		state->hard_mirroring = 0;
+		state->hard_mirroring = PPU_MIRROR_HORZ;
 
 	if (unif_board->chrram <= CHRRAM_8)
 		state->vram_chunks = 1;
