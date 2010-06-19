@@ -362,14 +362,11 @@ static int unif_initialize( running_machine *machine, int idx )
 		case DIS_74X161X138:	// mapper 38
 			prg32(machine, 0);
 			break;
-		case DIS_74X161X161X32:	// mapper 152
+		case DIS_74X161X161X32:	// mapper 152 & 70
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
-			chr8(machine, 0, CHRROM);
-			break;
-		case DIS_74X161X161X32_A:	// mapper 70
-			prg16_89ab(machine, state->prg_chunks - 2);
-			prg16_cdef(machine, state->prg_chunks - 1);
+			if (state->chr_chunks)
+				chr8(machine, 0, CHRROM);
 			break;
 		case BANDAI_LZ93:	// mapper 16, 157
 		case BANDAI_DATACH:
@@ -416,8 +413,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg16_89ab(machine, state->prg_chunks - 1);
 			prg16_cdef(machine, 0);
 			break;
-		case IREM_G101_A:	// mapper 32
-			set_nt_mirroring(machine, PPU_MIRROR_HIGH);  // needed by Major League
 		case IREM_G101:
 			state->mmc_latch1 = 0;
 			prg16_89ab(machine, 0);
@@ -467,14 +462,11 @@ static int unif_initialize( running_machine *machine, int idx )
 		case SUNSOFT_1:	// mapper 184
 			prg32(machine, 0);
 			break;
-		case SUNSOFT_2_A:	// mapper 93
+		case SUNSOFT_2:	// mapper 89 & 93
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-		case SUNSOFT_2_B:	// mapper 89
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			set_nt_mirroring(machine, PPU_MIRROR_LOW);
+			if (!state->hard_mirroring)
+				set_nt_mirroring(machine, PPU_MIRROR_LOW);
 			break;
 		case SUNSOFT_3:	// mapper 67
 			prg16_89ab(machine, 0);

@@ -5306,8 +5306,7 @@ static WRITE8_HANDLER( mapper92_w )
     Games: Shanghai, Fantasy Zone
 
     Very similar to mapper 89, but no NT mirroring for data&8
-    and only CHRRAM present
-
+ 
     In MESS: Supported.
 
 *************************************************************/

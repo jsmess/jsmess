@@ -300,8 +300,6 @@ static const nes_pcb pcb_list[] =
 	/* Discrete board IC_74x161x161x32 */
 	{ "BANDAI-74*161/161/32", DIS_74X161X161X32 },
 	{ "TAITO-74*161/161/32", DIS_74X161X161X32 },
-	/* FIXME: Made up boards the different mirroring handling */
-	{ "BANDAI-74*161/161/32-A", DIS_74X161X161X32_A },
 	/* Discrete board IC_74x161x138 */
 	{ "BIT-CORP-74*161/138", DIS_74X161X138 },
 //
@@ -366,11 +364,8 @@ static const nes_pcb pcb_list[] =
 	{ "NAMCOT-3453",      NAMCOT_3453 },
 //
 	{ "SUNSOFT-1",        SUNSOFT_1 },
-	{ "SUNSOFT-2",        SUNSOFT_2_B },
+	{ "SUNSOFT-2",        SUNSOFT_2 },
 	{ "SUNSOFT-3",        SUNSOFT_3 },
-	/* FIXME: Made up boards the different mirroring handling */
-	{ "SUNSOFT-2A",       SUNSOFT_2_A },
-	{ "SUNSOFT-2B",       SUNSOFT_2_B },
 	//
 	{ "TAITO-TC0190FMC",  TAITO_TC0190FMC },
 	{ "TAITO-TC0190FMC+PAL16R4", TAITO_TC0190FMCP },
@@ -2530,20 +2525,15 @@ static WRITE8_HANDLER( dis_74x161x138_m_w )
  
  *************************************************************/
 
-static WRITE8_HANDLER( dis_74x161x161x32a_w )
-{
-	LOG_MMC(("dis_74x161x161x32_w, offset: %04x, data: %02x\n", offset, data));
-	
-	chr8(space->machine, data, CHRROM);
-	prg16_89ab(space->machine, data >> 4);
-}
-
 static WRITE8_HANDLER( dis_74x161x161x32_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("dis_74x161x161x32_w, offset: %04x, data: %02x\n", offset, data));
 	
-	set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-	dis_74x161x161x32a_w(space, offset, data);
+	if (!state->hard_mirroring)	// there are two 'variants' depending on hardwired or mapper ctrl mirroring
+		set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
+	chr8(space->machine, data, CHRROM);
+	prg16_89ab(space->machine, data >> 4);
 }
 
 /*************************************************************
@@ -2764,14 +2754,13 @@ static WRITE8_HANDLER( tam_s1_w )
  
  Irem G-101 board emulation
  
- Major League uses hardwired mirroring, making necessary two 
- distinct pcb_id
+ Major League uses hardwired mirroring
 
  iNES: mapper 32
  
  *************************************************************/
 
-static WRITE8_HANDLER( g101a_w )
+static WRITE8_HANDLER( g101_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("g101_w, offset: %04x, data: %02x\n", offset, data));
@@ -2784,6 +2773,8 @@ static WRITE8_HANDLER( g101a_w )
 			break;
 		case 0x1000:
 			state->mmc_latch1 = BIT(data, 1);
+			if (!state->hard_mirroring)	// there are two 'variants' depending on hardwired or mapper ctrl mirroring
+				set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
 		case 0x2000:
 			prg8_ab(space->machine, data);
@@ -2793,17 +2784,6 @@ static WRITE8_HANDLER( g101a_w )
 			break;
 	}
 }
-
-static WRITE8_HANDLER( g101_w )
-{
-	LOG_MMC(("g101_w, offset: %04x, data: %02x\n", offset, data));
-
-	if ((offset & 0x7000) == 0x1000)
-		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-	g101a_w(space, offset, data);
-}
-
 
 /*************************************************************
  
@@ -3214,7 +3194,7 @@ static WRITE8_HANDLER( konami_vrc2_w )
 		shift = BIT(shifted_offs, 8) * 4;
 		bank = ((shifted_offs & 0x7000) - 0x3000) / 0x0800 + BIT(shifted_offs, 9);
 		state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & (0xf0 >> shift)) 
-		| ((data >> state->vrc_ls_chr) << shift);
+									| ((data >> state->vrc_ls_chr) << shift);
 		chr1_x(space->machine, bank, state->mmc_vrom_bank[bank], CHRROM);
 	}
 	else
@@ -3420,12 +3400,12 @@ static WRITE8_HANDLER( konami_vrc6_w )
 				break;
 			case 0x3300:
 				switch (data & 0x0c)
-			{
+				{
 				case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
 				case 0x04: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
 				case 0x08: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
 				case 0x0c: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
-			}
+				}
 				break;
 			case 0x5000:
 			case 0x5100:
@@ -3516,12 +3496,12 @@ static WRITE8_HANDLER( konami_vrc7_w )
 			
 		case 0x6000:
 			switch (data & 0x03)
-		{
+			{
 			case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
 			case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
 			case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
 			case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
-		}
+			}
 			break;
 		case 0x6008: case 0x6010: case 0x6018:
 			state->IRQ_count_latch = data;
@@ -3687,21 +3667,16 @@ static WRITE8_HANDLER( sunsoft1_m_w )
  
  *************************************************************/
 
-static WRITE8_HANDLER( sunsoft2a_w )
+static WRITE8_HANDLER( sunsoft2_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 sunsoft_helper = (data & 0x07) | ((data & 0x80) ? 0x08 : 0x00);
 	LOG_MMC(("mapper93_w, offset: %04x, data: %02x\n", offset, data));
-	
+
+	if (!state->hard_mirroring)	// there are two 'variants' depending on hardwired or mapper ctrl mirroring
+		set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	prg16_89ab(space->machine, data >> 4);
 	chr8(space->machine, sunsoft_helper, CHRROM);
-}
-
-static WRITE8_HANDLER( sunsoft2b_w )
-{
-	LOG_MMC(("mapper89_m_w, offset: %04x, data: %02x\n", offset, data));
-
-	set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
-	sunsoft2a_w(space, offset, data);
 }
 
 /*************************************************************
@@ -3982,11 +3957,8 @@ static WRITE8_HANDLER( x1005a_m_w )
 /*************************************************************
  
  Taito X1-017 board emulation
- 
- Actually, Fudou Myouou Den uses a variant of the board with
- CIRAM, making necessary two distinct mappers & pcb_id.
- 
- Also, we miss to emulate the security check at 0x6000-0x73ff
+  
+ We miss to emulate the security check at 0x6000-0x73ff
  and the ram!
  
  iNES: mapper 82
@@ -10371,7 +10343,6 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ DIS_74X139X74,        NES_NOACCESS, NES_WRITEONLY(dis_74x139x74_m_w), NES_NOACCESS,     NULL, NULL, NULL },
 	{ DIS_74X377,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(dis_74x377_w),          NULL, NULL, NULL },
 	{ DIS_74X161X161X32,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(dis_74x161x161x32_w),   NULL, NULL, NULL },
-	{ DIS_74X161X161X32_A,  NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(dis_74x161x161x32a_w),  NULL, NULL, NULL },
 	{ DIS_74X161X138,       NES_NOACCESS, NES_WRITEONLY(dis_74x161x138_m_w), NES_NOACCESS,    NULL, NULL, NULL },
 	{ BANDAI_LZ93,          NES_NOACCESS, NES_WRITEONLY(lz93d50_m_w), NES_WRITEONLY(lz93d50_w), NULL, NULL, bandai_lz_irq },
 	{ BANDAI_FCG,           NES_NOACCESS, NES_WRITEONLY(lz93d50_m_w), NES_WRITEONLY(lz93d50_w), NULL, NULL, bandai_lz_irq },
@@ -10380,7 +10351,6 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BANDAI_KARAOKE,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bandai_ks_w),           NULL, NULL, NULL },
 	{ BANDAI_OEKAKIDS,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bandai_ok_w),            NULL, NULL, NULL },
 	{ IREM_G101,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(g101_w),                NULL, NULL, NULL },
-	{ IREM_G101_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(g101a_w),               NULL, NULL, NULL },
 	{ IREM_LROG017,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(lrog017_w),             NULL, NULL, NULL },
 	{ IREM_H3001,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(h3001_w),               NULL, NULL, h3001_irq },
 	{ IREM_TAM_S1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tam_s1_w),              NULL, NULL, NULL },
@@ -10399,8 +10369,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ KONAMI_VRC7,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc7_w),         NULL, NULL, konami_irq },
 	{ NAMCOT_163,           {namcot163_l_w, namcot163_l_r}, NES_NOACCESS, NES_WRITEONLY(namcot163_w), NULL, NULL, namcot163_irq },
 	{ SUNSOFT_1,            NES_NOACCESS, NES_WRITEONLY(sunsoft1_m_w), NES_NOACCESS,          NULL, NULL, NULL },
-	{ SUNSOFT_2_A,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sunsoft2a_w),           NULL, NULL, NULL },
-	{ SUNSOFT_2_B,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sunsoft2b_w),           NULL, NULL, NULL },
+	{ SUNSOFT_2,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sunsoft2_w),            NULL, NULL, NULL },
 	{ SUNSOFT_3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sunsoft3_w),            NULL, NULL, sunsoft3_irq },
 	{ TAITO_TC0190FMC,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tc0190fmc_w),           NULL, NULL, NULL },
 	{ TAITO_TC0190FMCP,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tc0190fmc_p16_w),       NULL, NULL, mmc3_irq },

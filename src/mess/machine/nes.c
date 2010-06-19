@@ -1232,9 +1232,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if (state->pcb_id == STD_SXROM && !strcmp(image_get_feature(image, "mmc1_type"), "MMC1A"))
 			state->pcb_id = STD_SXROM_A;	// in MMC1-A PRG RAM is always enabled
 		
-		if (state->pcb_id == IREM_G101 && !strcmp(image_get_feature(image, "mirroring"), "high"))
-			state->pcb_id = IREM_G101_A;
-		
 		if (state->pcb_id == STD_NXROM || state->pcb_id == SUNSOFT_DCS)
 		{
 			if (image_get_software_region(image, "minicart") != NULL)	// check for dual minicart
