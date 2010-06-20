@@ -1450,8 +1450,13 @@ static void prepare_menus(HWND wnd)
 static void set_speed(int speed)
 {
 	if (speed != 0)
+	{
 		video_set_speed_factor(speed);
+		options_set_int(mame_options(), OPTION_SPEED, speed / 100, OPTION_PRIORITY_CMDLINE);
+	}
+
 	video_set_throttle(speed != 0);
+	options_set_bool(mame_options(), OPTION_THROTTLE, (speed != 0), OPTION_PRIORITY_CMDLINE);
 }
 
 
@@ -1819,6 +1824,7 @@ static int invoke_command(HWND wnd, UINT command)
 
 		case ID_FRAMESKIP_AUTO:
 			video_set_frameskip(-1);
+			options_set_bool(mame_options(), OPTION_AUTOFRAMESKIP, 1, OPTION_PRIORITY_CMDLINE);
 			break;
 
 		case ID_HELP_ABOUT_NEWUI:
@@ -1858,6 +1864,8 @@ static int invoke_command(HWND wnd, UINT command)
 			{
 				// change frameskip
 				video_set_frameskip(command - ID_FRAMESKIP_0);
+				options_set_bool(mame_options(), OPTION_AUTOFRAMESKIP, 0, OPTION_PRIORITY_CMDLINE);
+				options_set_int(mame_options(), OPTION_FRAMESKIP, command - ID_FRAMESKIP_0, OPTION_PRIORITY_CMDLINE);
 			}
 			else if ((command >= ID_DEVICE_0) && (command < ID_DEVICE_0 + (IO_COUNT*DEVOPTION_MAX)))
 			{
