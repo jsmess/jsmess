@@ -568,7 +568,7 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_8_60hz )
-	MDRV_MACHINE_RESET( ti99 )
+	MDRV_MACHINE_RESET( ti99_8 )
 
 	/* For HSGPL */
 	MDRV_NVRAM_HANDLER( ti99 )
@@ -624,7 +624,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_CPU_VBLANK_INT("screen", ti99_vblank_interrupt)
 
 	MDRV_MACHINE_START( ti99_8_50hz )
-	MDRV_MACHINE_RESET( ti99 )
+	MDRV_MACHINE_RESET( ti99_8 )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)

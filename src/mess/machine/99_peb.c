@@ -142,14 +142,11 @@ static ti99_4p_peb_card_handlers_t ti99_4p_expansion_ports[28];
 /* index of the currently active card (-1 if none) */
 static int active_card;
 
-/* when 1, enable a workaround required by snug sgcpu 99/4p, which mistakenly
-enables 2 cards simultaneously */
-#define ACTIVATE_BIT_EMULATE 1
+/* index of the currently active card, overridden by the mapper */
+static int active_card_tmp;
 
-#if ACTIVATE_BIT_EMULATE
-/* activate mask: 1 bit set for each card enable CRU bit set */
-static int active_card_mask;
-#endif
+/* Mapper override. */
+static int mapper_override;
 
 /* ila: inta status register (not actually used on ti-99/4(a), but nevertheless
 present) */
@@ -198,9 +195,10 @@ void ti99_peb_reset(int in_has_16bit_peb, void (*in_inta_callback)(running_machi
 	intb_callback = in_intb_callback;
 
 	active_card = -1;
-#if ACTIVATE_BIT_EMULATE
-	active_card_mask = 0;
-#endif
+	active_card_tmp = -1;
+
+	mapper_override = FALSE; // for ti99_4p
+
 	ila = 0;
 	ilb = 0;
 }
@@ -394,6 +392,7 @@ READ16_HANDLER ( ti99_4x_peb_r )
 			reply |= ((unsigned) (*handler)(space, offset << 1)) << 8;
 		}
 	}
+//  printf("[%04x:%04x] = %04x\n", (active_card<<8)+0x1000, (offset<<1)+0x4000, reply);
 
 	return tmp_buffer = reply;
 }
@@ -483,7 +482,7 @@ WRITE8_HANDLER ( geneve_peb_cru_w )
 
 	if (active_card != -1)
 	{
-            handler = expansion_ports[active_card].mem_read;
+		handler = expansion_ports[active_card].mem_read;
 		if (handler)
 			reply = (*handler)(space, offset);
 	}
@@ -597,7 +596,7 @@ WRITE8_HANDLER ( ti99_8_peb_w )
 /*
     Read CRU in range >0400->1ffe (>200->fff) (snug sgcpu 99/4p)
 */
- READ8_HANDLER ( ti99_4p_peb_cru_r )
+READ8_HANDLER( ti99_4p_peb_cru_r )
 {
 	int port;
 	cru_read_handler handler;
@@ -614,10 +613,12 @@ WRITE8_HANDLER ( ti99_8_peb_w )
 /*
     Write CRU in range >0400->1ffe (>200->fff) (snug sgcpu 99/4p)
 */
-WRITE8_HANDLER ( ti99_4p_peb_cru_w )
+WRITE8_HANDLER( ti99_4p_peb_cru_w )
 {
 	int port;
 	cru_write_handler handler;
+
+	int cru_address = (offset + 0x200)<<1;
 
 	port = offset >> 7;
 	handler = ti99_4p_expansion_ports[port].cru_write;
@@ -626,36 +627,33 @@ WRITE8_HANDLER ( ti99_4p_peb_cru_w )
 		(*handler)(space->machine, offset & 0x7f, data);
 
 	/* expansion card enable? */
-	if ((offset & 0x7f) == 0)
+	if ((cru_address & 0xfe) == 0)
 	{
 		if (data & 1)
 		{
 			/* enable */
+			if (cru_address == 0x1e00)
+			{
+				// The internal mapper has precedence over the external bus.
+				// It may be turned on although there is another device currently turned on
+				active_card_tmp = active_card;
+				mapper_override = TRUE;
+			}
 			active_card = port;
-#if ACTIVATE_BIT_EMULATE
-			active_card_mask |= (1 << port);
-#endif
 		}
 		else
 		{
-#if ACTIVATE_BIT_EMULATE
-			active_card_mask &= ~(1 << port);
-#endif
-			if (port == active_card)	/* geez... who cares? */
+			if ((cru_address == 0x1e00) && mapper_override)
 			{
-				active_card = -1;			/* no port selected */
-#if ACTIVATE_BIT_EMULATE
-				active_card_mask &= ~(1 << port);
-
-				if (active_card_mask)
+				active_card = active_card_tmp;
+				mapper_override = FALSE;
+			}
+			else
+			{
+				if (port == active_card)	/* geez... who cares? */
 				{
-					int i;
-					logerror("Extension card error, trying to recover\n");
-					for (i = 0; i<28; i++)
-						if (active_card_mask & (1 << i))
-							active_card = i;
+					active_card = -1;			/* no port selected */
 				}
-#endif
 			}
 		}
 	}
@@ -709,6 +707,7 @@ READ16_HANDLER ( ti99_4p_peb_r )
 			reply = (ilb & 0xff) | (ilb << 8);
 	}
 
+//  printf("[%04x:%04x] = %04x\n", (active_card<<8)+0x400, (offset<<1)+0x4000, reply);
 	return tmp_buffer = reply;
 }
 

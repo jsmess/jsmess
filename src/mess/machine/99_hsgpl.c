@@ -235,7 +235,7 @@ int ti99_hsgpl_save_flashroms(running_machine *machine, const char *name)
 
 	if (ti99_hsgpl_get_dirty_flag())
 	{
-		filerr = mame_fopen(SEARCHPATH_NVRAM, name, 
+		filerr = mame_fopen(SEARCHPATH_NVRAM, name,
 			OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
 
 		if (filerr != FILERR_NONE)
@@ -301,7 +301,7 @@ static void hsgpl_cru_w(running_machine *machine, int offset, int data)
 		hsgpl.cru_reg |= 1 << offset;
 	else
 		hsgpl.cru_reg &= ~ (1 << offset);
-	
+
 	if (offset == cr_crdena_bit)
 		ti99_set_hsgpl_crdena(data);
 }
@@ -342,6 +342,7 @@ READ16_HANDLER ( ti99_hsgpl_gpl_r )
 			reply = (hsgpl.addr + 1) & 0xff00;
 			hsgpl.raddr_LSB = TRUE;
 		}
+//      printf("hsgpl grmra: [%04x] = %02x\n", (offset<<1)+0x9800, reply>>8);
 	}
 	else
 	{	/* read GPL data */
@@ -417,14 +418,14 @@ READ16_HANDLER ( ti99_hsgpl_gpl_r )
 			break;
 		}
 
-		reply <<= 8;
+//      printf("hsgpl grmrd: [%04x:%04x] = %02x\n", (offset<<1)+0x9800, hsgpl.addr, reply);
 
+		reply <<= 8;
 
 		/* increment address */
 		hsgpl.addr++;
 		hsgpl.raddr_LSB = hsgpl.waddr_LSB = FALSE;
 	}
-
 	return reply;
 }
 
@@ -447,6 +448,7 @@ WRITE16_HANDLER ( ti99_hsgpl_gpl_w )
 		{
 			hsgpl.addr = (hsgpl.addr & 0xFF00) | ((data >> 8) & 0xFF);
 			hsgpl.waddr_LSB = FALSE;
+//          printf("hsgpl grmsa: [%04x:%04x]\n", (offset<<1)+0x9c00, hsgpl.addr);
 		}
 		else
 		{
@@ -583,7 +585,7 @@ READ16_HANDLER ( ti99_hsgpl_rom6_r )
 		reply = 0;
 		break;
 	}
-
+//  printf("[%02x:%04x] = %04x\n", hsgpl.cur_bank, 0x6000 + 2*offset, reply);
 	return reply;
 }
 
@@ -606,9 +608,9 @@ WRITE16_HANDLER ( ti99_hsgpl_rom6_w )
 		return;
 	}
 
-	/* MBX: RAM in 0x6c00-0x6ffd (it is unclear whether the MBX RAM area is
-    enabled/disabled by the wriena bit).  I guess RAM is unpaged, but it is
-    not implemented */
+	// MBX: RAM in 0x6c00-0x6ffd (it is unclear whether the MBX RAM area is
+	// enabled/disabled by the wriena bit).  I guess RAM is unpaged, but it is
+	// not implemented
 	if ((hsgpl.cru_reg & cr_wriena) || ((hsgpl.cru_reg & cr_mbxena) && (offset >= 0x0600) && (offset <= 0x07fe)))
 	{
 		switch (port)
@@ -637,8 +639,8 @@ WRITE16_HANDLER ( ti99_hsgpl_rom6_w )
 		case 13:
 		case 14:
 		case 15:
-			/* feeprom is normally written to using GPL ports, and I don't know
-            writing through >6000 page is enabled */
+			// feeprom is normally written to using GPL ports, and I don't know
+			// writing through >6000 page is enabled
 #if 0
 			at29c040a_w(feeprom_rom6, 1 + 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data);
 			at29c040a_w(feeprom_rom6, 2*offset + 0x2000*hsgpl.cur_bank + 0x8000*port, data >> 8);

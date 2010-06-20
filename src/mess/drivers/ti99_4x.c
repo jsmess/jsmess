@@ -300,6 +300,33 @@ static INPUT_PORTS_START(ti99_4a)
 
 INPUT_PORTS_END
 
+/*
+    Input ports for the TI-99/4A with EPVC
+    Same as above, but with some additional dip switches
+*/
+static INPUT_PORTS_START(ti99_4ev)
+	PORT_INCLUDE(ti99_4a)
+	PORT_START( "EVPC-SW1" )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC video mode" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 ) PORT_CHANGED( evpc_changed, (void *)0)
+		PORT_DIPSETTING(    0x00, "PAL" )
+		PORT_DIPSETTING(    0x01, "NTSC" )
+
+	PORT_START( "EVPC-SW3" )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC charset" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 ) PORT_CHANGED( evpc_changed, (void *)1)
+		PORT_DIPSETTING(    0x00, DEF_STR( International ))
+		PORT_DIPSETTING(    0x01, DEF_STR( German ))
+
+	PORT_START( "EVPC-SW4" )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC VDP RAM" ) PORT_CONDITION( "EVPC-SW8", 0x01, PORTCOND_EQUALS, 0x00 ) PORT_CHANGED( evpc_changed, (void *)2)
+		PORT_DIPSETTING(    0x00, "shifted" )
+		PORT_DIPSETTING(    0x01, "not shifted" )
+
+	PORT_START( "EVPC-SW8" )
+	PORT_DIPNAME( 0x01, 0x00, "EVPC Configuration" ) PORT_CHANGED( evpc_changed, (void *)3)
+		PORT_DIPSETTING(    0x00, "DIP" )
+		PORT_DIPSETTING(    0x01, "NOVRAM" )
+
+INPUT_PORTS_END
 
 #define JOYSTICK_DELTA			10
 #define JOYSTICK_SENSITIVITY	100
@@ -856,7 +883,7 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_MACHINE_START( ti99_4a_60hz )
 	MDRV_MACHINE_RESET( ti99 )
 
-	/* For HSGPL */
+	/* For HSGPL and EVPC */
 	MDRV_NVRAM_HANDLER( ti99 )
 
 	/* video hardware */
@@ -968,7 +995,7 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_CPU_ADD("maincpu", TMS9900, 3000000)
 	MDRV_CPU_PROGRAM_MAP(memmap_4ev)
 	MDRV_CPU_IO_MAP(cru_map)
-	MDRV_CPU_VBLANK_INT_HACK(ti99_4ev_hblank_interrupt, 263)	/* 262.5 in 60Hz, 312.5 in 50Hz */
+	MDRV_CPU_VBLANK_INT_HACK(ti99_4ev_hblank_interrupt, 262)	/* 262.5 in 60Hz, 312.5 in 50Hz */
 
 	MDRV_MACHINE_START( ti99_4ev_60hz )
 	MDRV_MACHINE_RESET( ti99 )
@@ -983,6 +1010,8 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512+32, (212+28)*2)
 	MDRV_SCREEN_VISIBLE_AREA(0, 512+32 - 1, 0, (212+28)*2 - 1)
+
+//  MDRV_TIMER_ADD_SCANLINE("v9938_scanline", ti99_4ev_scanline_interrupt , "screen", 1, 1)
 
 	MDRV_PALETTE_LENGTH(512)
 
@@ -1130,4 +1159,4 @@ COMP( 1979, ti99_4,   0,	   0,		ti99_4_60hz,  ti99_4,  ti99_4,	"Texas Instrument
 COMP( 1980, ti99_4e,  ti99_4,  0,		ti99_4_50hz,  ti99_4,  ti99_4,	"Texas Instruments", "TI99/4 Home Computer (Europe)" , 0)
 COMP( 1981, ti99_4a,  0,	   0,		ti99_4a_60hz, ti99_4a, ti99_4a,	"Texas Instruments", "TI99/4A Home Computer (US)" , 0)
 COMP( 1981, ti99_4ae, ti99_4a, 0,		ti99_4a_50hz, ti99_4a, ti99_4a,	"Texas Instruments", "TI99/4A Home Computer (Europe)" , 0)
-COMP( 1994, ti99_4ev, ti99_4a, 0,		ti99_4ev_60hz,ti99_4a, ti99_4ev,"Texas Instruments", "TI99/4A Home Computer with EVPC" , 0)
+COMP( 1994, ti99_4ev, ti99_4a, 0,		ti99_4ev_60hz,ti99_4ev, ti99_4ev,"Texas Instruments", "TI99/4A Home Computer with EVPC" , 0)

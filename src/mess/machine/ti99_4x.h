@@ -28,14 +28,14 @@ enum
 
 enum
 {
-	offset_rom0_4p = 0x4000,
-	offset_rom4_4p = 0xc000,
-	offset_rom6_4p = 0x6000,
-	offset_rom6b_4p= 0xe000,
-	offset_sram_4p = 0x10000,		/* scratch RAM (1kbyte) */
-	offset_dram_4p = 0x10400,		/* extra ram for debugger (768 bytes) */
-	offset_xram_4p = 0x10700,		/* extended RAM (1Mb with super AMS compatible mapper) */
-	region_cpu1_len_4p = 0x110700	/* total len */
+	offset_rom0_4p = 0x4000,        // ROM0: 4000-5fff
+	offset_rom4_4p = 0xc000,        // ROM4: c000-dfff
+	offset_rom6_4p = 0x6000,        // ROM6: 6000-7fff (first bank)
+	offset_rom6b_4p= 0xe000,        // ROM6: e000-ffff (second bank)
+	offset_sram_4p = 0x10000,       // scratch RAM (1 KiB)
+	offset_dram_4p = 0x10400,       // extra ram for debugger (768 bytes)
+	offset_xram_4p = 0x10700,       // extended RAM (1Mb with super AMS compatible mapper)
+	region_cpu1_len_4p = 0x110700   // total len
 };
 
 enum
@@ -80,16 +80,16 @@ enum
 /* GROM_port_t: descriptor for a port of 8 GROMs. Required by ti99_4x, ti99pcod */
 struct _GROM_port_t
 {
-        /* pointer to GROM data */
-        UINT8 *data_ptr;
-        /* current address pointer for the active GROM in port (16 bits) */
-        unsigned int addr;
-        /* GROM data buffer */
-        UINT8 buf;
-        /* internal flip-flops that are set after the first access to the GROM
-        address so that next access is mapped to the LSB, and cleared after each
-        data access */
-        char raddr_LSB, waddr_LSB;
+	// pointer to GROM data
+	UINT8 *data_ptr;
+	// current address pointer for the active GROM in port (16 bits)
+	unsigned int addr;
+	// GROM data buffer
+	UINT8 buf;
+	// internal flip-flops that are set after the first access to the GROM
+	// address so that next access is mapped to the LSB, and cleared after each
+	// data access
+	char raddr_LSB, waddr_LSB;
 };
 typedef struct _GROM_port_t GROM_port_t;
 
@@ -199,6 +199,8 @@ MACHINE_START( ti99_4ev_60hz );
 MACHINE_START( ti99_4p );
 
 MACHINE_RESET( ti99 );
+MACHINE_RESET( ti99_4p );
+MACHINE_RESET( ti99_8 );
 
 /* For HSGPL */
 NVRAM_HANDLER( ti99 );
@@ -207,9 +209,13 @@ INPUT_CHANGED( hsgpl_changed );
 /* For GRAM Kracker */
 INPUT_CHANGED( gk_changed );
 
+/* For EVPC */
+INPUT_CHANGED( evpc_changed );
+
 VIDEO_START( ti99_4ev );
 INTERRUPT_GEN( ti99_vblank_interrupt );
 INTERRUPT_GEN( ti99_4ev_hblank_interrupt );
+TIMER_DEVICE_CALLBACK( ti99_4ev_scanline_interrupt );
 
 void ti99_set_hsgpl_crdena(int data);
 void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm);

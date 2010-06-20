@@ -88,6 +88,8 @@ static void ti99_sAMSxram_init(running_machine *machine);
 static void ti99_4p_mapper_init(running_machine *machine);
 static void ti99_myarcxram_init(running_machine *machine);
 static void ti99_evpc_reset(running_machine *machine);
+static void ti99_evpc_load_novram(running_machine *machine, const char *filename);
+static void ti99_evpc_save_novram(running_machine *machine, const char *filename);
 
 /*
     pointer to extended RAM area
@@ -242,10 +244,8 @@ static char hsgpl_crdena;
 /* Used to cache the switch settings. */
 static UINT8 gk_switch[8];
 
-/* true if 99/4p rom6 is enabled */
-static int ti99_4p_internal_rom6_enable;
-/* pointer to the ROM6 data */
-static UINT16 *ti99_4p_internal_ROM6;
+/* DIP switches of EVPC */
+static UINT8 evpc_switch[4];
 
 /* Pointer to the cartridge system for the 99/8 */
 static running_device *multicart8;
@@ -333,43 +333,6 @@ DRIVER_INIT( ti99_4ev )
 	create_grom_high2k(0x0000, 0x5fff);
 }
 
-DRIVER_INIT( ti99_8 )
-{
-	UINT8 *mem = memory_region(machine, "maincpu");
-	ti99_model = model_99_8;
-	has_evpc = FALSE;
-
-	/* set up memory pointers */
-	xRAM_ptr_8 = mem + offset_xram_8;
-	ROM0_ptr_8 = mem + offset_rom0_8;
-	ROM1_ptr_8 = ROM0_ptr_8 + 0x2000;
-	ROM2_ptr_8 = ROM1_ptr_8 + 0x2000;
-	ROM3_ptr_8 = ROM2_ptr_8 + 0x2000;
-	sRAM_ptr_8 = mem + offset_sram_8;
-
-	/* Pull this one up here. */
-	ti99_8_enable_rom_and_ports = 1;
-
-	console_GROMs.data_ptr = memory_region(machine, region_grom);
-	create_grom_high2k(0x0000, 0x5fff);
-
-	multicart8 = devtag_get_device(machine, "ti99_multicart");
-	assert (multicart8 != NULL);
-}
-
-DRIVER_INIT( ti99_4p )
-{
-	ti99_model = model_99_4p;
-	has_evpc = TRUE;
-
-	/* set up memory pointers */
-	xRAM_ptr = (UINT16 *) (memory_region(machine, "maincpu") + offset_xram_4p);
-#if 0
-	console_GROMs.data_ptr = memory_region(machine, region_grom);
-	create_grom_high2k(0x0000, 0x5fff);
-#endif
-}
-
 static const TMS9928a_interface tms9918_interface =
 {
 	TMS99x8,
@@ -406,7 +369,7 @@ static const TMS9928a_interface tms9918a_interface =
 
 MACHINE_START( ti99_4a_60hz )
 {
-    ti99_common_init(machine, &tms9918a_interface);
+	ti99_common_init(machine, &tms9918a_interface);
 }
 
 static const TMS9928a_interface tms9929a_interface =
@@ -424,26 +387,8 @@ MACHINE_START( ti99_4a_50hz )
 
 MACHINE_START( ti99_4ev_60hz)
 {
-    /* has an own VDP, so skip initing the VDP */
-    ti99_common_init(machine, 0);
-}
-
-MACHINE_START( ti99_4p )
-{
-	UINT8* mem = memory_region(machine, "maincpu");
-
-	/* Set up system ROM and scratch pad pointers. Must be set up here */
-	/* so that the system can successfully reset (otherwise the reset  */
-	/* vector would be missing in 0x0000). */
-	memory_set_bankptr(machine, "bank1", mem + offset_rom0_4p);	/* system ROM */
-	memory_set_bankptr(machine, "bank2", mem + offset_sram_4p);	/* scratch pad */
-	memory_set_bankptr(machine, "bank11", mem + offset_dram_4p);	/* extra RAM for debugger */
-
-	ti99_peb_init();
-	ti99_floppy_controllers_init_all(machine);
-	ti99_ide_init(machine);
-	ti99_hsgpl_init(machine);
-	ti99_usbsm_init(machine);
+	/* has an own VDP, so skip initing the VDP */
+	ti99_common_init(machine, 0);
 }
 
 void ti99_common_init(running_machine *machine, const TMS9928a_interface *gfxparm)
@@ -478,26 +423,8 @@ MACHINE_RESET( ti99 )
 	console_GROMs.raddr_LSB = FALSE;
 	console_GROMs.waddr_LSB = FALSE;
 
-	if (ti99_model == model_99_8)
-	{
-		/* ... */
-		ti99_8_enable_rom_and_ports = 1;		/* ??? maybe there is a pull-up */
-		/* MZ: already setting this in driver init, otherwise machine locks up */
-	}
-	else if (ti99_model == model_99_4p)
-	{
-		UINT8* mem = memory_region(machine, "maincpu");
-
-		/* set up system ROM and scratch pad pointers */
-		memory_set_bankptr(machine, "bank1", mem + offset_rom0_4p);	/* system ROM */
-		memory_set_bankptr(machine, "bank2", mem + offset_sram_4p);	/* scratch pad */
-		memory_set_bankptr(machine, "bank11", mem + offset_dram_4p);	/* extra RAM for debugger */
-	}
-	else
-	{
-		/* set up scratch pad pointer */
-		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + offset_sram);
-	}
+	/* set up scratch pad pointer */
+	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + offset_sram);
 
 	if (!has_evpc) TMS9928A_reset();
 	else v9938_reset(0);
@@ -514,57 +441,31 @@ MACHINE_RESET( ti99 )
 	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 12, 0);
 
 	/* read config */
-	if (ti99_model == model_99_8)
-		xRAM_kind = RAM_99_8;
-	else if (ti99_model == model_99_4p)
-		xRAM_kind = RAM_99_4P;
-	else
-		xRAM_kind = input_port_read(machine, "RAM");
+	xRAM_kind = input_port_read(machine, "RAM");
 
-	if (ti99_model == model_99_8)
-		has_speech = TRUE;
-	else
-		has_speech = input_port_read(machine, "SPEECH");
-
+	has_speech = input_port_read(machine, "SPEECH");
 	has_ide = input_port_read(machine, "HDCTRL") & HD_IDE;
 	has_rs232 = input_port_read(machine, "SERIAL") & SERIAL_TI;
-
-	if (ti99_model == model_99_4)
-		has_handset = input_port_read(machine, "HCI") & HCI_IR;
-	else
-		has_handset = FALSE;
-
-	if (ti99_model == model_99_4p)
-		has_hsgpl = TRUE;
-	else
-		has_hsgpl = input_port_read(machine, "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH);
-
-	hsgpl_flash_mode = input_port_read(machine, "EXTCARD") & EXT_HSGPL_FLASH;
-
+	has_handset = (ti99_model == model_99_4)? (input_port_read(machine, "HCI") & HCI_IR) : FALSE;
+	has_mecmouse = input_port_read(machine, "HCI") & HCI_MECMOUSE;
+	has_hsgpl = input_port_read(machine, "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH);
 	has_usb_sm = input_port_read(machine, "HDCTRL") & HD_USB;
 	has_pcode = input_port_read(machine, "EXTCARD") & EXT_PCODE;
 
+	hsgpl_flash_mode = input_port_read(machine, "EXTCARD") & EXT_HSGPL_FLASH;
+
 	/* Get the GK settings once */
-	if (ti99_model != model_99_4p)
-	{
-		gk_switch[1] = input_port_read(machine, "GKSWITCH1");
-		gk_switch[2] = input_port_read(machine, "GKSWITCH2");
-		gk_switch[3] = input_port_read(machine, "GKSWITCH3");
-		gk_switch[4] = input_port_read(machine, "GKSWITCH4");
-		gk_switch[5] = input_port_read(machine, "GKSWITCH5");
-	}
+	gk_switch[1] = input_port_read(machine, "GKSWITCH1");
+	gk_switch[2] = input_port_read(machine, "GKSWITCH2");
+	gk_switch[3] = input_port_read(machine, "GKSWITCH3");
+	gk_switch[4] = input_port_read(machine, "GKSWITCH4");
+	gk_switch[5] = input_port_read(machine, "GKSWITCH5");
 
 	// Removes all card handlers
 	ti99_peb_init();
 
 	// set up optional expansion hardware
-	ti99_peb_reset(ti99_model == model_99_4p, tms9901_set_int1, NULL);
-
-	if (ti99_model == model_99_8)
-		ti99_8_internal_dsr_reset(machine);
-
-	if (ti99_model == model_99_4p)
-		ti99_4p_internal_dsr_reset(machine);
+	ti99_peb_reset(FALSE, tms9901_set_int1, NULL);
 
 	if (has_speech)
 	{
@@ -572,36 +473,22 @@ MACHINE_RESET( ti99 )
 
 		spchroms_config(machine, &speech_intf);
 
-		if (ti99_model != model_99_8)
-		{
-			memory_install_read16_handler(space, 0x9000, 0x93ff, 0, 0, ti99_rspeech_r);
-			memory_install_write16_handler(space, 0x9400, 0x97ff, 0, 0, ti99_wspeech_w);
-		}
+		memory_install_read16_handler(space, 0x9000, 0x93ff, 0, 0, ti99_rspeech_r);
+		memory_install_write16_handler(space, 0x9400, 0x97ff, 0, 0, ti99_wspeech_w);
 	}
 	else
 	{
-		/* which is never true for TI-99/8 */
 		memory_install_read16_handler(space, 0x9000, 0x93ff, 0, 0, ti99_nop_8_r);
 		memory_install_write16_handler(space, 0x9400, 0x97ff, 0, 0, ti99_nop_8_w);
 	}
 
 	switch (xRAM_kind)
 	{
-	case RAM_NONE:
-	default:
-		memory_install_read16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_nop_8_r);
-		memory_install_write16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_nop_8_w);
-		memory_install_read16_handler(space, 0xa000, 0xffff, 0, 0, ti99_nop_8_r);
-		memory_install_write16_handler(space, 0xa000, 0xffff, 0, 0, ti99_nop_8_w);
-		break;
 	case RAM_TI32:
 		ti99_TIxram_init(machine);
 		break;
 	case RAM_SUPERAMS1024:
 		ti99_sAMSxram_init(machine);
-		break;
-	case RAM_99_4P:
-		ti99_4p_mapper_init(machine);
 		break;
 	case RAM_FOUNDATION128:
 	case RAM_FOUNDATION512:
@@ -609,7 +496,12 @@ MACHINE_RESET( ti99 )
 	case RAM_MYARC512:
 		ti99_myarcxram_init(machine);
 		break;
-	case RAM_99_8:
+	case RAM_NONE:
+	default:
+		memory_install_read16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_nop_8_r);
+		memory_install_write16_handler(space, 0x2000, 0x3fff, 0, 0, ti99_nop_8_w);
+		memory_install_read16_handler(space, 0xa000, 0xffff, 0, 0, ti99_nop_8_r);
+		memory_install_write16_handler(space, 0xa000, 0xffff, 0, 0, ti99_nop_8_w);
 		break;
 	}
 
@@ -634,7 +526,7 @@ MACHINE_RESET( ti99 )
 	}
 
 	if (has_ide)
-		ti99_ide_reset(machine, ti99_model == model_99_8);
+		ti99_ide_reset(machine, FALSE);
 
 	if (has_hsgpl)
 		ti99_hsgpl_reset(machine);
@@ -642,10 +534,17 @@ MACHINE_RESET( ti99 )
 		hsgpl_crdena = 0;
 
 	if (has_usb_sm)
-		ti99_usbsm_reset(machine, ti99_model == model_99_8);
+		ti99_usbsm_reset(machine, FALSE);
 
 	if (has_evpc)
+	{
+		/* Get the EVPC settings once */
+		evpc_switch[0] = input_port_read(machine, "EVPC-SW1");
+		evpc_switch[1] = input_port_read(machine, "EVPC-SW3");
+		evpc_switch[2] = input_port_read(machine, "EVPC-SW4");
+		evpc_switch[3] = input_port_read(machine, "EVPC-SW8");
 		ti99_evpc_reset(machine);
+	}
 
 	if (has_pcode)
 		ti99_pcode_reset(machine);
@@ -672,14 +571,11 @@ void machine_stop_ti99(void)
 
 NVRAM_HANDLER( ti99 )
 {
-	const char *filename;
+	// called from generic.c
+	// (running_machine *machine, mame_file *file, int read_or_write)
 
-	/* We may have different HSGPL settings for 80 column and traditional */
-	/* 40 column display. For convenience, we use two different nvram files. */
-	if (has_evpc)
-		filename = "hsgpl80.nv";
-	else
-		filename = "hsgpl40.nv";
+	astring *hsname = astring_assemble_3(astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, "hsgpl.nv");
+	astring *evname = astring_assemble_3(astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, "evpc.nv");
 
 	// We always try to read the HSGPL, even when the config switch is
 	// set to off. Otherwise, when the system is started without HSGPL
@@ -688,12 +584,17 @@ NVRAM_HANDLER( ti99 )
 	// even when the card has been turned off during runtime.
 	if (read_or_write==0)
 	{
-		ti99_hsgpl_load_flashroms(machine, filename);
+		ti99_hsgpl_load_flashroms(machine, astring_c(hsname));
+		if (has_evpc) ti99_evpc_load_novram(machine, astring_c(evname));
 	}
 	else
 	{
-		ti99_hsgpl_save_flashroms(machine, filename);
+		ti99_hsgpl_save_flashroms(machine, astring_c(hsname));
+		if (has_evpc) ti99_evpc_save_novram(machine, astring_c(evname));
 	}
+
+	astring_free(hsname);
+	astring_free(evname);
 }
 
 INPUT_CHANGED( hsgpl_changed )
@@ -712,16 +613,6 @@ UINT8 get_gk_switch(int index)
 }
 
 /*
-    video initialization.
-*/
-VIDEO_START( ti99_4ev )
-{
-	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init(machine, 0, machine->primary_screen, machine->generic.tmpbitmap,
-		MODEL_V9938, 0x20000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
-}
-
-/*
     VBL interrupt  (mmm...  actually, it happens when the beam enters the lower
     border, so it is not a genuine VBI, but who cares ?)
 */
@@ -730,22 +621,8 @@ INTERRUPT_GEN( ti99_vblank_interrupt )
 	TMS9928A_interrupt(device->machine);
 	if (has_handset)
 		ti99_handset_task(device->machine);
-	has_mecmouse = input_port_read(device->machine, "HCI") & HCI_MECMOUSE;
 	if (has_mecmouse)
 		mecmouse_poll(device->machine);
-}
-
-INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
-{
-	static int line_count;
-	v9938_interrupt(device->machine, 0);
-	if (++line_count == 262)
-	{
-		line_count = 0;
-		has_mecmouse = input_port_read(device->machine, "HCI") & HCI_MECMOUSE;
-		if (has_mecmouse)
-			mecmouse_poll(device->machine);
-	}
 }
 
 /*
@@ -808,40 +685,10 @@ READ16_HANDLER ( ti99_cart_r )
 */
 WRITE16_HANDLER ( ti99_cart_w )
 {
-	ti99_multicart_w(cartslots, offset, data, mem_mask);
-	if (hsgpl_crdena && !hsgpl_flash_mode)
-		/* hsgpl is enabled */
-		ti99_hsgpl_rom6_w(space, offset, data, mem_mask);
-}
-
-/*
-    99/4p cartridge space: mapped either to internal ROM6 or to HSGPL.
-*/
-READ16_HANDLER ( ti99_4p_cart_r )
-{
-	if (ti99_4p_internal_rom6_enable)
-		return ti99_4p_internal_ROM6[offset];
-
-	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
-//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
-	if (hsgpl_crdena && !hsgpl_flash_mode)
-		/* hsgpl is enabled */
-		return ti99_hsgpl_rom6_r(space, offset, mem_mask);
-
-	return 0;
-}
-
-WRITE16_HANDLER ( ti99_4p_cart_w )
-{
-	if (ti99_4p_internal_rom6_enable)
-	{
-		ti99_4p_internal_ROM6 = (UINT16 *) (memory_region(space->machine, "maincpu") + (FPTR)((offset & 1) ? offset_rom6b_4p : offset_rom6_4p));
-		return;
-	}
-
-	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
-//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+	// Writing always means that we access the cartridges (and possibly the HGSPL)
+	// Except when we use the SGCPU.
+	if (ti99_model != model_99_4p)
+		ti99_multicart_w(cartslots, offset, data, mem_mask);
 
 	if (hsgpl_crdena && !hsgpl_flash_mode)
 		/* hsgpl is enabled */
@@ -922,53 +769,6 @@ WRITE16_HANDLER ( ti99_wvdp_w )
 	else
 	{	/* write VDP data */
 		TMS9928A_vram_w(space, 0, (data >> 8) & 0xff);
-	}
-}
-
-/*
-    V38 VDP read
-*/
-READ16_HANDLER ( ti99_rv38_r )
-{
-	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
-//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
-	if (offset & 1)
-	{	/* read VDP status */
-		return ((int) v9938_0_status_r(space, 0)) << 8;
-	}
-	else
-	{	/* read VDP RAM */
-		return ((int) v9938_0_vram_r(space, 0)) << 8;
-	}
-}
-
-/*
-    V38 vdp write
-*/
-WRITE16_HANDLER ( ti99_wv38_w )
-{
-	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
-//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
-	switch (offset & 3)
-	{
-	case 0:
-		/* write VDP data */
-		v9938_0_vram_w(space, 0, (data >> 8) & 0xff);
-		break;
-	case 1:
-		/* write VDP address */
-		v9938_0_command_w(space, 0, (data >> 8) & 0xff);
-		break;
-	case 2:
-		/* write VDP palette */
-		v9938_0_palette_w(space, 0, (data >> 8) & 0xff);
-		break;
-	case 3:
-		/* write VDP register */
-		v9938_0_register_w(space, 0, (data >> 8) & 0xff);
-		break;
 	}
 }
 
@@ -1151,9 +951,6 @@ READ16_HANDLER ( ti99_grom_r )
 			console_GROMs.raddr_LSB = TRUE;
 		}
 		/* GROM address values must be globally unique. */
-		// FIXME: HSGPL asserts here when switched on during runtime
-		//     You should not do that, but again the emulation should
-		//     not assert either
 		assert (replycart == reply);
 	}
 	else
@@ -1233,420 +1030,6 @@ WRITE16_HANDLER ( ti99_grom_w )
 	}
 }
 
-/*
-    GROM read for TI-99/8
-    For comments, see the handler for TI-99/4A
-*/
-static READ8_HANDLER ( ti99_grom_r8 )
-{
-	UINT8 reply, replycart;
-
-	cpu_adjust_icount(space->machine->firstcpu,-4);
-
-	if (offset & 2)
-	{
-		replycart = ti99_cartridge_grom_r(cartslots, offset);
-		console_GROMs.waddr_LSB = FALSE;
-
-		if (console_GROMs.raddr_LSB)
-		{
-			reply = console_GROMs.addr & 0x00ff;
-			console_GROMs.raddr_LSB = FALSE;
-		}
-		else
-		{
-			reply = (console_GROMs.addr>>8) & 0x00ff;
-			console_GROMs.raddr_LSB = TRUE;
-		}
-		/* GROM address values must be globally unique. */
-		assert (replycart == reply);
-	}
-	else
-	{
-		reply = GROM_dataread(space->machine, offset);
-	}
-	return reply;
-}
-
-/*
-    GROM write for TI-99/8
-    For comments, see the handler for TI-99/4A
-*/
-static WRITE8_HANDLER ( ti99_grom_w8 )
-{
-	cpu_adjust_icount(space->machine->firstcpu,-4/*20+3*/);		/* from 4 to 23? */
-
-	if (offset & 2)
-	{
-		ti99_cartridge_grom_w(cartslots, offset, data);
-		console_GROMs.raddr_LSB = FALSE;
-		if (console_GROMs.waddr_LSB)
-		{
-			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | (data & 0xFF);
-
-			GROM_dataread(space->machine, offset&0xfffc);
-			console_GROMs.waddr_LSB = FALSE;
-		}
-		else
-		{
-			console_GROMs.addr = ((data<<8) & 0xFF00) | (console_GROMs.addr & 0xFF);
-			console_GROMs.waddr_LSB = TRUE;
-		}
-
-	}
-	else
-	{
-		GRAM_datawrite(offset, (data>>8)&0xff);
-		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
-	}
-}
-
-
-/*
-    GROM read for TI-99/4p
-*/
-READ16_HANDLER ( ti99_4p_grom_r )
-{
-	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
-	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
-	return hsgpl_crdena? ti99_hsgpl_gpl_r(space, offset, mem_mask) : 0;
-}
-
-/*
-    GROM write
-*/
-WRITE16_HANDLER ( ti99_4p_grom_w )
-{
-	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);		/* HSGPL is located on 8-bit bus? */
-	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
-
-	if (hsgpl_crdena)
-		ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
-}
-
-
-#if 0
-#pragma mark -
-#pragma mark 99/8 MEMORY HANDLERS
-#endif
-
-READ8_HANDLER( ti99_8_r )
-{
-	/* Set the page. Page size is 4 KiB; page number are the high 4 bits. */
-	int page = offset >> 12;
-	UINT32 mapper_reg;
-	UINT8 reply = 0;
-
-	if (ti99_8_enable_rom_and_ports)
-	{
-		/* This is only important for address access 0000-1fff and
-        8000-9fff. Outside, the mapper mode is used. */
-		if ((offset >= 0x0000) && (offset < 0x2000))
-		{
-			/* ROM */
-			reply = ROM0_ptr_8[offset & 0x1fff];
-			return reply;
-		}
-		else if ((offset >= 0x8000) && (offset < 0xa000))
-		{
-			/* ti99 scratch pad and memory-mapped registers */
-			/* 0x8000-0x9fff */
-			switch ((offset - 0x8000) >> 10)
-			{
-			case 0:
-				/* RAM: >8000 - >83ff */
-				reply = sRAM_ptr_8[offset & 0x1fff];
-				break;
-
-			case 1:
-				/* >8400 - >840f: sound (cannot read)
-                >8410 - >87ff: SRAM */
-				if (offset >= 0x8410)
-					reply = sRAM_ptr_8[offset & 0x1fff];
-				break;
-
-			case 2:
-				/* VDP read + mapper status */
-				if (offset < 0x8810)
-				{
-					if (! (offset & 1))
-					{
-						if (offset & 2)
-							/* read VDP status >8802 */
-						reply = TMS9928A_register_r(space, 0);
-						else
-							/* read VDP RAM >8800 */
-						reply = TMS9928A_vram_r(space, 0);
-					}
-				}
-				else
-				{
-					/* Read mapper >8810 */
-					reply = ti99_8_mapper_status;
-					ti99_8_mapper_status = 0;
-				}
-				break;
-
-			case 4:
-				/* speech read: >9000 */
-				if (! (offset & 1))
-				{
-					cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-16*4);		/* this is just a minimum, it can be more */
-					reply = tms5220_status_r(devtag_get_device(space->machine, "tms5220"), 0);
-				}
-				break;
-
-			case 6:
-				/* GROM read: >9800 */
-				if (! (offset & 1))
-					reply = ti99_grom_r8(space, offset);
-				break;
-
-			default:
-				logerror("unmapped read offs=%d\n", (int) offset);
-				break;
-			}
-			return reply;
-		}
-	}
-
-	mapper_reg = ti99_8_mapper_regs[page];
-	offset = (mapper_reg + (offset & 0x0fff)) & 0x00ffffff;
-
-	#if 0
-	/* test read protect */
-	if (mapper_reg & 0x20000000)
-		;
-
-	/* test execute protect */
-	if (mapper_reg & 0x40000000)
-		;
-	#endif
-
-	if (offset < 0x010000)
-	/* Read RAM */
-	reply = xRAM_ptr_8[offset];
-
-	if (offset >= 0xff0000)
-	{
-		switch ((offset >> 13) & 7)
-		{
-		default:
-			/* should never happen */
-		case 0:
-			/* ff0000 - ff1fff: unassigned? */
-		case 1:
-			/* ff2000 - ff3fff: ? */
-		case 4:
-			/* ff8000 - ff9fff: internal DSR ROM? (normally enabled with a write to CRU >2700) */
-		case 7:
-			/* ffe000 - ffffff: ? */
-			logerror("unmapped read page=%d offs=%d\n", (int) page, (int) offset);
-			break;
-
-		case 2:
-			/* ff4000 - ff5fff: DSR space */
-			reply = ti99_8_peb_r(space, offset & 0x1fff);
-			break;
-
-		case 3:
-			/* ff6000 - ff7fff: cartridge ROM space */
-			offset &= 0x1fff;
-
-			/* We do not support hsgpl here because it is a 16 bit
-            system. Just check the cartridges.  */
-			reply = ti99_multicart8_r(multicart8, offset);
-			break;
-
-		case 5:
-			/* ffa000 - ffbfff: >2000 ROM (ROM1) */
-			reply = ROM1_ptr_8[offset & 0x1fff];
-			break;
-
-		case 6:
-			/* ffc000 - ffdfff: >6000 ROM */
-			reply = ROM3_ptr_8[offset & 0x1fff];
-			break;
-		}
-	}
-
-	return reply;
-}
-
-WRITE8_HANDLER ( ti99_8_w )
-{
-	int page = offset >> 12;
-	UINT32 mapper_reg;
-
-	if (ti99_8_enable_rom_and_ports)
-	{
-		/* memory mapped ports enabled */
-		if ((offset >= 0x0000) && (offset < 0x2000))
-		{
-			/* ROM? */
-			return;
-		}
-		else if ((offset >= 0x8000) && (offset < 0xa000))
-		{
-			/* ti99 scratch pad and memory-mapped registers */
-			/* 0x8000-0x9fff */
-			switch ((offset - 0x8000) >> 10)
-			{
-			case 0:
-				/* RAM */
-				sRAM_ptr_8[offset & 0x1fff] = data;
-				break;
-
-			case 1:
-				/* sound write + RAM */
-				if (offset < 0x8410)
-					sn76496_w(devtag_get_device(space->machine, "sn76496"), offset, data);
-				else
-					sRAM_ptr_8[offset & 0x1fff] = data;
-				break;
-
-			case 2:
-				/* VDP read + mapper control */
-				if (offset >= 0x8810)
-				{
-					int file = (data >> 1) & 3;
-					int i;
-
-					if (data & 1)
-					{	/* load */
-						for (i=0; i<16; i++)
-						{
-							ti99_8_mapper_regs[i] = (sRAM_ptr_8[(file << 6) + (i << 2)] << 24)
-													| (sRAM_ptr_8[(file << 6) + (i << 2) + 1] << 16)
-													| (sRAM_ptr_8[(file << 6) + (i << 2) + 2] << 8)
-													| sRAM_ptr_8[(file << 6) + (i << 2) + 3];
-						}
-					}
-					else
-					{	/* save */
-						for (i=0; i<16; i++)
-						{
-							sRAM_ptr_8[(file << 6) + (i << 2)] = ti99_8_mapper_regs[i] >> 24;
-							sRAM_ptr_8[(file << 6) + (i << 2) + 1] = ti99_8_mapper_regs[i] >> 16;
-							sRAM_ptr_8[(file << 6) + (i << 2) + 2] = ti99_8_mapper_regs[i] >> 8;
-							sRAM_ptr_8[(file << 6) + (i << 2) + 3] = ti99_8_mapper_regs[i];
-						}
-					}
-				}
-				break;
-
-			case 3:
-				/* VDP write */
-				if (! (offset & 1))
-				{
-					if (offset & 2)
-						/* read VDP status */
-						TMS9928A_register_w(space, 0, data);
-					else
-						/* read VDP RAM */
-						TMS9928A_vram_w(space, 0, data);
-				}
-				break;
-
-			case 5:
-				/* speech write */
-				if (! (offset & 1))
-				{
-					cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-48*4);		/* this is just an approx. minimum, it can be much more */
-
-					/* the stupid design of the tms5220 core means that ready is cleared when
-                    there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
-                    case, we would need to store the value on the bus, which would be more
-                    complex. */
-					if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
-					{
-						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
-						double d = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
-						int cycles_to_ready = ((int) (d + 3)) & ~3;
-
-						logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready)
-							, (int) cycles_to_ready);
-
-						cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-cycles_to_ready);
-						timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
-					}
-
-					tms5220_data_w(devtag_get_device(space->machine, "tms5220"), offset, data);
-				}
-				break;
-
-			case 7:
-				/* GPL write */
-				if (! (offset & 1))
-					ti99_grom_w8(space, offset, data);
-				break;
-
-			default:
-				logerror("unmapped write offs=%d data=%d\n", (int) offset, (int) data);
-				break;
-			}
-			return;
-		}
-	}
-
-	mapper_reg = ti99_8_mapper_regs[page];
-
-	/* 4 KiB page size */
-	offset = (mapper_reg + (offset & 0x0fff)) & 0x00ffffff;
-
-#if 0
-	/* test write protect */
-	if (mapper_reg & 0x80000000)
-		;
-#endif
-
-	if (offset < 0x010000)
-	{	/* Write RAM */
-		xRAM_ptr_8[offset] = data;
-	}
-	else if (offset >= 0xff0000)
-	{
-		switch ((offset >> 13) & 7)
-		{
-		default:
-			/* should never happen */
-		case 0:
-			/* unassigned??? */
-		case 1:
-			/* ??? */
-		case 4:
-			/* internal DSR ROM??? (normally enabled with a write to CRU >2700) */
-		case 7:
-			/* ??? */
-			break;
-
-		case 2:
-			/* DSR space */
-			ti99_8_peb_w(space, offset & 0x1fff, data);
-			break;
-
-		case 3:
-			/* cartridge space */
-			/* We do not support HSGPL for the 99/8 at this time. */
-			ti99_multicart8_w(multicart8, offset & 0x1fff, data);
-			break;
-
-		case 5:
-			/* >2000 ROM (ROM1) */
-			break;
-
-		case 6:
-			/* >6000 ROM */
-			break;
-		}
-	}
-	else
-	{
-		logerror("unmapped write page=%d offs=%d\n", (int) page, (int) offset);
-	}
-}
-
 /*===========================================================================*/
 #if 0
 #pragma mark -
@@ -1698,11 +1081,11 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 
 	if (handset_buflen == 1)
 	{
-		/* Unless I am missing something, the third and last nybble of the
-        message is not acknowledged by the DSR in any way, and the first nybble
-        of next message is not requested for either, so we need to decide on
-        our own when we can post a new event.  Currently, we wait for 1000us
-        after the DSR acknowledges the second nybble. */
+		// Unless I am missing something, the third and last nybble of the
+		// message is not acknowledged by the DSR in any way, and the first nybble
+		// of next message is not requested for either, so we need to decide on
+		// our own when we can post a new event.  Currently, we wait for 1000us
+		// after the DSR acknowledges the second nybble.
 		timer_set(machine, ATTOTIME_IN_USEC(1000), NULL, 0, ti99_handset_ack_callback);
 	}
 
@@ -1713,7 +1096,6 @@ static TIMER_CALLBACK(ti99_handset_ack_callback)
 
 /*
     ti99_handset_set_ack()
-
     Handler for tms9901 P0 pin (handset data acknowledge)
 */
 static WRITE8_DEVICE_HANDLER( ti99_handset_set_ack )
@@ -1747,11 +1129,8 @@ static void ti99_handset_post_message(running_machine *machine, int message)
 
 /*
     ti99_handset_poll_keyboard()
-
     Poll the current state of one given handset keypad.
-
     num: number of the keypad to poll (0-3)
-
     Returns TRUE if the handset state has changed and a message was posted.
 */
 static int ti99_handset_poll_keyboard(running_machine *machine, int num)
@@ -1766,8 +1145,8 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 	/* read current key state */
 	key_buf = ( input_port_read(machine, keynames[num]) | (input_port_read(machine, keynames[num + 1]) << 16) ) >> (4*num);
 
-	/* If a key was previously pressed, this key was not shift, and this key is
-    still down, then don't change the current key press. */
+	// If a key was previously pressed, this key was not shift, and this key is
+	// still down, then don't change the current key press.
 	if (previous_key[num] && (previous_key[num] != 0x24)
 		&& (key_buf & (1 << (previous_key[num] & 0x1f))))
 	{
@@ -1777,8 +1156,8 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 		return FALSE;
 		else
 		{
-			/* the shift modifier state has changed: we need to update the
-            keyboard state */
+			// The shift modifier state has changed: we need to update the
+			// keyboard state
 			if (key_buf & 0x0008)
 			{	/* shift has been pressed down */
 				previous_key[num] = current_key = previous_key[num] | 0x20;
@@ -1805,9 +1184,9 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
 				current_key |= 0x20;	/* set shift flag */
 
 			if (current_key != 0x24)
-				/* If this is the shift key, any other key we may find will
-                have higher priority; otherwise, we may exit the loop and keep
-                the key we have just found. */
+				// If this is the shift key, any other key we may find will
+				// have higher priority; otherwise, we may exit the loop and keep
+				// the key we have just found.
 				break;
 		}
 	}
@@ -1829,9 +1208,7 @@ static int ti99_handset_poll_keyboard(running_machine *machine, int num)
     ti99_handset_poll_joystick()
 
     Poll the current state of one given handset joystick.
-
     num: number of the joystick to poll (0-3)
-
     Returns TRUE if the handset state has changed and a message was posted.
 */
 static int ti99_handset_poll_joystick(running_machine *machine, int num)
@@ -1863,8 +1240,8 @@ static int ti99_handset_poll_joystick(running_machine *machine, int num)
 		message = 0;
 
 		/* set sign */
-		/* note that we set the sign if the joystick position is 0 to work
-        around a bug in the ti99/4 ROMs */
+		// note that we set the sign if the joystick position is 0 to work
+		// around a bug in the ti99/4 ROMs
 		if (current_joy_x <= 0)
 		{
 			message |= 0x040;
@@ -1904,7 +1281,6 @@ static int ti99_handset_poll_joystick(running_machine *machine, int num)
 
 /*
     ti99_handset_task()
-
     Manage handsets, posting an event if the state of any handset has changed.
 */
 static void ti99_handset_task(running_machine *machine)
@@ -2143,8 +1519,8 @@ static TMS9901_INT_CALLBACK( tms9901_interrupt_callback )
 {
 	if (intreq)
 	{
-		/* On TI99, TMS9900 IC0-3 lines are not connected to TMS9901,
-        * but hard-wired to force level 1 interrupts */
+		// On TI99, TMS9900 IC0-3 lines are not connected to TMS9901,
+		// but hard-wired to force level 1 interrupts
 		cputag_set_input_line_and_vector(device->machine, "maincpu", 0, ASSERT_LINE, 1);	/* interrupt it, baby */
 	}
 	else
@@ -2276,9 +1652,8 @@ static WRITE8_DEVICE_HANDLER( ti99_KeyC )
 	else
 		KeyCol &= ~ (1 << (offset-2));
 
-        if (has_mecmouse)
-                mecmouse_select(KeyCol, (ti99_model == model_99_4) ? 5 : 6,
-					(ti99_model == model_99_4) ? 6 : 7);
+	if (has_mecmouse)
+		mecmouse_select(KeyCol, (ti99_model == model_99_4) ? 5 : 6, (ti99_model == model_99_4) ? 6 : 7);
 }
 
 /*
@@ -2288,42 +1663,6 @@ static WRITE8_DEVICE_HANDLER( ti99_AlphaW )
 {
 	if ((ti99_model == model_99_4a) || (ti99_model == model_99_4p))
 		AlphaLockLine = data;
-}
-
-/*
-    Read pins INT3*-INT7* of TI99's 9901.
-
-    signification:
-     (bit 1: INT1 status)
-     (bit 2: INT2 status)
-     bits 3-4: unused?
-     bit 5: ???
-     bit 6-7: keyboard status bits 0 through 1
-*/
-static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
-{
-	int answer;
-	static const char *const keynames[] = {
-		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
-		"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
-	};
-
-	if (has_mecmouse && (KeyCol == 15))
-	{
-		int buttons = input_port_read(device->machine, "MOUSE0") & 3;
-
-		answer = ((mecmouse_read_y ? mecmouse_y_buf : mecmouse_x_buf) << 7) & 0x80;
-
-		if (! (buttons & 1))
-			/* action button */
-			answer |= 0x40;
-	}
-	else
-	{
-		answer = (input_port_read(device->machine, keynames[KeyCol]) << 6) & 0xC0;
-	}
-
-	return answer;
 }
 
 /*
@@ -2365,30 +1704,6 @@ static READ8_DEVICE_HANDLER( ti99_8_R9901_1 )
 #endif
 
 	return answer;
-}
-
-/*
-    WRITE key column select (P0-P3)
-*/
-static WRITE8_DEVICE_HANDLER( ti99_8_KeyC )
-{
-	if (data)
-		KeyCol |= 1 << offset;
-	else
-		KeyCol &= ~ (1 << offset);
-
-	if (has_mecmouse)
-		mecmouse_select(KeyCol, 14, 15);
-}
-
-static WRITE8_DEVICE_HANDLER( ti99_8_WCRUS )
-{
-	ti99_8_enable_rom_and_ports = data;
-}
-
-static WRITE8_DEVICE_HANDLER( ti99_8_PTGEN )
-{
-	/* ... */
 }
 
 /*
@@ -2439,149 +1754,44 @@ static WRITE8_DEVICE_HANDLER( ti99_CS_output )
 	}
 }
 
-
-
-/*===========================================================================*/
-#if 0
-#pragma mark -
-#pragma mark 99/8 INTERNAL DSR
-#endif
-/*
-    TI 99/8 internal DSR support.
-
-    Includes a few specific signals, and an extra ROM.
-*/
-
-/* prototypes */
-static void ti99_8_internal_dsr_cru_w(running_machine *machine, int offset, int data);
-static  READ8_HANDLER(ti99_8_internal_dsr_r);
-
-
-static const ti99_peb_card_handlers_t ti99_8_internal_dsr_handlers =
+/* tms9901 setup */
+const tms9901_interface tms9901reset_param_ti99_4x =
 {
-	NULL,
-	ti99_8_internal_dsr_cru_w,
-	ti99_8_internal_dsr_r,
-	NULL
+	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
+
+	{	/* read handlers */
+		ti99_R9901_0,
+		ti99_R9901_1,
+		ti99_R9901_2,
+		ti99_R9901_3
+	},
+
+	{	/* write handlers */
+		ti99_handset_set_ack,
+		NULL,
+		ti99_KeyC,
+		ti99_KeyC,
+		ti99_KeyC,
+		ti99_AlphaW,
+		ti99_CS_motor,
+		ti99_CS_motor,
+		ti99_audio_gate,
+		ti99_CS_output,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL,
+		NULL
+	},
+
+	/* interrupt handler */
+	tms9901_interrupt_callback,
+
+	/* clock rate = 3MHz */
+	3000000.
 };
 
-/* pointer to the internal DSR ROM data */
-static UINT8 *ti99_8_internal_DSR;
-
-
-/* set up handlers, and set initial state */
-static void ti99_8_internal_dsr_reset(running_machine *machine)
-{
-	ti99_8_internal_DSR = memory_region(machine, "maincpu") + offset_rom0_8 + 0x4000;
-
-	ti99_peb_set_card_handlers(0x2700, & ti99_8_internal_dsr_handlers);
-}
-
-/* write CRU bit:
-    bit0: enable/disable internal DSR ROM,
-    bit1: hard reset */
-static void ti99_8_internal_dsr_cru_w(running_machine *machine, int offset, int data)
-{
-	switch (offset)
-	{
-	case 1:
-		/* hard reset -- not emulated */
-		break;
-	}
-}
-
-/* read internal DSR ROM */
-static  READ8_HANDLER(ti99_8_internal_dsr_r)
-{
-	return ti99_8_internal_DSR[offset];
-}
-
-
-
-/*===========================================================================*/
-#if 0
-#pragma mark -
-#pragma mark SGCPU INTERNAL DSR
-#endif
-/*
-    SNUG SGCPU (a.k.a. 99/4p) internal DSR support.
-
-    Includes a few specific signals, and an extra ROM.
-*/
-
-/* prototypes */
-static void ti99_4p_internal_dsr_cru_w(running_machine *machine, int offset, int data);
-static READ16_HANDLER(ti99_4p_internal_dsr_r);
-
-
-static const ti99_peb_16bit_card_handlers_t ti99_4p_internal_dsr_handlers =
-{
-	NULL,
-	ti99_4p_internal_dsr_cru_w,
-	ti99_4p_internal_dsr_r,
-	NULL
-};
-
-/* pointer to the internal DSR ROM data */
-static UINT16 *ti99_4p_internal_DSR;
-
-
-/* set up handlers, and set initial state */
-static void ti99_4p_internal_dsr_reset(running_machine *machine)
-{
-	UINT8* mem = memory_region(machine, "maincpu");
-
-	ti99_4p_internal_DSR = (UINT16 *) (mem + offset_rom4_4p);
-	ti99_4p_internal_ROM6 = (UINT16 *) (mem + offset_rom6_4p);
-
-	ti99_peb_set_16bit_card_handlers(0x0f00, & ti99_4p_internal_dsr_handlers);
-
-	ti99_4p_internal_rom6_enable = 0;
-	ti99_4p_peb_set_senila(0);
-	ti99_4p_peb_set_senilb(0);
-}
-
-/* write CRU bit:
-    bit0: enable/disable internal DSR ROM,
-    bit1: enable/disable internal cartridge ROM
-    bit2: set/clear senila
-    bit3: set/clear senilb*/
-static void ti99_4p_internal_dsr_cru_w(running_machine *machine, int offset, int data)
-{
-	switch (offset)
-	{
-	case 1:
-		ti99_4p_internal_rom6_enable = data;
-		break;
-	case 2:
-		ti99_4p_peb_set_senila(data);
-		break;
-	case 3:
-		ti99_4p_peb_set_senilb(data);
-		break;
-	case 4:
-		/* 0: 16-bit (fast) memory timings */
-		/* 1: 8-bit memory timings */
-		break;
-	case 5:
-		/* if 0: "KBENA" mode (enable keyboard?) */
-		/* if 1: "KBINH" mode (inhibit keyboard?) */
-		break;
-	}
-}
-
-/* read internal DSR ROM */
-static READ16_HANDLER(ti99_4p_internal_dsr_r)
-{
-	return ti99_4p_internal_DSR[offset];
-}
-
-
-
-#if 0
-#pragma mark -
-#pragma mark MEMORY EXPANSION CARDS
-#endif
 /*===========================================================================*/
 /*
     TI memory extension support.
@@ -2668,7 +1878,6 @@ static const ti99_peb_card_handlers_t sAMS_expansion_handlers =
 
 static int sAMS_mapper_on;
 static int sAMSlookup[16];
-
 
 /* set up super AMS handlers, and set initial state */
 static void ti99_sAMSxram_init(running_machine *machine)
@@ -2757,168 +1966,6 @@ static WRITE16_HANDLER ( ti99_sAMSxramhigh_w )
 		COMBINE_DATA(xRAM_ptr + offset+0x5000);
 }
 
-
-/*===========================================================================*/
-/*
-    SNUG SGCPU (a.k.a. 99/4p) Super AMS clone support.
-    Compatible with Super AMS, but uses a 16-bit bus.
-
-    Up to 1Mb of SRAM.  Straightforward mapper, works with 4kb chunks.
-*/
-
-/* prototypes */
-static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data);
-static READ16_HANDLER(ti99_4p_mapper_r);
-static WRITE16_HANDLER(ti99_4p_mapper_w);
-
-
-static const ti99_peb_16bit_card_handlers_t ti99_4p_mapper_handlers =
-{
-	NULL,
-	ti99_4p_mapper_cru_w,
-	ti99_4p_mapper_r,
-	ti99_4p_mapper_w
-};
-
-
-static int ti99_4p_mapper_on;
-static int ti99_4p_mapper_lookup[16];
-
-
-/* set up handlers, and set initial state */
-static void ti99_4p_mapper_init(running_machine *machine)
-{
-	int i;
-	char bank_name[10];
-	/* Not required at run-time */
-#if 0
-	memory_install_read16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
-	memory_install_write16_handler(space, 0x2000, 0x2fff, SMH_BANK(3));
-	memory_install_read16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
-	memory_install_write16_handler(space, 0x3000, 0x3fff, SMH_BANK(4));
-	memory_install_read16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
-	memory_install_write16_handler(space, 0xa000, 0xafff, SMH_BANK(5));
-	memory_install_read16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
-	memory_install_write16_handler(space, 0xb000, 0xbfff, SMH_BANK(6));
-	memory_install_read16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
-	memory_install_write16_handler(space, 0xc000, 0xcfff, SMH_BANK(7));
-	memory_install_read16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
-	memory_install_write16_handler(space, 0xd000, 0xdfff, SMH_BANK(8));
-	memory_install_read16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
-	memory_install_write16_handler(space, 0xe000, 0xefff, SMH_BANK(9));
-	memory_install_read16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
-	memory_install_write16_handler(space, 0xf000, 0xffff, SMH_BANK(10));
-#endif
-
-	ti99_peb_set_16bit_card_handlers(0x1e00, & ti99_4p_mapper_handlers);
-
-	ti99_4p_mapper_on = 0;
-
-	for (i=0; i<16; i++)
-	{
-		ti99_4p_mapper_lookup[i] = i << 11;
-
-		/* update bank base */
-		switch (i)
-		{
-		case 2:
-		case 3:
-			sprintf(bank_name,"bank%d",3+(i-2));
-			memory_set_bankptr(machine,bank_name, xRAM_ptr + (i<<11));
-			break;
-
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-			sprintf(bank_name,"bank%d",5+(i-10));
-			memory_set_bankptr(machine,bank_name, xRAM_ptr + (i<<11));
-			break;
-		}
-	}
-}
-
-/* write CRU bit:
-    bit0: enable/disable mapper registers in DSR space,
-    bit1: enable/disable address mapping */
-static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data)
-{
-	int i;
-	char bank_name[10];
-
-	if (offset == 1)
-	{
-		if (ti99_4p_mapper_on != data)
-		{
-			ti99_4p_mapper_on = data;
-
-			for (i=0; i<16; i++)
-			{
-				/* update bank base */
-				switch (i)
-				{
-				case 2:
-				case 3:
-					sprintf(bank_name,"bank%d",3+(i-2));
-					memory_set_bankptr(machine,bank_name, xRAM_ptr + (ti99_4p_mapper_on ? (ti99_4p_mapper_lookup[i]) : (i<<11)));
-					break;
-
-				case 10:
-				case 11:
-				case 12:
-				case 13:
-				case 14:
-				case 15:
-					sprintf(bank_name,"bank%d",5+(i-10));
-					memory_set_bankptr(machine,bank_name, xRAM_ptr + (ti99_4p_mapper_on ? (ti99_4p_mapper_lookup[i]) : (i<<11)));
-					break;
-				}
-			}
-		}
-	}
-
-}
-
-/* read a mapper register */
-static READ16_HANDLER(ti99_4p_mapper_r)
-{
-	return (ti99_4p_mapper_lookup[offset & 0xf] >> 3);
-}
-
-/* write a mapper register */
-static WRITE16_HANDLER(ti99_4p_mapper_w)
-{
-	int page = offset & 0xf;
-	char bank_name[10];
-	ti99_4p_mapper_lookup[page] = (data & 0xff00) << 3;
-
-	if (ti99_4p_mapper_on)
-	{
-		/* update bank base */
-		switch (page)
-		{
-		case 2:
-		case 3:
-			sprintf(bank_name,"bank%d",3+(page-2));
-			memory_set_bankptr(space->machine,bank_name, xRAM_ptr+ti99_4p_mapper_lookup[page]);
-			break;
-
-		case 10:
-		case 11:
-		case 12:
-		case 13:
-		case 14:
-		case 15:
-			sprintf(bank_name,"bank%d",5+(page-10));
-			memory_set_bankptr(space->machine,bank_name, xRAM_ptr+ti99_4p_mapper_lookup[page]);
-			break;
-		}
-	}
-}
-
-
 /*===========================================================================*/
 /*
     myarc-ish memory extension support (foundation, and myarc clones).
@@ -2943,10 +1990,8 @@ static const ti99_peb_card_handlers_t myarc_expansion_handlers =
 	NULL
 };
 
-
 static int myarc_cur_page_offset;
 static int myarc_page_offset_mask;
-
 
 /* set up myarc handlers, and set initial state */
 static void ti99_myarcxram_init(running_machine *machine)
@@ -3022,14 +2067,12 @@ static void myarc_cru_w(running_machine *machine, int offset, int data)
 static READ16_HANDLER ( ti99_myarcxramlow_r )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
-
 	return xRAM_ptr[myarc_cur_page_offset + offset];
 }
 
 static WRITE16_HANDLER ( ti99_myarcxramlow_w )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
-
 	COMBINE_DATA(xRAM_ptr + myarc_cur_page_offset + offset);
 }
 
@@ -3037,26 +2080,25 @@ static WRITE16_HANDLER ( ti99_myarcxramlow_w )
 static READ16_HANDLER ( ti99_myarcxramhigh_r )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
-
 	return xRAM_ptr[myarc_cur_page_offset + offset+0x1000];
 }
 
 static WRITE16_HANDLER ( ti99_myarcxramhigh_w )
 {
 	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
-
 	COMBINE_DATA(xRAM_ptr + myarc_cur_page_offset + offset+0x1000);
 }
 
 
-/*===========================================================================*/
-#if 0
-#pragma mark -
-#pragma mark EVPC VIDEO CARD
-#endif
-/*
-    SNUG's EVPC emulation
-*/
+/**************************************************************************
+    EVPC (Enhanced Video Processor Card) from SNUG
+    based on v9938 (may also be equipped with v9958)
+    Can be used with TI-99/4A as an add-on card; internal VDP must be removed
+
+    The SGCPU ("TI-99/4P") only runs with EVPC.
+***************************************************************************/
+
+#include "emuopts.h"
 
 /* prototypes */
 static int evpc_cru_r(running_machine *machine, int offset);
@@ -3067,12 +2109,13 @@ static WRITE8_HANDLER(evpc_mem_w);
 /* pointer to the evpc DSR area */
 static UINT8 *ti99_evpc_DSR;
 
-/* pointer to the evpc novram area */
-/*static UINT8 *ti99_evpc_novram;*/
-
 static int RAMEN;
-
 static int evpc_dsr_page;
+
+/*
+    NOVRAM area
+*/
+static UINT8 ti99_evpc_novram[256];
 
 static const ti99_peb_card_handlers_t evpc_handlers =
 {
@@ -3082,6 +2125,129 @@ static const ti99_peb_card_handlers_t evpc_handlers =
 	evpc_mem_w
 };
 
+static struct
+{
+	UINT8 read_index, write_index, mask;
+	int read;
+	int state;
+	struct { UINT8 red, green, blue; } color[0x100];
+	//int dirty;
+} evpc_palette;
+
+/*
+    NOVRAM handling
+*/
+static void ti99_evpc_load_novram(running_machine *machine, const char *filename)
+{
+	file_error filerr;
+	mame_file *file;
+
+	filerr = mame_fopen(SEARCHPATH_NVRAM, filename, OPEN_FLAG_READ, &file);
+	if (filerr == FILERR_NONE)
+	{
+		if (mame_fread(file, ti99_evpc_novram, 256) != 256)
+			logerror("ti99_4ev: NOVRAM load error\n");
+		mame_fclose(file);
+	}
+}
+
+static void ti99_evpc_save_novram(running_machine *machine, const char *filename)
+{
+	file_error filerr;
+	mame_file *file;
+
+	filerr = mame_fopen(SEARCHPATH_NVRAM, filename,
+			OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
+
+	if (filerr == FILERR_NONE)
+	{
+		if (mame_fwrite(file, ti99_evpc_novram, 256) != 256)
+			logerror("ti99_4ev: NOVRAM save error\n");
+		mame_fclose(file);
+	}
+}
+
+INPUT_CHANGED( evpc_changed )
+{
+	evpc_switch[(UINT64)param&0x03] = newval;
+}
+
+INTERRUPT_GEN( ti99_4ev_hblank_interrupt )
+{
+//  static int line_count;
+	v9938_interrupt(device->machine, 0);
+
+	// No Mechatronic Mouse with v9938 (has own mouse)
+/*  if (++line_count == 262)
+    {
+        line_count = 0;
+        if (has_mecmouse)
+            mecmouse_poll(device->machine);
+    } */
+}
+
+// still unused
+TIMER_DEVICE_CALLBACK( ti99_4ev_scanline_interrupt )
+{
+	v9938_interrupt(timer->machine, 0);
+}
+
+/*
+    Video initialization. (also used by SGCPU)
+*/
+VIDEO_START( ti99_4ev )
+{
+	VIDEO_START_CALL(generic_bitmapped);
+	v9938_init(machine, 0, machine->primary_screen, machine->generic.tmpbitmap,
+		MODEL_V9938, 0x20000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
+}
+
+/*
+    V38 VDP read
+*/
+READ16_HANDLER ( ti99_rv38_r )
+{
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+
+	if (offset & 1)
+	{	/* read VDP status */
+		return ((int) v9938_0_status_r(space, 0)) << 8;
+	}
+	else
+	{	/* read VDP RAM */
+		return ((int) v9938_0_vram_r(space, 0)) << 8;
+	}
+}
+
+/*
+    V38 vdp write
+*/
+WRITE16_HANDLER ( ti99_wv38_w )
+{
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
+//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+
+	switch (offset & 3)
+	{
+	case 0:
+		/* write VDP data */
+		v9938_0_vram_w(space, 0, (data >> 8) & 0xff);
+		break;
+	case 1:
+		/* write VDP address */
+		v9938_0_command_w(space, 0, (data >> 8) & 0xff);
+		break;
+	case 2:
+		/* write VDP palette */
+		v9938_0_palette_w(space, 0, (data >> 8) & 0xff);
+		break;
+	case 3:
+		/* write VDP register pointer (indirect access) */
+		v9938_0_register_w(space, 0, (data >> 8) & 0xff);
+		break;
+	}
+}
 
 /*
     Reset evpc card, set up handlers
@@ -3097,11 +2263,25 @@ static void ti99_evpc_reset(running_machine *machine)
 }
 
 /*
-    Read evpc CRU interface
+    Read EVPC CRU interface (dip switches)
+    0: Video timing (PAL/NTSC)
+    1: -
+    2: charset
+    3: RAM shift
+    4: -
+    5: -
+    6: -
+    7: DIP or NOVRAM
+    Logic is inverted
 */
 static int evpc_cru_r(running_machine *machine, int offset)
 {
-	return 0;	/* dip-switch value */
+	UINT8 value = 0;
+
+	if (offset == 0)
+		value = ~(evpc_switch[0] | (evpc_switch[1]<<2) | (evpc_switch[2]<<3) | (evpc_switch[3]<<7));
+
+	return value;
 }
 
 /*
@@ -3150,23 +2330,12 @@ static void evpc_cru_w(running_machine *machine, int offset, int data)
 	}
 }
 
-
-static struct
-{
-	UINT8 read_index, write_index, mask;
-	int read;
-	int state;
-	struct { UINT8 red, green, blue; } color[0x100];
-	//int dirty;
-} evpc_palette;
-
 /*
     read a byte in evpc DSR space
 */
 static  READ8_HANDLER(evpc_mem_r)
 {
 	UINT8 reply = 0;
-
 
 	if (offset < 0x1f00)
 	{
@@ -3175,8 +2344,8 @@ static  READ8_HANDLER(evpc_mem_r)
 	else if (offset < 0x1ff0)
 	{
 		if (RAMEN)
-		{	/* NOVRAM */
-			reply = 0;
+		{
+			reply = ti99_evpc_novram[offset-0x1f00];
 		}
 		else
 		{
@@ -3185,18 +2354,15 @@ static  READ8_HANDLER(evpc_mem_r)
 	}
 	else
 	{	/* PALETTE */
-		logerror("palette read, offset=%d\n", offset-0x1ff0);
 		switch (offset - 0x1ff0)
 		{
 		case 0:
 			/* Palette Read Address Register */
-			logerror("EVPC palette address read\n");
 			reply = evpc_palette.write_index;
 			break;
 
 		case 2:
 			/* Palette Read Color Value */
-			logerror("EVPC palette color read\n");
 			if (evpc_palette.read)
 			{
 				switch (evpc_palette.state)
@@ -3222,12 +2388,10 @@ static  READ8_HANDLER(evpc_mem_r)
 
 		case 4:
 			/* Palette Read Pixel Mask */
-			logerror("EVPC palette mask read\n");
 			reply = evpc_palette.mask;
 			break;
 		case 6:
 			/* Palette Read Address Register for Color Value */
-			logerror("EVPC palette status read\n");
 			if (evpc_palette.read)
 				reply = 0;
 			else
@@ -3245,7 +2409,9 @@ static  READ8_HANDLER(evpc_mem_r)
 static WRITE8_HANDLER(evpc_mem_w)
 {
 	if ((offset >= 0x1f00) && (offset < 0x1ff0) && RAMEN)
-	{	/* NOVRAM */
+	{
+		// NOVRAM
+		ti99_evpc_novram[offset-0x1f00] = data;
 	}
 	else if (offset >= 0x1ff0)
 	{	/* PALETTE */
@@ -3304,43 +2470,610 @@ static WRITE8_HANDLER(evpc_mem_w)
 	}
 }
 
-/* tms9901 setup */
-const tms9901_interface tms9901reset_param_ti99_4x =
+/**************************************************************************
+    TI-99/8
+***************************************************************************/
+
+DRIVER_INIT( ti99_8 )
 {
-	TMS9901_INT1 | TMS9901_INT2 | TMS9901_INTC,	/* only input pins whose state is always known */
+	UINT8 *mem = memory_region(machine, "maincpu");
+	ti99_model = model_99_8;
+	has_evpc = FALSE;
 
-	{	/* read handlers */
-		ti99_R9901_0,
-		ti99_R9901_1,
-		ti99_R9901_2,
-		ti99_R9901_3
-	},
+	/* set up memory pointers */
+	xRAM_ptr_8 = mem + offset_xram_8;
+	ROM0_ptr_8 = mem + offset_rom0_8;
+	ROM1_ptr_8 = ROM0_ptr_8 + 0x2000;
+	ROM2_ptr_8 = ROM1_ptr_8 + 0x2000;
+	ROM3_ptr_8 = ROM2_ptr_8 + 0x2000;
+	sRAM_ptr_8 = mem + offset_sram_8;
 
-	{	/* write handlers */
-		ti99_handset_set_ack,
-		NULL,
-		ti99_KeyC,
-		ti99_KeyC,
-		ti99_KeyC,
-		ti99_AlphaW,
-		ti99_CS_motor,
-		ti99_CS_motor,
-		ti99_audio_gate,
-		ti99_CS_output,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL
-	},
+	/* Pull this one up here. */
+	ti99_8_enable_rom_and_ports = 1;
 
-	/* interrupt handler */
-	tms9901_interrupt_callback,
+	console_GROMs.data_ptr = memory_region(machine, region_grom);
+	create_grom_high2k(0x0000, 0x5fff);
 
-	/* clock rate = 3MHz */
-	3000000.
+	multicart8 = devtag_get_device(machine, "ti99_multicart");
+	assert (multicart8 != NULL);
+}
+
+/*
+    ti99_init_machine(); called before ti99_load_rom...
+*/
+MACHINE_RESET( ti99_8 )
+{
+	/*console_GROMs.data_ptr = memory_region(machine, region_grom);*/
+	console_GROMs.addr = 0;
+	console_GROMs.buf = 0;
+	console_GROMs.raddr_LSB = FALSE;
+	console_GROMs.waddr_LSB = FALSE;
+
+	ti99_8_enable_rom_and_ports = 1;		/* ??? maybe there is a pull-up */
+	/* MZ: already setting this in driver init, otherwise machine locks up */
+
+	TMS9928A_reset();
+
+	/* clear keyboard interface state (probably overkill, but can't harm) */
+	KeyCol = 0;
+	AlphaLockLine = 0;
+
+	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 12, 0);
+
+	xRAM_kind = RAM_99_8;
+	has_speech = TRUE;
+	has_ide = input_port_read(machine, "HDCTRL") & HD_IDE;
+	has_rs232 = input_port_read(machine, "SERIAL") & SERIAL_TI;
+	has_handset = FALSE;
+
+	has_mecmouse = input_port_read(machine, "HCI") & HCI_MECMOUSE;
+
+	has_hsgpl = input_port_read(machine, "EXTCARD") & (EXT_HSGPL_ON | EXT_HSGPL_FLASH);
+	hsgpl_flash_mode = input_port_read(machine, "EXTCARD") & EXT_HSGPL_FLASH;
+
+	has_usb_sm = input_port_read(machine, "HDCTRL") & HD_USB;
+	has_pcode = input_port_read(machine, "EXTCARD") & EXT_PCODE;
+
+	/* Get the GK settings once */
+	gk_switch[1] = input_port_read(machine, "GKSWITCH1");
+	gk_switch[2] = input_port_read(machine, "GKSWITCH2");
+	gk_switch[3] = input_port_read(machine, "GKSWITCH3");
+	gk_switch[4] = input_port_read(machine, "GKSWITCH4");
+	gk_switch[5] = input_port_read(machine, "GKSWITCH5");
+
+	// Removes all card handlers
+	ti99_peb_init();
+
+	// set up optional expansion hardware
+	ti99_peb_reset(FALSE, tms9901_set_int1, NULL);
+
+	ti99_8_internal_dsr_reset(machine);
+
+	static const spchroms_interface speech_intf = { region_speech_rom };
+	spchroms_config(machine, &speech_intf);
+
+	switch (input_port_read(machine, "DISKCTRL"))
+	{
+	case DISK_TIFDC:
+		ti99_fdc_reset(machine);
+		break;
+#if HAS_99CCFDC
+	case DISK_CC:
+		ti99_ccfdc_reset(machine);
+		break;
+#endif
+	case DISK_BWG:
+		ti99_bwg_reset(machine);
+		break;
+	case DISK_HFDC:
+		ti99_hfdc_reset(machine);
+		break;
+	case DISK_NONE:
+		break;
+	}
+
+	if (has_ide)
+		ti99_ide_reset(machine, TRUE);
+
+	if (has_hsgpl)
+		ti99_hsgpl_reset(machine);
+	else
+		hsgpl_crdena = 0;
+
+	if (has_usb_sm)
+		ti99_usbsm_reset(machine, TRUE);
+
+	if (has_pcode)
+		ti99_pcode_reset(machine);
+
+	/* initialize mechatronics mouse */
+	mecmouse_sel = 0;
+	mecmouse_read_y = 0;
+	mecmouse_x = 0;
+	mecmouse_y = 0;
+}
+
+/*
+    GROM read for TI-99/8
+    For comments, see the handler for TI-99/4A
+*/
+static READ8_HANDLER ( ti99_grom_r8 )
+{
+	UINT8 reply, replycart;
+
+	cpu_adjust_icount(space->machine->firstcpu,-4);
+
+	if (offset & 2)
+	{
+		replycart = ti99_cartridge_grom_r(cartslots, offset);
+		console_GROMs.waddr_LSB = FALSE;
+
+		if (console_GROMs.raddr_LSB)
+		{
+			reply = console_GROMs.addr & 0x00ff;
+			console_GROMs.raddr_LSB = FALSE;
+		}
+		else
+		{
+			reply = (console_GROMs.addr>>8) & 0x00ff;
+			console_GROMs.raddr_LSB = TRUE;
+		}
+		/* GROM address values must be globally unique. */
+		assert (replycart == reply);
+	}
+	else
+	{
+		reply = GROM_dataread(space->machine, offset);
+	}
+	return reply;
+}
+
+/*
+    GROM write for TI-99/8
+    For comments, see the handler for TI-99/4A
+*/
+static WRITE8_HANDLER ( ti99_grom_w8 )
+{
+	cpu_adjust_icount(space->machine->firstcpu,-4/*20+3*/);		/* from 4 to 23? */
+
+	if (offset & 2)
+	{
+		ti99_cartridge_grom_w(cartslots, offset, data);
+		console_GROMs.raddr_LSB = FALSE;
+		if (console_GROMs.waddr_LSB)
+		{
+			console_GROMs.addr = (console_GROMs.addr & 0xFF00) | (data & 0xFF);
+
+			GROM_dataread(space->machine, offset&0xfffc);
+			console_GROMs.waddr_LSB = FALSE;
+		}
+		else
+		{
+			console_GROMs.addr = ((data<<8) & 0xFF00) | (console_GROMs.addr & 0xFF);
+			console_GROMs.waddr_LSB = TRUE;
+		}
+
+	}
+	else
+	{
+		GRAM_datawrite(offset, (data>>8)&0xff);
+		console_GROMs.raddr_LSB = console_GROMs.waddr_LSB = FALSE;
+	}
+}
+
+READ8_HANDLER( ti99_8_r )
+{
+	/* Set the page. Page size is 4 KiB; page number are the high 4 bits. */
+	int page = offset >> 12;
+	UINT32 mapper_reg;
+	UINT8 reply = 0;
+
+	if (ti99_8_enable_rom_and_ports)
+	{
+		//  This is only important for address access 0000-1fff and
+		// 8000-9fff. Outside, the mapper mode is used.
+		if ((offset >= 0x0000) && (offset < 0x2000))
+		{
+			/* ROM */
+			reply = ROM0_ptr_8[offset & 0x1fff];
+			return reply;
+		}
+		else if ((offset >= 0x8000) && (offset < 0xa000))
+		{
+			/* ti99 scratch pad and memory-mapped registers */
+			/* 0x8000-0x9fff */
+			switch ((offset - 0x8000) >> 10)
+			{
+			case 0:
+				/* RAM: >8000 - >83ff */
+				reply = sRAM_ptr_8[offset & 0x1fff];
+				break;
+
+			case 1:
+				// >8400 - >840f: sound (cannot read)
+				// >8410 - >87ff: SRAM
+				if (offset >= 0x8410)
+					reply = sRAM_ptr_8[offset & 0x1fff];
+				break;
+
+			case 2:
+				/* VDP read + mapper status */
+				if (offset < 0x8810)
+				{
+					if (! (offset & 1))
+					{
+						if (offset & 2)
+							/* read VDP status >8802 */
+						reply = TMS9928A_register_r(space, 0);
+						else
+							/* read VDP RAM >8800 */
+						reply = TMS9928A_vram_r(space, 0);
+					}
+				}
+				else
+				{
+					/* Read mapper >8810 */
+					reply = ti99_8_mapper_status;
+					ti99_8_mapper_status = 0;
+				}
+				break;
+
+			case 4:
+				/* speech read: >9000 */
+				if (! (offset & 1))
+				{
+					cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-16*4);		/* this is just a minimum, it can be more */
+					reply = tms5220_status_r(devtag_get_device(space->machine, "tms5220"), 0);
+				}
+				break;
+
+			case 6:
+				/* GROM read: >9800 */
+				if (! (offset & 1))
+					reply = ti99_grom_r8(space, offset);
+				break;
+
+			default:
+				logerror("unmapped read offs=%d\n", (int) offset);
+				break;
+			}
+			return reply;
+		}
+	}
+
+	mapper_reg = ti99_8_mapper_regs[page];
+	offset = (mapper_reg + (offset & 0x0fff)) & 0x00ffffff;
+
+	if (offset < 0x010000)
+	/* Read RAM */
+	reply = xRAM_ptr_8[offset];
+
+	if (offset >= 0xff0000)
+	{
+		switch ((offset >> 13) & 7)
+		{
+		default:
+			/* should never happen */
+		case 0:
+			/* ff0000 - ff1fff: unassigned? */
+		case 1:
+			/* ff2000 - ff3fff: ? */
+		case 4:
+			/* ff8000 - ff9fff: internal DSR ROM? (normally enabled with a write to CRU >2700) */
+		case 7:
+			/* ffe000 - ffffff: ? */
+			logerror("unmapped read page=%d offs=%d\n", (int) page, (int) offset);
+			break;
+
+		case 2:
+			/* ff4000 - ff5fff: DSR space */
+			reply = ti99_8_peb_r(space, offset & 0x1fff);
+			break;
+
+		case 3:
+			/* ff6000 - ff7fff: cartridge ROM space */
+			offset &= 0x1fff;
+
+			// We do not support hsgpl here. Just check the cartridges.
+			reply = ti99_multicart8_r(multicart8, offset);
+			break;
+
+		case 5:
+			/* ffa000 - ffbfff: >2000 ROM (ROM1) */
+			reply = ROM1_ptr_8[offset & 0x1fff];
+			break;
+
+		case 6:
+			/* ffc000 - ffdfff: >6000 ROM */
+			reply = ROM3_ptr_8[offset & 0x1fff];
+			break;
+		}
+	}
+
+	return reply;
+}
+
+WRITE8_HANDLER ( ti99_8_w )
+{
+	int page = offset >> 12;
+	UINT32 mapper_reg;
+
+	if (ti99_8_enable_rom_and_ports)
+	{
+		/* memory mapped ports enabled */
+		if ((offset >= 0x0000) && (offset < 0x2000))
+		{
+			/* ROM? */
+			return;
+		}
+		else if ((offset >= 0x8000) && (offset < 0xa000))
+		{
+			/* ti99 scratch pad and memory-mapped registers */
+			/* 0x8000-0x9fff */
+			switch ((offset - 0x8000) >> 10)
+			{
+			case 0:
+				/* RAM */
+				sRAM_ptr_8[offset & 0x1fff] = data;
+				break;
+
+			case 1:
+				/* sound write + RAM */
+				if (offset < 0x8410)
+					sn76496_w(devtag_get_device(space->machine, "sn76496"), offset, data);
+				else
+					sRAM_ptr_8[offset & 0x1fff] = data;
+				break;
+
+			case 2:
+				/* VDP read + mapper control */
+				if (offset >= 0x8810)
+				{
+					int file = (data >> 1) & 3;
+					int i;
+
+					if (data & 1)
+					{	/* load */
+						for (i=0; i<16; i++)
+						{
+							ti99_8_mapper_regs[i] = (sRAM_ptr_8[(file << 6) + (i << 2)] << 24)
+													| (sRAM_ptr_8[(file << 6) + (i << 2) + 1] << 16)
+													| (sRAM_ptr_8[(file << 6) + (i << 2) + 2] << 8)
+													| sRAM_ptr_8[(file << 6) + (i << 2) + 3];
+						}
+					}
+					else
+					{	/* save */
+						for (i=0; i<16; i++)
+						{
+							sRAM_ptr_8[(file << 6) + (i << 2)] = ti99_8_mapper_regs[i] >> 24;
+							sRAM_ptr_8[(file << 6) + (i << 2) + 1] = ti99_8_mapper_regs[i] >> 16;
+							sRAM_ptr_8[(file << 6) + (i << 2) + 2] = ti99_8_mapper_regs[i] >> 8;
+							sRAM_ptr_8[(file << 6) + (i << 2) + 3] = ti99_8_mapper_regs[i];
+						}
+					}
+				}
+				break;
+
+			case 3:
+				/* VDP write */
+				if (! (offset & 1))
+				{
+					if (offset & 2)
+						/* read VDP status */
+						TMS9928A_register_w(space, 0, data);
+					else
+						/* read VDP RAM */
+						TMS9928A_vram_w(space, 0, data);
+				}
+				break;
+
+			case 5:
+				/* speech write */
+				if (! (offset & 1))
+				{
+					cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-48*4);		/* this is just an approx. minimum, it can be much more */
+
+					// the stupid design of the tms5220 core means that ready is cleared when
+					// there are 15 bytes in FIFO.  It should be 16.  Of course, if it were the
+					// case, we would need to store the value on the bus, which would be more
+					// complex.
+					if (! tms5220_readyq_r(devtag_get_device(space->machine, "tms5220")))
+					{
+						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(devtag_get_device(space->machine, "tms5220")));
+						double d = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
+						int cycles_to_ready = ((int) (d + 3)) & ~3;
+
+						logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready)
+							, (int) cycles_to_ready);
+
+						cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-cycles_to_ready);
+						timer_set(space->machine, attotime_zero, NULL, 0, /*speech_kludge_callback*/NULL);
+					}
+
+					tms5220_data_w(devtag_get_device(space->machine, "tms5220"), offset, data);
+				}
+				break;
+
+			case 7:
+				/* GPL write */
+				if (! (offset & 1))
+					ti99_grom_w8(space, offset, data);
+				break;
+
+			default:
+				logerror("unmapped write offs=%d data=%d\n", (int) offset, (int) data);
+				break;
+			}
+			return;
+		}
+	}
+
+	mapper_reg = ti99_8_mapper_regs[page];
+
+	/* 4 KiB page size */
+	offset = (mapper_reg + (offset & 0x0fff)) & 0x00ffffff;
+
+#if 0
+	/* test write protect */
+	if (mapper_reg & 0x80000000)
+		;
+#endif
+
+	if (offset < 0x010000)
+	{	/* Write RAM */
+		xRAM_ptr_8[offset] = data;
+	}
+	else if (offset >= 0xff0000)
+	{
+		switch ((offset >> 13) & 7)
+		{
+		default:
+			/* should never happen */
+		case 0:
+			/* unassigned??? */
+		case 1:
+			/* ??? */
+		case 4:
+			/* internal DSR ROM??? (normally enabled with a write to CRU >2700) */
+		case 7:
+			/* ??? */
+			break;
+
+		case 2:
+			/* DSR space */
+			ti99_8_peb_w(space, offset & 0x1fff, data);
+			break;
+
+		case 3:
+			/* cartridge space */
+			/* We do not support HSGPL for the 99/8 at this time. */
+			ti99_multicart8_w(multicart8, offset & 0x1fff, data);
+			break;
+
+		case 5:
+			/* >2000 ROM (ROM1) */
+			break;
+
+		case 6:
+			/* >6000 ROM */
+			break;
+		}
+	}
+	else
+	{
+		logerror("unmapped write page=%d offs=%d\n", (int) page, (int) offset);
+	}
+}
+
+/*
+    WRITE key column select (P0-P3)
+*/
+static WRITE8_DEVICE_HANDLER( ti99_8_KeyC )
+{
+	if (data)
+		KeyCol |= 1 << offset;
+	else
+		KeyCol &= ~ (1 << offset);
+
+	if (has_mecmouse)
+		mecmouse_select(KeyCol, 14, 15);
+}
+
+static WRITE8_DEVICE_HANDLER( ti99_8_WCRUS )
+{
+	ti99_8_enable_rom_and_ports = data;
+}
+
+static WRITE8_DEVICE_HANDLER( ti99_8_PTGEN )
+{
+	/* ... */
+}
+
+/*
+    TI 99/8 internal DSR support.
+    Includes a few specific signals, and an extra ROM.
+*/
+
+/* prototypes */
+static void ti99_8_internal_dsr_cru_w(running_machine *machine, int offset, int data);
+static  READ8_HANDLER(ti99_8_internal_dsr_r);
+
+
+static const ti99_peb_card_handlers_t ti99_8_internal_dsr_handlers =
+{
+	NULL,
+	ti99_8_internal_dsr_cru_w,
+	ti99_8_internal_dsr_r,
+	NULL
 };
+
+/* pointer to the internal DSR ROM data */
+static UINT8 *ti99_8_internal_DSR;
+
+
+/* set up handlers, and set initial state */
+static void ti99_8_internal_dsr_reset(running_machine *machine)
+{
+	ti99_8_internal_DSR = memory_region(machine, "maincpu") + offset_rom0_8 + 0x4000;
+
+	ti99_peb_set_card_handlers(0x2700, & ti99_8_internal_dsr_handlers);
+}
+
+/* write CRU bit:
+    bit0: enable/disable internal DSR ROM,
+    bit1: hard reset */
+static void ti99_8_internal_dsr_cru_w(running_machine *machine, int offset, int data)
+{
+	switch (offset)
+	{
+	case 1:
+		/* hard reset -- not emulated */
+		break;
+	}
+}
+
+/* read internal DSR ROM */
+static  READ8_HANDLER(ti99_8_internal_dsr_r)
+{
+	return ti99_8_internal_DSR[offset];
+}
+
+/*
+    Read pins INT3*-INT7* of TI99's 9901.
+
+    signification:
+     (bit 1: INT1 status)
+     (bit 2: INT2 status)
+     bits 3-4: unused?
+     bit 5: ???
+     bit 6-7: keyboard status bits 0 through 1
+*/
+static READ8_DEVICE_HANDLER( ti99_8_R9901_0 )
+{
+	int answer;
+	static const char *const keynames[] = {
+		"KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7",
+		"KEY8", "KEY9", "KEY10", "KEY11", "KEY12", "KEY13", "KEY14", "KEY15"
+	};
+
+	if (has_mecmouse && (KeyCol == 15))
+	{
+		int buttons = input_port_read(device->machine, "MOUSE0") & 3;
+
+		answer = ((mecmouse_read_y ? mecmouse_y_buf : mecmouse_x_buf) << 7) & 0x80;
+
+		if (! (buttons & 1))
+			/* action button */
+			answer |= 0x40;
+	}
+	else
+	{
+		answer = (input_port_read(device->machine, keynames[KeyCol]) << 6) & 0xC0;
+	}
+
+	return answer;
+}
 
 const tms9901_interface tms9901reset_param_ti99_8 =
 {
@@ -3378,3 +3111,417 @@ const tms9901_interface tms9901reset_param_ti99_8 =
 	/* clock rate = 3.58MHz??? 2.68MHz??? */
 	/*3579545.*/2684658.75
 };
+
+
+/**************************************************************************
+    SGCPU (aka "TI-99/4P")
+    Requires EVPC and HSGPL (with content)
+***************************************************************************/
+
+/* True if SGCPU rom6 is enabled */
+static int ti99_4p_internal_rom6_enable;
+
+/* Pointer to the memory area. */
+static UINT16 *ti99_4p_mem;
+
+/* pointer to the internal DSR ROM data */
+static UINT16 *ti99_4p_internal_DSR;
+
+/* Offset to the ROM6 bank. */
+static offs_t rom6_bank_offset;
+
+static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data);
+static READ16_HANDLER(ti99_4p_mapper_r);
+static WRITE16_HANDLER(ti99_4p_mapper_w);
+static void ti99_4p_internal_dsr_cru_w(running_machine *machine, int offset, int data);
+static READ16_HANDLER(ti99_4p_internal_dsr_r);
+
+static const ti99_peb_16bit_card_handlers_t ti99_4p_internal_dsr_handlers =
+{
+	NULL,
+	ti99_4p_internal_dsr_cru_w,
+	ti99_4p_internal_dsr_r,
+	NULL
+};
+
+static const ti99_peb_16bit_card_handlers_t ti99_4p_mapper_handlers =
+{
+	NULL,
+	ti99_4p_mapper_cru_w,
+	ti99_4p_mapper_r,
+	ti99_4p_mapper_w
+};
+
+static int ti99_4p_mapper_on;
+static int ti99_4p_mapper_lookup[16];
+
+DRIVER_INIT( ti99_4p )
+{
+	ti99_model = model_99_4p;
+	has_evpc = TRUE;
+
+	/* set up memory pointers */
+	xRAM_ptr = (UINT16 *) (memory_region(machine, "maincpu") + offset_xram_4p);
+}
+
+MACHINE_START( ti99_4p )
+{
+	UINT8* mem = memory_region(machine, "maincpu");
+
+	// Set up system ROM pointers. Must be set up here
+	// so that the system can successfully reset (otherwise the reset
+	// vector would be missing in 0x0000).
+	memory_set_bankptr(machine, "bank1", mem + offset_rom0_4p);	 // system ROM
+
+	ti99_floppy_controllers_init_all(machine);
+	ti99_ide_init(machine);
+	ti99_hsgpl_init(machine);
+	ti99_usbsm_init(machine);
+}
+
+/*
+    Reset the machine.
+*/
+MACHINE_RESET( ti99_4p )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	UINT8* mem = memory_region(machine, "maincpu");
+
+	/* set up system ROM and scratch pad pointers */
+	memory_set_bankptr(machine, "bank1", mem + offset_rom0_4p);	/* system ROM */
+	memory_set_bankptr(machine, "bank2", mem + offset_sram_4p);	/* scratch pad */
+	memory_set_bankptr(machine, "bank11", mem + offset_dram_4p);	/* extra RAM for debugger */
+
+	v9938_reset(0);
+
+	/* clear keyboard interface state (probably overkill, but can't harm) */
+	KeyCol = 0;
+	AlphaLockLine = 0;
+
+	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 12, 0);
+
+	xRAM_kind = RAM_99_4P;
+	has_speech = input_port_read(machine, "SPEECH");
+	has_ide = input_port_read(machine, "HDCTRL") & HD_IDE;
+	has_rs232 = input_port_read(machine, "SERIAL") & SERIAL_TI;
+
+	has_handset = FALSE;
+	has_mecmouse = FALSE;        // mouse is connected to v9938
+	has_hsgpl = TRUE;
+	has_usb_sm = input_port_read(machine, "HDCTRL") & HD_USB;
+	has_pcode = input_port_read(machine, "EXTCARD") & EXT_PCODE;
+
+	// Removes all card handlers
+	ti99_peb_init();
+
+	// set up optional expansion hardware
+	ti99_peb_reset(TRUE, tms9901_set_int1, NULL);
+
+	ti99_4p_internal_dsr_reset(machine);
+	ti99_4p_mapper_init(machine);
+	ti99_hsgpl_reset(machine);
+	ti99_evpc_reset(machine);
+
+	if (has_speech)
+	{
+		static const spchroms_interface speech_intf = { region_speech_rom };
+		spchroms_config(machine, &speech_intf);
+		memory_install_read16_handler(space, 0x9000, 0x93ff, 0, 0, ti99_rspeech_r);
+		memory_install_write16_handler(space, 0x9400, 0x97ff, 0, 0, ti99_wspeech_w);
+	}
+	else
+	{
+		memory_install_read16_handler(space, 0x9000, 0x93ff, 0, 0, ti99_nop_8_r);
+		memory_install_write16_handler(space, 0x9400, 0x97ff, 0, 0, ti99_nop_8_w);
+	}
+
+
+	switch (input_port_read(machine, "DISKCTRL"))
+	{
+	case DISK_TIFDC:
+		ti99_fdc_reset(machine);
+		break;
+#if HAS_99CCFDC
+	case DISK_CC:
+		ti99_ccfdc_reset(machine);
+		break;
+#endif
+	case DISK_BWG:
+		ti99_bwg_reset(machine);
+		break;
+	case DISK_HFDC:
+		ti99_hfdc_reset(machine);
+		break;
+	case DISK_NONE:
+		break;
+	}
+
+	if (has_ide)
+		ti99_ide_reset(machine, FALSE);
+
+	if (has_usb_sm)
+		ti99_usbsm_reset(machine, FALSE);
+
+	if (has_pcode)
+		ti99_pcode_reset(machine);
+}
+
+
+/*
+    SNUG SGCPU (a.k.a. 99/4p) Super AMS clone support.
+    Compatible with Super AMS, but uses a 16-bit bus.
+
+    Up to 1Mb of SRAM.  Straightforward mapper, works with 4kb chunks.
+*/
+
+/* set up handlers, and set initial state */
+static void ti99_4p_mapper_init(running_machine *machine)
+{
+	int i;
+	char bank_name[10];
+	/* Not required at run-time */
+	ti99_peb_set_16bit_card_handlers(0x1e00, & ti99_4p_mapper_handlers);
+
+	ti99_4p_mapper_on = 0;
+
+	for (i=0; i<16; i++)
+	{
+		ti99_4p_mapper_lookup[i] = i << 11;
+
+		/* update bank base */
+		switch (i)
+		{
+		case 2:
+		case 3:
+			sprintf(bank_name,"bank%d",3+(i-2));
+			memory_set_bankptr(machine,bank_name, xRAM_ptr + (i<<11));
+			break;
+
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+			sprintf(bank_name,"bank%d",5+(i-10));
+			memory_set_bankptr(machine,bank_name, xRAM_ptr + (i<<11));
+			break;
+		}
+	}
+}
+
+/*
+    Write CRU bit:
+    bit0: enable/disable mapper registers in DSR space,
+    bit1: enable/disable address mapping
+*/
+static void ti99_4p_mapper_cru_w(running_machine *machine, int offset, int data)
+{
+	int i;
+	char bank_name[10];
+
+	if (offset == 1)
+	{
+		if (ti99_4p_mapper_on != data)
+		{
+			ti99_4p_mapper_on = data;
+
+			for (i=0; i<16; i++)
+			{
+				/* update bank base */
+				switch (i)
+				{
+				case 2:
+				case 3:
+					sprintf(bank_name,"bank%d",3+(i-2));
+					memory_set_bankptr(machine,bank_name, xRAM_ptr + (ti99_4p_mapper_on ? (ti99_4p_mapper_lookup[i]) : (i<<11)));
+					break;
+
+				case 10:
+				case 11:
+				case 12:
+				case 13:
+				case 14:
+				case 15:
+					sprintf(bank_name,"bank%d",5+(i-10));
+					memory_set_bankptr(machine,bank_name, xRAM_ptr + (ti99_4p_mapper_on ? (ti99_4p_mapper_lookup[i]) : (i<<11)));
+					break;
+				}
+			}
+		}
+	}
+}
+
+/* read a mapper register */
+static READ16_HANDLER(ti99_4p_mapper_r)
+{
+	return (ti99_4p_mapper_lookup[offset & 0xf] >> 3);
+}
+
+/* write a mapper register */
+static WRITE16_HANDLER(ti99_4p_mapper_w)
+{
+	int page = offset & 0xf;
+	char bank_name[10];
+	ti99_4p_mapper_lookup[page] = (data & 0xff00) << 3;
+
+	if (ti99_4p_mapper_on)
+	{
+		/* update bank base */
+		switch (page)
+		{
+		case 2:
+		case 3:
+			sprintf(bank_name,"bank%d",3+(page-2));
+			memory_set_bankptr(space->machine,bank_name, xRAM_ptr+ti99_4p_mapper_lookup[page]);
+			break;
+
+		case 10:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+			sprintf(bank_name,"bank%d",5+(page-10));
+			memory_set_bankptr(space->machine,bank_name, xRAM_ptr+ti99_4p_mapper_lookup[page]);
+			break;
+		}
+	}
+}
+
+/*
+    Internal DSR support.
+    Includes a few specific signals, and an extra ROM.
+*/
+static void ti99_4p_internal_dsr_reset(running_machine *machine)
+{
+	// set up handlers, and set initial state
+	UINT8* mem = memory_region(machine, "maincpu");
+
+	ti99_4p_internal_DSR = (UINT16 *) (mem + offset_rom4_4p);
+	rom6_bank_offset = offset_rom6_4p;
+	ti99_4p_mem = (UINT16 *)mem;
+
+	ti99_peb_set_16bit_card_handlers(0x0f00, & ti99_4p_internal_dsr_handlers);
+
+	ti99_4p_internal_rom6_enable = 0;
+	ti99_4p_peb_set_senila(0);
+	ti99_4p_peb_set_senilb(0);
+}
+
+/*
+    Write CRU bit:
+    bit0: enable/disable internal DSR ROM,
+    bit1: enable/disable internal cartridge ROM
+    bit2: set/clear senila
+    bit3: set/clear senilb
+*/
+static void ti99_4p_internal_dsr_cru_w(running_machine *machine, int offset, int data)
+{
+	switch (offset)
+	{
+	case 1:
+		ti99_4p_internal_rom6_enable = data;
+		break;
+	case 2:
+		ti99_4p_peb_set_senila(data);
+		break;
+	case 3:
+		ti99_4p_peb_set_senilb(data);
+		break;
+	case 4:
+		/* 0: 16-bit (fast) memory timings */
+		/* 1: 8-bit memory timings */
+		break;
+	case 5:
+		/* if 0: "KBENA" mode (enable keyboard?) */
+		/* if 1: "KBINH" mode (inhibit keyboard?) */
+		break;
+	}
+}
+
+/*
+    Read internal DSR ROM.
+    Addresses 4000-5fff
+*/
+static READ16_HANDLER(ti99_4p_internal_dsr_r)
+{
+	return ti99_4p_internal_DSR[offset];
+}
+
+/*
+    SGCPU cartridge space: mapped either to internal ROM6 or to HSGPL.
+    Addresses 6000-7fff
+*/
+READ16_HANDLER ( ti99_4p_cart_r )
+{
+	UINT16 value = 0;
+	if (ti99_4p_internal_rom6_enable)
+	{
+		value = ti99_4p_mem[(rom6_bank_offset>>1) + offset];
+	}
+	else
+	{
+		cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
+		//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+
+		if (hsgpl_crdena)
+			/* hsgpl is enabled */
+			value = ti99_hsgpl_rom6_r(space, offset, mem_mask);
+	}
+	return value;
+}
+
+WRITE16_HANDLER ( ti99_4p_cart_w )
+{
+	if (ti99_4p_internal_rom6_enable)
+	{
+		// Switch ROMs
+		if (offset & 1)
+			rom6_bank_offset = offset_rom6b_4p;
+		else
+			rom6_bank_offset = offset_rom6_4p;
+	}
+	else
+	{
+		cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
+		//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+
+		if (hsgpl_crdena)
+			/* hsgpl is enabled */
+			ti99_hsgpl_rom6_w(space, offset, data, mem_mask);
+	}
+}
+
+/*
+    GROM read for TI-99/4p
+*/
+READ16_HANDLER ( ti99_4p_grom_r )
+{
+	UINT16 value = 0;
+	// HSGPL is located on 8-bit bus
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
+	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+
+	// When crdena is false, we must still be able to query the address
+	// counter (offset & 1)
+	if (hsgpl_crdena || (offset & 1))
+		value = ti99_hsgpl_gpl_r(space, offset, mem_mask);
+
+	return value;
+}
+
+/*
+    GROM write
+*/
+WRITE16_HANDLER ( ti99_4p_grom_w )
+{
+	// HSGPL is located on 8-bit bus
+	cpu_adjust_icount(devtag_get_device(space->machine, "maincpu"),-4);
+	//  cpu_spinuntil_time(space->machine->firstcpu, ATTOTIME_IN_USEC(6));
+
+	if (hsgpl_crdena || (offset & 1))
+		ti99_hsgpl_gpl_w(space, offset, data, mem_mask);
+}
+
