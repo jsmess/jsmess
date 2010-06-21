@@ -365,14 +365,6 @@ static void draw_roz(running_machine *machine, const rectangle *cliprect)
             pal = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0xf000) >> 12;
 
             drawgfx_transpen(roz_bitmap,NULL,machine->gfx[region],tile,pal,flipx,flipy,(x*8),(y*8),0);
-            drawgfx_transpen(roz_bitmap,NULL,machine->gfx[region],tile,pal,flipx,flipy,(x*8)+xsize*8,(y*8),0);
-            drawgfx_transpen(roz_bitmap,NULL,machine->gfx[region],tile,pal,flipx,flipy,(x*8),(y*8)+ysize*8,0);
-            drawgfx_transpen(roz_bitmap,NULL,machine->gfx[region],tile,pal,flipx,flipy,(x*8)+xsize*8,(y*8)+ysize*8,0);
-            drawgfx_transpen(roz_bitmap,NULL,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-xsize*8,(y*8),0);
-            drawgfx_transpen(roz_bitmap,NULL,machine->gfx[region],tile,pal,flipx,flipy,(x*8),(y*8)-ysize*8,0);
-            drawgfx_transpen(roz_bitmap,NULL,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-xsize*8,(y*8)-ysize*8,0);
-            drawgfx_transpen(roz_bitmap,NULL,machine->gfx[region],tile,pal,flipx,flipy,(x*8)+xsize*8,(y*8)-ysize*8,0);
-            drawgfx_transpen(roz_bitmap,NULL,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-xsize*8,(y*8)+ysize*8,0);
 
             count++;
         }
