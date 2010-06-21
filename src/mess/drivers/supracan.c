@@ -50,6 +50,8 @@ bpclear
 #include "devices/cartslot.h"
 #include "debugger.h"
 
+#define DRAW_DEBUG_ROZ  (0)
+
 typedef struct _acan_dma_regs_t acan_dma_regs_t;
 struct _acan_dma_regs_t
 {
@@ -63,7 +65,9 @@ typedef struct _acan_sprdma_regs_t acan_sprdma_regs_t;
 struct _acan_sprdma_regs_t
 {
 	UINT32 src;
+    UINT16 src_inc;
 	UINT32 dst;
+    UINT16 dst_inc;
 	UINT16 count;
 	UINT16 control;
 };
@@ -84,6 +88,7 @@ public:
 	emu_timer *video_timer;
 	UINT16 *vram;
 	UINT16 spr_limit;
+    UINT16 spr_yline;
 	UINT32 spr_base_addr;
 	UINT8 spr_flags;
 	UINT32 tilemap_base_addr[4];
@@ -170,8 +175,10 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 		default: xsize = 32; ysize = 32; break;
 	}
 
-	scrollx = (state->tilemap_scrollx[layer] & 0x800) ? ((state->tilemap_scrollx[layer] & (xsize*8-1)) - xsize*8) : (state->tilemap_scrollx[layer] & (xsize*8-1));
-	scrolly = (state->tilemap_scrolly[layer] & 0x800) ? ((state->tilemap_scrolly[layer] & (ysize*8-1)) - ysize*8) : (state->tilemap_scrolly[layer] & (ysize*8-1));
+    scrollx = state->tilemap_scrollx[layer];
+    scrolly = state->tilemap_scrolly[layer];
+    scrollx |= (scrollx & 0x800) ? 0xfffff000 : 0;
+    scrolly |= (scrolly & 0x800) ? 0xfffff000 : 0;
 
 	gfx_mode = (state->tilemap_mode[layer] & 0x7000) >> 12;
 
@@ -223,8 +230,13 @@ static void draw_roz_bitmap_scanline(running_machine *machine, bitmap_t *roz_bit
     INT32 sx = 0;
     INT32 sy = 0;
 
-    sx = (state->roz_mode & 0x800) ? 512 : 256;
-    sy = (state->roz_mode & 0x800) ? 512 : 256;
+    switch(state->roz_mode & 0x0f00)
+    {
+        case 0x600: sx = 64*8; sy = 32*8; break;
+        case 0xa00: sx = 128*8; sy = 32*8; break;
+        case 0xc00: sx = 64*8; sy = 64*8; break;
+        default: sx = 32*8; sy = 32*8; break;
+    }
 
     if (X & 0x08000000) X |= 0xf0000000;
     if (Y & 0x08000000) Y |= 0xf0000000;
@@ -272,9 +284,21 @@ static void draw_roz_bitmap_scanline(running_machine *machine, bitmap_t *roz_bit
 
     for(int x = 0; x < 320; x++)
     {
-        if(!(pixx < 0 || pixy < 0 || pixx >= sx || pixy >= sy))
+        if(state->roz_mode & 0x20)
         {
+            while(pixx < 0) pixx += sx;
+            while(pixy < 0) pixy += sy;
+            while(pixx >= sx) pixx -= sx;
+            while(pixy >= sy) pixy -= sy;
+
             scanline[x] = *BITMAP_ADDR16(roz_bitmap, pixy, pixx);
+        }
+        else
+        {
+            if(pixx >= 0 && pixy >= 0 && pixx < sx && pixy < sy)
+            {
+                scanline[x] = *BITMAP_ADDR16(roz_bitmap, pixy, pixx);
+            }
         }
 
         rx += dx;
@@ -283,27 +307,6 @@ static void draw_roz_bitmap_scanline(running_machine *machine, bitmap_t *roz_bit
         pixx = rx >> 8;
         pixy = ry >> 8;
     }
-
-    /*
-    for (y=0;y<ysize;y++)
-    {
-        for (x=0;x<xsize;x++)
-        {
-            int tile, flipx, flipy, pal;
-            tile = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0x03ff) | tile_bank;
-            flipx = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0x0800) ? 1 : 0;
-            flipy = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0x0400) ? 1 : 0;
-            pal = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0xf000) >> 12;
-
-            drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly,0);
-            drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+xsize*8,(y*8)-scrolly,0);
-            drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx,(y*8)-scrolly+ysize*8,0);
-            drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)-scrollx+xsize*8,(y*8)-scrolly+ysize*8,0);
-
-            count++;
-        }
-    }
-    */
 
     state->roz_changed = 0;
 }
@@ -314,22 +317,28 @@ static void draw_roz(running_machine *machine, const rectangle *cliprect)
     UINT16 *supracan_vram = state->vram;
     UINT32 roz_base_addr = state->roz_base_addr;
     int region = 0;
+    UINT16 tile_bank = 0;
 //  int gfx_mode;
 
     switch(state->roz_mode & 3) //FIXME: fix gfx bpp order
     {
-        case 0: return; //1bpp! Used on BIOS logo
+        case 0: return;//region = 2; tile_bank = (state->roz_tile_bank & 0xf000) >> 3; break;
         case 1: region = 2; break;
-        case 2: region = 1; break;
+        case 2: region = 1; tile_bank = (state->roz_tile_bank & 0xf000) >> 3; break;
         case 3: region = 0; break;
     }
 
-    int xsize = (state->roz_mode & 0x800) ? 64 : 32;
-    int ysize = (state->roz_mode & 0x800) ? 64 : 32;
+    int xsize = 32;
+    int ysize = 32;
+    switch(state->roz_mode & 0x0f00)
+    {
+        case 0x600: xsize = 64; ysize = 32; break;
+        case 0xa00: xsize = 128; ysize = 32; break;
+        case 0xc00: xsize = 64; ysize = 64; break;
+        default: xsize = 32; ysize = 32; break;
+    }
 
     UINT32 count = (0);
-
-    UINT16 tile_bank = (state->roz_tile_bank & 0xf000) >> 3; //FIXME: check this
 
     bitmap_t *roz_bitmap = state->roz_bitmap;
     for (int y = 0; y < ysize; y++)
@@ -347,55 +356,6 @@ static void draw_roz(running_machine *machine, const rectangle *cliprect)
             count++;
         }
     }
-
-    /*
-	supracan_state *state = (supracan_state *)machine->driver_data;
-	UINT16 *supracan_vram = state->vram;
-	UINT32 roz_base_addr = state->roz_base_addr;
-	UINT32 count = 0;
-	int xsize,ysize;
-
-	//roz_mode & 0x20 enables roz capabilities
-
-    int region = 0;
-    switch(state->roz_mode & 3)
-    {
-        case 0: region = 3; break;
-        case 1: region = 2; break;
-        case 2: region = 1; break;
-        case 3: region = 0; break;
-    }
-
-    if((state->roz_mode & 0xe00) == 0xc00)
-    {
-        xsize = ysize = 64;
-    }
-    else
-    {
-        xsize = ysize = (state->roz_mode & 0x200) ? 64 : 32;
-    }
-
-    int tile_bank = (state->roz_tile_bank & 0xf000) >> 3;
-
-    //bitmap_t *roz_bitmap = state->roz_bitmap;
-    for(int y = 0; y < ysize; y++)
-    {
-        for(int x = 0; x < xsize; x++)
-        {
-            int tile = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0x03ff) | tile_bank;
-            int flipx = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0x0800) ? 1 : 0;
-            int flipy = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0x0400) ? 1 : 0;
-            int pal = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0xf000) >> 12;
-
-            drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8),(y*8),0);
-            drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)+xsize*8,(y*8),0);
-            drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8),(y*8)+ysize*8,0);
-            drawgfx_transpen(bitmap,cliprect,machine->gfx[region],tile,pal,flipx,flipy,(x*8)+xsize*8,(y*8)+ysize*8,0);
-
-            count++;
-        }
-    }
-    */
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
@@ -515,7 +475,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-/*
+#if DRAW_DEBUG_ROZ
 static void draw_debug_roz(running_machine *machine, bitmap_t *bitmap)
 {
     supracan_state *state = (supracan_state *)machine->driver_data;
@@ -524,10 +484,26 @@ static void draw_debug_roz(running_machine *machine, bitmap_t *bitmap)
     for(int y = 0; y < 240; y++)
     {
         float x = ((float)supracan_vram[state->roz_unk_base0 + y] / 1024.0f) * 256.0f;
-        *BITMAP_ADDR16(bitmap, y, (int)x) = 0xffff;
+        *BITMAP_ADDR16(bitmap, y, (int)x) = 1;
+
+        INT32 temp = supracan_vram[state->roz_unk_base1 + y*2] << 16;
+        temp |= supracan_vram[state->roz_unk_base1 + y*2 + 1];
+        x = ((float)temp / 65536.0f) * 128.0f;
+        if(x > -160 && x < 160)
+        {
+            *BITMAP_ADDR16(bitmap, y, (int)x + 160) = 2;
+        }
+
+        temp = supracan_vram[state->roz_unk_base2 + y*2] << 16;
+        temp |= supracan_vram[state->roz_unk_base2 + y*2 + 1];
+        x = ((float)temp / 65536.0f) * 128.0f;
+        if(x > -160 && x < 160)
+        {
+            *BITMAP_ADDR16(bitmap, y, (int)x + 160) = 4;
+        }
     }
 }
-*/
+#endif
 
 static VIDEO_UPDATE( supracan )
 {
@@ -569,45 +545,62 @@ static VIDEO_UPDATE( supracan )
 	}
 #endif
 
-#if 0
-	count = 0x4200/2;
-
-	for (y=0;y<16;y++)
-	{
-		for (x=0;x<16;x++)
-		{
-			int tile;
-
-			tile = (supracan_vram[count] & 0x01ff);
-			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,0,0,0,x*8,y*8,0);
-			count++;
-		}
-	}
-#endif
-
 	if(state->video_flags & 0x20) //guess, not tested
 		draw_tilemap(screen->machine,bitmap,cliprect,2);
 
-	if((state->tilemap_flags[1] & 0x7000) < (state->tilemap_flags[0] & 0x7000)) //pri number?
-	{
-		if(state->video_flags & 0x80)
-			draw_tilemap(screen->machine,bitmap,cliprect,0);
-		if(state->video_flags & 0x40)
-			draw_tilemap(screen->machine,bitmap,cliprect,1);
-	}
-	else
-	{
-		if(state->video_flags & 0x40)
-			draw_tilemap(screen->machine,bitmap,cliprect,1);
-		if(state->video_flags & 0x80)
-			draw_tilemap(screen->machine,bitmap,cliprect,0);
-	}
+    int pri_order[3] = { 0, 0, 0 };
+    int pri_index[3] = { 0, 1, 2 };
+
+    pri_order[0] = state->tilemap_flags[0] >> 13;
+    pri_order[1] = state->tilemap_flags[1] >> 13;
+    pri_order[2] = state->roz_mode >> 13;
+
+    // Evil bubble sort, but who cares, it's 3 entries long...
+    for(int i1 = 0; i1 < 3; i1++)
+    {
+        for(int i2 = i1; i2 < 3; i2++)
+        {
+            if(pri_order[i2] > pri_order[i1])
+            {
+                int temp = pri_order[i1];
+                pri_order[i1] = pri_order[i2];
+                pri_order[i2] = temp;
+
+                temp = pri_index[i1];
+                pri_index[i1] = pri_index[i2];
+                pri_index[i2] = temp;
+            }
+        }
+    }
+
+    for(int index = 0; index < 3; index++)
+    {
+        switch(pri_index[index])
+        {
+            case 0:
+                if(state->video_flags & 0x80)
+                {
+                    draw_tilemap(screen->machine,bitmap,cliprect, 0);
+                }
+                break;
+            case 1:
+                if(state->video_flags & 0x40)
+                {
+                    draw_tilemap(screen->machine,bitmap,cliprect, 1);
+                }
+                break;
+            case 2:
+                copybitmap_trans(bitmap,state->roz_final_bitmap,0,0,0,0,cliprect,0);
+                break;
+        }
+    }
+
 	if(state->video_flags & 8)
 		draw_sprites(screen->machine,bitmap,cliprect);
 
-    copybitmap_trans(bitmap,state->roz_final_bitmap,0,0,0,0,cliprect,0);
-
-    //draw_debug_roz(screen->machine,bitmap);
+#if DRAW_DEBUG_ROZ
+    draw_debug_roz(screen->machine,bitmap);
+#endif
 
 	return 0;
 }
@@ -651,7 +644,7 @@ static WRITE16_HANDLER( supracan_dma_w )
 		case 0x0a/2: // Control
 		case 0x1a/2:
 			//if(acan_dma_regs.dest != 0xf00200)
-			printf("%08x %08x %02x %04x\n",acan_dma_regs->source[ch],acan_dma_regs->dest[ch],acan_dma_regs->count[ch] + 1,data);
+			//printf("%08x %08x %02x %04x\n",acan_dma_regs->source[ch],acan_dma_regs->dest[ch],acan_dma_regs->count[ch] + 1,data);
 			if(data & 0x8800)
 			{
 				//if(data != 0x9800 && data != 0x8800)
@@ -660,7 +653,7 @@ static WRITE16_HANDLER( supracan_dma_w )
 				//}
 //              if(data & 0x2000)
 //                  acan_dma_regs->source-=2;
-				verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1, data);
+				//verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_dma_regs->source[ch], acan_dma_regs->dest[ch], acan_dma_regs->count[ch] + 1, data);
 
 				for(i = 0; i <= acan_dma_regs->count[ch]; i++)
 				{
@@ -991,14 +984,9 @@ static WRITE16_HANDLER( supracan_video_w )
 
 	switch(offset)
 	{
-		case 0x18/2: // Source address MSW
-			acan_sprdma_regs->src &= 0x0000ffff;
-			acan_sprdma_regs->src |= data << 16;
-			break;
-		case 0x1a/2: // Source address LSW
-			acan_sprdma_regs->src &= 0xffff0000;
-			acan_sprdma_regs->src |= data;
-			break;
+        case 0x10/2: // Byte count
+            acan_sprdma_regs->count = data;
+            break;
 		case 0x12/2: // Destination address MSW
 			acan_sprdma_regs->dst &= 0x0000ffff;
 			acan_sprdma_regs->dst |= data << 16;
@@ -1007,12 +995,23 @@ static WRITE16_HANDLER( supracan_video_w )
 			acan_sprdma_regs->dst &= 0xffff0000;
 			acan_sprdma_regs->dst |= data;
 			break;
-		case 0x10/2: // Byte count
-			acan_sprdma_regs->count = data;
-			break;
+        case 0x16/2: // Source word increment
+            acan_sprdma_regs->dst_inc = data;
+            break;
+        case 0x18/2: // Source address MSW
+            acan_sprdma_regs->src &= 0x0000ffff;
+            acan_sprdma_regs->src |= data << 16;
+            break;
+        case 0x1a/2: // Source address LSW
+            acan_sprdma_regs->src &= 0xffff0000;
+            acan_sprdma_regs->src |= data;
+            break;
+        case 0x1c/2: // Source word increment
+            acan_sprdma_regs->src_inc = data;
+            break;
 		case 0x1e/2:
-			printf("* %08x %08x %04x %04x\n",acan_sprdma_regs->src,acan_sprdma_regs->dst,acan_sprdma_regs->count,data);
-			verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_sprdma_regs->src, acan_sprdma_regs->dst, acan_sprdma_regs->count + 1, data);
+			//printf("* %08x %08x %04x %04x\n",acan_sprdma_regs->src,acan_sprdma_regs->dst,acan_sprdma_regs->count,data);
+			//verboselog(space->machine, 0, "supracan_dma_w: Kicking off a DMA from %08x to %08x, %d bytes (%04x)\n", acan_sprdma_regs->src, acan_sprdma_regs->dst, acan_sprdma_regs->count + 1, data);
 
 			/* TODO: what's 0x2000 and 0x4000 for? */
 			if(data & 0x8000)
@@ -1025,14 +1024,14 @@ static WRITE16_HANDLER( supracan_video_w )
 					if(data & 0x0100) //dma 0x00 fill (or fixed value?)
 					{
 						memory_write_word(space, acan_sprdma_regs->dst, 0);
-						acan_sprdma_regs->dst+=2;
+                        acan_sprdma_regs->dst+=2 * acan_sprdma_regs->dst_inc;
 						//memset(supracan_vram,0x00,0x020000);
 					}
 					else
 					{
 						memory_write_word(space, acan_sprdma_regs->dst, memory_read_word(space, acan_sprdma_regs->src));
-						acan_sprdma_regs->dst+=2;
-						acan_sprdma_regs->src+=2;
+                        acan_sprdma_regs->dst+=2 * acan_sprdma_regs->dst_inc;
+                        acan_sprdma_regs->src+=2 * acan_sprdma_regs->src_inc;
 					}
 				}
 			}
@@ -1056,22 +1055,23 @@ static WRITE16_HANDLER( supracan_video_w )
 			break;
 		case 0x20/2: state->spr_base_addr = data << 2; break;
 		case 0x22/2: state->spr_limit = data+1; break;
-		case 0x26/2: state->spr_flags = data; break;
-		case 0x100/2: state->tilemap_flags[0] = data; break;
-        case 0x104/2: state->tilemap_scrollx[0] = data; break;
-		case 0x106/2: state->tilemap_scrolly[0] = data; break;
-		case 0x108/2: state->tilemap_base_addr[0] = (data) << 1; break;
-		case 0x10a/2: state->tilemap_mode[0] = data; break;
-		case 0x120/2: state->tilemap_flags[1] = data; break;
-		case 0x124/2: state->tilemap_scrollx[1] = data; break;
-		case 0x126/2: state->tilemap_scrolly[1] = data; break;
-		case 0x128/2: state->tilemap_base_addr[1] = (data) << 1; break;
-		case 0x12a/2: state->tilemap_mode[1] = data; break;
-        case 0x140/2: state->tilemap_flags[2] = data; verboselog(space->machine, 5, "tilemap_flags[2] = %04x\n", data); break;
-        case 0x144/2: state->tilemap_scrollx[2] = data; verboselog(space->machine, 5, "tilemap_scrollx[2] = %04x\n", data); break;
-        case 0x146/2: state->tilemap_scrolly[2] = data; verboselog(space->machine, 5, "tilemap_scrolly[2] = %04x\n", data); break;
-        case 0x148/2: state->tilemap_base_addr[2] = (data) << 1; verboselog(space->machine, 5, "tilemap_base_addr[2] = %05x\n", data << 1); break;
-        case 0x14a/2: state->tilemap_mode[2] = data; verboselog(space->machine, 5, "tilemap_mode[2] = %04x\n", data); break;
+        case 0x24/2: state->spr_yline = data; verboselog(space->machine, 0, "spr_yline = %04x\n", data); break;
+        case 0x26/2: state->spr_flags = data; verboselog(space->machine, 0, "spr_flags = %04x\n", data); break;
+        case 0x100/2: state->tilemap_flags[0] = data; verboselog(space->machine, 0, "tilemap_flags[0] = %04x\n", data); break;
+        case 0x104/2: state->tilemap_scrollx[0] = data; verboselog(space->machine, 0, "tilemap_scrollx[0] = %04x\n", data); break;
+        case 0x106/2: state->tilemap_scrolly[0] = data; verboselog(space->machine, 0, "tilemap_scrolly[0] = %04x\n", data); break;
+        case 0x108/2: state->tilemap_base_addr[0] = (data) << 1; verboselog(space->machine, 0, "tilemap_base_addr[0] = %05x\n", data << 2); break;
+        case 0x10a/2: state->tilemap_mode[0] = data; verboselog(space->machine, 0, "tilemap_mode[0] = %04x\n", data); break;
+        case 0x120/2: state->tilemap_flags[1] = data; verboselog(space->machine, 0, "tilemap_flags[1] = %04x\n", data); break;
+        case 0x124/2: state->tilemap_scrollx[1] = data; verboselog(space->machine, 0, "tilemap_scrollx[1] = %04x\n", data); break;
+        case 0x126/2: state->tilemap_scrolly[1] = data; verboselog(space->machine, 0, "tilemap_scrolly[1] = %04x\n", data); break;
+        case 0x128/2: state->tilemap_base_addr[1] = (data) << 1; verboselog(space->machine, 0, "tilemap_base_addr[1] = %05x\n", data << 2); break;
+        case 0x12a/2: state->tilemap_mode[1] = data; verboselog(space->machine, 0, "tilemap_mode[1] = %04x\n", data); break;
+        case 0x140/2: state->tilemap_flags[2] = data; verboselog(space->machine, 0, "tilemap_flags[2] = %04x\n", data); break;
+        case 0x144/2: state->tilemap_scrollx[2] = data; verboselog(space->machine, 0, "tilemap_scrollx[2] = %04x\n", data); break;
+        case 0x146/2: state->tilemap_scrolly[2] = data; verboselog(space->machine, 0, "tilemap_scrolly[2] = %04x\n", data); break;
+        case 0x148/2: state->tilemap_base_addr[2] = (data) << 1; verboselog(space->machine, 0, "tilemap_base_addr[2] = %05x\n", data << 2); verboselog(space->machine, 0, "tilemap_base_addr[2] = %05x\n", data << 1); break;
+        case 0x14a/2: state->tilemap_mode[2] = data; verboselog(space->machine, 0, "tilemap_mode[2] = %04x\n", data); break;
 
 		/* 0x180-0x19f are roz tilemap related regs */
         case 0x180/2: state->roz_mode = data; verboselog(space->machine, 5, "roz_mode = %04x\n", data); break;
@@ -1180,7 +1180,6 @@ static const gfx_layout supracan_gfx2bpp =
 	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16 },
 	8*16
 };
-
 
 static GFXDECODE_START( supracan )
 	GFXDECODE_ENTRY( "ram_gfx",  0, supracan_gfx8bpp,   0, 1 )
