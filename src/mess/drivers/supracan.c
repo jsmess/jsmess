@@ -222,15 +222,9 @@ static void draw_roz_bitmap_scanline(running_machine *machine, bitmap_t *roz_bit
 
     INT32 sx = 0;
     INT32 sy = 0;
-    if((state->roz_mode & 0xe00) == 0xc00)
-    {
-        sx = 512;
-        sy = 512;
-    }
-    else
-    {
-        sx = sy = (state->roz_mode & 0x200) ? 512 : 512;
-    }
+
+    sx = (state->roz_mode & 0x800) ? 512 : 256;
+    sy = (state->roz_mode & 0x800) ? 512 : 256;
 
     if (X & 0x08000000) X |= 0xf0000000;
     if (Y & 0x08000000) Y |= 0xf0000000;
@@ -319,13 +313,8 @@ static void draw_roz(running_machine *machine, const rectangle *cliprect)
     supracan_state *state = (supracan_state *)machine->driver_data;
     UINT16 *supracan_vram = state->vram;
     UINT32 roz_base_addr = state->roz_base_addr;
-    UINT32 count;
-    int x,y;
-    int scrollx,scrolly;
     int region = 0;
 //  int gfx_mode;
-    int xsize,ysize;
-    UINT16 tile_bank;
 
     switch(state->roz_mode & 3) //FIXME: fix gfx bpp order
     {
@@ -335,28 +324,17 @@ static void draw_roz(running_machine *machine, const rectangle *cliprect)
         case 3: region = 0; break;
     }
 
-    if((state->roz_mode & 0xe00) == 0xc00)
-    {
-        xsize = 64;
-        ysize = 64;
-    }
-    else
-    {
-        xsize = ysize = state->roz_mode & 0x200 ? 64 : 32;
-    }
+    int xsize = (state->roz_mode & 0x800) ? 64 : 32;
+    int ysize = (state->roz_mode & 0x800) ? 64 : 32;
 
-    count = (0);
-    scrollx = (state->roz_scrollx >> 8) & 0x1ff;
-    scrolly = (state->roz_scrolly >> 8) & 0x1ff;
+    UINT32 count = (0);
 
-    //roz_mode & 0x20 enables roz capabilities
-
-    tile_bank = (state->roz_tile_bank & 0xf000) >> 3; //FIXME: check this
+    UINT16 tile_bank = (state->roz_tile_bank & 0xf000) >> 3; //FIXME: check this
 
     bitmap_t *roz_bitmap = state->roz_bitmap;
-    for (y=0;y<ysize;y++)
+    for (int y = 0; y < ysize; y++)
     {
-        for (x=0;x<xsize;x++)
+        for (int x = 0; x < xsize; x++)
         {
             int tile, flipx, flipy, pal;
             tile = (supracan_vram[roz_base_addr | (count & 0xfff)] & 0x03ff) | tile_bank;
@@ -979,10 +957,10 @@ static TIMER_CALLBACK( supracan_video_callback )
 
     if (vpos == 0)
     {
+        bitmap_fill(state->roz_final_bitmap, video_screen_get_visible_area(machine->primary_screen), 0);
+        bitmap_fill(state->roz_bitmap, video_screen_get_visible_area(machine->primary_screen), 0);
         if(state->video_flags & 4)
         {
-            bitmap_fill(state->roz_final_bitmap, video_screen_get_visible_area(machine->primary_screen), 0);
-            bitmap_fill(state->roz_bitmap, video_screen_get_visible_area(machine->primary_screen), 0);
             draw_roz(machine, video_screen_get_visible_area(machine->primary_screen));
         }
     }
@@ -1064,9 +1042,11 @@ static WRITE16_HANDLER( supracan_video_w )
 			}
 			break;
 		case 0x08/2:
-			state->video_flags = data;
 			{
-				rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
+                verboselog(space->machine, 5, "video_flags = %04x\n", data);
+                state->video_flags = data;
+
+                rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
 
 				visarea.min_x = visarea.min_y = 0;
 				visarea.max_y = 240 - 1;
@@ -1087,24 +1067,24 @@ static WRITE16_HANDLER( supracan_video_w )
 		case 0x126/2: state->tilemap_scrolly[1] = data; break;
 		case 0x128/2: state->tilemap_base_addr[1] = (data) << 1; break;
 		case 0x12a/2: state->tilemap_mode[1] = data; break;
-		case 0x140/2: state->tilemap_flags[2] = data; break;
-		case 0x144/2: state->tilemap_scrollx[2] = data; break;
-		case 0x146/2: state->tilemap_scrolly[2] = data; break;
-		case 0x148/2: state->tilemap_base_addr[2] = (data) << 1; break;
-		case 0x14a/2: state->tilemap_mode[2] = data; break;
+        case 0x140/2: state->tilemap_flags[2] = data; verboselog(space->machine, 5, "tilemap_flags[2] = %04x\n", data); break;
+        case 0x144/2: state->tilemap_scrollx[2] = data; verboselog(space->machine, 5, "tilemap_scrollx[2] = %04x\n", data); break;
+        case 0x146/2: state->tilemap_scrolly[2] = data; verboselog(space->machine, 5, "tilemap_scrolly[2] = %04x\n", data); break;
+        case 0x148/2: state->tilemap_base_addr[2] = (data) << 1; verboselog(space->machine, 5, "tilemap_base_addr[2] = %05x\n", data << 1); break;
+        case 0x14a/2: state->tilemap_mode[2] = data; verboselog(space->machine, 5, "tilemap_mode[2] = %04x\n", data); break;
 
 		/* 0x180-0x19f are roz tilemap related regs */
-        case 0x180/2: state->roz_mode = data; verboselog(space->machine, 0, "roz_mode = %04x\n", data); break;
-        case 0x184/2: state->roz_scrollx = (data << 16) | (state->roz_scrollx & 0xffff); state->roz_changed |= 1; verboselog(space->machine, 0, "roz_scrollx = %08x\n", state->roz_scrollx); break;
-        case 0x186/2: state->roz_scrollx = (data) | (state->roz_scrollx & 0xffff0000); state->roz_changed |= 1; verboselog(space->machine, 0, "roz_scrollx = %08x\n", state->roz_scrollx); break;
-        case 0x188/2: state->roz_scrolly = (data << 16) | (state->roz_scrolly & 0xffff); state->roz_changed |= 2; verboselog(space->machine, 0, "roz_scrolly = %08x\n", state->roz_scrolly); break;
-        case 0x18a/2: state->roz_scrolly = (data) | (state->roz_scrolly & 0xffff0000); state->roz_changed |= 2; verboselog(space->machine, 0, "roz_scrolly = %08x\n", state->roz_scrolly); break;
+        case 0x180/2: state->roz_mode = data; verboselog(space->machine, 5, "roz_mode = %04x\n", data); break;
+        case 0x184/2: state->roz_scrollx = (data << 16) | (state->roz_scrollx & 0xffff); state->roz_changed |= 1; break;
+        case 0x186/2: state->roz_scrollx = (data) | (state->roz_scrollx & 0xffff0000); state->roz_changed |= 1; break;
+        case 0x188/2: state->roz_scrolly = (data << 16) | (state->roz_scrolly & 0xffff); state->roz_changed |= 2; break;
+        case 0x18a/2: state->roz_scrolly = (data) | (state->roz_scrolly & 0xffff0000); state->roz_changed |= 2; break;
         case 0x18c/2: state->roz_coeffa = data; break;
         case 0x18e/2: state->roz_coeffb = data; break;
         case 0x190/2: state->roz_coeffc = data; break;
         case 0x192/2: state->roz_coeffd = data; break;
-        case 0x194/2: state->roz_base_addr = (data) << 1; verboselog(space->machine, 0, "roz_base_addr = %05x\n", data << 2); break;
-        case 0x196/2: state->roz_tile_bank = data; verboselog(space->machine, 0, "roz_tile_bank = %04x\n", data); break; //tile bank
+        case 0x194/2: state->roz_base_addr = (data) << 1; verboselog(space->machine, 5, "roz_base_addr = %05x\n", data << 2); break;
+        case 0x196/2: state->roz_tile_bank = data; verboselog(space->machine, 5, "roz_tile_bank = %04x\n", data); break; //tile bank
         case 0x198/2: verboselog(space->machine, 0, "roz_unk_base0 = %05x\n", data << 2); state->roz_unk_base0 = data << 1; break;
         case 0x19a/2: verboselog(space->machine, 0, "roz_unk_base1 = %05x\n", data << 2); state->roz_unk_base1 = data << 1; break;
         case 0x19e/2: verboselog(space->machine, 0, "roz_unk_base2 = %05x\n", data << 2); state->roz_unk_base2 = data << 1; break;
