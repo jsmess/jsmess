@@ -13,6 +13,7 @@
     - run a first time without doing anything;
     - call the debugger then soft reset (the debugger will be called after the reset because the CPU is into an halt state);
     - wpiset 35,1,r -> do eip=90 -> bpset f926c -> do eip=128d -> run until HALT
+
     - soft reset -> wpiset 35,1,r -> do eip=90 again -> run until HALT
     - soft reset -> modify I/O $43d with a 0x02 (should bankswitch with the basic ROM) -> run
     - modify memory 0x53c from 0xc4 to 0x84 two times
@@ -316,6 +317,15 @@ static READ8_HANDLER( sys_port_r )
 	if(cpu_get_pc(space->cpu) == 0xf9088)
 		return 0x18; //FIXME: kludge to get over a probable PPI bug.
 
+	if(cpu_get_pc(space->cpu) == 0xf90b2)
+		return 0x38;
+
+	if(cpu_get_pc(space->cpu) == 0xf90e9)
+		return 0x38;
+
+	if(cpu_get_pc(space->cpu) == 0xf9233)
+		return 0x38;
+
 	if(offset & 1)
 		return i8255a_r(devtag_get_device(space->machine, "ppi8255_0"), (offset & 6) >> 1);
 
@@ -565,6 +575,9 @@ static WRITE8_HANDLER( wram_sel_w )
 
 static READ8_HANDLER( pc98_mouse_r )
 {
+	if(offset == 5)
+		return 0xfb;
+
 	//TODO: 0x7fd8 bit 6 controls testing of bank 3 (0x80000-0x9ffff), afaik the mouse ppi is at odd addresses...
 	return 0xff;
 }
@@ -587,6 +600,9 @@ static ADDRESS_MAP_START( pc9801_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x000a8000, 0x000bffff) AM_READWRITE(gfx_bitmap_ram_r,gfx_bitmap_ram_w)
 	AM_RANGE(0x000c0000, 0x000dffff) AM_READWRITE(wram_ide_r,wram_ide_w)
 	AM_RANGE(0x000e0000, 0x000fffff) AM_ROMBANK("bank1") AM_WRITE8(rom_bank_w,0xffffffff)
+	AM_RANGE(0x00100000, 0x007fffff) AM_RAM //extended memory, 7168 KB for now
+	AM_RANGE(0x00800000, 0x00ffffff) AM_NOP
+
 	AM_RANGE(0xfffe0000, 0xffffffff) AM_ROMBANK("bank1") AM_WRITE8(rom_bank_w,0xffffffff)
 ADDRESS_MAP_END
 
@@ -1033,7 +1049,65 @@ ROM_START( pc9821 )
 	ROM_LOAD( "font.rom", 0x00000, 0x46800, BAD_DUMP CRC(a61c0649) SHA1(554b87377d176830d21bd03964dc71f8e98676b1) )
 ROM_END
 
+static DRIVER_INIT( pc9801 )
+{
+	UINT8 *ROM = memory_region(machine, "cpudata");
+
+	/* patch unimplemented opcodes verr / verw */
+	ROM[0xf90be & 0x3ffff] = 0x90;
+	ROM[0xf90bf & 0x3ffff] = 0x90;
+	ROM[0xf90c0 & 0x3ffff] = 0x90;
+
+	ROM[0xf90c3 & 0x3ffff] = 0x90;
+	ROM[0xf90c4 & 0x3ffff] = 0x90;
+	ROM[0xf90c5 & 0x3ffff] = 0x90;
+
+	ROM[0xf90d8 & 0x3ffff] = 0x90;
+	ROM[0xf90d9 & 0x3ffff] = 0x90;
+	ROM[0xf90da & 0x3ffff] = 0x90;
+
+	ROM[0xf90dd & 0x3ffff] = 0x90;
+	ROM[0xf90de & 0x3ffff] = 0x90;
+	ROM[0xf90df & 0x3ffff] = 0x90;
+
+	/* patch verr / verw checks */
+	ROM[0xf90c1 & 0x3ffff] = 0x90;
+	ROM[0xf90c2 & 0x3ffff] = 0x90;
+
+	ROM[0xf90c6 & 0x3ffff] = 0x90;
+	ROM[0xf90c7 & 0x3ffff] = 0x90;
+
+	ROM[0xf90e0 & 0x3ffff] = 0x90;
+	ROM[0xf90e1 & 0x3ffff] = 0x90;
+
+	/* patch lldt / sldt checks (it tests a word at 0xf8070, and it wants zeroes on bits 8-15). */
+	ROM[0xf9103 & 0x3ffff] = 0x90;
+	ROM[0xf9104 & 0x3ffff] = 0x90;
+
+	/* patch ltr / str checks (it tests a word at 0xf8060, and it wants zeroes on bits 8-15).  */
+	ROM[0xf9118 & 0x3ffff] = 0x90;
+	ROM[0xf9119 & 0x3ffff] = 0x90;
+	ROM[0xf911a & 0x3ffff] = 0x90;
+
+	/* patch unimplemented lar opcode */
+	ROM[0xf91f6 & 0x3ffff] = 0x90;
+	ROM[0xf91f7 & 0x3ffff] = 0x90;
+	ROM[0xf91f8 & 0x3ffff] = 0x90;
+
+	/* patch lar checks */
+	ROM[0xf91fe & 0x3ffff] = 0x90;
+	ROM[0xf91ff & 0x3ffff] = 0x90;
+
+	/* can't avoid this??? */
+	ROM[0xf9258 & 0x3ffff] = 0xeb;
+	ROM[0xf9259 & 0x3ffff] = 0x33;
+
+	/* patch ROM checksum */
+	ROM[0xf8595 & 0x3ffff] = 0x90;
+	ROM[0xf8596 & 0x3ffff] = 0x90;
+}
+
 
 /*    YEAR  NAME      PARENT   COMPAT MACHINE   INPUT     INIT    COMPANY                        FULLNAME    FLAGS */
-COMP( 1981, pc9801,   0,       0,     pc9801,   pc9801,   0,      "Nippon Electronic Company",   "PC-9801",  GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1981, pc9801,   0,       0,     pc9801,   pc9801,   pc9801,      "Nippon Electronic Company",   "PC-9801",  GAME_NOT_WORKING | GAME_NO_SOUND)
 COMP( 1993, pc9821,   0,       0,     pc9801,   pc9801,   0,      "Nippon Electronic Company",   "PC-9821 (98MATE)",  GAME_NOT_WORKING | GAME_NO_SOUND)
