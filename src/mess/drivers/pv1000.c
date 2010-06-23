@@ -13,29 +13,30 @@
 #define SOUND_PV1000	DEVICE_GET_INFO_NAME(pv1000_sound)
 
 
-typedef struct _pvaudio_voice pvaudio_voice;
-struct _pvaudio_voice
-{
-	UINT32 count;
-	UINT16 period;
-	UINT8  val;
-};
+class d65010_state {
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, d65010_state(machine)); }
+	d65010_state(running_machine &machine) { }
 
+	UINT8	io_regs[8];
+	UINT8	fd_data;
+	struct
+	{
+		UINT32	count;
+		UINT16	period;
+		UINT8	val;
+	}		voice[4];
 
-typedef struct _pvaudio_state pvaudio_state;
-struct _pvaudio_state
-{
-	sound_stream *pv1000_sh_channel;
+	sound_stream	*sh_channel;
+	emu_timer		*irq_on_timer;
+	emu_timer		*irq_off_timer;
 
-	pvaudio_voice voice[4];
+	running_device *maincpu;
+	running_device *screen;
 };
 
 
 static UINT8 *pv1000_ram;
-static UINT8 pv1000_io_regs[8];
-static UINT8 pv1000_fd_data;
-static pvaudio_state g_audio;
-
 
 
 static WRITE8_HANDLER( pv1000_io_w );
@@ -67,6 +68,7 @@ static WRITE8_HANDLER( pv1000_gfxram_w )
 
 static WRITE8_HANDLER( pv1000_io_w )
 {
+	d65010_state *state = (d65010_state *)space->machine->driver_data;
 
 	switch ( offset )
 	{
@@ -74,7 +76,7 @@ static WRITE8_HANDLER( pv1000_io_w )
 	case 0x01:
 	case 0x02:
 		//logerror("pv1000_io_w offset=%02x, data=%02x (%03d)\n", offset, data , data);
-		g_audio.voice[offset].period=data;
+		state->voice[offset].period = data;
 	break;
 
 	case 0x03:
@@ -82,17 +84,18 @@ static WRITE8_HANDLER( pv1000_io_w )
 	break;
 
 	case 0x05:
-		pv1000_fd_data = 1;
+		state->fd_data = 1;
 		break;
 	}
 
-	pv1000_io_regs[offset] = data;
+	state->io_regs[offset] = data;
 }
 
 
 static READ8_HANDLER( pv1000_io_r )
 {
-	UINT8 data = pv1000_io_regs[offset];
+	d65010_state *state = (d65010_state *)space->machine->driver_data;
+	UINT8 data = state->io_regs[offset];
 
 //  logerror("pv1000_io_r offset=%02x\n", offset );
 
@@ -101,27 +104,28 @@ static READ8_HANDLER( pv1000_io_r )
 	case 0x04:
 		/* Bit 1 = 1 => Data is available in port FD */
 		/* Bit 0 = 1 => Buffer at port FD is empty */
-		data = pv1000_fd_data ? 0x02 : 0x01;
+		data = ( video_screen_get_vpos( state->screen ) >= 212 && video_screen_get_vpos( state->screen ) <= 220 ) ? 0x01 : 0x00;
+		data |= state->fd_data ? 0x02 : 0x00;
 		break;
 	case 0x05:
 		data = 0;
-		if ( pv1000_io_regs[5] & 0x08 )
+		if ( state->io_regs[5] & 0x08 )
 		{
 			data = input_port_read( space->machine, "IN3" );
 		}
-		if ( pv1000_io_regs[5] & 0x04 )
+		if ( state->io_regs[5] & 0x04 )
 		{
 			data = input_port_read( space->machine, "IN2" );
 		}
-		if ( pv1000_io_regs[5] & 0x02 )
+		if ( state->io_regs[5] & 0x02 )
 		{
 			data = input_port_read( space->machine, "IN1" );
 		}
-		if ( pv1000_io_regs[5] & 0x01 )
+		if ( state->io_regs[5] & 0x01 )
 		{
 			data = input_port_read( space->machine, "IN0" );
 		}
-		pv1000_fd_data = 0;
+		state->fd_data = 0;
 		break;
 	}
 
@@ -208,6 +212,7 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 
 static VIDEO_UPDATE( pv1000 )
 {
+	d65010_state *state = (d65010_state *)screen->machine->driver_data;
 	int x, y;
 
 	for ( y = 0; y < 24; y++ )
@@ -218,7 +223,7 @@ static VIDEO_UPDATE( pv1000 )
 
 			if ( tile < 0xe0 )
 			{
-				tile += ( pv1000_io_regs[7] * 8 );
+				tile += ( state->io_regs[7] * 8 );
 				drawgfx_opaque( bitmap, cliprect, screen->machine->gfx[0], tile, 0, 0, 0, x*8, y*8 );
 			}
 			else
@@ -235,16 +240,17 @@ static VIDEO_UPDATE( pv1000 )
 
 /*
  plgDavid's audio implementation/analysis notes:
-
+ 
  Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
  then by the value of the 6bit period registers.
  This creates a surprisingly accurate pitch range.
-
+ 
  Note: the register periods are inverted.
  */
 
 static STREAM_UPDATE( pv1000_sound_update )
 {
+	d65010_state *state = (d65010_state *)device->machine->driver_data;
 	stream_sample_t *buffer = outputs[0];
 
 	while ( samples > 0 )
@@ -254,18 +260,17 @@ static STREAM_UPDATE( pv1000_sound_update )
 
 		for (size_t i=0;i<3;i++)
 		{
-			pvaudio_voice *v = &g_audio.voice[i];
-			UINT32 per = (0x3F-(v->period & 0x3f));
+			UINT32 per = (0x3F-(state->voice[i].period & 0x3f));
 
 			if( per != 0)//OFF!
-				*buffer += v->val * 8192;
+				*buffer += state->voice[i].val * 8192;
 
-			v->count++;
+			state->voice[i].count++;
 
-			if (v->count >= per)
+			if (state->voice[i].count >= per)
 			{
-			   v->count = 0;
-			   v->val = !v->val;
+			   state->voice[i].count = 0;
+			   state->voice[i].val = !state->voice[i].val;
 			}
 		}
 
@@ -278,7 +283,8 @@ static STREAM_UPDATE( pv1000_sound_update )
 
 static DEVICE_START( pv1000_sound )
 {
-	g_audio.pv1000_sh_channel = stream_create( device, 0, 1, device->clock/1024, 0, pv1000_sound_update );
+	d65010_state *state = (d65010_state *)device->machine->driver_data;
+	state->sh_channel = stream_create( device, 0, 1, device->clock/1024, 0, pv1000_sound_update );
 }
 
 
@@ -296,17 +302,54 @@ static DEVICE_GET_INFO( pv1000_sound )
 }
 
 
-static TIMER_DEVICE_CALLBACK( pv1000_irq )
+/* Interrupt is triggering 16 times during vblank. */
+/* we have chosen to trigger on scanlines 195, 199, 203, 207, 211, 215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255 */
+static TIMER_CALLBACK( d65010_irq_on_cb )
 {
-	running_device *cpu = devtag_get_device( timer->machine, "maincpu" );
-	cpu_set_input_line(cpu, 0, HOLD_LINE);
+	d65010_state *state = (d65010_state *)machine->driver_data;
+	int vpos = video_screen_get_vpos( state->screen );
+	int next_vpos = vpos + 12;
+
+	/* Set IRQ line and schedule release of IRQ line */
+	cpu_set_input_line( state->maincpu, 0, ASSERT_LINE );
+	timer_adjust_oneshot( state->irq_off_timer, video_screen_get_time_until_pos( state->screen, vpos, 380/2 ), 0 );
+
+	/* Schedule next IRQ trigger */
+	if ( vpos >= 255 )
+	{
+		next_vpos = 195;
+	}
+	timer_adjust_oneshot( state->irq_on_timer, video_screen_get_time_until_pos( state->screen, next_vpos, 0 ), 0 );
+}
+
+
+static TIMER_CALLBACK( d65010_irq_off_cb )
+{
+	d65010_state *state = (d65010_state *)machine->driver_data;
+
+	cpu_set_input_line( state->maincpu, 0, CLEAR_LINE );
+}
+
+
+static MACHINE_START( pv1000 )
+{
+	d65010_state *state = (d65010_state *)machine->driver_data;
+
+	state->irq_on_timer = timer_alloc( machine, d65010_irq_on_cb, NULL );
+	state->irq_off_timer = timer_alloc( machine, d65010_irq_off_cb, NULL );
+	state->maincpu = devtag_get_device( machine, "maincpu" );
+	state->screen = devtag_get_device( machine, "screen" );
 }
 
 
 static MACHINE_RESET( pv1000 )
 {
-	pv1000_io_regs[5] = 0;
-	pv1000_fd_data = 0;
+	d65010_state *state = (d65010_state *)machine->driver_data;
+
+	state->io_regs[5] = 0;
+	state->fd_data = 0;
+	timer_adjust_oneshot( state->irq_on_timer, video_screen_get_time_until_pos( state->screen, 195, 0 ), 0 );
+	timer_adjust_oneshot( state->irq_off_timer, attotime_never, 0 );
 }
 
 
@@ -329,19 +372,18 @@ GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( pv1000 )
+	MDRV_DRIVER_DATA( d65010_state )
+
 	MDRV_CPU_ADD( "maincpu", Z80, 17897725/5 )
 	MDRV_CPU_PROGRAM_MAP( pv1000 )
 	MDRV_CPU_IO_MAP( pv1000_io )
 
-	MDRV_TIMER_ADD_PERIODIC("pv1000_irq", pv1000_irq, HZ(240))
-
+	MDRV_MACHINE_START( pv1000 )
 	MDRV_MACHINE_RESET( pv1000 )
 
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_SIZE(256, 192)
-	MDRV_SCREEN_VISIBLE_AREA( 0, 255, 0, 191 )
+	MDRV_SCREEN_RAW_PARAMS( 17897725/3, 380, 0, 256, 262, 0, 192 )
 
 	MDRV_PALETTE_LENGTH( 8 )
 	MDRV_PALETTE_INIT( pv1000 )
