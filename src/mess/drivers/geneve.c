@@ -208,7 +208,7 @@
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "audio/spchroms.h"
-#include "machine/99_peb.h"
+#include "devices/ti99_peb.h"
 #include "machine/994x_ser.h"
 #include "machine/99_dsk.h"
 #include "machine/99_ide.h"
@@ -237,10 +237,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
-	AM_RANGE(0x0100, 0x01ff) AM_READ(geneve_peb_cru_r)
+	AM_RANGE(0x0100, 0x01ff) AM_DEVREAD("per_exp_box", geneve_peb_cru_r)
 
 	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(geneve_peb_mode_cru_w)
+	AM_RANGE(0x0800, 0x0fff) AM_DEVWRITE("per_exp_box", geneve_peb_mode_cru_w)
 ADDRESS_MAP_END
 
 
@@ -271,7 +271,7 @@ static INPUT_PORTS_START(geneve)
 	PORT_START( "HDCTRL" )
 	PORT_CONFNAME( 0x03, 0x00, "HD controller" )
 		PORT_CONFSETTING(    0x00, DEF_STR( None ) )
-//		PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
+//      PORT_CONFSETTING(    0x01, "Nouspikel IDE Controller" )
 //      PORT_CONFSETTING(    0x02, "WHTech SCSI Controller" )
 	PORT_CONFNAME( 0x08, 0x00, "USB-SM card" )
 		PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
@@ -526,9 +526,11 @@ static MACHINE_DRIVER_START(geneve_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
-/*	MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+	MDRV_PBOX_ADD( "per_exp_box", FALSE, inta_callback, intb_callback )
 
-	MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
+/*  MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
+
+    MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
 
 	/* rtc */
 	MDRV_MM58274C_ADD("mm58274c", geneve_mm58274c_interface)

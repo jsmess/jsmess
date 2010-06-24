@@ -57,7 +57,7 @@ TODO:
 #include "audio/spchroms.h"
 #include "devices/cassette.h"
 #include "ti99_4x.h"
-#include "99_peb.h"
+#include "devices/ti99_peb.h"
 #include "994x_ser.h"
 #include "99_dsk.h"
 #include "99_ide.h"
@@ -74,8 +74,6 @@ TODO:
 /* prototypes */
 static READ16_HANDLER ( ti99_rspeech_r );
 static WRITE16_HANDLER ( ti99_wspeech_w );
-
-static void tms9901_set_int1(running_machine *machine, int state);
 
 static void ti99_handset_task(running_machine *machine);
 static void mecmouse_poll(running_machine *machine);
@@ -270,6 +268,9 @@ static UINT8 *sRAM_ptr_8;
 /* Link to the cartridge system. */
 static running_device *cartslots;
 
+/* Link to the Peripheral Expansion Box */
+static running_device *expansion_box;
+
 /*===========================================================================*/
 /*
     General purpose code:
@@ -423,6 +424,8 @@ MACHINE_RESET( ti99 )
 	console_GROMs.raddr_LSB = FALSE;
 	console_GROMs.waddr_LSB = FALSE;
 
+	expansion_box = devtag_get_device(machine, "per_exp_box");
+
 	/* set up scratch pad pointer */
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + offset_sram);
 
@@ -461,12 +464,7 @@ MACHINE_RESET( ti99 )
 	gk_switch[4] = input_port_read(machine, "GKSWITCH4");
 	gk_switch[5] = input_port_read(machine, "GKSWITCH5");
 
-	// Removes all card handlers
-	ti99_peb_init();
-
 	// set up optional expansion hardware
-	ti99_peb_reset(FALSE, tms9901_set_int1, NULL);
-
 	if (has_speech)
 	{
 		static const spchroms_interface speech_intf = { region_speech_rom };
@@ -1499,7 +1497,7 @@ nota:
 /*
     set the state of int1 (called by the peb core)
 */
-static void tms9901_set_int1(running_machine *machine, int state)
+void tms9901_set_int1(running_machine *machine, int state)
 {
 	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 1, state);
 }
@@ -1891,7 +1889,7 @@ static void ti99_sAMSxram_init(running_machine *machine)
 	memory_install_read16_handler(space, 0xa000, 0xffff, 0, 0, ti99_sAMSxramhigh_r);
 	memory_install_write16_handler(space, 0xa000, 0xffff, 0, 0, ti99_sAMSxramhigh_w);
 
-	ti99_peb_set_card_handlers(0x1e00, & sAMS_expansion_handlers);
+	ti99_peb_set_card_handlers(expansion_box, 0x1e00, & sAMS_expansion_handlers);
 
 	sAMS_mapper_on = 0;
 
@@ -2021,12 +2019,12 @@ static void ti99_myarcxram_init(running_machine *machine)
 	{
 	case RAM_FOUNDATION128:	/* 128kb foundation */
 	case RAM_FOUNDATION512:	/* 512kb foundation */
-		ti99_peb_set_card_handlers(0x1e00, & myarc_expansion_handlers);
+		ti99_peb_set_card_handlers(expansion_box, 0x1e00, & myarc_expansion_handlers);
 		break;
 	case RAM_MYARC128:		/* 128kb myarc clone */
 	case RAM_MYARC512:		/* 512kb myarc clone */
-		ti99_peb_set_card_handlers(0x1000, & myarc_expansion_handlers);
-		ti99_peb_set_card_handlers(0x1900, & myarc_expansion_handlers);
+		ti99_peb_set_card_handlers(expansion_box, 0x1000, & myarc_expansion_handlers);
+		ti99_peb_set_card_handlers(expansion_box, 0x1900, & myarc_expansion_handlers);
 		break;
 	default:
 		break;	/* let's just keep GCC's big mouth shut */
@@ -2255,11 +2253,12 @@ WRITE16_HANDLER ( ti99_wv38_w )
 static void ti99_evpc_reset(running_machine *machine)
 {
 	ti99_evpc_DSR = memory_region(machine, region_dsr) + offset_evpc_dsr;
+	running_device *box = devtag_get_device(machine, "per_exp_box");
 
 	RAMEN = 0;
 	evpc_dsr_page = 0;
 
-	ti99_peb_set_card_handlers(0x1400, & evpc_handlers);
+	ti99_peb_set_card_handlers(box, 0x1400, & evpc_handlers);
 }
 
 /*
@@ -2509,6 +2508,8 @@ MACHINE_RESET( ti99_8 )
 	console_GROMs.raddr_LSB = FALSE;
 	console_GROMs.waddr_LSB = FALSE;
 
+	expansion_box = devtag_get_device(machine, "per_exp_box");
+
 	ti99_8_enable_rom_and_ports = 1;		/* ??? maybe there is a pull-up */
 	/* MZ: already setting this in driver init, otherwise machine locks up */
 
@@ -2542,10 +2543,9 @@ MACHINE_RESET( ti99_8 )
 	gk_switch[5] = input_port_read(machine, "GKSWITCH5");
 
 	// Removes all card handlers
-	ti99_peb_init();
+//  ti99_peb_init();
 
 	// set up optional expansion hardware
-	ti99_peb_reset(FALSE, tms9901_set_int1, NULL);
 
 	ti99_8_internal_dsr_reset(machine);
 
@@ -2767,7 +2767,7 @@ READ8_HANDLER( ti99_8_r )
 
 		case 2:
 			/* ff4000 - ff5fff: DSR space */
-			reply = ti99_8_peb_r(space, offset & 0x1fff);
+			reply = ti99_8_peb_r(expansion_box, offset & 0x1fff);
 			break;
 
 		case 3:
@@ -2942,7 +2942,7 @@ WRITE8_HANDLER ( ti99_8_w )
 
 		case 2:
 			/* DSR space */
-			ti99_8_peb_w(space, offset & 0x1fff, data);
+			ti99_8_peb_w(expansion_box, offset & 0x1fff, data);
 			break;
 
 		case 3:
@@ -3016,8 +3016,7 @@ static UINT8 *ti99_8_internal_DSR;
 static void ti99_8_internal_dsr_reset(running_machine *machine)
 {
 	ti99_8_internal_DSR = memory_region(machine, "maincpu") + offset_rom0_8 + 0x4000;
-
-	ti99_peb_set_card_handlers(0x2700, & ti99_8_internal_dsr_handlers);
+	ti99_peb_set_card_handlers(expansion_box, 0x2700, & ti99_8_internal_dsr_handlers);
 }
 
 /* write CRU bit:
@@ -3188,6 +3187,8 @@ MACHINE_RESET( ti99_4p )
 
 	UINT8* mem = memory_region(machine, "maincpu");
 
+	expansion_box = devtag_get_device(machine, "per_exp_box");
+
 	/* set up system ROM and scratch pad pointers */
 	memory_set_bankptr(machine, "bank1", mem + offset_rom0_4p);	/* system ROM */
 	memory_set_bankptr(machine, "bank2", mem + offset_sram_4p);	/* scratch pad */
@@ -3212,12 +3213,7 @@ MACHINE_RESET( ti99_4p )
 	has_usb_sm = input_port_read(machine, "HDCTRL") & HD_USB;
 	has_pcode = input_port_read(machine, "EXTCARD") & EXT_PCODE;
 
-	// Removes all card handlers
-	ti99_peb_init();
-
 	// set up optional expansion hardware
-	ti99_peb_reset(TRUE, tms9901_set_int1, NULL);
-
 	ti99_4p_internal_dsr_reset(machine);
 	ti99_4p_mapper_init(machine);
 	ti99_hsgpl_reset(machine);
@@ -3281,7 +3277,7 @@ static void ti99_4p_mapper_init(running_machine *machine)
 	int i;
 	char bank_name[10];
 	/* Not required at run-time */
-	ti99_peb_set_16bit_card_handlers(0x1e00, & ti99_4p_mapper_handlers);
+	ti99_peb_set_16bit_card_handlers(expansion_box, 0x1e00, & ti99_4p_mapper_handlers);
 
 	ti99_4p_mapper_on = 0;
 
@@ -3403,11 +3399,11 @@ static void ti99_4p_internal_dsr_reset(running_machine *machine)
 	rom6_bank_offset = offset_rom6_4p;
 	ti99_4p_mem = (UINT16 *)mem;
 
-	ti99_peb_set_16bit_card_handlers(0x0f00, & ti99_4p_internal_dsr_handlers);
+	ti99_peb_set_16bit_card_handlers(expansion_box, 0x0f00, &ti99_4p_internal_dsr_handlers);
 
 	ti99_4p_internal_rom6_enable = 0;
-	ti99_4p_peb_set_senila(0);
-	ti99_4p_peb_set_senilb(0);
+	ti99_4p_peb_set_senila(expansion_box, 0);
+	ti99_4p_peb_set_senilb(expansion_box, 0);
 }
 
 /*
@@ -3425,10 +3421,10 @@ static void ti99_4p_internal_dsr_cru_w(running_machine *machine, int offset, int
 		ti99_4p_internal_rom6_enable = data;
 		break;
 	case 2:
-		ti99_4p_peb_set_senila(data);
+		ti99_4p_peb_set_senila(expansion_box, data);
 		break;
 	case 3:
-		ti99_4p_peb_set_senilb(data);
+		ti99_4p_peb_set_senilb(expansion_box, data);
 		break;
 	case 4:
 		/* 0: 16-bit (fast) memory timings */

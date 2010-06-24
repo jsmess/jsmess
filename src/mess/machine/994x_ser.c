@@ -22,7 +22,7 @@
 
 #include "emu.h"
 #include "ti99_4x.h"
-#include "99_peb.h"
+#include "devices/ti99_peb.h"
 #include "tms9902.h"
 #include "994x_ser.h"
 
@@ -174,8 +174,8 @@ static DEVICE_START( ti99_4_rs232 )
 static DEVICE_RESET( ti99_4_rs232 )
 {
 	rs232_DSR = memory_region(device->machine, region_dsr) + offset_rs232_dsr;
-
-	ti99_peb_set_card_handlers(0x1300, & rs232_handlers);
+	running_device *box = devtag_get_device(device->machine, "per_exp_box");
+	ti99_peb_set_card_handlers(box, 0x1300, & rs232_handlers);
 }
 
 static READ8_DEVICE_HANDLER(ti99_4_pio_r)
@@ -402,11 +402,13 @@ static WRITE8_HANDLER(rs232_mem_w)
 */
 static TMS9902_INT_CALLBACK( int_callback_0 )
 {
-	ti99_peb_set_ila_bit(device->machine, inta_rs232_1_bit, INT);
+	running_device *box = devtag_get_device(device->machine, "per_exp_box");
+	ti99_peb_set_ila_bit(box, inta_rs232_1_bit, INT);
 }
 static TMS9902_INT_CALLBACK( int_callback_1 )
 {
-	ti99_peb_set_ila_bit(device->machine, inta_rs232_2_bit, INT);
+	running_device *box = devtag_get_device(device->machine, "per_exp_box");
+	ti99_peb_set_ila_bit(box, inta_rs232_2_bit, INT);
 }
 
 static TMS9902_XMIT_CALLBACK( xmit_callback_0 )

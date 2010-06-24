@@ -32,7 +32,7 @@
 #include "wd17xx.h"
 #include "smc92x4.h"
 #include "ti99_4x.h"  /* required for memory region offsets */
-#include "99_peb.h"
+#include "devices/ti99_peb.h"
 #include "99_dsk.h"
 #include "mm58274c.h"
 #include "devices/flopdrv.h"
@@ -67,6 +67,8 @@ static int DVENA;
 static int motor_on;
 /* count 4.23s from rising edge of motor_on */
 static emu_timer *motor_on_timer;
+
+static running_device *expansion_box;
 
 /*
     Resets the drive geometry. This is required because the heuristic of
@@ -120,12 +122,12 @@ static WRITE_LINE_DEVICE_HANDLER( ti99_fdc_intrq_w )
 	if (state)
 	{
 		DRQ_IRQ_status |= fdc_IRQ;
-		ti99_peb_set_ilb_bit(device->machine, intb_fdc_bit, 1);
+		ti99_peb_set_ilb_bit(expansion_box, intb_fdc_bit, 1);
 	}
 	else
 	{
 		DRQ_IRQ_status &= ~fdc_IRQ;
-		ti99_peb_set_ilb_bit(device->machine, intb_fdc_bit, 0);
+		ti99_peb_set_ilb_bit(expansion_box, intb_fdc_bit, 0);
 	}
 
 	fdc_handle_hold(device->machine);
@@ -159,6 +161,7 @@ const wd17xx_interface ti99_wd17xx_interface =
 void ti99_floppy_controllers_init_all(running_machine *machine)
 {
 	motor_on_timer = timer_alloc(machine, motor_on_timer_callback, NULL);
+	expansion_box = devtag_get_device(machine, "per_exp_box");
 }
 
 /*===========================================================================*/
@@ -202,7 +205,7 @@ void ti99_fdc_reset(running_machine *machine)
 
 	set_all_geometries(machine, FLOPPY_DRIVE_DS_40);
 
-	ti99_peb_set_card_handlers(0x1100, & fdc_handlers);
+	ti99_peb_set_card_handlers(expansion_box, 0x1100, &fdc_handlers);
 	if (fdc) {
 		wd17xx_reset(fdc);		/* resets the fdc */
 		wd17xx_dden_w(fdc, ASSERT_LINE);
@@ -396,7 +399,7 @@ void ti99_ccfdc_reset(running_machine *machine)
 
 	set_all_geometries(machine, FLOPPY_DRIVE_DS_40);
 
-	ti99_peb_set_card_handlers(0x1100, & ccfdc_handlers);
+	ti99_peb_set_card_handlers(expansion_box, 0x1100, &ccfdc_handlers);
 
 	wd17xx_reset(fdc);		/* initialize the floppy disk controller */
 	wd17xx_dden(fdc, CLEAR_LINE);
@@ -618,7 +621,7 @@ void ti99_bwg_reset(running_machine *machine)
 
 	set_all_geometries(machine, FLOPPY_DRIVE_DS_40);
 
-	ti99_peb_set_card_handlers(0x1100, & bwg_handlers);
+	ti99_peb_set_card_handlers(expansion_box, 0x1100, & bwg_handlers);
 
 	wd17xx_reset(fdc);		/* initialize the floppy disk controller */
 	wd17xx_dden_w(fdc, CLEAR_LINE);
@@ -985,11 +988,11 @@ static WRITE_LINE_DEVICE_HANDLER( ti99_hfdc_intrq_w )
 	/* Set INTA */
 	if (state)
 	{
-		ti99_peb_set_ila_bit(device->machine, intb_fdc_bit, 1);
+		ti99_peb_set_ila_bit(expansion_box, intb_fdc_bit, 1);
 	}
 	else
 	{
-		ti99_peb_set_ila_bit(device->machine, intb_fdc_bit, 0);
+		ti99_peb_set_ila_bit(expansion_box, intb_fdc_bit, 0);
 	}
 
 	/* TODO: Check */
@@ -1160,7 +1163,7 @@ void ti99_hfdc_reset(running_machine *machine)
 	DVENA = 0;
 	motor_on = 0;
 
-	ti99_peb_set_card_handlers(0x1100, & hfdc_handlers);
+	ti99_peb_set_card_handlers(expansion_box, 0x1100, & hfdc_handlers);
 
 	if ((input_port_read(machine, "DISKCTRL") & DISK_HFDC)
 		&& (input_port_read(machine, "HFDCDIP")&0x55))

@@ -164,7 +164,7 @@ Known Issues (MZ, 2009-04-26)
 #include "machine/ti99_4x.h"
 #include "machine/tms9901.h"
 #include "audio/spchroms.h"
-#include "machine/99_peb.h"
+#include "devices/ti99_peb.h"
 #include "machine/994x_ser.h"
 #include "machine/99_dsk.h"
 #include "machine/99_ide.h"
@@ -203,12 +203,12 @@ static ADDRESS_MAP_START(ti99_8_cru_map, ADDRESS_SPACE_IO, 8)
 //  AM_RANGE(0x0000, 0x00ff) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0080, 0x00ff) AM_DEVREAD("ti99_multicart", ti99_multicart_cru_r)     /* SuperSpace cartridge */
-	AM_RANGE(0x0100, 0x02ff) AM_READ(ti99_8_peb_cru_r)
+	AM_RANGE(0x0100, 0x02ff) AM_DEVREAD("per_exp_box", ti99_8_peb_cru_r)
 
 //      AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
 	AM_RANGE(0x0000, 0x03ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
 	AM_RANGE(0x0400, 0x07ff) AM_DEVWRITE("ti99_multicart", ti99_multicart_cru_w)    /* SuperSpace cartridge */
-	AM_RANGE(0x0800, 0x17ff) AM_WRITE(ti99_8_peb_cru_w)
+	AM_RANGE(0x0800, 0x17ff) AM_DEVWRITE("per_exp_box", ti99_8_peb_cru_w)
 
 ADDRESS_MAP_END
 
@@ -591,6 +591,8 @@ static MACHINE_DRIVER_START(ti99_8_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
+	MDRV_PBOX_ADD( "per_exp_box", FALSE, tms9901_set_int1, NULL )
+
 	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt
 	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
@@ -644,6 +646,7 @@ static MACHINE_DRIVER_START(ti99_8_50hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
+	MDRV_PBOX_ADD( "per_exp_box", FALSE, tms9901_set_int1, NULL )
 	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
 	// MDRV_IDE_HARDDISK_ADD( "ide_harddisk" )
 	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)

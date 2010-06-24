@@ -57,7 +57,7 @@
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "audio/spchroms.h"
-#include "machine/99_peb.h"
+#include "devices/ti99_peb.h"
 #include "machine/994x_ser.h"
 #include "machine/99_dsk.h"
 #include "machine/99_ide.h"
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("bank1")                         // system ROM
 	AM_RANGE(0x2000, 0x2fff) AM_RAMBANK("bank3")                         // lower 8kb of RAM extension: AMS bank 2
 	AM_RANGE(0x3000, 0x3fff) AM_RAMBANK("bank4")                         // lower 8kb of RAM extension: AMS bank 3
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4p_peb_r, ti99_4p_peb_w)	 // DSR ROM space
+	AM_RANGE(0x4000, 0x5fff) AM_DEVREADWRITE("per_exp_box", ti99_4p_peb_r, ti99_4p_peb_w)	 // DSR ROM space
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_4p_cart_r,ti99_4p_cart_w) // cartridge space (internal or hsgpl)
 	AM_RANGE(0x8000, 0x83ff) AM_RAMBANK("bank2")                         // RAM PAD
 	AM_RANGE(0x8400, 0x87ff) AM_READWRITE(ti99_nop_8_r, ti99_wsnd_w)     // soundchip write
@@ -98,10 +98,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x003f) AM_DEVREAD("tms9901", tms9901_cru_r)
-	AM_RANGE(0x0040, 0x01ff) AM_READ(ti99_4p_peb_cru_r)
+	AM_RANGE(0x0040, 0x01ff) AM_DEVREAD("per_exp_box", ti99_4p_peb_cru_r)
 
 	AM_RANGE(0x0000, 0x01ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0200, 0x0fff) AM_WRITE(ti99_4p_peb_cru_w)
+	AM_RANGE(0x0200, 0x0fff) AM_DEVWRITE("per_exp_box", ti99_4p_peb_cru_w)
 ADDRESS_MAP_END
 
 
@@ -434,6 +434,8 @@ static MACHINE_DRIVER_START(ti99_4p_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
+	MDRV_PBOX_ADD( "per_exp_box", TRUE, tms9901_set_int1, NULL )
+
 /*  MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
     MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
 

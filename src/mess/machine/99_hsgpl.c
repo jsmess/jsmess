@@ -6,7 +6,7 @@
 #include "emu.h"
 #include "emuopts.h"
 #include "ti99_4x.h"
-#include "99_peb.h"
+#include "devices/ti99_peb.h"
 #include "99_hsgpl.h"
 #include "at29040.h"
 
@@ -118,6 +118,8 @@ enum
 
 static void hsgpl_cru_w(running_machine *machine, int offset, int data);
 static READ8_HANDLER(hsgpl_dsr_r);
+
+static running_device *expansion_box;
 
 static const ti99_peb_card_handlers_t hsgpl_handlers =
 {
@@ -283,10 +285,12 @@ void ti99_hsgpl_reset(running_machine *machine)
 	hsgpl.cur_bank = 0;
 	hsgpl.cru_reg = 0;
 
+	expansion_box = devtag_get_device(machine, "per_exp_box");
+
 	/* Card is enabled on startup. */
 	ti99_set_hsgpl_crdena(1);
 
-	ti99_peb_set_card_handlers(0x1b00, &hsgpl_handlers);
+	ti99_peb_set_card_handlers(expansion_box, 0x1b00, &hsgpl_handlers);
 }
 
 

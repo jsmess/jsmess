@@ -11,7 +11,7 @@
 #include "audio/spchroms.h"
 #include "ti99_4x.h"
 #include "includes/geneve.h"
-#include "99_peb.h"
+#include "devices/ti99_peb.h"
 #include "994x_ser.h"
 #include "99_dsk.h"
 #include "99_ide.h"
@@ -19,11 +19,6 @@
 
 #include "sound/tms5220.h"	/* for tms5220_set_variant() */
 #include "sound/sn76496.h"
-
-
-/* prototypes */
-static void inta_callback(running_machine *machine, int state);
-static void intb_callback(running_machine *machine, int state);
 
 static void read_key_if_possible(running_machine *machine);
 static void poll_keyboard(running_machine *machine);
@@ -79,6 +74,8 @@ static int KeyFakeShiftState;
 static int KeyFakeUnshiftState;
 static int KeyAutoRepeatKey;
 static int KeyAutoRepeatTimer;
+
+static running_device *expansion_box;
 
 /*
     GROM support.
@@ -155,7 +152,6 @@ MACHINE_START( geneve )
 	/* Initialize all. Actually, at this point, we don't know
        how the switches are set. Later we use the configuration switches to
        determine which one to use. */
-	ti99_peb_init();
 	ti99_floppy_controllers_init_all(machine);
 	ti99_ide_init(machine);
 	ti99_usbsm_init(machine);
@@ -178,6 +174,8 @@ MACHINE_RESET( geneve )
 
 	/* reset cartridge mapper */
 	cartridge_page = 0;
+
+	expansion_box = devtag_get_device(machine, "per_exp_box");
 
 	v9938_reset(0);
 
@@ -202,7 +200,6 @@ MACHINE_RESET( geneve )
 	has_usb_sm = input_port_read(machine, "HDCTRL") & HD_USB;
 
 	/* set up optional expansion hardware */
-	ti99_peb_reset(0, inta_callback, intb_callback);
 
 	if (has_speech)
 	{
@@ -269,7 +266,7 @@ INTERRUPT_GEN( geneve_hblank_interrupt )
 /*
     inta is connected to both tms9901 IRQ1 line and to tms9995 INT4/EC line.
 */
-static void inta_callback(running_machine *machine, int state)
+void inta_callback(running_machine *machine, int state)
 {
 	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 1, state);
 	cputag_set_input_line(machine, "maincpu", 1, state ? ASSERT_LINE : CLEAR_LINE);
@@ -278,7 +275,7 @@ static void inta_callback(running_machine *machine, int state)
 /*
     intb is connected to tms9901 IRQ12 line.
 */
-static void intb_callback(running_machine *machine, int state)
+void intb_callback(running_machine *machine, int state)
 {
 	tms9901_set_single_int(devtag_get_device(machine, "tms9901"), 12, state);
 }
@@ -578,7 +575,7 @@ READ8_HANDLER ( geneve_r )
 #endif
 	case 0xba:
 		/* DSR space */
-		return geneve_peb_r(space, offset);
+		return geneve_peb_r(expansion_box, offset);
 
 	case 0xbc:
 		/* speech space */
@@ -874,7 +871,7 @@ WRITE8_HANDLER ( geneve_w )
 #endif
 	case 0xba:
 		/* DSR space */
-		geneve_peb_w(space, offset, data);
+		geneve_peb_w(expansion_box, offset, data);
 		return;
 
 	case 0xbc:
@@ -943,7 +940,7 @@ WRITE8_HANDLER ( geneve_peb_mode_cru_w )
 		}
 	}
 
-	geneve_peb_cru_w(space, offset, data);
+	geneve_peb_cru_w(expansion_box, offset, data);
 }
 
 /*===========================================================================*/

@@ -29,7 +29,7 @@
 #include "machine/tms9901.h"
 #include "machine/tms9902.h"
 #include "audio/spchroms.h"
-#include "machine/99_peb.h"
+#include "devices/ti99_peb.h"
 #include "machine/994x_ser.h"
 #include "machine/99_dsk.h"
 #include "machine/99_ide.h"
@@ -54,7 +54,7 @@ static ADDRESS_MAP_START(memmap, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM										/*system ROM*/
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*lower 8kb of RAM extension - installed dynamically*/
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
+	AM_RANGE(0x4000, 0x5fff) AM_DEVREADWRITE("per_exp_box", ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_cart_r, ti99_cart_w)     /*cartridge memory*/
 //  AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE("ti99_multicart", ti99_multicart_r, ti99_multicart_w)
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAMBANK("bank1")			/*RAM PAD, mirrored 4 times*/
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START(memmap_4ev, ADDRESS_SPACE_PROGRAM, 16)
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM						/*system ROM*/
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ti99_nop_8_r, ti99_nop_8_w)	/*lower 8kb of RAM extension - installed dynamically*/
-	AM_RANGE(0x4000, 0x5fff) AM_READWRITE(ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
+	AM_RANGE(0x4000, 0x5fff) AM_DEVREADWRITE("per_exp_box", ti99_4x_peb_r, ti99_4x_peb_w)	/*DSR ROM space*/
 	AM_RANGE(0x6000, 0x7fff) AM_READWRITE(ti99_cart_r, ti99_cart_w)     /*cartridge memory*/
 //  AM_RANGE(0x6000, 0x7fff) AM_DEVREADWRITE("ti99_multicart", ti99_multicart_r, ti99_multicart_w)
 	AM_RANGE(0x8000, 0x80ff) AM_MIRROR(0x0300) AM_RAMBANK("bank1")			/*RAM PAD, mirrored 4 times*/
@@ -93,11 +93,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0000, 0x007f) AM_DEVREAD("tms9901", tms9901_cru_r)
 	AM_RANGE(0x0080, 0x00ff) AM_DEVREAD("ti99_multicart", ti99_multicart_cru_r)	/* SuperSpace */
-	AM_RANGE(0x0100, 0x01ff) AM_READ(ti99_4x_peb_cru_r)
+	AM_RANGE(0x0100, 0x01ff) AM_DEVREAD("per_exp_box", ti99_4x_peb_cru_r)
 
 	AM_RANGE(0x0000, 0x03ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
 	AM_RANGE(0x0400, 0x07ff) AM_DEVWRITE("ti99_multicart", ti99_multicart_cru_w)	/* SuperSpace */
-	AM_RANGE(0x0800, 0x0fff) AM_WRITE(ti99_4x_peb_cru_w)
+	AM_RANGE(0x0800, 0x0fff) AM_DEVWRITE("per_exp_box", ti99_4x_peb_cru_w)
 ADDRESS_MAP_END
 
 /*
@@ -790,6 +790,8 @@ static MACHINE_DRIVER_START(ti99_4_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* devices */
+	MDRV_PBOX_ADD( "per_exp_box", FALSE, tms9901_set_int1, NULL )
+
 	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
 	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
@@ -847,6 +849,8 @@ static MACHINE_DRIVER_START(ti99_4_50hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
+	MDRV_PBOX_ADD( "per_exp_box", FALSE, tms9901_set_int1, NULL )
+
 	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt
 	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
@@ -904,6 +908,8 @@ static MACHINE_DRIVER_START(ti99_4a_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
+	MDRV_PBOX_ADD( "per_exp_box", FALSE, tms9901_set_int1, NULL )
+
 	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
 	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)
 
@@ -963,6 +969,8 @@ static MACHINE_DRIVER_START(ti99_4a_50hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
+	MDRV_PBOX_ADD( "per_exp_box", FALSE, tms9901_set_int1, NULL )
+
 	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
 	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback) */
 
@@ -1031,6 +1039,8 @@ static MACHINE_DRIVER_START(ti99_4ev_60hz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	/* devices */
+	MDRV_PBOX_ADD( "per_exp_box", FALSE, tms9901_set_int1, NULL )
+
 	// MDRV_IDE_CONTROLLER_ADD( "ide", ti99_ide_interrupt )
 	// MDRV_RTC65271_ADD("ide_rtc", ti99_clk_interrupt_callback)  */
 

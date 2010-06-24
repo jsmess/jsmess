@@ -21,7 +21,7 @@
 #include "machine/idectrl.h"
 #include "machine/rtc65271.h"
 #include "ti99_4x.h"
-#include "99_peb.h"
+#include "devices/ti99_peb.h"
 #include "99_ide.h"
 
 
@@ -70,6 +70,8 @@ tms9995 CPU used by Geneve and ti-99/8.  Note that the first revision of IDE
 only supported ti-99/4(a) (LSByte first) mode. */
 static int tms9995_mode;
 
+static running_device *expansion_box;
+
 /*
     ti99_ide_interrupt()
 
@@ -79,7 +81,7 @@ void ti99_ide_interrupt(running_device *device, int state)
 {
 	ide_irq = state;
 	if (cru_register & cru_reg_int_en)
-		ti99_peb_set_ila_bit(device->machine, inta_ide_bit, state);
+		ti99_peb_set_ila_bit(expansion_box, inta_ide_bit, state);
 }
 
 /*
@@ -90,7 +92,7 @@ void ti99_ide_interrupt(running_device *device, int state)
 void ti99_clk_interrupt_callback(running_device *device, int state)
 {
 	clk_irq = state;
-	ti99_peb_set_ila_bit(device->machine, inta_ide_clk_bit, state);
+	ti99_peb_set_ila_bit(expansion_box, inta_ide_clk_bit, state);
 }
 
 /*
@@ -107,7 +109,8 @@ void ti99_ide_init(running_machine *machine)
 */
 void ti99_ide_reset(running_machine *machine, int in_tms9995_mode)
 {
-	ti99_peb_set_card_handlers(0x1000, & ide_handlers);
+	expansion_box = devtag_get_device(machine, "per_exp_box");
+	ti99_peb_set_card_handlers(expansion_box, 0x1000, & ide_handlers);
 
 	cur_page = 0;
 	sram_enable = 0;
@@ -169,7 +172,7 @@ static void ide_cru_w(running_machine *machine, int offset, int data)
 			cru_register &= ~ (1 << offset);
 
 		if (offset == 6)
-			ti99_peb_set_ila_bit(machine, inta_ide_bit, (cru_register & cru_reg_int_en) && ide_irq);
+			ti99_peb_set_ila_bit(expansion_box, inta_ide_bit, (cru_register & cru_reg_int_en) && ide_irq);
 
 		if ((offset == 6) || (offset == 7))
 			if ((cru_register & cru_reg_int_en) && !(cru_register & cru_reg_reset))

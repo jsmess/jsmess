@@ -243,7 +243,8 @@ WRITE16_HANDLER( ti99_grom_w );
 READ16_HANDLER( ti99_4p_grom_r );
 WRITE16_HANDLER( ti99_4p_grom_w );
 
-extern void tms9901_set_int2(running_machine *machine, int state);
+void tms9901_set_int2(running_machine *machine, int state);
+void tms9901_set_int1(running_machine *machine, int state);
 
 READ8_HANDLER ( ti99_8_r );
 WRITE8_HANDLER ( ti99_8_w );
