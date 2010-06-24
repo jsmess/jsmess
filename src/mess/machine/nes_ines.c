@@ -69,7 +69,7 @@ static void MMC1_set_prg( running_machine *machine )
 	{
 	case 0x00:
 	case 0x04:
-		prg32(machine, prg_offset + state->MMC1_regs[3]);
+		prg32(machine, (prg_offset + state->MMC1_regs[3]) >> 1);
 		break;
 	case 0x08:
 		prg16_89ab(machine, prg_offset + 0);

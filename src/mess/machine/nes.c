@@ -163,6 +163,12 @@ static void init_nes_core( running_machine *machine )
 			break;
 	}
 
+	// install additional handlers
+	if (state->pcb_id == BTL_SMB2B)
+	{
+		memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, smb2jb_extra_w);
+		memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, smb2jb_extra_w);
+	}
 }
 
 // to be probably removed (it does nothing since a long time)
@@ -286,8 +292,11 @@ static void nes_machine_stop( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 
 	/* Write out the battery file if necessary */
+	// FIXME: are there cases with both internal mapper RAM and external RAM (both battery backed)?
 	if (state->battery)
 		image_battery_save(state->cart, state->battery_ram, state->battery_size);
+	if (state->mapper_ram_size)
+		image_battery_save(state->cart, state->mapper_ram, state->mapper_ram_size);
 }
 
 
@@ -585,14 +594,17 @@ static const struct nes_cart_lines nes_cart_lines_table[] =
 	{ "CHR A15",  15 },
 	{ "CHR A16",  16 },
 	{ "CHR A17",  17 },
-	{ "NC",      128 },
+	{ "NC",      127 },
 	{ 0 }
 };
 
 static int nes_cart_get_line( const char *feature )
 {
 	const struct nes_cart_lines *nes_line = &nes_cart_lines_table[0];
-	
+
+	if (feature == NULL)
+		return 128;
+
 	while (nes_line->tag)
 	{
 		if (strcmp(nes_line->tag, feature) == 0)
@@ -607,6 +619,7 @@ static int nes_cart_get_line( const char *feature )
 DEVICE_IMAGE_LOAD( nes_cart )
 {
 	nes_state *state = (nes_state *)image->machine->driver_data;
+	state->pcb_id = NO_BOARD;	// initialization
 
 	if (image_software_entry(image) == NULL)
 	{
@@ -688,7 +701,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 
 			state->hard_mirroring = (local_options & 0x01) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ;
-//			printf("%d\n", state->hard_mirroring);
 			state->battery = local_options & 0x02;
 			state->trainer = local_options & 0x04;
 			state->four_screen_vram = local_options & 0x08;
@@ -800,9 +812,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 #endif
 
-			logerror("CHR chunks: %02x, size: %06x\n", state->chr_chunks, 0x4000 * state->chr_chunks);
+			logerror("CHR chunks: %02x, size: %06x\n", state->chr_chunks, 0x2000 * state->chr_chunks);
 			logerror("**\n");
-			// printf("CHR chunks: %02x, size: %06x\n", state->chr_chunks, 0x4000 * state->chr_chunks);
+			// printf("CHR chunks: %02x, size: %06x\n", state->chr_chunks, 0x2000 * state->chr_chunks);
 			// printf("**\n");
 		}
 		else if ((magic[0] == 'U') && (magic[1] == 'N') && (magic[2] == 'I') && (magic[3] == 'F')) /* If header starts with 'UNIF' it is UNIF */
@@ -1109,7 +1121,8 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		UINT32 prg_size = image_get_software_region_length(image, "prg");
 		UINT32 chr_size = image_get_software_region_length(image, "chr");
 		UINT32 vram_size = image_get_software_region_length(image, "vram");
-
+		vram_size += image_get_software_region_length(image, "vram2");
+		
 		/* Free the regions that were allocated by the ROM loader */
 		memory_region_free(image->machine, "maincpu");
 		memory_region_free(image->machine, "gfx1");
@@ -1147,19 +1160,35 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->mapper = 0;		// this allows us to set up memory handlers without duplicating code (for the moment)
 		state->pcb_id = nes_get_pcb_id(image->machine, image_get_feature(image, "pcb"));
 
-		if (state->pcb_id == UNSUPPORTED_BOARD)
-			printf("This board (%s) is currently not supported by MESS\n", image_get_feature(image, "pcb"));
-
 		if (state->pcb_id == STD_TVROM || state->pcb_id == STD_DRROM || state->pcb_id == IREM_LROG017)
 			state->four_screen_vram = 1;
+		else
+			state->four_screen_vram = 0;
 
 		state->battery = (image_get_software_region(image, "bwram") != NULL) ? 1 : 0;
 		state->battery_size = image_get_software_region_length(image, "bwram");
 
+		if (state->pcb_id == BANDAI_LZ93EX)
+		{
+			// allocate the 24C01 or 24C02 EEPROM
+			state->battery = 1;
+			state->battery_size += 0x2000;
+		}
+
+		if (state->pcb_id == BANDAI_DATACH)
+		{
+			// allocate the 24C01 and 24C02 EEPROM
+			state->battery = 1;
+			state->battery_size += 0x4000;
+		}
+		
 		state->prg_ram = (image_get_software_region(image, "wram") != NULL) ? 1 : 0;
 		state->wram_size = image_get_software_region_length(image, "wram");
+		state->mapper_ram_size = image_get_software_region_length(image, "mapper_ram");
 		if (state->prg_ram)
 			state->wram = auto_alloc_array(image->machine, UINT8, state->wram_size);
+		if (state->mapper_ram_size)
+			state->mapper_ram = auto_alloc_array(image->machine, UINT8, state->mapper_ram_size);
 
 		/* Check for mirroring */
 		if (image_get_feature(image, "mirroring") != NULL)
@@ -1197,7 +1226,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 		}
 
-		if (state->pcb_id == TAITO_X1_005)
+		if (state->pcb_id == TAITO_X1_005 && image_get_feature(image, "x1-pin17") != NULL && image_get_feature(image, "x1-pin31") != NULL)
 		{
 			if (!strcmp(image_get_feature(image, "x1-pin17"), "CIRAM A10") && !strcmp(image_get_feature(image, "x1-pin31"), "NC"))
 				state->pcb_id = TAITO_X1_005_A;
@@ -1206,31 +1235,37 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if (state->pcb_id == KONAMI_VRC2)
 		{
 			state->vrc_ls_prg_a = nes_cart_get_line(image_get_feature(image, "vrc2-pin3"));
-			state->vrc_ls_prg_b = nes_cart_get_line(image_get_feature(image, "vrc2-pin3"));
+			state->vrc_ls_prg_b = nes_cart_get_line(image_get_feature(image, "vrc2-pin4"));
 			state->vrc_ls_chr = (nes_cart_get_line(image_get_feature(image, "vrc2-pin21")) != 10) ? 1 : 0;
-			printf("VRC-2, pin3: A%d, pin4: A%d, pin21: %s\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b, state->vrc_ls_chr ? "NC" : "A10");
+//			printf("VRC-2, pin3: A%d, pin4: A%d, pin21: %s\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b, state->vrc_ls_chr ? "NC" : "A10");
 		}
 
 		if (state->pcb_id == KONAMI_VRC4)
 		{
 			state->vrc_ls_prg_a = nes_cart_get_line(image_get_feature(image, "vrc4-pin3"));
 			state->vrc_ls_prg_b = nes_cart_get_line(image_get_feature(image, "vrc4-pin4"));
-			printf("VRC-4, pin3: A%d, pin4: A%d\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b);
+//			printf("VRC-4, pin3: A%d, pin4: A%d\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b);
 		}
 		
 		if (state->pcb_id == KONAMI_VRC6)
 		{
 			state->vrc_ls_prg_a = nes_cart_get_line(image_get_feature(image, "vrc6-pin9"));
 			state->vrc_ls_prg_b = nes_cart_get_line(image_get_feature(image, "vrc6-pin10"));
-			printf("VRC-6, pin9: A%d, pin10: A%d\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b);
+//			printf("VRC-6, pin9: A%d, pin10: A%d\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b);
 		}
 
 		/* Check for other misc board variants */
-		if (state->pcb_id == STD_SOROM && !strcmp(image_get_feature(image, "mmc1_type"), "MMC1A"))
-			state->pcb_id = STD_SOROM_A;	// in MMC1-A PRG RAM is always enabled
+		if (state->pcb_id == STD_SOROM)
+		{
+			if (image_get_feature(image, "mmc1_type") != NULL && !strcmp(image_get_feature(image, "mmc1_type"), "MMC1A"))
+				state->pcb_id = STD_SOROM_A;	// in MMC1-A PRG RAM is always enabled
+		}
 		
-		if (state->pcb_id == STD_SXROM && !strcmp(image_get_feature(image, "mmc1_type"), "MMC1A"))
-			state->pcb_id = STD_SXROM_A;	// in MMC1-A PRG RAM is always enabled
+		if (state->pcb_id == STD_SXROM)
+		{
+			if (image_get_feature(image, "mmc1_type") != NULL && !strcmp(image_get_feature(image, "mmc1_type"), "MMC1A"))
+				state->pcb_id = STD_SXROM_A;	// in MMC1-A PRG RAM is always enabled
+		}
 		
 		if (state->pcb_id == STD_NXROM || state->pcb_id == SUNSOFT_DCS)
 		{
@@ -1241,7 +1276,9 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 		}
 		
-#if 1
+#if 0
+		if (state->pcb_id == UNSUPPORTED_BOARD)
+			printf("This board (%s) is currently not supported by MESS\n", image_get_feature(image, "pcb"));
 		printf("PCB Feature: %s\n", image_get_feature(image, "pcb"));
 		printf("PRG chunks: %d\n", state->prg_chunks);
 		printf("CHR chunks: %d\n", state->chr_chunks);
@@ -1249,24 +1286,23 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		printf("NVWRAM: Present %s, size: %d\n", state->battery ? "Yes" : "No", state->battery_size);
 		printf("WRAM:   Present %s, size: %d\n", state->prg_ram ? "Yes" : "No", state->wram_size);
 #endif
-		// FIXME: we need to handle the remaining variables. on the short term, we might
-		// create a table for the various mappers (based on the 'feature' value in xml),
-		// but on the long term we need to rework the whole emulation to first use the
-		// xml list and have mappers and unif boards to fall back to particular 'feature'
-		// values!
-
-		//state->crc_hack = ;
-		//state->hard_mirroring = ;
-		//state->trainer = ;
-		//state->four_screen_vram = ;
 	}
 
-	/* Attempt to load a battery file for this ROM. If successful, we */
-	/* must wait until later to move it to the system memory. */
-	if (state->battery)
+	// Attempt to load a battery file for this ROM
+	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
+	if (state->battery || state->mapper_ram_size)
 	{
-		state->battery_ram = auto_alloc_array(image->machine, UINT8, state->battery_size);
-		image_battery_load(image, state->battery_ram, state->battery_size, 0x00);
+		UINT8 *temp_nvram = auto_alloc_array(image->machine, UINT8, state->battery_size + state->mapper_ram_size);
+		image_battery_load(image, temp_nvram, state->battery_size + state->mapper_ram_size, 0x00);
+		if (state->battery)
+		{
+			state->battery_ram = auto_alloc_array(image->machine, UINT8, state->battery_size);
+			memcpy(state->battery_ram, temp_nvram, state->battery_size);
+		}
+		if (state->mapper_ram_size)
+			memcpy(state->mapper_ram, temp_nvram + state->battery_size, state->mapper_ram_size);
+		
+		auto_free(image->machine, temp_nvram);
 	}
 
 	return INIT_PASS;

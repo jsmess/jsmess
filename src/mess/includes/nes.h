@@ -117,11 +117,11 @@ public:
 	UINT8      *vram;
 	UINT8      *wram;
 	UINT8      *ciram; //PPU nametable RAM - external to PPU!
+	UINT8      *battery_ram;
+	UINT8      *mapper_ram;
 	// Variables which can change
 	UINT8      mid_ram_enable;
 
-	/* SRAM-related (we have two elements due to the init order, but it would be better to verify they both are still needed) */
-	UINT8      *battery_ram;
 
 	/***** Mapper-related variables *****/
 
@@ -156,6 +156,7 @@ public:
 
 	// misc mapper related variables which should be merged with the above one, where possible
 	UINT8 MMC1_regs[4];
+	int mmc1_reg_write_enable;
 	UINT8 MMC2_regs[4];	// these replace bank0/bank0_hi/bank1/bank1_hi
 
 	UINT8 mmc3_alt_irq;
@@ -188,7 +189,7 @@ public:
 	UINT8 map217_reg[4];
 	UINT8 map249_reg;
 	UINT8 map14_reg[2];
-	UINT8 mapper121_reg[3];
+	UINT8 mapper121_reg[8];
 	UINT8 mapper187_reg[4];
 	UINT8 map208_reg[5];
 	UINT8 bmc_64in1nr_reg[4];
@@ -216,6 +217,7 @@ public:
 	UINT32 battery_size;
 	UINT8 prg_ram;			// if there is PRG RAM with no backup
 	UINT32 wram_size;
+	UINT32 mapper_ram_size;
 
 	int format;	// 1 = iNES, 2 = UNIF
 
