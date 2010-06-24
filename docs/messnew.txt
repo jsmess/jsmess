@@ -11,6 +11,7 @@ Systems Promoted from GAME_NOT_WORKING:
 - Canon X07 [Sandro Ronco]
 - Othello Multivision FG-1000/FG-2000 [Enri, Curt Coder]
 - Philips VG5000 [Daniel Coulom, Sandro Ronco]
+- SGCPU aka TI-99/4P [Michael Zapf]
 
 
 
@@ -34,6 +35,16 @@ System Driver Changes:
   with disks not loading correctly. Many games are playable again. [Fabio Priuli]
 
 - [GBA] Improved flash saving in games such as Sword of Mana [R. Belmont]
+
+- [TI99] ti99cart: Fix for bug #1953 (assert with HSGPL set to on); 
+  type paged379i can now handle 128 KiB, minimem now accepts cartridges without 
+  rom part. Fixed at29c040a (CFI commands are only checked against A14 to A0).
+  v9938: Added status register 4+6 presets. 
+  Fixed HSGPL extension, introduced a "flash" mode which allows to upload 
+  the required OS to the HSGPL in-system. Various fixes for SGCPU 
+  (aka TI-99/4P), changed to working. New: GRAM Kracker module port device. 
+  Deactivated IDE support (pending review). Refactorings towards device 
+  structure support.
 
 - [VG5K] Added emulation for the EF9345 video chip, based on 
   Daniel Coulom's implementation in DCVG5K [Sandro Ronco]
