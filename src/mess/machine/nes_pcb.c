@@ -1136,6 +1136,10 @@ static void mmc3_set_wram( const address_space *space )
 {
 	running_machine *machine = space->machine;
 	nes_state *state = (nes_state *)machine->driver_data;
+	
+	// skip this function if we are emulating a MMC3 clone with mid writes
+	if (state->mmc_write_mid != NULL)
+		return;
 
 	if (BIT(state->mmc_latch2, 7))
 		memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
@@ -1331,7 +1335,7 @@ static WRITE8_HANDLER( hkrom_w )
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
-			mmc6_helper = state->mmc_cmd1 ^ data;
+			mmc6_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
 
 			if (!state->mmc_latch2 && BIT(data, 5))	// if WRAM is disabled and has to be enabled, write
