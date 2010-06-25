@@ -1278,6 +1278,13 @@ static int unif_initialize( running_machine *machine, int idx )
 			bmc_bs5_update_banks(machine);
 			break;
 			
+		case BMC_810544: 
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0);
+			chr8(machine, 0, CHRROM);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			
 		case UNSUPPORTED_BOARD:
 		default:
 			/* Mapper not supported */

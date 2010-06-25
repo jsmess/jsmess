@@ -570,7 +570,7 @@ static const nes_pcb pcb_list[] =
 	{ "BMC-22GAMES",         BMC_22GAMES },
 	{ "BMC-20IN1",           BMC_20IN1 },
 	{ "BMC-110IN1",          BMC_110IN1 },
-	{ "BMC-810544-C-A1",     UNSUPPORTED_BOARD },
+	{ "BMC-810544-C-A1",     BMC_810544 },
 	{ "BMC-411120-C",        UNSUPPORTED_BOARD },
 	{ "BMC-830118C",         UNSUPPORTED_BOARD },
 	{ "BMC-12-IN-1",         UNSUPPORTED_BOARD },
@@ -10683,6 +10683,8 @@ static READ8_HANDLER( bmc_vt5201_r )
  
  BMC-BS-5
  
+ Games: a few 4 in 1 multicarts
+ 
  *************************************************************/
 
 static void bmc_bs5_update_banks( running_machine *machine )
@@ -10718,6 +10720,33 @@ static WRITE8_HANDLER( bmc_bs5_w )
 	}
 	bmc_bs5_update_banks(space->machine);
 }
+
+/*************************************************************
+ 
+ BMC-810544-C-A1
+ 
+ Games: 200-in-1 Elfland
+
+ *************************************************************/
+
+static WRITE8_HANDLER( bmc_810544_w )
+{
+	UINT8 bank = (offset >> 7);
+	LOG_MMC(("bmc_810544_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (!BIT(offset, 6))
+	{
+		prg16_89ab(space->machine, (bank << 1) | BIT(offset, 5));
+		prg16_cdef(space->machine, (bank << 1) | BIT(offset, 5));
+	}
+	else
+		prg32(space->machine, bank);
+
+	set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	
+	chr8(space->machine, offset & 0x0f, CHRROM);
+}
+
 
 
 typedef void (*nes_ppu_latch)(running_device *device, offs_t offset);
@@ -10976,6 +11005,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BMC_GOLDENCARD_6IN1,  NES_WRITEONLY(bmc_gc6in1_l_w), NES_NOACCESS, NES_WRITEONLY(bmc_gc6in1_w), NULL, NULL, mmc3_irq },
 	{ BMC_VT5201,           NES_NOACCESS, NES_NOACCESS, {bmc_vt5201_w, bmc_vt5201_r},         NULL, NULL, NULL },
 	{ BMC_BENSHENG_BS5,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_bs5_w),             NULL, NULL, NULL },
+	{ BMC_810544,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_810544_w),          NULL, NULL, NULL },
 	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	//
 };
