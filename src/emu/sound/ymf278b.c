@@ -132,10 +132,8 @@ typedef struct
 INLINE YMF278BChip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_YMF278B);
-	return (YMF278BChip *)device->token;
+	assert(device->type() == SOUND_YMF278B);
+	return (YMF278BChip *)downcast<legacy_device_base *>(device)->token();
 }
 
 static INT32 *mix;
@@ -624,7 +622,7 @@ READ8_DEVICE_HANDLER( ymf278b_r )
 			return chip->current_irq | (chip->irq_line == ASSERT_LINE ? 0x80 : 0x00);
 
 		default:
-			logerror("%s: unexpected write at offset %X to ymf278b\n", cpuexec_describe_context(device->machine), offset);
+			logerror("%s: unexpected read at offset %X from ymf278b\n", cpuexec_describe_context(device->machine), offset);
 			break;
 	}
 	return 0xff;
@@ -668,12 +666,12 @@ WRITE8_DEVICE_HANDLER( ymf278b_w )
 
 static void ymf278b_init(running_device *device, YMF278BChip *chip, void (*cb)(running_device *, int))
 {
-	chip->rom = *device->region;
+	chip->rom = *device->region();
 	chip->irq_callback = cb;
 	chip->timer_a = timer_alloc(device->machine, ymf278b_timer_a_tick, chip);
 	chip->timer_b = timer_alloc(device->machine, ymf278b_timer_b_tick, chip);
 	chip->irq_line = CLEAR_LINE;
-	chip->clock = device->clock;
+	chip->clock = device->clock();
 
 	mix = auto_alloc_array(device->machine, INT32, 44100*2);
 }
@@ -686,10 +684,10 @@ static DEVICE_START( ymf278b )
 	YMF278BChip *chip = get_safe_token(device);
 
 	chip->device = device;
-	intf = (device->baseconfig().static_config != NULL) ? (const ymf278b_interface *)device->baseconfig().static_config : &defintrf;
+	intf = (device->baseconfig().static_config() != NULL) ? (const ymf278b_interface *)device->baseconfig().static_config() : &defintrf;
 
 	ymf278b_init(device, chip, intf->irq_callback);
-	chip->stream = stream_create(device, 0, 2, device->clock/768, chip, ymf278b_pcm_update);
+	chip->stream = stream_create(device, 0, 2, device->clock()/768, chip, ymf278b_pcm_update);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB
 	for(i = 0; i < 256; i++)
@@ -738,3 +736,5 @@ DEVICE_GET_INFO( ymf278b )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(YMF278B, ymf278b);

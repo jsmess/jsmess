@@ -27,9 +27,6 @@ struct _pf10_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( pf10 );
-
 /* serial interface in (to the host computer) */
 READ_LINE_DEVICE_HANDLER( pf10_txd1_r );
 WRITE_LINE_DEVICE_HANDLER( pf10_rxd1_w );
@@ -43,7 +40,7 @@ WRITE_LINE_DEVICE_HANDLER( pf10_rxd2_w );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define PF10 DEVICE_GET_INFO_NAME(pf10)
+DECLARE_LEGACY_DEVICE(PF10, pf10);
 
 #define MDRV_PF10_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, PF10, 0) \

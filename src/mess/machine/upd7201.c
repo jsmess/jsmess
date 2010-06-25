@@ -34,10 +34,9 @@ struct _upd7201_state
 INLINE upd7201_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == UPD7201);
+	assert(device->type() == UPD7201);
 
-	return (upd7201_state *)device->token;
+	return (upd7201_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -148,9 +147,9 @@ WRITE_LINE_DEVICE_HANDLER( upd7201_txcb_w )
 static DEVICE_START( upd7201 )
 {
 	upd7201_state *upd7201 = get_safe_token(device);
-	const upd7201_interface *intf = (const upd7201_interface *)device->baseconfig().static_config;
+	const upd7201_interface *intf = (const upd7201_interface *)device->baseconfig().static_config();
 
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&upd7201->out_int_func, &intf->out_int_func, device);
@@ -173,7 +172,6 @@ DEVICE_GET_INFO( upd7201 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(upd7201_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd7201);	break;
@@ -188,3 +186,5 @@ DEVICE_GET_INFO( upd7201 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(UPD7201, upd7201);

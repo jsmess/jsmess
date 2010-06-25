@@ -653,29 +653,29 @@ static DEVICE_START( ngp_cart )
 
 static DEVICE_IMAGE_LOAD( ngp_cart )
 {
-	ngp_state *state = (ngp_state *)image->machine->driver_data;
+	ngp_state *state = (ngp_state *)image.device().machine->driver_data;
 	UINT32 filesize;
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		filesize = image_length(image);
+		filesize = image.length();
 
 		if (filesize != 0x80000 && filesize != 0x100000 && filesize != 0x200000 && filesize != 0x400000)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
 			return INIT_FAIL;
 		}
 
-		if (image_fread(image, memory_region(image->machine, "cart"), filesize) != filesize)
+		if (image.fread( memory_region(image.device().machine, "cart"), filesize) != filesize)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Error loading file");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
 			return INIT_FAIL;
 		}
 	}
 	else
 	{
-		filesize = image_get_software_region_length(image, "rom");
-		memcpy(memory_region(image->machine, "cart"), image_get_software_region(image, "rom"), filesize);
+		filesize = image.get_software_region_length("rom");
+		memcpy(memory_region(image.device().machine, "cart"), image.get_software_region("rom"), filesize);
 	}
 
 	state->flash_chip[0].manufacturer_id = 0x98;
@@ -742,7 +742,7 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 
 static DEVICE_IMAGE_UNLOAD( ngp_cart )
 {
-	ngp_state *state = (ngp_state *)image->machine->driver_data;
+	ngp_state *state = (ngp_state *)image.device().machine->driver_data;
 
 	state->flash_chip[0].present = 0;
 	state->flash_chip[0].state = F_READ;

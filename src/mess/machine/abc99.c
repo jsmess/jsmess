@@ -21,7 +21,6 @@ DEVICE_GET_INFO( abc99 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(abc99);		break;
@@ -36,3 +35,5 @@ DEVICE_GET_INFO( abc99 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(ABC99, abc99);

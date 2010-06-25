@@ -274,12 +274,12 @@ static WRITE8_DEVICE_HANDLER( via0_ca2_w )
 	if (!BIT(data, 0))
 	{
 		cassette_change_state(state->cassette, CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		timer_device_adjust_periodic(state->cassette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
+		state->cassette_timer->adjust(attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 	}
 	else
 	{
 		cassette_change_state(state->cassette, CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
-		timer_device_reset(state->cassette_timer);
+		state->cassette_timer->reset();
 	}
 }
 
@@ -424,7 +424,7 @@ static const via6522_interface vic20_via1_intf =
 
 static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
-	vic20_state *state = (vic20_state *)timer->machine->driver_data;
+	vic20_state *state = (vic20_state *)timer.machine->driver_data;
 	int data = (cassette_input(state->cassette) > +0.0) ? 1 : 0;
 
 	via_ca1_w(state->via1, data);
@@ -524,12 +524,12 @@ static MACHINE_START( vic20 )
 	state->via1 = devtag_get_device(machine, M6522_1_TAG);
 	state->iec = devtag_get_device(machine, IEC_TAG);
 	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-	state->cassette_timer = devtag_get_device(machine, TIMER_C1530_TAG);
+	state->cassette_timer = machine->device<timer_device>(TIMER_C1530_TAG);
 	state->mos6560 = devtag_get_device(machine, M6560_TAG);
 
 	/* set VIA clocks */
-	state->via0->set_clock(cputag_get_clock(machine, M6502_TAG));
-	state->via1->set_clock(cputag_get_clock(machine, M6502_TAG));
+	state->via0->set_unscaled_clock(cputag_get_clock(machine, M6502_TAG));
+	state->via1->set_unscaled_clock(cputag_get_clock(machine, M6502_TAG));
 
 	/* memory expansions */
 	switch (messram_get_size(devtag_get_device(machine, "messram")))
@@ -556,10 +556,10 @@ static MACHINE_START( vic20 )
 
 static DEVICE_IMAGE_LOAD( vic20_cart )
 {
-	const address_space *program = cputag_get_address_space(image->machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
-	const char *filetype = image_filetype(image);
+	const address_space *program = cputag_get_address_space(image.device().machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
+	const char *filetype = image.filetype();
 	int address = 0;
-	int size = image_length(image);
+	int size = image.length();
 	UINT8 *ptr;
 
 	if (!mame_stricmp(filetype, "20"))
@@ -575,19 +575,19 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 	else if (!mame_stricmp(filetype, "b0"))
 		address = 0xb000;
 
-	ptr = memory_region(image->machine, M6502_TAG);
+	ptr = memory_region(image.device().machine, M6502_TAG);
 
 	if (size == 0x4000 && address != 0x4000)
 	{
-		image_fread(image, ptr + address, 0x2000);
-		image_fread(image, ptr + 0xa000, 0x2000);
+		image.fread( ptr + address, 0x2000);
+		image.fread( ptr + 0xa000, 0x2000);
 
 		memory_install_rom(program, address, address + 0x1fff, 0, 0, ptr + address);
 		memory_install_rom(program, 0xa000, 0xbfff, 0, 0, ptr + 0xa000);
 	}
 	else
 	{
-		image_fread(image, ptr + address, size);
+		image.fread( ptr + address, size);
 
 		memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
 	}

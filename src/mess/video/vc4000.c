@@ -77,9 +77,9 @@ static UINT8 joy1_x,joy1_y,joy2_x,joy2_y;
 
 VIDEO_START(vc4000)
 {
-	running_device *screen = video_screen_first(machine);
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*machine);
+	int width = screen->width();
+	int height = screen->height();
 	int i;
 
 	for (i=0;i<0x20; i++)
@@ -565,9 +565,9 @@ static void vc4000_sprite_update(bitmap_t *bitmap, UINT8 *collision, SPRITE *Thi
 
 INLINE void vc4000_draw_grid(running_machine *machine, UINT8 *collision)
 {
-	running_device *screen = video_screen_first(machine);
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*machine);
+	int width = screen->width();
+	int height = screen->height();
 	int i, j, m, x, line=vc4000_video.line-20;
 	int w, k;
 
@@ -624,8 +624,8 @@ INTERRUPT_GEN( vc4000_video_line )
 	int x,y,i;
 	UINT8 collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays
 	static UINT8 irq_pause=0;
-	const rectangle visarea = *video_screen_get_visible_area(device->machine->primary_screen);
-	assert(ARRAY_LENGTH(collision) >= video_screen_get_width(device->machine->primary_screen));
+	const rectangle &visarea = device->machine->primary_screen->visible_area();
+	assert(ARRAY_LENGTH(collision) >= device->machine->primary_screen->width());
 
 	vc4000_video.line++;
 	if (irq_pause) irq_pause++;

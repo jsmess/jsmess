@@ -39,7 +39,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define CDP1871		DEVICE_GET_INFO_NAME(cdp1871)
+DECLARE_LEGACY_DEVICE(CDP1871, cdp1871);
 
 #define MDRV_CDP1871_ADD(_tag, _intrf, _clock) \
 	MDRV_DEVICE_ADD(_tag, CDP1871, _clock) \
@@ -81,9 +81,6 @@ struct _cdp1871_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( cdp1871 );
 
 /* keyboard data */
 READ8_DEVICE_HANDLER( cdp1871_data_r );

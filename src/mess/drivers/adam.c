@@ -600,11 +600,9 @@ static MACHINE_START( adam )
 
 static MACHINE_RESET( adam )
 {
-	running_device *img;
+	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart");
 
-	img = devtag_get_device(machine, "cart");
-
-	if (image_exists(img))
+	if (image->exists())
 	{
 		/* ColecoVision Mode Reset (Cartridge Mounted) */
 		adam_lower_memory = 3; /* OS7 + 24k RAM */

@@ -93,7 +93,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define ABCBUS DEVICE_GET_INFO_NAME( abcbus )
+DECLARE_LEGACY_DEVICE(ABCBUS, abcbus);
 
 #define MDRV_ABCBUS_ADD(_tag, _daisy_chain) \
 	MDRV_DEVICE_ADD(_tag, ABCBUS, 0) \
@@ -129,10 +129,6 @@ struct _abcbus_daisy_chain
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( abcbus );
-
 /* card select */
 WRITE8_DEVICE_HANDLER( abcbus_cs_w );
 

@@ -9,7 +9,7 @@
 #ifndef FLOPIMG_H
 #define FLOPIMG_H
 
-#include "formats/ioprocs.h"
+#include "emu.h"
 #include "opresolv.h"
 
 

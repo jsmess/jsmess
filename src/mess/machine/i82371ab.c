@@ -41,10 +41,9 @@ struct _i82371ab_state
 INLINE i82371ab_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == I82371AB);
+	assert(device->type() == I82371AB);
 
-	return (i82371ab_state *)device->token;
+	return (i82371ab_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -259,3 +258,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_VERSION				"1.0"
 #define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
 #include "devtempl.h"
+
+DEFINE_LEGACY_DEVICE(I82371AB, i82371ab);

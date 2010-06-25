@@ -38,7 +38,7 @@ struct _zx8301_t
 	devcb_resolved_write8		out_ram_func;
 	devcb_resolved_write_line	out_vsync_func;
 
-	running_device *screen;	/* screen */
+	screen_device *screen;	/* screen */
 
 	int dispoff;					/* display off */
 	int mode8;						/* mode8 active */
@@ -61,16 +61,15 @@ struct _zx8301_t
 INLINE zx8301_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (zx8301_t *)device->token;
+	return (zx8301_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const zx8301_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == ZX8301));
-	return (const zx8301_interface *) device->baseconfig().static_config;
+	assert((device->type() == ZX8301));
+	return (const zx8301_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -144,7 +143,7 @@ READ8_DEVICE_HANDLER( zx8301_ram_r )
 
 	if (zx8301->vda)
 	{
-		cpu_spinuntil_time(zx8301->cpu, video_screen_get_time_until_pos(zx8301->screen, 256, 0));
+		cpu_spinuntil_time(zx8301->cpu, zx8301->screen->time_until_pos(256, 0));
 	}
 
 	return devcb_call_read8(&zx8301->in_ram_func, offset);
@@ -162,7 +161,7 @@ WRITE8_DEVICE_HANDLER( zx8301_ram_w )
 
 	if (zx8301->vda)
 	{
-		cpu_spinuntil_time(zx8301->cpu, video_screen_get_time_until_pos(zx8301->screen, 256, 0));
+		cpu_spinuntil_time(zx8301->cpu, zx8301->screen->time_until_pos(256, 0));
 	}
 
 	devcb_call_write8(&zx8301->out_ram_func, offset, data);
@@ -306,7 +305,7 @@ static DEVICE_START( zx8301 )
 	zx8301->cpu = devtag_get_device(device->machine, intf->cpu_tag);
 
 	/* get the screen device */
-	zx8301->screen = devtag_get_device(device->machine, intf->screen_tag);
+	zx8301->screen = device->machine->device<screen_device>(intf->screen_tag);
 	assert(zx8301->screen != NULL);
 
 	/* create the timers */
@@ -345,7 +344,6 @@ DEVICE_GET_INFO( zx8301 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(zx8301_t);						break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;									break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(zx8301);		break;
@@ -360,3 +358,5 @@ DEVICE_GET_INFO( zx8301 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(ZX8301, zx8301);

@@ -29,7 +29,7 @@ struct _sst39vfx_config
     MACROS
 ***************************************************************************/
 
-#define SST39VF020		DEVICE_GET_INFO_NAME(sst39vf020)
+DECLARE_LEGACY_DEVICE(SST39VF020, sst39vf020);
 
 #define MDRV_SST39VF020_ADD(_tag,_cpu_datawidth,_cpu_endianess) \
 	MDRV_DEVICE_ADD(_tag, SST39VF020, 0) \
@@ -39,7 +39,7 @@ struct _sst39vfx_config
 #define MDRV_SST39VF020_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag)
 
-#define SST39VF400A		DEVICE_GET_INFO_NAME(sst39vf400a)
+DECLARE_LEGACY_DEVICE(SST39VF400A, sst39vf400a);
 
 #define MDRV_SST39VF400A_ADD(_tag,_cpu_datawidth,_cpu_endianess) \
 	MDRV_DEVICE_ADD(_tag, SST39VF400A, 0) \
@@ -52,10 +52,6 @@ struct _sst39vfx_config
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO(sst39vf020);
-DEVICE_GET_INFO(sst39vf400a);
-
 // get base/size
 UINT8* sst39vfx_get_base( running_device *device );
 UINT32 sst39vfx_get_size( running_device *device );

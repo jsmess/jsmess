@@ -30,22 +30,24 @@ static TIMER_CALLBACK( req_delay )
 
 static unsigned char SASIReadByte(running_device* device)
 {
+	device_image_interface *image = (device_image_interface*)device;
 	//int ret;
 	unsigned char val;
 
-	/*ret = */image_fread(device,&val,1);
+	/*ret = */image->fread(&val,1);
 
 	return val;
 }
 
 static void SASIWriteByte(running_device* device, unsigned char val)
 {
-	image_fwrite(device,&val,1);
+	device_image_interface *image = (device_image_interface*)device;
+	image->fwrite(&val,1);
 }
 
 DEVICE_START( x68k_hdc )
 {
-	sasi_ctrl_t* sasi = (sasi_ctrl_t*)device->token;
+	sasi_ctrl_t* sasi = (sasi_ctrl_t*)downcast<legacy_device_base *>(device)->token();
 
 	sasi->status = 0x00;
 	sasi->status_port = 0x00;
@@ -63,7 +65,7 @@ DEVICE_IMAGE_CREATE( sasihd )
 	memset(sectordata,0,sizeof(sectordata));
 	for(x=0;x<0x013c98;x++)  // 0x13c98 = number of blocks on a 20MB HD
 	{
-		ret = image_fwrite(image,sectordata,256);
+		ret = image.fwrite(sectordata,256);
 		if(ret < 256)
 			return INIT_FAIL;
 	}
@@ -73,10 +75,10 @@ DEVICE_IMAGE_CREATE( sasihd )
 
 WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 {
-	sasi_ctrl_t* sasi = (sasi_ctrl_t*)device->token;
+	sasi_ctrl_t* sasi = (sasi_ctrl_t*)downcast<legacy_device_base *>(device)->token();
 	unsigned int lba = 0;
 	char* blk;
-
+	device_image_interface *image = (device_image_interface*)device;
 	switch(offset)
 	{
 	case 0x00:  // data I/O
@@ -104,7 +106,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 
 			if(sasi->command[0] == SASI_CMD_WRITE)
 			{
-				if(!image_exists(device))
+				if(!image->exists())
 				{
 					sasi->phase = SASI_PHASE_STATUS;
 					sasi->io = 1;  // Output
@@ -194,7 +196,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 					logerror("SASI: SPECIFY\n");
 					break;
 				case SASI_CMD_READ:
-					if(!image_exists(device))
+					if(!image->exists())
 					{
 						sasi->phase = SASI_PHASE_STATUS;
 						sasi->io = 1;  // Output
@@ -216,12 +218,12 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 						lba = sasi->command[3];
 						lba |= sasi->command[2] << 8;
 						lba |= (sasi->command[1] & 0x1f) << 16;
-						image_fseek(device,lba * 256,SEEK_SET);
+						image->fseek(lba * 256,SEEK_SET);
 						logerror("SASI: READ (LBA 0x%06x, blocks = %i)\n",lba,sasi->command[4]);
 					}
 					break;
 				case SASI_CMD_WRITE:
-					if(!image_exists(device))
+					if(!image->exists())
 					{
 						sasi->phase = SASI_PHASE_STATUS;
 						sasi->io = 1;  // Output
@@ -243,7 +245,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 						lba = sasi->command[3];
 						lba |= sasi->command[2] << 8;
 						lba |= (sasi->command[1] & 0x1f) << 16;
-						image_fseek(device,lba * 256,SEEK_SET);
+						image->fseek(lba * 256,SEEK_SET);
 						logerror("SASI: WRITE (LBA 0x%06x, blocks = %i)\n",lba,sasi->command[4]);
 					}
 					break;
@@ -274,11 +276,11 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 						lba = sasi->command[3];
 						lba |= sasi->command[2] << 8;
 						lba |= (sasi->command[1] & 0x1f) << 16;
-						image_fseek(device,lba * 256,SEEK_SET);
+						image->fseek(lba * 256,SEEK_SET);
 						blk = (char*)malloc(256*33);
 						memset(blk,0,256*33);
 						// formats 33 256-byte blocks
-						image_fwrite(device,blk,256*33);
+						image->fwrite(blk,256*33);
 						free(blk);
 						logerror("SASI: FORMAT UNIT (LBA 0x%06x)\n",lba);
 					break;
@@ -328,7 +330,8 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 
 READ16_DEVICE_HANDLER( x68k_hdc_r )
 {
-	sasi_ctrl_t* sasi = (sasi_ctrl_t*)device->token;
+	sasi_ctrl_t* sasi = (sasi_ctrl_t*)downcast<legacy_device_base *>(device)->token();
+	device_image_interface *image = (device_image_interface*)device;
 	int retval = 0xff;
 
 	switch(offset)
@@ -391,7 +394,7 @@ READ16_DEVICE_HANDLER( x68k_hdc_r )
 				logerror("REQUEST SENSE: read value 0x%02x\n",retval);
 				break;
 			case SASI_CMD_READ:
-				if(!image_exists(device))
+				if(!image->exists())
 				{
 					sasi->phase = SASI_PHASE_STATUS;
 					sasi->io = 1;  // Output
@@ -443,7 +446,6 @@ DEVICE_GET_INFO(x68k_hdc)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;				break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sasi_ctrl_t);				break;
 		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_HARDDISK; break;
 		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1; break;
@@ -468,3 +470,4 @@ DEVICE_GET_INFO(x68k_hdc)
 	}
 }
 
+DEFINE_LEGACY_IMAGE_DEVICE(X68KHDC, x68k_hdc);

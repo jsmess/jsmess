@@ -53,9 +53,8 @@ static TIMER_CALLBACK( ef9345_done );
 INLINE _ef9345_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == EF9345);
-	return (_ef9345_t *)device->token;
+	assert(device->type() == EF9345);
+	return (_ef9345_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*-------------------------------------------------
@@ -963,7 +962,7 @@ static DEVICE_START( ef9345 )
 	/* validate arguments */
 	assert(device != NULL);
 
-	ef9345->conf = (ef9345_config*)device->baseconfig().static_config;
+	ef9345->conf = (ef9345_config*)device->baseconfig().static_config();
 
 	ef9345->charset = memory_region(device->machine, ef9345->conf->charset);
 
@@ -1006,7 +1005,6 @@ DEVICE_GET_INFO( ef9345 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 	case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ef9345_t);				break;
 	case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(ef9345_config);		break;
-	case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_VIDEO;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 	case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ef9345);	break;
@@ -1022,3 +1020,5 @@ DEVICE_GET_INFO( ef9345 )
 	case DEVINFO_STR_CREDITS:						strcpy(info->s, "Daniel Coulom");					break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(EF9345, ef9345);

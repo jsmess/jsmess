@@ -514,7 +514,7 @@ static Z80PIO_INTERFACE( pio_intf )
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	tiki100_state *state = (tiki100_state *)timer->machine->driver_data;
+	tiki100_state *state = (tiki100_state *)timer.machine->driver_data;
 
 	z80ctc_trg0_w(state->z80ctc, 1);
 	z80ctc_trg0_w(state->z80ctc, 0);
@@ -567,7 +567,7 @@ static const ay8910_interface ay8910_intf =
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain tiki100_daisy_chain[] =
+static const z80_daisy_config tiki100_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
 	{ Z80PIO_TAG },

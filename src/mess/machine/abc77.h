@@ -25,7 +25,7 @@
 
 #define ABC77_TAG	"abc77"
 
-#define ABC77 DEVICE_GET_INFO_NAME( abc77 )
+DECLARE_LEGACY_DEVICE(ABC77, abc77);
 
 #define MDRV_ABC77_ADD(_config) \
 	MDRV_DEVICE_ADD(ABC77_TAG, ABC77, 0)\
@@ -54,10 +54,6 @@ struct _abc77_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( abc77 );
-
 /* keyboard matrix */
 INPUT_PORTS_EXTERN( abc77 );
 

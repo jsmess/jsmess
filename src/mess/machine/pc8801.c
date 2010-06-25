@@ -182,7 +182,7 @@ READ8_HANDLER( pc88sr_inport_40 )
 	r |= pc8801_is_24KHz ? 0x00 : 0x02;
 	r |= use_5FD ? 0x00 : 0x08;
 	r |= upd1990a_data_out_r(state->upd1990a) ? 0x10 : 0x00;
-	if(video_screen_get_vblank(space->machine->primary_screen)) r|=0x20;
+	if(space->machine->primary_screen->vblank()) r|=0x20;
 
 	return r|0xc0;
 }

@@ -64,7 +64,7 @@ Notes:
     There are 8 priority codes with RAM associated to each (8 x 256 values).
     For each screen position, to determine which pixel to display, the video
     chip associates a bit to the opacity of that pixel for each layer
-    (1 = trasparent) to form an address into the selected priority RAM.
+    (1 = transparent) to form an address into the selected priority RAM.
     The value at that address (0-7) is the topmost layer.
 
 ***************************************************************************/
@@ -250,7 +250,7 @@ static WRITE16_HANDLER( igs011_blit_gfx_hi_w )	{	COMBINE_DATA(&blitter.gfx_hi);	
 static WRITE16_HANDLER( igs011_blit_w_w )		{	COMBINE_DATA(&blitter.w);		}
 static WRITE16_HANDLER( igs011_blit_h_w )		{	COMBINE_DATA(&blitter.h);		}
 static WRITE16_HANDLER( igs011_blit_depth_w )	{	COMBINE_DATA(&blitter.depth);	}
-static WRITE16_HANDLER( igs011_blit_pen_w )	{	COMBINE_DATA(&blitter.pen);		}
+static WRITE16_HANDLER( igs011_blit_pen_w )		{	COMBINE_DATA(&blitter.pen);		}
 
 
 static WRITE16_HANDLER( igs011_blit_flags_w )
@@ -266,7 +266,7 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 	int gfx_size	=	memory_region_length(space->machine, "blitter");
 	int gfx2_size	=	memory_region_length(space->machine, "blitter_hi");
 
-	const rectangle *clip = video_screen_get_visible_area(space->machine->primary_screen);
+	const rectangle &clip = space->machine->primary_screen->visible_area();
 
 	COMBINE_DATA(&blitter.flags);
 
@@ -335,7 +335,7 @@ static WRITE16_HANDLER( igs011_blit_flags_w )
 			}
 
 			// plot it
-			if (x >= clip->min_x && x <= clip->max_x && y >= clip->min_y && y <= clip->max_y)
+			if (x >= clip.min_x && x <= clip.max_x && y >= clip.min_y && y <= clip.max_y)
 			{
 				if      (clear)				dest[x + y * 512] = clear_pen;
 				else if (pen != trans_pen)	dest[x + y * 512] = pen | pen_hi;
@@ -369,7 +369,7 @@ static UINT16 igs_dips_sel, igs_input_sel, igs_hopper;
 
 static CUSTOM_INPUT( igs_hopper_r )
 {
-	return (igs_hopper && ((video_screen_get_frame_number(field->port->machine->primary_screen)/5)&1)) ? 0x0000 : 0x0001;
+	return (igs_hopper && ((field->port->machine->primary_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }
 
 static WRITE16_HANDLER( igs_dips_w )
@@ -799,7 +799,8 @@ static WRITE16_HANDLER( lhb2_magic_w )
 			{
 				lhb2_pen_hi = data & 0x07;
 
-				okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x08) ? 0x40000 : 0);
+				okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+				oki->set_bank_base((data & 0x08) ? 0x40000 : 0);
 			}
 
 			if ( lhb2_pen_hi & ~0xf )
@@ -941,7 +942,8 @@ static WRITE16_HANDLER( wlcc_magic_w )
 				coin_counter_w(space->machine, 0,	data & 0x01);
 				//  coin out        data & 0x02
 
-				okim6295_set_bank_base(devtag_get_device(space->machine, "oki"), (data & 0x10) ? 0x40000 : 0);
+				okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+				oki->set_bank_base((data & 0x10) ? 0x40000 : 0);
 				igs_hopper		=	data & 0x20;
 			}
 
@@ -997,7 +999,8 @@ static WRITE16_DEVICE_HANDLER( lhb_okibank_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		okim6295_set_bank_base(device, (data & 0x200) ? 0x40000 : 0);
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base((data & 0x200) ? 0x40000 : 0);
 	}
 
 	if ( data & (~0x200) )
@@ -1426,6 +1429,100 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
+static INPUT_PORTS_START( drgnwrld )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Normal  ) )	// 513
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard    ) )	// 627
+	PORT_DIPSETTING(    0x08, DEF_STR( Harder  ) )	// 741
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )	// 855
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Open Girl?" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Background" )
+	PORT_DIPSETTING(    0x02, "Girl" )
+	PORT_DIPSETTING(    0x00, "Landscape" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Bang Turtle?" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Send Boom?" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPNAME( 0x80, 0x80, "Test?" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	// used?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )	// used?
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// press in girl test to pause, button 3 advances
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( drgnwrldc )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
@@ -1522,7 +1619,7 @@ static INPUT_PORTS_START( drgnwrldc )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( drgnwrld )
+static INPUT_PORTS_START( drgnwrldj )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
@@ -1742,100 +1839,6 @@ static INPUT_PORTS_START( lhb2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( drgnwrldj )
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Normal  ) )	// 513
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard    ) )	// 627
-	PORT_DIPSETTING(    0x08, DEF_STR( Harder  ) )	// 741
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )	// 855
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Open Girl?" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Background" )
-	PORT_DIPSETTING(    0x02, "Girl" )
-	PORT_DIPSETTING(    0x00, "Landscape" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Bang Turtle?" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Send Boom?" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPNAME( 0x80, 0x80, "Test?" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW3")
-	PORT_DIPUNKNOWN( 0x01, 0x01 )
-	PORT_DIPUNKNOWN( 0x02, 0x02 )
-	PORT_DIPUNKNOWN( 0x04, 0x04 )
-	PORT_DIPUNKNOWN( 0x08, 0x08 )
-	PORT_DIPUNKNOWN( 0x10, 0x10 )
-	PORT_DIPUNKNOWN( 0x20, 0x20 )
-	PORT_DIPUNKNOWN( 0x40, 0x40 )
-	PORT_DIPUNKNOWN( 0x80, 0x80 )
-
-	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )	// keep pressed while booting
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	// used?
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE3 )	// used?
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )	// press in girl test to pause, button 3 advances
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 
@@ -2525,8 +2528,7 @@ static MACHINE_DRIVER_START( igs011_base )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_22MHz/21)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_22MHz/21, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

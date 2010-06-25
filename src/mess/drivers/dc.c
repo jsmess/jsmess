@@ -39,7 +39,7 @@ extern WRITE64_HANDLER( dc_mess_g1_ctrl_w );
 
 static UINT32 *dc_sound_ram;
 static UINT64 *dc_ram;
-
+UINT16 actel_id;
 int jvsboard_type;
 
 static READ64_HANDLER( dcus_idle_skip_r )

@@ -39,7 +39,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define CRT9007 DEVICE_GET_INFO_NAME( crt9007 )
+DECLARE_LEGACY_DEVICE(CRT9007, crt9007);
 
 #define MDRV_CRT9007_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD((_tag), CRT9007, _clock)	\
@@ -86,9 +86,6 @@ struct _crt9007_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( crt9007 );
 
 /* register access */
 READ8_DEVICE_HANDLER( crt9007_r );

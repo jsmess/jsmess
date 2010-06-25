@@ -221,7 +221,7 @@ static DIRECT_UPDATE_HANDLER( scorpion_direct )
 {
 	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
 	running_device *beta = devtag_get_device(space->machine, BETA_DISK_TAG);
-	UINT16 pc = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPCBASE);
+	UINT16 pc = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), STATE_GENPCBASE);
 
 	if (betadisk_is_active(beta))
 	{

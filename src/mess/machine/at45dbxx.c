@@ -79,7 +79,7 @@ struct _at45dbxx_t
 INLINE at45dbxx_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	return (at45dbxx_t *) device->token;
+	return (at45dbxx_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -423,7 +423,6 @@ DEVICE_GET_INFO( at45db041 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(at45dbxx_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(at45db041);	break;
@@ -466,3 +465,7 @@ DEVICE_GET_INFO( at45db161 )
 		default:										DEVICE_GET_INFO_CALL(at45db041);				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(AT45DB041, at45db041);
+DEFINE_LEGACY_DEVICE(AT45DB081, at45db081);
+DEFINE_LEGACY_DEVICE(AT45DB161, at45db161);

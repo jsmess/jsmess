@@ -112,8 +112,8 @@ struct _m6800_state
 	UINT8	irq_state[2];	/* IRQ line state [IRQ1,TIN] */
 	UINT8	ic_eddge;		/* InputCapture eddge , b.0=fall,b.1=raise */
 
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 
 	/* Memory spaces */
     const address_space *program;
@@ -156,8 +156,7 @@ struct _m6800_state
 INLINE m6800_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M6800 ||
 		   cpu_get_type(device) == CPU_M6801 ||
 		   cpu_get_type(device) == CPU_M6802 ||
@@ -165,7 +164,7 @@ INLINE m6800_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_M6808 ||
 		   cpu_get_type(device) == CPU_HD63701 ||
 		   cpu_get_type(device) == CPU_NSC8105);
-	return (m6800_state *)device->token;
+	return (m6800_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #if 0
@@ -1256,7 +1255,6 @@ static CPU_EXECUTE( m6800 )
 {
 	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
-	cpustate->icount = cycles;
 
 	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 
@@ -1278,8 +1276,6 @@ static CPU_EXECUTE( m6800 )
 			increment_counter(cpustate, cycles_6800[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	return cycles - cpustate->icount;
 }
 
 /****************************************************************************
@@ -1298,7 +1294,7 @@ static CPU_INIT( m6801 )
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
-	cpustate->clock = device->clock / 4;
+	cpustate->clock = device->clock() / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
 	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
 
@@ -1340,7 +1336,7 @@ static CPU_INIT( m6803 )
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
-	cpustate->clock = device->clock / 4;
+	cpustate->clock = device->clock() / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
 	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
 
@@ -1621,7 +1617,6 @@ static CPU_EXECUTE( m6803 )
 {
 	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
-	cpustate->icount = cycles;
 
 	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 
@@ -1643,8 +1638,6 @@ static CPU_EXECUTE( m6803 )
 			increment_counter(cpustate, cycles_6803[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -1694,7 +1687,7 @@ static CPU_INIT( hd63701 )
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
-	cpustate->clock = device->clock / 4;
+	cpustate->clock = device->clock() / 4;
 	cpustate->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, cpustate);
 	cpustate->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, cpustate);
 
@@ -1975,7 +1968,6 @@ static CPU_EXECUTE( hd63701 )
 {
 	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
-	cpustate->icount = cycles;
 
 	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 
@@ -1997,8 +1989,6 @@ static CPU_EXECUTE( hd63701 )
 			increment_counter(cpustate, cycles_63701[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	return cycles - cpustate->icount;
 }
 
 /*
@@ -2321,7 +2311,6 @@ static CPU_EXECUTE( nsc8105 )
 {
 	m6800_state *cpustate = get_safe_token(device);
 	UINT8 ireg;
-	cpustate->icount = cycles;
 
 	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 
@@ -2343,8 +2332,6 @@ static CPU_EXECUTE( nsc8105 )
 			increment_counter(cpustate, cycles_nsc8105[ireg]);
 		}
 	} while( cpustate->icount>0 );
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -2672,7 +2659,7 @@ static CPU_SET_INFO( m6800 )
 
 CPU_GET_INFO( m6800 )
 {
-	m6800_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m6800_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

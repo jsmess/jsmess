@@ -52,8 +52,8 @@ static UINT8 thom_hires_better;
 
 static int thom_update_screen_size( running_machine *machine )
 {
-	running_device *screen = video_screen_first(machine);
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	screen_device *screen = screen_first(*machine);
+	const rectangle &visarea = screen->visible_area();
 	UINT8 p = input_port_read(machine, "vconfig");
 	int new_w, new_h, changed = 0;
 
@@ -73,10 +73,10 @@ static int thom_update_screen_size( running_machine *machine )
 
 	new_w = ( 320 + thom_bwidth * 2 ) * ( thom_hires + 1 ) - 1;
 	new_h = ( 200 + thom_bheight * 2 ) /** (thom_hires + 1 )*/ - 1;
-	if ( ( visarea->max_x != new_w ) || ( visarea->max_y != new_h ) )
+	if ( ( visarea.max_x != new_w ) || ( visarea.max_y != new_h ) )
 	{
 		changed = 1;
-		video_screen_set_visarea( machine->primary_screen, 0, new_w, 0, new_h );
+		machine->primary_screen->set_visible_area(0, new_w, 0, new_h );
 	}
 
 	return changed;

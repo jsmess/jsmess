@@ -53,7 +53,7 @@ struct _tpi6525_interface
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define TPI6525 DEVICE_GET_INFO_NAME(tpi6525)
+DECLARE_LEGACY_DEVICE(TPI6525, tpi6525);
 
 #define MDRV_TPI6525_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, TPI6525, 0) \
@@ -63,8 +63,6 @@ struct _tpi6525_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( tpi6525 );
 
 READ8_DEVICE_HANDLER( tpi6525_r );
 WRITE8_DEVICE_HANDLER( tpi6525_w );

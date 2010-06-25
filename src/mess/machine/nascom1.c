@@ -198,8 +198,8 @@ WRITE8_DEVICE_HANDLER( nascom1_hd6402_so )
 
 DEVICE_IMAGE_LOAD( nascom1_cassette )
 {
-	nascom1_tape_size = image_length(image);
-	nascom1_tape_image = (UINT8*)image_ptr(image);
+	nascom1_tape_size = image.length();
+	nascom1_tape_image = (UINT8*)image.ptr();
 	if (!nascom1_tape_image)
 		return INIT_FAIL;
 
@@ -228,21 +228,21 @@ SNAPSHOT_LOAD( nascom1 )
 {
 	UINT8 line[35];
 
-	while (image_fread(image, &line, sizeof(line)) == sizeof(line))
+	while (image.fread( &line, sizeof(line)) == sizeof(line))
 	{
 		int addr, b0, b1, b2, b3, b4, b5, b6, b7, dummy;
 
 		if (sscanf((char *)line, "%x %x %x %x %x %x %x %x %x %x\010\010\n",
 			&addr, &b0, &b1, &b2, &b3, &b4, &b5, &b6, &b7, &dummy) == 10)
 		{
-			memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b0);
-			memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b1);
-			memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b2);
-			memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b3);
-			memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b4);
-			memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b5);
-			memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b6);
-			memory_write_byte(cputag_get_address_space(image->machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b7);
+			memory_write_byte(cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b0);
+			memory_write_byte(cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b1);
+			memory_write_byte(cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b2);
+			memory_write_byte(cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b3);
+			memory_write_byte(cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b4);
+			memory_write_byte(cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b5);
+			memory_write_byte(cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b6);
+			memory_write_byte(cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM), addr++, b7);
 		}
 	}
 

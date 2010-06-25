@@ -36,7 +36,7 @@
 typedef void (*kr2376_on_strobe_changed_func) (running_device *device, int level);
 #define KR2376_ON_STROBE_CHANGED(name) void name(running_device *device, int level)
 
-#define KR2376		DEVICE_GET_INFO_NAME(kr2376)
+DECLARE_LEGACY_DEVICE(KR2376, kr2376);
 
 #define MDRV_KR2376_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, KR2376, 0) \
@@ -72,10 +72,6 @@ struct _kr2376_interface
 	write8_device_func	on_strobe_changed;
 };
 #define KR2376_INTERFACE(name) const kr2376_interface (name)=
-
-/* device interface */
-DEVICE_GET_INFO( kr2376 );
-
 /* keyboard matrix */
 INPUT_PORTS_EXTERN( kr2376 );
 

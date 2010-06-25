@@ -101,7 +101,7 @@ static READ8_HANDLER(mac_asc_r)
 
 static WRITE8_HANDLER(mac_asc_w)
 {
-	static running_device *dacs[2];
+	static dmadac_sound_device *dacs[2];
 	INT32 i;
 	mac_state *mac = (mac_state *)space->machine->driver_data;
 
@@ -112,8 +112,8 @@ static WRITE8_HANDLER(mac_asc_w)
 	switch (offset)
 	{
 		case 0x801:	// CONTROL
-			dacs[0] = devtag_get_device(space->machine, "ascal");
-			dacs[1] = devtag_get_device(space->machine, "ascar");
+			dacs[0] = space->machine->device<dmadac_sound_device>("ascal");
+			dacs[1] = space->machine->device<dmadac_sound_device>("ascar");
 
 			if (data == 2)	// boot ROM uses this mode
 			{

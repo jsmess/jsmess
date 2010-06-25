@@ -449,8 +449,8 @@ static VIDEO_UPDATE( pasogo )
 	if (w!=width || h!=height)
 	{
 		width=w; height=h;
-//      video_screen_set_visarea(machine->primary_screen, 0, width-1, 0, height-1);
-		video_screen_set_visarea(screen, 0, width-1, 0, height-1);
+//      machine->primary_screen->set_visible_area(0, width-1, 0, height-1);
+		screen->set_visible_area(0, width-1, 0, height-1);
 	}
 #endif
 	return 0;
@@ -505,23 +505,23 @@ static const struct pic8259_interface pasogo_pic8259_config =
 
 static DEVICE_IMAGE_LOAD( pasogo_cart )
 {
-	UINT8 *user = memory_region(image->machine, "user1");
+	UINT8 *user = memory_region(image.device().machine, "user1");
 	UINT32 size;
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
+		size = image.length();
 
-		if (image_fread(image, user, size) != size)
+		if (image.fread( user, size) != size)
 		{
-			logerror("%s load error\n", image_filename(image));
+			logerror("%s load error\n", image.filename());
 			return INIT_FAIL;
 		}
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
-		memcpy(user, image_get_software_region(image, "rom"), size);
+		size = image.get_software_region_length("rom");
+		memcpy(user, image.get_software_region("rom"), size);
 	}
 
 	return INIT_PASS;

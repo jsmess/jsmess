@@ -8,7 +8,7 @@
 #define __CRTC_EGA__
 
 
-#define CRTC_EGA	DEVICE_GET_INFO_NAME(crtc_ega)
+DECLARE_LEGACY_DEVICE(CRTC_EGA, crtc_ega);
 
 #define MDRV_CRTC_EGA_ADD(_tag, _clock, _intrf) \
 	MDRV_DEVICE_ADD(_tag, CRTC_EGA, _clock) \
@@ -74,10 +74,6 @@ struct _crtc_ega_interface
 	/* if specificed, this gets called for every change of the VBLANK signal */
 	crtc_ega_on_vblank_changed_func	on_vblank_changed;
 };
-
-
-/* device interface */
-DEVICE_GET_INFO( crtc_ega );
 
 /* select one of the registers for reading or writing */
 WRITE8_DEVICE_HANDLER( crtc_ega_address_w );

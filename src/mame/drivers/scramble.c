@@ -232,7 +232,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mimonscr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w)	/* mirror address?, probably not */
-	AM_RANGE(0x4400, 0x47ff) AM_ROM
+	AM_RANGE(0x4400, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(galaxold_videoram_w) AM_BASE(&galaxold_videoram)
 	AM_RANGE(0x5000, 0x503f) AM_RAM_WRITE(galaxold_attributesram_w) AM_BASE(&galaxold_attributesram)
 	AM_RANGE(0x5040, 0x505f) AM_RAM AM_BASE(&galaxold_spriteram) AM_SIZE(&galaxold_spriteram_size)
@@ -1243,9 +1243,10 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_CPU_PROGRAM_MAP(scramble_sound_map)
 	MDRV_CPU_IO_MAP(scramble_sound_io_map)
 
-	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
-	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
-	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
+	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
+
+	MDRV_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
 
 	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
@@ -1468,7 +1469,8 @@ static MACHINE_DRIVER_START( hncholms )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(hunchbks)
-	MDRV_CPU_REPLACE("maincpu", S2650, 18432000/6/2/2)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(18432000/6/2/2)
 
 	MDRV_VIDEO_START(scorpion)
 MACHINE_DRIVER_END
@@ -1478,9 +1480,9 @@ static MACHINE_DRIVER_START( ad2083 )
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(ad2083_map)
 
-	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
-	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
-	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
+	MDRV_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
+	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
 	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
@@ -1940,7 +1942,7 @@ ROM_START( ad2083 )
 	ROM_LOAD( "ad4.5k",       0x0000, 0x2000, CRC(388cdd21) SHA1(52f97d8e4f7c7f45a2875f03eadc622b540693e7) )
 	ROM_LOAD( "ad5.3k",       0x2000, 0x2000, CRC(f53f3449) SHA1(0711f2e47504f256d46eea1e225e35f9bde8b9fb) )
 
-	ROM_REGION( 0x2000, "tms5110", 0 ) /* data for the TMS5110 speech chip */
+	ROM_REGION( 0x2000, "tmsprom", 0 ) /* data for the TMS5110 speech chip */
 	ROM_LOAD( "ad1v.9a",      0x0000, 0x1000, CRC(4cb93fff) SHA1(2cc686a9a58a85f2bb04fb6ced4626e9952635bb) )
 	ROM_LOAD( "ad2v.10a",     0x1000, 0x1000, CRC(4b530ea7) SHA1(8793b3497b598f33b34bf9524e360c6c62e8001d) )
 

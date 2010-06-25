@@ -44,9 +44,7 @@ STREAM_UPDATE( odyssey2_sh_update );
 void odyssey2_ef9341_w( int command, int b, UINT8 data );
 UINT8 odyssey2_ef9341_r( int command, int b );
 
-#define SOUND_ODYSSEY2		DEVICE_GET_INFO_NAME( odyssey2_sound )
-
-DEVICE_GET_INFO( odyssey2_sound );
+DECLARE_LEGACY_SOUND_DEVICE(ODYSSEY2, odyssey2_sound);
 
 /*----------- defined in machine/odyssey2.c -----------*/
 

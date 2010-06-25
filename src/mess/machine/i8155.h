@@ -40,7 +40,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define I8155 DEVICE_GET_INFO_NAME( i8155 )
+DECLARE_LEGACY_DEVICE(I8155, i8155);
 
 #define MDRV_I8155_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD((_tag), I8155, _clock)	\
@@ -71,10 +71,6 @@ struct _i8155_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( i8155 );
-
 /* register access */
 READ8_DEVICE_HANDLER( i8155_r );
 WRITE8_DEVICE_HANDLER( i8155_w );

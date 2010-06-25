@@ -11,10 +11,9 @@
 
 #include "image.h"
 
-#define AES_MULTICART			DEVICE_GET_INFO_NAME(aes_multicart)
-
-#define AES_CARTRIDGE_PCB_NONE		DEVICE_GET_INFO_NAME(aes_cartridge_pcb_none)
-#define AES_CARTRIDGE_PCB_STD		DEVICE_GET_INFO_NAME(aes_cartridge_pcb_std)	/* standard normal cart */
+DECLARE_LEGACY_DEVICE(AES_MULTICART, aes_multicart);
+DECLARE_LEGACY_DEVICE(AES_CARTRIDGE_PCB_NONE, aes_cartridge_pcb_none);
+DECLARE_LEGACY_DEVICE(AES_CARTRIDGE_PCB_STD, aes_cartridge_pcb_std);
 
 /* There's only 1 slot in an AES */
 #define AES_NUMBER_OF_CARTRIDGE_SLOTS 1
@@ -26,11 +25,6 @@ struct _aescartridge_t
 	running_device *pcb;
 };
 typedef struct _aescartridge_t aescartridge_t;
-
-DEVICE_GET_INFO(aes_multicart);
-
-/* cartridge PCB types */
-DEVICE_GET_INFO(aes_cartridge_pcb_std);
 
 #define MDRV_AES_CARTRIDGE_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, AES_MULTICART, 0)

@@ -115,19 +115,19 @@ DEVICE_IMAGE_LOAD( svi318_cart )
 	UINT8 *p;
 	UINT32 size;
 
-	size = MAX(0x8000,image_length(image));
+	size = MAX(0x8000,image.length());
 
-	p = (UINT8*)image_malloc(image, size);
+	p = (UINT8*)image.image_malloc(size);
 	if (!p)
 		return INIT_FAIL;
 
 	pcart_rom_size = size;
 	memset(p, 0xff, size);
 
-	size = image_length(image);
-	if (image_fread(image, p, size) != size)
+	size = image.length();
+	if (image.fread( p, size) != size)
 	{
-		logerror ("can't read file %s\n", image_filename(image) );
+		logerror ("can't read file %s\n", image.filename() );
 		return INIT_FAIL;
 	}
 
@@ -615,12 +615,12 @@ MACHINE_START( svi318_pal )
 	TMS9928A_configure(&svi318_tms9929a_interface);
 }
 
-static void svi318_load_proc(running_device *image)
+static void svi318_load_proc(device_image_interface &image)
 {
 	int size;
-	int id = floppy_get_drive(image);
+	int id = floppy_get_drive(&image.device());
 
-	size = image_length (image);
+	size = image.length();
 	switch (size)
 	{
 	case 172032:	/* SVI-328 SSDD */
@@ -818,11 +818,11 @@ static void svi318_set_banks(running_machine *machine)
 
 int svi318_cassette_present(running_machine *machine, int id)
 {
-	running_device *img = devtag_get_device(machine, "cassette");
+	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cassette");
 
-	if ( img == NULL )
+	if ( image == NULL )
 		return FALSE;
-	return image_exists(img);
+	return image->exists();
 }
 
 /* External I/O */

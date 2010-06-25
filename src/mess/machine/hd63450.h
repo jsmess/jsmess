@@ -16,8 +16,6 @@ struct _hd63450_interface
 	void (*dma_write[4])(running_machine *machine,int addr,int data);
 };
 
-DEVICE_GET_INFO( hd63450 );
-
 int hd63450_read(running_device* device, int offset, UINT16 mem_mask);
 void hd63450_write(running_device* device,int offset, int data, UINT16 mem_mask);
 void hd63450_single_transfer(running_device* device, int x);
@@ -26,7 +24,7 @@ void hd63450_set_timer(running_device* device, int channel, attotime tm);
 int hd63450_get_vector(running_device* device, int channel);
 int hd63450_get_error_vector(running_device* device, int channel);
 
-#define HD63450 DEVICE_GET_INFO_NAME(hd63450)
+DECLARE_LEGACY_DEVICE(HD63450, hd63450);
 
 #define MDRV_HD63450_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, HD63450, 0) \

@@ -982,12 +982,12 @@ SNAPSHOT_LOAD( ti8x )
 	if (!(ti8x_snapshot_data = (UINT8*)malloc(snapshot_size)))
 		return INIT_FAIL;
 
-	image_fread(image, ti8x_snapshot_data, snapshot_size);
+	image.fread( ti8x_snapshot_data, snapshot_size);
 
 	switch (ti_calculator_model)
 	{
-		case TI_85: ti85_setup_snapshot(image->machine, ti8x_snapshot_data); break;
-		case TI_86: ti86_setup_snapshot(image->machine, ti8x_snapshot_data); break;
+		case TI_85: ti85_setup_snapshot(image.device().machine, ti8x_snapshot_data); break;
+		case TI_86: ti86_setup_snapshot(image.device().machine, ti8x_snapshot_data); break;
 	}
 	free(ti8x_snapshot_data);
 	return INIT_PASS;

@@ -121,7 +121,7 @@ struct _sed1330_t
 	int ov;						/* graphics mode layer composition */
 
 	/* devices */
-	running_device *screen;
+	screen_device *screen;
 };
 
 /***************************************************************************
@@ -131,15 +131,14 @@ struct _sed1330_t
 INLINE sed1330_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (sed1330_t *)device->token;
+	return (sed1330_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const sed1330_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == SED1330));
-	return (const sed1330_interface *) device->baseconfig().static_config;
+	assert((device->type() == SED1330));
+	return (const sed1330_interface *) device->baseconfig().static_config();
 }
 
 INLINE void increment_csr(sed1330_t *sed1330)
@@ -647,7 +646,7 @@ static DEVICE_START( sed1330 )
 	devcb_resolve_write8(&sed1330->out_vd_func, &intf->out_vd_func, device);
 
 	/* get the screen device */
-	sed1330->screen = devtag_get_device(device->machine, intf->screen_tag);
+	sed1330->screen = device->machine->device<screen_device>(intf->screen_tag);
 	assert(sed1330->screen != NULL);
 
 	/* register for state saving */
@@ -710,7 +709,6 @@ DEVICE_GET_INFO( sed1330 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sed1330_t);						break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;										break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sed1330);			break;
@@ -725,3 +723,5 @@ DEVICE_GET_INFO( sed1330 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(SED1330, sed1330);

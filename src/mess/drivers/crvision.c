@@ -448,21 +448,21 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 {
 	UINT32 size;
 	UINT8 *temp_copy;
-	running_machine *machine = image->machine;
+	running_machine *machine = image.device().machine;
 	UINT8 *mem = memory_region(machine, M6502_TAG);
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
+		size = image.length();
 		temp_copy = auto_alloc_array(machine, UINT8, size);
-		image_fread(image, temp_copy, size);
+		image.fread( temp_copy, size);
 	}
 	else
 	{
-		size= image_get_software_region_length(image, "rom");
+		size= image.get_software_region_length("rom");
 		temp_copy = auto_alloc_array(machine, UINT8, size);
-		memcpy(temp_copy, image_get_software_region(image, "rom"), size);
+		memcpy(temp_copy, image.get_software_region("rom"), size);
 	}
 
 	switch (size)

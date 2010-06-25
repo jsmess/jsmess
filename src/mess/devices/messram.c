@@ -41,10 +41,9 @@ struct _messram_state
 INLINE messram_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == MESSRAM);
+	assert(device->type() == MESSRAM);
 
-	return (messram_state *)device->token;
+	return (messram_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -121,7 +120,7 @@ const char *messram_string(char *buffer, UINT32 ram)
 static DEVICE_START( messram )
 {
 	messram_state *messram = get_safe_token(device);
-	ram_config *config = (ram_config *)device->baseconfig().inline_config;
+	ram_config *config = (ram_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 
 	/* the device named 'messram' can get ram options from command line */
 	if (strcmp(device->tag(), "messram") == 0)
@@ -149,7 +148,7 @@ static DEVICE_START( messram )
 
 static DEVICE_VALIDITY_CHECK( messram )
 {
-	ram_config *config = (ram_config *)device->inline_config;
+	ram_config *config = (ram_config *)downcast<const legacy_device_config_base *>(device)->inline_config();
 	const char *ramsize_string = NULL;
 	int is_valid = FALSE;
 	UINT32 specified_ram = 0;
@@ -260,13 +259,12 @@ DEVICE_GET_INFO( messram )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(messram_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(ram_config);				break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_OTHER;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(messram);	break;
 		case DEVINFO_FCT_STOP:							/* Nothing */								break;
 		case DEVINFO_FCT_RESET:							/* Nothing */								break;
-		case DEVINFO_FCT_VALIDITY_CHECK:				info->validity_check = DEVICE_VALIDITY_CHECK_NAME(messram); break;
+		case DEVINFO_FCT_VALIDITY_CHECK:				info->p = (void*)DEVICE_VALIDITY_CHECK_NAME(messram); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "MESS RAM");				break;
@@ -319,3 +317,5 @@ void messram_dump(running_device *device, const char *filename)
 	}
 }
 #endif
+
+DEFINE_LEGACY_DEVICE(MESSRAM, messram);

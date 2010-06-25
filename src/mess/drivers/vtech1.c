@@ -191,14 +191,14 @@ public:
 
 static SNAPSHOT_LOAD( vtech1 )
 {
-	vtech1_state *vtech1 = (vtech1_state *)image->machine->driver_data;
-	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	vtech1_state *vtech1 = (vtech1_state *)image.device().machine->driver_data;
+	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 i, header[24];
 	UINT16 start, end, size;
 	char pgmname[18];
 
 	/* get the header */
-	image_fread(image, &header, sizeof(header));
+	image.fread( &header, sizeof(header));
 	for (i = 0; i < 16; i++) pgmname[i] = header[i+4];
 	pgmname[16] = '\0';
 
@@ -212,13 +212,13 @@ static SNAPSHOT_LOAD( vtech1 )
 	{
 		char message[256];
 		snprintf(message, ARRAY_LENGTH(message), "SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
-		image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, message);
-		image_message(image, "SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, message);
+		image.message("SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
 		return INIT_FAIL;
 	}
 
 	/* write it to ram */
-	image_fread(image, &vtech1->ram[start - 0x7800], size);
+	image.fread( &vtech1->ram[start - 0x7800], size);
 
 	/* patch variables depending on snapshot type */
 	switch (header[21])
@@ -232,19 +232,19 @@ static SNAPSHOT_LOAD( vtech1 )
 		memory_write_byte(space, 0x78fc, end / 256);
 		memory_write_byte(space, 0x78fd, end % 256); /* start free mem, end variable table */
 		memory_write_byte(space, 0x78fe, end / 256);
-		image_message(image, " %s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
+		image.message(" %s (B)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
 		break;
 
 	case VZ_MCODE:		/* 0xF1 */
 		memory_write_byte(space, 0x788e, start % 256); /* usr subroutine address */
 		memory_write_byte(space, 0x788f, start / 256);
-		image_message(image, " %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, start);				/* start program */
+		image.message(" %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
+		cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, start);				/* start program */
 		break;
 
 	default:
-		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Snapshot format not supported.");
-		image_message(image, "Snapshot format not supported.");
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Snapshot format not supported.");
+		image.message("Snapshot format not supported.");
 		return INIT_FAIL;
 	}
 
@@ -285,12 +285,12 @@ static Z80BIN_EXECUTE( vtech1 )
 		if (!autorun)
 			memory_write_byte(space, 0x7929, 0xb6);	/* turn off autorun */
 
-		cpu_set_reg(cpu, REG_GENPC, 0x791e);
+		cpu_set_reg(cpu, STATE_GENPC, 0x791e);
 	}
 	else
 	{
 		if (autorun)
-			cpu_set_reg(cpu, REG_GENPC, execute_address);
+			cpu_set_reg(cpu, STATE_GENPC, execute_address);
 	}
 }
 
@@ -298,12 +298,12 @@ static Z80BIN_EXECUTE( vtech1 )
 /***************************************************************************
     FLOPPY DRIVE
 ***************************************************************************/
-static void vtech1_load_proc(running_device *image)
+static void vtech1_load_proc(device_image_interface &image)
 {
-	vtech1_state *vtech1 = (vtech1_state *)image->machine->driver_data;
-	int id = floppy_get_drive(image);
+	vtech1_state *vtech1 = (vtech1_state *)image.device().machine->driver_data;
+	int id = floppy_get_drive(&image.device());
 
-	if (image_is_writable(image))
+	if (image.is_writable())
 		vtech1->fdc_wrprot[id] = 0x00;
 	else
 		vtech1->fdc_wrprot[id] = 0x80;
@@ -312,15 +312,16 @@ static void vtech1_load_proc(running_device *image)
 static void vtech1_get_track(running_machine *machine)
 {
 	vtech1_state *vtech1 = (vtech1_state *)machine->driver_data;
+	device_image_interface *image = (device_image_interface*)floppy_get_device(machine,vtech1->drive);
 
 	/* drive selected or and image file ok? */
-	if (vtech1->drive >= 0 && image_exists(floppy_get_device(machine,vtech1->drive)))
+	if (vtech1->drive >= 0 && image->exists())
 	{
 		int size, offs;
 		size = TRKSIZE_VZ;
 		offs = TRKSIZE_VZ * vtech1->fdc_track_x2[vtech1->drive]/2;
-		image_fseek(floppy_get_device(machine,vtech1->drive), offs, SEEK_SET);
-		size = image_fread(floppy_get_device(machine,vtech1->drive), vtech1->fdc_data, size);
+		image->fseek(offs, SEEK_SET);
+		size = image->fread(vtech1->fdc_data, size);
 		if (LOG_VTECH1_FDC)
 			logerror("get track @$%05x $%04x bytes\n", offs, size);
     }
@@ -331,14 +332,16 @@ static void vtech1_get_track(running_machine *machine)
 static void vtech1_put_track(running_machine *machine)
 {
 	vtech1_state *vtech1 = (vtech1_state *)machine->driver_data;
+	
 
     /* drive selected and image file ok? */
 	if (vtech1->drive >= 0 && floppy_get_device(machine,vtech1->drive) != NULL)
 	{
 		int size, offs;
+		device_image_interface *image = (device_image_interface*)floppy_get_device(machine,vtech1->drive);
 		offs = TRKSIZE_VZ * vtech1->fdc_track_x2[vtech1->drive]/2;
-		image_fseek(floppy_get_device(machine,vtech1->drive), offs + vtech1->fdc_start, SEEK_SET);
-		size = image_fwrite(floppy_get_device(machine,vtech1->drive), &vtech1->fdc_data[vtech1->fdc_start], vtech1->fdc_write);
+		image->fseek(offs + vtech1->fdc_start, SEEK_SET);
+		size = image->fwrite(&vtech1->fdc_data[vtech1->fdc_start], vtech1->fdc_write);
 		if (LOG_VTECH1_FDC)
 			logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, vtech1->fdc_start, size, vtech1->fdc_write);
     }

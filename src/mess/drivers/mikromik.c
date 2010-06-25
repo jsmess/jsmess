@@ -595,11 +595,11 @@ static I8085_CONFIG( mm1_i8085_config )
 
 static TIMER_DEVICE_CALLBACK( kbclk_tick )
 {
-	mm1_state *state = (mm1_state *)timer->machine->driver_data;
+	mm1_state *state = (mm1_state *)timer.machine->driver_data;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
 
-	UINT8 data = input_port_read(timer->machine, keynames[state->drive]);
-	UINT8 special = input_port_read(timer->machine, "SPECIAL");
+	UINT8 data = input_port_read(timer.machine, keynames[state->drive]);
+	UINT8 special = input_port_read(timer.machine, "SPECIAL");
 	int ctrl = BIT(special, 0);
 	int shift = BIT(special, 2) & BIT(special, 1);
 	UINT8 keydata = 0xff;
@@ -794,7 +794,7 @@ static MACHINE_DRIVER_START( mm1m6 )
 	MDRV_CPU_PROGRAM_MAP(mm1m6_map)
 
 	/* video hardware */
-	MDRV_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, mm1_upd7220_intf, mm1_upd7220_map)
+	MDRV_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, mm1_upd7220_intf, mm1_upd7220_map)	
 MACHINE_DRIVER_END
 
 /* ROMs */

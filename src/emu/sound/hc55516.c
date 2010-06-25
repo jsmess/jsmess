@@ -55,12 +55,10 @@ static STREAM_UPDATE( hc55516_update );
 INLINE hc55516_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_HC55516 ||
-		   sound_get_type(device) == SOUND_MC3417 ||
-		   sound_get_type(device) == SOUND_MC3418);
-	return (hc55516_state *)device->token;
+	assert(device->type() == SOUND_HC55516 ||
+		   device->type() == SOUND_MC3417 ||
+		   device->type() == SOUND_MC3418);
+	return (hc55516_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -73,7 +71,7 @@ static void start_common(running_device *device, UINT8 _shiftreg_mask, int _acti
 	decay = pow(exp(-1.0), 1.0 / (FILTER_DECAY_TC * 16000.0));
 	leak = pow(exp(-1.0), 1.0 / (INTEGRATOR_LEAK_TC * 16000.0));
 
-	chip->clock = device->clock;
+	chip->clock = device->clock();
 	chip->shiftreg_mask = _shiftreg_mask;
 	chip->active_clock_hi = _active_clock_hi;
 	chip->last_clock_state = 0;
@@ -345,3 +343,8 @@ DEVICE_GET_INFO( mc3418 )
 		default:										DEVICE_GET_INFO_CALL(hc55516);					break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(HC55516, hc55516);
+DEFINE_LEGACY_SOUND_DEVICE(MC3417, mc3417);
+DEFINE_LEGACY_SOUND_DEVICE(MC3418, mc3418);

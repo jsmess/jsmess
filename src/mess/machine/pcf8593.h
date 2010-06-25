@@ -16,7 +16,7 @@
     MACROS
 ***************************************************************************/
 
-#define PCF8593		DEVICE_GET_INFO_NAME(pcf8593)
+DECLARE_LEGACY_DEVICE(PCF8593, pcf8593);
 
 #define MDRV_PCF8593_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, PCF8593, 0) \
@@ -29,9 +29,6 @@
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO(pcf8593);
-
 /* pins */
 void pcf8593_pin_scl(running_device *device, int data);
 void pcf8593_pin_sda_w(running_device *device, int data);

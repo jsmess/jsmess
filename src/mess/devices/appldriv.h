@@ -27,8 +27,7 @@ struct _appledriv_config
 
 };
 
-#define FLOPPY_APPLE	DEVICE_GET_INFO_NAME(apple525)
-DEVICE_GET_INFO(apple525);
+DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY_APPLE, apple525);
 
 #define MDRV_FLOPPY_APPLE_PARAMS(_dividend,_divisor)	\
 	MDRV_DEVICE_CONFIG_DATA32(appledriv_config, dividend, _dividend)	\

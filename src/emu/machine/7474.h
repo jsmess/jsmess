@@ -40,32 +40,30 @@
 #ifndef TTL7474_H
 #define TTL7474_H
 
+#include "devlegcy.h"
+
 
 typedef struct _ttl7474_config ttl7474_config;
 struct _ttl7474_config
 {
-	void (*output_cb)(running_device *device);
+	devcb_write_line output_cb;
+	devcb_write_line comp_output_cb;
 };
 
 
-#define MDRV_7474_ADD(_tag, _output_cb) \
+#define MDRV_7474_ADD(_tag, _target_tag, _output_cb, _comp_output_cb) \
 	MDRV_DEVICE_ADD(_tag, TTL7474, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ttl7474_config, output_cb, _output_cb)
+	MDRV_DEVICE_CONFIG_WRITE_LINE(ttl7474_config, output_cb, _target_tag, _output_cb) \
+	MDRV_DEVICE_CONFIG_WRITE_LINE(ttl7474_config, comp_output_cb, _target_tag, _comp_output_cb)
 
 
+WRITE_LINE_DEVICE_HANDLER( ttl7474_clear_w );
+WRITE_LINE_DEVICE_HANDLER( ttl7474_preset_w );
+WRITE_LINE_DEVICE_HANDLER( ttl7474_clock_w );
+WRITE_LINE_DEVICE_HANDLER( ttl7474_d_w );
+READ_LINE_DEVICE_HANDLER( ttl7474_output_r );
+READ_LINE_DEVICE_HANDLER( ttl7474_output_comp_r );	/* NOT strictly the same as !ttl7474_output_r() */
 
-/* must call TTL7474_update() after setting the inputs */
-void ttl7474_update(running_device *device);
-
-void ttl7474_clear_w(running_device *device, int data);
-void ttl7474_preset_w(running_device *device, int data);
-void ttl7474_clock_w(running_device *device, int data);
-void ttl7474_d_w(running_device *device, int data);
-int  ttl7474_output_r(running_device *device);
-int  ttl7474_output_comp_r(running_device *device);	/* NOT strictly the same as !ttl7474_output_r() */
-
-/* device get info callback */
-#define TTL7474 DEVICE_GET_INFO_NAME(ttl7474)
-DEVICE_GET_INFO( ttl7474 );
+DECLARE_LEGACY_DEVICE(TTL7474, ttl7474);
 
 #endif

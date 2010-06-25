@@ -1258,7 +1258,7 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 			// CPC+/GX4000 Programmable Raster Interrupt (disabled if &6800 in ASIC RAM is 0)
 			if ( asic.pri != 0 )
 			{
-				if ( asic.pri == video_screen_get_vpos( device->machine->primary_screen ) )
+				if ( asic.pri == device->machine->primary_screen->vpos() )
 				{
 					logerror("PRI: triggered, scanline %d\n",asic.pri);
 					cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
@@ -1269,9 +1269,9 @@ static WRITE_LINE_DEVICE_HANDLER( amstrad_plus_hsync_changed )
 			// CPC+/GX4000 Split screen registers  (disabled if &6801 in ASIC RAM is 0)
 			if(amstrad_plus_asic_ram[0x2801] != 0)
 			{
-				if ( amstrad_plus_asic_ram[0x2801] == video_screen_get_vpos( device->machine->primary_screen ) )	// split occurs here (hopefully)
+				if ( amstrad_plus_asic_ram[0x2801] == device->machine->primary_screen->vpos() )	// split occurs here (hopefully)
 				{
-					video_screen_update_partial( device->machine->primary_screen, video_screen_get_vpos( device->machine->primary_screen ) );
+					device->machine->primary_screen->update_partial(device->machine->primary_screen->vpos() );
 					logerror("SSCR: Split screen occured at scanline %d\n",amstrad_plus_asic_ram[0x2801]);
 				}
 			}
@@ -1861,7 +1861,7 @@ static void AmstradCPC_GA_SetRamConfiguration(running_machine *machine)
 
 WRITE8_HANDLER( amstrad_plus_asic_4000_w )
 {
-	video_screen_update_partial( space->machine->primary_screen, video_screen_get_vpos( space->machine->primary_screen ) );
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 //  logerror("ASIC: Write to register at &%04x\n",offset+0x4000);
 	amstrad_plus_asic_ram[offset] = data & 0x0f;
 }
@@ -1869,7 +1869,7 @@ WRITE8_HANDLER( amstrad_plus_asic_4000_w )
 
 WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 {
-	video_screen_update_partial( space->machine->primary_screen, video_screen_get_vpos( space->machine->primary_screen ) );
+	space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 	amstrad_plus_asic_ram[offset+0x2000] = data;
 	if(offset >= 0x0400 && offset < 0x440 && ( offset & 0x01 ) ) // ASIC palette
 	{
@@ -2081,7 +2081,7 @@ Bit Value Function
 1   x     |
 0   x     |*/
 	case 0x01:
-		video_screen_update_partial( machine->primary_screen, video_screen_get_vpos( machine->primary_screen ) );
+		machine->primary_screen->update_partial(machine->primary_screen->vpos());
 		amstrad_vh_update_colour( gate_array.pen_selected, (dataToGateArray & 0x1F));
 		break;
 
@@ -2145,7 +2145,7 @@ Bit 4 controls the interrupt generation. It can be used to delay interrupts.*/
 		amstrad_setUpperRom(machine);
 
 		/* b1b0 mode */
-		video_screen_update_partial( machine->primary_screen, video_screen_get_vpos( machine->primary_screen ) );
+		machine->primary_screen->update_partial(machine->primary_screen->vpos());
 		amstrad_vh_update_mode();
 
 		break;
@@ -2470,7 +2470,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 
 			break;
 		case 0x01:		/* Write to selected internal 6845 register Write Only */
-			video_screen_update_partial( space->machine->primary_screen, video_screen_get_vpos( space->machine->primary_screen ) );
+			space->machine->primary_screen->update_partial(space->machine->primary_screen->vpos());
 			mc6845_register_w( mc6845, 0, data );
 
 			/* printer port bit 8 */
@@ -2619,20 +2619,20 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 
 	if ((pSnapshot[0x01b] & 1)==1)
 	{
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, 1);
+		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, (UINT64)1);
 	}
 	else
 	{
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, 0);
+		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, (UINT64)0);
 	}
 
 	if ((pSnapshot[0x01c] & 1)==1)
 	{
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF2, 1);
+		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF2, (UINT64)1);
 	}
 	else
 	{
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF2, 0);
+		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF2, (UINT64)0);
 	}
 
 	RegData = (pSnapshot[0x01d] & 0x0ff) | ((pSnapshot[0x01e] & 0x0ff)<<8);
@@ -2643,7 +2643,7 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 
 	RegData = (pSnapshot[0x021] & 0x0ff) | ((pSnapshot[0x022] & 0x0ff)<<8);
 	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_SP, RegData);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENSP, RegData);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENSP, RegData);
 
 	RegData = (pSnapshot[0x023] & 0x0ff) | ((pSnapshot[0x024] & 0x0ff)<<8);
 
@@ -3466,7 +3466,7 @@ SNAPSHOT_LOAD(amstrad)
 		return INIT_FAIL;
 
 	/* read whole file */
-	image_fread(image, snapshot, snapshot_size);
+	image.fread(snapshot, snapshot_size);
 
 	if (memcmp(snapshot, "MV - SNA", 8))
 	{
@@ -3474,7 +3474,7 @@ SNAPSHOT_LOAD(amstrad)
 		return INIT_FAIL;
 	}
 
-	amstrad_handle_snapshot(image->machine, snapshot);
+	amstrad_handle_snapshot(image.device().machine, snapshot);
 	free(snapshot);
 	return INIT_PASS;
 }
@@ -3497,24 +3497,24 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 	int chunksize;                // chunk length, calcaulated from the above
 	int ramblock;                 // 16k RAM block chunk is to be loaded in to
 	unsigned int bytes_to_read;   // total bytes to read, as mame_feof doesn't react to EOF without trying to go past it.
-	unsigned char* mem = memory_region(image->machine, "maincpu");
+	unsigned char* mem = memory_region(image.device().machine, "maincpu");
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
-		temp_copy = auto_alloc_array(image->machine, UINT8, size);
-		if (image_fread(image, temp_copy, size) != size)
+		size = image.length();
+		temp_copy = auto_alloc_array(image.device().machine, UINT8, size);
+		if (image.fread(temp_copy, size) != size)
 		{
 			logerror("IMG: failed to read from cart image\n");
-			auto_free(image->machine, temp_copy);
+			auto_free(image.device().machine, temp_copy);
 			return INIT_FAIL;
 		}
 	}
 	else
 	{
-		size= image_get_software_region_length(image, "rom");
-		temp_copy = auto_alloc_array(image->machine, UINT8, size);
-		memcpy(temp_copy, image_get_software_region(image, "rom"), size);
+		size= image.get_software_region_length("rom");
+		temp_copy = auto_alloc_array(image.device().machine, UINT8, size);
+		memcpy(temp_copy, image.get_software_region("rom"), size);
 	}
 
 	logerror("IMG: loading CPC+ cartridge file\n");
@@ -3535,19 +3535,19 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 			if ((size - offset) < 0x4000)
 			{
 				logerror("BIN: block %i loaded is smaller than 16kB in size\n", offset / 0x4000);
-				auto_free(image->machine, temp_copy);
+				auto_free(image.device().machine, temp_copy);
 				return INIT_FAIL;
 			}
 			offset += 0x4000;
 		}
 	}
-	else if (image_software_entry(image) == NULL)	// we have no CPR carts in our gx4000 softlist
+	else if (image.software_entry() == NULL)	// we have no CPR carts in our gx4000 softlist
 	{
 		// Is RIFF format (*.cpr)
 		if (strncmp((char*)(header + 8), "AMS!", 4) != 0)
 		{
 			logerror("CPR: not an Amstrad CPC cartridge image\n");
-			auto_free(image->machine, temp_copy);
+			auto_free(image.device().machine, temp_copy);
 			return INIT_FAIL;
 		}
 
@@ -3605,11 +3605,11 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 	else	// CPR carts in our softlist
 	{
 		logerror("Gamelist cart in RIFF format\n");
-		auto_free(image->machine, temp_copy);
+		auto_free(image.device().machine, temp_copy);
 		return INIT_FAIL;
 	}
 
-	auto_free(image->machine, temp_copy);
+	auto_free(image.device().machine, temp_copy);
 	return INIT_PASS;
 }
 

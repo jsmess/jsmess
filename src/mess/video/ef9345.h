@@ -14,7 +14,7 @@
     MACROS
 ***************************************************************************/
 
-#define EF9345			DEVICE_GET_INFO_NAME(ef9345)
+DECLARE_LEGACY_DEVICE(EF9345, ef9345);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -39,8 +39,6 @@ struct _ef9345_config
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( ef9345 );
 
 void video_update_ef9345(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 void ef9345_scanline(running_device *device, UINT16 scanline);

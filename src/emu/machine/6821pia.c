@@ -110,16 +110,16 @@ struct _pia6821_state
 INLINE pia6821_state *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == PIA6821) || (device->type == PIA6822));
-	return (pia6821_state *) device->token;
+	assert((device->type() == PIA6821) || (device->type() == PIA6822));
+	return (pia6821_state *) downcast<legacy_device_base *>(device)->token();
 }
 
 
 INLINE const pia6821_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == PIA6821) || (device->type == PIA6822));
-	return (const pia6821_interface *) device->baseconfig().static_config;
+	assert((device->type() == PIA6821) || (device->type() == PIA6822));
+	return (const pia6821_interface *) device->baseconfig().static_config();
 }
 
 
@@ -1335,3 +1335,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_DERIVED_FEATURES	0
 #define DEVTEMPLATE_DERIVED_NAME		"6822 PIA"
 #include "devtempl.h"
+
+DEFINE_LEGACY_DEVICE(PIA6821, pia6821);
+DEFINE_LEGACY_DEVICE(PIA6822, pia6822);

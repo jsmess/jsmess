@@ -18,9 +18,9 @@
 #define	DEBUG_ZX81_PORTS	1
 #define DEBUG_ZX81_VSYNC	1
 
-#define LOG_ZX81_IOR(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOR: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, video_screen_get_vpos(space->machine->primary_screen), _comment); } while (0)
-#define LOG_ZX81_IOW(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, video_screen_get_vpos(space->machine->primary_screen), _comment); } while (0)
-#define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", video_screen_get_vpos(space->machine->primary_screen)); } while (0)
+#define LOG_ZX81_IOR(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOR: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space->machine->primary_screen->vpos(), _comment); } while (0)
+#define LOG_ZX81_IOW(_comment) do { if (DEBUG_ZX81_PORTS) logerror("ZX81 IOW: %04x, Data: %02x, Scanline: %d (%s)\n", offset, data, space->machine->primary_screen->vpos(), _comment); } while (0)
+#define LOG_ZX81_VSYNC do { if (DEBUG_ZX81_VSYNC) logerror("VSYNC starts in scanline: %d\n", space->machine->primary_screen->vpos()); } while (0)
 
 static UINT8 zx_tape_bit = 0x80;
 
@@ -399,8 +399,8 @@ WRITE8_HANDLER ( zx81_io_w )
     FE = turn on NMI generator
     FF = write HSYNC and cass data */
 
-	running_device *screen = video_screen_first(space->machine);
-	int height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*space->machine);
+	int height = screen->height();
 	UINT8 offs = offset & 0xff;
 
 	if (offs == 0xfd)
@@ -426,9 +426,9 @@ WRITE8_HANDLER ( zx81_io_w )
 		zx_ula_bkgnd(space->machine, 1);
 		if (ula_frame_vsync == 2)
 		{
-			cpu_spinuntil_time(space->cpu,video_screen_get_time_until_pos(space->machine->primary_screen, height - 1, 0));
+			cpu_spinuntil_time(space->cpu,space->machine->primary_screen->time_until_pos(height - 1, 0));
 			ula_scanline_count = height - 1;
-			logerror ("S: %d B: %d\n", video_screen_get_vpos(space->machine->primary_screen), video_screen_get_hpos(space->machine->primary_screen));
+			logerror ("S: %d B: %d\n", space->machine->primary_screen->vpos(), space->machine->primary_screen->hpos());
 		}
 
 		LOG_ZX81_IOW("ULA IRQs on");

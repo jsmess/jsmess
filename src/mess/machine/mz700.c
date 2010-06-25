@@ -129,7 +129,7 @@ static READ8_HANDLER( mz700_e008_r )
 
 	data |= mz->other_timer;
 	data |= input_port_read(space->machine, "JOY");
-	data |= video_screen_get_hblank(space->machine->primary_screen) << 7;
+	data |= space->machine->primary_screen->hblank() << 7;
 
 	LOG(1, "mz700_e008_r", ("%02X\n", data), space->machine);
 
@@ -486,7 +486,7 @@ static READ8_DEVICE_HANDLER( pio_port_c_r )
 		data |= 0x20;       /* set the RDATA status */
 
 	data |= mz->cursor_timer << 6;
-	data |= video_screen_get_vblank(device->machine->primary_screen) << 7;
+	data |= device->machine->primary_screen->vblank() << 7;
 
 	LOG(2,"mz700_pio_port_c_r",("%02X\n", data),device->machine);
 
@@ -496,7 +496,7 @@ static READ8_DEVICE_HANDLER( pio_port_c_r )
 
 static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 {
-	running_device *timer = devtag_get_device(device->machine, "cursor");
+	timer_device *timer = device->machine->device<timer_device>("cursor");
 
 	LOG(2,"mz700_pio_port_a_w",("%02X\n", data),device->machine);
 
@@ -504,7 +504,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_a_w )
 	ttl74145_w(device, 0, data & 0x07);
 
 	/* ne556 reset is connected to PA7 */
-	timer_device_enable(timer, BIT(data, 7));
+	timer->enable(BIT(data, 7));
 }
 
 
@@ -571,7 +571,7 @@ static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )
 
 	result |= centronics_busy_r(printer);
 	result |= centronics_pe_r(printer) << 1;
-	result |= video_screen_get_hblank(device->machine->primary_screen) << 5;
+	result |= device->machine->primary_screen->hblank() << 5;
 
 	return result;
 }

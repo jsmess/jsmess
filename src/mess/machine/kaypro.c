@@ -398,25 +398,25 @@ MACHINE_RESET( kaypro2x )
 
 QUICKLOAD_LOAD( kayproii )
 {
-	running_device *cpu = devtag_get_device(image->machine, "maincpu");
-	UINT8 *RAM = memory_region(image->machine, "rambank");
+	running_device *cpu = devtag_get_device(image.device().machine, "maincpu");
+	UINT8 *RAM = memory_region(image.device().machine, "rambank");
 	UINT16 i;
 	UINT8 data;
 
 	/* Load image to the TPA (Transient Program Area) */
 	for (i = 0; i < quickload_size; i++)
 	{
-		if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
+		if (image.fread( &data, 1) != 1) return INIT_FAIL;
 
 		RAM[i+0x100] = data;
 	}
 
-//  if (input_port_read(image->machine, "CONFIG") & 1)
+//  if (input_port_read(image.device().machine, "CONFIG") & 1)
 	{
 		common_pio_system_w(kayproii_z80pio_s, 0, kaypro_system_port & 0x7f);	// switch TPA in
 		RAM[0x80]=0;							// clear out command tail
 		RAM[0x81]=0;
-		cpu_set_reg(cpu, REG_GENPC, 0x100);				// start program
+		cpu_set_reg(cpu, STATE_GENPC, 0x100);				// start program
 	}
 
 	return INIT_PASS;
@@ -424,25 +424,25 @@ QUICKLOAD_LOAD( kayproii )
 
 QUICKLOAD_LOAD( kaypro2x )
 {
-	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *cpu = devtag_get_device(image->machine, "maincpu");
-	UINT8 *RAM = memory_region(image->machine, "rambank");
+	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	running_device *cpu = devtag_get_device(image.device().machine, "maincpu");
+	UINT8 *RAM = memory_region(image.device().machine, "rambank");
 	UINT16 i;
 	UINT8 data;
 
 	for (i = 0; i < quickload_size; i++)
 	{
-		if (image_fread(image, &data, 1) != 1) return INIT_FAIL;
+		if (image.fread( &data, 1) != 1) return INIT_FAIL;
 
 		RAM[i+0x100] = data;
 	}
 
-//  if (input_port_read(image->machine, "CONFIG") & 1)
+//  if (input_port_read(image.device().machine, "CONFIG") & 1)
 	{
 		kaypro2x_system_port_w(space, 0, kaypro_system_port & 0x7f);
 		RAM[0x80]=0;
 		RAM[0x81]=0;
-		cpu_set_reg(cpu, REG_GENPC, 0x100);
+		cpu_set_reg(cpu, STATE_GENPC, 0x100);
 	}
 
 	return INIT_PASS;

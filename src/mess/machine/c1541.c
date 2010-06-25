@@ -209,18 +209,17 @@ struct _c1541_t
 INLINE c1541_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == C1540) || (device->type == C1541) || (device->type == C1541C) || (device->type == C1541II) ||
-		(device->type == SX1541) || (device->type == OC118) || (device->type == C2031));
-	return (c1541_t *)device->token;
+	assert((device->type() == C1540) || (device->type() == C1541) || (device->type() == C1541C) || (device->type() == C1541II) ||
+		(device->type() == SX1541) || (device->type() == OC118) || (device->type() == C2031));
+	return (c1541_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE c1541_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == C1540) || (device->type == C1541) || (device->type == C1541C) || (device->type == C1541II) ||
-		(device->type == SX1541) || (device->type == OC118) || (device->type == C2031));
-	return (c1541_config *)device->baseconfig().inline_config;
+	assert((device->type() == C1540) || (device->type() == C1541) || (device->type() == C1541C) || (device->type() == C1541II) ||
+		(device->type() == SX1541) || (device->type() == OC118) || (device->type() == C2031));
+	return (c1541_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 /***************************************************************************
@@ -307,9 +306,9 @@ static void read_current_track(c1541_t *c1541)
     on_disk_change - disk change handler
 -------------------------------------------------*/
 
-static void on_disk_change(running_device *image)
+static void on_disk_change(device_image_interface &image)
 {
-	c1541_t *c1541 = get_safe_token(image->owner);
+	c1541_t *c1541 = get_safe_token(image.device().owner());
 
 	read_current_track(c1541);
 }
@@ -508,7 +507,7 @@ ADDRESS_MAP_END
 
 static WRITE_LINE_DEVICE_HANDLER( via0_irq_w )
 {
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	c1541->via0_irq = state;
 
@@ -538,7 +537,7 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 	UINT8 data = 0;
 
 	/* data in */
@@ -573,7 +572,7 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	int data_out = BIT(data, 1);
 	int clk_out = BIT(data, 3);
@@ -581,11 +580,11 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 	/* data out */
 	int serial_data = !data_out && !(atna ^ !cbm_iec_atn_r(c1541->bus));
-	cbm_iec_data_w(c1541->bus, device->owner, serial_data);
+	cbm_iec_data_w(c1541->bus, device->owner(), serial_data);
 	c1541->data_out = data_out;
 
 	/* clock out */
-	cbm_iec_clk_w(c1541->bus, device->owner, !clk_out);
+	cbm_iec_clk_w(c1541->bus, device->owner(), !clk_out);
 
 	/* attention acknowledge */
 	c1541->atna = atna;
@@ -593,7 +592,7 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 static READ_LINE_DEVICE_HANDLER( atn_in_r )
 {
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	return !cbm_iec_atn_r(c1541->bus);
 }
@@ -638,7 +637,7 @@ static READ8_DEVICE_HANDLER( c1541c_via0_pa_r )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	return !floppy_tk00_r(c1541->image);
 }
@@ -683,7 +682,7 @@ static READ8_DEVICE_HANDLER( c2031_via0_pa_r )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	return ieee488_dio_r(c1541->bus, 0);
 }
@@ -705,9 +704,9 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pa_w )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
-	ieee488_dio_w(c1541->bus, device->owner, data);
+	ieee488_dio_w(c1541->bus, device->owner(), data);
 }
 
 static READ8_DEVICE_HANDLER( c2031_via0_pb_r )
@@ -727,7 +726,7 @@ static READ8_DEVICE_HANDLER( c2031_via0_pb_r )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
@@ -766,7 +765,7 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pb_w )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	int atna = BIT(data, 0);
 	int nrfd = BIT(data, 1);
@@ -779,10 +778,10 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pb_w )
 	c1541->ndac_out = ndac;
 
 	/* end or identify */
-	ieee488_eoi_w(c1541->bus, device->owner, BIT(data, 3));
+	ieee488_eoi_w(c1541->bus, device->owner(), BIT(data, 3));
 
 	/* data valid */
-	ieee488_dav_w(c1541->bus, device->owner, BIT(data, 6));
+	ieee488_dav_w(c1541->bus, device->owner(), BIT(data, 6));
 
 	/* attention acknowledge */
 	c1541->atna = atna;
@@ -792,20 +791,20 @@ static WRITE8_DEVICE_HANDLER( c2031_via0_pb_w )
 		nrfd = ndac = 0;
 	}
 
-	ieee488_nrfd_w(c1541->bus, device->owner, nrfd);
-	ieee488_ndac_w(c1541->bus, device->owner, ndac);
+	ieee488_nrfd_w(c1541->bus, device->owner(), nrfd);
+	ieee488_ndac_w(c1541->bus, device->owner(), ndac);
 }
 
 static READ_LINE_DEVICE_HANDLER( c2031_via0_ca1_r )
 {
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	return !ieee488_atn_r(c1541->bus);
 }
 
 static READ_LINE_DEVICE_HANDLER( c2031_via0_ca2_r )
 {
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 	int state = 0;
 
 	/* device # selection */
@@ -845,7 +844,7 @@ static const via6522_interface c2031_via0_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 {
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	c1541->via1_irq = state;
 
@@ -869,7 +868,7 @@ static READ8_DEVICE_HANDLER( yb_r )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	return c1541->data & 0xff;
 }
@@ -891,7 +890,7 @@ static WRITE8_DEVICE_HANDLER( yb_w )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	c1541->yb = data;
 }
@@ -913,7 +912,7 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 	UINT8 data = 0;
 
 	/* write protect sense */
@@ -942,7 +941,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
     */
 
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	/* spindle motor */
 	int mtr = BIT(data, 2);
@@ -966,14 +965,14 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 static READ_LINE_DEVICE_HANDLER( byte_ready_r )
 {
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	return !(c1541->byte && c1541->soe);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( soe_w )
 {
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 	int byte_ready = !(state && c1541->byte);
 
 	c1541->soe = state;
@@ -984,7 +983,7 @@ static WRITE_LINE_DEVICE_HANDLER( soe_w )
 
 static WRITE_LINE_DEVICE_HANDLER( mode_w )
 {
-	c1541_t *c1541 = get_safe_token(device->owner);
+	c1541_t *c1541 = get_safe_token(device->owner());
 
 	c1541->mode = state;
 }
@@ -1276,7 +1275,6 @@ DEVICE_GET_INFO( c1540 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1541_t);									break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1541_config);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1540);							break;
@@ -1409,3 +1407,11 @@ DEVICE_GET_INFO( oc118 )
 		default:										DEVICE_GET_INFO_CALL(c1540);								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(C1540, c1540);
+DEFINE_LEGACY_DEVICE(C1541, c1541);
+DEFINE_LEGACY_DEVICE(C1541C, c1541c);
+DEFINE_LEGACY_DEVICE(C1541II, c1541ii);
+DEFINE_LEGACY_DEVICE(SX1541, sx1541);
+DEFINE_LEGACY_DEVICE(C2031, c2031);
+DEFINE_LEGACY_DEVICE(OC118, oc118);

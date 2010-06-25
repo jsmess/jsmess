@@ -227,13 +227,11 @@ unsigned long serial_device_get_state(running_device *device);
 /* connection is the serial connection to connect to the serial device */
 void serial_device_connect(running_device *image, struct serial_connection *connection);
 
-#define SERIAL	DEVICE_GET_INFO_NAME(serial)
+DECLARE_LEGACY_IMAGE_DEVICE(SERIAL, serial);
 
 #define MDRV_SERIAL_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, SERIAL, 0)
 
-/* device interface */
-DEVICE_GET_INFO( serial );
 DEVICE_START(serial);
 DEVICE_IMAGE_LOAD(serial);
 

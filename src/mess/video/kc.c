@@ -112,7 +112,7 @@ enum
 /* set new blink state - record blink state in event list */
 void kc85_video_set_blink_state(running_machine *machine, int data)
 {
-	EventList_AddItemOffset(machine, KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))));
+	EventList_AddItemOffset(machine, KC85_VIDEO_EVENT_SET_BLINK_STATE, ((data & 0x01)<<7), cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())));
 }
 
 
@@ -549,7 +549,7 @@ static void kc85_common_process_frame(running_machine *machine, bitmap_t *bitmap
 	/* process remainder */
 	kc85_common_vh_process_lines(&video_update, cycles_remaining_in_frame);
 	EventList_Reset();
-	EventList_SetOffsetStartTime ( cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))) );
+	EventList_SetOffsetStartTime ( cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
 }
 
 
@@ -572,7 +572,7 @@ static void kc85_common_vh_eof_callback(void)
 		{
 			//pItem = EventList_GetFirstItem();
 			EventList_Reset();
-			EventList_SetOffsetStartTime ( cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))) );
+			EventList_SetOffsetStartTime ( cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
 			logerror ("Event log reset in callback fn.\n");
 		}
 }

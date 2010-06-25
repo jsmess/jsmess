@@ -25,9 +25,8 @@ struct _lmc1992_t
 INLINE lmc1992_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (lmc1992_t *)device->token;
+	return (lmc1992_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 static void lmc1992_command_w(running_device *device, int addr, int data)
@@ -141,7 +140,7 @@ static DEVICE_START( lmc1992 )
 	assert(device != NULL);
 	assert(device->tag() != NULL);
 
-	lmc1992->intf = (const lmc1992_interface*)device->baseconfig().static_config;
+	lmc1992->intf = (const lmc1992_interface*)device->baseconfig().static_config();
 
 //  assert(lmc1992->intf != NULL);
 
@@ -168,7 +167,6 @@ DEVICE_GET_INFO( lmc1992 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(lmc1992_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(lmc1992);	break;
@@ -183,3 +181,5 @@ DEVICE_GET_INFO( lmc1992 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(LMC1992, lmc1992);

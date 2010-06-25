@@ -16,7 +16,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define C1551 DEVICE_GET_INFO_NAME( c1551 )
+DECLARE_LEGACY_DEVICE(C1551, c1551);
 
 #define MDRV_C1551_ADD(_tag, _cpu_tag, _address) \
 	MDRV_DEVICE_ADD(_tag, C1551, 0) \
@@ -33,12 +33,4 @@ struct _c1551_config
 	const char *cpu_tag;		/* CPU to hook into */
 	int address;				/* bus address */
 };
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( c1551 );
-
 #endif

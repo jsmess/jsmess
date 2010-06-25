@@ -158,9 +158,8 @@ struct _ay31015_t
 INLINE ay31015_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == AY31015);
-	return (ay31015_t *) device->token;
+	assert(device->type() == AY31015);
+	return (ay31015_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -711,7 +710,7 @@ static DEVICE_START(ay31015)
 {
 	ay31015_t	*ay31015 = get_safe_token(device);
 
-	ay31015->config = (const ay31015_config*)device->baseconfig().static_config;
+	ay31015->config = (const ay31015_config*)device->baseconfig().static_config();
 
 	ay31015->tx_clock = ay31015->config->transmitter_clock;
 	ay31015->rx_clock = ay31015->config->receiver_clock;
@@ -747,7 +746,6 @@ DEVICE_GET_INFO( ay31015 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ay31015_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;									break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ay31015);		break;
@@ -763,3 +761,4 @@ DEVICE_GET_INFO( ay31015 )
 	}
 }
 
+DEFINE_LEGACY_DEVICE(AY31015, ay31015);

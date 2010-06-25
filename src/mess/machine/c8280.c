@@ -51,16 +51,15 @@ struct _c8280_t
 INLINE c8280_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == C8280);
-	return (c8280_t *)device->token;
+	assert(device->type() == C8280);
+	return (c8280_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE c8280_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == C8280);
-	return (c8280_config *)device->baseconfig().inline_config;
+	assert(device->type() == C8280);
+	return (c8280_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 /***************************************************************************
@@ -220,7 +219,6 @@ DEVICE_GET_INFO( c8280 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c8280_t);									break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c8280_config);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c8280);							break;
@@ -239,3 +237,5 @@ DEVICE_GET_INFO( c8280 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(C8280, c8280);

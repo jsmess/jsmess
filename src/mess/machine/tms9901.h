@@ -10,7 +10,7 @@
     MACROS
 ***************************************************************************/
 
-#define TMS9901			DEVICE_GET_INFO_NAME(tms9901)
+DECLARE_LEGACY_DEVICE(TMS9901, tms9901);
 
 /* Masks for the interrupts levels available on TMS9901 */
 #define TMS9901_INT1 0x0002
@@ -52,8 +52,6 @@ struct _tms9901_interface
 ***************************************************************************/
 
 void tms9901_set_single_int(running_device *device, int pin_number, int state);
-
-DEVICE_GET_INFO(tms9901);
 
 READ8_DEVICE_HANDLER ( tms9901_cru_r );
 WRITE8_DEVICE_HANDLER( tms9901_cru_w );

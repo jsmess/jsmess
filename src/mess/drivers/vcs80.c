@@ -92,7 +92,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 {
-	vcs80_state *state = (vcs80_state *)timer->machine->driver_data;
+	vcs80_state *state = (vcs80_state *)timer.machine->driver_data;
 
 	if (state->keyclk)
 	{
@@ -181,7 +181,7 @@ static Z80PIO_INTERFACE( pio_intf )
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain vcs80_daisy_chain[] =
+static const z80_daisy_config vcs80_daisy_chain[] =
 {
 	{ Z80PIO_TAG },
 	{ NULL }

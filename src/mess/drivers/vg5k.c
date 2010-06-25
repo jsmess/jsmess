@@ -290,7 +290,7 @@ static TIMER_CALLBACK( z80_irq )
 
 static TIMER_DEVICE_CALLBACK( vg5k_scanline )
 {
-	vg5k_state *vg5k = (vg5k_state *)timer->machine->driver_data;
+	vg5k_state *vg5k = (vg5k_state *)timer.machine->driver_data;
 
 	ef9345_scanline(vg5k->ef9345, (UINT16)param);
 }

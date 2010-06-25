@@ -6,6 +6,7 @@
 #include "machine/latch8.h"
 
 #include "sound/tms5110.h"
+#include "machine/tms6100.h"
 
 #include "includes/dkong.h"
 
@@ -23,7 +24,7 @@
 #define USE_LS629	(0)		/* set to use new LS624 code */
 
 /* Issue surrounded by this define need to be analyzed and
- * reviewed at a lator time.
+ * reviewed at a later time.
  * Currently, the following issues exist:
  * - although not present on schematics, a 10K resistor is needed
  *   as RF in the mixer stage. Without this resistor, the DAC
@@ -1166,7 +1167,7 @@ Addresses found at @0x510, cpu2
 static WRITE8_DEVICE_HANDLER( M58817_command_w )
 {
 	tms5110_ctl_w(device, 0, data & 0x0f);
-	tms5110_pdc_w(device, 0, (data>>4) & 0x01);
+	tms5110_pdc_w(device, (data>>4) & 0x01);
 	/* FIXME 0x20 is CS */
 }
 
@@ -1295,6 +1296,15 @@ ADDRESS_MAP_END
 static const nes_interface nes_interface_1 = { "n2a03a" };
 static const nes_interface nes_interface_2 = { "n2a03b" };
 
+const tms5110_interface tms_interface = {
+	NULL,
+	NULL,
+	DEVCB_DEVICE_LINE("m58819", tms6100_m0_w),
+	DEVCB_DEVICE_LINE("m58819", tms6100_m1_w),
+	DEVCB_DEVICE_HANDLER("m58819", tms6100_addr_w),
+	DEVCB_DEVICE_LINE("m58819", tms6100_data_r),
+	DEVCB_DEVICE_LINE("m58819", tms6100_romclock_w)
+};
 
 /*************************************
  *
@@ -1364,7 +1374,11 @@ MACHINE_DRIVER_START( radarscp1_audio )
 	MDRV_LATCH8_DEVREAD(7, "ls259.6h", latch8_r, 3)
 	MDRV_LATCH8_DEVREAD(6, "tms", m58817_status_r, 0)
 
+	/* tms memory controller */
+	MDRV_DEVICE_ADD("m58819", M58819, 0)
+
 	MDRV_SOUND_ADD("tms", M58817, XTAL_640kHz)
+	MDRV_DEVICE_CONFIG(tms_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_DRIVER_END

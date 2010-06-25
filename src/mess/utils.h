@@ -188,8 +188,6 @@ INLINE UINT64 pick_integer_le(const void *ptr, size_t offset, size_t size)
  * ----------------------------------------------------------------------- */
 
 /* miscellaneous functions */
-char *stripspace(const char *src);
-char *strip_extension(const char *filename);
 int compute_log2(int val);
 int hexdigit(char c);
 
@@ -199,7 +197,5 @@ void specify_extension(char *buffer, size_t buffer_len, const char *extension);
 
 /* validity checks */
 int utils_validitychecks(void);
-
-const char *filename_basename(const char *filename);
 
 #endif /* UTILS_H */

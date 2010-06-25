@@ -29,7 +29,7 @@ struct _cdp1861_t
 	devcb_resolved_write_line	out_dmao_func;
 	devcb_resolved_write_line	out_efx_func;
 
-	running_device *screen;	/* screen */
+	screen_device *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 
 	int disp;						/* display enabled */
@@ -52,16 +52,15 @@ struct _cdp1861_t
 INLINE cdp1861_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CDP1861);
-	return (cdp1861_t *)device->token;
+	assert(device->type() == CDP1861);
+	return (cdp1861_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const cdp1861_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == CDP1861));
-	return (const cdp1861_interface *) device->baseconfig().static_config;
+	assert((device->type() == CDP1861));
+	return (const cdp1861_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -77,7 +76,7 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 	running_device *device = (running_device *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
-	int scanline = video_screen_get_vpos(cdp1861->screen);
+	int scanline = cdp1861->screen->vpos();
 
 	if (scanline == CDP1861_SCANLINE_INT_START)
 	{
@@ -86,7 +85,7 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 			devcb_call_write_line(&cdp1861->out_int_func, ASSERT_LINE);
 		}
 
-		timer_adjust_oneshot(cdp1861->int_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_INT_END, 0), 0);
+		timer_adjust_oneshot(cdp1861->int_timer, cdp1861->screen->time_until_pos( CDP1861_SCANLINE_INT_END, 0), 0);
 	}
 	else
 	{
@@ -95,7 +94,7 @@ static TIMER_CALLBACK( cdp1861_int_tick )
 			devcb_call_write_line(&cdp1861->out_int_func, CLEAR_LINE);
 		}
 
-		timer_adjust_oneshot(cdp1861->int_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_INT_START, 0), 0);
+		timer_adjust_oneshot(cdp1861->int_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0), 0);
 	}
 }
 
@@ -108,28 +107,28 @@ static TIMER_CALLBACK( cdp1861_efx_tick )
 	running_device *device = (running_device *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
-	int scanline = video_screen_get_vpos(cdp1861->screen);
+	int scanline = cdp1861->screen->vpos();
 
 	switch (scanline)
 	{
 	case CDP1861_SCANLINE_EFX_TOP_START:
 		devcb_call_write_line(&cdp1861->out_efx_func, ASSERT_LINE);
-		timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_TOP_END, 0), 0);
+		timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_END, 0), 0);
 		break;
 
 	case CDP1861_SCANLINE_EFX_TOP_END:
 		devcb_call_write_line(&cdp1861->out_efx_func, CLEAR_LINE);
-		timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_BOTTOM_START, 0), 0);
+		timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_START, 0), 0);
 		break;
 
 	case CDP1861_SCANLINE_EFX_BOTTOM_START:
 		devcb_call_write_line(&cdp1861->out_efx_func, ASSERT_LINE);
-		timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_BOTTOM_END, 0), 0);
+		timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_BOTTOM_END, 0), 0);
 		break;
 
 	case CDP1861_SCANLINE_EFX_BOTTOM_END:
 		devcb_call_write_line(&cdp1861->out_efx_func, CLEAR_LINE);
-		timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
+		timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
 		break;
 	}
 }
@@ -143,7 +142,7 @@ static TIMER_CALLBACK( cdp1861_dma_tick )
 	running_device *device = (running_device *)ptr;
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
-	int scanline = video_screen_get_vpos(cdp1861->screen);
+	int scanline = cdp1861->screen->vpos();
 
 	if (cdp1861->dmaout)
 	{
@@ -212,8 +211,8 @@ WRITE8_DEVICE_HANDLER( cdp1861_dma_w )
 {
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
-	int sx = video_screen_get_hpos(cdp1861->screen) + 4;
-	int y = video_screen_get_vpos(cdp1861->screen);
+	int sx = cdp1861->screen->hpos() + 4;
+	int y = cdp1861->screen->vpos();
 	int x;
 
 	for (x = 0; x < 8; x++)
@@ -260,11 +259,11 @@ static DEVICE_START( cdp1861 )
 	cdp1861->cpu = devtag_get_device(device->machine, intf->cpu_tag);
 
 	/* get the screen device */
-	cdp1861->screen = devtag_get_device(device->machine, intf->screen_tag);
+	cdp1861->screen =  device->machine->device<screen_device>(intf->screen_tag);
 	assert(cdp1861->screen != NULL);
 
 	/* allocate the temporary bitmap */
-	cdp1861->bitmap = auto_bitmap_alloc(device->machine, video_screen_get_width(cdp1861->screen), video_screen_get_height(cdp1861->screen), video_screen_get_format(cdp1861->screen));
+	cdp1861->bitmap = auto_bitmap_alloc(device->machine, cdp1861->screen->width(), cdp1861->screen->height(), cdp1861->screen->format());
 
 	/* create the timers */
 	cdp1861->int_timer = timer_alloc(device->machine, cdp1861_int_tick, (void *)device);
@@ -287,8 +286,8 @@ static DEVICE_RESET( cdp1861 )
 {
 	cdp1861_t *cdp1861 = get_safe_token(device);
 
-	timer_adjust_oneshot(cdp1861->int_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_INT_START, 0), 0);
-	timer_adjust_oneshot(cdp1861->efx_timer, video_screen_get_time_until_pos(cdp1861->screen, CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
+	timer_adjust_oneshot(cdp1861->int_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0), 0);
+	timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
 	timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(cdp1861->cpu, CDP1861_CYCLES_DMA_START), 0);
 
 	cdp1861->disp = 0;
@@ -310,7 +309,6 @@ DEVICE_GET_INFO( cdp1861 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1861_t);						break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;										break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1861);			break;
@@ -325,3 +323,5 @@ DEVICE_GET_INFO( cdp1861 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(CDP1861, cdp1861);

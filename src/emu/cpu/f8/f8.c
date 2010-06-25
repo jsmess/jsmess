@@ -52,8 +52,8 @@ struct _f8_Regs
 	UINT8	dbus;	/* data bus value */
 	UINT16	io; 	/* last I/O address */
 	UINT16  irq_vector;
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *iospace;
 	int icount;
@@ -64,10 +64,9 @@ struct _f8_Regs
 INLINE f8_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_F8);
-	return (f8_Regs *)device->token;
+	return (f8_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* timer shifter polynome values (will be used for timer interrupts) */
@@ -1546,7 +1545,7 @@ static CPU_RESET( f8 )
 	f8_Regs *cpustate = get_safe_token(device);
 	UINT8 data;
 	int i;
-	cpu_irq_callback save_callback;
+	device_irq_callback save_callback;
 
 	save_callback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(f8_Regs));
@@ -1587,7 +1586,6 @@ static CPU_RESET( f8 )
 static CPU_EXECUTE( f8 )
 {
     f8_Regs *cpustate = get_safe_token(device);
-    cpustate->icount = cycles;
 
     do
     {
@@ -1891,8 +1889,6 @@ static CPU_EXECUTE( f8 )
 	}
 
     } while( cpustate->icount > 0 );
-
-    return cycles - cpustate->icount;
 }
 
 CPU_DISASSEMBLE( f8 );
@@ -2020,7 +2016,7 @@ static CPU_SET_INFO( f8 )
 
 CPU_GET_INFO( f8 )
 {
-	f8_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	f8_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -221,12 +221,12 @@ SNAPSHOT_LOAD(apple1)
 	UINT8 *snapbuf, *snapptr;
 	UINT16 start_addr, end_addr, addr;
 
-	filesize = image_length(image);
+	filesize = image.length();
 
 	/* Read the snapshot data into a temporary array */
 	if (filesize < SNAP_HEADER_LEN)
 		return INIT_FAIL;
-	snapbuf = (UINT8*)image_ptr(image);
+	snapbuf = (UINT8*)image.ptr();
 	if (!snapbuf)
 		return INIT_FAIL;
 
@@ -245,7 +245,7 @@ SNAPSHOT_LOAD(apple1)
 
 	end_addr = start_addr + datasize - 1;
 
-	if ((start_addr < 0xE000 && end_addr > messram_get_size(devtag_get_device(image->machine, "messram")) - 1)
+	if ((start_addr < 0xE000 && end_addr > messram_get_size(devtag_get_device(image.device().machine, "messram")) - 1)
 		|| end_addr > 0xEFFF)
 	{
 		logerror("apple1 - Snapshot won't fit in this memory configuration;\n"
@@ -257,7 +257,7 @@ SNAPSHOT_LOAD(apple1)
 	for (addr = start_addr, snapptr = snapbuf + SNAP_HEADER_LEN;
 		 addr <= end_addr;
 		 addr++, snapptr++)
-		memory_write_byte(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr, *snapptr);
+		memory_write_byte(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr, *snapptr);
 
 	return INIT_PASS;
 }

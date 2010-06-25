@@ -271,7 +271,7 @@ extern INPUT_PORTS_START( k7659 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-static const z80_daisy_chain llc1_daisy_chain[] =
+static const z80_daisy_config llc1_daisy_chain[] =
 {
 	{ "z80pio" },
 	{ "z80ctc" },

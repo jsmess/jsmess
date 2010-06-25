@@ -14,9 +14,7 @@ struct _upd71071_interface
 
 int upd71071_dmarq(running_device* device,int state,int channel);
 
-DEVICE_GET_INFO(upd71071);
-
-#define UPD71071 DEVICE_GET_INFO_NAME(upd71071)
+DECLARE_LEGACY_DEVICE(UPD71071, upd71071);
 
 #define MDRV_UPD71071_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, UPD71071, 0) \

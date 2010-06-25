@@ -33,15 +33,14 @@ struct _mos6529_t
 INLINE mos6529_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (mos6529_t *)device->token;
+	return (mos6529_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const mos6529_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == MOS6529);
-	return (const mos6529_interface *) device->baseconfig().static_config;
+	assert(device->type() == MOS6529);
+	return (const mos6529_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -76,7 +75,7 @@ WRITE8_DEVICE_HANDLER( mos6529_w )
 
 static DEVICE_START( mos6529 )
 {
-	mos6529_t *mos6529 = (mos6529_t *)device->token;
+	mos6529_t *mos6529 = (mos6529_t *)downcast<legacy_device_base *>(device)->token();
 	const mos6529_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
@@ -95,7 +94,6 @@ DEVICE_GET_INFO( mos6529 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mos6529_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mos6529);	break;
@@ -110,3 +108,5 @@ DEVICE_GET_INFO( mos6529 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(MOS6529, mos6529);

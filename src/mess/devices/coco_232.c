@@ -38,8 +38,8 @@ struct _coco_rs232_pcb_t
 INLINE coco_rs232_pcb_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == COCO_CARTRIDGE_PCB_RS232);
-	return (coco_rs232_pcb_t *) device->token;
+	assert(device->type() == COCO_CARTRIDGE_PCB_RS232);
+	return (coco_rs232_pcb_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -56,8 +56,8 @@ static DEVICE_START(coco_rs232)
 	coco_rs232_pcb_t *pak_pcb = get_token(device);
 
 	memset(pak_pcb, 0, sizeof(*pak_pcb));
-	pak_pcb->cococart = device->owner->owner;
-	pak_pcb->cart = device->owner;
+	pak_pcb->cococart = device->owner()->owner();
+	pak_pcb->cart = device->owner();
 	pak_pcb->uart = device->subdevice(UART_TAG);
 }
 
@@ -106,7 +106,6 @@ DEVICE_GET_INFO(coco_cartridge_pcb_rs232)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(coco_rs232_pcb_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(coco_rs232);	break;
@@ -126,3 +125,5 @@ DEVICE_GET_INFO(coco_cartridge_pcb_rs232)
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_RS232, coco_cartridge_pcb_rs232);

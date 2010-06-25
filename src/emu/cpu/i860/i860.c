@@ -176,7 +176,7 @@ static CPU_SET_INFO( i860 )
 
 CPU_GET_INFO( i860 )
 {
-	i860_state_t *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	i860_state_t *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

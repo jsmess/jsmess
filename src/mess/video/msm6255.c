@@ -59,7 +59,7 @@ struct _msm6255_t
 {
 	const msm6255_interface *intf;	/* interface */
 
-	running_device *screen;	/* screen */
+	screen_device *screen;	/* screen */
 
 	UINT8 ir;						/* instruction register */
 	UINT8 mor;						/* mode control register */
@@ -83,8 +83,7 @@ struct _msm6255_t
 INLINE msm6255_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (msm6255_t *)device->token;
+	return (msm6255_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /***************************************************************************
@@ -380,11 +379,11 @@ static DEVICE_START( msm6255 )
 	msm6255_t *msm6255 = get_safe_token(device);
 
 	/* resolve callbacks */
-	msm6255->intf = (const msm6255_interface*)device->baseconfig().static_config;
+	msm6255->intf = (const msm6255_interface*)device->baseconfig().static_config();
 	assert(msm6255->intf->char_ram_r != NULL);
 
 	/* get the screen */
-	msm6255->screen = devtag_get_device(device->machine, msm6255->intf->screen_tag);
+	msm6255->screen = device->machine->device<screen_device>(msm6255->intf->screen_tag);
 	assert(msm6255->screen != NULL);
 
 	/* register for state saving */
@@ -424,7 +423,6 @@ DEVICE_GET_INFO( msm6255 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(msm6255_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;									break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(msm6255);		break;
@@ -439,3 +437,5 @@ DEVICE_GET_INFO( msm6255 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(MSM6255, msm6255);

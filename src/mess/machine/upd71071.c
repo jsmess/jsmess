@@ -115,7 +115,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 {
 	// single byte or word transfer
 	running_device* device = (running_device*)ptr;
-	upd71071_t* dmac = (upd71071_t*)device->token;
+	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
 	const address_space* space = cputag_get_address_space(device->machine,dmac->intf->cputag,ADDRESS_SPACE_PROGRAM);
 	int channel = param;
 	UINT16 data = 0;  // data to transfer
@@ -171,7 +171,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 
 void upd71071_soft_reset(running_device* device)
 {
-	upd71071_t* dmac = (upd71071_t*)device->token;
+	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
 	int x;
 
 	// Does not change base/current address, count, or buswidth
@@ -189,7 +189,7 @@ void upd71071_soft_reset(running_device* device)
 
 int upd71071_dmarq(running_device* device, int state,int channel)
 {
-	upd71071_t* dmac = (upd71071_t*)device->token;
+	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
 
 	if(state != 0)
 	{
@@ -231,10 +231,10 @@ int upd71071_dmarq(running_device* device, int state,int channel)
 
 static DEVICE_START(upd71071)
 {
-	upd71071_t* dmac = (upd71071_t*)device->token;
+	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
 	int x;
 
-	dmac->intf = (const upd71071_intf*)device->baseconfig().static_config;
+	dmac->intf = (const upd71071_intf*)device->baseconfig().static_config();
 	for(x=0;x<4;x++)
 	{
 		dmac->timer[x] = timer_alloc(device->machine,dma_transfer_timer,(void*)device);
@@ -244,7 +244,7 @@ static DEVICE_START(upd71071)
 
 static READ8_DEVICE_HANDLER(upd71071_read)
 {
-	upd71071_t* dmac = (upd71071_t*)device->token;
+	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
 	UINT8 ret = 0;
 
 	logerror("DMA: read from register %02x\n",offset);
@@ -322,7 +322,7 @@ static READ8_DEVICE_HANDLER(upd71071_read)
 
 static WRITE8_DEVICE_HANDLER(upd71071_write)
 {
-	upd71071_t* dmac = (upd71071_t*)device->token;
+	upd71071_t* dmac = (upd71071_t*)downcast<legacy_device_base *>(device)->token();
 
 	switch(offset)
 	{
@@ -408,7 +408,6 @@ DEVICE_GET_INFO(upd71071)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_OTHER;				break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(upd71071_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -428,3 +427,4 @@ DEVICE_GET_INFO(upd71071)
 READ8_DEVICE_HANDLER(upd71071_r) { return upd71071_read(device,offset); }
 WRITE8_DEVICE_HANDLER(upd71071_w) { upd71071_write(device,offset,data); }
 
+DEFINE_LEGACY_DEVICE(UPD71071, upd71071);

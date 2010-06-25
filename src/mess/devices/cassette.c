@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "utils.h"
 #include "cassette.h"
 #include "formats/cassimg.h"
 #include "ui.h"
@@ -18,11 +19,6 @@
 
 #define VERBOSE				0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
-
-
-// FIXME: try to put this somewhere else - cassette code should not be dependent on floppy code
-/* from devices/flopdrv.c */
-extern struct io_procs mess_ioprocs;
 
 
 typedef struct _dev_cassette_t	dev_cassette_t;
@@ -49,9 +45,8 @@ const cassette_config default_cassette_config =
 INLINE dev_cassette_t *get_safe_token(running_device *device)
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == DEVICE_GET_INFO_NAME(cassette) );
-	return (dev_cassette_t *) device->token;
+	assert( device->type() == CASSETTE );
+	return (dev_cassette_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -252,7 +247,7 @@ static DEVICE_START( cassette )
 	dev_cassette_t	*cassette = get_safe_token( device );
 
 	/* set to default state */
-	cassette->config = (const cassette_config*)device->baseconfig().static_config;
+	cassette->config = (const cassette_config*)device->baseconfig().static_config();
 	cassette->cassette = NULL;
 	cassette->state = cassette->config->default_state;
 }
@@ -261,7 +256,8 @@ static DEVICE_START( cassette )
 
 static DEVICE_IMAGE_LOAD( cassette )
 {
-	dev_cassette_t	*cassette = get_safe_token( image );
+	device_t *device = &image.device();
+	dev_cassette_t	*cassette = get_safe_token( device );
 	casserr_t err;
 	int cassette_flags;
 	const struct CassetteFormat * const *formats;
@@ -272,11 +268,11 @@ static DEVICE_IMAGE_LOAD( cassette )
 	/* figure out the cassette format */
 	formats = cassette->config->formats;
 
-	if (image_has_been_created(image))
+	if (image.has_been_created())
 	{
 		/* creating an image */
 		create_opts = cassette->config->create_opts;
-		err = cassette_create(image->machine, (void *) image, &mess_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &cassette->cassette);
+		err = cassette_create(device->machine, (void *) &image, &image_ioprocs, &wavfile_format, create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &cassette->cassette);
 		if (err)
 			goto error;
 	}
@@ -285,14 +281,14 @@ static DEVICE_IMAGE_LOAD( cassette )
 		/* opening an image */
 		do
 		{
-			is_writable = image_is_writable(image);
+			is_writable = image.is_writable();
 			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
-			extension = image_filetype(image);
-			err = cassette_open_choices(image->machine,(void *) image, &mess_ioprocs, extension, formats, cassette_flags, &cassette->cassette);
+			extension = image.filetype();
+			err = cassette_open_choices(device->machine,(void *) &image, &image_ioprocs, extension, formats, cassette_flags, &cassette->cassette);
 
 			/* this is kind of a hack */
 			if (err && is_writable)
-				image_make_readonly(image);
+				image.make_readonly();
 		}
 		while(err && is_writable);
 
@@ -301,11 +297,11 @@ static DEVICE_IMAGE_LOAD( cassette )
 	}
 
 	/* set to default state, but only change the UI state */
-	cassette_change_state(image, cassette->config->default_state, CASSETTE_MASK_UISTATE);
+	cassette_change_state(device, cassette->config->default_state, CASSETTE_MASK_UISTATE);
 
 	/* reset the position */
 	cassette->position = 0.0;
-	cassette->position_time = attotime_to_double(timer_get_time(image->machine));
+	cassette->position_time = attotime_to_double(timer_get_time(device->machine));
 
 	return INIT_PASS;
 
@@ -317,18 +313,19 @@ error:
 
 static DEVICE_IMAGE_UNLOAD( cassette )
 {
-	dev_cassette_t	*cassette = get_safe_token( image );
+	device_t *device = &image.device();
+	dev_cassette_t	*cassette = get_safe_token( device );
 
 	/* if we are recording, write the value to the image */
 	if ((cassette->state & CASSETTE_MASK_UISTATE) == CASSETTE_RECORD)
-		cassette_update(image);
+		cassette_update(device);
 
 	/* close out the cassette */
 	cassette_close(cassette->cassette);
 	cassette->cassette = NULL;
 
 	/* set to default state, but only change the UI state */
-	cassette_change_state(image, CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+	cassette_change_state(device, CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 }
 
 
@@ -336,37 +333,38 @@ static DEVICE_IMAGE_UNLOAD( cassette )
 /*
     display a small tape icon, with the current position in the tape image
 */
-static void device_display_cassette(running_device *image)
+static DEVICE_IMAGE_DISPLAY(cassette)
 {
+	device_t *device = &image.device();
 	char buf[65];
 	float x, y;
 	int n;
 	double position, length;
 	cassette_state uistate;
-	running_device *device;
+	running_device *dev;
 	UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
 
 	/* abort if we should not be showing the image */
-	if (!image_exists(image))
+	if (!image.exists())
 		return;
-	if (!cassette_is_motor_on(image))
+	if (!cassette_is_motor_on(device))
 		return;
 
 	/* figure out where we are in the cassette */
-	position = cassette_get_position(image);
-	length = cassette_get_length(image);
-	uistate = (cassette_state)(cassette_get_state(image) & CASSETTE_MASK_UISTATE);
+	position = cassette_get_position(device);
+	length = cassette_get_length(device);
+	uistate = (cassette_state)(cassette_get_state(device) & CASSETTE_MASK_UISTATE);
 
 	/* choose a location on the screen */
 	x = 0.0f;
 	y = 0.5f;
 
-	device = image->machine->devicelist.first(CASSETTE );
+	dev = device->machine->devicelist.first(CASSETTE );
 
-	while ( device && strcmp( device->tag(), image->tag() ) )
+	while ( dev && strcmp( dev->tag(), device->tag() ) )
 	{
 		y += 1;
-		device = device->typenext();
+		dev = dev->typenext();
 	}
 
 	y *= ui_get_line_height() + 2.0f * UI_BOX_TB_BORDER;
@@ -405,7 +403,6 @@ DEVICE_GET_INFO(cassette)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(dev_cassette_t); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0; break;
-		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL; break;
 		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_CASSETTE; break;
 		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1; break;
@@ -415,16 +412,16 @@ DEVICE_GET_INFO(cassette)
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(cassette); break;
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cassette); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cassette); break;
-		case DEVINFO_FCT_DISPLAY:					info->f = (genf *) device_display_cassette; break;
+		case DEVINFO_FCT_IMAGE_DISPLAY:				info->f = (genf *) DEVICE_IMAGE_DISPLAY_NAME(cassette); break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "Cassette"); break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Cassette"); break;
 		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__); break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:
-			if ( device && device->static_config )
+			if ( device && device->static_config() )
 			{
-				const struct CassetteFormat * const *formats = ((cassette_config *)device->static_config)->formats;
+				const struct CassetteFormat * const *formats = ((cassette_config *)device->static_config())->formats;
 				int		i;
 
 				/* set up a temporary string */
@@ -437,3 +434,4 @@ DEVICE_GET_INFO(cassette)
 	}
 }
 
+DEFINE_LEGACY_IMAGE_DEVICE(CASSETTE, cassette);

@@ -1792,15 +1792,15 @@ static MACHINE_START( stbook )
 
 static DEVICE_IMAGE_LOAD( atarist_cart )
 {
-	UINT8 *RAM = memory_region(image->machine, M68000_TAG);
+	UINT8 *RAM = memory_region(image.device().machine, M68000_TAG);
 	UINT8 *ptr = RAM + 0xfa0000;
-	int	filesize = image_length(image);
+	int	filesize = image.length();
 
 	if (filesize <= 128 * 1024)
 	{
-		if (image_fread(image, ptr, filesize) == filesize)
+		if (image.fread( ptr, filesize) == filesize)
 		{
-			memory_install_readwrite_bank(cputag_get_address_space(image->machine, M68000_TAG, ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, "bank3");
+			memory_install_readwrite_bank(cputag_get_address_space(image.device().machine, M68000_TAG, ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, "bank3");
 
 			return INIT_PASS;
 		}

@@ -28,7 +28,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define RP5C01A		DEVICE_GET_INFO_NAME(rp5c01a)
+DECLARE_LEGACY_DEVICE(RP5C01A, rp5c01a);
 
 #define MDRV_RP5C01A_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, RP5C01A, _clock) \
@@ -54,10 +54,6 @@ struct _rp5c01a_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( rp5c01a );
-
 /* adjust */
 WRITE_LINE_DEVICE_HANDLER( rp5c01a_adj_w );
 

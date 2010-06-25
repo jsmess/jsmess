@@ -46,7 +46,7 @@ WRITE8_DEVICE_HANDLER( tmc600_vismac_data_w )
 
 static TIMER_DEVICE_CALLBACK( blink_tick )
 {
-	tmc600_state *state = (tmc600_state *)timer->machine->driver_data;
+	tmc600_state *state = (tmc600_state *)timer.machine->driver_data;
 
 	state->blink = !state->blink;
 }

@@ -19,16 +19,14 @@
 *********************************************************************/
 
 /* Replace this with list<string>? */
-typedef struct _feature_list feature_list;
-struct _feature_list
+struct feature_list
 {
 	feature_list	*next;
 	char			*name;
 	char			*value;
 };
 
-typedef struct _software_part software_part;
-struct _software_part
+struct software_part
 {
 	const char *name;
 	const char *interface_;
@@ -41,8 +39,7 @@ struct _software_part
    optional information like local software names, release dates, serial
    numbers, etc can be maintained and stored in external recources.
 */
-typedef struct _software_info software_info;
-struct _software_info
+struct software_info
 {
 	const char *shortname;
 	const char *longname;
@@ -67,9 +64,9 @@ software_part *software_find_part(software_info *sw, const char *partname, const
 software_part *software_part_next(software_part *part);
 
 
-bool load_software_part(running_device *device, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);
+bool load_software_part(device_image_interface *image, const char *path, software_info **sw_info, software_part **sw_part, char **full_sw_name);
 
-void ui_mess_menu_software(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+void ui_image_menu_software(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 
 
 /*********************************************************************
@@ -77,8 +74,7 @@ void ui_mess_menu_software(running_machine *machine, ui_menu *menu, void *parame
     Driver software list configuration
 
 *********************************************************************/
-
-#define SOFTWARE_LIST		DEVICE_GET_INFO_NAME( software_list )
+DECLARE_LEGACY_DEVICE(SOFTWARE_LIST, software_list);
 #define __SOFTWARE_LIST_TAG	"software_list"
 
 
@@ -88,8 +84,6 @@ void ui_mess_menu_software(running_machine *machine, ui_menu *menu, void *parame
 
 
 #define SOFTWARE_LIST_CONFIG_SIZE	10
-
-DEVICE_GET_INFO( software_list );
 
 
 typedef struct _software_list_config software_list_config;

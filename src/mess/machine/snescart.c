@@ -128,7 +128,8 @@ static void snes_load_sram(running_machine *machine)
 
 	battery_ram = (UINT8*)malloc(state->cart[0].sram_max);
 	ptr = battery_ram;
-	image_battery_load(devtag_get_device(machine, "cart"), battery_ram, state->cart[0].sram_max, 0xff);
+	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart");
+	image->battery_load(battery_ram, state->cart[0].sram_max, 0xff);
 
 	if (state->cart[0].mode == SNES_MODE_20)
 	{
@@ -204,8 +205,8 @@ static void snes_save_sram(running_machine *machine)
 			ptr += 0x2000;
 		}
 	}
-
-	image_battery_save(devtag_get_device(machine, "cart"), battery_ram, state->cart[0].sram_max);
+	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart");
+	image->battery_save(battery_ram, state->cart[0].sram_max);
 
 	free(battery_ram);
 }
@@ -234,7 +235,8 @@ static void sufami_load_sram(running_machine *machine, const char *cart_tag)
 	
 	battery_ram = (UINT8*)malloc(0x20000);
 	ptr = battery_ram;
-	image_battery_load(devtag_get_device(machine, cart_tag), battery_ram, 0x20000, 0);
+	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, cart_tag);
+	image->battery_load(battery_ram, 0x20000, 0);
 	
 	if (strcmp(cart_tag, "slot_a") == 0)
 		st_sram_offset = 0x608000;
@@ -269,7 +271,8 @@ static void sufami_machine_stop(running_machine *machine)
 		{
 			memmove(ptr + ii * 0x8000, &snes_ram[0x608000 + (ii * 0x010000)], 0x8000);
 		}
-		image_battery_save(devtag_get_device(machine, "slot_a"), battery_ram, 0x20000);
+		device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "slot_a");
+		image->battery_save(battery_ram, 0x20000);
 	}
 
 	if (state->cart[1].slot_in_use)
@@ -278,7 +281,8 @@ static void sufami_machine_stop(running_machine *machine)
 		{
 			memmove(ptr + ii * 0x8000, &snes_ram[0x708000 + (ii * 0x010000)], 0x8000);
 		}
-		image_battery_save(devtag_get_device(machine, "slot_b"), battery_ram, 0x20000);
+		device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "slot_b");
+		image->battery_save(battery_ram, 0x20000);
 	}
 	
 	free(battery_ram);
@@ -407,16 +411,16 @@ static int snes_validate_infoblock( UINT8 *infoblock, UINT32 offset )
 }
 
 /* Here we add a couple of cart utilities, to avoid duplicating the code in each DEVICE_IMAGE_LOAD */
-static UINT32 snes_skip_header( running_device *image, UINT32 snes_rom_size )
+static UINT32 snes_skip_header( device_image_interface &image, UINT32 snes_rom_size )
 {
 	UINT8 header[512];
 	UINT32 offset = 512;
 	
 	/* Check for a header (512 bytes) */
-	if (image_software_entry(image) == NULL)
-		image_fread(image, header, 512);
+	if (image.software_entry() == NULL)
+		image.fread( header, 512);
 	else
-		memcpy(header, image_get_software_region(image, "rom"), 512);
+		memcpy(header, image.get_software_region("rom"), 512);
 	
 	if ((header[8] == 0xaa) && (header[9] == 0xbb) && (header[10] == 0x04))
 	{
@@ -447,9 +451,9 @@ static UINT32 snes_skip_header( running_device *image, UINT32 snes_rom_size )
 /* This determines if a cart is in Mode 20, 21, 22 or 25; sets state->cart[0].mode and 
  state->cart[0].sram accordingly; and returns the offset of the internal header (needed to
  detect BSX and ST carts) */
-static UINT32 snes_find_hilo_mode( running_device *image, UINT8 *buffer, UINT32 offset, int cartid )
+static UINT32 snes_find_hilo_mode( device_image_interface &image, UINT8 *buffer, UINT32 offset, int cartid )
 {
-	snes_state *state = (snes_state *)image->machine->driver_data;
+	snes_state *state = (snes_state *)image.device().machine->driver_data;
 	UINT8 valid_mode20, valid_mode21, valid_mode25;
 	UINT32 retvalue;
 
@@ -701,28 +705,28 @@ static void snes_cart_log_info( running_machine *machine, int total_blocks, int 
 static DEVICE_IMAGE_LOAD( snes_cart )
 {
 	int supported_type = 1, i, j;
-	running_machine *machine = image->machine;
+	running_machine *machine = image.device().machine;
 	snes_state *state = (snes_state *)machine->driver_data;
 	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 	int total_blocks, read_blocks, has_bsx_slot = 0, st_bios = 0;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = memory_region(image->machine, "cart");
+	UINT8 *ROM = memory_region(image.device().machine, "cart");
 
-	if (image_software_entry(image) == NULL)
-		state->cart_size = image_length(image);
+	if (image.software_entry() == NULL)
+		state->cart_size = image.length();
 	else
-		state->cart_size = image_get_software_region_length(image, "rom");
+		state->cart_size = image.get_software_region_length("rom");
 
 	/* Check for a header (512 bytes), and skip it if found */
 	offset = snes_skip_header(image, state->cart_size);
 	
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		image_fseek(image, offset, SEEK_SET);
-		image_fread(image, ROM, state->cart_size - offset);
+		image.fseek(offset, SEEK_SET);
+		image.fread( ROM, state->cart_size - offset);
 	}
 	else
-		memcpy(ROM, image_get_software_region(image, "rom") + offset, state->cart_size - offset);
+		memcpy(ROM, image.get_software_region("rom") + offset, state->cart_size - offset);
 	
 	if (SNES_CART_DEBUG) printf("size %08X\n", state->cart_size - offset);
 
@@ -1066,42 +1070,42 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 
 static DEVICE_IMAGE_LOAD( sufami_cart )
 {
-	running_machine *machine = image->machine;
+	running_machine *machine = image.device().machine;
 	snes_state *state = (snes_state *)machine->driver_data;
 	int total_blocks, read_blocks; 
 	int st_bios = 0, slot_id = 0;
 	UINT32 offset, st_data_offset = 0;
-	UINT8 *ROM = memory_region(image->machine, image->tag());
+	UINT8 *ROM = memory_region(image.device().machine, image.device().tag());
 
 	snes_ram = memory_region(machine, "maincpu");
 
-	if (strcmp(image->tag(), "slot_a") == 0)
+	if (strcmp(image.device().tag(), "slot_a") == 0)
 	{
 		st_data_offset = 0x200000;
 		slot_id = 0;
 	}
 
-	if (strcmp(image->tag(), "slot_b") == 0)
+	if (strcmp(image.device().tag(), "slot_b") == 0)
 	{
 		st_data_offset = 0x400000;
 		slot_id = 1;
 	}
 
-	if (image_software_entry(image) == NULL)
-		state->cart_size = image_length(image);
+	if (image.software_entry() == NULL)
+		state->cart_size = image.length();
 	else
-		state->cart_size = image_get_software_region_length(image, "rom");
+		state->cart_size = image.get_software_region_length("rom");
 	
 	/* Check for a header (512 bytes), and skip it if found */
 	offset = snes_skip_header(image, state->cart_size);
 	
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		image_fseek(image, offset, SEEK_SET);
-		image_fread(image, ROM, state->cart_size - offset);
+		image.fseek(offset, SEEK_SET);
+		image.fread( ROM, state->cart_size - offset);
 	}
 	else
-		memcpy(ROM, image_get_software_region(image, "rom") + offset, state->cart_size - offset);
+		memcpy(ROM, image.get_software_region("rom") + offset, state->cart_size - offset);
 	
 	if (SNES_CART_DEBUG) printf("size %08X\n", state->cart_size - offset);
 	
@@ -1160,39 +1164,39 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 		read_blocks += repeat_blocks;
 	}
 
-	sufami_load_sram(machine, image->tag());
+	sufami_load_sram(machine, image.device().tag());
 
 	state->cart[slot_id].slot_in_use = 1;	// aknowledge the cart in this slot, for saving sram at exit
 
-	auto_free(image->machine, ROM);
+	auto_free(image.device().machine, ROM);
 	
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( bsx_cart )
 {
-	running_machine *machine = image->machine;
+	running_machine *machine = image.device().machine;
 	snes_state *state = (snes_state *)machine->driver_data;
 	int total_blocks, read_blocks;
 	int has_bsx_slot = 0;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = memory_region(image->machine, "cart");
+	UINT8 *ROM = memory_region(image.device().machine, "cart");
 	
-	if (image_software_entry(image) == NULL)
-		state->cart_size = image_length(image);
+	if (image.software_entry() == NULL)
+		state->cart_size = image.length();
 	else
-		state->cart_size = image_get_software_region_length(image, "rom");
+		state->cart_size = image.get_software_region_length("rom");
 	
 	/* Check for a header (512 bytes), and skip it if found */
 	offset = snes_skip_header(image, state->cart_size);
 	
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		image_fseek(image, offset, SEEK_SET);
-		image_fread(image, ROM, state->cart_size - offset);
+		image.fseek(offset, SEEK_SET);
+		image.fread( ROM, state->cart_size - offset);
 	}
 	else
-		memcpy(ROM, image_get_software_region(image, "rom") + offset, state->cart_size - offset);
+		memcpy(ROM, image.get_software_region("rom") + offset, state->cart_size - offset);
 	
 	if (SNES_CART_DEBUG) printf("size %08X\n", state->cart_size - offset);
 	
@@ -1273,26 +1277,26 @@ static DEVICE_IMAGE_LOAD( bsx_cart )
 
 static DEVICE_IMAGE_LOAD( bsx2slot_cart )
 {
-	running_machine *machine = image->machine;
+	running_machine *machine = image.device().machine;
 	snes_state *state = (snes_state *)machine->driver_data;
 	UINT32 offset, int_header_offs;
-	UINT8 *ROM = memory_region(image->machine, "flash");
+	UINT8 *ROM = memory_region(image.device().machine, "flash");
 	
-	if (image_software_entry(image) == NULL)
-		state->cart_size = image_length(image);
+	if (image.software_entry() == NULL)
+		state->cart_size = image.length();
 	else
-		state->cart_size = image_get_software_region_length(image, "rom");
+		state->cart_size = image.get_software_region_length("rom");
 	
 	/* Check for a header (512 bytes), and skip it if found */
 	offset = snes_skip_header(image, state->cart_size);
 	
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		image_fseek(image, offset, SEEK_SET);
-		image_fread(image, ROM, state->cart_size - offset);
+		image.fseek(offset, SEEK_SET);
+		image.fread( ROM, state->cart_size - offset);
 	}
 	else
-		memcpy(ROM, image_get_software_region(image, "rom") + offset, state->cart_size - offset);
+		memcpy(ROM, image.get_software_region("rom") + offset, state->cart_size - offset);
 	
 	if (SNES_CART_DEBUG) printf("size %08X\n", state->cart_size - offset);
 	

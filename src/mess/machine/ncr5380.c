@@ -475,7 +475,6 @@ DEVICE_GET_INFO( ncr5380 ) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ncr5380_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;				    		break;
-		case DEVINFO_INT_CLASS:				info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(ncr5380);	break;
@@ -490,4 +489,8 @@ DEVICE_GET_INFO( ncr5380 ) {
 		case DEVINFO_STR_CREDITS:			strcpy(info->s, "Copyright the MAME and MESS Teams"); break;
 	}
 }
+#endif
+
+#if NCR5380_DEVICE_CONVERSION
+DEFINE_LEGACY_DEVICE(NCR5380, ncr5380);
 #endif

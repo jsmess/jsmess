@@ -13,10 +13,8 @@ struct _filter_volume_state
 INLINE filter_volume_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_FILTER_VOLUME);
-	return (filter_volume_state *)device->token;
+	assert(device->type() == SOUND_FILTER_VOLUME);
+	return (filter_volume_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -74,3 +72,5 @@ DEVICE_GET_INFO( filter_volume )
 	}
 }
 
+
+DEFINE_LEGACY_SOUND_DEVICE(FILTER_VOLUME, filter_volume);

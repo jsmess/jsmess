@@ -298,7 +298,7 @@ static void v1050_keyboard_scan(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( v1050_keyboard_tick )
 {
-	v1050_keyboard_scan(timer->machine);
+	v1050_keyboard_scan(timer.machine);
 }
 
 static READ8_HANDLER( v1050_get_key )
@@ -894,7 +894,7 @@ static WRITE8_DEVICE_HANDLER( misc_8255_c_w )
 		case 3:	period = ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/2); break;
 		}
 
-		timer_device_adjust_periodic(state->timer_sio, attotime_zero, 0, period);
+		state->timer_sio->adjust(attotime_zero, 0, period);
 
 		state->baud_sel = baud_sel;
 	}
@@ -995,7 +995,7 @@ static I8255A_INTERFACE( rtc_8255_intf )
 
 static TIMER_DEVICE_CALLBACK( kb_8251_tick )
 {
-	v1050_state *state = (v1050_state *)timer->machine->driver_data;
+	v1050_state *state = (v1050_state *)timer.machine->driver_data;
 
 	msm8251_transmit_clock(state->i8251_kb);
 	msm8251_receive_clock(state->i8251_kb);
@@ -1017,7 +1017,7 @@ static const msm8251_interface kb_8251_intf =
 
 static TIMER_DEVICE_CALLBACK( sio_8251_tick )
 {
-	v1050_state *state = (v1050_state *)timer->machine->driver_data;
+	v1050_state *state = (v1050_state *)timer.machine->driver_data;
 
 	msm8251_transmit_clock(state->i8251_sio);
 	msm8251_receive_clock(state->i8251_sio);
@@ -1110,7 +1110,7 @@ static MACHINE_START( v1050 )
 	state->i8255a_crt_m6502 = devtag_get_device(machine, I8255A_M6502_TAG);
 	state->i8251_kb = devtag_get_device(machine, I8251A_KB_TAG);
 	state->i8251_sio = devtag_get_device(machine, I8251A_SIO_TAG);
-	state->timer_sio = devtag_get_device(machine, TIMER_SIO_TAG);
+	state->timer_sio = machine->device<timer_device>(TIMER_SIO_TAG);
 	state->mb8877 = devtag_get_device(machine, MB8877_TAG);
 	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
 

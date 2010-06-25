@@ -235,11 +235,9 @@ struct _snes_sound_state
 INLINE snes_sound_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SNES_SPC);
+	assert(device->type() == SNES_SPC);
 
-	return (snes_sound_state *)device->token;
+	return (snes_sound_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -1363,3 +1361,6 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME				"SNES Custom DSP (SPC700)"
 #define DEVTEMPLATE_FAMILY				"SNES Custom"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_SOUND_DEVICE(SNES, snes_sound);

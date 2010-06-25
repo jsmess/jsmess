@@ -123,7 +123,7 @@ static void trs80m2_keyboard_scan(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( trs80m2_keyboard_tick )
 {
-	trs80m2_keyboard_scan(timer->machine);
+	trs80m2_keyboard_scan(timer.machine);
 }
 
 /* Read/Write Handlers */
@@ -882,7 +882,7 @@ static const z80sio_interface sio_intf =
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	trs80m2_state *state = (trs80m2_state *) timer->machine->driver_data;
+	trs80m2_state *state = (trs80m2_state *) timer.machine->driver_data;
 
 	z80ctc_trg0_w(state->z80ctc, 1);
 	z80ctc_trg0_w(state->z80ctc, 0);
@@ -936,7 +936,7 @@ static const wd17xx_interface fd1791_intf =
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain trs80m2_daisy_chain[] =
+static const z80_daisy_config trs80m2_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
 	{ Z80SIO_TAG },

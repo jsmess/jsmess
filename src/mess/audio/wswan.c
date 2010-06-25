@@ -249,3 +249,5 @@ DEVICE_GET_INFO( wswan_sound )
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(WSWAN, wswan_sound);

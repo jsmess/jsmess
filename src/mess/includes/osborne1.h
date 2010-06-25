@@ -27,7 +27,6 @@ DRIVER_INIT( osborne1 );
 MACHINE_RESET( osborne1 );
 
 /* Osborne1 specific daisy chain interface */
-#define OSBORNE1_DAISY	DEVICE_GET_INFO_NAME( osborne1_daisy )
-DEVICE_GET_INFO( osborne1_daisy );
+//DECLARE_LEGACY_DEVICE(OSBORNE1_DAISY, osborne1_daisy);
 
 #endif /* OSBORNE1_H_ */

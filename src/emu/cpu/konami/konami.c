@@ -56,12 +56,12 @@ struct _konami_state
     UINT8   cc;
     UINT8	ireg;
     UINT8   irq_state[2];
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
     UINT8   int_state;  /* SYNC and CWAI flags */
 	UINT8	nmi_state;
 	UINT8	nmi_pending;
 	int		icount;
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	konami_set_lines_func setlines_callback;
 };
@@ -69,10 +69,9 @@ struct _konami_state
 INLINE konami_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_KONAMI);
-	return (konami_state *)device->token;
+	return (konami_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* flag bits in the cc register */
@@ -474,7 +473,6 @@ static CPU_EXECUTE( konami )
 {
 	konami_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
 	check_irq_lines(cpustate);
 
 	if( cpustate->int_state & (KONAMI_CWAI | KONAMI_SYNC) )
@@ -500,8 +498,6 @@ static CPU_EXECUTE( konami )
 
         } while( cpustate->icount > 0 );
     }
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -548,7 +544,7 @@ static CPU_SET_INFO( konami )
 
 CPU_GET_INFO( konami )
 {
-	konami_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	konami_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

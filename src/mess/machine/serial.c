@@ -81,9 +81,8 @@ struct _serial_t
 INLINE serial_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (serial_t *)device->token;
+	return (serial_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -531,13 +530,13 @@ void serial_device_connect(running_device *device, struct serial_connection *con
 
 
 /* load image */
-static int serial_device_load_internal(running_device *image, unsigned char **ptr, int *pDataSize)
+static int serial_device_load_internal(device_image_interface &image, unsigned char **ptr, int *pDataSize)
 {
 	int datasize;
 	unsigned char *data;
 
 	/* get file size */
-	datasize = image_length(image);
+	datasize = image.length();
 
 	if (datasize!=0)
 	{
@@ -547,7 +546,7 @@ static int serial_device_load_internal(running_device *image, unsigned char **pt
 		if (data!=NULL)
 		{
 			/* read whole file */
-			image_fread(image, data, datasize);
+			image.fread(data, datasize);
 
 			*ptr = data;
 			*pDataSize = datasize;
@@ -603,8 +602,9 @@ DEVICE_IMAGE_LOAD(serial)
 {
 	int data_length;
 	unsigned char *data;
+	device_t *device = &image.device();
 
-	serial_t *ser = get_safe_token(image);
+	serial_t *ser = get_safe_token(device);
 
 	/* load file and setup transmit data */
 	if (serial_device_load_internal(image, &data, &data_length))
@@ -619,10 +619,11 @@ DEVICE_IMAGE_LOAD(serial)
 
 DEVICE_IMAGE_UNLOAD(serial)
 {
-	serial_t *ser = get_safe_token(image);
+	device_t *device = &image.device();
+	serial_t *ser = get_safe_token(device);
 
 	/* stop transmit */
-	serial_device_set_transmit_state(image, 0);
+	serial_device_set_transmit_state(device, 0);
 	/* free streams */
 	data_stream_free(&ser->transmit);
 	data_stream_free(&ser->receive);
@@ -633,7 +634,6 @@ DEVICE_GET_INFO( serial )
 {
 	switch ( state )
 	{
-		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;          			break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(serial_t);								break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_SERIAL;                                	break;
@@ -727,3 +727,5 @@ void	serial_connection_link(running_machine *machine, struct serial_connection *
 	/* let a know the state of b */
 	serial_connection_out(machine,connection_b);
 }
+
+DEFINE_LEGACY_IMAGE_DEVICE(SERIAL, serial);

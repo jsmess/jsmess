@@ -72,8 +72,8 @@ struct _tms7000_state
 	UINT8		irq_state[3];	/* State of the three IRQs */
 	UINT8		rf[0x80];	/* Register file (SJE) */
 	UINT8		pf[0x100];	/* Perpherial file */
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int			icount;
@@ -88,11 +88,10 @@ struct _tms7000_state
 INLINE tms7000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS7000 ||
 		   cpu_get_type(device) == CPU_TMS7000_EXL);
-	return (tms7000_state *)device->token;
+	return (tms7000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define pPC		cpustate->pc.w.l
@@ -265,7 +264,7 @@ static CPU_SET_INFO( tms7000 )
 
 CPU_GET_INFO( tms7000 )
 {
-	tms7000_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms7000_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
     switch( state )
     {
@@ -446,8 +445,7 @@ static CPU_EXECUTE( tms7000 )
 	tms7000_state *cpustate = get_safe_token(device);
 	int op;
 
-	cpustate->icount = cycles;
-	cpustate->div_by_16_trigger += cycles;
+	cpustate->div_by_16_trigger += cpustate->icount;
 
     tms7000_check_IRQ_lines(cpustate);
 
@@ -480,7 +478,6 @@ static CPU_EXECUTE( tms7000 )
 	} while( cpustate->icount > 0 );
 
 	cpustate->div_by_16_trigger -= cpustate->icount;
-	return cycles - cpustate->icount;
 }
 
 static CPU_EXECUTE( tms7000_exl )
@@ -488,8 +485,7 @@ static CPU_EXECUTE( tms7000_exl )
 	tms7000_state *cpustate = get_safe_token(device);
 	int op;
 
-	cpustate->icount = cycles;
-	cpustate->div_by_16_trigger += cycles;
+	cpustate->div_by_16_trigger += cpustate->icount;
 
     tms7000_check_IRQ_lines(cpustate);
 
@@ -523,7 +519,6 @@ static CPU_EXECUTE( tms7000_exl )
 	} while( cpustate->icount > 0 );
 
 	cpustate->div_by_16_trigger -= cpustate->icount;
-	return cycles - cpustate->icount;
 }
 
 /****************************************************************************

@@ -63,19 +63,18 @@ struct _dev_cdrom_t
 
 INLINE dev_cdrom_t *get_safe_token(running_device *device) {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( ( device->type == DEVICE_GET_INFO_NAME(cdrom) ) );
-	return (dev_cdrom_t *)  device->token;
+	assert( ( device->type() == CDROM ) );
+	return (dev_cdrom_t *)  downcast<legacy_device_base *>(device)->token();
 }
 
 
 static DEVICE_IMAGE_LOAD(cdrom)
 {
-	dev_cdrom_t	*cdrom = get_safe_token(image);
+	dev_cdrom_t	*cdrom = get_safe_token(&image.device());
 	chd_error	err = (chd_error)0;
 	chd_file	*chd = NULL;
 
-	err = chd_open_file( image_core_file( image ), CHD_OPEN_READ, NULL, &chd );	/* CDs are never writeable */
+	err = chd_open_file( image.image_core_file(), CHD_OPEN_READ, NULL, &chd );	/* CDs are never writeable */
 	if ( err )
 		goto error;
 
@@ -90,14 +89,14 @@ error:
 	if ( chd )
 		chd_close( chd );
 	if ( err )
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, chd_get_error_string( err ) );
+		image.seterror( IMAGE_ERROR_UNSPECIFIED, chd_get_error_string( err ) );
 	return INIT_FAIL;
 }
 
 
 static DEVICE_IMAGE_UNLOAD(cdrom)
 {
-	dev_cdrom_t	*cdrom = get_safe_token( image );
+	dev_cdrom_t	*cdrom = get_safe_token( &image.device() );
 
 	assert( cdrom->cdrom_handle );
 	cdrom_close( cdrom->cdrom_handle );
@@ -143,7 +142,6 @@ DEVICE_GET_INFO(cdrom)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(dev_cdrom_t); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0; break;
-		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL; break;
 		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_CDROM; break;
 		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 0; break;
@@ -168,3 +166,4 @@ DEVICE_GET_INFO(cdrom)
 	}
 }
 
+DEFINE_LEGACY_IMAGE_DEVICE(CDROM, cdrom);

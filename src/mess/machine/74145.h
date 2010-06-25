@@ -36,9 +36,6 @@ struct _ttl74145_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* device interface */
-DEVICE_GET_INFO( ttl74145 );
-
 /* standard handlers */
 WRITE8_DEVICE_HANDLER( ttl74145_w );
 READ16_DEVICE_HANDLER( ttl74145_r );
@@ -48,7 +45,7 @@ READ16_DEVICE_HANDLER( ttl74145_r );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define TTL74145	DEVICE_GET_INFO_NAME(ttl74145)
+DECLARE_LEGACY_DEVICE(TTL74145, ttl74145);
 
 #define MDRV_TTL74145_ADD(_tag, _intf) \
 	MDRV_DEVICE_ADD(_tag, TTL74145, 0) \

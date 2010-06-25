@@ -118,19 +118,18 @@ struct _tms32031_state
 	tms32031_xf_func	xf0_w;
 	tms32031_xf_func	xf1_w;
 	tms32031_iack_func	iack_w;
-	cpu_irq_callback	irq_callback;
-	running_device *device;
+	device_irq_callback	irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 };
 
 INLINE tms32031_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS32031 ||
 		   cpu_get_type(device) == CPU_TMS32032);
-	return (tms32031_state *)device->token;
+	return (tms32031_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -369,7 +368,7 @@ static void set_irq_line(tms32031_state *tms, int irqline, int state)
 
 static CPU_INIT( tms32031 )
 {
-	const tms32031_config *configdata = (const tms32031_config *)device->baseconfig().static_config;
+	const tms32031_config *configdata = (const tms32031_config *)device->baseconfig().static_config();
 	tms32031_state *tms = get_safe_token(device);
 	int i;
 
@@ -466,12 +465,14 @@ static CPU_EXECUTE( tms32031 )
 	tms32031_state *tms = get_safe_token(device);
 
 	/* check IRQs up front */
-	tms->icount = cycles;
 	check_irqs(tms);
 
 	/* if we're idling, just eat the cycles */
 	if (tms->is_idling)
-		return tms->icount;
+	{
+		tms->icount = 0;
+		return;
+	}
 
 	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
@@ -530,8 +531,6 @@ static CPU_EXECUTE( tms32031 )
 			execute_one(tms);
 		}
 	}
-
-	return cycles - tms->icount;
 }
 
 
@@ -689,7 +688,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( tms32031 )
 {
-	tms32031_state *tms = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms32031_state *tms = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	float ftemp;
 
 	switch (state)

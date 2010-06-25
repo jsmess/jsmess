@@ -50,8 +50,8 @@ struct _mac_sound
 INLINE mac_sound *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(sound_get_type(device) == SOUND_MAC_SOUND);
-	return (mac_sound *) device->token;
+	assert(device->type() == SOUND_MAC_SOUND);
+	return (mac_sound *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -201,3 +201,5 @@ DEVICE_GET_INFO( mac_sound )
 		case DEVINFO_STR_SOURCE_FILE:		strcpy(info->s, __FILE__);						break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(MAC_SOUND, mac_sound);

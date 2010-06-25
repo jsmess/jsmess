@@ -30,27 +30,26 @@ struct _k033906_state
 INLINE k033906_state *k033906_get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == K033906);
+	assert(device->type() == K033906);
 
-	return (k033906_state *)device->token;
+	return (k033906_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const k033906_interface *k033906_get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == K033906));
-	return (const k033906_interface *) device->baseconfig().static_config;
+	assert((device->type() == K033906));
+	return (const k033906_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
     DEVICE HANDLERS
 *****************************************************************************/
 
-void k033906_set_reg( running_device *device, int state )
+WRITE_LINE_DEVICE_HANDLER( k033906_set_reg )
 {
 	k033906_state *k033906 = k033906_get_safe_token(device);
-	k033906->reg_set = state;
+	k033906->reg_set = state & 1;
 }
 
 static UINT32 k033906_reg_r( running_device *device, int reg )
@@ -167,5 +166,7 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FEATURES	      DT_HAS_START
 #define DEVTEMPLATE_NAME		"Konami 033906"
 #define DEVTEMPLATE_FAMILY		"Konami PCI Bridge 033906"
-#define DEVTEMPLATE_CLASS		DEVICE_CLASS_PERIPHERAL
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_DEVICE(K033906, k033906);

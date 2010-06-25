@@ -86,9 +86,8 @@ struct _kr2376_t
 INLINE kr2376_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (kr2376_t *)device->token;
+	return (kr2376_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*-------------------------------------------------
@@ -343,7 +342,7 @@ static DEVICE_START( kr2376 )
 	assert(device != NULL);
 	assert(device->tag() != NULL);
 
-	kr2376->intf = (const kr2376_interface*)device->baseconfig().static_config;
+	kr2376->intf = (const kr2376_interface*)device->baseconfig().static_config();
 
 	assert(kr2376->intf != NULL);
 	assert(kr2376->intf->clock > 0);
@@ -379,7 +378,6 @@ DEVICE_GET_INFO( kr2376 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(kr2376_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(kr2376);	break;
@@ -394,3 +392,5 @@ DEVICE_GET_INFO( kr2376 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(KR2376, kr2376);

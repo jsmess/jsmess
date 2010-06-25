@@ -178,10 +178,10 @@ static void scan_keyboard(running_machine *machine)
 	{
 		if (keycode != keylatch)
 		{
-			running_device *z80dart = devtag_get_device(machine, Z80DART_TAG);
+			z80dart_device *z80dart = machine->device<z80dart_device>(Z80DART_TAG);
 
 			z80dart_dcdb_w(z80dart, 0);
-			z80dart_receive_data(z80dart, Z80DART_CH_B, keycode);
+			z80dart->receive_data(Z80DART_CH_B, keycode);
 
 			keylatch = keycode;
 		}
@@ -190,10 +190,10 @@ static void scan_keyboard(running_machine *machine)
 	{
 		if (keylatch)
 		{
-			running_device *z80dart = devtag_get_device(machine, Z80DART_TAG);
+			z80dart_device *z80dart = machine->device<z80dart_device>(Z80DART_TAG);
 
 			z80dart_dcdb_w(z80dart, 1);
-			z80dart_receive_data(z80dart, Z80DART_CH_B, 0);
+			z80dart->receive_data(Z80DART_CH_B, 0);
 
 			keylatch = 0;
 		}
@@ -202,7 +202,7 @@ static void scan_keyboard(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( keyboard_tick )
 {
-	scan_keyboard(timer->machine);
+	scan_keyboard(timer.machine);
 }
 
 /* Memory Banking */
@@ -708,7 +708,7 @@ static ABC77_INTERFACE( abc800_abc77_intf )
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	running_device *z80ctc = devtag_get_device(timer->machine, Z80CTC_TAG);
+	running_device *z80ctc = devtag_get_device(timer.machine, Z80CTC_TAG);
 
 	z80ctc_trg0_w(z80ctc, 1);
 	z80ctc_trg0_w(z80ctc, 0);
@@ -918,7 +918,7 @@ static Z80DART_INTERFACE( abc806_dart_intf )
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain abc800_daisy_chain[] =
+static const z80_daisy_config abc800_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
 	{ Z80SIO_TAG },

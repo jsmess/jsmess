@@ -16,15 +16,15 @@
     CONSTANTS
 ***************************************************************************/
 
-#define COCO_CARTRIDGE								DEVICE_GET_INFO_NAME(coco_cartridge)
-#define DRAGON_CARTRIDGE							DEVICE_GET_INFO_NAME(dragon_cartridge)
+DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE, coco_cartridge);
+DECLARE_LEGACY_DEVICE(DRAGON_CARTRIDGE, dragon_cartridge);
 
-#define COCO_CARTRIDGE_PCB_FDC_COCO					DEVICE_GET_INFO_NAME(coco_cartridge_pcb_fdc_coco)
-#define COCO_CARTRIDGE_PCB_FDC_DRAGON				DEVICE_GET_INFO_NAME(coco_cartridge_pcb_fdc_dragon)
-#define COCO_CARTRIDGE_PCB_PAK						DEVICE_GET_INFO_NAME(coco_cartridge_pcb_pak)
-#define COCO_CARTRIDGE_PCB_PAK_BANKED16K			DEVICE_GET_INFO_NAME(coco_cartridge_pcb_pak_banked16k)
-#define COCO_CARTRIDGE_PCB_ORCH90					DEVICE_GET_INFO_NAME(coco_cartridge_pcb_orch90)
-#define COCO_CARTRIDGE_PCB_RS232					DEVICE_GET_INFO_NAME(coco_cartridge_pcb_rs232)
+DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_FDC_COCO, coco_cartridge_pcb_fdc_coco);
+DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_FDC_DRAGON, coco_cartridge_pcb_fdc_dragon);
+DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_PAK, coco_cartridge_pcb_pak);
+DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_PAK_BANKED16K, coco_cartridge_pcb_pak_banked16k);
+DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_ORCH90, coco_cartridge_pcb_orch90);
+DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_RS232, coco_cartridge_pcb_rs232);
 
 enum
 {
@@ -69,20 +69,10 @@ struct _cococart_config
 ***************************************************************************/
 
 /* device get info function */
-DEVICE_GET_INFO(coco_cartridge);
-DEVICE_GET_INFO(dragon_cartridge);
 
 /* reading and writing to $FF40-$FF7F */
 READ8_DEVICE_HANDLER(coco_cartridge_r);
 WRITE8_DEVICE_HANDLER(coco_cartridge_w);
-
-/* cartridge PCB types */
-DEVICE_GET_INFO(coco_cartridge_pcb_fdc_coco);
-DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon);
-DEVICE_GET_INFO(coco_cartridge_pcb_pak);
-DEVICE_GET_INFO(coco_cartridge_pcb_pak_banked16k);
-DEVICE_GET_INFO(coco_cartridge_pcb_orch90);
-DEVICE_GET_INFO(coco_cartridge_pcb_rs232);
 
 /* sets a cartridge line */
 void coco_cartridge_set_line(running_device *device, cococart_line line, cococart_line_value value);

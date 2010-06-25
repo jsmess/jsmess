@@ -193,14 +193,14 @@ static PALETTE_INIT( vc4000 )
 
 static DEVICE_IMAGE_LOAD( vc4000_cart )
 {
-	running_machine *machine = image->machine;
+	running_machine *machine = image.device().machine;
 	const address_space *memspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 size;
 
-	if (image_software_entry(image) == NULL)
-		size = image_length(image);
+	if (image.software_entry() == NULL)
+		size = image.length();
 	else
-		size = image_get_software_region_length(image, "rom");
+		size = image.get_software_region_length("rom");
 
 	if (size > 0x1600)
 		size = 0x1600;
@@ -229,13 +229,13 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 
 	if (size > 0)
 	{
-		if (image_software_entry(image) == NULL)
+		if (image.software_entry() == NULL)
 		{
-			if (image_fread(image, memory_region(machine, "maincpu"), size) != size)
+			if (image.fread( memory_region(machine, "maincpu"), size) != size)
 				return INIT_FAIL;
 		}
 		else
-			memcpy(memory_region(machine, "maincpu"), image_get_software_region(image, "rom"), size);
+			memcpy(memory_region(machine, "maincpu"), image.get_software_region("rom"), size);
 	}
 
 	return INIT_PASS;
@@ -375,19 +375,19 @@ ROM_END
 
 QUICKLOAD_LOAD(vc4000)
 {
-	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 	int quick_addr = 0x08c0;
 	int quick_length;
 	UINT8 *quick_data;
 	int read_;
 
-	quick_length = image_length(image);
+	quick_length = image.length();
 	quick_data = (UINT8*)malloc(quick_length);
 	if (!quick_data)
 		return INIT_FAIL;
 
-	read_ = image_fread(image, quick_data, quick_length);
+	read_ = image.fread( quick_data, quick_length);
 	if (read_ != quick_length)
 		return INIT_FAIL;
 

@@ -47,10 +47,9 @@ struct _tf20_state
 INLINE tf20_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TF20);
+	assert(device->type() == TF20);
 
-	return (tf20_state *)device->token;
+	return (tf20_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -61,7 +60,7 @@ INLINE tf20_state *get_safe_token(running_device *device)
 /* serial clock, 38400 baud by default */
 static TIMER_DEVICE_CALLBACK( serial_clock )
 {
-	tf20_state *tf20 = get_safe_token(timer->owner);
+	tf20_state *tf20 = get_safe_token(timer.owner());
 
 	upd7201_rxca_w(tf20->upd7201, ASSERT_LINE);
 	upd7201_txca_w(tf20->upd7201, ASSERT_LINE);
@@ -72,7 +71,7 @@ static TIMER_DEVICE_CALLBACK( serial_clock )
 /* a read from this location disables the rom */
 static READ8_HANDLER( tf20_rom_disable )
 {
-	tf20_state *tf20 = get_safe_token(space->cpu->owner);
+	tf20_state *tf20 = get_safe_token(space->cpu->owner());
 	const address_space *prg = cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* switch in ram */
@@ -86,7 +85,7 @@ static READ8_HANDLER( tf20_rom_disable )
 
 static READ8_HANDLER( tf20_dip_r )
 {
-	tf20_state *tf20 = get_safe_token(space->cpu->owner);
+	tf20_state *tf20 = get_safe_token(space->cpu->owner());
 	logerror("%s: tf20_dip_r\n", cpuexec_describe_context(space->machine));
 
 	/* clear tc */
@@ -107,7 +106,7 @@ static READ8_DEVICE_HANDLER( tf20_upd765_tc_r )
 
 static WRITE8_HANDLER( tf20_fdc_control_w )
 {
-	tf20_state *tf20 = get_safe_token(space->cpu->owner);
+	tf20_state *tf20 = get_safe_token(space->cpu->owner());
 	logerror("%s: tf20_fdc_control_w %02x\n", cpuexec_describe_context(space->machine), data);
 
 	/* bit 0, motor on signal */
@@ -328,7 +327,7 @@ static DEVICE_START( tf20 )
 	tf20->ram = device->subdevice("ram");
 
 	/* make sure its already running */
-	if (!tf20->ram->started)
+	if (!tf20->ram->started())
 		throw device_missing_dependencies();
 
 	/* locate child devices */
@@ -347,7 +346,7 @@ static DEVICE_RESET( tf20 )
 	const address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* enable rom */
-	memory_install_rom(prg, 0x0000, 0x07ff, 0, 0x7800, cpu->region->base.v);
+	memory_install_rom(prg, 0x0000, 0x07ff, 0, 0x7800, cpu->region()->base.v);
 }
 
 DEVICE_GET_INFO( tf20 )
@@ -357,7 +356,6 @@ DEVICE_GET_INFO( tf20 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tf20_state);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;									break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_OTHER;					break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(tf20);	break;
@@ -376,3 +374,5 @@ DEVICE_GET_INFO( tf20 )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(TF20, tf20);

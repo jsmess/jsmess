@@ -4,10 +4,11 @@
 //
 //============================================================
 
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <tchar.h>
 #include <commctrl.h>
 #include <commdlg.h>
-#include <tchar.h>
 
 #include "dialog.h"
 #include "emu.h"
@@ -19,6 +20,7 @@
 #include "windows/input.h"
 #include "windows/window.h"
 #include "winutf8.h"
+
 
 #ifdef UNDER_CE
 #include "invokegx.h"

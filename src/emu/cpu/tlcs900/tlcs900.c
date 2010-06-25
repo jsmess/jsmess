@@ -71,8 +71,8 @@ struct _tlcs900_state
 	int halted;
 	int icount;
 	int regbank;
-	cpu_irq_callback irqcallback;
-	running_device *device;
+	device_irq_callback irqcallback;
+	legacy_cpu_device *device;
 	const address_space *program;
 };
 
@@ -207,11 +207,10 @@ struct _tlcs900_state
 INLINE tlcs900_state *get_safe_token( running_device *device )
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == CPU );
+	assert( device->type() == CPU );
 	assert( cpu_get_type(device) == CPU_TLCS900H );
 
-	return (tlcs900_state *) device->token;
+	return (tlcs900_state *) downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -219,7 +218,7 @@ static CPU_INIT( tlcs900 )
 {
 	tlcs900_state *cpustate = get_safe_token(device);
 
-	cpustate->intf = (const tlcs900_interface *)device->baseconfig().static_config;
+	cpustate->intf = (const tlcs900_interface *)device->baseconfig().static_config();
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space( AS_PROGRAM );
@@ -859,8 +858,6 @@ static CPU_EXECUTE( tlcs900 )
 {
 	tlcs900_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		const tlcs900inst *inst;
@@ -898,8 +895,6 @@ static CPU_EXECUTE( tlcs900 )
 
 		cpustate->icount -= cpustate->cycles;
 	} while ( cpustate->icount > 0 );
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -1126,7 +1121,7 @@ static CPU_SET_INFO( tlcs900 )
 
 CPU_GET_INFO( tlcs900h )
 {
-	tlcs900_state *cpustate = ( device != NULL && device->token != NULL ) ? get_safe_token(device) : NULL;
+	tlcs900_state *cpustate = ( device != NULL && device->token() != NULL ) ? get_safe_token(device) : NULL;
 
 	switch( state )
 	{

@@ -43,15 +43,14 @@ struct _dm9368_t
 INLINE dm9368_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (dm9368_t *)device->token;
+	return (dm9368_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE dm9368_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == DM9368);
-	return (dm9368_config *)device->baseconfig().inline_config;
+	assert(device->type() == DM9368);
+	return (dm9368_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 /***************************************************************************
@@ -139,7 +138,6 @@ DEVICE_GET_INFO( dm9368 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(dm9368_t);							break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(dm9368_config);					break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(dm9368);			break;
@@ -154,3 +152,5 @@ DEVICE_GET_INFO( dm9368 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(DM9368, dm9368);

@@ -120,10 +120,9 @@ static void set_irq_line(h6280_Regs* cpustate, int irqline, int state);
 INLINE h6280_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_H6280);
-	return (h6280_Regs *)device->token;
+	return (h6280_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* include the opcode macros, functions and function pointer tables */
@@ -171,7 +170,7 @@ static CPU_RESET( h6280 )
 {
 	h6280_Regs* cpustate = get_safe_token(device);
 
-	cpu_irq_callback save_irqcallback;
+	device_irq_callback save_irqcallback;
 	int i;
 
 	/* wipe out the h6280 structure */
@@ -217,8 +216,6 @@ static CPU_EXECUTE( h6280 )
 	int in;
 	h6280_Regs* cpustate = get_safe_token(device);
 
-	cpustate->ICount = cycles;
-
 	if ( cpustate->irq_pending == 2 ) {
 		cpustate->irq_pending--;
 	}
@@ -259,8 +256,6 @@ static CPU_EXECUTE( h6280 )
 			}
 		}
 	} while (cpustate->ICount > 0);
-
-	return cycles - cpustate->ICount;
 }
 
 /*****************************************************************************/
@@ -292,7 +287,7 @@ static void set_irq_line(h6280_Regs* cpustate, int irqline, int state)
 READ8_HANDLER( h6280_irq_status_r )
 {
 	int status;
-	h6280_Regs *cpustate = (h6280_Regs*)space->cpu->token;
+	h6280_Regs *cpustate = get_safe_token(space->cpu);
 
 	switch (offset&3)
 	{
@@ -311,7 +306,7 @@ READ8_HANDLER( h6280_irq_status_r )
 
 WRITE8_HANDLER( h6280_irq_status_w )
 {
-	h6280_Regs *cpustate = (h6280_Regs*)space->cpu->token;
+	h6280_Regs *cpustate = get_safe_token(space->cpu);
 	cpustate->io_buffer=data;
 	switch (offset&3)
 	{
@@ -330,13 +325,13 @@ WRITE8_HANDLER( h6280_irq_status_w )
 READ8_HANDLER( h6280_timer_r )
 {
 	/* only returns countdown */
-	h6280_Regs *cpustate = (h6280_Regs*)space->cpu->token;
+	h6280_Regs *cpustate = get_safe_token(space->cpu);
 	return ((cpustate->timer_value/1024)&0x7F)|(cpustate->io_buffer&0x80);
 }
 
 WRITE8_HANDLER( h6280_timer_w )
 {
-	h6280_Regs *cpustate = (h6280_Regs*)space->cpu->token;
+	h6280_Regs *cpustate = get_safe_token(space->cpu);
 	cpustate->io_buffer=data;
 	switch (offset) {
 		case 0: /* Counter preload */
@@ -426,7 +421,7 @@ static CPU_SET_INFO( h6280 )
 
 CPU_GET_INFO( h6280 )
 {
-	h6280_Regs* cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	h6280_Regs* cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

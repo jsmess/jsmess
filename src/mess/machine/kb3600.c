@@ -45,16 +45,15 @@ struct _ay3600_t
 INLINE ay3600_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (ay3600_t *)device->token;
+	return (ay3600_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const ay3600_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == AY3600PRO002));
-	return (const ay3600_interface *) device->baseconfig().static_config;
+	assert((device->type() == AY3600PRO002));
+	return (const ay3600_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -168,7 +167,6 @@ DEVICE_GET_INFO( ay3600pro002 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ay3600_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ay3600);	break;
@@ -183,3 +181,5 @@ DEVICE_GET_INFO( ay3600pro002 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(AY3600PRO002, ay3600pro002);

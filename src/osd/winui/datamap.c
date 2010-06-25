@@ -36,6 +36,7 @@
 #include "strconv.h"
 #include "datamap.h"
 #include "winutf8.h"
+#include "emu.h"
 #include "emuopts.h"
 
 #ifdef _MSC_VER

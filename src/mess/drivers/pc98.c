@@ -285,7 +285,7 @@ static VIDEO_UPDATE( pc9801 )
 					if(attr & 4)
 						color^=7;
 
-					if(((x*2+1)*8+xi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_x && (y*8+yi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_y)
+					if(((x*2+1)*8+xi)<screen->machine->primary_screen->visible_area().max_x && (y*8+yi)<screen->machine->primary_screen->visible_area().max_y)
 						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+1)*8+xi) = screen->machine->pens[color];
 
 					tile = (pc9801_vram[(x+y*40)] & 0x000000ff) >> 0;
@@ -302,7 +302,7 @@ static VIDEO_UPDATE( pc9801 )
 					if(attr & 4)
 						color^=7;
 
-					if(((x*2+0)*8+xi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_x && (y*8+yi)<video_screen_get_visible_area(screen->machine->primary_screen)->max_y)
+					if(((x*2+0)*8+xi)<screen->machine->primary_screen->visible_area().max_x && (y*8+yi)<screen->machine->primary_screen->visible_area().max_y)
 						*BITMAP_ADDR16(bitmap, y*8+yi, (x*2+0)*8+xi) = screen->machine->pens[color];
 				}
 			}

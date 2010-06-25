@@ -22,10 +22,9 @@ extern VIDEO_UPDATE( channelf );
 
 /*----------- defined in audio/channelf.c -----------*/
 
-#define SOUND_CHANNELF	DEVICE_GET_INFO_NAME( channelf_sound )
+DECLARE_LEGACY_SOUND_DEVICE(CHANNELF, channelf_sound);
 
 void channelf_sound_w(running_machine *machine, int mode);
-DEVICE_GET_INFO( channelf_sound );
 
 
 #endif /* CHANNELF_H_ */

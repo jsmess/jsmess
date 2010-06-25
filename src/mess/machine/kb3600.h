@@ -61,7 +61,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define AY3600PRO002	DEVICE_GET_INFO_NAME(ay3600pro002)
+DECLARE_LEGACY_DEVICE(AY3600PRO002, ay3600pro002);
 
 #define MDRV_AY3600PRO002_ADD(_tag, _intf) \
 	MDRV_DEVICE_ADD(_tag, AY3600PRO002, 0) \
@@ -95,10 +95,6 @@ struct _ay3600_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( ay3600pro002 );
-
 /* data read */
 UINT16 ay3600_b_r(running_device *device);
 

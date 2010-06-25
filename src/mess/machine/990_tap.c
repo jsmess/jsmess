@@ -39,7 +39,7 @@ static void update_interrupt(running_device *device);
 
 typedef struct tape_unit_t
 {
-	running_device *img;		/* image descriptor */
+	device_image_interface *img;		/* image descriptor */
 	unsigned int bot : 1;	/* TRUE if we are at the beginning of tape */
 	unsigned int eot : 1;	/* TRUE if we are at the end of tape */
 	unsigned int wp : 1;	/* TRUE if tape is write-protected */
@@ -126,21 +126,20 @@ int tape_get_id(running_device *image)
 INLINE tap_990_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (tap_990_t *)device->token;
+	return (tap_990_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 DEVICE_START( ti990_tape )
 {
 	tape_unit_t *t;
-	tap_990_t *tpc = get_safe_token(device->owner);
+	tap_990_t *tpc = get_safe_token(device->owner());
 	int id = tape_get_id(device);
 
 	t = &tpc->t[id];
 	memset(t, 0, sizeof(*t));
 
-	t->img = device;
+	t->img = (device_image_interface*)device;
 	t->wp = 1;
 	t->bot = 0;
 	t->eot = 0;
@@ -152,14 +151,14 @@ DEVICE_START( ti990_tape )
 DEVICE_IMAGE_LOAD( ti990_tape )
 {
 	tape_unit_t *t;
-	tap_990_t *tpc = get_safe_token(image->owner);
-	int id = tape_get_id(image);
+	tap_990_t *tpc = get_safe_token(image.device().owner());
+	int id = tape_get_id(&image.device());
 
 	t = &tpc->t[id];
 	memset(t, 0, sizeof(*t));
 
 	/* tell whether the image is writable */
-	t->wp = ! image_is_writable(image);
+	t->wp = ! image.is_writable();
 
 	t->bot = 1;
 
@@ -172,8 +171,8 @@ DEVICE_IMAGE_LOAD( ti990_tape )
 DEVICE_IMAGE_UNLOAD( ti990_tape )
 {
 	tape_unit_t *t;
-	tap_990_t *tpc = get_safe_token(image->owner);
-	int id = tape_get_id(image);
+	tap_990_t *tpc = get_safe_token(image.device().owner());
+	int id = tape_get_id(&image.device());
 
 	t = &tpc->t[id];
 	t->wp = 1;
@@ -246,7 +245,7 @@ static void cmd_read_binary_forward(running_device *device)
 		update_interrupt(device);
 		return;
 	}
-	else if (! image_exists(tpc->t[tap_sel].img))
+	else if (! tpc->t[tap_sel].img->exists())
 	{	/* offline */
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
@@ -269,7 +268,7 @@ static void cmd_read_binary_forward(running_device *device)
 	char_count = tpc->w[4];
 	read_offset = tpc->w[3];
 
-	bytes_read = image_fread(tpc->t[tap_sel].img, buffer, 4);
+	bytes_read = tpc->t[tap_sel].img->fread(buffer, 4);
 	if (bytes_read != 4)
 	{
 		if (bytes_read == 0)
@@ -285,7 +284,7 @@ static void cmd_read_binary_forward(running_device *device)
 			/* No idea what to report... */
 			/* eject tape to avoid catastrophes */
 			logerror("Tape error\n");
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -298,7 +297,7 @@ static void cmd_read_binary_forward(running_device *device)
 		logerror("Tape error\n");
 		logerror("Tape format looks gooofy\n");
 		/* eject tape to avoid catastrophes */
-		image_unload(tpc->t[tap_sel].img);
+		tpc->t[tap_sel].img->unload();
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 		update_interrupt(device);
@@ -322,10 +321,10 @@ static void cmd_read_binary_forward(running_device *device)
 	/* skip up to read_offset bytes */
 	chunk_len = (read_offset > rec_count) ? rec_count : read_offset;
 
-	if (image_fseek(tpc->t[tap_sel].img, chunk_len, SEEK_CUR))
+	if (tpc->t[tap_sel].img->fseek(chunk_len, SEEK_CUR))
 	{	/* eject tape */
 		logerror("Tape error\n");
-		image_unload(tpc->t[tap_sel].img);
+		tpc->t[tap_sel].img->unload();
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 		update_interrupt(device);
@@ -348,7 +347,7 @@ static void cmd_read_binary_forward(running_device *device)
 	for (; chunk_len>0; )
 	{
 		bytes_to_read = (chunk_len < sizeof(buffer)) ? chunk_len : sizeof(buffer);
-		bytes_read = image_fread(tpc->t[tap_sel].img, buffer, bytes_to_read);
+		bytes_read = tpc->t[tap_sel].img->fread(buffer, bytes_to_read);
 
 		if (bytes_read & 1)
 		{
@@ -369,7 +368,7 @@ static void cmd_read_binary_forward(running_device *device)
 		if (bytes_read != bytes_to_read)
 		{	/* eject tape */
 			logerror("Tape error\n");
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -387,10 +386,10 @@ static void cmd_read_binary_forward(running_device *device)
 
 	if (rec_count)
 	{	/* skip end of record */
-		if (image_fseek(tpc->t[tap_sel].img, rec_count, SEEK_CUR))
+		if (tpc->t[tap_sel].img->fseek(rec_count, SEEK_CUR))
 		{	/* eject tape */
 			logerror("Tape error\n");
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -399,10 +398,10 @@ static void cmd_read_binary_forward(running_device *device)
 	}
 
 skip_trailer:
-	if (image_fread(tpc->t[tap_sel].img, buffer, 4) != 4)
+	if (tpc->t[tap_sel].img->fread(buffer, 4) != 4)
 	{	/* eject tape */
 		logerror("Tape error\n");
-		image_unload(tpc->t[tap_sel].img);
+		tpc->t[tap_sel].img->unload();
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 		update_interrupt(device);
@@ -412,7 +411,7 @@ skip_trailer:
 	if (reclen != ((((int) buffer[1]) << 8) | buffer[0]))
 	{	/* eject tape */
 		logerror("Tape error\n");
-		image_unload(tpc->t[tap_sel].img);
+		tpc->t[tap_sel].img->unload();
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 		update_interrupt(device);
@@ -423,7 +422,7 @@ skip_trailer:
 		logerror("Tape error\n");
 		logerror("Tape format looks gooofy\n");
 		/* eject tape to avoid catastrophes */
-		image_unload(tpc->t[tap_sel].img);
+		tpc->t[tap_sel].img->unload();
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 		update_interrupt(device);
@@ -465,7 +464,7 @@ static void cmd_record_skip_forward(running_device *device)
 		update_interrupt(device);
 		return;
 	}
-	else if (! image_exists(tpc->t[tap_sel].img))
+	else if (! tpc->t[tap_sel].img->exists())
 	{	/* offline */
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
@@ -489,7 +488,7 @@ static void cmd_record_skip_forward(running_device *device)
 
 	while (record_count > 0)
 	{
-		bytes_read = image_fread(tpc->t[tap_sel].img, buffer, 4);
+		bytes_read = tpc->t[tap_sel].img->fread(buffer, 4);
 		if (bytes_read != 4)
 		{
 			if (bytes_read == 0)
@@ -504,7 +503,7 @@ static void cmd_record_skip_forward(running_device *device)
 			{	/* illegitimate EOF */
 				/* No idea what to report... */
 				/* eject tape to avoid catastrophes */
-				image_unload(tpc->t[tap_sel].img);
+				tpc->t[tap_sel].img->unload();
 				tpc->w[0] |= w0_offline;
 				tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 				update_interrupt(device);
@@ -516,7 +515,7 @@ static void cmd_record_skip_forward(running_device *device)
 		{	/* no idea what these bytes mean */
 			logerror("Tape format looks gooofy\n");
 			/* eject tape to avoid catastrophes */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -534,18 +533,18 @@ static void cmd_record_skip_forward(running_device *device)
 		}
 
 		/* skip record data */
-		if (image_fseek(tpc->t[tap_sel].img, reclen, SEEK_CUR))
+		if (tpc->t[tap_sel].img->fseek(reclen, SEEK_CUR))
 		{	/* eject tape */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
 			goto update_registers;
 		}
 
-		if (image_fread(tpc->t[tap_sel].img, buffer, 4) != 4)
+		if (tpc->t[tap_sel].img->fread(buffer, 4) != 4)
 		{	/* eject tape */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -554,7 +553,7 @@ static void cmd_record_skip_forward(running_device *device)
 
 		if (reclen != ((((int) buffer[1]) << 8) | buffer[0]))
 		{	/* eject tape */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -564,7 +563,7 @@ static void cmd_record_skip_forward(running_device *device)
 		{	/* no idea what these bytes mean */
 			logerror("Tape format looks gooofy\n");
 			/* eject tape to avoid catastrophes */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -602,7 +601,7 @@ static void cmd_record_skip_reverse(running_device *device)
 		update_interrupt(device);
 		return;
 	}
-	else if (! image_exists(tpc->t[tap_sel].img))
+	else if (! tpc->t[tap_sel].img->exists())
 	{	/* offline */
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
@@ -626,7 +625,7 @@ static void cmd_record_skip_reverse(running_device *device)
 
 	while (record_count > 0)
 	{
-		if (image_ftell(tpc->t[tap_sel].img) == 0)
+		if (tpc->t[tap_sel].img->ftell() == 0)
 		{	/* bot */
 			tpc->t[tap_sel].bot = 1;
 			tpc->w[0] |= w0_BOT;
@@ -634,21 +633,21 @@ static void cmd_record_skip_reverse(running_device *device)
 			update_interrupt(device);
 			goto update_registers;
 		}
-		if (image_fseek(tpc->t[tap_sel].img, -4, SEEK_CUR))
+		if (tpc->t[tap_sel].img->fseek(-4, SEEK_CUR))
 		{	/* eject tape */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
 			goto update_registers;
 		}
-		bytes_read = image_fread(tpc->t[tap_sel].img, buffer, 4);
+		bytes_read = tpc->t[tap_sel].img->fread(buffer, 4);
 		if (bytes_read != 4)
 		{
 			/* illegitimate EOF */
 			/* No idea what to report... */
 			/* eject tape to avoid catastrophes */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -659,7 +658,7 @@ static void cmd_record_skip_reverse(running_device *device)
 		{	/* no idea what these bytes mean */
 			logerror("Tape format looks gooofy\n");
 			/* eject tape to avoid catastrophes */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -670,9 +669,9 @@ static void cmd_record_skip_reverse(running_device *device)
 		if (reclen == 0)
 		{
 			logerror("record skip reverse: found EOF\n");
-			if (image_fseek(tpc->t[tap_sel].img, -4, SEEK_CUR))
+			if (tpc->t[tap_sel].img->fseek(-4, SEEK_CUR))
 			{	/* eject tape */
-				image_unload(tpc->t[tap_sel].img);
+				tpc->t[tap_sel].img->unload();
 				tpc->w[0] |= w0_offline;
 				tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 				update_interrupt(device);
@@ -684,18 +683,18 @@ static void cmd_record_skip_reverse(running_device *device)
 			goto update_registers;
 		}
 
-		if (image_fseek(tpc->t[tap_sel].img, -reclen-8, SEEK_CUR))
+		if (tpc->t[tap_sel].img->fseek(-reclen-8, SEEK_CUR))
 		{	/* eject tape */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
 			goto update_registers;
 		}
 
-		if (image_fread(tpc->t[tap_sel].img, buffer, 4) != 4)
+		if (tpc->t[tap_sel].img->fread(buffer, 4) != 4)
 		{	/* eject tape */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -703,7 +702,7 @@ static void cmd_record_skip_reverse(running_device *device)
 		}
 		if (reclen != ((((int) buffer[1]) << 8) | buffer[0]))
 		{	/* eject tape */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -713,16 +712,16 @@ static void cmd_record_skip_reverse(running_device *device)
 		{	/* no idea what these bytes mean */
 			logerror("Tape format looks gooofy\n");
 			/* eject tape to avoid catastrophes */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
 			goto update_registers;
 		}
 
-		if (image_fseek(tpc->t[tap_sel].img, -4, SEEK_CUR))
+		if (tpc->t[tap_sel].img->fseek(-4, SEEK_CUR))
 		{	/* eject tape */
-			image_unload(tpc->t[tap_sel].img);
+			tpc->t[tap_sel].img->unload();
 			tpc->w[0] |= w0_offline;
 			tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 			update_interrupt(device);
@@ -754,7 +753,7 @@ static void cmd_rewind(running_device *device)
 		update_interrupt(device);
 		return;
 	}
-	else if (! image_exists(tpc->t[tap_sel].img))
+	else if (! tpc->t[tap_sel].img->exists())
 	{	/* offline */
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
@@ -773,9 +772,9 @@ static void cmd_rewind(running_device *device)
 
 	tpc->t[tap_sel].eot = 0;
 
-	if (image_fseek(tpc->t[tap_sel].img, 0, SEEK_SET))
+	if (tpc->t[tap_sel].img->fseek(0, SEEK_SET))
 	{	/* eject tape */
-		image_unload(tpc->t[tap_sel].img);
+		tpc->t[tap_sel].img->unload();
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 		update_interrupt(device);
@@ -802,7 +801,7 @@ static void cmd_rewind_and_offline(running_device *device)
 		update_interrupt(device);
 		return;
 	}
-	else if (! image_exists(tpc->t[tap_sel].img))
+	else if (! tpc->t[tap_sel].img->exists())
 	{	/* offline */
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
@@ -820,7 +819,7 @@ static void cmd_rewind_and_offline(running_device *device)
 #endif
 
 	/* eject tape */
-	image_unload(tpc->t[tap_sel].img);
+	tpc->t[tap_sel].img->unload();
 
 	tpc->w[7] |= w7_idle | w7_complete;
 	update_interrupt(device);
@@ -840,7 +839,7 @@ static void read_transport_status(running_device *device)
 		tpc->w[7] |= w7_idle | w7_error | w7_hard_error;
 		update_interrupt(device);
 	}
-	else if (! image_exists(tpc->t[tap_sel].img))
+	else if (! tpc->t[tap_sel].img->exists())
 	{	/* offline */
 		tpc->w[0] |= w0_offline;
 		tpc->w[7] |= w7_idle | w7_error | w7_tape_error;
@@ -1001,7 +1000,6 @@ DEVICE_GET_INFO( ti990_tape )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ti990_tape_t);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_MAGTAPE;										break;
 		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1;												break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1;												break;
@@ -1021,7 +1019,8 @@ DEVICE_GET_INFO( ti990_tape )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }
-#define TI990_TAPE		DEVICE_GET_INFO_NAME(ti990_tape)
+DECLARE_LEGACY_IMAGE_DEVICE(TI990_TAPE, ti990_tape);
+DEFINE_LEGACY_IMAGE_DEVICE(TI990_TAPE, ti990_tape);
 
 #define MDRV_TI990_TAPE_ADD(_tag)	\
 	MDRV_DEVICE_ADD((_tag),  TI990_TAPE, 0)
@@ -1041,10 +1040,10 @@ DEVICE_START(tap_990)
 {
 	tap_990_t *tpc = get_safe_token(device);
 	/* verify that we have an interface assigned */
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
 	/* copy interface pointer */
-	tpc->intf = (const ti990_tpc_interface*)device->baseconfig().static_config;
+	tpc->intf = (const ti990_tpc_interface*)device->baseconfig().static_config();
 
 	memset(tpc->w, 0, sizeof(tpc->w));
 	/* The PE bit is always set for the MT3200 (but not MT1600) */
@@ -1062,7 +1061,6 @@ DEVICE_GET_INFO( tap_990 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tap_990_t);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(tap_990);		break;
@@ -1080,3 +1078,4 @@ DEVICE_GET_INFO( tap_990 )
 	}
 }
 
+DEFINE_LEGACY_DEVICE(TI990_TAPE_CTRL, tap_990);

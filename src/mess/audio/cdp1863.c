@@ -31,9 +31,8 @@ struct _cdp1863_t
 INLINE cdp1863_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (cdp1863_t *)device->token;
+	return (cdp1863_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /* Load Tone Latch */
@@ -136,7 +135,7 @@ static DEVICE_START( cdp1863 )
 	assert(device != NULL);
 	assert(device->tag() != NULL);
 
-	cdp1863->intf = device->baseconfig().static_config;
+	cdp1863->intf = device->baseconfig().static_config();
 
 	assert(cdp1863->intf != NULL);
 	assert((cdp1863->intf->clock1 > 0) || (cdp1863->intf->clock2 > 0));
@@ -164,7 +163,6 @@ DEVICE_GET_INFO( cdp1863 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1863_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1863);	break;
@@ -179,3 +177,5 @@ DEVICE_GET_INFO( cdp1863 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(CDP1863, cdp1863);

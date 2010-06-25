@@ -3,11 +3,8 @@
 #define __TI85SERIAL_H_
 
 
-#define TI85SERIAL	DEVICE_GET_INFO_NAME(ti85serial)
-#define TI86SERIAL	DEVICE_GET_INFO_NAME(ti86serial)
-
-DEVICE_GET_INFO(ti85serial);
-DEVICE_GET_INFO(ti86serial);
+DECLARE_LEGACY_IMAGE_DEVICE(TI85SERIAL, ti85serial);
+DECLARE_LEGACY_IMAGE_DEVICE(TI86SERIAL, ti86serial);
 
 extern void ti85_update_serial(running_device *device);
 

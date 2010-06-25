@@ -31,7 +31,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define I8214		DEVICE_GET_INFO_NAME(i8214)
+DECLARE_LEGACY_DEVICE(I8214, i8214);
 
 #define MDRV_I8214_ADD(_tag, _clock, _intrf) \
 	MDRV_DEVICE_ADD(_tag, I8214, _clock) \
@@ -54,10 +54,6 @@ struct _i8214_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( i8214 );
-
 /* request level read */
 READ8_DEVICE_HANDLER( i8214_a_r );
 

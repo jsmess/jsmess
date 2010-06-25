@@ -41,8 +41,8 @@ struct _s2650_regs {
 	UINT8	irq_state;
 
 	int		icount;
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 };
@@ -50,10 +50,9 @@ struct _s2650_regs {
 INLINE s2650_regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_S2650);
-	return (s2650_regs *)device->token;
+	return (s2650_regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* condition code changes for a byte */
@@ -888,10 +887,9 @@ static CPU_EXECUTE( s2650 )
 {
 	s2650_regs *s2650c = get_safe_token(device);
 
-	s2650c->icount = cycles;
-
 	/* check for external irqs */
-	s2650c->icount -= check_irq_line(s2650c);
+	int cycles = check_irq_line(s2650c);
+	s2650c->icount -= cycles;
 
 	do
 	{
@@ -1498,8 +1496,6 @@ static CPU_EXECUTE( s2650 )
 				break;
 		}
 	} while( s2650c->icount > 0 );
-
-	return cycles - s2650c->icount;
 }
 
 
@@ -1546,7 +1542,7 @@ static CPU_SET_INFO( s2650 )
 
 CPU_GET_INFO( s2650 )
 {
-	s2650_regs *s2650c = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	s2650_regs *s2650c = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

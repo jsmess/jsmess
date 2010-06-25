@@ -1992,44 +1992,44 @@ WRITE8_HANDLER ( bbc_disc_w )
 ***************************************/
 DEVICE_IMAGE_LOAD( bbcb_cart )
 {
-	UINT8 *mem = memory_region (image->machine, "user1");
+	UINT8 *mem = memory_region (image.device().machine, "user1");
 	int size, read_;
 	int addr = 0;
 	int index = 0;
 
-	size = image_length (image);
+	size = image.length();
 
-	if (strcmp(image->tag(),"cart1") == 0)
+	if (strcmp(image.device().tag(),"cart1") == 0)
 	{
 		index = 0;
 	}
-	if (strcmp(image->tag(),"cart2") == 0)
+	if (strcmp(image.device().tag(),"cart2") == 0)
 	{
 		index = 1;
 	}
-	if (strcmp(image->tag(),"cart3") == 0)
+	if (strcmp(image.device().tag(),"cart3") == 0)
 	{
 		index = 2;
 	}
-	if (strcmp(image->tag(),"cart4") == 0)
+	if (strcmp(image.device().tag(),"cart4") == 0)
 	{
 		index = 3;
 	}
 	addr = 0x8000 + (0x4000 * index);
 
 
-	logerror("loading rom %s at %.4x size:%.4x\n", image_filename(image), addr, size);
+	logerror("loading rom %s at %.4x size:%.4x\n", image.filename(), addr, size);
 
 
 	switch (size)
 	{
 	case 0x2000:
-		read_ = image_fread(image, mem + addr, size);
-		image_fseek(image, 0, SEEK_SET);
-		read_ = image_fread(image, mem + addr + 0x2000, size);
+		read_ = image.fread(mem + addr, size);
+		image.fseek(0, SEEK_SET);
+		read_ = image.fread(mem + addr + 0x2000, size);
 		break;
 	case 0x4000:
-		read_ = image_fread(image, mem + addr, size);
+		read_ = image.fread(mem + addr, size);
 		break;
 	default:
 		read_ = 0;

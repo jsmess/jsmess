@@ -4309,10 +4309,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( madshark )
 	PORT_START("P1") //Player 1
-	JOY_TYPE1_2BUTTONS(1)
+	JOY_TYPE1_2BUTTONS(1)	// BUTTON3 in "test mode" only
 
 	PORT_START("P2") //Player 2
-	JOY_TYPE1_2BUTTONS(2)
+	JOY_TYPE1_2BUTTONS(2)	// BUTTON3 in "test mode" only
 
 	PORT_START("COINS") //Coins
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(5)
@@ -7904,8 +7904,7 @@ static MACHINE_DRIVER_START( triplfun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 792000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 792000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
@@ -8049,8 +8048,7 @@ static MACHINE_DRIVER_START( wiggie )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -8331,8 +8329,7 @@ static MACHINE_DRIVER_START( crazyfgt )
 	MDRV_SOUND_ADD("ymsnd", YM3812, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)	// clock?
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)	// clock?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -8413,7 +8410,7 @@ static MACHINE_DRIVER_START( inttoote )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(inttoote)
-	MDRV_PALETTE_LENGTH(512 * 1)	/* sprites, layer1, layer2 */
+	MDRV_PALETTE_LENGTH(512 * 1)
 
 	MDRV_PALETTE_INIT(inttoote)
 	MDRV_VIDEO_START(seta_1_layer)
@@ -10083,8 +10080,8 @@ GAME( 1993, madshark, 0,        madshark, madshark, 0,        ROT270, "Allumer",
 GAME( 1993, msgundam, 0,        msgundam, msgundam, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam", 0 )
 GAME( 1993, msgundam1,msgundam, msgundam, msgunda1, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam (Japan)", 0 )
 GAME( 1993, oisipuzl, 0,        oisipuzl, oisipuzl, 0,        ROT0,   "Sunsoft / Atlus",        "Oishii Puzzle Ha Irimasenka", 0 )
-GAME( 1993, qzkklgy2, 0,        qzkklgy2, qzkklgy2, 0,        ROT0,   "Tecmo",                  "Quiz Kokology 2", 0 )
 GAME( 1993, triplfun, oisipuzl, triplfun, oisipuzl, 0,        ROT0,   "bootleg",                "Triple Fun", 0 )
+GAME( 1993, qzkklgy2, 0,        qzkklgy2, qzkklgy2, 0,        ROT0,   "Tecmo",                  "Quiz Kokology 2", 0 )
 GAME( 1993, utoukond, 0,        utoukond, utoukond, 0,        ROT0,   "Banpresto / Tsuburaya Productions", "Ultra Toukon Densetsu (Japan)", 0 )
 GAME( 1993, wrofaero, 0,        wrofaero, wrofaero, 0,        ROT270, "Yang Cheng",             "War of Aero - Project MEIOU", 0 )
 GAME( 1994, eightfrc, 0,        eightfrc, eightfrc, eightfrc, ROT90,  "Tecmo",                  "Eight Forces", 0 )

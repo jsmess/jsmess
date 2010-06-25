@@ -80,19 +80,11 @@ struct _mc6847_config
 	const UINT32 *custom_palette;
 };
 
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( mc6847 );
-
-
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MC6847 DEVICE_GET_INFO_NAME(mc6847)
+DECLARE_LEGACY_DEVICE(MC6847, mc6847);
 
 #define MDRV_MC6847_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, MC6847, 0) \

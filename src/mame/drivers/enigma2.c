@@ -4,17 +4,20 @@ Enigma 2 (c) Zilec Electronics
 
 driver by Pierpaolo Prazzoli and Tomasz Slanina
 
-Two sets:
 
-Enigma2 (1981)
+enigma2 (1981)
  2xZ80 + AY8910
+ Original dedicated board
 
-Enigma2a (1984?)
- Conversion applied to a Taito Space Invaders Part II board set. Bootleg ?
+enigma2a (1984?)
+ Conversion applied to a Taito Space Invaders Part II board set with 1984 copyrighy. hack / Bootleg ?
+
+enigma2b (1981)
+ Conversion like enigma2a, but boots with 1981 copyright and Phantoms II title
 
 TODO:
  - enigma2  - Star blinking frequency
- - enigma2a - bad sound ROM
+ - enigma2a + enigma2b - bad sound ROM?
 
 *********************************************************************/
 
@@ -113,7 +116,7 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 	int next_vpos;
 
 	/* compute vector and set the interrupt line */
-	int vpos = video_screen_get_vpos(machine->primary_screen);
+	int vpos = machine->primary_screen->vpos();
 	UINT16 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
 	cpu_set_input_line_and_vector(state->maincpu, 0, ASSERT_LINE, vector);
@@ -125,8 +128,8 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 		next_counter = INT_TRIGGER_COUNT_1;
 
 	next_vpos = vysnc_chain_counter_to_vpos(next_counter);
-	timer_adjust_oneshot(state->interrupt_assert_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), 0);
-	timer_adjust_oneshot(state->interrupt_clear_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos + 1, 0), 0);
+	timer_adjust_oneshot(state->interrupt_assert_timer, machine->primary_screen->time_until_pos(next_vpos), 0);
+	timer_adjust_oneshot(state->interrupt_clear_timer, machine->primary_screen->time_until_pos(vpos + 1), 0);
 }
 
 
@@ -142,7 +145,7 @@ static void start_interrupt_timers( running_machine *machine )
 {
 	enigma2_state *state = (enigma2_state *)machine->driver_data;
 	int vpos = vysnc_chain_counter_to_vpos(INT_TRIGGER_COUNT_1);
-	timer_adjust_oneshot(state->interrupt_assert_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
+	timer_adjust_oneshot(state->interrupt_assert_timer, machine->primary_screen->time_until_pos(vpos), 0);
 }
 
 
@@ -201,13 +204,13 @@ static VIDEO_UPDATE( enigma2 )
 	enigma2_state *state = (enigma2_state *)screen->machine->driver_data;
 	pen_t pens[NUM_PENS];
 
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	const rectangle &visarea = screen->visible_area();
 	UINT8 *prom = memory_region(screen->machine, "proms");
 	UINT8 *color_map_base = state->flip_screen ? &prom[0x0400] : &prom[0x0000];
 	UINT8 *star_map_base = (state->blink_count & 0x08) ? &prom[0x0c00] : &prom[0x0800];
 
 	UINT8 x = 0;
-	UINT16 bitmap_y = visarea->min_y;
+	UINT16 bitmap_y = visarea.min_y;
 	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
 	UINT8 video_data = 0;
 	UINT8 fore_color = 0;
@@ -269,7 +272,7 @@ static VIDEO_UPDATE( enigma2 )
 		if (x == 0)
 		{
 			/* end of screen? */
-			if (bitmap_y == visarea->max_y)
+			if (bitmap_y == visarea.max_y)
 				break;
 
 			/* next row */
@@ -288,8 +291,8 @@ static VIDEO_UPDATE( enigma2a )
 {
 	enigma2_state *state = (enigma2_state *)screen->machine->driver_data;
 	UINT8 x = 0;
-	const rectangle *visarea = video_screen_get_visible_area(screen);
-	UINT16 bitmap_y = visarea->min_y;
+	const rectangle &visarea = screen->visible_area();
+	UINT16 bitmap_y = visarea.min_y;
 	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
 	UINT8 video_data = 0;
 
@@ -332,7 +335,7 @@ static VIDEO_UPDATE( enigma2a )
 		if (x == 0)
 		{
 			/* end of screen? */
-			if (bitmap_y == visarea->max_y)
+			if (bitmap_y == visarea.max_y)
 				break;
 
 			/* next row */
@@ -695,6 +698,19 @@ ROM_START( enigma2a )
 	ROM_LOAD( "sound.bin",    0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
 ROM_END
 
+ROM_START( enigma2b )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic36.bin",   0x0000, 0x0800, CRC(71dc9ecc) SHA1(a41260259cf0a36b01b5e8ad35cf968e920d22d9) )
+	ROM_LOAD( "ic35.bin",   0x0800, 0x0800, CRC(e841072f) SHA1(6ab02fd9fdeac5ab887cd25eee3d6b70ab01f849) )
+	ROM_LOAD( "ic34.bin",   0x1000, 0x0800, CRC(1384073d) SHA1(7a3a910c0431e680cc952a10a040b02f3df0532a) )
+	ROM_LOAD( "ic33.bin",   0x1800, 0x0800, CRC(ac6c2410) SHA1(d35565a5ffe795d0c36970bd9c2f948bf79e0ed8) )
+	ROM_LOAD( "ic32.bin",   0x4000, 0x0800, CRC(098ac15b) SHA1(cce28a2540a9eabb473391fff92895129ae41751) )
+	ROM_LOAD( "ic42.bin",   0x4800, 0x0800, CRC(240a9d4b) SHA1(ca1c69fafec0471141ce1254ddfaef54fecfcbf0) )
+
+	/* this rom was completely broken on this pcb.. */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sound.bin",    0x0000, 0x0800, BAD_DUMP CRC(5f092d3c) SHA1(17c70f6af1b5560a45e6b1bdb330a98b27570fe9) )
+ROM_END
 
 
 static DRIVER_INIT(enigma2)
@@ -712,3 +728,4 @@ static DRIVER_INIT(enigma2)
 
 GAME( 1981, enigma2,  0,	   enigma2,  enigma2,  enigma2, ROT270, "GamePlan (Zilec Electronics license)", "Enigma II", GAME_SUPPORTS_SAVE )
 GAME( 1984, enigma2a, enigma2, enigma2a, enigma2a, enigma2, ROT270, "Zilec Electronics", "Enigma II (Space Invaders hardware)", GAME_SUPPORTS_SAVE )
+GAME( 1981, enigma2b, enigma2, enigma2a, enigma2a, enigma2, ROT270, "Zilec Electronics", "Phantoms II (Space Invaders hardware)", GAME_SUPPORTS_SAVE )

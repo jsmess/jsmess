@@ -33,10 +33,9 @@ CPU_DISASSEMBLE( sh4 );
 INLINE SH4 *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SH4);
-	return (SH4 *)device->token;
+	return (SH4 *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* Called for unimplemented opcodes */
@@ -3255,7 +3254,7 @@ static CPU_RESET( sh4 )
 	int	savecpu_clock, savebus_clock, savepm_clock;
 
 	void (*f)(UINT32 data);
-	cpu_irq_callback save_irqcallback;
+	device_irq_callback save_irqcallback;
 
 	m = sh4->m;
 	tsaved[0] = sh4->dma_timer[0];
@@ -3329,10 +3328,12 @@ static CPU_RESET( sh4 )
 static CPU_EXECUTE( sh4 )
 {
 	SH4 *sh4 = get_safe_token(device);
-	sh4->sh4_icount = cycles;
 
 	if (sh4->cpu_off)
-		return 0;
+	{
+		sh4->sh4_icount = 0;
+		return;
+	}
 
 	do
 	{
@@ -3378,13 +3379,11 @@ static CPU_EXECUTE( sh4 )
 		}
 		sh4->sh4_icount--;
 	} while( sh4->sh4_icount > 0 );
-
-	return cycles - sh4->sh4_icount;
 }
 
 static CPU_INIT( sh4 )
 {
-	const struct sh4_config *conf = (const struct sh4_config *)device->baseconfig().static_config;
+	const struct sh4_config *conf = (const struct sh4_config *)device->baseconfig().static_config();
 	SH4 *sh4 = get_safe_token(device);
 
 	sh4_common_init(device);
@@ -3675,7 +3674,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( sh4 )
 {
-	SH4 *sh4 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	SH4 *sh4 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

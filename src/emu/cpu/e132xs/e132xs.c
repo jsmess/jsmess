@@ -318,8 +318,8 @@ struct _hyperstone_state
 
 	struct _delay delay;
 
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	UINT32 opcodexor;
@@ -416,8 +416,7 @@ ADDRESS_MAP_END
 INLINE hyperstone_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_E116T ||
 		   cpu_get_type(device) == CPU_E116XT ||
 		   cpu_get_type(device) == CPU_E116XS ||
@@ -432,7 +431,7 @@ INLINE hyperstone_state *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_GMS30C2132 ||
 		   cpu_get_type(device) == CPU_GMS30C2216 ||
 		   cpu_get_type(device) == CPU_GMS30C2232);
-	return (hyperstone_state *)device->token;
+	return (hyperstone_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* Return the entry point for a determinated trap */
@@ -638,7 +637,7 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 
 static TIMER_CALLBACK( e132xs_timer_callback )
 {
-	running_device *device = (running_device *)ptr;
+	legacy_cpu_device *device = (legacy_cpu_device *)ptr;
 	hyperstone_state *cpustate = get_safe_token(device);
 	int update = param;
 
@@ -1528,7 +1527,7 @@ static void set_irq_line(hyperstone_state *cpustate, int irqline, int state)
 		ISR &= ~(1 << irqline);
 }
 
-static void hyperstone_init(running_device *device, cpu_irq_callback irqcallback, int scale_mask)
+static void hyperstone_init(legacy_cpu_device *device, device_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 
@@ -1550,7 +1549,7 @@ static void hyperstone_init(running_device *device, cpu_irq_callback irqcallback
 	cpustate->clock_scale_mask = scale_mask;
 }
 
-static void e116_init(running_device *device, cpu_irq_callback irqcallback, int scale_mask)
+static void e116_init(legacy_cpu_device *device, device_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
@@ -1587,7 +1586,7 @@ static CPU_INIT( gms30c2216 )
 	e116_init(device, irqcallback, 0);
 }
 
-static void e132_init(running_device *device, cpu_irq_callback irqcallback, int scale_mask)
+static void e132_init(legacy_cpu_device *device, device_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 	hyperstone_init(device, irqcallback, scale_mask);
@@ -1641,7 +1640,7 @@ static CPU_RESET( hyperstone )
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
 	emu_timer *save_timer;
-	cpu_irq_callback save_irqcallback;
+	device_irq_callback save_irqcallback;
 	UINT32 save_opcodexor;
 
 	save_timer = cpustate->timer;
@@ -4660,8 +4659,6 @@ static CPU_EXECUTE( hyperstone )
 {
 	hyperstone_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	if (cpustate->intblock < 0)
 		cpustate->intblock = 0;
 	check_interrupts(cpustate);
@@ -4696,8 +4693,6 @@ static CPU_EXECUTE( hyperstone )
 			check_interrupts(cpustate);
 
 	} while( cpustate->icount > 0 );
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -4844,7 +4839,7 @@ static CPU_SET_INFO( hyperstone )
 
 static CPU_GET_INFO( hyperstone )
 {
-	hyperstone_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	hyperstone_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

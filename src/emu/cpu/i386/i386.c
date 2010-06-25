@@ -463,7 +463,7 @@ static void I386OP(decode_two_byte)(i386_state *cpustate)
 
 static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
-	running_device *device = (running_device *)ref;
+	legacy_cpu_device *device = (legacy_cpu_device *)ref;
 	i386_state *cpustate = get_safe_token(device);
 	UINT32 result;
 	I386_SREG seg;
@@ -484,7 +484,7 @@ static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, cons
 
 static UINT64 i386_debug_seglimit(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
-	running_device *device = (running_device *)ref;
+	legacy_cpu_device *device = (legacy_cpu_device *)ref;
 	i386_state *cpustate = get_safe_token(device);
 	UINT32 result = 0;
 	I386_SREG seg;
@@ -509,7 +509,7 @@ static CPU_DEBUG_INIT( i386 )
 
 static STATE_POSTLOAD( i386_postload )
 {
-	running_device *device = (running_device *)param;
+	legacy_cpu_device *device = (legacy_cpu_device *)param;
 	i386_state *cpustate = get_safe_token(device);
 	int i;
 	for (i = 0; i < 6; i++)
@@ -641,7 +641,7 @@ static void build_opcode_table(i386_state *cpustate, UINT32 features)
 static CPU_RESET( i386 )
 {
 	i386_state *cpustate = get_safe_token(device);
-	cpu_irq_callback save_irqcallback;
+	device_irq_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
@@ -717,14 +717,15 @@ static CPU_EXECUTE( i386 )
 {
 	i386_state *cpustate = get_safe_token(device);
 
-	cpustate->cycles = cycles;
+	int cycles = cpustate->cycles;
 	cpustate->base_cycles = cycles;
 	CHANGE_PC(cpustate,cpustate->eip);
 
 	if (cpustate->halted)
 	{
 		cpustate->tsc += cycles;
-		return cycles;
+		cpustate->cycles = 0;
+		return;
 	}
 
 	while( cpustate->cycles > 0 )
@@ -741,8 +742,6 @@ static CPU_EXECUTE( i386 )
 		I386OP(decode_opcode)(cpustate);
 	}
 	cpustate->tsc += (cycles - cpustate->cycles);
-
-	return cycles - cpustate->cycles;
 }
 
 /*************************************************************************/
@@ -870,7 +869,7 @@ static CPU_SET_INFO( i386 )
 
 CPU_GET_INFO( i386 )
 {
-	i386_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	i386_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1097,7 +1096,7 @@ static CPU_INIT( i486 )
 static CPU_RESET( i486 )
 {
 	i386_state *cpustate = get_safe_token(device);
-	cpu_irq_callback save_irqcallback;
+	device_irq_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
@@ -1165,7 +1164,7 @@ static CPU_SET_INFO( i486 )
 
 CPU_GET_INFO( i486 )
 {
-	i386_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	i386_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(i486);break;
@@ -1213,7 +1212,7 @@ static CPU_INIT( pentium )
 static CPU_RESET( pentium )
 {
 	i386_state *cpustate = get_safe_token(device);
-	cpu_irq_callback save_irqcallback;
+	device_irq_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
@@ -1296,7 +1295,7 @@ static CPU_SET_INFO( pentium )
 
 CPU_GET_INFO( pentium )
 {
-	i386_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	i386_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(pentium);	break;
@@ -1344,7 +1343,7 @@ static CPU_INIT( mediagx )
 static CPU_RESET( mediagx )
 {
 	i386_state *cpustate = get_safe_token(device);
-	cpu_irq_callback save_irqcallback;
+	device_irq_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
@@ -1422,7 +1421,7 @@ static CPU_SET_INFO( mediagx )
 
 CPU_GET_INFO( mediagx )
 {
-	i386_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	i386_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		case CPUINFO_FCT_SET_INFO:	    				info->setinfo = CPU_SET_INFO_NAME(mediagx);	break;

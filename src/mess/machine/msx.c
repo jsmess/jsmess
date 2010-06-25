@@ -94,10 +94,10 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	slot_state *state;
 	int id = -1;
 
-	if (strcmp(image->tag(),"cart1")==0) {
+	if (strcmp(image.device().tag(),"cart1")==0) {
 		id = 0;
 	}
-	if (strcmp(image->tag(),"cart2")==0) {
+	if (strcmp(image.device().tag(),"cart2")==0) {
 		id = 1;
 	}
 
@@ -106,7 +106,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		return INIT_FAIL;
 	}
 
-	size = image_length (image);
+	size = image.length ();
 	if (size < 0x2000) {
 		logerror ("cart #%d: error: file is smaller than 2kb, too small "
 				  "to be true!\n", id);
@@ -118,7 +118,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	while (size_aligned < size) {
 		size_aligned *= 2;
 	}
-	mem = (UINT8*)image_malloc (image, size_aligned);
+	mem = (UINT8*)image.image_malloc(size_aligned);
 	if (!mem) {
 		logerror ("cart #%d: error: failed to allocate memory for cartridge\n",
 						id);
@@ -127,14 +127,14 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	if (size < size_aligned) {
 		memset (mem, 0xff, size_aligned);
 	}
-	if (image_fread(image, mem, size) != size) {
+	if (image.fread(mem, size) != size) {
 		logerror ("cart #%d: %s: can't read full %d bytes\n",
-						id, image_filename (image), size);
+						id, image.filename (), size);
 		return INIT_FAIL;
 	}
 
 	/* see if msx.crc will tell us more */
-	extra = image_extrainfo (image);
+	extra = image.extrainfo ();
 	if (!extra) {
 		logerror("cart #%d: warning: no information in crc file\n", id);
 		type = -1;
@@ -155,7 +155,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 
 		if (mem[0] != 'A' || mem[1] != 'B') {
 			logerror("cart #%d: %s: May not be a valid ROM file\n",
-							id, image_filename (image));
+							id, image.filename ());
 		}
 
 		logerror("cart #%d: Probed cartridge mapper %d/%s\n", id,
@@ -166,7 +166,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	if (!type && size_aligned != 0x10000)
 	{
 		size_aligned = 0x10000;
-		mem = (UINT8*)image_realloc(image, mem, 0x10000);
+		mem = (UINT8*)image.image_realloc(mem, 0x10000);
 		if (!mem) {
 			logerror ("cart #%d: error: cannot allocate memory\n", id);
 			return INIT_FAIL;
@@ -240,7 +240,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	}
 
 	/* allocate and set slot_state for this cartridge */
-	state = (slot_state*) image_malloc(image, sizeof (slot_state));
+	state = (slot_state*) image.image_malloc(sizeof (slot_state));
 	if (!state)
 	{
 		logerror ("cart #%d: error: cannot allocate memory for "
@@ -250,12 +250,12 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	memset (state, 0, sizeof (slot_state));
 
 	state->type = type;
-	sramfile = (char*)image_malloc(image, strlen (image_filename (image) + 1));
+	sramfile = (char*)image.image_malloc(strlen (image.filename () + 1));
 
 	if (sramfile) {
 		char *ext;
 
-		strcpy (sramfile, image_basename (image));
+		strcpy (sramfile, image.basename ());
 		ext = strrchr (sramfile, '.');
 		if (ext) {
 			*ext = 0;
@@ -263,7 +263,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		state->sramfile = sramfile;
 	}
 
-	if (msx_slot_list[type].init (image->machine, state, 0, mem, size_aligned)) {
+	if (msx_slot_list[type].init (image.device().machine, state, 0, mem, size_aligned)) {
 		return INIT_FAIL;
 	}
 	if (msx_slot_list[type].loadsram) {
@@ -280,10 +280,10 @@ DEVICE_IMAGE_UNLOAD (msx_cart)
 {
 	int id = -1;
 
-	if (strcmp(image->tag(),"cart1")==0) {
+	if (strcmp(image.device().tag(),"cart1")==0) {
 		id = 0;
 	}
-	if (strcmp(image->tag(),"cart2")==0) {
+	if (strcmp(image.device().tag(),"cart2")==0) {
 		id = 1;
 	}
 

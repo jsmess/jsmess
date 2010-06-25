@@ -15,7 +15,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define SOUND_DAVE		DEVICE_GET_INFO_NAME(dave_sound)
+DECLARE_LEGACY_SOUND_DEVICE(DAVE, dave_sound);
 
 #define DAVE_INT_SELECTABLE		0
 #define DAVE_INT_1KHZ_50HZ_TG	1
@@ -50,9 +50,6 @@ struct _dave_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO(dave_sound);
-
 void dave_set_reg(running_device *device, offs_t offset, UINT8 data);
 
 READ8_DEVICE_HANDLER ( dave_reg_r );

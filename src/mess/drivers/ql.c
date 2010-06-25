@@ -594,20 +594,20 @@ static MACHINE_START( ql )
 
 static DEVICE_IMAGE_LOAD( ql_cart )
 {
-	UINT8 *ptr = memory_region(image->machine, M68008_TAG) + 0x00c000;
-	int	filesize = image_length(image);
-
-	if (filesize <= 16 * 1024)
-	{
-		if (image_fread(image, ptr, filesize) == filesize)
-		{
-			memory_install_read_bank(cputag_get_address_space(image->machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, "bank1");
-			memory_unmap_write(cputag_get_address_space(image->machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0);
-
-			return INIT_PASS;
-		}
-	}
-
+//	UINT8 *ptr = memory_region(image.device().machine, M68008_TAG) + 0x00c000;
+//	int	filesize = image.length();
+//
+//	if (filesize <= 16 * 1024)
+//	{
+//		if (image.fread( ptr, filesize) == filesize)
+//		{
+//			memory_install_read_bank(cputag_get_address_space(image.device().machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, "bank1");
+//			memory_unmap_write(cputag_get_address_space(image.device().machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0);
+//
+//			return INIT_PASS;
+//		}
+//	}
+//
 	return INIT_FAIL;
 }
 
@@ -902,7 +902,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( ql )
 {
-	image_fread(image, messram_get_ptr(devtag_get_device(image->machine, "messram")), 128*1024);
+	image.fread(messram_get_ptr(devtag_get_device(image.device().machine, "messram")), 128*1024);
 
 	return INIT_PASS;
 }

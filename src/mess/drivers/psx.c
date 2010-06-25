@@ -413,7 +413,7 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 
 static QUICKLOAD_LOAD( psx_exe_load )
 {
-	const address_space *space = cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+	const address_space *space = cputag_get_address_space( image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 	exe_size = 0;
 	exe_buffer = (UINT8*)malloc( quickload_size );
@@ -422,7 +422,7 @@ static QUICKLOAD_LOAD( psx_exe_load )
 		logerror( "psx_exe_load: out of memory\n" );
 		return INIT_FAIL;
 	}
-	if( image_fread( image, exe_buffer, quickload_size ) != quickload_size )
+	if( image.fread( exe_buffer, quickload_size ) != quickload_size )
 	{
 		free( exe_buffer );
 		return INIT_FAIL;

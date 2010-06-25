@@ -31,7 +31,7 @@ struct _vt_video_t
 	devcb_resolved_read8		in_ram_func;
 	devcb_resolved_write8		clear_video_interrupt;
 
-	running_device *screen;	/* screen */
+	screen_device *screen;	/* screen */
 	UINT8 *gfx;		/* content of char rom */
 
     int lba7;
@@ -56,16 +56,15 @@ struct _vt_video_t
 INLINE vt_video_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (vt_video_t *)device->token;
+	return (vt_video_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const vt_video_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-//  assert((device->type == dc012));
-	return (const vt_video_interface *) device->baseconfig().static_config;
+//  assert((device->type() == dc012));
+	return (const vt_video_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -283,7 +282,7 @@ static DEVICE_START( vt_video )
 	devcb_resolve_write8(&vt->clear_video_interrupt, &intf->clear_video_interrupt, device);
 
 	/* get the screen device */
-	vt->screen = devtag_get_device(device->machine, intf->screen_tag);
+	vt->screen = device->machine->device<screen_device>(intf->screen_tag);
 	assert(vt->screen != NULL);
 
 	vt->gfx = memory_region(device->machine, intf->char_rom_region_tag);
@@ -329,7 +328,6 @@ DEVICE_GET_INFO( vt100_video )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vt_video_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;									break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(vt_video);		break;
@@ -344,3 +342,5 @@ DEVICE_GET_INFO( vt100_video )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(VT100_VIDEO, vt100_video);

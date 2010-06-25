@@ -454,18 +454,18 @@ static const cassette_config vidbrain_cassette_config =
 static DEVICE_IMAGE_LOAD( vidbrain_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = memory_region(image->machine, F3850_TAG) + 0x1000;
+	UINT8 *ptr = memory_region(image.device().machine, F3850_TAG) + 0x1000;
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
-		if (image_fread(image, ptr, size) != size)
+		size = image.length();
+		if (image.fread(ptr, size) != size)
 			return INIT_FAIL;
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
-		memcpy(ptr, image_get_software_region(image, "rom"), size);
+		size = image.get_software_region_length("rom");
+		memcpy(ptr, image.get_software_region("rom"), size);
 	}
 
 	return INIT_PASS;

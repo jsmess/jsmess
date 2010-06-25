@@ -88,8 +88,8 @@ static TIMER_CALLBACK( atarist_shifter_tick )
 {
 	atarist_state *state = (atarist_state *)machine->driver_data;
 
-	int y = video_screen_get_vpos(machine->primary_screen);
-	int x = video_screen_get_hpos(machine->primary_screen);
+	int y = machine->primary_screen->vpos();
+	int x = machine->primary_screen->hpos();
 
 	pen_t pen;
 
@@ -141,8 +141,8 @@ static TIMER_CALLBACK( atarist_glue_tick )
 {
 	atarist_state *state = (atarist_state *)machine->driver_data;
 
-	int y = video_screen_get_vpos(machine->primary_screen);
-	int x = video_screen_get_hpos(machine->primary_screen);
+	int y = machine->primary_screen->vpos();
+	int x = machine->primary_screen->hpos();
 
 	int v = (y >= state->shifter_y_start) && (y < state->shifter_y_end);
 	int h = (x >= state->shifter_x_start) && (x < state->shifter_x_end);
@@ -796,8 +796,8 @@ VIDEO_START( atarist )
 	state->shifter_timer = timer_alloc(machine, atarist_shifter_tick, NULL);
 	state->glue_timer = timer_alloc(machine, atarist_glue_tick, NULL);
 
-	timer_adjust_periodic(state->shifter_timer, video_screen_get_time_until_pos(machine->primary_screen,0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
-	timer_adjust_periodic(state->glue_timer, video_screen_get_time_until_pos(machine->primary_screen,0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
+	timer_adjust_periodic(state->shifter_timer, machine->primary_screen->time_until_pos(0,0), 0, ATTOTIME_IN_HZ(Y2/4)); // 125 ns
+	timer_adjust_periodic(state->glue_timer, machine->primary_screen->time_until_pos(0,0), 0, ATTOTIME_IN_HZ(Y2/16)); // 500 ns
 
 	/* register for state saving */
 	state_save_register_global(machine, state->shifter_base);

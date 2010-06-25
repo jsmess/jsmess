@@ -109,10 +109,9 @@ struct _kb_keytr_state
 INLINE kb_keytr_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == KB_KEYTRONIC);
+	assert(device->type() == KB_KEYTRONIC);
 
-	return (kb_keytr_state *)device->token;
+	return (kb_keytr_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -382,13 +381,13 @@ WRITE_LINE_DEVICE_HANDLER( kb_keytronic_data_w )
 
 static READ8_HANDLER( kb_keytronic_p1_r )
 {
-	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner);
+	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner());
 	return keytronic->p1 & keytronic->p1_data;
 }
 
 static WRITE8_HANDLER( kb_keytronic_p1_w )
 {
-	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner);
+	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner());
 
 	if (LOG)
 		logerror("kb_keytronic_p1_w(): write %02x\n", data);
@@ -398,13 +397,13 @@ static WRITE8_HANDLER( kb_keytronic_p1_w )
 
 static READ8_HANDLER( kb_keytronic_p2_r )
 {
-	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner);
+	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner());
 	return keytronic->p2;
 }
 
 static WRITE8_HANDLER( kb_keytronic_p2_w )
 {
-	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner);
+	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner());
 
 	if (LOG)
 		logerror("kb_keytronic_p2_w(): write %02x\n", data);
@@ -414,7 +413,7 @@ static WRITE8_HANDLER( kb_keytronic_p2_w )
 
 static READ8_HANDLER( kb_keytronic_p3_r )
 {
-	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner);
+	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner());
 	UINT8 data = keytronic->p3;
 
 	data &= ~0x14;
@@ -430,7 +429,7 @@ static READ8_HANDLER( kb_keytronic_p3_r )
 
 static WRITE8_HANDLER( kb_keytronic_p3_w )
 {
-	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner);
+	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner());
 
 	if (LOG)
 		logerror("kb_keytronic_p3_w(): write %02x\n", data);
@@ -440,7 +439,7 @@ static WRITE8_HANDLER( kb_keytronic_p3_w )
 
 static READ8_HANDLER( kb_keytronic_internal_data_r )
 {
-	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner);
+	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner());
 
 	if (LOG)
 		logerror("kb_keytronic_internal_data_r(): read from %04x\n", offset);
@@ -456,7 +455,7 @@ static READ8_HANDLER( kb_keytronic_internal_data_r )
 
 static WRITE8_HANDLER( kb_keytronic_internal_data_w )
 {
-	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner);
+	kb_keytr_state *keytronic = get_safe_token(space->cpu->owner());
 
 	if (LOG)
 		logerror("kb_keytronic_internal_data_w(): write to offset %04x\n", offset);
@@ -602,7 +601,7 @@ ROM_END
 static DEVICE_START( kb_keytr )
 {
 	kb_keytr_state *keytronic = get_safe_token(device);
-	const kb_keytronic_interface *intf = (const kb_keytronic_interface *)device->baseconfig().static_config;
+	const kb_keytronic_interface *intf = (const kb_keytronic_interface *)device->baseconfig().static_config();
 
 	/* find our cpu */
 	keytronic->cpu = device->subdevice("kb_keytr");
@@ -643,3 +642,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_VERSION				"1.0"
 #define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
 #include "devtempl.h"
+
+DEFINE_LEGACY_DEVICE(KB_KEYTRONIC, kb_keytr);

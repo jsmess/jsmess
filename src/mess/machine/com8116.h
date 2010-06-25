@@ -28,7 +28,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define COM8116 DEVICE_GET_INFO_NAME(com8116)
+DECLARE_LEGACY_DEVICE(COM8116, com8116);
 
 #define MDRV_COM8116_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, COM8116, _clock) \
@@ -63,9 +63,6 @@ struct _com8116_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( com8116 );
 
 /* receiver strobe */
 WRITE8_DEVICE_HANDLER( com8116_str_w );

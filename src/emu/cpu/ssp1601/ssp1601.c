@@ -52,7 +52,7 @@ struct _ssp1601_state_t
 
 	int g_cycles;
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 };
@@ -60,10 +60,9 @@ struct _ssp1601_state_t
 INLINE ssp1601_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SSP1601);
-	return (ssp1601_state_t *)device->token;
+	return (ssp1601_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -554,8 +553,6 @@ static CPU_EXECUTE( ssp1601 )
 {
 	ssp1601_state_t *ssp1601_state = get_safe_token(device);
 
-	ssp1601_state->g_cycles = cycles;
-
 	while (ssp1601_state->g_cycles > 0)
 	{
 		int op;
@@ -758,7 +755,6 @@ static CPU_EXECUTE( ssp1601 )
 	}
 
 	update_P(ssp1601_state);
-	return cycles - ssp1601_state->g_cycles;
 }
 
 
@@ -809,7 +805,7 @@ static CPU_SET_INFO( ssp1601 )
 
 CPU_GET_INFO( ssp1601 )
 {
-	ssp1601_state_t *ssp1601_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	ssp1601_state_t *ssp1601_state = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

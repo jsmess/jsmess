@@ -5,7 +5,7 @@
     MACROS
 ***************************************************************************/
 
-#define TMS9902			DEVICE_GET_INFO_NAME(tms9902)
+DECLARE_LEGACY_DEVICE(TMS9902, tms9902);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -43,8 +43,6 @@ void tms9902_set_cts(running_device *device, int state);
 void tms9902_set_dsr(running_device *device, int state);
 
 void tms9902_push_data(running_device *device, int data);
-
-DEVICE_GET_INFO(tms9902);
 
 READ8_DEVICE_HANDLER ( tms9902_cru_r );
 WRITE8_DEVICE_HANDLER( tms9902_cru_w );

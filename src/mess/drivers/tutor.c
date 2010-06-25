@@ -259,13 +259,13 @@ static READ8_HANDLER(read_keyboard)
 
 static DEVICE_IMAGE_LOAD( tutor_cart )
 {
-	image_fread(image, memory_region(image->machine, "maincpu") + cartridge_base, 0x6000);
+	image.fread( memory_region(image.device().machine, "maincpu") + cartridge_base, 0x6000);
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( tutor_cart )
 {
-	memset(memory_region(image->machine, "maincpu") + cartridge_base, 0, 0x6000);
+	memset(memory_region(image.device().machine, "maincpu") + cartridge_base, 0, 0x6000);
 }
 
 /*

@@ -17,7 +17,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define SED1330 DEVICE_GET_INFO_NAME( sed1330 )
+DECLARE_LEGACY_DEVICE(SED1330, sed1330);
 
 #define MDRV_SED1330_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, SED1330, _clock) \
@@ -42,10 +42,6 @@ struct _sed1330_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( sed1330 );
-
 /* register access */
 READ8_DEVICE_HANDLER( sed1330_status_r );
 WRITE8_DEVICE_HANDLER( sed1330_command_w );

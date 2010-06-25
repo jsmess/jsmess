@@ -43,7 +43,7 @@ static void print_game_switches(FILE *out, const game_driver *game, const ioport
 	const input_field_config *field;
 
 	/* iterate looking for DIP switches */
-	for (port = portlist.first(); port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_DIPSWITCH)
 			{
@@ -81,7 +81,7 @@ static void print_game_configs(FILE *out, const game_driver *game, const ioport_
 	const input_field_config *field;
 
 	/* iterate looking for configurations */
-	for (port = portlist.first(); port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_CONFIG)
 			{
@@ -119,7 +119,7 @@ static void print_game_adjusters(FILE *out, const game_driver *game, const iopor
 	const input_field_config *field;
 
 	/* iterate looking for Adjusters */
-	for (port = portlist.first(); port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_ADJUSTER)
 			{
@@ -175,7 +175,7 @@ enum {cjoy, cdoublejoy, cAD_stick, cdial, ctrackball, cpaddle, clightgun, cpedal
 		control[i].reverse = 0;
 	}
 
-	for (port = portlist.first(); port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
 			if (nplayer < field->player + 1)
@@ -566,12 +566,12 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 
 static void print_game_sampleof(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config *devconfig;
+	const device_config_sound_interface *sound = NULL;
 
-	for (devconfig = sound_first(config); devconfig != NULL; devconfig = sound_next(devconfig))
-		if (sound_get_type(devconfig) == SOUND_SAMPLES)
+	for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound))
+		if (sound->devconfig().type() == SOUND_SAMPLES)
 		{
-			const char *const *samplenames = ((const samples_interface *)devconfig->static_config)->samplenames;
+			const char *const *samplenames = ((const samples_interface *)sound->devconfig().static_config())->samplenames;
 			if (samplenames != NULL)
 			{
 				int sampnum;
@@ -597,13 +597,13 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 
 static void print_game_sample(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config *devconfig;
+	const device_config_sound_interface *sound = NULL;
 
 	/* iterate over sound chips looking for samples */
-	for (devconfig = sound_first(config); devconfig != NULL; devconfig = sound_next(devconfig))
-		if (sound_get_type(devconfig) == SOUND_SAMPLES)
+	for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound))
+		if (sound->devconfig().type() == SOUND_SAMPLES)
 		{
-			const char *const *samplenames = ((const samples_interface *)devconfig->static_config)->samplenames;
+			const char *const *samplenames = ((const samples_interface *)sound->devconfig().static_config())->samplenames;
 			if (samplenames != NULL)
 			{
 				int sampnum;
@@ -649,19 +649,20 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 		fprintf(out, " type=\"cpu\"");
 		fprintf(out, " tag=\"%s\"", xml_normalize_string(devconfig->tag()));
 		fprintf(out, " name=\"%s\"", xml_normalize_string(devconfig->name()));
-		fprintf(out, " clock=\"%d\"", devconfig->clock);
+		fprintf(out, " clock=\"%d\"", devconfig->clock());
 		fprintf(out, "/>\n");
 	}
 
 	/* iterate over sound chips */
-	for (devconfig = sound_first(config); devconfig != NULL; devconfig = sound_next(devconfig))
+	const device_config_sound_interface *sound = NULL;
+	for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound))
 	{
 		fprintf(out, "\t\t<chip");
 		fprintf(out, " type=\"audio\"");
-		fprintf(out, " tag=\"%s\"", xml_normalize_string(devconfig->tag()));
-		fprintf(out, " name=\"%s\"", xml_normalize_string(devconfig->name()));
-		if (devconfig->clock != 0)
-			fprintf(out, " clock=\"%d\"", devconfig->clock);
+		fprintf(out, " tag=\"%s\"", xml_normalize_string(sound->devconfig().tag()));
+		fprintf(out, " name=\"%s\"", xml_normalize_string(sound->devconfig().name()));
+		if (sound->devconfig().clock() != 0)
+			fprintf(out, " clock=\"%d\"", sound->devconfig().clock());
 		fprintf(out, "/>\n");
 	}
 }
@@ -674,16 +675,14 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 
 static void print_game_display(FILE *out, const game_driver *game, const machine_config *config)
 {
-	const device_config *devconfig;
+	const screen_device_config *devconfig;
 
 	/* iterate over screens */
-	for (devconfig = video_screen_first(config); devconfig != NULL; devconfig = video_screen_next(devconfig))
+	for (devconfig = screen_first(*config); devconfig != NULL; devconfig = screen_next(devconfig))
 	{
-		const screen_config *scrconfig = (const screen_config *)devconfig->inline_config;
-
 		fprintf(out, "\t\t<display");
 
-		switch (scrconfig->type)
+		switch (devconfig->screen_type())
 		{
 			case SCREEN_TYPE_RASTER:	fprintf(out, " type=\"raster\"");	break;
 			case SCREEN_TYPE_VECTOR:	fprintf(out, " type=\"vector\"");	break;
@@ -721,31 +720,32 @@ static void print_game_display(FILE *out, const game_driver *game, const machine
 		}
 
 		/* output width and height only for games that are not vector */
-		if (scrconfig->type != SCREEN_TYPE_VECTOR)
+		if (devconfig->screen_type() != SCREEN_TYPE_VECTOR)
 		{
-			int dx = scrconfig->visarea.max_x - scrconfig->visarea.min_x + 1;
-			int dy = scrconfig->visarea.max_y - scrconfig->visarea.min_y + 1;
+			const rectangle &visarea = devconfig->visible_area();
+			int dx = visarea.max_x - visarea.min_x + 1;
+			int dy = visarea.max_y - visarea.min_y + 1;
 
 			fprintf(out, " width=\"%d\"", dx);
 			fprintf(out, " height=\"%d\"", dy);
 		}
 
 		/* output refresh rate */
-		fprintf(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(scrconfig->refresh));
+		fprintf(out, " refresh=\"%f\"", ATTOSECONDS_TO_HZ(devconfig->refresh()));
 
 		/* output raw video parameters only for games that are not vector */
 		/* and had raw parameters specified                               */
-		if ((scrconfig->type != SCREEN_TYPE_VECTOR) && !scrconfig->oldstyle_vblank_supplied)
+		if (devconfig->screen_type() != SCREEN_TYPE_VECTOR && !devconfig->oldstyle_vblank_supplied())
 		{
-			int pixclock = scrconfig->width * scrconfig->height * ATTOSECONDS_TO_HZ(scrconfig->refresh);
+			int pixclock = devconfig->width() * devconfig->height() * ATTOSECONDS_TO_HZ(devconfig->refresh());
 
 			fprintf(out, " pixclock=\"%d\"", pixclock);
-			fprintf(out, " htotal=\"%d\"", scrconfig->width);
-			fprintf(out, " hbend=\"%d\"", scrconfig->visarea.min_x);
-			fprintf(out, " hbstart=\"%d\"", scrconfig->visarea.max_x+1);
-			fprintf(out, " vtotal=\"%d\"", scrconfig->height);
-			fprintf(out, " vbend=\"%d\"", scrconfig->visarea.min_y);
-			fprintf(out, " vbstart=\"%d\"", scrconfig->visarea.max_y+1);
+			fprintf(out, " htotal=\"%d\"", devconfig->width());
+			fprintf(out, " hbend=\"%d\"", devconfig->visible_area().min_x);
+			fprintf(out, " hbstart=\"%d\"", devconfig->visible_area().max_x+1);
+			fprintf(out, " vtotal=\"%d\"", devconfig->height());
+			fprintf(out, " vbend=\"%d\"", devconfig->visible_area().min_y);
+			fprintf(out, " vbstart=\"%d\"", devconfig->visible_area().max_y+1);
 		}
 		fprintf(out, " />\n");
 	}
@@ -762,7 +762,8 @@ static void print_game_sound(FILE *out, const game_driver *game, const machine_c
 	int speakers = speaker_output_count(config);
 
 	/* if we have no sound, zero out the speaker count */
-	if (sound_first(config) == NULL)
+	const device_config_sound_interface *sound = NULL;
+	if (!config->devicelist.first(sound))
 		speakers = 0;
 
 	fprintf(out, "\t\t<sound channels=\"%d\"/>\n", speakers);
@@ -837,13 +838,13 @@ static void print_game_driver(FILE *out, const game_driver *game, const machine_
     settings for a system
 -------------------------------------------------*/
 
-void print_game_categories(FILE *out, const game_driver *game, const ioport_list &portlist)
+static void print_game_categories(FILE *out, const game_driver *game, const ioport_list &portlist)
 {
 	const input_port_config *port;
 	const input_field_config *field;
 
 	/* iterate looking for Categories */
-	for (port = portlist.first(); port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next())
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if (field->type == IPT_CATEGORY)
 			{
@@ -864,6 +865,83 @@ void print_game_categories(FILE *out, const game_driver *game, const ioport_list
 				/* terminate the category entry */
 				fprintf(out, "\t\t</category>\n");
 			}
+}
+
+/*-------------------------------------------------
+    print_game_images - prints out all info on
+    image devices
+-------------------------------------------------*/
+
+static void print_game_images(FILE *out, const game_driver *game, const machine_config *config)
+{
+	const device_config_image_interface *dev = NULL;
+	const char *name;
+	const char *shortname;
+
+	for (bool gotone = config->devicelist.first(dev); gotone; gotone = dev->next(dev))
+	{
+		/* print out device type */
+		fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(dev->image_type_name()));
+
+		/* does this device have a tag? */
+		if (dev->devconfig().tag())
+			fprintf(out, " tag=\"%s\"", xml_normalize_string(dev->devconfig().tag()));
+
+		/* is this device mandatory? */
+		if (dev->must_be_loaded())
+			fprintf(out, " mandatory=\"1\"");
+
+		if (dev->image_interface()[0] )
+			fprintf(out, " interface=\"%s\"", xml_normalize_string(dev->image_interface()));
+
+		/* close the XML tag */
+		fprintf(out, ">\n");
+
+		name = dev->instance_name();
+		shortname = dev->brief_instance_name();
+
+		fprintf(out, "\t\t\t<instance");
+		fprintf(out, " name=\"%s\"", xml_normalize_string(name));
+		fprintf(out, " briefname=\"%s\"", xml_normalize_string(shortname));
+		fprintf(out, "/>\n");
+
+		astring extensions(dev->file_extensions());
+
+		char *ext = strtok((char*)extensions.cstr(),",");
+		while (ext != NULL)
+		{
+			fprintf(out, "\t\t\t<extension");
+			fprintf(out, " name=\"%s\"", xml_normalize_string(ext));
+			fprintf(out, "/>\n");
+			ext = strtok (NULL, ",");
+		}
+
+		fprintf(out, "\t\t</device>\n");
+	}
+}
+
+/*-------------------------------------------------
+    print_game_software_list - print the information
+    for all known software lists for this system
+-------------------------------------------------*/
+
+static void print_game_software_list(FILE *out, const game_driver *game, const machine_config *config)
+{
+	for (const device_config *dev = config->devicelist.first(); dev != NULL; dev = dev->next())
+	{
+		if ( ! strcmp( dev->tag(), __SOFTWARE_LIST_TAG ) )
+		{
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+
+			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+			{
+				if ( swlist->list_name[i] )
+				{
+					fprintf(out, "\t\t<softwarelist name=\"%s\" />\n", swlist->list_name[i] );
+				}
+			}
+		}
+	}
 }
 
 /*-------------------------------------------------
@@ -940,6 +1018,8 @@ static void print_game_info(FILE *out, const game_driver *game)
 	print_game_categories(out, game, portlist);
 	print_game_adjusters(out, game, portlist);
 	print_game_driver(out, game, config);
+	print_game_images( out, game, config );
+	print_game_software_list( out, game, config );
 #ifdef MESS
 	print_mess_game_xml(out, game, config);
 #endif /* MESS */
@@ -970,7 +1050,7 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 #ifdef MESS
 		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, ramoption*, softwarelist*)>\n"
 #else
-		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?)>\n"
+		"\t<!ELEMENT " XML_TOP " (description, year?, manufacturer, biosset*, rom*, disk*, sample*, chip*, display*, sound?, input?, dipswitch*, configuration*, category*, adjuster*, driver?, device*, softwarelist*)>\n"
 #endif
 		"\t\t<!ATTLIST " XML_TOP " name CDATA #REQUIRED>\n"
 		"\t\t<!ATTLIST " XML_TOP " sourcefile CDATA #IMPLIED>\n"
@@ -1077,7 +1157,6 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t<!ATTLIST driver protection (good|imperfect|preliminary) #IMPLIED>\n"
 		"\t\t\t<!ATTLIST driver savestate (supported|unsupported) #REQUIRED>\n"
 		"\t\t\t<!ATTLIST driver palettesize CDATA #REQUIRED>\n"
-#ifdef MESS
 		"\t\t<!ELEMENT device (instance*, extension*)>\n"
 		"\t\t\t<!ATTLIST device type CDATA #REQUIRED>\n"
 		"\t\t\t<!ATTLIST device tag CDATA #IMPLIED>\n"
@@ -1088,10 +1167,11 @@ void print_mame_xml(FILE *out, const game_driver *const games[], const char *gam
 		"\t\t\t\t<!ATTLIST instance briefname CDATA #REQUIRED>\n"
 		"\t\t\t<!ELEMENT extension EMPTY>\n"
 		"\t\t\t\t<!ATTLIST extension name CDATA #REQUIRED>\n"
-		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
-		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
 		"\t\t<!ELEMENT softwarelist EMPTY>\n"
 		"\t\t\t<!ATTLIST softwarelist name CDATA #REQUIRED>\n"
+#ifdef MESS
+		"\t\t<!ELEMENT ramoption (#PCDATA)>\n"
+		"\t\t\t<!ATTLIST ramoption default CDATA #IMPLIED>\n"
 #endif
 		"]>\n\n"
 		"<" XML_ROOT " build=\"%s\" debug=\""

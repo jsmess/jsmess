@@ -233,7 +233,7 @@ MACHINE_START( samcoupe )
 
 	/* schedule our video updates */
 	asic->video_update_timer = timer_alloc(machine, sam_video_update_callback, NULL);
-	timer_adjust_oneshot(asic->video_update_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(asic->video_update_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 }
 
 /***************************************************************************

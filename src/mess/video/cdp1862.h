@@ -36,7 +36,7 @@
 
 #define CPD1862_CLOCK	XTAL_7_15909MHz
 
-#define CDP1862		DEVICE_GET_INFO_NAME(cdp1862)
+DECLARE_LEGACY_DEVICE(CDP1862, cdp1862);
 
 #define MDRV_CDP1862_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, CDP1862, _clock) \
@@ -72,9 +72,6 @@ struct _cdp1862_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( cdp1862 );
 
 /* step background color */
 WRITE8_DEVICE_HANDLER( cdp1862_bkg_w ) ATTR_NONNULL(1);

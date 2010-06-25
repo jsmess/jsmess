@@ -16,6 +16,7 @@
 */
 
 #include "emu.h"
+#include "utils.h"
 #include "devices/flopdrv.h"
 #include "devices/harddriv.h"
 #include "harddisk.h"
@@ -263,8 +264,7 @@ static void dump_contents(UINT8 *buffer, int length)
 INLINE smc92x4_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (smc92x4_state *)device->token;
+	return (smc92x4_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -2137,9 +2137,9 @@ WRITE8_DEVICE_HANDLER( smc92x4_w )
 static DEVICE_START( smc92x4 )
 {
 	smc92x4_state *w = get_safe_token(device);
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
-	w->intf = (const smc92x4_interface*)device->baseconfig().static_config;
+	w->intf = (const smc92x4_interface*)device->baseconfig().static_config();
 	devcb_resolve_write_line(&w->out_intrq_func, &w->intf->out_intrq_func, device);
 	devcb_resolve_write_line(&w->out_dip_func, &w->intf->out_dip_func, device);
 	devcb_resolve_write8(&w->out_auxbus_func, &w->intf->out_auxbus_func, device);
@@ -2190,3 +2190,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
 #include "devtempl.h"
 
+DEFINE_LEGACY_DEVICE(SMC92X4, smc92x4);

@@ -12,7 +12,7 @@
 #include "image.h"
 
 
-#define XMODEM DEVICE_GET_INFO_NAME( xmodem )
+DECLARE_LEGACY_IMAGE_DEVICE(XMODEM, xmodem);
 
 
 typedef struct {
@@ -27,8 +27,6 @@ typedef struct {
   MDRV_DEVICE_ADD(_tag, XMODEM, 0)	      \
   MDRV_DEVICE_CONFIG(_intrf)
 
-
-extern DEVICE_GET_INFO( xmodem );
 
 
 /* call when the emulated machine has read the last byte sent by

@@ -79,7 +79,7 @@ struct _vic2_state
 {
 	vic2_type  type;
 
-	running_device *screen;			// screen which sets bitmap properties
+	screen_device *screen;			// screen which sets bitmap properties
 	running_device *cpu;
 
 	UINT8 reg[0x80];
@@ -266,17 +266,16 @@ struct _vic2_state
 INLINE vic2_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == VIC2);
+	assert(device->type() == VIC2);
 
-	return (vic2_state *)device->token;
+	return (vic2_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const vic2_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == VIC2));
-	return (const vic2_interface *) device->baseconfig().static_config;
+	assert((device->type() == VIC2));
+	return (const vic2_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -2525,15 +2524,15 @@ UINT32 vic2_video_update( running_device *device, bitmap_t *bitmap, const rectan
 static DEVICE_START( vic2 )
 {
 	vic2_state *vic2 = get_safe_token(device);
-	const vic2_interface *intf = (vic2_interface *)device->baseconfig().static_config;
+	const vic2_interface *intf = (vic2_interface *)device->baseconfig().static_config();
 	int width, height;
 	int i;
 
 	vic2->cpu = devtag_get_device(device->machine, intf->cpu);
 
-	vic2->screen = devtag_get_device(device->machine, intf->screen);
-	width = video_screen_get_width(vic2->screen);
-	height = video_screen_get_height(vic2->screen);
+	vic2->screen = device->machine->device<screen_device>(intf->screen);
+	width = vic2->screen->width();
+	height = vic2->screen->height();
 
 	vic2->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
 
@@ -2743,3 +2742,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME				"6567 / 6569 VIC II"
 #define DEVTEMPLATE_FAMILY				"6567 / 6569 VIC II"
 #include "devtempl.h"
+
+DEFINE_LEGACY_DEVICE(VIC2, vic2);

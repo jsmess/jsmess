@@ -20,17 +20,17 @@
     MACROS
 ***************************************************************************/
 
-#define AT45DB041		DEVICE_GET_INFO_NAME(at45db041)
+DECLARE_LEGACY_DEVICE(AT45DB041, at45db041);
 
 #define MDRV_AT45DB041_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, AT45DB041, 0) \
 
-#define AT45DB081		DEVICE_GET_INFO_NAME(at45db081)
+DECLARE_LEGACY_DEVICE(AT45DB081, at45db081);
 
 #define MDRV_AT45DB081_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, AT45DB081, 0) \
 
-#define AT45DB161		DEVICE_GET_INFO_NAME(at45db161)
+DECLARE_LEGACY_DEVICE(AT45DB161, at45db161);
 
 #define MDRV_AT45DB161_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, AT45DB161, 0) \
@@ -39,11 +39,6 @@
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO(at45db041);
-DEVICE_GET_INFO(at45db081);
-DEVICE_GET_INFO(at45db161);
-
 // pins
 void at45dbxx_pin_cs(running_device *device, int data);
 void at45dbxx_pin_sck(running_device *device,  int data);

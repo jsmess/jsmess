@@ -281,11 +281,11 @@ static WRITE_LINE_DEVICE_HANDLER( rtc_irq_w )
 */
 static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
 {
-	e01_state *state = (e01_state *)timer->machine->driver_data;
+	e01_state *state = (e01_state *)timer.machine->driver_data;
 
 	state->rtc_irq = !state->rtc_irq;
 
-	update_interrupts(timer->machine);
+	update_interrupts(timer.machine);
 }
 
 /*-------------------------------------------------

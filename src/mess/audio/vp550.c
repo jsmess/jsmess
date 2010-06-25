@@ -54,7 +54,7 @@ struct _vp550_t
 
 	/* devices */
 	running_device *cdp1863[MAX_CHANNELS];
-	running_device *sync_timer;
+	timer_device *sync_timer;
 };
 
 /***************************************************************************
@@ -64,9 +64,8 @@ struct _vp550_t
 INLINE vp550_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == VP550) || (device->type == VP551));
-	return (vp550_t *)device->token;
+	assert((device->type() == VP550) || (device->type() == VP551));
+	return (vp550_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /***************************************************************************
@@ -118,10 +117,10 @@ static WRITE8_DEVICE_HANDLER( vp550_octave_w )
 	{
 		switch (data & 0x03)
 		{
-		case 0: clock = device->clock / 8; break;
-		case 1: clock = device->clock / 4; break;
-		case 2: clock = device->clock / 2; break;
-		case 3: clock = device->clock;	   break;
+		case 0: clock = device->clock() / 8; break;
+		case 1: clock = device->clock() / 4; break;
+		case 2: clock = device->clock() / 2; break;
+		case 3: clock = device->clock();	   break;
 		}
 	}
 
@@ -149,7 +148,7 @@ static WRITE8_DEVICE_HANDLER( vp550_vlmn_w )
 
 static WRITE8_DEVICE_HANDLER( vp550_sync_w )
 {
-	timer_device_enable(device, BIT(data, 0));
+	downcast<timer_device *>(device)->enable(BIT(data, 0));
 
 	if (LOG) logerror("VP550 Interrupt Enable: %u\n", BIT(data, 0));
 }
@@ -198,7 +197,7 @@ void vp551_install_write_handlers(running_device *device, const address_space *p
 
 static TIMER_DEVICE_CALLBACK( sync_tick )
 {
-	cpu_set_input_line(timer->machine->firstcpu, CDP1802_INPUT_LINE_INT, ASSERT_LINE);
+	cpu_set_input_line(timer.machine->firstcpu, CDP1802_INPUT_LINE_INT, ASSERT_LINE);
 
 	if (LOG) logerror("VP550 Interrupt\n");
 }
@@ -242,7 +241,7 @@ static DEVICE_START( vp550 )
 	/* look up devices */
 	vp550->cdp1863[CHANNEL_A] = devtag_get_device(device->machine, "vp550:u1");
 	vp550->cdp1863[CHANNEL_B] = devtag_get_device(device->machine, "vp550:u2");
-	vp550->sync_timer = devtag_get_device(device->machine, "vp550:sync");
+	vp550->sync_timer = device->machine->device<timer_device>("vp550:sync");
 
 	/* set initial values */
 	vp550->channels = 2;
@@ -261,7 +260,7 @@ static DEVICE_START( vp551 )
 	vp550->cdp1863[CHANNEL_B] = device->subdevice(CDP1863_B_TAG);
 	vp550->cdp1863[CHANNEL_C] = device->subdevice(CDP1863_C_TAG);
 	vp550->cdp1863[CHANNEL_D] = device->subdevice(CDP1863_D_TAG);
-	vp550->sync_timer = device->subdevice("sync");
+	vp550->sync_timer = downcast<timer_device *>(device->subdevice("sync"));
 
 	/* set initial values */
 	vp550->channels = 4;
@@ -280,7 +279,7 @@ static DEVICE_RESET( vp550 )
 	vp550->cdp1863[CHANNEL_B]->reset();
 
 	/* disable interrupt timer */
-	timer_device_enable(vp550->sync_timer, 0);
+	vp550->sync_timer->enable(0);
 
 	/* clear interrupt */
 	cpu_set_input_line(device->machine->firstcpu, CDP1802_INPUT_LINE_INT, CLEAR_LINE);
@@ -312,7 +311,6 @@ DEVICE_GET_INFO( vp550 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vp550_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME( vp550 );	break;
@@ -342,7 +340,6 @@ DEVICE_GET_INFO( vp551 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vp550_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME( vp551 );	break;
@@ -360,3 +357,6 @@ DEVICE_GET_INFO( vp551 )
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(VP550, vp550);
+DEFINE_LEGACY_DEVICE(VP551, vp551);

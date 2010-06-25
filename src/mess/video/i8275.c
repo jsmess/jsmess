@@ -64,7 +64,7 @@ struct _i8275_t
 	devcb_resolved_write_line	out_drq_func;
 	devcb_resolved_write_line	out_irq_func;
 
-	running_device *screen;
+	screen_device *screen;
 
 	const i8275_interface *intf;
 
@@ -130,9 +130,8 @@ struct _i8275_t
 INLINE i8275_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (i8275_t *)device->token;
+	return (i8275_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -206,8 +205,8 @@ static void i8275_recompute_parameters(running_device *device)
 	visarea.max_x = horiz_pix_total - 1;
 	visarea.max_y = vert_pix_total - 1;
 
-	video_screen_configure(i8275->screen, horiz_pix_total, vert_pix_total, &visarea,
-				video_screen_get_frame_period(i8275->screen).attoseconds);
+	i8275->screen->configure(horiz_pix_total, vert_pix_total, visarea,
+				i8275->screen->frame_period().attoseconds);
 }
 
 static void i8275_set_parameter_reset(running_device *device, offs_t offset, UINT8 data)
@@ -499,14 +498,16 @@ static DEVICE_START( i8275 )
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
-	i8275->intf = (const i8275_interface*)device->baseconfig().static_config;
+	i8275->intf = (const i8275_interface*)device->baseconfig().static_config();
 
 	assert(i8275->intf->display_pixels != NULL);
 
 	/* get the screen device */
-	i8275->screen = devtag_get_device(device->machine, i8275->intf->screen_tag);
+	i8275->screen = device->machine->device<screen_device>(i8275->intf->screen_tag);
+
+	
 	assert(i8275->screen != NULL);
 
 	/* resolve callbacks */
@@ -596,7 +597,6 @@ DEVICE_GET_INFO( i8275 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8275_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(i8275);		break;
@@ -611,3 +611,5 @@ DEVICE_GET_INFO( i8275 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(I8275, i8275);

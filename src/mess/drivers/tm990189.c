@@ -82,7 +82,7 @@ static int LED_display_window_height;
 static void hold_load(running_machine *machine);
 
 
-static running_device *rs232_fp;
+static device_image_interface *rs232_fp;
 static UINT8 rs232_rts;
 static emu_timer *rs232_input_timer;
 
@@ -208,14 +208,14 @@ static VIDEO_UPDATE( tm990_189 )
 
 static VIDEO_START( tm990_189_v )
 {
-	running_device *screen = video_screen_first(machine);
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	screen_device *screen = screen_first(*machine);
+	const rectangle &visarea = screen->visible_area();
 
 	/* NPW 27-Feb-2006 - ewwww gross!!! maybe this can be fixed when
      * multimonitor support is added?*/
-	LED_display_window_left = visarea->min_x;
-	LED_display_window_top = visarea->max_y - 32;
-	LED_display_window_width = visarea->max_x - visarea->min_x;
+	LED_display_window_left = visarea.min_x;
+	LED_display_window_top = visarea.max_y - 32;
+	LED_display_window_width = visarea.max_x - visarea.min_x;
 	LED_display_window_height = 32;
 }
 
@@ -360,10 +360,10 @@ static WRITE8_DEVICE_HANDLER( sys9901_tapewdata_w )
 static TIMER_CALLBACK(rs232_input_callback)
 {
 	UINT8 buf;
-
+	device_image_interface *image = (device_image_interface*)ptr;
 	if (/*rs232_rts &&*/ /*(mame_ftell(rs232_fp) < mame_fsize(rs232_fp))*/1)
 	{
-		if (image_fread((running_device*)ptr, &buf, 1) == 1)
+		if (image->fread(&buf, 1) == 1)
 			tms9902_push_data(devtag_get_device(machine, "tms9902"), buf);
 	}
 }
@@ -373,8 +373,8 @@ static TIMER_CALLBACK(rs232_input_callback)
 */
 static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 {
-	tms9902_set_dsr(devtag_get_device(image->machine, "tms9902"), 1);
-	rs232_input_timer = timer_alloc(image->machine, rs232_input_callback, (void*)image);
+	tms9902_set_dsr(devtag_get_device(image.device().machine, "tms9902"), 1);
+	rs232_input_timer = timer_alloc(image.device().machine, rs232_input_callback, (void*)image);
 	timer_adjust_periodic(rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
 
 	return INIT_PASS;
@@ -385,12 +385,12 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 */
 static DEVICE_IMAGE_UNLOAD( tm990_189_rs232 )
 {
-	tms9902_set_dsr(devtag_get_device(image->machine, "tms9902"), 0);
+	tms9902_set_dsr(devtag_get_device(image.device().machine, "tms9902"), 0);
 
 	timer_reset(rs232_input_timer, attotime_never);	/* FIXME - timers should only be allocated once */
 }
 
-static DEVICE_GET_INFO( tm990_189_rs232 )
+DEVICE_GET_INFO( tm990_189_rs232 )
 {
 	switch ( state )
 	{
@@ -405,7 +405,8 @@ static DEVICE_GET_INFO( tm990_189_rs232 )
 	}
 }
 
-#define TM990_189_RS232	DEVICE_GET_INFO_NAME(tm990_189_rs232)
+DECLARE_LEGACY_IMAGE_DEVICE(TM990_189_RS232, tm990_189_rs232);
+DEFINE_LEGACY_IMAGE_DEVICE(TM990_189_RS232, tm990_189_rs232);
 
 #define MDRV_TM990_189_RS232_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, TM990_189_RS232, 0)
@@ -420,9 +421,9 @@ static TMS9902_RST_CALLBACK( rts_callback )
 static TMS9902_XMIT_CALLBACK( xmit_callback )
 {
 	UINT8 buf = data;
-
+	
 	if (rs232_fp)
-		image_fwrite(rs232_fp, &buf, 1);
+		rs232_fp->fwrite(&buf, 1);
 }
 
 /*

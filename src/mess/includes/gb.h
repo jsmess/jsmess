@@ -34,10 +34,9 @@
 
 /*----------- defined in audio/gb.c -----------*/
 
-#define SOUND_GAMEBOY	DEVICE_GET_INFO_NAME(gameboy_sound)
+DECLARE_LEGACY_SOUND_DEVICE(GAMEBOY, gameboy_sound);
 
 /* Custom Sound Interface */
-DEVICE_GET_INFO( gameboy_sound );
 READ8_DEVICE_HANDLER( gb_sound_r );
 WRITE8_DEVICE_HANDLER( gb_sound_w );
 READ8_DEVICE_HANDLER( gb_wave_r );

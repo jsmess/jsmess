@@ -360,7 +360,7 @@ Video part
 */
 #include "emu.h"
 #include "streams.h"
-
+#include "utils.h"
 #include "audio/ted7360.h"
 
 
@@ -369,7 +369,7 @@ struct _ted7360_state
 {
 	ted_type  type;
 
-	running_device *screen;			// screen which sets bitmap properties
+	screen_device *screen;			// screen which sets bitmap properties
 
 	UINT8 reg[0x20];
 
@@ -500,20 +500,17 @@ static int TEDTIME_TO_CYCLES(int pal, attotime t)
 INLINE ted7360_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == TED7360);
+	assert(device->type() == SOUND_TED7360);
 
-	return (ted7360_state *)device->token;
+	return (ted7360_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const ted7360_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == TED7360);
+	assert(device->type() == SOUND_TED7360);
 
-	return (const ted7360_interface *) device->baseconfig().static_config;
+	return (const ted7360_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -1381,12 +1378,12 @@ static void ted7360_sound_start( running_device *device )
 static DEVICE_START( ted7360 )
 {
 	ted7360_state *ted7360 = get_safe_token(device);
-	const ted7360_interface *intf = (ted7360_interface *)device->baseconfig().static_config;
+	const ted7360_interface *intf = (ted7360_interface *)device->baseconfig().static_config();
 	int width, height;
 
-	ted7360->screen = devtag_get_device(device->machine, intf->screen);
-	width = video_screen_get_width(ted7360->screen);
-	height = video_screen_get_height(ted7360->screen);
+	ted7360->screen = device->machine->device<screen_device>(intf->screen);
+	width = ted7360->screen->width();
+	height = ted7360->screen->height();
 
 	ted7360->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
 
@@ -1495,3 +1492,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME				"CBM TED 7360"
 #define DEVTEMPLATE_FAMILY				"CBM Text Display Video Chip"
 #include "devtempl.h"
+
+DEFINE_LEGACY_SOUND_DEVICE(TED7360, ted7360);

@@ -489,10 +489,13 @@ static void gb_update_scanline( running_machine *machine )
 			{
 				if ( gb_lcd.current_line < 144 )
 				{
-					running_device *screen = video_screen_first(machine);
-					rectangle r = *video_screen_get_visible_area(screen);
-					r.min_y = r.max_y = gb_lcd.current_line;
-					bitmap_fill( bitmap, &r , 0);
+					screen_device *screen = screen_first(*machine);
+					rectangle r1;
+					const rectangle &r = screen->visible_area();
+					r1.min_y = r1.max_y = gb_lcd.current_line;
+					r1.min_x = r.min_x;
+					r1.max_x = r.max_x;
+					bitmap_fill( bitmap, &r1 , 0);
 				}
 				gb_lcd.previous_line = gb_lcd.current_line;
 			}
@@ -737,8 +740,7 @@ static void sgb_update_scanline( running_machine *machine )
 				return;
 			case 2: /* Blank screen (black) */
 				{
-					running_device *screen = video_screen_first(machine);
-					rectangle r = *video_screen_get_visible_area(screen);
+					rectangle r;
 					r.min_x = SGB_XOFFSET;
 					r.max_x -= SGB_XOFFSET;
 					r.min_y = SGB_YOFFSET;
@@ -747,8 +749,7 @@ static void sgb_update_scanline( running_machine *machine )
 				} return;
 			case 3: /* Blank screen (white - or should it be color 0?) */
 				{
-					running_device *screen = video_screen_first(machine);
-					rectangle r = *video_screen_get_visible_area(screen);
+					rectangle r;
 					r.min_x = SGB_XOFFSET;
 					r.max_x -= SGB_XOFFSET;
 					r.min_y = SGB_YOFFSET;
@@ -770,8 +771,7 @@ static void sgb_update_scanline( running_machine *machine )
 			/* if background or screen disabled clear line */
 			if ( ! ( LCDCONT & 0x01 ) )
 			{
-				running_device *screen = video_screen_first(machine);
-				rectangle r = *video_screen_get_visible_area(screen);
+				rectangle r;
 				r.min_x = SGB_XOFFSET;
 				r.max_x -= SGB_XOFFSET;
 				r.min_y = r.max_y = gb_lcd.current_line + SGB_YOFFSET;
@@ -853,8 +853,7 @@ static void sgb_update_scanline( running_machine *machine )
 				/* Also refresh border here??? */
 				if ( gb_lcd.current_line < 144 )
 				{
-					running_device *screen = video_screen_first(machine);
-					rectangle r = *video_screen_get_visible_area(screen);
+					rectangle r;
 					r.min_x = SGB_XOFFSET;
 					r.max_x -= SGB_XOFFSET;
 					r.min_y = r.max_y = gb_lcd.current_line + SGB_YOFFSET;
@@ -1042,8 +1041,7 @@ static void cgb_update_scanline ( running_machine *machine )
 			/* Draw empty line when the background is disabled */
 			if ( ! ( LCDCONT & 0x01 ) )
 			{
-				running_device *screen = video_screen_first(machine);
-				rectangle r = *video_screen_get_visible_area(screen);
+				rectangle r;
 				r.min_y = r.max_y = gb_lcd.current_line;
 				r.min_x = gb_lcd.start_x;
 				r.max_x = gb_lcd.end_x - 1;
@@ -1160,8 +1158,11 @@ static void cgb_update_scanline ( running_machine *machine )
 			{
 				if ( gb_lcd.current_line < 144 )
 				{
-					running_device *screen = video_screen_first(machine);
-					rectangle r = *video_screen_get_visible_area(screen);
+					screen_device *screen = screen_first(*machine);
+					rectangle r;
+					const rectangle &r1 = screen->visible_area();
+					r.min_x = r1.min_x;
+					r.max_x = r1.max_x;					
 					r.min_y = r.max_y = gb_lcd.current_line;
 					bitmap_fill( bitmap, &r , ( ! gb_lcd.gbc_mode ) ? 0 : 32767);
 				}

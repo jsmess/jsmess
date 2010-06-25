@@ -652,7 +652,7 @@ static VIDEO_UPDATE( vboy )
 
 static TIMER_DEVICE_CALLBACK( video_tick )
 {
-	vboy_state *state = (vboy_state *)timer->machine->driver_data;
+	vboy_state *state = (vboy_state *)timer.machine->driver_data;
 
 	state->vip_regs.XPSTTS = (state->vip_regs.XPSTTS==0) ? 0x0c : 0x00;
 }
@@ -672,18 +672,18 @@ static PALETTE_INIT( vboy )
 static DEVICE_IMAGE_LOAD( vboy_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = memory_region(image->machine, "user1");
+	UINT8 *ptr = memory_region(image.device().machine, "user1");
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
-		if (image_fread(image, ptr, size) != size)
+		size = image.length();
+		if (image.fread( ptr, size) != size)
 			return INIT_FAIL;
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
-		memcpy(ptr, image_get_software_region(image, "rom"), size);
+		size = image.get_software_region_length("rom");
+		memcpy(ptr, image.get_software_region("rom"), size);
 	}
 
 	return INIT_PASS;

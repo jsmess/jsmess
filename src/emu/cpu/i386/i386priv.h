@@ -226,8 +226,8 @@ struct _i386_state
 	UINT8 opcode;
 
 	UINT8 irq_state;
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	UINT32 a20_mask;
@@ -260,13 +260,12 @@ struct _i386_state
 INLINE i386_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_I386 ||
 		   cpu_get_type(device) == CPU_I486 ||
 		   cpu_get_type(device) == CPU_PENTIUM ||
 		   cpu_get_type(device) == CPU_MEDIAGX);
-	return (i386_state *)device->token;
+	return (i386_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 extern int i386_parity_table[256];

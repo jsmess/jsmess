@@ -81,9 +81,8 @@ struct _mos6530_state
 INLINE mos6530_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == MOS6530);
-	return (mos6530_state *)device->token;
+	assert(device->type() == MOS6530);
+	return (mos6530_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -379,14 +378,14 @@ UINT8 mos6530_portb_out_get(running_device *device)
 static DEVICE_START( mos6530 )
 {
 	mos6530_state *miot = get_safe_token(device);
-	const mos6530_interface *intf = (const mos6530_interface*)device->baseconfig().static_config;
+	const mos6530_interface *intf = (const mos6530_interface*)device->baseconfig().static_config();
 
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag() != NULL);
 
 	/* set static values */
-	miot->clock = device->clock;
+	miot->clock = device->clock();
 
 	/* resolve callbacks */
 	devcb_resolve_read8(&miot->port[0].in_port_func, &intf->in_pa_func, device);
@@ -442,7 +441,6 @@ DEVICE_GET_INFO( mos6530 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mos6530_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mos6530);	break;
@@ -457,3 +455,5 @@ DEVICE_GET_INFO( mos6530 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(MOS6530, mos6530);

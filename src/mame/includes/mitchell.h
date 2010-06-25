@@ -4,12 +4,16 @@
 
 *************************************************************************/
 
+#include "sound/okim6295.h"
+
 class mitchell_state
 {
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mitchell_state(machine)); }
 
-	mitchell_state(running_machine &machine) { }
+	mitchell_state(running_machine &machine)
+		: audiocpu(machine.device<cpu_device>("audiocpu")),
+		  oki(machine.device<okim6295_device>("oki")) { }
 
 	/* memory pointers */
 	UINT8 *    videoram;
@@ -28,15 +32,14 @@ public:
 	int        sample_select;
 
 	/* misc */
-	UINT8      port5_kludge;
 	int        input_type;
 	int        dial[2], dial_selected;
 	int        dir[2];
 	int        keymatrix;
 
 	/* devices */
-	running_device *audiocpu;
-	running_device *oki;
+	cpu_device *audiocpu;
+	okim6295_device *oki;
 };
 
 
@@ -55,6 +58,7 @@ READ8_HANDLER( pang_videoram_r );
 WRITE8_HANDLER( pang_colorram_w );
 READ8_HANDLER( pang_colorram_r );
 WRITE8_HANDLER( pang_gfxctrl_w );
+WRITE8_HANDLER( pangbl_gfxctrl_w );
 WRITE8_HANDLER( pang_paletteram_w );
 READ8_HANDLER( pang_paletteram_r );
 

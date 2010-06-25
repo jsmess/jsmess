@@ -27,10 +27,8 @@ typedef struct
 INLINE SocratesASIC *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_SOCRATES);
-	return (SocratesASIC *)device->token;
+	assert(device->type() == SOUND_SOCRATES);
+	return (SocratesASIC *)downcast<legacy_device_base *>(device)->token();
 }
 
 static const UINT8 volumeLUT[16] =
@@ -100,7 +98,7 @@ static DEVICE_START( socrates_snd )
 	chip->DAC_output = 0x00; /* output */
 	chip->state[0] = chip->state[1] = chip->state[2] = 0;
 	chip->accum[0] = chip->accum[1] = chip->accum[2] = 0xFF;
-	chip->stream = stream_create(device, 0, 1, device->clock ? device->clock : device->machine->sample_rate, chip, socrates_snd_pcm_update);
+	chip->stream = stream_create(device, 0, 1, device->clock() ? device->clock() : device->machine->sample_rate, chip, socrates_snd_pcm_update);
 }
 
 
@@ -164,3 +162,5 @@ DEVICE_GET_INFO( socrates_snd )
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Jonathan Gevaryahu and The MESS Team"); break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(SOCRATES, socrates_snd);

@@ -9,9 +9,7 @@
 #ifndef __MESS_H__
 #define __MESS_H__
 
-#include "configms.h"
 #include "messopts.h"
-
 
 
 /***************************************************************************
@@ -41,9 +39,5 @@ extern const char mess_disclaimer[];
 #define INIT_FAIL 1
 #define IMAGE_VERIFY_PASS 0
 #define IMAGE_VERIFY_FAIL 1
-
-/* these are called from mame.c */
-void mess_predevice_init(running_machine *machine);
-void mess_postdevice_init(running_machine *machine);
 
 #endif /* __MESS_H__ */

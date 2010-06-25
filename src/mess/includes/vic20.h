@@ -32,7 +32,7 @@ public:
 	running_device *mos6560;
 
 	/* timers */
-	running_device *cassette_timer;
+	timer_device *cassette_timer;
 };
 
 #endif

@@ -268,10 +268,10 @@ static void s3c240x_lcd_render_16( running_machine *machine)
 
 static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
 {
-	running_device *screen = machine->primary_screen;
+	screen_device *screen = machine->primary_screen;
 	verboselog( machine, 2, "LCD timer callback\n");
-	s3c240x_lcd.vpos = video_screen_get_vpos( screen);
-	s3c240x_lcd.hpos = video_screen_get_hpos( screen);
+	s3c240x_lcd.vpos = screen->vpos();
+	s3c240x_lcd.hpos = screen->hpos();
 	verboselog( machine, 3, "LCD - vpos %d hpos %d\n", s3c240x_lcd.vpos, s3c240x_lcd.hpos);
 	if (s3c240x_lcd.vramaddr_cur >= s3c240x_lcd.vramaddr_max)
 	{
@@ -291,7 +291,7 @@ static TIMER_CALLBACK( s3c240x_lcd_timer_exp )
 		}
 		if ((s3c240x_lcd.vpos == 0) && (s3c240x_lcd.hpos == 0)) break;
 	}
-	timer_adjust_oneshot( s3c240x_lcd_timer, video_screen_get_time_until_pos( screen, s3c240x_lcd.vpos, s3c240x_lcd.hpos), 0);
+	timer_adjust_oneshot( s3c240x_lcd_timer, screen->time_until_pos(s3c240x_lcd.vpos, s3c240x_lcd.hpos), 0);
 }
 
 static VIDEO_START( gp32 )
@@ -318,7 +318,7 @@ static READ32_HANDLER( s3c240x_lcd_r )
 		{
 			// make sure line counter is going
 			UINT32 lineval = BITS( s3c240x_lcd_regs[1], 23, 14);
-			data = (data & ~0xFFFC0000) | ((lineval - video_screen_get_vpos( machine->primary_screen)) << 18);
+			data = (data & ~0xFFFC0000) | ((lineval - machine->primary_screen->vpos()) << 18);
 		}
 		break;
 	}
@@ -328,7 +328,7 @@ static READ32_HANDLER( s3c240x_lcd_r )
 
 static void s3c240x_lcd_configure( running_machine *machine)
 {
-	running_device *screen = machine->primary_screen;
+	screen_device *screen = machine->primary_screen;
 	UINT32 vspw, vbpd, lineval, vfpd, hspw, hbpd, hfpd, hozval, clkval, hclk;
 	double framerate, vclk;
 	rectangle visarea;
@@ -352,16 +352,16 @@ static void s3c240x_lcd_configure( running_machine *machine)
 	visarea.max_x = hozval;
 	visarea.max_y = lineval;
 	verboselog( machine, 3, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-	video_screen_configure( screen, hozval + 1, lineval + 1, &visarea, HZ_TO_ATTOSECONDS( framerate));
+	screen->configure(hozval + 1, lineval + 1, visarea, HZ_TO_ATTOSECONDS( framerate));
 }
 
 static void s3c240x_lcd_start( running_machine *machine)
 {
-	running_device *screen = machine->primary_screen;
+	screen_device *screen = machine->primary_screen;
 	verboselog( machine, 1, "LCD start\n");
 	s3c240x_lcd_configure( machine);
 	s3c240x_lcd_dma_init( machine);
-	timer_adjust_oneshot( s3c240x_lcd_timer, video_screen_get_time_until_pos( screen, 0, 0), 0);
+	timer_adjust_oneshot( s3c240x_lcd_timer, screen->time_until_pos(0, 0), 0);
 }
 
 static void s3c240x_lcd_stop( running_machine *machine)

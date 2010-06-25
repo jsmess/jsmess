@@ -231,7 +231,7 @@ static void abc80_keyboard_scan(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( abc80_keyboard_tick )
 {
-	abc80_keyboard_scan(timer->machine);
+	abc80_keyboard_scan(timer.machine);
 }
 
 /* Memory Maps */
@@ -379,7 +379,7 @@ static INTERRUPT_GEN( abc80_nmi_interrupt )
 
 static TIMER_DEVICE_CALLBACK( z80pio_astb_tick )
 {
-	abc80_state *state = (abc80_state *)timer->machine->driver_data;
+	abc80_state *state = (abc80_state *)timer.machine->driver_data;
 
 	/* toggle ASTB every other video line */
 	state->z80pio_astb = !state->z80pio_astb;
@@ -473,7 +473,7 @@ static Z80PIO_INTERFACE( abc80_pio_intf )
 	DEVCB_NULL						/* portB ready active callback */
 };
 
-static const z80_daisy_chain abc80_daisy_chain[] =
+static const z80_daisy_config abc80_daisy_chain[] =
 {
 	{ Z80PIO_TAG },
 	{ NULL }

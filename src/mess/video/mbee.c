@@ -213,17 +213,17 @@ static void m6545_update_strobe(running_machine *machine, int param)
 
 READ8_HANDLER ( m6545_status_r )
 {
-	running_device *screen = video_screen_first(space->machine);
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	screen_device *screen = screen_first(*space->machine);
+	const rectangle &visarea = screen->visible_area();
 
-	int data = 0, y = video_screen_get_vpos(space->machine->primary_screen);
-	int x = video_screen_get_hpos(space->machine->primary_screen);
+	int data = 0, y = space->machine->primary_screen->vpos();
+	int x = space->machine->primary_screen->hpos();
 
 	if (!mbee_wait_time)
 		m6545_update_strobe(space->machine, x+y*64);
 
-	if( y < visarea->min_y ||
-		y > visarea->max_y )
+	if( y < visarea.min_y ||
+		y > visarea.max_y )
 		data |= 0x20;	/* vertical blanking */
 	if( crt.lpen_strobe )
 		data |= 0x40;	/* lpen register full */
@@ -473,7 +473,7 @@ static void mc6845_screen_configure(running_machine *machine)
 	visarea.max_x = width-1;
 	visarea.min_y = 0;
 	visarea.max_y = height-1;
-	if (bytes < 0x800) video_screen_set_visarea(machine->primary_screen, 0, width, 0, height);
+	if (bytes < 0x800) machine->primary_screen->set_visible_area(0, width, 0, height);
 }
 
 VIDEO_START( mbee )

@@ -109,10 +109,9 @@ struct _dl1416_state
 INLINE dl1416_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == DL1416);
+	assert(device->type() == DL1416);
 
-	return (dl1416_state *)device->token;
+	return (dl1416_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -125,8 +124,8 @@ static DEVICE_START( dl1416 )
 	dl1416_state *dl1416 = get_safe_token(device);
 
 	/* validate arguments */
-	assert(((const dl1416_interface *)(device->baseconfig().inline_config))->type >= DL1416B);
-	assert(((const dl1416_interface *)(device->baseconfig().inline_config))->type < MAX_DL1416_TYPES);
+	assert(((const dl1416_interface *)(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config()))->type >= DL1416B);
+	assert(((const dl1416_interface *)(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config()))->type < MAX_DL1416_TYPES);
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "dl1416", device->tag(), 0, dl1416->chip_enable);
@@ -159,7 +158,6 @@ DEVICE_GET_INFO( dl1416 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(dl1416_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(dl1416_interface);		break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( dl1416 );				break;
@@ -205,7 +203,7 @@ WRITE_LINE_DEVICE_HANDLER( dl1416_cu_w )
 WRITE8_DEVICE_HANDLER( dl1416_data_w )
 {
 	dl1416_state *chip = get_safe_token(device);
-	const dl1416_interface *intf = (const dl1416_interface *)device->baseconfig().inline_config;
+	const dl1416_interface *intf = (const dl1416_interface *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 
 	offset &= 0x03; /* A0-A1 */
 	data &= 0x7f;   /* D0-D6 */
@@ -275,3 +273,5 @@ WRITE8_DEVICE_HANDLER( dl1416_data_w )
 		}
 	}
 }
+
+DEFINE_LEGACY_DEVICE(DL1416, dl1416);

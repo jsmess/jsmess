@@ -25,7 +25,7 @@
 #define ROM_FILL_FF		0x04000000
 #define ROM_NOCLEAR		0x08000000
 
-#define CARTSLOT	DEVICE_GET_INFO_NAME(cartslot)
+DECLARE_LEGACY_IMAGE_DEVICE(CARTSLOT, cartslot);
 
 
 
@@ -66,8 +66,6 @@ struct _cartslot_config
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO(cartslot);
 
 /* accesses the PCB associated with this cartslot */
 running_device *cartslot_get_pcb(running_device *device);

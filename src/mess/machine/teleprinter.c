@@ -23,17 +23,16 @@ struct _teleprinter_state
 INLINE teleprinter_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == GENERIC_TELEPRINTER);
+	assert(device->type() == GENERIC_TELEPRINTER);
 
-	return (teleprinter_state *)device->token;
+	return (teleprinter_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const teleprinter_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == GENERIC_TELEPRINTER);
-	return (const teleprinter_interface *) device->baseconfig().static_config;
+	assert(device->type() == GENERIC_TELEPRINTER);
+	return (const teleprinter_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -315,7 +314,6 @@ DEVICE_GET_INFO( teleprinter )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(teleprinter_state);							break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(teleprinter);					break;
@@ -334,3 +332,5 @@ DEVICE_GET_INFO( teleprinter )
 INPUT_PORTS_START( generic_teleprinter )
 	PORT_INCLUDE(generic_terminal)
 INPUT_PORTS_END
+
+DEFINE_LEGACY_DEVICE(GENERIC_TELEPRINTER, teleprinter);

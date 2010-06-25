@@ -32,7 +32,7 @@ struct _crtc_ega_t
 {
 	int device_type;
 	const crtc_ega_interface *intf;
-	running_device *screen;
+	screen_device *screen;
 
 	/* ega/vga register file */
 	UINT8	horiz_char_total;	/* 0x00 */
@@ -113,11 +113,10 @@ static void update_vblank_changed_timers(crtc_ega_t *crtc_ega);
 INLINE crtc_ega_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == DEVICE_GET_INFO_NAME(crtc_ega)) ||
-		   /*(device->type == DEVICE_GET_INFO_NAME(crtc_vga))*/0 );
+	assert((device->type() == CRTC_EGA) ||
+		   /*(device->type() == DEVICE_GET_INFO_NAME(crtc_vga))*/0 );
 
-	return (crtc_ega_t *)device->token;
+	return (crtc_ega_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -290,7 +289,7 @@ static void recompute_parameters(crtc_ega_t *crtc_ega, int postload)
 				if (LOG) logerror("CRTC_EGA config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-				video_screen_configure(crtc_ega->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
+				crtc_ega->screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 				crtc_ega->has_valid_parameters = TRUE;
 			}
@@ -317,7 +316,7 @@ static void recompute_parameters(crtc_ega_t *crtc_ega, int postload)
 
 INLINE int is_display_enabled(crtc_ega_t *crtc_ega)
 {
-	return !video_screen_get_vblank(crtc_ega->screen) && !video_screen_get_hblank(crtc_ega->screen);
+	return !crtc_ega->screen->vblank() && !crtc_ega->screen->hblank();
 }
 
 
@@ -333,7 +332,7 @@ static void update_de_changed_timer(crtc_ega_t *crtc_ega)
 		if (is_display_enabled(crtc_ega))
 		{
 			/* normally, it's at end the current raster line */
-			next_y = video_screen_get_vpos(crtc_ega->screen);
+			next_y = crtc_ega->screen->vpos();
 			next_x = crtc_ega->max_visible_x + 1;
 
 			/* but if visible width = horiz_pix_total, then we need
@@ -353,7 +352,7 @@ static void update_de_changed_timer(crtc_ega_t *crtc_ega)
 		else
 		{
 			next_x = 0;
-			next_y = (video_screen_get_vpos(crtc_ega->screen) + 1) % crtc_ega->vert_pix_total;
+			next_y = (crtc_ega->screen->vpos() + 1) % crtc_ega->vert_pix_total;
 
 			/* if we would now fall in the vertical blanking, we need
                to go to the top of the screen */
@@ -362,7 +361,7 @@ static void update_de_changed_timer(crtc_ega_t *crtc_ega)
 		}
 
 		if (next_y != -1)
-			duration = video_screen_get_time_until_pos(crtc_ega->screen, next_y, next_x);
+			duration = crtc_ega->screen->time_until_pos(next_y, next_x);
 		else
 			duration = attotime_never;
 
@@ -378,19 +377,19 @@ static void update_hsync_changed_timers(crtc_ega_t *crtc_ega)
 		UINT16 next_y;
 
 		/* we are before the HSYNC position, we trigger on the current line */
-		if (video_screen_get_hpos(crtc_ega->screen) < crtc_ega->hsync_on_pos)
-			next_y = video_screen_get_vpos(crtc_ega->screen);
+		if (crtc_ega->screen->hpos() < crtc_ega->hsync_on_pos)
+			next_y = crtc_ega->screen->vpos();
 
 		/* trigger on the next line */
 		else
-			next_y = (video_screen_get_vpos(crtc_ega->screen) + 1) % crtc_ega->vert_pix_total;
+			next_y = (crtc_ega->screen->vpos() + 1) % crtc_ega->vert_pix_total;
 
 		/* if the next line is not in the visible region, go to the beginning of the screen */
 		if (next_y > crtc_ega->max_visible_y)
 			next_y = 0;
 
-		timer_adjust_oneshot(crtc_ega->hsync_on_timer,  video_screen_get_time_until_pos(crtc_ega->screen, next_y, crtc_ega->hsync_on_pos) , 0);
-		timer_adjust_oneshot(crtc_ega->hsync_off_timer, video_screen_get_time_until_pos(crtc_ega->screen, next_y, crtc_ega->hsync_off_pos), 0);
+		timer_adjust_oneshot(crtc_ega->hsync_on_timer,  crtc_ega->screen->time_until_pos(next_y, crtc_ega->hsync_on_pos) , 0);
+		timer_adjust_oneshot(crtc_ega->hsync_off_timer, crtc_ega->screen->time_until_pos(next_y, crtc_ega->hsync_off_pos), 0);
 	}
 }
 
@@ -399,8 +398,8 @@ static void update_vsync_changed_timers(crtc_ega_t *crtc_ega)
 {
 	if (crtc_ega->has_valid_parameters && (crtc_ega->vsync_on_timer != NULL))
 	{
-		timer_adjust_oneshot(crtc_ega->vsync_on_timer,  video_screen_get_time_until_pos(crtc_ega->screen, crtc_ega->vsync_on_pos,  0), 0);
-		timer_adjust_oneshot(crtc_ega->vsync_off_timer, video_screen_get_time_until_pos(crtc_ega->screen, crtc_ega->vsync_off_pos, 0), 0);
+		timer_adjust_oneshot(crtc_ega->vsync_on_timer,  crtc_ega->screen->time_until_pos(crtc_ega->vsync_on_pos,  0), 0);
+		timer_adjust_oneshot(crtc_ega->vsync_off_timer, crtc_ega->screen->time_until_pos(crtc_ega->vsync_off_pos, 0), 0);
 	}
 }
 
@@ -409,8 +408,8 @@ static void update_vblank_changed_timers(crtc_ega_t *crtc_ega)
 {
 	if (crtc_ega->has_valid_parameters && (crtc_ega->vblank_on_timer != NULL))
 	{
-		timer_adjust_oneshot(crtc_ega->vblank_on_timer,  video_screen_get_time_until_pos(crtc_ega->screen, crtc_ega->vert_disp_end,  crtc_ega->hsync_on_pos), 0);
-		timer_adjust_oneshot(crtc_ega->vblank_off_timer, video_screen_get_time_until_pos(crtc_ega->screen, 0, crtc_ega->hsync_off_pos), 0);
+		timer_adjust_oneshot(crtc_ega->vblank_on_timer,  crtc_ega->screen->time_until_pos(crtc_ega->vert_disp_end,  crtc_ega->hsync_on_pos), 0);
+		timer_adjust_oneshot(crtc_ega->vblank_off_timer, crtc_ega->screen->time_until_pos(0, crtc_ega->hsync_off_pos), 0);
 	}
 }
 
@@ -504,8 +503,8 @@ UINT16 crtc_ega_get_ma(running_device *device)
 	if (crtc_ega->has_valid_parameters)
 	{
 		/* clamp Y/X to the visible region */
-		int y = video_screen_get_vpos(crtc_ega->screen);
-		int x = video_screen_get_hpos(crtc_ega->screen);
+		int y = crtc_ega->screen->vpos();
+		int x = crtc_ega->screen->hpos();
 
 		/* since the MA counter stops in the blanking regions, if we are in a
            VBLANK, both X and Y are at their max */
@@ -534,7 +533,7 @@ UINT8 crtc_ega_get_ra(running_device *device)
 	if (crtc_ega->has_valid_parameters)
 	{
 		/* get the current vertical raster position and clamp it to the visible region */
-		int y = video_screen_get_vpos(crtc_ega->screen);
+		int y = crtc_ega->screen->vpos();
 
 		if (y > crtc_ega->max_visible_y)
 			y = crtc_ega->max_visible_y;
@@ -568,8 +567,8 @@ void crtc_ega_assert_light_pen_input(running_device *device)
 	if (crtc_ega->has_valid_parameters)
 	{
 		/* get the current pixel coordinates */
-		y = video_screen_get_vpos(crtc_ega->screen);
-		x = video_screen_get_hpos(crtc_ega->screen);
+		y = crtc_ega->screen->vpos();
+		x = crtc_ega->screen->hpos();
 
 		/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
 		char_x = x / crtc_ega->hpixels_per_column;
@@ -586,7 +585,7 @@ void crtc_ega_assert_light_pen_input(running_device *device)
 		}
 
 		/* set the timer that will latch the display address into the light pen registers */
-		timer_adjust_oneshot(crtc_ega->light_pen_latch_timer, video_screen_get_time_until_pos(crtc_ega->screen, y, x), 0);
+		timer_adjust_oneshot(crtc_ega->light_pen_latch_timer, crtc_ega->screen->time_until_pos(y, x), 0);
 	}
 }
 
@@ -721,9 +720,9 @@ static void common_start(running_device *device, int device_type)
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->clock > 0);
+	assert(device->clock() > 0);
 
-	crtc_ega->intf = (const crtc_ega_interface*)device->baseconfig().static_config;
+	crtc_ega->intf = (const crtc_ega_interface*)device->baseconfig().static_config();
 	crtc_ega->device_type = device_type;
 
 	if (crtc_ega->intf != NULL)
@@ -731,11 +730,11 @@ static void common_start(running_device *device, int device_type)
 		assert(crtc_ega->intf->hpixels_per_column > 0);
 
 		/* copy the initial parameters */
-		crtc_ega->clock = device->clock;
+		crtc_ega->clock = device->clock();
 		crtc_ega->hpixels_per_column = crtc_ega->intf->hpixels_per_column;
 
 		/* get the screen device */
-		crtc_ega->screen = devtag_get_device(device->machine, crtc_ega->intf->screen_tag);
+		crtc_ega->screen = downcast<screen_device *>(devtag_get_device(device->machine, crtc_ega->intf->screen_tag));
 		assert(crtc_ega->screen != NULL);
 
 		/* create the timers */
@@ -842,7 +841,6 @@ DEVICE_GET_INFO( crtc_ega )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(crtc_ega_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(crtc_ega);	break;
@@ -868,3 +866,4 @@ DEVICE_GET_INFO( crtc_vga )
 }
 #endif
 
+DEFINE_LEGACY_DEVICE(CRTC_EGA, crtc_ega);

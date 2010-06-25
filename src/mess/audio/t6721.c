@@ -101,10 +101,9 @@ struct _t6721_state
 INLINE t6721_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == T6721);
+	assert(device->type() == T6721);
 
-	return (t6721_state *)device->token;
+	return (t6721_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -297,3 +296,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME				"Toshiba 6721A"
 #define DEVTEMPLATE_FAMILY				"Toshiba 6721A"
 #include "devtempl.h"
+
+DEFINE_LEGACY_DEVICE(T6721, t6721);

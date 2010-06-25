@@ -44,7 +44,7 @@ static UINT8 *FNT;
 
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
-	running_device *cpu = devtag_get_device( timer->machine, "maincpu" );
+	running_device *cpu = devtag_get_device( timer.machine, "maincpu" );
 	cpu_set_input_line(cpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
@@ -293,40 +293,40 @@ static void pegasus_decrypt_rom( running_machine *machine, UINT16 addr )
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 {
-	image_fread(image, memory_region(image->machine, "maincpu") + 0x0000, 0x1000);
-	pegasus_decrypt_rom( image->machine, 0x0000 );
+	image.fread(memory_region(image.device().machine, "maincpu") + 0x0000, 0x1000);
+	pegasus_decrypt_rom( image.device().machine, 0x0000 );
 
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 {
-	image_fread(image, memory_region(image->machine, "maincpu") + 0x1000, 0x1000);
-	pegasus_decrypt_rom( image->machine, 0x1000 );
+	image.fread(memory_region(image.device().machine, "maincpu") + 0x1000, 0x1000);
+	pegasus_decrypt_rom( image.device().machine, 0x1000 );
 
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 {
-	image_fread(image, memory_region(image->machine, "maincpu") + 0x2000, 0x1000);
-	pegasus_decrypt_rom( image->machine, 0x2000 );
+	image.fread(memory_region(image.device().machine, "maincpu") + 0x2000, 0x1000);
+	pegasus_decrypt_rom( image.device().machine, 0x2000 );
 
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 {
-	image_fread(image, memory_region(image->machine, "maincpu") + 0xc000, 0x1000);
-	pegasus_decrypt_rom( image->machine, 0xc000 );
+	image.fread(memory_region(image.device().machine, "maincpu") + 0xc000, 0x1000);
+	pegasus_decrypt_rom( image.device().machine, 0xc000 );
 
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 {
-	image_fread(image, memory_region(image->machine, "maincpu") + 0xd000, 0x1000);
-	pegasus_decrypt_rom( image->machine, 0xd000 );
+	image.fread( memory_region(image.device().machine, "maincpu") + 0xd000, 0x1000);
+	pegasus_decrypt_rom( image.device().machine, 0xd000 );
 
 	return INIT_PASS;
 }

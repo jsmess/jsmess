@@ -294,7 +294,7 @@ static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
 	if(pos_irq_active || !(namconb_cpureg[0x02] & 0xf0))
 		return;
 
-	video_screen_update_partial(machine->primary_screen, param);
+	machine->primary_screen->update_partial(param);
 	pos_irq_active = 1;
 	cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
 }
@@ -348,7 +348,7 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	}
 	if( scanline < NAMCONB1_VBSTART )
 	{
-		timer_set( device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namconb1_TriggerPOSIRQ );
+		timer_set( device->machine, device->machine->primary_screen->time_until_pos(scanline), NULL, scanline, namconb1_TriggerPOSIRQ );
 	}
 } /* namconb1_interrupt */
 
@@ -370,7 +370,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 
 static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 {
-	video_screen_update_partial(machine->primary_screen, param);
+	machine->primary_screen->update_partial(param);
 	pos_irq_active = 1;
 	cputag_set_input_line(machine, "maincpu", namconb_cpureg[0x02], ASSERT_LINE);
 }
@@ -417,7 +417,7 @@ static INTERRUPT_GEN( namconb2_interrupt )
 		scanline = 0;
 
 	if( scanline < NAMCONB1_VBSTART )
-		timer_set( device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, scanline, 0), NULL, scanline, namconb2_TriggerPOSIRQ );
+		timer_set( device->machine, device->machine->primary_screen->time_until_pos(scanline), NULL, scanline, namconb2_TriggerPOSIRQ );
 } /* namconb2_interrupt */
 
 static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
@@ -1079,7 +1079,7 @@ MACHINE_DRIVER_END
 
 /***************************************************************/
 
-ROM_START( ptblank )
+ROM_START( ptblank ) /* World set using 4Mb sound data rom (verified) */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn2_mprlb.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) )
 	ROM_LOAD32_WORD( "gn2_mprub.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) )
@@ -1087,8 +1087,9 @@ ROM_START( ptblank )
 	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
 	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "gn1-spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
+//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x200000, "c352", 0 )
 	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
@@ -1109,7 +1110,7 @@ ROM_START( ptblank )
 	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
 ROM_END
 
-ROM_START( gunbuletw )
+ROM_START( gunbuletw ) /* World set using 4Mb sound data rom (verified) */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn3_mprlb.15b", 0x00002, 0x80000, CRC(9260fce5) SHA1(064579be1ac90e04082a8b403c6adf35dbb46a7e) )
 	ROM_LOAD32_WORD( "gn3_mprub.13b", 0x00000, 0x80000, CRC(6c1ac697) SHA1(7b52b5ef8154a5d741ac24673f3e6bbfa246a494) )
@@ -1117,8 +1118,9 @@ ROM_START( gunbuletw )
 	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
 	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "gn1-spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
+//  ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+	ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x200000, "c352", 0 )
 	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )
@@ -1139,7 +1141,7 @@ ROM_START( gunbuletw )
 	ROM_LOAD( "gn1-sha0.5m", 0, 0x80000, CRC(86d4ff85) SHA1(a71056b2bcbba50c834fe28269ebda9719df354a) )
 ROM_END
 
-ROM_START( gunbuletj )
+ROM_START( gunbuletj ) /* Japanese set using 1Mb sound data rom (verified) */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gn1_mprl.15b", 0x00002, 0x80000, CRC(f99e309e) SHA1(3fe0ddf756e6849f8effc7672456cbe32f65c98a) )
 	ROM_LOAD32_WORD( "gn1_mpru.13b", 0x00000, 0x80000, CRC(72a4db07) SHA1(8c5e1e51cd961b311d03f7b21f36a5bd5e8e9104) )
@@ -1147,8 +1149,9 @@ ROM_START( gunbuletj )
 	ROM_REGION16_LE( 0x4000, "c75", 0 ) /* C75 program */
 	ROM_LOAD( "c75.bin", 0, 0x4000, CRC(42f539a5) SHA1(3103e5a0a2867620309fd4fe478a2be0effbeff8) )
 
-	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data */
-	ROM_LOAD( "gn1-spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) )
+	ROM_REGION16_LE( 0x80000, "c75data", 0 ) /* sound data - JP1 jumper selectable between 1Mb (27C1024) or 4Mb (27C4096) either rom is correct */
+	ROM_LOAD( "gn1_spr0.5b", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) ) /* 1Megabit, same data as the 4Mb rom at 0x00000-0x1ffff */
+//  ROM_LOAD( "gn1-spr0.5b", 0, 0x80000, CRC(71773811) SHA1(e482784d9b9ebf8c2e4a2a3f6f6c4dc8304d2251) ) /* 4Megabit, same data at 0x00000-0x1ffff, 0x20000-0x7ffff is 0xff filled */
 
 	ROM_REGION( 0x200000, "c352", 0 )
 	ROM_LOAD( "gn1-voi0.5j", 0, 0x200000, CRC(05477eb7) SHA1(f2eaacb5dbac06c37c56b9b131230c9cf6602221) )

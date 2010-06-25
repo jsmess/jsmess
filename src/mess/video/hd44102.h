@@ -17,7 +17,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define HD44102 DEVICE_GET_INFO_NAME( hd44102 )
+DECLARE_LEGACY_DEVICE(HD44102, hd44102);
 
 #define MDRV_HD44102_ADD(_tag, _screen, _sx, _sy) \
 	MDRV_DEVICE_ADD((_tag), HD44102, 0) \
@@ -41,9 +41,6 @@ struct _hd44102_config
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( hd44102 );
 
 /* chip select */
 WRITE_LINE_DEVICE_HANDLER( hd44102_cs2_w );

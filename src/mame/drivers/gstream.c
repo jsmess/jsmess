@@ -2,8 +2,6 @@
 
     G-Stream (c)2002 Oriental Soft Japan
 
-    Is 'Oriental Soft Japan' actually a Korean company?
-
     Hyperstone based hardware
 
     Simple Sprites (16x16x8bpp tiles)
@@ -131,7 +129,10 @@ class gstream_state
 public:
 	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gstream_state(machine)); }
 
-	gstream_state(running_machine &machine) { }
+	gstream_state(running_machine &machine)
+		: maincpu(machine.device<cpu_device>("maincpu")),
+		  oki_1(machine.device<okim6295_device>("oki1")),
+		  oki_2(machine.device<okim6295_device>("oki2")) { }
 
 	/* memory pointers */
 	UINT32 *  vram;
@@ -148,8 +149,9 @@ public:
 	int       oki_bank_0, oki_bank_1;
 
 	/* devices */
-	running_device *oki_1;
-	running_device *oki_2;
+	cpu_device *maincpu;
+	okim6295_device *oki_1;
+	okim6295_device *oki_2;
 };
 
 
@@ -333,8 +335,8 @@ static WRITE32_HANDLER( gstream_oki_banking_w )
 		state->oki_bank_1 = 3;		// end sequence music
 	}
 
-	okim6295_set_bank_base(state->oki_1, state->oki_bank_0 * 0x40000);
-	okim6295_set_bank_base(state->oki_2, state->oki_bank_1 * 0x40000);
+	state->oki_1->set_bank_base(state->oki_bank_0 * 0x40000);
+	state->oki_2->set_bank_base(state->oki_bank_1 * 0x40000);
 }
 
 static WRITE32_HANDLER( gstream_oki_4040_w )
@@ -466,7 +468,7 @@ static VIDEO_START(gstream)
 
 static VIDEO_UPDATE(gstream)
 {
-	/* The tilemaps and sprite sre interleaved together.
+	/* The tilemaps and sprite are interleaved together.
        Even Words are tilemap tiles
        Odd Words are sprite data
 
@@ -520,9 +522,6 @@ static VIDEO_UPDATE(gstream)
 static MACHINE_START( gstream )
 {
 	gstream_state *state = (gstream_state *)machine->driver_data;
-
-	state->oki_1 = devtag_get_device(machine, "oki1");
-	state->oki_2 = devtag_get_device(machine, "oki2");
 
 	state_save_register_global(machine, state->tmap1_scrollx);
 	state_save_register_global(machine, state->tmap2_scrollx);
@@ -580,12 +579,10 @@ static MACHINE_DRIVER_START( gstream )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1000000) /* 1 Mhz? */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 not verified
+	MDRV_OKIM6295_ADD("oki1", 1000000, OKIM6295_PIN7_HIGH) /* 1 Mhz? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000) /* 1 Mhz? */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 not verified
+	MDRV_OKIM6295_ADD("oki2", 1000000, OKIM6295_PIN7_HIGH) /* 1 Mhz? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
@@ -622,14 +619,17 @@ ROM_START( gstream )
 
 	ROM_REGION( 0x200000, "oki2", 0 )
 	ROM_COPY( "oki1", 0, 0, 0x200000 )
+
+	ROM_REGION( 0x2000, "nvram", 0 )
+	ROM_LOAD( "gstream.nv", 0x000000, 0x2000, CRC(895d724b) SHA1(97941102f94923220d9beb270939f0ad9a40fe0e) )
 ROM_END
 
 static READ32_HANDLER( gstream_speedup_r )
 {
 	gstream_state *state = (gstream_state *)space->machine->driver_data;
-	if (cpu_get_pc(space->cpu) == 0xc0001592)
+	if (state->maincpu->state_value(STATE_GENPC) == 0xc0001592)
 	{
-		cpu_eat_cycles(space->cpu, 50);
+		state->maincpu->eat_cycles(50);
 	}
 
 	return state->workram[0xd1ee0 / 4];

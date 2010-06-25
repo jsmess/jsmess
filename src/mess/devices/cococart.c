@@ -66,8 +66,8 @@ static TIMER_CALLBACK( halt_timer_callback );
 INLINE coco_cartridge_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == COCO_CARTRIDGE) || (device->type == DRAGON_CARTRIDGE));
-	return (coco_cartridge_t *) device->token;
+	assert((device->type() == COCO_CARTRIDGE) || (device->type() == DRAGON_CARTRIDGE));
+	return (coco_cartridge_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -83,7 +83,7 @@ static DEVICE_START(coco_cartridge)
 {
 	running_device *cartslot;
 	coco_cartridge_t *cococart = get_token(device);
-	const cococart_config *config = (const cococart_config *) device->baseconfig().inline_config;
+	const cococart_config *config = (const cococart_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 
 	/* initialize */
 	memset(cococart, 0, sizeof(*cococart));
@@ -98,8 +98,8 @@ static DEVICE_START(coco_cartridge)
 			throw device_missing_dependencies();
 		}
 
-		cococart->pcb_r = (read8_device_func) cococart->pcb->get_config_fct(COCOCARTINFO_FCT_FF40_R);
-		cococart->pcb_w = (write8_device_func) cococart->pcb->get_config_fct(COCOCARTINFO_FCT_FF40_W);
+//		cococart->pcb_r = (read8_device_func) cococart->pcb->get_config_fct(COCOCARTINFO_FCT_FF40_R);
+//		cococart->pcb_w = (write8_device_func) cococart->pcb->get_config_fct(COCOCARTINFO_FCT_FF40_W);
 	}
 
 	/* finish setup */
@@ -324,7 +324,6 @@ static DEVICE_GET_INFO(general_cartridge)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(coco_cartridge_t);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(cococart_config);			break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(coco_cartridge);	break;
@@ -404,3 +403,6 @@ DEVICE_GET_INFO(dragon_cartridge)
 		default:										DEVICE_GET_INFO_CALL(general_cartridge);	break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE, coco_cartridge);
+DEFINE_LEGACY_DEVICE(DRAGON_CARTRIDGE, dragon_cartridge);

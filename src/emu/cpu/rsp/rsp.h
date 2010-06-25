@@ -208,8 +208,8 @@ struct _rsp_state
 	UINT32 ppc;
 	UINT32 nextpc;
 
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 

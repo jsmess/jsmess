@@ -75,7 +75,7 @@ public:
 	running_device *mb8877;
 	running_device *mc6845;
 	running_device *centronics;
-	running_device *timer_sio;
+	timer_device *timer_sio;
 };
 
 /*----------- defined in drivers/v1050.c -----------*/

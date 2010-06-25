@@ -343,6 +343,8 @@ public:
 	int catprintf(const char *format, ...) { va_list ap; va_start(ap, format); int result = astring_catvprintf(this, format, ap); va_end(ap); return result; }
 	int catvprintf(const char *format, va_list args) { return astring_catvprintf(this, format, args); }
 
+	astring &format(const char *format, ...) { va_list ap; va_start(ap, format); astring_vprintf(this, format, ap); va_end(ap); return *this; }
+
 	int cmp(const astring &str2) const { return astring_cmp(this, &str2); }
 	int cmp(const char *str2) const { return astring_cmpc(this, str2); }
 	int cmp(const char *str2, int count) const { return astring_cmpch(this, str2, count); }

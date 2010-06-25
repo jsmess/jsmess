@@ -358,7 +358,7 @@ struct _apexc_state
 				/* running: flag implied by the existence of the stop instruction */
 	UINT32 pc;	/* address of next instruction for the disassembler */
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -371,10 +371,9 @@ struct _apexc_state
 INLINE apexc_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_APEXC);
-	return (apexc_state *)device->token;
+	return (apexc_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -835,8 +834,6 @@ static CPU_EXECUTE( apexc )
 {
 	apexc_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		debugger_instruction_hook(device, cpustate->pc);
@@ -848,8 +845,6 @@ static CPU_EXECUTE( apexc )
 			DELAY(cpustate->icount);	/* burn cycles once for all */
 		}
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static CPU_SET_INFO( apexc )
@@ -890,7 +885,7 @@ static CPU_SET_INFO( apexc )
 
 CPU_GET_INFO( apexc )
 {
-	apexc_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	apexc_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

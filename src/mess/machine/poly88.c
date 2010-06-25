@@ -261,8 +261,8 @@ WRITE8_HANDLER(poly88_intr_w)
 
 SNAPSHOT_LOAD( poly88 )
 {
-	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8* data= auto_alloc_array(image->machine, UINT8, snapshot_size);
+	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8* data= auto_alloc_array(image.device().machine, UINT8, snapshot_size);
 	UINT16 recordNum;
 	UINT16 recordLen;
 	UINT16 address;
@@ -273,7 +273,7 @@ SNAPSHOT_LOAD( poly88 )
 	int i = 0;
 	int theend = 0;
 
-	image_fread(image, data, snapshot_size);
+	image.fread( data, snapshot_size);
 
 	while (pos<snapshot_size) {
 		for(i=0;i<9;i++) {
@@ -304,7 +304,7 @@ SNAPSHOT_LOAD( poly88 )
 					break;
 			case 3 :
     				/* 03 Auto Start @ Address */
-    				cpu_set_reg(devtag_get_device(image->machine, "maincpu"), I8085_PC, address);
+    				cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), I8085_PC, address);
     				theend = 1;
     				break;
     		case 4 :
@@ -329,6 +329,6 @@ SNAPSHOT_LOAD( poly88 )
 		}
 		pos+=recordLen;
 	}
-	devtag_get_device(image->machine, "uart")->reset();
+	devtag_get_device(image.device().machine, "uart")->reset();
 	return INIT_PASS;
 }

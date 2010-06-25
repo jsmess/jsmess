@@ -104,7 +104,5 @@ void ay31015_set_transmit_data( running_device *device, UINT8 data );
     DEVICE INTERFACE
 ***************************************************************************/
 
-#define AY31015 DEVICE_GET_INFO_NAME( ay31015 )
-DEVICE_GET_INFO( ay31015 );
-
+DECLARE_LEGACY_DEVICE(AY31015, ay31015);
 #endif

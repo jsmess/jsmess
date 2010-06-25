@@ -1176,20 +1176,20 @@ static hard_disk_file *corvus_hdc_file(running_machine *machine, int id) {
 	static const char *const tags[] = {
 		"harddisk1"
 	};
-	running_device *img;
+	device_image_interface *img;
 
 	/* Only one harddisk supported right now */
 	assert ( id == 0 );
 
-	img = devtag_get_device(machine, tags[id]);
+	img = (device_image_interface*)devtag_get_device(machine, tags[id]);
 
 	if ( !img )
 		return NULL;
 
-	if (!image_exists(img))
+	if (!img->exists())
 		return NULL;
 
-	return mess_hd_get_hard_disk_file(img);
+	return mess_hd_get_hard_disk_file(&img->device());
 }
 
 

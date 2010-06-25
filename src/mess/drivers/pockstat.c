@@ -884,7 +884,7 @@ static MACHINE_START( pockstat )
 
 static MACHINE_RESET( pockstat )
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, 0x4000000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, 0x4000000);
 
 	ps_flash_write_enable_count = 0;
 	ps_flash_write_count = 0;
@@ -922,10 +922,10 @@ static VIDEO_UPDATE( pockstat )
 static DEVICE_IMAGE_LOAD( pockstat_flash)
 {
 	int i, length;
-	UINT8 *cart = memory_region(image->machine, "flash");
+	UINT8 *cart = memory_region(image.device().machine, "flash");
 	static const char *gme_id = "123-456-STD";
 
-	length = image_fread(image, cart, 0x20f40);
+	length = image.fread( cart, 0x20f40);
 
 	if(length != 0x20f40)
 	{

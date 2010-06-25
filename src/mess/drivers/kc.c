@@ -308,7 +308,7 @@ INPUT_PORTS_END
 
 /* pio is last in chain and therefore has highest priority */
 
-static const z80_daisy_chain kc85_daisy_chain[] =
+static const z80_daisy_config kc85_daisy_chain[] =
 {
 	{ "z80pio" },
 	{ "z80ctc" },

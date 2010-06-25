@@ -375,7 +375,7 @@ static MACHINE_RESET( mc1000 )
 
 static TIMER_DEVICE_CALLBACK( ne555_tick )
 {
-	mc1000_state *state = (mc1000_state *)timer->machine->driver_data;
+	mc1000_state *state = (mc1000_state *)timer.machine->driver_data;
 
 	if (state->ne555_int == ASSERT_LINE)
 	{
@@ -386,7 +386,7 @@ static TIMER_DEVICE_CALLBACK( ne555_tick )
 		state->ne555_int = ASSERT_LINE;
 	}
 
-	cputag_set_input_line(timer->machine, Z80_TAG, INPUT_LINE_IRQ0, state->ne555_int);
+	cputag_set_input_line(timer.machine, Z80_TAG, INPUT_LINE_IRQ0, state->ne555_int);
 }
 
 static const cassette_config mc1000_cassette_config =

@@ -25,7 +25,7 @@
 typedef struct _vdc8563_state vdc8563_state;
 struct _vdc8563_state
 {
-	running_device *screen;
+	screen_device *screen;
 
 	int state;
 	UINT8 reg[37];
@@ -160,17 +160,16 @@ static const struct {
 INLINE vdc8563_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == VDC8563);
+	assert(device->type() == VDC8563);
 
-	return (vdc8563_state *)device->token;
+	return (vdc8563_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const vdc8563_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == VDC8563));
-	return (const vdc8563_interface *) device->baseconfig().static_config;
+	assert((device->type() == VDC8563));
+	return (const vdc8563_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -404,8 +403,8 @@ static void vdc8563_monotext_screenrefresh( running_device *device, bitmap_t *bi
 	int h = CRTC6845_CHAR_LINES;
 	int height = CRTC6845_CHAR_HEIGHT;
 
-	rect.min_x = video_screen_get_visible_area(vdc8563->screen)->min_x;
-	rect.max_x = video_screen_get_visible_area(vdc8563->screen)->max_x;
+	rect.min_x = vdc8563->screen->visible_area().min_x;
+	rect.max_x = vdc8563->screen->visible_area().max_x;
 
 	if (full_refresh)
 		memset(vdc8563->dirty + vdc8563->videoram_start, 1, vdc8563->videoram_size);
@@ -447,8 +446,8 @@ static void vdc8563_text_screenrefresh( running_device *device, bitmap_t *bitmap
 	int h = CRTC6845_CHAR_LINES;
 	int height = CRTC6845_CHAR_HEIGHT;
 
-	rect.min_x = video_screen_get_visible_area(vdc8563->screen)->min_x;
-	rect.max_x = video_screen_get_visible_area(vdc8563->screen)->max_x;
+	rect.min_x = vdc8563->screen->visible_area().min_x;
+	rect.max_x = vdc8563->screen->visible_area().max_x;
 
 	if (full_refresh)
 		memset(vdc8563->dirty + vdc8563->videoram_start, 1, vdc8563->videoram_size);
@@ -511,8 +510,8 @@ static void vdc8563_graphic_screenrefresh( running_device *device, bitmap_t *bit
 	int h = CRTC6845_CHAR_LINES;
 	int height = CRTC6845_CHAR_HEIGHT;
 
-	rect.min_x = video_screen_get_visible_area(vdc8563->screen)->min_x;
-	rect.max_x = video_screen_get_visible_area(vdc8563->screen)->max_x;
+	rect.min_x = vdc8563->screen->visible_area().min_x;
+	rect.max_x = vdc8563->screen->visible_area().max_x;
 
 	if (full_refresh)
 		memset(vdc8563->dirty, 1, vdc8563->mask + 1);
@@ -596,9 +595,9 @@ UINT32 vdc8563_video_update( running_device *device, bitmap_t *bitmap, const rec
 static DEVICE_START( vdc8563 )
 {
 	vdc8563_state *vdc8563 = get_safe_token(device);
-	const vdc8563_interface *intf = (vdc8563_interface *)device->baseconfig().static_config;
+	const vdc8563_interface *intf = (vdc8563_interface *)device->baseconfig().static_config();
 
-	vdc8563->screen = devtag_get_device(device->machine, intf->screen);
+	vdc8563->screen = device->machine->device<screen_device>(intf->screen);
 
 	vdc8563->ram = auto_alloc_array_clear(device->machine, UINT8, 0x20000);
 	vdc8563->dirty = vdc8563->ram + 0x10000;
@@ -673,3 +672,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME				"8563 / 8568 VDC"
 #define DEVTEMPLATE_FAMILY				"8563 / 8568 VDC"
 #include "devtempl.h"
+
+DEFINE_LEGACY_DEVICE(VDC8563, vdc8563);

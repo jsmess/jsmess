@@ -78,16 +78,15 @@ struct _msm58321_t
 INLINE msm58321_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (msm58321_t *)device->token;
+	return (msm58321_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const msm58321_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == MSM58321RS);
-	return (const msm58321_interface *) device->baseconfig().static_config;
+	assert(device->type() == MSM58321RS);
+	return (const msm58321_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -345,7 +344,6 @@ DEVICE_GET_INFO( msm58321rs )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(msm58321_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(msm58321);	break;
@@ -360,3 +358,5 @@ DEVICE_GET_INFO( msm58321rs )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(MSM58321RS, msm58321rs);

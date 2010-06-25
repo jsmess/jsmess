@@ -22,8 +22,9 @@
 
 int printer_is_ready(running_device *printer)
 {
+	device_image_interface *image = (device_image_interface*)printer;
 	/* if there is a file attached to it, it's online */
-	return image_exists(printer) != 0;
+	return image->exists() != 0;
 }
 
 
@@ -34,9 +35,10 @@ int printer_is_ready(running_device *printer)
 
 void printer_output(running_device *printer, UINT8 data)
 {
-	if (image_exists(printer))
+	device_image_interface *image = (device_image_interface*)printer;
+	if (image->exists())
 	{
-		image_fwrite(printer, &data, 1);
+		image->fwrite(&data, 1);
 	}
 }
 
@@ -47,7 +49,7 @@ void printer_output(running_device *printer, UINT8 data)
 
 static DEVICE_IMAGE_LOAD( printer )
 {
-	const printer_config *conf = (const printer_config *)image->baseconfig().inline_config;
+	const printer_config *conf = (const printer_config *)downcast<const legacy_image_device_config_base &>(image.device().baseconfig()).inline_config();
 
 	/* send notify that the printer is now online */
 	if (conf != NULL && conf->online != NULL)
@@ -64,7 +66,7 @@ static DEVICE_IMAGE_LOAD( printer )
 
 static DEVICE_IMAGE_UNLOAD( printer )
 {
-	const printer_config *conf = (const printer_config *)image->baseconfig().inline_config;
+	const printer_config *conf = (const printer_config *)downcast<const legacy_image_device_config_base &>(image.device().baseconfig()).inline_config();
 
 	/* send notify that the printer is now offline */
 	if (conf != NULL && conf->online != NULL)
@@ -93,7 +95,6 @@ DEVICE_GET_INFO(printer)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = 1; break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(printer_config); break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL; break;
 		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_PRINTER; break;
 		case DEVINFO_INT_IMAGE_READABLE:				info->i = 0; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
@@ -111,3 +112,5 @@ DEVICE_GET_INFO(printer)
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "prn"); break;
 	}
 }
+
+DEFINE_LEGACY_IMAGE_DEVICE(PRINTER, printer);

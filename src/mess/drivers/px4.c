@@ -289,14 +289,14 @@ static TIMER_CALLBACK( ext_cassette_read )
 /* free running counter */
 static TIMER_DEVICE_CALLBACK( frc_tick )
 {
-	px4_state *px4 = (px4_state *)timer->machine->driver_data;
+	px4_state *px4 = (px4_state *)timer.machine->driver_data;
 
 	px4->frc_value++;
 
 	if (px4->frc_value == 0)
 	{
 		px4->isr |= INT3_OVF;
-		gapnit_interrupt(timer->machine);
+		gapnit_interrupt(timer.machine);
 	}
 }
 
@@ -820,7 +820,7 @@ static WRITE8_HANDLER( px4_ioctlr_w )
 
 static TIMER_DEVICE_CALLBACK( upd7508_1sec_callback )
 {
-	px4_state *px4 = (px4_state *)timer->machine->driver_data;
+	px4_state *px4 = (px4_state *)timer.machine->driver_data;
 
 	/* adjust interrupt status */
 	px4->interrupt_status |= UPD7508_INT_ONE_SECOND;
@@ -829,7 +829,7 @@ static TIMER_DEVICE_CALLBACK( upd7508_1sec_callback )
 	if (px4->one_sec_int_enabled)
 	{
 		px4->isr |= INT0_7508;
-		gapnit_interrupt(timer->machine);
+		gapnit_interrupt(timer.machine);
 	}
 }
 

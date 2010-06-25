@@ -17,7 +17,7 @@ BOOL DriverIsComputer(int driver_index)
 	const input_port_config *port;
 	int has_keyboard = FALSE;
 	if (portlist.first()==NULL) has_keyboard = TRUE;
-	for (port = portlist.first(); port != NULL; port = port->next)
+	for (port = portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -40,20 +40,17 @@ BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 {
 	BOOL b = FALSE;
 	machine_config *config;
-	const device_config *device;
+	const device_config_image_interface *device;
 
 	// allocate the machine config
 	config = machine_config_alloc(gamedrv->machine_config);
 
-	for (device = config->devicelist.first(); device != NULL;device = device->next)
-	{
-		if (is_image_device(device))
+	for (bool gotone = config->devicelist.first(device); gotone; gotone = device->next(device))
+	{	
+		if (device->image_type() == type)
 		{
-			if (image_device_getinfo(config, device).type == type)
-			{
-				b = TRUE;
-				break;
-			}
+			b = TRUE;
+			break;
 		}
 	}
 

@@ -11,7 +11,7 @@
 #include "video/pc_mda.h"
 #include "includes/amstr_pc.h"
 #include "video/mc6845.h"
-#include "video/pc_video.h"
+#include "video/pc_video_mess.h"
 #include "video/cgapal.h"
 
 
@@ -681,7 +681,7 @@ void pc_aga_set_mode(running_machine *machine, AGA_MODE mode)
 VIDEO_START( pc_aga )
 {
 	const address_space *space = cpu_get_address_space( machine->firstcpu, ADDRESS_SPACE_IO );
-	int buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
+	int buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 
 	switch(buswidth)
 	{
@@ -719,7 +719,7 @@ VIDEO_START( pc200 )
 
 	VIDEO_START_CALL(pc_aga);
 
-	buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
+	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:

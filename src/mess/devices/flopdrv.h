@@ -108,9 +108,9 @@ void floppy_drive_set_controller(running_device *img, running_device *controller
 floppy_image *flopimg_get_image(running_device *image);
 
 /* hack for apple II; replace this when we think of something better */
-void floppy_install_unload_proc(running_device *image, void (*proc)(running_device *image));
+void floppy_install_unload_proc(running_device *image, void (*proc)(device_image_interface &image));
 
-void floppy_install_load_proc(running_device *image, void (*proc)(running_device *image));
+void floppy_install_load_proc(running_device *image, void (*proc)(device_image_interface &image));
 
 /* hack for TI99; replace this when we think of something better */
 void floppy_install_tracktranslate_proc(running_device *image, int (*proc)(running_device *image, floppy_image *floppy, int physical_track));
@@ -155,8 +155,7 @@ READ_LINE_DEVICE_HANDLER( floppy_dskchg_r );
 /* 2-sided disk */
 READ_LINE_DEVICE_HANDLER( floppy_twosid_r );
 
-#define FLOPPY	DEVICE_GET_INFO_NAME(floppy)
-DEVICE_GET_INFO(floppy);
+DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY, floppy);
 
 extern DEVICE_START( floppy );
 extern DEVICE_IMAGE_LOAD( floppy );

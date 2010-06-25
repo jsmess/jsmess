@@ -228,9 +228,9 @@ static const riot6532_interface beta_riot_interface =
 
 static DEVICE_IMAGE_UNLOAD( beta_eprom )
 {
-	UINT8 *ptr = memory_region(image->machine, EPROM_TAG);
+	UINT8 *ptr = memory_region(image.device().machine, EPROM_TAG);
 
-	image_fwrite(image, ptr, 0x800);
+	image.fwrite(ptr, 0x800);
 }
 
 /* Machine Initialization */

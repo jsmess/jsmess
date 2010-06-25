@@ -14,7 +14,7 @@
     MACROS
 ***************************************************************************/
 
-#define ACIA6551		DEVICE_GET_INFO_NAME(acia6551)
+DECLARE_LEGACY_DEVICE(ACIA6551, acia6551);
 
 #define MDRV_ACIA6551_ADD(_tag)	\
 	MDRV_DEVICE_ADD((_tag), ACIA6551, 0)
@@ -23,8 +23,6 @@
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO(acia6551);
 
 READ8_DEVICE_HANDLER(acia_6551_r);
 WRITE8_DEVICE_HANDLER(acia_6551_w);

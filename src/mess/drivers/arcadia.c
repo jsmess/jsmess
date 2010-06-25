@@ -459,24 +459,24 @@ static PALETTE_INIT( arcadia )
 
 static DEVICE_IMAGE_LOAD( arcadia_cart )
 {
-	UINT8 *rom = memory_region(image->machine, "maincpu");
+	UINT8 *rom = memory_region(image.device().machine, "maincpu");
 	int size;
 
 	memset(rom, 0, 0x8000);
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
+		size = image.length();
 
-		if (size > memory_region_length(image->machine, "maincpu"))
-			size = memory_region_length(image->machine, "maincpu");
+		if (size > memory_region_length(image.device().machine, "maincpu"))
+			size = memory_region_length(image.device().machine, "maincpu");
 
-		if (image_fread(image, rom, size) != size)
+		if (image.fread(rom, size) != size)
 			return INIT_FAIL;
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
-		memcpy(rom, image_get_software_region(image, "rom"), size);
+		size = image.get_software_region_length("rom");
+		memcpy(rom, image.get_software_region("rom"), size);
 	}
 
 	if (size > 0x1000)

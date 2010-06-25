@@ -4209,6 +4209,7 @@ void ym2610_reset_chip(void *chip)
 	YM2610 *F2610 = (YM2610 *)chip;
 	FM_OPN *OPN   = &F2610->OPN;
 	YM_DELTAT *DELTAT = &F2610->deltaT;
+
 	astring name;
 	running_device* dev = F2610->OPN.ST.device;
 

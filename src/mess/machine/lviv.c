@@ -336,7 +336,7 @@ SNAPSHOT_LOAD( lviv )
 		return INIT_FAIL;
 	}
 
-	image_fread(image, lviv_snapshot_data, LVIV_SNAPSHOT_SIZE);
+	image.fread( lviv_snapshot_data, LVIV_SNAPSHOT_SIZE);
 
 	if( lviv_verify_snapshot(lviv_snapshot_data, snapshot_size) == IMAGE_VERIFY_FAIL)
 	{
@@ -344,9 +344,9 @@ SNAPSHOT_LOAD( lviv )
 		return INIT_FAIL;
 	}
 
-	lviv_setup_snapshot (image->machine,lviv_snapshot_data);
+	lviv_setup_snapshot (image.device().machine,lviv_snapshot_data);
 
-	dump_registers(image->machine);
+	dump_registers(image.device().machine);
 
 	free(lviv_snapshot_data);
 

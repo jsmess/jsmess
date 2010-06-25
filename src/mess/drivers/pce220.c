@@ -40,7 +40,7 @@ static VIDEO_UPDATE( pce220 )
 				{
 					color = (vram[count]) >> (yi) & 1;
 
-					//if ((x + xi) <= video_screen_get_visible_area(screen)->max_x && (y + 0) < video_screen_get_visible_area(screen)->max_y)
+					//if ((x + xi) <= screen->visible_area()->max_x && (y + 0) < screen->visible_area()->max_y)
 						*BITMAP_ADDR32(bitmap, y*8 + yi, x*5 + xi) = screen->machine->pens[color ^ 1];
 				}
 

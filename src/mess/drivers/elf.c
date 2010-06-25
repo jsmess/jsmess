@@ -353,14 +353,14 @@ ROM_END
 
 static QUICKLOAD_LOAD( elf )
 {
-	int size = image_length(image);
+	int size = image.length();
 
-	if (size > messram_get_size(devtag_get_device(image->machine, "messram")))
+	if (size > messram_get_size(devtag_get_device(image.device().machine, "messram")))
 	{
 		return INIT_FAIL;
 	}
 
-	image_fread(image, messram_get_ptr(devtag_get_device(image->machine, "messram")), size);
+	image.fread( messram_get_ptr(devtag_get_device(image.device().machine, "messram")), size);
 
 	return INIT_PASS;
 }

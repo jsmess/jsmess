@@ -12,6 +12,7 @@
 **************************************************************************/
 
 #include "emu.h"
+#include "utils.h"
 #include "harddisk.h"
 #include "harddriv.h"
 #include "machine/smc92x4.h"
@@ -69,7 +70,7 @@ static int harddisk_chs_to_lba(hard_disk_file *hdfile, int cylinder, int head, i
 void ti99_mfm_harddisk_read_sector(running_device *harddisk, int cylinder, int head, int sector, UINT8 **buf, int *sector_length)
 {
         UINT32 lba;
-	mfmhd_state *hd = (mfmhd_state *)harddisk->token;
+	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	running_device *drive = harddisk->subdevice("drive");
         hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
 
@@ -105,7 +106,7 @@ void ti99_mfm_harddisk_read_sector(running_device *harddisk, int cylinder, int h
 void ti99_mfm_harddisk_write_sector(running_device *harddisk, int cylinder, int head, int sector, UINT8 *buf, int sector_length)
 {
         UINT32 lba;
-	mfmhd_state *hd = (mfmhd_state *)harddisk->token;
+	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	running_device *drive = harddisk->subdevice("drive");
         hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
 
@@ -170,7 +171,7 @@ static int find_block(const UINT8 *buffer, int start, int stop, UINT8 byte, size
 */
 void ti99_mfm_harddisk_read_track(running_device *harddisk, int head, UINT8 **pbuffer, int *data_count)
 {
-	mfmhd_state *hd = (mfmhd_state *)harddisk->token;
+	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	running_device *drive = harddisk->subdevice("drive");
 
 	/* We assume an interleave of 3 for 32 sectors. */
@@ -305,7 +306,7 @@ void ti99_mfm_harddisk_write_track(running_device *harddisk, int head, UINT8 *tr
 	int sync = 13;
 
 	UINT32 lba;
-	mfmhd_state *hd = (mfmhd_state *)harddisk->token;
+	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	running_device *drive = harddisk->subdevice("drive");
 	hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
 
@@ -408,7 +409,7 @@ UINT8 ti99_mfm_harddisk_status(running_device *harddisk)
 {
 	UINT8 status = 0;
 	running_device *drive;
-	mfmhd_state *hd = (mfmhd_state *)harddisk->token;
+	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	drive = harddisk->subdevice("drive");
         hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
 
@@ -431,7 +432,7 @@ UINT8 ti99_mfm_harddisk_status(running_device *harddisk)
 void ti99_mfm_harddisk_seek(running_device *harddisk, int direction)
 {
 	running_device *drive = harddisk->subdevice("drive");
-	mfmhd_state *hd = (mfmhd_state *)harddisk->token;
+	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	const hard_disk_info *info;
         hard_disk_file *file = mess_hd_get_hard_disk_file(drive);
 
@@ -458,7 +459,7 @@ void ti99_mfm_harddisk_seek(running_device *harddisk, int direction)
 void ti99_mfm_harddisk_get_next_id(running_device *harddisk, int head, chrn_id_hd *id)
 {
 	running_device *drive = harddisk->subdevice("drive");
-	mfmhd_state *hd = (mfmhd_state *)harddisk->token;
+	mfmhd_state *hd = (mfmhd_state *)downcast<legacy_device_base *>(harddisk)->token();
 	const hard_disk_info *info;
         hard_disk_file *file;
 	int interleave = 3;
@@ -522,5 +523,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME                "TI99 IDE Hard disk"
 #include "devtempl.h"
 
-
-
+DEFINE_LEGACY_DEVICE(MFMHD, mfmhd);
+DEFINE_LEGACY_DEVICE(IDEHD, idehd);

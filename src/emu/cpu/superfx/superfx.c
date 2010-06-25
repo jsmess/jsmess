@@ -61,7 +61,7 @@ struct _superfx_state
 	cache_t cache;
 	pixelcache_t pixelcache[2];
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 };
@@ -69,10 +69,9 @@ struct _superfx_state
 INLINE superfx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SUPERFX);
-	return (superfx_state *)device->token;
+	return (superfx_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /*****************************************************************************/
@@ -670,7 +669,7 @@ void superfx_add_clocks(running_device *cpu, INT32 clocks)
 
 /*****************************************************************************/
 
-static void superfx_register_save( running_device *device )
+static void superfx_register_save( legacy_cpu_device *device )
 {
 	superfx_state *cpustate = get_safe_token(device);
 	int i;
@@ -756,9 +755,9 @@ static CPU_INIT( superfx )
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 
-	if (device->baseconfig().static_config != NULL)
+	if (device->baseconfig().static_config() != NULL)
 	{
-		cpustate->config = *(superfx_config *)device->baseconfig().static_config;
+		cpustate->config = *(superfx_config *)device->baseconfig().static_config();
 	}
 
 	devcb_resolve_write_line(&cpustate->out_irq_func, &cpustate->config.out_irq_func, device);
@@ -812,8 +811,6 @@ static CPU_EXECUTE( superfx )
 {
 	superfx_state *cpustate = get_safe_token(device);
 	UINT8 op;
-
-	cpustate->icount = cycles;
 
 	if(!(cpustate->sfr & SUPERFX_SFR_G))
 	{
@@ -1486,8 +1483,6 @@ static CPU_EXECUTE( superfx )
 
 		--cpustate->icount;
 	}
-
-	return cycles - cpustate->icount;
 }
 
 /*****************************************************************************/
@@ -1557,7 +1552,7 @@ static CPU_SET_INFO( superfx )
 
 CPU_GET_INFO( superfx )
 {
-	superfx_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	superfx_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

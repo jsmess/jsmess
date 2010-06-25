@@ -98,10 +98,9 @@ TODO general:
 INLINE g65816i_cpu_struct *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_G65816 || cpu_get_type(device) == CPU_5A22);
-	return (g65816i_cpu_struct *)device->token;
+	return (g65816i_cpu_struct *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* Temporary Variables */
@@ -250,7 +249,8 @@ static CPU_EXECUTE( g65816 )
 {
 	g65816i_cpu_struct *cpustate = get_safe_token(device);
 
-	return FTABLE_EXECUTE(cpustate, cycles);
+	int clocks = cpustate->ICount;
+	cpustate->ICount = clocks - FTABLE_EXECUTE(cpustate, cpustate->ICount);
 }
 
 
@@ -303,7 +303,7 @@ static void g65816_set_irq_line(g65816i_cpu_struct *cpustate, int line, int stat
 }
 
 /* Set the callback that is called when servicing an interrupt */
-static void g65816_set_irq_callback(g65816i_cpu_struct *cpustate, cpu_irq_callback callback)
+static void g65816_set_irq_callback(g65816i_cpu_struct *cpustate, device_irq_callback callback)
 {
 	INT_ACK = callback;
 }
@@ -419,7 +419,7 @@ void g65816_set_read_vector_callback(running_device *device, read8_space_func re
 
 CPU_GET_INFO( g65816 )
 {
-	g65816i_cpu_struct *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	g65816i_cpu_struct *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -280,14 +280,14 @@ WRITE8_HANDLER ( bbc_videoULA_w )
 	video_refresh=1;
 
 	// Make sure vpos is never <0 2008-10-11 PHS.
-	vpos=video_screen_get_vpos(space->machine->primary_screen);
+	vpos=space->machine->primary_screen->vpos();
 	if(vpos==0)
-	  video_screen_update_partial(space->machine->primary_screen, vpos);
+	  space->machine->primary_screen->update_partial(vpos);
 	else
-	  video_screen_update_partial(space->machine->primary_screen, vpos -1 );
+	  space->machine->primary_screen->update_partial(vpos -1 );
 
 //  logerror("setting videoULA %s at %.4x size:%.4x\n",image_filename(image), addr, size);
-	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,video_screen_get_vpos(space->machine->primary_screen) );
+	logerror("setting videoULA %.4x to:%.4x   at :%d \n",data,offset,space->machine->primary_screen->vpos() );
 
 
 	switch (offset&0x01)

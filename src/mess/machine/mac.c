@@ -2263,7 +2263,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 	else
 	{
 		/* video beam in display (! VBLANK && ! HBLANK basically) */
-		if (video_screen_get_vpos(device->machine->primary_screen) >= MAC_V_VIS)
+		if (device->machine->primary_screen->vpos() >= MAC_V_VIS)
 			val |= 0x40;
 
 		if (ADB_IS_BITBANG)
@@ -2536,7 +2536,7 @@ MACHINE_START( mac )
 		timer_adjust_oneshot(mac_adb_timer, attotime_never, 0);
 	}
 	mac_scanline_timer = timer_alloc(machine, mac_scanline_tick, NULL);
-	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(mac_scanline_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 }
 MACHINE_RESET(mac)
 {
@@ -2939,7 +2939,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 		mac_sh_updatebuffer(devtag_get_device(machine, "custom"));
 	}
 
-	scanline = video_screen_get_vpos(machine->primary_screen);
+	scanline = machine->primary_screen->vpos();
 	if (scanline == MAC_V_VIS)
 		mac_vblank_irq(machine);
 
@@ -2950,7 +2950,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 			mouse_callback(machine);
 	}
 
-	timer_adjust_oneshot(mac_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (scanline+1) % MAC_V_TOTAL, 0), 0);
+	timer_adjust_oneshot(mac_scanline_timer, machine->primary_screen->time_until_pos((scanline+1) % MAC_V_TOTAL, 0), 0);
 }
 
 

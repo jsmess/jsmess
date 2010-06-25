@@ -719,8 +719,8 @@ static READ8_HANDLER ( to7_qdd_r )
 	case 8: /* floppy status */
 	{
 		UINT8 data = 0;
-		running_device* img = to7_qdd_image(space->machine);
-		if ( ! image_exists( img ) )
+		device_image_interface* img = (device_image_interface*)to7_qdd_image(space->machine);
+		if ( ! img->exists() )
 			data |= 0x40; /* disk present */
 		if ( to7qdd->index_pulse )
 			data |= 0x80; /* disk start */
@@ -944,11 +944,11 @@ static running_device * thmfc_floppy_image ( running_machine *machine )
 
 
 
-static int thmfc_floppy_is_qdd ( running_device *image )
+static int thmfc_floppy_is_qdd ( device_image_interface *image )
 {
 	if (image==NULL) return 0;
-	if (!image_exists(image)) return 0;
-	return image_length(image)==51200; // idf QDD
+	if (!image->exists()) return 0;
+	return image->length()==51200; // idf QDD
 }
 
 
@@ -958,7 +958,7 @@ static void thmfc_floppy_index_pulse_cb ( running_device *controller,running_dev
 	if ( image != thmfc_floppy_image(image->machine) )
 		return;
 
-	if ( thmfc_floppy_is_qdd(image) )
+	if ( thmfc_floppy_is_qdd((device_image_interface*)image) )
 	{
 		/* pulse each time the whole-disk spiraling track ends */
 		floppy_drive_set_rpm( image, 16.92f /* 423/25 */ );
@@ -1079,7 +1079,7 @@ static UINT8 thmfc_floppy_raw_read_byte ( running_machine *machine )
 	/* rebuild track if needed */
 	if ( ! thmfc1->data_raw_size )
 	{
-		if ( thmfc_floppy_is_qdd(thmfc_floppy_image(machine)) )
+		if ( thmfc_floppy_is_qdd((device_image_interface*)thmfc_floppy_image(machine)) )
 			/* QDD: track = whole disk */
 			thmfc1->data_raw_size = thom_qdd_make_disk ( thmfc_floppy_image(machine), thmfc1->data );
 		else
@@ -1268,11 +1268,11 @@ READ8_HANDLER ( thmfc_floppy_r )
 	case 1: /* STAT1 */
 	{
 		UINT8 data = 0;
-		running_device * img = thmfc_floppy_image(space->machine);
-		int flags = floppy_drive_get_flag_state( img, -1 );
+		device_image_interface * img = (device_image_interface*)thmfc_floppy_image(space->machine);
+		int flags = floppy_drive_get_flag_state( &img->device(), -1 );
 		if ( thmfc_floppy_is_qdd(img) )
 		{
-			if ( ! image_exists(img) )
+			if ( ! img->exists() )
 				data |= 0x40; /* disk present */
 			if ( ! thmfc1->ipl )
 				data |= 0x02;       /* disk start */
@@ -1282,17 +1282,17 @@ READ8_HANDLER ( thmfc_floppy_r )
 		{
 			if ( thmfc1->ipl )
 				data |= 0x40;
-			if ( image_exists(img) )
+			if ( img->exists() )
 				data |= 0x20; /* disk change (?) */
 
-			data |= !floppy_tk00_r(img) << 3;
+			data |= !floppy_tk00_r(&img->device()) << 3;
 
 			if ( flags & FLOPPY_DRIVE_READY )
 				data |= 0x02;
 		}
 		if (!motor_on)
 			data |= 0x10;
-		if (!floppy_wpt_r(img))
+		if (!floppy_wpt_r(&img->device()))
 			data |= 0x04;
 		VLOG(( "%f $%04x thmfc_floppy_r: STAT1=$%02X\n", attotime_to_double(timer_get_time(space->machine)), cpu_get_previouspc(devtag_get_device(space->machine, "maincpu")), data ));
 		return data;
@@ -1331,7 +1331,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 	case 0: /* CMD0 */
 	{
 		int wsync = (data >> 4) & 1;
-		int qdd = thmfc_floppy_is_qdd(thmfc_floppy_image(space->machine));
+		int qdd = thmfc_floppy_is_qdd((device_image_interface*)thmfc_floppy_image(space->machine));
 		chrn_id id;
 		thmfc1->formatting = (data >> 2) & 1;
 		LOG (( "%f $%04x thmfc_floppy_w: CMD0=$%02X dens=%s wsync=%i dsync=%i fmt=%i op=%i\n",
@@ -1438,7 +1438,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 		thmfc1->drive = data & 2;
 
 		img = thmfc_floppy_image(space->machine);
-		if ( thmfc_floppy_is_qdd(img) )
+		if ( thmfc_floppy_is_qdd((device_image_interface*)img) )
 		{
 			motor = !(data & 0x40);
 			/* no side select & no seek for QDD */
@@ -1476,7 +1476,7 @@ WRITE8_HANDLER ( thmfc_floppy_w )
 
 	case 3: /* WDATA */
 		thmfc1->wsync = data;
-		if ( thmfc_floppy_is_qdd(thmfc_floppy_image(space->machine)) )
+		if ( thmfc_floppy_is_qdd((device_image_interface*)thmfc_floppy_image(space->machine)) )
 			thmfc_floppy_qdd_write_byte( space->machine, data );
 		else if ( thmfc1->op==THMFC1_OP_WRITE_SECT )
 			thmfc_floppy_write_byte( space->machine, data );

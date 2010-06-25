@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "utils.h"
 #include "formats/comx35_comx.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/messram.h"
@@ -34,11 +35,11 @@ enum
     image_fread_memory - read image to memory
 -------------------------------------------------*/
 
-static void image_fread_memory(running_device *image, UINT16 addr, UINT32 count)
+static void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
 {
-	void *ptr = memory_get_write_ptr(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), addr);
+	void *ptr = memory_get_write_ptr(cpu_get_address_space(image.device().machine->firstcpu, ADDRESS_SPACE_PROGRAM), addr);
 
-	image_fread(image, ptr, count);
+	image.fread( ptr, count);
 }
 
 /*-------------------------------------------------
@@ -47,17 +48,17 @@ static void image_fread_memory(running_device *image, UINT16 addr, UINT32 count)
 
 QUICKLOAD_LOAD( comx35_comx )
 {
-	const address_space *program = cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cpu_get_address_space(image.device().machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
 	UINT8 header[16] = {0};
-	int size = image_length(image);
+	int size = image.length();
 
-	if (size > messram_get_size(devtag_get_device(image->machine, "messram")))
+	if (size > messram_get_size(devtag_get_device(image.device().machine, "messram")))
 	{
 		return INIT_FAIL;
 	}
 
-	image_fread(image, header, 5);
+	image.fread( header, 5);
 
 	if (header[1] != 'C' || header[2] != 'O' || header[3] != 'M' || header[4] != 'X' )
 	{
@@ -83,7 +84,7 @@ QUICKLOAD_LOAD( comx35_comx )
 		{
 			UINT16 start_address, end_address, run_address;
 
-			image_fread(image, header, 6);
+			image.fread( header, 6);
 
 			start_address = pick_integer_be(header, 0, 2);
 			end_address = pick_integer_be(header, 2, 2);
@@ -169,7 +170,7 @@ QUICKLOAD_LOAD( comx35_comx )
 		{
 			UINT16 start_array, end_array, start_string, array_length;
 
-			image_fread(image, header, 2);
+			image.fread( header, 2);
 
 			array_length = pick_integer_be(header, 0, 2);
 			start_array = (memory_read_byte(program, 0x4295) << 8) | memory_read_byte(program, 0x4296);

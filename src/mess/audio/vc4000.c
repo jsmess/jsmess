@@ -23,8 +23,8 @@ struct _vc4000_sound
 static vc4000_sound *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(sound_get_type(device) == SOUND_VC4000);
-	return (vc4000_sound *) device->token;
+	assert(device->type() == SOUND_VC4000);
+	return (vc4000_sound *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -100,3 +100,5 @@ DEVICE_GET_INFO( vc4000_sound )
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(VC4000, vc4000_sound);

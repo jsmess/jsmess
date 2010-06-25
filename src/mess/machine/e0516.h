@@ -7,7 +7,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define E0516 DEVICE_GET_INFO_NAME(e0516)
+DECLARE_LEGACY_DEVICE(E0516 , e0516);
 
 #define MDRV_E0516_ADD(_tag, _clock) \
 	MDRV_DEVICE_ADD(_tag, E0516, _clock)
@@ -15,10 +15,6 @@
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( e0516 );
-
 /* serial data input/output */
 READ_LINE_DEVICE_HANDLER( e0516_dio_r );
 WRITE_LINE_DEVICE_HANDLER( e0516_dio_w );

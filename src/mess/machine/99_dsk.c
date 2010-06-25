@@ -1183,9 +1183,9 @@ void ti99_hfdc_reset(running_machine *machine)
     */
 	for (i = 0; i < 4; i++)
 	{
-		if (device->owner != NULL)
+		if (device->owner() != NULL)
 		{
-			floppy_unit[i] = device->owner->subdevice(flopname[i]);
+			floppy_unit[i] = device->owner()->subdevice(flopname[i]);
 			if (floppy_unit[i]==NULL)
 			{
 				floppy_unit[i] = devtag_get_device(device->machine, flopname[i]);

@@ -86,16 +86,15 @@ struct _c1551_t
 INLINE c1551_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == C1551);
-	return (c1551_t *)device->token;
+	assert(device->type() == C1551);
+	return (c1551_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE c1551_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == C1551);
-	return (c1551_config *)device->baseconfig().inline_config;
+	assert(device->type() == C1551);
+	return (c1551_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 /***************************************************************************
@@ -108,7 +107,7 @@ INLINE c1551_config *get_safe_config(running_device *device)
 
 static TIMER_DEVICE_CALLBACK( irq_tick )
 {
-	c1551_t *c1551 = get_safe_token(timer->owner);
+	c1551_t *c1551 = get_safe_token(timer.owner());
 
 	cpu_set_input_line(c1551->cpu, M6502_IRQ_LINE, ASSERT_LINE);
 	cpu_set_input_line(c1551->cpu, M6502_IRQ_LINE, CLEAR_LINE);
@@ -188,9 +187,9 @@ static void read_current_track(c1551_t *c1551)
     on_disk_change - disk change handler
 -------------------------------------------------*/
 
-static void on_disk_change(running_device *image)
+static void on_disk_change(device_image_interface &image)
 {
-	c1551_t *c1551 = get_safe_token(image->owner);
+	c1551_t *c1551 = get_safe_token(image.device().owner());
 
 	read_current_track(c1551);
 }
@@ -268,7 +267,7 @@ static UINT8 c1551_port_r( running_device *device, UINT8 direction )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 	UINT8 data = 0;
 
 	/* write protect sense */
@@ -301,7 +300,7 @@ static void c1551_port_w( running_device *device, UINT8 direction, UINT8 data )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	/* spindle motor */
 	int mtr = BIT(data, 2);
@@ -362,7 +361,7 @@ static READ8_DEVICE_HANDLER( tpi0_pa_r )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	return c1551->tcbm_data;
 }
@@ -384,7 +383,7 @@ static WRITE8_DEVICE_HANDLER( tpi0_pa_w )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	c1551->tcbm_data = data;
 }
@@ -406,7 +405,7 @@ static READ8_DEVICE_HANDLER( tpi0_pb_r )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	c1551->byte = 0;
 
@@ -430,7 +429,7 @@ static WRITE8_DEVICE_HANDLER( tpi0_pb_w )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	c1551->yb = data;
 }
@@ -452,7 +451,7 @@ static READ8_DEVICE_HANDLER( tpi0_pc_r )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 	UINT8 data = 0;
 
 	/* JP1 */
@@ -484,7 +483,7 @@ static WRITE8_DEVICE_HANDLER( tpi0_pc_w )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	/* TCBM status */
 	c1551->status = data & 0x03;
@@ -532,7 +531,7 @@ static READ8_DEVICE_HANDLER( tpi1_pa_r )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	return c1551->tcbm_data;
 }
@@ -554,7 +553,7 @@ static WRITE8_DEVICE_HANDLER( tpi1_pa_w )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	c1551->tcbm_data = data;
 }
@@ -576,7 +575,7 @@ static READ8_DEVICE_HANDLER( tpi1_pb_r )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	return c1551->status;
 }
@@ -598,7 +597,7 @@ static READ8_DEVICE_HANDLER( tpi1_pc_r )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
@@ -625,7 +624,7 @@ static WRITE8_DEVICE_HANDLER( tpi1_pc_w )
 
     */
 
-	c1551_t *c1551 = get_safe_token(device->owner);
+	c1551_t *c1551 = get_safe_token(device->owner());
 
 	/* TCBM data valid */
 	c1551->dav = BIT(data, 6);
@@ -773,7 +772,6 @@ DEVICE_GET_INFO( c1551 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1551_t);									break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1551_config);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1551);							break;
@@ -792,3 +790,5 @@ DEVICE_GET_INFO( c1551 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(C1551, c1551);

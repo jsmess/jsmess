@@ -919,9 +919,7 @@ static const char* TrimManufacturer(const char *s)
 	return strTemp2;
 }
 
-
-
-static void CreateDeviceFolders(int parent_index, device_class dev_class, int icon_id)
+void CreateCPUFolders(int parent_index)
 {
 	int i, j, device_folder_count = 0;
 	LPTREEFOLDER device_folders[512];
@@ -943,7 +941,7 @@ static void CreateDeviceFolders(int parent_index, device_class dev_class, int ic
 		}
 
 		// enumerate through all devices
-		for (device = config->devicelist.first(dev_class); device != NULL;
+		for (device = config->devicelist.first(CPU); device != NULL;
 			device = device->typenext())
 		{
 			// get the name
@@ -965,13 +963,13 @@ static void CreateDeviceFolders(int parent_index, device_class dev_class, int ic
 			{
 				LPTREEFOLDER lpTemp;
 
-				lpTemp = NewFolder(device->name(), next_folder_id, parent_index, icon_id,
+				lpTemp = NewFolder(device->name(), next_folder_id, parent_index, IDI_CPU,
  								   GetFolderFlags(numFolders));
 				ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
 				memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
 
 				ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
-				ExtraFolderData[next_folder_id]->m_nIconId = icon_id;
+				ExtraFolderData[next_folder_id]->m_nIconId = IDI_CPU;
 				ExtraFolderData[next_folder_id]->m_nParent = treeFolders[parent_index]->m_nFolderId;
 				ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
 				strcpy( ExtraFolderData[next_folder_id]->m_szTitle, device->name() );
@@ -990,19 +988,79 @@ static void CreateDeviceFolders(int parent_index, device_class dev_class, int ic
 
 	// free the config that we're still holding on to
 	if (config != NULL)
-		machine_config_free(config);
-}
-
-
-
-void CreateCPUFolders(int parent_index)
-{
-	CreateDeviceFolders(parent_index, DEVICE_CLASS_CPU_CHIP, IDI_CPU);
+		machine_config_free(config);	
 }
 
 void CreateSoundFolders(int parent_index)
 {
-	CreateDeviceFolders(parent_index, DEVICE_CLASS_SOUND_CHIP, IDI_SOUND);
+	int i, j, device_folder_count = 0;
+	LPTREEFOLDER device_folders[512];
+	LPTREEFOLDER folder;
+	machine_config *config = NULL;
+	const machine_config_token *last_tokens = NULL;
+	const device_config_sound_interface *device;
+	int nFolder = numFolders;
+
+	for (i = 0; drivers[i] != NULL; i++)
+	{
+		// instantiate this device config (if it is different than the previous)
+		if (last_tokens != drivers[i]->machine_config)
+		{
+			if (config != NULL)
+				machine_config_free(config);
+			config = machine_config_alloc(drivers[i]->machine_config);
+			last_tokens = drivers[i]->machine_config;
+		}
+
+		// enumerate through all devices
+		
+		for (bool gotone = config->devicelist.first(device); gotone; gotone = device->next(device))
+		{
+			// get the name
+			const char *dev_name = device->devconfig().name();
+
+			// do we have a folder for this device?
+			folder = NULL;
+			for (j = 0; j < device_folder_count; j++)
+			{
+				if (!strcmp(dev_name, device_folders[j]->m_lpTitle))
+				{
+					folder = device_folders[j];
+					break;
+				}
+			}
+
+			// are we forced to create a folder?
+			if (folder == NULL)
+			{
+				LPTREEFOLDER lpTemp;
+
+				lpTemp = NewFolder(device->devconfig().name(), next_folder_id, parent_index, IDI_SOUND,
+ 								   GetFolderFlags(numFolders));
+				ExtraFolderData[next_folder_id] = (EXFOLDERDATA*)malloc(sizeof(EXFOLDERDATA));
+				memset(ExtraFolderData[next_folder_id], 0, sizeof(EXFOLDERDATA));
+
+				ExtraFolderData[next_folder_id]->m_nFolderId = next_folder_id;
+				ExtraFolderData[next_folder_id]->m_nIconId = IDI_SOUND;
+				ExtraFolderData[next_folder_id]->m_nParent = treeFolders[parent_index]->m_nFolderId;
+				ExtraFolderData[next_folder_id]->m_nSubIconId = -1;
+				strcpy( ExtraFolderData[next_folder_id]->m_szTitle, device->devconfig().name() );
+				ExtraFolderData[next_folder_id++]->m_dwFlags = 0;
+				AddFolder(lpTemp);
+				folder = treeFolders[nFolder++];
+
+				// record that we found this folder
+				device_folders[device_folder_count++] = folder;
+			}
+
+			// cpu type #'s are one-based
+			AddGame(folder, i);
+		}
+	}
+
+	// free the config that we're still holding on to
+	if (config != NULL)
+		machine_config_free(config);	
 }
 
 void CreateDeficiencyFolders(int parent_index)
@@ -1927,7 +1985,7 @@ static int InitExtraFolders(void)
 	int             i, count = 0;
 	long            hLong;
 	char*           ext;
-	char            buf[MAX_PATH];
+	char            buf[256];
 	char            curdir[MAX_PATH];
 	const char*     dir = GetFolderDir();
 
@@ -1970,7 +2028,7 @@ static int InitExtraFolders(void)
 				int icon[2] = { 0, 0 };
 				char *p, *name;
 
-				while (fgets(buf, MAX_PATH, fp))
+				while (fgets(buf, 256, fp))
 				{
 					if (buf[0] == '[')
 					{
@@ -1982,7 +2040,7 @@ static int InitExtraFolders(void)
 						name = &buf[1];
 						if (!strcmp(name, "FOLDER_SETTINGS"))
 						{
-							while (fgets(buf, MAX_PATH, fp))
+							while (fgets(buf, 256, fp))
 							{
 								name = strtok(buf, " =\r\n");
 								if (name == NULL)

@@ -60,10 +60,7 @@ typedef struct
 
 extern SVISION_CHANNEL svision_channel[2];
 
-#define SOUND_SVISION	DEVICE_GET_INFO_NAME( svision_sound )
-
-DEVICE_GET_INFO( svision_sound );
-
+DECLARE_LEGACY_SOUND_DEVICE(SVISION, svision_sound);
 void svision_soundport_w (running_machine *machine, SVISION_CHANNEL *channel, int offset, int data);
 WRITE8_HANDLER( svision_sounddma_w );
 WRITE8_HANDLER( svision_noise_w );

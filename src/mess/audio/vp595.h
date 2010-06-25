@@ -18,7 +18,7 @@
 
 #define VP595_TAG	"vp595"
 
-#define VP595 DEVICE_GET_INFO_NAME(vp595)
+DECLARE_LEGACY_DEVICE(VP595, vp595);
 
 #define MDRV_VP595_ADD \
 	MDRV_DEVICE_ADD(VP595_TAG, VP595, 0)
@@ -26,10 +26,6 @@
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( vp595 );
-
 /* Q line */
 WRITE_LINE_DEVICE_HANDLER( vp595_q_w ) ATTR_NONNULL(1);
 

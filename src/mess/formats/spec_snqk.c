@@ -86,7 +86,7 @@ SNAPSHOT_LOAD(spectrum)
     if (!snapshot_data)
         goto error;
 
-    image_fread(image, snapshot_data, snapshot_size);
+    image.fread(snapshot_data, snapshot_size);
 
     if (!mame_stricmp(file_type, "sna"))
     {
@@ -95,7 +95,7 @@ SNAPSHOT_LOAD(spectrum)
             logerror("Invalid .SNA file size.\n");
             goto error;
         }
-        spectrum_setup_sna(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_sna(image.device().machine, snapshot_data, snapshot_size);
     }
     else if (!mame_stricmp(file_type, "sp"))
     {
@@ -107,7 +107,7 @@ SNAPSHOT_LOAD(spectrum)
                 goto error;
             }
         }
-        spectrum_setup_sp(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_sp(image.device().machine, snapshot_data, snapshot_size);
     }
     else if (!mame_stricmp(file_type, "ach"))
     {
@@ -116,7 +116,7 @@ SNAPSHOT_LOAD(spectrum)
             logerror("Invalid .ACH file size.\n");
             goto error;
         }
-        spectrum_setup_ach(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_ach(image.device().machine, snapshot_data, snapshot_size);
     }
     else if (!mame_stricmp(file_type, "prg"))
     {
@@ -125,7 +125,7 @@ SNAPSHOT_LOAD(spectrum)
             logerror("Invalid .PRG file size.\n");
             goto error;
         }
-        spectrum_setup_prg(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_prg(image.device().machine, snapshot_data, snapshot_size);
     }
     else if (!mame_stricmp(file_type, "plusd"))
     {
@@ -134,7 +134,7 @@ SNAPSHOT_LOAD(spectrum)
             logerror("Invalid .PLUSD file size.\n");
             goto error;
         }
-        spectrum_setup_plusd(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_plusd(image.device().machine, snapshot_data, snapshot_size);
     }
     else if (!mame_stricmp(file_type, "sem"))
     {
@@ -148,7 +148,7 @@ SNAPSHOT_LOAD(spectrum)
                 goto error;
             }
         }
-        spectrum_setup_sem(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_sem(image.device().machine, snapshot_data, snapshot_size);
     }
     else if (!mame_stricmp(file_type, "sit"))
     {
@@ -157,7 +157,7 @@ SNAPSHOT_LOAD(spectrum)
             logerror("Invalid .SIT file size.\n");
             goto error;
         }
-        spectrum_setup_sit(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_sit(image.device().machine, snapshot_data, snapshot_size);
     }
     else if (!mame_stricmp(file_type, "zx"))
     {
@@ -166,7 +166,7 @@ SNAPSHOT_LOAD(spectrum)
             logerror("Invalid .ZX file size.\n");
             goto error;
         }
-        spectrum_setup_zx(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_zx(image.device().machine, snapshot_data, snapshot_size);
     }
     else if (!mame_stricmp(file_type, "snp"))
     {
@@ -175,7 +175,7 @@ SNAPSHOT_LOAD(spectrum)
             logerror("Invalid .SNP file size.\n");
             goto error;
         }
-        spectrum_setup_snp(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_snp(image.device().machine, snapshot_data, snapshot_size);
     }
     else if (!mame_stricmp(file_type, "snx"))
     {
@@ -185,7 +185,7 @@ SNAPSHOT_LOAD(spectrum)
           logerror("Invalid .SNX file size.\n");
           goto error;
         }
-        spectrum_setup_snx(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_snx(image.device().machine, snapshot_data, snapshot_size);
     }
     else if (!mame_stricmp(file_type, "frz"))
     {
@@ -194,11 +194,11 @@ SNAPSHOT_LOAD(spectrum)
             logerror("Invalid .FRZ file size.\n");
             goto error;
         }
-        spectrum_setup_frz(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_frz(image.device().machine, snapshot_data, snapshot_size);
     }
     else
     {
-        spectrum_setup_z80(image->machine, snapshot_data, snapshot_size);
+        spectrum_setup_z80(image.device().machine, snapshot_data, snapshot_size);
     }
 
     free(snapshot_data);
@@ -356,7 +356,7 @@ void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
         break;
       case 2: // case 0: in version 0.99e of the emulator
       case 3: // case 1: in version 0.99e of the emulator
-        LOAD_REG(cpu, Z80_IM, 0);
+        LOAD_REG(cpu, Z80_IM, (UINT64)0);
     }
 
     data = BIT(status, 0);
@@ -388,7 +388,7 @@ void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
 
     spectrum_page_basicrom(machine);
 
-    logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+    //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
 }
 
 /*******************************************************************
@@ -599,7 +599,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         border_force_redraw();
         logerror("Border color:%02X\n", data);
 
-        logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+        //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
     }
     else
     {
@@ -650,7 +650,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         state->port_7ffd_data = snapdata[SNA128_OFFSET + 2];
         spectrum_update_paging(machine);
 
-        logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", data, cpu_get_reg_string(cpu, Z80_PC));
+        //logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", data, cpu_get_reg_string(cpu, Z80_PC));
     }
 }
 
@@ -783,7 +783,7 @@ void spectrum_setup_ach(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
     spectrum_page_basicrom(machine);
 
-    logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+    //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
 }
 
 /*******************************************************************
@@ -932,7 +932,7 @@ void spectrum_setup_prg(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
     spectrum_page_basicrom(machine);
 
-    logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+    //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
 }
 
 /*******************************************************************
@@ -1134,10 +1134,10 @@ void spectrum_setup_plusd(running_machine *machine, UINT8 *snapdata, UINT32 snap
     border_force_redraw();
     logerror("Border color:%02X\n", data);
 
-    if (snapsize == PLUSD48_SIZE)
-        logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
-    else
-        logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", state->port_7ffd_data & 0x07, cpu_get_reg_string(cpu, Z80_PC));
+    //if (snapsize == PLUSD48_SIZE)
+        //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+    //else
+        //logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", state->port_7ffd_data & 0x07, cpu_get_reg_string(cpu, Z80_PC));
 }
 
 /*******************************************************************
@@ -1258,7 +1258,7 @@ void spectrum_setup_sem(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
     spectrum_page_basicrom(machine);
 
-    logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+    //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
 
 /* TODO: Decode the optional POKE bank at the end of the image */
 
@@ -1379,7 +1379,7 @@ void spectrum_setup_sit(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
     spectrum_page_basicrom(machine);
 
-    logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+    //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
 }
 
 /*******************************************************************
@@ -1490,7 +1490,7 @@ void spectrum_setup_zx(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
     switch (mode)
     {
       case 0xffff:
-        LOAD_REG(cpu, Z80_IM, 0);
+        LOAD_REG(cpu, Z80_IM, (UINT64)0);
         break;
       case 0x00:
         LOAD_REG(cpu, Z80_IM, 1);
@@ -1525,7 +1525,7 @@ void spectrum_setup_zx(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
 
     spectrum_page_basicrom(machine);
 
-    logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+    //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
 }
 
 /*******************************************************************
@@ -1645,7 +1645,7 @@ void spectrum_setup_snp(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
     spectrum_page_basicrom(machine);
 
-    logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+    //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
 }
 
 /*******************************************************************
@@ -1901,7 +1901,7 @@ void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
 /* TODO: Enable selection of Issue 2/3 config switch as per snapdata[SNX_OFFSET + 37] */
 
-    logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
+    //logerror("Snapshot loaded.\nExecution resuming at %s\n", cpu_get_reg_string(cpu, Z80_PC));
 }
 
 /*******************************************************************
@@ -2061,7 +2061,7 @@ void spectrum_setup_frz(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     border_force_redraw();
     logerror("Border color:%02X\n", data);
 
-    logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", state->port_7ffd_data & 0x07, cpu_get_reg_string(cpu, Z80_PC));
+    //logerror("Snapshot loaded.\nExecution resuming at bank:%d %s\n", state->port_7ffd_data & 0x07, cpu_get_reg_string(cpu, Z80_PC));
 }
 
 static void spectrum_z80_decompress_block(running_machine *machine,UINT8 *source, UINT16 dest, UINT16 size)
@@ -2279,7 +2279,7 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     /* Interrupt Flip/Flop */
     if (snapdata[27] == 0)
     {
-        cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, 0);
+        cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, (UINT64)0);
         /* cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IRQ_STATE, 0); */
     }
     else
@@ -2288,7 +2288,7 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
         /* cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IRQ_STATE, 1); */
     }
 
-    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, data);
+    cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 //  cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, data);
     cputag_set_input_line(machine, "maincpu", INPUT_LINE_HALT, CLEAR_LINE);
 
@@ -2444,7 +2444,7 @@ QUICKLOAD_LOAD(spectrum)
     if (!quickload_data)
         goto error;
 
-    image_fread(image, quickload_data, quickload_size);
+    image.fread(quickload_data, quickload_size);
 
     if (!mame_stricmp(file_type, "scr"))
     {
@@ -2453,7 +2453,7 @@ QUICKLOAD_LOAD(spectrum)
             logerror("Invalid .SCR file size.\n");
             goto error;
         }
-        spectrum_setup_scr(image->machine, quickload_data, quickload_size);
+        spectrum_setup_scr(image.device().machine, quickload_data, quickload_size);
     }
     else if (!mame_stricmp(file_type, "raw"))
     {
@@ -2462,7 +2462,7 @@ QUICKLOAD_LOAD(spectrum)
             logerror("Invalid .RAW file size.\n");
             goto error;
         }
-        spectrum_setup_raw(image->machine, quickload_data, quickload_size);
+        spectrum_setup_raw(image.device().machine, quickload_data, quickload_size);
     }
 
     free(quickload_data);

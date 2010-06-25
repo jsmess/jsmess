@@ -50,7 +50,7 @@ typedef struct {
 	UINT16 pal_ind16[16];
 	UINT16 pal_ind256[256];
 	/* render screen */
-	running_device *screen;
+	screen_device *screen;
 	/* render bitmap */
 	bitmap_t *bitmap;
 	/* Command unit */
@@ -478,7 +478,7 @@ WRITE8_HANDLER (v9938_1_command_w)
 
 ***************************************************************************/
 
-void v9938_init (running_machine *machine, int which, running_device *screen, bitmap_t *bitmap, int model, int vram_size, void (*callback)(running_machine *, int) )
+void v9938_init (running_machine *machine, int which, screen_device &screen, bitmap_t *bitmap, int model, int vram_size, void (*callback)(running_machine *, int) )
 {
 	vdp = &vdps[which];
 
@@ -487,7 +487,7 @@ void v9938_init (running_machine *machine, int which, running_device *screen, bi
 	vdp->VdpOpsCnt = 1;
 	vdp->VdpEngine = NULL;
 
-	vdp->screen = screen;
+	vdp->screen = &screen;
 	vdp->bitmap = bitmap;
 	vdp->model = model;
 	vdp->vram_size = vram_size;
@@ -576,19 +576,6 @@ void v9938_reset (int which)
 	vdp->INT = 0;
 	vdp->read_ahead = 0; vdp->address_latch = 0; /* ??? */
 	vdp->scanline = 0;
-
-	// MZ: The status registers 4 and 6 hold the high bits of the sprite
-	// collision location. The unused bits are set to 1.
-	// SR3: x x x x x x x x
-	// SR4: 1 1 1 1 1 1 1 x
-	// SR5: y y y y y y y y 
-	// SR6: 1 1 1 1 1 1 y y	
-	// Note that status register 4 is used in detection algorithms to tell 
-	// apart the tms9929 from the v99x8.
-	
-	// TODO: SR3-S6 do not yet store the information about the sprite collision 
-	vdp->statReg[4] = 0xfe;
-	vdp->statReg[6] = 0xfc;
 }
 
 static void v9938_check_int (running_machine *machine)
@@ -1460,9 +1447,9 @@ static void v9938_interrupt_start_vblank (running_machine *machine)
 	if (vdp->size != vdp->size_old)
 		{
 		if (vdp->size == RENDER_HIGH)
-			video_screen_set_visarea (vdp->screen, 0, 512 + 32 - 1, 0, 424 + 56 - 1);
+			vdp->screen->set_visible_area (0, 512 + 32 - 1, 0, 424 + 56 - 1);
 		else
-			video_screen_set_visarea (vdp->screen, 0, 256 + 16 - 1, 0, 212 + 28 - 1);
+			vdp->screen->set_visible_area (0, 256 + 16 - 1, 0, 212 + 28 - 1);
 
 		vdp->size_old = vdp->size;
 		}

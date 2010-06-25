@@ -527,7 +527,7 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 
 static READ16_HANDLER( m37710_internal_word_r )
 {
-	m37710i_cpu_struct *cpustate = (m37710i_cpu_struct *)space->cpu->token;
+	m37710i_cpu_struct *cpustate = get_safe_token(space->cpu);
 
 	if (mem_mask == 0xffff)
 	{
@@ -547,7 +547,7 @@ static READ16_HANDLER( m37710_internal_word_r )
 
 static WRITE16_HANDLER( m37710_internal_word_w )
 {
-	m37710i_cpu_struct *cpustate = (m37710i_cpu_struct *)space->cpu->token;
+	m37710i_cpu_struct *cpustate = get_safe_token(space->cpu);
 
 	if (mem_mask == 0xffff)
 	{
@@ -817,7 +817,8 @@ static CPU_EXECUTE( m37710 )
 
 	m37710i_update_irqs(m37710);
 
-	return m37710->execute(m37710, cycles);
+	int clocks = m37710->ICount;
+	m37710->ICount = clocks - m37710->execute(m37710, m37710->ICount);
 }
 
 
@@ -860,7 +861,7 @@ static void m37710_set_irq_line(m37710i_cpu_struct *cpustate, int line, int stat
 
 /* Set the callback that is called when servicing an interrupt */
 #ifdef UNUSED_FUNCTION
-void m37710_set_irq_callback(cpu_irq_callback callback)
+void m37710_set_irq_callback(device_irq_callback callback)
 {
 	INT_ACK = callback;
 }
@@ -1014,7 +1015,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( m37710 )
 {
-	m37710i_cpu_struct *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m37710i_cpu_struct *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

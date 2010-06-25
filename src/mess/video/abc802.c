@@ -239,7 +239,7 @@ static VIDEO_UPDATE( abc802 )
 	abc802_state *state = (abc802_state *) screen->machine->driver_data;
 
 	/* expand visible area to workaround MC6845 */
-	video_screen_set_visarea(screen, 0, 767, 0, 311);
+	screen->set_visible_area(0, 767, 0, 311);
 
 	/* draw text */
 	mc6845_update(state->mc6845, bitmap, cliprect);

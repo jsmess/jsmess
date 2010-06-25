@@ -448,7 +448,7 @@ static MACHINE_START( c16 )
 {
 	c16_state *state = (c16_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
+	state->maincpu = machine->device<legacy_cpu_device>("maincpu");
 	state->ted7360 = devtag_get_device(machine, "ted7360");
 	state->serbus = devtag_get_device(machine, "iec");
 	state->cassette = devtag_get_device(machine, "cassette");

@@ -1075,10 +1075,9 @@ static const m6847_variant variants[] =
 INLINE mc6847_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == MC6847);
+	assert(device->type() == MC6847);
 
-	return (mc6847_state *)device->token;
+	return (mc6847_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -1766,8 +1765,8 @@ static STATE_POSTLOAD( mc6847_postload )
 static DEVICE_START( mc6847 )
 {
 	mc6847_state *mc6847 = get_safe_token(device);
-	const mc6847_interface *intf = (mc6847_interface *)device->baseconfig().static_config;
-	const mc6847_config *cfg = (mc6847_config *)device->baseconfig().inline_config;
+	const mc6847_interface *intf = (mc6847_interface *)device->baseconfig().static_config();
+	const mc6847_config *cfg = (mc6847_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 
 	const m6847_variant *v;
 	UINT32 frequency;
@@ -1775,8 +1774,8 @@ static DEVICE_START( mc6847 )
 	double total_scanlines;
 
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config != NULL);
-	assert(device->baseconfig().inline_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
 
 	/* identify proper M6847 variant */
 	assert(cfg->type < ARRAY_LENGTH(variants));
@@ -1914,7 +1913,6 @@ DEVICE_GET_INFO( mc6847 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(mc6847_state);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = sizeof(mc6847_config);				break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(mc6847);		break;
@@ -2195,3 +2193,4 @@ UINT32 mc6847_update(running_device *device, bitmap_t *bitmap, const rectangle *
 	return rc;
 }
 
+DEFINE_LEGACY_DEVICE(MC6847, mc6847);

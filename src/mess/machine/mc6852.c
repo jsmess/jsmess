@@ -114,16 +114,15 @@ struct _mc6852_t
 INLINE mc6852_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == MC6852);
-	return (mc6852_t *)device->token;
+	assert(device->type() == MC6852);
+	return (mc6852_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const mc6852_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == MC6852);
-	return (const mc6852_interface *) device->baseconfig().static_config;
+	assert(device->type() == MC6852);
+	return (const mc6852_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -334,7 +333,7 @@ READ_LINE_DEVICE_HANDLER( mc6852_tuf_r )
 
 static DEVICE_START( mc6852 )
 {
-	mc6852_t *mc6852 = (mc6852_t *)device->token;
+	mc6852_t *mc6852 = (mc6852_t *)downcast<legacy_device_base *>(device)->token();
 	const mc6852_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
@@ -357,7 +356,7 @@ static DEVICE_START( mc6852 )
 
 static DEVICE_RESET( mc6852 )
 {
-	mc6852_t *mc6852 = (mc6852_t *)device->token;
+	mc6852_t *mc6852 = (mc6852_t *)downcast<legacy_device_base *>(device)->token();
 
 	/* set receiver shift register to all 1's */
 	mc6852->rsr = 0xff;
@@ -377,7 +376,6 @@ DEVICE_GET_INFO( mc6852 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mc6852_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mc6852);	break;
@@ -392,3 +390,5 @@ DEVICE_GET_INFO( mc6852 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(MC6852, mc6852);

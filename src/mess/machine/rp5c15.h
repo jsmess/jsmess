@@ -13,9 +13,7 @@ struct rp5c15_interface
 	void (*alarm_irq_callback)(int state);
 };
 
-DEVICE_GET_INFO(rp5c15);
-
-#define RP5C15 DEVICE_GET_INFO_NAME(rp5c15)
+DECLARE_LEGACY_DEVICE(RP5C15, rp5c15);
 
 #define MDRV_RP5C15_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, RP5C15, 0) \

@@ -17,7 +17,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define A2CFFA		DEVICE_GET_INFO_NAME(a2cffa)
+DECLARE_LEGACY_DEVICE(A2CFFA, a2cffa);
 
 #define MDRV_A2CFFA_ADD(_tag)	\
 	MDRV_DEVICE_ADD((_tag), A2CFFA, 0)
@@ -26,10 +26,6 @@
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* device get info function */
-DEVICE_GET_INFO(a2cffa);	
-
 /* slot read function */
 READ8_DEVICE_HANDLER(a2cffa_r);
 

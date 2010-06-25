@@ -33,9 +33,8 @@ struct _adc080x_t
 INLINE adc080x_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (adc080x_t *)device->token;
+	return (adc080x_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /* Approximation Cycle */
@@ -140,17 +139,17 @@ static DEVICE_START( adc080x )
 	assert(device != NULL);
 	assert(device->tag() != NULL);
 
-	adc080x->intf = (const adc080x_interface*)device->baseconfig().static_config;
+	adc080x->intf = (const adc080x_interface*)device->baseconfig().static_config();
 
 	assert(adc080x->intf != NULL);
-	assert(device->clock > 0);
+	assert(device->clock() > 0);
 
 	/* set initial values */
 	adc080x->eoc = 1;
 
 	/* allocate cycle timer */
 	adc080x->cycle_timer = timer_alloc(device->machine, cycle_tick, (void *)device);
-	timer_adjust_periodic(adc080x->cycle_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock));
+	timer_adjust_periodic(adc080x->cycle_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock()));
 
 	/* register for state saving */
 	state_save_register_item(device->machine, "adc080x", device->tag(), 0, adc080x->address);
@@ -170,7 +169,6 @@ DEVICE_GET_INFO( adc0808 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(adc080x_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(adc080x);	break;
@@ -196,3 +194,6 @@ DEVICE_GET_INFO( adc0809 )
 		default:										DEVICE_GET_INFO_CALL(adc0808);				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(ADC0808, adc0808);
+DEFINE_LEGACY_DEVICE(ADC0809, adc0809);

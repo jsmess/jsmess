@@ -10,7 +10,7 @@
 #define CASSIMG_H
 
 #include "pool.h"
-#include "formats/ioprocs.h"
+#include "emu.h"
 
 /***************************************************************************
 

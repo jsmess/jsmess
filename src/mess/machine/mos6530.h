@@ -37,7 +37,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define MOS6530 DEVICE_GET_INFO_NAME( mos6530 )
+DECLARE_LEGACY_DEVICE(MOS6530, mos6530);
 
 #define MDRV_MOS6530_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD((_tag), MOS6530, _clock)	\
@@ -63,8 +63,6 @@ struct _mos6530_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( mos6530 );
 
 READ8_DEVICE_HANDLER( mos6530_r );
 WRITE8_DEVICE_HANDLER( mos6530_w );

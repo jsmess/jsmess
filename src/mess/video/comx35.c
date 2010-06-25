@@ -119,7 +119,7 @@ static VIDEO_START( comx35 )
 
 static VIDEO_UPDATE( comx35 )
 {
-	running_device *screen_40 = devtag_get_device(screen->machine, SCREEN_TAG);
+	screen_device *screen_40 = downcast<screen_device *>(devtag_get_device(screen->machine, SCREEN_TAG));
 
 	if (screen == screen_40)
 	{

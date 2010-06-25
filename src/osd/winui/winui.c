@@ -937,10 +937,8 @@ static DWORD RunMAME(int nGameIndex, const play_options *playopts)
 	// Tell mame were to get the INIs
 	options_set_string(mame_opts, OPTION_INIPATH, GetIniDir(), OPTION_PRIORITY_CMDLINE);
 
-#ifdef MESS
-	// add MESS specific device options
-	mess_add_device_options(mame_opts, drivers[nGameIndex]);
-#endif // MESS
+	// add image specific device options
+	image_add_device_options(mame_opts, drivers[nGameIndex]);
 
 	// set any specified play options
 	if (playopts != NULL)

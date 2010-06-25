@@ -14,7 +14,7 @@ typedef struct k1ge k1ge_t;
 struct k1ge
 {
 	const k1ge_interface *intf;
-	running_device *screen;
+	screen_device *screen;
 	devcb_resolved_write8 vblank_pin_w;
 	devcb_resolved_write8 hblank_pin_w;
 	UINT8 *vram;
@@ -61,10 +61,9 @@ PALETTE_INIT( k2ge )
 INLINE k1ge_t *get_safe_token( running_device *device )
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == K1GE || device->type == K2GE );
+	assert( device->type() == K1GE || device->type() == K2GE );
 
-	return ( k1ge_t *) device->token;
+	return ( k1ge_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -76,10 +75,10 @@ READ8_DEVICE_HANDLER( k1ge_r )
 	switch( offset )
 	{
 	case 0x008:		/* RAS.H */
-		data = video_screen_get_hpos( k1ge->screen ) >> 2;
+		data = k1ge->screen->hpos() >> 2;
 		break;
 	case 0x009:		/* RAS.V */
-		data = video_screen_get_vpos( k1ge->screen );
+		data = k1ge->screen->vpos();
 		break;
 	}
 	return data;
@@ -769,7 +768,7 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 {
 	running_device *device = (running_device *)ptr;
 	k1ge_t *k1ge = get_safe_token( device );
-	int y = video_screen_get_vpos( k1ge->screen );
+	int y = k1ge->screen->vpos();
 
 	/* Check for start of VBlank */
 	if ( y >= 152 )
@@ -798,7 +797,7 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 		{
 			if ( k1ge->vram[0x000] & 0x40 )
 				devcb_call_write8( &k1ge->hblank_pin_w, 0, 1 );
-			timer_adjust_oneshot( k1ge->hblank_on_timer, video_screen_get_time_until_pos( k1ge->screen, y, 480 ), 0 );
+			timer_adjust_oneshot( k1ge->hblank_on_timer, k1ge->screen->time_until_pos(y, 480 ), 0 );
 		}
 	}
 
@@ -808,7 +807,7 @@ static TIMER_CALLBACK( k1ge_timer_callback )
 		k1ge->draw( device, y - 1 );
 	}
 
-	timer_adjust_oneshot( k1ge->timer, video_screen_get_time_until_pos( k1ge->screen, ( y + 1 ) % K1GE_SCREEN_HEIGHT, 0 ), 0 );
+	timer_adjust_oneshot( k1ge->timer, k1ge->screen->time_until_pos(( y + 1 ) % K1GE_SCREEN_HEIGHT, 0 ), 0 );
 }
 
 
@@ -824,16 +823,16 @@ static DEVICE_START( k1ge )
 {
 	k1ge_t *k1ge = get_safe_token( device );
 
-	k1ge->intf = (const k1ge_interface*)device->baseconfig().static_config;
+	k1ge->intf = (const k1ge_interface*)device->baseconfig().static_config();
 
 	devcb_resolve_write8( &k1ge->vblank_pin_w, &k1ge->intf->vblank_pin_w, device );
 	devcb_resolve_write8( &k1ge->hblank_pin_w, &k1ge->intf->hblank_pin_w, device );
 
 	k1ge->timer = timer_alloc( device->machine, k1ge_timer_callback, (void *) device );
 	k1ge->hblank_on_timer = timer_alloc( device->machine, k1ge_hblank_on_timer_callback, (void *) device );
-	k1ge->screen = devtag_get_device( device->machine, k1ge->intf->screen_tag );
+	k1ge->screen = device->machine->device<screen_device>(k1ge->intf->screen_tag);
 	k1ge->vram = memory_region( device->machine, k1ge->intf->vram_tag );
-	k1ge->bitmap = auto_bitmap_alloc( device->machine, video_screen_get_width(k1ge->screen), video_screen_get_height(k1ge->screen), video_screen_get_format(k1ge->screen) );
+	k1ge->bitmap = auto_bitmap_alloc( device->machine, k1ge->screen->width(), k1ge->screen->height(), k1ge->screen->format() );
 	k1ge->draw = k1ge_draw;
 }
 
@@ -889,7 +888,7 @@ static DEVICE_RESET( k1ge )
 	k1ge->vram[0x7e0] = 0x52;	/* RESET */
 	k1ge->vram[0x7e2] = 0x00;	/* MODE */
 
-	timer_adjust_oneshot( k1ge->timer, video_screen_get_time_until_pos( k1ge->screen, ( video_screen_get_vpos( k1ge->screen ) + 1 ) % K1GE_SCREEN_HEIGHT, 0 ), 0 );
+	timer_adjust_oneshot( k1ge->timer, k1ge->screen->time_until_pos(( k1ge->screen->vpos() + 1 ) % K1GE_SCREEN_HEIGHT, 0 ), 0 );
 }
 
 
@@ -900,7 +899,6 @@ DEVICE_GET_INFO( k1ge )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof( k1ge_t ); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0; break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( k1ge ); break;
@@ -926,4 +924,5 @@ DEVICE_GET_INFO( k2ge )
 	}
 }
 
-
+DEFINE_LEGACY_DEVICE(K1GE, k1ge);
+DEFINE_LEGACY_DEVICE(K2GE, k2ge);

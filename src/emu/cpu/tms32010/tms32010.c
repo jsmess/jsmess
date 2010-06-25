@@ -91,7 +91,7 @@ struct _tms32010_state
 	UINT16	memaccess;
 	int		addr_mask;
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const	address_space *program;
 	const	address_space *data;
 	const	address_space *io;
@@ -100,10 +100,9 @@ struct _tms32010_state
 INLINE tms32010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS32010);
-	return (tms32010_state *)device->token;
+	return (tms32010_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* opcode table entry */
@@ -856,7 +855,6 @@ static int Ext_IRQ(tms32010_state *cpustate)
 static CPU_EXECUTE( tms32010 )
 {
 	tms32010_state *cpustate = get_safe_token(device);
-	cpustate->icount = cycles;
 
 	do
 	{
@@ -882,8 +880,6 @@ static CPU_EXECUTE( tms32010 )
 			(*opcode_7F[(cpustate->opcode.b.l & 0x1f)].function)(cpustate);
 		}
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -944,7 +940,7 @@ static CPU_SET_INFO( tms32010 )
 
 CPU_GET_INFO( tms32010 )
 {
-	tms32010_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms32010_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

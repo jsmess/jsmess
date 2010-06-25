@@ -14,7 +14,7 @@
     MACROS
 ***************************************************************************/
 
-#define ER59256		DEVICE_GET_INFO_NAME(er59256)
+DECLARE_LEGACY_DEVICE(ER59256, er59256);
 
 #define MDRV_ER59256_ADD(_tag)	\
 	MDRV_DEVICE_ADD((_tag), ER59256, 0)
@@ -90,6 +90,4 @@ void er59256_set_iobits(running_device *device, UINT8 newbits);
 UINT8 er59256_get_iobits(running_device *device);
 void preload_rom(running_device *device, UINT16 *rom_data, int count);
 UINT8 data_loaded(running_device *device);
-DEVICE_GET_INFO( er59256 );
-
 #endif

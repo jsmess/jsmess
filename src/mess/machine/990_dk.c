@@ -41,7 +41,7 @@ static struct
 
 	struct
 	{
-		running_device *img;
+		device_image_interface *img;
 		int phys_cylinder;
 		int log_cylinder[2];
 		int seclen;
@@ -95,9 +95,9 @@ static void fd800_field_interrupt(void)
 		(*fd800.interrupt_callback)(fd800.machine, (fd800.stat_reg & status_interrupt) && ! fd800.interrupt_f_f);
 }
 
-static void fd800_unload_proc(running_device *image)
+static void fd800_unload_proc(device_image_interface &image)
 {
-	int unit = floppy_get_drive(image);
+	int unit = floppy_get_drive(&image.device());
 
 	fd800.drv[unit].log_cylinder[0] = fd800.drv[unit].log_cylinder[1] = -1;
 }
@@ -117,11 +117,11 @@ void fd800_machine_init(running_machine *machine, void (*interrupt_callback)(run
 
 	for (i=0; i<MAX_FLOPPIES; i++)
 	{
-		fd800.drv[i].img = floppy_get_device(machine, i);
+		fd800.drv[i].img = (device_image_interface*)floppy_get_device(machine, i);
 		fd800.drv[i].phys_cylinder = -1;
 		fd800.drv[i].log_cylinder[0] = fd800.drv[i].log_cylinder[1] = -1;
 		fd800.drv[i].seclen = 64;
-		floppy_install_unload_proc(fd800.drv[i].img, fd800_unload_proc);
+		floppy_install_unload_proc(&fd800.drv[i].img->device(), fd800_unload_proc);
 	}
 
 	fd800_field_interrupt();
@@ -146,7 +146,7 @@ static int fd800_read_id(int unit, int head, int *cylinder_id, int *sector_id)
 
 	/*while (revolution_count < 2)*/
 	/*{*/
-		if (floppy_drive_get_next_id(fd800.drv[unit].img, head, &id))
+		if (floppy_drive_get_next_id(&fd800.drv[unit].img->device(), head, &id))
 		{
 			if (cylinder_id)
 				*cylinder_id = id.C;
@@ -178,7 +178,7 @@ static int fd800_find_sector(int unit, int head, int sector, int *data_id)
 
 	while (revolution_count < 2)
 	{
-		if (floppy_drive_get_next_id(fd800.drv[unit].img, head, &id))
+		if (floppy_drive_get_next_id(&fd800.drv[unit].img->device(), head, &id))
 		{
 			/* compare id */
 			if ((id.R == sector) && (id.N == 0))
@@ -213,7 +213,7 @@ static int fd800_do_seek(int unit, int cylinder, int head)
 		return TRUE;
 	}
 
-	if (!image_exists(fd800.drv[unit].img))
+	if (!fd800.drv[unit].img->exists())
 	{
 		fd800.stat_reg |= status_drv_not_ready;	/* right??? */
 		return TRUE;
@@ -235,7 +235,7 @@ static int fd800_do_seek(int unit, int cylinder, int head)
 	}
 	for (retries=0; retries<10; retries++)
 	{	/* seek to requested track */
-		floppy_drive_seek(fd800.drv[unit].img, cylinder-fd800.drv[unit].log_cylinder[head]);
+		floppy_drive_seek(&fd800.drv[unit].img->device(), cylinder-fd800.drv[unit].log_cylinder[head]);
 		/* update physical track position */
 		if (fd800.drv[unit].phys_cylinder != -1)
 			fd800.drv[unit].phys_cylinder += cylinder-fd800.drv[unit].log_cylinder[head];
@@ -270,16 +270,16 @@ static int fd800_do_restore(int unit)
 	int seek_count = 0;
 	int seek_complete;
 
-	if (!image_exists(fd800.drv[unit].img))
+	if (!fd800.drv[unit].img->exists())
 	{
 		fd800.stat_reg |= status_drv_not_ready;	/* right??? */
 		return TRUE;
 	}
 
 	/* limit iterations to 76 to prevent an endless loop if the disc is locked */
-	while (!(seek_complete = !floppy_tk00_r(fd800.drv[unit].img)) && (seek_count < 76))
+	while (!(seek_complete = !floppy_tk00_r(&fd800.drv[unit].img->device())) && (seek_count < 76))
 	{
-		floppy_drive_seek(fd800.drv[unit].img, -1);
+		floppy_drive_seek(&fd800.drv[unit].img->device(), -1);
 		seek_count++;
 	}
 	if (! seek_complete)
@@ -315,7 +315,7 @@ static void fd800_do_read(void)
 		return;
 	}
 
-	floppy_drive_read_sector_data(fd800.drv[fd800.unit].img, fd800.head, data_id, fd800.buf, 128);
+	floppy_drive_read_sector_data(&fd800.drv[fd800.unit].img->device(), fd800.head, data_id, fd800.buf, 128);
 	fd800.buf_pos = 0;
 	fd800.buf_mode = bm_read;
 	fd800.recv_buf = (fd800.buf[fd800.buf_pos<<1] << 8) | fd800.buf[(fd800.buf_pos<<1)+1];
@@ -341,7 +341,7 @@ static void fd800_do_write(void)
 		return;
 	}
 
-	floppy_drive_write_sector_data(fd800.drv[fd800.unit].img, fd800.head, data_id, fd800.buf, 128, fd800.ddam);
+	floppy_drive_write_sector_data(&fd800.drv[fd800.unit].img->device(), fd800.head, data_id, fd800.buf, 128, fd800.ddam);
 	fd800.buf_pos = 0;
 	fd800.buf_mode = bm_write;
 
@@ -389,9 +389,9 @@ static void fd800_do_cmd(void)
 		/* reset status */
 		fd800.stat_reg = unit << status_unit_shift;
 
-		if (!image_exists(fd800.drv[unit].img))
+		if (!fd800.drv[unit].img->exists())
 			fd800.stat_reg |= status_drv_not_ready;	/* right??? */
-		else if (!image_is_writable(fd800.drv[unit].img))
+		else if (!fd800.drv[unit].img->is_writable())
 			fd800.stat_reg |= status_write_prot;
 		else
 			fd800.stat_reg |= status_OP_complete;
@@ -623,7 +623,7 @@ static void fd800_do_cmd(void)
 		}
 		else if ((fd800.drv[unit].phys_cylinder != -1) || (!fd800_do_restore(unit)))
 		{
-			floppy_drive_seek(fd800.drv[unit].img, cylinder-fd800.drv[unit].phys_cylinder);
+			floppy_drive_seek(&fd800.drv[unit].img->device(), cylinder-fd800.drv[unit].phys_cylinder);
 			fd800.stat_reg |= status_OP_complete;
 		}
 

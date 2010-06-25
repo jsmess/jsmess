@@ -75,4 +75,4 @@ DEVICE_GET_INFO( specimx_sound )
 	}
 }
 
-
+DEFINE_LEGACY_SOUND_DEVICE(SPECIMX, specimx_sound);

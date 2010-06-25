@@ -14,9 +14,7 @@
     MACROS
 ***************************************************************************/
 
-#define SCC8530			DEVICE_GET_INFO_NAME(scc8530)
-
-
+DECLARE_LEGACY_DEVICE(SCC8530, scc8530);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -51,8 +49,6 @@ UINT8 scc8530_get_reg_a(running_device *device, int reg);
 UINT8 scc8530_get_reg_b(running_device *device, int reg);
 void scc8530_set_reg_a(running_device *device, int reg, UINT8 data);
 void scc8530_set_reg_b(running_device *device, int reg, UINT8 data);
-
-DEVICE_GET_INFO(scc8530);
 
 READ8_DEVICE_HANDLER(scc8530_r);
 WRITE8_DEVICE_HANDLER(scc8530_w);

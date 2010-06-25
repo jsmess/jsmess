@@ -74,7 +74,7 @@ static void pc8401a_keyboard_scan(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( pc8401a_keyboard_tick )
 {
-	pc8401a_keyboard_scan(timer->machine);
+	pc8401a_keyboard_scan(timer.machine);
 }
 
 /* Read/Write Handlers */

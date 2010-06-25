@@ -60,8 +60,8 @@ typedef struct
 	UINT8	cc; 			/* Condition codes */
 
 	UINT16	pending_interrupts; /* MB */
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
@@ -70,12 +70,11 @@ typedef struct
 INLINE m6805_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M6805 ||
 		   cpu_get_type(device) == CPU_M68705 ||
 		   cpu_get_type(device) == CPU_HD63705);
-	return (m6805_Regs *)device->token;
+	return (m6805_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /****************************************************************************/
@@ -442,7 +441,7 @@ static void Interrupt( m6805_Regs *cpustate )
 	}
 }
 
-static void state_register(m6805_Regs *cpustate, const char *type, running_device *device)
+static void state_register(m6805_Regs *cpustate, const char *type, legacy_cpu_device *device)
 {
 	state_save_register_device_item(device, 0, A);
 	state_save_register_device_item(device, 0, PC);
@@ -460,20 +459,20 @@ static CPU_INIT( m6805 )
 	state_register(cpustate, "m6805", device);
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
-	cpustate->program = cpustate->device->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 }
 
 static CPU_RESET( m6805 )
 {
 	m6805_Regs *cpustate = get_safe_token(device);
 
-	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
+	device_irq_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(m6805_Regs));
 
 	cpustate->iCount=50000;		/* Used to be global */
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
-	cpustate->program = cpustate->device->space(AS_PROGRAM);
+	cpustate->program = device->space(AS_PROGRAM);
 
 	/* Force CPU sub-type and relevant masks */
 	cpustate->subtype = SUBTYPE_M6805;
@@ -515,7 +514,6 @@ static CPU_EXECUTE( m6805 )
 	m6805_Regs *cpustate = get_safe_token(device);
 
 	S = SP_ADJUST( S );		/* Taken from CPU_SET_CONTEXT when pointer'afying */
-	cpustate->iCount = cycles;
 
 	do
 	{
@@ -800,8 +798,6 @@ static CPU_EXECUTE( m6805 )
 		}
 		cpustate->iCount -= cycles1[ireg];
 	} while( cpustate->iCount > 0 );
-
-	return cycles - cpustate->iCount;
 }
 
 /****************************************************************************
@@ -908,7 +904,7 @@ static CPU_SET_INFO( m6805 )
 
 CPU_GET_INFO( m6805 )
 {
-	m6805_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m6805_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1002,7 +998,7 @@ static CPU_SET_INFO( m68705 )
 
 CPU_GET_INFO( m68705 )
 {
-	m6805_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m6805_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -1049,7 +1045,7 @@ static CPU_SET_INFO( hd63705 )
 
 CPU_GET_INFO( hd63705 )
 {
-	m6805_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m6805_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

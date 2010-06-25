@@ -72,9 +72,8 @@ struct _atari_fdc_t
 INLINE atari_fdc_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (atari_fdc_t *)device->token;
+	return (atari_fdc_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*****************************************************************************
@@ -148,41 +147,41 @@ static const xfd_format xfd_formats[] =
  *****************************************************************************/
 
 #define MAXSIZE 5760 * 256 + 80
-static void atari_load_proc(running_device *image)
+static void atari_load_proc(device_image_interface &image)
 {
-	atari_fdc_t *fdc = get_safe_token(image->owner);
+	atari_fdc_t *fdc = get_safe_token(image.device().owner());
 	int id = floppy_get_drive(image);
 	int size, i;
 	const char *ext;
 
-	fdc->drv[id].image = (UINT8*)image_malloc(image, MAXSIZE);
+	fdc->drv[id].image = (UINT8*)image.image_malloc(MAXSIZE);
 	if (!fdc->drv[id].image)
 		return;
 
 	/* tell whether the image is writable */
-	fdc->drv[id].mode = image_is_writable(image);
+	fdc->drv[id].mode = image.is_writable();
 	/* set up image if it has been created */
-	if (image_has_been_created(image))
+	if (image.has_been_created())
 	{
 		int sector;
 		char buff[256];
 		memset(buff, 0, sizeof(buff));
 		/* default to 720 sectors */
 		for( sector = 0; sector < 720; sector++ )
-			image_fwrite(image, buff, 256);
-		image_fseek(image, 0, SEEK_SET);
+			image.fwrite(buff, 256);
+		image.fseek(0, SEEK_SET);
 	}
 
-	size = image_fread(image, fdc->drv[id].image, MAXSIZE);
+	size = image.fread(fdc->drv[id].image, MAXSIZE);
 	if( size <= 0 )
 	{
 		fdc->drv[id].image = NULL;
 		return;
 	}
 	/* re allocate the buffer; we don't want to be too lazy ;) */
-    fdc->drv[id].image = (UINT8*)image_realloc(image, fdc->drv[id].image, size);
+    fdc->drv[id].image = (UINT8*)image.image_realloc(fdc->drv[id].image, size);
 
-	ext = image_filetype(image);
+	ext = image.filetype();
     /* no extension: assume XFD format (no header) */
     if (!ext)
     {
@@ -322,7 +321,7 @@ static void atari_load_proc(running_device *image)
 		break;
 	}
 	logerror("atari opened floppy '%s', %d sectors (%d %s%s) %d bytes/sector\n",
-			image_filename(image),
+			image.filename(),
 			fdc->drv[id].sectors,
 			fdc->drv[id].tracks,
 			(fdc->drv[id].heads == 1) ? "SS" : "DS",
@@ -845,7 +844,6 @@ DEVICE_GET_INFO( atari_fdc )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(atari_fdc_t);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME(atari_fdc);		break;
@@ -863,3 +861,5 @@ DEVICE_GET_INFO( atari_fdc )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(ATARI_FDC, atari_fdc);

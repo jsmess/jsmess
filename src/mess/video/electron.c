@@ -49,7 +49,7 @@ VIDEO_START( electron )
 		map16[i] = ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x04 ) >> 1 ) | ( i & 0x01 );
 	}
 	scanline_timer = timer_alloc( machine, electron_scanline_interrupt, NULL );
-	timer_adjust_periodic( scanline_timer, video_screen_get_time_until_pos( machine->primary_screen, 0, 0 ), 0, video_screen_get_scan_period( machine->primary_screen ) );
+	timer_adjust_periodic( scanline_timer,  machine->primary_screen->time_until_pos(0), 0, machine->primary_screen->scan_period() );
 }
 
 INLINE UINT8 read_vram( UINT16 addr ) {
@@ -66,7 +66,7 @@ VIDEO_UPDATE( electron )
 	int i;
 	int x = 0;
 	int pal[16];
-	int scanline = video_screen_get_vpos(screen);
+	int scanline = screen->vpos();
 	rectangle r = *cliprect;
 	r.min_y = r.max_y = scanline;
 
@@ -258,7 +258,7 @@ VIDEO_UPDATE( electron )
 
 static TIMER_CALLBACK( electron_scanline_interrupt )
 {
-	switch (video_screen_get_vpos(machine->primary_screen))
+	switch (machine->primary_screen->vpos())
 	{
 	case 43:
 		electron_interrupt_handler( machine, INT_SET, INT_RTC );

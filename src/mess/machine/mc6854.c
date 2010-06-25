@@ -219,9 +219,8 @@ static const int word_length[4] = { 5, 6, 7, 8 };
 INLINE mc6854_t* get_safe_token( running_device *device )
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == DEVICE_GET_INFO_NAME( mc6854 ) );
-	return (mc6854_t*) device->token;
+	assert( device->type() == MC6854 );
+	return (mc6854_t*) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -995,7 +994,7 @@ static DEVICE_START( mc6854 )
 {
 	mc6854_t* mc6854 = get_safe_token( device );
 
-	mc6854->iface = (const mc6854_interface*)device->baseconfig().static_config;
+	mc6854->iface = (const mc6854_interface*)device->baseconfig().static_config();
 
 	mc6854->ttimer = timer_alloc( device->machine, mc6854_tfifo_cb , (void*) device );
 
@@ -1030,7 +1029,6 @@ DEVICE_GET_INFO( mc6854 ) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(mc6854_t);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;					break;
-		case DEVINFO_INT_CLASS:				info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(mc6854);	break;
@@ -1045,3 +1043,5 @@ DEVICE_GET_INFO( mc6854 ) {
 		case DEVINFO_STR_CREDITS:			strcpy(info->s, "Copyright the MAME and MESS Teams");  break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(MC6854, mc6854);

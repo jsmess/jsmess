@@ -820,25 +820,25 @@ ROM_END
 
 static QUICKLOAD_LOAD( vip )
 {
-	UINT8 *ptr = memory_region(image->machine, CDP1802_TAG);
+	UINT8 *ptr = memory_region(image.device().machine, CDP1802_TAG);
 	UINT8 *chip8_ptr = NULL;
 	int chip8_size = 0;
-	int size = image_length(image);
+	int size = image.length();
 
-	if (strcmp(image_filetype(image), "c8") == 0)
+	if (strcmp(image.filetype(), "c8") == 0)
 	{
 		/* CHIP-8 program */
-		chip8_ptr = memory_region(image->machine, "chip8");
-		chip8_size = memory_region_length(image->machine, "chip8");
+		chip8_ptr = memory_region(image.device().machine, "chip8");
+		chip8_size = memory_region_length(image.device().machine, "chip8");
 	}
-	else if (strcmp(image_filetype(image), "c8x") == 0)
+	else if (strcmp(image.filename(), "c8x") == 0)
 	{
 		/* CHIP-8X program */
-		chip8_ptr = memory_region(image->machine, "chip8x");
-		chip8_size = memory_region_length(image->machine, "chip8x");
+		chip8_ptr = memory_region(image.device().machine, "chip8x");
+		chip8_size = memory_region_length(image.device().machine, "chip8x");
 	}
 
-	if ((size + chip8_size) > messram_get_size(devtag_get_device(image->machine, "messram")))
+	if ((size + chip8_size) > messram_get_size(devtag_get_device(image.device().machine, "messram")))
 	{
 		return INIT_FAIL;
 	}
@@ -850,7 +850,7 @@ static QUICKLOAD_LOAD( vip )
 	}
 
 	/* load image to RAM */
-	image_fread(image, ptr + chip8_size, size);
+	image.fread( ptr + chip8_size, size);
 
 	return INIT_PASS;
 }

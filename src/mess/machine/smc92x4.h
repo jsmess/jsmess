@@ -1,7 +1,9 @@
 /* Interface */
 
-#ifndef SMC92X4
-#define SMC92X4		DEVICE_GET_INFO_NAME(smc92x4)
+#ifndef __SMC92X4_H__
+#define __SMC92X4_H__
+
+DECLARE_LEGACY_DEVICE(SMC92X4, smc92x4);
 
 #define INPUT_STATUS	0x00
 #define OUTPUT_DMA_ADDR 0x01
@@ -102,9 +104,6 @@ typedef struct _smc92x4_interface
 	/* Preliminary MFM hard disk interface. Writes a track. */
 	void (*mfmhd_write_track)(int head, UINT8 *buffer, int data_count);
 } smc92x4_interface;
-
-/* device interface */
-extern DEVICE_GET_INFO(smc92x4);
 
 void smc92x4_reset(running_device *device);
 

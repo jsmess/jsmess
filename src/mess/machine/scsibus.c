@@ -65,8 +65,8 @@ static const char *const phasenames[] =
 
 INLINE scsibus_t *get_token(running_device *device)
 {
-	assert(device->type == SCSIBUS);
-	return (scsibus_t *) device->token;
+	assert(device->type() == SCSIBUS);
+	return (scsibus_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 static void scsibus_read_data(scsibus_t   *bus)
@@ -654,8 +654,8 @@ static DEVICE_START( scsibus )
 {
     scsibus_t               *bus = get_token(device);
 
-	assert(device->baseconfig().static_config != NULL);
-    bus->interface = (const SCSIBus_interface*)device->baseconfig().static_config;
+	assert(device->baseconfig().static_config() != NULL);
+    bus->interface = (const SCSIBus_interface*)device->baseconfig().static_config();
 
 	memset(bus->devices, 0, sizeof(bus->devices));
 
@@ -695,7 +695,6 @@ DEVICE_GET_INFO( scsibus )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(scsibus_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;				    		break;
-		case DEVINFO_INT_CLASS:				    info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:				    info->start = DEVICE_START_NAME(scsibus);	break;
@@ -710,3 +709,5 @@ DEVICE_GET_INFO( scsibus )
 		case DEVINFO_STR_CREDITS:			    strcpy(info->s, "Copyright the MAME and MESS Teams"); break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(SCSIBUS, scsibus);

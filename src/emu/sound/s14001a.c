@@ -268,10 +268,8 @@ typedef struct
 INLINE S14001AChip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_S14001A);
-	return (S14001AChip *)device->token;
+	assert(device->type() == SOUND_S14001A);
+	return (S14001AChip *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -593,9 +591,9 @@ static DEVICE_START( s14001a )
 		chip->filtervals[i] = SILENCE;
 	}
 
-	chip->SpeechRom = *device->region;
+	chip->SpeechRom = *device->region();
 
-	chip->stream = stream_create(device, 0, 1, device->clock ? device->clock : device->machine->sample_rate, chip, s14001a_pcm_update);
+	chip->stream = stream_create(device, 0, 1, device->clock() ? device->clock() : device->machine->sample_rate, chip, s14001a_pcm_update);
 }
 
 int s14001a_bsy_r(running_device *device)
@@ -655,3 +653,5 @@ DEVICE_GET_INFO( s14001a )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Jonathan Gevaryahu"); break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(S14001A, s14001a);

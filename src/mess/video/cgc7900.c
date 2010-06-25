@@ -111,7 +111,7 @@ static void update_clut(running_machine *machine)
     draw_bitmap - draw bitmap image
 -------------------------------------------------*/
 
-static void draw_bitmap(running_device *screen, bitmap_t *bitmap)
+static void draw_bitmap(screen_device *screen, bitmap_t *bitmap)
 {
 }
 
@@ -119,7 +119,7 @@ static void draw_bitmap(running_device *screen, bitmap_t *bitmap)
     draw_overlay - draw text overlay
 -------------------------------------------------*/
 
-static void draw_overlay(running_device *screen, bitmap_t *bitmap)
+static void draw_overlay(screen_device *screen, bitmap_t *bitmap)
 {
 	cgc7900_state *state = (cgc7900_state *)screen->machine->driver_data;
 
@@ -167,7 +167,7 @@ static void draw_overlay(running_device *screen, bitmap_t *bitmap)
 
 static TIMER_DEVICE_CALLBACK( blink_tick )
 {
-	cgc7900_state *state = (cgc7900_state *)timer->machine->driver_data;
+	cgc7900_state *state = (cgc7900_state *)timer.machine->driver_data;
 
 	state->blink = !state->blink;
 }

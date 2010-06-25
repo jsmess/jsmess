@@ -3757,6 +3757,16 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 				8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
 		128*8
 	};
+	static const gfx_layout tasman_16x16_layout =
+	{
+		16,16,
+		RGN_FRAC(1,2),
+		8,
+		{ 0,8,16,24, RGN_FRAC(1,2)+0,RGN_FRAC(1,2)+8,RGN_FRAC(1,2)+16,RGN_FRAC(1,2)+24 },
+		{ 0,1,2,3,4,5,6,7, 32,33,34,35,36,37,38,39 },
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64, 8*64, 9*64, 10*64, 11*64, 12*64, 13*64, 14*64, 15*64 },
+		16*64
+	};
 
 
 	/* find first empty slot to decode gfx */
@@ -3773,13 +3783,18 @@ void K053247_vh_start(running_machine *machine, const char *gfx_memory_region, i
 		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &spritelayout, 4);
 		break;
 
+	case TASMAN_PLANE_ORDER:
+		total = memory_region_length(machine, gfx_memory_region) / 128;
+		decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &tasman_16x16_layout, 4);
+		break;
+
 	default:
 		fatalerror("Unsupported plane_order");
 	}
 
 	if (VERBOSE)
 	{
-	if (video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32)
+	if (machine->primary_screen->format() == BITMAP_FORMAT_RGB32)
 	{
 		if ((machine->config->video_attributes & (VIDEO_HAS_SHADOWS|VIDEO_HAS_HIGHLIGHTS)) != VIDEO_HAS_SHADOWS+VIDEO_HAS_HIGHLIGHTS)
 			popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
@@ -4192,7 +4207,7 @@ void K053247_sprites_draw(running_machine *machine, bitmap_t *bitmap,const recta
 	int offx = (short)((K053246_regs[0] << 8) | K053246_regs[1]);
 	int offy = (short)((K053246_regs[2] << 8) | K053246_regs[3]);
 
-	int screen_width = video_screen_get_width(machine->primary_screen);
+	int screen_width = machine->primary_screen->width();
 	UINT8 drawmode_table[256];
 	UINT8 shadowmode_table[256];
 	UINT8 *whichtable;
@@ -5632,6 +5647,16 @@ void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, i
 	int gfx_index;
 	int i;
 	UINT32 total;
+	static const gfx_layout charlayout8_tasman =
+	{
+		8,8,
+		RGN_FRAC(1,1),
+		8,
+		{ 0,8,16,24,32,40,48,56 },
+		{ 0,1,2,3,4,5,6,7 },
+		{ 0*64, 1*64, 2*64, 3*64, 4*64, 5*64, 6*64, 7*64},
+		8*64
+	};
 	static const gfx_layout charlayout8 =
 	{
 		8, 8,
@@ -5732,6 +5757,11 @@ void K056832_vh_start(running_machine *machine, const char *gfx_memory_region, i
 		case K056832_BPP_8LE:
 			total = memory_region_length(machine, gfx_memory_region) / (i*8);
 			decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout8le, 4);
+			break;
+
+		case K056832_BPP_8TASMAN:
+			total = memory_region_length(machine, gfx_memory_region) / (i*8);
+			decode_gfx(machine, gfx_index, memory_region(machine, gfx_memory_region), total, &charlayout8_tasman, 4);
 			break;
 
 		case K056832_BPP_4dj:
@@ -7337,12 +7367,12 @@ void K054338_fill_backcolor(running_machine *machine, bitmap_t *bitmap, int mode
 	int BGC_CBLK, BGC_SET;
 	UINT32 *dst_ptr, *pal_ptr;
 	int bgcolor;
-	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+	const rectangle &visarea = machine->primary_screen->visible_area();
 
-	clipx = visarea->min_x & ~3;
-	clipy = visarea->min_y;
-	clipw = (visarea->max_x - clipx + 4) & ~3;
-	cliph = visarea->max_y - clipy + 1;
+	clipx = visarea.min_x & ~3;
+	clipy = visarea.min_y;
+	clipw = (visarea.max_x - clipx + 4) & ~3;
+	cliph = visarea.max_y - clipy + 1;
 
 	dst_ptr = BITMAP_ADDR32(bitmap, clipy, 0);
 	dst_pitch = bitmap->rowpixels;
@@ -7507,7 +7537,7 @@ void K053250_dma(running_machine *machine, int chip, int limiter)
 
 	chip_ptr = &K053250_info.chip[chip];
 
-	current_frame = video_screen_get_frame_number(machine->primary_screen);
+	current_frame = machine->primary_screen->frame_number();
 	last_frame = chip_ptr->frame;
 
 	if (limiter && current_frame == last_frame) return; // make sure we only do DMA transfer once per frame
@@ -7810,7 +7840,7 @@ void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *c
 	static int pmode[2] = {-1,-1};
 	static int kc=-1, kk=0, kxx=-105, kyy=0;
 
-	const rectangle area = *video_screen_get_visible_area(machine->primary_screen);
+	const rectangle area = *machine->primary_screen->visible_area();
 	UINT16 *line;
 	int delta, dim1, dim1_max, dim2_max;
 	UINT32 mask1, mask2;

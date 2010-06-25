@@ -68,8 +68,8 @@ struct _m6502_Regs
 	UINT8	irq_state;
 	UINT8   so_state;
 
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *space;
 	const address_space *io;
 	int		int_occured;
@@ -87,8 +87,7 @@ struct _m6502_Regs
 INLINE m6502_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M6502 ||
 		   cpu_get_type(device) == CPU_M6510 ||
 		   cpu_get_type(device) == CPU_M6510T ||
@@ -98,7 +97,7 @@ INLINE m6502_Regs *get_safe_token(running_device *device)
 		   cpu_get_type(device) == CPU_M65C02 ||
 		   cpu_get_type(device) == CPU_M65SC02 ||
 		   cpu_get_type(device) == CPU_DECO16);
-	return (m6502_Regs *)device->token;
+	return (m6502_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static UINT8 default_rdmem_id(const address_space *space, offs_t offset) { return memory_read_byte_8le(space, offset); }
@@ -129,10 +128,10 @@ static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 da
  *
  *****************************************************************************/
 
-static void m6502_common_init(running_device *device, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
+static void m6502_common_init(legacy_cpu_device *device, device_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *cpustate), const char *type)
 {
 	m6502_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config;
+	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -227,8 +226,6 @@ static CPU_EXECUTE( m6502 )
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT8 op;
@@ -272,8 +269,6 @@ static CPU_EXECUTE( m6502 )
 		}
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static void m6502_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
@@ -360,8 +355,9 @@ static CPU_RESET( m6510 )
 	cpustate->ddr = 0x00;
 }
 
-static UINT8 m6510_get_port(m6502_Regs *cpustate)
+UINT8 m6510_get_port(legacy_cpu_device *device)
 {
+	m6502_Regs *cpustate = get_safe_token(device);
 	return (cpustate->port & cpustate->ddr) | (cpustate->ddr ^ 0xff);
 }
 
@@ -448,8 +444,6 @@ static CPU_EXECUTE( m65c02 )
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT8 op;
@@ -485,8 +479,6 @@ static CPU_EXECUTE( m65c02 )
 			m65c02_take_irq(cpustate);
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static void m65c02_set_irq_line(m6502_Regs *cpustate, int irqline, int state)
@@ -614,8 +606,6 @@ static CPU_EXECUTE( deco16 )
 {
 	m6502_Regs *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT8 op;
@@ -651,8 +641,6 @@ static CPU_EXECUTE( deco16 )
 			deco16_take_irq(cpustate);
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -692,7 +680,7 @@ static CPU_SET_INFO( m6502 )
 
 CPU_GET_INFO( m6502 )
 {
-	m6502_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m6502_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -810,8 +798,6 @@ static CPU_SET_INFO( m6510 )
 
 CPU_GET_INFO( m6510 )
 {
-	m6502_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
-
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -823,9 +809,6 @@ CPU_GET_INFO( m6510 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "M6510");				break;
-
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_M6510_PORT:					info->i = m6510_get_port(cpustate);				break;
 
 		default:										CPU_GET_INFO_CALL(m6502);			break;
 	}

@@ -32,7 +32,7 @@ typedef struct _tape_control_menu_state tape_control_menu_state;
 struct _tape_control_menu_state
 {
 	int index;
-	running_device *device;
+	device_image_interface *device;
 };
 
 
@@ -106,13 +106,13 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 			flags |= MENU_FLAG_RIGHT_ARROW;
 	}
 
-	if (image_exists(menustate->device))
+	if (menustate->device->exists())
 	{
 		double t0, t1;
 		UINT32 tapeflags = 0;
 
-		t0 = cassette_get_position(menustate->device);
-		t1 = cassette_get_length(menustate->device);
+		t0 = cassette_get_position(&menustate->device->device());
+		t1 = cassette_get_length(&menustate->device->device());
 
 		if (t1 > 0)
 		{
@@ -123,11 +123,11 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 		}				
 
 		/* name of tape */
-		ui_menu_item_append(menu, image_typename_id(menustate->device), image_filename(menustate->device), flags, TAPECMD_SELECT);
+		ui_menu_item_append(menu, menustate->device->image_config().name(), menustate->device->filename(), flags, TAPECMD_SELECT);
 
 		/* state */
-		tapecontrol_gettime(&timepos, menustate->device, NULL, NULL);
-		state = cassette_get_state(menustate->device);
+		tapecontrol_gettime(&timepos, &menustate->device->device(), NULL, NULL);
+		state = cassette_get_state(&menustate->device->device());
 		ui_menu_item_append(
 			menu,
 			(state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED
@@ -181,12 +181,13 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 	if (menustate->device == NULL)
 	{
 		int index = menustate->index;
-		running_device *device = machine->devicelist.first( CASSETTE );
-
-		while ( index > 0 && device )
-		{
-			device = device->typenext();
-			index--;
+		device_image_interface *device = NULL;
+		for (bool gotone = machine->devicelist.first(device); gotone; gotone = device->next(device))
+		{		
+			if(device->device().type() == CASSETTE) {
+				if (index==0) break;
+				index--;
+			}
 		}
 		menustate->device = device;
 		ui_menu_reset(menu, (ui_menu_reset_options)0);
@@ -204,7 +205,7 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 		{
 			case IPT_UI_LEFT:
 				if (event->itemref==TAPECMD_SLIDER)
-					cassette_seek(menustate->device, -1, SEEK_CUR);
+					cassette_seek(&menustate->device->device(), -1, SEEK_CUR);
 				else
 				if (event->itemref==TAPECMD_SELECT)
 				{
@@ -219,7 +220,7 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 
 			case IPT_UI_RIGHT:
 				if (event->itemref==TAPECMD_SLIDER)
-					cassette_seek(menustate->device, +1, SEEK_CUR);
+					cassette_seek(&menustate->device->device(), +1, SEEK_CUR);
 				else
 				if (event->itemref==TAPECMD_SELECT)
 				{
@@ -235,22 +236,22 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 			case IPT_UI_SELECT:
 				{
 					if (event->itemref==TAPECMD_STOP)
-						cassette_change_state(menustate->device, CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
+						cassette_change_state(&menustate->device->device(), CASSETTE_STOPPED, CASSETTE_MASK_UISTATE);
 					else
 					if (event->itemref==TAPECMD_PLAY)
-						cassette_change_state(menustate->device, CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
+						cassette_change_state(&menustate->device->device(), CASSETTE_PLAY, CASSETTE_MASK_UISTATE);
 					else
 					if (event->itemref==TAPECMD_RECORD)
-						cassette_change_state(menustate->device, CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
+						cassette_change_state(&menustate->device->device(), CASSETTE_RECORD, CASSETTE_MASK_UISTATE);
 					else
 					if (event->itemref==TAPECMD_REWIND)
-						cassette_seek(menustate->device, -30, SEEK_CUR);
+						cassette_seek(&menustate->device->device(), -30, SEEK_CUR);
 					else
 					if (event->itemref==TAPECMD_FAST_FORWARD)
-						cassette_seek(menustate->device, 30, SEEK_CUR);
+						cassette_seek(&menustate->device->device(), 30, SEEK_CUR);
 					else
 					if (event->itemref==TAPECMD_SLIDER)
-						cassette_seek(menustate->device, 0, SEEK_SET);
+						cassette_seek(&menustate->device->device(), 0, SEEK_SET);
 				}
 				break;
 		}

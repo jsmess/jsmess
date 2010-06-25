@@ -39,15 +39,14 @@ struct _abc77_t
 INLINE abc77_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (abc77_t *)device->token;
+	return (abc77_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const abc77_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == ABC77));
-	return (const abc77_interface *) device->baseconfig().static_config;
+	assert((device->type() == ABC77));
+	return (const abc77_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -77,7 +76,7 @@ DISCRETE_SOUND_END
 
 static TIMER_DEVICE_CALLBACK( clock_tick )
 {
-	running_device *device = devtag_get_device(timer->machine, ABC77_TAG);
+	running_device *device = devtag_get_device(timer.machine, ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->clock = !abc77->clock;
@@ -401,7 +400,7 @@ WRITE_LINE_DEVICE_HANDLER( abc77_reset_w )
 
 static DEVICE_START( abc77 )
 {
-	abc77_t *abc77 = (abc77_t *)device->token;
+	abc77_t *abc77 = (abc77_t *)downcast<legacy_device_base *>(device)->token();
 	const abc77_interface *intf = get_interface(device);
 
 	astring tempstring;
@@ -436,7 +435,6 @@ DEVICE_GET_INFO( abc77 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(abc77_t);					break;
 
 		/* --- the following bits of info are returned as pointers --- */
@@ -456,3 +454,5 @@ DEVICE_GET_INFO( abc77 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(ABC77, abc77);

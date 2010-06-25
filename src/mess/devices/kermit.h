@@ -12,7 +12,7 @@
 #include "image.h"
 
 
-#define KERMIT DEVICE_GET_INFO_NAME( kermit )
+DECLARE_LEGACY_IMAGE_DEVICE(KERMIT, kermit);
 
 
 typedef struct {
@@ -26,9 +26,6 @@ typedef struct {
 #define MDRV_KERMIT_ADD(_tag, _intrf) \
   MDRV_DEVICE_ADD(_tag, KERMIT, 0)	      \
   MDRV_DEVICE_CONFIG(_intrf)
-
-
-extern DEVICE_GET_INFO( kermit );
 
 
 /* call this when the emulated machine has read the last byte sent by

@@ -799,7 +799,8 @@ static READ8_HANDLER( fm7_cassette_printer_r )
 	}
 	else
 	{
-		if(image_exists(devtag_get_device(space->machine,"lpt:printer")))
+		device_image_interface *image = (device_image_interface*)devtag_get_device(space->machine,"lpt:printer");
+		if(image->exists())
 		{
 			if(centronics_pe_r(printer_dev))
 				ret |= 0x08;
@@ -1754,7 +1755,7 @@ static MACHINE_RESET(fm7)
 	timer_adjust_periodic(fm7_subtimer,ATTOTIME_IN_MSEC(20),0,ATTOTIME_IN_MSEC(20));
 	timer_adjust_periodic(fm7_keyboard_timer,attotime_zero,0,ATTOTIME_IN_MSEC(10));
 	if(fm7_type != SYS_FM7)
-		timer_adjust_oneshot(fm77av_vsync_timer,video_screen_get_time_until_vblank_end(machine->primary_screen),0);
+		timer_adjust_oneshot(fm77av_vsync_timer,machine->primary_screen->time_until_vblank_end(),0);
 
 	irq_mask = 0x00;
 	irq_flags = 0x00;

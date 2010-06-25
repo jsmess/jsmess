@@ -33,7 +33,7 @@ public:
 	int          sidcard, pal;
 
 	/* devices */
-	running_device *maincpu;
+	legacy_cpu_device *maincpu;
 	running_device *ted7360;
 	running_device *serbus;
 	running_device *cassette;

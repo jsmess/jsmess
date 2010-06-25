@@ -50,11 +50,6 @@
 #define THOM_FLOP_BANK  "bank4" /* external floppy controller ROM */
 #define THOM_BASE_BANK  "bank5" /* system RAM */
 
-/* serial */
-DEVICE_GET_INFO( thom_serial_cc90323 );
-DEVICE_GET_INFO( thom_serial_rf57232 );
-DEVICE_GET_INFO( thom_serial_modem );
-
 extern const pia6821_interface to7_pia6821_sys;
 extern const pia6821_interface to7_pia6821_io;
 extern const pia6821_interface to7_pia6821_modem;

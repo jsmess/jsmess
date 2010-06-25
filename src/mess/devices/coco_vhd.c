@@ -81,9 +81,8 @@ struct _vhd_info
 INLINE vhd_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == DEVICE_GET_INFO_NAME(coco_vhd));
-	return (vhd_info *) device->token;
+	assert(device->type() == COCO_VHD);
+	return (vhd_info *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -102,7 +101,7 @@ static DEVICE_START( coco_vhd )
 
 static DEVICE_IMAGE_LOAD( coco_vhd )
 {
-	vhd_info *vhd = get_safe_token(image);
+	vhd_info *vhd = get_safe_token(&image.device());
 	vhd->status = VHDSTATUS_POWER_ON_STATE;
 	vhd->logical_record_number = 0;
 	vhd->buffer_address = 0;
@@ -114,6 +113,7 @@ static DEVICE_IMAGE_LOAD( coco_vhd )
 static void coco_vhd_readwrite(running_device *device, UINT8 data)
 {
 	vhd_info *vhd = get_safe_token(device);
+	device_image_interface *image = (device_image_interface*)device;
 	int result;
 	int phyOffset;
 	UINT32 nBA = vhd->buffer_address;
@@ -124,7 +124,7 @@ static void coco_vhd_readwrite(running_device *device, UINT8 data)
 	char buffer[1024];
 
 	/* access the image */
-	if (!image_exists(device))
+	if (!image->exists())
 	{
 		vhd->status = VHDSTATUS_NO_VHD_ATTACHED;
 		return;
@@ -132,8 +132,8 @@ static void coco_vhd_readwrite(running_device *device, UINT8 data)
 
 	/* perform the seek */
 	seek_position = ((UINT64) 256) * vhd->logical_record_number;
-	total_size = image_length(device);
-	result = image_fseek(device, MIN(seek_position, total_size), SEEK_SET);
+	total_size = image->length();
+	result = image->fseek(MIN(seek_position, total_size), SEEK_SET);
 	if (result < 0)
 	{
 		vhd->status = VHDSTATUS_ACCESS_DENIED;
@@ -148,7 +148,7 @@ static void coco_vhd_readwrite(running_device *device, UINT8 data)
 			memset(buffer, 0, sizeof(buffer));
 
 			bytes_to_write = (UINT32) MIN(seek_position - total_size, (UINT64) sizeof(buffer));
-			result = image_fwrite(device, buffer, bytes_to_write);
+			result = image->fwrite(buffer, bytes_to_write);
 			if (result != bytes_to_write)
 			{
 				vhd->status = VHDSTATUS_ACCESS_DENIED;
@@ -168,7 +168,7 @@ static void coco_vhd_readwrite(running_device *device, UINT8 data)
 			if (total_size > seek_position)
 			{
 				bytes_to_read = (UINT32) MIN((UINT64) 256, total_size - seek_position);
-				result = image_fread(device, &messram_get_ptr(devtag_get_device(device->machine, "messram"))[phyOffset], bytes_to_read);
+				result = image->fread(&messram_get_ptr(devtag_get_device(device->machine, "messram"))[phyOffset], bytes_to_read);
 				if (result != bytes_to_read)
 				{
 					vhd->status = VHDSTATUS_ACCESS_DENIED;
@@ -180,7 +180,7 @@ static void coco_vhd_readwrite(running_device *device, UINT8 data)
 			break;
 
 		case VHDCMD_WRITE: /* Write Sector */
-			result = image_fwrite(device, &(messram_get_ptr(devtag_get_device(device->machine, "messram"))[phyOffset]), 256);
+			result = image->fwrite(&(messram_get_ptr(devtag_get_device(device->machine, "messram"))[phyOffset]), 256);
 
 			if (result != 256)
 			{
@@ -269,7 +269,6 @@ DEVICE_GET_INFO(coco_vhd)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vhd_info); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0; break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL; break;
 		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_HARDDISK; break;
 		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
@@ -286,3 +285,5 @@ DEVICE_GET_INFO(coco_vhd)
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "vhd"); break;
 	}
 }
+
+DEFINE_LEGACY_IMAGE_DEVICE(COCO_VHD, coco_vhd);

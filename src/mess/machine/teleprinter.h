@@ -21,7 +21,7 @@ struct _teleprinter_interface
 #define TELEPRINTER_TAG "teleprinter"
 #define TELEPRINTER_SCREEN_TAG "tty_screen"
 
-#define GENERIC_TELEPRINTER DEVICE_GET_INFO_NAME( teleprinter )
+DECLARE_LEGACY_DEVICE(GENERIC_TELEPRINTER, teleprinter);
 
 #define MDRV_GENERIC_TELEPRINTER_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, GENERIC_TELEPRINTER, 0) \
@@ -36,9 +36,6 @@ struct _teleprinter_interface
 ***************************************************************************/
 
 WRITE8_DEVICE_HANDLER ( teleprinter_write );
-
-/* device interface */
-DEVICE_GET_INFO( teleprinter );
 
 MACHINE_DRIVER_EXTERN( generic_teleprinter );
 

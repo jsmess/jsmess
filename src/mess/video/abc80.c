@@ -73,7 +73,7 @@ static UINT32 abc80_tilemap_scan( UINT32 col, UINT32 row, UINT32 num_cols, UINT3
 
 static TIMER_DEVICE_CALLBACK(abc80_blink_tick)
 {
-	abc80_state *state = (abc80_state *)timer->machine->driver_data;
+	abc80_state *state = (abc80_state *)timer.machine->driver_data;
 
 	state->blink = !state->blink;
 }

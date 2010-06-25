@@ -64,15 +64,14 @@ struct _i8355_t
 INLINE i8355_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (i8355_t *)device->token;
+	return (i8355_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const i8355_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == I8355);
-	return (const i8355_interface *) device->baseconfig().static_config;
+	assert(device->type() == I8355);
+	return (const i8355_interface *) device->baseconfig().static_config();
 }
 
 INLINE UINT8 read_port(i8355_t *i8355, int port)
@@ -168,7 +167,7 @@ READ8_DEVICE_HANDLER( i8355_rom_r )
 
 static DEVICE_START( i8355 )
 {
-	i8355_t *i8355 = (i8355_t *)device->token;
+	i8355_t *i8355 = (i8355_t *)downcast<legacy_device_base *>(device)->token();
 	const i8355_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
@@ -192,7 +191,7 @@ static DEVICE_START( i8355 )
 
 static DEVICE_RESET( i8355 )
 {
-	i8355_t *i8355 = (i8355_t *)device->token;
+	i8355_t *i8355 = (i8355_t *)downcast<legacy_device_base *>(device)->token();
 
 	/* set ports to input mode */
 	i8355->ddr[PORT_A] = 0;
@@ -209,7 +208,6 @@ DEVICE_GET_INFO( i8355 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8355_t);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -225,3 +223,5 @@ DEVICE_GET_INFO( i8355 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(I8355,  i8355);

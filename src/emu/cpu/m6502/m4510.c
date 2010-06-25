@@ -142,8 +142,8 @@ struct _m4510_Regs {
 	UINT16  low, high;
 	UINT32	mem[8];
 
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *space;
 	int 	icount;
 
@@ -159,10 +159,9 @@ struct _m4510_Regs {
 INLINE m4510_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M4510);
-	return (m4510_Regs *)device->token;
+	return (m4510_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************
@@ -198,7 +197,7 @@ static void default_wrmem_id(const address_space *space, offs_t address, UINT8 d
 static CPU_INIT( m4510 )
 {
 	m4510_Regs *cpustate = get_safe_token(device);
-	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config;
+	const m6502_interface *intf = (const m6502_interface *)device->baseconfig().static_config();
 
 	cpustate->interrupt_inhibit = 0;
 	cpustate->rdmem_id = default_rdmem_id;
@@ -283,8 +282,6 @@ static CPU_EXECUTE( m4510 )
 {
 	m4510_Regs *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT8 op;
@@ -319,8 +316,6 @@ static CPU_EXECUTE( m4510 )
 			m4510_take_irq(cpustate);
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static void m4510_set_irq_line(m4510_Regs *cpustate, int irqline, int state)
@@ -354,11 +349,11 @@ static void m4510_set_irq_line(m4510_Regs *cpustate, int irqline, int state)
 	}
 }
 
-static UINT8 m4510_get_port(m4510_Regs *cpustate)
+UINT8 m4510_get_port(legacy_cpu_device *device)
 {
+	m4510_Regs *cpustate = get_safe_token(device);
 	return (cpustate->port & cpustate->ddr) | (cpustate->ddr ^ 0xff);
 }
-
 static READ8_HANDLER( m4510_read_0000 )
 {
 	UINT8 result = 0x00;
@@ -393,7 +388,7 @@ static WRITE8_HANDLER( m4510_write_0000 )
 	}
 
 	if (cpustate->port_write)
-		cpustate->port_write(cpustate->device, 0, m4510_get_port(cpustate));
+		cpustate->port_write(cpustate->device, 0, m4510_get_port(downcast<legacy_cpu_device *>(space->cpu)));
 }
 
 static ADDRESS_MAP_START(m4510_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -456,7 +451,7 @@ static CPU_SET_INFO( m4510 )
 
 CPU_GET_INFO( m4510 )
 {
-	m4510_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m4510_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -511,7 +506,6 @@ CPU_GET_INFO( m4510 )
 		case CPUINFO_INT_REGISTER + M4510_MEM5:			info->i = cpustate->mem[5];					break;
 		case CPUINFO_INT_REGISTER + M4510_MEM6:			info->i = cpustate->mem[6];					break;
 		case CPUINFO_INT_REGISTER + M4510_MEM7:			info->i = cpustate->mem[7];					break;
-		case CPUINFO_INT_M6510_PORT:					info->i = m4510_get_port(cpustate);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m4510);			break;

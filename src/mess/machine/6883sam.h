@@ -25,8 +25,8 @@
     MACROS
 ***************************************************************************/
 
-#define SAM6883			DEVICE_GET_INFO_NAME(sam6883)
-#define SAM6883_GIME	DEVICE_GET_INFO_NAME(sam6883_gime)
+DECLARE_LEGACY_DEVICE(SAM6883, sam6883);
+DECLARE_LEGACY_DEVICE(SAM6883_GIME, sam6883_gime);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -60,11 +60,6 @@ struct _sam6883_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( sam6883 );
-DEVICE_GET_INFO( sam6883_gime );
-
 /* Standard handlers */
 
 /* write to the SAM */

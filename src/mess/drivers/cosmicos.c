@@ -362,7 +362,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( digit_tick )
 {
-	cosmicos_state *state = (cosmicos_state *)timer->machine->driver_data;
+	cosmicos_state *state = (cosmicos_state *)timer.machine->driver_data;
 
 	state->digit = !state->digit;
 
@@ -371,7 +371,7 @@ static TIMER_DEVICE_CALLBACK( digit_tick )
 
 static TIMER_DEVICE_CALLBACK( int_tick )
 {
-	cputag_set_input_line(timer->machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, ASSERT_LINE);
+	cputag_set_input_line(timer.machine, CDP1802_TAG, CDP1802_INPUT_LINE_INT, ASSERT_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cosmicos_dmaout_w )
@@ -577,11 +577,11 @@ static MACHINE_RESET( cosmicos )
 
 static QUICKLOAD_LOAD( cosmicos )
 {
-	UINT8 *ptr = memory_region(image->machine, CDP1802_TAG);
-	int size = image_length(image);
+	UINT8 *ptr = memory_region(image.device().machine, CDP1802_TAG);
+	int size = image.length();
 
 	/* load image to RAM */
-	image_fread(image, ptr, size);
+	image.fread(ptr, size);
 
 	return INIT_PASS;
 }

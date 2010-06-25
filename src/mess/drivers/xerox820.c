@@ -131,7 +131,7 @@ static void xerox820_keyboard_scan(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( xerox820_keyboard_tick )
 {
-	xerox820_keyboard_scan(timer->machine);
+	xerox820_keyboard_scan(timer.machine);
 }
 
 /* Read/Write Handlers */
@@ -541,7 +541,7 @@ static const z80sio_interface sio_intf =
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	xerox820_state *state = (xerox820_state *)timer->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)timer.machine->driver_data;
 
 	z80ctc_trg0_w(state->z80ctc, 1);
 	z80ctc_trg0_w(state->z80ctc, 0);
@@ -568,7 +568,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain xerox820_daisy_chain[] =
+static const z80_daisy_config xerox820_daisy_chain[] =
 {
 	{ Z80SIO_TAG },
 	{ Z80KBPIO_TAG },
@@ -681,11 +681,11 @@ static VIDEO_UPDATE( xerox820 )
 	return 0;
 }
 
-static void xerox820_load_proc(running_device *image)
+static void xerox820_load_proc(device_image_interface &image)
 {
-	xerox820_state *state = (xerox820_state *)image->machine->driver_data;
+	xerox820_state *state = (xerox820_state *)image.device().machine->driver_data;
 
-	switch (image_length(image))
+	switch (image.length())
 	{
 	case 77*1*26*128: // 250K 8" SSSD
 		state->_8n5 = 1;

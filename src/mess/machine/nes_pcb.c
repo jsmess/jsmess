@@ -1200,7 +1200,7 @@ static void mmc3_irq( running_device *device, int scanline, int vblank, int blan
 		if (state->IRQ_enable && !blanked && (state->IRQ_count == 0) && (priorCount || state->IRQ_clear /*|| !state->mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-					 video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+					 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
 			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
@@ -6501,7 +6501,7 @@ static void tengen_800032_irq( running_device *device, int scanline, int vblank,
 					if (state->IRQ_enable && !blanked && !state->IRQ_count)
 					{
 						LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-								 video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+								 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
 						cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 					}
 				}
@@ -6528,7 +6528,7 @@ static void tengen_800032_irq( running_device *device, int scanline, int vblank,
 				if (state->IRQ_enable && !blanked && (state->IRQ_count <= 114))
 				{
 					LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-							 video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+							 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
 					cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 				}
 			}
@@ -8607,7 +8607,7 @@ static void sc127_irq( running_device *device, int scanline, int vblank, int bla
 		if (!blanked && (state->IRQ_count == 0))
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-					 video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+					 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
 			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_enable = 0;
 		}
@@ -9131,7 +9131,7 @@ static void btl_dn_irq( running_device *device, int scanline, int vblank, int bl
 		
 		state->IRQ_count = 0;
 		LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-				 video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+				 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
 		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }

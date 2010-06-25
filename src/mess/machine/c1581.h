@@ -16,8 +16,8 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define C1581 DEVICE_GET_INFO_NAME( c1581 )
-#define C1563 DEVICE_GET_INFO_NAME( c1563 )
+DECLARE_LEGACY_DEVICE(C1581, c1581);
+DECLARE_LEGACY_DEVICE(C1563, c1563);
 
 #define MDRV_C1581_ADD(_tag, _serial_bus_tag, _address) \
 	MDRV_DEVICE_ADD(_tag, C1581, 0) \
@@ -46,11 +46,6 @@ struct _c1581_config
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( c1581 );
-DEVICE_GET_INFO( c1563 );
-
 /* IEC interface */
 WRITE_LINE_DEVICE_HANDLER( c1581_iec_srq_w );
 WRITE_LINE_DEVICE_HANDLER( c1581_iec_atn_w );

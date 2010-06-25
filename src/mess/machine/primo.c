@@ -84,7 +84,7 @@ READ8_HANDLER( primo_be_1_r )
 	// bit 7, 6 - not used
 
 	// bit 5 - VBLANK
-	data |= (video_screen_get_vblank(space->machine->primary_screen)) ? 0x20 : 0x00;
+	data |= (space->machine->primary_screen->vblank()) ? 0x20 : 0x00;
 
 	// bit 4 - I4 (external bus)
 
@@ -311,7 +311,7 @@ SNAPSHOT_LOAD( primo )
 	if (!(snapshot_data = (UINT8*) malloc(snapshot_size)))
 		return INIT_FAIL;
 
-	if (image_fread(image, snapshot_data, snapshot_size) != snapshot_size)
+	if (image.fread( snapshot_data, snapshot_size) != snapshot_size)
 	{
 		free(snapshot_data);
 		return INIT_FAIL;
@@ -323,7 +323,7 @@ SNAPSHOT_LOAD( primo )
 		return INIT_FAIL;
 	}
 
-	primo_setup_pss(image->machine,snapshot_data, snapshot_size);
+	primo_setup_pss(image.device().machine,snapshot_data, snapshot_size);
 
 	free(snapshot_data);
 	return INIT_PASS;
@@ -361,13 +361,13 @@ QUICKLOAD_LOAD( primo )
 	if (!(quickload_data = (UINT8*) malloc(quickload_size)))
 		return INIT_FAIL;
 
-	if (image_fread(image, quickload_data, quickload_size) != quickload_size)
+	if (image.fread( quickload_data, quickload_size) != quickload_size)
 	{
 		free(quickload_data);
 		return INIT_FAIL;
 	}
 
-	primo_setup_pp(image->machine, quickload_data, quickload_size);
+	primo_setup_pp(image.device().machine, quickload_data, quickload_size);
 
 	free(quickload_data);
 	return INIT_PASS;

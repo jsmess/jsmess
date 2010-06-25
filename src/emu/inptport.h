@@ -134,6 +134,10 @@ enum
 	IPT_COIN6,
 	IPT_COIN7,
 	IPT_COIN8,
+	IPT_COIN9,
+	IPT_COIN10,
+	IPT_COIN11,
+	IPT_COIN12,
 	IPT_BILL1,
 
 	/* service coin */
@@ -141,6 +145,12 @@ enum
 	IPT_SERVICE2,
 	IPT_SERVICE3,
 	IPT_SERVICE4,
+
+	/* tilt inputs */
+	IPT_TILT1,
+	IPT_TILT2,
+	IPT_TILT3,
+	IPT_TILT4,
 
 	/* misc other digital inputs */
 	IPT_SERVICE,
@@ -723,7 +733,9 @@ public:
 	input_port_config(const char *tag);
 	~input_port_config();
 
-	input_port_config *			next;			/* pointer to next port */
+	input_port_config *next() const { return m_next; }
+
+	input_port_config *			m_next;			/* pointer to next port */
 	const char *				tag;			/* pointer to this port's tag */
 	const input_field_config *	fieldlist;		/* list of input_field_configs */
 

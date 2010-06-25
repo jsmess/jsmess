@@ -147,21 +147,21 @@ static DEVICE_IMAGE_LOAD( astrocde_cart )
 {
 	UINT32 size;
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
+		size = image.length();
 
-		if (image_fread(image, memory_region(image->machine, "maincpu") + 0x2000, size) != size)
+		if (image.fread( memory_region(image.device().machine, "maincpu") + 0x2000, size) != size)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return INIT_FAIL;
 		}
 
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
-		memcpy(memory_region(image->machine, "maincpu") + 0x2000, image_get_software_region(image, "rom"), size);
+		size = image.get_software_region_length("rom");
+		memcpy(memory_region(image.device().machine, "maincpu") + 0x2000, image.get_software_region("rom"), size);
 	}
 
 	return INIT_PASS;

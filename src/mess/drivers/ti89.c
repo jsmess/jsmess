@@ -554,8 +554,8 @@ static VIDEO_UPDATE( ti68k )
 	/* preliminary implementation, doesn't use the contrast value */
 	t68k_state *state = (t68k_state *)screen->machine->driver_data;
 	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 width = video_screen_get_width(screen);
-	UINT8 height = video_screen_get_height(screen);
+	UINT8 width = screen->width();
+	UINT8 height = screen->height();
 	UINT8 x, y, b;
 
 	if (!state->lcd_on || !state->lcd_base)

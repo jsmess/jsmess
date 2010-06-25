@@ -404,7 +404,7 @@ WRITE8_HANDLER( c128_write_d000 )
 	running_device *vic2e = devtag_get_device(space->machine, "vic2e");
 	running_device *vdc8563 = devtag_get_device(space->machine, "vdc8563");
 
-	UINT8 c64_port6510 = (UINT8) space->machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = m6510_get_port(space->machine->device<legacy_cpu_device>("maincpu"));
 
 	if (!c128_write_io)
 	{
@@ -499,7 +499,7 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 	if (!c64mode)
 		return;
 
-	data = (UINT8) machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT) & 0x07;
+	data = m6510_get_port(machine->device<legacy_cpu_device>("maincpu")) & 0x07;
 	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset)
 		return;
 
@@ -828,8 +828,8 @@ static void c128_bankswitch( running_machine *machine, int reset )
              * driver used to work with this behavior, so I am doing this hack
              * where I set CPU #1's PC to 0x1100 on reset.
              */
-			if (cpu_get_reg(devtag_get_device(machine, "m8502"), REG_GENPC) == 0x0000)
-				cpu_set_reg(devtag_get_device(machine, "m8502"), REG_GENPC, 0x1100);
+			if (cpu_get_reg(devtag_get_device(machine, "m8502"), STATE_GENPC) == 0x0000)
+				cpu_set_reg(devtag_get_device(machine, "m8502"), STATE_GENPC, 0x1100);
 		}
 		mmu_cpu = MMU_CPU8502;
 		return;
@@ -1027,7 +1027,7 @@ WRITE8_HANDLER( c128_write_ff05 )
  */
 int c128_dma_read(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = (UINT8) machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = m6510_get_port(machine->device<legacy_cpu_device>("maincpu"));
 
 	/* main memory configuration to include */
 	if (c64mode)
@@ -1049,7 +1049,7 @@ int c128_dma_read(running_machine *machine, int offset)
 
 int c128_dma_read_color(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = (UINT8) machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT);
+	UINT8 c64_port6510 = m6510_get_port(machine->device<legacy_cpu_device>("maincpu"));
 
 	if (c64mode)
 		return c64_colorram[offset & 0x3ff] & 0xf;
@@ -1242,16 +1242,16 @@ INTERRUPT_GEN( c128_frame_interrupt )
 		{
 			vic2_set_rastering(vic2e, 0);
 			vdc8563_set_rastering(vdc8563, 1);
-			video_screen_set_visarea(device->machine->primary_screen, 0, 655, 0, 215);
+			device->machine->primary_screen->set_visible_area(0, 655, 0, 215);
 		}
 		else
 		{
 			vic2_set_rastering(vic2e, 1);
 			vdc8563_set_rastering(vdc8563, 0);
 			if (c64_pal)
-				video_screen_set_visarea(device->machine->primary_screen, 0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
+				device->machine->primary_screen->set_visible_area(0, VIC6569_VISIBLECOLUMNS - 1, 0, VIC6569_VISIBLELINES - 1);
 			else
-				video_screen_set_visarea(device->machine->primary_screen, 0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
+				device->machine->primary_screen->set_visible_area(0, VIC6567_VISIBLECOLUMNS - 1, 0, VIC6567_VISIBLELINES - 1);
 		}
 		monitor = input_port_read(device->machine, "SPECIAL") & 0x08;
 	}

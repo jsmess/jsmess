@@ -16,8 +16,8 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define C9060	DEVICE_GET_INFO_NAME( c9060 )
-#define C9090	DEVICE_GET_INFO_NAME( c9090 )
+DECLARE_LEGACY_DEVICE(C9060, c9060);
+DECLARE_LEGACY_DEVICE(C9090, c9090);
 
 #define MDRV_C9060_ADD(_tag, _bus_tag, _address) \
 	MDRV_DEVICE_ADD(_tag, C9060, 0) \
@@ -46,11 +46,6 @@ struct _c9060_config
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( c9060 );
-DEVICE_GET_INFO( c9090 );
-
 /* IEEE-488 interface */
 WRITE_LINE_DEVICE_HANDLER( c9060_ieee488_atn_w );
 WRITE_LINE_DEVICE_HANDLER( c9060_ieee488_ifc_w );

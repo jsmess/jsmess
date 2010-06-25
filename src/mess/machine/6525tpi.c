@@ -131,10 +131,9 @@ struct _tpi6525_state
 INLINE tpi6525_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TPI6525);
+	assert(device->type() == TPI6525);
 
-	return (tpi6525_state *)device->token;
+	return (tpi6525_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -147,7 +146,7 @@ static DEVICE_START( tpi6525 )
 	tpi6525_state *tpi6525 = get_safe_token(device);
 
 	/* verify that we have an interface assigned */
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, tpi6525->port_a);
@@ -176,7 +175,7 @@ static DEVICE_RESET( tpi6525 )
 	memset(tpi6525, 0, sizeof(*tpi6525));
 
 	/* copy interface pointer */
-	tpi6525->intf = (const tpi6525_interface*)device->baseconfig().static_config;
+	tpi6525->intf = (const tpi6525_interface*)device->baseconfig().static_config();
 
 	/* setup some initial values */
 	tpi6525->in_a = 0xff;
@@ -191,7 +190,6 @@ DEVICE_GET_INFO( tpi6525 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(tpi6525_state);		break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME( tpi6525 );			break;
@@ -626,3 +624,5 @@ UINT8 tpi6525_get_ddr_c(running_device *device)
 	tpi6525_state *tpi6525 = get_safe_token(device);
 	return tpi6525->ddr_c;
 }
+
+DEFINE_LEGACY_DEVICE(TPI6525, tpi6525);

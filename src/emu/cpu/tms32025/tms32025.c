@@ -165,7 +165,7 @@ struct _tms32025_state
 	int		init_load_addr;			/* 0=No, 1=Yes, 2=Once for repeat mode */
 	int		tms32025_irq_cycles;
 	int		tms32025_dec_cycles;
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 
 	PAIR	oldacc;
 	UINT32	memaccess;
@@ -173,7 +173,7 @@ struct _tms32025_state
 	int		mHackIgnoreARP;			 /* special handling for lst, lst1 instructions */
 	int		waiting_for_serial_frame;
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
@@ -185,11 +185,10 @@ struct _tms32025_state
 INLINE tms32025_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS32025 ||
 		   cpu_get_type(device) == CPU_TMS32026);
-	return (tms32025_state *)device->token;
+	return (tms32025_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* opcode table entry */
@@ -1968,7 +1967,6 @@ again:
 static CPU_EXECUTE( tms32025 )
 {
 	tms32025_state *cpustate = get_safe_token(device);
-	cpustate->icount = cycles;
 
 
 	/**** Respond to external hold signal */
@@ -2100,8 +2098,6 @@ static CPU_EXECUTE( tms32025 )
 			}
 		}
 	}
-
-	return (cycles - cpustate->icount);
 }
 
 
@@ -2311,7 +2307,7 @@ static CPU_SET_INFO( tms32025 )
 
 CPU_GET_INFO( tms32025 )
 {
-	tms32025_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms32025_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

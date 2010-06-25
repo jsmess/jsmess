@@ -24,10 +24,8 @@ struct _tms_state {
 INLINE tms_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_TMS3615);
-	return (tms_state *)device->token;
+	assert(device->type() == SOUND_TMS3615);
+	return (tms_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -92,9 +90,9 @@ static DEVICE_START( tms3615 )
 {
 	tms_state *tms = get_safe_token(device);
 
-	tms->channel = stream_create(device, 0, 2, device->clock/8, tms, tms3615_sound_update);
-	tms->samplerate = device->clock/8;
-	tms->basefreq = device->clock;
+	tms->channel = stream_create(device, 0, 2, device->clock()/8, tms, tms3615_sound_update);
+	tms->samplerate = device->clock()/8;
+	tms->basefreq = device->clock();
 }
 
 /**************************************************************************
@@ -121,3 +119,6 @@ DEVICE_GET_INFO( tms3615 )
 		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(TMS3615, tms3615);

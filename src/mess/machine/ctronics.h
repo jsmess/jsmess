@@ -28,9 +28,6 @@ struct _centronics_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( centronics );
-
 WRITE8_DEVICE_HANDLER( centronics_data_w );
 READ8_DEVICE_HANDLER( centronics_data_r );
 
@@ -61,7 +58,7 @@ READ_LINE_DEVICE_HANDLER( centronics_fault_r );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define CENTRONICS DEVICE_GET_INFO_NAME(centronics)
+DECLARE_LEGACY_DEVICE(CENTRONICS, centronics);
 
 #define MDRV_CENTRONICS_ADD(_tag, _intf) \
 	MDRV_DEVICE_ADD(_tag, CENTRONICS, 0) \

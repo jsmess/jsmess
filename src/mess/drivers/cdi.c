@@ -569,7 +569,7 @@ public:
 	UINT16 *planea;
 	UINT16 *planeb;
 
-	running_device *dmadac[2];
+	dmadac_sound_device *dmadac[2];
 
 	UINT8 timer_set;
 	emu_timer *test_timer;
@@ -2976,8 +2976,9 @@ static void mcd212_update_visible_area(running_machine *machine)
 {
 	cdi_state *state = (cdi_state *)machine->driver_data;
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
-	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
-	attoseconds_t period = video_screen_get_frame_period(machine->primary_screen).attoseconds;
+	const rectangle &visarea = machine->primary_screen->visible_area();
+	rectangle visarea1;
+	attoseconds_t period = machine->primary_screen->frame_period().attoseconds;
 	int width = 0;
 
 	if((mcd212->channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (mcd212->channel[0].csrw & MCD212_CSR1W_ST))
@@ -2989,9 +2990,12 @@ static void mcd212_update_visible_area(running_machine *machine)
 		width = 384;
 	}
 
-	visarea.max_x = width-1;
+	visarea1.max_x = width-1;
+	visarea1.min_x = visarea.min_x;
+	visarea1.min_y = visarea.min_y;
+	visarea1.max_y = visarea.max_y;	
 
-	video_screen_configure(machine->primary_screen, width, 262, &visarea, period);
+	machine->primary_screen->configure(width, 262, visarea1, period);
 }
 
 static WRITE16_HANDLER(mcd212_w)
@@ -4261,7 +4265,7 @@ static TIMER_CALLBACK( mcd212_perform_scan )
 {
 	cdi_state *state = (cdi_state *)machine->driver_data;
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
-	int scanline = video_screen_get_vpos(machine->primary_screen);
+	int scanline = machine->primary_screen->vpos();
 
 	if(/*mcd212->channel[0].dcr & MCD212_DCR_DE*/1)
 	{
@@ -4308,7 +4312,7 @@ static TIMER_CALLBACK( mcd212_perform_scan )
 			}
 		}
 	}
-	timer_adjust_oneshot(mcd212->scan_timer, video_screen_get_time_until_pos(machine->primary_screen, ( scanline + 1 ) % 262, 0), 0);
+	timer_adjust_oneshot(mcd212->scan_timer, machine->primary_screen->time_until_pos(( scanline + 1 ) % 262, 0), 0);
 }
 
 static void mcd212_init(running_machine *machine, mcd212_regs_t *mcd212)
@@ -4458,9 +4462,9 @@ static VIDEO_START(cdi)
 	mcd212_ab_init(&state->mcd212_ab);
 	mcd212_init(machine, &state->mcd212_regs);
 	state->mcd212_regs.scan_timer = timer_alloc(machine, mcd212_perform_scan, 0);
-	timer_adjust_oneshot(state->mcd212_regs.scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(state->mcd212_regs.scan_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 
-	state->lcdbitmap = video_screen_auto_bitmap_alloc(devtag_get_device(machine, "lcd"));
+	state->lcdbitmap = downcast<screen_device *>(machine->device("lcd"))->alloc_compatible_bitmap();
 }
 
 static VIDEO_UPDATE(cdi)
@@ -4632,8 +4636,8 @@ static MACHINE_RESET( cdi )
 
 	devtag_get_device(machine, "maincpu")->reset();
 
-	state->dmadac[0] = devtag_get_device(machine, "dac1");
-	state->dmadac[1] = devtag_get_device(machine, "dac2");
+	state->dmadac[0] = machine->device<dmadac_sound_device>("dac1");
+	state->dmadac[1] = machine->device<dmadac_sound_device>("dac2");
 
 	state->slave_regs.real_mouse_x = 0xffff;
 	state->slave_regs.real_mouse_y = 0xffff;

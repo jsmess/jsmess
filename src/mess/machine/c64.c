@@ -463,7 +463,7 @@ static void c64_bankswitch( running_machine *machine, int reset )
 	static int old = -1, exrom, game;
 	int loram, hiram, charen;
 	int ultimax_mode = 0;
-	int data = (UINT8) machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT) & 0x07;
+	int data = m6510_get_port(machine->device<legacy_cpu_device>("maincpu")) & 0x07;
 
 	/* If nothing has changed or reset = 0, don't do anything */
 	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset)
@@ -1024,15 +1024,15 @@ enum {
 
 static UINT8 c64_mapper = GENERIC_CRT;
 
-static int c64_common_cart_load( running_device *image )
+static int c64_common_cart_load( device_image_interface &image )
 {
-	int size = image_length(image), test, i = 0, n_banks;
+	int size = image.length(), test, i = 0, n_banks;
 	const char *filetype;
 	int address = 0, new_start = 0;
 	// int lbank_end_addr = 0, hbank_end_addr = 0;
-	UINT8 *cart = memory_region(image->machine, "user1");
+	UINT8 *cart = memory_region(image.device().machine, "user1");
 
-	filetype = image_filetype(image);
+	filetype = image.filetype();
 
 	/* We support .crt files */
 	if (!mame_stricmp(filetype, "crt"))
@@ -1048,8 +1048,8 @@ static int c64_common_cart_load( running_device *image )
 
 		/* Start to parse the .crt header */
 		/* 0x16-0x17 is Hardware type */
-		image_fseek(image, 0x16, SEEK_SET);
-		image_fread(image, &c64_cart_type, 2);
+		image.fseek(0x16, SEEK_SET);
+		image.fread( &c64_cart_type, 2);
 		c64_cart_type = BIG_ENDIANIZE_INT16(c64_cart_type);
 		c64_mapper = c64_cart_type;
 
@@ -1086,17 +1086,17 @@ static int c64_common_cart_load( running_device *image )
 		}
 
 		/* 0x18 is EXROM */
-		image_fseek(image, 0x18, SEEK_SET);
-		image_fread(image, &cbm_c64_exrom, 1);
+		image.fseek(0x18, SEEK_SET);
+		image.fread( &cbm_c64_exrom, 1);
 
 		/* 0x19 is GAME */
-		image_fread(image, &cbm_c64_game, 1);
+		image.fread( &cbm_c64_game, 1);
 
 		/* We can pass to the data: it starts from 0x40 */
-		image_fseek(image, 0x40, SEEK_SET);
+		image.fseek(0x40, SEEK_SET);
 		j = 0x40;
 
-		logerror("Loading cart %s size:%.4x\n", image_filename(image), size);
+		logerror("Loading cart %s size:%.4x\n", image.filename(), size);
 		logerror("Header info: EXROM %d, GAME %d, Cart Type %d \n", cbm_c64_exrom, cbm_c64_game, c64_cart_type);
 
 
@@ -1111,25 +1111,25 @@ static int c64_common_cart_load( running_device *image )
 
 			/* Start to parse the CHIP header */
 			/* First 4 bytes are the string 'CHIP' */
-			image_fread(image, buffer, 6);
+			image.fread( buffer, 6);
 
 			/* 0x06-0x07 is the size of the CHIP block (header + data) */
-			image_fread(image, &chip_size, 2);
+			image.fread( &chip_size, 2);
 			chip_size = BIG_ENDIANIZE_INT16(chip_size);
 
 			/* 0x08-0x09 chip type (ROM, RAM + no ROM, Flash ROM) */
-			image_fread(image, buffer + 6, 2);
+			image.fread( buffer + 6, 2);
 
 			/* 0x0a-0x0b is the bank number of the CHIP block */
-			image_fread(image, &chip_bank_index, 2);
+			image.fread( &chip_bank_index, 2);
 			chip_bank_index = BIG_ENDIANIZE_INT16(chip_bank_index);
 
 			/* 0x0c-0x0d is the loading address of the CHIP block */
-			image_fread(image, &address, 2);
+			image.fread( &address, 2);
 			address = BIG_ENDIANIZE_INT16(address);
 
 			/* 0x0e-0x0f is the data size of the CHIP block (without header) */
-			image_fread(image, &chip_data_size, 2);
+			image.fread( &chip_data_size, 2);
 			chip_data_size = BIG_ENDIANIZE_INT16(chip_data_size);
 
 			/* Print out the CHIP header! */
@@ -1140,7 +1140,7 @@ static int c64_common_cart_load( running_device *image )
 			logerror("Loading CHIP data at %.4x size:%.4x\n", address, chip_data_size);
 
 			/* Does CHIP contain any data? */
-			c64_cbm_cart[i].chip = (UINT8*) image_malloc(image, chip_data_size);
+			c64_cbm_cart[i].chip = (UINT8*) image.image_malloc(chip_data_size);
 			if (!c64_cbm_cart[i].chip)
 				return INIT_FAIL;
 
@@ -1150,7 +1150,7 @@ static int c64_common_cart_load( running_device *image )
 			c64_cbm_cart[i].size = chip_data_size;
 			c64_cbm_cart[i].start = new_start;
 
-			test = image_fread(image, c64_cbm_cart[i].chip, chip_data_size);
+			test = image.fread( c64_cbm_cart[i].chip, chip_data_size);
 
 			memcpy(&cart[new_start], c64_cbm_cart[i].chip, c64_cbm_cart[i].size);
 			new_start += c64_cbm_cart[i].size;
@@ -1175,10 +1175,10 @@ static int c64_common_cart_load( running_device *image )
 		if (!mame_stricmp (filetype, "f0"))
 			address = 0xf000;
 
-		logerror("loading %s rom at %.4x size:%.4x\n", image_filename(image), address, size);
+		logerror("loading %s rom at %.4x size:%.4x\n", image.filename(), address, size);
 
 		/* Does cart contain any data? */
-		c64_cbm_cart[0].chip = (UINT8*) image_malloc(image, size);
+		c64_cbm_cart[0].chip = (UINT8*) image.image_malloc(size);
 		if (!c64_cbm_cart[0].chip)
 			return INIT_FAIL;
 
@@ -1187,7 +1187,7 @@ static int c64_common_cart_load( running_device *image )
 		c64_cbm_cart[0].size = size;
 		c64_cbm_cart[0].start = new_start;
 
-		test = image_fread(image, c64_cbm_cart[0].chip, size);
+		test = image.fread( c64_cbm_cart[0].chip, size);
 
 		memcpy(&cart[new_start], c64_cbm_cart[0].chip, c64_cbm_cart[0].size);
 		new_start += c64_cbm_cart[0].size;
@@ -1241,7 +1241,7 @@ static DEVICE_IMAGE_LOAD( max_cart )
 {
 	int result = INIT_PASS;
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
 		result = c64_common_cart_load(image);
 	}
@@ -1260,14 +1260,14 @@ static DEVICE_IMAGE_LOAD( max_cart )
 		memset(romh, 0, 0x2000);
 
 		// is there anything to load at 0x8000?
-		size = image_get_software_region_length(image, "roml");
+		size = image.get_software_region_length("roml");
 		if (size)
-			memcpy(roml, image_get_software_region(image, "roml"), size);
+			memcpy(roml, image.get_software_region("roml"), size);
 
 		// is there anything to load at 0xe000?
-		size = image_get_software_region_length(image, "romh");
+		size = image.get_software_region_length("romh");
 		if (size)
-			memcpy(romh, image_get_software_region(image, "romh"), size);		
+			memcpy(romh, image.get_software_region("romh"), size);		
 	}
 
 	return result;

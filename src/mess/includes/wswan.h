@@ -107,10 +107,8 @@ extern void wswan_refresh_scanline( running_machine *machine );
 
 /*----------- defined in audio/wswan.c -----------*/
 
-#define SOUND_WSWAN		DEVICE_GET_INFO_NAME( wswan_sound )
+DECLARE_LEGACY_SOUND_DEVICE(WSWAN, wswan_sound);
 
 WRITE8_HANDLER( wswan_sound_port_w );
-DEVICE_GET_INFO( wswan_sound );
-
 
 #endif /* WSWAN_H_ */

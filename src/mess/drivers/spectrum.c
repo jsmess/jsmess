@@ -305,7 +305,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & 0x07)!=0)
 	{
 		/* yes - send event */
-		EventList_AddItemOffset(space->machine, 0x0fe, data & 0x07, cputag_attotime_to_clocks(space->machine, "maincpu", attotime_mul(video_screen_get_scan_period(space->machine->primary_screen), video_screen_get_vpos(space->machine->primary_screen))));
+		EventList_AddItemOffset(space->machine, 0x0fe, data & 0x07, cputag_attotime_to_clocks(space->machine, "maincpu", attotime_mul(space->machine->primary_screen->scan_period(), space->machine->primary_screen->vpos())));
 	}
 
 	if ((Changed & (1<<4))!=0)
@@ -327,7 +327,7 @@ static DIRECT_UPDATE_HANDLER(spectrum_direct)
 {
     /* Hack for correct handling 0xffff interrupt vector */
     if (address == 0x0001)
-        if (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPCBASE)==0xffff)
+        if (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), STATE_GENPCBASE)==0xffff)
         {
             cpu_set_reg(devtag_get_device(space->machine, "maincpu"), Z80_PC, 0xfff4);
             return 0xfff4;
@@ -427,7 +427,7 @@ READ8_HANDLER(spectrum_port_df_r)
 static READ8_HANDLER ( spectrum_port_ula_r )
 {
 	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
-	int vpos = video_screen_get_vpos(space->machine->primary_screen);
+	int vpos = space->machine->primary_screen->vpos();
 
 	return vpos<193 ? state->video_ram[(vpos&0xf8)<<2]:0xff;
 }
@@ -679,28 +679,27 @@ static DEVICE_IMAGE_LOAD( spectrum_cart )
 {
 	UINT32 filesize;
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		filesize = image_length(image);
+		filesize = image.length();
 
 		if (filesize != 0x4000 )
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
 			return INIT_FAIL;
 		}
 
-		if (image_fread(image, memory_region(image->machine, "maincpu"), filesize) != filesize)
+		if (image.fread(memory_region(image.device().machine, "maincpu"), filesize) != filesize)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Error loading file");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
 			return INIT_FAIL;
 		}
 	}
 	else
 	{
-		filesize = image_get_software_region_length(image, "rom");
-		memcpy(memory_region(image->machine, "maincpu"), image_get_software_region(image, "rom"), filesize);
+		filesize = image.get_software_region_length("rom");
+		memcpy(memory_region(image.device().machine, "maincpu"), image.get_software_region("rom"), filesize);
 	}
-	
 	return INIT_PASS;
 }
 

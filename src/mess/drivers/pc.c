@@ -121,13 +121,13 @@ TODO: Which clock signals are available in a PC Jr?
 #include "machine/pic8259.h"
 
 #include "machine/pit8253.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_mess.h"
 #include "video/pc_cga.h"
 #include "video/pc_mda.h"
 #include "video/pc_aga.h"
 #include "video/pc_t1t.h"
 #include "video/pc_ega.h"
-#include "video/pc_video.h"
+#include "video/pc_video_mess.h"
 
 #include "includes/pc_ide.h"
 #include "machine/pc_fdc.h"

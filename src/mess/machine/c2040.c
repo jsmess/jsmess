@@ -125,18 +125,17 @@ struct _c2040_t
 INLINE c2040_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == C2040) || (device->type == C3040) || (device->type == C4040) ||
-		(device->type == C8050) || (device->type == C8250) || (device->type == SFD1001));
-	return (c2040_t *)device->token;
+	assert((device->type() == C2040) || (device->type() == C3040) || (device->type() == C4040) ||
+		(device->type() == C8050) || (device->type() == C8250) || (device->type() == SFD1001));
+	return (c2040_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE c2040_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == C2040) || (device->type == C3040) || (device->type == C4040) ||
-		(device->type == C8050) || (device->type == C8250) || (device->type == SFD1001));
-	return (c2040_config *)device->baseconfig().inline_config;
+	assert((device->type() == C2040) || (device->type() == C3040) || (device->type() == C4040) ||
+		(device->type() == C8050) || (device->type() == C8250) || (device->type() == SFD1001));
+	return (c2040_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 INLINE void update_ieee_signals(running_device *device)
@@ -263,7 +262,7 @@ static TIMER_CALLBACK( bit_tick )
 		via_ca1_w(c2040->via, ready);
 		via_cb1_w(c2040->via, ERROR);
 
-		if ((device->type == C8050) || (device->type == C8250) || (device->type == SFD1001))
+		if ((device->type() == C8050) || (device->type() == C8250) || (device->type() == SFD1001))
 		{
 			cpu_set_input_line(c2040->cpu_fdc, M6502_SET_OVERFLOW, ready ? CLEAR_LINE : ASSERT_LINE);
 		}
@@ -292,9 +291,9 @@ static void read_current_track(c2040_t *c2040, int unit)
     on_disk_0_change - disk 0 change handler
 -------------------------------------------------*/
 
-static void on_disk_0_change(running_device *image)
+static void on_disk_0_change(device_image_interface &image)
 {
-	c2040_t *c2040 = get_safe_token(image->owner);
+	c2040_t *c2040 = get_safe_token(image.device().owner());
 
 	read_current_track(c2040, 0);
 }
@@ -303,9 +302,9 @@ static void on_disk_0_change(running_device *image)
     on_disk_1_change - disk 1 change handler
 -------------------------------------------------*/
 
-static void on_disk_1_change(running_device *image)
+static void on_disk_1_change(device_image_interface &image)
 {
-	c2040_t *c2040 = get_safe_token(image->owner);
+	c2040_t *c2040 = get_safe_token(image.device().owner());
 
 	read_current_track(c2040, 1);
 }
@@ -570,7 +569,7 @@ static READ8_DEVICE_HANDLER( dio_r )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	return ieee488_dio_r(c2040->bus, 0);
 }
@@ -592,9 +591,9 @@ static WRITE8_DEVICE_HANDLER( dio_w )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
-	ieee488_dio_w(c2040->bus, device->owner, data);
+	ieee488_dio_w(c2040->bus, device->owner(), data);
 }
 
 static const riot6532_interface riot0_intf =
@@ -627,7 +626,7 @@ static READ8_DEVICE_HANDLER( riot1_pa_r )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
@@ -660,7 +659,7 @@ static WRITE8_DEVICE_HANDLER( riot1_pa_w )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	/* attention acknowledge */
 	c2040->atna = BIT(data, 0);
@@ -672,12 +671,12 @@ static WRITE8_DEVICE_HANDLER( riot1_pa_w )
 	c2040->rfdo = BIT(data, 2);
 
 	/* end or identify out */
-	ieee488_eoi_w(c2040->bus, device->owner, BIT(data, 3));
+	ieee488_eoi_w(c2040->bus, device->owner(), BIT(data, 3));
 
 	/* data valid out */
-	ieee488_dav_w(c2040->bus, device->owner, BIT(data, 4));
+	ieee488_dav_w(c2040->bus, device->owner(), BIT(data, 4));
 
-	update_ieee_signals(device->owner);
+	update_ieee_signals(device->owner());
 }
 
 static READ8_DEVICE_HANDLER( riot1_pb_r )
@@ -697,7 +696,7 @@ static READ8_DEVICE_HANDLER( riot1_pb_r )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
@@ -739,7 +738,7 @@ static WRITE8_DEVICE_HANDLER( riot1_pb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( riot1_irq_w )
 {
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	cpu_set_input_line(c2040->cpu_dos, M6502_IRQ_LINE, state);
 }
@@ -774,7 +773,7 @@ static READ8_DEVICE_HANDLER( via_pa_r )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	UINT16 i = c2040->i;
 	UINT8 e = c2040->e;
@@ -800,7 +799,7 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	/* spindle motor 1 */
 	int mtr1 = BIT(data, 4);
@@ -823,21 +822,21 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
 static READ_LINE_DEVICE_HANDLER( ready_r )
 {
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	return c2040->ready;
 }
 
 static READ_LINE_DEVICE_HANDLER( err_r )
 {
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	return ERROR;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mode_sel_w )
 {
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	/* mode select */
 	c2040->mode = state;
@@ -848,7 +847,7 @@ static WRITE_LINE_DEVICE_HANDLER( mode_sel_w )
 
 static WRITE_LINE_DEVICE_HANDLER( rw_sel_w )
 {
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	/* read/write select */
 	c2040->rw = state;
@@ -897,7 +896,7 @@ static READ8_DEVICE_HANDLER( c8050_via_pb_r )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
@@ -924,7 +923,7 @@ static WRITE8_DEVICE_HANDLER( c8050_via_pb_w )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	/* spindle motor 1 */
 	int mtr1 = BIT(data, 4);
@@ -985,7 +984,7 @@ static READ8_DEVICE_HANDLER( pi_r )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	return c2040->pi;
 }
@@ -1007,7 +1006,7 @@ static WRITE8_DEVICE_HANDLER( pi_w )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	c2040->pi = data;
 }
@@ -1029,7 +1028,7 @@ static READ8_DEVICE_HANDLER( miot_pb_r )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
@@ -1059,7 +1058,7 @@ static WRITE8_DEVICE_HANDLER( miot_pb_w )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	/* drive select */
 	c2040->drive = BIT(data, 0);
@@ -1110,7 +1109,7 @@ static READ8_DEVICE_HANDLER( c8050_miot_pb_r )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
@@ -1121,7 +1120,7 @@ static READ8_DEVICE_HANDLER( c8050_miot_pb_r )
 	data |= 0x10;
 
 	/* single/dual sided */
-	if (device->owner->type == C8050)
+	if (device->owner()->type() == C8050)
 	{
 		data |= 0x40;
 	}
@@ -1146,10 +1145,10 @@ static WRITE8_DEVICE_HANDLER( c8050_miot_pb_w )
 
     */
 
-	c2040_t *c2040 = get_safe_token(device->owner);
+	c2040_t *c2040 = get_safe_token(device->owner());
 
 	/* drive select */
-	if ((device->owner->type == C8050) || (device->owner->type == C8250))
+	if ((device->owner()->type() == C8050) || (device->owner()->type() == C8250))
 	{
 		c2040->drive = BIT(data, 0);
 	}
@@ -1164,7 +1163,7 @@ static WRITE8_DEVICE_HANDLER( c8050_miot_pb_w )
 	}
 
 	/* side select */
-	if ((device->owner->type == C8250) || (device->owner->type == SFD1001))
+	if ((device->owner()->type() == C8250) || (device->owner()->type() == SFD1001))
 	{
 		c2040->side = !BIT(data, 4);
 	}
@@ -1526,19 +1525,19 @@ static DEVICE_START( c2040 )
 	/* find GCR ROM */
 	const region_info *region = device->subregion(C4040_REGION);
 
-	if ((device->type == C2040) || (device->type == C3040))
+	if ((device->type() == C2040) || (device->type() == C3040))
 	{
 		region = device->subregion(C2040_REGION);
 	}
-	else if (device->type == C4040)
+	else if (device->type() == C4040)
 	{
 		region = device->subregion(C4040_REGION);
 	}
-	else if ((device->type == C8050) || (device->type == C8250))
+	else if ((device->type() == C8050) || (device->type() == C8250))
 	{
 		region = device->subregion(C8050_REGION);
 	}
-	else if (device->type == SFD1001)
+	else if (device->type() == SFD1001)
 	{
 		region = device->subregion(SFD1001_REGION);
 	}
@@ -1612,7 +1611,6 @@ DEVICE_GET_INFO( c2040 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c2040_t);									break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c2040_config);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c2040);							break;
@@ -1726,3 +1724,10 @@ DEVICE_GET_INFO( sfd1001 )
 		default:										DEVICE_GET_INFO_CALL(c2040);								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(C2040, c2040);
+DEFINE_LEGACY_DEVICE(C3040, c3040);
+DEFINE_LEGACY_DEVICE(C4040, c4040);
+DEFINE_LEGACY_DEVICE(C8050, c8050);
+DEFINE_LEGACY_DEVICE(C8250, c8250);
+DEFINE_LEGACY_DEVICE(SFD1001, sfd1001);

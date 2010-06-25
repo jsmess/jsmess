@@ -114,8 +114,8 @@ TIMER_CALLBACK( sam_video_update_callback )
 {
 	coupe_asic *asic = (coupe_asic *)machine->driver_data;
 
-	int vpos = video_screen_get_vpos(machine->primary_screen);
-	int hpos = video_screen_get_hpos(machine->primary_screen);
+	int vpos = machine->primary_screen->vpos();
+	int hpos = machine->primary_screen->hpos();
 
 	int next_vpos = vpos;
 	int next_hpos = hpos + SAM_BLOCK*2;
@@ -158,5 +158,5 @@ TIMER_CALLBACK( sam_video_update_callback )
 		samcoupe_irq(machine->firstcpu, SAM_LINE_INT);
 
 	/* schedule next update */
-	timer_adjust_oneshot(asic->video_update_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, next_hpos), 0);
+	timer_adjust_oneshot(asic->video_update_timer, machine->primary_screen->time_until_pos(next_vpos, next_hpos), 0);
 }

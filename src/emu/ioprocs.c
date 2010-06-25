@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include "ioprocs.h"
-#include "utils.h"
 
 
 /*********************************************************************

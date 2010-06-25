@@ -27,7 +27,6 @@
 #include "mui_util.h"
 #include "columnedit.h"
 #include "mess.h"
-#include "configms.h"
 #include "softwarepicker.h"
 #include "softwarelist.h"
 #include "devview.h"
@@ -37,7 +36,6 @@
 #include "messui.h"
 #include "winutf8.h"
 #include "swconfig.h"
-#include "device.h"
 #include "zippath.h"
 #include "emuopts.h"
 
@@ -56,7 +54,7 @@
 typedef struct _mess_image_type mess_image_type;
 struct _mess_image_type
 {
-	const device_config *dev;
+	const device_config_image_interface *dev;
     char *ext;
 	const char *dlgname;
 };
@@ -151,7 +149,7 @@ static void SoftwareTabView_OnSelectionChanged(void);
 static void SoftwareTabView_OnMoveSize(void);
 static void SetupSoftwareTabView(void);
 
-static void MessOpenOtherSoftware(const device_config *dev);
+static void MessOpenOtherSoftware(const device_config_image_interface *dev);
 static void MessRefreshPicker(void);
 
 static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem);
@@ -162,10 +160,10 @@ static int SoftwareList_GetItemImage(HWND hwndPicker, int nItem);
 static void SoftwareList_LeavingItem(HWND hwndSoftwareList, int nItem);
 static void SoftwareList_EnteringItem(HWND hwndSoftwareList, int nItem);
 
-static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength);
-static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength);
-static void DevView_SetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const machine_config *config, const device_config *dev, LPCTSTR pszFilename);
-static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const machine_config *config, const device_config *dev, LPTSTR pszBuffer, UINT nBufferLength);
+static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config_image_interface *dev, LPTSTR pszFilename, UINT nFilenameLength);
+static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config_image_interface *dev, LPTSTR pszFilename, UINT nFilenameLength);
+static void DevView_SetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const machine_config *config, const device_config_image_interface *dev, LPCTSTR pszFilename);
+static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex, const machine_config *config, const device_config_image_interface *dev, LPTSTR pszBuffer, UINT nBufferLength);
 
 #ifdef MAME_DEBUG
 static void MessTestsBegin(void);
@@ -311,7 +309,7 @@ static int GetMessIcon(int drvindex, int nSoftwareType)
 
     if ((nSoftwareType >= 0) && (nSoftwareType < IO_COUNT))
 	{
-		iconname = device_brieftypename((iodevice_t)nSoftwareType);
+		iconname = device_config_image_interface::device_brieftypename((iodevice_t)nSoftwareType);
         the_index = (drvindex * IO_COUNT) + nSoftwareType;
 
         nIconPos = mess_icon_index[the_index];
@@ -448,11 +446,11 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	machine_config *config = machine_config_alloc( drivers[drvindex]->machine_config );
 
 	core_options *options = mame_options_init(NULL);
-	for (const device_config *dev = config->devicelist.first(); dev != NULL; dev = dev->next)
+	for (const device_config *dev = config->devicelist.first(); dev != NULL; dev = dev->next())
 	{
 		if ( ! strcmp( dev->tag(), __SOFTWARE_LIST_TAG ) )
 		{
-			software_list_config *swlist = (software_list_config *)dev->inline_config;
+			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
 
 			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
 			{
@@ -464,29 +462,23 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 					{
 						for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
 						{							
-							const device_config *selimage = NULL;
+							const device_config_image_interface *image;
 							software_part *part = software_find_part(swinfo, NULL, NULL);			
 
-							/* search for a device with the right interface */
-							for (const device_config *image = config->devicelist.first(); image != NULL; image = image->next)
+							// search for a device with the right interface 
+							for (bool gotone = config->devicelist.first(image); gotone; gotone = image->next(image))
 							{
-								const char *interface = image->get_config_string(DEVINFO_STR_INTERFACE);
-
+								const char *interface = image->image_interface();
 								if (interface != NULL)
 								{
 									if (!strcmp(interface, part->interface_))
 									{
-										selimage = image;
+										SoftwareList_AddFile(hwndSoftwareList, swinfo->shortname, swlist->list_name[i], swinfo->longname, swinfo->publisher, swinfo->year, image->brief_instance_name());
 										break;
 									}
 								}
 							}
-							if (selimage) {
-								image_device_info info = image_device_getinfo(config, selimage);
-								SoftwareList_AddFile(hwndSoftwareList, swinfo->shortname, swlist->list_name[i], swinfo->longname, swinfo->publisher, swinfo->year, info.brief_instance_name);
-							}
 						}
-
 						software_list_close(list);
 					}						
 				}
@@ -511,8 +503,7 @@ void MessUpdateSoftwareList(void)
 BOOL MessApproveImageList(HWND hParent, int drvindex)
 {
 	machine_config *config;
-	const device_config *dev;
-	//int nPos;
+	const device_config_image_interface *dev;
 	char szMessage[256];
 	LPCSTR pszSoftware;
 	BOOL bResult = FALSE;
@@ -520,33 +511,23 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 	if (g_szSelectedSoftware[0] && g_szSelectedDevice[0]) {
 		return TRUE;
 	}
-//  begin_resource_tracking();
-
 	// allocate the machine config
 	config = machine_config_alloc(drivers[drvindex]->machine_config);
 
-	//nPos = 0;
-	for (dev = config->devicelist.first(); dev != NULL; dev = dev->next)
+	for (bool gotone = config->devicelist.first(dev); gotone; gotone = dev->next(dev))
 	{
-		if (is_image_device(dev))
+		// confirm any mandatory devices are loaded
+		if (dev->must_be_loaded())
 		{
-			image_device_info info = image_device_getinfo(config, dev);
-
-			// confirm any mandatory devices are loaded
-			if (info.must_be_loaded)
+			pszSoftware = GetSelectedSoftware(drvindex, config, dev);
+			if (!pszSoftware || !*pszSoftware)
 			{
-				pszSoftware = GetSelectedSoftware(drvindex, config, dev);
-				if (!pszSoftware || !*pszSoftware)
-				{
-					snprintf(szMessage, ARRAY_LENGTH(szMessage),
-						"System '%s' requires that device %s must have an image to load\n",
-						drivers[drvindex]->description,
-						device_typename(info.type));
-					goto done;
-				}
+				snprintf(szMessage, ARRAY_LENGTH(szMessage),
+					"System '%s' requires that device %s must have an image to load\n",
+					drivers[drvindex]->description,
+					dev->image_type_name());
+				goto done;
 			}
-
-			//nPos++;
 		}
 	}
 	bResult = TRUE;
@@ -564,7 +545,7 @@ done:
 
 
 // this is a wrapper call to wrap the idiosycracies of SetSelectedSoftware()
-static void InternalSetSelectedSoftware(int drvindex, const machine_config *config, const device_config *device, const char *pszSoftware)
+static void InternalSetSelectedSoftware(int drvindex, const machine_config *config, const device_config_image_interface *device, const char *pszSoftware)
 {
 	if (!pszSoftware)
 		pszSoftware = "";
@@ -586,7 +567,7 @@ static int is_null_or_empty(const char *s)
 
 
 // Places the specified image in the specified slot; nID = -1 means don't matter
-static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR pszFilename)
+static void MessSpecifyImage(int drvindex, const device_config_image_interface *device, LPCSTR pszFilename)
 {
 	const char *s;
 
@@ -596,13 +577,13 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 	// if device is NULL, this is a special case; try to find existing image
 	if (device == NULL)
 	{
-		for (device = s_config->mconfig->devicelist.first(); device != NULL;device = device->next)
+		const device_config_image_interface *dev;
+		for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev)) 
 		{
-			if (is_image_device(device))
-			{
-				s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
-				if ((s != NULL) && !mame_stricmp(s, pszFilename))
-					break;
+			device = dev;
+			s = GetSelectedSoftware(drvindex, s_config->mconfig, device);			
+			if ((s != NULL) && !mame_stricmp(s, pszFilename)) {				
+				break;
 			}
 		}
 	}
@@ -619,13 +600,13 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 
 		if (file_extension != NULL)
 		{
-			for (device = s_config->mconfig->devicelist.first(); device != NULL;device = device->next)
+   		    const device_config_image_interface *dev;
+			for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))			
 			{
-				if (is_image_device(device))
-				{
-					s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
-					if (is_null_or_empty(s) && image_device_uses_file_extension(device, file_extension))
-						break;
+				device = dev;
+				s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
+				if (is_null_or_empty(s) && dev->uses_file_extension(file_extension)) {
+					break;
 				}
 			}
 		}
@@ -648,17 +629,14 @@ static void MessSpecifyImage(int drvindex, const device_config *device, LPCSTR p
 
 static void MessRemoveImage(int drvindex, const char *pszFilename)
 {
-	const device_config *device;
+	const device_config_image_interface *device;
 	const char *s;
 
-	for (device = s_config->mconfig->devicelist.first(); device != NULL;device = device->next)
+	for (bool gotone = s_config->mconfig->devicelist.first(device); gotone; gotone = device->next(device))			
 	{
-		if (is_image_device(device))
-		{
-			s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
-			if ((s != NULL) && !strcmp(pszFilename, s))
-				MessSpecifyImage(drvindex, device, NULL);
-		}
+		s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
+		if ((s != NULL) && !strcmp(pszFilename, s))
+			MessSpecifyImage(drvindex, device, NULL);
 	}
 }
 
@@ -680,7 +658,7 @@ static void MessRefreshPicker(void)
 	HWND hwndSoftware;
 	int i;
 	LVFINDINFO lvfi;
-	const device_config *dev;
+	const device_config_image_interface *dev;
 	LPCSTR pszSoftware;
 
 	hwndSoftware = GetDlgItem(GetMainWindow(), IDC_SWLIST);
@@ -691,27 +669,24 @@ static void MessRefreshPicker(void)
 	// be problematic
 	ListView_SetItemState(hwndSoftware, -1, 0, LVIS_SELECTED);
 
-	for (dev = s_config->mconfig->devicelist.first(); dev != NULL;dev = dev->next)
+	for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))			
 	{
-		if (is_image_device(dev))
+		pszSoftware = GetSelectedSoftware(s_config->driver_index, s_config->mconfig, dev);
+		if (pszSoftware && *pszSoftware)
 		{
-			pszSoftware = GetSelectedSoftware(s_config->driver_index, s_config->mconfig, dev);
-			if (pszSoftware && *pszSoftware)
+			i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
+			if (i < 0)
 			{
+				SoftwarePicker_AddFile(hwndSoftware, pszSoftware);
 				i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
-				if (i < 0)
-				{
-					SoftwarePicker_AddFile(hwndSoftware, pszSoftware);
-					i = SoftwarePicker_LookupIndex(hwndSoftware, pszSoftware);
-				}
-				if (i >= 0)
-				{
-					memset(&lvfi, 0, sizeof(lvfi));
-					lvfi.flags = LVFI_PARAM;
-					lvfi.lParam = i;
-					i = ListView_FindItem(hwndSoftware, -1, &lvfi);
-					ListView_SetItemState(hwndSoftware, i, LVIS_SELECTED, LVIS_SELECTED);
-				}
+			}
+			if (i >= 0)
+			{
+				memset(&lvfi, 0, sizeof(lvfi));
+				lvfi.flags = LVFI_PARAM;
+				lvfi.lParam = i;
+				i = ListView_FindItem(hwndSoftware, -1, &lvfi);
+				ListView_SetItemState(hwndSoftware, i, LVIS_SELECTED, LVIS_SELECTED);
 			}
 		}
 	}
@@ -877,7 +852,7 @@ static BOOL CommonFileImageDialog(LPTSTR the_last_directory, common_file_dialog_
 
 
 /* Specify IO_COUNT for type if you want all types */
-static void SetupImageTypes(const machine_config *config, mess_image_type *types, int count, BOOL bZip, const device_config *dev)
+static void SetupImageTypes(const machine_config *config, mess_image_type *types, int count, BOOL bZip, const device_config_image_interface *dev)
 {
     int num_extensions = 0;
 
@@ -895,38 +870,30 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 
 	if (dev == NULL)
 	{
+		const device_config_image_interface *device;
 		/* special case; all non-printer devices */
-		for (dev = config->devicelist.first(); dev != NULL;dev = dev->next)
+		for (bool gotone = config->devicelist.first(device); gotone; gotone = device->next(device))
 		{
-			if (is_image_device(dev))
-			{
-				image_device_info info = image_device_getinfo(config, dev);
-
-				if (info.type != IO_PRINTER)
-					SetupImageTypes(config, &types[num_extensions], count - num_extensions, FALSE, dev);
-			}
+			if (device->image_type() != IO_PRINTER)
+				SetupImageTypes(config, &types[num_extensions], count - num_extensions, FALSE, device);
 		}
 
 	}
 	else
-	{
-		image_device_info info = image_device_getinfo(config, dev);
-		const char *ext = info.file_extensions;
-
-		if (ext != NULL)
+	{	
+		astring extensions((char*)dev->file_extensions());
+		char *ext = strtok((char*)extensions.cstr(),",");
+		while (ext != NULL)
 		{
-			while(*ext != '\0')
+			if (num_extensions < count)
 			{
-				if (num_extensions < count)
-				{
-					types[num_extensions].dev = dev;
-					types[num_extensions].ext = mame_strdup(ext);
-					types[num_extensions].dlgname = lookupdevice(info.type)->dlgname;
-					num_extensions++;
-				}
-				ext += strlen(ext) + 1;
+				types[num_extensions].dev = dev;
+				types[num_extensions].ext = mame_strdup(ext);
+				types[num_extensions].dlgname = lookupdevice(dev->image_type())->dlgname;
+				num_extensions++;
 			}
-		}
+			ext = strtok (NULL, ",");
+		}	
 	}
 }
 
@@ -942,7 +909,7 @@ static void CleanupImageTypes(mess_image_type *types, int count)
 }
 
 
-static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *dev)
+static void MessSetupDevice(common_file_dialog_proc cfd, const device_config_image_interface *dev)
 {
 	TCHAR filename[MAX_PATH];
 	mess_image_type imagetypes[64];
@@ -979,7 +946,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config *de
 
 
 
-static void MessOpenOtherSoftware(const device_config *dev)
+static void MessOpenOtherSoftware(const device_config_image_interface *dev)
 {
 	MessSetupDevice(GetOpenFileName, dev);
 }
@@ -1000,7 +967,7 @@ static void MessOpenOtherSoftware(const device_config *dev)
     4. mess-folder\software
     5. mess-folder */
 
-static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
+static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *config, const device_config_image_interface *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
 	BOOL bResult;
 	TCHAR *t_s;
@@ -1079,7 +1046,7 @@ static BOOL DevView_GetOpenFileName(HWND hwndDevView, const machine_config *conf
     3. mess-folder\software
     4. mess-folder */
 
-static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config *dev, LPTSTR pszFilename, UINT nFilenameLength)
+static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *config, const device_config_image_interface *dev, LPTSTR pszFilename, UINT nFilenameLength)
 {
 	BOOL bResult;
 	TCHAR *t_s;
@@ -1142,7 +1109,7 @@ static BOOL DevView_GetCreateFileName(HWND hwndDevView, const machine_config *co
 
 
 static void DevView_SetSelectedSoftware(HWND hwndDevView, int drvindex,
-	const machine_config *config, const device_config *dev, LPCTSTR pszFilename)
+	const machine_config *config, const device_config_image_interface *dev, LPCTSTR pszFilename)
 {
 	char* utf8_filename = utf8_from_tstring(pszFilename);
 	if( !utf8_filename )
@@ -1155,7 +1122,7 @@ static void DevView_SetSelectedSoftware(HWND hwndDevView, int drvindex,
 
 
 static LPCTSTR DevView_GetSelectedSoftware(HWND hwndDevView, int nDriverIndex,
-	const machine_config *config, const device_config *dev, LPTSTR pszBuffer, UINT nBufferLength)
+	const machine_config *config, const device_config_image_interface *dev, LPTSTR pszBuffer, UINT nBufferLength)
 {
 	LPCTSTR t_buffer = NULL;
 	TCHAR* t_s;
@@ -1203,7 +1170,7 @@ static int SoftwarePicker_GetItemImage(HWND hwndPicker, int nItem)
 			default:
 				icon_name = lookupdevice(nType)->icon_name;
 				if (!icon_name)
-					icon_name = device_typename(nType);
+					icon_name = device_config_image_interface::device_typename(nType);
 				nIcon = FindIconIndexByName(icon_name);
 				if (nIcon < 0)
 					nIcon = FindIconIndex(IDI_WIN_UNKNOWN);
@@ -1296,7 +1263,7 @@ static int SoftwareList_GetItemImage(HWND hwndPicker, int nItem)
 			default:
 				icon_name = lookupdevice(nType)->icon_name;
 				if (!icon_name)
-					icon_name = device_typename(nType);
+					icon_name = device_config_image_interface::device_typename(nType);
 				nIcon = FindIconIndexByName(icon_name);
 				if (nIcon < 0)
 					nIcon = FindIconIndex(IDI_WIN_UNKNOWN);

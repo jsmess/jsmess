@@ -24,7 +24,7 @@ struct apple525_disk
 INLINE const appledriv_config *get_config(running_device *device)
 {
 	assert(device != NULL);
-	return (const appledriv_config *) device->baseconfig().inline_config;
+	return (const appledriv_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 static int apple525_enable_mask = 1;
@@ -167,13 +167,14 @@ static UINT8 apple525_process_byte(running_device *img, int write_value)
 	int spinfract_divisor;
 	int spinfract_dividend;
 	const appledriv_config *config = get_config(img);
+	device_image_interface *image = (device_image_interface*)img;
 
 	disk = (struct apple525_disk *)  flopimg_get_custom_data(img);
 	spinfract_dividend = config->dividend;
 	spinfract_divisor = config->divisor;
 
 	/* no image initialized for that drive ? */
-	if (!image_exists(img))
+	if (!image->exists())
 		return 0xFF;
 
 	/* check the spin count if reading*/
@@ -241,7 +242,7 @@ void apple525_write_data(running_device *device,UINT8 data)
 int apple525_read_status(running_device *device)
 {
 	int i, count, result = 0;
-	running_device *image;
+	device_image_interface *image;
 
 	count = apple525_get_count(device->machine);
 
@@ -249,8 +250,8 @@ int apple525_read_status(running_device *device)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = floppy_get_device_by_type(device->machine, FLOPPY_TYPE_APPLE, i);
-			if (image && !image_is_writable(image))
+			image = (device_image_interface*)floppy_get_device_by_type(device->machine, FLOPPY_TYPE_APPLE, i);
+			if (image && !image->is_writable())
 				result = 1;
 		}
 	}
@@ -270,8 +271,8 @@ static DEVICE_START( apple525_floppy )
 static DEVICE_IMAGE_LOAD( apple525_floppy )
 {
 	int result = DEVICE_IMAGE_LOAD_NAME(floppy)(image);
-	floppy_drive_seek(image, -999);
-	floppy_drive_seek(image, +35/2);
+	floppy_drive_seek(&image.device(), -999);
+	floppy_drive_seek(&image.device(), +35/2);
 	return result;
 }
 
@@ -295,3 +296,5 @@ DEVICE_GET_INFO( apple525 )
 		default:									DEVICE_GET_INFO_CALL(floppy);				break;
 	}
 }
+
+DEFINE_LEGACY_IMAGE_DEVICE(FLOPPY_APPLE, apple525);

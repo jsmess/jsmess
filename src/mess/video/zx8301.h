@@ -40,7 +40,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define ZX8301 DEVICE_GET_INFO_NAME( zx8301 )
+DECLARE_LEGACY_DEVICE(ZX8301, zx8301);
 
 #define MDRV_ZX8301_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, ZX8301, _clock) \
@@ -72,9 +72,6 @@ struct _zx8301_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( zx8301 );
 
 /* register access */
 WRITE8_DEVICE_HANDLER( zx8301_control_w );

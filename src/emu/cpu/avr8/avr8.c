@@ -26,7 +26,7 @@ struct _avr8_state
 {
     UINT32 pc;
 
-    running_device *device;
+    legacy_cpu_device *device;
     const address_space *program;
     const address_space *io;
     int icount;
@@ -78,10 +78,9 @@ enum
 INLINE avr8_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
-    assert(device->token != NULL);
-    assert(device->type == CPU);
+    assert(device->type() == CPU);
     assert(cpu_get_type(device) == CPU_AVR8);
-    return (avr8_state *)device->token;
+    return (avr8_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /*****************************************************************************/
@@ -222,8 +221,6 @@ static CPU_EXECUTE( avr8 )
     INT32 opcycles = 1;
     //UINT16 pr = 0;
     avr8_state *cpustate = get_safe_token(device);
-
-    cpustate->icount = cycles;
 
     while (cpustate->icount > 0)
     {
@@ -992,8 +989,6 @@ static CPU_EXECUTE( avr8 )
 
         cpustate->icount -= opcycles;
     }
-
-    return cycles - cpustate->icount;
 }
 
 /*****************************************************************************/
@@ -1074,7 +1069,7 @@ static CPU_SET_INFO( avr8 )
 
 CPU_GET_INFO( avr8 )
 {
-    avr8_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+    avr8_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
     switch(state)
     {

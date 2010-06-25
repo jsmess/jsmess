@@ -242,7 +242,7 @@ static emu_timer *x1_rtc_timer;
 
 static UINT8 pcg_write_addr;
 
-static DEVICE_START(x1_daisy){}
+//static DEVICE_START(x1_daisy){}
 
 static UINT8 *x1_colorram;
 /*************************************
@@ -300,7 +300,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 
 						pcg_pen = pen[2]<<2|pen[1]<<1|pen[0]<<0;
 
-						if(color & 0x10 &&	video_screen_get_frame_number(machine->primary_screen) & 0x10) //reverse flickering
+						if(color & 0x10 &&	machine->primary_screen->frame_number() & 0x10) //reverse flickering
 							pcg_pen^=7;
 
 						if(pcg_pen == 0 && (!(color & 8)))
@@ -312,7 +312,7 @@ static void draw_fgtilemap(running_machine *machine, bitmap_t *bitmap,const rect
 						if((scrn_reg.blackclip & 8) && (color == (scrn_reg.blackclip & 7)))
 							pcg_pen = 0; // clip the pen to black
 
-						if((res_x+xi)>video_screen_get_visible_area(machine->primary_screen)->max_x && (res_y+yi)>video_screen_get_visible_area(machine->primary_screen)->max_y)
+						if((res_x+xi)>machine->primary_screen->visible_area().max_x && (res_y+yi)>machine->primary_screen->visible_area().max_y)
 							continue;
 
 						if(scrn_reg.v400_mode)
@@ -405,14 +405,14 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 
 					if(scrn_reg.v400_mode)
 					{
-						if((x*8+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (( y*(tile_height+1)+yi)*2+0)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+						if((x*8+xi)<=machine->primary_screen->visible_area().max_x && (( y*(tile_height+1)+yi)*2+0)<=machine->primary_screen->visible_area().max_y)
 							*BITMAP_ADDR16(bitmap, ( y*(tile_height+1)+yi)*2+0, x*8+xi) = machine->pens[color+0x100];
-						if((x*8+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (( y*(tile_height+1)+yi)*2+1)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+						if((x*8+xi)<=machine->primary_screen->visible_area().max_x && (( y*(tile_height+1)+yi)*2+1)<=machine->primary_screen->visible_area().max_y)
 							*BITMAP_ADDR16(bitmap, ( y*(tile_height+1)+yi)*2+1, x*8+xi) = machine->pens[color+0x100];
 					}
 					else
 					{
-						if((x*8+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y*(tile_height+1)+yi)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+						if((x*8+xi)<=machine->primary_screen->visible_area().max_x && (y*(tile_height+1)+yi)<=machine->primary_screen->visible_area().max_y)
 							*BITMAP_ADDR16(bitmap, y*(tile_height+1)+yi, x*8+xi) = machine->pens[color+0x100];
 					}
 				}
@@ -458,14 +458,14 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 
 						if(scrn_reg.v400_mode)
 						{
-							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+(yi >> 1)*2+0)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							if((x+xi)<=machine->primary_screen->visible_area().max_x && (y+(yi >> 1)*2+0)<=machine->primary_screen->visible_area().max_y)
 								*BITMAP_ADDR16(bitmap, (y+(yi >> 1))*2+0, x+xi) = machine->pens[color+0x100];
-							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+(yi >> 1)*2+1)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							if((x+xi)<=machine->primary_screen->visible_area().max_x && (y+(yi >> 1)*2+1)<=machine->primary_screen->visible_area().max_y)
 								*BITMAP_ADDR16(bitmap, (y+(yi >> 1))*2+1, x+xi) = machine->pens[color+0x100];
 						}
 						else
 						{
-							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+(yi >> 1))<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							if((x+xi)<=machine->primary_screen->visible_area().max_x && (y+(yi >> 1))<=machine->primary_screen->visible_area().max_y)
 								*BITMAP_ADDR16(bitmap, y+(yi >> 1), x+xi) = machine->pens[color+0x100];
 						}
 					}
@@ -473,14 +473,14 @@ static void draw_gfxbitmap(running_machine *machine, bitmap_t *bitmap,const rect
 					{
 						if(scrn_reg.v400_mode)
 						{
-							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && ((y+yi)*2+0)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							if((x+xi)<=machine->primary_screen->visible_area().max_x && ((y+yi)*2+0)<=machine->primary_screen->visible_area().max_y)
 								*BITMAP_ADDR16(bitmap, (y+yi)*2+0, x+xi) = machine->pens[color+0x100];
-							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && ((y+yi)*2+1)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							if((x+xi)<=machine->primary_screen->visible_area().max_x && ((y+yi)*2+1)<=machine->primary_screen->visible_area().max_y)
 								*BITMAP_ADDR16(bitmap, (y+yi)*2+1, x+xi) = machine->pens[color+0x100];
 						}
 						else
 						{
-							if((x+xi)<=video_screen_get_visible_area(machine->primary_screen)->max_x && (y+yi)<=video_screen_get_visible_area(machine->primary_screen)->max_y)
+							if((x+xi)<=machine->primary_screen->visible_area().max_x && (y+yi)<=machine->primary_screen->visible_area().max_y)
 								*BITMAP_ADDR16(bitmap, y+yi, x+xi) = machine->pens[color+0x100];
 						}
 					}
@@ -498,7 +498,7 @@ static VIDEO_UPDATE( x1 )
 {
 	int w;
 
-	w = (video_screen_get_width(screen) < 640) ? 1 : 2;
+	w = (screen->width() < 640) ? 1 : 2;
 
 	bitmap_fill(bitmap, cliprect, MAKE_ARGB(0xff,0x00,0x00,0x00));
 
@@ -855,43 +855,42 @@ static WRITE8_HANDLER( sub_io_w )
 	logerror("SUB: Command byte 0x%02x\n",data);
 }
 
-static int x1_keyboard_irq_state(running_device* device)
-{
-	if(key_irq_flag != 0)
-		return Z80_DAISY_INT;
-
-	return 0;
-}
-
-static int x1_keyboard_irq_ack(running_device* device)
-{
-	key_irq_flag = 0;
-	cputag_set_input_line(device->machine,"maincpu",INPUT_LINE_IRQ0,CLEAR_LINE);
-	return key_irq_vector;
-}
-
-static DEVICE_GET_INFO( x1_keyboard_getinfo )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;						break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(x1_daisy);		break;
-		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)x1_keyboard_irq_state;	break;
-		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)x1_keyboard_irq_ack;		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "X1 keyboard");		break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "X1 daisy chain");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
-	}
-}
+//static int x1_keyboard_irq_state(running_device* device)
+//{
+//	if(key_irq_flag != 0)
+//		return Z80_DAISY_INT;
+//
+//	return 0;
+//}
+//
+//static int x1_keyboard_irq_ack(running_device* device)
+//{
+//	key_irq_flag = 0;
+//	cputag_set_input_line(device->machine,"maincpu",INPUT_LINE_IRQ0,CLEAR_LINE);
+//	return key_irq_vector;
+//}
+//
+//static DEVICE_GET_INFO( x1_keyboard_getinfo )
+//{
+//	switch (state)
+//	{
+//		/* --- the following bits of info are returned as 64-bit signed integers --- */
+//		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
+//		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+//
+//		/* --- the following bits of info are returned as pointers to data or functions --- */
+//		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(x1_daisy);		break;
+//		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)x1_keyboard_irq_state;	break;
+//		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)x1_keyboard_irq_ack;		break;
+//
+//		/* --- the following bits of info are returned as NULL-terminated strings --- */
+//		case DEVINFO_STR_NAME:							strcpy(info->s, "X1 keyboard");		break;
+//		case DEVINFO_STR_FAMILY:						strcpy(info->s, "X1 daisy chain");				break;
+//		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
+//		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
+//		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
+//	}
+//}
 
 /*************************************
  *
@@ -1530,7 +1529,7 @@ static READ8_DEVICE_HANDLER( x1_portb_r )
     ---- ---x "cmt test" (active low)
     */
 	UINT8 dat = 0;
-	vdisp = (video_screen_get_vpos(device->machine->primary_screen) < 200) ? 0x80 : 0x00;
+	vdisp = (device->machine->primary_screen->vpos() < 200) ? 0x80 : 0x00;
 	dat = (input_port_read(device->machine, "SYSTEM") & 0x10) | sub_obf | vsync | vdisp;
 
 	if(cassette_input(devtag_get_device(device->machine,"cass")) > 0.03)
@@ -1603,7 +1602,7 @@ static WRITE_LINE_DEVICE_HANDLER(vsync_changed)
 	vsync = (state & 1) ? 0x04 : 0x00;
 	if(state & 1 && pcg_reset_occurred == 0) { pcg_reset = pcg_reset_occurred = 1; }
 	if(!(state & 1))                         { pcg_reset_occurred = 0; }
-	//printf("%d %02x\n",video_screen_get_vpos(device->machine->primary_screen),vsync);
+	//printf("%d %02x\n",device->machine->primary_screen->vpos(),vsync);
 }
 
 static const mc6845_interface mc6845_intf =
@@ -1977,16 +1976,16 @@ static const z80sio_interface sio_intf =
 	0					/* receive handler */
 };
 
-static const z80_daisy_chain x1_daisy[] =
+static const z80_daisy_config x1_daisy[] =
 {
-	{ "x1kb" },
+//	{ "x1kb" },
 	{ "ctc" },
 	{ NULL }
 };
 
-static const z80_daisy_chain x1turbo_daisy[] =
+static const z80_daisy_config x1turbo_daisy[] =
 {
-	{ "x1kb" },
+//	{ "x1kb" },
 	{ "ctc" },
 	{ "dma" },
 //  { "sio" },
@@ -2234,7 +2233,7 @@ static MACHINE_DRIVER_START( x1 )
 
 	MDRV_Z80CTC_ADD( "ctc", MAIN_CLOCK/4 , ctc_intf )
 
-	MDRV_DEVICE_ADD("x1kb", DEVICE_GET_INFO_NAME(x1_keyboard_getinfo), 0)
+	//MDRV_DEVICE_ADD("x1kb", DEVICE_GET_INFO_NAME(x1_keyboard_getinfo), 0)
 
 	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 

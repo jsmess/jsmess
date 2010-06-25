@@ -386,12 +386,12 @@ Z80BIN_EXECUTE( exidy )
 		if ((execute_address != 0xc858) && autorun)
 			memory_write_word_16le(space, 0xf028, execute_address);
 
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, 0xf01f);
+		cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, 0xf01f);
 	}
 	else
 	{
 		if (autorun)
-			cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, execute_address);
+			cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, execute_address);
 	}
 }
 
@@ -401,23 +401,23 @@ Z80BIN_EXECUTE( exidy )
 
 SNAPSHOT_LOAD(exidy)
 {
-	UINT8 *ptr = memory_region(image->machine, "maincpu");
-	running_device *cpu = devtag_get_device(image->machine, "maincpu");
+	UINT8 *ptr = memory_region(image.device().machine, "maincpu");
+	running_device *cpu = devtag_get_device(image.device().machine, "maincpu");
 	UINT8 header[28];
 
 	/* check size */
 	if (snapshot_size != 0x1001c)
 	{
-		image_seterror(image, IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
-		image_message(image, "Snapshot must be 65564 bytes");
+		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
+		image.message("Snapshot must be 65564 bytes");
 		return INIT_FAIL;
 	}
 
 	/* get the header */
-	image_fread(image, &header, sizeof(header));
+	image.fread( &header, sizeof(header));
 
 	/* write it to ram */
-	image_fread(image, ptr, 0x10000);
+	image.fread( ptr, 0x10000);
 
 	/* patch CPU registers */
 	cpu_set_reg(cpu, Z80_I, header[0]);
@@ -434,9 +434,9 @@ SNAPSHOT_LOAD(exidy)
 	cpu_set_reg(cpu, Z80_IFF2, header[19]&4 ? 1 : 0);
 	cpu_set_reg(cpu, Z80_R, header[20]);
 	cpu_set_reg(cpu, Z80_AF, header[21] | (header[22] << 8));
-	cpu_set_reg(cpu, REG_GENSP, header[23] | (header[24] << 8));
+	cpu_set_reg(cpu, STATE_GENSP, header[23] | (header[24] << 8));
 	cpu_set_reg(cpu, Z80_IM, header[25]);
-	cpu_set_reg(cpu, REG_GENPC, header[26] | (header[27] << 8));
+	cpu_set_reg(cpu, STATE_GENPC, header[26] | (header[27] << 8));
 
 	return INIT_PASS;
 }

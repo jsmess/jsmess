@@ -166,8 +166,8 @@ static const wd17xx_interface coco_wd17xx_interface =
 INLINE fdc_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == COCO_CARTRIDGE_PCB_FDC_COCO) || (device->type == COCO_CARTRIDGE_PCB_FDC_DRAGON));
-	return (fdc_t *) device->token;
+	assert((device->type() == COCO_CARTRIDGE_PCB_FDC_COCO) || (device->type() == COCO_CARTRIDGE_PCB_FDC_DRAGON));
+	return (fdc_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -203,9 +203,9 @@ INLINE rtc_type_t real_time_clock(running_device *device)
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 {
-	fdc_t *fdc = get_token(device->owner);
+	fdc_t *fdc = get_token(device->owner());
 	fdc->intrq = state;
-	(*fdc->hwtype->update_lines)(device->owner);
+	(*fdc->hwtype->update_lines)(device->owner());
 }
 
 
@@ -215,9 +215,9 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 {
-	fdc_t *fdc = get_token(device->owner);
+	fdc_t *fdc = get_token(device->owner());
 	fdc->drq = state;
-	(*fdc->hwtype->update_lines)(device->owner);
+	(*fdc->hwtype->update_lines)(device->owner());
 }
 
 
@@ -228,13 +228,13 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 static DEVICE_START(fdc)
 {
 	fdc_t *fdc = get_token(device);
-	const fdc_hardware_type *hwtype = (const fdc_hardware_type *)device->get_config_ptr(FDCINFO_PTR_HWTYPE);
+//	const fdc_hardware_type *hwtype = (const fdc_hardware_type *)device->get_config_ptr(FDCINFO_PTR_HWTYPE);
 
 	/* initialize variables */
 	memset(fdc, 0, sizeof(*fdc));
-	fdc->hwtype			= hwtype;
-	fdc->drq			= hwtype->initial_drq;
-	fdc->cococart		= device->owner->owner;
+//	fdc->hwtype			= hwtype;
+//	fdc->drq			= hwtype->initial_drq;
+	fdc->cococart		= device->owner()->owner();
 	fdc->disto_msm6242	= device->subdevice(DISTO_TAG);
 	fdc->ds1315			= device->subdevice(CLOUD9_TAG);
 	fdc->wd17xx			= device->subdevice(WD_TAG);
@@ -256,7 +256,6 @@ static void general_fdc_get_info(const device_config *device, UINT32 state, devi
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(fdc_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = hwtype->wdmachine;	break;
@@ -650,3 +649,6 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 	general_fdc_get_info(device, state, info, &hwtype);
 }
 
+
+DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_FDC_COCO, coco_cartridge_pcb_fdc_coco);
+DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_FDC_DRAGON, coco_cartridge_pcb_fdc_dragon);

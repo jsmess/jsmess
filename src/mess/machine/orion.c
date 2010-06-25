@@ -95,7 +95,7 @@ static void orion_set_video_mode(running_machine *machine, int width)
 		visarea.min_y = 0;
 		visarea.max_x = width-1;
 		visarea.max_y = 255;
-		video_screen_configure(machine->primary_screen, width, 256, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+		machine->primary_screen->configure(width, 256, visarea, machine->primary_screen->frame_period().attoseconds);
 }
 
 WRITE8_HANDLER ( orion128_video_mode_w )

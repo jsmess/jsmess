@@ -44,8 +44,8 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define MC68901 DEVICE_GET_INFO_NAME( mc68901 )
-#define MK68901 DEVICE_GET_INFO_NAME( mk68901 )
+DECLARE_LEGACY_DEVICE(MC68901, mc68901);
+DECLARE_LEGACY_DEVICE(MK68901, mk68901);
 
 #define MDRV_MC68901_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD((_tag), MC68901, _clock)	\
@@ -99,9 +99,6 @@ struct _mc68901_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( mc68901 );
 
 /* register access */
 READ8_DEVICE_HANDLER( mc68901_register_r );

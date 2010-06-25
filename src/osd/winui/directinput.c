@@ -23,9 +23,9 @@
 #include <windows.h>
 
 // MAME/MAMEUI headers
-#include "directinput.h"
 #include "emu.h"
 #include "mui_util.h" // For ErrorMsg
+#include "directinput.h"
 
 /***************************************************************************
 	function prototypes

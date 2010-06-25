@@ -33,8 +33,7 @@ UINT8 sony_read_data(running_device *device);
 void sony_write_data(running_device *device,UINT8 data);
 int sony_read_status(running_device *device);
 
-#define FLOPPY_SONY	DEVICE_GET_INFO_NAME(sonydriv)
-DEVICE_GET_INFO(sonydriv);
+DECLARE_LEGACY_IMAGE_DEVICE(FLOPPY_SONY, sonydriv);
 
 #define MDRV_FLOPPY_SONY_2_DRIVES_ADD(_config)	\
 	MDRV_DEVICE_ADD(FLOPPY_0, FLOPPY_SONY, 0)		\

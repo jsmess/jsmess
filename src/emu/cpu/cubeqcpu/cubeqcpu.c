@@ -97,7 +97,7 @@ typedef struct
 	cubeqst_dac_w_func dac_w;
 	UINT16 *sound_data;
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 } cquestsnd_state;
@@ -137,8 +137,8 @@ typedef struct
 	UINT8 rc;
 	UINT8 clkcnt;
 
-	running_device *device;
-	running_device *lindevice;
+	legacy_cpu_device *device;
+	legacy_cpu_device *lindevice;
 	const address_space *program;
 	int icount;
 } cquestrot_state;
@@ -183,8 +183,8 @@ typedef struct
 	UINT32	*e_stack;
 	UINT32	*o_stack;
 
-	running_device *device;
-	running_device *rotdevice;
+	legacy_cpu_device *device;
+	legacy_cpu_device *rotdevice;
 	const address_space *program;
 	int icount;
 } cquestlin_state;
@@ -196,28 +196,25 @@ typedef struct
 INLINE cquestsnd_state *get_safe_token_snd(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CQUESTSND);
-	return (cquestsnd_state *)device->token;
+	return (cquestsnd_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE cquestrot_state *get_safe_token_rot(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CQUESTROT);
-	return (cquestrot_state *)device->token;
+	return (cquestrot_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE cquestlin_state *get_safe_token_lin(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CQUESTLIN);
-	return (cquestlin_state *)device->token;
+	return (cquestlin_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************************
@@ -284,7 +281,7 @@ static void cquestsnd_state_register(running_device *device)
 static CPU_INIT( cquestsnd )
 {
 	cquestsnd_state *cpustate = get_safe_token_snd(device);
-	cubeqst_snd_config* _config = (cubeqst_snd_config*)device->baseconfig().static_config;
+	cubeqst_snd_config* _config = (cubeqst_snd_config*)device->baseconfig().static_config();
 
 	memset(cpustate, 0, sizeof(*cpustate));
 
@@ -356,7 +353,7 @@ static void cquestrot_state_register(running_device *device)
 
 static CPU_INIT( cquestrot )
 {
-	const cubeqst_rot_config *rotconfig = (const cubeqst_rot_config *)device->baseconfig().static_config;
+	const cubeqst_rot_config *rotconfig = (const cubeqst_rot_config *)device->baseconfig().static_config();
 	cquestrot_state *cpustate = get_safe_token_rot(device);
 	memset(cpustate, 0, sizeof(*cpustate));
 
@@ -365,7 +362,7 @@ static CPU_INIT( cquestrot )
 	cpustate->sram = auto_alloc_array(device->machine, UINT16, 2048);   /* Private */
 
 	cpustate->device = device;
-	cpustate->lindevice = device->machine->device(rotconfig->lin_cpu_tag);
+	cpustate->lindevice = device->machine->device<legacy_cpu_device>(rotconfig->lin_cpu_tag);
 	cpustate->program = device->space(AS_PROGRAM);
 
 	cquestrot_state_register(device);
@@ -439,7 +436,7 @@ static void cquestlin_state_register(running_device *device)
 
 static CPU_INIT( cquestlin )
 {
-	const cubeqst_lin_config *linconfig = (const cubeqst_lin_config *)device->baseconfig().static_config;
+	const cubeqst_lin_config *linconfig = (const cubeqst_lin_config *)device->baseconfig().static_config();
 	cquestlin_state *cpustate = get_safe_token_lin(device);
 	memset(cpustate, 0, sizeof(*cpustate));
 
@@ -450,7 +447,7 @@ static CPU_INIT( cquestlin )
 	cpustate->o_stack = auto_alloc_array(device->machine, UINT32, 32768);  /* Stack DRAM: 32kx20 */
 
 	cpustate->device = device;
-	cpustate->rotdevice = device->machine->device(linconfig->rot_cpu_tag);
+	cpustate->rotdevice = device->machine->device<legacy_cpu_device>(linconfig->rot_cpu_tag);
 	cpustate->program = device->space(AS_PROGRAM);
 
 	cquestlin_state_register(device);
@@ -504,8 +501,6 @@ static CPU_EXECUTE( cquestsnd )
 {
 	cquestsnd_state *cpustate = get_safe_token_snd(device);
 	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
-
-	cpustate->icount = cycles;
 
 	/* Core execution loop */
 	do
@@ -700,8 +695,6 @@ static CPU_EXECUTE( cquestsnd )
 
 		cpustate->icount--;
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -769,8 +762,6 @@ static CPU_EXECUTE( cquestrot )
 	cquestrot_state *cpustate = get_safe_token_rot(device);
 	cquestlin_state *lincpustate = get_safe_token_lin(cpustate->lindevice);
 	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
-
-	cpustate->icount = cycles;
 
 	/* Core execution loop */
 	do
@@ -1084,8 +1075,6 @@ static CPU_EXECUTE( cquestrot )
 		cpustate->clkcnt++;
 		cpustate->icount--;
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -1200,8 +1189,6 @@ static CPU_EXECUTE( cquestlin )
 		stack_ram = cpustate->e_stack;
 		ptr_ram = &cpustate->ptr_ram[0x100];
 	}
-
-	cpustate->icount = cycles;
 
 	/* Core execution loop */
 	do
@@ -1553,8 +1540,6 @@ static CPU_EXECUTE( cquestlin )
 		cpustate->icount--;
 		cpustate->clkcnt++;
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -1600,7 +1585,7 @@ static CPU_SET_INFO( cquestsnd )
 
 CPU_GET_INFO( cquestsnd )
 {
-	cquestsnd_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token_snd(device) : NULL;
+	cquestsnd_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token_snd(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1718,7 +1703,7 @@ static CPU_SET_INFO( cquestrot )
 
 CPU_GET_INFO( cquestrot )
 {
-	cquestrot_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token_rot(device) : NULL;
+	cquestrot_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token_rot(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1836,7 +1821,7 @@ static CPU_SET_INFO( cquestlin )
 
 CPU_GET_INFO( cquestlin )
 {
-	cquestlin_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token_lin(device) : NULL;
+	cquestlin_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token_lin(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

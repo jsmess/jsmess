@@ -936,7 +936,7 @@ static READ16_HANDLER( supracan_video_r )
 static TIMER_CALLBACK( supracan_video_callback )
 {
 	supracan_state *state = (supracan_state *)machine->driver_data;
-	int vpos = video_screen_get_vpos(machine->primary_screen);
+	int vpos = machine->primary_screen->vpos();
 
 	switch( vpos )
 	{
@@ -950,11 +950,11 @@ static TIMER_CALLBACK( supracan_video_callback )
 
     if (vpos == 0)
     {
-        bitmap_fill(state->roz_final_bitmap, video_screen_get_visible_area(machine->primary_screen), 0);
-        bitmap_fill(state->roz_bitmap, video_screen_get_visible_area(machine->primary_screen), 0);
+        bitmap_fill(state->roz_final_bitmap, &machine->primary_screen->visible_area(), 0);
+        bitmap_fill(state->roz_bitmap, &machine->primary_screen->visible_area(), 0);
         if(state->video_flags & 4)
         {
-            draw_roz(machine, video_screen_get_visible_area(machine->primary_screen));
+            draw_roz(machine, &machine->primary_screen->visible_area());
         }
     }
 
@@ -964,7 +964,7 @@ static TIMER_CALLBACK( supracan_video_callback )
         draw_roz_bitmap_scanline(machine, state->roz_bitmap, scandata, vpos, state->roz_scrollx, state->roz_scrolly, state->roz_coeffa, state->roz_coeffb, state->roz_coeffc, state->roz_coeffd, &state->roz_cx, &state->roz_cy, state->roz_changed);
     }
 
-	timer_adjust_oneshot( state->video_timer, video_screen_get_time_until_pos( machine->primary_screen, ( vpos + 1 ) & 0xff, 0 ), 0 );
+	timer_adjust_oneshot( state->video_timer, machine->primary_screen->time_until_pos( ( vpos + 1 ) & 0xff, 0 ), 0 );
 }
 
 /*
@@ -1045,12 +1045,12 @@ static WRITE16_HANDLER( supracan_video_w )
                 verboselog(space->machine, 5, "video_flags = %04x\n", data);
                 state->video_flags = data;
 
-                rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
+                rectangle visarea = space->machine->primary_screen->visible_area();
 
 				visarea.min_x = visarea.min_y = 0;
 				visarea.max_y = 240 - 1;
 				visarea.max_x = ((state->video_flags & 0x100) ? 320 : 256) - 1;
-				video_screen_configure(space->machine->primary_screen, 348, 256, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
+				space->machine->primary_screen->configure(348, 256, visarea, space->machine->primary_screen->frame_period().attoseconds);
 			}
 			break;
 		case 0x20/2: state->spr_base_addr = data << 2; break;
@@ -1102,29 +1102,29 @@ static WRITE16_HANDLER( supracan_video_w )
 
 static DEVICE_IMAGE_LOAD( supracan_cart )
 {
-	UINT8 *cart = memory_region(image->machine, "cart");
+	UINT8 *cart = memory_region(image.device().machine, "cart");
 	UINT32 size;
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
+		size = image.length();
 
 		if (size > 0x400000)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			return INIT_FAIL;
 		}
 
-		if (image_fread(image, cart, size) != size)
+		if (image.fread( cart, size) != size)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return INIT_FAIL;
 		}
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
-		memcpy(cart, image_get_software_region(image, "rom"), size);
+		size = image.get_software_region_length("rom");
+		memcpy(cart, image.get_software_region("rom"), size);
 	}
 
 	return INIT_PASS;
@@ -1144,7 +1144,7 @@ static MACHINE_RESET( supracan )
 	supracan_state *state = (supracan_state *)machine->driver_data;
 
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
-	timer_adjust_oneshot( state->video_timer, video_screen_get_time_until_pos( machine->primary_screen, 0, 0 ), 0 );
+	timer_adjust_oneshot( state->video_timer, machine->primary_screen->time_until_pos(0, 0 ), 0 );
 	state->irq_mask = 0;
 }
 

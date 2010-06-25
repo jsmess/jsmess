@@ -860,15 +860,15 @@ static MACHINE_DRIVER_START( type1 )
 	MDRV_CPU_PROGRAM_MAP(scobra_sound_map)
 	MDRV_CPU_IO_MAP(scobra_sound_io_map)
 
-	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
+	MDRV_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
 
 	MDRV_MACHINE_RESET(scramble)
 
 	MDRV_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
 	MDRV_PPI8255_ADD( "ppi8255_1", scramble_ppi_1_intf )
 
-	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
-	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
+	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
 	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
@@ -991,12 +991,12 @@ static MACHINE_DRIVER_START( hustler )
 	MDRV_CPU_PROGRAM_MAP(hustler_sound_map)
 	MDRV_CPU_IO_MAP(hustler_sound_io_map)
 
-	MDRV_7474_ADD("konami_7474", scramble_sh_7474_callback)
+	MDRV_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
 
 	MDRV_MACHINE_RESET(scramble)
 
-	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
-	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
+	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
 	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
@@ -1420,7 +1420,7 @@ GAME( 1982, aponow,   rescue,   rescue,   rescue,   rescue,       ROT90,  "bootl
 GAME( 1983, minefld,  0,        minefld,  minefld,  minefld,      ROT90,  "Stern Electronics", "Minefield", GAME_SUPPORTS_SAVE )
 GAME( 1981, hustler,  0,        hustler,  hustler,  hustler,      ROT90,  "Konami", "Video Hustler", GAME_SUPPORTS_SAVE )
 GAME( 1981, billiard, hustler,  hustler,  hustler,  billiard,     ROT90,  "bootleg", "The Billiards (Video Hustler bootleg)", GAME_SUPPORTS_SAVE )
-GAME( 1981, hustlerb, hustler,  hustlerb, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_NOT_WORKING ) // broken?
+GAME( 1981, hustlerb, hustler,  hustlerb, hustler,  scramble_ppi, ROT90,  "bootleg (Digimatic)", "Video Hustler (bootleg)", GAME_NOT_WORKING ) // broken?
 GAME( 1981, hustlerb2,hustler,  hustler,  hustler,  scramble_ppi, ROT90,  "bootleg", "Fatsy Gambler (Video Hustler bootleg)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonkey, 0,        mimonkey, mimonkey, mimonkey,     ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
 GAME( 1982, mimonsco, mimonkey, mimonkey, mimonsco, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )

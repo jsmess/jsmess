@@ -188,17 +188,15 @@ struct _fast_t
 INLINE slow_t *get_safe_token_slow(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == LUXOR_55_10828);
-	return (slow_t *)device->token;
+	assert(device->type() == LUXOR_55_10828);
+	return (slow_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE fast_t *get_safe_token_fast(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == LUXOR_55_21046);
-	return (fast_t *)device->token;
+	assert(device->type() == LUXOR_55_21046);
+	return (fast_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /***************************************************************************
@@ -307,7 +305,7 @@ static WRITE8_DEVICE_HANDLER( slow_ctrl_w )
 
     */
 
-	slow_t *conkort = get_safe_token_slow(device->owner);
+	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	/* drive selection */
 	if (BIT(data, 0)) wd17xx_set_drive(device, 0);
@@ -349,14 +347,14 @@ static WRITE8_DEVICE_HANDLER( slow_status_w )
 
     */
 
-	slow_t *conkort = get_safe_token_slow(device->owner);
+	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	conkort->status = data;
 }
 
 static READ8_DEVICE_HANDLER( slow_fdc_r )
 {
-	slow_t *conkort = get_safe_token_slow(device->owner);
+	slow_t *conkort = get_safe_token_slow(device->owner());
 	UINT8 data = 0xff;
 
 	if (!conkort->wait_enable && !conkort->fdc_irq && !conkort->fdc_drq)
@@ -379,7 +377,7 @@ static READ8_DEVICE_HANDLER( slow_fdc_r )
 
 static WRITE8_DEVICE_HANDLER( slow_fdc_w )
 {
-	slow_t *conkort = get_safe_token_slow(device->owner);
+	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	if (!conkort->wait_enable && !conkort->fdc_irq && !conkort->fdc_drq)
 	{
@@ -478,21 +476,21 @@ WRITE_LINE_DEVICE_HANDLER( luxor_55_21046_rst_w )
 
 static READ8_DEVICE_HANDLER( fast_data_r )
 {
-	fast_t *conkort = get_safe_token_fast(device->owner);
+	fast_t *conkort = get_safe_token_fast(device->owner());
 
 	return conkort->data;
 }
 
 static WRITE8_DEVICE_HANDLER( fast_data_w )
 {
-	fast_t *conkort = get_safe_token_fast(device->owner);
+	fast_t *conkort = get_safe_token_fast(device->owner());
 
 	conkort->data = data;
 }
 
 static WRITE8_DEVICE_HANDLER( fast_status_w )
 {
-	fast_t *conkort = get_safe_token_fast(device->owner);
+	fast_t *conkort = get_safe_token_fast(device->owner());
 
 	conkort->status = data;
 }
@@ -588,14 +586,14 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( conkort_pio_port_a_r )
 {
-	slow_t *conkort = get_safe_token_slow(device->owner);
+	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	return conkort->data;
 }
 
 static WRITE8_DEVICE_HANDLER( conkort_pio_port_a_w )
 {
-	slow_t *conkort = get_safe_token_slow(device->owner);
+	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	conkort->data = data;
 }
@@ -617,7 +615,7 @@ static READ8_DEVICE_HANDLER( conkort_pio_port_b_r )
 
     */
 
-	slow_t *conkort = get_safe_token_slow(device->owner);
+	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	UINT8 data = 4;
 
@@ -657,7 +655,7 @@ static WRITE8_DEVICE_HANDLER( conkort_pio_port_b_w )
 
     */
 
-	slow_t *conkort = get_safe_token_slow(device->owner);
+	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	/* double density enable */
 	wd17xx_dden_w(conkort->fd1791, BIT(data, 3));
@@ -677,7 +675,7 @@ static Z80PIO_INTERFACE( conkort_pio_intf )
 	DEVCB_NULL								/* port B ready callback */
 };
 
-static const z80_daisy_chain slow_daisy_chain[] =
+static const z80_daisy_config slow_daisy_chain[] =
 {
 	{ Z80PIO_TAG },
 	{ NULL }
@@ -751,7 +749,7 @@ static Z80DMA_INTERFACE( dma_intf )
 	DEVCB_MEMORY_HANDLER(Z80_TAG, IO, memory_write_byte)
 };
 
-static const z80_daisy_chain fast_daisy_chain[] =
+static const z80_daisy_config fast_daisy_chain[] =
 {
 	{ Z80DMA_TAG },
 	{ NULL }
@@ -761,7 +759,7 @@ static const z80_daisy_chain fast_daisy_chain[] =
 
 static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_intrq_w )
 {
-	slow_t *conkort = get_safe_token_slow(device->owner);
+	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	conkort->fdc_irq = state;
 	z80pio_pb_w(conkort->z80pio, 0, state << 7);
@@ -775,7 +773,7 @@ static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( slow_fd1791_drq_w )
 {
-	slow_t *conkort = get_safe_token_slow(device->owner);
+	slow_t *conkort = get_safe_token_slow(device->owner());
 
 	conkort->fdc_drq = state;
 
@@ -947,7 +945,6 @@ DEVICE_GET_INFO( luxor_55_10828 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(slow_t);									break;
 
 		/* --- the following bits of info are returned as pointers --- */
@@ -1020,7 +1017,6 @@ DEVICE_GET_INFO( luxor_55_21046 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(fast_t);									break;
 
 		/* --- the following bits of info are returned as pointers --- */
@@ -1067,3 +1063,6 @@ FLOPPY_OPTIONS_START(abc80)
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([0]))
 FLOPPY_OPTIONS_END
+
+DEFINE_LEGACY_DEVICE(LUXOR_55_10828, luxor_55_10828);
+DEFINE_LEGACY_DEVICE(LUXOR_55_21046, luxor_55_21046);

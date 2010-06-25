@@ -65,23 +65,14 @@ struct _ted7360_interface
 #define TED7360NTSC_LINES 261
 #define TED7360PAL_LINES 312
 
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( ted7360 );
-
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define TED7360 DEVICE_GET_INFO_NAME( ted7360 )
-#define SOUND_TED7360 TED7360
+DECLARE_LEGACY_SOUND_DEVICE(TED7360, ted7360);
 
 #define MDRV_TED7360_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, SOUND, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(sound_config, type, SOUND_TED7360) \
+	MDRV_SOUND_ADD(_tag, TED7360, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
 
 

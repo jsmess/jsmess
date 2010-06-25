@@ -66,7 +66,7 @@ VIDEO_START( gamecom )
 {
 	VIDEO_START_CALL( generic_bitmapped );
 	scanline_timer = timer_alloc( machine, gamecom_scanline, NULL );
-	timer_adjust_periodic( scanline_timer, video_screen_get_time_until_pos( machine->primary_screen, 0, 0 ), 0, video_screen_get_scan_period( machine->primary_screen ) );
+	timer_adjust_periodic( scanline_timer, machine->primary_screen->time_until_pos(0, 0 ), 0, machine->primary_screen->scan_period() );
 
 }
 

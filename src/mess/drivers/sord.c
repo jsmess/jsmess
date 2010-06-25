@@ -498,7 +498,7 @@ INPUT_PORTS_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-static const z80_daisy_chain sord_m5_daisy_chain[] =
+static const z80_daisy_config sord_m5_daisy_chain[] =
 {
 	{ "z80ctc" },
 	{ NULL }

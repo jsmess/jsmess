@@ -1629,19 +1629,19 @@ INPUT_PORTS_END
 /* Serial */
 static DEVICE_IMAGE_LOAD( nc_serial )
 {
-	running_device *uart = devtag_get_device(image->machine, "uart");
+	running_device *uart = devtag_get_device(image.device().machine, "uart");
 
 	/* filename specified */
 	if (device_load_serial(image)==INIT_PASS)
 	{
 		/* setup transmit parameters */
-		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
+		serial_device_setup(&image.device(), 9600, 8, 1, SERIAL_PARITY_NONE);
 
 		/* connect serial chip to serial device */
-		msm8251_connect_to_serial_device(uart, image);
+		msm8251_connect_to_serial_device(uart, &image.device());
 
 		/* and start transmit */
-		serial_device_set_transmit_state(image,1);
+		serial_device_set_transmit_state(&image.device(),1);
 
 		return INIT_PASS;
 	}
@@ -1650,7 +1650,7 @@ static DEVICE_IMAGE_LOAD( nc_serial )
 
 }
 
-static DEVICE_GET_INFO( nc_serial )
+DEVICE_GET_INFO( nc_serial )
 {
 	switch ( state )
 	{
@@ -1664,7 +1664,8 @@ static DEVICE_GET_INFO( nc_serial )
 	}
 }
 
-#define NC_SERIAL	DEVICE_GET_INFO_NAME(nc_serial)
+DECLARE_LEGACY_IMAGE_DEVICE(NC_SERIAL, nc_serial);
+DEFINE_LEGACY_IMAGE_DEVICE(NC_SERIAL, nc_serial);
 
 #define MDRV_NC_SERIAL_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, NC_SERIAL, 0)

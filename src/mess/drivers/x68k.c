@@ -981,7 +981,7 @@ static WRITE16_HANDLER( x68k_fdc_w )
 					output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 					if(data & 0x20)  // ejects disk
 					{
-						image_unload(floppy_get_device(space->machine, drive));
+						((device_image_interface*)floppy_get_device(space->machine, drive))->unload();
 						floppy_mon_w(floppy_get_device(space->machine, drive), ASSERT_LINE);
 					}
 				}
@@ -1282,13 +1282,13 @@ static READ16_HANDLER( x68k_mfp_r )
 #if 0
     case 0x00:  // GPIP - General purpose I/O register (read-only)
         ret = 0x23;
-        if(video_screen_get_vpos(machine->primary_screen) == x68k_sys.crtc.reg[9])
+        if(machine->primary_screen->vpos() == x68k_sys.crtc.reg[9])
             ret |= 0x40;
         if(x68k_sys.crtc.vblank == 0)
             ret |= 0x10;  // Vsync signal (low if in vertical retrace)
 //      if(x68k_sys.mfp.isrb & 0x08)
 //          ret |= 0x08;  // FM IRQ signal
-        if(video_screen_get_hpos(machine->primary_screen) > x68k_sys.crtc.width - 32)
+        if(machine->primary_screen->hpos() > x68k_sys.crtc.width - 32)
             ret |= 0x80;  // Hsync signal
 //      logerror("MFP: [%08x] Reading offset %i (ret=%02x)\n",cpu_get_pc(space->cpu),offset,ret);
         return ret;  // bit 5 is always 1
@@ -1662,15 +1662,15 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 	if(messram_get_ptr(devtag_get_device(machine, "messram"))[v] != 0x02)  // normal vector for bus errors points to 02FF0540
 	{
 		int addr = (messram_get_ptr(devtag_get_device(machine, "messram"))[0x09] << 24) | (messram_get_ptr(devtag_get_device(machine, "messram"))[0x08] << 16) |(messram_get_ptr(devtag_get_device(machine, "messram"))[0x0b] << 8) | messram_get_ptr(devtag_get_device(machine, "messram"))[0x0a];
-		int sp = cpu_get_reg(devtag_get_device(machine, "maincpu"), REG_GENSP);
-		int pc = cpu_get_reg(devtag_get_device(machine, "maincpu"), REG_GENPC);
+		int sp = cpu_get_reg(devtag_get_device(machine, "maincpu"), STATE_GENSP);
+		int pc = cpu_get_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC);
 		int sr = cpu_get_reg(devtag_get_device(machine, "maincpu"), M68K_SR);
 		//int pda = cpu_get_reg(devtag_get_device(machine, "maincpu"), M68K_PREF_DATA);
 		if(strcmp(machine->gamedrv->name,"x68030") == 0)
 		{  // byte order varies on the 68030
 			addr = (messram_get_ptr(devtag_get_device(machine, "messram"))[0x0b] << 24) | (messram_get_ptr(devtag_get_device(machine, "messram"))[0x0a] << 16) |(messram_get_ptr(devtag_get_device(machine, "messram"))[0x09] << 8) | messram_get_ptr(devtag_get_device(machine, "messram"))[0x08];
 		}
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENSP, sp - 14);
+		cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENSP, sp - 14);
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-11] = (val & 0xff000000) >> 24;
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-12] = (val & 0x00ff0000) >> 16;
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-9] = (val & 0x0000ff00) >> 8;
@@ -1681,7 +1681,7 @@ static TIMER_CALLBACK(x68k_fake_bus_error)
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-2] = (pc & 0x000000ff);  // place PC onto the stack
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-5] = (sr & 0xff00) >> 8;
 		messram_get_ptr(devtag_get_device(machine, "messram"))[sp-6] = (sr & 0x00ff);  // place SR onto the stack
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
+		cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, addr);  // real exceptions seem to take too long to be acknowledged
 		popmessage("Expansion access [%08x]: PC jump to %08x", val, addr);
 	}
 }
@@ -1874,9 +1874,9 @@ static INTERRUPT_GEN( x68k_vsync_irq )
 //  mfp_trigger_irq(MFP_IRQ_GPIP4);
 //  }
 //  if(x68k_sys.crtc.height == 256)
-//      video_screen_update_partial(machine->primary_screen,256);//x68k_sys.crtc.reg[4]/2);
+//      machine->primary_screen->update_partial(256);//x68k_sys.crtc.reg[4]/2);
 //  else
-//      video_screen_update_partial(machine->primary_screen,512);//x68k_sys.crtc.reg[4]);
+//      machine->primary_screen->update_partial(512);//x68k_sys.crtc.reg[4]);
 }
 
 static IRQ_CALLBACK(x68k_int_ack)
@@ -2358,29 +2358,29 @@ static INPUT_PORTS_START( x68000 )
 
 INPUT_PORTS_END
 
-static void x68k_load_proc(running_device *image)
+static void x68k_load_proc(device_image_interface &image)
 {
 	if(x68k_sys.ioc.irqstatus & 0x02)
 	{
 		current_vector[1] = 0x61;
 		x68k_sys.ioc.irqstatus |= 0x40;
 		current_irq_line = 1;
-		cputag_set_input_line_and_vector(image->machine, "maincpu",1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+		cputag_set_input_line_and_vector(image.device().machine, "maincpu",1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 		logerror("IOC: Disk image inserted\n");
 	}
-	x68k_sys.fdc.disk_inserted[floppy_get_drive(image)] = 1;
+	x68k_sys.fdc.disk_inserted[floppy_get_drive(&image.device())] = 1;
 }
 
-static void x68k_unload_proc(running_device *image)
+static void x68k_unload_proc(device_image_interface &image)
 {
 	if(x68k_sys.ioc.irqstatus & 0x02)
 	{
 		current_vector[1] = 0x61;
 		x68k_sys.ioc.irqstatus |= 0x40;
 		current_irq_line = 1;
-		cputag_set_input_line_and_vector(image->machine, "maincpu",1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
+		cputag_set_input_line_and_vector(image.device().machine, "maincpu",1,ASSERT_LINE,current_vector[1]);  // Disk insert/eject interrupt
 	}
-	x68k_sys.fdc.disk_inserted[floppy_get_drive(image)] = 0;
+	x68k_sys.fdc.disk_inserted[floppy_get_drive(&image.device())] = 0;
 }
 
 static FLOPPY_OPTIONS_START( x68k )
@@ -2426,7 +2426,8 @@ static MACHINE_RESET( x68000 )
 	// check for disks
 	for(drive=0;drive<4;drive++)
 	{
-		if(image_exists(floppy_get_device(machine, drive)))
+		device_image_interface *image = (device_image_interface*)floppy_get_device(machine, drive);
+		if(image->exists())
 			x68k_sys.fdc.disk_inserted[drive] = 1;
 		else
 			x68k_sys.fdc.disk_inserted[drive] = 0;
@@ -2445,15 +2446,15 @@ static MACHINE_RESET( x68000 )
 
 	mfp_init();
 
-	x68k_scanline = video_screen_get_vpos(machine->primary_screen);// = x68k_sys.crtc.reg[6];  // Vertical start
+	x68k_scanline = machine->primary_screen->vpos();// = x68k_sys.crtc.reg[6];  // Vertical start
 
 	// start VBlank timer
 	x68k_sys.crtc.vblank = 1;
-	irq_time = video_screen_get_time_until_pos(machine->primary_screen,x68k_sys.crtc.reg[6],2);
+	irq_time = machine->primary_screen->time_until_pos(x68k_sys.crtc.reg[6],2);
 	timer_adjust_oneshot(x68k_vblank_irq, irq_time, 0);
 
 	// start HBlank timer
-	timer_adjust_oneshot(x68k_scanline_timer, video_screen_get_scan_period(machine->primary_screen), 1);
+	timer_adjust_oneshot(x68k_scanline_timer, machine->primary_screen->scan_period(), 1);
 
 	x68k_sys.mfp.gpio = 0xfb;
 

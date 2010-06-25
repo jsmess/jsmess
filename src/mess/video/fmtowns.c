@@ -159,7 +159,7 @@ void towns_crtc_refresh_mode(running_machine* machine)
 	if(scr.max_x <= scr.min_x || scr.max_y <= scr.min_y)
 		return;
 
-	video_screen_configure(machine->primary_screen,scr.max_x+1,scr.max_y+1,&scr,HZ_TO_ATTOSECONDS(60));
+	machine->primary_screen->configure(scr.max_x+1,scr.max_y+1,scr,HZ_TO_ATTOSECONDS(60));
 }
 
 READ8_HANDLER( towns_gfx_high_r )
@@ -396,8 +396,8 @@ READ8_HANDLER(towns_video_440_r)
 			if(towns_crtc_sel == 30)
 			{
 				// check video position
-				xpos = video_screen_get_hpos(space->machine->primary_screen);
-				ypos = video_screen_get_vpos(space->machine->primary_screen);
+				xpos = space->machine->primary_screen->hpos();
+				ypos = space->machine->primary_screen->vpos();
 
 				if(xpos < (towns_crtc_reg[0] & 0xfe))
 					ret |= 0x02;
@@ -538,7 +538,7 @@ READ8_HANDLER(towns_video_fd90_r)
 			return towns_degipal[offset-0x08];
 		case 0x10:  // "sub status register"
 			// check video position
-			xpos = video_screen_get_hpos(space->machine->primary_screen);
+			xpos = space->machine->primary_screen->hpos();
 
 			if(xpos < towns_crtc_layerscr[0].max_x && xpos > towns_crtc_layerscr[0].min_x)
 				ret |= 0x02;
@@ -1395,7 +1395,7 @@ INTERRUPT_GEN( towns_vsync_irq )
 	running_device* dev = devtag_get_device(device->machine,"pic8259_slave");
 	pic8259_ir3_w(dev, 1);  // IRQ11 = VSync
 	towns_vblank_flag = 1;
-	timer_set(device->machine,video_screen_get_time_until_vblank_end(device->machine->primary_screen),(void*)dev,0,towns_vblank_end);
+	timer_set(device->machine,device->machine->primary_screen->time_until_vblank_end(),(void*)dev,0,towns_vblank_end);
 	if(towns_tvram_enable)
 		draw_text_layer(dev->machine);
 	if(towns_sprite_reg[1] & 0x80)  // if sprites are enabled, then sprites are drawn on this layer.

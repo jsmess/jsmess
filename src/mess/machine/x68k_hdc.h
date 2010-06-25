@@ -103,11 +103,10 @@ struct hd_state
 };
 
 DEVICE_START( x68k_hdc );
-DEVICE_GET_INFO( x68k_hdc );
 
 DEVICE_IMAGE_CREATE( sasihd );
 
-#define X68KHDC DEVICE_GET_INFO_NAME(x68k_hdc)
+DECLARE_LEGACY_IMAGE_DEVICE(X68KHDC, x68k_hdc);
 
 #define MDRV_X68KHDC_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, X68KHDC, 0)

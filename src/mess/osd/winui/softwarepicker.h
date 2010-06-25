@@ -7,7 +7,7 @@
 #include "swconfig.h"
 
 LPCSTR SoftwarePicker_LookupFilename(HWND hwndPicker, int nIndex);
-const device_config *SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex);
+const device_config_image_interface *SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex);
 int SoftwarePicker_LookupIndex(HWND hwndPicker, LPCSTR pszFilename);
 iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex);
 BOOL SoftwarePicker_AddFile(HWND hwndPicker, LPCSTR pszFilename);

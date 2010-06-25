@@ -677,13 +677,13 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
         return INIT_FAIL;
 
     // determine image geometry
-    image_fseek(image, 0, SEEK_SET);
+    image.fseek(0, SEEK_SET);
 
     // determine geometry from disk contents
     for( i = 0; i < 12; i++ )
     {
-        image_fseek(image, pd_list[i].SPT * 256, SEEK_SET);
-        image_fread(image, buff, 16);
+        image.fseek(pd_list[i].SPT * 256, SEEK_SET);
+        image.fread( buff, 16);
         // find an entry with matching DDSL
         if (buff[0] != 0x00 || buff[1] != 0xfe || buff[2] != pd_list[i].DDSL)
             continue;
@@ -697,9 +697,9 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
         for( j = 16; j < 32; j += 8 )
         {
             dir_offset = dir_sector * 256 + j * 32;
-            if( image_fseek(image, dir_offset, SEEK_SET) < 0 )
+            if( image.fseek(dir_offset, SEEK_SET) < 0 )
                 break;
-            if( image_fread(image, buff, 16) != 16 )
+            if( image.fread( buff, 16) != 16 )
                 break;
             if( !strncmp((char*)buff + 5, "DIR     SYS", 11) ||
                 !strncmp((char*)buff + 5, "NCW1983 JHL", 11) )
@@ -709,7 +709,7 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
                 spt = pd_list[i].SPT / heads;
                 dir_sector = pd_list[i].DDSL * pd_list[i].GATM * pd_list[i].GPL + pd_list[i].SPT;
                 dir_length = pd_list[i].DDGA * pd_list[i].GPL;
-                memcpy(memory_region(image->machine, "maincpu") + 0x5A71 + floppy_get_drive(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
+                memcpy(memory_region(image.device().machine, "maincpu") + 0x5A71 + floppy_get_drive(image) * sizeof(PDRIVE), &pd_list[i], sizeof(PDRIVE));
                 break;
             }
         }

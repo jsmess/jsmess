@@ -139,15 +139,15 @@ ROM_END
 
 static QUICKLOAD_LOAD( lynx )
 {
-	running_device *cpu = devtag_get_device(image->machine, "maincpu");
-	const address_space *space = cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	running_device *cpu = devtag_get_device(image.device().machine, "maincpu");
+	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *data = NULL;
-	UINT8 *rom = memory_region(image->machine, "maincpu");
+	UINT8 *rom = memory_region(image.device().machine, "maincpu");
 	UINT8 header[10]; // 80 08 dw Start dw Len B S 9 3
 	UINT16 start, length;
 	int i;
 
-	if (image_fread(image, header, sizeof(header)) != sizeof(header))
+	if (image.fread( header, sizeof(header)) != sizeof(header))
 		return INIT_FAIL;
 
 	/* Check the image */
@@ -160,7 +160,7 @@ static QUICKLOAD_LOAD( lynx )
 
 	data = (UINT8*)malloc(length);
 
-	if (image_fread(image, data, length) != length)
+	if (image.fread( data, length) != length)
 	{
 		free(data);
 		return INIT_FAIL;
@@ -176,9 +176,9 @@ static QUICKLOAD_LOAD( lynx )
 	memory_write_byte(space, 0x1fc, start & 0xff);
 	memory_write_byte(space, 0x1fd, start >> 8);
 
-	lynx_crc_keyword(devtag_get_device(image->machine, "quickload"));
+	lynx_crc_keyword((device_image_interface&)*devtag_get_device(image.device().machine, "quickload"));	
 
-	cpu_set_reg(cpu, REG_GENPC, start);
+	cpu_set_reg(cpu, STATE_GENPC, start);
 
 	return INIT_PASS;
 }

@@ -298,7 +298,7 @@ static const z80sio_interface p8k_sio_1_intf =
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain p8k_daisy_chain[] =
+static const z80_daisy_config p8k_daisy_chain[] =
 {
 	{ "z80dma" },	/* FDC related */
 	{ "z80pio_2" },
@@ -456,7 +456,7 @@ static const z80sio_interface p8k_16_sio_1_intf =
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain p8k_16_daisy_chain[] =
+static const z80_daisy_config p8k_16_daisy_chain[] =
 {
 	{ "z80ctc_0" },
 	{ "z80ctc_1" },

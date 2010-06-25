@@ -22,11 +22,11 @@
 #include "machine/i82439tx.h"
 
 #include "machine/pit8253.h"
-#include "video/pc_vga.h"
+#include "video/pc_vga_mess.h"
 #include "video/pc_cga.h"
 #include "video/pc_mda.h"
 #include "video/pc_ega.h"
-#include "video/pc_video.h"
+#include "video/pc_video_mess.h"
 #include "includes/pc.h"
 
 #include "machine/pc_hdc.h"
@@ -557,12 +557,14 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ibm5170a )
 	MDRV_IMPORT_FROM( ibm5170 )
-	MDRV_CPU_REPLACE("maincpu", I80286, 8000000)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(8000000)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ec1849 )
 	MDRV_IMPORT_FROM( ibm5170 )
-	MDRV_CPU_REPLACE("maincpu", I80286, 12000000)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(12000000)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ibm5162 )
@@ -855,6 +857,8 @@ static MACHINE_DRIVER_START( at486 )
 	MDRV_IMPORT_FROM( at386 )
 
 	MDRV_CPU_REPLACE("maincpu", I486, 25000000)
+	MDRV_CPU_PROGRAM_MAP(at386_map)
+	MDRV_CPU_IO_MAP(at386_io)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( at586 )

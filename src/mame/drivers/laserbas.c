@@ -150,7 +150,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( laserbas_interrupt )
 {
-	if(video_screen_get_vblank(device->machine->primary_screen))
+	if(device->machine->primary_screen->vblank())
 		cpu_set_input_line(device, 0, HOLD_LINE);
 	else
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
@@ -283,6 +283,6 @@ ROM_START( futflash )
 	ROM_LOAD( "ff.8",         0xf000, 0x0800, CRC(623f558f) SHA1(be6c6565df658555f21c43a8c2459cf399794a84) )
 ROM_END
 
-GAME( 1981, laserbas, 0,        laserbas, laserbas, 0, ROT270, "Amstar / Hoei", "Laser Base (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1981, laserbasa,laserbas, laserbas, laserbas, 0, ROT270, "Amstar / Hoei", "Laser Base (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 1981, futflash, laserbas, laserbas, laserbas, 0, ROT270, "Hoei",          "Future Flash",       GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, laserbas, 0,        laserbas, laserbas, 0, ROT270, "Hoei (Amstar license)", "Laser Base (set 1)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, laserbasa,laserbas, laserbas, laserbas, 0, ROT270, "Hoei (Amstar license)", "Laser Base (set 2)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1981, futflash, laserbas, laserbas, laserbas, 0, ROT270, "Hoei", "Future Flash", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

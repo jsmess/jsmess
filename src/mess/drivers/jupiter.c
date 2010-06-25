@@ -266,12 +266,12 @@ static VIDEO_START( jupiter )
 	jupiter_clear_irq_timer = timer_alloc(machine,  jupiter_clear_irq_callback, NULL );
 
 	timer_adjust_periodic( jupiter_set_irq_timer,
-		video_screen_get_time_until_pos( machine->primary_screen, 31*8, 0 ),
-		0, video_screen_get_frame_period( machine->primary_screen ) );
+		machine->primary_screen->time_until_pos(31*8, 0 ),
+		0, machine->primary_screen->frame_period() );
 
 	timer_adjust_periodic( jupiter_clear_irq_timer,
-		video_screen_get_time_until_pos( machine->primary_screen, 32*8, 0 ),
-		0, video_screen_get_frame_period( machine->primary_screen ) );
+		machine->primary_screen->time_until_pos(32*8, 0 ),
+		0, machine->primary_screen->frame_period() );
 }
 
 

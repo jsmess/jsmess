@@ -98,9 +98,9 @@ struct _jaguar_state
 	int			icount;
 	int			bankswitch_icount;
 	void		(*const *table)(jaguar_state *jaguar, UINT16 op);
-	cpu_irq_callback irq_callback;
+	device_irq_callback irq_callback;
 	jaguar_int_func cpu_interrupt;
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 };
 
@@ -251,11 +251,10 @@ static void (*const dsp_op_table[64])(jaguar_state *jaguar, UINT16 op) =
 INLINE jaguar_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_JAGUARGPU ||
 		   cpu_get_type(device) == CPU_JAGUARDSP);
-	return (jaguar_state *)device->token;
+	return (jaguar_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE void update_register_banks(jaguar_state *jaguar)
@@ -402,7 +401,7 @@ static void init_tables(void)
 
 static STATE_POSTLOAD( jaguar_postload )
 {
-	running_device *device = (running_device *)param;
+	legacy_cpu_device *device = (legacy_cpu_device *)param;
 	jaguar_state *jaguar = get_safe_token(device);
 
 	update_register_banks(jaguar);
@@ -410,9 +409,9 @@ static STATE_POSTLOAD( jaguar_postload )
 }
 
 
-static void init_common(int isdsp, running_device *device, cpu_irq_callback irqcallback)
+static void init_common(int isdsp, legacy_cpu_device *device, device_irq_callback irqcallback)
 {
-	const jaguar_cpu_config *configdata = (const jaguar_cpu_config *)device->baseconfig().static_config;
+	const jaguar_cpu_config *configdata = (const jaguar_cpu_config *)device->baseconfig().static_config();
 	jaguar_state *jaguar = get_safe_token(device);
 
 	init_tables();
@@ -483,7 +482,8 @@ static CPU_EXECUTE( jaguargpu )
 	if (!(jaguar->ctrl[G_CTRL] & 1))
 	{
 		cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
-		return cycles;
+		jaguar->icount = 0;
+		return;
 	}
 
 	/* check for IRQs */
@@ -491,7 +491,6 @@ static CPU_EXECUTE( jaguargpu )
 
 	/* count cycles and interrupt cycles */
 	jaguar->bankswitch_icount = -1000;
-	jaguar->icount = cycles;
 
 	/* core execution loop */
 	do
@@ -512,8 +511,6 @@ static CPU_EXECUTE( jaguargpu )
 		jaguar->icount--;
 
 	} while (jaguar->icount > 0 || jaguar->icount == jaguar->bankswitch_icount);
-
-	return cycles - jaguar->icount;
 }
 
 static CPU_EXECUTE( jaguardsp )
@@ -524,7 +521,8 @@ static CPU_EXECUTE( jaguardsp )
 	if (!(jaguar->ctrl[G_CTRL] & 1))
 	{
 		cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
-		return cycles;
+		jaguar->icount = 0;
+		return;
 	}
 
 	/* check for IRQs */
@@ -532,7 +530,6 @@ static CPU_EXECUTE( jaguardsp )
 
 	/* count cycles and interrupt cycles */
 	jaguar->bankswitch_icount = -1000;
-	jaguar->icount = cycles;
 
 	/* core execution loop */
 	do
@@ -553,8 +550,6 @@ static CPU_EXECUTE( jaguardsp )
 		jaguar->icount--;
 
 	} while (jaguar->icount > 0 || jaguar->icount == jaguar->bankswitch_icount);
-
-	return cycles - jaguar->icount;
 }
 
 
@@ -1496,7 +1491,7 @@ static CPU_SET_INFO( jaguargpu )
 
 CPU_GET_INFO( jaguargpu )
 {
-	jaguar_state *jaguar = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	jaguar_state *jaguar = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1649,7 +1644,7 @@ static CPU_SET_INFO( jaguardsp )
 
 CPU_GET_INFO( jaguardsp )
 {
-	jaguar_state *jaguar = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	jaguar_state *jaguar = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

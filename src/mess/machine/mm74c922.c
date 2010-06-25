@@ -56,15 +56,14 @@ struct _mm74c922_t
 INLINE mm74c922_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (mm74c922_t *)device->token;
+	return (mm74c922_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const mm74c922_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == MM74C922) || (device->type == MM74C923));
-	return (const mm74c922_interface *) device->baseconfig().static_config;
+	assert((device->type() == MM74C922) || (device->type() == MM74C923));
+	return (const mm74c922_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -199,7 +198,7 @@ static DEVICE_START( mm74c922 )
 	mm74c922->next_da = 0;
 	change_output_lines(device);
 
-	if (device->type == MM74C922)
+	if (device->type() == MM74C922)
 	{
 		mm74c922->max_y = 4;
 	}
@@ -233,7 +232,6 @@ DEVICE_GET_INFO( mm74c922 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mm74c922_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mm74c922);	break;
@@ -260,7 +258,6 @@ DEVICE_GET_INFO( mm74c923 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mm74c922_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mm74c922);	break;
@@ -275,3 +272,6 @@ DEVICE_GET_INFO( mm74c923 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(MM74C922, mm74c922);
+DEFINE_LEGACY_DEVICE(MM74C923, mm74c923);

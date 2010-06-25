@@ -42,15 +42,14 @@ struct _i8214_t
 INLINE i8214_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (i8214_t *)device->token;
+	return (i8214_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const i8214_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == I8214));
-	return (const i8214_interface *) device->baseconfig().static_config;
+	assert((device->type() == I8214));
+	return (const i8214_interface *) device->baseconfig().static_config();
 }
 
 INLINE void trigger_interrupt(running_device *device, int level)
@@ -215,7 +214,6 @@ DEVICE_GET_INFO( i8214 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8214_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(i8214);		break;
@@ -230,3 +228,5 @@ DEVICE_GET_INFO( i8214 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(I8214, i8214);

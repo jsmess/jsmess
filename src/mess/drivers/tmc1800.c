@@ -994,15 +994,15 @@ ROM_END
 
 static QUICKLOAD_LOAD( tmc1800 )
 {
-	UINT8 *ptr = memory_region(image->machine, CDP1802_TAG);
-	int size = image_length(image);
+	UINT8 *ptr = memory_region(image.device().machine, CDP1802_TAG);
+	int size = image.length();
 
-	if (size > messram_get_size(devtag_get_device(image->machine, "messram")))
+	if (size > messram_get_size(devtag_get_device(image.device().machine, "messram")))
 	{
 		return INIT_FAIL;
 	}
 
-	image_fread(image, ptr, size);
+	image.fread( ptr, size);
 
 	return INIT_PASS;
 }

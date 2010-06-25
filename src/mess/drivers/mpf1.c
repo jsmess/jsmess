@@ -318,7 +318,7 @@ static Z80PIO_INTERFACE( mpf1_pio_intf )
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain mpf1_daisy_chain[] =
+static const z80_daisy_config mpf1_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
 	{ Z80PIO_TAG },
@@ -353,7 +353,7 @@ static TIMER_CALLBACK( check_halt_callback )
 {
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
-	INT64 led_halt = machine->device(Z80_TAG)->get_runtime_int(CPUINFO_INT_REGISTER + Z80_HALT);
+	INT64 led_halt = cpu_get_reg(devtag_get_device(machine, Z80_TAG), Z80_HALT);
 	set_led_status(machine, 1, led_halt);
 }
 

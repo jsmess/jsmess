@@ -157,9 +157,7 @@ INTERRUPT_GEN( mac_cb264_vbl );
 
 /*----------- defined in audio/mac.c -----------*/
 
-#define SOUND_MAC_SOUND DEVICE_GET_INFO_NAME(mac_sound)
-
-DEVICE_GET_INFO( mac_sound );
+DECLARE_LEGACY_SOUND_DEVICE(MAC_SOUND, mac_sound);
 
 void mac_enable_sound( running_device *device, int on );
 void mac_set_sound_buffer( running_device *device, int buffer );

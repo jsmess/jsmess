@@ -144,10 +144,9 @@ typedef struct _am29000_state
 INLINE am29000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_AM29000);
-	return (am29000_state *)device->token;
+	return (am29000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static CPU_INIT( am29000 )
@@ -265,7 +264,7 @@ static void external_irq_check(am29000_state *am29000)
 	}
 }
 
-UINT32 read_program_word(am29000_state *state, UINT32 address)
+static UINT32 read_program_word(am29000_state *state, UINT32 address)
 {
 	/* TODO: ROM enable? */
 	if (state->cps & CPS_PI || state->cps & CPS_RE)
@@ -387,7 +386,6 @@ static CPU_EXECUTE( am29000 )
 {
 	am29000_state *am29000 = get_safe_token(device);
 	UINT32 call_debugger = (device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0;
-	am29000->icount = cycles;
 
 	external_irq_check(am29000);
 
@@ -449,8 +447,6 @@ static CPU_EXECUTE( am29000 )
 		am29000->exec_pc = am29000->pc;
 		am29000->pc = am29000->next_pc;
 	} while (--am29000->icount > 0);
-
-	return cycles - am29000->icount;
 }
 
 static void set_irq_line(am29000_state *am29000, int line, int state)
@@ -713,7 +709,7 @@ static CPU_SET_INFO( am29000 )
 
 CPU_GET_INFO( am29000 )
 {
-	am29000_state *am29000 = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	am29000_state *am29000 = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

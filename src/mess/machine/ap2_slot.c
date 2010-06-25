@@ -28,7 +28,7 @@ struct _apple2_slot_token
 INLINE void assert_valid(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == APPLE2_SLOT);
+	assert(device->type() == APPLE2_SLOT);
 }
 
 
@@ -36,7 +36,7 @@ INLINE void assert_valid(running_device *device)
 INLINE const apple2_slot_config *get_config(running_device *device)
 {
 	assert_valid(device);
-	return (const apple2_slot_config *) device->baseconfig().inline_config;
+	return (const apple2_slot_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 
@@ -44,7 +44,7 @@ INLINE const apple2_slot_config *get_config(running_device *device)
 INLINE apple2_slot_token *get_token(running_device *device)
 {
 	assert_valid(device);
-	return (apple2_slot_token *) device->token;
+	return (apple2_slot_token *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -216,7 +216,6 @@ DEVICE_GET_INFO(apple2_slot)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(apple2_slot_token);		break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(apple2_slot_config);		break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(apple2_slot);	break;
@@ -230,3 +229,5 @@ DEVICE_GET_INFO(apple2_slot)
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(APPLE2_SLOT, apple2_slot);

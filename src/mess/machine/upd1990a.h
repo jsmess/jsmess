@@ -26,7 +26,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define UPD1990A		DEVICE_GET_INFO_NAME(upd1990a)
+DECLARE_LEGACY_DEVICE(UPD1990A, upd1990a);
 
 #define MDRV_UPD1990A_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, UPD1990A, _clock) \
@@ -55,9 +55,6 @@ struct _upd1990a_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( upd1990a );
 
 /* output enable */
 WRITE_LINE_DEVICE_HANDLER( upd1990a_oe_w );

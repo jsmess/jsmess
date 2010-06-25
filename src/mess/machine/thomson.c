@@ -86,8 +86,8 @@ static UINT8* to7_k7_bits;
 static int to7_get_cassette ( running_machine *machine )
 {
 	running_device* img = thom_cassette_img(machine);
-
-	if ( image_exists( img ) )
+	device_image_interface *image = (device_image_interface*)img;
+	if ( image->exists() )
 	{
 		cassette_image* cass = cassette_get_image( img );
 		cassette_state state = cassette_get_state( img );
@@ -187,8 +187,9 @@ static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 static int mo5_get_cassette ( running_machine *machine )
 {
 	running_device* img = thom_cassette_img(machine);
-
-	if ( image_exists( img ) )
+	device_image_interface *image = (device_image_interface*)img;
+	
+	if ( image->exists() )
 	{
 		cassette_image* cass = cassette_get_image( img );
 		cassette_state state = cassette_get_state( img );
@@ -484,8 +485,8 @@ static UINT8 thom_cart_bank;     /* current bank */
 DEVICE_IMAGE_LOAD( to7_cartridge )
 {
 	int i,j;
-	UINT8* pos = memory_region(image->machine,  "maincpu" ) + 0x10000;
-	offs_t size = image_length ( image );
+	UINT8* pos = memory_region(image.device().machine,  "maincpu" ) + 0x10000;
+	offs_t size = image.length();
 	char name[129];
 
 	/* get size & number of 16-KB banks */
@@ -501,7 +502,7 @@ DEVICE_IMAGE_LOAD( to7_cartridge )
 		return INIT_FAIL;
 	}
 
-	if ( image_fread( image, pos, size ) != size )
+	if ( image.fread( pos, size ) != size )
 	{
 		logerror( "to7_cartridge_load: read error\n" );
 		return INIT_FAIL;
@@ -770,11 +771,11 @@ typedef enum
 static to7_io_dev to7_io_mode( running_machine *machine )
 {
 	running_device *centronics = devtag_get_device(machine, "centronics");
-	running_device *serial = devtag_get_device(machine, "cc90232");
+	device_image_interface *serial = (device_image_interface*)devtag_get_device(machine, "cc90232");
 
 	if (centronics_pe_r(centronics) == TRUE)
 		return TO7_IO_CENTRONICS;
-	else if ( image_exists( serial ))
+	else if ( serial->exists())
 		return TO7_IO_RS232;
 	return TO7_IO_NONE;
 }
@@ -2015,8 +2016,8 @@ static UINT8 mo5_reg_cart; /* 0xa7cb bank switch */
 
 DEVICE_IMAGE_LOAD( mo5_cartridge )
 {
-	UINT8* pos = memory_region(image->machine, "maincpu") + 0x10000;
-	UINT64 size = image_length ( image );
+	UINT8* pos = memory_region(image.device().machine, "maincpu") + 0x10000;
+	UINT64 size = image.length();
 	int i,j;
 	char name[129];
 
@@ -2033,7 +2034,7 @@ DEVICE_IMAGE_LOAD( mo5_cartridge )
 		return INIT_FAIL;
 	}
 
-	if ( image_fread( image, pos, size ) != size )
+	if ( image.fread(pos, size ) != size )
 	{
 		logerror( "mo5_cartridge_load: read error\n" );
 		return INIT_FAIL;

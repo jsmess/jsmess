@@ -26,9 +26,9 @@ static int off_y = 0;
 ***************************************************************************/
 VIDEO_START( cgenie )
 {
-	running_device *screen = video_screen_first(machine);
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*machine);
+	int width = screen->width();
+	int height = screen->height();
 
 	machine->generic.videoram_size = 0x4000;
 

@@ -263,7 +263,7 @@ static void mc6845_screen_configure(running_machine *machine)
 	visarea.min_y = 0;
 	visarea.max_y = height-1;
 	if ((width < 640) && (height < 400) && (bytes < 0x800))	/* bounds checking to prevent an assert or violation */
-		video_screen_set_visarea(machine->primary_screen, 0, width, 0, height);
+		machine->primary_screen->set_visible_area(0, width, 0, height);
 }
 
 

@@ -4,9 +4,8 @@
 
 /*----------- defined in audio/gmaster.c -----------*/
 
-#define SOUND_GMASTER	DEVICE_GET_INFO_NAME( gmaster_sound )
+DECLARE_LEGACY_SOUND_DEVICE(GMASTER, gmaster_sound);
 
 int gmaster_io_callback(running_device *device, int ioline, int state);
-DEVICE_GET_INFO( gmaster_sound );
 
 #endif /* __GMASTER_H__ */

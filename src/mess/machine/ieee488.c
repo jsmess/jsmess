@@ -61,16 +61,15 @@ struct _ieee488_t
 INLINE ieee488_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == IEEE488);
-	return (ieee488_t *)device->token;
+	assert(device->type() == IEEE488);
+	return (ieee488_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const ieee488_daisy_chain *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == IEEE488);
-	return (const ieee488_daisy_chain *) device->baseconfig().static_config;
+	assert(device->type() == IEEE488);
+	return (const ieee488_daisy_chain *) device->baseconfig().static_config();
 }
 
 INLINE int get_signal(running_device *bus, int line)
@@ -313,7 +312,6 @@ DEVICE_GET_INFO( ieee488 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ieee488_t);								break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;												break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ieee488);					break;
@@ -328,3 +326,5 @@ DEVICE_GET_INFO( ieee488 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(IEEE488, ieee488);

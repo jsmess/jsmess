@@ -123,7 +123,7 @@ static void rtc_add_month(running_device*);
 static TIMER_CALLBACK(rtc_alarm_pulse)
 {
 	running_device* device = (running_device*)ptr;
-	rp5c15_t* rtc = (rp5c15_t*)device->token;
+	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 
 	if(rtc->pulse16_state == 0)  // low
 	{
@@ -149,11 +149,11 @@ static TIMER_CALLBACK(rtc_alarm_pulse)
 
 static DEVICE_START( rp5c15 )
 {
-	rp5c15_t* rtc = (rp5c15_t*)device->token;
+	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 	mame_system_time systm;
 	mame_system_tm time;
 
-	rtc->intf = (const rp5c15_intf*)device->baseconfig().static_config;
+	rtc->intf = (const rp5c15_intf*)device->baseconfig().static_config();
 
 	rtc->alarm_callback = rtc->intf->alarm_irq_callback;
 
@@ -194,7 +194,7 @@ static DEVICE_START( rp5c15 )
 
 static int rp5c15_read(running_device* device, int offset, UINT16 mem_mask)
 {
-	rp5c15_t* rtc = (rp5c15_t*)device->token;
+	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 	if((rtc->mode & 0x01) == 0x00)  // BANK 0 selected
 	{
 		switch(offset)
@@ -266,7 +266,7 @@ static int rp5c15_read(running_device* device, int offset, UINT16 mem_mask)
 
 static void rp5c15_write(running_device* device, int offset, int data, UINT16 mem_mask)
 {
-	rp5c15_t* rtc = (rp5c15_t*)device->token;
+	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 	if(offset == 13)
 	{
 		rtc->mode = data & 0x0f;
@@ -361,7 +361,7 @@ static void rp5c15_write(running_device* device, int offset, int data, UINT16 me
 
 static void rtc_add_second(running_device* device)  // add one second to current time
 {
-	rp5c15_t* rtc = (rp5c15_t*)device->token;
+	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 
 	if((rtc->mode & 0x08) == 0x00) // if timer is not enabled
 		return;
@@ -378,7 +378,7 @@ static void rtc_add_second(running_device* device)  // add one second to current
 
 static void rtc_add_minute(running_device* device)
 {
-	rp5c15_t* rtc = (rp5c15_t*)device->token;
+	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 
 	rtc->systime.min_1++;
 	if(rtc->systime.min_1 < 10)
@@ -403,7 +403,7 @@ static void rtc_add_minute(running_device* device)
 
 static void rtc_add_day(running_device* device)
 {
-	rp5c15_t* rtc = (rp5c15_t*)device->token;
+	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 	int d,m;
 
 	rtc->systime.dayofweek++;
@@ -471,7 +471,7 @@ static void rtc_add_day(running_device* device)
 
 static void rtc_add_month(running_device* device)
 {
-	rp5c15_t* rtc = (rp5c15_t*)device->token;
+	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
 
 	rtc->systime.month_1++;
 	if(rtc->systime.month_1 < 10 && rtc->systime.month_10 < 1)
@@ -499,7 +499,6 @@ DEVICE_GET_INFO( rp5c15 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_OTHER;				break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(rp5c15_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -518,3 +517,5 @@ DEVICE_GET_INFO( rp5c15 )
 
 READ16_DEVICE_HANDLER(rp5c15_r) { return rp5c15_read(device,offset,mem_mask); }
 WRITE16_DEVICE_HANDLER(rp5c15_w) { rp5c15_write(device,offset,data,mem_mask); }
+
+DEFINE_LEGACY_DEVICE(RP5C15, rp5c15);

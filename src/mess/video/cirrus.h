@@ -9,7 +9,7 @@
 #ifndef CIRRUS_H
 #define CIRRUS_H
 
-#include "pc_vga.h"
+#include "pc_vga_mess.h"
 #include "machine/pci.h"
 
 

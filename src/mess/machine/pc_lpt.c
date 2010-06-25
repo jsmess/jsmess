@@ -62,10 +62,9 @@ MACHINE_DRIVER_END
 INLINE pc_lpt_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == PC_LPT);
+	assert(device->type() == PC_LPT);
 
-	return (pc_lpt_state *)device->token;
+	return (pc_lpt_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -76,9 +75,9 @@ INLINE pc_lpt_state *get_safe_token(running_device *device)
 static DEVICE_START( pc_lpt )
 {
 	pc_lpt_state *lpt = get_safe_token(device);
-	const pc_lpt_interface *intf = (const pc_lpt_interface *)device->baseconfig().static_config;
+	const pc_lpt_interface *intf = (const pc_lpt_interface *)device->baseconfig().static_config();
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
 	/* get centronics device */
 	lpt->centronics = device->subdevice("centronics");
@@ -114,7 +113,6 @@ DEVICE_GET_INFO( pc_lpt )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(pc_lpt_state);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;							break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(pc_lpt);	break;
@@ -140,7 +138,7 @@ DEVICE_GET_INFO( pc_lpt )
 
 static WRITE_LINE_DEVICE_HANDLER( pc_lpt_ack_w )
 {
-	pc_lpt_state *lpt = get_safe_token(device->owner);
+	pc_lpt_state *lpt = get_safe_token(device->owner());
 
 	if (lpt->irq_enabled && lpt->ack == TRUE && state == FALSE)
 	{
@@ -243,3 +241,5 @@ WRITE8_DEVICE_HANDLER( pc_lpt_w )
 	case 2:	pc_lpt_control_w(device, 0, data); break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(PC_LPT, pc_lpt);

@@ -15,7 +15,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define APPLE2_SLOT		DEVICE_GET_INFO_NAME(apple2_slot)
+DECLARE_LEGACY_DEVICE(APPLE2_SLOT, apple2_slot);
 
 
 
@@ -61,10 +61,6 @@ struct _apple2_slot_config
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* device get info function */
-DEVICE_GET_INFO(apple2_slot);
-
 /* slot read function */
 READ8_DEVICE_HANDLER(apple2_slot_r);
 

@@ -54,10 +54,9 @@ struct _e05a03_state
 INLINE e05a03_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == E05A03);
+	assert(device->type() == E05A03);
 
-	return (e05a03_state *)device->token;
+	return (e05a03_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -68,10 +67,10 @@ INLINE e05a03_state *get_safe_token(running_device *device)
 static DEVICE_START( e05a03 )
 {
 	e05a03_state *e05a03 = get_safe_token(device);
-	const e05a03_interface *intf = (const e05a03_interface *)device->baseconfig().static_config;
+	const e05a03_interface *intf = (const e05a03_interface *)device->baseconfig().static_config();
 
 	/* validate some basic stuff */
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
 	/* resolve callbacks */
 	devcb_resolve_write_line(&e05a03->out_nlq_lp_func, &intf->out_nlq_lp_func, device);
@@ -118,7 +117,6 @@ DEVICE_GET_INFO( e05a03 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(e05a03_state);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;									break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_OTHER;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(e05a03);		break;
@@ -240,3 +238,5 @@ WRITE_LINE_DEVICE_HANDLER( e05a03_init_w )
 {
 	e05a03_resi_w(device, state);
 }
+
+DEFINE_LEGACY_DEVICE(E05A03, e05a03);

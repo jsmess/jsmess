@@ -557,12 +557,12 @@ static DEVICE_START( a2600_cart )
 
 static DEVICE_IMAGE_LOAD( a2600_cart )
 {
-	running_machine *machine = image->machine;
+	running_machine *machine = image.device().machine;
 	const struct _extrainfo_banking_def *eibd;
 	UINT8 *cart = CART;
 	const char	*extrainfo;
 
-	cart_size = image_length(image);
+	cart_size = image.length();
 
 	switch (cart_size)
 	{
@@ -579,15 +579,15 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 		break;
 
 	default:
-		image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
 		return 1; /* unsupported image format */
 	}
 
 	current_bank = 0;
 
-	image_fread(image, cart, cart_size);
+	image.fread(cart, cart_size);
 
-	if (!(cart_size == 0x4000 && detect_modef6(image->machine)))
+	if (!(cart_size == 0x4000 && detect_modef6(image.device().machine)))
 	{
 		while (cart_size > 0x00800)
 		{
@@ -596,7 +596,7 @@ static DEVICE_IMAGE_LOAD( a2600_cart )
 		}
 	}
 
-	extrainfo = image_extrainfo( image );
+	extrainfo = image.extrainfo();
 
 	if ( extrainfo && extrainfo[0] )
 	{
@@ -1514,7 +1514,7 @@ static WRITE16_HANDLER( a2600_tia_vsync_callback )
 			if ( supported_screen_heights[i] != current_screen_height )
 			{
 				current_screen_height = supported_screen_heights[i];
-//              video_screen_configure( machine->primary_screen, 228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * current_screen_height );
+//              machine->primary_screen->configure(228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_NTSC ) * 228 * current_screen_height );
 			}
 		}
 	}
@@ -1531,7 +1531,7 @@ static WRITE16_HANDLER( a2600_tia_vsync_callback_pal )
 			if ( supported_screen_heights[i] != current_screen_height )
 			{
 				current_screen_height = supported_screen_heights[i];
-//              video_screen_configure( machine->primary_screen, 228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * current_screen_height );
+//              machine->primary_screen->configure(228, current_screen_height, &visarea[i], HZ_TO_ATTOSECONDS( MASTER_CLOCK_PAL ) * 228 * current_screen_height );
 			}
 		}
 	}
@@ -1553,8 +1553,8 @@ static const struct tia_interface tia_interface_pal =
 
 static MACHINE_START( a2600 )
 {
-	running_device *screen = video_screen_first(machine);
-	current_screen_height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*machine);
+	current_screen_height = screen->height();
 	extra_RAM = memory_region_alloc( machine, "user2", 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface );
 	memset( riot_ram, 0x00, 0x80 );
@@ -1563,8 +1563,8 @@ static MACHINE_START( a2600 )
 
 static MACHINE_START( a2600p )
 {
-	running_device *screen = video_screen_first(machine);
-	current_screen_height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*machine);
+	current_screen_height = screen->height();
 	extra_RAM = memory_region_alloc( machine, "user2", 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface_pal );
 	memset( riot_ram, 0x00, 0x80 );

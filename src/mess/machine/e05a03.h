@@ -29,9 +29,6 @@ struct _e05a03_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( e05a03 );
-
 WRITE8_DEVICE_HANDLER( e05a03_w );
 READ8_DEVICE_HANDLER( e05a03_r );
 
@@ -47,7 +44,7 @@ WRITE_LINE_DEVICE_HANDLER( e05a03_init_w ); /* centronics init */
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define E05A03 DEVICE_GET_INFO_NAME(e05a03)
+DECLARE_LEGACY_DEVICE(E05A03, e05a03);
 
 #define MDRV_E05A03_ADD(_tag, _intf) \
 	MDRV_DEVICE_ADD(_tag, E05A03, 0) \

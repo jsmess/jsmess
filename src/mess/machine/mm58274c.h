@@ -5,15 +5,11 @@
     MACROS
 ***************************************************************************/
 
-#define MM58274C		DEVICE_GET_INFO_NAME(mm58274c)
+DECLARE_LEGACY_DEVICE(MM58274C, mm58274c);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( mm58274c );
-
 /* interface */
 /*
     Initializes the clock chip.

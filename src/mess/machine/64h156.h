@@ -64,7 +64,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define C64H156		DEVICE_GET_INFO_NAME(c64h156)
+DECLARE_LEGACY_DEVICE(C64H156, c64h156);
 
 #define MDRV_64H156_ADD(_tag, _clock, _intrf) \
 	MDRV_DEVICE_ADD(_tag, C64H156, _clock) \
@@ -88,9 +88,6 @@ struct _c64h156_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( c64h156 );
 
 /* parallel data */
 READ8_DEVICE_HANDLER( c64h156_yb_r );

@@ -191,7 +191,7 @@ READ8_HANDLER( odyssey2_video_r )
 			iff = 0;
 			cputag_set_input_line(space->machine, "maincpu", 0, CLEAR_LINE);
 			control_status &= ~ 0x08;
-			if ( video_screen_get_hpos( space->machine->primary_screen ) < I824X_START_ACTIVE_SCAN || video_screen_get_hpos( space->machine->primary_screen ) > I824X_END_ACTIVE_SCAN )
+			if ( space->machine->primary_screen->hpos() < I824X_START_ACTIVE_SCAN || space->machine->primary_screen->hpos() > I824X_END_ACTIVE_SCAN )
 			{
 				data |= 1;
 			}
@@ -207,7 +207,7 @@ READ8_HANDLER( odyssey2_video_r )
         case 0xa4:
 
             if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
-                y_beam_pos = video_screen_get_vpos( space->machine->primary_screen ) - start_vpos;
+                y_beam_pos = space->machine->primary_screen->vpos() - start_vpos;
 
             data = y_beam_pos;
 
@@ -218,7 +218,7 @@ READ8_HANDLER( odyssey2_video_r )
 
             if ((o2_vdc.s.control & VDC_CONTROL_REG_STROBE_XY))
 			{
-                x_beam_pos = video_screen_get_hpos( space->machine->primary_screen );
+                x_beam_pos = space->machine->primary_screen->hpos();
 				if ( x_beam_pos < I824X_START_ACTIVE_SCAN )
 				{
 					x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN + I824X_LINE_CLOCKS;
@@ -252,7 +252,7 @@ WRITE8_HANDLER( odyssey2_video_w )
              && !(data & VDC_CONTROL_REG_STROBE_XY))
         {
             /* Toggling strobe bit, tuck away values */
-            x_beam_pos = video_screen_get_hpos( space->machine->primary_screen );
+            x_beam_pos = space->machine->primary_screen->hpos();
 			if ( x_beam_pos < I824X_START_ACTIVE_SCAN )
 			{
 				x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN + 228;
@@ -262,7 +262,7 @@ WRITE8_HANDLER( odyssey2_video_w )
 				x_beam_pos = x_beam_pos - I824X_START_ACTIVE_SCAN;
 			}
 
-            y_beam_pos = video_screen_get_vpos( space->machine->primary_screen ) - start_vpos;
+            y_beam_pos = space->machine->primary_screen->vpos() - start_vpos;
 
             /* This is wrong but more games work with it, TODO: Figure
              * out correct change.  Maybe update the screen here??
@@ -284,9 +284,9 @@ WRITE8_HANDLER ( odyssey2_lum_w )
 
 READ8_HANDLER( odyssey2_t1_r )
 {
-	if ( video_screen_get_vpos( space->machine->primary_screen ) > start_vpos && video_screen_get_vpos( space->machine->primary_screen ) < start_vblank )
+	if ( space->machine->primary_screen->vpos() > start_vpos && space->machine->primary_screen->vpos() < start_vblank )
 	{
-		if ( video_screen_get_hpos( space->machine->primary_screen ) >= I824X_START_ACTIVE_SCAN && video_screen_get_hpos( space->machine->primary_screen ) < I824X_END_ACTIVE_SCAN )
+		if ( space->machine->primary_screen->hpos() >= I824X_START_ACTIVE_SCAN && space->machine->primary_screen->hpos() < I824X_END_ACTIVE_SCAN )
 		{
 			return 1;
 		}
@@ -297,7 +297,7 @@ READ8_HANDLER( odyssey2_t1_r )
 static TIMER_CALLBACK( i824x_scanline_callback )
 {
 	UINT8	collision_map[160];
-	int		vpos = video_screen_get_vpos( machine->primary_screen );
+	int		vpos = machine->primary_screen->vpos();
 
 	if ( vpos < start_vpos )
 		return;
@@ -583,7 +583,7 @@ static TIMER_CALLBACK( i824x_scanline_callback )
 
 static TIMER_CALLBACK( i824x_hblank_callback )
 {
-	int vpos = video_screen_get_vpos( machine->primary_screen );
+	int vpos = machine->primary_screen->vpos();
 
 	if ( vpos < start_vpos - 1 )
 		return;
@@ -602,9 +602,9 @@ static TIMER_CALLBACK( i824x_hblank_callback )
 
 VIDEO_START( odyssey2 )
 {
-	running_device *screen = video_screen_first(machine);
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*machine);
+	int width = screen->width();
+	int height = screen->height();
 
 	memset(o2_vdc.reg, 0, 0x100);
 
@@ -627,13 +627,13 @@ VIDEO_START( odyssey2 )
 	control_status = 0;
 	iff = 0;
 
-	tmp_bitmap = auto_bitmap_alloc( machine, width, height, video_screen_get_format(screen) );
+	tmp_bitmap = auto_bitmap_alloc( machine, width, height, screen->format() );
 
 	i824x_line_timer = timer_alloc(machine,  i824x_scanline_callback, NULL );
-	timer_adjust_periodic( i824x_line_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, I824X_START_ACTIVE_SCAN ), 0, video_screen_get_scan_period( machine->primary_screen ) );
+	timer_adjust_periodic( i824x_line_timer, machine->primary_screen->time_until_pos(1, I824X_START_ACTIVE_SCAN ), 0,  machine->primary_screen->scan_period() );
 
 	i824x_hblank_timer = timer_alloc(machine,  i824x_hblank_callback, NULL );
-	timer_adjust_periodic( i824x_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, I824X_END_ACTIVE_SCAN + 18 ), 0, video_screen_get_scan_period( machine->primary_screen ) );
+	timer_adjust_periodic( i824x_hblank_timer, machine->primary_screen->time_until_pos(1, I824X_END_ACTIVE_SCAN + 18 ), 0, machine->primary_screen->scan_period() );
 }
 
 /***************************************************************************
@@ -651,7 +651,7 @@ VIDEO_UPDATE( odyssey2 )
 
 static DEVICE_START( odyssey2_sound )
 {
-	odyssey2_sh_channel = stream_create(device, 0, 1, device->clock/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
+	odyssey2_sh_channel = stream_create(device, 0, 1, device->clock()/(I824X_LINE_CLOCKS*4), 0, odyssey2_sh_update );
 }
 
 
@@ -874,3 +874,4 @@ UINT8 odyssey2_ef9341_r( int command, int b )
 	return data;
 }
 
+DEFINE_LEGACY_SOUND_DEVICE(ODYSSEY2, odyssey2_sound);

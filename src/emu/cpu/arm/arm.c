@@ -233,8 +233,8 @@ typedef struct
 	UINT32 coproRegister[16];
 	UINT8 pendingIrq;
 	UINT8 pendingFiq;
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 } ARM_REGS;
 
@@ -253,10 +253,9 @@ static void arm_check_irq_state(ARM_REGS* cpustate);
 INLINE ARM_REGS *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ARM);
-	return (ARM_REGS *)device->token;
+	return (ARM_REGS *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE void cpu_write32( ARM_REGS* cpustate, int addr, UINT32 data )
@@ -312,7 +311,7 @@ static CPU_RESET( arm )
 {
 	ARM_REGS *cpustate = get_safe_token(device);
 
-	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
+	device_irq_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(ARM_REGS));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
@@ -333,7 +332,6 @@ static CPU_EXECUTE( arm )
 	UINT32 insn;
 	ARM_REGS *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
 	do
 	{
 		debugger_instruction_hook(device, R15 & ADDRESS_MASK);
@@ -437,8 +435,6 @@ static CPU_EXECUTE( arm )
 		arm_check_irq_state(cpustate);
 
 	} while( cpustate->icount > 0 );
-
-	return cycles - cpustate->icount;
 } /* arm_execute */
 
 
@@ -1436,7 +1432,7 @@ static CPU_SET_INFO( arm )
 
 CPU_GET_INFO( arm )
 {
-	ARM_REGS *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	ARM_REGS *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

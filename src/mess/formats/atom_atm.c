@@ -7,6 +7,7 @@
 *********************************************************************/
 
 #include "emu.h"
+#include "utils.h"
 #include "formats/atom_atm.h"
 
 /***************************************************************************
@@ -23,11 +24,11 @@
     image_fread_memory - read image to memory
 -------------------------------------------------*/
 
-static void image_fread_memory(running_device *image, UINT16 addr, UINT32 count)
+static void image_fread_memory(device_image_interface &image, UINT16 addr, UINT32 count)
 {
-	void *ptr = memory_get_write_ptr(cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM), addr);
+	void *ptr = memory_get_write_ptr(cpu_get_address_space(image.device().machine->firstcpu, ADDRESS_SPACE_PROGRAM), addr);
 
-	image_fread(image, ptr, count);
+	image.fread( ptr, count);
 }
 
 /*-------------------------------------------------
@@ -52,7 +53,7 @@ QUICKLOAD_LOAD( atom_atm )
 
 	UINT8 header[0x16] = { 0 };
 
-	image_fread(image, header, 0x16);
+	image.fread(header, 0x16);
 
 	UINT16 start_address = pick_integer_le(header, 0x10, 2);
 	UINT16 run_address = pick_integer_le(header, 0x12, 2);
@@ -69,7 +70,7 @@ QUICKLOAD_LOAD( atom_atm )
 
 	image_fread_memory(image, start_address, size);
 
-	cpu_set_reg(image->machine->firstcpu, REG_GENPC, run_address);
+	cpu_set_reg(image.device().machine->firstcpu, STATE_GENPC, run_address);
 
 	return INIT_PASS;
 }

@@ -56,7 +56,7 @@ const i8275_interface ipds_i8275_interface = {
 
 static MACHINE_RESET(ipds)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), I8085_PC, 0x0000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), I8085_PC, (UINT64)0x0000);
 }
 
 static VIDEO_UPDATE( ipds )

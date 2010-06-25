@@ -2416,8 +2416,8 @@ static MACHINE_DRIVER_START( tmnt )
 
 	MDRV_SOUND_ADD("k007232", K007232, XTAL_3_579545MHz)
 	MDRV_SOUND_CONFIG(k007232_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
+	MDRV_SOUND_ROUTE(0, "mono", 0.33)
+	MDRV_SOUND_ROUTE(1, "mono", 0.33)
 
 	MDRV_SOUND_ADD("upd", UPD7759, XTAL_640kHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -2852,8 +2852,7 @@ static MACHINE_DRIVER_START( sunsetbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END

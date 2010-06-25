@@ -25,9 +25,6 @@ struct _i82439tx_config
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( i82439tx );
-
 UINT32 i82439tx_pci_read(running_device *busdevice, running_device *device, int function, int offset, UINT32 mem_mask);
 void i82439tx_pci_write(running_device *busdevice, running_device *device, int function, int offset, UINT32 data, UINT32 mem_mask);
 
@@ -36,7 +33,7 @@ void i82439tx_pci_write(running_device *busdevice, running_device *device, int f
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define I82439TX DEVICE_GET_INFO_NAME(i82439tx)
+DECLARE_LEGACY_DEVICE(I82439TX, i82439tx);
 
 #define MDRV_I82439TX_ADD(_tag, _cputag, _rom_region) \
 	MDRV_DEVICE_ADD(_tag, I82439TX, 0) \

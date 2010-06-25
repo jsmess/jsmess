@@ -68,10 +68,10 @@ QUICKLOAD_LOAD(altair)
 {
 	int quick_length;
 	int read_;
-	quick_length = image_length(image);
+	quick_length = image.length();
 	if (quick_length >= 0xfd00)
 		return INIT_FAIL;
-	read_ = image_fread(image, altair_ram, quick_length);
+	read_ = image.fread(altair_ram, quick_length);
 	if (read_ != quick_length)
 		return INIT_FAIL;
 

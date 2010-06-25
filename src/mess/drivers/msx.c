@@ -997,7 +997,7 @@ static const ay8910_interface msx_ay8910_interface =
 static VIDEO_START( msx2 )
 {
 	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init(machine, 0, machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
+	v9938_init(machine, 0, *machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
 }
 
 #define MSX_XBORDER_PIXELS		15

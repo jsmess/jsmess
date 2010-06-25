@@ -46,7 +46,7 @@ static VIDEO_UPDATE( m20 )
 			{
 				pen = (m20_vram[count]) >> (15 - i) & 1;
 
-				if ((x + i) <= video_screen_get_visible_area(screen)->max_x && (y + 0) < video_screen_get_visible_area(screen)->max_y)
+				if ((x + i) <= screen->visible_area().max_x && (y + 0) < screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, x + i) = screen->machine->pens[pen];
 			}
 
@@ -145,7 +145,7 @@ static MACHINE_DRIVER_START( m20 )
     MDRV_CPU_ADD("apb", I8086, MAIN_CLOCK)
     MDRV_CPU_PROGRAM_MAP(m20_apb_mem)
     MDRV_CPU_IO_MAP(m20_apb_io)
-    MDRV_CPU_FLAGS(CPU_DISABLE)
+    MDRV_DEVICE_DISABLE()
 
 	MDRV_MACHINE_RESET(m20)
 

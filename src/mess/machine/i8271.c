@@ -181,9 +181,8 @@ static DEVICE_RESET( i8271 );
 INLINE i8271_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (i8271_t *)device->token;
+	return (i8271_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -1542,9 +1541,9 @@ static DEVICE_START( i8271 )
 
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
-	i8271->intf = (const i8271_interface*)device->baseconfig().static_config;
+	i8271->intf = (const i8271_interface*)device->baseconfig().static_config();
 
 	i8271->data_timer = timer_alloc(device->machine, i8271_data_timer_callback, (void *)device);
 	i8271->command_complete_timer = timer_alloc(device->machine, i8271_timed_command_complete_callback, (void *)device);
@@ -1582,7 +1581,6 @@ DEVICE_GET_INFO( i8271 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8271_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(i8271);		break;
@@ -1598,4 +1596,4 @@ DEVICE_GET_INFO( i8271 )
 	}
 }
 
-
+DEFINE_LEGACY_DEVICE(I8271, i8271);

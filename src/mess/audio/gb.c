@@ -180,8 +180,8 @@ struct _gb_sound_t
 INLINE gb_sound_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(sound_get_type(device) == SOUND_GAMEBOY);
-	return (gb_sound_t *) device->token;
+	assert(device->type() == SOUND_GAMEBOY);
+	return (gb_sound_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -772,3 +772,5 @@ DEVICE_GET_INFO( gameboy_sound )
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(GAMEBOY, gameboy_sound);

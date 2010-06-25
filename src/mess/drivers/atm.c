@@ -14,9 +14,9 @@ static DIRECT_UPDATE_HANDLER( atm_direct )
 {
 	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
 	running_device *beta = devtag_get_device(space->machine, BETA_DISK_TAG);
-	UINT16 pc = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPCBASE);
+	UINT16 pc = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), STATE_GENPCBASE);
 
-	if (beta->started && betadisk_is_active(beta))
+	if (beta->started() && betadisk_is_active(beta))
 	{
 		if (pc >= 0x4000)
 		{
@@ -29,7 +29,7 @@ static DIRECT_UPDATE_HANDLER( atm_direct )
 	else if (((pc & 0xff00) == 0x3d00) && (state->ROMSelection==1))
 	{
 		state->ROMSelection = 3;
-		if (beta->started)
+		if (beta->started())
 			betadisk_enable(beta);
 
 	}
@@ -57,7 +57,7 @@ static void atm_update_memory(running_machine *machine)
 
 	memory_set_bankptr(machine, "bank4", messram + ((state->port_7ffd_data & 0x07) * 0x4000));
 
-	if (beta->started && betadisk_is_active(beta) && !( state->port_7ffd_data & 0x10 ) )
+	if (beta->started() && betadisk_is_active(beta) && !( state->port_7ffd_data & 0x10 ) )
 	{
 		state->ROMSelection = 3;
 	}
@@ -107,7 +107,7 @@ static MACHINE_RESET( atm )
 	memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 
-	if (beta->started)  {
+	if (beta->started())  {
 		betadisk_enable(beta);
 		betadisk_clear_status(beta);
 	}

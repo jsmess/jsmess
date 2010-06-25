@@ -14,9 +14,6 @@
 #define MDV_OFFSET_DATA				MDV_OFFSET_DATA_PREAMBLE + MDV_PREAMBLE_LENGTH
 #define MDV_OFFSET_GAP				566
 
-#define MICRODRIVE	DEVICE_GET_INFO_NAME(microdrv)
-
-/* device getinfo function */
-DEVICE_GET_INFO(microdrv);
+DECLARE_LEGACY_IMAGE_DEVICE(MICRODRIVE, microdrv);
 
 #endif

@@ -197,7 +197,7 @@ struct _alpha8201_state
 	UINT8 halt;     /* halt input line                        */
 #endif
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 	int inst_cycles;
@@ -227,11 +227,10 @@ typedef struct {
 INLINE alpha8201_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ALPHA8201 ||
 		   cpu_get_type(device) == CPU_ALPHA8301);
-	return (alpha8201_state *)device->token;
+	return (alpha8201_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* Get next opcode argument and increment program counter */
@@ -730,17 +729,18 @@ static CPU_EXIT( alpha8201 )
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
 
-static int alpha8xxx_execute(running_device *device,const s_opcode *op_map,int cycles)
+static void alpha8xxx_execute(running_device *device,const s_opcode *op_map)
 {
 	alpha8201_state *cpustate = get_safe_token(device);
 	unsigned opcode;
 	UINT8 pcptr;
 
-	cpustate->icount = cycles;
-
 #if HANDLE_HALT_LINE
 	if(cpustate->halt)
-		return cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 #endif
 
 	/* setup address bank & fall safe */
@@ -807,13 +807,11 @@ mame_printf_debug("alpha8201:  cpustate->PC = %03x,  opcode = %02x\n", cpustate-
 		(*(op_map[opcode].function))(cpustate);
 		cpustate->icount -= cpustate->inst_cycles;
 	} while (cpustate->icount>0);
-
-	return cycles - cpustate->icount;
 }
 
-static CPU_EXECUTE( alpha8201 ) { return alpha8xxx_execute(device,opcode_8201,cycles); }
+static CPU_EXECUTE( alpha8201 ) { alpha8xxx_execute(device,opcode_8201); }
 
-static CPU_EXECUTE( ALPHA8301 ) { return alpha8xxx_execute(device,opcode_8301,cycles); }
+static CPU_EXECUTE( ALPHA8301 ) { alpha8xxx_execute(device,opcode_8301); }
 
 /****************************************************************************
  * Set IRQ line state
@@ -879,7 +877,7 @@ static CPU_SET_INFO( alpha8201 )
 /* 8201 and 8301 */
 static CPU_GET_INFO( alpha8xxx )
 {
-	alpha8201_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	alpha8201_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

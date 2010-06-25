@@ -185,7 +185,7 @@ SOUNDS += MSM5205
 SOUNDS += OKIM6258
 SOUNDS += OKIM6295
 #SOUNDS += OKIM6376
-#SOUNDS += UPD7759
+SOUNDS += UPD7759
 SOUNDS += HC55516
 #SOUNDS += K005289
 #SOUNDS += K007232
@@ -218,7 +218,7 @@ SOUNDS += CDDA
 #SOUNDS += NILE
 #SOUNDS += X1_010
 #SOUNDS += VRENDER0
-#SOUNDS += VOTRAX
+SOUNDS += VOTRAX
 #SOUNDS += ES8712
 SOUNDS += CDP1869
 SOUNDS += S14001A
@@ -406,7 +406,6 @@ DRVLIBS = \
 #-------------------------------------------------
 
 $(MESSOBJ)/shared.a: \
-	$(MESS_DEVICES)/imagedev.o	\
 	$(MAME_MACHINE)/pckeybrd.o	\
 	$(MESS_AUDIO)/lmc1992.o		\
 	$(MESS_AUDIO)/mea8000.o		\
@@ -435,7 +434,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_FORMATS)/coco_cas.o	\
 	$(MESS_FORMATS)/coco_dsk.o	\
 	$(MESS_FORMATS)/flopimg.o	\
-	$(MESS_FORMATS)/ioprocs.o	\
 	$(MESS_FORMATS)/pc_dsk.o	\
 	$(MESS_FORMATS)/rk_cas.o	\
 	$(MESS_FORMATS)/wavfile.o	\
@@ -461,7 +459,6 @@ $(MESSOBJ)/shared.a: \
 	$(MESS_MACHINE)/i8271.o		\
 	$(MESS_MACHINE)/i8355.o		\
 	$(MESS_MACHINE)/ieee488.o	\
-	$(MESS_MACHINE)/ins8250.o	\
 	$(MESS_MACHINE)/kb3600.o	\
 	$(MESS_MACHINE)/kr2376.o	\
 	$(MESS_MACHINE)/mc6843.o	\
@@ -1218,11 +1215,11 @@ $(MESSOBJ)/pcshare.a:			\
 	$(MESS_MACHINE)/pc_hdc.o	\
 	$(MESS_MACHINE)/pc_joy.o	\
 	$(MESS_MACHINE)/kb_keytro.o	\
-	$(MESS_VIDEO)/pc_video.o	\
+	$(MESS_VIDEO)/pc_video_mess.o	\
 	$(MESS_VIDEO)/pc_mda.o		\
 	$(MESS_VIDEO)/pc_cga.o		\
 	$(MESS_VIDEO)/cgapal.o		\
-	$(MESS_VIDEO)/pc_vga.o		\
+	$(MESS_VIDEO)/pc_vga_mess.o	\
 	$(MESS_VIDEO)/crtc_ega.o	\
 	$(MESS_VIDEO)/pc_ega.o		\
 

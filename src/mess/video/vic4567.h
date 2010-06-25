@@ -134,16 +134,10 @@ struct _vic3_interface
 #define VIC6567_LAST_X 0x19b
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( vic3 );
-
-/***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define VIC3 DEVICE_GET_INFO_NAME( vic3 )
+DECLARE_LEGACY_DEVICE(VIC3, vic3);
 
 #define MDRV_VIC3_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, VIC3, 0) \

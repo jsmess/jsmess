@@ -171,14 +171,14 @@ void asr733_init(running_machine *machine)
 
 int asr733_init_term(running_machine *machine, int unit, void (*int_callback)(running_machine *, int state))
 {
-	running_device *screen = video_screen_first(machine);
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	screen_device *screen = screen_first(*machine);
+	int width = screen->width();
+	int height = screen->height();
+	const rectangle &visarea = screen->visible_area();
 
 	asr[unit].bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 
-	bitmap_fill(asr[unit].bitmap, visarea, 0);
+	bitmap_fill(asr[unit].bitmap, &visarea, 0);
 
 	asr[unit].int_callback = int_callback;
 

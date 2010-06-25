@@ -99,12 +99,12 @@ static WRITE8_HANDLER( samcoupe_disk_w )
 
 static READ8_HANDLER( samcoupe_pen_r )
 {
-	running_device *scr = space->machine->primary_screen;
+	screen_device *scr = space->machine->primary_screen;
 	UINT8 data;
 
 	if (offset & 0x100)
 	{
-		int vpos = video_screen_get_vpos(scr);
+		int vpos = scr->vpos();
 
 		/* return the current screen line or 192 for the border area */
 		if (vpos < SAM_BORDER_TOP || vpos >= SAM_BORDER_TOP + SAM_SCREEN_HEIGHT)
@@ -115,7 +115,7 @@ static READ8_HANDLER( samcoupe_pen_r )
 	else
 	{
 		/* horizontal position is encoded into bits 3 to 8 */
-		data = video_screen_get_hpos(scr) & 0xfc;
+		data = scr->hpos() & 0xfc;
 	}
 
 	return data;

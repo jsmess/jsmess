@@ -12,17 +12,14 @@
 #include "image.h"
 #include "harddisk.h"
 
-#define HARDDISK		DEVICE_GET_INFO_NAME(mess_hd)
-#define IDE_HARDDISK	DEVICE_GET_INFO_NAME(mess_ide)
+DECLARE_LEGACY_IMAGE_DEVICE(HARDDISK, mess_hd);
+DECLARE_LEGACY_IMAGE_DEVICE(IDE_HARDDISK, mess_ide);
 
 #define MDRV_HARDDISK_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, HARDDISK, 0) \
 
 #define MDRV_IDE_HARDDISK_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, IDE_HARDDISK, 0) \
-
-DEVICE_GET_INFO( mess_hd );
-DEVICE_GET_INFO( mess_ide );
 
 hard_disk_file *mess_hd_get_hard_disk_file(running_device *device);
 chd_file *mess_hd_get_chd_file(running_device *device);

@@ -413,7 +413,7 @@ static WRITE8_HANDLER( ninjaw_pancontrol )
 }
 
 
-WRITE16_HANDLER( tc0100scn_triple_screen_w )
+static WRITE16_HANDLER( tc0100scn_triple_screen_w )
 {
 	ninjaw_state *state = (ninjaw_state *)space->machine->driver_data;
 
@@ -690,7 +690,8 @@ static DEVICE_GET_INFO( subwoofer )
 	}
 }
 
-#define SOUND_SUBWOOFER DEVICE_GET_INFO_NAME(subwoofer)
+DECLARE_LEGACY_SOUND_DEVICE(SUBWOOFER, subwoofer);
+DEFINE_LEGACY_SOUND_DEVICE(SUBWOOFER, subwoofer);
 #endif
 
 

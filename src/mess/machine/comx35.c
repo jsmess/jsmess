@@ -151,7 +151,7 @@ static UINT8 read_expansion(running_machine *machine)
 	return result;
 }
 
-static running_device *printer_device(running_machine *machine)
+static running_device *get_printer_device(running_machine *machine)
 {
 	return devtag_get_device(machine, "printer");
 }
@@ -323,7 +323,7 @@ static void printer_w(running_machine *machine, UINT8 data)
             OUT 2 is used to send a byte to the printer
         */
 
-		printer_output(printer_device(machine), data);
+		printer_output(get_printer_device(machine), data);
 		break;
 
 	case PRINTER_SERIAL:

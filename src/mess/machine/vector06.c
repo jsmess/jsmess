@@ -56,7 +56,7 @@ static void vector06_set_video_mode(running_machine *machine, int width) {
 	visarea.min_y = 0;
 	visarea.max_x = width+64-1;
 	visarea.max_y = 256+64-1;
-	video_screen_configure(machine->primary_screen, width+64, 256+64, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+	machine->primary_screen->configure(width+64, 256+64, visarea, machine->primary_screen->frame_period().attoseconds);
 }
 
 static WRITE8_DEVICE_HANDLER (vector06_8255_portb_w )

@@ -9,7 +9,7 @@
 #ifndef MC6846_H
 #define MC6846_H
 
-#define MC6846 DEVICE_GET_INFO_NAME(mc6846)
+DECLARE_LEGACY_DEVICE(MC6846, mc6846);
 
 /* ---------- configuration ------------ */
 
@@ -45,10 +45,6 @@ struct _mc6846_interface
 
 
 /* ---------- functions ------------ */
-
-
-extern DEVICE_GET_INFO(mc6846);
-
 /* interface to CPU via address/data bus*/
 extern READ8_DEVICE_HANDLER  ( mc6846_r );
 extern WRITE8_DEVICE_HANDLER ( mc6846_w );

@@ -1084,7 +1084,7 @@ READ8_HANDLER( fm77av_video_flags_r )
 {
 	UINT8 ret = 0xff;
 
-	if(video_screen_get_vblank(space->machine->primary_screen))
+	if(space->machine->primary_screen->vblank())
 		ret &= ~0x80;
 
 	if(fm7_alu.busy != 0)
@@ -1125,7 +1125,7 @@ READ8_HANDLER( fm77av_sub_modestatus_r )
 	ret |= 0xbc;
 	ret |= (fm7_video.modestatus & 0x40);
 
-	if(!video_screen_get_vblank(space->machine->primary_screen))
+	if(!space->machine->primary_screen->vblank())
 		ret |= 0x02;
 
 	if(fm7_video.vsync_flag != 0)
@@ -1143,14 +1143,14 @@ WRITE8_HANDLER( fm77av_sub_modestatus_w )
 		rect.min_x = rect.min_y = 0;
 		rect.max_x = 320-1;
 		rect.max_y = 200-1;
-		video_screen_configure(space->machine->primary_screen,320,200,&rect,HZ_TO_ATTOSECONDS(60));
+		space->machine->primary_screen->configure(320,200,rect,HZ_TO_ATTOSECONDS(60));
 	}
 	else
 	{
 		rect.min_x = rect.min_y = 0;
 		rect.max_x = 640-1;
 		rect.max_y = 200-1;
-		video_screen_configure(space->machine->primary_screen,640,200,&rect,HZ_TO_ATTOSECONDS(60));
+		space->machine->primary_screen->configure(640,200,rect,HZ_TO_ATTOSECONDS(60));
 	}
 }
 
@@ -1382,7 +1382,7 @@ TIMER_CALLBACK( fm77av_vsync )
 	else
 	{
 		fm7_video.vsync_flag = 0;
-		timer_adjust_oneshot(fm77av_vsync_timer,video_screen_get_time_until_vblank_end(machine->primary_screen),0);
+		timer_adjust_oneshot(fm77av_vsync_timer,machine->primary_screen->time_until_vblank_end(),0);
 	}
 }
 

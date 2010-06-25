@@ -6,7 +6,8 @@
     Driver by Pierpaolo Prazzoli
 
     TODO:
-      - Add colors when proms are dumped
+      - is the background color pen correct for both games? (Dacholer probably
+        just use a different color prom data)
 
     Mods by Tomasz Slanina (2008.06.12):
       - fixed sound cpu interrupts (mode 2 (two vectors)+ nmi)
@@ -22,7 +23,7 @@
 #include "sound/dac.h"
 #include "sound/msm5205.h"
 #include "sound/ay8910.h"
-
+#include "video/resnet.h"
 
 class dacholer_state
 {
@@ -395,9 +396,9 @@ static const gfx_layout spritelayout =
 };
 
 static GFXDECODE_START( dacholer )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0x00, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   0x10, 1 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x10, 1 )
 GFXDECODE_END
 
 
@@ -460,6 +461,46 @@ static MACHINE_RESET( dacholer )
 	state->snd_ack = 0;
 }
 
+/* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
+static PALETTE_INIT( dacholer )
+{
+	static const int resistances_rg[3] = { 1000, 470, 220 };
+	static const int resistances_b [2] = { 470, 220 };
+	double weights_rg[3], weights_b[2];
+	int i;
+
+	/* compute the color output resistor weights */
+	compute_resistor_weights(0, 255, -1.0,
+			3, resistances_rg, weights_rg, 0, 0,
+			2, resistances_b,  weights_b,  0, 0,
+			0, 0, 0, 0, 0);
+
+	for (i = 0;i < machine->config->total_colors; i++)
+	{
+		int bit0, bit1, bit2;
+		int r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = combine_3_weights(weights_rg, bit0, bit1, bit2);
+
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i] >> 4) & 0x01;
+		bit2 = (color_prom[i] >> 5) & 0x01;
+		g = combine_3_weights(weights_rg, bit0, bit1, bit2);
+
+		/* blue component */
+		bit0 = (color_prom[i] >> 6) & 0x01;
+		bit1 = (color_prom[i] >> 7) & 0x01;
+		b = combine_2_weights(weights_b, bit0, bit1);
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
 static MACHINE_DRIVER_START( dacholer )
 
 	/* driver data */
@@ -487,7 +528,8 @@ static MACHINE_DRIVER_START( dacholer )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1-16)
 
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_PALETTE_LENGTH(32)
+	MDRV_PALETTE_INIT(dacholer)
 	MDRV_GFXDECODE(dacholer)
 
 	MDRV_VIDEO_START(dacholer)
@@ -537,36 +579,36 @@ ROM_START( dacholer )
 	ROM_LOAD( "dacholer6.rom", 0x4000, 0x2000, CRC(0a6d4ec4) SHA1(419ea1f6ead3afb2de98432d9f8ead7447842a1e) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "proms", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "k.13d", 0x0000, 0x0020, BAD_DUMP CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) ) //taken from Kick Boy
 ROM_END
 
 ROM_START( kickboy )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "kickboy1.rom", 0x0000, 0x2000, CRC(525746f1) SHA1(4044f880f271f77b56b2d8964ab97d34fb507c7a) )
-	ROM_LOAD( "kickboy2.rom", 0x2000, 0x2000, CRC(9d091725) SHA1(827cea1c371094720b47fda271945cee20c9d956) )
-	ROM_LOAD( "kickboy3.rom", 0x4000, 0x2000, CRC(d61b6ff6) SHA1(071ab4c05ed54526144f2ba751c111e8c4bdc61a) )
-	ROM_LOAD( "kickboy4.rom", 0x6000, 0x2000, CRC(a8985bfe) SHA1(a8e466a7df381dfc8dd2e3483eba0215bfec7551) )
+	ROM_LOAD( "k_1.5k", 0x0000, 0x2000, CRC(525746f1) SHA1(4044f880f271f77b56b2d8964ab97d34fb507c7a) )
+	ROM_LOAD( "k_2.5l", 0x2000, 0x2000, CRC(9d091725) SHA1(827cea1c371094720b47fda271945cee20c9d956) )
+	ROM_LOAD( "k_3.5m", 0x4000, 0x2000, CRC(d61b6ff6) SHA1(071ab4c05ed54526144f2ba751c111e8c4bdc61a) )
+	ROM_LOAD( "k_4.5n", 0x6000, 0x2000, CRC(a8985bfe) SHA1(a8e466a7df381dfc8dd2e3483eba0215bfec7551) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
-	ROM_LOAD( "kickboy5.rom", 0x0000, 0x2000, CRC(cc3a4b68) SHA1(29344dc10c5d236f9a452196b3809565b4101327) )
-	ROM_LOAD( "kickboy6.rom", 0x2000, 0x2000, CRC(aa18e126) SHA1(e6af334188d0edbc37a7fb4a00a325b2039172b7) )
-	ROM_LOAD( "kickboy7.rom", 0x4000, 0x2000, CRC(3b0131c7) SHA1(338ca2c2c7480e1cd0bb15ee6b90d683ce06f0fd) )
+	ROM_LOAD( "k_1.6g", 0x0000, 0x2000, CRC(cc3a4b68) SHA1(29344dc10c5d236f9a452196b3809565b4101327) )
+	ROM_LOAD( "k_2.6h", 0x2000, 0x2000, CRC(aa18e126) SHA1(e6af334188d0edbc37a7fb4a00a325b2039172b7) )
+	ROM_LOAD( "k_3.6j", 0x4000, 0x2000, CRC(3b0131c7) SHA1(338ca2c2c7480e1cd0bb15ee6b90d683ce06f0fd) )
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "kickboy13.rom", 0x0000, 0x2000, CRC(22be46e8) SHA1(d92b3913d8eba881c69acd1d85ca73ee58489fae) )
+	ROM_LOAD( "k_7.12j", 0x0000, 0x2000, CRC(22be46e8) SHA1(d92b3913d8eba881c69acd1d85ca73ee58489fae) )
 
 	ROM_REGION( 0x4000, "gfx2", 0 )
-	ROM_LOAD( "kickboy9.rom",  0x0000, 0x2000, CRC(7eac2a64) SHA1(b4a44770bbded59cd572ac5d0ae178affc8cdab8) )
-	ROM_LOAD( "kickboy8.rom",  0x2000, 0x2000, CRC(b8829572) SHA1(01009ec63449c809608923fd9dcecd82b29c5d6d) )
+	ROM_LOAD( "k_3.13a",  0x0000, 0x2000, CRC(7eac2a64) SHA1(b4a44770bbded59cd572ac5d0ae178affc8cdab8) )
+	ROM_LOAD( "k_2.12a",  0x2000, 0x2000, CRC(b8829572) SHA1(01009ec63449c809608923fd9dcecd82b29c5d6d) )
 
 	ROM_REGION( 0x6000, "gfx3", 0 )
-	ROM_LOAD( "kickboy11.rom", 0x0000, 0x2000, CRC(4b769a1c) SHA1(fde17dcd4b7cda9cc54572e81bc2f0e48c19277d) )
-	ROM_LOAD( "kickboy10.rom", 0x2000, 0x2000, CRC(45199750) SHA1(a04b4d6d0defa613d269625b089d28dc68d5b73a) )
-	ROM_LOAD( "kickboy12.rom", 0x4000, 0x2000, CRC(d1795506) SHA1(e0f7a64e301cf43c4739031461dba16aa44100a1) )
+	ROM_LOAD( "k_5.2d", 0x0000, 0x2000, CRC(4b769a1c) SHA1(fde17dcd4b7cda9cc54572e81bc2f0e48c19277d) )
+	ROM_LOAD( "k_4.1d", 0x2000, 0x2000, CRC(45199750) SHA1(a04b4d6d0defa613d269625b089d28dc68d5b73a) )
+	ROM_LOAD( "k_6.3d", 0x4000, 0x2000, CRC(d1795506) SHA1(e0f7a64e301cf43c4739031461dba16aa44100a1) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
-	ROM_LOAD( "proms", 0x0000, 0x0020, NO_DUMP )
+	ROM_LOAD( "k.13d", 0x0000, 0x0020, CRC(82f87a36) SHA1(5dc2059eb5b6cd541b014347c36198b8838d98fa) )
 ROM_END
 
 GAME( 1983, dacholer, 0, dacholer, dacholer, 0, ROT0, "Nichibutsu", "Dacholer", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
-GAME( 1983, kickboy,  0, dacholer, kickboy,  0, ROT0, "Nichibutsu", "Kick Boy", GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1983, kickboy,  0, dacholer, kickboy,  0, ROT0, "Nichibutsu", "Kick Boy", GAME_SUPPORTS_SAVE )

@@ -32,14 +32,4 @@ extern const options_entry mess_core_options[];
 
 /* initialize MESS specific options (called from MAME core) */
 void mess_options_init(core_options *opts);
-
-/* extract device options out of core into the options */
-void mess_options_extract(running_machine *machine);
-
-/* add the device options for a specified device */
-void mess_add_device_options(core_options *opts, const game_driver *driver);
-
-/* accesses a device option, by device and index */
-const char *mess_get_device_option(const image_device_info *info);
-
 #endif /* __MESSOPTS_H__ */

@@ -96,8 +96,8 @@ static WRITE8_HANDLER( cassette_w )
 */
 static READ8_HANDLER( vsync_r )
 {
-	running_device *screen = space->machine->primary_screen;
-	return video_screen_get_vblank(screen) ? 0 : 1;
+	screen_device *screen = space->machine->primary_screen;
+	return screen->vblank() ? 0 : 1;
 }
 
 

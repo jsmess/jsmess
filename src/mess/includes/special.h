@@ -72,9 +72,8 @@ extern const rgb_t specimx_palette[16];
 
 /*----------- defined in audio/special.c -----------*/
 
-#define SOUND_SPECIMX	DEVICE_GET_INFO_NAME( specimx_sound )
+DECLARE_LEGACY_SOUND_DEVICE(SPECIMX, specimx_sound);
 
 void specimx_set_input(running_machine *machine, int index, int state);
-DEVICE_GET_INFO( specimx_sound );
 
 #endif /* SPECIAL_H_ */

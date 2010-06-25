@@ -64,7 +64,7 @@ VIDEO_UPDATE( trs80 )
 	if (trs80_mode != trs80_size_store)
 	{
 		trs80_size_store = trs80_mode & 1;
-		video_screen_set_visarea(screen, 0, cols*FW-1, 0, 16*FH-1);
+		screen->set_visible_area(0, cols*FW-1, 0, 16*FH-1);
 	}
 
 	for (y = 0; y < 16; y++)
@@ -136,7 +136,7 @@ VIDEO_UPDATE( trs80m4 )
 	if ((trs80_mode & 0x7f) != trs80_size_store)
 	{
 		trs80_size_store = trs80_mode & 5;
-		video_screen_set_visarea(screen, 0, s_cols*8-1, 0, rows*lines-1);
+		screen->set_visible_area(0, s_cols*8-1, 0, rows*lines-1);
 	}
 
 	for (y = 0; y < rows; y++)
@@ -221,7 +221,7 @@ VIDEO_UPDATE( ht1080z )
 	if (trs80_mode != trs80_size_store)
 	{
 		trs80_size_store = trs80_mode & 1;
-		video_screen_set_visarea(screen, 0, cols*FW-1, 0, 16*FH-1);
+		screen->set_visible_area(0, cols*FW-1, 0, 16*FH-1);
 	}
 
 	for (y = 0; y < 16; y++)
@@ -281,7 +281,7 @@ VIDEO_UPDATE( lnw80 )
 	if (trs80_mode != trs80_size_store)
 	{
 		trs80_size_store = trs80_mode & 0x10;
-		video_screen_set_visarea(screen, 0, cols*FW-1, 0, 16*FH-1);
+		screen->set_visible_area(0, cols*FW-1, 0, 16*FH-1);
 	}
 
 	if (trs80_mode & 8)
@@ -453,7 +453,7 @@ VIDEO_UPDATE( radionic )
 	if (trs80_mode != trs80_size_store)
 	{
 		trs80_size_store = trs80_mode & 1;
-		video_screen_set_visarea(screen, 0, cols*8-1, 0, 16*16-1);
+		screen->set_visible_area(0, cols*8-1, 0, 16*16-1);
 	}
 
 	for (y = 0; y < 16; y++)

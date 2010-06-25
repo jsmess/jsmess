@@ -156,18 +156,18 @@ VIDEO_UPDATE( hec2hrp )
         {
            if (hector_flag_80c==0)
            {
-              video_screen_set_visarea(screen, 0, 243, 0, 227);
+              screen->set_visible_area(0, 243, 0, 227);
               hector_hr( bitmap , &hector_videoram[0], 227, 64);
            }
            else
            {
-               video_screen_set_visarea(screen, 0, 243*2, 0, 227);
+               screen->set_visible_area(0, 243*2, 0, 227);
                hector_80c( bitmap , &hector_videoram[0], 227, 64);
            }
         }
 	else
         {
-            video_screen_set_visarea(screen, 0, 113, 0, 75);
+            screen->set_visible_area(0, 113, 0, 75);
             hector_hr( bitmap, screen->machine->generic.videoram.u8,  77, 32);
         }
 

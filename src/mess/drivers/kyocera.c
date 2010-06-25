@@ -1318,9 +1318,9 @@ static I8085_CONFIG( kc85_i8085_config )
 
 static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
 {
-	tandy200_state *state = (tandy200_state *)timer->machine->driver_data;
+	tandy200_state *state = (tandy200_state *)timer.machine->driver_data;
 
-	cputag_set_input_line(timer->machine, I8085_TAG, I8085_RST75_LINE, state->tp);
+	cputag_set_input_line(timer.machine, I8085_TAG, I8085_RST75_LINE, state->tp);
 
 	state->tp = !state->tp;
 }

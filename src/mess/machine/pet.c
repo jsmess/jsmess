@@ -853,11 +853,11 @@ static CBM_ROM pet_cbm_cart[0x20] = { {0} };
 
 static DEVICE_IMAGE_LOAD(pet_cart)
 {
-	int size = image_length(image), test;
+	int size = image.length(), test;
 	const char *filetype;
 	int address = 0;
 
-	filetype = image_filetype(image);
+	filetype = image.filetype();
 
 	if (!mame_stricmp(filetype, "crt"))
 	{
@@ -875,17 +875,17 @@ static DEVICE_IMAGE_LOAD(pet_cart)
 		else if (!mame_stricmp(filetype, "b0"))
 			address = 0xb000;
 
-		logerror("Loading cart %s at %.4x size:%.4x\n", image_filename(image), address, size);
+		logerror("Loading cart %s at %.4x size:%.4x\n", image.filename(), address, size);
 
 		/* Does cart contain any data? */
-		pet_cbm_cart[0].chip = (UINT8*) image_malloc(image, size);
+		pet_cbm_cart[0].chip = (UINT8*) image.image_malloc(size);
 		if (!pet_cbm_cart[0].chip)
 			return INIT_FAIL;
 
 		/* Store data, address & size */
 		pet_cbm_cart[0].addr = address;
 		pet_cbm_cart[0].size = size;
-		test = image_fread(image, pet_cbm_cart[0].chip, pet_cbm_cart[0].size);
+		test = image.fread(pet_cbm_cart[0].chip, pet_cbm_cart[0].size);
 
 		if (test != pet_cbm_cart[0].size)
 			return INIT_FAIL;

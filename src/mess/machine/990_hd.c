@@ -83,7 +83,7 @@ enum format_t
 /* disk drive unit descriptor */
 typedef struct hd_unit_t
 {
-	running_device *img;						/* image descriptor */
+	device_image_interface *img;						/* image descriptor */
 	format_t format;
 	hard_disk_file *hd_handle;		/* mame hard disk descriptor - only if format == format_mame */
 	unsigned int wp : 1;					/* TRUE if disk is write-protected */
@@ -205,12 +205,12 @@ DEVICE_STOP( ti990_hd )
 */
 static DEVICE_IMAGE_LOAD( ti990_hd )
 {
-	int id = get_id_from_device( image );
+	int id = get_id_from_device( &image.device() );
 	hd_unit_t *d;
 	hard_disk_file	*hd_file;
 
 	d = &hdc.d[id];
-	d->img = image;
+	d->img = &image;
 
 	hd_file = mess_hd_get_hard_disk_file( image );
 
@@ -242,8 +242,8 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 		/* use custom image header. */
 		/* to convert old header-less images to this format, insert a 16-byte
         header as follow: 00 00 03 8f  00 00 00 05  00 00 00 21  00 00 01 00 */
-		image_fseek(d->img, 0, SEEK_SET);
-		bytes_read = image_fread(d->img, &custom_header, sizeof(custom_header));
+		d->img->fseek(0, SEEK_SET);
+		bytes_read = d->img->fread(&custom_header, sizeof(custom_header));
 		if (bytes_read != sizeof(custom_header))
 		{
 			d->format = format_mame;    /* don't care */
@@ -268,7 +268,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 	}
 
 	/* tell whether the image is writable */
-	d->wp = ! image_is_writable( image );
+	d->wp = ! image.is_writable();
 
 	d->unsafe = 1;
 	/* set attention line */
@@ -310,7 +310,7 @@ INLINE int is_unit_loaded(int unit)
 		break;
 
 	case format_old:
-		reply = (image_exists(hdc.d[unit].img) ? 1 : 0);
+		reply = (hdc.d[unit].img->exists() ? 1 : 0);
 		break;
 	}
 
@@ -342,10 +342,10 @@ void ti990_hdc_init(running_machine *machine, void (*interrupt_callback)(running
 	hdc.w[7] = w7_idle;
 
 	/* get references to harddisk devices */
-	hdc.d[0].img = devtag_get_device(machine, "harddisk1");
-	hdc.d[1].img = devtag_get_device(machine, "harddisk2");
-	hdc.d[2].img = devtag_get_device(machine, "harddisk3");
-	hdc.d[3].img = devtag_get_device(machine, "harddisk4");
+	hdc.d[0].img = (device_image_interface *)devtag_get_device(machine, "harddisk1");
+	hdc.d[1].img = (device_image_interface *)devtag_get_device(machine, "harddisk2");
+	hdc.d[2].img = (device_image_interface *)devtag_get_device(machine, "harddisk3");
+	hdc.d[3].img = (device_image_interface *)devtag_get_device(machine, "harddisk4");
 
 	hdc.interrupt_callback = interrupt_callback;
 
@@ -449,8 +449,8 @@ static int read_sector(int unit, unsigned int lba, void *buffer, unsigned int by
 
 	case format_old:
 		byte_position = lba*hdc.d[unit].bytes_per_sector + header_len;
-		image_fseek(hdc.d[unit].img, byte_position, SEEK_SET);
-		bytes_read = image_fread(hdc.d[unit].img, buffer, bytes_to_read);
+		hdc.d[unit].img->fseek(byte_position, SEEK_SET);
+		bytes_read = hdc.d[unit].img->fread(buffer, bytes_to_read);
 		break;
 
 	default:
@@ -479,8 +479,8 @@ static int write_sector(int unit, unsigned int lba, const void *buffer, unsigned
 
 	case format_old:
 		byte_position = lba*hdc.d[unit].bytes_per_sector + header_len;
-		image_fseek(hdc.d[unit].img, byte_position, SEEK_SET);
-		bytes_written = image_fwrite(hdc.d[unit].img, buffer, bytes_to_write);
+		hdc.d[unit].img->fseek(byte_position, SEEK_SET);
+		bytes_written = hdc.d[unit].img->fwrite(buffer, bytes_to_write);
 		break;
 
 	default:

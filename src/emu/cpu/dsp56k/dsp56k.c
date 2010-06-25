@@ -232,7 +232,7 @@ static CPU_INIT( dsp56k )
 	state_save_register_device_item(device, 0, cpustate->HI.trxl);
 	state_save_register_device_item(device, 0, cpustate->HI.bootstrap_offset);
 
-	//cpustate->config = device->baseconfig().static_config;
+	//cpustate->config = device->baseconfig().static_config();
 	//cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
@@ -319,13 +319,18 @@ static CPU_EXECUTE( dsp56k )
 
 	/* If reset line is asserted, do nothing */
 	if (cpustate->reset_state)
-		return cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
 	/* HACK - if you're in bootstrap mode, simply pretend you ate up all your cycles waiting for data. */
 	if (cpustate->bootstrap_mode != BOOTSTRAP_OFF)
-		return cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
-	cpustate->icount = cycles;
 	cpustate->icount -= cpustate->interrupt_cycles;
 	cpustate->interrupt_cycles = 0;
 
@@ -337,8 +342,6 @@ static CPU_EXECUTE( dsp56k )
 
 	cpustate->icount -= cpustate->interrupt_cycles;
 	cpustate->interrupt_cycles = 0;
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -436,7 +439,7 @@ static CPU_SET_INFO( dsp56k )
 
 CPU_GET_INFO( dsp56k )
 {
-	dsp56k_core* cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	dsp56k_core* cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

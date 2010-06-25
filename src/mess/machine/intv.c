@@ -318,7 +318,7 @@ WRITE16_HANDLER( intv_ram16_w )
 	intv_ram16[offset] = data&0xffff;
 }
 
-static int intv_load_rom_file(running_device *image)
+static int intv_load_rom_file(device_image_interface &image)
 {
     int i,j;
 
@@ -333,21 +333,21 @@ static int intv_load_rom_file(running_device *image)
 	UINT8 high_byte;
 	UINT8 low_byte;
 
-	UINT8 *memory = memory_region(image->machine, "maincpu");
-	const char *filetype = image_filetype(image);
+	UINT8 *memory = memory_region(image.device().machine, "maincpu");
+	const char *filetype = image.filetype();
 
 	/* if it is in .rom format, we enter here */
 	if (!mame_stricmp (filetype, "rom"))
 	{
-		image_fread(image, &temp, 1);			/* header */
+		image.fread( &temp, 1);			/* header */
 		if (temp != 0xa8)
 		{
 			return INIT_FAIL;
 		}
 
-		image_fread(image, &num_segments, 1);
+		image.fread( &num_segments, 1);
 
-		image_fread(image, &temp, 1);
+		image.fread( &temp, 1);
 		if (temp != (num_segments ^ 0xff))
 		{
 			return INIT_FAIL;
@@ -355,30 +355,30 @@ static int intv_load_rom_file(running_device *image)
 
 		for (i = 0; i < num_segments; i++)
 		{
-			image_fread(image, &start_seg, 1);
+			image.fread( &start_seg, 1);
 			current_address = start_seg * 0x100;
 
-			image_fread(image, &end_seg, 1);
+			image.fread( &end_seg, 1);
 			end_address = end_seg * 0x100 + 0xff;
 
 			while (current_address <= end_address)
 			{
-				image_fread(image, &low_byte, 1);
+				image.fread( &low_byte, 1);
 				memory[(current_address << 1) + 1] = low_byte;
-				image_fread(image, &high_byte, 1);
+				image.fread( &high_byte, 1);
 				memory[current_address << 1] = high_byte;
 				current_address++;
 			}
 
 			/* Here we should calculate and compare the CRC16... */
-			image_fread(image, &temp, 1);
-			image_fread(image, &temp, 1);
+			image.fread( &temp, 1);
+			image.fread( &temp, 1);
 		}
 
 		/* Access tables and fine address restriction tables are not supported ATM */
 		for (i = 0; i < (16 + 32 + 2); i++)
 		{
-			image_fread(image, &temp, 1);
+			image.fread( &temp, 1);
 		}
 		return INIT_PASS;
 	}
@@ -398,20 +398,20 @@ static int intv_load_rom_file(running_device *image)
 		int start, size;
 		int mapper, rom[5], ram, extra;
 
-		if (!image_extrainfo(image))
+		if (!image.extrainfo())
 		{
 			/* If no extrainfo, we assume a single 0x2000 chunk at 0x5000 */
 			for (i = 0; i < 0x2000; i++ )
 			{
-				image_fread(image, &low_byte, 1);
+				image.fread( &low_byte, 1);
 				memory[((0x5000 + i) << 1) + 1] = low_byte;
-				image_fread(image, &high_byte, 1);
+				image.fread( &high_byte, 1);
 				memory[(0x5000 + i) << 1] = high_byte;
 			}
 		}
 		else
 		{
-			sscanf(image_extrainfo(image),"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
+			sscanf(image.extrainfo(),"%d %d %d %d %d %d %d", &mapper, &rom[0], &rom[1], &rom[2],
 																&rom[3], &ram, &extra);
 
 //          logerror("extrainfo: %d %d %d %d %d %d %d \n", mapper, rom[0], rom[1], rom[2],
@@ -451,9 +451,9 @@ static int intv_load_rom_file(running_device *image)
 
 				for (i = 0; i < size; i++ )
 				{
-					image_fread(image, &low_byte, 1);
+					image.fread( &low_byte, 1);
 					memory[((start + i) << 1) + 1] = low_byte;
-					image_fread(image, &high_byte, 1);
+					image.fread( &high_byte, 1);
 					memory[(start + i) << 1] = high_byte;
 				}
 			}
@@ -551,11 +551,11 @@ READ8_HANDLER( intv_left_control_r )
 
 DEVICE_IMAGE_LOAD( intvkbd_cart )
 {
-	if (strcmp(image->tag(),"cart1") == 0) /* Legacy cartridge slot */
+	if (strcmp(image.device().tag(),"cart1") == 0) /* Legacy cartridge slot */
 	{
 		/* First, initialize these as empty so that the intellivision
          * will think that the playcable is not attached */
-		UINT8 *memory = memory_region(image->machine, "maincpu");
+		UINT8 *memory = memory_region(image.device().machine, "maincpu");
 
 		/* assume playcable is absent */
 		memory[0x4800 << 1] = 0xff;
@@ -564,12 +564,12 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 		intv_load_rom_file(image);
 	}
 
-	if (strcmp(image->tag(),"cart2") == 0) /* Keyboard component cartridge slot */
+	if (strcmp(image.device().tag(),"cart2") == 0) /* Keyboard component cartridge slot */
 	{
-		UINT8 *memory = memory_region(image->machine, "keyboard");
+		UINT8 *memory = memory_region(image.device().machine, "keyboard");
 
 		/* Assume an 8K cart, like BASIC */
-		image_fread(image, &memory[0xe000], 0x2000);
+		image.fread( &memory[0xe000], 0x2000);
 	}
 
 	return INIT_PASS;

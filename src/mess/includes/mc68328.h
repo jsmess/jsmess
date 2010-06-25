@@ -160,8 +160,7 @@ void mc68328_set_port_d_lines(running_device *device, UINT8 state, int bit);
     DEVICE INTERFACE
 ***************************************************************************/
 
-#define MC68328 DEVICE_GET_INFO_NAME(mc68328)
-DEVICE_GET_INFO( mc68328 );
+DECLARE_LEGACY_DEVICE(MC68328, mc68328);
 
 /*----------- defined in video/mc68328.c -----------*/
 

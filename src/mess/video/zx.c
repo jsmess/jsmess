@@ -45,10 +45,10 @@ static int offs1 = 0;
  */
 void zx_ula_bkgnd(running_machine *machine, int color)
 {
-	running_device *screen = video_screen_first(machine);
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	screen_device *screen = screen_first(*machine);
+	int width = screen->width();
+	int height = screen->height();
+	const rectangle &visarea = screen->visible_area();
 
 	if (ula_frame_vsync == 0 && color != old_c)
 	{
@@ -56,8 +56,8 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 		rectangle r;
 		bitmap_t *bitmap = machine->generic.tmpbitmap;
 
-		new_y = video_screen_get_vpos(machine->primary_screen);
-		new_x = video_screen_get_hpos(machine->primary_screen);
+		new_y = machine->primary_screen->vpos();
+		new_x = machine->primary_screen->hpos();
 /*      logerror("zx_ula_bkgnd: %3d,%3d - %3d,%3d\n", old_x, old_y, new_x, new_y);*/
 		y = old_y;
 		for (;;)
@@ -73,7 +73,7 @@ void zx_ula_bkgnd(running_machine *machine, int color)
 			else
 			{
 				r.min_x = old_x;
-				r.max_x = visarea->max_x;
+				r.max_x = visarea.max_x;
 				r.min_y = r.max_y = y;
 				bitmap_fill(bitmap, &r, color);
 				old_x = 0;
@@ -104,14 +104,17 @@ static TIMER_CALLBACK(zx_ula_nmi)
      * An NMI is issued on the ZX81 every 64us for the blanked
      * scanlines at the top and bottom of the display.
      */
-	running_device *screen = video_screen_first(machine);
-	int height = video_screen_get_height(screen);
-	rectangle r = *video_screen_get_visible_area(screen);
+	screen_device *screen = screen_first(*machine);
+	int height = screen->height();
+	const rectangle r1 = screen->visible_area();
+	rectangle r;
+	
 	bitmap_t *bitmap = machine->generic.tmpbitmap;
-
+	r.min_x = r1.min_x;
+	r.max_x = r1.max_x;
 	r.min_y = r.max_y = ula_scanline_count;
 	bitmap_fill(bitmap, &r, 1);
-//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_PC));
+//  logerror("ULA %3d[%d] NMI, R:$%02X, $%04x\n", machine->primary_screen->vpos(), ula_scancode_count, (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_PC));
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 	if (++ula_scanline_count == height)
 		ula_scanline_count = 0;
@@ -127,7 +130,7 @@ static TIMER_CALLBACK(zx_ula_irq)
      */
 	if (ula_irq_active)
 	{
-//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", video_screen_get_vpos(machine->primary_screen), ula_scancode_count, (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_PC));
+//      logerror("ULA %3d[%d] IRQ, R:$%02X, $%04x\n", machine->primary_screen->vpos(), ula_scancode_count, (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_R), (unsigned) cpu_get_reg(devtag_get_device(machine, "maincpu"), Z80_PC));
 
 		ula_irq_active = 0;
 		cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
@@ -136,7 +139,7 @@ static TIMER_CALLBACK(zx_ula_irq)
 
 void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT8 param)
 {
-	running_device *screen = video_screen_first(machine);
+	screen_device *screen = screen_first(*machine);
 	int offs0 = offs & 0x7fff;
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 chr = rom[offs0];
@@ -155,7 +158,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 
 		chrgen = memory_region(machine, region);
 
-		if ((++ula_scanline_count == video_screen_get_height(screen)) || (creg == 32))
+		if ((++ula_scanline_count == screen->height()) || (creg == 32))
 		{
 			ula_scanline_count = 0;
 			offs1 = offs0;

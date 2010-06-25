@@ -6,9 +6,6 @@
     earlier version, without RAM banking, not encrypted (standard Z80)
     and without EEPROM.
 
-    Other games that might run on this hardware:
-    "Chi-toitsu"(YUGA 1988)-Another version of"Mahjong Gakuen"
-
     Notes:
     - Super Pang has a protection which involves copying code stored in the
       EEPROM to RAM and execute it from there. The first time the game is run,
@@ -18,8 +15,6 @@
 
     TODO:
     - understand what bits 0 and 3 of input port 0x05 are
-    - ball speed is erratic in Block Block. It was not like this at one point.
-      This is probably related to interrupts and maybe to the above bits.
 
 
 ******************************************************************************
@@ -120,25 +115,18 @@ static NVRAM_HANDLER( mitchell )
 
 static READ8_HANDLER( pang_port5_r )
 {
-	mitchell_state *state = (mitchell_state *)space->machine->driver_data;
-	int bit;
+	int bit = eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 7;
 
-	bit = eeprom_read_bit(devtag_get_device(space->machine, "eeprom")) << 7;
-
-	/* bits 0 and (sometimes) 3 are checked in the interrupt handler. */
-	/* Maybe they are vblank related, but I'm not sure. */
-	/* bit 3 is checked before updating the palette so it really seems to be vblank. */
-	/* Many games require two interrupts per frame and for these bits to toggle, */
-	/* otherwise music doesn't work. */
+	/* bits 0 and (sometimes) 3 are checked in the interrupt handler.
+        bit 3 is checked before updating the palette so it really seems to be vblank.
+        bit 0 may be vblank (or vblank irq flag) related too, but I'm not sure.
+        Many games require two interrupts per frame and for these bits to toggle,
+        otherwise music doesn't work.
+    */
 	if (cpu_getiloops(space->cpu) & 1)
 		bit |= 0x01;
-	else
-		bit |= 0x08;
 
-	if (state->port5_kludge)	/* hack... music doesn't work otherwise */
-		bit ^= 0x08;
-
-	return (input_port_read(space->machine, "DSW0") & 0x76) | bit;
+	return (input_port_read(space->machine, "SYS0") & 0x7e) | bit;
 }
 
 static WRITE8_DEVICE_HANDLER( eeprom_cs_w )
@@ -364,7 +352,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spangbl_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
+	AM_RANGE(0x00, 0x00) AM_WRITE(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
 	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_data_port_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_register_port_w)
@@ -399,7 +387,8 @@ ADDRESS_MAP_END
 /**** Monsters World ****/
 static WRITE8_DEVICE_HANDLER( oki_banking_w )
 {
-	okim6295_set_bank_base(device, 0x40000 * (data & 3));
+	mitchell_state *state = (mitchell_state *)device->machine->driver_data;
+	state->oki->set_bank_base(0x40000 * (data & 3));
 }
 
 static ADDRESS_MAP_START( mstworld_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -422,10 +411,10 @@ static ADDRESS_MAP_START( mstworld_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mstworld_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(pang_bankswitch_w)	/* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(mstworld_sound_w)	/* write to sound cpu */
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")	/* dips? */
-	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW0")	/* special? */
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW3")	/* dips? */
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(mstworld_sound_w)	/* write to sound cpu */
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")	/* dips? */
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")	/* special? */
+	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW2")	/* dips? */
 	AM_RANGE(0x06, 0x06) AM_WRITENOP		/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(mstworld_video_bank_w)	/* Video RAM bank register */
 ADDRESS_MAP_END
@@ -438,11 +427,11 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( mj_common )
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
@@ -560,7 +549,10 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mgakuen )
 	PORT_INCLUDE( mj_common )
 
-	PORT_START("DSW1")
+	PORT_MODIFY("SYS0")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	// not IPT_VBLANK
+
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -584,7 +576,7 @@ static INPUT_PORTS_START( mgakuen )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW2")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, "Player 1 Skill" )
 	PORT_DIPSETTING(    0x03, "Weak" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -612,7 +604,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( marukin )
 	PORT_INCLUDE( mj_common )
 
-	PORT_MODIFY("DSW0")
+	PORT_MODIFY("SYS0")
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
@@ -687,11 +679,11 @@ static INPUT_PORTS_START( pkladies )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pang )
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
@@ -735,11 +727,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( mstworld )
 	/* this port may not have the same role */
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM (spang) */
 
@@ -773,7 +765,7 @@ static INPUT_PORTS_START( mstworld )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START("DSW1")		/* coinage seems to be in here.. */
+	PORT_START("DSW0")		/* coinage seems to be in here.. */
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, "A 1Coin 4Credits / B 1Coin 4Credits" )
 	PORT_DIPSETTING(    0x02, "A 1Coin 3Credits / B 1Coin 3Credits" )
@@ -796,6 +788,32 @@ static INPUT_PORTS_START( mstworld )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "ds1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, "ds2" )
@@ -822,40 +840,14 @@ static INPUT_PORTS_START( mstworld )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, "ds3" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qtono1 )
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
@@ -891,11 +883,11 @@ static INPUT_PORTS_START( qtono1 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( block )
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
@@ -933,11 +925,11 @@ static INPUT_PORTS_START( block )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( blockjoy )
-	PORT_START("DSW0")
+	PORT_START("SYS0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* USED - handled in port5_r */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* data from EEPROM */
 
@@ -1090,9 +1082,6 @@ static MACHINE_START( mitchell )
 {
 	mitchell_state *state = (mitchell_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->oki = devtag_get_device(machine, "oki");
-
 	state_save_register_global(machine, state->sample_buffer);
 	state_save_register_global(machine, state->sample_select);
 	state_save_register_global(machine, state->dial_selected);
@@ -1135,7 +1124,7 @@ static MACHINE_DRIVER_START( mgakuen )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
@@ -1149,8 +1138,7 @@ static MACHINE_DRIVER_START( mgakuen )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* probably same clock as the other mitchell hardware games */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* probably same clock as the other mitchell hardware games */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_16MHz/4) /* probably same clock as the other mitchell hardware games */
@@ -1178,7 +1166,7 @@ static MACHINE_DRIVER_START( pang )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(57.42)   /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
@@ -1192,9 +1180,8 @@ static MACHINE_DRIVER_START( pang )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("ymsnd",YM2413, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1253,7 +1240,8 @@ static MACHINE_DRIVER_START( spangbl )
 
 	MDRV_GFXDECODE(spangbl)
 
-	MDRV_SOUND_REPLACE("oki", MSM5205, 384000)
+	MDRV_DEVICE_REMOVE("oki")
+	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
@@ -1295,8 +1283,7 @@ static MACHINE_DRIVER_START( mstworld )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 990000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki", 990000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1318,7 +1305,7 @@ static MACHINE_DRIVER_START( marukin )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
@@ -1332,9 +1319,8 @@ static MACHINE_DRIVER_START( marukin )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* verified on pcb */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1375,7 +1361,7 @@ static MACHINE_DRIVER_START( pkladiesbl )
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(59.09) /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 1*8, 31*8-1 )
@@ -1389,8 +1375,7 @@ static MACHINE_DRIVER_START( pkladiesbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/16) /* It should be a OKIM5205 with a 384khz resonator */
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb */
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* It should be a OKIM5205 with a 384khz resonator */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3750000) /* verified on pcb, read the comments */
@@ -2142,10 +2127,7 @@ static void bootleg_decode( running_machine *machine )
 
 static void configure_banks( running_machine *machine )
 {
-	mitchell_state *state = (mitchell_state *)machine->driver_data;
-
 	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
-	state->port5_kludge = 0;
 }
 
 
@@ -2248,8 +2230,8 @@ static DRIVER_INIT( mgakuen )
 	mitchell_state *state = (mitchell_state *)machine->driver_data;
 	state->input_type = 1;
 	configure_banks(machine);
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "DSW1");
-	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSW2");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, "DSW0");
+	memory_install_read_port(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, "DSW1");
 }
 static DRIVER_INIT( mgakuen2 )
 {
@@ -2258,7 +2240,6 @@ static DRIVER_INIT( mgakuen2 )
 	nvram_size = 0;
 	mgakuen2_decode(machine);
 	configure_banks(machine);
-	state->port5_kludge = 1;
 }
 static DRIVER_INIT( pkladies )
 {

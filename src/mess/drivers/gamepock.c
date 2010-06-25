@@ -45,22 +45,22 @@ static DEVICE_START(gamepock_cart)
 }
 
 static DEVICE_IMAGE_LOAD(gamepock_cart) {
-	UINT8 *cart = memory_region(image->machine,  "user1" );
+	UINT8 *cart = memory_region(image.device().machine,  "user1" );
 
-	if ( image_software_entry(image) == NULL )
+	if ( image.software_entry() == NULL )
 	{
-		int size = image_length( image );
-		if ( image_fread( image, cart, size ) != size ) {
-			image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
+		int size = image.length();
+		if ( image.fread( cart, size ) != size ) {
+			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
 			return INIT_FAIL;
 		}
 	}
 	else
 	{
-		cart = image_get_software_region( image, "rom" );
+		cart = image.get_software_region( "rom" );
 	}
 
-	memory_set_bankptr( image->machine, "bank1", cart );
+	memory_set_bankptr( image.device().machine, "bank1", cart );
 
 	return INIT_PASS;
 }

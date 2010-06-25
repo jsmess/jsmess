@@ -48,13 +48,13 @@ bit 0: TRUCK */
 
 
 /* load image */
-static int kc_load(running_device *image, unsigned char **ptr)
+static int kc_load(device_image_interface &image, unsigned char **ptr)
 {
 	int datasize;
 	unsigned char *data;
 
 	/* get file size */
-	datasize = image_length(image);
+	datasize = image.length();
 
 	if (datasize!=0)
 	{
@@ -64,7 +64,7 @@ static int kc_load(running_device *image, unsigned char **ptr)
 		if (data!=NULL)
 		{
 			/* read whole file */
-			image_fread(image, data, datasize);
+			image.fread( data, datasize);
 
 			*ptr = data;
 
@@ -113,7 +113,7 @@ QUICKLOAD_LOAD(kc)
 	addr = (header->load_address_l & 0x0ff) | ((header->load_address_h & 0x0ff)<<8);
 
 	for (i=0; i<datasize; i++)
-		messram_get_ptr(devtag_get_device(image->machine, "messram"))[(addr+i) & 0x0ffff] = data[i+128];
+		messram_get_ptr(devtag_get_device(image.device().machine, "messram"))[(addr+i) & 0x0ffff] = data[i+128];
 	return INIT_PASS;
 }
 
@@ -224,8 +224,8 @@ const upd765_interface kc_fdc_interface=
 
 static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 {
-	cpu_set_reg(devtag_get_device(machine, "disc"), REG_GENPC, 0x0f000);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, 0x0f000);
+	cpu_set_reg(devtag_get_device(machine, "disc"), STATE_GENPC, 0x0f000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, 0x0f000);
 }
 
 static void kc_disc_interface_init(running_machine *machine)
@@ -1635,7 +1635,7 @@ static DIRECT_UPDATE_HANDLER( kc85_3_opbaseoverride )
 
 	kc85_3_update_0x00000(machine);
 
-	return (cpunum_get_reg(0, REG_GENPC) & 0x0ffff);
+	return (cpunum_get_reg(0, STATE_GENPC) & 0x0ffff);
 }
 
 
@@ -1645,14 +1645,14 @@ static DIRECT_UPDATE_HANDLER( kc85_4_opbaseoverride )
 
 	kc85_4_update_0x00000(machine);
 
-	return (cpunum_get_reg(0, REG_GENPC) & 0x0ffff);
+	return (cpunum_get_reg(0, STATE_GENPC) & 0x0ffff);
 }
 #endif
 
 
 static TIMER_CALLBACK(kc85_reset_timer_callback)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, 0x0f000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, 0x0f000);
 }
 
  READ8_HANDLER ( kc85_pio_data_r )

@@ -32,7 +32,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define MC6852 DEVICE_GET_INFO_NAME( mc6852 )
+DECLARE_LEGACY_DEVICE(MC6852, mc6852);
 
 #define MDRV_MC6852_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD((_tag), MC6852, _clock)	\
@@ -65,10 +65,6 @@ struct _mc6852_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( mc6852 );
-
 /* register access */
 READ8_DEVICE_HANDLER( mc6852_r );
 WRITE8_DEVICE_HANDLER( mc6852_w );

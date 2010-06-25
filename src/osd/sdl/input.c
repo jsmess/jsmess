@@ -211,6 +211,7 @@ struct _kt_table {
 #define OSD_SDL_INDEX_KEYSYM(keysym) ((keysym)->scancode)
 
 #define GET_WINDOW(ev) window_from_id((ev)->windowID)
+//#define GET_WINDOW(ev) ((ev)->windowID)
 // FIXME: sdl does not properly report the window for certain OS.
 #define GET_FOCUS_WINDOW(ev) focus_window
 //#define GET_FOCUS_WINDOW(ev) window_from_id((ev)->windowID)
@@ -1184,14 +1185,15 @@ sdl_window_info *sdlinput_get_focus_window(running_machine *machine)
 //============================================================
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
-INLINE sdl_window_info * window_from_id(SDL_WindowID windowID)
+INLINE sdl_window_info * window_from_id(Uint32 windowID)
 {
 	sdl_window_info *w;
+	SDL_Window *window = SDL_GetWindowFromID(windowID);
 
 	for (w = sdl_window_list; w != NULL; w = w->next)
 	{
 		//printf("w->window_id: %d\n", w->window_id);
-		if (w->window_id == windowID)
+		if (w->sdl_window == window)
 		{
 			return w;
 		}
@@ -1685,12 +1687,6 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 				input_seq_set_5(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F7, SEQCODE_NOT, KEYCODE_LCONTROL, SEQCODE_NOT, KEYCODE_LSHIFT);
 				break;
 
-			// LCTRL-F10 to toggle the renderer (software vs opengl)
-			case IPT_OSD_10:
-				typedesc->token = "TOGGLE_RENDERER";
-				typedesc->name = "Toggle OpenGL/software rendering";
-				input_seq_set_2(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F10, KEYCODE_LCONTROL);
-				break;
 			// add a Not lcrtl condition to the throttle key
 			case IPT_UI_THROTTLE:
 				input_seq_set_3(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F10, SEQCODE_NOT, KEYCODE_LCONTROL);

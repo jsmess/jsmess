@@ -23,15 +23,16 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-// standard C headers
-#include <ddraw.h>
-#include <tchar.h>
-
 // MAME/MAMEUI headers
+#include "emu.h"
 #include "winui.h"
 #include "directdraw.h"
 #include "mui_util.h" // For ErrorMsg
 #include "dxdecode.h" // For DirectXDecodeError
+
+// standard C headers
+#include <ddraw.h>
+#include <tchar.h>
 
 /***************************************************************************
 	function prototypes

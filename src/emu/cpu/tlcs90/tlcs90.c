@@ -30,8 +30,8 @@ typedef struct
 	PAIR		af2,bc2,de2,hl2;
 	UINT8		halt, after_EI;
 	UINT16		irq_state, irq_mask;
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int		icount;
@@ -63,13 +63,12 @@ typedef struct
 INLINE t90_Regs *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMP90840 ||
 		   cpu_get_type(device) == CPU_TMP90841 ||
 		   cpu_get_type(device) == CPU_TMP91640 ||
 		   cpu_get_type(device) == CPU_TMP91641);
-	return (t90_Regs *)device->token;
+	return (t90_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 enum	{
@@ -1352,7 +1351,7 @@ static CPU_EXECUTE( t90 )
 	unsigned a32;
 	PAIR tmp;
 
-	cpustate->icount = cycles - cpustate->extra_cycles;
+	cpustate->icount -= cpustate->extra_cycles;
 	cpustate->extra_cycles = 0;
 
 	do
@@ -1982,8 +1981,6 @@ static CPU_EXECUTE( t90 )
 
 	cpustate->icount -= cpustate->extra_cycles;
 	cpustate->extra_cycles = 0;
-
-	return cycles - cpustate->icount;
 }
 
 static CPU_RESET( t90 )
@@ -2636,7 +2633,7 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 	cpustate->internal_registers[offset] = data;
 }
 
-static void state_register( running_device *device )
+static void state_register( legacy_cpu_device *device )
 {
 	t90_Regs *cpustate = get_safe_token(device);
 
@@ -2791,7 +2788,7 @@ static CPU_SET_INFO( t90 )
 
 CPU_GET_INFO( tmp90840 )
 {
-	t90_Regs *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	t90_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -9,7 +9,7 @@
 #ifndef MC6854_H
 #define MC6854_H
 
-#define MC6854 DEVICE_GET_INFO_NAME(mc6854)
+DECLARE_LEGACY_DEVICE(MC6854, mc6854);
 
 /* we provide two interfaces:
    - a bit-based interface:   out_tx, set_rx
@@ -58,9 +58,6 @@ struct _mc6854_interface
 
 
 /* ---------- functions ------------ */
-
-extern DEVICE_GET_INFO(mc6854);
-
 /* interface to CPU via address/data bus*/
 extern READ8_DEVICE_HANDLER  ( mc6854_r );
 extern WRITE8_DEVICE_HANDLER ( mc6854_w );

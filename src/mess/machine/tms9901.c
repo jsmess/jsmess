@@ -139,8 +139,8 @@ struct _tms9901_t
 INLINE tms9901_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == TMS9901);
-	return (tms9901_t *) device->token;
+	assert(device->type() == TMS9901);
+	return (tms9901_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -585,9 +585,9 @@ static DEVICE_START( tms9901 )
 
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
-	tms->intf = (const tms9901_interface*)device->baseconfig().static_config;
+	tms->intf = (const tms9901_interface*)device->baseconfig().static_config();
 
 	tms->timer = timer_alloc(device->machine, decrementer_callback, (void *) device);
 
@@ -611,7 +611,6 @@ DEVICE_GET_INFO( tms9901 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tms9901_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tms9901);	break;
@@ -626,3 +625,5 @@ DEVICE_GET_INFO( tms9901 )
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(TMS9901, tms9901);

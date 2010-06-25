@@ -17,7 +17,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define IEEE488 DEVICE_GET_INFO_NAME( ieee488 )
+DECLARE_LEGACY_DEVICE(IEEE488, ieee488);
 
 #define MDRV_IEEE488_ADD(_tag, _daisy_chain) \
 	MDRV_DEVICE_ADD(_tag, IEEE488, 0) \
@@ -48,10 +48,6 @@ struct _ieee488_daisy_chain
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( ieee488 );
-
 /* end or identify */
 void ieee488_eoi_w(running_device *bus, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( ieee488_eoi_r );

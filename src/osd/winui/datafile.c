@@ -18,8 +18,8 @@
  *      Token parsing by Neil Bradley
  *      Modifications and higher-level functions by John Butler
  ****************************************************************************/
-
 // standard windows headers
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 // standard C headers
@@ -27,8 +27,8 @@
 #include <ctype.h>
 
 // MAME/MAMEUI headers
-#include "osdcomm.h"
 #include "emu.h"
+#include "osdcomm.h"
 #include "datafile.h"
 #include "mui_opts.h" // For MameUIGlobal()
 

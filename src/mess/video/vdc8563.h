@@ -26,16 +26,10 @@ struct _vdc8563_interface
 };
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( vdc8563 );
-
-/***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define VDC8563 DEVICE_GET_INFO_NAME( vdc8563 )
+DECLARE_LEGACY_DEVICE(VDC8563, vdc8563);
 
 #define MDRV_VDC8563_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, VDC8563, 0) \

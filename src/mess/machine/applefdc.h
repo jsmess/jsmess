@@ -27,9 +27,9 @@
 #define APPLEFDC_PH2	0x04
 #define APPLEFDC_PH3	0x08
 
-#define APPLEFDC	DEVICE_GET_INFO_NAME( applefdc )
-#define IWM			DEVICE_GET_INFO_NAME( iwm )
-#define SWIM		DEVICE_GET_INFO_NAME( swim )
+DECLARE_LEGACY_DEVICE(APPLEFDC, applefdc);
+DECLARE_LEGACY_DEVICE(IWM, iwm);
+DECLARE_LEGACY_DEVICE(SWIM, swim);
 
 
 
@@ -53,16 +53,6 @@ struct _applefdc_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* classic Apple II disk controller (pre-IWM) */
-DEVICE_GET_INFO(applefdc);
-
-/* Integrated Woz Machine */
-DEVICE_GET_INFO(iwm);
-
-/* Steve Woz Integrated Machine (NYI) */
-DEVICE_GET_INFO(swim);
-
 /* read/write handlers */
 READ8_DEVICE_HANDLER(applefdc_r);
 WRITE8_DEVICE_HANDLER(applefdc_w);

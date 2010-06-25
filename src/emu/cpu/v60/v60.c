@@ -77,8 +77,8 @@ struct _v60_state
 	v60_flags			flags;
 	UINT8				irq_line;
 	UINT8				nmi_line;
-	cpu_irq_callback	irq_cb;
-	running_device *device;
+	device_irq_callback	irq_cb;
+	legacy_cpu_device *		device;
 	const address_space *program;
 	const address_space *io;
 	UINT32				PPC;
@@ -114,11 +114,10 @@ struct _v60_state
 INLINE v60_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_V60 ||
 		   cpu_get_type(device) == CPU_V70);
-	return (v60_state *)device->token;
+	return (v60_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /*
@@ -312,7 +311,7 @@ static UINT32 opUNHANDLED(v60_state *cpustate)
 // Opcode jump table
 #include "optable.c"
 
-static void base_init(running_device *device, cpu_irq_callback irqcallback)
+static void base_init(legacy_cpu_device *device, device_irq_callback irqcallback)
 {
 	v60_state *cpustate = get_safe_token(device);
 
@@ -442,7 +441,6 @@ static CPU_EXECUTE( v60 )
 {
 	v60_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
 	if (cpustate->irq_line != CLEAR_LINE)
 		v60_try_irq(cpustate);
 
@@ -457,8 +455,6 @@ static CPU_EXECUTE( v60 )
 		if (cpustate->irq_line != CLEAR_LINE)
 			v60_try_irq(cpustate);
 	}
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -552,7 +548,7 @@ static CPU_SET_INFO( v60 )
 
 CPU_GET_INFO( v60 )
 {
-	v60_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	v60_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

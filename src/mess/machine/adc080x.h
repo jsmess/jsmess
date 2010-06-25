@@ -39,8 +39,8 @@ typedef double (*adc080x_vref_neg_read) (running_device *device);
 typedef double (*adc080x_input_read) (running_device *device, int channel);
 #define ADC080X_INPUT_READ(name) double name(running_device *device, int channel)
 
-#define ADC0808		DEVICE_GET_INFO_NAME(adc0808)
-#define ADC0809		DEVICE_GET_INFO_NAME(adc0809)
+DECLARE_LEGACY_DEVICE(ADC0808, adc0808);
+DECLARE_LEGACY_DEVICE(ADC0809, adc0809);
 
 #define MDRV_ADC0808_ADD(_tag, _clock, _intrf) \
 	MDRV_DEVICE_ADD(_tag, ADC0808, _clock) \
@@ -68,10 +68,6 @@ struct _adc080x_interface
 	adc080x_input_read				input_r;
 };
 #define ADC080X_INTERFACE(name) const adc080x_interface (name)=
-
-/* device interface */
-DEVICE_GET_INFO( adc0808 );
-DEVICE_GET_INFO( adc0809 );
 
 /* address latching */
 void adc080x_ale_w(running_device *device, int level, int address);

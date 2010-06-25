@@ -129,13 +129,13 @@ DEVICE_IMAGE_LOAD( jupiter_ace )
 
 	if ((jupiter_data = (UINT8*)malloc(0x6000)))
 	{
-		logerror("Loading file %s.\r\n", image_filename(image));
+		logerror("Loading file %s.\r\n", image.filename());
 		while (!done && (jupiter_index < 0x6001))
 		{
-			image_fread(image, &jupiter_byte, 1);
+			image.fread( &jupiter_byte, 1);
 			if (jupiter_byte == 0xed)
 			{
-				image_fread(image, &jupiter_byte, 1);
+				image.fread(&jupiter_byte, 1);
 				switch (jupiter_byte)
 				{
 				case 0x00:
@@ -143,14 +143,14 @@ DEVICE_IMAGE_LOAD( jupiter_ace )
 					done = 1;
 					break;
 				case 0x01:
-					image_fread(image, &jupiter_byte, 1);
+					image.fread(&jupiter_byte, 1);
 					jupiter_data[jupiter_index++] = jupiter_byte;
 					break;
 				case 0x02:
 					logerror("Sequence 0xED 0x02 found in .ace file\r\n");
 					break;
 				default:
-					image_fread(image, &jupiter_repeat, 1);
+					image.fread(&jupiter_repeat, 1);
 					for (loop = 0; loop < jupiter_byte; loop++)
 						jupiter_data[jupiter_index++] = jupiter_repeat;
 					break;
@@ -182,42 +182,42 @@ DEVICE_IMAGE_LOAD( jupiter_tap )
 	if (jupiter_data_type != JUPITER_NONE)
 		return (0);
 
-	logerror("Loading file %s.\r\n", image_filename(image));
+	logerror("Loading file %s.\r\n", image.filename());
 
-    image_fread(image, &inpbyt, 1);
+    image.fread(&inpbyt, 1);
 	hdr_len = inpbyt;
-	image_fread(image, &inpbyt, 1);
+	image.fread(&inpbyt, 1);
 	hdr_len += (inpbyt * 256);
 
 	/* Read header block */
 
-	image_fread(image, &jupiter_tape.hdr_type, 1);
-	image_fread(image, jupiter_tape.hdr_name, 10);
-	image_fread(image, &inpbyt, 1);
+	image.fread(&jupiter_tape.hdr_type, 1);
+	image.fread(jupiter_tape.hdr_name, 10);
+	image.fread(&inpbyt, 1);
 	jupiter_tape.hdr_len = inpbyt;
-	image_fread(image, &inpbyt, 1);
+	image.fread(&inpbyt, 1);
 	jupiter_tape.hdr_len += (inpbyt * 256);
-	image_fread(image, &inpbyt, 1);
+	image.fread(&inpbyt, 1);
 	jupiter_tape.hdr_addr = inpbyt;
-	image_fread(image, &inpbyt, 1);
+	image.fread(&inpbyt, 1);
 	jupiter_tape.hdr_addr += (inpbyt * 256);
-	image_fread(image, &jupiter_tape.hdr_3c4c, 1);
-	image_fread(image, &jupiter_tape.hdr_3c4d, 1);
-	image_fread(image, jupiter_tape.hdr_vars, 8);
+	image.fread(&jupiter_tape.hdr_3c4c, 1);
+	image.fread(&jupiter_tape.hdr_3c4d, 1);
+	image.fread(jupiter_tape.hdr_vars, 8);
 	if (hdr_len > 0x19)
 		for (loop = 0x19; loop < hdr_len; loop++)
-			image_fread(image, &inpbyt, 1);
+			image.fread(&inpbyt, 1);
 
 	/* Read data block */
 
-	image_fread(image, &inpbyt, 1);
+	image.fread(&inpbyt, 1);
 	jupiter_tape.dat_len = inpbyt;
-	image_fread(image, &inpbyt, 1);
+	image.fread(&inpbyt, 1);
 	jupiter_tape.dat_len += (inpbyt * 256);
 
 	if ((jupiter_data = (UINT8*)malloc(jupiter_tape.dat_len)))
 	{
-		image_fread(image, jupiter_data, jupiter_tape.dat_len);
+		image.fread(jupiter_data, jupiter_tape.dat_len);
 		jupiter_data_type = JUPITER_TAP;
 		logerror("File loaded\r\n");
 	}

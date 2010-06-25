@@ -128,10 +128,8 @@ struct _upd1771_state
 INLINE upd1771_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
-    assert(device->token != NULL);
-    assert(device->type == SOUND);
-    assert(sound_get_type(device) == SOUND_UPD1771C);
-    return (upd1771_state *)device->token;
+    assert(device->type() == SOUND_UPD1771C);
+    return (upd1771_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -208,7 +206,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
                 //logerror( "upd1771_w: ----------------noise state reset\n");
             }
             else
-                timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock ), 0 );
+                timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock() ), 0 );
 		}break;
 
         case 2:
@@ -227,7 +225,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
                 state->index = 0;
             }
             else
-                timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock ), 0 );
+                timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock() ), 0 );
 
 		}break;
 
@@ -243,7 +241,7 @@ WRITE8_DEVICE_HANDLER( upd1771_w )
 				state->packet[0]=0;
 			}
 			else
-				timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock ), 0 );
+				timer_adjust_oneshot( state->timer, ticks_to_attotime( 512, device->clock() ), 0 );
 
 		}break;
 
@@ -346,9 +344,9 @@ static TIMER_CALLBACK( upd1771c_callback )
 
 static DEVICE_START( upd1771c )
 {
-    const upd1771_interface *intf = (const upd1771_interface *)device->baseconfig().static_config;
+    const upd1771_interface *intf = (const upd1771_interface *)device->baseconfig().static_config();
     upd1771_state *state = get_safe_token( device );
-    int sample_rate = device->clock / 4;
+    int sample_rate = device->clock() / 4;
 
     /* resolve callbacks */
     devcb_resolve_write_line( &state->ack_out_func, &intf->ack_callback, device );
@@ -399,3 +397,4 @@ DEVICE_GET_INFO( upd1771c )
     }
 }
 
+DEFINE_LEGACY_SOUND_DEVICE(UPD1771C, upd1771c);

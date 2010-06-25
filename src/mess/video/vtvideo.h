@@ -20,7 +20,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define VT100_VIDEO DEVICE_GET_INFO_NAME( vt100_video )
+DECLARE_LEGACY_DEVICE(VT100_VIDEO, vt100_video);
 
 #define MDRV_VT100_VIDEO_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, VT100_VIDEO, 0) \
@@ -43,10 +43,6 @@ struct _vt_video_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( vt100_video );
-
 /* register access */
 READ8_DEVICE_HANDLER  ( vt_video_lba7_r );
 WRITE8_DEVICE_HANDLER ( vt_video_dc012_w );

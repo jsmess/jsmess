@@ -46,7 +46,7 @@
 typedef struct _hd44102_t hd44102_t;
 struct _hd44102_t
 {
-	running_device *screen;	/* screen */
+	screen_device *screen;	/* screen */
 
 	UINT8 ram[4][50];				/* display memory */
 
@@ -66,15 +66,14 @@ struct _hd44102_t
 INLINE hd44102_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (hd44102_t *)device->token;
+	return (hd44102_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE hd44102_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == HD44102);
-	return (hd44102_config *)device->baseconfig().inline_config;
+	assert(device->type() == HD44102);
+	return (hd44102_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 /***************************************************************************
@@ -287,7 +286,7 @@ static DEVICE_START( hd44102 )
 	const hd44102_config *config = get_safe_config(device);
 
 	/* get the screen device */
-	hd44102->screen = devtag_get_device(device->machine, config->screen_tag);
+	hd44102->screen = device->machine->device<screen_device>(config->screen_tag);
 	assert(hd44102->screen != NULL);
 
 	/* register for state saving */
@@ -321,7 +320,6 @@ DEVICE_GET_INFO( hd44102 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(hd44102_t);						break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(hd44102_config);					break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(hd44102);			break;
@@ -336,3 +334,5 @@ DEVICE_GET_INFO( hd44102 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(HD44102, hd44102);

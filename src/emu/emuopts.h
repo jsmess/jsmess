@@ -39,6 +39,7 @@
 
 /* core configuration options */
 #define OPTION_READCONFIG			"readconfig"
+#define OPTION_WRITECONFIG			"writeconfig"
 
 /* core search path options */
 #define OPTION_ROMPATH				"rompath"
@@ -153,6 +154,8 @@
 #define OPTION_CHEAT				"cheat"
 #define OPTION_SKIP_GAMEINFO		"skip_gameinfo"
 
+/* image device options */
+#define OPTION_ADDED_DEVICE_OPTIONS	"added_device_options"
 
 
 /***************************************************************************
@@ -164,9 +167,22 @@ extern const options_entry mame_core_options[];
 
 
 /***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+/* referenced types from other classes */
+struct game_driver;
+
+
+/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
 core_options *mame_options_init(const options_entry *entries);
+
+/* add the device options for a specified device */
+void image_add_device_options(core_options *opts, const game_driver *driver);
+/* accesses a device option, by device and index */
+const char *image_get_device_option(device_image_interface *image);
 
 #endif	/* __EMUOPTS_H__ */

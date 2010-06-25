@@ -16,13 +16,13 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define C1540	DEVICE_GET_INFO_NAME( c1540 )
-#define C1541	DEVICE_GET_INFO_NAME( c1541 )
-#define C1541C	DEVICE_GET_INFO_NAME( c1541c )
-#define C1541II DEVICE_GET_INFO_NAME( c1541ii )
-#define SX1541	DEVICE_GET_INFO_NAME( sx1541 )
-#define C2031	DEVICE_GET_INFO_NAME( c2031 )
-#define OC118	DEVICE_GET_INFO_NAME( oc118 )
+DECLARE_LEGACY_DEVICE(C1540, c1540);
+DECLARE_LEGACY_DEVICE(C1541, c1541);
+DECLARE_LEGACY_DEVICE(C1541C, c1541c);
+DECLARE_LEGACY_DEVICE(C1541II, c1541ii);
+DECLARE_LEGACY_DEVICE(SX1541, sx1541);
+DECLARE_LEGACY_DEVICE(C2031, c2031);
+DECLARE_LEGACY_DEVICE(OC118, oc118);
 
 #define MDRV_C1540_ADD(_tag, _bus_tag, _address) \
 	MDRV_DEVICE_ADD(_tag, C1540, 0) \
@@ -79,16 +79,6 @@ struct _c1541_config
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( c1540 );
-DEVICE_GET_INFO( c1541 );
-DEVICE_GET_INFO( c1541c );
-DEVICE_GET_INFO( c1541ii );
-DEVICE_GET_INFO( sx1541 );
-DEVICE_GET_INFO( c2031 );
-DEVICE_GET_INFO( oc118 );
-
 /* IEC interface */
 WRITE_LINE_DEVICE_HANDLER( c1541_iec_atn_w );
 WRITE_LINE_DEVICE_HANDLER( c1541_iec_reset_w );

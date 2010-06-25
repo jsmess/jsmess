@@ -837,24 +837,24 @@ static void sg1000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 
 static DEVICE_IMAGE_LOAD( sg1000_cart )
 {
-	const address_space *program = cputag_get_address_space(image->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(image.device().machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT32 size;
-	UINT8 *ptr = memory_region(image->machine, Z80_TAG);
+	UINT8 *ptr = memory_region(image.device().machine, Z80_TAG);
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
-		if (image_fread(image, ptr, size) != size)
+		size = image.length();
+		if (image.fread( ptr, size) != size)
 			return INIT_FAIL;
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
-		memcpy(ptr, image_get_software_region(image, "rom"), size);
+		size = image.get_software_region_length("rom");
+		memcpy(ptr, image.get_software_region("rom"), size);
 	}
 
 	/* cartridge ROM banking */
-	sg1000_map_cartridge_memory(image->machine, ptr, size);
+	sg1000_map_cartridge_memory(image.device().machine, ptr, size);
 
 	/* work RAM banking */
 	memory_install_readwrite_bank(program, 0xc000, 0xc3ff, 0, 0x3c00, "bank2");
@@ -869,22 +869,22 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 static DEVICE_IMAGE_LOAD( omv_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = memory_region(image->machine, Z80_TAG);
+	UINT8 *ptr = memory_region(image.device().machine, Z80_TAG);
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
-		if (image_fread(image, ptr, size) != size)
+		size = image.length();
+		if (image.fread( ptr, size) != size)
 			return INIT_FAIL;
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
-		memcpy(ptr, image_get_software_region(image, "rom"), size);
+		size = image.get_software_region_length("rom");
+		memcpy(ptr, image.get_software_region("rom"), size);
 	}
 
 	/* cartridge ROM banking */
-	sg1000_map_cartridge_memory(image->machine, ptr, size);
+	sg1000_map_cartridge_memory(image.device().machine, ptr, size);
 
 	return INIT_PASS;
 }
@@ -924,22 +924,22 @@ static void sc3000_map_cartridge_memory(running_machine *machine, UINT8 *ptr, in
 static DEVICE_IMAGE_LOAD( sc3000_cart )
 {
 	UINT32 size;
-	UINT8 *ptr = memory_region(image->machine, Z80_TAG);
+	UINT8 *ptr = memory_region(image.device().machine, Z80_TAG);
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
-		if (image_fread(image, ptr, size) != size)
+		size = image.length();
+		if (image.fread( ptr, size) != size)
 			return INIT_FAIL;
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
-		memcpy(ptr, image_get_software_region(image, "rom"), size);
+		size = image.get_software_region_length("rom");
+		memcpy(ptr, image.get_software_region("rom"), size);
 	}
 
 	/* cartridge ROM and work RAM banking */
-	sc3000_map_cartridge_memory(image->machine, ptr, size);
+	sc3000_map_cartridge_memory(image.device().machine, ptr, size);
 
 	return INIT_PASS;
 }

@@ -225,7 +225,7 @@ device), PES Speech adapter (serial port connection)
 
 #define TMS5220_IS_TMC0285	TMS5220_IS_5200
 
-UINT8 reload_table[4] = { 0, 50, 100, 150 }; //is the sample count reload for 5220c only; 5200 and 5220 always reload with 0
+static UINT8 reload_table[4] = { 0, 50, 100, 150 }; //is the sample count reload for 5220c only; 5200 and 5220 always reload with 0
 
 typedef struct _tms5220_state tms5220_state;
 struct _tms5220_state
@@ -348,13 +348,11 @@ struct _tms5220_state
 INLINE tms5220_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_TMS5220 ||
-		   sound_get_type(device) == SOUND_TMS5220C ||
-		   sound_get_type(device) == SOUND_TMC0285 ||
-		   sound_get_type(device) == SOUND_TMS5200);
-	return (tms5220_state *)device->token;
+	assert(device->type() == SOUND_TMS5220 ||
+		   device->type() == SOUND_TMS5220C ||
+		   device->type() == SOUND_TMC0285 ||
+		   device->type() == SOUND_TMS5200);
+	return (tms5220_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 /* Static function prototypes */
@@ -367,7 +365,7 @@ static INT16 clip_analog(INT16 clip);
 static void update_ready_state(tms5220_state *tms);
 static STREAM_UPDATE( tms5220_update );
 
-void tms5220_set_variant(tms5220_state *tms, int variant)
+static void tms5220_set_variant(tms5220_state *tms, int variant)
 {
 	switch (variant)
 	{
@@ -974,7 +972,7 @@ static void tms5220_process(tms5220_state *tms, INT16 *buffer, unsigned int size
           else /*tms->pitch_count < 51*/
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
 #else // hack based sort of on the D68_10.ASM file from qboxpro, which has  0x580 and 0x3A80 at the end of its chirp table
-          if (tms->pitch_count >= 45)
+          if ((tms->pitch_count >= 45) || tms->pitch_count == 0)
               tms->excitation_data = -128;
           else /*tms->pitch_count < 45*/
               tms->excitation_data = tms->coeff->chirptable[tms->pitch_count];
@@ -1115,7 +1113,7 @@ static INT32 lattice_filter(tms5220_state *tms)
 {
    /* Lattice filter here */
    /* Aug/05/07: redone as unrolled loop, for clarity - LN*/
-   /* Copied verbatim from table I in US patent 4,209,804:
+   /* Originally Copied verbatim from table I in US patent 4,209,804, now updated to be in same order as the actual chip does it, not that it matters.
       notation equivalencies from table:
       Yn(i) == tms->u[n-1]
       Kn = tms->current_k[n-1]
@@ -1124,22 +1122,22 @@ static INT32 lattice_filter(tms5220_state *tms)
         tms->u[10] = matrix_multiply(tms->previous_energy, (tms->excitation_data*64));  //Y(11)
         tms->u[9] = tms->u[10] - matrix_multiply(tms->current_k[9], tms->x[9]);
         tms->u[8] = tms->u[9] - matrix_multiply(tms->current_k[8], tms->x[8]);
-        tms->x[9] = tms->x[8] + matrix_multiply(tms->current_k[8], tms->u[8]);
         tms->u[7] = tms->u[8] - matrix_multiply(tms->current_k[7], tms->x[7]);
-        tms->x[8] = tms->x[7] + matrix_multiply(tms->current_k[7], tms->u[7]);
         tms->u[6] = tms->u[7] - matrix_multiply(tms->current_k[6], tms->x[6]);
-        tms->x[7] = tms->x[6] + matrix_multiply(tms->current_k[6], tms->u[6]);
         tms->u[5] = tms->u[6] - matrix_multiply(tms->current_k[5], tms->x[5]);
-        tms->x[6] = tms->x[5] + matrix_multiply(tms->current_k[5], tms->u[5]);
         tms->u[4] = tms->u[5] - matrix_multiply(tms->current_k[4], tms->x[4]);
-        tms->x[5] = tms->x[4] + matrix_multiply(tms->current_k[4], tms->u[4]);
         tms->u[3] = tms->u[4] - matrix_multiply(tms->current_k[3], tms->x[3]);
-        tms->x[4] = tms->x[3] + matrix_multiply(tms->current_k[3], tms->u[3]);
         tms->u[2] = tms->u[3] - matrix_multiply(tms->current_k[2], tms->x[2]);
-        tms->x[3] = tms->x[2] + matrix_multiply(tms->current_k[2], tms->u[2]);
         tms->u[1] = tms->u[2] - matrix_multiply(tms->current_k[1], tms->x[1]);
-        tms->x[2] = tms->x[1] + matrix_multiply(tms->current_k[1], tms->u[1]);
         tms->u[0] = tms->u[1] - matrix_multiply(tms->current_k[0], tms->x[0]);
+        tms->x[9] = tms->x[8] + matrix_multiply(tms->current_k[8], tms->u[8]);
+        tms->x[8] = tms->x[7] + matrix_multiply(tms->current_k[7], tms->u[7]);
+        tms->x[7] = tms->x[6] + matrix_multiply(tms->current_k[6], tms->u[6]);
+        tms->x[6] = tms->x[5] + matrix_multiply(tms->current_k[5], tms->u[5]);
+        tms->x[5] = tms->x[4] + matrix_multiply(tms->current_k[4], tms->u[4]);
+        tms->x[4] = tms->x[3] + matrix_multiply(tms->current_k[3], tms->u[3]);
+        tms->x[3] = tms->x[2] + matrix_multiply(tms->current_k[2], tms->u[2]);
+        tms->x[2] = tms->x[1] + matrix_multiply(tms->current_k[1], tms->u[1]);
         tms->x[1] = tms->x[0] + matrix_multiply(tms->current_k[0], tms->u[0]);
         tms->x[0] = tms->u[0];
         tms->previous_energy = tms->current_energy;
@@ -1414,12 +1412,12 @@ static DEVICE_START( tms5220 )
 	static const tms5220_interface dummy = { DEVCB_NULL };
 	tms5220_state *tms = get_safe_token(device);
 
-	tms->intf = device->baseconfig().static_config ? (const tms5220_interface *)device->baseconfig().static_config : &dummy;
-	//tms->table = *device->region;
+	tms->intf = device->baseconfig().static_config() ? (const tms5220_interface *)device->baseconfig().static_config() : &dummy;
+	//tms->table = *device->region();
 
 	tms->device = device;
 	tms5220_set_variant(tms, TMS5220_IS_5220);
-	tms->clock = device->clock;
+	tms->clock = device->clock();
 
 	assert_always(tms != NULL, "Error creating TMS5220 chip");
 
@@ -1428,7 +1426,7 @@ static DEVICE_START( tms5220 )
 	devcb_resolve_write_line(&tms->readyq_func, &tms->intf->readyq_func, device);
 
 	/* initialize a stream */
-	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5220_update);
+	tms->stream = stream_create(device, 0, 1, device->clock() / 80, tms, tms5220_update);
 
 	/*if (tms->table == NULL)
     {
@@ -1553,6 +1551,9 @@ static TIMER_CALLBACK( io_ready_cb )
 	update_ready_state(tms);
 }
 
+/*
+ * /RS line write handler
+ */
 WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 {
 	tms5220_state *tms = get_safe_token(device);
@@ -1590,21 +1591,22 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_rsq_w )
 		}
 		else
 		{
-			/* high to low - schedule ready cycle*/
+			/* high to low - schedule ready cycle */
 #ifdef DEBUG_RS_WS
-			logerror("Schedule write ready\n");
+			logerror("Scheduling ready cycle for /RS...\n");
 #endif
-			//tms->io_ready = 1;
-			/* 100 nsec from data sheet, through 3 asynchronous gates on patent */
-			//timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // /READY goes inactive immediately, within one clock... for that matter, what do we even need a timer for then?
+			/* upon /RS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 			tms->io_ready = 0;
 			update_ready_state(tms);
-			/* 25 usec (16 clocks) in datasheet */
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11?) cycles to complete
+			/* How long does /READY stay inactive, when /RS is pulled low? I believe its almost always ~16 clocks (25 usec at 800khz as shown on the datasheet) */
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock()/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~11?) cycles to complete
 		}
 	}
 }
 
+/*
+ * /WS line write handler
+ */
 WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 {
 	tms5220_state *tms = get_safe_token(device);
@@ -1642,13 +1644,25 @@ WRITE_LINE_DEVICE_HANDLER( tms5220_wsq_w )
 		}
 		else
 		{
-			///* high to low - schedule ready cycle*/
-			//tms->io_ready = 1;
-			/* 100 nsec from data sheet, through 3 asynchronous gates on patent */
-			//timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock), tms, 0, io_ready_cb); // /READY goes inactive immediately, within one clock... for that matter, what do we even need a timer for then?
+			/* high to low - schedule ready cycle */
+#ifdef DEBUG_RS_WS
+			logerror("Scheduling ready cycle for /WS...\n");
+#endif
+			/* upon /WS being activated, /READY goes inactive after 100 nsec from data sheet, through 3 asynchronous gates on patent. This is effectively within one clock, so we immediately set io_ready to 0 and activate the callback. */
 			tms->io_ready = 0;
 			update_ready_state(tms);
-			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
+			/* Now comes the complicated part: long does /READY stay inactive, when /WS is pulled low? This depends ENTIRELY on the command written, or whether the chip is in speak external mode or not...
+            Speak external mode: ~16 cycles
+            Command Mode:
+            SPK: ? cycles
+            SPKEXT: ? cycles
+            RDBY: between 60 and 140 cycles
+            RB: ? cycles (80?)
+            RST: between 60 and 140 cycles
+            SET RATE (5220C only): ? cycles (probably ~16)
+            */
+			// TODO: actually HANDLE the timing differences! currently just assuming always 16 cycles
+			timer_set(tms->device->machine, ATTOTIME_IN_HZ(device->clock()/16), tms, 1, io_ready_cb); // this should take around 10-16 (closer to ~15) cycles to complete for fifo writes, TODO: but actually depends on what command is written if in command mode
 		}
 	}
 }
@@ -1836,3 +1850,9 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
 #define DEVTEMPLATE_DERIVED_NAME		"TMS5200"
 #include "devtempl.h"
+
+
+DEFINE_LEGACY_SOUND_DEVICE(TMS5220C, tms5220c);
+DEFINE_LEGACY_SOUND_DEVICE(TMS5220, tms5220);
+DEFINE_LEGACY_SOUND_DEVICE(TMC0285, tmc0285);
+DEFINE_LEGACY_SOUND_DEVICE(TMS5200, tms5200);

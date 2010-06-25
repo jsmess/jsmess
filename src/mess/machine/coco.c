@@ -555,7 +555,7 @@ const sam6883_interface coco3_sam_intf =
   changing to make it worthy of Microsoft.
 ***************************************************************************/
 
-static int load_pak_into_region(running_device *image, int *pakbase, int *paklen, UINT8 *mem, int segaddr, int seglen)
+static int load_pak_into_region(device_image_interface &image, int *pakbase, int *paklen, UINT8 *mem, int segaddr, int seglen)
 {
 	if (*paklen)
 	{
@@ -565,7 +565,7 @@ static int load_pak_into_region(running_device *image, int *pakbase, int *paklen
 			int skiplen;
 
 			skiplen = segaddr - *pakbase;
-			if (image_fseek(image, skiplen, SEEK_CUR))
+			if (image.fseek(skiplen, SEEK_CUR))
 			{
 				if (LOG_PAK)
 					logerror("Could not fully read PAK.\n");
@@ -584,7 +584,7 @@ static int load_pak_into_region(running_device *image, int *pakbase, int *paklen
 			if (seglen > *paklen)
 				seglen = *paklen;
 
-			if (image_fread(image, mem, seglen) < seglen)
+			if (image.fread( mem, seglen) < seglen)
 			{
 				if (LOG_PAK)
 					logerror("Could not fully read PAK.\n");
@@ -645,7 +645,7 @@ static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer 
 	sam6883_set_state(state->sam, trailer->sam, 0x7fff);
 }
 
-static int generic_pak_load(running_device *image, int rambase_index, int rombase_index, int pakbase_index)
+static int generic_pak_load(device_image_interface &image, int rambase_index, int rombase_index, int pakbase_index)
 {
 	UINT8 *ROM;
 	UINT8 *rambase;
@@ -659,19 +659,19 @@ static int generic_pak_load(running_device *image, int rambase_index, int rombas
 	pak_decodedtrailer trailer;
 	int trailer_load = 0;
 
-	ROM = memory_region(image->machine, "maincpu");
-	rambase = &messram_get_ptr(devtag_get_device(image->machine, "messram"))[rambase_index];
+	ROM = memory_region(image.device().machine, "maincpu");
+	rambase = &messram_get_ptr(devtag_get_device(image.device().machine, "messram"))[rambase_index];
 	rombase = &ROM[rombase_index];
 	pakbase = &ROM[pakbase_index];
 
-	if (messram_get_size(devtag_get_device(image->machine, "messram")) < 0x10000)
+	if (messram_get_size(devtag_get_device(image.device().machine, "messram")) < 0x10000)
 	{
 		if (LOG_PAK)
 			logerror("Cannot load PAK files without at least 64k.\n");
 		return INIT_FAIL;
 	}
 
-	if (image_fread(image, &header, sizeof(header)) < sizeof(header))
+	if (image.fread( &header, sizeof(header)) < sizeof(header))
 	{
 		if (LOG_PAK)
 			logerror("Could not fully read PAK.\n");
@@ -681,14 +681,14 @@ static int generic_pak_load(running_device *image, int rambase_index, int rombas
 	paklength = header.length ? LITTLE_ENDIANIZE_INT16(header.length) : 0x10000;
 	pakstart = LITTLE_ENDIANIZE_INT16(header.start);
 
-	if (image_fseek(image, paklength, SEEK_CUR))
+	if (image.fseek(paklength, SEEK_CUR))
 	{
 		if (LOG_PAK)
 			logerror("Could not fully read PAK.\n");
 		return INIT_FAIL;
 	}
 
-	trailerlen = image_fread(image, trailerraw, sizeof(trailerraw));
+	trailerlen = image.fread( trailerraw, sizeof(trailerraw));
 	if (trailerlen)
 	{
 		if (pak_decode_trailer(trailerraw, trailerlen, &trailer))
@@ -701,7 +701,7 @@ static int generic_pak_load(running_device *image, int rambase_index, int rombas
 		trailer_load = 1;
 	}
 
-	if (image_fseek(image, sizeof(pak_header), SEEK_SET))
+	if (image.fseek(sizeof(pak_header), SEEK_SET))
 	{
 		if (LOG_PAK)
 			logerror("Unexpected error while reading PAK.\n");
@@ -731,7 +731,7 @@ static int generic_pak_load(running_device *image, int rambase_index, int rombas
 	memcpy(pakbase, rambase + 0xC000, 0x3F00);
 
 	if (trailer_load)
-		pak_load_trailer(image->machine, &trailer);
+		pak_load_trailer(image.device().machine, &trailer);
 	return INIT_PASS;
 }
 
@@ -742,7 +742,7 @@ SNAPSHOT_LOAD ( coco_pak )
 
 SNAPSHOT_LOAD ( coco3_pak )
 {
-	return generic_pak_load(image, (0x70000 % messram_get_size(devtag_get_device(image->machine, "messram"))), 0x0000, 0xc000);
+	return generic_pak_load(image, (0x70000 % messram_get_size(devtag_get_device(image.device().machine, "messram"))), 0x0000, 0xc000);
 }
 
 /***************************************************************************
@@ -761,8 +761,8 @@ QUICKLOAD_LOAD ( coco )
 	int done = FALSE;
 
 	/* access the pointer and the length */
-	ptr = (const UINT8*)image_ptr(image);
-	length = image_length(image);
+	ptr = (const UINT8*)image.ptr();
+	length = image.length();
 
 	while(!done && (position + 5 <= length))
 	{
@@ -775,12 +775,12 @@ QUICKLOAD_LOAD ( coco )
 		if (preamble != 0)
 		{
 			/* start address - just set the address and return */
-			cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, block_address);
+			cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, block_address);
 			done = TRUE;
 		}
 		else
 		{
-			const address_space *space = cputag_get_address_space( image->machine, "maincpu", ADDRESS_SPACE_PROGRAM );
+			const address_space *space = cputag_get_address_space( image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM );
 
 			/* data block - need to cap the maximum length of the block */
 			block_length = MIN(block_length, length - position);
@@ -807,12 +807,12 @@ QUICKLOAD_LOAD ( coco )
 
 DEVICE_IMAGE_LOAD(coco_rom)
 {
-	UINT8 *dest = memory_region(image->machine, "cart");
-	UINT16 destlength = (UINT16) memory_region_length(image->machine, "cart");
+	UINT8 *dest = memory_region(image.device().machine, "cart");
+	UINT16 destlength = (UINT16) memory_region_length(image.device().machine, "cart");
 	UINT8 *rombase;
 	int   romsize;
 
-	romsize = image_length(image);
+	romsize = image.length();
 
 	/* The following hack is for Arkanoid running on the CoCo2.
         The issuse is the CoCo2 hardware only allows the cartridge
@@ -821,11 +821,11 @@ DEVICE_IMAGE_LOAD(coco_rom)
         from a CoCo2. Thus we need to skip ahead in the ROM file. On
         the CoCo3 the entire 32K ROM is accessable. */
 
-	if (image_crc(image) == 0x25C3AA70)     /* Test for Arkanoid  */
+	if (image.crc() == 0x25C3AA70)     /* Test for Arkanoid  */
 	{
 		if ( destlength == 0x4000 )						/* Test if CoCo2      */
 		{
-			image_fseek( image, 0x4000, SEEK_SET );			/* Move ahead in file */
+			image.fseek(0x4000, SEEK_SET );			/* Move ahead in file */
 			romsize -= 0x4000;							/* Adjust ROM size    */
 		}
 	}
@@ -835,7 +835,7 @@ DEVICE_IMAGE_LOAD(coco_rom)
 		romsize = destlength;
 	}
 
-	image_fread(image, dest, romsize);
+	image.fread( dest, romsize);
 
 	/* Now we need to repeat the mirror the ROM throughout the ROM memory */
 	rombase = dest;
@@ -854,8 +854,8 @@ DEVICE_IMAGE_LOAD(coco_rom)
 
 DEVICE_IMAGE_UNLOAD(coco_rom)
 {
-	UINT8 *dest = memory_region(image->machine, "cart");
-	UINT16 destlength = (UINT16) memory_region_length(image->machine, "cart");
+	UINT8 *dest = memory_region(image.device().machine, "cart");
+	UINT16 destlength = (UINT16) memory_region_length(image.device().machine, "cart");
 	memset(dest, 0, destlength);
 }
 
@@ -1019,7 +1019,7 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 			coco3_recalc_irq(machine);
 
 			if (LOG_INT_COCO3)
-				logerror("CoCo3 Interrupt: Raising IRQ; scanline=%i\n", video_screen_get_vpos(machine->primary_screen));
+				logerror("CoCo3 Interrupt: Raising IRQ; scanline=%i\n", machine->primary_screen->vpos());
 		}
 		if ((coco3_gimereg[0] & 0x10) && (coco3_gimereg[3] & mask))
 		{
@@ -1027,7 +1027,7 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 			coco3_recalc_firq(machine);
 
 			if (LOG_INT_COCO3)
-				logerror("CoCo3 Interrupt: Raising FIRQ; scanline=%i\n", video_screen_get_vpos(machine->primary_screen));
+				logerror("CoCo3 Interrupt: Raising FIRQ; scanline=%i\n", machine->primary_screen->vpos());
 		}
 	}
 }
@@ -1430,7 +1430,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 			break;
 
 		case 0x03: /* Diecom Light Gun */
-			if ((video_screen_get_vpos(machine->primary_screen) == input_port_read_safe(machine, portnames[joystick][ctrl][1], 0)))
+			if ((machine->primary_screen->vpos() == input_port_read_safe(machine, portnames[joystick][ctrl][1], 0)))
 			{
 				/* If gun is pointing at the current scan line, set hit bit and cache horizontal timer value */
 				dclg_output_h |= 0x02;
@@ -1443,7 +1443,7 @@ static UINT8 coco_update_keyboard( running_machine *machine )
 			if ((dclg_state == 7))
 			{
 				/* While in state 7, prepare to chech next video frame for a hit */
-				dclg_time = video_screen_get_time_until_pos(machine->primary_screen, input_port_read_safe(machine, portnames[joystick][ctrl][1], 0), 0);
+				dclg_time = machine->primary_screen->time_until_pos(input_port_read_safe(machine, portnames[joystick][ctrl][1], 0), 0);
 			}
 
 			break;

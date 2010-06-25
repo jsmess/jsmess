@@ -41,9 +41,8 @@ PALETTE_INIT( dai );
 
 /*----------- defined in audio/dai.c -----------*/
 
-#define SOUND_DAI	DEVICE_GET_INFO_NAME( dai_sound )
+DECLARE_LEGACY_SOUND_DEVICE(DAI, dai_sound);
 
-DEVICE_GET_INFO( dai_sound );
 void dai_set_input(running_machine *machine, int index, int state);
 
 

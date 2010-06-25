@@ -13,6 +13,10 @@
 
 *********************************************************************/
 
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
+
 #include "emu.h"
 #include "image.h"
 #include "ui.h"
@@ -76,7 +80,7 @@ struct _file_selector_entry
 typedef struct _file_manager_menu_state file_manager_menu_state;
 struct _file_manager_menu_state
 {
-	running_device *selected_device;
+	device_image_interface *selected_device;
 	astring *current_directory;
 	astring *current_file;
 };
@@ -110,8 +114,6 @@ struct _confirm_save_as_menu_state
 {
 	int *yes;
 };
-
-
 
 /***************************************************************************
     MENU HELPERS
@@ -306,7 +308,7 @@ static void menu_file_create_populate(running_machine *machine, ui_menu *menu, v
 {
 	astring buffer;
 	file_create_menu_state *menustate = (file_create_menu_state *) state;
-	running_device *device = menustate->manager_menustate->selected_device;
+	device_image_interface *device = menustate->manager_menustate->selected_device;
 	const image_device_format *format;
 	const char *new_image_name;
 
@@ -323,10 +325,10 @@ static void menu_file_create_populate(running_machine *machine, ui_menu *menu, v
 	ui_menu_item_append(menu, "New Image Name:", new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	/* do we support multiple formats? */
-	format = image_device_get_creatable_formats(device);
+	format = device->device_get_creatable_formats();
 	if (ENABLE_FORMATS && (format != NULL))
 	{
-		ui_menu_item_append(menu, "Image Format:", menustate->current_format->description, 0, ITEMREF_FORMAT);
+		ui_menu_item_append(menu, "Image Format:", menustate->current_format->m_description, 0, ITEMREF_FORMAT);
 		menustate->current_format = format;
 	}
 
@@ -344,7 +346,7 @@ static void menu_file_create_populate(running_machine *machine, ui_menu *menu, v
     create_new_image - creates a new disk image
 -------------------------------------------------*/
 
-static int create_new_image(running_device *device, const char *directory, const char *filename, int *yes)
+static int create_new_image(device_image_interface *image, const char *directory, const char *filename, int *yes)
 {
 	astring *path;
 	osd_directory_entry *entry;
@@ -376,7 +378,7 @@ static int create_new_image(running_device *device, const char *directory, const
 
 		case ENTTYPE_FILE:
 			/* a file exists here - ask for permission from the user */
-			child_menu = ui_menu_alloc(device->machine, render_container_get_ui(), menu_confirm_save_as, NULL);
+			child_menu = ui_menu_alloc(image->device().machine, render_container_get_ui(), menu_confirm_save_as, NULL);
 			child_menustate = (confirm_save_as_menu_state*)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 			child_menustate->yes = yes;
 			ui_menu_stack_push(child_menu);
@@ -398,9 +400,9 @@ static int create_new_image(running_device *device, const char *directory, const
 	/* create the image, if appropriate */
 	if (do_create)
 	{
-		err = image_create(device, astring_c(path), 0, NULL);
+		err = image->create(astring_c(path), 0, NULL);
 		if (err != 0)
-			popmessage("Error: %s", image_error(device));
+			popmessage("Error: %s", image->error());
 		else
 			result = TRUE;
 	}
@@ -676,8 +678,7 @@ static file_error menu_file_selector_populate(running_machine *machine, ui_menu 
 	const file_selector_entry *selected_entry = NULL;
 	int i;
 	const char *volume_name;
-	image_device_info info;
-	running_device *device = menustate->manager_menustate->selected_device;
+	device_image_interface *device = menustate->manager_menustate->selected_device;
 	const char *path = astring_c(menustate->manager_menustate->current_directory);
 
 	/* open the directory */
@@ -691,8 +692,7 @@ static file_error menu_file_selector_populate(running_machine *machine, ui_menu 
 	/* add the "[empty slot]" entry */
 	append_file_selector_entry(menu, menustate, SELECTOR_ENTRY_TYPE_EMPTY, NULL, NULL);
 
-	info = image_device_getinfo(device->machine->config, device);
-	if (info.creatable && !zippath_is_zip(directory))
+	if (device->image_config().is_creatable() && !zippath_is_zip(directory))
 	{
 		/* add the "[create]" entry */
 		append_file_selector_entry(menu, menustate, SELECTOR_ENTRY_TYPE_CREATE, NULL, NULL);
@@ -797,7 +797,7 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 			{
 				case SELECTOR_ENTRY_TYPE_EMPTY:
 					/* empty slot - unload */
-					image_unload(menustate->manager_menustate->selected_device);
+					menustate->manager_menustate->selected_device->unload();
 					ui_menu_stack_pop(machine);
 					break;
 
@@ -825,7 +825,7 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 
 				case SELECTOR_ENTRY_TYPE_FILE:
 					/* file */
-					image_load(menustate->manager_menustate->selected_device, entry->fullpath);
+					menustate->manager_menustate->selected_device->load(entry->fullpath);
 					ui_menu_stack_pop(machine);
 					break;
 			}
@@ -845,20 +845,20 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
     "makes sense"
 -------------------------------------------------*/
 
-static void fix_working_directory(running_device *device)
+static void fix_working_directory(device_image_interface *image)
 {
 	/* if the image exists, set the working directory to the parent directory */
-	if (image_exists(device))
+	if (image->exists())
 	{
 		astring *astr = astring_alloc();
-		zippath_parent(astr, image_filename(device));
-		image_set_working_directory(device, astring_c(astr));
+		zippath_parent(astr, image->filename());
+		image->set_working_directory(astring_c(astr));
 		astring_free(astr);
 	}
 
 	/* check to see if the path exists; if not clear it */
-	if (check_path(image_working_directory(device)) != FILERR_NONE)
-		image_set_working_directory(device, NULL);
+	if (check_path(image->working_directory()) != FILERR_NONE)
+		image->set_working_directory(NULL);
 }
 
 
@@ -874,7 +874,7 @@ static void file_manager_render_extra(running_machine *machine, ui_menu *menu, v
 	const char *path;
 
 	/* access the path */
-	path = (menustate->selected_device != NULL) ? image_filename(menustate->selected_device) : NULL;
+	path = (menustate->selected_device != NULL) ? menustate->selected_device->filename() : NULL;
 	extra_text_render(machine, menu, state, selectedref, top, bottom,
 		origx1, origy1, origx2, origy2, NULL, path);
 }
@@ -889,25 +889,22 @@ static void file_manager_render_extra(running_machine *machine, ui_menu *menu, v
 static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, void *state)
 {
 	char buffer[2048];
-	running_device *device;
+	device_image_interface *image = NULL;
 	const char *entry_basename;
 
 	/* cycle through all devices for this system */
-	for (device = machine->devicelist.first(); device != NULL; device = device->next)
+	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
 	{
-		if (is_image_device(device))
-		{
-			/* get the image type/id */
-			snprintf(buffer, ARRAY_LENGTH(buffer),
-				"%s",
-				image_typename_id(device));
+		/* get the image type/id */
+		snprintf(buffer, ARRAY_LENGTH(buffer),
+			"%s",
+			image->image_config().name());
 
-			/* get the base name */
-			entry_basename = image_basename(device);
+		/* get the base name */
+		entry_basename = image->basename();
 
-			/* record the menu item */
-			ui_menu_item_append(menu, buffer, (entry_basename != NULL) ? entry_basename : "---", 0, (void *) device);
-		}
+		/* record the menu item */
+		ui_menu_item_append(menu, buffer, (entry_basename != NULL) ? entry_basename : "---", 0, (void *) image);
 	}
 
 	/* set up custom render proc */
@@ -937,7 +934,7 @@ static void file_manager_destroy_state(ui_menu *menu, void *state)
     menu_file_manager - main file manager menu
 -------------------------------------------------*/
 
-void ui_mess_menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+void ui_image_menu_file_manager(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
 	const ui_menu_event *event;
 	file_manager_menu_state *menustate;
@@ -960,21 +957,21 @@ void ui_mess_menu_file_manager(running_machine *machine, ui_menu *menu, void *pa
 		menu_file_manager_populate(machine, menu, state);
 
 	/* update the selected device */
-	menustate->selected_device = (running_device *) ui_menu_get_selection(menu);
+	menustate->selected_device = (device_image_interface *) ui_menu_get_selection(menu);
 
 	/* process the menu */
 	event = ui_menu_process(machine, menu, 0);
 	if (event != NULL && event->iptkey == IPT_UI_SELECT)
 	{
-		menustate->selected_device = (running_device *) event->itemref;
+		menustate->selected_device = (device_image_interface *) event->itemref;
 		if (menustate->selected_device != NULL)
 		{
 			/* ensure that the working directory for this device exists */
 			fix_working_directory(menustate->selected_device);
 
 			/* set up current_directory and current_file - depends on whether we have an image */
-			astring_cpyc(menustate->current_directory, image_working_directory(menustate->selected_device));
-			astring_cpyc(menustate->current_file, image_exists(menustate->selected_device) ? image_basename(menustate->selected_device) : "");
+			astring_cpyc(menustate->current_directory, menustate->selected_device->working_directory());
+			astring_cpyc(menustate->current_file, menustate->selected_device->exists() ? menustate->selected_device->basename() : "");
 
 			/* reset the existing menu */
 			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
@@ -986,4 +983,23 @@ void ui_mess_menu_file_manager(running_machine *machine, ui_menu *menu, void *pa
 			ui_menu_stack_push(child_menu);
 		}
 	}
+}
+
+/*-------------------------------------------------
+    ui_image_menu_image_info - menu that shows info
+    on all loaded images
+-------------------------------------------------*/
+
+void ui_image_menu_image_info(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+{
+	/* if the menu isn't built, populate now */
+	if (!ui_menu_populated(menu))
+	{
+		astring *tempstring = image_info_astring(machine, astring_alloc());
+		ui_menu_item_append(menu, astring_c(tempstring), NULL, MENU_FLAG_MULTILINE, NULL);
+		astring_free(tempstring);
+	}
+
+	/* process the menu */
+	ui_menu_process(machine, menu, 0);
 }

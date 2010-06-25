@@ -565,22 +565,22 @@ DEVICE_IMAGE_LOAD( mekd2_cart )
 	const char magic[] = "MEK6800D2";
 	char buff[9];
 	UINT16 addr, size;
-	UINT8 ident, *RAM = memory_region(image->machine, "maincpu");
+	UINT8 ident, *RAM = memory_region(image.device().machine, "maincpu");
 
-	image_fread(image, buff, sizeof (buff));
+	image.fread( buff, sizeof (buff));
 	if (memcmp(buff, magic, sizeof (buff)))
 	{
 		logerror( "mekd2_rom_load: magic '%s' not found\n", magic);
 		return INIT_FAIL;
 	}
-	image_fread(image, &addr, 2);
+	image.fread( &addr, 2);
 	addr = LITTLE_ENDIANIZE_INT16(addr);
-	image_fread(image, &size, 2);
+	image.fread( &size, 2);
 	size = LITTLE_ENDIANIZE_INT16(size);
-	image_fread(image, &ident, 1);
+	image.fread( &ident, 1);
 	LOG(( "mekd2_rom_load: $%04X $%04X $%02X\n", addr, size, ident));
 	while (size-- > 0)
-		image_fread(image, &RAM[addr++], 1);
+		image.fread( &RAM[addr++], 1);
 
 	return INIT_PASS;
 }

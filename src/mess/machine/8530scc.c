@@ -84,15 +84,15 @@ struct _scc8530_t
 	       
 INLINE scc8530_t *get_token(running_device *device)
 {
-	assert(device->type == SCC8530);
-	return (scc8530_t *) device->token;
+	assert(device->type() == SCC8530);
+	return (scc8530_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
 INLINE const scc8530_interface *get_interface(running_device *device)
 {
-	assert(device->type == SCC8530);
-	return (const scc8530_interface *) device->baseconfig().inline_config;
+	assert(device->type() == SCC8530);
+	return (const scc8530_interface *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 
@@ -219,7 +219,7 @@ static DEVICE_START( scc8530 )
 {
 	scc8530_t *scc = get_token(device);
 	memset(scc, 0, sizeof(*scc));
-	scc->clock = device->clock;
+	scc->clock = device->clock();
 
 	scc->channel[0].baudtimer = timer_alloc(device->machine, scc8530_baud_expire, (void *)device);
 	scc->channel[1].baudtimer = timer_alloc(device->machine, scc8530_baud_expire, (void *)device);
@@ -659,7 +659,6 @@ DEVICE_GET_INFO( scc8530 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(scc8530_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(scc8530_interface);		break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(scc8530);	break;
@@ -675,3 +674,4 @@ DEVICE_GET_INFO( scc8530 )
 	}
 }
 
+DEFINE_LEGACY_DEVICE(SCC8530, scc8530);

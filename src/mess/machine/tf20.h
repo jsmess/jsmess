@@ -28,8 +28,6 @@ struct _tf20_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-DEVICE_GET_INFO( tf20 );
-
 /* serial interface in (to the host computer) */
 WRITE_LINE_DEVICE_HANDLER( tf20_txs_w );
 READ_LINE_DEVICE_HANDLER( tf20_rxs_r );
@@ -49,7 +47,7 @@ READ_LINE_DEVICE_HANDLER( tf20_pinc_w );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define TF20 DEVICE_GET_INFO_NAME(tf20)
+DECLARE_LEGACY_DEVICE(TF20, tf20);
 
 #define MDRV_TF20_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, TF20, 0) \

@@ -112,10 +112,9 @@ typedef struct {
 INLINE tms57002_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TMS57002);
-	return (tms57002_t *)device->token;
+	return (tms57002_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void tms57002_cache_flush(tms57002_t *s);
@@ -1277,10 +1276,9 @@ static int tms57002_decode_get_pc(tms57002_t *s)
 static CPU_EXECUTE(tms57002)
 {
 	tms57002_t *s = get_safe_token(device);
-	int initial_cycles = cycles;
 	int ipc = -1;
 
-	while(cycles > 0 && !(s->sti & (S_IDLE | IN_PLOAD | IN_CLOAD))) {
+	while(s->icount > 0 && !(s->sti & (S_IDLE | IN_PLOAD | IN_CLOAD))) {
 		int iipc;
 
 		debugger_instruction_hook(device, s->pc);
@@ -1316,7 +1314,7 @@ static CPU_EXECUTE(tms57002)
 			}
 		}
 	inst:
-		cycles--;
+		s->icount--;
 
 		if(s->rptc) {
 			s->rptc--;
@@ -1333,9 +1331,8 @@ static CPU_EXECUTE(tms57002)
 		}
 	}
 
-	if(cycles > 0)
-		cycles = 0;
-	return initial_cycles - cycles;
+	if(s->icount > 0)
+		s->icount = 0;
 }
 
 static CPU_INIT(tms57002)
@@ -1358,7 +1355,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO(tms57002)
 {
-	tms57002_t *s = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	tms57002_t *s = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state) {
 	case CPUINFO_INT_CONTEXT_SIZE:				info->i = sizeof(tms57002_t); break;

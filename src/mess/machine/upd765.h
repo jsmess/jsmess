@@ -18,10 +18,10 @@
     MACROS
 ***************************************************************************/
 
-#define UPD765A		DEVICE_GET_INFO_NAME(upd765a)
-#define UPD765B		DEVICE_GET_INFO_NAME(upd765b)
-#define SMC37C78	DEVICE_GET_INFO_NAME(smc37c78)
-#define UPD72065	DEVICE_GET_INFO_NAME(upd72065)
+DECLARE_LEGACY_DEVICE(UPD765A, upd765a);
+DECLARE_LEGACY_DEVICE(UPD765B, upd765b);
+DECLARE_LEGACY_DEVICE(SMC37C78, smc37c78);
+DECLARE_LEGACY_DEVICE(UPD72065, upd72065);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -64,12 +64,6 @@ typedef struct upd765_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( upd765a );
-DEVICE_GET_INFO( upd765b );
-DEVICE_GET_INFO( smc37c78 );
-DEVICE_GET_INFO( upd72065 );
 
 /* read of data register */
 READ8_DEVICE_HANDLER(upd765_data_r);

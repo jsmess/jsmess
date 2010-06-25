@@ -534,9 +534,8 @@ typedef struct
 INLINE mc68328_t* mc68328_get_safe_token( running_device *device )
 {
     assert( device != NULL );
-    assert( device->token != NULL );
-    assert( device->type == DEVICE_GET_INFO_NAME( mc68328 ) );
-    return (mc68328_t*) device->token;
+    assert( device->type() == MC68328 );
+    return (mc68328_t*) downcast<legacy_device_base *>(device)->token();
 }
 
 #endif // __MC68328_PRIVATE_H_

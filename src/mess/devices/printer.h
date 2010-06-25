@@ -25,7 +25,7 @@ struct _printer_config
 };
 
 
-#define PRINTER	DEVICE_GET_INFO_NAME(printer)
+DECLARE_LEGACY_IMAGE_DEVICE(PRINTER, printer);
 
 
 #define MDRV_PRINTER_ADD(_tag) \
@@ -44,8 +44,5 @@ int printer_is_ready(running_device *printer);
 
 /* outputs data to a printer */
 void printer_output(running_device *printer, UINT8 data);
-
-/* device getinfo function */
-DEVICE_GET_INFO(printer);
 
 #endif /* __PRINTER_H__ */

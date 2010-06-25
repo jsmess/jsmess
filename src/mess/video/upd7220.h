@@ -39,7 +39,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define UPD7220		DEVICE_GET_INFO_NAME(upd7220)
+DECLARE_LEGACY_DEVICE(UPD7220, upd7220);
 
 #define MDRV_UPD7220_ADD(_tag, _clock, _config, _map) \
 	MDRV_DEVICE_ADD(_tag, UPD7220, _clock) \
@@ -79,9 +79,6 @@ struct _upd7220_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( upd7220 );
 
 /* register read */
 READ8_DEVICE_HANDLER( upd7220_r );

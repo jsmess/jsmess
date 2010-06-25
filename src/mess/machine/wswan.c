@@ -211,9 +211,10 @@ static TIMER_CALLBACK(wswan_rtc_callback)
 
 static void wswan_machine_stop( running_machine *machine )
 {
+	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart");
 	if ( eeprom.size )
 	{
-		image_battery_save( devtag_get_device(machine, "cart"), eeprom.data, eeprom.size );
+		image->battery_save(eeprom.data, eeprom.size );
 	}
 }
 
@@ -1376,29 +1377,29 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	UINT32 ii, size;
 	const char *sram_str;
 
-	if (image_software_entry(image) == NULL)
-		size = image_length(image);
+	if (image.software_entry() == NULL)
+		size = image.length();
 	else
-		size = image_get_software_region_length(image, "rom");
+		size = image.get_software_region_length("rom");
 
-	ws_ram = (UINT8*) memory_get_read_ptr(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0);
+	ws_ram = (UINT8*) memory_get_read_ptr(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0);
 	memset(ws_ram, 0, 0xffff);
 	ROMBanks = size / 65536;
 
 	for (ii = 0; ii < ROMBanks; ii++)
 	{
-		if ((ROMMap[ii] = auto_alloc_array(image->machine, UINT8, 0x10000)))
+		if ((ROMMap[ii] = auto_alloc_array(image.device().machine, UINT8, 0x10000)))
 		{
-			if (image_software_entry(image) == NULL)
+			if (image.software_entry() == NULL)
 			{
-				if (image_fread(image, ROMMap[ii], 0x10000) != 0x10000)
+				if (image.fread( ROMMap[ii], 0x10000) != 0x10000)
 				{
 					logerror("Error while reading loading rom!\n");
 					return INIT_FAIL;
 				}
 			}
 			else
-				memcpy(ROMMap[ii], image_get_software_region(image, "rom") + ii * 0x10000, 0x10000);
+				memcpy(ROMMap[ii], image.get_software_region("rom") + ii * 0x10000, 0x10000);
 		}
 		else
 		{
@@ -1438,16 +1439,16 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 
 	if (eeprom.size != 0)
 	{
-		eeprom.data = auto_alloc_array(image->machine, UINT8, eeprom.size);
-		image_battery_load(image, eeprom.data, eeprom.size, 0x00);
+		eeprom.data = auto_alloc_array(image.device().machine, UINT8, eeprom.size);
+		image.battery_load(eeprom.data, eeprom.size, 0x00);
 		eeprom.page = eeprom.data;
 	}
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		logerror("Image Name: %s\n", image_longname(image));
-		logerror("Image Year: %s\n", image_year(image));
-		logerror("Image Manufacturer: %s\n", image_manufacturer(image));
+		logerror("Image Name: %s\n", image.longname());
+		logerror("Image Year: %s\n", image.year());
+		logerror("Image Manufacturer: %s\n", image.manufacturer());
 	}
 
 	/* All done */
@@ -1537,11 +1538,11 @@ static TIMER_CALLBACK(wswan_scanline_interrupt)
 			wswan_vdp.display_vertical = wswan_vdp.new_display_vertical;
 			if ( wswan_vdp.display_vertical )
 			{
-				video_screen_set_visarea( machine->primary_screen, 5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
+				machine->primary_screen->set_visible_area(5*8, 5*8 + WSWAN_Y_PIXELS - 1, 0, WSWAN_X_PIXELS - 1 );
 			}
 			else
 			{
-				video_screen_set_visarea( machine->primary_screen, 0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
+				machine->primary_screen->set_visible_area(0, WSWAN_X_PIXELS - 1, 5*8, 5*8 + WSWAN_Y_PIXELS - 1 );
 			}
 		}
 	}

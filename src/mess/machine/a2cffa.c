@@ -37,11 +37,11 @@ struct _a2cffa_token
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE a2cffa_token *get_token(const running_device *device)
+INLINE a2cffa_token *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == A2CFFA);
-	return (a2cffa_token *) device->token;
+	assert(device->type() == A2CFFA);
+	return (a2cffa_token *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -168,7 +168,6 @@ DEVICE_GET_INFO(a2cffa)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(a2cffa_token);		break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(a2cffa);	break;
@@ -183,3 +182,4 @@ DEVICE_GET_INFO(a2cffa)
 	}
 }
 
+DEFINE_LEGACY_DEVICE(A2CFFA, a2cffa);

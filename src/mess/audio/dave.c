@@ -99,8 +99,8 @@ struct _dave_t
 INLINE dave_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(sound_get_type(device) == SOUND_DAVE);
-	return (dave_t *) device->token;
+	assert(device->type() == SOUND_DAVE);
+	return (dave_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -108,8 +108,8 @@ INLINE dave_t *get_token(running_device *device)
 INLINE const dave_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(sound_get_type(device) == SOUND_DAVE);
-	return (const dave_interface *) device->baseconfig().static_config;
+	assert(device->type() == SOUND_DAVE);
+	return (const dave_interface *) device->baseconfig().static_config();
 }
 
 
@@ -833,3 +833,5 @@ DEVICE_GET_INFO( dave_sound )
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(DAVE, dave_sound);

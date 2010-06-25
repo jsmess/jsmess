@@ -2125,8 +2125,8 @@ static MACHINE_DRIVER_START( galaxold_base )
 
 	MDRV_MACHINE_RESET(galaxold)
 
-	MDRV_7474_ADD("7474_9m_1", galaxold_7474_9m_1_callback)
-	MDRV_7474_ADD("7474_9m_2", galaxold_7474_9m_2_callback)
+	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
 	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
@@ -2334,6 +2334,7 @@ static MACHINE_DRIVER_START( hunchbkg )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(galaxold_base)
 	MDRV_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
+
 	MDRV_CPU_PROGRAM_MAP(hunchbkg)
 	MDRV_CPU_IO_MAP(hunchbkg_io)
 

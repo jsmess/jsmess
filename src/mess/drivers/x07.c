@@ -1161,7 +1161,7 @@ static TIMER_CALLBACK( keyboard_clear )
 
 static TIMER_DEVICE_CALLBACK( keyboard_poll )
 {
-	keyboard_scan (timer->machine);
+	keyboard_scan (timer.machine);
 }
 
 static const gfx_layout x07_charlayout =

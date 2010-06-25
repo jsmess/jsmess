@@ -112,7 +112,7 @@ public:
 
 	/* 80 column device */
 	running_device *mc6845;
-	running_device *crtc_screen;
+	screen_device *crtc_screen;
 	UINT8 *crtc_ram;
 };
 
@@ -170,7 +170,7 @@ static READ8_HANDLER( einstein_80col_state_r )
 	einstein_state *einstein = (einstein_state *)space->machine->driver_data;
 	UINT8 result = 0;
 
-	result |= video_screen_get_vblank(einstein->crtc_screen);
+	result |= einstein->crtc_screen->vblank();
 	result |= input_port_read(space->machine, "80column_dips") & 0x06;
 
 	logerror("%s: einstein_80col_state_r %02x\n", cpuexec_describe_context(space->machine), result);
@@ -183,131 +183,128 @@ static READ8_HANDLER( einstein_80col_state_r )
     EINSTEIN NON-Z80 DEVICES DAISY CHAIN SUPPORT
 ****************************************************************/
 
-static DEVICE_START( einstein_daisy ) { }
+//static DEVICE_START( einstein_daisy ) { }
 
-static int einstein_keyboard_daisy_irq_state(running_device *device)
-{
-	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
+//static int einstein_keyboard_daisy_irq_state(running_device *device)
+//{
+//	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
+//
+//	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_KEY_INT)
+//		return Z80_DAISY_INT;
+//
+//	return 0;
+//}
+//
+//static int einstein_keyboard_daisy_irq_ack(running_device *device)
+//{
+//	return 0xf7;
+//}
 
-	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_KEY_INT)
-		return Z80_DAISY_INT;
+//static DEVICE_GET_INFO( einstein_keyboard_daisy )
+//{
+//	switch (state)
+//	{
+//		/* --- the following bits of info are returned as 64-bit signed integers --- */
+//		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
+//		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+//
+//		/* --- the following bits of info are returned as pointers to data or functions --- */
+//		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(einstein_daisy);		break;
+//		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)einstein_keyboard_daisy_irq_state;	break;
+//		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)einstein_keyboard_daisy_irq_ack;		break;
+//
+//		/* --- the following bits of info are returned as NULL-terminated strings --- */
+//		case DEVINFO_STR_NAME:							strcpy(info->s, "Einstein keyboard daisy chain");		break;
+//		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Einstein daisy chain");				break;
+//		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
+//		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
+//		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
+//	}
+//}
 
-	return 0;
-}
+//static int einstein_adc_daisy_irq_state(running_device *device)
+//{
+//	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
+//
+//	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_ADC_INT)
+//		return Z80_DAISY_INT;
+//
+//	return 0;
+//}
+//
+//static int einstein_adc_daisy_irq_ack(running_device *device)
+//{
+//	return 0xfb;
+//}
 
-static int einstein_keyboard_daisy_irq_ack(running_device *device)
-{
-	return 0xf7;
-}
+//static DEVICE_GET_INFO( einstein_adc_daisy )
+//{
+//	switch (state)
+//	{
+//		/* --- the following bits of info are returned as 64-bit signed integers --- */
+//		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
+//		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+//
+//		/* --- the following bits of info are returned as pointers to data or functions --- */
+//		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(einstein_daisy);		break;
+//		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)einstein_adc_daisy_irq_state;	break;
+//		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)einstein_adc_daisy_irq_ack;		break;
+//
+//		/* --- the following bits of info are returned as NULL-terminated strings --- */
+//		case DEVINFO_STR_NAME:							strcpy(info->s, "Einstein ADC daisy chain");			break;
+//		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Einstein daisy chain");				break;
+//		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
+//		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
+//		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
+//	}
+//}
 
-static DEVICE_GET_INFO( einstein_keyboard_daisy )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;						break;
+//static int einstein_fire_daisy_irq_state(running_device *device)
+//{
+//	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
+//
+//	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_FIRE_INT)
+//		return Z80_DAISY_INT;
+//
+//	return 0;
+//}
+//
+//static int einstein_fire_daisy_irq_ack(running_device *device)
+//{
+//	return 0xfd;
+//}
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(einstein_daisy);		break;
-		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)einstein_keyboard_daisy_irq_state;	break;
-		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)einstein_keyboard_daisy_irq_ack;		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Einstein keyboard daisy chain");		break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Einstein daisy chain");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
-	}
-}
-
-static int einstein_adc_daisy_irq_state(running_device *device)
-{
-	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
-
-	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_ADC_INT)
-		return Z80_DAISY_INT;
-
-	return 0;
-}
-
-static int einstein_adc_daisy_irq_ack(running_device *device)
-{
-	return 0xfb;
-}
-
-static DEVICE_GET_INFO( einstein_adc_daisy )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;						break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(einstein_daisy);		break;
-		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)einstein_adc_daisy_irq_state;	break;
-		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)einstein_adc_daisy_irq_ack;		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Einstein ADC daisy chain");			break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Einstein daisy chain");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
-	}
-}
-
-static int einstein_fire_daisy_irq_state(running_device *device)
-{
-	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
-
-	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_FIRE_INT)
-		return Z80_DAISY_INT;
-
-	return 0;
-}
-
-static int einstein_fire_daisy_irq_ack(running_device *device)
-{
-	return 0xfd;
-}
-
-static DEVICE_GET_INFO( einstein_fire_daisy )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;						break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(einstein_daisy);		break;
-		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)einstein_fire_daisy_irq_state;		break;
-		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)einstein_fire_daisy_irq_ack;			break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "Einstein fire button daisy chain");		break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Einstein daisy chain");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
-	}
-}
+//static DEVICE_GET_INFO( einstein_fire_daisy )
+//{
+//	switch (state)
+//	{
+//		/* --- the following bits of info are returned as 64-bit signed integers --- */
+//		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
+//		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+//
+//		/* --- the following bits of info are returned as pointers to data or functions --- */
+//		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(einstein_daisy);		break;
+//		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)einstein_fire_daisy_irq_state;		break;
+//		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)einstein_fire_daisy_irq_ack;			break;
+//
+//		/* --- the following bits of info are returned as NULL-terminated strings --- */
+//		case DEVINFO_STR_NAME:							strcpy(info->s, "Einstein fire button daisy chain");		break;
+//		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Einstein daisy chain");				break;
+//		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
+//		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
+//		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
+//	}
+//}
 
 /* int priority */
 /* keyboard int->ctc/adc->pio */
-static const z80_daisy_chain einstein_daisy_chain[] =
+static const z80_daisy_config einstein_daisy_chain[] =
 {
-	{ "keyboard_daisy" },
+	//{ "keyboard_daisy" },
 	{ IC_I058 },
-	{ "adc_daisy" },
+	//{ "adc_daisy" },
 	{ IC_I063 },
-	{ "fire_daisy" },
+	//{ "fire_daisy" },
 	{ NULL }
 };
 
@@ -336,13 +333,13 @@ static void einstein_scan_keyboard(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( einstein_keyboard_timer_callback )
 {
-	einstein_state *einstein = (einstein_state *)timer->machine->driver_data;
+	einstein_state *einstein = (einstein_state *)timer.machine->driver_data;
 
 	/* re-scan keyboard */
-	einstein_scan_keyboard(timer->machine);
+	einstein_scan_keyboard(timer.machine);
 
 	/* if /fire1 or /fire2 is 0, signal a fire interrupt */
-	if ((input_port_read(timer->machine, "BUTTONS") & 0x03) != 0)
+	if ((input_port_read(timer.machine, "BUTTONS") & 0x03) != 0)
 	{
 		einstein->interrupt |= EINSTEIN_FIRE_INT;
 	}
@@ -410,7 +407,7 @@ static WRITE8_DEVICE_HANDLER( einstein_drsel_w )
 /* channel 0 and 1 have a 2 MHz input clock for triggering */
 static TIMER_DEVICE_CALLBACK( einstein_ctc_trigger_callback )
 {
-	einstein_state *einstein = (einstein_state *)timer->machine->driver_data;
+	einstein_state *einstein = (einstein_state *)timer.machine->driver_data;
 
 	/* toggle line status */
 	einstein->ctc_trigger ^= 1;
@@ -607,7 +604,7 @@ static MACHINE_RESET( einstein2 )
 
 	/* get 80 column specific devices */
 	einstein->mc6845 = devtag_get_device(machine, "crtc");
-	einstein->crtc_screen = devtag_get_device(machine, "80column");
+	einstein->crtc_screen = machine->device<screen_device>("80column");
 
 	/* 80 column card palette */
 	palette_set_color(machine, TMS9928A_PALETTE_SIZE, RGB_BLACK);
@@ -921,9 +918,9 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_TIMER_ADD_PERIODIC("ctc", einstein_ctc_trigger_callback, HZ(XTAL_X002 /4))
 
 	/* Einstein daisy chain support for non-Z80 devices */
-	MDRV_DEVICE_ADD("keyboard_daisy", DEVICE_GET_INFO_NAME(einstein_keyboard_daisy), 0)
-	MDRV_DEVICE_ADD("adc_daisy", DEVICE_GET_INFO_NAME(einstein_adc_daisy), 0)
-	MDRV_DEVICE_ADD("fire_daisy", DEVICE_GET_INFO_NAME(einstein_fire_daisy), 0)
+	//MDRV_DEVICE_ADD("keyboard_daisy", DEVICE_GET_INFO_NAME(einstein_keyboard_daisy), 0)
+	//MDRV_DEVICE_ADD("adc_daisy", DEVICE_GET_INFO_NAME(einstein_adc_daisy), 0)
+	//MDRV_DEVICE_ADD("fire_daisy", DEVICE_GET_INFO_NAME(einstein_fire_daisy), 0)
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)

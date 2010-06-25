@@ -102,16 +102,16 @@ struct _tms5501_t
 INLINE tms5501_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == TMS5501);
-	return (tms5501_t *) device->token;
+	assert(device->type() == TMS5501);
+	return (tms5501_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
 INLINE const tms5501_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == TMS5501);
-	return (const tms5501_interface *) device->baseconfig().static_config;
+	assert(device->type() == TMS5501);
+	return (const tms5501_interface *) device->baseconfig().static_config();
 }
 
 static const UINT8 timer_name[] = { TMS5501_TIMER_0_INT, TMS5501_TIMER_1_INT, TMS5501_TIMER_2_INT, TMS5501_TIMER_3_INT, TMS5501_TIMER_4_INT };
@@ -505,7 +505,6 @@ DEVICE_GET_INFO( tms5501 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tms5501_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tms5501);	break;
@@ -520,3 +519,5 @@ DEVICE_GET_INFO( tms5501 )
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(TMS5501, tms5501);

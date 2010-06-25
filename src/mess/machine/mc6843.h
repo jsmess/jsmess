@@ -9,7 +9,7 @@
 #ifndef MC6843_H
 #define MC6843_H
 
-#define MC6843 DEVICE_GET_INFO_NAME(mc6843)
+DECLARE_LEGACY_DEVICE(MC6843, mc6843);
 
 
 /* ---------- configuration ------------ */
@@ -30,8 +30,6 @@ struct _mc6843_interface
 
 
 /* ---------- functions ------------ */
-
-extern DEVICE_GET_INFO(mc6843);
 
 extern READ8_DEVICE_HANDLER  ( mc6843_r );
 extern WRITE8_DEVICE_HANDLER ( mc6843_w );

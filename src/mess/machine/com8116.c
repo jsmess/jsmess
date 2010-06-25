@@ -46,16 +46,15 @@ struct _com8116_t
 INLINE com8116_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == COM8116);
-	return (com8116_t *)device->token;
+	assert(device->type() == COM8116);
+	return (com8116_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const com8116_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == COM8116));
-	return (const com8116_interface *) device->baseconfig().static_config;
+	assert((device->type() == COM8116));
+	return (const com8116_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -74,7 +73,7 @@ WRITE8_DEVICE_HANDLER( com8116_str_w )
 
 	com8116->fr = data & 0x0f;
 
-	timer_adjust_periodic(com8116->fr_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / com8116->fr_divisors[com8116->fr] / 2));
+	timer_adjust_periodic(com8116->fr_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock() / com8116->fr_divisors[com8116->fr] / 2));
 }
 
 /*-------------------------------------------------
@@ -89,7 +88,7 @@ WRITE8_DEVICE_HANDLER( com8116_stt_w )
 
 	com8116->ft = data & 0x0f;
 
-	timer_adjust_periodic(com8116->ft_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / com8116->ft_divisors[com8116->fr] / 2));
+	timer_adjust_periodic(com8116->ft_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock() / com8116->ft_divisors[com8116->fr] / 2));
 }
 
 /*-------------------------------------------------
@@ -156,7 +155,7 @@ static DEVICE_START( com8116 )
 	if (com8116->out_fx4_func.target)
 	{
 		com8116->fx4_timer = timer_alloc(device->machine, fx4_tick, (void *)device);
-		timer_adjust_periodic(com8116->fx4_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 4));
+		timer_adjust_periodic(com8116->fx4_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock() / 4));
 	}
 
 	com8116->fr_timer = timer_alloc(device->machine, fr_tick, (void *)device);
@@ -178,7 +177,6 @@ DEVICE_GET_INFO( com8116 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(com8116_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(com8116);	break;
@@ -193,3 +191,5 @@ DEVICE_GET_INFO( com8116 )
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(COM8116, com8116);

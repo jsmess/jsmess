@@ -76,7 +76,7 @@ struct _hd61830_t
 	int cp;						/* cursor position */
 
 	/* devices */
-	running_device *screen;
+	screen_device *screen;
 
 	/* timers */
 	emu_timer *busy_timer;
@@ -89,15 +89,14 @@ struct _hd61830_t
 INLINE hd61830_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (hd61830_t *)device->token;
+	return (hd61830_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE hd61830_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == HD61830);
-	return (hd61830_config *)device->baseconfig().inline_config;
+	assert(device->type() == HD61830);
+	return (hd61830_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 /***************************************************************************
@@ -409,7 +408,7 @@ static DEVICE_START( hd61830 )
 	const hd61830_config *config = get_safe_config(device);
 
 	/* get the screen device */
-	hd61830->screen = devtag_get_device(device->machine, config->screen_tag);
+	hd61830->screen = device->machine->device<screen_device>(config->screen_tag);
 	assert(hd61830->screen != NULL);
 
 	/* create the busy timer */
@@ -455,7 +454,6 @@ DEVICE_GET_INFO( hd61830 )
 		case DEVINFO_INT_DATABUS_WIDTH_0:				info->i = 8;										break;
 		case DEVINFO_INT_ADDRBUS_WIDTH_0:				info->i = 16;										break;
 		case DEVINFO_INT_ADDRBUS_SHIFT_0:				info->i = 0;										break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(hd61830);				break;
@@ -476,3 +474,5 @@ DEVICE_GET_INFO( hd61830 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(HD61830, hd61830);

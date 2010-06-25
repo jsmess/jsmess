@@ -64,16 +64,16 @@ struct _apexc_cylinder_t
 static DEVICE_IMAGE_LOAD( apexc_cylinder )
 {
 	/* load RAM contents */
-	apexc_cylinder_t *cyl = (apexc_cylinder_t *)image->token;
-	cyl->writable = image_is_writable(image);
+	apexc_cylinder_t *cyl = (apexc_cylinder_t *)downcast<legacy_device_base *>(&image.device())->token();
+	cyl->writable = image.is_writable();
 
-	image_fread(image, memory_region(image->machine, "maincpu"), /*0x8000*/0x1000);
+	image.fread( memory_region(image.device().machine, "maincpu"), /*0x8000*/0x1000);
 #ifdef LSB_FIRST
 	{	/* fix endianness */
 		UINT32 *RAM;
 		int i;
 
-		RAM = (UINT32 *) memory_region(image->machine, "maincpu");
+		RAM = (UINT32 *) memory_region(image.device().machine, "maincpu");
 
 		for (i=0; i < /*0x2000*/0x0400; i++)
 			RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
@@ -88,24 +88,24 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 */
 static DEVICE_IMAGE_UNLOAD( apexc_cylinder )
 {
-	apexc_cylinder_t *cyl = (apexc_cylinder_t *)image->token;
+	apexc_cylinder_t *cyl = (apexc_cylinder_t *)downcast<legacy_device_base *>(&image.device())->token();
 	if (cyl->writable)
 	{	/* save RAM contents */
 		/* rewind file */
-		image_fseek(image, 0, SEEK_SET);
+		image.fseek(0, SEEK_SET);
 #ifdef LSB_FIRST
 		{	/* fix endianness */
 			UINT32 *RAM;
 			int i;
 
-			RAM = (UINT32 *) memory_region(image->machine, "maincpu");
+			RAM = (UINT32 *) memory_region(image.device().machine, "maincpu");
 
 			for (i=0; i < /*0x2000*/0x0400; i++)
 				RAM[i] = BIG_ENDIANIZE_INT32(RAM[i]);
 		}
 #endif
 		/* write */
-		image_fwrite(image, memory_region(image->machine, "maincpu"), /*0x8000*/0x1000);
+		image.fwrite(memory_region(image.device().machine, "maincpu"), /*0x8000*/0x1000);
 	}
 }
 
@@ -117,11 +117,10 @@ static DEVICE_RESET(apexc_cylinder)
 {
 }
 
-static DEVICE_GET_INFO( apexc_cylinder )
+DEVICE_GET_INFO( apexc_cylinder )
 {
 	switch ( state )
 	{
-		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;          			break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(apexc_cylinder_t);						break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_CYLINDER;                              	break;
@@ -144,7 +143,8 @@ static DEVICE_GET_INFO( apexc_cylinder )
 	}
 }
 
-#define APEXC_CYLINDER	DEVICE_GET_INFO_NAME(apexc_cylinder)
+DECLARE_LEGACY_IMAGE_DEVICE(APEXC_CYLINDER, apexc_cylinder);
+DEFINE_LEGACY_IMAGE_DEVICE(APEXC_CYLINDER, apexc_cylinder);
 
 #define MDRV_APEXC_CYLINDER_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, APEXC_CYLINDER, 0)
@@ -211,7 +211,6 @@ static DEVICE_GET_INFO(apexc_tape_puncher)
 {
 	switch ( state )
 	{
-		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;          			break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(apexc_tape_t);							break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;											break;
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_PUNCHTAPE;                             	break;
@@ -231,8 +230,8 @@ static DEVICE_GET_INFO(apexc_tape_puncher)
 	}
 }
 
-
-#define APEXC_TAPE_PUNCHER	DEVICE_GET_INFO_NAME(apexc_tape_puncher)
+DECLARE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_PUNCHER, apexc_tape_puncher);
+DEFINE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_PUNCHER, apexc_tape_puncher);
 
 #define MDRV_APEXC_TAPE_PUNCHER_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, APEXC_TAPE_PUNCHER, 0)
@@ -249,7 +248,8 @@ static DEVICE_GET_INFO(apexc_tape_reader)
 	}
 }
 
-#define APEXC_TAPE_READER	DEVICE_GET_INFO_NAME(apexc_tape_reader)
+DECLARE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_READER, apexc_tape_reader);
+DEFINE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_READER, apexc_tape_reader);
 
 #define MDRV_APEXC_TAPE_READER_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, APEXC_TAPE_READER, 0)
@@ -261,8 +261,9 @@ static DEVICE_GET_INFO(apexc_tape_reader)
 static READ8_DEVICE_HANDLER(tape_read)
 {
 	UINT8 reply;
-
-	if (image_exists(device) && (image_fread(device, & reply, 1) == 1))
+	device_image_interface *image = (device_image_interface*)device;
+	
+	if (image->exists() && (image->fread(& reply, 1) == 1))
 		return reply & 0x1f;
 	else
 		return 0;	/* unit not ready - I don't know what we should do */
@@ -271,9 +272,10 @@ static READ8_DEVICE_HANDLER(tape_read)
 static WRITE8_DEVICE_HANDLER(tape_write)
 {
 	UINT8 data5 = (data & 0x1f);
-
-	if (image_exists(device))
-		image_fwrite(device, & data5, 1);
+	device_image_interface *image = (device_image_interface*)device;
+	
+	if (image->exists())
+		image->fwrite(& data5, 1);
 
 	apexc_teletyper_putchar(device->machine, data & 0x1f);	/* display on screen */
 }
@@ -551,9 +553,9 @@ static PALETTE_INIT( apexc )
 static VIDEO_START( apexc )
 {
 	apexc_state *state = (apexc_state *)machine->driver_data;
-	running_device *screen = video_screen_first(machine);
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*machine);
+	int width = screen->width();
+	int height = screen->height();
 
 	state->bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	bitmap_fill(state->bitmap, &/*machine->visible_area*/teletyper_window, 0);

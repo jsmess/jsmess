@@ -19,6 +19,7 @@
 
 
 #include "emu.h"
+#include "utils.h"
 #include "cpu/m68000/m68000.h"
 
 #include "devices/cartslot.h"
@@ -578,7 +579,8 @@ static WRITE16_HANDLER( genesis_TMSS_bank_w )
 static void alloc_sram(running_machine *machine)
 {
 	genesis_sram = auto_alloc_array(machine, UINT16, (genesis_sram_end - genesis_sram_start + 1) / sizeof(UINT16));
-	image_battery_load(devtag_get_device(machine, "cart"), genesis_sram, genesis_sram_end - genesis_sram_start + 1, 0x00);
+	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart");
+	image->battery_load(genesis_sram, genesis_sram_end - genesis_sram_start + 1, 0x00);
 	memcpy(megadriv_backupram, genesis_sram, genesis_sram_end - genesis_sram_start + 1);
 }
 
@@ -995,17 +997,17 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	unsigned char fliptemp;
 #endif
 
-	rawROM = memory_region(image->machine, "maincpu");
+	rawROM = memory_region(image.device().machine, "maincpu");
 	ROM = rawROM /*+ 512 */;
 
 	genesis_last_loaded_image_length = -1;
 
-	if (image_software_entry(image) == NULL)
-		length = image_fread(image, rawROM + 0x2000, 0x600000);
+	if (image.software_entry() == NULL)
+		length = image.fread( rawROM + 0x2000, 0x600000);
 	else
 	{
-		length = image_get_software_region_length(image, "rom");
-		memcpy(rawROM + 0x2000, image_get_software_region(image, "rom"), length);
+		length = image.get_software_region_length("rom");
+		memcpy(rawROM + 0x2000, image.get_software_region("rom"), length);
 	}
 
 	logerror("image length = 0x%x\n", length);
@@ -1290,7 +1292,7 @@ static DEVICE_IMAGE_UNLOAD( genesis_cart )
 	/* Write out the battery file if necessary */
 	if (genesis_sram != NULL)
 	{
-		image_battery_save(image, genesis_sram, genesis_sram_end - genesis_sram_start + 1);
+		image.battery_save(genesis_sram, genesis_sram_end - genesis_sram_start + 1);
 		free(genesis_sram);
 	}
 }
@@ -1308,34 +1310,34 @@ static DEVICE_IMAGE_LOAD( _32x_cart )
 	UINT32 *ROM32;
 	int i;
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		length = image_length(image);
-		temp_copy = auto_alloc_array(image->machine, UINT8, length);
-		image_fread(image, temp_copy, length);
+		length = image.length();
+		temp_copy = auto_alloc_array(image.device().machine, UINT8, length);
+		image.fread( temp_copy, length);
 	}
 	else
 	{
-		length = image_get_software_region_length(image, "rom");
-		temp_copy = auto_alloc_array(image->machine, UINT8, length);
-		memcpy(temp_copy, image_get_software_region(image, "rom"), length);
+		length = image.get_software_region_length("rom");
+		temp_copy = auto_alloc_array(image.device().machine, UINT8, length);
+		memcpy(temp_copy, image.get_software_region("rom"), length);
 	}
 
 	/* Copy the cart image in the locations the driver expects */
 	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
-	ROM16 = (UINT16 *) memory_region(image->machine, "gamecart");
+	ROM16 = (UINT16 *) memory_region(image.device().machine, "gamecart");
 	for (i = 0; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
 
-	ROM32 = (UINT32 *) memory_region(image->machine, "gamecart_sh2");
+	ROM32 = (UINT32 *) memory_region(image.device().machine, "gamecart_sh2");
 	for (i = 0; i < length; i += 4)
 		ROM32[i / 4] = pick_integer_be(temp_copy, i, 4);
 
-	ROM16 = (UINT16 *) memory_region(image->machine, "maincpu");
+	ROM16 = (UINT16 *) memory_region(image.device().machine, "maincpu");
 	for (i = 0x100; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(temp_copy, i, 2);
 
-	auto_free(image->machine, temp_copy);
+	auto_free(image.device().machine, temp_copy);
 
 	return INIT_PASS;
 }

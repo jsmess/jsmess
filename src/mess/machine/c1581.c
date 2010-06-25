@@ -64,16 +64,15 @@ struct _c1581_t
 INLINE c1581_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == C1581) || (device->type == C1563));
-	return (c1581_t *)device->token;
+	assert((device->type() == C1581) || (device->type() == C1563));
+	return (c1581_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE c1581_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == C1581) || (device->type == C1563));
-	return (c1581_config *)device->baseconfig().inline_config;
+	assert((device->type() == C1581) || (device->type() == C1563));
+	return (c1581_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 INLINE void set_iec_data(running_device *device)
@@ -185,27 +184,27 @@ ADDRESS_MAP_END
 
 static WRITE_LINE_DEVICE_HANDLER( cia_irq_w )
 {
-	c1581_t *c1581 = get_safe_token(device->owner);
+	c1581_t *c1581 = get_safe_token(device->owner());
 
 	cpu_set_input_line(c1581->cpu, M6502_IRQ_LINE, state);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia_cnt_w )
 {
-	c1581_t *c1581 = get_safe_token(device->owner);
+	c1581_t *c1581 = get_safe_token(device->owner());
 
 	/* fast serial clock out */
 	c1581->cnt_out = state;
-	set_iec_srq(device->owner);
+	set_iec_srq(device->owner());
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cia_sp_w )
 {
-	c1581_t *c1581 = get_safe_token(device->owner);
+	c1581_t *c1581 = get_safe_token(device->owner());
 
 	/* fast serial data out */
 	c1581->sp_out = state;
-	set_iec_data(device->owner);
+	set_iec_data(device->owner());
 }
 
 static READ8_DEVICE_HANDLER( cia_pa_r )
@@ -225,7 +224,7 @@ static READ8_DEVICE_HANDLER( cia_pa_r )
 
     */
 
-	c1581_t *c1581 = get_safe_token(device->owner);
+	c1581_t *c1581 = get_safe_token(device->owner());
 	UINT8 data = 0;
 
 	/* ready */
@@ -257,7 +256,7 @@ static WRITE8_DEVICE_HANDLER( cia_pa_w )
 
     */
 
-	c1581_t *c1581 = get_safe_token(device->owner);
+	c1581_t *c1581 = get_safe_token(device->owner());
 
 	/* side 0 */
 	wd17xx_set_side(c1581->wd1770, !BIT(data, 0));
@@ -289,7 +288,7 @@ static READ8_DEVICE_HANDLER( cia_pb_r )
 
     */
 
-	c1581_t *c1581 = get_safe_token(device->owner);
+	c1581_t *c1581 = get_safe_token(device->owner());
 	UINT8 data = 0;
 
 	/* data in */
@@ -324,13 +323,13 @@ static WRITE8_DEVICE_HANDLER( cia_pb_w )
 
     */
 
-	c1581_t *c1581 = get_safe_token(device->owner);
+	c1581_t *c1581 = get_safe_token(device->owner());
 
 	/* data out */
 	c1581->data_out = BIT(data, 1);
 
 	/* clock out */
-	cbm_iec_clk_w(c1581->serial_bus, device->owner, !BIT(data, 3));
+	cbm_iec_clk_w(c1581->serial_bus, device->owner(), !BIT(data, 3));
 
 	/* attention acknowledge */
 	c1581->atn_ack = BIT(data, 4);
@@ -338,8 +337,8 @@ static WRITE8_DEVICE_HANDLER( cia_pb_w )
 	/* fast serial direction */
 	c1581->ser_dir = BIT(data, 5);
 
-	set_iec_data(device->owner);
-	set_iec_srq(device->owner);
+	set_iec_data(device->owner());
+	set_iec_srq(device->owner());
 }
 
 static MOS8520_INTERFACE( cia_intf )
@@ -499,7 +498,6 @@ DEVICE_GET_INFO( c1581 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c1581_t);									break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c1581_config);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c1581);							break;
@@ -537,3 +535,6 @@ DEVICE_GET_INFO( c1563 )
 		default:										DEVICE_GET_INFO_CALL(c1581);								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(C1581, c1581);
+DEFINE_LEGACY_DEVICE(C1563, c1563);

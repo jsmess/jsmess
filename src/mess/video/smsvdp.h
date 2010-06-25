@@ -56,17 +56,10 @@ struct _smsvdp_interface
 };
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( smsvdp );
-
-
-/***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define SMSVDP DEVICE_GET_INFO_NAME( smsvdp )
+DECLARE_LEGACY_DEVICE(SMSVDP, smsvdp);
 
 #define MDRV_SMSVDP_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, SMSVDP, 0) \

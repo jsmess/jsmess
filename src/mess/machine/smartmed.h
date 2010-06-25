@@ -10,9 +10,6 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* device interface */
-DEVICE_GET_INFO( smartmedia );
-
 int smartmedia_present(running_device *device);
 int smartmedia_protected(running_device *device);
 
@@ -25,7 +22,7 @@ void smartmedia_data_w(running_device *device, UINT8 data);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define SMARTMEDIA	DEVICE_GET_INFO_NAME(smartmedia)
+DECLARE_LEGACY_IMAGE_DEVICE(SMARTMEDIA, smartmedia);
 
 #define MDRV_SMARTMEDIA_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, SMARTMEDIA, 0)

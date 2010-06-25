@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "pc_mda.h"
-#include "pc_video.h"
+#include "pc_video_mess.h"
 #include "video/mc6845.h"
 
 #define VERBOSE_MDA	0		/* MDA (Monochrome Display Adapter) */
@@ -103,7 +103,7 @@ VIDEO_START( pc_mda )
 	int buswidth;
 	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
-	buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
+	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -455,7 +455,7 @@ static VIDEO_START( pc_hercules )
 	int buswidth;
 	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
-	buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
+	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 	case 8:

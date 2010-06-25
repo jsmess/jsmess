@@ -79,7 +79,7 @@ VIDEO_EOF( spectrum )
 		pItem = EventList_GetFirstItem();
 		border_set_last_color ( pItem[NumItems-1].Event_Data );
 		EventList_Reset();
-		EventList_SetOffsetStartTime ( cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(video_screen_get_scan_period(machine->primary_screen), video_screen_get_vpos(machine->primary_screen))) );
+		EventList_SetOffsetStartTime ( cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
 		logerror ("Event log reset in callback fn.\n");
 	}
 }

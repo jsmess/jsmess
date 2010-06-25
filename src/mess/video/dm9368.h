@@ -28,7 +28,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define DM9368 DEVICE_GET_INFO_NAME( dm9368 )
+DECLARE_LEGACY_DEVICE(DM9368, dm9368);
 
 #define MDRV_DM9368_ADD(_tag, _digit, _rbo_tag) \
 	MDRV_DEVICE_ADD((_tag), DM9368, 0) \
@@ -50,10 +50,6 @@ struct _dm9368_config
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( dm9368 );
-
 /* latch input */
 WRITE8_DEVICE_HANDLER( dm9368_w );
 

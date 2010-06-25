@@ -16,7 +16,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MSM8251			DEVICE_GET_INFO_NAME(msm8251)
+DECLARE_LEGACY_DEVICE(MSM8251, msm8251);
 
 #define MSM8251_EXPECTING_MODE 0x01
 #define MSM8251_EXPECTING_SYNC_BYTE 0x02
@@ -57,9 +57,6 @@ struct _msm8251_interface
 ***************************************************************************/
 
 extern const msm8251_interface default_msm8251_interface;
-
-/* device get info function */
-DEVICE_GET_INFO(msm8251);
 
 /* read data register */
 READ8_DEVICE_HANDLER(msm8251_data_r);

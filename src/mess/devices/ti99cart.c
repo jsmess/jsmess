@@ -8,6 +8,7 @@
 
 *********************************************************************/
 #include "emu.h"
+#include "utils.h"
 #include "ti99cart.h"
 #include "cartslot.h"
 #include "machine/ti99_4x.h"
@@ -15,15 +16,25 @@
 
 typedef int assmfct(running_device *);
 
-#define TI99_CARTRIDGE_PCB_NONE		DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_none)
-#define TI99_CARTRIDGE_PCB_STD		DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_std)
-#define TI99_CARTRIDGE_PCB_PAGED	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_paged)
-#define TI99_CARTRIDGE_PCB_MINIMEM	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_minimem)
-#define TI99_CARTRIDGE_PCB_SUPER	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_super)
-#define TI99_CARTRIDGE_PCB_MBX		DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_mbx)
-#define TI99_CARTRIDGE_PCB_PAGED379I	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_paged379i)
-#define TI99_CARTRIDGE_PCB_PAGEDCRU	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_pagedcru)
-#define TI99_CARTRIDGE_PCB_GRAMKRACKER	DEVICE_GET_INFO_NAME(ti99_cartridge_pcb_gramkracker)
+DECLARE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_NONE, ti99_cartridge_pcb_none);
+DECLARE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_STD, ti99_cartridge_pcb_std);
+DECLARE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_PAGED, ti99_cartridge_pcb_paged);
+DECLARE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_MINIMEM, ti99_cartridge_pcb_minimem);
+DECLARE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_SUPER, ti99_cartridge_pcb_super);
+DECLARE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_MBX, ti99_cartridge_pcb_mbx);
+DECLARE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_PAGED379I, ti99_cartridge_pcb_paged379i);
+DECLARE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_PAGEDCRU, ti99_cartridge_pcb_pagedcru);
+DECLARE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_GRAMKRACKER, ti99_cartridge_pcb_gramkracker);
+
+DEFINE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_NONE, ti99_cartridge_pcb_none);
+DEFINE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_STD, ti99_cartridge_pcb_std);
+DEFINE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_PAGED, ti99_cartridge_pcb_paged);
+DEFINE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_MINIMEM, ti99_cartridge_pcb_minimem);
+DEFINE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_SUPER, ti99_cartridge_pcb_super);
+DEFINE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_MBX, ti99_cartridge_pcb_mbx);
+DEFINE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_PAGED379I, ti99_cartridge_pcb_paged379i);
+DEFINE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_PAGEDCRU, ti99_cartridge_pcb_pagedcru);
+DEFINE_LEGACY_DEVICE(TI99_CARTRIDGE_PCB_GRAMKRACKER, ti99_cartridge_pcb_gramkracker);
 
 /* Generic TI99 cartridge structure. */
 struct _cartridge_t
@@ -156,8 +167,8 @@ typedef enum _slotc_type_t
 
 /* Function declaration; the function itself is in the later part of this file. */
 static UINT8 cartridge_grom_read_legacy(running_device *cartsys);
-static void unload_legacy(running_device *image);
-static int load_legacy(running_device *image);
+static void unload_legacy(device_image_interface &image);
+static int load_legacy(device_image_interface &image);
 
 static int cartridge_gram_kracker_readg(running_device *cartsys);
 static void cartridge_gram_kracker_writeg(running_device *cartsys, UINT8 data);
@@ -196,7 +207,7 @@ typedef struct _ti99_pcb_t ti99_pcb_t;
 
 static int in_legacy_mode(running_device *device)
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 	if ((cartslots->legacy_slots>0) &&  (cartslots->multi_slots==0))
 		return TRUE;
 	return FALSE;
@@ -240,7 +251,7 @@ static int in_legacy_mode(running_device *device)
 */
 static void cartridge_slot_set(running_device *cartsys, int slotnumber)
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 	assert(slotnumber>=0 && slotnumber<=255);
 //  if (cartslots->active_slot != slotnumber) printf("Setting cartslot to %d\n", slotnumber);
 	if (cartslots->fixed_slot==AUTO)
@@ -252,7 +263,7 @@ static void cartridge_slot_set(running_device *cartsys, int slotnumber)
 static int slot_is_empty(running_device *cartsys, int slotnumber)
 {
 	cartridge_t *cart;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	cart = &cartslots->cartridge[slotnumber];
 
@@ -264,7 +275,7 @@ static int slot_is_empty(running_device *cartsys, int slotnumber)
 static void clear_slot(running_device *cartsys, int slotnumber)
 {
 	cartridge_t *cart;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	cart = &cartslots->cartridge[slotnumber];
 
@@ -303,7 +314,7 @@ static void grom_write_address(ti99_multicart_state *cartslots, UINT8 data)
 */
 WRITE8_DEVICE_HANDLER(ti99_cartridge_grom_w)
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	// Set the cart slot. Note that the port must be adjusted for 16-bit
 	// systems, i.e. it should be shifted left by 1.
@@ -375,7 +386,7 @@ READ8_DEVICE_HANDLER(ti99_cartridge_grom_r)
 	UINT8 value;
 	int slot;
 	cartridge_t *cartridge;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	// Set the cart slot. Note that the port must be adjusted for 16-bit
 	// systems, i.e. it should be shifted left by 1.
@@ -473,8 +484,8 @@ static cartridge_t *assemble_common(running_device *cartslot)
 {
 	/* Pointer to the cartridge structure. */
 	cartridge_t *cartridge;
-	running_device *cartsys = cartslot->owner;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	running_device *cartsys = cartslot->owner();
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	void *socketcont;
 	int reslength;
@@ -563,19 +574,19 @@ static cartridge_t *assemble_common(running_device *cartslot)
 
 static void set_pointers(running_device *pcb, int index)
 {
-	running_device *cartsys = pcb->owner->owner;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
-	ti99_pcb_t *pcb_def = (ti99_pcb_t *)pcb->token;
+	running_device *cartsys = pcb->owner()->owner();
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
+	ti99_pcb_t *pcb_def = (ti99_pcb_t *)downcast<legacy_device_base *>(pcb)->token();
 
-	pcb_def->read = (read16_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_R);
-	pcb_def->write = (write16_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_W);
-	pcb_def->read8 = (read8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_R8);
-	pcb_def->write8 = (write8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_W8);
-	pcb_def->cruread = (read8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_CRU_R);
-	pcb_def->cruwrite = (write8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_CRU_W);
+//	pcb_def->read = (read16_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_R);
+//	pcb_def->write = (write16_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_W);
+//	pcb_def->read8 = (read8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_R8);
+//	pcb_def->write8 = (write8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_6000_W8);
+//	pcb_def->cruread = (read8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_CRU_R);
+//	pcb_def->cruwrite = (write8_device_func) pcb->get_config_fct(TI99CARTINFO_FCT_CRU_W);
 
-	pcb_def->assemble = (assmfct *)pcb->get_config_fct(TI99CART_FCT_ASSM);
-	pcb_def->disassemble = (assmfct *)pcb->get_config_fct(TI99CART_FCT_DISASSM);
+//	pcb_def->assemble = (assmfct *)pcb->get_config_fct(TI99CART_FCT_ASSM);
+//	pcb_def->disassemble = (assmfct *)pcb->get_config_fct(TI99CART_FCT_DISASSM);
 
 	pcb_def->cartridge = &cartslots->cartridge[index];
 	pcb_def->cartridge->pcb = pcb;
@@ -589,7 +600,7 @@ static void set_pointers(running_device *pcb, int index)
 static DEVICE_START(ti99_pcb_none)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-	set_pointers(device, get_index_from_tagname(device->owner)-1);
+	set_pointers(device, get_index_from_tagname(device->owner())-1);
 }
 
 /*****************************************************************************
@@ -601,7 +612,7 @@ static DEVICE_START(ti99_pcb_none)
 static DEVICE_START(ti99_pcb_std)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-	set_pointers(device, get_index_from_tagname(device->owner)-1);
+	set_pointers(device, get_index_from_tagname(device->owner())-1);
 }
 
 /*
@@ -612,7 +623,7 @@ static READ16_DEVICE_HANDLER( read_cart_std )
 {
 	/* device is pcb, owner is cartslot */
 	UINT16 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 
 	if (cartridge->rom_ptr==NULL)
@@ -640,7 +651,7 @@ static WRITE16_DEVICE_HANDLER( write_cart_std )
 static READ8_DEVICE_HANDLER( read_cart_std8 )
 {
 	UINT8 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 
 	if (cartridge->rom_ptr==NULL)
@@ -681,8 +692,8 @@ static int disassemble_std(running_device *image)
 	int slotnumber;
 	int i;
 	cartridge_t *cart;
-	running_device *cartsys = image->owner;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	running_device *cartsys = image->owner();
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	slotnumber = get_index_from_tagname(image)-1;
 
@@ -725,7 +736,7 @@ static int disassemble_std(running_device *image)
 static DEVICE_START(ti99_pcb_paged)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-	set_pointers(device, get_index_from_tagname(device->owner)-1);
+	set_pointers(device, get_index_from_tagname(device->owner())-1);
 }
 
 /*
@@ -736,7 +747,7 @@ static READ16_DEVICE_HANDLER( read_cart_paged )
 {
 	/* device is pcb, owner is cartslot */
 	UINT16 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	UINT16 *rombank;
 
@@ -765,7 +776,7 @@ static READ16_DEVICE_HANDLER( read_cart_paged )
 */
 static WRITE16_DEVICE_HANDLER( write_cart_paged )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	cartridge->rom_page = offset & 1;
 }
@@ -778,7 +789,7 @@ static WRITE16_DEVICE_HANDLER( write_cart_paged )
 static READ8_DEVICE_HANDLER( read_cart_paged8 )
 {
 	UINT8 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	UINT8 *rombank;
 
@@ -808,7 +819,7 @@ static READ8_DEVICE_HANDLER( read_cart_paged8 )
 */
 static WRITE8_DEVICE_HANDLER( write_cart_paged8 )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	cartridge->rom_page = (offset>>1) & 1;
 }
@@ -844,14 +855,14 @@ static int assemble_paged(running_device *image)
 
 static DEVICE_START(ti99_pcb_minimem)
 {
-	set_pointers(device, get_index_from_tagname(device->owner)-1);
+	set_pointers(device, get_index_from_tagname(device->owner())-1);
 }
 
 static READ16_DEVICE_HANDLER( read_cart_minimem )
 {
 	/* device is pcb, owner is cartslot */
 	UINT16 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 
 	if (offset < 0x800)
@@ -884,7 +895,7 @@ static READ16_DEVICE_HANDLER( read_cart_minimem )
 */
 static WRITE16_DEVICE_HANDLER( write_cart_minimem )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	UINT16 *pos;
 
@@ -914,7 +925,7 @@ static READ8_DEVICE_HANDLER( read_cart_minimem8 )
 {
 	/* device is pcb, owner is cartslot */
 	UINT8 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 
 	if (offset < 0x1000)
@@ -948,7 +959,7 @@ static READ8_DEVICE_HANDLER( read_cart_minimem8 )
 */
 static WRITE8_DEVICE_HANDLER( write_cart_minimem8 )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 
 	if (offset < 0x1000)
@@ -1016,7 +1027,7 @@ static int assemble_minimem(running_device *image)
 
 static DEVICE_START(ti99_pcb_super)
 {
-	set_pointers(device, get_index_from_tagname(device->owner)-1);
+	set_pointers(device, get_index_from_tagname(device->owner())-1);
 }
 
 /*
@@ -1025,7 +1036,7 @@ static DEVICE_START(ti99_pcb_super)
 */
 static READ8_DEVICE_HANDLER( read_cart_cru )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	// offset is the bit number. The CRU base address is already divided  by 2.
 	int reply = 0;
@@ -1064,7 +1075,7 @@ static READ8_DEVICE_HANDLER( read_cart_cru )
 
 static WRITE8_DEVICE_HANDLER( write_cart_cru )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	// data is bit
 	// offset is address
@@ -1083,7 +1094,7 @@ static READ16_DEVICE_HANDLER( read_cart_super )
 {
 	/* device is pcb, owner is cartslot */
 	UINT16 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	offs_t boffset;
 
@@ -1105,7 +1116,7 @@ static READ16_DEVICE_HANDLER( read_cart_super )
 */
 static WRITE16_DEVICE_HANDLER( write_cart_super )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	UINT16 *pos;
 	offs_t boffset;
@@ -1130,7 +1141,7 @@ static READ8_DEVICE_HANDLER( read_cart_super8 )
 {
 	/* device is pcb, owner is cartslot */
 	UINT8 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	offs_t boffset;
 
@@ -1152,7 +1163,7 @@ static READ8_DEVICE_HANDLER( read_cart_super8 )
 */
 static WRITE8_DEVICE_HANDLER( write_cart_super8 )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	offs_t boffset;
 
@@ -1195,14 +1206,14 @@ static int assemble_super(running_device *image)
 
 static DEVICE_START(ti99_pcb_mbx)
 {
-	set_pointers(device, get_index_from_tagname(device->owner)-1);
+	set_pointers(device, get_index_from_tagname(device->owner())-1);
 }
 
 static READ16_DEVICE_HANDLER( read_cart_mbx )
 {
 	/* device is pcb, owner is cartslot */
 	UINT16 value = 0;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 
 	if ((offset >= 0x0600) && (offset <= 0x07fe))
@@ -1226,7 +1237,7 @@ static READ16_DEVICE_HANDLER( read_cart_mbx )
 */
 static WRITE16_DEVICE_HANDLER( write_cart_mbx )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	UINT16 *pos;
 
@@ -1252,7 +1263,7 @@ static READ8_DEVICE_HANDLER( read_cart_mbx8 )
 {
 	/* device is pcb, owner is cartslot */
 	UINT8 value = 0;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 
 	if ((offset >= 0x0c00) && (offset <= 0x0ffd))
@@ -1276,7 +1287,7 @@ static READ8_DEVICE_HANDLER( read_cart_mbx8 )
 */
 static WRITE8_DEVICE_HANDLER( write_cart_mbx8 )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 
 	if ((offset >= 0x0c00) && (offset <= 0x0ffd))
@@ -1334,7 +1345,7 @@ static int assemble_mbx(running_device *image)
 static DEVICE_START(ti99_pcb_paged379i)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-	set_pointers(device, get_index_from_tagname(device->owner)-1);
+	set_pointers(device, get_index_from_tagname(device->owner())-1);
 }
 
 /*
@@ -1345,7 +1356,7 @@ static READ16_DEVICE_HANDLER( read_cart_paged379i )
 {
 	/* device is pcb, owner is cartslot */
 	UINT16 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	offs_t boffset;
 
@@ -1394,7 +1405,7 @@ static void set_paged379i_bank(cartridge_t *cartridge, int rompage)
 */
 static WRITE16_DEVICE_HANDLER( write_cart_paged379i )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 
 	// Bits: 011x xxxx xxxb bbbx
@@ -1411,7 +1422,7 @@ static WRITE16_DEVICE_HANDLER( write_cart_paged379i )
 static READ8_DEVICE_HANDLER( read_cart_paged379i8 )
 {
 	UINT8 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	offs_t boffset;
 
@@ -1435,7 +1446,7 @@ static READ8_DEVICE_HANDLER( read_cart_paged379i8 )
 */
 static WRITE8_DEVICE_HANDLER( write_cart_paged379i8 )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 
 	// Bits: 011x xxxx xxxb bbbx
@@ -1484,7 +1495,7 @@ static int assemble_paged379i(running_device *image)
 static DEVICE_START(ti99_pcb_pagedcru)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
-	set_pointers(device, get_index_from_tagname(device->owner)-1);
+	set_pointers(device, get_index_from_tagname(device->owner())-1);
 }
 
 /*
@@ -1495,7 +1506,7 @@ static READ16_DEVICE_HANDLER( read_cart_pagedcru )
 {
 	/* device is pcb, owner is cartslot */
 	UINT16 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	offs_t boffset;
 
@@ -1530,7 +1541,7 @@ static WRITE16_DEVICE_HANDLER( write_cart_pagedcru )
 static READ8_DEVICE_HANDLER( read_cart_pagedcru8 )
 {
 	UINT8 value;
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	offs_t boffset;
 
@@ -1565,7 +1576,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_pagedcru8 )
 */
 static READ8_DEVICE_HANDLER( read_cart_cru_paged )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	int reply = 0;
 
@@ -1579,7 +1590,7 @@ static READ8_DEVICE_HANDLER( read_cart_cru_paged )
 
 static WRITE8_DEVICE_HANDLER( write_cart_cru_paged )
 {
-	ti99_pcb_t *pcb = (ti99_pcb_t *)device->token;
+	ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cartridge = pcb->cartridge;
 	// data is bit
 	// offset is address
@@ -1620,7 +1631,7 @@ static DEVICE_START(ti99_pcb_gramkracker)
 {
 	/* device is ti99_cartslot:cartridge:pcb */
 //  printf("DEVICE_START(ti99_pcb_pagedcru), tag of device=%s\n", device->tag());
-	set_pointers(device, get_index_from_tagname(device->owner)-1);
+	set_pointers(device, get_index_from_tagname(device->owner())-1);
 }
 
 /*
@@ -1631,8 +1642,8 @@ static int assemble_gramkracker(running_device *image)
 	cartridge_t *cart;
 	int id,i;
 
-	running_device *cartsys = image->owner;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	running_device *cartsys = image->owner();
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	cart = assemble_common(image);
 
@@ -1681,8 +1692,8 @@ static int assemble_gramkracker(running_device *image)
 */
 static int disassemble_gramkracker(running_device *cartslot)
 {
-	running_device *cartsys = cartslot->owner;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	running_device *cartsys = cartslot->owner();
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 	int i;
 
 	int slotnumber = get_index_from_tagname(cartslot)-1;
@@ -1721,10 +1732,6 @@ static DEVICE_GET_INFO(ti99_cart_common)
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:
 			info->i = 0;
 			break;
-		case DEVINFO_INT_CLASS:
-			info->i = DEVICE_CLASS_PERIPHERAL;
-			break;
-
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:
 			info->start = DEVICE_START_NAME(ti99_pcb_std);
@@ -1782,7 +1789,7 @@ static DEVICE_GET_INFO(ti99_cart_common)
 	}
 }
 
-static DEVICE_GET_INFO(ti99_cartridge_pcb_none)
+DEVICE_GET_INFO(ti99_cartridge_pcb_none)
 {
 	switch(state)
 	{
@@ -1800,12 +1807,12 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_none)
 	}
 }
 
-static DEVICE_GET_INFO(ti99_cartridge_pcb_std)
+DEVICE_GET_INFO(ti99_cartridge_pcb_std)
 {
 	DEVICE_GET_INFO_CALL(ti99_cart_common);
 }
 
-static DEVICE_GET_INFO(ti99_cartridge_pcb_paged)
+DEVICE_GET_INFO(ti99_cartridge_pcb_paged)
 {
 	switch(state)
 	{
@@ -1842,7 +1849,7 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_paged)
 	}
 }
 
-static DEVICE_GET_INFO(ti99_cartridge_pcb_minimem)
+DEVICE_GET_INFO(ti99_cartridge_pcb_minimem)
 {
 	switch(state)
 	{
@@ -1876,7 +1883,7 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_minimem)
 	}
 }
 
-static DEVICE_GET_INFO(ti99_cartridge_pcb_super)
+DEVICE_GET_INFO(ti99_cartridge_pcb_super)
 {
 	switch(state)
 	{
@@ -1916,7 +1923,7 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_super)
 	}
 }
 
-static DEVICE_GET_INFO(ti99_cartridge_pcb_mbx)
+DEVICE_GET_INFO(ti99_cartridge_pcb_mbx)
 {
 	switch(state)
 	{
@@ -1951,7 +1958,7 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_mbx)
 	}
 }
 
-static DEVICE_GET_INFO(ti99_cartridge_pcb_paged379i)
+DEVICE_GET_INFO(ti99_cartridge_pcb_paged379i)
 {
 	switch(state)
 	{
@@ -1988,7 +1995,7 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_paged379i)
 	}
 }
 
-static DEVICE_GET_INFO(ti99_cartridge_pcb_pagedcru)
+DEVICE_GET_INFO(ti99_cartridge_pcb_pagedcru)
 {
 	switch(state)
 	{
@@ -2033,7 +2040,7 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_pagedcru)
 	}
 }
 
-static DEVICE_GET_INFO(ti99_cartridge_pcb_gramkracker)
+DEVICE_GET_INFO(ti99_cartridge_pcb_gramkracker)
 {
 	switch(state)
 	{
@@ -2070,7 +2077,7 @@ static DEVICE_GET_INFO(ti99_cartridge_pcb_gramkracker)
 */
 static DEVICE_START( ti99_cartridge )
 {
-	cartslot_t *cart = (cartslot_t *)device->token;
+	cartslot_t *cart = (cartslot_t *)downcast<legacy_device_base *>(device)->token();
 
 	/* find the PCB device */
 	cart->pcb_device = device->subdevice(TAG_PCB);
@@ -2083,9 +2090,9 @@ static DEVICE_START( ti99_cartridge )
 */
 static DEVICE_IMAGE_LOAD( ti99_cartridge )
 {
-	running_device *pcbdev = cartslot_get_pcb(image);
-	running_device *cartsys = image->owner;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	running_device *pcbdev = cartslot_get_pcb(&image.device());
+	running_device *cartsys = image.device().owner();
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	int result;
 
@@ -2098,14 +2105,14 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 		if (pcbdev != NULL)
 		{
 			/* If we are here, we have a multicart. */
-			ti99_pcb_t *pcb = (ti99_pcb_t *)pcbdev->token;
-			cartslot_t *cart = (cartslot_t *)image->token;
+			ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(pcbdev)->token();
+			cartslot_t *cart = (cartslot_t *)downcast<legacy_device_base *>(&image.device())->token();
 
 			/* try opening this as a multicart */
 			// This line requires that cartslot_t be included in cartslot.h,
 			// otherwise one cannot make use of multicart handling within such a
 			// custom LOAD function.
-			multicart_open_error me = multicart_open(image_filename(image), image->machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
+			multicart_open_error me = multicart_open(image.filename(), image.device().machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
 
 			// Now that we have loaded the image files, let the PCB put them all
 			// together. This means we put the images in a structure which allows
@@ -2136,9 +2143,9 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 {
 	running_device *pcbdev;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)image->owner->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(image.device().owner())->token();
 
-	if (image->token == NULL)
+	if (downcast<legacy_device_base *>(&image.device())->token() == NULL)
 	{
 		// This means something went wrong during the pcb
 		// identification (e.g. one of the cartridge files was not
@@ -2149,8 +2156,8 @@ static DEVICE_IMAGE_UNLOAD( ti99_cartridge )
 
 	if (pcbdev != NULL)
 	{
-		ti99_pcb_t *pcb = (ti99_pcb_t *)pcbdev->token;
-		cartslot_t *cart = (cartslot_t *)image->token;
+		ti99_pcb_t *pcb = (ti99_pcb_t *)downcast<legacy_device_base *>(pcbdev)->token();
+		cartslot_t *cart = (cartslot_t *)downcast<legacy_device_base *>(&image.device())->token();
 
 		if (cart->mc != NULL)
 		{
@@ -2199,7 +2206,7 @@ static UINT8 cartridge_grom_read_legacy(running_device *cartsys)
 {
 	int slot;
 	cartridge_t *cartridge;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	UINT8 value;
 
@@ -2240,7 +2247,7 @@ static UINT8 cartridge_grom_read_legacy(running_device *cartsys)
 static READ16_DEVICE_HANDLER( ti99_cart_r_legacy )
 {
 	int slotmbx, slotmini, slotebr2, slotrom;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	slotmbx = cartslots->legacy_slotnumber[SLOTC_MBX];
 
@@ -2280,7 +2287,7 @@ static READ16_DEVICE_HANDLER( ti99_cart_r_legacy )
 static WRITE16_DEVICE_HANDLER( ti99_cart_w_legacy )
 {
 	int slotmbx, slotmini, slotebr2, slotrom;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	slotmbx = cartslots->legacy_slotnumber[SLOTC_MBX];
 	slotrom = cartslots->legacy_slotnumber[SLOTC_CROM];
@@ -2327,7 +2334,7 @@ static WRITE16_DEVICE_HANDLER( ti99_cart_w_legacy )
 static READ8_DEVICE_HANDLER( ti99_cart_r_legacy8 )
 {
 	int slotmbx, slotmini, slotebr2, slotrom;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	slotmbx = cartslots->legacy_slotnumber[SLOTC_MBX];
 
@@ -2369,7 +2376,7 @@ static READ8_DEVICE_HANDLER( ti99_cart_r_legacy8 )
 static WRITE8_DEVICE_HANDLER( ti99_cart_w_legacy8 )
 {
 	int slotmbx, slotmini, slotebr2, slotrom;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	slotmbx = cartslots->legacy_slotnumber[SLOTC_MBX];
 	slotrom = cartslots->legacy_slotnumber[SLOTC_CROM];
@@ -2411,10 +2418,10 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_w_legacy8 )
 }
 
 
-static int load_legacy(running_device *image)
+static int load_legacy(device_image_interface &image)
 {
-	running_device *cartsys = image->owner;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	running_device *cartsys = image.device().owner();
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	/* Some comments originally in machine/ti99_4x.c */
 
@@ -2429,13 +2436,13 @@ static int load_legacy(running_device *image)
 	int savembx;
 
 	const char *ch, *ch2;
-	const char *name = image_filename(image);
+	const char *name = image.filename();
 
-	UINT8 *grom = memory_region(image->machine, region_grom) + 0x6000;
-	UINT16 *cartrom = (UINT16 *) (memory_region(image->machine, "maincpu") + offset_cart);
-	UINT16 *cartrom2 = (UINT16 *) (memory_region(image->machine, "maincpu") + offset_cart + 0x2000);
-	UINT8 *cart8rom = memory_region(image->machine, "maincpu") + offset_cart_8;
-	UINT8 *cart8rom2  = memory_region(image->machine, "maincpu") + offset_cart_8 + 0x2000;
+	UINT8 *grom = memory_region(image.device().machine, region_grom) + 0x6000;
+	UINT16 *cartrom = (UINT16 *) (memory_region(image.device().machine, "maincpu") + offset_cart);
+	UINT16 *cartrom2 = (UINT16 *) (memory_region(image.device().machine, "maincpu") + offset_cart + 0x2000);
+	UINT8 *cart8rom = memory_region(image.device().machine, "maincpu") + offset_cart_8;
+	UINT8 *cart8rom2  = memory_region(image.device().machine, "maincpu") + offset_cart_8 + 0x2000;
 
 	UINT16 *cartmbx;
 	UINT8 *cartmbx8;
@@ -2494,7 +2501,7 @@ static int load_legacy(running_device *image)
 			break;
 
 		case SLOTC_GROM:
-			filesize = image_fread(image, grom, 0xA000);
+			filesize = image.fread(grom, 0xA000);
 			cartslots->cartridge[id].grom_ptr = grom;
 			cartslots->cartridge[id].grom_size = filesize;
 			// printf("loaded GROM, size = %d\n", filesize);
@@ -2526,13 +2533,13 @@ static int load_legacy(running_device *image)
 				{
 					cartmbx8 = (UINT8*)malloc(0x400);
 					memcpy(cartmbx8, cart8rom + 0x0c00, 0x400);
-					filesize = image_fread(image, cart8rom, maxrom);
+					filesize = image.fread(cart8rom, maxrom);
 					memcpy(cart8rom + 0xc00, cartmbx8, 0x400);
 					free(cartmbx8);
 				}
 				else
 				{
-					filesize = image_fread(image, cart8rom, maxrom);
+					filesize = image.fread(cart8rom, maxrom);
 				}
 				cartslots->cartridge[id].rom_ptr = cart8rom;
 				cartslots->cartridge[id].rom_size = filesize;
@@ -2543,11 +2550,11 @@ static int load_legacy(running_device *image)
 				{
 					cartmbx = (UINT16*)malloc(0x400);
 					memcpy(cartmbx, cartrom + 0x0600, 0x400);
-					filesize = image_fread(image, cartrom, maxrom);
+					filesize = image.fread(cartrom, maxrom);
 					memcpy(cartrom + 0x0600, cartmbx, 0x400);
 					free(cartmbx);
 				}
-				filesize = image_fread(image, cartrom, maxrom);
+				filesize = image.fread(cartrom, maxrom);
 				for (i = 0; i < maxrom/2; i++)
 					((UINT16 *)cartrom)[i] = BIG_ENDIANIZE_INT16(((UINT16 *)cartrom)[i]);
 				cartslots->cartridge[id].rom_ptr = cartrom;
@@ -2561,12 +2568,12 @@ static int load_legacy(running_device *image)
 			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
-				image_battery_load(image, cart8rom+0x1000,0x1000, 0x00);
+				image.battery_load(cart8rom+0x1000,0x1000, 0x00);
 				cartslots->cartridge[id].ram_ptr = cart8rom +  0x1000;
 			}
 			else
 			{
-				image_battery_load(image, cartrom+0x800,0x1000, 0x00);
+				image.battery_load(cartrom+0x800,0x1000, 0x00);
 				for (i = 0x800; i < 0x1000; i++)
 					cartrom[i] = BIG_ENDIANIZE_INT16(cartrom[i]);
 				cartslots->cartridge[id].ram_ptr = (UINT16 *)cartrom +  0x800;
@@ -2579,12 +2586,12 @@ static int load_legacy(running_device *image)
 			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
-				image_battery_load(image, cart8rom+0x0c00, 0x0400, 0x00);
+				image.battery_load(cart8rom+0x0c00, 0x0400, 0x00);
 				cartslots->cartridge[id].ram_ptr = cart8rom +  0xc00;
 			}
 			else
 			{
-				image_battery_load(image, cartrom+0x0600, 0x0400, 0x00);
+				image.battery_load(cartrom+0x0600, 0x0400, 0x00);
 				for (i = 0x0600; i < 0x0800; i++)
 					cartrom[i] = BIG_ENDIANIZE_INT16(cartrom[i]);
 				cartslots->cartridge[id].ram_ptr = (UINT16 *)cartrom +  0x600;
@@ -2598,12 +2605,12 @@ static int load_legacy(running_device *image)
 			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
-				filesize = image_fread(image, cart8rom2, maxrom);
+				filesize = image.fread(cart8rom2, maxrom);
 				cartslots->cartridge[id].rom2_ptr = cart8rom2;
 			}
 			else
 			{
-				filesize = image_fread(image, cartrom2, maxrom);
+				filesize = image.fread(cartrom2, maxrom);
 				for (i = 0; i < maxrom/2; i++)
 					cartrom2[i] = BIG_ENDIANIZE_INT16(cartrom2[i]);
 				cartslots->cartridge[id].rom2_ptr = cartrom2;
@@ -2614,12 +2621,12 @@ static int load_legacy(running_device *image)
 	return INIT_PASS;
 }
 
-static void unload_legacy(running_device *image)
+static void unload_legacy(device_image_interface &image)
 {
 	int i;
-	running_device *cartsys = image->owner;
+	running_device *cartsys = image.device().owner();
 
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	slotc_type_t type = SLOTC_EMPTY;
 	int slot = get_index_from_tagname(image)-1;
@@ -2648,7 +2655,7 @@ static void unload_legacy(running_device *image)
 			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
-				image_battery_save(image, cartslots->cartridge[slot].ram_ptr, 0x1000);
+				image.battery_save(cartslots->cartridge[slot].ram_ptr, 0x1000);
 				memset(cartslots->cartridge[slot].ram_ptr, 0, 0x1000);
 			}
 			else
@@ -2658,7 +2665,7 @@ static void unload_legacy(running_device *image)
 				UINT16 *ramcont = (UINT16 *)cartslots->cartridge[slot].ram_ptr;
 				for (i = 0; i < 0x0800; i++)
 					ramcont[i] = BIG_ENDIANIZE_INT16(ramcont[i]);
-				image_battery_save(image, ramcont, 0x1000);
+				image.battery_save(ramcont, 0x1000);
 				memset(ramcont, 0, 0x1000);
 			}
 			break;
@@ -2666,7 +2673,7 @@ static void unload_legacy(running_device *image)
 			if (ti99_is_99_8())
 			{
 				// printf("** is 99/8\n");
-				image_battery_save(image, cartslots->cartridge[slot].ram_ptr, 0x0400);
+				image.battery_save(cartslots->cartridge[slot].ram_ptr, 0x0400);
 				memset(cartslots->cartridge[slot].ram_ptr, 0, 0x0400);
 			}
 			else
@@ -2676,7 +2683,7 @@ static void unload_legacy(running_device *image)
 				UINT16 *ramcont = (UINT16 *)cartslots->cartridge[slot].ram_ptr;
 				for (i = 0; i < 0x0200; i++)
 					ramcont[i] = BIG_ENDIANIZE_INT16(ramcont[i]);
-				image_battery_save(image, ramcont, 0x0400);
+				image.battery_save(ramcont, 0x0400);
 				memset(ramcont, 0, 0x0400);
 			}
 			break;
@@ -2725,7 +2732,7 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_w_gk8 );
 static DEVICE_START(ti99_multicart)
 {
 	int i;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	cartslots->active_slot = 0;
 	cartslots->next_free_slot = 0;
@@ -2764,7 +2771,7 @@ static DEVICE_RESET(ti99_multicart)
 	// However, schematics do not reveal any pin for resetting a cartridge;
 	// the reset line is an input used when plugging in a cartridge.
 
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 	int slotnumber = input_port_read(device->machine, "CARTSLOT");
 	assert(slotnumber>=0 && slotnumber<=255);
 	cartslots->fixed_slot = slotnumber-1; /* auto = -1 */
@@ -2786,7 +2793,7 @@ static DEVICE_RESET(ti99_multicart)
 */
 READ16_DEVICE_HANDLER( ti99_multicart_r )
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) downcast<legacy_device_base *>(device)->token();
 	int slot = cartslots->active_slot;
 	cartridge_t *cart;
 
@@ -2827,7 +2834,7 @@ READ16_DEVICE_HANDLER( ti99_multicart_r )
 	if (!slot_is_empty(device, slot))
 	{
 		//      printf("accessing cartridge in slot %d\n", slot);
-		ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
+		ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(cart->pcb)->token();;
 		//      printf("address=%lx, offset=%lx\n", pcbdef, offset);
 		return (*pcbdef->read)(cart->pcb, offset, mem_mask);
 	}
@@ -2850,7 +2857,7 @@ READ16_DEVICE_HANDLER( ti99_multicart_r )
 */
 WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) downcast<legacy_device_base *>(device)->token();
 	int slot = cartslots->active_slot;
 	cartridge_t *cart;
 
@@ -2881,7 +2888,7 @@ WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 	{
 		if (!slot_is_empty(device, slot))
 		{
-			ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
+			ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(cart->pcb)->token();;
 			(*pcbdef->write)(cart->pcb, offset, data, mem_mask);
 		}
 	}
@@ -2895,7 +2902,7 @@ WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 */
 READ8_DEVICE_HANDLER( ti99_multicart_cru_r )
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cart;
 
 	int slot = cartslots->active_slot;
@@ -2920,7 +2927,7 @@ READ8_DEVICE_HANDLER( ti99_multicart_cru_r )
 
 	if (!slot_is_empty(device, slot))
 	{
-		ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
+		ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(cart->pcb)->token();;
 		if (pcbdef->cruread != NULL)
 			return (*pcbdef->cruread)(cart->pcb, offset);
 	}
@@ -2932,7 +2939,7 @@ READ8_DEVICE_HANDLER( ti99_multicart_cru_r )
 */
 WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w )
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cart;
 
 	int slot = cartslots->active_slot;
@@ -2957,7 +2964,7 @@ WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w )
 
 	if (!slot_is_empty(device, slot))
 	{
-		ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
+		ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(cart->pcb)->token();;
 		if (pcbdef->cruwrite != NULL)
 			(*pcbdef->cruwrite)(cart->pcb, offset, data);
 	}
@@ -2969,7 +2976,7 @@ WRITE8_DEVICE_HANDLER( ti99_multicart_cru_w )
 */
 READ8_DEVICE_HANDLER(ti99_multicart8_r)
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) downcast<legacy_device_base *>(device)->token();
 	int slot = cartslots->active_slot;
 	cartridge_t *cart;
 
@@ -2998,7 +3005,7 @@ READ8_DEVICE_HANDLER(ti99_multicart8_r)
 
 	if (!slot_is_empty(device, slot))
 	{
-		ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
+		ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(cart->pcb)->token();;
 		return (*pcbdef->read8)(cart->pcb, offset);
 	}
 	else
@@ -3009,7 +3016,7 @@ READ8_DEVICE_HANDLER(ti99_multicart8_r)
 
 WRITE8_DEVICE_HANDLER(ti99_multicart8_w)
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *) downcast<legacy_device_base *>(device)->token();
 	cartridge_t *cart;
 	int slot = cartslots->active_slot;
 
@@ -3039,7 +3046,7 @@ WRITE8_DEVICE_HANDLER(ti99_multicart8_w)
 	{
 		if (!slot_is_empty(device, slot))
 		{
-			ti99_pcb_t *pcbdef = (ti99_pcb_t *)cart->pcb->token;
+			ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(cart->pcb)->token();;
 			(*pcbdef->write8)(cart->pcb, offset, data);
 		}
 	}
@@ -3064,7 +3071,7 @@ static int cartridge_gram_kracker_readg(running_device *cartsys)
 	// gk_guest_slot is the slot where the cartridge is plugged in
 	UINT8 value;
 	cartridge_t *gkcartridge, *gkguestcart;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	// This is only called when there is really a GK module
 	gkcartridge = &cartslots->cartridge[cartslots->gk_slot];
@@ -3149,7 +3156,7 @@ static void cartridge_gram_kracker_writeg(running_device *cartsys, UINT8 data)
 	// gk_slot is the slot where the GK module is plugged in
 	// gk_guest_slot is the slot where the cartridge is plugged in
 	cartridge_t *gkcartridge;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)cartsys->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 
 	// This is only called when there is really a GK module
 	gkcartridge = &cartslots->cartridge[cartslots->gk_slot];
@@ -3184,7 +3191,7 @@ static READ16_DEVICE_HANDLER( ti99_cart_r_gk )
 	// gk_slot is the slot where the GK module is plugged in
 	// gk_guest_slot is the slot where the cartridge is plugged in
 	cartridge_t *gkcartridge, *gkguestcart;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	gkcartridge = &cartslots->cartridge[cartslots->gk_slot];
 
@@ -3197,7 +3204,7 @@ static READ16_DEVICE_HANDLER( ti99_cart_r_gk )
 			return 0;
 		}
 		//      printf("accessing cartridge in slot %d\n", slot);
-		ti99_pcb_t *pcbdef = (ti99_pcb_t *)gkguestcart->pcb->token;
+		ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(gkguestcart->pcb)->token();
 		//      printf("address=%lx, offset=%lx\n", pcbdef, offset);
 		return (*pcbdef->read)(gkguestcart->pcb, offset, mem_mask);
 	}
@@ -3236,7 +3243,7 @@ static WRITE16_DEVICE_HANDLER( ti99_cart_w_gk )
 	// gk_slot is the slot where the GK module is plugged in
 	// gk_guest_slot is the slot where the cartridge is plugged in
 	cartridge_t *gkcartridge, *gkguestcart;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	gkcartridge = &cartslots->cartridge[cartslots->gk_slot];
 
@@ -3249,7 +3256,7 @@ static WRITE16_DEVICE_HANDLER( ti99_cart_w_gk )
 			return;
 		}
 
-		ti99_pcb_t *pcbdef = (ti99_pcb_t *)gkguestcart->pcb->token;
+		ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(gkguestcart->pcb)->token();
 			(*pcbdef->write)(gkguestcart->pcb, offset, data, mem_mask);
 	}
 	else
@@ -3284,13 +3291,13 @@ static WRITE16_DEVICE_HANDLER( ti99_cart_w_gk )
 */
 static READ8_DEVICE_HANDLER( ti99_cart_crur_gk )
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *gkguestcart;
 
 	if (cartslots->gk_guest_slot != -1)
 	{
 		gkguestcart = &cartslots->cartridge[cartslots->gk_guest_slot];
-		ti99_pcb_t *pcbdef = (ti99_pcb_t *)gkguestcart->pcb->token;
+		ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(gkguestcart->pcb)->token();
 		if (pcbdef->cruread != NULL)
 			return (*pcbdef->cruread)(gkguestcart->pcb, offset);
 	}
@@ -3302,13 +3309,13 @@ static READ8_DEVICE_HANDLER( ti99_cart_crur_gk )
 */
 static WRITE8_DEVICE_HANDLER( ti99_cart_cruw_gk )
 {
-	ti99_multicart_state *cartslots = (ti99_multicart_state *) device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 	cartridge_t *gkguestcart;
 
 	if (cartslots->gk_guest_slot != -1)
 	{
 		gkguestcart = &cartslots->cartridge[cartslots->gk_guest_slot];
-		ti99_pcb_t *pcbdef = (ti99_pcb_t *)gkguestcart->pcb->token;
+		ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(gkguestcart->pcb)->token();
 		if (pcbdef->cruwrite != NULL)
 			(*pcbdef->cruwrite)(gkguestcart->pcb, offset, data);
 	}
@@ -3322,7 +3329,7 @@ static READ8_DEVICE_HANDLER( ti99_cart_r_gk8 )
 	// gk_slot is the slot where the GK module is plugged in
 	// gk_guest_slot is the slot where the cartridge is plugged in
 	cartridge_t *gkcartridge, *gkguestcart;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	gkcartridge = &cartslots->cartridge[cartslots->gk_slot];
 
@@ -3335,7 +3342,7 @@ static READ8_DEVICE_HANDLER( ti99_cart_r_gk8 )
 			return 0;
 		}
 		//      printf("accessing cartridge in slot %d\n", slot);
-		ti99_pcb_t *pcbdef = (ti99_pcb_t *)gkguestcart->pcb->token;
+		ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(gkguestcart->pcb)->token();
 		//      printf("address=%lx, offset=%lx\n", pcbdef, offset);
 		return (*pcbdef->read8)(gkguestcart->pcb, offset);
 	}
@@ -3367,7 +3374,7 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_w_gk8 )
 	// gk_slot is the slot where the GK module is plugged in
 	// gk_guest_slot is the slot where the cartridge is plugged in
 	cartridge_t *gkcartridge, *gkguestcart;
-	ti99_multicart_state *cartslots = (ti99_multicart_state *)device->token;
+	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(device)->token();
 
 	gkcartridge = &cartslots->cartridge[cartslots->gk_slot];
 
@@ -3380,7 +3387,7 @@ static WRITE8_DEVICE_HANDLER( ti99_cart_w_gk8 )
 			return;
 		}
 
-		ti99_pcb_t *pcbdef = (ti99_pcb_t *)gkguestcart->pcb->token;
+		ti99_pcb_t *pcbdef = (ti99_pcb_t *)downcast<legacy_device_base *>(gkguestcart->pcb)->token();
 			(*pcbdef->write8)(gkguestcart->pcb, offset, data);
 	}
 	else
@@ -3435,3 +3442,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FAMILY              "Multi-cartridge system"
 #include "devtempl.h"
 
+DEFINE_LEGACY_DEVICE(TI99_MULTICART, ti99_multicart);

@@ -30,7 +30,7 @@ UINT32 this_game_crc = 0;
 static void build_crc_table(running_machine *machine)
 {
 	int	listIdx;
-	running_device *img;
+	device_image_interface *image = NULL;
 	static UINT32 *tmp_list = NULL;
 
 	free(device_crc_list);
@@ -40,38 +40,35 @@ static void build_crc_table(running_machine *machine)
 	memset(device_crc_list,0,sizeof(UINT32));
 	device_crc_list_length = 1;
 
-	for (img = machine->devicelist.first(); img != NULL; img = img->next)
+	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
 	{
-		if (is_image_device(img))
+		if (image->exists())
 		{
-			if (image_exists(img))
+			UINT32	crc = image->crc();
+			int		isUnique = 1;
+
+			for(listIdx = 0; listIdx < device_crc_list_length; listIdx++)
 			{
-				UINT32	crc = image_crc(img);
-				int		isUnique = 1;
-
-				for(listIdx = 0; listIdx < device_crc_list_length; listIdx++)
+				if(device_crc_list[listIdx] == crc)
 				{
-					if(device_crc_list[listIdx] == crc)
-					{
-						isUnique = 0;
+					isUnique = 0;
 
-						break;
-					}
+					break;
 				}
+			}
 
-				if(isUnique)
-				{
-					if(!this_game_crc)
-						this_game_crc = crc;
+			if(isUnique)
+			{
+				if(!this_game_crc)
+					this_game_crc = crc;
 
-					tmp_list = (UINT32*)malloc((device_crc_list_length + 1) * sizeof(UINT32));
-					memcpy(tmp_list,device_crc_list,device_crc_list_length * sizeof(UINT32));
-					if (device_crc_list) free(device_crc_list);
-					device_crc_list = tmp_list;
+				tmp_list = (UINT32*)malloc((device_crc_list_length + 1) * sizeof(UINT32));
+				memcpy(tmp_list,device_crc_list,device_crc_list_length * sizeof(UINT32));
+				if (device_crc_list) free(device_crc_list);
+				device_crc_list = tmp_list;
 
-					device_crc_list[device_crc_list_length] = crc;
-					device_crc_list_length++;
-				}
+				device_crc_list[device_crc_list_length] = crc;
+				device_crc_list_length++;
 			}
 		}
 	}

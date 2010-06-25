@@ -340,7 +340,7 @@ DEVICE_IMAGE_LOAD( laser_cart )
 {
 	int size = 0;
 
-	size = image_fread(image, &mem[0x30000], 0x10000);
+	size = image.fread(&mem[0x30000], 0x10000);
 	laser_bank_mask &= ~0xf000;
 	if( size > 0 )
 		laser_bank_mask |= 0x1000;
@@ -374,10 +374,11 @@ static void laser_get_track(running_machine *machine)
     if( laser_drive >= 0 && laser_file(machine) != NULL )
     {
         int size, offs;
+		device_image_interface *image = (device_image_interface*)laser_file(machine);
         size = TRKSIZE_VZ;
         offs = TRKSIZE_VZ * laser_track_x2[laser_drive]/2;
-        image_fseek(laser_file(machine), offs, SEEK_SET);
-        size = image_fread(laser_file(machine), laser_fdc_data, size);
+        image->fseek(offs, SEEK_SET);
+        size = image->fread(laser_fdc_data, size);
         logerror("get track @$%05x $%04x bytes\n", offs, size);
     }
     laser_fdc_offs = 0;
@@ -386,13 +387,14 @@ static void laser_get_track(running_machine *machine)
 
 static void laser_put_track(running_machine *machine)
 {
+	device_image_interface *image = (device_image_interface*)laser_file(machine);
     /* drive selected and image file ok? */
     if( laser_drive >= 0 && laser_file(machine) != NULL )
     {
         int size, offs;
         offs = TRKSIZE_VZ * laser_track_x2[laser_drive]/2;
-        image_fseek(laser_file(machine), offs + laser_fdc_start, SEEK_SET);
-        size = image_fwrite(laser_file(machine), &laser_fdc_data[laser_fdc_start], laser_fdc_write);
+        image->fseek(offs + laser_fdc_start, SEEK_SET);
+        size = image->fwrite(&laser_fdc_data[laser_fdc_start], laser_fdc_write);
         logerror("put track @$%05X+$%X $%04X/$%04X bytes\n", offs, laser_fdc_start, size, laser_fdc_write);
     }
 }

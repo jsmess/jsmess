@@ -18,7 +18,7 @@
     MACROS
 ***************************************************************************/
 
-#define SCSIBUS		DEVICE_GET_INFO_NAME(scsibus)
+DECLARE_LEGACY_DEVICE(SCSIBUS, scsibus);
 
 #define MDRV_SCSIBUS_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, SCSIBUS, 0) \
@@ -99,10 +99,5 @@ int get_scsi_cmd_len(int cbyte);
 
 /* Initialisation at machine reset time */
 void init_scsibus(running_device *device);
-
-/* ----- device interface ----- */
-
-#define SCSIBUS DEVICE_GET_INFO_NAME(scsibus)
-DEVICE_GET_INFO( scsibus );
 
 #endif

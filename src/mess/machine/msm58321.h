@@ -27,7 +27,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define MSM58321RS		DEVICE_GET_INFO_NAME(msm58321rs)
+DECLARE_LEGACY_DEVICE(MSM58321RS, msm58321rs);
 
 #define MDRV_MSM58321RS_ADD(_tag, _clock, _intrf) \
 	MDRV_DEVICE_ADD(_tag, MSM58321RS, _clock) \
@@ -49,10 +49,6 @@ struct _msm58321_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( msm58321rs );
-
 /* register access */
 READ8_DEVICE_HANDLER( msm58321_r );
 WRITE8_DEVICE_HANDLER( msm58321_w );

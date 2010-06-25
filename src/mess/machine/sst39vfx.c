@@ -39,13 +39,13 @@ enum
 INLINE sst39vfx_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	return (sst39vfx_t *) device->token;
+	return (sst39vfx_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const sst39vfx_config *get_config(running_device *device)
 {
 	assert(device != NULL);
-	return (const sst39vfx_config *) device->baseconfig().inline_config;
+	return (const sst39vfx_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 
@@ -186,7 +186,6 @@ DEVICE_GET_INFO( sst39vf020 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(sst39vfx_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(sst39vfx_config);			break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(sst39vf020);	break;
@@ -215,3 +214,6 @@ DEVICE_GET_INFO( sst39vf400a )
 		default:										DEVICE_GET_INFO_CALL(sst39vf020);				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(SST39VF020, sst39vf020);
+DEFINE_LEGACY_DEVICE(SST39VF400A, sst39vf400a);

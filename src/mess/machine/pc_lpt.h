@@ -24,9 +24,6 @@ struct _pc_lpt_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO( pc_lpt );
-
 READ8_DEVICE_HANDLER( pc_lpt_r );
 WRITE8_DEVICE_HANDLER( pc_lpt_w );
 
@@ -41,7 +38,7 @@ WRITE8_DEVICE_HANDLER( pc_lpt_control_w );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define PC_LPT DEVICE_GET_INFO_NAME(pc_lpt)
+DECLARE_LEGACY_DEVICE(PC_LPT, pc_lpt);
 
 #define MDRV_PC_LPT_ADD(_tag, _intf) \
 	MDRV_DEVICE_ADD(_tag, PC_LPT, 0) \

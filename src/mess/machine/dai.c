@@ -48,7 +48,7 @@ static void dai_update_memory(running_machine *machine, int dai_rom_bank)
 
 static TIMER_CALLBACK(dai_bootstrap_callback)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, 0xc000);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, 0xc000);
 }
 
 static UINT8 dai_keyboard_scan_mask = 0;

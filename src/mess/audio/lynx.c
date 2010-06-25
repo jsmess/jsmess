@@ -401,3 +401,6 @@ DEVICE_GET_INFO( lynx2_sound )
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(LYNX, lynx_sound);
+DEFINE_LEGACY_SOUND_DEVICE(LYNX2, lynx2_sound);

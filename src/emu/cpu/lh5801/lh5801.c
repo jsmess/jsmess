@@ -50,7 +50,7 @@ typedef struct _lh5810_state lh5801_state;
 struct _lh5810_state
 {
 	const lh5801_cpu_core *config;
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 
 	PAIR s, p, u, x, y;
@@ -71,10 +71,9 @@ struct _lh5810_state
 INLINE lh5801_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_LH5801);
-	return (lh5801_state *)device->token;
+	return (lh5801_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define P cpustate->p.w.l
@@ -105,7 +104,7 @@ static CPU_INIT( lh5801 )
 	lh5801_state *cpustate = get_safe_token(device);
 
 	memset(cpustate, 0, sizeof(*cpustate));
-	cpustate->config = (const lh5801_cpu_core *) device->baseconfig().static_config;
+	cpustate->config = (const lh5801_cpu_core *) device->baseconfig().static_config();
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 }
@@ -123,8 +122,6 @@ static CPU_EXECUTE( lh5801 )
 {
 	lh5801_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	if (cpustate->idle) {
 		cpustate->icount=0;
 	} else {
@@ -137,8 +134,6 @@ static CPU_EXECUTE( lh5801 )
 
 		} while (cpustate->icount > 0);
 	}
-
-	return cycles - cpustate->icount;
 }
 
 static void set_irq_line(lh5801_state *cpustate, int irqline, int state)
@@ -184,7 +179,7 @@ static CPU_SET_INFO( lh5801 )
 
 CPU_GET_INFO( lh5801 )
 {
-	lh5801_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	lh5801_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

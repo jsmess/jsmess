@@ -105,7 +105,6 @@ DEVICE_GET_INFO(apple2_langcard)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = 1;								break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(apple2_langcard);	break;
@@ -119,3 +118,5 @@ DEVICE_GET_INFO(apple2_langcard)
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);							break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(APPLE2_LANGCARD, apple2_langcard);

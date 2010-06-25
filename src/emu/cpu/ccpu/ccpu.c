@@ -43,7 +43,7 @@ struct _ccpu_state
 
 	int					icount;
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 	const address_space *io;
@@ -53,10 +53,9 @@ struct _ccpu_state
 INLINE ccpu_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_CCPU);
-	return (ccpu_state *)device->token;
+	return (ccpu_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -125,7 +124,7 @@ void ccpu_wdt_timer_trigger(running_device *device)
 
 static CPU_INIT( ccpu )
 {
-	const ccpu_config *configdata = (const ccpu_config *)device->baseconfig().static_config;
+	const ccpu_config *configdata = (const ccpu_config *)device->baseconfig().static_config();
 	ccpu_state *cpustate = get_safe_token(device);
 
 	/* copy input params */
@@ -197,9 +196,10 @@ static CPU_EXECUTE( ccpu )
 	ccpu_state *cpustate = get_safe_token(device);
 
 	if (cpustate->waiting)
-		return cycles;
-
-	cpustate->icount = cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
 	do
 	{
@@ -684,8 +684,6 @@ static CPU_EXECUTE( ccpu )
 				break;
 		}
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -731,7 +729,7 @@ static CPU_SET_INFO( ccpu )
 
 CPU_GET_INFO( ccpu )
 {
-	ccpu_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	ccpu_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

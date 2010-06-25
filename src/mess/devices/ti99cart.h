@@ -9,7 +9,7 @@
 #ifndef __TI99CART_H__
 #define __TI99CART_H__
 
-#define TI99_MULTICART	DEVICE_GET_INFO_NAME(ti99_multicart)
+DECLARE_LEGACY_DEVICE(TI99_MULTICART, ti99_multicart);
 
 /* We set the number of slots to 8, although we may have up to 16. From a
    logical point of view we could have 256, but the operating system only checks
@@ -18,8 +18,6 @@
 
 READ8_DEVICE_HANDLER(ti99_cartridge_grom_r);
 WRITE8_DEVICE_HANDLER(ti99_cartridge_grom_w);
-
-DEVICE_GET_INFO(ti99_multicart);
 
 READ16_DEVICE_HANDLER(ti99_multicart_r);
 WRITE16_DEVICE_HANDLER(ti99_multicart_w);

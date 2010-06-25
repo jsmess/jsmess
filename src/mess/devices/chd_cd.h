@@ -11,14 +11,12 @@
 
 #include "cdrom.h"
 
-#define CDROM DEVICE_GET_INFO_NAME(cdrom)
+DECLARE_LEGACY_IMAGE_DEVICE(CDROM, cdrom);
 
 
 #define MDRV_CDROM_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, CDROM, 0) \
 
-
-DEVICE_GET_INFO(cdrom);
 
 
 cdrom_file *mess_cd_get_cdrom_file(running_device *device);

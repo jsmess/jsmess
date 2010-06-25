@@ -66,16 +66,15 @@ struct _c9060_t
 INLINE c9060_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == C9060) || (device->type == C9090));
-	return (c9060_t *)device->token;
+	assert((device->type() == C9060) || (device->type() == C9090));
+	return (c9060_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE c9060_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == C9060) || (device->type == C9090));
-	return (c9060_config *)device->baseconfig().inline_config;
+	assert((device->type() == C9060) || (device->type() == C9090));
+	return (c9060_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 INLINE void update_ieee_signals(running_device *device)
@@ -176,7 +175,7 @@ static READ8_DEVICE_HANDLER( dio_r )
 
     */
 
-	c9060_t *c9060 = get_safe_token(device->owner);
+	c9060_t *c9060 = get_safe_token(device->owner());
 
 	return ieee488_dio_r(c9060->bus, 0);
 }
@@ -198,9 +197,9 @@ static WRITE8_DEVICE_HANDLER( dio_w )
 
     */
 
-	c9060_t *c9060 = get_safe_token(device->owner);
+	c9060_t *c9060 = get_safe_token(device->owner());
 
-	ieee488_dio_w(c9060->bus, device->owner, data);
+	ieee488_dio_w(c9060->bus, device->owner(), data);
 }
 
 static const riot6532_interface riot0_intf =
@@ -233,7 +232,7 @@ static READ8_DEVICE_HANDLER( riot1_pa_r )
 
     */
 
-	c9060_t *c9060 = get_safe_token(device->owner);
+	c9060_t *c9060 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
@@ -266,7 +265,7 @@ static WRITE8_DEVICE_HANDLER( riot1_pa_w )
 
     */
 
-	c9060_t *c9060 = get_safe_token(device->owner);
+	c9060_t *c9060 = get_safe_token(device->owner());
 
 	/* attention acknowledge */
 	c9060->atna = BIT(data, 0);
@@ -278,12 +277,12 @@ static WRITE8_DEVICE_HANDLER( riot1_pa_w )
 	c9060->rfdo = BIT(data, 2);
 
 	/* end or identify out */
-	ieee488_eoi_w(c9060->bus, device->owner, BIT(data, 3));
+	ieee488_eoi_w(c9060->bus, device->owner(), BIT(data, 3));
 
 	/* data valid out */
-	ieee488_dav_w(c9060->bus, device->owner, BIT(data, 4));
+	ieee488_dav_w(c9060->bus, device->owner(), BIT(data, 4));
 
-	update_ieee_signals(device->owner);
+	update_ieee_signals(device->owner());
 }
 
 static READ8_DEVICE_HANDLER( riot1_pb_r )
@@ -303,7 +302,7 @@ static READ8_DEVICE_HANDLER( riot1_pb_r )
 
     */
 
-	c9060_t *c9060 = get_safe_token(device->owner);
+	c9060_t *c9060 = get_safe_token(device->owner());
 
 	UINT8 data = 0;
 
@@ -336,7 +335,7 @@ static WRITE8_DEVICE_HANDLER( riot1_pb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( riot1_irq_w )
 {
-	c9060_t *c9060 = get_safe_token(device->owner);
+	c9060_t *c9060 = get_safe_token(device->owner());
 
 	cpu_set_input_line(c9060->cpu_dos, M6502_IRQ_LINE, state);
 }
@@ -550,7 +549,6 @@ DEVICE_GET_INFO( c9060 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(c9060_t);									break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(c9060_config);								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(c9060);							break;
@@ -587,3 +585,6 @@ DEVICE_GET_INFO( c9090 )
 		default:										DEVICE_GET_INFO_CALL(c9060);								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(C9060, c9060);
+DEFINE_LEGACY_DEVICE(C9090, c9090);

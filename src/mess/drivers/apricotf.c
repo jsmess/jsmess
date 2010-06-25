@@ -54,7 +54,8 @@ static VIDEO_UPDATE( act_f1 )
 
 					color = pen[0]|pen[1]<<1;
 
-					if((x+i)<=video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+					const rectangle &visarea = screen->visible_area();
+					if((x+i)<=visarea.max_x && ((y)+0)<visarea.max_y)
 						*BITMAP_ADDR16(bitmap, y, x+i) = screen->machine->pens[color];
 				}
 
@@ -255,7 +256,7 @@ static const z80sio_interface sio_intf =
 #endif
 
 #if 0
-static const z80_daisy_chain x1_daisy[] =
+static const z80_daisy_config x1_daisy[] =
 {
 	{ "ctc" },
 	{ NULL }

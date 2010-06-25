@@ -71,16 +71,15 @@ struct _upd1990a_t
 INLINE upd1990a_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == UPD1990A);
-	return (upd1990a_t *)device->token;
+	assert(device->type() == UPD1990A);
+	return (upd1990a_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const upd1990a_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == UPD1990A));
-	return (const upd1990a_interface *) device->baseconfig().static_config;
+	assert((device->type() == UPD1990A));
+	return (const upd1990a_interface *) device->baseconfig().static_config();
 }
 
 INLINE UINT8 convert_to_bcd(int val)
@@ -544,7 +543,6 @@ DEVICE_GET_INFO( upd1990a )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(upd1990a_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd1990a);	break;
@@ -559,3 +557,5 @@ DEVICE_GET_INFO( upd1990a )
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(UPD1990A, upd1990a);

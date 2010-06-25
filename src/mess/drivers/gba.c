@@ -49,7 +49,8 @@ static void gba_machine_stop(running_machine *machine)
 	// only do this if the cart loader detected some form of backup
 	if (state->nvsize > 0)
 	{
-		image_battery_save(state->nvimage, state->nvptr, state->nvsize);
+		device_image_interface *image = (device_image_interface*)state->nvimage;
+		image->battery_save(state->nvptr, state->nvsize);
 	}
 }
 
@@ -516,7 +517,7 @@ static READ32_HANDLER( gba_io_r )
 			}
 			break;
 		case 0x0004/4:
-			retval = (state->DISPSTAT & 0xffff) | (video_screen_get_vpos(machine->primary_screen)<<16);
+			retval = (state->DISPSTAT & 0xffff) | (machine->primary_screen->vpos()<<16);
 			break;
 		case 0x0008/4:
 			if( (mem_mask) & 0x0000ffff )
@@ -1761,7 +1762,7 @@ static WRITE32_HANDLER( gba_io_w )
 		case 0x0200/4:
 			if( (mem_mask) & 0x0000ffff )
 			{
-//              printf("IE (%08x) = %04x raw %x (%08x) (scan %d PC %x)\n", 0x04000000 + ( offset << 2 ), data & mem_mask, data, ~mem_mask, video_screen_get_vpos(machine->primary_screen), cpu_get_pc(space->cpu));
+//              printf("IE (%08x) = %04x raw %x (%08x) (scan %d PC %x)\n", 0x04000000 + ( offset << 2 ), data & mem_mask, data, ~mem_mask, machine->primary_screen->vpos(), cpu_get_pc(space->cpu));
 				state->IE = ( state->IE & ~mem_mask ) | ( data & mem_mask );
 #if 0
 				if (state->IE & state->IF)
@@ -1918,7 +1919,7 @@ static TIMER_CALLBACK( perform_hbl )
 {
 	int ch, ctrl;
 	gba_state *state = (gba_state *)machine->driver_data;
-	int scanline = video_screen_get_vpos(machine->primary_screen);
+	int scanline = machine->primary_screen->vpos();
 
 	// draw only visible scanlines
 	if (scanline < 160)
@@ -1953,7 +1954,7 @@ static TIMER_CALLBACK( perform_scan )
 	// clear hblank and raster IRQ flags
 	state->DISPSTAT &= ~(DISPSTAT_HBL|DISPSTAT_VCNT);
 
-	scanline = video_screen_get_vpos(machine->primary_screen);
+	scanline = machine->primary_screen->vpos();
 
 	// VBL is set for scanlines 160 through 226 (but not 227, which is the last line)
 	if (scanline >= 160 && scanline < 227)
@@ -1997,8 +1998,8 @@ static TIMER_CALLBACK( perform_scan )
 		}
 	}
 
-	timer_adjust_oneshot(state->hbl_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 240), 0);
-	timer_adjust_oneshot(state->scan_timer, video_screen_get_time_until_pos(machine->primary_screen, ( scanline + 1 ) % 228, 0), 0);
+	timer_adjust_oneshot(state->hbl_timer, machine->primary_screen->time_until_pos(scanline, 240), 0);
+	timer_adjust_oneshot(state->scan_timer, machine->primary_screen->time_until_pos(( scanline + 1 ) % 228, 0), 0);
 }
 
 static MACHINE_RESET( gba )
@@ -2029,7 +2030,7 @@ static MACHINE_RESET( gba )
 	state->windowOn = 0;
 	state->fxOn = 0;
 
-	timer_adjust_oneshot(state->scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(state->scan_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 	timer_adjust_oneshot(state->hbl_timer, attotime_never, 0);
 	timer_adjust_oneshot(state->dma_timer[0], attotime_never, 0);
 	timer_adjust_oneshot(state->dma_timer[1], attotime_never, 1);
@@ -2056,7 +2057,7 @@ static MACHINE_START( gba )
 	/* create a timer to fire scanline functions */
 	state->scan_timer = timer_alloc(machine, perform_scan, 0);
 	state->hbl_timer = timer_alloc(machine, perform_hbl, 0);
-	timer_adjust_oneshot(state->scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(state->scan_timer, machine->primary_screen->time_until_pos(0, 0), 0);
 
 	/* and one for each DMA channel */
 	state->dma_timer[0] = timer_alloc(machine, dma_complete, 0);
@@ -2293,24 +2294,24 @@ static WRITE32_HANDLER( eeprom_w )
 
 static DEVICE_IMAGE_LOAD( gba_cart )
 {
-	UINT8 *ROM = memory_region(image->machine, "cartridge");
+	UINT8 *ROM = memory_region(image.device().machine, "cartridge");
 	int i;
 	UINT32 cart_size;
-	gba_state *state = (gba_state *)image->machine->driver_data;
+	gba_state *state = (gba_state *)image.device().machine->driver_data;
 
 	state->nvsize = 0;
 	state->flash_size = 0;
 	state->nvptr = (UINT8 *)NULL;
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		cart_size = image_length(image);
-		image_fread(image, ROM, cart_size);
+		cart_size = image.length();
+		image.fread( ROM, cart_size);
 	}
 	else
 	{
-		cart_size = image_get_software_region_length(image, "rom");
-		memcpy(ROM, image_get_software_region(image, "rom"), cart_size);
+		cart_size = image.get_software_region_length("rom");
+		memcpy(ROM, image.get_software_region("rom"), cart_size);
 	}
 
 	for (i = 0; i < cart_size; i++)
@@ -2322,13 +2323,13 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 
 			if (cart_size <= (16 * 1024 * 1024))
 			{
-				memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
-				memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
+				memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
+				memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
 			}
 			else
 			{
-				memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
-				memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
+				memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
+				memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
 			}
 			break;
 		}
@@ -2337,8 +2338,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			state->nvptr = (UINT8 *)&state->gba_sram;
 			state->nvsize = 0x10000;
 
-			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
-			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
+			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
+			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "FLASH1M_", 8))
@@ -2348,8 +2349,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			state->flash_size = 0x20000;
 			state->flash_mask = 0x1ffff/4;
 
-			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_r);
-			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
+			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_r);
+			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "FLASH", 5))
@@ -2359,8 +2360,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			state->flash_size = 0x10000;
 			state->flash_mask = 0xffff/4;
 
-			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_r);
-			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image->machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_w);
+			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_r);
+			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
@@ -2373,7 +2374,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	// if save media was found, reload it
 	if (state->nvsize > 0)
 	{
-		image_battery_load(image, state->nvptr, state->nvsize, 0x00);
+		image.battery_load(state->nvptr, state->nvsize, 0x00);
 		state->nvimage = image;
 	}
 	else
@@ -2387,11 +2388,11 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 	{
 		if (state->flash_size == 0x10000)
 		{
-			intelflash_init(image->machine, 0, FLASH_PANASONIC_MN63F805MNP, &state->gba_flash);
+			intelflash_init(image.device().machine, 0, FLASH_PANASONIC_MN63F805MNP, &state->gba_flash);
 		}
 		else
 		{
-			intelflash_init(image->machine, 0, FLASH_SANYO_LE26FV10N1TS, &state->gba_flash);
+			intelflash_init(image.device().machine, 0, FLASH_SANYO_LE26FV10N1TS, &state->gba_flash);
 		}
 	}
 

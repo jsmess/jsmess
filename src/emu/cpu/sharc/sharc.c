@@ -124,8 +124,8 @@ struct _SHARC_REGS
 	UINT16 *internal_ram;
 	UINT16 *internal_ram_block0, *internal_ram_block1;
 
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *data;
 	void (*opcode_handler)(SHARC_REGS *cpustate);
@@ -187,10 +187,9 @@ static void (* sharc_op[512])(SHARC_REGS *cpustate);
 INLINE SHARC_REGS *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ADSP21062);
-	return (SHARC_REGS *)device->token;
+	return (SHARC_REGS *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 INLINE void CHANGE_PC(SHARC_REGS *cpustate, UINT32 newpc)
@@ -420,7 +419,7 @@ void sharc_external_dma_write(running_device *device, UINT32 address, UINT64 dat
 static CPU_INIT( sharc )
 {
 	SHARC_REGS *cpustate = get_safe_token(device);
-	const sharc_config *cfg = (const sharc_config *)device->baseconfig().static_config;
+	const sharc_config *cfg = (const sharc_config *)device->baseconfig().static_config();
 	int saveindex;
 
 	cpustate->boot_mode = cfg->boot_mode;
@@ -671,14 +670,13 @@ static void check_interrupts(SHARC_REGS *cpustate)
 static CPU_EXECUTE( sharc )
 {
 	SHARC_REGS *cpustate = get_safe_token(device);
-	cpustate->icount = cycles;
 
 	if (cpustate->idle && cpustate->irq_active == 0)
 	{
 		// handle pending DMA transfers
 		if (cpustate->dmaop_cycles > 0)
 		{
-			cpustate->dmaop_cycles -= cycles;
+			cpustate->dmaop_cycles -= cpustate->icount;
 			if (cpustate->dmaop_cycles <= 0)
 			{
 				cpustate->dmaop_cycles = 0;
@@ -692,8 +690,6 @@ static CPU_EXECUTE( sharc )
 
 		cpustate->icount = 0;
 		debugger_instruction_hook(device, cpustate->daddr);
-
-		return cycles;
 	}
 	if (cpustate->irq_active != 0)
 	{
@@ -839,8 +835,6 @@ static CPU_EXECUTE( sharc )
 
 		--cpustate->icount;
 	};
-
-	return cycles - cpustate->icount;
 }
 
 /**************************************************************************
@@ -1059,7 +1053,7 @@ ADDRESS_MAP_END
 
 static CPU_GET_INFO( sharc )
 {
-	SHARC_REGS *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	SHARC_REGS *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

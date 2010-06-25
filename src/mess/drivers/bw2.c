@@ -779,11 +779,11 @@ static const wd17xx_interface bw2_wd17xx_interface =
 
 static DEVICE_IMAGE_LOAD( bw2_serial )
 {
-	bw2_state *state = (bw2_state *) image->machine->driver_data;
+	bw2_state *state = (bw2_state *) image.device().machine->driver_data;
 
 	if (device_load_serial(image) == INIT_PASS)
 	{
-		serial_device_setup(image, 9600 >> input_port_read(image->machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
+		serial_device_setup(image, 9600 >> input_port_read(image.device().machine, "BAUD"), 8, 1, SERIAL_PARITY_NONE);
 
 		msm8251_connect_to_serial_device(state->msm8251, image);
 
@@ -796,7 +796,7 @@ static DEVICE_IMAGE_LOAD( bw2_serial )
 }
 
 
-static DEVICE_GET_INFO( bw2_serial )
+DEVICE_GET_INFO( bw2_serial )
 {
 	switch ( state )
 	{
@@ -810,7 +810,8 @@ static DEVICE_GET_INFO( bw2_serial )
 	}
 }
 
-#define BW2_SERIAL	DEVICE_GET_INFO_NAME(bw2_serial)
+DECLARE_LEGACY_IMAGE_DEVICE(BW2_SERIAL, bw2_serial);
+DEFINE_LEGACY_IMAGE_DEVICE(BW2_SERIAL, bw2_serial);
 
 #define MDRV_BW2_SERIAL_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, BW2_SERIAL, 0)

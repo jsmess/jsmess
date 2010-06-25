@@ -86,8 +86,8 @@ typedef struct
 	uint line_nmi;	/* Status of the NMI line */
 	uint line_rst;	/* Status of the RESET line */
 	uint ir;		/* Instruction Register */
-	cpu_irq_callback int_ack;
-	running_device *device;
+	device_irq_callback int_ack;
+	legacy_cpu_device *device;
 	const address_space *program;
 	uint stopped;	/* stopped status */
 	int ICount;
@@ -101,10 +101,9 @@ typedef struct
 INLINE spc700i_cpu *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_SPC700);
-	return (spc700i_cpu *)device->token;
+	return (spc700i_cpu *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* ======================================================================== */
@@ -1247,7 +1246,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 /* ================================= API ================================== */
 /* ======================================================================== */
 
-static void state_register( running_device *device )
+static void state_register( legacy_cpu_device *device )
 {
 	spc700i_cpu *cpustate = get_safe_token(device);
 
@@ -1354,7 +1353,11 @@ static CPU_EXECUTE( spc700 )
 {
 	spc700i_cpu *cpustate = get_safe_token(device);
 
-	CLOCKS = CPU_STOPPED ? 0 : cycles;
+	if (CPU_STOPPED)
+	{
+		CLOCKS = 0;
+		return;
+	}
 	while(CLOCKS > 0)
 	{
 		REG_PPC = REG_PC;
@@ -1621,7 +1624,6 @@ static CPU_EXECUTE( spc700 )
 			case 0xff: OP_STOP  ( 3               ); break; /* STOP          */
 		}
 	}
-	return cycles - CLOCKS;
 }
 
 
@@ -1658,7 +1660,7 @@ static CPU_SET_INFO( spc700 )
 
 CPU_GET_INFO( spc700 )
 {
-	spc700i_cpu *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	spc700i_cpu *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	uint p = 0;
 
 	if (cpustate != NULL)

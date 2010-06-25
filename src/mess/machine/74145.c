@@ -95,10 +95,9 @@ const ttl74145_interface default_ttl74145 =
 INLINE ttl74145_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == TTL74145);
+	assert(device->type() == TTL74145);
 
-	return (ttl74145_t *)device->token;
+	return (ttl74145_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -143,11 +142,11 @@ READ16_DEVICE_HANDLER( ttl74145_r )
 
 static DEVICE_START( ttl74145 )
 {
-	const ttl74145_interface *intf = (const ttl74145_interface *)device->baseconfig().static_config;
+	const ttl74145_interface *intf = (const ttl74145_interface *)device->baseconfig().static_config();
 	ttl74145_t *ttl74145 = get_safe_token(device);
 
 	/* validate arguments */
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
 	/* initialize with 0 */
 	ttl74145->number = 0;
@@ -183,7 +182,6 @@ DEVICE_GET_INFO( ttl74145 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(ttl74145_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;								break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(ttl74145);	break;
@@ -198,3 +196,5 @@ DEVICE_GET_INFO( ttl74145 )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(TTL74145, ttl74145);

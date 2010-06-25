@@ -49,7 +49,7 @@ extern WRITE8_HANDLER(ncr5380_w);
 // device stuff
 
 #if NCR5380_DEVICE_CONVERSION
-#define NCR5380	DEVICE_GET_INFO_NAME(ncr5380)
+DECLARE_LEGACY_DEVICE(NCR5380, ncr5380);
 #endif
 
 #endif

@@ -16,8 +16,7 @@
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-#define BITBANGER	DEVICE_GET_INFO_NAME(bitbanger)
+DECLARE_LEGACY_IMAGE_DEVICE(BITBANGER, bitbanger);
 
 #define MDRV_BITBANGER_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, BITBANGER, 0) \
@@ -49,9 +48,6 @@ struct _bitbanger_config
 
 /* outputs data to a bitbanger port */
 void bitbanger_output(running_device *device, int value);
-
-/* device getinfo function */
-DEVICE_GET_INFO(bitbanger);
 
 
 #endif /* __BITBNGR_H__ */

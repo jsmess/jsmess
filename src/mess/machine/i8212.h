@@ -31,7 +31,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define I8212		DEVICE_GET_INFO_NAME(i8212)
+DECLARE_LEGACY_DEVICE(I8212, i8212);
 
 #define MDRV_I8212_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, I8212, 0) \
@@ -62,10 +62,6 @@ struct _i8212_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( i8212 );
-
 /* data latch access */
 READ8_DEVICE_HANDLER( i8212_r );
 WRITE8_DEVICE_HANDLER( i8212_w );

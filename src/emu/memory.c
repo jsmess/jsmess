@@ -380,8 +380,6 @@ static const data_accessors memory_accessors[4][2] =
 	{ ACCESSOR_GROUP(64le), ACCESSOR_GROUP(64be) }
 };
 
-const char *const address_space_names[ADDRESS_SPACES] = { "program", "data", "I/O" };
-
 
 
 /***************************************************************************
@@ -837,19 +835,23 @@ address_map *address_map_alloc(const device_config *devconfig, const game_driver
 {
 	address_map *map = global_alloc_clear(address_map);
 
+	const device_config_memory_interface *memintf;
+	if (!devconfig->interface(memintf))
+		throw emu_fatalerror("No memory interface defined for device '%s'\n", devconfig->tag());
+
+	const address_space_config *spaceconfig = memintf->space_config(spacenum);
+
 	/* append the internal device map (first so it takes priority) */
-	const addrmap_token *internal_map = devconfig->internal_map(spacenum);
-	if (internal_map != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, devconfig, internal_map);
+	if (spaceconfig != NULL && spaceconfig->m_internal_map != NULL)
+		map_detokenize((memory_private *)memdata, map, driver, devconfig, spaceconfig->m_internal_map);
 
 	/* construct the standard map */
-	if (devconfig->address_map[spacenum] != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, devconfig, devconfig->address_map[spacenum]);
+	if (memintf->address_map(spacenum) != NULL)
+		map_detokenize((memory_private *)memdata, map, driver, devconfig, memintf->address_map(spacenum));
 
 	/* append the default device map (last so it can be overridden) */
-	const addrmap_token *default_map = devconfig->default_map(spacenum);
-	if (default_map != NULL)
-		map_detokenize((memory_private *)memdata, map, driver, devconfig, default_map);
+	if (spaceconfig != NULL && spaceconfig->m_default_map != NULL)
+		map_detokenize((memory_private *)memdata, map, driver, devconfig, spaceconfig->m_default_map);
 
 	return map;
 }
@@ -1204,6 +1206,7 @@ void memory_set_bankptr(running_machine *machine, const char *tag, void *base)
     if present
 -------------------------------------------------*/
 
+#ifdef UNUSED_CODE
 void *_memory_install_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler)
 {
 	address_space *spacerw = (address_space *)space;
@@ -1218,6 +1221,7 @@ void *_memory_install_handler(const address_space *space, offs_t addrstart, offs
 	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, addrstart, addrend);
 }
+#endif
 
 
 /*-------------------------------------------------
@@ -1309,7 +1313,7 @@ UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, 
     but explicitly for 8-bit handlers
 -------------------------------------------------*/
 
-UINT8 *_memory_install_device_handler8(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rhandler_name, write8_device_func whandler, const char *whandler_name, int handlerunitmask)
+UINT8 *_memory_install_device_handler8(const address_space *space, device_t *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rhandler_name, write8_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
@@ -1330,7 +1334,7 @@ UINT8 *_memory_install_device_handler8(const address_space *space, running_devic
     above but explicitly for 16-bit handlers
 -------------------------------------------------*/
 
-UINT16 *_memory_install_device_handler16(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rhandler_name, write16_device_func whandler, const char *whandler_name, int handlerunitmask)
+UINT16 *_memory_install_device_handler16(const address_space *space, device_t *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, const char *rhandler_name, write16_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
@@ -1351,7 +1355,7 @@ UINT16 *_memory_install_device_handler16(const address_space *space, running_dev
     above but explicitly for 32-bit handlers
 -------------------------------------------------*/
 
-UINT32 *_memory_install_device_handler32(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rhandler_name, write32_device_func whandler, const char *whandler_name, int handlerunitmask)
+UINT32 *_memory_install_device_handler32(const address_space *space, device_t *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, const char *rhandler_name, write32_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
@@ -1372,7 +1376,7 @@ UINT32 *_memory_install_device_handler32(const address_space *space, running_dev
     above but explicitly for 64-bit handlers
 -------------------------------------------------*/
 
-UINT64 *_memory_install_device_handler64(const address_space *space, running_device *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rhandler_name, write64_device_func whandler, const char *whandler_name, int handlerunitmask)
+UINT64 *_memory_install_device_handler64(const address_space *space, device_t *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, const char *rhandler_name, write64_device_func whandler, const char *whandler_name, int handlerunitmask)
 {
 	address_space *spacerw = (address_space *)space;
 	if (rhandler != NULL && (FPTR)rhandler < STATIC_COUNT)
@@ -1679,7 +1683,6 @@ static void memory_init_spaces(running_machine *machine)
 {
 	memory_private *memdata = machine->memory_data;
 	address_space **nextptr = (address_space **)&memdata->spacelist;
-	running_device *device;
 	int spacenum;
 
 	/* create a global watchpoint-filled table */
@@ -1687,16 +1690,19 @@ static void memory_init_spaces(running_machine *machine)
 	memset(memdata->wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
 
 	/* loop over devices */
-	for (device = machine->devicelist.first(); device != NULL; device = device->next)
+	device_memory_interface *memory = NULL;
+	for (bool gotone = machine->devicelist.first(memory); gotone; gotone = memory->next(memory))
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			if (device->addrbus_width(spacenum) > 0)
+		{
+			const address_space_config *spaceconfig = memory->space_config(spacenum);
+			if (spaceconfig != NULL)
 			{
 				address_space *space = auto_alloc_clear(machine, address_space);
-				int logbits = cpu_get_logaddr_width(device, spacenum);
-				int ashift = device->baseconfig().addrbus_shift(spacenum);
-				int abits = device->addrbus_width(spacenum);
-				int dbits = device->databus_width(spacenum);
-				endianness_t endianness = device->endianness();
+				int ashift = spaceconfig->m_addrbus_shift;
+				int abits = spaceconfig->m_addrbus_width;
+				int dbits = spaceconfig->m_databus_width;
+				int logbits = spaceconfig->m_logaddr_width;
+				endianness_t endianness = spaceconfig->m_endianness;
 				int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
 				int entrynum;
 
@@ -1706,8 +1712,8 @@ static void memory_init_spaces(running_machine *machine)
 
 				/* determine the address and data bits */
 				space->machine = machine;
-				space->cpu = device;
-				space->name = address_space_names[spacenum];
+				space->cpu = &memory->device();
+				space->name = spaceconfig->m_name;
 				space->accessors = memory_accessors[accessorindex][(endianness == ENDIANNESS_LITTLE) ? 0 : 1];
 				space->addrmask = 0xffffffffUL >> (32 - abits);
 				space->bytemask = (ashift < 0) ? ((space->addrmask << -ashift) | ((1 << -ashift) - 1)) : (space->addrmask >> ashift);
@@ -1776,9 +1782,10 @@ static void memory_init_spaces(running_machine *machine)
 				*nextptr = space;
 				nextptr = (address_space **)&space->next;
 
-				/* notify the deveice */
-				device->set_address_space(spacenum, space);
+				/* notify the device */
+				memory->set_address_space(spacenum, space);
 			}
+		}
 }
 
 
@@ -1905,7 +1912,7 @@ static void memory_init_populate(running_machine *machine)
 static void memory_init_map_entry(address_space *space, const address_map_entry *entry, read_or_write readorwrite)
 {
 	const map_handler_data *handler = (readorwrite == ROW_READ) ? &entry->read : &entry->write;
-	running_device *device;
+	device_t *device;
 
 	/* based on the handler type, alter the bits, name, funcptr, and object */
 	switch (handler->type)

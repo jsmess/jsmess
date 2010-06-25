@@ -2,8 +2,6 @@
     header file for machine/99_peb.c
 */
 
-#define PBOX	DEVICE_GET_INFO_NAME( ti99_peb )
-
 /*
     mode16: TRUE if we are using the snug sgcpu 99/4p 16-bit extensions
     inta_callback: callback called when the state of INTA changes (may be NULL)
@@ -98,7 +96,7 @@ void ti99_4p_peb_set_senila(running_device *box, int state);
 void ti99_4p_peb_set_senilb(running_device *box, int state);
 
 /* device interface */
-DEVICE_GET_INFO( ti99_peb );
+DECLARE_LEGACY_DEVICE( PBOX, ti99_peb );
 
 #define MDRV_PBOX_ADD(_tag, _mode16, _inta, _intb)			\
 	MDRV_DEVICE_ADD(_tag, PBOX, 0)							\

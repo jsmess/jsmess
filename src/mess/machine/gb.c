@@ -433,7 +433,8 @@ static void gb_machine_stop(running_machine *machine)
 	/* NOTE: The reason we save the carts RAM this way instead of using MAME's
        built in macros is because they force the filename to be the name of
        the machine.  We need to have a separate name for each game. */
-	image_battery_save(devtag_get_device(machine, "cart"), gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000);
+	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart");
+	image->battery_save(gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000);
 }
 
 static void gb_set_mbc1_banks( running_machine *machine )
@@ -1639,10 +1640,10 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	UINT8 *gb_header;
 	static const int rambanks[8] = {0, 1, 1, 4, 16, 8, 0, 0};
 
-	if (image_software_entry(image) == NULL)
-		filesize = image_length(image);
+	if (image.software_entry() == NULL)
+		filesize = image.length();
 	else
-		filesize = image_get_software_region_length(image, "rom");
+		filesize = image.get_software_region_length("rom");
 
 	/* Check for presence of a header, and skip that header */
 	J = filesize % 0x4000;
@@ -1656,27 +1657,27 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	/* Verify that the file contains 16kb blocks */
 	if ((filesize == 0) || ((filesize % 0x4000) != 0))
 	{
-		image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
 		return INIT_FAIL;
 	}
 
 	/* Claim memory */
-	gb_driver_data.gb_cart = auto_alloc_array(image->machine, UINT8, filesize);
+	gb_driver_data.gb_cart = auto_alloc_array(image.device().machine, UINT8, filesize);
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
 		/* Actually skip the header */
-		image_fseek(image, load_start, SEEK_SET);
+		image.fseek(load_start, SEEK_SET);
 
 		/* Read cartridge */
-		if (image_fread(image, gb_driver_data.gb_cart, filesize) != filesize)
+		if (image.fread( gb_driver_data.gb_cart, filesize) != filesize)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return INIT_FAIL;
 		}
 	}
 	else
-		memcpy(gb_driver_data.gb_cart, image_get_software_region(image, "rom") + load_start, filesize);
+		memcpy(gb_driver_data.gb_cart, image.get_software_region("rom") + load_start, filesize);
 
 	gb_header = gb_driver_data.gb_cart;
 	gb_driver_data.ROMBank00 = 0;
@@ -1771,24 +1772,24 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	}
 	if (gb_driver_data.MBCType == MBC_UNKNOWN)
 	{
-		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Unknown mapper type");
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unknown mapper type");
 		return INIT_FAIL;
 	}
 	if (gb_driver_data.MBCType == MBC_MMM01)
 	{
-//      image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet");
+//      image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet");
 //      return INIT_FAIL;
 	}
 	if (gb_driver_data.MBCType == MBC_MBC4)
 	{
-		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Mapper MBC4 is not supported yet");
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MBC4 is not supported yet");
 		return INIT_FAIL;
 	}
 	/* MBC7 support is still work-in-progress, so only enable it for debug builds */
 #ifndef MAME_DEBUG
 	if (gb_driver_data.MBCType == MBC_MBC7)
 	{
-		image_seterror(image, IMAGE_ERROR_UNSUPPORTED, "Mapper MBC7 is not supported yet");
+		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MBC7 is not supported yet");
 		return INIT_FAIL;
 	}
 #endif
@@ -1905,7 +1906,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	if (gb_driver_data.RAMBanks && gb_driver_data.MBCType)
 	{
 		/* Claim memory */
-		gb_driver_data.gb_cart_ram = auto_alloc_array(image->machine, UINT8, gb_driver_data.RAMBanks * 0x2000);
+		gb_driver_data.gb_cart_ram = auto_alloc_array(image.device().machine, UINT8, gb_driver_data.RAMBanks * 0x2000);
 		memset(gb_driver_data.gb_cart_ram, 0xFF, gb_driver_data.RAMBank * 0x2000);
 
 		for (I = 0; I < gb_driver_data.RAMBanks; I++)
@@ -1928,19 +1929,19 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	/* If there's an RTC claim memory to store the RTC contents */
 	if (gb_driver_data.CartType & TIMER)
 	{
-		gb_driver_data.MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000);
+		gb_driver_data.MBC3RTCData = auto_alloc_array(image.device().machine, UINT8, 0x2000);
 	}
 
 	if (gb_driver_data.MBCType == MBC_TAMA5)
 	{
-		gb_driver_data.MBC3RTCData = auto_alloc_array(image->machine, UINT8, 0x2000);
+		gb_driver_data.MBC3RTCData = auto_alloc_array(image.device().machine, UINT8, 0x2000);
 		memset(gb_driver_data.gbTama5Memory, 0xff, sizeof(gb_driver_data.gbTama5Memory));
 	}
 
 	/* Load the saved RAM if this cart has a battery */
 	if (gb_driver_data.CartType & BATTERY && gb_driver_data.RAMBanks)
 	{
-		image_battery_load(image, gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000, 0x00);
+		image.battery_load(gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000, 0x00);
 	}
 
 	return INIT_PASS;
@@ -2220,34 +2221,34 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 	for (I = 0; I < MAX_RAMBANK; I++)
 		gb_driver_data.RAMMap[I] = NULL;
 
-	if (image_software_entry(image) == NULL)
-		filesize = image_length(image);
+	if (image.software_entry() == NULL)
+		filesize = image.length();
 	else
-		filesize = image_get_software_region_length(image, "rom");
+		filesize = image.get_software_region_length("rom");
 
 	if ((filesize == 0) || ((filesize % 0x4000) != 0))
 	{
-		image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
 		return INIT_FAIL;
 	}
 
 	gb_driver_data.ROMBanks = filesize / 0x4000;
 
 	/* Claim memory */
-	gb_driver_data.gb_cart = auto_alloc_array(image->machine, UINT8, filesize);
+	gb_driver_data.gb_cart = auto_alloc_array(image.device().machine, UINT8, filesize);
 
 	/* Read cartridge */
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		if (image_fread(image, gb_driver_data.gb_cart, filesize) != filesize)
+		if (image.fread( gb_driver_data.gb_cart, filesize) != filesize)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return INIT_FAIL;
 		}
 	}
 	else
 	{
-		memcpy(gb_driver_data.gb_cart, image_get_software_region(image, "rom"), filesize);
+		memcpy(gb_driver_data.gb_cart, image.get_software_region("rom"), filesize);
 	}
 
 	/* Log cart information */

@@ -38,7 +38,8 @@ static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 
 static WRITE8_DEVICE_HANDLER( cps1_oki_pin7_w )
 {
-	okim6295_set_pin7(device, (data & 1));
+	okim6295_device *oki6295 = device->machine->device<okim6295_device>("oki");
+	oki6295->set_pin7((data & 1));
 }
 
 static WRITE16_HANDLER( cps1_soundlatch_w )
@@ -389,7 +390,6 @@ static MACHINE_DRIVER_START( cps1_10MHz )
 	MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 can be changed by the game code, see f006 on z80
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

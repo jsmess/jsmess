@@ -277,7 +277,7 @@ static Z80PIO_INTERFACE( pio2_intf )
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain lc80_daisy_chain[] =
+static const z80_daisy_config lc80_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
 	{ Z80PIO2_TAG },

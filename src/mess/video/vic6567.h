@@ -133,16 +133,10 @@ struct _vic2_interface
 
 
 /***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO( vic2 );
-
-/***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define VIC2 DEVICE_GET_INFO_NAME( vic2 )
+DECLARE_LEGACY_DEVICE(VIC2, vic2);
 
 #define MDRV_VIC2_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, VIC2, 0) \

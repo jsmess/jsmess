@@ -41,8 +41,8 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define MM74C922 DEVICE_GET_INFO_NAME( mm74c922 )
-#define MM74C923 DEVICE_GET_INFO_NAME( mm74c923 )
+DECLARE_LEGACY_DEVICE(MM74C922, mm74c922);
+DECLARE_LEGACY_DEVICE(MM74C923, mm74c923);
 
 #define MDRV_MM74C922_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, MM74C922, 0) \
@@ -80,11 +80,6 @@ struct _mm74c922_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( mm74c922 );
-DEVICE_GET_INFO( mm74c923 );
-
 /* data read */
 READ8_DEVICE_HANDLER( mm74c922_r );
 

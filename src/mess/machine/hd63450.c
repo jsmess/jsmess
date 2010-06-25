@@ -50,10 +50,10 @@ static void dma_transfer_start(running_device* device, int channel, int dir);
 
 static DEVICE_START(hd63450)
 {
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 	int x;
 
-	dmac->intf = (const hd63450_intf*)device->baseconfig().static_config;
+	dmac->intf = (const hd63450_intf*)device->baseconfig().static_config();
 
 	// Initialise timers and registers
 	for(x=0;x<4;x++)
@@ -69,7 +69,7 @@ static DEVICE_START(hd63450)
 int hd63450_read(running_device* device, int offset, UINT16 mem_mask)
 {
 	int channel,reg;
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
 	channel = (offset & 0x60) >> 5;
 	reg = offset & 0x1f;
@@ -120,7 +120,7 @@ void hd63450_write(running_device* device, int offset, int data, UINT16 mem_mask
 {
 	int channel,reg;
 
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
 	channel = (offset & 0x60) >> 5;
 	reg = offset & 0x1f;
@@ -232,7 +232,7 @@ void hd63450_write(running_device* device, int offset, int data, UINT16 mem_mask
 static void dma_transfer_start(running_device* device, int channel, int dir)
 {
 	const address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 	dmac->in_progress[channel] = 1;
 	dmac->reg[channel].csr &= ~0xe0;
 	dmac->reg[channel].csr |= 0x08;  // Channel active
@@ -263,7 +263,7 @@ static void dma_transfer_start(running_device* device, int channel, int dir)
 
 void hd63450_set_timer(running_device* device, int channel, attotime tm)
 {
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
 	dmac->clock[channel] = tm;
 	if(dmac->in_progress[channel] != 0)
@@ -277,7 +277,7 @@ static TIMER_CALLBACK(dma_transfer_timer)
 
 static void dma_transfer_abort(running_device* device, int channel)
 {
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
 	logerror("DMA#%i: Transfer aborted\n",channel);
 	timer_adjust_oneshot(dmac->timer[channel], attotime_zero, 0);
@@ -289,7 +289,7 @@ static void dma_transfer_abort(running_device* device, int channel)
 
 static void dma_transfer_halt(running_device* device, int channel)
 {
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
 	dmac->halted[channel] = 1;
 	timer_adjust_oneshot(dmac->timer[channel], attotime_zero, 0);
@@ -297,7 +297,7 @@ static void dma_transfer_halt(running_device* device, int channel)
 
 static void dma_transfer_continue(running_device* device, int channel)
 {
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
 	if(dmac->halted[channel] != 0)
 	{
@@ -311,7 +311,7 @@ void hd63450_single_transfer(running_device* device, int x)
 	const address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	int data;
 	int datasize = 1;
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 
 		if(dmac->in_progress[x] != 0)  // DMA in progress in channel x
 		{
@@ -443,13 +443,13 @@ void hd63450_single_transfer(running_device* device, int x)
 
 int hd63450_get_vector(running_device* device, int channel)
 {
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 	return dmac->reg[channel].niv;
 }
 
 int hd63450_get_error_vector(running_device* device, int channel)
 {
-	hd63450_t* dmac = (hd63450_t*)device->token;
+	hd63450_t* dmac = (hd63450_t*)downcast<legacy_device_base *>(device)->token();
 	return dmac->reg[channel].eiv;
 }
 
@@ -458,7 +458,6 @@ DEVICE_GET_INFO(hd63450)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_OTHER;				break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(hd63450_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -478,3 +477,4 @@ DEVICE_GET_INFO(hd63450)
 READ16_DEVICE_HANDLER(hd63450_r) { return hd63450_read(device,offset,mem_mask); }
 WRITE16_DEVICE_HANDLER(hd63450_w) { hd63450_write(device,offset,data,mem_mask); }
 
+DEFINE_LEGACY_DEVICE(HD63450, hd63450);

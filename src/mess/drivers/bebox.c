@@ -13,7 +13,7 @@
 #include "includes/bebox.h"
 
 /* Components */
-#include "video/pc_vga.h"
+#include "video/pc_vga_mess.h"
 #include "video/cirrus.h"
 #include "cpu/powerpc/ppc.h"
 #include "sound/3812intf.h"

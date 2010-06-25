@@ -200,7 +200,7 @@ struct _crt9007_t
 
 	crt9007_draw_scanline_func	draw_scanline_func;
 
-	running_device *screen;			/* screen */
+	screen_device *screen;			/* screen */
 
 	/* registers */
 	UINT8 reg[0x3d];
@@ -229,15 +229,14 @@ struct _crt9007_t
 INLINE crt9007_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (crt9007_t *)device->token;
+	return (crt9007_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const crt9007_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == CRT9007);
-	return (const crt9007_interface *) device->baseconfig().static_config;
+	assert(device->type() == CRT9007);
+	return (const crt9007_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -252,7 +251,7 @@ static void update_vsync_timer(crt9007_t *crt9007, int state)
 {
 	int next_y = state ? crt9007->vsync_start : crt9007->vsync_end;
 
-	attotime duration = video_screen_get_time_until_pos(crt9007->screen, next_y, 0);
+	attotime duration = crt9007->screen->time_until_pos(next_y, 0);
 
 	timer_adjust_oneshot(crt9007->vsync_timer, duration, !state);
 }
@@ -277,12 +276,12 @@ static TIMER_CALLBACK( vsync_tick )
 
 static void update_hsync_timer(crt9007_t *crt9007, int state)
 {
-	int y = video_screen_get_vpos(crt9007->screen);
+	int y = crt9007->screen->vpos();
 
 	int next_x = state ? crt9007->hsync_start : crt9007->hsync_end;
 	int next_y = (y + 1) % SCAN_LINES_PER_FRAME;
 
-	attotime duration = video_screen_get_time_until_pos(crt9007->screen, next_y, next_x);
+	attotime duration = crt9007->screen->time_until_pos(next_y, next_x);
 
 	timer_adjust_oneshot(crt9007->hsync_timer, duration, !state);
 }
@@ -315,7 +314,7 @@ static void recompute_parameters(running_device *device)
 	int horiz_pix_total = CHARACTERS_PER_HORIZONTAL_PERIOD * crt9007->hpixels_per_column;
 	int vert_pix_total = SCAN_LINES_PER_FRAME;
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock) * horiz_pix_total * vert_pix_total;
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock()) * horiz_pix_total * vert_pix_total;
 
 	crt9007->hsync_start = (CHARACTERS_PER_HORIZONTAL_PERIOD - HORIZONTAL_SYNC_WIDTH) * crt9007->hpixels_per_column;
 	crt9007->hsync_end = 0;
@@ -339,7 +338,7 @@ static void recompute_parameters(running_device *device)
 		logerror("CRT9007 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	}
 
-	video_screen_configure(crt9007->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
+	crt9007->screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 	update_hsync_timer(crt9007, 1);
 	update_vsync_timer(crt9007, 1);
@@ -587,7 +586,7 @@ WRITE_LINE_DEVICE_HANDLER( crt9007_lpstb_w )
 
 void crt9007_set_clock(running_device *device, UINT32 clock)
 {
-	device->set_clock(clock);
+	device->set_unscaled_clock(clock);
 	recompute_parameters(device);
 }
 
@@ -641,7 +640,7 @@ void crt9007_update(running_device *device, bitmap_t *bitmap, const rectangle *c
 
 static DEVICE_START( crt9007 )
 {
-	crt9007_t *crt9007 = (crt9007_t *)device->token;
+	crt9007_t *crt9007 = (crt9007_t *)downcast<legacy_device_base *>(device)->token();
 	const crt9007_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
@@ -655,7 +654,7 @@ static DEVICE_START( crt9007 )
 	assert(crt9007->draw_scanline_func != NULL);
 
 	/* get the screen device */
-	crt9007->screen = devtag_get_device(device->machine, intf->screen_tag);
+	crt9007->screen = device->machine->device<screen_device>(intf->screen_tag);
 	assert(crt9007->screen != NULL);
 
 	/* set horizontal pixels per column */
@@ -675,7 +674,7 @@ static DEVICE_START( crt9007 )
 
 static DEVICE_RESET( crt9007 )
 {
-//  crt9007_t *crt9007 = (crt9007_t *)device->token;
+//  crt9007_t *crt9007 = (crt9007_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /*-------------------------------------------------
@@ -688,7 +687,6 @@ DEVICE_GET_INFO( crt9007 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(crt9007_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -704,3 +702,5 @@ DEVICE_GET_INFO( crt9007 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(CRT9007, crt9007);

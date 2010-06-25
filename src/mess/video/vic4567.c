@@ -14,6 +14,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "utils.h"
 #include "video/vic4567.h"
 
 #define SPRITE_BASE_X_SIZE		24
@@ -36,7 +37,7 @@ struct _vic3_state
 {
 	vic3_type  type;
 
-	running_device *main_screen;			// screen which sets bitmap properties
+	screen_device *main_screen;			// screen which sets bitmap properties
 
 	running_device *cpu;
 
@@ -227,17 +228,16 @@ struct _vic3_state
 INLINE vic3_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == VIC3);
+	assert(device->type() == VIC3);
 
-	return (vic3_state *)device->token;
+	return (vic3_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const vic3_interface *get_interface( running_device *device )
 {
 	assert(device != NULL);
-	assert((device->type == VIC3));
-	return (const vic3_interface *) device->baseconfig().static_config;
+	assert((device->type() == VIC3));
+	return (const vic3_interface *) device->baseconfig().static_config();
 }
 
 /*****************************************************************************
@@ -1757,7 +1757,7 @@ static void vic3_draw_bitplanes( running_device *device )
 	vic3_state *vic3 = get_safe_token(device);
 	int x, y, y1s, offset;
 	rectangle vis;
-	const rectangle *visarea = video_screen_get_visible_area(vic3->main_screen);
+	const rectangle &visarea = vic3->main_screen->visible_area();
 
 	if (VIC3_LINES == 400)
 	{ /* interlaced! */
@@ -1795,16 +1795,16 @@ static void vic3_draw_bitplanes( running_device *device )
 		vis.min_x = 0;
 		vis.max_x = XPOS - 1;
 		vis.min_y = 0;
-		vis.max_y = visarea->max_y;
+		vis.max_y = visarea.max_y;
 		bitmap_fill(vic3->bitmap, &vis, FRAMECOLOR);
 	}
 
-	if (XPOS + VIC3_BITPLANES_WIDTH < visarea->max_x)
+	if (XPOS + VIC3_BITPLANES_WIDTH < visarea.max_x)
 	{
 		vis.min_x = XPOS + VIC3_BITPLANES_WIDTH;
-		vis.max_x = visarea->max_x;
+		vis.max_x = visarea.max_x;
 		vis.min_y = 0;
-		vis.max_y = visarea->max_y;
+		vis.max_y = visarea.max_y;
 		bitmap_fill(vic3->bitmap, &vis, FRAMECOLOR);
 	}
 
@@ -1813,16 +1813,16 @@ static void vic3_draw_bitplanes( running_device *device )
 		vis.min_y = 0;
 		vis.max_y = YPOS - 1;
 		vis.min_x = 0;
-		vis.max_x = visarea->max_x;
+		vis.max_x = visarea.max_x;
 		bitmap_fill(vic3->bitmap, &vis, FRAMECOLOR);
 	}
 
-	if (YPOS + VIC3_LINES < visarea->max_y)
+	if (YPOS + VIC3_LINES < visarea.max_y)
 	{
 		vis.min_y = YPOS + VIC3_LINES;
-		vis.max_y = visarea->max_y;
+		vis.max_y = visarea.max_y;
 		vis.min_x = 0;
-		vis.max_x = visarea->max_x;
+		vis.max_x = visarea.max_x;
 		bitmap_fill(vic3->bitmap, &vis, FRAMECOLOR);
 	}
 }
@@ -1875,13 +1875,13 @@ void vic3_raster_interrupt_gen( running_device *device )
 			vic3->rows = new_rows;
 			vic3->columns = new_columns;
 			if (vic3->type == VIC4567_PAL)
-				video_screen_set_visarea(	vic3->main_screen,
+				vic3->main_screen->set_visible_area(
 									VIC2_STARTVISIBLECOLUMNS + 32,
 									VIC2_STARTVISIBLECOLUMNS + 32 + vic3->columns + 16 - 1,
 									VIC2_STARTVISIBLELINES + 34,
 									VIC2_STARTVISIBLELINES + 34 + vic3->rows + 16 - 1);
 			else
-				video_screen_set_visarea(	vic3->main_screen,
+				vic3->main_screen->set_visible_area(
 									VIC2_STARTVISIBLECOLUMNS + 34,
 									VIC2_STARTVISIBLECOLUMNS + 34 + vic3->columns + 16 - 1,
 									VIC2_STARTVISIBLELINES + 10,
@@ -1954,15 +1954,15 @@ UINT32 vic3_video_update( running_device *device, bitmap_t *bitmap, const rectan
 static DEVICE_START( vic3 )
 {
 	vic3_state *vic3 = get_safe_token(device);
-	const vic3_interface *intf = (vic3_interface *)device->baseconfig().static_config;
+	const vic3_interface *intf = (vic3_interface *)device->baseconfig().static_config();
 	int width, height;
 	int i;
 
 	vic3->cpu = devtag_get_device(device->machine, intf->cpu);
 
-	vic3->main_screen = devtag_get_device(device->machine, intf->screen);
-	width = video_screen_get_width(vic3->main_screen);
-	height = video_screen_get_height(vic3->main_screen);
+	vic3->main_screen = device->machine->device<screen_device>(intf->screen);
+	width = vic3->main_screen->width();
+	height = vic3->main_screen->height();
 
 	vic3->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
 
@@ -2163,3 +2163,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_NAME				"4567 VIC III"
 #define DEVTEMPLATE_FAMILY				"4567 VIC III"
 #include "devtempl.h"
+
+DEFINE_LEGACY_DEVICE(VIC3, vic3);

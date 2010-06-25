@@ -76,9 +76,8 @@ enum
 INLINE mm58274c_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
 
-	return (mm58274c_t *)device->token;
+	return (mm58274c_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 static attotime interrupt_period_table(int val)
@@ -448,9 +447,9 @@ static DEVICE_START( mm58274c )
 	// validate arguments
 	assert(device != NULL);
 	assert(device->tag() != NULL);
-	assert(device->baseconfig().static_config != NULL);
+	assert(device->baseconfig().static_config() != NULL);
 
-	mm58274c->intf = (const mm58274c_interface*)device->baseconfig().static_config;
+	mm58274c->intf = (const mm58274c_interface*)device->baseconfig().static_config();
 	// register for state saving
 	state_save_register_item(device->machine, "mm58274c", device->tag(), 0, mm58274c->status);
 	state_save_register_item(device->machine, "mm58274c", device->tag(), 0, mm58274c->control);
@@ -524,7 +523,6 @@ DEVICE_GET_INFO( mm58274c )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mm58274c_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mm58274c);	break;
@@ -539,3 +537,5 @@ DEVICE_GET_INFO( mm58274c )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");			break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(MM58274C, mm58274c);

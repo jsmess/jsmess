@@ -230,7 +230,7 @@ void spectrum_128_update_memory(running_machine *machine)
 static  READ8_HANDLER ( spectrum_128_ula_r )
 {
 	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
-	int vpos = video_screen_get_vpos(space->machine->primary_screen);
+	int vpos = space->machine->primary_screen->vpos();
 
 	return vpos<193 ? state->screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
 }

@@ -138,7 +138,7 @@ static MACHINE_RESET( jaguar )
 
 	/* Set up pointers for Jaguar logo */
 	memcpy(jaguar_shared_ram, rom_base, 0x400);	// do not increase, or Doom breaks
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_GENPC, rom_base[1]);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, rom_base[1]);
 
 #if 0
 	/* set up main CPU RAM/ROM banks */
@@ -183,15 +183,16 @@ static MACHINE_RESET( jaguar )
 *   0xF14000 (read data), F14800 (increment clock, write data), F15000 (reset for next word)
 *
 ********************************************************************/
+/*
 static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags)
 {
-	running_device *image = devtag_get_device(machine, "cart");
+	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart");
 	astring *fname;
 	file_error filerr;
 	mame_file *file;
-	if (image_exists(image))
+	if (image->exists())
 	{
-		fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, image_basename_noext(image), ".nv");
+		fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, image->basename_noext(), ".nv");
 		filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
 		astring_free( fname);
 		return (filerr == FILERR_NONE) ? file : NULL;
@@ -205,7 +206,7 @@ static void jaguar_nvram_load(running_machine *machine)
 	mame_file *nvram_file = NULL;
 	running_device *device;
 
-	for (device = machine->devicelist.first(); device != NULL; device = device->next)
+	for (device = machine->devicelist.first(); device != NULL; device = device->next())
 	{
 		device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
 		if (nvram != NULL)
@@ -225,7 +226,7 @@ static void jaguar_nvram_save(running_machine *machine)
 	mame_file *nvram_file = NULL;
 	running_device *device;
 
-	for (device = machine->devicelist.first(); device != NULL; device = device->next)
+	for (device = machine->devicelist.first(); device != NULL; device = device->next())
 	{
 		device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
 		if (nvram != NULL)
@@ -253,7 +254,7 @@ static NVRAM_HANDLER( jaguar )
 			jaguar_nvram_load(machine);
 	}
 }
-
+*/
 static WRITE32_HANDLER( jaguar_eeprom_w )
 {
 	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
@@ -623,7 +624,7 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_CPU_PROGRAM_MAP(gpu_map)
 
 	MDRV_MACHINE_RESET(jaguar)
-	MDRV_NVRAM_HANDLER(jaguar)
+//	MDRV_NVRAM_HANDLER(jaguar)
 
 	MDRV_TIMER_ADD("serial_timer", jaguar_serial_callback)
 
@@ -722,9 +723,9 @@ static QUICKLOAD_LOAD( jaguar )
 	memset(jaguar_shared_ram, 0, 0x200000);
 	quickload_size = MIN(quickload_size, 0x200000 - quickload_begin);
 
-	image_fread(image, &memory_region(image->machine, "maincpu")[quickload_begin], quickload_size);
+	image.fread( &memory_region(image.device().machine, "maincpu")[quickload_begin], quickload_size);
 
-	jaguar_fix_endian(image->machine, quickload_begin, quickload_size);
+	jaguar_fix_endian(image.device().machine, quickload_begin, quickload_size);
 
 	/* Deal with some of the numerous homebrew header systems */
 		/* COF */
@@ -754,11 +755,11 @@ static QUICKLOAD_LOAD( jaguar )
 		skip = 96;
 
 	else	/* ABS binary */
-	if (!mame_stricmp(image_filetype(image), "abs"))
+	if (!mame_stricmp(image.filetype(), "abs"))
 		start = 0xc000;
 
 	else	/* JAG binary */
-	if (!mame_stricmp(image_filetype(image), "jag"))
+	if (!mame_stricmp(image.filetype(), "jag"))
 		start = 0x5000;
 
 
@@ -766,19 +767,19 @@ static QUICKLOAD_LOAD( jaguar )
 	if ((start != quickload_begin) || (skip))
 	{
 		memset(jaguar_shared_ram, 0, 0x200000);
-		image_fseek(image, 0, SEEK_SET);
-		image_fread(image, &memory_region(image->machine, "maincpu")[start-skip], quickload_size);
+		image.fseek(0, SEEK_SET);
+		image.fread( &memory_region(image.device().machine, "maincpu")[start-skip], quickload_size);
 		quickload_begin = start;
-		jaguar_fix_endian(image->machine, (start-skip)&0xfffffc, quickload_size);
+		jaguar_fix_endian(image.device().machine, (start-skip)&0xfffffc, quickload_size);
 	}
 
 
 	/* Some programs are too lazy to set a stack pointer */
-	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENSP, 0x1000);
+	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENSP, 0x1000);
 	jaguar_shared_ram[0]=0x1000;
 
 	/* Transfer control to image */
-	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, quickload_begin);
+	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, quickload_begin);
 	jaguar_shared_ram[1]=quickload_begin;
 	return INIT_PASS;
 }
@@ -787,38 +788,38 @@ static DEVICE_IMAGE_LOAD( jaguar )
 {
 	UINT32 size, load_offset = 0;
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
+		size = image.length();
 
 		/* .rom files load & run at 802000 */
-		if (!mame_stricmp(image_filetype(image), "rom"))
+		if (!mame_stricmp(image.filetype(), "rom"))
 		{
 			load_offset = 0x2000;		// fix load address
 			cart_base[0x101]=0x802000;	// fix exec address
 		}
 
 		/* Load cart into memory */
-		image_fread(image, &memory_region(image->machine, "maincpu")[0x800000+load_offset], size);
+		image.fread( &memory_region(image.device().machine, "maincpu")[0x800000+load_offset], size);
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
+		size = image.get_software_region_length("rom");
 
-		memcpy(cart_base, image_get_software_region(image, "rom"), size);
+		memcpy(cart_base, image.get_software_region("rom"), size);
 	}
 
 	memset(jaguar_shared_ram, 0, 0x200000);
 	memcpy(jaguar_shared_ram, rom_base, 0x10);
 
-	jaguar_fix_endian(image->machine, 0x800000+load_offset, size);
+	jaguar_fix_endian(image.device().machine, 0x800000+load_offset, size);
 
 	/* Skip the logo */
 	using_cart = 1;
 //	cart_base[0x102] = 1;
 
 	/* Transfer control to the bios */
-	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), REG_GENPC, rom_base[1]);
+	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, rom_base[1]);
 	return INIT_PASS;
 }
 

@@ -76,10 +76,10 @@ const z80pio_interface z1013k7659_z80pio_intf =
 
 SNAPSHOT_LOAD( z1013 )
 {
-	UINT8* data= auto_alloc_array(image->machine, UINT8, snapshot_size);
+	UINT8* data= auto_alloc_array(image.device().machine, UINT8, snapshot_size);
 	UINT16 startaddr,endaddr,runaddr;
 
-	image_fread(image, data, snapshot_size);
+	image.fread( data, snapshot_size);
 
 	startaddr = data[0] + data[1]*256;
 	endaddr   = data[2] + data[3]*256;
@@ -87,10 +87,10 @@ SNAPSHOT_LOAD( z1013 )
 	if (data[12]!='C') return INIT_FAIL;
 	if (data[13]!=0xD3 || data[14]!=0xD3 || data[14]!=0xD3) return INIT_FAIL;
 
-	memcpy (memory_get_read_ptr(cputag_get_address_space(image->machine, "maincpu", ADDRESS_SPACE_PROGRAM),  startaddr ),
+	memcpy (memory_get_read_ptr(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM),  startaddr ),
 		 data+0x20, endaddr - startaddr + 1);
 
-	cpu_set_reg(devtag_get_device(image->machine, "maincpu"), Z80_PC, runaddr);
+	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), Z80_PC, runaddr);
 
 	return INIT_PASS;
 }

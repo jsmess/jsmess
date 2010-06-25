@@ -7,7 +7,7 @@
 #include "emu.h"
 #include "cbm_snqk.h"
 
-static int general_cbm_loadsnap( running_device *image, const char *file_type, int snapshot_size,
+static int general_cbm_loadsnap( device_image_interface &image, const char *file_type, int snapshot_size,
 								offs_t offset, void (*cbm_sethiaddress)(running_machine *machine, UINT16 hiaddress) )
 {
 	char buffer[7];
@@ -15,7 +15,7 @@ static int general_cbm_loadsnap( running_device *image, const char *file_type, i
 	UINT32 bytesread;
 	UINT16 address = 0;
 	int i;
-	const address_space *space = cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(image.device().machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
 	if (!file_type)
 		goto error;
@@ -27,21 +27,21 @@ static int general_cbm_loadsnap( running_device *image, const char *file_type, i
 	else if (!mame_stricmp(file_type, "p00"))
 	{
 		/* p00 files */
-		if (image_fread(image, buffer, sizeof(buffer)) != sizeof(buffer))
+		if (image.fread( buffer, sizeof(buffer)) != sizeof(buffer))
 			goto error;
 		if (memcmp(buffer, "C64File", sizeof(buffer)))
 			goto error;
-		image_fseek(image, 26, SEEK_SET);
+		image.fseek(26, SEEK_SET);
 		snapshot_size -= 26;
 	}
 	else if (!mame_stricmp(file_type, "t64"))
 	{
 		/* t64 files - for GB64 Single T64s loading to x0801 - header is always the same size */
-		if (image_fread(image, buffer, sizeof(buffer)) != sizeof(buffer))
+		if (image.fread( buffer, sizeof(buffer)) != sizeof(buffer))
 			goto error;
 		if (memcmp(buffer, "C64 tape image file", sizeof(buffer)))
 			goto error;
-		image_fseek(image, 94, SEEK_SET);
+		image.fseek(94, SEEK_SET);
 		snapshot_size -= 94;
 	}
 	else
@@ -49,7 +49,7 @@ static int general_cbm_loadsnap( running_device *image, const char *file_type, i
 		goto error;
 	}
 
-	image_fread(image, &address, 2);
+	image.fread( &address, 2);
 	address = LITTLE_ENDIANIZE_INT16(address);
 	if (!mame_stricmp(file_type, "t64"))
 		address = 2049;
@@ -59,14 +59,14 @@ static int general_cbm_loadsnap( running_device *image, const char *file_type, i
 	if (!data)
 		goto error;
 
-	bytesread = image_fread(image, data, snapshot_size);
+	bytesread = image.fread( data, snapshot_size);
 	if (bytesread != snapshot_size)
 		goto error;
 
 	for (i = 0; i < snapshot_size; i++)
 		memory_write_byte(space, address + i + offset, data[i]);
 
-	cbm_sethiaddress(image->machine, address + snapshot_size);
+	cbm_sethiaddress(image.device().machine, address + snapshot_size);
 	free(data);
 	return INIT_PASS;
 

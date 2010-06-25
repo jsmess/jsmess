@@ -35,17 +35,17 @@
 
 QUICKLOAD_LOAD( trs80_cmd )
 {
-    const address_space *program = cpu_get_address_space(image->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+    const address_space *program = cpu_get_address_space(image.device().machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 
 	UINT8 type, length;
 	UINT8 data[0x100];
 	UINT8 addr[2];
 	void *ptr;
 
-	while (!image_feof(image))
+	while (!image.feof())
 	{
-		image_fread(image, &type, 1);
-		image_fread(image, &length, 1);
+		image.fread( &type, 1);
+		image.fread( &length, 1);
 
 		length -= 2;
 		int block_length = length ? length : 256;
@@ -54,35 +54,35 @@ QUICKLOAD_LOAD( trs80_cmd )
 		{
 		case CMD_TYPE_OBJECT_CODE:
 			{
-			image_fread(image, &addr, 2);
+			image.fread( &addr, 2);
 			UINT16 address = (addr[1] << 8) | addr[0];
 			if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
 			ptr = memory_get_write_ptr(program, address);
-			image_fread(image, ptr, block_length);
+			image.fread( ptr, block_length);
 			}
 			break;
 
 		case CMD_TYPE_TRANSFER_ADDRESS:
 			{
-			image_fread(image, &addr, 2);
+			image.fread( &addr, 2);
 			UINT16 address = (addr[1] << 8) | addr[0];
 			if (LOG) logerror("/CMD transfer address %04x\n", address);
-			cpu_set_reg(image->machine->firstcpu, Z80_PC, address);
+			cpu_set_reg(image.device().machine->firstcpu, Z80_PC, address);
 			}
 			break;
 
 		case CMD_TYPE_LOAD_MODULE_HEADER:
-			image_fread(image, &data, block_length);
+			image.fread( &data, block_length);
 			if (LOG) logerror("/CMD load module header '%s'\n", data);
 			break;
 
 		case CMD_TYPE_COPYRIGHT_BLOCK:
-			image_fread(image, &data, block_length);
+			image.fread( &data, block_length);
 			if (LOG) logerror("/CMD copyright block '%s'\n", data);
 			break;
 
 		default:
-			image_fread(image, &data, block_length);
+			image.fread( &data, block_length);
 			logerror("/CMD unsupported block type %u!\n", type);
 		}
 	}

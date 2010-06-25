@@ -226,31 +226,31 @@ void pc_hdc_set_dma8237_device( running_device *dma8237 )
 
 static hard_disk_file *pc_hdc_file(running_machine *machine, int id)
 {
-	running_device *img = NULL;
+	device_image_interface *img = NULL;
 
 	switch( id )
 	{
 	case 0:
-		img = devtag_get_device(machine, "harddisk1");
+		img = (device_image_interface*)devtag_get_device(machine, "harddisk1");
 		break;
 	case 1:
-		img = devtag_get_device(machine, "harddisk2");
+		img = (device_image_interface*)devtag_get_device(machine, "harddisk2");
 		break;
 	case 2:
-		img = devtag_get_device(machine, "harddisk3");
+		img = (device_image_interface*)devtag_get_device(machine, "harddisk3");
 		break;
 	case 3:
-		img = devtag_get_device(machine, "harddisk4");
+		img = (device_image_interface*)devtag_get_device(machine, "harddisk4");
 		break;
 	}
 
 	if ( img == NULL )
 		return NULL;
 
-	if (!image_exists(img))
+	if (!img->exists())
 		return NULL;
 
-	return mess_hd_get_hard_disk_file(img);
+	return mess_hd_get_hard_disk_file(&img->device());
 }
 
 static void pc_hdc_result(running_machine *machine,int n, int set_error_info)
@@ -537,7 +537,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 	{
 		command_name = hdc_command_names[cmd] ? hdc_command_names[cmd] : "Unknown";
 		logerror("pc_hdc_command(): Executing command; pc=0x%08x cmd=0x%02x (%s) drv=%d\n",
-			(unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC), cmd, command_name, drv);
+			(unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), cmd, command_name, drv);
 	}
 
 	switch (cmd)
@@ -575,7 +575,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc read pc=0x%08x INDEX #%d D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
+					(unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
 			if (test_ready(machine, n))
@@ -590,7 +590,7 @@ static TIMER_CALLBACK(pc_hdc_command)
 			if (LOG_HDC_STATUS)
 			{
 				logerror("hdc write pc=0x%08x INDEX #%d D:%d C:%d H:%d S:%d N:%d CTL:$%02x\n",
-					(unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
+					(unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), idx, drv, cylinder[idx], head[idx], sector[idx], sector_cnt[idx], control[idx]);
 			}
 
 			if (test_ready(machine, n))
@@ -699,7 +699,7 @@ static void pc_hdc_data_w(running_machine *machine, int n, int data)
 		if (--data_cnt == 0)
 		{
 			if (LOG_HDC_STATUS)
-				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC));
+				logerror("pc_hdc_data_w(): Launching command; pc=0x%08x\n", (unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC));
 
             status[n] &= ~STA_COMMAND;
 			status[n] &= ~STA_REQUEST;
@@ -741,7 +741,7 @@ static void pc_hdc_control_w(running_machine *machine, int n, int data)
 	int irq = (dip[n] & 0x40) ? 5 : 2;
 
 	if (LOG_HDC_STATUS)
-		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine->firstcpu, REG_GENPC), data);
+		logerror("pc_hdc_control_w(): Control write pc=0x%08x data=%d\n", (unsigned) cpu_get_reg(machine->firstcpu, STATE_GENPC), data);
 
 	hdc_control = data;
 

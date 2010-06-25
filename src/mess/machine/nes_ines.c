@@ -272,7 +272,7 @@ static void mapper4_irq( running_device *device, int scanline, int vblank, int b
 		if (state->IRQ_enable && !blanked && (state->IRQ_count == 0) && priorCount)
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+					device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
 			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 		}
 	}
@@ -2737,7 +2737,7 @@ static void mapper35_irq( running_device *device, int scanline, int vblank, int 
 		if (!blanked && (state->IRQ_count == 0))
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-					video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+					device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
 			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_enable = 0;
 		}
@@ -3697,7 +3697,7 @@ static void mapper64_irq( running_device *device, int scanline, int vblank, int 
 					if (state->IRQ_enable && !blanked && !state->IRQ_count)
 					{
 						LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-								video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+								device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
 						cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 					}
 				}
@@ -3724,7 +3724,7 @@ static void mapper64_irq( running_device *device, int scanline, int vblank, int 
 				if (state->IRQ_enable && !blanked && (state->IRQ_count <= 114))
 				{
 					LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-							video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+							device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
 					cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 				}
 			}
@@ -9623,7 +9623,7 @@ static void mapper222_irq( running_device *device, int scanline, int vblank, int
 
 		state->IRQ_count = 0;
 		LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
-				video_screen_get_vpos(device->machine->primary_screen), video_screen_get_hpos(device->machine->primary_screen)));
+				device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
 		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }

@@ -83,8 +83,8 @@ struct _v30mz_state
 	UINT32	irq_state;
 	UINT8	no_interrupt;
 
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -104,10 +104,9 @@ extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec
 INLINE v30mz_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_V30MZ);
-	return (v30mz_state *)device->token;
+	return (v30mz_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /***************************************************************************/
@@ -134,7 +133,7 @@ static CPU_RESET( nec )
 	v30mz_state *cpustate = get_safe_token(device);
     unsigned int i,j,c;
     static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
-	cpu_irq_callback save_irqcallback;
+	device_irq_callback save_irqcallback;
 
 	save_irqcallback = cpustate->irq_callback;
 	memset( cpustate, 0, sizeof(*cpustate) );
@@ -933,7 +932,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, cpustate->config);
 }
 
-static void nec_init(running_device *device, cpu_irq_callback irqcallback, int type)
+static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback, int type)
 {
 	v30mz_state *cpustate = get_safe_token(device);
 
@@ -970,8 +969,6 @@ static CPU_EXECUTE( v30mz )
 {
 	v30mz_state *cpustate = get_safe_token(device);
 
-	cpustate->icount=cycles;
-
 	while(cpustate->icount>0) {
 		/* Dispatch IRQ */
 		if (cpustate->pending_irq && cpustate->no_interrupt==0)
@@ -989,8 +986,6 @@ static CPU_EXECUTE( v30mz )
 		debugger_instruction_hook(device, (cpustate->sregs[CS]<<4) + cpustate->ip);
 		nec_instruction[FETCHOP](cpustate);
 	}
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -1056,7 +1051,7 @@ static CPU_SET_INFO( nec )
 
 CPU_GET_INFO( v30mz )
 {
-	v30mz_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	v30mz_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	int flags;
 
 	switch (state)

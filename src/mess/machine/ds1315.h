@@ -18,7 +18,7 @@
     MACROS
 ***************************************************************************/
 
-#define DS1315			DEVICE_GET_INFO_NAME(ds1315)
+DECLARE_LEGACY_DEVICE(DS1315, ds1315);
 
 
 
@@ -34,7 +34,6 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-DEVICE_GET_INFO( ds1315 );
 READ8_DEVICE_HANDLER( ds1315_r_0 );
 READ8_DEVICE_HANDLER( ds1315_r_1 );
 READ8_DEVICE_HANDLER( ds1315_r_data );

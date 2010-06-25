@@ -21,7 +21,7 @@ struct _terminal_interface
 #define TERMINAL_TAG "terminal"
 #define TERMINAL_SCREEN_TAG "terminal_screen"
 
-#define GENERIC_TERMINAL DEVICE_GET_INFO_NAME( terminal )
+DECLARE_LEGACY_DEVICE(GENERIC_TERMINAL, terminal);
 
 #define MDRV_GENERIC_TERMINAL_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, GENERIC_TERMINAL, 0) \
@@ -36,9 +36,6 @@ struct _terminal_interface
 ***************************************************************************/
 
 WRITE8_DEVICE_HANDLER ( terminal_write );
-
-/* device interface */
-DEVICE_GET_INFO( terminal );
 
 MACHINE_DRIVER_EXTERN( generic_terminal );
 

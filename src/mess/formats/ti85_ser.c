@@ -111,8 +111,8 @@ typedef struct
 INLINE ti85serial_state *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == TI85SERIAL) || (device->type == TI86SERIAL));
-	return (ti85serial_state *) device->token;
+	assert((device->type() == TI85SERIAL) || (device->type() == TI86SERIAL));
+	return (ti85serial_state *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -324,10 +324,10 @@ static int ti85_convert_file_data_to_serial_stream (running_device *device, cons
 	UINT8* temp_data_to_convert = NULL;
 	UINT16 checksum;
 
-	if (device->type == TI85SERIAL)
+	if (device->type() == TI85SERIAL)
 		if (strncmp((char *) file_data, (char *) ti85_file_signature, 11))
 			return 0;
-	if (device->type == TI86SERIAL)
+	if (device->type() == TI86SERIAL)
 		if (strncmp((char *) file_data, (char *) ti86_file_signature, 11))
 			return 0;
 
@@ -416,9 +416,9 @@ static int ti85_convert_file_data_to_serial_stream (running_device *device, cons
 			}
 			serial_data->variables[i].header_size = (10+ti85_entries[i].name_size)*8;
 
-			if (device->type == TI85SERIAL)
+			if (device->type() == TI85SERIAL)
 				temp_data_to_convert[0] = 0x05;	//PC to TI-85
-			if (device->type == TI86SERIAL)
+			if (device->type() == TI86SERIAL)
 				temp_data_to_convert[0] = 0x06;	//PC to TI-86
 			temp_data_to_convert[1] = 0x06;	//header
 			temp_data_to_convert[2] = (4+ti85_entries[i].name_size)&0x00ff;
@@ -442,9 +442,9 @@ static int ti85_convert_file_data_to_serial_stream (running_device *device, cons
 			free (ti85_entries);
 			return 0;
 		}
-		if (device->type == TI85SERIAL)
+		if (device->type() == TI85SERIAL)
 			ti85_convert_data_to_stream(ti85_pc_ok_packet, TI85_PC_OK_PACKET_SIZE, serial_data->variables[i].ok);
-		if (device->type == TI86SERIAL)
+		if (device->type() == TI86SERIAL)
 			ti85_convert_data_to_stream(ti86_pc_ok_packet, TI85_PC_OK_PACKET_SIZE, serial_data->variables[i].ok);
 		serial_data->variables[i].ok_size = TI85_PC_OK_PACKET_SIZE*8;
 
@@ -464,9 +464,9 @@ static int ti85_convert_file_data_to_serial_stream (running_device *device, cons
 		}
 		serial_data->variables[i].data_size = (6+ti85_entries[i].data_size)*8;
 
-		if (device->type == TI85SERIAL)
+		if (device->type() == TI85SERIAL)
 			temp_data_to_convert[0] = 0x05;	//PC to TI-85
-		if (device->type == TI86SERIAL)
+		if (device->type() == TI86SERIAL)
 			temp_data_to_convert[0] = 0x06;	//PC to TI-86
 		temp_data_to_convert[1] = 0x15;	//data
 		temp_data_to_convert[2] = (ti85_entries[i].data_size)&0x00ff;
@@ -490,9 +490,9 @@ static int ti85_convert_file_data_to_serial_stream (running_device *device, cons
 		free (ti85_entries);
 		return 0;
 	}
-	if (device->type == TI85SERIAL)
+	if (device->type() == TI85SERIAL)
 		ti85_convert_data_to_stream(ti85_pc_end_packet, TI85_PC_END_PACKET_SIZE, serial_data->end);
-	if (device->type == TI86SERIAL)
+	if (device->type() == TI86SERIAL)
 		ti85_convert_data_to_stream(ti86_pc_end_packet, TI85_PC_END_PACKET_SIZE, serial_data->end);
 	serial_data->end_size = TI85_PC_END_PACKET_SIZE*8;
 
@@ -1301,12 +1301,12 @@ static DEVICE_IMAGE_LOAD( ti85serial )
 
 	if (ti85serial->status != TI85_SEND_STOP) return INIT_FAIL;
 
-	file_size = image_length(image);
+	file_size = image.length();
 
 	if (file_size != 0)
 	{
-		file_data = auto_alloc_array(image->machine, UINT8, file_size);
-		image_fread(image, file_data, file_size);
+		file_data = auto_alloc_array(image.device().machine, UINT8, file_size);
+		image.fread( file_data, file_size);
 
 		if(!ti85_convert_file_data_to_serial_stream(image, file_data, file_size, &ti85serial->stream))
 		{
@@ -1340,7 +1340,6 @@ DEVICE_GET_INFO( ti85serial )
 	{
 	case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof( ti85serial_state );											break;
 	case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;																	break;
-	case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;												break;
 	case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_SERIAL;															break;
 	case DEVINFO_INT_IMAGE_READABLE:				info->i = 1;																	break;
 	case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 0;																	break;
@@ -1370,3 +1369,5 @@ DEVICE_GET_INFO( ti86serial )
 	}
 }
 
+DEFINE_LEGACY_IMAGE_DEVICE(TI85SERIAL, ti85serial);
+DEFINE_LEGACY_IMAGE_DEVICE(TI86SERIAL, ti86serial);

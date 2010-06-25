@@ -484,8 +484,8 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	running_device *ppi = devtag_get_device(space->machine, "ppi");
-	running_device *pio = devtag_get_device(space->machine, "pio");
+	ppi8255_device *ppi = space->machine->device<ppi8255_device>("ppi");
+	z80pio_device *pio = space->machine->device<z80pio_device>("pio");
 
 	/* if we have an 8255 PPI, get the data from the port and toggle the ack */
 	if (ppi != NULL)
@@ -499,9 +499,9 @@ static READ8_HANDLER( sound_data_r )
 	/* if we have a Z80 PIO, get the data from the port and toggle the strobe */
 	else if (pio != NULL)
 	{
-		UINT8 data = z80pio_pa_r(pio, 0);
-		z80pio_astb_w(pio, 0);
-		z80pio_astb_w(pio, 1);
+		UINT8 data = pio->port_read(z80pio_device::PORT_A);
+		pio->strobe(z80pio_device::PORT_A, false);
+		pio->strobe(z80pio_device::PORT_A, true);
 		return data;
 	}
 
@@ -520,7 +520,7 @@ static WRITE8_HANDLER( soundport_w )
 static TIMER_DEVICE_CALLBACK( soundirq_gen )
 {
 	/* sound IRQ is generated on 32V, 96V, ... and auto-acknowledged */
-	cputag_set_input_line(timer->machine, "soundcpu", 0, HOLD_LINE);
+	cputag_set_input_line(timer.machine, "soundcpu", 0, HOLD_LINE);
 }
 
 
@@ -607,7 +607,7 @@ static TIMER_DEVICE_CALLBACK( mcu_t0_callback )
        enough, the MCU will fail; on shtngmst this happens after 3
        VBLANKs without a tick */
 
-	running_device *mcu = devtag_get_device(timer->machine, "mcu");
+	running_device *mcu = devtag_get_device(timer.machine, "mcu");
 	cpu_set_input_line(mcu, MCS51_T0_LINE, ASSERT_LINE);
 	cpu_set_input_line(mcu, MCS51_T0_LINE, CLEAR_LINE);
 }

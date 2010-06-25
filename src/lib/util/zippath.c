@@ -7,10 +7,10 @@
 ***************************************************************************/
 
 #include <ctype.h>
-
+#include <stdlib.h>
 #include "zippath.h"
 #include "unzip.h"
-#include "emu.h"
+#include "corestr.h"
 #include "osdcore.h"
 
 
@@ -206,7 +206,7 @@ static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header
 	zip_error ziperr;
 	void *ptr;
 
-	ptr = global_alloc_array_clear(UINT8,header->uncompressed_length);
+	ptr = malloc(header->uncompressed_length);
 	if (ptr == NULL)
 	{
 		filerr = FILERR_OUT_OF_MEMORY;
@@ -226,7 +226,7 @@ static file_error create_core_file_from_zip(zip_file *zip, const zip_file_header
 
 done:
 	if (ptr != NULL)
-		global_free(ptr);
+		free(ptr);
 	return filerr;
 }
 
@@ -397,7 +397,7 @@ static int is_root(const char *path)
 static int is_zip_file(const char *path)
 {
 	const char *s = strrchr(path, '.');
-	return (s != NULL) && !mame_stricmp(s, ".zip");
+	return (s != NULL) && !core_stricmp(s, ".zip");
 }
 
 
@@ -558,7 +558,7 @@ static file_error zippath_resolve(const char *path, osd_dir_entry_type *entry_ty
 		{
 			/* get the entry type and free the stat entry */
 			current_entry_type = current_entry->type;
-			global_free(current_entry);
+			free(current_entry);
 			current_entry = NULL;
 		}
 		else
@@ -633,12 +633,13 @@ file_error zippath_opendir(const char *path, zippath_directory **directory)
 	zippath_directory *result;
 
 	/* allocate a directory */
-	result = (zippath_directory *) global_alloc_clear(zippath_directory);
+	result = (zippath_directory *) malloc(sizeof(*result));
 	if (result == NULL)
 	{
 		err = FILERR_OUT_OF_MEMORY;
 		goto done;
 	}
+	memset(result, 0, sizeof(*result));
 
 	/* resolve the path */
 	err = zippath_resolve(path, &entry_type, &result->zipfile, newpath);
@@ -711,10 +712,10 @@ void zippath_closedir(zippath_directory *directory)
 	{
 		dirlist = directory->returned_dirlist;
 		directory->returned_dirlist = directory->returned_dirlist->next;
-		global_free(dirlist);
+		free(dirlist);
 	}
 
-	global_free(directory);
+	free(directory);
 }
 
 
@@ -816,7 +817,7 @@ const osd_directory_entry *zippath_readdir(zippath_directory *directory)
 					if (rdent == NULL)
 					{
 						/* we've found a new directory; add this to returned_dirlist */
-						rdent = (zippath_returned_directory*)global_alloc_array_clear(UINT8,sizeof(*rdent) + (separator - relpath));
+						rdent = (zippath_returned_directory *)malloc(sizeof(*rdent) + (separator - relpath));
 						rdent->next = directory->returned_dirlist;
 						memcpy(rdent->name, relpath, (separator - relpath) * sizeof(rdent->name[0]));
 						rdent->name[separator - relpath] = '\0';

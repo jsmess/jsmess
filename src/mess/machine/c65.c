@@ -886,7 +886,7 @@ void c65_bankswitch( running_machine *machine )
 	static int old = -1;
 	int data, loram, hiram, charen;
 
-	data = (UINT8) machine->device("maincpu")->get_runtime_int(CPUINFO_INT_M6510_PORT);
+	data = m6510_get_port(machine->device<legacy_cpu_device>("maincpu"));
 	if (data == old)
 		return;
 

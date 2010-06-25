@@ -55,8 +55,8 @@ struct _arcadia_sound
 INLINE arcadia_sound *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(sound_get_type(device) == SOUND_ARCADIA);
-	return (arcadia_sound *) device->token;
+	assert(device->type() == SOUND_ARCADIA);
+	return (arcadia_sound *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -194,3 +194,5 @@ DEVICE_GET_INFO(arcadia_sound)
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
 	}
 }
+
+DEFINE_LEGACY_SOUND_DEVICE(ARCADIA, arcadia_sound);

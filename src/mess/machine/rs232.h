@@ -16,7 +16,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define RS232 DEVICE_GET_INFO_NAME( rs232 )
+DECLARE_LEGACY_DEVICE(RS232, rs232);
 
 #define MDRV_RS232_ADD(_tag, _intf) \
 	MDRV_DEVICE_ADD(_tag, RS232, 0) \
@@ -54,9 +54,6 @@ struct _rs232_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( rs232 );
 
 /* receive/transmit data */
 READ_LINE_DEVICE_HANDLER( rs232_rd_r );

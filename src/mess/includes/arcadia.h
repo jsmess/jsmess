@@ -32,9 +32,8 @@ extern VIDEO_UPDATE( arcadia );
 
 /*----------- defined in audio/arcadia.c -----------*/
 
-#define SOUND_ARCADIA	DEVICE_GET_INFO_NAME(arcadia_sound)
+DECLARE_LEGACY_SOUND_DEVICE(ARCADIA, arcadia_sound);
 
-DEVICE_GET_INFO(arcadia_sound);
 void arcadia_soundport_w (running_device *device, int mode, int data);
 
 

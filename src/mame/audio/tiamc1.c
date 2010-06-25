@@ -288,7 +288,7 @@ static DEVICE_START( tiamc1_sound )
 	timer8253_reset(&timer0);
 	timer8253_reset(&timer1);
 
-	channel = stream_create(device, 0, 1, device->clock / CLOCK_DIVIDER, 0, tiamc1_sound_update);
+	channel = stream_create(device, 0, 1, device->clock() / CLOCK_DIVIDER, 0, tiamc1_sound_update);
 
 	timer1_divider = 0;
 
@@ -326,3 +326,5 @@ DEVICE_GET_INFO( tiamc1_sound )
 }
 
 
+
+DEFINE_LEGACY_SOUND_DEVICE(TIAMC1, tiamc1_sound);

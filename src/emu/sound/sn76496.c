@@ -138,17 +138,15 @@ struct _sn76496_state
 INLINE sn76496_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_SN76496 ||
-		   sound_get_type(device) == SOUND_SN76489 ||
-		   sound_get_type(device) == SOUND_SN76489A ||
-		   sound_get_type(device) == SOUND_SN76494 ||
-		   sound_get_type(device) == SOUND_SN94624 ||
-		   sound_get_type(device) == SOUND_NCR7496 ||
-		   sound_get_type(device) == SOUND_GAMEGEAR ||
-		   sound_get_type(device) == SOUND_SMSIII);
-	return (sn76496_state *)device->token;
+	assert(device->type() == SOUND_SN76496 ||
+		   device->type() == SOUND_SN76489 ||
+		   device->type() == SOUND_SN76489A ||
+		   device->type() == SOUND_SN76494 ||
+		   device->type() == SOUND_SN94624 ||
+		   device->type() == SOUND_NCR7496 ||
+		   device->type() == SOUND_GAMEGEAR ||
+		   device->type() == SOUND_SMSIII);
+	return (sn76496_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 READ8_DEVICE_HANDLER( sn76496_ready_r )
@@ -346,7 +344,7 @@ static void SN76496_set_gain(sn76496_state *R,int gain)
 
 static int SN76496_init(running_device *device, sn76496_state *R, int stereo)
 {
-	int sample_rate = device->clock/2;
+	int sample_rate = device->clock()/2;
 	int i;
 
 	R->Channel = stream_create(device,0,(stereo?2:1),sample_rate,R,SN76496Update);
@@ -555,3 +553,13 @@ DEVICE_GET_INFO( smsiii )
 		default:										DEVICE_GET_INFO_CALL(sn76496);						break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(SN76496, sn76496);
+DEFINE_LEGACY_SOUND_DEVICE(SN76489, sn76489);
+DEFINE_LEGACY_SOUND_DEVICE(SN76489A, sn76489a);
+DEFINE_LEGACY_SOUND_DEVICE(SN76494, sn76494);
+DEFINE_LEGACY_SOUND_DEVICE(SN94624, sn94624);
+DEFINE_LEGACY_SOUND_DEVICE(NCR7496, ncr7496);
+DEFINE_LEGACY_SOUND_DEVICE(GAMEGEAR, gamegear);
+DEFINE_LEGACY_SOUND_DEVICE(SMSIII, smsiii);

@@ -20,6 +20,99 @@
 /*      -lrescue                                                            */
 /*      -invasion                                                           */
 /*                                                                          */
+/*  - The Taito Space invaders hardware comes on at least five board types;
+      The Taito manufactured ones are:
+      * The "L-shaped" PCB set, Upright, B&W only
+      * Three pcbs in a stack, often called the '3 layer pcb set' (most common)
+      * Two pcbs in a stack, with the function of two of the three pcb stack
+        pcbs combined.
+      * In general, discounting revision specific differences, the pcbs are
+        arranged in a stack, connected end-to-end by ribbon cables and folded
+        such that the middle pcb (of 3 pcb stack) or the bottom pcb (of 2 pcb
+        stack) is upside down.
+      * Keep in mind specific differences on the pcbs (especially the TVN pcbs
+        vs the others) sometimes prevent exchanging 'equivalent' pcbs between stacks.
+        * L-shaped pcb set details:
+          * One large, square board with ROM, RAM, CPU, Video circuitry on it.
+          * One smaller pcb with audio/io/shifter circuitry on it, plugged into
+            the main pcb at a right angle (hence the entire pcb set is 'L-shaped')
+          * Does not have the capability of any sort of electronic color overlay.
+        * 3 layer pcb set details:
+          * This pcb set came in 3 versions: TVN, CVN, PVN; see below for differences.
+          * Top pcb: Audio/IO/Shifter pcb
+            - discrete audio and sn76477, and volume knobs
+            - data shifter, using either ~11 74xx chips, AM25S10s, Fujitsu MB14221
+              or Fujitsu MB14241 chips, which all do the same thing.
+            - has the dipswitches
+            - has the main "G" edge connector for the wiring harness
+            - has the gating circuitry for the color overlay
+              (these are not present and/or populated on some TVN pcbs)
+            - despite there being at least six versions of this pcb, the discrete
+              audio section is identical in all of them.
+          * Middle pcb: CPU/RAM/Color overlay pcb
+            - has SRAMS on it
+            - has the 8080 CPU on it
+            - has the two PROMS for color overlay on it (one for each player flip)
+              (these are not populated on TVN pcbs and the related circuitry is not
+              present and/or populated on some TVN pcbs)
+          * Bottom pcb: Power/Video/ROM pcb
+            - has the game roms on it
+            - has the main B&W video generation logic on it
+            - has the larger connection to the PSU, and B&W composite output "T" connector
+        * 2 layer pcb set details:
+          * This pcb set came in one version: PVN, and is entirely exchangable
+            with the 3 layer PVN pcb set.
+          * Top pcb is same as 3 layer pcb set
+          * Bottom pcb combines the function of the Middle and Bottom pcbs
+            of the 3 layer set.
+
+       * The different pcb set versions are noted by a different version code on
+         a paper sticker on the pcb; The code will be of the format mVNnnnnn where
+         m is a letter and nnnnn is a number.
+         Codes:
+         * SVNxxxxx? (L shaped pcbset) - B&W only, used on "Space Invaders" Upright
+           with 3-strip overlay.
+           Audio PCB daughterboard has part number SVN00001 or SVN00003.
+           Came from factory with one of the TV romsets ONLY?
+           Capable of running TV, SV or CV romsets.
+         * TVNxxxxx (3 layer pcb) - B&W only, used on "T.T Space Invaders"
+           cocktail with blended single-sheet color gel overlay.
+        TODO: this overlay is not supported in MAME yet.
+           Several revisions (at least 5 rom, 3 cpu, 3 audio) of each pcb exist
+           for this set.
+           Came from factory with one of the SV or TV romsets.
+           Capable of running TV, SV or CV romsets.
+         * CVNxxxxx (3 layer pcb) - Color, used on "T.T Space Invaders Color"
+           cocktail with electronic overlay.
+           Came from factory with one of the CV romsets.
+           Capable of running TV, SV or CV romsets.
+         * PVNxxxxx (2&3 layer pcb) - Color, used on "T.T Space Invaders Part
+           II" cocktail with electronic overlay.
+           Several revisions (at least 3 rom, 1 cpu, 2 audio) of each pcb exist
+           for this set.
+           Came from factory with UV (2708) or PV (2716) romsets.
+           Capable of running TV, SV, CV, UV or PV romsets.
+
+       * The following Romsets are known:
+         TV0H, TV02, TV03, TV04 (w/test mode) - sitv
+         TV01, TV02, TV03, TV04 (w/o test mode) - undumped, tv01 has crc32 of 9F37B146
+         SV0H, SV11, SV12, SV04, SV13, SV14 - undumped? roms called sv0h exist in mame...
+         SV01, SV11, SV12, SV04, SV13, SV14 - sisv2
+         SV01, SV02, SV10, SV04, SV09, SV06 - sisv
+         CV03, CV04, CV05, CV06 w/proms - undumped (but apparently the same as sisv with the roms combined to 2716 size)
+         CV17, CV18, CV19, CV20 w/proms- sicv
+         UV1, UV2, UV3, UV4, UV5, UV6, UV7, UV8, UV9, UV10 w/proms - undumped (probably same as pvxx set just split differently)
+         PV01, PV02, PV03, PV04, PV05 w/proms - invadpt2
+
+      - Midway PCB sets: (cursory descripton)
+         NOTE: The discrete components, particularly for the shot sound, differ between Taito and Midway audio daughterboards.
+         TODO: figure out the difference between the Taito and Midway discrete boards and emulate them both properly. Figure out what the current discrete setup is trying to emulate.
+         * All Midway Space Invaders games ([Space Invader Upright], [Space Invader Cocktail], [Deluxe Space Invaders Upright], [Deluxe Space Invaders Cocktail], and [Space Invaders II]) use the same 8080 mainboard, with no emulation-relevant differences between revisions.
+         * [Space Invaders II] from Midway (only produced as a cocktail) uses an extra sound board for the simultaneous 2 player head-to-head sounds.
+         TODO: remove Space Invader 'invaders' set from mw8080bw.c, it does not belong there at all
+
+      - Taito-USA-made 'trimline' PCBS do not match the taito pcbs either.
+*/
 /*  To Do:                                                                  */
 /*  -----                                                                   */
 /*                                                                          */
@@ -258,6 +351,7 @@ static ADDRESS_MAP_START( invadpt2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( invadpt2 )
 	PORT_INCLUDE( sicv )
@@ -2008,6 +2102,136 @@ static MACHINE_DRIVER_START( darthvdr )
 
 MACHINE_DRIVER_END
 
+/*************************************
+ *
+ * Vortex (by Zilec AKA Zenitone-Microsec)
+ * Runs on Space Invaders CV (color)/PV (part 2) board with
+ * some color mods, and an epoxy brick for rom encryption
+ * see below for decryption function (A0, A3, A9 invert)
+ * It uses its own I/O function since A9 is inverted (and A9 mirrors A1 for I/O)
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( vortex_io_map, ADDRESS_SPACE_IO, 8 )
+	// I/O map is same as invaders but with A9 (used as A1 for I/O) inverted
+	ADDRESS_MAP_GLOBAL_MASK(0xFF)
+	AM_RANGE(0x02, 0x02) AM_MIRROR(0x04) AM_READ_PORT("IN0")
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ_PORT("IN1")
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN2")
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_DEVREAD("mb14241", mb14241_shift_result_r)
+
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("mb14241", mb14241_shift_count_w)
+	AM_RANGE(0x01, 0x01) AM_DEVWRITE("discrete", invaders_audio_1_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("mb14241", mb14241_shift_data_w)
+	AM_RANGE(0x07, 0x07) AM_DEVWRITE("discrete", invaders_audio_2_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( vortex )
+	PORT_INCLUDE( sicv )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+
+	PORT_MODIFY("IN2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
+INPUT_PORTS_END
+
+MACHINE_DRIVER_START( vortex )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(mw8080bw_root)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_IO_MAP(vortex_io_map)
+	MDRV_MACHINE_START(extra_8080bw)
+	MDRV_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+
+	/* video hardware */
+	// TODO: replace with modified invaders color renderer code allowing midscanline color writes
+	MDRV_VIDEO_UPDATE(invaders)
+
+	/* add shifter */
+	MDRV_MB14241_ADD("mb14241")
+
+	/* audio hardware */
+	MDRV_IMPORT_FROM(invaders_audio)
+
+MACHINE_DRIVER_END
+
+/* decrypt function for vortex */
+static DRIVER_INIT( vortex )
+{
+	UINT8 *rom = memory_region(machine, "maincpu");
+	int length = memory_region_length(machine, "maincpu");
+	UINT8 *buf1 = auto_alloc_array(machine, UINT8, length);
+	UINT32 x;
+	for (x = 0; x < length; x++)
+	{
+		UINT32 addr = x;
+		/*
+        A15 A14 A13     A0  A3  A9
+        0   0   0       I   I   I
+        0   0   1       I   I   I
+        0   1   0       N   N   N
+        0   1   1       N   I   I
+        1   0   0       N   I   I
+        1   0   1       N   I   I
+        1   1   0       N   I   I
+        1   1   1       N   I   I
+        */
+		switch (x&0xE000) // inputs are A13 A14 A15
+		{
+			case 0x0000: case 0x2000: // A0 A3 A9
+				addr ^= 0x0209;
+				break;
+			case 0x4000: // none, but doesn't decode right with none
+				addr ^= 0x0209; // hack: this doesn't match schematic but gets code running. Why does this work? Is there something I'm not undertstanding about how the memory_region maps? or was the zilec/zinitone-microsec epoxy brick simply a bad design which is always stuck on the 0x0000 encryption no matter what?
+				break;
+			case 0x6000: case 0x8000: case 0xa000: case 0xc000: case 0xe000: // A3 and A9
+				addr ^= 0x0208;
+				break;
+		/*
+            case 0x0000: case 0x2000: // A0 A3 A9
+                addr ^= 0x0001;
+                break;
+            case 0x4000:
+                addr ^= 0x0208;
+                break;
+            case 0x6000: case 0x8000: case 0xa000: case 0xc000: case 0xe000:
+                break;*/
+		}
+		buf1[addr] = rom[x];
+	}
+
+	memcpy(rom, buf1, length);
+
+	auto_free(machine, buf1);
+}
+
 
 ROM_START( searthin )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2950,7 +3174,7 @@ GAME( 1979, grescue,  lrescue,  lrescue,  lrescue,  0, ROT270, "Taito (Universal
 GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Destination Earth", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Taito (Midway license)", "Space Invaders Deluxe", GAME_SUPPORTS_SAVE )
-GAME( 1980, vortex,   0,        invaders, invadpt2, 0, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080 */
+GAME( 1980, vortex,   0,        vortex,   vortex, vortex, ROT270, "Zilec Electronics Ltd.", "Vortex", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) /* Encrypted 8080/IO */
 GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_COLORS )
 GAME( 1979, schasercv,schaser,  schasercv,schasercv,0, ROT270, "Taito", "Space Chaser (CV version)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
@@ -2972,11 +3196,11 @@ GAMEL(1978, invadrmr, invaders, invaders, invadrmr, 0, ROT270, "bootleg? (Model 
 GAMEL(1978, spaceatt, invaders, invaders, sicv,     0, ROT270, "bootleg (Video Games GmbH)", "Space Attack", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2, invaders, invaders, spaceatt, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II", GAME_SUPPORTS_SAVE, layout_invaders ) // bootleg of super invaders
 GAMEL(19??, sinvzen,  invaders, invaders, spaceatt, 0, ROT270, "Zenitone-Microsec Ltd", "Super Invaders (Zenitone-Microsec)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg", "Super Invaders (EMAG)", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(19??, sinvemag, invaders, invaders, sinvemag, 0, ROT270, "bootleg (Emag)", "Super Invaders (Emag)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "<unknown>", "Space Invaders Test ROM", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninv, invaders, invaders, alieninv, 0, ROT270, "bootleg (Margamatics)", "Alien Invasion", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, alieninvp2,invaders,invaders, searthin, 0, ROT270, "bootleg", "Alien Invasion Part II", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation (Konami)","Space King", GAME_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation","Space King", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spcewars, invaders, spcewars, spcewars, 0, ROT270, "bootleg? (Sanritsu)", "Space War (Sanritsu)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invaders )
 GAME (19??, astropal, 0,        astropal, astropal, 0, ROT0,   "Sidam?", "Astropal", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAMEL(1978, spacewr3, invaders, spcewars, sicv,     0, ROT270, "bootleg", "Space War Part 3", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_invaders )
@@ -2990,8 +3214,8 @@ GAMEL(19??, superinv, invaders, invaders, superinv, 0, ROT270, "bootleg", "Super
 GAMEL(19??, invasion, invaders, invaders, invasion, 0, ROT270, "Sidam",   "Invasion (Sidam)", GAME_SUPPORTS_SAVE, layout_invaders )
 GAMEL(19??, invasiona,invaders, invaders, invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 1, normal graphics)", GAME_SUPPORTS_SAVE, layout_invaders ) // has Sidam replaced with 'Ufo Monster Attack' and standard GFX
 GAMEL(19??, invasionb,invaders, invaders, invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 2, no copyright)", GAME_SUPPORTS_SAVE, layout_invaders )
-GAMEL(19??, invasionrz,invaders,invaders, invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 3, R Z SRL BOLOGNA)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
-GAMEL(19??, invasionrza,invaders,invaders,invasion, 0, ROT270, "bootleg", "Invasion (bootleg, set 4, R Z SRL BOLOGNA)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
+GAMEL(19??, invasionrz,invaders,invaders, invasion, 0, ROT270, "bootleg (R Z SRL Bologna)", "Invasion (bootleg, set 3, R Z SRL Bologna)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
+GAMEL(19??, invasionrza,invaders,invaders,invasion, 0, ROT270, "bootleg (R Z SRL Bologna)", "Invasion (bootleg, set 4, R Z SRL Bologna)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING, layout_invaders )
 GAME( 19??, darthvdr, invaders, darthvdr, darthvdr, 0, ROT270, "bootleg", "Darth Vader", GAME_SUPPORTS_SAVE | GAME_NO_SOUND )
 GAME( 1979, moonbase, invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu (Taito license?)", "Moon Base (set 1)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND ) // this has a 'Taito Corp' string hidden away in the rom - how do you get it to display?
 GAME( 1979, moonbasea,invadpt2, invadpt2, invadpt2, 0, ROT270, "Nichibutsu", "Moon Base (set 2)", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )                  // this has the same string replaced with Nichibutsu, no other differences
@@ -3000,7 +3224,7 @@ GAMEL(19??, invrvngea,invrvnge, invrvnge, invrvnge, 0, ROT270, "Zenitone-Microse
 GAME( 1980, spclaser, 0,        invaders, spclaser, 0, ROT270, "Taito", "Space Laser", GAME_SUPPORTS_SAVE )
 GAME( 1980, intruder, spclaser, invadpt2, spclaser, 0, ROT270, "Taito (GamePlan license?)", "Intruder", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
 GAME( 1980, laser,    spclaser, invaders, spclaser, 0, ROT270, "bootleg (Leisure Time Electronics Inc.)", "Astro Laser", GAME_SUPPORTS_SAVE )
-GAME( 1979, spcewarl, spclaser, invaders, spclaser, 0, ROT270, "Leijac Corporation (Konami)","Space War (Leijac Corporation)", GAME_SUPPORTS_SAVE )
+GAME( 1979, spcewarl, spclaser, invaders, spclaser, 0, ROT270, "Leijac Corporation","Space War (Leijac Corporation)", GAME_SUPPORTS_SAVE )
 GAME( 1979, rollingc, 0,        rollingc, rollingc, 0, ROT270, "Nichibutsu", "Rolling Crash / Moon Base", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1979, ozmawars, 0,        invaders, ozmawars, 0, ROT270, "SNK", "Ozma Wars (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1979, ozmawars2,ozmawars, invaders, ozmawars, 0, ROT270, "SNK", "Ozma Wars (set 2)", GAME_SUPPORTS_SAVE ) /* Uses Taito's three board color version of Space Invaders PCB */

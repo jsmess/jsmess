@@ -498,8 +498,8 @@ struct _upd7810_state
 	const struct opcode_s *op74;
 	void (*handle_timers)(upd7810_state *cpustate, int cycles);
 	UPD7810_CONFIG config;
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -508,14 +508,13 @@ struct _upd7810_state
 INLINE upd7810_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_UPD7810 ||
 		   cpu_get_type(device) == CPU_UPD7807 ||
 		   cpu_get_type(device) == CPU_UPD7801 ||
 		   cpu_get_type(device) == CPU_UPD78C05 ||
 		   cpu_get_type(device) == CPU_UPD78C06);
-	return (upd7810_state *)device->token;
+	return (upd7810_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define CY	0x01
@@ -1701,7 +1700,7 @@ static CPU_INIT( upd7810 )
 {
 	upd7810_state *cpustate = get_safe_token(device);
 
-	cpustate->config = *(const UPD7810_CONFIG*) device->baseconfig().static_config;
+	cpustate->config = *(const UPD7810_CONFIG*) device->baseconfig().static_config();
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
@@ -1780,7 +1779,7 @@ static CPU_RESET( upd7810 )
 {
 	upd7810_state *cpustate = get_safe_token(device);
 	UPD7810_CONFIG save_config;
-	cpu_irq_callback save_irqcallback;
+	device_irq_callback save_irqcallback;
 
 	save_config = cpustate->config;
 	save_irqcallback = cpustate->irq_callback;
@@ -1886,7 +1885,6 @@ static CPU_EXIT( upd7810 )
 static CPU_EXECUTE( upd7810 )
 {
 	upd7810_state *cpustate = get_safe_token(device);
-	cpustate->icount = cycles;
 
 	do
 	{
@@ -1962,8 +1960,6 @@ static CPU_EXECUTE( upd7810 )
 		upd7810_take_irq(cpustate);
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 static void set_irq_line(upd7810_state *cpustate, int irqline, int state)
@@ -2130,7 +2126,7 @@ static CPU_SET_INFO( upd7810 )
 
 CPU_GET_INFO( upd7810 )
 {
-	upd7810_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	upd7810_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

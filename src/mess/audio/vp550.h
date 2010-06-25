@@ -19,8 +19,8 @@
 #define VP550_TAG	"vp550"
 #define VP551_TAG	"vp551"
 
-#define VP550 DEVICE_GET_INFO_NAME(vp550)
-#define VP551 DEVICE_GET_INFO_NAME(vp551)
+DECLARE_LEGACY_DEVICE(VP550, vp550);
+DECLARE_LEGACY_DEVICE(VP551, vp551);
 
 #define MDRV_VP550_ADD(_clock) \
 	MDRV_DEVICE_ADD(VP550_TAG, VP550, _clock)
@@ -31,11 +31,6 @@
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( vp550 );
-DEVICE_GET_INFO( vp551 );
-
 /* Q line */
 WRITE_LINE_DEVICE_HANDLER( vp550_q_w ) ATTR_NONNULL(1);
 

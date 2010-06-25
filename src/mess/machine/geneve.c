@@ -245,7 +245,7 @@ MACHINE_RESET( geneve )
 VIDEO_START(geneve)
 {
 	VIDEO_START_CALL(generic_bitmapped);
-	v9938_init(machine, 0, machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, /*0x20000*/0x30000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
+	v9938_init(machine, 0, *machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, /*0x20000*/0x30000, tms9901_set_int2);	/* v38 with 128 kb of video RAM */
 }
 
 /*

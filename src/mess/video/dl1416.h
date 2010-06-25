@@ -70,8 +70,6 @@ WRITE_LINE_DEVICE_HANDLER( dl1416_cu_w ); /* cursor enable */
 WRITE8_DEVICE_HANDLER( dl1416_data_w );
 
 /* device get info callback */
-#define DL1416 DEVICE_GET_INFO_NAME(dl1416)
-DEVICE_GET_INFO( dl1416 );
-
+DECLARE_LEGACY_DEVICE(DL1416, dl1416);
 
 #endif /* DL1416_H_ */

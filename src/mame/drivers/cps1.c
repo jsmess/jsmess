@@ -289,7 +289,7 @@ static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 
 static WRITE8_DEVICE_HANDLER( cps1_oki_pin7_w )
 {
-	okim6295_set_pin7(device, (data & 1));
+	downcast<okim6295_device *>(device)->set_pin7(data & 1);
 }
 
 static WRITE16_HANDLER( cps1_soundlatch_w )
@@ -3000,8 +3000,7 @@ static MACHINE_DRIVER_START( cps1_10MHz )
 	MDRV_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_16MHz/4/4)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // pin 7 can be changed by the game code, see f006 on z80
+	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/4/4, OKIM6295_PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -3011,7 +3010,8 @@ static MACHINE_DRIVER_START( cps1_12MHz )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(cps1_10MHz)
 
-	MDRV_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )	/* verified on pcb */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK( XTAL_12MHz )	/* verified on pcb */
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pang3 )
@@ -3064,7 +3064,7 @@ static MACHINE_DRIVER_START( cpspicb )
 	MDRV_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)
 
 	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000)
-	MDRV_CPU_FLAGS(CPU_DISABLE) /* no valid dumps .. */
+	MDRV_DEVICE_DISABLE() /* no valid dumps .. */
 
 	MDRV_MACHINE_START(common)
 
@@ -3086,8 +3086,7 @@ static MACHINE_DRIVER_START( cpspicb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1000000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -7806,7 +7805,7 @@ ROM_START( sf2hf )
 	ROM_LOAD( "sou1",         0x0000, 0x0117, CRC(84f4b2fe) SHA1(dcc9e86cc36316fe42eace02d6df75d08bc8bb6d) )
 ROM_END
 
-ROM_START( sf2t )
+ROM_START( sf2hfu )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sf2.23",        0x000000, 0x80000, CRC(89a1fc38) SHA1(aafb40fc311e318250973be8c6aa0d3f7902cb3c) )
 	ROM_LOAD16_WORD_SWAP( "sf2_22.bin",    0x080000, 0x80000, CRC(aea6e035) SHA1(ce5fe961b2c1c95d231d1235bfc03b47de489f2a) )
@@ -9123,8 +9122,8 @@ GAME( 1989, dynwarj,  dynwar,   cps1_10MHz, dynwar,   cps1,     ROT0,   "Capcom"
 GAME( 1989, willow,   0,        cps1_10MHz, willow,   cps1,     ROT0,   "Capcom", "Willow (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, willowj,  willow,   cps1_10MHz, willow,   cps1,     ROT0,   "Capcom", "Willow (Japan, Japanese)", GAME_SUPPORTS_SAVE )		// Japan "warning"
 GAME( 1989, willowje, willow,   cps1_10MHz, willow,   cps1,     ROT0,   "Capcom", "Willow (Japan, English)", GAME_SUPPORTS_SAVE )		// (c) Capcom U.S.A. but Japan "warning"
-GAME( 1989, unsquad,  0,        cps1_10MHz, unsquad,  cps1,     ROT0,   "Capcom", "U.N. Squadron (US)", GAME_SUPPORTS_SAVE )
-GAME( 1989, area88,   unsquad,  cps1_10MHz, unsquad,  cps1,     ROT0,   "Capcom", "Area 88 (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1989, unsquad,  0,        cps1_10MHz, unsquad,  cps1,     ROT0,   "Capcom / Daipro", "U.N. Squadron (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, area88,   unsquad,  cps1_10MHz, unsquad,  cps1,     ROT0,   "Capcom / Daipro", "Area 88 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffight,   0,        cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffightu,  ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffightua, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (US 900112)", GAME_SUPPORTS_SAVE )
@@ -9132,7 +9131,7 @@ GAME( 1989, ffightub, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom"
 GAME( 1989, ffightj,  ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffightj1, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900305)", GAME_SUPPORTS_SAVE )
 GAME( 1989, ffightj2, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "Capcom", "Final Fight (Japan 900112)", GAME_SUPPORTS_SAVE )
-GAME( 1989, ffightjh, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "hack",   "Street Smart / Final Fight (Japan, hack)", GAME_SUPPORTS_SAVE )
+GAME( 199?, ffightjh, ffight,   cps1_10MHz, ffight,   cps1,     ROT0,   "hack",   "Street Smart / Final Fight (Japan, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1990, 1941,     0,        cps1_10MHz, 1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, 1941j,    1941,     cps1_10MHz, 1941,     cps1,     ROT270, "Capcom", "1941 - Counter Attack (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, mercs,    0,        cps1_10MHz, mercs,    cps1,     ROT270, "Capcom", "Mercs (World 900302)", GAME_SUPPORTS_SAVE )					// "ETC"
@@ -9209,9 +9208,9 @@ GAME( 1992, varthr1,  varth,    cps1_12MHz, varth,    cps1,     ROT270, "Capcom"
 GAME( 1992, varthu,   varth,    cps1_12MHz, varth,    cps1,     ROT270, "Capcom (Romstar license)", "Varth - Operation Thunderstorm (US 920612)", GAME_SUPPORTS_SAVE )
 GAME( 1992, varthj,   varth,    cps1_12MHz, varth,    cps1,     ROT270, "Capcom", "Varth - Operation Thunderstorm (Japan 920714)", GAME_SUPPORTS_SAVE )
 GAME( 1992, cworld2j, 0,        cps1_12MHz, cworld2j, cps1,     ROT0,   "Capcom", "Capcom World 2 (Japan 920611)", GAME_SUPPORTS_SAVE )
-GAME( 1992, sf2hf,    sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Hyper Fighting (World 921209)", GAME_SUPPORTS_SAVE )
-GAME( 1992, sf2t,     sf2ce,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Hyper Fighting (US 921209)", GAME_SUPPORTS_SAVE )
-GAME( 1992, sf2tj,    sf2ce,    cps1_12MHz, sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II' Turbo - Hyper Fighting (Japan 921209)", GAME_SUPPORTS_SAVE )
+GAME( 1992, sf2hf,    0,    	cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Hyper Fighting (World 921209)", GAME_SUPPORTS_SAVE )
+GAME( 1992, sf2hfu,   sf2hf,    cps1_12MHz, sf2,      cps1,     ROT0,   "Capcom", "Street Fighter II' - Hyper Fighting (US 921209)", GAME_SUPPORTS_SAVE )
+GAME( 1992, sf2tj,    sf2hf,    cps1_12MHz, sf2j,     cps1,     ROT0,   "Capcom", "Street Fighter II' Turbo - Hyper Fighting (Japan 921209)", GAME_SUPPORTS_SAVE )
 GAME( 1992, qad,      0,        cps1_12MHz, qad,      cps1,     ROT0,   "Capcom", "Quiz & Dragons (US 920701)", GAME_SUPPORTS_SAVE )	// 12MHz verified
 GAME( 1994, qadj,     qad,      cps1_12MHz, qadj,     cps1,     ROT0,   "Capcom", "Quiz & Dragons (Japan 940921)", GAME_SUPPORTS_SAVE )
 GAME( 1995, qtono2,   0,        cps1_12MHz, qtono2,   cps1,     ROT0,   "Capcom", "Quiz Tonosama no Yabou 2 Zenkoku-ban (Japan 950123)", GAME_SUPPORTS_SAVE )

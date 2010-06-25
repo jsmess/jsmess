@@ -225,7 +225,7 @@ static void dump_screenshot(running_machine *machine, int write_file)
 		if (filerr == FILERR_NONE)
 		{
 			/* choose a screen */
-			running_device *screen = video_screen_first(machine);
+			screen_device *screen = screen_first(*machine);
 			while((screen != NULL) && !render_is_live_screen(screen))
 			{
 				screen = video_screen_next(screen);

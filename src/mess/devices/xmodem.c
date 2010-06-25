@@ -1,4 +1,4 @@
-/* XMODEM protocol implementation.
+	/* XMODEM protocol implementation.
 
    Transfer between an emulated machine and an image using the XMODEM protocol.
 
@@ -66,7 +66,7 @@ typedef struct {
 	UINT16  pos;                 /* position in block, including header */
 	UINT8   state;               /* one of XMODEM_ */
 
-	running_device* image;  /* underlying image */
+	device_image_interface* image;  /* underlying image */
 
 	emu_timer* timer;            /* used to send periodic NAKs */
 
@@ -94,8 +94,8 @@ static int xmodem_make_send_block( xmodem* state )
 {
 	if ( ! state->image ) return -1;
 	memset( state->block + 3, 0, 128 );
-	if ( image_fseek( state->image, (state->id - 1) * 128, SEEK_SET ) ) return -1;
-	if ( image_fread( state->image, state->block + 3, 128 ) <= 0 ) return -1;
+	if ( state->image->fseek( (state->id - 1) * 128, SEEK_SET ) ) return -1;
+	if ( state->image->fread( state->block + 3, 128 ) <= 0 ) return -1;
 	state->block[0] = XMODEM_SOH;
 	state->block[1] = state->id & 0xff;
 	state->block[2] = 0xff - state->block[1];
@@ -110,13 +110,13 @@ static int xmodem_get_receive_block( xmodem* state )
 {
 	int next_id = state->id + 1;
 	if ( ! state->image ) return -1;
-	if ( ! image_is_writable( state->image ) ) return -1;
+	if ( ! state->image->is_writable() ) return -1;
 	if ( state->block[0] != XMODEM_SOH ) return -1;
 	if ( state->block[1] != 0xff - state->block[2] ) return -1;
 	if ( state->block[131] != xmodem_chksum( state ) ) return -1;
 	if ( state->block[1] != (next_id & 0xff) ) return -1;
-	if ( image_fseek( state->image, (next_id - 1) * 128, SEEK_SET ) ) return -1;
-	if ( image_fwrite( state->image, state->block + 3, 128 ) != 128 ) return -1;
+	if ( state->image->fseek( (next_id - 1) * 128, SEEK_SET ) ) return -1;
+	if ( state->image->fwrite( state->block + 3, 128 ) != 128 ) return -1;
 	return 0;
 }
 
@@ -162,7 +162,7 @@ static void xmodem_make_idle( xmodem* state )
 /* emulated machine has read the last byte we sent */
 void xmodem_byte_transmitted( running_device *device )
 {
-	xmodem* state = (xmodem*) device->token;
+	xmodem* state = (xmodem*) downcast<legacy_device_base *>(device)->token();
 	if ( (state->state == XMODEM_SENDING) && (state->pos < 132) )
 	{
 		/* send next byte */
@@ -173,7 +173,7 @@ void xmodem_byte_transmitted( running_device *device )
 /* emulated machine sends a byte to the outside (us) */
 void xmodem_receive_byte( running_device *device, UINT8 data )
 {
-	xmodem* state = (xmodem*) device->token;
+	xmodem* state = (xmodem*) downcast<legacy_device_base *>(device)->token();
 	switch ( state->state )
 	{
 
@@ -293,43 +293,43 @@ void xmodem_receive_byte( running_device *device, UINT8 data )
 
 static DEVICE_START( xmodem )
 {
-	xmodem* state = (xmodem*) device->token;
+	xmodem* state = (xmodem*) downcast<legacy_device_base *>(device)->token();
 	LOG(( "xmodem: start\n" ));
 	state->state = XMODEM_NOIMAGE;
 	state->image = NULL;
-	state->conf = (xmodem_config*) device->baseconfig().static_config;
+	state->conf = (xmodem_config*) device->baseconfig().static_config();
 	state->machine = device->machine;
 	state->timer = timer_alloc(device->machine,  xmodem_nak_cb, state );
 }
 
 static DEVICE_RESET( xmodem )
 {
-	xmodem* state = (xmodem*) device->token;
+	xmodem* state = (xmodem*) downcast<legacy_device_base *>(device)->token();
 	LOG(( "xmodem: reset\n" ));
 	if ( state->state != XMODEM_NOIMAGE ) xmodem_make_idle( state );
 }
 
 static DEVICE_IMAGE_LOAD( xmodem )
 {
-	xmodem* state = (xmodem*) image->token;
+	xmodem* state = (xmodem*) downcast<legacy_device_base *>(&image.device())->token();
 	LOG(( "xmodem: image load\n" ));
-	state->image = image;
+	state->image = &image;
 	xmodem_make_idle( state );
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_CREATE( xmodem )
 {
-	xmodem* state = (xmodem*) image->token;
+	xmodem* state = (xmodem*) downcast<legacy_device_base *>(&image.device())->token();
 	LOG(( "xmodem: image create\n" ));
-	state->image = image;
+	state->image = &image;
 	xmodem_make_idle( state );
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( xmodem )
 {
-	xmodem* state = (xmodem*) image->token;
+	xmodem* state = (xmodem*) downcast<legacy_device_base *>(&image.device())->token();
 	LOG(( "xmodem: image unload\n" ));
 	state->state = XMODEM_NOIMAGE;
 	state->image = NULL;
@@ -341,7 +341,6 @@ DEVICE_GET_INFO( xmodem )
 	switch ( state ) {
 	case DEVINFO_INT_TOKEN_BYTES:               info->i = sizeof( xmodem );                              break;
 	case DEVINFO_INT_INLINE_CONFIG_BYTES:       info->i = 0;                                             break;
-	case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;                       break;
 	case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_SERIAL;                                     break;
 	case DEVINFO_INT_IMAGE_READABLE:            info->i = 1;                                             break;
 	case DEVINFO_INT_IMAGE_WRITEABLE:	    info->i = 1;                                             break;
@@ -353,10 +352,11 @@ DEVICE_GET_INFO( xmodem )
 	case DEVINFO_FCT_IMAGE_CREATE:		    info->f = (genf *) DEVICE_IMAGE_CREATE_NAME( xmodem );   break;
 	case DEVINFO_STR_IMAGE_BRIEF_INSTANCE_NAME: strcpy(info->s, "x");	                                     break;
 	case DEVINFO_STR_IMAGE_INSTANCE_NAME:
-	case DEVINFO_STR_NAME:		            strcpy(info->s, "xmodem");	                                     break;
-	case DEVINFO_STR_FAMILY:                    strcpy(info->s, "serial protocol");	                     break;
+	case DEVINFO_STR_NAME:		            strcpy(info->s, "Xmodem");	                                     break;
+	case DEVINFO_STR_FAMILY:                    strcpy(info->s, "Serial protocol");	                     break;
 	case DEVINFO_STR_SOURCE_FILE:		    strcpy(info->s, __FILE__);                                      break;
 	case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "");                                            break;
 	}
 }
 
+DEFINE_LEGACY_IMAGE_DEVICE(XMODEM, xmodem);

@@ -646,7 +646,7 @@ VIDEO_EOF( nimbus )
 VIDEO_UPDATE( nimbus )
 {
     int     XCoord;
-    int     YCoord = video_screen_get_vpos(screen);
+    int     YCoord = screen->vpos();
 
     for(XCoord=0;XCoord<SCREEN_WIDTH_PIXELS;XCoord++)
     {

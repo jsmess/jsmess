@@ -122,10 +122,9 @@ struct _smartmedia_t
 INLINE smartmedia_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SMARTMEDIA);
+	assert(device->type() == SMARTMEDIA);
 
-	return (smartmedia_t *)device->token;
+	return (smartmedia_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -159,12 +158,13 @@ static DEVICE_START( smartmedia )
 */
 static DEVICE_IMAGE_LOAD( smartmedia_format_1 )
 {
-	smartmedia_t *sm = get_safe_token(image);
+	device_t *device = &image.device();
+	smartmedia_t *sm = get_safe_token(device);
 	disk_image_header custom_header;
 	int bytes_read;
 
 
-	bytes_read = image_fread(image, &custom_header, sizeof(custom_header));
+	bytes_read = image.fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
 		return INIT_FAIL;
@@ -179,31 +179,31 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_1 )
 	sm->page_total_size = get_UINT32BE(custom_header.page_total_size);
 	sm->num_pages = get_UINT32BE(custom_header.num_pages);
 	sm->log2_pages_per_block = get_UINT32BE(custom_header.log2_pages_per_block);
-	sm->data_ptr = auto_alloc_array(image->machine, UINT8, sm->page_total_size*sm->num_pages);
-	sm->data_uid_ptr = auto_alloc_array(image->machine, UINT8, 256 + 16);
+	sm->data_ptr = auto_alloc_array(device->machine, UINT8, sm->page_total_size*sm->num_pages);
+	sm->data_uid_ptr = auto_alloc_array(device->machine, UINT8, 256 + 16);
 	sm->mode = SM_M_INIT;
 	sm->pointer_mode = SM_PM_A;
 	sm->page_addr = 0;
 	sm->byte_addr = 0;
 	sm->status = 0x40;
-	if (!image_is_writable(image))
+	if (!image.is_writable())
 		sm->status |= 0x80;
 	sm->accumulated_status = 0;
-	sm->pagereg = auto_alloc_array(image->machine, UINT8, sm->page_total_size);
+	sm->pagereg = auto_alloc_array(device->machine, UINT8, sm->page_total_size);
 	sm->id[0] = sm->id[1] = sm->id[2] = 0;
 
 	if (custom_header.version == 0)
 	{
-		image_fread(image, sm->id, 2);
-		image_fread(image, &sm->mp_opcode, 1);
+		image.fread(sm->id, 2);
+		image.fread(&sm->mp_opcode, 1);
 	}
 	else if (custom_header.version == 1)
 	{
-		image_fread(image, sm->id, 3);
-		image_fread(image, &sm->mp_opcode, 1);
-		image_fread(image, sm->data_uid_ptr, 256 + 16);
+		image.fread(sm->id, 3);
+		image.fread(&sm->mp_opcode, 1);
+		image.fread(sm->data_uid_ptr, 256 + 16);
 	}
-	image_fread(image, sm->data_ptr, sm->page_total_size*sm->num_pages);
+	image.fread(sm->data_ptr, sm->page_total_size*sm->num_pages);
 
 	return INIT_PASS;
 }
@@ -237,11 +237,12 @@ static int detect_geometry( smartmedia_t *sm, UINT8 id1, UINT8 id2)
 
 static DEVICE_IMAGE_LOAD( smartmedia_format_2 )
 {
-	smartmedia_t *sm = get_safe_token(image);
+	device_t *device = &image.device();
+	smartmedia_t *sm = get_safe_token(device);
 	disk_image_format_2_header custom_header;
 	int bytes_read, i, j;
 
-	bytes_read = image_fread(image, &custom_header, sizeof(custom_header));
+	bytes_read = image.fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
 		return INIT_FAIL;
@@ -257,17 +258,17 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_2 )
 		return INIT_FAIL;
 	}
 
-	sm->data_ptr = auto_alloc_array(image->machine, UINT8, sm->page_total_size*sm->num_pages);
-	sm->data_uid_ptr = auto_alloc_array(image->machine, UINT8, 256 + 16);
+	sm->data_ptr = auto_alloc_array(device->machine, UINT8, sm->page_total_size*sm->num_pages);
+	sm->data_uid_ptr = auto_alloc_array(device->machine, UINT8, 256 + 16);
 	sm->mode = SM_M_INIT;
 	sm->pointer_mode = SM_PM_A;
 	sm->page_addr = 0;
 	sm->byte_addr = 0;
 	sm->status = 0x40;
-	if (!image_is_writable(image))
+	if (!image.is_writable())
 		sm->status |= 0x80;
 	sm->accumulated_status = 0;
-	sm->pagereg = auto_alloc_array(image->machine, UINT8, sm->page_total_size);
+	sm->pagereg = auto_alloc_array(device->machine, UINT8, sm->page_total_size);
 	memcpy( sm->id, custom_header.data1, 3);
 	sm->mp_opcode = 0;
 
@@ -278,7 +279,7 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_2 )
 	}
 	memcpy( sm->data_uid_ptr + 256, custom_header.data3, 16);
 
-	image_fread(image, sm->data_ptr, sm->page_total_size*sm->num_pages);
+	image.fread(sm->data_ptr, sm->page_total_size*sm->num_pages);
 
 	return INIT_PASS;
 }
@@ -288,12 +289,12 @@ static DEVICE_IMAGE_LOAD( smartmedia )
 	int result;
 	UINT64 position;
 	// try format 1
-	position = image_ftell( image);
+	position = image.ftell();
 	result = DEVICE_IMAGE_LOAD_NAME(smartmedia_format_1)(image);
 	if (result != INIT_PASS)
 	{
 			// try format 2
-			image_fseek( image, position, SEEK_SET);
+			image.fseek( position, SEEK_SET);
 			result = DEVICE_IMAGE_LOAD_NAME(smartmedia_format_2)(image);
 	}
 	return result;
@@ -304,7 +305,9 @@ static DEVICE_IMAGE_LOAD( smartmedia )
 */
 static DEVICE_IMAGE_UNLOAD( smartmedia )
 {
-	smartmedia_t *sm = get_safe_token(image);
+	device_t *device = &image.device();
+
+	smartmedia_t *sm = get_safe_token(device);
 
 	sm->page_data_size = 0;
 	sm->page_total_size = 0;
@@ -318,7 +321,7 @@ static DEVICE_IMAGE_UNLOAD( smartmedia )
 	sm->byte_addr = 0;
 	sm->status = 0x40;
 	sm->accumulated_status = 0;
-	sm->pagereg = auto_alloc_array(image->machine, UINT8, sm->page_total_size);
+	sm->pagereg = auto_alloc_array(device->machine, UINT8, sm->page_total_size);
 	sm->id[0] = sm->id[1] = sm->id[2] = 0;
 	sm->mp_opcode = 0;
 	sm->mode_3065 = 0;
@@ -623,7 +626,6 @@ DEVICE_GET_INFO( smartmedia )
 {
 	switch ( state )
 	{
-		case DEVINFO_INT_CLASS:	                    info->i = DEVICE_CLASS_PERIPHERAL;                         break;
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(smartmedia_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;
 		case DEVINFO_INT_IMAGE_TYPE:	            info->i = IO_MEMCARD;                                      break;
@@ -640,3 +642,5 @@ DEVICE_GET_INFO( smartmedia )
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:	    strcpy(info->s, "smc");                                           break;
 	}
 }
+
+DEFINE_LEGACY_IMAGE_DEVICE(SMARTMEDIA, smartmedia);

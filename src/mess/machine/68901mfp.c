@@ -323,15 +323,14 @@ struct _mc68901_t
 INLINE mc68901_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (mc68901_t *)device->token;
+	return (mc68901_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const mc68901_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == MC68901);
-	return (const mc68901_interface *) device->baseconfig().static_config;
+	assert(device->type() == MC68901);
+	return (const mc68901_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -1534,7 +1533,7 @@ WRITE_LINE_DEVICE_HANDLER( mc68901_tx_clock_w )
 
 static DEVICE_START( mc68901 )
 {
-	mc68901_t *mc68901 = (mc68901_t *)device->token;
+	mc68901_t *mc68901 = (mc68901_t *)downcast<legacy_device_base *>(device)->token();
 	const mc68901_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
@@ -1571,7 +1570,7 @@ static DEVICE_START( mc68901 )
 	}
 
 	mc68901->poll_timer = timer_alloc(device->machine, gpio_poll_tick, (void *)device);
-	timer_adjust_periodic(mc68901->poll_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 4));
+	timer_adjust_periodic(mc68901->poll_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock() / 4));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, mc68901->gpip);
@@ -1646,7 +1645,6 @@ DEVICE_GET_INFO( mc68901 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mc68901_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -1667,14 +1665,12 @@ DEVICE_GET_INFO( mc68901 )
     DEVICE_GET_INFO( mk68901 )
 -------------------------------------------------*/
 
-#ifdef UNUSED_FUNCTION
 DEVICE_GET_INFO( mk68901 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(mc68901_t);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -1690,4 +1686,6 @@ DEVICE_GET_INFO( mk68901 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
 	}
 }
-#endif
+
+DEFINE_LEGACY_DEVICE(MC68901, mc68901);
+DEFINE_LEGACY_DEVICE(MK68901, mk68901);

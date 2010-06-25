@@ -124,9 +124,8 @@ typedef struct
 INLINE mea8000_t* get_safe_token( running_device *device )
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( device->type == DEVICE_GET_INFO_NAME( mea8000 ) );
-	return (mea8000_t*) device->token;
+	assert( device->type() == MEA8000);
+	return (mea8000_t*) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -667,7 +666,7 @@ static DEVICE_START( mea8000 )
 {
 	mea8000_t* mea8000 = get_safe_token( device );
 	int i;
-	mea8000->iface = (const mea8000_interface*)device->baseconfig().static_config;
+	mea8000->iface = (const mea8000_interface*)device->baseconfig().static_config();
 
 	mea8000_init_tables(device->machine);
 
@@ -708,7 +707,6 @@ DEVICE_GET_INFO( mea8000 ) {
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(mea8000_t);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;					break;
-		case DEVINFO_INT_CLASS:				info->i = DEVICE_CLASS_PERIPHERAL;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:				info->start = DEVICE_START_NAME(mea8000);	break;
@@ -723,3 +721,5 @@ DEVICE_GET_INFO( mea8000 ) {
 		case DEVINFO_STR_CREDITS:			strcpy(info->s, "Copyright the MAME and MESS Teams");  break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(MEA8000, mea8000);

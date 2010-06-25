@@ -39,7 +39,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define ZX8302 DEVICE_GET_INFO_NAME( zx8302 )
+DECLARE_LEGACY_DEVICE(ZX8302, zx8302);
 
 #define MDRV_ZX8302_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, ZX8302, _clock) \
@@ -73,10 +73,6 @@ struct _zx8302_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( zx8302 );
-
 /* real time clock */
 READ8_DEVICE_HANDLER( zx8302_rtc_r );
 WRITE8_DEVICE_HANDLER( zx8302_rtc_w );

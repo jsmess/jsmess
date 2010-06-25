@@ -558,10 +558,10 @@ static MACHINE_RESET( coleco )
 
 static DEVICE_IMAGE_LOAD( czz50_cart )
 {
-	int size = image_length(image);
-	UINT8 *ptr = memory_region(image->machine, "maincpu") + 0x8000;
+	int size = image.length();
+	UINT8 *ptr = memory_region(image.device().machine, "maincpu") + 0x8000;
 
-	if (image_fread(image, ptr, size ) != size)
+	if (image.fread( ptr, size ) != size)
 	{
 		return INIT_FAIL;
 	}

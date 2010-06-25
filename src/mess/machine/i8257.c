@@ -111,16 +111,15 @@ struct _dma8257_t
 INLINE i8257_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == I8257);
-	return (i8257_t *) device->token;
+	assert(device->type() == I8257);
+	return (i8257_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const i8257_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == I8257));
-	return (const i8257_interface *) device->baseconfig().static_config;
+	assert((device->type() == I8257));
+	return (const i8257_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -608,7 +607,7 @@ WRITE_LINE_DEVICE_HANDLER( i8257_drq3_w ) { drq_w(device, 3, state); }
 static DEVICE_START( i8257 )
 {
 	i8257_t *i8257 = get_safe_token(device);
-	i8257_interface *intf = (i8257_interface *)device->baseconfig().static_config;
+	i8257_interface *intf = (i8257_interface *)device->baseconfig().static_config();
 	int ch;
 
 	/* resolve callbacks */
@@ -627,7 +626,7 @@ static DEVICE_START( i8257 )
 
 	/* create the DMA timer */
 	i8257->dma_timer = timer_alloc(device->machine, dma_tick, (void *)device);
-	timer_adjust_periodic(i8257->dma_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock));
+	timer_adjust_periodic(i8257->dma_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock()));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, i8257->mr);
@@ -683,7 +682,6 @@ DEVICE_GET_INFO( i8257 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8257_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(i8257);		break;
@@ -698,3 +696,5 @@ DEVICE_GET_INFO( i8257 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(I8257, i8257);

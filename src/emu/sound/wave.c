@@ -27,8 +27,8 @@
 static STREAM_UPDATE( wave_sound_update )
 {
 #ifdef MESS
-	running_device *image = (running_device *)param;
-	int speakers = speaker_output_count(image->machine->config);
+	device_image_interface *image = (device_image_interface *)param;
+	int speakers = speaker_output_count(image->device().machine->config);
 	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
@@ -37,15 +37,15 @@ static STREAM_UPDATE( wave_sound_update )
 	stream_sample_t *right_buffer = outputs[1];
 	int i;
 
-	state = cassette_get_state(image);
+	state = cassette_get_state(&image->device());
 
 	state = (cassette_state)(state & (CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER));
 
-	if (image_exists(image) && (ALWAYS_PLAY_SOUND || (state == (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED))))
+	if (image->exists() && (ALWAYS_PLAY_SOUND || (state == (CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED))))
 	{
-		cassette = cassette_get_image(image);
-		time_index = cassette_get_position(image);
-		duration = ((double) samples) / image->machine->sample_rate;
+		cassette = cassette_get_image(&image->device());
+		time_index = cassette_get_position(&image->device());
+		duration = ((double) samples) / image->device().machine->sample_rate;
 
 		cassette_get_samples(cassette, 0, time_index, duration, samples, 2, left_buffer, CASSETTE_WAVEFORM_16BIT);
 		if (speakers > 1)
@@ -71,13 +71,13 @@ static STREAM_UPDATE( wave_sound_update )
 
 static DEVICE_START( wave )
 {
-	running_device *image = NULL;
+	device_image_interface *image = NULL;
 
 	assert( device != NULL );
-	assert( device->baseconfig().static_config != NULL );
+	assert( device->baseconfig().static_config() != NULL );
 	int speakers = speaker_output_count(device->machine->config);
 #ifdef MESS
-	image = device->machine->device( (const char *)device->baseconfig().static_config );
+	image = dynamic_cast<device_image_interface *>(device->machine->device( (const char *)device->baseconfig().static_config()));
 #endif
 	if (speakers > 1)
 		stream_create(device, 0, 2, device->machine->sample_rate, (void *)image, wave_sound_update);
@@ -111,3 +111,6 @@ DEVICE_GET_INFO( wave )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright The MESS Team"); break;
 	}
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(WAVE, wave);

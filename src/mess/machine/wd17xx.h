@@ -17,15 +17,15 @@
     MACROS
 ***************************************************************************/
 
-#define WD1770		DEVICE_GET_INFO_NAME(wd1770)
-#define WD1771		DEVICE_GET_INFO_NAME(wd1771)
-#define WD1772		DEVICE_GET_INFO_NAME(wd1772)
-#define WD1773		DEVICE_GET_INFO_NAME(wd1773)
-#define WD179X		DEVICE_GET_INFO_NAME(wd179x)
-#define WD1793		DEVICE_GET_INFO_NAME(wd1793)
-#define WD2793		DEVICE_GET_INFO_NAME(wd2793)
-#define WD177X		DEVICE_GET_INFO_NAME(wd177x)
-#define MB8877		DEVICE_GET_INFO_NAME(mb8877)
+DECLARE_LEGACY_DEVICE(WD1770, wd1770);
+DECLARE_LEGACY_DEVICE(WD1771, wd1771);
+DECLARE_LEGACY_DEVICE(WD1772, wd1772);
+DECLARE_LEGACY_DEVICE(WD1773, wd1773);
+DECLARE_LEGACY_DEVICE(WD179X, wd179x);
+DECLARE_LEGACY_DEVICE(WD1793, wd1793);
+DECLARE_LEGACY_DEVICE(WD2793, wd2793);
+DECLARE_LEGACY_DEVICE(WD177X, wd177x);
+DECLARE_LEGACY_DEVICE(MB8877, mb8877);
 
 
 /***************************************************************************
@@ -46,18 +46,6 @@ struct _wd17xx_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-extern DEVICE_GET_INFO(wd1770);
-extern DEVICE_GET_INFO(wd1771);
-extern DEVICE_GET_INFO(wd1772);
-extern DEVICE_GET_INFO(wd1773);
-extern DEVICE_GET_INFO(wd179x);
-extern DEVICE_GET_INFO(wd1793);
-extern DEVICE_GET_INFO(wd2793);
-extern DEVICE_GET_INFO(wd177x);
-extern DEVICE_GET_INFO(mb8877);
-
 void wd17xx_reset(running_device *device);
 
 /* the following are not strictly part of the wd179x hardware/emulation

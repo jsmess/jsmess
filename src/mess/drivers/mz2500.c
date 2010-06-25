@@ -232,8 +232,8 @@ static READ8_HANDLER( mz2500_crtc_r )
 	static UINT8 vblank_bit, hblank_bit;
 
 	/* TODO */
-	vblank_bit^= 1;//video_screen_get_vblank(space->machine->primary_screen) ? 0 : 1;
-	hblank_bit = video_screen_get_hblank(space->machine->primary_screen) ? 0 : 2;
+	vblank_bit^= 1;//space->machine->primary_screen->vblank() ? 0 : 1;
+	hblank_bit = space->machine->primary_screen->hblank() ? 0 : 2;
 
 	return vblank_bit | hblank_bit;
 }

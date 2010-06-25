@@ -178,15 +178,15 @@ typedef struct _ti99_peb_state
 INLINE ti99_peb_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (ti99_peb_state *)device->token;
+	assert(downcast<legacy_device_base *>(device)->token() != NULL);
+	return (ti99_peb_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const ti99_peb_config *get_config(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == PBOX);
-	return (const ti99_peb_config *) device->baseconfig().inline_config;
+	assert(device->type() == PBOX);
+	return (const ti99_peb_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 /*
@@ -815,3 +815,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FAMILY              "External devices"
 #include "devtempl.h"
 
+DEFINE_LEGACY_DEVICE( PBOX, ti99_peb );

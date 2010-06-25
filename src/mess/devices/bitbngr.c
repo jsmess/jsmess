@@ -51,9 +51,8 @@ static TIMER_CALLBACK(bitbanger_overthreshhold);
 INLINE bitbanger_token *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == BITBANGER);
-	return (bitbanger_token *) device->token;
+	assert(device->type() == BITBANGER);
+	return (bitbanger_token *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -65,9 +64,8 @@ INLINE bitbanger_token *get_token(running_device *device)
 INLINE const bitbanger_config *get_config(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == BITBANGER);
-	return (const bitbanger_config *) device->baseconfig().static_config;
+	assert(device->type() == BITBANGER);
+	return (const bitbanger_config *) device->baseconfig().static_config();
 }
 
 
@@ -235,7 +233,6 @@ DEVICE_GET_INFO(bitbanger)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(bitbanger_token); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0; break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL; break;
 		case DEVINFO_INT_IMAGE_TYPE:					info->i = IO_PRINTER; break;
 		case DEVINFO_INT_IMAGE_READABLE:				info->i = 0; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 1; break;
@@ -251,3 +248,5 @@ DEVICE_GET_INFO(bitbanger)
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, "prn"); break;
 	}
 }
+
+DEFINE_LEGACY_IMAGE_DEVICE(BITBANGER, bitbanger);

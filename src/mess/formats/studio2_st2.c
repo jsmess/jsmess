@@ -52,16 +52,16 @@ DEVICE_IMAGE_LOAD( st2_cartslot_load )
 	st2_header header;
 
 	/* check file size */
-	int filesize = image_length(image);
+	int filesize = image.length();
 
 	if (filesize <= ST2_BLOCK_SIZE) {
-		logerror("Error loading cartridge: Invalid ROM file: %s.\n", image_filename(image));
+		logerror("Error loading cartridge: Invalid ROM file: %s.\n", image.filename());
 		return INIT_FAIL;
 	}
 
 	/* read ST2 header */
-	if (image_fread(image, &header, ST2_BLOCK_SIZE) != ST2_BLOCK_SIZE) {
-		logerror("Error loading cartridge: Unable to read header from file: %s.\n", image_filename(image));
+	if (image.fread( &header, ST2_BLOCK_SIZE) != ST2_BLOCK_SIZE) {
+		logerror("Error loading cartridge: Unable to read header from file: %s.\n", image.filename());
 		return INIT_FAIL;
 	}
 
@@ -72,12 +72,12 @@ DEVICE_IMAGE_LOAD( st2_cartslot_load )
 	for (int block = 0; block < (header.blocks - 1); block++)
 	{
 		UINT16 offset = header.page[block] << 8;
-		UINT8 *ptr = ((UINT8 *) memory_region(image->machine, CDP1802_TAG)) + offset;
+		UINT8 *ptr = ((UINT8 *) memory_region(image.device().machine, CDP1802_TAG)) + offset;
 
 		if (LOG) logerror("ST2 Reading block %u to %04x\n", block, offset);
 
-		if (image_fread(image, ptr, ST2_BLOCK_SIZE) != ST2_BLOCK_SIZE) {
-			logerror("Error loading cartridge: Unable to read contents from file: %s.\n", image_filename(image));
+		if (image.fread( ptr, ST2_BLOCK_SIZE) != ST2_BLOCK_SIZE) {
+			logerror("Error loading cartridge: Unable to read contents from file: %s.\n", image.filename());
 			return INIT_FAIL;
 		}
 	}

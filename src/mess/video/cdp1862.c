@@ -35,7 +35,7 @@ struct _cdp1862_t
 	devcb_resolved_read_line		in_bd_func;
 	devcb_resolved_read_line		in_gd_func;
 
-	running_device *screen;	/* screen */
+	screen_device *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 
 	int bgcolor;					/* background color */
@@ -49,9 +49,8 @@ struct _cdp1862_t
 INLINE cdp1862_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CDP1862);
-	return (cdp1862_t *)device->token;
+	assert(device->type() == CDP1862);
+	return (cdp1862_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /***************************************************************************
@@ -64,7 +63,7 @@ INLINE cdp1862_t *get_safe_token(running_device *device)
 
 static void initialize_palette(running_device *device)
 {
-	const cdp1862_interface *intf = (const cdp1862_interface *)device->baseconfig().static_config;
+	const cdp1862_interface *intf = (const cdp1862_interface *)device->baseconfig().static_config();
 	int i;
 
 	double res_total = intf->chr_r + intf->chr_g + intf->chr_b + intf->chr_bkg;
@@ -113,8 +112,8 @@ WRITE8_DEVICE_HANDLER( cdp1862_dma_w )
 	cdp1862_t *cdp1862 = get_safe_token(device);
 
 	int rd = 1, bd = 1, gd = 1;
-	int sx = video_screen_get_hpos(cdp1862->screen) + 4;
-	int y = video_screen_get_vpos(cdp1862->screen);
+	int sx = cdp1862->screen->hpos() + 4;
+	int y = cdp1862->screen->vpos();
 	int x;
 
 	if (!cdp1862->con)
@@ -172,7 +171,7 @@ void cdp1862_update(running_device *device, bitmap_t *bitmap, const rectangle *c
 static DEVICE_START( cdp1862 )
 {
 	cdp1862_t *cdp1862 = get_safe_token(device);
-	const cdp1862_interface *intf = (const cdp1862_interface *)device->baseconfig().static_config;
+	const cdp1862_interface *intf = (const cdp1862_interface *)device->baseconfig().static_config();
 
 	/* resolve callbacks */
 	devcb_resolve_read_line(&cdp1862->in_rd_func, &intf->in_rd_func, device);
@@ -180,11 +179,11 @@ static DEVICE_START( cdp1862 )
 	devcb_resolve_read_line(&cdp1862->in_gd_func, &intf->in_gd_func, device);
 
 	/* get the screen device */
-	cdp1862->screen = devtag_get_device(device->machine, intf->screen_tag);
+	cdp1862->screen = device->machine->device<screen_device>(intf->screen_tag);
 	assert(cdp1862->screen != NULL);
 
 	/* allocate the temporary bitmap */
-	cdp1862->bitmap = auto_bitmap_alloc(device->machine, video_screen_get_width(cdp1862->screen), video_screen_get_height(cdp1862->screen), video_screen_get_format(cdp1862->screen));
+	cdp1862->bitmap = auto_bitmap_alloc(device->machine, cdp1862->screen->width(), cdp1862->screen->height(), cdp1862->screen->format());
 
 	/* initialize the palette */
 	initialize_palette(device);
@@ -218,7 +217,6 @@ DEVICE_GET_INFO( cdp1862 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1862_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1862);	break;
@@ -233,3 +231,5 @@ DEVICE_GET_INFO( cdp1862 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(CDP1862, cdp1862);

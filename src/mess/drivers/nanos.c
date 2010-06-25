@@ -97,7 +97,7 @@ static const z80sio_interface sio_intf =
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain nanos_daisy_chain[] =
+static const z80_daisy_config nanos_daisy_chain[] =
 {
 	{ "z80pio" },
 	{ "z80pio_0" },

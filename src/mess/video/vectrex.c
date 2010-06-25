@@ -295,13 +295,13 @@ static TIMER_CALLBACK(update_signal)
 
 VIDEO_START(vectrex)
 {
-	running_device *screen = video_screen_first(machine);
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	screen_device *screen = screen_first(*machine);
+	const rectangle &visarea = screen->visible_area();
 
-	x_center=((visarea->max_x - visarea->min_x) / 2) << 16;
-	y_center=((visarea->max_y - visarea->min_y) / 2) << 16;
-	x_max = visarea->max_x << 16;
-	y_max = visarea->max_y << 16;
+	x_center=((visarea.max_x - visarea.min_x) / 2) << 16;
+	y_center=((visarea.max_y - visarea.min_y) / 2) << 16;
+	x_max = visarea.max_x << 16;
+	y_max = visarea.max_y << 16;
 
 	vectrex_imager_freq = 1;
 
@@ -490,13 +490,13 @@ WRITE8_HANDLER(raaspec_led_w)
 
 VIDEO_START(raaspec)
 {
-	running_device *screen = video_screen_first(machine);
-	const rectangle *visarea = video_screen_get_visible_area(screen);
+	screen_device *screen = screen_first(*machine);
+	const rectangle &visarea = screen->visible_area();
 
-	x_center=((visarea->max_x - visarea->min_x) / 2) << 16;
-	y_center=((visarea->max_y - visarea->min_y) / 2) << 16;
-	x_max = visarea->max_x << 16;
-	y_max = visarea->max_y << 16;
+	x_center=((visarea.max_x - visarea.min_x) / 2) << 16;
+	y_center=((visarea.max_y - visarea.min_y) / 2) << 16;
+	x_max = visarea.max_x << 16;
+	y_max = visarea.max_y << 16;
 
 	refresh = timer_alloc(machine, vectrex_refresh, NULL);
 

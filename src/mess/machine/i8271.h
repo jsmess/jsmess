@@ -11,7 +11,7 @@
     MACROS
 ***************************************************************************/
 
-#define I8271		DEVICE_GET_INFO_NAME(i8271)
+DECLARE_LEGACY_DEVICE(I8271, i8271);
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -27,10 +27,6 @@ typedef struct i8271_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( i8271 );
-
 READ8_DEVICE_HANDLER (i8271_r);
 WRITE8_DEVICE_HANDLER(i8271_w);
 

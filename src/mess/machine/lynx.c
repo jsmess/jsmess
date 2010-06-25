@@ -1293,7 +1293,7 @@ static void lynx_draw_lines(running_machine *machine, int newline)
 		{
 			width = w;
 			height = h;
-			video_screen_set_visarea(machine->primary_screen, 0, width - 1, 0, height - 1);
+			machine->primary_screen->set_visible_area(0, width - 1, 0, height - 1);
 		}
 	}
 }
@@ -1924,11 +1924,11 @@ INTERRUPT_GEN( lynx_frame_int )
 		lynx_rotate=input_port_read(device->machine, "ROTATION") & 0x03;
 }
 
-void lynx_crc_keyword(running_device *image)
+void lynx_crc_keyword(device_image_interface &image)
 {
     const char *info;
 
-    info = image_extrainfo(image);
+    info = image.extrainfo();
     rotate = 0;
 
     if (info)
@@ -1942,14 +1942,14 @@ void lynx_crc_keyword(running_device *image)
 
 static DEVICE_IMAGE_LOAD( lynx_cart )
 {
-	UINT8 *rom = memory_region(image->machine, "user1");
+	UINT8 *rom = memory_region(image.device().machine, "user1");
 	UINT32 size;
 	UINT8 header[0x40];
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
 		const char *filetype;
-		size = image_length(image);
+		size = image.length();
 /* 64 byte header
    LYNX
    intelword lower counter size
@@ -1958,11 +1958,11 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
    22 chars manufacturer
 */
 
-		filetype = image_filetype(image);
+		filetype = image.filetype();
 
 		if (!mame_stricmp (filetype, "lnx"))
 		{
-			if (image_fread(image, header, 0x40) != 0x40)
+			if (image.fread( header, 0x40) != 0x40)
 				return INIT_FAIL;
 
 			/* Check the image */
@@ -1992,18 +1992,18 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 				lynx_granularity = 0x0400;
 		}
 
-		if (image_fread(image, rom, size) != size)
+		if (image.fread( rom, size) != size)
 			return INIT_FAIL;
 
 		lynx_crc_keyword(image);
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
+		size = image.get_software_region_length("rom");
 
 		/* here we assume images to be in .lnx format and to have an header.
          we should eventually remove them, though! */
-		memcpy(header, image_get_software_region(image, "rom"), 0x40);
+		memcpy(header, image.get_software_region("rom"), 0x40);
 
 		/* Check the image */
 		if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
@@ -2018,7 +2018,7 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 				  header + 10, size / 1024, lynx_granularity, header + 42);
 
 		size -= 0x40;
-		memcpy(rom, image_get_software_region(image, "rom") + 0x40, size);
+		memcpy(rom, image.get_software_region("rom") + 0x40, size);
 	}
 
 	return INIT_PASS;

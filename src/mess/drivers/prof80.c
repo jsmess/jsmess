@@ -136,9 +136,9 @@ static void prof80_keyboard_scan(running_machine *machine)
 
 static TIMER_DEVICE_CALLBACK( keyboard_tick )
 {
-	prof80_state *state = (prof80_state *)timer->machine->driver_data;
+	prof80_state *state = (prof80_state *)timer.machine->driver_data;
 
-	if (!state->kbf) prof80_keyboard_scan(timer->machine);
+	if (!state->kbf) prof80_keyboard_scan(timer.machine);
 }
 
 /* PROF-80 */
@@ -1174,7 +1174,7 @@ static Z80STI_INTERFACE( grip_z80sti_interface )
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain grip_daisy_chain[] =
+static const z80_daisy_config grip_daisy_chain[] =
 {
 	{ Z80STI_TAG },
 	{ NULL }

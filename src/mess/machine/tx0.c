@@ -19,7 +19,7 @@ static TIMER_CALLBACK(dis_callback);
 /* tape reader registers */
 typedef struct tape_reader_t
 {
-	running_device *fd;	/* file descriptor of tape image */
+	device_image_interface *fd;	/* file descriptor of tape image */
 
 	int motor_on;	/* 1-bit reader motor on */
 
@@ -35,7 +35,7 @@ static tape_reader_t tape_reader;
 /* tape puncher registers */
 typedef struct tape_puncher_t
 {
-	running_device *fd;	/* file descriptor of tape image */
+	device_image_interface *fd;	/* file descriptor of tape image */
 
 	emu_timer *timer;	/* timer to generate completion pulses */
 } tape_puncher_t;
@@ -46,7 +46,7 @@ static tape_puncher_t tape_puncher;
 /* typewriter registers */
 typedef struct typewriter_t
 {
-	running_device *fd;	/* file descriptor of output image */
+	device_image_interface *fd;	/* file descriptor of output image */
 
 	emu_timer *prt_timer;/* timer to generate completion pulses */
 } typewriter_t;
@@ -102,7 +102,7 @@ enum irg_pos_t
 /* magnetic tape unit registers */
 typedef struct magtape_t
 {
-	running_device *img;		/* image descriptor */
+	device_image_interface *img;		/* image descriptor */
 
 	state_t state;
 
@@ -272,7 +272,7 @@ DEVICE_IMAGE_UNLOAD( tx0_tape )
 */
 static int tape_read(UINT8 *reply)
 {
-	if (tape_reader.fd && (image_fread(tape_reader.fd, reply, 1) == 1))
+	if (tape_reader.fd && (tape_reader.fd->fread(reply, 1) == 1))
 		return 0;	/* unit OK */
 	else
 		return 1;	/* unit not ready */
@@ -284,7 +284,7 @@ static int tape_read(UINT8 *reply)
 static void tape_write(UINT8 data)
 {
 	if (tape_puncher.fd)
-		image_fwrite(tape_puncher.fd, & data, 1);
+		tape_puncher.fd->fwrite(& data, 1);
 }
 
 /*
@@ -342,7 +342,7 @@ static TIMER_CALLBACK(reader_callback)
 				if (tape_reader.rc == 0)
 				{	/* IO complete */
 					tape_reader.rcl = 0;
-					cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, 0);
+					cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, (UINT64)0);
 				}
 			}
 		}
@@ -360,7 +360,7 @@ static TIMER_CALLBACK(reader_callback)
 */
 static TIMER_CALLBACK(puncher_callback)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, 0);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, (UINT64)0);
 }
 
 /*
@@ -423,7 +423,7 @@ void tx0_io_p7h(running_device *device)
 DEVICE_IMAGE_LOAD(tx0_typewriter)
 {
 	/* open file */
-	typewriter.fd = image;
+	typewriter.fd = &image;
 
 	return INIT_PASS;
 }
@@ -440,7 +440,7 @@ static void typewriter_out(running_machine *machine, UINT8 data)
 {
 	tx0_typewriter_drawchar(machine, data);
 	if (typewriter.fd)
-		image_fwrite(typewriter.fd, & data, 1);
+		typewriter.fd->fwrite(& data, 1);
 }
 
 /*
@@ -448,7 +448,7 @@ static void typewriter_out(running_machine *machine, UINT8 data)
 */
 static TIMER_CALLBACK(prt_callback)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, 0);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, (UINT64)0);
 }
 
 /*
@@ -474,7 +474,7 @@ void tx0_io_prt(running_device *device)
 */
 static TIMER_CALLBACK(dis_callback)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, 0);
+	cpu_set_reg(devtag_get_device(machine, "maincpu"), TX0_IO_COMPLETE, (UINT64)0);
 }
 
 /*
@@ -551,7 +551,7 @@ static void schedule_unselect(void)
 
 DEVICE_START( tx0_magtape )
 {
-	magtape.img = device;
+	magtape.img = (device_image_interface*)device;
 }
 
 /*
@@ -559,7 +559,7 @@ DEVICE_START( tx0_magtape )
 */
 DEVICE_IMAGE_LOAD( tx0_magtape )
 {
-	magtape.img = image;
+	magtape.img = &image;
 
 	magtape.irg_pos = MTIRGP_END;
 
@@ -588,7 +588,7 @@ DEVICE_IMAGE_UNLOAD( tx0_magtape )
 		if ((magtape.state == MTS_SELECTED) || ((magtape.state == MTS_SELECTING) && (magtape.command == 2)))
 		{	/* unit has become unavailable */
 			magtape.state = MTS_UNSELECTING;
-			cpu_set_reg(devtag_get_device(image->machine, "maincpu"), TX0_PF, cpu_get_reg(devtag_get_device(image->machine, "maincpu"), TX0_PF) | PF_RWC);
+			cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), TX0_PF, cpu_get_reg(devtag_get_device(image.device().machine, "maincpu"), TX0_PF) | PF_RWC);
 			schedule_unselect();
 		}
 	}
@@ -629,7 +629,7 @@ static void magtape_callback(running_device *device)
 			}
 
 			magtape.sel_pending = FALSE;
-			cpu_set_reg(device, TX0_IO_COMPLETE, 0);
+			cpu_set_reg(device, TX0_IO_COMPLETE, (UINT64)0);
 		}
 		break;
 
@@ -669,23 +669,23 @@ static void magtape_callback(running_device *device)
 		switch (magtape.command)
 		{
 		case 0:	/* backspace */
-			if (image_ftell(magtape.img) == 0)
+			if (magtape.img->ftell() == 0)
 			{	/* tape at ldp */
 				magtape.state = MTS_UNSELECTING;
 				cpu_set_reg(device, TX0_PF, cpu_get_reg(device, TX0_PF) | PF_RWC);
 				schedule_unselect();
 			}
-			else if (image_fseek(magtape.img, -1, SEEK_CUR))
+			else if (magtape.img->fseek( -1, SEEK_CUR))
 			{	/* eject tape */
-				image_unload(magtape.img);
+				magtape.img->unload();
 			}
-			else if (image_fread(magtape.img, &buf, 1) != 1)
+			else if (magtape.img->fread(&buf, 1) != 1)
 			{	/* eject tape */
-				image_unload(magtape.img);
+				magtape.img->unload();
 			}
-			else if (image_fseek(magtape.img, -1, SEEK_CUR))
+			else if (magtape.img->fseek( -1, SEEK_CUR))
 			{	/* eject tape */
-				image_unload(magtape.img);
+				magtape.img->unload();
 			}
 			else
 			{
@@ -717,7 +717,7 @@ static void magtape_callback(running_device *device)
 					{
 						logerror("tape seems to be corrupt\n");
 						/* eject tape */
-						image_unload(magtape.img);
+						magtape.img->unload();
 					}
 					break;
 				case MTBSS_STATE3:
@@ -729,7 +729,7 @@ static void magtape_callback(running_device *device)
 					{
 						logerror("tape seems to be corrupt\n");
 						/* eject tape */
-						image_unload(magtape.img);
+						magtape.img->unload();
 					}
 					break;
 				case MTBSS_STATE4:
@@ -754,7 +754,7 @@ static void magtape_callback(running_device *device)
 					{
 						logerror("tape seems to be corrupt\n");
 						/* eject tape */
-						image_unload(magtape.img);
+						magtape.img->unload();
 					}
 					else
 						magtape.u.backspace_state = MTBSS_STATE6;
@@ -765,7 +765,7 @@ static void magtape_callback(running_device *device)
 					{
 						logerror("tape seems to be corrupt\n");
 						/* eject tape */
-						image_unload(magtape.img);
+						magtape.img->unload();
 					}
 					else
 						magtape.u.backspace_state = MTBSS_STATE6;
@@ -777,24 +777,24 @@ static void magtape_callback(running_device *device)
 			break;
 
 		case 1:	/* read */
-			if (image_fread(magtape.img, &buf, 1) != 1)
+			if (magtape.img->fread(&buf, 1) != 1)
 			{	/* I/O error or EOF? */
 				/* The MAME fileio layer makes it very hard to make the
                 difference...  MAME seems to assume that I/O errors never
                 happen, whereas it is really easy to cause one by
                 deconnecting an external drive the image is located on!!! */
 				UINT64 offs;
-				offs = image_ftell(magtape.img);
-				if (image_fseek(magtape.img, 0, SEEK_END) || (offs != image_ftell(magtape.img)))
+				offs = magtape.img->ftell();
+				if (magtape.img->fseek( 0, SEEK_END) || (offs != magtape.img->ftell()))
 				{	/* I/O error */
 					/* eject tape */
-					image_unload(magtape.img);
+					magtape.img->unload();
 				}
 				else
 				{	/* end of tape -> ??? */
 					/* maybe we run past end of tape, so that tape is ejected from
                     upper reel and unit becomes unavailable??? */
-					/*image_unload(magtape.img);*/
+					/*magtape.img->unload();*/
 					/* Or do we stop at EOT mark??? */
 					magtape.state = MTS_UNSELECTING;
 					cpu_set_reg(device, TX0_PF, cpu_get_reg(device, TX0_PF) | PF_EOT);
@@ -814,7 +814,7 @@ static void magtape_callback(running_device *device)
 						if (magtape.cpy_pending)
 						{	/* read command */
 							magtape.u.read.space_flag = FALSE;
-							cpu_set_reg(device, TX0_IO_COMPLETE, 0);
+							cpu_set_reg(device, TX0_IO_COMPLETE, (UINT64)0);
 							cpu_set_reg(device, TX0_LR, ((cpu_get_reg(device, TX0_LR) >> 1) & 0333333)
 														| ((buf & 040) << 12) | ((buf & 020) << 10) | ((buf & 010) << 8) | ((buf & 004) << 6) | ((buf & 002) << 4) | ((buf & 001) << 2));
 							/* check parity */
@@ -834,7 +834,7 @@ static void magtape_callback(running_device *device)
 					{
 						logerror("tape seems to be corrupt\n");
 						/* eject tape */
-						image_unload(magtape.img);
+						magtape.img->unload();
 					}
 					if (!magtape.u.read.space_flag)
 					{
@@ -852,7 +852,7 @@ static void magtape_callback(running_device *device)
 					{
 						logerror("tape seems to be corrupt\n");
 						/* eject tape */
-						image_unload(magtape.img);
+						magtape.img->unload();
 					}
 					if (!magtape.u.read.space_flag)
 					{
@@ -863,7 +863,7 @@ static void magtape_callback(running_device *device)
 							cpu_set_reg(device, TX0_PF, cpu_get_reg(device, TX0_PF) | PF_PC);
 						/* synchronize with cpy instruction */
 						if (magtape.cpy_pending)
-							cpu_set_reg(device, TX0_IO_COMPLETE, 0);
+							cpu_set_reg(device, TX0_IO_COMPLETE, (UINT64)0);
 						else
 							cpu_set_reg(device, TX0_PF, cpu_get_reg(device, TX0_PF) | PF_RWC);
 					}
@@ -894,7 +894,7 @@ static void magtape_callback(running_device *device)
 					{
 						logerror("tape seems to be corrupt\n");
 						/* eject tape */
-						image_unload(magtape.img);
+						magtape.img->unload();
 					}
 					else
 						magtape.u.read.state = MTRDS_STATE5;
@@ -907,7 +907,7 @@ static void magtape_callback(running_device *device)
 					{
 						logerror("tape seems to be corrupt\n");
 						/* eject tape */
-						image_unload(magtape.img);
+						magtape.img->unload();
 					}
 					else
 						magtape.u.read.state = MTRDS_STATE6;
@@ -938,9 +938,9 @@ static void magtape_callback(running_device *device)
 		case 2:	/* rewind */
 			magtape.state = MTS_UNSELECTING;
 			/* we rewind at 10*read speed (I don't know the real value) */
-			timer_adjust_oneshot(magtape.timer, attotime_mul(ATTOTIME_IN_NSEC(6600), image_ftell(magtape.img)), 0);
+			timer_adjust_oneshot(magtape.timer, attotime_mul(ATTOTIME_IN_NSEC(6600), magtape.img->ftell()), 0);
 			//schedule_unselect();
-			image_fseek(magtape.img, 0, SEEK_END);
+			magtape.img->fseek( 0, SEEK_END);
 			magtape.irg_pos = MTIRGP_END;
 			break;
 
@@ -972,7 +972,7 @@ static void magtape_callback(running_device *device)
 				{
 					if (magtape.cpy_pending)
 					{
-						cpu_set_reg(device, TX0_IO_COMPLETE, 0);
+						cpu_set_reg(device, TX0_IO_COMPLETE, (UINT64)0);
 						lr = cpu_get_reg(device, TX0_LR);
 						buf = ((lr >> 10) & 040) | ((lr >> 8) & 020) | ((lr >> 6) & 010) | ((lr >> 4) & 004) | ((lr >> 2) & 002) | (lr & 001);
 						buf |= ((buf << 1) ^ (buf << 2) ^ (buf << 3) ^ (buf << 4) ^ (buf << 5) ^ (buf << 6) ^ ((!magtape.binary_flag) << 6)) & 0100;
@@ -1020,10 +1020,10 @@ static void magtape_callback(running_device *device)
 			if (magtape.state != MTS_UNSELECTING)
 			{	/* write data word */
 				magtape.long_parity ^= buf;
-				if (image_fwrite(magtape.img, &buf, 1) != 1)
+				if (magtape.img->fwrite(&buf, 1) != 1)
 				{	/* I/O error */
 					/* eject tape */
-					image_unload(magtape.img);
+					magtape.img->unload();
 				}
 				else
 					timer_adjust_oneshot(magtape.timer, ATTOTIME_IN_USEC(66), 0);
@@ -1053,7 +1053,7 @@ void tx0_io_cpy(running_device *device)
 	case MTS_UNSELECTED:
 	case MTS_UNSELECTING:
 		/* ignore instruction and set rwc flag? */
-		cpu_set_reg(device, TX0_IO_COMPLETE, 0);
+		cpu_set_reg(device, TX0_IO_COMPLETE, (UINT64)0);
 		break;
 
 	case MTS_SELECTING:
@@ -1063,7 +1063,7 @@ void tx0_io_cpy(running_device *device)
 		case 0:	/* backspace */
 		case 2:	/* rewind */
 			/* ignore instruction and set rwc flag? */
-			cpu_set_reg(device, TX0_IO_COMPLETE, 0);
+			cpu_set_reg(device, TX0_IO_COMPLETE, (UINT64)0);
 			break;
 		case 1:	/* read */
 		case 3:	/* write */
@@ -1178,18 +1178,18 @@ INTERRUPT_GEN( tx0_interrupt )
 		}
 		if (control_transitions & tx0_stop)
 		{
-			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RUN, 0);
-			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RIM, 0);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RUN, (UINT64)0);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RIM, (UINT64)0);
 		}
 		if (control_transitions & tx0_restart)
 		{
 			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RUN, 1);
-			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RIM, 0);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RIM, (UINT64)0);
 		}
 		if (control_transitions & tx0_read_in)
 		{	/* set cpu to read instructions from perforated tape */
-			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RESET, 0);
-			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RUN, 0);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RESET, (UINT64)0);
+			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RUN, (UINT64)0);
 			cpu_set_reg(devtag_get_device(device->machine, "maincpu"), TX0_RIM, 1);
 		}
 		if (control_transitions & tx0_toggle_dn)

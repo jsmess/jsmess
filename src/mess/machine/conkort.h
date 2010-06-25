@@ -8,8 +8,8 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define LUXOR_55_10828 DEVICE_GET_INFO_NAME( luxor_55_10828 )
-#define LUXOR_55_21046 DEVICE_GET_INFO_NAME( luxor_55_21046 )
+DECLARE_LEGACY_DEVICE(LUXOR_55_10828, luxor_55_10828);
+DECLARE_LEGACY_DEVICE(LUXOR_55_21046, luxor_55_21046);
 
 #define MDRV_LUXOR_55_10828_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, LUXOR_55_10828, 0)
@@ -30,11 +30,6 @@
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( luxor_55_10828 );
-DEVICE_GET_INFO( luxor_55_21046 );
-
 /* configuration dips */
 INPUT_PORTS_EXTERN( luxor_55_21046 );
 

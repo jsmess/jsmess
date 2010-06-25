@@ -42,7 +42,8 @@
  different set of registers for the frame / call this time. (or if another
  Hyperstone bug is trashing some of the code in RAM)
 
-
+ Mr Kicker is also known to exist (not dumped) on the F-E1-16-010 PCB
+ that Semicom also used for Date Quiz Go Go Episode 2 game.
 
 
 *********************************************************************/
@@ -187,7 +188,7 @@ F94B
 
 static WRITE32_DEVICE_HANDLER( finalgdr_oki_bank_w )
 {
-	okim6295_set_bank_base(device, 0x40000 * ((data & 0x300) >> 8));
+	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * ((data & 0x300) >> 8));
 }
 
 static WRITE32_HANDLER( finalgdr_backupram_bank_w )
@@ -225,7 +226,7 @@ static WRITE32_HANDLER( finalgdr_prize_w )
 
 static WRITE32_DEVICE_HANDLER( aoh_oki_bank_w )
 {
-	okim6295_set_bank_base(device, 0x40000 * (data & 0x3));
+	downcast<okim6295_device *>(device)->set_bank_base(0x40000 * (data & 0x3));
 }
 
 static ADDRESS_MAP_START( common_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -388,7 +389,7 @@ or
 Offset+3
 -------x xxxxxxxx X offs
 */
-static void draw_sprites(running_device *screen, bitmap_t *bitmap)
+static void draw_sprites(screen_device *screen, bitmap_t *bitmap)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	UINT32 cnt;
@@ -396,8 +397,8 @@ static void draw_sprites(running_device *screen, bitmap_t *bitmap)
 	int code,color,x,y,fx,fy;
 	rectangle clip;
 
-	clip.min_x = video_screen_get_visible_area(screen)->min_x;
-	clip.max_x = video_screen_get_visible_area(screen)->max_x;
+	clip.min_x = screen->visible_area().min_x;
+	clip.max_x = screen->visible_area().max_x;
 
 	for (block=0; block<0x8000; block+=0x800)
 	{
@@ -461,7 +462,7 @@ static void draw_sprites(running_device *screen, bitmap_t *bitmap)
 	}
 }
 
-static void draw_sprites_aoh(running_device *screen, bitmap_t *bitmap)
+static void draw_sprites_aoh(screen_device *screen, bitmap_t *bitmap)
 {
 	const gfx_element *gfx = screen->machine->gfx[0];
 	UINT32 cnt;
@@ -469,8 +470,8 @@ static void draw_sprites_aoh(running_device *screen, bitmap_t *bitmap)
 	int code,color,x,y,fx,fy;
 	rectangle clip;
 
-	clip.min_x = video_screen_get_visible_area(screen)->min_x;
-	clip.max_x = video_screen_get_visible_area(screen)->max_x;
+	clip.min_x = screen->visible_area().min_x;
+	clip.max_x = screen->visible_area().max_x;
 
 	for (block=0; block<0x8000; block+=0x800)
 	{
@@ -700,8 +701,7 @@ static MACHINE_DRIVER_START( sound_ym_oki )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 28000000/16 )
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 28000000/16 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
@@ -713,8 +713,7 @@ static MACHINE_DRIVER_START( sound_suplup )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1789772.5 )
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", 1789772.5 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END
@@ -737,7 +736,9 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( misncrft )
 	MDRV_IMPORT_FROM(common)
 	MDRV_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
+	MDRV_CPU_PROGRAM_MAP(common_map)
 	MDRV_CPU_IO_MAP(misncrft_io)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_IMPORT_FROM(sound_qs1000)
 MACHINE_DRIVER_END
@@ -768,9 +769,12 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mrdig )
 	MDRV_IMPORT_FROM(common)
+
 	MDRV_CPU_REPLACE("maincpu", GMS30C2116, 50000000)	/* 50 MHz */
+	MDRV_CPU_PROGRAM_MAP(common_map)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mrdig_io)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_IMPORT_FROM(sound_ym_oki)
 MACHINE_DRIVER_END
@@ -780,6 +784,7 @@ static MACHINE_DRIVER_START( wyvernwg )
 	MDRV_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_32bit_map)
 	MDRV_CPU_IO_MAP(wyvernwg_io)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_IMPORT_FROM(sound_qs1000)
 MACHINE_DRIVER_END
@@ -789,6 +794,7 @@ static MACHINE_DRIVER_START( finalgdr )
 	MDRV_CPU_REPLACE("maincpu", E132T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_32bit_map)
 	MDRV_CPU_IO_MAP(finalgdr_io)
+	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	MDRV_NVRAM_HANDLER(finalgdr)
 
@@ -834,13 +840,11 @@ static MACHINE_DRIVER_START( aoh )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki_1", OKIM6295, 32000000/8)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki_1", 32000000/8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("oki_2", OKIM6295, 32000000/32)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki_2", 32000000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_DRIVER_END

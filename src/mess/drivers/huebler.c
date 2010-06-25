@@ -31,7 +31,7 @@
 
 static TIMER_DEVICE_CALLBACK( keyboard_tick )
 {
-	amu880_state *state = (amu880_state *)timer->machine->driver_data;
+	amu880_state *state = (amu880_state *)timer.machine->driver_data;
 
 	state->key_y++;
 
@@ -320,7 +320,7 @@ static const z80sio_interface sio_intf =
 
 /* Z80 Daisy Chain */
 
-static const z80_daisy_chain amu880_daisy_chain[] =
+static const z80_daisy_config amu880_daisy_chain[] =
 {
 	{ Z80CTC_TAG },
 	{ Z80SIO_TAG },

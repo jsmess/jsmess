@@ -18,7 +18,7 @@ void betadisk_clear_status(running_device *device);
 
 #define BETA_DISK_TAG	"beta"
 
-#define BETA_DISK DEVICE_GET_INFO_NAME( beta_disk )
+DECLARE_LEGACY_DEVICE(BETA_DISK, beta_disk);
 
 #define MDRV_BETA_DISK_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, BETA_DISK, 0)
@@ -37,8 +37,4 @@ WRITE8_DEVICE_HANDLER(betadisk_command_w);
 WRITE8_DEVICE_HANDLER(betadisk_track_w);
 WRITE8_DEVICE_HANDLER(betadisk_sector_w);
 WRITE8_DEVICE_HANDLER(betadisk_data_w);
-
-/* device interface */
-DEVICE_GET_INFO( beta_disk );
-
 #endif /* __BETA_H__ */

@@ -39,7 +39,7 @@ struct _ram_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MESSRAM DEVICE_GET_INFO_NAME(messram)
+DECLARE_LEGACY_DEVICE(MESSRAM, messram);
 
 #define MDRV_RAM_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, MESSRAM, 0) \
@@ -66,7 +66,6 @@ struct _ram_config
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-DEVICE_GET_INFO( messram );
 UINT32 messram_get_size(running_device *device);
 UINT8 *messram_get_ptr(running_device *device);
 #ifdef UNUSED_FUNCTION

@@ -336,7 +336,7 @@ static INPUT_PORTS_START( mbee )
 //  PORT_CONFSETTING(    0x00, DEF_STR(Off))
 INPUT_PORTS_END
 
-static const z80_daisy_chain mbee_daisy_chain[] =
+static const z80_daisy_config mbee_daisy_chain[] =
 {
 	{ "z80pio" },
 	{ NULL }

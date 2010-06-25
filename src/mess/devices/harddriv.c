@@ -79,10 +79,9 @@ struct _dev_harddisk_t
 INLINE dev_harddisk_t *get_safe_token(running_device *device)
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( ( device->type == DEVICE_GET_INFO_NAME(mess_hd) ) ||
-	        ( device->type == DEVICE_GET_INFO_NAME(mess_ide) ) );
-	return (dev_harddisk_t *) device->token;
+	assert( ( device->type() == HARDDISK ) ||
+	        ( device->type() == IDE_HARDDISK ) );
+	return (dev_harddisk_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -95,23 +94,23 @@ INLINE dev_harddisk_t *get_safe_token(running_device *device)
  *
  *************************************/
 
-static int internal_load_mess_hd(running_device *image, const char *metadata)
+static int internal_load_mess_hd(device_image_interface &image, const char *metadata)
 {
-	dev_harddisk_t	*harddisk = get_safe_token( image );
+	dev_harddisk_t	*harddisk = get_safe_token( &image.device() );
 	chd_error		err = (chd_error)0;
 	int				is_writeable;
 
 	/* open the CHD file */
 	do
 	{
-		is_writeable = image_is_writable(image);
+		is_writeable = image.is_writable();
 		harddisk->chd = NULL;
-		err = chd_open_file(image_core_file(image), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &harddisk->chd);
+		err = chd_open_file(image.image_core_file(), is_writeable ? CHD_OPEN_READWRITE : CHD_OPEN_READ, NULL, &harddisk->chd);
 
 		/* special case; if we get CHDERR_FILE_NOT_WRITEABLE, make the
          * image read only and repeat */
 		if (err == CHDERR_FILE_NOT_WRITEABLE)
-			image_make_readonly(image);
+			image.make_readonly();
 	}
 	while(!harddisk->chd && is_writeable && (err == CHDERR_FILE_NOT_WRITEABLE));
 	if (!harddisk->chd)
@@ -140,7 +139,7 @@ done:
 			harddisk->chd = NULL;
 		}
 
-		image_seterror(image, IMAGE_ERROR_UNSPECIFIED, chd_get_error_string(err));
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, chd_get_error_string(err));
 	}
 	return err ? INIT_FAIL : INIT_PASS;
 }
@@ -180,7 +179,7 @@ static DEVICE_IMAGE_CREATE( mess_hd )
 	totalsectors = cylinders * heads * sectors;
 
 	/* create the CHD file */
-	err = chd_create_file(image_core_file(image), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_NONE, NULL);
+	err = chd_create_file(image.image_core_file(), (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_NONE, NULL);
 	if (err != CHDERR_NONE)
 		goto error;
 
@@ -270,7 +269,7 @@ static DEVICE_START(mess_hd)
 {
 	dev_harddisk_t	*harddisk = get_safe_token( device );
 
-	harddisk->config = (const harddisk_callback_config*)device->baseconfig().static_config;
+	harddisk->config = (const harddisk_callback_config*)device->baseconfig().static_config();
 	harddisk->chd = NULL;
 	harddisk->hard_disk_handle = NULL;
 }
@@ -287,7 +286,6 @@ DEVICE_GET_INFO(mess_hd)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(dev_harddisk_t); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0; break;
-		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL; break;
 		case DEVINFO_INT_IMAGE_TYPE:				info->i = IO_HARDDISK; break;
 		case DEVINFO_INT_IMAGE_READABLE:			info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:			info->i = 1; break;
@@ -402,3 +400,5 @@ DEVICE_GET_INFO(mess_ide)
 	}
 }
 
+DEFINE_LEGACY_IMAGE_DEVICE(HARDDISK, mess_hd);
+DEFINE_LEGACY_IMAGE_DEVICE(IDE_HARDDISK, mess_ide);

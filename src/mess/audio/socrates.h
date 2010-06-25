@@ -9,8 +9,7 @@ void socrates_snd_reg2_w(running_device *device, int data);
 void socrates_snd_reg3_w(running_device *device, int data);
 void socrates_snd_reg4_w(running_device *device, int data);
 
-DEVICE_GET_INFO( socrates_snd );
-#define SOUND_SOCRATES DEVICE_GET_INFO_NAME( socrates_snd )
+DECLARE_LEGACY_SOUND_DEVICE(SOCRATES, socrates_snd);
 
 #endif /* __SOCR_SND_H__ */
 

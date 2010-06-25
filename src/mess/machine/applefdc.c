@@ -139,7 +139,7 @@ static TIMER_CALLBACK(iwm_turnmotor_onoff);
 INLINE void assert_is_applefdc(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == APPLEFDC) || (device->type == IWM) || (device->type == SWIM));
+	assert((device->type() == APPLEFDC) || (device->type() == IWM) || (device->type() == SWIM));
 }
 
 
@@ -147,7 +147,7 @@ INLINE void assert_is_applefdc(running_device *device)
 INLINE applefdc_token *get_token(running_device *device)
 {
 	assert_is_applefdc(device);
-	return (applefdc_token *) device->token;
+	return (applefdc_token *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -157,8 +157,8 @@ INLINE const applefdc_interface *get_interface(running_device *device)
 	static const applefdc_interface dummy_interface = {0, };
 
 	assert_is_applefdc(device);
-	return (device->baseconfig().static_config != NULL)
-		? (const applefdc_interface *) device->baseconfig().static_config
+	return (device->baseconfig().static_config() != NULL)
+		? (const applefdc_interface *) device->baseconfig().static_config()
 		: &dummy_interface;
 }
 
@@ -619,7 +619,6 @@ static DEVICE_GET_INFO(applefdc_base)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(applefdc_token);			break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							/* Nothing */								break;
@@ -731,3 +730,7 @@ DEVICE_GET_INFO(swim)
 		default:										DEVICE_GET_INFO_CALL(applefdc_base);	break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(APPLEFDC, applefdc);
+DEFINE_LEGACY_DEVICE(IWM, iwm);
+DEFINE_LEGACY_DEVICE(SWIM, swim);

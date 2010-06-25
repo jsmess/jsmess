@@ -68,7 +68,7 @@ struct _upd3301_t
 	upd3301_display_pixels_func		display_func;
 
 	/* screen drawing */
-	running_device *screen;	/* screen */
+	screen_device *screen;	/* screen */
 	bitmap_t *bitmap;				/* bitmap */
 	int y;							/* current scanline */
 	int hrtc;						/* horizontal retrace */
@@ -129,16 +129,15 @@ struct _upd3301_t
 INLINE upd3301_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == UPD3301));
-	return (upd3301_t *)device->token;
+	assert((device->type() == UPD3301));
+	return (upd3301_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const upd3301_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == UPD3301));
-	return (const upd3301_interface *) device->baseconfig().static_config;
+	assert((device->type() == UPD3301));
+	return (const upd3301_interface *) device->baseconfig().static_config();
 }
 
 /***************************************************************************
@@ -211,12 +210,12 @@ static void reset_counters(running_device *device)
 
 static void update_hrtc_timer(upd3301_t *upd3301, int state)
 {
-	int y = video_screen_get_vpos(upd3301->screen);
+	int y = upd3301->screen->vpos();
 
 	int next_x = state ? upd3301->h : 0;
 	int next_y = state ? y : ((y + 1) % ((upd3301->l + upd3301->v) * upd3301->width));
 
-	attotime duration = video_screen_get_time_until_pos(upd3301->screen, next_y, next_x);
+	attotime duration = upd3301->screen->time_until_pos(next_y, next_x);
 
 	timer_adjust_oneshot(upd3301->hrtc_timer, duration, !state);
 }
@@ -230,7 +229,7 @@ static void update_vrtc_timer(upd3301_t *upd3301, int state)
 {
 	int next_y = state ? (upd3301->l * upd3301->r) : 0;
 
-	attotime duration = video_screen_get_time_until_pos(upd3301->screen, next_y, 0);
+	attotime duration = upd3301->screen->time_until_pos(next_y, 0);
 
 	timer_adjust_oneshot(upd3301->vrtc_timer, duration, !state);
 }
@@ -247,7 +246,7 @@ static void recompute_parameters(running_device *device)
 	int horiz_pix_total = (upd3301->h + upd3301->z) * upd3301->width;
 	int vert_pix_total = (upd3301->l + upd3301->v) * upd3301->r;
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock) * horiz_pix_total * vert_pix_total;
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock()) * horiz_pix_total * vert_pix_total;
 
 	rectangle visarea;
 
@@ -262,7 +261,7 @@ static void recompute_parameters(running_device *device)
 		if (LOG) logerror("UPD3301 '%s' Visible Area: (%u, %u) - (%u, %u)\n", device->tag(), visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
 	}
 
-	video_screen_configure(upd3301->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
+	upd3301->screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 	update_hrtc_timer(upd3301, 0);
 	update_vrtc_timer(upd3301, 0);
@@ -628,7 +627,7 @@ static DEVICE_START( upd3301 )
 	devcb_resolve_write_line(&upd3301->out_vrtc_func, &intf->out_vrtc_func, device);
 
 	/* get the screen device */
-	upd3301->screen = devtag_get_device(device->machine, intf->screen_tag);
+	upd3301->screen = downcast<screen_device *>(devtag_get_device(device->machine, intf->screen_tag));
 	assert(upd3301->screen != NULL);
 
 	/* get character width */
@@ -676,7 +675,6 @@ DEVICE_GET_INFO( upd3301 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(upd3301_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(upd3301);	break;
@@ -691,3 +689,5 @@ DEVICE_GET_INFO( upd3301 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(UPD3301, upd3301);

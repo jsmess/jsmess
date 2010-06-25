@@ -839,13 +839,13 @@ INPUT_PORTS_END
 
 static DEVICE_IMAGE_LOAD( vii_cart )
 {
-	vii_state *state = (vii_state *)image->machine->driver_data;
-	UINT8 *cart = memory_region( image->machine, "cart" );
-	int size = image_length( image );
+	vii_state *state = (vii_state *)image.device().machine->driver_data;
+	UINT8 *cart = memory_region( image.device().machine, "cart" );
+	int size = image.length();
 
-	if( image_fread( image, cart, size ) != size )
+	if( image.fread(cart, size ) != size )
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
+		image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
 		return INIT_FAIL;
 	}
 
@@ -867,13 +867,13 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 
 static DEVICE_IMAGE_LOAD( vsmile_cart )
 {
-	vii_state *state = (vii_state *)image->machine->driver_data;
-	UINT8 *cart = memory_region( image->machine, "cart" );
-	int size = image_length( image );
+	vii_state *state = (vii_state *)image.device().machine->driver_data;
+	UINT8 *cart = memory_region( image.device().machine, "cart" );
+	int size = image.length();
 
-	if( image_fread( image, cart, size ) != size )
+	if( image.fread( cart, size ) != size )
 	{
-		image_seterror( image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
+		image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
 		return INIT_FAIL;
 	}
 

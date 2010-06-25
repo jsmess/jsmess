@@ -1304,7 +1304,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"mbombrd",  CPS_B_21_QS5, mapper_MB63B },
 	{"mbombrdj", CPS_B_21_QS5, mapper_MB63B },
 	{"sf2hf",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2t",     CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2hfu",   CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2tj",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"qad",      CPS_B_21_BT7, mapper_QD22B,  0x36 },	/* TODO: layer enable (port 36 probably leftover input code from another game) */
 	{"qadj",     CPS_B_21_DEF, mapper_qadj,   0x36, 0x38, 0x34 },	/* (ports 36, 38, 34 probably leftover input code from another game) */
@@ -2591,7 +2591,7 @@ static void cps2_render_sprites( running_machine *machine, bitmap_t *bitmap, con
 
 
 
-static void cps1_render_stars( running_device *screen, bitmap_t *bitmap, const rectangle *cliprect )
+static void cps1_render_stars( screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	cps_state *state = (cps_state *)screen->machine->driver_data;
 	int offs;
@@ -2622,7 +2622,7 @@ static void cps1_render_stars( running_device *screen, bitmap_t *bitmap, const r
 					sy = 255 - sy;
 				}
 
-				col = ((col & 0xe0) >> 1) + (video_screen_get_frame_number(screen) / 16 & 0x0f);
+				col = ((col & 0xe0) >> 1) + (screen->frame_number() / 16 & 0x0f);
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)
@@ -2648,7 +2648,7 @@ static void cps1_render_stars( running_device *screen, bitmap_t *bitmap, const r
 					sy = 255 - sy;
 				}
 
-				col = ((col & 0xe0) >> 1) + (video_screen_get_frame_number(screen) / 16 & 0x0f);
+				col = ((col & 0xe0) >> 1) + (screen->frame_number() / 16 & 0x0f);
 
 				if (sx >= cliprect->min_x && sx <= cliprect->max_x &&
 					sy >= cliprect->min_y && sy <= cliprect->max_y)

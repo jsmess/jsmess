@@ -444,7 +444,7 @@ located at I/O port 0x3CE, and a data register located at I/O port 0x3CF.
 #include "emu.h"
 #include "video/pc_ega.h"
 #include "video/crtc_ega.h"
-#include "video/pc_video.h"
+#include "video/pc_video_mess.h"
 #include "memconv.h"
 
 
@@ -612,7 +612,7 @@ static VIDEO_START( pc_ega )
 	const address_space *space = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 	const address_space *spaceio = cpu_get_address_space(machine->firstcpu, ADDRESS_SPACE_IO);
 
-	buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
+	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:

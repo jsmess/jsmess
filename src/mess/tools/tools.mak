@@ -14,15 +14,6 @@ CFLAGS += -I$(MESSSRC)/tools
 MESS_TOOLS = $(MESSOBJ)/tools
 
 
-ifdef BUILD_IMGTOOL
-include $(MESSSRC)/tools/imgtool/imgtool.mak
-TOOLS += $(IMGTOOL)
-endif
-
-ifdef BUILD_CASTOOL
-include $(MESSSRC)/tools/castool/castool.mak
-TOOLS += $(CASTOOL)
-endif
 
 ifdef BUILD_MESSTEST
 include $(MESSSRC)/tools/messtest/messtest.mak

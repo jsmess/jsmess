@@ -8,8 +8,8 @@
 #define K1GE_SCREEN_HEIGHT	199
 
 
-#define K1GE		DEVICE_GET_INFO_NAME(k1ge)
-#define K2GE		DEVICE_GET_INFO_NAME(k2ge)
+DECLARE_LEGACY_DEVICE(K1GE, k1ge);
+DECLARE_LEGACY_DEVICE(K2GE, k2ge);
 
 
 #define MDRV_K1GE_ADD(_tag, _clock, _config ) \
@@ -34,11 +34,6 @@ struct _k1ge_interface
 
 PALETTE_INIT( k1ge );
 PALETTE_INIT( k2ge );
-
-
-DEVICE_GET_INFO( k1ge );
-DEVICE_GET_INFO( k2ge );
-
 
 WRITE8_DEVICE_HANDLER( k1ge_w );
 READ8_DEVICE_HANDLER( k1ge_r );

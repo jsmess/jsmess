@@ -10,7 +10,8 @@
 #include "streams.h"
 
 
-#define SOUND_PV1000	DEVICE_GET_INFO_NAME(pv1000_sound)
+DECLARE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
+DEFINE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
 
 
 class d65010_state {
@@ -32,7 +33,7 @@ public:
 	emu_timer		*irq_off_timer;
 
 	running_device *maincpu;
-	running_device *screen;
+	screen_device *screen;
 };
 
 
@@ -104,7 +105,7 @@ static READ8_HANDLER( pv1000_io_r )
 	case 0x04:
 		/* Bit 1 = 1 => Data is available in port FD */
 		/* Bit 0 = 1 => Buffer at port FD is empty */
-		data = ( video_screen_get_vpos( state->screen ) >= 212 && video_screen_get_vpos( state->screen ) <= 220 ) ? 0x01 : 0x00;
+		data = ( state->screen->vpos() >= 212 && state->screen->vpos() <= 220 ) ? 0x01 : 0x00;
 		data |= state->fd_data ? 0x02 : 0x00;
 		break;
 	case 0x05:
@@ -175,31 +176,31 @@ static PALETTE_INIT( pv1000 )
 
 static DEVICE_IMAGE_LOAD( pv1000_cart )
 {
-	UINT8 *cart = memory_region(image->machine, "cart");
+	UINT8 *cart = memory_region(image.device().machine, "cart");
 	UINT32 size;
 
-	if (image_software_entry(image) == NULL)
-		size = image_length(image);
+	if (image.software_entry() == NULL)
+		size = image.length();
 	else
-		size = image_get_software_region_length(image, "rom");
+		size = image.get_software_region_length("rom");
 
 
 	if (size != 0x2000 && size != 0x4000)
 	{
-		image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 		return INIT_FAIL;
 	}
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		if (image_fread(image, cart, size) != size)
+		if (image.fread( cart, size) != size)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			return INIT_FAIL;
 		}
 	}
 	else
-		memcpy(cart, image_get_software_region(image, "rom"), size);
+		memcpy(cart, image.get_software_region("rom"), size);
 
 
 	/* Mirror 8KB rom */
@@ -284,11 +285,11 @@ static STREAM_UPDATE( pv1000_sound_update )
 static DEVICE_START( pv1000_sound )
 {
 	d65010_state *state = (d65010_state *)device->machine->driver_data;
-	state->sh_channel = stream_create( device, 0, 1, device->clock/1024, 0, pv1000_sound_update );
+	state->sh_channel = stream_create( device, 0, 1, device->clock()/1024, 0, pv1000_sound_update );
 }
 
 
-static DEVICE_GET_INFO( pv1000_sound )
+DEVICE_GET_INFO( pv1000_sound )
 {
 	switch (state)
 	{
@@ -307,19 +308,19 @@ static DEVICE_GET_INFO( pv1000_sound )
 static TIMER_CALLBACK( d65010_irq_on_cb )
 {
 	d65010_state *state = (d65010_state *)machine->driver_data;
-	int vpos = video_screen_get_vpos( state->screen );
+	int vpos = state->screen->vpos();
 	int next_vpos = vpos + 12;
 
 	/* Set IRQ line and schedule release of IRQ line */
 	cpu_set_input_line( state->maincpu, 0, ASSERT_LINE );
-	timer_adjust_oneshot( state->irq_off_timer, video_screen_get_time_until_pos( state->screen, vpos, 380/2 ), 0 );
+	timer_adjust_oneshot( state->irq_off_timer, state->screen->time_until_pos(vpos, 380/2 ), 0 );
 
 	/* Schedule next IRQ trigger */
 	if ( vpos >= 255 )
 	{
 		next_vpos = 195;
 	}
-	timer_adjust_oneshot( state->irq_on_timer, video_screen_get_time_until_pos( state->screen, next_vpos, 0 ), 0 );
+	timer_adjust_oneshot( state->irq_on_timer, state->screen->time_until_pos(next_vpos, 0 ), 0 );
 }
 
 
@@ -338,7 +339,7 @@ static MACHINE_START( pv1000 )
 	state->irq_on_timer = timer_alloc( machine, d65010_irq_on_cb, NULL );
 	state->irq_off_timer = timer_alloc( machine, d65010_irq_off_cb, NULL );
 	state->maincpu = devtag_get_device( machine, "maincpu" );
-	state->screen = devtag_get_device( machine, "screen" );
+	state->screen = machine->device<screen_device>("screen" );
 }
 
 
@@ -348,7 +349,7 @@ static MACHINE_RESET( pv1000 )
 
 	state->io_regs[5] = 0;
 	state->fd_data = 0;
-	timer_adjust_oneshot( state->irq_on_timer, video_screen_get_time_until_pos( state->screen, 195, 0 ), 0 );
+	timer_adjust_oneshot( state->irq_on_timer, state->screen->time_until_pos(195, 0 ), 0 );
 	timer_adjust_oneshot( state->irq_off_timer, attotime_never, 0 );
 }
 

@@ -17,14 +17,9 @@ struct _ti990_tpc_interface
     MACROS
 ***************************************************************************/
 
-#define TI990_TAPE_CTRL		DEVICE_GET_INFO_NAME(tap_990)
+DECLARE_LEGACY_DEVICE(TI990_TAPE_CTRL, tap_990);
 
 #define MDRV_TI990_TAPE_CTRL_ADD(_tag, _intrf)	\
 	MDRV_DEVICE_ADD((_tag),  TI990_TAPE_CTRL, 0)\
 	MDRV_DEVICE_CONFIG(_intrf)
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO(tap_990);

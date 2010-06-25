@@ -123,7 +123,7 @@ static void filter_init(running_machine *machine, lp_filter *iir, double fs)
 	iir->history = (float *)auto_alloc_array_clear(machine, float, 2 * 2);
 }
 
-void prewarp(double *a0, double *a1, double *a2,double fc, double fs)
+static void prewarp(double *a0, double *a1, double *a2,double fc, double fs)
 {
 	double wp, pi;
 
@@ -134,7 +134,7 @@ void prewarp(double *a0, double *a1, double *a2,double fc, double fs)
 	*a1 = *a1 / wp;
 }
 
-void bilinear(double a0, double a1, double a2,
+static void bilinear(double a0, double a1, double a2,
 			  double b0, double b1, double b2,
 			  double *k, double fs, float *coef)
 {
@@ -152,7 +152,7 @@ void bilinear(double a0, double a1, double a2,
 	*coef = (4. * a2 * fs * fs - 2. * a1 * fs + a0) / ad;
 }
 
-void recompute_filter(lp_filter *iir, double k, double q, double fc)
+static void recompute_filter(lp_filter *iir, double k, double q, double fc)
 {
 	int nInd;
 	double a0, a1, a2, b0, b1, b2;
@@ -186,7 +186,7 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 	if (~data & 8)
 	{
 		running_device *device = devtag_get_device(machine, data & 4 ? "noise_2" : "noise_1");
-		noise_state *nstate = (noise_state *)device->token;
+		noise_state *nstate = (noise_state *)downcast<legacy_device_base *>(device)->token();
 
 		if (state->dac_data != nstate->dac[data & 3])
 		{
@@ -213,11 +213,9 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 INLINE noise_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_MICRO3D);
+	assert(device->type() == SOUND_MICRO3D);
 
-	return (noise_state *)device->token;
+	return (noise_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 static STREAM_UPDATE( micro3d_stream_update )
@@ -425,3 +423,6 @@ WRITE8_DEVICE_HANDLER( micro3d_upd7759_w )
 	upd7759_start_w(device, 0);
 	upd7759_start_w(device, 1);
 }
+
+
+DEFINE_LEGACY_SOUND_DEVICE(MICRO3D, micro3d_sound);

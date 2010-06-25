@@ -194,8 +194,8 @@ void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data )
 /* end of send event */
 static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 {
-	running_device *xmodem = devtag_get_device(machine, "rs232_x");
-	running_device *kermit = devtag_get_device(machine, "rs232_k");
+	device_image_interface *xmodem = (device_image_interface*)devtag_get_device(machine, "rs232_x");
+	device_image_interface *kermit = (device_image_interface*)devtag_get_device(machine, "rs232_k");
 
 	LOG_SERIAL(( "%f hp48_rs232_byte_sent_cb: end of send, data=%02x\n",
 		     attotime_to_double(timer_get_time(machine)), param ));
@@ -209,8 +209,8 @@ static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 	}
 
 	/* protocol action */
-	if ( xmodem && image_exists( xmodem ) ) xmodem_receive_byte( xmodem, param );
-	else if ( kermit && image_exists( kermit ) ) kermit_receive_byte( kermit, param );
+	if ( xmodem && xmodem->exists() ) xmodem_receive_byte( &xmodem->device(), param );
+	else if ( kermit && kermit->exists() ) kermit_receive_byte( &kermit->device(), param );
 #ifdef CHARDEV
 	else chardev_out( hp48_chardev, param );
 #endif
@@ -563,7 +563,7 @@ static READ8_HANDLER ( hp48_io_r )
 	case 0x29:
 	{
 		int last_line = HP48_IO_8(0x28) & 0x3f; /* last line of main bitmap before menu */
-		int cur_line = video_screen_get_vpos( space->machine->primary_screen );
+		int cur_line = space->machine->primary_screen->vpos();
 		if ( last_line <= 1 ) last_line = 0x3f;
 		data = ( cur_line >= 0 && cur_line <= last_line ) ? last_line - cur_line : 0;
 		if ( offset == 0x29 )
@@ -594,15 +594,15 @@ static READ8_HANDLER ( hp48_io_r )
 	{
                 /* second nibble of received data */
 
-		running_device *xmodem = devtag_get_device(space->machine, "rs232_x");
-		running_device *kermit = devtag_get_device(space->machine, "rs232_k");
+		device_image_interface *xmodem = (device_image_interface *)devtag_get_device(space->machine, "rs232_x");
+		device_image_interface *kermit = (device_image_interface *)devtag_get_device(space->machine, "rs232_k");
 
 		hp48_io[0x11] &= ~1;  /* clear byte received */
 		data = hp48_io[offset];
 
 		/* protocol action */
-		if ( xmodem && image_exists( xmodem ) ) xmodem_byte_transmitted( xmodem );
-		else if ( kermit && image_exists( kermit ) ) kermit_byte_transmitted( kermit );
+		if ( xmodem && xmodem->exists() ) xmodem_byte_transmitted( &xmodem->device() );
+		else if ( kermit && kermit->exists() ) kermit_byte_transmitted( &kermit->device() );
 		break;
 	}
 
@@ -1011,7 +1011,7 @@ const struct hp48_port_config hp48gx_port2_config = { 1, 4, 4*1024*1024, "p2", "
 /* helper for load and create */
 static void hp48_fill_port( running_device* image )
 {
-	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config;
+	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config();
 	int size = hp48_port_size[conf->port];
 	LOG(( "hp48_fill_port: %s module=%i size=%i rw=%i\n", conf->name, conf->module, size, hp48_port_write[conf->port] ));
 	hp48_port_data[conf->port] = (UINT8*)malloc( 2 * size );
@@ -1030,7 +1030,7 @@ static void hp48_fill_port( running_device* image )
 /* helper for start and unload */
 static void hp48_unfill_port( running_device* image )
 {
-	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config;
+	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config();
 	hp48_modules[conf->module].off_mask = 0x00fff;  /* 2 KB */
 	hp48_modules[conf->module].read     = NULL;
 	hp48_modules[conf->module].write    = NULL;
@@ -1040,8 +1040,8 @@ static void hp48_unfill_port( running_device* image )
 
 static DEVICE_IMAGE_LOAD( hp48_port )
 {
-	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config;
-	int size = image_length( image );
+	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().baseconfig().static_config();
+	int size = image.length();
 	if ( size == 0 ) size = conf->max_size; /* default size */
 
 	/* check size */
@@ -1052,16 +1052,16 @@ static DEVICE_IMAGE_LOAD( hp48_port )
 	}
 
 	hp48_port_size[conf->port] = size;
-	hp48_port_write[conf->port] = image_is_writable( image );
+	hp48_port_write[conf->port] = image.is_writable();
 	hp48_fill_port( image );
-	image_fread( image, hp48_port_data[conf->port], hp48_port_size[conf->port] );
+	image.fread(hp48_port_data[conf->port], hp48_port_size[conf->port] );
 	hp48_decode_nibble( hp48_port_data[conf->port], hp48_port_data[conf->port], hp48_port_size[conf->port] );
 	return INIT_PASS;
 }
 
 static DEVICE_IMAGE_CREATE( hp48_port )
 {
-	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config;
+	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().baseconfig().static_config();
 	int size = conf->max_size;
         /* XXX defaults to max_size; get user-specified size instead */
 
@@ -1081,18 +1081,18 @@ static DEVICE_IMAGE_CREATE( hp48_port )
 
 static DEVICE_IMAGE_UNLOAD( hp48_port )
 {
-	struct hp48_port_config* conf = (struct hp48_port_config*) image->baseconfig().static_config;
+	struct hp48_port_config* conf = (struct hp48_port_config*) image.device().baseconfig().static_config();
 	LOG(( "hp48_port image unload: %s size=%i rw=%i\n",
 	      conf->name, hp48_port_size[conf->port] ,hp48_port_write[conf->port] ));
 	if ( hp48_port_write[conf->port] )
 	{
 		hp48_encode_nibble( hp48_port_data[conf->port], hp48_port_data[conf->port], hp48_port_size[conf->port] );
-		image_fseek( image, 0, SEEK_SET );
-		image_fwrite( image, hp48_port_data[conf->port], hp48_port_size[conf->port] );
+		image.fseek( 0, SEEK_SET );
+		image.fwrite( hp48_port_data[conf->port], hp48_port_size[conf->port] );
 	}
 	free( hp48_port_data[conf->port] );
 	hp48_unfill_port( image );
-	hp48_apply_modules( image->machine, NULL );
+	hp48_apply_modules( image.device().machine, NULL );
 }
 
 static DEVICE_START( hp48_port )
@@ -1102,12 +1102,11 @@ static DEVICE_START( hp48_port )
 
 DEVICE_GET_INFO( hp48_port )
 {
-	struct hp48_port_config* conf = device ? (struct hp48_port_config*) device->static_config : NULL;
+	struct hp48_port_config* conf = device ? (struct hp48_port_config*) device->static_config() : NULL;
 	switch ( state )
 	{
 	case DEVINFO_INT_TOKEN_BYTES:                 info->i = 1;                                               break;
 	case DEVINFO_INT_INLINE_CONFIG_BYTES:         info->i = 0;                                               break;
-	case DEVINFO_INT_CLASS:	                      info->i = DEVICE_CLASS_PERIPHERAL;                         break;
 	case DEVINFO_INT_IMAGE_TYPE:	              info->i = IO_MEMCARD;                                      break;
 	case DEVINFO_INT_IMAGE_READABLE:              info->i = 1;                                               break;
 	case DEVINFO_INT_IMAGE_WRITEABLE:	      info->i = 1;                                               break;
@@ -1272,3 +1271,5 @@ MACHINE_START( hp48gp )
 {
 	hp48_machine_start( machine, HP48_GP );
 }
+
+DEFINE_LEGACY_IMAGE_DEVICE(HP48_PORT, hp48_port);

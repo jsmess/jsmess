@@ -24,14 +24,13 @@ struct _upd1771_interface
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define SOUND_UPD1771C DEVICE_GET_INFO_NAME(upd1771c)
+DECLARE_LEGACY_SOUND_DEVICE(UPD1771C, upd1771c);
 
 
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
 
-DEVICE_GET_INFO( upd1771c );
 WRITE8_DEVICE_HANDLER( upd1771_w );
 WRITE_LINE_DEVICE_HANDLER( upd1771_pcm_w );
 

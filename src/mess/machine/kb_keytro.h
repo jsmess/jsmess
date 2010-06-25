@@ -25,9 +25,6 @@ struct _kb_keytronic_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-extern DEVICE_GET_INFO( kb_keytr );
-
 WRITE_LINE_DEVICE_HANDLER( kb_keytronic_clock_w );
 WRITE_LINE_DEVICE_HANDLER( kb_keytronic_data_w );
 
@@ -44,7 +41,7 @@ INPUT_PORTS_EXTERN( kb_keytronic_at );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define KB_KEYTRONIC DEVICE_GET_INFO_NAME(kb_keytr)
+DECLARE_LEGACY_DEVICE(KB_KEYTRONIC, kb_keytr);
 
 #define MDRV_KB_KEYTRONIC_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, KB_KEYTRONIC, 0) \

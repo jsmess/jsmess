@@ -27,11 +27,9 @@ UINT8 ti99_mfm_harddisk_status(running_device *harddisk);
 void ti99_mfm_harddisk_seek(running_device *harddisk, int direction);
 void ti99_mfm_harddisk_get_next_id(running_device *harddisk, int head, chrn_id_hd *id);
 
-#define MFMHD	DEVICE_GET_INFO_NAME( mfmhd )
-DEVICE_GET_INFO( mfmhd );
+DECLARE_LEGACY_DEVICE(MFMHD, mfmhd);
 
-#define IDEHD	DEVICE_GET_INFO_NAME( idehd )
-DEVICE_GET_INFO( idehd );
+DECLARE_LEGACY_DEVICE(IDEHD, idehd);
 
 #define MDRV_MFMHD_3_DRIVES_ADD()			\
 	MDRV_DEVICE_ADD(MFMHD_0, MFMHD, 0)		\

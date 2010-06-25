@@ -60,7 +60,7 @@ static VIDEO_START( astrocorp )
 {
 	astrocorp_state *state = (astrocorp_state *)machine->driver_data;
 
-	state->bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	state->bitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	state_save_register_global_bitmap(machine, state->bitmap);
 	state_save_register_global       (machine, state->screen_enable);
@@ -163,7 +163,7 @@ static WRITE16_HANDLER( astrocorp_draw_sprites_w )
 	UINT16 now = COMBINE_DATA(&state->draw_sprites);
 
 	if (!old && now)
-		draw_sprites(space->machine, state->bitmap, video_screen_get_visible_area(space->machine->primary_screen));
+		draw_sprites(space->machine, state->bitmap, &space->machine->primary_screen->visible_area());
 }
 
 static WRITE16_HANDLER( astrocorp_eeprom_w )
@@ -178,7 +178,8 @@ static WRITE16_DEVICE_HANDLER( astrocorp_sound_bank_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		okim6295_set_bank_base(device, 0x40000 * ((data >> 8) & 1));
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(0x40000 * ((data >> 8) & 1));
 //      logerror("CPU #0 PC %06X: OKI bank %08X\n", cpu_get_pc(space->cpu), data);
 	}
 }
@@ -187,7 +188,8 @@ static WRITE16_DEVICE_HANDLER( skilldrp_sound_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_set_bank_base(device, 0x40000 * (data & 1));
+		okim6295_device *oki = downcast<okim6295_device *>(device);
+		oki->set_bank_base(0x40000 * (data & 1));
 //      logerror("CPU #0 PC %06X: OKI bank %08X\n", cpu_get_pc(space->cpu), data);
 	}
 }
@@ -473,8 +475,7 @@ static MACHINE_DRIVER_START( showhand )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_20MHz/20)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_20MHz/20, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -528,8 +529,7 @@ static MACHINE_DRIVER_START( skilldrp )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_24MHz/24)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
+	MDRV_OKIM6295_ADD("oki", XTAL_24MHz/24, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -791,10 +791,6 @@ ROM_END
 /***************************************************************************
 
 Zoo by Astro
-
-ZOO Z0.02.D at both U25 & U26 are Winbond W27C512 roms and are program code
-5 ZOO is a MX 27C4000 rom and is the sample rom
-29F1610mc at U26 (yes "U26" is present twice on the PCB) are the graphics
 
 ASTRO M1.1 PCB:
  Astro V06 0430 160pin PQFP ("ASTRO02" silkscreened under chip)

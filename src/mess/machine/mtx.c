@@ -7,6 +7,7 @@
 **************************************************************************/
 
 #include "emu.h"
+#include "utils.h"
 #include "includes/mtx.h"
 #include "cpu/z80/z80.h"
 #include "devices/cassette.h"
@@ -361,32 +362,32 @@ INTERRUPT_GEN( mtx_interrupt )
 
 SNAPSHOT_LOAD( mtx )
 {
-	const address_space *program = cputag_get_address_space(image->machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
+	const address_space *program = cputag_get_address_space(image.device().machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	UINT8 header[18];
 	UINT16 addr;
 
 	/* get the header */
-	image_fread(image, &header, sizeof(header));
+	image.fread( &header, sizeof(header));
 
 	if (header[0] == 0xff)
 	{
 		/* long header */
 		addr = pick_integer_le(header, 16, 2);
 		void *ptr = memory_get_write_ptr(program, addr);
-		image_fread(image, ptr, 599);
+		image.fread( ptr, 599);
 		ptr = memory_get_write_ptr(program, 0xc000);
-		image_fread(image, ptr, snapshot_size - 599 - 18);
+		image.fread( ptr, snapshot_size - 599 - 18);
 	}
 	else
 	{
 		/* short header */
 		addr = pick_integer_le(header, 0, 2);
-		image_fseek(image, 4, SEEK_SET);
+		image.fseek(4, SEEK_SET);
 		void *ptr = memory_get_write_ptr(program, addr);
-		image_fread(image, ptr, 599);
+		image.fread( ptr, 599);
 		ptr = memory_get_write_ptr(program, 0xc000);
-		image_fread(image, ptr, snapshot_size - 599 - 4);
+		image.fread( ptr, snapshot_size - 599 - 4);
 	}
 
 	return INIT_PASS;

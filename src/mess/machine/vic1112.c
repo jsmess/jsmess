@@ -43,16 +43,15 @@ struct _vic1112_t
 INLINE vic1112_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == VIC1112);
-	return (vic1112_t *)device->token;
+	assert(device->type() == VIC1112);
+	return (vic1112_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE vic1112_config *get_safe_config(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == VIC1112);
-	return (vic1112_config *)device->baseconfig().inline_config;
+	assert(device->type() == VIC1112);
+	return (vic1112_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 /***************************************************************************
@@ -77,7 +76,7 @@ WRITE_LINE_DEVICE_HANDLER( vic1112_ieee488_srq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via0_irq_w )
 {
-	vic1112_t *vic1112 = get_safe_token(device->owner);
+	vic1112_t *vic1112 = get_safe_token(device->owner());
 
 	vic1112->via0_irq = state;
 
@@ -101,7 +100,7 @@ static READ8_DEVICE_HANDLER( via0_pb_r )
 
     */
 
-	vic1112_t *vic1112 = get_safe_token(device->owner);
+	vic1112_t *vic1112 = get_safe_token(device->owner());
 	UINT8 data = 0;
 
 	/* end or identify */
@@ -139,16 +138,16 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
     */
 
-	vic1112_t *vic1112 = get_safe_token(device->owner);
+	vic1112_t *vic1112 = get_safe_token(device->owner());
 
 	/* data valid out */
-	ieee488_dav_w(vic1112->bus, device->owner, BIT(data, 0));
+	ieee488_dav_w(vic1112->bus, device->owner(), BIT(data, 0));
 
 	/* not ready for data out */
-	ieee488_nrfd_w(vic1112->bus, device->owner, BIT(data, 1));
+	ieee488_nrfd_w(vic1112->bus, device->owner(), BIT(data, 1));
 
 	/* not data accepted out */
-	ieee488_ndac_w(vic1112->bus, device->owner, BIT(data, 2));
+	ieee488_ndac_w(vic1112->bus, device->owner(), BIT(data, 2));
 }
 
 static const via6522_interface vic1112_via0_intf =
@@ -176,7 +175,7 @@ static const via6522_interface vic1112_via0_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 {
-	vic1112_t *vic1112 = get_safe_token(device->owner);
+	vic1112_t *vic1112 = get_safe_token(device->owner());
 
 	vic1112->via1_irq = state;
 
@@ -200,7 +199,7 @@ static READ8_DEVICE_HANDLER( dio_r )
 
     */
 
-	vic1112_t *vic1112 = get_safe_token(device->owner);
+	vic1112_t *vic1112 = get_safe_token(device->owner());
 
 	return ieee488_dio_r(vic1112->bus, 0);
 }
@@ -222,22 +221,22 @@ static WRITE8_DEVICE_HANDLER( dio_w )
 
     */
 
-	vic1112_t *vic1112 = get_safe_token(device->owner);
+	vic1112_t *vic1112 = get_safe_token(device->owner());
 
-	ieee488_dio_w(vic1112->bus, device->owner, data);
+	ieee488_dio_w(vic1112->bus, device->owner(), data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( atn_w )
 {
-	vic1112_t *vic1112 = get_safe_token(device->owner);
+	vic1112_t *vic1112 = get_safe_token(device->owner());
 
 	/* attention out */
-	ieee488_atn_w(vic1112->bus, device->owner, state);
+	ieee488_atn_w(vic1112->bus, device->owner(), state);
 }
 
 static READ_LINE_DEVICE_HANDLER( srq_r )
 {
-	vic1112_t *vic1112 = get_safe_token(device->owner);
+	vic1112_t *vic1112 = get_safe_token(device->owner());
 
 	/* service request in */
 	return ieee488_srq_r(vic1112->bus);
@@ -245,10 +244,10 @@ static READ_LINE_DEVICE_HANDLER( srq_r )
 
 static WRITE_LINE_DEVICE_HANDLER( eoi_w )
 {
-	vic1112_t *vic1112 = get_safe_token(device->owner);
+	vic1112_t *vic1112 = get_safe_token(device->owner());
 
 	/* end or identify out */
-	ieee488_eoi_w(vic1112->bus, device->owner, state);
+	ieee488_eoi_w(vic1112->bus, device->owner(), state);
 }
 
 static const via6522_interface vic1112_via1_intf =
@@ -304,8 +303,8 @@ static DEVICE_START( vic1112 )
 	vic1112->bus = devtag_get_device(device->machine, config->bus_tag);
 
 	/* set VIA clocks */
-	vic1112->via0->set_clock(cpu_get_clock(device->machine->firstcpu));
-	vic1112->via1->set_clock(cpu_get_clock(device->machine->firstcpu));
+	vic1112->via0->set_unscaled_clock(cpu_get_clock(device->machine->firstcpu));
+	vic1112->via1->set_unscaled_clock(cpu_get_clock(device->machine->firstcpu));
 
 	/* map VIAs to memory */
 	memory_install_readwrite8_device_handler(program, vic1112->via0, 0x9800, 0x980f, 0, 0, via_r, via_w);
@@ -350,7 +349,6 @@ DEVICE_GET_INFO( vic1112 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vic1112_t);								break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(vic1112_config);							break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;							break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(vic1112);						break;
@@ -369,3 +367,5 @@ DEVICE_GET_INFO( vic1112 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team"); 				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(VIC1112, vic1112);

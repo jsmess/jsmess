@@ -64,9 +64,9 @@ VIDEO_RESET( micro3d )
  *
  *************************************/
 
-void micro3d_scanline_update(running_device *screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
+void micro3d_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params)
 {
-	micro3d_state *state = (micro3d_state*)screen->machine->driver_data;
+	micro3d_state *state = (micro3d_state*)screen.machine->driver_data;
 
 	UINT16 *src = &state->micro3d_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
 	UINT16 *dest = BITMAP_ADDR16(bitmap, scanline, 0);
@@ -288,7 +288,7 @@ INLINE void write_span(micro3d_state *state, UINT32 y, UINT32 x)
 }
 
 /* This is the same algorithm used in the 3D tests */
-void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2)
+static void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2)
 {
 	UINT32 tmp2;
 	UINT32 acc;
@@ -391,7 +391,7 @@ void draw_line(micro3d_state *state, UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2)
 	}
 }
 
-void rasterise_spans(micro3d_state *state, UINT32 min_y, UINT32 max_y, UINT32 attr)
+static void rasterise_spans(micro3d_state *state, UINT32 min_y, UINT32 max_y, UINT32 attr)
 {
 	int y;
 	int color = attr & 0xfff;

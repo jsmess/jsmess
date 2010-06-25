@@ -30,10 +30,9 @@ struct _i82439tx_state
 INLINE i82439tx_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == I82439TX);
+	assert(device->type() == I82439TX);
 
-	return (i82439tx_state *)device->token;
+	return (i82439tx_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -213,7 +212,7 @@ void i82439tx_pci_write(running_device *busdevice, running_device *device, int f
 static DEVICE_START( i82439tx )
 {
 	i82439tx_state *i82439tx = get_safe_token(device);
-	i82439tx_config *config = (i82439tx_config *)device->baseconfig().inline_config;
+	i82439tx_config *config = (i82439tx_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 
 	/* get address space we are working on */
 	running_device *cpu = devtag_get_device(device->machine, config->cputag);
@@ -274,3 +273,5 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_VERSION				"1.0"
 #define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
 #include "devtempl.h"
+
+DEFINE_LEGACY_DEVICE(I82439TX, i82439tx);

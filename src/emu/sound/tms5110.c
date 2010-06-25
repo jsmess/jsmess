@@ -104,7 +104,6 @@ struct _tms5110_state
 	UINT8 PDC;
 	UINT8 CTL_pins;
 	UINT8 speaking_now;
-	UINT8 speak_delay_frames;
 	UINT8 talk_status;
 	UINT8 state;
 
@@ -117,6 +116,15 @@ struct _tms5110_state
 	/* external callback */
 	int (*M0_callback)(running_device *);
 	void (*set_load_address)(running_device *, int);
+
+	/* callbacks */
+	devcb_resolved_write_line m0_func;		/* the M0 line */
+	devcb_resolved_write_line m1_func;		/* the M1 line */
+	devcb_resolved_write8 addr_func;		/* Write to ADD1,2,4,8 - 4 address bits */
+	devcb_resolved_read_line data_func;		/* Read one bit from ADD8/Data - voice data */
+	devcb_resolved_write_line romclk_func;	/* rom clock - Only used to drive the data lines */
+
+
 	running_device *device;
 
 	/* these contain data describing the current and previous voice frames */
@@ -156,6 +164,31 @@ struct _tms5110_state
 	UINT8 romclk_hack_state;
 };
 
+typedef struct _tmsprom_state tmsprom_state;
+struct _tmsprom_state
+{
+	/* Rom interface */
+	UINT32 address;
+	/* ctl lines */
+	UINT8  m0;
+	UINT8  enable;
+	UINT32  base_address;
+	UINT8  bit;
+
+	int prom_cnt;
+
+	int    clock;
+	const UINT8 *rom;
+	const UINT8 *prom;
+
+	devcb_resolved_write_line pdc_func;		/* tms pdc func */
+	devcb_resolved_write8 ctl_func;			/* tms ctl func */
+
+	running_device *device;
+	emu_timer *romclk_timer;
+
+	const tmsprom_interface *intf;
+};
 
 /* Pull in the ROM tables */
 #include "tms5110r.c"
@@ -165,18 +198,22 @@ struct _tms5110_state
 INLINE tms5110_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SOUND);
-	assert(sound_get_type(device) == SOUND_TMS5110 ||
-		   sound_get_type(device) == SOUND_TMS5100 ||
-		   sound_get_type(device) == SOUND_TMS5110A ||
-		   sound_get_type(device) == SOUND_CD2801 ||
-		   sound_get_type(device) == SOUND_TMC0281 ||
-		   sound_get_type(device) == SOUND_CD2802 ||
-		   sound_get_type(device) == SOUND_M58817);
-	return (tms5110_state *)device->token;
+	assert(device->type() == SOUND_TMS5110 ||
+		   device->type() == SOUND_TMS5100 ||
+		   device->type() == SOUND_TMS5110A ||
+		   device->type() == SOUND_CD2801 ||
+		   device->type() == SOUND_TMC0281 ||
+		   device->type() == SOUND_CD2802 ||
+		   device->type() == SOUND_M58817);
+	return (tms5110_state *)downcast<legacy_device_base *>(device)->token();
 }
 
+INLINE tmsprom_state *get_safe_token_prom(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->type() == TMSPROM);
+	return (tmsprom_state *)downcast<legacy_device_base *>(device)->token();
+}
 
 /* Static function prototypes */
 static void tms5110_set_variant(tms5110_state *tms, int variant);
@@ -209,6 +246,39 @@ void tms5110_set_variant(tms5110_state *tms, int variant)
 	tms->variant = variant;
 }
 
+static void new_int_write(tms5110_state *tms, UINT8 rc, UINT8 m0, UINT8 m1, UINT8 addr)
+{
+	if (tms->m0_func.write)
+		devcb_call_write_line(&tms->m0_func, m0);
+	if (tms->m1_func.write)
+		devcb_call_write_line(&tms->m1_func, m1);
+	if (tms->addr_func.write)
+		devcb_call_write8(&tms->addr_func, 0, addr);
+	if (tms->romclk_func.write)
+	{
+		//printf("rc %d\n", rc);
+		devcb_call_write_line(&tms->romclk_func, rc);
+	}
+}
+
+static void new_int_write_addr(tms5110_state *tms, UINT8 addr)
+{
+	new_int_write(tms, 1, 0, 1, addr);
+	new_int_write(tms, 0, 0, 1, addr);
+	new_int_write(tms, 1, 0, 0, addr);
+	new_int_write(tms, 0, 0, 0, addr);
+}
+
+static UINT8 new_int_read(tms5110_state *tms)
+{
+	new_int_write(tms, 1, 1, 0, 0);
+	new_int_write(tms, 0, 1, 0, 0);
+	new_int_write(tms, 1, 0, 0, 0);
+	new_int_write(tms, 0, 0, 0, 0);
+	if (tms->data_func.read)
+		return devcb_call_read_line(&tms->data_func);
+	return 0;
+}
 
 static void register_for_save_states(tms5110_state *tms)
 {
@@ -220,7 +290,6 @@ static void register_for_save_states(tms5110_state *tms)
 	state_save_register_device_item(tms->device, 0, tms->PDC);
 	state_save_register_device_item(tms->device, 0, tms->CTL_pins);
 	state_save_register_device_item(tms->device, 0, tms->speaking_now);
-	state_save_register_device_item(tms->device, 0, tms->speak_delay_frames);
 	state_save_register_device_item(tms->device, 0, tms->talk_status);
 	state_save_register_device_item(tms->device, 0, tms->state);
 
@@ -310,7 +379,11 @@ int i;
 			FIFO_data_write(tms, data);
 		}
 		else
-			if (DEBUG_5110) logerror("-->ERROR: TMS5110 missing M0 callback function\n");
+		{
+			//if (DEBUG_5110) logerror("-->ERROR: TMS5110 missing M0 callback function\n");
+			UINT8 data = new_int_read(tms);
+			FIFO_data_write(tms, data);
+		}
 	}
 }
 
@@ -321,10 +394,16 @@ static void perform_dummy_read(tms5110_state *tms)
 		if (tms->M0_callback)
 		{
 			int data = (*tms->M0_callback)(tms->device);
-				if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data&1);
+
+			if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data&1);
 		}
-			else
-				if (DEBUG_5110) logerror("-->ERROR: TMS5110 missing M0 callback function\n");
+		else
+		{
+			int data = new_int_read(tms);
+
+			if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data&1);
+			//if (DEBUG_5110) logerror("-->ERROR: TMS5110 missing M0 callback function\n");
+		}
 		tms->schedule_dummy_read = FALSE;
 	}
 }
@@ -685,6 +764,7 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 				tms->schedule_dummy_read = TRUE;
 				if (tms->set_load_address)
 					tms->set_load_address(tms->device, tms->address);
+				new_int_write_addr(tms, tms->CTL_pins & 0x0F);
 			}
 			else
 			{
@@ -714,6 +794,16 @@ void tms5110_PDC_set(tms5110_state *tms, int data)
 
 				case TMS5110_CMD_LOAD_ADDRESS:
 					tms->next_is_address = TRUE;
+					break;
+
+				case TMS5110_CMD_READ_BRANCH:
+					new_int_write(tms, 0,1,1,0);
+					new_int_write(tms, 1,1,1,0);
+					new_int_write(tms, 0,1,1,0);
+					new_int_write(tms, 0,0,0,0);
+					new_int_write(tms, 1,0,0,0);
+					new_int_write(tms, 0,0,0,0);
+					tms->schedule_dummy_read = FALSE;
 					break;
 
 				case TMS5110_CMD_TEST_TALK:
@@ -918,25 +1008,37 @@ static void speech_rom_set_addr(running_device *device, int addr)
 
 ******************************************************************************/
 
+
 static DEVICE_START( tms5110 )
 {
-	static const tms5110_interface dummy = { 0 };
+	static const tms5110_interface dummy = { NULL, NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL};
 	tms5110_state *tms = get_safe_token(device);
 
-	tms->intf = device->baseconfig().static_config ? (const tms5110_interface *)device->baseconfig().static_config : &dummy;
-	tms->table = *device->region;
+	assert_always(tms != NULL, "Error creating TMS5110 chip");
+
+	assert_always(device->baseconfig().static_config() != NULL, "No config");
+
+	tms->intf = device->baseconfig().static_config() ? (const tms5110_interface *)device->baseconfig().static_config() : &dummy;
+	tms->table = *device->region();
 
 	tms->device = device;
 	tms5110_set_variant(tms, TMS5110_IS_5110A);
 
-	assert_always(tms != NULL, "Error creating TMS5110 chip");
+	/* resolve lines */
+	devcb_resolve_write_line(&tms->m0_func, &tms->intf->m0_func, device);
+	devcb_resolve_write_line(&tms->m1_func, &tms->intf->m1_func, device);
+	devcb_resolve_write_line(&tms->romclk_func, &tms->intf->romclk_func, device);
+	devcb_resolve_write8(&tms->addr_func, &tms->intf->addr_func, device);
+	devcb_resolve_read_line(&tms->data_func, &tms->intf->data_func, device);
 
 	/* initialize a stream */
-	tms->stream = stream_create(device, 0, 1, device->clock / 80, tms, tms5110_update);
+	tms->stream = stream_create(device, 0, 1, device->clock() / 80, tms, tms5110_update);
 
 	if (tms->table == NULL)
 	{
+#if 0
 		assert_always(tms->intf->M0_callback != NULL, "Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
+#endif
 	    tms->M0_callback = tms->intf->M0_callback;
 	    tms->set_load_address = tms->intf->load_address;
 	}
@@ -1004,7 +1106,7 @@ static DEVICE_RESET( tms5110 )
 	tms->fifo_head = tms->fifo_tail = tms->fifo_count = 0;
 
 	/* initialize the chip state */
-	tms->speaking_now = tms->speak_delay_frames = tms->talk_status = 0;
+	tms->speaking_now = tms->talk_status = 0;
 	tms->CTL_pins = 0;
 		tms->RNG = 0x1fff;
 
@@ -1021,7 +1123,19 @@ static DEVICE_RESET( tms5110 )
 	memset(tms->x, 0, sizeof(tms->x));
 	tms->next_is_address = FALSE;
 	tms->address = 0;
-	tms->schedule_dummy_read = TRUE;
+	if (tms->table != NULL || tms->M0_callback != NULL)
+	{
+		/* legacy interface */
+		tms->schedule_dummy_read = TRUE;
+
+	}
+	else
+	{
+		/* no dummy read! This makes bagman and ad2083 speech fail
+         * with the new cycle and transition exact interfaces
+         */
+		tms->schedule_dummy_read = FALSE;
+	}
 	tms->addr_bit = 0;
 }
 
@@ -1050,13 +1164,13 @@ WRITE8_DEVICE_HANDLER( tms5110_ctl_w )
 
 ******************************************************************************/
 
-WRITE8_DEVICE_HANDLER( tms5110_pdc_w )
+WRITE_LINE_DEVICE_HANDLER( tms5110_pdc_w )
 {
 	tms5110_state *tms = get_safe_token(device);
 
     /* bring up to date first */
     stream_update(tms->stream);
-    tms5110_PDC_set(tms, data);
+    tms5110_PDC_set(tms, state);
 }
 
 
@@ -1126,7 +1240,7 @@ READ8_DEVICE_HANDLER( tms5110_romclk_hack_r )
     if (!tms->romclk_hack_timer_started)
     {
     	tms->romclk_hack_timer_started = TRUE;
-		timer_adjust_periodic(tms->romclk_hack_timer, ATTOTIME_IN_HZ(device->clock / 40), 0, ATTOTIME_IN_HZ(device->clock / 40));
+		timer_adjust_periodic(tms->romclk_hack_timer, ATTOTIME_IN_HZ(device->clock() / 40), 0, ATTOTIME_IN_HZ(device->clock() / 40));
 	}
     return tms->romclk_hack_state;
 }
@@ -1193,9 +1307,195 @@ void tms5110_set_frequency(running_device *device, int frequency)
 }
 
 
+/*
+ *
+ * General Interface design (Bagman)
+ *
+ *                         +------------------------------------------------------------------------+
+ *                         |                                                                        |
+ *       +-------------+   |           +-------------+       +-------------+       +-------------+  |
+ *       | TMS5100     |   |           | Counters    |       | Rom(s)      |       | Decoder     |  |
+ *       |        ADD8 |<--+           | LS393s      |       |             |       |             |  |
+ *       |             |               |             |       |             |       |        Out  |--+
+ *       |          M0 |---+           |     Address |======>| Address     |       | IN1         |
+ *       |             |   |           |             |       |       Data  |======>| ...         |
+ *   M   |             |   +---------->| Clk         |       |             |       | IN8         |
+ *   A-->| CTL1        |               |             |       |             |       |             |
+ *   P-->| CTL2        |          +--->| Reset       |       |             |       |             |
+ *   P-->| CTL3        |          |    |             |       |             |       |    A  B  C  |
+ *   E-->| CTL4        |          |    +-------------+       +-------------+       +-------------+
+ *   D-->| PDC         |          |                                                     ^  ^  ^
+ *       |             |          +-------------------------------------------------+   |  |  |
+ *       |             |                                                            |   Bit Select
+ *       |      ROMCLK |---+           +-------------+       +-------------+        |
+ *       |             |   |           | Counter     |       | PROM        |        |
+ *       +-------------+   |           | LS393       |       |          D1 |   M  --+ Reset Bit
+ *                         |           |          Q0 |------>| A0          |   A
+ *                         +---------->| Clk      Q1 |------>| A1          |   P ==>  CTL1 ... CTL4
+ *                                     |          Q2 |------>| A2          |   P -->  PDC
+ *                                     | Reset    Q3 |------>| A3          |   E  --+ Stop Bit
+ *                                     |             |   +-->| A4       D8 |   D    |
+ *                                     +-------------+   |   +-------------+        |
+ *                                                       |                          |
+ *                                                       |   +---+                  |
+ *                                                       |   |   |<-----------------+
+ *                                                       +---| & |
+ *                                                           |   |<-------- Enable
+ *                                                           +---+
+ *
+ */
+
+/******************************************************************************
+
+     DEVICE_START( tmsprom ) -- allocate buffers initialize
+
+******************************************************************************/
+
+static void register_for_save_states_prom(tmsprom_state *tms)
+{
+	state_save_register_device_item(tms->device, 0, tms->address);
+	state_save_register_device_item(tms->device, 0, tms->base_address);
+	state_save_register_device_item(tms->device, 0, tms->bit);
+	state_save_register_device_item(tms->device, 0, tms->enable);
+	state_save_register_device_item(tms->device, 0, tms->prom_cnt);
+	state_save_register_device_item(tms->device, 0, tms->m0);
+}
+
+
+static void update_prom_cnt(tmsprom_state *tms)
+{
+	UINT8 prev_val = tms->prom[tms->prom_cnt] | 0x0200;
+	if (tms->enable && (prev_val & (1<<tms->intf->stop_bit)))
+		tms->prom_cnt |= 0x10;
+	else
+		tms->prom_cnt &= 0x0f;
+}
+
+static TIMER_CALLBACK( tmsprom_step )
+{
+	running_device *device = (running_device *)ptr;
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	/* only 16 bytes needed ... The original dump is bad. This
+     * is what is needed to get speech to work. The prom data has
+     * been updated and marked as BAD_DUMP. The information below
+     * is given for reference once another dump should surface.
+     *
+     * static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
+     *              0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
+     */
+	UINT16 ctrl;
+
+	update_prom_cnt(tms);
+	ctrl = (tms->prom[tms->prom_cnt] | 0x200);
+
+	//if (tms->enable && tms->prom_cnt < 0x10) printf("ctrl %04x, enable %d cnt %d\n", ctrl, tms->enable, tms->prom_cnt);
+	tms->prom_cnt = ((tms->prom_cnt + 1) & 0x0f) | (tms->prom_cnt & 0x10);
+
+	if (ctrl & (1 << tms->intf->reset_bit))
+		tms->address = 0;
+
+	devcb_call_write8(&tms->ctl_func, 0, BITSWAP8(ctrl,0,0,0,0,tms->intf->ctl8_bit,
+			tms->intf->ctl4_bit,tms->intf->ctl2_bit,tms->intf->ctl1_bit));
+
+	devcb_call_write_line(&tms->pdc_func, (ctrl >> tms->intf->pdc_bit) & 0x01);
+}
+
+static DEVICE_START( tmsprom )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	assert_always(tms != NULL, "Error creating TMSPROM chip");
+
+	tms->intf = (const tmsprom_interface *) device->baseconfig().static_config();
+	assert_always(tms->intf != NULL, "Error creating TMSPROM chip: No configuration");
+
+	/* resolve lines */
+	devcb_resolve_write_line(&tms->pdc_func, &tms->intf->pdc_func, device);
+	devcb_resolve_write8(&tms->ctl_func, &tms->intf->ctl_func, device);
+
+	tms->rom = *device->region();
+	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No rom region found");
+	tms->prom = memory_region(device->machine, tms->intf->prom_region);
+	assert_always(tms->rom != NULL, "Error creating TMSPROM chip: No prom region found");
+
+	tms->device = device;
+	tms->clock = device->clock();
+
+	tms->romclk_timer = timer_alloc(device->machine, tmsprom_step, device);
+	timer_adjust_periodic(tms->romclk_timer, attotime_zero, 0, ATTOTIME_IN_HZ(tms->clock));
+
+	tms->bit = 0;
+	tms->base_address = 0;
+	tms->address = 0;
+	tms->enable = 0;
+	tms->m0 = 0;
+	tms->prom_cnt = 0;
+	register_for_save_states_prom(tms);
+}
+
+WRITE_LINE_DEVICE_HANDLER( tmsprom_m0_w )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	/* falling edge counts */
+	if (tms->m0 && !state)
+	{
+		tms->address += 1;
+		tms->address &= (tms->intf->rom_size-1);
+	}
+	tms->m0 = state;
+}
+
+READ_LINE_DEVICE_HANDLER( tmsprom_data_r )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	return (tms->rom[tms->base_address + tms->address] >> tms->bit) & 0x01;
+}
+
+
+WRITE8_DEVICE_HANDLER( tmsprom_rom_csq_w )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	if (!data)
+		tms->base_address = offset * tms->intf->rom_size;
+}
+
+WRITE8_DEVICE_HANDLER( tmsprom_bit_w )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	tms->bit = data;
+}
+
+WRITE_LINE_DEVICE_HANDLER( tmsprom_enable_w )
+{
+	tmsprom_state *tms = get_safe_token_prom(device);
+
+	if (state != tms->enable)
+	{
+		tms->enable = state;
+		update_prom_cnt(tms);
+
+		/* the following is needed for ad2084.
+         * It is difficult to derive the actual connections from
+         * pcb pictures but the reset pin of the LS393 driving
+         * the prom address line is connected somewhere.
+         *
+         * This does not affect bagman. It just simulates that a
+         * write to ads3 is always happening when the four lower
+         * counter bits are 0!
+         */
+		if (state)
+			tms->prom_cnt &= 0x10;
+	}
+}
+
 
 /*-------------------------------------------------
-    device definition
+    TMS 5110 device definition
 -------------------------------------------------*/
 
 static const char DEVTEMPLATE_SOURCE[] = __FILE__;
@@ -1235,3 +1535,28 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_DERIVED_FEATURES	DT_HAS_START
 #define DEVTEMPLATE_DERIVED_NAME		"M58817"
 #include "devtempl.h"
+
+/*-------------------------------------------------
+    TMS PROM interface definition
+-------------------------------------------------*/
+
+#undef DEVTEMPLATE_ID
+#undef DEVTEMPLATE_NAME
+#undef DEVTEMPLATE_FEATURES
+
+#define DEVTEMPLATE_ID(p,s)				p##tmsprom##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START
+#define DEVTEMPLATE_NAME				"TMSPROM"
+#define DEVTEMPLATE_FAMILY				"TI Speech"
+#include "devtempl.h"
+
+
+DEFINE_LEGACY_SOUND_DEVICE(TMS5110, tms5110);
+DEFINE_LEGACY_SOUND_DEVICE(TMS5100, tms5100);
+DEFINE_LEGACY_SOUND_DEVICE(TMS5110A, tms5110a);
+DEFINE_LEGACY_SOUND_DEVICE(CD2801, cd2801);
+DEFINE_LEGACY_SOUND_DEVICE(TMC0281, tmc0281);
+DEFINE_LEGACY_SOUND_DEVICE(CD2802, cd2802);
+DEFINE_LEGACY_SOUND_DEVICE(M58817, m58817);
+
+DEFINE_LEGACY_DEVICE(TMSPROM, tmsprom);

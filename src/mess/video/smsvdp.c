@@ -143,17 +143,16 @@ static void sms_update_palette( smsvdp_t *smsvdp );
 INLINE smsvdp_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == SMSVDP);
+	assert(device->type() == SMSVDP);
 
-	return (smsvdp_t *)device->token;
+	return (smsvdp_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const smsvdp_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == SMSVDP));
-	return (const smsvdp_interface *) device->baseconfig().static_config;
+	assert((device->type() == SMSVDP));
+	return (const smsvdp_interface *) device->baseconfig().static_config();
 }
 
 /*************************************
@@ -166,8 +165,8 @@ static void set_display_settings( running_device *device )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
 
-	running_device *screen = video_screen_first(device->machine);
-	int height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*device->machine);
+	int height = screen->height();
 	int M1, M2, M3, M4;
 	M1 = smsvdp->reg[0x01] & 0x10;
 	M2 = smsvdp->reg[0x00] & 0x02;
@@ -235,13 +234,13 @@ static void set_display_settings( running_device *device )
 READ8_DEVICE_HANDLER( sms_vdp_vcount_r )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
-	int vpos = video_screen_get_vpos(device->machine->primary_screen);
+	int vpos = device->machine->primary_screen->vpos();
 
-	if (video_screen_get_hpos(device->machine->primary_screen) < VCOUNT_CHANGE_HPOS)
+	if (device->machine->primary_screen->hpos() < VCOUNT_CHANGE_HPOS)
 	{
 		vpos--;
 		if (vpos < 0)
-			vpos += video_screen_get_height(device->machine->primary_screen);
+			vpos += device->machine->primary_screen->height();
 	}
 
 	return (smsvdp->sms_frame_timing[INIT_VCOUNT] + vpos) & 0xff;
@@ -323,7 +322,7 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 	smsvdp_t *smsvdp = (smsvdp_t *) ptr;
 
 	rectangle rec;
-	int vpos = video_screen_get_vpos(machine->primary_screen);
+	int vpos = machine->primary_screen->vpos();
 	int vpos_limit = smsvdp->sms_frame_timing[VERTICAL_BLANKING] + smsvdp->sms_frame_timing[TOP_BLANKING]
 	               + smsvdp->sms_frame_timing[TOP_BORDER] + smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V]
 	               + smsvdp->sms_frame_timing[BOTTOM_BORDER] + smsvdp->sms_frame_timing[BOTTOM_BLANKING];
@@ -356,7 +355,7 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 	{
 		if (vpos == vpos_limit)
 		{
-			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, HINT_HPOS), smsvdp, 0, smsvdp_check_hint);
+			timer_set(machine, machine->primary_screen->time_until_pos(vpos, HINT_HPOS), smsvdp, 0, smsvdp_check_hint);
 		}
 		else
 		{
@@ -365,8 +364,8 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 
 		if (vpos == vpos_limit + 1)
 		{
-			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, VINT_FLAG_HPOS), smsvdp, (int)STATUS_VINT, smsvdp_set_status);
-			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, VINT_HPOS), smsvdp, 0, smsvdp_check_vint);
+			timer_set(machine, machine->primary_screen->time_until_pos(vpos, VINT_FLAG_HPOS), smsvdp, (int)STATUS_VINT, smsvdp_set_status);
+			timer_set(machine, machine->primary_screen->time_until_pos(vpos, VINT_HPOS), smsvdp, 0, smsvdp_check_vint);
 		}
 
 		sms_update_palette(smsvdp);
@@ -398,7 +397,7 @@ static TIMER_CALLBACK( smsvdp_display_callback )
 			smsvdp->reg9copy = smsvdp->reg[0x09];
 		}
 
-		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, vpos, HINT_HPOS), smsvdp, 0, smsvdp_check_hint);
+		timer_set(machine, machine->primary_screen->time_until_pos(vpos, HINT_HPOS), smsvdp, 0, smsvdp_check_hint);
 
 		sms_update_palette(smsvdp);
 
@@ -568,7 +567,7 @@ WRITE8_DEVICE_HANDLER( sms_vdp_ctrl_w )
 
 			if (reg_num == 1)
 			{
-				timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, video_screen_get_vpos(device->machine->primary_screen), VINT_HPOS), smsvdp, 0, smsvdp_check_vint);
+				timer_set(device->machine, device->machine->primary_screen->time_until_pos(device->machine->primary_screen->vpos(), VINT_HPOS), smsvdp, 0, smsvdp_check_vint);
 			}
 			smsvdp->addrmode = 0;
 			break;
@@ -709,7 +708,7 @@ static void sms_refresh_mode4_sprites( running_machine *machine, smsvdp_t *smsvd
 			else if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
 			{
 				/* Too many sprites per line */
-				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, pixel_plot_y + line, SPROVR_HPOS), smsvdp, (int)STATUS_SPROVR, smsvdp_set_status);
+				timer_set(machine, machine->primary_screen->time_until_pos(pixel_plot_y + line, SPROVR_HPOS), smsvdp, (int)STATUS_SPROVR, smsvdp_set_status);
 			}
 			sprite_buffer_count++;
 		}
@@ -864,7 +863,7 @@ static void sms_refresh_mode4_sprites( running_machine *machine, smsvdp_t *smsvd
 			}
 		}
 		if (sprite_col_occurred)
-			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x), smsvdp, (int)STATUS_SPRCOL, smsvdp_set_status);
+			timer_set(machine, machine->primary_screen->time_until_pos(pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x), smsvdp, (int)STATUS_SPRCOL, smsvdp_set_status);
 	}
 
 	/* Fill column 0 with overscan color from reg[0x07] */
@@ -916,7 +915,7 @@ static void sms_refresh_tms9918_sprites( running_machine *machine, smsvdp_t *sms
 			else if (line >= 0 && line < smsvdp->sms_frame_timing[ACTIVE_DISPLAY_V])
 			{
 				/* Too many sprites per line */
-				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, pixel_plot_y + line, SPROVR_HPOS), smsvdp, (int)STATUS_SPROVR, smsvdp_set_status);
+				timer_set(machine, machine->primary_screen->time_until_pos(pixel_plot_y + line, SPROVR_HPOS), smsvdp, (int)STATUS_SPROVR, smsvdp_set_status);
 			}
 			sprite_buffer_count++;
 		}
@@ -1128,7 +1127,7 @@ static void sms_refresh_tms9918_sprites( running_machine *machine, smsvdp_t *sms
 			}
 		}
 		if (sprite_col_occurred)
-			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x), smsvdp, (int)STATUS_SPRCOL, smsvdp_set_status);
+			timer_set(machine, machine->primary_screen->time_until_pos(pixel_plot_y + line, SPRCOL_BASEHPOS + sprite_col_x), smsvdp, (int)STATUS_SPRCOL, smsvdp_set_status);
 	}
 }
 
@@ -1367,8 +1366,8 @@ UINT8 sms_vdp_area_brightness(running_device *device, int x, int y, int x_range,
 
 	smsvdp = get_safe_token(device);
 
-	beam_x = video_screen_get_hpos(device->machine->primary_screen);
-	beam_y = video_screen_get_vpos(device->machine->primary_screen);
+	beam_x = device->machine->primary_screen->hpos();
+	beam_y = device->machine->primary_screen->vpos();
 	dx = x - beam_x;
 	dy = y - beam_y;
 
@@ -1445,9 +1444,9 @@ static void sms_update_palette( smsvdp_t *smsvdp )
 UINT32 sms_vdp_update( running_device *device, bitmap_t *bitmap, const rectangle *cliprect )
 {
 	smsvdp_t *smsvdp = get_safe_token(device);
-	running_device *screen = video_screen_first(device->machine);
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*device->machine);
+	int width = screen->width();
+	int height = screen->height();
 	int x, y;
 
 	if (IS_GAMEGEAR_VDP)
@@ -1493,9 +1492,9 @@ static DEVICE_START( smsvdp )
 	smsvdp_t *smsvdp = get_safe_token(device);
 	const smsvdp_interface *intf = get_interface(device);
 
-	running_device *screen = video_screen_first(device->machine);
-	int width = video_screen_get_width(screen);
-	int height = video_screen_get_height(screen);
+	screen_device *screen = screen_first(*device->machine);
+	int width = screen->width();
+	int height = screen->height();
 
 	smsvdp->features = intf->model;
 	smsvdp->int_callback = intf->int_callback;
@@ -1514,7 +1513,7 @@ static DEVICE_START( smsvdp )
 	smsvdp->prev_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED32);
 
 	smsvdp->smsvdp_display_timer = timer_alloc(device->machine, smsvdp_display_callback, smsvdp);
-	timer_adjust_periodic(smsvdp->smsvdp_display_timer, video_screen_get_time_until_pos(screen, 0, DISPLAY_CB_HPOS), 0, video_screen_get_scan_period(screen));
+	timer_adjust_periodic(smsvdp->smsvdp_display_timer, screen->time_until_pos(0, DISPLAY_CB_HPOS), 0, screen->scan_period());
 
 	state_save_register_device_item(device, 0, smsvdp->status);
 	state_save_register_device_item(device, 0, smsvdp->reg9copy);
@@ -1585,8 +1584,7 @@ DEVICE_GET_INFO( smsvdp )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(smsvdp_t);					break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_VIDEO;					break;
-
+		
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(smsvdp);		break;
 		case DEVINFO_FCT_STOP:					/* Nothing */									break;
@@ -1600,3 +1598,5 @@ DEVICE_GET_INFO( smsvdp )
 		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright MAME / MESS Team");			break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(SMSVDP, smsvdp);

@@ -137,7 +137,7 @@ struct _upd7220_t
 	devcb_resolved_write_line	out_blank_func;
 	upd7220_display_pixels_func display_func;
 
-	running_device *screen;	/* screen */
+	screen_device *screen;	/* screen */
 
 	int clock;						/* device clock */
 
@@ -197,16 +197,15 @@ struct _upd7220_t
 INLINE upd7220_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert((device->type == UPD7220));
-	return (upd7220_t *)device->token;
+	assert((device->type() == UPD7220));
+	return (upd7220_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const upd7220_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == UPD7220));
-	return (const upd7220_interface *) device->baseconfig().static_config;
+	assert((device->type() == UPD7220));
+	return (const upd7220_interface *) device->baseconfig().static_config();
 }
 
 INLINE void fifo_clear(upd7220_t *upd7220)
@@ -310,7 +309,7 @@ static void update_vsync_timer(upd7220_t *upd7220, int state)
 {
 	int next_y = state ? upd7220->vs : 0;
 
-	attotime duration = video_screen_get_time_until_pos(upd7220->screen, next_y, 0);
+	attotime duration = upd7220->screen->time_until_pos(next_y, 0);
 
 	timer_adjust_oneshot(upd7220->vsync_timer, duration, !state);
 }
@@ -344,12 +343,12 @@ static TIMER_CALLBACK( vsync_tick )
 
 static void update_hsync_timer(upd7220_t *upd7220, int state)
 {
-	int y = video_screen_get_vpos(upd7220->screen);
+	int y = upd7220->screen->vpos();
 
 	int next_x = state ? upd7220->hs : 0;
 	int next_y = state ? y : ((y + 1) % upd7220->al);
 
-	attotime duration = video_screen_get_time_until_pos(upd7220->screen, next_y, next_x);
+	attotime duration = upd7220->screen->time_until_pos(next_y, next_x);
 
 	timer_adjust_oneshot(upd7220->hsync_timer, duration, !state);
 }
@@ -374,12 +373,12 @@ static TIMER_CALLBACK( hsync_tick )
 
 static void update_blank_timer(upd7220_t *upd7220, int state)
 {
-	int y = video_screen_get_vpos(upd7220->screen);
+	int y = upd7220->screen->vpos();
 
 	int next_x = state ? (upd7220->hs + upd7220->hbp) : (upd7220->hs + upd7220->hbp + (upd7220->aw << 3));
 	int next_y = state ? ((y + 1) % (upd7220->vs + upd7220->vbp + upd7220->al + upd7220->vfp - 1)) : y;
 
-	attotime duration = video_screen_get_time_until_pos(upd7220->screen, next_y, next_x);
+	attotime duration = upd7220->screen->time_until_pos(next_y, next_x);
 
 	timer_adjust_oneshot(upd7220->hsync_timer, duration, !state);
 }
@@ -418,7 +417,7 @@ static void recompute_parameters(running_device *device)
 	int horiz_pix_total = (upd7220->hs + upd7220->hbp + upd7220->aw + upd7220->hfp) * 16;
 	int vert_pix_total = upd7220->vs + upd7220->vbp + upd7220->al + upd7220->vfp;
 
-	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock * 8) * horiz_pix_total * vert_pix_total;
+	attoseconds_t refresh = HZ_TO_ATTOSECONDS(device->clock() * 8) * horiz_pix_total * vert_pix_total;
 
 	rectangle visarea;
 
@@ -435,7 +434,7 @@ static void recompute_parameters(running_device *device)
 
 	if (upd7220->m)
 	{
-		video_screen_configure(upd7220->screen, horiz_pix_total, vert_pix_total, &visarea, refresh);
+		upd7220->screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 		update_hsync_timer(upd7220, 0);
 		update_vsync_timer(upd7220, 0);
@@ -1091,7 +1090,7 @@ static DEVICE_START( upd7220 )
 	upd7220->display_func = intf->display_func;
 
 	/* get the screen device */
-	upd7220->screen = devtag_get_device(device->machine, intf->screen_tag);
+	upd7220->screen = device->machine->device<screen_device>(intf->screen_tag);
 	assert(upd7220->screen != NULL);
 
 	/* create the timers */
@@ -1162,7 +1161,6 @@ DEVICE_GET_INFO( upd7220 )
 		case DEVINFO_INT_DATABUS_WIDTH_0:				info->i = 16;										break;
 		case DEVINFO_INT_ADDRBUS_WIDTH_0:				info->i = 18;										break;
 		case DEVINFO_INT_ADDRBUS_SHIFT_0:				info->i = -1;										break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_ROM_REGION:					info->romregion = ROM_NAME(upd7220);				break;
@@ -1183,3 +1181,5 @@ DEVICE_GET_INFO( upd7220 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");				break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(UPD7220, upd7220);

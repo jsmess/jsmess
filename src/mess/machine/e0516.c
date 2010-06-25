@@ -41,8 +41,7 @@ struct _e0516_t
 INLINE e0516_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (e0516_t *)device->token;
+	return (e0516_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /***************************************************************************
@@ -215,7 +214,7 @@ static DEVICE_START( e0516 )
 
 	/* create the timers */
 	e0516->clock_timer = timer_alloc(device->machine, clock_tick, (void *)device);
-	timer_adjust_periodic(e0516->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock / 32768));
+	timer_adjust_periodic(e0516->clock_timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock() / 32768));
 
 	/* register for state saving */
 	state_save_register_device_item(device, 0, e0516->cs);
@@ -239,7 +238,6 @@ DEVICE_GET_INFO( e0516 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(e0516_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(e0516);		break;
@@ -254,3 +252,5 @@ DEVICE_GET_INFO( e0516 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright MESS Team");		break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(E0516 , e0516);

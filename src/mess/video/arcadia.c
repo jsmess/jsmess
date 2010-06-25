@@ -349,9 +349,9 @@ VIDEO_START( arcadia )
 	}
 
 	{
-		running_device *screen = video_screen_first(machine);
-		int width = video_screen_get_width(screen);
-		int height = video_screen_get_height(screen);
+		screen_device *screen = screen_first(*machine);
+		int width = screen->width();
+		int height = screen->height();
 		arcadia_video.bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 	}
 }
@@ -643,8 +643,8 @@ static void arcadia_draw_sprites(running_machine *machine, bitmap_t *bitmap)
 
 INTERRUPT_GEN( arcadia_video_line )
 {
-	running_device *screen = video_screen_first(device->machine);
-	int width = video_screen_get_width(screen);
+	screen_device *screen = screen_first(*device->machine);
+	int width = screen->width();
 
 	if (arcadia_video.ad_delay<=0)
 	arcadia_video.ad_select=arcadia_video.reg.d.pal[1]&0x40;

@@ -9,7 +9,6 @@
 #include "hashfile.h"
 #include "pool.h"
 #include "expat.h"
-#include "device.h"
 #include "emuopts.h"
 /***************************************************************************
     TYPE DEFINITIONS
@@ -195,7 +194,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 					else if (!strcmp(attributes[0], "type"))
 					{
 						/* type attribute */
-						i = device_typeid(attributes[1]);
+						i = 0;//device_typeid(attributes[1]);
 						if (i < 0)
 							unknown_attribute_value(state, attributes[0], attributes[1]);
 						else

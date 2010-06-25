@@ -26,7 +26,7 @@
 
 #include "emu.h"
 
-#define LMC1992		DEVICE_GET_INFO_NAME(lmc1992)
+DECLARE_LEGACY_DEVICE(LMC1992, lmc1992);
 
 #define MDRV_LMC1992_ADD(_tag)		\
 	MDRV_DEVICE_ADD(_tag, LMC1992, 0)
@@ -69,8 +69,6 @@ enum
 };
 
 #define LMC1992_MICROWIRE_DEVICE_ADDRESS	2
-
-DEVICE_GET_INFO(lmc1992);
 
 void lmc1992_clock_w(running_device *device, int level);
 void lmc1992_data_w(running_device *device, int level);

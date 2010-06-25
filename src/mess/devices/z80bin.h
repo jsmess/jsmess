@@ -18,7 +18,7 @@
     MACROS
 ***************************************************************************/
 
-#define Z80BIN	DEVICE_GET_INFO_NAME(z80bin)
+DECLARE_LEGACY_IMAGE_DEVICE(Z80BIN, z80bin);
 
 #define Z80BIN_EXECUTE_NAME(name)	z80bin_execute_##name
 #define Z80BIN_EXECUTE(name)		void Z80BIN_EXECUTE_NAME(name)(running_machine *machine, UINT16 start_address, UINT16 end_address, UINT16 execute_address, int autorun)
@@ -51,16 +51,5 @@ struct _z80bin_config
 	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_seconds, (seconds_t) (_delay)) \
 	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_attoseconds, (attoseconds_t) (((_delay) - (int)(_delay)) * ATTOSECONDS_PER_SECOND)) \
 	MDRV_DEVICE_CONFIG_DATAPTR(z80bin_config, execute, Z80BIN_EXECUTE_NAME(_execute))
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-/* device getinfo function */
-DEVICE_GET_INFO(z80bin);
-
-
 
 #endif /* __Z80BIN_H__ */

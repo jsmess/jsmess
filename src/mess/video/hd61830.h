@@ -19,7 +19,7 @@
 
 #define HD61830_TAG		"hd61830"
 
-#define HD61830 DEVICE_GET_INFO_NAME( hd61830 )
+DECLARE_LEGACY_DEVICE(HD61830, hd61830);
 
 #define MDRV_HD61830_ADD(_tag, _clock, _screen) \
 	MDRV_DEVICE_ADD(_tag, HD61830, _clock) \
@@ -38,9 +38,6 @@ struct _hd61830_config
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( hd61830 );
 
 /* register access */
 READ8_DEVICE_HANDLER( hd61830_r );

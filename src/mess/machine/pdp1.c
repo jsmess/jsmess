@@ -96,7 +96,7 @@ enum
 /* tape reader registers */
 typedef struct tape_reader_t
 {
-	running_device *fd;	/* file descriptor of tape image */
+	device_image_interface *fd;	/* file descriptor of tape image */
 
 	int motor_on;	/* 1-bit reader motor on */
 
@@ -115,7 +115,7 @@ static tape_reader_t tape_reader;
 /* tape puncher registers */
 typedef struct tape_puncher_t
 {
-	running_device *fd;	/* file descriptor of tape image */
+	device_image_interface *fd;	/* file descriptor of tape image */
 
 	emu_timer *timer;	/* timer to generate completion pulses */
 } tape_puncher_t;
@@ -126,7 +126,7 @@ static tape_puncher_t tape_puncher;
 /* typewriter registers */
 typedef struct typewriter_t
 {
-	running_device *fd;	/* file descriptor of output image */
+	device_image_interface *fd;	/* file descriptor of output image */
 
 	int tb;			/* typewriter buffer */
 
@@ -146,7 +146,7 @@ static lightpen_t lightpen;
 /* MIT parallel drum (mostly similar to type 23) */
 typedef struct parallel_drum_t
 {
-	running_device *fd;	/* file descriptor of drum image */
+	device_image_interface *fd;	/* file descriptor of drum image */
 
 	int il;			/* initial location (12-bit) */
 	int wc;			/* word counter (12-bit) */
@@ -477,7 +477,7 @@ DEVICE_IMAGE_UNLOAD( pdp1_tape )
 */
 static int tape_read(UINT8 *reply)
 {
-	if (tape_reader.fd && (image_fread(tape_reader.fd, reply, 1) == 1))
+	if (tape_reader.fd && (tape_reader.fd->fread(reply, 1) == 1))
 		return 0;	/* unit OK */
 	else
 		return 1;	/* unit not ready */
@@ -489,7 +489,7 @@ static int tape_read(UINT8 *reply)
 static void tape_write(UINT8 data)
 {
 	if (tape_puncher.fd)
-		image_fwrite(tape_puncher.fd, & data, 1);
+		tape_puncher.fd->fwrite(& data, 1);
 }
 
 /*
@@ -747,7 +747,7 @@ static void iot_ppb(running_device *device, int op2, int nac, int mb, int *io, i
 DEVICE_IMAGE_LOAD(pdp1_typewriter)
 {
 	/* open file */
-	typewriter.fd = image;
+	typewriter.fd = &image;
 
 	io_status |= io_st_tyo;
 
@@ -770,7 +770,7 @@ static void typewriter_out(running_machine *machine, UINT8 data)
 	pdp1_typewriter_drawchar(machine, data);
 	if (typewriter.fd)
 #if 1
-		image_fwrite(typewriter.fd, & data, 1);
+		typewriter.fd->fwrite(& data, 1);
 #else
 	{
 		static const char ascii_table[2][64] =
@@ -1079,7 +1079,7 @@ static void parallel_drum_init(void)
 DEVICE_IMAGE_LOAD(pdp1_drum)
 {
 	/* open file */
-	parallel_drum.fd = image;
+	parallel_drum.fd = &image;
 
 	return INIT_PASS;
 }
@@ -1113,7 +1113,7 @@ static UINT32 drum_read(int field, int position)
 	int offset = (field*4096+position)*3;
 	UINT8 buf[3];
 
-	if (parallel_drum.fd && (!image_fseek(parallel_drum.fd, offset, SEEK_SET)) && (image_fread(parallel_drum.fd, buf, 3) == 3))
+	if (parallel_drum.fd && (!parallel_drum.fd->fseek(offset, SEEK_SET)) && (parallel_drum.fd->fread( buf, 3) == 3))
 		return ((buf[0] << 16) | (buf[1] << 8) | buf[2]) & 0777777;
 
 	return 0;
@@ -1133,8 +1133,8 @@ static void drum_write(int field, int position, UINT32 data)
 		buf[1] = data >> 8;
 		buf[2] = data;
 
-		image_fseek(parallel_drum.fd, offset, SEEK_SET);
-		image_fwrite(parallel_drum.fd, buf, 3);
+		parallel_drum.fd->fseek(offset, SEEK_SET);
+		parallel_drum.fd->fwrite( buf, 3);
 	}
 }
 
@@ -1403,8 +1403,8 @@ INTERRUPT_GEN( pdp1_interrupt )
 		{
 			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
 			cpu_set_reg(device, PDP1_EXD, cpu_get_reg(device, PDP1_EXTEND_SW));
-			cpu_set_reg(device, PDP1_SBM, 0);
-			cpu_set_reg(device, PDP1_OV, 0);
+			cpu_set_reg(device, PDP1_SBM, (UINT64)0);
+			cpu_set_reg(device, PDP1_OV, (UINT64)0);
 			cpu_set_reg(device, PDP1_PC, cpu_get_reg(device, PDP1_TA));
 			cpu_set_reg(device, PDP1_RUN, 1);
 		}
@@ -1413,14 +1413,14 @@ INTERRUPT_GEN( pdp1_interrupt )
 			pdp1_pulse_start_clear(device);	/* pulse Start Clear line */
 			cpu_set_reg(device, PDP1_EXD, cpu_get_reg(device, PDP1_EXTEND_SW));
 			cpu_set_reg(device, PDP1_SBM, 1);
-			cpu_set_reg(device, PDP1_OV, 0);
+			cpu_set_reg(device, PDP1_OV, (UINT64)0);
 			cpu_set_reg(device, PDP1_PC, cpu_get_reg(device, PDP1_TA));
 			cpu_set_reg(device, PDP1_RUN, 1);
 		}
 		if (control_transitions & pdp1_stop)
 		{
-			cpu_set_reg(device, PDP1_RUN, 0);
-			cpu_set_reg(device, PDP1_RIM, 0);	/* bug : we stop after reading an even-numbered word
+			cpu_set_reg(device, PDP1_RUN, (UINT64)0);
+			cpu_set_reg(device, PDP1_RIM, (UINT64)0);	/* bug : we stop after reading an even-numbered word
                                             (i.e. data), whereas a real pdp-1 stops after reading
                                             an odd-numbered word (i.e. dio instruciton) */
 		}
@@ -1456,8 +1456,8 @@ INTERRUPT_GEN( pdp1_interrupt )
 										|  (cpu_get_reg(device, PDP1_PC) & 0007777));	/* transfer ETA to EPC */
 			/*cpu_set_reg(devtag_get_device(machine, "maincpu"), PDP1_MA, cpu_get_reg(devtag_get_device(machine, "maincpu"), PDP1_PC));*/
 			cpu_set_reg(device, PDP1_EXD, cpu_get_reg(device, PDP1_EXTEND_SW));
-			cpu_set_reg(device, PDP1_OV, 0);		/* right??? */
-			cpu_set_reg(device, PDP1_RUN, 0);
+			cpu_set_reg(device, PDP1_OV, (UINT64)0);		/* right??? */
+			cpu_set_reg(device, PDP1_RUN, (UINT64)0);
 			cpu_set_reg(device, PDP1_RIM, 1);
 		}
 		if (control_transitions & pdp1_reader)

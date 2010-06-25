@@ -98,8 +98,8 @@ struct _m68_state_t
 	UINT8	irq_state[2];
 
 	int 	extra_cycles; /* cycles used up by interrupts */
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const m6809_config *config;
 	int		icount;
 	PAIR	ea;			/* effective address */
@@ -114,11 +114,10 @@ struct _m68_state_t
 INLINE m68_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_M6809 ||
 		   cpu_get_type(device) == CPU_M6809E);
-	return (m68_state_t *)device->token;
+	return (m68_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void check_irq_lines( m68_state_t *m68_state );
@@ -377,7 +376,7 @@ static CPU_INIT( m6809 )
 		0
 	};
 
-	const m6809_config *configdata = device->baseconfig().static_config ? (const m6809_config *)device->baseconfig().static_config : &default_config;
+	const m6809_config *configdata = device->baseconfig().static_config() ? (const m6809_config *)device->baseconfig().static_config() : &default_config;
 	m68_state_t *m68_state = get_safe_token(device);
 
 	m68_state->config = configdata;
@@ -488,7 +487,7 @@ static CPU_EXECUTE( m6809 )	/* NS 970908 */
 {
 	m68_state_t *m68_state = get_safe_token(device);
 
-    m68_state->icount = cycles - m68_state->extra_cycles;
+    m68_state->icount -= m68_state->extra_cycles;
 	m68_state->extra_cycles = 0;
 
 	check_irq_lines(m68_state);
@@ -778,8 +777,6 @@ static CPU_EXECUTE( m6809 )	/* NS 970908 */
         m68_state->icount -= m68_state->extra_cycles;
 		m68_state->extra_cycles = 0;
     }
-
-    return cycles - m68_state->icount;   /* NS 970908 */
 }
 
 INLINE void fetch_effective_address( m68_state_t *m68_state )
@@ -1102,7 +1099,7 @@ static CPU_SET_INFO( m6809 )
 
 CPU_GET_INFO( m6809 )
 {
-	m68_state_t *m68_state = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	m68_state_t *m68_state = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

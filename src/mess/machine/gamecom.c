@@ -694,7 +694,7 @@ void gamecom_update_timers( running_device *device, int cycles )
 DRIVER_INIT( gamecom )
 {
 	gamecom_cpu = devtag_get_device(machine, "maincpu");
-	gamecom_iram = (UINT8*)machine->device("maincpu")->get_config_ptr(CPUINFO_PTR_SM8500_INTERNAL_RAM);
+	gamecom_iram = sm8500_get_internal_ram(machine->device<legacy_cpu_device>("maincpu"));
 	gamecom_clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
 }
 
@@ -703,12 +703,12 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 	UINT32 filesize;
 	UINT32 load_offset = 0;
 
-	cartridge1 = memory_region(image->machine, "user2");
+	cartridge1 = memory_region(image.device().machine, "user2");
 
-	if (image_software_entry(image) == NULL)
-		filesize = image_length(image);
+	if (image.software_entry() == NULL)
+		filesize = image.length();
 	else
-		filesize = image_get_software_region_length(image, "rom");
+		filesize = image.get_software_region_length("rom");
 
 	switch(filesize)
 	{
@@ -720,20 +720,20 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 		case 0x200000: load_offset = 0;        break;  /* 2  MB */
 		default:                                       /* otherwise */
 			logerror("Error loading cartridge: Invalid file size 0x%X\n", filesize);
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unhandled cart size");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unhandled cart size");
 			return INIT_FAIL;
 	}
 
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		if (image_fread(image, cartridge1 + load_offset, filesize) != filesize)
+		if (image.fread( cartridge1 + load_offset, filesize) != filesize)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart");
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart");
 			return INIT_FAIL;
 		}
 	}
 	else
-		memcpy(cartridge1 + load_offset, image_get_software_region(image, "rom"), filesize);
+		memcpy(cartridge1 + load_offset, image.get_software_region("rom"), filesize);
 
 	if (filesize < 0x010000) { memcpy(cartridge1 + 0x008000, cartridge1, 0x008000); } /* ->64KB */
 	if (filesize < 0x020000) { memcpy(cartridge1 + 0x010000, cartridge1, 0x010000); } /* ->128KB */

@@ -10,16 +10,9 @@ void amiga_fdc_setup_dma( running_device *device );
     MACROS
 ***************************************************************************/
 
-#define AMIGA_FDC		DEVICE_GET_INFO_NAME(amiga_fdc)
+DECLARE_LEGACY_DEVICE(AMIGA_FDC, amiga_fdc);
 
 #define MDRV_AMIGA_FDC_ADD(_tag)	\
 	MDRV_DEVICE_ADD((_tag),  AMIGA_FDC, 0)
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-DEVICE_GET_INFO(amiga_fdc);
 
 #endif /* AMIGAFDC_H */

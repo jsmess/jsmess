@@ -67,9 +67,7 @@ extern const struct hp48_port_config hp48sx_port2_config;
 extern const struct hp48_port_config hp48gx_port1_config;
 extern const struct hp48_port_config hp48gx_port2_config;
 
-extern DEVICE_GET_INFO( hp48_port );
-
-#define HP48_PORT DEVICE_GET_INFO_NAME( hp48_port )
+DECLARE_LEGACY_IMAGE_DEVICE(HP48_PORT, hp48_port);
 
 #define MDRV_HP48_PORT_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, HP48_PORT, 0) \

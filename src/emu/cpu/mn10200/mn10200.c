@@ -64,7 +64,7 @@ struct _mn102_info
 
 	int cycles;
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 };
@@ -149,11 +149,10 @@ INLINE void mn102_change_pc(mn102_info *mn102, UINT32 pc)
 INLINE mn102_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_MN10200);
 
-	return (mn102_info *)device->token;
+	return (mn102_info *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static void mn102_take_irq(mn102_info *mn102, int level, int group)
@@ -513,8 +512,6 @@ static void mn102_extirq(mn102_info *mn102, int irqnum, int status)
 static CPU_EXECUTE(mn10200)
 {
 	mn102_info *mn102 = get_safe_token(device);
-
-	mn102->cycles = cycles;
 
 	while(mn102->cycles > 0)
 	{
@@ -1819,11 +1816,9 @@ static CPU_EXECUTE(mn10200)
 			break;
 		}
 	}
-
-	return cycles - mn102->cycles;
 }
 
-const char *inames[10][4] = {
+static const char *const inames[10][4] = {
   { "timer0", "timer1", "timer2", "timer3" },
   { "timer4", "timer5", "timer6", "timer7" },
   { "timer8", "timer9", "timer12a", "timer12b" },
@@ -2336,7 +2331,7 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 
 static CPU_SET_INFO(mn10200)
 {
-	mn102_info *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	mn102_info *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -2365,7 +2360,7 @@ static CPU_SET_INFO(mn10200)
 
 CPU_GET_INFO( mn10200 )
 {
-	mn102_info *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	mn102_info *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch(state)
 	{

@@ -2238,7 +2238,10 @@ const game_driver * const drivers[] =
 	DRIVER( optiger )	/* 1998.09 E63 (c) 1998 Taito */
 
 	/* Taito Type-Zero System */
-	DRIVER( landhigh )	/* E68 (c) 1999 Taito */
+	DRIVER( taitotz )
+	DRIVER( batlgear )	/* E68 (c) 1999 Taito */
+	DRIVER( landhigh )	/* E82 (c) 1999 Taito */
+	DRIVER( batlgr2 )	/* E87 (c) 2000 Taito */
 
 	/* Toaplan games */
 	DRIVER( perfrman )	/* (c) 1985 Data East Corporation (Japan) */
@@ -2311,10 +2314,11 @@ const game_driver * const drivers[] =
 		/* SemiCom games on snowbros like hardware */
 	DRIVER( hyperpac )	/* (c) 1995 SemiCom */
 	DRIVER( hyperpacb )	/* bootleg */
-	DRIVER( twinkle )	/* (c) 1997 SemiCom */
 	DRIVER( toppyrap )	/* (c) 1996 SemiCom */
 	DRIVER( cookbib2 )	/* (c) 1996 SemiCom */
 	DRIVER( cookbib3 )	/* (c) 1997 SemiCom */
+	DRIVER( twinkle )	/* (c) 1997 SemiCom */
+	DRIVER( pzlbreak )	/* (c) 1997 SemiCom */
 	DRIVER( 3in1semi )	/* (c) 1998 SemiCom */
 	DRIVER( moremore )	/* (c) 1999 SemiCom + Exit */
 	DRIVER( moremorp )	/* (c) 1999 SemiCom + Exit */
@@ -2745,7 +2749,7 @@ V-V                           TP-027
 	DRIVER( wofj )		/* 31/10/1992 (c) 1992 (Japan) (CPS1 + QSound) */
 	DRIVER( wofhfh )	/* bootleg */
 	DRIVER( sf2hf )		/* 09/12/1992 (c) 1992 (World) */
-	DRIVER( sf2t )		/* 09/12/1992 (c) 1992 (US)    */
+	DRIVER( sf2hfu )	/* 09/12/1992 (c) 1992 (US)    */
 	DRIVER( sf2tj )		/* 09/12/1992 (c) 1992 (Japan) */
 	DRIVER( dino )		/* 01/02/1993 (c) 1993 (World) (CPS1 + QSound) */
 	DRIVER( dinou )		/* 01/02/1993 (c) 1993 (US)    (CPS1 + QSound) */
@@ -3131,7 +3135,10 @@ V-V                           TP-027
 	DRIVER( bldyror2u )	/* Bloody Roar 2 (USA) */
 	DRIVER( bldyror2a )	/* Bloody Roar 2 (ASIA) */
 	DRIVER( bldyror2j )	/* Bloody Roar 2 (JAPAN) */
-	DRIVER( brvblade )	/* Brave Blade (JAPAN) */
+	DRIVER( brvblade )	/* Brave Blade (WORLD) */
+	DRIVER( brvbladeu )	/* Brave Blade (USA) */
+	DRIVER( brvbladea )	/* Brave Blade (ASIA) */
+	DRIVER( brvbladej )	/* Brave Blade (JAPAN) */
 	DRIVER( bam2 )		/* Bust a Move 2 (JAPANESE ROM ver. 1999/07/17 10:00:00) */
 
 	/* Atari PSX */
@@ -5751,6 +5758,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kbm )		/* GQ974 (c) 2000 */
 	DRIVER( kbm2nd )	/* GCA01 (c) 2000 */
 	DRIVER( kbm3rd )	/* GCA12 (c) 2001 */
+	DRIVER( popn5 )		/* GCA04 (c) 2000 */
 	DRIVER( popn7 )		/* not sure, doesn't boot yet (c) 2001 */
 
 	/* PowerPC based Konami games */
@@ -7343,6 +7351,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( toki )		/* (c) 1989 Tad (World) */
 	DRIVER( tokia )		/* (c) 1989 Tad (World) */
 	DRIVER( tokiu )		/* (c) 1989 Tad + Fabtek license (US) */
+	DRIVER( tokiua )	/* (c) 1989 Tad + Fabtek license (US) */
 	DRIVER( tokib )		/* bootleg */
 	DRIVER( juju )		/* (c) 1989 Tad (Japan) */
 	DRIVER( jujub )		/* (c) 1989 Tad (Japan) */
@@ -7717,6 +7726,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( brapboys )	/* (c) 1992 Kaneko */
 	DRIVER( brapboysj )	/* (c) 1992 Kaneko */
 	DRIVER( bloodwar )	/* (c) 1994 Kaneko */
+	DRIVER( oedfight )	/* (c) 1994 Kaneko */
 	DRIVER( bonkadv )	/* (c) 1994 Kaneko */
 	DRIVER( gtmr )		/* (c) 1994 Kaneko */
 	DRIVER( gtmra )		/* (c) 1994 Kaneko */
@@ -8269,6 +8279,7 @@ Other Sun games
 	DRIVER( quizchql )	/* "73" (c) 1993 Laxan */
 	DRIVER( funkyfig )	/* "74" (c) 1993 Nakanihon + East Technology */
 	DRIVER( animaljr )	/* "75" 1993 Nakanihon/Taito */
+	DRIVER( animaljrj )	/* "75" 1993 Nakanihon/Taito */
 	DRIVER( hginga )	/*      1994 Dynax */
 	DRIVER( mjmyster )	/* "?7" 1994 Dynax */
 	DRIVER( mjmywrld )	/* "?7" 1994 Dynax */
@@ -8367,7 +8378,8 @@ Other Sun games
 
 	/* IGS005 + IGS006 + IGS007 + IGS008 Games */
 	DRIVER( lordgun )	/* (c) 1994 */
-	DRIVER( hfh )		/* (c) 199? */
+	DRIVER( aliencha )	/* (c) 1994 */
+	DRIVER( alienchac )	/* (c) 1994 */
 
 	/* IGS009 Games */
 	DRIVER( jingbell )	/* (c) 1995? */
@@ -8943,6 +8955,7 @@ Other Sun games
 	DRIVER( maddonnb )	/* (c) 1995 Tuning */
 	DRIVER( tugboat )	/* (c) 1982 ETM */
 	DRIVER( noahsark )	/* (c) 1983 Enter-Tech */
+	DRIVER( berenstn )	/* (c) 1984 Enter-Tech */
 	DRIVER( gotcha )	/* (c) 1997 Dongsung + "presented by Para" */
 	DRIVER( ppchamp )	/* (c) 1997 Dongsung + "presented by Para" */
 	DRIVER( amerdart )	/* (c) 1989 Ameri Corporation */
@@ -9007,6 +9020,7 @@ Other Sun games
 	DRIVER( portraita )	/* (c) 1983 Olympia */
 	DRIVER( enigma2 )	/* (c) 1981 Game Plan (Zilec Electronics license) */
 	DRIVER( enigma2a )	/* (c) 1984 Zilec Electronics (bootleg?) */
+	DRIVER( enigma2b )	/* (c) 1981 Zilec Electronics */
 	DRIVER( ltcasino )	/* (c) 1982 Digital Controls Inc */
 	DRIVER( mv4in1 )	/* (c) 1983 Entertainment Enterprises */
 	DRIVER( ltcasinn )	/* (c) 1984 Digital Controls Inc */
@@ -9164,6 +9178,7 @@ Other Sun games
 	DRIVER( gunpey )	/* (c) 2000 Banpresto */
 	DRIVER( spaceg )	/* (c) 19?? */
 	DRIVER( wldarrow )	/* (c) 1982 */
+	DRIVER( unkmeyco )	/* (c) 198? */
 	DRIVER( mdrawpkr )	/* (c) 19?? */
 	DRIVER( mdrawpkra )	/* (c) 19?? */
 	DRIVER( laserbas )	/* (c) 1981 Amstar/HOEI */
@@ -9681,6 +9696,7 @@ Other Sun games
 
 	/* Eagle */
 	DRIVER( janshi )
+	DRIVER( ronjan )
 	DRIVER( pinkiri8 )
 
 	/* Wing */

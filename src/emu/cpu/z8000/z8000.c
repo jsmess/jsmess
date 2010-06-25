@@ -81,8 +81,8 @@ struct _z8000_state
     z8000_reg_file regs;/* registers */
 	int nmi_state;		/* NMI line state */
 	int irq_state[2];	/* IRQ line states (NVI, VI) */
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -93,10 +93,9 @@ struct _z8000_state
 INLINE z8000_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_Z8001 || cpu_get_type(device) == CPU_Z8002);
-	return (z8000_state *)device->token;
+	return (z8000_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* opcode execution table */
@@ -392,7 +391,7 @@ static CPU_RESET( z8001 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
-	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
+	device_irq_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
@@ -413,7 +412,7 @@ static CPU_RESET( z8002 )
 {
 	z8000_state *cpustate = get_safe_token(device);
 
-	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
+	device_irq_callback save_irqcallback = cpustate->irq_callback;
 	memset(cpustate, 0, sizeof(*cpustate));
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
@@ -431,8 +430,6 @@ static CPU_EXIT( z8000 )
 static CPU_EXECUTE( z8000 )
 {
 	z8000_state *cpustate = get_safe_token(device);
-
-    cpustate->icount = cycles;
 
     do
     {
@@ -461,8 +458,6 @@ static CPU_EXECUTE( z8000 )
             (*exec->opcode)(cpustate);
         }
     } while (cpustate->icount > 0);
-
-    return cycles - cpustate->icount;
 
 }
 
@@ -569,7 +564,7 @@ static CPU_SET_INFO( z8002 )
 
 CPU_GET_INFO( z8002 )
 {
-	z8000_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	z8000_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

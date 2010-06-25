@@ -14,7 +14,7 @@
     MACROS
 ***************************************************************************/
 
-#define TMS5501			DEVICE_GET_INFO_NAME(tms5501)
+DECLARE_LEGACY_DEVICE(TMS5501, tms5501);
 
 
 
@@ -47,8 +47,6 @@ struct _tms5501_interface
 /***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
-
-DEVICE_GET_INFO(tms5501);
 
 READ8_DEVICE_HANDLER( tms5501_r );
 WRITE8_DEVICE_HANDLER( tms5501_w );

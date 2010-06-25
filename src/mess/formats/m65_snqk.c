@@ -321,14 +321,14 @@ SNAPSHOT_LOAD( microtan )
 {
     UINT8 *snapshot_buff;
 
-    snapshot_buff = (UINT8*)image_ptr(image);
+    snapshot_buff = (UINT8*)image.ptr();
     if (!snapshot_buff)
         return INIT_FAIL;
 
     if (microtan_verify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
         return INIT_FAIL;
 
-    microtan_snapshot_copy(image->machine, snapshot_buff, snapshot_size);
+    microtan_snapshot_copy(image.device().machine, snapshot_buff, snapshot_size);
     return INIT_PASS;
 }
 
@@ -355,7 +355,7 @@ QUICKLOAD_LOAD( microtan )
         logerror("microtan_hexfile_load: could not allocate %d bytes of buffer\n", quickload_size);
         return INIT_FAIL;
     }
-    image_fread(image, buff, quickload_size);
+    image.fread( buff, quickload_size);
 
     buff[quickload_size] = '\0';
 
@@ -364,7 +364,7 @@ QUICKLOAD_LOAD( microtan )
     else
         rc = parse_zillion_hex(snapshot_buff, buff);
     if (rc == INIT_PASS)
-        microtan_snapshot_copy(image->machine, snapshot_buff, snapshot_size);
+        microtan_snapshot_copy(image.device().machine, snapshot_buff, snapshot_size);
     free(snapshot_buff);
     return rc;
 }

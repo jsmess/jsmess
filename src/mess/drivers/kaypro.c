@@ -144,7 +144,7 @@ GFXDECODE_END
 
 ****************************************************************/
 
-static const z80_daisy_chain kayproii_daisy_chain[] =
+static const z80_daisy_config kayproii_daisy_chain[] =
 {
 	{ "z80sio" },		/* sio */
 	{ "z80pio_s" },		/* System pio */
@@ -152,7 +152,7 @@ static const z80_daisy_chain kayproii_daisy_chain[] =
 	{ NULL }
 };
 
-static const z80_daisy_chain kaypro2x_daisy_chain[] =
+static const z80_daisy_config kaypro2x_daisy_chain[] =
 {
 	{ "z80sio" },		/* sio for RS232C and keyboard */
 	{ "z80sio_2x" },	/* sio for serial printer and inbuilt modem */

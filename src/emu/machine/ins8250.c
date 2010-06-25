@@ -75,8 +75,6 @@ History:
 
 #include "emu.h"
 #include "machine/ins8250.h"
-#include "includes/pc_mouse.h"
-#include "memconv.h"
 
 
 #define LOG(LEVEL,N,M,A)  \
@@ -144,14 +142,13 @@ typedef struct {
 INLINE ins8250_t *get_safe_token(running_device *device)
 {
 	assert( device != NULL );
-	assert( device->token != NULL );
-	assert( ( device->type == DEVICE_GET_INFO_NAME(ins8250) ) ||
-			( device->type == DEVICE_GET_INFO_NAME(ins8250a) ) ||
-			( device->type == DEVICE_GET_INFO_NAME(ns16450) ) ||
-			( device->type == DEVICE_GET_INFO_NAME(ns16550) ) ||
-			( device->type == DEVICE_GET_INFO_NAME(ns16550a) ) ||
-			( device->type == DEVICE_GET_INFO_NAME(pc16550d) ) );
-	return ( ins8250_t *) device->token;
+	assert( ( device->type() == INS8250 ) ||
+			( device->type() == INS8250A ) ||
+			( device->type() == NS16450 ) ||
+			( device->type() == NS16550 ) ||
+			( device->type() == NS16550A ) ||
+			( device->type() == PC16550D ) );
+	return (ins8250_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -270,6 +267,10 @@ WRITE8_DEVICE_HANDLER( ins8250_w )
 					ins8250->rbr = data;
 					ins8250_trigger_int( device, COM_INT_PENDING_RECEIVED_DATA_AVAILABLE );
 				}
+
+				if ( ins8250->interface->transmit )
+					ins8250->interface->transmit(device, ins8250->thr);
+
 				/* writing to thr will clear the int */
 				ins8250_clear_int(device, COM_INT_PENDING_TRANSMITTER_HOLDING_REGISTER_EMPTY);
 			}
@@ -543,7 +544,7 @@ static void common_start( running_device *device, int device_type )
 {
 	ins8250_t	*ins8250 = get_safe_token(device);
 
-	ins8250->interface = (const ins8250_interface*)device->baseconfig().static_config;
+	ins8250->interface = (const ins8250_interface*)device->baseconfig().static_config();
 	ins8250->device_type = device_type;
 }
 
@@ -609,7 +610,6 @@ DEVICE_GET_INFO( ins8250 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(ins8250_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
-		case DEVINFO_INT_CLASS:						info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ins8250);	break;
@@ -700,3 +700,11 @@ DEVICE_GET_INFO( pc16550d )
 	}
 }
 
+
+
+DEFINE_LEGACY_DEVICE(INS8250, ins8250);
+DEFINE_LEGACY_DEVICE(INS8250A, ins8250a);
+DEFINE_LEGACY_DEVICE(NS16450, ns16450);
+DEFINE_LEGACY_DEVICE(NS16550, ns16550);
+DEFINE_LEGACY_DEVICE(NS16550A, ns16550a);
+DEFINE_LEGACY_DEVICE(PC16550D, pc16550d);

@@ -16,7 +16,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define CBM_IEC DEVICE_GET_INFO_NAME( cbm_iec )
+DECLARE_LEGACY_DEVICE(CBM_IEC, cbm_iec);
 
 #define MDRV_CBM_IEC_ADD(_tag, _daisy_chain) \
 	MDRV_DEVICE_ADD(_tag, CBM_IEC, 0) \
@@ -44,10 +44,6 @@ struct _cbm_iec_daisy_chain
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( cbm_iec );
-
 /* service request */
 void cbm_iec_srq_w(running_device *iec, running_device *device, int state);
 READ_LINE_DEVICE_HANDLER( cbm_iec_srq_r );

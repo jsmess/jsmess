@@ -78,7 +78,7 @@
 #include "emu.h"
 #include "video/pc_cga.h"
 #include "video/mc6845.h"
-#include "video/pc_video.h"
+#include "video/pc_video_mess.h"
 #include "video/cgapal.h"
 #include "memconv.h"
 
@@ -465,7 +465,7 @@ static VIDEO_START( pc_cga )
      * Plantronics chipset.
      * TODO: Cards which don't support Plantronics should repeat at
      * BC000h */
-	buswidth = machine->firstcpu->databus_width(AS_PROGRAM);
+	buswidth = device_memory(machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
@@ -1283,7 +1283,7 @@ static WRITE8_HANDLER( pc_cga8_w )
 		break;
 	case 0x0f:
 		// Not sure if some all CGA cards have ability to upload char definition
-		UINT8 buswidth = space->machine->firstcpu->databus_width(AS_PROGRAM);
+		UINT8 buswidth = device_memory(space->machine->firstcpu)->space_config(AS_PROGRAM)->m_databus_width;
 		const address_space *space_prg = cpu_get_address_space(space->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 		cga.p3df = data;
 		if (data & 1) {

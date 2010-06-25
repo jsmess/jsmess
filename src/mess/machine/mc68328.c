@@ -2798,7 +2798,7 @@ static DEVICE_START( mc68328 )
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
-    mc68328->iface = (const mc68328_interface*)device->baseconfig().static_config;
+    mc68328->iface = (const mc68328_interface*)device->baseconfig().static_config();
 
     mc68328->gptimer[0] = timer_alloc(device->machine, mc68328_timer1_hit, 0);
     mc68328->gptimer[1] = timer_alloc(device->machine, mc68328_timer2_hit, 0);
@@ -2815,7 +2815,6 @@ DEVICE_GET_INFO( mc68328 )
         /* --- the following bits of info are returned as 64-bit signed integers --- */
         case DEVINFO_INT_TOKEN_BYTES:           info->i = sizeof(mc68328_t);                    break;
         case DEVINFO_INT_INLINE_CONFIG_BYTES:   info->i = 0;                                    break;
-        case DEVINFO_INT_CLASS:                 info->i = DEVICE_CLASS_PERIPHERAL;              break;
 
         /* --- the following bits of info are returned as pointers to data or functions --- */
         case DEVINFO_FCT_START:                 info->start = DEVICE_START_NAME(mc68328);       break;
@@ -2830,3 +2829,5 @@ DEVICE_GET_INFO( mc68328 )
         case DEVINFO_STR_CREDITS:               strcpy(info->s, "Copyright the MESS Teams and Ryan Holtz"); break;
     }
 }
+
+DEFINE_LEGACY_DEVICE(MC68328, mc68328);

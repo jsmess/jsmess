@@ -114,15 +114,14 @@ struct _i8155_t
 INLINE i8155_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	return (i8155_t *)device->token;
+	return (i8155_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 INLINE const i8155_interface *get_interface(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type == I8155);
-	return (const i8155_interface *) device->baseconfig().static_config;
+	assert(device->type() == I8155);
+	return (const i8155_interface *) device->baseconfig().static_config();
 }
 
 INLINE UINT8 get_timer_mode(i8155_t *i8155)
@@ -389,7 +388,7 @@ WRITE8_DEVICE_HANDLER( i8155_w )
 			{
 				/* load mode and CNT length and start immediately after loading (if timer is not running) */
 				i8155->counter = i8155->count_length;
-				timer_adjust_periodic(i8155->timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock));
+				timer_adjust_periodic(i8155->timer, attotime_zero, 0, ATTOTIME_IN_HZ(device->clock()));
 			}
 			break;
 		}
@@ -470,7 +469,7 @@ WRITE8_DEVICE_HANDLER( i8155_ram_w )
 
 static DEVICE_START( i8155 )
 {
-	i8155_t *i8155 = (i8155_t *)device->token;
+	i8155_t *i8155 = (i8155_t *)downcast<legacy_device_base *>(device)->token();
 	const i8155_interface *intf = get_interface(device);
 
 	/* resolve callbacks */
@@ -501,7 +500,7 @@ static DEVICE_START( i8155 )
 
 static DEVICE_RESET( i8155 )
 {
-	i8155_t *i8155 = (i8155_t *)device->token;
+	i8155_t *i8155 = (i8155_t *)downcast<legacy_device_base *>(device)->token();
 
 	/* clear output registers */
 	i8155->output[I8155_PORT_A] = 0;
@@ -532,7 +531,6 @@ DEVICE_GET_INFO( i8155 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8155_t);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -548,3 +546,5 @@ DEVICE_GET_INFO( i8155 )
 		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");	break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(I8155, i8155);

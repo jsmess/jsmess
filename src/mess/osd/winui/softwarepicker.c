@@ -38,7 +38,7 @@
 typedef struct _file_info file_info;
 struct _file_info
 {
-	const device_config *device;
+	const device_config_image_interface *device;
 
 	// hash information
 	char hash_string[HASH_BUF_SIZE];
@@ -146,7 +146,7 @@ LPCSTR SoftwarePicker_LookupFilename(HWND hwndPicker, int nIndex)
 
 
 
-const device_config *SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex)
+const device_config_image_interface *SoftwarePicker_LookupDevice(HWND hwndPicker, int nIndex)
 {
 	software_picker_info *pPickerInfo;
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
@@ -178,11 +178,11 @@ int SoftwarePicker_LookupIndex(HWND hwndPicker, LPCSTR pszFilename)
 iodevice_t SoftwarePicker_GetImageType(HWND hwndPicker, int nIndex)
 {
 	iodevice_t type;
-	const device_config *device = SoftwarePicker_LookupDevice(hwndPicker, nIndex);
+	const device_config_image_interface *device = SoftwarePicker_LookupDevice(hwndPicker, nIndex);
 
 	if (device != NULL)
 	{
-		type = image_device_getinfo(GetSoftwarePickerInfo(hwndPicker)->config->mconfig, device).type;
+		type = device->image_type();
 	}
 	else
 	{
@@ -215,17 +215,13 @@ void SoftwarePicker_SetDriver(HWND hwndPicker, const software_config *config)
 static void ComputeFileHash(software_picker_info *pPickerInfo,
 	file_info *pFileInfo, const unsigned char *pBuffer, unsigned int nLength)
 {
-	image_device_info info;
 	unsigned int functions;
 
-	// get the device info
-	info = image_device_getinfo(pPickerInfo->config->mconfig, pFileInfo->device);
-
 	// determine which functions to use
-	functions = hashfile_functions_used(pPickerInfo->config->hashfile, info.type);
+	functions = hashfile_functions_used(pPickerInfo->config->hashfile, pFileInfo->device->image_type());
 
 	// compute the hash
-	image_device_compute_hash(pFileInfo->hash_string, pFileInfo->device, pBuffer, nLength, functions);
+	pFileInfo->device->device_compute_hash((char *)pFileInfo->hash_string, (const void *)pBuffer, (size_t)nLength, functions);
 }
 
 
@@ -340,8 +336,7 @@ static void SoftwarePicker_RealizeHash(HWND hwndPicker, int nIndex)
 	// have already been calculated
 	if ((pPickerInfo->config->hashfile != NULL) && (pFileInfo->device != NULL))
 	{
-		image_device_info info = image_device_getinfo(pPickerInfo->config->mconfig, pFileInfo->device);
-		type = info.type;
+		type = pFileInfo->device->image_type();
 		if (type < IO_COUNT)
 	        nHashFunctionsUsed = hashfile_functions_used(pPickerInfo->config->hashfile, type);
 		nCalculatedHashes = hash_data_used_functions(pFileInfo->hash_string);
@@ -372,7 +367,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 	file_info *pInfo;
 	int nIndex, nSize;
 	LPCSTR pszExtension = NULL;
-	const device_config *device = NULL;
+	const device_config_image_interface *device = NULL;
 
 	// first check to see if it is already here
 	if (SoftwarePicker_LookupIndex(hwndPicker, pszFilename) >= 0)
@@ -385,12 +380,10 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 		pszExtension = strrchr(pszFilename, '.');
 	if ((pszExtension != NULL) && (pPickerInfo->config != NULL))
 	{
-		for (device = pPickerInfo->config->mconfig->devicelist.first(); device != NULL;device = device->next)
+		for (bool gotone = pPickerInfo->config->mconfig->devicelist.first(device); gotone; gotone = device->next(device))
 		{
-			if (is_image_device(device))
-			{
-				if (image_device_uses_file_extension(device, pszExtension))
-					break;
+			if (device->uses_file_extension(pszExtension)) {
+				break;
 			}
 		}
 	}
@@ -411,7 +404,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 
 	// set up device and CRC, if specified
 	pInfo->device = device;
-	if ((device != NULL) && (image_device_getinfo(pPickerInfo->config->mconfig, device).has_partial_hash != 0))
+	if ((device != NULL) && (device->has_partial_hash() != 0))
 		nCrc = 0;
 	if (nCrc != 0)
 		snprintf(pInfo->hash_string, ARRAY_LENGTH(pInfo->hash_string), "c:%08x#", nCrc);
@@ -647,7 +640,6 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 	BOOL bSuccess;
 	int nCount;
 	BOOL bDone = FALSE;
-	image_device_info info;
 
 	pPickerInfo = GetSoftwarePickerInfo(hwndPicker);
 
@@ -697,8 +689,7 @@ BOOL SoftwarePicker_Idle(HWND hwndPicker)
 		pFileInfo = pPickerInfo->file_index[pPickerInfo->current_position];
 		if (!pFileInfo->hash_realized)
 		{
-			info = image_device_getinfo(pPickerInfo->config->mconfig, pFileInfo->device);
-			if (hashfile_functions_used(pPickerInfo->config->hashfile, info.type))
+			if (hashfile_functions_used(pPickerInfo->config->hashfile, pFileInfo->device->image_type()))
 			{
 				// only calculate the hash if it is appropriate for this device
 				if (!SoftwarePicker_CalculateHash(hwndPicker, pPickerInfo->current_position))

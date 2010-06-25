@@ -106,14 +106,14 @@ static INTERRUPT_GEN( n64_vblank )
 static DEVICE_IMAGE_LOAD(n64_cart)
 {
 	int i, length;
-	UINT8 *cart = memory_region(image->machine, "user2");
+	UINT8 *cart = memory_region(image.device().machine, "user2");
 
-	if (image_software_entry(image) == NULL)
-		length = image_fread(image, cart, 0x4000000);
+	if (image.software_entry() == NULL)
+		length = image.fread( cart, 0x4000000);
 	else
 	{
-		length = image_get_software_region_length(image, "rom");
-		memcpy(cart, image_get_software_region(image, "rom"), length);
+		length = image.get_software_region_length("rom");
+		memcpy(cart, image.get_software_region("rom"), length);
 	}
 
 	if (cart[0] == 0x37 && cart[1] == 0x80)

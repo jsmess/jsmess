@@ -857,7 +857,7 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask)
 {
 	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask,
-					(unsigned int) cpu_get_reg(devtag_get_device(machine, "maincpu"), REG_GENPC)));
+					(unsigned int) cpu_get_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC)));
 
 	assert((val & mask) == val);
 
@@ -1063,7 +1063,7 @@ INTERRUPT_GEN( apple2_interrupt )
 
 	profiler_mark_start(PROFILER_A2INT);
 
-	scanline = video_screen_get_vpos(device->machine->primary_screen);
+	scanline = device->machine->primary_screen->vpos();
 
 	if (scanline > 190)
 	{
@@ -1075,7 +1075,7 @@ INTERRUPT_GEN( apple2_interrupt )
 			cputag_set_input_line(device->machine, "maincpu", M6502_IRQ_LINE, PULSE_LINE);
 	}
 
-	video_screen_update_partial(device->machine->primary_screen, scanline);
+	device->machine->primary_screen->update_partial(scanline);
 
 	profiler_mark_end();
 }
@@ -1190,7 +1190,7 @@ READ8_HANDLER ( apple2_c01x_r )
 			case 0x06:			result |= (apple2_flags & VAR_ALTZP)		? 0x80 : 0x00;	break;
 			case 0x07:			result |= (apple2_flags & VAR_SLOTC3ROM)	? 0x80 : 0x00;	break;
 			case 0x08:			result |= (apple2_flags & VAR_80STORE)	? 0x80 : 0x00;	break;
-			case 0x09:			result |= !video_screen_get_vblank(space->machine->primary_screen)		? 0x80 : 0x00;	break;
+			case 0x09:			result |= !space->machine->primary_screen->vblank()		? 0x80 : 0x00;	break;
 			case 0x0A:			result |= (apple2_flags & VAR_TEXT)		? 0x80 : 0x00;	break;
 			case 0x0B:			result |= (apple2_flags & VAR_MIXED)		? 0x80 : 0x00;	break;
 			case 0x0C:			result |= (apple2_flags & VAR_PAGE2)		? 0x80 : 0x00;	break;

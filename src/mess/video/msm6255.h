@@ -14,7 +14,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define MSM6255		DEVICE_GET_INFO_NAME(msm6255)
+DECLARE_LEGACY_DEVICE(MSM6255, msm6255);
 
 #define MDRV_MSM6255_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, MSM6255, _clock) \
@@ -49,9 +49,6 @@ struct _msm6255_interface
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( msm6255 );
 
 /* character memory access */
 READ8_DEVICE_HANDLER ( msm6255_register_r );

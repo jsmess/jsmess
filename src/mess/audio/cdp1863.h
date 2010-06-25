@@ -19,7 +19,7 @@
 
 #include "sound/beep.h"
 
-#define CDP1863		DEVICE_GET_INFO_NAME(cdp1863)
+DECLARE_LEGACY_DEVICE(CDP1863, cdp1863);
 
 /* interface */
 typedef struct _cdp1863_interface cdp1863_interface;
@@ -29,9 +29,6 @@ struct _cdp1863_interface
 	int clock2;					/* the clock 2 (pin 2) of the chip */
 };
 #define CDP1863_INTERFACE(name) const cdp1863_interface (name)=
-
-/* device interface */
-DEVICE_GET_INFO( cdp1863 );
 
 /* load tone latch */
 WRITE8_DEVICE_HANDLER( cdp1863_str_w );

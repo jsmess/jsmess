@@ -37,9 +37,9 @@ struct _snapquick_token
 INLINE void assert_is_snapshot_or_quickload(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->baseconfig().inline_config != NULL);
-	assert((device->type == SNAPSHOT) || (device->type == QUICKLOAD)
-		|| (device->type == Z80BIN));
+	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() != NULL);
+	assert((device->type() == SNAPSHOT) || (device->type() == QUICKLOAD)
+		|| (device->type() == Z80BIN));
 }
 
 
@@ -51,7 +51,7 @@ INLINE void assert_is_snapshot_or_quickload(running_device *device)
 INLINE snapquick_token *get_token(running_device *device)
 {
 	assert_is_snapshot_or_quickload(device);
-	return (snapquick_token *) device->token;
+	return (snapquick_token *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -63,16 +63,15 @@ INLINE snapquick_token *get_token(running_device *device)
 INLINE const snapquick_config *get_config(running_device *device)
 {
 	assert_is_snapshot_or_quickload(device);
-	return (const snapquick_config *) device->baseconfig().inline_config;
+	return (const snapquick_config *) downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
 }
 
 INLINE const snapquick_config *get_config_dev(const device_config *device)
 {
 	assert(device != NULL);
-	assert(device->inline_config != NULL);
-	assert((device->type == SNAPSHOT) || (device->type == QUICKLOAD)
-		|| (device->type == Z80BIN));
-	return (const snapquick_config *) device->inline_config;
+	assert((device->type() == SNAPSHOT) || (device->type() == QUICKLOAD)
+		|| (device->type() == Z80BIN));
+	return (const snapquick_config *) downcast<const legacy_device_config_base *>(device)->inline_config();
 }
 
 /*-------------------------------------------------
@@ -113,16 +112,16 @@ void log_quickload(const char *type, UINT32 start, UINT32 length, UINT32 exec, c
 
 static TIMER_CALLBACK(process_snapshot_or_quickload)
 {
-	running_device *device = (running_device *) ptr;
-	snapquick_token *token = get_token(device);
+	device_image_interface *image = (device_image_interface *) ptr;
+	snapquick_token *token = get_token(&image->device());
 
 	/* invoke the load */
-	(*token->load)(device,
-		image_filetype(device),
-		image_length(device));
+	(*token->load)(*image,
+		image->filetype(),
+		image->length());
 
 	/* unload the device */
-	image_unload(device);
+	image->unload();
 }
 
 
@@ -136,10 +135,8 @@ static DEVICE_START( snapquick )
 	snapquick_token *token = get_token(device);
 
 	/* allocate a timer */
-	token->timer = timer_alloc(device->machine, process_snapshot_or_quickload, (void *) device);
+	token->timer = timer_alloc(device->machine, process_snapshot_or_quickload, (void *) dynamic_cast<device_image_interface *>(device));
 
-	/* locate the load function */
-	token->load = (snapquick_load_func) device->get_config_fct(DEVINFO_FCT_SNAPSHOT_QUICKLOAD_LOAD);
 }
 
 
@@ -152,6 +149,9 @@ static DEVICE_IMAGE_LOAD( snapquick )
 {
 	const snapquick_config *config = get_config(image);
 	snapquick_token *token = get_token(image);
+
+	/* locate the load function */
+	token->load = (snapquick_load_func) reinterpret_cast<snapquick_load_func>(image.get_device_specific_call());
 
 	/* adjust the timer */
 	timer_adjust_oneshot(
@@ -176,7 +176,6 @@ static DEVICE_GET_INFO(snapquick)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(snapquick_token); break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(snapquick_config); break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL; break;
 		case DEVINFO_INT_IMAGE_READABLE:				info->i = 1; break;
 		case DEVINFO_INT_IMAGE_WRITEABLE:				info->i = 0; break;
 		case DEVINFO_INT_IMAGE_CREATABLE:				info->i = 0; break;
@@ -235,3 +234,6 @@ DEVICE_GET_INFO(quickload)
 		default: DEVICE_GET_INFO_CALL(snapquick); break;
 	}
 }
+
+DEFINE_LEGACY_IMAGE_DEVICE(SNAPSHOT, snapshot);
+DEFINE_LEGACY_IMAGE_DEVICE(QUICKLOAD, quickload);

@@ -167,7 +167,7 @@ static TIMER_CALLBACK( irq_callback )
 	next_v256 = irq_trigger_v256s[next_irq_number];
 
 	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_irq_number);
+	timer_adjust_oneshot(irq_timer, machine->primary_screen->time_until_pos(next_vpos), next_irq_number);
 }
 
 
@@ -180,7 +180,7 @@ static void create_irq_timer(running_machine *machine)
 static void start_irq_timer(running_machine *machine)
 {
 	int vpos = vsync_chain_counter_to_vpos(irq_trigger_counts[0], irq_trigger_v256s[0]);
-	timer_adjust_oneshot(irq_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
+	timer_adjust_oneshot(irq_timer, machine->primary_screen->time_until_pos(vpos), 0);
 }
 
 
@@ -244,7 +244,7 @@ static TIMER_CALLBACK( nmi_callback )
 	next_v256 = nmi_trigger_v256s[next_nmi_number];
 
 	next_vpos = vsync_chain_counter_to_vpos(next_counter, next_v256);
-	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(machine->primary_screen, next_vpos, 0), next_nmi_number);
+	timer_adjust_oneshot(nmi_timer, machine->primary_screen->time_until_pos(next_vpos), next_nmi_number);
 }
 
 
@@ -257,7 +257,7 @@ static void create_nmi_timer(running_machine *machine)
 static void start_nmi_timer(running_machine *machine)
 {
 	int vpos = vsync_chain_counter_to_vpos(nmi_trigger_counts[0], nmi_trigger_v256s[0]);
-	timer_adjust_oneshot(nmi_timer, video_screen_get_time_until_pos(machine->primary_screen, vpos, 0), 0);
+	timer_adjust_oneshot(nmi_timer, machine->primary_screen->time_until_pos(vpos), 0);
 }
 
 
@@ -377,7 +377,7 @@ static READ8_HANDLER( intercept_v256_r )
 	UINT8 counter;
 	UINT8 v256;
 
-	vpos_to_vsync_chain_counter(video_screen_get_vpos(space->machine->primary_screen), &counter, &v256);
+	vpos_to_vsync_chain_counter(space->machine->primary_screen->vpos(), &counter, &v256);
 
 	return (!intercept << 7) | v256;
 }
@@ -931,21 +931,39 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:4")
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:6")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:7")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F2:8")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xF8, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("F2:4,5,6,7,8")
+	PORT_DIPSETTING(    0x00, "10000" )
+	PORT_DIPSETTING(    0x08, "15000" )
+	PORT_DIPSETTING(    0x10, "20000" )
+	PORT_DIPSETTING(    0x20, "30000" )
+	PORT_DIPSETTING(    0x40, "40000" )
+	PORT_DIPSETTING(    0x80, "50000" )
+	PORT_DIPSETTING(    0x18, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0x28, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0x30, "20000 (duplicate)" )
+	PORT_DIPSETTING(    0x38, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0x48, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0x50, "20000 (duplicate)" )
+	PORT_DIPSETTING(    0x58, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0x60, "30000 (duplicate)" )
+	PORT_DIPSETTING(    0x68, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0x70, "20000 (duplicate)" )
+	PORT_DIPSETTING(    0x78, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0x88, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0x90, "20000 (duplicate)" )
+	PORT_DIPSETTING(    0x98, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0xa0, "30000 (duplicate)" )
+	PORT_DIPSETTING(    0xa8, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0xb0, "20000 (duplicate)" )
+	PORT_DIPSETTING(    0xb8, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0xc0, "40000 (duplicate)" )
+	PORT_DIPSETTING(    0xc8, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0xd0, "20000 (duplicate)" )
+	PORT_DIPSETTING(    0xd8, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0xe0, "30000 (duplicate)" )
+	PORT_DIPSETTING(    0xe8, "15000 (duplicate)" )
+	PORT_DIPSETTING(    0xf0, "20000 (duplicate)" )
+	PORT_DIPSETTING(    0xf8, "15000 (duplicate)" )
 
 	PORT_START("F3")
 	PORT_DIPNAME( 0x01, 0x00, "Input Test Mode" ) PORT_CODE(KEYCODE_F2) PORT_TOGGLE PORT_DIPLOCATION("F3:1")
@@ -957,7 +975,7 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F3:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Spinner Direction" ) PORT_DIPLOCATION("F3:4")
+	PORT_DIPNAME( 0x08, 0x00, "Spinner Orientation" ) PORT_DIPLOCATION("F3:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Reverse ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Standard ) )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F3:5")
@@ -1010,7 +1028,7 @@ static INPUT_PORTS_START( moonwarp )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) ) PORT_DIPLOCATION("F6:6") // enemy spawn rate?
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("F6:7,8") // difficulties might be in the wrong order but 0xc0 is clearly the hardest
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("F6:7,8") // Difficulty select effectively chooses what level to start on, level 1, 2, 3, or 4 for very easy, easy, normal, and hard. Number here is added to the current level count (base 1) at $43be.
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )

@@ -28,10 +28,7 @@ extern VIDEO_UPDATE( vc4000 );
 
 /*----------- defined in audio/vc4000.c -----------*/
 
-#define SOUND_VC4000	DEVICE_GET_INFO_NAME( vc4000_sound )
-
-DEVICE_GET_INFO( vc4000_sound );
-
+DECLARE_LEGACY_SOUND_DEVICE(VC4000, vc4000_sound);
 void vc4000_soundport_w (running_device *device, int mode, int data);
 
 

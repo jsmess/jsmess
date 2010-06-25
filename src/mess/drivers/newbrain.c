@@ -823,13 +823,13 @@ static WRITE8_HANDLER( cop_w )
 
 static TIMER_DEVICE_CALLBACK( cop_regint_tick )
 {
-	newbrain_state *state = (newbrain_state *)timer->machine->driver_data;
+	newbrain_state *state = (newbrain_state *)timer.machine->driver_data;
 
 	if (copregint)
 	{
 		logerror("COP REGINT\n");
 		state->copint = 0;
-		check_interrupt(timer->machine);
+		check_interrupt(timer.machine);
 	}
 }
 
@@ -1349,7 +1349,7 @@ static Z80CTC_INTERFACE( newbrain_ctc_intf )
 
 static TIMER_DEVICE_CALLBACK( ctc_c2_tick )
 {
-	newbrain_state *state = (newbrain_state *)timer->machine->driver_data;
+	newbrain_state *state = (newbrain_state *)timer.machine->driver_data;
 
 	z80ctc_trg2_w(state->z80ctc, 1);
 	z80ctc_trg2_w(state->z80ctc, 0);
@@ -1508,7 +1508,7 @@ static DEVICE_IMAGE_LOAD( newbrain_serial )
 }
 
 
-static DEVICE_GET_INFO( newbrain_serial )
+DEVICE_GET_INFO( newbrain_serial )
 {
 	switch ( state )
 	{
@@ -1540,7 +1540,8 @@ static GFXDECODE_START( newbrain )
 	GFXDECODE_ENTRY( "chargen", 0x0000, newbrain_charlayout, 0, 1 )
 GFXDECODE_END
 
-#define NEWBRAIN_SERIAL	DEVICE_GET_INFO_NAME(newbrain_serial)
+DECLARE_LEGACY_IMAGE_DEVICE(NEWBRAIN_SERIAL, newbrain_serial);
+DEFINE_LEGACY_IMAGE_DEVICE(NEWBRAIN_SERIAL, newbrain_serial);
 
 #define MDRV_NEWBRAIN_SERIAL_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, NEWBRAIN_SERIAL, 0)

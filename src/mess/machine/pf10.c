@@ -32,10 +32,9 @@ struct _pf10_state
 INLINE pf10_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == PF10);
+	assert(device->type() == PF10);
 
-	return (pf10_state *)device->token;
+	return (pf10_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -109,7 +108,6 @@ DEVICE_GET_INFO( pf10 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(pf10_state);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0;									break;
-		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_OTHER;					break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = MACHINE_DRIVER_NAME(pf10);	break;
@@ -160,3 +158,5 @@ WRITE_LINE_DEVICE_HANDLER( pf10_rxd2_w )
 {
 	logerror("%s: pf10_rxd2_w %u\n", cpuexec_describe_context(device->machine), state);
 }
+
+DEFINE_LEGACY_DEVICE(PF10, pf10);

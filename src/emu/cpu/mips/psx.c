@@ -184,8 +184,8 @@ struct _psxcpu_state
 	int multiplier_operation;
 	UINT32 multiplier_operand1;
 	UINT32 multiplier_operand2;
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int bus_attached;
 	UINT32 bad_byte_address_mask;
@@ -196,11 +196,10 @@ struct _psxcpu_state
 INLINE psxcpu_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_PSXCPU ||
 		   cpu_get_type(device) == CPU_CXD8661R);
-	return (psxcpu_state *)device->token;
+	return (psxcpu_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 static const UINT32 mips_mtc0_writemask[]=
@@ -1606,7 +1605,7 @@ static STATE_POSTLOAD( mips_postload )
 	mips_update_scratchpad( psxcpu->program );
 }
 
-static void mips_state_register( const char *type, running_device *device )
+static void mips_state_register( const char *type, legacy_cpu_device *device )
 {
 	psxcpu_state *psxcpu = get_safe_token(device);
 
@@ -1633,7 +1632,7 @@ static void mips_state_register( const char *type, running_device *device )
 static CPU_INIT( psxcpu )
 {
 	psxcpu_state *psxcpu = get_safe_token(device);
-//  psxcpu->intf = (psxcpu_interface *) device->baseconfig().static_config;
+//  psxcpu->intf = (psxcpu_interface *) device->baseconfig().static_config();
 
 	psxcpu->irq_callback = irqcallback;
 	psxcpu->device = device;
@@ -1848,8 +1847,6 @@ static void mips_bc( psxcpu_state *psxcpu, int cop, int sr_cu, int condition )
 static CPU_EXECUTE( psxcpu )
 {
 	psxcpu_state *psxcpu = get_safe_token(device);
-
-	psxcpu->icount = cycles;
 
 	do
 	{
@@ -2842,8 +2839,6 @@ static CPU_EXECUTE( psxcpu )
 		}
 		psxcpu->icount--;
 	} while( psxcpu->icount > 0 );
-
-	return cycles - psxcpu->icount;
 }
 
 static void set_irq_line( psxcpu_state *psxcpu, int irqline, int state )
@@ -6111,7 +6106,7 @@ static CPU_SET_INFO( psxcpu )
 
 CPU_GET_INFO( psxcpu )
 {
-	psxcpu_state *psxcpu = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	psxcpu_state *psxcpu = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

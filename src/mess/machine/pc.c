@@ -217,7 +217,7 @@ static TIMER_CALLBACK( pcjr_delayed_pic8259_irq )
 
 static WRITE_LINE_DEVICE_HANDLER( pcjr_pic8259_set_int_line )
 {
-	if ( cpu_get_reg( device->machine->firstcpu, REG_GENPC ) == 0xF0454 )
+	if ( cpu_get_reg( device->machine->firstcpu, STATE_GENPC ) == 0xF0454 )
 	{
 		timer_adjust_oneshot( pc_int_delay_timer, cpu_clocks_to_attotime(device->machine->firstcpu, 1), state );
 	}
@@ -1388,21 +1388,21 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 	UINT32	address;
 	UINT32	size;
 
-	address = ( ! strcmp( "cart2", image->tag() ) ) ? 0xd0000 : 0xe0000;
+	address = ( ! strcmp( "cart2", image.device().tag() ) ) ? 0xd0000 : 0xe0000;
 
-	if ( image_software_entry(image) )
+	if ( image.software_entry() )
 	{
-		UINT8 *cart = image_get_software_region( image, "rom" );
+		UINT8 *cart = image.get_software_region( "rom" );
 
-		size = image_get_software_region_length( image, "rom" );
+		size = image.get_software_region_length("rom" );
 
-		memcpy( memory_region(image->machine, "maincpu") + address, cart, size );
+		memcpy( memory_region(image.device().machine, "maincpu") + address, cart, size );
 	}
 	else
 	{
 		UINT8	header[0x200];
 
-		unsigned size = image_length(image);
+		unsigned size = image.length();
 
 		/* Check for supported image sizes */
 		switch( size )
@@ -1413,21 +1413,21 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 		case 0x10200:
 			break;
 		default:
-			image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
+			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
 			return INIT_FAIL;
 		}
 
 		/* Read and verify the header */
-		if ( 512 != image_fread( image, header, 512 ) )
+		if ( 512 != image.fread( header, 512 ) )
 		{
-			image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unable to read header" );
+			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read header" );
 			return INIT_FAIL;
 		}
 
 		/* Read the cartridge contents */
-		if ( ( size - 0x200 ) != image_fread( image, memory_region(image->machine, "maincpu") + address, size - 0x200 ) )
+		if ( ( size - 0x200 ) != image.fread(memory_region(image.device().machine, "maincpu") + address, size - 0x200 ) )
 		{
-			image_seterror( image, IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
+			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
 			return INIT_FAIL;
 		}
 	}

@@ -16,12 +16,12 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define C2040	DEVICE_GET_INFO_NAME( c2040 )
-#define C3040	DEVICE_GET_INFO_NAME( c3040 )
-#define C4040	DEVICE_GET_INFO_NAME( c4040 )
-#define C8050	DEVICE_GET_INFO_NAME( c8050 )
-#define C8250	DEVICE_GET_INFO_NAME( c8250 )
-#define SFD1001	DEVICE_GET_INFO_NAME( sfd1001 )
+DECLARE_LEGACY_DEVICE(C2040, c2040);
+DECLARE_LEGACY_DEVICE(C3040, c3040);
+DECLARE_LEGACY_DEVICE(C4040, c4040);
+DECLARE_LEGACY_DEVICE(C8050, c8050);
+DECLARE_LEGACY_DEVICE(C8250, c8250);
+DECLARE_LEGACY_DEVICE(SFD1001, sfd1001);
 
 #define MDRV_C2040_ADD(_tag, _bus_tag, _address) \
 	MDRV_DEVICE_ADD(_tag, C2040, 0) \
@@ -70,15 +70,6 @@ struct _c2040_config
 /***************************************************************************
     PROTOTYPES
 ***************************************************************************/
-
-/* device interface */
-DEVICE_GET_INFO( c2040 );
-DEVICE_GET_INFO( c3040 );
-DEVICE_GET_INFO( c4040 );
-DEVICE_GET_INFO( c8050 );
-DEVICE_GET_INFO( c8250 );
-DEVICE_GET_INFO( sfd1001 );
-
 /* IEEE-488 interface */
 WRITE_LINE_DEVICE_HANDLER( c2040_ieee488_atn_w );
 WRITE_LINE_DEVICE_HANDLER( c2040_ieee488_ifc_w );

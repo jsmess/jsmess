@@ -233,7 +233,7 @@ WRITE8_HANDLER(at_page8_w)
 	if (LOG_PORT80 && (offset == 0))
 	{
 		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data,
-							(unsigned) cpu_get_reg(devtag_get_device(space->machine, "maincpu"), REG_GENPC));
+							(unsigned) cpu_get_reg(devtag_get_device(space->machine, "maincpu"), STATE_GENPC));
 	}
 
 	switch(offset % 8) {

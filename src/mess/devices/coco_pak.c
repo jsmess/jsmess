@@ -18,7 +18,7 @@ typedef struct _coco_pak_pcb_t coco_pak_pcb_t;
 struct _coco_pak_pcb_t
 {
 	running_device *cococart;
-	running_device *cart;
+	device_image_interface *cart;
 };
 
 
@@ -29,8 +29,8 @@ struct _coco_pak_pcb_t
 INLINE coco_pak_pcb_t *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type == COCO_CARTRIDGE_PCB_PAK) || (device->type == COCO_CARTRIDGE_PCB_PAK_BANKED16K));
-	return (coco_pak_pcb_t *) device->token;
+	assert((device->type() == COCO_CARTRIDGE_PCB_PAK) || (device->type() == COCO_CARTRIDGE_PCB_PAK_BANKED16K));
+	return (coco_pak_pcb_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -47,8 +47,8 @@ static DEVICE_START(coco_pak)
 	coco_pak_pcb_t *pak_pcb = get_token(device);
 
 	memset(pak_pcb, 0, sizeof(*pak_pcb));
-	pak_pcb->cococart = device->owner->owner;
-	pak_pcb->cart = device->owner;
+	pak_pcb->cococart = device->owner()->owner();
+	pak_pcb->cart = (device_image_interface*)device->owner();
 }
 
 
@@ -85,7 +85,6 @@ DEVICE_GET_INFO(coco_cartridge_pcb_pak)
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(coco_pak_pcb_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(coco_pak);	break;
@@ -114,17 +113,18 @@ DEVICE_GET_INFO(coco_cartridge_pcb_pak)
 static void banked_pak_set_bank(running_device *device, UINT32 bank)
 {
 	coco_pak_pcb_t *pak_pcb = get_token(device);
+	
 	UINT64 pos;
 	UINT32 i;
 	UINT8 *rom = memory_region(device->machine, "cart");
 	UINT32 rom_length = memory_region_length(device->machine, "cart");
 
-	pos = (bank * 0x4000) % image_length(pak_pcb->cart);
+	pos = (bank * 0x4000) % pak_pcb->cart->length();
 
 	for (i = 0; i < rom_length / 0x4000; i++)
 	{
-		image_fseek(pak_pcb->cart, pos, SEEK_SET);
-		image_fread(pak_pcb->cart, &rom[i * 0x4000], 0x4000);
+		pak_pcb->cart->fseek(pos, SEEK_SET);
+		pak_pcb->cart->fread(&rom[i * 0x4000], 0x4000);
 	}
 
 }
@@ -180,3 +180,6 @@ DEVICE_GET_INFO(coco_cartridge_pcb_pak_banked16k)
 		default: DEVICE_GET_INFO_CALL(coco_cartridge_pcb_pak); break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_PAK, coco_cartridge_pcb_pak);
+DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_PAK_BANKED16K, coco_cartridge_pcb_pak_banked16k);

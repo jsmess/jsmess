@@ -84,10 +84,23 @@
 
 
 /* macros for defining read_line/write_line functions */
-#define READ_LINE_DEVICE_HANDLER(name)		int  name(ATTR_UNUSED running_device *device)
-#define WRITE_LINE_DEVICE_HANDLER(name) 	void name(ATTR_UNUSED running_device *device, ATTR_UNUSED int state)
+#define READ_LINE_DEVICE_HANDLER(name)		int  name(ATTR_UNUSED device_t *device)
+#define WRITE_LINE_DEVICE_HANDLER(name) 	void name(ATTR_UNUSED device_t *device, ATTR_UNUSED int state)
 
+/* macros for inline device handler initialization */
 
+#define MDRV_DEVICE_CONFIG_DEVCB_GENERIC(_access, _struct, _entry, _tag, _type, _linefunc, _devfunc, _spacefunc) \
+	MDRV_DEVICE_CONFIG_DATA32(_struct, _entry .type, DEVCB_TYPE_DEVICE) \
+	MDRV_DEVICE_CONFIG_DATAPTR(_struct, _entry .tag, _tag) \
+	MDRV_DEVICE_CONFIG_DATAPTR(_struct, _entry . _access ## line, _linefunc) \
+	MDRV_DEVICE_CONFIG_DATAPTR(_struct, _entry . _access ## device, _devfunc) \
+	MDRV_DEVICE_CONFIG_DATAPTR(_struct, _entry .  _access ## space, _spacefunc)
+
+#define MDRV_DEVICE_CONFIG_READ_LINE(_struct, _entry, _tag, _func) MDRV_DEVICE_CONFIG_DEVCB_GENERIC(read, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, _func, NULL, NULL)
+#define MDRV_DEVICE_CONFIG_WRITE_LINE(_struct, _entry, _tag, _func) MDRV_DEVICE_CONFIG_DEVCB_GENERIC(write, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, _func, NULL, NULL)
+
+#define MDRV_DEVICE_CONFIG_READ_HANDLER(_struct, _entry, _tag, _func) MDRV_DEVICE_CONFIG_DEVCB_GENERIC(read, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, NULL, _func, NULL)
+#define MDRV_DEVICE_CONFIG_WRITE_HANDLER(_struct, _entry, _tag, _func) MDRV_DEVICE_CONFIG_DEVCB_GENERIC(write, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, NULL, _func, NULL)
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -98,8 +111,8 @@ class device_config;
 
 
 /* read/write types for I/O lines (similar to read/write handlers but no offset) */
-typedef int (*read_line_device_func)(running_device *device);
-typedef void (*write_line_device_func)(running_device *device, int state);
+typedef int (*read_line_device_func)(device_t *device);
+typedef void (*write_line_device_func)(device_t *device, int state);
 
 
 /* static structure used for device configuration when the desired callback type is a read_line_device_func */
@@ -214,16 +227,16 @@ struct _devcb_resolved_write8
 /* ----- static-to-live conversion ----- */
 
 /* convert a static read line definition to a live definition */
-void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_read_line *config, running_device *device);
+void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_read_line *config, device_t *device);
 
 /* convert a static write line definition to a live definition */
-void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_write_line *config, running_device *device);
+void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_write_line *config, device_t *device);
 
 /* convert a static 8-bit read definition to a live definition */
-void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *config, running_device *device);
+void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *config, device_t *device);
 
 /* convert a static 8-bit write definition to a live definition */
-void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *config, running_device *device);
+void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *config, device_t *device);
 
 
 
@@ -238,7 +251,7 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 
 INLINE int devcb_call_read_line(const devcb_resolved_read_line *resolved)
 {
-	return (resolved->read != NULL) ? (*resolved->read)((running_device *)resolved->target) : 0;
+	return (resolved->read != NULL) ? (*resolved->read)((device_t *)resolved->target) : 0;
 }
 
 
@@ -249,7 +262,7 @@ INLINE int devcb_call_read_line(const devcb_resolved_read_line *resolved)
 
 INLINE int devcb_call_read8(const devcb_resolved_read8 *resolved, offs_t offset)
 {
-	return (resolved->read != NULL) ? (*resolved->read)((running_device *)resolved->target, offset) : 0;
+	return (resolved->read != NULL) ? (*resolved->read)((device_t *)resolved->target, offset) : 0;
 }
 
 
@@ -261,7 +274,7 @@ INLINE int devcb_call_read8(const devcb_resolved_read8 *resolved, offs_t offset)
 INLINE void devcb_call_write_line(const devcb_resolved_write_line *resolved, int state)
 {
 	if (resolved->write != NULL)
-		(*resolved->write)((running_device *)resolved->target, state);
+		(*resolved->write)((device_t *)resolved->target, state);
 }
 
 
@@ -273,7 +286,7 @@ INLINE void devcb_call_write_line(const devcb_resolved_write_line *resolved, int
 INLINE void devcb_call_write8(const devcb_resolved_write8 *resolved, offs_t offset, UINT8 data)
 {
 	if (resolved->write != NULL)
-		(*resolved->write)((running_device *)resolved->target, offset, data);
+		(*resolved->write)((device_t *)resolved->target, offset, data);
 }
 
 /*-------------------------------------------------

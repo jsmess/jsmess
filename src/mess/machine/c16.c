@@ -86,7 +86,7 @@ UINT8 c16_m7501_port_read( running_device *device, UINT8 direction )
 {
 	c16_state *state = (c16_state *)device->machine->driver_data;
 	UINT8 data = 0xff;
-	UINT8 c16_port7501 = (UINT8) state->maincpu->get_runtime_int(CPUINFO_INT_M6510_PORT);
+	UINT8 c16_port7501 = m6510_get_port(state->maincpu);
 
 	if (BIT(c16_port7501, 0) || !cbm_iec_data_r(state->serbus))
 		data &= ~0x80;
@@ -618,8 +618,8 @@ INTERRUPT_GEN( c16_frame_interrupt )
 
 static DEVICE_IMAGE_LOAD( c16_cart )
 {
-	UINT8 *mem = memory_region(image->machine, "maincpu");
-	int size = image_length(image), test;
+	UINT8 *mem = memory_region(image.device().machine, "maincpu");
+	int size = image.length(), test;
 	const char *filetype;
 	int address = 0;
 
@@ -628,16 +628,16 @@ static DEVICE_IMAGE_LOAD( c16_cart )
 	static const unsigned char magic[] = {0x43, 0x42, 0x4d};
 	unsigned char buffer[sizeof (magic)];
 
-	image_fseek(image, 7, SEEK_SET);
-	image_fread(image, buffer, sizeof (magic));
-	image_fseek(image, 0, SEEK_SET);
+	image.fseek(7, SEEK_SET);
+	image.fread( buffer, sizeof (magic));
+	image.fseek(0, SEEK_SET);
 
 	/* Check if our cart has the magic string, and set its loading address */
 	if (!memcmp(buffer, magic, sizeof (magic)))
 		address = 0x20000;
 
 	/* Give a loading address to non .bin / non .rom carts as well */
-	filetype = image_filetype(image);
+	filetype = image.filetype();
 
 	/* We would support .hi and .lo files, but currently I'm not sure where to load them.
        We simply load them at 0x20000 at this stage, even if it's probably wrong!
@@ -653,14 +653,14 @@ static DEVICE_IMAGE_LOAD( c16_cart )
 	/* As a last try, give a reasonable loading address also to .bin/.rom without the magic string */
 	else if (!address)
 	{
-		logerror("Cart %s does not contain the magic string: it may be loaded at the wrong memory address!\n", image_filename(image));
+		logerror("Cart %s does not contain the magic string: it may be loaded at the wrong memory address!\n", image.filename());
 		address = 0x20000;
 	}
 
-	logerror("Loading cart %s at %.5x size:%.4x\n", image_filename(image), address, size);
+	logerror("Loading cart %s at %.5x size:%.4x\n", image.filename(), address, size);
 
 	/* Finally load the cart */
-	test = image_fread(image, mem + address, size);
+	test = image.fread( mem + address, size);
 
 	if (test != size)
 		return INIT_FAIL;

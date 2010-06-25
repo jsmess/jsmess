@@ -276,7 +276,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 		{ \
 			if (m68k->remaining_cycles > 0) \
 				m68k->remaining_cycles = 0; \
-			return m68k->initial_cycles; \
+			return; \
 		} \
 	}
 
@@ -297,7 +297,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 		{ \
 			if (m68k->remaining_cycles > 0) \
 				m68k->remaining_cycles = 0; \
-			return m68k->initial_cycles; \
+			return; \
 		} \
 	}
 
@@ -620,20 +620,19 @@ struct _m68ki_cpu_core
 	const UINT8* cyc_exception;
 
 	/* Callbacks to host */
-	cpu_irq_callback int_ack_callback;			  /* Interrupt Acknowledge */
+	device_irq_callback int_ack_callback;			  /* Interrupt Acknowledge */
 	m68k_bkpt_ack_func bkpt_ack_callback;         /* Breakpoint Acknowledge */
 	m68k_reset_func reset_instr_callback;         /* Called when a RESET instruction is encountered */
 	m68k_cmpild_func cmpild_instr_callback;       /* Called when a CMPI.L #v, Dn instruction is encountered */
 	m68k_rte_func rte_instr_callback;             /* Called when a RTE instruction is encountered */
 	m68k_tas_func tas_instr_callback;             /* Called when a TAS instruction is encountered, allows / disallows writeback */
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 	m68k_memory_interface memory;
 	offs_t encrypted_start;
 	offs_t encrypted_end;
 
-	cpu_state_table state;
 	UINT32		iotemp;
 
 	/* save state data */

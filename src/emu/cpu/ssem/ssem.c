@@ -21,7 +21,7 @@ struct _ssem_state
     UINT32 a;
     UINT32 halt;
 
-    running_device *device;
+    legacy_cpu_device *device;
     const address_space *program;
     int icount;
 };
@@ -29,10 +29,9 @@ struct _ssem_state
 INLINE ssem_state *get_safe_token(running_device *device)
 {
     assert(device != NULL);
-    assert(device->token != NULL);
-    assert(device->type == CPU);
+    assert(device->type() == CPU);
     assert(cpu_get_type(device) == CPU_SSEM);
-    return (ssem_state *)device->token;
+    return (ssem_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define INSTR       ((op >> 13) & 7)
@@ -173,8 +172,6 @@ static CPU_EXECUTE( ssem )
     ssem_state *cpustate = get_safe_token(device);
     UINT32 op;
 
-    cpustate->icount = cycles;
-
     cpustate->pc &= 0x1f;
 
     while (cpustate->icount > 0)
@@ -233,8 +230,6 @@ static CPU_EXECUTE( ssem )
 
         --cpustate->icount;
     }
-
-    return cycles - cpustate->icount;
 }
 
 
@@ -256,7 +251,7 @@ static CPU_SET_INFO( ssem )
 
 CPU_GET_INFO( ssem )
 {
-    ssem_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+    ssem_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
     switch(state)
     {

@@ -111,9 +111,9 @@ static void galaxy_setup_snapshot (running_machine *machine, const UINT8 * data,
 			cpu_set_reg(cpu, Z80_HL2,  data[0x16] | data[0x17] << 8);
 
 			cpu_set_reg(cpu, Z80_IFF1, data[0x18] & 0x01);
-			cpu_set_reg(cpu, Z80_IFF2, 0);
+			cpu_set_reg(cpu, Z80_IFF2, (UINT64)0);
 
-			cpu_set_reg(cpu, Z80_HALT, 0);
+			cpu_set_reg(cpu, Z80_HALT, (UINT64)0);
 
 			cpu_set_reg(cpu, Z80_IM,   (data[0x18] >> 1) & 0x03);
 
@@ -137,15 +137,15 @@ SNAPSHOT_LOAD( galaxy )
 	{
 		case GALAXY_SNAPSHOT_V1_SIZE:
 		case GALAXY_SNAPSHOT_V2_SIZE:
-			snapshot_data = auto_alloc_array(image->machine, UINT8, snapshot_size);
+			snapshot_data = auto_alloc_array(image.device().machine, UINT8, snapshot_size);
 			break;
 		default:
 			return INIT_FAIL;
 	}
 
-	image_fread(image, snapshot_data, snapshot_size);
+	image.fread( snapshot_data, snapshot_size);
 
-	galaxy_setup_snapshot(image->machine, snapshot_data, snapshot_size);
+	galaxy_setup_snapshot(image.device().machine, snapshot_data, snapshot_size);
 
 	return INIT_PASS;
 }

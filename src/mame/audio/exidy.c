@@ -393,6 +393,7 @@ static DEVICE_START( exidy_sound )
 	DEVICE_START_CALL(common_sh_start);
 }
 
+DEFINE_LEGACY_SOUND_DEVICE(EXIDY, exidy_sound);
 
 /*************************************
  *
@@ -801,7 +802,7 @@ static DEVICE_RESET( venture_sound )
 }
 
 
-static DEVICE_GET_INFO( venture_sound )
+DEVICE_GET_INFO( venture_sound )
 {
 	switch (state)
 	{
@@ -815,8 +816,8 @@ static DEVICE_GET_INFO( venture_sound )
 	}
 }
 
-
-#define SOUND_EXIDY_VENTURE DEVICE_GET_INFO_NAME( venture_sound )
+DECLARE_LEGACY_SOUND_DEVICE(EXIDY_VENTURE, venture_sound);
+DEFINE_LEGACY_SOUND_DEVICE(EXIDY_VENTURE, venture_sound);
 
 
 static ADDRESS_MAP_START( venture_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1027,7 +1028,7 @@ static DEVICE_RESET( victory_sound )
 }
 
 
-static DEVICE_GET_INFO( victory_sound )
+DEVICE_GET_INFO( victory_sound )
 {
 	switch (state)
 	{
@@ -1042,7 +1043,8 @@ static DEVICE_GET_INFO( victory_sound )
 }
 
 
-#define SOUND_EXIDY_VICTORY DEVICE_GET_INFO_NAME( victory_sound )
+DECLARE_LEGACY_SOUND_DEVICE(EXIDY_VICTORY, victory_sound);
+DEFINE_LEGACY_SOUND_DEVICE(EXIDY_VICTORY, victory_sound);
 
 
 static ADDRESS_MAP_START( victory_audio_map, ADDRESS_SPACE_PROGRAM, 8 )

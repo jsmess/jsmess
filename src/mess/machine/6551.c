@@ -63,8 +63,8 @@ static void acia_6551_refresh_ints(running_device *device);
 
 INLINE acia6551_t *get_token(running_device *device)
 {
-	assert(device->type == ACIA6551);
-	return (acia6551_t *) device->token;
+	assert(device->type() == ACIA6551);
+	return (acia6551_t *) downcast<legacy_device_base *>(device)->token();
 }
 
 
@@ -594,7 +594,6 @@ DEVICE_GET_INFO( acia6551 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(acia6551_t);				break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(acia6551);	break;
@@ -609,3 +608,5 @@ DEVICE_GET_INFO( acia6551 )
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(ACIA6551, acia6551);

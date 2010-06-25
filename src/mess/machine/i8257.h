@@ -39,7 +39,7 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-#define I8257 DEVICE_GET_INFO_NAME(i8257)
+DECLARE_LEGACY_DEVICE(I8257, i8257);
 
 #define MDRV_I8257_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, I8257, _clock) \
@@ -99,7 +99,5 @@ WRITE_LINE_DEVICE_HANDLER( i8257_drq0_w );
 WRITE_LINE_DEVICE_HANDLER( i8257_drq1_w );
 WRITE_LINE_DEVICE_HANDLER( i8257_drq2_w );
 WRITE_LINE_DEVICE_HANDLER( i8257_drq3_w );
-
-DEVICE_GET_INFO( i8257 );
 
 #endif

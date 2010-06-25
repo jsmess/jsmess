@@ -36,9 +36,8 @@ struct _vp595_t
 INLINE vp595_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == VP595);
-	return (vp595_t *)device->token;
+	assert(device->type() == VP595);
+	return (vp595_t *)downcast<legacy_device_base *>(device)->token();
 }
 
 /***************************************************************************
@@ -122,7 +121,6 @@ DEVICE_GET_INFO( vp595 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(vp595_t);					break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
-		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
 		/* --- the following bits of info are returned as pointers --- */
 		case DEVINFO_PTR_MACHINE_CONFIG:				info->machine_config = MACHINE_DRIVER_NAME( vp595 );	break;
@@ -140,3 +138,5 @@ DEVICE_GET_INFO( vp595 )
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
 	}
 }
+
+DEFINE_LEGACY_DEVICE(VP595, vp595);

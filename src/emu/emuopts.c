@@ -28,6 +28,11 @@ const options_entry mame_core_options[] =
 	/* config options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE CONFIGURATION OPTIONS" },
 	{ "readconfig;rc",               "1",         OPTION_BOOLEAN,    "enable loading of configuration files" },
+#ifdef MESS
+	{ "writeconfig;wc",				 "1",		  OPTION_BOOLEAN,	 "writes configuration to (driver).ini on exit" },
+#else
+	{ "writeconfig;wc",				 "0",		  OPTION_BOOLEAN,	 "writes configuration to (driver).ini on exit" },
+#endif /* MESS */
 
 	/* seach path options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE SEARCH PATH OPTIONS" },
@@ -159,6 +164,8 @@ const options_entry mame_core_options[] =
 	{ "cheat;c",                     "0",         OPTION_BOOLEAN,    "enable cheat subsystem" },
 	{ "skip_gameinfo",               "0",         OPTION_BOOLEAN,    "skip displaying the information screen at startup" },
 
+	/* image device options */
+	{ OPTION_ADDED_DEVICE_OPTIONS,	 "0",		  OPTION_BOOLEAN | OPTION_INTERNAL,	"image device-specific options have been added" },
 	{ NULL }
 };
 
@@ -200,6 +207,91 @@ static void mame_puts_error(const char *s)
 	mame_printf_error("%s", s);
 }
 
+/*-------------------------------------------------
+    image_get_device_option - accesses a device
+    option
+-------------------------------------------------*/
+
+const char *image_get_device_option(device_image_interface *image)
+{
+	const char *result = NULL;
+
+	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS))
+	{
+		/* access the option */
+		result = options_get_string(mame_options(),  image->image_config().instance_name());
+	}
+	return result;
+}
+
+/*-------------------------------------------------
+    image_add_device_options - add all of the device
+    options for a specified device
+-------------------------------------------------*/
+
+void image_add_device_options(core_options *opts, const game_driver *driver)
+{
+	int index = 0;
+	machine_config *config;
+	const device_config_image_interface *image = NULL;
+
+	/* create the configuration */
+	config = machine_config_alloc(driver->machine_config);
+
+	/* enumerate our callback for every device */
+	/* loop on each device instance */
+	for (bool gotone = config->devicelist.first(image); gotone; gotone = image->next(image))
+	{
+		options_entry entry[2];
+		astring dev_full_name;
+
+		/* first device? add the header as to be pretty */
+		if (index == 0)
+		{
+			memset(entry, 0, sizeof(entry));
+			entry[0].description = "IMAGE DEVICES";
+			entry[0].flags = OPTION_HEADER;
+			options_add_entries(opts, entry);
+		}
+
+		/* retrieve info about the device instance */
+		dev_full_name.printf("%s;%s", image->instance_name(), image->brief_instance_name());
+
+		/* add the option */
+		memset(entry, 0, sizeof(entry));
+		entry[0].name = dev_full_name;
+		options_add_entries(opts, entry);
+
+		index++;
+	}
+
+	/* record that we've added device options */
+	options_set_bool(opts, OPTION_ADDED_DEVICE_OPTIONS, TRUE, OPTION_PRIORITY_CMDLINE);
+
+	/* free the configuration */
+	machine_config_free(config);
+}
+
+/*-------------------------------------------------
+    image_driver_name_callback - called when we
+    parse the driver name, so we can add options
+    specific to that driver
+-------------------------------------------------*/
+
+static void image_driver_name_callback(core_options *opts, const char *arg)
+{
+	const game_driver *driver;
+
+	/* only add these options if we have not yet added them */
+	if (!options_get_bool(opts, OPTION_ADDED_DEVICE_OPTIONS))
+	{
+		driver = driver_get_name(arg);
+		if (driver != NULL)
+		{
+			image_add_device_options(opts, driver);
+		}
+	}
+}
 
 
 /*-------------------------------------------------
@@ -219,6 +311,9 @@ core_options *mame_options_init(const options_entry *entries)
 	options_add_entries(opts, mame_core_options);
 	if (entries != NULL)
 		options_add_entries(opts, entries);
+
+	/* we need to dynamically add options when the device name is parsed */
+	options_set_option_callback(opts, OPTION_GAMENAME, image_driver_name_callback);
 
 #ifdef MESS
 	mess_options_init(opts);

@@ -109,7 +109,7 @@ typedef struct
 	UINT16	*ipt_ram;
 	UINT8	*lbrm;
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const	address_space *program;
 	int		icount;
 
@@ -123,10 +123,9 @@ typedef struct
 INLINE esrip_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_ESRIP);
-	return (esrip_state *)device->token;
+	return (esrip_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -250,7 +249,7 @@ static void make_ops(esrip_state *cpustate)
 static CPU_INIT( esrip )
 {
 	esrip_state *cpustate = get_safe_token(device);
-	esrip_config* _config = (esrip_config*)device->baseconfig().static_config;
+	esrip_config* _config = (esrip_config*)device->baseconfig().static_config();
 
 	memset(cpustate, 0, sizeof(cpustate));
 
@@ -356,7 +355,7 @@ static CPU_EXIT( esrip )
 
 static int get_hblank(running_machine *machine)
 {
-	return video_screen_get_hblank(machine->primary_screen);
+	return machine->primary_screen->hblank();
 }
 
 /* Return the state of the LBRM line (Y-scaling related) */
@@ -1667,8 +1666,6 @@ static CPU_EXECUTE( esrip )
 	int calldebugger = (device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0;
 	UINT8 status;
 
-	cpustate->icount = cycles;
-
 	/* I think we can get away with placing this outside of the loop */
 	status = cpustate->status_in(device->machine);
 
@@ -1861,8 +1858,6 @@ static CPU_EXECUTE( esrip )
 
 		cpustate->icount--;
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -1891,7 +1886,7 @@ static CPU_SET_INFO( esrip )
 
 CPU_GET_INFO( esrip )
 {
-	esrip_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	esrip_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

@@ -635,7 +635,7 @@ static const floppy_config atom_floppy_config =
 
 static TIMER_DEVICE_CALLBACK( cassette_output_tick )
 {
-	atom_state *state = (atom_state *)timer->machine->driver_data;
+	atom_state *state = (atom_state *)timer.machine->driver_data;
 
 	int level = !(!(!state->hz2400 & state->pc1) & state->pc0);
 
@@ -770,7 +770,7 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 	/* First, determine where this cart has to be loaded */
 	while (atom_cart->tag)
 	{
-		if (strcmp(atom_cart->tag, image->tag()) == 0)
+		if (strcmp(atom_cart->tag, image.device().tag()) == 0)
 			break;
 		
 		atom_cart++;
@@ -778,39 +778,39 @@ static DEVICE_IMAGE_LOAD( atom_cart )
 	
 	this_cart = atom_cart;
 		
-	if (image_software_entry(image) == NULL)
+	if (image.software_entry() == NULL)
 	{
-		size = image_length(image);
-		temp_copy = auto_alloc_array(image->machine, UINT8, size);
+		size = image.length();
+		temp_copy = auto_alloc_array(image.device().machine, UINT8, size);
 		
 		if (size > 0x1000)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			auto_free(image->machine, temp_copy);
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+			auto_free(image.device().machine, temp_copy);
 			return INIT_FAIL;
 		}
 		
-		if (image_fread(image, temp_copy, size) != size)
+		if (image.fread(temp_copy, size) != size)
 		{
-			image_seterror(image, IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			auto_free(image->machine, temp_copy);
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			auto_free(image.device().machine, temp_copy);
 			return INIT_FAIL;
 		}
 	}
 	else
 	{
-		size = image_get_software_region_length(image, "rom");
-		temp_copy = auto_alloc_array(image->machine, UINT8, size);
-		memcpy(temp_copy, image_get_software_region(image, "rom"), size);
+		size = image.get_software_region_length( "rom");
+		temp_copy = auto_alloc_array(image.device().machine, UINT8, size);
+		memcpy(temp_copy, image.get_software_region("rom"), size);
 	}
 	
 	mirror = 0x1000 / size;
 	
 	/* With the following, we mirror the cart in the whole memory region */
 	for (i = 0; i < mirror; i++)
-		memcpy(memory_region(image->machine, this_cart->region) + this_cart->offset + i * size, temp_copy, size);
+		memcpy(memory_region(image.device().machine, this_cart->region) + this_cart->offset + i * size, temp_copy, size);
 	
-	auto_free(image->machine, temp_copy);
+	auto_free(image.device().machine, temp_copy);
 	
 	return INIT_PASS;
 }

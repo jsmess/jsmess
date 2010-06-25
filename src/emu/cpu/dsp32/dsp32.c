@@ -184,7 +184,7 @@ struct _dsp32_state
 	UINT8			lastpins;
 	UINT32			ppc;
 	void			(*output_pins_changed)(running_device *device, UINT32 pins);
-	running_device *device;
+	legacy_cpu_device *	device;
 	const address_space *program;
 };
 
@@ -205,10 +205,9 @@ static CPU_RESET( dsp32c );
 INLINE dsp32_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_DSP32C);
-	return (dsp32_state *)device->token;
+	return (dsp32_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -352,7 +351,7 @@ static void dsp32_register_save( running_device *device )
 
 static CPU_INIT( dsp32c )
 {
-	const dsp32_config *configdata = (const dsp32_config *)device->baseconfig().static_config;
+	const dsp32_config *configdata = (const dsp32_config *)device->baseconfig().static_config();
 	dsp32_state *cpustate = get_safe_token(device);
 
 	/* copy in config data */
@@ -416,10 +415,10 @@ static CPU_EXECUTE( dsp32c )
 
 	/* skip if halted */
 	if ((cpustate->pcr & PCR_RESET) == 0)
-		return cycles;
-
-	/* count cycles and interrupt cycles */
-	cpustate->icount = cycles;
+	{
+		cpustate->icount = 0;
+		return;
+	}
 
 	/* update buffered accumulator values */
 	cpustate->abufcycle[0] += cpustate->icount;
@@ -438,8 +437,6 @@ static CPU_EXECUTE( dsp32c )
 	cpustate->abufcycle[1] -= cpustate->icount;
 	cpustate->abufcycle[2] -= cpustate->icount;
 	cpustate->abufcycle[3] -= cpustate->icount;
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -766,7 +763,7 @@ static CPU_SET_INFO( dsp32c )
 
 CPU_GET_INFO( dsp32c )
 {
-	dsp32_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	dsp32_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

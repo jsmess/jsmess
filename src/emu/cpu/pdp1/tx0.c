@@ -64,18 +64,17 @@ struct _tx0_state
 
 	int icount;
 
-	running_device *device;
+	legacy_cpu_device *device;
 	const address_space *program;
 };
 
 INLINE tx0_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_TX0_64KW ||
 		   cpu_get_type(device) == CPU_TX0_8KW);
-	return (tx0_state *)device->token;
+	return (tx0_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 #define READ_TX0_18BIT(A) ((signed)memory_read_dword_32be(cpustate->program, (A)<<2))
@@ -127,12 +126,12 @@ static void tx0_write(tx0_state *cpustate, offs_t address, int data)
 		;
 }
 
-static void tx0_init_common(running_device *device, cpu_irq_callback irqcallback, int is_64kw)
+static void tx0_init_common(legacy_cpu_device *device, device_irq_callback irqcallback, int is_64kw)
 {
 	tx0_state *cpustate = get_safe_token(device);
 
 	/* clean-up */
-	cpustate->iface = (const tx0_reset_param_t *)device->baseconfig().static_config;
+	cpustate->iface = (const tx0_reset_param_t *)device->baseconfig().static_config();
 
 	cpustate->address_mask = is_64kw ? ADDRESS_MASK_64KW : ADDRESS_MASK_8KW;
 	cpustate->ir_mask = is_64kw ? 03 : 037;
@@ -165,8 +164,6 @@ static CPU_RESET( tx0 )
 static CPU_EXECUTE( tx0_64kw )
 {
 	tx0_state *cpustate = get_safe_token(device);
-
-	cpustate->icount = cycles;
 
 	do
 	{
@@ -267,16 +264,12 @@ static CPU_EXECUTE( tx0_64kw )
 		}
 	}
 	while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( tx0_8kw )
 {
 	tx0_state *cpustate = get_safe_token(device);
-
-	cpustate->icount = cycles;
 
 	do
 	{
@@ -377,8 +370,6 @@ static CPU_EXECUTE( tx0_8kw )
 		}
 	}
 	while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -435,7 +426,7 @@ static CPU_SET_INFO( tx0 )
 
 CPU_GET_INFO( tx0_64kw )
 {
-	tx0_state *cpustate = ( device != NULL && device->token != NULL ) ? get_safe_token(device) : NULL;
+	tx0_state *cpustate = ( device != NULL && device->token() != NULL ) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
@@ -561,7 +552,7 @@ CPU_GET_INFO( tx0_64kw )
 
 CPU_GET_INFO( tx0_8kw )
 {
-	tx0_state *cpustate = ( device != NULL && device->token != NULL ) ? get_safe_token(device) : NULL;
+	tx0_state *cpustate = ( device != NULL && device->token() != NULL ) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{

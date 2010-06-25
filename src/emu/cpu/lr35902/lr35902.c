@@ -64,8 +64,8 @@ typedef struct {
 	UINT8	IF;
 	int	irq_state;
 	int	ei_delay;
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	int icount;
 	/* Timer stuff */
@@ -116,10 +116,9 @@ union _lr35902_state {
 INLINE lr35902_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_LR35902);
-	return (lr35902_state *)device->token;
+	return (lr35902_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 typedef int (*OpcodeEmulator) (lr35902_state *cpustate);
@@ -191,7 +190,7 @@ static CPU_INIT( lr35902 )
 {
 	lr35902_state *cpustate = get_safe_token(device);
 
-	cpustate->w.config = (const lr35902_cpu_core *) device->baseconfig().static_config;
+	cpustate->w.config = (const lr35902_cpu_core *) device->baseconfig().static_config();
 	cpustate->w.irq_callback = irqcallback;
 	cpustate->w.device = device;
 	cpustate->w.program = device->space(AS_PROGRAM);
@@ -307,8 +306,6 @@ static CPU_EXECUTE( lr35902 )
 {
 	lr35902_state *cpustate = get_safe_token(device);
 
-	cpustate->w.icount = cycles;
-
 	do
 	{
 		if ( cpustate->w.execution_state ) {
@@ -335,8 +332,6 @@ static CPU_EXECUTE( lr35902 )
 		}
 		cpustate->w.execution_state ^= 1;
 	} while (cpustate->w.icount > 0);
-
-	return cycles - cpustate->w.icount;
 }
 
 static CPU_BURN( lr35902 )
@@ -411,7 +406,7 @@ static CPU_SET_INFO( lr35902 )
 
 CPU_GET_INFO( lr35902 )
 {
-	lr35902_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	lr35902_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
