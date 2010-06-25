@@ -29,8 +29,8 @@ struct _hcd62121_state
 	UINT8 reg[0x80];
 	UINT8 temp1[0x10];
 	UINT8 temp2[0x10];
-	cpu_irq_callback irq_callback;
-	running_device *device;
+	device_irq_callback irq_callback;
+	legacy_cpu_device *device;
 	const address_space *program;
 	const address_space *io;
 	int icount;
@@ -305,10 +305,9 @@ INLINE int check_cond( hcd62121_state *cpustate, UINT8 op )
 INLINE hcd62121_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->token != NULL);
-	assert(device->type == CPU);
+	assert(device->type() == CPU);
 	assert(cpu_get_type(device) == CPU_HCD62121);
-	return (hcd62121_state *)device->token;
+	return (hcd62121_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 
@@ -347,8 +346,6 @@ static CPU_EXECUTE( hcd62121 )
 {
 	hcd62121_state *cpustate = get_safe_token(device);
 
-	cpustate->icount = cycles;
-
 	do
 	{
 		UINT32 pc = ( cpustate->cseg << 16 ) | cpustate->ip;
@@ -367,8 +364,6 @@ static CPU_EXECUTE( hcd62121 )
 		};
 
 	} while (cpustate->icount > 0);
-
-	return cycles - cpustate->icount;
 }
 
 
@@ -396,7 +391,7 @@ static CPU_SET_INFO( hcd62121 )
 
 CPU_GET_INFO( hcd62121 )
 {
-	hcd62121_state *cpustate = (device != NULL && device->token != NULL) ? get_safe_token(device) : NULL;
+	hcd62121_state *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 
 	switch (state)
 	{
