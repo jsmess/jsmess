@@ -121,7 +121,14 @@ WRITE8_HANDLER ( cassette_w )
 {
 	vg5k_state *vg5k = (vg5k_state *)space->machine->driver_data;
 
-	dac_signed_data_w(vg5k->dac, data <<2);
+	dac_data_w(vg5k->dac, data <<2);
+
+	if (data == 0x03)
+		cassette_output(vg5k->cassette, +1);
+	else if (data == 0x02)
+		cassette_output(vg5k->cassette, -1);
+	else
+		cassette_output(vg5k->cassette, 0);
 }
 
 
@@ -268,9 +275,17 @@ static INPUT_PORTS_START( vg5k )
 INPUT_PORTS_END
 
 
+static TIMER_CALLBACK( z80_irq_clear )
+{
+	cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
+}
+
+
 static TIMER_CALLBACK( z80_irq )
 {
-	cputag_set_input_line(machine, "maincpu", 0, HOLD_LINE);
+	cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+
+	timer_set(machine, ATTOTIME_IN_USEC(100), NULL, 0, z80_irq_clear);
 }
 
 static TIMER_DEVICE_CALLBACK( vg5k_scanline )
@@ -363,7 +378,7 @@ static const ef9345_config vg5k_ef9345_config =
 	300					/* screen height */
 };
 
-static const struct CassetteOptions vg5kr_cassette_options =
+static const struct CassetteOptions vg5k_cassette_options =
 {
 	1,		/* channels */
 	16,		/* bits per sample */
@@ -373,7 +388,7 @@ static const struct CassetteOptions vg5kr_cassette_options =
 static const cassette_config vg5k_cassette_config =
 {
 	vg5k_cassette_formats,
-	&vg5kr_cassette_options,
+	&vg5k_cassette_options,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
 };
 

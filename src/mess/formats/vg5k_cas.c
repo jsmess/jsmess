@@ -125,14 +125,14 @@ static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 		/* Identify type of block */
 		if (casdata[data_pos] == 0xd3)
 		{
-			/* head block have fixed size of 20 byte */
+			/* head block have fixed size of 32 byte */
 			block_size = 0x20;
 
 			/* 1 sec of silence before the head block */
 			sample_count += vg5k_cas_silence(buffer, sample_count, 44100);
 
-			/* head block starts with 15000 samples of synchro */
-			sample_count += vg5k_k7_synchro( buffer, sample_count, 15000 );
+			/* head block starts with 30000 samples of synchro */
+			sample_count += vg5k_k7_synchro( buffer, sample_count, 30000 );
 		}
 		else if (casdata[data_pos] == 0xd6)
 		{
@@ -142,8 +142,8 @@ static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 			/* 10000 samples of silence before the data block */
 			sample_count += vg5k_cas_silence(buffer, sample_count, 10000);
 
-			/* data block starts with 3600 samples of synchro */
-			sample_count += vg5k_k7_synchro( buffer, sample_count, 3600);
+			/* data block starts with 7200 samples of synchro */
+			sample_count += vg5k_k7_synchro( buffer, sample_count, 7200);
 		}
 		else
 			return -1;

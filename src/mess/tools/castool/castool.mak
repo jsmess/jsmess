@@ -59,6 +59,7 @@ CASTOOL_LIB_OBJS =						\
 	$(MESS_FORMATS)/trs_cas.o           \
 	$(MESS_FORMATS)/tzx_cas.o           \
 	$(MESS_FORMATS)/uef_cas.o           \
+	$(MESS_FORMATS)/vg5k_cas.o          \
 	$(MESS_FORMATS)/vt_cas.o            \
 	$(MESS_FORMATS)/zx81_p.o		    \
 	$(MESS_FORMATS)/ioprocs.o			\

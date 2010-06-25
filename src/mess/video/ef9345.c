@@ -829,9 +829,6 @@ READ8_DEVICE_HANDLER ( ef9345_r )
 {
 	ef9345_t *ef9345 = get_safe_token(device);
 
-	if(offset & 8)
-		ef9345_exec(ef9345, ef9345->registers[0] & 0xff);
-
 	if(offset & 7)
 		return ef9345->registers[offset & 7];
 

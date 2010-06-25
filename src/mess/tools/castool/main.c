@@ -44,6 +44,7 @@
 #include "formats/trs_cas.h"
 #include "formats/tzx_cas.h"
 #include "formats/uef_cas.h"
+#include "formats/vg5k_cas.h"
 #include "formats/vt_cas.h"
 #include "formats/zx81_p.h"
 
@@ -87,6 +88,7 @@ const struct SupportedCassetteFormats formats[] = {
 	{"tzx", tzx_cassette_formats               ,"ZX Spectrum"},
 	{"cdt", cdt_cassette_formats               ,"Amstrad CPC"},
 	{"uef", uef_cassette_formats               ,"Acorn Electron"},
+	{"vg5k", vg5k_cassette_formats             ,"VG 5000 k7"},
 	{"vtech1", vtech1_cassette_formats         ,"Video Technology Laser 110-310"},
 	{"vtech2", vtech2_cassette_formats         ,"Video Technology Laser 350-700"},
 	{"zx81_p", zx81_p_format                   ,"Sinclair ZX81"},
