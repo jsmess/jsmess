@@ -576,15 +576,15 @@ static const nes_pcb pcb_list[] =
 	{ "BMC-12-IN-1",         UNSUPPORTED_BOARD },
 	{ "BMC-NTD-03",          UNSUPPORTED_BOARD },
 	{ "BMC-8157",            UNSUPPORTED_BOARD /*BMC_8157*/ },
-	{ "BMC-BS-5",            UNSUPPORTED_BOARD /*BENSHENG_BS5*/ },
+	{ "BMC-BS-5",            BMC_BENSHENG_BS5 },
 	{ "BMC-FK23C",           UNSUPPORTED_BOARD /*BMC_FK23C*/ },
 	{ "BMC-FK23CA",          UNSUPPORTED_BOARD /*BMC_FK23C*/ },	// diff reg init
 	{ "BMC-GHOSTBUSTERS63IN1", UNSUPPORTED_BOARD /*BMC_G63IN1*/ },
 	{ "BMC-SUPERVISION16IN1", UNSUPPORTED_BOARD },	// mapper 53
 	{ "BMC-RESETBASED-4IN1", UNSUPPORTED_BOARD },// mapper 60 with 64k prg and 32k chr
-	{ "BMC-VT5201",          UNSUPPORTED_BOARD },// mapper 60 otherwise
+	{ "BMC-VT5201",          BMC_VT5201 },// mapper 60 otherwise
+	{ "BMC-D1038",           BMC_VT5201 }, // mapper 60?
 	{ "BMC-42IN1RESETSWITCH", UNSUPPORTED_BOARD },	// mapper 60?
-	{ "BMC-D1038",           UNSUPPORTED_BOARD }, // mapper 60?
 	{ "BMC-SUPER22GAMES",    UNSUPPORTED_BOARD },// mapper 233
 	{ "BMC-GOLDENGAME-150IN1", UNSUPPORTED_BOARD },// mapper 235 with 2M PRG
 	{ "BMC-GOLDENGAME-260IN1", UNSUPPORTED_BOARD },// mapper 235 with 4M PRG
@@ -10628,6 +10628,97 @@ static WRITE8_HANDLER( bmc_family4646_m_w )
 	}
 }
 
+/*************************************************************
+ 
+ BMC-VT5201
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( bmc_vt5201_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("bmc_vt5201_w, offset: %04x, data: %02x\n", offset, data));
+	
+	state->mmc_latch1 = BIT(offset, 8);
+	
+	// not sure about this mirroring bit!! 
+	// without it TN 95 in 1 has glitches in Lunar Ball; with it TN 95 in 1 has glitches in Galaxian!
+	set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+	if (BIT(offset, 7))
+	{
+		prg16_89ab(space->machine, (offset >> 4) & 0x07);
+		prg16_cdef(space->machine, (offset >> 4) & 0x07);
+	}
+	else
+		prg32(space->machine, (offset >> 5) & 0x03);
+	chr8(space->machine, offset, CHRROM);
+}
+
+static READ8_HANDLER( bmc_vt5201_r )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("bmc_vt5201_r, offset: %04x\n", offset));
+	//	state->mmc_dipsetting = input_port_read(space->machine, "CARTDIPS");
+
+	if (state->mmc_latch1)
+		return state->mmc_dipsetting; // cart mode, depending on the Dip Switches (always zero atm, given we have no way to add cart-based DIPs)
+	else
+	{	// usual ROM access
+		switch (offset & 0x6000)
+		{
+			case 0x0000:
+				return state->rom[0x10000 + state->prg_bank[0] * 0x2000 + (offset & 0x1fff)];
+			case 0x2000:
+				return state->rom[0x10000 + state->prg_bank[1] * 0x2000 + (offset & 0x1fff)];
+			case 0x4000:
+				return state->rom[0x10000 + state->prg_bank[2] * 0x2000 + (offset & 0x1fff)];
+			case 0x6000:
+				return state->rom[0x10000 + state->prg_bank[3] * 0x2000 + (offset & 0x1fff)];
+		}
+		return 0;
+	}
+}
+
+/*************************************************************
+ 
+ BMC-BS-5
+ 
+ *************************************************************/
+
+static void bmc_bs5_update_banks( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	prg8_89(machine, state->mmc_prg_bank[0]);
+	prg8_ab(machine, state->mmc_prg_bank[1]);
+	prg8_cd(machine, state->mmc_prg_bank[2]);
+	prg8_ef(machine, state->mmc_prg_bank[3]);
+	chr2_0(machine, state->mmc_vrom_bank[0], CHRROM);
+	chr2_2(machine, state->mmc_vrom_bank[1], CHRROM);
+	chr2_4(machine, state->mmc_vrom_bank[2], CHRROM);
+	chr2_6(machine, state->mmc_vrom_bank[3], CHRROM);
+}
+
+static WRITE8_HANDLER( bmc_bs5_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	UINT8 bs5_helper = (offset & 0xc00) >> 10;
+	LOG_MMC(("bmc_bs5_w, offset: %04x, data: %02x\n", offset, data));
+//	state->mmc_dipsetting = input_port_read(space->machine, "CARTDIPS");
+	
+	switch (offset & 0x7000)
+	{
+		case 0x0000:
+			state->mmc_vrom_bank[bs5_helper] = offset & 0x1f;
+			break;
+		case 0x2000:
+			if (BIT(offset, state->mmc_dipsetting + 4))	// mmc_dipsetting is always zero atm, given we have no way to add cart-based DIPs
+				state->mmc_prg_bank[bs5_helper] = offset & 0x0f;
+			break;
+	}
+	bmc_bs5_update_banks(space->machine);
+}
+
 
 typedef void (*nes_ppu_latch)(running_device *device, offs_t offset);
 
@@ -10883,6 +10974,8 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BMC_15IN1,            NES_NOACCESS, NES_WRITEONLY(bmc_15in1_m_w), NES_WRITEONLY(txrom_w), NULL, NULL, mmc3_irq },
 	{ BMC_BALLGAMES_11IN1,  NES_NOACCESS, NES_WRITEONLY(bmc_ball11_m_w), NES_WRITEONLY(bmc_ball11_w), NULL, NULL, NULL },
 	{ BMC_GOLDENCARD_6IN1,  NES_WRITEONLY(bmc_gc6in1_l_w), NES_NOACCESS, NES_WRITEONLY(bmc_gc6in1_w), NULL, NULL, mmc3_irq },
+	{ BMC_VT5201,           NES_NOACCESS, NES_NOACCESS, {bmc_vt5201_w, bmc_vt5201_r},         NULL, NULL, NULL },
+	{ BMC_BENSHENG_BS5,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_bs5_w),             NULL, NULL, NULL },
 	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	//
 };

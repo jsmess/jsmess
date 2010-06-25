@@ -153,6 +153,8 @@ public:
 
 	UINT8 mmc_latch1, mmc_latch2;
 	UINT8 mmc_reg[16];
+	
+	UINT8 mmc_dipsetting;
 
 	// misc mapper related variables which should be merged with the above one, where possible
 	UINT8 MMC1_regs[4];

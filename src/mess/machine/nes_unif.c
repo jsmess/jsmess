@@ -1265,6 +1265,19 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 			
+		case BMC_VT5201:
+			prg32(machine, 0);
+			chr8(machine, 0, CHRROM);
+			break;
+
+		case BMC_BENSHENG_BS5:
+			state->mmc_prg_bank[0] = 0xff;
+			state->mmc_prg_bank[1] = 0xff;
+			state->mmc_prg_bank[2] = 0xff;
+			state->mmc_prg_bank[3] = 0xff;
+			bmc_bs5_update_banks(machine);
+			break;
+			
 		case UNSUPPORTED_BOARD:
 		default:
 			/* Mapper not supported */
