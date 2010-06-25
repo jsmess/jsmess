@@ -1898,134 +1898,6 @@ static WRITE8_HANDLER( mapper19_w )
 
 /*************************************************************
 
-    Mapper 20
-
-    Known Boards: Reserved for FDS
-    Games: any FDS disk
-
-    In MESS: Supported
-
-*************************************************************/
-
-static void fds_irq( running_device *device, int scanline, int vblank, int blanked )
-{
-	nes_state *state = (nes_state *)device->machine->driver_data;
-
-	if (state->IRQ_enable_latch)
-		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
-
-	if (state->IRQ_enable)
-	{
-		if (state->IRQ_count <= 114)
-		{
-			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
-			state->IRQ_enable = 0;
-			state->fds_status0 |= 0x01;
-		}
-		else
-			state->IRQ_count -= 114;
-	}
-}
-
-READ8_HANDLER( nes_fds_r )
-{
-	nes_state *state = (nes_state *)space->machine->driver_data;
-	UINT8 ret = 0x00;
-	LOG_MMC(("fds_r, offset: %04x\n", offset));
-
-	switch (offset)
-	{
-		case 0x00: /* $4030 - disk status 0 */
-			ret = state->fds_status0;
-			/* clear the disk IRQ detect flag */
-			state->fds_status0 &= ~0x01;
-			break;
-		case 0x01: /* $4031 - data latch */
-			/* don't read data if disk is unloaded */
-			if (state->fds_data == NULL)
-				ret = 0;
-			else if (state->fds_current_side)
-				ret = state->fds_data[(state->fds_current_side - 1) * 65500 + state->fds_head_position++];
-			else
-				ret = 0;
-			break;
-		case 0x02: /* $4032 - disk status 1 */
-			/* return "no disk" status if disk is unloaded */
-			if (state->fds_data == NULL)
-				ret = 1;
-			else if (state->fds_last_side != state->fds_current_side)
-			{
-				/* If we've switched disks, report "no disk" for a few reads */
-				ret = 1;
-				state->fds_count++;
-				if (state->fds_count == 50)
-				{
-					state->fds_last_side = state->fds_current_side;
-					state->fds_count = 0;
-				}
-			}
-			else
-				ret = (state->fds_current_side == 0); /* 0 if a disk is inserted */
-			break;
-		case 0x03: /* $4033 */
-			ret = 0x80;
-			break;
-		default:
-			ret = 0x00;
-			break;
-	}
-
-	LOG_FDS(("fds_r, address: %04x, data: %02x\n", offset + 0x4030, ret));
-
-	return ret;
-}
-
-WRITE8_HANDLER( nes_fds_w )
-{
-	nes_state *state = (nes_state *)space->machine->driver_data;
-	LOG_MMC(("fds_w, offset: %04x, data: %02x\n", offset, data));
-
-	switch (offset)
-	{
-		case 0x00:
-			state->IRQ_count_latch = (state->IRQ_count_latch & 0xff00) | data;
-			break;
-		case 0x01:
-			state->IRQ_count_latch = (state->IRQ_count_latch & 0x00ff) | (data << 8);
-			break;
-		case 0x02:
-			state->IRQ_count = state->IRQ_count_latch;
-			state->IRQ_enable = data;
-			break;
-		case 0x03:
-			// d0 = sound io (1 = enable)
-			// d1 = disk io (1 = enable)
-			break;
-		case 0x04:
-			/* write data out to disk */
-			break;
-		case 0x05:
-			state->fds_motor_on = BIT(data, 0);
-
-			if (BIT(data, 1))
-				state->fds_head_position = 0;
-
-			state->fds_read_mode = BIT(data, 2);
-			set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-
-			if ((!(data & 0x40)) && (state->fds_write_reg & 0x40))
-				state->fds_head_position -= 2; // ???
-
-			state->IRQ_enable_latch = BIT(data, 7);
-			state->fds_write_reg = data;
-			break;
-	}
-
-	LOG_FDS(("fds_w, address: %04x, data: %02x\n", offset + 0x4020, data));
-}
-
-/*************************************************************
-
     Mapper 21 & 25
 
     Known Boards: Konami VRC4A & VRC4C (21), VRC4B & VRC4D (25)
@@ -10796,7 +10668,6 @@ static const mmc mmc_list[] =
 	{ 17, "FFE F8xxx",                 mapper17_l_w, NULL, NULL, NULL, NULL, NULL, ffe_irq },
 	{ 18, "Jaleco SS88006",            NULL, NULL, NULL, mapper18_w, NULL, NULL, jaleco_irq },
 	{ 19, "Namcot 106 + N106",         mapper19_l_w, mapper19_l_r, NULL, mapper19_w, NULL, NULL, namcot_irq },
-	{ 20, "Famicom Disk System",       NULL, NULL, NULL, NULL, NULL, NULL, fds_irq },
 	{ 21, "Konami VRC 4a",             NULL, NULL, NULL, konami_vrc4a_w, NULL, NULL, konami_irq },
 	{ 22, "Konami VRC 2a",             NULL, NULL, NULL, konami_vrc2a_w, NULL, NULL, NULL },
 	{ 23, "Konami VRC 2b",             NULL, NULL, NULL, konami_vrc2b_w, NULL, NULL, konami_irq },
@@ -11204,16 +11075,6 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			prg16_cdef(machine, state->prg_chunks - 1);
 			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
-			break;
-		case 20:
-			state->fds_last_side = 0;
-			state->fds_count = 0;
-			state->fds_motor_on = 0;
-			state->fds_door_closed = 0;
-			state->fds_current_side = 1;
-			state->fds_head_position = 0;
-			state->fds_status0 = 0;
-			state->fds_read_mode = state->fds_write_reg = 0;
 			break;
 		case 21:
 		case 22:

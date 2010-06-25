@@ -64,7 +64,7 @@ VIDEO_UPDATE( nes )
 	ppu2c0x_render(state->ppu, bitmap, 0, 0, 0, 0);
 
 	/* if this is a disk system game, check for the flip-disk key */
-	if (state->mapper == 20)
+	if (state->disk_expansion && state->pcb_id == NO_BOARD)
 	{
 		// latch this input so it doesn't go at warp speed
 		if ((input_port_read(screen->machine, "FLIPDISK") & 0x01) && (!state->last_frame_flip))

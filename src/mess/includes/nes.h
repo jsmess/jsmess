@@ -232,6 +232,8 @@ public:
 
 	/***** FDS-floppy related *****/
 
+	int     disk_expansion;
+
 	UINT8   fds_sides;
 	UINT8   *fds_data;	// here, we store a copy of the disk
 	UINT8   *fds_ram;	// here, we emulate the RAM adapter

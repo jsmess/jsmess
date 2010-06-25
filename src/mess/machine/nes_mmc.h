@@ -116,8 +116,6 @@ READ8_HANDLER( nes_chr_r );
 WRITE8_HANDLER( nes_nt_w );
 READ8_HANDLER( nes_nt_r );
 
-READ8_HANDLER( nes_fds_r );
-WRITE8_HANDLER( nes_fds_w );
 WRITE8_HANDLER( nes_mapper50_add_w );
 WRITE8_HANDLER( smb2jb_extra_w );
 

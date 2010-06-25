@@ -25,6 +25,9 @@
 
 static void init_nes_core(running_machine *machine);
 static void nes_machine_stop(running_machine *machine);
+static READ8_HANDLER(nes_fds_r);
+static WRITE8_HANDLER(nes_fds_w);
+static void fds_irq(running_device *device, int scanline, int vblank, int blanked);
 
 /***************************************************************************
     FUNCTIONS
@@ -52,6 +55,34 @@ static void init_nes_core( running_machine *machine )
 
 	memory_set_bankptr(machine, "bank10", state->rom);
 
+	/* If there is Disk Expansion and no cart has been loaded, setup memory accordingly */
+	if (state->disk_expansion && state->pcb_id == NO_BOARD)
+	{
+		state->slow_banking = 0;
+		/* If we are loading a disk we have already filled state->fds_data and we don't want to overwrite it,
+		 if we are loading a cart image identified as mapper 20 (probably wrong mapper...) we need to alloc
+		 memory for use in nes_fds_r/nes_fds_w. Same goes for allocation of fds_ram (used for bank2)  */
+		if (state->fds_data == NULL)
+		{
+			UINT32 size = memory_region_length(machine, "maincpu") - 0x10000;
+			state->fds_data = auto_alloc_array_clear(machine, UINT8, size);
+			memcpy(state->fds_data, state->rom, size);	// copy in fds_data the cart PRG
+		}
+		if (state->fds_ram == NULL)
+			state->fds_ram = auto_alloc_array(machine, UINT8, 0x8000);
+		
+		memory_install_read8_handler(space, 0x4030, 0x403f, 0, 0, nes_fds_r);
+		memory_install_read_bank(space, 0x6000, 0xdfff, 0, 0, "bank2");
+		memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank1");
+		
+		memory_install_write8_handler(space, 0x4020, 0x402f, 0, 0, nes_fds_w);
+		memory_install_write_bank(space, 0x6000, 0xdfff, 0, 0, "bank2");
+		
+		memory_set_bankptr(machine, "bank1", &state->rom[0xe000]);
+		memory_set_bankptr(machine, "bank2", state->fds_ram);
+		return;
+	}
+
 	/* Set up the mapper callbacks */
 	if (state->format == 1)
 		mapper_handlers_setup(machine);
@@ -61,30 +92,6 @@ static void init_nes_core( running_machine *machine )
 	/* Set up the memory handlers for the mapper */
 	switch (state->mapper)
 	{
-		case 20:
-			state->slow_banking = 0;
-			/* If we are loading a disk we have already filled state->fds_data and we don't want to overwrite it,
-            if we are loading a cart image identified as mapper 20 (probably wrong mapper...) we need to alloc
-            memory for use in nes_fds_r/nes_fds_w. Same goes for allocation of fds_ram (used for bank2)  */
-			if (state->fds_data == NULL)
-			{
-				UINT32 size = memory_region_length(machine, "maincpu") - 0x10000;
-				state->fds_data = auto_alloc_array_clear(machine, UINT8, size);
-				memcpy(state->fds_data, state->rom, size);	// copy in fds_data the cart PRG
-			}
-			if (state->fds_ram == NULL)
-				state->fds_ram = auto_alloc_array(machine, UINT8, 0x8000);
-
-			memory_install_read8_handler(space, 0x4030, 0x403f, 0, 0, nes_fds_r);
-			memory_install_read_bank(space, 0x6000, 0xdfff, 0, 0, "bank2");
-			memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank1");
-
-			memory_install_write8_handler(space, 0x4020, 0x402f, 0, 0, nes_fds_w);
-			memory_install_write_bank(space, 0x6000, 0xdfff, 0, 0, "bank2");
-
-			memory_set_bankptr(machine, "bank1", &state->rom[0xe000]);
-			memory_set_bankptr(machine, "bank2", state->fds_ram);
-			break;
 		case 50:
 			memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, nes_mapper50_add_w);
 			memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, nes_mapper50_add_w);
@@ -185,6 +192,9 @@ MACHINE_RESET( nes )
 	state->mid_ram_enable = 1;
 	
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
+	if (state->disk_expansion && state->pcb_id == NO_BOARD)
+		ppu2c0x_set_hblank_callback(state->ppu, fds_irq);
+
 	if (state->format == 1)
 		nes_mapper_reset(machine);
 
@@ -1317,6 +1327,122 @@ void nes_partialhash( char *dest, const unsigned char *data, unsigned long lengt
 	hash_compute(dest, &data[16], length - 16, functions);
 }
 
+/**************************
+ 
+ Disk System emulation
+ 
+**************************/
+
+static void fds_irq( running_device *device, int scanline, int vblank, int blanked )
+{
+	nes_state *state = (nes_state *)device->machine->driver_data;
+	
+	if (state->IRQ_enable_latch)
+		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+	
+	if (state->IRQ_enable)
+	{
+		if (state->IRQ_count <= 114)
+		{
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			state->IRQ_enable = 0;
+			state->fds_status0 |= 0x01;
+		}
+		else
+			state->IRQ_count -= 114;
+	}
+}
+
+static READ8_HANDLER( nes_fds_r )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	UINT8 ret = 0x00;
+	
+	switch (offset)
+	{
+		case 0x00: /* $4030 - disk status 0 */
+			ret = state->fds_status0;
+			/* clear the disk IRQ detect flag */
+			state->fds_status0 &= ~0x01;
+			break;
+		case 0x01: /* $4031 - data latch */
+			/* don't read data if disk is unloaded */
+			if (state->fds_data == NULL)
+				ret = 0;
+			else if (state->fds_current_side)
+				ret = state->fds_data[(state->fds_current_side - 1) * 65500 + state->fds_head_position++];
+			else
+				ret = 0;
+			break;
+		case 0x02: /* $4032 - disk status 1 */
+			/* return "no disk" status if disk is unloaded */
+			if (state->fds_data == NULL)
+				ret = 1;
+			else if (state->fds_last_side != state->fds_current_side)
+			{
+				/* If we've switched disks, report "no disk" for a few reads */
+				ret = 1;
+				state->fds_count++;
+				if (state->fds_count == 50)
+				{
+					state->fds_last_side = state->fds_current_side;
+					state->fds_count = 0;
+				}
+			}
+			else
+				ret = (state->fds_current_side == 0); /* 0 if a disk is inserted */
+			break;
+		case 0x03: /* $4033 */
+			ret = 0x80;
+			break;
+		default:
+			ret = 0x00;
+			break;
+	}
+
+	return ret;
+}
+
+static WRITE8_HANDLER( nes_fds_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	
+	switch (offset)
+	{
+		case 0x00:
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0xff00) | data;
+			break;
+		case 0x01:
+			state->IRQ_count_latch = (state->IRQ_count_latch & 0x00ff) | (data << 8);
+			break;
+		case 0x02:
+			state->IRQ_count = state->IRQ_count_latch;
+			state->IRQ_enable = data;
+			break;
+		case 0x03:
+			// d0 = sound io (1 = enable)
+			// d1 = disk io (1 = enable)
+			break;
+		case 0x04:
+			/* write data out to disk */
+			break;
+		case 0x05:
+			state->fds_motor_on = BIT(data, 0);
+			
+			if (BIT(data, 1))
+				state->fds_head_position = 0;
+			
+			state->fds_read_mode = BIT(data, 2);
+			set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+			
+			if ((!(data & 0x40)) && (state->fds_write_reg & 0x40))
+				state->fds_head_position -= 2; // ???
+			
+			state->IRQ_enable_latch = BIT(data, 7);
+			state->fds_write_reg = data;
+			break;
+	}
+}
 
 static void nes_load_proc( running_device *image )
 {
@@ -1350,26 +1476,43 @@ static void nes_unload_proc( running_device *image )
 DRIVER_INIT( famicom )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
+	int i;
 
-	/* clear some of the cart variables we don't use */
+	/* clear some of the variables we don't use */
 	state->trainer = 0;
 	state->battery = 0;
 	state->prg_ram = 0;
-	state->prg_chunks = state->chr_chunks = 0;
-
-	/* initialize the system as if using a mapper 20 cart */
-	state->format = 1;
-	state->mapper = 20;
 	state->four_screen_vram = 0;
 	state->hard_mirroring = 0;
+	state->prg_chunks = state->chr_chunks = 0;
+
+	/* initialize the disk system */
+	state->disk_expansion = 1;
+	state->pcb_id = NO_BOARD;
 
 	state->fds_sides = 0;
-	state->fds_data = NULL;
-
+	state->fds_last_side = 0;
+	state->fds_count = 0;
+	state->fds_motor_on = 0;
+	state->fds_door_closed = 0;
+	state->fds_current_side = 1;
+	state->fds_head_position = 0;
+	state->fds_status0 = 0;
+	state->fds_read_mode = state->fds_write_reg = 0;
+	
 	state->fds_data = auto_alloc_array_clear(machine, UINT8, 65500 * 2);
 	state->fds_ram = auto_alloc_array_clear(machine, UINT8, 0x8000);
 	state_save_register_global_pointer(machine, state->fds_ram, 0x8000);
 
+	// setup CHR accesses to 8k VRAM
+	state->vram = memory_region(machine, "gfx2");
+	for (i = 0; i < 8; i++)
+	{
+		state->chr_map[i].source = CHRRAM;
+		state->chr_map[i].origin = i * 0x400; // for save state uses!
+		state->chr_map[i].access = &state->vram[state->chr_map[i].origin];
+	}
+	
 	floppy_install_load_proc(floppy_get_device(machine, 0), nes_load_proc);
 	floppy_install_unload_proc(floppy_get_device(machine, 0), nes_unload_proc);
 }
