@@ -3300,7 +3300,6 @@ static WRITE8_HANDLER( konami_vrc3_w )
  
  *************************************************************/
 
-#if 0
 static void vrc4_set_prg( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
@@ -3327,7 +3326,6 @@ static void konami_irq( running_device *device, int scanline, int vblank, int bl
 		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
-#endif
 
 static WRITE8_HANDLER( konami_vrc4_w )
 {
@@ -3498,7 +3496,6 @@ static WRITE8_HANDLER( konami_vrc6_w )
  
  *************************************************************/
 
-#if 0
 static WRITE8_HANDLER( konami_vrc7_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
@@ -3570,8 +3567,6 @@ static WRITE8_HANDLER( konami_vrc7_w )
 			break;
 	}
 }
-
-#endif
 
 /*************************************************************
  
@@ -5766,7 +5761,6 @@ static WRITE8_HANDLER( rumblestation_w )
  
  *************************************************************/
 
-#if 0
 static void sachen_set_mirror( running_machine *machine, UINT8 nt ) // used by mappers 137, 138, 139, 141
 {
 	switch (nt)
@@ -5789,7 +5783,6 @@ static void sachen_set_mirror( running_machine *machine, UINT8 nt ) // used by m
 			break;
 	}
 }
-#endif
 
 static WRITE8_HANDLER( sachen_74x374_l_w )
 {
@@ -6970,7 +6963,6 @@ static WRITE8_HANDLER( txc_mxmdhtwo_w )
  
  *************************************************************/
 
-#if 0
 /* MIRROR_LOW and MIRROR_HIGH are swapped! */
 static void waixing_set_mirror( running_machine *machine, UINT8 nt )
 {
@@ -6991,7 +6983,6 @@ static void waixing_set_mirror( running_machine *machine, UINT8 nt )
 			break;
 	}
 }
-#endif
 
 static void waixing_a_set_chr( running_machine *machine, int chr_base, int chr_mask )
 {
@@ -8254,20 +8245,75 @@ static WRITE8_HANDLER( unl_kof97_w )
 
 static WRITE8_HANDLER( unl_t230_w )
 {
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	UINT8 bank;
 	LOG_MMC(("unl_t230_w offset: %04x, data: %02x\n", offset, data));
 	
-	switch (offset & 0x7007)
+	switch (offset & 0x700c)
 	{
 		case 0x0000:
 			break;
 		case 0x2000:
-			data = (data << 1) & 0x1f;
-			prg8_89(space->machine, data);
-			prg8_ab(space->machine, data | 0x01);
+			prg16_89ab(space->machine, data);
+			break;
+
+		// the part below works like VRC-2. how was the original board wired up? 
+		// was there a VRC2? if so, we can use VRC-2 and add proper pin settings to xml!
+		case 0x1000:
+		case 0x1004:
+		case 0x1008:
+		case 0x100c:
+			switch (data & 0x03)
+			{
+			case 0x00: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+			case 0x01: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+			case 0x02: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+			case 0x03: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
+			}
+			break;
+
+		case 0x3000:
+		case 0x3004:
+		case 0x3008:
+		case 0x300c:
+		case 0x4000:
+		case 0x4004:
+		case 0x4008:
+		case 0x400c:
+		case 0x5000:
+		case 0x5004:
+		case 0x5008:
+		case 0x500c:
+		case 0x6000:
+		case 0x6004:
+		case 0x6008:
+		case 0x600c:
+			bank = ((offset & 0x7000) - 0x3000) / 0x0800 + ((offset & 0x0008) >> 2);
+			if (offset & 0x0004)
+				state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0x0f) | (data << 4);
+			else
+				state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
+			
+			chr1_x(space->machine, bank, state->mmc_vrom_bank[bank], state->mmc_chr_source);
+			break;
+		case 0x7000:
+			state->IRQ_count_latch &= ~0x0f;
+			state->IRQ_count_latch |= data & 0x0f;
+			break;
+		case 0x7004:
+			state->IRQ_count_latch &= ~0xf0;
+			state->IRQ_count_latch |= (data << 4) & 0xf0;
+			break;
+		case 0x7008:
+			state->IRQ_mode = data & 0x04;	// currently not implemented: 0 = prescaler mode / 1 = CPU mode
+			state->IRQ_enable = data & 0x02;
+			state->IRQ_enable_latch = data & 0x01;
+			if (data & 0x02)
+				state->IRQ_count = state->IRQ_count_latch;
 			break;
 			
 		default:
-			konami_vrc2b_w(space, offset, data);
+			logerror("unl_t230_w uncaught offset: %04x value: %02x\n", offset, data);
 			break;
 	}
 }

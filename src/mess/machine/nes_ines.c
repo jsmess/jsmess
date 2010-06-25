@@ -2036,7 +2036,7 @@ WRITE8_HANDLER( nes_fds_w )
 
 *************************************************************/
 
-static void vrc4_set_prg( running_machine *machine )
+static void vrc4a_set_prg( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	if (state->mmc_cmd1 & 0x02)
@@ -2048,18 +2048,6 @@ static void vrc4_set_prg( running_machine *machine )
 	{
 		prg8_89(machine, state->mmc_prg_bank[0]);
 		prg8_cd(machine, 0xfe);
-	}
-}
-
-static void konami_irq( running_device *device, int scanline, int vblank, int blanked )
-{
-	nes_state *state = (nes_state *)device->machine->driver_data;
-	/* Increment & check the IRQ scanline counter */
-	if (state->IRQ_enable && (++state->IRQ_count == 0x100))
-	{
-		state->IRQ_count = state->IRQ_count_latch;
-		state->IRQ_enable = state->IRQ_enable_latch;
-		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -2078,7 +2066,7 @@ static WRITE8_HANDLER( konami_vrc4a_w )
 		case 0x0080:
 		case 0x00c0:
 			state->mmc_prg_bank[0] = data;
-			vrc4_set_prg(space->machine);
+			vrc4a_set_prg(space->machine);
 			break;
 
 		case 0x1000:
@@ -2098,7 +2086,7 @@ static WRITE8_HANDLER( konami_vrc4a_w )
 		case 0x1080:
 		case 0x10c0:
 			state->mmc_cmd1 = data & 0x02;
-			vrc4_set_prg(space->machine);
+			vrc4a_set_prg(space->machine);
 			break;
 
 		case 0x2000:
@@ -2228,7 +2216,7 @@ static WRITE8_HANDLER( konami_vrc4b_w )
 		case 0x0008:
 		case 0x000c:
 			state->mmc_prg_bank[0] = data;
-			vrc4_set_prg(space->machine);
+			vrc4a_set_prg(space->machine);
 			break;
 
 		case 0x1000:
@@ -2248,7 +2236,7 @@ static WRITE8_HANDLER( konami_vrc4b_w )
 		case 0x1004:
 		case 0x100c:
 			state->mmc_cmd1 = data & 0x02;
-			vrc4_set_prg(space->machine);
+			vrc4a_set_prg(space->machine);
 			break;
 
 		case 0x2000:
@@ -4526,27 +4514,6 @@ static WRITE8_HANDLER( mapper73_w )
 
 *************************************************************/
 
-/* MIRROR_LOW and MIRROR_HIGH are swapped! */
-static void waixing_set_mirror( running_machine *machine, UINT8 nt )
-{
-	switch (nt)
-	{
-	case 0:
-	case 1:
-		set_nt_mirroring(machine, nt ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-		break;
-	case 2:
-		set_nt_mirroring(machine, PPU_MIRROR_LOW);
-		break;
-	case 3:
-		set_nt_mirroring(machine, PPU_MIRROR_HIGH);
-		break;
-	default:
-		LOG_MMC(("Mapper set NT to invalid value %02x", nt));
-		break;
-	}
-}
-
 static void mapper74_set_chr( running_machine *machine, int chr_base, int chr_mask )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
@@ -5046,7 +5013,7 @@ static WRITE8_HANDLER( mapper83_w )
 
 *************************************************************/
 
-static WRITE8_HANDLER( konami_vrc7_w )
+static WRITE8_HANDLER( mapper85_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
@@ -6619,29 +6586,6 @@ static READ8_HANDLER( mapper136_l_r )
     In MESS: Supported.
 
 *************************************************************/
-
-static void sachen_set_mirror( running_machine *machine, UINT8 nt ) // used by mappers 137, 138, 139, 141
-{
-	switch (nt)
-	{
-	case 0:
-	case 1:
-		set_nt_mirroring(machine, nt ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-		break;
-	case 2:
-		set_nt_page(machine, 0, CIRAM, 0, 1);
-		set_nt_page(machine, 1, CIRAM, 1, 1);
-		set_nt_page(machine, 2, CIRAM, 1, 1);
-		set_nt_page(machine, 3, CIRAM, 1, 1);
-		break;
-	case 3:
-		set_nt_mirroring(machine, PPU_MIRROR_LOW);
-		break;
-	default:
-		LOG_MMC(("Mapper set NT to invalid value %02x", nt));
-		break;
-	}
-}
 
 static WRITE8_HANDLER( mapper137_l_w )
 {
@@ -10915,7 +10859,7 @@ static const mmc mmc_list[] =
 	{ 82, "Taito X1-017",              NULL, NULL, mapper82_m_w, NULL, NULL, NULL, NULL },
 	{ 83, "Cony",                      mapper83_l_w, mapper83_l_r, NULL, mapper83_w, NULL, NULL, NULL },
 	{ 84, "Pasofami hacked images?",   NULL, NULL, NULL, NULL, NULL, NULL, NULL },
-	{ 85, "Konami VRC 7",              NULL, NULL, NULL, konami_vrc7_w, NULL, NULL, konami_irq },
+	{ 85, "Konami VRC 7",              NULL, NULL, NULL, mapper85_w, NULL, NULL, konami_irq },
 	{ 86, "Jaleco JF13",               NULL, NULL, mapper86_m_w, NULL, NULL, NULL, NULL },
 	{ 87, "74139/74",                  NULL, NULL, mapper87_m_w, NULL, NULL, NULL, NULL },
 	{ 88, "Namcot 34x3",               NULL, NULL, NULL, mapper88_w, NULL, NULL, NULL },

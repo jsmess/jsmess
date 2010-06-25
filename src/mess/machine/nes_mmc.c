@@ -681,15 +681,6 @@ void set_nt_mirroring( running_machine *machine, int mirroring )
     MIRROR_HIGH and MIRROR_LOW compared to the above) and Sachen games use sachen_set_mirror (which has
     a slightly different MIRROR_HIGH, with page 0 set to 0) */
 
-/*************************************************************
-
-    Support for .nes Files
-
-*************************************************************/
-
-/* Include emulation of iNES Mappers for .nes files */
-#include "machine/nes_ines.c"
-
 
 /*************************************************************
  
@@ -710,4 +701,13 @@ void set_nt_mirroring( running_machine *machine, int mirroring )
 /* Include emulation of UNIF Boards for .unf files */
 #include "machine/nes_unif.c"
 
+
+/*************************************************************
+ 
+ Support for .nes Files
+ 
+ *************************************************************/
+
+/* Include emulation of iNES Mappers for .nes files */
+#include "machine/nes_ines.c"
 

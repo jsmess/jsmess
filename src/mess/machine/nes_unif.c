@@ -239,6 +239,7 @@ static int unif_initialize( running_machine *machine, int idx )
 		case WAIXING_TYPE_E:	// mapper 195
 		case WAIXING_TYPE_H:	// mapper 245
 		case BTL_SUPERBROS11:	// mapper 196
+		case UNL_KOF97:
 		case NITRA_TDA:	// mapper 250
 			if (state->four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
 			{
@@ -573,7 +574,11 @@ static int unif_initialize( running_machine *machine, int idx )
 			chr8(machine, 0, CHRROM);
 			break;
 		case BTL_SMB2B:
-			mapper_initialize(machine, 50);
+			prg8_67(machine, 0x0f);
+			prg8_89(machine, 0x08);
+			prg8_ab(machine, 0x09);
+			prg8_cd(machine, 0);
+			prg8_ef(machine, 0x0b);
 			break;
 // mapper 51
 		case BMC_BALLGAMES_11IN1:
@@ -1236,9 +1241,6 @@ static int unif_initialize( running_machine *machine, int idx )
 		case UNL_CC21:
 			prg32(machine, 0);
 			chr8(machine, 0, CHRROM);
-			break;
-		case UNL_KOF97:
-			mapper_initialize(machine, 4);
 			break;
 		case UNL_T230:
 			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
