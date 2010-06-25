@@ -28052,6 +28052,17 @@
 	</software>
 
 	<software name="texashld">
+		<description>Texas Hold 'em Poker (Euro, Rev. 1)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="texas hold 'em poker (europe) (rev 1).bin" size="4194304" crc="1a13df6b" sha1="f6d018d9174bf04fd8c90b3173570391f2d11b19" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="texashlda" cloneof="texashld">
 		<description>Texas Hold 'em Poker (Euro, USA)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
@@ -31668,6 +31679,30 @@
 		<part name="cart" interface="gba_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="xploder advance (europe) (unl).bin" size="131072" crc="ad71f6ff" sha1="b7e7448152df42548a6d7a8a593543d439bbfd45" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Misc dumps to sort -->
+
+	<software name="tintoyd1" cloneof="tintoyd">
+		<description>Tin Toy Advance (Demo 1, 20010529)</description>
+		<year>2001</year>
+		<publisher>Mutation Software</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="2142784">
+				<rom name="tintoy (gba engine demo 1).bin" size="2142784" crc="944aa8fb" sha1="975ea205a3457c48c2062b8313dd37c8e6bf918e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tintoyd">
+		<description>Tin Toy Advance (Demo 2, 20010717)</description>
+		<year>2001</year>
+		<publisher>Mutation Software</publisher>
+		<part name="cart" interface="gba_cart">
+			<dataarea name="rom" size="2391740">
+				<rom name="tintoy (gba engine demo 2).bin" size="2391740" crc="7bda5802" sha1="dea31690917e27850922f5aa40c1c43ea785e438" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

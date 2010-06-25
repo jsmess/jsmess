@@ -88,7 +88,11 @@
   * Jack Nicklaus Power Challenge
   * Stone Protectors
   * Danny Sullivan's Indy Heat
-  * Star Trek Starfleet Academy".
+  * Star Trek Starfleet Academy
+  
+Known undumped pirates
+
+  * 
 
 -->
 
@@ -24050,6 +24054,75 @@
 		</part>
 	</software>
 
+<!-- Other Dumps to be sorted -->
+
+	<software name="dynoblaz">
+		<description>Dyno Blaze (Early Prototype)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1511878">
+				<rom name="dyno blaze (proto).bin" size="1511878" crc="d625e584" sha1="c5f01dcfbf01d9a3b08e4d6ebe0c460cc3508413" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deathcal">
+		<description>Death Caliber (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="4194304">
+				<rom name="death caliber.bin" size="4194304" crc="3cd2c797" sha1="414bce2fa385642fccaa4653339dae44f1913505" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="comnconq">
+		<description>Command &amp; Conquer (Prototype)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1598086">
+				<rom name="command &amp; conquer (beta).bin" size="1598086" crc="747fcc62" sha1="221ab42a07c37e8c4c4b0d2852b376874c522add" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="commands">
+		<description>Commandos (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="commandos.bin" size="2097152" crc="28a88d6f" sha1="8adecc339a364b9516a5d83536bbdfa87ea20dda" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="deerhunt">
+		<description>Deer Hunter (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="1048576">
+				<rom name="deer hunter.bin" size="1048576" crc="da11978b" sha1="866fb68f8398da233835d198dbfea52bae387818" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hpotter">
+		<description>Harry Potter (Rus)</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="harry potter.bin" size="2097152" crc="a184fc76" sha1="e7d8b985243bd5bbd00c68b89060d0a37bf61870" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Non game cartridge -->
 
 	<software name="ar" supported="no">
@@ -24192,5 +24265,6 @@
 	</software>
 
 -->
+
 
 </softwarelist>

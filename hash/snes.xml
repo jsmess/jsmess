@@ -23174,14 +23174,27 @@ Among undumped protos & special release
 		</part>
 	</software>
 
-	<software name="picachu">
+	<software name="pokemon">
 		<!-- Serial:  - Release Date:  -->
-		<description>Picachu (World)</description>
+		<description>Pocket Monster (World)</description>
 		<year>19??</year>
 		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="snes_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="picachu (world) (unl).sfc" size="2097152" crc="892c6765" sha1="bf4ba0eea04c777c97a2d622d939597e7c0b340b" offset="000000" />
+				<rom name="pocket monster (world) (unl).sfc" size="2097152" crc="892c6765" sha1="bf4ba0eea04c777c97a2d622d939597e7c0b340b" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This is temporarily included for reference, until we fix emulation of the good dump -->
+	<software name="pokemonh" cloneof="pokemon">
+		<!-- Serial:  - Release Date:  -->
+		<description>Pocket Monster (World, Cracked)</description>
+		<year>19??</year>
+		<publisher>&lt;unlicensed&gt;</publisher>
+		<part name="cart" interface="snes_cart">
+			<dataarea name="rom" size="2097152">
+				<rom name="pocket monster (world) (cracked).sfc" size="2097152" crc="1e21df4a" sha1="6f56ae4f76229ad749d1e28634540328d6fb9205" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
