@@ -489,7 +489,7 @@ static const nes_pcb pcb_list[] =
 	{ "RCM-GS2015",       RCM_GS2015 },
 	{ "RCM-TETRISFAMILY", RCM_TETRISFAMILY },
 	{ "UNL-NINJARYU",     UNSUPPORTED_BOARD },// mapper 111
-	{ "UNL-NANJING",      UNSUPPORTED_BOARD },// mapper 163
+	{ "UNL-NANJING",      NANJING_BOARD },// mapper 163
 	{ "FUKUTAKE",         UNSUPPORTED_BOARD },
 	{ "WHIRLWIND-2706",   UNSUPPORTED_BOARD },
 	{ "UNL-H2288",        UNSUPPORTED_BOARD },	// mapper 123
@@ -5243,6 +5243,112 @@ static WRITE8_HANDLER( magics_md_w )
 	
 	prg32(space->machine, data >> 1);
 	chr8(space->machine, data, CHRROM);
+}
+
+/*************************************************************
+ 
+ Bootleg Board by Nanjing
+ 
+ Games: A lot of pirate originals
+  
+ iNES: mapper 163
+ 
+ In MESS: Unsupported.
+ 
+ *************************************************************/
+
+static void nanjing_irq( running_device *device, int scanline, int vblank, int blanked )
+{
+	nes_state *state = (nes_state *)device->machine->driver_data;
+
+	if (BIT(state->mmc_reg[0], 7))
+	{
+		if (scanline == 127)
+		{
+			chr4_0(device->machine, 1, CHRRAM);
+			chr4_4(device->machine, 1, CHRRAM);
+		}
+		
+		if (scanline == 239)
+		{
+			chr4_0(device->machine, 0, CHRRAM);
+			chr4_4(device->machine, 0, CHRRAM);
+		}
+	}
+	
+}
+
+static WRITE8_HANDLER( nanjing_l_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("nanjing_l_w, offset: %04x, data: %02x\n", offset, data));
+	
+	offset += 0x100;
+
+	if (offset < 0x1000)
+		return;
+
+	if (offset == 0x1100)	// 0x5100
+	{
+		if (data == 6)
+			prg32(space->machine, 3);
+		return;
+	}
+	
+	if (offset == 0x1101)	// 0x5101
+	{
+		UINT8 temp = state->mmc_count;
+		state->mmc_count = data;
+		
+		if (temp & !data)
+			state->mmc_latch2 ^= 0xff;
+	}
+
+	switch (offset & 0x300)
+	{
+		case 0x000:
+		case 0x200:
+			state->mmc_reg[BIT(offset, 9)] = data;
+			if (!BIT(state->mmc_reg[0], 7) && ppu2c0x_get_current_scanline(state->ppu) <= 127)
+				chr8(space->machine, 0, CHRRAM);
+			break;
+		case 0x300:
+			state->mmc_latch1 = data;
+			break;
+	}
+
+	prg32(space->machine, (state->mmc_reg[0] & 0x0f) | ((state->mmc_reg[1] & 0x0f) << 4));
+}
+
+static READ8_HANDLER( nanjing_l_r )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	UINT8 value = 0;
+	LOG_MMC(("nanjing_l_r, offset: %04x\n", offset));
+	
+	offset += 0x100;
+	
+	if (offset < 0x1000)
+		return 0;
+	
+	switch (offset & 0x700)
+	{
+		case 0x100:
+			value = state->mmc_latch1;
+			break;
+		case 0x500:
+			value = state->mmc_latch2 & state->mmc_latch1;
+			break;
+		case 0x000:
+		case 0x200:
+		case 0x300:
+		case 0x400:
+		case 0x600:
+		case 0x700:
+			value = 4;
+			break;
+	}
+	return value;
 }
 
 /*************************************************************
@@ -10683,6 +10789,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ SUBOR_TYPE0,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(subor0_w),              NULL, NULL, NULL },
 	{ SUBOR_TYPE1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(subor1_w),              NULL, NULL, NULL },
 	{ MAGICSERIES_MD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(magics_md_w),           NULL, NULL, NULL },
+	{ NANJING_BOARD,        {nanjing_l_w, nanjing_l_r}, NES_NOACCESS, NES_NOACCESS,           NULL, NULL, nanjing_irq }, 
 	{ NITRA_TDA,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nitra_w),               NULL, NULL, mmc3_irq },
 	{ NTDEC_ASDER,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ntdec_asder_w),         NULL, NULL, NULL },
 	{ NTDEC_FIGHTINGHERO,   NES_NOACCESS, NES_WRITEONLY(ntdec_fh_m_w), NES_NOACCESS,          NULL, NULL, NULL },

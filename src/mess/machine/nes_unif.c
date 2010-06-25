@@ -841,6 +841,16 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg16_cdef(machine, state->prg_chunks - 1);
 			set_nt_mirroring(machine, PPU_MIRROR_LOW);
 			break;
+// mapper 163
+		case NANJING_BOARD:
+			state->mmc_count = 0xff;
+			state->mmc_reg[0] = 0xff;
+			state->mmc_reg[1] = 0;
+			state->mmc_latch1 = 0;
+			state->mmc_latch2 = 0;
+			prg16_89ab(machine, state->prg_chunks - 2);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
 // mapper 164
 		case WAIXING_FFV:
 			prg32(machine, 0xff);
