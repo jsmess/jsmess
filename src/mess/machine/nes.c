@@ -90,91 +90,88 @@ static void init_nes_core( running_machine *machine )
 		pcb_handlers_setup(machine);
 
 	/* Set up the memory handlers for the mapper */
-	switch (state->mapper)
+	state->slow_banking = 0;
+	memory_install_read_bank(space, 0x8000, 0x9fff, 0, 0, "bank1");
+	memory_install_read_bank(space, 0xa000, 0xbfff, 0, 0, "bank2");
+	memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank3");
+	memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank4");
+	memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
+	
+	/* configure banks 1-4 */
+	for (i = 0; i < 4; i++)
 	{
-		case 50:
-			memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, nes_mapper50_add_w);
-			memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, nes_mapper50_add_w);
-		default:
-			state->slow_banking = 0;
-			memory_install_read_bank(space, 0x8000, 0x9fff, 0, 0, "bank1");
-			memory_install_read_bank(space, 0xa000, 0xbfff, 0, 0, "bank2");
-			memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank3");
-			memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank4");
-			memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
-
-			/* configure banks 1-4 */
-			for (i = 0; i < 4; i++)
-			{
-				memory_configure_bank(machine, bank_names[i], 0, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
-				// some mappers (e.g. MMC5) can map PRG RAM in  0x8000-0xffff as well
-				if (state->prg_ram)
-					memory_configure_bank(machine, bank_names[i], prg_banks, state->wram_size / 0x2000, state->wram, 0x2000);
-				// however, at start we point to PRG ROM
-				memory_set_bank(machine, bank_names[i], i);
-				state->prg_bank[i] = i;
-			}
-
-			/* bank 5 configuration is more delicate, since it can have PRG RAM, PRG ROM or SRAM mapped to it */
-			/* we first map PRG ROM banks, then the battery bank (if a battery is present), and finally PRG RAM (state->wram) */
-			memory_configure_bank(machine, "bank5", 0, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
-			state->battery_bank5_start = prg_banks;
-			state->prgram_bank5_start = prg_banks;
-			state->empty_bank5_start = prg_banks;
-
-			/* add battery ram, but only if there's no trainer since they share overlapping memory. */
-			if (state->battery && !state->trainer)
-			{
-				UINT32 bank_size = (state->battery_size > 0x2000) ? 0x2000 : state->battery_size;
-				int bank_num = (state->battery_size > 0x2000) ? state->battery_size / 0x2000 : 1;
-				memory_configure_bank(machine, "bank5", prg_banks, bank_num, state->battery_ram, bank_size);
-				state->prgram_bank5_start += bank_num;
-				state->empty_bank5_start += bank_num;
-			}
-			/* add prg ram. */
-			if (state->prg_ram)
-			{
-				memory_configure_bank(machine, "bank5", state->prgram_bank5_start, state->wram_size / 0x2000, state->wram, 0x2000);
-				state->empty_bank5_start += state->wram_size / 0x2000;
-			}
-
-			memory_configure_bank(machine, "bank5", state->empty_bank5_start, 1, state->rom + 0x6000, 0x2000);
-			
-			/* if we have any additional PRG RAM, point bank5 to its first bank */
-			if (state->battery || state->prg_ram)
-				state->prg_bank[4] = state->battery_bank5_start;
-			else
-				state->prg_bank[4] = state->empty_bank5_start; // or shall we point to "maincpu" region at 0x6000? point is that we should never access this region if no sram or wram is present!
-
-			memory_set_bank(machine, "bank5", state->prg_bank[4]);
-
-			if (state->four_screen_vram)
-			{
-				state->extended_ntram = auto_alloc_array(machine, UINT8, 0x2000);
-				state_save_register_global_pointer(machine, state->extended_ntram, 0x2000);
-			}
-
-			// there are still some quirk about writes to bank5... I hope to fix them soon. (mappers 34,45,52,246 have both mid_w and WRAM-->check)
-			if (state->mmc_write_mid)
-				memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, state->mmc_write_mid);
-			if (state->mmc_write)
-				memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, state->mmc_write);
-
-			// In fact, we also allow single pcbs to overwrite the bank read handlers defined above,
-			// because some pcbs (mainly pirate ones) require protection values to be read instead of
-			// the expected ROM banks: these handlers, though, must take care of the ROM access as well
-			if (state->mmc_read_mid)
-				memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, state->mmc_read_mid);
-			if (state->mmc_read)
-				memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, state->mmc_read);
-			break;
+		memory_configure_bank(machine, bank_names[i], 0, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+		// some mappers (e.g. MMC5) can map PRG RAM in  0x8000-0xffff as well
+		if (state->prg_ram)
+			memory_configure_bank(machine, bank_names[i], prg_banks, state->wram_size / 0x2000, state->wram, 0x2000);
+		// however, at start we point to PRG ROM
+		memory_set_bank(machine, bank_names[i], i);
+		state->prg_bank[i] = i;
 	}
-
+	
+	/* bank 5 configuration is more delicate, since it can have PRG RAM, PRG ROM or SRAM mapped to it */
+	/* we first map PRG ROM banks, then the battery bank (if a battery is present), and finally PRG RAM (state->wram) */
+	memory_configure_bank(machine, "bank5", 0, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
+	state->battery_bank5_start = prg_banks;
+	state->prgram_bank5_start = prg_banks;
+	state->empty_bank5_start = prg_banks;
+	
+	/* add battery ram, but only if there's no trainer since they share overlapping memory. */
+	if (state->battery && !state->trainer)
+	{
+		UINT32 bank_size = (state->battery_size > 0x2000) ? 0x2000 : state->battery_size;
+		int bank_num = (state->battery_size > 0x2000) ? state->battery_size / 0x2000 : 1;
+		memory_configure_bank(machine, "bank5", prg_banks, bank_num, state->battery_ram, bank_size);
+		state->prgram_bank5_start += bank_num;
+		state->empty_bank5_start += bank_num;
+	}
+	/* add prg ram. */
+	if (state->prg_ram)
+	{
+		memory_configure_bank(machine, "bank5", state->prgram_bank5_start, state->wram_size / 0x2000, state->wram, 0x2000);
+		state->empty_bank5_start += state->wram_size / 0x2000;
+	}
+	
+	memory_configure_bank(machine, "bank5", state->empty_bank5_start, 1, state->rom + 0x6000, 0x2000);
+	
+	/* if we have any additional PRG RAM, point bank5 to its first bank */
+	if (state->battery || state->prg_ram)
+		state->prg_bank[4] = state->battery_bank5_start;
+	else
+		state->prg_bank[4] = state->empty_bank5_start; // or shall we point to "maincpu" region at 0x6000? point is that we should never access this region if no sram or wram is present!
+	
+	memory_set_bank(machine, "bank5", state->prg_bank[4]);
+	
+	if (state->four_screen_vram)
+	{
+		state->extended_ntram = auto_alloc_array(machine, UINT8, 0x2000);
+		state_save_register_global_pointer(machine, state->extended_ntram, 0x2000);
+	}
+	
+	// there are still some quirk about writes to bank5... I hope to fix them soon. (mappers 34,45,52,246 have both mid_w and WRAM-->check)
+	if (state->mmc_write_mid)
+		memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, state->mmc_write_mid);
+	if (state->mmc_write)
+		memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, state->mmc_write);
+	
+	// In fact, we also allow single pcbs to overwrite the bank read handlers defined above,
+	// because some pcbs (mainly pirate ones) require protection values to be read instead of
+	// the expected ROM banks: these handlers, though, must take care of the ROM access as well
+	if (state->mmc_read_mid)
+		memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, state->mmc_read_mid);
+	if (state->mmc_read)
+		memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, state->mmc_read);
+	
 	// install additional handlers
 	if (state->pcb_id == BTL_SMB2B)
 	{
 		memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, smb2jb_extra_w);
 		memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, smb2jb_extra_w);
+	}
+	if (state->mapper == 50)
+	{
+		memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, nes_mapper50_add_w);
+		memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, nes_mapper50_add_w);
 	}
 }
 
