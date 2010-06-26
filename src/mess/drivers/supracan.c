@@ -42,6 +42,21 @@ bp 0269E4
 [ff7be4] <- 0x269ec
 bpclear
 
+Sound notes:
+
+There are 6 interrupt sources on the 6502 side, all of which use the IRQ line.
+The register at 0x411 is bitmapped to indicate what source(s) are active.
+In priority order from most to least important, they are:
+
+411 value  How acked                     Notes
+0x40       read reg 0x16 of sound chip	 likely timer. snd regs 0x16/0x17 are time constant, write 0 to reg 0x9f to start
+0x04       read at 0x405                 latch 1?  0xcd is magic value
+0x08       read at 0x404                 latch 2?  0xcd is magic value
+0x10       read at 0x409                 unknown, dispatched but not used in startup 6502 code
+0x20       read at 0x40a                 possible periodic like vblank?
+0x80       read reg 0x14 of sound chip   depends on reg 0x14 of sound chip & 0x40: if not set writes 0x8f to reg 0x14, 
+                                         otherwise writes 0x4f to reg 0x14 and performs additional processing
+
 ***************************************************************************/
 
 #include "emu.h"
