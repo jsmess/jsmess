@@ -75,13 +75,10 @@ LIBOCORE_NOMAIN = $(OBJ)/libocore_nomain.a
 
 EMUOBJS += \
 	$(MESSOBJ)/mess.o		\
-	$(MESSOBJ)/messopts.o	\
 	$(MESSOBJ)/uimess.o		\
 	$(MESSOBJ)/tapectrl.o	\
 	$(MESSOBJ)/utils.o		\
 	$(MESSOBJ)/eventlst.o	\
 	$(MESSOBJ)/cheatms.o	\
-	$(MESSOBJ)/infomess.o	\
-	$(MESSOBJ)/climess.o	\
 
 $(LIBEMU): $(EMUOBJS)

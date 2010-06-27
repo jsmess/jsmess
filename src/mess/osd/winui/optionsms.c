@@ -13,7 +13,6 @@
 #include "mui_opts.h"
 #include "optionsms.h"
 #include "emuopts.h"
-#include "messopts.h"
 #include "winmain.h"
 
 #define WINGUIOPTION_SOFTWARE_COLUMN_SHOWN		"mess_column_shown"

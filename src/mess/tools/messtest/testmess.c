@@ -18,8 +18,6 @@
 #include "sound/wavwrite.h"
 #include "video/generic.h"
 #include "render.h"
-#include "messopts.h"
-#include "device.h"
 #include "devices/messram.h"
 #include "debug/debugcpu.h"
 
