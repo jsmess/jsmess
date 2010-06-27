@@ -68,6 +68,8 @@ System Driver Changes:
 
 - [GBA] Improved flash saving in games such as Sword of Mana [R. Belmont]
 
+- [MAC] Improved Egret MCU simulation [R. Belmont]
+
 - [TI99] ti99cart: Fix for bug #1953 (assert with HSGPL set to on); 
   type paged379i can now handle 128 KiB, minimem now accepts cartridges without 
   rom part. Fixed at29c040a (CFI commands are only checked against A14 to A0).
