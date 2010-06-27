@@ -5,7 +5,6 @@
 
     Nate Woods, Raphael Nabet, R. Belmont
 
-
         0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
         0x400000 - 0x4fffff     ROM
         0x580000 - 0x5fffff     5380 NCR/Symbios SCSI peripherals chip (Mac Plus only)
@@ -85,12 +84,31 @@ static READ8_HANDLER(mac_asc_r)
 {
 	mac_state *mac = (mac_state *)space->machine->driver_data;
 
-//  logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
+	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
 
 	switch (offset)
 	{
-		case 0:	// VERSION
+		case 0x800:	// VERSION
+			// LC/LCII return 0xe8 (V8 ASIC ASC emulation)
+			if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
+		      	{
+				return 0xe8;
+			}
+
+			// LCIII returns 0xbc (Sonora ASIC ASC emulation)
+			if (mac->mac_model == MODEL_MAC_LC_III)
+			{
+				return 0xbc;
+			}
+
 			return 0;	// original ASC
+
+		case 0x804:
+			if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
+		      	{
+				return 3;
+			}
+			break;
 
 		default:
 			break;
@@ -105,7 +123,7 @@ static WRITE8_HANDLER(mac_asc_w)
 	INT32 i;
 	mac_state *mac = (mac_state *)space->machine->driver_data;
 
-//  logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
+	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
 
 	mac->mac_asc_regs[offset] = data;
 
@@ -874,6 +892,7 @@ static MACHINE_DRIVER_START( maciix )
 
 	MDRV_CPU_REPLACE("maincpu", M68030, 7833600*2)
 	MDRV_CPU_PROGRAM_MAP(macii_map)
+	MDRV_CPU_VBLANK_INT("screen", mac_cb264_vbl)
 
 	MDRV_RAM_MODIFY("messram")
 	MDRV_RAM_DEFAULT_SIZE("2M")

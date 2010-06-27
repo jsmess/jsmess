@@ -78,7 +78,7 @@
 #include "devices/messram.h"
 
 #define ADB_IS_BITBANG	(mac->mac_model >= MODEL_MAC_SE && mac->mac_model <= MODEL_MAC_CLASSIC) || (mac->mac_model >= MODEL_MAC_II && mac->mac_model <= MODEL_MAC_IICX) || (mac->mac_model == MODEL_MAC_SE30)
-#define ADB_IS_EGRET	(mac->mac_model >= MODEL_MAC_LC && mac->mac_model <= MODEL_MAC_COLOR_CLASSIC) || (mac->mac_model == MODEL_MAC_IICI) || (mac->mac_model == MODEL_MAC_IISI)
+#define ADB_IS_EGRET	(mac->mac_model >= MODEL_MAC_LC && mac->mac_model <= MODEL_MAC_COLOR_CLASSIC) || (mac->mac_model == MODEL_MAC_IISI)
 #define ADB_IS_PM	(mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 
 #ifdef MAME_DEBUG
@@ -997,7 +997,6 @@ WRITE16_HANDLER ( mac_scc_2_w )
 {
 	running_device *scc = devtag_get_device(space->machine, "scc");
 	UINT8 wdata = data>>8;
-
 	scc8530_w(scc, offset, wdata);
 }
 
@@ -1798,16 +1797,46 @@ static TIMER_CALLBACK(mac_adb_tick)
 			// Egret sending a response to the 680x0?
 			if (mac->adb_state & 1)
 			{
-				mac->adb_send = mac->adb_buffer[mac->adb_datasize];
-				#if LOG_ADB
-				printf("Egret ADB: done sending byte %02x, %d left\n", mac->adb_send, mac->adb_datasize);
-				#endif
+				if (mac->adb_datasize > 0)
+				{
+					mac->adb_send = mac->adb_buffer[mac->adb_datasize];
+					#if LOG_ADB
+					printf("Egret ADB: sending byte %02x, %d left\n", mac->adb_send, mac->adb_datasize-1);
+					#endif
 
-				mac->adb_datasize--;
-				mac->adb_timer_ticks = 8;
-				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+					mac->adb_datasize--;
+				}
+				else
+				{
+					switch (mac->adb_streaming)
+					{
+						case MCU_STREAMING_PRAMRD:
+							#if LOG_ADB
+							printf("Egret ADB: streaming PRAM byte %02x = %02x\n", mac->adb_stream_ptr, mac->rtc_ram[mac->adb_stream_ptr]);
+							#endif
+							mac->adb_send = mac->rtc_ram[mac->adb_stream_ptr++];
+							if (mac->adb_stream_ptr >= 256)
+							{
+								#if LOG_ADB
+								printf("Egret ADB: this is the last PRAM byte, dropping XS\n");
+								#endif
+								mac->adb_state &= ~1;
+							}
+							break;
 
-				if (mac->adb_datasize == 0)
+						default:
+							#if LOG_ADB
+							printf("Egret ADB: trying to stream unhandled type\n");
+							#endif
+							mac->adb_send = 0;
+							break;
+					}
+				}
+
+//				mac->adb_timer_ticks = 8;
+//				timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+
+				if ((mac->adb_datasize == 0) && (mac->adb_streaming == MCU_STREAMING_NONE))
 				{
 					#if LOG_ADB
 					printf("Egret ADB: this is the last byte, dropping XS\n");
@@ -1817,11 +1846,15 @@ static TIMER_CALLBACK(mac_adb_tick)
 			}
 			else
 			{
-				#if LOG_ADB
-				printf("Egret ADB: got command byte %02x\n", mac->adb_command);
-				#endif
-				mac->adb_buffer[mac->adb_datasize++] = mac->adb_command;
-				mac->adb_command = 0;
+				// it's not a command byte if SS is low
+				if (mac->adb_state & 0x02)
+				{
+					#if LOG_ADB
+					printf("Egret ADB: got command byte %02x [%02x]\n", mac->adb_command, mac->adb_datasize);
+					#endif
+					mac->adb_buffer[mac->adb_datasize++] = mac->adb_command;
+					mac->adb_command = 0;
+				}
 			}
 		}
 	}
@@ -1839,7 +1872,7 @@ static READ8_DEVICE_HANDLER(mac_adb_via_in_cb2)
 	ret = (mac->adb_send & 0x80)>>7;
 	mac->adb_send <<= 1;
 
-//  printf("IN CB2 = %x\n", ret);
+//	printf("VIA IN CB2 = %x\n", ret);
 
 	return ret;
 }
@@ -1848,7 +1881,7 @@ static WRITE8_DEVICE_HANDLER(mac_adb_via_out_cb2)
 {
 	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-//      printf("OUT CB2 = %x\n", data);
+//        printf("VIA OUT CB2 = %x\n", data);
 	mac->adb_command <<= 1;
 	mac->adb_command |= data & 1;
 }
@@ -1925,28 +1958,26 @@ static void mac_egret_response_std(mac_state *mac, int type, int flag, int cmd)
 
 static void mac_egret_response_read_pram(mac_state *mac, int addr)
 {
-	int count = 0x100 - addr;
-
-	mac->adb_datasize = count+3;
-
-	mac->adb_buffer[count+3] = 1;
-	mac->adb_buffer[count+2] = 0;
-	mac->adb_buffer[count+1] = 7;
-	while (count)
-	{
-		mac->adb_buffer[count] = mac->rtc_ram[addr];
-		addr++;
-		count--;
-	}
+	mac->adb_datasize = 4;
 
 	mac->adb_send = 0xaa;
+	mac->adb_buffer[4] = 1;	// type
+	mac->adb_buffer[3] = 0;	// flag
+	mac->adb_buffer[2] = 7;	// command
+	mac->adb_buffer[1] = mac->rtc_ram[addr]; 
+
 	mac->adb_state |= 1;
 	mac->adb_timer_ticks = 8;
 	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+
+	// read PRAM is a "streaming" command, don't drop the state line when we're out of data
+	mac->adb_streaming = MCU_STREAMING_PRAMRD;
+	mac->adb_stream_ptr = addr+1;
 }
 
 static void mac_egret_mcu_exec(mac_state *mac)
 {
+	mac->adb_streaming = MCU_STREAMING_NONE;
 	switch (mac->adb_buffer[1])
 	{
 		case 0x01:	// enable/disable ADB auto-polling
@@ -1970,6 +2001,51 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			#endif
 
 			mac_egret_response_read_pram(mac, mac->adb_buffer[2]<<8 | mac->adb_buffer[3]);
+			break;
+
+		case 0x08: // write 6805 address
+			{
+				int addr = mac->adb_buffer[2]<<8 | mac->adb_buffer[3];
+				int len = mac->adb_datasize - 4;
+
+				#if LOG_ADB
+				printf("ADB: Egret write %d bytes to address %x\n", len, addr);
+				#endif
+
+				// check if this is a sneaky PRAM write (PRAM is at 6805 address 0x100)
+				if ((addr >= 0x100) && (addr <= 0x200))
+				{
+					for (int i = 0; i < len; i++)
+					{
+						mac->rtc_ram[(addr-0x100)+i] = mac->adb_buffer[4+i];
+					}
+				}
+				#if LOG_ADB
+				else
+				{
+					printf("ADB: Egret unhandled direct write\n");
+				}
+				#endif
+
+				mac_egret_response_std(mac, 1, 0, 0x08);
+			}
+			break;
+
+		case 0x0c: // write PRAM
+			#if LOG_ADB
+			printf("ADB: Egret write %02x to PRAM at %x\n", mac->adb_buffer[4], mac->adb_buffer[2]<<8 | mac->adb_buffer[3]);
+			#endif
+
+			mac->rtc_ram[mac->adb_buffer[2]<<8 | mac->adb_buffer[3]] = mac->adb_buffer[4];
+
+			mac->adb_datasize = 4;
+			mac->adb_buffer[4] = 1;	// type
+			mac->adb_buffer[3] = 0;	// flag
+			mac->adb_buffer[2] = 0x0c;	// command
+			mac->adb_buffer[1] = 0;	// spare
+			mac->adb_state |= 1;
+			mac->adb_timer_ticks = 8;
+			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 			break;
 
 		case 0x0e: // send to DFAC
@@ -2023,24 +2099,49 @@ static void mac_egret_newaction(mac_state *mac, int state)
 	if (state != mac->adb_state)
 	{
 		#if LOG_ADB
-		printf("ADB: New Egret state: SS %d VF %d XS %d\n", (state>>2)&1, (state>>1)&1, mac->adb_state&1);
+		printf("ADB: New Egret state: SS %d VF %d XS (68k %d MCU %d)\n", (state>>2)&1, (state>>1)&1, state&1, mac->adb_state&1);
 		#endif
 
-		// if bit 2 is high and stays high, the rising edge of bit 1 indicates the start of sending a command
-		if ((state & 0x04) && (mac->adb_state & 0x04) && (state & 0x02) && !(mac->adb_state & 0x02))
+		// if bit 2 is high and stays high, the rising edge of bit 1 indicates the start of sending a byte to the MCU if XS isn't high
+		if ((state & 0x04) && (mac->adb_state & 0x04) && (state & 0x02) && !(mac->adb_state & 0x02) && !(mac->adb_state & 0x01))
 		{
-			mac->adb_command = mac->adb_send = 0;
+			mac->adb_command = 0;
 			mac->adb_timer_ticks = 8;
 			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 		}
 
+		// if bit 2 is high and stays high, the falling edge of bit 1, and we're in send phase, the MCU should clock out a byte
+		if ((state & 0x04) && (mac->adb_state & 0x04) && !(state & 0x02) && (mac->adb_state & 0x02) && (mac->adb_state & 0x01))
+		{
+			mac->adb_timer_ticks = 8;
+			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+		}
+
+		// if bit 2 rises, bit 1 is 0, and MCU XS is high, the MCU should clock out a byte
+		if ((state & 0x04) && !(mac->adb_state & 0x04) && !(state & 0x02) && (mac->adb_state & 0x01))
+		{
+			mac->adb_timer_ticks = 8;
+			timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
+		}
+
+		// if bit 2 drops and bit 1 is 1, terminate the command
+		if ((state & 0x02) && !(state & 0x04) && (mac->adb_state & 0x04))
+		{
+			#if LOG_ADB
+			printf("Egret ADB: SESSION dropped with VF=1, terminating command\n");
+			#endif
+			mac->adb_streaming = MCU_STREAMING_NONE;
+			mac->adb_state &= ~1;
+			mac->adb_datasize = 0;
+		}
+
 		// if bit 2 drops and bit 1 is zero, execute the command
-		if (!(state & 0x02) && !(state & 0x04) && (mac->adb_state & 0x04) && (mac->adb_datasize))
+		if (!(state & 0x02) && !(state & 0x04) && (mac->adb_state & 0x04) && (mac->adb_datasize > 0))
 		{
 			#if LOG_ADB
 			int i;
 
-			printf("ADB: Egret exec command with %d bytes: ", mac->adb_datasize);
+			printf("Egret ADB: exec command with %d bytes: ", mac->adb_datasize);
 
 			for (i = 0; i < mac->adb_datasize; i++)
 			{
@@ -2138,6 +2239,7 @@ static void adb_reset(mac_state *mac)
 	mac->adb_extclock = 0;
 	mac->adb_send = 0;
 	mac->adb_waiting_cmd = 0;
+	mac->adb_streaming = MCU_STREAMING_NONE;
 	if (ADB_IS_BITBANG)
 	{
 		mac->adb_state = ADB_STATE_NOTINIT;
