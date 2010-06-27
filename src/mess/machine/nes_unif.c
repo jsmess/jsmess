@@ -128,18 +128,18 @@ static const unif unif_list[] =
 	{ "BMC-FK23C",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD /*BMC_FK23C*/},
 	{ "BMC-FK23CA",                 0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD /*BMC_FK23C*/},	// diff reg init
 	{ "BMC-GHOSTBUSTERS63IN1",      0,    0, CHRRAM_8,  NT_HORZ, UNSUPPORTED_BOARD /*BMC_G63IN1*/},
-	{ "BMC-BS-5",                   0,    0, CHRRAM_0,  NT_VERT, UNSUPPORTED_BOARD /*BENSHENG_BS5*/},
-	{ "BMC-810544-C-A1",            0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
+	{ "BMC-BS-5",                   0,    0, CHRRAM_0,  NT_VERT, BMC_BENSHENG_BS5},
+	{ "BMC-810544-C-A1",            0,    0, CHRRAM_0,  NT_X,  BMC_810544},
 	{ "BMC-411120-C",               0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
 	{ "BMC-8157",                   0,    0, CHRRAM_8,  NT_VERT, UNSUPPORTED_BOARD /*BMC_8157*/},
 	{ "BMC-42IN1RESETSWITCH",       0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 60?
 	{ "BMC-830118C",                0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
-	{ "BMC-D1038",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, // mapper 60?
+	{ "BMC-D1038",                  0,    0, CHRRAM_0,  NT_X,  BMC_VT5201}, // mapper 60?
 	{ "BMC-12-IN-1",                0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
 	{ "BMC-70IN1",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 236?
 	{ "BMC-70IN1B",                 0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 236?
 	{ "BMC-SUPERVISION16IN1",       0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 53
-	{ "BMC-NTD-03",                 0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}
+	{ "BMC-NTD-03",                 0,    0, CHRRAM_0,  NT_X,  BMC_NTD_03}
 };
 
 const unif *nes_unif_lookup( const char *board )
@@ -307,6 +307,14 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc5_split_scr = 0;
 			memset(state->MMC5_vrom_bank, 0, ARRAY_LENGTH(state->MMC5_vrom_bank));
 			state->mid_ram_enable = 0;
+			state->mmc5_prg_mode = 3;
+			state->mmc5_last_chr_a = 1;
+			state->mmc5_prg_regs[0] = 0xfc;
+			state->mmc5_prg_regs[1] = 0xfd;
+			state->mmc5_prg_regs[2] = 0xfe;
+			state->mmc5_prg_regs[3] = 0xff;
+			memset(state->mmc5_vrom_regA, ~0, ARRAY_LENGTH(state->mmc5_vrom_regA));
+			memset(state->mmc5_vrom_regB, ~0, ARRAY_LENGTH(state->mmc5_vrom_regB));
 			prg16_89ab(machine, state->prg_chunks - 2);
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
@@ -1283,6 +1291,19 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg16_cdef(machine, 0);
 			chr8(machine, 0, CHRROM);
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+
+		case BMC_NTD_03:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			chr8(machine, 0, CHRROM);
+			break;
+
+		case UNL_EDU2K:
+			break;
+
+		case BMC_G63IN1:
+			bmc_gb63_update(machine);
 			break;
 
 		case UNSUPPORTED_BOARD:

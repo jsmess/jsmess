@@ -90,6 +90,18 @@ public:
 	UINT8 mmc5_high_chr;
 	UINT8 mmc5_split_scr;
 	UINT8 *extended_ntram;
+	
+	UINT8 mmc5_last_chr_a;
+	UINT16 mmc5_vrom_regA[8];
+	UINT16 mmc5_vrom_regB[4];
+	UINT8 mmc5_prg_regs[4];
+	UINT8 mmc5_bank_security;
+	UINT8 mmc5_prg_mode;
+	UINT8 mmc5_chr_mode;
+	UINT8 mmc5_chr_high;
+	UINT8 mmc5_split_ctrl;
+	UINT8 mmc5_split_yst;
+	UINT8 mmc5_split_bank;
 
 	/* video-related */
 	int nes_vram_sprite[8]; /* Used only by mmc5 for now */

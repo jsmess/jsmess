@@ -694,6 +694,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 					state->prg_chunks = mapint3;
 					state->chr_chunks = mapint4;
 					logerror("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
+//					printf("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
 					goodcrcinfo = 1;
 					state->ines20 = 0;
 				}
@@ -708,6 +709,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 
 			state->hard_mirroring = (local_options & 0x01) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ;
+//			printf("%s\n", state->hard_mirroring & 0x01 ? "Vertical" : "Horizontal");
 			state->battery = local_options & 0x02;
 			state->trainer = local_options & 0x04;
 			state->four_screen_vram = local_options & 0x08;
@@ -1285,7 +1287,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 #if 0
 		if (state->pcb_id == UNSUPPORTED_BOARD)
-			printf("This board (%s) is currently not supported by MESS\n", image_get_feature(image, "pcb"));
+			printf("This board (%s) is currently not supported by MESS\n", image.get_feature("pcb"));
 		printf("PCB Feature: %s\n", image.get_feature("pcb"));
 		printf("PRG chunks: %d\n", state->prg_chunks);
 		printf("CHR chunks: %d\n", state->chr_chunks);

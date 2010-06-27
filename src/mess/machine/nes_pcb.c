@@ -494,7 +494,7 @@ static const nes_pcb pcb_list[] =
 	{ "WHIRLWIND-2706",   UNSUPPORTED_BOARD },
 	{ "UNL-H2288",        UNSUPPORTED_BOARD },	// mapper 123
 	{ "UNL-DANCE",        UNSUPPORTED_BOARD },
-	{ "UNL-EDU2000",      UNSUPPORTED_BOARD /*UNL_EDU2K*/ },
+	{ "UNL-EDU2000",      UNL_EDU2K },
 	{ "UNL-SHERO",        UNSUPPORTED_BOARD /*SACHEN_SHERO*/ },
 	{ "UNL-TF1201",       UNSUPPORTED_BOARD /*UNL_TF1201*/ },
 	{ "RUMBLESTATION",    RUMBLESTATION_BOARD },	// mapper 46
@@ -574,12 +574,12 @@ static const nes_pcb pcb_list[] =
 	{ "BMC-411120-C",        UNSUPPORTED_BOARD },
 	{ "BMC-830118C",         UNSUPPORTED_BOARD },
 	{ "BMC-12-IN-1",         UNSUPPORTED_BOARD },
-	{ "BMC-NTD-03",          UNSUPPORTED_BOARD },
+	{ "BMC-NTD-03",          BMC_NTD_03 },
 	{ "BMC-8157",            UNSUPPORTED_BOARD /*BMC_8157*/ },
 	{ "BMC-BS-5",            BMC_BENSHENG_BS5 },
 	{ "BMC-FK23C",           UNSUPPORTED_BOARD /*BMC_FK23C*/ },
 	{ "BMC-FK23CA",          UNSUPPORTED_BOARD /*BMC_FK23C*/ },	// diff reg init
-	{ "BMC-GHOSTBUSTERS63IN1", UNSUPPORTED_BOARD /*BMC_G63IN1*/ },
+	{ "BMC-GHOSTBUSTERS63IN1", BMC_G63IN1 },
 	{ "BMC-SUPERVISION16IN1", UNSUPPORTED_BOARD },	// mapper 53
 	{ "BMC-RESETBASED-4IN1", UNSUPPORTED_BOARD },// mapper 60 with 64k prg and 32k chr
 	{ "BMC-VT5201",          BMC_VT5201 },// mapper 60 otherwise
@@ -638,6 +638,25 @@ const nes_pcb *nes_pcb_lookup( const char *board )
 
 ************************************************/
 
+// helper function for the few mappers reading from 0x8000-0xffff for protection
+INLINE UINT8 mmc_hi_access_rom( running_machine *machine, UINT32 offset )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	// usual ROM access
+	switch (offset & 0x6000)
+	{
+		case 0x0000:
+			return state->rom[0x10000 + state->prg_bank[0] * 0x2000 + (offset & 0x1fff)];
+		case 0x2000:
+			return state->rom[0x10000 + state->prg_bank[1] * 0x2000 + (offset & 0x1fff)];
+		case 0x4000:
+			return state->rom[0x10000 + state->prg_bank[2] * 0x2000 + (offset & 0x1fff)];
+		case 0x6000:
+			return state->rom[0x10000 + state->prg_bank[3] * 0x2000 + (offset & 0x1fff)];
+	}
+	return 0;
+}
 
 /*************************************************************
 
@@ -1575,24 +1594,194 @@ static WRITE8_HANDLER( qj_m_w )
 
  *************************************************************/
 
+#if 0
+static void mmc5_update_chr_a( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	switch (state->mmc5_chr_mode)
+	{
+		case 0:	// 8k banks
+			chr8(machine, state->mmc5_vrom_regA[7] & 0xff, CHRROM);
+			break;
+			
+		case 1:	// 4k banks
+			chr4_0(machine, state->mmc5_vrom_regA[3] & 0xff, CHRROM);
+			chr4_4(machine, state->mmc5_vrom_regA[7] & 0xff, CHRROM);
+			break;
+			
+		case 2:	// 2k banks
+			chr2_0(machine, state->mmc5_vrom_regA[1], CHRROM);
+			chr2_2(machine, state->mmc5_vrom_regA[3], CHRROM);
+			chr2_4(machine, state->mmc5_vrom_regA[5], CHRROM);
+			chr2_6(machine, state->mmc5_vrom_regA[7], CHRROM);
+			break;
+			
+		case 3:	// 1k banks
+			chr1_0(machine, state->mmc5_vrom_regA[0], CHRROM);
+			chr1_1(machine, state->mmc5_vrom_regA[1], CHRROM);
+			chr1_2(machine, state->mmc5_vrom_regA[2], CHRROM);
+			chr1_3(machine, state->mmc5_vrom_regA[3], CHRROM);
+			chr1_4(machine, state->mmc5_vrom_regA[4], CHRROM);
+			chr1_5(machine, state->mmc5_vrom_regA[5], CHRROM);
+			chr1_6(machine, state->mmc5_vrom_regA[6], CHRROM);
+			chr1_7(machine, state->mmc5_vrom_regA[7], CHRROM);
+			break;
+	}
+}
+
+static void mmc5_update_chr_b( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	switch (state->mmc5_chr_mode)
+	{
+		case 0:	// 8k banks
+			chr8(machine, state->mmc5_vrom_regB[3] & 0xff, CHRROM);
+			break;
+			
+		case 1:	// 4k banks
+			chr4_0(machine, state->mmc5_vrom_regB[3] & 0xff, CHRROM);
+			chr4_4(machine, state->mmc5_vrom_regB[3] & 0xff, CHRROM);
+			break;
+			
+		case 2:	// 2k banks
+			chr2_0(machine, state->mmc5_vrom_regB[1], CHRROM);
+			chr2_2(machine, state->mmc5_vrom_regB[3], CHRROM);
+			chr2_4(machine, state->mmc5_vrom_regB[1], CHRROM);
+			chr2_6(machine, state->mmc5_vrom_regB[3], CHRROM);
+			break;
+			
+		case 3:	// 1k banks
+			chr1_0(machine, state->mmc5_vrom_regB[0], CHRROM);
+			chr1_1(machine, state->mmc5_vrom_regB[1], CHRROM);
+			chr1_2(machine, state->mmc5_vrom_regB[2], CHRROM);
+			chr1_3(machine, state->mmc5_vrom_regB[3], CHRROM);
+			chr1_4(machine, state->mmc5_vrom_regB[0], CHRROM);
+			chr1_5(machine, state->mmc5_vrom_regB[1], CHRROM);
+			chr1_6(machine, state->mmc5_vrom_regB[2], CHRROM);
+			chr1_7(machine, state->mmc5_vrom_regB[3], CHRROM);
+			break;
+	}
+}
+#endif
+
+static void mmc5_update_prg( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	int bank1, bank2, bank3;
+	
+	switch (state->mmc5_prg_mode)
+	{
+		case 0:	// 32k banks
+			prg32(machine, state->mmc5_prg_regs[3] >> 2);
+			break;
+			
+		case 1:	// 16k banks
+			//          printf("problema 1: %x\n", state->mmc5_prg_regs[1]);
+			bank1 = state->mmc5_prg_regs[1];
+			
+			if (!BIT(bank1, 7))
+			{
+				state->prg_bank[0] = state->prg_chunks + (bank1 & 0x06);
+				state->prg_bank[1] = state->prg_chunks + (bank1 & 0x06) + 1;
+				memory_set_bank(machine, "bank1", state->prg_bank[0]);
+				memory_set_bank(machine, "bank2", state->prg_bank[1]);
+			}
+			else
+				prg16_89ab(machine, bank1 >> 1);
+			
+			prg16_cdef(machine, state->mmc5_prg_regs[3] >> 1);
+			break;
+			
+		case 2:	// 16k-8k banks
+			//          printf("problema 2: %x %x\n", state->mmc5_prg_regs[1], state->mmc5_prg_regs[2]);
+			bank1 = state->mmc5_prg_regs[1];
+			bank3 = state->mmc5_prg_regs[2];
+			
+			if (!BIT(bank1, 7))
+			{
+				state->prg_bank[0] = state->prg_chunks + (bank1 & 0x06);
+				state->prg_bank[1] = state->prg_chunks + (bank1 & 0x06) + 1;
+				memory_set_bank(machine, "bank1", state->prg_bank[0]);
+				memory_set_bank(machine, "bank2", state->prg_bank[1]);
+			}
+			else
+				prg16_89ab(machine, (bank1 & 0x7f) >> 1);
+			
+			if (!BIT(bank3, 7))
+			{
+				state->prg_bank[2] = state->prg_chunks + (bank3 & 0x07);
+				memory_set_bank(machine, "bank3", state->prg_bank[2]);
+			}
+			else
+				prg8_cd(machine, bank3 & 0x7f);
+			
+			prg8_ef(machine, state->mmc5_prg_regs[3]);
+			break;
+			
+		case 3:	// 8k banks
+			//          printf("problema 3: %x %x %x\n", state->mmc5_prg_regs[0], state->mmc5_prg_regs[1], state->mmc5_prg_regs[2]);
+			bank1 = state->mmc5_prg_regs[0];
+			bank2 = state->mmc5_prg_regs[1];
+			bank3 = state->mmc5_prg_regs[2];
+			
+			if (!BIT(bank1, 7))
+			{
+				state->prg_bank[0] = state->prg_chunks + (bank1 & 0x07);
+				memory_set_bank(machine, "bank1", state->prg_bank[0]);
+			}
+			else
+				prg8_89(machine, bank1 & 0x7f);
+			
+			if (!BIT(bank2, 7))
+			{
+				state->prg_bank[1] = state->prg_chunks + (bank2 & 0x07);
+				memory_set_bank(machine, "bank2", state->prg_bank[1]);
+			}
+			else
+				prg8_ab(machine, bank2 & 0x7f);
+			
+			if (!BIT(bank3, 7))
+			{
+				state->prg_bank[2] = state->prg_chunks + (bank3 & 0x07);
+				memory_set_bank(machine, "bank3", state->prg_bank[2]);
+			}
+			else
+				prg8_cd(machine, bank3 & 0x7f);
+			
+			prg8_ef(machine, state->mmc5_prg_regs[3]);
+			break;
+	}
+}
+
+static void mmc5_update_render_mode( running_machine *machine )
+{
+}
+
 static void mmc5_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-
+	
 #if 1
 	if (scanline == 0)
 		state->IRQ_status |= 0x40;
 	else if (scanline > PPU_BOTTOM_VISIBLE_SCANLINE)
 		state->IRQ_status &= ~0x40;
 #endif
-
+	
 	if (scanline == state->IRQ_count)
 	{
 		if (state->IRQ_enable)
 			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
-
+		
 		state->IRQ_status = 0xff;
 	}
+	
+	/* FIXME: this is ok, but then we would need to update them again when we have the BG Hblank
+     I leave it commented out until the PPU is updated for this */
+	//  if (ppu2c0x_is_sprite_8x16(state->ppu) || state->mmc5_last_chr_a)
+	//      mmc5_update_chr_a(device->machine);
+	//  else
+	//      mmc5_update_chr_b(device->machine);
 }
 
 static void mmc5_ppu_mirror( running_machine *machine, int page, int src )
@@ -1621,13 +1810,13 @@ static READ8_HANDLER( exrom_l_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	int retVal;
-
+	
 	/* $5c00 - $5fff: extended videoram attributes */
 	if ((offset >= 0x1b00) && (offset <= 0x1eff))
 	{
 		return state->mmc5_vram[offset - 0x1b00];
 	}
-
+	
 	switch (offset)
 	{
 		case 0x1104: /* $5204 */
@@ -1641,12 +1830,12 @@ static READ8_HANDLER( exrom_l_r )
 			state->IRQ_status &= ~0x80;
 			return retVal;
 #endif
-
+			
 		case 0x1105: /* $5205 */
 			return (state->mult1 * state->mult2) & 0xff;
 		case 0x1106: /* $5206 */
 			return ((state->mult1 * state->mult2) & 0xff00) >> 8;
-
+			
 		default:
 			logerror("** MMC5 uncaught read, offset: %04x\n", offset + 0x4100);
 			return 0x00;
@@ -1657,7 +1846,7 @@ static READ8_HANDLER( exrom_l_r )
 static WRITE8_HANDLER( exrom_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-
+	
 	//  LOG_MMC(("Mapper 5 write, offset: %04x, data: %02x\n", offset + 0x4100, data));
 	/* Send $5000-$5015 to the sound chip */
 	if ((offset >= 0xf00) && (offset <= 0xf15))
@@ -1665,7 +1854,7 @@ static WRITE8_HANDLER( exrom_l_w )
 		nes_psg_w(state->sound, offset & 0x1f, data);
 		return;
 	}
-
+	
 	/* $5c00 - $5fff: extended videoram attributes */
 	if ((offset >= 0x1b00) && (offset <= 0x1eff))
 	{
@@ -1673,19 +1862,21 @@ static WRITE8_HANDLER( exrom_l_w )
 			state->mmc5_vram[offset - 0x1b00] = data;
 		return;
 	}
-
+	
 	switch (offset)
 	{
 		case 0x1000: /* $5100 */
-			state->MMC5_rom_bank_mode = data & 0x03;
+			state->mmc5_prg_mode = data & 0x03;
+			//          mmc5_update_prg(space->machine);
 			LOG_MMC(("MMC5 rom bank mode: %02x\n", data));
 			break;
-
+			
 		case 0x1001: /* $5101 */
-			state->MMC5_vrom_bank_mode = data & 0x03;
+			state->mmc5_chr_mode = data & 0x03;
+			// update chr
 			LOG_MMC(("MMC5 vrom bank mode: %02x\n", data));
 			break;
-
+			
 		case 0x1002: /* $5102 */
 			if (data == 0x02)
 				state->MMC5_vram_protect |= 1;
@@ -1700,36 +1891,40 @@ static WRITE8_HANDLER( exrom_l_w )
 				state->MMC5_vram_protect = 0;
 			LOG_MMC(("MMC5 vram protect 2: %02x\n", data));
 			break;
-
+			
 		case 0x1004: /* $5104 - Extra VRAM (EXRAM) control */
 			state->mmc5_vram_control = data & 0x03;
+			// update render
+			mmc5_update_render_mode(space->machine);
 			LOG_MMC(("MMC5 exram control: %02x\n", data));
 			break;
-
+			
 		case 0x1005: /* $5105 */
 			mmc5_ppu_mirror(space->machine, 0, data & 0x03);
 			mmc5_ppu_mirror(space->machine, 1, (data & 0x0c) >> 2);
 			mmc5_ppu_mirror(space->machine, 2, (data & 0x30) >> 4);
 			mmc5_ppu_mirror(space->machine, 3, (data & 0xc0) >> 6);
+			// update render
+			mmc5_update_render_mode(space->machine);
 			break;
-
+			
 			/* tile data for MMC5 flood-fill NT mode */
 		case 0x1006:
 			state->MMC5_floodtile = data;
 			break;
-
+			
 			/* attr data for MMC5 flood-fill NT mode */
 		case 0x1007:
 			switch (data & 3)
-			{
+		{
 			default:
 			case 0: state->MMC5_floodattr = 0x00; break;
 			case 1: state->MMC5_floodattr = 0x55; break;
 			case 2: state->MMC5_floodattr = 0xaa; break;
 			case 3: state->MMC5_floodattr = 0xff; break;
-			}
+		}
 			break;
-
+			
 		case 0x1013: /* $5113 */
 			LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
 			// FIXME: a few Koei games have both WRAM & BWRAM but here we don't support this (yet)
@@ -1738,118 +1933,63 @@ static WRITE8_HANDLER( exrom_l_w )
 			else
 				wram_bank(space->machine, data, NES_WRAM);
 			break;
-
+			
+			
 		case 0x1014: /* $5114 */
-			LOG_MMC(("MMC5 $5114 bank select: %02x (mode: %d)\n", data, state->MMC5_rom_bank_mode));
-			switch (state->MMC5_rom_bank_mode)
-			{
-			case 0x03:
-				/* 8k switch */
-				if (data & 0x80)
-				{
-					/* ROM */
-					LOG_MMC(("\tROM bank select (8k, $8000): %02x\n", data & 0x7f));
-					prg8_89(space->machine, data & 0x7f);
-				}
-				else
-				{
-					/* RAM */
-					LOG_MMC(("\tRAM bank select (8k, $8000): %02x\n", data & 0x07));
-					state->prg_bank[0] = state->prg_chunks + (data & 0x07);
-					memory_set_bank(space->machine, "bank1", state->prg_bank[0]);
-				}
-				break;
-			}
-			break;
 		case 0x1015: /* $5115 */
-			LOG_MMC(("MMC5 $5115 bank select: %02x (mode: %d)\n", data, state->MMC5_rom_bank_mode));
-			switch (state->MMC5_rom_bank_mode)
-			{
-			case 0x01:
-			case 0x02:
-				if (data & 0x80)
-				{
-					/* 16k switch - ROM only */
-					LOG_MMC(("\tROM bank select (16k, $8000): %02x\n", (data & 0x7f) >> 1));
-					prg16_89ab(space->machine, (data & 0x7f) >> 1);
-				}
-				else
-				{
-					/* RAM */
-					LOG_MMC(("\tRAM bank select (16k, $8000): %02x\n", (data & 0x07) >> 1));
-					state->prg_bank[0] = state->prg_chunks + (data & 0x06);
-					state->prg_bank[1] = state->prg_chunks + (data & 0x06) + 1;
-					memory_set_bank(space->machine, "bank1", state->prg_bank[0]);
-					memory_set_bank(space->machine, "bank2", state->prg_bank[1]);
-				}
-				break;
-			case 0x03:
-				/* 8k switch */
-				if (data & 0x80)
-				{
-					/* ROM */
-					LOG_MMC(("\tROM bank select (8k, $a000): %02x\n", data & 0x7f));
-					prg8_ab(space->machine, data & 0x7f);
-				}
-				else
-				{
-					/* RAM */
-					LOG_MMC(("\tRAM bank select (8k, $a000): %02x\n", data & 0x07));
-					state->prg_bank[1] = state->prg_chunks + (data & 0x07);
-					memory_set_bank(space->machine, "bank2", state->prg_bank[1]);
-				}
-				break;
-			}
-			break;
 		case 0x1016: /* $5116 */
-			LOG_MMC(("MMC5 $5116 bank select: %02x (mode: %d)\n", data, state->MMC5_rom_bank_mode));
-			switch (state->MMC5_rom_bank_mode)
-			{
-			case 0x02:
-			case 0x03:
-				/* 8k switch */
-				if (data & 0x80)
-				{
-					/* ROM */
-					LOG_MMC(("\tROM bank select (8k, $c000): %02x\n", data & 0x7f));
-					prg8_cd(space->machine, data & 0x7f);
-				}
-				else
-				{
-					/* RAM */
-					LOG_MMC(("\tRAM bank select (8k, $c000): %02x\n", data & 0x07));
-					state->prg_bank[2] = state->prg_chunks + (data & 0x07);
-					memory_set_bank(space->machine, "bank3", state->prg_bank[2]);
-				}
-				break;
-			}
-			break;
 		case 0x1017: /* $5117 */
-			LOG_MMC(("MMC5 $5117 bank select: %02x (mode: %d)\n", data, state->MMC5_rom_bank_mode));
-			switch (state->MMC5_rom_bank_mode)
+			state->mmc5_prg_regs[offset & 3] = data;
+			mmc5_update_prg(space->machine);
+			break;
+			
+#if 0
+		// these do not work as expected... I guess we definitely need the bank update at proper times (with BG vs. sprite timing)
+		case 0x1020: /* $5120 */
+		case 0x1021: /* $5121 */
+		case 0x1022: /* $5122 */
+		case 0x1023: /* $5123 */
+		case 0x1024: /* $5124 */
+		case 0x1025: /* $5125 */
+		case 0x1026: /* $5126 */
+		case 0x1027: /* $5127 */
+			data |= (state->mmc5_chr_high << 8);
+			if (!state->mmc5_last_chr_a)
 			{
-			case 0x00:
-				/* 32k switch - ROM only */
-				LOG_MMC(("\tROM bank select (32k, $8000): %02x\n", (data & 0x7f) >> 2));
-				prg32(space->machine, data >> 2);
-				break;
-			case 0x01:
-				/* 16k switch - ROM only */
-				LOG_MMC(("\tROM bank select (16k, $c000): %02x\n", (data & 0x7f) >> 1));
-				prg16_cdef(space->machine, data >> 1);
-				break;
-			case 0x02:
-			case 0x03:
-				/* 8k switch */
-				LOG_MMC(("\tROM bank select (8k, $e000): %02x\n", data & 0x7f));
-				prg8_ef(space->machine, data & 0x7f);
-				break;
+				state->mmc5_vrom_regA[offset & 0x07] = data;
+				state->mmc5_last_chr_a = 1;
+				if (ppu2c0x_get_current_scanline(state->ppu) == 240 || !ppu2c0x_is_sprite_8x16(state->ppu))
+					mmc5_update_chr_a(space->machine);
 			}
 			break;
-		case 0x1020: /* $5120 */
-			LOG_MMC(("MMC5 $5120 vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
+			
+			
+		case 0x1028: /* $5128 */
+		case 0x1029: /* $5129 */
+		case 0x102a: /* $512a */
+		case 0x102b: /* $512b */
+			data |= (state->mmc5_chr_high << 8);
+			state->mmc5_vrom_regB[offset & 0x03] = data;
+			state->mmc5_last_chr_a = 0;
+			if (ppu2c0x_get_current_scanline(state->ppu) == 240 || !ppu2c0x_is_sprite_8x16(state->ppu))
+				mmc5_update_chr_b(space->machine);
+			break;
+
+		case 0x1030: /* $5130 */
+			state->mmc5_chr_high = data & 0x03;
+			if (state->mmc5_vram_control == 1)
 			{
+				// in this case state->mmc5_chr_high selects which 256KB of CHR ROM
+				// is to be used for all background tiles on the screen.
+			}
+			break;
+			
+#endif
+			
+		case 0x1020: /* $5120 */
+			LOG_MMC(("MMC5 $5120 vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x03:
 				/* 1k switch */
 				state->MMC5_vrom_bank[0] = data | (state->mmc5_high_chr << 8);
@@ -1860,12 +2000,12 @@ static WRITE8_HANDLER( exrom_l_w )
 				//                  vrom_page_a = 1;
 				//                  vrom_page_b = 0;
 				break;
-			}
+		}
 			break;
 		case 0x1021: /* $5121 */
-			LOG_MMC(("MMC5 $5121 vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $5121 vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x02:
 				/* 2k switch */
 				chr2_0(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
@@ -1880,12 +2020,12 @@ static WRITE8_HANDLER( exrom_l_w )
 				//                  vrom_page_a = 1;
 				//                  vrom_page_b = 0;
 				break;
-			}
+		}
 			break;
 		case 0x1022: /* $5122 */
-			LOG_MMC(("MMC5 $5122 vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $5122 vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x03:
 				/* 1k switch */
 				state->MMC5_vrom_bank[2] = data | (state->mmc5_high_chr << 8);
@@ -1896,12 +2036,12 @@ static WRITE8_HANDLER( exrom_l_w )
 				//                  vrom_page_a = 1;
 				//                  vrom_page_b = 0;
 				break;
-			}
+		}
 			break;
 		case 0x1023: /* $5123 */
-			LOG_MMC(("MMC5 $5123 vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $5123 vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x01:
 				chr4_0(space->machine, data, CHRROM);
 				break;
@@ -1919,12 +2059,12 @@ static WRITE8_HANDLER( exrom_l_w )
 				//                  vrom_page_a = 1;
 				//                  vrom_page_b = 0;
 				break;
-			}
+		}
 			break;
 		case 0x1024: /* $5124 */
-			LOG_MMC(("MMC5 $5124 vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $5124 vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x03:
 				/* 1k switch */
 				state->MMC5_vrom_bank[4] = data | (state->mmc5_high_chr << 8);
@@ -1935,12 +2075,12 @@ static WRITE8_HANDLER( exrom_l_w )
 				//                  vrom_page_a = 0;
 				//                  vrom_page_b = 0;
 				break;
-			}
+		}
 			break;
 		case 0x1025: /* $5125 */
-			LOG_MMC(("MMC5 $5125 vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $5125 vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x02:
 				/* 2k switch */
 				chr2_4(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
@@ -1955,12 +2095,12 @@ static WRITE8_HANDLER( exrom_l_w )
 				//                  vrom_page_a = 0;
 				//                  vrom_page_b = 0;
 				break;
-			}
+		}
 			break;
 		case 0x1026: /* $5126 */
-			LOG_MMC(("MMC5 $5126 vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $5126 vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x03:
 				/* 1k switch */
 				state->MMC5_vrom_bank[6] = data | (state->mmc5_high_chr << 8);
@@ -1971,12 +2111,12 @@ static WRITE8_HANDLER( exrom_l_w )
 				//                  vrom_page_a = 0;
 				//                  vrom_page_b = 0;
 				break;
-			}
+		}
 			break;
 		case 0x1027: /* $5127 */
-			LOG_MMC(("MMC5 $5127 vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $5127 vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x00:
 				/* 8k switch */
 				chr8(space->machine, data, CHRROM);
@@ -1999,12 +2139,12 @@ static WRITE8_HANDLER( exrom_l_w )
 				//                  vrom_page_a = 0;
 				//                  vrom_page_b = 0;
 				break;
-			}
+		}
 			break;
 		case 0x1028: /* $5128 */
-			LOG_MMC(("MMC5 $5128 vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $5128 vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x03:
 				/* 1k switch */
 				state->MMC5_vrom_bank[8] = data | (state->mmc5_high_chr << 8);
@@ -2019,12 +2159,12 @@ static WRITE8_HANDLER( exrom_l_w )
 					state->vrom_page_b = 1;
 				}
 				break;
-			}
+		}
 			break;
 		case 0x1029: /* $5129 */
-			LOG_MMC(("MMC5 $5129 vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $5129 vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x02:
 				/* 2k switch */
 				chr2_0(space->machine, data | (state->mmc5_high_chr << 8), CHRROM);
@@ -2044,12 +2184,12 @@ static WRITE8_HANDLER( exrom_l_w )
 					state->vrom_page_b = 1;
 				}
 				break;
-			}
+		}
 			break;
 		case 0x102a: /* $512a */
-			LOG_MMC(("MMC5 $512a vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $512a vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x03:
 				/* 1k switch */
 				state->MMC5_vrom_bank[10] = data | (state->mmc5_high_chr << 8);
@@ -2064,12 +2204,12 @@ static WRITE8_HANDLER( exrom_l_w )
 					state->vrom_page_b = 1;
 				}
 				break;
-			}
+		}
 			break;
 		case 0x102b: /* $512b */
-			LOG_MMC(("MMC5 $512b vrom select: %02x (mode: %d)\n", data, state->MMC5_vrom_bank_mode));
-			switch (state->MMC5_vrom_bank_mode)
-			{
+			LOG_MMC(("MMC5 $512b vrom select: %02x (mode: %d)\n", data, state->mmc5_chr_mode));
+			switch (state->mmc5_chr_mode)
+		{
 			case 0x00:
 				/* 8k switch */
 				/* switches in first half of an 8K bank!) */
@@ -2100,9 +2240,9 @@ static WRITE8_HANDLER( exrom_l_w )
 					state->vrom_page_b = 1;
 				}
 				break;
-			}
+		}
 			break;
-
+			
 		case 0x1030: /* $5130 */
 			state->mmc5_high_chr = data & 0x03;
 			if (state->mmc5_vram_control == 1)
@@ -2111,15 +2251,24 @@ static WRITE8_HANDLER( exrom_l_w )
 				// is to be used for all background tiles on the screen.
 			}
 			break;
-
-
+			
+			
 		case 0x1100: /* $5200 */
 			state->mmc5_split_scr = data;
 			// in EX2 and EX3 modes, no split screen
 			if (state->mmc5_vram_control & 0x02)
 				state->mmc5_split_scr &= 0x7f;
+			state->mmc5_split_ctrl = data;
 			break;
-
+			
+		case 0x1101: /* $5201 */
+			state->mmc5_split_yst = (data >= 240) ? data - 16 : data;
+			break;
+			
+		case 0x1102: /* $5202 */
+			state->mmc5_split_bank = data;
+			break;
+			
 		case 0x1103: /* $5203 */
 			state->IRQ_count = data;
 			state->MMC5_scanline = data;
@@ -2135,7 +2284,7 @@ static WRITE8_HANDLER( exrom_l_w )
 		case 0x1106: /* $5206 */
 			state->mult2 = data;
 			break;
-
+			
 		default:
 			logerror("** MMC5 uncaught write, offset: %04x, data: %02x\n", offset + 0x4100, data);
 			break;
@@ -9356,10 +9505,10 @@ static WRITE8_HANDLER( bmc_190in1_w )
 	LOG_MMC(("bmc_190in1_w offset: %04x, data: %02x\n", offset, data));
 
 	set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	data >>= 2;
-	prg16_89ab(space->machine, data);
-	prg16_cdef(space->machine, data);
-	chr8(space->machine, data, CHRROM);
+	offset >>= 2;
+	prg16_89ab(space->machine, offset);
+	prg16_cdef(space->machine, offset);
+	chr8(space->machine, offset, CHRROM);
 }
 
 /*************************************************************
@@ -10663,20 +10812,7 @@ static READ8_HANDLER( bmc_vt5201_r )
 	if (state->mmc_latch1)
 		return state->mmc_dipsetting; // cart mode, depending on the Dip Switches (always zero atm, given we have no way to add cart-based DIPs)
 	else
-	{	// usual ROM access
-		switch (offset & 0x6000)
-		{
-			case 0x0000:
-				return state->rom[0x10000 + state->prg_bank[0] * 0x2000 + (offset & 0x1fff)];
-			case 0x2000:
-				return state->rom[0x10000 + state->prg_bank[1] * 0x2000 + (offset & 0x1fff)];
-			case 0x4000:
-				return state->rom[0x10000 + state->prg_bank[2] * 0x2000 + (offset & 0x1fff)];
-			case 0x6000:
-				return state->rom[0x10000 + state->prg_bank[3] * 0x2000 + (offset & 0x1fff)];
-		}
-		return 0;
-	}
+		return mmc_hi_access_rom(space->machine, offset);
 }
 
 /*************************************************************
@@ -10745,6 +10881,97 @@ static WRITE8_HANDLER( bmc_810544_w )
 	set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 
 	chr8(space->machine, offset & 0x0f, CHRROM);
+}
+
+/*************************************************************
+
+ BMC-NTD-03
+
+ *************************************************************/
+
+static WRITE8_HANDLER( bmc_ntd03_w )
+{
+	UINT8 pbank, cbank;
+	LOG_MMC(("bmc_ntd03_w, offset: %04x, data: %02x\n", offset, data));
+
+	pbank = (offset >> 10) & 0x1e;
+	cbank = ((offset & 0x300) >> 5) | (offset & 0x07);
+
+	if (BIT(offset, 7))
+	{
+		prg16_89ab(space->machine, pbank | BIT(offset, 6));
+		prg16_cdef(space->machine, pbank | BIT(offset, 6));
+	}
+	else
+		prg32(space->machine, pbank >> 1);
+
+	set_nt_mirroring(space->machine, BIT(data, 10) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+
+	chr8(space->machine, cbank, CHRROM);
+}
+
+/*************************************************************
+
+ BMC-GHOSTBUSTERS63IN1
+
+ in MESS: only preliminar support
+
+ *************************************************************/
+
+static void bmc_gb63_update( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	set_nt_mirroring(machine, BIT(state->mmc_reg[0], 6) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+
+	if (BIT(state->mmc_reg[0], 5))
+	{
+		prg16_89ab(machine, state->mmc_reg[0] & 0x1f);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
+		prg16_cdef(machine, state->mmc_reg[0] & 0x1f);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
+	}
+	else
+		prg32(machine, (state->mmc_reg[0] & 0x1f) >> 1);	// FIXME: here probably we could also have PRGRAM, depending on mmc_latch1!
+
+	if (BIT(state->mmc_reg[1], 2))
+		chr8(machine, 0, CHRRAM);
+//  else
+//      chr8(machine, 0, CHRROM);
+}
+
+static WRITE8_HANDLER( bmc_gb63_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("bmc_gb63_w, offset: %04x, data: %02x\n", offset, data));
+
+	state->mmc_reg[offset & 1] = data;
+	state->mmc_latch1 = BIT(state->mmc_reg[0], 7) | (BIT(state->mmc_reg[1], 0) << 1);
+
+}
+
+static READ8_HANDLER( bmc_gb63_r )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("bmc_gb63_r, offset: %04x\n", offset));
+	//  state->mmc_dipsetting = input_port_read(space->machine, "CARTDIPS");
+
+	if (state->mmc_latch1 == 1)
+		return 0xff;	// open bus
+	else
+		return mmc_hi_access_rom(space->machine, offset);
+}
+
+/*************************************************************
+
+ UNL-EDU2000
+
+ *************************************************************/
+
+static WRITE8_HANDLER( edu2k_w )
+{
+	LOG_MMC(("edu2k_w, offset: %04x, data: %02x\n", offset, data));
+
+	prg32(space->machine, data & 0x1f);
+	wram_bank(space->machine, (data & 0xc0) >> 6, NES_WRAM);
 }
 
 
@@ -11006,6 +11233,9 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BMC_VT5201,           NES_NOACCESS, NES_NOACCESS, {bmc_vt5201_w, bmc_vt5201_r},         NULL, NULL, NULL },
 	{ BMC_BENSHENG_BS5,     NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_bs5_w),             NULL, NULL, NULL },
 	{ BMC_810544,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_810544_w),          NULL, NULL, NULL },
+	{ BMC_NTD_03,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_ntd03_w),           NULL, NULL, NULL },
+	{ BMC_G63IN1,           NES_NOACCESS, NES_NOACCESS, {bmc_gb63_w, bmc_gb63_r},             NULL, NULL, NULL },
+	{ UNL_EDU2K,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(edu2k_w),                NULL, NULL, NULL },
 	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	//
 };
