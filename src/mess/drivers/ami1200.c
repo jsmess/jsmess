@@ -478,7 +478,8 @@ static MACHINE_DRIVER_START( a1200p )
 	MDRV_IMPORT_FROM(a1200n)
 
 	/* adjust for PAL specs */
-	MDRV_CPU_REPLACE("maincpu", M68EC020, A1200PAL_XTAL_X1/2) /* 14.18758 MHz */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(A1200PAL_XTAL_X1/2) /* 14.18758 MHz */
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

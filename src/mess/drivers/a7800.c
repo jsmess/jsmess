@@ -294,7 +294,8 @@ static MACHINE_DRIVER_START( a7800_pal )
 	MDRV_IMPORT_FROM( a7800_ntsc )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", M6502, CLK_PAL)
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_CLOCK(CLK_PAL)
 	MDRV_CPU_VBLANK_INT_HACK(a7800_interrupt, 312)
 
 	MDRV_SCREEN_MODIFY( "screen" )
