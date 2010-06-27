@@ -794,7 +794,7 @@ static MACHINE_DRIVER_START( mm1m6 )
 	MDRV_CPU_PROGRAM_MAP(mm1m6_map)
 
 	/* video hardware */
-	MDRV_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, mm1_upd7220_intf, mm1_upd7220_map)	
+	MDRV_UPD7220_ADD(UPD7220_TAG, XTAL_18_720MHz/8, mm1_upd7220_intf, mm1_upd7220_map)
 MACHINE_DRIVER_END
 
 /* ROMs */

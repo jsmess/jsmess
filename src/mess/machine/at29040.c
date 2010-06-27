@@ -274,11 +274,11 @@ UINT8 at29c040a_r(int id, offs_t offset)
 void at29c040a_w(int id, offs_t offset, UINT8 data)
 {
 	offset &= ADDRESS_MASK;
-	
+
 	/* The special CFI commands assume a smaller address space according */
 	/* to the specification ("address format A14-A0") */
 	offs_t cfi_offset = offset & 0x7fff;
-	
+
 	if (at29c040a[id].s_enabling_bbl)
 	{
 		at29c040a[id].s_enabling_bbl = FALSE;

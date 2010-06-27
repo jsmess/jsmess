@@ -106,7 +106,7 @@ static void print_game_ramoptions(FILE *out, const game_driver *game, const mach
 
 void print_mess_game_xml(FILE *out, const game_driver *game, const machine_config *config)
 {
-	print_game_ramoptions( out, game, config );	
+	print_game_ramoptions( out, game, config );
 }
 
 /***************************************************************************
@@ -133,4 +133,4 @@ void mess_options_init(core_options *opts)
 {
 	/* add MESS-specific options */
 	options_add_entries(opts, mess_core_options);
-} 
+}

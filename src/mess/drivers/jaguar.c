@@ -186,73 +186,73 @@ static MACHINE_RESET( jaguar )
 /*
 static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags)
 {
-	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart"));
-	astring *fname;
-	file_error filerr;
-	mame_file *file;
-	if (image->exists())
-	{
-		fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, image->basename_noext(), ".nv");
-		filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
-		astring_free( fname);
-		return (filerr == FILERR_NONE) ? file : NULL;
-	}
-	else
-		return NULL;
+    device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart"));
+    astring *fname;
+    file_error filerr;
+    mame_file *file;
+    if (image->exists())
+    {
+        fname = astring_assemble_4( astring_alloc(), machine->gamedrv->name, PATH_SEPARATOR, image->basename_noext(), ".nv");
+        filerr = mame_fopen( SEARCHPATH_NVRAM, astring_c( fname), openflags, &file);
+        astring_free( fname);
+        return (filerr == FILERR_NONE) ? file : NULL;
+    }
+    else
+        return NULL;
 }
 
 static void jaguar_nvram_load(running_machine *machine)
 {
-	mame_file *nvram_file = NULL;
-	running_device *device;
+    mame_file *nvram_file = NULL;
+    running_device *device;
 
-	for (device = machine->devicelist.first(); device != NULL; device = device->next())
-	{
-		device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
-		if (nvram != NULL)
-		{
-			if (nvram_file == NULL)
-				nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_READ);
-			(*nvram)(device, nvram_file, 0);
-		}
-	}
-	if (nvram_file != NULL)
-		mame_fclose(nvram_file);
+    for (device = machine->devicelist.first(); device != NULL; device = device->next())
+    {
+        device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
+        if (nvram != NULL)
+        {
+            if (nvram_file == NULL)
+                nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_READ);
+            (*nvram)(device, nvram_file, 0);
+        }
+    }
+    if (nvram_file != NULL)
+        mame_fclose(nvram_file);
 }
 
 
 static void jaguar_nvram_save(running_machine *machine)
 {
-	mame_file *nvram_file = NULL;
-	running_device *device;
+    mame_file *nvram_file = NULL;
+    running_device *device;
 
-	for (device = machine->devicelist.first(); device != NULL; device = device->next())
-	{
-		device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
-		if (nvram != NULL)
-		{
-			if (nvram_file == NULL)
-				nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-			// check nvram_file to avoid crash when no image is mounted or cannot be created
-			if (nvram_file)
-				(*nvram)(device, nvram_file, 1);
-		}
-	}
+    for (device = machine->devicelist.first(); device != NULL; device = device->next())
+    {
+        device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
+        if (nvram != NULL)
+        {
+            if (nvram_file == NULL)
+                nvram_file = jaguar_nvram_fopen(machine, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+            // check nvram_file to avoid crash when no image is mounted or cannot be created
+            if (nvram_file)
+                (*nvram)(device, nvram_file, 1);
+        }
+    }
 
-	if (nvram_file != NULL)
-		mame_fclose(nvram_file);
+    if (nvram_file != NULL)
+        mame_fclose(nvram_file);
 }
 
 static NVRAM_HANDLER( jaguar )
 {
-	if (read_or_write)	{
-		jaguar_nvram_save(machine);
-	}
-	else
-	{
-		if (file)
-			jaguar_nvram_load(machine);
-	}
+    if (read_or_write)  {
+        jaguar_nvram_save(machine);
+    }
+    else
+    {
+        if (file)
+            jaguar_nvram_load(machine);
+    }
 }
 */
 static WRITE32_HANDLER( jaguar_eeprom_w )
@@ -624,7 +624,7 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_CPU_PROGRAM_MAP(gpu_map)
 
 	MDRV_MACHINE_RESET(jaguar)
-//	MDRV_NVRAM_HANDLER(jaguar)
+//  MDRV_NVRAM_HANDLER(jaguar)
 
 	MDRV_TIMER_ADD("serial_timer", jaguar_serial_callback)
 
@@ -816,7 +816,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 
 	/* Skip the logo */
 	using_cart = 1;
-//	cart_base[0x102] = 1;
+//  cart_base[0x102] = 1;
 
 	/* Transfer control to the bios */
 	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, rom_base[1]);

@@ -262,7 +262,7 @@ static READ8_DEVICE_HANDLER(tape_read)
 {
 	UINT8 reply;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
-	
+
 	if (image->exists() && (image->fread(& reply, 1) == 1))
 		return reply & 0x1f;
 	else
@@ -273,7 +273,7 @@ static WRITE8_DEVICE_HANDLER(tape_write)
 {
 	UINT8 data5 = (data & 0x1f);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
-	
+
 	if (image->exists())
 		image->fwrite(& data5, 1);
 

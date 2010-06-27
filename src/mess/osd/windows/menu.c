@@ -1430,7 +1430,7 @@ static void prepare_menus(HWND wnd)
 
 		snprintf(buf, ARRAY_LENGTH(buf), "%s: %s", img->image_config().name(), s);
 		win_append_menu_utf8(device_menu, MF_POPUP, (UINT_PTR)sub_menu, buf);
-		
+
 		cnt++;
 	}
 }

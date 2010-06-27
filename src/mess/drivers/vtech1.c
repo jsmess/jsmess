@@ -332,7 +332,7 @@ static void vtech1_get_track(running_machine *machine)
 static void vtech1_put_track(running_machine *machine)
 {
 	vtech1_state *vtech1 = (vtech1_state *)machine->driver_data;
-	
+
 
     /* drive selected and image file ok? */
 	if (vtech1->drive >= 0 && floppy_get_device(machine,vtech1->drive) != NULL)

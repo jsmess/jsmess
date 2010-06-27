@@ -1,11 +1,11 @@
 /*********************************************************************
 
-	a2cffa.c
+    a2cffa.c
 
-	Implementation of Rich Dreher's IDE/CompactFlash card
-	for the Apple II.
+    Implementation of Rich Dreher's IDE/CompactFlash card
+    for the Apple II.
 
-	http://www.dreher.net/
+    http://www.dreher.net/
 
 *********************************************************************/
 
@@ -52,7 +52,7 @@ INLINE a2cffa_token *get_token(running_device *device)
 
 /*-------------------------------------------------
     DEVICE_START(a2cffa) - device start
-	function
+    function
 -------------------------------------------------*/
 
 static DEVICE_START(a2cffa)
@@ -63,7 +63,7 @@ static DEVICE_START(a2cffa)
 
 /*-------------------------------------------------
     DEVICE_RESET(a2cffa) - device reset
-	function
+    function
 -------------------------------------------------*/
 
 static DEVICE_RESET(a2cffa)
@@ -87,7 +87,7 @@ READ8_DEVICE_HANDLER(a2cffa_r)
 	if (offset == 0)
 	{
 		return token->lastdata>>8;
-	}	
+	}
 	else if (offset == 8)
 	{
 		token->lastdata = ide_controller_r(device->machine->devicelist.find("ide"), 0x1f0+offset-8, 2);
@@ -115,7 +115,7 @@ WRITE8_DEVICE_HANDLER(a2cffa_w)
 	{
 		token->lastdata &= 0x00ff;
 		token->lastdata |= data<<8;
-	}	
+	}
 	else if (offset == 8)
 	{
 		token->lastdata &= 0xff00;
@@ -158,7 +158,7 @@ WRITE8_DEVICE_HANDLER(a2cffa_cnxx_w)
 
 /*-------------------------------------------------
     DEVICE_GET_INFO(a2cffa) - device get info
-	function
+    function
 -------------------------------------------------*/
 
 DEVICE_GET_INFO(a2cffa)

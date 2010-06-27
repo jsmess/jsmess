@@ -153,7 +153,7 @@ public:
 
 	UINT8 mmc_latch1, mmc_latch2;
 	UINT8 mmc_reg[16];
-	
+
 	UINT8 mmc_dipsetting;
 
 	// misc mapper related variables which should be merged with the above one, where possible
@@ -197,11 +197,11 @@ public:
 	UINT8 bmc_64in1nr_reg[4];
 	UINT8 unl_8237_reg[3];
 	UINT8 bmc_s24in1sc03_reg[3];
-	
+
 	// mapper 68 needs these for NT mirroring!
 	int m68_mirror;
 	int m0, m1;
-	
+
 	// Famicom Jump II is identified as Mapper 153, but it works in a completely different way.
 	// in particular, it requires these (not needed by other Mapper 153 games)
 	UINT8 map153_reg[8];

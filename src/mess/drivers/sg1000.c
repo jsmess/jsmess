@@ -86,7 +86,7 @@ Notes:
 
 /*
 
-	Terebi Oekaki (TV Draw)
+    Terebi Oekaki (TV Draw)
 
     Address Access  Bits
                     7       6   5   4   3   2   1   0
@@ -143,7 +143,7 @@ static READ8_HANDLER( tvdraw_data_r )
 }
 
 /*-------------------------------------------------
-    sg1000_joysel_r - 
+    sg1000_joysel_r -
 -------------------------------------------------*/
 
 static READ8_HANDLER( sg1000_joysel_r )
@@ -1009,7 +1009,7 @@ static MACHINE_START( sc3000 )
 }
 
 /*-------------------------------------------------
-    sf7000_fdc_index_callback - 
+    sf7000_fdc_index_callback -
 -------------------------------------------------*/
 
 static void sf7000_fdc_index_callback(running_device *controller, running_device *img, int state)

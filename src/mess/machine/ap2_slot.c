@@ -177,7 +177,7 @@ READ8_DEVICE_HANDLER(apple2_slot_ROM_r)
 	/* do we actually have a device, and can we read? */
 	if ((token->slot_device != NULL) && (config->rhcnxx != NULL))
 	{
-		return (*config->rhcnxx)(token->slot_device, offset); 
+		return (*config->rhcnxx)(token->slot_device, offset);
 	}
 
 	if (config->slotnum > 0)

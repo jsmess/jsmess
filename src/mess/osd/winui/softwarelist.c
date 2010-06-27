@@ -43,7 +43,7 @@ struct _file_info
 	char file_name[MAX_PATH];
 	char publisher[MAX_PATH];
 	char year[10];
-	
+
 	char device[MAX_PATH];
 };
 
@@ -131,7 +131,7 @@ void SoftwareList_SetDriver(HWND hwndPicker, const software_config *config)
 BOOL SoftwareList_AddFile(HWND hwndPicker,LPCSTR pszName, LPCSTR pszListname, LPCSTR pszDescription, LPCSTR pszPublisher, LPCSTR pszYear, LPCSTR pszDevice)
 {
 	Picker_ResetIdle(hwndPicker);
-	
+
 	software_list_info *pPickerInfo;
 	file_info **ppNewIndex;
 	file_info *pInfo;
@@ -157,7 +157,7 @@ BOOL SoftwareList_AddFile(HWND hwndPicker,LPCSTR pszName, LPCSTR pszListname, LP
 	strcpy(pInfo->publisher, pszPublisher);
 	strcpy(pInfo->year, pszYear);
 	strcpy(pInfo->device, pszDevice);
-	
+
 	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
 	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));
 	if (pPickerInfo->file_index) free(pPickerInfo->file_index);
@@ -175,7 +175,7 @@ BOOL SoftwareList_AddFile(HWND hwndPicker,LPCSTR pszName, LPCSTR pszListname, LP
 error:
 	if (pInfo)
 		free(pInfo);
-	return FALSE;	
+	return FALSE;
 }
 
 
@@ -266,7 +266,7 @@ LPCTSTR SoftwareList_GetItemString(HWND hwndPicker, int nRow, int nColumn,
 			s = pszBuffer;
 			osd_free(t_buf);
 			break;
-		
+
 	}
 	return s;
 }

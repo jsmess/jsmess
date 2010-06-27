@@ -505,7 +505,7 @@ DRIVER_INIT( osborne1 )
 //static int osborne1_daisy_irq_ack(running_device *device)
 //{
 //    /* Enable ROM and I/O when IRQ is acknowledged */
-//    UINT8	old_bankswitch = osborne1.bankswitch;
+//    UINT8 old_bankswitch = osborne1.bankswitch;
 //    const address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 //
 //    osborne1_bankswitch_w( space, 0, 0 );
@@ -531,27 +531,27 @@ DRIVER_INIT( osborne1 )
 //
 //DEVICE_GET_INFO( osborne1_daisy )
 //{
-//	switch (state)
-//	{
-//		/* --- the following bits of info are returned as 64-bit signed integers --- */
-//		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
-//		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+//  switch (state)
+//  {
+//      /* --- the following bits of info are returned as 64-bit signed integers --- */
+//      case DEVINFO_INT_TOKEN_BYTES:                   info->i = 4;                                            break;
+//      case DEVINFO_INT_INLINE_CONFIG_BYTES:           info->i = 0;                                            break;
 //
-//		/* --- the following bits of info are returned as pointers to data or functions --- */
-//		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(osborne1_daisy);		break;
-//		case DEVINFO_FCT_STOP:							/* Nothing */											break;
-//		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(osborne1_daisy);		break;
-//		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)osborne1_daisy_irq_state;				break;
-//		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)osborne1_daisy_irq_ack;				break;
-//		case DEVINFO_FCT_IRQ_RETI:						info->f = (genf *)osborne1_daisy_irq_reti;				break;
+//      /* --- the following bits of info are returned as pointers to data or functions --- */
+//      case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME(osborne1_daisy);        break;
+//      case DEVINFO_FCT_STOP:                          /* Nothing */                                           break;
+//      case DEVINFO_FCT_RESET:                         info->reset = DEVICE_RESET_NAME(osborne1_daisy);        break;
+//      case DEVINFO_FCT_IRQ_STATE:                     info->f = (genf *)osborne1_daisy_irq_state;             break;
+//      case DEVINFO_FCT_IRQ_ACK:                       info->f = (genf *)osborne1_daisy_irq_ack;               break;
+//      case DEVINFO_FCT_IRQ_RETI:                      info->f = (genf *)osborne1_daisy_irq_reti;              break;
 //
-//		/* --- the following bits of info are returned as NULL-terminated strings --- */
-//		case DEVINFO_STR_NAME:							strcpy(info->s, "Osborne1 daisy");								break;
-//		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Z80");										break;
-//		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");										break;
-//		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);										break;
-//		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");					break;
-//	}
+//      /* --- the following bits of info are returned as NULL-terminated strings --- */
+//      case DEVINFO_STR_NAME:                          strcpy(info->s, "Osborne1 daisy");                              break;
+//      case DEVINFO_STR_FAMILY:                        strcpy(info->s, "Z80");                                     break;
+//      case DEVINFO_STR_VERSION:                       strcpy(info->s, "1.0");                                     break;
+//      case DEVINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                                      break;
+//      case DEVINFO_STR_CREDITS:                       strcpy(info->s, "Copyright the MESS Team");                 break;
+//  }
 //}
 //
 //DEFINE_LEGACY_DEVICE(OSBORNE1_DAISY, osborne1_daisy);

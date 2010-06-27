@@ -108,7 +108,7 @@ static TIMER_CALLBACK(zx_ula_nmi)
 	int height = screen->height();
 	const rectangle r1 = screen->visible_area();
 	rectangle r;
-	
+
 	bitmap_t *bitmap = machine->generic.tmpbitmap;
 	r.min_x = r1.min_x;
 	r.max_x = r1.max_x;

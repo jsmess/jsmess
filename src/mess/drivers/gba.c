@@ -2208,7 +2208,7 @@ static WRITE32_HANDLER( eeprom_w )
 		data >>= 16;
 	}
 
-//	printf("eeprom_w: %x @ %x (state %d) (PC=%x)\n", data, offset, state->eeprom_state, cpu_get_pc(space->cpu));
+//  printf("eeprom_w: %x @ %x (state %d) (PC=%x)\n", data, offset, state->eeprom_state, cpu_get_pc(space->cpu));
 
 	switch (state->eeprom_state)
 	{

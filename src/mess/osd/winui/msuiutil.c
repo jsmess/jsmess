@@ -46,7 +46,7 @@ BOOL DriverHasDevice(const game_driver *gamedrv, iodevice_t type)
 	config = machine_config_alloc(gamedrv->machine_config);
 
 	for (bool gotone = config->devicelist.first(device); gotone; gotone = device->next(device))
-	{	
+	{
 		if (device->image_type() == type)
 		{
 			b = TRUE;

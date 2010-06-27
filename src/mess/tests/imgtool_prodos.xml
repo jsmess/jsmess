@@ -2,13 +2,13 @@
 
 <imgtooltest name="prodos_001">
 	<createimage driver="apple2_do_prodos_525"/>
-	
+
 	<putfile name="EMPTY.TXT"/>
 	<checkdirectory>
 		<entry name="EMPTY.TXT" size="0"/>
 	</checkdirectory>
 	<checkfile name="EMPTY.TXT"/>
-	
+
 	<putfile name="SEEDLING.TXT">'seed!' * 10 </putfile>
 	<checkdirectory>
 		<entry name="EMPTY.TXT" size="0"/>
@@ -153,7 +153,7 @@
 	<checkdirectory path="/DIR">
 		<entry name="FILE.TXT"/>
 	</checkdirectory>
-	
+
 	<checkfile name="/DIR/FILE.TXT">'subdir file'</checkfile>
 </imgtooltest>
 
@@ -168,14 +168,14 @@
 
 <imgtooltest name="prodos_007">
 	<createimage driver="apple2_do_prodos_525"/>
-	
+
 	<putfile name="FOO.TXT">'data fork text'</putfile>
 	<checkdirectory>
 		<entry name="FOO.TXT" size="14"/>
 	</checkdirectory>
 	<checkfile name="FOO.TXT" fork="">'data fork text'</checkfile>
 	<checkfile name="FOO.TXT" fork="RESOURCE_FORK"/>
-	
+
 	<putfile name="FOO.TXT" fork="RESOURCE_FORK">'resource fork text'</putfile>
 	<checkdirectory>
 		<entry name="FOO.TXT" size="14"/>
@@ -186,14 +186,14 @@
 
 <imgtooltest name="prodos_008">
 	<createimage driver="apple2_do_prodos_525"/>
-	
+
 	<putfile name="FOO.TXT">'data fork text' * 500</putfile>
 	<checkdirectory>
 		<entry name="FOO.TXT" size="14"/>
 	</checkdirectory>
 	<checkfile name="FOO.TXT" fork="">'data fork text' * 500</checkfile>
 	<checkfile name="FOO.TXT" fork="RESOURCE_FORK"/>
-	
+
 	<putfile name="FOO.TXT" fork="RESOURCE_FORK">'resource fork text' * 1000</putfile>
 	<checkdirectory>
 		<entry name="FOO.TXT" size="14"/>
@@ -204,18 +204,18 @@
 
 <imgtooltest name="prodos_009">
 	<createimage driver="apple2_do_prodos_525"/>
-	
+
 	<putfile name="FOO.TXT">'data fork text' * 500</putfile>
 	<checkattr path="FOO.TXT" name="mac_file_type" value="????"/>
 	<checkattr path="FOO.TXT" name="mac_file_creator" value="????"/>
 
-	<setattr path="FOO.TXT" name="mac_file_type" value="TEXT"/>	
+	<setattr path="FOO.TXT" name="mac_file_type" value="TEXT"/>
 	<checkattr path="FOO.TXT" name="mac_file_type" value="TEXT"/>
 	<checkattr path="FOO.TXT" name="mac_file_creator" value="????"/>
 
-	<setattr path="FOO.TXT" name="mac_file_creator" value="NATE"/>	
+	<setattr path="FOO.TXT" name="mac_file_creator" value="NATE"/>
 	<checkattr path="FOO.TXT" name="mac_file_type" value="TEXT"/>
-	<checkattr path="FOO.TXT" name="mac_file_creator" value="NATE"/>	
+	<checkattr path="FOO.TXT" name="mac_file_creator" value="NATE"/>
 </imgtooltest>
 
 <imgtooltest name="prodos_010">
@@ -223,7 +223,7 @@
 	<recordfreespace/>
 <!--
 	<putfile name="FOO.TXT">'data fork text' * 500</putfile>
-	<setattr path="FOO.TXT" name="mac_file_type" value="TEXT"/>	
+	<setattr path="FOO.TXT" name="mac_file_type" value="TEXT"/>
 	<putfile name="FOO.TXT" fork="RESOURCE_FORK">'resource fork text' * 1000</putfile>
 	<deletefile name="FOO.TXT"/>
 -->

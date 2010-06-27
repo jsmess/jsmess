@@ -176,7 +176,7 @@ static QUICKLOAD_LOAD( lynx )
 	memory_write_byte(space, 0x1fc, start & 0xff);
 	memory_write_byte(space, 0x1fd, start >> 8);
 
-	lynx_crc_keyword((device_image_interface&)*devtag_get_device(image.device().machine, "quickload"));	
+	lynx_crc_keyword((device_image_interface&)*devtag_get_device(image.device().machine, "quickload"));
 
 	cpu_set_reg(cpu, STATE_GENPC, start);
 

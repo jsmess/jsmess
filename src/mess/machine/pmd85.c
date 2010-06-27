@@ -933,7 +933,7 @@ MACHINE_RESET( pmd85 )
 		case MATO:
 			break;
 	}
-	
+
 	for (i = 0; i < 4; i++)
 		for (j = 0; j < 3; j++)
 			pmd85_ppi_port_outputs[i][j] = 0;

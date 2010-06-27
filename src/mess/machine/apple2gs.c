@@ -38,11 +38,11 @@
         bit 0 - shift key pressed
 
     C027 - KMSTATUS
-        bit 7 - set if mouse register full	   
+        bit 7 - set if mouse register full
         bit 6 - mouse interupt enable flag
         bit 5 - set if data register full
-        bit 4 - data interrupt enabled		   
-        bit 3 - set if key data full		   
+        bit 4 - data interrupt enabled
+        bit 3 - set if key data full
         bit 2 - key data interurpt enabled
         bit 1 - clear if horizontal mouse data, set if vertical
         bit 0 - command register full

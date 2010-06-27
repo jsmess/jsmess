@@ -100,7 +100,7 @@ static ADDRESS_MAP_START(pc2000_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_REGION("bios", 0x00000)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
-	AM_RANGE(0x8000, 0xbfff) AM_READNOP //	0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x59 0x45, if it succeeds a jump at 0x8004 occurs
+	AM_RANGE(0x8000, 0xbfff) AM_READNOP //  0x8000 - 0xbfff tests a cartridge, header is 0x55 0xaa 0x59 0x45, if it succeeds a jump at 0x8004 occurs
 	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE(&wram)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("bios", 0x10000) //tied with rom bank at I/O 3
 ADDRESS_MAP_END

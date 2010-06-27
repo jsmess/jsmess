@@ -545,14 +545,14 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 			memory_region_alloc(image.device().machine,"audiocrypt",size,ROMREGION_ERASEFF);
 			memcpy(memory_region(image.device().machine,"audiocrypt"),image.get_software_region("audiocrypt"),size);
 		}
-		
+
 		// setup cartridge ROM area
 		memory_install_read_bank(cputag_get_address_space(image.device().machine,"maincpu",ADDRESS_SPACE_PROGRAM),0x000080,0x0fffff,0,0,"cart_rom");
 		memory_set_bankptr(image.device().machine,"cart_rom",&memory_region(image.device().machine,"maincpu")[0x80]);
-		
+
 		// handle possible protection
 		install_protection(image);
-		
+
 		return IMAGE_INIT_PASS;
 	}
 

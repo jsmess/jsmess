@@ -1162,7 +1162,7 @@ static void cgb_update_scanline ( running_machine *machine )
 					rectangle r;
 					const rectangle &r1 = screen->visible_area();
 					r.min_x = r1.min_x;
-					r.max_x = r1.max_x;					
+					r.max_x = r1.max_x;
 					r.min_y = r.max_y = gb_lcd.current_line;
 					bitmap_fill( bitmap, &r , ( ! gb_lcd.gbc_mode ) ? 0 : 32767);
 				}

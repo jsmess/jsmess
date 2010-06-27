@@ -85,7 +85,7 @@ static READ8_HANDLER(mac_asc_r)
 {
 	mac_state *mac = (mac_state *)space->machine->driver_data;
 
-//	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
+//  logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
 
 	switch (offset)
 	{
@@ -105,7 +105,7 @@ static WRITE8_HANDLER(mac_asc_w)
 	INT32 i;
 	mac_state *mac = (mac_state *)space->machine->driver_data;
 
-//	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
+//  logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(devtag_get_device(space->machine, "maincpu")));
 
 	mac->mac_asc_regs[offset] = data;
 
@@ -261,7 +261,7 @@ static READ16_HANDLER ( mac_v8_r )
 	int data, viaoffs;
 	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 
-//	printf("v8_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
+//  printf("v8_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
 
 	viaoffs = (offset >> 8) & 0x0f;
 
@@ -283,7 +283,7 @@ static WRITE16_HANDLER ( mac_v8_w )
 	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 	int viaoffs;
 
-//	printf("v8_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
+//  printf("v8_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
 
 	viaoffs = (offset >> 8) & 0x0f;
 
@@ -353,7 +353,7 @@ static READ16_HANDLER ( mac_sonora_r )
 	int data, viaoffs;
 	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 
-//	printf("sonora_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
+//  printf("sonora_r: %x, mask %x (PC %x)\n", offset*2, mem_mask, cpu_get_pc(space->cpu));
 
 	viaoffs = (offset >> 8) & 0x0f;
 
@@ -375,7 +375,7 @@ static WRITE16_HANDLER ( mac_sonora_w )
 	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
 	int viaoffs;
 
-//	printf("sonora_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
+//  printf("sonora_w: %x to offset %x, mask %x (PC %x)\n", data, offset*2, mem_mask, cpu_get_pc(space->cpu));
 
 	viaoffs = (offset >> 8) & 0x0f;
 
@@ -436,7 +436,7 @@ static VIDEO_UPDATE( macsonora )
 
 static READ32_HANDLER(mac_lc3_id)
 {
-//	printf("Sonora ID register read, PC=%x\n", cpu_get_pc(space->cpu));
+//  printf("Sonora ID register read, PC=%x\n", cpu_get_pc(space->cpu));
 
 	return 0xa55a0001;	// 25 MHz LC III
 }

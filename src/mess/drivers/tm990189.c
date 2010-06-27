@@ -421,7 +421,7 @@ static TMS9902_RST_CALLBACK( rts_callback )
 static TMS9902_XMIT_CALLBACK( xmit_callback )
 {
 	UINT8 buf = data;
-	
+
 	if (rs232_fp)
 		rs232_fp->fwrite(&buf, 1);
 }

@@ -14,7 +14,7 @@
 typedef struct __unif
 {
 	const char *board; /* UNIF board */
-	
+
 	int nvwram;
 	int wram;
 	int chrram;
@@ -111,7 +111,7 @@ static const unif unif_list[] =
 	{ "BMC-SUPER24IN1SC03",         8,    0, CHRRAM_8,  NT_X,  BMC_S24IN1SC03},
 	{ "BMC-SUPERHIK8IN1",           8,    0, CHRRAM_0,  NT_X,  BMC_HIK8IN1},
 	{ "BMC-T-262",                  0,    0, CHRRAM_8,  NT_VERT,  BMC_T262},		//UNIF only!
-	{ "BMC-WS",                     0,    0, CHRRAM_0,  NT_VERT,  BMC_WS},		//UNIF only!	
+	{ "BMC-WS",                     0,    0, CHRRAM_0,  NT_VERT,  BMC_WS},		//UNIF only!
 	{ "BMC-N625092",                0,    0, CHRRAM_0,  NT_VERT,  UNL_N625092},
 	// below are boards which are not yet supported, but are used by some UNIF files. they are here as a reminder to what is missing to be added
 	{ "UNL-TEK90",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// related to JY Company? (i.e. mappers 90, 209, 211?)
@@ -158,7 +158,7 @@ static int unif_initialize( running_machine *machine, int idx )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	int err = 0, i;
-	
+
 	switch (idx)
 	{
 		case STD_NROM:	// mapper 0
@@ -218,7 +218,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg8_ab(machine, (state->prg_chunks << 1) - 3);
 			prg8_cd(machine, (state->prg_chunks << 1) - 2);
 			prg8_ef(machine, (state->prg_chunks << 1) - 1);
-			break;			
+			break;
 		case STD_FXROM: // mapper 10
 			state->MMC2_regs[0] = state->MMC2_regs[2] = 0;
 			state->MMC2_regs[1] = state->MMC2_regs[3] = 0;
@@ -271,7 +271,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
-			break;			
+			break;
 		case PAL_ZZ:	// mapper 37
 			state->mmc3_alt_irq = 0;
 			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
@@ -722,9 +722,9 @@ static int unif_initialize( running_machine *machine, int idx )
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 // mapper 116
-//		case SOMERITEAM_SL12:
-//			mapper_initialize(machine, 116);
-//			break;
+//      case SOMERITEAM_SL12:
+//          mapper_initialize(machine, 116);
+//          break;
 // mapper 117
 		case FUTUREMEDIA_BOARD:
 			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
@@ -1177,7 +1177,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 
-// UNIF only			
+// UNIF only
 		case BMC_64IN1NR:
 			state->bmc_64in1nr_reg[0] = 0x80;
 			state->bmc_64in1nr_reg[1] = 0x43;
@@ -1264,7 +1264,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
-			
+
 		case BMC_VT5201:
 			prg32(machine, 0);
 			chr8(machine, 0, CHRROM);
@@ -1277,26 +1277,26 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_prg_bank[3] = 0xff;
 			bmc_bs5_update_banks(machine);
 			break;
-			
-		case BMC_810544: 
+
+		case BMC_810544:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 0);
 			chr8(machine, 0, CHRROM);
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
-			
+
 		case UNSUPPORTED_BOARD:
 		default:
 			/* Mapper not supported */
 			err = 2;
 			break;
 	}
-	
+
 	return err;
 }
 
 /*************************************************************
- 
+
  unif_mapr_setup
 
  setup the board specific variables (wram, nvwram, pcb_id etc.)
@@ -1308,12 +1308,12 @@ void unif_mapr_setup( running_machine *machine, const char *board )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	const unif *unif_board = nes_unif_lookup(board);
-	
+
 	logerror("%s\n", board);
-	
+
 	if (unif_board == NULL)
 		fatalerror("Unknown UNIF board %s.", board);
-	
+
 	state->mapper = 0;	// this allows us to set up memory handlers without duplicating code (for the moment)
 	state->pcb_id = unif_board->board_idx;
 	state->battery = unif_board->nvwram;	// we should implement battery banks based on the size of this...

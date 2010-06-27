@@ -857,39 +857,39 @@ static WRITE8_HANDLER( sub_io_w )
 
 //static int x1_keyboard_irq_state(running_device* device)
 //{
-//	if(key_irq_flag != 0)
-//		return Z80_DAISY_INT;
+//  if(key_irq_flag != 0)
+//      return Z80_DAISY_INT;
 //
-//	return 0;
+//  return 0;
 //}
 //
 //static int x1_keyboard_irq_ack(running_device* device)
 //{
-//	key_irq_flag = 0;
-//	cputag_set_input_line(device->machine,"maincpu",INPUT_LINE_IRQ0,CLEAR_LINE);
-//	return key_irq_vector;
+//  key_irq_flag = 0;
+//  cputag_set_input_line(device->machine,"maincpu",INPUT_LINE_IRQ0,CLEAR_LINE);
+//  return key_irq_vector;
 //}
 //
 //static DEVICE_GET_INFO( x1_keyboard_getinfo )
 //{
-//	switch (state)
-//	{
-//		/* --- the following bits of info are returned as 64-bit signed integers --- */
-//		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
-//		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+//  switch (state)
+//  {
+//      /* --- the following bits of info are returned as 64-bit signed integers --- */
+//      case DEVINFO_INT_TOKEN_BYTES:                   info->i = 4;                                            break;
+//      case DEVINFO_INT_INLINE_CONFIG_BYTES:           info->i = 0;                                            break;
 //
-//		/* --- the following bits of info are returned as pointers to data or functions --- */
-//		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(x1_daisy);		break;
-//		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)x1_keyboard_irq_state;	break;
-//		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)x1_keyboard_irq_ack;		break;
+//      /* --- the following bits of info are returned as pointers to data or functions --- */
+//      case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME(x1_daisy);      break;
+//      case DEVINFO_FCT_IRQ_STATE:                     info->f = (genf *)x1_keyboard_irq_state;    break;
+//      case DEVINFO_FCT_IRQ_ACK:                       info->f = (genf *)x1_keyboard_irq_ack;      break;
 //
-//		/* --- the following bits of info are returned as NULL-terminated strings --- */
-//		case DEVINFO_STR_NAME:							strcpy(info->s, "X1 keyboard");		break;
-//		case DEVINFO_STR_FAMILY:						strcpy(info->s, "X1 daisy chain");				break;
-//		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
-//		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
-//		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
-//	}
+//      /* --- the following bits of info are returned as NULL-terminated strings --- */
+//      case DEVINFO_STR_NAME:                          strcpy(info->s, "X1 keyboard");     break;
+//      case DEVINFO_STR_FAMILY:                        strcpy(info->s, "X1 daisy chain");              break;
+//      case DEVINFO_STR_VERSION:                       strcpy(info->s, "1.0");                                 break;
+//      case DEVINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                              break;
+//      case DEVINFO_STR_CREDITS:                       strcpy(info->s, "Copyright the MESS Team");             break;
+//  }
 //}
 
 /*************************************
@@ -1978,14 +1978,14 @@ static const z80sio_interface sio_intf =
 
 static const z80_daisy_config x1_daisy[] =
 {
-//	{ "x1kb" },
+//  { "x1kb" },
 	{ "ctc" },
 	{ NULL }
 };
 
 static const z80_daisy_config x1turbo_daisy[] =
 {
-//	{ "x1kb" },
+//  { "x1kb" },
 	{ "ctc" },
 	{ "dma" },
 //  { "sio" },
@@ -2094,12 +2094,12 @@ static TIMER_CALLBACK(x1_rtc_increment)
 	if((x1_rtc.sec & 0xf0) >= 0x60) 				{ x1_rtc.min++; x1_rtc.sec = 0; }
 	if((x1_rtc.min & 0x0f) >= 0x0a) 				{ x1_rtc.min+=0x10; x1_rtc.min&=0xf0; }
 	if((x1_rtc.min & 0xf0) >= 0x60) 				{ x1_rtc.hour++; x1_rtc.min = 0; }
-	if((x1_rtc.hour & 0x0f) >= 0x0a) 				{ x1_rtc.hour+=0x10; x1_rtc.hour&=0xf0; }
+	if((x1_rtc.hour & 0x0f) >= 0x0a)				{ x1_rtc.hour+=0x10; x1_rtc.hour&=0xf0; }
 	if((x1_rtc.hour & 0xff) >= 0x24)				{ x1_rtc.day++; x1_rtc.wday++; x1_rtc.hour = 0; }
 	if((x1_rtc.wday & 0x0f) >= 0x07)				{ x1_rtc.wday = 0; }
 	if((x1_rtc.day & 0x0f) >= 0x0a)					{ x1_rtc.day+=0x10; x1_rtc.day&=0xf0; }
 	/* FIXME: very crude leap year support (i.e. it treats the RTC to be with a 2000-2099 timeline), dunno how the real x1 supports this,
-	   maybe it just have a 1980-1999 timeline since year 0x00 shows as a XX on display */
+       maybe it just have a 1980-1999 timeline since year 0x00 shows as a XX on display */
 	if(((x1_rtc.year % 4) == 0) && x1_rtc.month == 2)
 	{
 		if((x1_rtc.day & 0xff) >= dpm[x1_rtc.month-1]+1+1)

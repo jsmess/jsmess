@@ -9,7 +9,7 @@
 typedef struct __mmc
 {
 	int iNesMapper; /* iNES Mapper # */
-	
+
 	const char *desc;     /* Mapper description */
 	write8_space_func mmc_write_low; /* $4100-$5fff write routine */
 	read8_space_func mmc_read_low; /* $4100-$5fff read routine */
@@ -893,12 +893,12 @@ static WRITE8_HANDLER( mapper5_l_w )
 			state->mmc5_high_chr = data & 0x03;
 			if (state->mmc5_vram_control == 1)
 			{
-				// in this case state->mmc5_high_chr selects which 256KB of CHR ROM 
+				// in this case state->mmc5_high_chr selects which 256KB of CHR ROM
 				// is to be used for all background tiles on the screen.
 			}
 			break;
 
-			
+
 		case 0x1100: /* $5200 */
 			state->mmc5_split_scr = data;
 			// in EX2 and EX3 modes, no split screen
@@ -5145,7 +5145,7 @@ static WRITE8_HANDLER( mapper92_w )
     Games: Shanghai, Fantasy Zone
 
     Very similar to mapper 89, but no NT mirroring for data&8
- 
+
     In MESS: Supported.
 
 *************************************************************/
@@ -10909,21 +10909,21 @@ const mmc *nes_mapper_lookup( int mapper )
 }
 
 /*************************************************************
- 
+
  mapper_initialize
- 
+
  Initialize various constants needed by mappers, depending
  on the mapper number. As long as the code is mainly iNES
  centric, also UNIF images will call this function to
  initialize their bankswitch and registers.
- 
+
  *************************************************************/
 
 static int mapper_initialize( running_machine *machine, int mmc_num )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	int err = 0, i;
-	
+
 	switch (mmc_num)
 	{
 		case 0:
@@ -11171,7 +11171,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			state->mmc_chr_mask = 0x7f;
 			mapper4_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mapper4_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
-			//			memory_set_bankptr(machine, "bank5", state->wram);
+			//          memory_set_bankptr(machine, "bank5", state->wram);
 			break;
 		case 46:
 			prg32(machine, 0);
@@ -11209,7 +11209,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			state->mmc_chr_mask = 0xff;
 			mapper4_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mapper4_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
-			//			memory_set_bankptr(machine, "bank5", state->wram);
+			//          memory_set_bankptr(machine, "bank5", state->wram);
 			break;
 		case 57:
 			state->mmc_cmd1 = 0x00;
@@ -11465,7 +11465,7 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			// Famicom Jump II needs also the following!
 			for (i = 0; i < 8; i++)
 				state->map153_reg[i] = 0;
-			
+
 			state->map153_bank_latch = 0;
 			if (state->crc_hack)
 				mapper153_set_prg(machine);
@@ -11712,22 +11712,22 @@ static int mapper_initialize( running_machine *machine, int mmc_num )
 			err = 2;
 			break;
 	}
-	
+
 	return err;
 }
 
 /*************************************************************
- 
+
  nes_mapper_reset
- 
+
  Resets the mapper bankswitch areas to their defaults.
  It returns a value "err" that indicates if it was
  successful. Possible values for err are:
- 
+
  0 = success
  1 = no mapper found
  2 = mapper not supported
- 
+
  *************************************************************/
 
 int nes_mapper_reset( running_machine *machine )
@@ -11735,24 +11735,24 @@ int nes_mapper_reset( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	int err = 0, i;
 	const mmc *mapper;
-	
+
 	/* Set the mapper irq callback */
 	mapper = nes_mapper_lookup(state->mapper);
-	
+
 	if (mapper == NULL)
 		fatalerror("Unimplemented Mapper %d", state->mapper);
 	//      logerror("Mapper %d is not yet supported, defaulting to no mapper.\n", state->mapper);    // this one would be a better output
-	
+
 	ppu2c0x_set_scanline_callback(state->ppu, mapper ? mapper->mmc_scanline : NULL);
 	ppu2c0x_set_hblank_callback(state->ppu, mapper ? mapper->mmc_hblank : NULL);
-	
+
 	if (state->chr_chunks == 0)
 		chr8(machine, 0, CHRRAM);
 	else
 		chr8(machine, 0, CHRROM);
-	
+
 	state->mmc5_vram_control = 0;
-	
+
 	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
 	for (i = 0; i < 4; i++)
 		state->mmc_prg_bank[i] = 0;
@@ -11760,14 +11760,14 @@ int nes_mapper_reset( running_machine *machine )
 		state->mmc_vrom_bank[i] = 0;
 	for (i = 0; i < 16; i++)
 		state->mmc_extra_bank[i] = 0;
-	
+
 	/* Finally, we init IRQ-related quantities. */
 	state->IRQ_enable = state->IRQ_enable_latch = 0;
 	state->IRQ_count = state->IRQ_count_latch = 0;
 	state->IRQ_toggle = 0;
-	
+
 	err = mapper_initialize(machine, state->mapper);
-	
+
 	return err;
 }
 
@@ -11775,7 +11775,7 @@ void mapper_handlers_setup( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	const mmc *mapper = nes_mapper_lookup(state->mapper);
-	
+
 	if (mapper)
 	{
 		state->mmc_write_low = mapper->mmc_write_low;

@@ -241,11 +241,11 @@ static VIDEO_UPDATE( pv1000 )
 
 /*
  plgDavid's audio implementation/analysis notes:
- 
+
  Sound appears to be 3 50/50 pulse voices made by cutting the main clock by 1024,
  then by the value of the 6bit period registers.
  This creates a surprisingly accurate pitch range.
- 
+
  Note: the register periods are inverted.
  */
 

@@ -508,23 +508,23 @@ static void pc8801_init_bank(running_machine *machine, int hireso)
 	pc8801_update_bank(machine);
 	pc8801_video_init(machine, hireso);
 
-	if (extmem_mode != input_port_read(machine, "MEM")) 
+	if (extmem_mode != input_port_read(machine, "MEM"))
 	{
 		extmem_mode = input_port_read(machine, "MEM");
 
 		// reset all the bank-related quantities
 		memset(extRAM, 0, extRAM_size);
 
-		for (i = 0; i < 4; i++) 
+		for (i = 0; i < 4; i++)
 			ext_bank_80[i] = NULL;
 
-		for (i = 0; i < 256; i++) 
+		for (i = 0; i < 256; i++)
 			ext_bank_88[i] = NULL;
 
 		num80 = num88 = numIO = 0;
 
 		// set up the required number of banks
-		switch (extmem_mode) 
+		switch (extmem_mode)
 		{
 			case 0x00: /* none */
 				break;
@@ -576,36 +576,36 @@ static void pc8801_init_bank(running_machine *machine, int hireso)
 		}
 
 		// point the banks to the correct memory
-		if (num80 != 0 || num88 != 0 || numIO != 0) 
+		if (num80 != 0 || num88 != 0 || numIO != 0)
 		{
 			e = extRAM;
 
-			for (i = 0; i < num80; i++) 
+			for (i = 0; i < num80; i++)
 			{
 				ext_bank_80[i] = e;
 				e += 0x8000;
 			}
- 
-			for (i = 0; i < num88 * 4; i++) 
+
+			for (i = 0; i < num88 * 4; i++)
 			{
-				for (j = i; j < 256; j += 16) 
+				for (j = i; j < 256; j += 16)
 				{
 					ext_bank_88[j] = e;
 				}
 				e += 0x8000;
 			}
 
-			if (num88 == 0) 
+			if (num88 == 0)
 			{
-				for (i = 0; i < numIO * 32; i++) 
+				for (i = 0; i < numIO * 32; i++)
 				{
 					ext_bank_88[(i & 0x07) | ((i & 0x18) << 1) | ((i & 0x20) >> 2) | (i & 0xc0)] = e;
 					e += 0x8000;
 				}
-			} 
-			else 
+			}
+			else
 			{
-				for (i = 0; i < numIO * 32; i++) 
+				for (i = 0; i < numIO * 32; i++)
 				{
 					ext_bank_88[(i & 0x07) | ((i & 0x78) << 1) | 0x08] = e;
 					e += 0x8000;

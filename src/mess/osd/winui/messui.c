@@ -395,7 +395,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	const game_driver *drv;
 	HWND hwndSoftwarePicker;
 	HWND hwndSoftwareList;
-	HWND hwndSoftwareDevView;	
+	HWND hwndSoftwareDevView;
 
 	// do we have to do anything?
 	if (!bForce)
@@ -437,7 +437,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 		drv = driver_get_compatible(drv);
 	}
 	AddSoftwarePickerDirs(hwndSoftwarePicker, GetExtraSoftwarePaths(drvindex), NULL);
-	
+
 	// set up the software picker
 	SoftwareList_Clear(hwndSoftwareList);
 	SoftwareList_SetDriver(hwndSoftwareList, s_config);
@@ -461,11 +461,11 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 					if (list)
 					{
 						for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
-						{							
+						{
 							const device_config_image_interface *image;
-							software_part *part = software_find_part(swinfo, NULL, NULL);			
+							software_part *part = software_find_part(swinfo, NULL, NULL);
 
-							// search for a device with the right interface 
+							// search for a device with the right interface
 							for (bool gotone = config->devicelist.first(image); gotone; gotone = image->next(image))
 							{
 								const char *interface = image->image_interface();
@@ -480,14 +480,14 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 							}
 						}
 						software_list_close(list);
-					}						
+					}
 				}
 			}
 		}
 	}
 
 	/* free the machine config */
-	machine_config_free( config );		
+	machine_config_free( config );
 }
 
 
@@ -578,11 +578,11 @@ static void MessSpecifyImage(int drvindex, const device_config_image_interface *
 	if (device == NULL)
 	{
 		const device_config_image_interface *dev;
-		for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev)) 
+		for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))
 		{
 			device = dev;
-			s = GetSelectedSoftware(drvindex, s_config->mconfig, device);			
-			if ((s != NULL) && !mame_stricmp(s, pszFilename)) {				
+			s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
+			if ((s != NULL) && !mame_stricmp(s, pszFilename)) {
 				break;
 			}
 		}
@@ -600,8 +600,8 @@ static void MessSpecifyImage(int drvindex, const device_config_image_interface *
 
 		if (file_extension != NULL)
 		{
-   		    const device_config_image_interface *dev;
-			for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))			
+		    const device_config_image_interface *dev;
+			for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))
 			{
 				device = dev;
 				s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
@@ -632,7 +632,7 @@ static void MessRemoveImage(int drvindex, const char *pszFilename)
 	const device_config_image_interface *device;
 	const char *s;
 
-	for (bool gotone = s_config->mconfig->devicelist.first(device); gotone; gotone = device->next(device))			
+	for (bool gotone = s_config->mconfig->devicelist.first(device); gotone; gotone = device->next(device))
 	{
 		s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
 		if ((s != NULL) && !strcmp(pszFilename, s))
@@ -669,7 +669,7 @@ static void MessRefreshPicker(void)
 	// be problematic
 	ListView_SetItemState(hwndSoftware, -1, 0, LVIS_SELECTED);
 
-	for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))			
+	for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))
 	{
 		pszSoftware = GetSelectedSoftware(s_config->driver_index, s_config->mconfig, dev);
 		if (pszSoftware && *pszSoftware)
@@ -725,7 +725,7 @@ void InitMessPicker(void)
 		};
 		DevView_SetCallbacks(GetDlgItem(GetMainWindow(), IDC_SWDEVVIEW), &s_devViewCallbacks);
 	}
-	
+
 	HWND hwndSoftwareList;
 
 	hwndSoftwareList = GetDlgItem(GetMainWindow(), IDC_SOFTLIST);
@@ -880,7 +880,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 
 	}
 	else
-	{	
+	{
 		astring extensions((char*)dev->file_extensions());
 		char *ext = strtok((char*)extensions.cstr(),",");
 		while (ext != NULL)
@@ -893,7 +893,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 				num_extensions++;
 			}
 			ext = strtok (NULL, ",");
-		}	
+		}
 	}
 }
 
@@ -1302,9 +1302,9 @@ static void SoftwareList_EnteringItem(HWND hwndSoftwareList, int nItem)
 		pszFullName = SoftwareList_LookupFilename(hwndSoftwareList, nItem);
 
 		strncpyz(g_szSelectedSoftware, pszFullName, ARRAY_LENGTH(g_szSelectedSoftware));
-		
+
 		strncpyz(g_szSelectedDevice, SoftwareList_LookupDevice(hwndSoftwareList, nItem), ARRAY_LENGTH(g_szSelectedDevice));
-		
+
 		// Set up s_szSelecteItem, for the benefit of UpdateScreenShot()
 		strncpyz(g_szSelectedItem, pszFullName, ARRAY_LENGTH(g_szSelectedItem));
 

@@ -113,7 +113,7 @@ DEVICE_GET_INFO(coco_cartridge_pcb_pak)
 static void banked_pak_set_bank(running_device *device, UINT32 bank)
 {
 	coco_pak_pcb_t *pak_pcb = get_token(device);
-	
+
 	UINT64 pos;
 	UINT32 i;
 	UINT8 *rom = memory_region(device->machine, "cart");

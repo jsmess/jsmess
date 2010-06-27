@@ -922,7 +922,7 @@ ROM_START(apple2ee)
 	ROM_LOAD ( "341-0027-a.p5", 0x4500, 0x0100, CRC(ce7144f6) SHA1(d4181c9f046aafc3fb326b381baac809d9e38d16)) /* Disk II ROM - DOS 3.3 version */
 
 	ROM_REGION(0x1000, "cffa", 0)
-        ROM_LOAD( "cffa20eec02.bin", 0x000000, 0x001000, CRC(fb3726f8) SHA1(080ff88f19de22328e162954ee2b51ee65f9d5cd) ) 
+        ROM_LOAD( "cffa20eec02.bin", 0x000000, 0x001000, CRC(fb3726f8) SHA1(080ff88f19de22328e162954ee2b51ee65f9d5cd) )
 ROM_END
 
 ROM_START(apple2ep)
@@ -1028,7 +1028,7 @@ COMP( 1985, prav8m,   apple2,   0,        apple2p,	   apple2p,  0,        "Prave
 COMP( 1980, apple2jp, apple2,   0,        apple2p,	   apple2p,  0,        "Apple Computer",    "Apple ][j+", GAME_SUPPORTS_SAVE )
 COMP( 1982, ace100,   apple2,   0,        apple2,	   apple2e,  0,        "Franklin Computer", "Franklin Ace 100", GAME_SUPPORTS_SAVE )
 COMP( 1983, apple2e,  0,        apple2,	  apple2e,	   apple2e,  0,        "Apple Computer",    "Apple //e", GAME_SUPPORTS_SAVE )
-//COMP( 1983, apple2ez, apple2e,  0,	  apple2e_z80,	   apple2e,  0,        "Apple Computer",    "Apple //e (with Z80 SoftCard)", GAME_SUPPORTS_SAVE )
+//COMP( 1983, apple2ez, apple2e,  0,      apple2e_z80,     apple2e,  0,        "Apple Computer",    "Apple //e (with Z80 SoftCard)", GAME_SUPPORTS_SAVE )
 COMP( 1983, mprof3,   apple2e,  0,        mprof3,	   apple2e,  0,        "Multitech",         "Microprofessor III", GAME_SUPPORTS_SAVE )
 COMP( 1985, apple2ee, apple2e,  0,        apple2ee,	   apple2e,  0,        "Apple Computer",    "Apple //e (enhanced)", GAME_SUPPORTS_SAVE )
 COMP( 1987, apple2ep, apple2e,  0,        apple2ep,	   apple2ep, 0,        "Apple Computer",    "Apple //e (Platinum)", GAME_SUPPORTS_SAVE )

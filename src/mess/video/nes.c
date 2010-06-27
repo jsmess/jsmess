@@ -38,9 +38,9 @@ static void nes_vh_reset( running_machine *machine )
 VIDEO_START( nes )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
-	
+
 	state->last_frame_flip =  0;
-	
+
 	add_reset_callback(machine, nes_vh_reset);
 }
 

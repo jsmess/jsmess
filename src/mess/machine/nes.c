@@ -60,8 +60,8 @@ static void init_nes_core( running_machine *machine )
 	{
 		state->slow_banking = 0;
 		/* If we are loading a disk we have already filled state->fds_data and we don't want to overwrite it,
-		 if we are loading a cart image identified as mapper 20 (probably wrong mapper...) we need to alloc
-		 memory for use in nes_fds_r/nes_fds_w. Same goes for allocation of fds_ram (used for bank2)  */
+         if we are loading a cart image identified as mapper 20 (probably wrong mapper...) we need to alloc
+         memory for use in nes_fds_r/nes_fds_w. Same goes for allocation of fds_ram (used for bank2)  */
 		if (state->fds_data == NULL)
 		{
 			UINT32 size = memory_region_length(machine, "maincpu") - 0x10000;
@@ -70,14 +70,14 @@ static void init_nes_core( running_machine *machine )
 		}
 		if (state->fds_ram == NULL)
 			state->fds_ram = auto_alloc_array(machine, UINT8, 0x8000);
-		
+
 		memory_install_read8_handler(space, 0x4030, 0x403f, 0, 0, nes_fds_r);
 		memory_install_read_bank(space, 0x6000, 0xdfff, 0, 0, "bank2");
 		memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank1");
-		
+
 		memory_install_write8_handler(space, 0x4020, 0x402f, 0, 0, nes_fds_w);
 		memory_install_write_bank(space, 0x6000, 0xdfff, 0, 0, "bank2");
-		
+
 		memory_set_bankptr(machine, "bank1", &state->rom[0xe000]);
 		memory_set_bankptr(machine, "bank2", state->fds_ram);
 		return;
@@ -96,7 +96,7 @@ static void init_nes_core( running_machine *machine )
 	memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank3");
 	memory_install_read_bank(space, 0xe000, 0xffff, 0, 0, "bank4");
 	memory_install_readwrite_bank(space, 0x6000, 0x7fff, 0, 0, "bank5");
-	
+
 	/* configure banks 1-4 */
 	for (i = 0; i < 4; i++)
 	{
@@ -108,14 +108,14 @@ static void init_nes_core( running_machine *machine )
 		memory_set_bank(machine, bank_names[i], i);
 		state->prg_bank[i] = i;
 	}
-	
+
 	/* bank 5 configuration is more delicate, since it can have PRG RAM, PRG ROM or SRAM mapped to it */
 	/* we first map PRG ROM banks, then the battery bank (if a battery is present), and finally PRG RAM (state->wram) */
 	memory_configure_bank(machine, "bank5", 0, prg_banks, memory_region(machine, "maincpu") + 0x10000, 0x2000);
 	state->battery_bank5_start = prg_banks;
 	state->prgram_bank5_start = prg_banks;
 	state->empty_bank5_start = prg_banks;
-	
+
 	/* add battery ram, but only if there's no trainer since they share overlapping memory. */
 	if (state->battery && !state->trainer)
 	{
@@ -131,29 +131,29 @@ static void init_nes_core( running_machine *machine )
 		memory_configure_bank(machine, "bank5", state->prgram_bank5_start, state->wram_size / 0x2000, state->wram, 0x2000);
 		state->empty_bank5_start += state->wram_size / 0x2000;
 	}
-	
+
 	memory_configure_bank(machine, "bank5", state->empty_bank5_start, 1, state->rom + 0x6000, 0x2000);
-	
+
 	/* if we have any additional PRG RAM, point bank5 to its first bank */
 	if (state->battery || state->prg_ram)
 		state->prg_bank[4] = state->battery_bank5_start;
 	else
 		state->prg_bank[4] = state->empty_bank5_start; // or shall we point to "maincpu" region at 0x6000? point is that we should never access this region if no sram or wram is present!
-	
+
 	memory_set_bank(machine, "bank5", state->prg_bank[4]);
-	
+
 	if (state->four_screen_vram)
 	{
 		state->extended_ntram = auto_alloc_array(machine, UINT8, 0x2000);
 		state_save_register_global_pointer(machine, state->extended_ntram, 0x2000);
 	}
-	
+
 	// there are still some quirk about writes to bank5... I hope to fix them soon. (mappers 34,45,52,246 have both mid_w and WRAM-->check)
 	if (state->mmc_write_mid)
 		memory_install_write8_handler(space, 0x6000, 0x7fff, 0, 0, state->mmc_write_mid);
 	if (state->mmc_write)
 		memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, state->mmc_write);
-	
+
 	// In fact, we also allow single pcbs to overwrite the bank read handlers defined above,
 	// because some pcbs (mainly pirate ones) require protection values to be read instead of
 	// the expected ROM banks: these handlers, though, must take care of the ROM access as well
@@ -161,7 +161,7 @@ static void init_nes_core( running_machine *machine )
 		memory_install_read8_handler(space, 0x6000, 0x7fff, 0, 0, state->mmc_read_mid);
 	if (state->mmc_read)
 		memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, state->mmc_read);
-	
+
 	// install additional handlers
 	if (state->pcb_id == BTL_SMB2B)
 	{
@@ -187,7 +187,7 @@ MACHINE_RESET( nes )
 
 	/* Some carts have extra RAM and require it on at startup, e.g. Metroid */
 	state->mid_ram_enable = 1;
-	
+
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	if (state->disk_expansion && state->pcb_id == NO_BOARD)
 		ppu2c0x_set_hblank_callback(state->ppu, fds_irq);
@@ -299,9 +299,9 @@ static void nes_machine_stop( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(state->cart);
 	/* Write out the battery file if necessary */
-	if (state->battery) 	
+	if (state->battery)
 		image->battery_save(state->battery_ram, state->battery_size);
-	
+
 	if (state->mapper_ram_size)
 		image->battery_save(state->mapper_ram, state->mapper_ram_size);
 }
@@ -324,22 +324,22 @@ READ8_HANDLER( nes_IN0_r )
 		/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
 		/* in the unused upper 3 bits, so typically a read from $4016 leaves 0x40 there. */
 		ret = 0x40;
-		
+
 		ret |= ((state->in_0.i0 >> state->in_0.shift) & 0x01);
-		
+
 		/* zapper */
 		if ((cfg & 0x000f) == 0x0002)
 		{
 			int x = state->in_0.i1;	/* read Zapper x-position */
 			int y = state->in_0.i2;	/* read Zapper y-position */
 			UINT32 pix, color_base;
-			
+
 			/* get the pixel at the gun position */
 			pix = ppu2c0x_get_pixel(state->ppu, x, y);
-			
+
 			/* get the color base from the ppu */
 			color_base = ppu2c0x_get_colorbase(state->ppu);
-			
+
 			/* look at the screen and see if the cursor is over a bright pixel */
 			if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
 				(pix == color_base + 0x33) || (pix == color_base + 0x34))
@@ -348,14 +348,14 @@ READ8_HANDLER( nes_IN0_r )
 			}
 			else
 				ret |= 0x08;  /* no sprite hit */
-			
+
 			/* If button 1 is pressed, indicate the light gun trigger is pressed */
 			ret |= ((state->in_0.i0 & 0x01) << 4);
 		}
-		
+
 		if (LOG_JOY)
 			logerror("joy 0 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), state->in_0.shift, state->in_0.i0);
-		
+
 		state->in_0.shift++;
 	}
 
@@ -371,7 +371,7 @@ static UINT8 nes_read_fc_keyboard_line( running_machine *machine, UINT8 scan, UI
 
 static UINT8 nes_read_subor_keyboard_line( running_machine *machine, UINT8 scan, UINT8 mode )
 {
-	static const char *const sub_keyport_names[] = { "SUBKEY0", "SUBKEY1", "SUBKEY2", "SUBKEY3", "SUBKEY4", 
+	static const char *const sub_keyport_names[] = { "SUBKEY0", "SUBKEY1", "SUBKEY2", "SUBKEY3", "SUBKEY4",
 		"SUBKEY5", "SUBKEY6", "SUBKEY7", "SUBKEY8", "SUBKEY9", "SUBKEY10", "SUBKEY11", "SUBKEY12" };
 	return ((input_port_read(machine, sub_keyport_names[scan]) >> (mode * 4)) & 0x0f) << 1;
 }
@@ -401,23 +401,23 @@ READ8_HANDLER( nes_IN1_r )
 		/* Some games expect bit 6 to be set because the last entry on the data bus shows up */
 		/* in the unused upper 3 bits, so typically a read from $4017 leaves 0x40 there. */
 		ret = 0x40;
-		
+
 		/* Handle data line 0's serial output */
 		ret |= ((state->in_1.i0 >> state->in_1.shift) & 0x01);
-		
+
 		/* zapper */
 		if ((cfg & 0x00f0) == 0x0030)
 		{
 			int x = state->in_1.i1;	/* read Zapper x-position */
 			int y = state->in_1.i2;	/* read Zapper y-position */
 			UINT32 pix, color_base;
-			
+
 			/* get the pixel at the gun position */
 			pix = ppu2c0x_get_pixel(state->ppu, x, y);
-			
+
 			/* get the color base from the ppu */
 			color_base = ppu2c0x_get_colorbase(state->ppu);
-			
+
 			/* look at the screen and see if the cursor is over a bright pixel */
 			if ((pix == color_base + 0x20) || (pix == color_base + 0x30) ||
 				(pix == color_base + 0x33) || (pix == color_base + 0x34))
@@ -426,26 +426,26 @@ READ8_HANDLER( nes_IN1_r )
 			}
 			else
 				ret |= 0x08;  /* no sprite hit */
-			
+
 			/* If button 1 is pressed, indicate the light gun trigger is pressed */
 			ret |= ((state->in_1.i0 & 0x01) << 4);
 		}
-		
+
 		/* arkanoid dial */
 		else if ((cfg & 0x00f0) == 0x0040)
 		{
 			/* Handle data line 2's serial output */
 			ret |= ((state->in_1.i2 >> state->in_1.shift) & 0x01) << 3;
-			
+
 			/* Handle data line 3's serial output - bits are reversed */
 			/* NPW 27-Nov-2007 - there is no third subscript! commenting out */
 			/* ret |= ((state->in_1[3] >> state->in_1.shift) & 0x01) << 4; */
 			/* ret |= ((state->in_1[3] << state->in_1.shift) & 0x80) >> 3; */
 		}
-		
+
 		if (LOG_JOY)
 			logerror("joy 1 read, val: %02x, pc: %04x, bits read: %d, chan0: %08x\n", ret, cpu_get_pc(space->cpu), state->in_1.shift, state->in_1.i0);
-		
+
 		state->in_1.shift++;
 	}
 
@@ -527,7 +527,7 @@ WRITE8_HANDLER( nes_IN0_w )
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	timer_set(space->machine, attotime_zero, NULL, 0, lightgun_tick);
-	
+
 	if ((cfg & 0x000f) >= 0x04)	// for now we treat the FC keyboard separately from other inputs!
 	{
 		// here we should also have the tape output
@@ -536,12 +536,12 @@ WRITE8_HANDLER( nes_IN0_w )
 		{
 			int lines = ((cfg & 0x000f) == 0x04) ? 9 : 12;
 			UINT8 out = BIT(data, 1);	// scan
-			
+
 			if (state->fck_mode && !out && ++state->fck_scan > lines)
 				state->fck_scan = 0;
-			
+
 			state->fck_mode = out;	// access lower or upper 4 bits
-			
+
 			if (BIT(data, 0))	// reset
 				state->fck_scan = 0;
 		}
@@ -550,23 +550,23 @@ WRITE8_HANDLER( nes_IN0_w )
 	{
 		if (data & 0x01)
 			return;
-		
+
 		if (LOG_JOY)
 			logerror("joy 0 bits read: %d\n", state->in_0.shift);
-		
+
 		/* Toggling bit 0 high then low resets both controllers */
 		state->in_0.shift = 0;
 		state->in_1.shift = 0;
-		
+
 		/* Read the input devices */
 		nes_read_input_device(space->machine, cfg >>  0, &state->in_0, 0,  TRUE, -1);
 		nes_read_input_device(space->machine, cfg >>  4, &state->in_1, 1,  TRUE,  1);
 		nes_read_input_device(space->machine, cfg >>  8, &state->in_2, 2, FALSE, -1);
 		nes_read_input_device(space->machine, cfg >> 12, &state->in_3, 3, FALSE, -1);
-		
+
 		if (cfg & 0x0f00)
 			state->in_0.i0 |= (state->in_2.i0 << 8) | (0x08 << 16);
-		
+
 		if (cfg & 0xf000)
 			state->in_1.i0 |= (state->in_3.i0 << 8) | (0x04 << 16);
 	}
@@ -616,7 +616,7 @@ static int nes_cart_get_line( const char *feature )
 	{
 		if (strcmp(nes_line->tag, feature) == 0)
 			break;
-		
+
 		nes_line++;
 	}
 
@@ -647,7 +647,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			state->format = 1;	// we use this to select between mapper_reset / unif_reset
 			state->ines20 = 0;
 			state->battery_size = NES_BATTERY_SIZE; // with iNES we can only support 8K WRAM battery (iNES 2.0 might fix this)
-			state->prg_ram = 1;	// always map state->wram in bank5 (eventually, this should be enabled only for some mappers) 
+			state->prg_ram = 1;	// always map state->wram in bank5 (eventually, this should be enabled only for some mappers)
 
 			// check if the image is recognized by nes.hsi
 			mapinfo = image.extrainfo();
@@ -655,23 +655,23 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			// image_extrainfo() resets the file position back to start.
 			// Let's skip past the magic header once again.
 			image.fseek(4, SEEK_SET);
-			
+
 			image.fread( &state->prg_chunks, 1);
 			image.fread( &state->chr_chunks, 1);
 			/* Read the first ROM option byte (offset 6) */
 			image.fread( &m, 1);
-			
+
 			/* Interpret the iNES header flags */
 			state->mapper = (m & 0xf0) >> 4;
 			local_options = m & 0x0f;
-			
+
 			/* Read the second ROM option byte (offset 7) */
 			image.fread( &m, 1);
-			
+
 			switch (m & 0xc)
 			{
 				case 0x4:
-				case 0xc:	
+				case 0xc:
 					// probably the header got corrupted: don't trust upper bits for mapper
 					break;
 
@@ -751,14 +751,14 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 			state->rom = memory_region(image.device().machine, "maincpu");
 			state->vrom = memory_region(image.device().machine, "gfx1");
-			
+
 			state->vram_chunks = memory_region_length(image.device().machine, "gfx2") / 0x2000;
 			state->vram = memory_region(image.device().machine, "gfx2");
 			// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->prg_ram = 1)!
 			// or if there is a trainer, I think
 			state->wram_size = 0x10000;
 			state->wram = auto_alloc_array(image.device().machine, UINT8, state->wram_size);
-			
+
 			/* Position past the header */
 			image.fseek(16, SEEK_SET);
 
@@ -861,10 +861,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				memset(magic2, '\0', sizeof(magic2));
 				image.fread( &magic2, 4);
 
-				/* We first run through the whole image to find a [MAPR] chunk. This is needed 
-				 because, unfortunately, the MAPR chunk is not always the first chunk (see 
-				 Super 24-in-1). When such a chunk is found, we set mapr_chunk_found=1 and 
-				 we go back to load other chunks! */
+				/* We first run through the whole image to find a [MAPR] chunk. This is needed
+                 because, unfortunately, the MAPR chunk is not always the first chunk (see
+                 Super 24-in-1). When such a chunk is found, we set mapr_chunk_found=1 and
+                 we go back to load other chunks! */
 				if (!mapr_chunk_found)
 				{
 					if ((magic2[0] == 'M') && (magic2[1] == 'A') && (magic2[2] == 'P') && (magic2[3] == 'R'))
@@ -1049,7 +1049,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			memory_region_free(image.device().machine, "maincpu");
 			memory_region_free(image.device().machine, "gfx1");
 			memory_region_free(image.device().machine, "gfx2");
-			
+
 			/* Allocate them again, and copy PRG/CHR from temp buffers */
 			/* Take care of PRG */
 			prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
@@ -1078,12 +1078,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			// FIXME: this should only be allocated if there is actual wram in the cart (i.e. if state->prg_ram = 1)!
 			state->wram_size = 0x10000;
 			state->wram = auto_alloc_array(image.device().machine, UINT8, state->wram_size);
-				
+
 #if SPLIT_PRG
 			{
 				FILE *prgout;
 				char outname[255];
-				
+
 				sprintf(outname, "%s.prg", image.filename());
 				prgout = fopen(outname, "wb");
 				if (prgout)
@@ -1091,17 +1091,17 @@ DEVICE_IMAGE_LOAD( nes_cart )
 					fwrite(&state->rom[0x10000], 1, 0x4000 * state->prg_chunks, prgout);
 					printf("Created PRG chunk\n");
 				}
-				
+
 				fclose(prgout);
 			}
 #endif
-			
+
 #if SPLIT_CHR
 			if (state->chr_chunks > 0)
 			{
 				FILE *chrout;
 				char outname[255];
-				
+
 				sprintf(outname, "%s.chr", image.filename());
 				chrout= fopen(outname, "wb");
 				if (chrout)
@@ -1114,7 +1114,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 #endif
 			// free the temporary copy of PRG/CHR
 			auto_free(image.device().machine, temp_prg);
-			auto_free(image.device().machine, temp_chr);			
+			auto_free(image.device().machine, temp_chr);
 			logerror("UNIF support is only very preliminary.\n");
 		}
 		else
@@ -1129,7 +1129,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		UINT32 chr_size = image.get_software_region_length("chr");
 		UINT32 vram_size = image.get_software_region_length("vram");
 		vram_size += image.get_software_region_length("vram2");
-		
+
 		/* Free the regions that were allocated by the ROM loader */
 		memory_region_free(image.device().machine, "maincpu");
 		memory_region_free(image.device().machine, "gfx1");
@@ -1188,7 +1188,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			state->battery = 1;
 			state->battery_size += 0x4000;
 		}
-		
+
 		state->prg_ram = (image.get_software_region("wram") != NULL) ? 1 : 0;
 		state->wram_size = image.get_software_region_length("wram");
 		state->mapper_ram_size = image.get_software_region_length("mapper_ram");
@@ -1244,21 +1244,21 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			state->vrc_ls_prg_a = nes_cart_get_line(image.get_feature("vrc2-pin3"));
 			state->vrc_ls_prg_b = nes_cart_get_line(image.get_feature("vrc2-pin3"));
 			state->vrc_ls_chr = (nes_cart_get_line(image.get_feature("vrc2-pin21")) != 10) ? 1 : 0;
-//			printf("VRC-2, pin3: A%d, pin4: A%d, pin21: %s\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b, state->vrc_ls_chr ? "NC" : "A10");
+//          printf("VRC-2, pin3: A%d, pin4: A%d, pin21: %s\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b, state->vrc_ls_chr ? "NC" : "A10");
 		}
 
 		if (state->pcb_id == KONAMI_VRC4)
 		{
 			state->vrc_ls_prg_a = nes_cart_get_line(image.get_feature("vrc4-pin3"));
 			state->vrc_ls_prg_b = nes_cart_get_line(image.get_feature("vrc4-pin4"));
-//			printf("VRC-4, pin3: A%d, pin4: A%d\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b);
+//          printf("VRC-4, pin3: A%d, pin4: A%d\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b);
 		}
-		
+
 		if (state->pcb_id == KONAMI_VRC6)
 		{
 			state->vrc_ls_prg_a = nes_cart_get_line(image.get_feature("vrc6-pin9"));
 			state->vrc_ls_prg_b = nes_cart_get_line(image.get_feature("vrc6-pin10"));
-//			printf("VRC-6, pin9: A%d, pin10: A%d\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b);
+//          printf("VRC-6, pin9: A%d, pin10: A%d\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b);
 		}
 
 		/* Check for other misc board variants */
@@ -1267,13 +1267,13 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			if (image.get_feature("mmc1_type") != NULL && !strcmp(image.get_feature("mmc1_type"), "MMC1A"))
 				state->pcb_id = STD_SOROM_A;	// in MMC1-A PRG RAM is always enabled
 		}
-		
+
 		if (state->pcb_id == STD_SXROM)
 		{
 			if (image.get_feature("mmc1_type") != NULL && !strcmp(image.get_feature("mmc1_type"), "MMC1A"))
 				state->pcb_id = STD_SXROM_A;	// in MMC1-A PRG RAM is always enabled
 		}
-		
+
 		if (state->pcb_id == STD_NXROM || state->pcb_id == SUNSOFT_DCS)
 		{
 			if (image.get_software_region("minicart") != NULL)	// check for dual minicart
@@ -1282,7 +1282,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				// we shall load somewhere the minicart, but we still do not support this
 			}
 		}
-		
+
 #if 0
 		if (state->pcb_id == UNSUPPORTED_BOARD)
 			printf("This board (%s) is currently not supported by MESS\n", image_get_feature(image, "pcb"));
@@ -1308,7 +1308,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		}
 		if (state->mapper_ram_size)
 			memcpy(state->mapper_ram, temp_nvram + state->battery_size, state->mapper_ram_size);
-		
+
 		auto_free(image.device().machine, temp_nvram);
 	}
 
@@ -1325,18 +1325,18 @@ void nes_partialhash( char *dest, const unsigned char *data, unsigned long lengt
 }
 
 /**************************
- 
+
  Disk System emulation
- 
+
 **************************/
 
 static void fds_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 	if (state->IRQ_enable_latch)
 		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
-	
+
 	if (state->IRQ_enable)
 	{
 		if (state->IRQ_count <= 114)
@@ -1354,7 +1354,7 @@ static READ8_HANDLER( nes_fds_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 ret = 0x00;
-	
+
 	switch (offset)
 	{
 		case 0x00: /* $4030 - disk status 0 */
@@ -1403,7 +1403,7 @@ static READ8_HANDLER( nes_fds_r )
 static WRITE8_HANDLER( nes_fds_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	
+
 	switch (offset)
 	{
 		case 0x00:
@@ -1425,16 +1425,16 @@ static WRITE8_HANDLER( nes_fds_w )
 			break;
 		case 0x05:
 			state->fds_motor_on = BIT(data, 0);
-			
+
 			if (BIT(data, 1))
 				state->fds_head_position = 0;
-			
+
 			state->fds_read_mode = BIT(data, 2);
 			set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-			
+
 			if ((!(data & 0x40)) && (state->fds_write_reg & 0x40))
 				state->fds_head_position -= 2; // ???
-			
+
 			state->IRQ_enable_latch = BIT(data, 7);
 			state->fds_write_reg = data;
 			break;
@@ -1496,7 +1496,7 @@ DRIVER_INIT( famicom )
 	state->fds_head_position = 0;
 	state->fds_status0 = 0;
 	state->fds_read_mode = state->fds_write_reg = 0;
-	
+
 	state->fds_data = auto_alloc_array_clear(machine, UINT8, 65500 * 2);
 	state->fds_ram = auto_alloc_array_clear(machine, UINT8, 0x8000);
 	state_save_register_global_pointer(machine, state->fds_ram, 0x8000);
@@ -1509,7 +1509,7 @@ DRIVER_INIT( famicom )
 		state->chr_map[i].origin = i * 0x400; // for save state uses!
 		state->chr_map[i].access = &state->vram[state->chr_map[i].origin];
 	}
-	
+
 	floppy_install_load_proc(floppy_get_device(machine, 0), nes_load_proc);
 	floppy_install_unload_proc(floppy_get_device(machine, 0), nes_unload_proc);
 }

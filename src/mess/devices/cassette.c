@@ -211,7 +211,7 @@ void cassette_seek(running_device *device, double time, int origin)
 
 	cassette_update(device);
 
-	length = cassette_get_length(device);	
+	length = cassette_get_length(device);
 
 	switch(origin) {
 	case SEEK_SET:

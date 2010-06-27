@@ -25,7 +25,7 @@
     * 000 F1 Race requires more precise PPU timing. It currently has plenty of 1-line glitches.
     * 001 AD&D Hillsfar and Bill & Ted are broken. We need to ignore the case of writes happening on 2
           consecutive CPU cycles because these games use dirty tricks to reset counters (see note in mapper1_w)
-    * 001 Yoshi flashes in-game. Zombie Hunter regressed. Rocket Ranger and Back to the Future have heavily 
+    * 001 Yoshi flashes in-game. Zombie Hunter regressed. Rocket Ranger and Back to the Future have heavily
           corrupted graphics (since forever) and Snow Bros. (J) has never worked.
     * 001, 155 We don't handle (yet) WRAM enable/disable bit
     * 002, 003, 094, 097, 152 Bus conflict?
@@ -177,10 +177,10 @@ READ8_HANDLER( nes_chr_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	int bank = offset >> 10;
-	
+
 	// a few CNROM boards contained copy protection schemes through
 	// suitably configured diodes, so that subsequent CHR reads can
-	// give actual VROM content or open bus values. 
+	// give actual VROM content or open bus values.
 	// For most boards, chr_open_bus remains always zero.
 	if (state->chr_open_bus)
 		return 0xff;
@@ -252,7 +252,7 @@ static void wram_bank( running_machine *machine, int bank, int source )
 		bank &= (state->battery_size / 0x2000) - 1;
 		state->prg_bank[4] = state->battery_bank5_start + bank;
 	}
-	else 
+	else
 	{
 		bank &= (state->wram_size / 0x2000) - 1;
 		state->prg_bank[4] = state->prgram_bank5_start + bank;
@@ -403,7 +403,7 @@ INLINE void chr_sanity_check( running_machine *machine, int source )
 
 	if (source == CHRRAM && state->vram == NULL)
 		fatalerror("CHRRAM bankswitch with no VRAM");
-	
+
 	if (source == CHRROM && state->vrom == NULL)
 		fatalerror("CHRROM bankswitch with no VROM");
 }
@@ -443,7 +443,7 @@ static void chr4_x( running_machine *machine, int start, int bank, int source )
 	int i;
 
 	chr_sanity_check(machine, source);
-	
+
 	if (source == CHRRAM)
 	{
 		bank &= ((state->vram_chunks << 1) - 1);
@@ -482,7 +482,7 @@ static void chr2_x( running_machine *machine, int start, int bank, int source )
 	int i;
 
 	chr_sanity_check(machine, source);
-	
+
 	if (source == CHRRAM)
 	{
 		bank &= ((state->vram_chunks << 2) - 1);
@@ -530,7 +530,7 @@ static void chr1_x( running_machine *machine, int start, int bank, int source )
 	nes_state *state = (nes_state *)machine->driver_data;
 
 	chr_sanity_check(machine, source);
-	
+
 	if (source == CHRRAM)
 	{
 		bank &= ((state->vram_chunks << 3) - 1);
@@ -683,9 +683,9 @@ void set_nt_mirroring( running_machine *machine, int mirroring )
 
 
 /*************************************************************
- 
+
  Support for xml list
- 
+
  *************************************************************/
 
 /* Include emulation of NES PCBs for softlist */
@@ -703,9 +703,9 @@ void set_nt_mirroring( running_machine *machine, int mirroring )
 
 
 /*************************************************************
- 
+
  Support for .nes Files
- 
+
  *************************************************************/
 
 /* Include emulation of iNES Mappers for .nes files */

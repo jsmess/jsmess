@@ -4,45 +4,45 @@
 
     20/05/2010 Skeleton driver.
 
-	http://acorn.chriswhy.co.uk/Network/Econet.html
-	http://acorn.chriswhy.co.uk/Network/Pics/Acorn_FileStoreE01.html
-	http://acorn.chriswhy.co.uk/8bit_Upgrades/Acorn_FileStoreE01S.html
-	http://www.heyrick.co.uk/econet/fs/emulator.html
+    http://acorn.chriswhy.co.uk/Network/Econet.html
+    http://acorn.chriswhy.co.uk/Network/Pics/Acorn_FileStoreE01.html
+    http://acorn.chriswhy.co.uk/8bit_Upgrades/Acorn_FileStoreE01S.html
+    http://www.heyrick.co.uk/econet/fs/emulator.html
 
 ****************************************************************************/
 
 /*
 
-	The FileStore E01 is an Econet station in its own right which acts as a fileserver when connected to a network. It is a single unit 
-	which does not require a monitor or keyboard. Communication with the FileStore is done via another Econet station when the FileStore 
-	is in one of two "maintenance modes"
+    The FileStore E01 is an Econet station in its own right which acts as a fileserver when connected to a network. It is a single unit
+    which does not require a monitor or keyboard. Communication with the FileStore is done via another Econet station when the FileStore
+    is in one of two "maintenance modes"
 
-	The E01 can be seen as a slimmed-down BBC computer tailored for its function as a fileserver. It has a 6502 processor at its heart 
-	along with a 6522 VIA just like the BBC. It requires a Master series Econet module to be plugged in and connects to the network via 
-	an Econet port in the same way as any other station.
+    The E01 can be seen as a slimmed-down BBC computer tailored for its function as a fileserver. It has a 6502 processor at its heart
+    along with a 6522 VIA just like the BBC. It requires a Master series Econet module to be plugged in and connects to the network via
+    an Econet port in the same way as any other station.
 
-	The FileStore E01S was Acorns second generation Filestore replacing the FileStore E01. The FileStore is a dedicated Econet fileserver, 
-	it does not support a keyboard and monitor, instead you use an Econet attached station to logon and perform administrative tasks.
+    The FileStore E01S was Acorns second generation Filestore replacing the FileStore E01. The FileStore is a dedicated Econet fileserver,
+    it does not support a keyboard and monitor, instead you use an Econet attached station to logon and perform administrative tasks.
 
-			Hitachi HD146818P Real Time Clock
-			Rockwell R65C102P3 CPU
-			2 x TMM27256D-20 white labelled EPROMs, TMSE01 MOS on left and E01 FS on the right
-	IC20	WD2793-APL-02 floppy disc controller
-			2 x NEC D41464C-12 64k x 4bit NMOS RAM ICs giving 64K memory
-	IC21	Rockwell RC6522AP VIA behind to the right
+            Hitachi HD146818P Real Time Clock
+            Rockwell R65C102P3 CPU
+            2 x TMM27256D-20 white labelled EPROMs, TMSE01 MOS on left and E01 FS on the right
+    IC20    WD2793-APL-02 floppy disc controller
+            2 x NEC D41464C-12 64k x 4bit NMOS RAM ICs giving 64K memory
+    IC21    Rockwell RC6522AP VIA behind to the right
 
 */
 
 /*
 
-	TODO:
+    TODO:
 
-	- RTC interrupts (rewrite mc146818)
-	- ADLC interrupts
-	- ECONET device
-	- printer
-	- artwork
-	- hard disk
+    - RTC interrupts (rewrite mc146818)
+    - ADLC interrupts
+    - ECONET device
+    - printer
+    - artwork
+    - hard disk
 
 */
 
@@ -123,19 +123,19 @@ static READ8_HANDLER( ram_select_r )
 static WRITE8_DEVICE_HANDLER( floppy_w )
 {
 	/*
-		
-		bit		description
 
-		0		floppy 1 select
-		1		floppy 2 select
-		2		floppy side select
-		3		NVRAM select
-		4		floppy density
-		5		floppy master reset
-		6		floppy test
-		7		mode LED
+        bit     description
 
-	*/
+        0       floppy 1 select
+        1       floppy 2 select
+        2       floppy side select
+        3       NVRAM select
+        4       floppy density
+        5       floppy master reset
+        6       floppy test
+        7       mode LED
+
+    */
 
 	/* floppy 1 select */
 	if (!BIT(data, 0))
@@ -236,9 +236,9 @@ static ADDRESS_MAP_START( e01_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc24, 0xfc24) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_disable_r, network_irq_disable_w)
 	AM_RANGE(0xfc28, 0xfc28) AM_MIRROR(0x00c3) AM_READWRITE(network_irq_enable_r, network_irq_enable_w)
 	AM_RANGE(0xfc2c, 0xfc2c) AM_MIRROR(0x00c3) AM_READ_PORT("FLAP")
-//	AM_RANGE(0xfc30, 0xfc30) AM_MIRROR(0x00c0) HD data
-//	AM_RANGE(0xfc31, 0xfc31) AM_MIRROR(0x00c0) HD status
-//	AM_RANGE(0xfc32, 0xfc32) AM_MIRROR(0x00c0) HD select
+//  AM_RANGE(0xfc30, 0xfc30) AM_MIRROR(0x00c0) HD data
+//  AM_RANGE(0xfc31, 0xfc31) AM_MIRROR(0x00c0) HD status
+//  AM_RANGE(0xfc32, 0xfc32) AM_MIRROR(0x00c0) HD select
 	AM_RANGE(0xfc33, 0xfc33) AM_MIRROR(0x00c0) AM_WRITE(hdc_irq_enable_w)
 	AM_RANGE(0xfd00, 0xffff) AM_READ_BANK("bank3") AM_WRITE_BANK("bank4")
 ADDRESS_MAP_END
@@ -272,11 +272,11 @@ INPUT_PORTS_END
 /*
 static WRITE_LINE_DEVICE_HANDLER( rtc_irq_w )
 {
-	e01_state *driver_state = (e01_state *)device->machine->driver_data;
+    e01_state *driver_state = (e01_state *)device->machine->driver_data;
 
-	driver_state->rtc_irq = state;
+    driver_state->rtc_irq = state;
 
-	update_interrupts(device->machine);
+    update_interrupts(device->machine);
 }
 */
 static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
@@ -294,14 +294,14 @@ static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
 /*
 static WRITE_LINE_DEVICE_HANDLER( adlc_irq_w )
 {
-	e01_state *driver_state = (e01_state *)device->machine->driver_data;
+    e01_state *driver_state = (e01_state *)device->machine->driver_data;
 
-	driver_state->adlc_irq = state;
+    driver_state->adlc_irq = state;
 
-	update_interrupts(device->machine);
+    update_interrupts(device->machine);
 }
 */
-static const mc6854_interface adlc_intf = 
+static const mc6854_interface adlc_intf =
 {
 	NULL,
 	NULL,
@@ -459,7 +459,7 @@ static MACHINE_DRIVER_START( e01 )
 	MDRV_MC6854_ADD(MC6854_TAG, adlc_intf)
 	MDRV_WD2793_ADD(WD2793_TAG, fdc_intf)
 	MDRV_FLOPPY_2_DRIVES_ADD(e01_floppy_config)
-//	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, e01_centronics_config)
+//  MDRV_CENTRONICS_ADD(CENTRONICS_TAG, e01_centronics_config)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

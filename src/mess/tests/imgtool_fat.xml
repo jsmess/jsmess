@@ -126,7 +126,7 @@
 	<!-- Testing directories -->
 	<createimage driver="pc_dsk_fat"/>
 	<recordfreespace/>
-	
+
 	<createdirectory path="FOO"/>
 	<putfile name="\FOO\BAR.TXT">'Party'</putfile>
 
@@ -226,7 +226,7 @@
 	<!-- Testing many more files in a subdirectory -->
 	<createimage driver="pc_dsk_fat"/>
 	<createdirectory path="FOO"/>
-	
+
 	<putfile name="\FOO\1.TXT">'Alpha'</putfile>
 	<putfile name="\FOO\2.TXT">'Bravo'</putfile>
 	<putfile name="\FOO\3.TXT">'Charlie'</putfile>
@@ -246,7 +246,7 @@
 	<!-- Testing longer file names -->
 	<createimage driver="pc_dsk_fat"/>
 	<createdirectory path="FOO"/>
-	
+
 	<putfile name="\FOO\Alpha.Bravo.TXT">'Aaa'</putfile>
 	<putfile name="\FOO\Charlie.Delta.Echo.TXT">'Bbbb'</putfile>
 	<putfile name="\FOO\Foxtrot.Golf.Hotel.India.Juliet.TXT">'Ccccc'</putfile>

@@ -188,7 +188,7 @@ static int mo5_get_cassette ( running_machine *machine )
 {
 	running_device* img = thom_cassette_img(machine);
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
-	
+
 	if ( image->exists() )
 	{
 		cassette_image* cass = cassette_get_image( img );

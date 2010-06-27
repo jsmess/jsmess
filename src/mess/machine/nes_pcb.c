@@ -322,7 +322,7 @@ static const nes_pcb pcb_list[] =
 	{ "BANDAI-LZ93D50+24C02", BANDAI_LZ93EX },
 	{ "BANDAI-FCG-1",     BANDAI_FCG },
 	{ "BANDAI-FCG-2",     BANDAI_FCG },
-	{ "BANDAI-JUMP2",     BANDAI_JUMP2 },	
+	{ "BANDAI-JUMP2",     BANDAI_JUMP2 },
 	{ "BANDAI-DATACH",    BANDAI_DATACH },
 	{ "BANDAI-KARAOKE",   BANDAI_KARAOKE },
 	{ "BANDAI-OEKAKIDS",  BANDAI_OEKAKIDS },
@@ -530,7 +530,7 @@ static const nes_pcb pcb_list[] =
 	{ "BTL-TOBIDASEDAISAKUSEN", UNSUPPORTED_BOARD },// mapper 120
 	{ "BTL-SHUIGUANPIPE",  UNSUPPORTED_BOARD },// mapper 183
 	{ "BTL-PIKACHUY2K",    UNSUPPORTED_BOARD },// mapper 254
-//	
+//
 	{ "BMC-190IN1",          BMC_190IN1 },
 	{ "BMC-64IN1NOREPEAT",   BMC_64IN1NR },
 	{ "BMC-A65AS",           BMC_A65AS },
@@ -623,28 +623,28 @@ const nes_pcb *nes_pcb_lookup( const char *board )
 
    PCB Emulation (to be moved to MAME later)
 
-   In the end, iNES, UNIF and xml should be 
-   simply handled through a look-up table 
+   In the end, iNES, UNIF and xml should be
+   simply handled through a look-up table
    which associates the mapper/board/feature
    to the correct pcb_id and then the core
    function pcb_handlers_setup should be called
    to set-up the expected handlers and callbacks
- 
-   Similarly, PC-10, VSNES and NES-based 
-   multigame boards, should simply call 
-   pcb_handlers_setup with the proper pcb_id 
+
+   Similarly, PC-10, VSNES and NES-based
+   multigame boards, should simply call
+   pcb_handlers_setup with the proper pcb_id
    at the beginning, rather than use ad hoc
    implementations.
- 
+
 ************************************************/
 
 
 /*************************************************************
- 
+
  UxROM board emulation
- 
+
  writes to 0x8000-0xffff change PRG 16K lower banks
- 
+
  missing BC?
 
  iNES: mapper 2
@@ -654,64 +654,64 @@ const nes_pcb *nes_pcb_lookup( const char *board )
 static WRITE8_HANDLER( uxrom_w )
 {
 	LOG_MMC(("uxrom_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg16_89ab(space->machine, data);
 }
 
 /*************************************************************
- 
+
  Nihon Bussan UNROM M5
 
  Games: Crazy Climber Jpn
- 
+
  Very simple mapper: prg16_89ab is always set to bank 0,
  while prg16_cdef is set by writes to 0x8000-0xffff. The game
  uses a custim controller.
- 
+
  iNES: mapper 180
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( uxrom_cc_w )
 {
 	LOG_MMC(("uxrom_cc_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg16_cdef(space->machine, data);
 }
 
 /*************************************************************
- 
+
  UN1ROM board emulation
- 
- writes to 0x8000-0xffff change PRG 16K lower banks 
- 
+
+ writes to 0x8000-0xffff change PRG 16K lower banks
+
  missing BC?
 
  iNES: mapper 94
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( un1rom_w )
 {
 	LOG_MMC(("un1rom_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg16_89ab(space->machine, data >> 2);
 }
 
 /*************************************************************
- 
+
  CNROM board emulation
- 
+
  writes to 0x8000-0xffff change CHR 8K banks
- 
+
  missing BC?
 
  iNES: mapper 3
- 
- Notice that BANDAI_PT554 board (Aerobics Studio) uses very 
- similar hardware but with an additional sound chip which 
+
+ Notice that BANDAI_PT554 board (Aerobics Studio) uses very
+ similar hardware but with an additional sound chip which
  gets writes to 0x6000 (currently unemulated in MESS)
 
  *************************************************************/
@@ -735,13 +735,13 @@ static WRITE8_HANDLER( cnrom_w )
 }
 
 /*************************************************************
- 
+
  Bandai PT-554 board emulation
- 
+
  This is used by Aerobics Studio. It is basically a CNROM board
  with an additional sound chip which is not currently emulated by
  MESS
- 
+
  iNES: mapper 3?
 
  *************************************************************/
@@ -749,7 +749,7 @@ static WRITE8_HANDLER( cnrom_w )
 static WRITE8_HANDLER( bandai_pt554_m_w )
 {
 	LOG_MMC(("Bandai PT-554 Sound write, data: %02x\n", data));
-	
+
 	// according to NEStopia, this is the effect
 	if (!BIT(data, 6))
 	{
@@ -758,13 +758,13 @@ static WRITE8_HANDLER( bandai_pt554_m_w )
 }
 
 /*************************************************************
- 
+
  CPROM board emulation
- 
+
  writes to 0x8000-0xffff change CHR 4K lower banks
- 
+
  iNES: mapper 13
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( cprom_w )
@@ -774,35 +774,35 @@ static WRITE8_HANDLER( cprom_w )
 }
 
 /*************************************************************
- 
+
  AxROM board emulation
- 
+
  writes to 0x8000-0xffff change PRG banks + sets mirroring
- 
+
  missing BC for AMROM?
- 
+
  iNES: mapper 7
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( axrom_w )
 {
 	LOG_MMC(("axrom_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	prg32(space->machine, data);
 }
 
 /*************************************************************
- 
+
  BxROM board emulation
- 
+
  writes to 0x8000-0xffff change PRG banks
- 
+
  missing BC?
- 
+
  iNES: mapper 34
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bxrom_w )
@@ -810,37 +810,37 @@ static WRITE8_HANDLER( bxrom_w )
 	/* This portion of the mapper is nearly identical to Mapper 7, except no one-screen mirroring */
 	/* Deadly Towers is really a BxROM game - the demo screens look wrong using mapper 7. */
 	LOG_MMC(("bxrom_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, data);
 }
 
 /*************************************************************
- 
+
  GxROM/MxROM board emulation
- 
+
  writes to 0x8000-0xffff change PRG and CHR banks
- 
+
  missing BC?
- 
+
  iNES: mapper 66
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( gxrom_w )
 {
 	LOG_MMC(("gxrom_w, offset %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, (data & 0xf0) >> 4);
 	chr8(space->machine, data & 0x0f, CHRROM);
 }
 
 /*************************************************************
- 
+
  SxROM (MMC1 based) board emulation
- 
- iNES: mapper 1 (and 155 for the MMC1A variant which does not 
+
+ iNES: mapper 1 (and 155 for the MMC1A variant which does not
  have WRAM disable bit)
- 
+
  *************************************************************/
 
 static TIMER_CALLBACK( mmc1_resync_callback )
@@ -890,32 +890,32 @@ static void mmc1_set_prg( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_mode, prg_offset;
-	
+
 	prg_mode = state->mmc_reg[0] & 0x0c;
 	/* prg_mode&0x8 determines bank size: 32k (if 0) or 16k (if 1)? when in 16k mode,
-	 prg_mode&0x4 determines which half of the PRG space we can swap: if it is 4,
-	 mmc_reg[3] sets banks at 0x8000; if it is 0, mmc_reg[3] sets banks at 0xc000. */
-	
+     prg_mode&0x4 determines which half of the PRG space we can swap: if it is 4,
+     mmc_reg[3] sets banks at 0x8000; if it is 0, mmc_reg[3] sets banks at 0xc000. */
+
 	prg_offset = state->mmc_reg[1] & 0x10;
 	/* In principle, mmc_reg[2]&0x10 might affect "extended" banks as well, when chr_mode=1.
-	 However, quoting Disch's docs: When in 4k CHR mode, 0x10 in both $A000 and $C000 *must* be
-	 set to the same value, or else pages will constantly be swapped as graphics render!
-	 Hence, we use only mmc_reg[1]&0x10 for prg_offset */
+     However, quoting Disch's docs: When in 4k CHR mode, 0x10 in both $A000 and $C000 *must* be
+     set to the same value, or else pages will constantly be swapped as graphics render!
+     Hence, we use only mmc_reg[1]&0x10 for prg_offset */
 
 	switch (prg_mode)
 	{
 		case 0x00:
 		case 0x04:
-//			printf("PRG 32 bank %d \n", (prg_offset + state->mmc_reg[3]) >> 1);
+//          printf("PRG 32 bank %d \n", (prg_offset + state->mmc_reg[3]) >> 1);
 			prg32(machine, (prg_offset + state->mmc_reg[3]) >> 1);
 			break;
 		case 0x08:
-//			printf("PRG 16 bank %d (high) \n", prg_offset + state->mmc_reg[3]);
+//          printf("PRG 16 bank %d (high) \n", prg_offset + state->mmc_reg[3]);
 			prg16_89ab(machine, prg_offset + 0);
 			prg16_cdef(machine, prg_offset + state->mmc_reg[3]);
 			break;
 		case 0x0c:
-//			printf("PRG 16 bank %d (low) \n", prg_offset + state->mmc_reg[3]);
+//          printf("PRG 16 bank %d (low) \n", prg_offset + state->mmc_reg[3]);
 			prg16_89ab(machine, prg_offset + state->mmc_reg[3]);
 			prg16_cdef(machine, prg_offset + 0x0f);
 			break;
@@ -932,7 +932,7 @@ static void mmc1_set_chr( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_mode = BIT(state->mmc_reg[0], 4);
-	
+
 	if (chr_mode)
 	{
 		chr4_0(machine, state->mmc_reg[1] & 0x1f, state->mmc_chr_source);
@@ -947,13 +947,13 @@ static void common_sxrom_write_handler( const address_space *space, offs_t offse
 	running_machine *machine = space->machine;
 	nes_state *state = (nes_state *)machine->driver_data;
 	/* Note that there is only one latch and shift counter, shared amongst the 4 regs */
-	/* Space Shuttle will not work if they have independent variables. */	
-	
+	/* Space Shuttle will not work if they have independent variables. */
+
 	/* here we would need to add an if(cpu_cycles_passed>1) test, and
-	 if requirement is not met simply return without writing anything.
-	 Some games (AD&D Hillsfar, Bill & Ted Excellent Adventure, Cosmic 
-	 Wars, Rocket Ranger, Sesame Street 123 and Snow Brothers) rely on 
-	 this behavior!! */
+     if requirement is not met simply return without writing anything.
+     Some games (AD&D Hillsfar, Bill & Ted Excellent Adventure, Cosmic
+     Wars, Rocket Ranger, Sesame Street 123 and Snow Brothers) rely on
+     this behavior!! */
 	if (state->mmc1_reg_write_enable == 0)
 	{
 		return;
@@ -968,13 +968,13 @@ static void common_sxrom_write_handler( const address_space *space, offs_t offse
 	{
 		state->mmc_count = 0;
 		state->mmc_latch1 = 0;
-		
+
 		/* Set reg at 0x8000 to size 16k and lower half swap - needed for Robocop 3, Dynowars */
 		state->mmc_reg[0] |= 0x0c;
 		mmc1_set_prg_wram(space, board);
 		return;
 	}
-	
+
 	if (state->mmc_count < 5)
 	{
 		if (state->mmc_count == 0) state->mmc_latch1 = 0;
@@ -982,14 +982,14 @@ static void common_sxrom_write_handler( const address_space *space, offs_t offse
 		state->mmc_latch1 |= (data & 0x01) ? 0x10 : 0x00;
 		state->mmc_count++;
 	}
-	
+
 	if (state->mmc_count == 5)
 	{
 		switch (offset & 0x6000)	/* Which reg shall we write to? */
 		{
 			case 0x0000:
 				state->mmc_reg[0] = state->mmc_latch1;
-				
+
 				switch (state->mmc_reg[0] & 0x03)
 				{
 				case 0: set_nt_mirroring(machine, PPU_MIRROR_LOW); break;
@@ -1014,7 +1014,7 @@ static void common_sxrom_write_handler( const address_space *space, offs_t offse
 				mmc1_set_prg_wram(space, board);
 				break;
 		}
-		
+
 		state->mmc_count = 0;
 	}
 }
@@ -1028,11 +1028,11 @@ static WRITE8_HANDLER( sxrom_w )
 }
 
 /*************************************************************
- 
+
  PxROM (MMC2 based) board emulation
- 
+
  iNES: mapper 9
- 
+
  *************************************************************/
 
 static void mmc2_latch( running_device *device, offs_t offset )
@@ -1103,11 +1103,11 @@ static WRITE8_HANDLER( pxrom_w )
 }
 
 /*************************************************************
- 
+
  FxROM (MMC4 based) board emulation
- 
+
  iNES: mapper 10
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( fxrom_w )
@@ -1125,18 +1125,18 @@ static WRITE8_HANDLER( fxrom_w )
 }
 
 /*************************************************************
- 
+
  TxROM (MMC3 based) board emulation
- 
+
  iNES: mapper 4
- 
+
  *************************************************************/
 
 static void mmc3_set_wram( const address_space *space )
 {
 	running_machine *machine = space->machine;
 	nes_state *state = (nes_state *)machine->driver_data;
-	
+
 	// skip this function if we are emulating a MMC3 clone with mid writes
 	if (state->mmc_write_mid != NULL)
 		return;
@@ -1162,7 +1162,7 @@ static void mmc3_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_flip = (state->mmc_latch1 & 0x40) ? 2 : 0;
-	
+
 	prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
 	prg8_ab(machine, prg_base | (state->mmc_prg_bank[1] & prg_mask));
 	prg8_cd(machine, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
@@ -1173,7 +1173,7 @@ static void mmc3_set_chr( running_machine *machine, UINT8 chr, int chr_base, int
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
@@ -1188,7 +1188,7 @@ static void mmc3_set_chr( running_machine *machine, UINT8 chr, int chr_base, int
 static void mmc3_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE)
 	{
 		int priorCount = state->IRQ_count;
@@ -1196,7 +1196,7 @@ static void mmc3_irq( running_device *device, int scanline, int vblank, int blan
 			state->IRQ_count = state->IRQ_count_latch;
 		else
 			state->IRQ_count--;
-		
+
 		if (state->IRQ_enable && !blanked && (state->IRQ_count == 0) && (priorCount || state->IRQ_clear /*|| !state->mmc3_alt_irq*/)) // according to blargg the latter should be present as well, but it breaks Rampart and Joe & Mac US: they probably use the alt irq!
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
@@ -1211,24 +1211,24 @@ static WRITE8_HANDLER( txrom_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 mmc3_helper, cmd;
-	
+
 	LOG_MMC(("txrom_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			mmc3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (mmc3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (mmc3_helper & 0x80)
 				mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -1245,32 +1245,32 @@ static WRITE8_HANDLER( txrom_w )
 				break;
 			}
 			break;
-			
+
 		case 0x2000:
 			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
-			
+
 		case 0x2001:
 			state->mmc_latch2 = data;
 			mmc3_set_wram(space);
 			break;
-			
+
 		case 0x4000:
 			state->IRQ_count_latch = data;
 			break;
-			
+
 		case 0x4001:
 			state->IRQ_count = 0;
 			break;
-			
+
 		case 0x6000:
 			state->IRQ_enable = 0;
 			break;
-			
+
 		case 0x6001:
 			state->IRQ_enable = 1;
 			break;
-			
+
 		default:
 			logerror("txrom_w uncaught: %04x value: %02x\n", offset + 0x8000, data);
 			break;
@@ -1278,11 +1278,11 @@ static WRITE8_HANDLER( txrom_w )
 }
 
 /*************************************************************
- 
+
  HKROM (MMC6 based) board emulation
- 
+
  iNES: mapper 4
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( hkrom_m_w )
@@ -1290,9 +1290,9 @@ static WRITE8_HANDLER( hkrom_m_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 write_hi, write_lo;
 	LOG_MMC(("hkrom_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x1000)
-		return;	
+		return;
 
 	// banks can be written only if both read & write is enabled!
 	write_hi = ((state->mmc6_reg & 0xc0) == 0xc0);
@@ -1300,7 +1300,7 @@ static WRITE8_HANDLER( hkrom_m_w )
 
 	if (BIT(offset, 9) && write_hi)	// access to upper 1k
 		state->mapper_ram[offset & (state->mapper_ram_size - 1)] = data;
-	
+
 	if (!BIT(offset, 9) && write_lo)	// access to lower 1k
 		state->mapper_ram[offset & (state->mapper_ram_size - 1)] = data;
 }
@@ -1309,7 +1309,7 @@ static READ8_HANDLER( hkrom_m_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("hkrom_m_r, offset: %04x\n", offset));
-	
+
 	if (offset < 0x1000)
 		return 0xff;	// here it should be open bus
 
@@ -1340,11 +1340,11 @@ static WRITE8_HANDLER( hkrom_w )
 
 			if (!state->mmc_latch2 && BIT(data, 5))	// if WRAM is disabled and has to be enabled, write
 				state->mmc_latch2 = BIT(data, 5);	// (once WRAM has been enabled, it cannot be disabled without resetting the game)
-			
+
 			/* Has PRG Mode changed? */
 			if (BIT(mmc6_helper, 6))
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (BIT(mmc6_helper, 7))
 				mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
@@ -1359,7 +1359,7 @@ static WRITE8_HANDLER( hkrom_w )
 			state->IRQ_count = 0;
 			state->IRQ_clear = 1;
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -1367,11 +1367,11 @@ static WRITE8_HANDLER( hkrom_w )
 }
 
 /*************************************************************
- 
+
  TxSROM (MMC3 based) board emulation
- 
+
  iNES: mapper 118
- 
+
  *************************************************************/
 
 static void txsrom_set_mirror( running_machine *machine )
@@ -1398,17 +1398,17 @@ static WRITE8_HANDLER( txsrom_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper118_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 			{
@@ -1416,7 +1416,7 @@ static WRITE8_HANDLER( txsrom_w )
 				mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			}
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -1434,10 +1434,10 @@ static WRITE8_HANDLER( txsrom_w )
 				break;
 			}
 			break;
-			
+
 		case 0x2000:
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -1445,11 +1445,11 @@ static WRITE8_HANDLER( txsrom_w )
 }
 
 /*************************************************************
- 
+
  TQROM (MMC3 based) board emulation
- 
+
  iNES: mapper 119
- 
+
  *************************************************************/
 
 static void tqrom_set_chr( running_machine *machine )
@@ -1458,13 +1458,13 @@ static void tqrom_set_chr( running_machine *machine )
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	UINT8 chr_src[6], chr_mask[6];
 	int i;
-	
+
 	for (i = 0; i < 6; i++)
 	{
 		chr_src[i] = (state->mmc_vrom_bank[i] & 0x40) ? CHRRAM : CHRROM;
 		chr_mask[i] =  (state->mmc_vrom_bank[i] & 0x40) ? 0x07 : 0x3f;
 	}
-	
+
 	chr1_x(machine, chr_page ^ 0, ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask[0]), chr_src[0]);
 	chr1_x(machine, chr_page ^ 1, ((state->mmc_vrom_bank[0] |  0x01) & chr_mask[0]), chr_src[0]);
 	chr1_x(machine, chr_page ^ 2, ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask[1]), chr_src[1]);
@@ -1480,17 +1480,17 @@ static WRITE8_HANDLER( tqrom_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("mapper119_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				tqrom_set_chr(space->machine);
@@ -1511,7 +1511,7 @@ static WRITE8_HANDLER( tqrom_w )
 				break;
 			}
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -1519,12 +1519,12 @@ static WRITE8_HANDLER( tqrom_w )
 }
 
 /*************************************************************
- 
+
  PAL-ZZ board (MMC3 variant for European 3-in-1 Nintendo cart
  Super Mario Bros. + Tetris + Nintendo World Cup)
- 
+
  iNES: mapper 37
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( zz_m_w )
@@ -1532,9 +1532,9 @@ static WRITE8_HANDLER( zz_m_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map37_helper;
 	LOG_MMC(("zz_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	map37_helper = data & 0x07;
-	
+
 	state->mmc_prg_base = (BIT(map37_helper, 2) << 4) | (((map37_helper & 0x03) == 0x03) ? 0x08 : 0);
 	state->mmc_prg_mask = (map37_helper << 1) | 0x07;
 	state->mmc_chr_base = BIT(map37_helper, 2) << 7;
@@ -1544,19 +1544,19 @@ static WRITE8_HANDLER( zz_m_w )
 }
 
 /*************************************************************
- 
+
  NES-QJ board (MMC3 variant for US 2-in-1 Nintendo cart
  Super Spike V'Ball + Nintendo World Cup)
- 
+
  iNES: mapper 47
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( qj_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("qj_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->mmc_prg_base = BIT(data, 0) << 4;
 	state->mmc_prg_mask = 0x0f;
 	state->mmc_chr_base = BIT(data, 0) << 7;
@@ -1566,31 +1566,31 @@ static WRITE8_HANDLER( qj_m_w )
 }
 
 /*************************************************************
- 
+
  ExROM (MMC5 based) board emulation
- 
+
  iNES: mapper 5
- 
+
  MESS status: Mostly Unsupported
- 
+
  *************************************************************/
 
 static void mmc5_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 #if 1
 	if (scanline == 0)
 		state->IRQ_status |= 0x40;
 	else if (scanline > PPU_BOTTOM_VISIBLE_SCANLINE)
 		state->IRQ_status &= ~0x40;
 #endif
-	
+
 	if (scanline == state->IRQ_count)
 	{
 		if (state->IRQ_enable)
 			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
-		
+
 		state->IRQ_status = 0xff;
 	}
 }
@@ -1621,13 +1621,13 @@ static READ8_HANDLER( exrom_l_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	int retVal;
-	
+
 	/* $5c00 - $5fff: extended videoram attributes */
 	if ((offset >= 0x1b00) && (offset <= 0x1eff))
 	{
 		return state->mmc5_vram[offset - 0x1b00];
 	}
-	
+
 	switch (offset)
 	{
 		case 0x1104: /* $5204 */
@@ -1641,12 +1641,12 @@ static READ8_HANDLER( exrom_l_r )
 			state->IRQ_status &= ~0x80;
 			return retVal;
 #endif
-			
+
 		case 0x1105: /* $5205 */
 			return (state->mult1 * state->mult2) & 0xff;
 		case 0x1106: /* $5206 */
 			return ((state->mult1 * state->mult2) & 0xff00) >> 8;
-			
+
 		default:
 			logerror("** MMC5 uncaught read, offset: %04x\n", offset + 0x4100);
 			return 0x00;
@@ -1657,7 +1657,7 @@ static READ8_HANDLER( exrom_l_r )
 static WRITE8_HANDLER( exrom_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	
+
 	//  LOG_MMC(("Mapper 5 write, offset: %04x, data: %02x\n", offset + 0x4100, data));
 	/* Send $5000-$5015 to the sound chip */
 	if ((offset >= 0xf00) && (offset <= 0xf15))
@@ -1665,7 +1665,7 @@ static WRITE8_HANDLER( exrom_l_w )
 		nes_psg_w(state->sound, offset & 0x1f, data);
 		return;
 	}
-	
+
 	/* $5c00 - $5fff: extended videoram attributes */
 	if ((offset >= 0x1b00) && (offset <= 0x1eff))
 	{
@@ -1673,19 +1673,19 @@ static WRITE8_HANDLER( exrom_l_w )
 			state->mmc5_vram[offset - 0x1b00] = data;
 		return;
 	}
-	
+
 	switch (offset)
 	{
 		case 0x1000: /* $5100 */
 			state->MMC5_rom_bank_mode = data & 0x03;
 			LOG_MMC(("MMC5 rom bank mode: %02x\n", data));
 			break;
-			
+
 		case 0x1001: /* $5101 */
 			state->MMC5_vrom_bank_mode = data & 0x03;
 			LOG_MMC(("MMC5 vrom bank mode: %02x\n", data));
 			break;
-			
+
 		case 0x1002: /* $5102 */
 			if (data == 0x02)
 				state->MMC5_vram_protect |= 1;
@@ -1700,24 +1700,24 @@ static WRITE8_HANDLER( exrom_l_w )
 				state->MMC5_vram_protect = 0;
 			LOG_MMC(("MMC5 vram protect 2: %02x\n", data));
 			break;
-			
+
 		case 0x1004: /* $5104 - Extra VRAM (EXRAM) control */
 			state->mmc5_vram_control = data & 0x03;
 			LOG_MMC(("MMC5 exram control: %02x\n", data));
 			break;
-			
+
 		case 0x1005: /* $5105 */
 			mmc5_ppu_mirror(space->machine, 0, data & 0x03);
 			mmc5_ppu_mirror(space->machine, 1, (data & 0x0c) >> 2);
 			mmc5_ppu_mirror(space->machine, 2, (data & 0x30) >> 4);
 			mmc5_ppu_mirror(space->machine, 3, (data & 0xc0) >> 6);
 			break;
-			
+
 			/* tile data for MMC5 flood-fill NT mode */
 		case 0x1006:
 			state->MMC5_floodtile = data;
 			break;
-			
+
 			/* attr data for MMC5 flood-fill NT mode */
 		case 0x1007:
 			switch (data & 3)
@@ -1729,7 +1729,7 @@ static WRITE8_HANDLER( exrom_l_w )
 			case 3: state->MMC5_floodattr = 0xff; break;
 			}
 			break;
-			
+
 		case 0x1013: /* $5113 */
 			LOG_MMC(("MMC5 mid RAM bank select: %02x\n", data & 0x07));
 			// FIXME: a few Koei games have both WRAM & BWRAM but here we don't support this (yet)
@@ -1738,7 +1738,7 @@ static WRITE8_HANDLER( exrom_l_w )
 			else
 				wram_bank(space->machine, data, NES_WRAM);
 			break;
-			
+
 		case 0x1014: /* $5114 */
 			LOG_MMC(("MMC5 $5114 bank select: %02x (mode: %d)\n", data, state->MMC5_rom_bank_mode));
 			switch (state->MMC5_rom_bank_mode)
@@ -2102,24 +2102,24 @@ static WRITE8_HANDLER( exrom_l_w )
 				break;
 			}
 			break;
-			
+
 		case 0x1030: /* $5130 */
 			state->mmc5_high_chr = data & 0x03;
 			if (state->mmc5_vram_control == 1)
 			{
-				// in this case state->mmc5_high_chr selects which 256KB of CHR ROM 
+				// in this case state->mmc5_high_chr selects which 256KB of CHR ROM
 				// is to be used for all background tiles on the screen.
 			}
 			break;
-			
-			
+
+
 		case 0x1100: /* $5200 */
 			state->mmc5_split_scr = data;
 			// in EX2 and EX3 modes, no split screen
 			if (state->mmc5_vram_control & 0x02)
 				state->mmc5_split_scr &= 0x7f;
 			break;
-			
+
 		case 0x1103: /* $5203 */
 			state->IRQ_count = data;
 			state->MMC5_scanline = data;
@@ -2135,7 +2135,7 @@ static WRITE8_HANDLER( exrom_l_w )
 		case 0x1106: /* $5206 */
 			state->mult2 = data;
 			break;
-			
+
 		default:
 			logerror("** MMC5 uncaught write, offset: %04x, data: %02x\n", offset + 0x4100, data);
 			break;
@@ -2143,14 +2143,14 @@ static WRITE8_HANDLER( exrom_l_w )
 }
 
 /*************************************************************
- 
+
  NTBROM & Sunsoft-4 board emulation
 
  Part of this can be used also for Sunsoft Double Cassette
  System... which games use it?
- 
+
  iNES: mapper 68
- 
+
  *************************************************************/
 
 static void ntbrom_mirror( running_machine *machine, int mirror, int mirr0, int mirr1 )
@@ -2199,9 +2199,9 @@ static void ntbrom_mirror( running_machine *machine, int mirror, int mirr0, int 
 static WRITE8_HANDLER( ntbrom_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	
+
 	LOG_MMC(("ntbrom_w, offset %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
@@ -2238,14 +2238,14 @@ static WRITE8_HANDLER( ntbrom_w )
 }
 
 /*************************************************************
- 
+
  JxROM & Sunsoft 5A / 5B / FME7 board emulation
- 
- Notice that Sunsoft-5B = FME7 + sound chip (the latter being 
+
+ Notice that Sunsoft-5B = FME7 + sound chip (the latter being
  currently unemulated in MESS)
- 
+
  iNES: mapper 69
- 
+
  *************************************************************/
 
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
@@ -2254,7 +2254,7 @@ static WRITE8_HANDLER( ntbrom_w )
 static void jxrom_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 	/* TODO: change to reflect the actual number of cycles spent */
 	if ((state->IRQ_enable & 0x80) && (state->IRQ_enable & 0x01))
 	{
@@ -2279,20 +2279,20 @@ static WRITE8_HANDLER( jxrom_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("jxrom_w, offset %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6000)
 	{
 		case 0x0000:
 			state->mmc_latch1 = data & 0x0f;
 			break;
-			
+
 		case 0x2000:
 			switch (state->mmc_latch1)
 			{
 			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
 				chr1_x(space->machine, state->mmc_latch1, data, CHRROM);
 				break;
-				
+
 			case 8:
 				if (!(data & 0x40))
 				{
@@ -2308,7 +2308,7 @@ static WRITE8_HANDLER( jxrom_w )
 					memory_set_bank(space->machine, "bank5", state->prg_bank[4]);
 				}
 				break;
-				
+
 			case 9:
 				prg8_89(space->machine, data);
 				break;
@@ -2338,11 +2338,11 @@ static WRITE8_HANDLER( jxrom_w )
 				break;
 			}
 			break;
-			
+
 			/* Here we would have sound command for Sunsoft 5b variant */
 			//      case 0x4000:
 			//      case 0x6000:
-			
+
 		case 0x4000:
 			LOG_MMC(("Sunsoft-5B Sound: Register select write, data: %02x\n", data));
 			break;
@@ -2356,14 +2356,14 @@ static WRITE8_HANDLER( jxrom_w )
 }
 
 /*************************************************************
- 
+
  DxROM & Namcot 3433 - 3443 board emulation
- 
- These are the same board, but DRROM (and Tengen 800004) have 
+
+ These are the same board, but DRROM (and Tengen 800004) have
  4-screen mirroring
- 
+
  iNES: mappers 88, 206 (same as 88 but possibly 4-screen mirroring)
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( dxrom_w )
@@ -2397,20 +2397,20 @@ static WRITE8_HANDLER( dxrom_w )
 
 
 /*************************************************************
- 
+
  Namcot 3453 board emulation
- 
+
  These are the same as Namcot 34x3, but with additional mirroring
  control
- 
+
  iNES: mapper 154
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( namcot3453_w )
 {
 	LOG_MMC(("namcot3453_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	// additional mirroring control when writing to even addresses
 	if (!(offset & 1))
 		set_nt_mirroring(space->machine, BIT(data, 6) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
@@ -2419,20 +2419,20 @@ static WRITE8_HANDLER( namcot3453_w )
 }
 
 /*************************************************************
- 
+
  Namcot 3446 board emulation
- 
+
  These are similar Namcot 34x3, but different bankswitch capabilities
- 
+
  iNES: mapper 76
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( namcot3446_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("namcot3446_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	// NEStopia does not have this!
 	if (offset >= 0x2000)
 	{
@@ -2440,7 +2440,7 @@ static WRITE8_HANDLER( namcot3446_w )
 			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		return;
 	}
-	
+
 	switch (offset & 1)
 	{
 		case 1:
@@ -2461,14 +2461,14 @@ static WRITE8_HANDLER( namcot3446_w )
 }
 
 /*************************************************************
- 
+
  Namcot 3425 board emulation
- 
- These are similar Namcot 34x3, but with NT mirroring (two 
+
+ These are similar Namcot 34x3, but with NT mirroring (two
  different modes)
- 
+
  iNES: mappers 95
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( namcot3425_w )
@@ -2478,7 +2478,7 @@ static WRITE8_HANDLER( namcot3425_w )
 	LOG_MMC(("namcot3425_w, offset: %04x, data: %02x\n", offset, data));
 	if (offset >= 0x2000)
 		return;
-	
+
 	switch (offset & 1)
 	{
 		case 1:
@@ -2514,70 +2514,70 @@ static WRITE8_HANDLER( namcot3425_w )
 }
 
 /*************************************************************
- 
+
  Discrete Logic board IC 74x377 by Color Dreams / Nina-007 emulation
-  
+
  iNES: mappers 11
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( dis_74x377_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("dis_74x377_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	chr8(space->machine, data >> 4, state->mmc_chr_source);
 	prg32(space->machine, data & 0x0f);
 }
 
 /*************************************************************
- 
+
  Discrete Logic board IC 74x139x74 by Konami & Jaleco
- 
+
  iNES: mappers 87
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( dis_74x139x74_m_w )
 {
 	LOG_MMC(("dis_74x139x74_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	chr8(space->machine, ((data & 0x02) >> 1) | ((data & 0x01) << 1), CHRROM);
 }
 
 /*************************************************************
- 
+
  Discrete Logic board IC 74x161x138
- 
+
  iNES: mappers 38
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( dis_74x161x138_m_w )
 {
 	LOG_MMC(("dis_74x161x138_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	chr8(space->machine, data >> 2, CHRROM);
 	prg32(space->machine, data);
 }
 
 /*************************************************************
- 
+
  Discrete Logic board IC 74x161x161x32
- 
+
  There are two variants (one with hardwired mirroring, the
- other with a mirroring control), making necessary two distinct 
+ other with a mirroring control), making necessary two distinct
  mappers & pcb_id
- 
+
  iNES: mapper 70 & 152
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( dis_74x161x161x32_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("dis_74x161x161x32_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (!state->hard_mirroring)	// there are two 'variants' depending on hardwired or mapper ctrl mirroring
 		set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	chr8(space->machine, data, CHRROM);
@@ -2585,15 +2585,15 @@ static WRITE8_HANDLER( dis_74x161x161x32_w )
 }
 
 /*************************************************************
- 
+
  Bandai LZ93D50 boards emulation
- 
+
  There are several variants: plain board, board + 24C01 EEPROM,
- board + 24C02 EEPROM, board + Barcode Reader (DATACH). 
+ board + 24C02 EEPROM, board + Barcode Reader (DATACH).
  We currently only emulate the base hardware.
- 
+
  iNES: mapper 16, 153 & 157
- 
+
  *************************************************************/
 
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
@@ -2602,7 +2602,7 @@ static WRITE8_HANDLER( dis_74x161x161x32_w )
 static void bandai_lz_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
 	if (state->IRQ_enable)
@@ -2620,7 +2620,7 @@ static WRITE8_HANDLER( lz93d50_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("lz93d50_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x000f)
 	{
 		case 0: case 1: case 2: case 3:
@@ -2672,10 +2672,10 @@ static void fjump2_set_prg( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 mmc_helper = 0;
 	int i;
-	
+
 	for (i = 0; i < 8; i++)
 		mmc_helper |= ((state->mmc_reg[i] & 0x01) << 4);
-	
+
 	prg16_89ab(machine, mmc_helper | state->mmc_latch1);
 	prg16_cdef(machine, mmc_helper | 0x0f);
 }
@@ -2684,7 +2684,7 @@ static WRITE8_HANDLER( fjump2_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("fjump2_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x000f)
 	{
 		case 0: case 1: case 2: case 3:
@@ -2703,30 +2703,30 @@ static WRITE8_HANDLER( fjump2_w )
 }
 
 /*************************************************************
- 
+
  Bandai Karaoke Studio board emulation
- 
+
  Note: we currently do not emulate the mic
- 
+
  iNES: mapper 188
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bandai_ks_w )
 {
 	LOG_MMC(("bandai_ks_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg16_89ab(space->machine, data ^ 0x08);
 }
 
 /*************************************************************
- 
+
  Bandai Oeka Kids board emulation
- 
+
  Note: we currently do support the correct mirroring
- 
+
  iNES: mapper 96
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bandai_ok_w )
@@ -2744,50 +2744,50 @@ static WRITE8_HANDLER( bandai_ok_w )
 }
 
 /*************************************************************
- 
+
  Irem Discrete board emulation (74*161/161/21/138)
- 
+
  iNES: mapper 77
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( lrog017_w )
 {
 	LOG_MMC(("lrog017_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, data);
 	chr2_0(space->machine, (data >> 4), CHRROM);
 }
 
 /*************************************************************
- 
+
  Irem Holy Diver board emulation
- 
+
  iNES: mapper 78 (shared with JF-16)
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( irem_hd_w )
 {
 	LOG_MMC(("irem_hd_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 	chr8(space->machine, data >> 4, CHRROM);
 	prg16_89ab(space->machine, data);
 }
 
 /*************************************************************
- 
+
  Irem TAM-S1 board emulation
-  
+
  iNES: mapper 97
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( tam_s1_w )
 {
 	LOG_MMC(("tam_s1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x4000)
 	{
 		set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
@@ -2796,20 +2796,20 @@ static WRITE8_HANDLER( tam_s1_w )
 }
 
 /*************************************************************
- 
+
  Irem G-101 board emulation
- 
+
  Major League uses hardwired mirroring
 
  iNES: mapper 32
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( g101_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("g101_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
@@ -2831,11 +2831,11 @@ static WRITE8_HANDLER( g101_w )
 }
 
 /*************************************************************
- 
+
  Irem H-3001 board emulation
- 
+
  iNES: mapper 65
- 
+
  *************************************************************/
 
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
@@ -2847,7 +2847,7 @@ static void h3001_irq( running_device *device, int scanline, int vblank, int bla
 	if (state->IRQ_enable)
 	{
 		state->IRQ_count -= 114;
-		
+
 		if (state->IRQ_count <= 114)
 		{
 			state->IRQ_enable = 0;
@@ -2860,58 +2860,58 @@ static WRITE8_HANDLER( h3001_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("h3001_w, offset %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7fff)
 	{
 		case 0x0000:
 			prg8_89(space->machine, data);
 			break;
-			
+
 		case 0x1001:
 			set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
-			
+
 		case 0x1003:
 			state->IRQ_enable = data & 0x80;
 			break;
-			
+
 		case 0x1004:
 			state->IRQ_count = state->IRQ_count_latch;
 			break;
-			
+
 		case 0x1005:
 			state->IRQ_count_latch = (state->IRQ_count_latch & 0x00ff) | (data << 8);
 			break;
-			
+
 		case 0x1006:
 			state->IRQ_count_latch = (state->IRQ_count_latch & 0xff00) | data;
 			break;
-			
+
 		case 0x2000:
 			prg8_ab(space->machine, data);
 			break;
-			
+
 		case 0x3000: case 0x3001: case 0x3002: case 0x3003:
 		case 0x3004: case 0x3005: case 0x3006: case 0x3007:
 			chr1_x(space->machine, offset & 0x07, data, CHRROM);
 			break;
-			
+
 		case 0x4000:
 			prg8_cd(space->machine, data);
 			break;
-			
+
 		default:
 			break;
 	}
 }
 
 /*************************************************************
- 
+
  Jaleco SS88006 board emulation, aka JF-27, JF-29, JF-30, ...,
  JF-38, JF-40, JF-41
- 
+
  iNES: mapper 18
- 
+
  *************************************************************/
 
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
@@ -2920,7 +2920,7 @@ static WRITE8_HANDLER( h3001_w )
 static void ss88006_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 	/* Increment & check the IRQ scanline counter */
 	if (state->IRQ_enable)
 	{
@@ -2969,7 +2969,7 @@ static WRITE8_HANDLER( ss88006_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("mapper18_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
@@ -2996,10 +2996,10 @@ static WRITE8_HANDLER( ss88006_w )
 			state->mmc_prg_bank[2] = (state->mmc_prg_bank[2] & 0x0f) | (data << 4);
 			prg8_cd(space->machine, state->mmc_prg_bank[2]);
 			break;
-			
+
 			/* $9002, 3 (1002, 3) uncaught = Jaleco Baseball writes 0 */
 			/* believe it's related to battery-backed ram enable/disable */
-			
+
 		case 0x2000: case 0x2001: case 0x2002: case 0x2003:
 		case 0x3000: case 0x3001: case 0x3002: case 0x3003:
 		case 0x4000: case 0x4001: case 0x4002: case 0x4003:
@@ -3009,10 +3009,10 @@ static WRITE8_HANDLER( ss88006_w )
 				state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0x0f) | ((data & 0x0f)<< 4);
 			else
 				state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			
+
 			chr1_x(space->machine, bank, state->mmc_vrom_bank[bank], CHRROM);
 			break;
-			
+
 		case 0x6000:
 			state->IRQ_count_latch = (state->IRQ_count_latch & 0xfff0) | (data & 0x0f);
 			break;
@@ -3025,7 +3025,7 @@ static WRITE8_HANDLER( ss88006_w )
 		case 0x6003:
 			state->IRQ_count_latch = (state->IRQ_count_latch & 0x0fff) | ((data & 0x0f) << 12);
 			break;
-			
+
 		case 0x7000:
 			state->IRQ_count = state->IRQ_count_latch;
 			break;
@@ -3033,7 +3033,7 @@ static WRITE8_HANDLER( ss88006_w )
 			state->IRQ_enable = data & 0x01;
 			state->IRQ_mode = data & 0x0e;
 			break;
-			
+
 		case 0x7002:
 			switch (data & 0x03)
 			{
@@ -3043,7 +3043,7 @@ static WRITE8_HANDLER( ss88006_w )
 			case 3: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
 			}
 			break;
-			
+
 		default:
 			logerror("Jaleco SS88006 uncaught write, addr: %04x, value: %02x\n", offset + 0x8000, data);
 			break;
@@ -3051,11 +3051,11 @@ static WRITE8_HANDLER( ss88006_w )
 }
 
 /*************************************************************
- 
+
  Jaleco JF-11, JF-12 & JF-14 boards emulation
- 
+
  iNES: mapper 140
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( jf11_m_w )
@@ -3066,19 +3066,19 @@ static WRITE8_HANDLER( jf11_m_w )
 }
 
 /*************************************************************
- 
+
  Jaleco JF-13 board emulation
- 
+
  Note: we don't emulate the additional sound hardware.
 
  iNES: mapper 86
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( jf13_m_w )
 {
 	LOG_MMC(("jf13_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset == 0)
 	{
 		prg32(space->machine, (data >> 4) & 0x03);
@@ -3097,11 +3097,11 @@ static WRITE8_HANDLER( jf13_m_w )
 }
 
 /*************************************************************
- 
+
  Jaleco JF-16 board emulation
- 
+
  iNES: mapper 78 (shared with a diff Irem board)
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( jf16_w )
@@ -3114,13 +3114,13 @@ static WRITE8_HANDLER( jf16_w )
 }
 
 /*************************************************************
- 
+
  Jaleco JF-17, JF-26 & JF-28 boards emulation
- 
+
  Note: we don't emulate the additional sound hardware.
 
  iNES: mapper 72
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( jf17_w )
@@ -3136,13 +3136,13 @@ static WRITE8_HANDLER( jf17_w )
 }
 
 /*************************************************************
- 
+
  Jaleco JF-19 & JF-21 boards emulation
- 
+
  Note: we don't emulate the additional sound hardware.
- 
+
  iNES: mapper 92
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( jf19_w )
@@ -3158,22 +3158,22 @@ static WRITE8_HANDLER( jf19_w )
 }
 
 /*************************************************************
- 
+
  Konami VRC1 and Jaleco JF20, JF22
 
  Games: Exciting Boxing, Ganbare Goemon!, Tetsuwan Atom
- 
+
  iNES: mapper 75
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( konami_vrc1_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("konami_vrc1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
@@ -3204,11 +3204,11 @@ static WRITE8_HANDLER( konami_vrc1_w )
 }
 
 /*************************************************************
- 
- Konami VRC-2 
- 
+
+ Konami VRC-2
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( konami_vrc2_w )
@@ -3219,7 +3219,7 @@ static WRITE8_HANDLER( konami_vrc2_w )
 						| ((offset << (9 - state->vrc_ls_prg_a)) & 0x200)
 						| ((offset << (8 - state->vrc_ls_prg_b)) & 0x100);
 	LOG_MMC(("konami_vrc2_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x1000)
 		prg8_89(space->machine, data);
 	else if (offset < 0x2000)
@@ -3239,7 +3239,7 @@ static WRITE8_HANDLER( konami_vrc2_w )
 		bank = ((shifted_offs & 0x7000) - 0x3000) / 0x0800 + BIT(shifted_offs, 9);
 		shift = BIT(shifted_offs, 8) * 4;
 		mask = (0xf0 >> shift);
-		state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & mask) 
+		state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & mask)
 									| (((data >> state->vrc_ls_chr) & 0x0f) << shift);
 		chr1_x(space->machine, bank, state->mmc_vrom_bank[bank], CHRROM);
 	}
@@ -3248,22 +3248,22 @@ static WRITE8_HANDLER( konami_vrc2_w )
 }
 
 /*************************************************************
- 
+
  Konami VRC3
 
  Games: Salamander
- 
+
  iNES: mapper 73
- 
+
  In MESS: Supported. It also uses konami_irq.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( konami_vrc3_w )
 {
 	LOG_MMC(("konami_vrc3_w, offset: %04x, data: %02x\n", offset, data));
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	
+
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
@@ -3293,11 +3293,11 @@ static WRITE8_HANDLER( konami_vrc3_w )
 }
 
 /*************************************************************
- 
+
  Konami VRC-4
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static void vrc4_set_prg( running_machine *machine )
@@ -3335,7 +3335,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 						| ((offset << (9 - state->vrc_ls_prg_a)) & 0x200)
 						| ((offset << (8 - state->vrc_ls_prg_b)) & 0x100);
 	LOG_MMC(("konami_vrc4_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x1000)
 	{
 		state->mmc_prg_bank[0] = data;
@@ -3408,12 +3408,12 @@ static WRITE8_HANDLER( konami_vrc4_w )
 }
 
 /*************************************************************
- 
+
  Konami VRC-6
- 
+
  In MESS: Supported. It also uses konami_irq (there are IRQ
  issues though: see Akumajou Densetsu intro).
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( konami_vrc6_w )
@@ -3424,7 +3424,7 @@ static WRITE8_HANDLER( konami_vrc6_w )
 						| ((offset << (9 - state->vrc_ls_prg_a)) & 0x200)
 						| ((offset << (8 - state->vrc_ls_prg_b)) & 0x100);
 	LOG_MMC(("konami_vrc6_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x1000)
 		prg16_89ab(space->machine, data);
 	else if (offset >= 0x4000 && offset < 0x5000)
@@ -3485,15 +3485,15 @@ static WRITE8_HANDLER( konami_vrc6_w )
 }
 
 /*************************************************************
- 
+
  Konami VRC7
 
  Games: Lagrange Point, Tiny Toon Adventures 2
- 
+
  iNES: mapper 85
- 
+
  In MESS: Supported. It also uses konami_irq.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( konami_vrc7_w )
@@ -3501,7 +3501,7 @@ static WRITE8_HANDLER( konami_vrc7_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("konami_vrc7_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7018)
 	{
 		case 0x0000:
@@ -3512,13 +3512,13 @@ static WRITE8_HANDLER( konami_vrc7_w )
 		case 0x0018:
 			prg8_ab(space->machine, data);
 			break;
-			
+
 		case 0x1000:
 			prg8_cd(space->machine, data);
 			break;
-			
+
 			/* TODO: there are sound regs in here */
-			
+
 		case 0x2000:
 		case 0x2008:
 		case 0x2010:
@@ -3538,7 +3538,7 @@ static WRITE8_HANDLER( konami_vrc7_w )
 			bank = ((offset & 0x7000) - 0x2000) / 0x0800 + ((offset & 0x0018) ? 1 : 0);
 			chr1_x(space->machine, bank, data, state->mmc_chr_source);
 			break;
-			
+
 		case 0x6000:
 			switch (data & 0x03)
 			{
@@ -3561,7 +3561,7 @@ static WRITE8_HANDLER( konami_vrc7_w )
 		case 0x7008: case 0x7010: case 0x7018:
 			state->IRQ_enable = state->IRQ_enable_latch;
 			break;
-			
+
 		default:
 			logerror("konami_vrc7_w uncaught write, addr: %04x value: %02x\n", offset + 0x8000, data);
 			break;
@@ -3569,11 +3569,11 @@ static WRITE8_HANDLER( konami_vrc7_w )
 }
 
 /*************************************************************
- 
+
  Namcot-163 board emulation
- 
+
  iNES: mapper 19
- 
+
  *************************************************************/
 
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
@@ -3582,7 +3582,7 @@ static WRITE8_HANDLER( konami_vrc7_w )
 static void namcot163_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 	if (state->IRQ_enable)
 	{
 		if (state->IRQ_count >= (0x7fff - 114))
@@ -3600,7 +3600,7 @@ static WRITE8_HANDLER( namcot163_l_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("namcot163_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
+
 	switch (offset & 0x1800)
 	{
 		case 0x0800:
@@ -3621,7 +3621,7 @@ static READ8_HANDLER( namcot163_l_r )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("namcot163_l_r, offset: %04x\n", offset));
 	offset += 0x100;
-	
+
 	switch (offset & 0x1800)
 	{
 		case 0x1000:
@@ -3684,19 +3684,19 @@ static WRITE8_HANDLER( namcot163_w )
 }
 
 /*************************************************************
- 
+
  Sunsoft-1 board emulation
- 
- iNES: mapper 184 (Fantasy Zone uses this board with no 
+
+ iNES: mapper 184 (Fantasy Zone uses this board with no
  CHRROM, and the register switches PRG banks)
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( sunsoft1_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("sunsoft1_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (state->chr_chunks)
 	{
 		chr4_0(space->machine, data & 0x0f, CHRROM);
@@ -3707,14 +3707,14 @@ static WRITE8_HANDLER( sunsoft1_m_w )
 }
 
 /*************************************************************
- 
+
  Sunsoft-2 board emulation
- 
+
  The two games using this board have incompatible mirroring
  wiring, making necessary two distinct mappers & pcb_id
- 
+
  iNES: mapper 89 & 93
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( sunsoft2_w )
@@ -3732,14 +3732,14 @@ static WRITE8_HANDLER( sunsoft2_w )
 }
 
 /*************************************************************
- 
+
  Sunsoft-3 board emulation
- 
+
  The two games using this board have incompatible mirroring
  wiring, making necessary two distinct mappers & pcb_id
- 
+
  iNES: mapper 67
- 
+
  *************************************************************/
 
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
@@ -3748,9 +3748,9 @@ static WRITE8_HANDLER( sunsoft2_w )
 static void sunsoft3_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 	/* TODO: change to reflect the actual number of cycles spent: both using 114 or cycling 114,114,113
-	 produces a 1-line glitch in Fantasy Zone 2: it really requires the counter to be updated each CPU cycle! */
+     produces a 1-line glitch in Fantasy Zone 2: it really requires the counter to be updated each CPU cycle! */
 	if (state->IRQ_enable)
 	{
 		if (state->IRQ_count <= 114)
@@ -3768,7 +3768,7 @@ static WRITE8_HANDLER( sunsoft3_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("sunsoft3_w, offset %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7800)
 	{
 		case 0x0800:
@@ -3814,17 +3814,17 @@ static WRITE8_HANDLER( sunsoft3_w )
 }
 
 /*************************************************************
- 
+
  Taito TC0190FMC + board emulation
- 
+
  iNES: mapper 33
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( tc0190fmc_w )
 {
 	LOG_MMC(("tc0190fmc_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
@@ -3856,18 +3856,18 @@ static WRITE8_HANDLER( tc0190fmc_w )
 }
 
 /*************************************************************
- 
+
  Taito TC0190FMC + PAL16R4 board emulation
- 
+
  iNES: mapper 48
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( tc0190fmc_p16_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("tc0190fmc_p16_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
@@ -3901,24 +3901,24 @@ static WRITE8_HANDLER( tc0190fmc_p16_w )
 }
 
 /*************************************************************
- 
+
  Taito X1-005 board emulation
- 
+
  Actually, Fudou Myouou Den uses a variant of the board with
  CIRAM, making necessary two distinct mappers & pcb_id.
- 
+
  Also, we miss to emulate the security check at 0x7ef8 / 0x7ef9
  and the 0x80 ram!
- 
+
  iNES: mappers 80 & 207
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( x1005_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("x1005_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset)
 	{
 		case 0x1ef0:
@@ -3982,7 +3982,7 @@ static READ8_HANDLER( x1005_m_r )
 static WRITE8_HANDLER( x1005a_m_w )
 {
 	LOG_MMC(("x1005a_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	// similar to x1005_m_w but mirroring is handled differently
 	if (offset == 0x1ef6 || offset == 0x1ef7)
 		return;
@@ -4003,14 +4003,14 @@ static WRITE8_HANDLER( x1005a_m_w )
 }
 
 /*************************************************************
- 
+
  Taito X1-017 board emulation
-  
+
  We miss to emulate the security check at 0x6000-0x73ff
  and the ram!
- 
+
  iNES: mapper 82
- 
+
  *************************************************************/
 
 static void x1017_set_chr( running_machine *machine )
@@ -4030,14 +4030,14 @@ static void x1017_set_chr( running_machine *machine )
 	chr1_x(machine, 5 ^ state->mmc_latch1, state->mmc_vrom_bank[3], CHRROM);
 	chr1_x(machine, 6 ^ state->mmc_latch1, state->mmc_vrom_bank[4], CHRROM);
 	chr1_x(machine, 7 ^ state->mmc_latch1, state->mmc_vrom_bank[5], CHRROM);
-}	
+}
 
 static WRITE8_HANDLER( x1017_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 reg = offset & 0x07;
 	LOG_MMC(("x1017_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset)
 	{
 		case 0x1ef0:
@@ -4095,47 +4095,47 @@ static READ8_HANDLER( x1017_m_r )
 		return state->mapper_ram[offset & (state->mapper_ram_size - 1)];
 	if (offset < 0x1800 && state->mapper_ram != NULL && state->mmc_reg[2] == 0x84)
 		return state->mapper_ram[offset & (state->mapper_ram_size - 1)];
-	
+
 	return 0xff;
 }
 
 /*************************************************************
- 
+
       MISC UNLICENSED BOARDS
- 
+
  *************************************************************/
 
 /*************************************************************
- 
+
  AGCI 50282 bootleg board emulation
- 
+
  iNES: mapper 144
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( agci_50282_w )
 {
 	LOG_MMC(("agci_50282_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	offset += 0x8000;
 	data |= (memory_read_byte(space, offset) & 1);
-	
+
 	chr8(space->machine, data >> 4, CHRROM);
 	prg32(space->machine, data);
 }
 
 /*************************************************************
- 
+
  AVE NINA-001 board emulation
- 
+
  iNES: mapper 34
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( nina01_m_w )
 {
 	LOG_MMC(("nina01_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset)
 	{
 		case 0x1ffd:
@@ -4151,17 +4151,17 @@ static WRITE8_HANDLER( nina01_m_w )
 }
 
 /*************************************************************
- 
+
  AVE NINA-003, NINA-006 and MB-91 boards emulation
- 
+
  iNES: mapper 79
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( nina06_l_w )
 {
 	LOG_MMC(("nina06_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (!(offset & 0x0100))
 	{
 		prg32(space->machine, data >> 3);
@@ -4170,11 +4170,11 @@ static WRITE8_HANDLER( nina06_l_w )
 }
 
 /*************************************************************
- 
+
  Active Entertainment Action 52 board emulation
- 
+
  iNES: mapper 228
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( ae_act52_w )
@@ -4182,12 +4182,12 @@ static WRITE8_HANDLER( ae_act52_w )
 	int pbank, cbank;
 	UINT8 pmode;
 	LOG_MMC(("ae_act52_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, BIT(offset, 13) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	
+
 	cbank = (data & 0x03) | ((offset & 0x0f) << 2);
 	chr8(space->machine, cbank, CHRROM);
-	
+
 	pmode = offset & 0x20;
 	pbank = (offset & 0x1fc0) >> 6;
 	if (pmode)
@@ -4201,24 +4201,24 @@ static WRITE8_HANDLER( ae_act52_w )
 
 
 /*************************************************************
- 
+
  C & E Bootleg Board for Decathlon
- 
+
  Games: Decathlon
- 
+
  Pretty simple mapper: writes to 0x8065-0x80a4 set prg32 to
  data & 3; writes to 0x80a5-0x80e4 set chr8 to data & 7
- 
+
  iNES: mapper 244
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( cne_decathl_w )
 {
 	LOG_MMC(("cne_decathl_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x0065)
 		return;
 	if (offset < 0x00a5)
@@ -4233,27 +4233,27 @@ static WRITE8_HANDLER( cne_decathl_w )
 }
 
 /*************************************************************
- 
+
  C & E Bootleg Board for Fong Shen Bang
- 
+
  Games: Fong Shen Bang - Zhu Lu Zhi Zhan
- 
+
  Simple mapper: writes to 0x6000-0x67ff set PRG and CHR banks.
  Namely, 0x6000->0x6003 select resp. prg8_89, prg8_ab, prg8_cd
  and prg8_ef. 0x6004->0x6007 select resp. crh2_0, chr2_2,
  chr2_4 and chr2_6. In 0x6800-0x7fff lies WRAM.
- 
+
  iNES: mapper 246
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( cne_fsb_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("cne_fsb_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x0800)
 	{
 		switch (offset & 0x0007)
@@ -4289,47 +4289,47 @@ static WRITE8_HANDLER( cne_fsb_m_w )
 }
 
 /*************************************************************
- 
+
  C & E Bootleg Board for Sheng Huo Lie Zhuan
- 
+
  Games: Jing Ke Xin Zhuan, Sheng Huo Lie Zhuan
- 
+
  Simple Mapper: writes to 0x4020-0x5fff sets prg32 to
  data>>4 and chr8 to data&f. We currently do not map
  writes to 0x4020-0x40ff (to do: verify if this produces
  issues)
- 
+
  iNES: mapper 240
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( cne_shlz_l_w )
 {
 	LOG_MMC(("cne_shlz_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, data >> 4);
 	chr8(space->machine, data & 0x0f, CHRROM);
 }
 
 /*************************************************************
- 
+
  Caltron 6 in 1 Board
 
  Games: 6 in 1 by Caltron
- 
+
  iNES: mapper 41
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( caltron6in1_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("caltron6in1_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->mmc_latch1 = offset & 0xff;
 	set_nt_mirroring(space->machine, BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	prg32(space->machine, offset & 0x07);
@@ -4339,33 +4339,33 @@ static WRITE8_HANDLER( caltron6in1_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("caltron6in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (state->mmc_latch1 & 0x04)
 		chr8(space->machine, ((state->mmc_latch1 & 0x18) >> 1) | (data & 0x03), CHRROM);
 }
 
 /*************************************************************
- 
+
  Camerica Boards (BF9093, BF9097, BF909X, ALGNV11)
 
  Games: Linus Spacehead's Cosmic Crusade, Micro Machines,
  Mig-29, Stunt Kids
- 
+
  To emulate NT mirroring for BF9097 board (missing in BF9093)
  we use crc_hack, however Fire Hawk is broken (but without
  mirroring there would be no helicopter graphics).
- 
+
  iNES: mapper 71
- 
+
  In MESS: Partially Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bf9093_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bf9093_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
@@ -4383,21 +4383,21 @@ static WRITE8_HANDLER( bf9093_w )
 }
 
 /*************************************************************
- 
+
  Camerica BF9096 & ALGQV11 Boards
 
  Games: Quattro Adventure, Quattro Arcade, Quattro Sports
- 
+
  Writes to 0x8000-0x9fff set prg block to (data&0x18)>>1,
  writes to 0xa000-0xbfff set prg page to data&3. selected
  prg are: prg16_89ab = block|page, prg_cdef = 3|page.
  For more info on the hardware to bypass the NES lockout, see
  Kevtris' Camerica Mappers documentation.
- 
+
  iNES: mapper 232
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void bf9096_set_prg( running_machine *machine )
@@ -4411,32 +4411,32 @@ static WRITE8_HANDLER( bf9096_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bf9096_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x2000)
 		state->mmc_latch1 = data;
 	else
 		state->mmc_latch2 = data;
-	
+
 	bf9096_set_prg(space->machine);
 }
 
 /*************************************************************
- 
+
  Camerica Golden Five board
 
  Games: Pegasus 5 in 1
- 
+
  iNES: mapper 104
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( golden5_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("golden5_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x4000)
 	{
 		if (data & 0x08)
@@ -4445,7 +4445,7 @@ static WRITE8_HANDLER( golden5_w )
 			prg16_89ab(space->machine, state->mmc_prg_bank[0]);
 			prg16_cdef(space->machine, ((data & 0x07) << 4) | 0x0f);
 		}
-		
+
 	}
 	else
 	{
@@ -4455,16 +4455,16 @@ static WRITE8_HANDLER( golden5_w )
 }
 
 /*************************************************************
- 
+
  Cony Bootleg Board
 
  Games: Dragon Ball Party, Fatal Fury 2, Street Blaster II
  Pro, World Heroes 2
- 
+
  iNES: mapper 83
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( cony_l_w )
@@ -4596,34 +4596,34 @@ static WRITE8_HANDLER( cony_w )
 }
 
 /*************************************************************
- 
+
  Board DREAMTECH01
- 
+
  Games: Korean Igo
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( dreamtech_l_w )
 {
 	LOG_MMC(("dreamtech_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
+
 	if (offset == 0x1020)	/* 0x5020 */
 		prg16_89ab(space->machine, data);
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Future Media
 
  Games: Crayon Shin-chan (C), San Guo Zhi 4 - Chi Bi Feng Yun
- 
+
  iNES: mapper 117
- 
+
  In MESS: Unsupported.
- 
+
  *************************************************************/
 
 static void futuremedia_irq( running_device *device, int scanline, int vblank, int blanked )
@@ -4644,7 +4644,7 @@ static WRITE8_HANDLER( futuremedia_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("futuremedia_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset)
 	{
 		case 0x0000:
@@ -4669,11 +4669,11 @@ static WRITE8_HANDLER( futuremedia_w )
 		case 0x2007:
 			chr1_x(space->machine, offset & 0x07, data, CHRROM);
 			break;
-			
+
 		case 0x5000:
 			set_nt_mirroring(space->machine, BIT(data, 0) ?  PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
-			
+
 		case 0x4001:
 			state->IRQ_count_latch = data;
 			break;
@@ -4690,17 +4690,17 @@ static WRITE8_HANDLER( futuremedia_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board 37017 (?) by Gouder
 
  Games: Street Fighter IV
- 
+
  MMC3 clone. It also requires reads from 0x5000-0x7fff.
- 
+
  iNES: mapper 208
- 
+
  In MESS: Preliminary Support.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( gouder_sf4_l_w )
@@ -4725,9 +4725,9 @@ static WRITE8_HANDLER( gouder_sf4_l_w )
 		0x01,0x11,0x41,0x51,0x01,0x11,0x41,0x51,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 		0x09,0x19,0x49,0x59,0x09,0x19,0x49,0x59,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
 	};
-	
+
 	LOG_MMC(("gouder_sf4_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (!(offset < 0x1700))
 		state->map208_reg[offset & 0x03] = data ^ conv_table[state->map208_reg[4]];
 	else if (!(offset < 0xf00))
@@ -4740,10 +4740,10 @@ static READ8_HANDLER( gouder_sf4_l_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("gouder_sf4_l_r, offset: %04x\n", offset));
-	
+
 	if (!(offset < 0x1700))
 		return state->map208_reg[offset & 0x03];
-	
+
 	return 0x00;
 }
 
@@ -4754,18 +4754,18 @@ static WRITE8_HANDLER( gouder_sf4_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("gouder_sf4_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -4777,7 +4777,7 @@ static WRITE8_HANDLER( gouder_sf4_w )
 				break;
 			}
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -4785,49 +4785,49 @@ static WRITE8_HANDLER( gouder_sf4_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Henggedianzi
 
  Games: Mei Guo Fu Hao, Shang Gu Shen Jian , Wang Zi Fu
  Chou Ji
- 
+
  Writes to 0x8000-0xffff set prg32. Moreover, data&0x20 sets
  NT mirroring.
- 
+
  iNES: mapper 177
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( henggedianzi_w )
 {
 	LOG_MMC(("henggedianzi_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, data);
 	set_nt_mirroring(space->machine, BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Henggedianzi
- 
+
  Games: Xing He Zhan Shi
- 
+
  Writes to 0x5000-0x5fff set prg32 banks, writes to 0x8000-
  0xffff set NT mirroring
- 
+
  iNES: mapper 179
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( heng_xjzb_l_w )
 {
 	LOG_MMC(("heng_xjzb_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x4100;
-	
+
 	if (offset & 0x5000)
 		prg32(space->machine, data >> 1);
 }
@@ -4835,30 +4835,30 @@ static WRITE8_HANDLER( heng_xjzb_l_w )
 static WRITE8_HANDLER( heng_xjzb_w )
 {
 	LOG_MMC(("heng_xjzb_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
- 
+
  Bootleg Board by HES (also used by others)
 
  Games: AV Hanafuda Club, AV Soccer, Papillon, Sidewinder,
  Total Funpack
- 
+
  Actually, two variant: one for HES 6-in-1 with mirroring control
  and one for AV Soccer and others with hardwired mirroring
 
  iNES: mapper 113
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( hes6in1_l_w )
 {
 	LOG_MMC(("hes6in1_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (!(offset & 0x100))
 	{
 		prg32(space->machine, (data & 0x38) >> 3);
@@ -4870,7 +4870,7 @@ static WRITE8_HANDLER( hes6in1_l_w )
 static WRITE8_HANDLER( hes_l_w )
 {
 	LOG_MMC(("hes_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (!(offset & 0x100))
 	{
 		prg32(space->machine, (data & 0x38) >> 3);
@@ -4879,22 +4879,22 @@ static WRITE8_HANDLER( hes_l_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Hosenkan
 
  Games: Pocahontas, Super Donkey Kong
- 
+
  iNES: mapper 182
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( hosenkan_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("hosenkan_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7003)
 	{
 		case 0x0001:
@@ -4945,25 +4945,25 @@ static WRITE8_HANDLER( hosenkan_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Kaiser (KS7058)
 
  Games: Tui Do Woo Ma Jeung
- 
+
  Writes to 0xf000-0xffff set 4k chr banks. Namely, if
  offset&0x80 is 0 the lower 4k are set, if it is 1 the
  upper 4k are set.
- 
+
  iNES: mapper 171
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( ks7058_w )
 {
 	LOG_MMC(("ks7058_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7080)
 	{
 		case 0x7000:
@@ -4976,18 +4976,18 @@ static WRITE8_HANDLER( ks7058_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Kay (for Panda Prince)
 
  Games: The Panda Prince
- 
+
  MMC3 clone
- 
+
  iNES: mapper 121
- 
- In MESS: Only preliminarly supported (Panda Prince works, 
+
+ In MESS: Only preliminarly supported (Panda Prince works,
  other games require handling properly the protection).
-  
+
  *************************************************************/
 
 static WRITE8_HANDLER( kay_pp_l_w )
@@ -4995,7 +4995,7 @@ static WRITE8_HANDLER( kay_pp_l_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("kay_pp_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
+
 	if (!(offset < 0x1000))
 	{
 		switch (data & 0x03)
@@ -5019,7 +5019,7 @@ static READ8_HANDLER( kay_pp_l_r )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("kay_pp_l_r, offset: %04x\n", offset));
 	offset += 0x100;
-	
+
 	if (!(offset < 0x1000))
 		return state->mapper121_reg[2];
 	else
@@ -5036,24 +5036,24 @@ static void kay_pp_update_regs( running_machine *machine, UINT8 data )
 		case 0x29:
 		case 0x2b:
 		case 0x3f:
-//			printf("reg (%x) %x \n", data, state->mapper121_reg[3]);
+//          printf("reg (%x) %x \n", data, state->mapper121_reg[3]);
 			state->mapper121_reg[1] = state->mapper121_reg[3];
 			break;
 		case 0x2c:
-//			printf("reg (%x) %x \n", data, state->mapper121_reg[3]);
+//          printf("reg (%x) %x \n", data, state->mapper121_reg[3]);
 			state->mapper121_reg[1] = state->mapper121_reg[3];
 			break;
-			
+
 		case 0x28:
-//			printf("reg (%x) %x \n", data, state->mapper121_reg[3]);
+//          printf("reg (%x) %x \n", data, state->mapper121_reg[3]);
 			state->mapper121_reg[0] = state->mapper121_reg[3];
 			break;
-			
+
 		case 0x2a:
-//			printf("reg (%x) %x \n", data, state->mapper121_reg[3]);
+//          printf("reg (%x) %x \n", data, state->mapper121_reg[3]);
 			state->mapper121_reg[4] = state->mapper121_reg[3];
 			break;
-			
+
 		case 0x2f:
 			break;
 
@@ -5070,11 +5070,11 @@ static void kay_pp_set_prg( running_machine *machine, int prg_base, int prg_mask
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_flip = (state->mmc_latch1 & 0x40) ? 2 : 0;
 	UINT8 new_bank1, new_bank2, new_bank3;
-	
+
 	new_bank2 = state->mapper121_reg[0] ? state->mapper121_reg[0] : state->mmc_prg_bank[2 ^ prg_flip];
 	new_bank3 = state->mapper121_reg[1] ? state->mapper121_reg[1] : state->mmc_prg_bank[3];
 	new_bank1 = state->mapper121_reg[4] ? state->mapper121_reg[4] : state->mmc_prg_bank[1];
-	
+
 	prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
 	prg8_ab(machine, prg_base | (new_bank1 & prg_mask));
 	prg8_cd(machine, prg_base | (new_bank2 & prg_mask));
@@ -5086,7 +5086,7 @@ static WRITE8_HANDLER( kay_pp_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("kay_pp_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if ((offset < 0x2000) && (offset & 0x03) == 0x03)
 	{
 		kay_pp_update_regs(space->machine, data);
@@ -5099,18 +5099,18 @@ static WRITE8_HANDLER( kay_pp_w )
 			case 0x0000:
 				MMC3_helper = state->mmc_latch1 ^ data;
 				state->mmc_latch1 = data;
-				
+
 				/* Has PRG Mode changed? */
 				if (MMC3_helper & 0x40)
 					kay_pp_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-				
+
 				/* Has CHR Mode changed? */
 				if (MMC3_helper & 0x80)
 					mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 				break;
-				
+
 			case 0x0001:
-				state->mapper121_reg[3] = (BIT(data, 0) << 5) | (BIT(data, 1) << 4) | (BIT(data, 2) << 3) 
+				state->mapper121_reg[3] = (BIT(data, 0) << 5) | (BIT(data, 1) << 4) | (BIT(data, 2) << 3)
 										| (BIT(data, 3) << 2) | (BIT(data, 4) << 1) | BIT(data, 5);
 				cmd = state->mmc_latch1 & 0x07;
 				switch (cmd)
@@ -5127,7 +5127,7 @@ static WRITE8_HANDLER( kay_pp_w )
 					break;
 				}
 				break;
-				
+
 			default:
 				txrom_w(space, offset, data);
 				break;
@@ -5137,18 +5137,18 @@ static WRITE8_HANDLER( kay_pp_w )
 
 
 /*************************************************************
- 
+
  Bootleg Board by Kasing
 
  Games: AV Jiu Ji Mahjong, Bao Qing Tian, Thunderbolt 2,
  Shisen Mahjong 2
- 
+
  MMC3 clone
- 
+
  iNES: mapper 115
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static void kasing_set_prg( running_machine *machine, int prg_base, int prg_mask  )
@@ -5164,7 +5164,7 @@ static WRITE8_HANDLER( kasing_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("kasing_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x01)
 	{
 		case 0x00:
@@ -5183,22 +5183,22 @@ static WRITE8_HANDLER( kasing_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map115_helper, cmd;
 	LOG_MMC(("kasing_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			map115_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (map115_helper & 0x40)
 				kasing_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (map115_helper & 0x80)
 				mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -5215,7 +5215,7 @@ static WRITE8_HANDLER( kasing_w )
 				break;
 		}
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -5223,38 +5223,38 @@ static WRITE8_HANDLER( kasing_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Magic Series
 
  Games: Magic Dragon
- 
+
  Very simple mapper: writes to 0x8000-0xffff set prg32 and chr8
  banks
- 
+
  iNES: mapper 107
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( magics_md_w )
 {
 	LOG_MMC(("magics_md_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, data >> 1);
 	chr8(space->machine, data, CHRROM);
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Nanjing
- 
+
  Games: A lot of pirate originals
-  
+
  iNES: mapper 163
- 
+
  In MESS: Unsupported.
- 
+
  *************************************************************/
 
 static void nanjing_irq( running_device *device, int scanline, int vblank, int blanked )
@@ -5268,21 +5268,21 @@ static void nanjing_irq( running_device *device, int scanline, int vblank, int b
 			chr4_0(device->machine, 1, CHRRAM);
 			chr4_4(device->machine, 1, CHRRAM);
 		}
-		
+
 		if (scanline == 239)
 		{
 			chr4_0(device->machine, 0, CHRRAM);
 			chr4_4(device->machine, 0, CHRRAM);
 		}
 	}
-	
+
 }
 
 static WRITE8_HANDLER( nanjing_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("nanjing_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	offset += 0x100;
 
 	if (offset < 0x1000)
@@ -5294,12 +5294,12 @@ static WRITE8_HANDLER( nanjing_l_w )
 			prg32(space->machine, 3);
 		return;
 	}
-	
+
 	if (offset == 0x1101)	// 0x5101
 	{
 		UINT8 temp = state->mmc_count;
 		state->mmc_count = data;
-		
+
 		if (temp & !data)
 			state->mmc_latch2 ^= 0xff;
 	}
@@ -5325,12 +5325,12 @@ static READ8_HANDLER( nanjing_l_r )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 value = 0;
 	LOG_MMC(("nanjing_l_r, offset: %04x\n", offset));
-	
+
 	offset += 0x100;
-	
+
 	if (offset < 0x1000)
 		return 0;
-	
+
 	switch (offset & 0x700)
 	{
 		case 0x100:
@@ -5352,45 +5352,45 @@ static READ8_HANDLER( nanjing_l_r )
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Nitra
 
  Games: Time Diver Avenger
- 
+
  This acts basically like a MMC3 with different use of write
  address.
- 
+
  iNES: mapper 250
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( nitra_w )
 {
 	LOG_MMC(("nitra_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	txrom_w(space, (offset & 0x6000) | ((offset & 0x400) >> 10), offset & 0xff);
 }
 
 /*************************************************************
- 
- NTDEC ASDER Bootleg Board 
+
+ NTDEC ASDER Bootleg Board
 
  Games: Cobra Mission, Fighting Hero III, Huang Di, Master
  Shooter
- 
+
  iNES: mapper 112
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( ntdec_asder_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("ntdec_asder_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset)
 	{
 		case 0x0000:
@@ -5436,24 +5436,24 @@ static WRITE8_HANDLER( ntdec_asder_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board by NTDEC for Fighting Hero
 
  Games: Fighting Hero
- 
+
  Very simple mapper: writes to 0x6000-0x7fff swap PRG and
  CHR banks.
- 
+
  iNES: mapper 193
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( ntdec_fh_m_w )
 {
 	LOG_MMC(("ntdec_fh_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x03)
 	{
 		case 0:
@@ -5472,21 +5472,21 @@ static WRITE8_HANDLER( ntdec_fh_m_w )
 }
 
 /*************************************************************
- 
+
  Open Corp DAOU306 board
 
  Games: Metal Force (K)
- 
+
  iNES: mapper 156
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( daou306_w )
 {
 	LOG_MMC(("daou306_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset)
 	{
 		case 0x4000:
@@ -5520,51 +5520,51 @@ static WRITE8_HANDLER( daou306_w )
 }
 
 /*************************************************************
- 
+
  RCM GS2015 Board
 
  Games: Bonza, Magic Jewelry 2
- 
+
  Very simple mapper: writes to 0x8000-0xffff sets prg32
  to offset and chr8 to offset>>1 (when chrrom is present)
- 
+
  iNES: mapper 216
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( gs2015_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("gs2015_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, offset);
 	chr8(space->machine, offset >> 1, state->mmc_chr_source);
 }
 
 /*************************************************************
- 
+
  Bootleg Board by RCM for Tetris Family
 
  Games: Tetris Family 9 in 1, 20 in 1
- 
+
  Simple Mapper: prg/chr/nt are swapped depending on the offset
  of writes in 0x8000-0xffff. offset&0x80 set NT mirroring,
  when (offset&0x30) is 0,3 prg32 is set; when it is 1,2
  two 16k prg banks are set. See below for the values used in
  these banks.
- 
+
  iNES: mapper 61
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( rcm_tf_w )
 {
 	LOG_MMC(("rcm_tf_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x30)
 	{
 		case 0x00:
@@ -5581,25 +5581,25 @@ static WRITE8_HANDLER( rcm_tf_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Rex Soft
 
  Games: Dragon Ball Z 5, Dragon Ball Z Super
- 
+
  MMC3 clone
- 
+
  iNES: mapper 12
- 
+
  In MESS: Partially Supported
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( rex_dbz_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	
+
 	LOG_MMC(("rex_dbz_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->mapper12_reg = data;
 }
 
@@ -5614,7 +5614,7 @@ static void rex_dbz_set_chr( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
-	
+
 	chr1_x(machine, chr_page ^ 0, ((state->mapper12_reg & 0x01) << 8) | (state->mmc_vrom_bank[0] & ~0x01), CHRROM);
 	chr1_x(machine, chr_page ^ 1, ((state->mapper12_reg & 0x01) << 8) | (state->mmc_vrom_bank[0] |  0x01), CHRROM);
 	chr1_x(machine, chr_page ^ 2, ((state->mapper12_reg & 0x01) << 8) | (state->mmc_vrom_bank[1] & ~0x01), CHRROM);
@@ -5630,22 +5630,22 @@ static WRITE8_HANDLER( rex_dbz_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("rex_dbz_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				rex_dbz_set_chr(space->machine);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -5662,7 +5662,7 @@ static WRITE8_HANDLER( rex_dbz_w )
 				break;
 		}
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -5670,23 +5670,23 @@ static WRITE8_HANDLER( rex_dbz_w )
 }
 
 /*************************************************************
- 
+
  Rex Soft SL1632 Board
 
  Games: Samurai Spirits
- 
+
  MMC3 clone
- 
+
  iNES: mapper 14
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static void rex_sl1632_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
-	
+
 	if (state->map14_reg[0] & 0x02)
 	{
 		mmc3_set_prg(machine, prg_base, prg_mask);
@@ -5708,7 +5708,7 @@ static void rex_sl1632_set_chr( running_machine *machine, UINT8 chr, int chr_bas
 	UINT8 bank[8];
 	UINT8 chr_base2[8];
 	int i;
-	
+
 	if (state->map14_reg[0] & 0x02)
 	{
 		for(i = 0; i < 8; i++)
@@ -5725,7 +5725,7 @@ static void rex_sl1632_set_chr( running_machine *machine, UINT8 chr, int chr_bas
 			chr_base2[i] = chr_base;
 		}
 	}
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base2[0] | (bank[0] & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 1, chr_base2[1] | (bank[1] & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 2, chr_base2[2] | (bank[2] & chr_mask), chr);
@@ -5741,17 +5741,17 @@ static WRITE8_HANDLER( rex_sl1632_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map14_helper1, map14_helper2, MMC3_helper, cmd;
 	LOG_MMC(("rex_sl1632_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset == 0x2131)
 	{
 		state->map14_reg[0] = data;
 		rex_sl1632_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 		rex_sl1632_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
-		
+
 		if (!(state->map14_reg[0] & 0x02))
 			set_nt_mirroring(space->machine, BIT(state->map14_reg[1], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	}
-	
+
 	if (state->map14_reg[0] & 0x02)
 	{
 		switch (offset & 0x6001)
@@ -5759,16 +5759,16 @@ static WRITE8_HANDLER( rex_sl1632_w )
 			case 0x0000:
 				MMC3_helper = state->mmc_latch1 ^ data;
 				state->mmc_latch1 = data;
-				
+
 				/* Has PRG Mode changed? */
 				if (MMC3_helper & 0x40)
 					rex_sl1632_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-				
+
 				/* Has CHR Mode changed? */
 				if (MMC3_helper & 0x80)
 					rex_sl1632_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 				break;
-				
+
 			case 0x0001:
 				cmd = state->mmc_latch1 & 0x07;
 				switch (cmd)
@@ -5789,11 +5789,11 @@ static WRITE8_HANDLER( rex_sl1632_w )
 					break;
 			}
 				break;
-				
+
 			case 0x2000:
 				set_nt_mirroring(space->machine, BIT(state->map14_reg[1], 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 				break;
-				
+
 			default:
 				txrom_w(space, offset, data);
 				break;
@@ -5816,7 +5816,7 @@ static WRITE8_HANDLER( rex_sl1632_w )
 				state->mmc_extra_bank[offset >> 13] = data;
 				rex_sl1632_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 				break;
-				
+
 			case 0x1000:
 				state->map14_reg[1] = data;
 				set_nt_mirroring(space->machine, BIT(state->map14_reg[1], 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
@@ -5826,22 +5826,22 @@ static WRITE8_HANDLER( rex_sl1632_w )
 }
 
 /*************************************************************
- 
+
  Rumblestation Board
 
  Games: Rumblestation 15 in 1
- 
+
  iNES: mapper 46
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( rumblestation_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("rumblestation_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->mmc_prg_bank[0] = (state->mmc_prg_bank[0] & 0x01) | ((data & 0x0f) << 1);
 	state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & 0x07) | ((data & 0xf0) >> 1);
 	prg32(space->machine, state->mmc_prg_bank[0]);
@@ -5852,7 +5852,7 @@ static WRITE8_HANDLER( rumblestation_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("rumblestation_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->mmc_prg_bank[0] = (state->mmc_prg_bank[0] & ~0x01) | (data & 0x01);
 	state->mmc_vrom_bank[0] = (state->mmc_vrom_bank[0] & ~0x07) | ((data & 0x70) >> 4);
 	prg32(space->machine, state->mmc_prg_bank[0]);
@@ -5860,11 +5860,11 @@ static WRITE8_HANDLER( rumblestation_w )
 }
 
 /*************************************************************
- 
+
  Sachen 74x374 bootleg boards
- 
+
  iNES: mapper 150 & 243
- 
+
  *************************************************************/
 
 static void sachen_set_mirror( running_machine *machine, UINT8 nt ) // used by mappers 137, 138, 139, 141
@@ -5894,7 +5894,7 @@ static WRITE8_HANDLER( sachen_74x374_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("sachen_74x374_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
@@ -5934,7 +5934,7 @@ static READ8_HANDLER( sachen_74x374_l_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("sachen_74x374_l_r, offset: %04x", offset));
-	
+
 	/* read  happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 		return (~state->mmc_latch1 & 0x3f) /* ^ dips*/;	// we would need to check the Dips here
@@ -5946,7 +5946,7 @@ static WRITE8_HANDLER( sachen_74x374a_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("sachen_74x374a_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	/* write happens only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 	{
@@ -5986,11 +5986,11 @@ static WRITE8_HANDLER( sachen_74x374a_l_w )
 }
 
 /*************************************************************
- 
+
  Sachen S8259 bootleg boards
- 
+
  iNES: mapper 141 (A), 138 (B), 139 (C), 137 (D)
- 
+
  *************************************************************/
 
 static void common_s8259_write_handler( const address_space *space, offs_t offset, UINT8 data, int board )
@@ -6006,7 +6006,7 @@ static void common_s8259_write_handler( const address_space *space, offs_t offse
 		else
 		{
 			state->sachen_reg[state->mmc_latch1] = data;
-			
+
 			switch (state->mmc_latch1)
 			{
 				case 0x05:
@@ -6034,7 +6034,7 @@ static void common_s8259_write_handler( const address_space *space, offs_t offse
 						add1 = (board == SACHEN_8259B) ? 0 : 1;
 						add2 = (board == SACHEN_8259C) ? 2 : 0;
 						add3 = (board == SACHEN_8259A) ? 1 : (board == SACHEN_8259C) ? 3 : 0;
-						
+
 						if (state->mmc_chr_source == CHRROM)
 						{
 							chr2_0(space->machine, ((state->sachen_reg[bank_helper1 ? 0 : 0] & 0x07) | bank_helper2) << shift, CHRROM);
@@ -6053,7 +6053,7 @@ static WRITE8_HANDLER( s8259_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("s8259_w, type: %d, offset: %04x, data: %02x\n", state->pcb_id, offset, data));
-	
+
 	common_s8259_write_handler(space, offset, data, state->pcb_id);
 }
 
@@ -6061,87 +6061,87 @@ static WRITE8_HANDLER( s8259_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("s8259_w, type: %d, offset: %04x, data: %02x\n", state->pcb_id, offset, data));
-	
+
 	common_s8259_write_handler(space, (offset + 0x100) & 0xfff, data, state->pcb_id);
 }
 
 
 /*************************************************************
- 
+
  Sachen SA0036 bootleg boards
- 
+
  iNES: mapper 149
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( sa0036_w )
 {
 	LOG_MMC(("sa0036_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	chr8(space->machine, data >> 7, CHRROM);
 }
 
 /*************************************************************
- 
+
  Sachen SA0037 bootleg boards
- 
+
  iNES: mapper 148
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( sa0037_w )
 {
 	LOG_MMC(("sa0037_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, data >> 3);
 	chr8(space->machine, data, CHRROM);
 }
 
 /*************************************************************
- 
+
  Sachen SA72007 bootleg boards
- 
+
  iNES: mapper 145
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( sa72007_l_w )
 {
 	LOG_MMC(("sa72007_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	/* only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 		chr8(space->machine, data >> 7, CHRROM);
 }
 
 /*************************************************************
- 
+
  Sachen SA72008 bootleg boards
- 
+
  iNES: mapper 133
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( sa72008_l_w )
 {
 	LOG_MMC(("sa72008_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, data >> 2);
 	chr8(space->machine, data, CHRROM);
 }
 
 /*************************************************************
- 
+
  Sachen TCA-01 bootleg boards
- 
+
  iNES: mapper 143
- 
+
  *************************************************************/
 
 static READ8_HANDLER( tca01_l_r )
 {
 	LOG_MMC(("tca01_l_r, offset: %04x\n", offset));
-	
+
 	/* the address is read only if we are at 0x4100 + k * 0x200, but 0x4100 is offset = 0 */
 	if (!(offset & 0x100))
 		return (~offset & 0x3f) | 0x40;
@@ -6150,17 +6150,17 @@ static READ8_HANDLER( tca01_l_r )
 }
 
 /*************************************************************
- 
+
  Sachen TCU-01 bootleg boards
- 
+
  iNES: mapper 147
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( tcu01_l_w )
 {
 	LOG_MMC(("tcu01_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if ((offset & 0x103) == 0x002)
 	{
 		prg32(space->machine, ((data >> 6) & 0x02) | ((data >> 2) & 0x01));
@@ -6171,30 +6171,30 @@ static WRITE8_HANDLER( tcu01_l_w )
 static WRITE8_HANDLER( tcu01_m_w )
 {
 	LOG_MMC(("tcu01_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	tcu01_l_w(space, (offset + 0x100) & 0xfff, data);
 }
 
 static WRITE8_HANDLER( tcu01_w )
 {
 	LOG_MMC(("tcu01_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	tcu01_l_w(space, (offset + 0x100) & 0xfff, data);
 }
 
 /*************************************************************
- 
+
  Sachen TCU-02 bootleg boards
- 
+
  iNES: mapper 136
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( tcu02_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("tcu02_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if ((offset & 0x103) == 0x002)
 	{
 		state->mmc_latch1 = (data & 0x30) | ((data + 3) & 0x0f);
@@ -6206,7 +6206,7 @@ static READ8_HANDLER( tcu02_l_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("tcu02_l_r, offset: %04x\n", offset));
-	
+
 	if ((offset & 0x103) == 0x000)
 		return state->mmc_latch1 | 0x40;
 	else
@@ -6215,11 +6215,11 @@ static READ8_HANDLER( tcu02_l_r )
 
 
 /*************************************************************
- 
+
  Subor bootleg board Type 0
- 
+
  iNES: mapper 167
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( subor0_w )
@@ -6227,11 +6227,11 @@ static WRITE8_HANDLER( subor0_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 subor_helper1, subor_helper2;
 	LOG_MMC(("subor0_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->subor_reg[(offset >> 13) & 0x03] = data;
 	subor_helper1 = ((state->subor_reg[0] ^ state->subor_reg[1]) << 1) & 0x20;
 	subor_helper2 = ((state->subor_reg[2] ^ state->subor_reg[3]) << 0) & 0x1f;
-	
+
 	if (state->subor_reg[1] & 0x08)
 	{
 		subor_helper1 += subor_helper2 & 0xfe;
@@ -6248,17 +6248,17 @@ static WRITE8_HANDLER( subor0_w )
 		subor_helper1 += subor_helper2;
 		subor_helper2 = 0x20;
 	}
-	
+
 	prg16_89ab(space->machine, subor_helper1);
 	prg16_cdef(space->machine, subor_helper2);
 }
 
 /*************************************************************
- 
+
  Subor bootleg board Type 1
- 
+
  iNES: mapper 166
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( subor1_w )
@@ -6266,11 +6266,11 @@ static WRITE8_HANDLER( subor1_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 subor_helper1, subor_helper2;
 	LOG_MMC(("subor1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->subor_reg[(offset >> 13) & 0x03] = data;
 	subor_helper1 = ((state->subor_reg[0] ^ state->subor_reg[1]) << 1) & 0x20;
 	subor_helper2 = ((state->subor_reg[2] ^ state->subor_reg[3]) << 0) & 0x1f;
-	
+
 	if (state->subor_reg[1] & 0x08)
 	{
 		subor_helper1 += subor_helper2 & 0xfe;
@@ -6287,24 +6287,24 @@ static WRITE8_HANDLER( subor1_w )
 		subor_helper1 += subor_helper2;
 		subor_helper2 = 0x07;
 	}
-	
+
 	prg16_89ab(space->machine, subor_helper1);
 	prg16_cdef(space->machine, subor_helper2);
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Super Game
 
  Games: Boogerman, Mortal Kombat III
- 
+
  MMC3 clone. Also, it probably needs a hack to support both
  variants (Boogerman & MK3).
- 
+
  iNES: mapper 215
- 
+
  In MESS: Preliminary support.
- 
+
  *************************************************************/
 
 // remove mask & base parameters!
@@ -6320,7 +6320,7 @@ static void sgame_boog_set_prg( running_machine *machine, int prg_base, int prg_
 	{
 		state->mmc_prg_base = (state->map215_reg[1] & 0x08) ? 0x20 : (state->map215_reg[1] & 0x10);
 		state->mmc_prg_mask = (state->map215_reg[1] & 0x08) ? 0x1f : 0x0f;
-		
+
 		mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 	}
 }
@@ -6331,7 +6331,7 @@ static void sgame_boog_set_chr( running_machine *machine, UINT8 chr )
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	int chr_base = (state->map215_reg[1] & 0x04) ? 0x100 : ((state->map215_reg[1] & 0x10) << 3);
 	int chr_mask = (state->map215_reg[1] & 0x04) ? 0xff : 0x7f;
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
@@ -6347,7 +6347,7 @@ static WRITE8_HANDLER( sgame_boog_l_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("sgame_boog_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
+
 	if (offset == 0x1000)
 	{
 		state->map215_reg[0] = data;
@@ -6373,7 +6373,7 @@ static WRITE8_HANDLER( sgame_boog_w )
 	UINT8 MMC3_helper, cmd;
 	static const UINT8 conv_table[8] = {0,2,5,3,6,1,7,4};
 	LOG_MMC(("sgame_boog_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (!state->map215_reg[2]) // in this case we act like MMC3, only with alt prg/chr handlers
 	{
 		switch (offset & 0x6001)
@@ -6381,16 +6381,16 @@ static WRITE8_HANDLER( sgame_boog_w )
 			case 0x0000:
 				MMC3_helper = state->mmc_latch1 ^ data;
 				state->mmc_latch1 = data;
-				
+
 				/* Has PRG Mode changed? */
 				if (MMC3_helper & 0x40)
 					sgame_boog_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-				
+
 				/* Has CHR Mode changed? */
 				if (MMC3_helper & 0x80)
 					sgame_boog_set_chr(space->machine, state->mmc_chr_source);
 				break;
-				
+
 			case 0x0001:
 				cmd = state->mmc_latch1 & 0x07;
 				switch (cmd)
@@ -6407,7 +6407,7 @@ static WRITE8_HANDLER( sgame_boog_w )
 					break;
 			}
 				break;
-				
+
 			default:
 				txrom_w(space, offset, data);
 				break;
@@ -6419,7 +6419,7 @@ static WRITE8_HANDLER( sgame_boog_w )
 		{
 			case 0x0000:
 				break;
-				
+
 			case 0x0001:
 				cmd = state->mmc_latch1 & 0x07;
 				if (state->map215_reg[3] && ((state->map215_reg[0] & 0x80) == 0 || cmd < 6))	// if we use the prg16 banks and cmd=6,7 DON'T enter!
@@ -6440,44 +6440,44 @@ static WRITE8_HANDLER( sgame_boog_w )
 					}
 				}
 				break;
-				
+
 			case 0x2000:
 				data = (data & 0xc0) | conv_table[data & 0x07];
 				MMC3_helper = state->mmc_latch1 ^ data;
 				state->mmc_latch1 = data;
-				
+
 				/* Has PRG Mode changed? */
 				if (MMC3_helper & 0x40)
 					sgame_boog_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-				
+
 				/* Has CHR Mode changed? */
 				if (MMC3_helper & 0x80)
 					sgame_boog_set_chr(space->machine, state->mmc_chr_source);
-				
+
 				state->map215_reg[3] = 1;
 				break;
-				
+
 				//      case 0x2001:
 				//          txrom_w(space, 0x4001, data);
 				//          break;
-				
+
 			case 0x4000:
 				set_nt_mirroring(space->machine, ((data >> 7) | data) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
-				
+
 			case 0x4001:
 				txrom_w(space, 0x6001, data);
 				break;
-				
+
 				//      case 0x6000:
 				//          txrom_w(space, 0x6000, data);
 				//          break;
-				
+
 			case 0x6001:
 				txrom_w(space, 0x4000, data);
 				txrom_w(space, 0x4001, data);
 				break;
-				
+
 			default:
 				txrom_w(space, offset, data);
 				break;
@@ -6486,26 +6486,26 @@ static WRITE8_HANDLER( sgame_boog_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board by Super Game
- 
+
  Games: The Lion King
- 
+
  MMC3 clone.
- 
+
  iNES: mapper 114
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( sgame_lion_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("sgame_lion_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->map114_reg = data;
-	
+
 	if (state->map114_reg & 0x80)
 	{
 		prg16_89ab(space->machine, data & 0x1f);
@@ -6513,7 +6513,7 @@ static WRITE8_HANDLER( sgame_lion_m_w )
 	}
 	else
 		mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-	
+
 }
 
 static WRITE8_HANDLER( sgame_lion_w )
@@ -6521,7 +6521,7 @@ static WRITE8_HANDLER( sgame_lion_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	static const UINT8 conv_table[8] = {0, 3, 1, 5, 6, 7, 2, 4};
 	LOG_MMC(("sgame_lion_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x6000)
 	{
 		switch (offset & 0x6000)
@@ -6560,34 +6560,34 @@ static WRITE8_HANDLER( sgame_lion_w )
 }
 
 /*************************************************************
- 
+
  Tengen 800008 Board
-  
+
  iNES: mapper 3?
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( tengen_800008_w )
 {
 	LOG_MMC(("tengen_800008_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, data >> 3);
 	chr8(space->machine, data, CHRROM);
 }
 
 /*************************************************************
- 
+
  Tengen 800032 Board
 
  Games: Klax, Road Runner, Rolling Thunder, Shinobi, Skulls
  & Croosbones, Xybots
- 
+
  iNES: mapper 64
- 
+
  In MESS: Partially Supported.
- 
+
  *************************************************************/
 
 static void tengen_800032_irq( running_device *device, int scanline, int vblank, int blanked )
@@ -6651,7 +6651,7 @@ static void tengen_800032_set_prg( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_mode = state->mmc_latch1 & 0x40;
-	
+
 	prg8_89(machine, state->mmc_prg_bank[prg_mode ? 2: 0]);
 	prg8_ab(machine, state->mmc_prg_bank[prg_mode ? 0: 1]);
 	prg8_cd(machine, state->mmc_prg_bank[prg_mode ? 1: 2]);
@@ -6661,7 +6661,7 @@ static void tengen_800032_set_chr( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
-	
+
 	if (state->mmc_latch1 & 0x20)
 	{
 		chr1_x(machine, 0 ^ chr_page, state->mmc_vrom_bank[0], CHRROM);
@@ -6676,7 +6676,7 @@ static void tengen_800032_set_chr( running_machine *machine )
 		chr1_x(machine, 2 ^ chr_page, state->mmc_vrom_bank[1] & ~0x01, CHRROM);
 		chr1_x(machine, 3 ^ chr_page, state->mmc_vrom_bank[1] |  0x01, CHRROM);
 	}
-	
+
 	chr1_x(machine, 4 ^ chr_page, state->mmc_vrom_bank[2], CHRROM);
 	chr1_x(machine, 5 ^ chr_page, state->mmc_vrom_bank[3], CHRROM);
 	chr1_x(machine, 6 ^ chr_page, state->mmc_vrom_bank[4], CHRROM);
@@ -6688,22 +6688,22 @@ static WRITE8_HANDLER( tengen_800032_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map64_helper, cmd;
 	LOG_MMC(("tengen_800032_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			map64_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (map64_helper & 0x40)
 				tengen_800032_set_prg(space->machine);
-			
+
 			/* Has CHR Mode changed? */
 			if (map64_helper & 0xa0)
 				tengen_800032_set_chr(space->machine);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x0f;
 			switch (cmd)
@@ -6728,28 +6728,28 @@ static WRITE8_HANDLER( tengen_800032_w )
 				break;
 		}
 			break;
-			
+
 		case 0x2000:
 			set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
-			
+
 		case 0x4000:
 			state->IRQ_count_latch = data;
 			break;
-			
+
 		case 0x4001: /* $c001 - IRQ scanline latch */
 			state->IRQ_mode = data & 0x01;
 			state->IRQ_reset = 1;
 			break;
-			
+
 		case 0x6000:
 			state->IRQ_enable = 0;
 			break;
-			
+
 		case 0x6001:
 			state->IRQ_enable = 1;
 			break;
-			
+
 		default:
 			LOG_MMC(("Mapper 64 write. addr: %04x value: %02x\n", offset + 0x8000, data));
 			break;
@@ -6757,15 +6757,15 @@ static WRITE8_HANDLER( tengen_800032_w )
 }
 
 /*************************************************************
- 
+
  Tengen 800037 Board
- 
+
  Games: Alien Syndrome
- 
+
  iNES: mapper 158
- 
+
  In MESS: Very preliminary support.
- 
+
  *************************************************************/
 
 // probably wrong...
@@ -6773,7 +6773,7 @@ static void tengen_800037_set_mirror( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 nt_mode = state->mmc_latch1 & 0x80;
-	
+
 	set_nt_page(machine, 0, ROM, state->mmc_vrom_bank[nt_mode ? 2 : 0], 0);
 	set_nt_page(machine, 1, ROM, state->mmc_vrom_bank[nt_mode ? 3 : 0], 0);
 	set_nt_page(machine, 2, ROM, state->mmc_vrom_bank[nt_mode ? 4 : 1], 0);
@@ -6785,17 +6785,17 @@ static WRITE8_HANDLER( tengen_800037_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map158_helper, cmd;
 	LOG_MMC(("tengen_800037_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			map158_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (map158_helper & 0x40)
 				tengen_800032_set_prg(space->machine);
-			
+
 			/* Has CHR Mode changed? */
 			if (map158_helper & 0xa0)
 			{
@@ -6803,7 +6803,7 @@ static WRITE8_HANDLER( tengen_800037_w )
 				tengen_800037_set_mirror(space->machine);
 			}
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x0f;
 			switch (cmd)
@@ -6830,10 +6830,10 @@ static WRITE8_HANDLER( tengen_800037_w )
 				break;
 		}
 			break;
-			
+
 		case 0x2000:
 			break;
-			
+
 		default:
 			tengen_800032_w(space, offset, data);
 			break;
@@ -6841,26 +6841,26 @@ static WRITE8_HANDLER( tengen_800037_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board 22211 by TXC (Type A)
 
  Games: Creatom
- 
+
  Info from NEStopia: this mapper features write to four
  registers (0x4100-0x4103). The third one is used to select
  PRG and CHR banks.
- 
+
  iNES: mapper 132
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( txc_22211_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("txc_22211_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 4)
 		state->txc_reg[offset & 0x03] = data;
 }
@@ -6869,7 +6869,7 @@ static READ8_HANDLER( txc_22211_l_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("txc_22211_l_r, offset: %04x\n", offset));
-	
+
 	if (offset == 0x0000)
 		return (state->txc_reg[1] ^ state->txc_reg[2]) | 0x40;
 	else
@@ -6880,55 +6880,55 @@ static WRITE8_HANDLER( txc_22211_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("txc_22211_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, state->txc_reg[2] >> 2);
 	chr8(space->machine, state->txc_reg[2], CHRROM);
 }
 
 /*************************************************************
- 
+
  Bootleg Board 22211 by TXC (Type B)
- 
+
  Games: 1991 Du Ma Racing
- 
+
  This mapper is basically the same as Type A. Only difference is
  in the way CHR banks are selected (see below)
- 
+
  iNES: mapper 172
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( txc_22211b_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("txc_22211b_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, state->txc_reg[2] >> 2);
 	chr8(space->machine, (((data ^ state->txc_reg[2]) >> 3) & 0x02) | (((data ^ state->txc_reg[2]) >> 5) & 0x01), CHRROM);
 }
 
 /*************************************************************
- 
+
  Bootleg Board 22211 by TXC (Type C)
- 
+
  Games: Mahjong Block, Xiao Ma Li
- 
+
  This mapper is basically the same as 132 too. Only difference is
  in 0x4100 reads which expect also bit 0 to be set
- 
+
  iNES: mapper 172
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static READ8_HANDLER( txc_22211c_l_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("txc_22211c_l_r, offset: %04x\n", offset));
-	
+
 	if (offset == 0x0000)
 		return (state->txc_reg[1] ^ state->txc_reg[2]) | 0x41;
 	else
@@ -6936,30 +6936,30 @@ static READ8_HANDLER( txc_22211c_l_r )
 }
 
 /*************************************************************
- 
+
  Bootleg Board 'Thunder Warrior' by TXC
 
  Games: Master Fighter II, Master Fighter 3, Thunder Warrior
- 
+
  MMC3 clone
- 
+
  iNES: mapper 189
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( txc_tw_l_w )
 {
 	LOG_MMC(("txctw_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, (data >> 4) | data);
 }
 
 static WRITE8_HANDLER( txc_tw_m_w )
 {
 	LOG_MMC(("txctw_m_w, offset: %04x, data: %04x\n", offset, data));
-	
+
 	txc_tw_l_w(space, offset & 0xff, data);	// offset does not really count for this mapper
 }
 
@@ -6969,18 +6969,18 @@ static WRITE8_HANDLER( txc_tw_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("txctw_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -6992,7 +6992,7 @@ static WRITE8_HANDLER( txc_tw_w )
 				break;
 			}
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -7000,23 +7000,23 @@ static WRITE8_HANDLER( txc_tw_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board 'Strike Wolf' by TXC
- 
+
  Games: Strike Wolf (also Policeman?? according to Nestopia)
 
  iNES: mapper 36
- 
+
  Known Boards: Bootleg Board by TXC
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( txc_strikewolf_w )
 {
 	LOG_MMC(("txc_strikewolf_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if ((offset >= 0x400) && (offset < 0x7fff))
 	{
 		prg32(space->machine, data >> 4);
@@ -7025,19 +7025,19 @@ static WRITE8_HANDLER( txc_strikewolf_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board MXMDHTWO by TXC
 
  Games: Commandos, Journey to the West, Ma Bu Mi Zhen &
  Qu Wei Cheng Yu Wu, Si Lu Chuan Qi
- 
+
  Simple Mapper: writes to 0x8000-0xffff sets the prg32 bank.
  Not sure if returning 0x50 for reads in 0x4100-0x5000 is correct.
- 
+
  iNES: mapper 241
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static READ8_HANDLER( txc_mxmdhtwo_l_r )
@@ -7048,25 +7048,25 @@ static READ8_HANDLER( txc_mxmdhtwo_l_r )
 static WRITE8_HANDLER( txc_mxmdhtwo_w )
 {
 	LOG_MMC(("txc_mxmdhtwo_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, data);
 }
 
 /*************************************************************
- 
- Waixing Board Type A 
+
+ Waixing Board Type A
 
  Games: Columbus - Ougon no Yoake (C), Ji Jia Zhan Shi,
  Jia A Fung Yun, Wei Luo Chuan Qi
- 
+
  This mapper is quite similar to MMC3, but with two differences:
  mirroring is not the same, and when VROM banks 8,9 are accessed
  they point to CHRRAM and not CHRROM.
- 
+
  iNES: mapper 74
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 /* MIRROR_LOW and MIRROR_HIGH are swapped! */
@@ -7096,10 +7096,10 @@ static void waixing_a_set_chr( running_machine *machine, int chr_base, int chr_m
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
-	
+
 	for (i = 0; i < 6; i++)
 		chr_src[i] = ((state->mmc_vrom_bank[i] == 8) || (state->mmc_vrom_bank[i] == 9)) ? CHRRAM : CHRROM;
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
@@ -7115,22 +7115,22 @@ static WRITE8_HANDLER( waixing_a_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("waixing_a_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				waixing_a_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -7147,14 +7147,14 @@ static WRITE8_HANDLER( waixing_a_w )
 				break;
 			}
 			break;
-			
+
 		case 0x2000:
 			waixing_set_mirror(space->machine, data);	//maybe data & 0x03?
 			break;
-			
+
 		case 0x2001:
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -7162,19 +7162,19 @@ static WRITE8_HANDLER( waixing_a_w )
 }
 
 /*************************************************************
- 
+
  Waixing Board Type B
- 
+
  Games: Sugoro Quest (C)
- 
+
  MMC3 clone. This is a minor modification of Mapper 74,
  in the sense that it is the same board except for the
  CHRRAM pages.
- 
+
  iNES: mapper 191
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void waixing_b_set_chr( running_machine *machine, int chr_base, int chr_mask )
@@ -7183,10 +7183,10 @@ static void waixing_b_set_chr( running_machine *machine, int chr_base, int chr_m
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
-	
+
 	for (i = 0; i < 6; i++)
 		chr_src[i] = (state->mmc_vrom_bank[i] & 0x80) ? CHRRAM : CHRROM;
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
@@ -7202,22 +7202,22 @@ static WRITE8_HANDLER( waixing_b_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("waixing_b_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				waixing_b_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -7234,7 +7234,7 @@ static WRITE8_HANDLER( waixing_b_w )
 				break;
 			}
 			break;
-			
+
 		default:
 			waixing_a_w(space, offset, data);
 			break;
@@ -7242,19 +7242,19 @@ static WRITE8_HANDLER( waixing_b_w )
 }
 
 /*************************************************************
- 
- Waixing Board Type C 
- 
+
+ Waixing Board Type C
+
  Games: Ying Lie Qun Xia Zhuan, Young Chivalry
- 
+
  MMC3 clone. This is a minor modification of Mapper 74,
  in the sense that it is the same board except for the
  CHRRAM pages.
- 
+
  iNES: mapper 192
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void waixing_c_set_chr( running_machine *machine, int chr_base, int chr_mask )
@@ -7263,10 +7263,10 @@ static void waixing_c_set_chr( running_machine *machine, int chr_base, int chr_m
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
-	
+
 	for (i = 0; i < 6; i++)
 		chr_src[i] = ((state->mmc_vrom_bank[i] == 0x08) || (state->mmc_vrom_bank[i] == 0x09) || (state->mmc_vrom_bank[i] == 0x0a) || (state->mmc_vrom_bank[i] == 0x0b)) ? CHRRAM : CHRROM;
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
@@ -7282,22 +7282,22 @@ static WRITE8_HANDLER( waixing_c_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("waixing_c_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				waixing_c_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -7314,7 +7314,7 @@ static WRITE8_HANDLER( waixing_c_w )
 				break;
 			}
 			break;
-			
+
 		default:
 			waixing_a_w(space, offset, data);
 			break;
@@ -7322,19 +7322,19 @@ static WRITE8_HANDLER( waixing_c_w )
 }
 
 /*************************************************************
- 
- Waixing Board Type D 
- 
+
+ Waixing Board Type D
+
  Games: Super Robot Taisen (C)
- 
+
  MMC3 clone. This is a minor modification of Mapper 74,
  in the sense that it is the same board except for the
  CHRRAM pages.
- 
+
  iNES: mapper 194
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void waixing_d_set_chr( running_machine *machine, int chr_base, int chr_mask )
@@ -7343,10 +7343,10 @@ static void waixing_d_set_chr( running_machine *machine, int chr_base, int chr_m
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
-	
+
 	for (i = 0; i < 6; i++)
 		chr_src[i] = (state->mmc_vrom_bank[i] < 0x02) ? CHRRAM : CHRROM;
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
@@ -7362,22 +7362,22 @@ static WRITE8_HANDLER( waixing_d_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("waixing_d_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				waixing_d_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -7394,7 +7394,7 @@ static WRITE8_HANDLER( waixing_d_w )
 				break;
 		}
 			break;
-			
+
 		default:
 			waixing_a_w(space, offset, data);
 			break;
@@ -7402,20 +7402,20 @@ static WRITE8_HANDLER( waixing_d_w )
 }
 
 /*************************************************************
- 
- Waixing Board Type E 
- 
+
+ Waixing Board Type E
+
  Games: Captain Tsubasa Vol. II (C), Chaos World, God
  Slayer (C), Zu Qiu Xiao Jiang
- 
+
  MMC3 clone. This is a minor modification of Mapper 74,
  in the sense that it is the same board except for the
  CHRRAM pages.
- 
+
  iNES: mapper 195
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void waixing_e_set_chr( running_machine *machine, int chr_base, int chr_mask )
@@ -7424,10 +7424,10 @@ static void waixing_e_set_chr( running_machine *machine, int chr_base, int chr_m
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	UINT8 chr_src[6];
 	int i;
-	
+
 	for (i = 0; i < 6; i++)
 		chr_src[i] = (state->mmc_vrom_bank[i] < 0x04) ? CHRRAM : CHRROM;
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr_src[1]);
@@ -7443,22 +7443,22 @@ static WRITE8_HANDLER( waixing_e_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("waixing_e_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				waixing_e_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -7475,7 +7475,7 @@ static WRITE8_HANDLER( waixing_e_w )
 				break;
 		}
 			break;
-			
+
 		default:
 			waixing_a_w(space, offset, data);
 			break;
@@ -7483,24 +7483,24 @@ static WRITE8_HANDLER( waixing_e_w )
 }
 
 /*************************************************************
- 
- Waixing Board Type F 
- 
+
+ Waixing Board Type F
+
  Games: Tenchi wo Kurau II (C)
- 
+
  MMC3 clone.
- 
+
  iNES: mapper 198
- 
+
  In MESS: Preliminary support.
- 
+
  *************************************************************/
 
 static void waixing_f_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_flip = (state->mmc_latch1 & 0x40) ? 2 : 0;
-	
+
 	prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
 	prg8_ab(machine, prg_base | (state->mmc_prg_bank[1] & prg_mask));
 	prg8_cd(machine, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
@@ -7512,22 +7512,22 @@ static WRITE8_HANDLER( waixing_f_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("waixing_f_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				waixing_f_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -7544,7 +7544,7 @@ static WRITE8_HANDLER( waixing_f_w )
 				break;
 		}
 			break;
-			
+
 		default:
 			waixing_a_w(space, offset, data);
 			break;
@@ -7552,18 +7552,18 @@ static WRITE8_HANDLER( waixing_f_w )
 }
 
 /*************************************************************
- 
- Waixing Board Type G 
- 
+
+ Waixing Board Type G
+
  Games: San Guo Zhi 2, Dragon Ball Z Gaiden (C), Dragon
  Ball Z II (C)
- 
+
  MMC3 clone
- 
+
  iNES: mapper 199
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void waixing_g_set_chr( running_machine *machine, int chr_base, int chr_mask )
@@ -7572,10 +7572,10 @@ static void waixing_g_set_chr( running_machine *machine, int chr_base, int chr_m
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	UINT8 chr_src[8];
 	int i;
-	
+
 	for (i = 0; i < 8; i++)
 		chr_src[i] = (state->mmc_vrom_bank[i] < 0x08) ? CHRRAM : CHRROM;
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | (state->mmc_vrom_bank[0] & chr_mask), chr_src[0]);
 	chr1_x(machine, chr_page ^ 1, chr_base | (state->mmc_vrom_bank[6] & chr_mask), chr_src[6]);
 	chr1_x(machine, chr_page ^ 2, chr_base | (state->mmc_vrom_bank[1] & chr_mask), chr_src[1]);
@@ -7591,22 +7591,22 @@ static WRITE8_HANDLER( waixing_g_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("waixing_g_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				waixing_g_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x0f;
 			switch (cmd)
@@ -7629,7 +7629,7 @@ static WRITE8_HANDLER( waixing_g_w )
 				break;
 		}
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -7637,18 +7637,18 @@ static WRITE8_HANDLER( waixing_g_w )
 }
 
 /*************************************************************
- 
- Waixing Board Type H 
- 
+
+ Waixing Board Type H
+
  Games: Ying Xiong Yuan Yi Jing Chuan Qi, Yong Zhe Dou E
  Long - Dragon Quest VII
- 
+
  MMC3 clone. More info to come.
- 
+
  iNES: mapper 245
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( waixing_h_w )
@@ -7656,7 +7656,7 @@ static WRITE8_HANDLER( waixing_h_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 cmd, map245_helper;
 	LOG_MMC(("waixing_h_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0001:
@@ -7685,10 +7685,10 @@ static WRITE8_HANDLER( waixing_h_w )
 				break;
 		}
 			break;
-			
+
 		case 0x2001:
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -7696,17 +7696,17 @@ static WRITE8_HANDLER( waixing_h_w )
 }
 
 /*************************************************************
- 
+
  Waixing San Guo Zhi Board
- 
+
  Games: San Guo Zhi
- 
+
  This board uses Konami IRQ
- 
+
  iNES: mapper 252
- 
+
  In MESS: Unsupported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( waixing_sgz_w )
@@ -7714,7 +7714,7 @@ static WRITE8_HANDLER( waixing_sgz_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 mmc_helper, bank;
 	LOG_MMC(("waixing_sgz_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
@@ -7760,23 +7760,23 @@ static WRITE8_HANDLER( waixing_sgz_w )
 
 
 /*************************************************************
- 
+
  Waixing San Guo Zhong Lie Zhuan Board
- 
+
  Games: Fan Kong Jing Ying, San Guo Zhong Lie Zhuan, Xing
  Ji Zheng Ba
- 
+
  iNES: mapper 178
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( waixing_sgzlz_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("waixing_sgzlz_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset)
 	{
 		case 0x700:
@@ -7793,23 +7793,23 @@ static WRITE8_HANDLER( waixing_sgzlz_l_w )
 }
 
 /*************************************************************
- 
+
  Waixing Final Fantasy V Board
- 
+
  Games: Darkseed, Digital Dragon, Final Fantasy V, Pocket
  Monster Red
- 
+
  iNES: mapper 164
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( waixing_ffv_l_w )
 {
 	LOG_MMC(("waixing_ffv_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x4100; /* the checks work better on addresses */
-	
+
 	if (0x5000 == (offset & 0x7300))
 		prg32(space->machine, data);
 }
@@ -7822,30 +7822,30 @@ static WRITE8_HANDLER( waixing_ffv_w )
 }
 
 /*************************************************************
- 
+
  Waixing Zhan Shi Board
- 
+
  Games: Wai Xing Zhan Shi
- 
+
  Simple mapper: writes to 0x8000-0xffff sets prg32 banks to
  (offset>>3)&f. written data&3 sets the mirroring (with
- switched high/low compared to the standard one).  
- 
+ switched high/low compared to the standard one).
+
  A crc check is required to support Dragon Quest VIII (which
  uses a slightly different board)
- 
+
  iNES: mapper 242
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( waixing_zs_w )
 {
 	LOG_MMC(("waixing_zs_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, offset >> 3);
-	
+
 	switch (data & 0x03)
 	{
 		case 0: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
@@ -7856,49 +7856,49 @@ static WRITE8_HANDLER( waixing_zs_w )
 }
 
 /*************************************************************
- 
+
  Waixing Dragon Quest VIII Board
- 
+
  Games: Dragon Quest VIII
- 
+
  Simple mapper: writes to 0x8000-0xffff sets prg32 banks to
  (offset>>3)&f.
- 
+
  iNES: mapper 242
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( waixing_dq8_w )
 {
 	LOG_MMC(("waixing_dq8_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, offset >> 3);
 }
 
 
 /*************************************************************
- 
+
  Waixing PS2 board
 
  Games: Bao Xiao Tien Guo, Bio Hazard, Pokemon Gold, Subor (R)
- 
+
  iNES: mapper 15
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( waixing_ps2_w )
 {
 	UINT8 map15_flip = (data & 0x80) >> 7;
 	UINT8 map15_helper = (data & 0x7f) << 1;
-	
+
 	LOG_MMC(("waixing_ps2_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	
+
 	switch (offset & 0x0fff)
 	{
 		case 0x000:
@@ -7932,25 +7932,25 @@ static WRITE8_HANDLER( waixing_ps2_w )
 }
 
 /*************************************************************
- 
+
  Waixing Board with Security Chip
-  
+
  Games: Duo Bao Xiao Ying Hao - Guang Ming yu An Hei Chuan Shuo,
  Myth Struggle, San Shi Liu Ji, Shui Hu Zhuan
- 
+
  MMC3 clone
- 
+
  iNES: mapper 249
- 
+
  In MESS: Partially Supported.
- 
+
  *************************************************************/
 
 static void waixing_sec_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	int i;
-	
+
 	if (state->map249_reg)
 	{
 		for (i = 0; i < 4; i ++)	// should this apply only to bank[0],bank[1]?
@@ -7959,7 +7959,7 @@ static void waixing_sec_set_prg( running_machine *machine, int prg_base, int prg
 			((state->mmc_prg_bank[i] >> 1) & 0x04) | ((state->mmc_prg_bank[i] << 2) & 0x18);
 		}
 	}
-	
+
 	mmc3_set_prg(machine, prg_base, prg_mask);
 }
 
@@ -7968,7 +7968,7 @@ static void waixing_sec_set_chr( running_machine *machine, int chr_base, int chr
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	int i;
-	
+
 	if (state->map249_reg)
 	{
 		for (i = 0; i < 6; i ++)
@@ -7978,7 +7978,7 @@ static void waixing_sec_set_chr( running_machine *machine, int chr_base, int chr
 			((state->mmc_vrom_bank[i] << 3) & 0x20) | ((state->mmc_vrom_bank[i] << 2) & 0xc0);
 		}
 	}
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), state->mmc_chr_source);
 	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), state->mmc_chr_source);
 	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), state->mmc_chr_source);
@@ -7993,9 +7993,9 @@ static WRITE8_HANDLER( waixing_sec_l_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("waixing_sec_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	offset += 0x100;
-	
+
 	if (offset == 0x1000)
 	{
 		state->map249_reg = data & 0x02;
@@ -8009,22 +8009,22 @@ static WRITE8_HANDLER( waixing_sec_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("waixing_sec_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				waixing_sec_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				waixing_sec_set_chr(space->machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -8041,7 +8041,7 @@ static WRITE8_HANDLER( waixing_sec_w )
 				break;
 		}
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -8049,22 +8049,22 @@ static WRITE8_HANDLER( waixing_sec_w )
 }
 
 /*************************************************************
- 
+
  Board UNL-8237
- 
+
  Games: Pochahontas 2
- 
+
  MMC3 clone
- 
+
  In MESS: Not working
- 
+
  *************************************************************/
 
 static void unl_8237_set_prg( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_flip = (state->mmc_latch1 & 0x40) ? 2 : 0;
-	
+
 	if (!(state->unl_8237_reg[0] & 0x80))
 	{
 		prg8_89(machine, state->mmc_prg_bank[0 ^ prg_flip]);
@@ -8080,10 +8080,10 @@ static void unl_8237_set_chr( running_machine *machine )
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	UINT8 bank[8];
 	int i;
-	
+
 	for(i = 0; i < 6; i++)
 		bank[i] = state->mmc_vrom_bank[i] | ((state->unl_8237_reg[1] << 6) & 0x100);
-	
+
 	chr1_x(machine, chr_page ^ 0, (bank[0] & ~0x01), CHRROM);
 	chr1_x(machine, chr_page ^ 1, (bank[0] |  0x01), CHRROM);
 	chr1_x(machine, chr_page ^ 2, (bank[1] & ~0x01), CHRROM);
@@ -8099,7 +8099,7 @@ static WRITE8_HANDLER( unl_8237_l_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("unl_8237_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
+
 	if (offset == 0x1000)
 	{
 		state->unl_8237_reg[0] = data;
@@ -8116,7 +8116,7 @@ static WRITE8_HANDLER( unl_8237_l_w )
 		else
 			unl_8237_set_prg(space->machine);
 	}
-	
+
 	if (offset == 0x1001)
 	{
 		state->unl_8237_reg[1] = data;
@@ -8130,7 +8130,7 @@ static WRITE8_HANDLER( unl_8237_w )
 	UINT8 unl_8237_helper, cmd;
 	static const UINT8 conv_table[8] = {0,2,6,1,7,3,4,5};
 	LOG_MMC(("unl_8237_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7000)
 	{
 		case 0x2000:
@@ -8139,16 +8139,16 @@ static WRITE8_HANDLER( unl_8237_w )
 			data = (data & 0xc0) | conv_table[data & 0x07];
 			unl_8237_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (unl_8237_helper & 0x40)
 				unl_8237_set_prg(space->machine);
-			
+
 			/* Has CHR Mode changed? */
 			if (unl_8237_helper & 0x80)
 				unl_8237_set_chr(space->machine);
 			break;
-			
+
 		case 0x4000:
 		case 0x5000:
 			if (state->unl_8237_reg[2])
@@ -8170,15 +8170,15 @@ static WRITE8_HANDLER( unl_8237_w )
 				}
 			}
 			break;
-			
+
 		case 0x0000:
 		case 0x1000:
 			set_nt_mirroring(space->machine, (data | (data >> 7)) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 			break;
-			
+
 		case 0x6000:
 			break;
-			
+
 		case 0x7000:
 			txrom_w(space, 0x6001, data);
 			txrom_w(space, 0x4000, data);
@@ -8188,13 +8188,13 @@ static WRITE8_HANDLER( unl_8237_w )
 }
 
 /*************************************************************
- 
+
  Board UNL-AX5705
- 
+
  Games: Super Mario Bros. Pocker Mali (Crayon Shin-chan pirate hack)
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static void unl_ax5705_set_prg( running_machine *machine )
@@ -8209,7 +8209,7 @@ static WRITE8_HANDLER( unl_ax5705_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("unl_ax5705_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x700f)
 	{
 		case 0x0000:
@@ -8261,33 +8261,33 @@ static WRITE8_HANDLER( unl_ax5705_w )
 }
 
 /*************************************************************
- 
+
  Board UNL-CC-21
- 
+
  Games: Mi Hun Che
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( unl_cc21_w )
 {
 	LOG_MMC(("unl_cc21_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 1) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	chr8(space->machine, (offset & 0x01), CHRROM);
 }
 
 /*************************************************************
- 
+
  Board UNL-KOF97
- 
+
  Games: King of Fighters 97 (Rex Soft)
- 
+
  MMC3 clone
- 
+
  In MESS: Not working
- 
+
  *************************************************************/
 
 static UINT8 unl_kof97_unscramble( UINT8 data )
@@ -8298,7 +8298,7 @@ static UINT8 unl_kof97_unscramble( UINT8 data )
 static WRITE8_HANDLER( unl_kof97_w )
 {
 	LOG_MMC(("unl_kof97_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	/* Addresses 0x9000, 0xa000, 0xd000 & 0xf000 behaves differently than MMC3 */
 	if (offset == 0x1000)
 	{
@@ -8340,13 +8340,13 @@ static WRITE8_HANDLER( unl_kof97_w )
 }
 
 /*************************************************************
- 
+
  Board UNL-T-230
- 
+
  Games: Dragon Ball Z IV (Unl)
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( unl_t230_w )
@@ -8354,7 +8354,7 @@ static WRITE8_HANDLER( unl_t230_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("unl_t230_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x700c)
 	{
 		case 0x0000:
@@ -8363,7 +8363,7 @@ static WRITE8_HANDLER( unl_t230_w )
 			prg16_89ab(space->machine, data);
 			break;
 
-		// the part below works like VRC-2. how was the original board wired up? 
+		// the part below works like VRC-2. how was the original board wired up?
 		// was there a VRC2? if so, we can use VRC-2 and add proper pin settings to xml!
 		case 0x1000:
 		case 0x1004:
@@ -8399,7 +8399,7 @@ static WRITE8_HANDLER( unl_t230_w )
 				state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0x0f) | (data << 4);
 			else
 				state->mmc_vrom_bank[bank] = (state->mmc_vrom_bank[bank] & 0xf0) | (data & 0x0f);
-			
+
 			chr1_x(space->machine, bank, state->mmc_vrom_bank[bank], state->mmc_chr_source);
 			break;
 		case 0x7000:
@@ -8417,7 +8417,7 @@ static WRITE8_HANDLER( unl_t230_w )
 			if (data & 0x02)
 				state->IRQ_count = state->IRQ_count_latch;
 			break;
-			
+
 		default:
 			logerror("unl_t230_w uncaught offset: %04x value: %02x\n", offset, data);
 			break;
@@ -8425,25 +8425,25 @@ static WRITE8_HANDLER( unl_t230_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board for KOF96
 
  Games: The King of Fighters 96, Sonic 3D Blast 6, Street
  Fighter Zero 2
- 
+
  MMC3 clone
- 
+
  iNES: mapper 187
- 
+
  In MESS: Preliminary Support.
- 
+
  *************************************************************/
 
 static void kof96_set_prg( running_machine *machine, int prg_base, int prg_mask )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_flip = (state->mmc_latch1 & 0x40) ? 2 : 0;
-	
+
 	if (!(state->mapper187_reg[0] & 0x80))
 	{
 		prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
@@ -8459,10 +8459,10 @@ static void kof96_set_chr( running_machine *machine, UINT8 chr, int chr_base, in
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	UINT8 new_base[8];
 	int i;
-	
+
 	for (i = 0; i < 8; i++)
 		new_base[i] = ((i & 0x04) == chr_page)? (chr_base | 0x100) : chr_base;
-	
+
 	chr1_x(machine, chr_page ^ 0, new_base[0] | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 1, new_base[1] | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 2, new_base[2] | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
@@ -8479,7 +8479,7 @@ static WRITE8_HANDLER( kof96_l_w )
 	UINT8 new_bank;
 	LOG_MMC(("kof96_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
+
 	if (offset == 0x1000)
 	{
 		switch (data & 0x03)
@@ -8496,15 +8496,15 @@ static WRITE8_HANDLER( kof96_l_w )
 				break;
 		}
 	}
-	
+
 	if (!(offset <= 0x1000))
 	{
 		state->mapper187_reg[0] = data;
-		
+
 		if (state->mapper187_reg[0] & 0x80)
 		{
 			new_bank = (state->mapper187_reg[0] & 0x1f);
-			
+
 			if (state->mapper187_reg[0] & 0x20)
 				prg32(space->machine, new_bank >> 2);
 			else
@@ -8523,7 +8523,7 @@ static READ8_HANDLER( kof96_l_r )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("kof96_l_r, offset: %04x\n", offset));
 	offset += 0x100;
-	
+
 	if (!(offset < 0x1000))
 		return state->mapper187_reg[1];
 	else
@@ -8535,23 +8535,23 @@ static WRITE8_HANDLER( kof96_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("kof96_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6003)
 	{
 		case 0x0000:
 			state->mapper187_reg[2] = 1;
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				kof96_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				kof96_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			if (state->mapper187_reg[2])
 			{
@@ -8571,19 +8571,19 @@ static WRITE8_HANDLER( kof96_w )
 				}
 			}
 			break;
-			
+
 		case 0x0002:
 			break;
-			
+
 		case 0x0003:
 			state->mapper187_reg[2] = 0;
-			
+
 			if (data == 0x28)
 				prg8_cd(space->machine, 0x17);
 			else if (data == 0x2a)
 				prg8_ab(space->machine, 0x0f);
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -8591,26 +8591,26 @@ static WRITE8_HANDLER( kof96_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board for MK2
 
  Games: Mortal Kombat II, Street Fighter III, Super Mario
  Kart Rider
- 
+
  This board uses an IRQ system very similar to MMC3. We indeed
  use mapper4_irq, but there is some small glitch!
- 
+
  iNES: mapper 91
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( mk2_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("mk2_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x1000)
 	{
 		case 0x0000:
@@ -8638,26 +8638,26 @@ static WRITE8_HANDLER( mk2_m_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board N625092
 
  Games: 400 in 1, 700 in 1, 1000 in 1
- 
+
  iNES: mapper 221
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void n625092_set_prg( running_machine *machine, UINT8 reg1, UINT8 reg2 )
 {
 	UINT8 map221_helper1, map221_helper2;
-	
+
 	map221_helper1 = !(reg1 & 0x01) ? reg2 :
 	(reg1 & 0x80) ? reg2 : (reg2 & 0x06) | 0x00;
 	map221_helper2 = !(reg1 & 0x01) ? reg2 :
 	(reg1 & 0x80) ? 0x07 : (reg2 & 0x06) | 0x01;
-	
+
 	prg16_89ab(machine, map221_helper1 | ((reg1 & 0x70) >> 1));
 	prg16_cdef(machine, map221_helper2 | ((reg1 & 0x70) >> 1));
 }
@@ -8666,12 +8666,12 @@ static WRITE8_HANDLER( n625092_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("n625092_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x4000)
 	{
 		set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 		offset = (offset >> 1) & 0xff;
-		
+
 		if (state->mmc_latch1 != offset)
 		{
 			state->mmc_latch1 = offset;
@@ -8681,7 +8681,7 @@ static WRITE8_HANDLER( n625092_w )
 	else
 	{
 		offset &= 0x07;
-		
+
 		if (state->mmc_latch2 != offset)
 		{
 			state->mmc_latch2 = offset;
@@ -8691,25 +8691,25 @@ static WRITE8_HANDLER( n625092_w )
 }
 
 /*************************************************************
- 
+
  SC-127 Board
 
  Games: Wario World II (Kirby Hack)
- 
+
  iNES: mapper 35
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static void sc127_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 	if (scanline < PPU_BOTTOM_VISIBLE_SCANLINE && state->IRQ_enable)
 	{
 		state->IRQ_count--;
-		
+
 		if (!blanked && (state->IRQ_count == 0))
 		{
 			LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
@@ -8724,7 +8724,7 @@ static WRITE8_HANDLER( sc127_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("sc127_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset)
 	{
 		case 0x0000:
@@ -8764,27 +8764,27 @@ static WRITE8_HANDLER( sc127_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board SMB2J
 
  Games: Super Mario Bros. 2 Pirate (LF36)
- 
+
  iNES: mapper 43
- 
+
  In MESS: Supported? The only image I found is not working
  (not even in NEStopia).
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( smb2j_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	int bank = (((offset >> 8) & 0x03) * 0x20) + (offset & 0x1f);
-	
+
 	LOG_MMC(("smb2j_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, (offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	
+
 	if (offset & 0x0800)
 	{
 		if (offset & 0x1000)
@@ -8832,17 +8832,17 @@ static WRITE8_HANDLER( smb2j_w )
 }
 
 /*************************************************************
- 
+
  BTL-SMB2B
- 
+
  Games: Super Mario Bros. 2 Pirate (Jpn version of SMB2)
- 
+
  This was marked as Alt. Levels. is it true?
- 
+
  iNES: mapper 50
 
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void smb2jb_irq( running_device *device, int scanline, int vblank, int blanked )
@@ -8859,7 +8859,7 @@ static void smb2jb_irq( running_device *device, int scanline, int vblank, int bl
 		}
 		else
 			state->IRQ_count += 114;
-		
+
 		state->IRQ_count &= 0xffff;	// according to docs is 16bit counter -> it wraps only after 0xffff
 	}
 }
@@ -8870,7 +8870,7 @@ static WRITE8_HANDLER( smb2jb_l_w )
 	UINT8 prg;
 	LOG_MMC(("smb2jb_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
+
 	switch (offset & 0x160)
 	{
 		case 0x020:
@@ -8888,19 +8888,19 @@ WRITE8_HANDLER( smb2jb_extra_w )
 {
 	UINT8 prg;
 	LOG_MMC(("smb2jb_extra_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg = (data & 0x08) | ((data & 0x06) >> 1) | ((data & 0x01) << 2);
 	prg8_cd(space->machine, prg);
 }
 
 /*************************************************************
- 
+
  Bootleg Board for Super Fighter III
- 
+
  MMC3 clone
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void unl_sf3_set_chr( running_machine *machine, UINT8 chr_source, int chr_base, int chr_mask )
@@ -8916,22 +8916,22 @@ static WRITE8_HANDLER( unl_sf3_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("unl_sf3_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			MMC3_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (MMC3_helper & 0x40)
 				mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-			
+
 			/* Has CHR Mode changed? */
 			if (MMC3_helper & 0x80)
 				unl_sf3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x0f;
 			switch (cmd)
@@ -8947,7 +8947,7 @@ static WRITE8_HANDLER( unl_sf3_w )
 				break;
 		}
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -8955,24 +8955,24 @@ static WRITE8_HANDLER( unl_sf3_w )
 }
 
 /*************************************************************
- 
+
  Bootleg Board for Xiao Zhuan Yuan
 
  Games: Shu Qi Yu - Zhi Li Xiao Zhuan Yuan
- 
+
  Very simple mapper: writes to 0x5ff1 set prg32 (to data>>1),
  while writes to 0x5ff2 set chr8
- 
+
  iNES: mapper 176
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( unl_xzy_l_w )
 {
 	LOG_MMC(("unl_xzy_l_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset)
 	{
 		case 0x1ef1:	/* 0x5ff1 */
@@ -8985,12 +8985,12 @@ static WRITE8_HANDLER( unl_xzy_l_w )
 }
 
 /*************************************************************
- 
+
  Board UNL-RACERMATE
-  
+
  In MESS: *VERY* preliminary support. Also, it seems that this
  board saves to battery the CHRRAM!!!
- 
+
  *************************************************************/
 
 static void racmate_update_banks( running_machine *machine )
@@ -9013,45 +9013,45 @@ static WRITE8_HANDLER( unl_racmate_w )
 }
 
 /*************************************************************
- 
+
         BOOTLEG CART VERSIONS OF FDS GAMES
- 
+
  *************************************************************/
 
 /*************************************************************
- 
+
  BTL-SUPERBROS11
- 
+
  Known Boards: Unknown Bootleg Board
  Games: Super Mario Bros. 11, Super Mario Bros. 17
- 
+
  This acts basically like a MMC3 with different use of write
  address.
- 
+
  iNES: mapper 196
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( btl_smb11_w )
 {
 	LOG_MMC(("btl_smb11_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	txrom_w(space, (offset & 0x6000) | ((offset & 0x04) >> 2), data);
 }
 
 /*************************************************************
- 
+
  BTL-MARIOBABY
- 
+
  Known Boards: Unknown Bootleg Board
  Games: Mario Baby, Ai Senshi Nicol
- 
+
  iNES: mapper 42
 
  In MESS: Supported.
- 
+
  *************************************************************/
 
 // is the code fine for ai senshi nicol?!?
@@ -9059,7 +9059,7 @@ static WRITE8_HANDLER( btl_mariobaby_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("btl_mariobaby_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset >= 0x7000)
 	{
 		switch(offset & 0x03)
@@ -9088,22 +9088,22 @@ static WRITE8_HANDLER( btl_mariobaby_w )
 }
 
 /*************************************************************
- 
+
  BTL-SMB2A
- 
+
  Known Boards: Unknown Bootleg Board
  Games: Super Mario Bros. 2 Pirate (Jpn version of SMB2)
- 
+
  iNES: mapper 40
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void btl_smb2a_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 	if (state->IRQ_enable)
 	{
 		if ((0xfff - state->IRQ_count) <= 114)
@@ -9121,7 +9121,7 @@ static WRITE8_HANDLER( btl_smb2a_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("btl_smb2a_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6000)
 	{
 		case 0x0000:
@@ -9138,22 +9138,22 @@ static WRITE8_HANDLER( btl_smb2a_w )
 }
 
 /*************************************************************
- 
+
  BTL-SMB3
- 
+
  Known Boards: Unknown Bootleg Board
  Games: Super Mario Bros. 3 Pirate
- 
+
  iNES: mapper 106
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static void btl_smb3_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
-	
+
 	if (state->IRQ_enable)
 	{
 		if ((0xffff - state->IRQ_count) < 114)
@@ -9161,7 +9161,7 @@ static void btl_smb3_irq( running_device *device, int scanline, int vblank, int 
 			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 			state->IRQ_enable = 0;
 		}
-		
+
 		state->IRQ_count = (state->IRQ_count + 114) & 0xffff;
 	}
 }
@@ -9214,16 +9214,16 @@ static WRITE8_HANDLER( btl_smb3_w )
 }
 
 /*************************************************************
- 
+
  BTL-DRAGONNINJA
- 
+
  Known Boards: Unknown Bootleg Board
  Games: Dragon Ninja (Bootleg), Super Mario Bros. 8
- 
+
  iNES: mapper 222
- 
+
  In MESS: Unsupported.
- 
+
  *************************************************************/
 
 /* Scanline based IRQ ? */
@@ -9234,7 +9234,7 @@ static void btl_dn_irq( running_device *device, int scanline, int vblank, int bl
 	{
 		if (!state->IRQ_count || ++state->IRQ_count < 240)
 			return;
-		
+
 		state->IRQ_count = 0;
 		LOG_MMC(("irq fired, scanline: %d (MAME %d, beam pos: %d)\n", scanline,
 				 device->machine->primary_screen->vpos(), device->machine->primary_screen->hpos()));
@@ -9247,7 +9247,7 @@ static WRITE8_HANDLER( btl_dn_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank;
 	LOG_MMC(("btl_dn_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x7003)
 	{
 		case 0x0000:
@@ -9283,13 +9283,13 @@ static WRITE8_HANDLER( btl_dn_w )
  *************************************************************/
 
 /*************************************************************
- 
+
  Board BMC-64IN1NOREPEAT
- 
+
  Games: 64-in-1 Y2K
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static void bmc_64in1nr_set_prg( running_machine *machine )
@@ -9297,7 +9297,7 @@ static void bmc_64in1nr_set_prg( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 helper1 = (state->bmc_64in1nr_reg[1] & 0x1f);
 	UINT8 helper2 = (helper1 << 1) | ((state->bmc_64in1nr_reg[1] & 0x40) >> 6);
-	
+
 	if (state->bmc_64in1nr_reg[0] & 0x80)
 	{
 		if (state->bmc_64in1nr_reg[1] & 0x80)
@@ -9317,7 +9317,7 @@ static WRITE8_HANDLER( bmc_64in1nr_l_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_64in1nr_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
+
 	switch (offset)
 	{
 		case 0x1000:
@@ -9337,24 +9337,24 @@ static WRITE8_HANDLER( bmc_64in1nr_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_64in1nr_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->bmc_64in1nr_reg[3] = data;	// reg[3] is currently unused?!?
 }
 
 /*************************************************************
- 
+
  Board BMC-190IN1
- 
+
  Games: 190-in-1
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_190in1_w )
 {
 	LOG_MMC(("bmc_190in1_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	data >>= 2;
 	prg16_89ab(space->machine, data);
@@ -9363,25 +9363,25 @@ static WRITE8_HANDLER( bmc_190in1_w )
 }
 
 /*************************************************************
- 
+
  Board BMC-A65AS
- 
+
  Games: 3-in-1 (N068)
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_a65as_w )
 {
 	UINT8 helper = (data & 0x30) >> 1;
 	LOG_MMC(("bmc_a65as_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (data & 0x80)
 		set_nt_mirroring(space->machine, BIT(data, 5) ? PPU_MIRROR_HIGH : PPU_MIRROR_LOW);
 	else
 		set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	
+
 	if (data & 0x40)
 		prg32(space->machine, data >> 1);
 	else
@@ -9392,38 +9392,38 @@ static WRITE8_HANDLER( bmc_a65as_w )
 }
 
 /*************************************************************
- 
+
  Board BMC-GS2004
- 
+
  Games: Tetris Family 6-in-1
- 
+
  In MESS: Preliminary Support. It also misses WRAM handling
  (we need reads from 0x6000-0x7fff)
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_gs2004_w )
 {
 	LOG_MMC(("bmc_gs2004_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, data);
 }
 
 /*************************************************************
- 
+
  Board BMC-GS2013
- 
+
  Games: Tetris Family 12-in-1
- 
+
  In MESS: Preliminary Support. It also misses WRAM handling
  (we need reads from 0x6000-0x7fff)
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_gs2013_w )
 {
 	LOG_MMC(("bmc_gs2013_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (data & 0x08)
 		prg32(space->machine, data & 0x09);
 	else
@@ -9431,13 +9431,13 @@ static WRITE8_HANDLER( bmc_gs2013_w )
 }
 
 /*************************************************************
- 
+
  Board BMC-SUPER24IN1SC03
- 
+
  Games: Super 24-in-1
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static void bmc_s24in1sc03_set_prg( running_machine *machine )
@@ -9447,7 +9447,7 @@ static void bmc_s24in1sc03_set_prg( running_machine *machine )
 	UINT8 prg_flip = (state->mmc_latch1 & 0x40) ? 2 : 0;
 	int prg_base = state->bmc_s24in1sc03_reg[1] << 1;
 	int prg_mask = masks[state->bmc_s24in1sc03_reg[0] & 0x07];
-	
+
 	prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
 	prg8_ab(machine, prg_base | (state->mmc_prg_bank[1] & prg_mask));
 	prg8_cd(machine, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
@@ -9460,7 +9460,7 @@ static void bmc_s24in1sc03_set_chr( running_machine *machine )
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	UINT8 chr = (state->bmc_s24in1sc03_reg[0] & 0x20) ? CHRRAM : CHRROM;
 	int chr_base = (state->bmc_s24in1sc03_reg[2] << 3) & 0xf00;
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | (state->mmc_vrom_bank[0] & ~0x01), chr);
 	chr1_x(machine, chr_page ^ 1, chr_base | (state->mmc_vrom_bank[0] |  0x01), chr);
 	chr1_x(machine, chr_page ^ 2, chr_base | (state->mmc_vrom_bank[1] & ~0x01), chr);
@@ -9476,20 +9476,20 @@ static WRITE8_HANDLER( bmc_s24in1sc03_l_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_s24in1sc03_l_w offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
+
 	if (offset == 0x1ff0)
 	{
 		state->bmc_s24in1sc03_reg[0] = data;
 		bmc_s24in1sc03_set_prg(space->machine);
 		bmc_s24in1sc03_set_chr(space->machine);
 	}
-	
+
 	if (offset == 0x1ff1)
 	{
 		state->bmc_s24in1sc03_reg[1] = data;
 		bmc_s24in1sc03_set_prg(space->machine);
 	}
-	
+
 	if (offset == 0x1ff2)
 	{
 		state->bmc_s24in1sc03_reg[2] = data;
@@ -9502,22 +9502,22 @@ static WRITE8_HANDLER( bmc_s24in1sc03_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 cmd, bmc_s24in1sc03_helper;
 	LOG_MMC(("bmc_s24in1sc03_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x0000:
 			bmc_s24in1sc03_helper = state->mmc_latch1 ^ data;
 			state->mmc_latch1 = data;
-			
+
 			/* Has PRG Mode changed? */
 			if (bmc_s24in1sc03_helper & 0x40)
 				bmc_s24in1sc03_set_prg(space->machine);
-			
+
 			/* Has CHR Mode changed? */
 			if (bmc_s24in1sc03_helper & 0x80)
 				bmc_s24in1sc03_set_chr(space->machine);
 			break;
-			
+
 		case 0x0001:
 			cmd = state->mmc_latch1 & 0x07;
 			switch (cmd)
@@ -9534,7 +9534,7 @@ static WRITE8_HANDLER( bmc_s24in1sc03_w )
 				break;
 		}
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -9542,13 +9542,13 @@ static WRITE8_HANDLER( bmc_s24in1sc03_w )
 }
 
 /*************************************************************
- 
+
  Board BMC-T-262
- 
+
  Games: 4-in-1 (D-010), 8-in-1 (A-020)
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_t262_w )
@@ -9556,7 +9556,7 @@ static WRITE8_HANDLER( bmc_t262_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 mmc_helper;
 	LOG_MMC(("bmc_t262_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (state->mmc_latch2 || offset == 0)
 	{
 		state->mmc_latch1 = (state->mmc_latch1 & 0x38) | (data & 0x07);
@@ -9574,13 +9574,13 @@ static WRITE8_HANDLER( bmc_t262_w )
 }
 
 /*************************************************************
- 
+
  Board BMC-WS
- 
+
  Games: Super 40-in-1
- 
+
  In MESS: Supported
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_ws_m_w )
@@ -9588,7 +9588,7 @@ static WRITE8_HANDLER( bmc_ws_m_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 mmc_helper;
 	LOG_MMC(("bmc_ws_m_w offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset < 0x1000)
 	{
 		switch (offset & 0x01)
@@ -9614,26 +9614,26 @@ static WRITE8_HANDLER( bmc_ws_m_w )
 }
 
 /*************************************************************
- 
+
  BMC-NOVELDIAMOND and BMC-999999in1
- 
+
  Unknown Bootleg Multigame Board
  Games: I only found 'Novel Diamond 999999-in-1.unf' using
  this mapper (hence the code is used for BMC_NOVELDIAMOND
  board). The code is included here in case a mapper 54
  dump arises.
- 
+
  iNES: 54 and 213
 
  In MESS: Partial Support.
- 
+
  *************************************************************/
 
 // Are this correct or should they work the same?
 static WRITE8_HANDLER( novel1_w )
 {
 	LOG_MMC(("novel1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, offset & 0x03);
 	chr8(space->machine, offset & 0x07, CHRROM);
 }
@@ -9641,34 +9641,34 @@ static WRITE8_HANDLER( novel1_w )
 static WRITE8_HANDLER( novel2_w )
 {
 	LOG_MMC(("novel2_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, offset >> 1);
 	chr8(space->machine, offset >> 3, CHRROM);
 }
 
 /*************************************************************
- 
+
  Board BMC-GKA
- 
+
  Unknown Bootleg Multigame Board
  Games: 6 in 1, 54 in 1, 106 in 1
- 
+
  iNES: mapper 57
 
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_gka_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_gka_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset & 0x0800)
 		state->mmc_latch2 = data;
 	else
 		state->mmc_latch1 = data;
-	
+
 	if (state->mmc_latch2 & 0x80)
 		prg32(space->machine, 2 | (state->mmc_latch2 >> 6));
 	else
@@ -9676,24 +9676,24 @@ static WRITE8_HANDLER( bmc_gka_w )
 		prg16_89ab(space->machine, (state->mmc_latch2 >> 5) & 0x03);
 		prg16_cdef(space->machine, (state->mmc_latch2 >> 5) & 0x03);
 	}
-	
+
 	set_nt_mirroring(space->machine, (state->mmc_latch2 & 0x08) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	
+
 	chr8(space->machine, (state->mmc_latch1 & 0x03) | (state->mmc_latch2 & 0x07) | ((state->mmc_latch2 & 0x10) >> 1), CHRROM);
 }
 
 
 /*************************************************************
- 
+
  Board BMC-GKB
- 
+
  Unknown Bootleg Multigame Board
  Games: 68 in 1, 73 in 1, 98 in 1
- 
+
  iNES: mapper 58
 
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_gkb_w )
@@ -9701,7 +9701,7 @@ static WRITE8_HANDLER( bmc_gkb_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bank = (offset & 0x40) ? 0 : 1;
 	LOG_MMC(("bmc_gkb_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg16_89ab(space->machine, offset & ~bank);
 	prg16_cdef(space->machine, offset | bank);
 	chr8(space->machine, offset >> 3, state->mmc_chr_source);
@@ -9709,24 +9709,24 @@ static WRITE8_HANDLER( bmc_gkb_w )
 }
 
 /*************************************************************
- 
+
  BMC-SUPER-700IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: Super 700 in 1
- 
+
  iNES: mapper 62
 
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_super700in1_w )
 {
 	LOG_MMC(("bmc_super700in1_w, offset :%04x, data: %02x\n", offset, data));
-	
+
 	chr8(space->machine, ((offset & 0x1f) << 2) | (data & 0x03), CHRROM);
-	
+
 	if (offset & 0x20)
 	{
 		prg16_89ab(space->machine, (offset & 0x40) | ((offset >> 8) & 0x3f));
@@ -9736,147 +9736,147 @@ static WRITE8_HANDLER( bmc_super700in1_w )
 	{
 		prg32(space->machine, ((offset & 0x40) | ((offset >> 8) & 0x3f)) >> 1);
 	}
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
- 
+
  BMC-36IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 36 in 1, 1200 in 1
- 
+
  iNES: mapper 200
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_36in1_w )
 {
 	LOG_MMC(("bmc_36in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg16_89ab(space->machine, offset & 0x07);
 	prg16_cdef(space->machine, offset & 0x07);
 	chr8(space->machine, offset & 0x07, CHRROM);
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
- 
+
  BMC-21IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 8 in 1, 21 in 1
- 
+
  iNES: mapper 201
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_21in1_w )
 {
 	LOG_MMC(("bmc_21in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg32(space->machine, offset & 0x03);
 	chr8(space->machine, offset & 0x03, CHRROM);
 }
 
 /*************************************************************
- 
+
  BMC-150IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 150 in 1
- 
+
  iNES: mapper 202
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_150in1_w )
 {
 	int bank = (offset >> 1) & 0x07;
-	
+
 	LOG_MMC(("bmc_150in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg16_89ab(space->machine, bank);
 	prg16_cdef(space->machine, bank + (((bank & 0x06) == 0x06) ? 1 : 0));
 	chr8(space->machine, bank, CHRROM);
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
 }
 
 /*************************************************************
- 
+
  BMC-35IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 35 in 1
- 
+
  iNES: mapper 203
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_35in1_w )
 {
 	LOG_MMC(("bmc_35in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg16_89ab(space->machine, (data >> 2) & 0x03);
 	prg16_cdef(space->machine, (data >> 2) & 0x03);
 	chr8(space->machine, data & 0x03, CHRROM);
 }
 
 /*************************************************************
- 
+
  BMC-64IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 64 in 1
- 
+
  iNES: mapper 204
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_64in1_w )
 {
 	int bank = (offset >> 1) & (offset >> 2) & 0x01;
-	
+
 	LOG_MMC(("bmc_64in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg16_89ab(space->machine, offset & ~bank);
 	prg16_cdef(space->machine, offset | bank);
 	chr8(space->machine, offset & ~bank, CHRROM);
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HORZ: PPU_MIRROR_VERT);
 }
 
 /*************************************************************
- 
+
  BMC-15IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 3 in 1, 15 in 1
- 
+
  iNES: mapper 205, MMC3 clone
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_15in1_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_15in1_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset & 0x0800)
 	{
 		state->mmc_prg_base = (data & 0x03) << 4;
@@ -9889,25 +9889,25 @@ static WRITE8_HANDLER( bmc_15in1_m_w )
 }
 
 /*************************************************************
- 
+
  BMC-SUPERHIK_300IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 100000 in 1, Super HIK 300 in 1, 1997 in 1
- 
+
  iNES: mapper 212
 
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_hik300_w )
 {
 	LOG_MMC(("bmc_hik300_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	chr8(space->machine, offset, CHRROM);
-	
+
 	if (offset < 0x4000)
 	{
 		prg16_89ab(space->machine, offset);
@@ -9918,38 +9918,38 @@ static WRITE8_HANDLER( bmc_hik300_w )
 }
 
 /*************************************************************
- 
+
  BMC-SUPERGUN-20IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: Super Gun 20 in 1
- 
+
  iNES: mapper 214
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( supergun20in1_w )
 {
 	LOG_MMC(("supergun20in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	prg16_89ab(space->machine, offset >> 2);
 	prg16_cdef(space->machine, offset >> 2);
 	chr8(space->machine, offset, CHRROM);
 }
 
 /*************************************************************
- 
+
  BMC-72IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 72 in 1, 115 in 1 and other multigame carts
- 
+
  iNES: mapper 225
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_72in1_w )
@@ -9957,12 +9957,12 @@ static WRITE8_HANDLER( bmc_72in1_w )
 	int hi_bank;
 	int size_16;
 	int bank;
-	
+
 	LOG_MMC(("bmc_72in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	chr8(space->machine, offset, CHRROM);
 	set_nt_mirroring(space->machine, (offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	
+
 	hi_bank = offset & 0x40;
 	size_16 = offset & 0x1000;
 	bank = (offset & 0xf80) >> 7;
@@ -9971,7 +9971,7 @@ static WRITE8_HANDLER( bmc_72in1_w )
 		bank <<= 1;
 		if (hi_bank)
 			bank ++;
-		
+
 		prg16_89ab(space->machine, bank);
 		prg16_cdef(space->machine, bank);
 	}
@@ -9980,16 +9980,16 @@ static WRITE8_HANDLER( bmc_72in1_w )
 }
 
 /*************************************************************
- 
+
  BMC-76IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 76 in 1, Super 42 in 1
- 
+
  iNES: mapper 226
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 // does this work for super42in1 as well?!?
@@ -9999,26 +9999,26 @@ static WRITE8_HANDLER( bmc_76in1_w )
 	int hi_bank;
 	int size_16;
 	int bank;
-	
+
 	LOG_MMC(("bmc_76in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset & 0x01)
 		state->mmc_latch2 = data;
 	else
 		state->mmc_latch1 = data;
-	
+
 	set_nt_mirroring(space->machine, BIT(state->mmc_latch1, 6) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	
+
 	hi_bank = state->mmc_latch1 & 0x01;
 	size_16 = state->mmc_latch1 & 0x20;
 	bank = ((state->mmc_latch1 & 0x1e) >> 1) | ((state->mmc_latch1 & 0x80) >> 3) | ((state->mmc_latch2 & 0x01) << 5);
-	
+
 	if (size_16)
 	{
 		bank <<= 1;
 		if (hi_bank)
 			bank ++;
-		
+
 		prg16_89ab(space->machine, bank);
 		prg16_cdef(space->machine, bank);
 	}
@@ -10027,16 +10027,16 @@ static WRITE8_HANDLER( bmc_76in1_w )
 }
 
 /*************************************************************
- 
+
  BMC-1200IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 1200 in 1, 295 in 1, 76 in 1
- 
+
  iNES: mapper 227
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_1200in1_w )
@@ -10044,9 +10044,9 @@ static WRITE8_HANDLER( bmc_1200in1_w )
 	int hi_bank;
 	int size_32;
 	int bank;
-	
+
 	LOG_MMC(("bmc_1200in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	hi_bank = offset & 0x04;
 	size_32 = offset & 0x01;
 	bank = ((offset & 0x78) >> 3) | ((offset & 0x0100) >> 4);
@@ -10055,13 +10055,13 @@ static WRITE8_HANDLER( bmc_1200in1_w )
 		bank <<= 1;
 		if (hi_bank)
 			bank ++;
-		
+
 		prg16_89ab(space->machine, bank);
 		prg16_cdef(space->machine, bank);
 	}
 	else
 		prg32(space->machine, bank);
-	
+
 	if (!(offset & 0x80))
 	{
 		if (offset & 0x200)
@@ -10069,30 +10069,30 @@ static WRITE8_HANDLER( bmc_1200in1_w )
 		else
 			prg16_cdef(space->machine, ((bank << 1) & 0x38));
 	}
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 1) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 }
 
 /*************************************************************
- 
+
  BMC-31IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 31 in 1
- 
+
  iNES: mapper 229
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_31in1_w )
 {
 	LOG_MMC(("bmc_31in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 5) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	chr8(space->machine, offset, CHRROM);
-	
+
 	if ((offset & 0x1e) == 0)
 	{
 		prg16_89ab(space->machine, 0);
@@ -10106,23 +10106,23 @@ static WRITE8_HANDLER( bmc_31in1_w )
 }
 
 /*************************************************************
- 
+
  BMC-22GAMES
- 
+
  Unknown Bootleg Multigame Board
  Games: 22 in 1
- 
+
  iNES: mapper 230
- 
+
  In MESS: Partially Supported. It would need a reset
  to work (not possible yet)
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_22g_w )
 {
 	LOG_MMC(("bmc_22g_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (1)	// this should flip at reset
 	{
 		prg16_89ab(space->machine, data & 0x07);
@@ -10144,48 +10144,48 @@ static WRITE8_HANDLER( bmc_22g_w )
 }
 
 /*************************************************************
- 
+
  BMC-20IN1
- 
+
  Unknown Bootleg Multigame Board
  Games: 20 in 1
- 
+
  iNES: mapper 231
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_20in1_w )
 {
 	LOG_MMC(("bmc_20in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, BIT(data, 7) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	
+
 	prg16_89ab(space->machine, (offset & 0x1e));
 	prg16_cdef(space->machine, (offset & 0x1e) | ((offset & 0x20) ? 1 : 0));
 }
 
 /*************************************************************
- 
+
  BMC-110IN1
- 
+
  Known Boards: Unknown Bootleg Board
  Games: 110 in 1
- 
+
  iNES: mapper 255
- 
+
  In MESS: Preliminary support.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_110in1_w )
 {
 	UINT8 map255_helper1 = (offset >> 12) ? 0 : 1;
 	UINT8 map255_helper2 = ((offset >> 8) & 0x40) | ((offset >> 6) & 0x3f);
-	
+
 	LOG_MMC(("bmc_110in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	set_nt_mirroring(space->machine, (offset & 0x2000) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	prg16_89ab(space->machine, map255_helper1 & ~map255_helper2);
 	prg16_cdef(space->machine, map255_helper1 | map255_helper2);
@@ -10193,16 +10193,16 @@ static WRITE8_HANDLER( bmc_110in1_w )
 }
 
 /*************************************************************
- 
+
  BMC-SUPERBIG-7IN1
- 
+
  Known Boards: Unknown Multigame Bootleg Board
  Games: Kunio 8 in 1, Super Big 7 in 1
- 
+
  iNES: mapper 44
- 
+
  In MESS: Supported. It also uses mmc3_irq.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_sbig7_w )
@@ -10210,14 +10210,14 @@ static WRITE8_HANDLER( bmc_sbig7_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 page;
 	LOG_MMC(("bmc_sbig7_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6001)
 	{
 		case 0x2001: /* $a001 - Select 128K ROM/VROM base (0..5) or last 256K ROM/VRAM base (6) */
 			page = (data & 0x07);
 			if (page > 6)
 				page = 6;
-			
+
 			state->mmc_prg_base = page << 4;
 			state->mmc_prg_mask = (page > 5) ? 0x1f : 0x0f;
 			state->mmc_chr_base = page << 7;
@@ -10225,7 +10225,7 @@ static WRITE8_HANDLER( bmc_sbig7_w )
 			mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-			
+
 		default:
 			txrom_w(space, offset, data);
 			break;
@@ -10233,37 +10233,37 @@ static WRITE8_HANDLER( bmc_sbig7_w )
 }
 
 /*************************************************************
- 
+
  BMC-HIK8IN1
- 
+
  Known Boards: Unknown Multigame Bootleg Board
  Games: Street Fighter V, various multigame carts
- 
+
  iNES: mapper 45
- 
+
  In MESS: Supported. It also uses mmc3_irq.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_hik8_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_hik8_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	/* This bit is the "register lock". Once register are locked, writes go to WRAM
-	 and there is no way to unlock them (except by resetting the machine) */
+     and there is no way to unlock them (except by resetting the machine) */
 	if ((state->mapper45_reg[3] & 0x40) && state->wram != NULL)
 		state->wram[offset] = data;
 	else
 	{
 		state->mapper45_reg[state->mmc_count] = data;
 		state->mmc_count = (state->mmc_count + 1) & 0x03;
-		
+
 		if (!state->mmc_count)
 		{
 			LOG_MMC(("bmc_hik8_m_w, command completed %02x %02x %02x %02x\n", state->mapper45_reg[3],
 					 state->mapper45_reg[2], state->mapper45_reg[1], state->mapper45_reg[0]));
-			
+
 			state->mmc_prg_base = state->mapper45_reg[1];
 			state->mmc_prg_mask = 0x3f ^ (state->mapper45_reg[3] & 0x3f);
 			state->mmc_chr_base = ((state->mapper45_reg[2] & 0xf0) << 4) | state->mapper45_reg[0];
@@ -10273,7 +10273,7 @@ static WRITE8_HANDLER( bmc_hik8_m_w )
 				state->mmc_chr_mask = 0;
 			else
 				state->mmc_chr_mask = 0xff;	// i.e. we use the vrom_bank with no masking
-			
+
 			mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 		}
@@ -10281,26 +10281,26 @@ static WRITE8_HANDLER( bmc_hik8_m_w )
 }
 
 /*************************************************************
- 
+
  BMC-SUPERHIK-4IN1
- 
+
  Known Boards: Unknown Multigame Bootleg Board
  Games: Super HIK 4 in 1
- 
+
  iNES: mapper 49
- 
+
  In MESS: Supported. It also uses mmc3_irq.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_hik4in1_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_hik4in1_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	/* mid writes only work when WRAM is enabled. not sure if I should
-	 change the condition to state->mmc_latch2==0x80 (i.e. what is the effect of
-	 the read-only bit?) */
+     change the condition to state->mmc_latch2==0x80 (i.e. what is the effect of
+     the read-only bit?) */
 	if (state->mmc_latch2 & 0x80)
 	{
 		if (data & 0x01)	/* if this is 0, then we have 32k PRG blocks */
@@ -10311,7 +10311,7 @@ static WRITE8_HANDLER( bmc_hik4in1_m_w )
 		}
 		else
 			prg32(space->machine, (data & 0x30) >> 4);
-		
+
 		state->mmc_chr_base = (data & 0xc0) << 1;
 		state->mmc_chr_mask = 0x7f;
 		mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
@@ -10319,23 +10319,23 @@ static WRITE8_HANDLER( bmc_hik4in1_m_w )
 }
 
 /*************************************************************
- 
+
  BMC-BALLGAMES-11IN1
- 
+
  Known Boards: Unknown Multigame Bootleg Board
  Games: 11 in 1 Ball Games
- 
+
  iNES: mapper 51
- 
+
  In MESS: Partially Supported.
- 
+
  *************************************************************/
 
 static void bmc_ball11_set_banks( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	set_nt_mirroring(machine, (state->mapper51_reg[0] == 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	
+
 	if (state->mapper51_reg[0] & 0x01)
 	{
 		prg32(machine, state->mapper51_reg[1]);
@@ -10350,9 +10350,9 @@ static void bmc_ball11_set_banks( running_machine *machine )
 static WRITE8_HANDLER( bmc_ball11_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	
+
 	LOG_MMC(("bmc_ball11_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->mapper51_reg[0] = ((data >> 1) & 0x01) | ((data >> 3) & 0x02);
 	bmc_ball11_set_banks(space->machine);
 }
@@ -10360,9 +10360,9 @@ static WRITE8_HANDLER( bmc_ball11_m_w )
 static WRITE8_HANDLER( bmc_ball11_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	
+
 	LOG_MMC(("bmc_ball11_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	switch (offset & 0x6000)
 	{
 		case 0x4000:	// here we also update reg[0] upper bit
@@ -10377,18 +10377,18 @@ static WRITE8_HANDLER( bmc_ball11_w )
 }
 
 /*************************************************************
- 
+
  BMC-MARIOPARTY-7IN1
- 
+
  Known Boards: Unknown Multigame Bootleg Board
  Games: Mario 7 in 1
- 
+
  MMC3 clone
- 
+
  iNES: mapper 52
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_mario7in1_m_w )
@@ -10396,22 +10396,22 @@ static WRITE8_HANDLER( bmc_mario7in1_m_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 map52_helper1, map52_helper2;
 	LOG_MMC(("bmc_mario7in1_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	/* mid writes only work when WRAM is enabled. not sure if I should
-	 change the condition to state->mmc_latch2==0x80 (i.e. what is the effect of
-	 the read-only bit?) and it only can happen once! */
+     change the condition to state->mmc_latch2==0x80 (i.e. what is the effect of
+     the read-only bit?) and it only can happen once! */
 	if ((state->mmc_latch2 & 0x80) && !state->map52_reg_written)
 	{
 		map52_helper1 = (data & 0x08);
 		map52_helper2 = (data & 0x40);
-		
+
 		state->mmc_prg_base = map52_helper1 ? ((data & 0x07) << 4) : ((data & 0x06) << 4);
 		state->mmc_prg_mask = map52_helper1 ? 0x0f : 0x1f;
 		state->mmc_chr_base = ((data & 0x20) << 4) | ((data & 0x04) << 6) | (map52_helper2 ? ((data & 0x10) << 3) : 0);
 		state->mmc_chr_mask = map52_helper2 ? 0x7f : 0xff;
 		mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
 		mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
-		
+
 		state->map52_reg_written = 1;
 	}
 	else
@@ -10419,18 +10419,18 @@ static WRITE8_HANDLER( bmc_mario7in1_m_w )
 }
 
 /*************************************************************
- 
+
  BMC-GOLDENCARD-6IN1
- 
+
  Known Boards: Unknown Bootleg Multigame Board
  Games: Golden Card 6 in 1
- 
+
  MMC3 clone
- 
+
  iNES: mapper 217
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 // remove mask & base parameters!
@@ -10439,9 +10439,9 @@ static void bmc_gc6in1_set_prg( running_machine *machine, int prg_base, int prg_
 	nes_state *state = (nes_state *)machine->driver_data;
 	state->mmc_prg_base = (state->map217_reg[1] & 0x08) ? 0 : (state->map217_reg[1] & 0x10);
 	state->mmc_prg_mask = (state->map217_reg[1] & 0x08) ? 0x1f : 0x0f;
-	
+
 	state->mmc_prg_base |= ((state->map217_reg[1] & 0x03) << 5);
-	
+
 	mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 }
 
@@ -10451,9 +10451,9 @@ static void bmc_gc6in1_set_chr( running_machine *machine, UINT8 chr )
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 	int chr_base = (state->map217_reg[1] & 0x08) ? 0x00 : ((state->map217_reg[1] & 0x10) << 3);
 	int chr_mask = (state->map217_reg[1] & 0x08) ? 0xff : 0x7f;
-	
+
 	chr_base |= ((state->map217_reg[1] & 0x03) << 8);
-	
+
 	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
 	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
@@ -10470,7 +10470,7 @@ static WRITE8_HANDLER( bmc_gc6in1_l_w )
 	UINT8 bank;
 	LOG_MMC(("bmc_gc6in1_l_w, offset: %04x, data: %02x\n", offset, data));
 	offset += 0x100;
-	
+
 	if (offset == 0x1000)
 	{
 		state->map217_reg[0] = data;
@@ -10500,7 +10500,7 @@ static WRITE8_HANDLER( bmc_gc6in1_w )
 	UINT8 MMC3_helper, cmd;
 	static const UINT8 conv_table[8] = {0, 6, 3, 7, 5, 2, 4, 1};
 	LOG_MMC(("bmc_gc6in1_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (!state->map217_reg[2]) // in this case we act like MMC3, only with alt prg/chr handlers
 	{
 		switch (offset & 0x6001)
@@ -10508,16 +10508,16 @@ static WRITE8_HANDLER( bmc_gc6in1_w )
 			case 0x0000:
 				MMC3_helper = state->mmc_latch1 ^ data;
 				state->mmc_latch1 = data;
-				
+
 				/* Has PRG Mode changed? */
 				if (MMC3_helper & 0x40)
 					bmc_gc6in1_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-				
+
 				/* Has CHR Mode changed? */
 				if (MMC3_helper & 0x80)
 					bmc_gc6in1_set_chr(space->machine, state->mmc_chr_source);
 				break;
-				
+
 			case 0x0001:
 				cmd = state->mmc_latch1 & 0x07;
 				switch (cmd)
@@ -10534,7 +10534,7 @@ static WRITE8_HANDLER( bmc_gc6in1_w )
 					break;
 			}
 				break;
-				
+
 			default:
 				txrom_w(space, offset, data);
 				break;
@@ -10547,23 +10547,23 @@ static WRITE8_HANDLER( bmc_gc6in1_w )
 			case 0x0000:
 				txrom_w(space, 0xc000, data);
 				break;
-				
+
 			case 0x0001:
 				data = (data & 0xc0) | conv_table[data & 0x07];
 				MMC3_helper = state->mmc_latch1 ^ data;
 				state->mmc_latch1 = data;
-				
+
 				/* Has PRG Mode changed? */
 				if (MMC3_helper & 0x40)
 					bmc_gc6in1_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-				
+
 				/* Has CHR Mode changed? */
 				if (MMC3_helper & 0x80)
 					bmc_gc6in1_set_chr(space->machine, state->mmc_chr_source);
-				
+
 				state->map217_reg[3] = 1;
 				break;
-				
+
 			case 0x2000:
 				cmd = state->mmc_latch1 & 0x07;
 				if (state->map217_reg[3])
@@ -10584,12 +10584,12 @@ static WRITE8_HANDLER( bmc_gc6in1_w )
 					}
 				}
 				break;
-				
-				
+
+
 			case 0x2001:
 				set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 				break;
-				
+
 			default:
 				txrom_w(space, offset, data);
 				break;
@@ -10598,25 +10598,25 @@ static WRITE8_HANDLER( bmc_gc6in1_w )
 }
 
 /*************************************************************
- 
+
  BMC-FAMILY-4646B
- 
+
  Known Boards: Unknown Multigame Bootleg Board (4646B)
  Games: 2 in 1 - Family Kid & Aladdin 4
- 
+
  MMC3 clone
- 
+
  iNES: mapper 134
- 
+
  In MESS: Supported.
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_family4646_m_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_family4646_m_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	if (offset == 0x01)
 	{
 		state->mmc_prg_base = (data & 0x02) << 4;
@@ -10629,19 +10629,19 @@ static WRITE8_HANDLER( bmc_family4646_m_w )
 }
 
 /*************************************************************
- 
+
  BMC-VT5201
- 
+
  *************************************************************/
 
 static WRITE8_HANDLER( bmc_vt5201_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_vt5201_w, offset: %04x, data: %02x\n", offset, data));
-	
+
 	state->mmc_latch1 = BIT(offset, 8);
-	
-	// not sure about this mirroring bit!! 
+
+	// not sure about this mirroring bit!!
 	// without it TN 95 in 1 has glitches in Lunar Ball; with it TN 95 in 1 has glitches in Galaxian!
 	set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
 	if (BIT(offset, 7))
@@ -10658,7 +10658,7 @@ static READ8_HANDLER( bmc_vt5201_r )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	LOG_MMC(("bmc_vt5201_r, offset: %04x\n", offset));
-	//	state->mmc_dipsetting = input_port_read(space->machine, "CARTDIPS");
+	//  state->mmc_dipsetting = input_port_read(space->machine, "CARTDIPS");
 
 	if (state->mmc_latch1)
 		return state->mmc_dipsetting; // cart mode, depending on the Dip Switches (always zero atm, given we have no way to add cart-based DIPs)
@@ -10680,11 +10680,11 @@ static READ8_HANDLER( bmc_vt5201_r )
 }
 
 /*************************************************************
- 
+
  BMC-BS-5
- 
+
  Games: a few 4 in 1 multicarts
- 
+
  *************************************************************/
 
 static void bmc_bs5_update_banks( running_machine *machine )
@@ -10706,8 +10706,8 @@ static WRITE8_HANDLER( bmc_bs5_w )
 	nes_state *state = (nes_state *)space->machine->driver_data;
 	UINT8 bs5_helper = (offset & 0xc00) >> 10;
 	LOG_MMC(("bmc_bs5_w, offset: %04x, data: %02x\n", offset, data));
-//	state->mmc_dipsetting = input_port_read(space->machine, "CARTDIPS");
-	
+//  state->mmc_dipsetting = input_port_read(space->machine, "CARTDIPS");
+
 	switch (offset & 0x7000)
 	{
 		case 0x0000:
@@ -10722,9 +10722,9 @@ static WRITE8_HANDLER( bmc_bs5_w )
 }
 
 /*************************************************************
- 
+
  BMC-810544-C-A1
- 
+
  Games: 200-in-1 Elfland
 
  *************************************************************/
@@ -10743,7 +10743,7 @@ static WRITE8_HANDLER( bmc_810544_w )
 		prg32(space->machine, bank);
 
 	set_nt_mirroring(space->machine, BIT(data, 4) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-	
+
 	chr8(space->machine, offset & 0x0f, CHRROM);
 }
 
@@ -10800,7 +10800,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ STD_UN1ROM,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(un1rom_w),              NULL, NULL, NULL },
 	{ STD_CPROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(cprom_w),               NULL, NULL, NULL },
 	{ STD_CNROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(cnrom_w),               NULL, NULL, NULL },
-	{ BANDAI_PT554,         NES_NOACCESS, NES_WRITEONLY(bandai_pt554_m_w), NES_WRITEONLY(cnrom_w), NULL, NULL, NULL },	
+	{ BANDAI_PT554,         NES_NOACCESS, NES_WRITEONLY(bandai_pt554_m_w), NES_WRITEONLY(cnrom_w), NULL, NULL, NULL },
 	{ STD_AXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(axrom_w),               NULL, NULL, NULL },
 	{ STD_PXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(pxrom_w),               mmc2_latch, NULL, NULL },
 	{ STD_FXROM,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(fxrom_w),               mmc2_latch, NULL, NULL },
@@ -10909,7 +10909,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ SUBOR_TYPE0,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(subor0_w),              NULL, NULL, NULL },
 	{ SUBOR_TYPE1,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(subor1_w),              NULL, NULL, NULL },
 	{ MAGICSERIES_MD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(magics_md_w),           NULL, NULL, NULL },
-	{ NANJING_BOARD,        {nanjing_l_w, nanjing_l_r}, NES_NOACCESS, NES_NOACCESS,           NULL, NULL, nanjing_irq }, 
+	{ NANJING_BOARD,        {nanjing_l_w, nanjing_l_r}, NES_NOACCESS, NES_NOACCESS,           NULL, NULL, nanjing_irq },
 	{ NITRA_TDA,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(nitra_w),               NULL, NULL, mmc3_irq },
 	{ NTDEC_ASDER,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ntdec_asder_w),         NULL, NULL, NULL },
 	{ NTDEC_FIGHTINGHERO,   NES_NOACCESS, NES_WRITEONLY(ntdec_fh_m_w), NES_NOACCESS,          NULL, NULL, NULL },
@@ -10924,11 +10924,11 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ TENGEN_800008,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800008_w),       NULL, NULL, NULL },
 	{ TENGEN_800032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800032_w),       NULL, NULL, tengen_800032_irq },
 	{ TENGEN_800037,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800037_w),       NULL, NULL, tengen_800032_irq },
-	{ TXC_22211A,           {txc_22211_l_w, txc_22211_l_r}, NES_NOACCESS, NES_WRITEONLY(txc_22211_w), NULL, NULL, NULL }, 
-	{ TXC_22211B,           {txc_22211_l_w, txc_22211_l_r}, NES_NOACCESS, NES_WRITEONLY(txc_22211b_w), NULL, NULL, NULL }, 
-	{ TXC_22211C,           {txc_22211_l_w, txc_22211c_l_r}, NES_NOACCESS, NES_WRITEONLY(txc_22211_w), NULL, NULL, NULL }, 
+	{ TXC_22211A,           {txc_22211_l_w, txc_22211_l_r}, NES_NOACCESS, NES_WRITEONLY(txc_22211_w), NULL, NULL, NULL },
+	{ TXC_22211B,           {txc_22211_l_w, txc_22211_l_r}, NES_NOACCESS, NES_WRITEONLY(txc_22211b_w), NULL, NULL, NULL },
+	{ TXC_22211C,           {txc_22211_l_w, txc_22211c_l_r}, NES_NOACCESS, NES_WRITEONLY(txc_22211_w), NULL, NULL, NULL },
 	{ TXC_TW,               NES_WRITEONLY(txc_tw_l_w), NES_WRITEONLY(txc_tw_m_w), NES_WRITEONLY(txc_tw_w), NULL, NULL, mmc3_irq },
-	{ TXC_STRIKEWOLF,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(txc_strikewolf_w),      NULL, NULL, NULL }, 
+	{ TXC_STRIKEWOLF,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(txc_strikewolf_w),      NULL, NULL, NULL },
 	{ TXC_MXMDHTWO,         NES_READONLY(txc_mxmdhtwo_l_r), NES_NOACCESS, NES_WRITEONLY(txc_mxmdhtwo_w), NULL, NULL, NULL },
 	{ WAIXING_TYPE_A,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(waixing_a_w),           NULL, NULL, mmc3_irq },
 	{ WAIXING_TYPE_B,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(waixing_b_w),           NULL, NULL, mmc3_irq },
@@ -10948,8 +10948,8 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ UNL_8237,             NES_WRITEONLY(unl_8237_l_w), NES_NOACCESS, NES_WRITEONLY(unl_8237_w),      NULL, NULL, mmc3_irq },
 	{ UNL_AX5705,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_ax5705_w),          NULL, NULL, NULL },
 	{ UNL_CC21,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_cc21_w),            NULL, NULL, NULL },
- 	{ UNL_KOF97,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_kof97_w),           NULL, NULL, mmc3_irq },
- 	{ UNL_T230,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_t230_w),            NULL, NULL, konami_irq },
+	{ UNL_KOF97,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_kof97_w),           NULL, NULL, mmc3_irq },
+	{ UNL_T230,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_t230_w),            NULL, NULL, konami_irq },
 	{ UNL_KOF96,            {kof96_l_w, kof96_l_r}, NES_NOACCESS, NES_WRITEONLY(kof96_w),     NULL, NULL, mmc3_irq },
 	{ UNL_MK2,              NES_NOACCESS, NES_WRITEONLY(mk2_m_w), NES_NOACCESS,               NULL, NULL, mmc3_irq },
 	{ UNL_N625092,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(n625092_w),             NULL, NULL, NULL },
@@ -11027,21 +11027,21 @@ int nes_pcb_reset( running_machine *machine )
 	nes_state *state = (nes_state *)machine->driver_data;
 	int err = 0;
 	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->pcb_id);
-	
+
 	if (intf == NULL)
 		fatalerror("Missing PCB interface\n");
-	
+
 	if (state->chr_chunks == 0)
 		chr8(machine, 0, CHRRAM);
 	else
 		chr8(machine, 0, CHRROM);
-	
+
 	/* Set the mapper irq callback */
 	ppu2c0x_set_scanline_callback(state->ppu, intf ? intf->mmc_scanline : NULL);
 	ppu2c0x_set_hblank_callback(state->ppu, intf ? intf->mmc_hblank : NULL);
-	
+
 	err = unif_initialize(machine, state->pcb_id);
-	
+
 	return err;
 }
 
@@ -11051,7 +11051,7 @@ int nes_get_pcb_id( running_machine *machine, const char *feature )
 
 	if (pcb == NULL)
 		fatalerror("Unimplemented PCB type %s\n", feature);
-	
+
 	return pcb->pcb_id;
 }
 
@@ -11059,10 +11059,10 @@ void pcb_handlers_setup( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->pcb_id);
-	
+
 	if (intf == NULL)
 		fatalerror("Missing PCB interface\n");
-	
+
 	if (intf)
 	{
 		state->mmc_write_low = intf->mmc_l.write;

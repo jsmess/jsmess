@@ -1252,10 +1252,10 @@ static DEVICE_IMAGE_LOAD( max_cart )
 		// setup Ultimax mode
 		c64_exrom = 1;
 		c64_game  = 0;
-		
+
 		roml = c64_roml;
 		romh = c64_romh;
-		
+
 		memset(roml, 0, 0x2000);
 		memset(romh, 0, 0x2000);
 
@@ -1267,7 +1267,7 @@ static DEVICE_IMAGE_LOAD( max_cart )
 		// is there anything to load at 0xe000?
 		size = image.get_software_region_length("romh");
 		if (size)
-			memcpy(romh, image.get_software_region("romh"), size);		
+			memcpy(romh, image.get_software_region("romh"), size);
 	}
 
 	return result;

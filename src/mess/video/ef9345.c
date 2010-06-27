@@ -146,24 +146,24 @@ void init_char_prt(ef9345_t *ef9345)
 			ef9345->acc_char[0x0400 + j + i +  8] |= 0x08; //aigu
 			ef9345->acc_char[0x0600 + j + i +  4] |= 0x04; //grave
 			ef9345->acc_char[0x0600 + j + i +  8] |= 0x08; //grave
-			
+
 			ef9345->acc_char[0x0a00 + j + i +  4] |= 0x1c; //tilde
 			ef9345->acc_char[0x0c00 + j + i +  4] |= 0x10; //aigu
 			ef9345->acc_char[0x0c00 + j + i +  8] |= 0x08; //aigu
 			ef9345->acc_char[0x0e00 + j + i +  4] |= 0x04; //grave
 			ef9345->acc_char[0x0e00 + j + i +  8] |= 0x08; //grave
-			
+
 			ef9345->acc_char[0x1200 + j + i +  4] |= 0x08; //point
 			ef9345->acc_char[0x1400 + j + i +  4] |= 0x14; //trema
 			ef9345->acc_char[0x1600 + j + i + 32] |= 0x08; //cedille
 			ef9345->acc_char[0x1600 + j + i + 36] |= 0x04; //cedille
-			
+
 			ef9345->acc_char[0x1a00 + j + i +  4] |= 0x08; //point
 			ef9345->acc_char[0x1c00 + j + i +  4] |= 0x14; //trema
 			ef9345->acc_char[0x1e00 + j + i + 32] |= 0x08; //cedille
 			ef9345->acc_char[0x1e00 + j + i + 36] |= 0x04; //cedille
 		}
-	
+
 	//initialisation des pointeurs de polices fixes
 	ef9345->char_ptr[0x00] = ef9345->charset;          //G0
 	ef9345->char_ptr[0x01] = ef9345->charset + 0x0800; //G0 underlined

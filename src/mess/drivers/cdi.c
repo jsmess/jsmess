@@ -2993,7 +2993,7 @@ static void mcd212_update_visible_area(running_machine *machine)
 	visarea1.max_x = width-1;
 	visarea1.min_x = visarea.min_x;
 	visarea1.min_y = visarea.min_y;
-	visarea1.max_y = visarea.max_y;	
+	visarea1.max_y = visarea.max_y;
 
 	machine->primary_screen->configure(width, 262, visarea1, period);
 }

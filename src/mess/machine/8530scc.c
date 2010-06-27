@@ -81,7 +81,7 @@ struct _scc8530_t
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
-	       
+
 INLINE scc8530_t *get_token(running_device *device)
 {
 	assert(device->type() == SCC8530);
@@ -138,8 +138,8 @@ static void scc_updateirqs(running_device *device)
 		scc->IRQType = IRQ_NONE;
 	}
 
-//	printf("SCC: irqstat %d, last %d\n", irqstat, scc->lastIRQStat);
-//	printf("ch0: en %d pd %d  ch1: en %d pd %d\n", scc->channel[0].txIRQEnable, scc->channel[0].txIRQPending, scc->channel[1].txIRQEnable, scc->channel[1].txIRQPending);
+//  printf("SCC: irqstat %d, last %d\n", irqstat, scc->lastIRQStat);
+//  printf("ch0: en %d pd %d  ch1: en %d pd %d\n", scc->channel[0].txIRQEnable, scc->channel[0].txIRQPending, scc->channel[1].txIRQEnable, scc->channel[1].txIRQPending);
 
 	// don't spam the driver with unnecessary transitions
 	if (irqstat != scc->lastIRQStat)
@@ -203,7 +203,7 @@ static TIMER_CALLBACK( scc8530_baud_expire )
 		{
 			pChan->extIRQPending = 1;
 			pChan->baudIRQPending = 0;
- 			scc_updateirqs(device);
+			scc_updateirqs(device);
 		}
 	}
 
@@ -546,7 +546,7 @@ WRITE8_DEVICE_HANDLER(scc8530_w)
 
 	offset &= 3;
 
-//	printf("SCC: mode %d data %x offset %d\n", scc->mode, data, offset);
+//  printf("SCC: mode %d data %x offset %d\n", scc->mode, data, offset);
 
 	switch(offset)
 	{
@@ -558,7 +558,7 @@ WRITE8_DEVICE_HANDLER(scc8530_w)
 				{
 					scc->mode = 1;
 					scc->reg = data & 0x0f;
-//					scc_putbreg(device, data & 0xf0);
+//                  scc_putbreg(device, data & 0xf0);
 				}
 				else if (data == 0x10)
 				{
@@ -584,7 +584,7 @@ WRITE8_DEVICE_HANDLER(scc8530_w)
 				{
 					scc->mode = 1;
 					scc->reg = data & 0x0f;
-//					scc_putareg(device, data & 0xf0);
+//                  scc_putareg(device, data & 0xf0);
 				}
 				else if (data == 0x10)
 				{

@@ -25,12 +25,12 @@ public:
 static ADDRESS_MAP_START( cfx9850, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x000000, 0x007fff ) AM_ROM
 	AM_RANGE( 0x080000, 0x0807ff ) AM_RAM AM_BASE_MEMBER( cfx9850_state, video_ram )
-//	AM_RANGE( 0x100000, 0x10ffff ) /* some memory mapped i/o? */
-//	AM_RANGE( 0x110000, 0x11ffff ) /* some memory mapped i/o? */
+//  AM_RANGE( 0x100000, 0x10ffff ) /* some memory mapped i/o? */
+//  AM_RANGE( 0x110000, 0x11ffff ) /* some memory mapped i/o? */
 	AM_RANGE( 0x200000, 0x27ffff ) AM_ROM AM_REGION( "bios", 0 )
 	AM_RANGE( 0x400000, 0x40ffff ) AM_RAM
 	AM_RANGE( 0x600000, 0x601fff ) AM_MIRROR(0xe000) AM_RAM AM_BASE_MEMBER( cfx9850_state, display_ram )
-//	AM_RANGE( 0xe10000, 0xe1ffff ) /* some memory mapped i/o? */
+//  AM_RANGE( 0xe10000, 0xe1ffff ) /* some memory mapped i/o? */
 ADDRESS_MAP_END
 
 
@@ -163,16 +163,16 @@ static INPUT_PORTS_START( cfx9850 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "F1 Trace" )
 
 	/* KO11 is not connected */
-//	PORT_START( "KO11" )
+//  PORT_START( "KO11" )
 
 	PORT_START( "KO12" )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "TEST" )
 
 	/* KO13 is not connected */
-//	PORT_START( "KO13" )
+//  PORT_START( "KO13" )
 
 	/* KO14 is not connected */
-//	PORT_START( "KO14" )
+//  PORT_START( "KO14" )
 INPUT_PORTS_END
 
 

@@ -2,25 +2,25 @@
 
     Casio X-07
 
-	Driver by Sandro Ronco based on X-07 emu by J.Brigaud
+    Driver by Sandro Ronco based on X-07 emu by J.Brigaud
 
-	TODO:
-	-External video (need X-720 dump)
-	-Serial port
+    TODO:
+    -External video (need X-720 dump)
+    -Serial port
 
-	Memory Map
+    Memory Map
 
-	0x0000 - 0x1fff   Internal RAM
-	0x2000 - 0x3fff   External RAM Card
-	0x4000 - 0x5fff   Extension ROM/RAM
-	0x6000 - 0x7fff   ROM Card
-	0x8000 - 0x97ff   Video RAM
-	0x9800 - 0x9fff   ?
-	0xa000 - 0xafff   TV ROM (no dump)
-	0xb000 - 0xffff   ROM
+    0x0000 - 0x1fff   Internal RAM
+    0x2000 - 0x3fff   External RAM Card
+    0x4000 - 0x5fff   Extension ROM/RAM
+    0x6000 - 0x7fff   ROM Card
+    0x8000 - 0x97ff   Video RAM
+    0x9800 - 0x9fff   ?
+    0xa000 - 0xafff   TV ROM (no dump)
+    0xb000 - 0xffff   ROM
 
-	CPU was actually a NSC800 (Z80 compatible)
-	More info: http://www.silicium.org/oldskool/calc/x07/
+    CPU was actually a NSC800 (Z80 compatible)
+    More info: http://www.silicium.org/oldskool/calc/x07/
 
 ****************************************************************************/
 
@@ -149,7 +149,7 @@ static void t6834_cmd (running_machine *machine, UINT8 cmd)
 		break;
 
 	case 0x05:	//T6834 Ram Read
-   		address = state->in_data[state->in_pos++];
+		address = state->in_data[state->in_pos++];
 		address |= state->in_data[state->in_pos++] << 8;
 		if(address == 0xc00e)
 			p1 = 0x0a;
@@ -165,8 +165,8 @@ static void t6834_cmd (running_machine *machine, UINT8 cmd)
 		break;
 
 	case 0x06:	//T6834 Ram Write
-	   	p1 = state->in_data[state->in_pos++];
-   		address = state->in_data[state->in_pos++];
+		p1 = state->in_data[state->in_pos++];
+		address = state->in_data[state->in_pos++];
 		address |= state->in_data[state->in_pos++] << 8;
 
 		if(0x200 <= address && address < 0x300)
@@ -374,7 +374,7 @@ static void t6834_cmd (running_machine *machine, UINT8 cmd)
 		break;
 
 	case 0x24:	//Locate
-	   	p1 = state->in_data[state->in_pos++];
+		p1 = state->in_data[state->in_pos++];
 		p2 = state->in_data[state->in_pos++];
 		p3 = state->in_data[state->in_pos++];
 		state->loc_on = (state->loc_x != p1 || state->loc_y != p2);
@@ -426,7 +426,7 @@ static void t6834_cmd (running_machine *machine, UINT8 cmd)
 		draw_udk(machine);
 		break;
 
-	case 0x31: 	//udk Off
+	case 0x31:	//udk Off
 		state->udk = 0;
 		p1 = state->in_data[state->in_pos++];
 		for(UINT8 l = 3 * 8; l < (3 + 1) * 8; l++)
@@ -592,8 +592,8 @@ static void send_to_t6834 (running_machine *machine)
 }
 
 /****************************************************
-	this function emulate the color printer X-710
-	only the text functions are emulated
+    this function emulate the color printer X-710
+    only the text functions are emulated
 ****************************************************/
 static void send_to_printer(running_machine *machine)
 {
@@ -1249,34 +1249,34 @@ static MACHINE_RESET( x07 )
 	memset(state->kb_data, 0, sizeof(state->kb_data));
 	memset(state->printer_buffer, 0, sizeof(state->printer_buffer));
 
-	state->enable_k7 = 	0;
-	state->udk = 		0;
-	state->z80_irq = 	0;
-	state->in_size = 	0;
+	state->enable_k7 =	0;
+	state->udk =		0;
+	state->z80_irq =	0;
+	state->in_size =	0;
 	state->in_pos = 	0;
-	state->out_size = 	0;
-	state->out_pos = 	0;
+	state->out_size =	0;
+	state->out_pos =	0;
 	state->lcd_on = 	0x01;
 	state->scroll_min = 0;
 	state->scroll_max = 0x03;
 	state->cur_on = 	0;
-	state->cur_x = 		0;
-	state->cur_y = 		0;
+	state->cur_x =		0;
+	state->cur_y =		0;
 	state->loc_on = 	0;
-	state->loc_x = 		0;
-	state->loc_y = 		0;
-	state->font_code = 	0;
-	state->kb_on = 		0;
-	state->ctrl = 		0;
-	state->shift = 		0;
-	state->kana = 		0;
-	state->graph = 		0;
-	state->stick = 		0x30;
-	state->strig = 		0xff;
+	state->loc_x =		0;
+	state->loc_y =		0;
+	state->font_code =	0;
+	state->kb_on =		0;
+	state->ctrl =		0;
+	state->shift =		0;
+	state->kana =		0;
+	state->graph =		0;
+	state->stick =		0x30;
+	state->strig =		0xff;
 	state->strig1 = 	0xff;
 	state->kb_brk = 	0;
-	state->kb_wait = 	0;
-	state->kb_size = 	0;
+	state->kb_wait =	0;
+	state->kb_size =	0;
 	state->send_bit =	0;
 	state->char_code =	0;
 	state->printer_size = 0;

@@ -1,9 +1,9 @@
 /*********************************************************************
 
-	a2cffa.h
+    a2cffa.h
 
-	Implementation of Rich Dreher's IDE/CompactFlash board for
-	the Apple II
+    Implementation of Rich Dreher's IDE/CompactFlash board for
+    the Apple II
 
 *********************************************************************/
 

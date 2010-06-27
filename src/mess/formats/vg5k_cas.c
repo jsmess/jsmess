@@ -155,7 +155,7 @@ static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 		    if ( data_pos > k7_size )
 			   return -1;
 
-     		sample_count += vg5k_cas_byte( buffer, sample_count, casdata[data_pos] );
+    		sample_count += vg5k_cas_byte( buffer, sample_count, casdata[data_pos] );
 
 			/* generate the end-byte samples */
 			sample_count += vg5k_cas_eob( buffer, sample_count);

@@ -25,7 +25,7 @@ static VIDEO_UPDATE( pce220 )
 {
 	int x, y, xi,yi;
 	int count = 0;
-//	static int test_x,test_y;
+//  static int test_x,test_y;
 	static UINT8 *vram = memory_region(screen->machine, "lcd_vram");
 
 	for (y = 0; y < 4; y++)
@@ -128,30 +128,30 @@ static WRITE8_HANDLER( timer_lcd_w )
 static READ8_HANDLER( port15_r )
 {
 	/*
-	x--- ---- XIN input enabled
-	---- ---0
-	*/
+    x--- ---- XIN input enabled
+    ---- ---0
+    */
 	return 0;
 }
 
 static READ8_HANDLER( port18_r )
 {
 	/*
-	x--- ---- XOUT/TXD
-	---- --x- DOUT
-	---- ---x BUSY/CTS
-	*/
+    x--- ---- XOUT/TXD
+    ---- --x- DOUT
+    ---- ---x BUSY/CTS
+    */
 	return 0;
 }
 
 static READ8_HANDLER( port1f_r )
 {
 	/*
-	x--- ---- ON - resp. break key status (?)
-	---- -x-- XIN/RXD
-	---- --x- ACK/RTS
-	---- ---x DIN
-	*/
+    x--- ---- ON - resp. break key status (?)
+    ---- -x-- XIN/RXD
+    ---- --x- ACK/RTS
+    ---- ---x DIN
+    */
 
 	return 0;
 }

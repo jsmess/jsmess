@@ -594,19 +594,19 @@ static MACHINE_START( ql )
 
 static DEVICE_IMAGE_LOAD( ql_cart )
 {
-//	UINT8 *ptr = memory_region(image.device().machine, M68008_TAG) + 0x00c000;
-//	int	filesize = image.length();
+//  UINT8 *ptr = memory_region(image.device().machine, M68008_TAG) + 0x00c000;
+//  int filesize = image.length();
 //
-//	if (filesize <= 16 * 1024)
-//	{
-//		if (image.fread( ptr, filesize) == filesize)
-//		{
-//			memory_install_read_bank(cputag_get_address_space(image.device().machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, "bank1");
-//			memory_unmap_write(cputag_get_address_space(image.device().machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0);
+//  if (filesize <= 16 * 1024)
+//  {
+//      if (image.fread( ptr, filesize) == filesize)
+//      {
+//          memory_install_read_bank(cputag_get_address_space(image.device().machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, "bank1");
+//          memory_unmap_write(cputag_get_address_space(image.device().machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0);
 //
-//			return IMAGE_INIT_PASS;
-//		}
-//	}
+//          return IMAGE_INIT_PASS;
+//      }
+//  }
 //
 	return IMAGE_INIT_FAIL;
 }

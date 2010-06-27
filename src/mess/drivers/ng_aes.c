@@ -866,10 +866,10 @@ static MACHINE_START( neogeo )
 
 //static DEVICE_IMAGE_LOAD(aes_cart)
 //{
-//	else
-//		return IMAGE_INIT_FAIL;
-	
-//	return IMAGE_INIT_PASS;
+//  else
+//      return IMAGE_INIT_FAIL;
+
+//  return IMAGE_INIT_PASS;
 //}
 
 /*************************************
@@ -1276,11 +1276,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( aes )
 	MDRV_IMPORT_FROM(neogeo)
 	MDRV_AES_CARTRIDGE_ADD("aes_multicart")
-//	MDRV_CARTSLOT_ADD("cart")
-//	MDRV_CARTSLOT_MANDATORY
-	
-//	MDRV_CARTSLOT_LOAD(aes_cart)
-	
+//  MDRV_CARTSLOT_ADD("cart")
+//  MDRV_CARTSLOT_MANDATORY
+
+//  MDRV_CARTSLOT_LOAD(aes_cart)
+
 	MDRV_SOFTWARE_LIST_ADD("aes")
 MACHINE_DRIVER_END
 

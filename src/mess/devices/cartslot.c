@@ -278,9 +278,9 @@ static DEVICE_IMAGE_LOAD( cartslot )
 {
 	int result;
 	device_t *device = &image.device();
-	cartslot_t *cart = get_token(device);	
+	cartslot_t *cart = get_token(device);
 	const cartslot_config *config = get_config(device);
-	
+
 	/* if this cartridge has a custom DEVICE_IMAGE_LOAD, use it */
 	if (config->device_load != NULL)
 		return (*config->device_load)(image);
@@ -289,8 +289,8 @@ static DEVICE_IMAGE_LOAD( cartslot )
 	multicart_open(image.filename(), device->machine->gamedrv->name, MULTICART_FLAGS_LOAD_RESOURCES, &cart->mc);
 	if (cart->mc == NULL)
 	{
-			
-		
+
+
 		/* otherwise try the normal route */
 		result = process_cartridge(&image, PROCESS_LOAD);
 		if (result != IMAGE_INIT_PASS)
@@ -389,31 +389,31 @@ static const cartslot_pcb_type *identify_pcb(device_image_interface &image)
 -------------------------------------------------*/
 static void add_device_with_subdevices(const running_device *_owner, device_type _type, const char *_tag, UINT32 _clock)
 {
-/*	astring tempstring;
-	device_list *devlist = &_owner->machine->devicelist;
-	const device_config *cfg = new device_config(&_owner->baseconfig(), _type, _tag, _clock);
-	running_device *dev = devlist->append(_owner->subtag(tempstring,_tag), new running_device(*_owner->machine, *cfg));
+/*  astring tempstring;
+    device_list *devlist = &_owner->machine->devicelist;
+    const device_config *cfg = new device_config(&_owner->baseconfig(), _type, _tag, _clock);
+    running_device *dev = devlist->append(_owner->subtag(tempstring,_tag), new running_device(*_owner->machine, *cfg));
 
-	const machine_config_token *tokens = (const machine_config_token *)dev->get_config_ptr(DEVINFO_PTR_MACHINE_CONFIG);
-	machine_config *config;
-	const device_config *config_dev;
-	running_device *new_dev = NULL;
-	if (tokens != NULL)
-	{
-		config = machine_config_alloc(tokens);
-		for (config_dev = config->devicelist.first(); config_dev != NULL; config_dev = config_dev->next)
-		{
-			device_config *new_cfg = new device_config(cfg, config_dev->type, config_dev->tag(), config_dev->clock);
-			new_cfg->static_config = config_dev->static_config;
-			memcpy(
-				new_cfg->inline_config,
-				config_dev->inline_config,
-				new_cfg->get_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES));
-			new_dev = devlist->append(dev->subtag(tempstring,config_dev->tag()), new running_device(*_owner->machine, *new_cfg));
-			new_dev->owner = dev;
-		}
-		machine_config_free(config);
-	}*/
+    const machine_config_token *tokens = (const machine_config_token *)dev->get_config_ptr(DEVINFO_PTR_MACHINE_CONFIG);
+    machine_config *config;
+    const device_config *config_dev;
+    running_device *new_dev = NULL;
+    if (tokens != NULL)
+    {
+        config = machine_config_alloc(tokens);
+        for (config_dev = config->devicelist.first(); config_dev != NULL; config_dev = config_dev->next)
+        {
+            device_config *new_cfg = new device_config(cfg, config_dev->type, config_dev->tag(), config_dev->clock);
+            new_cfg->static_config = config_dev->static_config;
+            memcpy(
+                new_cfg->inline_config,
+                config_dev->inline_config,
+                new_cfg->get_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES));
+            new_dev = devlist->append(dev->subtag(tempstring,config_dev->tag()), new running_device(*_owner->machine, *new_cfg));
+            new_dev->owner = dev;
+        }
+        machine_config_free(config);
+    }*/
 }
 
 static DEVICE_IMAGE_GET_DEVICES(cartslot)

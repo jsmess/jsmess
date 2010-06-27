@@ -1584,7 +1584,7 @@ DEVICE_GET_INFO( smsvdp )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(smsvdp_t);					break;
-		
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(smsvdp);		break;
 		case DEVINFO_FCT_STOP:					/* Nothing */									break;

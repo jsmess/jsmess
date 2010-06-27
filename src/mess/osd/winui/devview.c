@@ -203,16 +203,16 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 
 	// count total amount of devices
 	nDevCount = 0;
-	
+
 	{
 		for (bool gotone = pDevViewInfo->config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))
 		{
-			nDevCount++;			
-		}	
+			nDevCount++;
+		}
 	}
-	
+
 	if (nDevCount > 0)
-	{	
+	{
 		// get the names of all of the devices
 		ppszDevices = (LPTSTR *) alloca(nDevCount * sizeof(*ppszDevices));
 		i = 0;

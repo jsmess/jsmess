@@ -4,11 +4,11 @@
 
     NVRAM works only if the calculator is turned off (2nd + ON) before closing of MESS
 
-	TODO:
-	 -Link
-	 -HW 3 I/O port
-	 -RTC
-	 -LCD contrast
+    TODO:
+     -Link
+     -HW 3 I/O port
+     -RTC
+     -LCD contrast
 ****************************************************************************/
 
 #include "emu.h"

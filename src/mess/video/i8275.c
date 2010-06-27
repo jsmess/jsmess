@@ -507,7 +507,7 @@ static DEVICE_START( i8275 )
 	/* get the screen device */
 	i8275->screen = device->machine->device<screen_device>(i8275->intf->screen_tag);
 
-	
+
 	assert(i8275->screen != NULL);
 
 	/* resolve callbacks */

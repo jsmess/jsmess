@@ -120,7 +120,7 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 				tapeflags |= MENU_FLAG_LEFT_ARROW;
 			if (t0 < t1)
 				tapeflags |= MENU_FLAG_RIGHT_ARROW;
-		}				
+		}
 
 		/* name of tape */
 		ui_menu_item_append(menu, menustate->device->image_config().name(), menustate->device->filename(), flags, TAPECMD_SELECT);
@@ -183,7 +183,7 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 		int index = menustate->index;
 		device_image_interface *device = NULL;
 		for (bool gotone = machine->devicelist.first(device); gotone; gotone = device->next(device))
-		{		
+		{
 			if(device->device().type() == CASSETTE) {
 				if (index==0) break;
 				index--;

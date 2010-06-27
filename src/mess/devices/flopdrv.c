@@ -511,7 +511,7 @@ void floppy_drive_read_sector_data(running_device *img, int side, int index1, vo
 {
 	floppy_drive *flopimg;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
-	
+
 	if (image->exists())
 	{
 		flopimg = get_safe_token( img );

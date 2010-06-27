@@ -162,7 +162,7 @@ static PALETTE_INIT( osborne1 )
 static const z80_daisy_config osborne1_daisy_chain[] =
 {
 /*  { osborne1_z80_reset, osborne1_z80_irq_state, osborne1_z80_irq_ack, osborne1_z80_irq_reti, 0 }, */
-//	{ "osborne1_daisy" },
+//  { "osborne1_daisy" },
 	{ NULL }
 };
 
@@ -246,7 +246,7 @@ static MACHINE_DRIVER_START( osborne1 )
 
 	MDRV_MACHINE_RESET( osborne1 )
 
-	//MDRV_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY, 0 )	
+	//MDRV_DEVICE_ADD( "osborne1_daisy", OSBORNE1_DAISY, 0 )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_INDEXED16 )

@@ -187,113 +187,113 @@ static READ8_HANDLER( einstein_80col_state_r )
 
 //static int einstein_keyboard_daisy_irq_state(running_device *device)
 //{
-//	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
+//  einstein_state *einstein = (einstein_state *)device->machine->driver_data;
 //
-//	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_KEY_INT)
-//		return Z80_DAISY_INT;
+//  if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_KEY_INT)
+//      return Z80_DAISY_INT;
 //
-//	return 0;
+//  return 0;
 //}
 //
 //static int einstein_keyboard_daisy_irq_ack(running_device *device)
 //{
-//	return 0xf7;
+//  return 0xf7;
 //}
 
 //static DEVICE_GET_INFO( einstein_keyboard_daisy )
 //{
-//	switch (state)
-//	{
-//		/* --- the following bits of info are returned as 64-bit signed integers --- */
-//		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
-//		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+//  switch (state)
+//  {
+//      /* --- the following bits of info are returned as 64-bit signed integers --- */
+//      case DEVINFO_INT_TOKEN_BYTES:                   info->i = 4;                                            break;
+//      case DEVINFO_INT_INLINE_CONFIG_BYTES:           info->i = 0;                                            break;
 //
-//		/* --- the following bits of info are returned as pointers to data or functions --- */
-//		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(einstein_daisy);		break;
-//		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)einstein_keyboard_daisy_irq_state;	break;
-//		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)einstein_keyboard_daisy_irq_ack;		break;
+//      /* --- the following bits of info are returned as pointers to data or functions --- */
+//      case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME(einstein_daisy);        break;
+//      case DEVINFO_FCT_IRQ_STATE:                     info->f = (genf *)einstein_keyboard_daisy_irq_state;    break;
+//      case DEVINFO_FCT_IRQ_ACK:                       info->f = (genf *)einstein_keyboard_daisy_irq_ack;      break;
 //
-//		/* --- the following bits of info are returned as NULL-terminated strings --- */
-//		case DEVINFO_STR_NAME:							strcpy(info->s, "Einstein keyboard daisy chain");		break;
-//		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Einstein daisy chain");				break;
-//		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
-//		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
-//		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
-//	}
+//      /* --- the following bits of info are returned as NULL-terminated strings --- */
+//      case DEVINFO_STR_NAME:                          strcpy(info->s, "Einstein keyboard daisy chain");       break;
+//      case DEVINFO_STR_FAMILY:                        strcpy(info->s, "Einstein daisy chain");                break;
+//      case DEVINFO_STR_VERSION:                       strcpy(info->s, "1.0");                                 break;
+//      case DEVINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                              break;
+//      case DEVINFO_STR_CREDITS:                       strcpy(info->s, "Copyright the MESS Team");             break;
+//  }
 //}
 
 //static int einstein_adc_daisy_irq_state(running_device *device)
 //{
-//	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
+//  einstein_state *einstein = (einstein_state *)device->machine->driver_data;
 //
-//	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_ADC_INT)
-//		return Z80_DAISY_INT;
+//  if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_ADC_INT)
+//      return Z80_DAISY_INT;
 //
-//	return 0;
+//  return 0;
 //}
 //
 //static int einstein_adc_daisy_irq_ack(running_device *device)
 //{
-//	return 0xfb;
+//  return 0xfb;
 //}
 
 //static DEVICE_GET_INFO( einstein_adc_daisy )
 //{
-//	switch (state)
-//	{
-//		/* --- the following bits of info are returned as 64-bit signed integers --- */
-//		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
-//		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+//  switch (state)
+//  {
+//      /* --- the following bits of info are returned as 64-bit signed integers --- */
+//      case DEVINFO_INT_TOKEN_BYTES:                   info->i = 4;                                            break;
+//      case DEVINFO_INT_INLINE_CONFIG_BYTES:           info->i = 0;                                            break;
 //
-//		/* --- the following bits of info are returned as pointers to data or functions --- */
-//		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(einstein_daisy);		break;
-//		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)einstein_adc_daisy_irq_state;	break;
-//		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)einstein_adc_daisy_irq_ack;		break;
+//      /* --- the following bits of info are returned as pointers to data or functions --- */
+//      case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME(einstein_daisy);        break;
+//      case DEVINFO_FCT_IRQ_STATE:                     info->f = (genf *)einstein_adc_daisy_irq_state; break;
+//      case DEVINFO_FCT_IRQ_ACK:                       info->f = (genf *)einstein_adc_daisy_irq_ack;       break;
 //
-//		/* --- the following bits of info are returned as NULL-terminated strings --- */
-//		case DEVINFO_STR_NAME:							strcpy(info->s, "Einstein ADC daisy chain");			break;
-//		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Einstein daisy chain");				break;
-//		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
-//		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
-//		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
-//	}
+//      /* --- the following bits of info are returned as NULL-terminated strings --- */
+//      case DEVINFO_STR_NAME:                          strcpy(info->s, "Einstein ADC daisy chain");            break;
+//      case DEVINFO_STR_FAMILY:                        strcpy(info->s, "Einstein daisy chain");                break;
+//      case DEVINFO_STR_VERSION:                       strcpy(info->s, "1.0");                                 break;
+//      case DEVINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                              break;
+//      case DEVINFO_STR_CREDITS:                       strcpy(info->s, "Copyright the MESS Team");             break;
+//  }
 //}
 
 //static int einstein_fire_daisy_irq_state(running_device *device)
 //{
-//	einstein_state *einstein = (einstein_state *)device->machine->driver_data;
+//  einstein_state *einstein = (einstein_state *)device->machine->driver_data;
 //
-//	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_FIRE_INT)
-//		return Z80_DAISY_INT;
+//  if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_FIRE_INT)
+//      return Z80_DAISY_INT;
 //
-//	return 0;
+//  return 0;
 //}
 //
 //static int einstein_fire_daisy_irq_ack(running_device *device)
 //{
-//	return 0xfd;
+//  return 0xfd;
 //}
 
 //static DEVICE_GET_INFO( einstein_fire_daisy )
 //{
-//	switch (state)
-//	{
-//		/* --- the following bits of info are returned as 64-bit signed integers --- */
-//		case DEVINFO_INT_TOKEN_BYTES:					info->i = 4;											break;
-//		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;											break;
+//  switch (state)
+//  {
+//      /* --- the following bits of info are returned as 64-bit signed integers --- */
+//      case DEVINFO_INT_TOKEN_BYTES:                   info->i = 4;                                            break;
+//      case DEVINFO_INT_INLINE_CONFIG_BYTES:           info->i = 0;                                            break;
 //
-//		/* --- the following bits of info are returned as pointers to data or functions --- */
-//		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(einstein_daisy);		break;
-//		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)einstein_fire_daisy_irq_state;		break;
-//		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)einstein_fire_daisy_irq_ack;			break;
+//      /* --- the following bits of info are returned as pointers to data or functions --- */
+//      case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME(einstein_daisy);        break;
+//      case DEVINFO_FCT_IRQ_STATE:                     info->f = (genf *)einstein_fire_daisy_irq_state;        break;
+//      case DEVINFO_FCT_IRQ_ACK:                       info->f = (genf *)einstein_fire_daisy_irq_ack;          break;
 //
-//		/* --- the following bits of info are returned as NULL-terminated strings --- */
-//		case DEVINFO_STR_NAME:							strcpy(info->s, "Einstein fire button daisy chain");		break;
-//		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Einstein daisy chain");				break;
-//		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");									break;
-//		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);								break;
-//		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright the MESS Team");				break;
-//	}
+//      /* --- the following bits of info are returned as NULL-terminated strings --- */
+//      case DEVINFO_STR_NAME:                          strcpy(info->s, "Einstein fire button daisy chain");        break;
+//      case DEVINFO_STR_FAMILY:                        strcpy(info->s, "Einstein daisy chain");                break;
+//      case DEVINFO_STR_VERSION:                       strcpy(info->s, "1.0");                                 break;
+//      case DEVINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                              break;
+//      case DEVINFO_STR_CREDITS:                       strcpy(info->s, "Copyright the MESS Team");             break;
+//  }
 //}
 
 /* int priority */

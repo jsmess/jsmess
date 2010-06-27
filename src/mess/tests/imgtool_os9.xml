@@ -49,7 +49,7 @@
 	</checkdirectory>
 	<checkfile name="FOO.TXT">'Party'</checkfile>
 	<checkfile name="BAR.TXT">'Lame'</checkfile>
-	
+
 	<deletefile name="BAR.TXT"/>
 	<checkdirectory>
 		<entry name="FOO.TXT" size="5"/>
@@ -134,7 +134,7 @@
 	<!-- Testing directories -->
 	<createimage driver="coco_jvc_os9"/>
 	<recordfreespace/>
-	
+
 	<createdirectory path="FOO"/>
 	<putfile name="/FOO/BAR.TXT">'Party'</putfile>
 
@@ -237,7 +237,7 @@
 	<!-- Testing many more files in a subdirectory -->
 	<createimage driver="coco_jvc_os9"/>
 	<createdirectory path="FOO"/>
-	
+
 	<putfile name="/FOO/1.TXT">'Alpha'</putfile>
 	<putfile name="/FOO/2.TXT">'Bravo'</putfile>
 	<putfile name="/FOO/3.TXT">'Charlie'</putfile>
