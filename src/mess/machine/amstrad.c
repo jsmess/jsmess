@@ -3459,11 +3459,11 @@ SNAPSHOT_LOAD(amstrad)
 
 	/* get file size */
 	if (snapshot_size < 8)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	snapshot = (UINT8 *)malloc(snapshot_size);
 	if (!snapshot)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	/* read whole file */
 	image.fread(snapshot, snapshot_size);
@@ -3471,12 +3471,12 @@ SNAPSHOT_LOAD(amstrad)
 	if (memcmp(snapshot, "MV - SNA", 8))
 	{
 		free(snapshot);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	amstrad_handle_snapshot(image.device().machine, snapshot);
 	free(snapshot);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 
@@ -3507,7 +3507,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 		{
 			logerror("IMG: failed to read from cart image\n");
 			auto_free(image.device().machine, temp_copy);
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -3536,7 +3536,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 			{
 				logerror("BIN: block %i loaded is smaller than 16kB in size\n", offset / 0x4000);
 				auto_free(image.device().machine, temp_copy);
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 			}
 			offset += 0x4000;
 		}
@@ -3548,7 +3548,7 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 		{
 			logerror("CPR: not an Amstrad CPC cartridge image\n");
 			auto_free(image.device().machine, temp_copy);
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		bytes_to_read = header[4] + (header[5] << 8) + (header[6] << 16)+ (header[7] << 24);
@@ -3606,22 +3606,22 @@ DEVICE_IMAGE_LOAD(amstrad_plus_cartridge)
 	{
 		logerror("Gamelist cart in RIFF format\n");
 		auto_free(image.device().machine, temp_copy);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	auto_free(image.device().machine, temp_copy);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 
 #if 0
 static DEVICE_IMAGE_LOAD( aleste )
 {
-    if (device_load_basicdsk_floppy(image)==INIT_PASS)
+    if (device_load_basicdsk_floppy(image)==IMAGE_INIT_PASS)
     {
         basicdsk_set_geometry(image, 80, 2, 9, 512, 0x01, 0, FALSE);
-        return INIT_PASS;
+        return IMAGE_INIT_PASS;
     }
-    return INIT_FAIL;
+    return IMAGE_INIT_FAIL;
 }
 #endif

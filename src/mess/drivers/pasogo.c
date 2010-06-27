@@ -515,7 +515,7 @@ static DEVICE_IMAGE_LOAD( pasogo_cart )
 		if (image.fread( user, size) != size)
 		{
 			logerror("%s load error\n", image.filename());
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -524,7 +524,7 @@ static DEVICE_IMAGE_LOAD( pasogo_cart )
 		memcpy(user, image.get_software_region("rom"), size);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( pasogo )

@@ -655,7 +655,7 @@ static DEVICE_IMAGE_LOAD( kermit )
 	LOG(( "kermit: image load\n" ));
 	state->image = &image;
 	kermit_reset( state );
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_CREATE( kermit )
@@ -664,7 +664,7 @@ static DEVICE_IMAGE_CREATE( kermit )
 	LOG(( "kermit: image create\n" ));
 	state->image = &image;
 	kermit_reset( state );
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( kermit )

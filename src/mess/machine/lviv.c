@@ -333,7 +333,7 @@ SNAPSHOT_LOAD( lviv )
 	if (!lviv_snapshot_data)
 	{
 		logerror ("Unable to load snapshot file\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	image.fread( lviv_snapshot_data, LVIV_SNAPSHOT_SIZE);
@@ -341,7 +341,7 @@ SNAPSHOT_LOAD( lviv )
 	if( lviv_verify_snapshot(lviv_snapshot_data, snapshot_size) == IMAGE_VERIFY_FAIL)
 	{
 		free(lviv_snapshot_data);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	lviv_setup_snapshot (image.device().machine,lviv_snapshot_data);
@@ -351,6 +351,6 @@ SNAPSHOT_LOAD( lviv )
 	free(lviv_snapshot_data);
 
 	logerror("Snapshot file loaded\n");
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 

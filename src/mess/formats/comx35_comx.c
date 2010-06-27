@@ -55,14 +55,14 @@ QUICKLOAD_LOAD( comx35_comx )
 
 	if (size > messram_get_size(devtag_get_device(image.device().machine, "messram")))
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	image.fread( header, 5);
 
 	if (header[1] != 'C' || header[2] != 'O' || header[3] != 'M' || header[4] != 'X' )
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	switch (header[0])
@@ -189,5 +189,5 @@ QUICKLOAD_LOAD( comx35_comx )
 		break;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }

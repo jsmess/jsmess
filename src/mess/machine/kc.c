@@ -105,7 +105,7 @@ QUICKLOAD_LOAD(kc)
 	int i;
 
 	if (!kc_load(image, &data))
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	header = (struct kcc_header *) data;
 	datasize = (header->length_l & 0x0ff) | ((header->length_h & 0x0ff)<<8);
@@ -114,7 +114,7 @@ QUICKLOAD_LOAD(kc)
 
 	for (i=0; i<datasize; i++)
 		messram_get_ptr(devtag_get_device(image.device().machine, "messram"))[(addr+i) & 0x0ffff] = data[i+128];
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

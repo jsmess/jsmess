@@ -315,7 +315,7 @@ static DEVICE_IMAGE_LOAD( xmodem )
 	LOG(( "xmodem: image load\n" ));
 	state->image = &image;
 	xmodem_make_idle( state );
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_CREATE( xmodem )
@@ -324,7 +324,7 @@ static DEVICE_IMAGE_CREATE( xmodem )
 	LOG(( "xmodem: image create\n" ));
 	state->image = &image;
 	xmodem_make_idle( state );
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( xmodem )

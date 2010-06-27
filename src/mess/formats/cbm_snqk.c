@@ -68,12 +68,12 @@ static int general_cbm_loadsnap( device_image_interface &image, const char *file
 
 	cbm_sethiaddress(image.device().machine, address + snapshot_size);
 	free(data);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 
 error:
 	if (data)
 		free(data);
-	return INIT_FAIL;
+	return IMAGE_INIT_FAIL;
 }
 
 static void cbm_quick_sethiaddress( running_machine *machine, UINT16 hiaddress )

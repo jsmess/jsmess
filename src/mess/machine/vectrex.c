@@ -84,7 +84,7 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 	if (vectrex_verify_cart((char*)mem) == IMAGE_VERIFY_FAIL)
 	{
 		logerror("Invalid image!\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* If VIA T2 starts, reset refresh timer.
@@ -116,7 +116,7 @@ DEVICE_IMAGE_LOAD(vectrex_cart)
 		vectrex_reset_refresh = 0;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

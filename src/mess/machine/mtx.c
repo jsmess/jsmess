@@ -390,7 +390,7 @@ SNAPSHOT_LOAD( mtx )
 		image.fread( ptr, snapshot_size - 599 - 4);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /***************************************************************************

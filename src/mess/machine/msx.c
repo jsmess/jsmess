@@ -103,14 +103,14 @@ DEVICE_IMAGE_LOAD (msx_cart)
 
 	if( id == -1 ) {
 		//logerror ("error: invalid cart tag '%s'\n", image->tag);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	size = image.length ();
 	if (size < 0x2000) {
 		logerror ("cart #%d: error: file is smaller than 2kb, too small "
 				  "to be true!\n", id);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* allocate memory and load */
@@ -122,7 +122,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	if (!mem) {
 		logerror ("cart #%d: error: failed to allocate memory for cartridge\n",
 						id);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	if (size < size_aligned) {
 		memset (mem, 0xff, size_aligned);
@@ -130,7 +130,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	if (image.fread(mem, size) != size) {
 		logerror ("cart #%d: %s: can't read full %d bytes\n",
 						id, image.filename (), size);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* see if msx.crc will tell us more */
@@ -169,7 +169,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 		mem = (UINT8*)image.image_realloc(mem, 0x10000);
 		if (!mem) {
 			logerror ("cart #%d: error: cannot allocate memory\n", id);
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		if (size < 0x10000) {
@@ -245,7 +245,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	{
 		logerror ("cart #%d: error: cannot allocate memory for "
 				  "cartridge state\n", id);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	memset (state, 0, sizeof (slot_state));
 
@@ -264,7 +264,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	}
 
 	if (msx_slot_list[type].init (image.device().machine, state, 0, mem, size_aligned)) {
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	if (msx_slot_list[type].loadsram) {
 		msx_slot_list[type].loadsram (state);
@@ -273,7 +273,7 @@ DEVICE_IMAGE_LOAD (msx_cart)
 	msx1.cart_state[id] = cart_state[id] = state;
 	msx_memory_set_carts ();
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD (msx_cart)

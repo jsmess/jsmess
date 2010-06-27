@@ -1395,7 +1395,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 				if (image.fread( ROMMap[ii], 0x10000) != 0x10000)
 				{
 					logerror("Error while reading loading rom!\n");
-					return INIT_FAIL;
+					return IMAGE_INIT_FAIL;
 				}
 			}
 			else
@@ -1404,7 +1404,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 		else
 		{
 			logerror("Memory allocation failed reading rom!\n");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 
@@ -1452,7 +1452,7 @@ DEVICE_IMAGE_LOAD(wswan_cart)
 	}
 
 	/* All done */
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static TIMER_CALLBACK(wswan_scanline_interrupt)

@@ -203,12 +203,12 @@ SNAPSHOT_LOAD(spectrum)
 
     free(snapshot_data);
 
-    return INIT_PASS;
+    return IMAGE_INIT_PASS;
 
 error:
     if (snapshot_data)
         free(snapshot_data);
-    return INIT_FAIL;
+    return IMAGE_INIT_FAIL;
 }
 
 /*******************************************************************
@@ -2467,12 +2467,12 @@ QUICKLOAD_LOAD(spectrum)
 
     free(quickload_data);
 
-    return INIT_PASS;
+    return IMAGE_INIT_PASS;
 
 error:
     if (quickload_data)
         free(quickload_data);
-    return INIT_FAIL;
+    return IMAGE_INIT_FAIL;
 }
 
 /*******************************************************************

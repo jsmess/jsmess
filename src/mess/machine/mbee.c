@@ -229,7 +229,7 @@ QUICKLOAD_LOAD( mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 			}
 
 			if ((j < mbee_size) || (j > 0xefff))
@@ -237,7 +237,7 @@ QUICKLOAD_LOAD( mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 			}
 		}
 
@@ -259,7 +259,7 @@ QUICKLOAD_LOAD( mbee )
 			if (image.fread(&data, 1) != 1)
 			{
 				image.message("Unexpected EOF");
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 			}
 
 			if ((j < mbee_size) || (j > 0xefff))
@@ -267,12 +267,12 @@ QUICKLOAD_LOAD( mbee )
 			else
 			{
 				image.message("Not enough memory in this microbee");
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 			}
 		}
 
 		if (sw) cpu_set_reg(cpu, STATE_GENPC, 0x100);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }

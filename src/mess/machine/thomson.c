@@ -412,13 +412,13 @@ static DEVICE_START( thom_serial_modem )
 
 static DEVICE_IMAGE_LOAD( thom_serial )
 {
-	if ( device_load_serial( image ) != INIT_PASS )
+	if ( device_load_serial( image ) != IMAGE_INIT_PASS )
 	{
 		logerror( "thom_serial_load: could not load serial image in device\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_GET_INFO( thom_serial_cc90323 )
@@ -499,13 +499,13 @@ DEVICE_IMAGE_LOAD( to7_cartridge )
 	else
 	{
 		logerror( "to7_cartridge_load: invalid cartridge size %i\n", size );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if ( image.fread( pos, size ) != size )
 	{
 		logerror( "to7_cartridge_load: read error\n" );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* extract name */
@@ -523,7 +523,7 @@ DEVICE_IMAGE_LOAD( to7_cartridge )
 
 	PRINT (( "to7_cartridge_load: cartridge \"%s\" banks=%i, size=%i\n", name, thom_cart_nb_banks, size ));
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 
@@ -2031,13 +2031,13 @@ DEVICE_IMAGE_LOAD( mo5_cartridge )
 	else
 	{
 		logerror( "mo5_cartridge_load: invalid cartridge size %u\n", (unsigned) size );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if ( image.fread(pos, size ) != size )
 	{
 		logerror( "mo5_cartridge_load: read error\n" );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* extract name */
@@ -2055,7 +2055,7 @@ DEVICE_IMAGE_LOAD( mo5_cartridge )
 
 	PRINT (( "mo5_cartridge_load: cartridge \"%s\" banks=%i, size=%u\n", name, thom_cart_nb_banks, (unsigned) size ));
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

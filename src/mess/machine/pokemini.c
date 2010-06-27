@@ -1409,14 +1409,14 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 		if (size <= 0x2100)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too small");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		/* Verify that the image is not too big */
 		if (size > 0x1FFFFF)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too big");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		/* Skip the first 0x2100 bytes */
@@ -1426,7 +1426,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 		if (size != image.fread( memory_region(image.device().machine, "maincpu") + 0x2100, size))
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error occured while reading ROM image");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -1436,7 +1436,7 @@ DEVICE_IMAGE_LOAD( pokemini_cart )
 		memcpy(memory_region(image.device().machine, "maincpu") + 0x2100, cart_rom + 0x2100, cart_rom_size - 0x2100);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

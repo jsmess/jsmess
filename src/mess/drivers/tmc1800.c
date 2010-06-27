@@ -999,12 +999,12 @@ static QUICKLOAD_LOAD( tmc1800 )
 
 	if (size > messram_get_size(devtag_get_device(image.device().machine, "messram")))
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	image.fread( ptr, size);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /* Driver Initialization */

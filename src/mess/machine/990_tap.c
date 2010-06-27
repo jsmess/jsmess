@@ -162,7 +162,7 @@ DEVICE_IMAGE_LOAD( ti990_tape )
 
 	t->bot = 1;
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*

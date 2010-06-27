@@ -471,14 +471,14 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
 			auto_free(image.device().machine, temp_copy);
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		if (image.fread( temp_copy, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
 			auto_free(image.device().machine, temp_copy);
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -496,7 +496,7 @@ static DEVICE_IMAGE_LOAD( svision_cart )
 
 	auto_free(image.device().machine, temp_copy);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_RESET( svision )

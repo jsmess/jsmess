@@ -535,7 +535,7 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 		/* Does cart contain any data? */
 		cbmb_cbm_cart[0].chip = (UINT8*) image.image_malloc(size);
 		if (!cbmb_cbm_cart[0].chip)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 
 		/* Store data, address & size */
 		cbmb_cbm_cart[0].addr = address;
@@ -543,7 +543,7 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 		test = image.fread(cbmb_cbm_cart[0].chip, cbmb_cbm_cart[0].size);
 
 		if (test != cbmb_cbm_cart[0].size)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 	}
 
 	/* Finally load the cart */
@@ -552,7 +552,7 @@ static DEVICE_IMAGE_LOAD(cbmb_cart)
 //      memcpy(cbmb_memory + cbmb_cbm_cart[i].addr + 0xf0000, cbmb_cbm_cart[i].chip, cbmb_cbm_cart[i].size);
 	memcpy(cbmb_memory + cbmb_cbm_cart[0].addr + 0xf0000, cbmb_cbm_cart[0].chip, cbmb_cbm_cart[0].size);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

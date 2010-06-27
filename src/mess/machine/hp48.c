@@ -1048,7 +1048,7 @@ static DEVICE_IMAGE_LOAD( hp48_port )
 	if ( (size < 32*1024) || (size > conf->max_size) || (size & (size-1)) )
 	{
 		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", conf->name, 32*1024, conf->max_size );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	hp48_port_size[conf->port] = size;
@@ -1056,7 +1056,7 @@ static DEVICE_IMAGE_LOAD( hp48_port )
 	hp48_fill_port( image );
 	image.fread(hp48_port_data[conf->port], hp48_port_size[conf->port] );
 	hp48_decode_nibble( hp48_port_data[conf->port], hp48_port_data[conf->port], hp48_port_size[conf->port] );
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_CREATE( hp48_port )
@@ -1070,13 +1070,13 @@ static DEVICE_IMAGE_CREATE( hp48_port )
 	if ( (size < 32*1024) || (size > conf->max_size) || (size & (size-1)) )
 	{
 		logerror( "hp48: image size for %s should be a power of two between %i and %i\n", conf->name, 32*1024, conf->max_size );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	hp48_port_size[conf->port] = size;
 	hp48_port_write[conf->port] = 1;
 	hp48_fill_port( image );
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( hp48_port )

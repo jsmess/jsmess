@@ -1963,11 +1963,11 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 		if (!mame_stricmp (filetype, "lnx"))
 		{
 			if (image.fread( header, 0x40) != 0x40)
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 
 			/* Check the image */
 			if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 
 			/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
             it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
@@ -1993,7 +1993,7 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 		}
 
 		if (image.fread( rom, size) != size)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 
 		lynx_crc_keyword(image);
 	}
@@ -2007,7 +2007,7 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 
 		/* Check the image */
 		if (lynx_verify_cart((char*)header, LYNX_CART) == IMAGE_VERIFY_FAIL)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 
 		/* 2008-10 FP: According to Handy source these should be page_size_bank0. Are we using
          it correctly in MESS? Moreover, the next two values should be page_size_bank1. We should
@@ -2021,7 +2021,7 @@ static DEVICE_IMAGE_LOAD( lynx_cart )
 		memcpy(rom, image.get_software_region("rom") + 0x40, size);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 MACHINE_DRIVER_START(lynx_cartslot)

@@ -846,7 +846,7 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 	if( image.fread(cart, size ) != size )
 	{
 		image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	memcpy(state->cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
@@ -862,7 +862,7 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 	{
 		state->centered_coordinates = 0;
 	}
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( vsmile_cart )
@@ -874,12 +874,12 @@ static DEVICE_IMAGE_LOAD( vsmile_cart )
 	if( image.fread( cart, size ) != size )
 	{
 		image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	memcpy(state->cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_START( vii )

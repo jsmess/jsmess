@@ -56,7 +56,7 @@ static DEVICE_IMAGE_LOAD( printer )
 		conf->online(image, TRUE);
 
 	/* we don't need to do anything special */
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

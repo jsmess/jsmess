@@ -1127,13 +1127,13 @@ static DEVICE_IMAGE_LOAD( supracan_cart )
 		if (size > 0x400000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		if (image.fread( cart, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -1142,7 +1142,7 @@ static DEVICE_IMAGE_LOAD( supracan_cart )
 		memcpy(cart, image.get_software_region("rom"), size);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

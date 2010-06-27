@@ -563,10 +563,10 @@ static DEVICE_IMAGE_LOAD( czz50_cart )
 
 	if (image.fread( ptr, size ) != size)
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /* Machine Drivers */

@@ -159,7 +159,7 @@ static DEVICE_IMAGE_LOAD( snapquick )
 		attotime_make(config->delay_seconds, config->delay_attoseconds),
 		0);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

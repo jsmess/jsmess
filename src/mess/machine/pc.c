@@ -1414,25 +1414,25 @@ DEVICE_IMAGE_LOAD( pcjr_cartridge )
 			break;
 		default:
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid rom file size" );
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		/* Read and verify the header */
 		if ( 512 != image.fread( header, 512 ) )
 		{
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read header" );
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		/* Read the cartridge contents */
 		if ( ( size - 0x200 ) != image.fread(memory_region(image.device().machine, "maincpu") + address, size - 0x200 ) )
 		{
 			image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unable to read cartridge contents" );
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

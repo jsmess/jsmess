@@ -94,7 +94,7 @@ static DEVICE_IMAGE_LOAD( ti99_4_pio )
 	else
 		pio->pio_handshakein = 1;
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*
@@ -149,7 +149,7 @@ static DEVICE_IMAGE_LOAD( ti99_4_rs232 )
 		tms9902_set_dsr(tms9902, 0);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*

@@ -80,7 +80,7 @@ static DEVICE_IMAGE_LOAD( apexc_cylinder )
 	}
 #endif
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*

@@ -263,7 +263,7 @@ static int assemble_std(running_machine *machine, running_device *image)
 //  printf("assemble_std, %s\n", image->tag);
 	/*cart = */assemble_common(machine, image);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*
@@ -304,7 +304,7 @@ static int disassemble_std(running_device *image)
 
 //  clear_slot(cartsys, slotnumber);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*****************************************************************************
@@ -553,7 +553,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 		// handle possible protection
 		install_protection(image);
 		
-		return INIT_PASS;
+		return IMAGE_INIT_PASS;
 	}
 
 	if (pcbdev == NULL)

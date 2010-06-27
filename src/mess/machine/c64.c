@@ -1044,7 +1044,7 @@ static int c64_common_cart_load( device_image_interface &image )
 		;
 
 		if (i >= ARRAY_LENGTH(c64_cbm_cart))
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 
 		/* Start to parse the .crt header */
 		/* 0x16-0x17 is Hardware type */
@@ -1142,7 +1142,7 @@ static int c64_common_cart_load( device_image_interface &image )
 			/* Does CHIP contain any data? */
 			c64_cbm_cart[i].chip = (UINT8*) image.image_malloc(chip_data_size);
 			if (!c64_cbm_cart[i].chip)
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 
 			/* Store data, address & size of the CHIP block */
 			c64_cbm_cart[i].addr = address;
@@ -1156,7 +1156,7 @@ static int c64_common_cart_load( device_image_interface &image )
 			new_start += c64_cbm_cart[i].size;
 
 			if (test != chip_data_size)
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 
 			/* Advance to the next CHIP block */
 			i++;
@@ -1180,7 +1180,7 @@ static int c64_common_cart_load( device_image_interface &image )
 		/* Does cart contain any data? */
 		c64_cbm_cart[0].chip = (UINT8*) image.image_malloc(size);
 		if (!c64_cbm_cart[0].chip)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 
 		/* Store data, address & size */
 		c64_cbm_cart[0].addr = address;
@@ -1193,7 +1193,7 @@ static int c64_common_cart_load( device_image_interface &image )
 		new_start += c64_cbm_cart[0].size;
 
 		if (test != c64_cbm_cart[0].size)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 	}
 
 	n_banks = i;
@@ -1229,7 +1229,7 @@ static int c64_common_cart_load( device_image_interface &image )
 
 	c64_cart_n_banks = n_banks; // this is needed so that we only set mappers if a cart is present!
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( c64_cart )
@@ -1239,7 +1239,7 @@ static DEVICE_IMAGE_LOAD( c64_cart )
 
 static DEVICE_IMAGE_LOAD( max_cart )
 {
-	int result = INIT_PASS;
+	int result = IMAGE_INIT_PASS;
 
 	if (image.software_entry() == NULL)
 	{

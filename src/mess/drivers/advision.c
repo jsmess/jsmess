@@ -72,13 +72,13 @@ static DEVICE_IMAGE_LOAD( advision_cart )
 		if (size > memory_region_length(image.device().machine, I8048_TAG))
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		if (image.fread( memory_region(image.device().machine, I8048_TAG), size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 	}
@@ -88,7 +88,7 @@ static DEVICE_IMAGE_LOAD( advision_cart )
 		memcpy(memory_region(image.device().machine, I8048_TAG), image.get_software_region("rom"), size);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /* Machine Driver */

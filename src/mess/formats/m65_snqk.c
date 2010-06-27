@@ -115,7 +115,7 @@ static int parse_intel_hex(UINT8 *snapshot_buff, char *src)
         logerror("parse_intel_hex: registers (?) at %04X\n", last_addr);
         memcpy(&snapshot_buff[8192+64], &snapshot_buff[last_addr], last_size);
     }
-    return INIT_PASS;
+    return IMAGE_INIT_PASS;
 }
 
 static int parse_zillion_hex(UINT8 *snapshot_buff, char *src)
@@ -198,7 +198,7 @@ static int parse_zillion_hex(UINT8 *snapshot_buff, char *src)
         }
         src++;
     }
-    return INIT_PASS;
+    return IMAGE_INIT_PASS;
 }
 
 static void microtan_set_cpu_regs(running_machine *machine,const UINT8 *snapshot_buff, int base)
@@ -323,13 +323,13 @@ SNAPSHOT_LOAD( microtan )
 
     snapshot_buff = (UINT8*)image.ptr();
     if (!snapshot_buff)
-        return INIT_FAIL;
+        return IMAGE_INIT_FAIL;
 
     if (microtan_verify_snapshot(snapshot_buff, snapshot_size)==IMAGE_VERIFY_FAIL)
-        return INIT_FAIL;
+        return IMAGE_INIT_FAIL;
 
     microtan_snapshot_copy(image.device().machine, snapshot_buff, snapshot_size);
-    return INIT_PASS;
+    return IMAGE_INIT_PASS;
 }
 
 QUICKLOAD_LOAD( microtan )
@@ -344,7 +344,7 @@ QUICKLOAD_LOAD( microtan )
     if (!snapshot_buff)
     {
         logerror("microtan_hexfile_load: could not allocate %d bytes of buffer\n", snapshot_size);
-        return INIT_FAIL;
+        return IMAGE_INIT_FAIL;
     }
     memset(snapshot_buff, 0, snapshot_size);
 
@@ -353,7 +353,7 @@ QUICKLOAD_LOAD( microtan )
     {
         free(snapshot_buff);
         logerror("microtan_hexfile_load: could not allocate %d bytes of buffer\n", quickload_size);
-        return INIT_FAIL;
+        return IMAGE_INIT_FAIL;
     }
     image.fread( buff, quickload_size);
 
@@ -363,7 +363,7 @@ QUICKLOAD_LOAD( microtan )
         rc = parse_intel_hex(snapshot_buff, buff);
     else
         rc = parse_zillion_hex(snapshot_buff, buff);
-    if (rc == INIT_PASS)
+    if (rc == IMAGE_INIT_PASS)
         microtan_snapshot_copy(image.device().machine, snapshot_buff, snapshot_size);
     free(snapshot_buff);
     return rc;

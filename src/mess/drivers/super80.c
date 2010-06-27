@@ -611,7 +611,7 @@ static DEVICE_IMAGE_LOAD( super80_cart )
 {
 	image.fread( memory_region(image.device().machine, "maincpu") + 0xc000, 0x3000);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static const mc6845_interface super80v_crtc = {

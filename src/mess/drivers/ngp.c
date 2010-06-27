@@ -663,13 +663,13 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 		if (filesize != 0x80000 && filesize != 0x100000 && filesize != 0x200000 && filesize != 0x400000)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		if (image.fread( memory_region(image.device().machine, "cart"), filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Error loading file");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -736,7 +736,7 @@ static DEVICE_IMAGE_LOAD( ngp_cart )
 	state->flash_chip[0].present = 1;
 	state->flash_chip[0].state = F_READ;
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

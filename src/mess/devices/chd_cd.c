@@ -83,14 +83,14 @@ static DEVICE_IMAGE_LOAD(cdrom)
 	if ( ! cdrom->cdrom_handle )
 		goto error;
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 
 error:
 	if ( chd )
 		chd_close( chd );
 	if ( err )
 		image.seterror( IMAGE_ERROR_UNSPECIFIED, chd_get_error_string( err ) );
-	return INIT_FAIL;
+	return IMAGE_INIT_FAIL;
 }
 
 

@@ -377,7 +377,7 @@ static DEVICE_IMAGE_LOAD( tm990_189_rs232 )
 	rs232_input_timer = timer_alloc(image.device().machine, rs232_input_callback, (void*)image);
 	timer_adjust_periodic(rs232_input_timer, attotime_zero, 0, ATTOTIME_IN_MSEC(10));
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*

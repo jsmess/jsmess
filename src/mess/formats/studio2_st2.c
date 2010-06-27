@@ -56,13 +56,13 @@ DEVICE_IMAGE_LOAD( st2_cartslot_load )
 
 	if (filesize <= ST2_BLOCK_SIZE) {
 		logerror("Error loading cartridge: Invalid ROM file: %s.\n", image.filename());
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* read ST2 header */
 	if (image.fread( &header, ST2_BLOCK_SIZE) != ST2_BLOCK_SIZE) {
 		logerror("Error loading cartridge: Unable to read header from file: %s.\n", image.filename());
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (LOG) logerror("ST2 Catalogue: %s\n", header.catalogue);
@@ -78,9 +78,9 @@ DEVICE_IMAGE_LOAD( st2_cartslot_load )
 
 		if (image.fread( ptr, ST2_BLOCK_SIZE) != ST2_BLOCK_SIZE) {
 			logerror("Error loading cartridge: Unable to read contents from file: %s.\n", image.filename());
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }

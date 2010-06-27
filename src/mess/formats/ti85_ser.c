@@ -1299,7 +1299,7 @@ static DEVICE_IMAGE_LOAD( ti85serial )
 	UINT8* file_data;
 	UINT16 file_size;
 
-	if (ti85serial->status != TI85_SEND_STOP) return INIT_FAIL;
+	if (ti85serial->status != TI85_SEND_STOP) return IMAGE_INIT_FAIL;
 
 	file_size = image.length();
 
@@ -1311,16 +1311,16 @@ static DEVICE_IMAGE_LOAD( ti85serial )
 		if(!ti85_convert_file_data_to_serial_stream(image, file_data, file_size, &ti85serial->stream))
 		{
 			ti85_free_serial_stream (&ti85serial->stream);
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		ti85serial->status = TI85_SEND_HEADER;
 	}
 	else
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

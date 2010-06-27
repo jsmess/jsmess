@@ -851,7 +851,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			if (size <= 0x20)
 			{
 				logerror("%s only contains the UNIF header and no data.\n", image.filename());
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 			}
 
 			do
@@ -1120,7 +1120,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		else
 		{
 			logerror("%s is NOT a file in either iNES or UNIF format.\n", image.filename());
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -1312,7 +1312,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		auto_free(image.device().machine, temp_nvram);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

@@ -879,7 +879,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			{
 				logerror("This image has been identified as ExHiROM, but it's too small!\n");
 				logerror("Please verify if it's corrupted. If it's not please report this as a bug.\n");
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 			}
 			/* Scaling down the counter */
 			read_blocks -= 64;
@@ -943,7 +943,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			{
 				printf("This is a Sufami Turbo data cart and cannot be loaded for snes/snespal in MESS.\n");
 				printf("Please use snesst driver to load it, instead.\n");
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 			}
 			else
 			{
@@ -977,7 +977,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 			{
 				printf("This is a BS-X flash cart and cannot be loaded in snes/snespal.\n");
 //				printf("Please use snesbsx driver to load it, instead.\n");
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 			}
 #endif
 			break;
@@ -1007,7 +1007,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 				{
 					logerror("This image has been identified as a SuperFX game, but it's too large!\n");
 					logerror("Please verify if it's corrupted. If it's not please report this as a bug.\n");
-					return INIT_FAIL;
+					return IMAGE_INIT_FAIL;
 				}
 			}
 			else
@@ -1065,7 +1065,7 @@ static DEVICE_IMAGE_LOAD( snes_cart )
 	snes_load_sram(machine);
 
 	/* All done */
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( sufami_cart )
@@ -1120,14 +1120,14 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 	{
 		printf("This is not a Sufami Turbo data pack.\n");
 		printf("This image cannot be loaded in snesst (Use snes or snespal drivers, instead).\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	
 	if (st_bios == 1)
 	{
 		printf("This is the Sufami Turbo BIOS and not a Sufami Turbo data pack.\n");
 		printf("This image cannot be loaded in snesst.\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* FIXME: Insert crc check here? */
@@ -1170,7 +1170,7 @@ static DEVICE_IMAGE_LOAD( sufami_cart )
 
 	auto_free(image.device().machine, ROM);
 	
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( bsx_cart )
@@ -1236,7 +1236,7 @@ static DEVICE_IMAGE_LOAD( bsx_cart )
 	{
 		printf("This is not a BS-X compatible cart.\n");
 		printf("This image cannot be loaded in the first cartslot of snesbsx.\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	
 
@@ -1272,7 +1272,7 @@ static DEVICE_IMAGE_LOAD( bsx_cart )
 		read_blocks += repeat_blocks;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( bsx2slot_cart )
@@ -1322,11 +1322,11 @@ static DEVICE_IMAGE_LOAD( bsx2slot_cart )
 	{
 		printf("This is not a BS-X flash cart.\n");
 		printf("This image cannot be loaded in the second cartslot of snesbsx.\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 		
 	// actually load the cart
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 MACHINE_DRIVER_START( snes_cartslot )

@@ -1252,7 +1252,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	if (!size)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid ROM image: ROM image is too small");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* Create a new memory region to hold the ROM. */
@@ -1267,7 +1267,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 		image.fseek(offset, SEEK_SET);
 
 		if (image.fread( sms_state.cartridge[index].ROM, size) != size)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 	}
 	else
 		memcpy(sms_state.cartridge[index].ROM, image.get_software_region("rom") + offset, size);
@@ -1357,7 +1357,7 @@ DEVICE_IMAGE_LOAD( sms_cart )
 	/* Load battery backed RAM, if available */
 	image.battery_load(sms_state.cartridge[index].cartSRAM, sizeof(UINT8) * NVRAM_SIZE, 0x00);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

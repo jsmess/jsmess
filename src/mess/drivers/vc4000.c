@@ -232,13 +232,13 @@ static DEVICE_IMAGE_LOAD( vc4000_cart )
 		if (image.software_entry() == NULL)
 		{
 			if (image.fread( memory_region(machine, "maincpu"), size) != size)
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 		}
 		else
 			memcpy(memory_region(machine, "maincpu"), image.get_software_region("rom"), size);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( vc4000 )
@@ -385,19 +385,19 @@ QUICKLOAD_LOAD(vc4000)
 	quick_length = image.length();
 	quick_data = (UINT8*)malloc(quick_length);
 	if (!quick_data)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	read_ = image.fread( quick_data, quick_length);
 	if (read_ != quick_length)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	if (quick_data[0] != 2)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	quick_addr = quick_data[1] * 256 + quick_data[2];
 
 	//if ((quick_addr + quick_length - 5) > 0x1000)
-	//  return INIT_FAIL;
+	//  return IMAGE_INIT_FAIL;
 
 	memory_write_byte(space, 0x08be, quick_data[3]);
 	memory_write_byte(space, 0x08bf, quick_data[4]);
@@ -408,7 +408,7 @@ QUICKLOAD_LOAD(vc4000)
 	}
 
 	logerror("quick loading at %.4x size:%.4x\n", quick_addr, (quick_length-5));
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

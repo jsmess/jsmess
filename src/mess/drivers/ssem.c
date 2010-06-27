@@ -602,7 +602,7 @@ static DEVICE_IMAGE_LOAD(ssem_store)
         }
     }
 
-    return INIT_PASS;
+    return IMAGE_INIT_PASS;
 }
 
 /****************************************************\

@@ -72,5 +72,5 @@ QUICKLOAD_LOAD( atom_atm )
 
 	cpu_set_reg(image.device().machine->firstcpu, STATE_GENPC, run_address);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }

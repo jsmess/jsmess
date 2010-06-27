@@ -357,12 +357,12 @@ static QUICKLOAD_LOAD( elf )
 
 	if (size > messram_get_size(devtag_get_device(image.device().machine, "messram")))
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	image.fread( messram_get_ptr(devtag_get_device(image.device().machine, "messram")), size);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /* System Drivers */

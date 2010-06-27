@@ -668,14 +668,14 @@ static int generic_pak_load(device_image_interface &image, int rambase_index, in
 	{
 		if (LOG_PAK)
 			logerror("Cannot load PAK files without at least 64k.\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (image.fread( &header, sizeof(header)) < sizeof(header))
 	{
 		if (LOG_PAK)
 			logerror("Could not fully read PAK.\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	paklength = header.length ? LITTLE_ENDIANIZE_INT16(header.length) : 0x10000;
@@ -685,7 +685,7 @@ static int generic_pak_load(device_image_interface &image, int rambase_index, in
 	{
 		if (LOG_PAK)
 			logerror("Could not fully read PAK.\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	trailerlen = image.fread( trailerraw, sizeof(trailerraw));
@@ -695,7 +695,7 @@ static int generic_pak_load(device_image_interface &image, int rambase_index, in
 		{
 			if (LOG_PAK)
 				logerror("Invalid or unknown PAK trailer.\n");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		trailer_load = 1;
@@ -705,7 +705,7 @@ static int generic_pak_load(device_image_interface &image, int rambase_index, in
 	{
 		if (LOG_PAK)
 			logerror("Unexpected error while reading PAK.\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* Now that we are done reading the trailer; we can cap the length */
@@ -726,13 +726,13 @@ static int generic_pak_load(device_image_interface &image, int rambase_index, in
 
 	/* Get the RAM portion */
 	if (load_pak_into_region(image, &pakstart, &paklength, rambase, 0x0000, 0xff00))
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	memcpy(pakbase, rambase + 0xC000, 0x3F00);
 
 	if (trailer_load)
 		pak_load_trailer(image.device().machine, &trailer);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 SNAPSHOT_LOAD ( coco_pak )
@@ -795,7 +795,7 @@ QUICKLOAD_LOAD ( coco )
 			position += block_length;
 		}
 	}
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /***************************************************************************
@@ -849,7 +849,7 @@ DEVICE_IMAGE_LOAD(coco_rom)
 		dest += romsize;
 		destlength -= romsize;
 	}
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD(coco_rom)

@@ -52,14 +52,14 @@ DEVICE_IMAGE_LOAD( timex_cart )
 //	if (file_size < 0x09)
 //	{
 //		logerror ("Bad file size\n");
-//		return INIT_FAIL;
+//		return IMAGE_INIT_FAIL;
 //	}
 //
 //	file_data = (UINT8 *)malloc(file_size);
 //	if (file_data == NULL)
 //	{
 //		logerror ("Memory allocating error\n");
-//		return INIT_FAIL;
+//		return IMAGE_INIT_FAIL;
 //	}
 //
 //	image_fread(image, file_data, file_size);
@@ -71,7 +71,7 @@ DEVICE_IMAGE_LOAD( timex_cart )
 //	{
 //		free (file_data);
 //		logerror ("File corrupted\n");
-//		return INIT_FAIL;
+//		return IMAGE_INIT_FAIL;
 //	}
 //
 //	switch (file_data[0x00])
@@ -83,7 +83,7 @@ DEVICE_IMAGE_LOAD( timex_cart )
 //				{
 //					free (file_data);
 //					logerror ("Memory allocate error\n");
-//					return INIT_FAIL;
+//					return IMAGE_INIT_FAIL;
 //				}
 //				chunks_in_file = 0;
 //				for (i=0; i<8; i++)
@@ -108,12 +108,12 @@ DEVICE_IMAGE_LOAD( timex_cart )
 //		default:	logerror ("Cart type not supported\n");
 //				free (file_data);
 //				timex_cart_type = TIMEX_CART_NONE;
-//				return INIT_FAIL;
+//				return IMAGE_INIT_FAIL;
 //	}
 //
 //	logerror ("Cart loaded\n");
 //	logerror ("Chunks %02x\n", timex_cart_chunks);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD( timex_cart )

@@ -249,7 +249,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 			d->format = format_mame;    /* don't care */
 			d->wp = 1;
 			d->unsafe = 1;
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		d->cylinders = get_UINT32BE(custom_header.cylinders);
@@ -264,7 +264,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 		d->hd_handle = NULL;
 		d->wp = 1;
 		d->unsafe = 1;
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* tell whether the image is writable */
@@ -274,7 +274,7 @@ static DEVICE_IMAGE_LOAD( ti990_hd )
 	/* set attention line */
 	hdc.w[0] |= (0x80 >> id);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*

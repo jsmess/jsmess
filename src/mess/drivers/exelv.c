@@ -107,7 +107,7 @@ static INTERRUPT_GEN( exelv_hblank_interrupt )
 #ifdef UNUSED_FUNCTION
 static DEVICE_IMAGE_LOAD(exelv_cart)
 {
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( exelv_cart )

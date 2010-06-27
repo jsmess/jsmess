@@ -781,7 +781,7 @@ static QUICKLOAD_LOAD( jaguar )
 	/* Transfer control to image */
 	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, quickload_begin);
 	jaguar_shared_ram[1]=quickload_begin;
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( jaguar )
@@ -820,7 +820,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 
 	/* Transfer control to the bios */
 	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, rom_base[1]);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*************************************

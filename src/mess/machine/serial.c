@@ -610,10 +610,10 @@ DEVICE_IMAGE_LOAD(serial)
 	if (serial_device_load_internal(image, &data, &data_length))
 	{
 		data_stream_init(&ser->transmit, data, data_length);
-		return INIT_PASS;
+		return IMAGE_INIT_PASS;
 	}
 
-	return INIT_FAIL;
+	return IMAGE_INIT_FAIL;
 }
 
 

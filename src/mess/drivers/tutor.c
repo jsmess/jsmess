@@ -260,7 +260,7 @@ static READ8_HANDLER(read_keyboard)
 static DEVICE_IMAGE_LOAD( tutor_cart )
 {
 	image.fread( memory_region(image.device().machine, "maincpu") + cartridge_base, 0x6000);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_UNLOAD( tutor_cart )

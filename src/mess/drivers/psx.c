@@ -420,16 +420,16 @@ static QUICKLOAD_LOAD( psx_exe_load )
 	if( exe_buffer == NULL )
 	{
 		logerror( "psx_exe_load: out of memory\n" );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	if( image.fread( exe_buffer, quickload_size ) != quickload_size )
 	{
 		free( exe_buffer );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	exe_size = quickload_size;
 	memory_set_direct_update_handler( space, psx_setopbase );
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /* PAD emulation */

@@ -188,7 +188,7 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 	if (size != 0x2000 && size != 0x4000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (image.software_entry() == NULL)
@@ -196,7 +196,7 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 		if (image.fread( cart, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -207,7 +207,7 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 	if (size == 0x2000)
 		memcpy(cart + 0x2000, cart, 0x2000);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

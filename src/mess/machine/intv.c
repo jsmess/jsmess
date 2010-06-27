@@ -342,7 +342,7 @@ static int intv_load_rom_file(device_image_interface &image)
 		image.fread( &temp, 1);			/* header */
 		if (temp != 0xa8)
 		{
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		image.fread( &num_segments, 1);
@@ -350,7 +350,7 @@ static int intv_load_rom_file(device_image_interface &image)
 		image.fread( &temp, 1);
 		if (temp != (num_segments ^ 0xff))
 		{
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		for (i = 0; i < num_segments; i++)
@@ -380,7 +380,7 @@ static int intv_load_rom_file(device_image_interface &image)
 		{
 			image.fread( &temp, 1);
 		}
-		return INIT_PASS;
+		return IMAGE_INIT_PASS;
 	}
 	/* otherwise, we load it as a .bin file, using extrainfo from intv.hsi in place of .cfg */
 	else
@@ -459,7 +459,7 @@ static int intv_load_rom_file(device_image_interface &image)
 			}
 		}
 
-		return INIT_PASS;
+		return IMAGE_INIT_PASS;
 	}
 }
 
@@ -572,6 +572,6 @@ DEVICE_IMAGE_LOAD( intvkbd_cart )
 		image.fread( &memory[0xe000], 0x2000);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 
 }

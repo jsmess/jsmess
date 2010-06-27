@@ -80,7 +80,7 @@ static int load_cartridge(device_image_interface *image, const rom_entry *romrgn
 		if (flags & ROM_FULLSIZE)
 		{
 			if (image->length() != length)
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 		}
 
 		/* read the ROM */
@@ -137,7 +137,7 @@ static int load_cartridge(device_image_interface *image, const rom_entry *romrgn
 		clear_val = (flags & ROM_FILL_FF) ? 0xFF : 0x00;
 		memset(ptr + pos, clear_val, length - pos);
 	}
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 
@@ -175,7 +175,7 @@ static int process_cartridge(device_image_interface *image, process_mode mode)
 		}
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 
@@ -293,11 +293,11 @@ static DEVICE_IMAGE_LOAD( cartslot )
 		
 		/* otherwise try the normal route */
 		result = process_cartridge(&image, PROCESS_LOAD);
-		if (result != INIT_PASS)
+		if (result != IMAGE_INIT_PASS)
 			return result;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

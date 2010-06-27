@@ -583,7 +583,7 @@ static QUICKLOAD_LOAD( cosmicos )
 	/* load image to RAM */
 	image.fread(ptr, size);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /* Machine Driver */

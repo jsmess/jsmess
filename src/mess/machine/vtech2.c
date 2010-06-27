@@ -351,7 +351,7 @@ DEVICE_IMAGE_LOAD( laser_cart )
 	if( size > 0xc000 )
 		laser_bank_mask |= 0x8000;
 
-	return size > 0 ? INIT_PASS : INIT_FAIL;
+	return size > 0 ? IMAGE_INIT_PASS : IMAGE_INIT_FAIL;
 }
 
 DEVICE_IMAGE_UNLOAD( laser_cart )

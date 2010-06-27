@@ -679,7 +679,7 @@ static int internal_floppy_device_load(device_image_interface *image, int create
 			floppy_get_tracks_per_disk(flopimg->floppy),
 			floppy_get_heads_per_disk(flopimg->floppy));
 	}
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 
 error:
 	for (i = 0; i < ARRAY_LENGTH(errmap); i++)
@@ -687,7 +687,7 @@ error:
 		if (err == errmap[i].ferr)
 			image->seterror(errmap[i].ierr, errmap[i].message);
 	}
-	return INIT_FAIL;
+	return IMAGE_INIT_FAIL;
 }
 
 static TIMER_CALLBACK( set_wpt )
@@ -703,7 +703,7 @@ DEVICE_IMAGE_LOAD( floppy )
 	floppy_drive *flopimg;
 	int retVal = internal_floppy_device_load(&image, -1, NULL);
 	flopimg = get_safe_token( &image.device() );
-	if (retVal==INIT_PASS) {
+	if (retVal==IMAGE_INIT_PASS) {
 		/* if we have one of our hacky unload procs, call it */
 		if (flopimg->load_proc)
 			flopimg->load_proc(image);

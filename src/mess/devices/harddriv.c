@@ -141,7 +141,7 @@ done:
 
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, chd_get_error_string(err));
 	}
-	return err ? INIT_FAIL : INIT_PASS;
+	return err ? IMAGE_INIT_FAIL : IMAGE_INIT_PASS;
 }
 
 
@@ -187,7 +187,7 @@ static DEVICE_IMAGE_CREATE( mess_hd )
 	return internal_load_mess_hd(image, metadata);
 
 error:
-	return INIT_FAIL;
+	return IMAGE_INIT_FAIL;
 }
 
 
@@ -346,14 +346,14 @@ static DEVICE_IMAGE_LOAD(mess_ide)
 
 	/* call the parent load function */
 	result = parent_load(image);
-	if (result != INIT_PASS)
+	if (result != IMAGE_INIT_PASS)
 		return result;
 
 	/* configure IDE */
 	/* FIXME IDE */
 	/* ide_controller_init_custom(which_bus, intf, mess_hd_get_chd_file(image)); */
 	/* ide_controller_reset(which_bus); */
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 #endif
 	return device_load_mess_hd( image );
 }

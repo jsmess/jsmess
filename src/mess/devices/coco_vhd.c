@@ -105,7 +105,7 @@ static DEVICE_IMAGE_LOAD( coco_vhd )
 	vhd->status = VHDSTATUS_POWER_ON_STATE;
 	vhd->logical_record_number = 0;
 	vhd->buffer_address = 0;
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

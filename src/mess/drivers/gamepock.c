@@ -52,7 +52,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 		int size = image.length();
 		if ( image.fread( cart, size ) != size ) {
 			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -62,7 +62,7 @@ static DEVICE_IMAGE_LOAD(gamepock_cart) {
 
 	memory_set_bankptr( image.device().machine, "bank1", cart );
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( gamepock )

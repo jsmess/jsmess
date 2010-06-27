@@ -1495,16 +1495,16 @@ static const cassette_config newbrain_cassette_config =
 
 static DEVICE_IMAGE_LOAD( newbrain_serial )
 {
-	if (device_load_serial(image)==INIT_PASS)
+	if (device_load_serial(image)==IMAGE_INIT_PASS)
 	{
 		serial_device_setup(image, 9600, 8, 1, SERIAL_PARITY_NONE);
 
 		serial_device_set_transmit_state(image, 1);
 
-		return INIT_PASS;
+		return IMAGE_INIT_PASS;
 	}
 
-	return INIT_FAIL;
+	return IMAGE_INIT_FAIL;
 }
 
 

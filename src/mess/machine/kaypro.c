@@ -406,7 +406,7 @@ QUICKLOAD_LOAD( kayproii )
 	/* Load image to the TPA (Transient Program Area) */
 	for (i = 0; i < quickload_size; i++)
 	{
-		if (image.fread( &data, 1) != 1) return INIT_FAIL;
+		if (image.fread( &data, 1) != 1) return IMAGE_INIT_FAIL;
 
 		RAM[i+0x100] = data;
 	}
@@ -419,7 +419,7 @@ QUICKLOAD_LOAD( kayproii )
 		cpu_set_reg(cpu, STATE_GENPC, 0x100);				// start program
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 QUICKLOAD_LOAD( kaypro2x )
@@ -432,7 +432,7 @@ QUICKLOAD_LOAD( kaypro2x )
 
 	for (i = 0; i < quickload_size; i++)
 	{
-		if (image.fread( &data, 1) != 1) return INIT_FAIL;
+		if (image.fread( &data, 1) != 1) return IMAGE_INIT_FAIL;
 
 		RAM[i+0x100] = data;
 	}
@@ -445,5 +445,5 @@ QUICKLOAD_LOAD( kaypro2x )
 		cpu_set_reg(cpu, STATE_GENPC, 0x100);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }

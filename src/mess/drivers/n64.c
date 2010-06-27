@@ -146,7 +146,7 @@ static DEVICE_IMAGE_LOAD(n64_cart)
 	}
 
 	logerror("cart length = %d\n", length);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( n64 )

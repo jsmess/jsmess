@@ -338,13 +338,13 @@ static DEVICE_IMAGE_LOAD( scv_cart )
 		if ( size > memory_region_length( image.device().machine, "cart" ) )
 		{
 			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size" );
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		if ( image.fread( cart, size ) != size )
 		{
 			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		state->cart_rom = cart;
@@ -362,7 +362,7 @@ static DEVICE_IMAGE_LOAD( scv_cart )
 
 	scv_set_banks( image.device().machine );
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

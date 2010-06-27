@@ -44,7 +44,7 @@ static int z80bin_load_file(device_image_interface *image, const char *file_type
 		{
 			image->seterror(IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file name");
 			image->message(" Unexpected EOF while getting file name");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		if (ch != '\0')
@@ -53,7 +53,7 @@ static int z80bin_load_file(device_image_interface *image, const char *file_type
 			{
 				image->seterror(IMAGE_ERROR_INVALIDIMAGE, "File name too long");
 				image->message(" File name too long");
-				return INIT_FAIL;
+				return IMAGE_INIT_FAIL;
 			}
 
 			pgmname[i] = ch;	/* build program name */
@@ -67,7 +67,7 @@ static int z80bin_load_file(device_image_interface *image, const char *file_type
 	{
 		image->seterror(IMAGE_ERROR_INVALIDIMAGE, "Unexpected EOF while getting file size");
 		image->message(" Unexpected EOF while getting file size");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	exec_addr[0] = LITTLE_ENDIANIZE_INT16(args[0]);
@@ -87,12 +87,12 @@ static int z80bin_load_file(device_image_interface *image, const char *file_type
 			snprintf(message, ARRAY_LENGTH(message), "%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
 			image->seterror(IMAGE_ERROR_INVALIDIMAGE, message);
 			image->message("%s: Unexpected EOF while writing byte to %04X", pgmname, (unsigned) j);
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 		memory_write_byte(cputag_get_address_space(image->device().machine,"maincpu",ADDRESS_SPACE_PROGRAM), j, data);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 
@@ -108,8 +108,8 @@ static QUICKLOAD_LOAD( z80bin )
 	int autorun;
 
 	/* load the binary into memory */
-	if (z80bin_load_file(&image, file_type, &exec_addr, &start_addr, &end_addr) == INIT_FAIL)
-		return INIT_FAIL;
+	if (z80bin_load_file(&image, file_type, &exec_addr, &start_addr, &end_addr) == IMAGE_INIT_FAIL)
+		return IMAGE_INIT_FAIL;
 
 	/* is this file executable? */
 	if (exec_addr != 0xffff)
@@ -131,7 +131,7 @@ static QUICKLOAD_LOAD( z80bin )
 		}
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

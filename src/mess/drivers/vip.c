@@ -840,7 +840,7 @@ static QUICKLOAD_LOAD( vip )
 
 	if ((size + chip8_size) > messram_get_size(devtag_get_device(image.device().machine, "messram")))
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (chip8_size > 0)
@@ -852,7 +852,7 @@ static QUICKLOAD_LOAD( vip )
 	/* load image to RAM */
 	image.fread( ptr + chip8_size, size);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /* System Drivers */

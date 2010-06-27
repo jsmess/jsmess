@@ -592,7 +592,7 @@ static DEVICE_IMAGE_LOAD( vic20_cart )
 		memory_install_rom(program, address, (address + size) - 1, 0, 0, ptr + address);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /* Graphics Definitions and Video Emulation */

@@ -1658,7 +1658,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	if ((filesize == 0) || ((filesize % 0x4000) != 0))
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* Claim memory */
@@ -1673,7 +1673,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		if (image.fread( gb_driver_data.gb_cart, filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -1773,24 +1773,24 @@ DEVICE_IMAGE_LOAD(gb_cart)
 	if (gb_driver_data.MBCType == MBC_UNKNOWN)
 	{
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Unknown mapper type");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	if (gb_driver_data.MBCType == MBC_MMM01)
 	{
 //      image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MMM01 is not supported yet");
-//      return INIT_FAIL;
+//      return IMAGE_INIT_FAIL;
 	}
 	if (gb_driver_data.MBCType == MBC_MBC4)
 	{
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MBC4 is not supported yet");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	/* MBC7 support is still work-in-progress, so only enable it for debug builds */
 #ifndef MAME_DEBUG
 	if (gb_driver_data.MBCType == MBC_MBC7)
 	{
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Mapper MBC7 is not supported yet");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 #endif
 
@@ -1944,7 +1944,7 @@ DEVICE_IMAGE_LOAD(gb_cart)
 		image.battery_load(gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000, 0x00);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 INTERRUPT_GEN( gb_scanline_interrupt )
@@ -2229,7 +2229,7 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 	if ((filesize == 0) || ((filesize % 0x4000) != 0))
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	gb_driver_data.ROMBanks = filesize / 0x4000;
@@ -2243,7 +2243,7 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 		if (image.fread( gb_driver_data.gb_cart, filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -2273,5 +2273,5 @@ DEVICE_IMAGE_LOAD(megaduck_cart)
 
 	gb_driver_data.MBCType = MBC_MEGADUCK;
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }

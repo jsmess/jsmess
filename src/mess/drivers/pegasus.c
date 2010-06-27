@@ -296,7 +296,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_1 )
 	image.fread(memory_region(image.device().machine, "maincpu") + 0x0000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine, 0x0000 );
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
@@ -304,7 +304,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_2 )
 	image.fread(memory_region(image.device().machine, "maincpu") + 0x1000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine, 0x1000 );
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
@@ -312,7 +312,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_3 )
 	image.fread(memory_region(image.device().machine, "maincpu") + 0x2000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine, 0x2000 );
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
@@ -320,7 +320,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_4 )
 	image.fread(memory_region(image.device().machine, "maincpu") + 0xc000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine, 0xc000 );
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
@@ -328,7 +328,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 	image.fread( memory_region(image.device().machine, "maincpu") + 0xd000, 0x1000);
 	pegasus_decrypt_rom( image.device().machine, 0xd000 );
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_START( pegasus )

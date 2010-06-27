@@ -721,7 +721,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 		default:                                       /* otherwise */
 			logerror("Error loading cartridge: Invalid file size 0x%X\n", filesize);
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unhandled cart size");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 	}
 
 	if (image.software_entry() == NULL)
@@ -729,7 +729,7 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 		if (image.fread( cartridge1 + load_offset, filesize) != filesize)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to load all of the cart");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -741,6 +741,6 @@ DEVICE_IMAGE_LOAD( gamecom_cart )
 	if (filesize < 0x080000) { memcpy(cartridge1 + 0x040000, cartridge1, 0x040000); } /* ->512KB */
 	if (filesize < 0x100000) { memcpy(cartridge1 + 0x080000, cartridge1, 0x080000); } /* ->1MB */
 	if (filesize < 0x1c0000) { memcpy(cartridge1 + 0x100000, cartridge1, 0x100000); } /* -> >=1.8MB */
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 

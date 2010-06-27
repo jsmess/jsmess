@@ -976,11 +976,11 @@ SNAPSHOT_LOAD( ti8x )
 	if (snapshot_size != expected_snapshot_size)
 	{
 		logerror ("Incomplete snapshot file\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (!(ti8x_snapshot_data = (UINT8*)malloc(snapshot_size)))
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	image.fread( ti8x_snapshot_data, snapshot_size);
 
@@ -990,7 +990,7 @@ SNAPSHOT_LOAD( ti8x )
 		case TI_86: ti86_setup_snapshot(image.device().machine, ti8x_snapshot_data); break;
 	}
 	free(ti8x_snapshot_data);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

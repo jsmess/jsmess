@@ -240,7 +240,7 @@ DEVICE_IMAGE_LOAD( tx0_tape )
 		break;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD( tx0_tape )
@@ -425,7 +425,7 @@ DEVICE_IMAGE_LOAD(tx0_typewriter)
 	/* open file */
 	typewriter.fd = &image;
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD(tx0_typewriter)
@@ -573,7 +573,7 @@ DEVICE_IMAGE_LOAD( tx0_magtape )
 			schedule_select();
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD( tx0_magtape )

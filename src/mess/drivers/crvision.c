@@ -539,7 +539,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 
 	default:
 		auto_free(machine, temp_copy);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	memory_configure_bank(machine, "bank1", 0, 1, mem + 0x8000, 0);
@@ -550,7 +550,7 @@ static DEVICE_IMAGE_LOAD( crvision_cart )
 
 	auto_free(machine, temp_copy);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /* Machine Driver */

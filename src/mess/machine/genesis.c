@@ -1053,7 +1053,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 		if (!tmpROMnew)
 		{
 			logerror("Memory allocation failed reading roms!\n");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		memcpy(tmpROMnew, ROM + 0x2000, length);
@@ -1282,7 +1282,7 @@ static DEVICE_IMAGE_LOAD( genesis_cart )
 	if (sram_detected)
 		logerror("SRAM detected from header: starting location %X - SRAM Length %X\n", genesis_sram_start, genesis_sram_end - genesis_sram_start + 1);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /******* Image unloading (with SRAM saving) *******/
@@ -1339,7 +1339,7 @@ static DEVICE_IMAGE_LOAD( _32x_cart )
 
 	auto_free(image.device().machine, temp_copy);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /******* Cart getinfo *******/

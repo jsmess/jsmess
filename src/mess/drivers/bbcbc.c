@@ -136,7 +136,7 @@ static DEVICE_IMAGE_LOAD( bbcbc_cart )
 		int size = image.length();
 		if ( image.fread(cart, size ) != size ) {
 			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 	else
@@ -147,7 +147,7 @@ static DEVICE_IMAGE_LOAD( bbcbc_cart )
 		memcpy( cart, reg, MIN(reg_len, 0x8000) );
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 
 }
 

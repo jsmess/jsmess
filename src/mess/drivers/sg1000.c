@@ -845,7 +845,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	{
 		size = image.length();
 		if (image.fread( ptr, size) != size)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 	}
 	else
 	{
@@ -859,7 +859,7 @@ static DEVICE_IMAGE_LOAD( sg1000_cart )
 	/* work RAM banking */
 	memory_install_readwrite_bank(program, 0xc000, 0xc3ff, 0, 0x3c00, "bank2");
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*-------------------------------------------------
@@ -875,7 +875,7 @@ static DEVICE_IMAGE_LOAD( omv_cart )
 	{
 		size = image.length();
 		if (image.fread( ptr, size) != size)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 	}
 	else
 	{
@@ -886,7 +886,7 @@ static DEVICE_IMAGE_LOAD( omv_cart )
 	/* cartridge ROM banking */
 	sg1000_map_cartridge_memory(image.device().machine, ptr, size);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*-------------------------------------------------
@@ -930,7 +930,7 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 	{
 		size = image.length();
 		if (image.fread( ptr, size) != size)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 	}
 	else
 	{
@@ -941,7 +941,7 @@ static DEVICE_IMAGE_LOAD( sc3000_cart )
 	/* cartridge ROM and work RAM banking */
 	sc3000_map_cartridge_memory(image.device().machine, ptr, size);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /***************************************************************************

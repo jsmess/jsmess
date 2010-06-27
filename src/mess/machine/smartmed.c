@@ -167,12 +167,12 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_1 )
 	bytes_read = image.fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (custom_header.version > 1)
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	sm->page_data_size = get_UINT32BE(custom_header.page_data_size);
@@ -205,7 +205,7 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_1 )
 	}
 	image.fread(sm->data_ptr, sm->page_total_size*sm->num_pages);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static int detect_geometry( smartmedia_t *sm, UINT8 id1, UINT8 id2)
@@ -245,17 +245,17 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_2 )
 	bytes_read = image.fread(&custom_header, sizeof(custom_header));
 	if (bytes_read != sizeof(custom_header))
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (custom_header.data1[0] != 0xEC)
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (!detect_geometry( sm, custom_header.data1[0], custom_header.data1[1]))
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	sm->data_ptr = auto_alloc_array(device->machine, UINT8, sm->page_total_size*sm->num_pages);
@@ -281,7 +281,7 @@ static DEVICE_IMAGE_LOAD( smartmedia_format_2 )
 
 	image.fread(sm->data_ptr, sm->page_total_size*sm->num_pages);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static DEVICE_IMAGE_LOAD( smartmedia )
@@ -291,7 +291,7 @@ static DEVICE_IMAGE_LOAD( smartmedia )
 	// try format 1
 	position = image.ftell();
 	result = DEVICE_IMAGE_LOAD_NAME(smartmedia_format_1)(image);
-	if (result != INIT_PASS)
+	if (result != IMAGE_INIT_PASS)
 	{
 			// try format 2
 			image.fseek( position, SEEK_SET);

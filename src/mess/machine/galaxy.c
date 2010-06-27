@@ -140,14 +140,14 @@ SNAPSHOT_LOAD( galaxy )
 			snapshot_data = auto_alloc_array(image.device().machine, UINT8, snapshot_size);
 			break;
 		default:
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 	}
 
 	image.fread( snapshot_data, snapshot_size);
 
 	galaxy_setup_snapshot(image.device().machine, snapshot_data, snapshot_size);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

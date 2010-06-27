@@ -471,7 +471,7 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 			size = memory_region_length(image.device().machine, "maincpu");
 
 		if (image.fread(rom, size) != size)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 	}
 	else
 	{
@@ -528,7 +528,7 @@ static DEVICE_IMAGE_LOAD( arcadia_cart )
 	    rom[patch[i].address] = patch[i].new;
 	}
 #endif
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( arcadia )

@@ -225,16 +225,16 @@ SNAPSHOT_LOAD(apple1)
 
 	/* Read the snapshot data into a temporary array */
 	if (filesize < SNAP_HEADER_LEN)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	snapbuf = (UINT8*)image.ptr();
 	if (!snapbuf)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	/* Verify the snapshot header */
 	if (apple1_verify_header(snapbuf) == IMAGE_VERIFY_FAIL)
 	{
 		logerror("apple1 - Snapshot Header is in incorrect format - needs to be LOAD:xxyyDATA:\n");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	datasize = filesize - SNAP_HEADER_LEN;
@@ -250,7 +250,7 @@ SNAPSHOT_LOAD(apple1)
 	{
 		logerror("apple1 - Snapshot won't fit in this memory configuration;\n"
 			   "needs memory from $%04X to $%04X.\n", start_addr, end_addr);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* Copy the data into memory space. */
@@ -259,7 +259,7 @@ SNAPSHOT_LOAD(apple1)
 		 addr++, snapptr++)
 		memory_write_byte(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM), addr, *snapptr);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

@@ -789,11 +789,11 @@ static void command_image_loadcreate(running_machine *machine)
 		switch(current_command->command_type)
 		{
 			case MESSTEST_COMMAND_IMAGE_CREATE:
-				success = (image_create(image, astring_c(filepath), format, NULL) == INIT_PASS);
+				success = (image_create(image, astring_c(filepath), format, NULL) == IMAGE_INIT_PASS);
 				break;
 
 			case MESSTEST_COMMAND_IMAGE_LOAD:
-				success = (image_load(image, astring_c(filepath)) == INIT_PASS);
+				success = (image_load(image, astring_c(filepath)) == IMAGE_INIT_PASS);
 				break;
 
 			default:

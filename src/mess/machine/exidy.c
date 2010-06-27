@@ -410,7 +410,7 @@ SNAPSHOT_LOAD(exidy)
 	{
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, "Snapshot must be 65564 bytes");
 		image.message("Snapshot must be 65564 bytes");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* get the header */
@@ -438,7 +438,7 @@ SNAPSHOT_LOAD(exidy)
 	cpu_set_reg(cpu, Z80_IM, header[25]);
 	cpu_set_reg(cpu, STATE_GENPC, header[26] | (header[27] << 8));
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 MACHINE_START( exidy )

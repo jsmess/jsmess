@@ -1632,7 +1632,7 @@ static DEVICE_IMAGE_LOAD( nc_serial )
 	running_device *uart = devtag_get_device(image.device().machine, "uart");
 
 	/* filename specified */
-	if (device_load_serial(image)==INIT_PASS)
+	if (device_load_serial(image)==IMAGE_INIT_PASS)
 	{
 		/* setup transmit parameters */
 		serial_device_setup(&image.device(), 9600, 8, 1, SERIAL_PARITY_NONE);
@@ -1643,10 +1643,10 @@ static DEVICE_IMAGE_LOAD( nc_serial )
 		/* and start transmit */
 		serial_device_set_transmit_state(&image.device(),1);
 
-		return INIT_PASS;
+		return IMAGE_INIT_PASS;
 	}
 
-	return INIT_FAIL;
+	return IMAGE_INIT_FAIL;
 
 }
 

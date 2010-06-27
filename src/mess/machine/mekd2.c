@@ -571,7 +571,7 @@ DEVICE_IMAGE_LOAD( mekd2_cart )
 	if (memcmp(buff, magic, sizeof (buff)))
 	{
 		logerror( "mekd2_rom_load: magic '%s' not found\n", magic);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	image.fread( &addr, 2);
 	addr = LITTLE_ENDIANIZE_INT16(addr);
@@ -582,5 +582,5 @@ DEVICE_IMAGE_LOAD( mekd2_cart )
 	while (size-- > 0)
 		image.fread( &RAM[addr++], 1);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }

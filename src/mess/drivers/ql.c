@@ -604,11 +604,11 @@ static DEVICE_IMAGE_LOAD( ql_cart )
 //			memory_install_read_bank(cputag_get_address_space(image.device().machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0, "bank1");
 //			memory_unmap_write(cputag_get_address_space(image.device().machine, M68008_TAG, ADDRESS_SPACE_PROGRAM), 0x00c000, 0x00ffff, 0, 0);
 //
-//			return INIT_PASS;
+//			return IMAGE_INIT_PASS;
 //		}
 //	}
 //
-	return INIT_FAIL;
+	return IMAGE_INIT_FAIL;
 }
 
 
@@ -904,7 +904,7 @@ static QUICKLOAD_LOAD( ql )
 {
 	image.fread(messram_get_ptr(devtag_get_device(image.device().machine, "messram")), 128*1024);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /* Computer Drivers */

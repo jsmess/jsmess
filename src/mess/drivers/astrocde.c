@@ -154,7 +154,7 @@ static DEVICE_IMAGE_LOAD( astrocde_cart )
 		if (image.fread( memory_region(image.device().machine, "maincpu") + 0x2000, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 	}
@@ -164,7 +164,7 @@ static DEVICE_IMAGE_LOAD( astrocde_cart )
 		memcpy(memory_region(image.device().machine, "maincpu") + 0x2000, image.get_software_region("rom"), size);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( astrocde )

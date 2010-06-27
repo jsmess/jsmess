@@ -84,14 +84,14 @@ SNAPSHOT_LOAD( z1013 )
 	startaddr = data[0] + data[1]*256;
 	endaddr   = data[2] + data[3]*256;
 	runaddr   = data[4] + data[5]*256;
-	if (data[12]!='C') return INIT_FAIL;
-	if (data[13]!=0xD3 || data[14]!=0xD3 || data[14]!=0xD3) return INIT_FAIL;
+	if (data[12]!='C') return IMAGE_INIT_FAIL;
+	if (data[13]!=0xD3 || data[14]!=0xD3 || data[14]!=0xD3) return IMAGE_INIT_FAIL;
 
 	memcpy (memory_get_read_ptr(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM),  startaddr ),
 		 data+0x20, endaddr - startaddr + 1);
 
 	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), Z80_PC, runaddr);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 

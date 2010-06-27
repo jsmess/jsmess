@@ -2413,7 +2413,7 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			break;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( gbadv )

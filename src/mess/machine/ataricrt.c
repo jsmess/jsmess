@@ -184,7 +184,7 @@ DEVICE_IMAGE_LOAD( a800_cart )
 		a800_cart_is_16k = size > 0x2000;
 		logerror("%s loaded left cartridge '%s' size %s\n", image.device().machine->gamedrv->name, image.filename() , (a800_cart_is_16k) ? "16K":"8K");
 	}
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD( a800_cart )
@@ -251,7 +251,7 @@ DEVICE_IMAGE_LOAD( a800xl_cart )
 		mame_fclose(basic_fp);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 
@@ -292,7 +292,7 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 	}
 	logerror("%s loaded cartridge '%s' size %dK\n",
 		image.device().machine->gamedrv->name, image.filename() , size/1024);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD( a5200_cart )

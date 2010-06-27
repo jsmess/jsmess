@@ -1802,11 +1802,11 @@ static DEVICE_IMAGE_LOAD( atarist_cart )
 		{
 			memory_install_readwrite_bank(cputag_get_address_space(image.device().machine, M68000_TAG, ADDRESS_SPACE_PROGRAM), 0xfa0000, 0xfbffff, 0, 0, "bank3");
 
-			return INIT_PASS;
+			return IMAGE_INIT_PASS;
 		}
 	}
 
-	return INIT_FAIL;
+	return IMAGE_INIT_FAIL;
 }
 
 static const floppy_config atarist_floppy_config =

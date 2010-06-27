@@ -929,20 +929,20 @@ static DEVICE_IMAGE_LOAD( pockstat_flash)
 
 	if(length != 0x20f40)
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	for(i = 0; i < strlen(gme_id); i++)
 	{
 		if(cart[i] != gme_id[i])
 		{
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 	}
 
 	memcpy(cart, cart + 0xf40, 0x20000);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( pockstat )

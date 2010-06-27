@@ -673,8 +673,8 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
     short dir_length = 0;
 
     // A Floppy Isnt manditory, so return if none
-    if (device_load_basicdsk_floppy(image) != INIT_PASS)
-        return INIT_FAIL;
+    if (device_load_basicdsk_floppy(image) != IMAGE_INIT_PASS)
+        return IMAGE_INIT_FAIL;
 
     // determine image geometry
     image.fseek(0, SEEK_SET);
@@ -749,7 +749,7 @@ DEVICE_IMAGE_LOAD( cgenie_floppy )
         }
 
     }
-    return INIT_PASS;
+    return IMAGE_INIT_PASS;
 }
 #endif
 

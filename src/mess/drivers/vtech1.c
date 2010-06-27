@@ -214,7 +214,7 @@ static SNAPSHOT_LOAD( vtech1 )
 		snprintf(message, ARRAY_LENGTH(message), "SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
 		image.seterror(IMAGE_ERROR_INVALIDIMAGE, message);
 		image.message("SNAPLOAD: %s\nInsufficient RAM - need %04X",pgmname,size);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	/* write it to ram */
@@ -245,10 +245,10 @@ static SNAPSHOT_LOAD( vtech1 )
 	default:
 		image.seterror(IMAGE_ERROR_UNSUPPORTED, "Snapshot format not supported.");
 		image.message("Snapshot format not supported.");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static Z80BIN_EXECUTE( vtech1 )

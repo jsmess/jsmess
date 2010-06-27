@@ -330,5 +330,5 @@ SNAPSHOT_LOAD( poly88 )
 		pos+=recordLen;
 	}
 	devtag_get_device(image.device().machine, "uart")->reset();
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }

@@ -119,7 +119,7 @@ DEVICE_IMAGE_LOAD( svi318_cart )
 
 	p = (UINT8*)image.image_malloc(size);
 	if (!p)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	pcart_rom_size = size;
 	memset(p, 0xff, size);
@@ -128,14 +128,14 @@ DEVICE_IMAGE_LOAD( svi318_cart )
 	if (image.fread( p, size) != size)
 	{
 		logerror ("can't read file %s\n", image.filename() );
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (svi318_verify_cart(p)==IMAGE_VERIFY_FAIL)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	pcart = p;
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD( svi318_cart )

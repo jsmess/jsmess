@@ -867,9 +867,9 @@ static MACHINE_START( neogeo )
 //static DEVICE_IMAGE_LOAD(aes_cart)
 //{
 //	else
-//		return INIT_FAIL;
+//		return IMAGE_INIT_FAIL;
 	
-//	return INIT_PASS;
+//	return IMAGE_INIT_PASS;
 //}
 
 /*************************************

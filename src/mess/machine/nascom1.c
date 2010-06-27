@@ -201,10 +201,10 @@ DEVICE_IMAGE_LOAD( nascom1_cassette )
 	nascom1_tape_size = image.length();
 	nascom1_tape_image = (UINT8*)image.ptr();
 	if (!nascom1_tape_image)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	nascom1_tape_index = 0;
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 
@@ -246,7 +246,7 @@ SNAPSHOT_LOAD( nascom1 )
 		}
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

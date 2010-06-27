@@ -245,13 +245,13 @@ static DEVICE_IMAGE_LOAD( channelf_cart )
 		if (size > 0xf800)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 		if (image.fread( memory_region(image.device().machine, "maincpu") + 0x0800, size) != size)
 		{
 			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 		}
 
 	}
@@ -261,7 +261,7 @@ static DEVICE_IMAGE_LOAD( channelf_cart )
 		memcpy(memory_region(image.device().machine, "maincpu") + 0x0800, image.get_software_region("rom"), size);
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static MACHINE_DRIVER_START( channelf_cart )

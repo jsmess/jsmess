@@ -880,7 +880,7 @@ static DEVICE_IMAGE_LOAD(pet_cart)
 		/* Does cart contain any data? */
 		pet_cbm_cart[0].chip = (UINT8*) image.image_malloc(size);
 		if (!pet_cbm_cart[0].chip)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 
 		/* Store data, address & size */
 		pet_cbm_cart[0].addr = address;
@@ -888,7 +888,7 @@ static DEVICE_IMAGE_LOAD(pet_cart)
 		test = image.fread(pet_cbm_cart[0].chip, pet_cbm_cart[0].size);
 
 		if (test != pet_cbm_cart[0].size)
-			return INIT_FAIL;
+			return IMAGE_INIT_FAIL;
 	}
 
 	/* Finally load the cart */
@@ -897,7 +897,7 @@ static DEVICE_IMAGE_LOAD(pet_cart)
 //      memcpy(pet_memory + pet_cbm_cart[i].addr, pet_cbm_cart[i].chip, pet_cbm_cart[i].size);
 	memcpy(pet_memory + pet_cbm_cart[0].addr, pet_cbm_cart[0].chip, pet_cbm_cart[0].size);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 MACHINE_DRIVER_START(pet_cartslot)

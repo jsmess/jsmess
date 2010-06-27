@@ -677,7 +677,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_std8 )
 static int assemble_std(running_device *image)
 {
 	assemble_common(image);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*
@@ -721,7 +721,7 @@ static int disassemble_std(running_device *image)
 
 	clear_slot(cartsys, slotnumber);
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*****************************************************************************
@@ -835,15 +835,15 @@ static int assemble_paged(running_device *image)
 	if (cart->rom_ptr==NULL)
 	{
 		logerror("Missing ROM for paged cartridge");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	if (cart->rom2_ptr==NULL)
 	{
 		logerror("Missing second ROM for paged cartridge");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*****************************************************************************
@@ -991,20 +991,20 @@ static int assemble_minimem(running_device *image)
 		logerror("Missing GROM for Mini Memory");
 		// should not fail here because there may be variations of
 		// cartridges which do not use all parts
-//      return INIT_FAIL;
+//      return IMAGE_INIT_FAIL;
 	}
 	if (cart->rom_size==0)
 	{
 		logerror("Missing ROM for Mini Memory");
-//      return INIT_FAIL;
+//      return IMAGE_INIT_FAIL;
 	}
 	if (cart->ram_size==0)
 	{
 		logerror("Missing RAM for Mini Memory");
-//      return INIT_FAIL;
+//      return IMAGE_INIT_FAIL;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 
@@ -1187,9 +1187,9 @@ static int assemble_super(running_device *image)
 	if (cart->ram_size==0)
 	{
 		logerror("Missing RAM for SuperSpace");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*****************************************************************************
@@ -1308,7 +1308,7 @@ static WRITE8_DEVICE_HANDLER( write_cart_mbx8 )
 static int assemble_mbx(running_device *image)
 {
 	assemble_common(image);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*****************************************************************************
@@ -1465,10 +1465,10 @@ static int assemble_paged379i(running_device *image)
 	if (cart->rom_ptr==NULL)
 	{
 		logerror("Missing ROM for paged cartridge");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	set_paged379i_bank(cart, 15);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*****************************************************************************
@@ -1617,10 +1617,10 @@ static int assemble_pagedcru(running_device *image)
 	if (cart->rom_ptr==NULL)
 	{
 		logerror("Missing ROM for pagedcru cartridge");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 	cart->rom_page = 0;
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*****************************************************************************
@@ -1650,13 +1650,13 @@ static int assemble_gramkracker(running_device *image)
 	if (cart->grom_ptr==NULL)
 	{
 		logerror("Missing loader GROM for GRAM Kracker system");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (cart->ram_size < 81920)
 	{
 		logerror("Missing or insufficient RAM for GRAM Kracker system");
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	// Caution: We are using the ram_socket for both grom and direct access.
@@ -1683,7 +1683,7 @@ static int assemble_gramkracker(running_device *image)
 			break;
 		}
 	}
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*
@@ -2098,7 +2098,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 
 	result = load_legacy(image);
 
-	if (result != INIT_FAIL)
+	if (result != IMAGE_INIT_FAIL)
 		cartslots->legacy_slots++;
 	else
 	{
@@ -2125,7 +2125,7 @@ static DEVICE_IMAGE_LOAD( ti99_cartridge )
 
 			// This is for legacy support. If we have no multicart left
 			// but there are still legacy dumps, we switch to legacy mode.
-			if (result != INIT_FAIL)
+			if (result != IMAGE_INIT_FAIL)
 				cartslots->multi_slots++;
 		}
 		else
@@ -2483,7 +2483,7 @@ static int load_legacy(device_image_interface &image)
 
 	if (type == SLOTC_EMPTY)
 	{
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	id = get_index_from_tagname(image)-1;
@@ -2618,7 +2618,7 @@ static int load_legacy(device_image_interface &image)
 			cartslots->cartridge[id].rom_size = filesize;
 			break;
 	}
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 static void unload_legacy(device_image_interface &image)

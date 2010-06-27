@@ -309,24 +309,24 @@ SNAPSHOT_LOAD( primo )
 	UINT8 *snapshot_data;
 
 	if (!(snapshot_data = (UINT8*) malloc(snapshot_size)))
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	if (image.fread( snapshot_data, snapshot_size) != snapshot_size)
 	{
 		free(snapshot_data);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	if (strncmp((char *)snapshot_data, "PS01", 4))
 	{
 		free(snapshot_data);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	primo_setup_pss(image.device().machine,snapshot_data, snapshot_size);
 
 	free(snapshot_data);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 /*******************************************************************************
@@ -359,16 +359,16 @@ QUICKLOAD_LOAD( primo )
 	UINT8 *quickload_data;
 
 	if (!(quickload_data = (UINT8*) malloc(quickload_size)))
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	if (image.fread( quickload_data, quickload_size) != quickload_size)
 	{
 		free(quickload_data);
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 	}
 
 	primo_setup_pp(image.device().machine, quickload_data, quickload_size);
 
 	free(quickload_data);
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }

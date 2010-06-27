@@ -230,7 +230,7 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 
 	/* Check the cart */
 	if( a7800_verify_cart((char *)header) == IMAGE_VERIFY_FAIL)
-		return INIT_FAIL;
+		return IMAGE_INIT_FAIL;
 
 	len =(header[49] << 24) |(header[50] << 16) |(header[51] << 8) | header[52];
 	a7800_cart_size = len;
@@ -325,7 +325,7 @@ DEVICE_IMAGE_LOAD( a7800_cart )
 
 	memcpy( a7800_cart_bkup, memory + 0xC000, 0x4000 );
 	memcpy( memory + 0xC000, a7800_bios_bkup, 0x4000 );
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 

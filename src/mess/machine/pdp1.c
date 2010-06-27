@@ -445,7 +445,7 @@ DEVICE_IMAGE_LOAD( pdp1_tape )
 		break;
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD( pdp1_tape )
@@ -751,7 +751,7 @@ DEVICE_IMAGE_LOAD(pdp1_typewriter)
 
 	io_status |= io_st_tyo;
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD(pdp1_typewriter)
@@ -1081,7 +1081,7 @@ DEVICE_IMAGE_LOAD(pdp1_drum)
 	/* open file */
 	parallel_drum.fd = &image;
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
 
 DEVICE_IMAGE_UNLOAD(pdp1_drum)

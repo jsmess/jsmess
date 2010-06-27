@@ -114,12 +114,12 @@ DEVICE_IMAGE_LOAD( nc_pcmcia_card )
 			{
 				nc_set_card_present_state(1);
 			}
-			return INIT_PASS;
+			return IMAGE_INIT_PASS;
 		}
 	}
 
 	/* nc100 can run without a image */
-	return INIT_FAIL;
+	return IMAGE_INIT_FAIL;
 }
 
 DEVICE_IMAGE_UNLOAD( nc_pcmcia_card )

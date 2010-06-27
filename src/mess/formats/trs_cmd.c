@@ -87,5 +87,5 @@ QUICKLOAD_LOAD( trs80_cmd )
 		}
 	}
 
-	return INIT_PASS;
+	return IMAGE_INIT_PASS;
 }
