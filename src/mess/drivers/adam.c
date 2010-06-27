@@ -600,7 +600,7 @@ static MACHINE_START( adam )
 
 static MACHINE_RESET( adam )
 {
-	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart");
+	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart"));
 
 	if (image->exists())
 	{

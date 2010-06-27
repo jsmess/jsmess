@@ -539,7 +539,7 @@ If you have the source listing or the Rom dump, please send us.
 
 			if (deviceNum>=4 && deviceNum<=7)
 			{
-				image = (device_image_interface*)floppy_get_device(machine, deviceNum - 4);
+				image = dynamic_cast<device_image_interface *>(floppy_get_device(machine, deviceNum - 4));
 				if (image->exists())
 					ram[statusDCB+20] = (ram[statusDCB+20]&0xF0); /* Inserted Media */
 				else
@@ -561,7 +561,7 @@ If you have the source listing or the Rom dump, please send us.
 					}
 					else if (deviceNum>=4 && deviceNum<=7)
 					{
-						image = (device_image_interface*)floppy_get_device(machine, deviceNum - 4);
+						image = dynamic_cast<device_image_interface *>(floppy_get_device(machine, deviceNum - 4));
 						if (image->exists())
 						{
 							ram[statusDCB] = 0x80;
@@ -622,7 +622,7 @@ If you have the source listing or the Rom dump, please send us.
 					}
 					else if (deviceNum>=4 && deviceNum<=7)
 					{
-						image = (device_image_interface*)floppy_get_device(machine, deviceNum - 4);
+						image = dynamic_cast<device_image_interface *>(floppy_get_device(machine, deviceNum - 4));
 						if (image->exists())
 						{
 							sectorNmbr = ((ram[statusDCB+5])+(ram[statusDCB+6]<<8)+(ram[statusDCB+7]<<16)+(ram[statusDCB+8]<<24))<<1;

@@ -433,7 +433,7 @@ static void gb_machine_stop(running_machine *machine)
 	/* NOTE: The reason we save the carts RAM this way instead of using MAME's
        built in macros is because they force the filename to be the name of
        the machine.  We need to have a separate name for each game. */
-	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart");
+	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart"));
 	image->battery_save(gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000);
 }
 

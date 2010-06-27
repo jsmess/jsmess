@@ -261,7 +261,7 @@ DEFINE_LEGACY_IMAGE_DEVICE(APEXC_TAPE_READER, apexc_tape_reader);
 static READ8_DEVICE_HANDLER(tape_read)
 {
 	UINT8 reply;
-	device_image_interface *image = (device_image_interface*)device;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 	
 	if (image->exists() && (image->fread(& reply, 1) == 1))
 		return reply & 0x1f;
@@ -272,7 +272,7 @@ static READ8_DEVICE_HANDLER(tape_read)
 static WRITE8_DEVICE_HANDLER(tape_write)
 {
 	UINT8 data5 = (data & 0x1f);
-	device_image_interface *image = (device_image_interface*)device;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 	
 	if (image->exists())
 		image->fwrite(& data5, 1);

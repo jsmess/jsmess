@@ -194,8 +194,8 @@ void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data )
 /* end of send event */
 static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 {
-	device_image_interface *xmodem = (device_image_interface*)devtag_get_device(machine, "rs232_x");
-	device_image_interface *kermit = (device_image_interface*)devtag_get_device(machine, "rs232_k");
+	device_image_interface *xmodem = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "rs232_x"));
+	device_image_interface *kermit = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "rs232_k"));
 
 	LOG_SERIAL(( "%f hp48_rs232_byte_sent_cb: end of send, data=%02x\n",
 		     attotime_to_double(timer_get_time(machine)), param ));
@@ -594,8 +594,8 @@ static READ8_HANDLER ( hp48_io_r )
 	{
                 /* second nibble of received data */
 
-		device_image_interface *xmodem = (device_image_interface *)devtag_get_device(space->machine, "rs232_x");
-		device_image_interface *kermit = (device_image_interface *)devtag_get_device(space->machine, "rs232_k");
+		device_image_interface *xmodem = dynamic_cast<device_image_interface *>(devtag_get_device(space->machine, "rs232_x"));
+		device_image_interface *kermit = dynamic_cast<device_image_interface *>(devtag_get_device(space->machine, "rs232_k"));
 
 		hp48_io[0x11] &= ~1;  /* clear byte received */
 		data = hp48_io[offset];

@@ -374,7 +374,7 @@ static void laser_get_track(running_machine *machine)
     if( laser_drive >= 0 && laser_file(machine) != NULL )
     {
         int size, offs;
-		device_image_interface *image = (device_image_interface*)laser_file(machine);
+		device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file(machine));
         size = TRKSIZE_VZ;
         offs = TRKSIZE_VZ * laser_track_x2[laser_drive]/2;
         image->fseek(offs, SEEK_SET);
@@ -387,7 +387,7 @@ static void laser_get_track(running_machine *machine)
 
 static void laser_put_track(running_machine *machine)
 {
-	device_image_interface *image = (device_image_interface*)laser_file(machine);
+	device_image_interface *image = dynamic_cast<device_image_interface *>(laser_file(machine));
     /* drive selected and image file ok? */
     if( laser_drive >= 0 && laser_file(machine) != NULL )
     {

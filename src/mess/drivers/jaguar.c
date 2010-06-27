@@ -186,7 +186,7 @@ static MACHINE_RESET( jaguar )
 /*
 static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags)
 {
-	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart");
+	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart"));
 	astring *fname;
 	file_error filerr;
 	mame_file *file;

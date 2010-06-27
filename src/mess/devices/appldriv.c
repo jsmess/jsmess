@@ -167,7 +167,7 @@ static UINT8 apple525_process_byte(running_device *img, int write_value)
 	int spinfract_divisor;
 	int spinfract_dividend;
 	const appledriv_config *config = get_config(img);
-	device_image_interface *image = (device_image_interface*)img;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
 
 	disk = (struct apple525_disk *)  flopimg_get_custom_data(img);
 	spinfract_dividend = config->dividend;
@@ -250,7 +250,7 @@ int apple525_read_status(running_device *device)
 	{
 		if (apple525_enable_mask & (1 << i))
 		{
-			image = (device_image_interface*)floppy_get_device_by_type(device->machine, FLOPPY_TYPE_APPLE, i);
+			image = dynamic_cast<device_image_interface *>(floppy_get_device_by_type(device->machine, FLOPPY_TYPE_APPLE, i));
 			if (image && !image->is_writable())
 				result = 1;
 		}

@@ -22,7 +22,7 @@
 
 int printer_is_ready(running_device *printer)
 {
-	device_image_interface *image = (device_image_interface*)printer;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(printer);
 	/* if there is a file attached to it, it's online */
 	return image->exists() != 0;
 }
@@ -35,7 +35,7 @@ int printer_is_ready(running_device *printer)
 
 void printer_output(running_device *printer, UINT8 data)
 {
-	device_image_interface *image = (device_image_interface*)printer;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(printer);
 	if (image->exists())
 	{
 		image->fwrite(&data, 1);

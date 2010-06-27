@@ -1912,7 +1912,7 @@ static void upd765_setup_command(running_device *device)
 			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
 			{
 				/* is disk inserted? */
-				device_image_interface *image = (device_image_interface*) img;
+				device_image_interface *image = dynamic_cast<device_image_interface *>( img);
 				if (image->exists())
 				{
 					int index_count = 0;
@@ -2225,7 +2225,7 @@ void upd765_reset(running_device *device, int offset)
 				else
 					img = devtag_get_device(device->machine, fdc->intf->floppy_drive_tags[i]);
 
-				device_image_interface *image = (device_image_interface*) img;
+				device_image_interface *image = dynamic_cast<device_image_interface *>( img);
 				if (image->exists())
 				{
 					a_drive_is_ready = 1;

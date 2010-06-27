@@ -342,10 +342,10 @@ void ti990_hdc_init(running_machine *machine, void (*interrupt_callback)(running
 	hdc.w[7] = w7_idle;
 
 	/* get references to harddisk devices */
-	hdc.d[0].img = (device_image_interface *)devtag_get_device(machine, "harddisk1");
-	hdc.d[1].img = (device_image_interface *)devtag_get_device(machine, "harddisk2");
-	hdc.d[2].img = (device_image_interface *)devtag_get_device(machine, "harddisk3");
-	hdc.d[3].img = (device_image_interface *)devtag_get_device(machine, "harddisk4");
+	hdc.d[0].img = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "harddisk1"));
+	hdc.d[1].img = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "harddisk2"));
+	hdc.d[2].img = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "harddisk3"));
+	hdc.d[3].img = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "harddisk4"));
 
 	hdc.interrupt_callback = interrupt_callback;
 

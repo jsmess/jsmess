@@ -213,7 +213,7 @@ static WRITE8_DEVICE_HANDLER(ti99_4_pio_buf_w)
 static WRITE8_DEVICE_HANDLER(ti99_4_pio_w)
 {
 	pio_t *pio = get_safe_token_pio(device);
-	device_image_interface *image = (device_image_interface*)device;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 	switch (offset & 7)
 	{
 		case 0:
@@ -414,7 +414,7 @@ static TMS9902_INT_CALLBACK( int_callback_1 )
 static TMS9902_XMIT_CALLBACK( xmit_callback_0 )
 {
 	UINT8 buf = data;
-	device_image_interface *rs232_fp = (device_image_interface *)devtag_get_device(device->machine, "rs232:port0");
+	device_image_interface *rs232_fp = dynamic_cast<device_image_interface *>(devtag_get_device(device->machine, "rs232:port0"));
 
 	if (rs232_fp)
 		rs232_fp->fwrite(&buf, 1);
@@ -423,7 +423,7 @@ static TMS9902_XMIT_CALLBACK( xmit_callback_0 )
 static TMS9902_XMIT_CALLBACK( xmit_callback_1 )
 {
 	UINT8 buf = data;
-	device_image_interface *rs232_fp = (device_image_interface *)devtag_get_device(device->machine, "rs232:port1");
+	device_image_interface *rs232_fp = dynamic_cast<device_image_interface *>(devtag_get_device(device->machine, "rs232:port1"));
 
 	if (rs232_fp)
 		rs232_fp->fwrite(&buf, 1);

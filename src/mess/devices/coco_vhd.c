@@ -113,7 +113,7 @@ static DEVICE_IMAGE_LOAD( coco_vhd )
 static void coco_vhd_readwrite(running_device *device, UINT8 data)
 {
 	vhd_info *vhd = get_safe_token(device);
-	device_image_interface *image = (device_image_interface*)device;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 	int result;
 	int phyOffset;
 	UINT32 nBA = vhd->buffer_address;

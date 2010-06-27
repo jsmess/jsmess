@@ -49,7 +49,7 @@ static void gba_machine_stop(running_machine *machine)
 	// only do this if the cart loader detected some form of backup
 	if (state->nvsize > 0)
 	{
-		device_image_interface *image = (device_image_interface*)state->nvimage;
+		device_image_interface *image = dynamic_cast<device_image_interface *>(state->nvimage);
 		image->battery_save(state->nvptr, state->nvsize);
 	}
 }

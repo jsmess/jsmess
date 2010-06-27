@@ -981,7 +981,7 @@ static WRITE16_HANDLER( x68k_fdc_w )
 					output_set_indexed_value("eject_drv",drive,(data & 0x40) ? 1 : 0);
 					if(data & 0x20)  // ejects disk
 					{
-						((device_image_interface*)floppy_get_device(space->machine, drive))->unload();
+						(dynamic_cast<device_image_interface *>(floppy_get_device(space->machine, drive)))->unload();
 						floppy_mon_w(floppy_get_device(space->machine, drive), ASSERT_LINE);
 					}
 				}
@@ -2426,7 +2426,7 @@ static MACHINE_RESET( x68000 )
 	// check for disks
 	for(drive=0;drive<4;drive++)
 	{
-		device_image_interface *image = (device_image_interface*)floppy_get_device(machine, drive);
+		device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine, drive));
 		if(image->exists())
 			x68k_sys.fdc.disk_inserted[drive] = 1;
 		else

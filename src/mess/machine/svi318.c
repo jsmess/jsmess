@@ -818,7 +818,7 @@ static void svi318_set_banks(running_machine *machine)
 
 int svi318_cassette_present(running_machine *machine, int id)
 {
-	device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cassette");
+	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cassette"));
 
 	if ( image == NULL )
 		return FALSE;

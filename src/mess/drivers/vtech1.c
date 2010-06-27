@@ -312,7 +312,7 @@ static void vtech1_load_proc(device_image_interface &image)
 static void vtech1_get_track(running_machine *machine)
 {
 	vtech1_state *vtech1 = (vtech1_state *)machine->driver_data;
-	device_image_interface *image = (device_image_interface*)floppy_get_device(machine,vtech1->drive);
+	device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine,vtech1->drive));
 
 	/* drive selected or and image file ok? */
 	if (vtech1->drive >= 0 && image->exists())
@@ -338,7 +338,7 @@ static void vtech1_put_track(running_machine *machine)
 	if (vtech1->drive >= 0 && floppy_get_device(machine,vtech1->drive) != NULL)
 	{
 		int size, offs;
-		device_image_interface *image = (device_image_interface*)floppy_get_device(machine,vtech1->drive);
+		device_image_interface *image = dynamic_cast<device_image_interface *>(floppy_get_device(machine,vtech1->drive));
 		offs = TRKSIZE_VZ * vtech1->fdc_track_x2[vtech1->drive]/2;
 		image->fseek(offs + vtech1->fdc_start, SEEK_SET);
 		size = image->fwrite(&vtech1->fdc_data[vtech1->fdc_start], vtech1->fdc_write);

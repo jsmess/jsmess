@@ -48,7 +48,7 @@ static DEVICE_START(coco_pak)
 
 	memset(pak_pcb, 0, sizeof(*pak_pcb));
 	pak_pcb->cococart = device->owner()->owner();
-	pak_pcb->cart = (device_image_interface*)device->owner();
+	pak_pcb->cart = dynamic_cast<device_image_interface *>(device->owner());
 }
 
 

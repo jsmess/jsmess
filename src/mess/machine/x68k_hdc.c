@@ -30,7 +30,7 @@ static TIMER_CALLBACK( req_delay )
 
 static unsigned char SASIReadByte(running_device* device)
 {
-	device_image_interface *image = (device_image_interface*)device;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 	//int ret;
 	unsigned char val;
 
@@ -41,7 +41,7 @@ static unsigned char SASIReadByte(running_device* device)
 
 static void SASIWriteByte(running_device* device, unsigned char val)
 {
-	device_image_interface *image = (device_image_interface*)device;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 	image->fwrite(&val,1);
 }
 
@@ -78,7 +78,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 	sasi_ctrl_t* sasi = (sasi_ctrl_t*)downcast<legacy_device_base *>(device)->token();
 	unsigned int lba = 0;
 	char* blk;
-	device_image_interface *image = (device_image_interface*)device;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 	switch(offset)
 	{
 	case 0x00:  // data I/O
@@ -331,7 +331,7 @@ WRITE16_DEVICE_HANDLER( x68k_hdc_w )
 READ16_DEVICE_HANDLER( x68k_hdc_r )
 {
 	sasi_ctrl_t* sasi = (sasi_ctrl_t*)downcast<legacy_device_base *>(device)->token();
-	device_image_interface *image = (device_image_interface*)device;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 	int retval = 0xff;
 
 	switch(offset)

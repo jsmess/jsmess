@@ -360,7 +360,7 @@ static WRITE8_DEVICE_HANDLER( sys9901_tapewdata_w )
 static TIMER_CALLBACK(rs232_input_callback)
 {
 	UINT8 buf;
-	device_image_interface *image = (device_image_interface*)ptr;
+	device_image_interface *image = (device_image_interface *)(ptr);
 	if (/*rs232_rts &&*/ /*(mame_ftell(rs232_fp) < mame_fsize(rs232_fp))*/1)
 	{
 		if (image->fread(&buf, 1) == 1)

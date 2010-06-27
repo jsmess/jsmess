@@ -799,7 +799,7 @@ static READ8_HANDLER( fm7_cassette_printer_r )
 	}
 	else
 	{
-		device_image_interface *image = (device_image_interface*)devtag_get_device(space->machine,"lpt:printer");
+		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(space->machine,"lpt:printer"));
 		if(image->exists())
 		{
 			if(centronics_pe_r(printer_dev))

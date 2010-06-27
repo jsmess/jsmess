@@ -197,7 +197,7 @@ running_device *cartslot_get_pcb(running_device *device)
 void *cartslot_get_socket(running_device *device, const char *socket_name)
 {
 	cartslot_t *cart = get_token(device);
-	device_image_interface *image = (device_image_interface*)device;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(device);
 	void *result = NULL;
 
 	if (cart->mc != NULL)

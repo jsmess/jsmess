@@ -931,7 +931,7 @@ static void sms_machine_stop( running_machine *machine )
 {
 	/* Does the cartridge have SRAM that should be saved? */
 	if (sms_state.cartridge[sms_state.current_cartridge].sram_save) {
-		device_image_interface *image = (device_image_interface*)devtag_get_device(machine, "cart1");
+		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart1"));
 		image->battery_save(sms_state.cartridge[sms_state.current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 	}
 }

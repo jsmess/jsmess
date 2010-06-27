@@ -86,7 +86,7 @@ static UINT8* to7_k7_bits;
 static int to7_get_cassette ( running_machine *machine )
 {
 	running_device* img = thom_cassette_img(machine);
-	device_image_interface *image = (device_image_interface*)img;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
 	if ( image->exists() )
 	{
 		cassette_image* cass = cassette_get_image( img );
@@ -187,7 +187,7 @@ static WRITE8_DEVICE_HANDLER ( to7_set_cassette_motor )
 static int mo5_get_cassette ( running_machine *machine )
 {
 	running_device* img = thom_cassette_img(machine);
-	device_image_interface *image = (device_image_interface*)img;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(img);
 	
 	if ( image->exists() )
 	{
@@ -771,7 +771,7 @@ typedef enum
 static to7_io_dev to7_io_mode( running_machine *machine )
 {
 	running_device *centronics = devtag_get_device(machine, "centronics");
-	device_image_interface *serial = (device_image_interface*)devtag_get_device(machine, "cc90232");
+	device_image_interface *serial = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cc90232"));
 
 	if (centronics_pe_r(centronics) == TRUE)
 		return TO7_IO_CENTRONICS;

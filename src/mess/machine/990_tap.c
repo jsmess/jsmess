@@ -139,7 +139,7 @@ DEVICE_START( ti990_tape )
 	t = &tpc->t[id];
 	memset(t, 0, sizeof(*t));
 
-	t->img = (device_image_interface*)device;
+	t->img = dynamic_cast<device_image_interface *>(device);
 	t->wp = 1;
 	t->bot = 0;
 	t->eot = 0;

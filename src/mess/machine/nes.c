@@ -297,7 +297,7 @@ MACHINE_START( nes )
 static void nes_machine_stop( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
-	device_image_interface *image = (device_image_interface*)state->cart;
+	device_image_interface *image = dynamic_cast<device_image_interface *>(state->cart);
 	/* Write out the battery file if necessary */
 	if (state->battery) 	
 		image->battery_save(state->battery_ram, state->battery_size);

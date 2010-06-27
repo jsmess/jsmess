@@ -551,7 +551,7 @@ static void schedule_unselect(void)
 
 DEVICE_START( tx0_magtape )
 {
-	magtape.img = (device_image_interface*)device;
+	magtape.img = dynamic_cast<device_image_interface *>(device);
 }
 
 /*
