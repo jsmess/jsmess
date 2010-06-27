@@ -383,37 +383,35 @@ static const cartslot_pcb_type *identify_pcb(device_image_interface &image)
 	return pcb_type;
 }
 
+static machine_config *device_cfg = NULL;
+
+static void memory_exit(running_machine *machine)
+{
+	machine_config_free(device_cfg);
+}
 
 /*-------------------------------------------------
     DEVICE_IMAGE_GET_DEVICES(cartslot)
 -------------------------------------------------*/
-static void add_device_with_subdevices(const running_device *_owner, device_type _type, const char *_tag, UINT32 _clock)
+static void add_device_with_subdevices(device_t *_owner, device_type _type, const char *_tag, UINT32 _clock)
 {
-/*  astring tempstring;
-    device_list *devlist = &_owner->machine->devicelist;
-    const device_config *cfg = new device_config(&_owner->baseconfig(), _type, _tag, _clock);
-    running_device *dev = devlist->append(_owner->subtag(tempstring,_tag), new running_device(*_owner->machine, *cfg));
-
-    const machine_config_token *tokens = (const machine_config_token *)dev->get_config_ptr(DEVINFO_PTR_MACHINE_CONFIG);
-    machine_config *config;
-    const device_config *config_dev;
-    running_device *new_dev = NULL;
-    if (tokens != NULL)
-    {
-        config = machine_config_alloc(tokens);
-        for (config_dev = config->devicelist.first(); config_dev != NULL; config_dev = config_dev->next)
+	astring tempstring;
+	device_list *devlist = &_owner->machine->devicelist;	
+	const machine_config *config = _owner->machine->config;
+	
+	device_config *devconfig = _type(*config, _owner->subtag(tempstring,_tag), &_owner->baseconfig(), _clock);
+	
+	running_device *dev = devlist->append(_owner->subtag(tempstring,_tag), devconfig->alloc_device(*_owner->machine));
+	const machine_config_token *tokens = dev->machine_config_tokens();
+	if (tokens != NULL) 
+    {		
+        device_cfg = machine_config_alloc_owner(tokens,&dev->baseconfig());
+        for (const device_config *config_dev = device_cfg->devicelist.first(); config_dev != NULL; config_dev = config_dev->next())
         {
-            device_config *new_cfg = new device_config(cfg, config_dev->type, config_dev->tag(), config_dev->clock);
-            new_cfg->static_config = config_dev->static_config;
-            memcpy(
-                new_cfg->inline_config,
-                config_dev->inline_config,
-                new_cfg->get_config_int(DEVINFO_INT_INLINE_CONFIG_BYTES));
-            new_dev = devlist->append(dev->subtag(tempstring,config_dev->tag()), new running_device(*_owner->machine, *new_cfg));
-            new_dev->owner = dev;
+			devlist->append(config_dev->tag(), config_dev->alloc_device(*_owner->machine));
         }
-        machine_config_free(config);
-    }*/
+		add_exit_callback(_owner->machine, memory_exit);        
+    }
 }
 
 static DEVICE_IMAGE_GET_DEVICES(cartslot)

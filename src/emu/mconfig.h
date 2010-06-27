@@ -423,6 +423,8 @@ union machine_config_token
 /* allocate a new machine configuration and populate it using the supplied constructor */
 machine_config *machine_config_alloc(const machine_config_token *tokens);
 
+machine_config *machine_config_alloc_owner(const machine_config_token *tokens, const device_config *owner);
+
 /* release memory allocated for a machine configuration */
 void machine_config_free(machine_config *config);
 

@@ -467,7 +467,10 @@ protected:
 public:
 	// access to legacy token
 	void *token() const { return m_token; }
-
+	
+	INT64 get_config_int(UINT32 state) const { return m_config.get_legacy_config_int(state); }
+	genf *get_config_fct(UINT32 state) const { return m_config.get_legacy_config_fct(state); }
+	void *get_config_ptr(UINT32 state) const { return m_config.get_legacy_config_ptr(state); }
 protected:
 	// device-level overrides
 	virtual void device_start();

@@ -221,8 +221,8 @@ static void set_pointers(running_device *pcb, int index)
 	aes_multicart_t *cartslots = (aes_multicart_t *)downcast<legacy_device_base *>(cartsys)->token();
 	aes_pcb_t *pcb_def = (aes_pcb_t *)downcast<legacy_device_base *>(pcb)->token();
 
-	//pcb_def->assemble = (assmfct *)pcb->get_config_fct(AESCART_FCT_ASSM);
-	//pcb_def->disassemble = (assmfct *)pcb->get_config_fct(AESCART_FCT_DISASSM);
+	pcb_def->assemble = (assmfct *)downcast<legacy_device_base *>(pcb)->get_config_fct(AESCART_FCT_ASSM);
+	pcb_def->disassemble = (assmfct *)downcast<legacy_device_base *>(pcb)->get_config_fct(AESCART_FCT_DISASSM);
 
 	pcb_def->cartridge = &cartslots->cartridge[index];
 	pcb_def->cartridge->pcb = pcb;

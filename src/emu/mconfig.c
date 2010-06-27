@@ -26,12 +26,12 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 ***************************************************************************/
 
 /*-------------------------------------------------
-    machine_config_alloc - allocate a new
+    machine_config_alloc_owner - allocate a new
     machine configuration and populate it using
-    the supplied constructor
+    the supplied constructor, and assign owner
 -------------------------------------------------*/
 
-machine_config *machine_config_alloc(const machine_config_token *tokens)
+machine_config *machine_config_alloc_owner(const machine_config_token *tokens, const device_config *owner)
 {
 	machine_config *config;
 
@@ -39,7 +39,7 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 	config = global_alloc_clear(machine_config);
 
 	/* parse tokens into the config */
-	machine_config_detokenize(config, tokens, NULL);
+	machine_config_detokenize(config, tokens, owner);
 
 	/* process any device-specific machine configurations */
 	for (const device_config *device = config->devicelist.first(); device != NULL; device = device->next())
@@ -56,6 +56,15 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 	return config;
 }
 
+/*-------------------------------------------------
+    machine_config_alloc - allocate a new
+    machine configuration and populate it using
+    the supplied constructor
+-------------------------------------------------*/
+machine_config *machine_config_alloc(const machine_config_token *tokens)
+{
+	return machine_config_alloc_owner(tokens,NULL);
+}
 
 /*-------------------------------------------------
     machine_config_free - release memory allocated
