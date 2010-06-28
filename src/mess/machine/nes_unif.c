@@ -1306,6 +1306,11 @@ static int unif_initialize( running_machine *machine, int idx )
 			bmc_gb63_update(machine);
 			break;
 
+		case UNL_SHJY3:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+			
 		case UNSUPPORTED_BOARD:
 		default:
 			/* Mapper not supported */

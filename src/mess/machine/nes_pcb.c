@@ -501,7 +501,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-WORLDHERO",    UNSUPPORTED_BOARD },// mapper 27
 	{ "UNL-A9746",        UNSUPPORTED_BOARD },// mapper 219
 	{ "UNL-603-5052",     UNSUPPORTED_BOARD },// mapper 238?
-	{ "UNL-SHJY3",        UNSUPPORTED_BOARD },// mapper 253
+	{ "UNL-SHJY3",        UNL_SHJY3 },// mapper 253
 	{ "UNL-RACERMATE",    UNL_RACERMATE },// mapper 168
 	{ "UNL-N625092",      UNL_N625092 },
 	{ "BMC-N625092",      UNL_N625092 },
@@ -10974,6 +10974,109 @@ static WRITE8_HANDLER( edu2k_w )
 	wram_bank(space->machine, (data & 0xc0) >> 6, NES_WRAM);
 }
 
+/*************************************************************
+ 
+ UNL-SHJY3
+ 
+ *************************************************************/
+
+/* I think the IRQ should only get fired if enough CPU cycles have passed, but we don't implement (yet) this part */
+static void shjy3_irq( running_device *device, int scanline, int vblank, int blanked )
+{
+	nes_state *state = (nes_state *)device->machine->driver_data;
+	if (state->IRQ_enable & 0x02)
+	{
+		if (state->IRQ_count == 0xff)
+		{
+			state->IRQ_count = state->IRQ_count_latch;
+			state->IRQ_enable = state->IRQ_enable | ((state->IRQ_enable & 0x01) << 1);
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+		}
+		else
+			state->IRQ_count++;
+	}
+}
+
+static void shjy3_update( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	int i;
+	
+	prg8_89(machine, state->mmc_prg_bank[0]);
+	prg8_ab(machine, state->mmc_prg_bank[1]);
+
+	for (i = 0; i < 8; i++)
+	{
+		UINT8 chr_bank = state->mmc_vrom_bank[i] | (state->mmc_extra_bank[i] << 4);
+		if (state->mmc_vrom_bank[i] == 0xc8)
+		{
+			state->mmc_latch1 = 0;
+			continue;
+		}
+		else if (state->mmc_vrom_bank[i] == 0x88)
+		{
+			state->mmc_latch1 = 1;
+			continue;
+		}
+		if ((state->mmc_vrom_bank[i] == 4 || state->mmc_vrom_bank[i] == 5) && !state->mmc_latch1)
+			chr1_x(machine, i, chr_bank & 1, CHRRAM);
+		else
+			chr1_x(machine, i, chr_bank, CHRROM);
+	}
+}
+
+static WRITE8_HANDLER( shjy3_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	UINT8 mmc_helper, shift;
+	LOG_MMC(("shjy3_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset >= 0x3000 && offset <= 0x600c)
+	{
+		mmc_helper = ((offset & 8) | (offset >> 8)) >> 3;
+		mmc_helper += 2;
+		mmc_helper &= 7;
+		shift = offset & 4;
+		
+		state->mmc_vrom_bank[mmc_helper] = (state->mmc_vrom_bank[mmc_helper] & (0xf0 >> shift)) | ((data & 0x0f) << shift);
+		if (shift)
+			state->mmc_extra_bank[mmc_helper] = data >> 4;
+	}
+	else
+	{
+		switch (offset)
+		{
+			case 0x0010:
+				state->mmc_prg_bank[0] = data;
+				break;
+			case 0x2010:
+				state->mmc_prg_bank[1] = data;
+				break;
+			case 0x1400:
+				switch (data & 0x03)
+				{
+					case 0: set_nt_mirroring(space->machine, PPU_MIRROR_VERT); break;
+					case 1: set_nt_mirroring(space->machine, PPU_MIRROR_HORZ); break;
+					case 2: set_nt_mirroring(space->machine, PPU_MIRROR_LOW); break;
+					case 3: set_nt_mirroring(space->machine, PPU_MIRROR_HIGH); break;
+				}
+				break;
+			case 0x7000:
+				state->IRQ_count_latch = (state->IRQ_count_latch & 0xf0) | (data & 0x0f);
+				break;
+			case 0x7004:
+				state->IRQ_count_latch = (state->IRQ_count_latch & 0x0f) | ((data & 0x0f) << 4);
+				break;
+			case 0x7008:
+				state->IRQ_enable = data & 0x03;
+				if (state->IRQ_enable & 0x02)
+					state->IRQ_count = state->IRQ_count_latch;
+				break;
+		}
+	}
+	shjy3_update(space->machine);
+}
+
 
 
 typedef void (*nes_ppu_latch)(running_device *device, offs_t offset);
@@ -11235,7 +11338,8 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BMC_810544,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_810544_w),          NULL, NULL, NULL },
 	{ BMC_NTD_03,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_ntd03_w),           NULL, NULL, NULL },
 	{ BMC_G63IN1,           NES_NOACCESS, NES_NOACCESS, {bmc_gb63_w, bmc_gb63_r},             NULL, NULL, NULL },
-	{ UNL_EDU2K,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(edu2k_w),                NULL, NULL, NULL },
+	{ UNL_EDU2K,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(edu2k_w),               NULL, NULL, NULL },
+	{ UNL_SHJY3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(shjy3_w),               NULL, NULL, shjy3_irq },
 	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	//
 };
