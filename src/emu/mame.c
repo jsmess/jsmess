@@ -1423,15 +1423,15 @@ static void init_machine(running_machine *machine)
 	/* start up the devices */
 	machine->devicelist.start_all();
 	
-	/* finish image devices init process*/
-	image_postdevice_init(machine);
-
 	/* call the game driver's init function */
 	/* this is where decryption is done and memory maps are altered */
 	/* so this location in the init order is important */
 	ui_set_startup_text(machine, "Initializing...", TRUE);
 	if (machine->gamedrv->driver_init != NULL)
 		(*machine->gamedrv->driver_init)(machine);
+
+	/* finish image devices init process*/
+	image_postdevice_init(machine);
 
 	/* start the video and audio hardware */
 	video_init(machine);
