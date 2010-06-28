@@ -2744,9 +2744,11 @@ READ8_HANDLER( ti99_8_r )
 	mapper_reg = ti99_8_mapper_regs[page];
 	offset = (mapper_reg + (offset & 0x0fff)) & 0x00ffffff;
 
-	if (offset < 0x010000)
-	/* Read RAM */
-	reply = xRAM_ptr_8[offset];
+	if (offset < 0x010000) {
+		UINT8 *mem = memory_region(space->machine, "maincpu")+ offset_xram_8;
+		/* Read RAM */
+		reply = mem[offset];
+	}
 
 	if (offset >= 0xff0000)
 	{
