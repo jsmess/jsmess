@@ -226,13 +226,13 @@ static void dump_screenshot(running_machine *machine, int write_file)
 			screen_device *screen = screen_first(*machine);
 			while((screen != NULL) && !render_is_live_screen(screen))
 			{
-				screen = video_screen_next(screen);
+				screen = screen_next(screen);
 			}
 
 			/* did we find a live screen? */
 			if (screen != NULL)
 			{
-				video_screen_save_snapshot(screen->machine, screen, fp);
+				screen_save_snapshot(screen->machine, screen, fp);
 				report_message(MSG_INFO, "Saved screenshot as %s", buf);
 			}
 			else
