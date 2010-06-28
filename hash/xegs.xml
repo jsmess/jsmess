@@ -127,7 +127,7 @@
 	
 	<software name="commando" supported="no">
 		<description>Commando (Prototype)</description>
-		<!-- <cart number>------</cart number> -->
+		<!-- <cart number></cart number> -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -211,7 +211,7 @@
 	
 	<software name="deflktor" supported="no">
 		<description>Deflektor (Prototype)</description>
-		<!-- <cart number>------</cart number> -->
+		<!-- <cart number></cart number> -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -343,7 +343,7 @@
 	
 	<software name="mean18" supported="no">
 		<description>Mean 18 (Prototype)</description>
-		<!-- <cart number>------</cart number> -->
+		<!-- <cart number></cart number> -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -355,7 +355,7 @@
 	
 	<software name="midimaze" supported="no">
 		<description>MIDI Maze (Prototype)</description>
-		<!-- <cart number>------</cart number> -->
+		<!-- <cart number></cart number> -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
@@ -439,7 +439,7 @@
 	
 	<software name="ttoppler" supported="no">
 		<description>Tower Toppler (Prototype)</description>
-		<!-- <cart number>------</cart number> -->
+		<!-- <cart number></cart number> -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="xegs_cart">
