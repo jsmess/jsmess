@@ -1034,6 +1034,8 @@ static void apple2_reset(running_machine *machine)
 	need_intcxrom = !strcmp(machine->gamedrv->name, "apple2c")
 		|| !strcmp(machine->gamedrv->name, "apple2c0")
 		|| !strcmp(machine->gamedrv->name, "apple2c3")
+		|| !strcmp(machine->gamedrv->name, "apple2c4")
+		|| !strcmp(machine->gamedrv->name, "prav8c")
 		|| !strcmp(machine->gamedrv->name, "apple2cp")
 		|| !strncmp(machine->gamedrv->name, "apple2g", 7);
 	apple2_setvar(machine, need_intcxrom ? VAR_INTCXROM : 0, ~0);
