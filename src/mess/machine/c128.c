@@ -404,7 +404,7 @@ WRITE8_HANDLER( c128_write_d000 )
 	running_device *vic2e = devtag_get_device(space->machine, "vic2e");
 	running_device *vdc8563 = devtag_get_device(space->machine, "vdc8563");
 
-	UINT8 c64_port6510 = m6510_get_port(space->machine->device<legacy_cpu_device>("maincpu"));
+	UINT8 c64_port6510 = m6510_get_port(space->machine->device<legacy_cpu_device>("m8502"));
 
 	if (!c128_write_io)
 	{
@@ -499,7 +499,7 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 	if (!c64mode)
 		return;
 
-	data = m6510_get_port(machine->device<legacy_cpu_device>("maincpu")) & 0x07;
+	data = m6510_get_port(machine->device<legacy_cpu_device>("m8502")) & 0x07;
 	if ((data == old) && (exrom == c64_exrom) && (game == c64_game) && !reset)
 		return;
 
@@ -1027,7 +1027,7 @@ WRITE8_HANDLER( c128_write_ff05 )
  */
 int c128_dma_read(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = m6510_get_port(machine->device<legacy_cpu_device>("maincpu"));
+	UINT8 c64_port6510 = m6510_get_port(machine->device<legacy_cpu_device>("m8502"));
 
 	/* main memory configuration to include */
 	if (c64mode)
@@ -1049,7 +1049,7 @@ int c128_dma_read(running_machine *machine, int offset)
 
 int c128_dma_read_color(running_machine *machine, int offset)
 {
-	UINT8 c64_port6510 = m6510_get_port(machine->device<legacy_cpu_device>("maincpu"));
+	UINT8 c64_port6510 = m6510_get_port(machine->device<legacy_cpu_device>("m8502"));
 
 	if (c64mode)
 		return c64_colorram[offset & 0x3ff] & 0xf;
