@@ -3,7 +3,7 @@
 //  wmain.h - Win32 GUI Imgtool main code
 //
 //============================================================
-
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <commctrl.h>
 
@@ -13,6 +13,7 @@
 #include "../modules.h"
 #include "winutf8.h"
 #include "strconv.h"
+#include "utils.h"
 
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance,
 	LPWSTR command_line_w, int cmd_show)

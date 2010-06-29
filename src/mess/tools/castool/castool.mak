@@ -34,8 +34,8 @@ CASTOOL_LIB_OBJS =						\
 	$(EMUOBJ)/emucore.o					\
 	$(EMUOBJ)/emuopts.o 				\
 	$(EMUOBJ)/memory.o					\
+	$(EMUOBJ)/ioprocs.o			\
 	$(MESSOBJ)/utils.o					\
-	$(MESSOBJ)/opresolv.o				\
 	$(MESS_FORMATS)/a26_cas.o           \
 	$(MESS_FORMATS)/apf_apt.o           \
 	$(MESS_FORMATS)/cbm_tap.o           \
@@ -62,7 +62,6 @@ CASTOOL_LIB_OBJS =						\
 	$(MESS_FORMATS)/vg5k_cas.o          \
 	$(MESS_FORMATS)/vt_cas.o            \
 	$(MESS_FORMATS)/zx81_p.o		    \
-	$(MESS_FORMATS)/ioprocs.o			\
 	$(MESS_FORMATS)/cassimg.o			\
 	$(MESS_FORMATS)/wavfile.o			\
 

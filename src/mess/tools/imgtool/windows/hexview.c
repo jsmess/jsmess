@@ -3,7 +3,12 @@
 //  hexview.c - A Win32 hex editor control
 //
 //============================================================
-
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <windowsx.h>
+#include <shellapi.h>
+#include <commctrl.h>
+#include <commdlg.h>
 #include "winutils.h"
 #include <stdio.h>
 #include <tchar.h>

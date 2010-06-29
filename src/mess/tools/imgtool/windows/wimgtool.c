@@ -3,12 +3,26 @@
 //  wimgtool.c - Win32 GUI Imgtool
 //
 //============================================================
-
+// standard windows headers
+#define WIN32_LEAN_AND_MEAN
+#define _WIN32_IE 0x0501
 #include <windows.h>
 #include <windowsx.h>
+#include <shellapi.h>
 #include <commctrl.h>
-#include <tchar.h>
+#include <commdlg.h>
+#include <wingdi.h>
+
+// standard C headers
+#include <stdio.h>
 #include <ctype.h>
+#include <io.h>
+#include <fcntl.h>
+#include <dlgs.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <tchar.h>
 
 #include "emu.h"
 #include "wimgtool.h"
