@@ -107,3 +107,4 @@ int cheat_mess_matches_crc_table(UINT32 crc)
 
 	return 0;
 }
+
