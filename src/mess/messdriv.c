@@ -1430,8 +1430,8 @@ const game_driver * const drivers[] =
 	DRIVER( newbraim )
 
 	/* Nokia Data */
-//138u2 DRIVER( mm1m6 )
-//138u2 DRIVER( mm1m7 )
+	DRIVER( mm1m6 )
+	DRIVER( mm1m7 )
 
 	/* Nuova Elettronica */
 	DRIVER( z80ne )	 /* 1980 - Z80NE */
