@@ -17,7 +17,7 @@
 		<publisher>Sinclair Research</publisher>
 		<part name="cart" interface="spectrum_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="jetpac.rom" size="16384" crc="1d194e5b" sha1="9745d1ee713b2c6d319752aee523105905cbf562" offset="000000" />
+				<rom name="jetpac.rom" size="16384" crc="1d194e5b" sha1="0f0ddb79bb6b052846e0419df231df44184fbca6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
