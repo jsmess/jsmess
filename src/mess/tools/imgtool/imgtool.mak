@@ -38,7 +38,6 @@ IMGTOOL_LIB_OBJS =					\
 	$(EMUOBJ)/memory.o				\
 	$(MESSOBJ)/utils.o				\
 	$(EMUOBJ)/ioprocs.o			\
-	$(EMUOBJ)/image.o			\
 	$(MESS_FORMATS)/flopimg.o			\
 	$(MESS_FORMATS)/cassimg.o			\
 	$(MESS_FORMATS)/basicdsk.o			\
