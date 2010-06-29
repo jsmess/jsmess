@@ -39,12 +39,12 @@
     MACROS / CONSTANTS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(UPD7220, upd7220);
+DECLARE_LEGACY_MEMORY_DEVICE(UPD7220, upd7220);
 
 #define MDRV_UPD7220_ADD(_tag, _clock, _config, _map) \
 	MDRV_DEVICE_ADD(_tag, UPD7220, _clock) \
 	MDRV_DEVICE_CONFIG(_config) \
-//	MDRV_DEVICE_ADDRESS_MAP(0, _map)
+	MDRV_DEVICE_ADDRESS_MAP(0, _map)
 
 #define UPD7220_INTERFACE(name) \
 	const upd7220_interface (name) =
