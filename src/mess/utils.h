@@ -191,11 +191,4 @@ INLINE UINT64 pick_integer_le(const void *ptr, size_t offset, size_t size)
 int compute_log2(int val);
 int hexdigit(char c);
 
-/* extension list handling */
-int find_extension(const char *extensions, const char *ext);
-void specify_extension(char *buffer, size_t buffer_len, const char *extension);
-
-/* validity checks */
-int utils_validitychecks(void);
-
 #endif /* UTILS_H */

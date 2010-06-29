@@ -1059,7 +1059,7 @@ DEVICE_GET_INFO(floppy)
 				/* set up a temporary string */
 				info->s[0] = '\0';
 				for ( i = 0; floppy_options[i].construct; i++ )
-					specify_extension( info->s, 256, floppy_options[i].extensions );
+					image_specify_extension( info->s, 256, floppy_options[i].extensions );
 			}
 			break;
 		default:

@@ -186,7 +186,7 @@ static void setup_extensions(assocdlg_info *dlginfo)
 
 	// merge all file extensions onto one comma-delimited list
 	for (module = imgtool_find_module(NULL); module; module = module->next)
-		specify_extension(dlginfo->buffer, ARRAY_LENGTH(dlginfo->buffer) - 1, module->extensions);
+		image_specify_extension(dlginfo->buffer, ARRAY_LENGTH(dlginfo->buffer) - 1, module->extensions);
 
 	// split the comma delimited list, and convert it to a string array
 	dlginfo->extension_count = 0;

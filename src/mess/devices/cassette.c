@@ -428,7 +428,7 @@ DEVICE_GET_INFO(cassette)
 				info->s[0] = '\0';
 
 				for ( i = 0; formats[i]; i++ )
-					specify_extension( info->s, 256, formats[i]->extensions );
+					image_specify_extension( info->s, 256, formats[i]->extensions );
 			}
 			break;
 	}

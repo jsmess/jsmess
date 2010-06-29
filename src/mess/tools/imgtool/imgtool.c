@@ -379,7 +379,7 @@ imgtoolerr_t imgtool_identify_file(const char *fname, imgtool_module **modules, 
 	/* iterate through all modules */
 	while((module = imgtool_library_iterate(library, module)) != NULL)
 	{
-		if (!extension || find_extension(module->extensions, extension))
+		if (!extension || image_find_extension(module->extensions, extension))
 		{
 			err = evaluate_module(fname, module, &val);
 			if (err)
