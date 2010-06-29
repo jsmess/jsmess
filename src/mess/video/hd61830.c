@@ -60,6 +60,8 @@ static const int HD61830_CYCLES[] = {
 typedef struct _hd61830_t hd61830_t;
 struct _hd61830_t
 {
+	const address_space *space;	/* memory space */
+
 	int bf;						/* busy flag */
 
 	UINT8 ir;					/* instruction register */
@@ -74,6 +76,8 @@ struct _hd61830_t
 	int hn;						/* horizontal number of characters */
 	int nx;						/* number of time divisions */
 	int cp;						/* cursor position */
+
+    int blink;					/* blinking */
 
 	/* devices */
 	screen_device *screen;
@@ -161,12 +165,11 @@ WRITE8_DEVICE_HANDLER( hd61830_control_w )
 READ8_DEVICE_HANDLER( hd61830_data_r )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
-	const address_space *space = cputag_get_address_space(device->machine, HD61830_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 data = hd61830->dor;
 
 	if (LOG) logerror("HD61380 '%s' Display Data Read %02x\n", device->tag(), hd61830->dor);
 
-	hd61830->dor = memory_read_byte(space, hd61830->cac);
+	hd61830->dor = memory_read_byte(hd61830->space, hd61830->cac);
 
 	hd61830->cac++;
 
@@ -180,7 +183,6 @@ READ8_DEVICE_HANDLER( hd61830_data_r )
 WRITE8_DEVICE_HANDLER( hd61830_data_w )
 {
 	hd61830_t *hd61830 = get_safe_token(device);
-	const address_space *space = cputag_get_address_space(device->machine, HD61830_TAG, ADDRESS_SPACE_PROGRAM);
 	switch (hd61830->ir)
 	{
 	case HD61830_INSTRUCTION_MODE_CONTROL:
@@ -255,7 +257,7 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 		break;
 
 	case HD61830_INSTRUCTION_DISPLAY_DATA_WRITE:
-		memory_write_byte(space, hd61830->cac, data);
+		memory_write_byte(hd61830->space, hd61830->cac, data);
 
 		if (LOG) logerror("HD61380 '%s' Display Data Write %02x -> %04x row %u col %u\n", device->tag(), data, hd61830->cac, hd61830->cac / 40, hd61830->cac % 40);
 
@@ -265,13 +267,13 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 	case HD61830_INSTRUCTION_CLEAR_BIT:
 		{
 		int nb = data & 0x07;
-		UINT8 data_ = memory_read_byte(space, hd61830->cac);
+		UINT8 data_ = memory_read_byte(hd61830->space, hd61830->cac);
 
 		data_ &= ~(2 << nb);
 
 		if (LOG) logerror("HD61380 '%s' Clear Bit %u at %04x\n", device->tag(), nb + 1, hd61830->cac);
 
-		memory_write_byte(space, hd61830->cac, data_);
+		memory_write_byte(hd61830->space, hd61830->cac, data_);
 
 		hd61830->cac++;
 		}
@@ -280,13 +282,13 @@ WRITE8_DEVICE_HANDLER( hd61830_data_w )
 	case HD61830_INSTRUCTION_SET_BIT:
 		{
 		int nb = data & 0x07;
-		UINT8 data_ = memory_read_byte(space, hd61830->cac);
+		UINT8 data_ = memory_read_byte(hd61830->space, hd61830->cac);
 
 		data_ |= 2 << nb;
 
 		if (LOG) logerror("HD61380 '%s' Set Bit %u at %04x\n", device->tag(), nb + 1, hd61830->cac);
 
-		memory_write_byte(space, hd61830->cac, data_);
+		memory_write_byte(hd61830->space, hd61830->cac, data_);
 
 		hd61830->cac++;
 		}
@@ -309,11 +311,10 @@ static void draw_scanline(running_device *device, bitmap_t *bitmap, const rectan
 {
 	hd61830_t *hd61830 = get_safe_token(device);
 	int sx, x;
-	const address_space *space = cputag_get_address_space(device->machine, HD61830_TAG, ADDRESS_SPACE_PROGRAM);
 
 	for (sx = 0; sx < hd61830->hn; sx++)
 	{
-		UINT8 data = memory_read_byte(space, ra++);
+		UINT8 data = memory_read_byte(hd61830->space, ra++);
 
 		for (x = 0; x < hd61830->hp; x++)
 		{
@@ -346,6 +347,74 @@ static void update_graphics(running_device *device, bitmap_t *bitmap, const rect
 }
 
 /*-------------------------------------------------
+    draw_char - draw a char
+-------------------------------------------------*/
+
+static void draw_char(running_device *device, bitmap_t *bitmap, const rectangle *cliprect, int x, int y, UINT8 char_code)
+{
+	hd61830_t *hd61830 = get_safe_token(device);
+
+	if (char_code < 0x20 || char_code > 0x7f)
+		return;
+
+	for(int cl = 0; cl < 7; cl++)
+	{
+		for(int cr = 0; cr < 5; cr++)
+		{
+			if (hd61830->screen->height() > y * hd61830->vp + cl && hd61830->screen->width() > x * hd61830->hp + cr )
+				*BITMAP_ADDR16(bitmap, y * hd61830->vp + cl, x * hd61830->hp + cr) = device->subregion("hd61830")->base.u8[((char_code - 0x20) * 7 + cl)] & (1<<(4 - cr)) ? 1 : 0;
+		}
+	}
+}
+
+/*-------------------------------------------------
+    update_text- draw text mode screen
+-------------------------------------------------*/
+
+static void update_text(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+{
+	hd61830_t *hd61830 = get_safe_token(device);
+
+	if (hd61830->blink < 0xff)
+		hd61830->blink++;
+	else
+		hd61830->blink = 0;
+
+	for(int y = 0; y < 8; y++)
+		for(int x = 0; x < hd61830->hn; x++)
+		{
+			UINT8 char_code = memory_read_byte(hd61830->space, y * hd61830->hn + x);
+
+			if (hd61830->cac == y * hd61830->hn + x)
+			{
+				/* update cursor */
+				switch ((hd61830->mcr >> 2) & 0x03)
+				{
+					case 0: //cursor OFF
+						draw_char(device, bitmap, cliprect, x, y, char_code);
+						break;
+					case 1:  //cursor ON
+						if (hd61830->blink & 0x20)
+							for(int cr = 0; cr < hd61830->hp; cr++)
+								*BITMAP_ADDR16(bitmap, y * hd61830->vp + (hd61830->cp - 1), x * hd61830->hp + cr) = 1;
+						else
+							draw_char(device, bitmap, cliprect, x, y, char_code);
+						break;
+					case 2: //cursor OFF character blink
+					case 3: //cursor blank
+						if (hd61830->blink & 0x20)
+							draw_char(device, bitmap, cliprect, x, y, 0x20);
+						else
+							draw_char(device, bitmap, cliprect, x, y, char_code);
+						break;
+				}
+			}
+			else
+				draw_char(device, bitmap, cliprect, x, y, char_code);
+		}
+}
+
+/*-------------------------------------------------
     hd61830_update - update screen
 -------------------------------------------------*/
 
@@ -359,7 +428,7 @@ void hd61830_update(running_device *device, bitmap_t *bitmap, const rectangle *c
 	}
 	else
 	{
-		logerror("HD61830 text mode not supported!\n");
+		update_text(device, bitmap, cliprect);
 	}
 }
 
@@ -387,7 +456,8 @@ WRITE8_DEVICE_HANDLER( hd61830_w )
 
 ROM_START( hd61830 )
 	ROM_REGION( 0x398, "hd61830", ROMREGION_LOADBYNAME )
-	ROM_LOAD( "hd61830.bin", 0x000, 0x398, NO_DUMP ) /* internal 7360-bit chargen ROM */
+	/* this is a fake charset used only for testing, the internal charset is still not dumped */
+	ROM_LOAD( "hd61830.bin", 0x000, 0x2a0, BAD_DUMP CRC(8faff7b9) SHA1(9626d4ace32d495f9840e456a501845fe60ad64c) ) /* internal 7360-bit chargen ROM */
 ROM_END
 
 /*-------------------------------------------------
@@ -410,6 +480,8 @@ static DEVICE_START( hd61830 )
 	/* get the screen device */
 	hd61830->screen = device->machine->device<screen_device>(config->screen_tag);
 	assert(hd61830->screen != NULL);
+
+	hd61830->space = device_get_space(device, ADDRESS_SPACE_0);
 
 	/* create the busy timer */
 	hd61830->busy_timer = timer_alloc(device->machine, busy_tick, (void *)device);
@@ -475,4 +547,4 @@ DEVICE_GET_INFO( hd61830 )
 	}
 }
 
-DEFINE_LEGACY_DEVICE(HD61830, hd61830);
+DEFINE_LEGACY_MEMORY_DEVICE(HD61830, hd61830);
