@@ -24,10 +24,10 @@ include $(MESSSRC)/tools/castool/castool.mak
 TOOLS += $(CASTOOL)
 endif
 
-#ifdef BUILD_MESSTEST
-#include $(MESSSRC)/tools/messtest/messtest.mak
-#TOOLS += $(MESSTEST)
-#endif
+ifdef BUILD_MESSTEST
+include $(MESSSRC)/tools/messtest/messtest.mak
+TOOLS += $(MESSTEST)
+endif
 
 ifdef BUILD_DAT2HTML
 include $(MESSSRC)/tools/dat2html/dat2html.mak
