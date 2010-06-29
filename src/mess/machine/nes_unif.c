@@ -119,7 +119,7 @@ static const unif unif_list[] =
 	{ "UNL-KS7032",                 0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, //  mapper 142
 	{ "UNL-DANCE",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},
 	{ "UNL-603-5052",               0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD}, // mapper 238?
-	{ "UNL-EDU2000",               32,    0, CHRRAM_8,  NT_Y,  UNSUPPORTED_BOARD /*UNL_EDU2K*/},
+	{ "UNL-EDU2000",               32,    0, CHRRAM_8,  NT_Y,  UNL_EDU2K},
 	{ "UNL-H2288",                  0,    0, CHRRAM_0,  NT_X,  UNSUPPORTED_BOARD},	// mapper 123
 	{ "UNL-SHERO",                  0,    0, CHRRAM_8,  NT_4SCR_2K, UNSUPPORTED_BOARD /*SACHEN_SHERO*/},
 	{ "UNL-TF1201",                 0,    0, CHRRAM_0,  NT_VERT, UNSUPPORTED_BOARD /*UNL_TF1201*/},
@@ -1301,6 +1301,11 @@ static int unif_initialize( running_machine *machine, int idx )
 
 		case UNL_EDU2K:
 			break;
+			
+		case KAISER_KS7022:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
 
 		case BMC_G63IN1:
 			bmc_gb63_update(machine);
@@ -1310,7 +1315,20 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
-			
+
+		case KAISER_KS7017:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+
+		case KAISER_KS7032:
+		case KAISER_KS202:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
+			chr8(machine, 0, state->mmc_chr_source);
+			break;
+
 		case UNSUPPORTED_BOARD:
 		default:
 			/* Mapper not supported */

@@ -163,15 +163,16 @@ static void init_nes_core( running_machine *machine )
 		memory_install_read8_handler(space, 0x8000, 0xffff, 0, 0, state->mmc_read);
 
 	// install additional handlers
-	if (state->pcb_id == BTL_SMB2B)
+	if (state->pcb_id == BTL_SMB2B || state->mapper == 50)
 	{
 		memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, smb2jb_extra_w);
 		memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, smb2jb_extra_w);
 	}
-	if (state->mapper == 50)
+
+	if (state->pcb_id == KAISER_KS7017)
 	{
-		memory_install_write8_handler(space, 0x4020, 0x403f, 0, 0, nes_mapper50_add_w);
-		memory_install_write8_handler(space, 0x40a0, 0x40bf, 0, 0, nes_mapper50_add_w);
+		memory_install_read8_handler(space, 0x4030, 0x4030, 0, 0, ks7017_extra_r);
+		memory_install_write8_handler(space, 0x4020, 0x40ff, 0, 0, ks7017_extra_w);
 	}
 }
 

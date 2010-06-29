@@ -482,10 +482,10 @@ static const nes_pcb pcb_list[] =
 	{ "HENGGEDIANZI",     HENGEDIANZI_BOARD },
 	{ "HENGGEDIANZI-XJZB", HENGEDIANZI_XJZB },
 	{ "KAISER-KS7058",    KAISER_KS7058 },
-	{ "KAISER-KS202",     UNSUPPORTED_BOARD },// mapper 56
-	{ "KAISER-KS7022",    UNSUPPORTED_BOARD },// mapper 175
-	{ "UNL-KS7017",       UNSUPPORTED_BOARD },
-	{ "UNL-KS7032",       UNSUPPORTED_BOARD }, //  mapper 142
+	{ "KAISER-KS202",     KAISER_KS202 },// mapper 56
+	{ "KAISER-KS7022",    KAISER_KS7022 },// mapper 175
+	{ "UNL-KS7017",       KAISER_KS7017 },
+	{ "UNL-KS7032",       KAISER_KS7032 }, //  mapper 142
 	{ "RCM-GS2015",       RCM_GS2015 },
 	{ "RCM-TETRISFAMILY", RCM_TETRISFAMILY },
 	{ "UNL-NINJARYU",     UNSUPPORTED_BOARD },// mapper 111
@@ -601,7 +601,6 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-8157",         UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
 	{ "UNL-3D-BLOCK",     UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
 	{ "UNL-C-N22M",       UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
-	{ "UNL-KS7017",       UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
 	{ "UNL-PEC-586",      UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
 	{ "UNL-SA-009",       UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
 //
@@ -659,14 +658,32 @@ INLINE UINT8 mmc_hi_access_rom( running_machine *machine, UINT32 offset )
 }
 
 /*************************************************************
+ 
+ NROM board emulation
+ 
+ Games: Mario Bros., Super Mario Bros., Tennis and most of
+ the first generation games
+ 
+ iNES: mapper 0
+ 
+ In MESS: Supported, no need of specific handlers or IRQ
+ 
+ *************************************************************/
+
+/*************************************************************
 
  UxROM board emulation
+ 
+ Games: Castlevania, Dragon Quest II, Duck Tales, MegaMan, 
+ Metal Gear
 
  writes to 0x8000-0xffff change PRG 16K lower banks
 
  missing BC?
 
  iNES: mapper 2
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -685,7 +702,7 @@ static WRITE8_HANDLER( uxrom_w )
 
  Very simple mapper: prg16_89ab is always set to bank 0,
  while prg16_cdef is set by writes to 0x8000-0xffff. The game
- uses a custim controller.
+ uses a custom controller.
 
  iNES: mapper 180
 
@@ -704,11 +721,15 @@ static WRITE8_HANDLER( uxrom_cc_w )
 
  UN1ROM board emulation
 
+ Games: Senjou no Okami
+
  writes to 0x8000-0xffff change PRG 16K lower banks
 
  missing BC?
 
  iNES: mapper 94
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -722,16 +743,24 @@ static WRITE8_HANDLER( un1rom_w )
 /*************************************************************
 
  CNROM board emulation
+ 
+ Games: B-Wings, Mighty Bomb Jack, Seicross, Spy vs. Spy,
+ Adventure Island, Flipull, Friday 13th, GeGeGe no
+ Kitarou, Ghostbusters, Gradius, Hokuto no Ken, Milon's
+ Secret Castle
 
  writes to 0x8000-0xffff change CHR 8K banks
 
  missing BC?
 
- iNES: mapper 3
+ iNES: mappers 3 & 185 (the latter for games using Pins as 
+ protection)
 
  Notice that BANDAI_PT554 board (Aerobics Studio) uses very
  similar hardware but with an additional sound chip which
  gets writes to 0x6000 (currently unemulated in MESS)
+
+ In MESS: Supported
 
  *************************************************************/
 
@@ -780,9 +809,13 @@ static WRITE8_HANDLER( bandai_pt554_m_w )
 
  CPROM board emulation
 
+ Games: Videomation
+
  writes to 0x8000-0xffff change CHR 4K lower banks
 
  iNES: mapper 13
+
+ In MESS: Supported
 
  *************************************************************/
 
@@ -796,11 +829,15 @@ static WRITE8_HANDLER( cprom_w )
 
  AxROM board emulation
 
+ Games: Arch Rivals, Battletoads, Cabal, Commando, Solstice
+
  writes to 0x8000-0xffff change PRG banks + sets mirroring
 
  missing BC for AMROM?
 
  iNES: mapper 7
+
+ In MESS: Supported
 
  *************************************************************/
 
@@ -1050,7 +1087,11 @@ static WRITE8_HANDLER( sxrom_w )
 
  PxROM (MMC2 based) board emulation
 
+ Games: Punch Out!!, Mike Tyson's Punch Out!!
+
  iNES: mapper 9
+
+ In MESS: Supported
 
  *************************************************************/
 
@@ -1125,9 +1166,13 @@ static WRITE8_HANDLER( pxrom_w )
 
  FxROM (MMC4 based) board emulation
 
+ Games: Famicom Wars, Fire Emblem, Fire Emblem Gaiden
+
  iNES: mapper 10
 
- *************************************************************/
+ In MESS: Supported
+
+*************************************************************/
 
 static WRITE8_HANDLER( fxrom_w )
 {
@@ -1389,8 +1434,13 @@ static WRITE8_HANDLER( hkrom_w )
 
  TxSROM (MMC3 based) board emulation
 
+ Games: Armadillo, Play Action Football, Pro Hockey, RPG
+ Jinsei Game, Y's 3
+
  iNES: mapper 118
 
+ In MESS: Supported. It also uses mmc3_irq.
+ 
  *************************************************************/
 
 static void txsrom_set_mirror( running_machine *machine )
@@ -1467,8 +1517,12 @@ static WRITE8_HANDLER( txsrom_w )
 
  TQROM (MMC3 based) board emulation
 
+ Games: Pin Bot, High Speed
+ 
  iNES: mapper 119
 
+ In MESS: Supported. It also uses mmc3_irq.
+ 
  *************************************************************/
 
 static void tqrom_set_chr( running_machine *machine )
@@ -1587,6 +1641,8 @@ static WRITE8_HANDLER( qj_m_w )
 /*************************************************************
 
  ExROM (MMC5 based) board emulation
+
+ Games: Castlevania III, Just Breed, many Koei titles
 
  iNES: mapper 5
 
@@ -2508,6 +2564,8 @@ static WRITE8_HANDLER( jxrom_w )
 
  DxROM & Namcot 3433 - 3443 board emulation
 
+ Games: Dragon Spirit - Aratanaru Densetsu, Namcot Mahjong, Quinty
+
  These are the same board, but DRROM (and Tengen 800004) have
  4-screen mirroring
 
@@ -2549,6 +2607,8 @@ static WRITE8_HANDLER( dxrom_w )
 
  Namcot 3453 board emulation
 
+ Games: Devil Man
+ 
  These are the same as Namcot 34x3, but with additional mirroring
  control
 
@@ -2570,6 +2630,8 @@ static WRITE8_HANDLER( namcot3453_w )
 /*************************************************************
 
  Namcot 3446 board emulation
+
+ Games: Digital Devil Monogatari - Megami Tensei
 
  These are similar Namcot 34x3, but different bankswitch capabilities
 
@@ -2613,10 +2675,12 @@ static WRITE8_HANDLER( namcot3446_w )
 
  Namcot 3425 board emulation
 
+ Games: Dragon Buster
+
  These are similar Namcot 34x3, but with NT mirroring (two
  different modes)
 
- iNES: mappers 95
+ iNES: mapper 95
 
  *************************************************************/
 
@@ -2666,8 +2730,12 @@ static WRITE8_HANDLER( namcot3425_w )
 
  Discrete Logic board IC 74x377 by Color Dreams / Nina-007 emulation
 
- iNES: mappers 11
+ Games: many Color Dreams and Wisdom Tree titles
 
+ iNES: mapper 11
+
+ In MESS: Supported
+ 
  *************************************************************/
 
 static WRITE8_HANDLER( dis_74x377_w )
@@ -2683,7 +2751,7 @@ static WRITE8_HANDLER( dis_74x377_w )
 
  Discrete Logic board IC 74x139x74 by Konami & Jaleco
 
- iNES: mappers 87
+ iNES: mapper 87
 
  *************************************************************/
 
@@ -2698,7 +2766,9 @@ static WRITE8_HANDLER( dis_74x139x74_m_w )
 
  Discrete Logic board IC 74x161x138
 
- iNES: mappers 38
+ Games: Crime Busters
+
+ iNES: mapper 38
 
  *************************************************************/
 
@@ -2718,7 +2788,7 @@ static WRITE8_HANDLER( dis_74x161x138_m_w )
  other with a mirroring control), making necessary two distinct
  mappers & pcb_id
 
- iNES: mapper 70 & 152
+ iNES: mappers 70 & 152
 
  *************************************************************/
 
@@ -2737,12 +2807,23 @@ static WRITE8_HANDLER( dis_74x161x161x32_w )
 
  Bandai LZ93D50 boards emulation
 
- There are several variants: plain board, board + 24C01 EEPROM,
- board + 24C02 EEPROM, board + Barcode Reader (DATACH).
+ There are several variants: plain board with or without SRAM, 
+ board + 24C01 EEPROM, board + 24C02 EEPROM, board + Barcode 
+ Reader (DATACH).
  We currently only emulate the base hardware.
 
- iNES: mapper 16, 153 & 157
+ Games: Crayon Shin-Chan - Ora to Poi Poi, Dragon Ball Z Gaiden,
+ Dragon Ball Z II & III, Rokudenashi Blues, SD Gundam
+ Gaiden - KGM2, Dragon Ball Z, Magical Taruruuto-kun, SD Gundam 
+ Gaiden [with EEPROM], Dragon Ball, Dragon Ball 3, Famicom Jump, 
+ Famicom Jump II [no EEPROM], Datach Games
 
+ At the moment, we don't support EEPROM I/O
+
+ iNES: mapper 16, 153, 157 & 159
+
+ In MESS: Supported
+ 
  *************************************************************/
 
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
@@ -2855,6 +2936,8 @@ static WRITE8_HANDLER( fjump2_w )
 
  Bandai Karaoke Studio board emulation
 
+ Games: Karaoke Studio
+ 
  Note: we currently do not emulate the mic
 
  iNES: mapper 188
@@ -2872,10 +2955,13 @@ static WRITE8_HANDLER( bandai_ks_w )
 
  Bandai Oeka Kids board emulation
 
- Note: we currently do support the correct mirroring
+ Games: Oeka Kids - Anpanman no Hiragana Daisuki, Oeka
+ Kids - Anpanman to Oekaki Shiyou!!
 
  iNES: mapper 96
 
+ In MESS: Preliminary Support.
+ 
  *************************************************************/
 
 static WRITE8_HANDLER( bandai_ok_w )
@@ -2894,7 +2980,9 @@ static WRITE8_HANDLER( bandai_ok_w )
 
 /*************************************************************
 
- Irem Discrete board emulation (74*161/161/21/138)
+ Irem LROG017 - Discrete board emulation (74*161/161/21/138)
+
+ Games: Napoleon Senki
 
  iNES: mapper 77
 
@@ -2929,8 +3017,12 @@ static WRITE8_HANDLER( irem_hd_w )
 
  Irem TAM-S1 board emulation
 
+ Games: Kaiketsu Yanchamaru
+
  iNES: mapper 97
 
+ In MESS: Supported.
+ 
  *************************************************************/
 
 static WRITE8_HANDLER( tam_s1_w )
@@ -2983,7 +3075,12 @@ static WRITE8_HANDLER( g101_w )
 
  Irem H-3001 board emulation
 
+ Games: Daiku no Gen San 2 - Akage no Dan no Gyakushuu,
+ Kaiketsu Yanchamaru 3, Spartan X 2
+
  iNES: mapper 65
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -3058,9 +3155,14 @@ static WRITE8_HANDLER( h3001_w )
 
  Jaleco SS88006 board emulation, aka JF-27, JF-29, JF-30, ...,
  JF-38, JF-40, JF-41
+ 
+ Games: Lord of King, Magic John, Moe Pro '90, Ninja Jajamaru,
+ Pizza Pop, Plasma Ball
 
  iNES: mapper 18
 
+ In MESS: Supported
+ 
  *************************************************************/
 
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
@@ -3203,8 +3305,12 @@ static WRITE8_HANDLER( ss88006_w )
 
  Jaleco JF-11, JF-12 & JF-14 boards emulation
 
+ Games: Bio Senshi Dan, Mississippi Satsujin Jiken
+
  iNES: mapper 140
 
+ In MESS: Supported.
+ 
  *************************************************************/
 
 static WRITE8_HANDLER( jf11_m_w )
@@ -3218,9 +3324,13 @@ static WRITE8_HANDLER( jf11_m_w )
 
  Jaleco JF-13 board emulation
 
+ Games: Moero Pro Yakyuu
+
  Note: we don't emulate the additional sound hardware.
 
  iNES: mapper 86
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -3268,7 +3378,12 @@ static WRITE8_HANDLER( jf16_w )
 
  Note: we don't emulate the additional sound hardware.
 
+ Games: Moero!! Juudou Warriors, Moero!! Pro Tennis, Pinball
+ Quest Jpn
+
  iNES: mapper 72
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -3290,8 +3405,12 @@ static WRITE8_HANDLER( jf17_w )
 
  Note: we don't emulate the additional sound hardware.
 
+ Games: Moero Pro Soccer, Moero Pro Yakyuu '88
+
  iNES: mapper 92
 
+ In MESS: Supported (no samples).
+ 
  *************************************************************/
 
 static WRITE8_HANDLER( jf19_w )
@@ -3721,14 +3840,19 @@ static WRITE8_HANDLER( konami_vrc7_w )
 
  Namcot-163 board emulation
 
+ Games: Battle Fleet, Family Circuit '91, Famista '90, '91,
+ '92 & '94, Megami Tensei II, Top Striker, Wagyan Land 2 & 3
+
  iNES: mapper 19
+
+ In MESS: Supported
 
  *************************************************************/
 
 /* Here, IRQ counter decrements every CPU cycle. Since we update it every scanline,
  we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
  there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
-static void namcot163_irq( running_device *device, int scanline, int vblank, int blanked )
+static void namcot_irq( running_device *device, int scanline, int vblank, int blanked )
 {
 	nes_state *state = (nes_state *)device->machine->driver_data;
 
@@ -3835,6 +3959,9 @@ static WRITE8_HANDLER( namcot163_w )
 /*************************************************************
 
  Sunsoft-1 board emulation
+
+ Games: Atlantis no Nazo, Kanshakudama Nage Kantarou no
+ Toukaidou Gojuusan Tsugi, Wing of Madoola, Fantasy Zone
 
  iNES: mapper 184 (Fantasy Zone uses this board with no
  CHRROM, and the register switches PRG banks)
@@ -3966,7 +4093,13 @@ static WRITE8_HANDLER( sunsoft3_w )
 
  Taito TC0190FMC + board emulation
 
+ Games: Akira, Bakushou!! Jinsei Gekijou, Don Doko Don,
+ Insector X, Operation Wolf, Power Blazer, Takeshi no
+ Sengoku Fuuunji
+
  iNES: mapper 33
+ 
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -4008,8 +4141,19 @@ static WRITE8_HANDLER( tc0190fmc_w )
 
  Taito TC0190FMC + PAL16R4 board emulation
 
+ Games: Bakushou!! Jinsei Gekijou 3, Bubble Bobble 2,
+ Captain Saver, Don Doko Don 2, Flintstones, Jetsons
+ 
+ This is basically Mapper 33 + IRQ. Notably, IRQ works the
+ same as MMC3 irq, BUT latch values are "inverted" (XOR'ed
+ with 0xff) and there is a little delay (not implemented yet)
+ We simply use MMC3 IRQ and XOR the value written in the
+ register 0xc000 below
+ 
  iNES: mapper 48
 
+ In MESS: Supported.
+ 
  *************************************************************/
 
 static WRITE8_HANDLER( tc0190fmc_p16_w )
@@ -4158,8 +4302,13 @@ static WRITE8_HANDLER( x1005a_m_w )
  We miss to emulate the security check at 0x6000-0x73ff
  and the ram!
 
+ Games: Kyuukyoku Harikiri Koushien, Kyuukyoku Harikiri
+ Stadium, SD Keiji - Blader
+
  iNES: mapper 82
 
+ In MESS: Supported.
+ 
  *************************************************************/
 
 static void x1017_set_chr( running_machine *machine )
@@ -4258,7 +4407,11 @@ static READ8_HANDLER( x1017_m_r )
 
  AGCI 50282 bootleg board emulation
 
+ Games: Death Race
+
  iNES: mapper 144
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -4303,7 +4456,12 @@ static WRITE8_HANDLER( nina01_m_w )
 
  AVE NINA-003, NINA-006 and MB-91 boards emulation
 
+ Games: Krazy Kreatures, Poke Block, Puzzle, Pyramid,
+ Solitaire, Ultimate League Soccer
+
  iNES: mapper 79
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -5095,7 +5253,7 @@ static WRITE8_HANDLER( hosenkan_w )
 
 /*************************************************************
 
- Bootleg Board by Kaiser (KS7058)
+ Kaiser Board KS7058
 
  Games: Tui Do Woo Ma Jeung
 
@@ -5122,6 +5280,247 @@ static WRITE8_HANDLER( ks7058_w )
 			chr4_4(space->machine, data, CHRROM);
 			break;
 	}
+}
+
+/*************************************************************
+ 
+ Kaiser Board KS7022
+ 
+ Games: 15 in 1
+ 
+ iNES: mapper 175
+ 
+ In MESS: Supported?
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( ks7022_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("ks7022_w, offset: %04x, data: %02x\n", offset, data));
+
+	if (offset == 0)
+		set_nt_mirroring(space->machine, BIT(data, 2) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+
+	if (offset == 0x2000)
+		state->mmc_latch1 = data & 0x0f;
+}
+
+static READ8_HANDLER( ks7022_r )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("ks7022_r, offset: %04x\n", offset));
+	
+	if (offset == 0x7ffc)
+	{
+		chr8(space->machine, state->mmc_latch1, CHRROM);
+		prg16_89ab(space->machine, state->mmc_latch1);
+		prg16_cdef(space->machine, state->mmc_latch1);
+	}
+
+	return mmc_hi_access_rom(space->machine, offset);
+}
+
+/*************************************************************
+ 
+ Kaiser Board KS7032
+ 
+ Games: 
+ 
+ iNES: 
+ 
+ In MESS: 
+ 
+ *************************************************************/
+
+static void ks7032_prg_update( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	prg8_67(machine, state->mmc_reg[4]);
+	prg8_89(machine, state->mmc_reg[1]);
+	prg8_ab(machine, state->mmc_reg[2]);
+	prg8_cd(machine, state->mmc_reg[3]);
+}
+
+static void ks7032_irq( running_device *device, int scanline, int vblank, int blanked )
+{
+	nes_state *state = (nes_state *)device->machine->driver_data;
+	
+	if (state->IRQ_enable)
+	{
+		if (state->IRQ_count >= (0xffff - 114))
+		{
+			state->IRQ_enable = 0;
+			state->IRQ_count = state->IRQ_count_latch;
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+		}
+		else
+			state->IRQ_count += 114;
+	}
+}
+
+static WRITE8_HANDLER( ks7032_l_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("ks7032_l_w, offset: %04x, data: %02x\n", offset, data));
+
+	chr8(space->machine, data, state->mmc_chr_source);
+}
+
+static WRITE8_HANDLER( ks7032_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("ks7032_w, offset: %04x, data: %02x\n", offset, data));
+	
+	switch (offset & 0x7000)
+	{
+		case 0x0000:
+			state->IRQ_count = (state->IRQ_count & 0xfff0) | (data & 0x0f);
+			break;
+		case 0x1000:
+			state->IRQ_count = (state->IRQ_count & 0xff0f) | ((data & 0x0f) << 4);
+			break;
+		case 0x2000:
+			state->IRQ_count = (state->IRQ_count & 0xf0ff) | ((data & 0x0f) << 8);
+			break;
+		case 0x3000:
+			state->IRQ_count = (state->IRQ_count & 0x0fff) | ((data & 0x0f) << 12);
+			break;
+		case 0x4000:
+			state->IRQ_enable = 1;
+			break;
+		case 0x6000:
+			state->mmc_latch1 = data & 0x07;
+			break;
+		case 0x7000:
+			state->mmc_reg[state->mmc_latch1] = data;
+			ks7032_prg_update(space->machine);
+			break;
+	}
+}
+
+/*************************************************************
+ 
+ Kaiser Board KS202
+ 
+ Games: 
+ 
+ iNES: 
+ 
+ In MESS: Supported?
+ 
+ *************************************************************/
+
+
+static WRITE8_HANDLER( ks202_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("ks202_w, offset: %04x, data: %02x\n", offset, data));
+	
+	switch (offset & 0x7000)
+	{
+		case 0x0000:
+			state->IRQ_count = (state->IRQ_count & 0xfff0) | (data & 0x0f);
+			break;
+		case 0x1000:
+			state->IRQ_count = (state->IRQ_count & 0xff0f) | ((data & 0x0f) << 4);
+			break;
+		case 0x2000:
+			state->IRQ_count = (state->IRQ_count & 0xf0ff) | ((data & 0x0f) << 8);
+			break;
+		case 0x3000:
+			state->IRQ_count = (state->IRQ_count & 0x0fff) | ((data & 0x0f) << 12);
+			break;
+		case 0x4000:
+			state->IRQ_enable = 1;
+			break;
+		case 0x6000:
+			state->mmc_latch1 = data & 0x07;
+			break;
+		case 0x7000:
+			state->mmc_reg[state->mmc_latch1] = data;
+			ks7032_prg_update(space->machine);
+			switch (offset & 0xc00)
+			{
+			case 0x800:
+				set_nt_mirroring(space->machine, BIT(data, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
+				break;
+			case 0xc00:
+				chr1_x(space->machine, offset & 0x07, data, CHRROM);
+				break;
+			}
+			break;
+	}
+}
+
+/*************************************************************
+ 
+ Kaiser Board KS7017
+ 
+ Games: 
+ 
+ iNES: 
+ 
+ In MESS: Not working
+ 
+ *************************************************************/
+
+static void mmc_fds_irq( running_device *device, int scanline, int vblank, int blanked )
+{
+	nes_state *state = (nes_state *)device->machine->driver_data;
+	
+	if (state->IRQ_enable)
+	{
+		if (state->IRQ_count <= 114)
+		{
+			cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
+			state->IRQ_enable = 0;
+			state->IRQ_status |= 0x01;
+		}
+		else
+			state->IRQ_count -= 114;
+	}
+}
+
+static WRITE8_HANDLER( ks7017_l_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("ks7022_w, offset: %04x, data: %02x\n", offset, data));
+	
+	offset += 0x100;
+
+	if (offset >= 0xa00 && offset < 0xb00)
+		state->mmc_latch1 = ((offset >> 2) & 0x03) | ((offset >> 4) & 0x04);
+	
+	if (offset >= 0x1000 && offset < 0x1100)
+		prg16_89ab(space->machine, state->mmc_latch1);
+}
+
+WRITE8_HANDLER( ks7017_extra_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("ks7017_extra_w, offset: %04x, data: %02x\n", offset, data));
+	
+	offset += 0x20;
+
+	if (offset == 0x0020) /* 0x4020 */
+		state->IRQ_count = (state->IRQ_count & 0xff00) | data;
+	
+	if (offset == 0x0021) /* 0x4021 */
+		state->IRQ_count = (state->IRQ_count & 0x00ff) | (data << 8);
+
+	if (offset == 0x0025) /* 0x4025 */
+		set_nt_mirroring(space->machine, BIT(data, 3) ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+}
+
+READ8_HANDLER( ks7017_extra_r )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("ks7017_extra_r, offset: %04x\n", offset));
+	
+	state->IRQ_status &= ~0x01;
+	return state->IRQ_status;
 }
 
 /*************************************************************
@@ -6012,7 +6411,10 @@ static WRITE8_HANDLER( rumblestation_w )
 
  Sachen 74x374 bootleg boards
 
- iNES: mapper 150 & 243
+ Games: Chess Academy, Chinese Checkers Jpn, Mahjong Academy,
+ Olympic IQ, Poker II, Tasac [150], Poker III [243]
+ 
+ iNES: mappers 150 & 243
 
  *************************************************************/
 
@@ -6219,8 +6621,12 @@ static WRITE8_HANDLER( s8259_m_w )
 
  Sachen SA0036 bootleg boards
 
+ Games: Taiwan Mahjong 16
+ 
  iNES: mapper 149
 
+ In MESS: Supported.
+ 
  *************************************************************/
 
 static WRITE8_HANDLER( sa0036_w )
@@ -6234,8 +6640,12 @@ static WRITE8_HANDLER( sa0036_w )
 
  Sachen SA0037 bootleg boards
 
+ Games: Mahjong World, Shisen Mahjong
+ 
  iNES: mapper 148
 
+ In MESS: Supported.
+ 
  *************************************************************/
 
 static WRITE8_HANDLER( sa0037_w )
@@ -6250,8 +6660,12 @@ static WRITE8_HANDLER( sa0037_w )
 
  Sachen SA72007 bootleg boards
 
+ Games: Sidewinder
+ 
  iNES: mapper 145
 
+ In MESS: Supported.
+ 
  *************************************************************/
 
 static WRITE8_HANDLER( sa72007_l_w )
@@ -6267,7 +6681,11 @@ static WRITE8_HANDLER( sa72007_l_w )
 
  Sachen SA72008 bootleg boards
 
+ Games: Jovial Race, Qi Wang
+ 
  iNES: mapper 133
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -6284,6 +6702,10 @@ static WRITE8_HANDLER( sa72008_l_w )
  Sachen TCA-01 bootleg boards
 
  iNES: mapper 143
+
+ Games: Dancing Blocks, Magic Mathematic
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -6302,7 +6724,11 @@ static READ8_HANDLER( tca01_l_r )
 
  Sachen TCU-01 bootleg boards
 
+ Games: Challenge of the Dragon, Chinese Kungfu
+ 
  iNES: mapper 147
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -6335,7 +6761,11 @@ static WRITE8_HANDLER( tcu01_w )
 
  Sachen TCU-02 bootleg boards
 
+ Games: Mei Loi Siu Ji
+
  iNES: mapper 136
+
+ In MESS: Supported.
 
  *************************************************************/
 
@@ -9048,6 +9478,8 @@ WRITE8_HANDLER( smb2jb_extra_w )
 
  MMC3 clone
 
+ iNES: mapper 197
+ 
  In MESS: Supported.
 
  *************************************************************/
@@ -9211,7 +9643,7 @@ static WRITE8_HANDLER( btl_mariobaby_w )
 
 	if (offset >= 0x7000)
 	{
-		switch(offset & 0x03)
+		switch (offset & 0x03)
 		{
 			case 0x00:
 				prg8_67(space->machine, data);
@@ -9772,7 +10204,7 @@ static WRITE8_HANDLER( bmc_ws_m_w )
  board). The code is included here in case a mapper 54
  dump arises.
 
- iNES: 54 and 213
+ iNES: mappers 54 and 213
 
  In MESS: Partial Support.
 
@@ -11189,7 +11621,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ KONAMI_VRC4,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc4_w),         NULL, NULL, konami_irq },
 	{ KONAMI_VRC6,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc6_w),         NULL, NULL, konami_irq },
 	{ KONAMI_VRC7,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(konami_vrc7_w),         NULL, NULL, konami_irq },
-	{ NAMCOT_163,           {namcot163_l_w, namcot163_l_r}, NES_NOACCESS, NES_WRITEONLY(namcot163_w), NULL, NULL, namcot163_irq },
+	{ NAMCOT_163,           {namcot163_l_w, namcot163_l_r}, NES_NOACCESS, NES_WRITEONLY(namcot163_w), NULL, NULL, namcot_irq },
 	{ SUNSOFT_1,            NES_NOACCESS, NES_WRITEONLY(sunsoft1_m_w), NES_NOACCESS,          NULL, NULL, NULL },
 	{ SUNSOFT_2,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sunsoft2_w),            NULL, NULL, NULL },
 	{ SUNSOFT_3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sunsoft3_w),            NULL, NULL, sunsoft3_irq },
@@ -11221,6 +11653,10 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ HES_BOARD,            NES_WRITEONLY(hes_l_w), NES_NOACCESS, NES_NOACCESS,               NULL, NULL, NULL },
 	{ HOSENKAN_BOARD,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(hosenkan_w),            NULL, NULL, mmc3_irq },
 	{ KAISER_KS7058,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ks7058_w),              NULL, NULL, NULL },
+	{ KAISER_KS7022,        NES_NOACCESS, NES_NOACCESS, {ks7022_w, ks7022_r},                 NULL, NULL, NULL },
+	{ KAISER_KS7032,        NES_WRITEONLY(ks7032_l_w), NES_NOACCESS, NES_WRITEONLY(ks7032_w), NULL, NULL, ks7032_irq },
+	{ KAISER_KS202,         NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(ks202_w),               NULL, NULL, ks7032_irq },
+	{ KAISER_KS7017,		NES_WRITEONLY(ks7017_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, mmc_fds_irq },
 	{ KAY_PANDAPRINCE,      {kay_pp_l_w, kay_pp_l_r}, NES_NOACCESS, NES_WRITEONLY(kay_pp_w),  NULL, NULL, mmc3_irq },
 	{ KASING_BOARD,         NES_NOACCESS, NES_WRITEONLY(kasing_m_w), NES_WRITEONLY(kasing_w), NULL, NULL, mmc3_irq },
 	{ SACHEN_74LS374,       {sachen_74x374_l_w, sachen_74x374_l_r}, NES_NOACCESS, NES_NOACCESS, NULL, NULL, NULL },
