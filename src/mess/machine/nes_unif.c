@@ -154,58 +154,153 @@ const unif *nes_unif_lookup( const char *board )
 }
 
 // WIP code
-static int unif_initialize( running_machine *machine, int idx )
+static int pcb_initialize( running_machine *machine, int idx )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	int err = 0, i;
 
+	/* basic PRG config */
+	prg32(machine, 0);
+
+	/* some boards will not use this, but directly CHRROM (resp. CHRRAM) if the board only has VROM (resp. VRAM) */
+	state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
+	chr8(machine, 0, state->mmc_chr_source);
+	
+	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
+	for (i = 0; i < 4; i++)
+		state->mmc_prg_bank[i] = 0;
+	for (i = 0; i < 16; i++)
+		state->mmc_vrom_bank[i] = 0;
+	for (i = 0; i < 16; i++)
+		state->mmc_extra_bank[i] = 0;
+
+	state->mmc_latch1 = 0;
+	state->mmc_latch2 = 0;
+
+	/* Finally, we init IRQ-related quantities. */
+	state->IRQ_enable = state->IRQ_enable_latch = 0;
+	state->IRQ_count = state->IRQ_count_latch = 0;
+	state->IRQ_toggle = 0;
+	
 	switch (idx)
 	{
+		/* many boards only needs PRG to point at first 32k and CHR at first 8k */
 		case STD_NROM:	// mapper 0
 		case HVC_FAMBASIC:
 		case GG_NROM:
-			prg32(machine, 0);
-			break;
-		case STD_UXROM:	// mapper 2
-		case STD_UN1ROM:	// mapper 94
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
 		case UXROM_CC:	// mapper 180
-			prg32(machine, 0);
-			break;
 		case STD_CNROM:	// mapper 3, 185
 		case BANDAI_PT554:
 		case TENGEN_800008:
-			prg32(machine, 0);
+		case STD_BXROM:	// mapper 34
+		case STD_GXROM:	// mapper 66
+		case STD_MXROM:
+		case BANDAI_OEKAKIDS:	// mapper 96
+		case JALECO_JF11:	// mapper 140
+		case JALECO_JF13:	// mapper 86
+		case JALECO_JF19:	// mapper 92
+		case DIS_74X377:	// mapper 11
+		case DIS_74X161X138:	// mapper 38
+		case CALTRON_6IN1:	// mapper 41
+		case TXC_STRIKEWOLF:	// mapper 36
+		case UNL_STUDYNGAME:	// mapper 39
+		case RUMBLESTATION_BOARD:	// mapper 46
+		case BMC_GKB:	// mapper 58
+		case RCM_TETRISFAMILY:	// mapper 61
+		case BMC_SUPER_700IN1:	// mapper 62
+		case MAGICSERIES_MD:	// mapper 107
+		case HES_BOARD:	// mapper 113
+		case HES6IN1_BOARD:	// mapper 113
+		case SACHEN_SA72008:	// mapper 133
+		case SACHEN_TCU02:	// mapper 136
+		case SACHEN_SA72007:	// mapper 145
+		case SACHEN_TCU01:	// mapper 147
+		case SACHEN_SA0037:	// mapper 148
+		case SACHEN_SA0036:	// mapper 149
+		case AGCI_50282:	// mapper 144
+		case KAISER_KS7058:	// mapper 171
+		case HENGEDIANZI_BOARD:	// mapper 177
+		case WAIXING_SGZLZ:	// mapper 178
+		case HENGEDIANZI_XJZB:	// mapper 179
+		case BMC_21IN1:	// mapper 201
+		case BMC_9999999IN1:	// mapper 213
+		case RCM_GS2015:	// mapper 216
+		case BMC_72IN1:	// mapper 225
+		case BMC_76IN1:	// mapper 226
+		case BMC_SUPER_42IN1:	// mapper 226
+		case ACTENT_ACT52:	// mapper 228
+		case CNE_SHLZ:	// mapper 240
+		case TXC_MXMDHTWO:	// mapper 241
+		case WAIXING_ZS:	// mapper 242
+		case WAIXING_DQ8:	// mapper 242
+		case CNE_DECATHLON:	// mapper 244
+		case UNL_CC21:
+		case BMC_VT5201:
+		case BMC_WS:
+		case UNL_EDU2K:
 			break;
+
+		/* other boards need additional initialization */
+		case STD_UXROM:	// mapper 2
+		case STD_UN1ROM:	// mapper 94
+		case STD_JXROM:		// mapper 69
+		case SUNSOFT_5B:
+		case SUNSOFT_FME7:
+		case NAMCOT_3425:	// mapper 95
+		case DIS_74X139X74:	// mapper 87
+		case DIS_74X161X161X32:	// mapper 152 & 70
+		case BANDAI_LZ93:	// mapper 16, 157
+		case BANDAI_LZ93EX:	// same + EEPROM
+		case BANDAI_DATACH:
+		case BANDAI_FCG:
+		case IREM_HOLYDIV:	// mapper 78
+		case IREM_G101:	// mapper 32
+		case IREM_H3001:	// mapper 65
+		case JALECO_SS88006:	// mapper 18
+		case JALECO_JF16:	// mapper 78
+		case JALECO_JF17:	// mapper 72
+		case KONAMI_VRC1:	// mapper 75
+		case KONAMI_VRC2:
+		case KONAMI_VRC3:	// mapper 73
+		case KONAMI_VRC4:
+		case KONAMI_VRC6:
+		case SUNSOFT_3:	// mapper 67
+		case TAITO_TC0190FMC:	// mapper 33
+		case TAITO_TC0190FMCP:	// mapper 48
+		case TAITO_X1_005:	// mapper 80
+		case TAITO_X1_005_A:	// mapper 207
+		case TAITO_X1_017:	// mapper 82
+		case NTDEC_ASDER:	// mapper 112
+		case FUTUREMEDIA_BOARD:	// mapper 117
+		case BTL_DRAGONNINJA:	// mapper 222
+		case WAIXING_SGZ:	// mapper 252
+		case UNL_T230:
+		case BMC_NTD_03:
+		case KAISER_KS7022:
+		case UNL_SHJY3:
+		case KAISER_KS7017:
+		case KAISER_KS7032:
+		case KAISER_KS202:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+
 		case STD_CPROM:	// mapper 13
 			chr4_0(machine, 0, CHRRAM);
 			chr4_4(machine, 0, CHRRAM);
-			prg32(machine, 0);
 			break;
 		case STD_AXROM:	// mapper 7
 			set_nt_mirroring(machine, PPU_MIRROR_LOW);
-			prg32(machine, 0);
-			break;
-		case STD_BXROM:	// mapper 34
-			prg32(machine, 0);
-			break;
-		case STD_GXROM:	// mapper 66
-		case STD_MXROM:
-			prg32(machine, 0);
 			break;
 		case STD_SXROM:	// mapper 1, 155
 		case STD_SOROM:
 		case STD_SXROM_A:
 		case STD_SOROM_A:
-			state->mmc_latch1 = 0;
 			state->mmc_count = 0;
 			state->mmc_reg[0] = 0x0f;
 			state->mmc_reg[1] = state->mmc_reg[2] = state->mmc_reg[3] = 0;
 			state->mmc1_reg_write_enable = 1;
 			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc1_set_chr(machine);
 			mmc1_set_prg(machine);
 			wram_bank(machine, 0, (idx == STD_SOROM) ? NES_WRAM : NES_BATTERY);
@@ -255,7 +350,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;	// these could be init'ed as xxx_chunks-1 and they would work the same
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -268,7 +362,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;	// these could be init'ed as xxx_chunks-1 and they would work the same
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -281,7 +374,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = 0x07;
 			state->mmc_chr_mask = 0x7f;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -294,7 +386,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = 0x0f;
 			state->mmc_chr_mask = 0x7f;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -306,7 +397,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc5_vram_control = 0;
 			state->mmc5_split_scr = 0;
 			memset(state->MMC5_vrom_bank, 0, ARRAY_LENGTH(state->MMC5_vrom_bank));
-			state->mid_ram_enable = 0;
 			state->mmc5_prg_mode = 3;
 			state->mmc5_last_chr_a = 1;
 			state->mmc5_prg_regs[0] = 0xfc;
@@ -320,13 +410,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			break;
 		case STD_NXROM:		// mapper 68
 		case SUNSOFT_DCS:		// mapper 68
-			state->mmc_reg[0] = state->mmc_latch1 = state->mmc_latch2 = 0;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-		case STD_JXROM:		// mapper 69
-		case SUNSOFT_5B:
-		case SUNSOFT_FME7:
+			state->mmc_reg[0] = 0;
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
@@ -352,121 +436,36 @@ static int unif_initialize( running_machine *machine, int idx )
 			chr2_2(machine, 1, CHRROM);
 			chr2_4(machine, 2, CHRROM);
 			chr2_6(machine, 3, CHRROM);
-			state->mmc_latch1 = 0;
-			break;
-		case NAMCOT_3425:	// mapper 95
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-		case DIS_74X377:	// mapper 11
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;	// NINA-07 has no CHRROM
-			prg32(machine, 0);
-			break;
-		case DIS_74X139X74:	// mapper 87
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-		case DIS_74X161X138:	// mapper 38
-			prg32(machine, 0);
-			break;
-		case DIS_74X161X161X32:	// mapper 152 & 70
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			if (state->chr_chunks)
-				chr8(machine, 0, CHRROM);
-			break;
-		case BANDAI_LZ93:	// mapper 16, 157
-		case BANDAI_LZ93EX:	// same + EEPROM
-		case BANDAI_DATACH:
-			state->mmc_latch1 = 0;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			break;
 		case BANDAI_JUMP2:	// mapper 153
 			for (i = 0; i < 8; i++)
 				state->mmc_reg[i] = 0;
-			state->mmc_latch1 = 0;
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			fjump2_set_prg(machine);
-			break;
-		case BANDAI_FCG:
-			state->mmc_latch1 = 0;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			break;
-		case BANDAI_OEKAKIDS:	// mapper 96
-			prg32(machine, 0);
 			break;
 		case BANDAI_KARAOKE:	// mapper 188
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, (state->prg_chunks - 1) ^ 0x08);
 			break;
 		case IREM_LROG017:	// mapper 77
-			prg32(machine, 0);
 			chr2_2(machine, 0, CHRROM);
 			chr2_4(machine, 1, CHRROM);
 			chr2_6(machine, 2, CHRROM);
-			break;
-		case IREM_HOLYDIV:	// mapper 78
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 		case IREM_TAM_S1:	// mapper 97
 			prg16_89ab(machine, state->prg_chunks - 1);
 			prg16_cdef(machine, 0);
 			break;
-		case IREM_G101:
-			state->mmc_latch1 = 0;
-			prg16_89ab(machine, 0);
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-		case IREM_H3001:	// mapper 65
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-		case JALECO_SS88006:	// mapper 18
-			state->mmc_latch1 = 0;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			break;
-		case JALECO_JF11:	// mapper 140
-		case JALECO_JF13:	// mapper 86
-		case JALECO_JF19:	// mapper 92
-			prg32(machine, 0);
-			break;
-		case JALECO_JF16:	// mapper 78
-		case JALECO_JF17:	// mapper 72
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-		case KONAMI_VRC1:	// mapper 75
-		case KONAMI_VRC2:
-		case KONAMI_VRC3:	// mapper 73
-		case KONAMI_VRC4:
-		case KONAMI_VRC6:
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
 		case KONAMI_VRC7:	// mapper 85
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			prg8_89(machine, 0);
 			prg8_ab(machine, 0);
 			prg8_cd(machine, 0);
 			prg8_ef(machine, 0xff);
 			break;
 		case NAMCOT_163:	// mapper 19
-			state->mmc_latch1 = 0;
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 		case SUNSOFT_1:	// mapper 184
@@ -476,19 +475,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			if (!state->hard_mirroring)
 				set_nt_mirroring(machine, PPU_MIRROR_LOW);
 			break;
-		case SUNSOFT_3:	// mapper 67
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-		case TAITO_TC0190FMC:	// mapper 33
-		case TAITO_TC0190FMCP:	// mapper 48
-		case TAITO_X1_005:	// mapper 80
-		case TAITO_X1_005_A:	// mapper 207
-		case TAITO_X1_017:	// mapper 82
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
+
 // mapper 14
 		case REXSOFT_SL1632:
 			state->mmc_extra_bank[2] = 0xfe;
@@ -502,24 +489,22 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 // mapper 15
 		case WAIXING_PS2:
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
-			prg32(machine, 0);
 			break;
 
 // mapper 35
 		case UNL_SC127:
+// mapper 42
+		case BTL_MARIOBABY:
+		case BTL_AISENSHINICOL:
 			prg32(machine, 0xff);
 			break;
 
-// mapper 36
-		case TXC_STRIKEWOLF:
-			break;
 // mapper 40
 		case BTL_SMB2A:
 			prg8_67(machine, 0xfe);
@@ -528,19 +513,9 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg8_cd(machine, 0xfe);
 			prg8_ef(machine, 0xff);
 			break;
-// mapper 41
-		case CALTRON_6IN1:
-			state->mmc_latch1 = 0;
-			prg32(machine, 0);
-			break;
-// mapper 42
-		case BTL_MARIOBABY:
-		case BTL_AISENSHINICOL:
-			prg32(machine, state->prg_chunks - 1);
-			break;
+
 // mapper 43
 		case UNL_SMB2J:
-			prg32(machine, 0);
 			if (state->battery)
 				memset(state->battery_ram, 0x2000, 0xff);
 			else if (state->prg_ram)
@@ -557,7 +532,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = 0x0f;
 			state->mmc_chr_mask = 0x7f;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -567,7 +541,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
 			state->mmc_latch1 = 0;
 			state->mmc_latch2 = 0x80;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			state->mapper45_reg[0] = state->mapper45_reg[1] = state->mapper45_reg[2] = state->mapper45_reg[3] = 0;
 			state->mmc_prg_base = 0;
 			state->mmc_prg_mask = 0x3f;
@@ -576,11 +549,8 @@ static int unif_initialize( running_machine *machine, int idx )
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-// mapper 46
-		case RUMBLESTATION_BOARD:
-			prg32(machine, 0);
-			chr8(machine, 0, CHRROM);
-			break;
+
+// mapper 50
 		case BTL_SMB2B:
 			prg8_67(machine, 0x0f);
 			prg8_89(machine, 0x08);
@@ -603,7 +573,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch1 = 0;
 			state->mmc_latch2 = 0x80;
 			state->map52_reg_written = 0;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			state->mmc_prg_base = 0;
 			state->mmc_prg_mask = 0x1f;
 			state->mmc_chr_base = 0;
@@ -613,37 +582,18 @@ static int unif_initialize( running_machine *machine, int idx )
 			break;
 // mapper 54
 		case BMC_NOVELDIAMOND:
-			prg32(machine, 0);
-			chr8(machine, 0, CHRROM);
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 // mapper 57
 		case BMC_GKA:
-			state->mmc_latch1 = 0x00;
-			state->mmc_latch2 = 0x00;
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 0);
-			chr8(machine, 0, CHRROM);
 			break;
-// mapper 58
-		case BMC_GKB:
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg32(machine, 0);
-			chr8(machine, 0, state->mmc_chr_source);
-			break;
-// mapper 61
-		case RCM_TETRISFAMILY:
-			prg32(machine, 0);
-			break;
-// mapper 62
-		case BMC_SUPER_700IN1:
-			prg32(machine, 0);
-			break;
+
 // mapper 64
 		case TENGEN_800032:
 // mapper 158
 		case TENGEN_800037:
-			state->mmc_latch1 = 0;
 			prg16_89ab(machine, state->prg_chunks - 1);
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
@@ -657,13 +607,10 @@ static int unif_initialize( running_machine *machine, int idx )
 // mapper 79 (& 146)
 		case AVE_NINA06:
 			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
-			chr8(machine, 0, CHRROM);
-			prg32(machine, 0);
 			break;
 
 // mapper 83
 		case CONY_BOARD:
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			state->mapper83_reg[9] = 0x0f;
 			prg8_cd(machine, 0x1e);
 			prg8_ef(machine, 0x1f);
@@ -688,21 +635,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg8_cd(machine, 0);
 			prg8_ef(machine, (state->prg_chunks << 1) - 1);
 			break;
-// mapper 107
-		case MAGICSERIES_MD:
-			prg32(machine, 0);
-			break;
-// mapper 112
-		case NTDEC_ASDER:
-			state->mmc_latch1 = 0;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-// mapper 113
-		case HES_BOARD:
-		case HES6IN1_BOARD:
-			prg32(machine, 0);
-			break;
+
 // mapper 114
 		case SUPERGAME_LIONKING:
 			state->map114_reg = state->map114_reg_enabled = 0;
@@ -712,7 +645,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -725,37 +657,15 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 // mapper 116
 //      case SOMERITEAM_SL12:
-//          mapper_initialize(machine, 116);
 //          break;
-// mapper 117
-		case FUTUREMEDIA_BOARD:
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
+
 // mapper 121
 		case KAY_PANDAPRINCE:
-#if 0
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mapper121_reg[0] = state->mapper121_reg[1] = state->mapper121_reg[2] = 0;
-			state->mapper121_reg[3] = 0;
-			state->mapper121_reg[4] = state->mapper121_reg[5] = state->mapper121_reg[6] = 0;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			kay_pp_update_reg(machine);
-			kay_pp_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			kay_pp_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
-#endif
 			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
 			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
 			state->mapper121_reg[0] = state->mapper121_reg[1] = state->mapper121_reg[2] = 0;
@@ -763,7 +673,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -774,21 +683,8 @@ static int unif_initialize( running_machine *machine, int idx )
 // mapper 173
 		case TXC_22211C:
 			state->txc_reg[0] = state->txc_reg[1] = state->txc_reg[2] = state->txc_reg[3] = 0;
-			prg32(machine, 0);
 			break;
-// mapper 133
-		case SACHEN_SA72008:
-// mapper 145
-		case SACHEN_SA72007:
-// mapper 147
-		case SACHEN_TCU01:
-// mapper 148
-		case SACHEN_SA0037:
-// mapper 149
-		case SACHEN_SA0036:
-			prg32(machine, 0);
-			chr8(machine, 0, CHRROM);
-			break;
+
 // mapper 134
 		case BMC_FAMILY_4646B:
 			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
@@ -798,19 +694,12 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = 0x1f;
 			state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-// mapper 136
-		case SACHEN_TCU02:
-			state->mmc_latch1 = 0;
-			prg32(machine, 0);
-			break;
+
 // mapper 137
 		case SACHEN_8259D:
-			state->mmc_latch1 = 0;
-			prg32(machine, 0);
 			chr8(machine, state->chr_chunks - 1, CHRROM);
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
@@ -820,29 +709,16 @@ static int unif_initialize( running_machine *machine, int idx )
 		case SACHEN_8259C:
 // mapper 141
 		case SACHEN_8259A:
-			state->mmc_latch1 = 0;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg32(machine, 0);
-			chr8(machine, 0, state->mmc_chr_source);
+// mapper 150
+		case SACHEN_74LS374:
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 // mapper 143
 		case SACHEN_TCA01:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 1);
-			chr8(machine, 0, CHRROM);
 			break;
-// mapper 144
-		case AGCI_50282:
-			prg32(machine, 0);
-			break;
-// mapper 150
-		case SACHEN_74LS374:
-			state->mmc_latch1 = 0;
-			prg32(machine, 0);
-			chr8(machine, 0, CHRROM);
-			set_nt_mirroring(machine, PPU_MIRROR_VERT);
-			break;
+
 // mapper 156
 		case OPENCORP_DAOU306:
 			prg16_89ab(machine, state->prg_chunks - 2);
@@ -854,15 +730,12 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_count = 0xff;
 			state->mmc_reg[0] = 0xff;
 			state->mmc_reg[1] = 0;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0;
 			prg16_89ab(machine, state->prg_chunks - 2);
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 // mapper 164
 		case WAIXING_FFV:
 			prg32(machine, 0xff);
-			state->mid_ram_enable = 1;
 			break;
 // mapper 166
 		case SUBOR_TYPE1:
@@ -876,28 +749,9 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 0x20);
 			break;
-// mapper 171
-		case KAISER_KS7058:
-			prg32(machine, 0);
-			chr8(machine, 0, CHRROM);
-			break;
+
 // mapper 176
 		case UNL_XZY:
-			prg32(machine, (state->prg_chunks - 1) >> 1);
-			break;
-// mapper 177
-		case HENGEDIANZI_BOARD:
-			prg32(machine, 0);
-			break;
-// mapper 178
-		case WAIXING_SGZLZ:
-			state->mmc_latch1 = 0;
-			prg32(machine, 0);
-			break;
-// mapper 179
-		case HENGEDIANZI_XJZB:
-			prg32(machine, 0);
-			break;
 // mapper 182
 		case HOSENKAN_BOARD:
 			prg32(machine, (state->prg_chunks - 1) >> 1);
@@ -912,7 +766,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			kof96_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			kof96_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -922,8 +775,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_chr_base = 0;
 			state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg32(machine, 0);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 // mapper 193
@@ -939,7 +790,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			unl_sf3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -953,7 +803,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			waixing_f_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -967,7 +816,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			waixing_g_set_chr(machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -976,11 +824,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg16_89ab(machine, state->prg_chunks - 1);
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
-// mapper 201
-		case BMC_21IN1:
-			prg32(machine, 0);
-			chr8(machine, 0, CHRROM);
-			break;
+
 // mapper 202
 		case BMC_150IN1:
 // mapper 203
@@ -991,7 +835,6 @@ static int unif_initialize( running_machine *machine, int idx )
 		case BMC_SUPERGUN_20IN1:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 0);
-			chr8(machine, 0, CHRROM);
 			break;
 // mapper 205
 		case BMC_15IN1:
@@ -1003,7 +846,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_prg_mask = 0x1f;
 			state->mmc_chr_base = 0;
 			state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -1017,7 +859,6 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -1026,11 +867,7 @@ static int unif_initialize( running_machine *machine, int idx )
 			chr8(machine, 0xff, CHRROM);
 			prg32(machine, 0xff);
 			break;
-// mapper 213
-		case BMC_9999999IN1:
-			prg32(machine, 0);
-			chr8(machine, 0, CHRROM);
-			break;
+
 // mapper 215
 		case SUPERGAME_BOOGERMAN:
 			state->mmc_prg_bank[0] = 0x00;
@@ -1045,16 +882,10 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->map215_reg[3] = 0;
 			state->mmc_prg_base = 0;
 			state->mmc_prg_mask = 0x1f;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			sgame_boog_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			sgame_boog_set_chr(machine, state->mmc_chr_source);
 			break;
-// mapper 216
-		case RCM_GS2015:
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg32(machine, 0);
-			chr8(machine, 0, state->mmc_chr_source);
-			break;
+
 // mapper 217
 		case BMC_GOLDENCARD_6IN1:
 			state->map217_reg[0] = 0x00;
@@ -1067,49 +898,25 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x80;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			bmc_gc6in1_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			bmc_gc6in1_set_chr(machine, state->mmc_chr_source);
 			break;
 // mapper 221
 		case UNL_N625092:
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0;
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 0);
 			break;
-// mapper 222
-		case BTL_DRAGONNINJA:
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-// mapper 225
-		case BMC_72IN1:
-			prg32(machine, 0);
-			break;
-// mapper 226
-		case BMC_76IN1:
-		case BMC_SUPER_42IN1:
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0;
-			prg32(machine, 0);
-			break;
+
 // mapper 227
 		case BMC_1200IN1:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 0);
 			break;
-// mapper 228
-		case ACTENT_ACT52:
-			chr8(machine, 0, CHRROM);
-			prg32(machine, 0);
-			break;
+
 // mapper 229
 		case BMC_31IN1:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 1);
-			chr8(machine, 0, CHRROM);
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 // mapper 230
@@ -1129,31 +936,14 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->mmc_latch2 = 0x00;
 			bf9096_set_prg(machine);
 			break;
-// mapper 240
-		case CNE_SHLZ:
-			prg32(machine, 0);
-			break;
-// mapper 241
-		case TXC_MXMDHTWO:
-			prg32(machine, 0);
-			break;
-// mapper 242
-		case WAIXING_ZS:
-		case WAIXING_DQ8:
-			prg32(machine, 0);
-			break;
+
 // mapper 243
 		case SACHEN_74LS374_A:
 			state->mmc_vrom_bank[0] = 3;
-			state->mmc_latch1 = 0;
 			chr8(machine, 3, CHRROM);
-			prg32(machine, 0);
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
-// mapper 244
-		case CNE_DECATHLON:
-			prg32(machine, 0);
-			break;
+
 // mapper 246
 		case CNE_FSB:
 			prg32(machine, 0xff);
@@ -1167,21 +957,14 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->map249_reg = 0;
 			state->mmc_prg_base = state->mmc_chr_base = 0;
 			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			waixing_sec_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			waixing_sec_set_chr(machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
-// mapper 252
-		case WAIXING_SGZ:
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
+
 // mapper 255
 		case BMC_110IN1:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 1);
-			chr8(machine, 0, CHRROM);
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
 			break;
 
@@ -1192,12 +975,10 @@ static int unif_initialize( running_machine *machine, int idx )
 			state->bmc_64in1nr_reg[2] = state->bmc_64in1nr_reg[3] = 0;
 			bmc_64in1nr_set_prg(machine);
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
-			chr8(machine, 0, CHRROM);
 			break;
 		case BMC_190IN1:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 0);
-			chr8(machine, 0, CHRROM);
 			break;
 		case BMC_A65AS:
 			prg16_89ab(machine, 0);
@@ -1207,7 +988,6 @@ static int unif_initialize( running_machine *machine, int idx )
 		case BMC_GS2004:
 		case BMC_GS2013:
 			prg32(machine, 0xff);
-			chr8(machine, 0, CHRRAM);
 			break;
 		case BMC_S24IN1SC03:
 			state->bmc_s24in1sc03_reg[0] = 0x24;
@@ -1228,14 +1008,9 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 7);
 			break;
-		case BMC_WS:
-			state->mmc_latch1 = 0;
-			prg32(machine, 0);
-			break;
 		case DREAMTECH_BOARD:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 8);
-			chr8(machine, 0, CHRRAM);
 			break;
 		case UNL_8237:
 			state->unl_8237_reg[0] = state->unl_8237_reg[1] = state->unl_8237_reg[2] = 0;
@@ -1256,26 +1031,11 @@ static int unif_initialize( running_machine *machine, int idx )
 			prg8_cd(machine, 0xfe);
 			prg8_ef(machine, 0xff);
 			break;
-		case UNL_CC21:
-			prg32(machine, 0);
-			chr8(machine, 0, CHRROM);
-			break;
-		case UNL_T230:
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
 		case UNL_RACERMATE:
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
 			chr4_0(machine, 0, state->mmc_chr_source);
 			chr4_4(machine, 0, state->mmc_chr_source);
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-
-		case BMC_VT5201:
-			prg32(machine, 0);
-			chr8(machine, 0, CHRROM);
 			break;
 
 		case BMC_BENSHENG_BS5:
@@ -1289,46 +1049,25 @@ static int unif_initialize( running_machine *machine, int idx )
 		case BMC_810544:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, 0);
-			chr8(machine, 0, CHRROM);
 			set_nt_mirroring(machine, PPU_MIRROR_VERT);
-			break;
-
-		case BMC_NTD_03:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			chr8(machine, 0, CHRROM);
-			break;
-
-		case UNL_EDU2K:
-			break;
-			
-		case KAISER_KS7022:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
 
 		case BMC_G63IN1:
 			bmc_gb63_update(machine);
 			break;
 
-		case UNL_SHJY3:
+		case FFE_MAPPER6:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 7);
+			break;
+		case FFE_MAPPER8:
+			prg32(machine, 0);
+			break;
+		case FFE_MAPPER17:
 			prg16_89ab(machine, 0);
 			prg16_cdef(machine, state->prg_chunks - 1);
 			break;
-
-		case KAISER_KS7017:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			break;
-
-		case KAISER_KS7032:
-		case KAISER_KS202:
-			prg16_89ab(machine, 0);
-			prg16_cdef(machine, state->prg_chunks - 1);
-			state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
-			chr8(machine, 0, state->mmc_chr_source);
-			break;
-
+			
 		case UNSUPPORTED_BOARD:
 		default:
 			/* Mapper not supported */

@@ -11836,35 +11836,17 @@ const nes_pcb_intf *nes_pcb_intf_lookup( int pcb_id )
 int nes_pcb_reset( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
-	int err = 0, i;
+	int err = 0;
 	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->pcb_id);
 
 	if (intf == NULL)
 		fatalerror("Missing PCB interface\n");
 
-	if (state->chr_chunks == 0)
-		chr8(machine, 0, CHRRAM);
-	else
-		chr8(machine, 0, CHRROM);
-
-	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
-	for (i = 0; i < 4; i++)
-		state->mmc_prg_bank[i] = 0;
-	for (i = 0; i < 16; i++)
-		state->mmc_vrom_bank[i] = 0;
-	for (i = 0; i < 16; i++)
-		state->mmc_extra_bank[i] = 0;
-	
 	/* Set the mapper irq callback */
 	ppu2c0x_set_scanline_callback(state->ppu, intf ? intf->mmc_scanline : NULL);
 	ppu2c0x_set_hblank_callback(state->ppu, intf ? intf->mmc_hblank : NULL);
 
-	/* Finally, we init IRQ-related quantities. */
-	state->IRQ_enable = state->IRQ_enable_latch = 0;
-	state->IRQ_count = state->IRQ_count_latch = 0;
-	state->IRQ_toggle = 0;
-	
-	err = unif_initialize(machine, state->pcb_id);
+	err = pcb_initialize(machine, state->pcb_id);
 
 	return err;
 }

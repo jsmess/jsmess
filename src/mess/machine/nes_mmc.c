@@ -137,7 +137,7 @@
 #define LOG_MMC(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG_FDS(x) do { if (VERBOSE) logerror x; } while (0)
 
-static int unif_initialize( running_machine *machine, int idx );
+static int pcb_initialize( running_machine *machine, int idx );
 
 static void ffe_irq( running_device *device, int scanline, int vblank, int blanked );
 static WRITE8_HANDLER( mapper6_l_w );
