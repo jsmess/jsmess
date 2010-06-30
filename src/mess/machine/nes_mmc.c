@@ -139,6 +139,12 @@
 
 static int unif_initialize( running_machine *machine, int idx );
 
+static void ffe_irq( running_device *device, int scanline, int vblank, int blanked );
+static WRITE8_HANDLER( mapper6_l_w );
+static WRITE8_HANDLER( mapper6_w );
+static WRITE8_HANDLER( mapper8_w );
+static WRITE8_HANDLER( mapper17_l_w );
+
 /*************************************************************
 
     Base emulation (see drivers/nes.c):

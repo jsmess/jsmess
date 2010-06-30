@@ -517,6 +517,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-CC-21",        UNL_CC21 },
 	{ "UNL-KOF97",        UNL_KOF97 },
 	{ "UNL-T-230",        UNL_T230 },
+	{ "UNL-STUDYNGAME",   UNL_STUDYNGAME },	// mapper 39
 //
 	{ "BTL-SMB2A",         BTL_SMB2A },
 	{ "BTL-MARIOBABY",     BTL_MARIOBABY },
@@ -617,6 +618,7 @@ const nes_pcb *nes_pcb_lookup( const char *board )
 	}
 	return NULL;
 }
+
 
 /************************************************
 
@@ -2820,7 +2822,7 @@ static WRITE8_HANDLER( dis_74x161x161x32_w )
 
  At the moment, we don't support EEPROM I/O
 
- iNES: mapper 16, 153, 157 & 159
+ iNES: mappers 16, 153, 157 & 159
 
  In MESS: Supported
  
@@ -3571,7 +3573,7 @@ static WRITE8_HANDLER( konami_vrc3_w )
 static void vrc4_set_prg( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
-	if (state->mmc_cmd1 & 0x02)
+	if (state->mmc_latch1 & 0x02)
 	{
 		prg8_89(machine, 0xfe);
 		prg8_cd(machine, state->mmc_prg_bank[0]);
@@ -3627,7 +3629,7 @@ static WRITE8_HANDLER( konami_vrc4_w )
 				break;
 			case 0x1200:
 			case 0x1300:
-				state->mmc_cmd1 = data & 0x02;
+				state->mmc_latch1 = data & 0x02;
 				vrc4_set_prg(space->machine);
 				break;
 			case 0x3000:
@@ -10265,6 +10267,25 @@ static WRITE8_HANDLER( bmc_gka_w )
 
 
 /*************************************************************
+ 
+ Board UNL-STUDYNGAME
+ 
+ Games: Study n Game 32 in 1
+ 
+ iNES: mapper 39
+ 
+ In MESS: Partially Supported (problems with PRG bankswitch, 
+ only keyboard exercise work).
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( sng32_w )
+{
+	LOG_MMC(("sng32_w, offset: %04x, data: %02x\n", offset, data));
+	prg32(space->machine, data);
+}
+
+/*************************************************************
 
  Board BMC-GKB
 
@@ -11724,6 +11745,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ UNL_SUPERFIGHTER3,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_sf3_w),             NULL, NULL, mmc3_irq },
 	{ UNL_XZY,              NES_WRITEONLY(unl_xzy_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
 	{ UNL_RACERMATE,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_racmate_w),         NULL, NULL, NULL },
+	{ UNL_STUDYNGAME,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sng32_w),               NULL, NULL, NULL },
 	//
 	{ BTL_AISENSHINICOL,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_mariobaby_w),       NULL, NULL, NULL },
 	{ BTL_DRAGONNINJA,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_dn_w),              NULL, NULL, btl_dn_irq },
@@ -11776,6 +11798,11 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BMC_G63IN1,           NES_NOACCESS, NES_NOACCESS, {bmc_gb63_w, bmc_gb63_r},             NULL, NULL, NULL },
 	{ UNL_EDU2K,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(edu2k_w),               NULL, NULL, NULL },
 	{ UNL_SHJY3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(shjy3_w),               NULL, NULL, shjy3_irq },
+	//
+	{ FFE_MAPPER6,          NES_WRITEONLY(mapper6_l_w), NES_NOACCESS, NES_WRITEONLY(mapper6_w), NULL, NULL, ffe_irq },
+	{ FFE_MAPPER8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(mapper8_w),             NULL, NULL, NULL },
+	{ FFE_MAPPER17,         NES_WRITEONLY(mapper17_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, ffe_irq },
+	//
 	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	//
 };
@@ -11792,10 +11819,24 @@ const nes_pcb_intf *nes_pcb_intf_lookup( int pcb_id )
 	return NULL;
 }
 
+/*************************************************************
+ 
+ nes_pcb_reset
+ 
+ Resets the mmc bankswitch areas to their defaults.
+ It returns a value "err" that indicates if it was
+ successful. Possible values for err are:
+ 
+ 0 = success
+ 1 = no pcb found
+ 2 = pcb not supported
+ 
+ *************************************************************/
+
 int nes_pcb_reset( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
-	int err = 0;
+	int err = 0, i;
 	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->pcb_id);
 
 	if (intf == NULL)
@@ -11806,10 +11847,23 @@ int nes_pcb_reset( running_machine *machine )
 	else
 		chr8(machine, 0, CHRROM);
 
+	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
+	for (i = 0; i < 4; i++)
+		state->mmc_prg_bank[i] = 0;
+	for (i = 0; i < 16; i++)
+		state->mmc_vrom_bank[i] = 0;
+	for (i = 0; i < 16; i++)
+		state->mmc_extra_bank[i] = 0;
+	
 	/* Set the mapper irq callback */
 	ppu2c0x_set_scanline_callback(state->ppu, intf ? intf->mmc_scanline : NULL);
 	ppu2c0x_set_hblank_callback(state->ppu, intf ? intf->mmc_hblank : NULL);
 
+	/* Finally, we init IRQ-related quantities. */
+	state->IRQ_enable = state->IRQ_enable_latch = 0;
+	state->IRQ_count = state->IRQ_count_latch = 0;
+	state->IRQ_toggle = 0;
+	
 	err = unif_initialize(machine, state->pcb_id);
 
 	return err;

@@ -82,7 +82,7 @@ enum
 	UNL_N625092, UNL_SC127, UNL_SMB2J, UNL_T230,
 	UNL_UXROM, UNL_MK2, UNL_XZY, UNL_KOF96,
 	UNL_SUPERFIGHTER3, UNL_RACERMATE, UNL_EDU2K,
-	UNL_SHJY3, 
+	UNL_SHJY3, UNL_STUDYNGAME,
 	/* Bootleg boards */
 	BTL_SMB2A, BTL_MARIOBABY, BTL_AISENSHINICOL,
 	BTL_SMB2B, BTL_SMB3, BTL_SUPERBROS11, BTL_DRAGONNINJA,
@@ -97,6 +97,8 @@ enum
 	WAIXING_SGZLZ, WAIXING_SGZ, WAIXING_ZS, WAIXING_SECURITY,
 	WAIXING_DQ8, WAIXING_FFV, WAIXING_PS2, SUPERGAME_LIONKING, SUPERGAME_BOOGERMAN,
 	KAY_PANDAPRINCE, HOSENKAN_BOARD, NITRA_TDA, GOUDER_37017, NANJING_BOARD,
+	/* FFE boards, for mappers 6, 8, 17 */
+	FFE_MAPPER6, FFE_MAPPER8, FFE_MAPPER17,
 	/* Unsupported (for place-holder boards, with no working emulation) & no-board (at init) */
 	UNSUPPORTED_BOARD, NO_BOARD
 };
@@ -105,13 +107,12 @@ enum
 
 #define MMC5_VRAM
 
-int nes_mapper_reset(running_machine *machine);
 int nes_pcb_reset(running_machine *machine);
 
-void mapper_handlers_setup(running_machine *machine);
 void pcb_handlers_setup(running_machine *machine);
 void unif_mapr_setup(running_machine *machine, const char *board);
 int nes_get_pcb_id(running_machine *machine, const char *feature);
+int nes_get_mmc_id(running_machine *machine, int mapper);
 
 WRITE8_HANDLER( nes_low_mapper_w );
 READ8_HANDLER( nes_low_mapper_r );
