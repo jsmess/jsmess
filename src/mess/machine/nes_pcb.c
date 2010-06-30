@@ -490,7 +490,7 @@ static const nes_pcb pcb_list[] =
 	{ "RCM-TETRISFAMILY", RCM_TETRISFAMILY },
 	{ "UNL-NINJARYU",     UNSUPPORTED_BOARD },// mapper 111
 	{ "UNL-NANJING",      NANJING_BOARD },// mapper 163
-	{ "FUKUTAKE",         UNSUPPORTED_BOARD },
+	{ "FUKUTAKE",         UNSUPPORTED_BOARD },	// mapper 186
 	{ "WHIRLWIND-2706",   UNSUPPORTED_BOARD },
 	{ "UNL-H2288",        UNSUPPORTED_BOARD },	// mapper 123
 	{ "UNL-DANCE",        UNSUPPORTED_BOARD },

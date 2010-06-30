@@ -684,7 +684,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 					/* image is present in nes.hsi: overwrite the header settings with these */
 					state->mapper = mapint1;
 					local_options = mapint2 & 0x0f;
-					state->crc_hack = mapint2 & 0xf0;	// this is used to differentiate among variants of the same Mapper (see nes_mmc.c)
+					state->crc_hack = (mapint2 & 0xf0) >> 4;	// this is used to differentiate among variants of the same Mapper (see below)
 					state->prg_chunks = mapint3;
 					state->chr_chunks = mapint4;
 					logerror("NES.HSI info: %d %d %d %d\n", mapint1, mapint2, mapint3, mapint4);
@@ -762,12 +762,76 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			switch (state->pcb_id)
 			{
 				case STD_CNROM:
-					// crc hack for PIN settings
+					if (state->mapper == 185)
+					{
+						switch (state->crc_hack)
+						{
+							case 0x0: // pin26: CE, pin27: CE (B-Wings, Bird Week)
+								state->ce_mask = 0x03;
+								state->ce_state = 0x03;
+								break;
+							case 0x4: // pin26: CE, pin27: /CE (Mighty Bomb Jack, Spy Vs. Spy)
+								state->ce_mask = 0x03;
+								state->ce_state = 0x01;
+								break;
+							case 0x8: // pin26: /CE, pin27: CE (Sansu 1, 2, 3 Nen)
+								state->ce_mask = 0x03;
+								state->ce_state = 0x02;
+								break;
+							case 0xc: // pin26: /CE, pin27: /CE (Seicross v2.0)
+								state->ce_mask = 0x03;
+								state->ce_state = 0x00;
+								break;
+						}
+					}
 					break;
 				case KONAMI_VRC2:
+					if (state->mapper == 22)
+					{
+						state->vrc_ls_prg_a = 0;
+						state->vrc_ls_prg_b = 1;
+						state->vrc_ls_chr = 1;
+					}
+					if (state->mapper == 23 && !state->crc_hack)
+					{
+						state->vrc_ls_prg_a = 1;
+						state->vrc_ls_prg_b = 0;
+						state->vrc_ls_chr = 0;
+					}
+					if (state->mapper == 23 && state->crc_hack)
+					{
+						// here there are also Akumajou Special, Crisis Force, Parodius da!, Tiny Toons which are VRC-4
+						state->vrc_ls_prg_a = 3;
+						state->vrc_ls_prg_b = 2;
+						state->pcb_id = KONAMI_VRC4; // this allows for konami_irq to be installed at reset
+					}
+					break;
 				case KONAMI_VRC4:
+					if (state->mapper == 21)
+					{
+						// Wai Wai World 2 & Ganbare Goemon Gaiden 2 (the latter with crc_hack)
+						state->vrc_ls_prg_a = 7;
+						state->vrc_ls_prg_b = 6;
+						state->vrc_ls_prg_a = state->crc_hack ? 7 : 2;
+						state->vrc_ls_prg_b = state->crc_hack ? 6 : 1;
+					}
+					if (state->mapper == 25)	// here there is also Ganbare Goemon Gaiden which is VRC-2
+					{
+						state->vrc_ls_prg_a = state->crc_hack ? 2 : 0;
+						state->vrc_ls_prg_b = state->crc_hack ? 3 : 1;
+					}
+					break;
 				case KONAMI_VRC6:
-					// crc hack for PIN settings
+					if (state->mapper == 24)
+					{
+						state->vrc_ls_prg_a = 1;
+						state->vrc_ls_prg_b = 0;
+					}
+					if (state->mapper == 26)
+					{
+						state->vrc_ls_prg_a = 0;
+						state->vrc_ls_prg_b = 1;
+					}
 					break;
 				case IREM_G101:
 					if (state->crc_hack)
@@ -1290,7 +1354,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if (state->pcb_id == KONAMI_VRC2)
 		{
 			state->vrc_ls_prg_a = nes_cart_get_line(image.get_feature("vrc2-pin3"));
-			state->vrc_ls_prg_b = nes_cart_get_line(image.get_feature("vrc2-pin3"));
+			state->vrc_ls_prg_b = nes_cart_get_line(image.get_feature("vrc2-pin4"));
 			state->vrc_ls_chr = (nes_cart_get_line(image.get_feature("vrc2-pin21")) != 10) ? 1 : 0;
 //          printf("VRC-2, pin3: A%d, pin4: A%d, pin21: %s\n", state->vrc_ls_prg_a, state->vrc_ls_prg_b, state->vrc_ls_chr ? "NC" : "A10");
 		}
