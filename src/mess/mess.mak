@@ -1355,6 +1355,7 @@ $(MESSOBJ)/sharp.a:				\
 	$(MESS_VIDEO)/mz80.o		\
 	$(MESS_MACHINE)/mz80.o		\
 	$(MESS_DRIVERS)/x1.o		\
+	$(MESS_MACHINE)/x1.o		\
 	$(MESS_FORMATS)/x1_tap.o	\
 	$(MESS_DRIVERS)/mz2500.o	\
 	$(MESS_DRIVERS)/pce220.o	\
@@ -1446,6 +1447,7 @@ $(MESSOBJ)/tangerin.a:			\
 
 $(MESSOBJ)/tatung.a:			\
 	$(MESS_DRIVERS)/einstein.o	\
+	$(MESS_MACHINE)/einstein.o	\
 
 $(MESSOBJ)/teamconc.a:			\
 	$(MESS_VIDEO)/comquest.o	\

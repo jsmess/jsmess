@@ -26,7 +26,48 @@ WRITE8_HANDLER( osborne1_bankswitch_w );
 DRIVER_INIT( osborne1 );
 MACHINE_RESET( osborne1 );
 
-/* Osborne1 specific daisy chain interface */
+// ======================>  osborne1_daisy_device_config
+
+class osborne1_daisy_device_config :	public device_config,
+								public device_config_z80daisy_interface
+{
+	friend class osborne1_daisy_device;
+
+	// construction/destruction
+	osborne1_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+	// basic information getters
+	virtual const char *name() const { return "Osborne 1 daisy"; }
+};
+
+
+
+// ======================> osborne1_daisy_device
+
+class osborne1_daisy_device :	public device_t,
+						public device_z80daisy_interface
+{
+	friend class osborne1_daisy_device_config;
+
+	// construction/destruction
+	osborne1_daisy_device(running_machine &_machine, const osborne1_daisy_device_config &_config);
+
+private:
+	virtual void device_start();
+	// z80daisy_interface overrides
+	virtual int z80daisy_irq_state();
+	virtual int z80daisy_irq_ack();
+	virtual void z80daisy_irq_reti();
+
+	// internal state
+	const osborne1_daisy_device_config &m_config;
+};
+
 extern const device_type OSBORNE1_DAISY;
 
 #endif /* OSBORNE1_H_ */

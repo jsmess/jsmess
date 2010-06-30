@@ -198,6 +198,7 @@
 #include "formats/basicdsk.h"
 #include "formats/x1_tap.h"
 #include "devices/cartslot.h"
+#include "includes/x1.h"
 //#include <ctype.h>
 
 #define MAIN_CLOCK XTAL_16MHz
@@ -212,7 +213,7 @@ static UINT8 pcg_reset;
 static UINT16 crtc_start_addr;
 static UINT8 tile_height;
 static UINT8 sub_obf;
-static UINT8 key_irq_flag;
+UINT8 x1_key_irq_flag;
 static UINT8 ctc_irq_flag;
 static struct
 {
@@ -686,7 +687,7 @@ static READ8_HANDLER( sub_io_r )
 
 static UINT8 x1_irq_vector;
 //static UINT8 ctc_irq_vector; //always 0x5e?
-static UINT8 key_irq_vector;
+UINT8 x1_key_irq_vector;
 static UINT8 cmt_current_cmd;
 static UINT8 cmt_test;
 
@@ -778,7 +779,7 @@ static WRITE8_HANDLER( sub_io_w )
 
 	if(sub_cmd == 0xe4)
 	{
-		key_irq_vector = data;
+		x1_key_irq_vector = data;
 		logerror("Key vector set to 0x%02x\n",data);
 	}
 
@@ -854,147 +855,6 @@ static WRITE8_HANDLER( sub_io_w )
 	sub_obf = (sub_cmd_length) ? 0x00 : 0x20;
 	logerror("SUB: Command byte 0x%02x\n",data);
 }
-
-
-// ======================>  x1_keyboard_device_config
-
-class x1_keyboard_device_config :	public device_config,
-								public device_config_z80daisy_interface
-{
-	friend class x1_keyboard_device;
-
-	// construction/destruction
-	x1_keyboard_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// basic information getters
-	virtual const char *name() const { return "X1 Keyboard"; }
-};
-
-
-
-// ======================> x1_keyboard_device
-
-class x1_keyboard_device :	public device_t,
-						public device_z80daisy_interface
-{
-	friend class x1_keyboard_device_config;
-
-	// construction/destruction
-	x1_keyboard_device(running_machine &_machine, const x1_keyboard_device_config &_config);
-
-private:
-	virtual void device_start();
-	// z80daisy_interface overrides
-	virtual int z80daisy_irq_state();
-	virtual int z80daisy_irq_ack();
-	virtual void z80daisy_irq_reti();
-
-	// internal state
-	const x1_keyboard_device_config &m_config;
-};
-
-//**************************************************************************
-//  DEVICE CONFIGURATION
-//**************************************************************************
-
-//-------------------------------------------------
-//  x1_keyboard_device_config - constructor
-//-------------------------------------------------
-
-x1_keyboard_device_config::x1_keyboard_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
-	  device_config_z80daisy_interface(mconfig, *this)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *x1_keyboard_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-	return global_alloc(x1_keyboard_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *x1_keyboard_device_config::alloc_device(running_machine &machine) const
-{
-	return auto_alloc(&machine, x1_keyboard_device(machine, *this));
-}
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
-
-//-------------------------------------------------
-//  z80ctc_device - constructor
-//-------------------------------------------------
-
-x1_keyboard_device::x1_keyboard_device(running_machine &_machine, const x1_keyboard_device_config &_config)
-	: device_t(_machine, _config),
-	  device_z80daisy_interface(_machine, _config, *this),
-	  m_config(_config)
-{
-}
-
-//-------------------------------------------------
-//  device_start - device-specific startup
-//-------------------------------------------------
-
-void x1_keyboard_device::device_start()
-{
-}
-
-//**************************************************************************
-//  DAISY CHAIN INTERFACE
-//**************************************************************************
-
-//-------------------------------------------------
-//  z80daisy_irq_state - return the overall IRQ
-//  state for this device
-//-------------------------------------------------
-
-int x1_keyboard_device::z80daisy_irq_state()
-{
-	if(key_irq_flag != 0)
-		return Z80_DAISY_INT;
-	return 0;
-}
-
-
-//-------------------------------------------------
-//  z80daisy_irq_ack - acknowledge an IRQ and
-//  return the appropriate vector
-//-------------------------------------------------
-
-int x1_keyboard_device::z80daisy_irq_ack()
-{
-	key_irq_flag = 0;
-	cputag_set_input_line(device().machine,"maincpu",INPUT_LINE_IRQ0,CLEAR_LINE);
-	return key_irq_vector;
-}
-
-//-------------------------------------------------
-//  z80daisy_irq_reti - clear the interrupt
-//  pending state to allow other interrupts through
-//-------------------------------------------------
-
-void x1_keyboard_device::z80daisy_irq_reti()
-{
-}
-
-const device_type X1_KEYBOARD = x1_keyboard_device_config::static_alloc_device_config;
 
 /*************************************
  *
@@ -2145,16 +2005,16 @@ static IRQ_CALLBACK(x1_irq_callback)
     if(ctc_irq_flag != 0)
     {
         ctc_irq_flag = 0;
-        if(key_irq_flag == 0)  // if no other devices are pulling the IRQ line high
+        if(x1_key_irq_flag == 0)  // if no other devices are pulling the IRQ line high
             cpu_set_input_line(device, 0, CLEAR_LINE);
         return x1_irq_vector;
     }
-    if(key_irq_flag != 0)
+    if(x1_key_irq_flag != 0)
     {
-        key_irq_flag = 0;
+        x1_key_irq_flag = 0;
         if(ctc_irq_flag == 0)  // if no other devices are pulling the IRQ line high
             cpu_set_input_line(device, 0, CLEAR_LINE);
-        return key_irq_vector;
+        return x1_key_irq_vector;
     }
     return x1_irq_vector;
 }
@@ -2170,14 +2030,14 @@ static TIMER_CALLBACK(keyboard_callback)
 	UINT32 f_key = input_port_read(machine, "f_keys");
 	static UINT32 old_key1,old_key2,old_key3,old_key4,old_fkey;
 
-	if(key_irq_vector)
+	if(x1_key_irq_vector)
 	{
 		if((key1 != old_key1) || (key2 != old_key2) || (key3 != old_key3) || (key4 != old_key4) || (f_key != old_fkey))
 		{
 			// generate keyboard IRQ
 			sub_io_w(space,0,0xe6);
-			x1_irq_vector = key_irq_vector;
-			key_irq_flag = 1;
+			x1_irq_vector = x1_key_irq_vector;
+			x1_key_irq_flag = 1;
 			cputag_set_input_line(machine,"maincpu",0,ASSERT_LINE);
 			old_key1 = key1;
 			old_key2 = key2;
@@ -2247,7 +2107,7 @@ static MACHINE_RESET( x1 )
 	cmt_test = 0;
 	cassette_change_state(devtag_get_device(machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
 
-	key_irq_flag = ctc_irq_flag = 0;
+	x1_key_irq_flag = ctc_irq_flag = 0;
 
 	/* Reinitialize palette here if there's a soft reset for the Turbo PAL stuff*/
 	for(i=0;i<8;i++)
