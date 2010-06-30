@@ -855,42 +855,146 @@ static WRITE8_HANDLER( sub_io_w )
 	logerror("SUB: Command byte 0x%02x\n",data);
 }
 
-//static int x1_keyboard_irq_state(running_device* device)
-//{
-//  if(key_irq_flag != 0)
-//      return Z80_DAISY_INT;
-//
-//  return 0;
-//}
-//
-//static int x1_keyboard_irq_ack(running_device* device)
-//{
-//  key_irq_flag = 0;
-//  cputag_set_input_line(device->machine,"maincpu",INPUT_LINE_IRQ0,CLEAR_LINE);
-//  return key_irq_vector;
-//}
-//
-//static DEVICE_GET_INFO( x1_keyboard_getinfo )
-//{
-//  switch (state)
-//  {
-//      /* --- the following bits of info are returned as 64-bit signed integers --- */
-//      case DEVINFO_INT_TOKEN_BYTES:                   info->i = 4;                                            break;
-//      case DEVINFO_INT_INLINE_CONFIG_BYTES:           info->i = 0;                                            break;
-//
-//      /* --- the following bits of info are returned as pointers to data or functions --- */
-//      case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME(x1_daisy);      break;
-//      case DEVINFO_FCT_IRQ_STATE:                     info->f = (genf *)x1_keyboard_irq_state;    break;
-//      case DEVINFO_FCT_IRQ_ACK:                       info->f = (genf *)x1_keyboard_irq_ack;      break;
-//
-//      /* --- the following bits of info are returned as NULL-terminated strings --- */
-//      case DEVINFO_STR_NAME:                          strcpy(info->s, "X1 keyboard");     break;
-//      case DEVINFO_STR_FAMILY:                        strcpy(info->s, "X1 daisy chain");              break;
-//      case DEVINFO_STR_VERSION:                       strcpy(info->s, "1.0");                                 break;
-//      case DEVINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                              break;
-//      case DEVINFO_STR_CREDITS:                       strcpy(info->s, "Copyright the MESS Team");             break;
-//  }
-//}
+
+// ======================>  x1_keyboard_device_config
+
+class x1_keyboard_device_config :	public device_config,
+								public device_config_z80daisy_interface
+{
+	friend class x1_keyboard_device;
+
+	// construction/destruction
+	x1_keyboard_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+	// basic information getters
+	virtual const char *name() const { return "X1 Keyboard"; }
+};
+
+
+
+// ======================> x1_keyboard_device
+
+class x1_keyboard_device :	public device_t,
+						public device_z80daisy_interface
+{
+	friend class x1_keyboard_device_config;
+
+	// construction/destruction
+	x1_keyboard_device(running_machine &_machine, const x1_keyboard_device_config &_config);
+
+private:
+	virtual void device_start();
+	// z80daisy_interface overrides
+	virtual int z80daisy_irq_state();
+	virtual int z80daisy_irq_ack();
+	virtual void z80daisy_irq_reti();
+
+	// internal state
+	const x1_keyboard_device_config &m_config;
+};
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  x1_keyboard_device_config - constructor
+//-------------------------------------------------
+
+x1_keyboard_device_config::x1_keyboard_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	  device_config_z80daisy_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *x1_keyboard_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(x1_keyboard_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *x1_keyboard_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, x1_keyboard_device(machine, *this));
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  z80ctc_device - constructor
+//-------------------------------------------------
+
+x1_keyboard_device::x1_keyboard_device(running_machine &_machine, const x1_keyboard_device_config &_config)
+	: device_t(_machine, _config),
+	  device_z80daisy_interface(_machine, _config, *this),
+	  m_config(_config)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void x1_keyboard_device::device_start()
+{
+}
+
+//**************************************************************************
+//  DAISY CHAIN INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  z80daisy_irq_state - return the overall IRQ
+//  state for this device
+//-------------------------------------------------
+
+int x1_keyboard_device::z80daisy_irq_state()
+{
+	if(key_irq_flag != 0)
+		return Z80_DAISY_INT;
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  z80daisy_irq_ack - acknowledge an IRQ and
+//  return the appropriate vector
+//-------------------------------------------------
+
+int x1_keyboard_device::z80daisy_irq_ack()
+{
+	key_irq_flag = 0;
+	cputag_set_input_line(device().machine,"maincpu",INPUT_LINE_IRQ0,CLEAR_LINE);
+	return key_irq_vector;
+}
+
+//-------------------------------------------------
+//  z80daisy_irq_reti - clear the interrupt
+//  pending state to allow other interrupts through
+//-------------------------------------------------
+
+void x1_keyboard_device::z80daisy_irq_reti()
+{
+}
+
+const device_type X1_KEYBOARD = x1_keyboard_device_config::static_alloc_device_config;
 
 /*************************************
  *
@@ -1978,14 +2082,14 @@ static const z80sio_interface sio_intf =
 
 static const z80_daisy_config x1_daisy[] =
 {
-//  { "x1kb" },
+    { "x1kb" },
 	{ "ctc" },
 	{ NULL }
 };
 
 static const z80_daisy_config x1turbo_daisy[] =
 {
-//  { "x1kb" },
+    { "x1kb" },
 	{ "ctc" },
 	{ "dma" },
 //  { "sio" },
@@ -2233,7 +2337,7 @@ static MACHINE_DRIVER_START( x1 )
 
 	MDRV_Z80CTC_ADD( "ctc", MAIN_CLOCK/4 , ctc_intf )
 
-	//MDRV_DEVICE_ADD("x1kb", DEVICE_GET_INFO_NAME(x1_keyboard_getinfo), 0)
+	MDRV_DEVICE_ADD("x1kb", X1_KEYBOARD, 0)
 
 	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf )
 

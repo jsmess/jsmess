@@ -495,64 +495,145 @@ DRIVER_INIT( osborne1 )
     Osborne1 specific daisy chain code
 ****************************************************************/
 
+// ======================>  osborne1_daisy_device_config
 
-//static int osborne1_daisy_irq_state(running_device *device)
-//{
-//    return ( osborne1.pia_1_irq_state ? Z80_DAISY_INT : 0 );
-//}
-//
-//
-//static int osborne1_daisy_irq_ack(running_device *device)
-//{
-//    /* Enable ROM and I/O when IRQ is acknowledged */
-//    UINT8 old_bankswitch = osborne1.bankswitch;
-//    const address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-//
-//    osborne1_bankswitch_w( space, 0, 0 );
-//    osborne1.bankswitch = old_bankswitch;
-//    osborne1.in_irq_handler = 1;
-//    return 0xF8;
-//}
-//
-//static void osborne1_daisy_irq_reti(running_device *device)
-//{
-//}
-//
-//
-//static DEVICE_START( osborne1_daisy )
-//{
-//}
-//
-//
-//static DEVICE_RESET( osborne1_daisy )
-//{
-//}
-//
-//
-//DEVICE_GET_INFO( osborne1_daisy )
-//{
-//  switch (state)
-//  {
-//      /* --- the following bits of info are returned as 64-bit signed integers --- */
-//      case DEVINFO_INT_TOKEN_BYTES:                   info->i = 4;                                            break;
-//      case DEVINFO_INT_INLINE_CONFIG_BYTES:           info->i = 0;                                            break;
-//
-//      /* --- the following bits of info are returned as pointers to data or functions --- */
-//      case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME(osborne1_daisy);        break;
-//      case DEVINFO_FCT_STOP:                          /* Nothing */                                           break;
-//      case DEVINFO_FCT_RESET:                         info->reset = DEVICE_RESET_NAME(osborne1_daisy);        break;
-//      case DEVINFO_FCT_IRQ_STATE:                     info->f = (genf *)osborne1_daisy_irq_state;             break;
-//      case DEVINFO_FCT_IRQ_ACK:                       info->f = (genf *)osborne1_daisy_irq_ack;               break;
-//      case DEVINFO_FCT_IRQ_RETI:                      info->f = (genf *)osborne1_daisy_irq_reti;              break;
-//
-//      /* --- the following bits of info are returned as NULL-terminated strings --- */
-//      case DEVINFO_STR_NAME:                          strcpy(info->s, "Osborne1 daisy");                              break;
-//      case DEVINFO_STR_FAMILY:                        strcpy(info->s, "Z80");                                     break;
-//      case DEVINFO_STR_VERSION:                       strcpy(info->s, "1.0");                                     break;
-//      case DEVINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                                      break;
-//      case DEVINFO_STR_CREDITS:                       strcpy(info->s, "Copyright the MESS Team");                 break;
-//  }
-//}
-//
-//DEFINE_LEGACY_DEVICE(OSBORNE1_DAISY, osborne1_daisy);
+class osborne1_daisy_device_config :	public device_config,
+								public device_config_z80daisy_interface
+{
+	friend class osborne1_daisy_device;
 
+	// construction/destruction
+	osborne1_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+	// basic information getters
+	virtual const char *name() const { return "Osborne 1 daisy"; }
+};
+
+
+
+// ======================> osborne1_daisy_device
+
+class osborne1_daisy_device :	public device_t,
+						public device_z80daisy_interface
+{
+	friend class osborne1_daisy_device_config;
+
+	// construction/destruction
+	osborne1_daisy_device(running_machine &_machine, const osborne1_daisy_device_config &_config);
+
+private:
+	virtual void device_start();
+	// z80daisy_interface overrides
+	virtual int z80daisy_irq_state();
+	virtual int z80daisy_irq_ack();
+	virtual void z80daisy_irq_reti();
+
+	// internal state
+	const osborne1_daisy_device_config &m_config;
+};
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  osborne1_daisy_device_config - constructor
+//-------------------------------------------------
+
+osborne1_daisy_device_config::osborne1_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	  device_config_z80daisy_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *osborne1_daisy_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(osborne1_daisy_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *osborne1_daisy_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, osborne1_daisy_device(machine, *this));
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  z80ctc_device - constructor
+//-------------------------------------------------
+
+osborne1_daisy_device::osborne1_daisy_device(running_machine &_machine, const osborne1_daisy_device_config &_config)
+	: device_t(_machine, _config),
+	  device_z80daisy_interface(_machine, _config, *this),
+	  m_config(_config)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void osborne1_daisy_device::device_start()
+{
+}
+
+//**************************************************************************
+//  DAISY CHAIN INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  z80daisy_irq_state - return the overall IRQ
+//  state for this device
+//-------------------------------------------------
+
+int osborne1_daisy_device::z80daisy_irq_state()
+{
+	return ( osborne1.pia_1_irq_state ? Z80_DAISY_INT : 0 );
+}
+
+
+//-------------------------------------------------
+//  z80daisy_irq_ack - acknowledge an IRQ and
+//  return the appropriate vector
+//-------------------------------------------------
+
+int osborne1_daisy_device::z80daisy_irq_ack()
+{
+	/* Enable ROM and I/O when IRQ is acknowledged */
+	UINT8 old_bankswitch = osborne1.bankswitch;
+	const address_space* space = cputag_get_address_space(device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	osborne1_bankswitch_w( space, 0, 0 );
+	osborne1.bankswitch = old_bankswitch;
+	osborne1.in_irq_handler = 1;
+	return 0xF8;
+}
+
+//-------------------------------------------------
+//  z80daisy_irq_reti - clear the interrupt
+//  pending state to allow other interrupts through
+//-------------------------------------------------
+
+void osborne1_daisy_device::z80daisy_irq_reti()
+{
+}
+
+const device_type OSBORNE1_DAISY = osborne1_daisy_device_config::static_alloc_device_config;

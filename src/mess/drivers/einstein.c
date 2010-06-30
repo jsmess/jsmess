@@ -183,128 +183,438 @@ static READ8_HANDLER( einstein_80col_state_r )
     EINSTEIN NON-Z80 DEVICES DAISY CHAIN SUPPORT
 ****************************************************************/
 
-//static DEVICE_START( einstein_daisy ) { }
+// ======================>  einstein_keyboard_daisy_device_config
 
-//static int einstein_keyboard_daisy_irq_state(running_device *device)
-//{
-//  einstein_state *einstein = (einstein_state *)device->machine->driver_data;
-//
-//  if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_KEY_INT)
-//      return Z80_DAISY_INT;
-//
-//  return 0;
-//}
-//
-//static int einstein_keyboard_daisy_irq_ack(running_device *device)
-//{
-//  return 0xf7;
-//}
+class einstein_keyboard_daisy_device_config :	public device_config,
+								public device_config_z80daisy_interface
+{
+	friend class einstein_keyboard_daisy_device;
 
-//static DEVICE_GET_INFO( einstein_keyboard_daisy )
-//{
-//  switch (state)
-//  {
-//      /* --- the following bits of info are returned as 64-bit signed integers --- */
-//      case DEVINFO_INT_TOKEN_BYTES:                   info->i = 4;                                            break;
-//      case DEVINFO_INT_INLINE_CONFIG_BYTES:           info->i = 0;                                            break;
-//
-//      /* --- the following bits of info are returned as pointers to data or functions --- */
-//      case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME(einstein_daisy);        break;
-//      case DEVINFO_FCT_IRQ_STATE:                     info->f = (genf *)einstein_keyboard_daisy_irq_state;    break;
-//      case DEVINFO_FCT_IRQ_ACK:                       info->f = (genf *)einstein_keyboard_daisy_irq_ack;      break;
-//
-//      /* --- the following bits of info are returned as NULL-terminated strings --- */
-//      case DEVINFO_STR_NAME:                          strcpy(info->s, "Einstein keyboard daisy chain");       break;
-//      case DEVINFO_STR_FAMILY:                        strcpy(info->s, "Einstein daisy chain");                break;
-//      case DEVINFO_STR_VERSION:                       strcpy(info->s, "1.0");                                 break;
-//      case DEVINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                              break;
-//      case DEVINFO_STR_CREDITS:                       strcpy(info->s, "Copyright the MESS Team");             break;
-//  }
-//}
+	// construction/destruction
+	einstein_keyboard_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
-//static int einstein_adc_daisy_irq_state(running_device *device)
-//{
-//  einstein_state *einstein = (einstein_state *)device->machine->driver_data;
-//
-//  if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_ADC_INT)
-//      return Z80_DAISY_INT;
-//
-//  return 0;
-//}
-//
-//static int einstein_adc_daisy_irq_ack(running_device *device)
-//{
-//  return 0xfb;
-//}
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
 
-//static DEVICE_GET_INFO( einstein_adc_daisy )
-//{
-//  switch (state)
-//  {
-//      /* --- the following bits of info are returned as 64-bit signed integers --- */
-//      case DEVINFO_INT_TOKEN_BYTES:                   info->i = 4;                                            break;
-//      case DEVINFO_INT_INLINE_CONFIG_BYTES:           info->i = 0;                                            break;
-//
-//      /* --- the following bits of info are returned as pointers to data or functions --- */
-//      case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME(einstein_daisy);        break;
-//      case DEVINFO_FCT_IRQ_STATE:                     info->f = (genf *)einstein_adc_daisy_irq_state; break;
-//      case DEVINFO_FCT_IRQ_ACK:                       info->f = (genf *)einstein_adc_daisy_irq_ack;       break;
-//
-//      /* --- the following bits of info are returned as NULL-terminated strings --- */
-//      case DEVINFO_STR_NAME:                          strcpy(info->s, "Einstein ADC daisy chain");            break;
-//      case DEVINFO_STR_FAMILY:                        strcpy(info->s, "Einstein daisy chain");                break;
-//      case DEVINFO_STR_VERSION:                       strcpy(info->s, "1.0");                                 break;
-//      case DEVINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                              break;
-//      case DEVINFO_STR_CREDITS:                       strcpy(info->s, "Copyright the MESS Team");             break;
-//  }
-//}
+	// basic information getters
+	virtual const char *name() const { return "Einstein keyboard daisy chain"; }
+};
 
-//static int einstein_fire_daisy_irq_state(running_device *device)
-//{
-//  einstein_state *einstein = (einstein_state *)device->machine->driver_data;
-//
-//  if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_FIRE_INT)
-//      return Z80_DAISY_INT;
-//
-//  return 0;
-//}
-//
-//static int einstein_fire_daisy_irq_ack(running_device *device)
-//{
-//  return 0xfd;
-//}
 
-//static DEVICE_GET_INFO( einstein_fire_daisy )
-//{
-//  switch (state)
-//  {
-//      /* --- the following bits of info are returned as 64-bit signed integers --- */
-//      case DEVINFO_INT_TOKEN_BYTES:                   info->i = 4;                                            break;
-//      case DEVINFO_INT_INLINE_CONFIG_BYTES:           info->i = 0;                                            break;
-//
-//      /* --- the following bits of info are returned as pointers to data or functions --- */
-//      case DEVINFO_FCT_START:                         info->start = DEVICE_START_NAME(einstein_daisy);        break;
-//      case DEVINFO_FCT_IRQ_STATE:                     info->f = (genf *)einstein_fire_daisy_irq_state;        break;
-//      case DEVINFO_FCT_IRQ_ACK:                       info->f = (genf *)einstein_fire_daisy_irq_ack;          break;
-//
-//      /* --- the following bits of info are returned as NULL-terminated strings --- */
-//      case DEVINFO_STR_NAME:                          strcpy(info->s, "Einstein fire button daisy chain");        break;
-//      case DEVINFO_STR_FAMILY:                        strcpy(info->s, "Einstein daisy chain");                break;
-//      case DEVINFO_STR_VERSION:                       strcpy(info->s, "1.0");                                 break;
-//      case DEVINFO_STR_SOURCE_FILE:                   strcpy(info->s, __FILE__);                              break;
-//      case DEVINFO_STR_CREDITS:                       strcpy(info->s, "Copyright the MESS Team");             break;
-//  }
-//}
+
+// ======================> einstein_keyboard_daisy_device
+
+class einstein_keyboard_daisy_device :	public device_t,
+						public device_z80daisy_interface
+{
+	friend class einstein_keyboard_daisy_device_config;
+
+	// construction/destruction
+	einstein_keyboard_daisy_device(running_machine &_machine, const einstein_keyboard_daisy_device_config &_config);
+
+private:
+	virtual void device_start();
+	// z80daisy_interface overrides
+	virtual int z80daisy_irq_state();
+	virtual int z80daisy_irq_ack();
+	virtual void z80daisy_irq_reti();
+
+	// internal state
+	const einstein_keyboard_daisy_device_config &m_config;
+};
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  einstein_keyboard_daisy_device_config - constructor
+//-------------------------------------------------
+
+einstein_keyboard_daisy_device_config::einstein_keyboard_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	  device_config_z80daisy_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *einstein_keyboard_daisy_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(einstein_keyboard_daisy_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *einstein_keyboard_daisy_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, einstein_keyboard_daisy_device(machine, *this));
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  z80ctc_device - constructor
+//-------------------------------------------------
+
+einstein_keyboard_daisy_device::einstein_keyboard_daisy_device(running_machine &_machine, const einstein_keyboard_daisy_device_config &_config)
+	: device_t(_machine, _config),
+	  device_z80daisy_interface(_machine, _config, *this),
+	  m_config(_config)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void einstein_keyboard_daisy_device::device_start()
+{
+}
+
+//**************************************************************************
+//  DAISY CHAIN INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  z80daisy_irq_state - return the overall IRQ
+//  state for this device
+//-------------------------------------------------
+
+int einstein_keyboard_daisy_device::z80daisy_irq_state()
+{
+	einstein_state *einstein = (einstein_state *)device().machine->driver_data;
+
+	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_KEY_INT)
+		return Z80_DAISY_INT;
+
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  z80daisy_irq_ack - acknowledge an IRQ and
+//  return the appropriate vector
+//-------------------------------------------------
+
+int einstein_keyboard_daisy_device::z80daisy_irq_ack()
+{
+	return 0xf7;
+}
+
+//-------------------------------------------------
+//  z80daisy_irq_reti - clear the interrupt
+//  pending state to allow other interrupts through
+//-------------------------------------------------
+
+void einstein_keyboard_daisy_device::z80daisy_irq_reti()
+{
+}
+
+const device_type EINSTEIN_KEYBOARD_DAISY = einstein_keyboard_daisy_device_config::static_alloc_device_config;
+
+// ======================>  einstein_adc_daisy_device_config
+
+class einstein_adc_daisy_device_config :	public device_config,
+								public device_config_z80daisy_interface
+{
+	friend class einstein_adc_daisy_device;
+
+	// construction/destruction
+	einstein_adc_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+	// basic information getters
+	virtual const char *name() const { return "Einstein ADC daisy chain"; }
+};
+
+
+
+// ======================> einstein_adc_daisy_device
+
+class einstein_adc_daisy_device :	public device_t,
+						public device_z80daisy_interface
+{
+	friend class einstein_adc_daisy_device_config;
+
+	// construction/destruction
+	einstein_adc_daisy_device(running_machine &_machine, const einstein_adc_daisy_device_config &_config);
+
+private:
+	virtual void device_start();
+	// z80daisy_interface overrides
+	virtual int z80daisy_irq_state();
+	virtual int z80daisy_irq_ack();
+	virtual void z80daisy_irq_reti();
+
+	// internal state
+	const einstein_adc_daisy_device_config &m_config;
+};
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  einstein_adc_daisy_device_config - constructor
+//-------------------------------------------------
+
+einstein_adc_daisy_device_config::einstein_adc_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	  device_config_z80daisy_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *einstein_adc_daisy_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(einstein_adc_daisy_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *einstein_adc_daisy_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, einstein_adc_daisy_device(machine, *this));
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  z80ctc_device - constructor
+//-------------------------------------------------
+
+einstein_adc_daisy_device::einstein_adc_daisy_device(running_machine &_machine, const einstein_adc_daisy_device_config &_config)
+	: device_t(_machine, _config),
+	  device_z80daisy_interface(_machine, _config, *this),
+	  m_config(_config)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void einstein_adc_daisy_device::device_start()
+{
+}
+
+//**************************************************************************
+//  DAISY CHAIN INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  z80daisy_irq_state - return the overall IRQ
+//  state for this device
+//-------------------------------------------------
+
+int einstein_adc_daisy_device::z80daisy_irq_state()
+{
+	einstein_state *einstein = (einstein_state *)device().machine->driver_data;
+
+	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_ADC_INT)
+		return Z80_DAISY_INT;
+
+	return 0;
+}
+
+
+//-------------------------------------------------
+//  z80daisy_irq_ack - acknowledge an IRQ and
+//  return the appropriate vector
+//-------------------------------------------------
+
+int einstein_adc_daisy_device::z80daisy_irq_ack()
+{
+	return 0xfb;
+}
+
+//-------------------------------------------------
+//  z80daisy_irq_reti - clear the interrupt
+//  pending state to allow other interrupts through
+//-------------------------------------------------
+
+void einstein_adc_daisy_device::z80daisy_irq_reti()
+{
+}
+
+const device_type EINSTEIN_ADC_DAISY = einstein_adc_daisy_device_config::static_alloc_device_config;
+
+// ======================>  einstein_fire_daisy_device_config
+
+class einstein_fire_daisy_device_config :	public device_config,
+								public device_config_z80daisy_interface
+{
+	friend class einstein_fire_daisy_device;
+
+	// construction/destruction
+	einstein_fire_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+	// basic information getters
+	virtual const char *name() const { return "Einstein fire button daisy chain"; }
+};
+
+
+
+// ======================> einstein_fire_daisy_device
+
+class einstein_fire_daisy_device :	public device_t,
+						public device_z80daisy_interface
+{
+	friend class einstein_fire_daisy_device_config;
+
+	// construction/destruction
+	einstein_fire_daisy_device(running_machine &_machine, const einstein_fire_daisy_device_config &_config);
+
+private:
+	virtual void device_start();
+	// z80daisy_interface overrides
+	virtual int z80daisy_irq_state();
+	virtual int z80daisy_irq_ack();
+	virtual void z80daisy_irq_reti();
+
+	// internal state
+	const einstein_fire_daisy_device_config &m_config;
+};
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  einstein_fire_daisy_device_config - constructor
+//-------------------------------------------------
+
+einstein_fire_daisy_device_config::einstein_fire_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	  device_config_z80daisy_interface(mconfig, *this)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *einstein_fire_daisy_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+	return global_alloc(einstein_fire_daisy_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *einstein_fire_daisy_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, einstein_fire_daisy_device(machine, *this));
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  z80ctc_device - constructor
+//-------------------------------------------------
+
+einstein_fire_daisy_device::einstein_fire_daisy_device(running_machine &_machine, const einstein_fire_daisy_device_config &_config)
+	: device_t(_machine, _config),
+	  device_z80daisy_interface(_machine, _config, *this),
+	  m_config(_config)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void einstein_fire_daisy_device::device_start()
+{
+}
+
+//**************************************************************************
+//  DAISY CHAIN INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  z80daisy_irq_state - return the overall IRQ
+//  state for this device
+//-------------------------------------------------
+
+int einstein_fire_daisy_device::z80daisy_irq_state()
+{
+  einstein_state *einstein = (einstein_state *)device().machine->driver_data;
+
+  if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_FIRE_INT)
+      return Z80_DAISY_INT;
+
+  return 0;
+}
+
+
+//-------------------------------------------------
+//  z80daisy_irq_ack - acknowledge an IRQ and
+//  return the appropriate vector
+//-------------------------------------------------
+
+int einstein_fire_daisy_device::z80daisy_irq_ack()
+{
+	return 0xfd;
+}
+
+//-------------------------------------------------
+//  z80daisy_irq_reti - clear the interrupt
+//  pending state to allow other interrupts through
+//-------------------------------------------------
+
+void einstein_fire_daisy_device::z80daisy_irq_reti()
+{
+}
+
+const device_type EINSTEIN_FIRE_DAISY = einstein_fire_daisy_device_config::static_alloc_device_config;
 
 /* int priority */
 /* keyboard int->ctc/adc->pio */
 static const z80_daisy_config einstein_daisy_chain[] =
 {
-	//{ "keyboard_daisy" },
+	{ "keyboard_daisy" },
 	{ IC_I058 },
-	//{ "adc_daisy" },
+	{ "adc_daisy" },
 	{ IC_I063 },
-	//{ "fire_daisy" },
+	{ "fire_daisy" },
 	{ NULL }
 };
 
@@ -918,9 +1228,9 @@ static MACHINE_DRIVER_START( einstein )
 	MDRV_TIMER_ADD_PERIODIC("ctc", einstein_ctc_trigger_callback, HZ(XTAL_X002 /4))
 
 	/* Einstein daisy chain support for non-Z80 devices */
-	//MDRV_DEVICE_ADD("keyboard_daisy", DEVICE_GET_INFO_NAME(einstein_keyboard_daisy), 0)
-	//MDRV_DEVICE_ADD("adc_daisy", DEVICE_GET_INFO_NAME(einstein_adc_daisy), 0)
-	//MDRV_DEVICE_ADD("fire_daisy", DEVICE_GET_INFO_NAME(einstein_fire_daisy), 0)
+	MDRV_DEVICE_ADD("keyboard_daisy", EINSTEIN_KEYBOARD_DAISY, 0)
+	MDRV_DEVICE_ADD("adc_daisy", EINSTEIN_ADC_DAISY, 0)
+	MDRV_DEVICE_ADD("fire_daisy", EINSTEIN_FIRE_DAISY, 0)
 
     /* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
