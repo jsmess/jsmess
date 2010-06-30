@@ -810,8 +810,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 					if (state->mapper == 21)
 					{
 						// Wai Wai World 2 & Ganbare Goemon Gaiden 2 (the latter with crc_hack)
-						state->vrc_ls_prg_a = 7;
-						state->vrc_ls_prg_b = 6;
 						state->vrc_ls_prg_a = state->crc_hack ? 7 : 2;
 						state->vrc_ls_prg_b = state->crc_hack ? 6 : 1;
 					}
