@@ -577,8 +577,8 @@ static const nes_pcb pcb_list[] =
 	{ "BMC-NTD-03",          BMC_NTD_03 },
 	{ "BMC-8157",            UNSUPPORTED_BOARD /*BMC_8157*/ },
 	{ "BMC-BS-5",            BMC_BENSHENG_BS5 },
-	{ "BMC-FK23C",           UNSUPPORTED_BOARD /*BMC_FK23C*/ },
-	{ "BMC-FK23CA",          UNSUPPORTED_BOARD /*BMC_FK23C*/ },	// diff reg init
+	{ "BMC-FK23C",           BMC_FK23C },
+	{ "BMC-FK23CA",          BMC_FK23CA },
 	{ "BMC-GHOSTBUSTERS63IN1", BMC_G63IN1 },
 	{ "BMC-SUPERVISION16IN1", UNSUPPORTED_BOARD },	// mapper 53
 	{ "BMC-RESETBASED-4IN1", UNSUPPORTED_BOARD },// mapper 60 with 64k prg and 32k chr
@@ -1228,20 +1228,10 @@ static void mmc3_set_prg( running_machine *machine, int prg_base, int prg_mask )
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_flip = (state->mmc_latch1 & 0x40) ? 2 : 0;
 
-	if (state->mmc3_prg_cb)
-	{
-		state->mmc3_prg_cb(machine, 0, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
-		state->mmc3_prg_cb(machine, 1, prg_base | (state->mmc_prg_bank[1] & prg_mask));
-		state->mmc3_prg_cb(machine, 2, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
-		state->mmc3_prg_cb(machine, 3, prg_base | (state->mmc_prg_bank[3] & prg_mask));
-	}
-	else
-	{
-		prg8_x(machine, 0, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
-		prg8_x(machine, 1, prg_base | (state->mmc_prg_bank[1] & prg_mask));
-		prg8_x(machine, 2, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
-		prg8_x(machine, 3, prg_base | (state->mmc_prg_bank[3] & prg_mask));
-	}
+	state->mmc3_prg_cb(machine, 0, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
+	state->mmc3_prg_cb(machine, 1, prg_base | (state->mmc_prg_bank[1] & prg_mask));
+	state->mmc3_prg_cb(machine, 2, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
+	state->mmc3_prg_cb(machine, 3, prg_base | (state->mmc_prg_bank[3] & prg_mask));
 }
 
 static void mmc3_set_chr( running_machine *machine, UINT8 chr, int chr_base, int chr_mask )
@@ -1249,28 +1239,14 @@ static void mmc3_set_chr( running_machine *machine, UINT8 chr, int chr_base, int
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 
-	if (state->mmc3_chr_cb)
-	{
-		state->mmc3_chr_cb(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
-		state->mmc3_chr_cb(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
-		state->mmc3_chr_cb(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
-		state->mmc3_chr_cb(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
-		state->mmc3_chr_cb(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr);
-		state->mmc3_chr_cb(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr);
-		state->mmc3_chr_cb(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr);
-		state->mmc3_chr_cb(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr);
-	}
-	else
-	{
-		chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
-		chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
-		chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
-		chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
-		chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr);
-		chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr);
-		chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr);
-		chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr);
-	}
+	state->mmc3_chr_cb(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
+	state->mmc3_chr_cb(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
+	state->mmc3_chr_cb(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
+	state->mmc3_chr_cb(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
+	state->mmc3_chr_cb(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr);
+	state->mmc3_chr_cb(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr);
+	state->mmc3_chr_cb(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr);
+	state->mmc3_chr_cb(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr);
 }
 
 /* Here, IRQ counter decrements every scanline. */
@@ -6915,8 +6891,33 @@ static WRITE8_HANDLER( subor1_w )
 
  *************************************************************/
 
-// remove mask & base parameters!
-static void sgame_boog_set_prg( running_machine *machine, int prg_base, int prg_mask )
+static void sgame_boog_prg_cb( running_machine *machine, int start, int bank )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	if (!(state->map215_reg[0] & 0x80))	// if this is != 0 we should never even arrive here
+	{
+		if (state->map215_reg[1] & 0x08)
+			bank = (bank & 0x1f) | 0x20;
+		else
+			bank = (bank & 0x0f) | (state->map215_reg[1] & 0x10);
+
+		prg8_x(machine, start, bank);
+	}
+}
+
+static void sgame_boog_chr_cb( running_machine *machine, int start, int bank, int source )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	
+	if ((state->map215_reg[1] & 0x04))
+		bank |= 0x100;
+	else
+		bank = (bank & 0x7f) | ((state->map215_reg[1] & 0x10) << 3);
+	
+	chr1_x(machine, start, bank, source);
+}
+
+static void sgame_boog_set_prg( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	if (state->map215_reg[0] & 0x80)
@@ -6925,29 +6926,7 @@ static void sgame_boog_set_prg( running_machine *machine, int prg_base, int prg_
 		prg16_cdef(machine, (state->map215_reg[0] & 0xf0) | (state->map215_reg[1] & 0x10));
 	}
 	else
-	{
-		state->mmc_prg_base = (state->map215_reg[1] & 0x08) ? 0x20 : (state->map215_reg[1] & 0x10);
-		state->mmc_prg_mask = (state->map215_reg[1] & 0x08) ? 0x1f : 0x0f;
-
 		mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-	}
-}
-
-static void sgame_boog_set_chr( running_machine *machine, UINT8 chr )
-{
-	nes_state *state = (nes_state *)machine->driver_data;
-	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
-	int chr_base = (state->map215_reg[1] & 0x04) ? 0x100 : ((state->map215_reg[1] & 0x10) << 3);
-	int chr_mask = (state->map215_reg[1] & 0x04) ? 0xff : 0x7f;
-
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr);
 }
 
 static WRITE8_HANDLER( sgame_boog_l_w )
@@ -6959,137 +6938,108 @@ static WRITE8_HANDLER( sgame_boog_l_w )
 	if (offset == 0x1000)
 	{
 		state->map215_reg[0] = data;
-		sgame_boog_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+		sgame_boog_set_prg(space->machine);
 	}
 	else if (offset == 0x1001)
 	{
 		state->map215_reg[1] = data;
-		sgame_boog_set_chr(space->machine, state->mmc_chr_source);
+		mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 	}
 	else if (offset == 0x1007)
 	{
 		state->mmc_latch1 = 0;
 		state->map215_reg[2] = data;
-		sgame_boog_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-		sgame_boog_set_chr(space->machine, state->mmc_chr_source);
+		sgame_boog_set_prg(space->machine);
+		mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+	}
+}
+
+static WRITE8_HANDLER( sgame_boog_m_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("sgame_boog_m_w, offset: %04x, data: %02x\n", offset, data));
+	
+	if (offset == 0x0000)
+	{
+		state->map215_reg[0] = data;
+		sgame_boog_set_prg(space->machine);
+	}
+	else if (offset == 0x0001)
+	{
+		state->map215_reg[1] = data;
+		mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+	}
+	else if (offset == 0x0007)
+	{
+		state->mmc_latch1 = 0;
+		state->map215_reg[2] = data;
+		sgame_boog_set_prg(space->machine);
+		mmc3_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 	}
 }
 
 static WRITE8_HANDLER( sgame_boog_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	UINT8 MMC3_helper, cmd;
 	static const UINT8 conv_table[8] = {0,2,5,3,6,1,7,4};
 	LOG_MMC(("sgame_boog_w, offset: %04x, data: %02x\n", offset, data));
 
-	if (!state->map215_reg[2]) // in this case we act like MMC3, only with alt prg/chr handlers
+	switch (offset & 0x6001)
 	{
-		switch (offset & 0x6001)
-		{
-			case 0x0000:
-				MMC3_helper = state->mmc_latch1 ^ data;
-				state->mmc_latch1 = data;
-
-				/* Has PRG Mode changed? */
-				if (MMC3_helper & 0x40)
-					sgame_boog_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-
-				/* Has CHR Mode changed? */
-				if (MMC3_helper & 0x80)
-					sgame_boog_set_chr(space->machine, state->mmc_chr_source);
-				break;
-
-			case 0x0001:
-				cmd = state->mmc_latch1 & 0x07;
-				switch (cmd)
+		case 0x0000:
+			if (!state->map215_reg[2])
+				txrom_w(space, 0x0000, data);
+			break;
+			
+		case 0x0001:
+			if (!state->map215_reg[2])
+				txrom_w(space, 0x0001, data);
+			else if (state->map215_reg[3] && ((state->map215_reg[0] & 0x80) == 0 || (state->mmc_latch1 & 0x07) < 6))	// if we use the prg16 banks and cmd=6,7 DON'T enter!
 			{
-				case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
-				case 2: case 3: case 4: case 5:
-					state->mmc_vrom_bank[cmd] = data;
-					sgame_boog_set_chr(space->machine, state->mmc_chr_source);
-					break;
-				case 6:
-				case 7:
-					state->mmc_prg_bank[cmd - 6] = data;
-					sgame_boog_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-					break;
+				state->map215_reg[3] = 0;
+				txrom_w(space, 0x0001, data);
 			}
-				break;
-
-			default:
-				txrom_w(space, offset, data);
-				break;
-		}
-	}
-	else
-	{
-		switch (offset & 0x6001)
-		{
-			case 0x0000:
-				break;
-
-			case 0x0001:
-				cmd = state->mmc_latch1 & 0x07;
-				if (state->map215_reg[3] && ((state->map215_reg[0] & 0x80) == 0 || cmd < 6))	// if we use the prg16 banks and cmd=6,7 DON'T enter!
-				{
-					state->map215_reg[3] = 0;
-					switch (cmd)
-					{
-						case 0: case 1:	// these do not need to be separated: we take care of them in set_chr!
-						case 2: case 3: case 4: case 5:
-							state->mmc_vrom_bank[cmd] = data;
-							sgame_boog_set_chr(space->machine, state->mmc_chr_source);
-							break;
-						case 6:
-						case 7:
-							state->mmc_prg_bank[cmd - 6] = data;
-							sgame_boog_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-							break;
-					}
-				}
-				break;
-
-			case 0x2000:
+			break;
+			
+		case 0x2000:
+			if (!state->map215_reg[2])
+				txrom_w(space, 0x2000, data);
+			else
+			{
 				data = (data & 0xc0) | conv_table[data & 0x07];
-				MMC3_helper = state->mmc_latch1 ^ data;
-				state->mmc_latch1 = data;
-
-				/* Has PRG Mode changed? */
-				if (MMC3_helper & 0x40)
-					sgame_boog_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-
-				/* Has CHR Mode changed? */
-				if (MMC3_helper & 0x80)
-					sgame_boog_set_chr(space->machine, state->mmc_chr_source);
-
 				state->map215_reg[3] = 1;
+				txrom_w(space, 0x0000, data);
 				break;
+			}
+			break;
 
-				//      case 0x2001:
-				//          txrom_w(space, 0x4001, data);
-				//          break;
-
-			case 0x4000:
+		case 0x4000:
+			if (!state->map215_reg[2])
+				txrom_w(space, 0x4000, data);
+			else 
 				set_nt_mirroring(space->machine, ((data >> 7) | data) & 0x01 ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
-				break;
+			break;
 
-			case 0x4001:
+		case 0x4001:
+			if (!state->map215_reg[2])
+				txrom_w(space, 0x4001, data);
+			else 
 				txrom_w(space, 0x6001, data);
-				break;
+			break;
 
-				//      case 0x6000:
-				//          txrom_w(space, 0x6000, data);
-				//          break;
-
-			case 0x6001:
+		case 0x6001:
+			if (!state->map215_reg[2])
+				txrom_w(space, 0x6001, data);
+			else 
+			{
 				txrom_w(space, 0x4000, data);
 				txrom_w(space, 0x4001, data);
-				break;
-
-			default:
-				txrom_w(space, offset, data);
-				break;
-		}
+			}
+			break;
+			
+		default:
+			txrom_w(space, offset, data);
+			break;
 	}
 }
 
@@ -9047,38 +8997,23 @@ static WRITE8_HANDLER( unl_t230_w )
 
  *************************************************************/
 
-static void kof96_set_prg( running_machine *machine, int prg_base, int prg_mask )
+static void kof96_prg_cb( running_machine *machine, int start, int bank )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
-	UINT8 prg_flip = (state->mmc_latch1 & 0x40) ? 2 : 0;
 
 	if (!(state->mapper187_reg[0] & 0x80))
-	{
-		prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
-		prg8_ab(machine, prg_base | (state->mmc_prg_bank[1] & prg_mask));
-		prg8_cd(machine, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
-		prg8_ef(machine, prg_base | (state->mmc_prg_bank[3] & prg_mask));
-	}
+		prg8_x(machine, start, bank);
 }
 
-static void kof96_set_chr( running_machine *machine, UINT8 chr, int chr_base, int chr_mask )
+static void kof96_chr_cb( running_machine *machine, int start, int bank, int source )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
-	UINT8 new_base[8];
-	int i;
 
-	for (i = 0; i < 8; i++)
-		new_base[i] = ((i & 0x04) == chr_page)? (chr_base | 0x100) : chr_base;
+	if ((start & 0x04) == chr_page)
+		bank |= 0x100;
 
-	chr1_x(machine, chr_page ^ 0, new_base[0] | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, new_base[1] | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, new_base[2] | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, new_base[3] | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, new_base[4] | (state->mmc_vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, new_base[5] | (state->mmc_vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, new_base[6] | (state->mmc_vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, new_base[7] | (state->mmc_vrom_bank[5] & chr_mask), chr);
+	chr1_x(machine, start, bank, source);
 }
 
 static WRITE8_HANDLER( kof96_l_w )
@@ -9089,23 +9024,6 @@ static WRITE8_HANDLER( kof96_l_w )
 	offset += 0x100;
 
 	if (offset == 0x1000)
-	{
-		switch (data & 0x03)
-		{
-			case 0x00:
-			case 0x01:
-				state->mapper187_reg[1] = 0x83;
-				break;
-			case 0x02:
-				state->mapper187_reg[1] = 0x42;
-				break;
-			case 0x03:
-				state->mapper187_reg[1] = 0x00;
-				break;
-		}
-	}
-
-	if (!(offset <= 0x1000))
 	{
 		state->mapper187_reg[0] = data;
 
@@ -9122,7 +9040,31 @@ static WRITE8_HANDLER( kof96_l_w )
 			}
 		}
 		else
-			kof96_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+			mmc3_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
+	}
+
+	if (offset >= 0x1000)
+	{
+		switch (data & 0x03)
+		{
+			case 0x00:
+			case 0x01:
+				state->mapper187_reg[1] = 0x83;
+				break;
+			case 0x02:
+				state->mapper187_reg[1] = 0x42;
+				break;
+			case 0x03:
+				state->mapper187_reg[1] = 0x00;
+				break;
+		}
+		
+	}
+	
+	if (!state->mapper187_reg[3] && offset > 0x1000)
+	{
+		state->mapper187_reg[3] = 1;
+		memory_write_byte(space, 0x4017, 0x40);
 	}
 }
 
@@ -9141,43 +9083,18 @@ static READ8_HANDLER( kof96_l_r )
 static WRITE8_HANDLER( kof96_w )
 {
 	nes_state *state = (nes_state *)space->machine->driver_data;
-	UINT8 MMC3_helper, cmd;
 	LOG_MMC(("kof96_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset & 0x6003)
 	{
 		case 0x0000:
 			state->mapper187_reg[2] = 1;
-			MMC3_helper = state->mmc_latch1 ^ data;
-			state->mmc_latch1 = data;
-
-			/* Has PRG Mode changed? */
-			if (MMC3_helper & 0x40)
-				kof96_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-
-			/* Has CHR Mode changed? */
-			if (MMC3_helper & 0x80)
-				kof96_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			txrom_w(space, 0x0000, data);
 			break;
 
 		case 0x0001:
 			if (state->mapper187_reg[2])
-			{
-				cmd = state->mmc_latch1 & 0x07;
-				switch (cmd)
-				{
-					case 0: case 1:
-					case 2: case 3: case 4: case 5:
-						state->mmc_vrom_bank[cmd] = data;
-						kof96_set_chr(space->machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
-						break;
-					case 6:
-					case 7:
-						state->mmc_prg_bank[cmd - 6] = data;
-						kof96_set_prg(space->machine, state->mmc_prg_base, state->mmc_prg_mask);
-						break;
-				}
-			}
+				txrom_w(space, 0x0001, data);
 			break;
 
 		case 0x0002:
@@ -9973,6 +9890,163 @@ static READ8_HANDLER( btl_pika_y2k_m_r )
           MULTICART
 
  *************************************************************/
+
+/*************************************************************
+ 
+ Board BMC-FK23C
+ 
+ In MESS: partially supported (still to sort initial banking
+ for many games)
+ 
+ *************************************************************/
+
+#if 0
+static void fk23c_prg_cb( running_machine *machine, int start, int bank )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	
+	if (((state->mmc_reg[0] & 0x07) - 3) > 1 && (!(state->mmc_reg[3] & 0x02) || start < 2))
+	{
+		if (state->mmc_reg[0] & 0x03)
+			bank = (bank & (0x3f >> (state->mmc_reg[0] & 0x03))) | (state->mmc_reg[1] << 1);
+		
+		prg8_x(machine, start, bank);
+	}
+}
+
+static void fk23c_chr_cb( running_machine *machine, int start, int bank, int source )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	
+	if (!(state->mmc_reg[0] & 0x40) && (!(state->mmc_reg[3] & 0x02) || (start != 1 && start != 3)))
+		chr1_x(machine, start, ((state->mmc_reg[2] & 0x7f) << 3) | bank, source);
+}
+
+#endif
+
+static void fk23c_prg_cb( running_machine *machine, int start, int bank )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	UINT8 mask = (0x3f >> (state->mmc_reg[0] & 0x03));
+	
+	if ((state->mmc_reg[0] & 0x07) < 3)
+	{
+		if (!(state->mmc_reg[0] & 0x03))
+			bank = (bank & mask) | ((state->mmc_reg[1]  & (0x7f ^ mask)) << 1);
+
+		prg8_x(machine, start, bank);
+	}
+}
+
+static void fk23c_chr_cb( running_machine *machine, int start, int bank, int source )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	if (!(state->mmc_reg[0] & 0x40) && (!(state->mmc_reg[3] & 0x02) || (start != 1 && start != 3)))
+		chr1_x(machine, start, ((state->mmc_reg[2] & 0x7f) << 3) | bank, source);
+}
+
+static void fk23c_set_prg( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	if ((state->mmc_reg[0] & 0x07) == 4)
+		prg32(machine, (state->mmc_reg[1] & 0x7f) >> 1);
+	else if ((state->mmc_reg[0] & 0x07) == 3)
+	{
+		prg16_89ab(machine, state->mmc_reg[1] & 0x7f);
+		prg16_cdef(machine, state->mmc_reg[1] & 0x7f);
+	}
+	else
+	{
+		if (state->mmc_reg[3] & 0x02)
+		{
+			prg8_cd(machine, state->mmc_reg[4]);
+			prg8_ef(machine, state->mmc_reg[5]);
+		}
+		
+		mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+	}
+}
+
+static void fk23c_set_chr( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	if (state->mmc_reg[0] & 0x40)
+		chr8(machine, state->mmc_reg[2] | state->mmc_cmd1, state->mmc_chr_source);
+	else
+	{
+		if (state->mmc_reg[3] & 0x02)
+		{
+			int base = (state->mmc_reg[2] & 0x7f) << 3;
+			chr1_x(machine, 1, base | state->mmc_reg[6], state->mmc_chr_source);
+			chr1_x(machine, 3, base | state->mmc_reg[7], state->mmc_chr_source);
+		}
+
+		mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+	}
+}
+
+static WRITE8_HANDLER( fk23c_l_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("fk23c_l_w, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x100;
+
+	if (offset >= 0x1000)
+	{
+		if (offset & (1 << 4))	// here it should be (4 + state->mmc_dipsetting)
+		{
+			state->mmc_reg[offset & 0x03] = data;
+			
+			fk23c_set_prg(space->machine);
+			fk23c_set_chr(space->machine);
+		}
+	}
+}
+
+static WRITE8_HANDLER( fk23c_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("fk23c_w, offset: %04x, data: %02x\n", offset, data));
+	
+	if (state->mmc_reg[0] & 0x40)
+	{
+		if (state->mmc_reg[0] & 0x30)
+			state->mmc_cmd1 = 0;
+		else
+		{
+			state->mmc_cmd1 = data & 0x03;
+			fk23c_set_chr(space->machine);
+		}
+	}
+	else
+	{
+		switch (offset & 0x6001)
+		{
+			case 0x0001:
+				if ((state->mmc_reg[3] & 0x02) && (state->mmc_latch1 & 0x08))
+				{
+					state->mmc_reg[4 | (state->mmc_latch1 & 0x03)] = data;
+					fk23c_set_prg(space->machine);
+					fk23c_set_chr(space->machine);
+				}
+				else
+					txrom_w(space, offset, data);
+				break;
+				
+			case 0x2000:
+				set_nt_mirroring(space->machine, data ? PPU_MIRROR_HORZ : PPU_MIRROR_VERT);
+				break;
+				
+			default:
+				txrom_w(space, offset, data);
+				break;
+		}	
+	}
+}
+
 
 /*************************************************************
 
@@ -11731,7 +11805,7 @@ struct _nes_pcb_intf
 
 static WRITE8_HANDLER( dummy_l_w )
 {
-	logerror("write access, offset: %04x, data: %02x\n", offset + 0x8000, data);
+	logerror("write access, offset: %04x, data: %02x\n", offset + 0x4100, data);
 }
 
 static WRITE8_HANDLER( dummy_m_w )
@@ -11741,12 +11815,12 @@ static WRITE8_HANDLER( dummy_m_w )
 
 static WRITE8_HANDLER( dummy_w )
 {
-	logerror("write access, offset: %04x, data: %02x\n", offset + 0x4100, data);
+	logerror("write access, offset: %04x, data: %02x\n", offset + 0x8000, data);
 }
 
 static READ8_HANDLER( dummy_l_r )
 {
-	logerror("read access, offset: %04x\n", offset + 0x8000);	
+	logerror("read access, offset: %04x\n", offset + 0x4100);	
 	return 0x00;
 }
 
@@ -11758,7 +11832,7 @@ static READ8_HANDLER( dummy_m_r )
 
 static READ8_HANDLER( dummy_r )
 {
-	logerror("read access, offset: %04x\n", offset + 0x4100);	
+	logerror("read access, offset: %04x\n", offset + 0x8000);	
 	return 0x00;
 }
 
@@ -11896,7 +11970,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ REXSOFT_DBZ5,         {rex_dbz_l_w, rex_dbz_l_r}, NES_NOACCESS, NES_WRITEONLY(rex_dbz_w), NULL, NULL, mmc3_irq },
 	{ REXSOFT_SL1632,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(rex_sl1632_w),          NULL, NULL, mmc3_irq },
 	{ RUMBLESTATION_BOARD,  NES_NOACCESS, NES_WRITEONLY(rumblestation_m_w), NES_WRITEONLY(rumblestation_w),      NULL, NULL, NULL },
-	{ SUPERGAME_BOOGERMAN,  NES_WRITEONLY(sgame_boog_l_w), NES_NOACCESS, NES_WRITEONLY(sgame_boog_w), NULL, NULL, mmc3_irq },
+	{ SUPERGAME_BOOGERMAN,  NES_WRITEONLY(sgame_boog_l_w), NES_WRITEONLY(sgame_boog_m_w), NES_WRITEONLY(sgame_boog_w), NULL, NULL, mmc3_irq },
 	{ SUPERGAME_LIONKING,   NES_NOACCESS, NES_WRITEONLY(sgame_lion_m_w), NES_WRITEONLY(sgame_lion_w), NULL, NULL, mmc3_irq },
 	{ TENGEN_800008,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800008_w),       NULL, NULL, NULL },
 	{ TENGEN_800032,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(tengen_800032_w),       NULL, NULL, tengen_800032_irq },
@@ -11992,6 +12066,8 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BMC_G63IN1,           NES_NOACCESS, NES_NOACCESS, {bmc_gb63_w, bmc_gb63_r},             NULL, NULL, NULL },
 	{ UNL_EDU2K,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(edu2k_w),               NULL, NULL, NULL },
 	{ UNL_SHJY3,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(shjy3_w),               NULL, NULL, shjy3_irq },
+	{ BMC_FK23C,            NES_WRITEONLY(fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(fk23c_w),   NULL, NULL, mmc3_irq },
+	{ BMC_FK23CA,           NES_WRITEONLY(fk23c_l_w), NES_NOACCESS, NES_WRITEONLY(fk23c_w),   NULL, NULL, mmc3_irq },
 	//
 	{ FFE_MAPPER6,          NES_WRITEONLY(mapper6_l_w), NES_NOACCESS, NES_WRITEONLY(mapper6_w), NULL, NULL, ffe_irq },
 	{ FFE_MAPPER8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(mapper8_w),             NULL, NULL, NULL },
@@ -12065,9 +12141,6 @@ void pcb_handlers_setup( running_machine *machine )
 	if (intf == NULL)
 		fatalerror("Missing PCB interface\n");
 
-//	state->mmc3_chr_cb = chr1_x;
-//	state->mmc3_prg_cb = prg8_x;
-
 	if (intf)
 	{
 		state->mmc_write_low = intf->mmc_l.write;
@@ -12088,6 +12161,25 @@ void pcb_handlers_setup( running_machine *machine )
 		state->mmc_read_mid = NULL;	// in progress
 		state->mmc_read = NULL;	// in progress
 		ppu_latch = NULL;
+	}
+
+	state->mmc3_prg_cb = prg8_x;
+	state->mmc3_chr_cb = chr1_x;
+
+	switch (state->pcb_id)
+	{
+		case SUPERGAME_BOOGERMAN:
+			state->mmc3_prg_cb = sgame_boog_prg_cb;
+			state->mmc3_chr_cb = sgame_boog_chr_cb;
+			break;
+		case UNL_KOF96:
+			state->mmc3_prg_cb = kof96_prg_cb;
+			state->mmc3_chr_cb = kof96_chr_cb;
+			break;
+		case BMC_FK23C:
+			state->mmc3_prg_cb = fk23c_prg_cb;
+			state->mmc3_chr_cb = fk23c_chr_cb;
+			break;
 	}
 }
 

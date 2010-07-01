@@ -690,10 +690,8 @@ static int pcb_initialize( running_machine *machine, int idx )
 
 // mapper 187
 		case UNL_KOF96:
-			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			state->mapper187_reg[0] = state->mapper187_reg[1] = state->mapper187_reg[2] = state->mapper187_reg[3] = 0;
-			kof96_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			kof96_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			break;
 // mapper 189
 		case TXC_TW:
@@ -776,20 +774,13 @@ static int pcb_initialize( running_machine *machine, int idx )
 
 // mapper 215
 		case SUPERGAME_BOOGERMAN:
-			state->mmc_prg_bank[0] = 0x00;
-			state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = 0x01;
-			state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
 			state->map215_reg[0] = 0x00;
 			state->map215_reg[1] = 0xff;
 			state->map215_reg[2] = 0x04;
 			state->map215_reg[3] = 0;
-			state->mmc_prg_base = 0;
-			state->mmc_prg_mask = 0x1f;
-			sgame_boog_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			sgame_boog_set_chr(machine, state->mmc_chr_source);
+			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
+			sgame_boog_set_prg(machine);
+			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 
 // mapper 217
@@ -957,6 +948,25 @@ static int pcb_initialize( running_machine *machine, int idx )
 		case BMC_G63IN1:
 			bmc_gb63_update(machine);
 			break;
+
+		case BMC_FK23C:
+			state->mmc_reg[0] = 4;
+			state->mmc_reg[1] = 0xff;
+			state->mmc_reg[2] = state->mmc_reg[3] = 0;
+			state->mmc_reg[4] = state->mmc_reg[5] = state->mmc_reg[6] = state->mmc_reg[7] = 0xff;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			fk23c_set_prg(machine);
+			fk23c_set_chr(machine);
+			break;
+			
+		case BMC_FK23CA:
+			state->mmc_reg[0] = state->mmc_reg[1] = state->mmc_reg[2] = state->mmc_reg[3] = 0;
+			state->mmc_reg[4] = state->mmc_reg[5] = state->mmc_reg[6] = state->mmc_reg[7] = 0xff;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			fk23c_set_prg(machine);
+			fk23c_set_chr(machine);
+			break;
+
 
 		case FFE_MAPPER6:
 			prg16_89ab(machine, 0);
