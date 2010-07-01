@@ -490,7 +490,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-NINJARYU",     UNSUPPORTED_BOARD },// mapper 111
 	{ "UNL-NANJING",      NANJING_BOARD },// mapper 163
 	{ "FUKUTAKE",         UNSUPPORTED_BOARD },	// mapper 186
-	{ "WHIRLWIND-2706",   UNSUPPORTED_BOARD },
+	{ "WHIRLWIND-2706",   WHIRLWIND_2706 },
 	{ "UNL-H2288",        UNSUPPORTED_BOARD },	// mapper 123
 	{ "UNL-DANCE",        UNSUPPORTED_BOARD },
 	{ "UNL-EDU2000",      UNL_EDU2K },
@@ -499,7 +499,7 @@ static const nes_pcb pcb_list[] =
 	{ "RUMBLESTATION",    RUMBLESTATION_BOARD },	// mapper 46
 	{ "UNL-WORLDHERO",    UNSUPPORTED_BOARD },// mapper 27
 	{ "UNL-A9746",        UNSUPPORTED_BOARD },// mapper 219
-	{ "UNL-603-5052",     UNSUPPORTED_BOARD },// mapper 238?
+	{ "UNL-603-5052",     UNL_603_5052 },// mapper 238?
 	{ "UNL-SHJY3",        UNL_SHJY3 },// mapper 253
 	{ "UNL-RACERMATE",    UNL_RACERMATE },// mapper 168
 	{ "UNL-N625092",      UNL_N625092 },
@@ -527,9 +527,9 @@ static const nes_pcb pcb_list[] =
 	{ "BTL-DRAGONNINJA",   BTL_DRAGONNINJA },
 	{ "BTL-MARIO1-MALEE2", UNSUPPORTED_BOARD },	// mapper 55?
 	{ "BTL-2708",          UNSUPPORTED_BOARD },// mapper 103
-	{ "BTL-TOBIDASEDAISAKUSEN", UNSUPPORTED_BOARD },// mapper 120
+	{ "BTL-TOBIDASEDAISAKUSEN", BTL_TOBIDASE },// mapper 120
 	{ "BTL-SHUIGUANPIPE",  UNSUPPORTED_BOARD },// mapper 183
-	{ "BTL-PIKACHUY2K",    UNSUPPORTED_BOARD },// mapper 254
+	{ "BTL-PIKACHUY2K",    BTL_PIKACHUY2K },// mapper 254
 //
 	{ "BMC-190IN1",          BMC_190IN1 },
 	{ "BMC-64IN1NOREPEAT",   BMC_64IN1NR },
@@ -604,7 +604,7 @@ static const nes_pcb pcb_list[] =
 	{ "UNL-PEC-586",      UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
 	{ "UNL-SA-009",       UNSUPPORTED_BOARD }, //  [mentioned in FCEUMM source - we need more info]
 //
-	{ "UNKNOWN",          UNSUPPORTED_BOARD }  //  a few pirate dumps uses the wrong mapper...
+	{ "UNKNOWN",          UNKNOWN_BOARD }  //  a few pirate dumps uses the wrong mapper...
 };
 
 const nes_pcb *nes_pcb_lookup( const char *board )
@@ -9604,7 +9604,6 @@ static WRITE8_HANDLER( unl_racmate_w )
 
  BTL-SUPERBROS11
 
- Known Boards: Unknown Bootleg Board
  Games: Super Mario Bros. 11, Super Mario Bros. 17
 
  This acts basically like a MMC3 with different use of write
@@ -9627,7 +9626,6 @@ static WRITE8_HANDLER( btl_smb11_w )
 
  BTL-MARIOBABY
 
- Known Boards: Unknown Bootleg Board
  Games: Mario Baby, Ai Senshi Nicol
 
  iNES: mapper 42
@@ -9673,7 +9671,6 @@ static WRITE8_HANDLER( btl_mariobaby_w )
 
  BTL-SMB2A
 
- Known Boards: Unknown Bootleg Board
  Games: Super Mario Bros. 2 Pirate (Jpn version of SMB2)
 
  iNES: mapper 40
@@ -9720,10 +9717,48 @@ static WRITE8_HANDLER( btl_smb2a_w )
 }
 
 /*************************************************************
+ 
+ WHIRLWIND-2706
+ 
+ Games: Meikyuu Jiin Dababa (FDS conversion)
+ 
+ iNES: mapper 108
+ 
+ In MESS: Supported.
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( whirl2706_w )
+{
+	LOG_MMC(("whirl2706_w, offset: %04x, data: %02x\n", offset, data));
+	prg8_67(space->machine, data);
+}
+
+/*************************************************************
+ 
+ Bootleg Board used for FDS conversion
+ 
+ Games: Tobidase Daisakusen (FDS conversion)
+ 
+ iNES: mapper 120
+ 
+ In MESS: Partially Supported.
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( btl_tobi_l_w )
+{
+	LOG_MMC(("btl_tobi_l_w, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x100;
+
+	if ((offset & 0x43c0) == 0x41c0)
+		prg8_67(space->machine, data & 0x07);
+}
+
+/*************************************************************
 
  BTL-SMB3
 
- Known Boards: Unknown Bootleg Board
  Games: Super Mario Bros. 3 Pirate
 
  iNES: mapper 106
@@ -9799,7 +9834,6 @@ static WRITE8_HANDLER( btl_smb3_w )
 
  BTL-DRAGONNINJA
 
- Known Boards: Unknown Bootleg Board
  Games: Dragon Ninja (Bootleg), Super Mario Bros. 8
 
  iNES: mapper 222
@@ -9856,6 +9890,54 @@ static WRITE8_HANDLER( btl_dn_w )
 			state->IRQ_count = data;
 			break;
 	}
+}
+
+/*************************************************************
+ 
+ BTL-PIKACHUY2K
+ 
+ Games: Pikachu Y2k
+ 
+ iNES: mapper 254
+ 
+ In MESS: 
+ 
+ *************************************************************/
+
+static WRITE8_HANDLER( btl_pika_y2k_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("btl_pika_y2k_w, offset: %04x, data: %02x\n", offset, data));
+
+	switch (offset & 0x6001)
+	{
+		case 0x2001:
+			state->mmc_latch2 = data;
+			break;
+
+		case 0x2000:
+			state->mmc_reg[0] = 0;
+		default:
+			txrom_w(space, offset, data);
+			break;
+	}
+}
+
+// strange WRAM usage: it is protected at start, and gets unprotected after the first write to 0xa000
+static WRITE8_HANDLER( btl_pika_y2k_m_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("btl_pika_y2k_m_w, offset: %04x, data: %02x\n", offset, data));
+
+	state->wram[offset] = data;
+}
+
+static READ8_HANDLER( btl_pika_y2k_m_r )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("btl_pika_y2k_m_r, offset: %04x\n", offset));
+	
+	return 	state->wram[offset] ^ (state->mmc_latch2 & state->mmc_reg[0]);
 }
 
 /*************************************************************
@@ -11530,6 +11612,64 @@ static WRITE8_HANDLER( shjy3_w )
 	shjy3_update(space->machine);
 }
 
+/*************************************************************
+ 
+ FUJIYA Board - mapper 170 according to NEStopia
+ 
+ Which games are supposed to use this?
+ 
+ *************************************************************/
+
+#ifdef UNUSED_FUNCTION
+static WRITE8_HANDLER( fujiya_m_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("fujiya_m_w, offset: %04x, data: %02x\n", offset, data));
+	offset += 0x6000;
+
+	if (offset == 0x6502 || offset == 0x7000)
+		state->mmc_latch1 = (data & 0x40) << 1;
+}
+
+static READ8_HANDLER( fujiya_m_r )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("fujiya_m_r, offset: %04x\n", offset));	
+	offset += 0x6000;
+	
+	if (offset == 0x7001 || offset == 0x7777)
+		return state->mmc_latch1 | ((offset >> 8) & 0x7f);
+	
+	return 0;
+}
+#endif
+
+/*************************************************************
+ 
+ UNL-603-5052
+ 
+ MMC3 + protection access in 0x4020 - 0x7fff
+ 
+ in MESS: Partial support
+
+ *************************************************************/
+
+WRITE8_HANDLER( unl_6035052_extra_w )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("unl_6035052_extra_w, offset: %04x, data: %02x\n", offset, data));
+	state->mmc_latch1 = data & 0x03;
+	if (state->mmc_latch1 == 1)
+		state->mmc_latch1 = 2;
+}
+
+READ8_HANDLER( unl_6035052_extra_r )
+{
+	nes_state *state = (nes_state *)space->machine->driver_data;
+	LOG_MMC(("unl_6035052_extra_r, offset: %04x\n", offset));	
+	return state->mmc_latch1;
+}
+
 
 
 typedef void (*nes_ppu_latch)(running_device *device, offs_t offset);
@@ -11561,16 +11701,38 @@ struct _nes_pcb_intf
 #define NES_WRITEONLY(a) \
 {a, NULL}
 
-#if 0
+static WRITE8_HANDLER( dummy_l_w )
+{
+	logerror("write access, offset: %04x, data: %02x\n", offset + 0x8000, data);
+}
+
+static WRITE8_HANDLER( dummy_m_w )
+{
+	logerror("write access, offset: %04x, data: %02x\n", offset + 0x6000, data);
+}
+
 static WRITE8_HANDLER( dummy_w )
 {
+	logerror("write access, offset: %04x, data: %02x\n", offset + 0x4100, data);
+}
+
+static READ8_HANDLER( dummy_l_r )
+{
+	logerror("read access, offset: %04x\n", offset + 0x8000);	
+	return 0x00;
+}
+
+static READ8_HANDLER( dummy_m_r )
+{
+	logerror("read access, offset: %04x\n", offset + 0x6000);	
+	return 0x00;
 }
 
 static READ8_HANDLER( dummy_r )
 {
+	logerror("read access, offset: %04x\n", offset + 0x4100);	
 	return 0x00;
 }
-#endif
 
 // further review needed for: TXROM, PXROM, FXROM, Bandai LZ93D50, Irem G-101, Konami VRC3
 // all multicart pcb, many unl/btl pcbs
@@ -11746,6 +11908,7 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ UNL_XZY,              NES_WRITEONLY(unl_xzy_l_w), NES_NOACCESS, NES_NOACCESS,           NULL, NULL, NULL },
 	{ UNL_RACERMATE,        NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(unl_racmate_w),         NULL, NULL, NULL },
 	{ UNL_STUDYNGAME,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(sng32_w),               NULL, NULL, NULL },
+	{ UNL_603_5052,         {unl_6035052_extra_w, unl_6035052_extra_r}, {unl_6035052_extra_w, unl_6035052_extra_r}, NES_WRITEONLY(txrom_w), NULL, NULL, NULL },
 	//
 	{ BTL_AISENSHINICOL,    NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_mariobaby_w),       NULL, NULL, NULL },
 	{ BTL_DRAGONNINJA,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_dn_w),              NULL, NULL, btl_dn_irq },
@@ -11754,6 +11917,9 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ BTL_SMB2B,            NES_WRITEONLY(smb2jb_l_w), NES_NOACCESS, NES_NOACCESS,            NULL, NULL, smb2jb_irq },
 	{ BTL_SMB3,             NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_smb3_w),            NULL, NULL, btl_smb3_irq },
 	{ BTL_SUPERBROS11,      NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(btl_smb11_w),           NULL, NULL, mmc3_irq },
+	{ BTL_TOBIDASE,         NES_WRITEONLY(btl_tobi_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, NULL },
+	{ BTL_PIKACHUY2K,       NES_NOACCESS, {btl_pika_y2k_m_w, btl_pika_y2k_m_r}, NES_WRITEONLY(btl_pika_y2k_w),  NULL, NULL, NULL },
+	{ WHIRLWIND_2706,       NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(whirl2706_w),           NULL, NULL, NULL },
 	//
 	{ BMC_190IN1,           NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_190in1_w),          NULL, NULL, NULL },
 	{ BMC_A65AS,            NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(bmc_a65as_w),           NULL, NULL, NULL },
@@ -11802,6 +11968,8 @@ static const nes_pcb_intf nes_intf_list[] =
 	{ FFE_MAPPER6,          NES_WRITEONLY(mapper6_l_w), NES_NOACCESS, NES_WRITEONLY(mapper6_w), NULL, NULL, ffe_irq },
 	{ FFE_MAPPER8,          NES_NOACCESS, NES_NOACCESS, NES_WRITEONLY(mapper8_w),             NULL, NULL, NULL },
 	{ FFE_MAPPER17,         NES_WRITEONLY(mapper17_l_w), NES_NOACCESS, NES_NOACCESS,          NULL, NULL, ffe_irq },
+	// for debug and development
+	{ UNKNOWN_BOARD,        {dummy_l_w, dummy_l_r}, {dummy_m_w, dummy_m_r}, {dummy_w, dummy_r}, NULL, NULL, NULL },
 	//
 	{ UNSUPPORTED_BOARD,    NES_NOACCESS, NES_NOACCESS, NES_NOACCESS,                         NULL, NULL, NULL },
 	//

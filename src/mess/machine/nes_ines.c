@@ -291,7 +291,7 @@ static const nes_mmc mmc_list[] =
 	// 105 Nintendo World Championship - Unsupported
 	{ 106, BTL_SMB3 },
 	{ 107, MAGICSERIES_MD },
-	// 108 Whirlwind board (Meikyuu Jiin Dababa - FDS Conversion) - Unsupported
+	{ 108, WHIRLWIND_2706 },
 	// 109 Unused
 	// 110 Unused
 	// 111 Ninja Ryuukenden Chinese? - Unsupported
@@ -303,7 +303,7 @@ static const nes_mmc mmc_list[] =
 	{ 117, FUTUREMEDIA_BOARD },
 	{ 118, STD_TXSROM },
 	{ 119, STD_TQROM },
-	// 120 FDS bootleg (Tobidase Daisakusen) - Unsupported
+	{ 120, BTL_TOBIDASE },
 	{ 121, KAY_PANDAPRINCE },
 	// 122 Unused
 	// 123 K H2288 (ejim2) - Unsupported
@@ -421,7 +421,7 @@ static const nes_mmc mmc_list[] =
 	// 235 Golden Game x-in-1 - Unsupported
 	// 236 Game 800-in-1 - Unsupported
 	// 237 Unused
-	// 238 Bootleg 603-5052 - Unsupported
+	{ 238, UNL_603_5052 },
 	// 239 Unused
 	{ 240, CNE_SHLZ },
 	{ 241, TXC_MXMDHTWO },
@@ -437,7 +437,7 @@ static const nes_mmc mmc_list[] =
 	// 251 Shen Hua Jian Yun III?? - Unsupported
 	{ 252, WAIXING_SGZ },
 	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
-	// 254 Pikachu Y2K
+	{ 254, BTL_PIKACHUY2K },
 	{ 255, BMC_110IN1 },
 };
 

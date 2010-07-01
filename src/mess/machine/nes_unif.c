@@ -335,6 +335,7 @@ static int pcb_initialize( running_machine *machine, int idx )
 		case WAIXING_TYPE_H:	// mapper 245
 		case BTL_SUPERBROS11:	// mapper 196
 		case UNL_KOF97:
+		case UNL_603_5052:
 		case NITRA_TDA:	// mapper 250
 			if (state->four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
 			{
@@ -635,7 +636,12 @@ static int pcb_initialize( running_machine *machine, int idx )
 			prg8_cd(machine, 0);
 			prg8_ef(machine, (state->prg_chunks << 1) - 1);
 			break;
-
+			
+// mapper 108
+		case WHIRLWIND_2706:
+			prg32(machine, 0xff);
+			break;
+			
 // mapper 114
 		case SUPERGAME_LIONKING:
 			state->map114_reg = state->map114_reg_enabled = 0;
@@ -664,6 +670,11 @@ static int pcb_initialize( running_machine *machine, int idx )
 //      case SOMERITEAM_SL12:
 //          break;
 
+// mapper 120
+		case BTL_TOBIDASE:
+			prg32(machine, 2);
+			break;
+			
 // mapper 121
 		case KAY_PANDAPRINCE:
 			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
@@ -961,6 +972,20 @@ static int pcb_initialize( running_machine *machine, int idx )
 			waixing_sec_set_chr(machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 
+// mapper 254
+		case BTL_PIKACHUY2K:
+			state->mmc_reg[0] = 0xff;
+			state->mmc3_alt_irq = 0;
+			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
+			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
+			state->mmc_latch1 = 0;
+			state->mmc_latch2 = 0x80;
+			state->mmc_prg_base = state->mmc_chr_base = 0;
+			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
+			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			break;
+			
 // mapper 255
 		case BMC_110IN1:
 			prg16_89ab(machine, 0);

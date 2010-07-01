@@ -171,6 +171,12 @@ static void init_nes_core( running_machine *machine )
 		memory_install_read8_handler(space, 0x4030, 0x4030, 0, 0, ks7017_extra_r);
 		memory_install_write8_handler(space, 0x4020, 0x40ff, 0, 0, ks7017_extra_w);
 	}
+
+	if (state->pcb_id == UNL_603_5052)
+	{
+		memory_install_read8_handler(space, 0x4020, 0x40ff, 0, 0, unl_6035052_extra_r);
+		memory_install_write8_handler(space, 0x4020, 0x40ff, 0, 0, unl_6035052_extra_w);
+	}
 }
 
 // to be probably removed (it does nothing since a long time)
