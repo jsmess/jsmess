@@ -181,5 +181,5 @@ DEVICE_GET_INFO(coco_cartridge_pcb_pak_banked16k)
 	}
 }
 
-DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_PAK, coco_cartridge_pcb_pak);
-DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_PAK_BANKED16K, coco_cartridge_pcb_pak_banked16k);
+DEFINE_LEGACY_CART_SLOT_DEVICE(COCO_CARTRIDGE_PCB_PAK, coco_cartridge_pcb_pak);
+DEFINE_LEGACY_CART_SLOT_DEVICE(COCO_CARTRIDGE_PCB_PAK_BANKED16K, coco_cartridge_pcb_pak_banked16k);

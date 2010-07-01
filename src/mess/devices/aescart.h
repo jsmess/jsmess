@@ -13,8 +13,8 @@
 #include "cartslot.h"
 
 DECLARE_LEGACY_CART_SLOT_DEVICE(AES_MULTICART, aes_multicart);
-DECLARE_LEGACY_DEVICE(AES_CARTRIDGE_PCB_NONE, aes_cartridge_pcb_none);
-DECLARE_LEGACY_DEVICE(AES_CARTRIDGE_PCB_STD, aes_cartridge_pcb_std);
+DECLARE_LEGACY_CART_SLOT_DEVICE(AES_CARTRIDGE_PCB_NONE, aes_cartridge_pcb_none);
+DECLARE_LEGACY_CART_SLOT_DEVICE(AES_CARTRIDGE_PCB_STD, aes_cartridge_pcb_std);
 
 /* There's only 1 slot in an AES */
 #define AES_NUMBER_OF_CARTRIDGE_SLOTS 1

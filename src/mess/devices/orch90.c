@@ -110,4 +110,4 @@ DEVICE_GET_INFO(coco_cartridge_pcb_orch90)
 	}
 }
 
-DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_ORCH90, coco_cartridge_pcb_orch90);
+DEFINE_LEGACY_CART_SLOT_DEVICE(COCO_CARTRIDGE_PCB_ORCH90, coco_cartridge_pcb_orch90);
