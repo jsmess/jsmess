@@ -1364,10 +1364,10 @@ static WRITE8_HANDLER( hkrom_m_w )
 	write_lo = ((state->mmc6_reg & 0x30) == 0x30);
 
 	if (BIT(offset, 9) && write_hi)	// access to upper 1k
-		state->mapper_ram[offset & (state->mapper_ram_size - 1)] = data;
+		state->mapper_bram[offset & (state->mapper_bram_size - 1)] = data;
 
 	if (!BIT(offset, 9) && write_lo)	// access to lower 1k
-		state->mapper_ram[offset & (state->mapper_ram_size - 1)] = data;
+		state->mapper_bram[offset & (state->mapper_bram_size - 1)] = data;
 }
 
 static READ8_HANDLER( hkrom_m_r )
@@ -1382,10 +1382,10 @@ static READ8_HANDLER( hkrom_m_r )
 		return 0xff;	// here it should be open bus
 
 	if (BIT(offset, 9) && BIT(state->mmc6_reg, 7))	// access to upper 1k when upper read is enabled
-		return state->mapper_ram[offset & (state->mapper_ram_size - 1)];
+		return state->mapper_bram[offset & (state->mapper_bram_size - 1)];
 
 	if (!BIT(offset, 9) && BIT(state->mmc6_reg, 5))	// access to lower 1k when lower read is enabled
-		return state->mapper_ram[offset & (state->mapper_ram_size - 1)];
+		return state->mapper_bram[offset & (state->mapper_bram_size - 1)];
 
 	// If only one bank is enabled for reading, the other reads back as zero
 	return 0x00;
@@ -1871,7 +1871,7 @@ static READ8_HANDLER( exrom_l_r )
 	/* $5c00 - $5fff: extended videoram attributes */
 	if ((offset >= 0x1b00) && (offset <= 0x1eff))
 	{
-		return state->mmc5_vram[offset - 0x1b00];
+		return state->mapper_ram[offset - 0x1b00];
 	}
 	
 	switch (offset)
@@ -1916,7 +1916,7 @@ static WRITE8_HANDLER( exrom_l_w )
 	if ((offset >= 0x1b00) && (offset <= 0x1eff))
 	{
 		if (state->MMC5_vram_protect == 0x03)
-			state->mmc5_vram[offset - 0x1b00] = data;
+			state->mapper_ram[offset - 0x1b00] = data;
 		return;
 	}
 	
@@ -4260,6 +4260,8 @@ static WRITE8_HANDLER( x1005_m_w )
 
 	if (offset >= 0x1f00 && state->mapper_ram != NULL && state->mmc_latch1 == 0xa3)
 		state->mapper_ram[offset & (state->mapper_ram_size - 1)] = data;
+	else if (offset >= 0x1f00 && state->mapper_bram != NULL && state->mmc_latch1 == 0xa3)
+		state->mapper_bram[offset & (state->mapper_bram_size - 1)] = data;
 }
 
 static READ8_HANDLER( x1005_m_r )
@@ -4269,6 +4271,8 @@ static READ8_HANDLER( x1005_m_r )
 
 	if (offset >= 0x1f00 && state->mapper_ram != NULL && state->mmc_latch1 == 0xa3)
 		return state->mapper_ram[offset & (state->mapper_ram_size - 1)];
+	else if (offset >= 0x1f00 && state->mapper_bram != NULL && state->mmc_latch1 == 0xa3)
+		return state->mapper_bram[offset & (state->mapper_bram_size - 1)];
 
 	return 0xff;
 }
@@ -4388,12 +4392,12 @@ static READ8_HANDLER( x1017_m_r )
 	LOG_MMC(("x1017_m_r, offset: %04x\n", offset));
 
 	// 2+2+1 KB of Internal RAM can be independently enabled/disabled!
-	if (offset < 0x0800 && state->mapper_ram != NULL && state->mmc_reg[0] == 0xca)
-		return state->mapper_ram[offset & (state->mapper_ram_size - 1)];
-	if (offset < 0x1000 && state->mapper_ram != NULL && state->mmc_reg[1] == 0x69)
-		return state->mapper_ram[offset & (state->mapper_ram_size - 1)];
-	if (offset < 0x1800 && state->mapper_ram != NULL && state->mmc_reg[2] == 0x84)
-		return state->mapper_ram[offset & (state->mapper_ram_size - 1)];
+	if (offset < 0x0800 && state->mapper_bram != NULL && state->mmc_reg[0] == 0xca)
+		return state->mapper_bram[offset & (state->mapper_bram_size - 1)];
+	if (offset < 0x1000 && state->mapper_bram != NULL && state->mmc_reg[1] == 0x69)
+		return state->mapper_bram[offset & (state->mapper_bram_size - 1)];
+	if (offset < 0x1800 && state->mapper_bram != NULL && state->mmc_reg[2] == 0x84)
+		return state->mapper_bram[offset & (state->mapper_bram_size - 1)];
 
 	return 0xff;
 }

@@ -613,7 +613,7 @@ static void set_nt_page( running_machine *machine, int page, int source, int ban
 			base_ptr = state->vrom;
 			break;
 		case EXRAM:
-			base_ptr = state->mmc5_vram;
+			base_ptr = state->mapper_ram;
 			break;
 		case CIRAM:
 		default:

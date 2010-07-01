@@ -189,9 +189,6 @@ MACHINE_RESET( nes )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 
-	/* Some carts have extra RAM and require it on at startup, e.g. Metroid */
-	state->mid_ram_enable = 1;
-
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	if (state->disk_expansion && state->pcb_id == NO_BOARD)
 		ppu2c0x_set_hblank_callback(state->ppu, fds_irq);
@@ -231,12 +228,10 @@ static void nes_state_register( running_machine *machine )
 
 	state_save_register_global(machine, state->MMC5_floodtile);
 	state_save_register_global(machine, state->MMC5_floodattr);
-	state_save_register_global_array(machine, state->mmc5_vram);
 	state_save_register_global(machine, state->mmc5_vram_control);
 
 	state_save_register_global_array(machine, state->nes_vram_sprite);
 	state_save_register_global(machine, state->last_frame_flip);
-	state_save_register_global(machine, state->mid_ram_enable);
 
 	// shared mapper variables
 	state_save_register_global(machine, state->IRQ_enable);
@@ -302,8 +297,8 @@ static void nes_machine_stop( running_machine *machine )
 	if (state->battery)
 		image->battery_save(state->battery_ram, state->battery_size);
 
-	if (state->mapper_ram_size)
-		image->battery_save(state->mapper_ram, state->mapper_ram_size);
+	if (state->mapper_bram_size)
+		image->battery_save(state->mapper_bram, state->mapper_bram_size);
 }
 
 
@@ -876,6 +871,19 @@ DEVICE_IMAGE_LOAD( nes_cart )
 				//FIXME: we also have to fix Action 52 PRG loading somewhere...
 			}
 
+			/* Allocate internal Mapper RAM for boards which require it */
+			if (state->pcb_id == STD_EXROM)
+				state->mapper_ram = auto_alloc_array(image.device().machine, UINT8, 0x400);
+			
+			if (state->pcb_id == TAITO_X1_005 || state->pcb_id == TAITO_X1_005_A)
+				state->mapper_bram = auto_alloc_array(image.device().machine, UINT8, 0x80);
+			
+			if (state->pcb_id == TAITO_X1_017)
+				state->mapper_bram = auto_alloc_array(image.device().machine, UINT8, 0x1400);
+			
+			if (state->pcb_id == NAMCOT_163)
+				state->mapper_ram = auto_alloc_array(image.device().machine, UINT8, 0x2000);
+			
 			/* Position past the header */
 			image.fseek(16, SEEK_SET);
 
@@ -1308,10 +1316,14 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->prg_ram = (image.get_software_region("wram") != NULL) ? 1 : 0;
 		state->wram_size = image.get_software_region_length("wram");
 		state->mapper_ram_size = image.get_software_region_length("mapper_ram");
+		state->mapper_bram_size = image.get_software_region_length("mapper_bram");
+
 		if (state->prg_ram)
 			state->wram = auto_alloc_array(image.device().machine, UINT8, state->wram_size);
 		if (state->mapper_ram_size)
 			state->mapper_ram = auto_alloc_array(image.device().machine, UINT8, state->mapper_ram_size);
+		if (state->mapper_bram_size)
+			state->mapper_bram = auto_alloc_array(image.device().machine, UINT8, state->mapper_bram_size);
 
 		/* Check for mirroring */
 		if (image.get_feature("mirroring") != NULL)
@@ -1413,17 +1425,17 @@ DEVICE_IMAGE_LOAD( nes_cart )
 
 	// Attempt to load a battery file for this ROM
 	// A few boards have internal RAM with a battery (MMC6, Taito X1-005 & X1-017, etc.)
-	if (state->battery || state->mapper_ram_size)
+	if (state->battery || state->mapper_bram_size)
 	{
-		UINT8 *temp_nvram = auto_alloc_array(image.device().machine, UINT8, state->battery_size + state->mapper_ram_size);
-		image.battery_load(temp_nvram, state->battery_size + state->mapper_ram_size, 0x00);
+		UINT8 *temp_nvram = auto_alloc_array(image.device().machine, UINT8, state->battery_size + state->mapper_bram_size);
+		image.battery_load(temp_nvram, state->battery_size + state->mapper_bram_size, 0x00);
 		if (state->battery)
 		{
 			state->battery_ram = auto_alloc_array(image.device().machine, UINT8, state->battery_size);
 			memcpy(state->battery_ram, temp_nvram, state->battery_size);
 		}
-		if (state->mapper_ram_size)
-			memcpy(state->mapper_ram, temp_nvram + state->battery_size, state->mapper_ram_size);
+		if (state->mapper_bram_size)
+			memcpy(state->mapper_bram, temp_nvram + state->battery_size, state->mapper_bram_size);
 
 		auto_free(image.device().machine, temp_nvram);
 	}

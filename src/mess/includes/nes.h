@@ -85,7 +85,6 @@ public:
 
 	int MMC5_floodtile;
 	int MMC5_floodattr;
-	UINT8 mmc5_vram[0x400];
 	int mmc5_vram_control;
 	UINT8 mmc5_high_chr;
 	UINT8 mmc5_split_scr;
@@ -131,9 +130,7 @@ public:
 	UINT8      *ciram; //PPU nametable RAM - external to PPU!
 	UINT8      *battery_ram;
 	UINT8      *mapper_ram;
-	// Variables which can change
-	UINT8      mid_ram_enable;
-
+	UINT8      *mapper_bram;
 
 	/***** Mapper-related variables *****/
 
@@ -232,6 +229,7 @@ public:
 	UINT8 prg_ram;			// if there is PRG RAM with no backup
 	UINT32 wram_size;
 	UINT32 mapper_ram_size;
+	UINT32 mapper_bram_size;
 
 	int format;	// 1 = iNES, 2 = UNIF
 
