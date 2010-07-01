@@ -303,8 +303,8 @@ ROM_START(apple2gsr3lp)
 ROM_END
 
 ROM_START(apple2gsr1)
-	ROM_REGION(0x1000,"keyboard",0)
-	ROM_LOAD ("341-0024", 0x0000, 0x0C00, NO_DUMP) /* Label needs verify: Keyboard M50740 MCU, 3K ROM */
+	ROM_REGION(0xc00,"keyboard",0)
+	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) ) 
 
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89)) /* need label/part number */
@@ -314,8 +314,8 @@ ROM_START(apple2gsr1)
 ROM_END
 
 ROM_START(apple2gsr0)
-	ROM_REGION(0x1000,"keyboard",0)
-	ROM_LOAD ("341-0024", 0x0000, 0x0C00, NO_DUMP)  /* Label needs verify: Keyboard M50740 MCU, 3K ROM */
+	ROM_REGION(0xc00,"keyboard",0)
+	ROM_LOAD( "341s0345.bin", 0x000000, 0x000c00, CRC(48cd5779) SHA1(97e421f5247c00a0ca34cd08b6209df573101480) ) 
 
 	ROM_REGION(0x1000,"gfx1",0)
 	ROM_LOAD ( "apple2gs.chr", 0x0000, 0x1000, CRC(91e53cd8) SHA1(34e2443e2ef960a36c047a09ed5a93f471797f89))
