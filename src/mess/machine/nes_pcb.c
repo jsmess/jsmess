@@ -11,7 +11,6 @@ struct _nes_pcb
 	int                     pcb_id;
 };
 
-
 // Here, we take the feature attribute from .xml (i.e. the PCB name) and we assign a unique ID to it
 static const nes_pcb pcb_list[] =
 {
@@ -10162,7 +10161,8 @@ static WRITE8_HANDLER( bmc_t262_w )
 
  Games: Super 40-in-1
 
- In MESS: Supported
+ In MESS: Partially Supported (some games, like Galaxian, have
+ issues)
 
  *************************************************************/
 

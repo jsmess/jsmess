@@ -173,867 +173,11 @@ static WRITE8_HANDLER( mapper17_l_w )
 	}
 }
 
-#if 0
-
-/*************************************************************
-
-    Mapper 27
-
-    Known Boards: Unknown Bootleg Board
-    Games: World Hero
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 28
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 29
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 30
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 31
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 53
-
-    Known Boards: Unknown Multigame Bootleg Board
-    Games: Supervision 16 in 1
-
-    In MESS: Unsupported (SRAM banks can go in mid-regions).
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 55
-
-    Known Boards: Unknown Bootleg Board
-    Games: [no games in nes.hsi]
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 56
-
-    Known Boards: Bootleg Board by Kaiser (KS202)
-    Games: Super Mario Bros. 3 Pirate
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 59
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 60
-
-    Known Boards: Unknown Multigame Bootleg Board
-    Games: 4 in 1, 35 in 1
-
-    In MESS: Unsupported (these are reset-based and have dips).
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 63
-
-    Known Boards: Unknown Multigame Bootleg Board
-    Games: [no games in nes.hsi]
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 81
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 84
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 90
-
-    Known Boards: Type A by J.Y. Company
-    Games: Aladdin, Final Fight 3, Super Mario World, Tekken 2
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 98
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 99
-
-    Known Boards: VS. System
-    Games: most Vs. games
-
-    In MESS: Unsupported, low priority (you should use MAME)
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 100
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 101
-
-    Known Boards: Unused (Urusei Yatsura had been assigned to 
-    this mapper, but it's Mapper 87)
-
-    Games: ----------
- 
-    In MESS: ----------
- 
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 102
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 103
-
-    Known Boards: Unknown Bootleg Board (2708)
-    Games: Doki Doki Panic (FDS Conversion)
-
-    In MESS: Unsupported. Need reads from 0x6000
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 105
-
-    Known Boards: Custom Board
-    Games: Nintendo World Championships 1990
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 108
-
-    Known Boards: Bootleg Board by Whirlwind
-    Games: Meikyuu Jiin Dababa (FDS Conversion)
-
-    Simple mapper: reads in 0x6000-0x7fff return wram, writes to
-          0x8fff set prg8_89 to the bank corresponding to data
-
-    In MESS: Unsupported. Needs to read from 0x6000.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 109
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 110
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 111
-
-    Known Boards: ???
-    Games: Ninja Ryukenden (C)
-
-    No info avaliable
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 116
-
-    Known Boards: Unknown Bootleg Board (Someri?!?)
-    Games: AV Mei Shao Nv Zhan Shi, Chuugoku Taitei
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 120
-
-    Known Boards: Unknown Bootleg Board
-    Games: Tobidase Daisakusen (FDS Conversion)
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 122
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 123
-
-    Known Boards: Bootleg Board ???
-    Games: [no games in state->hsi]
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 124
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 125
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 126
-
-    Known Boards: Unknown Multigame Bootleg Board
-    Games: [no games in state->hsi]
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 127
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 128
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 129
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 130
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 131
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 135
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 142
-
-    Known Boards: Bootleg Board by Kaiser (KS7032)
-    Games: Super Mario Bros. 2 (by Kaiser), Pipe 5 (by Sachen?)
-
-    In MESS: Unsupported. Requires reads from 0x6000-0x7fff.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 151
-
-    Known Boards: Konami VS System
-    Games: Goonies VS, VS TKO Boxing
-
-    In MESS: Unsupported, low priority (you should use MAME)
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 160
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 161
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 162
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 163
-
-    Known Boards: Bootleg Board by Nanjing
-    Games: Diablo, Final Fantasy VII, Harvest Moon, He Xin Wei
-          Ji, Yu-Gi-Oh, Zelda - Shen Qi De Mao Zi and other
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 165
-
-    Known Boards: Bootleg Board by Waixing
-    Games: Fire Emblem (C), Fire Emblem Gaiden (C)
-
-    MMC3 clone
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 168
-
-    Known Boards: ???
-    Games: Racermate Challenger II
-
-    No info at all are available.
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 169
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 170
-
-    Known Boards: Bootleg Board by Fujiya
-    Games: [no games in nes.hsi]
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 174
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 175
-
-    Known Boards: Bootleg Board by Kaiser (KS7022)
-    Games: 15 in 1
-
-    In MESS: Unsupported. Requires reads from 0xfffc (according to
-      NEStopia).
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 181
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 183
-
-    Known Boards: Unknown Bootleg Board
-    Games: Shui Guan Pipe
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 186
-
-    Known Boards: Bootleg Board by Fukutake
-    Games: Study Box
-
-    In MESS: Unsupported. Needs reads from 0x6000-0x7fff.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 190
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 209
-
-    Known Boards: Type B by J.Y. Company
-    Games: Power Rangers 3, Power Rangers 4, Shin Samurai
-          Spirits 2
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 210
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    For some emulators, this is the same as Mapper 19 but it
-    has hardwired mirroring and no additional sound hardware.
-    Initializing Mirroring to Vertical in Mapper 19 seems to
-    fix all glitches in 'so-called' Mapper 210 games, so there
-    seems to be no reason to have this duplicate mapper (at
-    least until we emulate additional sound hardware... if sound
-    writes would create conflicts, we might consider to split the
-    mapper in two variants)
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 211
-
-    Known Boards: Type C by J.Y. Company
-    Games: Tiny Toon Adventures 6, Donkey Kong Country 4
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 218
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 219
-
-    Known Boards: A9746??
-    Games: [no games in nes.hsi]
-
-    MMC3 clone according to NEStopia
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 220
-
-    Known Boards: ???
-    Games: Summer Carnival '92 - Recca US ?? (MMC3 for nestopia)
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 223
-
-    Known Boards: Type I by Waixing
-    Games: [no games in nes.hsi] Tang Mu Li Xian Ji?
-
-    MMC3 clone according to NEStopia
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 224
-
-    Known Boards: Type J by Waixing
-    Games: [no games in nes.hsi] Ying Xiong Chuan Qi?
-
-    MMC3 clone according to NEStopia
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 233
-
-    Known Boards: Unknown Bootleg Multigame Board
-    Games: Super 22 in 1
-
-    In MESS: Unsupported. Banking depends on dipswitch, so we
-      need to implement these...
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 234
-
-    Known Boards: Bootleg Board by AVE (D1012)
-    Games: Maxi 15 Eur
-
-    In MESS: Unsupported. Needs to read from 0xff80-0xffff.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 235
-
-    Known Boards: Unknown Bootleg Board by Golden Game
-    Games: 260 in 1, 150 in 1
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 236
-
-    Known Boards: Unknown Bootleg Multigame Board
-    Games: a 800 in 1 multigame cart present in NEStopia db.
-
-    No info available.
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 237
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 238
-
-    Known Boards: Unknown Bootleg Board, 6035052
-    Games: Contra Fighter
-
-    MMC3 simple clone.
-
-    In MESS: Unsupported. Needs to read from 0x6000-0x7fff (for
-          protection). It also needs to read in 0x4020-0x40ff.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 239
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 247
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 248
-
-    Known Boards: Undocumented / Unused ?!?
-    Games: ----------
-
-    In MESS: ----------
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 251
-
-    Known Boards: Undocumented
-    Games: Super 8-in-1 99 King Fighter
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 253
-
-    Known Boards: Undocumented
-    Games: Shen Hua Jian Yun III ?
-
-    In MESS: Unsupported.
-
-*************************************************************/
-
-/*************************************************************
-
-    Mapper 254
-
-    Known Boards: Unknown Bootleg Board
-    Games: Pikachu Y2K
-
-    MMC3 simple clone.
-
-    In MESS: Unsupported. Needs to read from 0x6000-0x7fff (for
-          protection).
-
-*************************************************************/
-
-#endif
-
 /*************************************************************
 
     mmc_list
 
-    Supported mappers and corresponding handlers
+    Supported mappers and corresponding pcb id
 
 *************************************************************/
 
@@ -1060,19 +204,21 @@ static const nes_mmc mmc_list[] =
 	{ 17, FFE_MAPPER17 },
 	{ 18, JALECO_SS88006 },
 	{ 19, NAMCOT_163 },
-	{ 21, KONAMI_VRC4 },	// 4a
-	{ 22, KONAMI_VRC2 },	// 2a
-	{ 23, KONAMI_VRC2 },	// 2b
-	{ 24, KONAMI_VRC6 },	// 6a
-	{ 25, KONAMI_VRC4 },	// 4b
-	{ 26, KONAMI_VRC6 },	// 6b
-	// 27 World Hero
-// 28, 29, 30, 31 Unused
+	{ 21, KONAMI_VRC4 },
+	{ 22, KONAMI_VRC2 },
+	{ 23, KONAMI_VRC2 },
+	{ 24, KONAMI_VRC6 },
+	{ 25, KONAMI_VRC4 },
+	{ 26, KONAMI_VRC6 },
+	// 27 World Hero board - Unsupported
+	// 28 Unused
+	// 29 Unused
+	// 30 Unused
+	// 31 Unused
 	{ 32, IREM_G101 },
 	{ 33, TAITO_TC0190FMC },
 	{ 34, STD_BXROM },
 	{ 35, UNL_SC127 },
-// 35 Unused
 	{ 36, TXC_STRIKEWOLF },
 	{ 37, PAL_ZZ },
 	{ 38, DIS_74X161X138 },
@@ -1090,17 +236,17 @@ static const nes_mmc mmc_list[] =
 	{ 50, BTL_SMB2B },
 	{ 51, BMC_BALLGAMES_11IN1 },
 	{ 52, BMC_MARIOPARTY_7IN1 },
-// 53 Supervision 16-in-1
+	// 53 Supervision 16-in-1 - Unsupported
 	{ 54, BMC_NOVELDIAMOND },
-// 55 Genius SMB
+	// 55 Genius SMB - No info (nor images) available
 	{ 56, KAISER_KS202 },
 	{ 57, BMC_GKA },
 	{ 58, BMC_GKB },
-// 59 Unused
-// 60 4-in-1 Reset based
+	// 59 Unused
+	// 60 4-in-1, 35-in-1 Reset based
 	{ 61, RCM_TETRISFAMILY },
 	{ 62, BMC_SUPER_700IN1 },
-// 63 CH001 X-in-1
+	// 63 CH001 X-in-1 - No info (nor images) available
 	{ 64, TENGEN_800032 },
 	{ 65, IREM_H3001 },
 	{ 66, STD_GXROM },
@@ -1118,16 +264,16 @@ static const nes_mmc mmc_list[] =
 	{ 78, IREM_HOLYDIV },
 	{ 79, AVE_NINA06 },
 	{ 80, TAITO_X1_005 },
-// 81 Unused
+	// 81 Unused
 	{ 82, TAITO_X1_017 },
 	{ 83, CONY_BOARD },
-//	{ 84, "Pasofami hacked images?",   NULL, NULL, NULL, NULL, NULL, NULL, NULL },
+	// 84 Pasofami hacked images?
 	{ 85, KONAMI_VRC7 },
 	{ 86, JALECO_JF13 },
 	{ 87, DIS_74X139X74 },
 	{ 88, NAMCOT_34X3 },
 	{ 89, SUNSOFT_2 },
-// 90 JY Company Type A
+	// 90 JY Company Type A (Aladdin, Final Fight 3, Super Mario World, Tekken 2) - Unsupported
 	{ 91, UNL_MK2 },
 	{ 92, JALECO_JF19 },
 	{ 93, SUNSOFT_2 },
@@ -1135,38 +281,44 @@ static const nes_mmc mmc_list[] =
 	{ 95, NAMCOT_3425 },
 	{ 96, BANDAI_OEKAKIDS },
 	{ 97, IREM_TAM_S1 },
-// 98 Unused
-// 99 VS. system
-// 100 images hacked to work with nesticle?
-// 101 Unused
-// 102 Unused
-// 103 Bootleg cart 2708
+	// 98 Unused
+	// 99 VS. system - Not going to be implemented (use MAME instead)
+	// 100 images hacked to work with nesticle?
+	// 101 Unused (Urusei Yatsura had been assigned to this mapper, but it's Mapper 87)
+	// 102 Unused
+	// 103 Bootleg cart 2708 (Doki Doki Panic - FDS Conversion) - Unsupported
 	{ 104, CAMERICA_GOLDENFIVE },
-// 105 Nintendo World Championship
+	// 105 Nintendo World Championship - Unsupported
 	{ 106, BTL_SMB3 },
 	{ 107, MAGICSERIES_MD },
-// 108 Whirlwind
-// 109, 110 Unused
-// 111 Ninja Ryuukenden Chinese?
+	// 108 Whirlwind board (Meikyuu Jiin Dababa - FDS Conversion) - Unsupported
+	// 109 Unused
+	// 110 Unused
+	// 111 Ninja Ryuukenden Chinese? - Unsupported
 	{ 112, NTDEC_ASDER },
 	{ 113, HES_BOARD },
 	{ 114, SUPERGAME_LIONKING },
 	{ 115, KASING_BOARD },
-// 116 Someri Team
+	// 116 Someri Team (AV Mei Shao Nv Zhan Shi, Chuugoku Taitei) - Unsupported
 	{ 117, FUTUREMEDIA_BOARD },
 	{ 118, STD_TXSROM },
 	{ 119, STD_TQROM },
-// 120 FDS bootleg
+	// 120 FDS bootleg (Tobidase Daisakusen) - Unsupported
 	{ 121, KAY_PANDAPRINCE },
-// 122 Unused
-// 123 K H2288
-// 124, 125 Unused
-// 126 Powerjoy 84-in-1
-// 127, 128, 129, 130, 131 Unused
+	// 122 Unused
+	// 123 K H2288 (ejim2) - Unsupported
+	// 124 Unused
+	// 125 Unused
+	// 126 Powerjoy 84-in-1 - Unsupported
+	// 127 Unused
+	// 128 Unused
+	// 129 Unused
+	// 130 Unused
+	// 131 Unused
 	{ 132, TXC_22211B },
 	{ 133, SACHEN_SA72008 },
 	{ 134, BMC_FAMILY_4646B },
-// 135 Unused
+	// 135 Unused
 	{ 136, SACHEN_TCU02 },
 	{ 137, SACHEN_8259D },
 	{ 138, SACHEN_8259B },
@@ -1182,7 +334,7 @@ static const nes_mmc mmc_list[] =
 	{ 148, SACHEN_SA0037 },
 	{ 149, SACHEN_SA0036 },
 	{ 150, SACHEN_74LS374 },
-// 151 Konami VS. system
+	// 151 VS. system by Konami - Not going to be implemented (use MAME instead)
 	{ 152, DIS_74X161X161X32 },
 	{ 153, BANDAI_LZ93 },
 	{ 154, NAMCOT_3453 },
@@ -1191,35 +343,37 @@ static const nes_mmc mmc_list[] =
 	{ 157, BANDAI_DATACH },	// no Datach Reader -> we fall back to mapper 16
 	{ 158, TENGEN_800037 },
 	{ 159, BANDAI_LZ93EX },	// with 24c01
-// 160, 161, 162 Unused
+	// 160 Unused
+	// 161 Unused
+	// 162 Unused
 	{ 163, NANJING_BOARD},
 	{ 164, WAIXING_FFV },
-// 165 Waixing SH2
+	// 165 Waixing SH2 (Fire Emblem & Fire Emblem Gaiden Chinese) - Unsupported
 	{ 166, SUBOR_TYPE1 },
 	{ 167, SUBOR_TYPE0 },
 	{ 168, UNL_RACERMATE },
-// 169 Unused
-// 170 Fujiya
+	// 169 Unused
+	// 170 Fujiya
 	{ 171, KAISER_KS7058 },
 	{ 172, TXC_22211B },
 	{ 173, TXC_22211C },
-// 174 Unused
+	// 174 Unused
 	{ 175, KAISER_KS7022}, 
 	{ 176, UNL_XZY },
 	{ 177, HENGEDIANZI_BOARD },
 	{ 178, WAIXING_SGZLZ },
 	{ 179, HENGEDIANZI_XJZB },
 	{ 180, UXROM_CC },
-// 181 Unused
+	// 181 Unused
 	{ 182, HOSENKAN_BOARD },
-// 183 FDS bootleg
+	// 183 FDS bootleg (Shui Guan Pipe) - Unsupported
 	{ 184, SUNSOFT_1 },
 	{ 185, STD_CNROM },
-// 186 Fukutake
+	// 186 Fukutake (Study Box) - Unsupported
 	{ 187, UNL_KOF96 },
 	{ 188, BANDAI_KARAOKE },
 	{ 189, TXC_TW },
-// 190 Unused
+	// 190 Unused
 	{ 191, WAIXING_TYPE_B },
 	{ 192, WAIXING_TYPE_C },
 	{ 193, NTDEC_FIGHTINGHERO },
@@ -1238,22 +392,22 @@ static const nes_mmc mmc_list[] =
 	{ 206, STD_DXROM },
 	{ 207, TAITO_X1_005_A },
 	{ 208, GOUDER_37017 },
-// 209 JY Company Type B
-// 210 Some emu uses this as Mapper 19 without some features
-// 211 JY Company Type C
+	// 209 JY Company Type B (Power Rangers 3 & 4, Shin Samurai Spirits 2) - Unsupported
+	// 210 Some emu uses this as Mapper 19 without some features
+	// 211 JY Company Type C (Tiny Toon Adventures 6, Donkey Kong Country 4) - Unsupported
 	{ 212, BMC_SUPERHIK_300IN1 },
 	{ 213, BMC_9999999IN1 },
 	{ 214, BMC_SUPERGUN_20IN1 },
 	{ 215, SUPERGAME_BOOGERMAN },
 	{ 216, RCM_GS2015 },
 	{ 217, BMC_GOLDENCARD_6IN1 },
-// 218 Unused
-// 219 Bootleg a9746
-// 220 Unused
+	// 218 Unused
+	// 219 Bootleg A9746 - Unsupported
+	// 220 Unused
 	{ 221, UNL_N625092 },
 	{ 222, BTL_DRAGONNINJA },
-// 223 Waixing Type I
-// 224 Waixing Type J
+	// 223 Waixing Type I - Unsupported
+	// 224 Waixing Type J - Unsupported
 	{ 225, BMC_72IN1 },
 	{ 226, BMC_76IN1 },
 	{ 227, BMC_1200IN1 },
@@ -1262,13 +416,13 @@ static const nes_mmc mmc_list[] =
 	{ 230, BMC_22GAMES },
 	{ 231, BMC_20IN1 },
 	{ 232, CAMERICA_BF9096 },
-// 233 Super 22 Games
-// 234 AVE Maxi 15
-// 235 Golden Game x-in-1
-// 236 Game 800-in-1
-// 237 Unused
-// 238 Bootleg 6035052
-// 239 Unused
+	// 233 Super 22 Games - Unsupported
+	// 234 AVE Maxi 15 - Unsupported
+	// 235 Golden Game x-in-1 - Unsupported
+	// 236 Game 800-in-1 - Unsupported
+	// 237 Unused
+	// 238 Bootleg 603-5052 - Unsupported
+	// 239 Unused
 	{ 240, CNE_SHLZ },
 	{ 241, TXC_MXMDHTWO },
 	{ 242, WAIXING_ZS },
@@ -1276,13 +430,14 @@ static const nes_mmc mmc_list[] =
 	{ 244, CNE_DECATHLON },
 	{ 245, WAIXING_TYPE_H },
 	{ 246, CNE_FSB },
-// 247, 248 Unused
+	// 247 Unused
+	// 248 Unused
 	{ 249, WAIXING_SECURITY },
 	{ 250, NITRA_TDA },
-// 251 Shen Hua Jian Yun III??
+	// 251 Shen Hua Jian Yun III?? - Unsupported
 	{ 252, WAIXING_SGZ },
-// 253 Super 8-in-1 99 King Fighter??
-// 254 Pikachu Y2K
+	// 253 Super 8-in-1 99 King Fighter?? - Unsupported
+	// 254 Pikachu Y2K
 	{ 255, BMC_110IN1 },
 };
 
