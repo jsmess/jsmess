@@ -153,6 +153,23 @@ const unif *nes_unif_lookup( const char *board )
 	return NULL;
 }
 
+/* this is used by many boards (MMC3, MMC6 + most MMC3 pirate clone boards) */
+static void mmc3_common_initialize( running_machine *machine, int prg_mask, int chr_mask, int IRQ_type )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+
+	state->mmc3_alt_irq = IRQ_type;		// later MMC3 boards seem to use MMC6-type IRQ... more investigations are in progress at NESDev...
+	state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;	// prg_bank[2] & prg_bank[3] remain always the same in most MMC3 variants
+	state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;	// but some pirate clone mappers change them after writing certain registers
+	state->mmc_latch1 = 0;
+	state->mmc_latch2 = 0x80;
+	state->mmc_prg_base = state->mmc_chr_base = 0;
+	state->mmc_prg_mask = prg_mask;
+	state->mmc_chr_mask = chr_mask;
+	mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+	mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+}
+
 // WIP code
 static int pcb_initialize( running_machine *machine, int idx )
 {
@@ -344,51 +361,18 @@ static int pcb_initialize( running_machine *machine, int idx )
 				set_nt_page(machine, 2, CART_NTRAM, 2, 1);
 				set_nt_page(machine, 3, CART_NTRAM, 3, 1);
 			}
-			state->mmc3_alt_irq = 0;	// in fact, later MMC3 boards seem to use MMC6-type IRQ... more investigations are in progress at NESDev...
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;	// prg_bank[2] & prg_bank[3] remain always the same in most MMC3 variants
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;	// but some pirate clone mappers change them after writing certain registers
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;	// these could be init'ed as xxx_chunks-1 and they would work the same
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			break;
 		case STD_HKROM:	// MMC6 (basically the same as TxROM, but alt IRQ behaviour)
-			state->mmc3_alt_irq = 0;
+			mmc3_common_initialize(machine, 0xff, 0xff, 1);
 			state->mmc6_reg = 0xf0;
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;	// prg_bank[2] & prg_bank[3] remain always the same in most MMC3 variants
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;	// but some pirate clone mappers change them after writing certain registers
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;	// these could be init'ed as xxx_chunks-1 and they would work the same
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			state->mmc_latch2 = 0;	// this is used differently here compared to MMC3
 			break;
 		case PAL_ZZ:	// mapper 37
-			state->mmc3_alt_irq = 0;
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = 0x07;
-			state->mmc_chr_mask = 0x7f;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0x07, 0x7f, 0);
 			break;
 		case NES_QJ:	// mapper 47
-			state->mmc3_alt_irq = 0;
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = 0x0f;
-			state->mmc_chr_mask = 0x7f;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0x0f, 0x7f, 0);
 			break;
 		case STD_EXROM:	// mapper 5
 			state->MMC5_rom_bank_mode = 3;
@@ -484,14 +468,7 @@ static int pcb_initialize( running_machine *machine, int idx )
 			state->mmc_extra_bank[0] = state->mmc_extra_bank[1] = state->mmc_extra_bank[4] = state->mmc_extra_bank[5] = state->mmc_extra_bank[6] = 0;
 			state->mmc_extra_bank[7] = state->mmc_extra_bank[8] = state->mmc_extra_bank[9] = state->mmc_extra_bank[0xa] = state->mmc_extra_bank[0xb] = 0;
 			state->map14_reg[0] = state->map14_reg[1] = 0;
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			break;
 // mapper 15
 		case WAIXING_PS2:
@@ -526,29 +503,12 @@ static int pcb_initialize( running_machine *machine, int idx )
 		case BMC_SUPERBIG_7IN1:
 // mapper 49
 		case BMC_SUPERHIK_4IN1:
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = 0x0f;
-			state->mmc_chr_mask = 0x7f;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0x0f, 0x7f, 0);
 			break;
 // mapper 45
 		case BMC_HIK8IN1:
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
 			state->mapper45_reg[0] = state->mapper45_reg[1] = state->mapper45_reg[2] = state->mapper45_reg[3] = 0;
-			state->mmc_prg_base = 0;
-			state->mmc_prg_mask = 0x3f;
-			state->mmc_chr_base = 0;
-			state->mmc_chr_mask = 0xff;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0x3f, 0xff, 0);
 			break;
 
 // mapper 50
@@ -567,19 +527,8 @@ static int pcb_initialize( running_machine *machine, int idx )
 			break;
 // mapper 52
 		case BMC_MARIOPARTY_7IN1:
-			state->mmc_prg_bank[0] = 0xfe;
-			state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = 0xff;
-			state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
 			state->map52_reg_written = 0;
-			state->mmc_prg_base = 0;
-			state->mmc_prg_mask = 0x1f;
-			state->mmc_chr_base = 0;
-			state->mmc_chr_mask = 0xff;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
 			break;
 // mapper 54
 		case BMC_NOVELDIAMOND:
@@ -645,26 +594,12 @@ static int pcb_initialize( running_machine *machine, int idx )
 // mapper 114
 		case SUPERGAME_LIONKING:
 			state->map114_reg = state->map114_reg_enabled = 0;
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			break;
 // mapper 115
 		case KASING_BOARD:
 			state->mapper115_reg[0] = 0;
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			break;
 // mapper 116
 //      case SOMERITEAM_SL12:
@@ -677,15 +612,8 @@ static int pcb_initialize( running_machine *machine, int idx )
 			
 // mapper 121
 		case KAY_PANDAPRINCE:
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
 			state->mapper121_reg[0] = state->mapper121_reg[1] = state->mapper121_reg[2] = 0;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			break;
 // mapper 132
 		case TXC_22211A:
@@ -698,15 +626,7 @@ static int pcb_initialize( running_machine *machine, int idx )
 
 // mapper 134
 		case BMC_FAMILY_4646B:
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = 0x1f;
-			state->mmc_chr_mask = 0xff;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
 			break;
 
 // mapper 137
@@ -770,13 +690,8 @@ static int pcb_initialize( running_machine *machine, int idx )
 
 // mapper 187
 		case UNL_KOF96:
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			state->mapper187_reg[0] = state->mapper187_reg[1] = state->mapper187_reg[2] = state->mapper187_reg[3] = 0;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
 			kof96_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			kof96_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -795,13 +710,7 @@ static int pcb_initialize( running_machine *machine, int idx )
 			break;
 // mapper 197
 		case UNL_SUPERFIGHTER3:
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			unl_sf3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 // mapper 198
@@ -849,29 +758,15 @@ static int pcb_initialize( running_machine *machine, int idx )
 			break;
 // mapper 205
 		case BMC_15IN1:
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = 0x10;
-			state->mmc_prg_mask = 0x1f;
-			state->mmc_chr_base = 0;
-			state->mmc_chr_mask = 0xff;
+			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
+			state->mmc_prg_base = 0x10;	// this board has a diff prg_base
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 
 // mapper 208
 		case GOUDER_37017:
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			state->map208_reg[0] = state->map208_reg[1] = state->map208_reg[2] = state->map208_reg[3] = state->map208_reg[4] = 0;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 // mapper 212
 		case BMC_SUPERHIK_300IN1:
@@ -899,16 +794,11 @@ static int pcb_initialize( running_machine *machine, int idx )
 
 // mapper 217
 		case BMC_GOLDENCARD_6IN1:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			state->map217_reg[0] = 0x00;
 			state->map217_reg[1] = 0xff;
 			state->map217_reg[2] = 0x03;
 			state->map217_reg[3] = 0;
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
 			bmc_gc6in1_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			bmc_gc6in1_set_chr(machine, state->mmc_chr_source);
 			break;
@@ -961,13 +851,8 @@ static int pcb_initialize( running_machine *machine, int idx )
 			break;
 // mapper 249
 		case WAIXING_SECURITY:
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			state->map249_reg = 0;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
 			waixing_sec_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			waixing_sec_set_chr(machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
@@ -975,15 +860,7 @@ static int pcb_initialize( running_machine *machine, int idx )
 // mapper 254
 		case BTL_PIKACHUY2K:
 			state->mmc_reg[0] = 0xff;
-			state->mmc3_alt_irq = 0;
-			state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			break;
 			
 // mapper 255
