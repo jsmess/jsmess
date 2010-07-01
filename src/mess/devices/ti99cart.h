@@ -9,7 +9,9 @@
 #ifndef __TI99CART_H__
 #define __TI99CART_H__
 
-DECLARE_LEGACY_DEVICE(TI99_MULTICART, ti99_multicart);
+#include "cartslot.h"
+
+DECLARE_LEGACY_CART_SLOT_DEVICE(TI99_MULTICART, ti99_multicart);
 
 /* We set the number of slots to 8, although we may have up to 16. From a
    logical point of view we could have 256, but the operating system only checks

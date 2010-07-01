@@ -578,15 +578,15 @@ static void set_pointers(running_device *pcb, int index)
 	ti99_multicart_state *cartslots = (ti99_multicart_state *)downcast<legacy_device_base *>(cartsys)->token();
 	ti99_pcb_t *pcb_def = (ti99_pcb_t *)downcast<legacy_device_base *>(pcb)->token();
 
-	pcb_def->read = (read16_device_func) downcast<legacy_device_base *>(pcb)->get_config_fct(TI99CARTINFO_FCT_6000_R);
-	pcb_def->write = (write16_device_func) downcast<legacy_device_base *>(pcb)->get_config_fct(TI99CARTINFO_FCT_6000_W);
-	pcb_def->read8 = (read8_device_func) downcast<legacy_device_base *>(pcb)->get_config_fct(TI99CARTINFO_FCT_6000_R8);
-	pcb_def->write8 = (write8_device_func) downcast<legacy_device_base *>(pcb)->get_config_fct(TI99CARTINFO_FCT_6000_W8);
-	pcb_def->cruread = (read8_device_func) downcast<legacy_device_base *>(pcb)->get_config_fct(TI99CARTINFO_FCT_CRU_R);
-	pcb_def->cruwrite = (write8_device_func) downcast<legacy_device_base *>(pcb)->get_config_fct(TI99CARTINFO_FCT_CRU_W);
+	pcb_def->read = (read16_device_func)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(TI99CARTINFO_FCT_6000_R);
+	pcb_def->write = (write16_device_func)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(TI99CARTINFO_FCT_6000_W);
+	pcb_def->read8 = (read8_device_func)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(TI99CARTINFO_FCT_6000_R8);
+	pcb_def->write8 = (write8_device_func)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(TI99CARTINFO_FCT_6000_W8);
+	pcb_def->cruread = (read8_device_func)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(TI99CARTINFO_FCT_CRU_R);
+	pcb_def->cruwrite = (write8_device_func)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(TI99CARTINFO_FCT_CRU_W);
 
-    pcb_def->assemble = (assmfct *)downcast<legacy_device_base *>(pcb)->get_config_fct(TI99CART_FCT_ASSM);
-    pcb_def->disassemble = (assmfct *)downcast<legacy_device_base *>(pcb)->get_config_fct(TI99CART_FCT_DISASSM);
+    pcb_def->assemble = (assmfct *)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(TI99CART_FCT_ASSM);
+    pcb_def->disassemble = (assmfct *)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(TI99CART_FCT_DISASSM);
 
 	pcb_def->cartridge = &cartslots->cartridge[index];
 	pcb_def->cartridge->pcb = pcb;
@@ -3442,4 +3442,4 @@ static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 #define DEVTEMPLATE_FAMILY              "Multi-cartridge system"
 #include "devtempl.h"
 
-DEFINE_LEGACY_DEVICE(TI99_MULTICART, ti99_multicart);
+DEFINE_LEGACY_CART_SLOT_DEVICE(TI99_MULTICART, ti99_multicart);

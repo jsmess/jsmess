@@ -115,5 +115,66 @@ int cartslot_get_resource_length(running_device *device, const char *socket_name
 #define MDRV_CARTSLOT_INTERFACE(_interface)							\
 	MDRV_DEVICE_CONFIG_DATAPTR(cartslot_config, interface, _interface )
 
+#define DECLARE_LEGACY_CART_SLOT_DEVICE(name, basename) _DECLARE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_cart_slot_device_config_base, legacy_cart_slot_device_base)
+#define DEFINE_LEGACY_CART_SLOT_DEVICE(name, basename) _DEFINE_LEGACY_DEVICE(name, basename, basename##_device_config, basename##_device, legacy_cart_slot_device_config_base, legacy_cart_slot_device_base)
 
-#endif /* __CARTSLOT_H__ */
+// ======================> device_config_cart_slot_interface
+
+// class representing interface-specific configuration cart_slot
+class device_config_cart_slot_interface : public device_config_interface
+{
+public:
+	// construction/destruction
+	device_config_cart_slot_interface(const machine_config &mconfig, device_config &device);
+	virtual ~device_config_cart_slot_interface();
+};
+
+
+
+// ======================> device_cart_slot_interface
+
+// class representing interface-specific live cart_slot
+class device_cart_slot_interface : public device_interface
+{
+public:
+	// construction/destruction
+	device_cart_slot_interface(running_machine &machine, const device_config &config, device_t &device);
+	virtual ~device_cart_slot_interface();
+
+	// configuration access
+	const device_config_cart_slot_interface &cart_slot_config() const { return m_cart_slot_config; }
+protected:
+
+	// configuration
+	const device_config_cart_slot_interface &m_cart_slot_config;	// reference to our device_config_execute_interface
+};
+// ======================> legacy_cart_slot_device_config
+
+// legacy_cart_slot_device_config is a device_config with a cart_slot interface
+class legacy_cart_slot_device_config_base : 	public legacy_device_config_base,
+											public device_config_cart_slot_interface
+{
+protected:
+	// construction/destruction
+	legacy_cart_slot_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config);
+public:
+	INT64 get_config_int(UINT32 state) const { return get_legacy_config_int(state); }
+	genf *get_config_fct(UINT32 state) const { return get_legacy_config_fct(state); }
+	void *get_config_ptr(UINT32 state) const { return get_legacy_config_ptr(state); }	
+};
+
+
+
+// ======================> legacy_cart_slot_device
+
+// legacy_cart_slot_device is a legacy_device_base with a cart_slot interface
+class legacy_cart_slot_device_base :	public legacy_device_base,
+									public device_cart_slot_interface
+{
+protected:
+	// construction/destruction
+	legacy_cart_slot_device_base(running_machine &machine, const device_config &config);
+
+	// device_cart_slot_interface overrides
+};
+#endif /* __cart_slot_H__ */

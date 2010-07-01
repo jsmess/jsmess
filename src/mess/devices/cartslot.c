@@ -488,3 +488,80 @@ DEVICE_GET_INFO( cartslot )
 }
 
 DEFINE_LEGACY_IMAGE_DEVICE(CARTSLOT, cartslot);
+
+
+//**************************************************************************
+//  DEVICE CONFIG CARTSLOT INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_config_cart_slot_interface - constructor
+//-------------------------------------------------
+
+device_config_cart_slot_interface::device_config_cart_slot_interface(const machine_config &mconfig, device_config &devconfig)
+	: device_config_interface(mconfig, devconfig)
+{
+}
+
+
+//-------------------------------------------------
+//  ~device_config_cart_slot_interface - destructor
+//-------------------------------------------------
+
+device_config_cart_slot_interface::~device_config_cart_slot_interface()
+{
+}
+
+
+
+//**************************************************************************
+//  DEVICE CARTSLOT INTERFACE
+//**************************************************************************
+
+//-------------------------------------------------
+//  device_cart_slot_interface - constructor
+//-------------------------------------------------
+
+device_cart_slot_interface::device_cart_slot_interface(running_machine &machine, const device_config &config, device_t &device)
+	: device_interface(machine, config, device),
+	  m_cart_slot_config(dynamic_cast<const device_config_cart_slot_interface &>(config))
+{
+}
+
+
+//-------------------------------------------------
+//  ~device_cart_slot_interface - destructor
+//-------------------------------------------------
+
+device_cart_slot_interface::~device_cart_slot_interface()
+{
+}
+
+//**************************************************************************
+//  LEGACY cart_slot DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  legacy_cart_slot_device_config_base - constructor
+//-------------------------------------------------
+
+legacy_cart_slot_device_config_base::legacy_cart_slot_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock, device_get_config_func get_config)
+	: legacy_device_config_base(mconfig, type, tag, owner, clock, get_config),
+	  device_config_cart_slot_interface(mconfig, *this)
+{
+}
+
+
+//**************************************************************************
+//  LIVE LEGACY cart_slot DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  legacy_cart_slot_device_base - constructor
+//-------------------------------------------------
+
+legacy_cart_slot_device_base::legacy_cart_slot_device_base(running_machine &machine, const device_config &config)
+	: legacy_device_base(machine, config),
+	  device_cart_slot_interface(machine, config, *this)
+{
+}

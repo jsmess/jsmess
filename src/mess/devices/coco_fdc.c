@@ -228,7 +228,7 @@ static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 static DEVICE_START(fdc)
 {
 	fdc_t *fdc = get_token(device);
-    const fdc_hardware_type *hwtype = (const fdc_hardware_type *)downcast<legacy_device_base *>(device)->get_config_ptr(FDCINFO_PTR_HWTYPE);	
+    const fdc_hardware_type *hwtype = (const fdc_hardware_type *)downcast<const legacy_cart_slot_device_config_base *>(&device->baseconfig())->get_config_ptr(FDCINFO_PTR_HWTYPE);	
 
 	/* initialize variables */
 	memset(fdc, 0, sizeof(*fdc));
@@ -650,5 +650,5 @@ DEVICE_GET_INFO(coco_cartridge_pcb_fdc_dragon)
 }
 
 
-DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_FDC_COCO, coco_cartridge_pcb_fdc_coco);
-DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_FDC_DRAGON, coco_cartridge_pcb_fdc_dragon);
+DEFINE_LEGACY_CART_SLOT_DEVICE(COCO_CARTRIDGE_PCB_FDC_COCO, coco_cartridge_pcb_fdc_coco);
+DEFINE_LEGACY_CART_SLOT_DEVICE(COCO_CARTRIDGE_PCB_FDC_DRAGON, coco_cartridge_pcb_fdc_dragon);

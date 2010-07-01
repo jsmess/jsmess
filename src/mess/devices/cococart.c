@@ -98,8 +98,8 @@ static DEVICE_START(coco_cartridge)
 			throw device_missing_dependencies();
 		}
 
-      cococart->pcb_r = (read8_device_func) downcast<legacy_device_base *>(cococart->pcb)->get_config_fct(COCOCARTINFO_FCT_FF40_R);
-      cococart->pcb_w = (write8_device_func) downcast<legacy_device_base *>(cococart->pcb)->get_config_fct(COCOCARTINFO_FCT_FF40_W);
+      cococart->pcb_r = (read8_device_func)downcast<const legacy_cart_slot_device_config_base *>(&cococart->pcb->baseconfig())->get_config_fct(COCOCARTINFO_FCT_FF40_R);
+      cococart->pcb_w = (write8_device_func)downcast<const legacy_cart_slot_device_config_base *>(&cococart->pcb->baseconfig())->get_config_fct(COCOCARTINFO_FCT_FF40_W);
 	}
 
 	/* finish setup */
@@ -404,5 +404,5 @@ DEVICE_GET_INFO(dragon_cartridge)
 	}
 }
 
-DEFINE_LEGACY_DEVICE(COCO_CARTRIDGE, coco_cartridge);
-DEFINE_LEGACY_DEVICE(DRAGON_CARTRIDGE, dragon_cartridge);
+DEFINE_LEGACY_CART_SLOT_DEVICE(COCO_CARTRIDGE, coco_cartridge);
+DEFINE_LEGACY_CART_SLOT_DEVICE(DRAGON_CARTRIDGE, dragon_cartridge);

@@ -10,17 +10,17 @@
 #define __COCOCART_H__
 
 #include "image.h"
-
+#include "cartslot.h"
 
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE, coco_cartridge);
-DECLARE_LEGACY_DEVICE(DRAGON_CARTRIDGE, dragon_cartridge);
+DECLARE_LEGACY_CART_SLOT_DEVICE(COCO_CARTRIDGE, coco_cartridge);
+DECLARE_LEGACY_CART_SLOT_DEVICE(DRAGON_CARTRIDGE, dragon_cartridge);
 
-DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_FDC_COCO, coco_cartridge_pcb_fdc_coco);
-DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_FDC_DRAGON, coco_cartridge_pcb_fdc_dragon);
+DECLARE_LEGACY_CART_SLOT_DEVICE(COCO_CARTRIDGE_PCB_FDC_COCO, coco_cartridge_pcb_fdc_coco);
+DECLARE_LEGACY_CART_SLOT_DEVICE(COCO_CARTRIDGE_PCB_FDC_DRAGON, coco_cartridge_pcb_fdc_dragon);
 DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_PAK, coco_cartridge_pcb_pak);
 DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_PAK_BANKED16K, coco_cartridge_pcb_pak_banked16k);
 DECLARE_LEGACY_DEVICE(COCO_CARTRIDGE_PCB_ORCH90, coco_cartridge_pcb_orch90);

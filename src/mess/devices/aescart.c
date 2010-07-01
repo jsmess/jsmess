@@ -221,8 +221,8 @@ static void set_pointers(running_device *pcb, int index)
 	aes_multicart_t *cartslots = (aes_multicart_t *)downcast<legacy_device_base *>(cartsys)->token();
 	aes_pcb_t *pcb_def = (aes_pcb_t *)downcast<legacy_device_base *>(pcb)->token();
 
-	pcb_def->assemble = (assmfct *)downcast<legacy_device_base *>(pcb)->get_config_fct(AESCART_FCT_ASSM);
-	pcb_def->disassemble = (assmfct *)downcast<legacy_device_base *>(pcb)->get_config_fct(AESCART_FCT_DISASSM);
+	pcb_def->assemble = (assmfct *)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(AESCART_FCT_ASSM);
+	pcb_def->disassemble = (assmfct *)downcast<const legacy_cart_slot_device_config_base *>(&pcb->baseconfig())->get_config_fct(AESCART_FCT_DISASSM);
 
 	pcb_def->cartridge = &cartslots->cartridge[index];
 	pcb_def->cartridge->pcb = pcb;
@@ -714,6 +714,6 @@ DEVICE_GET_INFO(aes_multicart)
 	}
 }
 
-DEFINE_LEGACY_DEVICE(AES_MULTICART, aes_multicart);
+DEFINE_LEGACY_CART_SLOT_DEVICE(AES_MULTICART, aes_multicart);
 DEFINE_LEGACY_DEVICE(AES_CARTRIDGE_PCB_NONE, aes_cartridge_pcb_none);
 DEFINE_LEGACY_DEVICE(AES_CARTRIDGE_PCB_STD, aes_cartridge_pcb_std);

@@ -10,8 +10,9 @@
 #define __AESCART_H__
 
 #include "image.h"
+#include "cartslot.h"
 
-DECLARE_LEGACY_DEVICE(AES_MULTICART, aes_multicart);
+DECLARE_LEGACY_CART_SLOT_DEVICE(AES_MULTICART, aes_multicart);
 DECLARE_LEGACY_DEVICE(AES_CARTRIDGE_PCB_NONE, aes_cartridge_pcb_none);
 DECLARE_LEGACY_DEVICE(AES_CARTRIDGE_PCB_STD, aes_cartridge_pcb_std);
 
