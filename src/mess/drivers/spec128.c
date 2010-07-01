@@ -151,7 +151,6 @@ resulting mess can be seen in the F4 viewer display.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
-#include "eventlst.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"

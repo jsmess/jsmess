@@ -147,7 +147,6 @@ http://www.z88forever.org.uk/zxplus3e/
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
-#include "eventlst.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
