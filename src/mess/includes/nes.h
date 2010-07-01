@@ -61,6 +61,8 @@ typedef struct
 	UINT8* access;	/* direct access when possible */
 } name_table;
 
+typedef void (*nes_prg_callback)(running_machine *machine, int start, int bank);
+typedef void (*nes_chr_callback)(running_machine *machine, int start, int bank, int source);
 
 class nes_state
 {
@@ -114,6 +116,9 @@ public:
 	read8_space_func    mmc_read_mid;
 	read8_space_func    mmc_read;
 	emu_timer	        *irq_timer;
+
+	nes_prg_callback    mmc3_prg_cb;	// these are used to simplify a lot emulation of some MMC3 pirate clones
+	nes_chr_callback    mmc3_chr_cb;
 
 	/* devices */
 	running_device      *maincpu;
@@ -238,7 +243,6 @@ public:
 	UINT16 pcb_id;		// for UNIF & xml
 	UINT8 four_screen_vram;
 	UINT8 hard_mirroring;
-	UINT8 slow_banking;
 	UINT8 crc_hack;	// this is needed to detect different boards sharing the same Mappers (shame on .nes format)
 	UINT8 ines20;
 

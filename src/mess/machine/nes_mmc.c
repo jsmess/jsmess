@@ -283,16 +283,12 @@ static void prg32( running_machine *machine, int bank )
 
 	/* assumes that bank references a 32k chunk */
 	bank &= ((state->prg_chunks >> 1) - 1);
-	if (state->slow_banking)
-		memcpy(&state->rom[0x8000], &state->rom[bank * 0x8000 + 0x10000], 0x8000);
-	else
-	{
-		state->prg_bank[0] = bank * 4 + 0;
-		state->prg_bank[1] = bank * 4 + 1;
-		state->prg_bank[2] = bank * 4 + 2;
-		state->prg_bank[3] = bank * 4 + 3;
-		prg_bank_refresh(machine);
-	}
+
+	state->prg_bank[0] = bank * 4 + 0;
+	state->prg_bank[1] = bank * 4 + 1;
+	state->prg_bank[2] = bank * 4 + 2;
+	state->prg_bank[3] = bank * 4 + 3;
+	prg_bank_refresh(machine);
 }
 
 static void prg16_89ab( running_machine *machine, int bank )
@@ -301,14 +297,10 @@ static void prg16_89ab( running_machine *machine, int bank )
 
 	/* assumes that bank references a 16k chunk */
 	bank &= (state->prg_chunks - 1);
-	if (state->slow_banking)
-		memcpy(&state->rom[0x8000], &state->rom[bank * 0x4000 + 0x10000], 0x4000);
-	else
-	{
-		state->prg_bank[0] = bank * 2 + 0;
-		state->prg_bank[1] = bank * 2 + 1;
-		prg_bank_refresh(machine);
-	}
+
+	state->prg_bank[0] = bank * 2 + 0;
+	state->prg_bank[1] = bank * 2 + 1;
+	prg_bank_refresh(machine);
 }
 
 static void prg16_cdef( running_machine *machine, int bank )
@@ -317,14 +309,10 @@ static void prg16_cdef( running_machine *machine, int bank )
 
 	/* assumes that bank references a 16k chunk */
 	bank &= (state->prg_chunks - 1);
-	if (state->slow_banking)
-		memcpy(&state->rom[0xc000], &state->rom[bank * 0x4000 + 0x10000], 0x4000);
-	else
-	{
-		state->prg_bank[2] = bank * 2 + 0;
-		state->prg_bank[3] = bank * 2 + 1;
-		prg_bank_refresh(machine);
-	}
+
+	state->prg_bank[2] = bank * 2 + 0;
+	state->prg_bank[3] = bank * 2 + 1;
+	prg_bank_refresh(machine);
 }
 
 static void prg8_89( running_machine *machine, int bank )
@@ -333,13 +321,9 @@ static void prg8_89( running_machine *machine, int bank )
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
-	if (state->slow_banking)
-		memcpy(&state->rom[0x8000], &state->rom[bank * 0x2000 + 0x10000], 0x2000);
-	else
-	{
-		state->prg_bank[0] = bank;
-		prg_bank_refresh(machine);
-	}
+
+	state->prg_bank[0] = bank;
+	prg_bank_refresh(machine);
 }
 
 static void prg8_ab( running_machine *machine, int bank )
@@ -348,13 +332,9 @@ static void prg8_ab( running_machine *machine, int bank )
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
-	if (state->slow_banking)
-		memcpy(&state->rom[0xa000], &state->rom[bank * 0x2000 + 0x10000], 0x2000);
-	else
-	{
-		state->prg_bank[1] = bank;
-		prg_bank_refresh(machine);
-	}
+
+	state->prg_bank[1] = bank;
+	prg_bank_refresh(machine);
 }
 
 static void prg8_cd( running_machine *machine, int bank )
@@ -363,13 +343,9 @@ static void prg8_cd( running_machine *machine, int bank )
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
-	if (state->slow_banking)
-		memcpy(&state->rom[0xc000], &state->rom[bank * 0x2000 + 0x10000], 0x2000);
-	else
-	{
-		state->prg_bank[2] = bank;
-		prg_bank_refresh(machine);
-	}
+
+	state->prg_bank[2] = bank;
+	prg_bank_refresh(machine);
 }
 
 static void prg8_ef( running_machine *machine, int bank )
@@ -378,13 +354,9 @@ static void prg8_ef( running_machine *machine, int bank )
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
-	if (state->slow_banking)
-		memcpy(&state->rom[0xe000], &state->rom[bank * 0x2000 + 0x10000], 0x2000);
-	else
-	{
-		state->prg_bank[3] = bank;
-		prg_bank_refresh(machine);
-	}
+
+	state->prg_bank[3] = bank;
+	prg_bank_refresh(machine);
 }
 
 /* We define an additional helper to map PRG-ROM to 0x6000-0x7000 */
@@ -396,8 +368,23 @@ static void prg8_67( running_machine *machine, int bank )
 
 	/* assumes that bank references an 8k chunk */
 	bank &= ((state->prg_chunks << 1) - 1);
+
 	state->prg_bank[4] = bank;
 	memory_set_bank(machine, "bank5", state->prg_bank[4]);
+}
+
+/* We also define an additional helper to map 8k PRG-ROM to one of the banks (passed as parameter) */
+static void prg8_x( running_machine *machine, int start, int bank )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	
+	assert(start < 4);
+
+	/* assumes that bank references an 8k chunk */
+	bank &= ((state->prg_chunks << 1) - 1);
+	
+	state->prg_bank[start] = bank;
+	prg_bank_refresh(machine);
 }
 
 /* CHR ROM in 1K, 2K, 4K or 8K blocks */

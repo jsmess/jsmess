@@ -58,7 +58,6 @@ static void init_nes_core( running_machine *machine )
 	/* If there is Disk Expansion and no cart has been loaded, setup memory accordingly */
 	if (state->disk_expansion && state->pcb_id == NO_BOARD)
 	{
-		state->slow_banking = 0;
 		/* If we are loading a disk we have already filled state->fds_data and we don't want to overwrite it,
          if we are loading a cart image identified as mapper 20 (probably wrong mapper...) we need to alloc
          memory for use in nes_fds_r/nes_fds_w. Same goes for allocation of fds_ram (used for bank2)  */
@@ -87,7 +86,6 @@ static void init_nes_core( running_machine *machine )
 	pcb_handlers_setup(machine);
 
 	/* Set up the memory handlers for the mapper */
-	state->slow_banking = 0;
 	memory_install_read_bank(space, 0x8000, 0x9fff, 0, 0, "bank1");
 	memory_install_read_bank(space, 0xa000, 0xbfff, 0, 0, "bank2");
 	memory_install_read_bank(space, 0xc000, 0xdfff, 0, 0, "bank3");

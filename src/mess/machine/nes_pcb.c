@@ -1228,10 +1228,20 @@ static void mmc3_set_prg( running_machine *machine, int prg_base, int prg_mask )
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 prg_flip = (state->mmc_latch1 & 0x40) ? 2 : 0;
 
-	prg8_89(machine, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
-	prg8_ab(machine, prg_base | (state->mmc_prg_bank[1] & prg_mask));
-	prg8_cd(machine, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
-	prg8_ef(machine, prg_base | (state->mmc_prg_bank[3] & prg_mask));
+	if (state->mmc3_prg_cb)
+	{
+		state->mmc3_prg_cb(machine, 0, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
+		state->mmc3_prg_cb(machine, 1, prg_base | (state->mmc_prg_bank[1] & prg_mask));
+		state->mmc3_prg_cb(machine, 2, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
+		state->mmc3_prg_cb(machine, 3, prg_base | (state->mmc_prg_bank[3] & prg_mask));
+	}
+	else
+	{
+		prg8_x(machine, 0, prg_base | (state->mmc_prg_bank[0 ^ prg_flip] & prg_mask));
+		prg8_x(machine, 1, prg_base | (state->mmc_prg_bank[1] & prg_mask));
+		prg8_x(machine, 2, prg_base | (state->mmc_prg_bank[2 ^ prg_flip] & prg_mask));
+		prg8_x(machine, 3, prg_base | (state->mmc_prg_bank[3] & prg_mask));
+	}
 }
 
 static void mmc3_set_chr( running_machine *machine, UINT8 chr, int chr_base, int chr_mask )
@@ -1239,14 +1249,28 @@ static void mmc3_set_chr( running_machine *machine, UINT8 chr, int chr_base, int
 	nes_state *state = (nes_state *)machine->driver_data;
 	UINT8 chr_page = (state->mmc_latch1 & 0x80) >> 5;
 
-	chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr);
-	chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr);
+	if (state->mmc3_chr_cb)
+	{
+		state->mmc3_chr_cb(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
+		state->mmc3_chr_cb(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
+		state->mmc3_chr_cb(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
+		state->mmc3_chr_cb(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
+		state->mmc3_chr_cb(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr);
+		state->mmc3_chr_cb(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr);
+		state->mmc3_chr_cb(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr);
+		state->mmc3_chr_cb(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr);
+	}
+	else
+	{
+		chr1_x(machine, chr_page ^ 0, chr_base | ((state->mmc_vrom_bank[0] & ~0x01) & chr_mask), chr);
+		chr1_x(machine, chr_page ^ 1, chr_base | ((state->mmc_vrom_bank[0] |  0x01) & chr_mask), chr);
+		chr1_x(machine, chr_page ^ 2, chr_base | ((state->mmc_vrom_bank[1] & ~0x01) & chr_mask), chr);
+		chr1_x(machine, chr_page ^ 3, chr_base | ((state->mmc_vrom_bank[1] |  0x01) & chr_mask), chr);
+		chr1_x(machine, chr_page ^ 4, chr_base | (state->mmc_vrom_bank[2] & chr_mask), chr);
+		chr1_x(machine, chr_page ^ 5, chr_base | (state->mmc_vrom_bank[3] & chr_mask), chr);
+		chr1_x(machine, chr_page ^ 6, chr_base | (state->mmc_vrom_bank[4] & chr_mask), chr);
+		chr1_x(machine, chr_page ^ 7, chr_base | (state->mmc_vrom_bank[5] & chr_mask), chr);
+	}
 }
 
 /* Here, IRQ counter decrements every scanline. */
@@ -12040,6 +12064,9 @@ void pcb_handlers_setup( running_machine *machine )
 
 	if (intf == NULL)
 		fatalerror("Missing PCB interface\n");
+
+//	state->mmc3_chr_cb = chr1_x;
+//	state->mmc3_prg_cb = prg8_x;
 
 	if (intf)
 	{
