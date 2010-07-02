@@ -296,7 +296,7 @@ GFXDECODE_END
 MACHINE_DRIVER_START( spectrum_128 )
 	MDRV_IMPORT_FROM( spectrum )
 
-	MDRV_CPU_REPLACE("maincpu", Z80, 3500000)        /* 3.5 MHz */
+	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spectrum_128_mem)
 	MDRV_CPU_IO_MAP(spectrum_128_io)
 
