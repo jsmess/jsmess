@@ -175,6 +175,9 @@ static void init_nes_core( running_machine *machine )
 		memory_install_read8_handler(space, 0x4020, 0x40ff, 0, 0, unl_6035052_extra_r);
 		memory_install_write8_handler(space, 0x4020, 0x40ff, 0, 0, unl_6035052_extra_w);
 	}
+
+	if (state->pcb_id == WAIXING_SH2)
+		memory_install_read8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, waixing_sh2_chr_r);
 }
 
 // to be probably removed (it does nothing since a long time)

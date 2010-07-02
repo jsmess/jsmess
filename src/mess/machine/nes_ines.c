@@ -348,7 +348,7 @@ static const nes_mmc mmc_list[] =
 	// 162 Unused
 	{ 163, NANJING_BOARD},
 	{ 164, WAIXING_FFV },
-	// 165 Waixing SH2 (Fire Emblem & Fire Emblem Gaiden Chinese) - Unsupported
+	{ 165, WAIXING_SH2 },
 	{ 166, SUBOR_TYPE1 },
 	{ 167, SUBOR_TYPE0 },
 	{ 168, UNL_RACERMATE },
@@ -406,8 +406,8 @@ static const nes_mmc mmc_list[] =
 	// 220 Unused
 	{ 221, UNL_N625092 },
 	{ 222, BTL_DRAGONNINJA },
-	// 223 Waixing Type I - Unsupported
-	// 224 Waixing Type J - Unsupported
+	{ 223, WAIXING_TYPE_I },	// (according to NEStopia source, it's MMC3 with more WRAM)
+	{ 224, WAIXING_TYPE_J },	// (according to NEStopia source, it's MMC3 with more WRAM)
 	{ 225, BMC_72IN1 },
 	{ 226, BMC_76IN1 },
 	{ 227, BMC_1200IN1 },

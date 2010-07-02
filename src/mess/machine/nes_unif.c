@@ -343,8 +343,10 @@ static int pcb_initialize( running_machine *machine, int idx )
 		case STD_TKROM:
 		case REXSOFT_DBZ5:	// mapper 12
 		case WAIXING_TYPE_A:	// mapper 74
+		case WAIXING_TYPE_A_1:
 		case STD_TXSROM:	// mapper 118
 		case STD_TQROM:	// mapper 119
+		case WAIXING_SH2:	// mapper 165
 		case WAIXING_TYPE_B:	// mapper 191
 		case WAIXING_TYPE_C:	// mapper 192
 		case WAIXING_TYPE_D:	// mapper 194
@@ -666,7 +668,8 @@ static int pcb_initialize( running_machine *machine, int idx )
 			break;
 // mapper 164
 		case WAIXING_FFV:
-			prg32(machine, 0xff);
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0x1f);
 			break;
 // mapper 166
 		case SUBOR_TYPE1:
@@ -713,30 +716,32 @@ static int pcb_initialize( running_machine *machine, int idx )
 			break;
 // mapper 198
 		case WAIXING_TYPE_F:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			state->mmc_prg_bank[0] = 0x00;
 			state->mmc_prg_bank[1] = 0x01;
 			state->mmc_prg_bank[2] = 0x4e;
 			state->mmc_prg_bank[3] = 0x4f;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
-			waixing_f_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
 			break;
 // mapper 199
 		case WAIXING_TYPE_G:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			state->mmc_prg_bank[0] = 0x00;
 			state->mmc_prg_bank[1] = 0x01;
 			state->mmc_prg_bank[2] = 0x3e;
 			state->mmc_prg_bank[3] = 0x3f;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			state->mmc_prg_base = state->mmc_chr_base = 0;
-			state->mmc_prg_mask = state->mmc_chr_mask = 0xff;
 			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			state->mmc_vrom_bank[0] = 0x00;
+			state->mmc_vrom_bank[1] = 0x02;
+			state->mmc_vrom_bank[2] = 0x04;
+			state->mmc_vrom_bank[3] = 0x05;
+			state->mmc_vrom_bank[4] = 0x06;
+			state->mmc_vrom_bank[5] = 0x07;
+			state->mmc_vrom_bank[6] = 0x01;
+			state->mmc_vrom_bank[7] = 0x03;
 			waixing_g_set_chr(machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
+
 // mapper 200
 		case BMC_36IN1:
 			prg16_89ab(machine, state->prg_chunks - 1);
@@ -799,6 +804,22 @@ static int pcb_initialize( running_machine *machine, int idx )
 			prg16_cdef(machine, 0);
 			break;
 
+// mapper 223?
+		case WAIXING_TYPE_I:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			state->mmc_latch2 = 0;
+			break;
+			
+// mapper 224?
+		case WAIXING_TYPE_J:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			state->mmc_prg_bank[0] = 0x01;
+			state->mmc_prg_bank[1] = 0x02;
+			state->mmc_prg_bank[2] = 0x7e;
+			state->mmc_prg_bank[3] = 0x7f;
+			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			break;
+
 // mapper 227
 		case BMC_1200IN1:
 			prg16_89ab(machine, 0);
@@ -842,10 +863,8 @@ static int pcb_initialize( running_machine *machine, int idx )
 			break;
 // mapper 249
 		case WAIXING_SECURITY:
+			state->mmc_reg[0] = 0;
 			mmc3_common_initialize(machine, 0xff, 0xff, 0);
-			state->map249_reg = 0;
-			waixing_sec_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
-			waixing_sec_set_chr(machine, state->mmc_chr_base, state->mmc_chr_mask);
 			break;
 
 // mapper 254
@@ -907,14 +926,7 @@ static int pcb_initialize( running_machine *machine, int idx )
 			break;
 		case UNL_8237:
 			state->unl_8237_reg[0] = state->unl_8237_reg[1] = state->unl_8237_reg[2] = 0;
-			state->mmc_prg_bank[0] = 0x00;
-			state->mmc_prg_bank[1] = 0x01;
-			state->mmc_prg_bank[2] = 0xfe;
-			state->mmc_prg_bank[3] = 0xff;
-			state->mmc_latch1 = 0;
-			state->mmc_latch2 = 0x80;
-			unl_8237_set_prg(machine);
-			unl_8237_set_chr(machine);
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			break;
 		case UNL_AX5705:
 			state->mmc_prg_bank[0] = 0;
