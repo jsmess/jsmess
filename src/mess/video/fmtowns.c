@@ -92,66 +92,41 @@
 //#define CRTC_REG_DISP 1
 //#define SPR_DEBUG 1
 
-static UINT8 towns_vram_wplane;
-static UINT8 towns_vram_rplane;
-static UINT8 towns_vram_page_sel;
-static UINT8 towns_palette_select;
-static UINT8 towns_palette_r[256];
-static UINT8 towns_palette_g[256];
-static UINT8 towns_palette_b[256];
-static UINT8 towns_degipal[8];
-static UINT8 towns_dpmd_flag;
-static UINT8 towns_crtc_mix;
-static UINT8 towns_crtc_sel;  // selected CRTC register
-static UINT16 towns_crtc_reg[32];
-static UINT8 towns_video_sel;  // selected video register
-static UINT8 towns_video_reg[2];
-static UINT8 towns_sprite_sel;  // selected sprite register
-static UINT8 towns_sprite_reg[8];
-static UINT8 towns_tvram_enable;
-static UINT16 towns_kanji_offset;
-static UINT8 towns_kanji_code_h;
-static UINT8 towns_kanji_code_l;
-static rectangle towns_crtc_layerscr[2];  // each layer has independent sizes
-static UINT8 towns_display_plane;
-static UINT8 towns_display_page_sel;
-static UINT8 towns_vblank_flag;
-static UINT8 towns_layer_ctrl;
-
-extern UINT32* towns_vram;
-extern UINT8* towns_gfxvram;
-extern UINT8* towns_txtvram;
+//extern UINT32* towns_vram;
+//extern UINT8* towns_gfxvram;
+//extern UINT8* towns_txtvram;
 //extern UINT8* towns_sprram;
 
-extern UINT32 towns_mainmem_enable;
-extern UINT32 towns_ankcg_enable;
+//extern UINT32 towns_mainmem_enable;
+//extern UINT32 towns_ankcg_enable;
 
 //static UINT32 pshift;  // for debugging
 
 void towns_crtc_refresh_mode(running_machine* machine)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	rectangle scr;
 	unsigned int width,height;
 
 	scr.min_x = scr.min_y = 0;
-	scr.max_x = towns_crtc_reg[4];
-	scr.max_y = towns_crtc_reg[8] / 2;
+	scr.max_x = state->video.towns_crtc_reg[4];
+	scr.max_y = state->video.towns_crtc_reg[8] / 2;
 
 	// layer 0
-	width = towns_crtc_reg[10] - towns_crtc_reg[9];
-	height = (towns_crtc_reg[14] - towns_crtc_reg[13]) / 2;
-	towns_crtc_layerscr[0].min_x = (scr.max_x / 2) - (width / 2);
-	towns_crtc_layerscr[0].min_y = (scr.max_y / 2) - (height / 2);
-	towns_crtc_layerscr[0].max_x = (scr.max_x / 2) + (width / 2);
-	towns_crtc_layerscr[0].max_y = (scr.max_y / 2) + (height / 2);
+	width = state->video.towns_crtc_reg[10] - state->video.towns_crtc_reg[9];
+	height = (state->video.towns_crtc_reg[14] - state->video.towns_crtc_reg[13]) / 2;
+	state->video.towns_crtc_layerscr[0].min_x = (scr.max_x / 2) - (width / 2);
+	state->video.towns_crtc_layerscr[0].min_y = (scr.max_y / 2) - (height / 2);
+	state->video.towns_crtc_layerscr[0].max_x = (scr.max_x / 2) + (width / 2);
+	state->video.towns_crtc_layerscr[0].max_y = (scr.max_y / 2) + (height / 2);
 
 	// layer 1
-	width = towns_crtc_reg[12] - towns_crtc_reg[11];
-	height = (towns_crtc_reg[16] - towns_crtc_reg[15]) / 2;
-	towns_crtc_layerscr[1].min_x = (scr.max_x / 2) - (width / 2);
-	towns_crtc_layerscr[1].min_y = (scr.max_y / 2) - (height / 2);
-	towns_crtc_layerscr[1].max_x = (scr.max_x / 2) + (width / 2);
-	towns_crtc_layerscr[1].max_y = (scr.max_y / 2) + (height / 2);
+	width = state->video.towns_crtc_reg[12] - state->video.towns_crtc_reg[11];
+	height = (state->video.towns_crtc_reg[16] - state->video.towns_crtc_reg[15]) / 2;
+	state->video.towns_crtc_layerscr[1].min_x = (scr.max_x / 2) - (width / 2);
+	state->video.towns_crtc_layerscr[1].min_y = (scr.max_y / 2) - (height / 2);
+	state->video.towns_crtc_layerscr[1].max_x = (scr.max_x / 2) + (width / 2);
+	state->video.towns_crtc_layerscr[1].max_y = (scr.max_y / 2) + (height / 2);
 
 	// sanity checks
 	if(scr.max_x == 0 || scr.max_y == 0)
@@ -164,145 +139,152 @@ void towns_crtc_refresh_mode(running_machine* machine)
 
 READ8_HANDLER( towns_gfx_high_r )
 {
-	return towns_gfxvram[offset];
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	return state->towns_gfxvram[offset];
 }
 
 WRITE8_HANDLER( towns_gfx_high_w )
 {
-	towns_gfxvram[offset] = data;
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	state->towns_gfxvram[offset] = data;
 }
 
 READ8_HANDLER( towns_gfx_r )
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	UINT8 ret = 0;
 
-	if(towns_mainmem_enable != 0)
-		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xc0000];
+	if(state->towns_mainmem_enable != 0)
+		return messram_get_ptr(state->messram)[offset+0xc0000];
 
 	offset = offset << 2;
 
-	if(towns_vram_page_sel != 0)
+	if(state->video.towns_vram_page_sel != 0)
 		offset += 0x20000;
 
-	ret = (((towns_gfxvram[offset] >> towns_vram_rplane) << 7) & 0x80)
-		| (((towns_gfxvram[offset] >> towns_vram_rplane) << 2) & 0x40)
-		| (((towns_gfxvram[offset+1] >> towns_vram_rplane) << 5) & 0x20)
-		| (((towns_gfxvram[offset+1] >> towns_vram_rplane)) & 0x10)
-		| (((towns_gfxvram[offset+2] >> towns_vram_rplane) << 3) & 0x08)
-		| (((towns_gfxvram[offset+2] >> towns_vram_rplane) >> 2) & 0x04)
-		| (((towns_gfxvram[offset+3] >> towns_vram_rplane) << 1) & 0x02)
-		| (((towns_gfxvram[offset+3] >> towns_vram_rplane) >> 4) & 0x01);
+	ret = (((state->towns_gfxvram[offset] >> state->video.towns_vram_rplane) << 7) & 0x80)
+		| (((state->towns_gfxvram[offset] >> state->video.towns_vram_rplane) << 2) & 0x40)
+		| (((state->towns_gfxvram[offset+1] >> state->video.towns_vram_rplane) << 5) & 0x20)
+		| (((state->towns_gfxvram[offset+1] >> state->video.towns_vram_rplane)) & 0x10)
+		| (((state->towns_gfxvram[offset+2] >> state->video.towns_vram_rplane) << 3) & 0x08)
+		| (((state->towns_gfxvram[offset+2] >> state->video.towns_vram_rplane) >> 2) & 0x04)
+		| (((state->towns_gfxvram[offset+3] >> state->video.towns_vram_rplane) << 1) & 0x02)
+		| (((state->towns_gfxvram[offset+3] >> state->video.towns_vram_rplane) >> 4) & 0x01);
 
 	return ret;
 }
 
 WRITE8_HANDLER( towns_gfx_w )
 {
-	if(towns_mainmem_enable != 0)
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
+	if(state->towns_mainmem_enable != 0)
 	{
-		messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xc0000] = data;
+		messram_get_ptr(state->messram)[offset+0xc0000] = data;
 		return;
 	}
 	offset = offset << 2;
-	if(towns_vram_page_sel != 0)
+	if(state->video.towns_vram_page_sel != 0)
 		offset += 0x20000;
-	if(towns_vram_wplane & 0x08)
+	if(state->video.towns_vram_wplane & 0x08)
 	{
-		towns_gfxvram[offset] &= ~0x88;
-		towns_gfxvram[offset] |= ((data & 0x80) >> 4) | ((data & 0x40) << 1);
-		towns_gfxvram[offset + 1] &= ~0x88;
-		towns_gfxvram[offset + 1] |= ((data & 0x20) >> 2) | ((data & 0x10) << 3);
-		towns_gfxvram[offset + 2] &= ~0x88;
-		towns_gfxvram[offset + 2] |= ((data & 0x08)) | ((data & 0x04) << 5);
-		towns_gfxvram[offset + 3] &= ~0x88;
-		towns_gfxvram[offset + 3] |= ((data & 0x02) << 2) | ((data & 0x01) << 7);
+		state->towns_gfxvram[offset] &= ~0x88;
+		state->towns_gfxvram[offset] |= ((data & 0x80) >> 4) | ((data & 0x40) << 1);
+		state->towns_gfxvram[offset + 1] &= ~0x88;
+		state->towns_gfxvram[offset + 1] |= ((data & 0x20) >> 2) | ((data & 0x10) << 3);
+		state->towns_gfxvram[offset + 2] &= ~0x88;
+		state->towns_gfxvram[offset + 2] |= ((data & 0x08)) | ((data & 0x04) << 5);
+		state->towns_gfxvram[offset + 3] &= ~0x88;
+		state->towns_gfxvram[offset + 3] |= ((data & 0x02) << 2) | ((data & 0x01) << 7);
 	}
-	if(towns_vram_wplane & 0x04)
+	if(state->video.towns_vram_wplane & 0x04)
 	{
-		towns_gfxvram[offset] &= ~0x44;
-		towns_gfxvram[offset] |= ((data & 0x80) >> 5) | ((data & 0x40));
-		towns_gfxvram[offset + 1] &= ~0x44;
-		towns_gfxvram[offset + 1] |= ((data & 0x20) >> 3) | ((data & 0x10) << 2);
-		towns_gfxvram[offset + 2] &= ~0x44;
-		towns_gfxvram[offset + 2] |= ((data & 0x08) >> 1) | ((data & 0x04) << 4);
-		towns_gfxvram[offset + 3] &= ~0x44;
-		towns_gfxvram[offset + 3] |= ((data & 0x02) << 1) | ((data & 0x01) << 6);
+		state->towns_gfxvram[offset] &= ~0x44;
+		state->towns_gfxvram[offset] |= ((data & 0x80) >> 5) | ((data & 0x40));
+		state->towns_gfxvram[offset + 1] &= ~0x44;
+		state->towns_gfxvram[offset + 1] |= ((data & 0x20) >> 3) | ((data & 0x10) << 2);
+		state->towns_gfxvram[offset + 2] &= ~0x44;
+		state->towns_gfxvram[offset + 2] |= ((data & 0x08) >> 1) | ((data & 0x04) << 4);
+		state->towns_gfxvram[offset + 3] &= ~0x44;
+		state->towns_gfxvram[offset + 3] |= ((data & 0x02) << 1) | ((data & 0x01) << 6);
 	}
-	if(towns_vram_wplane & 0x02)
+	if(state->video.towns_vram_wplane & 0x02)
 	{
-		towns_gfxvram[offset] &= ~0x22;
-		towns_gfxvram[offset] |= ((data & 0x80) >> 6) | ((data & 0x40) >> 1);
-		towns_gfxvram[offset + 1] &= ~0x22;
-		towns_gfxvram[offset + 1] |= ((data & 0x20) >> 4) | ((data & 0x10) << 1);
-		towns_gfxvram[offset + 2] &= ~0x22;
-		towns_gfxvram[offset + 2] |= ((data & 0x08) >> 2) | ((data & 0x04) << 3);
-		towns_gfxvram[offset + 3] &= ~0x22;
-		towns_gfxvram[offset + 3] |= ((data & 0x02)) | ((data & 0x01) << 5);
+		state->towns_gfxvram[offset] &= ~0x22;
+		state->towns_gfxvram[offset] |= ((data & 0x80) >> 6) | ((data & 0x40) >> 1);
+		state->towns_gfxvram[offset + 1] &= ~0x22;
+		state->towns_gfxvram[offset + 1] |= ((data & 0x20) >> 4) | ((data & 0x10) << 1);
+		state->towns_gfxvram[offset + 2] &= ~0x22;
+		state->towns_gfxvram[offset + 2] |= ((data & 0x08) >> 2) | ((data & 0x04) << 3);
+		state->towns_gfxvram[offset + 3] &= ~0x22;
+		state->towns_gfxvram[offset + 3] |= ((data & 0x02)) | ((data & 0x01) << 5);
 	}
-	if(towns_vram_wplane & 0x01)
+	if(state->video.towns_vram_wplane & 0x01)
 	{
-		towns_gfxvram[offset] &= ~0x11;
-		towns_gfxvram[offset] |= ((data & 0x80) >> 7) | ((data & 0x40) >> 2);
-		towns_gfxvram[offset + 1] &= ~0x11;
-		towns_gfxvram[offset + 1] |= ((data & 0x20) >> 5) | ((data & 0x10));
-		towns_gfxvram[offset + 2] &= ~0x11;
-		towns_gfxvram[offset + 2] |= ((data & 0x08) >> 3) | ((data & 0x04) << 2);
-		towns_gfxvram[offset + 3] &= ~0x11;
-		towns_gfxvram[offset + 3] |= ((data & 0x02) >> 1) | ((data & 0x01) << 4);
+		state->towns_gfxvram[offset] &= ~0x11;
+		state->towns_gfxvram[offset] |= ((data & 0x80) >> 7) | ((data & 0x40) >> 2);
+		state->towns_gfxvram[offset + 1] &= ~0x11;
+		state->towns_gfxvram[offset + 1] |= ((data & 0x20) >> 5) | ((data & 0x10));
+		state->towns_gfxvram[offset + 2] &= ~0x11;
+		state->towns_gfxvram[offset + 2] |= ((data & 0x08) >> 3) | ((data & 0x04) << 2);
+		state->towns_gfxvram[offset + 3] &= ~0x11;
+		state->towns_gfxvram[offset + 3] |= ((data & 0x02) >> 1) | ((data & 0x01) << 4);
 	}
 }
 
-static void towns_update_kanji_offset(void)
+static void towns_update_kanji_offset(running_machine* machine)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	// this is a little over the top...
-	if(towns_kanji_code_h < 0x30)
+	if(state->video.towns_kanji_code_h < 0x30)
 	{
-		towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
-		                   | (((towns_kanji_code_l - 0x20) & 0x20) << 8)
-		                   | (((towns_kanji_code_l - 0x20) & 0x40) << 6)
-		                   | ((towns_kanji_code_h & 0x07) << 9);
+		state->video.towns_kanji_offset = ((state->video.towns_kanji_code_l & 0x1f) << 4)
+		                   | (((state->video.towns_kanji_code_l - 0x20) & 0x20) << 8)
+		                   | (((state->video.towns_kanji_code_l - 0x20) & 0x40) << 6)
+		                   | ((state->video.towns_kanji_code_h & 0x07) << 9);
 	}
-	else if(towns_kanji_code_h < 0x70)
+	else if(state->video.towns_kanji_code_h < 0x70)
 	{
-		towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
-		                   + (((towns_kanji_code_l - 0x20) & 0x60) << 8)
-		                   + ((towns_kanji_code_h & 0x0f) << 9)
-		                   + (((towns_kanji_code_h - 0x30) & 0x70) * 0xc00)
+		state->video.towns_kanji_offset = ((state->video.towns_kanji_code_l & 0x1f) << 4)
+		                   + (((state->video.towns_kanji_code_l - 0x20) & 0x60) << 8)
+		                   + ((state->video.towns_kanji_code_h & 0x0f) << 9)
+		                   + (((state->video.towns_kanji_code_h - 0x30) & 0x70) * 0xc00)
 		                   + 0x8000;
 	}
 	else
 	{
-		towns_kanji_offset = ((towns_kanji_code_l & 0x1f) << 4)
-		                   | (((towns_kanji_code_l - 0x20) & 0x20) << 8)
-		                   | (((towns_kanji_code_l - 0x20) & 0x40) << 6)
-		                   | ((towns_kanji_code_h & 0x07) << 9)
+		state->video.towns_kanji_offset = ((state->video.towns_kanji_code_l & 0x1f) << 4)
+		                   | (((state->video.towns_kanji_code_l - 0x20) & 0x20) << 8)
+		                   | (((state->video.towns_kanji_code_l - 0x20) & 0x40) << 6)
+		                   | ((state->video.towns_kanji_code_h & 0x07) << 9)
 		                   | 0x38000;
 	}
 }
 
 READ8_HANDLER( towns_video_cff80_r )
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	UINT8* ROM = memory_region(space->machine,"user");
 
 	switch(offset)
 	{
 		case 0x00:  // mix register
-			return towns_crtc_mix;
+			return state->video.towns_crtc_mix;
 		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
-			return ((towns_vram_rplane << 6) & 0xc0) | towns_vram_wplane;
+			return ((state->video.towns_vram_rplane << 6) & 0xc0) | state->video.towns_vram_wplane;
 		case 0x02:  // display planes (bits 0-2,5), display page select (bit 4)
-			return towns_display_plane | towns_display_page_sel;
+			return state->video.towns_display_plane | state->video.towns_display_page_sel;
 		case 0x03:  // VRAM page select (bit 5)
-			if(towns_vram_page_sel != 0)
+			if(state->video.towns_vram_page_sel != 0)
 				return 0x10;
 			else
 				return 0x00;
 		case 0x16:  // Kanji character data
-			return ROM[(towns_kanji_offset << 1) + 0x180000];
+			return ROM[(state->video.towns_kanji_offset << 1) + 0x180000];
 		case 0x17:  // Kanji character data
-			return ROM[(towns_kanji_offset++ << 1) + 0x180001];
+			return ROM[(state->video.towns_kanji_offset++ << 1) + 0x180001];
 		case 0x19:  // ANK CG ROM
-			if(towns_ankcg_enable != 0)
+			if(state->towns_ankcg_enable != 0)
 				return 0x01;
 			else
 				return 0x00;
@@ -315,36 +297,38 @@ READ8_HANDLER( towns_video_cff80_r )
 
 WRITE8_HANDLER( towns_video_cff80_w )
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
 	switch(offset)
 	{
 		case 0x00:  // mix register
-			towns_crtc_mix = data;
+			state->video.towns_crtc_mix = data;
 			break;
 		case 0x01:  // read/write plane select (bit 0-3 write, bit 6-7 read)
-			towns_vram_wplane = data & 0x0f;
-			towns_vram_rplane = (data & 0xc0) >> 6;
+			state->video.towns_vram_wplane = data & 0x0f;
+			state->video.towns_vram_rplane = (data & 0xc0) >> 6;
 			towns_update_video_banks(space);
 			//logerror("VGA: VRAM wplane select = 0x%02x\n",towns_vram_wplane);
 			break;
 		case 0x02:  // display plane (bits 0-2), display page select (bit 4)
-			towns_display_plane = data & 0x27;
-			towns_display_page_sel = data & 0x10;
+			state->video.towns_display_plane = data & 0x27;
+			state->video.towns_display_page_sel = data & 0x10;
 			break;
 		case 0x03:  // VRAM page select (bit 4)
-			towns_vram_page_sel = data & 0x10;
+			state->video.towns_vram_page_sel = data & 0x10;
 			break;
 		case 0x14:  // Kanji offset (high)
-			towns_kanji_code_h = data & 0x7f;
-			towns_update_kanji_offset();
+			state->video.towns_kanji_code_h = data & 0x7f;
+			towns_update_kanji_offset(space->machine);
 			//logerror("VID: Kanji code set (high) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
 			break;
 		case 0x15:  // Kanji offset (low)
-			towns_kanji_code_l = data & 0x7f;
-			towns_update_kanji_offset();
+			state->video.towns_kanji_code_l = data & 0x7f;
+			towns_update_kanji_offset(space->machine);
 			//logerror("VID: Kanji code set (low) = %02x %02x\n",towns_kanji_code_h,towns_kanji_code_l);
 			break;
 		case 0x19:  // ANK CG ROM
-			towns_ankcg_enable = data & 0x01;
+			state->towns_ankcg_enable = data & 0x01;
 			towns_update_video_banks(space);
 			break;
 		default:
@@ -354,17 +338,21 @@ WRITE8_HANDLER( towns_video_cff80_w )
 
 READ8_HANDLER( towns_video_cff80_mem_r )
 {
-	if(towns_mainmem_enable != 0)
-		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xcff80];
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
+	if(state->towns_mainmem_enable != 0)
+		return messram_get_ptr(state->messram)[offset+0xcff80];
 
 	return towns_video_cff80_r(space,offset);
 }
 
 WRITE8_HANDLER( towns_video_cff80_mem_w )
 {
-	if(towns_mainmem_enable != 0)
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
+	if(state->towns_mainmem_enable != 0)
 	{
-		messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xcff80] = data;
+		messram_get_ptr(state->messram)[offset+0xcff80] = data;
 		return;
 	}
 	towns_video_cff80_w(space,offset,data);
@@ -379,60 +367,61 @@ WRITE8_HANDLER( towns_video_cff80_mem_w )
  */
 READ8_HANDLER(towns_video_440_r)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	UINT8 ret = 0;
 	UINT16 xpos,ypos;
 
 	switch(offset)
 	{
 		case 0x00:
-			return towns_crtc_sel;
+			return state->video.towns_crtc_sel;
 		case 0x02:
 //          logerror("CRTC: reading register %i (0x442) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
-			if(towns_crtc_sel == 30)
+			if(state->video.towns_crtc_sel == 30)
 					return 0x00;
-			return towns_crtc_reg[towns_crtc_sel] & 0x00ff;
+			return state->video.towns_crtc_reg[state->video.towns_crtc_sel] & 0x00ff;
 		case 0x03:
 //          logerror("CRTC: reading register %i (0x443) [%04x]\n",towns_crtc_sel,towns_crtc_reg[towns_crtc_sel]);
-			if(towns_crtc_sel == 30)
+			if(state->video.towns_crtc_sel == 30)
 			{
 				// check video position
 				xpos = space->machine->primary_screen->hpos();
 				ypos = space->machine->primary_screen->vpos();
 
-				if(xpos < (towns_crtc_reg[0] & 0xfe))
+				if(xpos < (state->video.towns_crtc_reg[0] & 0xfe))
 					ret |= 0x02;
-				if(ypos < (towns_crtc_reg[6] & 0x1f))
+				if(ypos < (state->video.towns_crtc_reg[6] & 0x1f))
 					ret |= 0x04;
-				if(xpos < towns_crtc_layerscr[0].max_x && xpos > towns_crtc_layerscr[0].min_x)
+				if(xpos < state->video.towns_crtc_layerscr[0].max_x && xpos > state->video.towns_crtc_layerscr[0].min_x)
 					ret |= 0x10;
-				if(xpos < towns_crtc_layerscr[1].max_x && xpos > towns_crtc_layerscr[1].min_x)
+				if(xpos < state->video.towns_crtc_layerscr[1].max_x && xpos > state->video.towns_crtc_layerscr[1].min_x)
 					ret |= 0x20;
-				if(ypos < towns_crtc_layerscr[0].max_y && ypos > towns_crtc_layerscr[0].min_y)
+				if(ypos < state->video.towns_crtc_layerscr[0].max_y && ypos > state->video.towns_crtc_layerscr[0].min_y)
 					ret |= 0x40;
-				if(ypos < towns_crtc_layerscr[1].max_y && ypos > towns_crtc_layerscr[1].min_y)
+				if(ypos < state->video.towns_crtc_layerscr[1].max_y && ypos > state->video.towns_crtc_layerscr[1].min_y)
 					ret |= 0x80;
 
 				return ret;
 			}
-			return (towns_crtc_reg[towns_crtc_sel] & 0xff00) >> 8;
+			return (state->video.towns_crtc_reg[state->video.towns_crtc_sel] & 0xff00) >> 8;
 		case 0x08:
-			return towns_video_sel;
+			return state->video.towns_video_sel;
 		case 0x0a:
-			logerror("Video: reading register %i (0x44a) [%02x]\n",towns_video_sel,towns_video_reg[towns_video_sel]);
-			return towns_video_reg[towns_video_sel];
+			logerror("Video: reading register %i (0x44a) [%02x]\n",state->video.towns_video_sel,state->video.towns_video_reg[state->video.towns_video_sel]);
+			return state->video.towns_video_reg[state->video.towns_video_sel];
 		case 0x0c:
-			if(towns_dpmd_flag != 0)
+			if(state->video.towns_dpmd_flag != 0)
 			{
-				towns_dpmd_flag = 0;
+				state->video.towns_dpmd_flag = 0;
 				ret |= 0x80;
 			}
-			ret |= (towns_vblank_flag ? 0x02 : 0x00);  // TODO: figure out just what this bit is...
+			ret |= (state->video.towns_vblank_flag ? 0x02 : 0x00);  // TODO: figure out just what this bit is...
 			return ret;
 		case 0x10:
-			return towns_sprite_sel;
+			return state->video.towns_sprite_sel;
 		case 0x12:
-			logerror("SPR: reading register %i (0x452) [%02x]\n",towns_sprite_sel,towns_sprite_reg[towns_sprite_sel]);
-			return towns_sprite_reg[towns_sprite_sel];
+			logerror("SPR: reading register %i (0x452) [%02x]\n",state->video.towns_sprite_sel,state->video.towns_sprite_reg[state->video.towns_sprite_sel]);
+			return state->video.towns_sprite_reg[state->video.towns_sprite_sel];
 		default:
 			logerror("VID: read port %04x\n",offset+0x440);
 	}
@@ -441,36 +430,38 @@ READ8_HANDLER(towns_video_440_r)
 
 WRITE8_HANDLER(towns_video_440_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
 	switch(offset)
 	{
 		case 0x00:
-			towns_crtc_sel = data;
+			state->video.towns_crtc_sel = data;
 			break;
 		case 0x02:
 //          logerror("CRTC: writing register %i (0x442) [%02x]\n",towns_crtc_sel,data);
-			towns_crtc_reg[towns_crtc_sel] =
-				(towns_crtc_reg[towns_crtc_sel] & 0xff00) | data;
+			state->video.towns_crtc_reg[state->video.towns_crtc_sel] =
+				(state->video.towns_crtc_reg[state->video.towns_crtc_sel] & 0xff00) | data;
 			towns_crtc_refresh_mode(space->machine);
 			break;
 		case 0x03:
 //          logerror("CRTC: writing register %i (0x443) [%02x]\n",towns_crtc_sel,data);
-			towns_crtc_reg[towns_crtc_sel] =
-				(towns_crtc_reg[towns_crtc_sel] & 0x00ff) | (data << 8);
+			state->video.towns_crtc_reg[state->video.towns_crtc_sel] =
+				(state->video.towns_crtc_reg[state->video.towns_crtc_sel] & 0x00ff) | (data << 8);
 			towns_crtc_refresh_mode(space->machine);
 			break;
 		case 0x08:
-			towns_video_sel = data & 0x01;
+			state->video.towns_video_sel = data & 0x01;
 			break;
 		case 0x0a:
-			logerror("Video: writing register %i (0x44a) [%02x]\n",towns_video_sel,data);
-			towns_video_reg[towns_video_sel] = data;
+			logerror("Video: writing register %i (0x44a) [%02x]\n",state->video.towns_video_sel,data);
+			state->video.towns_video_reg[state->video.towns_video_sel] = data;
 			break;
 		case 0x10:
-			towns_sprite_sel = data & 0x07;
+			state->video.towns_sprite_sel = data & 0x07;
 			break;
 		case 0x12:
-			logerror("SPR: writing register %i (0x452) [%02x]\n",towns_sprite_sel,data);
-			towns_sprite_reg[towns_sprite_sel] = data;
+			logerror("SPR: writing register %i (0x452) [%02x]\n",state->video.towns_sprite_sel,data);
+			state->video.towns_sprite_reg[state->video.towns_sprite_sel] = data;
 			break;
 		default:
 			logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0x440);
@@ -479,13 +470,15 @@ WRITE8_HANDLER(towns_video_440_w)
 
 READ8_HANDLER(towns_video_5c8_r)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
 	logerror("VID: read port %04x\n",offset+0x5c8);
 	switch(offset)
 	{
 		case 0x00:  // 0x5c8 - disable TVRAM?
-		if(towns_tvram_enable != 0)
+		if(state->video.towns_tvram_enable != 0)
 		{
-			towns_tvram_enable = 0;
+			state->video.towns_tvram_enable = 0;
 			return 0x80;
 		}
 		else
@@ -496,11 +489,14 @@ READ8_HANDLER(towns_video_5c8_r)
 
 WRITE8_HANDLER(towns_video_5c8_w)
 {
-	running_device* dev = devtag_get_device(space->machine,"pic8259_slave");
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	running_device* dev = state->pic_slave;
+
 	switch(offset)
 	{
 		case 0x02:  // 0x5ca - VSync clear?
 			pic8259_ir3_w(dev, 0);
+			logerror("PIC: IRQ11 (VSync) set low\n");
 			//towns_vblank_flag = 0;
 			break;
 	}
@@ -515,18 +511,19 @@ WRITE8_HANDLER(towns_video_5c8_w)
  */
 READ8_HANDLER(towns_video_fd90_r)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	UINT8 ret = 0;
 	UINT16 xpos;
 	switch(offset)
 	{
 		case 0x00:
-			return towns_palette_select;
+			return state->video.towns_palette_select;
 		case 0x02:
-			return towns_palette_b[towns_palette_select];
+			return state->video.towns_palette_b[state->video.towns_palette_select];
 		case 0x04:
-			return towns_palette_r[towns_palette_select];
+			return state->video.towns_palette_r[state->video.towns_palette_select];
 		case 0x06:
-			return towns_palette_g[towns_palette_select];
+			return state->video.towns_palette_g[state->video.towns_palette_select];
 		case 0x08:
 		case 0x09:
 		case 0x0a:
@@ -535,14 +532,14 @@ READ8_HANDLER(towns_video_fd90_r)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			return towns_degipal[offset-0x08];
+			return state->video.towns_degipal[offset-0x08];
 		case 0x10:  // "sub status register"
 			// check video position
 			xpos = space->machine->primary_screen->hpos();
 
-			if(xpos < towns_crtc_layerscr[0].max_x && xpos > towns_crtc_layerscr[0].min_x)
+			if(xpos < state->video.towns_crtc_layerscr[0].max_x && xpos > state->video.towns_crtc_layerscr[0].min_x)
 				ret |= 0x02;
-			if(towns_vblank_flag)
+			if(state->video.towns_vblank_flag)
 				ret |= 0x01;
 			return ret;
 	}
@@ -552,19 +549,21 @@ READ8_HANDLER(towns_video_fd90_r)
 
 WRITE8_HANDLER(towns_video_fd90_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
 	switch(offset)
 	{
 		case 0x00:
-			towns_palette_select = data;
+			state->video.towns_palette_select = data;
 			break;
 		case 0x02:
-			towns_palette_b[towns_palette_select] = data;
+			state->video.towns_palette_b[state->video.towns_palette_select] = data;
 			break;
 		case 0x04:
-			towns_palette_r[towns_palette_select] = data;
+			state->video.towns_palette_r[state->video.towns_palette_select] = data;
 			break;
 		case 0x06:
-			towns_palette_g[towns_palette_select] = data;
+			state->video.towns_palette_g[state->video.towns_palette_select] = data;
 			break;
 		case 0x08:
 		case 0x09:
@@ -574,11 +573,11 @@ WRITE8_HANDLER(towns_video_fd90_w)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			towns_degipal[offset-0x08] = data;
-			towns_dpmd_flag = 1;
+			state->video.towns_degipal[offset-0x08] = data;
+			state->video.towns_dpmd_flag = 1;
 			break;
 		case 0x10:
-			towns_layer_ctrl = data;
+			state->video.towns_layer_ctrl = data;
 			break;
 	}
 	//logerror("VID: wrote 0x%02x to port %04x\n",data,offset+0xfd90);
@@ -586,15 +585,19 @@ WRITE8_HANDLER(towns_video_fd90_w)
 
 READ8_HANDLER(towns_video_ff81_r)
 {
-	return ((towns_vram_rplane << 6) & 0xc0) | towns_vram_wplane;
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
+	return ((state->video.towns_vram_rplane << 6) & 0xc0) | state->video.towns_vram_wplane;
 }
 
 WRITE8_HANDLER(towns_video_ff81_w)
 {
-	towns_vram_wplane = data & 0x0f;
-	towns_vram_rplane = (data & 0xc0) >> 6;
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
+	state->video.towns_vram_wplane = data & 0x0f;
+	state->video.towns_vram_rplane = (data & 0xc0) >> 6;
 	towns_update_video_banks(space);
-	logerror("VGA: VRAM wplane select (I/O) = 0x%02x\n",towns_vram_wplane);
+	logerror("VGA: VRAM wplane select (I/O) = 0x%02x\n",state->video.towns_vram_wplane);
 }
 
 /*
@@ -609,17 +612,18 @@ WRITE8_HANDLER(towns_video_ff81_w)
  */
 READ8_HANDLER(towns_spriteram_low_r)
 {
-	UINT8* RAM = messram_get_ptr(devtag_get_device(space->machine, "messram"));
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	UINT8* RAM = messram_get_ptr(state->messram);
 	UINT8* ROM = memory_region(space->machine,"user");
 
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff
-		if(towns_mainmem_enable == 0)
+		if(state->towns_mainmem_enable == 0)
 		{
 //          if(towns_tvram_enable == 0)
 //              return towns_sprram[offset];
 //          else
-				return towns_txtvram[offset];
+				return state->towns_txtvram[offset];
 		}
 		else
 			return RAM[offset + 0xc8000];
@@ -630,14 +634,14 @@ READ8_HANDLER(towns_spriteram_low_r)
 	}
 	if(offset >= 0x2000 && offset < 0x3000)
 	{  // 0xca000-0xcafff
-		if(towns_mainmem_enable == 0)
+		if(state->towns_mainmem_enable == 0)
 		{
-			if(towns_ankcg_enable != 0 && offset < 0x2800)
+			if(state->towns_ankcg_enable != 0 && offset < 0x2800)
 				return ROM[0x180000 + 0x3d000 + (offset-0x2000)];
 //          if(towns_tvram_enable == 0)
-//              return towns_sprram[offset];
+//              return state->towns_sprram[offset];
 //          else
-				return towns_txtvram[offset];
+				return state->towns_txtvram[offset];
 		}
 		else
 			return RAM[offset + 0xca000];
@@ -647,12 +651,14 @@ READ8_HANDLER(towns_spriteram_low_r)
 
 WRITE8_HANDLER(towns_spriteram_low_w)
 {
-	UINT8* RAM = messram_get_ptr(devtag_get_device(space->machine, "messram"));
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	UINT8* RAM = messram_get_ptr(state->messram);
+
 	if(offset < 0x1000)
 	{  // 0xc8000-0xc8fff
-		towns_tvram_enable = 1;
-		if(towns_mainmem_enable == 0)
-			towns_txtvram[offset] = data;
+		state->video.towns_tvram_enable = 1;
+		if(state->towns_mainmem_enable == 0)
+			state->towns_txtvram[offset] = data;
 		else
 			RAM[offset + 0xc8000] = data;
 	}
@@ -662,9 +668,9 @@ WRITE8_HANDLER(towns_spriteram_low_w)
 	}
 	if(offset >= 0x2000 && offset < 0x3000)
 	{  // 0xca000-0xcafff
-		towns_tvram_enable = 1;
-		if(towns_mainmem_enable == 0)
-			towns_txtvram[offset] = data;
+		state->video.towns_tvram_enable = 1;
+		if(state->towns_mainmem_enable == 0)
+			state->towns_txtvram[offset] = data;
 		else
 			RAM[offset + 0xca000] = data;
 	}
@@ -672,12 +678,16 @@ WRITE8_HANDLER(towns_spriteram_low_w)
 
 READ8_HANDLER( towns_spriteram_r)
 {
-	return towns_txtvram[offset];
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
+	return state->towns_txtvram[offset];
 }
 
 WRITE8_HANDLER( towns_spriteram_w)
 {
-	towns_txtvram[offset] = data;
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
+	state->towns_txtvram[offset] = data;
 }
 
 /*
@@ -699,16 +709,17 @@ WRITE8_HANDLER( towns_spriteram_w)
  *      +6: Sprite Colour
  *          bit 15: use colour data in located in sprite RAM offset in bits 11-0 (x32)
  */
-void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
+void render_sprite_4(running_machine* machine, UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	UINT16 xpos,ypos;
 	UINT16 col,pixel;
 	UINT32 voffset;
 	UINT16 xstart,xend,ystart,yend;
 	int xdir,ydir;
-	int width = (towns_crtc_reg[12] - towns_crtc_reg[11]) / (((towns_crtc_reg[27] & 0x0f00) >> 8)+1);
-	int height = (towns_crtc_reg[16] - towns_crtc_reg[15]) / (((towns_crtc_reg[27] & 0xf000) >> 12)+1);
-	UINT32 vram_start = (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
+	int width = (state->video.towns_crtc_reg[12] - state->video.towns_crtc_reg[11]) / (((state->video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
+	int height = (state->video.towns_crtc_reg[16] - state->video.towns_crtc_reg[15]) / (((state->video.towns_crtc_reg[27] & 0xf000) >> 12)+1);
+	UINT32 vram_start = (state->video.towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
 
 	if(xflip)
 	{
@@ -745,28 +756,28 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
 			voffset = 0;
-			pixel = (towns_txtvram[poffset] & 0xf0) >> 4;
-			col = towns_txtvram[coffset+(pixel*2)] | (towns_txtvram[coffset+(pixel*2)+1] << 8);
-			voffset += (towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
+			pixel = (state->towns_txtvram[poffset] & 0xf0) >> 4;
+			col = state->towns_txtvram[coffset+(pixel*2)] | (state->towns_txtvram[coffset+(pixel*2)+1] << 8);
+			voffset += (state->video.towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
 			voffset &= 0x3ffff;
 			//voffset += (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
 			if(xpos < width && ypos < height && pixel != 0)
 			{
-				towns_gfxvram[voffset+vram_start+1] = (col & 0xff00) >> 8;
-				towns_gfxvram[voffset+vram_start] = col & 0x00ff;
+				state->towns_gfxvram[voffset+vram_start+1] = (col & 0xff00) >> 8;
+				state->towns_gfxvram[voffset+vram_start] = col & 0x00ff;
 			}
 			if(xflip)
 				voffset+=2;
 			else
 				voffset-=2;
-			pixel = towns_txtvram[poffset] & 0x0f;
-			col = towns_txtvram[coffset+(pixel*2)] | (towns_txtvram[coffset+(pixel*2)+1] << 8);
+			pixel = state->towns_txtvram[poffset] & 0x0f;
+			col = state->towns_txtvram[coffset+(pixel*2)] | (state->towns_txtvram[coffset+(pixel*2)+1] << 8);
 			voffset &= 0x3ffff;
 			if(xpos < width && ypos < height && pixel != 0)
 			{
-				towns_gfxvram[voffset+vram_start+1] = (col & 0xff00) >> 8;
-				towns_gfxvram[voffset+vram_start] = col & 0x00ff;
+				state->towns_gfxvram[voffset+vram_start+1] = (col & 0xff00) >> 8;
+				state->towns_gfxvram[voffset+vram_start] = col & 0x00ff;
 			}
 			poffset++;
 			poffset &= 0x1ffff;
@@ -774,15 +785,16 @@ void render_sprite_4(UINT32 poffset, UINT32 coffset, UINT16 x, UINT16 y, UINT16 
 	}
 }
 
-void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
+void render_sprite_16(running_machine* machine, UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 yflip, const rectangle* rect)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	UINT16 xpos,ypos;
 	UINT16 col;
 	UINT32 voffset;
 	UINT16 xstart,ystart,xend,yend;
 	int xdir,ydir;
-	int width = (towns_crtc_reg[12] - towns_crtc_reg[11]) / (((towns_crtc_reg[27] & 0x0f00) >> 8)+1);
-	int height = (towns_crtc_reg[16] - towns_crtc_reg[15]) / (((towns_crtc_reg[27] & 0xf000) >> 12)+1);
+	int width = (state->video.towns_crtc_reg[12] - state->video.towns_crtc_reg[11]) / (((state->video.towns_crtc_reg[27] & 0x0f00) >> 8)+1);
+	int height = (state->video.towns_crtc_reg[16] - state->video.towns_crtc_reg[15]) / (((state->video.towns_crtc_reg[27] & 0xf000) >> 12)+1);
 
 	if(xflip)
 	{
@@ -818,15 +830,15 @@ void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 y
 	{
 		for(xpos=xstart;xpos!=xend;xpos+=xdir,xpos&=0x1ff)
 		{
-			voffset = (towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
-			col = towns_txtvram[poffset] | (towns_txtvram[poffset+1] << 8);
-			voffset += (towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
+			voffset = (state->video.towns_sprite_reg[6] & 0x10) ? 0x60000 : 0x40000;
+			col = state->towns_txtvram[poffset] | (state->towns_txtvram[poffset+1] << 8);
+			voffset += (state->video.towns_crtc_reg[24] * 4) * ypos;  // scanline size in bytes * y pos
 			voffset += (xpos & 0x1ff) * 2;
 			voffset &= 0x7ffff;
 			if(xpos < width && ypos < height && col < 0x8000)
 			{
-				towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
-				towns_gfxvram[voffset] = col & 0x00ff;
+				state->towns_gfxvram[voffset+1] = (col & 0xff00) >> 8;
+				state->towns_gfxvram[voffset] = col & 0x00ff;
 			}
 			poffset+=2;
 			poffset &= 0x1ffff;
@@ -836,28 +848,29 @@ void render_sprite_16(UINT32 poffset, UINT16 x, UINT16 y, UINT16 xflip, UINT16 y
 
 void draw_sprites(running_machine* machine, const rectangle* rect)
 {
-	UINT16 sprite_limit = (towns_sprite_reg[0] | (towns_sprite_reg[1] << 8)) & 0x3ff;
+	towns_state* state = (towns_state*)machine->driver_data;
+	UINT16 sprite_limit = (state->video.towns_sprite_reg[0] | (state->video.towns_sprite_reg[1] << 8)) & 0x3ff;
 	int n;
 	UINT16 x,y,attr,colour;
-	UINT16 xoff = (towns_sprite_reg[2] | (towns_sprite_reg[3] << 8)) & 0x1ff;
-	UINT16 yoff = (towns_sprite_reg[4] | (towns_sprite_reg[5] << 8)) & 0x1ff;
+	UINT16 xoff = (state->video.towns_sprite_reg[2] | (state->video.towns_sprite_reg[3] << 8)) & 0x1ff;
+	UINT16 yoff = (state->video.towns_sprite_reg[4] | (state->video.towns_sprite_reg[5] << 8)) & 0x1ff;
 	UINT32 poffset,coffset;
 
-	if(!(towns_sprite_reg[1] & 0x80))
+	if(!(state->video.towns_sprite_reg[1] & 0x80))
 		return;
 
 	// clears VRAM for each frame?
-	if(towns_sprite_reg[6] & 0x10)
-		memset(towns_gfxvram+0x60000,0x80,0x20000);
+	if(state->video.towns_sprite_reg[6] & 0x10)
+		memset(state->towns_gfxvram+0x60000,0x80,0x20000);
 	else
-		memset(towns_gfxvram+0x40000,0x80,0x20000);
+		memset(state->towns_gfxvram+0x40000,0x80,0x20000);
 
 	for(n=sprite_limit;n<1024;n++)
 	{
-		x = towns_txtvram[8*n] | (towns_txtvram[8*n+1] << 8);
-		y = towns_txtvram[8*n+2] | (towns_txtvram[8*n+3] << 8);
-		attr = towns_txtvram[8*n+4] | (towns_txtvram[8*n+5] << 8);
-		colour = towns_txtvram[8*n+6] | (towns_txtvram[8*n+7] << 8);
+		x = state->towns_txtvram[8*n] | (state->towns_txtvram[8*n+1] << 8);
+		y = state->towns_txtvram[8*n+2] | (state->towns_txtvram[8*n+3] << 8);
+		attr = state->towns_txtvram[8*n+4] | (state->towns_txtvram[8*n+5] << 8);
+		colour = state->towns_txtvram[8*n+6] | (state->towns_txtvram[8*n+7] << 8);
 		if(attr & 0x8000)
 		{
 			x += xoff;
@@ -875,7 +888,7 @@ void draw_sprites(running_machine* machine, const rectangle* rect)
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_4((poffset)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,rect);
+				render_sprite_4(machine,(poffset)&0x1ffff,coffset,x,y,attr&0x2000,attr&0x1000,rect);
 		}
 		else
 		{
@@ -886,13 +899,14 @@ void draw_sprites(running_machine* machine, const rectangle* rect)
 				n,x,y,attr,colour,poffset,coffset);
 #endif
 			if(!(colour & 0x2000))
-				render_sprite_16((poffset)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
+				render_sprite_16(machine,(poffset)&0x1ffff,x,y,attr&0x2000,attr&0x1000,rect);
 		}
 	}
 }
 
-void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+void towns_crtc_draw_scan_layer_hicolour(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	UINT32 off = 0;
 	int x;
 	UINT16 colour;
@@ -901,38 +915,38 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 	UINT32 scroll;
 
 	if(layer == 0)
-		linesize = towns_crtc_reg[20] * 4;
+		linesize = state->video.towns_crtc_reg[20] * 4;
 	else
-		linesize = towns_crtc_reg[24] * 4;
+		linesize = state->video.towns_crtc_reg[24] * 4;
 
-	if(towns_display_page_sel != 0)
+	if(state->video.towns_display_page_sel != 0)
 		off = 0x20000;
 	if(layer != 0)
 	{
-		if(!(towns_video_reg[0] & 0x10))
+		if(!(state->video.towns_video_reg[0] & 0x10))
 			return;
-		if(!(towns_crtc_reg[28] & 0x10))
-			off += (towns_crtc_reg[21]) << 2;  // initial offset
+		if(!(state->video.towns_crtc_reg[28] & 0x10))
+			off += (state->video.towns_crtc_reg[21]) << 2;  // initial offset
 		else
 		{
-			scroll = ((towns_crtc_reg[21] & 0xfc00) << 2) | (((towns_crtc_reg[21] & 0x3ff) << 2));
+			scroll = ((state->video.towns_crtc_reg[21] & 0xfc00) << 2) | (((state->video.towns_crtc_reg[21] & 0x3ff) << 2));
 			off += scroll;
 		}
-		off += (towns_crtc_reg[11] - towns_crtc_reg[22]);
-		if(towns_crtc_reg[27] & 0x0100)
+		off += (state->video.towns_crtc_reg[11] - state->video.towns_crtc_reg[22]);
+		if(state->video.towns_crtc_reg[27] & 0x0100)
 			hzoom = 2;
 	}
 	else
 	{
-		if(!(towns_crtc_reg[28] & 0x20))
-			off += (towns_crtc_reg[17]) << 2;  // initial offset
+		if(!(state->video.towns_crtc_reg[28] & 0x20))
+			off += (state->video.towns_crtc_reg[17]) << 2;  // initial offset
 		else
 		{
-			scroll = ((towns_crtc_reg[17] & 0xfc00) << 2) | (((towns_crtc_reg[17] & 0x3ff) << 2));
+			scroll = ((state->video.towns_crtc_reg[17] & 0xfc00) << 2) | (((state->video.towns_crtc_reg[17] & 0x3ff) << 2));
 			off += scroll;
 		}
-		off += (towns_crtc_reg[9] - towns_crtc_reg[18]);
-		if(towns_crtc_reg[27] & 0x0001)
+		off += (state->video.towns_crtc_reg[9] - state->video.towns_crtc_reg[18]);
+		if(state->video.towns_crtc_reg[27] & 0x0001)
 			hzoom = 2;
 	}
 
@@ -942,12 +956,12 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 	{
 		for(x=rect->min_x;x<rect->max_x;x++)
 		{
-			if(towns_video_reg[0] & 0x10)
+			if(state->video.towns_video_reg[0] & 0x10)
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
 
-			colour = (towns_gfxvram[off+(layer*0x40000)+1] << 8) | towns_gfxvram[off+(layer*0x40000)];
+			colour = (state->towns_gfxvram[off+(layer*0x40000)+1] << 8) | state->towns_gfxvram[off+(layer*0x40000)];
 			if(colour < 0x8000)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
@@ -962,11 +976,11 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 	{  // x2 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=2)
 		{
-			if(towns_video_reg[0] & 0x10)
+			if(state->video.towns_video_reg[0] & 0x10)
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = (towns_gfxvram[off+(layer*0x40000)+1] << 8) | towns_gfxvram[off+(layer*0x40000)];
+			colour = (state->towns_gfxvram[off+(layer*0x40000)+1] << 8) | state->towns_gfxvram[off+(layer*0x40000)];
 			if(colour < 0x8000)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
@@ -983,8 +997,9 @@ void towns_crtc_draw_scan_layer_hicolour(bitmap_t* bitmap,const rectangle* rect,
 	}
 }
 
-void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+void towns_crtc_draw_scan_layer_256(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	int off = 0;
 	int x;
 	UINT8 colour;
@@ -992,39 +1007,39 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	int linesize;
 	UINT32 scroll;
 
-	if(towns_display_page_sel != 0)
+	if(state->video.towns_display_page_sel != 0)
 		off = 0x20000;
 	if(layer == 0)
-		linesize = towns_crtc_reg[20] * 8;
+		linesize = state->video.towns_crtc_reg[20] * 8;
 	else
-		linesize = towns_crtc_reg[24] * 8;
+		linesize = state->video.towns_crtc_reg[24] * 8;
 
 	if(layer != 0)
 	{
-		if(!(towns_video_reg[0] & 0x10))
+		if(!(state->video.towns_video_reg[0] & 0x10))
 			return;
-		if(!(towns_crtc_reg[28] & 0x10))
-			off += towns_crtc_reg[21] << 3;  // initial offset
+		if(!(state->video.towns_crtc_reg[28] & 0x10))
+			off += state->video.towns_crtc_reg[21] << 3;  // initial offset
 		else
 		{
-			scroll = ((towns_crtc_reg[21] & 0xfc00) << 3) | (((towns_crtc_reg[21] & 0x3ff) << 3));
+			scroll = ((state->video.towns_crtc_reg[21] & 0xfc00) << 3) | (((state->video.towns_crtc_reg[21] & 0x3ff) << 3));
 			off += scroll;
 		}
-		off += (towns_crtc_reg[11] - towns_crtc_reg[22]);
-		if(towns_crtc_reg[27] & 0x0100)
+		off += (state->video.towns_crtc_reg[11] - state->video.towns_crtc_reg[22]);
+		if(state->video.towns_crtc_reg[27] & 0x0100)
 			hzoom = 2;
 	}
 	else
 	{
-		if(!(towns_crtc_reg[28] & 0x20))
-			off += towns_crtc_reg[17] << 3;  // initial offset
+		if(!(state->video.towns_crtc_reg[28] & 0x20))
+			off += state->video.towns_crtc_reg[17] << 3;  // initial offset
 		else
 		{
-			scroll = ((towns_crtc_reg[17] & 0xfc00) << 3) | (((towns_crtc_reg[17] & 0x3ff) << 3));
+			scroll = ((state->video.towns_crtc_reg[17] & 0xfc00) << 3) | (((state->video.towns_crtc_reg[17] & 0x3ff) << 3));
 			off += scroll;
 		}
-		off += (towns_crtc_reg[9] - towns_crtc_reg[18]);
-		if(towns_crtc_reg[27] & 0x0001)
+		off += (state->video.towns_crtc_reg[9] - state->video.towns_crtc_reg[18]);
+		if(state->video.towns_crtc_reg[27] & 0x0001)
 			hzoom = 2;
 	}
 
@@ -1034,13 +1049,13 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	{
 		for(x=rect->min_x;x<rect->max_x;x++)
 		{
-			colour = towns_gfxvram[off+(layer*0x40000)];
+			colour = state->towns_gfxvram[off+(layer*0x40000)];
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
-					(towns_palette_r[colour] << 16)
-					| (towns_palette_g[colour] << 8)
-					| (towns_palette_b[colour]);
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
 			}
 			off++;
 		}
@@ -1049,25 +1064,26 @@ void towns_crtc_draw_scan_layer_256(bitmap_t* bitmap,const rectangle* rect,int l
 	{  // x2 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=2)
 		{
-			colour = towns_gfxvram[off+(layer*0x40000)+1];
+			colour = state->towns_gfxvram[off+(layer*0x40000)+1];
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
-					(towns_palette_r[colour] << 16)
-					| (towns_palette_g[colour] << 8)
-					| (towns_palette_b[colour]);
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
 				*BITMAP_ADDR32(bitmap,scanline,x+1) =
-					(towns_palette_r[colour] << 16)
-					| (towns_palette_g[colour] << 8)
-					| (towns_palette_b[colour]);
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
 			}
 			off++;
 		}
 	}
 }
 
-void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
+void towns_crtc_draw_scan_layer_16(running_machine* machine, bitmap_t* bitmap,const rectangle* rect,int layer,int line,int scanline)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	int off = 0;
 	int x;
 	UINT8 colour;
@@ -1075,39 +1091,39 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 	int linesize;
 	UINT32 scroll;
 
-	if(towns_display_page_sel != 0)
+	if(state->video.towns_display_page_sel != 0)
 		off = 0x20000;
 	if(layer == 0)
-		linesize = towns_crtc_reg[20] * 4;
+		linesize = state->video.towns_crtc_reg[20] * 4;
 	else
-		linesize = towns_crtc_reg[24] * 4;
+		linesize = state->video.towns_crtc_reg[24] * 4;
 
 	if(layer != 0)
 	{
-		if(!(towns_video_reg[0] & 0x10))
+		if(!(state->video.towns_video_reg[0] & 0x10))
 			return;
-		if(!(towns_crtc_reg[28] & 0x10))
-			off += towns_crtc_reg[21];  // initial offset
+		if(!(state->video.towns_crtc_reg[28] & 0x10))
+			off += state->video.towns_crtc_reg[21];  // initial offset
 		else
 		{
-			scroll = ((towns_crtc_reg[21] & 0xfc00)<<2) | (((towns_crtc_reg[21] & 0x3ff)<<2));
+			scroll = ((state->video.towns_crtc_reg[21] & 0xfc00)<<2) | (((state->video.towns_crtc_reg[21] & 0x3ff)<<2));
 			off += scroll;
 		}
-		off += (towns_crtc_reg[11] - towns_crtc_reg[22]);
-		if(towns_crtc_reg[27] & 0x0100)
+		off += (state->video.towns_crtc_reg[11] - state->video.towns_crtc_reg[22]);
+		if(state->video.towns_crtc_reg[27] & 0x0100)
 			hzoom = 2;
 	}
 	else
 	{
-		if(!(towns_crtc_reg[28] & 0x20))
-			off += towns_crtc_reg[17];  // initial offset
+		if(!(state->video.towns_crtc_reg[28] & 0x20))
+			off += state->video.towns_crtc_reg[17];  // initial offset
 		else
 		{
-			scroll = ((towns_crtc_reg[17] & 0xfc00)<<2) | (((towns_crtc_reg[17] & 0x3ff)<<2));
+			scroll = ((state->video.towns_crtc_reg[17] & 0xfc00)<<2) | (((state->video.towns_crtc_reg[17] & 0x3ff)<<2));
 			off += scroll;
 		}
-		off += (towns_crtc_reg[9] - towns_crtc_reg[18]);
-		if(towns_crtc_reg[27] & 0x0001)
+		off += (state->video.towns_crtc_reg[9] - state->video.towns_crtc_reg[18]);
+		if(state->video.towns_crtc_reg[27] & 0x0001)
 			hzoom = 2;
 	}
 
@@ -1117,21 +1133,21 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 	{
 		for(x=rect->min_x;x<rect->max_x;x+=2)
 		{
-			colour = towns_gfxvram[off+(layer*0x40000)] >> 4;
+			colour = state->towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x+1) =
-					(towns_palette_r[colour] << 16)
-					| (towns_palette_g[colour] << 8)
-					| (towns_palette_b[colour]);
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
 			}
-			colour = towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			colour = state->towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
-					(towns_palette_r[colour] << 16)
-					| (towns_palette_g[colour] << 8)
-					| (towns_palette_b[colour]);
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
 			}
 			off++;
 		}
@@ -1140,33 +1156,33 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 	{  // x2 horizontal zoom
 		for(x=rect->min_x;x<rect->max_x;x+=4)
 		{
-			if(towns_video_reg[0] & 0x10)
+			if(state->video.towns_video_reg[0] & 0x10)
 				off &= 0x3ffff;  // 2 layers
 			else
 				off &= 0x7ffff;  // 1 layer
-			colour = towns_gfxvram[off+(layer*0x40000)] >> 4;
+			colour = state->towns_gfxvram[off+(layer*0x40000)] >> 4;
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x+2) =
-					(towns_palette_r[colour] << 16)
-					| (towns_palette_g[colour] << 8)
-					| (towns_palette_b[colour]);
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
 				*BITMAP_ADDR32(bitmap,scanline,x+3) =
-					(towns_palette_r[colour] << 16)
-					| (towns_palette_g[colour] << 8)
-					| (towns_palette_b[colour]);
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
 			}
-			colour = towns_gfxvram[off+(layer*0x40000)] & 0x0f;
+			colour = state->towns_gfxvram[off+(layer*0x40000)] & 0x0f;
 			if(colour != 0)
 			{
 				*BITMAP_ADDR32(bitmap,scanline,x) =
-					(towns_palette_r[colour] << 16)
-					| (towns_palette_g[colour] << 8)
-					| (towns_palette_b[colour]);
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
 				*BITMAP_ADDR32(bitmap,scanline,x+1) =
-					(towns_palette_r[colour] << 16)
-					| (towns_palette_g[colour] << 8)
-					| (towns_palette_b[colour]);
+					(state->video.towns_palette_r[colour] << 16)
+					| (state->video.towns_palette_g[colour] << 8)
+					| (state->video.towns_palette_b[colour]);
 			}
 			off++;
 		}
@@ -1175,6 +1191,7 @@ void towns_crtc_draw_scan_layer_16(bitmap_t* bitmap,const rectangle* rect,int la
 
 void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const rectangle* rect,int layer)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	int line;
 	int scanline;
 	int height;
@@ -1183,18 +1200,18 @@ void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const recta
 	{
 		scanline = rect->min_y;
 		height = (rect->max_y - rect->min_y);
-		if(towns_crtc_reg[27] & 0x0010)
+		if(state->video.towns_crtc_reg[27] & 0x0010)
 			height /= 2;
-		switch(towns_video_reg[0] & 0x03)
+		switch(state->video.towns_video_reg[0] & 0x03)
 		{
 			case 0x01:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
+					towns_crtc_draw_scan_layer_16(machine,bitmap,rect,layer,line,scanline);
 					scanline++;
-					if(towns_crtc_reg[27] & 0x0010)  // vertical zoom
+					if(state->video.towns_crtc_reg[27] & 0x0010)  // vertical zoom
 					{
-						towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
+						towns_crtc_draw_scan_layer_16(machine,bitmap,rect,layer,line,scanline);
 						scanline++;
 					}
 				}
@@ -1202,11 +1219,11 @@ void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const recta
 			case 0x02:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
+					towns_crtc_draw_scan_layer_256(machine,bitmap,rect,layer,line,scanline);
 					scanline++;
-					if(towns_crtc_reg[27] & 0x0010)  // vertical zoom
+					if(state->video.towns_crtc_reg[27] & 0x0010)  // vertical zoom
 					{
-						towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
+						towns_crtc_draw_scan_layer_256(machine,bitmap,rect,layer,line,scanline);
 						scanline++;
 					}
 				}
@@ -1214,11 +1231,11 @@ void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const recta
 			case 0x03:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
+					towns_crtc_draw_scan_layer_hicolour(machine,bitmap,rect,layer,line,scanline);
 					scanline++;
-					if(towns_crtc_reg[27] & 0x0010)  // vertical zoom
+					if(state->video.towns_crtc_reg[27] & 0x0010)  // vertical zoom
 					{
-						towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
+						towns_crtc_draw_scan_layer_hicolour(machine,bitmap,rect,layer,line,scanline);
 						scanline++;
 					}
 				}
@@ -1229,18 +1246,18 @@ void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const recta
 	{
 		scanline = rect->min_y;
 		height = (rect->max_y - rect->min_y);
-		if(towns_crtc_reg[27] & 0x1000)
+		if(state->video.towns_crtc_reg[27] & 0x1000)
 			height /= 2;
-		switch(towns_video_reg[0] & 0x0c)
+		switch(state->video.towns_video_reg[0] & 0x0c)
 		{
 			case 0x04:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
+					towns_crtc_draw_scan_layer_16(machine,bitmap,rect,layer,line,scanline);
 					scanline++;
-					if(towns_crtc_reg[27] & 0x1000)  // vertical zoom
+					if(state->video.towns_crtc_reg[27] & 0x1000)  // vertical zoom
 					{
-						towns_crtc_draw_scan_layer_16(bitmap,rect,layer,line,scanline);
+						towns_crtc_draw_scan_layer_16(machine,bitmap,rect,layer,line,scanline);
 						scanline++;
 					}
 				}
@@ -1248,11 +1265,11 @@ void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const recta
 			case 0x08:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
+					towns_crtc_draw_scan_layer_256(machine,bitmap,rect,layer,line,scanline);
 					scanline++;
-					if(towns_crtc_reg[27] & 0x1000)  // vertical zoom
+					if(state->video.towns_crtc_reg[27] & 0x1000)  // vertical zoom
 					{
-						towns_crtc_draw_scan_layer_256(bitmap,rect,layer,line,scanline);
+						towns_crtc_draw_scan_layer_256(machine,bitmap,rect,layer,line,scanline);
 						scanline++;
 					}
 				}
@@ -1260,11 +1277,11 @@ void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const recta
 			case 0x0c:
 				for(line=0;line<height;line++)
 				{
-					towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
+					towns_crtc_draw_scan_layer_hicolour(machine,bitmap,rect,layer,line,scanline);
 					scanline++;
-					if(towns_crtc_reg[27] & 0x1000)  // vertical zoom
+					if(state->video.towns_crtc_reg[27] & 0x1000)  // vertical zoom
 					{
-						towns_crtc_draw_scan_layer_hicolour(bitmap,rect,layer,line,scanline);
+						towns_crtc_draw_scan_layer_hicolour(machine,bitmap,rect,layer,line,scanline);
 						scanline++;
 					}
 				}
@@ -1275,9 +1292,10 @@ void towns_crtc_draw_layer(running_machine* machine,bitmap_t* bitmap,const recta
 
 void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 ascii, UINT16 jis, UINT8 attr)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	UINT32 rom_addr;
 	UINT32 vram_addr;
-	UINT16 linesize = towns_crtc_reg[24] * 4;
+	UINT16 linesize = state->video.towns_crtc_reg[24] * 4;
 	UINT8 code_h,code_l;
 	UINT8 colour;
 	UINT8 data;
@@ -1301,7 +1319,7 @@ void render_text_char(running_machine* machine, UINT8 x, UINT8 y, UINT8 ascii, U
 			                   | (((code_l - 0x20) & 0x40) << 6)
 			                   | ((code_h & 0x07) << 9);
 		}
-		else if(towns_kanji_code_h < 0x70)
+		else if(code_h < 0x70)
 		{
 			rom_addr = ((code_l & 0x1f) << 4)
 			                   + (((code_l - 0x20) & 0x60) << 8)
@@ -1370,13 +1388,14 @@ void draw_text_layer(running_machine* machine)
  *
  *  The video hardware renders text to VRAM layer 1, there is no separate text layer
  */
+	towns_state* state = (towns_state*)machine->driver_data;
 	int x,y,c = 0;
 
 	for(y=0;y<40;y++)
 	{
 		for(x=0;x<80;x++)
 		{
-			render_text_char(machine,x,y,towns_txtvram[c],((towns_txtvram[c+0x2000] << 8)|(towns_txtvram[c+0x2001])),towns_txtvram[c+1]);
+			render_text_char(machine,x,y,state->towns_txtvram[c],((state->towns_txtvram[c+0x2000] << 8)|(state->towns_txtvram[c+0x2001])),state->towns_txtvram[c+1]);
 			c+=2;
 		}
 	}
@@ -1385,56 +1404,64 @@ void draw_text_layer(running_machine* machine)
 static TIMER_CALLBACK( towns_vblank_end )
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
+	towns_state* state = (towns_state*)machine->driver_data;
 	running_device* dev = (running_device*)ptr;
 	pic8259_ir3_w(dev, 0);  // IRQ11 = VSync
-	towns_vblank_flag = 0;
+	logerror("PIC: IRQ11 (VSync) set low\n");
+	state->video.towns_vblank_flag = 0;
 }
 
 INTERRUPT_GEN( towns_vsync_irq )
 {
-	running_device* dev = devtag_get_device(device->machine,"pic8259_slave");
+	towns_state* state = (towns_state*)device->machine->driver_data;
+	running_device* dev = state->pic_slave;
 	pic8259_ir3_w(dev, 1);  // IRQ11 = VSync
-	towns_vblank_flag = 1;
+	logerror("PIC: IRQ11 (VSync) set high\n");
+	state->video.towns_vblank_flag = 1;
 	timer_set(device->machine,device->machine->primary_screen->time_until_vblank_end(),(void*)dev,0,towns_vblank_end);
-	if(towns_tvram_enable)
+	if(state->video.towns_tvram_enable)
 		draw_text_layer(dev->machine);
-	if(towns_sprite_reg[1] & 0x80)  // if sprites are enabled, then sprites are drawn on this layer.
-		draw_sprites(dev->machine,&towns_crtc_layerscr[1]);
+	if(state->video.towns_sprite_reg[1] & 0x80)  // if sprites are enabled, then sprites are drawn on this layer.
+		draw_sprites(dev->machine,&state->video.towns_crtc_layerscr[1]);
 }
 
 VIDEO_START( towns )
 {
-	towns_vram_wplane = 0x00;
+	towns_state* state = (towns_state*)machine->driver_data;
+
+	state->video.towns_vram_wplane = 0x00;
 }
 
 VIDEO_UPDATE( towns )
 {
+	towns_state* state = (towns_state*)screen->machine->driver_data;
+
 	bitmap_fill(bitmap,cliprect,0x00000000);
 
-	if(!(towns_video_reg[1] & 0x01))
+	if(!(state->video.towns_video_reg[1] & 0x01))
 	{
 		if(!input_code_pressed(screen->machine,KEYCODE_Q))
 		{
-			if((towns_layer_ctrl & 0x03) != 0)
-				towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[1],1);
+			if((state->video.towns_layer_ctrl & 0x03) != 0)
+				towns_crtc_draw_layer(screen->machine,bitmap,&state->video.towns_crtc_layerscr[1],1);
 		}
 		if(!input_code_pressed(screen->machine,KEYCODE_W))
 		{
-			if((towns_layer_ctrl & 0x0c) != 0)
-				towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[0],0);
+			if((state->video.towns_layer_ctrl & 0x0c) != 0)
+				towns_crtc_draw_layer(screen->machine,bitmap,&state->video.towns_crtc_layerscr[0],0);
 		}
 	}
 	else
 	{
 		if(!input_code_pressed(screen->machine,KEYCODE_Q))
 		{
-			if((towns_layer_ctrl & 0x0c) != 0)
-				towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[0],0);
+			if((state->video.towns_layer_ctrl & 0x0c) != 0)
+				towns_crtc_draw_layer(screen->machine,bitmap,&state->video.towns_crtc_layerscr[0],0);
 		}
 		if(!input_code_pressed(screen->machine,KEYCODE_W))
 		{
-			if((towns_layer_ctrl & 0x03) != 0)
-				towns_crtc_draw_layer(screen->machine,bitmap,&towns_crtc_layerscr[1],1);
+			if((state->video.towns_layer_ctrl & 0x03) != 0)
+				towns_crtc_draw_layer(screen->machine,bitmap,&state->video.towns_crtc_layerscr[1],1);
 		}
 	}
 

@@ -140,64 +140,6 @@ enum
 	MOUSE_Y_LOW
 };
 
-static UINT8 ftimer;
-static UINT8 nmi_mask;
-static UINT8 compat_mode;
-static UINT8 towns_system_port;
-UINT32 towns_ankcg_enable;
-UINT32 towns_mainmem_enable;
-static UINT32 towns_ram_enable;
-static UINT8* towns_cmos;
-UINT32* towns_vram;
-UINT8* towns_gfxvram;
-UINT8* towns_txtvram;
-//UINT8* towns_sprram;
-static int towns_selected_drive;
-static UINT8 towns_fdc_irq6mask;
-static UINT8* towns_serial_rom;
-static int towns_srom_position;
-static UINT8 towns_srom_clk;
-static UINT8 towns_srom_reset;
-static UINT8 towns_rtc_select;
-static UINT8 towns_rtc_data;
-static UINT8 towns_rtc_reg[16];
-static emu_timer* towns_rtc_timer;
-static UINT8 towns_timer_mask;
-static UINT16 towns_machine_id;  // default is 0x0101
-static UINT8 towns_kb_status;
-static UINT8 towns_kb_irq1_enable;
-static UINT8 towns_kb_output;  // key output
-static UINT8 towns_kb_extend;  // extended key output
-static emu_timer* towns_kb_timer;
-static emu_timer* towns_mouse_timer;
-static UINT8 towns_fm_irq_flag;
-static UINT8 towns_pcm_irq_flag;
-static UINT8 towns_pcm_channel_flag;
-static UINT8 towns_pcm_channel_mask;
-static UINT8 towns_pad_mask;
-static UINT8 towns_mouse_output;
-static UINT8 towns_mouse_x;
-static UINT8 towns_mouse_y;
-
-static struct towns_cdrom_controller
-{
-	UINT8 command;
-	UINT8 status;
-	UINT8 cmd_status[4];
-	UINT8 cmd_status_ptr;
-	UINT8 extra_status;
-	UINT8 parameter[8];
-	UINT8 mpu_irq_enable;
-	UINT8 dma_irq_enable;
-	UINT8 buffer[2048];
-	INT32 buffer_ptr;
-	UINT32 lba_current;
-	UINT32 lba_last;
-	UINT32 cdda_current;
-	UINT32 cdda_length;
-	emu_timer* read_timer;
-} towns_cd;
-
 static WRITE_LINE_DEVICE_HANDLER( towns_pic_irq );
 
 INLINE UINT8 byte_to_bcd(UINT8 val)
@@ -216,74 +158,77 @@ INLINE UINT32 msf_to_lba(UINT32 val)  // because the CDROM core doesn't provide 
 	f = bcd_to_byte(val & 0x0000ff);
 	s = (bcd_to_byte((val & 0x00ff00) >> 8));
 	m = (bcd_to_byte((val & 0xff0000) >> 16));
-	return (m * (60 * 75)) + (s * 75) + f;
+	return ((m * (60 * 75)) + (s * 75) + f);
 }
 
 static void towns_init_serial_rom(running_machine* machine)
 {
 	// TODO: init serial ROM contents
+	towns_state* state = (towns_state*)machine->driver_data;
 	int x;
 	UINT8 code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
 	UINT8* srom = memory_region(machine,"serial");
 
-	memset(towns_serial_rom,0,256/8);
+	memset(state->towns_serial_rom,0,256/8);
 
 	if(srom)
 	{
-		memcpy(towns_serial_rom,srom,32);
-		towns_machine_id = (towns_serial_rom[0x18] << 8) | towns_serial_rom[0x17];
-		popmessage("Machine ID in serial ROM: %04x",towns_machine_id);
+		memcpy(state->towns_serial_rom,srom,32);
+		state->towns_machine_id = (state->towns_serial_rom[0x18] << 8) | state->towns_serial_rom[0x17];
+		popmessage("Machine ID in serial ROM: %04x",state->towns_machine_id);
 		return;
 	}
 
 	for(x=8;x<=21;x++)
-		towns_serial_rom[x] = 0xff;
+		state->towns_serial_rom[x] = 0xff;
 
 	for(x=0;x<=7;x++)
 	{
-		towns_serial_rom[x] = code[x];
+		state->towns_serial_rom[x] = code[x];
 	}
 
 	// add Machine ID
-	towns_machine_id = 0x0101;
-	towns_serial_rom[0x17] = 0x01;
-	towns_serial_rom[0x18] = 0x01;
+	state->towns_machine_id = 0x0101;
+	state->towns_serial_rom[0x17] = 0x01;
+	state->towns_serial_rom[0x18] = 0x01;
 
 	// serial number?
-	towns_serial_rom[29] = 0x10;
-	towns_serial_rom[28] = 0x6e;
-	towns_serial_rom[27] = 0x54;
-	towns_serial_rom[26] = 0x32;
-	towns_serial_rom[25] = 0x10;
+	state->towns_serial_rom[29] = 0x10;
+	state->towns_serial_rom[28] = 0x6e;
+	state->towns_serial_rom[27] = 0x54;
+	state->towns_serial_rom[26] = 0x32;
+	state->towns_serial_rom[25] = 0x10;
 }
 
-static void towns_init_rtc(void)
+static void towns_init_rtc(running_machine* machine)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	// for now, we'll just keep a static time stored here
 	// seconds
-	towns_rtc_reg[0] = 0;
-	towns_rtc_reg[1] = 3;
+	state->towns_rtc_reg[0] = 0;
+	state->towns_rtc_reg[1] = 3;
 	// minutes
-	towns_rtc_reg[2] = 2;
-	towns_rtc_reg[3] = 1;
+	state->towns_rtc_reg[2] = 2;
+	state->towns_rtc_reg[3] = 1;
 	// hours
-	towns_rtc_reg[4] = 8;
-	towns_rtc_reg[5] = 0;
+	state->towns_rtc_reg[4] = 8;
+	state->towns_rtc_reg[5] = 0;
 	// weekday
-	towns_rtc_reg[6] = 2;
+	state->towns_rtc_reg[6] = 2;
 	// day
-	towns_rtc_reg[7] = 1;
-	towns_rtc_reg[8] = 1;
+	state->towns_rtc_reg[7] = 1;
+	state->towns_rtc_reg[8] = 1;
 	// month
-	towns_rtc_reg[9] = 6;
-	towns_rtc_reg[10] = 0;
+	state->towns_rtc_reg[9] = 6;
+	state->towns_rtc_reg[10] = 0;
 	// year
-	towns_rtc_reg[11] = 9;
-	towns_rtc_reg[12] = 0;
+	state->towns_rtc_reg[11] = 9;
+	state->towns_rtc_reg[12] = 0;
 }
 
 static READ8_HANDLER(towns_system_r)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	UINT8 ret = 0;
 
 	switch(offset)
@@ -296,22 +241,22 @@ static READ8_HANDLER(towns_system_r)
 			return 0x00;
 		case 0x06:
 			//logerror("SYS: (0x26) timer read\n");
-			ftimer -= 0x13;
-			return ftimer;
+			state->ftimer -= 0x13;
+			return state->ftimer;
 		case 0x08:
 			//logerror("SYS: (0x28) NMI mask read\n");
-			return nmi_mask & 0x01;
+			return state->nmi_mask & 0x01;
 		case 0x10:
 			logerror("SYS: (0x30) Machine ID read\n");
-			return (towns_machine_id >> 8) & 0xff;
+			return (state->towns_machine_id >> 8) & 0xff;
 		case 0x11:
 			logerror("SYS: (0x31) Machine ID read\n");
-			return towns_machine_id & 0xff;
+			return state->towns_machine_id & 0xff;
 		case 0x12:
 			/* Bit 0 = data, bit 6 = CLK, bit 7 = RESET, bit 5 is always 1? */
-			ret = (towns_serial_rom[towns_srom_position/8] & (1 << (towns_srom_position%8))) ? 1 : 0;
-			ret |= towns_srom_clk;
-			ret |= towns_srom_reset;
+			ret = (state->towns_serial_rom[state->towns_srom_position/8] & (1 << (state->towns_srom_position%8))) ? 1 : 0;
+			ret |= state->towns_srom_clk;
+			ret |= state->towns_srom_reset;
 			//logerror("SYS: (0x32) Serial ROM read [0x%02x, pos=%i]\n",ret,towns_srom_position);
 			return ret;
 		default:
@@ -322,6 +267,8 @@ static READ8_HANDLER(towns_system_r)
 
 static WRITE8_HANDLER(towns_system_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
 	switch(offset)
 	{
 		case 0x00:  // bit 7 = NMI vector protect, bit 6 = power off, bit 0 = software reset
@@ -332,21 +279,21 @@ static WRITE8_HANDLER(towns_system_w)
 			break;
 		case 0x08:
 			//logerror("SYS: (0x28) NMI mask write %02x\n",data);
-			nmi_mask = data & 0x01;
+			state->nmi_mask = data & 0x01;
 			break;
 		case 0x12:
 			//logerror("SYS: (0x32) Serial ROM write %02x\n",data);
 			// clocks on low-to-high transition
-			if((data & 0x40) && towns_srom_clk == 0) // CLK
+			if((data & 0x40) && state->towns_srom_clk == 0) // CLK
 			{  // advance to next bit
-				towns_srom_position++;
+				state->towns_srom_position++;
 			}
-			if((data & 0x80) && towns_srom_reset == 0) // reset
+			if((data & 0x80) && state->towns_srom_reset == 0) // reset
 			{  // reset to beginning
-				towns_srom_position = 0;
+				state->towns_srom_position = 0;
 			}
-			towns_srom_clk = data & 0x40;
-			towns_srom_reset = data & 0x80;
+			state->towns_srom_clk = data & 0x40;
+			state->towns_srom_reset = data & 0x80;
 			break;
 		default:
 			logerror("SYS: Unknown system port write 0x%02x (0x%02x)\n",data,offset);
@@ -361,13 +308,15 @@ static READ8_HANDLER(towns_sys6c_r)
 
 static WRITE8_HANDLER(towns_sys6c_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 //  logerror("SYS: (0x6c) write to timer (0x%02x)\n",data);
-	ftimer -= 0x54;
+	state->ftimer -= 0x54;
 }
 
 static READ8_HANDLER(towns_dma1_r)
 {
-	running_device* dev = devtag_get_device(space->machine,"dma_1");
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	running_device* dev = state->dma_1;
 
 	logerror("DMA#1: read register %i\n",offset);
 	return upd71071_r(dev,offset);
@@ -375,7 +324,8 @@ static READ8_HANDLER(towns_dma1_r)
 
 static WRITE8_HANDLER(towns_dma1_w)
 {
-	running_device* dev = devtag_get_device(space->machine,"dma_1");
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	running_device* dev = state->dma_1;
 
 	logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
 	upd71071_w(dev,offset,data);
@@ -383,7 +333,8 @@ static WRITE8_HANDLER(towns_dma1_w)
 
 static READ8_HANDLER(towns_dma2_r)
 {
-	running_device* dev = devtag_get_device(space->machine,"dma_2");
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	running_device* dev = state->dma_2;
 
 	logerror("DMA#2: read register %i\n",offset);
 	return upd71071_r(dev,offset);
@@ -391,7 +342,8 @@ static READ8_HANDLER(towns_dma2_r)
 
 static WRITE8_HANDLER(towns_dma2_w)
 {
-	running_device* dev = devtag_get_device(space->machine,"dma_2");
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	running_device* dev = state->dma_2;
 
 	logerror("DMA#2: wrote 0x%02x to register %i\n",data,offset);
 	upd71071_w(dev,offset,data);
@@ -403,7 +355,9 @@ static WRITE8_HANDLER(towns_dma2_w)
 
 static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_irq_w )
 {
-	if(towns_fdc_irq6mask == 0)
+	towns_state* tstate = (towns_state*)device->machine->driver_data;
+
+	if(tstate->towns_fdc_irq6mask == 0)
 		state = 0;
 	pic8259_ir6_w(device, state);  // IRQ6 = FDC
 	logerror("PIC: IRQ6 (FDC) set to %i\n",state);
@@ -416,7 +370,8 @@ static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_drq_w )
 
 static READ8_HANDLER(towns_floppy_r)
 {
-	running_device* fdc = devtag_get_device(space->machine,"fdc");
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	running_device* fdc = state->fdc;
 
 	switch(offset)
 	{
@@ -430,7 +385,7 @@ static READ8_HANDLER(towns_floppy_r)
 			return wd17xx_data_r(fdc,offset/2);
 		case 0x08:  // selected drive status?
 			//logerror("FDC: read from offset 0x08\n");
-			if(towns_selected_drive < 1 || towns_selected_drive > 2)
+			if(state->towns_selected_drive < 1 || state->towns_selected_drive > 2)
 				return 0x01;
 			else
 				return 0x07;
@@ -445,7 +400,8 @@ static READ8_HANDLER(towns_floppy_r)
 
 static WRITE8_HANDLER(towns_floppy_w)
 {
-	running_device* fdc = devtag_get_device(space->machine,"fdc");
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	running_device* fdc = state->fdc;
 
 	switch(offset)
 	{
@@ -468,37 +424,37 @@ static WRITE8_HANDLER(towns_floppy_w)
 			break;
 		case 0x08:
 			// bit 5 - CLKSEL
-			if(towns_selected_drive != 0 && towns_selected_drive < 2)
+			if(state->towns_selected_drive != 0 && state->towns_selected_drive < 2)
 			{
-				floppy_mon_w(floppy_get_device(space->machine, towns_selected_drive-1), !BIT(data, 4));
-				floppy_drive_set_ready_state(floppy_get_device(space->machine, towns_selected_drive-1), data & 0x10,0);
+				floppy_mon_w(floppy_get_device(space->machine, state->towns_selected_drive-1), !BIT(data, 4));
+				floppy_drive_set_ready_state(floppy_get_device(space->machine, state->towns_selected_drive-1), data & 0x10,0);
 			}
 			wd17xx_set_side(fdc,(data & 0x04)>>2);
 			wd17xx_dden_w(fdc, BIT(~data, 1));
 
-			towns_fdc_irq6mask = data & 0x01;
+			state->towns_fdc_irq6mask = data & 0x01;
 			logerror("FDC: write %02x to offset 0x08\n",data);
 			break;
 		case 0x0c:  // drive select
 			switch(data & 0x0f)
 			{
 				case 0x00:
-					towns_selected_drive = 0;  // No drive selected
+					state->towns_selected_drive = 0;  // No drive selected
 					break;
 				case 0x01:
-					towns_selected_drive = 1;
+					state->towns_selected_drive = 1;
 					wd17xx_set_drive(fdc,0);
 					break;
 				case 0x02:
-					towns_selected_drive = 2;
+					state->towns_selected_drive = 2;
 					wd17xx_set_drive(fdc,1);
 					break;
 				case 0x04:
-					towns_selected_drive = 3;
+					state->towns_selected_drive = 3;
 					wd17xx_set_drive(fdc,2);
 					break;
 				case 0x08:
-					towns_selected_drive = 4;
+					state->towns_selected_drive = 4;
 					wd17xx_set_drive(fdc,3);
 					break;
 			}
@@ -511,13 +467,15 @@ static WRITE8_HANDLER(towns_floppy_w)
 
 static UINT16 towns_fdc_dma_r(running_machine* machine)
 {
-	running_device* fdc = devtag_get_device(machine,"fdc");
+	towns_state* state = (towns_state*)machine->driver_data;
+	running_device* fdc = state->fdc;
 	return wd17xx_data_r(fdc,0);
 }
 
 static void towns_fdc_dma_w(running_machine* machine, UINT16 data)
 {
-	running_device* fdc = devtag_get_device(machine,"fdc");
+	towns_state* state = (towns_state*)machine->driver_data;
+	running_device* fdc = state->fdc;
 	wd17xx_data_w(fdc,0,data);
 }
 
@@ -539,37 +497,38 @@ static void towns_fdc_dma_w(running_machine* machine, UINT16 data)
  */
 static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int release)
 {
-	running_device* dev = devtag_get_device(machine,"pic8259_master");
+	towns_state* state = (towns_state*)machine->driver_data;
+	running_device* dev = state->pic_master;
 
 	switch(release)
 	{
 		case 0:  // key press
-			towns_kb_output = 0x80;
-			towns_kb_extend = scancode & 0x7f;
+			state->towns_kb_output = 0x80;
+			state->towns_kb_extend = scancode & 0x7f;
 			if(input_port_read(machine,"key3") & 0x00080000)
-				towns_kb_output |= 0x04;
+				state->towns_kb_output |= 0x04;
 			if(input_port_read(machine,"key3") & 0x00040000)
-				towns_kb_output |= 0x08;
+				state->towns_kb_output |= 0x08;
 			if(input_port_read(machine,"key3") & 0x06400000)
-				towns_kb_output |= 0x20;
+				state->towns_kb_output |= 0x20;
 			break;
 		case 1:  // key release
-			towns_kb_output = 0x90;
-			towns_kb_extend = scancode & 0x7f;
+			state->towns_kb_output = 0x90;
+			state->towns_kb_extend = scancode & 0x7f;
 			if(input_port_read(machine,"key3") & 0x00080000)
-				towns_kb_output |= 0x04;
+				state->towns_kb_output |= 0x04;
 			if(input_port_read(machine,"key3") & 0x00040000)
-				towns_kb_output |= 0x08;
+				state->towns_kb_output |= 0x08;
 			if(input_port_read(machine,"key3") & 0x06400000)
-				towns_kb_output |= 0x20;
+				state->towns_kb_output |= 0x20;
 			break;
 		case 2:  // extended byte
-			towns_kb_output = scancode;
-			towns_kb_extend = 0xff;
+			state->towns_kb_output = scancode;
+			state->towns_kb_extend = 0xff;
 			break;
 	}
-	towns_kb_status |= 0x01;
-	if(towns_kb_irq1_enable)
+	state->towns_kb_status |= 0x01;
+	if(state->towns_kb_irq1_enable)
 	{
 		pic8259_ir1_w(dev, 1);
 		logerror("PIC: IRQ1 (keyboard) set high\n");
@@ -606,24 +565,26 @@ static TIMER_CALLBACK( poll_keyboard )
 
 static READ8_HANDLER(towns_keyboard_r)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	UINT8 ret = 0x00;
+
 	switch(offset)
 	{
 		case 0:  // scancode output
-			ret = towns_kb_output;
+			ret = state->towns_kb_output;
 			//logerror("KB: read keyboard output port, returning %02x\n",ret);
-			pic8259_ir1_w(devtag_get_device(space->machine,"pic8259_master"), 0);
+			pic8259_ir1_w(state->pic_master, 0);
 			logerror("PIC: IRQ1 (keyboard) set low\n");
-			if(towns_kb_extend != 0xff)
+			if(state->towns_kb_extend != 0xff)
 			{
-				towns_kb_sendcode(space->machine,towns_kb_extend,2);
+				towns_kb_sendcode(space->machine,state->towns_kb_extend,2);
 			}
 			else
-				towns_kb_status &= ~0x01;
+				state->towns_kb_status &= ~0x01;
 			return ret;
 		case 1:  // status
-			logerror("KB: read status port, returning %02x\n",towns_kb_status);
-			return towns_kb_status;
+			logerror("KB: read status port, returning %02x\n",state->towns_kb_status);
+			return state->towns_kb_status;
 		default:
 			logerror("KB: read offset %02x\n",offset);
 	}
@@ -632,17 +593,19 @@ static READ8_HANDLER(towns_keyboard_r)
 
 static WRITE8_HANDLER(towns_keyboard_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
 	switch(offset)
 	{
 		case 0:  // command input
-			towns_kb_status &= ~0x08;
-			towns_kb_status |= 0x01;
+			state->towns_kb_status &= ~0x08;
+			state->towns_kb_status |= 0x01;
 			break;
 		case 1:  // control
-			towns_kb_status |= 0x08;
+			state->towns_kb_status |= 0x08;
 			break;
 		case 2:  // IRQ1 enable
-			towns_kb_irq1_enable = data & 0x01;
+			state->towns_kb_irq1_enable = data & 0x01;
 			break;
 		default:
 			logerror("KB: wrote 0x%02x to offset %02x\n",data,offset);
@@ -659,14 +622,15 @@ static WRITE8_HANDLER(towns_keyboard_w)
  */
 static READ8_HANDLER(towns_port60_r)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	UINT8 val = 0x00;
 
-	if ( pit8253_get_output(devtag_get_device(space->machine, "pit"), 0 ) )
+	if ( pit8253_get_output(state->pit, 0 ) )
 		val |= 0x01;
-	if ( pit8253_get_output(devtag_get_device(space->machine, "pit"), 1 ) )
+	if ( pit8253_get_output(state->pit, 1 ) )
 		val |= 0x02;
 
-	val |= (towns_timer_mask & 0x07) << 2;
+	val |= (state->towns_timer_mask & 0x07) << 2;
 
 	//logerror("PIT: port 0x60 read, returning 0x%02x\n",val);
 	return val;
@@ -674,19 +638,22 @@ static READ8_HANDLER(towns_port60_r)
 
 static WRITE8_HANDLER(towns_port60_w)
 {
-	running_device* dev = devtag_get_device(space->machine,"pic8259_master");
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	running_device* dev = state->pic_master;
 
 	if(data & 0x80)
 	{
 		towns_pic_irq(dev,0);
 	}
-	towns_timer_mask = data & 0x07;
+	state->towns_timer_mask = data & 0x07;
 	// bit 2 = sound (beeper?)
 	//logerror("PIT: wrote 0x%02x to port 0x60\n",data);
 }
 
 static READ32_HANDLER(towns_sys5e8_r)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
 	switch(offset)
 	{
 		case 0x00:
@@ -700,7 +667,7 @@ static READ32_HANDLER(towns_sys5e8_r)
 			if(ACCESSING_BITS_0_7)
 			{
 				logerror("SYS: read port 5ec\n");
-				return compat_mode & 0x01;
+				return state->compat_mode & 0x01;
 			}
 			break;
 	}
@@ -709,6 +676,8 @@ static READ32_HANDLER(towns_sys5e8_r)
 
 static WRITE32_HANDLER(towns_sys5e8_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
 	switch(offset)
 	{
 		case 0x00:
@@ -721,7 +690,7 @@ static WRITE32_HANDLER(towns_sys5e8_w)
 			if(ACCESSING_BITS_0_7)
 			{
 				logerror("SYS: wrote 0x%02x to port 5ec\n",data);
-				compat_mode = data & 0x01;
+				state->compat_mode = data & 0x01;
 			}
 			break;
 	}
@@ -734,21 +703,22 @@ static WRITE32_HANDLER(towns_sys5e8_w)
 // W/O  -- (0x4ec) LED control
 static READ8_HANDLER(towns_sound_ctrl_r)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	UINT8 ret = 0;
 
 	switch(offset)
 	{
 		case 0x01:
-			if(towns_fm_irq_flag)
+			if(state->towns_fm_irq_flag)
 				ret |= 0x01;
-			if(towns_pcm_irq_flag)
+			if(state->towns_pcm_irq_flag)
 				ret |= 0x08;
 			break;
 		case 0x03:
-			ret = towns_pcm_channel_flag;
-			towns_pcm_channel_flag = 0;
-			towns_pcm_irq_flag = 0;
-			pic8259_ir5_w(devtag_get_device(space->machine,"pic8259_slave"), 0);
+			ret = state->towns_pcm_channel_flag;
+			state->towns_pcm_channel_flag = 0;
+			state->towns_pcm_irq_flag = 0;
+			pic8259_ir5_w(state->pic_slave, 0);
 			logerror("PIC: IRQ13 (PCM) set low\n");
 			break;
 		default:
@@ -759,10 +729,11 @@ static READ8_HANDLER(towns_sound_ctrl_r)
 
 static WRITE8_HANDLER(towns_sound_ctrl_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	switch(offset)
 	{
 		case 0x02:  // PCM channel interrupt mask
-			towns_pcm_channel_mask = data;
+			state->towns_pcm_channel_mask = data;
 			break;
 		default:
 			logerror("FM: unimplemented port 0x%04x write %02x\n",offset + 0x4e8,data);
@@ -773,11 +744,13 @@ static WRITE8_HANDLER(towns_sound_ctrl_w)
 // Joysticks are multiplexed, with fire buttons available when bits 0 and 1 of port 0x4d6 are high. (bits 2 and 3 for second port?)
 static TIMER_CALLBACK(towns_mouse_timeout)
 {
-	towns_mouse_output = MOUSE_START;  // reset mouse data
+	towns_state* state = (towns_state*)machine->driver_data;
+	state->towns_mouse_output = MOUSE_START;  // reset mouse data
 }
 
 static READ32_HANDLER(towns_padport_r)
 {
+	towns_state* tstate = (towns_state*)space->machine->driver_data;
 	UINT32 ret = 0;
 	UINT32 porttype = input_port_read(space->machine,"ctrltype");
 	UINT8 extra1;
@@ -792,7 +765,7 @@ static READ32_HANDLER(towns_padport_r)
 	{
 		extra1 = input_port_read(space->machine,"joy1_ex");
 
-		if(towns_pad_mask & 0x10)
+		if(tstate->towns_pad_mask & 0x10)
 			ret |= (input_port_read(space->machine,"joy1") & 0x3f) | 0x00000040;
 		else
 			ret |= (input_port_read(space->machine,"joy1") & 0x0f) | 0x00000030;
@@ -802,16 +775,16 @@ static READ32_HANDLER(towns_padport_r)
 		if(extra1 & 0x02) // Select button = up+down
 			ret &= ~0x00000003;
 
-		if((extra1 & 0x10) && (towns_pad_mask & 0x01))
+		if((extra1 & 0x10) && (tstate->towns_pad_mask & 0x01))
 			ret &= ~0x00000010;
-		if((extra1 & 0x20) && (towns_pad_mask & 0x02))
+		if((extra1 & 0x20) && (tstate->towns_pad_mask & 0x02))
 			ret &= ~0x00000020;
 	}
 	if((porttype & 0xf0) == 0x10)
 	{
 		extra2 = input_port_read(space->machine,"joy2_ex");
 
-		if(towns_pad_mask & 0x20)
+		if(tstate->towns_pad_mask & 0x20)
 			ret |= ((input_port_read(space->machine,"joy2") & 0x3f) << 16) | 0x00400000;
 		else
 			ret |= ((input_port_read(space->machine,"joy2") & 0x0f) << 16) | 0x00300000;
@@ -821,31 +794,31 @@ static READ32_HANDLER(towns_padport_r)
 		if(extra2 & 0x02)
 			ret &= ~0x00030000;
 
-		if((extra2 & 0x10) && (towns_pad_mask & 0x04))
+		if((extra2 & 0x10) && (tstate->towns_pad_mask & 0x04))
 			ret &= ~0x00100000;
-		if((extra2 & 0x20) && (towns_pad_mask & 0x08))
+		if((extra2 & 0x20) && (tstate->towns_pad_mask & 0x08))
 			ret &= ~0x00200000;
 	}
 	if((porttype & 0x0f) == 0x02)  // mouse
 	{
-		switch(towns_mouse_output)
+		switch(tstate->towns_mouse_output)
 		{
 			case MOUSE_X_HIGH:
-				ret |= ((towns_mouse_x & 0xf0) >> 4);
+				ret |= ((tstate->towns_mouse_x & 0xf0) >> 4);
 				break;
 			case MOUSE_X_LOW:
-				ret |= (towns_mouse_x & 0x0f);
+				ret |= (tstate->towns_mouse_x & 0x0f);
 				break;
 			case MOUSE_Y_HIGH:
-				ret |= ((towns_mouse_y & 0xf0) >> 4);
+				ret |= ((tstate->towns_mouse_y & 0xf0) >> 4);
 				break;
 			case MOUSE_Y_LOW:
-				ret |= (towns_mouse_y & 0x0f);
+				ret |= (tstate->towns_mouse_y & 0x0f);
 				break;
 			case MOUSE_START:
 			case MOUSE_SYNC:
 			default:
-				if(towns_mouse_output < MOUSE_Y_LOW)
+				if(tstate->towns_mouse_output < MOUSE_Y_LOW)
 					ret |= 0x0000000f;
 		}
 
@@ -855,29 +828,29 @@ static READ32_HANDLER(towns_padport_r)
 			ret |= 0x00000010;
 		if(!(state & 0x02))
 			ret |= 0x00000020;
-		if(towns_pad_mask & 0x10)
+		if(tstate->towns_pad_mask & 0x10)
 			ret |= 0x00000040;
 	}
 	if((porttype & 0xf0) == 0x20)  // mouse
 	{
-		switch(towns_mouse_output)
+		switch(tstate->towns_mouse_output)
 		{
 			case MOUSE_X_HIGH:
-				ret |= ((towns_mouse_x & 0xf0) << 12);
+				ret |= ((tstate->towns_mouse_x & 0xf0) << 12);
 				break;
 			case MOUSE_X_LOW:
-				ret |= ((towns_mouse_x & 0x0f) << 16);
+				ret |= ((tstate->towns_mouse_x & 0x0f) << 16);
 				break;
 			case MOUSE_Y_HIGH:
-				ret |= ((towns_mouse_y & 0xf0) << 12);
+				ret |= ((tstate->towns_mouse_y & 0xf0) << 12);
 				break;
 			case MOUSE_Y_LOW:
-				ret |= ((towns_mouse_y & 0x0f) << 16);
+				ret |= ((tstate->towns_mouse_y & 0x0f) << 16);
 				break;
 			case MOUSE_START:
 			case MOUSE_SYNC:
 			default:
-				if(towns_mouse_output < MOUSE_Y_LOW)
+				if(tstate->towns_mouse_output < MOUSE_Y_LOW)
 					ret |= 0x000f0000;
 		}
 
@@ -887,7 +860,7 @@ static READ32_HANDLER(towns_padport_r)
 			ret |= 0x00100000;
 		if(!(state & 0x02))
 			ret |= 0x00200000;
-		if(towns_pad_mask & 0x20)
+		if(tstate->towns_pad_mask & 0x20)
 			ret |= 0x00400000;
 	}
 
@@ -896,6 +869,7 @@ static READ32_HANDLER(towns_padport_r)
 
 static WRITE32_HANDLER(towns_pad_mask_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	static UINT8 prev;
 	static UINT8 prev_x,prev_y;
 	UINT8 current_x,current_y;
@@ -903,139 +877,146 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 
 	if(ACCESSING_BITS_16_23)
 	{
-		towns_pad_mask = (data & 0x00ff0000) >> 16;
+		state->towns_pad_mask = (data & 0x00ff0000) >> 16;
 		if((type & 0x0f) == 0x02)  // mouse
 		{
-			if((towns_pad_mask & 0x10) != 0 && (prev & 0x10) == 0)
+			if((state->towns_pad_mask & 0x10) != 0 && (prev & 0x10) == 0)
 			{
-				if(towns_mouse_output == MOUSE_START)
+				if(state->towns_mouse_output == MOUSE_START)
 				{
-					towns_mouse_output = MOUSE_X_HIGH;
+					state->towns_mouse_output = MOUSE_X_HIGH;
 					current_x = input_port_read(space->machine,"mouse2");
 					current_y = input_port_read(space->machine,"mouse3");
-					towns_mouse_x = prev_x - current_x;
-					towns_mouse_y = prev_y - current_y;
+					state->towns_mouse_x = prev_x - current_x;
+					state->towns_mouse_y = prev_y - current_y;
 					prev_x = current_x;
 					prev_y = current_y;
 				}
 				else
-					towns_mouse_output++;
-				timer_adjust_periodic(towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
+					state->towns_mouse_output++;
+				timer_adjust_periodic(state->towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
 			}
-			if((towns_pad_mask & 0x10) == 0 && (prev & 0x10) != 0)
+			if((state->towns_pad_mask & 0x10) == 0 && (prev & 0x10) != 0)
 			{
-				if(towns_mouse_output == MOUSE_START)
+				if(state->towns_mouse_output == MOUSE_START)
 				{
-					towns_mouse_output = MOUSE_SYNC;
+					state->towns_mouse_output = MOUSE_SYNC;
 					current_x = input_port_read(space->machine,"mouse2");
 					current_y = input_port_read(space->machine,"mouse3");
-					towns_mouse_x = prev_x - current_x;
-					towns_mouse_y = prev_y - current_y;
+					state->towns_mouse_x = prev_x - current_x;
+					state->towns_mouse_y = prev_y - current_y;
 					prev_x = current_x;
 					prev_y = current_y;
 				}
 				else
-					towns_mouse_output++;
-				timer_adjust_periodic(towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
+					state->towns_mouse_output++;
+				timer_adjust_periodic(state->towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
 			}
-			prev = towns_pad_mask;
+			prev = state->towns_pad_mask;
 		}
 		if((type & 0xf0) == 0x20)  // mouse
 		{
-			if((towns_pad_mask & 0x20) != 0 && (prev & 0x20) == 0)
+			if((state->towns_pad_mask & 0x20) != 0 && (prev & 0x20) == 0)
 			{
-				if(towns_mouse_output == MOUSE_START)
+				if(state->towns_mouse_output == MOUSE_START)
 				{
-					towns_mouse_output = MOUSE_X_HIGH;
+					state->towns_mouse_output = MOUSE_X_HIGH;
 					current_x = input_port_read(space->machine,"mouse2");
 					current_y = input_port_read(space->machine,"mouse3");
-					towns_mouse_x = prev_x - current_x;
-					towns_mouse_y = prev_y - current_y;
+					state->towns_mouse_x = prev_x - current_x;
+					state->towns_mouse_y = prev_y - current_y;
 					prev_x = current_x;
 					prev_y = current_y;
 				}
 				else
-					towns_mouse_output++;
-				timer_adjust_periodic(towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
+					state->towns_mouse_output++;
+				timer_adjust_periodic(state->towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
 			}
-			if((towns_pad_mask & 0x20) == 0 && (prev & 0x20) != 0)
+			if((state->towns_pad_mask & 0x20) == 0 && (prev & 0x20) != 0)
 			{
-				if(towns_mouse_output == MOUSE_START)
+				if(state->towns_mouse_output == MOUSE_START)
 				{
-					towns_mouse_output = MOUSE_SYNC;
+					state->towns_mouse_output = MOUSE_SYNC;
 					current_x = input_port_read(space->machine,"mouse2");
 					current_y = input_port_read(space->machine,"mouse3");
-					towns_mouse_x = prev_x - current_x;
-					towns_mouse_y = prev_y - current_y;
+					state->towns_mouse_x = prev_x - current_x;
+					state->towns_mouse_y = prev_y - current_y;
 					prev_x = current_x;
 					prev_y = current_y;
 				}
 				else
-					towns_mouse_output++;
-				timer_adjust_periodic(towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
+					state->towns_mouse_output++;
+				timer_adjust_periodic(state->towns_mouse_timer,ATTOTIME_IN_USEC(600),0,attotime_zero);
 			}
-			prev = towns_pad_mask;
+			prev = state->towns_pad_mask;
 		}
 	}
 }
 
 static READ8_HANDLER( towns_cmos8_r )
 {
-	return towns_cmos[offset];
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	return state->towns_cmos[offset];
 }
 
 static WRITE8_HANDLER( towns_cmos8_w )
 {
-	towns_cmos[offset] = data;
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	state->towns_cmos[offset] = data;
 }
 
 static READ8_HANDLER( towns_cmos_low_r )
 {
-	if(towns_mainmem_enable != 0)
-		return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset + 0xd8000];
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	if(state->towns_mainmem_enable != 0)
+		return messram_get_ptr(state->messram)[offset + 0xd8000];
 
-	return towns_cmos[offset];
+	return state->towns_cmos[offset];
 }
 
 static WRITE8_HANDLER( towns_cmos_low_w )
 {
-	if(towns_mainmem_enable != 0)
-		messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset+0xd8000] = data;
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	if(state->towns_mainmem_enable != 0)
+		messram_get_ptr(state->messram)[offset+0xd8000] = data;
 	else
-		towns_cmos[offset] = data;
+		state->towns_cmos[offset] = data;
 }
 
 static READ8_HANDLER( towns_cmos_r )
 {
-	return towns_cmos[offset];
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	return state->towns_cmos[offset];
 }
 
 static WRITE8_HANDLER( towns_cmos_w )
 {
-	towns_cmos[offset] = data;
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	state->towns_cmos[offset] = data;
 }
 
 void towns_update_video_banks(const address_space* space)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	UINT8* ROM;
 
-	if(towns_mainmem_enable != 0)  // first MB is RAM
+	if(state->towns_mainmem_enable != 0)  // first MB is RAM
 	{
 		ROM = memory_region(space->machine,"user");
 
-//      memory_set_bankptr(space->machine,1,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc0000);
-//      memory_set_bankptr(space->machine,2,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc8000);
-//      memory_set_bankptr(space->machine,3,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc9000);
-//      memory_set_bankptr(space->machine,4,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca000);
-//      memory_set_bankptr(space->machine,5,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca000);
-//      memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
-		memory_set_bankptr(space->machine,"bank6",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
-		memory_set_bankptr(space->machine,"bank7",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
-		if(towns_system_port & 0x02)
-			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
+//      memory_set_bankptr(space->machine,1,messram_get_ptr(state->messram)+0xc0000);
+//      memory_set_bankptr(space->machine,2,messram_get_ptr(state->messram)+0xc8000);
+//      memory_set_bankptr(space->machine,3,messram_get_ptr(state->messram)+0xc9000);
+//      memory_set_bankptr(space->machine,4,messram_get_ptr(state->messram)+0xca000);
+//      memory_set_bankptr(space->machine,5,messram_get_ptr(state->messram)+0xca000);
+//      memory_set_bankptr(space->machine,10,messram_get_ptr(state->messram)+0xca800);
+		memory_set_bankptr(space->machine,"bank6",messram_get_ptr(state->messram)+0xcb000);
+		memory_set_bankptr(space->machine,"bank7",messram_get_ptr(state->messram)+0xcb000);
+		if(state->towns_system_port & 0x02)
+			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(state->messram)+0xf8000);
 		else
 			memory_set_bankptr(space->machine,"bank11",ROM+0x238000);
-		memory_set_bankptr(space->machine,"bank12",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
+		memory_set_bankptr(space->machine,"bank12",messram_get_ptr(state->messram)+0xf8000);
 		return;
 	}
 	else  // enable I/O ports and VRAM
@@ -1044,30 +1025,31 @@ void towns_update_video_banks(const address_space* space)
 
 //      memory_set_bankptr(space->machine,1,towns_gfxvram+(towns_vram_rplane*0x8000));
 //      memory_set_bankptr(space->machine,2,towns_txtvram);
-//      memory_set_bankptr(space->machine,3,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xc9000);
+//      memory_set_bankptr(space->machine,3,messram_get_ptr(state->messram)+0xc9000);
 //      if(towns_ankcg_enable != 0)
 //          memory_set_bankptr(space->machine,4,ROM+0x180000+0x3d000);  // ANK CG 8x8
 //      else
 //          memory_set_bankptr(space->machine,4,towns_txtvram+0x2000);
 //      memory_set_bankptr(space->machine,5,towns_txtvram+0x2000);
-//      memory_set_bankptr(space->machine,10,messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xca800);
-		if(towns_ankcg_enable != 0)
+//      memory_set_bankptr(space->machine,10,messram_get_ptr(state->messram)+0xca800);
+		if(state->towns_ankcg_enable != 0)
 			memory_set_bankptr(space->machine,"bank6",ROM+0x180000+0x3d800);  // ANK CG 8x16
 		else
-			memory_set_bankptr(space->machine,"bank6",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
-		memory_set_bankptr(space->machine,"bank7",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xcb000);
-		if(towns_system_port & 0x02)
-			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
+			memory_set_bankptr(space->machine,"bank6",messram_get_ptr(state->messram)+0xcb000);
+		memory_set_bankptr(space->machine,"bank7",messram_get_ptr(state->messram)+0xcb000);
+		if(state->towns_system_port & 0x02)
+			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(state->messram)+0xf8000);
 		else
 			memory_set_bankptr(space->machine,"bank11",ROM+0x238000);
-		memory_set_bankptr(space->machine,"bank12",messram_get_ptr(devtag_get_device(space->machine, "messram"))+0xf8000);
+		memory_set_bankptr(space->machine,"bank12",messram_get_ptr(state->messram)+0xf8000);
 		return;
 	}
 }
 
 static READ8_HANDLER( towns_sys480_r )
 {
-	if(towns_system_port & 0x02)
+	towns_state* state = (towns_state*)space->machine->driver_data;
+	if(state->towns_system_port & 0x02)
 		return 0x02;
 	else
 		return 0x00;
@@ -1075,25 +1057,31 @@ static READ8_HANDLER( towns_sys480_r )
 
 static WRITE8_HANDLER( towns_sys480_w )
 {
-	towns_system_port = data;
-	towns_ram_enable = data & 0x02;
+	towns_state* state = (towns_state*)space->machine->driver_data;
+
+	state->towns_system_port = data;
+	state->towns_ram_enable = data & 0x02;
 	towns_update_video_banks(space);
 }
 
 static WRITE32_HANDLER( towns_video_404_w )
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	if(ACCESSING_BITS_0_7)
 	{
-		towns_mainmem_enable = data & 0x80;
+		state->towns_mainmem_enable = data & 0x80;
 		towns_update_video_banks(space);
+		logerror("mainmem_enable - set to 0x%02x\n",state->towns_mainmem_enable);
 	}
 }
 
 static READ32_HANDLER( towns_video_404_r )
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	if(ACCESSING_BITS_0_7)
 	{
-		if(towns_mainmem_enable != 0)
+		logerror("mainmem_enable - reading 0x%02x\n",state->towns_mainmem_enable);
+		if(state->towns_mainmem_enable != 0)
 			return 0x00000080;
 	}
 	return 0;
@@ -1138,45 +1126,46 @@ static READ32_HANDLER( towns_video_404_r )
  */
 static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 {
+	towns_state* tstate = (towns_state*)machine->driver_data;
 	switch(line)
 	{
 		case TOWNS_CD_IRQ_MPU:
 			if(state != 0)
 			{
-				if(towns_cd.command & 0x40)
+				if(tstate->towns_cd.command & 0x40)
 				{
-					towns_cd.status |= 0x80;
-					if(towns_cd.mpu_irq_enable)
+					tstate->towns_cd.status |= 0x80;
+					if(tstate->towns_cd.mpu_irq_enable)
 					{
-						pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 1);
+						pic8259_ir1_w(tstate->pic_slave, 1);
 						logerror("PIC: IRQ9 (CD-ROM) set high\n");
 					}
 				}
 			}
 			else
 			{
-				towns_cd.status &= ~0x80;
-				pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 0);
+				tstate->towns_cd.status &= ~0x80;
+				pic8259_ir1_w(tstate->pic_slave, 0);
 				logerror("PIC: IRQ9 (CD-ROM) set low\n");
 			}
 			break;
 		case TOWNS_CD_IRQ_DMA:
 			if(state != 0)
 			{
-				if(towns_cd.command & 0x40)
+				if(tstate->towns_cd.command & 0x40)
 				{
-					towns_cd.status |= 0x40;
-					if(towns_cd.dma_irq_enable)
+					tstate->towns_cd.status |= 0x40;
+					if(tstate->towns_cd.dma_irq_enable)
 					{
-						pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 1);
+						pic8259_ir1_w(tstate->pic_slave, 1);
 						logerror("PIC: IRQ9 (CD-ROM DMA) set high\n");
 					}
 				}
 			}
 			else
 			{
-				towns_cd.status &= ~0x40;
-				pic8259_ir1_w(devtag_get_device(machine,"pic8259_slave"), 0);
+				tstate->towns_cd.status &= ~0x40;
+				pic8259_ir1_w(tstate->pic_slave, 0);
 				logerror("PIC: IRQ9 (CD-ROM DMA) set low\n");
 			}
 			break;
@@ -1185,26 +1174,29 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 
 static TIMER_CALLBACK( towns_cd_status_ready )
 {
-	towns_cd.status |= 0x02;  // status read request
-	towns_cd.status |= 0x01;  // ready
-	towns_cd.cmd_status_ptr = 0;
+	towns_state* state = (towns_state*)machine->driver_data;
+	state->towns_cd.status |= 0x02;  // status read request
+	state->towns_cd.status |= 0x01;  // ready
+	state->towns_cd.cmd_status_ptr = 0;
 	towns_cdrom_set_irq((running_machine*)ptr,TOWNS_CD_IRQ_MPU,1);
 }
 
 static void towns_cd_set_status(running_machine* machine, UINT8 st0, UINT8 st1, UINT8 st2, UINT8 st3)
 {
-	towns_cd.cmd_status[0] = st0;
-	towns_cd.cmd_status[1] = st1;
-	towns_cd.cmd_status[2] = st2;
-	towns_cd.cmd_status[3] = st3;
+	towns_state* state = (towns_state*)machine->driver_data;
+	state->towns_cd.cmd_status[0] = st0;
+	state->towns_cd.cmd_status[1] = st1;
+	state->towns_cd.cmd_status[2] = st2;
+	state->towns_cd.cmd_status[3] = st3;
 	// wait a bit
 	timer_set(machine,ATTOTIME_IN_MSEC(1),machine,0,towns_cd_status_ready);
 }
 
 static UINT8 towns_cd_get_track(running_machine* machine)
 {
-	running_device* cdrom = devtag_get_device(machine,"cdrom");
-	running_device* cdda = devtag_get_device(machine,"cdda");
+	towns_state* state = (towns_state*)machine->driver_data;
+	running_device* cdrom = state->cdrom;
+	running_device* cdda = state->cdda;
 	UINT32 lba = cdda_get_audio_lba(cdda);
 	UINT8 track;
 
@@ -1219,48 +1211,49 @@ static UINT8 towns_cd_get_track(running_machine* machine)
 static TIMER_CALLBACK( towns_cdrom_read_byte )
 {
 	running_device* device = (running_device* )ptr;
+	towns_state* state = (towns_state*)machine->driver_data;
 	int masked;
 	// TODO: support software transfers, for now DMA is assumed.
 
-	if(towns_cd.buffer_ptr < 0) // transfer has ended
+	if(state->towns_cd.buffer_ptr < 0) // transfer has ended
 		return;
 
 	masked = upd71071_dmarq(device,param,3);  // CD-ROM controller uses DMA1 channel 3
-//  logerror("DMARQ: param=%i ret=%i bufferptr=%i\n",param,masked,towns_cd.buffer_ptr);
+//  logerror("DMARQ: param=%i ret=%i bufferptr=%i\n",param,masked,state->towns_cd.buffer_ptr);
 	if(param != 0)
 	{
-		timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),0);
+		timer_adjust_oneshot(state->towns_cd.read_timer,ATTOTIME_IN_HZ(300000),0);
 	}
 	else
 	{
 		if(masked != 0)  // check if the DMA channel is masked
 		{
-			timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
+			timer_adjust_oneshot(state->towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
 			return;
 		}
-		if(towns_cd.buffer_ptr < 2048)
-			timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
+		if(state->towns_cd.buffer_ptr < 2048)
+			timer_adjust_oneshot(state->towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
 		else
 		{  // end of transfer
-			towns_cd.status &= ~0x10;  // no longer transferring by DMA
-			towns_cd.status &= ~0x20;  // no longer transferring by software
-			logerror("DMA1: end of transfer (LBA=%08x)\n",towns_cd.lba_current);
-			if(towns_cd.lba_current >= towns_cd.lba_last)
+			state->towns_cd.status &= ~0x10;  // no longer transferring by DMA
+			state->towns_cd.status &= ~0x20;  // no longer transferring by software
+			logerror("DMA1: end of transfer (LBA=%08x)\n",state->towns_cd.lba_current);
+			if(state->towns_cd.lba_current >= state->towns_cd.lba_last)
 			{
-				towns_cd.extra_status = 0;
+				state->towns_cd.extra_status = 0;
 				towns_cd_set_status(device->machine,0x06,0x00,0x00,0x00);
 				towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_DMA,1);
-				towns_cd.buffer_ptr = -1;
-				towns_cd.status |= 0x01;  // ready
+				state->towns_cd.buffer_ptr = -1;
+				state->towns_cd.status |= 0x01;  // ready
 			}
 			else
 			{
-				towns_cd.extra_status = 0;
+				state->towns_cd.extra_status = 0;
 				towns_cd_set_status(device->machine,0x22,0x00,0x00,0x00);
 				towns_cdrom_set_irq(device->machine,TOWNS_CD_IRQ_DMA,1);
-				cdrom_read_data(mess_cd_get_cdrom_file(devtag_get_device(device->machine,"cdrom")),++towns_cd.lba_current,towns_cd.buffer,CD_TRACK_MODE1);
-				timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
-				towns_cd.buffer_ptr = -1;
+				cdrom_read_data(mess_cd_get_cdrom_file(state->cdrom),++state->towns_cd.lba_current,state->towns_cd.buffer,CD_TRACK_MODE1);
+				timer_adjust_oneshot(state->towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
+				state->towns_cd.buffer_ptr = -1;
 			}
 		}
 	}
@@ -1275,40 +1268,41 @@ static void towns_cdrom_read(running_device* device)
 	// parameters:
 	//          3 bytes: MSF of first sector to read
 	//          3 bytes: MSF of last sector to read
+	towns_state* state = (towns_state*)device->machine->driver_data;
 	UINT32 lba1,lba2,track;
 
-	lba1 = towns_cd.parameter[7] << 16;
-	lba1 += towns_cd.parameter[6] << 8;
-	lba1 += towns_cd.parameter[5];
-	lba2 = towns_cd.parameter[4] << 16;
-	lba2 += towns_cd.parameter[3] << 8;
-	lba2 += towns_cd.parameter[2];
-	towns_cd.lba_current = msf_to_lba(lba1);
-	towns_cd.lba_last = msf_to_lba(lba2);
+	lba1 = state->towns_cd.parameter[7] << 16;
+	lba1 += state->towns_cd.parameter[6] << 8;
+	lba1 += state->towns_cd.parameter[5];
+	lba2 = state->towns_cd.parameter[4] << 16;
+	lba2 += state->towns_cd.parameter[3] << 8;
+	lba2 += state->towns_cd.parameter[2];
+	state->towns_cd.lba_current = msf_to_lba(lba1);
+	state->towns_cd.lba_last = msf_to_lba(lba2);
 
 	// first track starts at 00:02:00 - this is hardcoded in the boot procedure
-	track = cdrom_get_track(mess_cd_get_cdrom_file(device),towns_cd.lba_current);
+	track = cdrom_get_track(mess_cd_get_cdrom_file(device),state->towns_cd.lba_current);
 	if(track < 2)
 	{  // recalculate LBA
-		towns_cd.lba_current -= 150;
-		towns_cd.lba_last -= 150;
+		state->towns_cd.lba_current -= 150;
+		state->towns_cd.lba_last -= 150;
 	}
 
-	logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",towns_cd.lba_current,towns_cd.lba_last,track);
+	logerror("CD: Mode 1 read from LBA next:%i last:%i track:%i\n",state->towns_cd.lba_current,state->towns_cd.lba_last,track);
 
-	if(towns_cd.lba_current > towns_cd.lba_last)
+	if(state->towns_cd.lba_current > state->towns_cd.lba_last)
 	{
-		towns_cd.extra_status = 0;
+		state->towns_cd.extra_status = 0;
 		towns_cd_set_status(device->machine,0x01,0x00,0x00,0x00);
 	}
 	else
 	{
-		cdrom_read_data(mess_cd_get_cdrom_file(device),towns_cd.lba_current,towns_cd.buffer,CD_TRACK_MODE1);
-		towns_cd.status |= 0x10;  // DMA transfer begin
-		towns_cd.status &= ~0x20;  // not a software transfer
-//      towns_cd.buffer_ptr = 0;
-//      timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
-		towns_cd.extra_status = 2;
+		cdrom_read_data(mess_cd_get_cdrom_file(device),state->towns_cd.lba_current,state->towns_cd.buffer,CD_TRACK_MODE1);
+		state->towns_cd.status |= 0x10;  // DMA transfer begin
+		state->towns_cd.status &= ~0x20;  // not a software transfer
+//      state->towns_cd.buffer_ptr = 0;
+//      timer_adjust_oneshot(state->towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
+		state->towns_cd.extra_status = 2;
 		towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 	}
 }
@@ -1320,53 +1314,56 @@ static void towns_cdrom_play_cdda(running_device* device)
 	// Parameters:
 	//          3 bytes: starting MSF of audio to play
 	//          3 bytes: ending MSF of audio to play (can span multiple tracks)
+	towns_state* state = (towns_state*)device->machine->driver_data;
 	UINT32 lba1,lba2;
-	running_device* cdda = devtag_get_device(device->machine,"cdda");
+	running_device* cdda = state->cdda;
 
-	lba1 = towns_cd.parameter[7] << 16;
-	lba1 += towns_cd.parameter[6] << 8;
-	lba1 += towns_cd.parameter[5];
-	lba2 = towns_cd.parameter[4] << 16;
-	lba2 += towns_cd.parameter[3] << 8;
-	lba2 += towns_cd.parameter[2];
-	towns_cd.cdda_current = msf_to_lba(lba1);
-	towns_cd.cdda_length = msf_to_lba(lba2) - towns_cd.cdda_current;
+	lba1 = state->towns_cd.parameter[7] << 16;
+	lba1 += state->towns_cd.parameter[6] << 8;
+	lba1 += state->towns_cd.parameter[5];
+	lba2 = state->towns_cd.parameter[4] << 16;
+	lba2 += state->towns_cd.parameter[3] << 8;
+	lba2 += state->towns_cd.parameter[2];
+	state->towns_cd.cdda_current = msf_to_lba(lba1);
+	state->towns_cd.cdda_length = msf_to_lba(lba2) - state->towns_cd.cdda_current;
 
 	cdda_set_cdrom(cdda,mess_cd_get_cdrom_file(device));
-	cdda_start_audio(cdda,towns_cd.cdda_current,towns_cd.cdda_length);
-	logerror("CD: CD-DA start from LBA:%i length:%i\n",towns_cd.cdda_current,towns_cd.cdda_length);
+	cdda_start_audio(cdda,state->towns_cd.cdda_current,state->towns_cd.cdda_length);
+	logerror("CD: CD-DA start from LBA:%i length:%i\n",state->towns_cd.cdda_current,state->towns_cd.cdda_length);
 
-	towns_cd.extra_status = 1;
+	state->towns_cd.extra_status = 1;
 	towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 }
 
 static void towns_cdrom_execute_command(running_device* device)
 {
+	towns_state* state = (towns_state*)device->machine->driver_data;
+
 	if(mess_cd_get_cdrom_file(device) == NULL)
 	{  // No CD in drive
-		if(towns_cd.command & 0x20)
+		if(state->towns_cd.command & 0x20)
 		{
-			towns_cd.extra_status = 0;
+			state->towns_cd.extra_status = 0;
 			towns_cd_set_status(device->machine,0x10,0x00,0x00,0x00);
 		}
 	}
 	else
 	{
-		towns_cd.status &= ~0x02;
-		switch(towns_cd.command & 0x9f)
+		state->towns_cd.status &= ~0x02;
+		switch(state->towns_cd.command & 0x9f)
 		{
 			case 0x00:  // Seek
-				if(towns_cd.command & 0x20)
+				if(state->towns_cd.command & 0x20)
 				{
-					towns_cd.extra_status = 1;
+					state->towns_cd.extra_status = 1;
 					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 				}
 				logerror("CD: Command 0x00: SEEK\n");
 				break;
 			case 0x01:  // unknown
-				if(towns_cd.command & 0x20)
+				if(state->towns_cd.command & 0x20)
 				{
-					towns_cd.extra_status = 0;
+					state->towns_cd.extra_status = 0;
 					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 				}
 				logerror("CD: Command 0x01: unknown\n");
@@ -1381,25 +1378,25 @@ static void towns_cdrom_execute_command(running_device* device)
 				break;
 			case 0x05:  // Read TOC
 				logerror("CD: Command 0x05: READ TOC\n");
-				towns_cd.extra_status = 1;
+				state->towns_cd.extra_status = 1;
 				towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 				break;
 			case 0x06:  // Read CD-DA state?
 				logerror("CD: Command 0x06: READ CD-DA STATE\n");
-				towns_cd.extra_status = 1;
+				state->towns_cd.extra_status = 1;
 				towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 				break;
 			case 0x80:  // set state
 				logerror("CD: Command 0x80: set state\n");
-				if(towns_cd.command & 0x20)
+				if(state->towns_cd.command & 0x20)
 				{
-					towns_cd.extra_status = 0;
-					if(towns_cd.parameter[7] != 0)
+					state->towns_cd.extra_status = 0;
+					if(state->towns_cd.parameter[7] != 0)
 					{
 						towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 						break;
 					}
-					if(cdda_audio_active(devtag_get_device(device->machine,"cdda")))
+					if(cdda_audio_active(state->cdda))
 						towns_cd_set_status(device->machine,0x00,0x03,0x00,0x00);
 					else
 						towns_cd_set_status(device->machine,0x00,0x01,0x00,0x00);
@@ -1407,187 +1404,189 @@ static void towns_cdrom_execute_command(running_device* device)
 				}
 				break;
 			case 0x81:  // set state (CDDASET)
-				if(towns_cd.command & 0x20)
+				if(state->towns_cd.command & 0x20)
 				{
-					towns_cd.extra_status = 0;
+					state->towns_cd.extra_status = 0;
 					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
 				}
 				logerror("CD: Command 0x81: set state (CDDASET)\n");
 				break;
 			case 0x84:   // Stop CD audio track
-				if(towns_cd.command & 0x20)
+				if(state->towns_cd.command & 0x20)
 				{
-					towns_cd.extra_status = 1;
+					state->towns_cd.extra_status = 1;
 					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
-					cdda_stop_audio(devtag_get_device(device->machine,"cdda"));
+					cdda_stop_audio(state->cdda);
 				}
 				logerror("CD: Command 0x84: STOP CD-DA\n");
 				break;
 			case 0x85:   // Stop CD audio track (difference from 0x84?)
-				if(towns_cd.command & 0x20)
+				if(state->towns_cd.command & 0x20)
 				{
-					towns_cd.extra_status = 1;
+					state->towns_cd.extra_status = 1;
 					towns_cd_set_status(device->machine,0x00,0x00,0x00,0x00);
-					cdda_stop_audio(devtag_get_device(device->machine,"cdda"));
+					cdda_stop_audio(state->cdda);
 				}
 				logerror("CD: Command 0x85: STOP CD-DA\n");
 				break;
 			default:
-				towns_cd.extra_status = 0;
+				state->towns_cd.extra_status = 0;
 				towns_cd_set_status(device->machine,0x10,0x00,0x00,0x00);
-				logerror("CD: Unknown or unimplemented command %02x\n",towns_cd.command);
+				logerror("CD: Unknown or unimplemented command %02x\n",state->towns_cd.command);
 		}
 	}
 }
 
 static UINT16 towns_cdrom_dma_r(running_machine* machine)
 {
-	if(towns_cd.buffer_ptr >= 2048)
+	towns_state* state = (towns_state*)machine->driver_data;
+	if(state->towns_cd.buffer_ptr >= 2048)
 		return 0x00;
-	return towns_cd.buffer[towns_cd.buffer_ptr++];
+	return state->towns_cd.buffer[state->towns_cd.buffer_ptr++];
 }
 
 static READ8_HANDLER(towns_cdrom_r)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	UINT32 addr = 0;
 	UINT8 ret = 0;
 
-	ret = towns_cd.cmd_status[towns_cd.cmd_status_ptr];
+	ret = state->towns_cd.cmd_status[state->towns_cd.cmd_status_ptr];
 
 	switch(offset)
 	{
 		case 0x00:  // status
 			//logerror("CD: status read, returning %02x\n",towns_cd.status);
-			return towns_cd.status;
+			return state->towns_cd.status;
 		case 0x01:  // command status
-			if(towns_cd.cmd_status_ptr >= 3)
+			if(state->towns_cd.cmd_status_ptr >= 3)
 			{
-				towns_cd.status &= ~0x02;
+				state->towns_cd.status &= ~0x02;
 				// check for more status bytes
-				if(towns_cd.extra_status != 0)
+				if(state->towns_cd.extra_status != 0)
 				{
-					switch(towns_cd.command & 0x9f)
+					switch(state->towns_cd.command & 0x9f)
 					{
 						case 0x00:  // seek
 							towns_cd_set_status(space->machine,0x04,0x00,0x00,0x00);
-							towns_cd.extra_status = 0;
+							state->towns_cd.extra_status = 0;
 							break;
 						case 0x02:  // read
-							if(towns_cd.extra_status == 2)
+							if(state->towns_cd.extra_status == 2)
 								towns_cd_set_status(space->machine,0x22,0x00,0x00,0x00);
-							towns_cd.extra_status = 0;
+							state->towns_cd.extra_status = 0;
 							break;
 						case 0x04:  // play cdda
 							towns_cd_set_status(space->machine,0x07,0x00,0x00,0x00);
-							towns_cd.extra_status = 0;
+							state->towns_cd.extra_status = 0;
 							break;
 						case 0x05:  // read toc
-							switch(towns_cd.extra_status)
+							switch(state->towns_cd.extra_status)
 							{
 								case 1:
 								case 3:
 									towns_cd_set_status(space->machine,0x16,0x00,0x00,0x00);
-									towns_cd.extra_status++;
+									state->towns_cd.extra_status++;
 									break;
 								case 2: // st1 = first track number (BCD)
 									towns_cd_set_status(space->machine,0x17,0x01,0x00,0x00);
-									towns_cd.extra_status++;
+									state->towns_cd.extra_status++;
 									break;
 								case 4: // st1 = last track number (BCD)
 									towns_cd_set_status(space->machine,0x17,
-										byte_to_bcd(cdrom_get_last_track(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")))),
+										byte_to_bcd(cdrom_get_last_track(mess_cd_get_cdrom_file(state->cdrom))),
 										0x00,0x00);
-									towns_cd.extra_status++;
+									state->towns_cd.extra_status++;
 									break;
 								case 5:  // st1 = control/adr of track 0xaa?
 									towns_cd_set_status(space->machine,0x16,
-										cdrom_get_adr_control(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),0xaa),
+										cdrom_get_adr_control(mess_cd_get_cdrom_file(state->cdrom),0xaa),
 										0xaa,0x00);
-									towns_cd.extra_status++;
+									state->towns_cd.extra_status++;
 									break;
 								case 6:  // st1/2/3 = address of track 0xaa? (BCD)
-									addr = cdrom_get_track_start(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),0xaa);
+									addr = cdrom_get_track_start(mess_cd_get_cdrom_file(state->cdrom),0xaa);
 									addr = lba_to_msf(addr);
 									towns_cd_set_status(space->machine,0x17,
 										(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
-									towns_cd.extra_status++;
+									state->towns_cd.extra_status++;
 									break;
 								default:  // same as case 5 and 6, but for each individual track
-									if(towns_cd.extra_status & 0x01)
+									if(state->towns_cd.extra_status & 0x01)
 									{
 										towns_cd_set_status(space->machine,0x16,
-											((cdrom_get_adr_control(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),(towns_cd.extra_status/2)-3) & 0x0f) << 4)
-											| ((cdrom_get_adr_control(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),(towns_cd.extra_status/2)-3) & 0xf0) >> 4),
-											(towns_cd.extra_status/2)-3,0x00);
-										towns_cd.extra_status++;
+											((cdrom_get_adr_control(mess_cd_get_cdrom_file(state->cdrom),(state->towns_cd.extra_status/2)-3) & 0x0f) << 4)
+											| ((cdrom_get_adr_control(mess_cd_get_cdrom_file(state->cdrom),(state->towns_cd.extra_status/2)-3) & 0xf0) >> 4),
+											(state->towns_cd.extra_status/2)-3,0x00);
+										state->towns_cd.extra_status++;
 									}
 									else
 									{
-										addr = cdrom_get_track_start(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom")),(towns_cd.extra_status/2)-4);
+										addr = cdrom_get_track_start(mess_cd_get_cdrom_file(state->cdrom),(state->towns_cd.extra_status/2)-4);
 										addr = lba_to_msf(addr);
 										towns_cd_set_status(space->machine,0x17,
 											(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
-										if(((towns_cd.extra_status/2)-3) >= cdrom_get_last_track(mess_cd_get_cdrom_file(devtag_get_device(space->machine,"cdrom"))))
+										if(((state->towns_cd.extra_status/2)-3) >= cdrom_get_last_track(mess_cd_get_cdrom_file(state->cdrom)))
 										{
-											towns_cd.extra_status = 0;
+											state->towns_cd.extra_status = 0;
 										}
 										else
-											towns_cd.extra_status++;
+											state->towns_cd.extra_status++;
 									}
 									break;
 							}
 							break;
 						case 0x06:  // read CD-DA state
-							switch(towns_cd.extra_status)
+							switch(state->towns_cd.extra_status)
 							{
 								case 1:  // st2 = track number
 									towns_cd_set_status(space->machine,0x18,
 										0x00,towns_cd_get_track(space->machine),0x00);
-									towns_cd.extra_status++;
+									state->towns_cd.extra_status++;
 									break;
 								case 2:  // st0/1/2 = MSF from beginning of current track
-									addr = cdda_get_audio_lba(devtag_get_device(space->machine,"cdda"));
-									addr = lba_to_msf(addr - towns_cd.cdda_current);
+									addr = cdda_get_audio_lba(state->cdda);
+									addr = lba_to_msf(addr - state->towns_cd.cdda_current);
 									towns_cd_set_status(space->machine,0x19,
 										(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8,addr & 0x0000ff);
-									towns_cd.extra_status++;
+									state->towns_cd.extra_status++;
 									break;
 								case 3:  // st1/2 = current MSF
-									addr = cdda_get_audio_lba(devtag_get_device(space->machine,"cdda"));
+									addr = cdda_get_audio_lba(state->cdda);
 									addr = lba_to_msf(addr);  // this data is incorrect, but will do until exact meaning is found
 									towns_cd_set_status(space->machine,0x19,
 										0x00,(addr & 0xff0000) >> 16,(addr & 0x00ff00) >> 8);
-									towns_cd.extra_status++;
+									state->towns_cd.extra_status++;
 									break;
 								case 4:
-									addr = cdda_get_audio_lba(devtag_get_device(space->machine,"cdda"));
+									addr = cdda_get_audio_lba(state->cdda);
 									addr = lba_to_msf(addr);  // this data is incorrect, but will do until exact meaning is found
 									towns_cd_set_status(space->machine,0x20,
 										addr & 0x0000ff,0x00,0x00);
-									towns_cd.extra_status = 0;
+									state->towns_cd.extra_status = 0;
 									break;
 							}
 							break;
 						case 0x84:
 							towns_cd_set_status(space->machine,0x11,0x00,0x00,0x00);
-							towns_cd.extra_status = 0;
+							state->towns_cd.extra_status = 0;
 							break;
 						case 0x85:
 							towns_cd_set_status(space->machine,0x12,0x00,0x00,0x00);
-							towns_cd.extra_status = 0;
+							state->towns_cd.extra_status = 0;
 							break;
 					}
 				}
 			}
-			logerror("CD: reading command status port (%i), returning %02x\n",towns_cd.cmd_status_ptr,ret);
-			towns_cd.cmd_status_ptr++;
-			if(towns_cd.cmd_status_ptr > 3)
+			logerror("CD: reading command status port (%i), returning %02x\n",state->towns_cd.cmd_status_ptr,ret);
+			state->towns_cd.cmd_status_ptr++;
+			if(state->towns_cd.cmd_status_ptr > 3)
 			{
-				towns_cd.cmd_status_ptr = 0;
-/*              if(towns_cd.extra_status != 0)
+				state->towns_cd.cmd_status_ptr = 0;
+/*              if(state->towns_cd.extra_status != 0)
                 {
                     towns_cdrom_set_irq(space->machine,TOWNS_CD_IRQ_MPU,1);
-                    towns_cd.status |= 0x02;
+                    state->towns_cd.status |= 0x02;
                 }*/
 			}
 			return ret;
@@ -1598,6 +1597,7 @@ static READ8_HANDLER(towns_cdrom_r)
 
 static WRITE8_HANDLER(towns_cdrom_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	int x;
 	switch(offset)
 	{
@@ -1608,35 +1608,35 @@ static WRITE8_HANDLER(towns_cdrom_w)
 				towns_cdrom_set_irq(space->machine,TOWNS_CD_IRQ_DMA,0);
 			if(data & 0x04)
 				logerror("CD: sub MPU reset\n");
-			towns_cd.mpu_irq_enable = data & 0x02;
-			towns_cd.dma_irq_enable = data & 0x01;
+			state->towns_cd.mpu_irq_enable = data & 0x02;
+			state->towns_cd.dma_irq_enable = data & 0x01;
 			logerror("CD: status write %02x\n",data);
 			break;
 		case 0x01: // command
-			towns_cd.command = data;
-			towns_cdrom_execute_command(devtag_get_device(space->machine,"cdrom"));
+			state->towns_cd.command = data;
+			towns_cdrom_execute_command(state->cdrom);
 			logerror("CD: command %02x sent\n",data);
 			logerror("CD: parameters: %02x %02x %02x %02x %02x %02x %02x %02x\n",
-				towns_cd.parameter[7],towns_cd.parameter[6],towns_cd.parameter[5],
-				towns_cd.parameter[4],towns_cd.parameter[3],towns_cd.parameter[2],
-				towns_cd.parameter[1],towns_cd.parameter[0]);
+				state->towns_cd.parameter[7],state->towns_cd.parameter[6],state->towns_cd.parameter[5],
+				state->towns_cd.parameter[4],state->towns_cd.parameter[3],state->towns_cd.parameter[2],
+				state->towns_cd.parameter[1],state->towns_cd.parameter[0]);
 			break;
 		case 0x02: // parameter
 			for(x=7;x>0;x--)
-				towns_cd.parameter[x] = towns_cd.parameter[x-1];
-			towns_cd.parameter[0] = data;
+				state->towns_cd.parameter[x] = state->towns_cd.parameter[x-1];
+			state->towns_cd.parameter[0] = data;
 			logerror("CD: parameter %02x added\n",data);
 			break;
 		case 0x03:
 			// TODO: software transfer mode (bit 3)
 			if(data & 0x10)
 			{
-				towns_cd.status |= 0x10;  // DMA transfer begin
-				towns_cd.status &= ~0x20;  // not a software transfer
-				if(towns_cd.buffer_ptr < 0)
+				state->towns_cd.status |= 0x10;  // DMA transfer begin
+				state->towns_cd.status &= ~0x20;  // not a software transfer
+				if(state->towns_cd.buffer_ptr < 0)
 				{
-					towns_cd.buffer_ptr = 0;
-					timer_adjust_oneshot(towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
+					state->towns_cd.buffer_ptr = 0;
+					timer_adjust_oneshot(state->towns_cd.read_timer,ATTOTIME_IN_HZ(300000),1);
 				}
 			}
 			logerror("CD: transfer mode write %02x\n",data);
@@ -1653,72 +1653,80 @@ static WRITE8_HANDLER(towns_cdrom_w)
  */
 static READ32_HANDLER(towns_rtc_r)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	if(ACCESSING_BITS_0_7)
-		return 0x80 | towns_rtc_reg[towns_rtc_select];
+		return 0x80 | state->towns_rtc_reg[state->towns_rtc_select];
 
 	return 0x00;
 }
 
 static WRITE32_HANDLER(towns_rtc_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	if(ACCESSING_BITS_0_7)
-		towns_rtc_data = data;
+		state->towns_rtc_data = data;
 }
 
 static WRITE32_HANDLER(towns_rtc_select_w)
 {
+	towns_state* state = (towns_state*)space->machine->driver_data;
 	if(ACCESSING_BITS_0_7)
 	{
 		if(data & 0x80)
 		{
 			if(data & 0x01)
-				towns_rtc_select = towns_rtc_data & 0x0f;
+				state->towns_rtc_select = state->towns_rtc_data & 0x0f;
 		}
 	}
 }
 
-static void rtc_hour(void)
+static void rtc_hour(running_machine* machine)
 {
-	towns_rtc_reg[4]++;
-	if(towns_rtc_reg[4] > 4 && towns_rtc_reg[5] == 2)
+	towns_state* state = (towns_state*)machine->driver_data;
+
+	state->towns_rtc_reg[4]++;
+	if(state->towns_rtc_reg[4] > 4 && state->towns_rtc_reg[5] == 2)
 	{
-		towns_rtc_reg[4] = 0;
-		towns_rtc_reg[5] = 0;
+		state->towns_rtc_reg[4] = 0;
+		state->towns_rtc_reg[5] = 0;
 	}
-	else if(towns_rtc_reg[4] > 9)
+	else if(state->towns_rtc_reg[4] > 9)
 	{
-		towns_rtc_reg[4] = 0;
-		towns_rtc_reg[5]++;
+		state->towns_rtc_reg[4] = 0;
+		state->towns_rtc_reg[5]++;
 	}
 }
 
-static void rtc_minute(void)
+static void rtc_minute(running_machine* machine)
 {
-	towns_rtc_reg[2]++;
-	if(towns_rtc_reg[2] > 9)
+	towns_state* state = (towns_state*)machine->driver_data;
+
+	state->towns_rtc_reg[2]++;
+	if(state->towns_rtc_reg[2] > 9)
 	{
-		towns_rtc_reg[2] = 0;
-		towns_rtc_reg[3]++;
-		if(towns_rtc_reg[3] > 5)
+		state->towns_rtc_reg[2] = 0;
+		state->towns_rtc_reg[3]++;
+		if(state->towns_rtc_reg[3] > 5)
 		{
-			towns_rtc_reg[3] = 0;
-			rtc_hour();
+			state->towns_rtc_reg[3] = 0;
+			rtc_hour(machine);
 		}
 	}
 }
 
 static TIMER_CALLBACK(rtc_second)
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	// increase RTC time by one second
-	towns_rtc_reg[0]++;
-	if(towns_rtc_reg[0] > 9)
+	state->towns_rtc_reg[0]++;
+	if(state->towns_rtc_reg[0] > 9)
 	{
-		towns_rtc_reg[0] = 0;
-		towns_rtc_reg[1]++;
-		if(towns_rtc_reg[1] > 5)
+		state->towns_rtc_reg[0] = 0;
+		state->towns_rtc_reg[1]++;
+		if(state->towns_rtc_reg[1] > 5)
 		{
-			towns_rtc_reg[1] = 0;
-			rtc_minute();
+			state->towns_rtc_reg[1] = 0;
+			rtc_minute(machine);
 		}
 	}
 }
@@ -1741,8 +1749,9 @@ static READ8_HANDLER(towns_41ff_r)
 
 static IRQ_CALLBACK( towns_irq_callback )
 {
-	running_device* pic1 = devtag_get_device(device->machine,"pic8259_master");
-	running_device* pic2 = devtag_get_device(device->machine,"pic8259_slave");
+	towns_state* state = (towns_state*)device->machine->driver_data;
+	running_device* pic1 = state->pic_master;
+	running_device* pic2 = state->pic_slave;
 	int r;
 
 	r = pic8259_acknowledge(pic2);
@@ -1757,16 +1766,17 @@ static IRQ_CALLBACK( towns_irq_callback )
 // YM3438 interrupt (IRQ 13)
 void towns_fm_irq(running_device* device, int irq)
 {
-	running_device* pic = devtag_get_device(device->machine,"pic8259_slave");
+	towns_state* state = (towns_state*)device->machine->driver_data;
+	running_device* pic = state->pic_slave;
 	if(irq)
 	{
-		towns_fm_irq_flag = 1;
+		state->towns_fm_irq_flag = 1;
 		pic8259_ir5_w(pic, 1);
 		logerror("PIC: IRQ13 (FM) set high\n");
 	}
 	else
 	{
-		towns_fm_irq_flag = 0;
+		state->towns_fm_irq_flag = 0;
 		pic8259_ir5_w(pic, 0);
 		logerror("PIC: IRQ13 (FM) set low\n");
 	}
@@ -1775,12 +1785,13 @@ void towns_fm_irq(running_device* device, int irq)
 // PCM interrupt (IRQ 13)
 void towns_pcm_irq(running_device* device, int channel)
 {
-	running_device* pic = devtag_get_device(device->machine,"pic8259_slave");
+	towns_state* state = (towns_state*)device->machine->driver_data;
+	running_device* pic = state->pic_slave;
 
-	towns_pcm_irq_flag = 1;
-	if(towns_pcm_channel_mask & (1 << channel))
+	state->towns_pcm_irq_flag = 1;
+	if(state->towns_pcm_channel_mask & (1 << channel))
 	{
-		towns_pcm_channel_flag |= (1 << channel);
+		state->towns_pcm_channel_flag |= (1 << channel);
 		pic8259_ir5_w(pic, 1);
 		logerror("PIC: IRQ13 (PCM) set high\n");
 	}
@@ -1794,9 +1805,10 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pic_irq )
 
 static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 {
-	running_device* dev = devtag_get_device(device->machine,"pic8259_master");
+	towns_state* tstate = (towns_state*)device->machine->driver_data;
+	running_device* dev = tstate->pic_master;
 
-	if(towns_timer_mask & 0x01)
+	if(tstate->towns_timer_mask & 0x01)
 	{
 		pic8259_ir0_w(dev, state);
 		logerror("PIC: IRQ0 (PIT Timer) set to %i\n",state);
@@ -1805,9 +1817,10 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 
 static WRITE_LINE_DEVICE_HANDLER( towns_pit_out1_changed )
 {
-//  running_device* dev = devtag_get_device(device->machine,"pic8259_master");
+	towns_state* tstate = (towns_state*)device->machine->driver_data;
+//  running_device* dev = tstate->pic_master;
 
-	if(towns_timer_mask & 0x02)
+	if(tstate->towns_timer_mask & 0x02)
 	{
 	//  pic8259_ir0_w(dev, state);
 	}
@@ -2130,47 +2143,63 @@ INPUT_PORTS_END
 
 static DRIVER_INIT( towns )
 {
-	towns_vram = auto_alloc_array(machine,UINT32,0x20000);
-	towns_cmos = auto_alloc_array(machine,UINT8,0x2000);
-	towns_gfxvram = auto_alloc_array(machine,UINT8,0x80000);
-	towns_txtvram = auto_alloc_array(machine,UINT8,0x20000);
+	towns_state* state = (towns_state*)machine->driver_data;
+	state->pic_master = devtag_get_device(machine,"pic8259_master");
+	state->pic_slave = devtag_get_device(machine,"pic8259_slave");
+	state->towns_vram = auto_alloc_array(machine,UINT32,0x20000);
+	state->towns_cmos = auto_alloc_array(machine,UINT8,0x2000);
+	state->towns_gfxvram = auto_alloc_array(machine,UINT8,0x80000);
+	state->towns_txtvram = auto_alloc_array(machine,UINT8,0x20000);
 	//towns_sprram = auto_alloc_array(machine,UINT8,0x20000);
-	towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
+	state->towns_serial_rom = auto_alloc_array(machine,UINT8,256/8);
 	towns_init_serial_rom(machine);
-	towns_init_rtc();
-	towns_rtc_timer = timer_alloc(machine,rtc_second,NULL);
-	towns_kb_timer = timer_alloc(machine,poll_keyboard,NULL);
-	towns_mouse_timer = timer_alloc(machine,towns_mouse_timeout,NULL);
+	towns_init_rtc(machine);
+	state->towns_rtc_timer = timer_alloc(machine,rtc_second,NULL);
+	state->towns_kb_timer = timer_alloc(machine,poll_keyboard,NULL);
+	state->towns_mouse_timer = timer_alloc(machine,towns_mouse_timeout,NULL);
 
 	// CD-ROM init
-	towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)devtag_get_device(machine,"dma_1"));
+	state->towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)devtag_get_device(machine,"dma_1"));
 
 	cpu_set_irq_callback(devtag_get_device(machine,"maincpu"), towns_irq_callback);
 }
 
 static DRIVER_INIT( marty )
 {
+	towns_state* state = (towns_state*)machine->driver_data;
 	DRIVER_INIT_CALL(towns);
-	towns_machine_id = 0x034a;
+	state->towns_machine_id = 0x034a;
 }
 
 static MACHINE_RESET( towns )
 {
-	ftimer = 0x00;
-	nmi_mask = 0x00;
-	compat_mode = 0x00;
-	towns_ankcg_enable = 0x00;
-	towns_mainmem_enable = 0x00;
-	towns_ram_enable = 0x00;
-	towns_update_video_banks(cpu_get_address_space(devtag_get_device(machine,"maincpu"),ADDRESS_SPACE_PROGRAM));
-	towns_kb_status = 0x18;
-	towns_kb_irq1_enable = 0;
-	towns_pad_mask = 0x7f;
-	towns_mouse_output = MOUSE_START;
-	towns_cd.status = 0x01;  // CDROM controller ready
-	towns_cd.buffer_ptr = -1;
-	timer_adjust_periodic(towns_rtc_timer,attotime_zero,0,ATTOTIME_IN_HZ(1));
-	timer_adjust_periodic(towns_kb_timer,attotime_zero,0,ATTOTIME_IN_MSEC(10));
+	towns_state* state = (towns_state*)machine->driver_data;
+	state->maincpu = devtag_get_device(machine,"maincpu");
+	state->dma_1 = devtag_get_device(machine,"dma_1");
+	state->dma_2 = devtag_get_device(machine,"dma_2");
+	state->fdc = devtag_get_device(machine,"fdc");
+	state->pic_master = devtag_get_device(machine,"pic8259_master");
+	state->pic_slave = devtag_get_device(machine,"pic8259_slave");
+	state->pit = devtag_get_device(machine,"pit");
+	state->messram = devtag_get_device(machine,"messram");
+	state->cdrom = devtag_get_device(machine,"cdrom");
+	state->cdda = devtag_get_device(machine,"cdda");
+	state->ftimer = 0x00;
+	state->nmi_mask = 0x00;
+	state->compat_mode = 0x00;
+	state->towns_ankcg_enable = 0x00;
+	state->towns_mainmem_enable = 0x00;
+	state->towns_system_port = 0x00;
+	state->towns_ram_enable = 0x00;
+	towns_update_video_banks(cpu_get_address_space(state->maincpu,ADDRESS_SPACE_PROGRAM));
+	state->towns_kb_status = 0x18;
+	state->towns_kb_irq1_enable = 0;
+	state->towns_pad_mask = 0x7f;
+	state->towns_mouse_output = MOUSE_START;
+	state->towns_cd.status = 0x01;  // CDROM controller ready
+	state->towns_cd.buffer_ptr = -1;
+	timer_adjust_periodic(state->towns_rtc_timer,attotime_zero,0,ATTOTIME_IN_HZ(1));
+	timer_adjust_periodic(state->towns_kb_timer,attotime_zero,0,ATTOTIME_IN_MSEC(10));
 }
 
 static const struct pit8253_config towns_pit8253_config =
@@ -2280,7 +2309,9 @@ static GFXDECODE_START( towns )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( towns )
-    /* basic machine hardware */
+	MDRV_DRIVER_DATA(towns_state)
+
+	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I386, 16000000)
     MDRV_CPU_PROGRAM_MAP(towns_mem)
     MDRV_CPU_IO_MAP(towns_io)
