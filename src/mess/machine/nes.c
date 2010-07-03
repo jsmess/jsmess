@@ -310,7 +310,7 @@ READ8_HANDLER( nes_IN0_r )
 	int cfg = input_port_read(space->machine, "CTRLSEL");
 	int ret;
 
-	if ((cfg & 0x000f) >= 0x04)	// for now we treat the FC keyboard separately from other inputs!
+	if ((cfg & 0x000f) >= 0x07)	// for now we treat the FC keyboard separately from other inputs!
 	{
 		// here we should have the tape input
 		ret = 0;
@@ -378,7 +378,7 @@ READ8_HANDLER( nes_IN1_r )
 	int cfg = input_port_read(space->machine, "CTRLSEL");
 	int ret;
 
-	if ((cfg & 0x000f) == 0x04)	// for now we treat the FC keyboard separately from other inputs!
+	if ((cfg & 0x000f) == 0x07)	// for now we treat the FC keyboard separately from other inputs!
 	{
 		if (state->fck_scan < 9)
 			ret = ~nes_read_fc_keyboard_line(space->machine, state->fck_scan, state->fck_mode) & 0x1e;
@@ -449,22 +449,24 @@ READ8_HANDLER( nes_IN1_r )
 }
 
 
-
-static void nes_read_input_device( running_machine *machine, int cfg, nes_input *vals, int pad_port, int supports_zapper, int paddle_port )
+// FIXME: this is getting messier and messier (no pun intended). inputs reading should be simplified and port_categories cleaned up 
+// to also emulate the fact that nothing should be in Port 2 if there is a Crazy Climber pad, etc.
+static void nes_read_input_device( running_machine *machine, int cfg, nes_input *vals, int pad_port, int supports_zapper )
 {
-	static const char *const padnames[] = { "PAD1", "PAD2", "PAD3", "PAD4" };
-
+	nes_state *state = (nes_state *)machine->driver_data;
+	static const char *const padnames[] = { "PAD1", "PAD2", "PAD3", "PAD4", "CC_LEFT", "CC_RIGHT" };
+	
 	vals->i0 = 0;
 	vals->i1 = 0;
 	vals->i2 = 0;
-
-	switch(cfg & 0x0f)
+	
+	switch (cfg & 0x0f)
 	{
 		case 0x01:	/* gamepad */
 			if (pad_port >= 0)
 				vals->i0 = input_port_read(machine, padnames[pad_port]);
 			break;
-
+			
 		case 0x02:	/* zapper 1 */
 			if (supports_zapper)
 			{
@@ -473,7 +475,7 @@ static void nes_read_input_device( running_machine *machine, int cfg, nes_input 
 				vals->i2 = input_port_read(machine, "ZAPPER1_Y");
 			}
 			break;
-
+			
 		case 0x03:	/* zapper 2 */
 			if (supports_zapper)
 			{
@@ -482,10 +484,18 @@ static void nes_read_input_device( running_machine *machine, int cfg, nes_input 
 				vals->i2 = input_port_read(machine, "ZAPPER2_Y");
 			}
 			break;
-
+			
 		case 0x04:	/* arkanoid paddle */
-			if (paddle_port >= 0)
+			if (pad_port == 1)
 				vals->i0 = (UINT8) ((UINT8) input_port_read(machine, "PADDLE") + (UINT8)0x52) ^ 0xff;
+			break;
+			
+		case 0x05:	/* crazy climber controller */
+			if (pad_port == 0)
+			{
+				state->in_0.i0 = input_port_read(machine, padnames[4]);
+				state->in_1.i0 = input_port_read(machine, padnames[5]);
+			}
 			break;
 	}
 }
@@ -524,7 +534,7 @@ WRITE8_HANDLER( nes_IN0_w )
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
 	timer_set(space->machine, attotime_zero, NULL, 0, lightgun_tick);
 
-	if ((cfg & 0x000f) >= 0x04)	// for now we treat the FC keyboard separately from other inputs!
+	if ((cfg & 0x000f) >= 0x07)	// for now we treat the FC keyboard separately from other inputs!
 	{
 		// here we should also have the tape output
 
@@ -546,23 +556,33 @@ WRITE8_HANDLER( nes_IN0_w )
 	{
 		if (data & 0x01)
 			return;
-
+		
 		if (LOG_JOY)
 			logerror("joy 0 bits read: %d\n", state->in_0.shift);
-
+		
 		/* Toggling bit 0 high then low resets both controllers */
 		state->in_0.shift = 0;
 		state->in_1.shift = 0;
-
+		
 		/* Read the input devices */
-		nes_read_input_device(space->machine, cfg >>  0, &state->in_0, 0,  TRUE, -1);
-		nes_read_input_device(space->machine, cfg >>  4, &state->in_1, 1,  TRUE,  1);
-		nes_read_input_device(space->machine, cfg >>  8, &state->in_2, 2, FALSE, -1);
-		nes_read_input_device(space->machine, cfg >> 12, &state->in_3, 3, FALSE, -1);
-
+		if ((cfg & 0x000f) != 0x06)
+		{
+			nes_read_input_device(space->machine, cfg >>  0, &state->in_0, 0,  TRUE);
+			nes_read_input_device(space->machine, cfg >>  4, &state->in_1, 1,  TRUE);
+			nes_read_input_device(space->machine, cfg >>  8, &state->in_2, 2, FALSE);
+			nes_read_input_device(space->machine, cfg >> 12, &state->in_3, 3, FALSE);
+		}
+		else // crazy climber pad
+		{
+			nes_read_input_device(space->machine, 0, &state->in_1, 1,  TRUE);
+			nes_read_input_device(space->machine, 0, &state->in_2, 2, FALSE);
+			nes_read_input_device(space->machine, 0, &state->in_3, 3, FALSE);
+			nes_read_input_device(space->machine, cfg >>  0, &state->in_0, 0,  TRUE);
+		}
+		
 		if (cfg & 0x0f00)
 			state->in_0.i0 |= (state->in_2.i0 << 8) | (0x08 << 16);
-
+		
 		if (cfg & 0xf000)
 			state->in_1.i0 |= (state->in_3.i0 << 8) | (0x04 << 16);
 	}
