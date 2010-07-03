@@ -158,7 +158,7 @@ public:
 	int mmc_prg_base, mmc_prg_mask;	// MMC3 based multigame carts select a block of banks by using these (and then act like normal MMC3),
 	int mmc_chr_base, mmc_chr_mask;	// while MMC3 and clones (mapper 118 & 119) simply set them as 0 and 0xff resp.
 
-	UINT8 mmc_prg_bank[4];				// Many mappers writes only some bits of the selected bank (for both PRG and CHR),
+	UINT8 mmc_prg_bank[6];				// Many mappers writes only some bits of the selected bank (for both PRG and CHR),
 	UINT8 mmc_vrom_bank[16];			// hence these are handy to latch bank values.
 
 	UINT16 MMC5_vrom_bank[12];			// MMC5 has 10bit wide VROM regs!
