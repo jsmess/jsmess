@@ -232,6 +232,7 @@ static int pcb_initialize( running_machine *machine, int idx )
 		case SACHEN_TCU02:	// mapper 136
 		case SACHEN_SA72007:	// mapper 145
 		case SACHEN_TCU01:	// mapper 147
+		case SACHEN_SA009:	// mapper 160
 		case SACHEN_SA0037:	// mapper 148
 		case SACHEN_SA0036:	// mapper 149
 		case AGCI_50282:	// mapper 144
@@ -353,6 +354,7 @@ static int pcb_initialize( running_machine *machine, int idx )
 		case WAIXING_TYPE_E:	// mapper 195
 		case WAIXING_TYPE_H:	// mapper 245
 		case BTL_SUPERBROS11:	// mapper 196
+		case UNL_H2288:		// mapper 123
 		case UNL_KOF97:
 		case UNL_603_5052:
 		case NITRA_TDA:	// mapper 250
@@ -604,9 +606,38 @@ static int pcb_initialize( running_machine *machine, int idx )
 			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			break;
 // mapper 116
-//      case SOMERITEAM_SL12:
-//          break;
-
+		case SOMERI_SL12:
+			state->mmc_prg_base = state->mmc_chr_base = 0;
+			state->mmc_prg_mask = 0xff;
+			state->mmc_chr_mask = 0xff;
+			state->mmc_cmd1 = 2; // mode
+			state->mmc_latch1 = 0;
+			state->mmc_latch2 = 0;
+			// MMC1 regs
+			state->mmc_count = 0;
+			state->mmc_reg[0] = 0x0c;
+			state->mmc_reg[1] = 0x00;
+			state->mmc_reg[2] = 0x00;
+			state->mmc_reg[3] = 0x00;
+			// MMC3 regs
+			state->mmc_prg_bank[0] = 0x3c;
+			state->mmc_prg_bank[1] = 0x3d;
+			state->mmc_prg_bank[2] = 0xfe;
+			state->mmc_prg_bank[3] = 0xff;
+			state->mmc_vrom_bank[0] = 0x00;
+			state->mmc_vrom_bank[1] = 0x01;
+			state->mmc_vrom_bank[2] = 0x04;
+			state->mmc_vrom_bank[3] = 0x05;
+			state->mmc_vrom_bank[4] = 0x06;
+			state->mmc_vrom_bank[5] = 0x07;
+			// VRC2 regs
+			state->mmc_prg_bank[4] = 0x00;
+			state->mmc_prg_bank[5] = 0x01;
+			for (i = 0; i < 8; ++i)
+				state->mmc_vrom_bank[6 + i] = i;
+			someri_mode_update(machine);
+			break;
+			
 // mapper 120
 		case BTL_TOBIDASE:
 			prg32(machine, 2);
@@ -614,9 +645,19 @@ static int pcb_initialize( running_machine *machine, int idx )
 			
 // mapper 121
 		case KAY_PANDAPRINCE:
-			state->mapper121_reg[0] = state->mapper121_reg[1] = state->mapper121_reg[2] = 0;
+			state->mmc_reg[5] = state->mmc_reg[6] = state->mmc_reg[7] = 0;
 			mmc3_common_initialize(machine, 0xff, 0xff, 0);
 			break;
+			
+// mapper 126
+		case BMC_PJOY84:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			state->mmc_reg[0] = state->mmc_reg[1] = state->mmc_reg[2] = state->mmc_reg[3] = 0;
+			pjoy84_set_base_mask(machine);
+			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			break;
+
 // mapper 132
 		case TXC_22211A:
 // mapper 172
@@ -689,6 +730,11 @@ static int pcb_initialize( running_machine *machine, int idx )
 // mapper 182
 		case HOSENKAN_BOARD:
 			prg32(machine, (state->prg_chunks - 1) >> 1);
+			break;
+
+		case FUKUTAKE_BOARD:	// mapper 186
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0);
 			break;
 
 // mapper 187

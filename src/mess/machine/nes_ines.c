@@ -299,17 +299,17 @@ static const nes_mmc mmc_list[] =
 	{ 113, HES_BOARD },
 	{ 114, SUPERGAME_LIONKING },
 	{ 115, KASING_BOARD },
-	// 116 Someri Team (AV Mei Shao Nv Zhan Shi, Chuugoku Taitei) - Unsupported
+	{ 116, SOMERI_SL12 },
 	{ 117, FUTUREMEDIA_BOARD },
 	{ 118, STD_TXSROM },
 	{ 119, STD_TQROM },
 	{ 120, BTL_TOBIDASE },
 	{ 121, KAY_PANDAPRINCE },
 	// 122 Unused
-	// 123 K H2288 (ejim2) - Unsupported
+	{ 123, UNL_H2288 },
 	// 124 Unused
 	// 125 Unused
-	// 126 Powerjoy 84-in-1 - Unsupported
+	{ 126, BMC_PJOY84 },
 	// 127 Unused
 	// 128 Unused
 	// 129 Unused
@@ -343,7 +343,7 @@ static const nes_mmc mmc_list[] =
 	{ 157, BANDAI_DATACH },	// no Datach Reader -> we fall back to mapper 16
 	{ 158, TENGEN_800037 },
 	{ 159, BANDAI_LZ93EX },	// with 24c01
-	// 160 Unused
+	{ 160, SACHEN_SA009 },
 	// 161 Unused
 	// 162 Unused
 	{ 163, NANJING_BOARD},
@@ -369,7 +369,7 @@ static const nes_mmc mmc_list[] =
 	// 183 FDS bootleg (Shui Guan Pipe) - Unsupported
 	{ 184, SUNSOFT_1 },
 	{ 185, STD_CNROM },
-	// 186 Fukutake (Study Box) - Unsupported
+	{ 186, FUKUTAKE_BOARD },
 	{ 187, UNL_KOF96 },
 	{ 188, BANDAI_KARAOKE },
 	{ 189, TXC_TW },
