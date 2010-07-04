@@ -213,8 +213,6 @@ public:
 	UINT32 mapper_ram_size;
 	UINT32 mapper_bram_size;
 
-	int format;	// 1 = iNES, 2 = UNIF
-
 	/* system variables which don't change at run-time */
 	UINT16 mapper;		// for iNES
 	UINT16 pcb_id;		// for UNIF & xml

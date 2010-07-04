@@ -618,6 +618,15 @@ const nes_pcb *nes_pcb_lookup( const char *board )
 	return NULL;
 }
 
+int nes_get_pcb_id( running_machine *machine, const char *feature )
+{
+	const nes_pcb *pcb = nes_pcb_lookup(feature);
+	
+	if (pcb == NULL)
+		fatalerror("Unimplemented PCB type %s\n", feature);
+	
+	return pcb->pcb_id;
+}
 
 /************************************************
 
@@ -11945,7 +11954,6 @@ static const nes_pcb_intf nes_intf_list[] =
 	//
 };
 
-
 const nes_pcb_intf *nes_pcb_intf_lookup( int pcb_id )
 {
 	int i;
@@ -11957,56 +11965,14 @@ const nes_pcb_intf *nes_pcb_intf_lookup( int pcb_id )
 	return NULL;
 }
 
-/*************************************************************
- 
- nes_pcb_reset
- 
- Resets the mmc bankswitch areas to their defaults.
- It returns a value "err" that indicates if it was
- successful. Possible values for err are:
- 
- 0 = success
- 1 = no pcb found
- 2 = pcb not supported
- 
- *************************************************************/
-
-int nes_pcb_reset( running_machine *machine )
-{
-	nes_state *state = (nes_state *)machine->driver_data;
-	int err = 0;
-	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->pcb_id);
-
-	if (intf == NULL)
-		fatalerror("Missing PCB interface\n");
-
-	/* Set the mapper irq callback */
-	ppu2c0x_set_scanline_callback(state->ppu, intf ? intf->mmc_scanline : NULL);
-	ppu2c0x_set_hblank_callback(state->ppu, intf ? intf->mmc_hblank : NULL);
-
-	err = pcb_initialize(machine, state->pcb_id);
-
-	return err;
-}
-
-int nes_get_pcb_id( running_machine *machine, const char *feature )
-{
-	const nes_pcb *pcb = nes_pcb_lookup(feature);
-
-	if (pcb == NULL)
-		fatalerror("Unimplemented PCB type %s\n", feature);
-
-	return pcb->pcb_id;
-}
-
 void pcb_handlers_setup( running_machine *machine )
 {
 	nes_state *state = (nes_state *)machine->driver_data;
 	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->pcb_id);
-
+	
 	if (intf == NULL)
 		fatalerror("Missing PCB interface\n");
-
+	
 	if (intf)
 	{
 		state->mmc_write_low = intf->mmc_l.write;
@@ -12028,10 +11994,10 @@ void pcb_handlers_setup( running_machine *machine )
 		state->mmc_read = NULL;	// in progress
 		ppu_latch = NULL;
 	}
-
+	
 	state->mmc3_prg_cb = prg8_x;
 	state->mmc3_chr_cb = chr1_x;
-
+	
 	switch (state->pcb_id)
 	{
 		case STD_TXSROM:
@@ -12114,3 +12080,932 @@ void pcb_handlers_setup( running_machine *machine )
 	}
 }
 
+/*************************************************************
+ 
+ pcb_initialize
+
+ Initialize all the necessary registers and quantities for
+ emulation of each board
+ 
+ *************************************************************/
+
+/* this is used by many boards (MMC3, MMC6 + most MMC3 pirate clone boards) */
+static void mmc3_common_initialize( running_machine *machine, int prg_mask, int chr_mask, int IRQ_type )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	
+	state->mmc3_alt_irq = IRQ_type;		// later MMC3 boards seem to use MMC6-type IRQ... more investigations are in progress at NESDev...
+	state->mmc_prg_bank[0] = state->mmc_prg_bank[2] = 0xfe;	// prg_bank[2] & prg_bank[3] remain always the same in most MMC3 variants
+	state->mmc_prg_bank[1] = state->mmc_prg_bank[3] = 0xff;	// but some pirate clone mappers change them after writing certain registers
+	state->mmc3_latch = 0;
+	state->mmc3_wram_protect = 0x80;
+	state->mmc_prg_base = state->mmc_chr_base = 0;
+	state->mmc_prg_mask = prg_mask;
+	state->mmc_chr_mask = chr_mask;
+	mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+	mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+}
+
+// WIP code
+static int pcb_initialize( running_machine *machine, int idx )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	int err = 0, i;
+	
+	/* basic PRG config */
+	prg32(machine, 0);
+	
+	/* some boards will not use this, but directly CHRROM (resp. CHRRAM) if the board only has VROM (resp. VRAM) */
+	state->mmc_chr_source = state->chr_chunks ? CHRROM : CHRRAM;
+	chr8(machine, 0, state->mmc_chr_source);
+	
+	/* Here, we init a few helpers: 4 prg banks and 16 chr banks - some mappers use them */
+	for (i = 0; i < 4; i++)
+		state->mmc_prg_bank[i] = 0;
+	for (i = 0; i < 16; i++)
+		state->mmc_vrom_bank[i] = 0;
+	for (i = 0; i < 16; i++)
+		state->mmc_extra_bank[i] = 0;
+	
+	state->mmc_latch1 = 0;
+	state->mmc_latch2 = 0;
+	
+	/* Finally, we init IRQ-related quantities. */
+	state->IRQ_enable = state->IRQ_enable_latch = 0;
+	state->IRQ_count = state->IRQ_count_latch = 0;
+	state->IRQ_toggle = 0;
+	
+	switch (idx)
+	{
+			/* many boards only needs PRG to point at first 32k and CHR at first 8k */
+		case STD_NROM:	// mapper 0
+		case HVC_FAMBASIC:
+		case GG_NROM:
+		case UXROM_CC:	// mapper 180
+		case STD_CNROM:	// mapper 3, 185
+		case BANDAI_PT554:
+		case TENGEN_800008:
+		case STD_BXROM:	// mapper 34
+		case STD_GXROM:	// mapper 66
+		case STD_MXROM:
+		case BANDAI_OEKAKIDS:	// mapper 96
+		case JALECO_JF11:	// mapper 140
+		case JALECO_JF13:	// mapper 86
+		case JALECO_JF19:	// mapper 92
+		case DIS_74X377:	// mapper 11
+		case DIS_74X161X138:	// mapper 38
+		case CALTRON_6IN1:	// mapper 41
+		case TXC_STRIKEWOLF:	// mapper 36
+		case UNL_STUDYNGAME:	// mapper 39
+		case RUMBLESTATION_BOARD:	// mapper 46
+		case BMC_GKB:	// mapper 58
+		case RCM_TETRISFAMILY:	// mapper 61
+		case BMC_SUPER_700IN1:	// mapper 62
+		case MAGICSERIES_MD:	// mapper 107
+		case HES_BOARD:	// mapper 113
+		case HES6IN1_BOARD:	// mapper 113
+		case SACHEN_SA72008:	// mapper 133
+		case SACHEN_TCU02:	// mapper 136
+		case SACHEN_SA72007:	// mapper 145
+		case SACHEN_TCU01:	// mapper 147
+		case SACHEN_SA009:	// mapper 160
+		case SACHEN_SA0037:	// mapper 148
+		case SACHEN_SA0036:	// mapper 149
+		case AGCI_50282:	// mapper 144
+		case KAISER_KS7058:	// mapper 171
+		case HENGEDIANZI_BOARD:	// mapper 177
+		case WAIXING_SGZLZ:	// mapper 178
+		case HENGEDIANZI_XJZB:	// mapper 179
+		case BMC_21IN1:	// mapper 201
+		case BMC_9999999IN1:	// mapper 213
+		case RCM_GS2015:	// mapper 216
+		case BMC_72IN1:	// mapper 225
+		case BMC_76IN1:	// mapper 226
+		case BMC_SUPER_42IN1:	// mapper 226
+		case ACTENT_ACT52:	// mapper 228
+		case CNE_SHLZ:	// mapper 240
+		case TXC_MXMDHTWO:	// mapper 241
+		case WAIXING_ZS:	// mapper 242
+		case WAIXING_DQ8:	// mapper 242
+		case CNE_DECATHLON:	// mapper 244
+		case UNL_CC21:
+		case BMC_VT5201:
+		case BMC_WS:
+		case UNL_EDU2K:
+			break;
+			
+			/* other boards need additional initialization */
+		case STD_UXROM:	// mapper 2
+		case STD_UN1ROM:	// mapper 94
+		case STD_JXROM:		// mapper 69
+		case SUNSOFT_5B:
+		case SUNSOFT_FME7:
+		case NAMCOT_3425:	// mapper 95
+		case DIS_74X139X74:	// mapper 87
+		case DIS_74X161X161X32:	// mapper 152 & 70
+		case BANDAI_LZ93:	// mapper 16, 157
+		case BANDAI_LZ93EX:	// same + EEPROM
+		case BANDAI_DATACH:
+		case BANDAI_FCG:
+		case IREM_HOLYDIV:	// mapper 78
+		case IREM_G101:	// mapper 32
+		case IREM_H3001:	// mapper 65
+		case JALECO_SS88006:	// mapper 18
+		case JALECO_JF16:	// mapper 78
+		case JALECO_JF17:	// mapper 72
+		case KONAMI_VRC1:	// mapper 75
+		case KONAMI_VRC2:
+		case KONAMI_VRC3:	// mapper 73
+		case KONAMI_VRC4:
+		case KONAMI_VRC6:
+		case SUNSOFT_3:	// mapper 67
+		case TAITO_TC0190FMC:	// mapper 33
+		case TAITO_TC0190FMCP:	// mapper 48
+		case TAITO_X1_005:	// mapper 80
+		case TAITO_X1_005_A:	// mapper 207
+		case TAITO_X1_017:	// mapper 82
+		case NTDEC_ASDER:	// mapper 112
+		case FUTUREMEDIA_BOARD:	// mapper 117
+		case BTL_DRAGONNINJA:	// mapper 222
+		case WAIXING_SGZ:	// mapper 252
+		case UNL_T230:
+		case BMC_NTD_03:
+		case KAISER_KS7022:
+		case UNL_SHJY3:
+		case KAISER_KS7017:
+		case KAISER_KS7032:
+		case KAISER_KS202:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+			
+		case STD_CPROM:	// mapper 13
+			chr4_0(machine, 0, CHRRAM);
+			chr4_4(machine, 0, CHRRAM);
+			break;
+		case STD_AXROM:	// mapper 7
+			set_nt_mirroring(machine, PPU_MIRROR_LOW);
+			break;
+		case STD_SXROM:	// mapper 1, 155
+		case STD_SOROM:
+		case STD_SXROM_A:
+		case STD_SOROM_A:
+			state->mmc1_latch = 0;
+			state->mmc1_count = 0;
+			state->mmc_reg[0] = 0x0f;
+			state->mmc_reg[1] = state->mmc_reg[2] = state->mmc_reg[3] = 0;
+			state->mmc1_reg_write_enable = 1;
+			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
+			mmc1_set_chr(machine);
+			mmc1_set_prg(machine);
+			wram_bank(machine, 0, (idx == STD_SOROM) ? NES_WRAM : NES_BATTERY);
+			break;
+		case STD_PXROM:	// mapper 9
+			state->mmc_reg[0] = state->mmc_reg[2] = 0;
+			state->mmc_reg[1] = state->mmc_reg[3] = 0;
+			state->mmc_latch1 = state->mmc_latch2 = 0xfe;
+			prg8_89(machine, 0);
+			prg8_ab(machine, (state->prg_chunks << 1) - 3);
+			prg8_cd(machine, (state->prg_chunks << 1) - 2);
+			prg8_ef(machine, (state->prg_chunks << 1) - 1);
+			break;
+		case STD_FXROM: // mapper 10
+			state->mmc_reg[0] = state->mmc_reg[2] = 0;
+			state->mmc_reg[1] = state->mmc_reg[3] = 0;
+			state->mmc_latch1 = state->mmc_latch2 = 0xfe;
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+		case STD_TXROM:	// mapper 4
+		case STD_TVROM:
+		case STD_TKROM:
+		case REXSOFT_DBZ5:	// mapper 12
+		case WAIXING_TYPE_A:	// mapper 74
+		case WAIXING_TYPE_A_1:
+		case STD_TXSROM:	// mapper 118
+		case STD_TQROM:	// mapper 119
+		case WAIXING_SH2:	// mapper 165
+		case WAIXING_TYPE_B:	// mapper 191
+		case WAIXING_TYPE_C:	// mapper 192
+		case WAIXING_TYPE_D:	// mapper 194
+		case WAIXING_TYPE_E:	// mapper 195
+		case WAIXING_TYPE_H:	// mapper 245
+		case BTL_SUPERBROS11:	// mapper 196
+		case UNL_H2288:		// mapper 123
+		case UNL_KOF97:
+		case UNL_603_5052:
+		case NITRA_TDA:	// mapper 250
+			if (state->four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
+			{
+				set_nt_page(machine, 0, CART_NTRAM, 0, 1);
+				set_nt_page(machine, 1, CART_NTRAM, 1, 1);
+				set_nt_page(machine, 2, CART_NTRAM, 2, 1);
+				set_nt_page(machine, 3, CART_NTRAM, 3, 1);
+			}
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+		case STD_HKROM:	// MMC6 (basically the same as TxROM, but alt IRQ behaviour)
+			mmc3_common_initialize(machine, 0xff, 0xff, 1);
+			state->mmc6_reg = 0xf0;
+			state->mmc_latch2 = 0;	// this is used differently here compared to MMC3
+			break;
+		case PAL_ZZ:	// mapper 37
+			mmc3_common_initialize(machine, 0x07, 0x7f, 0);
+			break;
+		case NES_QJ:	// mapper 47
+			mmc3_common_initialize(machine, 0x0f, 0x7f, 0);
+			break;
+		case STD_EXROM:	// mapper 5
+			state->MMC5_rom_bank_mode = 3;
+			state->MMC5_vrom_bank_mode = 0;
+			state->MMC5_vram_protect = 0;
+			state->mmc5_high_chr = 0;
+			state->mmc5_vram_control = 0;
+			state->mmc5_split_scr = 0;
+			memset(state->MMC5_vrom_bank, 0, ARRAY_LENGTH(state->MMC5_vrom_bank));
+			state->mmc5_prg_mode = 3;
+			state->mmc5_last_chr_a = 1;
+			state->mmc5_prg_regs[0] = 0xfc;
+			state->mmc5_prg_regs[1] = 0xfd;
+			state->mmc5_prg_regs[2] = 0xfe;
+			state->mmc5_prg_regs[3] = 0xff;
+			memset(state->mmc5_vrom_regA, ~0, ARRAY_LENGTH(state->mmc5_vrom_regA));
+			memset(state->mmc5_vrom_regB, ~0, ARRAY_LENGTH(state->mmc5_vrom_regB));
+			prg16_89ab(machine, state->prg_chunks - 2);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+		case STD_NXROM:		// mapper 68
+		case SUNSOFT_DCS:		// mapper 68
+			state->mmc_reg[0] = 0;
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+		case NAMCOT_34X3:	// mapper 88
+		case STD_DXROM:	// mapper 206
+		case STD_DRROM:
+			if (state->four_screen_vram)	// only TXROM and DXROM have 4-screen mirroring
+			{
+				set_nt_page(machine, 0, CART_NTRAM, 0, 1);
+				set_nt_page(machine, 1, CART_NTRAM, 1, 1);
+				set_nt_page(machine, 2, CART_NTRAM, 2, 1);
+				set_nt_page(machine, 3, CART_NTRAM, 3, 1);
+			}
+		case NAMCOT_3453:	// mapper 154
+			prg16_89ab(machine, state->prg_chunks - 2);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+		case NAMCOT_3446:	// mapper 76
+			prg8_89(machine, 0);
+			prg8_ab(machine, 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			chr2_0(machine, 0, CHRROM);
+			chr2_2(machine, 1, CHRROM);
+			chr2_4(machine, 2, CHRROM);
+			chr2_6(machine, 3, CHRROM);
+			break;
+		case BANDAI_JUMP2:	// mapper 153
+			for (i = 0; i < 8; i++)
+				state->mmc_reg[i] = 0;
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			fjump2_set_prg(machine);
+			break;
+		case BANDAI_KARAOKE:	// mapper 188
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, (state->prg_chunks - 1) ^ 0x08);
+			break;
+		case IREM_LROG017:	// mapper 77
+			chr2_2(machine, 0, CHRROM);
+			chr2_4(machine, 1, CHRROM);
+			chr2_6(machine, 2, CHRROM);
+			break;
+		case IREM_TAM_S1:	// mapper 97
+			prg16_89ab(machine, state->prg_chunks - 1);
+			prg16_cdef(machine, 0);
+			break;
+		case KONAMI_VRC7:	// mapper 85
+			prg8_89(machine, 0);
+			prg8_ab(machine, 0);
+			prg8_cd(machine, 0);
+			prg8_ef(machine, 0xff);
+			break;
+		case NAMCOT_163:	// mapper 19
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+		case SUNSOFT_1:	// mapper 184
+		case SUNSOFT_2:	// mapper 89 & 93
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			if (!state->hard_mirroring)
+				set_nt_mirroring(machine, PPU_MIRROR_LOW);
+			break;
+			
+			// mapper 14
+		case REXSOFT_SL1632:
+			state->mmc_extra_bank[2] = 0xfe;
+			state->mmc_extra_bank[3] = 0xff;
+			state->mmc_extra_bank[0] = state->mmc_extra_bank[1] = state->mmc_extra_bank[4] = state->mmc_extra_bank[5] = state->mmc_extra_bank[6] = 0;
+			state->mmc_extra_bank[7] = state->mmc_extra_bank[8] = state->mmc_extra_bank[9] = state->mmc_extra_bank[0xa] = state->mmc_extra_bank[0xb] = 0;
+			state->mmc_reg[0] = state->mmc_reg[1] = 0;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+			// mapper 15
+		case WAIXING_PS2:
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			
+			// mapper 35
+		case UNL_SC127:
+			// mapper 42
+		case BTL_MARIOBABY:
+		case BTL_AISENSHINICOL:
+			prg32(machine, 0xff);
+			break;
+			
+			// mapper 40
+		case BTL_SMB2A:
+			prg8_67(machine, 0xfe);
+			prg8_89(machine, 0xfc);
+			prg8_ab(machine, 0xfd);
+			prg8_cd(machine, 0xfe);
+			prg8_ef(machine, 0xff);
+			break;
+			
+			// mapper 43
+		case UNL_SMB2J:
+			if (state->battery)
+				memset(state->battery_ram, 0x2000, 0xff);
+			else if (state->prg_ram)
+				memset(state->wram, 0x2000, 0xff);
+			break;
+			// mapper 44
+		case BMC_SUPERBIG_7IN1:
+			// mapper 49
+		case BMC_SUPERHIK_4IN1:
+			mmc3_common_initialize(machine, 0x0f, 0x7f, 0);
+			break;
+			// mapper 45
+		case BMC_HIK8IN1:
+			state->mmc_reg[0] = state->mmc_reg[1] = state->mmc_reg[2] = state->mmc_reg[3] = 0;
+			mmc3_common_initialize(machine, 0x3f, 0xff, 0);
+			break;
+			
+			// mapper 50
+		case BTL_SMB2B:
+			prg8_67(machine, 0x0f);
+			prg8_89(machine, 0x08);
+			prg8_ab(machine, 0x09);
+			prg8_cd(machine, 0);
+			prg8_ef(machine, 0x0b);
+			break;
+			// mapper 51
+		case BMC_BALLGAMES_11IN1:
+			state->mmc_reg[0] = 0x01;
+			state->mmc_reg[1] = 0x00;
+			bmc_ball11_set_banks(machine);
+			break;
+			// mapper 52
+		case BMC_MARIOPARTY_7IN1:
+			state->map52_reg_written = 0;
+			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
+			break;
+			// mapper 54
+		case BMC_NOVELDIAMOND:
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			// mapper 57
+		case BMC_GKA:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0);
+			break;
+			
+			// mapper 64
+		case TENGEN_800032:
+			// mapper 158
+		case TENGEN_800037:
+			prg16_89ab(machine, state->prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+			// mapper 71
+		case CAMERICA_BF9097:
+			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
+		case CAMERICA_BF9093:
+			prg32(machine, 0xff);
+			break;
+			
+			// mapper 79 (& 146)
+		case AVE_NINA06:
+			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
+			break;
+			
+			// mapper 83
+		case CONY_BOARD:
+			state->mapper83_reg[9] = 0x0f;
+			prg8_cd(machine, 0x1e);
+			prg8_ef(machine, 0x1f);
+			break;
+			
+			// mapper 91
+		case UNL_MK2:
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			prg16_89ab(machine, state->prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+			
+			// mapper 104
+		case CAMERICA_GOLDENFIVE:
+			prg16_89ab(machine, 0x00);
+			prg16_cdef(machine, 0x0f);
+			break;
+			// mapper 106
+		case BTL_SMB3:
+			prg8_89(machine, (state->prg_chunks << 1) - 1);
+			prg8_ab(machine, 0);
+			prg8_cd(machine, 0);
+			prg8_ef(machine, (state->prg_chunks << 1) - 1);
+			break;
+			
+			// mapper 108
+		case WHIRLWIND_2706:
+			prg32(machine, 0xff);
+			break;
+			
+			// mapper 114
+		case SUPERGAME_LIONKING:
+			state->map114_reg = state->map114_reg_enabled = 0;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+			// mapper 115
+		case KASING_BOARD:
+			state->mmc_reg[0] = 0;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+			// mapper 116
+		case SOMERI_SL12:
+			state->mmc_prg_base = state->mmc_chr_base = 0;
+			state->mmc_prg_mask = 0xff;
+			state->mmc_chr_mask = 0xff;
+			state->mmc_cmd1 = 2; // mode
+			state->mmc3_latch = 0;
+			state->mmc3_wram_protect = 0;
+			// MMC1 regs
+			state->mmc1_count = 0;
+			state->mmc_reg[0] = 0x0c;
+			state->mmc_reg[1] = 0x00;
+			state->mmc_reg[2] = 0x00;
+			state->mmc_reg[3] = 0x00;
+			// MMC3 regs
+			state->mmc_prg_bank[0] = 0x3c;
+			state->mmc_prg_bank[1] = 0x3d;
+			state->mmc_prg_bank[2] = 0xfe;
+			state->mmc_prg_bank[3] = 0xff;
+			state->mmc_vrom_bank[0] = 0x00;
+			state->mmc_vrom_bank[1] = 0x01;
+			state->mmc_vrom_bank[2] = 0x04;
+			state->mmc_vrom_bank[3] = 0x05;
+			state->mmc_vrom_bank[4] = 0x06;
+			state->mmc_vrom_bank[5] = 0x07;
+			// VRC2 regs
+			state->mmc_prg_bank[4] = 0x00;
+			state->mmc_prg_bank[5] = 0x01;
+			for (i = 0; i < 8; ++i)
+				state->mmc_vrom_bank[6 + i] = i;
+			someri_mode_update(machine);
+			break;
+			
+			// mapper 120
+		case BTL_TOBIDASE:
+			prg32(machine, 2);
+			break;
+			
+			// mapper 121
+		case KAY_PANDAPRINCE:
+			state->mmc_reg[5] = state->mmc_reg[6] = state->mmc_reg[7] = 0;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+			
+			// mapper 126
+		case BMC_PJOY84:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			state->mmc_reg[0] = state->mmc_reg[1] = state->mmc_reg[2] = state->mmc_reg[3] = 0;
+			pjoy84_set_base_mask(machine);
+			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			break;
+			
+			// mapper 132
+		case TXC_22211A:
+			// mapper 172
+		case TXC_22211B:
+			// mapper 173
+		case TXC_22211C:
+			state->txc_reg[0] = state->txc_reg[1] = state->txc_reg[2] = state->txc_reg[3] = 0;
+			break;
+			
+			// mapper 134
+		case BMC_FAMILY_4646B:
+			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
+			break;
+			
+			// mapper 137
+		case SACHEN_8259D:
+			chr8(machine, state->chr_chunks - 1, CHRROM);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			// mapper 138
+		case SACHEN_8259B:
+			// mapper 139
+		case SACHEN_8259C:
+			// mapper 141
+		case SACHEN_8259A:
+			// mapper 150
+		case SACHEN_74LS374:
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			// mapper 143
+		case SACHEN_TCA01:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 1);
+			break;
+			
+			// mapper 156
+		case OPENCORP_DAOU306:
+			prg16_89ab(machine, state->prg_chunks - 2);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			set_nt_mirroring(machine, PPU_MIRROR_LOW);
+			break;
+			// mapper 163
+		case NANJING_BOARD:
+			state->mmc_count = 0xff;
+			state->mmc_reg[0] = 0xff;
+			state->mmc_reg[1] = 0;
+			prg16_89ab(machine, state->prg_chunks - 2);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+			// mapper 164
+		case WAIXING_FFV:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0x1f);
+			break;
+			// mapper 166
+		case SUBOR_TYPE1:
+			state->subor_reg[0] = state->subor_reg[1] = state->subor_reg[2] = state->subor_reg[3] = 0;
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0x07);
+			break;
+			// mapper 167
+		case SUBOR_TYPE0:
+			state->subor_reg[0] = state->subor_reg[1] = state->subor_reg[2] = state->subor_reg[3] = 0;
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0x20);
+			break;
+			
+			// mapper 176
+		case UNL_XZY:
+			// mapper 182
+		case HOSENKAN_BOARD:
+			prg32(machine, (state->prg_chunks - 1) >> 1);
+			break;
+			
+		case FUKUTAKE_BOARD:	// mapper 186
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0);
+			break;
+			
+			// mapper 187
+		case UNL_KOF96:
+			state->mmc_reg[0] = state->mmc_reg[1] = state->mmc_reg[2] = state->mmc_reg[3] = 0;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+			// mapper 189
+		case TXC_TW:
+			state->mmc_latch1 = 0;
+			state->mmc_latch2 = 0x80;
+			state->mmc_chr_base = 0;
+			state->mmc_chr_mask = 0xff;
+			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			break;
+			// mapper 193
+		case NTDEC_FIGHTINGHERO:
+			prg32(machine, (state->prg_chunks - 1) >> 1);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			// mapper 197
+		case UNL_SUPERFIGHTER3:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			unl_sf3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			break;
+			// mapper 198
+		case WAIXING_TYPE_F:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			state->mmc_prg_bank[0] = 0x00;
+			state->mmc_prg_bank[1] = 0x01;
+			state->mmc_prg_bank[2] = 0x4e;
+			state->mmc_prg_bank[3] = 0x4f;
+			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			break;
+			// mapper 199
+		case WAIXING_TYPE_G:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			state->mmc_prg_bank[0] = 0x00;
+			state->mmc_prg_bank[1] = 0x01;
+			state->mmc_prg_bank[2] = 0x3e;
+			state->mmc_prg_bank[3] = 0x3f;
+			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			state->mmc_vrom_bank[0] = 0x00;
+			state->mmc_vrom_bank[1] = 0x02;
+			state->mmc_vrom_bank[2] = 0x04;
+			state->mmc_vrom_bank[3] = 0x05;
+			state->mmc_vrom_bank[4] = 0x06;
+			state->mmc_vrom_bank[5] = 0x07;
+			state->mmc_vrom_bank[6] = 0x01;
+			state->mmc_vrom_bank[7] = 0x03;
+			waixing_g_set_chr(machine, state->mmc_chr_base, state->mmc_chr_mask);
+			break;
+			
+			// mapper 200
+		case BMC_36IN1:
+			prg16_89ab(machine, state->prg_chunks - 1);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+			
+			// mapper 202
+		case BMC_150IN1:
+			// mapper 203
+		case BMC_35IN1:
+			// mapper 204
+		case BMC_64IN1:
+			// mapper 214
+		case BMC_SUPERGUN_20IN1:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0);
+			break;
+			// mapper 205
+		case BMC_15IN1:
+			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
+			state->mmc_prg_base = 0x10;	// this board has a diff prg_base
+			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			break;
+			
+			// mapper 208
+		case GOUDER_37017:
+			state->mmc_reg[0] = state->mmc_reg[1] = state->mmc_reg[2] = state->mmc_reg[3] = state->mmc_reg[4] = 0;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+			// mapper 212
+		case BMC_SUPERHIK_300IN1:
+			chr8(machine, 0xff, CHRROM);
+			prg32(machine, 0xff);
+			break;
+			
+			// mapper 215
+		case SUPERGAME_BOOGERMAN:
+			state->mmc_reg[0] = 0x00;
+			state->mmc_reg[1] = 0xff;
+			state->mmc_reg[2] = 0x04;
+			state->mmc_reg[3] = 0;
+			mmc3_common_initialize(machine, 0x1f, 0xff, 0);
+			sgame_boog_set_prg(machine);
+			mmc3_set_chr(machine, state->mmc_chr_source, state->mmc_chr_base, state->mmc_chr_mask);
+			break;
+			
+			// mapper 217
+		case BMC_GOLDENCARD_6IN1:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			state->mmc_reg[0] = 0x00;
+			state->mmc_reg[1] = 0xff;
+			state->mmc_reg[2] = 0x03;
+			state->mmc_reg[3] = 0;
+			bmc_gc6in1_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			bmc_gc6in1_set_chr(machine, state->mmc_chr_source);
+			break;
+			// mapper 221
+		case UNL_N625092:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0);
+			break;
+			
+			// mapper 223?
+		case WAIXING_TYPE_I:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			state->mmc3_wram_protect = 0;
+			break;
+			
+			// mapper 224?
+		case WAIXING_TYPE_J:
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			state->mmc_prg_bank[0] = 0x01;
+			state->mmc_prg_bank[1] = 0x02;
+			state->mmc_prg_bank[2] = 0x7e;
+			state->mmc_prg_bank[3] = 0x7f;
+			mmc3_set_prg(machine, state->mmc_prg_base, state->mmc_prg_mask);
+			break;
+			
+			// mapper 227
+		case BMC_1200IN1:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0);
+			break;
+			
+			// mapper 229
+		case BMC_31IN1:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 1);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			// mapper 230
+		case BMC_22GAMES:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 7);
+			break;
+			// mapper 231
+		case BMC_20IN1:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			// mapper 232
+		case CAMERICA_BF9096:
+			state->mmc_latch1 = 0x18;
+			state->mmc_latch2 = 0x00;
+			bf9096_set_prg(machine);
+			break;
+			
+			// mapper 243
+		case SACHEN_74LS374_A:
+			state->mmc_vrom_bank[0] = 3;
+			chr8(machine, 3, CHRROM);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			
+			// mapper 246
+		case CNE_FSB:
+			prg32(machine, 0xff);
+			break;
+			// mapper 249
+		case WAIXING_SECURITY:
+			state->mmc_reg[0] = 0;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+			
+			// mapper 254
+		case BTL_PIKACHUY2K:
+			state->mmc_reg[0] = 0xff;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+			
+			// mapper 255
+		case BMC_110IN1:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 1);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			
+			// UNIF only
+		case BMC_64IN1NR:
+			state->mmc_reg[0] = 0x80;
+			state->mmc_reg[1] = 0x43;
+			state->mmc_reg[2] = state->mmc_reg[3] = 0;
+			bmc_64in1nr_set_prg(machine);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+		case BMC_190IN1:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0);
+			break;
+		case BMC_A65AS:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 7);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+		case BMC_GS2004:
+		case BMC_GS2013:
+			prg32(machine, 0xff);
+			break;
+		case BMC_S24IN1SC03:
+			state->mmc_reg[0] = 0x24;
+			state->mmc_reg[1] = 0x9f;
+			state->mmc_reg[2] = 0;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+		case BMC_T262:
+			state->mmc_latch1 = 0;
+			state->mmc_latch2 = 0;
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 7);
+			break;
+		case DREAMTECH_BOARD:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 8);
+			break;
+		case UNL_8237:
+			state->mmc_reg[0] = state->mmc_reg[1] = state->mmc_reg[2] = 0;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			break;
+		case UNL_AX5705:
+			state->mmc_prg_bank[0] = 0;
+			state->mmc_prg_bank[1] = 1;
+			prg8_89(machine, state->mmc_prg_bank[0]);
+			prg8_ab(machine, state->mmc_prg_bank[1]);
+			prg8_cd(machine, 0xfe);
+			prg8_ef(machine, 0xff);
+			break;
+		case UNL_RACERMATE:
+			chr4_0(machine, 0, state->mmc_chr_source);
+			chr4_4(machine, 0, state->mmc_chr_source);
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+			
+		case BMC_BENSHENG_BS5:
+			state->mmc_prg_bank[0] = 0xff;
+			state->mmc_prg_bank[1] = 0xff;
+			state->mmc_prg_bank[2] = 0xff;
+			state->mmc_prg_bank[3] = 0xff;
+			bmc_bs5_update_banks(machine);
+			break;
+			
+		case BMC_810544:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 0);
+			set_nt_mirroring(machine, PPU_MIRROR_VERT);
+			break;
+			
+		case BMC_G63IN1:
+			bmc_gb63_update(machine);
+			break;
+			
+		case BMC_FK23C:
+			state->mmc_reg[0] = 4;
+			state->mmc_reg[1] = 0xff;
+			state->mmc_reg[2] = state->mmc_reg[3] = 0;
+			state->mmc_reg[4] = state->mmc_reg[5] = state->mmc_reg[6] = state->mmc_reg[7] = 0xff;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			fk23c_set_prg(machine);
+			fk23c_set_chr(machine);
+			break;
+			
+		case BMC_FK23CA:
+			state->mmc_reg[0] = state->mmc_reg[1] = state->mmc_reg[2] = state->mmc_reg[3] = 0;
+			state->mmc_reg[4] = state->mmc_reg[5] = state->mmc_reg[6] = state->mmc_reg[7] = 0xff;
+			mmc3_common_initialize(machine, 0xff, 0xff, 0);
+			fk23c_set_prg(machine);
+			fk23c_set_chr(machine);
+			break;
+			
+			
+		case FFE_MAPPER6:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, 7);
+			break;
+		case FFE_MAPPER8:
+			prg32(machine, 0);
+			break;
+		case FFE_MAPPER17:
+			prg16_89ab(machine, 0);
+			prg16_cdef(machine, state->prg_chunks - 1);
+			break;
+			
+		case UNSUPPORTED_BOARD:
+		default:
+			/* Mapper not supported */
+			err = 2;
+			break;
+	}
+	
+	return err;
+}
+
+/*************************************************************
+ 
+ nes_pcb_reset
+ 
+ Resets the mmc bankswitch areas to their defaults.
+ It returns a value "err" that indicates if it was
+ successful. Possible values for err are:
+ 
+ 0 = success
+ 1 = no pcb found
+ 2 = pcb not supported
+ 
+ *************************************************************/
+
+int nes_pcb_reset( running_machine *machine )
+{
+	nes_state *state = (nes_state *)machine->driver_data;
+	int err = 0;
+	const nes_pcb_intf *intf = nes_pcb_intf_lookup(state->pcb_id);
+
+	if (intf == NULL)
+		fatalerror("Missing PCB interface\n");
+
+	/* Set the mapper irq callback */
+	ppu2c0x_set_scanline_callback(state->ppu, intf ? intf->mmc_scanline : NULL);
+	ppu2c0x_set_hblank_callback(state->ppu, intf ? intf->mmc_hblank : NULL);
+
+	err = pcb_initialize(machine, state->pcb_id);
+
+	return err;
+}

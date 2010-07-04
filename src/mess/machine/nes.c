@@ -660,7 +660,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		if ((magic[0] == 'N') && (magic[1] == 'E') && (magic[2] == 'S'))	/* If header starts with 'NES' it is iNES */
 		{
 			UINT32 prg_size;
-			state->format = 1;	// we use this to select between mapper_reset / unif_reset
 			state->ines20 = 0;
 			state->battery_size = NES_BATTERY_SIZE; // with iNES we can only support 8K WRAM battery (iNES 2.0 might fix this)
 			state->prg_ram = 1;	// always map state->wram in bank5 (eventually, this should be enabled only for some mappers)
@@ -988,8 +987,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			state->prg_chunks = 0;
 			state->chr_chunks = 0;
 
-			state->format = 2;	// we use this to select between mapper_reset / unif_reset
-
 			image.fread(&buffer, 4);
 			unif_ver = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
 			logerror("UNIF file found, version %d\n", unif_ver);
@@ -1309,7 +1306,6 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		state->chr_chunks = chr_size / 0x2000;
 		state->vram_chunks = vram_size / 0x2000;
 
-		state->format = 3;
 		state->pcb_id = nes_get_pcb_id(image.device().machine, image.get_feature("pcb"));
 
 		if (state->pcb_id == STD_TVROM || state->pcb_id == STD_DRROM || state->pcb_id == IREM_LROG017)

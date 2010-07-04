@@ -106,16 +106,15 @@ enum
 	UNSUPPORTED_BOARD, UNKNOWN_BOARD, NO_BOARD
 };
 
-//extern int MMC1_extended; /* 0 = normal MMC1 cart, 1 = 512k MMC1, 2 = 1024k MMC1 */
+// these are used to setup the proper PCB ID, for each supported type of files
+int nes_get_pcb_id(running_machine *machine, const char *feature);	// for softlist
+void unif_mapr_setup(running_machine *machine, const char *board);	// for UNIF files
+int nes_get_mmc_id(running_machine *machine, int mapper);	// for iNES files
 
-#define MMC5_VRAM
-
+// these are used to setup handlers and callbacks necessary to the emulation (resp. at start and reset)
+void pcb_handlers_setup(running_machine *machine);
 int nes_pcb_reset(running_machine *machine);
 
-void pcb_handlers_setup(running_machine *machine);
-void unif_mapr_setup(running_machine *machine, const char *board);
-int nes_get_pcb_id(running_machine *machine, const char *feature);
-int nes_get_mmc_id(running_machine *machine, int mapper);
 
 WRITE8_HANDLER( nes_low_mapper_w );
 READ8_HANDLER( nes_low_mapper_r );
