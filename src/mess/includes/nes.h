@@ -171,11 +171,13 @@ public:
 	UINT8 mmc_dipsetting;
 
 	// misc mapper related variables which should be merged with the above one, where possible
-	UINT8 MMC1_regs[4];
 	int mmc1_reg_write_enable;
-	UINT8 MMC2_regs[4];	// these replace bank0/bank0_hi/bank1/bank1_hi
+	int mmc1_latch;
+	int mmc1_count;
 
-	UINT8 mmc3_alt_irq;
+	int mmc3_latch;
+	int mmc3_wram_protect;
+	int mmc3_alt_irq;
 
 	int MMC5_rom_bank_mode;
 	int MMC5_vrom_bank_mode;
@@ -189,38 +191,13 @@ public:
 
 	// these might be unified in single mmc_reg[] array, together with state->mmc_cmd1 & state->mmc_cmd2
 	// but be careful that MMC3 clones often use state->mmc_cmd1/state->mmc_cmd2 (from base MMC3) AND additional regs below!
-	UINT8 mapper45_reg[4];
-	UINT8 mapper51_reg[3];
 	UINT8 mapper83_reg[10];
 	UINT8 mapper83_low_reg[4];
-	UINT8 mapper95_reg[4];
-	UINT8 mapper115_reg[4];
 	UINT8 txc_reg[4];	// used by mappers 132, 172 & 173
 	UINT8 subor_reg[4];	// used by mappers 166 & 167
 	UINT8 sachen_reg[8];	// used by mappers 137, 138, 139 & 141
-	UINT8 mapper12_reg;
 	UINT8 map52_reg_written;
 	UINT8 map114_reg, map114_reg_enabled;
-	UINT8 map215_reg[4];
-	UINT8 map217_reg[4];
-	UINT8 map249_reg;
-	UINT8 map14_reg[2];
-	UINT8 mapper121_reg[8];
-	UINT8 mapper187_reg[4];
-	UINT8 map208_reg[5];
-	UINT8 bmc_64in1nr_reg[4];
-	UINT8 unl_8237_reg[3];
-	UINT8 bmc_s24in1sc03_reg[3];
-
-	// mapper 68 needs these for NT mirroring!
-	int m68_mirror;
-	int m0, m1;
-
-	// Famicom Jump II is identified as Mapper 153, but it works in a completely different way.
-	// in particular, it requires these (not needed by other Mapper 153 games)
-	UINT8 map153_reg[8];
-	UINT8 map153_bank_latch;
-
 
 	/***** NES-cart related *****/
 
