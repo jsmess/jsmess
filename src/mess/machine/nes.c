@@ -982,6 +982,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			// allocate space to temporarily store PRG & CHR banks
 			UINT8 *temp_prg = auto_alloc_array(image.device().machine, UINT8, 256 * 0x4000);
 			UINT8 *temp_chr = auto_alloc_array(image.device().machine, UINT8, 256 * 0x2000);
+			UINT8 temp_byte = 0;
 
 			/* init prg/chr chunks to 0: the exact number of chunks will be determined while reading the file */
 			state->prg_chunks = 0;
@@ -1075,9 +1076,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 					}
 					else if ((magic2[0] == 'T') && (magic2[1] == 'V') && (magic2[2] == 'C') && (magic2[3] == 'I'))
 					{
-						logerror("[TVCI] chunk found. No support yet.\n");
+						logerror("[TVCI] chunk found.\n");
 						image.fread(&buffer, 4);
 						chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
+
+						image.fread(&temp_byte, 1);
+						logerror("Television Standard : %s\n", (temp_byte == 0) ? "NTSC" : (temp_byte == 1) ? "PAL" : "Does not matter");
 
 						read_length += (chunk_length + 8);
 					}
@@ -1115,10 +1119,40 @@ DEVICE_IMAGE_LOAD( nes_cart )
 					}
 					else if ((magic2[0] == 'M') && (magic2[1] == 'I') && (magic2[2] == 'R') && (magic2[3] == 'R'))
 					{
-						logerror("[MIRR] chunk found. No support yet.\n");
+						logerror("[MIRR] chunk found.\n");
 						image.fread(&buffer, 4);
 						chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
-
+						
+						image.fread(&temp_byte, 1);
+						switch (temp_byte)
+						{
+							case 0:	// Horizontal Mirroring (Hard Wired)
+								state->hard_mirroring = PPU_MIRROR_HORZ;
+								break;
+							case 1:	// Vertical Mirroring (Hard Wired)
+								state->hard_mirroring = PPU_MIRROR_VERT;
+								break;
+							case 2:	// Mirror All Pages From $2000 (Hard Wired)
+								state->hard_mirroring = PPU_MIRROR_LOW;
+								break;
+							case 3:	// Mirror All Pages From $2400 (Hard Wired)
+								state->hard_mirroring = PPU_MIRROR_HIGH;
+								break;
+							case 4:	// Four Screens of VRAM (Hard Wired)
+								state->four_screen_vram = 1;
+								break;
+							case 5:	// Mirroring Controlled By Mapper Hardware
+								logerror("Mirroring handled by the board hardware.\n");
+								// default to horizontal at start
+								state->hard_mirroring = PPU_MIRROR_HORZ;
+								break;
+							default:
+								logerror("Undocumented mirroring value.\n");
+								// default to horizontal
+								state->hard_mirroring = PPU_MIRROR_HORZ;
+								break;
+						}
+						
 						read_length += (chunk_length + 8);
 					}
 					else if ((magic2[0] == 'P') && (magic2[1] == 'C') && (magic2[2] == 'K'))
