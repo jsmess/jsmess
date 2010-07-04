@@ -4,7 +4,7 @@
 	<software name="cookie">
 		<description>Cookie</description>
 		<year>1983</year>
-		<publisher>Sinclair Research</publisher>
+		<publisher>Ultimate play the game</publisher>
 		<part name="cart" interface="spectrum_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="cookie.rom" size="16384" crc="7108e9a8" sha1="fa5753133daa2a6b122948adf604c12ab70e2ce9" offset="000000" />
@@ -14,7 +14,7 @@
 	<software name="jetpac">
 		<description>Jet Pac</description>
 		<year>1983</year>
-		<publisher>Sinclair Research</publisher>
+		<publisher>Ultimate play the game</publisher>
 		<part name="cart" interface="spectrum_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="jetpac.rom" size="16384" crc="1d194e5b" sha1="0f0ddb79bb6b052846e0419df231df44184fbca6" offset="000000" />
@@ -24,7 +24,7 @@
 	<software name="pssst">
 		<description>Pssst</description>
 		<year>1983</year>
-		<publisher>Sinclair Research</publisher>
+		<publisher>Ultimate play the game</publisher>
 		<part name="cart" interface="spectrum_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="pssst.rom" size="16384" crc="464cd4f6" sha1="cebafa93c110eabb4b343e7a34175d77d0fd0797" offset="000000" />
@@ -34,10 +34,70 @@
 	<software name="tranzam">
 		<description>Tranz Am</description>
 		<year>1983</year>
-		<publisher>Sinclair Research</publisher>
+		<publisher>Ultimate play the game</publisher>
 		<part name="cart" interface="spectrum_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="tranzam.rom" size="16384" crc="03da9be7" sha1="caf4441730a7032375d82edf385d5ac7f65c1dcd" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="chess">
+		<description>Chess</description>
+		<year>1983</year>
+		<publisher>Psion Software / Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chess.rom" size="16384" crc="08c6a8c6" sha1="bba6d31ff54d3009cc61ae767973aab492bb104c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="backgamm">
+		<description>Backgammon</description>
+		<year>1983</year>
+		<publisher>Psion Software / Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="backgammon.rom" size="16384" crc="40e78b48" sha1="e6ede60bb5e08d7ead8343f8078834d2afb49c30" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="horace">
+		<description>Hungry Horace</description>
+		<year>1982</year>
+		<publisher>Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="hungry horace.rom" size="16384" crc="bef35699" sha1="00129d9a5094a91a6e7392245be5121d5d17adf0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="horacesp">
+		<description>Horace &amp; the Spider</description>
+		<year>1983</year>
+		<publisher>Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="horace and the spider.rom" size="16384" crc="8ce28ffe" sha1="805fcdf83c74937adffab97027310d8c8e431c5a" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="planetoi">
+		<description>Planetoids</description>
+		<year>1983</year>
+		<publisher>Psion Software / Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="planetoids.rom" size="16384" crc="06e43fa2" sha1="da3041aa2f14abda0d2966e44fd2fd144bb3aa72" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="spacerai">
+		<description>Space Raiders</description>
+		<year>1983</year>
+		<publisher>Psion Software / Sinclair Research</publisher>
+		<part name="cart" interface="spectrum_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="space raiders.rom" size="16384" crc="a570bd3d" sha1="f8359abdf50360261099460e48d440738109af1d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
