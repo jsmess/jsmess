@@ -127,6 +127,24 @@ extern void border_draw(running_machine *machine, bitmap_t *bitmap, int full_ref
                 int LeftBorderPixels, int ScreenPixels, int RightBorderPixels,
                 int LeftBorderCycles, int ScreenCycles, int RightBorderCycles,
                 int HorizontalRetraceCycles, int VRetraceTime, int EventID);
+
+				typedef struct EVENT_LIST_ITEM
+{
+	/* driver defined ID for this write */
+	int	Event_ID;
+	/* driver defined data for this write */
+	int	Event_Data;
+	/* time at which this write occured */
+	int Event_Time;
+} EVENT_LIST_ITEM;
+
+void	EventList_Initialise(running_machine *machine, int NumEntries);
+void    EventList_Reset(void);
+void    EventList_AddItem(int ID, int Data,int Time);
+void    EventList_SetOffsetStartTime(int StartTime);
+void    EventList_AddItemOffset(running_machine *machine, int ID, int Data,int Time);
+int     EventList_NumEvents(void);
+EVENT_LIST_ITEM *EventList_GetFirstItem(void);
 				
 /*----------- defined in video/timex.c -----------*/
 extern VIDEO_EOF( ts2068 );

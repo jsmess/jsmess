@@ -274,7 +274,6 @@ SamRam
 #include "sound/speaker.h"
 #include "sound/wave.h"
 #include "includes/spectrum.h"
-#include "eventlst.h"
 #include "devices/snapquik.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"

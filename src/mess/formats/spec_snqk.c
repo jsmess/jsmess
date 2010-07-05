@@ -28,7 +28,6 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/spectrum.h"
-#include "eventlst.h"
 #include "sound/ay8910.h"
 #include "formats/spec_snqk.h"
 #include "utils.h"

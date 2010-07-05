@@ -75,7 +75,6 @@ EMUOBJS += \
 	$(MESSOBJ)/mess.o		\
 	$(MESSOBJ)/uimess.o		\
 	$(MESSOBJ)/utils.o		\
-	$(MESSOBJ)/eventlst.o	\
 	$(MESSOBJ)/cheatms.o	\
 
 $(LIBEMU): $(EMUOBJS)

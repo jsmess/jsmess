@@ -15,7 +15,6 @@
 
 #include "emu.h"
 #include "includes/spectrum.h"
-#include "eventlst.h"
 #include "devices/messram.h"
 
 INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)

@@ -132,7 +132,7 @@
 			</dataarea>
 		</part>
 	</software>
-	<software name="montezuma">
+	<software name="montezum">
 		<description>Montezuma's Revenge (Prototype)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
@@ -142,13 +142,13 @@
 			</dataarea>
 		</part>
 	</software>			
-	<software name="montezuma1" cloneof="montezuma">
+	<software name="montezuma1" cloneof="montezum">
 		<description>Montezuma's Revenge (Prototype, Alt)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
 		<part name="cart" interface="spectrum_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="montezuma&apos;s revenge.rom" size="16384" crc="5d73082e" sha1="e8f1b6e6b8c8eb6de6a0c6d271351ca7056a39af" offset="000000" />
+				<rom name="montezuma&apos;s revenge (prot).rom" size="16384" crc="5d73082e" sha1="e8f1b6e6b8c8eb6de6a0c6d271351ca7056a39af" offset="000000" />
 			</dataarea>
 		</part>
 	</software>	
