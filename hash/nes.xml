@@ -7567,10 +7567,10 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C02" />
 			<dataarea name="prg" size="262144">
-				<rom name="d·b·z-4 prg" size="262144" crc="2e991109" sha1="b7582841bcbf50de7a93b525430f1317e07ab7e4" offset="00000" />
+				<rom name="d-b-z-4 prg" size="262144" crc="2e991109" sha1="b7582841bcbf50de7a93b525430f1317e07ab7e4" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="d·b·z-4 chr" size="262144" crc="b6b9f9f7" sha1="abef2b37cc0a84c979975608ce9be36af4d8a090" offset="00000" />
+				<rom name="d-b-z-4 chr" size="262144" crc="b6b9f9f7" sha1="abef2b37cc0a84c979975608ce9be36af4d8a090" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7583,10 +7583,10 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C02" />
 			<dataarea name="prg" size="262144">
-				<rom name="d·b·z-2 prg" size="262144" crc="1582fee0" sha1="2d24c6893a96abeed9269804b82ae4a3f8fa230a" offset="00000" />
+				<rom name="d-b-z-2 prg" size="262144" crc="1582fee0" sha1="2d24c6893a96abeed9269804b82ae4a3f8fa230a" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="d·b·z-2 chr" size="262144" crc="6e2df8bd" sha1="564cfe1aebc1ae5ffbd576466016136b8b660d4b" offset="00000" />
+				<rom name="d-b-z-2 chr" size="262144" crc="6e2df8bd" sha1="564cfe1aebc1ae5ffbd576466016136b8b660d4b" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -7599,10 +7599,10 @@
 		<part name="cart" interface="nes_cart">
 			<feature name="pcb" value="BANDAI-LZ93D50+24C02" />
 			<dataarea name="prg" size="262144">
-				<rom name="d·b·z·2 prg ver2" size="262144" crc="e49fc53e" sha1="fd2b56ec610aa29e25c95dcc93e0ec4fe6f0f833" offset="00000" />
+				<rom name="d-b-z-2 prg ver2" size="262144" crc="e49fc53e" sha1="fd2b56ec610aa29e25c95dcc93e0ec4fe6f0f833" offset="00000" />
 			</dataarea>
 			<dataarea name="chr" size="262144">
-				<rom name="d·b·z-2 chr" size="262144" crc="6e2df8bd" sha1="564cfe1aebc1ae5ffbd576466016136b8b660d4b" offset="00000" />
+				<rom name="d-b-z-2 chr" size="262144" crc="6e2df8bd" sha1="564cfe1aebc1ae5ffbd576466016136b8b660d4b" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
