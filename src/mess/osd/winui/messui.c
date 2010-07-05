@@ -460,7 +460,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 
 					if (list)
 					{
-						for (software_info *swinfo = software_list_first(list); swinfo != NULL; swinfo = software_list_next(list))
+						for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 						{
 							const device_config_image_interface *image;
 							software_part *part = software_find_part(swinfo, NULL, NULL);
