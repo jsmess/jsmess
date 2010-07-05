@@ -17,7 +17,7 @@
 -->
 
 <softwarelist name="xegs" description="Atari XE Game System cartridges">
-	<software name="aceaces" supported="no">
+	<software name="aceaces">
 		<description>Ace of Aces</description>
 		<!-- <cart number>RX8099</cart number> -->
 		<year>1988</year>
@@ -29,7 +29,7 @@
 		</part>
 	</software>
 
-	<software name="airball" supported="no">
+	<software name="airball">
 		<description>Airball</description>
 		<!-- <cart number>RX8109</cart number> -->
 		<year>1988</year>
@@ -41,7 +41,7 @@
 		</part>		
 	</software>
 	
-	<software name="archon" supported="no">
+	<software name="archon">
 		<description>Archon: The Light and the Dark</description>
 		<!-- <cart number>RX8092</cart number> -->
 		<year>1987</year>
@@ -65,7 +65,7 @@
 		</part>
 	</software>
 
-	<software name="brnblstr" supported="no">
+	<software name="brnblstr">
 		<description>Barnyard Blaster</description>
 		<!-- <cart number>RX8086</cart number> -->
 		<year>1987</year>
@@ -77,7 +77,7 @@
 		</part>
 	</software>
 	
-	<software name="bzone" supported="no">
+	<software name="bzone">
 		<description>BattleZone</description>
 		<!-- <cart number>RX8077</cart number> -->
 		<year>1987</year>
@@ -89,7 +89,7 @@
 		</part>
 	</software>
 	
-	<software name="bluemax" supported="no">
+	<software name="bluemax">
 		<description>Blue Max</description>
 		<!-- <cart number>RX8081</cart number> -->
 		<year>1987</year>
@@ -101,7 +101,7 @@
 		</part>
 	</software>
 	
-	<software name="bughunt" supported="no">
+	<software name="bughunt">
 		<description>Bug Hunt</description>
 		<!-- <cart number>RX8087</cart number> -->
 		<year>1987</year>
@@ -113,7 +113,7 @@
 		</part>
 	</software>
 	
-	<software name="choplift" supported="no">
+	<software name="choplift" supported="partial">
 		<description>Choplifter!</description>
 		<!-- <cart number>RX8096</cart number> -->
 		<year>1987</year>
@@ -125,7 +125,7 @@
 		</part>
 	</software>
 	
-	<software name="commando" supported="no">
+	<software name="commando">
 		<description>Commando (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1988</year>
@@ -137,7 +137,7 @@
 		</part>
 	</software>
 	
-	<software name="crimbstr" supported="no">
+	<software name="crimbstr">
 		<description>Crime Buster</description>
 		<!-- <cart number>RX8104</cart number> -->
 		<year>1988</year>
@@ -149,7 +149,7 @@
 		</part>
 	</software>
 	
-	<software name="crossbow" supported="no">
+	<software name="crossbow" supported="partial">
 		<description>Crossbow</description>
 		<!-- <cart number>RX8088</cart number> -->
 		<year>1988</year>
@@ -161,7 +161,7 @@
 		</part>
 	</software>
 	
-	<software name="crossbowa" cloneof="crossbow" supported="no">
+	<software name="crossbowa" cloneof="crossbow" supported="partial">
 		<description>Crossbow (Alt)</description>
 		<!-- <cart number>RX8088</cart number> -->
 		<year>1988</year>
@@ -173,7 +173,7 @@
 		</part>
 	</software>
 	
-	<software name="ccastles" supported="no">
+	<software name="ccastles">
 		<description>Crystal Castles</description>
 		<!-- <cart number>RX8102</cart number> -->
 		<year>1988</year>
@@ -185,7 +185,7 @@
 		</part>
 	</software>
 	
-	<software name="drkchmbr" supported="no">
+	<software name="drkchmbr">
 		<description>Dark Chambers</description>
 		<!-- <cart number>RX8101</cart number> -->
 		<year>1988</year>
@@ -197,8 +197,8 @@
 		</part>
 	</software>
 	
-	<software name="midntmgc" supported="no">
-		<description>David&apos;s Midnight Magic</description>
+	<software name="midntmgc">
+		<description>David's Midnight Magic</description>
 		<!-- <cart number>RX8083</cart number> -->
 		<year>1987</year>
 		<publisher>Atari</publisher>
@@ -209,7 +209,7 @@
 		</part>
 	</software>
 	
-	<software name="deflktor" supported="no">
+	<software name="deflktor">
 		<description>Deflektor (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1988</year>
@@ -221,7 +221,7 @@
 		</part>
 	</software>
 	
-	<software name="dsrtflcn" supported="no">
+	<software name="dsrtflcn">
 		<description>Desert Falcon</description>
 		<!-- <cart number>RX8089</cart number> -->
 		<year>1988</year>
@@ -233,7 +233,7 @@
 		</part>
 	</software>
 	
-	<software name="fightnit" supported="no">
+	<software name="fightnit">
 		<description>Fight Night</description>
 		<!-- <cart number>RX8085</cart number> -->
 		<year>1987</year>
@@ -245,7 +245,7 @@
 		</part>
 	</software>	
 	
-	<software name="flgtsim2" supported="no">
+	<software name="flgtsim2" supported="partial">
 		<description>Flight Simulator 2</description>
 		<!-- <cart number>RX8091</cart number> -->
 		<year>1987</year>
@@ -257,7 +257,7 @@
 		</part>
 	</software>
 		
-	<software name="foodf" supported="no">
+	<software name="foodf">
 		<description>Food Fight</description>
 		<!-- <cart number>RX8079</cart number> -->
 		<year>1987</year>
@@ -269,7 +269,7 @@
 		</part>
 	</software>
 	
-	<software name="gato" supported="no">
+	<software name="gato">
 		<description>GATO Submarine Simulation</description>
 		<!-- <cart number>RX8090</cart number> -->
 		<year>1987</year>
@@ -281,7 +281,7 @@
 		</part>
 	</software>
 		
-	<software name="hardball" supported="no">
+	<software name="hardball">
 		<description>Hardball!</description>
 		<!-- <cart number>RX8084</cart number> -->
 		<year>1987</year>
@@ -293,8 +293,8 @@
 		</part>
 	</software>	
 	
-	<software name="eaglnest" supported="no">
-		<description>Into the Eagle&apos;s Nest</description>
+	<software name="eaglnest">
+		<description>Into the Eagle's Nest</description>
 		<!-- <cart number>RX8114</cart number> -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
@@ -305,7 +305,7 @@
 		</part>
 	</software>	
 	
-	<software name="karateka" supported="no">
+	<software name="karateka">
 		<description>Karateka</description>
 		<!-- <cart number>RX8095</cart number> -->
 		<year>1988</year>
@@ -317,7 +317,7 @@
 		</part>
 	</software>
 		
-	<software name="ldrun" supported="no">
+	<software name="ldrun">
 		<description>Lode Runner</description>
 		<!-- <cart number>RX8082</cart number> -->
 		<year>1987</year>
@@ -329,8 +329,8 @@
 		</part>
 	</software>	
 	
-	<software name="mariobro" supported="no">
-		<description>Mario Brothers</description>
+	<software name="mariobro">
+		<description>Mario Bros.</description>
 		<!-- <cart number>RX8103</cart number> -->
 		<year>1988</year>
 		<publisher>Atari</publisher>
@@ -341,7 +341,7 @@
 		</part>
 	</software>	
 	
-	<software name="mean18" supported="no">
+	<software name="mean18">
 		<description>Mean 18 (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1988</year>
@@ -353,7 +353,7 @@
 		</part>
 	</software>
 	
-	<software name="midimaze" supported="no">
+	<software name="midimaze" supported="partial">
 		<description>MIDI Maze (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1988</year>
@@ -365,7 +365,7 @@
 		</part>
 	</software>
 		
-	<software name="necroman" supported="no">
+	<software name="necroman">
 		<description>Necromancer</description>
 		<!-- <cart number>RX8108</cart number> -->
 		<year>1988</year>
@@ -377,7 +377,7 @@
 		</part>
 	</software>	
 	
-	<software name="1on1" supported="no">
+	<software name="1on1">
 		<description>One-on-One</description>
 		<!-- <cart number>RX8093</cart number> -->
 		<year>1987</year>
@@ -389,7 +389,7 @@
 		</part>
 	</software>	
 	
-	<software name="fractlus" supported="no">
+	<software name="fractlus">
 		<description>Rescue on Fractalus!</description>
 		<!-- <cart number>RX8063</cart number> -->
 		<year>1987</year>
@@ -401,7 +401,7 @@
 		</part>
 	</software>
 	
-	<software name="raiders2" supported="no">
+	<software name="raiders2">
 		<description>Star Raiders II</description>
 		<!-- <cart number>RX8078</cart number> -->
 		<year>1987</year>
@@ -413,7 +413,7 @@
 		</part>
 	</software>
 	
-	<software name="sumrgams" supported="no">
+	<software name="sumrgams">
 		<description>Summer Games</description>
 		<!-- <cart number>RX8098</cart number> -->
 		<year>1987</year>
@@ -425,7 +425,7 @@
 		</part>
 	</software>
 	
-	<software name="thundfox" supported="no">
+	<software name="thundfox">
 		<description>Thunderfox</description>
 		<!-- <cart number>RX8113</cart number> -->
 		<year>1988</year>
@@ -437,7 +437,7 @@
 		</part>
 	</software>	
 	
-	<software name="ttoppler" supported="no">
+	<software name="ttoppler">
 		<description>Tower Toppler (Prototype)</description>
 		<!-- <cart number></cart number> -->
 		<year>1988</year>

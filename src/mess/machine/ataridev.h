@@ -18,6 +18,7 @@ MACHINE_START( a400 );
 MACHINE_START( a800 );
 MACHINE_START( a800xl );
 MACHINE_START( a5200 );
+MACHINE_START( xegs );
 
 DEVICE_IMAGE_LOAD( a800_cart );
 DEVICE_IMAGE_UNLOAD( a800_cart );
@@ -28,6 +29,7 @@ DEVICE_IMAGE_UNLOAD( a800xl_cart );
 DEVICE_IMAGE_LOAD( a5200_cart );
 DEVICE_IMAGE_UNLOAD( a5200_cart );
 
+DEVICE_IMAGE_LOAD( xegs_cart );
 
 /*----------- defined in machine/atarifdc.c -----------*/
 /***************************************************************************

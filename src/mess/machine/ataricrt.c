@@ -301,3 +301,68 @@ DEVICE_IMAGE_UNLOAD( a5200_cart )
 	/* zap the cartridge memory (again) */
 	memset(&mem[0x4000], 0x00, 0x8000);
 }
+
+/*************************************
+ *
+ *  Atari XEGS
+ *
+ *************************************/
+
+static UINT8 xegs_banks = 0;
+static UINT8 xegs_cart = 0;
+
+static WRITE8_HANDLER( xegs_bankswitch )
+{
+	UINT8 *cart = memory_region(space->machine, "user1");
+	data &= xegs_banks - 1;
+	memory_set_bankptr(space->machine, "bank0", cart + data * 0x2000);
+}
+
+MACHINE_START( xegs )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 *cart = memory_region(space->machine, "user1");
+	UINT8 *cpu  = memory_region(space->machine, "maincpu");
+	
+	atari_machine_start(machine);
+	memory_install_write8_handler(space, 0xd500, 0xd5ff, 0, 0, xegs_bankswitch);
+
+	if (xegs_cart)
+	{
+		memory_set_bankptr(machine, "bank0", cart);
+		memory_set_bankptr(machine, "bank1", cart + (xegs_banks - 1) * 0x2000);
+	}
+	else
+	{
+		// point to built-in Missile Command (this does not work well, though... FIXME!!)
+		memory_set_bankptr(machine, "bank0", cpu + 0x10000);
+		memory_set_bankptr(machine, "bank1", cpu + 0x10000);
+	}
+}
+
+DEVICE_IMAGE_LOAD( xegs_cart )
+{
+	UINT32 size;
+	UINT8 *ptr = memory_region(image.device().machine, "user1");
+	
+	if (image.software_entry() == NULL)
+	{
+		// skip the header
+		image.fseek(0x10, SEEK_SET);
+		size = image.length() - 0x10;
+		if (image.fread(ptr, size) != size)
+			return IMAGE_INIT_FAIL;
+	}
+	else
+	{
+		size = image.get_software_region_length("rom");
+		memcpy(ptr, image.get_software_region("rom"), size);
+	}
+
+	xegs_banks = size / 0x2000;
+	xegs_cart = 1;
+
+	return IMAGE_INIT_PASS;
+}
+
+
