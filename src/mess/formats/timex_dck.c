@@ -25,7 +25,6 @@
 
 #include "emu.h"
 #include "formats/timex_dck.h"
-#include "video/border.h"
 #include "sound/ay8910.h"
 #include "utils.h"
 

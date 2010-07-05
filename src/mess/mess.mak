@@ -1362,7 +1362,6 @@ $(MESSOBJ)/sharp.a:				\
 
 
 $(MESSOBJ)/sinclair.a:			\
-	$(MESS_VIDEO)/border.o		\
 	$(MESS_VIDEO)/spectrum.o	\
 	$(MESS_VIDEO)/timex.o		\
 	$(MESS_VIDEO)/zx.o			\

@@ -22,7 +22,6 @@
 */
 
 #include "emu.h"
-#include "video/border.h"
 #include "memory.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcon.h"

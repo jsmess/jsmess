@@ -120,6 +120,14 @@ extern VIDEO_START( spectrum_128 );
 extern VIDEO_UPDATE( spectrum );
 extern VIDEO_EOF( spectrum );
 
+extern void border_force_redraw (void);
+extern void border_set_last_color (int NewColor);
+extern void border_draw(running_machine *machine, bitmap_t *bitmap, int full_refresh,
+                int TopBorderLines, int ScreenLines, int BottomBorderLines,
+                int LeftBorderPixels, int ScreenPixels, int RightBorderPixels,
+                int LeftBorderCycles, int ScreenCycles, int RightBorderCycles,
+                int HorizontalRetraceCycles, int VRetraceTime, int EventID);
+				
 /*----------- defined in video/timex.c -----------*/
 extern VIDEO_EOF( ts2068 );
 extern VIDEO_UPDATE( ts2068 );
