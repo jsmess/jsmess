@@ -1374,10 +1374,7 @@ static DRIVER_INIT( a800xl )
 
 static DRIVER_INIT( xegs )
 {
-	if (1)
-		xegs_mmu(machine, 0xff);
-	else
-		a800xl_mmu(machine, 0xff);
+	xegs_mmu(machine, 0xff);
 }
 
 static DRIVER_INIT( a600xl )
