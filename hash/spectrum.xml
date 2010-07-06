@@ -142,7 +142,7 @@
 			</dataarea>
 		</part>
 	</software>			
-	<software name="montezuma1" cloneof="montezum">
+	<software name="montezum1" cloneof="montezum">
 		<description>Montezuma's Revenge (Prototype, Alt)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
@@ -192,7 +192,7 @@
 			</dataarea>
 		</part>
 	</software>	
-	<software name="starwarsa" cloneof="starwars">
+	<software name="starwars1" cloneof="starwars">
 		<description>Star Wars (Prototype, Alt)</description>
 		<year>1984</year>
 		<publisher>Parker Software</publisher>
