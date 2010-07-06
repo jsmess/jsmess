@@ -305,8 +305,7 @@ INLINE int check_cond( hcd62121_state *cpustate, UINT8 op )
 INLINE hcd62121_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_HCD62121);
+	assert(device->type() == HCD62121);
 	return (hcd62121_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -501,4 +500,6 @@ CPU_GET_INFO( hcd62121 )
 	case CPUINFO_STR_REGISTER + HCD62121_R7C: sprintf(info->s, "R7C:%02X%02X%02X%02X", cpustate->reg[0x7c], cpustate->reg[0x7d], cpustate->reg[0x7e], cpustate->reg[0x7f]); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(HCD62121, hcd62121);
 
