@@ -64,7 +64,7 @@
 /////////////////////////
 
 #define MACHINE_STOP(name) \
-	static void machine_stop_##name( running_machine *machine)
+	static void machine_stop_##name( running_machine &machine)
 
 // machine stop
 MACHINE_STOP( cybikov1 );
@@ -226,7 +226,7 @@ MACHINE_START( cybikov1 )
 	// serial port
 	cybiko_rs232_init();
 	// other
-	add_exit_callback( machine, machine_stop_cybikov1);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, machine_stop_cybikov1);
 }
 
 MACHINE_START( cybikov2 )
@@ -244,7 +244,7 @@ MACHINE_START( cybikov2 )
 	// serial port
 	cybiko_rs232_init();
 	// other
-	add_exit_callback( machine, machine_stop_cybikov2);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, machine_stop_cybikov2);
 }
 
 MACHINE_START( cybikoxt )
@@ -259,7 +259,7 @@ MACHINE_START( cybikoxt )
 	// serial port
 	cybiko_rs232_init();
 	// other
-	add_exit_callback( machine, machine_stop_cybikoxt);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, machine_stop_cybikoxt);
 }
 
 ///////////////////
@@ -292,9 +292,9 @@ MACHINE_STOP( cybikov1 )
 {
 	_logerror( 0, ("machine_stop_cybikov1\n"));
 	// real-time clock
-	nvram_system_save( machine, "rtc", cybiko_pcf8593_save);
+	nvram_system_save( &machine, "rtc", cybiko_pcf8593_save);
 	// serial dataflash
-	nvram_system_save( machine, "flash1", cybiko_at45dbxx_save);
+	nvram_system_save( &machine, "flash1", cybiko_at45dbxx_save);
 	// serial port
 	cybiko_rs232_exit();
 }
@@ -303,11 +303,11 @@ MACHINE_STOP( cybikov2 )
 {
 	_logerror( 0, ("machine_stop_cybikov2\n"));
 	// real-time clock
-	nvram_system_save( machine, "rtc", cybiko_pcf8593_save);
+	nvram_system_save( &machine, "rtc", cybiko_pcf8593_save);
 	// serial dataflash
-	nvram_system_save( machine, "flash1", cybiko_at45dbxx_save);
+	nvram_system_save( &machine, "flash1", cybiko_at45dbxx_save);
 	// multi-purpose flash
-	nvram_system_save( machine, "flash2", cybiko_sst39vfx_save);
+	nvram_system_save( &machine, "flash2", cybiko_sst39vfx_save);
 	// serial port
 	cybiko_rs232_exit();
 }
@@ -316,9 +316,9 @@ MACHINE_STOP( cybikoxt )
 {
 	_logerror( 0, ("machine_stop_cybikoxt\n"));
 	// real-time clock
-	nvram_system_save( machine, "rtc", cybiko_pcf8593_save);
+	nvram_system_save( &machine, "rtc", cybiko_pcf8593_save);
 	// multi-purpose flash
-	nvram_system_save( machine, "flash1", cybiko_sst39vfx_save);
+	nvram_system_save( &machine, "flash1", cybiko_sst39vfx_save);
 	// serial port
 	cybiko_rs232_exit();
 }

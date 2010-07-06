@@ -322,9 +322,9 @@ static TIMER_CALLBACK(setup_beep)
 	beep_set_frequency( speaker, 300 );
 }
 
-static void electron_reset(running_machine *machine)
+static void electron_reset(running_machine &machine)
 {
-	memory_set_bank(machine, "bank2", 0);
+	memory_set_bank(&machine, "bank2", 0);
 
 	electron_ula.communication_mode = 0x04;
 	electron_ula.screen_mode = 0;
@@ -336,7 +336,7 @@ static void electron_reset(running_machine *machine)
 	electron_ula.screen_size = 0x8000 - 0x3000;
 	electron_ula.screen_addr = 0;
 	electron_ula.tape_running = 0;
-	electron_ula.vram = (UINT8 *)memory_get_read_ptr(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), electron_ula.screen_base);
+	electron_ula.vram = (UINT8 *)memory_get_read_ptr(cputag_get_address_space(&machine, "maincpu", ADDRESS_SPACE_PROGRAM), electron_ula.screen_base);
 }
 
 MACHINE_START( electron )
@@ -347,6 +347,6 @@ MACHINE_START( electron )
 	electron_ula.interrupt_control = 0x00;
 	timer_set(machine, attotime_zero, NULL, 0, setup_beep );
 	electron_tape_timer = timer_alloc(machine,  electron_tape_timer_handler, NULL );
-	add_reset_callback(machine, electron_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, electron_reset);
 }
 

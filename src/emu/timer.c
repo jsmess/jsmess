@@ -123,7 +123,7 @@ INLINE attotime get_current_time(running_machine *machine)
 
 	/* if we're executing as a particular CPU, use its local time as a base */
 	/* otherwise, return the global base time */
-	device_execute_interface *execdevice = machine->scheduler.currently_executing();
+	device_execute_interface *execdevice = machine->scheduler().currently_executing();
 	return (execdevice != NULL) ? execdevice->local_time() : global->exec.basetime;
 }
 
@@ -704,7 +704,7 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 	/* if this was inserted as the head, abort the current timeslice and resync */
 	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
 	if (which == global->activelist)
-		which->machine->scheduler.abort_timeslice();
+		which->machine->scheduler().abort_timeslice();
 }
 
 
@@ -939,7 +939,7 @@ void timer_print_first_timer(running_machine *machine)
 //-------------------------------------------------
 
 timer_device_config::timer_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Timer", tag, owner, clock),
 	  m_type(TIMER_TYPE_GENERIC),
 	  m_callback(NULL),
 	  m_ptr(NULL),

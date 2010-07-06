@@ -137,10 +137,10 @@ enum
 static UINT8 read_expansion(running_machine *machine)
 {
 	UINT8 result;
-	switch(mame_get_phase(machine))
+	switch(machine->phase())
 	{
-		case MAME_PHASE_RESET:
-		case MAME_PHASE_RUNNING:
+		case MACHINE_PHASE_RESET:
+		case MACHINE_PHASE_RUNNING:
 			result = input_port_read(machine, "EXPANSION");
 			break;
 

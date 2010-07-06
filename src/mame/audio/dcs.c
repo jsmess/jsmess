@@ -409,12 +409,12 @@ static WRITE16_HANDLER( output_latch_w );
 static READ16_HANDLER( output_control_r );
 static WRITE16_HANDLER( output_control_w );
 
-static void timer_enable_callback(running_device *device, int enable);
+static void timer_enable_callback(cpu_device &device, int enable);
 static TIMER_DEVICE_CALLBACK( internal_timer_callback );
 static TIMER_DEVICE_CALLBACK( dcs_irq );
 static TIMER_DEVICE_CALLBACK( sport0_irq );
 static void recompute_sample_rate(running_machine *machine);
-static void sound_tx_callback(running_device *device, int port, INT32 data);
+static void sound_tx_callback(cpu_device &device, int port, INT32 data);
 
 static READ16_HANDLER( dcs_polling_r );
 static WRITE16_HANDLER( dcs_polling_w );
@@ -1695,7 +1695,7 @@ static WRITE16_HANDLER( output_control_w )
 
 static READ16_HANDLER( output_control_r )
 {
-	dcs.output_control_cycles = cpu_get_total_cycles(space->cpu);
+	dcs.output_control_cycles = dcs.cpu->total_cycles();
 	return dcs.output_control;
 }
 
@@ -1724,7 +1724,7 @@ static void update_timer_count(running_machine *machine)
 		return;
 
 	/* count cycles */
-	elapsed_cycles = cpu_get_total_cycles(dcs.cpu) - dcs.timer_start_cycles;
+	elapsed_cycles = dcs.cpu->total_cycles() - dcs.timer_start_cycles;
 	elapsed_clocks = elapsed_cycles / dcs.timer_scale;
 
 	/* if we haven't counted past the initial count yet, just do that */
@@ -1750,11 +1750,11 @@ static TIMER_DEVICE_CALLBACK( internal_timer_callback )
 	/* we do this to avoid drifting */
 	dcs.timers_fired++;
 	target_cycles = dcs.timer_start_cycles + dcs.timer_scale * (dcs.timer_start_count + 1 + dcs.timers_fired * (dcs.timer_period + 1));
-	target_cycles -= cpu_get_total_cycles(dcs.cpu);
+	target_cycles -= dcs.cpu->total_cycles();
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
-		timer.adjust(cpu_clocks_to_attotime(dcs.cpu, target_cycles));
+		timer.adjust(dcs.cpu->cycles_to_attotime(target_cycles));
 
 	/* the IRQ line is edge triggered */
 	cpu_set_input_line(dcs.cpu, ADSP2105_TIMER, ASSERT_LINE);
@@ -1769,7 +1769,7 @@ static void reset_timer(running_machine *machine)
 		return;
 
 	/* compute the time until the first firing */
-	dcs.timer_start_cycles = cpu_get_total_cycles(dcs.cpu);
+	dcs.timer_start_cycles = dcs.cpu->total_cycles();
 	dcs.timers_fired = 0;
 
 	/* if this is the first timer, check the IRQ routine for the DRAM refresh stub */
@@ -1790,18 +1790,18 @@ static void reset_timer(running_machine *machine)
 
 	/* adjust the timer if not optimized */
 	if (!dcs.timer_ignore)
-		dcs.internal_timer->adjust(cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_start_count + 1)));
+		dcs.internal_timer->adjust(dcs.cpu->cycles_to_attotime(dcs.timer_scale * (dcs.timer_start_count + 1)));
 }
 
 
-static void timer_enable_callback(running_device *device, int enable)
+static void timer_enable_callback(cpu_device &device, int enable)
 {
 	dcs.timer_enable = enable;
 	dcs.timer_ignore = 0;
 	if (enable)
 	{
-//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_period + 1)));
-		reset_timer(device->machine);
+//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / dcs.cpu->cycles_to_attotime(dcs.timer_scale * (dcs.timer_period + 1)));
+		reset_timer(device.machine);
 	}
 	else
 	{
@@ -1971,7 +1971,7 @@ static TIMER_DEVICE_CALLBACK( dcs_irq )
 	}
 
 	/* store it */
-	cpu_set_reg(dcs.cpu, ADSP2100_I0 + dcs.ireg, reg);
+	dcs.cpu->set_state(ADSP2100_I0 + dcs.ireg, reg);
 }
 
 
@@ -1981,7 +1981,7 @@ static TIMER_DEVICE_CALLBACK( sport0_irq )
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */
 	/* so we skip the SPORT interrupt if we read with output_control within the last 5 cycles */
-	if ((cpu_get_total_cycles(dcs.cpu) - dcs.output_control_cycles) > 5)
+	if ((dcs.cpu->total_cycles() - dcs.output_control_cycles) > 5)
 	{
 		cpu_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, ASSERT_LINE);
 		cpu_set_input_line(dcs.cpu, ADSP2115_SPORT0_RX, CLEAR_LINE);
@@ -2010,7 +2010,7 @@ static void recompute_sample_rate(running_machine *machine)
 }
 
 
-static void sound_tx_callback(running_device *device, int port, INT32 data)
+static void sound_tx_callback(cpu_device &device, int port, INT32 data)
 {
 	/* check if it's for SPORT1 */
 	if (port != 1)
@@ -2033,21 +2033,21 @@ static void sound_tx_callback(running_device *device, int port, INT32 data)
 
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (wich is the case in our core) */
-			source = cpu_get_reg(device, ADSP2100_I0 + dcs.ireg);
-			dcs.incs = cpu_get_reg(device, ADSP2100_M0 + mreg);
-			dcs.size = cpu_get_reg(device, ADSP2100_L0 + lreg);
+			source = device.state(ADSP2100_I0 + dcs.ireg);
+			dcs.incs = device.state(ADSP2100_M0 + mreg);
+			dcs.size = device.state(ADSP2100_L0 + lreg);
 
 			/* get the base value, since we need to keep it around for wrapping */
 			source -= dcs.incs;
 
 			/* make it go back one so we dont lose the first sample */
-			cpu_set_reg(device, ADSP2100_I0 + dcs.ireg, source);
+			device.set_state(ADSP2100_I0 + dcs.ireg, source);
 
 			/* save it as it is now */
 			dcs.ireg_base = source;
 
 			/* recompute the sample rate and timer */
-			recompute_sample_rate(device->machine);
+			recompute_sample_rate(device.machine);
 			return;
 		}
 		else

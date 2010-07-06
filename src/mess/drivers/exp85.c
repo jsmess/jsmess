@@ -141,7 +141,7 @@ static I8355_INTERFACE( i8355_intf )
 	DEVCB_NULL,					/* port B write */
 };
 
-/* I8085A Interface */
+/* II8085A Interface */
 
 static WRITE_LINE_DEVICE_HANDLER( exp85_sod_w )
 {
@@ -168,8 +168,8 @@ static I8085_CONFIG( exp85_i8085_config )
 {
 	DEVCB_NULL,					/* STATUS changed callback */
 	DEVCB_NULL,					/* INTE changed callback */
-	DEVCB_LINE(exp85_sid_r),	/* SID changed callback (8085A only) */
-	DEVCB_LINE(exp85_sod_w)		/* SOD changed callback (8085A only) */
+	DEVCB_LINE(exp85_sid_r),	/* SID changed callback (I8085A only) */
+	DEVCB_LINE(exp85_sod_w)		/* SOD changed callback (I8085A only) */
 };
 
 /* Machine Initialization */
@@ -204,7 +204,7 @@ static MACHINE_DRIVER_START( exp85 )
 	MDRV_DRIVER_DATA(exp85_state)
 
     /* basic machine hardware */
-    MDRV_CPU_ADD(I8085A_TAG, 8085A, XTAL_6_144MHz)
+    MDRV_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
     MDRV_CPU_PROGRAM_MAP(exp85_mem)
     MDRV_CPU_IO_MAP(exp85_io)
 	MDRV_CPU_CONFIG(exp85_i8085_config)

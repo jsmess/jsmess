@@ -58,7 +58,7 @@ void mess_display_help(void)
  *************************************/
 
 /* device iteration helpers */
-#define ram_first(config)				(config)->devicelist.first(MESSRAM)
+#define ram_first(config)				(config)->m_devicelist.first(MESSRAM)
 #define ram_next(previous)				((previous)->typenext())
 
 /*-------------------------------------------------

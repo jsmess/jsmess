@@ -113,7 +113,7 @@ static WRITE8_HANDLER( sms_input_write )
 		case 0x03:	/* Sports Pad */
 			if (data != sms_state.sports_pad_last_data_1)
 			{
-				UINT32 cpu_cycles = cpu_get_total_cycles(space->cpu);
+				UINT32 cpu_cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
 
 				sms_state.sports_pad_last_data_1 = data;
 				if (cpu_cycles - sms_state.last_sports_pad_time_1 > 512)
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( sms_input_write )
 		case 0x03:	/* Sports Pad */
 			if (data != sms_state.sports_pad_last_data_2)
 			{
-				UINT32 cpu_cycles = cpu_get_total_cycles(space->cpu);
+				UINT32 cpu_cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
 
 				sms_state.sports_pad_last_data_2 = data;
 				if (cpu_cycles - sms_state.last_sports_pad_time_2 > 2048)
@@ -201,7 +201,7 @@ static UINT8 sms_vdp_hcount( running_machine *machine )
 		time_end = attotime_zero;
 	else
 		time_end = screen->time_until_pos(vpos, max_hpos);
-	calc_cycles = cpu_attotime_to_clocks(devtag_get_device(machine, "maincpu"), time_end);
+	calc_cycles = machine->device<cpu_device>("maincpu")->attotime_to_clocks(time_end);
 
 	/* equation got from SMSPower forum, posted by Flubba. */
 	tmp = ((590 - (calc_cycles * 3)) / 4) & 0xff;
@@ -263,7 +263,7 @@ static int lphaser_sensor_is_on( running_machine *machine, const char *tag_x, co
 static void sms_get_inputs( const address_space *space )
 {
 	UINT8 data = 0x00;
-	UINT32 cpu_cycles = cpu_get_total_cycles(space->cpu);
+	UINT32 cpu_cycles = downcast<cpu_device *>(space->cpu)->total_cycles();
 	running_machine *machine = space->machine;
 
 	sms_state.input_port0 = 0xff;
@@ -927,11 +927,11 @@ READ8_HANDLER( gg_sio_r )
 	return sms_state.gg_sio[offset];
 }
 
-static void sms_machine_stop( running_machine *machine )
+static void sms_machine_stop( running_machine &machine )
 {
 	/* Does the cartridge have SRAM that should be saved? */
 	if (sms_state.cartridge[sms_state.current_cartridge].sram_save) {
-		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart1"));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(&machine, "cart1"));
 		image->battery_save(sms_state.cartridge[sms_state.current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 	}
 }
@@ -1418,7 +1418,7 @@ static void setup_banks( running_machine *machine )
 
 MACHINE_START( sms )
 {
-	add_exit_callback(machine, sms_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, sms_machine_stop);
 	sms_state.rapid_fire_timer = timer_alloc(machine, rapid_fire_callback , NULL);
 	timer_adjust_periodic(sms_state.rapid_fire_timer, ATTOTIME_IN_HZ(10), 0, ATTOTIME_IN_HZ(10));
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */

@@ -42,9 +42,9 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 
 static UINT32 timer_clks[4] = { 16777216, 16777216/64, 16777216/256, 16777216/1024 };
 
-static void gba_machine_stop(running_machine *machine)
+static void gba_machine_stop(running_machine &machine)
 {
-	gba_state *state = (gba_state *)machine->driver_data;
+	gba_state *state = (gba_state *)machine.driver_data;
 
 	// only do this if the cart loader detected some form of backup
 	if (state->nvsize > 0)
@@ -1779,7 +1779,7 @@ static WRITE32_HANDLER( gba_io_w )
 				// if we still have interrupts, yank the IRQ line again
 				if (state->IF)
 				{
-					timer_adjust_oneshot(state->irq_timer, cpu_clocks_to_attotime(devtag_get_device(machine, "maincpu"), 120), 0);
+					timer_adjust_oneshot(state->irq_timer, machine->device<cpu_device>("maincpu")->clocks_to_attotime(120), 0);
 				}
 			}
 			break;
@@ -2052,7 +2052,7 @@ static MACHINE_START( gba )
 	gba_state *state = (gba_state *)machine->driver_data;
 
 	/* add a hook for battery save */
-	add_exit_callback(machine, gba_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, gba_machine_stop);
 
 	/* create a timer to fire scanline functions */
 	state->scan_timer = timer_alloc(machine, perform_scan, 0);

@@ -24,9 +24,9 @@
 #include "devices/messram.h"
 
 /* Until support for the H8Sxxxx variants used by cybiko is added, we use H8_3002 (even if opcodes differ) */
-#define CPU_H8S2241   CPU_H83002
-#define CPU_H8S2246   CPU_H83002
-#define CPU_H8S2323   CPU_H83002
+#define H8S2241   H83002
+#define H8S2246   H83002
+#define H8S2323   H83002
 
 //  +------------------------------------------------------+
 //  | Cybiko Classic (CY6411)                         | V2 |

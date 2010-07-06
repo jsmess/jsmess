@@ -133,8 +133,8 @@ static int nc_membank_rom_mask;
 static int nc_membank_internal_ram_mask;
 int nc_membank_card_ram_mask;
 
-static void nc100_machine_stop(running_machine *machine);
-static void nc200_machine_stop(running_machine *machine);
+static void nc100_machine_stop(running_machine &machine);
+static void nc200_machine_stop(running_machine &machine);
 
 /*
     Port 0x00:
@@ -964,14 +964,14 @@ static MACHINE_RESET( nc100 )
 	nc_irq_latch_mask = (1<<0) | (1<<1);
 }
 
-static void nc100_machine_stop(running_machine *machine)
+static void nc100_machine_stop(running_machine &machine)
 {
-	nc_common_open_stream_for_writing(machine);
+	nc_common_open_stream_for_writing(&machine);
 	{
-		running_device *rtc = devtag_get_device(machine, "rtc");
+		running_device *rtc = devtag_get_device(&machine, "rtc");
 		tc8521_save_stream(rtc, file);
 	}
-	nc_common_store_memory_to_stream(machine);
+	nc_common_store_memory_to_stream(&machine);
 	nc_common_close_stream();
 }
 
@@ -979,7 +979,7 @@ static MACHINE_START( nc100 )
 {
     nc_type = NC_TYPE_1xx;
 
-	add_exit_callback(machine, nc100_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, nc100_machine_stop);
 
 	/* keyboard timer */
 	nc_keyboard_timer = timer_alloc(machine, nc_keyboard_timer_callback, NULL);
@@ -1354,14 +1354,14 @@ static MACHINE_RESET( nc200 )
 	nc200_video_set_backlight(0);
 }
 
-static void nc200_machine_stop(running_machine *machine)
+static void nc200_machine_stop(running_machine &machine)
 {
-	nc_common_open_stream_for_writing(machine);
+	nc_common_open_stream_for_writing(&machine);
 	if (file)
 	{
 		mc146818_save_stream(file);
 	}
-	nc_common_store_memory_to_stream(machine);
+	nc_common_store_memory_to_stream(&machine);
 	nc_common_close_stream();
 }
 
@@ -1369,7 +1369,7 @@ static MACHINE_START( nc200 )
 {
     nc_type = NC_TYPE_200;
 
-	add_exit_callback(machine, nc200_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, nc200_machine_stop);
 
 	/* keyboard timer */
 	nc_keyboard_timer = timer_alloc(machine, nc_keyboard_timer_callback, NULL);

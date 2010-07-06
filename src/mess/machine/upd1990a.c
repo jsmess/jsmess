@@ -519,9 +519,9 @@ static DEVICE_RESET( upd1990a )
 {
 	upd1990a_t *upd1990a = get_safe_token(device);
 
-	mame_system_time curtime, *systime = &curtime;
+	system_time curtime, *systime = &curtime;
 
-	mame_get_current_datetime(device->machine, &curtime);
+	device->machine->current_datetime(curtime);
 
 	/* HACK: load time counter from system time */
 	upd1990a->time_counter[0] = convert_to_bcd(systime->local_time.second);

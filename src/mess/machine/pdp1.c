@@ -39,7 +39,7 @@ static TIMER_CALLBACK(reader_callback);
 static TIMER_CALLBACK(puncher_callback);
 static TIMER_CALLBACK(tyo_callback);
 static TIMER_CALLBACK(dpy_callback);
-static void pdp1_machine_stop(running_machine *machine);
+static void pdp1_machine_stop(running_machine &machine);
 
 static void pdp1_tape_read_binary(running_device *device);
 static void pdp1_io_sc_callback(running_device *device);
@@ -219,7 +219,7 @@ MACHINE_RESET( pdp1 )
 }
 
 
-static void pdp1_machine_stop(running_machine *machine)
+static void pdp1_machine_stop(running_machine &machine)
 {
 	/* the core will take care of freeing the timers, BUT we must set the variables
     to NULL if we don't want to risk confusing the tape image init function */
@@ -365,7 +365,7 @@ MACHINE_START( pdp1 )
 	dst = memory_region(machine, "gfx1");
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
-	add_exit_callback(machine, pdp1_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, pdp1_machine_stop);
 
 	tape_reader.timer = timer_alloc(machine, reader_callback, NULL);
 	tape_puncher.timer = timer_alloc(machine, puncher_callback, NULL);

@@ -692,7 +692,7 @@ static MACHINE_DRIVER_START( snes_base )
 	MDRV_DRIVER_DATA(snes_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 5A22, MCLK_NTSC)	/* 2.68 MHz, also 3.58 MHz */
+	MDRV_CPU_ADD("maincpu", _5A22, MCLK_NTSC)	/* 2.68 MHz, also 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(snes_map)
 
 	MDRV_CPU_ADD("soundcpu", SPC700, 1024000)	/* 1.024 MHz */
@@ -741,7 +741,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( snespal )
 	MDRV_IMPORT_FROM(snes)
-	MDRV_CPU_REPLACE("maincpu", 5A22, MCLK_PAL)
+	MDRV_CPU_REPLACE("maincpu", _5A22, MCLK_PAL)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(DOTCLK_PAL, SNES_HTOTAL, 0, SNES_SCR_WIDTH, SNES_VTOTAL_PAL, 0, SNES_SCR_HEIGHT_PAL)

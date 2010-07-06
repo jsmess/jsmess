@@ -393,7 +393,7 @@ static void memory_init_populate(running_machine *machine);
 static void memory_init_map_entry(address_space *space, const address_map_entry *entry, read_or_write readorwrite);
 static void memory_init_allocate(running_machine *machine);
 static void memory_init_locate(running_machine *machine);
-static void memory_exit(running_machine *machine);
+static void memory_exit(running_machine &machine);
 
 /* address map helpers */
 static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const device_config *devconfig, const addrmap_token *tokens);
@@ -793,7 +793,7 @@ void memory_init(running_machine *machine)
 {
 	memory_private *memdata;
 
-	add_exit_callback(machine, memory_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, memory_exit);
 
 	/* allocate our private data */
 	memdata = machine->memory_data = auto_alloc_clear(machine, memory_private);
@@ -1493,7 +1493,7 @@ void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t a
 		/* if we still don't have a pointer, and we're past the initialization phase, allocate a new block */
 		if (memdata->bank_ptr[bankindex] == NULL && memdata->initialized)
 		{
-			if (mame_get_phase(space->machine) >= MAME_PHASE_RESET)
+			if (space->machine->phase() >= MACHINE_PHASE_RESET)
 				fatalerror("Attempted to call memory_install_ram() after initialization time without a baseptr!");
 			memdata->bank_ptr[bankindex] = (UINT8 *)block_allocate(space, memory_address_to_byte(space, addrstart), memory_address_to_byte_end(space, addrend), NULL);
 		}
@@ -1517,7 +1517,7 @@ void *_memory_install_ram(const address_space *space, offs_t addrstart, offs_t a
 		/* if we still don't have a pointer, and we're past the initialization phase, allocate a new block */
 		if (memdata->bank_ptr[bankindex] == NULL && memdata->initialized)
 		{
-			if (mame_get_phase(space->machine) >= MAME_PHASE_RESET)
+			if (space->machine->phase() >= MACHINE_PHASE_RESET)
 				fatalerror("Attempted to call memory_install_ram() after initialization time without a baseptr!");
 			memdata->bank_ptr[bankindex] = (UINT8 *)block_allocate(space, memory_address_to_byte(space, addrstart), memory_address_to_byte_end(space, addrend), NULL);
 		}
@@ -1691,7 +1691,7 @@ static void memory_init_spaces(running_machine *machine)
 
 	/* loop over devices */
 	device_memory_interface *memory = NULL;
-	for (bool gotone = machine->devicelist.first(memory); gotone; gotone = memory->next(memory))
+	for (bool gotone = machine->m_devicelist.first(memory); gotone; gotone = memory->next(memory))
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			const address_space_config *spaceconfig = memory->space_config(spacenum);
@@ -1805,7 +1805,8 @@ static void memory_init_preflight(running_machine *machine)
 	/* loop over valid address spaces */
 	for (space = (address_space *)memdata->spacelist; space != NULL; space = (address_space *)space->next)
 	{
-		int regionsize = (space->spacenum == ADDRESS_SPACE_0) ? memory_region_length(space->machine, space->cpu->tag()) : 0;
+		const region_info *devregion = (space->spacenum == ADDRESS_SPACE_0) ? space->machine->region(space->cpu->tag()) : NULL;
+		int devregionsize = (devregion != NULL) ? devregion->bytes() : 0;
 		address_map_entry *entry;
 		int entrynum;
 
@@ -1834,7 +1835,7 @@ static void memory_init_preflight(running_machine *machine)
 			if (space->spacenum == ADDRESS_SPACE_0 && entry->read.type == AMH_ROM && entry->region == NULL)
 			{
 				/* make sure it fits within the memory region before doing so, however */
-				if (entry->byteend < regionsize)
+				if (entry->byteend < devregionsize)
 				{
 					entry->region = space->cpu->tag();
 					entry->rgnoffs = entry->bytestart;
@@ -1844,19 +1845,18 @@ static void memory_init_preflight(running_machine *machine)
 			/* validate adjusted addresses against implicit regions */
 			if (entry->region != NULL && entry->share == NULL && entry->baseptr == NULL)
 			{
-				UINT8 *base = memory_region(machine, entry->region);
-				offs_t length = memory_region_length(machine, entry->region);
+				const region_info *region = machine->region(entry->region);
+				if (region == NULL)
+					fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", space->cpu->tag(), space->name, entry->addrstart, entry->addrend, entry->region);
 
 				/* validate the region */
-				if (base == NULL)
-					fatalerror("Error: device '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", space->cpu->tag(), space->name, entry->addrstart, entry->addrend, entry->region);
-				if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > length)
-					fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", space->cpu->tag(), space->name, entry->addrstart, entry->addrend, entry->region, length);
+				if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > region->bytes())
+					fatalerror("Error: device '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", space->cpu->tag(), space->name, entry->addrstart, entry->addrend, entry->region, region->bytes());
 			}
 
 			/* convert any region-relative entries to their memory pointers */
 			if (entry->region != NULL)
-				entry->memory = memory_region(machine, entry->region) + entry->rgnoffs;
+				entry->memory = machine->region(entry->region)->base() + entry->rgnoffs;
 		}
 
 		/* now loop over all the handlers and enforce the address mask */
@@ -2171,9 +2171,9 @@ static void memory_init_locate(running_machine *machine)
     memory_exit - free memory
 -------------------------------------------------*/
 
-static void memory_exit(running_machine *machine)
+static void memory_exit(running_machine &machine)
 {
-	memory_private *memdata = machine->memory_data;
+	memory_private *memdata = machine.memory_data;
 	address_space *space;
 
 	/* free all the address spaces and tables */
@@ -2539,8 +2539,9 @@ static int space_needs_backing_store(const address_space *space, const address_m
 		return TRUE;
 
 	/* if we're reading from RAM or from ROM outside of address space 0 or its region, then yes, we do need backing */
+	const region_info *region = space->machine->region(space->cpu->tag());
 	if (entry->read.type == AMH_RAM ||
-		(entry->read.type == AMH_ROM && (space->spacenum != ADDRESS_SPACE_0 || entry->addrstart >= memory_region_length(space->machine, space->cpu->tag()))))
+		(entry->read.type == AMH_ROM && (space->spacenum != ADDRESS_SPACE_0 || region == NULL || entry->addrstart >= region->bytes())))
 		return TRUE;
 
 	/* all other cases don't need backing */
@@ -3323,7 +3324,7 @@ static void *block_allocate(const address_space *space, offs_t bytestart, offs_t
 	int allocatemem = (memory == NULL);
 	memory_block *block;
 	size_t bytestoalloc;
-	const char *region;
+	const region_info *region;
 
 	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space->cpu->tag(), space->name, bytestart, byteend, memory));
 
@@ -3338,11 +3339,9 @@ static void *block_allocate(const address_space *space, offs_t bytestart, offs_t
 		memory = block + 1;
 
 	/* register for saving, but only if we're not part of a memory region */
-	for (region = memory_region_next(space->machine, NULL); region != NULL; region = memory_region_next(space->machine, region))
+	for (region = space->machine->m_regionlist.first(); region != NULL; region = region->next())
 	{
-		UINT8 *region_base = memory_region(space->machine, region);
-		UINT32 region_length = memory_region_length(space->machine, region);
-		if (region_base != NULL && region_length != 0 && (UINT8 *)memory >= region_base && ((UINT8 *)memory + (byteend - bytestart + 1)) < region_base + region_length)
+		if ((UINT8 *)memory >= region->base() && ((UINT8 *)memory + (byteend - bytestart + 1)) < region->end())
 		{
 			VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));
 			break;
@@ -3495,7 +3494,7 @@ static READ8_HANDLER( watchpoint_read8 )
 	UINT8 *oldtable = spacerw->readlookup;
 	UINT8 result;
 
-	debug_cpu_memory_read_hook(spacerw, offset, 0xff);
+	spacerw->cpu->debug()->memory_read_hook(*spacerw, offset, 0xff);
 	spacerw->readlookup = space->read.table;
 	result = read_byte_generic(spacerw, offset);
 	spacerw->readlookup = oldtable;
@@ -3508,7 +3507,7 @@ static READ16_HANDLER( watchpoint_read16 )
 	UINT8 *oldtable = spacerw->readlookup;
 	UINT16 result;
 
-	debug_cpu_memory_read_hook(spacerw, offset << 1, mem_mask);
+	spacerw->cpu->debug()->memory_read_hook(*spacerw, offset << 1, mem_mask);
 	spacerw->readlookup = spacerw->read.table;
 	result = read_word_generic(spacerw, offset << 1, mem_mask);
 	spacerw->readlookup = oldtable;
@@ -3521,7 +3520,7 @@ static READ32_HANDLER( watchpoint_read32 )
 	UINT8 *oldtable = spacerw->readlookup;
 	UINT32 result;
 
-	debug_cpu_memory_read_hook(spacerw, offset << 2, mem_mask);
+	spacerw->cpu->debug()->memory_read_hook(*spacerw, offset << 2, mem_mask);
 	spacerw->readlookup = spacerw->read.table;
 	result = read_dword_generic(spacerw, offset << 2, mem_mask);
 	spacerw->readlookup = oldtable;
@@ -3534,7 +3533,7 @@ static READ64_HANDLER( watchpoint_read64 )
 	UINT8 *oldtable = spacerw->readlookup;
 	UINT64 result;
 
-	debug_cpu_memory_read_hook(spacerw, offset << 3, mem_mask);
+	spacerw->cpu->debug()->memory_read_hook(*spacerw, offset << 3, mem_mask);
 	spacerw->readlookup = spacerw->read.table;
 	result = read_qword_generic(spacerw, offset << 3, mem_mask);
 	spacerw->readlookup = oldtable;
@@ -3546,7 +3545,7 @@ static WRITE8_HANDLER( watchpoint_write8 )
 	address_space *spacerw = (address_space *)space;
 	UINT8 *oldtable = spacerw->writelookup;
 
-	debug_cpu_memory_write_hook(spacerw, offset, data, 0xff);
+	spacerw->cpu->debug()->memory_write_hook(*spacerw, offset, data, 0xff);
 	spacerw->writelookup = spacerw->write.table;
 	write_byte_generic(spacerw, offset, data);
 	spacerw->writelookup = oldtable;
@@ -3557,7 +3556,7 @@ static WRITE16_HANDLER( watchpoint_write16 )
 	address_space *spacerw = (address_space *)space;
 	UINT8 *oldtable = spacerw->writelookup;
 
-	debug_cpu_memory_write_hook(spacerw, offset << 1, data, mem_mask);
+	spacerw->cpu->debug()->memory_write_hook(*spacerw, offset << 1, data, mem_mask);
 	spacerw->writelookup = spacerw->write.table;
 	write_word_generic(spacerw, offset << 1, data, mem_mask);
 	spacerw->writelookup = oldtable;
@@ -3568,7 +3567,7 @@ static WRITE32_HANDLER( watchpoint_write32 )
 	address_space *spacerw = (address_space *)space;
 	UINT8 *oldtable = spacerw->writelookup;
 
-	debug_cpu_memory_write_hook(spacerw, offset << 2, data, mem_mask);
+	spacerw->cpu->debug()->memory_write_hook(*spacerw, offset << 2, data, mem_mask);
 	spacerw->writelookup = spacerw->write.table;
 	write_dword_generic(spacerw, offset << 2, data, mem_mask);
 	spacerw->writelookup = oldtable;
@@ -3579,7 +3578,7 @@ static WRITE64_HANDLER( watchpoint_write64 )
 	address_space *spacerw = (address_space *)space;
 	UINT8 *oldtable = spacerw->writelookup;
 
-	debug_cpu_memory_write_hook(spacerw, offset << 3, data, mem_mask);
+	spacerw->cpu->debug()->memory_write_hook(*spacerw, offset << 3, data, mem_mask);
 	spacerw->writelookup = spacerw->write.table;
 	write_qword_generic(spacerw, offset << 3, data, mem_mask);
 	spacerw->writelookup = oldtable;

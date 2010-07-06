@@ -215,7 +215,7 @@ static casserr_t zx81_p_load(cassette_image *cassette)
        part of the image file itself?
        Hardcoding this to "cassette".
     */
-	zx81_fill_file_name ("cassette" /*image_basename_noext(device_list_find_by_tag( Machine->config->devicelist, CASSETTE, "cassette" ))*/ );
+	zx81_fill_file_name ("cassette" /*image_basename_noext(device_list_find_by_tag( Machine->config->m_devicelist, CASSETTE, "cassette" ))*/ );
 	return cassette_legacy_construct(cassette, &zx81_legacy_fill_wave);
 }
 

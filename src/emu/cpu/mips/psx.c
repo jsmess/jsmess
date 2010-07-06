@@ -196,9 +196,8 @@ struct _psxcpu_state
 INLINE psxcpu_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_PSXCPU ||
-		   cpu_get_type(device) == CPU_CXD8661R);
+	assert(device->type() == PSXCPU ||
+		   device->type() == CXD8661R);
 	return (psxcpu_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -6290,7 +6289,7 @@ CPU_GET_INFO( psxcpu )
 
 		case CPUINFO_STR_REGISTER + PSXCPU_PC:			sprintf( info->s, "pc      :%08x", psxcpu->pc ); break;
 		case CPUINFO_STR_REGISTER + PSXCPU_DELAYV:		sprintf( info->s, "delayv  :%08x", psxcpu->delayv ); break;
-		case CPUINFO_STR_REGISTER + PSXCPU_DELAYR:		sprintf( info->s, "delayr  :%02x %s", psxcpu->delayr, delayn[ psxcpu->delayr ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_DELAYR:		sprintf( info->s, "delayr  :%02x %-3s", psxcpu->delayr, delayn[ psxcpu->delayr ] ); break;
 		case CPUINFO_STR_REGISTER + PSXCPU_HI:			sprintf( info->s, "hi      :%08x", psxcpu->hi ); break;
 		case CPUINFO_STR_REGISTER + PSXCPU_LO:			sprintf( info->s, "lo      :%08x", psxcpu->lo ); break;
 		case CPUINFO_STR_REGISTER + PSXCPU_BIU:			sprintf( info->s, "biu     :%08x", psxcpu->biu ); break;
@@ -6426,3 +6425,6 @@ CPU_GET_INFO( cxd8661r )
 	}
 }
 
+
+DEFINE_LEGACY_CPU_DEVICE(PSXCPU, psxcpu);
+DEFINE_LEGACY_CPU_DEVICE(CXD8661R, cxd8661r);

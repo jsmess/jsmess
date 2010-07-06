@@ -1114,7 +1114,7 @@ static void seqselect_start_read_from_main_thread(void *param)
 	// the Win32 OSD code thinks that we are paused, we need to temporarily
 	// unpause ourselves or else we will block
 	pause_count = 0;
-	while(mame_is_paused(Machine) && !winwindow_ui_is_paused(Machine))
+	while(Machine->paused() && !winwindow_ui_is_paused(Machine))
 	{
 		winwindow_ui_pause_from_main_thread(Machine, FALSE);
 		pause_count++;

@@ -16,7 +16,7 @@
 #include "debugger.h"
 #include "devices/messram.h"
 
-static CPU_DISASSEMBLE(palm_dasm_override);
+static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 static UINT8 port_f_latch;
 static UINT16 spim_data;
@@ -137,7 +137,7 @@ static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 
 static DRIVER_INIT( palm )
 {
-    debug_cpu_set_dasm_override(devtag_get_device(machine, "maincpu"), CPU_DISASSEMBLE_NAME(palm_dasm_override));
+	machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(palm_dasm_override);
 }
 
 static const mc68328_interface palm_dragonball_iface =

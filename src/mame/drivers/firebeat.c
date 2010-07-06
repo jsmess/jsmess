@@ -470,7 +470,7 @@ static VIDEO_UPDATE(firebeat)
 {
 	int chip;
 
-	if (screen == screen->machine->devicelist.find(SCREEN, 0))
+	if (screen == screen->machine->m_devicelist.find(SCREEN, 0))
 		chip = 0;
 	else
 		chip = 1;
@@ -599,7 +599,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 			COMBINE_DATA( &gcu[chip].visible_area );
 			if (ACCESSING_BITS_0_15)
 			{
-				screen_device *screen = downcast<screen_device *>(machine->devicelist.find(SCREEN, chip));
+				screen_device *screen = downcast<screen_device *>(machine->m_devicelist.find(SCREEN, chip));
 
 				if (screen != NULL)
 				{
@@ -864,7 +864,7 @@ static void atapi_clear_irq(running_machine *machine)
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ4, CLEAR_LINE);
 }
 
-static void atapi_exit(running_machine* machine)
+static void atapi_exit(running_machine& machine)
 {
 	SCSIDeleteInstance(atapi_device_data[1]);
 	SCSIDeleteInstance(atapi_device_data[0]);
@@ -886,7 +886,7 @@ static void atapi_init(running_machine *machine)
 	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &atapi_device_data[0], "scsi0" );
 	// TODO: the slave drive can be either CD-ROM, DVD-ROM or HDD
 	SCSIAllocInstance( machine, SCSI_DEVICE_CDROM, &atapi_device_data[1], "scsi1" );
-	add_exit_callback(machine, atapi_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, atapi_exit);
 }
 
 static void atapi_reset(void)

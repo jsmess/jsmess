@@ -1542,7 +1542,7 @@ static DEVICE_START( c2040 )
 		region = device->subregion(SFD1001_REGION);
 	}
 
-	c2040->gcr = region->base.u8 + region->length - 0x800;
+	c2040->gcr = region->base() + region->bytes() - 0x800;
 
 	/* allocate data timer */
 	c2040->bit_timer = timer_alloc(device->machine, bit_tick, (void *)device);

@@ -344,7 +344,7 @@ static PALETTE_INIT( sbowling )
 		3,	resistances_rg, outputs_g,	0,	100,
 		2,	resistances_b,  outputs_b,	0,	100);
 
-	for (i = 0;i < machine->config->total_colors;i++)
+	for (i = 0;i < machine->total_colors();i++)
 	{
 		int bit0,bit1,bit2,r,g,b;
 
@@ -373,7 +373,7 @@ static MACHINE_DRIVER_START( sbowling )
 
 	MDRV_DRIVER_DATA( sbowling_state )
 
-	MDRV_CPU_ADD("maincpu", 8080, XTAL_19_968MHz/10)	/* ? */
+	MDRV_CPU_ADD("maincpu", I8080, XTAL_19_968MHz/10)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(port_map)
 	MDRV_CPU_VBLANK_INT_HACK(sbw_interrupt, 2)

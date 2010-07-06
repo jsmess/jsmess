@@ -219,7 +219,7 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_pic8259_set_int_line )
 {
 	if ( cpu_get_reg( device->machine->firstcpu, STATE_GENPC ) == 0xF0454 )
 	{
-		timer_adjust_oneshot( pc_int_delay_timer, cpu_clocks_to_attotime(device->machine->firstcpu, 1), state );
+		timer_adjust_oneshot( pc_int_delay_timer, device->machine->firstcpu->cycles_to_attotime(1), state );
 	}
 	else
 	{

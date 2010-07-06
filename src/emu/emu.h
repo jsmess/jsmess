@@ -106,6 +106,7 @@
 #ifdef MESS
 #include "mess.h"
 #endif /* MESS */
+#include "machine.h"
 #include "mame.h"
 
 // video-related

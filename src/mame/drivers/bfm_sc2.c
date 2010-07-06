@@ -506,7 +506,7 @@ static INTERRUPT_GEN( timer_irq )
 		watchdog_cnt++;
 		if ( watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
 		{  // reset board
-			mame_schedule_soft_reset(device->machine);		// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
+			device->machine->schedule_soft_reset();		// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
 			on_scorpion2_reset(device->machine);
 			return;
 		}
@@ -600,7 +600,7 @@ static WRITE8_HANDLER( mmtr_w )
 {
 	int i;
 	int  changed = mmtr_latch ^ data;
-	UINT64 cycles  = cpu_get_total_cycles(space->cpu);
+	UINT64 cycles  = downcast<cpu_device *>(space->cpu)->total_cycles();
 
 	mmtr_latch = data;
 

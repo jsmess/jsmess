@@ -206,7 +206,7 @@ static void jaguar_nvram_load(running_machine *machine)
     mame_file *nvram_file = NULL;
     running_device *device;
 
-    for (device = machine->devicelist.first(); device != NULL; device = device->next())
+    for (device = machine->m_devicelist.first(); device != NULL; device = device->next())
     {
         device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
         if (nvram != NULL)
@@ -226,7 +226,7 @@ static void jaguar_nvram_save(running_machine *machine)
     mame_file *nvram_file = NULL;
     running_device *device;
 
-    for (device = machine->devicelist.first(); device != NULL; device = device->next())
+    for (device = machine->m_devicelist.first(); device != NULL; device = device->next())
     {
         device_nvram_func nvram = (device_nvram_func)device->get_config_fct(DEVINFO_FCT_NVRAM);
         if (nvram != NULL)

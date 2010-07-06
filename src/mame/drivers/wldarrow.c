@@ -347,7 +347,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( wldarrow )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, 2000000)
+	MDRV_CPU_ADD("maincpu", I8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(wldarrow_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -486,4 +486,4 @@ static DRIVER_INIT( wldarrow )
 GAME( 1982, wldarrow,  0,        wldarrow, wldarrow, wldarrow, ROT0, "Meyco Games", "Wild Arrow (Standard V4.8)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 198?, mdrawpkr,  0,        wldarrow, mdrawpkr, wldarrow, ROT0, "Meyco Games", "Draw Poker Joker's Wild (Standard)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 198?, mdrawpkra, mdrawpkr, wldarrow, mdrawpkr, wldarrow, ROT0, "Meyco Games", "Draw Poker Joker's Wild (02-11)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 198?, unkmeyco,  0,        wldarrow, mdrawpkr, wldarrow, ROT0, "Meyco Games", "Unknown Meyco Game", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 198?, unkmeyco,  0,        wldarrow, mdrawpkr, wldarrow, ROT0, "Meyco Games", "unknown Meyco game", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

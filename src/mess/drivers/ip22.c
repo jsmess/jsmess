@@ -1482,7 +1482,7 @@ static const struct WD33C93interface scsi_intf =
 	&scsi_irq,		/* command completion IRQ */
 };
 
-static void ip225015_exit(running_machine *machine)
+static void ip225015_exit(running_machine &machine)
 {
 	wd33c93_exit(&scsi_intf);
 }
@@ -1495,7 +1495,7 @@ static MACHINE_START( ip22 )
 {
 	// SCSI init
 	wd33c93_init(machine, &scsi_intf);
-	add_exit_callback(machine, ip225015_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, ip225015_exit);
 }
 
 static DRIVER_INIT( ip225015 )

@@ -362,7 +362,7 @@ static void draw_char(running_device *device, bitmap_t *bitmap, const rectangle 
 		for(int cr = 0; cr < 5; cr++)
 		{
 			if (hd61830->screen->height() > y * hd61830->vp + cl && hd61830->screen->width() > x * hd61830->hp + cr )
-				*BITMAP_ADDR16(bitmap, y * hd61830->vp + cl, x * hd61830->hp + cr) = device->subregion("hd61830")->base.u8[((char_code - 0x20) * 7 + cl)] & (1<<(4 - cr)) ? 1 : 0;
+				*BITMAP_ADDR16(bitmap, y * hd61830->vp + cl, x * hd61830->hp + cr) = device->subregion("hd61830")->u8(((char_code - 0x20) * 7 + cl)) & (1<<(4 - cr)) ? 1 : 0;
 		}
 	}
 }

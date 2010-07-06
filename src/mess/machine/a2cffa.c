@@ -90,12 +90,12 @@ READ8_DEVICE_HANDLER(a2cffa_r)
 	}
 	else if (offset == 8)
 	{
-		token->lastdata = ide_controller_r(device->machine->devicelist.find("ide"), 0x1f0+offset-8, 2);
+		token->lastdata = ide_controller_r(device->machine->m_devicelist.find("ide"), 0x1f0+offset-8, 2);
 		return token->lastdata & 0xff;
 	}
 	else if (offset > 8)
 	{
-		return ide_controller_r(device->machine->devicelist.find("ide"), 0x1f0+offset-8, 1);
+		return ide_controller_r(device->machine->m_devicelist.find("ide"), 0x1f0+offset-8, 1);
 	}
 
 	return 0xff;
@@ -120,11 +120,11 @@ WRITE8_DEVICE_HANDLER(a2cffa_w)
 	{
 		token->lastdata &= 0xff00;
 		token->lastdata |= data;
-		ide_controller_w(device->machine->devicelist.find("ide"), 0x1f0+offset-8, 2, token->lastdata);
+		ide_controller_w(device->machine->m_devicelist.find("ide"), 0x1f0+offset-8, 2, token->lastdata);
 	}
 	else if (offset > 8)
 	{
-		ide_controller_w(device->machine->devicelist.find("ide"), 0x1f0+offset-8, 1, data);
+		ide_controller_w(device->machine->m_devicelist.find("ide"), 0x1f0+offset-8, 1, data);
 	}
 }
 

@@ -39,21 +39,25 @@ static UINT8* janshi_vram1;
 static UINT8* janshi_vram2;
 static UINT8* janshi_back_vram;
 static UINT8* janshi_crtc_regs;
-
+static UINT8* janshi_unk1;
+static UINT8* janshi_widthflags;
+static UINT8* janshi_unk2;
 
 static ADDRESS_MAP_START( janshi_vdp_map8, 0, 8 )
-	AM_RANGE(0x00000, 0x007ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x02000, 0x027ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 
-	AM_RANGE(0x06000, 0x0601f) AM_RAM AM_BASE(&janshi_crtc_regs)
+	AM_RANGE(0xfc0000, 0xfc1fff) AM_RAM AM_BASE(&janshi_back_vram) // bg tilemap?
+	AM_RANGE(0xfc2000, 0xfc2fff) AM_RAM AM_BASE(&janshi_vram1) // xpos, colour, tile number etc.
 
-	AM_RANGE(0x12000, 0x12fff) AM_RAM AM_BASE(&janshi_vram1)
+	AM_RANGE(0xfc3700, 0xfc377f) AM_RAM AM_BASE(&janshi_unk1) // ?? height related?
+	AM_RANGE(0xfc3780, 0xfc37bf) AM_RAM AM_BASE(&janshi_widthflags)
+	AM_RANGE(0xfc37c0, 0xfc37ff) AM_RAM AM_BASE(&janshi_unk2) // 2x increasing tables 00 10 20 30 etc.
 
-	AM_RANGE(0x13700, 0x137ff) AM_RAM //??
+	AM_RANGE(0xfc3800, 0xfc3fff) AM_RAM AM_BASE(&janshi_vram2) // y pos + unknown
 
-	AM_RANGE(0x13800, 0x13fff) AM_RAM AM_BASE(&janshi_vram2)
+	AM_RANGE(0xff0000, 0xff07ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xff2000, 0xff27ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 
-	AM_RANGE(0x20000, 0x21fff) AM_RAM AM_BASE(&janshi_back_vram)
+	AM_RANGE(0xff6000, 0xff601f) AM_RAM AM_BASE(&janshi_crtc_regs)
 ADDRESS_MAP_END
 
 
@@ -68,7 +72,6 @@ class janshi_vdp_device_config : public device_config,
 public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
-	virtual const char *name() const { return "JANSHIVDP"; }
 protected:
 	virtual void device_config_complete();
 	virtual bool device_validity_check(const game_driver &driver) const;
@@ -91,7 +94,7 @@ protected:
 const device_type JANSHIVDP = janshi_vdp_device_config::static_alloc_device_config;
 
 janshi_vdp_device_config::janshi_vdp_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "JANSHIVDP", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  m_space_config("janshi_vdp", ENDIANNESS_LITTLE, 8,24, 0, NULL, *ADDRESS_MAP_NAME(janshi_vdp_map8))
 {
@@ -147,12 +150,44 @@ void janshi_vdp_device::device_reset()
 
 
 static UINT32 vram_addr;
-static UINT8 vram_bank;
 
 static VIDEO_START( pinkiri8 )
 {
 
 }
+
+/*
+
+ronjan
+00, 7d, 00, 40, 00, 42, 00, 44, 00, 46, 00, 48, 00, 4a, 00, 0c, 00, 4e, 00, 10, 00, 12, 00, 14, 00, 16, 00, 18, 00, 1a, 00, 1c,
+00, 7d, 00, 40, 00, 42, 00, 44, 00, 46, 00, 48, 00, 4a, 00, 4c, 00, 4e, 00, 50, 00, 52, 00, 54, 00, 56, 00, 58, 00, 5a, 00, 5c,
+00, 7d, 00, 40, 00, 42, 00, 44, 00, 46, 00, 48, 00, 4a, 00, 4c, 00, 4e, 00, 50, 00, 52, 00, 54, 00, 56, 00, 58, 00, 5a, 00, 5c,
+
+00, 1e, 00, 20, 00, 22, 00, 24, 00, 26, 00, 68, 00, 6a, 00, 6c, 00, 6e, 00, 70, 00, 72, 00, 74, 00, 76, 00, 38, 00, 3a, 00, c0,
+00, 5e, 00, 60, 00, 62, 00, 64, 00, 66, 00, 68, 00, 6a, 00, 6c, 00, 6e, 00, 70, 00, 72, 00, 74, 00, 76, 00, 78, 00, 7a, 00, c0,
+00, 5e, 00, 60, 00, 62, 00, 64, 00, 66, 00, 68, 00, 6a, 00, 6c, 00, 6e, 00, 70, 00, 72, 00, 74, 00, 76, 00, 78, 00, 7a, 00, c0,
+
+
+00, c2, 00, c4, 00, c6, 00, c8, 00, ca, 00, cc, 00, ce, 00, d0, 00, d2, 00, d4, 00, d6, 00, d8, 00, da, 00, dc, 00, de, 00, e0,
+00, c2, 00, c4, 00, c6, 00, c8, 00, ca, 00, cc, 00, ce, 00, d0, 00, d2, 00, d4, 00, d6, 00, d8, 00, da, 00, dc, 00, de, 00, e0,
+00, c2, 00, c4, 00, c6, 00, c8, 00, ca, 00, cc, 00, ce, 00, d0, 00, d2, 00, d4, 00, d6, 00, d8, 00, da, 00, dc, 00, de, 00, e0,
+
+00, e3, 00, e5, 00, e7, 00, e9, 00, eb, 00, ed, 00, ef, 00, f1, 00, f3, 00, f5, 00, f7, 00, f9, 00, fb, 00, fd, 00, ff, 00, 7e,
+00, e3, 00, e5, 00, e7, 00, e9, 00, eb, 00, ed, 00, ef, 00, f1, 00, f3, 00, f5, 00, f7, 00, f9, 00, fb, 00, fd, 00, ff, 00, 7e,
+00, e3, 00, e5, 00, e7, 00, e9, 00, eb, 00, ed, 00, ef, 00, f1, 00, f3, 00, f5, 00, f7, 00, f9, 00, fb, 00, fd, 00, ff, 00, 7e,
+
+00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 01, 00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01,
+00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01,
+00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01,
+
+
+00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 01, 00, 01, 00, 00, 00, 00,
+00, 01, 00, 01, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00, 00,
+00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 01, 00, 00, 00, 00, 00, 00,
+
+
+
+*/
 
 static VIDEO_UPDATE( pinkiri8 )
 {
@@ -162,6 +197,33 @@ static VIDEO_UPDATE( pinkiri8 )
 	static int game_type_hack = 0;
 
 	if (!strcmp(screen->machine->gamedrv->name,"janshi")) game_type_hack = 1;
+
+	if ( input_code_pressed_once(screen->machine, KEYCODE_W) )
+	{
+		int i;
+		int count2;
+		printf("-------------------------------\n");
+		count2=0;
+		for (i=0x00;i<0x40;i+=2)
+		{
+
+			printf("%02x, ", janshi_widthflags[i+1]);
+
+			count2++;
+
+			if (count2==0x10)
+			{
+				printf("\n");
+				count2 = 0;
+			}
+
+
+		}
+
+
+	}
+
+
 
 	//popmessage("%02x",janshi_crtc_regs[0x0a]);
 	col_bank = (janshi_crtc_regs[0x0a] & 0x40) >> 6;
@@ -202,11 +264,11 @@ static VIDEO_UPDATE( pinkiri8 )
 		for(i=(0x1000/4)-4;i>=0;i--)
 		{
 
-		/* vram 1 (12000 - 12fff)
+		/* vram 1 (video map 0xfc2000)
 
           tttt tttt | 00tt tttt | cccc c000 | xxxx xxxx |
 
-          vram 2 (13800 - 13fff)
+          vram 2 (video map 0xfc3800)
 
           yyyy yyyy | ???? ???? |
 
@@ -231,76 +293,84 @@ static VIDEO_UPDATE( pinkiri8 )
 
 		//  width = 0; height = 0;
 
+			width = 2;
+			height = 2;
+
+
+			// these bits seem to somehow determine the sprite height / widths for the sprite ram region?
+			int bit = janshi_widthflags[(i/0x20)*2 + 1];
+
+			if (bit)
+			{
+				//col = mame_rand(screen->machine);
+				width = 2;
+			}
+			else
+			{
+				width = 1;
+				height = 2;
+			}
 
 			// hacks!
 			if (game_type_hack==1) // janshi
 			{
 				if (spr_offs<0x400)
 				{
-					width = 2;
 					height = 4;
 				}
 				else if (spr_offs<0x580)
 				{
-					width = 1;
-					height = 2;
+				//  height = 2;
 				}
 				else if (spr_offs<0x880)
 				{
-					width = 2;
 					height = 4;
 				}
 				else if (spr_offs<0x1000)
 				{
-					width = 2;
-					height = 2;
+				//  height = 2;
 				}
 				else if (spr_offs<0x1080)
 				{
-					width = 1;
-					height = 2;
+				//  height = 2;
 				}
 				else if (spr_offs<0x1700)
 				{
-					width = 2;
 					height = 4;
 				}
 				else if (spr_offs<0x1730)
 				{
-					width = 2;
-					height = 2;
+				//  height = 2;
 				}
 				else if (spr_offs<0x1930)
 				{
-					width = 2;
 					height = 4;
 				}
 				else if (spr_offs<0x19c0)
 				{
-					width = 2;
 					height = 1;
 				}
 				else
 				{
-					width = 2;
 					height = 4;
 				}
 
 
-				if (height==1)
-					y+=16;
-
-
-				// hmm...
-				if (height==2)
-					y+=16;
-
 			}
-			else // other games
-			{
-					width = 2;
-					height = 2;
-			}
+
+
+
+
+
+
+			if (height==1)
+				y+=16;
+
+
+			// hmm...
+			if (height==2)
+				y+=16;
+
 
 
 			{
@@ -342,67 +412,33 @@ static int prev_writes = 0;
 
 static WRITE8_HANDLER( pinkiri8_vram_w )
 {
-//  static UINT8 *vram = memory_region(space->machine, "vram");
-
-
-
 	switch(offset)
 	{
 		case 0:
-			vram_addr = (data & 0xff);
+			vram_addr = (data << 0)  | (vram_addr&0xffff00);
 			if (LOG_VRAM) printf("\n prev writes was %04x\n\naddress set to %04x -\n", prev_writes, vram_addr );
 			prev_writes = 0;
 			break;
 
 		case 1:
-			vram_addr = (data << 8) | (vram_addr & 0x00ff);
+			vram_addr = (data << 8)  | (vram_addr & 0xff00ff);
 			if (LOG_VRAM)printf("\naddress set to %04x\n", vram_addr);
 			break;
 
 		case 2:
-			vram_bank = ((data ^ 0x06) & 0x06)>>1; //unknown purpose
-			if (LOG_VRAM)printf("\nunk set to %02x\n", data);
-
-			if ((data!= 0xfb) && (data!=0xfc) && (data!=0xff) && (data!=0xfe)  && (data!=0x0c))
-				if (LOG_VRAM) fatalerror("unknown unknown\n");
-			//printf("%02x\n",vram_bank);
+			vram_addr = (data << 16) | (vram_addr & 0x00ffff);
+			if (LOG_VRAM)printf("\naddress set to %04x\n", vram_addr);
 			break;
 
 		case 3:
 
 			const address_space *vdp_space = space->machine->device<janshi_vdp_device>("janshivdp")->space();
 
-
-
 			if (LOG_VRAM) printf("%02x ", data);
 			prev_writes++;
 			vram_addr++;
-			vram_addr&=0xffff;
 
-			memory_write_byte_8le(vdp_space, (vram_addr) | (vram_bank << 16), data);
-
-
-
-			//vram[(vram_addr) | (vram_bank << 16)] = data;
-			/*
-
-            if(vram_addr <= 0xffff)
-            {
-                static UINT16 datax,pal_offs;
-                static UINT8 r,g,b;
-
-                pal_offs = vram_addr;
-
-                datax = (vram[pal_offs & 0x1fff]) + (vram[(pal_offs & 0x1fff) | (0x2000)]<<8);
-
-                r = ((datax)&0x001f)>>0;
-                g = ((datax)&0x03e0)>>5;
-                b = ((datax)&0x7c00)>>10;
-
-                palette_set_color_rgb(space->machine, pal_offs & 0x1fff, pal5bit(r), pal5bit(g), pal5bit(b));
-            }
-            */
-
+			memory_write_byte_8le(vdp_space, vram_addr, data);
 			break;
 	}
 }
@@ -479,7 +515,7 @@ static ADDRESS_MAP_START( pinkiri8_io, ADDRESS_SPACE_IO, 8 )
 
 ADDRESS_MAP_END
 
-static INPUT_PORTS_START( pinkiri8 )
+static INPUT_PORTS_START( base_inputs )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Reset SW")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Books SW")
@@ -511,15 +547,15 @@ static INPUT_PORTS_START( pinkiri8 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PL1_04")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PL1_05")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE )
@@ -551,15 +587,15 @@ static INPUT_PORTS_START( pinkiri8 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PL2_04")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PL2_05")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_LAST_CHANCE ) PORT_PLAYER(2)
@@ -675,7 +711,7 @@ static INPUT_PORTS_START( pinkiri8 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( janshi )
-	PORT_INCLUDE( pinkiri8 )
+	PORT_INCLUDE( base_inputs )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:1,2,3")
@@ -747,6 +783,314 @@ static INPUT_PORTS_START( janshi )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW4:8" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( ronjan )
+	PORT_INCLUDE( base_inputs )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x00, "Play Time Limit" ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "16 Seconds" )
+	PORT_DIPSETTING(    0x01, "13 Seconds" )
+	PORT_DIPSETTING(    0x02, "10 Seconds" )
+	PORT_DIPSETTING(    0x03, "7 Seconds" )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Payment" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Auto" )
+	//FIXME: Bet Min can't be higher than Bet Max, needs a conditional dip here (or maybe, unified dips)
+	PORT_DIPNAME( 0x38, 0x38, "Bet Min" ) PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x38, "1" )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x28, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x18, "5" )
+	PORT_DIPSETTING(    0x10, "6" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0xc0, 0x00, "Bet Max" ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, "5" )
+	PORT_DIPSETTING(    0x80, "10" )
+	PORT_DIPSETTING(    0x40, "15" )
+	PORT_DIPSETTING(    0x00, "20" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0f, 0x00, "Rate of Win" ) PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "98%" )
+	PORT_DIPSETTING(    0x01, "95%" )
+	PORT_DIPSETTING(    0x02, "92%" )
+	PORT_DIPSETTING(    0x03, "89%" )
+	PORT_DIPSETTING(    0x04, "86%" )
+	PORT_DIPSETTING(    0x05, "83%" )
+	PORT_DIPSETTING(    0x06, "80%" )
+	PORT_DIPSETTING(    0x07, "77%" )
+	PORT_DIPSETTING(    0x08, "74%" )
+	PORT_DIPSETTING(    0x09, "71%" )
+	PORT_DIPSETTING(    0x0a, "68%" )
+	PORT_DIPSETTING(    0x0b, "65%" )
+	PORT_DIPSETTING(    0x0c, "62%" )
+	PORT_DIPSETTING(    0x0d, "59%" )
+	PORT_DIPSETTING(    0x0e, "56%" )
+	PORT_DIPSETTING(    0x0f, "53%" )
+	PORT_DIPNAME( 0x10, 0x10, "Limit Display" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0xe0, 0xe0, "Credit Limit" )  PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPSETTING(    0x00, "50000" )
+	PORT_DIPSETTING(    0x20, "40000" )
+	PORT_DIPSETTING(    0x40, "30000" )
+	PORT_DIPSETTING(    0x60, "20000" )
+	PORT_DIPSETTING(    0x80, "15000" )
+	PORT_DIPSETTING(    0xa0, "10000" )
+	PORT_DIPSETTING(    0xc0, "5000" )
+	PORT_DIPSETTING(    0xe0, "No Limit" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x07, 0x07, "Key In Coinage" ) PORT_DIPLOCATION("SW3:1,2,3")
+	PORT_DIPSETTING(    0x00, "1 Coin/500 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin/200 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x78, 0x40, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW3:4,5,6,7")
+	PORT_DIPSETTING(    0x78, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x70, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x68, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x58, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x48, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x20, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x18, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/100 Credits" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "Odds Type" ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x01, "A" )
+	PORT_DIPSETTING(    0x00, "B" )
+	PORT_DIPNAME( 0x02, 0x02, "Special Bonus Odds" ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x02, "A" )
+	PORT_DIPSETTING(    0x00, "B" )
+	PORT_DIPNAME( 0x04, 0x00, "Kind Mark of Back" ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x08, 0x08, "Nudity" ) PORT_DIPLOCATION("SW4:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x10, 0x10, "BGM" ) PORT_DIPLOCATION("SW4:5")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x20, 0x20, "Voice" ) PORT_DIPLOCATION("SW4:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x40, "Double Up Game" ) PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Double Up Limit" ) PORT_DIPLOCATION("SW4:8")
+	PORT_DIPSETTING(    0x80, "6" )
+	PORT_DIPSETTING(    0x00, "No Limit" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( pinkiri8 )
+	PORT_INCLUDE( base_inputs )
+
+	/* standard mahjong panel converted to a hanafuda one */
+	PORT_MODIFY("PL1_01")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_MODIFY("PL1_02")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
+
+	PORT_MODIFY("PL1_03")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PL1_04")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PL1_05")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PL2_01")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_A ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_E ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_YES ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_MODIFY("PL2_02")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_B ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_F ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_HANAFUDA_NO ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
+
+	PORT_MODIFY("PL2_03")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_C ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_G ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PL2_04")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_HANAFUDA_D ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_HANAFUDA_H ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("PL2_05")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Game Style" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x01, "Win / Bet" )
+	PORT_DIPSETTING(    0x00, "Out / In" )
+	PORT_DIPNAME( 0x02, 0x02, "Premium Hand" ) PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x04, "Coin Payment" ) PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "Auto" )
+	//FIXME: Bet Min can't be higher than Bet Max, needs a conditional dip here (or maybe, unified dips)
+	PORT_DIPNAME( 0x38, 0x38, "Bet Min" ) PORT_DIPLOCATION("SW1:4,5,6")
+	PORT_DIPSETTING(    0x38, "1" )
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x28, "3" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x18, "5" )
+	PORT_DIPSETTING(    0x10, "6" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x00, "10" )
+	PORT_DIPNAME( 0xc0, 0x00, "Bet Max" ) PORT_DIPLOCATION("SW1:7,8")
+	PORT_DIPSETTING(    0xc0, "5" )
+	PORT_DIPSETTING(    0x80, "10" )
+	PORT_DIPSETTING(    0x40, "15" )
+	PORT_DIPSETTING(    0x00, "20" )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0f, 0x00, "Rate of Win" ) PORT_DIPLOCATION("SW2:1,2,3,4")
+	PORT_DIPSETTING(    0x00, "90%" )
+	PORT_DIPSETTING(    0x01, "86%" )
+	PORT_DIPSETTING(    0x02, "82%" )
+	PORT_DIPSETTING(    0x03, "78%" )
+	PORT_DIPSETTING(    0x04, "74%" )
+	PORT_DIPSETTING(    0x05, "70%" )
+	PORT_DIPSETTING(    0x06, "66%" )
+	PORT_DIPSETTING(    0x07, "62%" )
+	PORT_DIPSETTING(    0x08, "58%" )
+	PORT_DIPSETTING(    0x09, "54%" )
+	PORT_DIPSETTING(    0x0a, "50%" )
+	PORT_DIPSETTING(    0x0b, "46%" )
+	PORT_DIPSETTING(    0x0c, "42%" )
+	PORT_DIPSETTING(    0x0d, "38%" )
+	PORT_DIPSETTING(    0x0e, "34%" )
+	PORT_DIPSETTING(    0x0f, "30%" )
+	PORT_DIPNAME( 0x10, 0x10, "Odds Type" ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, "A" )
+	PORT_DIPSETTING(    0x00, "B" )
+	PORT_DIPNAME( 0x20, 0x20, "BGM" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x40, 0x00, "Oya (Owner)" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, "CPU Only" )
+	PORT_DIPSETTING(    0x00, "Winner" )
+	PORT_DIPNAME( 0x80, 0x00, "Koi Time Limit" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, "15 Seconds" )
+	PORT_DIPSETTING(    0x00, "30 Seconds" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x07, 0x07, "Key In Coinage" ) PORT_DIPLOCATION("SW3:1,2,3")
+	PORT_DIPSETTING(    0x00, "1 Coin/500 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin/200 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin/100 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x04, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x05, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x06, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_5C ) )
+	PORT_DIPNAME( 0x78, 0x40, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW3:4,5,6,7")
+	PORT_DIPSETTING(    0x78, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(    0x70, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x68, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0x60, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x58, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x48, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x20, "1 Coin/10 Credits" )
+	PORT_DIPSETTING(    0x18, "1 Coin/20 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Coin/25 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Coin/50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/100 Credits" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:8" )
+
+	PORT_MODIFY("DSW4")
+	PORT_DIPNAME( 0x01, 0x01, "Pinkiri Bonus" ) PORT_DIPLOCATION("SW4:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "Same Month Bonus" ) PORT_DIPLOCATION("SW4:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x04, 0x00, "Play Time Limit" ) PORT_DIPLOCATION("SW4:3")
+	PORT_DIPSETTING(    0x04, "7 Seconds" )
+	PORT_DIPSETTING(    0x00, "12 Seconds" )
+	PORT_DIPNAME( 0x18, 0x00, "Credit Clear" ) PORT_DIPLOCATION("SW4:4,5")
+	PORT_DIPSETTING(    0x00, "300 Seconds" )
+	PORT_DIPSETTING(    0x08, "180 Seconds" )
+	PORT_DIPSETTING(    0x10, "120 Seconds" )
+	PORT_DIPSETTING(    0x18, "60 Seconds" )
+	PORT_DIPNAME( 0x20, 0x20, "Panel Type" ) PORT_DIPLOCATION("SW4:6") // no real difference?
+	PORT_DIPSETTING(    0x20, "Mahjong" )
+	PORT_DIPSETTING(    0x00, "Hanafuda" )
+	PORT_DIPNAME( 0x40, 0x40, "Flip Flop Button" ) PORT_DIPLOCATION("SW4:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW4:8" )
+INPUT_PORTS_END
 
 static const gfx_layout charlayout =
 {
@@ -781,7 +1125,7 @@ static MACHINE_DRIVER_START( pinkiri8 )
 	MDRV_VIDEO_START(pinkiri8)
 	MDRV_VIDEO_UPDATE(pinkiri8)
 
-	MDRV_DEVICE_ADD("janshivdp", JANSHIVDP, 0) \
+	MDRV_DEVICE_ADD("janshivdp", JANSHIVDP, 0)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -808,8 +1152,6 @@ ROM_START( pinkiri8 )
 	ROM_LOAD( "pinkiri8-chr-04.ef1", 0x60000, 0x20000, CRC(4d0e5005) SHA1(4b90119c359c4de576131fd0e28d2fe1482ce74f) )
 	ROM_LOAD( "pinkiri8-chr-05.h1",  0x80000, 0x20000, CRC(036ca165) SHA1(c4a2d6e394bbabcae1413d8a2916a19c90687edf) )
 
-	ROM_REGION( 0x80000, "vram", ROMREGION_ERASE00)
-
 	ROM_REGION( 0x40000, "oki", ROMREGION_ERASE00 )
 ROM_END
 
@@ -828,9 +1170,6 @@ ROM_START( janshi )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "6.1k", 0x00000, 0x40000, CRC(8197034d) SHA1(b501dc7a27b1faad1361c309afd726da14b8b5f5) )
-
-	ROM_REGION( 0x80000, "vram", ROMREGION_ERASE00)
-
 ROM_END
 
 ROM_START( ronjan )
@@ -847,9 +1186,6 @@ ROM_START( ronjan )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "eagle.6", 0x00000, 0x40000, CRC(8197034d) SHA1(b501dc7a27b1faad1361c309afd726da14b8b5f5) )
-
-	ROM_REGION( 0x80000, "vram", ROMREGION_ERASE00)
-
 ROM_END
 
 static UINT8 prot_read_index;
@@ -902,5 +1238,5 @@ static DRIVER_INIT( ronjan )
 }
 
 GAME( 1992,  janshi,    0,   pinkiri8, janshi,    0,      ROT0, "Eagle",         "Janshi",          GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1994,  ronjan,    0,   pinkiri8, pinkiri8,  ronjan, ROT0, "Wing Co., Ltd", "Ron Jan (Super)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
+GAME( 1994,  ronjan,    0,   pinkiri8, ronjan,    ronjan, ROT0, "Wing Co., Ltd", "Ron Jan (Super)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING ) // 'SUPER' flashes in the middle of the screen
 GAME( 1994,  pinkiri8,  0,   pinkiri8, pinkiri8,  0,      ROT0, "Alta",          "Pinkiri 8",       GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )

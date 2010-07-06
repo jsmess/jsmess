@@ -152,7 +152,7 @@ GFXDECODE_END
 /* Machine driver */
 static MACHINE_DRIVER_START( apogee )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", 8080, XTAL_16MHz / 9)
+    MDRV_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
     MDRV_CPU_PROGRAM_MAP(apogee_mem)
     MDRV_MACHINE_RESET( radio86 )
 

@@ -590,7 +590,7 @@ static READ8_DEVICE_HANDLER( konami_sound_timer_r )
         current counter index, we use the sound cpu clock times 8 mod
         16*16*2*8*5*2.
     */
-	UINT32 cycles = (cputag_get_total_cycles(device->machine, "audiocpu") * 8) % (UINT64)(16*16*2*8*5*2);
+	UINT32 cycles = (device->machine->device<cpu_device>("audiocpu")->total_cycles() * 8) % (UINT64)(16*16*2*8*5*2);
 	UINT8 hibit = 0;
 
 	/* separate the high bit from the others */
@@ -2658,7 +2658,7 @@ static DRIVER_INIT( gmgalax )
 	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 
 	/* callback when the game select is toggled */
-	gmgalax_game_changed(machine->portlist.first()->fieldlist, NULL, 0, 0);
+	gmgalax_game_changed(machine->m_portlist.first()->fieldlist, NULL, 0, 0);
 	state_save_register_global(machine, gmgalax_selected_game);
 }
 

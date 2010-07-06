@@ -129,7 +129,7 @@ static WRITE8_DEVICE_HANDLER(mac_via2_out_a);
 static WRITE8_DEVICE_HANDLER(mac_via2_out_b);
 static void mac_via_irq(running_device *device, int state);
 static void mac_via2_irq(running_device *device, int state);
-static CPU_DISASSEMBLE(mac_dasm_override);
+static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 const via6522_interface mac_via6522_intf =
 {
@@ -1309,11 +1309,11 @@ NVRAM_HANDLER( mac )
 		{
 			/* Now we copy the host clock into the Mac clock */
 			/* Cool, isn't it ? :-) */
-			mame_system_time systime;
+			system_time systime;
 			struct tm mac_reference;
 			UINT32 seconds;
 
-			mame_get_base_datetime(machine, &systime);
+			machine->base_datetime(systime);
 
 			/* The count starts on 1st January 1904 */
 			mac_reference.tm_sec = 0;
@@ -2688,7 +2688,7 @@ MACHINE_RESET(mac)
 	mac->via2_ca1 = 0;
 	mac->mac_nubus_irq_state = 0xff;
 
-	debug_cpu_set_dasm_override(devtag_get_device(machine, "maincpu"), CPU_DISASSEMBLE_NAME(mac_dasm_override));
+	machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(mac_dasm_override);
 }
 
 
@@ -2823,7 +2823,7 @@ static const struct NCR5380interface macplus_5380intf =
 	mac_scsi_irq	// IRQ (unconnected on the Mac Plus)
 };
 
-static void macscsi_exit(running_machine *machine)
+static void macscsi_exit(running_machine &machine)
 {
 	ncr5380_exit(&macplus_5380intf);
 }
@@ -2834,7 +2834,7 @@ MACHINE_START( macscsi )
 
 	ncr5380_init(machine, &macplus_5380intf);
 
-	add_exit_callback(machine, macscsi_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, macscsi_exit);
 }
 
 DRIVER_INIT(macplus)
@@ -3883,7 +3883,7 @@ static const char *lookup_trap(UINT16 opcode)
 
 
 
-static CPU_DISASSEMBLE(mac_dasm_override)
+static offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
 {
 	UINT16 opcode;
 	unsigned result = 0;

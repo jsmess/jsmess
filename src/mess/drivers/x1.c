@@ -2126,8 +2126,8 @@ static MACHINE_START( x1 )
 
 	/* set up RTC */
 	{
-		mame_system_time systime;
-		mame_get_base_datetime(machine, &systime);
+		system_time systime;
+		machine->base_datetime(systime);
 
 		x1_rtc.day = ((systime.local_time.mday / 10)<<4) | ((systime.local_time.mday % 10) & 0xf);
 		x1_rtc.month = ((systime.local_time.month+1));

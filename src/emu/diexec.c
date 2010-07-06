@@ -97,7 +97,7 @@ device_config_execute_interface::~device_config_execute_interface()
 //  of clocks to cycles, rounding down if necessary
 //-------------------------------------------------
 
-UINT32 device_config_execute_interface::execute_clocks_to_cycles(UINT32 clocks) const
+UINT64 device_config_execute_interface::execute_clocks_to_cycles(UINT64 clocks) const
 {
 	return clocks;
 }
@@ -108,7 +108,7 @@ UINT32 device_config_execute_interface::execute_clocks_to_cycles(UINT32 clocks) 
 //  of cycles to clocks, rounding down if necessary
 //-------------------------------------------------
 
-UINT32 device_config_execute_interface::execute_cycles_to_clocks(UINT32 cycles) const
+UINT64 device_config_execute_interface::execute_cycles_to_clocks(UINT64 cycles) const
 {
 	return cycles;
 }
@@ -217,7 +217,7 @@ bool device_config_execute_interface::interface_validity_check(const game_driver
 			mame_printf_error("%s: %s device '%s' has a new VBLANK interrupt handler with >1 interrupts!\n", driver.source_file, driver.name, devconfig->tag());
 			error = true;
 		}
-		else if (m_vblank_interrupt_screen != NULL && m_machine_config.devicelist.find(m_vblank_interrupt_screen) == NULL)
+		else if (m_vblank_interrupt_screen != NULL && m_machine_config.m_devicelist.find(m_vblank_interrupt_screen) == NULL)
 		{
 			mame_printf_error("%s: %s device '%s' VBLANK interrupt with a non-existant screen tag (%s)!\n", driver.source_file, driver.name, devconfig->tag(), m_vblank_interrupt_screen);
 			error = true;
@@ -297,13 +297,13 @@ device_execute_interface::~device_execute_interface()
 
 
 //-------------------------------------------------
-//  is_executing - return true if this device
-//  is within its execute function
+//  executing - return true if this device is
+//  within its execute function
 //-------------------------------------------------
 
-bool device_execute_interface::is_executing() const
+bool device_execute_interface::executing() const
 {
-	return (this == m_machine.scheduler.currently_executing());
+	return (this == m_machine.scheduler().currently_executing());
 }
 
 
@@ -314,7 +314,7 @@ bool device_execute_interface::is_executing() const
 
 INT32 device_execute_interface::cycles_remaining() const
 {
-	return is_executing() ? *m_icount : 0;
+	return executing() ? *m_icount : 0;
 }
 
 
@@ -326,7 +326,7 @@ INT32 device_execute_interface::cycles_remaining() const
 void device_execute_interface::eat_cycles(int cycles)
 {
 	// ignore if not the executing device
-	if (!is_executing())
+	if (!executing())
 		return;
 
 	// clamp cycles to the icount and update
@@ -344,7 +344,7 @@ void device_execute_interface::eat_cycles(int cycles)
 void device_execute_interface::adjust_icount(int delta)
 {
 	// ignore if not the executing device
-	if (!is_executing())
+	if (!executing())
 		return;
 
 	// aply the delta directly
@@ -361,7 +361,7 @@ void device_execute_interface::adjust_icount(int delta)
 void device_execute_interface::abort_timeslice()
 {
 	// ignore if not the executing device
-	if (this != m_machine.scheduler.currently_executing())
+	if (this != m_machine.scheduler().currently_executing())
 		return;
 
 	// swallow the remaining cycles
@@ -478,11 +478,11 @@ attotime device_execute_interface::local_time() const
 {
 	// if we're active, add in the time from the current slice
 	attotime result = m_localtime;
-	if (is_executing())
+	if (executing())
 	{
 		assert(m_cycles_running >= *m_icount);
 		int cycles = m_cycles_running - *m_icount;
-		result = attotime_add(result, m_device.clocks_to_attotime(cycles_to_clocks(cycles)));
+		result = attotime_add(result, cycles_to_attotime(cycles));
 	}
 	return result;
 }
@@ -495,7 +495,7 @@ attotime device_execute_interface::local_time() const
 
 UINT64 device_execute_interface::total_cycles() const
 {
-	if (is_executing())
+	if (executing())
 	{
 		assert(m_cycles_running >= *m_icount);
 		return m_totalcycles + m_cycles_running - *m_icount;
@@ -536,7 +536,7 @@ void device_execute_interface::execute_set_input(int linenum, int state)
 void device_execute_interface::interface_pre_start()
 {
 	// fill in the initial states
-	int index = m_machine.devicelist.index(&m_device);
+	int index = m_machine.m_devicelist.index(&m_device);
 	m_suspend = SUSPEND_REASON_RESET;
 	m_profiler = index + PROFILER_DEVICE_FIRST;
 	m_inttrigger = index + TRIGGER_INT;
@@ -655,7 +655,7 @@ void device_execute_interface::interface_clock_changed()
 	m_divisor = attos;
 
 	// re-compute the perfect interleave factor
-	m_machine.scheduler.compute_perfect_interleave();
+	m_machine.scheduler().compute_perfect_interleave();
 }
 
 
@@ -699,7 +699,7 @@ void device_execute_interface::static_on_vblank(screen_device &screen, void *par
 	if (vblank_state)
 	{
 		device_execute_interface *exec = NULL;
-		for (bool gotone = screen.machine->devicelist.first(exec); gotone; gotone = exec->next(exec))
+		for (bool gotone = screen.machine->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 			exec->on_vblank_start(screen);
 	}
 }
@@ -707,7 +707,7 @@ void device_execute_interface::static_on_vblank(screen_device &screen, void *par
 void device_execute_interface::on_vblank_start(screen_device &screen)
 {
 	// start the interrupt counter
-	if (!is_suspended(SUSPEND_REASON_DISABLE))
+	if (!suspended(SUSPEND_REASON_DISABLE))
 		m_iloops = 0;
 	else
 		m_iloops = -1;
@@ -724,11 +724,11 @@ void device_execute_interface::on_vblank_start(screen_device &screen)
 	// if interested, call the interrupt handler
 	if (interested)
 	{
-		if (!is_suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+		if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 			(*m_execute_config.m_vblank_interrupt)(&m_device);
 
 		// if we have more than one interrupt per frame, start the timer now to trigger the rest of them
-		if (m_execute_config.m_vblank_interrupts_per_frame > 1 && !is_suspended(SUSPEND_REASON_DISABLE))
+		if (m_execute_config.m_vblank_interrupts_per_frame > 1 && !suspended(SUSPEND_REASON_DISABLE))
 		{
 			m_partial_frame_period = attotime_div(m_machine.primary_screen->frame_period(), m_execute_config.m_vblank_interrupts_per_frame);
 			timer_adjust_oneshot(m_partial_frame_timer, m_partial_frame_period, 0);
@@ -757,7 +757,7 @@ void device_execute_interface::trigger_partial_frame_interrupt()
 	m_iloops--;
 
 	// call the interrupt handler if we're not suspended
-	if (!is_suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 		(*m_execute_config.m_vblank_interrupt)(&m_device);
 
 	// set up to retrigger if there's more interrupts to generate
@@ -779,7 +779,7 @@ TIMER_CALLBACK( device_execute_interface::static_trigger_periodic_interrupt )
 void device_execute_interface::trigger_periodic_interrupt()
 {
 	// bail if there is no routine
-	if (m_execute_config.m_timed_interrupt != NULL && !is_suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+	if (m_execute_config.m_timed_interrupt != NULL && !suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 		(*m_execute_config.m_timed_interrupt)(&m_device);
 }
 
@@ -943,7 +943,7 @@ if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 				m_execute->suspend(SUSPEND_REASON_RESET, true);
 
 			// if we're clearing the line that was previously asserted, reset the device
-			else if (m_execute->is_suspended(SUSPEND_REASON_RESET))
+			else if (m_execute->suspended(SUSPEND_REASON_RESET))
 			{
 				m_device->reset();
 				m_execute->resume(SUSPEND_REASON_RESET);

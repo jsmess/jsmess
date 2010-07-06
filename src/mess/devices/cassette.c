@@ -359,7 +359,7 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 	x = 0.0f;
 	y = 0.5f;
 
-	dev = device->machine->devicelist.first(CASSETTE );
+	dev = device->machine->m_devicelist.first(CASSETTE );
 
 	while ( dev && strcmp( dev->tag(), device->tag() ) )
 	{

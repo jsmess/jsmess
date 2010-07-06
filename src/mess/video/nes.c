@@ -11,13 +11,13 @@
 #include "includes/nes.h"
 #include "machine/nes_mmc.h"
 
-static void nes_vh_reset( running_machine *machine )
+static void nes_vh_reset( running_machine &machine )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
-	ppu2c0x_set_vidaccess_callback(devtag_get_device(machine,"ppu"), nes_ppu_vidaccess);
+	nes_state *state = (nes_state *)machine.driver_data;
+	ppu2c0x_set_vidaccess_callback(devtag_get_device(&machine,"ppu"), nes_ppu_vidaccess);
 
 	if (state->four_screen_vram)
-		set_nt_mirroring(machine, PPU_MIRROR_4SCREEN);
+		set_nt_mirroring(&machine, PPU_MIRROR_4SCREEN);
 	else
 	{
 		switch (state->hard_mirroring)
@@ -26,10 +26,10 @@ static void nes_vh_reset( running_machine *machine )
 			case PPU_MIRROR_VERT:
 			case PPU_MIRROR_HIGH:
 			case PPU_MIRROR_LOW:
-				set_nt_mirroring(machine, state->hard_mirroring);
+				set_nt_mirroring(&machine, state->hard_mirroring);
 				break;
 			default:
-				set_nt_mirroring(machine, PPU_MIRROR_NONE);
+				set_nt_mirroring(&machine, PPU_MIRROR_NONE);
 				break;
 		}
 	}
@@ -41,7 +41,7 @@ VIDEO_START( nes )
 
 	state->last_frame_flip =  0;
 
-	add_reset_callback(machine, nes_vh_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, nes_vh_reset);
 }
 
 PALETTE_INIT( nes )

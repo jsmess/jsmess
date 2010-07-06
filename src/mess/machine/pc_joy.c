@@ -19,7 +19,7 @@ READ8_HANDLER ( pc_JOY_r )
 	UINT8 data = 0;
 	int delta;
 	attotime new_time = timer_get_time(space->machine);
-	const input_port_config *joystick_port = space->machine->portlist.find("pc_joy");
+	const input_port_config *joystick_port = space->machine->m_portlist.find("pc_joy");
 
 	if (joystick_port != NULL)
 	{

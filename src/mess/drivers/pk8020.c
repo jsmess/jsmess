@@ -198,7 +198,7 @@ GFXDECODE_END
 /* Machine driver */
 static MACHINE_DRIVER_START( pk8020 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, XTAL_20MHz / 8)
+	MDRV_CPU_ADD("maincpu", I8080, XTAL_20MHz / 8)
 	MDRV_CPU_PROGRAM_MAP(pk8020_mem)
 	MDRV_CPU_IO_MAP(pk8020_io)
 	MDRV_CPU_VBLANK_INT("screen", pk8020_interrupt)

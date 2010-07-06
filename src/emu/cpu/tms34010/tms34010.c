@@ -83,9 +83,8 @@ struct _tms34010_state
 INLINE tms34010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_TMS34010 ||
-		   cpu_get_type(device) == CPU_TMS34020);
+	assert(device->type() == TMS34010 ||
+		   device->type() == TMS34020);
 	return (tms34010_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -1081,14 +1080,14 @@ VIDEO_UPDATE( tms340x0 )
 	pen_t blackpen = get_black_pen(screen->machine);
 	tms34010_display_params params;
 	tms34010_state *tms = NULL;
-	running_device *cpu;
+	device_t *cpu;
 	int x;
 
 	/* find the owning CPU */
-	for (cpu = screen->machine->firstcpu; cpu != NULL; cpu = cpu_next(cpu))
+	for (cpu = screen->machine->m_devicelist.first(); cpu != NULL; cpu = cpu->next())
 	{
-		cpu_type type = cpu_get_type(cpu);
-		if (type == CPU_TMS34010 || type == CPU_TMS34020)
+		device_type type = cpu->type();
+		if (type == TMS34010 || type == TMS34020)
 		{
 			tms = get_safe_token(cpu);
 			if (tms->config != NULL && tms->config->scanline_callback != NULL && tms->screen == screen)
@@ -1483,7 +1482,7 @@ READ16_HANDLER( tms34010_io_register_r )
 			return result;
 
 		case REG_REFCNT:
-			return (cpu_get_total_cycles(space->cpu) / 16) & 0xfffc;
+			return (tms->device->total_cycles() / 16) & 0xfffc;
 
 		case REG_INTPEND:
 			result = IOREG(tms, offset);
@@ -1529,7 +1528,7 @@ READ16_HANDLER( tms34020_io_register_r )
 		{
 			int refreshrate = (IOREG(tms, REG020_CONFIG) >> 8) & 7;
 			if (refreshrate < 6)
-				return (cpu_get_total_cycles(space->cpu) / refreshrate) & 0xffff;
+				return (tms->device->total_cycles() / refreshrate) & 0xffff;
 			break;
 		}
 	}
@@ -1785,3 +1784,6 @@ CPU_GET_INFO( tms34020 )
 		default:										CPU_GET_INFO_CALL(tms34010);		break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(TMS34010, tms34010);
+DEFINE_LEGACY_CPU_DEVICE(TMS34020, tms34020);

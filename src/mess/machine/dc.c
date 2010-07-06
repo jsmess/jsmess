@@ -369,7 +369,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						timer_adjust_oneshot( atapi_timer, cpu_clocks_to_attotime( space->cpu, ATAPI_CYCLES_PER_SECTOR ), 0 );
+						timer_adjust_oneshot( atapi_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime(ATAPI_CYCLES_PER_SECTOR ), 0 );
 						break;
 				}
 
@@ -523,7 +523,7 @@ static WRITE32_HANDLER( atapi_w )
 	}
 }
 
-static void dreamcast_atapi_exit(running_machine* machine)
+static void dreamcast_atapi_exit(running_machine& machine)
 {
 	if (gdrom_device != NULL)
 	{
@@ -550,7 +550,7 @@ void dreamcast_atapi_init(running_machine *machine)
 
 	gdrom_device = NULL;
 
-	add_exit_callback(machine, dreamcast_atapi_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, dreamcast_atapi_exit);
 
 	atapi_data = auto_alloc_array(machine, UINT8,  ATAPI_DATA_SIZE );
 

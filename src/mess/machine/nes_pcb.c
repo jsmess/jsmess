@@ -9125,7 +9125,7 @@ static WRITE8_HANDLER( btl_mariobaby_w )
 				if (!state->IRQ_enable && (data & 0x02))
 				{
 					state->IRQ_enable = 1;
-					timer_adjust_oneshot(state->irq_timer, cpu_clocks_to_attotime(state->maincpu, 24576), 0);
+					timer_adjust_oneshot(state->irq_timer, downcast<cpu_device *>(state->maincpu)->cycles_to_attotime(24576), 0);
 				}
 				if (!(data & 0x02))
 				{

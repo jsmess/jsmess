@@ -4869,14 +4869,14 @@ static const TCHAR *GamePicker_GetItemString(HWND hwndPicker, int nItem, int nCo
 
 		case COLUMN_TYPE:
 			{
-				machine_config *config = machine_config_alloc(drivers[nItem]->machine_config);
+				machine_config *config = global_alloc(machine_config(drivers[nItem]->machine_config));
 				/* Vector/Raster */
 				if (isDriverVector(config))
 					s = TEXT("Vector");
 				else
 					s = TEXT("Raster");
 
-				machine_config_free(config);
+				global_free(config);
 			}
 			break;
 
@@ -5358,13 +5358,13 @@ static int GamePicker_Compare(HWND hwndPicker, int index1, int index2, int sort_
 
 	case COLUMN_TYPE:
 		{
-			machine_config *config1 = machine_config_alloc(drivers[index1]->machine_config);
-			machine_config *config2 = machine_config_alloc(drivers[index2]->machine_config);
+			machine_config *config1 = global_alloc(machine_config(drivers[index1]->machine_config));
+			machine_config *config2 = global_alloc(machine_config(drivers[index2]->machine_config));
 
 			value = isDriverVector(config1) - isDriverVector(config2);
 
-			machine_config_free(config1);
-			machine_config_free(config2);
+			global_free(config1);
+			global_free(config2);
 		}
 		break;
 

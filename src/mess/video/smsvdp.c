@@ -461,7 +461,7 @@ READ8_DEVICE_HANDLER( sms_vdp_data_r )
 	temp = smsvdp->buffer;
 
 	/* Load read buffer */
-	smsvdp->buffer = smsvdp->VRAM->base.u8[(smsvdp->addr & 0x3fff)];
+	smsvdp->buffer = smsvdp->VRAM->u8((smsvdp->addr & 0x3fff));
 
 	/* Bump internal address register */
 	smsvdp->addr += 1;
@@ -510,14 +510,14 @@ WRITE8_DEVICE_HANDLER( sms_vdp_data_w )
 		case 0x01:
 		case 0x02:
 			address = (smsvdp->addr & 0x3fff);
-			smsvdp->VRAM->base.u8[address] = data;
+			smsvdp->VRAM->u8(address) = data;
 			break;
 
 		case 0x03:
 			address = smsvdp->addr & smsvdp->cram_mask;
-			if (data != smsvdp->CRAM->base.u8[address])
+			if (data != smsvdp->CRAM->u8(address))
 			{
-				smsvdp->CRAM->base.u8[address] = data;
+				smsvdp->CRAM->u8(address) = data;
 				smsvdp->cram_dirty = 1;
 			}
 			break;
@@ -549,7 +549,7 @@ WRITE8_DEVICE_HANDLER( sms_vdp_ctrl_w )
 		switch (smsvdp->addrmode)
 		{
 		case 0:		/* VRAM reading mode */
-			smsvdp->buffer = smsvdp->VRAM->base.u8[smsvdp->addr & 0x3fff];
+			smsvdp->buffer = smsvdp->VRAM->u8(smsvdp->addr & 0x3fff);
 			smsvdp->addr += 1;
 			break;
 
@@ -620,7 +620,7 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int *pri
 		/* vertical scrolling when bit 7 of reg[0x00] is set */
 		y_scroll = ((smsvdp->reg[0x00] & 0x80) && (tile_column > 23)) ? 0 : smsvdp->reg9copy;
 
-		name_table = smsvdp->VRAM->base.u8 + name_table_address + ((((line + y_scroll) % scroll_mod) >> 3) << 6);
+		name_table = smsvdp->VRAM->base() + name_table_address + ((((line + y_scroll) % scroll_mod) >> 3) << 6);
 
 		tile_line = ((tile_column + x_scroll_start_column) & 0x1f) * 2;
 		tile_data = name_table[tile_line] | (name_table[tile_line + 1] << 8);
@@ -635,10 +635,10 @@ static void sms_refresh_line_mode4( smsvdp_t *smsvdp, int *line_buffer, int *pri
 		if (vert_selected)
 			tile_line = 0x07 - tile_line;
 
-		bit_plane_0 = smsvdp->VRAM->base.u8[((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x00];
-		bit_plane_1 = smsvdp->VRAM->base.u8[((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x01];
-		bit_plane_2 = smsvdp->VRAM->base.u8[((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x02];
-		bit_plane_3 = smsvdp->VRAM->base.u8[((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x03];
+		bit_plane_0 = smsvdp->VRAM->u8(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x00);
+		bit_plane_1 = smsvdp->VRAM->u8(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x01);
+		bit_plane_2 = smsvdp->VRAM->u8(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x02);
+		bit_plane_3 = smsvdp->VRAM->u8(((tile_selected << 5) + ((tile_line & 0x07) << 2)) + 0x03);
 
 		for (pixel_x = 0; pixel_x < 8 ; pixel_x++)
 		{
@@ -682,7 +682,7 @@ static void sms_refresh_mode4_sprites( running_machine *machine, smsvdp_t *smsvd
 	int sprite_col_occurred, sprite_col_x;
 	int sprite_buffer[8], sprite_buffer_count, sprite_buffer_index;
 	int bit_plane_0, bit_plane_1, bit_plane_2, bit_plane_3;
-	UINT8 *sprite_table = smsvdp->VRAM->base.u8 + ((smsvdp->reg[0x05] << 7) & 0x3f00);
+	UINT8 *sprite_table = smsvdp->VRAM->base() + ((smsvdp->reg[0x05] << 7) & 0x3f00);
 
 	/* Draw sprite layer */
 	sprite_height = (smsvdp->reg[0x01] & 0x02 ? 16 : 8);
@@ -750,10 +750,10 @@ static void sms_refresh_mode4_sprites( running_machine *machine, smsvdp_t *smsvd
 		if (sprite_line > 0x07)
 			sprite_tile_selected += 1;
 
-		bit_plane_0 = smsvdp->VRAM->base.u8[((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x00];
-		bit_plane_1 = smsvdp->VRAM->base.u8[((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x01];
-		bit_plane_2 = smsvdp->VRAM->base.u8[((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x02];
-		bit_plane_3 = smsvdp->VRAM->base.u8[((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x03];
+		bit_plane_0 = smsvdp->VRAM->u8(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x00);
+		bit_plane_1 = smsvdp->VRAM->u8(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x01);
+		bit_plane_2 = smsvdp->VRAM->u8(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x02);
+		bit_plane_3 = smsvdp->VRAM->u8(((sprite_tile_selected << 5) + ((sprite_line & 0x07) << 2)) + 0x03);
 
 		sprite_col_occurred = 0;
 		sprite_col_x = 0;
@@ -889,8 +889,8 @@ static void sms_refresh_tms9918_sprites( running_machine *machine, smsvdp_t *sms
 	UINT8 *sprite_table, *sprite_pattern_table;
 
 	/* Draw sprite layer */
-	sprite_table = smsvdp->VRAM->base.u8 + ((smsvdp->reg[0x05] & 0x7f) << 7);
-	sprite_pattern_table = smsvdp->VRAM->base.u8 + ((smsvdp->reg[0x06] & 0x07) << 11);
+	sprite_table = smsvdp->VRAM->base() + ((smsvdp->reg[0x05] & 0x7f) << 7);
+	sprite_pattern_table = smsvdp->VRAM->base() + ((smsvdp->reg[0x06] & 0x07) << 11);
 	sprite_height = 8;
 
 	if (smsvdp->reg[0x01] & 0x02)                         /* Check if SI is set */
@@ -1140,10 +1140,10 @@ static void sms_refresh_line_mode2( smsvdp_t *smsvdp, int *line_buffer, int line
 	int pattern_mask, color_mask, pattern_offset;
 
 	/* Draw background layer */
-	name_table = smsvdp->VRAM->base.u8 + ((smsvdp->reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
-	color_table = smsvdp->VRAM->base.u8 + ((smsvdp->reg[0x03] & 0x80) << 6);
+	name_table = smsvdp->VRAM->base() + ((smsvdp->reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
+	color_table = smsvdp->VRAM->base() + ((smsvdp->reg[0x03] & 0x80) << 6);
 	color_mask = ((smsvdp->reg[0x03] & 0x7f) << 3) | 0x07;
-	pattern_table = smsvdp->VRAM->base.u8 + ((smsvdp->reg[0x04] & 0x04) << 11);
+	pattern_table = smsvdp->VRAM->base() + ((smsvdp->reg[0x04] & 0x04) << 11);
 	pattern_mask = ((smsvdp->reg[0x04] & 0x03) << 8) | 0xff;
 	pattern_offset = (line & 0xc0) << 2;
 
@@ -1189,9 +1189,9 @@ static void sms_refresh_line_mode0( smsvdp_t *smsvdp, int *line_buffer, int line
 	UINT8 *name_table, *color_table, *pattern_table;
 
 	/* Draw background layer */
-	name_table = smsvdp->VRAM->base.u8 + ((smsvdp->reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
-	color_table = smsvdp->VRAM->base.u8 + ((smsvdp->reg[0x03] << 6) & (VRAM_SIZE - 1));
-	pattern_table = smsvdp->VRAM->base.u8 + ((smsvdp->reg[0x04] << 11) & (VRAM_SIZE - 1));
+	name_table = smsvdp->VRAM->base() + ((smsvdp->reg[0x02] & 0x0f) << 10) + ((line >> 3) * 32);
+	color_table = smsvdp->VRAM->base() + ((smsvdp->reg[0x03] << 6) & (VRAM_SIZE - 1));
+	pattern_table = smsvdp->VRAM->base() + ((smsvdp->reg[0x04] << 11) & (VRAM_SIZE - 1));
 
 	for (tile_column = 0; tile_column < 32; tile_column++)
 	{
@@ -1420,14 +1420,14 @@ static void sms_update_palette( smsvdp_t *smsvdp )
 		{
 			for (i = 0; i < 32; i++)
 			{
-				smsvdp->current_palette[i] = ((smsvdp->CRAM->base.u8[i] & 0x30) << 6) | ((smsvdp->CRAM->base.u8[i] & 0x0c ) << 4) | ((smsvdp->CRAM->base.u8[i] & 0x03) << 2);
+				smsvdp->current_palette[i] = ((smsvdp->CRAM->u8(i) & 0x30) << 6) | ((smsvdp->CRAM->u8(i) & 0x0c ) << 4) | ((smsvdp->CRAM->u8(i) & 0x03) << 2);
 			}
 		}
 		else
 		{
 			for (i = 0; i < 32; i++)
 			{
-				smsvdp->current_palette[i] = ((smsvdp->CRAM->base.u8[i * 2 + 1] << 8) | smsvdp->CRAM->base.u8[i * 2]) & 0x0fff;
+				smsvdp->current_palette[i] = ((smsvdp->CRAM->u8(i * 2 + 1) << 8) | smsvdp->CRAM->u8(i * 2)) & 0x0fff;
 			}
 		}
 	}
@@ -1435,7 +1435,7 @@ static void sms_update_palette( smsvdp_t *smsvdp )
 	{
 		for (i = 0; i < 32; i++)
 		{
-			smsvdp->current_palette[i] = smsvdp->CRAM->base.u8[i] & 0x3f;
+			smsvdp->current_palette[i] = smsvdp->CRAM->u8(i) & 0x3f;
 		}
 	}
 }
@@ -1501,8 +1501,8 @@ static DEVICE_START( smsvdp )
 	smsvdp->pause_callback = intf->pause_callback;
 
 	/* Allocate video RAM */
-	smsvdp->VRAM = memory_region_alloc(device->machine, "vdp_vram", VRAM_SIZE, ROM_REQUIRED);
-	smsvdp->CRAM = memory_region_alloc(device->machine, "vdp_cram", MAX_CRAM_SIZE, ROM_REQUIRED);
+	smsvdp->VRAM = device->machine->region_alloc("vdp_vram", VRAM_SIZE, ROM_REQUIRED);
+	smsvdp->CRAM = device->machine->region_alloc("vdp_cram", MAX_CRAM_SIZE, ROM_REQUIRED);
 	smsvdp->line_buffer = auto_alloc_array(device->machine, int, 256 * 5);
 
 	smsvdp->collision_buffer = auto_alloc_array(device->machine, UINT8, SMS_X_PIXELS);
@@ -1573,8 +1573,8 @@ static DEVICE_RESET( smsvdp )
 	set_display_settings(device);
 
 	/* Clear RAM */
-	memset(smsvdp->VRAM->base.u8, 0, VRAM_SIZE);
-	memset(smsvdp->CRAM->base.u8, 0, MAX_CRAM_SIZE);
+	memset(smsvdp->VRAM->base(), 0, VRAM_SIZE);
+	memset(smsvdp->CRAM->base(), 0, MAX_CRAM_SIZE);
 	memset(smsvdp->line_buffer, 0, 256 * 5 * sizeof(int));
 }
 

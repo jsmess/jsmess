@@ -209,9 +209,9 @@ static TIMER_CALLBACK(wswan_rtc_callback)
 	}
 }
 
-static void wswan_machine_stop( running_machine *machine )
+static void wswan_machine_stop( running_machine &machine )
 {
-	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart"));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(&machine, "cart"));
 	if ( eeprom.size )
 	{
 		image->battery_save(eeprom.data, eeprom.size );
@@ -231,7 +231,7 @@ MACHINE_START( wswan )
 {
 	ws_bios_bank = NULL;
 	system_type = WSWAN;
-	add_exit_callback( machine, wswan_machine_stop );
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, wswan_machine_stop );
 	wswan_vdp.timer = timer_alloc( machine, wswan_scanline_interrupt, &wswan_vdp );
 	timer_adjust_periodic( wswan_vdp.timer, ticks_to_attotime( 256, 3072000 ), 0, ticks_to_attotime( 256, 3072000 ) );
 
@@ -246,7 +246,7 @@ MACHINE_START( wscolor )
 {
 	ws_bios_bank = NULL;
 	system_type = WSC;
-	add_exit_callback( machine, wswan_machine_stop );
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, wswan_machine_stop );
 	wswan_vdp.timer = timer_alloc( machine, wswan_scanline_interrupt, &wswan_vdp );
 	timer_adjust_periodic( wswan_vdp.timer, ticks_to_attotime( 256, 3072000 ), 0, ticks_to_attotime( 256, 3072000 ) );
 

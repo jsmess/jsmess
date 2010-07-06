@@ -678,7 +678,7 @@ static void mode3E_switch(running_machine *machine, UINT16 offset, UINT8 data)
 }
 static void mode3E_RAM_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
-	ram_base = extra_RAM->base.u8 + 0x200 * ( data & 0x3F );
+	ram_base = extra_RAM->base() + 0x200 * ( data & 0x3F );
 	memory_set_bankptr(machine,"bank1", ram_base );
 	mode3E_ram_enabled = 1;
 }
@@ -792,43 +792,43 @@ static READ8_HANDLER(modeSS_r)
 		switch ( modeSS_byte & 0x1C )
 		{
 		case 0x00:
-			bank_base[1] = extra_RAM->base.u8 + 2 * 0x800;
+			bank_base[1] = extra_RAM->base() + 2 * 0x800;
 			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x04:
-			bank_base[1] = extra_RAM->base.u8;
+			bank_base[1] = extra_RAM->base();
 			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x08:
-			bank_base[1] = extra_RAM->base.u8 + 2 * 0x800;
-			bank_base[2] = extra_RAM->base.u8;
+			bank_base[1] = extra_RAM->base() + 2 * 0x800;
+			bank_base[2] = extra_RAM->base();
 			modeSS_high_ram_enabled = 1;
 			break;
 		case 0x0C:
-			bank_base[1] = extra_RAM->base.u8;
-			bank_base[2] = extra_RAM->base.u8 + 2 * 0x800;
+			bank_base[1] = extra_RAM->base();
+			bank_base[2] = extra_RAM->base() + 2 * 0x800;
 			modeSS_high_ram_enabled = 1;
 			break;
 		case 0x10:
-			bank_base[1] = extra_RAM->base.u8 + 2 * 0x800;
+			bank_base[1] = extra_RAM->base() + 2 * 0x800;
 			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x14:
-			bank_base[1] = extra_RAM->base.u8 + 0x800;
+			bank_base[1] = extra_RAM->base() + 0x800;
 			bank_base[2] = ( modeSS_byte & 0x01 ) ? memory_region(space->machine, "maincpu") + 0x1800 : memory_region(space->machine, "user1");
 			modeSS_high_ram_enabled = 0;
 			break;
 		case 0x18:
-			bank_base[1] = extra_RAM->base.u8 + 2 * 0x800;
-			bank_base[2] = extra_RAM->base.u8 + 0x800;
+			bank_base[1] = extra_RAM->base() + 2 * 0x800;
+			bank_base[2] = extra_RAM->base() + 0x800;
 			modeSS_high_ram_enabled = 1;
 			break;
 		case 0x1C:
-			bank_base[1] = extra_RAM->base.u8 + 0x800;
-			bank_base[2] = extra_RAM->base.u8 + 2 * 0x800;
+			bank_base[1] = extra_RAM->base() + 0x800;
+			bank_base[2] = extra_RAM->base() + 2 * 0x800;
 			modeSS_high_ram_enabled = 1;
 			break;
 		}
@@ -854,7 +854,7 @@ static READ8_HANDLER(modeSS_r)
 		/* Possible RAM write */
 		if ( modeSS_write_enabled )
 		{
-			int diff = cputag_get_total_cycles(space->machine, "maincpu") - modeSS_byte_started;
+			int diff = space->machine->device<cpu_device>("maincpu")->total_cycles() - modeSS_byte_started;
 			//logerror("%04X: offset = %04X, %d\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset, diff);
 			if ( diff - modeSS_diff_adjust == 5 )
 			{
@@ -876,7 +876,7 @@ static READ8_HANDLER(modeSS_r)
 			else if ( offset < 0x0100 )
 			{
 				modeSS_byte = offset;
-				modeSS_byte_started = cputag_get_total_cycles(space->machine, "maincpu");
+				modeSS_byte_started = space->machine->device<cpu_device>("maincpu")->total_cycles();
 			}
 			/* Check for dummy read from same address */
 			if ( diff == 2 )
@@ -891,7 +891,7 @@ static READ8_HANDLER(modeSS_r)
 		else if ( offset < 0x0100 )
 		{
 			modeSS_byte = offset;
-			modeSS_byte_started = cputag_get_total_cycles(space->machine, "maincpu");
+			modeSS_byte_started = space->machine->device<cpu_device>("maincpu")->total_cycles();
 		}
 	}
 	/* Because the mame core caches opcode data and doesn't perform reads like normal */
@@ -1555,7 +1555,7 @@ static MACHINE_START( a2600 )
 {
 	screen_device *screen = screen_first(*machine);
 	current_screen_height = screen->height();
-	extra_RAM = memory_region_alloc( machine, "user2", 0x8600, ROM_REQUIRED );
+	extra_RAM =	machine->region_alloc("user2", 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface );
 	memset( riot_ram, 0x00, 0x80 );
 	current_reset_bank_counter = 0xFF;
@@ -1565,7 +1565,7 @@ static MACHINE_START( a2600p )
 {
 	screen_device *screen = screen_first(*machine);
 	current_screen_height = screen->height();
-	extra_RAM = memory_region_alloc( machine, "user2", 0x8600, ROM_REQUIRED );
+	extra_RAM = machine->region_alloc("user2", 0x8600, ROM_REQUIRED );
 	tia_init( machine, &tia_interface_pal );
 	memset( riot_ram, 0x00, 0x80 );
 	current_reset_bank_counter = 0xFF;
@@ -1865,7 +1865,7 @@ static MACHINE_RESET( a2600 )
 
 	case modeSS:
 		memory_install_read8_handler(space, 0x1000, 0x1fff, 0, 0, modeSS_r);
-		bank_base[1] = extra_RAM->base.u8 + 2 * 0x800;
+		bank_base[1] = extra_RAM->base() + 2 * 0x800;
 		bank_base[2] = CART;
 		memory_set_bankptr(machine, "bank1", bank_base[1] );
 		memory_set_bankptr(machine, "bank2", bank_base[2] );

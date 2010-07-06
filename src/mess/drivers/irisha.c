@@ -154,7 +154,7 @@ GFXDECODE_END
 /* Machine driver */
 static MACHINE_DRIVER_START( irisha )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, XTAL_16MHz / 9)
+	MDRV_CPU_ADD("maincpu", I8080, XTAL_16MHz / 9)
 	MDRV_CPU_PROGRAM_MAP(irisha_mem)
 	MDRV_CPU_IO_MAP(irisha_io)
 

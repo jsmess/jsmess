@@ -155,8 +155,8 @@ public:
 	bool disabled() const { return m_disabled; }
 
 	// clock and cycle information getters
-	UINT32 clocks_to_cycles(UINT32 clocks) const { return execute_clocks_to_cycles(clocks); }
-	UINT32 cycles_to_clocks(UINT32 cycles) const { return execute_cycles_to_clocks(cycles); }
+	UINT64 clocks_to_cycles(UINT64 clocks) const { return execute_clocks_to_cycles(clocks); }
+	UINT64 cycles_to_clocks(UINT64 cycles) const { return execute_cycles_to_clocks(cycles); }
 	UINT32 min_cycles() const { return execute_min_cycles(); }
 	UINT32 max_cycles() const { return execute_max_cycles(); }
 
@@ -166,8 +166,8 @@ public:
 
 protected:
 	// clock and cycle information getters
-	virtual UINT32 execute_clocks_to_cycles(UINT32 clocks) const;
-	virtual UINT32 execute_cycles_to_clocks(UINT32 cycles) const;
+	virtual UINT64 execute_clocks_to_cycles(UINT64 clocks) const;
+	virtual UINT64 execute_cycles_to_clocks(UINT64 cycles) const;
 	virtual UINT32 execute_min_cycles() const;
 	virtual UINT32 execute_max_cycles() const;
 
@@ -207,7 +207,7 @@ public:
 	bool disabled() const { return m_execute_config.disabled(); }
 
 	// execution management
-	bool is_executing() const;
+	bool executing() const;
 	INT32 cycles_remaining() const;
 	void eat_cycles(int cycles);
 	void adjust_icount(int delta);
@@ -226,7 +226,7 @@ public:
 	// suspend/resume
 	void suspend(UINT32 reason, bool eatcycles);
 	void resume(UINT32 reason);
-	bool is_suspended(UINT32 reason = SUSPEND_ANY_REASON) { return (m_nextsuspend & reason) != 0; }
+	bool suspended(UINT32 reason = SUSPEND_ANY_REASON) { return (m_nextsuspend & reason) != 0; }
 	void yield() { suspend(SUSPEND_REASON_TIMESLICE, false); }
 	void spin() { suspend(SUSPEND_REASON_TIMESLICE, true); }
 	void spin_until_trigger(int trigid) { suspend_until_trigger(trigid, true); }
@@ -243,10 +243,12 @@ public:
 	UINT64 total_cycles() const;
 
 	// clock and cycle information getters ... pass through to underlying config
-	UINT32 clocks_to_cycles(UINT32 clocks) const { return m_execute_config.clocks_to_cycles(clocks); }
-	UINT32 cycles_to_clocks(UINT32 cycles) const { return m_execute_config.cycles_to_clocks(cycles); }
+	UINT64 clocks_to_cycles(UINT64 clocks) const { return m_execute_config.clocks_to_cycles(clocks); }
+	UINT64 cycles_to_clocks(UINT64 cycles) const { return m_execute_config.cycles_to_clocks(cycles); }
 	UINT32 min_cycles() const { return m_execute_config.min_cycles(); }
 	UINT32 max_cycles() const { return m_execute_config.max_cycles(); }
+	attotime cycles_to_attotime(UINT64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
+	UINT64 attotime_to_cycles(attotime duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
 
 	// input line information getters
 	UINT32 input_lines() const { return m_execute_config.input_lines(); }
@@ -392,18 +394,6 @@ inline void device_resume(device_t *device, int reason)
 	device_execute(device)->resume(reason);
 }
 
-// return TRUE if the given device is within its execute function
-inline bool device_is_executing(device_t *device)
-{
-	return device_execute(device)->is_executing();
-}
-
-// returns TRUE if the given device is suspended for any of the given reasons
-inline int device_is_suspended(device_t *device, int reason)
-{
-	return device_execute(device)->is_suspended(reason);
-}
-
 
 
 // ======================> synchronization helpers
@@ -440,12 +430,6 @@ inline void device_spin_until_time(device_t *device, attotime duration)
 inline attotime device_get_local_time(device_t *device)
 {
 	return device_execute(device)->local_time();
-}
-
-// returns the total number of executed cycles for a given device
-inline UINT64 device_get_total_cycles(device_t *device)
-{
-	return device_execute(device)->total_cycles();
 }
 
 // safely eats cycles so we don't cross a timeslice boundary

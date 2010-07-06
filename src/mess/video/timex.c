@@ -44,7 +44,7 @@ VIDEO_EOF( ts2068 )
 		pItem = EventList_GetFirstItem();
 		border_set_last_color ( pItem[NumItems-1].Event_Data );
 		EventList_Reset();
-		EventList_SetOffsetStartTime ( cpu_attotime_to_clocks(machine->firstcpu, attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
+		EventList_SetOffsetStartTime ( machine->firstcpu->attotime_to_cycles(attotime_mul(machine->primary_screen->scan_period(), machine->primary_screen->vpos())) );
 		logerror ("Event log reset in callback fn.\n");
 	}
 }

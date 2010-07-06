@@ -504,7 +504,7 @@ DRIVER_INIT( osborne1 )
 //-------------------------------------------------
 
 osborne1_daisy_device_config::osborne1_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Osborne 1 daisy", tag, owner, clock),
 	  device_config_z80daisy_interface(mconfig, *this)
 {
 }

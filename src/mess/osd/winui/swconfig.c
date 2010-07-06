@@ -21,7 +21,7 @@ software_config *software_config_alloc(int driver_index, core_options *opts, has
 	memset(config,0,sizeof(software_config));
 
 	// allocate the machine config
-	config->mconfig = machine_config_alloc(drivers[driver_index]->machine_config);
+	config->mconfig = global_alloc(machine_config(drivers[driver_index]->machine_config));
 
 	// allocate the hash file
 	driver = drivers[driver_index];
@@ -44,7 +44,7 @@ void software_config_free(software_config *config)
 {
 	if (config->mconfig != NULL)
 	{
-		machine_config_free(config->mconfig);
+		global_free(config->mconfig);
 		config->mconfig = NULL;
 	}
 	if (config->hashfile != NULL)

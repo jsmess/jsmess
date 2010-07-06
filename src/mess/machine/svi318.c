@@ -374,7 +374,7 @@ MC6845_UPDATE_ROW( svi806_crtc6845_update_row )
 	for( i = 0; i < x_count; i++ )
 	{
 		int j;
-		UINT8	data = svi.svi806_gfx[ svi.svi806_ram->base.u8[ ( ma + i ) & 0x7FF ] * 16 + ra ];
+		UINT8	data = svi.svi806_gfx[ svi.svi806_ram->u8(( ma + i ) & 0x7FF) * 16 + ra ];
 
 		if ( i == cursor_x )
 		{
@@ -395,9 +395,9 @@ static void svi318_80col_init(running_machine *machine)
 {
 	/* 2K RAM, but allocating 4KB to make banking easier */
 	/* The upper 2KB will be set to FFs and will never be written to */
-	svi.svi806_ram = memory_region_alloc( machine, "gfx2", 0x1000, 0 );
-	memset( svi.svi806_ram->base.u8, 0x00, 0x800 );
-	memset( svi.svi806_ram->base.u8 + 0x800, 0xFF, 0x800 );
+	svi.svi806_ram = machine->region_alloc("gfx2", 0x1000, 0 );
+	memset( svi.svi806_ram->base(), 0x00, 0x800 );
+	memset( svi.svi806_ram->base() + 0x800, 0xFF, 0x800 );
 	svi.svi806_gfx = memory_region(machine, "gfx1");
 }
 
@@ -691,7 +691,7 @@ WRITE8_HANDLER( svi318_writemem4 )
 	{
 		if ( offset < 0x800 )
 		{
-			svi.svi806_ram->base.u8[ offset ] = data;
+			svi.svi806_ram->u8(offset) = data;
 		}
 	}
 	else

@@ -348,7 +348,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( vt100 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",8080, XTAL_24_8832MHz / 9)
+	MDRV_CPU_ADD("maincpu",I8080, XTAL_24_8832MHz / 9)
 	MDRV_CPU_PROGRAM_MAP(vt100_mem)
 	MDRV_CPU_IO_MAP(vt100_io)
 	MDRV_CPU_VBLANK_INT("screen", vt100_vertical_interrupt)
@@ -629,7 +629,7 @@ ROM_END
 
 ROM_START( vt101 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
 // does not have integrated STP or AVO populated
-// 8085 based instead of 8080
+// 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-???e4-00.e69", 0x0000, 0x2000, NO_DUMP)
 	ROM_LOAD( "23-???e4-00.e71", 0x2000, 0x2000, NO_DUMP)
@@ -642,7 +642,7 @@ ROM_END
 ROM_START( vt102 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt102/vt131 mainboard
 // has integrated STP and AVO both populated
 // ROMS have the set up page C in them
-// 8085 based instead of 8080
+// 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-225e4-00.e69", 0x0000, 0x2000, BAD_DUMP CRC(7ddf75cb) SHA1(a3530bb562b5c6ea8ba23f0988b35ef404abcb93)) // is this right for vt102? A11 stuck high
 	ROM_LOAD( "23-226e4-00.e71", 0x2000, 0x2000, BAD_DUMP CRC(339d4e4e) SHA1(f1b08f2c6bbc2b234f3f43bd800a2615f6dd18d3)) // is this right for vt102? A11 stuck high
@@ -655,7 +655,7 @@ ROM_END
 ROM_START( vt131 ) // p/n 5414185-01 'unupgradable/low cost' vt101/vt131 mainboard with vt132-style block serial mode
 // has integrated STP and AVO both populated
 // ROMS have the set up page C in them
-// 8085 based instead of 8080
+// 8085 based instead of I8080
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "23-225e4-00.e69", 0x0000, 0x2000, BAD_DUMP CRC(7ddf75cb) SHA1(a3530bb562b5c6ea8ba23f0988b35ef404abcb93)) // A11 stuck high
 	ROM_LOAD( "23-226e4-00.e71", 0x2000, 0x2000, BAD_DUMP CRC(339d4e4e) SHA1(f1b08f2c6bbc2b234f3f43bd800a2615f6dd18d3)) // A11 stuck high

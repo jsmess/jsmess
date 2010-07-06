@@ -62,7 +62,7 @@ static GENERIC_TERMINAL_INTERFACE( pimps_terminal_intf )
 
 static MACHINE_DRIVER_START( pimps )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8085A, XTAL_2MHz)
+    MDRV_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(pimps_mem)
     MDRV_CPU_IO_MAP(pimps_io)
 

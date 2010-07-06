@@ -196,12 +196,12 @@ static void ds1315_fill_raw_data(running_device *device)
        date and time and then fill in the raw data struct.
     */
 
-	mame_system_time systime;
+	system_time systime;
 	ds1315_t *ds1315 = get_token(device);
 	int raw[8], i, j;
 
 	/* get the current date/time from the core */
-	mame_get_current_datetime(device->machine, &systime);
+	device->machine->current_datetime(systime);
 
 	raw[0] = 0;	/* tenths and hundreths of seconds are always zero */
 	raw[1] = dec_2_bcd(systime.local_time.second);

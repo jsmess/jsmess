@@ -100,7 +100,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 /* The 3DO has an ARM6 core which is a bit different from the current
    ARM cpu cores. This define 'hack' can be removed once the ARM6 core
    is fully supported. */
-#define CPU_ARM6	CPU_ARM7
+#define ARM6	ARM7
 
 
 #define X2_CLOCK_PAL	59000000

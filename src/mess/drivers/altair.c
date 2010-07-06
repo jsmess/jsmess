@@ -99,7 +99,7 @@ static GENERIC_TERMINAL_INTERFACE( altair_terminal_intf )
 
 static MACHINE_DRIVER_START( altair )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", 8080, XTAL_2MHz)
+    MDRV_CPU_ADD("maincpu", I8080, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(altair_mem)
     MDRV_CPU_IO_MAP(altair_io)
 

@@ -40,7 +40,7 @@ static VIDEO_UPDATE( ipc )
 
 static MACHINE_DRIVER_START( ipc )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8085A, XTAL_19_6608MHz / 4)
+    MDRV_CPU_ADD("maincpu",I8085A, XTAL_19_6608MHz / 4)
     MDRV_CPU_PROGRAM_MAP(ipc_mem)
     MDRV_CPU_IO_MAP(ipc_io)
 

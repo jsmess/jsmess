@@ -48,7 +48,7 @@ struct _tape_control_menu_state
 void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
 {
 	/* add tape control menu */
-	if (machine->devicelist.first(CASSETTE))
+	if (machine->m_devicelist.first(CASSETTE))
 		ui_menu_item_append(menu, "Tape Control", NULL, 0, (void*)ui_mess_menu_tape_control);
 }
 
@@ -61,7 +61,7 @@ void ui_mess_main_menu_populate(running_machine *machine, ui_menu *menu)
 INLINE int cassette_count( running_machine *machine )
 {
 	int count = 0;
-	running_device *device = machine->devicelist.first(CASSETTE );
+	running_device *device = machine->m_devicelist.first(CASSETTE );
 
 	while ( device )
 	{
@@ -135,7 +135,7 @@ static void menu_tape_control_populate(running_machine *machine, ui_menu *menu, 
 		}
 
 		/* name of tape */
-		ui_menu_item_append(menu, menustate->device->image_config().name(), menustate->device->filename(), flags, TAPECMD_SELECT);
+		ui_menu_item_append(menu, menustate->device->image_config().devconfig().name(), menustate->device->filename(), flags, TAPECMD_SELECT);
 
 		/* state */
 		tapecontrol_gettime(&timepos, &menustate->device->device(), NULL, NULL);
@@ -194,7 +194,7 @@ void ui_mess_menu_tape_control(running_machine *machine, ui_menu *menu, void *pa
 	{
 		int index = menustate->index;
 		device_image_interface *device = NULL;
-		for (bool gotone = machine->devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = machine->m_devicelist.first(device); gotone; gotone = device->next(device))
 		{
 			if(device->device().type() == CASSETTE) {
 				if (index==0) break;

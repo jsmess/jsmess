@@ -14,13 +14,8 @@ public:
 	size_t       videoram_size;
 
 	/* misc */
-	int invertcoin;
 	int sound_pending;
 	int sound_nmi_enable, pending_nmi, sound_cmd, sound_result;
-
-	/* daikaiju */
-	int daikaiju_xor, daikaiju_command, daikaiju_length, daikaiju_prev, daikaiju_cnt, daikaiju_cntr;
-	int daikaiju_buffer[256];
 
 	/* mcu */
 	UINT8 from_main, from_mcu;
@@ -33,13 +28,6 @@ public:
 	running_device *audiocpu;
 	running_device *mcu;
 };
-
-
-/*----------- defined in machine/daikaiju.c -----------*/
-
-READ8_HANDLER( daikaiju_mcu_r);
-WRITE8_HANDLER( daikaiju_mcu_w);
-READ8_HANDLER( daikaiju_mcu_status_r);
 
 /*----------- defined in machine/lsasquad.c -----------*/
 
@@ -63,6 +51,7 @@ READ8_HANDLER( lsasquad_mcu_status_r );
 
 READ8_HANDLER( daikaiju_sound_status_r );
 READ8_HANDLER( daikaiju_sh_sound_command_r );
+READ8_HANDLER( daikaiju_mcu_status_r );
 
 
 /*----------- defined in video/lsasquad.c -----------*/

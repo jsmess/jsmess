@@ -24,7 +24,7 @@
 ***************************************************************************/
 
 static void init_nes_core(running_machine *machine);
-static void nes_machine_stop(running_machine *machine);
+static void nes_machine_stop(running_machine &machine);
 static READ8_HANDLER(nes_fds_r);
 static WRITE8_HANDLER(nes_fds_w);
 static void fds_irq(running_device *device, int scanline, int vblank, int blanked);
@@ -279,7 +279,7 @@ MACHINE_START( nes )
 	nes_state *state = (nes_state *)machine->driver_data;
 
 	init_nes_core(machine);
-	add_exit_callback(machine, nes_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, nes_machine_stop);
 
 	state->maincpu = devtag_get_device(machine, "maincpu");
 	state->ppu = devtag_get_device(machine, "ppu");
@@ -290,9 +290,9 @@ MACHINE_START( nes )
 	nes_state_register(machine);
 }
 
-static void nes_machine_stop( running_machine *machine )
+static void nes_machine_stop( running_machine &machine )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
+	nes_state *state = (nes_state *)machine.driver_data;
 	device_image_interface *image = dynamic_cast<device_image_interface *>(state->cart);
 	/* Write out the battery file if necessary */
 	if (state->battery)
@@ -757,14 +757,14 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 
 			/* Free the regions that were allocated by the ROM loader */
-			memory_region_free(image.device().machine, "maincpu");
-			memory_region_free(image.device().machine, "gfx1");
+			image.device().machine->region_free("maincpu");
+			image.device().machine->region_free("gfx1");
 
 			/* Allocate them again with the proper size */
 			prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
-			memory_region_alloc(image.device().machine, "maincpu", 0x10000 + prg_size, 0);
+			image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 0);
 			if (state->chr_chunks)
-				memory_region_alloc(image.device().machine, "gfx1", state->chr_chunks * 0x2000, 0);
+				image.device().machine->region_alloc("gfx1", state->chr_chunks * 0x2000, 0);
 
 			state->rom = memory_region(image.device().machine, "maincpu");
 			state->vrom = memory_region(image.device().machine, "gfx1");
@@ -1223,14 +1223,14 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			}
 
 			/* Free the regions that were allocated by the ROM loader */
-			memory_region_free(image.device().machine, "maincpu");
-			memory_region_free(image.device().machine, "gfx1");
-			memory_region_free(image.device().machine, "gfx2");
+			image.device().machine->region_free("maincpu");
+			image.device().machine->region_free("gfx1");
+			image.device().machine->region_free("gfx2");
 
 			/* Allocate them again, and copy PRG/CHR from temp buffers */
 			/* Take care of PRG */
 			prg_size = (state->prg_chunks == 1) ? 2 * 0x4000 : state->prg_chunks * 0x4000;
-			memory_region_alloc(image.device().machine, "maincpu", 0x10000 + prg_size, 0);
+			image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 0);
 			state->rom = memory_region(image.device().machine, "maincpu");
 			memcpy(&state->rom[0x10000], &temp_prg[0x00000], state->prg_chunks * 0x4000);
 			/* If only a single 16K PRG chunk is present, mirror it! */
@@ -1240,7 +1240,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			/* Take care of CHR ROM */
 			if (state->chr_chunks)
 			{
-				memory_region_alloc(image.device().machine, "gfx1", state->chr_chunks * 0x2000, 0);
+				image.device().machine->region_alloc("gfx1", state->chr_chunks * 0x2000, 0);
 				state->vrom = memory_region(image.device().machine, "gfx1");
 				memcpy(&state->vrom[0x00000], &temp_chr[0x00000], state->chr_chunks * 0x2000);
 			}
@@ -1248,7 +1248,7 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			/* Take care of CHR RAM */
 			if (state->vram_chunks)
 			{
-				memory_region_alloc(image.device().machine, "gfx2", state->vram_chunks * 0x2000, 0);
+				image.device().machine->region_alloc("gfx2", state->vram_chunks * 0x2000, 0);
 				state->vram = memory_region(image.device().machine, "gfx2");
 			}
 
@@ -1308,12 +1308,12 @@ DEVICE_IMAGE_LOAD( nes_cart )
 		vram_size += image.get_software_region_length("vram2");
 
 		/* Free the regions that were allocated by the ROM loader */
-		memory_region_free(image.device().machine, "maincpu");
-		memory_region_free(image.device().machine, "gfx1");
-		memory_region_free(image.device().machine, "gfx2");
+		image.device().machine->region_free("maincpu");
+		image.device().machine->region_free("gfx1");
+		image.device().machine->region_free("gfx2");
 
 		/* Allocate them again with the proper size */
-		memory_region_alloc(image.device().machine, "maincpu", 0x10000 + prg_size, 0);
+		image.device().machine->region_alloc("maincpu", 0x10000 + prg_size, 0);
 
 		// validate the xml fields
 		if (!prg_size)
@@ -1322,10 +1322,10 @@ DEVICE_IMAGE_LOAD( nes_cart )
 			fatalerror("PRG entry is too small! Please check if the xml list got corrupted");
 
 		if (chr_size)
-			memory_region_alloc(image.device().machine, "gfx1", chr_size, 0);
+			image.device().machine->region_alloc("gfx1", chr_size, 0);
 
 		if (vram_size)
-			memory_region_alloc(image.device().machine, "gfx2", vram_size, 0);
+			image.device().machine->region_alloc("gfx2", vram_size, 0);
 
 		state->rom = memory_region(image.device().machine, "maincpu");
 		state->vrom = memory_region(image.device().machine, "gfx1");

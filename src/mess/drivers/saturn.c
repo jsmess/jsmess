@@ -547,12 +547,12 @@ static UINT8 stv_SMPC_r8(const address_space *space, int offset)
 
 static void stv_SMPC_w8(const address_space *space, int offset, UINT8 data)
 {
-	mame_system_time systime;
+	system_time systime;
 	UINT8 last;
 	running_machine *machine = space->machine;
 
 	/* get the current date/time from the core */
-	mame_get_current_datetime(machine, &systime);
+	machine->current_datetime(systime);
 
   if (LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x (reg %d) with Data %02x (prev %02x)\n", offset, offset>>1, data, smpc_ram[offset]);
 
@@ -2167,7 +2167,7 @@ static INTERRUPT_GEN( stv_interrupt )
 
 static void saturn_init_driver(running_machine *machine, int rgn)
 {
-	mame_system_time systime;
+	system_time systime;
 
 	saturn_region = rgn;
 
@@ -2176,7 +2176,7 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	sh2drc_set_options(devtag_get_device(machine, "slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* get the current date/time from the core */
-	mame_get_current_datetime(machine, &systime);
+	machine->current_datetime(systime);
 
 	/* amount of time to boost interleave for on MINIT / SINIT, needed for communication to work */
 	minit_boost = 400;
@@ -2247,7 +2247,7 @@ static MACHINE_START( saturn )
 	state_save_register_global(machine, smpcSR);
 	state_save_register_global_array(machine, SMEM);
 
-	add_exit_callback(machine, stvcd_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, stvcd_exit);
 }
 
 static MACHINE_RESET( saturn )

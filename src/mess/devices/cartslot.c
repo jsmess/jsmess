@@ -383,37 +383,9 @@ static const cartslot_pcb_type *identify_pcb(device_image_interface &image)
 	return pcb_type;
 }
 
-static machine_config *device_cfg = NULL;
-
-static void memory_exit(running_machine *machine)
-{
-	machine_config_free(device_cfg);
-}
-
 /*-------------------------------------------------
     DEVICE_IMAGE_GET_DEVICES(cartslot)
 -------------------------------------------------*/
-static void add_device_with_subdevices(device_t *_owner, device_type _type, const char *_tag, UINT32 _clock)
-{
-	astring tempstring;
-	device_list *devlist = &_owner->machine->devicelist;	
-	const machine_config *config = _owner->machine->config;
-	
-	device_config *devconfig = _type(*config, _owner->subtag(tempstring,_tag), &_owner->baseconfig(), _clock);
-	
-	running_device *dev = devlist->append(_owner->subtag(tempstring,_tag), devconfig->alloc_device(*_owner->machine));
-	const machine_config_token *tokens = dev->machine_config_tokens();
-	if (tokens != NULL) 
-    {		
-        device_cfg = machine_config_alloc_owner(tokens,&dev->baseconfig());
-        for (const device_config *config_dev = device_cfg->devicelist.first(); config_dev != NULL; config_dev = config_dev->next())
-        {
-			devlist->append(config_dev->tag(), config_dev->alloc_device(*_owner->machine));
-        }
-		add_exit_callback(_owner->machine, memory_exit);        
-    }
-}
-
 static DEVICE_IMAGE_GET_DEVICES(cartslot)
 {
 	const cartslot_pcb_type *pcb_type;
@@ -422,7 +394,7 @@ static DEVICE_IMAGE_GET_DEVICES(cartslot)
 	pcb_type = identify_pcb(image);
 	if (pcb_type != NULL)
 	{
-		add_device_with_subdevices(device,pcb_type->devtype,TAG_PCB,0);
+		image_add_device_with_subdevices(device,pcb_type->devtype,TAG_PCB,0);
 	}
 }
 

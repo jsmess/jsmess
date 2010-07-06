@@ -4,10 +4,38 @@
 
     Debugger CPU/memory interface engine.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
 
-*********************************************************************/
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+***************************************************************************/
 
 #pragma once
 
@@ -17,151 +45,311 @@
 #include "express.h"
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
-#define TRACE_LOOPS					64
-#define DEBUG_HISTORY_SIZE			256
-
-#define WATCHPOINT_READ				1
-#define WATCHPOINT_WRITE			2
-#define WATCHPOINT_READWRITE		(WATCHPOINT_READ | WATCHPOINT_WRITE)
-
-#define DEBUG_FLAG_OBSERVING		0x00000001		/* observing this CPU */
-#define DEBUG_FLAG_HISTORY			0x00000002		/* tracking this CPU's history */
-#define DEBUG_FLAG_TRACING			0x00000004		/* tracing this CPU */
-#define DEBUG_FLAG_TRACING_OVER		0x00000008		/* tracing this CPU with step over behavior */
-#define DEBUG_FLAG_HOOKED			0x00000010		/* per-instruction callback hook */
-#define DEBUG_FLAG_STEPPING			0x00000020		/* CPU is single stepping */
-#define DEBUG_FLAG_STEPPING_OVER	0x00000040		/* CPU is stepping over a function */
-#define DEBUG_FLAG_STEPPING_OUT		0x00000080		/* CPU is stepping out of a function */
-#define DEBUG_FLAG_STOP_PC			0x00000100		/* there is a pending stop at cpu->breakpc */
-#define DEBUG_FLAG_STOP_CONTEXT		0x00000200		/* there is a pending stop on next context switch */
-#define DEBUG_FLAG_STOP_INTERRUPT	0x00000400		/* there is a pending stop on the next interrupt */
-#define DEBUG_FLAG_STOP_EXCEPTION	0x00000800		/* there is a pending stop on the next exception */
-#define DEBUG_FLAG_STOP_VBLANK		0x00001000		/* there is a pending stop on the next VBLANK */
-#define DEBUG_FLAG_STOP_TIME		0x00002000		/* there is a pending stop at cpu->stoptime */
-#define DEBUG_FLAG_LIVE_BP			0x00010000		/* there are live breakpoints for this CPU */
-
-#define DEBUG_FLAG_STEPPING_ANY		(DEBUG_FLAG_STEPPING | \
-									 DEBUG_FLAG_STEPPING_OVER | \
-									 DEBUG_FLAG_STEPPING_OUT)
-
-#define DEBUG_FLAG_TRACING_ANY		(DEBUG_FLAG_TRACING | \
-									 DEBUG_FLAG_TRACING_OVER)
-
-#define DEBUG_FLAG_TRANSIENT		(DEBUG_FLAG_STEPPING_ANY | \
-									 DEBUG_FLAG_STOP_PC | \
-									 DEBUG_FLAG_STOP_CONTEXT | \
-									 DEBUG_FLAG_STOP_INTERRUPT | \
-									 DEBUG_FLAG_STOP_EXCEPTION | \
-									 DEBUG_FLAG_STOP_VBLANK | \
-									 DEBUG_FLAG_STOP_TIME)
+const UINT8 WATCHPOINT_READ				= 1;
+const UINT8 WATCHPOINT_WRITE			= 2;
+const UINT8 WATCHPOINT_READWRITE		= WATCHPOINT_READ | WATCHPOINT_WRITE;
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-typedef int (*debug_instruction_hook_func)(device_t *device, offs_t curpc);
-
-
-typedef struct _debug_cpu_breakpoint debug_cpu_breakpoint;
-typedef struct _debug_cpu_watchpoint debug_cpu_watchpoint;
-typedef struct _debug_cpu_comment_group debug_cpu_comment_group;
+typedef int (*debug_instruction_hook_func)(device_t &device, offs_t curpc);
 
 
-typedef struct _debug_trace_info debug_trace_info;
-struct _debug_trace_info
+class debug_cpu_comment_group;
+
+
+class device_debug
 {
-	FILE *			file;						/* tracing file for this CPU */
-	char *			action;						/* action to perform during a trace */
-	offs_t			history[TRACE_LOOPS];		/* history of recent PCs */
-	int				loops;						/* number of instructions in a loop */
-	int				nextdex;					/* next index */
-	offs_t			trace_over_target;			/* target for tracing over
-                                                    (0 = not tracing over,
-                                                    ~0 = not currently tracing over) */
-};
+	typedef offs_t (*dasm_override_func)(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
-
-typedef struct _debug_hotspot_entry debug_hotspot_entry;
-struct _debug_hotspot_entry
-{
-	offs_t			access;						/* access address */
-	offs_t			pc;							/* PC of the access */
-	const address_space *space;					/* space where the access occurred */
-	UINT32			count;						/* number of hits */
-};
-
-
-/* In cpuintrf.h: typedef struct _cpu_debug_data cpu_debug_data; */
-class cpu_debug_data
-{
 public:
-	cpu_device *	cpudevice;					/* CPU device object */
-	symbol_table *			symtable;					/* symbol table for expression evaluation */
-	UINT32					flags;						/* debugging flags for this CPU */
-	UINT8					opwidth;					/* width of an opcode */
-	offs_t					stepaddr;					/* step target address for DEBUG_FLAG_STEPPING_OVER */
-	int						stepsleft;					/* number of steps left until done */
-	offs_t					stopaddr;					/* stop address for DEBUG_FLAG_STOP_PC */
-	attotime				stoptime;					/* stop time for DEBUG_FLAG_STOP_TIME */
-	int						stopirq;					/* stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT */
-	int						stopexception;				/* stop exception number for DEBUG_FLAG_STOP_EXCEPTION */
-	attotime				endexectime;				/* ending time of the current execution */
-	debug_trace_info		trace;						/* trace info */
-	debug_cpu_breakpoint *	bplist;						/* list of breakpoints */
-	debug_hotspot_entry *	hotspots;					/* hotspot list */
-	offs_t					pc_history[DEBUG_HISTORY_SIZE]; /* history of recent PCs */
-	UINT32					pc_history_index;			/* current history index */
-	int						hotspot_count;				/* number of hotspots */
-	int						hotspot_threshhold;			/* threshhold for the number of hits to print */
-	cpu_disassemble_func	dasm_override;				/* pointer to provided override function */
-	debug_instruction_hook_func instrhook;				/* per-instruction callback hook */
-	debug_cpu_watchpoint *	wplist[ADDRESS_SPACES];		/* watchpoint lists for each address space */
-	debug_cpu_comment_group *comments;					/* disassembly comments */
+	// breakpoint class
+	class breakpoint
+	{
+		friend class device_debug;
+
+	public:
+		// construction/destruction
+		breakpoint(int index, offs_t address, parsed_expression *condition = NULL, const char *action = NULL);
+		~breakpoint();
+
+		// getters
+		breakpoint *next() const { return m_next; }
+		int index() const { return m_index; }
+		bool enabled() const { return m_enabled; }
+		offs_t address() const { return m_address; }
+		const char *condition() const { return (m_condition != NULL) ? expression_original_string(m_condition) : NULL; }
+		const char *action() const { return m_action; }
+
+	private:
+		// internals
+		bool hit(offs_t pc);
+
+		breakpoint *		m_next;						// next in the list
+		int					m_index;					// user reported index
+		UINT8				m_enabled;					// enabled?
+		offs_t				m_address;					// execution address
+		parsed_expression *	m_condition;				// condition
+		astring				m_action;					// action
+	};
+
+	// watchpoint class
+	class watchpoint
+	{
+		friend class device_debug;
+
+	public:
+		// construction/destruction
+		watchpoint(int index, const address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition = NULL, const char *action = NULL);
+		~watchpoint();
+
+		// getters
+		watchpoint *next() const { return m_next; }
+		const address_space &space() const { return m_space; }
+		int index() const { return m_index; }
+		int type() const { return m_type; }
+		bool enabled() const { return m_enabled; }
+		offs_t address() const { return m_address; }
+		offs_t length() const { return m_length; }
+		const char *condition() const { return (m_condition != NULL) ? expression_original_string(m_condition) : NULL; }
+		const char *action() const { return m_action; }
+
+	private:
+		// internals
+		bool hit(int type, offs_t address, int size);
+
+		watchpoint *		m_next;						// next in the list
+		const address_space &m_space;					// address space
+		int					m_index;					// user reported index
+		bool				m_enabled;					// enabled?
+		UINT8				m_type;						// type (read/write)
+		offs_t				m_address;					// start address
+		offs_t				m_length;					// length of watch area
+		parsed_expression *	m_condition;				// condition
+		astring				m_action;					// action
+	};
+
+public:
+	// construction/destruction
+	device_debug(device_t &device, symbol_table *globalsyms);
+	~device_debug();
+
+	// getters
+	symbol_table *symtable() const { return m_symtable; }
+
+	// commonly-used pass-throughs
+	offs_t pc() const { return (m_state != NULL) ? m_state->pc() : 0; }
+	int logaddrchars(int spacenum = AS_PROGRAM) const { return (m_memory != NULL && m_memory->space(spacenum) != NULL) ? m_memory->space(spacenum)->logaddrchars : 8; }
+	int min_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
+	int max_opcode_bytes() const { return (m_disasm != NULL) ? m_disasm->max_opcode_bytes() : 1; }
+
+	// hooks used by the rest of the system
+	void start_hook(attotime endtime);
+	void stop_hook();
+	void interrupt_hook(int irqline);
+	void exception_hook(int exception);
+	void instruction_hook(offs_t curpc);
+	void memory_read_hook(const address_space &space, offs_t address, UINT64 mem_mask);
+	void memory_write_hook(const address_space &space, offs_t address, UINT64 data, UINT64 mem_mask);
+
+	// hooks into our operations
+	void set_instruction_hook(debug_instruction_hook_func hook);
+	void set_dasm_override(dasm_override_func dasm_override) { m_dasm_override = dasm_override; }
+
+	// disassembly
+	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+
+	// debugger focus
+	void ignore(bool ignore = true);
+	bool observing() const { return ((m_flags & DEBUG_FLAG_OBSERVING) != 0); }
+
+	// single stepping
+	void single_step(int numsteps = 1);
+	void single_step_over(int numsteps = 1);
+	void single_step_out();
+
+	// execution
+	void go(offs_t targetpc = ~0);
+	void go_vblank();
+	void go_interrupt(int irqline = -1);
+	void go_exception(int exception);
+	void go_milliseconds(UINT64 milliseconds);
+	void go_next_device();
+	void halt_on_next_instruction(const char *fmt, ...);
+
+	// breakpoints
+	breakpoint *breakpoint_first() const { return m_bplist; }
+	int breakpoint_set(offs_t address, parsed_expression *condition = NULL, const char *action = NULL);
+	bool breakpoint_clear(int index);
+	void breakpoint_clear_all();
+	bool breakpoint_enable(int index, bool enable = true);
+	void breakpoint_enable_all(bool enable = true);
+
+	// watchpoints
+	watchpoint *watchpoint_first(int spacenum) const { return m_wplist[spacenum]; }
+	int watchpoint_set(const address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action);
+	bool watchpoint_clear(int wpnum);
+	void watchpoint_clear_all();
+	bool watchpoint_enable(int index, bool enable = true);
+	void watchpoint_enable_all(bool enable = true);
+
+	// hotspots
+	bool hotspot_tracking_enabled() const { return (m_hotspots != NULL); }
+	void hotspot_track(int numspots, int threshhold);
+
+	// history
+	offs_t history_pc(int index) const;
+
+	// tracing
+	void trace(FILE *file, bool trace_over, const char *action);
+	void trace_printf(const char *fmt, ...);
+	void trace_flush() { if (m_trace != NULL) m_trace->flush(); }
+
+	void reset_transient_flag() { m_flags &= ~DEBUG_FLAG_TRANSIENT; }
+
+	static const int HISTORY_SIZE = 256;
+
+private:
+	// internal helpers
+	void compute_debug_flags();
+	void prepare_for_step_overout(offs_t pc);
+	UINT32 dasm_wrapped(astring &buffer, offs_t pc);
+
+	// breakpoint and watchpoint helpers
+	void breakpoint_update_flags();
+	void breakpoint_check(offs_t pc);
+	void watchpoint_update_flags(const address_space &space);
+	void watchpoint_check(const address_space &space, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask);
+	void hotspot_check(const address_space &space, offs_t address);
+
+	// symbol get/set callbacks
+	static UINT64 get_current_pc(void *globalref, void *ref);
+	static UINT64 get_cycles(void *globalref, void *ref);
+	static UINT64 get_logunmap(void *globalref, void *ref);
+	static void set_logunmap(void *globalref, void *ref, UINT64 value);
+	static UINT64 get_cpu_reg(void *globalref, void *ref);
+	static void set_state(void *globalref, void *ref, UINT64 value);
+
+	// basic device information
+	device_t &				m_device;					// device we are attached to
+	device_execute_interface *m_exec;					// execute interface, if present
+	device_memory_interface *m_memory;					// memory interface, if present
+	device_state_interface *m_state;					// state interface, if present
+	device_disasm_interface *m_disasm;					// disasm interface, if present
+
+	// global state
+	UINT32					m_flags;					// debugging flags for this CPU
+	symbol_table *			m_symtable;					// symbol table for expression evaluation
+	debug_instruction_hook_func m_instrhook;			// per-instruction callback hook
+
+	// disassembly
+	dasm_override_func		m_dasm_override;			// pointer to provided override function
+	UINT8					m_opwidth;					// width of an opcode
+
+	// stepping information
+	offs_t					m_stepaddr;					// step target address for DEBUG_FLAG_STEPPING_OVER
+	int						m_stepsleft;				// number of steps left until done
+
+	// execution information
+	offs_t					m_stopaddr;					// stop address for DEBUG_FLAG_STOP_PC
+	attotime				m_stoptime;					// stop time for DEBUG_FLAG_STOP_TIME
+	int						m_stopirq;					// stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
+	int						m_stopexception;			// stop exception number for DEBUG_FLAG_STOP_EXCEPTION
+	attotime				m_endexectime;				// ending time of the current execution
+
+	// history
+	offs_t					m_pc_history[HISTORY_SIZE]; // history of recent PCs
+	UINT32					m_pc_history_index;			// current history index
+
+	// breakpoints and watchpoints
+	breakpoint *			m_bplist;					// list of breakpoints
+	watchpoint *			m_wplist[ADDRESS_SPACES];	// watchpoint lists for each address space
+
+	// tracing
+	class tracer
+	{
+	public:
+		tracer(device_debug &debug, FILE &file, bool trace_over, const char *action);
+		~tracer();
+
+		void update(offs_t pc);
+		void vprintf(const char *format, va_list va);
+		void flush();
+
+	private:
+		static const int TRACE_LOOPS = 64;
+
+		device_debug &		m_debug;					// reference to our owner
+		FILE &				m_file;						// tracing file for this CPU
+		astring				m_action;					// action to perform during a trace
+		offs_t				m_history[TRACE_LOOPS];		// history of recent PCs
+		int					m_loops;					// number of instructions in a loop
+		int					m_nextdex;					// next index
+		bool				m_trace_over;				// true if we're tracing over
+		offs_t				m_trace_over_target;		// target for tracing over
+	                                                	//    (0 = not tracing over,
+	                                                	//    ~0 = not currently tracing over)
+	};
+	tracer *				m_trace;					// tracer state
+
+	// hotspots
+	struct hotspot_entry
+	{
+		offs_t				m_access;					// access address
+		offs_t				m_pc;						// PC of the access
+		const address_space *m_space;					// space where the access occurred
+		UINT32				m_count;					// number of hits
+	};
+	hotspot_entry *			m_hotspots;					// hotspot list
+	int						m_hotspot_count;			// number of hotspots
+	int						m_hotspot_threshhold;		// threshhold for the number of hits to print
+
+	// internal flag values
+	static const UINT32 DEBUG_FLAG_OBSERVING		= 0x00000001;		// observing this CPU
+	static const UINT32 DEBUG_FLAG_HISTORY			= 0x00000002;		// tracking this CPU's history
+	static const UINT32 DEBUG_FLAG_TRACING			= 0x00000004;		// tracing this CPU
+	static const UINT32 DEBUG_FLAG_TRACING_OVER		= 0x00000008;		// tracing this CPU with step over behavior
+	static const UINT32 DEBUG_FLAG_HOOKED			= 0x00000010;		// per-instruction callback hook
+	static const UINT32 DEBUG_FLAG_STEPPING			= 0x00000020;		// CPU is single stepping
+	static const UINT32 DEBUG_FLAG_STEPPING_OVER	= 0x00000040;		// CPU is stepping over a function
+	static const UINT32 DEBUG_FLAG_STEPPING_OUT		= 0x00000080;		// CPU is stepping out of a function
+	static const UINT32 DEBUG_FLAG_STOP_PC			= 0x00000100;		// there is a pending stop at cpu->breakpc
+	static const UINT32 DEBUG_FLAG_STOP_CONTEXT		= 0x00000200;		// there is a pending stop on next context switch
+	static const UINT32 DEBUG_FLAG_STOP_INTERRUPT	= 0x00000400;		// there is a pending stop on the next interrupt
+	static const UINT32 DEBUG_FLAG_STOP_EXCEPTION	= 0x00000800;		// there is a pending stop on the next exception
+	static const UINT32 DEBUG_FLAG_STOP_VBLANK		= 0x00001000;		// there is a pending stop on the next VBLANK
+	static const UINT32 DEBUG_FLAG_STOP_TIME		= 0x00002000;		// there is a pending stop at cpu->stoptime
+	static const UINT32 DEBUG_FLAG_LIVE_BP			= 0x00010000;		// there are live breakpoints for this CPU
+
+	static const UINT32 DEBUG_FLAG_STEPPING_ANY		= DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
+	static const UINT32 DEBUG_FLAG_TRACING_ANY		= DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
+	static const UINT32 DEBUG_FLAG_TRANSIENT		= DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_STOP_CONTEXT |
+			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK | DEBUG_FLAG_STOP_TIME;
+
+public: // until comments get folded in
+	debug_cpu_comment_group *m_comments;				// disassembly comments
 };
 
 
-struct _debug_cpu_breakpoint
-{
-	debug_cpu_breakpoint *next;					/* next in the list */
-	int				index;						/* user reported index */
-	UINT8			enabled;					/* enabled? */
-	offs_t			address;					/* execution address */
-	parsed_expression *condition;				/* condition */
-	char *			action;						/* action */
-};
 
-
-struct _debug_cpu_watchpoint
-{
-	int				index;						/* user reported index */
-	UINT8			enabled;					/* enabled? */
-	UINT8			type;						/* type (read/write) */
-	offs_t			address;					/* start address */
-	offs_t			length;						/* length of watch area */
-	parsed_expression *condition;				/* condition */
-	char *			action;						/* action */
-	debug_cpu_watchpoint *next;					/* next in the list */
-};
-
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
 extern const express_callbacks debug_expression_callbacks;
 
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+//**************************************************************************
+//  FUNCTION PROTOTYPES
+//**************************************************************************
 
 /* ----- initialization and cleanup ----- */
 
@@ -194,110 +382,6 @@ symbol_table *debug_cpu_get_global_symtable(running_machine *machine);
 /* return the locally-visible symbol table */
 symbol_table *debug_cpu_get_visible_symtable(running_machine *machine);
 
-/* return a specific CPU's symbol table */
-symbol_table *debug_cpu_get_symtable(device_t *device);
-
-
-
-/* ----- memory and disassembly helpers ----- */
-
-/* return the physical address corresponding to the given logical address */
-int debug_cpu_translate(const address_space *space, int intention, offs_t *address);
-
-/* disassemble a line at a given PC on a given CPU */
-offs_t debug_cpu_disassemble(device_t *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-
-/* set an override handler for disassembly */
-void debug_cpu_set_dasm_override(device_t *device, cpu_disassemble_func dasm_override);
-
-
-
-/* ----- core debugger hooks ----- */
-
-/* the CPU execution system calls this hook before beginning execution for the given CPU */
-void debug_cpu_start_hook(device_t *device, attotime endtime);
-
-/* the CPU execution system calls this hook when ending execution for the given CPU */
-void debug_cpu_stop_hook(device_t *device);
-
-/* the CPU execution system calls this hook when an interrupt is acknowledged */
-void debug_cpu_interrupt_hook(device_t *device, int irqline);
-
-/* called by the CPU cores when an exception is generated */
-void debug_cpu_exception_hook(device_t *device, int exception);
-
-/* called by the CPU cores before executing each instruction */
-void debug_cpu_instruction_hook(device_t *device, offs_t curpc);
-
-/* the memory system calls this hook when watchpoints are enabled and a memory read happens */
-void debug_cpu_memory_read_hook(const address_space *space, offs_t address, UINT64 mem_mask);
-
-/* the memory system calls this hook when watchpoints are enabled and a memory write happens */
-void debug_cpu_memory_write_hook(const address_space *space, offs_t address, UINT64 data, UINT64 mem_mask);
-
-
-
-/* ----- execution control ----- */
-
-/* halt in the debugger on the next instruction */
-void debug_cpu_halt_on_next_instruction(device_t *device, const char *fmt, ...) ATTR_PRINTF(2,3);
-
-/* ignore/observe a given CPU */
-void debug_cpu_ignore_cpu(device_t *cpu, int ignore);
-
-/* single step the visible CPU past the requested number of instructions */
-void debug_cpu_single_step(running_machine *machine, int numsteps);
-
-/* single step the visible over the requested number of instructions */
-void debug_cpu_single_step_over(running_machine *machine, int numsteps);
-
-/* single step the visible CPU out of the current function */
-void debug_cpu_single_step_out(running_machine *machine);
-
-/* execute the visible CPU until it hits the given address */
-void debug_cpu_go(running_machine *machine, offs_t targetpc);
-
-/* execute until the next VBLANK */
-void debug_cpu_go_vblank(running_machine *machine);
-
-/* execute until the specified interrupt fires on the visible CPU */
-void debug_cpu_go_interrupt(running_machine *machine, int irqline);
-
-/* execute until the specified exception fires on the visible CPU */
-void debug_cpu_go_exception(running_machine *machine, int exception);
-
-/* execute until the specified delay elapses */
-void debug_cpu_go_milliseconds(running_machine *machine, UINT64 milliseconds);
-
-/* execute until we hit the next CPU */
-void debug_cpu_next_cpu(running_machine *machine);
-
-
-
-/* ----- breakpoints ----- */
-
-/* set a new breakpoint, returning its index */
-int	debug_cpu_breakpoint_set(device_t *device, offs_t address, parsed_expression *condition, const char *action);
-
-/* clear a breakpoint by index */
-int	debug_cpu_breakpoint_clear(running_machine *machine, int bpnum);
-
-/* enable/disable a breakpoint by index */
-int	debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable);
-
-
-
-/* ----- watchpoints ----- */
-
-/* set a new watchpoint, returning its index */
-int	debug_cpu_watchpoint_set(const address_space *space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action);
-
-/* clear a watchpoint by index */
-int	debug_cpu_watchpoint_clear(running_machine *machine, int wpnum);
-
-/* enable/disable a watchpoint by index */
-int	debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable);
-
 
 
 /* ----- misc debugger functions ----- */
@@ -305,21 +389,12 @@ int	debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable)
 /* specifies a debug command script to execute */
 void debug_cpu_source_script(running_machine *machine, const char *file);
 
-/* trace execution of a given CPU */
-void debug_cpu_trace(device_t *device, FILE *file, int trace_over, const char *action);
-
-/* output data into the given CPU's tracefile, if tracing */
-void debug_cpu_trace_printf(device_t *device, const char *fmt, ...) ATTR_PRINTF(2,3);
-
-/* set a hook to be called on each instruction for a given CPU */
-void debug_cpu_set_instruction_hook(device_t *device, debug_instruction_hook_func hook);
-
-/* hotspots */
-int	debug_cpu_hotspot_track(device_t *device, int numspots, int threshhold);
-
 
 
 /* ----- debugger memory accessors ----- */
+
+/* return the physical address corresponding to the given logical address */
+int debug_cpu_translate(const address_space *space, int intention, offs_t *address);
 
 /* return a byte from the the specified memory space */
 UINT8 debug_read_byte(const address_space *space, offs_t address, int apply_translation);
@@ -353,5 +428,6 @@ void debug_write_memory(const address_space *space, offs_t address, UINT64 data,
 
 /* read 1,2,4 or 8 bytes at the given offset from opcode space */
 UINT64 debug_read_opcode(const address_space *space, offs_t offset, int size, int arg);
+
 
 #endif

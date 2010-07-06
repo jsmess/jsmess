@@ -346,7 +346,7 @@ static DEVICE_RESET( tf20 )
 	const address_space *prg = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* enable rom */
-	memory_install_rom(prg, 0x0000, 0x07ff, 0, 0x7800, cpu->region()->base.v);
+	memory_install_rom(prg, 0x0000, 0x07ff, 0, 0x7800, cpu->region()->base());
 }
 
 DEVICE_GET_INFO( tf20 )

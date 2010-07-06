@@ -380,7 +380,7 @@ static BOOL SoftwarePicker_AddFileEntry(HWND hwndPicker, LPCSTR pszFilename,
 		pszExtension = strrchr(pszFilename, '.');
 	if ((pszExtension != NULL) && (pPickerInfo->config != NULL))
 	{
-		for (bool gotone = pPickerInfo->config->mconfig->devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = pPickerInfo->config->mconfig->m_devicelist.first(device); gotone; gotone = device->next(device))
 		{
 			if (device->uses_file_extension(pszExtension)) {
 				break;

@@ -70,11 +70,11 @@ static const UINT8 cb2001_decryption_table[256] = {
 //    ????      pppp pppp pppp ???? pppp !!!!  pppp      pppp pppp pppp pppp      pppp
 	0xac,xxxx,0xb4,xxxx,xxxx,0x83,xxxx,xxxx, xxxx,0x13,0x03,xxxx,0x1e,xxxx,0x07,0xcf, /* B0 */
 //    pppp      pppp           pppp                 ???? pppp      pppp      pppp pppp
-	xxxx,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,xxxx,xxxx,0x2e,xxxx, /* C0 */
-//         pppp pppp           pppp pppp                 pppp ????           pppp
+	0xcb,0xec,0xee,xxxx,xxxx,0xe2,0x87,xxxx, xxxx,xxxx,0x76,0x61,xxxx,xxxx,0x2e,xxxx, /* C0 */
+//    pppp pppp pppp           pppp pppp                 pppp ????           pppp
 	xxxx,0xf3,0x46,xxxx,0x60,xxxx,0x4f,0x47, 0x88,xxxx,xxxx,xxxx,xxxx,0xfa,0xc7,0x8b, /* D0 */
 //         ???? pppp      ????      pppp pppp  pppp                     ???? !!!! pppp
-	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,xxxx, xxxx,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
+	0x8a,0xb1,xxxx,0xc6,xxxx,0x5a,xxxx,xxxx, 0x9a,0x52,xxxx,xxxx,xxxx,xxxx,xxxx,xxxx, /* E0 */
 //    pppp gggg      !!!!      ????            pppp ????
 	xxxx,0xae,0xfe,xxxx,xxxx,xxxx,xxxx,0x2a, xxxx,xxxx,0x1c,xxxx,0x81,xxxx,xxxx,xxxx, /* F0 */
 //         ???? pppp                     ????            ????      ????
@@ -82,31 +82,15 @@ static const UINT8 cb2001_decryption_table[256] = {
 
 /* robiza's notes:
 
-sure but for now don't add
-e8 -> 9a
-
-aa opcode:
-e0086 aa
-e0087 3e cc 00          mov iy,0cc
-e008a aa
-e008b 36 1c 05          mov ix,51c
-e008e 9c 08 00          mov cw,8h
-e0091 23 26             cmp4s
-e0093 78 03             bc e0098
+sure:
+e8 -> 9a call_far
+c0 -> cb ret_f
 
 aa -> 8d
-
-1) aa 1e ## ## -> bb mov bw,####
-_     1e ## ## -> 89 mov
-
-2) aa 26 ## ## -> bc mov sp,####
-_     26 ##    -> b5 mov ch,##
-
-3) aa 36 ## ## -> be mov ix,####
-_     36       -> ????
-
-4) aa 3e ## ## -> bf mov iy,####
-_     3e       -> ????
+aa 1e ## ## -> bb mov bw,####
+aa 26 ## ## -> bc mov sp,####
+aa 36 ## ## -> be mov ix,####
+aa 3e ## ## -> bf mov iy,####
 
 e01f7-e0204 (b0 -> ac) (ce -> 2e) (a4 -> aa) : this routine write the "dyna..." string in nvram
 e33ac / 2bbc : c6 -> 87, 9a -> 57, 28 -> 56, 46 -> 5e, 0f -> 5f, a8 -> 4e, ab -> 50, 73 -> 58
@@ -126,7 +110,7 @@ e0033 45 01      mov al,1
 e0035 49 d3 06   mov [6d3],al
 
 0089 call 2a9d                            e0038 call e30a2
-  2a9d ld hl,d0b3                           e30a2 premov bw,[04a6]          (1e -> bb)
+  2a9d ld hl,d0b3                           e30a2 lea bw,[04a6]          (1e -> bb)
   2aa0 inc (hl)                             e30a5 inc b ptr[bw]
   2aa1 inc hl                               e30a8 inc bw
   2aa2 inc (hl)                             e30a9 inc b ptr[bw]
@@ -213,7 +197,7 @@ cmv4                          cb2001                     (en -> de)
 02a1 call $0c38               e0239 call 0e30b8h
 02a4 ld hl,$d023              e023d mov ix,90h           (36 -> be)
 02a7 call $2b2d               e0240 call 0e32a6h         (00 -> e8)
-  2b2d ld a,$01                 e32a6 mov al,1h                                                                           c3ecf
+  2b2d ld a,$01                 e32a6 mov al,1h
   2b2f or a                     e32a8 and al,al
   2b30 add a,(hl)               e32aa add al,b ptr [ix]
   2b31 daa                      e32ac daa                (13 -> 27) not sure
@@ -263,7 +247,7 @@ cmv4                          cb2001                     (en -> de)
   4ab2 xor a                    .
   4ab3 ld ($d618),a             e66f5 mov b ptr[72dh],ah (d8 -> 88)
   4ab6 ld ($d619),a             e66f9 mov b ptr[72eh],ah
-  4ab9 ld ($d61a),hl            e66fd mov w ptr[72fh],bw (1e -> 89) BAD DUMP, i think
+  4ab9 ld ($d61a),hl            e66fd mov w ptr[72fh],bw
   4abc jr $4ac9                 e6701 br 0e6712h
 
   4abe ld a,($d619)             e6703 mov al,[72eh]
@@ -286,7 +270,7 @@ cmv4                          cb2001                     (en -> de)
   4add sub $50                  e672f sub al,50h         (52 -> 2c)
   4adf cp $50                   e6731 cmp al,50h
   4ae1 jr c,$4ae7               e6733 bc 0e6739          (78 -> 72)
-  4ae3 ld b,$04                 e6735 mov ch,4h          (26 -> b5) but 26 in other place probably is mov sp,xxxx (BAD DUMP?)
+  4ae3 ld b,$04                 e6735 mov ch,4h          (26 -> b5)
   4ae5 sub $50                  e6737 sub al,50h
   4ae7 ld c,a                   e6739 mov cl,al
   4ae8 and $0f                  e673b and al,0fh         (76 -> 24)
@@ -345,7 +329,9 @@ e328e 18 c0 xor al,al
       70    ret
 */
 
-static UINT16 *cb2001_vram;
+static UINT16 *cb2001_vram_fg;
+static UINT16* cb2001_vram_bg;
+static int cb2001_videobank;
 
 static VIDEO_START(cb2001)
 {
@@ -363,18 +349,68 @@ static VIDEO_UPDATE(cb2001)
 		for (x=0;x<64;x++)
 		{
 			int tile;
+			int colour;
 
-			tile = (cb2001_vram[count] & 0x3fff);
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,0,0,0,x*8,y*8);
+			tile = (cb2001_vram_bg[count] & 0x0fff);
+			colour = (cb2001_vram_bg[count] & 0xf000)>>12;
+			tile += cb2001_videobank*0x2000;
+
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8);
+
+			count++;
+		}
+	}
+
+
+	count = 0x0000;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<64;x++)
+		{
+			int tile;
+			int colour;
+
+			tile = (cb2001_vram_fg[count] & 0x0fff);
+			colour = (cb2001_vram_fg[count] & 0xf000)>>12;
+			tile += cb2001_videobank*0x2000;
+
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,colour,0,0,x*8,y*8, 0);
 			count++;
 		}
 	}
 	return 0;
 }
 
+
+/* these ports sometimes get written with similar values
+ - they could be hooked up wrong, or subject to change it the code
+   is being executed incorrectly */
+WRITE16_HANDLER( cb2001_vidctrl_w )
+{
+	if (mem_mask&0xff00) // video control?
+	{
+		printf("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
+		cb2001_videobank = (data & 0x0800)>>11;
+	}
+	else // something else
+		logerror("cb2001_vidctrl_w %04x %04x\n", data, mem_mask);
+}
+
+WRITE16_HANDLER( cb2001_vidctrl2_w )
+{
+	if (mem_mask&0xff00) // video control?
+	{
+		logerror("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask);
+	}
+	else // something else
+		logerror("cb2001_vidctrl2_w %04x %04x\n", data, mem_mask); // bank could be here instead
+}
+
 static ADDRESS_MAP_START( cb2001_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x1ffff) AM_RAM
-	AM_RANGE(0x20000, 0x21fff) AM_RAM AM_BASE(&cb2001_vram)
+	AM_RANGE(0x20000, 0x20fff) AM_RAM AM_BASE(&cb2001_vram_fg)
+	AM_RANGE(0x21000, 0x21fff) AM_RAM AM_BASE(&cb2001_vram_bg)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
@@ -384,6 +420,9 @@ static ADDRESS_MAP_START( cb2001_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE8("ppi8255_1", ppi8255_r, ppi8255_w, 0xffff)	/* DIP switches */
 	AM_RANGE(0x20, 0x21) AM_DEVREAD8("aysnd", ay8910_r, 0x00ff)
 	AM_RANGE(0x22, 0x23) AM_DEVWRITE8("aysnd", ay8910_data_address_w, 0xffff)
+
+	AM_RANGE(0x30, 0x31) AM_WRITE(cb2001_vidctrl_w)
+	AM_RANGE(0x32, 0x33) AM_WRITE(cb2001_vidctrl2_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cb2001 )
@@ -589,6 +628,7 @@ static PALETTE_INIT(cb2001)
 		int r,g,b;
 
 		UINT8*proms = memory_region(machine, "proms");
+		int length = memory_region_length(machine, "proms");
 		UINT16 dat;
 
 		dat = (proms[0x000+i] << 8) | proms[0x200+i];
@@ -598,7 +638,14 @@ static PALETTE_INIT(cb2001)
 		r = ((dat >> 6 )& 0x1f)<<3;
 		g = ((dat >> 11 ) & 0x1f)<<3;
 
-		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		if (length==0x400) // are the cb2001 proms dumped incorrectly?
+		{
+			if (!(i&0x20)) palette_set_color(machine, (i&0x1f) | ((i&~0x3f)>>1), MAKE_RGB(r, g, b));
+		}
+		else
+		{
+			palette_set_color(machine, i, MAKE_RGB(r, g, b));
+		}
 	}
 }
 
@@ -654,7 +701,7 @@ static MACHINE_DRIVER_START( cb2001 )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_VIDEO_START(cb2001)
 	MDRV_VIDEO_UPDATE(cb2001)
@@ -683,8 +730,8 @@ ROM_START( scherrym )
 	ROM_REGION( 0x040000, "boot_prg", 0 )
 	ROM_LOAD16_WORD( "f11.bin", 0x000000, 0x40000, CRC(8967f58d) SHA1(eb01a16b7d108f5fbe5de8f611b4f77869aedbf1) )
 
-	ROM_REGION( 0x080000, "gfx", 0 )
-	ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB
+	ROM_REGION( 0x080000, "gfx", ROMREGION_ERASEFF )
+//  ROM_LOAD( "12a.bin", 0x000000, 0x80000,NO_DUMP ) // missing on PCB - 2 PCBs have been found this way, it probably uploads the GFX.
 
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "n82s135-1.bin", 0x000, 0x100, CRC(66ed363f) SHA1(65bd37842c441c2e712844b07c0cfe37ef16d0ef) )

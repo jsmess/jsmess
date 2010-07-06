@@ -43,7 +43,7 @@ static void lviv_update_memory (running_machine *machine)
 
 static TIMER_CALLBACK( lviv_reset )
 {
-	mame_schedule_soft_reset(machine);
+	machine->schedule_soft_reset();
 }
 
 static DIRECT_UPDATE_HANDLER(lviv_directoverride)

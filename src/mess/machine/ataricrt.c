@@ -89,10 +89,10 @@ static void a800_setbank(running_machine *machine, int n)
 }
 
 
-static void cart_reset(running_machine *machine)
+static void cart_reset(running_machine &machine)
 {
 	if (a800_cart_loaded)
-		a800_setbank(machine, 1);
+		a800_setbank(&machine, 1);
 }
 
 /* MESS specific parts that have to be started */
@@ -125,7 +125,7 @@ static void ms_atari_machine_start(running_machine *machine, int type, int has_c
 
 	/* cartridge */
 	if (has_cart)
-		add_reset_callback(machine, cart_reset);
+		machine->add_notifier(MACHINE_NOTIFY_RESET, cart_reset);
 }
 
 static void ms_atari800xl_machine_start(running_machine *machine, int type, int has_cart)
@@ -135,7 +135,7 @@ static void ms_atari800xl_machine_start(running_machine *machine, int type, int 
 
 	/* cartridge */
 	if (has_cart)
-		add_reset_callback(machine, cart_reset);
+		machine->add_notifier(MACHINE_NOTIFY_RESET, cart_reset);
 }
 
 /*************************************

@@ -80,7 +80,7 @@ resource_pool &machine_get_pool(running_machine &machine)
 {
 	// temporary to get around include dependencies, until CPUs
 	// get a proper device class
-	return machine.respool;
+	return machine.m_respool;
 }
 
 
@@ -112,7 +112,11 @@ void device_list::import_config_list(const device_config_list &list, running_mac
 
 	// append each device from the configuration list
 	for (const device_config *devconfig = list.first(); devconfig != NULL; devconfig = devconfig->next())
-		append(devconfig->tag(), devconfig->alloc_device(*m_machine));
+	{
+		device_t *newdevice = devconfig->alloc_device(*m_machine);
+		append(devconfig->tag(), newdevice);
+		newdevice->find_interfaces();
+	}
 }
 
 
@@ -125,8 +129,8 @@ void device_list::start_all()
 {
 	// add exit and reset callbacks
 	assert(m_machine != NULL);
-	add_reset_callback(m_machine, static_reset);
-	add_exit_callback(m_machine, static_exit);
+	m_machine->add_notifier(MACHINE_NOTIFY_RESET, static_reset);
+	m_machine->add_notifier(MACHINE_NOTIFY_EXIT, static_exit);
 
 	// add pre-save and post-load callbacks
 	state_save_register_presave(m_machine, static_pre_save, this);
@@ -185,9 +189,9 @@ void device_list::reset_all()
 }
 
 
-void device_list::static_reset(running_machine *machine)
+void device_list::static_reset(running_machine &machine)
 {
-	machine->devicelist.reset_all();
+	machine.m_devicelist.reset_all();
 }
 
 
@@ -195,9 +199,9 @@ void device_list::static_reset(running_machine *machine)
 //  static_exit - tear down all the devices
 //-------------------------------------------------
 
-void device_list::static_exit(running_machine *machine)
+void device_list::static_exit(running_machine &machine)
 {
-	machine->devicelist.reset();
+	machine.m_devicelist.reset();
 }
 
 
@@ -301,7 +305,7 @@ bool device_config_interface::interface_validity_check(const game_driver &driver
 //  device configuration
 //-------------------------------------------------
 
-device_config::device_config(const machine_config &mconfig, device_type type, const char *_tag, const device_config *owner, UINT32 clock)
+device_config::device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock)
 	: m_next(NULL),
 	  m_owner(const_cast<device_config *>(owner)),
 	  m_interface_list(NULL),
@@ -309,7 +313,9 @@ device_config::device_config(const machine_config &mconfig, device_type type, co
 	  m_clock(clock),
 	  m_machine_config(mconfig),
 	  m_static_config(NULL),
-	  m_tag(_tag)
+	  m_name(name),
+	  m_tag(tag),
+	  m_config_complete(false)
 {
 	memset(m_inline_data, 0, sizeof(m_inline_data));
 
@@ -681,8 +687,12 @@ void device_interface::interface_debug_setup()
 device_t::device_t(running_machine &_machine, const device_config &config)
 	: machine(&_machine),
 	  m_machine(_machine),
+	  m_debug(NULL),
+	  m_execute(NULL),
+	  m_memory(NULL),
+	  m_state(NULL),
 	  m_next(NULL),
-	  m_owner((config.m_owner != NULL) ? _machine.devicelist.find(config.m_owner->tag()) : NULL),
+	  m_owner((config.m_owner != NULL) ? _machine.m_devicelist.find(config.m_owner->tag()) : NULL),
 	  m_interface_list(NULL),
 	  m_started(false),
 	  m_clock(config.m_clock),
@@ -808,6 +818,19 @@ attotime device_t::clocks_to_attotime(UINT64 numclocks) const
 UINT64 device_t::attotime_to_clocks(attotime duration) const
 {
 	return mulu_32x32(duration.seconds, m_clock) + (UINT64)duration.attoseconds / (UINT64)m_attoseconds_per_clock;
+}
+
+
+//-------------------------------------------------
+//  find_interfaces - locate fast interfaces
+//-------------------------------------------------
+
+void device_t::find_interfaces()
+{
+	// look up the common interfaces
+	m_execute = dynamic_cast<device_execute_interface *>(this);
+	m_memory = dynamic_cast<device_memory_interface *>(this);
+	m_state = dynamic_cast<device_state_interface *>(this);
 }
 
 

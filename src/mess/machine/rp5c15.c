@@ -150,38 +150,36 @@ static TIMER_CALLBACK(rtc_alarm_pulse)
 static DEVICE_START( rp5c15 )
 {
 	rp5c15_t* rtc = (rp5c15_t*)downcast<legacy_device_base *>(device)->token();
-	mame_system_time systm;
-	mame_system_tm time;
+	system_time systm;
 
 	rtc->intf = (const rp5c15_intf*)device->baseconfig().static_config();
 
 	rtc->alarm_callback = rtc->intf->alarm_irq_callback;
 
-	mame_get_base_datetime(device->machine,&systm);
-	time = systm.local_time;
+	device->machine->base_datetime(systm);
 
 	// date/time is stored as BCD
-	rtc->systime.sec_1 = time.second % 10;
-	rtc->systime.sec_10 = time.second / 10;
-	rtc->systime.min_1 = time.minute % 10;
-	rtc->systime.min_10 = time.minute / 10;
-	rtc->systime.hour_1 = time.hour % 10;
-	rtc->systime.hour_10 = time.hour / 10;
-	rtc->systime.day_1 = time.mday % 10;
-	rtc->systime.day_10 = time.mday / 10;
-	rtc->systime.month_1 = (time.month+1) % 10;
-	rtc->systime.month_10 = (time.month+1) / 10;
-	rtc->systime.year_1 = (time.year - 1980) % 10;
-	rtc->systime.year_10 = (time.year - 1980) / 10;
-	rtc->systime.dayofweek = time.weekday;
-	rtc->alarm.min_1 = time.minute % 10;
-	rtc->alarm.min_10 = time.minute / 10;
-	rtc->alarm.hour_1 = time.hour % 10;
-	rtc->alarm.hour_10 = time.hour / 10;
-	rtc->alarm.day_1 = time.mday % 10;
-	rtc->alarm.day_10 = time.mday / 10;
-	rtc->alarm.dayofweek = time.weekday;
-	rtc->leap = time.year % 4;
+	rtc->systime.sec_1 = systm.local_time.second % 10;
+	rtc->systime.sec_10 = systm.local_time.second / 10;
+	rtc->systime.min_1 = systm.local_time.minute % 10;
+	rtc->systime.min_10 = systm.local_time.minute / 10;
+	rtc->systime.hour_1 = systm.local_time.hour % 10;
+	rtc->systime.hour_10 = systm.local_time.hour / 10;
+	rtc->systime.day_1 = systm.local_time.mday % 10;
+	rtc->systime.day_10 = systm.local_time.mday / 10;
+	rtc->systime.month_1 = (systm.local_time.month+1) % 10;
+	rtc->systime.month_10 = (systm.local_time.month+1) / 10;
+	rtc->systime.year_1 = (systm.local_time.year - 1980) % 10;
+	rtc->systime.year_10 = (systm.local_time.year - 1980) / 10;
+	rtc->systime.dayofweek = systm.local_time.weekday;
+	rtc->alarm.min_1 = systm.local_time.minute % 10;
+	rtc->alarm.min_10 = systm.local_time.minute / 10;
+	rtc->alarm.hour_1 = systm.local_time.hour % 10;
+	rtc->alarm.hour_10 = systm.local_time.hour / 10;
+	rtc->alarm.day_1 = systm.local_time.mday % 10;
+	rtc->alarm.day_10 = systm.local_time.mday / 10;
+	rtc->alarm.dayofweek = systm.local_time.weekday;
+	rtc->leap = systm.local_time.year % 4;
 
 	rtc->mode = 0x08;  // Timer enabled, Alarm disable, BANK 0 selected (defaults are guessed)
 	rtc->reset = 0x00;  // enable both 1Hz and 16Hz alarm counters by default

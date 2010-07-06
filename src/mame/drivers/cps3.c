@@ -805,12 +805,12 @@ static VIDEO_START(cps3)
 	state_save_register_global_pointer(machine, cps3_char_ram, 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[0] = gfx_element_alloc(machine, &cps3_tiles8x8_layout, (UINT8 *)cps3_ss_ram, machine->config->total_colors / 16, 0);
+	machine->gfx[0] = gfx_element_alloc(machine, &cps3_tiles8x8_layout, (UINT8 *)cps3_ss_ram, machine->total_colors() / 16, 0);
 
 	//decode_ssram();
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[1] = gfx_element_alloc(machine, &cps3_tiles16x16_layout, (UINT8 *)cps3_char_ram, machine->config->total_colors / 64, 0);
+	machine->gfx[1] = gfx_element_alloc(machine, &cps3_tiles16x16_layout, (UINT8 *)cps3_char_ram, machine->total_colors() / 64, 0);
 	machine->gfx[1]->color_granularity = 64;
 
 	//decode_charram();
@@ -2269,7 +2269,7 @@ static const struct WD33C93interface scsi_intf =
 	NULL			/* command completion IRQ */
 };
 
-static void cps3_exit(running_machine *machine)
+static void cps3_exit(running_machine &machine)
 {
 	wd33c93_exit(&scsi_intf);
 }
@@ -2277,7 +2277,7 @@ static void cps3_exit(running_machine *machine)
 static MACHINE_START( cps3 )
 {
 	wd33c93_init(machine, &scsi_intf);
-	add_exit_callback(machine, cps3_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, cps3_exit);
 }
 
 static MACHINE_RESET( cps3 )

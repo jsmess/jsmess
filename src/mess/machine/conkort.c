@@ -913,7 +913,7 @@ static DEVICE_START( luxor_55_10828 )
 	state_save_register_device_item(device, 0, conkort->wait_enable);
 
 	/* patch out protection checks */
-	UINT8 *rom = device->subregion("abc830")->base.u8;
+	UINT8 *rom = device->subregion("abc830")->base();
 	rom[0x0718] = 0xff;
 	rom[0x072c] = 0xff;
 	rom[0x0336] = 0xff;

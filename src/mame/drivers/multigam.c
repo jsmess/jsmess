@@ -499,6 +499,10 @@ static void multigam_init_mmc3(running_machine *machine, UINT8 *prg_base, int pr
 {
 	UINT8* dst = memory_region(machine, "maincpu");
 
+	// Tom & Jerry in Super Game III enables 6000 ram, but does not read/write it
+	// however, it expects ROM from 6000 there (code jumps to $6xxx)
+	memcpy(multigmc_mmc3_6000_ram, dst + 0x6000, 0x2000);
+
 	memcpy(&dst[0x8000], prg_base + (prg_size - 0x4000), 0x4000);
 	memcpy(&dst[0xc000], prg_base + (prg_size - 0x4000), 0x4000);
 
@@ -631,11 +635,27 @@ static int mmc1_rom_mask;
 static UINT8* multigam_mmc1_prg_base;
 static int multigam_mmc1_prg_size;
 static int multigam_mmc1_chr_bank_base;
+static int multigam_mmc1_reg_write_enable;
+
+static TIMER_CALLBACK( mmc1_resync_callback )
+{
+	multigam_mmc1_reg_write_enable = 1;
+}
 
 static WRITE8_HANDLER( mmc1_rom_switch_w )
 {
 	/* basically, a MMC1 mapper from the nes */
 	static int size16k, switchlow, vrom4k;
+
+	if ( multigam_mmc1_reg_write_enable == 0 )
+	{
+		return;
+	}
+	else
+	{
+		multigam_mmc1_reg_write_enable = 0;
+		timer_call_after_resynch(space->machine, NULL, 0, mmc1_resync_callback);
+	}
 
 	int reg = (offset >> 13);
 
@@ -725,6 +745,7 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 
 					if (!size16k)
 					{
+						bank = ((mmc1_shiftreg >> 1) & mmc1_rom_mask) * 0x4000;
 						/* switch 32k */
 						memcpy(&prg[0x08000], multigam_mmc1_prg_base + bank, 0x8000);
 					}
@@ -758,6 +779,7 @@ static void multigam_init_mmc1(running_machine *machine, UINT8 *prg_base, int pr
 
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mmc1_rom_switch_w );
 
+	multigam_mmc1_reg_write_enable = 1;
 	mmc1_rom_mask = (prg_size / 0x4000) - 1;
 	multigam_mmc1_prg_base = prg_base;
 	multigam_mmc1_prg_size = prg_size;

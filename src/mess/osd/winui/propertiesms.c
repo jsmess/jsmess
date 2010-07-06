@@ -210,7 +210,7 @@ static BOOL SoftwareDirectories_OnEndLabelEdit(HWND hDlg, NMHDR* pNMHDR)
 
 BOOL PropSheetFilter_Config(const machine_config *drv, const game_driver *gamedrv)
 {
-	return (drv->devicelist.first(MESSRAM)!=NULL) || DriverHasDevice(gamedrv, IO_PRINTER);
+	return (drv->m_devicelist.first(MESSRAM)!=NULL) || DriverHasDevice(gamedrv, IO_PRINTER);
 }
 
 
@@ -403,10 +403,10 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	(void)ComboBox_ResetContent(control);
 
 	// allocate the machine config
-	cfg = machine_config_alloc(gamedrv->machine_config);
+	cfg = global_alloc(machine_config(gamedrv->machine_config));
 
 	// identify how many options that we have
-	device = cfg->devicelist.first(MESSRAM);
+	device = cfg->m_devicelist.first(MESSRAM);
 
 	EnableWindow(control, (device != NULL));
 	i = 0;
@@ -485,7 +485,7 @@ static BOOL RamPopulateControl(datamap *map, HWND dialog, HWND control, core_opt
 	if (cfg != NULL)
 	{
 		/* Free the structure */
-		machine_config_free(cfg);
+		global_free(cfg);
 	}
 	return TRUE;
 }

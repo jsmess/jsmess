@@ -68,7 +68,7 @@ static void image_dirs_load(running_machine *machine, int config_type, xml_data_
 	const char *dev_instance;
 	const char *working_directory;
 	device_image_interface *image = NULL;
-	
+
 	if ((config_type == CONFIG_TYPE_GAME) && (parentnode != NULL))
 	{
 		for (node = xml_get_sibling(parentnode->child, "device"); node; node = xml_get_sibling(node->next, "device"))
@@ -77,13 +77,13 @@ static void image_dirs_load(running_machine *machine, int config_type, xml_data_
 
 			if ((dev_instance != NULL) && (dev_instance[0] != '\0'))
 			{
-				for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+				for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 				{
 					if (!strcmp(dev_instance, image->image_config().instance_name())) {
 						working_directory = xml_get_attribute_string(node, "directory", NULL);
 						if (working_directory != NULL)
 							image->set_working_directory(working_directory);
-					}					
+					}
 				}
 			}
 		}
@@ -106,7 +106,7 @@ static void image_dirs_save(running_machine *machine, int config_type, xml_data_
 	/* only care about game-specific data */
 	if (config_type == CONFIG_TYPE_GAME)
 	{
-		for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+		for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 		{
 			dev_instance = image->image_config().instance_name();
 
@@ -115,7 +115,7 @@ static void image_dirs_save(running_machine *machine, int config_type, xml_data_
 			{
 				xml_set_attribute(node, "instance", dev_instance);
 				xml_set_attribute(node, "directory", image->working_directory());
-			}		
+			}
 		}
 	}
 }
@@ -159,23 +159,23 @@ done:
 static void image_options_extract(running_machine *machine)
 {
 	/* only extract the device options if we've added them */
-	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS)) {
-		int index = 0;		
+	if (options_get_bool(machine->options(), OPTION_ADDED_DEVICE_OPTIONS)) {
+		int index = 0;
 		device_image_interface *image = NULL;
 
-		for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
-		{		
+		for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
+		{
 			const char *filename = image->filename();
 
 			/* and set the option */
-			options_set_string(mame_options(), image->image_config().instance_name() , filename ? filename : "", OPTION_PRIORITY_CMDLINE);				
-			
+			options_set_string(machine->options(), image->image_config().instance_name() , filename ? filename : "", OPTION_PRIORITY_CMDLINE);
+
 			index++;
 		}
 	}
 
 	/* write the config, if appropriate */
-	if (options_get_bool(mame_options(), OPTION_WRITECONFIG))
+	if (options_get_bool(machine->options(), OPTION_WRITECONFIG))
 		write_config(NULL, machine->gamedrv);
 }
 
@@ -184,14 +184,14 @@ static void image_options_extract(running_machine *machine)
     extract options
 -------------------------------------------------*/
 
-void image_unload_all(running_machine *machine)
+void image_unload_all(running_machine &machine)
 {
     device_image_interface *image = NULL;
 
-	// extract the options 
-	image_options_extract(machine);
+	// extract the options
+	image_options_extract(&machine);
 
-	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = machine.m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		// unload this image
 		image->unload();
@@ -208,7 +208,7 @@ void image_device_init(running_machine *machine)
 	device_image_interface *image = NULL;
 
 	/* make sure that any required devices have been allocated */
-    for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+    for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		/* is an image specified for this image */
 		image_name = image_get_device_option(image);
@@ -217,7 +217,7 @@ void image_device_init(running_machine *machine)
 		{
 			/* mark init state */
 			image->set_init_phase();
-			
+
 			/* try to load this image */
 			bool result = image->load(image_name);
 
@@ -229,10 +229,10 @@ void image_device_init(running_machine *machine)
 				const char *image_basename_str = image->basename();
 
 				/* unload all images */
-				image_unload_all(machine);
+				image_unload_all(*machine);
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
-					image->image_config().name(),
+					image->image_config().devconfig().name(),
 					image_basename_str,
 					image_err);
 			}
@@ -245,7 +245,7 @@ void image_device_init(running_machine *machine)
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Driver requires that device \"%s\" must have an image to load", image->image_config().instance_name());
 			}
 		}
-		
+
 		image->call_get_devices();
 	}
 }
@@ -260,7 +260,7 @@ void image_postdevice_init(running_machine *machine)
 	device_image_interface *image = NULL;
 
 	/* make sure that any required devices have been allocated */
-    for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+    for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
     {
 			int result = image->finish_load();
 			/* did the image load fail? */
@@ -271,17 +271,17 @@ void image_postdevice_init(running_machine *machine)
 				const char *image_basename_str = image->basename();
 
 				/* unload all images */
-				image_unload_all(machine);
+				image_unload_all(*machine);
 
 				fatalerror_exitcode(machine, MAMERR_DEVICE, "Device %s load (%s) failed: %s",
-					image->image_config().name(),
+					image->image_config().devconfig().name(),
 					image_basename_str,
 					image_err);
 			}
 	}
 
 	/* add a callback for when we shut down */
-	add_exit_callback(machine, image_unload_all);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, image_unload_all);
 }
 /***************************************************************************
     INITIALIZATION
@@ -392,7 +392,7 @@ astring *image_info_astring(running_machine *machine, astring *string)
 	}
 #endif
 
-	for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		const char *name = image->filename();
 		if (name != NULL)
@@ -405,7 +405,7 @@ astring *image_info_astring(running_machine *machine, astring *string)
 			base_filename_noextension = strip_extension(base_filename);
 
 			/* display device type and filename */
-			astring_catprintf(string, "%s: %s\n", image->image_config().name(), base_filename);
+			astring_catprintf(string, "%s: %s\n", image->image_config().devconfig().name(), base_filename);
 
 			/* display long filename, if present and doesn't correspond to name */
 			info = image->longname();
@@ -433,8 +433,8 @@ astring *image_info_astring(running_machine *machine, astring *string)
 		}
 		else
 		{
-			astring_catprintf(string, "%s: ---\n", image->image_config().name());
-		}		
+			astring_catprintf(string, "%s: ---\n", image->image_config().devconfig().name());
+		}
 	}
 	return string;
 }
@@ -487,16 +487,48 @@ void image_battery_save_by_name(const char *filename, const void *buffer, int le
     }
 }
 
+/*-------------------------------------------------
+    image_from_absolute_index - retreives index number
+    of image in device list
+-------------------------------------------------*/
 device_image_interface *image_from_absolute_index(running_machine *machine, int absolute_index)
 {
 	device_image_interface *image = NULL;
 	int cnt = 0;
 	/* make sure that any required devices have been allocated */
-    for (bool gotone = machine->devicelist.first(image); gotone; gotone = image->next(image))
+    for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		if (cnt==absolute_index) return image;
 		cnt++;
 	}
 	return NULL;
-} 
+}
+
+/*-------------------------------------------------
+    image_add_device_with_subdevices - adds
+    device with parameters sent, and all subdevices
+    from it's machine config devices list
+-------------------------------------------------*/
+void image_add_device_with_subdevices(device_t *owner, device_type type, const char *tag, UINT32 clock)
+{
+	astring tempstring;
+	device_list *device_list = &owner->machine->m_devicelist;
+	machine_config *config = (machine_config *)owner->machine->config;
+
+	device_config *devconfig = type(*config, owner->subtag(tempstring,tag), &owner->baseconfig(), clock);
+	running_device *device = device_list->append(devconfig->tag(), devconfig->alloc_device(*owner->machine));
+
+	const machine_config_token *tokens = device->machine_config_tokens();
+	if (tokens != NULL)
+    {
+		config->detokenize(tokens,devconfig);
+        for (const device_config *config_dev = config->m_devicelist.first(); config_dev != NULL; config_dev = config_dev->next())
+        {
+			if (config_dev->owner()==devconfig) {
+				device_list->append(config_dev->tag(), config_dev->alloc_device(*owner->machine));
+			}
+        }
+    }
+	config->m_devicelist.append(devconfig->tag(), devconfig);
+}
 

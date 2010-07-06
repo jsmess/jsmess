@@ -25,8 +25,8 @@
 
 /* these functions are macros primarily due to include file ordering */
 /* plus, they are very simple */
-#define speaker_output_count(config)		(config)->devicelist.count(SPEAKER)
-#define speaker_output_first(config)		(config)->devicelist.first(SPEAKER)
+#define speaker_output_count(config)		(config)->m_devicelist.count(SPEAKER)
+#define speaker_output_first(config)		(config)->m_devicelist.first(SPEAKER)
 #define speaker_output_next(previous)		(previous)->typenext()
 
 
@@ -48,9 +48,6 @@ public:
 	// allocators
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
-
-	// basic information getters
-	virtual const char *name() const { return "Speaker"; }
 
 	// indexes to inline data
 	enum
@@ -136,9 +133,9 @@ extern const device_type SPEAKER;
 /* add/remove speakers */
 #define MDRV_SPEAKER_ADD(_tag, _x, _y, _z) \
 	MDRV_DEVICE_ADD(_tag, SPEAKER, 0) \
-	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_X, (_x) * (double)(1 << 24)) \
-	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Y, (_y) * (double)(1 << 24)) \
-	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Z, (_z) * (double)(1 << 24))
+	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_X, (INT32)((_x) * (double)(1 << 24))) \
+	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Y, (INT32)((_y) * (double)(1 << 24))) \
+	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Z, (INT32)((_z) * (double)(1 << 24)))
 
 #define MDRV_SPEAKER_STANDARD_MONO(_tag) \
 	MDRV_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
@@ -190,7 +187,7 @@ void sound_set_output_gain(device_t *device, int output, float gain);
 
 inline int speaker_count(const machine_config &config)
 {
-	return config.devicelist.count(SPEAKER);
+	return config.m_devicelist.count(SPEAKER);
 }
 
 
@@ -201,7 +198,7 @@ inline int speaker_count(const machine_config &config)
 
 inline const speaker_device_config *speaker_first(const machine_config &config)
 {
-	return downcast<speaker_device_config *>(config.devicelist.first(SPEAKER));
+	return downcast<speaker_device_config *>(config.m_devicelist.first(SPEAKER));
 }
 
 
@@ -223,7 +220,7 @@ inline const speaker_device_config *speaker_next(const speaker_device_config *pr
 
 inline int speaker_count(running_machine &machine)
 {
-	return machine.devicelist.count(SPEAKER);
+	return machine.m_devicelist.count(SPEAKER);
 }
 
 
@@ -234,7 +231,7 @@ inline int speaker_count(running_machine &machine)
 
 inline speaker_device *speaker_first(running_machine &machine)
 {
-	return downcast<speaker_device *>(machine.devicelist.first(SPEAKER));
+	return downcast<speaker_device *>(machine.m_devicelist.first(SPEAKER));
 }
 
 

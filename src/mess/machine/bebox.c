@@ -1074,7 +1074,7 @@ MACHINE_RESET( bebox )
 	cputag_set_input_line(machine, "ppc2", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static void bebox_exit(running_machine *machine)
+static void bebox_exit(running_machine &machine)
 {
 	lsi53c810_exit(&scsi53c810_intf);
 }
@@ -1084,7 +1084,7 @@ MACHINE_START( bebox )
 	pc_fdc_init(machine, &bebox_fdc_interface);
 	/* SCSI */
 	lsi53c810_init(machine, &scsi53c810_intf);
-	add_exit_callback(machine, bebox_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, bebox_exit);
 }
 
 DRIVER_INIT( bebox )

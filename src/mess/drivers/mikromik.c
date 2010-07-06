@@ -38,7 +38,7 @@
     6,144 MHz xtal (CPU clock)
     18,720 MHz xtal (pixel clock)
     16 MHz xtal (FDC clock)
-    Intel 8085AP (CPU)
+    Intel I8085AP (CPU)
     Intel 8253-5P (PIT)
     Intel 8275P (CRTC)
     Intel 8212P (I/OP)
@@ -576,7 +576,7 @@ static UPD7201_INTERFACE( mm1_upd7201_intf )
 	}
 };
 
-/* 8085A Interface */
+/* I8085A Interface */
 
 static READ_LINE_DEVICE_HANDLER( dsra_r )
 {
@@ -587,8 +587,8 @@ static I8085_CONFIG( mm1_i8085_config )
 {
 	DEVCB_NULL,			/* STATUS changed callback */
 	DEVCB_NULL,			/* INTE changed callback */
-	DEVCB_LINE(dsra_r),	/* SID changed callback (8085A only) */
-	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w)	/* SOD changed callback (8085A only) */
+	DEVCB_LINE(dsra_r),	/* SID changed callback (I8085A only) */
+	DEVCB_DEVICE_LINE(SPEAKER_TAG, speaker_level_w)	/* SOD changed callback (I8085A only) */
 };
 
 /* Keyboard */
@@ -741,7 +741,7 @@ static MACHINE_DRIVER_START( mm1 )
 	MDRV_DRIVER_DATA(mm1_state)
 
 	/* basic system hardware */
-	MDRV_CPU_ADD(I8085A_TAG, 8085A, XTAL_6_144MHz)
+	MDRV_CPU_ADD(I8085A_TAG, I8085A, XTAL_6_144MHz)
 	MDRV_CPU_PROGRAM_MAP(mm1_map)
 	MDRV_CPU_CONFIG(mm1_i8085_config)
 

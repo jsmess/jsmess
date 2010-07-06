@@ -1814,11 +1814,11 @@ WRITE8_HANDLER( lynx_memory_config_w )
 	memory_set_bank(space->machine, "bank4", (data & 8) ? 1 : 0);
 }
 
-static void lynx_reset(running_machine *machine)
+static void lynx_reset(running_machine &machine)
 {
-	lynx_memory_config_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
+	lynx_memory_config_w(cputag_get_address_space(&machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
 
-	cputag_set_input_line(machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
+	cputag_set_input_line(&machine, "maincpu", M65SC02_IRQ_LINE, CLEAR_LINE);
 
 	memset(&suzy, 0, sizeof(suzy));
 	memset(&mikey, 0, sizeof(mikey));
@@ -1866,7 +1866,7 @@ MACHINE_START( lynx )
 
 	memset(&suzy, 0, sizeof(suzy));
 
-	add_reset_callback(machine, lynx_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, lynx_reset);
 
 	for (i = 0; i < NR_LYNX_TIMERS; i++)
 		lynx_timer_init(machine, i);

@@ -21,7 +21,7 @@
 
 static void counters_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void counters_save(running_machine *machine, int config_type, xml_data_node *parentnode);
-static void interrupt_reset(running_machine *machine);
+static void interrupt_reset(running_machine &machine);
 
 
 
@@ -41,6 +41,7 @@ struct _generic_machine_private
 	int 		memcard_inserted;
 
 	/* interrupt status for up to 8 CPUs */
+	device_t *	interrupt_device[8];
 	UINT8		interrupt_enable[8];
 };
 
@@ -58,8 +59,10 @@ struct _generic_machine_private
 INLINE int interrupt_enabled(running_device *device)
 {
 	generic_machine_private *state = device->machine->generic_machine_data;
-	int cpunum = cpu_get_index(device);
-	return (cpunum >= ARRAY_LENGTH(state->interrupt_enable) || state->interrupt_enable[cpunum]);
+	for (int index = 0; index < ARRAY_LENGTH(state->interrupt_device); index++)
+		if (state->interrupt_device[index] == device)
+			return state->interrupt_enable[index];
+	return TRUE;
 }
 
 
@@ -89,6 +92,13 @@ void generic_machine_init(running_machine *machine)
 		state->coinlockedout[counternum] = 0;
 	}
 
+	// map devices to the interrupt state
+	memset(state->interrupt_device, 0, sizeof(state->interrupt_device));
+	device_execute_interface *exec;
+	int index = 0;
+	for (bool gotone = machine->m_devicelist.first(exec); gotone && index < ARRAY_LENGTH(state->interrupt_device); gotone = exec->next(exec))
+		state->interrupt_device[index++] = &exec->device();
+
 	/* register coin save state */
 	state_save_register_item_array(machine, "coin", NULL, 0, state->coin_count);
 	state_save_register_item_array(machine, "coin", NULL, 0, state->coinlockedout);
@@ -102,17 +112,17 @@ void generic_machine_init(running_machine *machine)
 	state->memcard_inserted = -1;
 
 	/* register a reset callback and save state for interrupt enable */
-	add_reset_callback(machine, interrupt_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, interrupt_reset);
 	state_save_register_item_array(machine, "cpu", NULL, 0, state->interrupt_enable);
 
 	/* register for configuration */
 	config_register(machine, "counters", counters_load, counters_save);
 
 	/* for memory cards, request save state and an exit callback */
-	if (machine->config->memcard_handler != NULL)
+	if (machine->config->m_memcard_handler != NULL)
 	{
 		state_save_register_global(machine, state->memcard_inserted);
-		add_exit_callback(machine, memcard_eject);
+		machine->add_notifier(MACHINE_NOTIFY_EXIT, memcard_eject);
 	}
 }
 
@@ -314,7 +324,7 @@ mame_file *nvram_fopen(running_machine *machine, UINT32 openflags)
 	file_error filerr;
 	mame_file *file;
 
-	astring fname(machine->basename, ".nv");
+	astring fname(machine->basename(), ".nv");
 	filerr = mame_fopen(SEARCHPATH_NVRAM, fname, openflags, &file);
 
 	return (filerr == FILERR_NONE) ? file : NULL;
@@ -329,7 +339,7 @@ void nvram_load(running_machine *machine)
 {
 	// only need to do something if we have an NVRAM device or an nvram_handler
 	device_nvram_interface *nvram = NULL;
-	if (!machine->devicelist.first(nvram) && machine->config->nvram_handler == NULL)
+	if (!machine->m_devicelist.first(nvram) && machine->config->m_nvram_handler == NULL)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
@@ -337,8 +347,8 @@ void nvram_load(running_machine *machine)
 	if (nvram_file != NULL)
 	{
 		// read data from general NVRAM handler first
-		if (machine->config->nvram_handler != NULL)
-			(*machine->config->nvram_handler)(machine, nvram_file, FALSE);
+		if (machine->config->m_nvram_handler != NULL)
+			(*machine->config->m_nvram_handler)(machine, nvram_file, FALSE);
 
 		// find all devices with NVRAM handlers, and read from them next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
@@ -352,8 +362,8 @@ void nvram_load(running_machine *machine)
 	else
 	{
 		// initialize via the general NVRAM handler first
-		if (machine->config->nvram_handler != NULL)
-			(*machine->config->nvram_handler)(machine, NULL, FALSE);
+		if (machine->config->m_nvram_handler != NULL)
+			(*machine->config->m_nvram_handler)(machine, NULL, FALSE);
 
 		// find all devices with NVRAM handlers, and read from them next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
@@ -370,7 +380,7 @@ void nvram_save(running_machine *machine)
 {
 	// only need to do something if we have an NVRAM device or an nvram_handler
 	device_nvram_interface *nvram = NULL;
-	if (!machine->devicelist.first(nvram) && machine->config->nvram_handler == NULL)
+	if (!machine->m_devicelist.first(nvram) && machine->config->m_nvram_handler == NULL)
 		return;
 
 	// open the file; if it exists, call everyone to read from it
@@ -378,8 +388,8 @@ void nvram_save(running_machine *machine)
 	if (nvram_file != NULL)
 	{
 		// write data via general NVRAM handler first
-		if (machine->config->nvram_handler != NULL)
-			(*machine->config->nvram_handler)(machine, nvram_file, TRUE);
+		if (machine->config->m_nvram_handler != NULL)
+			(*machine->config->m_nvram_handler)(machine, nvram_file, TRUE);
 
 		// find all devices with NVRAM handlers, and tell them to write next
 		for (bool gotone = (nvram != NULL); gotone; gotone = nvram->next(nvram))
@@ -398,12 +408,13 @@ void nvram_save(running_machine *machine)
 
 NVRAM_HANDLER( generic_0fill )
 {
+	const region_info *region = machine->region("nvram");
 	if (read_or_write)
 		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file != NULL)
 		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (memory_region_length(machine, "nvram") == machine->generic.nvram_size)
-		memcpy(machine->generic.nvram.v, memory_region(machine, "nvram"), machine->generic.nvram_size);
+	else if (region != NULL && region->bytes() == machine->generic.nvram_size)
+		memcpy(machine->generic.nvram.v, region->base(), machine->generic.nvram_size);
 	else
 		memset(machine->generic.nvram.v, 0, machine->generic.nvram_size);
 }
@@ -416,12 +427,13 @@ NVRAM_HANDLER( generic_0fill )
 
 NVRAM_HANDLER( generic_1fill )
 {
+	const region_info *region = machine->region("nvram");
 	if (read_or_write)
 		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file != NULL)
 		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (memory_region_length(machine, "nvram") == machine->generic.nvram_size)
-		memcpy(machine->generic.nvram.v, memory_region(machine, "nvram"), machine->generic.nvram_size);
+	else if (region != NULL && region->bytes() == machine->generic.nvram_size)
+		memcpy(machine->generic.nvram.v, region->base(), machine->generic.nvram_size);
 	else
 		memset(machine->generic.nvram.v, 0xff, machine->generic.nvram_size);
 }
@@ -434,12 +446,13 @@ NVRAM_HANDLER( generic_1fill )
 
 NVRAM_HANDLER( generic_randfill )
 {
+	const region_info *region = machine->region("nvram");
 	if (read_or_write)
 		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
 	else if (file != NULL)
 		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (memory_region_length(machine, "nvram") == machine->generic.nvram_size)
-		memcpy(machine->generic.nvram.v, memory_region(machine, "nvram"), machine->generic.nvram_size);
+	else if (region != NULL && region->bytes() == machine->generic.nvram_size)
+		memcpy(machine->generic.nvram.v, region->base(), machine->generic.nvram_size);
 	else
 	{
 		UINT8 *nvram = (UINT8 *)machine->generic.nvram.v;
@@ -481,7 +494,7 @@ int memcard_create(running_machine *machine, int index, int overwrite)
 	memcard_name(index, name);
 
 	/* if we can't overwrite, fail if the file already exists */
-	astring fname(machine->basename, PATH_SEPARATOR, name);
+	astring fname(machine->basename(), PATH_SEPARATOR, name);
 	if (!overwrite)
 	{
 		filerr = mame_fopen(SEARCHPATH_MEMCARD, fname, OPEN_FLAG_READ, &file);
@@ -498,8 +511,8 @@ int memcard_create(running_machine *machine, int index, int overwrite)
 		return 1;
 
 	/* initialize and then save the card */
-	if (machine->config->memcard_handler)
-		(*machine->config->memcard_handler)(machine, file, MEMCARD_CREATE);
+	if (machine->config->m_memcard_handler)
+		(*machine->config->m_memcard_handler)(machine, file, MEMCARD_CREATE);
 
 	/* close the file */
 	mame_fclose(file);
@@ -521,12 +534,12 @@ int memcard_insert(running_machine *machine, int index)
 
 	/* if a card is already inserted, eject it first */
 	if (state->memcard_inserted != -1)
-		memcard_eject(machine);
+		memcard_eject(*machine);
 	assert(state->memcard_inserted == -1);
 
 	/* create a name */
 	memcard_name(index, name);
-	astring fname(machine->basename, PATH_SEPARATOR, name);
+	astring fname(machine->basename(), PATH_SEPARATOR, name);
 
 	/* open the file; if we can't, it's an error */
 	filerr = mame_fopen(SEARCHPATH_MEMCARD, fname, OPEN_FLAG_READ, &file);
@@ -534,8 +547,8 @@ int memcard_insert(running_machine *machine, int index)
 		return 1;
 
 	/* initialize and then load the card */
-	if (machine->config->memcard_handler)
-		(*machine->config->memcard_handler)(machine, file, MEMCARD_INSERT);
+	if (machine->config->m_memcard_handler)
+		(*machine->config->m_memcard_handler)(machine, file, MEMCARD_INSERT);
 
 	/* close the file */
 	mame_fclose(file);
@@ -549,9 +562,9 @@ int memcard_insert(running_machine *machine, int index)
     its contents along the way
 -------------------------------------------------*/
 
-void memcard_eject(running_machine *machine)
+void memcard_eject(running_machine &machine)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	file_error filerr;
 	mame_file *file;
 	char name[16];
@@ -562,7 +575,7 @@ void memcard_eject(running_machine *machine)
 
 	/* create a name */
 	memcard_name(state->memcard_inserted, name);
-	astring fname(machine->basename, PATH_SEPARATOR, name);
+	astring fname(machine.basename(), PATH_SEPARATOR, name);
 
 	/* open the file; if we can't, it's an error */
 	filerr = mame_fopen(SEARCHPATH_MEMCARD, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &file);
@@ -573,8 +586,8 @@ void memcard_eject(running_machine *machine)
 	}
 
 	/* initialize and then load the card */
-	if (machine->config->memcard_handler)
-		(*machine->config->memcard_handler)(machine, file, MEMCARD_EJECT);
+	if (machine.m_config.m_memcard_handler)
+		(*machine.m_config.m_memcard_handler)(&machine, file, MEMCARD_EJECT);
 
 	/* close the file */
 	mame_fclose(file);
@@ -619,9 +632,9 @@ void set_led_status(running_machine *machine, int num, int on)
     states on a reset
 -------------------------------------------------*/
 
-static void interrupt_reset(running_machine *machine)
+static void interrupt_reset(running_machine &machine)
 {
-	generic_machine_private *state = machine->generic_machine_data;
+	generic_machine_private *state = machine.generic_machine_data;
 	int cpunum;
 
 	/* on a reset, enable all interrupts */
@@ -673,8 +686,7 @@ void generic_pulse_irq_line(running_device *device, int irqline)
 	cpu_set_input_line(device, irqline, ASSERT_LINE);
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
-	int clocks = cpudevice->cycles_to_clocks(cpudevice->min_cycles());
-	attotime target_time = attotime_add(cpudevice->local_time(), cpudevice->clocks_to_attotime(MAX(clocks, 1)));
+	attotime target_time = attotime_add(cpudevice->local_time(), cpudevice->cycles_to_attotime(cpudevice->min_cycles()));
 	timer_set(device->machine, attotime_sub(target_time, timer_get_time(device->machine)), (void *)device, irqline, irq_pulse_clear);
 }
 
@@ -691,8 +703,7 @@ void generic_pulse_irq_line_and_vector(running_device *device, int irqline, int 
 	cpu_set_input_line_and_vector(device, irqline, ASSERT_LINE, vector);
 
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
-	int clocks = cpudevice->cycles_to_clocks(cpudevice->min_cycles());
-	attotime target_time = attotime_add(cpudevice->local_time(), cpudevice->clocks_to_attotime(MAX(clocks, 1)));
+	attotime target_time = attotime_add(cpudevice->local_time(), cpudevice->cycles_to_attotime(cpudevice->min_cycles()));
 	timer_set(device->machine, attotime_sub(target_time, timer_get_time(device->machine)), (void *)device, irqline, irq_pulse_clear);
 }
 
@@ -707,12 +718,15 @@ void cpu_interrupt_enable(running_device *device, int enabled)
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 
 	generic_machine_private *state = device->machine->generic_machine_data;
-	int cpunum = cpu_get_index(device);
-	assert_always(cpunum < ARRAY_LENGTH(state->interrupt_enable), "cpu_interrupt_enable() called for a CPU > position 7!");
+	int index;
+	for (index = 0; index < ARRAY_LENGTH(state->interrupt_device); index++)
+		if (state->interrupt_device[index] == device)
+			break;
+	assert_always(index < ARRAY_LENGTH(state->interrupt_enable), "cpu_interrupt_enable() called for invalid CPU!");
 
 	/* set the new state */
-	if (cpunum < ARRAY_LENGTH(state->interrupt_enable))
-		state->interrupt_enable[cpunum] = enabled;
+	if (index < ARRAY_LENGTH(state->interrupt_enable))
+		state->interrupt_enable[index] = enabled;
 
 	/* make sure there are no queued interrupts */
 	if (enabled == 0)

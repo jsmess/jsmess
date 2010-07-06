@@ -216,10 +216,10 @@ const char *image_get_device_option(device_image_interface *image)
 {
 	const char *result = NULL;
 
-	if (options_get_bool(mame_options(), OPTION_ADDED_DEVICE_OPTIONS))
+	if (options_get_bool(image->device().machine->options(), OPTION_ADDED_DEVICE_OPTIONS))
 	{
 		/* access the option */
-		result = options_get_string(mame_options(),  image->image_config().instance_name());
+		result = options_get_string(image->device().machine->options(),  image->image_config().instance_name());
 	}
 	return result;
 }
@@ -236,11 +236,11 @@ void image_add_device_options(core_options *opts, const game_driver *driver)
 	const device_config_image_interface *image = NULL;
 
 	/* create the configuration */
-	config = machine_config_alloc(driver->machine_config);
+	config = global_alloc(machine_config(driver->machine_config));
 
 	/* enumerate our callback for every device */
 	/* loop on each device instance */
-	for (bool gotone = config->devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = config->m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		options_entry entry[2];
 		astring dev_full_name;
@@ -269,7 +269,7 @@ void image_add_device_options(core_options *opts, const game_driver *driver)
 	options_set_bool(opts, OPTION_ADDED_DEVICE_OPTIONS, TRUE, OPTION_PRIORITY_CMDLINE);
 
 	/* free the configuration */
-	machine_config_free(config);
+	global_free(config);
 }
 
 /*-------------------------------------------------

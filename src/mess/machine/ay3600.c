@@ -290,17 +290,17 @@ static UINT8 keymodreg;
 
 INLINE int a2_has_keypad(running_machine *machine)
 {
-	return machine->portlist.find("keypad_1") != NULL;
+	return machine->m_portlist.find("keypad_1") != NULL;
 }
 
 INLINE int a2_has_reset_dip(running_machine *machine)
 {
-	return machine->portlist.find("reset_dip") != NULL;
+	return machine->m_portlist.find("reset_dip") != NULL;
 }
 
 INLINE int a2_has_repeat(running_machine *machine)
 {
-	return machine->portlist.find("keyb_repeat") != NULL;
+	return machine->m_portlist.find("keyb_repeat") != NULL;
 }
 
 INLINE int a2_has_capslock(running_machine *machine)
@@ -451,7 +451,7 @@ static TIMER_CALLBACK(AY3600_poll)
 	{
 		reset_flag = 0;
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_RESET, CLEAR_LINE);
-		mame_schedule_soft_reset(machine);
+		machine->schedule_soft_reset();
 	}
 
 	/* run through real keys and see what's being pressed */

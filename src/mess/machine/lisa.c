@@ -1053,8 +1053,8 @@ NVRAM_HANDLER(lisa)
 
 		{
 			/* Now we copy the host clock into the Lisa clock */
-			mame_system_time systime;
-			mame_get_base_datetime(machine, &systime);
+			system_time systime;
+			machine->base_datetime(systime);
 
 			clock_regs.alarm = 0xfffffL;
 			/* The clock count starts on 1st January 1980 */

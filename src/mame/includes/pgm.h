@@ -63,11 +63,11 @@ public:
 
 	/* calendar */
 	UINT8        cal_val, cal_mask, cal_com, cal_cnt;
-	mame_system_time systime;
+	system_time  systime;
 
 	/* devices */
-	running_device *soundcpu;
-	running_device *prot;
+	cpu_device *soundcpu;
+	cpu_device *prot;
 	running_device *ics;
 };
 

@@ -366,10 +366,10 @@ READ16_HANDLER( neogeo_unmapped_r )
 static void calendar_init(running_machine *machine)
 {
 	/* set the celander IC to 'right now' */
-	mame_system_time systime;
-	mame_system_tm time;
+	system_time systime;
+	system_tm time;
 
-	mame_get_base_datetime(machine, &systime);
+	machine->base_datetime(&systime);
 	time = systime.local_time;
 
 	pd4990a.seconds = ((time.second / 10) << 4) + (time.second % 10);

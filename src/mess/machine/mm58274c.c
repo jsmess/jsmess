@@ -479,10 +479,10 @@ static DEVICE_START( mm58274c )
 static DEVICE_RESET( mm58274c )
 {
 	mm58274c_t *mm58274c = get_safe_token(device);
-	mame_system_time systime;
+	system_time systime;
 
 	/* get the current date/time from the core */
-	mame_get_current_datetime(device->machine, &systime);
+	device->machine->current_datetime(systime);
 
 	mm58274c->clk_set = systime.local_time.year & 3 << 2;
 	if (mm58274c->intf->mode24)

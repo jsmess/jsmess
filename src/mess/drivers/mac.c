@@ -790,7 +790,7 @@ static MACHINE_DRIVER_START( macii )
 	MDRV_DRIVER_DATA(mac_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68020_68851, 7833600*2)
+	MDRV_CPU_ADD("maincpu", M68020PMMU, 7833600*2)
 	MDRV_CPU_PROGRAM_MAP(macii_map)
 	MDRV_CPU_VBLANK_INT("screen", mac_cb264_vbl)
 

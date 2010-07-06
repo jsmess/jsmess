@@ -241,10 +241,10 @@ static struct {
 
 void europc_rtc_set_time(running_machine *machine)
 {
-	mame_system_time systime;
+	system_time systime;
 
 	/* get the current date/time from the core */
-	mame_get_current_datetime(machine, &systime);
+	machine->current_datetime(systime);
 
 	europc_rtc.data[0] = dec_2_bcd(systime.utc_time.second);
 	europc_rtc.data[1] = dec_2_bcd(systime.utc_time.minute);

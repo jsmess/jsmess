@@ -423,7 +423,7 @@ static messtest_result_t run_test(int flags, messtest_results *results)
 
 
 
-static void testmess_exit(running_machine *machine)
+static void testmess_exit(running_machine &machine)
 {
 	if (target != NULL)
 	{
@@ -435,8 +435,8 @@ static void testmess_exit(running_machine *machine)
 
 
 void osd_init(running_machine *machine)
-{
-	add_exit_callback(machine, testmess_exit);
+{	
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, testmess_exit);
 	target = render_target_alloc(machine, NULL, 0);
 	render_target_set_orientation(target, 0);
 }
@@ -493,7 +493,7 @@ static const input_setting_config *find_switch(running_machine *machine, const c
 
 	/* find switch with the name */
 	found = FALSE;
-	for (port = machine->portlist.first(); !found && (port != NULL); port = port->next())
+	for (port = machine->m_portlist.first(); !found && (port != NULL); port = port->next())
 	{
 		for (field = port->fieldlist; !found && (field != NULL); field = field->next)
 		{
@@ -935,14 +935,15 @@ static void command_verify_image(running_machine *machine)
 
 static void command_trace(running_machine *machine)
 {
-	running_device *cpu;
+	device_execute_interface *cpu;
 	int cpunum = 0;
 	FILE *file;
 	char filename[256];
-
-	for (cpu = cpu_first(machine); cpu != NULL; cpu = cpu_next(cpu))
+	for (bool gotone = machine->m_devicelist.first(cpu); gotone; gotone = cpu->next(cpu))
 	{
-		if (cpu_next(cpu_first(machine)) == NULL)
+		device_execute_interface *first = NULL;
+		machine->m_devicelist.first(first);
+		if (!cpu->next(first))
 			snprintf(filename, ARRAY_LENGTH(filename), "_%s.tr", current_testcase.name);
 		else
 			snprintf(filename, ARRAY_LENGTH(filename), "_%s.%d.tr", current_testcase.name, cpunum);
@@ -951,7 +952,7 @@ static void command_trace(running_machine *machine)
 		if (file)
 		{
 			report_message(MSG_INFO, "Tracing CPU #%d: %s", cpunum, filename);
-			debug_cpu_trace(cpu, file, FALSE, NULL);
+			debug_cpu_trace(downcast<cpu_device *>(&cpu->device()), file, FALSE, NULL);
 			fclose(file);
 		}
 
@@ -963,14 +964,14 @@ static void command_trace(running_machine *machine)
 
 static void command_soft_reset(running_machine *machine)
 {
-	mame_schedule_soft_reset(machine);
+	machine->schedule_soft_reset();
 }
 
 
 
 static void command_hard_reset(running_machine *machine)
 {
-	mame_schedule_hard_reset(machine);
+	machine->schedule_hard_reset();
 }
 
 
@@ -980,7 +981,7 @@ static void command_end(running_machine *machine)
 	/* at the end of our test */
 	state = STATE_DONE;
 	final_time = timer_get_time(machine);
-	mame_schedule_exit(machine);
+	machine->schedule_exit();
 }
 
 
@@ -1021,18 +1022,19 @@ void osd_update(running_machine *machine, int skip_redraw)
 	render_target_get_primitives(target);
 
 	/* don't do anything if we are initializing! */
-	switch(mame_get_phase(machine))
+	switch(machine->phase())
 	{
-		case MAME_PHASE_PREINIT:
-		case MAME_PHASE_INIT:
-		case MAME_PHASE_RESET:
+		case MACHINE_PHASE_PREINIT:
+		case MACHINE_PHASE_INIT:
+		case MACHINE_PHASE_RESET:
 			return;
+		default: break;
 	}
 
 	/* if we have already aborted or completed, our work is done */
 	if ((state == STATE_ABORTED) || (state == STATE_DONE))
 	{
-		mame_schedule_exit(machine);
+		machine->schedule_exit();
 		return;
 	}
 

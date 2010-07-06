@@ -454,10 +454,10 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	SoftwareList_SetDriver(hwndSoftwareList, s_config);
 
 	/* allocate the machine config */
-	machine_config *config = machine_config_alloc( drivers[drvindex]->machine_config );
+	machine_config *config = global_alloc(machine_config( drivers[drvindex]->machine_config ));
 
 	core_options *options = mame_options_init(NULL);
-	for (const device_config *dev = config->devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	for (const device_config *dev = config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
 
@@ -475,7 +475,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 						software_part *part = software_find_part(swinfo, NULL, NULL);
 
 						// search for a device with the right interface
-						for (bool gotone = config->devicelist.first(image); gotone; gotone = image->next(image))
+						for (bool gotone = config->m_devicelist.first(image); gotone; gotone = image->next(image))
 						{
 							const char *interface = image->image_interface();
 							if (interface != NULL)
@@ -495,7 +495,7 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	}
 
 	/* free the machine config */
-	machine_config_free( config );
+	global_free( config );
 }
 
 
@@ -520,9 +520,9 @@ BOOL MessApproveImageList(HWND hParent, int drvindex)
 		return TRUE;
 	}
 	// allocate the machine config
-	config = machine_config_alloc(drivers[drvindex]->machine_config);
+	config = global_alloc(machine_config(drivers[drvindex]->machine_config));
 
-	for (bool gotone = config->devicelist.first(dev); gotone; gotone = dev->next(dev))
+	for (bool gotone = config->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 	{
 		// confirm any mandatory devices are loaded
 		if (dev->must_be_loaded())
@@ -546,7 +546,7 @@ done:
 		win_message_box_utf8(hParent, szMessage, MAMEUINAME, MB_OK);
 	}
 
-	machine_config_free(config);
+	global_free(config);
 	return bResult;
 }
 
@@ -586,7 +586,7 @@ static void MessSpecifyImage(int drvindex, const device_config_image_interface *
 	if (device == NULL)
 	{
 		const device_config_image_interface *dev;
-		for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))
+		for (bool gotone = s_config->mconfig->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 		{			
 			s = GetSelectedSoftware(drvindex, s_config->mconfig, dev);
 			if ((s != NULL) && !mame_stricmp(s, pszFilename)) {
@@ -609,7 +609,7 @@ static void MessSpecifyImage(int drvindex, const device_config_image_interface *
 		if (file_extension != NULL)
 		{
 		    const device_config_image_interface *dev;
-			for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))
+			for (bool gotone = s_config->mconfig->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 			{				
 				s = GetSelectedSoftware(drvindex, s_config->mconfig, dev);
 				if (is_null_or_empty(s) && dev->uses_file_extension(file_extension)) {
@@ -640,7 +640,7 @@ static void MessRemoveImage(int drvindex, const char *pszFilename)
 	const device_config_image_interface *device;
 	const char *s;
 
-	for (bool gotone = s_config->mconfig->devicelist.first(device); gotone; gotone = device->next(device))
+	for (bool gotone = s_config->mconfig->m_devicelist.first(device); gotone; gotone = device->next(device))
 	{
 		s = GetSelectedSoftware(drvindex, s_config->mconfig, device);
 		if ((s != NULL) && !strcmp(pszFilename, s))
@@ -677,7 +677,7 @@ static void MessRefreshPicker(void)
 	// be problematic
 	ListView_SetItemState(hwndSoftware, -1, 0, LVIS_SELECTED);
 
-	for (bool gotone = s_config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))
+	for (bool gotone = s_config->mconfig->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 	{
 		pszSoftware = GetSelectedSoftware(s_config->driver_index, s_config->mconfig, dev);
 		if (pszSoftware && *pszSoftware)
@@ -880,7 +880,7 @@ static void SetupImageTypes(const machine_config *config, mess_image_type *types
 	{
 		const device_config_image_interface *device;
 		/* special case; all non-printer devices */
-		for (bool gotone = config->devicelist.first(device); gotone; gotone = device->next(device))
+		for (bool gotone = config->m_devicelist.first(device); gotone; gotone = device->next(device))
 		{
 			if (device->image_type() != IO_PRINTER)
 				SetupImageTypes(config, &types[num_extensions], count - num_extensions, FALSE, device);
@@ -933,7 +933,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config_ima
 	drvindex = Picker_GetSelectedItem(hwndList);
 
 	// allocate the machine config
-	config = machine_config_alloc(drivers[drvindex]->machine_config);
+	config = global_alloc(machine_config(drivers[drvindex]->machine_config));
 
 	SetupImageTypes(config, imagetypes, ARRAY_LENGTH(imagetypes), TRUE, dev);
 	cfd_res = CommonFileImageDialog(last_directory, cfd, filename, config, imagetypes);
@@ -949,7 +949,7 @@ static void MessSetupDevice(common_file_dialog_proc cfd, const device_config_ima
 		osd_free(utf8_filename);
 	}
 
-	machine_config_free(config);
+	global_free(config);
 }
 
 

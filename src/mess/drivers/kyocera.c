@@ -1312,8 +1312,8 @@ static I8085_CONFIG( kc85_i8085_config )
 {
 	DEVCB_NULL,				/* STATUS changed callback */
 	DEVCB_NULL,				/* INTE changed callback */
-	DEVCB_LINE(kc85_sid_r),	/* SID changed callback (8085A only) */
-	DEVCB_LINE(kc85_sod_w)	/* SOD changed callback (8085A only) */
+	DEVCB_LINE(kc85_sid_r),	/* SID changed callback (I8085A only) */
+	DEVCB_LINE(kc85_sod_w)	/* SOD changed callback (I8085A only) */
 };
 
 static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
@@ -1329,7 +1329,7 @@ static MACHINE_DRIVER_START( kc85 )
 	MDRV_DRIVER_DATA(kc85_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_4_9152MHz)
+	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(kc85_mem)
 	MDRV_CPU_IO_MAP(kc85_io)
 	MDRV_CPU_CONFIG(kc85_i8085_config)
@@ -1369,7 +1369,7 @@ static MACHINE_DRIVER_START( pc8201 )
 	MDRV_DRIVER_DATA(kc85_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_4_9152MHz)
+	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(pc8201_mem)
 	MDRV_CPU_IO_MAP(pc8201_io)
 	MDRV_CPU_CONFIG(kc85_i8085_config)
@@ -1436,7 +1436,7 @@ static MACHINE_DRIVER_START( tandy200 )
 	MDRV_DRIVER_DATA(tandy200_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(I8085_TAG, 8085A, XTAL_4_9152MHz)
+	MDRV_CPU_ADD(I8085_TAG, I8085A, XTAL_4_9152MHz)
 	MDRV_CPU_PROGRAM_MAP(tandy200_mem)
 	MDRV_CPU_IO_MAP(tandy200_io)
 	MDRV_CPU_CONFIG(kc85_i8085_config)

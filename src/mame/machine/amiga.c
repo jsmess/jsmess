@@ -1026,7 +1026,7 @@ static void blitter_setup(const address_space *space)
 	CUSTOM_REG(REG_DMACON) |= 0x4000;
 
 	/* set a timer */
-	timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( space->cpu, blittime ), 0);
+	timer_adjust_oneshot( amiga_blitter_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( blittime ), 0);
 }
 
 
@@ -1421,7 +1421,7 @@ WRITE16_HANDLER( amiga_custom_w )
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
-				timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( space->cpu, BLITTER_NASTY_DELAY ), 0);
+				timer_adjust_oneshot( amiga_blitter_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( BLITTER_NASTY_DELAY ), 0);
 
 			break;
 
@@ -1432,7 +1432,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
-				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( space->cpu, AMIGA_IRQ_DELAY_CYCLES ), 0);
+				timer_adjust_oneshot( amiga_irq_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( AMIGA_IRQ_DELAY_CYCLES ), 0);
 			else /* if we're disabling irq's, process right away */
 				update_irqs(space->machine);
 			break;
@@ -1575,7 +1575,7 @@ void amiga_add_autoconfig(running_machine *machine, const amiga_autoconfig_devic
 	autoconfig_device *dev, **d;
 
 	/* validate the data */
-	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call amiga_add_autoconfig at init time!");
+	assert_always(machine->phase() == MACHINE_PHASE_INIT, "Can only call amiga_add_autoconfig at init time!");
 	assert_always((device->size & (device->size - 1)) == 0, "device->size must be power of 2!");
 
 	/* allocate memory and link it in at the end of the list */

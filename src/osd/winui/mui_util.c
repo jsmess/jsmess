@@ -366,7 +366,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			int num_speakers;
 
 			/* Allocate machine config */
-			config = machine_config_alloc(gamedrv->machine_config);
+			config = global_alloc(machine_config(gamedrv->machine_config));
 
 			gameinfo->isClone = (GetParentRomSetIndex(gamedrv) != -1);
 			gameinfo->isBroken = ((gamedrv->flags & GAME_NOT_WORKING) != 0);
@@ -416,7 +416,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			{
 				const device_config_sound_interface *sound;
 				const char * const * samplenames = NULL;
-				for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound)) {
+				for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound)) {
 					if (sound->devconfig().type() == SOUND_SAMPLES)
 					{
 						const samples_interface *intf = (const samples_interface *)sound->devconfig().static_config();
@@ -431,7 +431,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 				}
 			}
 			/* Free the structure */
-			machine_config_free(config);
+			global_free(config);
 
 			gameinfo->usesTrackball = FALSE;
 			gameinfo->usesLightGun = FALSE;

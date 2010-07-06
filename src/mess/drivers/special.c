@@ -411,7 +411,7 @@ static const floppy_config specimx_floppy_config =
 /* Machine driver */
 static MACHINE_DRIVER_START( special )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", 8080, 2000000)
+    MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(specialist_mem)
     MDRV_MACHINE_RESET( special )
 

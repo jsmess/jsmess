@@ -228,7 +228,7 @@ INLINE void gb_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 static void gb_select_sprites( void )
 {
 	int	i, /*yindex,*/ line, height;
-	UINT8	*oam = gb_lcd.gb_oam->base.u8 + 39 * 4;
+	UINT8	*oam = gb_lcd.gb_oam->base() + 39 * 4;
 
 	gb_lcd.sprCount = 0;
 
@@ -285,8 +285,8 @@ INLINE void gb_update_sprites ( running_machine *machine )
 	yindex = gb_lcd.current_line;
 	line = gb_lcd.current_line + 16;
 
-	oam = gb_lcd.gb_oam->base.u8 + 39 * 4;
-	vram = gb_lcd.gb_vram->base.u8;
+	oam = gb_lcd.gb_oam->base() + 39 * 4;
+	vram = gb_lcd.gb_vram->base();
 	for (i = 39; i >= 0; i--)
 	{
 		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
@@ -528,8 +528,8 @@ INLINE void sgb_update_sprites (running_machine *machine)
 	yindex = gb_lcd.current_line + SGB_YOFFSET;
 	line = gb_lcd.current_line + 16;
 
-	oam = gb_lcd.gb_oam->base.u8 + 39 * 4;
-	vram = gb_lcd.gb_vram->base.u8;
+	oam = gb_lcd.gb_oam->base() + 39 * 4;
+	vram = gb_lcd.gb_vram->base();
 	for (i = 39; i >= 0; i--)
 	{
 		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
@@ -889,7 +889,7 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 	yindex = gb_lcd.current_line;
 	line = gb_lcd.current_line + 16;
 
-	oam = gb_lcd.gb_oam->base.u8 + 39 * 4;
+	oam = gb_lcd.gb_oam->base() + 39 * 4;
 	for (i = 39; i >= 0; i--)
 	{
 		/* if sprite is on current line && x-coordinate && x-coordinate is < 168 */
@@ -907,11 +907,11 @@ INLINE void cgb_update_sprites ( running_machine *machine )
 			xindex = oam[1] - 8;
 			if (oam[3] & 0x40)		   /* flip y ? */
 			{
-				data = *((UINT16 *) &gb_lcd.gb_vram->base.u8[ ((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (height - 1 - line + oam[0]) * 2]);
+				data = *((UINT16 *) &gb_lcd.gb_vram->base()[ ((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (height - 1 - line + oam[0]) * 2]);
 			}
 			else
 			{
-				data = *((UINT16 *) &gb_lcd.gb_vram->base.u8[ ((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (line - oam[0]) * 2]);
+				data = *((UINT16 *) &gb_lcd.gb_vram->base()[ ((oam[3] & 0x8)<<10) + (oam[2] & tilemask) * 16 + (line - oam[0]) * 2]);
 			}
 #ifndef LSB_FIRST
 			data = (data << 8) | (data >> 8);
@@ -1310,17 +1310,17 @@ void gb_video_reset( running_machine *machine, int mode )
 	if (mode == GB_VIDEO_CGB) vram_size = 0x4000;
 
 	/* free regions if already allocated */
-	if (memory_region(machine, "gfx1"))		memory_region_free(machine, "gfx1");
-	if (memory_region(machine, "gfx2"))		memory_region_free(machine, "gfx2");
+	if (memory_region(machine, "gfx1"))		machine->region_free("gfx1");
+	if (memory_region(machine, "gfx2"))		machine->region_free("gfx2");
 
-	gb_lcd.gb_vram = memory_region_alloc( machine, "gfx1", vram_size, 0 );
-	gb_lcd.gb_oam = memory_region_alloc( machine, "gfx2", 0x100, 0 );
-	memset( gb_lcd.gb_vram->base.u8, 0, vram_size );
+	gb_lcd.gb_vram = machine->region_alloc("gfx1", vram_size, 0 );
+	gb_lcd.gb_oam = machine->region_alloc("gfx2", 0x100, 0 );
+	memset( gb_lcd.gb_vram->base(), 0, vram_size );
 
-	gb_lcd.gb_vram_ptr = gb_lcd.gb_vram->base.u8;
-	gb_lcd.gb_chrgen = gb_lcd.gb_vram->base.u8;
-	gb_lcd.gb_bgdtab = gb_lcd.gb_vram->base.u8 + 0x1C00;
-	gb_lcd.gb_wndtab = gb_lcd.gb_vram->base.u8 + 0x1C00;
+	gb_lcd.gb_vram_ptr = gb_lcd.gb_vram->base();
+	gb_lcd.gb_chrgen = gb_lcd.gb_vram->base();
+	gb_lcd.gb_bgdtab = gb_lcd.gb_vram->base() + 0x1C00;
+	gb_lcd.gb_wndtab = gb_lcd.gb_vram->base() + 0x1C00;
 
 	gb_lcd.gb_vid_regs[0x06] = 0xFF;
 	for( i = 0x0c; i < _NR_GB_VID_REGS; i++ )
@@ -1349,7 +1349,7 @@ void gb_video_reset( running_machine *machine, int mode )
 		/* set the scanline update function */
 		update_scanline = gb_update_scanline;
 
-		memcpy( gb_lcd.gb_oam->base.u8, dmg_oam_fingerprint, 0x100 );
+		memcpy( gb_lcd.gb_oam->base(), dmg_oam_fingerprint, 0x100 );
 
 		break;
 	case GB_VIDEO_MGB:
@@ -1358,13 +1358,13 @@ void gb_video_reset( running_machine *machine, int mode )
 		/* Initialize part of VRAM. This code must be deleted when we have added the bios dump */
 		for( i = 1; i < 0x0D; i++ )
 		{
-			gb_lcd.gb_vram->base.u8[ 0x1903 + i ] = i;
-			gb_lcd.gb_vram->base.u8[ 0x1923 + i ] = i + 0x0C;
+			gb_lcd.gb_vram->base()[ 0x1903 + i ] = i;
+			gb_lcd.gb_vram->base()[ 0x1923 + i ] = i + 0x0C;
 		}
-		gb_lcd.gb_vram->base.u8[ 0x1910 ] = 0x19;
+		gb_lcd.gb_vram->base()[ 0x1910 ] = 0x19;
 
 
-		memcpy( gb_lcd.gb_oam->base.u8, mgb_oam_fingerprint, 0x100 );
+		memcpy( gb_lcd.gb_oam->base(), mgb_oam_fingerprint, 0x100 );
 
 		/* Make sure the VBlank interrupt is set when the first instruction gets executed */
 		timer_set(machine,  cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, gb_video_init_vbl );
@@ -1391,12 +1391,12 @@ void gb_video_reset( running_machine *machine, int mode )
 		/* set the scanline update function */
 		update_scanline = cgb_update_scanline;
 
-		memcpy( gb_lcd.gb_oam->base.u8, cgb_oam_fingerprint, 0x100 );
+		memcpy( gb_lcd.gb_oam->base(), cgb_oam_fingerprint, 0x100 );
 
-		gb_lcd.gb_chrgen = gb_lcd.gb_vram->base.u8;
-		gb_lcd.gbc_chrgen = gb_lcd.gb_vram->base.u8 + 0x2000;
-		gb_lcd.gb_bgdtab = gb_lcd.gb_wndtab = gb_lcd.gb_vram->base.u8 + 0x1C00;
-		gb_lcd.gbc_bgdtab = gb_lcd.gbc_wndtab = gb_lcd.gb_vram->base.u8 + 0x3C00;
+		gb_lcd.gb_chrgen = gb_lcd.gb_vram->base();
+		gb_lcd.gbc_chrgen = gb_lcd.gb_vram->base() + 0x2000;
+		gb_lcd.gb_bgdtab = gb_lcd.gb_wndtab = gb_lcd.gb_vram->base() + 0x1C00;
+		gb_lcd.gbc_bgdtab = gb_lcd.gbc_wndtab = gb_lcd.gb_vram->base() + 0x3C00;
 
 		/* HDMA disabled */
 		gb_lcd.hdma_enabled = 0;
@@ -2065,7 +2065,7 @@ WRITE8_HANDLER( gb_vram_w )
 
 READ8_HANDLER( gb_oam_r )
 {
-	return ( gb_lcd.oam_locked == LOCKED ) ? 0xFF : gb_lcd.gb_oam->base.u8[offset];
+	return ( gb_lcd.oam_locked == LOCKED ) ? 0xFF : gb_lcd.gb_oam->base()[offset];
 }
 
 WRITE8_HANDLER( gb_oam_w )
@@ -2074,7 +2074,7 @@ WRITE8_HANDLER( gb_oam_w )
 	{
 		return;
 	}
-	gb_lcd.gb_oam->base.u8[offset] = data;
+	gb_lcd.gb_oam->base()[offset] = data;
 }
 
 WRITE8_HANDLER ( gb_video_w )
@@ -2082,10 +2082,10 @@ WRITE8_HANDLER ( gb_video_w )
 	switch (offset)
 	{
 	case 0x00:						/* LCDC - LCD Control */
-		gb_lcd.gb_chrgen = gb_lcd.gb_vram->base.u8 + ((data & 0x10) ? 0x0000 : 0x0800);
+		gb_lcd.gb_chrgen = gb_lcd.gb_vram->base() + ((data & 0x10) ? 0x0000 : 0x0800);
 		gb_lcd.gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
-		gb_lcd.gb_bgdtab = gb_lcd.gb_vram->base.u8 + ((data & 0x08) ? 0x1C00 : 0x1800 );
-		gb_lcd.gb_wndtab = gb_lcd.gb_vram->base.u8 + ((data & 0x40) ? 0x1C00 : 0x1800 );
+		gb_lcd.gb_bgdtab = gb_lcd.gb_vram->base() + ((data & 0x08) ? 0x1C00 : 0x1800 );
+		gb_lcd.gb_wndtab = gb_lcd.gb_vram->base() + ((data & 0x40) ? 0x1C00 : 0x1800 );
 		/* if LCD controller is switched off, set STAT and LY to 00 */
 		if ( ! ( data & 0x80 ) )
 		{
@@ -2170,7 +2170,7 @@ WRITE8_HANDLER ( gb_video_w )
 		break;
 	case 0x06:						/* DMA - DMA Transfer and Start Address */
 		{
-			UINT8 *P = gb_lcd.gb_oam->base.u8;
+			UINT8 *P = gb_lcd.gb_oam->base();
 			offset = (UINT16) data << 8;
 			for (data = 0; data < 0xA0; data++)
 				*P++ = memory_read_byte (space, offset++);
@@ -2234,13 +2234,13 @@ WRITE8_HANDLER ( gbc_video_w )
 	switch( offset )
 	{
 	case 0x00:      /* LCDC - LCD Control */
-		gb_lcd.gb_chrgen = gb_lcd.gb_vram->base.u8 + ((data & 0x10) ? 0x0000 : 0x0800);
-		gb_lcd.gbc_chrgen = gb_lcd.gb_vram->base.u8 + ((data & 0x10) ? 0x2000 : 0x2800);
+		gb_lcd.gb_chrgen = gb_lcd.gb_vram->base() + ((data & 0x10) ? 0x0000 : 0x0800);
+		gb_lcd.gbc_chrgen = gb_lcd.gb_vram->base() + ((data & 0x10) ? 0x2000 : 0x2800);
 		gb_lcd.gb_tile_no_mod = (data & 0x10) ? 0x00 : 0x80;
-		gb_lcd.gb_bgdtab = gb_lcd.gb_vram->base.u8 + ((data & 0x08) ? 0x1C00 : 0x1800);
-		gb_lcd.gbc_bgdtab = gb_lcd.gb_vram->base.u8 + ((data & 0x08) ? 0x3C00 : 0x3800);
-		gb_lcd.gb_wndtab = gb_lcd.gb_vram->base.u8 + ((data & 0x40) ? 0x1C00 : 0x1800);
-		gb_lcd.gbc_wndtab = gb_lcd.gb_vram->base.u8 + ((data & 0x40) ? 0x3C00 : 0x3800);
+		gb_lcd.gb_bgdtab = gb_lcd.gb_vram->base() + ((data & 0x08) ? 0x1C00 : 0x1800);
+		gb_lcd.gbc_bgdtab = gb_lcd.gb_vram->base() + ((data & 0x08) ? 0x3C00 : 0x3800);
+		gb_lcd.gb_wndtab = gb_lcd.gb_vram->base() + ((data & 0x40) ? 0x1C00 : 0x1800);
+		gb_lcd.gbc_wndtab = gb_lcd.gb_vram->base() + ((data & 0x40) ? 0x3C00 : 0x3800);
 		/* if LCD controller is switched off, set STAT to 00 */
 		if ( ! ( data & 0x80 ) )
 		{
@@ -2327,7 +2327,7 @@ WRITE8_HANDLER ( gbc_video_w )
 		logerror( "Write to undocumented register: %X = %X\n", offset, data );
 		break;
 	case 0x0F:		/* VBK - VRAM bank select */
-		gb_lcd.gb_vram_ptr = gb_lcd.gb_vram->base.u8 + ( data & 0x01 ) * 0x2000;
+		gb_lcd.gb_vram_ptr = gb_lcd.gb_vram->base() + ( data & 0x01 ) * 0x2000;
 		data |= 0xFE;
 		break;
 	case 0x11:      /* HDMA1 - HBL General DMA - Source High */

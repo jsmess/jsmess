@@ -26,7 +26,7 @@ static struct mpc105_info *mpc105;
 
 static void mpc105_update_memory(running_machine *machine)
 {
-	running_device *cpu;
+	const cpu_device *cpu;
 	int bank;
 	offs_t begin, end;
 	char bank_str[10];
@@ -37,9 +37,9 @@ static void mpc105_update_memory(running_machine *machine)
 	if (mpc105->bank_base > 0)
 	{
 		/* TODO: Fix me properly! changing all cpus???? */
-		for (cpu = cpu_first(machine); cpu != NULL; cpu = cpu_next(cpu))
+		for (bool gotone = machine->config->m_devicelist.first(cpu); gotone; gotone = cpu->typenext())
 		{
-			const address_space *space = cpu_get_address_space( cpu, ADDRESS_SPACE_PROGRAM );
+			const address_space *space = cpu_get_address_space( (cpu_device *)cpu, ADDRESS_SPACE_PROGRAM );
 
 			/* first clear everything out */
 			memory_nop_read(space, 0x00000000, 0x3FFFFFFF, 0, 0);
@@ -68,9 +68,9 @@ static void mpc105_update_memory(running_machine *machine)
 				if (mpc105->bank_base > 0)
 				{
 					/* TODO: Fix me properly! changing all cpus??? */
-					for (cpu = cpu_first(machine); cpu != NULL; cpu = cpu_next(cpu))
+					for (bool gotone = machine->config->m_devicelist.first(cpu); gotone; gotone = cpu->typenext())
 					{
-						const address_space *space = cpu_get_address_space( cpu, ADDRESS_SPACE_PROGRAM );
+						const address_space *space = cpu_get_address_space( (cpu_device *)cpu, ADDRESS_SPACE_PROGRAM );
 
 						memory_install_read64_handler(space, begin, end,
 							0, 0, (read64_space_func) (FPTR)(bank + mpc105->bank_base));

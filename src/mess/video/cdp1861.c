@@ -42,7 +42,7 @@ struct _cdp1861_t
 	emu_timer *efx_timer;			/* EFx timer */
 	emu_timer *dma_timer;			/* DMA timer */
 
-	running_device *cpu;
+	cpu_device *cpu;
 };
 
 /***************************************************************************
@@ -154,7 +154,7 @@ static TIMER_CALLBACK( cdp1861_dma_tick )
 			}
 		}
 
-		timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(cdp1861->cpu, CDP1861_CYCLES_DMA_WAIT), 0);
+		timer_adjust_oneshot(cdp1861->dma_timer, cdp1861->cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_WAIT), 0);
 
 		cdp1861->dmaout = 0;
 	}
@@ -168,7 +168,7 @@ static TIMER_CALLBACK( cdp1861_dma_tick )
 			}
 		}
 
-		timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(cdp1861->cpu, CDP1861_CYCLES_DMA_ACTIVE), 0);
+		timer_adjust_oneshot(cdp1861->dma_timer, cdp1861->cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_ACTIVE), 0);
 
 		cdp1861->dmaout = 1;
 	}
@@ -256,7 +256,7 @@ static DEVICE_START( cdp1861 )
 	devcb_resolve_write_line(&cdp1861->out_efx_func, &intf->out_efx_func, device);
 
 	/* get the cpu */
-	cdp1861->cpu = devtag_get_device(device->machine, intf->cpu_tag);
+	cdp1861->cpu = device->machine->device<cpu_device>(intf->cpu_tag);
 
 	/* get the screen device */
 	cdp1861->screen =  device->machine->device<screen_device>(intf->screen_tag);
@@ -288,7 +288,7 @@ static DEVICE_RESET( cdp1861 )
 
 	timer_adjust_oneshot(cdp1861->int_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_INT_START, 0), 0);
 	timer_adjust_oneshot(cdp1861->efx_timer, cdp1861->screen->time_until_pos(CDP1861_SCANLINE_EFX_TOP_START, 0), 0);
-	timer_adjust_oneshot(cdp1861->dma_timer, cpu_clocks_to_attotime(cdp1861->cpu, CDP1861_CYCLES_DMA_START), 0);
+	timer_adjust_oneshot(cdp1861->dma_timer, cdp1861->cpu->cycles_to_attotime(CDP1861_CYCLES_DMA_START), 0);
 
 	cdp1861->disp = 0;
 	cdp1861->dmaout = 0;

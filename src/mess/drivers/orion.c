@@ -123,7 +123,7 @@ static const floppy_config orion_floppy_config =
 
 /* Machine driver */
 static MACHINE_DRIVER_START( orion128 )
-    MDRV_CPU_ADD("maincpu", 8080, 2000000)
+    MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(orion128_mem)
     MDRV_CPU_IO_MAP(orion128_io)
 

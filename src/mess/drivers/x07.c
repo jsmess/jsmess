@@ -122,8 +122,8 @@ static void t6834_cmd (running_machine *machine, UINT8 cmd)
 
 	case 0x01:	//DATA$ TIME$ read
 		{
-		mame_system_time systime;
-		mame_get_current_datetime(machine, &systime);
+		system_time systime;
+		machine->current_datetime(systime);
 		state->out_data[state->out_size++] = (systime.local_time.year>>8) & 0xFF;
 		state->out_data[state->out_size++] = systime.local_time.year & 0xFF;
 		state->out_data[state->out_size++] = systime.local_time.month + 1;

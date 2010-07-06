@@ -114,7 +114,7 @@ static int input_item_from_serial_number(running_machine *machine, int serial_nu
 	const input_setting_config *this_setting = NULL;
 
 	i = 0;
-	for (this_port = machine->portlist.first(); (i != serial_number) && (this_port != NULL); this_port = this_port->next())
+	for (this_port = machine->m_portlist.first(); (i != serial_number) && (this_port != NULL); this_port = this_port->next())
 	{
 		i++;
 		for (this_field = this_port->fieldlist; (i != serial_number) && (this_field != NULL); this_field = this_field->next)
@@ -156,7 +156,7 @@ static int serial_number_from_input_item(running_machine *machine, const input_p
 	const input_setting_config *this_setting;
 
 	i = 0;
-	for (this_port = machine->portlist.first(); this_port != NULL; this_port = this_port->next())
+	for (this_port = machine->m_portlist.first(); this_port != NULL; this_port = this_port->next())
 	{
 		if ((port == this_port) && (field == NULL) && (setting == NULL))
 			return i;
@@ -203,7 +203,7 @@ static void customize_input(running_machine *machine, HWND wnd, const char *titl
 	if (!dlg)
 		goto done;
 
-	for (port = machine->portlist.first(); port != NULL; port = port->next())
+	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -339,7 +339,7 @@ static void customize_switches(running_machine *machine, HWND wnd, const char* t
 	if (!dlg)
 		goto done;
 
-	for (port = machine->portlist.first(); port != NULL; port = port->next())
+	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -479,7 +479,7 @@ static void customize_analogcontrols(running_machine *machine, HWND wnd)
 	if (!dlg)
 		goto done;
 
-	for (port = machine->portlist.first(); port != NULL; port = port->next())
+	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -567,7 +567,7 @@ static char *win_dirname(const char *filename)
 //============================================================
 
 static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
-	DWORD fileproc_flags, void (*mameproc)(running_machine *machine, const char *),
+	DWORD fileproc_flags, bool is_load,
 	running_machine *machine)
 {
 	win_open_file_name ofn;
@@ -600,7 +600,11 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 		else
 			snprintf(state_filename, ARRAY_LENGTH(state_filename), "%s", ofn.filename);
 
-		mameproc(machine, state_filename);
+		if (is_load) {
+			machine->schedule_load(state_filename);
+		} else {
+			machine->schedule_save(state_filename);
+		}
 	}
 	if (dir)
 		free(dir);
@@ -610,17 +614,17 @@ static void state_dialog(HWND wnd, win_file_dialog_type dlgtype,
 
 static void state_load(HWND wnd, running_machine *machine)
 {
-	state_dialog(wnd, WIN_FILE_DIALOG_OPEN, OFN_FILEMUSTEXIST, mame_schedule_load, machine);
+	state_dialog(wnd, WIN_FILE_DIALOG_OPEN, OFN_FILEMUSTEXIST, TRUE, machine);
 }
 
 static void state_save_as(HWND wnd, running_machine *machine)
 {
-	state_dialog(wnd, WIN_FILE_DIALOG_SAVE, OFN_OVERWRITEPROMPT, mame_schedule_save, machine);
+	state_dialog(wnd, WIN_FILE_DIALOG_SAVE, OFN_OVERWRITEPROMPT, FALSE, machine);
 }
 
 static void state_save(running_machine *machine)
 {
-	mame_schedule_save(machine, state_filename);
+	machine->schedule_save(state_filename);
 }
 
 
@@ -996,7 +1000,11 @@ done:
 
 static void pause(running_machine *machine)
 {
-	mame_pause(machine, !winwindow_ui_is_paused(machine));
+	if (!winwindow_ui_is_paused(machine)) {
+		machine->pause();
+	} else {
+		machine->resume();
+	}
 }
 
 
@@ -1142,7 +1150,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	int child_count = 0;
 
 	use_input_categories = 0;
-	for (port = machine->portlist.first(); port != NULL; port = port->next())
+	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1161,7 +1169,7 @@ static void setup_joystick_menu(running_machine *machine, HMENU menu_bar)
 	if (use_input_categories)
 	{
 		// using input categories
-		for (port = machine->portlist.first(); port != NULL; port = port->next())
+		for (port = machine->m_portlist.first(); port != NULL; port = port->next())
 		{
 			for (field = port->fieldlist; field != NULL; field = field->next)
 			{
@@ -1296,7 +1304,7 @@ static void prepare_menus(HWND wnd)
 	has_misc		= input_has_input_class(window->machine, INPUT_CLASS_MISC);
 
 	has_analog = 0;
-	for (port = window->machine->portlist.first(); port != NULL; port = port->next())
+	for (port = window->machine->m_portlist.first(); port != NULL; port = port->next())
 	{
 		for (field = port->fieldlist; field != NULL; field = field->next)
 		{
@@ -1351,7 +1359,7 @@ static void prepare_menus(HWND wnd)
 	// if we are using categorized input, we need to properly checkmark the categories
 	if (use_input_categories)
 	{
-		for (port = window->machine->portlist.first(); port != NULL; port = port->next())
+		for (port = window->machine->m_portlist.first(); port != NULL; port = port->next())
 		{
 			for (field = port->fieldlist; field != NULL; field = field->next)
 			{
@@ -1394,7 +1402,7 @@ static void prepare_menus(HWND wnd)
 
 	int cnt = 0;
 	// then set up the actual devices
-	for (bool gotone = window->machine->devicelist.first(img); gotone; gotone = img->next(img))
+	for (bool gotone = window->machine->m_devicelist.first(img); gotone; gotone = img->next(img))
 	{
 		new_item = ID_DEVICE_0 + (cnt * DEVOPTION_MAX);
 		flags_for_exists = MF_STRING;
@@ -1427,7 +1435,7 @@ static void prepare_menus(HWND wnd)
 		}
 		s = img->exists() ? img->filename() : "[empty slot]";
 
-		snprintf(buf, ARRAY_LENGTH(buf), "%s: %s", img->image_config().name(), s);
+		snprintf(buf, ARRAY_LENGTH(buf), "%s: %s", img->image_config().devconfig().name(), s);
 		win_append_menu_utf8(device_menu, MF_POPUP, (UINT_PTR)sub_menu, buf);
 
 		cnt++;
@@ -1718,7 +1726,7 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_FILE_EXIT_NEWUI:
-			mame_schedule_exit(window->machine);
+			window->machine->schedule_exit();
 			break;
 
 		case ID_EDIT_PASTE:
@@ -1758,11 +1766,11 @@ static int invoke_command(HWND wnd, UINT command)
 			break;
 
 		case ID_OPTIONS_HARDRESET:
-			mame_schedule_hard_reset(window->machine);
+			window->machine->schedule_hard_reset();
 			break;
 
 		case ID_OPTIONS_SOFTRESET:
-			mame_schedule_soft_reset(window->machine);
+			window->machine->schedule_soft_reset();
 			break;
 
 #if HAS_PROFILER
@@ -1772,7 +1780,7 @@ static int invoke_command(HWND wnd, UINT command)
 #endif // HAS_PROFILER
 
 		case ID_OPTIONS_DEBUGGER:
-			debug_cpu_halt_on_next_instruction(debug_cpu_get_visible_cpu(window->machine), "User-initiated break\n");
+			debug_cpu_get_visible_cpu(window->machine)->debug()->halt_on_next_instruction("User-initiated break\n");
 			break;
 
 		case ID_OPTIONS_CONFIGURATION:

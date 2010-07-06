@@ -397,11 +397,11 @@ static TIMER_CALLBACK( pcf8593_timer_callback )
 void pcf8593_load(running_device *device, mame_file *file)
 {
 	pcf8593_t *rtc = get_token(device);
-	mame_system_time systime;
+	system_time systime;
 
 	_logerror( 0, ("pcf8593_load (%p)\n", file));
 	mame_fread( file, rtc->data, sizeof(rtc->data));
-	mame_get_current_datetime(device->machine, &systime);
+	device->machine->current_datetime(systime);
 	pcf8593_set_date(device, systime.local_time.year, systime.local_time.month + 1, systime.local_time.mday);
 	pcf8593_set_time(device, systime.local_time.hour, systime.local_time.minute, systime.local_time.second);
 }

@@ -916,7 +916,7 @@ UINT8 apple2_getfloatingbusvalue(running_machine *machine)
 
 	// video scanner data
 	//
-	i = cputag_get_total_cycles(machine, "maincpu") % kClocksPerVSync; // cycles into this VSync
+	i = (machine->device<cpu_device>("maincpu"))->total_cycles() % kClocksPerVSync; // cycles into this VSync
 
 	// machine state switches
 	//
@@ -1027,23 +1027,23 @@ UINT8 apple2_getfloatingbusvalue(running_machine *machine)
  * Machine reset
  * ----------------------------------------------------------------------- */
 
-static void apple2_reset(running_machine *machine)
+static void apple2_reset(running_machine &machine)
 {
 	int need_intcxrom;
 
-	need_intcxrom = !strcmp(machine->gamedrv->name, "apple2c")
-		|| !strcmp(machine->gamedrv->name, "apple2c0")
-		|| !strcmp(machine->gamedrv->name, "apple2c3")
-		|| !strcmp(machine->gamedrv->name, "apple2c4")
-		|| !strcmp(machine->gamedrv->name, "prav8c")
-		|| !strcmp(machine->gamedrv->name, "apple2cp")
-		|| !strncmp(machine->gamedrv->name, "apple2g", 7);
-	apple2_setvar(machine, need_intcxrom ? VAR_INTCXROM : 0, ~0);
+	need_intcxrom = !strcmp(machine.gamedrv->name, "apple2c")
+		|| !strcmp(machine.gamedrv->name, "apple2c0")
+		|| !strcmp(machine.gamedrv->name, "apple2c3")
+		|| !strcmp(machine.gamedrv->name, "apple2c4")
+		|| !strcmp(machine.gamedrv->name, "prav8c")
+		|| !strcmp(machine.gamedrv->name, "apple2cp")
+		|| !strncmp(machine.gamedrv->name, "apple2g", 7);
+	apple2_setvar(&machine, need_intcxrom ? VAR_INTCXROM : 0, ~0);
 
 	// ROM 0 cannot boot unless language card bank 2 is write-enabled (but read ROM) on startup
-	if (!strncmp(machine->gamedrv->name, "apple2g", 7))
+	if (!strncmp(machine.gamedrv->name, "apple2g", 7))
 	{
-		apple2_setvar(machine, VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
+		apple2_setvar(&machine, VAR_LCWRITE|VAR_LCRAM2, VAR_LCWRITE | VAR_LCRAM | VAR_LCRAM2);
 	}
 
 	a2_speaker_state = 0;
@@ -1597,7 +1597,7 @@ void apple2_init_common(running_machine *machine)
 	apple2_fdc_diskreg = 0;
 
 	AY3600_init(machine);
-	add_reset_callback(machine, apple2_reset);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, apple2_reset);
 
 	/* state save registers */
 	state_save_register_global(machine, apple2_flags);
@@ -1640,7 +1640,7 @@ MACHINE_START( apple2 )
 	apple2_setup_memory(machine, &mem_cfg);
 
 	/* perform initial reset */
-	apple2_reset(machine);
+	apple2_reset(*machine);
 }
 
 

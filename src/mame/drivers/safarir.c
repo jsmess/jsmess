@@ -135,7 +135,7 @@ static PALETTE_INIT( safarir )
 {
 	int i;
 
-	for (i = 0; i < machine->config->total_colors / 2; i++)
+	for (i = 0; i < machine->total_colors() / 2; i++)
 	{
 		palette_set_color(machine, (i * 2) + 0, RGB_BLACK);
 		palette_set_color(machine, (i * 2) + 1, MAKE_RGB(pal1bit(i >> 2), pal1bit(i >> 1), pal1bit(i >> 0)));
@@ -401,7 +401,7 @@ static MACHINE_DRIVER_START( safarir )
 	MDRV_DRIVER_DATA( safarir_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8085A, 18000000/8)	/* 2.25 MHz ? */
+	MDRV_CPU_ADD("maincpu", I8085A, 18000000/8)	/* 2.25 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_START(safarir)

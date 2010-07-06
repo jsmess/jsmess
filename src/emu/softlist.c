@@ -991,11 +991,11 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 	else
 	{
 		/* Loop through all the software lists named in the driver */
-		for (device_t *swlists = image->device().machine->devicelist.first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
+		for (device_t *swlists = image->device().machine->m_devicelist.first(SOFTWARE_LIST); swlists != NULL; swlists = swlists->typenext())
 		{
 			if ( swlists )
 			{
-				
+
 				software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(&swlists->baseconfig())->inline_config();
 				UINT32 i = DEVINFO_STR_SWLIST_0;
 
@@ -1010,7 +1010,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 							software_list_close( software_list_ptr );
 						}
 
-						software_list_ptr = software_list_open( mame_options(), swlist_name, FALSE, NULL );
+						software_list_ptr = software_list_open( image->device().machine->options(), swlist_name, FALSE, NULL );
 
 						if ( software_list_ptr )
 						{
@@ -1026,6 +1026,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 				}
 			}
 		}
+
 		/* If not found try to load the software list using the driver name */
 		if ( ! software_part_ptr )
 		{
@@ -1036,7 +1037,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 				software_list_close( software_list_ptr );
 			}
 
-			software_list_ptr = software_list_open( mame_options(), swlist_name, FALSE, NULL );
+			software_list_ptr = software_list_open( image->device().machine->options(), swlist_name, FALSE, NULL );
 
 			if ( software_list_ptr )
 			{
@@ -1062,7 +1063,7 @@ bool load_software_part(device_image_interface *image, const char *path, softwar
 				software_list_close( software_list_ptr );
 			}
 
-			software_list_ptr = software_list_open( mame_options(), swlist_name, FALSE, NULL );
+			software_list_ptr = software_list_open( image->device().machine->options(), swlist_name, FALSE, NULL );
 
 			if ( software_list_ptr )
 			{
@@ -1327,7 +1328,7 @@ struct _software_entry_state
 /* populate a specific list */
 static void ui_mess_menu_populate_software_entries(running_machine *machine, ui_menu *menu, char *list_name, device_image_interface* image)
 {
-	software_list *list = software_list_open(mame_options(), list_name, FALSE, NULL);
+	software_list *list = software_list_open(machine->options(), list_name, FALSE, NULL);
 	const char *interface = image->image_config().image_interface();
 	if (list)
 	{
@@ -1363,10 +1364,10 @@ void ui_mess_menu_software_list(running_machine *machine, ui_menu *menu, void *p
 
 	if (event != NULL && event->iptkey == IPT_UI_SELECT && event->itemref != NULL)
 	{
-		device_image_interface *sel_image = sw_state->image;
+		device_image_interface *image = sw_state->image;
 		software_entry_state *entry = (software_entry_state *) event->itemref;
-		if (sel_image != NULL)
-			sel_image->load(entry->short_name);
+		if (image != NULL)
+			image->load(entry->short_name);
 		else
 			popmessage("No matching device found for interface '%s'!", entry->interface);
 	}
@@ -1377,8 +1378,8 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 {
 	bool haveCompatible = FALSE;
 	const char *interface = image->image_config().image_interface();
-	
-	for (const device_config *dev = machine->config->devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+
+	for (const device_config *dev = machine->config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
 
@@ -1397,7 +1398,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 						if (strcmp(interface,part->interface_)==0) {
 							found = TRUE;
 						}
-					}					
+					}
 					if (found) {
 						ui_menu_item_append(menu, list->description, NULL, 0, swlist->list_name[i]);
 					}
@@ -1407,8 +1408,8 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 			}
 		}
 	}
-	
-	for (const device_config *dev = machine->config->devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+
+	for (const device_config *dev = machine->config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
 
@@ -1427,7 +1428,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 						if (strcmp(interface,part->interface_)==0) {
 							found = TRUE;
 						}
-					}					
+					}
 					if (found) {
 						if (!haveCompatible) {
 							ui_menu_item_append(menu, "[compatible lists]", NULL, 0, NULL);
@@ -1441,7 +1442,7 @@ static void ui_mess_menu_populate_software_list(running_machine *machine, ui_men
 			}
 		}
 	}
-	
+
 }
 
 void ui_image_menu_software(running_machine *machine, ui_menu *menu, void *parameter, void *state)

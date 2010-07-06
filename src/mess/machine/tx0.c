@@ -152,7 +152,7 @@ MACHINE_RESET( tx0 )
 }
 
 
-static void tx0_machine_stop(running_machine *machine)
+static void tx0_machine_stop(running_machine &machine)
 {
 	/* the core will take care of freeing the timers, BUT we must set the variables
     to NULL if we don't want to risk confusing the tape image init function */
@@ -167,7 +167,7 @@ MACHINE_START( tx0 )
 	typewriter.prt_timer = timer_alloc(machine, prt_callback, NULL);
 	dis_timer = timer_alloc(machine, dis_callback, NULL);
 
-	add_exit_callback(machine, tx0_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, tx0_machine_stop);
 }
 
 

@@ -107,9 +107,9 @@ READ8_DEVICE_HANDLER( msm58321_r )
 	{
 		if (msm58321->read)
 		{
-			mame_system_time systime;
+			system_time systime;
 
-			mame_get_current_datetime(device->machine, &systime);
+			device->machine->current_datetime(systime);
 
 			switch (msm58321->latch)
 			{

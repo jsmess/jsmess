@@ -472,14 +472,14 @@ static const struct WD33C93interface scsi_intf =
 	&scsi_irq,		/* command completion IRQ */
 };
 
-static void ip204415_exit(running_machine *machine)
+static void ip204415_exit(running_machine &machine)
 {
 	wd33c93_exit(&scsi_intf);
 }
 
 static DRIVER_INIT( ip204415 )
 {
-	add_exit_callback(machine, ip204415_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, ip204415_exit);
 }
 
 // sgi_mc_update wants once every millisecond (1/1000th of a second)

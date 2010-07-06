@@ -17,6 +17,7 @@ IRQ is used to handle coin inputs
 
 Known issues:
 - coin counter isn't working properly (interrupt related?)
+- kuniokun MCU internal ROM needs to be dumped
 
 Memory Map (Preliminary):
 
@@ -104,6 +105,7 @@ $8000 - $ffff   ROM
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "cpu/m6809/m6809.h"
+#include "cpu/m6805/m6805.h"
 #include "sound/3526intf.h"
 #include "sound/okim6295.h"
 
@@ -117,13 +119,25 @@ WRITE8_HANDLER( renegade_flipscreen_w );
 
 extern UINT8 *renegade_videoram2;
 
+static UINT8 bank;
+static int mcu_sim;
+
+/* MCU */
+static int from_main;
+static int from_mcu;
+static int main_sent;
+static int mcu_sent;
+static UINT8 ddr_a, ddr_b, ddr_c;
+static UINT8 port_a_out, port_b_out, port_c_out;
+static UINT8 port_a_in, port_b_in, port_c_in;
+
+/* MCU simulation (Kunio Kun) */
 #define MCU_BUFFER_MAX 6
 static UINT8 mcu_buffer[MCU_BUFFER_MAX];
 static UINT8 mcu_input_size;
 static UINT8 mcu_output_byte;
 static INT8 mcu_key;
 
-static UINT8 bank;
 
 /********************************************************************************************/
 
@@ -228,20 +242,9 @@ static WRITE8_HANDLER( sound_w )
 **  (and enemy health??)
 */
 
-static int mcu_type;
+static int mcu_checksum;
 static const UINT8 *mcu_encrypt_table;
 static int mcu_encrypt_table_len;
-
-static const UINT8 renegade_xor_table[0x37] =
-{
-	0x8A, 0x48, 0x98, 0x48, 0xA9, 0x00, 0x85, 0x14,
-	0x85, 0x15, 0xA5, 0x11, 0x05, 0x10, 0xF0, 0x21,
-	0x46, 0x11, 0x66, 0x10, 0x90, 0x0F, 0x18, 0xA5,
-	0x14, 0x65, 0x12, 0x85, 0x14, 0xA5, 0x15, 0x65,
-	0x13, 0x85, 0x15, 0xB0, 0x06, 0x06, 0x12, 0x26,
-	0x13, 0x90, 0xDF, 0x68, 0xA8, 0x68, 0xAA, 0x38,
-	0x60, 0x68, 0xA8, 0x68, 0xAA, 0x18, 0x60
-};
 
 static const UINT8 kuniokun_xor_table[0x2a] =
 {
@@ -275,45 +278,152 @@ static MACHINE_START( renegade )
 	state_save_register_postload(machine, renegade_postload, NULL);
 }
 
-static DRIVER_INIT( kuniokun )
-{
-	mcu_type = 0x85;
-	mcu_encrypt_table = kuniokun_xor_table;
-	mcu_encrypt_table_len = 0x2a;
-}
-
 static DRIVER_INIT( renegade )
 {
-	mcu_type = 0xda;
-	mcu_encrypt_table = renegade_xor_table;
-	mcu_encrypt_table_len = 0x37;
+	mcu_sim = FALSE;
 }
+
+static DRIVER_INIT( kuniokun )
+{
+	mcu_sim = TRUE;
+	mcu_checksum = 0x85;
+	mcu_encrypt_table = kuniokun_xor_table;
+	mcu_encrypt_table_len = 0x2a;
+
+	cputag_suspend(machine, "mcu", SUSPEND_REASON_DISABLE, 1);
+}
+
+static DRIVER_INIT( kuniokunb )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	/* Remove the MCU handlers */
+	memory_unmap_readwrite(space, 0x3804, 0x3804, 0, 0);
+	memory_unmap_read(space, 0x3805, 0x3805, 0, 0);
+}
+
+
+/***************************************************************************
+
+    MC68705P5 I/O
+
+***************************************************************************/
+
+READ8_HANDLER( renegade_68705_port_a_r )
+{
+	return (port_a_out & ddr_a) | (port_a_in & ~ddr_a);
+}
+
+WRITE8_HANDLER( renegade_68705_port_a_w )
+{
+	port_a_out = data;
+}
+
+WRITE8_HANDLER( renegade_68705_ddr_a_w )
+{
+	ddr_a = data;
+}
+
+READ8_HANDLER( renegade_68705_port_b_r )
+{
+	return (port_b_out & ddr_b) | (port_b_in & ~ddr_b);
+}
+
+WRITE8_HANDLER( renegade_68705_port_b_w )
+{
+	if ((ddr_b & 0x02) && (~data & 0x02) && (port_b_out & 0x02))
+	{
+		port_a_in = from_main;
+
+		if (main_sent)
+			cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
+
+		main_sent = 0;
+	}
+	if ((ddr_b & 0x04) && (data & 0x04) && (~port_b_out & 0x04))
+	{
+		from_mcu = port_a_out;
+		mcu_sent = 1;
+	}
+
+	port_b_out = data;
+}
+
+WRITE8_HANDLER( renegade_68705_ddr_b_w )
+{
+	ddr_b = data;
+}
+
+
+READ8_HANDLER( renegade_68705_port_c_r )
+{
+	port_c_in = 0;
+	if (main_sent)
+		port_c_in |= 0x01;
+	if (!mcu_sent)
+		port_c_in |= 0x02;
+
+	return (port_c_out & ddr_c) | (port_c_in & ~ddr_c);
+}
+
+WRITE8_HANDLER( renegade_68705_port_c_w )
+{
+	port_c_out = data;
+}
+
+WRITE8_HANDLER( renegade_68705_ddr_c_w )
+{
+	ddr_c = data;
+}
+
+
+/***************************************************************************
+
+    MCU simulation
+
+***************************************************************************/
 
 static READ8_HANDLER( mcu_reset_r )
 {
-	mcu_key = -1;
-	mcu_input_size = 0;
-	mcu_output_byte = 0;
+	if (mcu_sim == TRUE)
+	{
+		mcu_key = -1;
+		mcu_input_size = 0;
+		mcu_output_byte = 0;
+	}
+	else
+	{
+		cputag_set_input_line(space->machine, "mcu", INPUT_LINE_RESET, PULSE_LINE);
+	}
 	return 0;
 }
 
 static WRITE8_HANDLER( mcu_w )
 {
-	mcu_output_byte = 0;
-
-	if (mcu_key < 0)
+	if (mcu_sim == TRUE)
 	{
-		mcu_key = 0;
-		mcu_input_size = 1;
-		mcu_buffer[0] = data;
+		mcu_output_byte = 0;
+
+		if (mcu_key < 0)
+		{
+			mcu_key = 0;
+			mcu_input_size = 1;
+			mcu_buffer[0] = data;
+		}
+		else
+		{
+			data ^= mcu_encrypt_table[mcu_key++];
+			if (mcu_key == mcu_encrypt_table_len)
+				mcu_key = 0;
+			if (mcu_input_size < MCU_BUFFER_MAX)
+				mcu_buffer[mcu_input_size++] = data;
+		}
 	}
 	else
 	{
-		data ^= mcu_encrypt_table[mcu_key++];
-		if (mcu_key == mcu_encrypt_table_len)
-			mcu_key = 0;
-		if (mcu_input_size < MCU_BUFFER_MAX)
-			mcu_buffer[mcu_input_size++] = data;
+		from_main = data;
+		main_sent = 1;
+		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 	}
 }
 
@@ -327,7 +437,7 @@ static void mcu_process_command(void)
 	/* 0x0d: stop MCU when ROM check fails */
 
 	case 0x10:
-		mcu_buffer[0] = mcu_type;
+		mcu_buffer[0] = mcu_checksum;
 		break;
 
 	case 0x26: /* sound code -> sound command */
@@ -484,15 +594,42 @@ static void mcu_process_command(void)
 
 static READ8_HANDLER( mcu_r )
 {
-	int result = 1;
+	if (mcu_sim == TRUE)
+	{
+		int result = 1;
 
-	if (mcu_input_size)
-		mcu_process_command();
+		if (mcu_input_size)
+			mcu_process_command();
 
-	if (mcu_output_byte < MCU_BUFFER_MAX)
-		result = mcu_buffer[mcu_output_byte++];
+		if (mcu_output_byte < MCU_BUFFER_MAX)
+			result = mcu_buffer[mcu_output_byte++];
 
-	return result;
+		return result;
+	}
+	else
+	{
+		mcu_sent = 0;
+		return from_mcu;
+	}
+}
+
+static CUSTOM_INPUT( mcu_status_r )
+{
+	UINT8 res = 0;
+
+	if (mcu_sim == TRUE)
+	{
+		res = 1;
+	}
+	else
+	{
+		if (!main_sent)
+			res |= 0x01;
+		if (!mcu_sent)
+			res |= 0x02;
+	}
+
+	return res;
 }
 
 /********************************************************************************************/
@@ -547,8 +684,8 @@ static ADDRESS_MAP_START( renegade_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3801, 0x3801) AM_READ_PORT("IN1") AM_WRITE(renegade_scroll1_w)		/* Player#2 controls, coin triggers */
 	AM_RANGE(0x3802, 0x3802) AM_READ_PORT("DSW2") AM_WRITE(sound_w)	/* DIP2  various IO ports */
 	AM_RANGE(0x3803, 0x3803) AM_READ_PORT("DSW1") AM_WRITE(renegade_flipscreen_w)	/* DIP1 */
-	AM_RANGE(0x3804, 0x3804) AM_READWRITE(mcu_r,mcu_w)
-	AM_RANGE(0x3805, 0x3805) AM_READWRITE(mcu_reset_r,bankswitch_w)
+	AM_RANGE(0x3804, 0x3804) AM_READWRITE(mcu_r, mcu_w)
+	AM_RANGE(0x3805, 0x3805) AM_READWRITE(mcu_reset_r, bankswitch_w)
 	AM_RANGE(0x3806, 0x3806) AM_WRITENOP // ?? watchdog
 	AM_RANGE(0x3807, 0x3807) AM_WRITE(renegade_coin_counter_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
@@ -565,6 +702,19 @@ static ADDRESS_MAP_START( renegade_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( renegade_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(renegade_68705_port_a_r, renegade_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(renegade_68705_port_b_r, renegade_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(renegade_68705_port_c_r, renegade_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(renegade_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(renegade_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(renegade_68705_ddr_c_w)
+//  AM_RANGE(0x0008, 0x0008) AM_READWRITE(m68705_tdr_r, m68705_tdr_w)
+//  AM_RANGE(0x0009, 0x0009) AM_READWRITE(m68705_tcr_r, m68705_tcr_w)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
+ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( renegade )
@@ -597,8 +747,7 @@ static INPUT_PORTS_START( renegade )
 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* attack right */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	/* attack right */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) 			/* 68705 status */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )			/* 68705 status */
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM(mcu_status_r, NULL)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
@@ -722,39 +871,39 @@ static const gfx_layout tileslayout4 =
 
 static GFXDECODE_START( renegade )
 	/* 8x8 text, 8 colors */
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,	 0, 4 )	/* colors   0- 32 */
+	GFXDECODE_ENTRY( "chars", 0x00000, charlayout,	 0, 4 )	/* colors   0- 32 */
 
 	/* 16x16 background tiles, 8 colors */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tileslayout1, 192, 8 )	/* colors 192-255 */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tileslayout2, 192, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tileslayout3, 192, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, tileslayout4, 192, 8 )
+	GFXDECODE_ENTRY( "tiles", 0x00000, tileslayout1, 192, 8 )	/* colors 192-255 */
+	GFXDECODE_ENTRY( "tiles", 0x00000, tileslayout2, 192, 8 )
+	GFXDECODE_ENTRY( "tiles", 0x00000, tileslayout3, 192, 8 )
+	GFXDECODE_ENTRY( "tiles", 0x00000, tileslayout4, 192, 8 )
 
-	GFXDECODE_ENTRY( "gfx2", 0x18000, tileslayout1, 192, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0x18000, tileslayout2, 192, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0x18000, tileslayout3, 192, 8 )
-	GFXDECODE_ENTRY( "gfx2", 0x18000, tileslayout4, 192, 8 )
+	GFXDECODE_ENTRY( "tiles", 0x18000, tileslayout1, 192, 8 )
+	GFXDECODE_ENTRY( "tiles", 0x18000, tileslayout2, 192, 8 )
+	GFXDECODE_ENTRY( "tiles", 0x18000, tileslayout3, 192, 8 )
+	GFXDECODE_ENTRY( "tiles", 0x18000, tileslayout4, 192, 8 )
 
 	/* 16x16 sprites, 8 colors */
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tileslayout1, 128, 4 )	/* colors 128-159 */
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tileslayout2, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tileslayout3, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, tileslayout4, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, tileslayout1, 128, 4 )	/* colors 128-159 */
+	GFXDECODE_ENTRY( "sprites", 0x00000, tileslayout2, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, tileslayout3, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x00000, tileslayout4, 128, 4 )
 
-	GFXDECODE_ENTRY( "gfx3", 0x18000, tileslayout1, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x18000, tileslayout2, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x18000, tileslayout3, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x18000, tileslayout4, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x18000, tileslayout1, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x18000, tileslayout2, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x18000, tileslayout3, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x18000, tileslayout4, 128, 4 )
 
-	GFXDECODE_ENTRY( "gfx3", 0x30000, tileslayout1, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x30000, tileslayout2, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x30000, tileslayout3, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x30000, tileslayout4, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x30000, tileslayout1, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x30000, tileslayout2, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x30000, tileslayout3, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x30000, tileslayout4, 128, 4 )
 
-	GFXDECODE_ENTRY( "gfx3", 0x48000, tileslayout1, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x48000, tileslayout2, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x48000, tileslayout3, 128, 4 )
-	GFXDECODE_ENTRY( "gfx3", 0x48000, tileslayout4, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x48000, tileslayout1, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x48000, tileslayout2, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x48000, tileslayout3, 128, 4 )
+	GFXDECODE_ENTRY( "sprites", 0x48000, tileslayout4, 128, 4 )
 GFXDECODE_END
 
 
@@ -786,15 +935,18 @@ static MACHINE_DRIVER_START( renegade )
 	MDRV_CPU_VBLANK_INT_HACK(renegade_interrupt,2)
 
 	MDRV_CPU_ADD("audiocpu", M6809, 12000000/8)
-	MDRV_CPU_PROGRAM_MAP(renegade_sound_map)
-								/* IRQs are caused by the main CPU */
+	MDRV_CPU_PROGRAM_MAP(renegade_sound_map)	/* IRQs are caused by the main CPU */
+
+	MDRV_CPU_ADD("mcu", M68705, 12000000/4) // ?
+	MDRV_CPU_PROGRAM_MAP(renegade_mcu_map)
+
 	MDRV_MACHINE_START(renegade)
 	MDRV_MACHINE_RESET(renegade)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */*2)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)*2)  /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(32*8, 32*8)
     MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 0, 30*8-1)
@@ -817,32 +969,37 @@ static MACHINE_DRIVER_START( renegade )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( kuniokunb )
+	MDRV_IMPORT_FROM(renegade)
+	MDRV_DEVICE_REMOVE("mcu")
+MACHINE_DRIVER_END
+
 
 ROM_START( renegade )
 	ROM_REGION( 0x14000, "maincpu", 0 )	/* 64k for code + bank switched ROM */
-	ROM_LOAD( "nb-5.bin",     0x08000, 0x8000, CRC(ba683ddf) SHA1(7516fac1c4fd14cbf43481e94c0c26c662c4cd28) )
-	ROM_LOAD( "na-5.bin",     0x04000, 0x4000, CRC(de7e7df4) SHA1(7d26ac29e0b5858d9a0c0cdc86c864e464145260) )
+	ROM_LOAD( "nb-5.ic51",     0x08000, 0x8000, CRC(ba683ddf) SHA1(7516fac1c4fd14cbf43481e94c0c26c662c4cd28) )
+	ROM_LOAD( "na-5.ic52",     0x04000, 0x4000, CRC(de7e7df4) SHA1(7d26ac29e0b5858d9a0c0cdc86c864e464145260) )
 	ROM_CONTINUE(		  0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU (M6809) */
-	ROM_LOAD( "n0-5.bin",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "n0-5.ic13",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* mcu (missing) */
-	ROM_LOAD( "mcu",          0x8000, 0x8000, NO_DUMP )
+	ROM_REGION( 0x0800, "mcu", 0 ) /* MC68705P5 */
+	ROM_LOAD( "nz-5.ic97",    0x0000, 0x0800, CRC(32e47560) SHA1(93a386b3f3c8eb35a53487612147a877dc7453ff) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "nc-5.bin",     0x0000, 0x8000, CRC(9adfaa5d) SHA1(7bdb7bd4387b49e0489f9539161e1ed9d8f9f6a0) )  /* characters */
+	ROM_REGION( 0x08000, "chars", 0 )
+	ROM_LOAD( "nc-5.bin",     0x0000, 0x8000, CRC(9adfaa5d) SHA1(7bdb7bd4387b49e0489f9539161e1ed9d8f9f6a0) )
 
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "n1-5.bin",     0x00000, 0x8000, CRC(4a9f47f3) SHA1(01c94bc4c85314f1e0caa3afe91705875d118c13) ) /* tiles */
-	ROM_LOAD( "n6-5.bin",     0x08000, 0x8000, CRC(d62a0aa8) SHA1(a0b55cd3eee352fb91d9bb8c6c4f4f55b2df83e9) )
-	ROM_LOAD( "n7-5.bin",     0x10000, 0x8000, CRC(7ca5a532) SHA1(1110aa1c7562805dd4b298ab2860c66a6cc2685b) )
-	ROM_LOAD( "n2-5.bin",     0x18000, 0x8000, CRC(8d2e7982) SHA1(72fc85ff7b54be10501a2a24303dadd5f33e5650) )
-	ROM_LOAD( "n8-5.bin",     0x20000, 0x8000, CRC(0dba31d3) SHA1(8fe250787debe07e4f6c0002a9f799869b13a5fd) )
-	ROM_LOAD( "n9-5.bin",     0x28000, 0x8000, CRC(5b621b6a) SHA1(45c6a688a5b4e9da71133c43cc48eea568557be3) )
+	ROM_REGION( 0x30000, "tiles", 0 )
+	ROM_LOAD( "n1-5.ic1",     0x00000, 0x8000, CRC(4a9f47f3) SHA1(01c94bc4c85314f1e0caa3afe91705875d118c13) )
+	ROM_LOAD( "n6-5.ic28",    0x08000, 0x8000, CRC(d62a0aa8) SHA1(a0b55cd3eee352fb91d9bb8c6c4f4f55b2df83e9) )
+	ROM_LOAD( "n7-5.ic27",    0x10000, 0x8000, CRC(7ca5a532) SHA1(1110aa1c7562805dd4b298ab2860c66a6cc2685b) )
+	ROM_LOAD( "n2-5.ic14",    0x18000, 0x8000, CRC(8d2e7982) SHA1(72fc85ff7b54be10501a2a24303dadd5f33e5650) )
+	ROM_LOAD( "n8-5.ic26",    0x20000, 0x8000, CRC(0dba31d3) SHA1(8fe250787debe07e4f6c0002a9f799869b13a5fd) )
+	ROM_LOAD( "n9-5.ic25",    0x28000, 0x8000, CRC(5b621b6a) SHA1(45c6a688a5b4e9da71133c43cc48eea568557be3) )
 
-	ROM_REGION( 0x60000, "gfx3", 0 )
-	ROM_LOAD( "nh-5.bin",     0x00000, 0x8000, CRC(dcd7857c) SHA1(eb530ccc939f2fa42b3c743605d5398f4afe7d7a) ) /* sprites */
+	ROM_REGION( 0x60000, "sprites", 0 )
+	ROM_LOAD( "nh-5.bin",     0x00000, 0x8000, CRC(dcd7857c) SHA1(eb530ccc939f2fa42b3c743605d5398f4afe7d7a) )
 	ROM_LOAD( "nd-5.bin",     0x08000, 0x8000, CRC(2de1717c) SHA1(af5a994348301fa888092ae65d08cfb6ad124407) )
 	ROM_LOAD( "nj-5.bin",     0x10000, 0x8000, CRC(0f96a18e) SHA1(1f7e11e11d5031b4942d9d05161bcb9466514af8) )
 	ROM_LOAD( "nn-5.bin",     0x18000, 0x8000, CRC(1bf15787) SHA1(b3371bf33f8b76a4a9887a7a43dba1f26353e978) )
@@ -855,10 +1012,10 @@ ROM_START( renegade )
 	ROM_LOAD( "ng-5.bin",     0x50000, 0x8000, CRC(a8ee3720) SHA1(df3d40015b16fa7a9bf05f0ed5741c22f7f152c7) )
 	ROM_LOAD( "nm-5.bin",     0x58000, 0x8000, CRC(c100258e) SHA1(0e2124e642b9742a9a0045f460974025048bc2dd) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 ) /* adpcm */
-	ROM_LOAD( "n5-5.bin",     0x00000, 0x8000, CRC(7ee43a3c) SHA1(36b14b886096177cdd0bd0c99cbcfcc362b2bc30) )
-	ROM_LOAD( "n4-5.bin",     0x10000, 0x8000, CRC(6557564c) SHA1(b3142be9d48eacb43786079a7ae012010f6afabb) )
-	ROM_LOAD( "n3-5.bin",     0x18000, 0x8000, CRC(78fd6190) SHA1(995df0e88f5c34946e0634b50bda8c1cc621afaa) )
+	ROM_REGION( 0x20000, "adpcm", 0 )
+	ROM_LOAD( "n5-5.ic31",    0x00000, 0x8000, CRC(7ee43a3c) SHA1(36b14b886096177cdd0bd0c99cbcfcc362b2bc30) )
+	ROM_LOAD( "n4-5.ic32",    0x10000, 0x8000, CRC(6557564c) SHA1(b3142be9d48eacb43786079a7ae012010f6afabb) )
+	ROM_LOAD( "n3-5.ic33",    0x18000, 0x8000, CRC(78fd6190) SHA1(995df0e88f5c34946e0634b50bda8c1cc621afaa) )
 ROM_END
 
 ROM_START( kuniokun )
@@ -867,25 +1024,25 @@ ROM_START( kuniokun )
 	ROM_LOAD( "ta18-11.bin",  0x04000, 0x4000, CRC(f240f5cd) SHA1(ed6875e8ad2988e88389d4f63ff448d0823c195f) )
 	ROM_CONTINUE(		  0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU (M6809) */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "n0-5.bin",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* mcu (missing) */
+	ROM_REGION( 0x10000, "mcu", 0 )
 	ROM_LOAD( "mcu",          0x8000, 0x8000, NO_DUMP )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "ta18-25.bin",  0x0000, 0x8000, CRC(9bd2bea3) SHA1(fa79c9d4c71c1dbbf0e14cb8d6870f1f94b9af88) )  /* characters */
+	ROM_REGION( 0x08000, "chars", 0 )
+	ROM_LOAD( "ta18-25.bin",  0x0000, 0x8000, CRC(9bd2bea3) SHA1(fa79c9d4c71c1dbbf0e14cb8d6870f1f94b9af88) )
 
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "ta18-01.bin",  0x00000, 0x8000, CRC(daf15024) SHA1(f37de97275f52dfbbad7bf8c82f8108e84bcf63e) ) /* tiles */
+	ROM_REGION( 0x30000, "tiles", 0 )
+	ROM_LOAD( "ta18-01.bin",  0x00000, 0x8000, CRC(daf15024) SHA1(f37de97275f52dfbbad7bf8c82f8108e84bcf63e) )
 	ROM_LOAD( "ta18-06.bin",  0x08000, 0x8000, CRC(1f59a248) SHA1(8ab70aa8f0dccbe94240c96835a43b0900d52120) )
 	ROM_LOAD( "n7-5.bin",     0x10000, 0x8000, CRC(7ca5a532) SHA1(1110aa1c7562805dd4b298ab2860c66a6cc2685b) )
 	ROM_LOAD( "ta18-02.bin",  0x18000, 0x8000, CRC(994c0021) SHA1(9219464decc1b07591d0485502e2bcc0c2d16261) )
 	ROM_LOAD( "ta18-04.bin",  0x20000, 0x8000, CRC(55b9e8aa) SHA1(26c91030c53a022c1f1f3131768e8f7ba613168d) )
 	ROM_LOAD( "ta18-03.bin",  0x28000, 0x8000, CRC(0475c99a) SHA1(36b7b856e728c68e0dd3ecb844033369a5117270) )
 
-	ROM_REGION( 0x60000, "gfx3", 0 )
-	ROM_LOAD( "ta18-20.bin",  0x00000, 0x8000, CRC(c7d54139) SHA1(f76d237a6ee8bbcbf344145d31e532834da7c131) ) /* sprites */
+	ROM_REGION( 0x60000, "sprites", 0 )
+	ROM_LOAD( "ta18-20.bin",  0x00000, 0x8000, CRC(c7d54139) SHA1(f76d237a6ee8bbcbf344145d31e532834da7c131) )
 	ROM_LOAD( "ta18-24.bin",  0x08000, 0x8000, CRC(84677d45) SHA1(cb7fe69e13d2d696acbc464b7584c7514cfc7f85) )
 	ROM_LOAD( "ta18-18.bin",  0x10000, 0x8000, CRC(1c770853) SHA1(4fe6051265729a9d36b6d3dd826c3f6dcb4a7a25) )
 	ROM_LOAD( "ta18-14.bin",  0x18000, 0x8000, CRC(af656017) SHA1(d395d35fe6d8e281596b2df571099b841f979a97) )
@@ -898,7 +1055,7 @@ ROM_START( kuniokun )
 	ROM_LOAD( "ta18-21.bin",  0x50000, 0x8000, CRC(c95e009b) SHA1(d45a247d4ebf8587a2cd30c83444cc7bd17a3534) )
 	ROM_LOAD( "ta18-15.bin",  0x58000, 0x8000, CRC(a5d61d01) SHA1(9bf1f0b8296667db31ff1c34e28c8eda3ce9f7c3) )
 
-	ROM_REGION( 0x20000, "adpcm", 0 ) /* adpcm */
+	ROM_REGION( 0x20000, "adpcm", 0 )
 	ROM_LOAD( "ta18-07.bin",  0x00000, 0x8000, CRC(02e3f3ed) SHA1(ab09b3af2c4ab9a36eb1273bcc7c788350048554) )
 	ROM_LOAD( "ta18-08.bin",  0x10000, 0x8000, CRC(c9312613) SHA1(fbbdf7c56c34cbee42984e41fcf2a21da2b87a31) )
 	ROM_LOAD( "ta18-09.bin",  0x18000, 0x8000, CRC(07ed4705) SHA1(6fd4b78ca846fa602504f06f3105b2da03bcd00c) )
@@ -910,22 +1067,22 @@ ROM_START( kuniokunb )
 	ROM_LOAD( "ta18-11.bin",  0x04000, 0x4000, CRC(f240f5cd) SHA1(ed6875e8ad2988e88389d4f63ff448d0823c195f) )
 	ROM_CONTINUE(		  0x10000, 0x4000 )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 ) /* audio CPU (M6809) */
+	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "n0-5.bin",     0x8000, 0x8000, CRC(3587de3b) SHA1(f82e758254b21eb0c5a02469c72adb86d9577065) )
 
-	ROM_REGION( 0x08000, "gfx1", 0 )
-	ROM_LOAD( "ta18-25.bin",  0x0000, 0x8000, CRC(9bd2bea3) SHA1(fa79c9d4c71c1dbbf0e14cb8d6870f1f94b9af88) )  /* characters */
+	ROM_REGION( 0x08000, "chars", 0 )
+	ROM_LOAD( "ta18-25.bin",  0x0000, 0x8000, CRC(9bd2bea3) SHA1(fa79c9d4c71c1dbbf0e14cb8d6870f1f94b9af88) )
 
-	ROM_REGION( 0x30000, "gfx2", 0 )
-	ROM_LOAD( "ta18-01.bin",  0x00000, 0x8000, CRC(daf15024) SHA1(f37de97275f52dfbbad7bf8c82f8108e84bcf63e) ) /* tiles */
+	ROM_REGION( 0x30000, "tiles", 0 )
+	ROM_LOAD( "ta18-01.bin",  0x00000, 0x8000, CRC(daf15024) SHA1(f37de97275f52dfbbad7bf8c82f8108e84bcf63e) )
 	ROM_LOAD( "ta18-06.bin",  0x08000, 0x8000, CRC(1f59a248) SHA1(8ab70aa8f0dccbe94240c96835a43b0900d52120) )
 	ROM_LOAD( "n7-5.bin",     0x10000, 0x8000, CRC(7ca5a532) SHA1(1110aa1c7562805dd4b298ab2860c66a6cc2685b) )
 	ROM_LOAD( "ta18-02.bin",  0x18000, 0x8000, CRC(994c0021) SHA1(9219464decc1b07591d0485502e2bcc0c2d16261) )
 	ROM_LOAD( "ta18-04.bin",  0x20000, 0x8000, CRC(55b9e8aa) SHA1(26c91030c53a022c1f1f3131768e8f7ba613168d) )
 	ROM_LOAD( "ta18-03.bin",  0x28000, 0x8000, CRC(0475c99a) SHA1(36b7b856e728c68e0dd3ecb844033369a5117270) )
 
-	ROM_REGION( 0x60000, "gfx3", 0 )
-	ROM_LOAD( "ta18-20.bin",  0x00000, 0x8000, CRC(c7d54139) SHA1(f76d237a6ee8bbcbf344145d31e532834da7c131) ) /* sprites */
+	ROM_REGION( 0x60000, "sprites", 0 )
+	ROM_LOAD( "ta18-20.bin",  0x00000, 0x8000, CRC(c7d54139) SHA1(f76d237a6ee8bbcbf344145d31e532834da7c131) )
 	ROM_LOAD( "ta18-24.bin",  0x08000, 0x8000, CRC(84677d45) SHA1(cb7fe69e13d2d696acbc464b7584c7514cfc7f85) )
 	ROM_LOAD( "ta18-18.bin",  0x10000, 0x8000, CRC(1c770853) SHA1(4fe6051265729a9d36b6d3dd826c3f6dcb4a7a25) )
 	ROM_LOAD( "ta18-14.bin",  0x18000, 0x8000, CRC(af656017) SHA1(d395d35fe6d8e281596b2df571099b841f979a97) )
@@ -946,6 +1103,6 @@ ROM_END
 
 
 
-GAME( 1986, renegade, 0,        renegade, renegade, renegade, ROT0, "Technos Japan (Taito America license)", "Renegade (US)", 0 )
-GAME( 1986, kuniokun, renegade, renegade, renegade, kuniokun, ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", 0 )
-GAME( 1986, kuniokunb,renegade, renegade, renegade, 0,        ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", 0 )
+GAME( 1986, renegade,  0,        renegade,  renegade, renegade,  ROT0, "Technos Japan (Taito America license)", "Renegade (US)", 0 )
+GAME( 1986, kuniokun,  renegade, renegade,  renegade, kuniokun,  ROT0, "Technos Japan", "Nekketsu Kouha Kunio-kun (Japan)", 0 )
+GAME( 1986, kuniokunb, renegade, kuniokunb, renegade, kuniokunb, ROT0, "bootleg", "Nekketsu Kouha Kunio-kun (Japan bootleg)", 0 )

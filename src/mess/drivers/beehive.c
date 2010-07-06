@@ -41,7 +41,7 @@ static VIDEO_UPDATE( beehive )
 
 static MACHINE_DRIVER_START( beehive )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8085A, XTAL_4MHz)
+    MDRV_CPU_ADD("maincpu",I8085A, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(beehive_mem)
     MDRV_CPU_IO_MAP(beehive_io)
 

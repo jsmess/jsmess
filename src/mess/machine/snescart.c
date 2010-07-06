@@ -211,18 +211,18 @@ static void snes_save_sram(running_machine *machine)
 	free(battery_ram);
 }
 
-static void snes_machine_stop(running_machine *machine)
+static void snes_machine_stop(running_machine &machine)
 {
-	snes_state *state = (snes_state *)machine->driver_data;
+	snes_state *state = (snes_state *)machine.driver_data;
 
 	/* Save SRAM */
 	if (state->cart[0].sram > 0)
-		snes_save_sram(machine);
+		snes_save_sram(&machine);
 }
 
 MACHINE_START( snes_mess )
 {
-	add_exit_callback(machine, snes_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, snes_machine_stop);
 	MACHINE_START_CALL(snes);
 }
 
@@ -256,9 +256,9 @@ static void sufami_load_sram(running_machine *machine, const char *cart_tag)
 	free(battery_ram);
 }
 
-static void sufami_machine_stop(running_machine *machine)
+static void sufami_machine_stop(running_machine &machine)
 {
-	snes_state *state = (snes_state *)machine->driver_data;
+	snes_state *state = (snes_state *)machine.driver_data;
 	UINT8 ii;
 	UINT8 *battery_ram, *ptr;
 
@@ -271,7 +271,7 @@ static void sufami_machine_stop(running_machine *machine)
 		{
 			memmove(ptr + ii * 0x8000, &snes_ram[0x608000 + (ii * 0x010000)], 0x8000);
 		}
-		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "slot_a"));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(&machine, "slot_a"));
 		image->battery_save(battery_ram, 0x20000);
 	}
 
@@ -281,7 +281,7 @@ static void sufami_machine_stop(running_machine *machine)
 		{
 			memmove(ptr + ii * 0x8000, &snes_ram[0x708000 + (ii * 0x010000)], 0x8000);
 		}
-		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "slot_b"));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(&machine, "slot_b"));
 		image->battery_save(battery_ram, 0x20000);
 	}
 
@@ -290,7 +290,7 @@ static void sufami_machine_stop(running_machine *machine)
 
 MACHINE_START( snesst )
 {
-	add_exit_callback(machine, sufami_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, sufami_machine_stop);
 	MACHINE_START_CALL(snes);
 }
 

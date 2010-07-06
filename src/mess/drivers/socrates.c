@@ -867,7 +867,7 @@ static TIMER_CALLBACK( clear_irq_cb )
 static INTERRUPT_GEN( assert_irq )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, cpu_clocks_to_attotime(device, 44), NULL, 0, clear_irq_cb);
+	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(44), NULL, 0, clear_irq_cb);
 // 44 is a complete and total guess, need to properly measure how many clocks/microseconds the int line is high for.
 	socrates.vblankstate = 1;
 }

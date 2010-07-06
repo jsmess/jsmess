@@ -42,7 +42,7 @@ static VIDEO_UPDATE( sdk85 )
 
 static MACHINE_DRIVER_START( sdk85 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8085A, XTAL_2MHz)
+    MDRV_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(sdk85_mem)
     MDRV_CPU_IO_MAP(sdk85_io)
 

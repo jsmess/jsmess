@@ -32,7 +32,7 @@ jupiter_tape;
 static UINT8 *jupiter_data = NULL;
 static int jupiter_data_type = JUPITER_NONE;
 
-static void jupiter_machine_stop(running_machine *machine);
+static void jupiter_machine_stop(running_machine &machine);
 
 
 /* only gets called at the start of a cpu time slice */
@@ -94,10 +94,10 @@ MACHINE_START( jupiter )
 		memory_set_direct_update_handler(space, jupiter_opbaseoverride);
 	}
 
-	add_exit_callback(machine, jupiter_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, jupiter_machine_stop);
 }
 
-static void jupiter_machine_stop(running_machine *machine)
+static void jupiter_machine_stop(running_machine &machine)
 {
 	if (jupiter_data)
 	{

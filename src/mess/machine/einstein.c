@@ -14,7 +14,7 @@
 //-------------------------------------------------
 
 einstein_keyboard_daisy_device_config::einstein_keyboard_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Einstein keyboard daisy chain", tag, owner, clock),
 	  device_config_z80daisy_interface(mconfig, *this)
 {
 }
@@ -113,7 +113,7 @@ const device_type EINSTEIN_KEYBOARD_DAISY = einstein_keyboard_daisy_device_confi
 //-------------------------------------------------
 
 einstein_adc_daisy_device_config::einstein_adc_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Einstein ADC daisy chain", tag, owner, clock),
 	  device_config_z80daisy_interface(mconfig, *this)
 {
 }
@@ -212,7 +212,7 @@ const device_type EINSTEIN_ADC_DAISY = einstein_adc_daisy_device_config::static_
 //-------------------------------------------------
 
 einstein_fire_daisy_device_config::einstein_fire_daisy_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, tag, owner, clock),
+	: device_config(mconfig, static_alloc_device_config, "Einstein fire button daisy chain", tag, owner, clock),
 	  device_config_z80daisy_interface(mconfig, *this)
 {
 }

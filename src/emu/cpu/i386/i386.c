@@ -501,8 +501,8 @@ static UINT64 i386_debug_seglimit(void *globalref, void *ref, UINT32 params, con
 
 static CPU_DEBUG_INIT( i386 )
 {
-	symtable_add_function(debug_cpu_get_symtable(device), "segbase", (void *)device, 1, 1, i386_debug_segbase);
-	symtable_add_function(debug_cpu_get_symtable(device), "seglimit", (void *)device, 1, 1, i386_debug_seglimit);
+	symtable_add_function(device->debug()->symtable(), "segbase", (void *)device, 1, 1, i386_debug_segbase);
+	symtable_add_function(device->debug()->symtable(), "seglimit", (void *)device, 1, 1, i386_debug_seglimit);
 }
 
 /*************************************************************************/
@@ -1456,3 +1456,8 @@ CPU_GET_INFO( mediagx )
 		default:										CPU_GET_INFO_CALL(i386);				break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(I386, i386);
+DEFINE_LEGACY_CPU_DEVICE(I486, i486);
+DEFINE_LEGACY_CPU_DEVICE(PENTIUM, pentium);
+DEFINE_LEGACY_CPU_DEVICE(MEDIAGX, mediagx);

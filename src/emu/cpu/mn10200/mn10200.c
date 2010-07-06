@@ -149,8 +149,7 @@ INLINE void mn102_change_pc(mn102_info *mn102, UINT32 pc)
 INLINE mn102_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_MN10200);
+	assert(device->type() == MN10200);
 
 	return (mn102_info *)downcast<legacy_cpu_device *>(device)->token();
 }
@@ -2124,8 +2123,8 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
   }
 
   case 0x28a: case 0x29a: case 0x2aa: case 0x2ba: case 0x2ca: case 0x2da: case 0x2ea: case 0x2fa: {
-    static const char *trans[4] = { "M-IO", "M-M", "M-X1", "m-X2" };
-    static const char *start[32] = {
+    static const char *const trans[4] = { "M-IO", "M-M", "M-X1", "m-X2" };
+    static const char *const start[32] = {
       "soft", "a/d", "ser0tx", "set0rx", "ser1tx", "ser1rx",
       "timer0", "timer1", "timer2", "timer3", "timer4", "timer5", "timer6", "timer7", "timer8", "timer9",
       "timer10u", "timer10a", "timer10b",
@@ -2146,7 +2145,7 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
   }
 
   case 0x28b: case 0x29b: case 0x2ab: case 0x2bb: case 0x2cb: case 0x2db: case 0x2eb: case 0x2fb: {
-    static const char *tradr[4] = { "inc", "dec", "fixed", "reserved" };
+    static const char *const tradr[4] = { "inc", "dec", "fixed", "reserved" };
     int dma = (adr-0x280) >> 4;
     mn102->dma[dma].ctrlh = data;
 	logerror("MN10200: DMA %d control %s irq=%s %s %s dir=%s %s %s\n",
@@ -2437,3 +2436,5 @@ CPU_GET_INFO( mn10200 )
 		case CPUINFO_STR_REGISTER + MN10200_IAGR:          sprintf(info->s, "IAGR:  %02x", cpustate->iagr); break;
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(MN10200, mn10200);

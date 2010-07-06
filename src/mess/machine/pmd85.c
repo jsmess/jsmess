@@ -845,7 +845,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 
 static TIMER_CALLBACK( pmd_reset )
 {
-	mame_schedule_soft_reset(machine);
+	machine->schedule_soft_reset();
 }
 
 static DIRECT_UPDATE_HANDLER(pmd85_opbaseoverride)

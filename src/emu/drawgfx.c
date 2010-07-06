@@ -81,7 +81,7 @@ INLINE INT32 normalize_yscroll(bitmap_t *bitmap, INT32 yscroll)
 
 void gfx_init(running_machine *machine)
 {
-	const gfx_decode_entry *gfxdecodeinfo = machine->config->gfxdecodeinfo;
+	const gfx_decode_entry *gfxdecodeinfo = machine->config->m_gfxdecodeinfo;
 	int curgfx;
 
 	/* skip if nothing to do */
@@ -92,8 +92,9 @@ void gfx_init(running_machine *machine)
 	for (curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != NULL; curgfx++)
 	{
 		const gfx_decode_entry *gfxdecode = &gfxdecodeinfo[curgfx];
-		UINT32 region_length = (gfxdecode->memory_region != NULL) ? (8 * memory_region_length(machine, gfxdecode->memory_region)) : 0;
-		const UINT8 *region_base = (gfxdecode->memory_region != NULL) ? memory_region(machine, gfxdecode->memory_region) : NULL;
+		const region_info *region = (gfxdecode->memory_region != NULL) ? machine->region(gfxdecode->memory_region) : NULL;
+		UINT32 region_length = (region != NULL) ? (8 * region->bytes()) : 0;
+		const UINT8 *region_base = (region != NULL) ? region->base() : NULL;
 		UINT32 xscale = (gfxdecode->xscale == 0) ? 1 : gfxdecode->xscale;
 		UINT32 yscale = (gfxdecode->yscale == 0) ? 1 : gfxdecode->yscale;
 		UINT32 *extpoffs, extxoffs[MAX_ABS_GFX_SIZE], extyoffs[MAX_ABS_GFX_SIZE];
@@ -368,7 +369,7 @@ void gfx_element_build_temporary(gfx_element *gfx, running_machine *machine, UIN
 	gfx->color_base = color_base;
 	gfx->color_depth = color_granularity;
 	gfx->color_granularity = color_granularity;
-	gfx->total_colors = (machine->config->total_colors - color_base) / color_granularity;
+	gfx->total_colors = (machine->total_colors() - color_base) / color_granularity;
 
 	gfx->pen_usage = NULL;
 

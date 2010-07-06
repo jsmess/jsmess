@@ -58,6 +58,55 @@ const int TRIGGER_SUSPENDTIME = -4000;
 
 
 //**************************************************************************
+//  ADDRESS SPACE CONFIG
+//**************************************************************************
+
+//-------------------------------------------------
+//  address_space_config - constructors
+//-------------------------------------------------
+
+address_space_config::address_space_config()
+	: m_name("unknown"),
+	  m_endianness(ENDIANNESS_NATIVE),
+	  m_databus_width(0),
+	  m_addrbus_width(0),
+	  m_addrbus_shift(0),
+	  m_logaddr_width(0),
+	  m_page_shift(0),
+	  m_internal_map(NULL),
+	  m_default_map(NULL)
+{
+}
+
+address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, const addrmap_token *internal, const addrmap_token *defmap)
+	: m_name(name),
+	  m_endianness(endian),
+	  m_databus_width(datawidth),
+	  m_addrbus_width(addrwidth),
+	  m_addrbus_shift(addrshift),
+	  m_logaddr_width(addrwidth),
+	  m_page_shift(0),
+	  m_internal_map(internal),
+	  m_default_map(defmap)
+{
+}
+
+address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, const addrmap_token *internal, const addrmap_token *defmap)
+	: m_name(name),
+	  m_endianness(endian),
+	  m_databus_width(datawidth),
+	  m_addrbus_width(addrwidth),
+	  m_addrbus_shift(addrshift),
+	  m_logaddr_width(logwidth),
+	  m_page_shift(pageshift),
+	  m_internal_map(internal),
+	  m_default_map(defmap)
+{
+}
+
+
+
+//**************************************************************************
 //  MEMORY DEVICE CONFIG
 //**************************************************************************
 
@@ -238,8 +287,8 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 				}
 
 				// make sure all devices exist
-				if ((entry->read.type == AMH_DEVICE_HANDLER && entry->read.tag != NULL && m_machine_config.devicelist.find(entry->read.tag) == NULL) ||
-					(entry->write.type == AMH_DEVICE_HANDLER && entry->write.tag != NULL && m_machine_config.devicelist.find(entry->write.tag) == NULL))
+				if ((entry->read.type == AMH_DEVICE_HANDLER && entry->read.tag != NULL && m_machine_config.m_devicelist.find(entry->read.tag) == NULL) ||
+					(entry->write.type == AMH_DEVICE_HANDLER && entry->write.tag != NULL && m_machine_config.m_devicelist.find(entry->write.tag) == NULL))
 				{
 					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->write.tag);
 					error = true;

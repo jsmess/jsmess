@@ -165,9 +165,9 @@ static void draw_object(running_machine *machine, bitmap_t *bitmap, const rectan
 	}
 }
 
-static void taitojc_exit(running_machine *machine)
+static void taitojc_exit(running_machine &machine)
 {
-	taitojc_state *state = (taitojc_state *)machine->driver_data;
+	taitojc_state *state = (taitojc_state *)machine.driver_data;
 	poly_free(state->poly);
 }
 
@@ -177,7 +177,7 @@ VIDEO_START( taitojc )
 	int width, height;
 
 	state->poly = poly_alloc(machine, 4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
-	add_exit_callback(machine, taitojc_exit);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, taitojc_exit);
 
 	/* find first empty slot to decode gfx */
 	for (state->gfx_index = 0; state->gfx_index < MAX_GFX_ELEMENTS; state->gfx_index++)
@@ -194,7 +194,7 @@ VIDEO_START( taitojc )
 	state->tile_ram = auto_alloc_array_clear(machine, UINT32, 0x4000/4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	machine->gfx[state->gfx_index] = gfx_element_alloc(machine, &taitojc_char_layout, (UINT8 *)state->char_ram, machine->config->total_colors / 16, 0);
+	machine->gfx[state->gfx_index] = gfx_element_alloc(machine, &taitojc_char_layout, (UINT8 *)state->char_ram, machine->total_colors() / 16, 0);
 
 	state->texture = auto_alloc_array(machine, UINT8, 0x400000);
 

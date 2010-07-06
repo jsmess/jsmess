@@ -251,7 +251,7 @@ static void set_line_timer(running_device *device, coco_cartridge_line *line, co
 {
 	/* calculate delay; it isn't clear why we have to do this every single time */
 	attotime delay = (line->delay != 0)
-		? cpu_clocks_to_attotime(device->machine->firstcpu, line->delay)
+		? device->machine->firstcpu->cycles_to_attotime(line->delay)
 		: attotime_zero;
 
 	timer_adjust_oneshot(line->timer, delay, (int) value);

@@ -227,7 +227,7 @@ static void execute_debug_irq(running_machine *machine, int ref, int params, con
 static void execute_debug_intmasks(running_machine *machine, int ref, int params, const char *param[]);
 static void nimbus_debug(running_machine *machine, int ref, int params, const char *param[]);
 
-static int instruction_hook(running_device *device, offs_t curpc);
+static int instruction_hook(device_t &device, offs_t curpc);
 static void decode_subbios(running_device *device,offs_t pc);
 static void decode_dssi_f_fill_area(running_device *device,UINT16  ds, UINT16 si);
 static void decode_dssi_f_plot_character_string(running_device *device,UINT16  ds, UINT16 si);
@@ -1342,9 +1342,8 @@ MACHINE_START( nimbus )
         debug_console_register_command(machine, "nimbus_intmasks", CMDFLAG_NONE, 0, 0, 0, execute_debug_intmasks);
         debug_console_register_command(machine, "nimbus_debug", CMDFLAG_NONE, 0, 0, 1, nimbus_debug);
 
-        /* set up the instruction hook */
-        debug_cpu_set_instruction_hook(devtag_get_device(machine, MAINCPU_TAG), instruction_hook);
-
+        /* set up the instruction hook */        
+		machine->device(MAINCPU_TAG)->debug()->set_instruction_hook(instruction_hook);
     }
 
     debug_flags=DECODE_BIOS;
@@ -1404,16 +1403,16 @@ static void nimbus_debug(running_machine *machine, int ref, int params, const ch
     instruction_hook - per-instruction hook
 -----------------------------------------------*/
 
-static int instruction_hook(running_device *device, offs_t curpc)
+static int instruction_hook(device_t &device, offs_t curpc)
 {
-    const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+    const address_space *space = cpu_get_address_space(&device, ADDRESS_SPACE_PROGRAM);
     UINT8               *addr_ptr;
 
     addr_ptr = (UINT8*)memory_get_read_ptr(space,curpc);
 
     if(DEBUG_SET(DECODE_BIOS))
         if ((addr_ptr !=NULL) && (addr_ptr[0]==0xCD) && (addr_ptr[1]==0xF0))
-            decode_subbios(device,curpc);
+            decode_subbios(&device,curpc);
 
     return 0;
 }

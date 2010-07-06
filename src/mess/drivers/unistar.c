@@ -57,7 +57,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( unistar )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8085A, XTAL_2MHz)
+    MDRV_CPU_ADD("maincpu",I8085A, XTAL_2MHz)
     MDRV_CPU_PROGRAM_MAP(unistar_mem)
     MDRV_CPU_IO_MAP(unistar_io)
 

@@ -510,39 +510,39 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 	{
 		// create memory regions
 		size = image.get_software_region_length("maincpu");
-		memory_region_free(image.device().machine,"maincpu");
-		memory_region_alloc(image.device().machine,"maincpu",size,0);
+		image.device().machine->region_free("maincpu");
+		image.device().machine->region_alloc("maincpu",size,0);
 		memcpy(memory_region(image.device().machine,"maincpu"),image.get_software_region("maincpu"),size);
 		size = image.get_software_region_length("fixed");
-		memory_region_free(image.device().machine,"fixed");
-		memory_region_alloc(image.device().machine,"fixed",size,ROMREGION_ERASEFF);
+		image.device().machine->region_free("fixed");
+		image.device().machine->region_alloc("fixed",size,ROMREGION_ERASEFF);
 		memcpy(memory_region(image.device().machine,"fixed"),image.get_software_region("fixed"),size);
 		size = image.get_software_region_length("audiocpu");
-		memory_region_free(image.device().machine,"audiocpu");
-		memory_region_alloc(image.device().machine,"audiocpu",size,ROMREGION_ERASEFF);
+		image.device().machine->region_free("audiocpu");
+		image.device().machine->region_alloc("audiocpu",size,ROMREGION_ERASEFF);
 		memcpy(memory_region(image.device().machine,"audiocpu"),image.get_software_region("audiocpu"),size);
 		size = image.get_software_region_length("ymsnd");
-		memory_region_free(image.device().machine,"ymsnd");
-		memory_region_alloc(image.device().machine,"ymsnd",size,ROMREGION_ERASEFF);
+		image.device().machine->region_free("ymsnd");
+		image.device().machine->region_alloc("ymsnd",size,ROMREGION_ERASEFF);
 		memcpy(memory_region(image.device().machine,"ymsnd"),image.get_software_region("ymsnd"),size);
 		if(image.get_software_region("ymsnd.deltat") != NULL)
 		{
 			size = image.get_software_region_length("ymsnd.deltat");
-			memory_region_free(image.device().machine,"ymsnd.deltat");
-			memory_region_alloc(image.device().machine,"ymsnd.deltat",size,ROMREGION_ERASEFF);
+			image.device().machine->region_free("ymsnd.deltat");
+			image.device().machine->region_alloc("ymsnd.deltat",size,ROMREGION_ERASEFF);
 			memcpy(memory_region(image.device().machine,"ymsnd.deltat"),image.get_software_region("ymsnd.deltat"),size);
 		}
 		else
-			memory_region_free(image.device().machine,"ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
+			image.device().machine->region_free("ymsnd.deltat");  // removing the region will fix sound glitches in non-Delta-T games
 		ym->reset();
 		size = image.get_software_region_length("sprites");
-		memory_region_free(image.device().machine,"sprites");
-		memory_region_alloc(image.device().machine,"sprites",size,ROMREGION_ERASEFF);
+		image.device().machine->region_free("sprites");
+		image.device().machine->region_alloc("sprites",size,ROMREGION_ERASEFF);
 		memcpy(memory_region(image.device().machine,"sprites"),image.get_software_region("sprites"),size);
 		if(image.get_software_region("audiocrypt") != NULL)  // encrypted Z80 code
 		{
 			size = image.get_software_region_length("audiocrypt");
-			memory_region_alloc(image.device().machine,"audiocrypt",size,ROMREGION_ERASEFF);
+			image.device().machine->region_alloc("audiocrypt",size,ROMREGION_ERASEFF);
 			memcpy(memory_region(image.device().machine,"audiocrypt"),image.get_software_region("audiocrypt"),size);
 		}
 

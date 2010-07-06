@@ -102,10 +102,14 @@
 
 // forward references
 class region_info;
+class device_debug;
 class device_config;
 class device_config_interface;
 class device_t;
 class device_interface;
+class device_execute_interface;
+class device_memory_interface;
+class device_state_interface;
 struct rom_entry;
 union machine_config_token;
 class machine_config;
@@ -201,8 +205,8 @@ class device_list : public tagged_device_list<device_t>
 {
 	running_machine *m_machine;
 
-	static void static_reset(running_machine *machine);
-	static void static_exit(running_machine *machine);
+	static void static_reset(running_machine &machine);
+	static void static_exit(running_machine &machine);
 	static void static_pre_save(running_machine *machine, void *param);
 	static void static_post_load(running_machine *machine, void *param);
 
@@ -224,13 +228,14 @@ class device_config
 {
 	DISABLE_COPYING(device_config);
 
+	friend class machine_config;
 	friend class device_t;
 	friend class device_config_interface;
 	template<class T> friend class tagged_list;
 
 protected:
 	// construction/destruction
-	device_config(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock);
+	device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock);
 	virtual ~device_config();
 
 public:
@@ -256,6 +261,7 @@ public:
 	// basic information getters
 	device_type type() const { return m_type; }
 	UINT32 clock() const { return m_clock; }
+	const char *name() const { return m_name; }
 	const char *tag() const { return m_tag; }
 	const void *static_config() const { return m_static_config; }
 
@@ -275,10 +281,7 @@ protected:
 	virtual void device_config_complete();
 	virtual bool device_validity_check(const game_driver &driver) const;
 
-	// required information overrides
 public:
-	virtual const char *name() const = 0;
-
 	// optional information overrides
 	virtual const rom_entry *rom_region() const;
 	virtual const machine_config_token *machine_config_tokens() const;
@@ -298,8 +301,11 @@ protected:
 	const void *			m_static_config;		// static device configuration
 	UINT64					m_inline_data[16];		// array of inline configuration values
 
+	astring					m_name;					// name of the device
+
 private:
 	astring 				m_tag;					// tag for this instance
+	bool					m_config_complete;		// have we completed our configuration?
 };
 
 
@@ -363,13 +369,18 @@ public:
 
 	// interface helpers
 	template<class T> bool interface(T *&intf) { intf = dynamic_cast<T *>(this); return (intf != NULL); }
-	template<class T> bool next(T *&intf) const
+	template<class T> bool next(T *&intf)
 	{
 		for (device_t *cur = m_next; cur != NULL; cur = cur->m_next)
 			if (cur->interface(intf))
 				return true;
 		return false;
 	}
+
+	// specialized helpers
+	bool interface(device_execute_interface *&intf) { intf = m_execute; return (intf != NULL); }
+	bool interface(device_memory_interface *&intf) { intf = m_memory; return (intf != NULL); }
+	bool interface(device_state_interface *&intf) { intf = m_state; return (intf != NULL); }
 
 	// owned object helpers
 	astring &subtag(astring &dest, const char *tag) const { return m_baseconfig.subtag(dest, tag); }
@@ -395,6 +406,10 @@ public:
 	attotime clocks_to_attotime(UINT64 clocks) const;
 	UINT64 attotime_to_clocks(attotime duration) const;
 
+	// debugging
+	device_debug *debug() const { return m_debug; }
+	void set_debug(device_debug &debug) { m_debug = &debug; }
+
 	// basic information getters ... pass through to underlying config
 	device_type type() const { return m_baseconfig.type(); }
 	const char *name() const { return m_baseconfig.name(); }
@@ -409,6 +424,7 @@ public:
 
 protected:
 	// miscellaneous helpers
+	void find_interfaces();
 	void start();
 	void debug_setup();
 	void pre_save();
@@ -428,6 +444,12 @@ protected:
 	//------------------- end derived class overrides
 
 	running_machine &		m_machine;
+	device_debug *			m_debug;
+
+	// for speed
+	device_execute_interface *m_execute;
+	device_memory_interface *m_memory;
+	device_state_interface *m_state;
 
 	// device relationships
 	device_t *				m_next;					// next device (of any type/class)
@@ -465,6 +487,7 @@ protected:
 public:
 	// casting helpers
 	device_t &device() { return m_device; }
+	const device_t &device() const { return m_device; }
 	operator device_t &() { return m_device; }
 	operator device_t *() { return &m_device; }
 
@@ -554,18 +577,6 @@ inline double device_get_clock_scale(device_t *device)
 inline void device_set_clock_scale(device_t *device, double clockscale)
 {
 	device->set_clock_scale(clockscale);
-}
-
-// converts a number of clock ticks to an attotime
-inline attotime device_clocks_to_attotime(device_t *device, UINT64 clocks)
-{
-	return device->clocks_to_attotime(clocks);
-}
-
-// converts a duration as attotime to device clock ticks
-inline UINT64 device_attotime_to_clocks(device_t *device, attotime duration)
-{
-	return device->attotime_to_clocks(duration);
 }
 
 

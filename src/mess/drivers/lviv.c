@@ -13,9 +13,9 @@ What's new:
         problems with "Doroga (1991)(-)(Ru).lvt".
 21.12.2002  Cassette support rewritten, WAVs saving and loading are working now.
 08.12.2002  Comments on emulation status updated. Changed 'lvive' to 'lvivp'.
-        ADC r instruction in 8080 core fixed (Arkanoid works now).
+        ADC r instruction in I8080 core fixed (Arkanoid works now).
         Orginal keyboard layout added.
-20.07.2002  "Reset" key fixed. 8080 core fixed (all BASIC commands works).
+20.07.2002  "Reset" key fixed. I8080 core fixed (all BASIC commands works).
         now). Unsupported .lvt files versions aren't now loaded.
 xx.07.2002  Improved port and memory mapping (Raphael Nabet).
         Hardware description updated (Raphael Nabet).
@@ -41,7 +41,7 @@ Lviv technical information
 
 CPU:
 ----
-    8080 2.5MHz (2MHz in first machines)
+    I8080 2.5MHz (2MHz in first machines)
 
 Memory map:
 -----------
@@ -426,7 +426,7 @@ static const cassette_config lviv_cassette_config =
 /* machine definition */
 static MACHINE_DRIVER_START( lviv )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8080, 2500000)
+	MDRV_CPU_ADD("maincpu", I8080, 2500000)
 	MDRV_CPU_PROGRAM_MAP(lviv_mem)
 	MDRV_CPU_IO_MAP(io_map)
 	MDRV_QUANTUM_TIME(HZ(60))

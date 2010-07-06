@@ -2550,9 +2550,9 @@ static DEVICE_START( vic2 )
 
 	// immediately call the timer to handle the first line
 	if (vic2->type == VIC6569 || vic2->type == VIC8566)
-		timer_set(device->machine, cpu_clocks_to_attotime(vic2->cpu, 0), vic2, 0, pal_timer_callback);
+		timer_set(device->machine, downcast<cpu_device *>(vic2->cpu)->cycles_to_attotime(0), vic2, 0, pal_timer_callback);
 	else
-		timer_set(device->machine, cpu_clocks_to_attotime(vic2->cpu, 0), vic2, 0, ntsc_timer_callback);
+		timer_set(device->machine, downcast<cpu_device *>(vic2->cpu)->cycles_to_attotime(0), vic2, 0, ntsc_timer_callback);
 
 	for (i = 0; i < 256; i++)
 	{

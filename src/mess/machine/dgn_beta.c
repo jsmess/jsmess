@@ -110,7 +110,7 @@ static WRITE8_HANDLER( dgnbeta_ram_bG_w );
 
 
 /* Debugging commands and handlers. */
-static CPU_DISASSEMBLE(dgnbeta_dasm_override);
+static offs_t dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 static void execute_beta_dat_log(running_machine *machine, int ref, int params, const char *param[]);
 static void execute_beta_key_dump(running_machine *machine, int ref, int params, const char *param[]);
 
@@ -1068,19 +1068,19 @@ void dgn_beta_line_interrupt (int data)
 
 
 /********************************* Machine/Driver Initialization ****************************************/
-static void dgnbeta_reset(running_machine *machine)
+static void dgnbeta_reset(running_machine &machine)
 {
-	running_device *fdc = devtag_get_device(machine, FDC_TAG);
-	running_device *pia_0 = devtag_get_device( machine, PIA_0_TAG );
-	running_device *pia_1 = devtag_get_device( machine, PIA_1_TAG );
-	running_device *pia_2 = devtag_get_device( machine, PIA_2_TAG );
+	running_device *fdc = devtag_get_device(&machine, FDC_TAG);
+	running_device *pia_0 = devtag_get_device( &machine, PIA_0_TAG );
+	running_device *pia_1 = devtag_get_device( &machine, PIA_1_TAG );
+	running_device *pia_2 = devtag_get_device( &machine, PIA_2_TAG );
 
     logerror("MACHINE_RESET( dgnbeta )\n");
 
-	system_rom = memory_region(machine, MAINCPU_TAG);
+	system_rom = memory_region(&machine, MAINCPU_TAG);
 
 	/* Make sure CPU 1 is started out halted ! */
-	cputag_set_input_line(machine, DMACPU_TAG, INPUT_LINE_HALT, ASSERT_LINE);
+	cputag_set_input_line(&machine, DMACPU_TAG, INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* Reset to task 0, and map banks disabled, so standard memory map */
 	/* with ram at $0000-$BFFF, ROM at $C000-FBFF, IO at $FC00-$FEFF */
@@ -1089,7 +1089,7 @@ static void dgnbeta_reset(running_machine *machine)
 	PIATaskReg = 0;
 	EnableMapRegs = 0;
 	memset(PageRegs, 0, sizeof(PageRegs));	/* Reset page registers to 0 */
-	SetDefaultTask(machine);
+	SetDefaultTask(&machine);
 
 	/* Set pullups on all PIA port A, to match what hardware does */
 	pia6821_set_port_a_z_mask(pia_0, 0xFF);
@@ -1112,9 +1112,9 @@ static void dgnbeta_reset(running_machine *machine)
 	wd17xx_dden_w(fdc, CLEAR_LINE);
 	wd17xx_set_drive(fdc, 0);
 
-	machine->generic.videoram.u8 = messram_get_ptr(devtag_get_device(machine, "messram"));		/* Point video ram at the start of physical ram */
+	machine.generic.videoram.u8 = messram_get_ptr(devtag_get_device(&machine, "messram"));		/* Point video ram at the start of physical ram */
 
-    dgnbeta_video_reset(machine);
+    dgnbeta_video_reset(&machine);
     wd17xx_reset(fdc);
     wd2797_written=0;
 }
@@ -1125,10 +1125,10 @@ MACHINE_START( dgnbeta )
 
     dgnbeta_init_video(machine);
 
-	debug_cpu_set_dasm_override(devtag_get_device(machine, MAINCPU_TAG), CPU_DISASSEMBLE_NAME(dgnbeta_dasm_override));
+	machine->device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
 
-	add_reset_callback(machine, dgnbeta_reset);
-	dgnbeta_reset(machine);
+	machine->add_notifier(MACHINE_NOTIFY_RESET, dgnbeta_reset);
+	dgnbeta_reset(*machine);
 	/* setup debug commands */
 	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
 	{
@@ -1294,7 +1294,7 @@ static const char *const os9syscalls[] =
 };
 
 
-static CPU_DISASSEMBLE(dgnbeta_dasm_override)
+static offs_t dgnbeta_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
 {
 	unsigned call;
 	unsigned result = 0;

@@ -163,7 +163,7 @@ static MACHINE_RESET(mmd2)
 
 static MACHINE_DRIVER_START( mmd1 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8080, 6750000 / 9)
+    MDRV_CPU_ADD("maincpu",I8080, 6750000 / 9)
     MDRV_CPU_PROGRAM_MAP(mmd1_mem)
     MDRV_CPU_IO_MAP(mmd1_io)
 
@@ -175,7 +175,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( mmd2 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8080, 6750000 / 9)
+    MDRV_CPU_ADD("maincpu",I8080, 6750000 / 9)
     MDRV_CPU_PROGRAM_MAP(mmd2_mem)
     MDRV_CPU_IO_MAP(mmd2_io)
 

@@ -39,7 +39,7 @@ VK100 LOGICBOARD
 | 4116 4116 4116       5.0688MHz  ROM4                       PR4       |
 |                                                                      |
 | 4116 4116       INTEL    SMC_5016T                            PIEZO  |
-|                 D8085A                        IDC40   LM556   75452  |
+|                 DI8085A                        IDC40   LM556   75452  |
 |----------------------------------------------------------------------|
 Notes:
       ROM1 - TP-01 (C) DEC 23-031E4-00 (M) SCM91276L 8114
@@ -115,7 +115,7 @@ static VIDEO_UPDATE( vk100 )
 
 static MACHINE_DRIVER_START( vk100 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",8085A, XTAL_5_0688MHz)
+    MDRV_CPU_ADD("maincpu", I8085A, XTAL_5_0688MHz)
     MDRV_CPU_PROGRAM_MAP(vk100_mem)
     MDRV_CPU_IO_MAP(vk100_io)
     //MDRV_CPU_VBLANK_INT("screen", vk100_vertical_interrupt) // hook me up please

@@ -44,7 +44,7 @@ static VIDEO_UPDATE( vt240 )
 
 static MACHINE_DRIVER_START( vt240 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", 8085A, XTAL_16MHz / 4)
+	MDRV_CPU_ADD("maincpu", I8085A, XTAL_16MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(vt240_mem)
 	MDRV_CPU_IO_MAP(vt240_io)
 

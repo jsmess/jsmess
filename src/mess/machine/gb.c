@@ -139,7 +139,7 @@ static gb_state gb_driver_data;
 */
 
 static TIMER_CALLBACK(gb_serial_timer_proc);
-static void gb_machine_stop(running_machine *machine);
+static void gb_machine_stop(running_machine &machine);
 static WRITE8_HANDLER( gb_rom_bank_select_mbc1 );
 static WRITE8_HANDLER( gb_ram_bank_select_mbc1 );
 static WRITE8_HANDLER( gb_mem_mode_select_mbc1 );
@@ -299,7 +299,7 @@ static void gb_init(running_machine *machine)
 
 MACHINE_START( gb )
 {
-	add_exit_callback(machine, gb_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
 	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
@@ -310,7 +310,7 @@ MACHINE_START( gb )
 
 MACHINE_START( gbc )
 {
-	add_exit_callback(machine, gb_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
 	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
@@ -338,7 +338,7 @@ MACHINE_START( sgb )
 {
 	sgb_tile_data = auto_alloc_array_clear(machine, UINT8, 0x2000 );
 
-	add_exit_callback(machine, gb_machine_stop);
+	machine->add_notifier(MACHINE_NOTIFY_EXIT, gb_machine_stop);
 
 	/* Allocate the serial timer, and disable it */
 	gb_driver_data.gb_serial_timer = timer_alloc(machine,  gb_serial_timer_proc , NULL);
@@ -424,7 +424,7 @@ MACHINE_RESET( gbc )
 	}
 }
 
-static void gb_machine_stop(running_machine *machine)
+static void gb_machine_stop(running_machine &machine)
 {
 	/* Don't save if there was no battery */
 	if(!(gb_driver_data.CartType & BATTERY) || !gb_driver_data.RAMBanks)
@@ -433,7 +433,7 @@ static void gb_machine_stop(running_machine *machine)
 	/* NOTE: The reason we save the carts RAM this way instead of using MAME's
        built in macros is because they force the filename to be the name of
        the machine.  We need to have a separate name for each game. */
-	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart"));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(&machine, "cart"));
 	image->battery_save(gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000);
 }
 

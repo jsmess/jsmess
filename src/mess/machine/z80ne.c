@@ -409,7 +409,7 @@ INPUT_CHANGED( z80ne_reset )
 	if ( ! BIT(rst, 0))
 	{
 		running_machine *machine = field->port->machine;
-		mame_schedule_soft_reset(machine);
+		machine->schedule_soft_reset();
 	}
 }
 

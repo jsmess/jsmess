@@ -205,7 +205,7 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 	nDevCount = 0;
 
 	{
-		for (bool gotone = pDevViewInfo->config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))
+		for (bool gotone = pDevViewInfo->config->mconfig->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 		{
 			nDevCount++;
 		}
@@ -216,9 +216,9 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 		// get the names of all of the devices
 		ppszDevices = (LPTSTR *) alloca(nDevCount * sizeof(*ppszDevices));
 		i = 0;
-		for (bool gotone = pDevViewInfo->config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))
+		for (bool gotone = pDevViewInfo->config->mconfig->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 		{
-			t_s = tstring_from_utf8(dev->name());
+			t_s = tstring_from_utf8(dev->devconfig().name());
 			ppszDevices[i] = (TCHAR*)alloca((_tcslen(t_s) + 1) * sizeof(TCHAR));
 			_tcscpy(ppszDevices[i], t_s);
 			osd_free(t_s);
@@ -250,11 +250,11 @@ BOOL DevView_SetDriver(HWND hwndDevView, const software_config *config)
 		DevView_GetColumns(hwndDevView, &nStaticPos, &nStaticWidth,
 			&nEditPos, &nEditWidth, &nButtonPos, &nButtonWidth);
 
-		for (bool gotone = pDevViewInfo->config->mconfig->devicelist.first(dev); gotone; gotone = dev->next(dev))
+		for (bool gotone = pDevViewInfo->config->mconfig->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 		{
 			pEnt->dev = dev;
 
-			pEnt->hwndStatic = win_create_window_ex_utf8(0, "STATIC", dev->name(),
+			pEnt->hwndStatic = win_create_window_ex_utf8(0, "STATIC", dev->devconfig().name(),
 				WS_VISIBLE | WS_CHILD, nStaticPos, y, nStaticWidth, nHeight,
 				hwndDevView, NULL, NULL, NULL);
 

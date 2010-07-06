@@ -329,7 +329,7 @@ static INPUT_CHANGED( ti68k_on_key )
 
 	if (state->on_key)
 	{
-		if (cputag_is_suspended(field->port->machine, "maincpu", SUSPEND_REASON_DISABLE))
+		if (field->port->machine->device<cpu_device>("maincpu")->suspended(SUSPEND_REASON_DISABLE))
 			cputag_resume(field->port->machine, "maincpu", SUSPEND_REASON_DISABLE);
 
 		cputag_set_input_line(field->port->machine, "maincpu", M68K_IRQ_6, HOLD_LINE);

@@ -67,7 +67,7 @@ static MACHINE_DRIVER_START( dual68 )
     MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz / 2)
     MDRV_CPU_PROGRAM_MAP(dual68_mem)
 
-	MDRV_CPU_ADD("siocpu", 8085A, XTAL_16MHz / 8)
+	MDRV_CPU_ADD("siocpu", I8085A, XTAL_16MHz / 8)
     MDRV_CPU_PROGRAM_MAP(sio4_mem)
     MDRV_CPU_IO_MAP(sio4_io)
 

@@ -201,7 +201,7 @@ static const floppy_config b2m_floppy_config =
 static MACHINE_DRIVER_START( b2m )
 	MDRV_DRIVER_DATA(b2m_state)
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", 8080, 2000000)
+    MDRV_CPU_ADD("maincpu", I8080, 2000000)
     MDRV_CPU_PROGRAM_MAP(b2m_mem)
     MDRV_CPU_IO_MAP(b2m_io)
     MDRV_CPU_VBLANK_INT("screen", b2m_vblank_interrupt)

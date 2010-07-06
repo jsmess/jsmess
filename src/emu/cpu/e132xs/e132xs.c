@@ -416,21 +416,20 @@ ADDRESS_MAP_END
 INLINE hyperstone_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == CPU);
-	assert(cpu_get_type(device) == CPU_E116T ||
-		   cpu_get_type(device) == CPU_E116XT ||
-		   cpu_get_type(device) == CPU_E116XS ||
-		   cpu_get_type(device) == CPU_E116XSR ||
-		   cpu_get_type(device) == CPU_E132N ||
-		   cpu_get_type(device) == CPU_E132T ||
-		   cpu_get_type(device) == CPU_E132XN ||
-		   cpu_get_type(device) == CPU_E132XT ||
-		   cpu_get_type(device) == CPU_E132XS ||
-		   cpu_get_type(device) == CPU_E132XSR ||
-		   cpu_get_type(device) == CPU_GMS30C2116 ||
-		   cpu_get_type(device) == CPU_GMS30C2132 ||
-		   cpu_get_type(device) == CPU_GMS30C2216 ||
-		   cpu_get_type(device) == CPU_GMS30C2232);
+	assert(device->type() == E116T ||
+		   device->type() == E116XT ||
+		   device->type() == E116XS ||
+		   device->type() == E116XSR ||
+		   device->type() == E132N ||
+		   device->type() == E132T ||
+		   device->type() == E132XN ||
+		   device->type() == E132XT ||
+		   device->type() == E132XS ||
+		   device->type() == E132XSR ||
+		   device->type() == GMS30C2116 ||
+		   device->type() == GMS30C2132 ||
+		   device->type() == GMS30C2216 ||
+		   device->type() == GMS30C2232);
 	return (hyperstone_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
@@ -576,7 +575,7 @@ static void hyperstone_set_trap_entry(hyperstone_state *cpustate, int which)
 
 static UINT32 compute_tr(hyperstone_state *cpustate)
 {
-	UINT64 cycles_since_base = cpu_get_total_cycles(cpustate->device) - cpustate->tr_base_cycles;
+	UINT64 cycles_since_base = cpustate->device->total_cycles() - cpustate->tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> cpustate->clock_scale;
 	return cpustate->tr_base_value + (clocks_since_base / cpustate->tr_clocks_per_tick);
 }
@@ -592,12 +591,12 @@ static void update_timer_prescale(hyperstone_state *cpustate)
 	cpustate->clock_cycles_6 = 6 << cpustate->clock_scale;
 	cpustate->tr_clocks_per_tick = ((TPR >> 16) & 0xff) + 2;
 	cpustate->tr_base_value = prevtr;
-	cpustate->tr_base_cycles = cpu_get_total_cycles(cpustate->device);
+	cpustate->tr_base_cycles = cpustate->device->total_cycles();
 }
 
 static void adjust_timer_interrupt(hyperstone_state *cpustate)
 {
-	UINT64 cycles_since_base = cpu_get_total_cycles(cpustate->device) - cpustate->tr_base_cycles;
+	UINT64 cycles_since_base = cpustate->device->total_cycles() - cpustate->tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> cpustate->clock_scale;
 	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << cpustate->clock_scale);
 
@@ -609,7 +608,7 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 	{
 		UINT64 clocks_until_int = cpustate->tr_clocks_per_tick - (clocks_since_base % cpustate->tr_clocks_per_tick);
 		UINT64 cycles_until_int = (clocks_until_int << cpustate->clock_scale) + cycles_until_next_clock;
-		timer_adjust_oneshot(cpustate->timer, cpu_clocks_to_attotime(cpustate->device, cycles_until_int + 1), 1);
+		timer_adjust_oneshot(cpustate->timer, cpustate->device->cycles_to_attotime(cycles_until_int + 1), 1);
 	}
 
 	/* else if the timer interrupt is enabled, configure it to fire at the appropriate time */
@@ -626,7 +625,7 @@ static void adjust_timer_interrupt(hyperstone_state *cpustate)
 		{
 			UINT64 clocks_until_int = mulu_32x32(delta, cpustate->tr_clocks_per_tick);
 			UINT64 cycles_until_int = (clocks_until_int << cpustate->clock_scale) + cycles_until_next_clock;
-			timer_adjust_oneshot(cpustate->timer, cpu_clocks_to_attotime(cpustate->device, cycles_until_int), 0);
+			timer_adjust_oneshot(cpustate->timer, cpustate->device->cycles_to_attotime(cycles_until_int), 0);
 		}
 	}
 
@@ -767,7 +766,7 @@ INLINE void set_global_register(hyperstone_state *cpustate, UINT8 code, UINT32 v
 */
 			case TR_REGISTER:
 				cpustate->tr_base_value = val;
-				cpustate->tr_base_cycles = cpu_get_total_cycles(cpustate->device);
+				cpustate->tr_base_cycles = cpustate->device->total_cycles();
 				adjust_timer_interrupt(cpustate);
 				break;
 
@@ -5430,3 +5429,18 @@ CPU_GET_INFO( gms30c2232 )
 			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
+
+DEFINE_LEGACY_CPU_DEVICE(E116T, e116t);
+DEFINE_LEGACY_CPU_DEVICE(E116XT, e116xt);
+DEFINE_LEGACY_CPU_DEVICE(E116XS, e116xs);
+DEFINE_LEGACY_CPU_DEVICE(E116XSR, e116xsr);
+DEFINE_LEGACY_CPU_DEVICE(E132N, e132n);
+DEFINE_LEGACY_CPU_DEVICE(E132T, e132t);
+DEFINE_LEGACY_CPU_DEVICE(E132XN, e132xn);
+DEFINE_LEGACY_CPU_DEVICE(E132XT, e132xt);
+DEFINE_LEGACY_CPU_DEVICE(E132XS, e132xs);
+DEFINE_LEGACY_CPU_DEVICE(E132XSR, e132xsr);
+DEFINE_LEGACY_CPU_DEVICE(GMS30C2116, gms30c2116);
+DEFINE_LEGACY_CPU_DEVICE(GMS30C2132, gms30c2132);
+DEFINE_LEGACY_CPU_DEVICE(GMS30C2216, gms30c2216);
+DEFINE_LEGACY_CPU_DEVICE(GMS30C2232, gms30c2232);

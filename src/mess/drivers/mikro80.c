@@ -166,7 +166,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( mikro80 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",8080, 2000000)
+	MDRV_CPU_ADD("maincpu",I8080, 2000000)
 	MDRV_CPU_PROGRAM_MAP(mikro80_mem)
 	MDRV_CPU_IO_MAP(mikro80_io)
 	MDRV_MACHINE_RESET( mikro80 )

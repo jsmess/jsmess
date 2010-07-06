@@ -209,7 +209,7 @@ static void setup_memory_map(running_machine *machine);
 
 #define GIME_TYPE_1987	0
 
-static CPU_DISASSEMBLE(coco_dasm_override);
+static offs_t coco_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
 
 
 /* ----------------------------------------------------------------------- */
@@ -2824,7 +2824,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	/* setup printer output callback */
 	printer_out = init->printer_out_;
 
-	debug_cpu_set_dasm_override(devtag_get_device(machine, "maincpu"), CPU_DISASSEMBLE_NAME(coco_dasm_override));
+	machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(coco_dasm_override);
 
 	state_save_register_global(machine, mux_sel1);
 	state_save_register_global(machine, mux_sel2);
@@ -3184,7 +3184,7 @@ static const char *const os9syscalls[] =
 };
 
 
-static CPU_DISASSEMBLE(coco_dasm_override)
+static offs_t coco_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options)
 {
 	unsigned call;
 	unsigned result = 0;

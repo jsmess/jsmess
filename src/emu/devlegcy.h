@@ -202,12 +202,12 @@ public:																			\
 extern const device_type name
 
 // macro for defining the implementation needed for configuration and device classes
-#define _DEFINE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass)		\
+#define _DEFINE_LEGACY_DEVICE(name, basename, configclass, deviceclass, baseconfigclass, basedeviceclass) \
 																				\
 deviceclass::deviceclass(running_machine &_machine, const configclass &config)	\
-		: basedeviceclass(_machine, config)										\
-	{																			\
-	}																			\
+	: basedeviceclass(_machine, config)											\
+{																				\
+}																				\
 																				\
 configclass::configclass(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner, UINT32 clock) \
 	: baseconfigclass(mconfig, type, tag, owner, clock, DEVICE_GET_INFO_NAME(basename)) \
@@ -431,7 +431,6 @@ protected:
 
 	// basic information getters
 public:
-	virtual const char *name() const { return get_legacy_config_string(DEVINFO_STR_NAME); }
 	virtual const rom_entry *rom_region() const { return reinterpret_cast<const rom_entry *>(get_legacy_config_ptr(DEVINFO_PTR_ROM_REGION)); }
 	virtual const machine_config_token *machine_config_tokens() const { return reinterpret_cast<const machine_config_token *>(get_legacy_config_ptr(DEVINFO_PTR_MACHINE_CONFIG)); }
 
@@ -468,6 +467,7 @@ protected:
 public:
 	// access to legacy token
 	void *token() const { return m_token; }
+
 protected:
 	// device-level overrides
 	virtual void device_start();
@@ -577,7 +577,6 @@ class legacy_image_device_config_base : 	public legacy_device_config_base,
 											public device_config_image_interface
 {
 public:
-	virtual const char *name() const { return get_legacy_config_string(DEVINFO_STR_NAME); }
 	virtual iodevice_t image_type()  const { return m_type; }
 	virtual const char *image_type_name()  const { return device_typename(m_type); }
 	virtual iodevice_t image_type_direct() const { return static_cast<iodevice_t>(get_legacy_config_int(DEVINFO_INT_IMAGE_TYPE)); }
@@ -614,7 +613,7 @@ protected:
     astring m_instance_name;
     astring m_brief_instance_name;
 	astring m_interface_name;
-	
+
     /* creation info */
     const option_guide *m_create_option_guide;
     image_device_format *m_formatlist;
@@ -631,8 +630,8 @@ public:
 	virtual bool load(const char *path);
 	virtual bool finish_load();
 	virtual void unload();
-	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);	
-	
+	virtual bool create(const char *path, const image_device_format *create_format, option_resolution *create_args);
+
 	virtual int call_load();
 	virtual int call_create(int format_type, option_resolution *format_options);
 	virtual void call_unload();
@@ -647,9 +646,9 @@ protected:
 	bool load_internal(const char *path, bool is_create, int create_format, option_resolution *create_args);
 	void determine_open_plan(int is_create, UINT32 *open_plan);
 	image_error_t load_image_by_path(UINT32 open_flags, const char *path);
-	void clear();	
+	void clear();
 	bool is_loaded();
-	
+
 	bool m_is_loading;
 };
 

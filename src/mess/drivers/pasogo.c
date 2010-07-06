@@ -101,14 +101,14 @@ static void vg230_reset(running_machine *machine)
 {
 	pasogo_state *state = (pasogo_state *)machine->driver_data;
 	vg230_t *vg230 = &state->vg230;
-	mame_system_time systime;
+	system_time systime;
 
 	memset(vg230, 0, sizeof(*vg230));
 	vg230->pmu.write_protected=TRUE;
 	timer_pulse(machine, ATTOTIME_IN_HZ(1), NULL, 0, vg230_timer);
 
 
-	mame_get_base_datetime(machine, &systime);
+	machine->base_datetime(systime);
 
 	vg230->rtc.seconds= systime.local_time.second;
 	vg230->rtc.minutes= systime.local_time.minute;

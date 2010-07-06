@@ -397,7 +397,7 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 			/* Allocate machine config */
 			if (gamedrv != NULL)
 			{
-				config = machine_config_alloc(gamedrv->machine_config);
+				config = global_alloc(machine_config(gamedrv->machine_config));
 			}
 			if (!gamedrv || !g_propSheets[i].pfnFilterProc || g_propSheets[i].pfnFilterProc(config, gamedrv))
 			{
@@ -413,7 +413,7 @@ static PROPSHEETPAGE *CreatePropSheetPages(HINSTANCE hInst, BOOL bOnlyDefault,
 			if (config != NULL)
 			{
 				/* Free the structure */
-				machine_config_free(config);
+				global_free(config);
 			}
 		}
 	}
@@ -602,36 +602,36 @@ void InitPropertyPageToPage(HINSTANCE hInst, HWND hWnd, HICON hIcon, OPTIONS_TYP
 static char *GameInfoCPU(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
-	const device_config *cpu;
+	machine_config *config = global_alloc(machine_config(drivers[nIndex]->machine_config));
+	const device_config_execute_interface *cpu;
 
 	ZeroMemory(buf, sizeof(buf));
 
-	cpu = config->devicelist.first(CPU);
-	while (cpu != NULL)
+	bool gotone = config->m_devicelist.first(cpu);
+	while (gotone)
 	{
-		if (cpu->clock() >= 1000000)
+		if (cpu->devconfig().clock() >= 1000000)
 		{
 			sprintf(&buf[strlen(buf)], "%s %d.%06d MHz",
-				cpu->name(),
-				cpu->clock() / 1000000,
-				cpu->clock() % 1000000);
+				cpu->devconfig().name(),
+				cpu->devconfig().clock() / 1000000,
+				cpu->devconfig().clock() % 1000000);
 		}
 		else
 		{
 			sprintf(&buf[strlen(buf)], "%s %d.%03d kHz",
-				cpu->name(),
-				cpu->clock() / 1000,
-				cpu->clock() % 1000);
+				cpu->devconfig().name(),
+				cpu->devconfig().clock() / 1000,
+				cpu->devconfig().clock() % 1000);
 		}
 
 		strcat(buf, "\n");
 
-		cpu = cpu->typenext();
+		gotone = cpu->next(cpu);
     }
 
 	/* Free the structure */
-	machine_config_free(config);
+	global_free(config);
 
 	return buf;
 }
@@ -643,11 +643,11 @@ static char *GameInfoSound(UINT nIndex)
 
 	buf[0] = 0;
 	
-	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
+	machine_config *config = global_alloc(machine_config(drivers[nIndex]->machine_config));
 	
 	/* iterate over sound chips */
 	const device_config_sound_interface *sound = NULL;
-	bool gotone = config->devicelist.first(sound);
+	bool gotone = config->m_devicelist.first(sound);
 	while(gotone)
 	{
 		int clock,count;
@@ -696,7 +696,7 @@ static char *GameInfoSound(UINT nIndex)
 		strcat(buf,"\n");
 	}
 	/* Free the structure */
-	machine_config_free(config);
+	global_free(config);
 
 	return buf;
 }
@@ -705,7 +705,7 @@ static char *GameInfoSound(UINT nIndex)
 static char *GameInfoScreen(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
+	machine_config *config = global_alloc(machine_config(drivers[nIndex]->machine_config));
 	memset(buf, '\0', 1024);
 
 	if (isDriverVector(config))
@@ -740,7 +740,7 @@ static char *GameInfoScreen(UINT nIndex)
 		}
 	}
 	/* Free the structure */
-	machine_config_free(config);
+	global_free(config);
 
 	return buf;
 }
@@ -749,11 +749,11 @@ static char *GameInfoScreen(UINT nIndex)
 static char *GameInfoColors(UINT nIndex)
 {
 	static char buf[1024];
-	machine_config *config = machine_config_alloc(drivers[nIndex]->machine_config);
+	machine_config *config = global_alloc(machine_config(drivers[nIndex]->machine_config));
 
 	ZeroMemory(buf, sizeof(buf));
-	sprintf(buf, "%d colors ", config->total_colors);
-	machine_config_free(config);
+	sprintf(buf, "%d colors ", config->m_total_colors);
+	global_free(config);
 
 	return buf;
 }
@@ -2593,7 +2593,7 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 	hCtrl = GetDlgItem(hWnd, IDC_SAMPLES);
 
 	if ( nIndex > -1 ) {
-		config = machine_config_alloc(drivers[nIndex]->machine_config);
+		config = global_alloc(machine_config(drivers[nIndex]->machine_config));
 	}
 	
 	if (hCtrl)
@@ -2601,7 +2601,7 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 		const device_config_sound_interface *sound;
 		if (config != NULL)
 		{
-			for (bool gotone = config->devicelist.first(sound); gotone; gotone = sound->next(sound))
+			for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 			{
 				if (sound->devconfig().type() == SOUND_SAMPLES ||
 					sound->devconfig().type() == SOUND_VLM5030) {
@@ -2615,7 +2615,7 @@ static void SetSamplesEnabled(HWND hWnd, int nIndex, BOOL bSoundEnabled)
 	}
 	if (config != NULL)
 	{
-		machine_config_free(config);
+		global_free(config);
 	}
 }
 
