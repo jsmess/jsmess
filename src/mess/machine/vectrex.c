@@ -78,7 +78,13 @@ static int vectrex_verify_cart(char *data)
 DEVICE_IMAGE_LOAD(vectrex_cart)
 {
 	UINT8 *mem = memory_region(image.device().machine, "maincpu");
-	image.fread( mem, 0x8000);
+	if (image.software_entry() == NULL)
+	{	
+		image.fread( mem, 0x8000);
+	} else {
+		int size = image.get_software_region_length("rom");
+		memcpy(mem, image.get_software_region("rom"), size);
+	}
 
 	/* check image! */
 	if (vectrex_verify_cart((char*)mem) == IMAGE_VERIFY_FAIL)

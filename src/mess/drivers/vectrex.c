@@ -126,6 +126,10 @@ static MACHINE_DRIVER_START(vectrex)
 	MDRV_CARTSLOT_EXTENSION_LIST("bin,gam,vec")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(vectrex_cart)
+	MDRV_CARTSLOT_INTERFACE("vectrex_cart")
+	
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("vectrex")
 MACHINE_DRIVER_END
 
 ROM_START(vectrex)
