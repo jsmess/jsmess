@@ -8,7 +8,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/ay8910.h"
+#include "machine/z80ctc.h"
+#include "machine/i8255a.h"
+#include "sound/sn76496.h"
 #include "video/mc6845.h"
 
 static UINT8 vram_sel;
@@ -89,25 +91,16 @@ static WRITE8_HANDLER( paso7_bankswitch )
 	// bit 3? PIO2 port C
 
 	// bank4 is always RAM
+
+	printf("%02x\n",data);
 }
 
-static READ8_HANDLER( test_r )
+#if 0
+static READ8_HANDLER( fdc_r )
 {
 	return mame_rand(space->machine);
 }
-
-
-#if 0
-static WRITE8_HANDLER( test_w )
-{
-	printf("%02x %02x\n",offset,data);
-}
 #endif
-
-static READ8_HANDLER( test2_r )
-{
-	return 0xff;
-}
 
 static ADDRESS_MAP_START(paso7_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -120,18 +113,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( paso7_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x09, 0x09 ) AM_READ(test_r)
+	AM_RANGE( 0x08, 0x0b ) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
+	AM_RANGE( 0x0c, 0x0f ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
 	AM_RANGE( 0x10, 0x10 ) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE( 0x11, 0x11 ) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE( 0x22, 0x22 ) AM_READ(test2_r) AM_WRITENOP
+//	AM_RANGE( 0x18, 0x1b ) //PAC2 (???)
+	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
+	AM_RANGE( 0x28, 0x2b ) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
+//	AM_RANGE( 0x30, 0x33 ) //I8255 related (port mirrors?)
+	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("sn1", sn76496_w)
+	AM_RANGE( 0x3b, 0x3b ) AM_DEVWRITE("sn2", sn76496_w)
 	AM_RANGE( 0x3c, 0x3c ) AM_WRITE(paso7_bankswitch)
-//	AM_RANGE( 0x08, 0x0b )  // PIO0
-//	AM_RANGE( 0x0c, 0x0f )  // PIO1
-//	AM_RANGE( 0x20, 0x23 )  // PIO2
-//	AM_RANGE( 0x28, 0x2b )  // CTC
-//	AM_RANGE( 0x3a, 0x3a )  // PSG0
-//	AM_RANGE( 0x3b, 0x3b )  // PSG1
-//	AM_RANGE( 0xe0, 0xe6 )  // FLOPPY
+//	AM_RANGE( 0xe0, 0xe6 ) AM_READWRITE( fdc_r, fdc_w )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -183,14 +176,104 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
+static Z80CTC_INTERFACE( ctc_intf )
+{
+	0,					// timer disables
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),		// interrupt handler
+	DEVCB_LINE(z80ctc_trg1_w),		// ZC/TO0 callback
+	DEVCB_NULL,						// ZC/TO1 callback, beep interface
+	DEVCB_LINE(z80ctc_trg3_w),		// ZC/TO2 callback
+};
+
+
+static const z80_daisy_config p7_daisy[] =
+{
+	{ "ctc" },
+	{ NULL }
+};
+
+static READ8_DEVICE_HANDLER( crtc_portb_r )
+{
+	// --x- ---- vsync bit
+	// ---- x--- disp bit
+	int vdisp = (device->machine->primary_screen->vpos() < 200) ? 0x08 : 0x00;
+
+	return 0xf7 | vdisp;
+}
+
+static WRITE8_DEVICE_HANDLER( ppi8255_0a_w )
+{
+
+}
+
+static WRITE8_DEVICE_HANDLER( ppi8255_1a_w )
+{
+
+}
+
+static WRITE8_DEVICE_HANDLER( ppi8255_1b_w )
+{
+
+}
+
+static WRITE8_DEVICE_HANDLER( ppi8255_1c_w )
+{
+
+}
+
+static WRITE8_DEVICE_HANDLER( ppi8255_2a_w )
+{
+	/* --x- ---- (related to the data rec) */
+	/* ---x ---- data rec out */
+	/* ---- --x- sound off */
+}
+
+
+static I8255A_INTERFACE( ppi8255_intf_0 )
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_HANDLER(crtc_portb_r),	/* Port B read */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(ppi8255_0a_w),		/* Port A write */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL						/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_intf_1 )
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(ppi8255_1a_w),	/* Port A write */
+	DEVCB_HANDLER(ppi8255_1b_w),	/* Port B write */
+	DEVCB_HANDLER(ppi8255_1c_w)		/* Port C write */
+};
+
+static I8255A_INTERFACE( ppi8255_intf_2 )
+{
+	DEVCB_NULL,						/* Port A read */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(ppi8255_2a_w),	/* Port A write */
+	DEVCB_NULL,						/* Port B write */
+	DEVCB_NULL						/* Port C write */
+};
+
 static MACHINE_DRIVER_START( paso7 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(paso7_mem)
     MDRV_CPU_IO_MAP(paso7_io)
 //	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MDRV_CPU_CONFIG(p7_daisy)
+
+	MDRV_Z80CTC_ADD( "ctc", XTAL_4MHz/4 , ctc_intf )
 
     MDRV_MACHINE_RESET(paso7)
+
+	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
+	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
+	MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
@@ -207,6 +290,14 @@ static MACHINE_DRIVER_START( paso7 )
 
     MDRV_VIDEO_START(paso7)
     MDRV_VIDEO_UPDATE(paso7)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("sn1", SN76489A, 18432000/4) // unknown clock / divider
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("sn2", SN76489A, 18432000/4) // unknown clock / divider
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -239,4 +330,4 @@ static DRIVER_INIT( paso7 )
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 19??, pasopia7,  0,       0, 	 paso7,	paso7,   paso7,   "Toshiba",   "PASOPIA 7", GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 19??, pasopia7,  0,       0, 	 paso7,	paso7,   paso7,   "Toshiba",   "PASOPIA 7", GAME_NOT_WORKING )
