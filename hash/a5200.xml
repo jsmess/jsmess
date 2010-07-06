@@ -1133,4 +1133,37 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="csltblst">
+		<description>Castle Blast (Unl)</description>
+		<year>2002</year>
+		<publisher>Ronen Habot</publisher>
+		<part name="cart" interface="a5200_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="csltblst.bin" size="32768" crc="7c988054" sha1="c1a56a1fc51e09b1d8e93af40ddd7596847e6164" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="csltcrss">
+		<description>Castle Crisis (Unl)</description>
+		<year>2004</year>
+		<publisher>Bryan Edewaard</publisher>
+		<part name="cart" interface="a5200_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="csltcrss.bin" size="32768" crc="d50e4061" sha1="4e022e101d7346a0a8618018372740e7333b4a36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="koffiyk">
+		<description>Koffi: Yellow Kopter (Unl)</description>
+		<year>2002</year>
+		<publisher>Ron Lloyd</publisher>
+		<part name="cart" interface="a5200_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="koffiyk.bin" size="32768" crc="917be656" sha1="9547c56e2951e1b3a713b0b99d3edb43c9d3cdd8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
 </softwarelist>
