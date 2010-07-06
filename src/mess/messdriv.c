@@ -1700,5 +1700,6 @@ const game_driver * const drivers[] =
 	DRIVER( pegasusm )
 	DRIVER( e01 )
 	DRIVER( e01s )
+	DRIVER( pasopia7 )
 
 #endif /* DRIVER_RECURSIVE */
