@@ -272,9 +272,14 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 {
 	UINT8 *mem = memory_region(image.device().machine, "maincpu");
 	int size;
-
-	/* load an optional (dual) cartidge */
-	size = image.fread(&mem[0x4000], 0x8000);
+	if (image.software_entry() == NULL)
+	{
+		/* load an optional (dual) cartidge */
+		size = image.fread(&mem[0x4000], 0x8000);
+	} else {
+		size = image.get_software_region_length("rom");
+		memcpy(mem + 0x4000, image.get_software_region("rom"), size);
+	}
 	if (size<0x8000) memmove(mem+0x4000+0x8000-size, mem+0x4000, size);
 	// mirroring of smaller cartridges
 	if (size <= 0x1000) memcpy(mem+0xa000, mem+0xb000, 0x1000);
@@ -291,7 +296,7 @@ DEVICE_IMAGE_LOAD( a5200_cart )
 		}
 	}
 	logerror("%s loaded cartridge '%s' size %dK\n",
-		image.device().machine->gamedrv->name, image.filename() , size/1024);
+		image.device().machine->gamedrv->name, image.filename() , size/1024);	
 	return IMAGE_INIT_PASS;
 }
 
