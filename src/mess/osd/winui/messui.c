@@ -31,7 +31,6 @@
 #include "softwarelist.h"
 #include "devview.h"
 #include "windows/window.h"
-#include "utils.h"
 #include "strconv.h"
 #include "messui.h"
 #include "winutf8.h"
@@ -254,6 +253,18 @@ static const struct TabViewCallbacks s_softwareTabViewCallbacks =
 //============================================================
 //  IMPLEMENTATION
 //============================================================
+static char *strncpyz(char *dest, const char *source, size_t len)
+{
+	char *s;
+	if (len) {
+		s = strncpy(dest, source, len - 1);
+		dest[len-1] = '\0';
+	}
+	else {
+		s = dest;
+	}
+	return s;
+}
 
 static const device_entry *lookupdevice(iodevice_t d)
 {

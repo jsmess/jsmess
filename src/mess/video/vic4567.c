@@ -14,7 +14,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "utils.h"
 #include "video/vic4567.h"
 
 #define SPRITE_BASE_X_SIZE		24
@@ -672,6 +671,17 @@ static void vic3_draw_sprite_multi( running_device *device, int nr, int yoff, in
 		}
 	}
 }
+
+#ifndef memset16
+static void *memset16 (void *dest, int value, size_t size)
+{
+	register int i;
+
+	for (i = 0; i < size; i++)
+		((short *) dest)[i] = value;
+	return dest;
+}
+#endif
 
 static void vic3_drawlines( running_device *device, int first, int last, int start_x, int end_x )
 {

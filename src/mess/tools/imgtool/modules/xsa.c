@@ -6,7 +6,6 @@
 
 #include "osdepend.h"
 #include "imgtoolx.h"
-#include "utils.h"
 
 
 typedef struct

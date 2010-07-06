@@ -4,7 +4,6 @@
 #include "osdepend.h"
 #include "formats/svi_cas.h"
 #include "imgtoolx.h"
-#include "utils.h"
 
 /*
     SVI module

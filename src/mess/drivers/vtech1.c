@@ -112,7 +112,7 @@ Notes:
 ******************************************************************************/
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "cpu/z80/z80.h"
 #include "video/m6847.h"
 #include "machine/ctronics.h"

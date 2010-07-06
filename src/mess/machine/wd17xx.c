@@ -134,10 +134,9 @@
 
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "machine/wd17xx.h"
 #include "devices/flopdrv.h"
-
 #include "formats/flopimg.h"
 
 /***************************************************************************

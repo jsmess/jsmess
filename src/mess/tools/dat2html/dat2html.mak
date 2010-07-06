@@ -25,7 +25,6 @@ DAT2HTML_OBJS =								\
 	$(EMUOBJ)/emucore.o						\
 	$(MESSOBJ)/tools/dat2html/dat2html.o	\
 	$(MESSOBJ)/tools/imgtool/stubs.o		\
-	$(MESSOBJ)/utils.o						\
 
 
 

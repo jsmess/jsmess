@@ -4,7 +4,6 @@
 #include "osdepend.h"
 #include "formats/fmsx_cas.h"
 #include "imgtoolx.h"
-#include "utils.h"
 
 /*
     MSX module

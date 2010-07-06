@@ -10,7 +10,7 @@
 #include <string.h>
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "pool.h"
 #include "formats/cassimg.h"
 

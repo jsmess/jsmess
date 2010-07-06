@@ -19,7 +19,7 @@
 
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "cpu/m68000/m68000.h"
 
 #include "devices/cartslot.h"

@@ -10,7 +10,7 @@
 #include "formats/z80ne_dsk.h"
 #include "formats/basicdsk.h"
 #include "devices/flopdrv.h"
-#include "utils.h"
+#include "imageutl.h"
 
 /* -----------------------------------------------------------------------
  * DMK file format

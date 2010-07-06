@@ -24,7 +24,6 @@
 #include "video/v9938.h"
 #include "machine/ctronics.h"
 #include "devices/cassette.h"
-#include "utils.h"
 #include "osdepend.h"
 #include "sound/ay8910.h"
 #include "sound/2413intf.h"

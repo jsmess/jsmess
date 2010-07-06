@@ -14,7 +14,6 @@
 #include <tchar.h>
 #include "emu.h"
 #include "hexview.h"
-#include "utils.h"
 
 const TCHAR hexview_class[] = TEXT("hexview_class");
 

@@ -23,7 +23,6 @@
 #include "dialog.h"
 #include "opcntrl.h"
 #include "strconv.h"
-#include "utils.h"
 #include "debug/debugcpu.h"
 #include "inptport.h"
 #include "devices/cassette.h"

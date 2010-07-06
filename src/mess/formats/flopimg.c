@@ -16,7 +16,7 @@
 #include "osdepend.h"
 #include "formats/flopimg.h"
 #include "pool.h"
-#include "utils.h"
+#include "imageutl.h"
 
 #define TRACK_LOADED		0x01
 #define TRACK_DIRTY			0x02

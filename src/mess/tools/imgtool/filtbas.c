@@ -22,7 +22,7 @@
 #include <ctype.h>
 
 #include "imgtool.h"
-#include "utils.h"
+#include "imageutl.h"
 
 
 /***************************************************************************

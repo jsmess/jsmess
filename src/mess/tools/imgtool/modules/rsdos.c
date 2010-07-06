@@ -11,10 +11,8 @@
 #include <stdlib.h>
 #include "osdepend.h"
 #include "imgtoolx.h"
-#include "utils.h"
 #include "formats/coco_dsk.h"
 #include "iflopimg.h"
-#include "utils.h"
 
 
 /* this structure mirrors the structure of an RS-DOS directory entry on disk */

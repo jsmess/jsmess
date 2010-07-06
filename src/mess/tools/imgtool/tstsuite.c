@@ -1,7 +1,6 @@
 #include <ctype.h>
 #include "imgtool.h"
 #include "main.h"
-#include "utils.h"
 #include "snprintf.h"
 
 #ifdef MAME_DEBUG

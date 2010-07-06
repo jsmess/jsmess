@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "cassette.h"
 #include "formats/cassimg.h"
 #include "ui.h"

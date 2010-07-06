@@ -7,7 +7,7 @@
 **************************************************************************/
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "includes/mtx.h"
 #include "cpu/z80/z80.h"
 #include "devices/cassette.h"

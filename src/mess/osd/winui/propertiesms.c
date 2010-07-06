@@ -25,7 +25,6 @@
 #include "mui_opts.h"
 #include "resourcems.h"
 #include "mess.h"
-#include "utils.h"
 #include "propertiesms.h"
 #include "optionsms.h"
 #include "msuiutil.h"

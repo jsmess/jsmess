@@ -14,7 +14,6 @@
 
 #include "emu.h"
 #include "osdcore.h"
-#include "utils.h"
 
 static void replace_lt_gt(char *line)
 {

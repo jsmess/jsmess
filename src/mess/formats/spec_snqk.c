@@ -30,7 +30,6 @@
 #include "includes/spectrum.h"
 #include "sound/ay8910.h"
 #include "formats/spec_snqk.h"
-#include "utils.h"
 
 
 /*******************************************************************

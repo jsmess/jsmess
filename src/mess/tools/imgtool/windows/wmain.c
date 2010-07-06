@@ -13,7 +13,6 @@
 #include "../modules.h"
 #include "winutf8.h"
 #include "strconv.h"
-#include "utils.h"
 
 int WINAPI wWinMain(HINSTANCE instance, HINSTANCE prev_instance,
 	LPWSTR command_line_w, int cmd_show)

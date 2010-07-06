@@ -36,7 +36,6 @@ IMGTOOL_LIB_OBJS =					\
 	$(EMUOBJ)/emucore.o				\
 	$(EMUOBJ)/emuopts.o 				\
 	$(EMUOBJ)/memory.o				\
-	$(MESSOBJ)/utils.o				\
 	$(EMUOBJ)/ioprocs.o			\
 	$(MESS_FORMATS)/flopimg.o			\
 	$(MESS_FORMATS)/cassimg.o			\

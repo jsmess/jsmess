@@ -162,4 +162,8 @@ imgtool_image *imgtool_directory_image(imgtool_directory *enumeration);
 int imgtool_validitychecks(void);
 void unknown_partition_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info);
 
+char *strncpyz(char *dest, const char *source, size_t len);
+char *strncatz(char *dest, const char *source, size_t len);
+void rtrim(char *buf);
+
 #endif /* IMGTOOL_H */

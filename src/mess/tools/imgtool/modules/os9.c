@@ -9,7 +9,7 @@
 #include <time.h>
 
 #include "imgtool.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "formats/coco_dsk.h"
 #include "iflopimg.h"
 

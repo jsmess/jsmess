@@ -26,7 +26,6 @@
 #include "emu.h"
 #include "formats/timex_dck.h"
 #include "sound/ay8910.h"
-#include "utils.h"
 
 
 int timex_cart_type;

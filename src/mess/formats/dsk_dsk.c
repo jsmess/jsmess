@@ -9,7 +9,7 @@
 #include <string.h>
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "formats/flopimg.h"
 #include "devices/flopdrv.h"
 

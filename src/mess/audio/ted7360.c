@@ -360,7 +360,6 @@ Video part
 */
 #include "emu.h"
 #include "streams.h"
-#include "utils.h"
 #include "audio/ted7360.h"
 
 
@@ -665,6 +664,17 @@ static void ted7360_draw_bitmap_multi( running_device *device, int ybegin, int y
 			*BITMAP_ADDR16(ted7360->bitmap, y + yoff, 7 + xoff) = ted7360->bitmapmulti[code & 3];
 	}
 }
+
+#ifndef memset16
+static void *memset16 (void *dest, int value, size_t size)
+{
+	register int i;
+
+	for (i = 0; i < size; i++)
+		((short *) dest)[i] = value;
+	return dest;
+}
+#endif
 
 static void ted7360_draw_cursor( running_device *device, int ybegin, int yend, int yoff, int xoff, int color )
 {

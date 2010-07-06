@@ -16,7 +16,7 @@
 */
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "devices/flopdrv.h"
 #include "devices/harddriv.h"
 #include "harddisk.h"

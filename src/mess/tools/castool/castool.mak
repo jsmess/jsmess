@@ -34,8 +34,7 @@ CASTOOL_LIB_OBJS =						\
 	$(EMUOBJ)/emucore.o					\
 	$(EMUOBJ)/emuopts.o 				\
 	$(EMUOBJ)/memory.o					\
-	$(EMUOBJ)/ioprocs.o			\
-	$(MESSOBJ)/utils.o					\
+	$(EMUOBJ)/ioprocs.o					\
 	$(MESS_FORMATS)/a26_cas.o           \
 	$(MESS_FORMATS)/apf_apt.o           \
 	$(MESS_FORMATS)/cbm_tap.o           \

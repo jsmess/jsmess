@@ -13,7 +13,7 @@
 #include "osdepend.h"
 #include "formats/coco_dsk.h"
 #include "formats/basicdsk.h"
-#include "utils.h"
+#include "imageutl.h"
 
 /* -----------------------------------------------------------------------
  * JVC (Jeff Vavasour CoCo) format

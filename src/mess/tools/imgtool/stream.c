@@ -15,7 +15,6 @@
 #include "unzip.h"
 #include "osdcore.h"
 #include "imgtool.h"
-#include "utils.h"
 
 typedef enum
 {

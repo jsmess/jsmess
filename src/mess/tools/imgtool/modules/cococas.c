@@ -4,7 +4,6 @@
 #include "osdepend.h"
 #include "imgtoolx.h"
 #include "formats/cococas.h"
-#include "utils.h"
 
 static int cococas_initalt(imgtool_stream *instream, imgtool_stream **outstream, int *basepos,
 	int *length, int *channels, int *frequency, int *resolution);

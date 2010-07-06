@@ -8,7 +8,6 @@
 
 *********************************************************************/
 #include "emu.h"
-#include "utils.h"
 #include "ti99cart.h"
 #include "cartslot.h"
 #include "machine/ti99_4x.h"

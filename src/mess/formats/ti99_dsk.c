@@ -77,8 +77,8 @@
 #include <time.h>
 
 #include "osdepend.h"
+#include "imageutl.h"
 #include "formats/ti99_dsk.h"
-#include "utils.h"
 
 #define SECTOR_SIZE 256
 #define TI99_IDAM_LENGTH 7

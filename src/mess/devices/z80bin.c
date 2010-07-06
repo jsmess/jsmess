@@ -8,7 +8,6 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "utils.h"
 #include "z80bin.h"
 #include "snapquik.h"
 

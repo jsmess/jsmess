@@ -12,7 +12,6 @@
 
 #include "dialog.h"
 #include "emu.h"
-#include "utils.h"
 #include "strconv.h"
 #include "pool.h"
 #include "winutil.h"

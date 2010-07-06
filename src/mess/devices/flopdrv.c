@@ -12,7 +12,7 @@
 */
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "flopdrv.h"
 
 #define VERBOSE		0

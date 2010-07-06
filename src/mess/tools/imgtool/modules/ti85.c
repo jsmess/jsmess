@@ -1,6 +1,5 @@
 #include "osdepend.h"
 #include "imgtoolx.h"
-#include "utils.h"
 #include "formats/ti85_ser.h"
 
 static const char *const var_type[] = {

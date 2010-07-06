@@ -9,7 +9,7 @@
 #include <string.h>
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "formats/oric_dsk.h"
 #include "formats/basicdsk.h"
 #include "devices/flopdrv.h"

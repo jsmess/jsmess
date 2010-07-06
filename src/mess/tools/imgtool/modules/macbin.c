@@ -47,7 +47,7 @@
 #include <string.h>
 
 #include "imgtool.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "macutil.h"
 
 

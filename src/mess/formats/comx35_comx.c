@@ -7,7 +7,7 @@
 *********************************************************************/
 
 #include "emu.h"
-#include "utils.h"
+#include "imageutl.h"
 #include "formats/comx35_comx.h"
 #include "cpu/cdp1802/cdp1802.h"
 #include "devices/messram.h"

@@ -1,41 +1,48 @@
-/***********************************************************
+/***************************************************************************
 
-  utils.h
+    imageutl.h
 
-  Nifty utility code
+    Image related utilities
 
-***********************************************************/
+****************************************************************************
 
-#ifndef UTILS_H
-#define UTILS_H
+    Copyright Aaron Giles
+    All rights reserved.
 
-#include <string.h>
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
 
-/* -----------------------------------------------------------------------
- * strncpyz
- * strncatz
- *
- * strncpy done right :-)
- * ----------------------------------------------------------------------- */
-char *strncpyz(char *dest, const char *source, size_t len);
-char *strncatz(char *dest, const char *source, size_t len);
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
 
-/* -----------------------------------------------------------------------
- * rtrim
- *
- * Removes all trailing spaces from a string
- * ----------------------------------------------------------------------- */
-void rtrim(char *buf);
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
-/* -----------------------------------------------------------------------
- * memset16
- *
- * 16 bit memset
- * ----------------------------------------------------------------------- */
-#ifndef memset16
-void *memset16 (void *dest, int value, size_t size);
-#endif /* memset16 */
+***************************************************************************/
 
+#pragma once
+
+#ifndef __IMAGEUTL_H__
+#define __IMAGEUTL_H__
+
+#include "osdcore.h"
 
 /* -----------------------------------------------------------------------
  * CRC stuff
@@ -189,10 +196,12 @@ INLINE UINT64 pick_integer_le(const void *ptr, size_t offset, size_t size)
 
 /* miscellaneous functions */
 int compute_log2(int val);
-int hexdigit(char c);
 
-/* extension list handling */
+/* -----------------------------------------------------------------------
+ * Extension list handling
+ * ----------------------------------------------------------------------- */
+
 int image_find_extension(const char *extensions, const char *ext);
 void image_specify_extension(char *buffer, size_t buffer_len, const char *extension);
 
-#endif /* UTILS_H */
+#endif /* __IMAGEUTL_H__ */
