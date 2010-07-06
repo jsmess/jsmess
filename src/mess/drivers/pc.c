@@ -2406,7 +2406,7 @@ static MACHINE_DRIVER_START( ibmpcjr )
 	MDRV_RAM_DEFAULT_SIZE("640K")
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("ibmpcjr_cart")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","ibmpcjr_cart")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( iskr1031 )

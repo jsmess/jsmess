@@ -457,41 +457,38 @@ void MyFillSoftwareList(int drvindex, BOOL bForce)
 	machine_config *config = machine_config_alloc( drivers[drvindex]->machine_config );
 
 	core_options *options = mame_options_init(NULL);
-	for (const device_config *dev = config->devicelist.first(); dev != NULL; dev = dev->next())
+	for (const device_config *dev = config->devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
-		if ( ! strcmp( dev->tag(), __SOFTWARE_LIST_TAG ) )
+		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
+
+		for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
 		{
-			software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
-
-			for ( int i = 0; i < DEVINFO_STR_SWLIST_MAX - DEVINFO_STR_SWLIST_0; i++ )
+			if (swlist->list_name[i])
 			{
-				if (swlist->list_name[i])
+				software_list *list = software_list_open(options, swlist->list_name[i], FALSE, NULL);
+
+				if (list)
 				{
-					software_list *list = software_list_open(options, swlist->list_name[i], FALSE, NULL);
-
-					if (list)
+					for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
 					{
-						for (software_info *swinfo = software_list_find(list, "*", NULL); swinfo != NULL; swinfo = software_list_find(list, "*", swinfo))
-						{
-							const device_config_image_interface *image;
-							software_part *part = software_find_part(swinfo, NULL, NULL);
+						const device_config_image_interface *image;
+						software_part *part = software_find_part(swinfo, NULL, NULL);
 
-							// search for a device with the right interface
-							for (bool gotone = config->devicelist.first(image); gotone; gotone = image->next(image))
+						// search for a device with the right interface
+						for (bool gotone = config->devicelist.first(image); gotone; gotone = image->next(image))
+						{
+							const char *interface = image->image_interface();
+							if (interface != NULL)
 							{
-								const char *interface = image->image_interface();
-								if (interface != NULL)
+								if (!strcmp(interface, part->interface_))
 								{
-									if (!strcmp(interface, part->interface_))
-									{
-										SoftwareList_AddFile(hwndSoftwareList, swinfo->shortname, swlist->list_name[i], swinfo->longname, swinfo->publisher, swinfo->year, image->brief_instance_name());
-										break;
-									}
+									SoftwareList_AddFile(hwndSoftwareList, swinfo->shortname, swlist->list_name[i], swinfo->longname, swinfo->publisher, swinfo->year, image->brief_instance_name());
+									break;
 								}
 							}
 						}
-						software_list_close(list);
 					}
+					software_list_close(list);
 				}
 			}
 		}

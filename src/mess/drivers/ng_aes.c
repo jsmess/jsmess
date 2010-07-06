@@ -1281,7 +1281,7 @@ static MACHINE_DRIVER_START( aes )
 
 //  MDRV_CARTSLOT_LOAD(aes_cart)
 
-	MDRV_SOFTWARE_LIST_ADD("aes")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","aes")
 MACHINE_DRIVER_END
 
 /*************************************

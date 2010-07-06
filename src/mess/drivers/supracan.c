@@ -1238,7 +1238,7 @@ static MACHINE_DRIVER_START( supracan )
 	MDRV_CARTSLOT_INTERFACE("supracan_cart")
 	MDRV_CARTSLOT_LOAD(supracan_cart)
 
-	MDRV_SOFTWARE_LIST_ADD("supracan")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","supracan")
 
 	MDRV_VIDEO_START( supracan )
 	MDRV_VIDEO_UPDATE( supracan )

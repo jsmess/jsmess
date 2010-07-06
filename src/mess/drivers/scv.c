@@ -800,7 +800,7 @@ static MACHINE_DRIVER_START( scv )
 	MDRV_CARTSLOT_LOAD( scv_cart )
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("scv")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","scv")
 MACHINE_DRIVER_END
 
 
@@ -840,7 +840,7 @@ static MACHINE_DRIVER_START( scv_pal )
 	MDRV_CARTSLOT_LOAD( scv_cart )
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("scv")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","scv")
 MACHINE_DRIVER_END
 
 

@@ -1614,5 +1614,5 @@ MACHINE_DRIVER_START( ultimax_cartslot )
 	MDRV_CARTSLOT_UNLOAD(c64_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("max")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","max")
 MACHINE_DRIVER_END

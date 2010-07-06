@@ -184,7 +184,7 @@ static MACHINE_DRIVER_START( bbcbc )
 	MDRV_CARTSLOT_LOAD( bbcbc_cart )
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("bbcbc")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","bbcbc")
 MACHINE_DRIVER_END
 
 

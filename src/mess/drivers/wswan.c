@@ -165,7 +165,7 @@ static MACHINE_DRIVER_START( wswan )
 	MDRV_CARTSLOT_LOAD(wswan_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("wswan")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","wswan")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( wscolor )

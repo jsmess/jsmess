@@ -735,7 +735,7 @@ static MACHINE_DRIVER_START( vboy )
 	MDRV_CARTSLOT_LOAD(vboy_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("vboy")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","vboy")
 MACHINE_DRIVER_END
 
 /* ROM definition */

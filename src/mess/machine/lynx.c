@@ -2033,5 +2033,5 @@ MACHINE_DRIVER_START(lynx_cartslot)
 	MDRV_CARTSLOT_PARTIALHASH(lynx_partialhash)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("lynx")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","lynx")
 MACHINE_DRIVER_END

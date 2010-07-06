@@ -872,7 +872,7 @@ static MACHINE_DRIVER_START( atom )
 	MDRV_RAM_EXTRA_OPTIONS("4K,6K,8K,10K,12K")
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("atom")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","atom")
 MACHINE_DRIVER_END
 
 /*-------------------------------------------------

@@ -196,7 +196,7 @@ static MACHINE_DRIVER_START( astrocde )
 	MDRV_CARTSLOT_LOAD(astrocde_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("astrocde")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","astrocde")
 MACHINE_DRIVER_END
 
 

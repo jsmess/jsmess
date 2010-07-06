@@ -557,7 +557,7 @@ static MACHINE_DRIVER_START( svision )
 	MDRV_CARTSLOT_LOAD(svision_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("svision")
+	MDRV_SOFTWARE_LIST_ADD("mainlist","svision")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( svisionp )
