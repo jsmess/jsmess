@@ -271,7 +271,8 @@ static WRITE8_HANDLER(towns_system_w)
 
 	switch(offset)
 	{
-		case 0x00:  // bit 7 = NMI vector protect, bit 6 = power off, bit 0 = software reset
+		case 0x00:  // bit 7 = NMI vector protect, bit 6 = power off, bit 0 = software reset, bit 3 = A20 line?
+//			cputag_set_input_line(space->machine,"maincpu",INPUT_LINE_A20,(data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 			logerror("SYS: port 0x20 write %02x\n",data);
 			break;
 		case 0x02:
@@ -1846,7 +1847,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
   AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
-  AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE8(towns_cmos_r,towns_cmos_w,0xffffffff) // CMOS (mirror?)
+  AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE8(towns_cmos_r,towns_cmos_w,0xffffffff) AM_BASE_SIZE_GENERIC(nvram) // CMOS (mirror?)
   AM_RANGE(0xc2180000, 0xc21fffff) AM_ROM AM_REGION("user",0x080000)  // F20 ROM
   AM_RANGE(0xc2200000, 0xc220ffff) AM_DEVREADWRITE8("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
   AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
@@ -2147,7 +2148,7 @@ static DRIVER_INIT( towns )
 	state->pic_master = devtag_get_device(machine,"pic8259_master");
 	state->pic_slave = devtag_get_device(machine,"pic8259_slave");
 	state->towns_vram = auto_alloc_array(machine,UINT32,0x20000);
-	state->towns_cmos = auto_alloc_array(machine,UINT8,0x2000);
+	state->towns_cmos = machine->generic.nvram.u8;
 	state->towns_gfxvram = auto_alloc_array(machine,UINT8,0x80000);
 	state->towns_txtvram = auto_alloc_array(machine,UINT8,0x20000);
 	//towns_sprram = auto_alloc_array(machine,UINT8,0x20000);
@@ -2353,6 +2354,8 @@ static MACHINE_DRIVER_START( towns )
 
 	MDRV_UPD71071_ADD("dma_1",towns_dma_config)
 	MDRV_UPD71071_ADD("dma_2",towns_dma_config)
+
+	MDRV_NVRAM_HANDLER( generic_0fill )
 
     MDRV_VIDEO_START(towns)
     MDRV_VIDEO_UPDATE(towns)
