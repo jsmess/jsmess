@@ -55,7 +55,6 @@ DRVLIBS = \
 	$(MESS_DEVICES)/messram.o	\
 	$(MESS_DEVICES)/multcart.o	\
 	$(MESS_FORMATS)/cassimg.o	\
-	$(MESS_FORMATS)/ioprocs.o	\
 	$(MESS_FORMATS)/wavfile.o	\
 
 
