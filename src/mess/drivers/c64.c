@@ -939,6 +939,14 @@ ROM_END
 #define rom_c64cpal		rom_c64c
 #define rom_c64g		rom_c64c
 
+ROM_START( c64csfi )
+	ROM_REGION( 0x19400, "maincpu", 0 )
+	ROM_LOAD( "325182-01.ua4",		  0x10000, 0x4000, CRC(2aff27d3) SHA1(267654823c4fdf2167050f41faa118218d2569ce) ) // 128/64 FI
+	ROM_LOAD( "cbm 64 skand.gen.ua5", 0x14000, 0x1000, CRC(377a382b) SHA1(20df25e0ba1c88f31689c1521397c96968967fac) )
+
+	ROM_REGION( 0x80000, "user1", ROMREGION_ERASE00 )
+ROM_END
+
 ROM_START( c64gs )
 	ROM_REGION( 0x19400, "maincpu", 0 )
 	/* standard basic, modified kernel */
@@ -970,7 +978,7 @@ ROM_END
 
 /*   YEAR  NAME   PARENT COMPAT MACHINE  INPUT    INIT     COMPANY                            FULLNAME */
 
-COMP(1982, max,	  0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines", "Commodore Max Machine", 0)
+COMP(1982, max,		0,    0,    ultimax, c64,     ultimax, "Commodore Business Machines", "Commodore Max Machine", 0)
 
 COMP(1982, c64,     0,    0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64 (NTSC)", 0)
 COMP(1982, c64pal,  c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64 (PAL)",  0)
@@ -978,16 +986,19 @@ COMP(1982, c64jpn,  c64,  0,    c64,     c64,     c64,     "Commodore Business M
 COMP(1982, vic64s,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines", "VIC 64S", 0)
 COMP(1982, c64swe,  c64,  0,    c64pal,  vic64s,  c64pal,  "Commodore Business Machines", "Commodore 64 (Sweden/Finland)", 0)
 
-COMP(1983, pet64,	  c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines", "PET 64 (NTSC)", 0)
+COMP(1983, pet64,	c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines", "PET 64 (NTSC)", 0)
 COMP(1983, cbm4064, c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines", "CBM 4064 (NTSC)", 0)
 COMP(1983, edu64,   c64,  0,    pet64,   c64,     c64,     "Commodore Business Machines", "Educator 64 (NTSC)", 0) // maybe different palette?
+//COMP(1983, clipper,  c64,  0,	c64pal,  clipper, c64pal,  "PDC", "Clipper", GAME_NOT_WORKING) // C64 in a briefcase with 3" floppy, electroluminescent flat screen, thermal printer
+//COMP(1983, tesa6240, c64,  0,	c64pal,  c64,	  c64pal,  "Tesa", "6240", GAME_NOT_WORKING) // modified SX64 with label printer
 
 COMP(1984, sx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines", "SX-64 Executive Computer (PAL)", GAME_NOT_WORKING)
 COMP(1984, vip64,   c64,  0,    sx64,    vip64,   sx64,    "Commodore Business Machines", "VIP64 (SX64 PAL), Swedish Expansion Kit", GAME_NOT_WORKING)
-COMP(198?, dx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines", "DX-64 (Prototype, PAL)", GAME_NOT_WORKING)
+COMP(1983, dx64,    c64,  0,    sx64,    c64,     sx64,    "Commodore Business Machines", "DX-64 (Prototype, PAL)", GAME_NOT_WORKING)
 
 COMP(1986, c64c,    c64,  0,    c64,     c64,     c64,     "Commodore Business Machines", "Commodore 64C (NTSC)", 0)
 COMP(1986, c64cpal, c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64C (PAL)", 0)
+COMP(1986, c64csfi, c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64C (Sweden/Finland)", 0)
 COMP(1986, c64g,    c64,  0,    c64pal,  c64,     c64pal,  "Commodore Business Machines", "Commodore 64G (PAL)", 0)
 
 CONS(1990, c64gs,   c64,  0,    c64gs,   c64gs,   c64gs,   "Commodore Business Machines", "Commodore 64 Games System (PAL)", 0)

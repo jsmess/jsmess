@@ -495,6 +495,7 @@ const game_driver * const drivers[] =
 //  DRIVER( dx64 )    /* Commodore DX-64 - Prototype      */
 	DRIVER( c64c )	  /* Commodore 64C (NTSC)    */
 	DRIVER( c64cpal )   /* Commodore 64C (PAL)    */
+	DRIVER( c64csfi )
 	DRIVER( c64g )	  /* Commodore 64G (PAL)      */
 	DRIVER( c64gs )	 /* Commodore 64 Games System   */
 	DRIVER( c64dtv )	 /* Commodore 64 Direct-to-TV   */
@@ -533,7 +534,6 @@ const game_driver * const drivers[] =
 	DRIVER( c128 )	  /* Commodore 128 - NTSC    */
 	DRIVER( c128cr )	/* Commodore 128CR - NTSC (proto?)    */
 	DRIVER( c128sfi )   /* Commodore 128 - PAL (Swedish / Finnish)    */
-	DRIVER( c128fino )  /* Commodore 128 - PAL (Finnish, Unconfirmed dumps) */
 	DRIVER( c128fra )   /* Commodore 128 - PAL (French)  */
 	DRIVER( c128ger )   /* Commodore 128 - PAL (German)  */
 	DRIVER( c128nor )   /* Commodore 128 - PAL (Norwegian)    */

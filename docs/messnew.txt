@@ -3,6 +3,7 @@
 New System Drivers Supported:
 -----------------------------
 - Bally Home Library Computer [ranger_lennier]
+- Commodore 64C (Swedish/Finland) [Curt Coder]
 
 
 
@@ -28,6 +29,8 @@ System Driver Changes:
 
 - [APPLE2] Preliminary cassette support - many Applesoft tapes load
   fine. [R. Belmont]
+
+- [C128] Removed c128fino set, fixed ROM labels for c128sfi. [Curt Coder]
 
 - [COCO3] Extended video to support 8MB of RAM. (bug #1963) [Robert Gault]
 
