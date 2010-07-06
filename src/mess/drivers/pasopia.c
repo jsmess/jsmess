@@ -92,7 +92,7 @@ static WRITE8_HANDLER( paso7_bankswitch )
 
 	// bank4 is always RAM
 
-	printf("%02x\n",data);
+//	printf("%02x\n",data);
 }
 
 #if 0
@@ -101,6 +101,51 @@ static READ8_HANDLER( fdc_r )
 	return mame_rand(space->machine);
 }
 #endif
+
+static UINT16 pac2_index[8];
+static UINT8 pac2_bank_select;
+
+static WRITE8_HANDLER( pac2_w )
+{
+	/*
+	select register:
+	4 = ram1;
+	3 = ram2;
+	2 = kanji ROM;
+	1 = joy;
+	anything else is nop
+	*/
+
+
+	switch(offset)
+	{
+		case 0: pac2_index[pac2_bank_select] = (pac2_index[pac2_bank_select] & 0x7f00) | (data & 0xff); break;
+		case 1: pac2_index[pac2_bank_select] = (pac2_index[pac2_bank_select] & 0xff) | ((data & 0x7f) << 8); break;
+		case 2: // RAM write
+			break;
+		case 3:
+		{
+			if(data & 0x80)
+			{
+				// ...
+			}
+			else
+				pac2_bank_select = data & 7;
+		}
+		break;
+	}
+}
+
+static READ8_HANDLER( pac2_r )
+{
+	UINT8 *pac2_ram = memory_region(space->machine, "rampac1");
+
+	if(offset == 2)
+		if(pac2_bank_select == 4)
+			return pac2_ram[pac2_index[4]];
+
+	return 0xff;
+}
 
 static ADDRESS_MAP_START(paso7_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -117,7 +162,7 @@ static ADDRESS_MAP_START( paso7_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x0c, 0x0f ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
 	AM_RANGE( 0x10, 0x10 ) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE( 0x11, 0x11 ) AM_DEVWRITE("crtc", mc6845_register_w)
-//	AM_RANGE( 0x18, 0x1b ) //PAC2 (???)
+	AM_RANGE( 0x18, 0x1b ) AM_READWRITE( pac2_r, pac2_w )
 	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
 	AM_RANGE( 0x28, 0x2b ) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
 //	AM_RANGE( 0x30, 0x33 ) //I8255 related (port mirrors?)
@@ -313,6 +358,12 @@ ROM_START( pasopia7 )
 
 	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, CRC(6109e308) SHA1(5c21cf1f241ef1fa0b41009ea41e81771729785f))
+
+	ROM_REGION( 0x8000, "rampac1", ROMREGION_ERASE00 )
+//	ROM_LOAD( "rampac1.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
+
+	ROM_REGION( 0x8000, "rampac2", ROMREGION_ERASE00 )
+//	ROM_LOAD( "rampac2.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
 ROM_END
 
 static DRIVER_INIT( paso7 )
