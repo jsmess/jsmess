@@ -26,7 +26,7 @@ static struct mpc105_info *mpc105;
 
 static void mpc105_update_memory(running_machine *machine)
 {
-	const cpu_device *cpu;
+	const cpu_device *cpu = NULL;
 	int bank;
 	offs_t begin, end;
 	char bank_str[10];
