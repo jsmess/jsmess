@@ -508,7 +508,7 @@ ROM_START( megacd2 )
 	ROM_SYSTEM_BIOS(0, "v200w", "v2.00W")	// confirmed good dump
 	ROMX_LOAD( "megacd_model2_bios_2_00w_e.bin", 0x000000,  0x020000, CRC(4d5cb8da) SHA1(f5f60f03501908962446ee02fc27d98694dd157d), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "v200", "v2.00")
-	ROMX_LOAD( "mpr-15512a.bin", 0x000000,  0x020000, CRC(62108fff) SHA1(cfcf092e0a70779fc5912da0fbd154838df997da), ROM_BIOS(2) )
+	ROMX_LOAD( "mpr-15512-t.bin", 0x000000,  0x020000, CRC(62108fff) SHA1(cfcf092e0a70779fc5912da0fbd154838df997da), ROM_BIOS(2) )
 ROM_END
 
 ROM_START( megacd2j )
