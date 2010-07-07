@@ -302,7 +302,8 @@ static const cassette_config tmc600_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL
 };
 static FLOPPY_OPTIONS_START(tmc600)
 	// dsk
@@ -317,7 +318,8 @@ static const floppy_config tmc600_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(tmc600),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 /* F4 Character Displayer */

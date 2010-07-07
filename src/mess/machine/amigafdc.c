@@ -832,7 +832,8 @@ static const floppy_config amiga_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(amiga_only),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static MACHINE_DRIVER_START( amiga_fdc )

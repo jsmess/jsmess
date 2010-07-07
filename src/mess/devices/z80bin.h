@@ -52,4 +52,7 @@ struct _z80bin_config
 	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_attoseconds, (attoseconds_t) (((_delay) - (int)(_delay)) * ATTOSECONDS_PER_SECOND)) \
 	MDRV_DEVICE_CONFIG_DATAPTR(z80bin_config, execute, Z80BIN_EXECUTE_NAME(_execute))
 
+#define MDRV_Z80BIN_QUICKLOAD_INTERFACE(_interface)							\
+	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, interface, _interface )
+
 #endif /* __Z80BIN_H__ */

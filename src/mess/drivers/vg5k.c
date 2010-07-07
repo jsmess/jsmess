@@ -389,7 +389,8 @@ static const cassette_config vg5k_cassette_config =
 {
 	vg5k_cassette_formats,
 	&vg5k_cassette_options,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
+	NULL
 };
 
 

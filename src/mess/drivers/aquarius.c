@@ -388,7 +388,8 @@ static const cassette_config aquarius_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED),
+	NULL
 };
 
 static MACHINE_DRIVER_START( aquarius )
@@ -451,7 +452,8 @@ static const floppy_config aquarius_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(aquarius),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static MACHINE_DRIVER_START( aquarius_qd )

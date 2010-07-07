@@ -419,14 +419,16 @@ static const cassette_config z80ne_cassettea_config =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 static const cassette_config z80ne_cassetteb_config =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 static const kr2376_interface lx388_kr2376_interface =
@@ -444,7 +446,8 @@ static const floppy_config z80netf_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(z80ne),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static const mc6847_interface z80net_mc6847_intf =

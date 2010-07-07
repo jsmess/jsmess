@@ -523,7 +523,8 @@ static const floppy_config vtech1_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(vtech1_only),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 /***************************************************************************
@@ -966,7 +967,8 @@ static const cassette_config laser_cassette_config =
 {
 	vtech1_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY)
+	(cassette_state)(CASSETTE_PLAY),
+	NULL
 };
 
 static const mc6847_interface vtech1_mc6847_intf =

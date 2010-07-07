@@ -248,7 +248,8 @@ static const cassette_config hector_cassette_config =
 {
 	hector_cassette_formats,
 	&hector_cassette_options,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MASK_SPEAKER),
+	NULL
 };
 
 /* Discrete Sound */

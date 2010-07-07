@@ -178,7 +178,8 @@ static const cassette_config dai_cassette_config =
 {
 	cassette_default_formats,
 	&dai_cassette_options,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 /* F4 Character Displayer */

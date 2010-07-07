@@ -269,7 +269,8 @@ static const cassette_config svi318_cassette_config =
 {
 	svi_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY)
+	(cassette_state)(CASSETTE_PLAY),
+	NULL
 };
 
 static const floppy_config svi318_floppy_config =
@@ -281,7 +282,8 @@ static const floppy_config svi318_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(svi318),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static MACHINE_DRIVER_START( svi318_cartslot )

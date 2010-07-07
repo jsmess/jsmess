@@ -242,7 +242,8 @@ static const cassette_config primo_cassette_config =
 {
 	primo_ptp_format,
 	&primo_cassette_options,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 static CBM_IEC_DAISY( cbm_iec_daisy )

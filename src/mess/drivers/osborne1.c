@@ -217,7 +217,8 @@ static const floppy_config osborne1_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(osborne1),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 /* F4 Character Displayer */

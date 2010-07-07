@@ -419,7 +419,8 @@ static const cassette_config lviv_cassette_config =
 {
 	lviv_lvt_format,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 

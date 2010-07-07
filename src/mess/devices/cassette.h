@@ -46,6 +46,7 @@ struct cassette_config_t
 	const struct CassetteFormat*	const *formats;
 	const struct CassetteOptions	*create_opts;
 	const cassette_state			default_state;
+	const char *					interface;
 };
 
 

@@ -254,7 +254,8 @@ static const cassette_config spc1000_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL
 };
 
 static const mc6847_interface spc1000_mc6847_intf =

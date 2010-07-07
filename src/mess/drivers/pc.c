@@ -1458,7 +1458,8 @@ static const floppy_config ibmpc_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(pc),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static const kb_keytronic_interface pc_keytronic_intf =
@@ -1648,7 +1649,8 @@ static const cassette_config ibm5150_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 static GFXDECODE_START( ibm5150 )

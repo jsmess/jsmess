@@ -512,7 +512,8 @@ static const cassette_config elwro800jr_cassette_config =
 {
 	tzx_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL
 };
 
 static INTERRUPT_GEN( elwro800jr_interrupt )
@@ -529,7 +530,8 @@ static const floppy_config elwro800jr_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(default),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 /* F4 Character Displayer */

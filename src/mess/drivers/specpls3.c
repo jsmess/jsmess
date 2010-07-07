@@ -387,7 +387,8 @@ static const floppy_config specpls3_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(default),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 /* F4 Character Displayer */

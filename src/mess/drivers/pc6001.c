@@ -872,7 +872,8 @@ static const cassette_config pc6001_cassette_config =
 {
 	pc6001_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 static MACHINE_DRIVER_START( pc6001 )

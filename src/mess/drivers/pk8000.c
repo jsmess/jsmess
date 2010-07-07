@@ -320,7 +320,8 @@ static const cassette_config pk8000_cassette_config =
 {
 	fmsx_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY)
+	(cassette_state)(CASSETTE_PLAY),
+	NULL
 };
 
 static MACHINE_DRIVER_START( pk8000 )

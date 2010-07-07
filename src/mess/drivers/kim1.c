@@ -294,7 +294,8 @@ static const cassette_config kim1_cassette_config =
 {
 	kim1_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED)
+	(cassette_state)(CASSETTE_STOPPED),
+	NULL
 };
 
 

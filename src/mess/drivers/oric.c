@@ -349,7 +349,8 @@ static const cassette_config oric_cassette_config =
 {
 	oric_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED)
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED),
+	NULL
 };
 
 static const centronics_interface oric_centronics_config =
@@ -369,7 +370,8 @@ static const floppy_config oric1_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(oric),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static const floppy_config prav8d_floppy_config =
@@ -381,7 +383,8 @@ static const floppy_config prav8d_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
     FLOPPY_OPTIONS_NAME(apple2),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static MACHINE_DRIVER_START( oric )

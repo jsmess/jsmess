@@ -370,14 +370,16 @@ static const cassette_config zx80_cassette_config =
 {
 	zx80_o_format,
 	&zx81_cassette_options,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 static const cassette_config zx81_cassette_config =
 {
 	zx81_p_format,
 	&zx81_cassette_options,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 

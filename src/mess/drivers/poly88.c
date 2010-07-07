@@ -139,7 +139,8 @@ static const cassette_config poly88_cassette_config =
 {
 	cassette_default_formats,
 	&poly88_cassette_options,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 

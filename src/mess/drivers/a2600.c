@@ -2098,7 +2098,8 @@ static const cassette_config a2600_cassette_config =
 {
 	a26_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 static MACHINE_DRIVER_START( a2600_cartslot )

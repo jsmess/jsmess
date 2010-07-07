@@ -349,5 +349,6 @@ const cassette_config cbm_cassette_config =
 {
 	cbm_cassette_formats,
 	NULL,
-	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state) (CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };

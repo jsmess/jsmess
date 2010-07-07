@@ -517,7 +517,8 @@ static const cassette_config sordm5_cassette_config =
 {
 	sordm5_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY)
+	(cassette_state)(CASSETTE_PLAY),
+	NULL
 };
 
 static const TMS9928a_interface tms9928a_interface =
@@ -597,7 +598,8 @@ static const floppy_config sordm5_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(sordm5),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static MACHINE_DRIVER_START( sord_m5_fd5 )

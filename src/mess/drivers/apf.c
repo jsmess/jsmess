@@ -663,7 +663,8 @@ static const cassette_config apf_cassette_config =
 {
 	apf_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY)
+	(cassette_state)(CASSETTE_PLAY),
+	NULL
 };
 
 static FLOPPY_OPTIONS_START(apfimag)
@@ -684,7 +685,8 @@ static const floppy_config apfimag_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(apfimag),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static const mc6847_interface apf_mc6847_intf =

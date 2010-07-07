@@ -38,7 +38,8 @@ const cassette_config default_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	CASSETTE_PLAY
+	CASSETTE_PLAY,
+	NULL
 };
 
 
@@ -431,6 +432,12 @@ DEVICE_GET_INFO(cassette)
 					image_specify_extension( info->s, 256, formats[i]->extensions );
 			}
 			break;
+		case DEVINFO_STR_IMAGE_INTERFACE:
+			if ( device && device->static_config() && ((cassette_config *)device->static_config())->interface)
+			{
+				strcpy(info->s, ((cassette_config *)device->static_config())->interface );
+			}
+			break;			
 	}
 }
 

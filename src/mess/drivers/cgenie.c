@@ -490,7 +490,8 @@ static const cassette_config cgenie_cassette_config =
 {
 	cgenie_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED)
+	(cassette_state)(CASSETTE_STOPPED),
+	NULL
 };
 
 // This is currently broken
@@ -512,7 +513,8 @@ static const floppy_config cgenie_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(cgenie),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static MACHINE_DRIVER_START( cgenie_common )

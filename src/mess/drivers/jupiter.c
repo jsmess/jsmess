@@ -303,7 +303,8 @@ static const cassette_config jupiter_cassette_config =
 {
 	jupiter_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED)
+	(cassette_state)(CASSETTE_STOPPED),
+	NULL
 };
 
 /* machine definition */

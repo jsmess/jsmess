@@ -142,7 +142,8 @@ static const cassette_config mikro80_cassette_config =
 {
 	rk8_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL
 };
 
 

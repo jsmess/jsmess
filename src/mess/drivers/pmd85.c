@@ -537,7 +537,8 @@ static const cassette_config pmd85_cassette_config =
 {
 	pmd85_pmd_format,
 	&pmd85_cassette_options,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 

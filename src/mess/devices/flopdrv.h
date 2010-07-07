@@ -43,6 +43,7 @@ struct floppy_config_t
 	floppy_type_t floppy_type;
 	const struct FloppyFormat *formats;
 	keep_geometry keep_drive_geometry;
+	const char *interface;
 };
 
 /* sector has a deleted data address mark */

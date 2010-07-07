@@ -592,14 +592,16 @@ static const floppy_config apple2_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(apple2),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static const cassette_config apple2_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED)
+	(cassette_state)(CASSETTE_STOPPED),
+	NULL
 };
 
 static MACHINE_DRIVER_START( apple2_common )

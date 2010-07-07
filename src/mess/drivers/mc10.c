@@ -384,7 +384,8 @@ static const cassette_config mc10_cassette_config =
 {
 	coco_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_SPEAKER_ENABLED | CASSETTE_MOTOR_ENABLED),
+	NULL
 };
 
 static const mc6847_interface mc10_mc6847_intf =

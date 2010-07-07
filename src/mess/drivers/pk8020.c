@@ -144,7 +144,8 @@ static const cassette_config pk8020_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_PLAY)
+	(cassette_state)(CASSETTE_PLAY),
+	NULL
 };
 
 static FLOPPY_OPTIONS_START(pk8020)
@@ -165,7 +166,8 @@ static const floppy_config pk8020_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(pk8020),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static const wd17xx_interface pk8020_wd17xx_interface =

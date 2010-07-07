@@ -213,7 +213,8 @@ static const cassette_config apple1_cassette_config =
 {
 	cassette_default_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED)
+	(cassette_state)(CASSETTE_STOPPED),
+	NULL
 };
 
 /* machine definition */

@@ -1984,7 +1984,8 @@ static const cassette_config x1_cassette_config =
 {
 	x1_cassette_formats,
 	NULL,
-	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
 };
 
 
@@ -2184,7 +2185,8 @@ static const floppy_config x1_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_40,
 	FLOPPY_OPTIONS_NAME(x1),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static MACHINE_DRIVER_START( x1 )

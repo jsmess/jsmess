@@ -1062,6 +1062,12 @@ DEVICE_GET_INFO(floppy)
 					image_specify_extension( info->s, 256, floppy_options[i].extensions );
 			}
 			break;
+		case DEVINFO_STR_IMAGE_INTERFACE:
+			if ( device && device->static_config() && ((floppy_config *)device->static_config())->interface)
+			{
+				strcpy(info->s, ((floppy_config *)device->static_config())->interface );
+			}
+			break;
 		default:
 			{
 				if ( device && device->static_config() )

@@ -1267,7 +1267,8 @@ static const floppy_config prof80_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(default),
-	DO_NOT_KEEP_GEOMETRY
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
 };
 
 static const INT16 speaker_levels[] = {-32768, 0, 32767, 0};
