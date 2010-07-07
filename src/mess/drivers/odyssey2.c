@@ -323,9 +323,19 @@ ROM_START (g7400)
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_MIRROR)
 ROM_END
 
+ROM_START (jopac)
+	ROM_REGION(0x10000,"maincpu",0)    /* safer for the memory handler/bankswitching??? */
+	ROM_LOAD ("jopac.bin", 0x0000, 0x0400, CRC(11647ca5) SHA1(54b8d2c1317628de51a85fc1c424423a986775e4))
+	ROM_REGION(0x100, "gfx1", ROMREGION_ERASEFF)
+
+	ROM_REGION(0x4000, "user1", 0)
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_MIRROR)
+ROM_END
+
 /*     YEAR  NAME      PARENT   COMPAT  MACHINE   INPUT     INIT      COMPANY     FULLNAME     FLAGS */
 COMP( 1978, odyssey2, 0,		0,		odyssey2, odyssey2, odyssey2, "Magnavox", "Odyssey 2", GAME_IMPERFECT_SOUND )
 COMP( 1979, videopac, odyssey2,	0,		videopac, odyssey2, odyssey2, "Philips", "Videopac G7000/C52", GAME_IMPERFECT_SOUND )
 COMP( 1983, g7400, odyssey2, 0,			g7400,    odyssey2, odyssey2, "Philips", "Videopac Plus G7400", GAME_NOT_WORKING )
+COMP( 1983, jopac, odyssey2, 0,			g7400,    odyssey2, odyssey2, "Brandt", "Jopac JO7400", GAME_NOT_WORKING )
 
 

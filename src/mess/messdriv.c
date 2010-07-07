@@ -934,6 +934,9 @@ const game_driver * const drivers[] =
 	DRIVER( g7400 )	 /* 1983 Videopac Plus G7400     */
 	DRIVER( vg5k )	  /* 1984 VG-5000    */
 
+	/* Brandt */
+	DRIVER( jopac )	/* 19?? Jopac JO7400    */
+
 	/* Compukit */
 	DRIVER( uk101 )
 
