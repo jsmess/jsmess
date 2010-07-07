@@ -42,7 +42,7 @@ QUICKLOAD_LOAD( trs80_cmd )
 	UINT8 addr[2];
 	void *ptr;
 
-	while (!image.feof())
+	while (!image.image_feof())
 	{
 		image.fread( &type, 1);
 		image.fread( &length, 1);

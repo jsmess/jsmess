@@ -57,7 +57,6 @@ struct _snapquick_config
 	const char *		file_extensions;	/* file extensions */
 	seconds_t			delay_seconds;		/* loading delay (seconds) */
 	attoseconds_t		delay_attoseconds;	/* loading delay (attoseconds) */
-	const char *		interface;	
 };
 
 
@@ -73,10 +72,6 @@ struct _snapquick_config
 	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_seconds, (seconds_t) (_delay)) \
 	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_attoseconds, (attoseconds_t) (((_delay) - (int)(_delay)) * ATTOSECONDS_PER_SECOND)) \
 
-#define MDRV_SNAPSHOT_INTERFACE(_interface)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, interface, _interface )
-
-
 /***************************************************************************
     QUICKLOAD DEVICE CONFIGURATION MACROS
 ***************************************************************************/
@@ -87,11 +82,6 @@ struct _snapquick_config
 	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, file_extensions, _file_extensions) \
 	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_seconds, (seconds_t) (_delay)) \
 	MDRV_DEVICE_CONFIG_DATA64(snapquick_config, delay_attoseconds, (attoseconds_t) (((_delay) - (int)(_delay)) * ATTOSECONDS_PER_SECOND)) \
-
-#define MDRV_QUICKLOAD_INTERFACE(_interface)							\
-	MDRV_DEVICE_CONFIG_DATAPTR(snapquick_config, interface, _interface )
-
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES

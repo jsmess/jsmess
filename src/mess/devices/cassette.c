@@ -396,6 +396,13 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 	ui_draw_text_box(render_container_get_ui(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
 }
 
+/*-------------------------------------------------
+    DEVICE_IMAGE_SOFTLIST_LOAD(cassette)
+-------------------------------------------------*/
+static DEVICE_IMAGE_SOFTLIST_LOAD(cassette)
+{
+	return FALSE;
+}
 
 DEVICE_GET_INFO(cassette)
 {
@@ -414,6 +421,7 @@ DEVICE_GET_INFO(cassette)
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(cassette); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(cassette); break;
 		case DEVINFO_FCT_IMAGE_DISPLAY:				info->f = (genf *) DEVICE_IMAGE_DISPLAY_NAME(cassette); break;
+		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(cassette);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:						strcpy(info->s, "Cassette"); break;

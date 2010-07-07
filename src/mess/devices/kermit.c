@@ -223,7 +223,7 @@ static void kermit_send_data_packet( kermit* state )
 	for ( len = 2; len < state->maxl-2; len++ )
 	{
 		UINT8 c;
-		if ( state->image->feof() ) break;
+		if ( state->image->image_feof() ) break;
 		c = state->image->fgetc();
 		if ( kermit_is_ctl( c ) )
 		{
@@ -552,7 +552,7 @@ void kermit_receive_byte( running_device *device, UINT8 data )
 
 						case KERMIT_SEND_DATA:
 							/* send next data packet or EOF */
-							if ( state->image->feof() )
+							if ( state->image->image_feof() )
 							{
 								kermit_send_simple_packet( state, KERMIT_EOF );
 								state->state = KERMIT_SEND_EOF;

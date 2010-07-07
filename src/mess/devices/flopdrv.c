@@ -993,6 +993,14 @@ READ_LINE_DEVICE_HANDLER( floppy_twosid_r )
 		return !floppy_get_heads_per_disk(drive->floppy);
 }
 
+/*-------------------------------------------------
+    DEVICE_IMAGE_SOFTLIST_LOAD(floppy)
+-------------------------------------------------*/
+static DEVICE_IMAGE_SOFTLIST_LOAD(floppy)
+{
+	return FALSE;
+}
+
 /*************************************
  *
  *  Device specification function
@@ -1036,6 +1044,7 @@ DEVICE_GET_INFO(floppy)
 		case DEVINFO_FCT_IMAGE_CREATE:				info->f = (genf *) DEVICE_IMAGE_CREATE_NAME(floppy); break;
 		case DEVINFO_FCT_IMAGE_LOAD:				info->f = (genf *) DEVICE_IMAGE_LOAD_NAME(floppy); break;
 		case DEVINFO_FCT_IMAGE_UNLOAD:				info->f = (genf *) DEVICE_IMAGE_UNLOAD_NAME(floppy); break;
+		case DEVINFO_FCT_IMAGE_SOFTLIST_LOAD:		info->f = (genf *) DEVICE_IMAGE_SOFTLIST_LOAD_NAME(floppy);	break;
 		case DEVINFO_PTR_IMAGE_CREATE_OPTGUIDE:		info->p = (void *)floppy_option_guide; break;
 		case DEVINFO_INT_IMAGE_CREATE_OPTCOUNT:
 		{

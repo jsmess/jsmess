@@ -188,13 +188,6 @@ static DEVICE_GET_INFO(snapquick)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__); break;
 		case DEVINFO_STR_IMAGE_FILE_EXTENSIONS:			strcpy(info->s, get_config_dev(device)->file_extensions); break;
-		case DEVINFO_STR_IMAGE_INTERFACE:
-			if ( device && device->static_config() && get_config_dev(device)->interface)
-			{
-				strcpy(info->s, get_config_dev(device)->interface );
-			}
-			break;
-		
 	}
 }
 
