@@ -259,7 +259,21 @@ static READ8_HANDLER(read_keyboard)
 
 static DEVICE_IMAGE_LOAD( tutor_cart )
 {
-	image.fread( memory_region(image.device().machine, "maincpu") + cartridge_base, 0x6000);
+	UINT32 size;
+	UINT8 *ptr = memory_region(image.device().machine, "maincpu");
+	
+	if (image.software_entry() == NULL)
+	{
+		size = image.length();
+		if (image.fread(ptr + cartridge_base, size) != size)
+			return IMAGE_INIT_FAIL;
+	}
+	else
+	{
+		size = image.get_software_region_length("rom");
+		memcpy(ptr + cartridge_base, image.get_software_region("rom"), size);
+	}
+	
 	return IMAGE_INIT_PASS;
 }
 
@@ -672,6 +686,8 @@ static MACHINE_DRIVER_START(tutor)
 	MDRV_SOUND_WAVE_ADD("wave", "cassette")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
+	MDRV_CENTRONICS_ADD("printer", standard_centronics)
+
 	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	/* cartridge */
@@ -679,8 +695,11 @@ static MACHINE_DRIVER_START(tutor)
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(tutor_cart)
 	MDRV_CARTSLOT_UNLOAD(tutor_cart)
+	MDRV_CARTSLOT_INTERFACE("tutor_cart")
 
-	MDRV_CENTRONICS_ADD("printer", standard_centronics)
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("mainlist","tutor")
+
 MACHINE_DRIVER_END
 
 

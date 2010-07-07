@@ -530,6 +530,26 @@ static const TMS9928a_interface tms9928a_interface =
 };
 
 
+static DEVICE_IMAGE_LOAD( sord_cart )
+{
+	UINT32 size;
+	UINT8 *ptr = memory_region(image.device().machine, "maincpu");
+	
+	if (image.software_entry() == NULL)
+	{
+		size = image.length();
+		if (image.fread(ptr + 0x2000, size) != size)
+			return IMAGE_INIT_FAIL;
+	}
+	else
+	{
+		size = image.get_software_region_length("rom");
+		memcpy(ptr + 0x2000, image.get_software_region("rom"), size);
+	}
+	
+	return IMAGE_INIT_PASS;
+}
+
 static MACHINE_START( sord_m5 )
 {
 	TMS9928A_configure(&tms9928a_interface);
@@ -575,8 +595,14 @@ static MACHINE_DRIVER_START( sord_m5 )
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
-	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
 	MDRV_CARTSLOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(sord_cart)
+	MDRV_CARTSLOT_INTERFACE("m5_cart")
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("mainlist","sordm5")
+
 MACHINE_DRIVER_END
 
 
@@ -620,6 +646,9 @@ static MACHINE_DRIVER_START( sord_m5_fd5 )
 	MDRV_MACHINE_RESET(sord_m5_fd5)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(sordm5_floppy_config)
+
+	MDRV_CARTSLOT_MODIFY("cart")
+	MDRV_CARTSLOT_NOT_MANDATORY
 MACHINE_DRIVER_END
 
 
@@ -630,14 +659,13 @@ MACHINE_DRIVER_END
 ROM_START( sordm5 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("sordint.rom", 0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
-	ROM_CART_LOAD("cart", 0x2000, 0x5000, ROM_NOMIRROR)
 ROM_END
 
 
-ROM_START( srdm5fd5 )
+ROM_START( sordm5fd5 )
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("sordint.rom",0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
-	ROM_CART_LOAD("cart", 0x2000, 0x5000, ROM_NOMIRROR | ROM_OPTIONAL)
+
 	ROM_REGION(0x4000, "floppy", 0)
 	ROM_LOAD("sordfd5.rom",0x0000, 0x4000, NO_DUMP)
 ROM_END
@@ -656,6 +684,6 @@ ROM_END
     GAME DRIVERS
 ***************************************************************************/
 
-/*    YEAR  NAME      PARENT  COMPAT  MACHINE      INPUT    INIT  COMPANY  FULLNAME               FLAGS */
-COMP( 1983, sordm5,	  0,      0,      sord_m5,	   sord_m5, 0,    "Sord",  "Sord M5",             0 )
-COMP( 1983, srdm5fd5, sordm5, 0,      sord_m5_fd5, sord_m5, 0,    "Sord",  "Sord M5 + PI5 + FD5", GAME_NOT_WORKING )
+/*    YEAR  NAME       PARENT  COMPAT  MACHINE      INPUT    INIT  COMPANY  FULLNAME               FLAGS */
+COMP( 1983, sordm5,    0,      0,      sord_m5,	    sord_m5, 0,    "Sord",  "Sord M5",             0 )
+COMP( 1983, sordm5fd5, sordm5, 0,      sord_m5_fd5, sord_m5, 0,    "Sord",  "Sord M5 + PI5 + FD5", GAME_NOT_WORKING )

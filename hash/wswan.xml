@@ -3,6 +3,7 @@
 
 <softwarelist name="wswan" description="Bandai Wonderswan (Color) cartridges">
 	<software name="anchorz">
+        <!-- Alt title: アンカーズ・フィールド -->
 		<description>Anchorz Field</description>
 		<!--<release_date>1999-06-24</release_date>-->
 		<year>1999</year>
@@ -17,30 +18,38 @@
 	</software>
 
 	<software name="anotherh">
+        <!-- Alt title: アナザヘヴン ～memory of those days～ -->
+		<!-- WSC -->
 		<description>Another Heaven - Memory of those Days</description>
-		<year>200?</year>
-		<publisher>unknown</publisher>
-		<!-- <serial></serial> -->
+		<!--<release_date>2000-12-21</release_date>-->
+		<year>2000</year>
+		<publisher>Omega Micott</publisher>
+		<!-- <serial>SWJ-OMMC03</serial> -->
 		<!-- 16k EEPROM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="another heaven.bin" size="4194304" crc="d7a0ab74" sha1="caf4a8de853ded732b2a72619acf2784eeceafc7" offset="000000" />
+				<rom name="swj-ommc03.bin" size="4194304" crc="d7a0ab74" sha1="caf4a8de853ded732b2a72619acf2784eeceafc7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="arclad">
+        <!-- Alt title: アークザラッド 機神復活 -->
+		<!-- WSC only -->
 		<description>Arc the Lad - Kishin Fukkatsu</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-07-04</release_date>-->
+		<year>2000</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC2A</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="arc the lad - kishin fukkatsu (japan).bin" size="8388608" crc="e2317345" sha1="68981c05d8118d4189100eed462ee6639328dc59" offset="000000" />
+				<rom name="swj-banc2a.bin" size="8388608" crc="e2317345" sha1="68981c05d8118d4189100eed462ee6639328dc59" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="armrunit">
+        <!-- Alt title: アーマードユニット -->
 		<description>Armored Unit</description>
 		<!--<release_date>1999-11-18</release_date>-->
 		<year>1999</year>
@@ -55,9 +64,13 @@
 	</software>
 
 	<software name="alchemst">
+        <!-- Alt title: マリー＆エリー ～ふたりのアトリエ～ -->
+		<!-- WSC only -->
 		<description>Alchemist Marie &amp; Elie - Futari no Atelier</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2001-10-25</release_date>-->
+		<year>2001</year>
+		<publisher>E3Staff</publisher>
+		<!-- <serial>SWJ-HTRC01</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-htrc01.bin" size="4194304" crc="b18cdc0d" sha1="99d9d7f951ae589059f34e76aea7489ae4cd79f1" offset="000000" />
@@ -66,10 +79,11 @@
 	</software>
 
 	<software name="bakusoud">
+        <!-- Alt title: 爆走デコトラ伝説 フォー ワンダースワン -->
 		<description>Bakusou Dekotora Densetsu for WonderSwan</description>
 		<!--<release_date>1999-12-29</release_date>-->
 		<year>1999</year>
-		<publisher>Kaga Tech Co., Ltd.</publisher>
+		<publisher>Kaga Tech</publisher>
 		<!-- <serial>SWJ-KGT003</serial> -->
 		<!-- 64k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -80,19 +94,24 @@
 	</software>
 
 	<software name="battlesp">
+        <!-- Alt title: バトルスピリット デジモンフロンティア -->
+		<!-- WSC only -->
 		<description>Battle Spirit - Digimon Frontier</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-12-07</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC31</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="battle spirit - digimon frontier (japan).bin" size="4194304" crc="8ba49dab" sha1="fffb1aea34e0a96113cd10ba9de515000d27bfe6" offset="000000" />
+				<rom name="swj-banc31.bin" size="4194304" crc="8ba49dab" sha1="fffb1aea34e0a96113cd10ba9de515000d27bfe6" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="bemaniws">
+        <!-- Alt title: ビートマニア for ワンダースワン -->
 		<description>Beatmania for WonderSwan</description>
-		<!--<release_date>1999-04-20</release_date>-->
+		<!--<release_date>1999-04-28</release_date>-->
 		<year>1999</year>
 		<publisher>Konami</publisher>
 		<!-- <serial>SWJ-KNM001</serial> -->
@@ -105,6 +124,8 @@
 	</software>
 
 	<software name="bluewing">
+        <!-- Alt title: ブルー ウイング ブリッツ -->
+		<!-- WSC -->
 		<description>Blue Wing Blitz</description>
 		<!--<release_date>2001-07-05</release_date>-->
 		<year>2001</year>
@@ -118,10 +139,11 @@
 	</software>
 
 	<software name="buffers">
+        <!-- Alt title: バッファーズエボリューション -->
 		<description>Buffers Evolution</description>
-		<!--<release_date>1999-12</release_date>-->
+		<!--<release_date>1999-12-09</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN01B</serial> -->
 		<!-- 16k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -132,12 +154,12 @@
 	</software>
 
 	<software name="cclimber">
+        <!-- Alt title: クレイジー・クライマー -->
 		<description>Crazy Climber</description>
 		<!--<release_date>1999-07-29</release_date>-->
 		<year>1999</year>
-		<publisher>Nihon Bussan Co., Ltd.</publisher>
+		<publisher>Nihon Bussan</publisher>
 		<!-- <serial>SWJ-NHB001</serial> -->
-		<!-- none -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="swj-nhb001.bin" size="524288" crc="c995274b" sha1="67a80b7fb00c3afe0ce9b0f8975c6d250a2cd49d" offset="000000" />
@@ -146,10 +168,11 @@
 	</software>
 
 	<software name="ccsakura">
+        <!-- Alt title: カードキャプターさくら ～さくらとふしぎなクロウカード～ -->
 		<description>Cardcaptor Sakura - Sakura to Fushigi na Clow Card</description>
 		<!--<release_date>1999-12-02</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN01A</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -160,10 +183,11 @@
 	</software>
 
 	<software name="chaosgea">
+        <!-- Alt title: カオスギア 導かれし者 -->
 		<description>Chaos Gear - Michibikareshi Mono</description>
 		<!--<release_date>1999-06-10</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN00B</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -174,10 +198,11 @@
 	</software>
 
 	<software name="chocodun">
+        <!-- Alt title: チョコボの不思議なダンジョン for ワンダースワン -->
 		<description>Chocobo no Fushigi na Dungeon for WonderSwan</description>
 		<!--<release_date>1999-03-04</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN002</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -188,10 +213,11 @@
 	</software>
 
 	<software name="chouanik">
+        <!-- Alt title: 超兄貴 男の魂札 -->
 		<description>Chou Aniki - Otoko no Tamafuda</description>
 		<!--<release_date>2000-02-10</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN023</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -201,7 +227,8 @@
 		</part>
 	</software>
 
-	<software name="choudenk">
+	<software name="youfumak">
+        <!-- Alt title: 超伝奇カードバトル 妖符魔界 菊地秀行 -->
 		<description>Chou Denki Card Game - Youfu Makai - Kikuchi Shuukou</description>
 		<!--<release_date>1999-12-16</release_date>-->
 		<year>1999</year>
@@ -215,10 +242,11 @@
 	</software>
 
 	<software name="clocktow">
+        <!-- Alt title: クロックタワー フォー ワンダースワン -->
 		<description>Clock Tower for WonderSwan</description>
 		<!--<release_date>1999-12-09</release_date>-->
 		<year>1999</year>
-		<publisher>Kaga Tech Co., Ltd.</publisher>
+		<publisher>Kaga Tech</publisher>
 		<!-- <serial>SWJ-KGT002</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -229,21 +257,27 @@
 	</software>
 
 	<software name="crshgear">
+        <!-- Alt title: 激闘！ クラッシュギア ターボギアチャンピオンリーグ -->
+		<!-- WSC only -->
 		<description>Gekitou! Crash Gear Turbo - Gear Champion League</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-08-10</release_date>-->
+		<year>2002</year>
+		<publisher>WiZ</publisher>
+		<!-- <serial>SWJ-WIZC01</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="gekitou! crash gear turbo - gear champion league (japan).bin" size="4194304" crc="8a8b827c" sha1="1bc1e831b9e2aefc59f2cac5f19f7d22be574fc1" offset="000000" />
+				<rom name="swj-wizc01.bin" size="4194304" crc="8a8b827c" sha1="1bc1e831b9e2aefc59f2cac5f19f7d22be574fc1" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="darkeyes">
+        <!-- Alt title: バトルゲート ダークアイズ -->
+		<!-- WSC -->
 		<description>Dark Eyes - Battle Gate</description>
 		<!--<release_date>2001-03-15</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC08</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -253,12 +287,12 @@
 	</software>
 
 	<software name="denshad2">
+        <!-- Alt title: 電車でGO ! 2 -->
 		<description>Densha de Go! 2</description>
 		<!--<release_date>1999-10-07</release_date>-->
 		<year>1999</year>
 		<publisher>CyberFront</publisher>
 		<!-- <serial>SWJ-CFT001</serial> -->
-		<!-- none -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-cft001.bin" size="4194304" crc="af9d8f42" sha1="c07f776ac4374b648d1a49efd9d6fcd0db2ac1fa" offset="000000" />
@@ -267,12 +301,12 @@
 	</software>
 
 	<software name="denshadg">
+        <!-- Alt title: 電車でGO！ -->
 		<description>Densha de Go!</description>
 		<!--<release_date>1999-03-04</release_date>-->
 		<year>1999</year>
-		<publisher>Taito Corp.</publisher>
+		<publisher>Taito</publisher>
 		<!-- <serial>SWJ-TAT001</serial> -->
-		<!-- none -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-tat001.bin" size="4194304" crc="b62e5dd0" sha1="d3da0ae529c6f78162682141154a95879f288ca7" offset="000000" />
@@ -281,9 +315,12 @@
 	</software>
 
 	<software name="dicing">
+        <!-- Alt title: だいしんぐないと・ピリオド -->
+		<!-- WSC only -->
 		<description>Dicing Knight.</description>
-		<year>20??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2004-05-31</release_date>-->
+		<year>2004</year>
+		<publisher>Qute</publisher>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="dicing knight. (japan).bin" size="524288" crc="d28dc930" sha1="79658575c736fcad18e9225aa0e62398b086093b" offset="000000" />
@@ -292,10 +329,12 @@
 	</software>
 
 	<software name="digi2d1">
+        <!-- Alt title: デジモンアドベンチャー02 ディーワンテイマーズ -->
+		<!-- WSC -->
 		<description>Digimon Adventure 02 - D1 Tamers</description>
 		<!--<release_date>2000-12-09</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC03</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -306,10 +345,11 @@
 	</software>
 
 	<software name="digi2tag">
+        <!-- Alt title: デジモンアドベンチャー02 タッグテイマーズ -->
 		<description>Digimon Adventure 02 - Tag Tamers</description>
 		<!--<release_date>2000-08-03</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN032</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -320,9 +360,10 @@
 	</software>
 
 	<software name="digianca">
-		<description>Digimon - Anode Tamer &amp; Cathode Tamer</description>
+        <!-- Alt title:  -->
+		<description>Digimon - Anode Tamer &amp; Cathode Tamer (Asia?)</description>
 		<year>19??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN001</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -332,10 +373,11 @@
 	</software>
 
 	<software name="digianod">
+        <!-- Alt title: デジモンアドベンチャー アノードテイマー -->
 		<description>Digimon Adventure - Anode Tamer</description>
 		<!--<release_date>1999-12-16</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN01C</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -346,10 +388,12 @@
 	</software>
 
 	<software name="digicard">
+        <!-- Alt title: デジタルモンスター カードゲーム バージョン ワンダースワンカラー -->
+		<!-- WSC only -->
 		<description>Digital Monster Card Game - Ver. WonderSwan Color</description>
 		<!--<release_date>2002-03-16</release_date>-->
 		<year>2002</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC22</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -359,10 +403,11 @@
 	</software>
 
 	<software name="digicatd">
+        <!-- Alt title: デジモンアドベンチャー カソードテイマー -->
 		<description>Digimon Adventure - Cathode Tamer</description>
 		<!--<release_date>2000-01-20</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN01D</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -373,21 +418,26 @@
 	</software>
 
 	<software name="digimdp">
+        <!-- Alt title: デジタルモンスター ディープロジェクト -->
+		<!-- WSC only -->
 		<description>Digital Monster - D-Project</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-08-03</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC2E</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="digital monster - d-project (japan).bin" size="4194304" crc="faaefbcb" sha1="3e8fffe1f607ea5f855397d9d877cecb285507f7" offset="000000" />
+				<rom name="swj-banc2e.bin" size="4194304" crc="faaefbcb" sha1="3e8fffe1f607ea5f855397d9d877cecb285507f7" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="digimon">
+        <!-- Alt title: デジタルモンスター バージョン ワンダースワン -->
 		<description>Digital Monster - Ver. WonderSwan</description>
 		<!--<release_date>1999-03-25</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN005</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -397,9 +447,10 @@
 	</software>
 
 	<software name="digimon1" cloneof="digimon">
+         <!-- Alt title: -->
 		<description>Digimon - Ver. WonderSwan (Asia)</description>
 		<year>19??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN001</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -410,11 +461,12 @@
 	</software>
 
 	<software name="digipart">
+        <!-- Alt title: デジモンアドベンチャー02 デジタルパートナー -->
 		<description>Digital Partner</description>
 		<!--<release_date>2000-05-25</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
-		<!-- <serial>SWJ-BAN02C</serial> -->
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BAN02C / SWJ-BAN02F</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
 				<rom name="swj-ban02c.bin" size="2097152" crc="b5e675ae" sha1="c622f6742ca3f0129fc12dce0a1c17d292388ffb" offset="000000" />
@@ -423,10 +475,12 @@
 	</software>
 
 	<software name="digitbs">
+        <!-- Alt title: デジモンテイマーズ バトルスピリット Ver.1.5 -->
+		<!-- WSC only -->
 		<description>Digimon Tamers - Battle Spirit Ver. 1.5</description>
 		<!--<release_date>2002-04-27</release_date>-->
 		<year>2002</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC30</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
@@ -436,11 +490,13 @@
 	</software>
 
 	<software name="digitbs1">
+        <!-- Alt title: デジモンテイマーズ バトルスピリット -->
+		<!-- WSC only -->
 		<description>Digimon Tamers - Battle Spirit</description>
 		<!--<release_date>2001-10-06</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
-		<!-- <serial>SWJ-BANC1A</serial> -->
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC1A / SWJ-BANC24</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="swj-banc1a.bin" size="4194304" crc="c927bfcb" sha1="757e92177385a14d979227edee1cb544b4c56bd6" offset="000000" />
@@ -449,10 +505,12 @@
 	</software>
 
 	<software name="digitbt">
+        <!-- Alt title: デジモンテイマーズ ブレイブテイマー -->
+		<!-- WSC only -->
 		<description>Digimon Tamers - Brave Tamer</description>
 		<!--<release_date>2001-12-29</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC1D</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -462,10 +520,12 @@
 	</software>
 
 	<software name="digitmed">
+        <!-- Alt title: デジモンテイマーズ デジモンメドレー -->
+		<!-- WSC -->
 		<description>Digimon Tamers - Digimon Medley</description>
 		<!--<release_date>2001-07-12</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC14</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -475,10 +535,12 @@
 	</software>
 
 	<software name="dokodem3">
+        <!-- Alt title: どこでもハムスター3 おでかけサフラン -->
+		<!-- WSC -->
 		<description>Dokodemo Hamster 3 - Odekake Saffron</description>
 		<!--<release_date>2000-12-14</release_date>-->
 		<year>2000</year>
-		<publisher>Bec Co., Ltd.</publisher>
+		<publisher>BEC</publisher>
 		<!-- <serial>SWJ-BECC01</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -489,10 +551,11 @@
 	</software>
 
 	<software name="dokodemo">
+        <!-- Alt title: どこでもハムスター -->
 		<description>Dokodemo Hamster</description>
 		<!--<release_date>2000-01-06</release_date>-->
 		<year>2000</year>
-		<publisher>Bec Co., Ltd.</publisher>
+		<publisher>BEC</publisher>
 		<!-- <serial>SWJ-BEC003</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -502,9 +565,11 @@
 	</software>
 
 	<software name="doraemon">
+        <!-- Alt title: ポケットの中の ドラえもん -->
 		<description>Pocket no Naka no Doraemon</description>
+		<!--<release_date>2001-05-24</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC0D</serial> -->
 		<!-- 16k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -514,22 +579,27 @@
 		</part>
 	</software>
 
-	<software name="dragball">
+	<software name="dball">
+        <!-- Alt title: ドラゴンボール -->
+		<!-- WSC only - Rated "Everyone" -->
 		<description>Dragon Ball</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2003-11-20</release_date>-->
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC3C</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="dragon ball (japan).bin" size="2097152" crc="067238d1" sha1="5384f9974c66e5e26129a4709976de0bb1ae1f17" offset="000000" />
+				<rom name="swj-banc3c.bin" size="2097152" crc="067238d1" sha1="5384f9974c66e5e26129a4709976de0bb1ae1f17" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="dsgarage">
+        <!-- Alt title: D's Garage21公募ゲーム たねをまく鳥 -->
 		<description>D's Garage 21 Koubo Game - Tane o Maku Tori</description>
 		<!--<release_date>1999-12-22</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN01E</serial> -->
 		<!-- 1k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -540,10 +610,11 @@
 	</software>
 
 	<software name="engacho">
+        <!-- Alt title: えんがちょ！for ワンダースワン -->
 		<description>Engacho! for WonderSwan</description>
 		<!--<release_date>1999-10-28</release_date>-->
 		<year>1999</year>
-		<publisher>Nihon Application Co., Ltd.</publisher>
+		<publisher>Nihon Application</publisher>
 		<!-- <serial>SWJ-NAP001</serial> -->
 		<!-- 1k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -554,10 +625,11 @@
 	</software>
 
 	<software name="evangeln">
+        <!-- Alt title: 新世紀エヴァンゲリオン シト育成 -->
 		<description>Neon Genesis Evangelion - Shito Ikusei</description>
 		<!--<release_date>1999-07-22</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN00E</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -568,10 +640,11 @@
 	</software>
 
 	<software name="feversan">
+        <!-- Alt title: フィーバー サンキョー 公式パチンコシミュレーション フォー ワンダースワン -->
 		<description>Fever - Sankyo Koushiki Pachinko Simulation for WonderSwan</description>
 		<!--<release_date>1999-12-09</release_date>-->
 		<year>1999</year>
-		<publisher>Bec Co., Ltd.</publisher>
+		<publisher>BEC</publisher>
 		<!-- <serial>SWJ-BEC002</serial> -->
 		<!-- 1k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -582,6 +655,8 @@
 	</software>
 
 	<software name="ffant">
+        <!-- Alt title: ファイナルファンタジー -->
+		<!-- WSC only -->
 		<description>Final Fantasy</description>
 		<!--<release_date>2000-12-09</release_date>-->
 		<year>2000</year>
@@ -596,8 +671,10 @@
 	</software>
 
 	<software name="ffant2">
+        <!-- Alt title: ファイナルファンタジーII -->
+		<!-- WSC only -->
 		<description>Final Fantasy II</description>
-		<!--<release_date>2001-05-03</release_date>-->
+		<!--<release_date>2001-05-02</release_date>-->
 		<year>2001</year>
 		<publisher>Square</publisher>
 		<!-- <serial>SWJ-SQRC02</serial> -->
@@ -610,6 +687,8 @@
 	</software>
 
 	<software name="ffant4">
+        <!-- Alt title: ファイナルファンタジーIV -->
+		<!-- WSC only -->
 		<description>Final Fantasy IV</description>
 		<!--<release_date>2002-03-28</release_date>-->
 		<year>2002</year>
@@ -623,10 +702,11 @@
 	</software>
 
 	<software name="fishingf">
+        <!-- Alt title: フィッシングフリークス バスライズ フォー ワンダースワン -->
 		<description>Fishing Freaks - Bass Rise for WonderSwan</description>
 		<!--<release_date>2000-02-24</release_date>-->
 		<year>2000</year>
-		<publisher>Bec Co., Ltd.</publisher>
+		<publisher>BEC</publisher>
 		<!-- <serial>SWJ-BEC004</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -637,10 +717,11 @@
 	</software>
 
 	<software name="flap2000">
+        <!-- Alt title: ファイナルラップ2000 -->
 		<description>Final Lap 2000</description>
 		<!--<release_date>2000-03-23</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN026</serial> -->
 		<!-- 16k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -651,10 +732,12 @@
 	</software>
 
 	<software name="flapspec">
+        <!-- Alt title: ファイナルラップスペシャル -->
+		<!-- WSC only -->
 		<description>Final Lap Special - GT &amp; Formula Machine</description>
 		<!--<release_date>2001-11-15</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC23</serial> -->
 		<!-- TOOD -->
 		<part name="cart" interface="wswan_cart">
@@ -665,6 +748,8 @@
 	</software>
 
 	<software name="flashkk">
+        <!-- Alt title: フラッシュ 恋人クン -->
+		<!-- WSC -->
 		<description>Flash Koibito-kun </description>
 		<!--<release_date>2000-12-28</release_date>-->
 		<year>2000</year>
@@ -679,10 +764,11 @@
 	</software>
 
 	<software name="fprowres">
+        <!-- Alt title: ファイヤープロレスリング フォー ワンダースワン -->
 		<description>Fire Pro Wrestling for WonderSwan</description>
-		<!--<release_date>2000-08</release_date>-->
+		<!--<release_date>2000-08-31</release_date>-->
 		<year>2000</year>
-		<publisher>Kaga Tech Co., Ltd.</publisher>
+		<publisher>Kaga Tech</publisher>
 		<!-- <serial>SWJ-KGT007</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -693,21 +779,27 @@
 	</software>
 
 	<software name="frontmis">
+        <!-- Alt title: フロントミッション -->
+		<!-- WSC only -->
 		<description>Front Mission</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-07-12</release_date>-->
+		<year>2002</year>
+		<publisher>Square</publisher>
+		<!-- <serial>SWJ-SQRC10</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="front mission (japan).bin" size="8388608" crc="2f9e2560" sha1="3c752694ab651f9a00ccd39c334a2e3ff78f5cb2" offset="000000" />
+				<rom name="swj-sqrc10.bin" size="8388608" crc="2f9e2560" sha1="3c752694ab651f9a00ccd39c334a2e3ff78f5cb2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gaxe">
+        <!-- Alt title: ゴールデンアックス -->
+		<!-- WSC only -->
 		<description>Golden Axe</description>
 		<!--<release_date>2002-02-28</release_date>-->
 		<year>2002</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC2B</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -717,10 +809,11 @@
 	</software>
 
 	<software name="gensouma">
+        <!-- Alt title 幻想魔伝最遊記 Retribution ～陽のあたる場所で～: -->
 		<description>Gensou Maden Saiyuuki Retribution - Hi no Ataru Basho de</description>
 		<!--<release_date>2001-06-07</release_date>-->
 		<year>2001</year>
-		<publisher>Movic</publisher>
+		<publisher>Movic ~ Soeishinsha</publisher>
 		<!-- <serial>SWJ-SESC01</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -730,6 +823,8 @@
 	</software>
 
 	<software name="ggpetit">
+        <!-- Alt title: ギルティギア プチ -->
+		<!-- WSC only -->
 		<description>Guilty Gear Petit</description>
 		<!--<release_date>2001-01-25</release_date>-->
 		<year>2001</year>
@@ -744,6 +839,8 @@
 	</software>
 
 	<software name="ggpetit2">
+        <!-- Alt title: ギルティギア プチ2 -->
+		<!-- WSC only -->
 		<description>Guilty Gear Petit 2</description>
 		<!--<release_date>2001-09-27</release_date>-->
 		<year>2001</year>
@@ -757,12 +854,12 @@
 	</software>
 
 	<software name="gjajamar">
+        <!-- Alt title: 元祖じゃじゃ丸くん -->
 		<description>Ganso Jajamaru-kun</description>
 		<!--<release_date>1999-04-15</release_date>-->
 		<year>1999</year>
-		<publisher>Jaleco Ltd.</publisher>
+		<publisher>Jaleco</publisher>
 		<!-- <serial>SWJ-JLC001</serial> -->
-		<!-- none -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="swj-jlc001.bin" size="524288" crc="a193458c" sha1="cbf6455e89b20a000b6121e5c485be1a20d1f726" offset="000000" />
@@ -771,12 +868,12 @@
 	</software>
 
 	<software name="glochex">
+        <!-- Alt title: グローカルヘキサイト -->
 		<description>Glocal Hexcite</description>
 		<!--<release_date>2000-06-29</release_date>-->
 		<year>2000</year>
-		<publisher>Kaga Tech Co., Ltd.</publisher>
+		<publisher>Kaga Tech</publisher>
 		<!-- <serial>SWJ-KGT008</serial> -->
-		<!-- none -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="swj-kgt008.bin" size="524288" crc="8fcd6d2c" sha1="e100d54e5c63512dbd655f0439870e08ced439dd" offset="000000" />
@@ -785,6 +882,7 @@
 	</software>
 
 	<software name="gomokuna">
+        <!-- Alt title: 五目並べ＆リバーシ 登龍門 -->
 		<description>Gomoku Narabe &amp; Reversi - Touryuumon</description>
 		<!--<release_date>2000-01-13</release_date>-->
 		<year>2000</year>
@@ -799,6 +897,7 @@
 	</software>
 
 	<software name="gorakuta">
+        <!-- Alt title: 語楽王 タンゴ ! -->
 		<description>Goraku Ou Tango!</description>
 		<!--<release_date>1999-04-01</release_date>-->
 		<year>1999</year>
@@ -812,6 +911,8 @@
 	</software>
 
 	<software name="gransta">
+        <!-- Alt title: グランスタ クロニクル -->
+		<!-- WSC only -->
 		<description>Gransta Chronicle</description>
 		<!--<release_date>2002-06-13</release_date>-->
 		<year>2002</year>
@@ -825,10 +926,11 @@
 	</software>
 
 	<software name="gundmsvs">
-		<description>Mobile Suit Gundam MSVS</description>
+        <!-- Alt title: 機動戦士ガンダム エムエスバーサス -->
+		<description>Kidou Senshi Gundam MSVS</description>
 		<!--<release_date>1999-08-26</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN015</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -839,32 +941,42 @@
 	</software>
 
 	<software name="gundseed">
+        <!-- Alt title: 機動戦士ガンダム シード -->
+		<!-- WSC only -->
 		<description>Kidou Senshi Gundam Seed</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2003-03-15</release_date>-->
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC36</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="kidou senshi gundam seed (japan).bin" size="4194304" crc="bce15137" sha1="e933ff8eace56a462019ae4654b0bab1b21b1d6c" offset="000000" />
+				<rom name="swj-banc36.bin" size="4194304" crc="bce15137" sha1="e933ff8eace56a462019ae4654b0bab1b21b1d6c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gundtoku">
+        <!-- Alt title: 機動戦士ガンダム ギレンの野望 特別編 蒼き星の覇者 -->
+		<!-- WSC only, Rated "Everyone" -->
 		<description>Kidou Senshi Gundam - Giren no Yabou - Tokubetsu Hen - Aoki Hoshi no Hasha</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2003-05-02</release_date>-->
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC3A</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="kidou senshi gundam - giren no yabou - tokubetsu hen - aoki hoshi no hasha (japan).bin" size="4194304" crc="d4061551" sha1="20b671bc14a8ab6373deecc641479d09658ac21f" offset="000000" />
+				<rom name="swj-banc3a.bin" size="4194304" crc="d4061551" sha1="20b671bc14a8ab6373deecc641479d09658ac21f" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gundvol1">
+        <!-- Alt title: 機動戦士ガンダム Vol.1 サイドセブン -->
+		<!-- WSC only -->
 		<description>Kidou Senshi Gundam Vol. 1 - Side 7</description>
 		<!--<release_date>2001-02-01</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC07</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -875,10 +987,12 @@
 	</software>
 
 	<software name="gundvol2">
+        <!-- Alt title: 機動戦士ガンダム Vol.2 ジャブロー -->
+		<!-- WSC only -->
 		<description>Kidou Senshi Gundam Vol. 2 - Jaburo</description>
 		<!--<release_date>2001-08-16</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC17</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
@@ -888,35 +1002,42 @@
 	</software>
 
 	<software name="gundvol3">
+        <!-- Alt title: 機動戦士ガンダム Vol.3 ア・バオア・クー -->
+		<!-- WSC only -->
 		<description>Kidou Senshi Gundam Vol. 3 - A Baoa Qu</description>
-		<year>20??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-05-25</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC25</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="kidou senshi gundam vol. 3 - a baoa qu (japan).bin" size="8388608" crc="a9f5bf54" sha1="35443e2ef8a20a0ad82da1274b2768c16239dd46" offset="000000" />
+				<rom name="swj-banc25.bin" size="8388608" crc="a9f5bf54" sha1="35443e2ef8a20a0ad82da1274b2768c16239dd46" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gunpey">
+        <!-- Alt title: グンペイ -->
 		<description>GunPey</description>
 		<!--<release_date>1999-03-04</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
-		<!-- <serial>SWJ-BAN001</serial> -->
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BAN010</serial> -->
 		<!-- 16k EEPROM -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="swj-ban001.bin" size="1048576" crc="a1656bbb" sha1="ee4b777f029bac9561e60c19407d08360e733822" offset="000000" />
+				<rom name="swj-ban010.bin" size="1048576" crc="a1656bbb" sha1="ee4b777f029bac9561e60c19407d08360e733822" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="gunpeyex">
+        <!-- Alt title: グンペイEX -->
+		<!-- WSC only -->
 		<description>GunPey EX</description>
 		<!--<release_date>2000-12-09</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC02</serial> -->
 		<!-- 16k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -927,10 +1048,11 @@
 	</software>
 
 	<software name="hanafuda">
+        <!-- Alt title: 花札しようよ -->
 		<description>Hanafuda Shiyouyo</description>
 		<!--<release_date>2000-02-17</release_date>-->
 		<year>2000</year>
-		<publisher>Kaga Tech Co., Ltd.</publisher>
+		<publisher>Kaga Tech</publisher>
 		<!-- <serial>SWJ-KGT005</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -941,10 +1063,11 @@
 	</software>
 
 	<software name="handsonr">
-		<description>WonderSwan Handy Sonar</description>
+        <!-- Alt title: 携帯魚群探知機 ワンダースワン ハンディーソナー -->
+		<description>Keitai Gyogun Tanchiki - WonderSwan Handy Sonar</description>
 		<!--<release_date>1999-05-13</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN00F</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -954,6 +1077,8 @@
 	</software>
 
 	<software name="hanjuher">
+        <!-- Alt title: はんじゅくヒーロー半熟英雄 ああ、世界よ半熟なれ…！！ -->
+		<!-- WSC only -->
 		<description>Hanjuku Hero - Ah, Sekai yo Hanjuku Nare...!!</description>
 		<!--<release_date>2002-02-14</release_date>-->
 		<year>2002</year>
@@ -967,6 +1092,7 @@
 	</software>
 
 	<software name="harobots">
+        <!-- Alt title: ハロボッツ -->
 		<description>Harobots</description>
 		<!--<release_date>1999-10-07</release_date>-->
 		<year>1999</year>
@@ -981,6 +1107,8 @@
 	</software>
 
 	<software name="hatachoc">
+        <!-- Alt title: はたらくチョコボ -->
+		<!-- WSC -->
 		<description>Hataraku Chocobo</description>
 		<!--<release_date>2000-09-21</release_date>-->
 		<year>2000</year>
@@ -994,21 +1122,26 @@
 	</software>
 
 	<software name="hxhgrisl">
+        <!-- Alt title: ハンター×ハンター グリードアイランド -->
+		<!-- WSC only, Rated "Everyone" -->
 		<description>Hunter X Hunter - Greed Island</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2003-04-24</release_date>-->
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC39</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="hunter x hunter - greed island (japan).bin" size="8388608" crc="a487b7a8" sha1="f66335b5af87e7cb72ae311eb9b339534722f738" offset="000000" />
+				<rom name="swj-banc39.bin" size="8388608" crc="a487b7a8" sha1="f66335b5af87e7cb72ae311eb9b339534722f738" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="hxhishi">
+        <!-- Alt title: ハンター×ハンター 意志を継ぐ者 -->
 		<description>Hunter X Hunter - Ishi o Tsugu Mono</description>
 		<!--<release_date>2000-06-01</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN02A</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -1018,10 +1151,12 @@
 	</software>
 
 	<software name="hxhmichi">
+        <!-- Alt title: ハンター×ハンター 導かれし者 -->
+		<!-- WSC only -->
 		<description>Hunter X Hunter - Michibikareshi Mono</description>
 		<!--<release_date>2001-08-23</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC18</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -1031,10 +1166,12 @@
 	</software>
 
 	<software name="hxhsorez">
+        <!-- Alt title: ハンター×ハンター ～それぞれの決意～ -->
+		<!-- WSC only -->
 		<description>Hunter X Hunter - Sorezore no Ketsui</description>
 		<!--<release_date>2001-04-26</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC0F</serial> -->
 		<!-- 16k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -1045,21 +1182,27 @@
 	</software>
 
 	<software name="inuyfema">
+        <!-- Alt title: 犬夜叉 風雲絵巻 -->
+		<!-- WSC only -->
 		<description>Inuyasha - Fuuun Emaki</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-07-27</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC26</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="inuyasha - fuuun emaki (japan).bin" size="4194304" crc="3ff5791f" sha1="99d5bdde193685a1d09ea73bb79a54b4da82625d" offset="000000" />
+				<rom name="swj-banc26.bin" size="4194304" crc="3ff5791f" sha1="99d5bdde193685a1d09ea73bb79a54b4da82625d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="inuyksen">
+        <!-- Alt title: 犬夜叉 かごめの戦国日記 -->
+		<!-- WSC only -->
 		<description>Inuyasha - Kagome no Sengoku Nikki</description>
 		<!--<release_date>2001-11-02</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC1B</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -1069,17 +1212,22 @@
 	</software>
 
 	<software name="inuykyum">
+        <!-- Alt title: 犬夜叉 かごめの夢日記 -->
+		<!-- WSC only -->
 		<description>Inuyasha - Kagome no Yume Nikki</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-11-16</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC32</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="inuyasha - kagome no yume nikki (japan).bin" size="4194304" crc="44453234" sha1="f7c8f8b6b6d036df8fc4bde72fcfac2846dffe35" offset="000000" />
+				<rom name="swj-banc32.bin" size="4194304" crc="44453234" sha1="f7c8f8b6b6d036df8fc4bde72fcfac2846dffe35" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="itoujunj">
+        <!-- Alt title: うずまき 呪いシミュレーション -->
 		<description>Itou Junji Uzumaki - Noroi Simulation</description>
 		<!--<release_date>2000-03-04</release_date>-->
 		<year>2000</year>
@@ -1093,9 +1241,12 @@
 	</software>
 
 	<software name="jsilver">
+         <!-- Alt title: -->
+		<!-- WSC only -->
 		<description>Judgement Silversword - Rebirth Edition (Rev. 4321)</description>
-		<year>200?</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2004-02-05</release_date>-->
+		<year>2004</year>
+		<publisher>Qute</publisher>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="judgement silversword - rebirth edition (japan) (rev 4321).bin" size="524288" crc="60191872" sha1="657aea8377e207b9b5a182b13966a27f46633640" offset="000000" />
@@ -1104,9 +1255,12 @@
 	</software>
 
 	<software name="jsilver1" cloneof="jsilver">
+         <!-- Alt title: -->
+		<!-- WSC only -->
 		<description>Judgement Silversword - Rebirth Edition (Rev. SC21)</description>
-		<year>200?</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2004-02-05</release_date>-->
+		<year>2004</year>
+		<publisher>Qute</publisher>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="judgement silversword - rebirth edition (japan) (rev sc21).bin" size="524288" crc="4fce380d" sha1="a1d910123b6be0b941f699ef70c745d16350d029" offset="000000" />
@@ -1114,7 +1268,8 @@
 		</part>
 	</software>
 
-	<software name="kakutour">
+	<software name="kakutobr">
+        <!-- Alt title: 格闘料理伝説 ビストロレシピ ワンダーバトル編 -->
 		<description>Kakutou Ryouri Densetsu Bistro Recipe - Wonder Battle Hen</description>
 		<!--<release_date>1999-09-30</release_date>-->
 		<year>1999</year>
@@ -1128,6 +1283,7 @@
 	</software>
 
 	<software name="keibayos">
+        <!-- Alt title: 競馬予想支援ソフト 予想進化論 -->
 		<description>Keiba Yosou Shien Soft - Yosou Shinkaron</description>
 		<!--<release_date>1999-09-14</release_date>-->
 		<year>1999</year>
@@ -1141,21 +1297,27 @@
 	</software>
 
 	<software name="kikuchou">
+        <!-- Alt title: キン肉マンII世 超人聖戦史 -->
+		<!-- WSC only -->
 		<description>Kinnikuman IIsei - Choujin Seisenshi</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2003-01-30</release_date>-->
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC34</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="kinnikuman iisei - choujin seisenshi (japan).bin" size="4194304" crc="6142fd9d" sha1="efcf8f92357ffc6f6ec0e4aa960cd97a5070836e" offset="000000" />
+				<rom name="swj-banc34.bin" size="4194304" crc="6142fd9d" sha1="efcf8f92357ffc6f6ec0e4aa960cd97a5070836e" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="kikudrmt">
+        <!-- Alt title: キン肉マンII世 ドリームタッグマッチ -->
+		<!-- WSC only -->
 		<description>Kinnikuman IIsei - Dream Tag Match</description>
 		<!--<release_date>2002-03-02</release_date>-->
 		<year>2002</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC20</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -1165,6 +1327,7 @@
 	</software>
 
 	<software name="kissyori">
+        <!-- Alt title: キスより… ～シーサイドセレナーデ～ -->
 		<description>Kiss Yori... - Seaside Serenade</description>
 		<!--<release_date>1999-12-02</release_date>-->
 		<year>1999</year>
@@ -1179,10 +1342,11 @@
 	</software>
 
 	<software name="klonoa">
+        <!-- Alt title: 風のクロノアムーンライトミュージアム -->
 		<description>Kaze no Klonoa - Moonlight Museum</description>
 		<!--<release_date>1999-05-20</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN008</serial> -->
 		<!-- 64k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -1193,10 +1357,11 @@
 	</software>
 
 	<software name="kosodate">
+        <!-- Alt title: 子育てクイズ どこでもマイエンジェル -->
 		<description>Kosodate Quiz Dokodemo - My Angel</description>
 		<!--<release_date>1999-04-15</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN007</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -1206,6 +1371,7 @@
 	</software>
 
 	<software name="kurupara">
+        <!-- Alt title: くるパラ！ -->
 		<description>Kurupara!</description>
 		<!--<release_date>2001-06-14</release_date>-->
 		<year>2001</year>
@@ -1219,10 +1385,11 @@
 	</software>
 
 	<software name="kyousoub">
+        <!-- Alt title: 競走馬育成シミュレーション ケイバ -->
 		<description>Kyousouba Ikusei Simulation - Keiba</description>
 		<!--<release_date>1999-11-18</release_date>-->
 		<year>1999</year>
-		<publisher>Bec Co., Ltd.</publisher>
+		<publisher>BEC</publisher>
 		<!-- <serial>SWJ-BEC001</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -1232,10 +1399,11 @@
 	</software>
 
 	<software name="langriss">
+        <!-- Alt title: ラングリッサーミレニアム WS ～The LastCentury～ -->
 		<description>Langrisser Millennium WS - The Last Century</description>
 		<!--<release_date>2000-03-09</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN024</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -1246,10 +1414,12 @@
 	</software>
 
 	<software name="lastaliv">
+        <!-- Alt title: ラストアライブ -->
+		<!-- WSC only -->
 		<description>Last Alive</description>
 		<!--<release_date>2001-07-26</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC15</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -1259,10 +1429,11 @@
 	</software>
 
 	<software name="laststnd">
+        <!-- Alt title: ラストスタンド -->
 		<description>Last Stand</description>
 		<!--<release_date>1999-05-27</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN009</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -1272,6 +1443,7 @@
 	</software>
 
 	<software name="loderun">
+        <!-- Alt title: ロードランナー フォー ワンダースワン -->
 		<description>Lode Runner for WonderSwan</description>
 		<!--<release_date>2000-04-20</release_date>-->
 		<year>2000</year>
@@ -1285,6 +1457,7 @@
 	</software>
 
 	<software name="macross">
+        <!-- Alt title: 超時空要塞マクロス トゥルーラブソング -->
 		<description>Macross - True Love Song</description>
 		<!--<release_date>2000-03-23</release_date>-->
 		<year>2000</year>
@@ -1298,6 +1471,7 @@
 	</software>
 
 	<software name="magdrop">
+        <!-- Alt title: マジカルドロップ for ワンダースワン -->
 		<description>Magical Drop for WonderSwan</description>
 		<!--<release_date>1999-10-14</release_date>-->
 		<year>1999</year>
@@ -1311,6 +1485,7 @@
 	</software>
 
 	<software name="mahjongt">
+        <!-- Alt title: 麻雀 登龍門 -->
 		<description>Mahjong Touryuumon</description>
 		<!--<release_date>1999-03-11</release_date>-->
 		<year>1999</year>
@@ -1324,10 +1499,11 @@
 	</software>
 
 	<software name="makai">
+        <!-- Alt title: 魔界村 for ワンダースワン -->
 		<description>Makaimura for WonderSwan</description>
 		<!--<release_date>1999-07-22</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN011</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -1338,6 +1514,8 @@
 	</software>
 
 	<software name="makaitou">
+        <!-- Alt title: 魔界塔士 サ・ガ -->
+		<!-- WSC only -->
 		<description>Makai Toushi Sa-Ga</description>
 		<!--<release_date>2002-03-20</release_date>-->
 		<year>2002</year>
@@ -1351,10 +1529,12 @@
 	</software>
 
 	<software name="mconanyk">
+        <!-- Alt title: 名探偵コナン ～夕暮れの皇女～ -->
+		<!-- WSC -->
 		<description>Meitantei Conan - Yuugure no Koujo</description>
 		<!--<release_date>2001-04-05</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC0E</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -1364,10 +1544,11 @@
 	</software>
 
 	<software name="mconanmc">
+        <!-- Alt title: 名探偵コナン 魔術師の挑戦状！ -->
 		<description>Meitantei Conan - Majutsushi no Chousenjou!</description>
 		<!--<release_date>1999-08-05</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN012</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -1378,10 +1559,11 @@
 	</software>
 
 	<software name="mconannm">
+        <!-- Alt title: 名探偵コナン 西の名探偵 最大の危機！？ -->
 		<description>Meitantei Conan - Nishi no Meitantei Saidai no Kiki!</description>
 		<!--<release_date>2000-07-27</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN027</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -1391,10 +1573,11 @@
 	</software>
 
 	<software name="medpkabu">
+        <!-- Alt title: メダロット パーフェクトエディション - カブトバージョン -->
 		<description>Medarot Perfect Edition - Kabuto Version</description>
 		<!--<release_date>1999-05-04</release_date>-->
 		<year>1999</year>
-		<publisher>Imagineer Co., Ltd.</publisher>
+		<publisher>Imagineer</publisher>
 		<!-- <serial>SWJ-MGA001</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -1404,10 +1587,11 @@
 	</software>
 
 	<software name="medpkuwa">
+        <!-- Alt title: メダロット パーフェクトエディション - クワガタバージョン -->
 		<description>Medarot Perfect Edition - Kuwagata Version</description>
 		<!--<release_date>1999-05-04</release_date>-->
 		<year>1999</year>
-		<publisher>Imagineer Co., Ltd.</publisher>
+		<publisher>Imagineer</publisher>
 		<!-- <serial>SWJ-MGA002</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -1417,6 +1601,8 @@
 	</software>
 
 	<software name="memories">
+        <!-- Alt title: メモリーズオフ フェスタ -->
+		<!-- WSC only -->
 		<description>Memories Off - Festa</description>
 		<!--<release_date>2001-03-08</release_date>-->
 		<year>2001</year>
@@ -1431,6 +1617,8 @@
 	</software>
 
 	<software name="mikeneko">
+        <!-- Alt title: サウンドコミック - 三毛猫ホームズ ゴーストパニック -->
+		<!-- WSC -->
 		<description>Mikeneko Holmes - Ghost Panic</description>
 		<!--<release_date>2001-04-26</release_date>-->
 		<year>2001</year>
@@ -1445,12 +1633,12 @@
 	</software>
 
 	<software name="mingmagn">
+        <!-- Alt title: ミングルマグネット -->
 		<description>Mingle Magnet</description>
 		<!--<release_date>1999-11-02</release_date>-->
 		<year>1999</year>
 		<publisher>Hal Corporation</publisher>
 		<!-- <serial>SWJ-HAL002</serial> -->
-		<!-- none -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
 				<rom name="swj-hal002.bin" size="524288" crc="9baac7bb" sha1="c7230ef709f6ceaef9a220541c8cdc05c0cd549f" offset="000000" />
@@ -1459,6 +1647,7 @@
 	</software>
 
 	<software name="mjkiwame">
+        <!-- Alt title: プロ麻雀 極 フォー ワンダースワン -->
 		<description>Pro Mahjong Kiwame for WonderSwan</description>
 		<!--<release_date>1999-10-07</release_date>-->
 		<year>1999</year>
@@ -1472,10 +1661,11 @@
 	</software>
 
 	<software name="mjtetsu">
+        <!-- Alt title: 日本プロ麻雀連盟公認 徹萬 -->
 		<description>Nippon Pro Mahjong Renmei Kounin Tetsuman</description>
 		<!--<release_date>1999-07-15</release_date>-->
 		<year>1999</year>
-		<publisher>Kaga Tech Co., Ltd.</publisher>
+		<publisher>Kaga Tech</publisher>
 		<!-- <serial>SWJ-KGT001</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -1485,6 +1675,7 @@
 	</software>
 
 	<software name="mobilewg">
+         <!-- Alt title: -->
 		<description>MobileWonderGate</description>
 		<year>19??</year>
 		<publisher>unknown</publisher>
@@ -1495,11 +1686,12 @@
 		</part>
 	</software>
 
-	<software name="moeropro">
+	<software name="proyakyu">
+        <!-- Alt title: 燃えろ！！プロ野球 ルーキーズ -->
 		<description>Moero!! Pro Yakyuu Rookies</description>
 		<!--<release_date>2000-03-30</release_date>-->
 		<year>2000</year>
-		<publisher>Jaleco Ltd.</publisher>
+		<publisher>Jaleco</publisher>
 		<!-- <serial>SWJ-JLC002</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -1509,6 +1701,7 @@
 	</software>
 
 	<software name="moritash">
+        <!-- Alt title: 森田将棋 フォー ワンダースワン -->
 		<description>Morita Shougi for WonderSwan</description>
 		<!--<release_date>1999-11-02</release_date>-->
 		<year>1999</year>
@@ -1522,10 +1715,12 @@
 	</software>
 
 	<software name="mrdrillr">
+        <!-- Alt title: ミスタードリラー -->
+		<!-- WSC only -->
 		<description>Mr. Driller</description>
 		<!--<release_date>2001-04-05</release_date>-->
 		<year>2001</year>
-		<publisher>Namco Ltd.</publisher>
+		<publisher>Namco</publisher>
 		<!-- <serial>SWJ-NMCC01</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -1536,10 +1731,11 @@
 	</software>
 
 	<software name="mtherapy">
+        <!-- Alt title: メタコミセラピー ねぇ聞いて！ -->
 		<description>Metakomi Theraphy - Nee Kiite!</description>
 		<!--<release_date>2000-03-23</release_date>-->
 		<year>2000</year>
-		<publisher>Kaga Tech Co., Ltd.</publisher>
+		<publisher>Kaga Tech</publisher>
 		<!-- <serial>SWJ-KGT006</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -1549,17 +1745,22 @@
 	</software>
 
 	<software name="naruto">
+        <!-- Alt title: Naruto ナルト- 木ノ葉忍法帖 -->
+		<!-- WSC only -->
 		<description>Naruto - Konoha Ninpouchou</description>
-		<year>19??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<!--<release_date>2003-03-27</release_date>-->
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC38</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="naruto - konoha ninpouchou (japan).bin" size="4194304" crc="71556e6a" sha1="dbaa50fd56e69e72fdfe49362ef5fe4437d66667" offset="000000" />
+				<rom name="swj-banc38.bin" size="4194304" crc="71556e6a" sha1="dbaa50fd56e69e72fdfe49362ef5fe4437d66667" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="nazoou">
+        <!-- Alt title: 謎王 Pocket -->
 		<description>Nazo Ou Pocket</description>
 		<!--<release_date>1999-11-18</release_date>-->
 		<year>1999</year>
@@ -1574,6 +1775,7 @@
 	</software>
 
 	<software name="niceon">
+        <!-- Alt title: ナイスオン -->
 		<description>Nice On</description>
 		<!--<release_date>1999-04-08</release_date>-->
 		<year>1999</year>
@@ -1588,10 +1790,11 @@
 	</software>
 
 	<software name="nobunaga">
+        <!-- Alt title: 信長の野望 for ワンダースワン -->
 		<description>Nobunaga no Yabou for WonderSwan</description>
 		<!--<release_date>1999-03-11</release_date>-->
 		<year>1999</year>
-		<publisher>Koei Co., Ltd.</publisher>
+		<publisher>Koei</publisher>
 		<!-- <serial>SWJ-KEX001</serial> -->
 		<!-- TOOD -->
 		<part name="cart" interface="wswan_cart">
@@ -1602,6 +1805,7 @@
 	</software>
 
 	<software name="oekakil">
+        <!-- Alt title: おーちゃんのお絵かきロジック -->
 		<description>Ou-chan no Oekaki Logic</description>
 		<!--<release_date>2000-01-06</release_date>-->
 		<year>2000</year>
@@ -1616,32 +1820,41 @@
 	</software>
 
 	<software name="onepbatl">
+        <!-- Alt title: フロムテレビアニメーション ワンピース グランドバトル スワンコロシアム -->
+		<!-- WSC only -->
 		<description>From TV Animation One Piece - Grand Battle Swan Colosseum</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-07-12</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC29</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="from tv animation one piece - grand battle swan colosseum (japan).bin" size="8388608" crc="f8a1dd2b" sha1="01e765bf356cdcb413bfd27c6321f7449465766a" offset="000000" />
+				<rom name="swj-banc29.bin" size="8388608" crc="f8a1dd2b" sha1="01e765bf356cdcb413bfd27c6321f7449465766a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="onepchop">
+        <!-- Alt title: フロムテレビアニメーション ワンピース チョッパーの大冒険 -->
+		<!-- WSC only, Rated "Everyone" -->
 		<description>From TV Animation One Piece - Chopper no Daibouken</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2003-10-16</release_date>-->
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC3B</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="from tv animation one piece - chopper no daibouken (japan).bin" size="4194304" crc="8e120b5a" sha1="221f48e97ec2c6d0046213956e1f36e923c0dec2" offset="000000" />
+				<rom name="swj-banc3b.bin" size="4194304" crc="8e120b5a" sha1="221f48e97ec2c6d0046213956e1f36e923c0dec2" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="onepmeza">
+        <!-- Alt title: フロムテレビアニメーション ワンピース めざせ海賊王！ -->
 		<description>From TV Animation One Piece - Mezase Kaizoku Ou!</description>
 		<!--<release_date>2000-07-19</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN02B</serial> -->
 		<!-- 16k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -1652,10 +1865,12 @@
 	</software>
 
 	<software name="onepniji">
+        <!-- Alt title: フロムテレビアニメーション ワンピース 虹の島伝説 -->
+		<!-- WSC only -->
 		<description>From TV Animation One Piece - Niji no Shima Densetsu</description>
 		<!--<release_date>2001-09-13</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC19</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -1665,10 +1880,12 @@
 	</software>
 
 	<software name="oneptwar">
+        <!-- Alt title: フロムテレビアニメーション ワンピース トレジャーウォーズ -->
+		<!-- WSC only -->
 		<description>From TV Animation One Piece - Treasure Wars</description>
 		<!--<release_date>2002-01-03</release_date>-->
 		<year>2002</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC1E</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -1678,17 +1895,22 @@
 	</software>
 
 	<software name="oneptwr2">
+        <!-- Alt title: フロムテレビアニメーション ワンピース トレジャーウォーズ2 バギーランドへようこそ -->
+		<!-- WSC only -->
 		<description>From TV Animation One Piece - Treasure Wars 2 - Buggy Land e Youkoso</description>
-		<year>20??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-12-20</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC33</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="from tv animation one piece - treasure wars 2 - buggy land e youkoso (japan).bin" size="8388608" crc="0d1048f0" sha1="b7775e8f60fd62dc07f2865f8fad29a11e12dbb5" offset="000000" />
+				<rom name="swj-banc33.bin" size="8388608" crc="0d1048f0" sha1="b7775e8f60fd62dc07f2865f8fad29a11e12dbb5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="pbobble">
+        <!-- Alt title: パズルボブル -->
 		<description>Puzzle Bobble</description>
 		<!--<release_date>1999-07-01</release_date>-->
 		<year>1999</year>
@@ -1703,10 +1925,11 @@
 	</software>
 
 	<software name="pocketfi">
+        <!-- Alt title: ポケットファイター -->
 		<description>Pocket Fighter</description>
 		<!--<release_date>2000-04-06</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN00A</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -1717,12 +1940,12 @@
 	</software>
 
 	<software name="puyopuyo">
+        <!-- Alt title: ぷよぷよ通 -->
 		<description>Puyo Puyo Tsuu</description>
 		<!--<release_date>1999-03-11</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN004</serial> -->
-		<!-- none -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-ban004.bin" size="1048576" crc="5a41a7ba" sha1="d72c1221c2ce3e281a0ee288a3d079aa8e1b714b" offset="000000" />
@@ -1731,6 +1954,7 @@
 	</software>
 
 	<software name="rainbow">
+        <!-- Alt title: レインボーアイランド パティーズ☆パーティ！ -->
 		<description>Rainbow Islands - Putty's Party</description>
 		<!--<release_date>2000-06-29</release_date>-->
 		<year>2000</year>
@@ -1745,10 +1969,12 @@
 	</software>
 
 	<software name="rakujong">
+        <!-- Alt title: 落雀 -->
+		<!-- WSC only -->
 		<description>Raku Jongg</description>
 		<!--<release_date>2001-05-31</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC10</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -1758,10 +1984,12 @@
 	</software>
 
 	<software name="rhymridr">
+        <!-- Alt title: ライムライダー ケロリカン -->
+		<!-- WSC only -->
 		<description>Rhyme Rider Kerorican</description>
 		<!--<release_date>2000-12-09</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC01</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -1772,6 +2000,7 @@
 	</software>
 
 	<software name="ring">
+        <!-- Alt title: リング インフィニティ -->
 		<description>Ring Infinity</description>
 		<!--<release_date>2000-08-10</release_date>-->
 		<year>2000</year>
@@ -1786,17 +2015,22 @@
 	</software>
 
 	<software name="riviera">
+        <!-- Alt title: Riviera ～約束の地 リヴィエラ～ -->
+		<!-- WSC only -->
 		<description>Riviera - Yakusoku no Chi Riviera</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2002-07-12</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC27</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="riviera - yakusoku no chi riviera (japan).bin" size="8388608" crc="2460b45a" sha1="a8f8d3efc9b2d5741081e05f517d746ee5437f87" offset="000000" />
+				<rom name="swj-banc27.bin" size="8388608" crc="2460b45a" sha1="a8f8d3efc9b2d5741081e05f517d746ee5437f87" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="robotc2a">
+	<software name="srobot2a">
+        <!-- Alt title: スーパーロボット大戦 コンパクト2 第1部：地上激闘篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-1-bu - Chijou Gekidou Hen</description>
 		<!--<release_date>2000-03-30</release_date>-->
 		<year>2000</year>
@@ -1809,7 +2043,8 @@
 		</part>
 	</software>
 
-	<software name="robotc2b">
+	<software name="srobot2b">
+         <!-- Alt title: スーパーロボット大戦 コンパクト2 第2部：宇宙激震篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-2-bu - Uchuu Gekishin Hen</description>
 		<!--<release_date>2000-09-14</release_date>-->
 		<year>2000</year>
@@ -1823,7 +2058,8 @@
 		</part>
 	</software>
 
-	<software name="robotc2c">
+	<software name="srobot2c">
+         <!-- Alt title: スーパーロボット大戦 コンパクト2 第3部：銀河決戦篇 -->
 		<description>Super Robot Taisen Compact 2 - Dai-3-bu - Ginga Kessen Hen</description>
 		<!--<release_date>2001-01-18</release_date>-->
 		<year>2001</year>
@@ -1837,29 +2073,38 @@
 		</part>
 	</software>
 
-	<software name="robotc3">
+	<software name="srobotc3a" cloneof="robotc3">
+         <!-- Alt title: スーパーロボット大戦 コンパクト3 -->
+		<!-- WSC only, Rated "Everyone" -->
 		<description>Super Robot Taisen Compact 3 (v1.5)</description>
-		<year>20??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<!--<release_date>2003-07-17</release_date>-->
+		<year>2003</year>
+		<publisher>Banpresto</publisher>
+		<!-- <serial>SWJ-BPRC09</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="super robot taisen compact 3 (japan) (v1.5).bin" size="8388608" crc="6918c824" sha1="b579f204be604ebef4e8238e5883152b70399c4d" offset="000000" />
+				<rom name="swj-bprc09.bin" size="8388608" crc="6918c824" sha1="b579f204be604ebef4e8238e5883152b70399c4d" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="robotc3a" cloneof="robotc3">
+	<software name="srobotc3">
+        <!-- Alt title: スーパーロボット大戦 コンパクト3 -->
+		<!-- WSC only, Rated "Everyone" -->
 		<description>Super Robot Taisen Compact 3 (v1.6)</description>
-		<year>20??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<!--<release_date>2003-07-17</release_date>-->
+		<year>2003</year>
+		<publisher>Banpresto</publisher>
+		<!-- <serial>SWJ-BPRC09</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="super robot taisen compact 3 (japan) (v1.6).bin" size="8388608" crc="188ca644" sha1="dd6fe0f278cdec2670d3be8552dbb0cf6a3a2841" offset="000000" />
+				<rom name="swj-bprc09-1.bin" size="8388608" crc="188ca644" sha1="dd6fe0f278cdec2670d3be8552dbb0cf6a3a2841" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="robotws">
+	<software name="srobotws">
+        <!-- Alt title: スーパーロボット大戦 コンパクト -->
 		<description>Super Robot Taisen Compact</description>
 		<!--<release_date>1999-04-28</release_date>-->
 		<year>1999</year>
@@ -1873,7 +2118,9 @@
 		</part>
 	</software>
 
-	<software name="robotwsc">
+	<software name="srobotwc">
+        <!-- Alt title: フォー ワンダースワンカラーコンパクト スーパーロボット大戦 -->
+		<!-- WSC only -->
 		<description>Super Robot Taisen Compact for WonderSwan Color</description>
 		<!--<release_date>2001-12-13</release_date>-->
 		<year>2001</year>
@@ -1887,9 +2134,11 @@
 	</software>
 
 	<software name="robworks">
-		<description>Robot Works</description>
-		<year>20??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+        <!-- Alt title: ワンダーボーグ 完 -->
+		<description>Wonder Borg Robot Works</description>
+		<!--<release_date>2000-08-04</release_date>-->
+		<year>2000</year>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN033</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -1899,9 +2148,11 @@
 	</software>
 
 	<software name="robworks1" cloneof="robworks">
+        <!-- Alt title: ワンダーボーグ 完 -->
 		<description>Robot Works (Asia)</description>
-		<year>20??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<!--<release_date>2000-08-04</release_date>-->
+		<year>2000</year>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN033</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -1911,10 +2162,11 @@
 	</software>
 
 	<software name="rockmanf">
+        <!-- Alt title: ロックマン＆フォルテ 未来からの挑戦者 -->
 		<description>Rockman &amp; Forte - Mirai Kara no Chousensha</description>
 		<!--<release_date>1999-10-28</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN013</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -1925,28 +2177,38 @@
 	</software>
 
 	<software name="rockmnex">
+        <!-- Alt title: ロックマンエグゼ ワンダースワン -->
+		<!-- WSC only -->
 		<description>Rockman EXE WS</description>
-		<year>19??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2003-02-08</release_date>-->
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC35</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="rockman exe ws (japan).bin" size="4194304" crc="658c4b98" sha1="b4a3ff3b72639f27d1a6f449b0335074aeb9e603" offset="000000" />
+				<rom name="swj-banc35.bin" size="4194304" crc="658c4b98" sha1="b4a3ff3b72639f27d1a6f449b0335074aeb9e603" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="rockmnxn">
+        <!-- Alt title: ロックマンエグゼ N1バトル -->
+		<!-- WSC only, Rated "Everyone" -->
 		<description>Rockman EXE - N1 Battle</description>
-		<year>20??</year>
-		<publisher>unknown</publisher>
+		<!--<release_date>2003-08-08</release_date>-->
+		<year>2003</year>
+		<publisher>Capcom</publisher>
+		<!-- <serial>SWJ-CPCC01</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="rockman exe - n1 battle (japan).bin" size="4194304" crc="1f10ca75" sha1="9b4786adca7b83fe66a9d4b9fd4ffaf32abe7656" offset="000000" />
+				<rom name="swj-cpcc01.bin" size="4194304" crc="1f10ca75" sha1="9b4786adca7b83fe66a9d4b9fd4ffaf32abe7656" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="romnsaga">
+        <!-- Alt title: ロマンシング　サ・ガ -->
+		<!-- WSC only -->
 		<description>Romancing Sa-Ga</description>
 		<!--<release_date>2001-12-20</release_date>-->
 		<year>2001</year>
@@ -1960,6 +2222,8 @@
 	</software>
 
 	<software name="rundim">
+        <!-- Alt title: ランディム Return To Earth -->
+		<!-- WSC only -->
 		<description>RUN=DIM - Return to Earth</description>
 		<!--<release_date>2002-02-07</release_date>-->
 		<year>2002</year>
@@ -1973,10 +2237,11 @@
 	</software>
 
 	<software name="sangoku">
+        <!-- Alt title: 三国志 for ワンダースワン -->
 		<description>San Goku Shi for WonderSwan</description>
 		<!--<release_date>1999-04-01</release_date>-->
 		<year>1999</year>
-		<publisher>Koei Co., Ltd.</publisher>
+		<publisher>Koei</publisher>
 		<!-- <serial>SWJ-KEX002</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -1987,10 +2252,11 @@
 	</software>
 
 	<software name="sangoku2">
+        <!-- Alt title: 三国志II フォー ワンダースワン -->
 		<description>San Goku Shi II for WonderSwan</description>
 		<!--<release_date>2000-04-06</release_date>-->
 		<year>2000</year>
-		<publisher>Koei Co., Ltd.</publisher>
+		<publisher>Koei</publisher>
 		<!-- <serial>SWJ-KEX004</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
@@ -2000,10 +2266,12 @@
 	</software>
 
 	<software name="sdgunde1">
+        <!-- Alt title: SDガンダム英雄伝 ～騎士伝説～ -->
+		<!-- WSC -->
 		<description>SD Gundam Eiyuuden - Kishi Densetsu</description>
 		<!--<release_date>2001-03-15</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC0A</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2014,10 +2282,12 @@
 	</software>
 
 	<software name="sdgunde2">
+        <!-- Alt title: SDガンダム英雄伝 ～武者伝説～ -->
+		<!-- WSC -->
 		<description>SD Gundam Eiyuuden - Musha Densetsu</description>
 		<!--<release_date>2001-03-15</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC0B</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2028,10 +2298,11 @@
 	</software>
 
 	<software name="sdgundem">
+        <!-- Alt title: SDガンダム エモーショナルジャム -->
 		<description>SD Gundam - Emotional Jam</description>
 		<!--<release_date>1999-05-27</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN006</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2042,10 +2313,12 @@
 	</software>
 
 	<software name="sdgundg1">
+        <!-- Alt title: SDガンダム Gジェネレーション ギャザービート2 -->
+		<!-- WSC only -->
 		<description>SD Gundam G-Generation - Gather Beat 2</description>
 		<!--<release_date>2001-06-14</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC12</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
@@ -2055,21 +2328,26 @@
 	</software>
 
 	<software name="sdgundg2">
+        <!-- Alt title: SDガンダム ジージェネレーション モノアイガンダムズ -->
+		<!-- WSC only -->
 		<description>SD Gundam G-Generation - Mono-Eye Gundams</description>
-		<year>20??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<!--<release_date>2002-09-26</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC2F</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
-				<rom name="sd gundam g-generation - mono-eye gundams (japan).bin" size="8388608" crc="6aca1f04" sha1="91e087056207fce21e782e25e383c203bc046897" offset="000000" />
+				<rom name="swj-banc2f.bin" size="8388608" crc="6aca1f04" sha1="91e087056207fce21e782e25e383c203bc046897" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="sdgundga">
+        <!-- Alt title: SD ガンダム ガシャポン戦記 -エピソード1- -->
 		<description>SD Gundam Gashapon Senki - Episode 1</description>
 		<!--<release_date>1999-12-29</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN020</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -2079,10 +2357,12 @@
 	</software>
 
 	<software name="sdgundgg">
+        <!-- Alt title: SDガンダム Gジェネレーション ギャザービート -->
+		<!-- WSC only -->
 		<description>SD Gundam G-Generation - Gather Beat</description>
 		<!--<release_date>2000-07-13</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN030</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2093,10 +2373,12 @@
 	</software>
 
 	<software name="sdgunduc">
+        <!-- Alt title: SDガンダム オペレーション U.C. -->
+		<!-- WSC only -->
 		<description>SD Gundam - Operation U.C.</description>
 		<!--<release_date>2002-02-16</release_date>-->
 		<year>2002</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC21</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -2106,10 +2388,11 @@
 	</software>
 
 	<software name="senkai">
+        <!-- Alt title: 仙界伝 ～TVアニメーション仙界伝封神演義より～ -->
 		<description>Senkaiden - TV Animation Senkaiden Houshin Engi Yori</description>
 		<!--<release_date>2000-02-24</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN022</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2120,10 +2403,12 @@
 	</software>
 
 	<software name="senkaini">
+        <!-- Alt title: 仙界伝 弐～TVアニメーション仙界伝封神演義より～ -->
+		<!-- WSC -->
 		<description>Senkaiden Ni - TV Animation Senkaiden Houshin Engi Yori</description>
 		<!--<release_date>2000-12-21</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC04</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2134,10 +2419,11 @@
 	</software>
 
 	<software name="sennoumi">
+        <!-- Alt title: 線脳 ミレニアム -->
 		<description>Sennou Millennium</description>
 		<!--<release_date>2000-03-16</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN025</serial> -->
 		<!-- 1k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -2148,28 +2434,37 @@
 	</software>
 
 	<software name="shamking">
+        <!-- Alt title: シャーマンキング 未来への意志 -->
+		<!-- WSC only -->
 		<description>Shaman King - Asu e no Ishi (v1.1)</description>
-		<year>20??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<!--<release_date>2002-08-29</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC2D</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="shaman king - asu e no ishi (japan) (v1.1).bin" size="4194304" crc="34908cb4" sha1="473195666a633573c777d3be98d7e8f46569c84b" offset="000000" />
+				<rom name="swj-banc2d-1.bin" size="4194304" crc="34908cb4" sha1="473195666a633573c777d3be98d7e8f46569c84b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="shamking1" cloneof="shamking">
+        <!-- Alt title: シャーマンキング 未来への意志 -->
+		<!-- WSC only -->
 		<description>Shaman King - Asu e no Ishi</description>
-		<year>20??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<!--<release_date>2002-08-29</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC2D</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
-				<rom name="shaman king - asu e no ishi (japan).bin" size="4194304" crc="6c029674" sha1="1e735d1e83a7bfa06c5c717c7e8a386d55a8e3f0" offset="000000" />
+				<rom name="swj-banc2d.bin" size="4194304" crc="6c029674" sha1="1e735d1e83a7bfa06c5c717c7e8a386d55a8e3f0" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="shanghai">
+        <!-- Alt title: 上海 ポケット -->
 		<description>Shanghai Pocket</description>
 		<!--<release_date>1999-04-01</release_date>-->
 		<year>1999</year>
@@ -2183,6 +2478,7 @@
 	</software>
 
 	<software name="shinpwre">
+        <!-- Alt title: 新日本プロレスリング 闘魂烈伝 -->
 		<description>Shin Nippon Pro Wrestling Toukon Retsuden</description>
 		<!--<release_date>1999-03-04</release_date>-->
 		<year>1999</year>
@@ -2196,6 +2492,7 @@
 	</software>
 
 	<software name="shougito">
+        <!-- Alt title: 将棋 登龍門 -->
 		<description>Shougi Touryuumon</description>
 		<!--<release_date>1999-10-28</release_date>-->
 		<year>1999</year>
@@ -2209,6 +2506,7 @@
 	</software>
 
 	<software name="sidepock">
+        <!-- Alt title: サイドポケット for ワンダースワン -->
 		<description>Side Pocket for WonderSwan</description>
 		<!--<release_date>1999-11-25</release_date>-->
 		<year>1999</year>
@@ -2222,10 +2520,11 @@
 	</software>
 
 	<software name="slitherl">
+        <!-- Alt title: スリザーリンク -->
 		<description>Slither Link</description>
 		<!--<release_date>2000-04-20</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN029</serial> -->
 		<!-- 1k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -2236,10 +2535,11 @@
 	</software>
 
 	<software name="soccerya">
+        <!-- Alt title: サッカーやろう！ チャレンジ・ザ・ワールド -->
 		<description>Soccer Yarou! - Challenge the World</description>
 		<!--<release_date>1999-08-12</release_date>-->
 		<year>1999</year>
-		<publisher>Coconuts Japan Entertainment Co., Ltd.</publisher>
+		<publisher>Coconuts Japan Entertainment</publisher>
 		<!-- <serial>SWJ-CCJ002</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
@@ -2249,10 +2549,12 @@
 	</software>
 
 	<software name="sorobang">
+        <!-- Alt title: そろばんぐ -->
+        <!-- WSC -->
 		<description>Sorobang</description>
 		<!--<release_date>2000-12-09</release_date>-->
 		<year>2000</year>
-		<publisher>Kaga Tech Co., Ltd.</publisher>
+		<publisher>Kaga Tech</publisher>
 		<!-- <serial>SWJ-KGTC09</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2263,6 +2565,7 @@
 	</software>
 
 	<software name="sotsugyo">
+        <!-- Alt title: 卒業 フォー ワンダースワン -->
 		<description>Sotsugyou for WonderSwan</description>
 		<!--<release_date>1999-12-16</release_date>-->
 		<year>1999</year>
@@ -2277,6 +2580,7 @@
 	</software>
 
 	<software name="spaceinv">
+        <!-- Alt title: スペースインベーダー -->
 		<description>Space Invaders</description>
 		<!--<release_date>1999-05-13</release_date>-->
 		<year>1999</year>
@@ -2290,21 +2594,27 @@
 	</software>
 
 	<software name="sseiya">
+        <!-- Alt title: 聖闘士星矢 黄金伝説編 パーフェクトエディション -->
+		<!-- WSC only, Rated "Everyone" -->
 		<description>Saint Seiya - Ougon Densetsu Hen - Perfect Edition</description>
-		<year>20??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<!--<release_date>2003-07-31</release_date>-->
+		<year>2003</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC3D</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="saint seiya - ougon densetsu hen - perfect edition (japan).bin" size="2097152" crc="6e8a792d" sha1="8542649963efe0976015759382c180b7c056be9a" offset="000000" />
+				<rom name="swj-banc3d.bin" size="2097152" crc="6e8a792d" sha1="8542649963efe0976015759382c180b7c056be9a" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="starhear">
+        <!-- Alt title: スターハーツ ～星と大地の使者～ -->
+		<!-- WSC only -->
 		<description>Star Hearts - Hoshi to Daichi no Shisha</description>
 		<!--<release_date>2001-08-27</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC16</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -2314,9 +2624,10 @@
 	</software>
 
 	<software name="starheartai" cloneof="starhear">
+        <!-- Alt title:  -->
 		<description>Star Hearts - Hoshi to Daichi no Shisha - Taikenban</description>
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
 				<rom name="star hearts - hoshi to daichi no shisha - taikenban (japan).bin" size="4194304" crc="9874e9a2" sha1="44940ae0140df1bd91d742a166c459df1b6c2339" offset="000000" />
@@ -2325,10 +2636,11 @@
 	</software>
 
 	<software name="streetdn">
+        <!-- Alt title: ワサビ プロデュース ストリートダンサー -->
 		<description>Wasabi Produce - Street Dancer</description>
 		<!--<release_date>2000-04-27</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN028</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -2338,21 +2650,26 @@
 	</software>
 
 	<software name="suprwars">
+        <!-- Alt title: ナムコスーパーウォーズ -->
+		<!-- WSC only -->
 		<description>Namco Super Wars</description>
-		<year>19??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<!--<release_date>2002-10-31</release_date>-->
+		<year>2002</year>
+		<publisher>Bandai</publisher>
+		<!-- <serial>SWJ-BANC28</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
-				<rom name="namco super wars (japan).bin" size="2097152" crc="8ce4652f" sha1="c48569fd0a46ab7b7ceafeb5698be90420cd4fbe" offset="000000" />
+				<rom name="swj-banc28.bin" size="2097152" crc="8ce4652f" sha1="c48569fd0a46ab7b7ceafeb5698be90420cd4fbe" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="taikyigo">
+        <!-- Alt title: 対局囲碁 平成棋院 -->
 		<description>Taikyoku Igo - Heisei Kiin</description>
 		<!--<release_date>2000-02-24</release_date>-->
 		<year>2000</year>
-		<publisher>Kaga Tech Co., Ltd.</publisher>
+		<publisher>Kaga Tech</publisher>
 		<!-- <serial>SWJ-KGT004</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
@@ -2365,7 +2682,7 @@
 	<software name="taikyigo">
 		<description>Taikyoku Igo - Heisei Kiin</description>
 		<year>2000</year>
-		<publisher>Kaga Tech Co., Ltd.</publisher>
+		<publisher>Kaga Tech</publisher>
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
 				<rom name="swj-kgt004.bin" size="1048576" crc="50b7a742" sha1="be4559d6f48d7cb9550c8776f877c5c9cda0efa1" offset="000000" />
@@ -2374,6 +2691,7 @@
 	</software-->
 
 	<software name="tanjoude">
+        <!-- Alt title: 誕生 デビュー フォー ワンダースワン -->
 		<description>Tanjou Debut for WonderSwan</description>
 		<!--<release_date>2000-02-24</release_date>-->
 		<year>2000</year>
@@ -2388,10 +2706,11 @@
 	</software>
 
 	<software name="tekkncrd">
+        <!-- Alt title: 鉄拳カードチャレンジ -->
 		<description>Tekken Card Challenge</description>
 		<!--<release_date>1999-06-17</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN00D</serial> -->
 		<!-- 64k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2402,10 +2721,11 @@
 	</software>
 
 	<software name="terrors">
+        <!-- Alt title: テラーズ -->
 		<description>Terrors</description>
 		<!--<release_date>1999-05-08</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN014</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2416,10 +2736,12 @@
 	</software>
 
 	<software name="terrors2">
+        <!-- Alt title: テラーズ2 -->
+        <!-- WSC -->
 		<description>Terrors 2</description>
 		<!--<release_date>2000-12-21</release_date>-->
 		<year>2000</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC05</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -2429,17 +2751,22 @@
 	</software>
 
 	<software name="tetris">
+        <!-- Alt title: テトリス -->
+        <!-- WSC -->
 		<description>Tetris</description>
-		<year>19??</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<!--<release_date>2002-04-18</release_date>-->
+		<year>2002</year>
+		<publisher>Vanguard</publisher>
+		<!-- <serial>SWJ-VGDC01</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
-				<rom name="tetris (japan).bin" size="1048576" crc="7b0caea9" sha1="1a86403d7896d60fcb7a4c09367f5a976c7ea5a5" offset="000000" />
+				<rom name="swj-vgdc01.bin" size="1048576" crc="7b0caea9" sha1="1a86403d7896d60fcb7a4c09367f5a976c7ea5a5" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="tetsu28g">
+        <!-- Alt title: 鉄人28号 -->
 		<description>Tetsujin 28 Gou</description>
 		<!--<release_date>1999-12-22</release_date>-->
 		<year>1999</year>
@@ -2454,6 +2781,7 @@
 	</software>
 
 	<software name="timeboka">
+        <!-- Alt title: タイム ボカン シリーズ ボカン伝説 ブタもおだてりゃドロンボー -->
 		<description>Time Bokan Series - Bokan Densetsu - Butamo Odaterya Doronbou</description>
 		<!--<release_date>2000-04-27</release_date>-->
 		<year>2000</year>
@@ -2468,6 +2796,7 @@
 	</software>
 
 	<software name="tokyomg">
+        <!-- Alt title: 東京魔人学園 符咒封録 -->
 		<description>Tokyo Majin Gakuen - Fuju Houroku</description>
 		<!--<release_date>2000-10-12</release_date>-->
 		<year>2000</year>
@@ -2482,9 +2811,12 @@
 	</software>
 
 	<software name="tonpuuso">
+        <!-- Alt title: 東風荘 -->
+        <!-- WSC -->
 		<description>Tonpuusou</description>
+		<!--<release_date>2001-06-28</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC13</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -2494,10 +2826,11 @@
 	</software>
 
 	<software name="tpgunpey">
+        <!-- Alt title: たれぱんだのぐんぺい -->
 		<description>Tare Panda no GunPey</description>
 		<!--<release_date>1999-12-09</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN01F</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="1048576">
@@ -2507,6 +2840,7 @@
 	</software>
 
 	<software name="trumpcl2">
+        <!-- Alt title: トランプコレクション ボトムアップ的トランプ生活 -->
 		<description>Trump Collection 2 - Bottom-Up Teki Sekaiisshuu no Tabi</description>
 		<!--<release_date>2000-09-28</release_date>-->
 		<year>2000</year>
@@ -2532,6 +2866,7 @@
 	</software-->
 
 	<software name="trumpcol">
+        <!-- Alt title: トランプコレクション2 ボトムアップ的世界一周の旅 -->
 		<description>Trump Collection - Bottom-Up Teki Trump Seikatsu</description>
 		<!--<release_date>1999-07-01</release_date>-->
 		<year>1999</year>
@@ -2545,10 +2880,11 @@
 	</software>
 
 	<software name="turntabl">
+        <!-- Alt title: タ→ンテ→ブリスト DJバトル -->
 		<description>Turntablist - DJ Battle</description>
 		<!--<release_date>1999-11-25</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN017</serial> -->
 		<!-- 16k EEPROM -->
 		<part name="cart" interface="wswan_cart">
@@ -2559,10 +2895,12 @@
 	</software>
 
 	<software name="uchuusen">
+        <!-- Alt title: 宇宙戦艦ヤマト -->
+        <!-- WSC -->
 		<description>Uchuu Senkan Yamato</description>
 		<!--<release_date>2001-02-08</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC09</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -2572,10 +2910,12 @@
 	</software>
 
 	<software name="ultraman">
+        <!-- Alt title: ウルトラマン 光の国の使者 -->
+        <!-- WSC only -->
 		<description>Ultraman - Hikari no Kuni no Shisha</description>
 		<!--<release_date>2001-06-21</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC11</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
@@ -2585,10 +2925,11 @@
 	</software>
 
 	<software name="umizuri">
+        <!-- Alt title: 海釣りに行こう！ -->
 		<description>Umizuri ni Ikou!</description>
 		<!--<release_date>1999-04-01</release_date>-->
 		<year>1999</year>
-		<publisher>Coconuts Japan Entertainment Co., Ltd.</publisher>
+		<publisher>Coconuts Japan Entertainment</publisher>
 		<!-- <serial>SWJ-CCJ001</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="524288">
@@ -2598,6 +2939,7 @@
 	</software>
 
 	<software name="uzumaki">
+        <!-- Alt title: うずまき ～電視怪奇篇～ -->
 		<description>Uzumaki - Denshi Kaiki Hen</description>
 		<!--<release_date>2000-02-03</release_date>-->
 		<year>2000</year>
@@ -2611,10 +2953,11 @@
 	</software>
 
 	<software name="vaitzbla">
+        <!-- Alt title: ヴァイツブレイド -->
 		<description>Vaitz Blade</description>
 		<!--<release_date>1999-06-24</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN00C</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2625,10 +2968,12 @@
 	</software>
 
 	<software name="wclassic">
+        <!-- Alt title: ナムコワンダークラシック -->
+        <!-- WSC -->
 		<description>Wonder Classic</description>
 		<!--<release_date>2001-01-18</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC06</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2639,6 +2984,8 @@
 	</software>
 
 	<software name="wildcard">
+        <!-- Alt title: ワイルドカード -->
+        <!-- WSC only -->
 		<description>Wild Card</description>
 		<!--<release_date>2001-03-29</release_date>-->
 		<year>2001</year>
@@ -2653,10 +3000,12 @@
 	</software>
 
 	<software name="withyou">
+        <!-- Alt title: ウィズ・ユー ～みつめていたい～ -->
+        <!-- WSC only -->
 		<description>With You - Mitsumete Itai</description>
 		<!--<release_date>2001-01-25</release_date>-->
 		<year>2001</year>
-		<publisher>Cocktail Soft / F&amp;C Co. Ltd.</publisher>
+		<publisher>Cocktail Soft / F&amp;C Co.</publisher>
 		<!-- <serial>SWJ-SHLC01</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -2666,10 +3015,12 @@
 	</software>
 
 	<software name="wizardry">
+        <!-- Alt title: ウィザードリィ シナリオ1 狂王の試練場 -->
+        <!-- WSC -->
 		<description>Wizardry Scenario 1 - Proving Grounds of the Mad Overlord</description>
 		<!--<release_date>2001-03-01</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC0C</serial> -->
 		<!-- 256k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2680,10 +3031,11 @@
 	</software>
 
 	<software name="wstad99">
+        <!-- Alt title: ワンダースタジアム'99 -->
 		<description>Wonder Stadium '99</description>
 		<!--<release_date>1999-09</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN019</serial> -->
 		<!-- 64k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2694,10 +3046,11 @@
 	</software>
 
 	<software name="wstadium">
+        <!-- Alt title: ワンダースタジアム -->
 		<description>Wonder Stadium</description>
 		<!--<release_date>1999-03</release_date>-->
 		<year>1999</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BAN003</serial> -->
 		<!-- 64k SRAM -->
 		<part name="cart" interface="wswan_cart">
@@ -2708,10 +3061,12 @@
 	</software>
 
 	<software name="xcard">
+        <!-- Alt title: エックス カード オブ フェイト -->
+        <!-- WSC only -->
 		<description>X - Card of Fate</description>
 		<!--<release_date>2002-06-??</release_date>-->
 		<year>2002</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC2C</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="4194304">
@@ -2721,10 +3076,12 @@
 	</software>
 
 	<software name="xilittle">
-		<description>XI Little</description>
+        <!-- Alt title: サイ リトル -->
+        <!-- WSC only -->
+		<description>XI[sai] Little</description>
 		<!--<release_date>2001-12-20</release_date>-->
 		<year>2001</year>
-		<publisher>Bandai Co., Ltd.</publisher>
+		<publisher>Bandai</publisher>
 		<!-- <serial>SWJ-BANC1F</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
