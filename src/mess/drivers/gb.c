@@ -653,7 +653,7 @@ static MACHINE_DRIVER_START( gbcolor )
 	MDRV_CARTSLOT_START(gb_cart)
 	MDRV_CARTSLOT_LOAD(gb_cart)
 	MDRV_SOFTWARE_LIST_ADD("mainlist","gbcolor")
-	MDRV_SOFTWARE_LIST_ADD("gameboy","gameboy")
+	MDRV_SOFTWARE_LIST_COMPATIBLE_ADD("gameboy","gameboy")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( megaduck )
