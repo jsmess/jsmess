@@ -1125,7 +1125,9 @@ MACHINE_START( dgnbeta )
 
     dgnbeta_init_video(machine);
 
-	machine->device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
+	if (machine->device<cpu_device>(MAINCPU_TAG)->debug()) {
+		machine->device<cpu_device>(MAINCPU_TAG)->debug()->set_dasm_override(dgnbeta_dasm_override);
+	}
 
 	machine->add_notifier(MACHINE_NOTIFY_RESET, dgnbeta_reset);
 	dgnbeta_reset(*machine);

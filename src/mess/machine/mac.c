@@ -2687,8 +2687,9 @@ MACHINE_RESET(mac)
 	scsi_interrupt = 0;
 	mac->via2_ca1 = 0;
 	mac->mac_nubus_irq_state = 0xff;
-
-	machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(mac_dasm_override);
+	if (machine->device<cpu_device>("maincpu")->debug()) {
+		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(mac_dasm_override);
+	}
 }
 
 

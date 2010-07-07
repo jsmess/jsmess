@@ -2823,8 +2823,9 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 
 	/* setup printer output callback */
 	printer_out = init->printer_out_;
-
-	machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(coco_dasm_override);
+	if (machine->device<cpu_device>("maincpu")->debug()) {
+		machine->device<cpu_device>("maincpu")->debug()->set_dasm_override(coco_dasm_override);
+	}
 
 	state_save_register_global(machine, mux_sel1);
 	state_save_register_global(machine, mux_sel2);
