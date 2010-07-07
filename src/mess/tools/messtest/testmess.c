@@ -952,7 +952,7 @@ static void command_trace(running_machine *machine)
 		if (file)
 		{
 			report_message(MSG_INFO, "Tracing CPU #%d: %s", cpunum, filename);
-			debug_cpu_trace(downcast<cpu_device *>(&cpu->device()), file, FALSE, NULL);
+			downcast<cpu_device *>(&cpu->device())->debug()->trace( file, FALSE, NULL);
 			fclose(file);
 		}
 
