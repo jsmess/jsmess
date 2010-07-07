@@ -916,7 +916,7 @@
 		<description>Gransta Chronicle</description>
 		<!--<release_date>2002-06-13</release_date>-->
 		<year>2002</year>
-		<publisher>unknown</publisher>
+		<publisher>Megatron</publisher>
 		<!-- <serial>SWJ-MGTC01</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="8388608">
@@ -2227,7 +2227,7 @@
 		<description>RUN=DIM - Return to Earth</description>
 		<!--<release_date>2002-02-07</release_date>-->
 		<year>2002</year>
-		<publisher>unknown</publisher>
+		<publisher>Digital Dream</publisher>
 		<!-- <serial>SWJ-DDJC01</serial> -->
 		<part name="cart" interface="wswan_cart">
 			<dataarea name="rom" size="2097152">
