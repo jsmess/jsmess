@@ -117,10 +117,14 @@ static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 	data_pos = 0;
 	sample_count = 0;
 
+	/* file has to start with an head block */
+	if (casdata[0] != 0xd3  || casdata[1] != 0xd3 || casdata[2] != 0xd3)
+		return -1;
+
 	/* on the entire file*/
     while( data_pos < k7_size )
 	{
-		UINT16	block_size;
+		UINT16	block_size = 0;
 
 		/* Identify type of block */
 		if (casdata[data_pos] == 0xd3)
@@ -146,13 +150,17 @@ static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 			sample_count += vg5k_k7_synchro( buffer, sample_count, 7200);
 		}
 		else
-			return -1;
+		{
+			/* tries to handle files that do not respect the size declared in the head block */
+			while (data_pos < k7_size && casdata[data_pos] != 0xd3 && casdata[data_pos] != 0xd6)
+				data_pos++;
+		}
 
 		/* Data samples */
 		for ( ; block_size ; data_pos++, block_size-- )
         {
 		    /* Make sure there are enough bytes left */
-		    if ( data_pos > k7_size )
+		    if (data_pos > k7_size)
 			   return -1;
 
     		sample_count += vg5k_cas_byte( buffer, sample_count, casdata[data_pos] );
@@ -174,7 +182,7 @@ static int vg5k_handle_tap(INT16 *buffer, const UINT8 *casdata)
 ********************************************************************/
 static int vg5k_k7_fill_wave(INT16 *buffer, int sample_count, UINT8 *bytes)
 {
-	return vg5k_handle_tap( buffer, bytes );
+	return vg5k_handle_tap(buffer, bytes);
 }
 
 

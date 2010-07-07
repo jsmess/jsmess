@@ -15,10 +15,16 @@
 #include "emu.h"
 #include "ef9345.h"
 
+#define MODE24x40	0
+#define MODEVAR40	1
+#define MODE8x80	2
+#define MODE12x80	3
+#define MODE16x40	4
+
 typedef struct _ef9345_t ef9345_t;
 struct _ef9345_t
 {
-	const ef9345_config *conf;
+	screen_device *screen;			//screen we are acting on
 
 	UINT8 bf;						//busy flag
 	UINT8 char_mode;				//40 or 80 chars for line
@@ -30,7 +36,6 @@ struct _ef9345_t
 	UINT8 TGS,MAT,PAT,DOR,ROR;		//registres acces indirect
 	UINT8 border[80];				//caractere du cadre
 	UINT8 *block;					//pointeur block courant
-	UINT8 *matrice;					//pointeur matrice caractere courant
 	UINT8 *char_ptr[16];			//pointeurs polices de caracteres
 	UINT16 blink;					//etat du clignotement
 	UINT8 dial;						//cadran en cours d'affichage
@@ -44,7 +49,6 @@ struct _ef9345_t
 
 	emu_timer *busy_timer;
 	emu_timer *blink_timer;
-
 };
 
 static TIMER_CALLBACK( ef9345_done );
@@ -75,7 +79,7 @@ void draw_char_40(ef9345_t *ef9345, UINT8 *c, int x, int y)
 	UINT16 i, j;
 
 	/* verify size limit */
-	if (y * 10 >= ef9345->conf->height || x * 8 >= ef9345->conf->width)
+	if (y * 10 >= ef9345->screen->height() || x * 8 >= ef9345->screen->width())
 		return;
 
 	for(i = 0; i < 10; i++)
@@ -91,7 +95,7 @@ void draw_char_80(ef9345_t *ef9345, UINT8 *c, int x, int y)
 	int i, j;
 
 	/* verify size limit */
-	if (y * 10 >= ef9345->conf->height || x * 6 >= ef9345->conf->width)
+	if (y * 10 >= ef9345->screen->height() || x * 6 >= ef9345->screen->width())
 		return;
 
 	for(i = 0; i < 10; i++)
@@ -107,6 +111,15 @@ void set_ef9345_mode(ef9345_t *ef9345)
 {
 	UINT8 i;
 	ef9345->char_mode = ((ef9345->PAT & 0x80) >> 5) | ((ef9345->TGS & 0xc0) >> 6);
+	UINT16 new_width = (ef9345->char_mode == MODE12x80 || ef9345->char_mode == MODE8x80) ? 492 : 336;
+
+	if (ef9345->screen->width() != new_width)
+	{
+		rectangle visarea = ef9345->screen->visible_area();
+		visarea.max_x = new_width - 1;
+
+		ef9345->screen->configure(new_width, ef9345->screen->height(), visarea, ef9345->screen->frame_period().attoseconds);
+	}
 
 	//couleur de bordure
 	for(i = 0; i < 80; i++)
@@ -295,7 +308,7 @@ void zoom(ef9345_t *ef9345, UINT8 *pix, int n)
 }
 
 // Display bichrome character (40 columns)
-void Bichrome40(ef9345_t *ef9345, int iblock, int x, int y, int c0, int c1, int insert, int flash, int conceal, int negative, int underline)
+void Bichrome40(ef9345_t *ef9345, UINT8 *matrice, int iblock, int x, int y, int c0, int c1, int insert, int flash, int conceal, int negative, int underline)
 {
 	UINT8 i, j, pix[80];
 
@@ -357,14 +370,14 @@ void Bichrome40(ef9345_t *ef9345, int iblock, int x, int y, int c0, int c1, int 
 
 	for(i = 0; i < 10; i++)
 	{
-		pix[j++] = (*(ef9345->matrice + 4 * i) & 0x01) ? c1 : c0;
-		pix[j++] = (*(ef9345->matrice + 4 * i) & 0x02) ? c1 : c0;
-		pix[j++] = (*(ef9345->matrice + 4 * i) & 0x04) ? c1 : c0;
-		pix[j++] = (*(ef9345->matrice + 4 * i) & 0x08) ? c1 : c0;
-		pix[j++] = (*(ef9345->matrice + 4 * i) & 0x10) ? c1 : c0;
-		pix[j++] = (*(ef9345->matrice + 4 * i) & 0x20) ? c1 : c0;
-		pix[j++] = (*(ef9345->matrice + 4 * i) & 0x40) ? c1 : c0;
-		pix[j++] = (*(ef9345->matrice + 4 * i) & 0x80) ? c1 : c0;
+		pix[j++] = (*(matrice + 4 * i) & 0x01) ? c1 : c0;
+		pix[j++] = (*(matrice + 4 * i) & 0x02) ? c1 : c0;
+		pix[j++] = (*(matrice + 4 * i) & 0x04) ? c1 : c0;
+		pix[j++] = (*(matrice + 4 * i) & 0x08) ? c1 : c0;
+		pix[j++] = (*(matrice + 4 * i) & 0x10) ? c1 : c0;
+		pix[j++] = (*(matrice + 4 * i) & 0x20) ? c1 : c0;
+		pix[j++] = (*(matrice + 4 * i) & 0x40) ? c1 : c0;
+		pix[j++] = (*(matrice + 4 * i) & 0x80) ? c1 : c0;
 
 	}
 
@@ -379,6 +392,10 @@ void Bichrome40(ef9345_t *ef9345, int iblock, int x, int y, int c0, int c1, int 
 	//voir Displayscreen() dans le module de traitement de la video
 	if(ef9345->dial > 0)
 		zoom(ef9345, pix, ef9345->dial);
+
+	//doubles the height of the char
+	if (ef9345->MAT & 0x80)
+		zoom(ef9345, pix, (y & 0x01) ? 0x0c : 0x03);
 
 	draw_char_40(ef9345, pix, x + 1 , y + 1);
 }
@@ -491,9 +508,10 @@ void Bichrome80(ef9345_t *ef9345, int c, int a, int x, int y)
 void makechar_16x40(ef9345_t *ef9345, int x, int y)
 {
 	int i, a, b, type, c0, c1, f, m, n, u, iblock;
+	UINT8* matrice;
 
 	//recherche des octets b, a (precedent si double largeur)
-	iblock = indexblock(ef9345, x, y);
+	iblock = (ef9345->MAT & 0x80 && y > 1) ? indexblock(ef9345, x, y / 2) : indexblock(ef9345, x, y);
 	a = ef9345->block[iblock];
 	b = ef9345->block[iblock + 0x800];
 
@@ -502,9 +520,9 @@ void makechar_16x40(ef9345_t *ef9345, int x, int y)
 
 	//adresse de la matrice de definition du caractere
 	type = ((b & 0x80) >> 4) | ((a & 0x80) >> 6);
-	ef9345->matrice = ef9345->char_ptr[type] + ((b & 0x7f) >> 2) * 0x40 + (b & 0x03);
+	matrice = ef9345->char_ptr[type] + ((b & 0x7f) >> 2) * 0x40 + (b & 0x03);
 	if((b & 0xe0) == 0x80)
-		ef9345->matrice = ef9345->char_ptr[0x03]; //negative space
+		matrice = ef9345->char_ptr[0x03]; //negative space
 
 	//attributs latches
 	if(x == 0) ef9345->latchm = ef9345->latchi = ef9345->latchu = ef9345->latchc0 = 0;
@@ -521,18 +539,17 @@ void makechar_16x40(ef9345_t *ef9345, int x, int y)
 	u = ef9345->latchu;						//underline
 
 	//affichage
-	Bichrome40(ef9345, iblock, x, y, c0, c1, i, f, m, n, u);
+	Bichrome40(ef9345, matrice, iblock, x, y, c0, c1, i, f, m, n, u);
 }
 
 // Affichage d'un caractere 24 bits 40 colonnes
 void makechar_24x40(ef9345_t *ef9345, int x, int y)
 {
 	int i, a, b, c, c0, c1, f, m, n, u, iblock;
+	UINT8* matrice;
 
 	//recherche des octets c, b, a
-	//iblock = (ef9345->MAT & 0x80) ? indexblock(x, y / 2) : indexblock(x, y);
-	//la double hauteur est maintenant prise en compte dans Displayscreen()
-	iblock = indexblock(ef9345, x, y);
+	iblock = (ef9345->MAT & 0x80 && y > 1) ? indexblock(ef9345,x, y / 2) : indexblock(ef9345, x, y);
 	c = ef9345->block[iblock]; b = ef9345->block[iblock + 0x800]; a = ef9345->block[iblock + 0x1000];
 	if((b & 0xc0) == 0xc0) {Quadrichrome40(ef9345, c, b, a, x, y); return;}
 
@@ -540,7 +557,7 @@ void makechar_24x40(ef9345_t *ef9345, int x, int y)
 	Cadran(ef9345, x, (b & 0x02) + ((b & 0x08) >> 3));
 
 	//adresse de la matrice de definition du caractere
-	ef9345->matrice = ef9345->char_ptr[(b & 0xf0) >> 4] + ((c & 0x7f) >> 2) * 0x40 + (c & 0x03);
+	matrice = ef9345->char_ptr[(b & 0xf0) >> 4] + ((c & 0x7f) >> 2) * 0x40 + (c & 0x03);
 
 	//attributs du caractere
 	c0 = a & 0x07;        //background
@@ -552,7 +569,7 @@ void makechar_24x40(ef9345_t *ef9345, int x, int y)
 	u = (((b & 0x60) == 0) || ((b & 0xc0) == 0x40)) ? ((b & 0x10) >> 4) : 0;
 
 	//affichage
-	Bichrome40(ef9345, iblock, x, y, c0, c1, i, f, m, n, u);
+	Bichrome40(ef9345, matrice, iblock, x, y, c0, c1, i, f, m, n, u);
 }
 
 
@@ -561,21 +578,27 @@ void makechar_12x80(ef9345_t *ef9345, int x, int y)
 {
 	int iblock;
 	iblock = indexblock(ef9345, x, y);
-	Bichrome80(ef9345, ef9345->block[iblock], (ef9345->block[iblock + 0x1000] >> 4) & 0x0f, 2 * x + 2, y + 1);
-	Bichrome80(ef9345, ef9345->block[iblock + 0x800], ef9345->block[iblock + 0x1000] & 0x0f, 2 * x + 3, y + 1);
+	Bichrome80(ef9345, ef9345->block[iblock], (ef9345->block[iblock + 0x1000] >> 4) & 0x0f, 2 * x + 1, y + 1);
+	Bichrome80(ef9345, ef9345->block[iblock + 0x800], ef9345->block[iblock + 0x1000] & 0x0f, 2 * x + 2, y + 1);
 }
 
 void makechar(ef9345_t *ef9345, int x, int y)
 {
 	switch (ef9345->char_mode)
 	{
-		case 0:
+		case MODE24x40:
 			makechar_24x40(ef9345, x, y);
 			break;
-		case 3:
+		case MODEVAR40:
+			//TODO
+			break;
+		case MODE8x80:
+			//TODO
+			break;
+		case MODE12x80:
 			makechar_12x80(ef9345, x, y);
 			break;
-		case 4:
+		case MODE16x40:
 			makechar_16x40(ef9345, x, y);
 			break;
 		default:
@@ -859,6 +882,18 @@ static TIMER_CALLBACK( ef9345_done )
 	ef9345->bf = 0;
 }
 
+void draw_border(ef9345_t *ef9345, UINT8 line)
+{
+	UINT8 i;
+
+	if (ef9345->char_mode == MODE12x80 || ef9345->char_mode == MODE8x80)
+		for(i = 0; i < 82; i++)
+			draw_char_80(ef9345, ef9345->border, i, line);
+	else
+		for(i = 0; i < 42; i++)
+			draw_char_40(ef9345, ef9345->border, i, line);
+}
+
 void ef9345_scanline(running_device *device, UINT16 scanline)
 {
 	ef9345_t *ef9345 = get_safe_token(device);
@@ -869,15 +904,21 @@ void ef9345_scanline(running_device *device, UINT16 scanline)
 
 	set_busy_flag(ef9345, 104);
 
-	draw_char_40(ef9345, ef9345->border, 0, (scanline / 10) + 1);
-	draw_char_40(ef9345, ef9345->border, 41, (scanline / 10) + 1);
+	if (ef9345->char_mode == MODE12x80 || ef9345->char_mode == MODE8x80)
+	{
+		draw_char_80(ef9345, ef9345->border, 0, (scanline / 10) + 1);
+		draw_char_80(ef9345, ef9345->border, 81, (scanline / 10) + 1);
+	}
+	else
+	{
+		draw_char_40(ef9345, ef9345->border, 0, (scanline / 10) + 1);
+		draw_char_40(ef9345, ef9345->border, 41, (scanline / 10) + 1);
+	}
 
 	if(scanline == 0)
 	{
 		ef9345->state |= 0x04;
-		for(i = 0; i < 42; i++)
-			draw_char_40(ef9345, ef9345->border, i, 0);
-
+		draw_border(ef9345, 0);
 		if(ef9345->PAT & 1)
 			for(i = 0; i < 40; i++)
 				makechar(ef9345, i, (scanline / 10));
@@ -891,8 +932,7 @@ void ef9345_scanline(running_device *device, UINT16 scanline)
 			for(i = 0; i < 40; i++)
 				makechar(ef9345, i, (scanline / 10));
 		else
-			for(i = 0; i < 42; i++)
-				draw_char_40(ef9345, ef9345->border, i, (scanline / 10));
+			draw_border(ef9345, scanline / 10);
 	}
 	else if(scanline < 250)
 	{
@@ -900,12 +940,10 @@ void ef9345_scanline(running_device *device, UINT16 scanline)
 			for(i = 0; i < 40; i++)
 				makechar(ef9345, i, (scanline / 10));
 		else
-			for(i = 0; i < 42; i++)
-				draw_char_40(ef9345, ef9345->border, i, (scanline / 10));
+			draw_border(ef9345, scanline / 10);
 
 		if(scanline == 240)
-			for(i = 0; i < 42; i++)
-				draw_char_40(ef9345, ef9345->border, i, 26);
+			draw_border(ef9345, 26);
 	}
 }
 
@@ -958,18 +996,20 @@ static DEVICE_RESET( ef9345 )
 static DEVICE_START( ef9345 )
 {
 	ef9345_t *ef9345 = get_safe_token(device);
+	const ef9345_config *config = (ef9345_config*)device->baseconfig().static_config();
 
 	/* validate arguments */
 	assert(device != NULL);
 
-	ef9345->conf = (ef9345_config*)device->baseconfig().static_config();
+	ef9345->charset = memory_region(device->machine, config->charset);
 
-	ef9345->charset = memory_region(device->machine, ef9345->conf->charset);
+	ef9345->screen = device->machine->device<screen_device>(config->screen_tag);
+	assert(ef9345->screen != NULL);
 
 	ef9345->busy_timer = timer_alloc(device->machine, ef9345_done, (void *)device);
 	ef9345->blink_timer = timer_alloc(device->machine, blinking, (void *)device);
 
-	ef9345->screen_out = auto_bitmap_alloc(device->machine, ef9345->conf->width , ef9345->conf->height , BITMAP_FORMAT_INDEXED16);
+	ef9345->screen_out = auto_bitmap_alloc(device->machine, 496, ef9345->screen->height() , BITMAP_FORMAT_INDEXED16);
 
 	timer_adjust_periodic(ef9345->blink_timer, ATTOTIME_IN_MSEC(500), 0, ATTOTIME_IN_MSEC(500));
 

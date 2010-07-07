@@ -23,9 +23,8 @@ DECLARE_LEGACY_DEVICE(EF9345, ef9345);
 typedef struct _ef9345_config ef9345_config;
 struct _ef9345_config
 {
-	const char* charset;
-	UINT16 width;
-	UINT16 height;
+	const char *screen_tag;
+	const char *charset;
 };
 
 /***************************************************************************

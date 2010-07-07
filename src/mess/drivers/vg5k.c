@@ -373,9 +373,8 @@ static DRIVER_INIT( vg5k )
 
 static const ef9345_config vg5k_ef9345_config =
 {
-	"gfx1",				/* charset */
-	336,				/* screen width */
-	300					/* screen height */
+	"screen",			/* screen we are acting on */
+	"gfx1"				/* charset */
 };
 
 static const struct CassetteOptions vg5k_cassette_options =
@@ -422,7 +421,6 @@ static MACHINE_DRIVER_START( vg5k )
 
 	MDRV_VIDEO_START(vg5k)
 	MDRV_VIDEO_UPDATE(vg5k)
-
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
