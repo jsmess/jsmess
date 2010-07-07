@@ -935,7 +935,7 @@ static void mmc1_set_wram( const address_space *space, int board )
 		case STD_SXROM_A:	// ignore WRAM enable bit
 			if (state->battery_size > 0x2000)
 				wram_bank(machine, ((state->mmc_reg[1] & 3) >> 2), NES_BATTERY);
-			else
+			else if (state->battery_size)
 				wram_bank(machine, 0, NES_BATTERY);
 			break;
 		case STD_SOROM:		// there are 2 WRAM banks only and battery is bank 2 for the cart (hence, we invert bank, because we have battery first)
@@ -12258,7 +12258,8 @@ static int pcb_initialize( running_machine *machine, int idx )
 			set_nt_mirroring(machine, PPU_MIRROR_HORZ);
 			mmc1_set_chr(machine);
 			mmc1_set_prg(machine);
-			wram_bank(machine, 0, (idx == STD_SOROM) ? NES_WRAM : NES_BATTERY);
+			if (state->battery || state->wram)
+				wram_bank(machine, 0, (idx == STD_SOROM) ? NES_WRAM : NES_BATTERY);
 			break;
 		case STD_PXROM:	// mapper 9
 			state->mmc_reg[0] = state->mmc_reg[2] = 0;
