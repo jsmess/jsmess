@@ -7,7 +7,7 @@ What's new:
 21.05.2004  TMS5501 fixes. Debug code cleanups.
 06.03.2004  Stack overflow interrupt added.
 05.09.2003  Random number generator added. Few video hardware bugs fixed.
-        Fixed few iI8080 instructions, making much more BASIC games playable.
+        Fixed few I8080 instructions, making much more BASIC games playable.
 
 Notes on emulation status and to do list:
 -----------------------------------------

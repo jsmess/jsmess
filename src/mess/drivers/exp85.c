@@ -141,7 +141,7 @@ static I8355_INTERFACE( i8355_intf )
 	DEVCB_NULL,					/* port B write */
 };
 
-/* II8085A Interface */
+/* I8085A Interface */
 
 static WRITE_LINE_DEVICE_HANDLER( exp85_sod_w )
 {
