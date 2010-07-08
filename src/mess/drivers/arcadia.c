@@ -566,7 +566,7 @@ static MACHINE_DRIVER_START( arcadia )
 	MDRV_CARTSLOT_LOAD(arcadia_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","arcadia")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","arcadia")
 MACHINE_DRIVER_END
 
 ROM_START(advsnha)

@@ -142,7 +142,7 @@ static MACHINE_DRIVER_START( advision )
 	MDRV_CARTSLOT_LOAD(advision_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","advision")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","advision")
 MACHINE_DRIVER_END
 
 /* ROMs */

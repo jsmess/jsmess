@@ -601,7 +601,7 @@ static MACHINE_DRIVER_START( sord_m5 )
 	MDRV_CARTSLOT_INTERFACE("m5_cart")
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","sordm5")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","sordm5")
 
 MACHINE_DRIVER_END
 

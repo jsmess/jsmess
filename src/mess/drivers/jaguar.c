@@ -656,7 +656,7 @@ static MACHINE_DRIVER_START( jaguar )
 	MDRV_CARTSLOT_LOAD(jaguar)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","jaguar")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","jaguar")
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
 MACHINE_DRIVER_END

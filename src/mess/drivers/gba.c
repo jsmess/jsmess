@@ -2452,7 +2452,7 @@ static MACHINE_DRIVER_START( gbadv )
 	MDRV_CARTSLOT_EXTENSION_LIST("gba,bin")
 	MDRV_CARTSLOT_INTERFACE("gba_cart")
 	MDRV_CARTSLOT_LOAD(gba_cart)
-	MDRV_SOFTWARE_LIST_ADD("mainlist","gba")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","gba")
 MACHINE_DRIVER_END
 
 /* this emulates the GBA's hardware protection: the BIOS returns only zeros when the PC is not in it,

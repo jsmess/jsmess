@@ -594,7 +594,7 @@ static MACHINE_DRIVER_START( gameboy )
 	MDRV_CARTSLOT_INTERFACE("gameboy_cart")
 	MDRV_CARTSLOT_START(gb_cart)
 	MDRV_CARTSLOT_LOAD(gb_cart)
-	MDRV_SOFTWARE_LIST_ADD("mainlist","gameboy")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","gameboy")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( supergb )
@@ -652,7 +652,7 @@ static MACHINE_DRIVER_START( gbcolor )
 	MDRV_CARTSLOT_INTERFACE("gameboy_cart")
 	MDRV_CARTSLOT_START(gb_cart)
 	MDRV_CARTSLOT_LOAD(gb_cart)
-	MDRV_SOFTWARE_LIST_ADD("mainlist","gbcolor")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","gbcolor")
 	MDRV_SOFTWARE_LIST_COMPATIBLE_ADD("gameboy","gameboy")
 MACHINE_DRIVER_END
 
@@ -692,7 +692,7 @@ static MACHINE_DRIVER_START( megaduck )
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_INTERFACE("megaduck_cart")
 	MDRV_CARTSLOT_LOAD(megaduck_cart)
-	MDRV_SOFTWARE_LIST_ADD("mainlist","megaduck")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","megaduck")
 MACHINE_DRIVER_END
 
 /***************************************************************************

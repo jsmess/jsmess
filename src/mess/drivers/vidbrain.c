@@ -545,7 +545,7 @@ static MACHINE_DRIVER_START( vidbrain )
 	MDRV_CARTSLOT_LOAD(vidbrain_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","vidbrain")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","vidbrain")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

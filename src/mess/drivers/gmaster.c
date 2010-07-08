@@ -284,7 +284,7 @@ static MACHINE_DRIVER_START( gmaster )
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_INTERFACE("gmaster_cart")
 	MDRV_CARTSLOT_LOAD(gmaster_cart)
-	MDRV_SOFTWARE_LIST_ADD("mainlist","gmaster")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","gmaster")
 MACHINE_DRIVER_END
 
 

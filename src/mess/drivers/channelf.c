@@ -272,7 +272,7 @@ static MACHINE_DRIVER_START( channelf_cart )
 	MDRV_CARTSLOT_LOAD(channelf_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","channelf")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","channelf")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( channelf )

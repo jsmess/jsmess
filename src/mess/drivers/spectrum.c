@@ -748,7 +748,7 @@ MACHINE_DRIVER_START( spectrum_common )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(spectrum_cart)
 	MDRV_CARTSLOT_INTERFACE("spectrum_cart")
-	MDRV_SOFTWARE_LIST_ADD("mainlist","spectrum")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","spectrum")
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( spectrum )

@@ -129,7 +129,7 @@ static MACHINE_DRIVER_START(vectrex)
 	MDRV_CARTSLOT_INTERFACE("vectrex_cart")
 	
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","vectrex")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","vectrex")
 MACHINE_DRIVER_END
 
 ROM_START(vectrex)

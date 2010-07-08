@@ -1099,7 +1099,7 @@ static MACHINE_DRIVER_START( sg1000 )
 	MDRV_CARTSLOT_LOAD(sg1000_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","sg1000")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","sg1000")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
@@ -1165,7 +1165,7 @@ static MACHINE_DRIVER_START( sc3000 )
 	MDRV_CARTSLOT_LOAD(sc3000_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","sg1000")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","sg1000")
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

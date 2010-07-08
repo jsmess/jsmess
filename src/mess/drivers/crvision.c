@@ -590,7 +590,7 @@ static MACHINE_DRIVER_START( creativision )
 	MDRV_CARTSLOT_LOAD(crvision_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","crvision")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","crvision")
 
 	/* cassette */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_config)

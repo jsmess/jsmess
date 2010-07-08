@@ -164,7 +164,7 @@ static MACHINE_DRIVER_START( pce_cartslot )
 	MDRV_CARTSLOT_INTERFACE("pce_cart")
 	MDRV_CARTSLOT_LOAD(pce_cart)
 	MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
-	MDRV_SOFTWARE_LIST_ADD("mainlist","pce")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","pce")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( tg16_cartslot )
@@ -174,7 +174,7 @@ static MACHINE_DRIVER_START( tg16_cartslot )
 	MDRV_CARTSLOT_INTERFACE("tg16_cart")
 	MDRV_CARTSLOT_LOAD(pce_cart)
 	MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
-	MDRV_SOFTWARE_LIST_ADD("mainlist","tg16")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","tg16")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sgx_cartslot )
@@ -184,7 +184,7 @@ MDRV_CARTSLOT_MANDATORY
 MDRV_CARTSLOT_INTERFACE("pce_cart")
 MDRV_CARTSLOT_LOAD(pce_cart)
 MDRV_CARTSLOT_PARTIALHASH(pce_partialhash)
-MDRV_SOFTWARE_LIST_ADD("mainlist","sgx")
+MDRV_SOFTWARE_LIST_ADD("cart_list","sgx")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pce_common )

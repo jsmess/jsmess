@@ -698,7 +698,7 @@ static MACHINE_DRIVER_START(tutor)
 	MDRV_CARTSLOT_INTERFACE("tutor_cart")
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","tutor")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","tutor")
 
 MACHINE_DRIVER_END
 

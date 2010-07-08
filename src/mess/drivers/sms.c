@@ -377,7 +377,7 @@ static MACHINE_DRIVER_START( sms_cartslot )
 	MDRV_CARTSLOT_START(sms_cart)
 	MDRV_CARTSLOT_LOAD(sms_cart)
 
-	MDRV_SOFTWARE_LIST_ADD("mainlist","sms")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","sms")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( gg_cartslot )
@@ -388,7 +388,7 @@ static MACHINE_DRIVER_START( gg_cartslot )
 	MDRV_CARTSLOT_START(sms_cart)
 	MDRV_CARTSLOT_LOAD(sms_cart)
 
-	MDRV_SOFTWARE_LIST_ADD("mainlist","gamegear")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","gamegear")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sms_ntsc_base )

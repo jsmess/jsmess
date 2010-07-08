@@ -1335,7 +1335,7 @@ MACHINE_DRIVER_START( snes_cartslot )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_INTERFACE("snes_cart")
 	MDRV_CARTSLOT_LOAD(snes_cart)
-	MDRV_SOFTWARE_LIST_ADD("mainlist","snes")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","snes")
 MACHINE_DRIVER_END
 
 // This (hackily) emulates a SNES unit with a Sufami Turbo Unit cart inserted:
@@ -1353,7 +1353,7 @@ MACHINE_DRIVER_START( sufami_cartslot )
 	MDRV_CARTSLOT_INTERFACE("sufami_cart")
 	MDRV_CARTSLOT_LOAD(sufami_cart)
 
-//  MDRV_SOFTWARE_LIST_ADD("mainlist","snes")
+//  MDRV_SOFTWARE_LIST_ADD("cart_list","snes")
 MACHINE_DRIVER_END
 
 // This (hackily) emulates a SNES unit where you want to load a BS-X compatible cart:
@@ -1373,7 +1373,7 @@ MACHINE_DRIVER_START( bsx_cartslot )
 	MDRV_CARTSLOT_INTERFACE("bsx_cart")
 	MDRV_CARTSLOT_LOAD(bsx2slot_cart)
 
-//  MDRV_SOFTWARE_LIST_ADD("mainlist","snes")
+//  MDRV_SOFTWARE_LIST_ADD("cart_list","snes")
 MACHINE_DRIVER_END
 
 DRIVER_INIT( snes_mess )

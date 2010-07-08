@@ -127,7 +127,7 @@ static MACHINE_DRIVER_START( gamecom )
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_INTERFACE("gamecom_cart")
 	MDRV_CARTSLOT_LOAD(gamecom_cart)
-	MDRV_SOFTWARE_LIST_ADD("mainlist","gamecom")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","gamecom")
 MACHINE_DRIVER_END
 
 ROM_START( gamecom )

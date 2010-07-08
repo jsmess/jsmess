@@ -1223,7 +1223,7 @@ static MACHINE_DRIVER_START( xegs )
 	MDRV_CARTSLOT_LOAD(xegs_cart)
 
 	/* software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","xegs")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","xegs")
 
 MACHINE_DRIVER_END
 
@@ -1249,7 +1249,7 @@ static MACHINE_DRIVER_START( a5200 )
 	MDRV_CARTSLOT_INTERFACE("a5200_cart")
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","a5200")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","a5200")
 	
 	/* internal ram */
 	MDRV_RAM_MODIFY("messram")

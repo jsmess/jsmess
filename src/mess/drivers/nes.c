@@ -507,7 +507,7 @@ static MACHINE_DRIVER_START( nes )
 	MDRV_CARTSLOT_INTERFACE("nes_cart")
 	MDRV_CARTSLOT_LOAD(nes_cart)
 	MDRV_CARTSLOT_PARTIALHASH(nes_partialhash)
-	MDRV_SOFTWARE_LIST_ADD("mainlist","nes")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","nes")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( nespal )

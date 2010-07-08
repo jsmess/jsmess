@@ -98,7 +98,7 @@ static MACHINE_DRIVER_START( gamepock )
 	MDRV_CARTSLOT_LOAD(gamepock_cart)
 
 	/* Software lists */
-	MDRV_SOFTWARE_LIST_ADD("mainlist","gamepock")
+	MDRV_SOFTWARE_LIST_ADD("cart_list","gamepock")
 MACHINE_DRIVER_END
 
 
