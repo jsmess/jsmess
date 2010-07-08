@@ -1837,7 +1837,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
   AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_mem_r,towns_video_cff80_mem_w,0xffffffff)
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
-  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) // CMOS? RAM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_BASE_SIZE_GENERIC(nvram) // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
@@ -1847,7 +1847,7 @@ static ADDRESS_MAP_START(towns_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
   AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
   AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
-  AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE8(towns_cmos_r,towns_cmos_w,0xffffffff) AM_BASE_SIZE_GENERIC(nvram) // CMOS (mirror?)
+  AM_RANGE(0xc2140000, 0xc2141fff) AM_READWRITE8(towns_cmos_r,towns_cmos_w,0xffffffff) // CMOS (mirror?)
   AM_RANGE(0xc2180000, 0xc21fffff) AM_ROM AM_REGION("user",0x080000)  // F20 ROM
   AM_RANGE(0xc2200000, 0xc220ffff) AM_DEVREADWRITE8("pcm",rf5c68_mem_r,rf5c68_mem_w,0xffffffff)  // WAVE RAM
   AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user",0x200000)  // SYSTEM ROM
@@ -1861,7 +1861,7 @@ static ADDRESS_MAP_START(marty_mem, ADDRESS_SPACE_PROGRAM, 32)
   AM_RANGE(0x000cc000, 0x000cff7f) AM_RAM
   AM_RANGE(0x000cff80, 0x000cffff) AM_READWRITE8(towns_video_cff80_r,towns_video_cff80_w,0xffffffff)
   AM_RANGE(0x000d0000, 0x000d7fff) AM_RAM
-  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) // CMOS? RAM
+  AM_RANGE(0x000d8000, 0x000d9fff) AM_READWRITE8(towns_cmos_low_r,towns_cmos_low_w,0xffffffff) AM_BASE_SIZE_GENERIC(nvram) // CMOS? RAM
   AM_RANGE(0x000da000, 0x000effff) AM_RAM //READWRITE(SMH_BANK(11),SMH_BANK(11))
   AM_RANGE(0x000f0000, 0x000f7fff) AM_RAM //READWRITE(SMH_BANK(12),SMH_BANK(12))
   AM_RANGE(0x000f8000, 0x000fffff) AM_READ_BANK("bank11") AM_WRITE_BANK("bank12")
