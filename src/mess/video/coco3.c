@@ -649,7 +649,7 @@ UINT32 coco3_get_video_base(UINT8 ff9d_mask, UINT8 ff9e_mask)
      */
 	return	((offs_t) (coco3_gimereg[14] & ff9e_mask)	* 0x00008)
 		|	((offs_t) (coco3_gimereg[13] & ff9d_mask)	* 0x00800)
-		|	((offs_t) (coco3_gimereg[11] & 0x03)		* 0x80000);
+		|	((offs_t) (coco3_gimereg[11] & 0x0F)		* 0x80000);
 }
 
 
@@ -835,6 +835,7 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	/* initialize the CoCo video code */
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.type = type;
+	cfg.cpu0_timing_factor = 4;
 	cfg.get_attributes = coco_get_attributes;
 	cfg.get_video_ram = get_video_ram_coco3;
 	cfg.horizontal_sync_callback = coco3_horizontal_sync_callback;

@@ -89,6 +89,11 @@ static void internal_video_start_coco(running_machine *machine, m6847_type type)
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.type = type;
 
+	/* NPW 14-May-2006 - Ugly hack; using CPU timing factor seems to break some
+     * Dragon games */
+	if (machine->gamedrv->name[0] == 'c')
+		cfg.cpu0_timing_factor = 4;
+
 	if (type==M6847_VERSION_M6847T1_NTSC) {
 		cfg.get_attributes = coco_get_attributes;
 	} else {

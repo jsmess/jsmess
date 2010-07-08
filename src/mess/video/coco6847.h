@@ -48,7 +48,8 @@ typedef struct _m6847_config m6847_config;
 struct _m6847_config
 {
 	m6847_type type;
-	
+	int cpu0_timing_factor;
+
 	/* callbacks */
 	void (*horizontal_sync_callback)(running_machine *machine, int line);
 	void (*field_sync_callback)(running_machine *machine,int line);
