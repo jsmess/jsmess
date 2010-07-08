@@ -2073,7 +2073,7 @@
 		</part>
 	</software>
 
-	<software name="srobotc3a" cloneof="robotc3">
+	<software name="srobotc3a" cloneof="srobotc3">
          <!-- Alt title: スーパーロボット大戦 コンパクト3 -->
 		<!-- WSC only, Rated "Everyone" -->
 		<description>Super Robot Taisen Compact 3 (v1.5)</description>
