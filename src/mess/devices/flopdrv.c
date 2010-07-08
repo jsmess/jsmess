@@ -998,7 +998,7 @@ READ_LINE_DEVICE_HANDLER( floppy_twosid_r )
 -------------------------------------------------*/
 static DEVICE_IMAGE_SOFTLIST_LOAD(floppy)
 {
-	return FALSE;
+	return image.load_software(swlist, swname, start_entry);
 }
 
 /*************************************

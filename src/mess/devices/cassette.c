@@ -401,7 +401,7 @@ static DEVICE_IMAGE_DISPLAY(cassette)
 -------------------------------------------------*/
 static DEVICE_IMAGE_SOFTLIST_LOAD(cassette)
 {
-	return FALSE;
+	return image.load_software(swlist, swname, start_entry);
 }
 
 DEVICE_GET_INFO(cassette)

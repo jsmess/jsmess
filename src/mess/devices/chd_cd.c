@@ -141,7 +141,7 @@ static DEVICE_START(cdrom)
 -------------------------------------------------*/
 static DEVICE_IMAGE_SOFTLIST_LOAD(cdrom)
 {
-	return FALSE;
+	return image.load_software(swlist, swname, start_entry);
 }
 
 /*-------------------------------------------------
