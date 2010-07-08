@@ -835,7 +835,6 @@ static void internal_video_start_coco3(running_machine *machine, m6847_type type
 	/* initialize the CoCo video code */
 	memset(&cfg, 0, sizeof(cfg));
 	cfg.type = type;
-	cfg.cpu0_timing_factor = 4;
 	cfg.get_attributes = coco_get_attributes;
 	cfg.get_video_ram = get_video_ram_coco3;
 	cfg.horizontal_sync_callback = coco3_horizontal_sync_callback;
