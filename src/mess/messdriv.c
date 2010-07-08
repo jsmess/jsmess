@@ -900,6 +900,7 @@ const game_driver * const drivers[] =
 	DRIVER( rameses )
 	DRIVER( vz2000 )
 	DRIVER( crvisio2 )
+	DRIVER( manager )
 	DRIVER( laser110 )  /* 1983 Laser 110      */
 	DRIVER( las110de )  /* 1983 Sanyo Laser 110 (Germany)      */
 	DRIVER( laser200 )  /* 1983 Laser 200 (color version of 110)    */

@@ -21,6 +21,92 @@
         * Titanic Frogger Demo 1.1
 */
 
+/*
+	
+Salora Manager
+
+PCB Layout
+----------
+
+Main board
+
+|-------------------------------------------------------------------------------|
+|				|-----CN1-----|				|-----CN2-----|						|
+|																	10.738MHz	--|
+|									X										CN3	  |
+|		ROM01												VDC					  |
+|									X											--|
+|																				|
+|		ROM23						X											|
+|																				|
+|									X											|
+|	LS04																		--|
+|									X						6821				  |
+|	LS32																		  |
+|									X											  |
+|	LS139											PSG							  |
+|									X											  |
+|	LS138																		  |
+|									X										CN4	  |
+|	LS244																		  |
+|																				  |
+|	LS245																		  |
+|																				  |
+|					LS244														  |
+|		6502																	--|
+|					LS244														|
+|															CN5					|
+|-------------------------------------------------------------------------------|
+
+Notes:
+All IC's shown. Prototype-ish board, with many jumper wires and extra capacitors.
+
+ROM01	- Toshiba TMM2464P 8Kx8 one-time PROM, labeled "0.1"
+ROM23	- Toshiba TMM2464P 8Kx8 one-time PROM, labeled "23"
+6502	- Rockwell R6502AP 8-bit Microprocessor
+6821	- Hitachi HD468B21P Peripheral Interface Adaptor
+VDC		- most likely TMS9929A (covered w/heatsink)
+PSG		- Texas Instruments SN76489AN Programmable Sound Generator
+X		- some kind of RAM chip (covered w/heatsink)
+CN1		- sub board connector (17x2 pin header)
+CN2		- RF board connector (17x1 pin header)
+CN3		- tape connector (7x2 PCB edge male)
+CN4		- expansion connector (30x2 PCB edge male)
+CN5		- cartridge connector (18x2 PCB edge female)
+
+Sub board
+
+|---------------------------------------|
+|	17.73447MHz	|-----CN1-----|			|
+|										|
+|	74S04						4116	|
+|										|
+|	LS90						4116	|
+|										|
+|	LS10						4116	|
+|										|
+|	LS367						4116	|
+|										|
+|	LS393						4116	|
+|										|
+|	LS244						4116	|
+|										|
+|	LS257						4116	|
+|										|
+|	LS257						4116	|
+|										|
+|								LS139	|
+|										|
+|---------------------------------------|
+
+Notes:
+All IC's shown.
+
+4116	- Toshiba TMM416P-3 16Kx1 RAM
+CN1		- main board connector (17x2 pin header)
+
+*/
+
 #include "emu.h"
 #include "includes/crvision.h"
 #include "cpu/m6502/m6502.h"
@@ -65,6 +151,16 @@ static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE(CENTRONICS_TAG, centronics_status_r, centronics_ctrl_w)
 //  AM_RANGE(0xe802, 0xf7ff) AM_RAMBANK(4)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( lasr2001_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x0c00) AM_RAM
+	AM_RANGE(0x1000, 0x1003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE(PIA6821_TAG, pia6821_r, pia6821_w)
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_vram_r)
+	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_register_r)
+	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_vram_w)
+	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_register_w)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -237,6 +333,9 @@ static INPUT_PORTS_START( crvision )
 
 	PORT_START("NMI")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_NAME("Reset") PORT_CODE(KEYCODE_F10) PORT_CHANGED(trigger_nmi, 0)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( manager )
 INPUT_PORTS_END
 
 /* Machine Interface */
@@ -628,6 +727,54 @@ static MACHINE_DRIVER_START( pal )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( lasr2001 )
+	MDRV_DRIVER_DATA(crvision_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD(M6502_TAG, M6502, 2000000)
+	MDRV_CPU_PROGRAM_MAP(lasr2001_map)
+	MDRV_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
+
+	MDRV_MACHINE_START(pal)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD(SN76489_TAG, SN76489A, 2000000)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
+	MDRV_SOUND_ROUTE(1, "mono", 0.25)
+
+	/* peripheral hardware */
+	MDRV_PIA6821_ADD(PIA6821_TAG, crvision_pia_intf)
+
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin,rom")
+	MDRV_CARTSLOT_INTERFACE("crvision_cart")
+	MDRV_CARTSLOT_LOAD(crvision_cart)
+
+	/* software lists */
+	MDRV_SOFTWARE_LIST_ADD("cart_list","crvision")
+
+	/* cassette */
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_config)
+
+	/* printer */
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("1K")	// MAIN RAM
+	MDRV_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
+
+	/* video hardware */
+	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_SCREEN_MODIFY(SCREEN_TAG)
+	MDRV_SCREEN_REFRESH_RATE((float)10738000/2/342/313)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+MACHINE_DRIVER_END
+
 /* ROMs */
 
 ROM_START( crvision )
@@ -646,18 +793,24 @@ ROM_END
 #define rom_rameses rom_fnvision
 #define rom_vz2000 rom_fnvision
 
+ROM_START( manager )
+    ROM_REGION( 0x4000, M6502_TAG, 0 )
+    ROM_LOAD( "01", 0x0000, 0x2000, CRC(702f4cf5) SHA1(cd14ee74e787d24b76c166de484dae24206e219b) )
+    ROM_LOAD( "23", 0x2000, 0x2000, CRC(46489d88) SHA1(467f5bcd62d0b4117c443e13373df8f3c45df7b2) )
+ROM_END
+
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       INIT   COMPANY                   FULLNAME */
-CONS(	1982,	crvision,   0,          0,    pal,        crvision,	0,     "Video Technology",       "CreatiVision", 0 )
-CONS(	1982,	fnvision,   crvision,   0,    pal,        crvision,	0,     "Video Technology",       "FunVision", 0 )
-CONS(	1982,	crvisioj,   crvision,   0,    ntsc,       crvision,	0,     "Cheryco",                "CreatiVision (Japan)", 0 )
-CONS(	1982,	wizzard,    crvision,   0,    pal,        crvision,	0,     "Dick Smith Electronics", "Wizzard (Oceania)", 0 )
-CONS(	1982,	rameses,    crvision,   0,    pal,        crvision,	0,     "Hanimex",                "Rameses (Oceania)", 0 )
-CONS(	1983,	vz2000,     crvision,   0,    pal,        crvision,	0,     "Dick Smith Electronics", "VZ 2000 (Oceania)", 0 )
-CONS(	1983,	crvisio2,   crvision,   0,    pal,        crvision,	0,     "Video Technology",       "CreatiVision MK-II (Europe)", 0 )
+/*    YEAR  NAME        PARENT		COMPAT	MACHINE		INPUT       INIT	COMPANY                   FULLNAME */
+CONS( 1982,	crvision,   0,          0,		pal,		crvision,	0,		"Video Technology",       "CreatiVision", 0 )
+CONS( 1982,	fnvision,   crvision,   0,		pal,		crvision,	0,		"Video Technology",       "FunVision", 0 )
+CONS( 1982,	crvisioj,   crvision,   0,		ntsc,		crvision,	0,		"Cheryco",                "CreatiVision (Japan)", 0 )
+CONS( 1982,	wizzard,    crvision,   0,		pal,		crvision,	0,		"Dick Smith Electronics", "Wizzard (Oceania)", 0 )
+CONS( 1982,	rameses,    crvision,   0,		pal,		crvision,	0,		"Hanimex",                "Rameses (Oceania)", 0 )
+CONS( 1983,	vz2000,     crvision,   0,		pal,		crvision,	0,		"Dick Smith Electronics", "VZ 2000 (Oceania)", 0 )
+CONS( 1983,	crvisio2,   crvision,   0,		pal,		crvision,	0,		"Video Technology",       "CreatiVision MK-II (Europe)", 0 )
 /*
-COMP(   1983,   lasr2001,   0,          0,    lasr2001,   lasr2001, 0,     "Video Technology",       "Laser 2001", GAME_NOT_WORKING )
-COMP(   1983,   vz2001,     lasr2001,   0,    lasr2001,   lasr2001, 0,     "Dick Smith Electronics", "VZ 2001 (Oceania)", GAME_NOT_WORKING )
-COMP(   1983,   manager,    lasr2001,   0,    lasr2001,   lasr2001, 0,     "Salora",                 "Manager (Finland)", GAME_NOT_WORKING )
+COMP( 1983,	lasr2001,   0,          0,		lasr2001,	lasr2001,	0,		"Video Technology",       "Laser 2001", GAME_NOT_WORKING )
+COMP( 1983, vz2001,     lasr2001,   0,		lasr2001,	lasr2001,	0,		"Dick Smith Electronics", "VZ 2001 (Oceania)", GAME_NOT_WORKING )
 */
+COMP( 1983,	manager,    0,			0,		lasr2001,   manager,	0,		"Salora",                 "Manager (Finland)", GAME_NOT_WORKING )
