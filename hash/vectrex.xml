@@ -23,13 +23,13 @@
 		</part>
 	</software>
 
-	<software name="armattck">
+	<software name="armora">
 		<description>Armor Attack</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="armattck.bin" size="4096" crc="b7510971" sha1="eb76f860130f8cc87826fa931350467760511213" offset="0" />
+				<rom name="armora.bin" size="4096" crc="b7510971" sha1="eb76f860130f8cc87826fa931350467760511213" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -67,7 +67,7 @@
 		</part>
 	</software>
 
-	<software name="berzerkd">
+	<software name="berzerkd" cloneof="berzerk">
 		<description>Berzerk (Debugged Prototype)</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
@@ -89,7 +89,7 @@
 		</part>
 	</software>
 
-	<software name="blitza">
+	<software name="blitza" cloneof="blitz">
 		<description>Blitz! (Alt)</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
@@ -111,13 +111,13 @@
 		</part>
 	</software>
 
-	<software name="csmcchsm">
+	<software name="cchasm">
 		<description>Cosmic Chasm</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="csmcchsm.bin" size="4096" crc="6c1afa52" sha1="56a7f277bf09f94461dda542c04c36266d838b86" offset="0" />
+				<rom name="cchasm.bin" size="4096" crc="6c1afa52" sha1="56a7f277bf09f94461dda542c04c36266d838b86" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -155,13 +155,13 @@
 		</part>
 	</software>
 
-	<software name="fortnzod">
+	<software name="fnarzod">
 		<description>Fortress of Narzod</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="fortnzod.bin" size="8192" crc="13a35c8a" sha1="286e061331289b031de33725a4966c379c1df47f" offset="0" />
+				<rom name="fnarzod.bin" size="8192" crc="13a35c8a" sha1="286e061331289b031de33725a4966c379c1df47f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -265,7 +265,7 @@
 		</part>
 	</software>
 
-	<software name="polarrsb">
+	<software name="polarresb" cloneof="polarres">
 		<description>Polar Rescue (Beta)</description>
 		<year>1983</year>
 		<publisher>GCE</publisher>
@@ -287,7 +287,7 @@
 		</part>
 	</software>
 
-	<software name="poleposa">
+	<software name="poleposa" cloneof="polepos">
 		<description>Pole Position (Alt)</description>
 		<year>1983</year>
 		<publisher>GCE / Namco Ltd.</publisher>
@@ -331,24 +331,24 @@
 		</part>
 	</software>
 
-	<software name="solarqst">
+	<software name="solarq">
 		<description>Solar Quest</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="solarqst.bin" size="4096" crc="5c4611c8" sha1="38072dc491d5c729c06f4c50bc310d361e0ff62a" offset="0" />
+				<rom name="solarq.bin" size="4096" crc="5c4611c8" sha1="38072dc491d5c729c06f4c50bc310d361e0ff62a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="spcewars">
+	<software name="spacewar">
 		<description>Space Wars</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="spcewars.bin" size="4096" crc="a3be5aff" sha1="0c229dd12a55044681585f7fdabd37dbc1243b59" offset="0" />
+				<rom name="spacewar.bin" size="4096" crc="a3be5aff" sha1="0c229dd12a55044681585f7fdabd37dbc1243b59" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -375,13 +375,13 @@
 		</part>
 	</software>
 
-	<software name="starcstl">
+	<software name="starcas">
 		<description>Star Castle</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="starcstl.bin" size="4096" crc="c9039623" sha1="c9b79f1ba30dcbce5a068b606a97775cf863fe0a" offset="0" />
+				<rom name="starcas.bin" size="4096" crc="c9039623" sha1="c9b79f1ba30dcbce5a068b606a97775cf863fe0a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -408,13 +408,13 @@
 		</part>
 	</software>
 
-	<software name="startrkp">
+	<software name="startrekp" cloneof="startrek">
 		<description>Star Trek (Debugged Prototype)</description>
 		<year>1982</year>
 		<publisher>GCE</publisher>
 		<part name="cart" interface="vectrex_cart">
 			<dataarea name="rom" size="4096">
-				<rom name="startrkp.bin" size="4096" crc="563f846b" sha1="21707811e544edae66ca076351bf0743842b46e5" offset="0" />
+				<rom name="startrekp.bin" size="4096" crc="563f846b" sha1="21707811e544edae66ca076351bf0743842b46e5" offset="0" />
 			</dataarea>
 		</part>
 	</software>

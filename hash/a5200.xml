@@ -1,46 +1,46 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="a5200" description="Atari 5200 cartridges">
-	<software name="menupro">
-		<description>5200 Menu (Proto)</description>
+	<software name="5200menu">
+		<description>5200 Menu (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="menupro.bin" size="8192" crc="0de2db48" sha1="e64fb1a353c72b87c5483bb88cb3523ea5d37b59" offset="0" />
+				<rom name="5200menu.bin" size="8192" crc="0de2db48" sha1="e64fb1a353c72b87c5483bb88cb3523ea5d37b59" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="aeproto">
-		<description>A.E. (Proto)</description>
+	<software name="aep">
+		<description>A.E. (Prototype)</description>
 		<year>1982</year>
 		<publisher>Broderbund Software Inc</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="aeproto.bin" size="16384" crc="35484751" sha1="e18a603b18b85e24f9c938b33b6077a767c1fa9c" offset="0" />
+				<rom name="aep.bin" size="16384" crc="35484751" sha1="e18a603b18b85e24f9c938b33b6077a767c1fa9c" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="dcathlon">
+	<software name="decathln">
 		<description>The Activision Decathlon</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="dcathlon.bin" size="16384" crc="f43e7cd0" sha1="db203973df13b071da46d52fdb078a76f4db428d" offset="0" />
+				<rom name="decathln.bin" size="16384" crc="f43e7cd0" sha1="db203973df13b071da46d52fdb078a76f4db428d" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="asterpro">
-		<description>Asteroids (Proto)</description>
+	<software name="asteroid">
+		<description>Asteroids (Prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="asterpro.bin" size="8192" crc="38480891" sha1="18697dd8e640fa1578b3b4ae09af484c14fb8410" offset="0" />
+				<rom name="asteroid.bin" size="8192" crc="38480891" sha1="18697dd8e640fa1578b3b4ae09af484c14fb8410" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -67,35 +67,35 @@
 		</part>
 	</software>
 
-	<software name="barballp">
-		<description>Barroom Baseball (Proto)</description>
+	<software name="barbball">
+		<description>Barroom Baseball (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="barballp.bin" size="32768" crc="21d19c8f" sha1="510ccb20df2ecdbe7f8373de6a9fc11493e8c3f2" offset="0" />
+				<rom name="barbball.bin" size="32768" crc="21d19c8f" sha1="510ccb20df2ecdbe7f8373de6a9fc11493e8c3f2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="bttlzone">
-		<description>Battlezone (Proto)</description>
+	<software name="bzone">
+		<description>Battlezone (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="bttlzone.bin" size="16384" crc="b3b8e314" sha1="a339cddfc28477c21c58783d2d3b0cf0f4626ddf" offset="0" />
+				<rom name="bzone.bin" size="16384" crc="b3b8e314" sha1="a339cddfc28477c21c58783d2d3b0cf0f4626ddf" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="beamrder">
+	<software name="beamrid">
 		<description>Beamrider</description>
 		<year>1983</year>
 		<publisher>Activision</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="beamrder.bin" size="16384" crc="9bae58dc" sha1="b75d555d059ad61992f9f5a234129ecbf9504c35" offset="0" />
+				<rom name="beamrid.bin" size="16384" crc="9bae58dc" sha1="b75d555d059ad61992f9f5a234129ecbf9504c35" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -112,7 +112,7 @@
 	</software>
 
 	<software name="blckbelt">
-		<description>Black Belt (Proto)</description>
+		<description>Black Belt (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -123,7 +123,7 @@
 	</software>
 
 	<software name="blaster">
-		<description>Blaster (Proto)</description>
+		<description>Blaster (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -155,24 +155,24 @@
 		</part>
 	</software>
 
-	<software name="buckrgrs">
+	<software name="buckrog">
 		<description>Buck Rogers</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="buckrgrs.bin" size="16384" crc="04807705" sha1="bc7c81f758dd3e224e42ac8a16c1a12d69aed722" offset="0" />
+				<rom name="buckrog.bin" size="16384" crc="04807705" sha1="bc7c81f758dd3e224e42ac8a16c1a12d69aed722" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="centpede">
+	<software name="centiped">
 		<description>Centipede</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="centpede.bin" size="16384" crc="536a70fe" sha1="eb343b90d3de696e69b1f039d4fb2c6afb0d80c0" offset="0" />
+				<rom name="centiped.bin" size="16384" crc="536a70fe" sha1="eb343b90d3de696e69b1f039d4fb2c6afb0d80c0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -188,13 +188,13 @@
 		</part>
 	</software>
 
-	<software name="congbong">
+	<software name="congo">
 		<description>Congo Bongo</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="congbong.bin" size="16384" crc="f1f42bbd" sha1="e0203c2124127eba2d679be548fa257ecc5b2607" offset="0" />
+				<rom name="congo.bin" size="16384" crc="f1f42bbd" sha1="e0203c2124127eba2d679be548fa257ecc5b2607" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -255,7 +255,7 @@
 	</software>
 
 	<software name="finalleg">
-		<description>Final Legacy (Proto)</description>
+		<description>Final Legacy (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -265,13 +265,13 @@
 		</part>
 	</software>
 
-	<software name="frskytom">
-		<description>Frisky Tom (Proto)</description>
+	<software name="friskyt">
+		<description>Frisky Tom (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="frskytom.bin" size="16384" crc="04b299a4" sha1="69dcc8f59ca449f13dc896b4b29b534762d97064" offset="0" />
+				<rom name="friskyt.bin" size="16384" crc="04b299a4" sha1="69dcc8f59ca449f13dc896b4b29b534762d97064" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -376,7 +376,7 @@
 	</software>
 
 	<software name="jrpacman">
-		<description>Jr Pacman (Proto)</description>
+		<description>Jr Pacman (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -386,13 +386,13 @@
 		</part>
 	</software>
 
-	<software name="jnglhunt">
+	<software name="jungleh">
 		<description>Jungle Hunt</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="jnglhunt.bin" size="16384" crc="2c676662" sha1="fa02ee04cfad90c6ccf9d9b984e3b7b3327fec12" offset="0" />
+				<rom name="jungleh.bin" size="16384" crc="2c676662" sha1="fa02ee04cfad90c6ccf9d9b984e3b7b3327fec12" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -442,7 +442,7 @@
 	</software>
 
 	<software name="laststar">
-		<description>The Last Starfighter (Proto)</description>
+		<description>The Last Starfighter (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -453,7 +453,7 @@
 	</software>
 
 	<software name="loontoon">
-		<description>Looney Tunes Hotel (Proto)</description>
+		<description>Looney Tunes Hotel (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -463,19 +463,19 @@
 		</part>
 	</software>
 
-	<software name="mariobro">
+	<software name="mario">
 		<description>Mario Bros.</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="mariobro.bin" size="32768" crc="873742f1" sha1="a293b6b06050e11029d97137f2b1b36059567273" offset="0" />
+				<rom name="mario.bin" size="32768" crc="873742f1" sha1="a293b6b06050e11029d97137f2b1b36059567273" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="meebzork">
-		<description>Meebzork (Proto)</description>
+		<description>Meebzork (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -496,35 +496,35 @@
 		</part>
 	</software>
 
-	<software name="mteortes">
+	<software name="meteorit">
 		<description>Meteorites</description>
 		<year>1983</year>
 		<publisher>Electra Concepts</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="mteortes.bin" size="16384" crc="ab8e035b" sha1="32d86a381feff43149b66336dcc4ba2523273228" offset="0" />
+				<rom name="meteorit.bin" size="16384" crc="ab8e035b" sha1="32d86a381feff43149b66336dcc4ba2523273228" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mgmmonsb">
-		<description>Microgammon SB (Proto)</description>
+	<software name="microgam">
+		<description>Microgammon SB (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="mgmmonsb.bin" size="16384" crc="931a454a" sha1="2f152a857a8a58d602b3c717612d9744423ee495" offset="0" />
+				<rom name="microgam.bin" size="16384" crc="931a454a" sha1="2f152a857a8a58d602b3c717612d9744423ee495" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="mllipede">
-		<description>Millipede (Proto)</description>
+	<software name="milliped">
+		<description>Millipede (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="mllipede.bin" size="16384" crc="969cfe1a" sha1="1243a8ecfc02a74ae4e1f4fcda38502776f45cb0" offset="0" />
+				<rom name="milliped.bin" size="16384" crc="969cfe1a" sha1="1243a8ecfc02a74ae4e1f4fcda38502776f45cb0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -541,7 +541,7 @@
 	</software>
 
 	<software name="minigolf">
-		<description>Miniature Golf (Proto)</description>
+		<description>Miniature Golf (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -551,35 +551,35 @@
 		</part>
 	</software>
 
-	<software name="msslecom">
+	<software name="missile">
 		<description>Missile Command</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="msslecom.bin" size="8192" crc="44d3ff6f" sha1="5c8ec22e131810ccac08066ca96e9944ccfa4ecb" offset="0" />
+				<rom name="missile.bin" size="8192" crc="44d3ff6f" sha1="5c8ec22e131810ccac08066ca96e9944ccfa4ecb" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="montzrev">
+	<software name="montezum">
 		<description>Montezuma's Revenge</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="montzrev.bin" size="16384" crc="2a640143" sha1="7e2a05625598c7e6615f969aa695e64315cd9846" offset="0" />
+				<rom name="montezum.bin" size="16384" crc="2a640143" sha1="7e2a05625598c7e6615f969aa695e64315cd9846" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="moonpatr">
+	<software name="mpatrol">
 		<description>Moon Patrol</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="moonpatr.bin" size="16384" crc="d0b2f285" sha1="02dd5b9278c06ae8cbb6dacc094e238fbacf08d2" offset="0" />
+				<rom name="mpatrol.bin" size="16384" crc="d0b2f285" sha1="02dd5b9278c06ae8cbb6dacc094e238fbacf08d2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -595,13 +595,13 @@
 		</part>
 	</software>
 
-	<software name="mrdocast">
+	<software name="docastle">
 		<description>Mr. Do!'s Castle</description>
 		<year>1984</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="mrdocast.bin" size="8192" crc="aa55f9be" sha1="002e6f8c7533b03f8041e7f1896589c0ab0e17a6" offset="0" />
+				<rom name="docastle.bin" size="8192" crc="aa55f9be" sha1="002e6f8c7533b03f8041e7f1896589c0ab0e17a6" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -650,13 +650,13 @@
 		</part>
 	</software>
 
-	<software name="poleposn">
+	<software name="polepos">
 		<description>Pole Position</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="poleposn.bin" size="16384" crc="abc2d1e4" sha1="d504764c5894ee99c0b5e2024cbe833ebba3ab17" offset="0" />
+				<rom name="polepos.bin" size="16384" crc="abc2d1e4" sha1="d504764c5894ee99c0b5e2024cbe833ebba3ab17" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -717,7 +717,7 @@
 	</software>
 
 	<software name="rsbktbll">
-		<description>RealSports Basketball (83-12-16)</description>
+		<description>RealSports Basketball (19831216)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -727,24 +727,24 @@
 		</part>
 	</software>
 
-	<software name="rsbktblo">
-		<description>RealSports Basketball (83-10-31) (Proto)</description>
+	<software name="rsbktbll1" cloneof="rsbktbll">
+		<description>RealSports Basketball (Prototype, 19831031)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="rsbktblo.bin" size="32768" crc="c90196fa" sha1="9edb066a37ca7657979952c946ab89be7926f4f8" offset="0" />
+				<rom name="rsbktbll1.bin" size="32768" crc="c90196fa" sha1="9edb066a37ca7657979952c946ab89be7926f4f8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="rsbktblp">
-		<description>RealSports Basketball (82-11-05) (Proto)</description>
+	<software name="rsbktbll2" cloneof="rsbktbll">
+		<description>RealSports Basketball (Prototype, 19821105)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="rsbktblp.bin" size="16384" crc="0f996184" sha1="2b43f74db4833272d2048de8fa32b857af8e090f" offset="0" />
+				<rom name="rsbktbll2.bin" size="16384" crc="0f996184" sha1="2b43f74db4833272d2048de8fa32b857af8e090f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -782,13 +782,13 @@
 		</part>
 	</software>
 
-	<software name="rescuefr">
+	<software name="fractlus">
 		<description>Rescue on Fractalus!</description>
 		<year>1986</year>
 		<publisher>Atari / Lucasfilm</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="rescuefr.bin" size="32768" crc="762c591b" sha1="9253d7286cf87999474b37df242ba23b4358ef4a" offset="0" />
+				<rom name="fractlus.bin" size="32768" crc="762c591b" sha1="9253d7286cf87999474b37df242ba23b4358ef4a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -804,13 +804,13 @@
 		</part>
 	</software>
 
-	<software name="roadrnnr">
-		<description>Road Runner (Proto)</description>
+	<software name="roadrunn">
+		<description>Road Runner (Prototype)</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="roadrnnr.bin" size="16384" crc="a97606ab" sha1="0a7aaef5b0ede927cea13e724906207e1db48068" offset="0" />
+				<rom name="roadrunn.bin" size="16384" crc="a97606ab" sha1="0a7aaef5b0ede927cea13e724906207e1db48068" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -837,13 +837,13 @@
 		</part>
 	</software>
 
-	<software name="spceinvr">
+	<software name="spaceinv">
 		<description>Space Invaders</description>
 		<year>1982</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="spceinvr.bin" size="8192" crc="de5c354a" sha1="cf411db770217b5af5fcfa32725cc587a8b9e710" offset="0" />
+				<rom name="spaceinv.bin" size="8192" crc="de5c354a" sha1="cf411db770217b5af5fcfa32725cc587a8b9e710" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -860,7 +860,7 @@
 	</software>
 
 	<software name="spitfire">
-		<description>Spitfire (Proto)</description>
+		<description>Spitfire (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -871,7 +871,7 @@
 	</software>
 
 	<software name="sprtgoof">
-		<description>Sport Goofy (Proto)</description>
+		<description>Sport Goofy (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -914,19 +914,19 @@
 		</part>
 	</software>
 
-	<software name="starwrsa">
+	<software name="swa">
 		<description>Star Wars - The Arcade Game</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="starwrsa.bin" size="16384" crc="75f566df" sha1="ab676ffe054b23bdd43cee2498afefaabbf9355b" offset="0" />
+				<rom name="swa.bin" size="16384" crc="75f566df" sha1="ab676ffe054b23bdd43cee2498afefaabbf9355b" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="stargate">
-		<description>Stargate (Proto)</description>
+		<description>Stargate (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -947,46 +947,46 @@
 		</part>
 	</software>
 
-	<software name="sprcobra">
+	<software name="scobra">
 		<description>Super Cobra</description>
 		<year>1983</year>
 		<publisher>Parker Brothers</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="8192">
-				<rom name="sprcobra.bin" size="8192" crc="97debcd2" sha1="8205093f5fb1fdf0ccb71d667ea0a3849fb0a0f2" offset="0" />
+				<rom name="scobra.bin" size="8192" crc="97debcd2" sha1="8205093f5fb1fdf0ccb71d667ea0a3849fb0a0f2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="sprpacmn">
-		<description>Super Pacman (Proto)</description>
+	<software name="spacman">
+		<description>Super Pacman (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="sprpacmn.bin" size="16384" crc="0a4ddb1e" sha1="238cb448555d8bb5c96aa0354718411e8777c613" offset="0" />
+				<rom name="spacman.bin" size="16384" crc="0a4ddb1e" sha1="238cb448555d8bb5c96aa0354718411e8777c613" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="tempestp">
-		<description>Tempest (Proto)</description>
+	<software name="tempest">
+		<description>Tempest (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="tempestp.bin" size="16384" crc="1187342f" sha1="85fcea0a4d4d1f22437801c96229ba96e0f6b711" offset="0" />
+				<rom name="tempest.bin" size="16384" crc="1187342f" sha1="85fcea0a4d4d1f22437801c96229ba96e0f6b711" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="trckafld">
-		<description>Track and Field (Proto)</description>
+	<software name="trackfld">
+		<description>Track and Field (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="trckafld.bin" size="16384" crc="0ba22ece" sha1="9dfbb5d8b77504c66ce3ac4382daf79820393dd8" offset="0" />
+				<rom name="trackfld.bin" size="16384" crc="0ba22ece" sha1="9dfbb5d8b77504c66ce3ac4382daf79820393dd8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1002,19 +1002,19 @@
 		</part>
 	</software>
 
-	<software name="wizofwar">
+	<software name="wow">
 		<description>Wizard of Wor</description>
 		<year>1983</year>
 		<publisher>CBS Electronics</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="16384">
-				<rom name="wizofwar.bin" size="16384" crc="d6f7ddfd" sha1="49debdf3c133fde9905d6d9137da5d8dff8d6283" offset="0" />
+				<rom name="wow.bin" size="16384" crc="d6f7ddfd" sha1="49debdf3c133fde9905d6d9137da5d8dff8d6283" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="xariarna">
-		<description>Xari Arena (Proto)</description>
+		<description>Xari Arena (Prototype)</description>
 		<year>1983</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
@@ -1024,13 +1024,13 @@
 		</part>
 	</software>
 
-	<software name="xeviousp">
-		<description>Xevious (Proto)</description>
+	<software name="xevious">
+		<description>Xevious (Prototype)</description>
 		<year>1984</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="xeviousp.bin" size="32768" crc="382634dc" sha1="c3cf33216dfa484309b923f21829d040486bc481" offset="0" />
+				<rom name="xevious.bin" size="32768" crc="382634dc" sha1="c3cf33216dfa484309b923f21829d040486bc481" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1134,32 +1134,35 @@
 		</part>
 	</software>
 
-	<software name="csltblst">
-		<description>Castle Blast (Unl)</description>
+	<software name="cblast">
+		<description>Castle Blast</description>
 		<year>2002</year>
-		<publisher>Ronen Habot</publisher>
+        <!-- by Ronen Habot -->
+		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="csltblst.bin" size="32768" crc="7c988054" sha1="c1a56a1fc51e09b1d8e93af40ddd7596847e6164" offset="0" />
+				<rom name="cblast.bin" size="32768" crc="7c988054" sha1="c1a56a1fc51e09b1d8e93af40ddd7596847e6164" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="csltcrss">
-		<description>Castle Crisis (Unl)</description>
+	<software name="ccrisis">
+		<description>Castle Crisis</description>
 		<year>2004</year>
-		<publisher>Bryan Edewaard</publisher>
+        <!-- by Bryan Edewaard -->
+		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="csltcrss.bin" size="32768" crc="d50e4061" sha1="4e022e101d7346a0a8618018372740e7333b4a36" offset="0" />
+				<rom name="ccrisis.bin" size="32768" crc="d50e4061" sha1="4e022e101d7346a0a8618018372740e7333b4a36" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
 	<software name="koffiyk">
-		<description>Koffi: Yellow Kopter (Unl)</description>
+		<description>Koffi: Yellow Kopter</description>
 		<year>2002</year>
-		<publisher>Ron Lloyd</publisher>
+        <!-- by Ron Lloyd -->
+		<publisher>&lt;unlicensed&gt;</publisher>
 		<part name="cart" interface="a5200_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="koffiyk.bin" size="32768" crc="917be656" sha1="9547c56e2951e1b3a713b0b99d3edb43c9d3cdd8" offset="0" />
