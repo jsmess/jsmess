@@ -69,7 +69,6 @@ typedef struct _mc6847_config mc6847_config;
 struct _mc6847_config
 {
 	m6847_type type;
-	int cpu0_timing_factor;
 
 	UINT8 (*get_char_rom)(running_machine *machine, UINT8 ch, int line);
 
@@ -92,9 +91,6 @@ DECLARE_LEGACY_DEVICE(MC6847, mc6847);
 
 #define MDRV_MC6847_TYPE(_type) \
 	MDRV_DEVICE_CONFIG_DATA32(mc6847_config, type, _type)
-
-#define MDRV_MC6847_TIMING_FACTOR(_factor) \
-	MDRV_DEVICE_CONFIG_DATA32(mc6847_config, cpu0_timing_factor, _factor)
 
 #define MDRV_MC6847_CHAR_ROM(_get_char_rom) \
 	MDRV_DEVICE_CONFIG_DATAPTR(mc6847_config, get_char_rom, _get_char_rom)

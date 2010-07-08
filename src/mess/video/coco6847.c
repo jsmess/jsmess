@@ -1829,7 +1829,7 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 {
 	const m6847_variant *v;
 	UINT32 frequency;
-	attoseconds_t period, frame_period, cpu0_clock_period = 0;
+	attoseconds_t period, frame_period;
 	double total_scanlines;
 
 	/* identify proper M6847 variant */
@@ -1886,13 +1886,6 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 		* ((UINT32) (v->clocks_per_scanline * FACTOR_CLOCKS_PER_SCANLINE));
 	period = ATTOSECONDS_PER_SECOND / frequency;
 
-	/* choose CPU clock, if specified */
-	if (cfg->cpu0_timing_factor > 0)
-	{
-		cpu0_clock_period = period * cfg->cpu0_timing_factor * GROSS_FACTOR;
-		cpu_set_clock(machine->firstcpu, ATTOSECONDS_PER_SECOND / cpu0_clock_period);
-	}
-
 	/* calculate timing */
 	total_scanlines = v->vblank_scanlines
 		+ v->top_border_scanlines
@@ -1921,8 +1914,6 @@ void m6847_init(running_machine *machine, const m6847_config *cfg)
 	{
 		logerror("m6847_init():\n");
 		logerror("\tclock:      %30s sec\n", attotime_string(attotime_make(0, period * GROSS_FACTOR), ATTOTIME_STRING_PRECISION));
-		if (cpu0_clock_period > 0)
-			logerror("\tCPU0 clock: %30s sec\n", attotime_string(attotime_make(0, cpu0_clock_period), ATTOTIME_STRING_PRECISION));
 		logerror("\tscanline:   %30s sec\n", attotime_string(attotime_make(0, m6847->scanline_period), ATTOTIME_STRING_PRECISION));
 		logerror("\tfield sync: %30s sec\n", attotime_string(attotime_make(0, m6847->field_sync_period), ATTOTIME_STRING_PRECISION));
 		logerror("\thorz sync:  %30s sec\n", attotime_string(attotime_make(0, m6847->horizontal_sync_period), ATTOTIME_STRING_PRECISION));
