@@ -28237,8 +28237,8 @@
 		</part>
 	</software>
 
+	<software name="smbtnwca" cloneof="smbtnwc">
 		<!-- Serial: NES-ZZ (FRG/SCN) - Release Date: 1988-11 -->
-	<!--software name="smbtnwca" cloneof="smbtnwc">
 		<description>Super Mario Bros. / Tetris / Nintendo World Cup (Euro)</description>
 		<year>1988</year>
 		<publisher>Nintendo</publisher>
@@ -28252,7 +28252,7 @@
 				<rom name="0.chr" size="262144" crc="bd06932a" sha1="2de4136620ba64618592dcbb288c109567d83ec8" offset="00000" />
 			</dataarea>
 		</part>
-	</software-->
+	</software>
 
 	<software name="smbtnwc">
 		<!-- Serial: NES-ZZ-FRG - Release Date: 1988-11 -->
