@@ -69,7 +69,7 @@ ROM01   - Toshiba TMM2464P 8Kx8 one-time PROM, labeled "0.1"
 ROM23   - Toshiba TMM2464P 8Kx8 one-time PROM, labeled "23"
 6502    - Rockwell R6502AP 8-bit Microprocessor
 6821    - Hitachi HD468B21P Peripheral Interface Adaptor
-VDC     - most likely TMS9929A (covered w/heatsink)
+VDC     - Texas Instruments TMS9929A Video Display Controller (covered w/heatsink)
 PSG     - Texas Instruments SN76489AN Programmable Sound Generator
 X       - some kind of RAM chip (covered w/heatsink)
 CN1     - sub board connector (17x2 pin header)
@@ -373,6 +373,14 @@ static const TMS9928a_interface tms9929_intf =
 	crvision_vdp_interrupt
 };
 
+static const TMS9928a_interface tms9929a_intf =
+{
+	TMS9929A,
+	0x4000,
+	0, 0,
+	crvision_vdp_interrupt
+};
+
 static WRITE8_DEVICE_HANDLER( crvision_pia_porta_w )
 {
 	/*
@@ -548,6 +556,13 @@ static MACHINE_START( pal )
 	MACHINE_START_CALL(creativision);
 
 	TMS9928A_configure(&tms9929_intf);
+}
+
+static MACHINE_START( lasr2001 )
+{
+	MACHINE_START_CALL(creativision);
+
+	TMS9928A_configure(&tms9929a_intf);
 }
 
 static DEVICE_IMAGE_LOAD( crvision_cart )
@@ -742,7 +757,7 @@ static MACHINE_DRIVER_START( lasr2001 )
 	MDRV_CPU_PROGRAM_MAP(lasr2001_map)
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
 
-	MDRV_MACHINE_START(pal)
+	MDRV_MACHINE_START(lasr2001)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
