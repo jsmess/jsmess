@@ -906,6 +906,9 @@ static MACHINE_START( vii )
 	state->controller_input[4] = 0;
 	state->controller_input[6] = 0xff;
 	state->controller_input[7] = 0;
+
+	UINT8 *rom = memory_region( machine, "cart" );
+	memcpy(state->cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
 }
 
 static MACHINE_RESET( vii )
@@ -968,7 +971,6 @@ static MACHINE_DRIVER_START( vii )
 
 	MDRV_CARTSLOT_ADD( "cart" )
 	MDRV_CARTSLOT_EXTENSION_LIST( "bin" )
-	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD( vii_cart )
 	MDRV_CARTSLOT_INTERFACE("vii_cart")
 
@@ -1060,6 +1062,7 @@ ROM_START( vii )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASEFF )      /* dummy region for u'nSP */
 
 	ROM_REGION( 0x2000000, "cart", ROMREGION_ERASE00 )
+	ROM_LOAD( "vii.bin", 0x0000, 0x2000000, CRC(04627639) SHA1(f883a92d31b53c9a5b0cdb112d07cd793c95fc43))
 ROM_END
 
 ROM_START( batman )
