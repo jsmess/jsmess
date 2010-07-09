@@ -841,12 +841,18 @@ static DEVICE_IMAGE_LOAD( vii_cart )
 {
 	vii_state *state = (vii_state *)image.device().machine->driver_data;
 	UINT8 *cart = memory_region( image.device().machine, "cart" );
-	int size = image.length();
-
-	if( image.fread(cart, size ) != size )
+	if (image.software_entry() == NULL)
 	{
-		image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-		return IMAGE_INIT_FAIL;
+		int size = image.length();
+
+		if( image.fread(cart, size ) != size )
+		{
+			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
+			return IMAGE_INIT_FAIL;
+		}
+	} else {
+		int filesize = image.get_software_region_length("rom");
+		memcpy(cart, image.get_software_region("rom"), filesize);
 	}
 
 	memcpy(state->cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
@@ -869,16 +875,22 @@ static DEVICE_IMAGE_LOAD( vsmile_cart )
 {
 	vii_state *state = (vii_state *)image.device().machine->driver_data;
 	UINT8 *cart = memory_region( image.device().machine, "cart" );
-	int size = image.length();
-
-	if( image.fread( cart, size ) != size )
+	if (image.software_entry() == NULL)
 	{
-		image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
-		return IMAGE_INIT_FAIL;
+		int size = image.length();
+
+		if( image.fread( cart, size ) != size )
+		{
+			image.seterror( IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file" );
+			return IMAGE_INIT_FAIL;
+		}		
 	}
-
+	else
+	{
+		int filesize = image.get_software_region_length("rom");
+		memcpy(cart, image.get_software_region("rom"), filesize);
+	}
 	memcpy(state->cart, cart + 0x4000*2, (0x400000 - 0x4000) * 2);
-
 	return IMAGE_INIT_PASS;
 }
 
@@ -958,9 +970,12 @@ static MACHINE_DRIVER_START( vii )
 	MDRV_CARTSLOT_EXTENSION_LIST( "bin" )
 	MDRV_CARTSLOT_MANDATORY
 	MDRV_CARTSLOT_LOAD( vii_cart )
+	MDRV_CARTSLOT_INTERFACE("vii_cart")
 
 	MDRV_VIDEO_START( vii )
 	MDRV_VIDEO_UPDATE( vii )
+	
+	MDRV_SOFTWARE_LIST_ADD("vii_cart","vii")	
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vsmile )
