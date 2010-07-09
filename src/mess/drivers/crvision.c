@@ -19,10 +19,14 @@
         * Christmas Demo 1.0
         * Titanic Frogger Demo 1.0
         * Titanic Frogger Demo 1.1
+
+	- manager keyboard
+	- manager 16K RAM mapping
+
 */
 
 /*
-	
+
 Salora Manager
 
 PCB Layout
@@ -31,79 +35,79 @@ PCB Layout
 Main board
 
 |-------------------------------------------------------------------------------|
-|				|-----CN1-----|				|-----CN2-----|						|
-|																	10.738MHz	--|
-|									X										CN3	  |
-|		ROM01												VDC					  |
-|									X											--|
-|																				|
-|		ROM23						X											|
-|																				|
-|									X											|
-|	LS04																		--|
-|									X						6821				  |
-|	LS32																		  |
-|									X											  |
-|	LS139											PSG							  |
-|									X											  |
-|	LS138																		  |
-|									X										CN4	  |
-|	LS244																		  |
-|																				  |
-|	LS245																		  |
-|																				  |
-|					LS244														  |
-|		6502																	--|
-|					LS244														|
-|															CN5					|
+|               |-----CN1-----|             |-----CN2-----|                     |
+|                                                                   10.738MHz   --|
+|                                   X                                       CN3   |
+|       ROM01                                               VDC                   |
+|                                   X                                           --|
+|                                                                               |
+|       ROM23                       X                                           |
+|                                                                               |
+|                                   X                                           |
+|   LS04                                                                        --|
+|                                   X                       6821                  |
+|   LS32                                                                          |
+|                                   X                                             |
+|   LS139                                           PSG                           |
+|                                   X                                             |
+|   LS138                                                                         |
+|                                   X                                       CN4   |
+|   LS244                                                                         |
+|                                                                                 |
+|   LS245                                                                         |
+|                                                                                 |
+|                   LS244                                                         |
+|       6502                                                                    --|
+|                   LS244                                                       |
+|                                                           CN5                 |
 |-------------------------------------------------------------------------------|
 
 Notes:
 All IC's shown. Prototype-ish board, with many jumper wires and extra capacitors.
 
-ROM01	- Toshiba TMM2464P 8Kx8 one-time PROM, labeled "0.1"
-ROM23	- Toshiba TMM2464P 8Kx8 one-time PROM, labeled "23"
-6502	- Rockwell R6502AP 8-bit Microprocessor
-6821	- Hitachi HD468B21P Peripheral Interface Adaptor
-VDC		- most likely TMS9929A (covered w/heatsink)
-PSG		- Texas Instruments SN76489AN Programmable Sound Generator
-X		- some kind of RAM chip (covered w/heatsink)
-CN1		- sub board connector (17x2 pin header)
-CN2		- RF board connector (17x1 pin header)
-CN3		- tape connector (7x2 PCB edge male)
-CN4		- expansion connector (30x2 PCB edge male)
-CN5		- cartridge connector (18x2 PCB edge female)
+ROM01   - Toshiba TMM2464P 8Kx8 one-time PROM, labeled "0.1"
+ROM23   - Toshiba TMM2464P 8Kx8 one-time PROM, labeled "23"
+6502    - Rockwell R6502AP 8-bit Microprocessor
+6821    - Hitachi HD468B21P Peripheral Interface Adaptor
+VDC     - most likely TMS9929A (covered w/heatsink)
+PSG     - Texas Instruments SN76489AN Programmable Sound Generator
+X       - some kind of RAM chip (covered w/heatsink)
+CN1     - sub board connector (17x2 pin header)
+CN2     - RF board connector (17x1 pin header)
+CN3     - tape connector (7x2 PCB edge male)
+CN4     - expansion connector (30x2 PCB edge male)
+CN5     - cartridge connector (18x2 PCB edge female)
 
 Sub board
 
 |---------------------------------------|
-|	17.73447MHz	|-----CN1-----|			|
-|										|
-|	74S04						4116	|
-|										|
-|	LS90						4116	|
-|										|
-|	LS10						4116	|
-|										|
-|	LS367						4116	|
-|										|
-|	LS393						4116	|
-|										|
-|	LS244						4116	|
-|										|
-|	LS257						4116	|
-|										|
-|	LS257						4116	|
-|										|
-|								LS139	|
-|										|
+|   17.73447MHz |-----CN1-----|         |
+|                                       |
+|   74S04                       4116    |
+|                                       |
+|   LS90                        4116    |
+|                                       |
+|   LS10                        4116    |
+|                                       |
+|   LS367                       4116    |
+|                                       |
+|   LS393                       4116    |
+|                                       |
+|   LS244                       4116    |
+|                                       |
+|   LS257                       4116    |
+|                                       |
+|   LS257                       4116    |
+|                                       |
+|                               LS139   |
+|                                       |
 |---------------------------------------|
 
 Notes:
 All IC's shown.
 
-4116	- Toshiba TMM416P-3 16Kx1 RAM
-CN1		- main board connector (17x2 pin header)
+4116    - Toshiba TMM416P-3 16Kx1 RAM
+CN1     - main board connector (17x2 pin header)
 
 */
 
@@ -160,6 +164,8 @@ static ADDRESS_MAP_START( lasr2001_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_register_r)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_register_w)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK(BANK_ROM2)
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(BANK_ROM1)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 
@@ -336,6 +342,7 @@ static INPUT_PORTS_START( crvision )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( manager )
+	PORT_INCLUDE( crvision )
 INPUT_PORTS_END
 
 /* Machine Interface */
@@ -765,8 +772,7 @@ static MACHINE_DRIVER_START( lasr2001 )
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("1K")	// MAIN RAM
-	MDRV_RAM_EXTRA_OPTIONS("15K") // 16K expansion (lower 14K available only, upper 2K shared with BIOS ROM)
+	MDRV_RAM_DEFAULT_SIZE("16K")
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -801,7 +807,7 @@ ROM_END
 
 /* System Drivers */
 
-/*    YEAR  NAME        PARENT		COMPAT	MACHINE		INPUT       INIT	COMPANY                   FULLNAME */
+/*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT    COMPANY                   FULLNAME */
 CONS( 1982,	crvision,   0,          0,		pal,		crvision,	0,		"Video Technology",       "CreatiVision", 0 )
 CONS( 1982,	fnvision,   crvision,   0,		pal,		crvision,	0,		"Video Technology",       "FunVision", 0 )
 CONS( 1982,	crvisioj,   crvision,   0,		ntsc,		crvision,	0,		"Cheryco",                "CreatiVision (Japan)", 0 )
@@ -810,7 +816,7 @@ CONS( 1982,	rameses,    crvision,   0,		pal,		crvision,	0,		"Hanimex",          
 CONS( 1983,	vz2000,     crvision,   0,		pal,		crvision,	0,		"Dick Smith Electronics", "VZ 2000 (Oceania)", 0 )
 CONS( 1983,	crvisio2,   crvision,   0,		pal,		crvision,	0,		"Video Technology",       "CreatiVision MK-II (Europe)", 0 )
 /*
-COMP( 1983,	lasr2001,   0,          0,		lasr2001,	lasr2001,	0,		"Video Technology",       "Laser 2001", GAME_NOT_WORKING )
-COMP( 1983, vz2001,     lasr2001,   0,		lasr2001,	lasr2001,	0,		"Dick Smith Electronics", "VZ 2001 (Oceania)", GAME_NOT_WORKING )
+COMP( 1983, lasr2001,   0,          0,      lasr2001,   lasr2001,   0,      "Video Technology",       "Laser 2001", GAME_NOT_WORKING )
+COMP( 1983, vz2001,     lasr2001,   0,      lasr2001,   lasr2001,   0,      "Dick Smith Electronics", "VZ 2001 (Oceania)", GAME_NOT_WORKING )
 */
 COMP( 1983,	manager,    0,			0,		lasr2001,   manager,	0,		"Salora",                 "Manager (Finland)", GAME_NOT_WORKING )
