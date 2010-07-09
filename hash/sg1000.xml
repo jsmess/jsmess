@@ -1,6 +1,40 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!-- Othello Multivision carts are marked with OMV -->
+<!--
+Many SG-1000 games were also sold in Taiwan by Aaronix
+These are mostly undumped (except a few, thanks to Bock and SMS Power)
+and probably many more exist
+
+codes: "color of the cart"-"game number". colors: White, Blue and Red.
+
+W-011 世界棒球賽 -> G-1011 Champion Baseball
+W-012 辛巴達 -> G-1012 Sindbad Mystery
+W-020 迷魂車 -> G-1020 Pacar
+W-022 蜜蜂二代 -> G-1022 Sega Galaga
+B-026 摩托車遊美國 -> G-1026 Zippy Race
+B-028 火鳳凰 -> G-1028 Exerion
+B-031 尋寶記(敲金塊) -> G-1031 Lode Runner
+B-035 貓抓老鼠 -> G-1035 Hustle Chumy
+B-036 餓貓抓小雞 -> G-1036 Flicky
+B-042 奧運大賽 -> G-1042 Konami's Hyper Sports
+B-043 星際大戰 -> G-1043 Star Force [dumped]
+
+R-046 精武門 -> C-46 Dragon Wang [dumped]
+R-048 飛狼 -> C-48 Choplifter
+R-049 法櫃奇兵 -> C-49 Pitfall II
+R-050 企鵝 -> C-50 Penguin Land [dumped]
+R-051 救難小英雄 -> C-51 Drol
+R-052 打漁 -> C-52 Chack'n Pop
+R-054 摩天大樓 -> C-54 Rock n' Bolt	
+R-055 諜對諜 -> C-55 Elevator Action	
+R-056 倉庫番 -> C-56 Sokoban	
+R-062 摩托飛車 -> ?? maybe is the same as B-026 (i.e. Zippy Race)
+R-065 忍者公主 -> C-65 Ninja Princess
+R-066 超級坦克 -> C-66 Super Tank
+
+-->
+
 <softwarelist name="sg1000" description="Sega SG-1000 and SG-1000 MarkII cartridges">
 	<software name="bankpani">
 		<description>Bank Panic (Jpn)</description>
@@ -255,13 +289,13 @@
 		</part>
 	</software>
 
-	<software name="dokidokip" cloneof="dokidoki">
-		<description>Dokidoki Penguin Land (Pirate)</description>
+	<software name="dokidokit" cloneof="dokidoki">
+		<description>Dokidoki Penguin Land (Tw)</description>
 		<year>1985?</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="doki doki penguin land (19xx)(-)(hk)[p].bin" size="32768" crc="fdc095bc" sha1="176e2d2648b20e6fac823021697138803ef38b27" offset="000000" />
+				<rom name="doki doki penguin land (19xx)(-)(tw).bin" size="32768" crc="fdc095bc" sha1="176e2d2648b20e6fac823021697138803ef38b27" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -273,6 +307,18 @@
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="dragon wang (japan).bin" size="32768" crc="99c3de21" sha1="43807c9f634b8cf85aa5c3b2459885eedbb99955" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="jingwumn" cloneof="dragwang">
+    <!-- Alt. Title: 精武門 -->
+		<description>Jing Wu Men (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="dragon wang (tw).bin" size="32768" crc="7c7d4397" sha1="57ade81eaa044d69621741d8c5f5c5e8650f6c2b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -443,7 +489,7 @@
 		</part>
 	</software>
 
-	<!-- //only game not touched by Sega in any way? -->
+	<!-- only game not touched by Sega in any way? -->
 	<software name="hustle">
 		<description>Hustle Chumy (Jpn)</description>
 		<year>1984</year>
@@ -804,6 +850,18 @@
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="star force (japan).bin" size="32768" crc="b846b52a" sha1="d38875cb08de0ea892e5ef80f93987bbc445ef8f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="starforct" cloneof="starforc">
+    <!-- Alt. Title: Star Wars ~ 星際大戰 -->
+		<description>Star Force (Tw)</description>
+		<year>1985?</year>
+		<publisher>Aaronix</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="star force (tw).bin" size="32768" crc="1f736931" sha1="f3ddf97ddf0e40289e38d9105300f15ec7eab78c" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

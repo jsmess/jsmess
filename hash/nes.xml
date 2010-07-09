@@ -43855,7 +43855,7 @@ Also notice that VRAM, WRAM & mirror are probably incorrect for some of these se
 		</part>
 	</software>
 
-	<!-- TC-031 is unknown. Possibly "The Bridge", an unreleased proto -->
+	<!-- TC-031 is unknown. Possibly "Bridge", an unreleased proto -->
 
 	<software name="chuugokt" supported="no">
 		<!-- Serial: TC-032 - Release Date:  - Alternative Title:  -->
