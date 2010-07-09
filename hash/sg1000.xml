@@ -1,6 +1,28 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<!-- Othello Multivision carts are marked with OMV -->
+<!-- Othello Multivision carts are marked with OMV.
+Known undumped OMV games
+  OM-G004   3-nin Mahjong ~ 三人麻雀	
+  OM-G005   Challenge Derby ~ チャレンジダービー
+  OM-G007   Space Armor ~ スペースアーマー	
+
+Other Canceled titles (possibly exist in prototype form)
+  C-62    Champion Ski (by Sega)
+  OM-G009 Challenge Soccer (by Tsukuda)
+  OM-G010 Great Escape 2 (by Tsukuda)
+ -->
+<!--
+The following games were available both as Golden Carts and as MyCards. 
+I'm not sure from what version the dumps below come (or it they have been
+verified to contain the same data)
+
+C-05 - Champion Golf
+C-17 - Monaco GP
+C-26 - Star Force
+C-33 - Champion Boxing [dumped and verified to be diff from G-1033]
+C-43 - Zippy Race
+
+ -->
 <!--
 Many SG-1000 games were also sold in Taiwan by Aaronix
 These are mostly undumped (except a few, thanks to Bock and SMS Power)
@@ -17,13 +39,13 @@ B-028 火鳳凰 -> G-1028 Exerion
 B-031 尋寶記(敲金塊) -> G-1031 Lode Runner
 B-035 貓抓老鼠 -> G-1035 Hustle Chumy
 B-036 餓貓抓小雞 -> G-1036 Flicky
-B-042 奧運大賽 -> G-1042 Konami's Hyper Sports
+B-042 奧運大賽 -> G-1042 Hyper Sports
 B-043 星際大戰 -> G-1043 Star Force [dumped]
 
 R-046 精武門 -> C-46 Dragon Wang [dumped]
 R-048 飛狼 -> C-48 Choplifter
 R-049 法櫃奇兵 -> C-49 Pitfall II
-R-050 企鵝 -> C-50 Penguin Land [dumped]
+R-050 企鵝 -> C-50 Doki Doki Penguin Land [dumped]
 R-051 救難小英雄 -> C-51 Drol
 R-052 打漁 -> C-52 Chack'n Pop
 R-054 摩天大樓 -> C-54 Rock n' Bolt	
@@ -37,6 +59,7 @@ R-066 超級坦克 -> C-66 Super Tank
 
 <softwarelist name="sg1000" description="Sega SG-1000 and SG-1000 MarkII cartridges">
 	<software name="bankpani">
+		<!-- Serial: C-53 - Alt Title: バンク パニック -->
 		<description>Bank Panic (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Sanritsu</publisher>
@@ -48,6 +71,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="blckonyx">
+		<!-- Serial: C-72 - Alt Title: ザ・ブラック オニキス -->
 		<description>The Black Onyx (Jpn)</description>
 		<year>1987</year>
 		<publisher>Sega / BPS</publisher>
@@ -59,6 +83,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="bombjack">
+		<!-- Serial: C-61 - Alt Title: ボンジャック -->
 		<description>Bomb Jack (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Tehkan</publisher>
@@ -70,6 +95,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="bordrlin">
+		<!-- Serial: G-1001 - Alt Title: ボーダーライン -->
 		<description>Borderline (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -81,6 +107,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="castle">
+		<!-- Serial: G-1046 - Alt Title: ザ・キャッスル -->
 		<description>The Castle (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega / ASCII</publisher>
@@ -92,6 +119,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="chackn">
+		<!-- Serial: C-52 - Alt Title: チャックン ポップ -->
 		<description>Chack'n Pop (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Taito</publisher>
@@ -103,6 +131,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champbas">
+		<!-- Serial: G-1011 - Alt Title: チャンピオンベースボール -->
 		<description>Champion Baseball (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega / Alpha Denshi</publisher>
@@ -114,6 +143,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champbil">
+		<!-- Serial: C-71 - Alt Title: チャンピオン ビリヤード -->
 		<description>Champion Billiards (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -125,6 +155,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champbox">
+		<!-- Serial: G-1033 - Alt Title: チャンピオン ボクシング -->
 		<description>Champion Boxing (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -136,6 +167,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champbox1" cloneof="champbox">
+		<!-- Serial: C-33 - Alt Title: チャンピオン ボクシング -->
 		<description>Champion Boxing (MyCard) (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -147,6 +179,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champglf">
+		<!-- Serial: G-1005 & C-05 - Alt Title: チャンピオン ゴルフ -->
 		<description>Champion Golf (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega / Logitec</publisher>
@@ -158,6 +191,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champice">
+		<!-- Serial: C-59 - Alt Title: チャンピオン アイスホッケー -->
 		<description>Champion Ice Hockey (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -169,6 +203,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champken">
+		<!-- Serial: C-67 - Alt Title: チャンピオン剣道 -->
 		<description>Champion Kendou (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -180,6 +215,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champpwr">
+		<!-- Serial: G-1039 - Alt Title: チャンピオン プロレス -->
 		<description>Champion Pro Wrestling (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -191,6 +227,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champscr">
+		<!-- Serial: G-1034 - Alt Title: チャンピオン サッカー -->
 		<description>Champion Soccer (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -202,6 +239,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="champtns">
+		<!-- Serial: G-1009 - Alt Title: チャンピオン テニス -->
 		<description>Champion Tennis (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -213,6 +251,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="choplift">
+		<!-- Serial: C-48 - Alt Title: チョップリフター -->
 		<description>Choplifter (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -235,6 +274,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="cloderun">
+		<!-- Serial: C-57 - Alt Title: チャンピオンシップ ロードランナー -->
 		<description>Championship Lode Runner (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Broderbund Software</publisher>
@@ -246,6 +286,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="congo">
+		<!-- Serial: G-1007 - Alt Title: コンゴ・ボンゴ -->
 		<description>Congo Bongo (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -268,6 +309,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="cso">
+		<!-- Serial: C-64 - Alt Title: シーソー -->
 		<description>C_So! (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Pony Canyon</publisher>
@@ -279,6 +321,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="dokidoki">
+		<!-- Serial: C-50 - Alt Title: ドキドキペンギンランド -->
 		<description>Dokidoki Penguin Land (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -290,7 +333,8 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="dokidokit" cloneof="dokidoki">
-		<description>Dokidoki Penguin Land (Tw)</description>
+		<!-- Serial: R-050 - Alt Title: 企鵝 -->
+		<description>Penguin Land (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
 		<part name="cart" interface="sg1000_cart">
@@ -301,6 +345,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="dragwang">
+		<!-- Serial: C-46 - Alt Title: ドラゴン-ワン -->
 		<description>Dragon Wang (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -312,7 +357,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="jingwumn" cloneof="dragwang">
-    <!-- Alt. Title: 精武門 -->
+        <!-- Serial: R-046 - Alt Title: 精武門 -->
 		<description>Jing Wu Men (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -335,6 +380,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="drol">
+		<!-- Serial: C-51 - Alt Title: ドロール -->
 		<description>Drol (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Aik Beng / Broderbund Software</publisher>
@@ -346,6 +392,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="elevator">
+		<!-- Serial: C-55 - Alt Title: エレベーター アクション -->
 		<description>Elevator Action (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Taito</publisher>
@@ -357,6 +404,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="exerion">
+		<!-- Serial: G-1028 - Alt Title: エクセリオン -->
 		<description>Exerion (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega / Jaleco</publisher>
@@ -368,6 +416,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="flicky">
+		<!-- Serial: G-1036 - Alt Title: フリッキー -->
 		<description>Flicky (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -379,6 +428,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="girlgard">
+		<!-- Serial: G-1037 - Alt Title: ガールズガーデン -->
 		<description>Girl's Garden (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -390,6 +440,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="golgo13">
+		<!-- Serial: G-1014 - Alt Title: ゴルゴ 13 -->
 		<description>Golgo 13 (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -401,6 +452,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="gpworld">
+		<!-- Serial: G-1040 - Alt Title: GPワールド -->
 		<description>GP World (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -412,6 +464,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="gulkave">
+		<!-- Serial: C-63 - Alt Title: ガルケーブ -->
 		<description>Gulkave (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -423,9 +476,10 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="guzzler">
+		<!-- Serial: OM-G002 - Release Date: 1983-11-30 - Alt Title: ガズラー -->
 		<description>Guzzler (Jpn, OMV)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Tsukuda Original / Tehkan</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="guzzler (japan) (om).bin" size="8192" crc="61fa9ea0" sha1="d42b2c5f1da4e0fbd29fcea91bfc092ae46da4b8" offset="000000" />
@@ -434,6 +488,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="hangon2">
+		<!-- Serial: C-60 - Alt Title: ハング オン II -->
 		<description>Hang-On II (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -445,6 +500,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="hero">
+		<!-- Serial: C-58 - Alt Title: ヒーロー -->
 		<description>H.E.R.O. (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Activision</publisher>
@@ -455,19 +511,8 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
-	<software name="homebas">
-	<!-- SC3000 cart -->
-		<description>Home BASIC (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="home basic (jp).bin" size="32768" crc="78a37cbc" sha1="f1e1e7e9687cf4f9f498779a44134c2d70bb8d4b" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="homemj">
+		<!-- Serial: G-1030 - Alt Title: ホーム麻雀 -->
 		<description>Home Mahjong (Jpn, v1.1)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -491,6 +536,7 @@ R-066 超級坦克 -> C-66 Super Tank
 
 	<!-- only game not touched by Sega in any way? -->
 	<software name="hustle">
+		<!-- Serial: G-1035 - Alt Title: ハッスルチューミー -->
 		<description>Hustle Chumy (Jpn)</description>
 		<year>1984</year>
 		<publisher>Compile</publisher>
@@ -502,6 +548,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="hypersp">
+		<!-- Serial: G-1042 - Alt Title: Konami no Hyper Sports ~ コナミのハイパースポーツ (on the game box) -->
 		<description>Hyper Sports (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Konami</publisher>
@@ -513,9 +560,10 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="jb007">
+		<!-- Serial: OM-G008 - Alt Title: ダブルオーセブン ジェームス・ボンド -->
 		<description>James Bond 007 (Jpn, v2.7, OMV)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1984</year>
+		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="16384">
 				<rom name="james bond 007 (japan) (v2.7) (om).bin" size="16384" crc="90160849" sha1="88d8c1f56f06ec76be285c29f41322a748f7c4db" offset="000000" />
@@ -524,6 +572,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="loderun">
+		<!-- Serial: G-1031 - Alt Title: ロードランナー -->
 		<description>Lode Runner (Euro, Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega / Broderbund Software</publisher>
@@ -535,6 +584,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="mahjong">
+		<!-- Serial: G-1004 - Alt Title: 麻雀 -->
 		<description>Mahjong (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -558,6 +608,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="monacogpa" cloneof="monacogp">
+		<!-- Serial: G-1017 & C-17 - Alt Title: モナコ GP -->
 		<description>Monaco GP (Jpn, Alt)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -569,6 +620,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="ninjap">
+		<!-- Serial: C-65 - Alt Title: 忍者プリンセス -->
 		<description>Ninja Princess (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -580,6 +632,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="nsub">
+		<!-- Serial: G-1003 - Alt Title: N-サブ -->
 		<description>N-Sub (Euro)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
@@ -591,9 +644,10 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="matchpga">
+		<!-- Serial: OM-G006 - Alt Title: 岡本綾子のマッチプレイゴルフ -->
 		<description>Okamoto Ayako no Match Play Golf (Jpn, Rev. A?, OMV)</description>
-		<year>198?</year>
-		<publisher>Sega</publisher>
+		<year>1984?</year>
+		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="Okamoto Ayako no Match Play Golf [A] (JP).bin" size="32768" crc="547dd7fd" sha1="2fe5e6811aa340f10b67f78ee9ed566a94326bad" offset="000000" />
@@ -602,9 +656,10 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="matchpgb">
+		<!-- Serial:  - Alt Title:  -->
 		<description>Okamoto Ayako no Match Play Golf (Jpn, Rev. B?, OMV)</description>
-		<year>198?</year>
-		<publisher>Sega</publisher>
+		<year>1984?</year>
+		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="Okamoto Ayako no Match Play Golf [B] (JP).bin" size="32768" crc="49d3db2c" sha1="bcb03afd3bbd5dadf00474eac44bb66a5df419cf" offset="000000" />
@@ -613,6 +668,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="orguss">
+		<!-- Serial: G-1015 - Alt Title: オーガス -->
 		<description>Orguss (Euro, Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -624,6 +680,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="othello">
+		<!-- Serial: G-1044 - Alt Title: オセロ -->
 		<description>Othello (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Tsukuda Original</publisher>
@@ -635,6 +692,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="pacar">
+		<!-- Serial: G-1020 - Alt Title: パッカー -->
 		<description>Pacar (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -646,6 +704,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="pachink2">
+		<!-- Serial: G-1027 - Alt Title: パチンコ -->
 		<description>Pachinko II (Jpn)</description>
 		<year>1984</year>
 		<publisher>Sega</publisher>
@@ -657,6 +716,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="pachinko">
+		<!-- Serial: G-1027 - Alt Title: パチンコ -->
 		<description>Pachinko (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -668,6 +728,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="pitfall2">
+		<!-- Serial: C-49 - Alt Title: ピットフォールII -->
 		<description>Pitfall II - The Lost Caverns (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -690,6 +751,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="popflame">
+		<!-- Serial: G-1019 - Alt Title: ポップ フレーマー -->
 		<description>Pop Flamer (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega / Jaleco</publisher>
@@ -701,9 +763,10 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="qbert">
-		<description>Q-bert (Jpn, OMV)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<!-- Serial: OM-G001 - Release Date: 1983-11-30 - Alt Title: キューバート	 -->
+		<description>Q*bert (Jpn, OMV)</description>
+		<year>1983</year>
+		<publisher>Tsukuda Original / Parker Brothers</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="q-bert (japan) (om).bin" size="8192" crc="77db4704" sha1="ae23fce5dbbc1536275d57ca65d2aa9170d46ea4" offset="000000" />
@@ -712,6 +775,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="rocknbol">
+		<!-- Serial: C-54 - Alt Title: ロックンボルト -->
 		<description>Rock n' Bolt (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Activision</publisher>
@@ -723,6 +787,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="safarihu">
+		<!-- Serial: G-1002 - Alt Title: サファリハンティング -->
 		<description>Safari Hunting (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -734,6 +799,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="safarirc">
+		<!-- Serial: G-1032 - Alt Title: サファリレース -->
 		<description>Safari Race (Jpn)</description>
 		<year>1988</year>
 		<publisher>Sega</publisher>
@@ -745,6 +811,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="segaflip">
+		<!-- Serial: G-1018 - Alt Title: セガ フリッパー -->
 		<description>Sega Flipper (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -756,6 +823,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="segagala">
+		<!-- Serial: G-1022 - Alt Title: セガ・ギャラガ -->
 		<description>Sega-Galaga (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega / Namco</publisher>
@@ -767,6 +835,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="serizawa">
+		<!-- Serial: G-1006 - Alt Title: 芹沢八段の詰将棋 -->
 		<description>Serizawa Hachidan no Tsumeshogi (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -778,6 +847,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="shinnyus">
+		<!-- Serial: G-1041 - Alt Title: Konami no Shinnyushain Tooru Kun ~ コナミの新入社員とおるくん (on the game box) -->
 		<description>Shinnyushain Tooru Kun (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Konami</publisher>
@@ -789,6 +859,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="sindbadm">
+		<!-- Serial: G-1012 - Alt Title: シンドバッドミステリー -->
 		<description>Sindbad Mystery (Euro, Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -800,6 +871,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="soukoban">
+		<!-- Serial: C-56 - Alt Title: 倉庫番 -->
 		<description>Soukoban (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Thinking Rabbit</publisher>
@@ -811,6 +883,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="spaceinv">
+		<!-- Serial: G-1045 - Alt Title: スペースインベーダー -->
 		<description>Space Invaders (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Taito</publisher>
@@ -822,9 +895,10 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="spacemnt">
+		<!-- Serial: OM-G003 - Alt Title: スペースマウンテン -->
 		<description>Space Mountain (Jpn, OMV)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
+		<year>1983</year>
+		<publisher>Tsukuda Original</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="space mountain (japan) (om).bin" size="8192" crc="bbd87d8f" sha1="08d9360d6e92b081d99b7629f91d4fe482383a18" offset="000000" />
@@ -833,6 +907,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="spacesla">
+		<!-- Serial: G-1023 - Alt Title: スペース スラローム -->
 		<description>Space Slalom (Jpn)</description>
 		<year>1983</year>
 		<publisher>Sega / Orca</publisher>
@@ -844,6 +919,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="starforc">
+		<!-- Serial: G-1043 & C-43 - Alt Title: スター・フォース -->
 		<description>Star Force (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega / Tehkan</publisher>
@@ -855,7 +931,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="starforct" cloneof="starforc">
-    <!-- Alt. Title: Star Wars ~ 星際大戰 -->
+        <!-- Serial: B-043 - Alt Title: Star Wars ~ 星際大戰 -->
 		<description>Star Force (Tw)</description>
 		<year>1985?</year>
 		<publisher>Aaronix</publisher>
@@ -867,6 +943,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="starjack">
+		<!-- Serial: G-1010 - Alt Title: スター・ジャッカー -->
 		<description>Star Jacker (Euro, Jpn, v1.2)</description>
 		<year>1983</year>
 		<publisher>Sega</publisher>
@@ -900,6 +977,7 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="supertnk">
+		<!-- Serial: C-66 - Alt Title: スーパー タンク -->
 		<description>Super Tank (Jpn)</description>
 		<year>1986</year>
 		<publisher>Sega</publisher>
@@ -911,12 +989,86 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 	<software name="terebioe">
+		<!-- Serial: GB-800 - Alt Title: テレビおえかき - Notes: This game used a tablet as controller, directly connected to the cart itself -->
 		<description>Terebi Oekaki (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="8192">
 				<rom name="terebi oekaki (japan).bin" size="8192" crc="dd4a661b" sha1="12296f2bb57d80d1774749d3002a039e0940c6fa" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wboy">
+		<!-- Serial: C-69 - Alt Title: ワンダーボーイ -->
+		<description>Wonder Boy (Jpn)</description>
+		<year>1986</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="wonder boy (japan).bin" size="32768" crc="160535c5" sha1="4a54933135cdff546fd79cbc61a38355f7335f3f" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="yamato">
+		<!-- Serial: G-1008 - Alt Title: ヤマト -->
+		<description>Yamato (Euro, Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="yamato (japan, europe).bin" size="16384" crc="e2fd5201" sha1="4d746558fb699c5cb480ba26130518105b2e2031" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zaxxon">
+		<!-- Serial: G-1038 - Alt Title: ザクソン -->
+		<description>Zaxxon (Jpn)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="zaxxon (japan).bin" size="32768" crc="905467e4" sha1="e32f536c3576d41ab485e07809c4404e6b462443" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zippyrac">
+		<!-- Serial: G-1026 & C-26 - Alt Title: ジッピーレース -->
+		<description>Zippy Race (Jpn)</description>
+		<year>1983</year>
+		<publisher>Sega / Irem</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="zippy race (japan).bin" size="32768" crc="bc5d20df" sha1="8c48dbe187ff4b26d6244d38075565f284536d0c" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="zoom909">
+		<!-- Serial: C-47 - Alt Title: ズーム909 -->
+		<description>Zoom 909 (Jpn)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="zoom 909 (japan).bin" size="32768" crc="093830d8" sha1="09552aaa7140f9fc780b5f7d541478b534320075" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- SC-3000 carts -->
+	<software name="homebas">
+	<!-- SC3000 cart -->
+		<description>Home BASIC (Jpn)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="home basic (jp).bin" size="32768" crc="78a37cbc" sha1="f1e1e7e9687cf4f9f498779a44134c2d70bb8d4b" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -929,61 +1081,6 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="Uranai Angel Cutie (JP).bin" size="32768" crc="ae4f92cf" sha1="90e32471b68cb60449b30e5d5a19d3a88f9829d3" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wboy">
-		<description>Wonder Boy (Jpn)</description>
-		<year>1986</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="wonder boy (japan).bin" size="32768" crc="160535c5" sha1="4a54933135cdff546fd79cbc61a38355f7335f3f" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="yamato">
-		<description>Yamato (Euro, Jpn)</description>
-		<year>1983</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="16384">
-				<rom name="yamato (japan, europe).bin" size="16384" crc="e2fd5201" sha1="4d746558fb699c5cb480ba26130518105b2e2031" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zaxxon">
-		<description>Zaxxon (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="zaxxon (japan).bin" size="32768" crc="905467e4" sha1="e32f536c3576d41ab485e07809c4404e6b462443" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zippyrac">
-		<description>Zippy Race (Jpn)</description>
-		<year>1983</year>
-		<publisher>Sega / Irem</publisher>
-		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="zippy race (japan).bin" size="32768" crc="bc5d20df" sha1="8c48dbe187ff4b26d6244d38075565f284536d0c" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="zoom909">
-		<description>Zoom 909 (Jpn)</description>
-		<year>1985</year>
-		<publisher>Sega</publisher>
-		<part name="cart" interface="sg1000_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="zoom 909 (japan).bin" size="32768" crc="093830d8" sha1="09552aaa7140f9fc780b5f7d541478b534320075" offset="000000" />
 			</dataarea>
 		</part>
 	</software>

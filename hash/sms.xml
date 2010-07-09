@@ -2867,7 +2867,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1315 - Releases: 1987-02-18 (JPN) -->
+	<!-- Id: G-1315 - Releases: 1987-02-18 (JPN) - Notes: This is actually compatible with SG-1000 and SG-1000 Mark II (and SC-3000) -->
 	<software name="loretta">
 		<description>Loretta no Shouzou (Jpn)</description>
 		<year>1987</year>
