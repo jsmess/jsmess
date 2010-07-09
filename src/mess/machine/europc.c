@@ -120,9 +120,9 @@ WRITE8_HANDLER ( europc_jim_w )
 	case 4:
 		switch(data & 0xc0)
 		{
-		case 0x00: cpu_set_clockscale(space->machine->device("maincpu"), 1.0 / 2); break;
-		case 0x40: cpu_set_clockscale(space->machine->device("maincpu"), 3.0 / 4); break;
-		default: cpu_set_clockscale(space->machine->device("maincpu"), 1); break;
+		case 0x00: space->machine->device("maincpu")->set_clock_scale(1.0 / 2); break;
+		case 0x40: space->machine->device("maincpu")->set_clock_scale(3.0 / 4); break;
+		default: space->machine->device("maincpu")->set_clock_scale(1); break;
 		}
 		break;
 	case 0xa:

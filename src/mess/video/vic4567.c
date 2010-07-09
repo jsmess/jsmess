@@ -1387,9 +1387,9 @@ WRITE8_DEVICE_HANDLER( vic3_port_w )
 	case 0x31:
 		vic3->reg[offset] = data;
 		if (data & 0x40)
-			cpu_set_clockscale(vic3->cpu, 1.0);
+			vic3->cpu->set_clock_scale(1.0);
 		else
-			cpu_set_clockscale(vic3->cpu, 1.0/3.5);
+			vic3->cpu->set_clock_scale(1.0/3.5);
 		break;
 	case 0x32:
 	case 0x33:

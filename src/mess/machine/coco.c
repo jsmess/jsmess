@@ -1973,7 +1973,7 @@ static SAM6883_SET_MPU_RATE( d_sam_set_mpurate )
      * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
      * access but RAM was not.  I don't know how to simulate this.
      */
-    cpu_set_clockscale(device->machine->device("maincpu"), val ? 2 : 1);
+    device->machine->device("maincpu")->set_clock_scale(val ? 2 : 1);
 }
 
 READ8_HANDLER(dgnalpha_mapped_irq_r)

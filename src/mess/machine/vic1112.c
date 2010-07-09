@@ -303,8 +303,8 @@ static DEVICE_START( vic1112 )
 	vic1112->bus = device->machine->device(config->bus_tag);
 
 	/* set VIA clocks */
-	vic1112->via0->set_unscaled_clock(cpu_get_clock(device->machine->firstcpu));
-	vic1112->via1->set_unscaled_clock(cpu_get_clock(device->machine->firstcpu));
+	vic1112->via0->set_unscaled_clock(device->machine->firstcpu->unscaled_clock());
+	vic1112->via1->set_unscaled_clock(device->machine->firstcpu->unscaled_clock());
 
 	/* map VIAs to memory */
 	memory_install_readwrite8_device_handler(program, vic1112->via0, 0x9800, 0x980f, 0, 0, via_r, via_w);

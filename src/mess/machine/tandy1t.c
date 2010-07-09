@@ -214,9 +214,9 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	case 2:
 		tandy_ppi.portc = data;
 		if (data & 8)
-			cpu_set_clockscale(space->machine->device("maincpu"), 1);
+			space->machine->device("maincpu")->set_clock_scale(1);
 		else
-			cpu_set_clockscale(space->machine->device("maincpu"), 4.77/8);
+			space->machine->device("maincpu")->set_clock_scale(4.77/8);
 		break;
 	}
 }

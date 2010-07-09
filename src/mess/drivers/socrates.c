@@ -201,7 +201,7 @@ static DRIVER_INIT( socrates )
     for (i = 0; i < 0x10000; i++)
         gfx[i] = (((i&0x1)?0x00:0xFF)^((i&0x100)?0x00:0xff));
 // init sound channels to both be on lowest pitch and max volume
-    cpu_set_clockscale(machine->device("maincpu"), 0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+    machine->device("maincpu")->set_clock_scale(0.45f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 static READ8_HANDLER( socrates_rom_bank_r )

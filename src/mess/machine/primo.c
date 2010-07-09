@@ -244,7 +244,7 @@ static void primo_common_machine_init (running_machine *machine)
 	if (input_port_read(machine, "MEMORY_EXPANSION"))
 		primo_port_FD = 0x00;
 	primo_update_memory(machine);
-	cpu_set_clockscale(machine->device("maincpu"), input_port_read(machine, "CPU_CLOCK") ? 1.5 : 1.0);
+	machine->device("maincpu")->set_clock_scale(input_port_read(machine, "CPU_CLOCK") ? 1.5 : 1.0);
 }
 
 MACHINE_RESET( primoa )

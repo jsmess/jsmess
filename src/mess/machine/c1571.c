@@ -462,7 +462,7 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 	{
 		UINT32 clock = clock_1_2 ? XTAL_16MHz/8 : XTAL_16MHz/16;
 
-		cpu_set_clock(c1571->cpu, clock);
+		c1571->cpu->set_unscaled_clock(clock);
 		c1571->cia->set_unscaled_clock(clock);
 		c1571->via0->set_unscaled_clock(clock);
 		c1571->via1->set_unscaled_clock(clock);
