@@ -35,7 +35,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6526cia.h"
-
+#include "machine/i2cmem.h"
 #include "machine/amigafdc.h"
 #include "machine/amigakbd.h"
 
@@ -498,6 +498,14 @@ static MACHINE_DRIVER_START( a1200p )
 	MDRV_DEVICE_CLOCK(A1200PAL_XTAL_X1/20)
 MACHINE_DRIVER_END
 
+#define	NVRAM_SIZE 1024
+#define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
+
+static const i2cmem_interface i2cmem_interface =
+{
+	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
+};
+
 static MACHINE_DRIVER_START( cd32 )
 
 	/* basic machine hardware */
@@ -505,7 +513,7 @@ static MACHINE_DRIVER_START( cd32 )
 	MDRV_CPU_PROGRAM_MAP(cd32_map)
 
 	MDRV_MACHINE_RESET(amiga)
-	MDRV_NVRAM_HANDLER(cd32)
+	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

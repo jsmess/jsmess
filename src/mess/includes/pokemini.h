@@ -12,8 +12,8 @@
 
 extern UINT8 *pokemini_ram;
 MACHINE_START( pokemini );
-WRITE8_HANDLER( pokemini_hwreg_w );
-READ8_HANDLER( pokemini_hwreg_r );
+WRITE8_DEVICE_HANDLER( pokemini_hwreg_w );
+READ8_DEVICE_HANDLER( pokemini_hwreg_r );
 
 DEVICE_IMAGE_LOAD( pokemini_cart );
 

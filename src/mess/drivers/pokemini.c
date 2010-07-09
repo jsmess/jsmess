@@ -18,7 +18,7 @@ The LCD is likely to be a SSD1828 LCD.
 static ADDRESS_MAP_START( pokemini_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x000000, 0x000FFF )  AM_ROM							/* bios */
 	AM_RANGE( 0x001000, 0x001FFF )	AM_RAM AM_BASE( &pokemini_ram)				/* VRAM/RAM */
-	AM_RANGE( 0x002000, 0x0020FF )  AM_READWRITE( pokemini_hwreg_r, pokemini_hwreg_w )	/* hardware registers */
+	AM_RANGE( 0x002000, 0x0020FF )  AM_DEVREADWRITE( "i2cmem", pokemini_hwreg_r, pokemini_hwreg_w )	/* hardware registers */
 	AM_RANGE( 0x002100, 0x1FFFFF )  AM_ROM							/* cartridge area */
 ADDRESS_MAP_END
 
@@ -52,6 +52,11 @@ static const speaker_interface pokemini_speaker_interface =
 	speaker_levels	/* optional: level lookup table */
 };
 
+static const i2cmem_interface i2cmem_interface =
+{
+       I2CMEM_SLAVE_ADDRESS, 0, 0x2000
+};
+
 static MACHINE_DRIVER_START( pokemini )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", MINX, 4000000 )
@@ -61,7 +66,7 @@ static MACHINE_DRIVER_START( pokemini )
 
 	MDRV_MACHINE_START( pokemini )
 
-	MDRV_NVRAM_HANDLER( i2cmem_0 )
+	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	/* video hardware */
 	MDRV_VIDEO_START( generic_bitmapped )
@@ -94,16 +99,10 @@ static MACHINE_DRIVER_START( pokemini )
 	MDRV_SOFTWARE_LIST_ADD("cart_list","pokemini")
 MACHINE_DRIVER_END
 
-
-static DRIVER_INIT( pokemini )
-{
-	i2cmem_init( machine, 0, I2CMEM_SLAVE_ADDRESS, 0, 0x2000, NULL);
-}
-
 ROM_START( pokemini )
 	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD( "bios.min", 0x0000, 0x1000, CRC(aed3c14d) SHA1(daad4113713ed776fbd47727762bca81ba74915f) )
 ROM_END
 
 
-CONS( 2001, pokemini, 0, 0, pokemini, pokemini, pokemini, "Nintendo", "Pokemon Mini", GAME_NOT_WORKING )
+CONS( 2001, pokemini, 0, 0, pokemini, pokemini, 0, "Nintendo", "Pokemon Mini", GAME_NOT_WORKING )

@@ -1008,6 +1008,11 @@ static MACHINE_DRIVER_START( vsmile )
 	MDRV_VIDEO_UPDATE( vii )
 MACHINE_DRIVER_END
 
+static const i2cmem_interface i2cmem_interface =
+{
+       I2CMEM_SLAVE_ADDRESS, 0, 0x200
+};
+
 static MACHINE_DRIVER_START( batman )
 
 	MDRV_DRIVER_DATA( vii_state )
@@ -1019,7 +1024,7 @@ static MACHINE_DRIVER_START( batman )
 	MDRV_MACHINE_START( vii )
 	MDRV_MACHINE_RESET( vii )
 
-	MDRV_NVRAM_HANDLER( i2cmem_0 )
+	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	MDRV_SCREEN_ADD( "screen", RASTER )
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1047,7 +1052,6 @@ static DRIVER_INIT( batman )
 
 	state->spg243_mode = SPG243_BATMAN;
 	state->centered_coordinates = 1;
-	i2cmem_init(machine, 0, I2CMEM_SLAVE_ADDRESS, 0, 0x200, NULL);
 }
 
 static DRIVER_INIT( vsmile )
