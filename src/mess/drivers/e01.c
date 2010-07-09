@@ -389,7 +389,7 @@ static MACHINE_START( e01 )
 {
 	e01_state *state = (e01_state *)machine->driver_data;
 
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 	UINT8 *rom = memory_region(machine, R65C102_TAG);
 
 	/* setup memory banking */

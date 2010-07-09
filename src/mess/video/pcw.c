@@ -98,14 +98,14 @@ VIDEO_UPDATE( pcw )
 
 			x = PCW_BORDER_WIDTH;
 
-			roller_ram_ptr = messram_get_ptr(devtag_get_device(screen->machine, "messram")) + roller_ram_addr + roller_ram_offs;
+			roller_ram_ptr = messram_get_ptr(screen->machine->device("messram")) + roller_ram_addr + roller_ram_offs;
 
 			/* get line address */
 			/* b16-14 control which bank the line is to be found in, b13-3 the address in the bank (in 16-byte units), and b2-0 the offset. Thus a roller RAM address bbbxxxxxxxxxxxyyy indicates bank bbb, address 00xxxxxxxxxxx0yyy. */
 			line_data = ((unsigned char *)roller_ram_ptr)[0] | (((unsigned char *)roller_ram_ptr)[1]<<8);
 
 			/* calculate address of pixel data */
-			line_ptr = messram_get_ptr(devtag_get_device(screen->machine, "messram")) + ((line_data & 0x0e000)<<1) + ((line_data & 0x01ff8)<<1) + (line_data & 0x07);
+			line_ptr = messram_get_ptr(screen->machine->device("messram")) + ((line_data & 0x0e000)<<1) + ((line_data & 0x01ff8)<<1) + (line_data & 0x07);
 
 			for (by=0; by<90; by++)
 			{

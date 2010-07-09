@@ -36,7 +36,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf );
+		logerror( "%08x: %s", cpu_get_pc(machine->device("maincpu")), buf );
 	}
 }
 
@@ -85,8 +85,8 @@ static void gba_request_irq(running_machine *machine, UINT32 int_type)
 		// master enable?
 		if (state->IME & 1)
 		{
-			cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
-			cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+			cpu_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 		}
 	}
 }
@@ -141,7 +141,7 @@ static void dma_exec(running_machine *machine, FPTR ch)
 	int ctrl;
 	int srcadd, dstadd;
 	UINT32 src, dst;
-	const address_space *space = cpu_get_address_space(devtag_get_device(machine, "maincpu"), ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->device("maincpu"), ADDRESS_SPACE_PROGRAM);
 	gba_state *state = (gba_state *)machine->driver_data;
 
 	src = state->dma_src[ch];
@@ -291,13 +291,13 @@ static void audio_tick(running_machine *machine, int ref)
 
 			if (state->SOUNDCNT_H & 0x200)
 			{
-				running_device *dac_device = devtag_get_device(machine, "direct_a_left");
+				running_device *dac_device = machine->device("direct_a_left");
 
 				dac_signed_data_w(dac_device, state->fifo_a[state->fifo_a_ptr]^0x80);
 			}
 			if (state->SOUNDCNT_H & 0x100)
 			{
-				running_device *dac_device = devtag_get_device(machine, "direct_a_right");
+				running_device *dac_device = machine->device("direct_a_right");
 
 				dac_signed_data_w(dac_device, state->fifo_a[state->fifo_a_ptr]^0x80);
 			}
@@ -331,13 +331,13 @@ static void audio_tick(running_machine *machine, int ref)
 
 			if (state->SOUNDCNT_H & 0x2000)
 			{
-				running_device *dac_device = devtag_get_device(machine, "direct_b_left");
+				running_device *dac_device = machine->device("direct_b_left");
 
 				dac_signed_data_w(dac_device, state->fifo_b[state->fifo_b_ptr]^0x80);
 			}
 			if (state->SOUNDCNT_H & 0x1000)
 			{
-				running_device *dac_device = devtag_get_device(machine, "direct_b_right");
+				running_device *dac_device = machine->device("direct_b_right");
 
 				dac_signed_data_w(dac_device, state->fifo_b[state->fifo_b_ptr]^0x80);
 			}
@@ -499,7 +499,7 @@ static READ32_HANDLER( gba_io_r )
 {
 	UINT32 retval = 0;
 	running_machine *machine = space->machine;
-	running_device *gb_device = devtag_get_device(space->machine, "custom");
+	running_device *gb_device = space->machine->device("custom");
 	gba_state *state = (gba_state *)machine->driver_data;
 
 	switch( offset )
@@ -1017,7 +1017,7 @@ static READ32_HANDLER( gba_io_r )
 static WRITE32_HANDLER( gba_io_w )
 {
 	running_machine *machine = space->machine;
-	running_device *gb_device = devtag_get_device(space->machine, "custom");
+	running_device *gb_device = space->machine->device("custom");
 	gba_state *state = (gba_state *)machine->driver_data;
 
 	switch( offset )
@@ -1417,8 +1417,8 @@ static WRITE32_HANDLER( gba_io_w )
 				// DAC A reset?
 				if (data & 0x0800)
 				{
-					running_device *gb_a_l = devtag_get_device(machine, "direct_a_left");
-					running_device *gb_a_r = devtag_get_device(machine, "direct_a_right");
+					running_device *gb_a_l = machine->device("direct_a_left");
+					running_device *gb_a_r = machine->device("direct_a_right");
 
 					state->fifo_a_ptr = 17;
 					state->fifo_a_in = 17;
@@ -1429,8 +1429,8 @@ static WRITE32_HANDLER( gba_io_w )
 				// DAC B reset?
 				if (data & 0x8000)
 				{
-					running_device *gb_b_l = devtag_get_device(machine, "direct_b_left");
-					running_device *gb_b_r = devtag_get_device(machine, "direct_b_right");
+					running_device *gb_b_l = machine->device("direct_b_left");
+					running_device *gb_b_r = machine->device("direct_b_right");
 
 					state->fifo_b_ptr = 17;
 					state->fifo_b_in = 17;
@@ -1442,10 +1442,10 @@ static WRITE32_HANDLER( gba_io_w )
 		case 0x0084/4:
 			if( (mem_mask) & 0x000000ff )
 			{
-				running_device *gb_a_l = devtag_get_device(machine, "direct_a_left");
-				running_device *gb_a_r = devtag_get_device(machine, "direct_a_right");
-				running_device *gb_b_l = devtag_get_device(machine, "direct_b_left");
-				running_device *gb_b_r = devtag_get_device(machine, "direct_b_right");
+				running_device *gb_a_l = machine->device("direct_a_left");
+				running_device *gb_a_r = machine->device("direct_a_right");
+				running_device *gb_b_l = machine->device("direct_b_left");
+				running_device *gb_b_r = machine->device("direct_b_right");
 
 				gb_sound_w(gb_device, 0x16, data);
 				if ((data & 0x80) && !(state->SOUNDCNT_X & 0x80))
@@ -1822,7 +1822,7 @@ static WRITE32_HANDLER( gba_io_w )
 					state->HALTCNT = data & 0x000000ff;
 
 					// either way, wait for an IRQ
-					cpu_spinuntil_int(devtag_get_device(machine, "maincpu"));
+					cpu_spinuntil_int(machine->device("maincpu"));
 				}
 			}
 			if( (mem_mask) & 0xffff0000 )
@@ -2004,10 +2004,10 @@ static TIMER_CALLBACK( perform_scan )
 
 static MACHINE_RESET( gba )
 {
-	running_device *gb_a_l = devtag_get_device(machine, "direct_a_left");
-	running_device *gb_a_r = devtag_get_device(machine, "direct_a_right");
-	running_device *gb_b_l = devtag_get_device(machine, "direct_b_left");
-	running_device *gb_b_r = devtag_get_device(machine, "direct_b_right");
+	running_device *gb_a_l = machine->device("direct_a_left");
+	running_device *gb_a_r = machine->device("direct_a_right");
+	running_device *gb_b_l = machine->device("direct_b_left");
+	running_device *gb_b_r = machine->device("direct_b_right");
 	gba_state *state = (gba_state *)machine->driver_data;
 
 	memset(state, 0, sizeof(state));
@@ -2273,7 +2273,7 @@ static WRITE32_HANDLER( eeprom_w )
 
 			if (state->eeprom_bits == 0)
 			{
-				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), state->eep_data, state->eeprom_addr );
+				mame_printf_verbose("%08x: EEPROM: %02x to %x\n", cpu_get_pc(space->machine->device("maincpu")), state->eep_data, state->eeprom_addr );
 				state->gba_eeprom[state->eeprom_addr] = state->eep_data;
 				state->eeprom_addr++;
 				state->eep_data = 0;
@@ -2323,13 +2323,13 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 
 			if (cart_size <= (16 * 1024 * 1024))
 			{
-				memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
-				memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
+				memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_r);
+				memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xd000000, 0xdffffff, 0, 0, eeprom_w);
 			}
 			else
 			{
-				memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
-				memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
+				memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_r);
+				memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xdffff00, 0xdffffff, 0, 0, eeprom_w);
 			}
 			break;
 		}
@@ -2338,8 +2338,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			state->nvptr = (UINT8 *)&state->gba_sram;
 			state->nvsize = 0x10000;
 
-			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
-			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
+			memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_r);
+			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, sram_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "FLASH1M_", 8))
@@ -2349,8 +2349,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			state->flash_size = 0x20000;
 			state->flash_mask = 0x1ffff/4;
 
-			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_r);
-			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
+			memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_r);
+			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe01ffff, 0, 0, flash_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "FLASH", 5))
@@ -2360,8 +2360,8 @@ static DEVICE_IMAGE_LOAD( gba_cart )
 			state->flash_size = 0x10000;
 			state->flash_mask = 0xffff/4;
 
-			memory_install_read32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_r);
-			memory_install_write32_handler(cpu_get_address_space(devtag_get_device(image.device().machine, "maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_w);
+			memory_install_read32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_r);
+			memory_install_write32_handler(cpu_get_address_space(image.device().machine->device("maincpu"), ADDRESS_SPACE_PROGRAM), 0xe000000, 0xe00ffff, 0, 0, flash_w);
 			break;
 		}
 		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))

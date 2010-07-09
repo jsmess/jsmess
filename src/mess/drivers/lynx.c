@@ -139,7 +139,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( lynx )
 {
-	running_device *cpu = devtag_get_device(image.device().machine, "maincpu");
+	running_device *cpu = image.device().machine->device("maincpu");
 	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *data = NULL;
 	UINT8 *rom = memory_region(image.device().machine, "maincpu");
@@ -176,7 +176,7 @@ static QUICKLOAD_LOAD( lynx )
 	memory_write_byte(space, 0x1fc, start & 0xff);
 	memory_write_byte(space, 0x1fd, start >> 8);
 
-	lynx_crc_keyword((device_image_interface&)*devtag_get_device(image.device().machine, "quickload"));
+	lynx_crc_keyword((device_image_interface&)*image.device().machine->device("quickload"));
 
 	cpu_set_reg(cpu, STATE_GENPC, start);
 

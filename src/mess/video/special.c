@@ -103,7 +103,7 @@ VIDEO_UPDATE( specimx )
 	{
 		for (y = 0; y < 256; y++)
 		{
-			code = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0x9000 + y + x*256];
+			code = messram_get_ptr(screen->machine->device("messram"))[0x9000 + y + x*256];
 			color = specimx_colorram[y + x*256];
 			for (b = 7; b >= 0; b--)
 			{
@@ -148,8 +148,8 @@ VIDEO_UPDATE( erik )
 	UINT8 *erik_video_ram_p1;
 	UINT8 *erik_video_ram_p2;
 
-	erik_video_ram_p1 =  messram_get_ptr(devtag_get_device(screen->machine, "messram")) + 0x9000;
-	erik_video_ram_p2 =  messram_get_ptr(devtag_get_device(screen->machine, "messram")) + 0xd000;
+	erik_video_ram_p1 =  messram_get_ptr(screen->machine->device("messram")) + 0x9000;
+	erik_video_ram_p2 =  messram_get_ptr(screen->machine->device("messram")) + 0xd000;
 
 	for (x = 0; x < 48; x++)
 	{

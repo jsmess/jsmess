@@ -14,16 +14,16 @@ static VIDEO_START( kc85 )
 	kc85_state *state = (kc85_state *)machine->driver_data;
 
 	/* find devices */
-	state->hd44102[0] = devtag_get_device(machine, "m1");
-	state->hd44102[1] = devtag_get_device(machine, "m2");
-	state->hd44102[2] = devtag_get_device(machine, "m3");
-	state->hd44102[3] = devtag_get_device(machine, "m4");
-	state->hd44102[4] = devtag_get_device(machine, "m5");
-	state->hd44102[5] = devtag_get_device(machine, "m6");
-	state->hd44102[6] = devtag_get_device(machine, "m7");
-	state->hd44102[7] = devtag_get_device(machine, "m8");
-	state->hd44102[8] = devtag_get_device(machine, "m9");
-	state->hd44102[9] = devtag_get_device(machine, "m10");
+	state->hd44102[0] = machine->device("m1");
+	state->hd44102[1] = machine->device("m2");
+	state->hd44102[2] = machine->device("m3");
+	state->hd44102[3] = machine->device("m4");
+	state->hd44102[4] = machine->device("m5");
+	state->hd44102[5] = machine->device("m6");
+	state->hd44102[6] = machine->device("m7");
+	state->hd44102[7] = machine->device("m8");
+	state->hd44102[8] = machine->device("m9");
+	state->hd44102[9] = machine->device("m10");
 }
 
 static VIDEO_UPDATE( kc85 )
@@ -44,7 +44,7 @@ static VIDEO_START( tandy200 )
 	tandy200_state *state = (tandy200_state *)machine->driver_data;
 
 	/* find devices */
-	state->hd61830 = devtag_get_device(machine, HD61830_TAG);
+	state->hd61830 = machine->device(HD61830_TAG);
 }
 
 static VIDEO_UPDATE( tandy200 )

@@ -347,13 +347,13 @@ static void set_memory_overlay(running_machine *machine, int overlay)
 			is_rom = TRUE;
 
 			/* HACK! - copy in the initial reset/stack */
-			memcpy(messram_get_ptr(devtag_get_device(machine, "messram")), memory_data, 8);
+			memcpy(messram_get_ptr(machine->device("messram")), memory_data, 8);
 		}
 		else
 		{
 			/* RAM */
-			memory_size = messram_get_size(devtag_get_device(machine, "messram"));
-			memory_data = messram_get_ptr(devtag_get_device(machine, "messram"));
+			memory_size = messram_get_size(machine->device("messram"));
+			memory_data = messram_get_ptr(machine->device("messram"));
 			is_rom = FALSE;
 		}
 
@@ -561,7 +561,7 @@ static void keyboard_init(mac_state *mac)
 static TIMER_CALLBACK(kbd_clock)
 {
 	int i;
-	running_device *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = machine->device("via6522_0");
 	mac_state *mac = (mac_state *)machine->driver_data;
 
 	if (mac->kbd_comm == TRUE)
@@ -951,7 +951,7 @@ void mac_scc_irq(running_device *device, int status)
 
 void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 {
-	running_device *scc = devtag_get_device(machine, "scc");
+	running_device *scc = machine->device("scc");
 	static int last_was_x = 0;
 	if (x && y)
 	{
@@ -978,7 +978,7 @@ void mac_scc_mouse_irq(running_machine *machine, int x, int y)
 
 READ16_HANDLER ( mac_scc_r )
 {
-	running_device *scc = devtag_get_device(space->machine, "scc");
+	running_device *scc = space->machine->device("scc");
 	UINT16 result;
 
 	result = scc8530_r(scc, offset);
@@ -989,13 +989,13 @@ READ16_HANDLER ( mac_scc_r )
 
 WRITE16_HANDLER ( mac_scc_w )
 {
-	running_device *scc = devtag_get_device(space->machine, "scc");
+	running_device *scc = space->machine->device("scc");
 	scc8530_w(scc, offset, (UINT8) data);
 }
 
 WRITE16_HANDLER ( mac_scc_2_w )
 {
-	running_device *scc = devtag_get_device(space->machine, "scc");
+	running_device *scc = space->machine->device("scc");
 	UINT8 wdata = data>>8;
 	scc8530_w(scc, offset, wdata);
 }
@@ -1352,7 +1352,7 @@ READ16_HANDLER ( mac_iwm_r )
      */
 
 	UINT16 result = 0;
-	running_device *fdc = devtag_get_device(space->machine, "fdc");
+	running_device *fdc = space->machine->device("fdc");
 
 	if (LOG_MAC_IWM)
 		logerror("mac_iwm_r: offset=0x%08x mem_mask %04x (PC %x)\n", offset, mem_mask, cpu_get_pc(space->cpu));
@@ -1363,7 +1363,7 @@ READ16_HANDLER ( mac_iwm_r )
 
 WRITE16_HANDLER ( mac_iwm_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "fdc");
+	running_device *fdc = space->machine->device("fdc");
 
 	if (LOG_MAC_IWM)
 		logerror("mac_iwm_w: offset=0x%08x data=0x%04x mask %04x (PC=%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
@@ -1774,7 +1774,7 @@ static void mac_adb_talk(running_machine *machine)
 
 static TIMER_CALLBACK(mac_adb_tick)
 {
-	running_device *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = machine->device("via6522_0");
 	mac_state *mac = (mac_state *)machine->driver_data;
 
 	// do one clock transition on CB1 to advance the VIA shifter
@@ -2308,7 +2308,7 @@ static READ8_DEVICE_HANDLER(mac_via_in_a)
 {
 	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-//  printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  printf("VIA1 IN_A (PC %x)\n", cpu_get_pc(device->machine->device("maincpu")));
 
 	switch (mac->mac_model)
 	{
@@ -2395,18 +2395,18 @@ static READ8_DEVICE_HANDLER(mac_via_in_b)
 			val |= 1;
 	}
 
-//  printf("VIA1 IN_B = %02x (PC %x)\n", val, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  printf("VIA1 IN_B = %02x (PC %x)\n", val, cpu_get_pc(device->machine->device("maincpu")));
 
 	return val;
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 {
-	running_device *sound = devtag_get_device(device->machine, "custom");
-	running_device *fdc = devtag_get_device(device->machine, "fdc");
+	running_device *sound = device->machine->device("custom");
+	running_device *fdc = device->machine->device("fdc");
 	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-//  printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  printf("VIA1 OUT A: %02x (PC %x)\n", data, cpu_get_pc(device->machine->device("maincpu")));
 
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
@@ -2442,15 +2442,15 @@ static WRITE8_DEVICE_HANDLER(mac_via_out_a)
 
 static WRITE8_DEVICE_HANDLER(mac_via_out_b)
 {
-	running_device *sound = devtag_get_device(device->machine, "custom");
+	running_device *sound = device->machine->device("custom");
 	int new_rtc_rTCClk;
 	mac_state *mac = (mac_state *)device->machine->driver_data;
 
-//  printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  printf("VIA1 OUT B: %02x (PC %x)\n", data, cpu_get_pc(device->machine->device("maincpu")));
 
 	if (mac->mac_model >= MODEL_MAC_PORTABLE && mac->mac_model <= MODEL_MAC_PB100)
 	{
-		running_device *fdc = devtag_get_device(device->machine, "fdc");
+		running_device *fdc = device->machine->device("fdc");
 
 		mac_enable_sound(sound, (data & 0x80) == 0);
 		sony_set_sel_line(fdc,(data & 0x20) >> 5);
@@ -2509,7 +2509,7 @@ static void mac_via_irq(running_device *device, int state)
 READ16_HANDLER ( mac_via_r )
 {
 	UINT16 data;
-	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *via_0 = space->machine->device("via6522_0");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -2523,7 +2523,7 @@ READ16_HANDLER ( mac_via_r )
 
 WRITE16_HANDLER ( mac_via_w )
 {
-	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+	running_device *via_0 = space->machine->device("via6522_0");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -2547,7 +2547,7 @@ static void mac_via2_irq(running_device *device, int state)
 READ16_HANDLER ( mac_via2_r )
 {
 	int data;
-	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_1 = space->machine->device("via6522_1");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -2561,7 +2561,7 @@ READ16_HANDLER ( mac_via2_r )
 
 WRITE16_HANDLER ( mac_via2_w )
 {
-	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_1 = space->machine->device("via6522_1");
 
 	offset >>= 8;
 	offset &= 0x0f;
@@ -2593,7 +2593,7 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 {
 	mac_state *mac =(mac_state *)device->machine->driver_data;
 
-//  logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  logerror("VIA2 IN B (PC %x)\n", cpu_get_pc(device->machine->device("maincpu")));
 
 	if ((mac->mac_model == MODEL_MAC_LC) || (mac->mac_model == MODEL_MAC_LC_II))
 	{
@@ -2610,14 +2610,14 @@ static READ8_DEVICE_HANDLER(mac_via2_in_b)
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_a)
 {
-//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  logerror("VIA2 OUT A: %02x (PC %x)\n", data, cpu_get_pc(device->machine->device("maincpu")));
 }
 
 static WRITE8_DEVICE_HANDLER(mac_via2_out_b)
 {
-	running_device *via_0 = devtag_get_device(device->machine, "via6522_0");
+	running_device *via_0 = device->machine->device("via6522_0");
 
-//  logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(devtag_get_device(device->machine, "maincpu")));
+//  logerror("VIA2 OUT B: %02x (PC %x)\n", data, cpu_get_pc(device->machine->device("maincpu")));
 
 //  printf("VIA2 OUT B: %02x (MMU = %02x)\n", data, data & 0x08);
 
@@ -2668,7 +2668,7 @@ MACHINE_RESET(mac)
 	/* setup sound */
 	if (mac->mac_model < MODEL_MAC_II)
 	{
-		mac_set_sound_buffer(devtag_get_device(machine, "custom"), 0);
+		mac_set_sound_buffer(machine->device("custom"), 0);
 	}
 
 	if (has_adb(mac))
@@ -2678,10 +2678,10 @@ MACHINE_RESET(mac)
 
 	if ((mac->mac_model == MODEL_MAC_SE) || (mac->mac_model == MODEL_MAC_CLASSIC))
 	{
-		mac_set_sound_buffer(devtag_get_device(machine, "custom"), 1);
+		mac_set_sound_buffer(machine->device("custom"), 1);
 
 		// classic will fail RAM test and try to boot appletalk if RAM is not all zero
-		memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
+		memset(messram_get_ptr(machine->device("messram")), 0, messram_get_size(machine->device("messram")));
 	}
 
 	scsi_interrupt = 0;
@@ -2762,7 +2762,7 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	else if (model < MODEL_MAC_II)
 	{
 		/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
-		mac_install_memory(machine, 0x600000, 0x6fffff, messram_get_size(devtag_get_device(machine, "messram")), messram_get_ptr(devtag_get_device(machine, "messram")), FALSE, "bank2");
+		mac_install_memory(machine, 0x600000, 0x6fffff, messram_get_size(machine->device("messram")), messram_get_ptr(machine->device("messram")), FALSE, "bank2");
 
 		/* set up ROM at 0x400000-0x43ffff (-0x5fffff for mac 128k/512k/512ke) */
 		mac_install_memory(machine, 0x400000, (model >= MODEL_MAC_PLUS) ? 0x43ffff : 0x5fffff,
@@ -2770,17 +2770,17 @@ static void mac_driver_init(running_machine *machine, mac_model_t model)
 	}
 	else if ((model == MODEL_MAC_LC) || (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III))
 	{
-		mac_install_memory(machine, 0x000000, messram_get_size(devtag_get_device(machine, "messram"))-1, messram_get_size(devtag_get_device(machine, "messram")), messram_get_ptr(devtag_get_device(machine, "messram")), FALSE, "bank2");
+		mac_install_memory(machine, 0x000000, messram_get_size(machine->device("messram"))-1, messram_get_size(machine->device("messram")), messram_get_ptr(machine->device("messram")), FALSE, "bank2");
 	}
 	else if ((mac->mac_model == MODEL_MAC_CLASSIC_II) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30)))
 	{
-		mac_install_memory(machine, 0x00000000, 0x3fffffff, messram_get_size(devtag_get_device(machine, "messram")), messram_get_ptr(devtag_get_device(machine, "messram")), FALSE, "bank2");
+		mac_install_memory(machine, 0x00000000, 0x3fffffff, messram_get_size(machine->device("messram")), messram_get_ptr(machine->device("messram")), FALSE, "bank2");
 	}
 
 	set_memory_overlay(machine, 1);
 	mac->mac_overlay = 1;
 
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
+	memset(messram_get_ptr(machine->device("messram")), 0, messram_get_size(machine->device("messram")));
 
 	if ((model == MODEL_MAC_SE) || (model == MODEL_MAC_CLASSIC) || (model == MODEL_MAC_CLASSIC_II) || (model == MODEL_MAC_LC) ||
 	    (model == MODEL_MAC_LC_II) || (model == MODEL_MAC_LC_III) || ((mac->mac_model >= MODEL_MAC_II) && (mac->mac_model <= MODEL_MAC_SE30)) ||
@@ -2965,7 +2965,7 @@ void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state
 
 	if ((mac->mac_nubus_irq_state & 0x3f) != 0x3f)
 	{
-		running_device *via_1 = devtag_get_device(machine, "via6522_1");
+		running_device *via_1 = machine->device("via6522_1");
 
 		mac->via2_ca1 ^= 1;
 		via_ca1_w(via_1, mac->via2_ca1);
@@ -2975,7 +2975,7 @@ void mac_nubus_slot_interrupt(running_machine *machine, UINT8 slot, UINT32 state
 static void mac_vblank_irq(running_machine *machine)
 {
 	static int irq_count = 0, ca1_data = 0, ca2_data = 0;
-	running_device *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = machine->device("via6522_0");
 	mac_state *mac = (mac_state *)machine->driver_data;
 
 	/* handle ADB keyboard/mouse */
@@ -3039,7 +3039,7 @@ static TIMER_CALLBACK(mac_scanline_tick)
 
 	if (mac->mac_model < MODEL_MAC_II)
 	{
-		mac_sh_updatebuffer(devtag_get_device(machine, "custom"));
+		mac_sh_updatebuffer(machine->device("custom"));
 	}
 
 	scanline = machine->primary_screen->vpos();

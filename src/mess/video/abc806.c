@@ -442,7 +442,7 @@ static VIDEO_START(abc806)
 
 	/* find devices */
 
-	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
+	state->mc6845 = machine->device(MC6845_TAG);
 
 	/* find memory regions */
 

@@ -71,7 +71,7 @@ static void bw12_bankswitch(running_machine *machine)
 
 	case 2: /* BK1 */
 	case 3: /* BK2 */
-		if (messram_get_size(devtag_get_device(machine, "messram")) > 64*1024)
+		if (messram_get_size(machine->device("messram")) > 64*1024)
 		{
 			memory_install_readwrite_bank(program, 0x0000, 0x7fff, 0, 0, "bank1");
 		}
@@ -409,7 +409,7 @@ static VIDEO_START( bw12 )
 	bw12_state *state =(bw12_state *) machine->driver_data;
 
 	/* find devices */
-	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
+	state->mc6845 = machine->device(MC6845_TAG);
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, "chargen");
@@ -674,17 +674,17 @@ static MACHINE_START( bw12 )
 	bw12_state *state =(bw12_state *) machine->driver_data;
 
 	/* find devices */
-	state->pia6821 = devtag_get_device(machine, PIA6821_TAG);
-	state->upd765 = devtag_get_device(machine, UPD765_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->pia6821 = machine->device(PIA6821_TAG);
+	state->upd765 = machine->device(UPD765_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* allocate floppy motor off timer */
 	state->floppy_motor_off_timer = timer_alloc(machine, floppy_motor_off_tick, NULL);
 
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_configure_bank(machine, "bank1", 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000, 0x8000);
+	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(machine->device("messram")), 0);
+	memory_configure_bank(machine, "bank1", 2, 2, messram_get_ptr(machine->device("messram")) + 0x10000, 0x8000);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->bank);

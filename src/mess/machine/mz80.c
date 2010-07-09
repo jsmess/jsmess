@@ -50,9 +50,9 @@ static READ8_DEVICE_HANDLER(mz80k_8255_portc_r)
 	UINT8 val = 0;
 	val |= mz80k_vertical ? 0x80 : 0x00;
 	val |= (mz80k_cursor_cnt > 31) ? 0x40 : 0x00;
-    val |= (cassette_get_state(devtag_get_device(device->machine, "cassette")) & CASSETTE_MASK_UISTATE)== CASSETTE_PLAY ? 0x10 : 0x00;
+    val |= (cassette_get_state(device->machine->device("cassette")) & CASSETTE_MASK_UISTATE)== CASSETTE_PLAY ? 0x10 : 0x00;
 
-    if (cassette_input(devtag_get_device(device->machine, "cassette")) > 0.00)
+    if (cassette_input(device->machine->device("cassette")) > 0.00)
         val |= 0x20;
 
 	return val;
@@ -73,7 +73,7 @@ static UINT8 prev_state = 0;
 
 static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 {
-	running_device *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = device->machine->device("speaker");
 	if((prev_state==0) && (state==1)) {
 		speaker_level ^= 1;
 	}
@@ -112,6 +112,6 @@ READ8_HANDLER(mz80k_strobe_r)
 }
 WRITE8_HANDLER(mz80k_strobe_w)
 {
-	running_device *pit = devtag_get_device(space->machine, "pit8253");
+	running_device *pit = space->machine->device("pit8253");
 	pit8253_gate0_w(pit, BIT(data, 0));
 }

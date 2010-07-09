@@ -20,7 +20,7 @@ DRIVER_INIT(z1013)
 
 MACHINE_RESET( z1013 )
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xF000);
+	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xF000);
 	z1013_keyboard_part = 0;
 	z1013_keyboard_line = 0;
 }
@@ -90,7 +90,7 @@ SNAPSHOT_LOAD( z1013 )
 	memcpy (memory_get_read_ptr(cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM),  startaddr ),
 		 data+0x20, endaddr - startaddr + 1);
 
-	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), Z80_PC, runaddr);
+	cpu_set_reg(image.device().machine->device("maincpu"), Z80_PC, runaddr);
 
 	return IMAGE_INIT_PASS;
 }

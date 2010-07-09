@@ -28,29 +28,29 @@ static void pp01_video_w(running_machine *machine,UINT8 block,UINT16 offset,UINT
 	if (BIT(pp01_video_write_mode,3)) {
 		// Copy mode
 		if(BIT(pp01_video_write_mode,0)) {
-			messram_get_ptr(devtag_get_device(machine, "messram"))[0x6000+offset+addroffset] = data;
+			messram_get_ptr(machine->device("messram"))[0x6000+offset+addroffset] = data;
 		} else {
-			messram_get_ptr(devtag_get_device(machine, "messram"))[0x6000+offset+addroffset] = 0;
+			messram_get_ptr(machine->device("messram"))[0x6000+offset+addroffset] = 0;
 		}
 		if(BIT(pp01_video_write_mode,1)) {
-			messram_get_ptr(devtag_get_device(machine, "messram"))[0xa000+offset+addroffset] = data;
+			messram_get_ptr(machine->device("messram"))[0xa000+offset+addroffset] = data;
 		} else {
-			messram_get_ptr(devtag_get_device(machine, "messram"))[0xa000+offset+addroffset] = 0;
+			messram_get_ptr(machine->device("messram"))[0xa000+offset+addroffset] = 0;
 		}
 		if(BIT(pp01_video_write_mode,2)) {
-			messram_get_ptr(devtag_get_device(machine, "messram"))[0xe000+offset+addroffset] = data;
+			messram_get_ptr(machine->device("messram"))[0xe000+offset+addroffset] = data;
 		} else {
-			messram_get_ptr(devtag_get_device(machine, "messram"))[0xe000+offset+addroffset] = 0;
+			messram_get_ptr(machine->device("messram"))[0xe000+offset+addroffset] = 0;
 		}
 	} else {
 		if (block==0) {
-			messram_get_ptr(devtag_get_device(machine, "messram"))[0x6000+offset+addroffset] = data;
+			messram_get_ptr(machine->device("messram"))[0x6000+offset+addroffset] = data;
 		}
 		if (block==1) {
-			messram_get_ptr(devtag_get_device(machine, "messram"))[0xa000+offset+addroffset] = data;
+			messram_get_ptr(machine->device("messram"))[0xa000+offset+addroffset] = data;
 		}
 		if (block==2) {
-			messram_get_ptr(devtag_get_device(machine, "messram"))[0xe000+offset+addroffset] = data;
+			messram_get_ptr(machine->device("messram"))[0xe000+offset+addroffset] = data;
 		}
 	}
 }
@@ -119,7 +119,7 @@ static void pp01_set_memory(running_machine *machine,UINT8 block, UINT8 data)
 					break;
 		}
 
-		memory_set_bankptr(machine, bank, messram_get_ptr(devtag_get_device(machine, "messram")) + (data & 0x0F)* 0x1000);
+		memory_set_bankptr(machine, bank, messram_get_ptr(machine->device("messram")) + (data & 0x0F)* 0x1000);
 	} else if (data>=0xF8) {
 		memory_install_read_bank (space, startaddr, endaddr, 0, 0, bank);
 		memory_unmap_write(space, startaddr, endaddr, 0, 0);

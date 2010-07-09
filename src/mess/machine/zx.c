@@ -52,8 +52,8 @@ DRIVER_INIT ( zx )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_install_read_bank(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, "bank1");
-	memory_install_write8_handler(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, zx_ram_w);
+	memory_install_read_bank(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 1, 0, 0, "bank1");
+	memory_install_write8_handler(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 1, 0, 0, zx_ram_w);
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x4000);
 }
 
@@ -133,7 +133,7 @@ READ8_HANDLER ( zx80_io_r )
 		if (!input_port_read(space->machine, "CONFIG"))
 			data &= ~0x40;
 
-		cassette_output(devtag_get_device(space->machine, "cassette"), +0.75);
+		cassette_output(space->machine->device("cassette"), +0.75);
 
 		if (ula_irq_active)
 		{
@@ -144,7 +144,7 @@ READ8_HANDLER ( zx80_io_r )
 		}
 //      else
 //      {
-			if ((cassette_input(devtag_get_device(space->machine, "cassette")) < -0.75) && zx_tape_bit)
+			if ((cassette_input(space->machine->device("cassette")) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
 				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
@@ -197,7 +197,7 @@ READ8_HANDLER ( zx81_io_r )
 		if (!input_port_read(space->machine, "CONFIG"))
 			data &= ~0x40;
 
-		cassette_output(devtag_get_device(space->machine, "cassette"), +0.75);
+		cassette_output(space->machine->device("cassette"), +0.75);
 
 		if (ula_irq_active)
 		{
@@ -208,7 +208,7 @@ READ8_HANDLER ( zx81_io_r )
 		}
 		else
 		{
-			if ((cassette_input(devtag_get_device(space->machine, "cassette")) < -0.75) && zx_tape_bit)
+			if ((cassette_input(space->machine->device("cassette")) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
 				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
@@ -242,7 +242,7 @@ READ8_HANDLER ( pc8300_io_r )
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
 	static UINT8 speaker_state = 0;
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 
 	if (offs == 0xf5)
 	{
@@ -269,7 +269,7 @@ READ8_HANDLER ( pc8300_io_r )
 		if ((offset & 0x8000) == 0)
 			data &= input_port_read(space->machine, "ROW7");
 
-		cassette_output(devtag_get_device(space->machine, "cassette"), +0.75);
+		cassette_output(space->machine->device("cassette"), +0.75);
 
 		if (ula_irq_active)
 		{
@@ -280,7 +280,7 @@ READ8_HANDLER ( pc8300_io_r )
 		}
 		else
 		{
-			if ((cassette_input(devtag_get_device(space->machine, "cassette")) < -0.75) && zx_tape_bit)
+			if ((cassette_input(space->machine->device("cassette")) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
 				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
@@ -314,7 +314,7 @@ READ8_HANDLER ( pow3000_io_r )
 	UINT8 data = 0xff;
 	UINT8 offs = offset & 0xff;
 	static UINT8 speaker_state = 0;
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 
 	if (offs == 0x7e)
 	{
@@ -346,7 +346,7 @@ READ8_HANDLER ( pow3000_io_r )
 		if ((offset & 0x8000) == 0)
 			data &= input_port_read(space->machine, "ROW7");
 
-		cassette_output(devtag_get_device(space->machine, "cassette"), +0.75);
+		cassette_output(space->machine->device("cassette"), +0.75);
 
 		if (ula_irq_active)
 		{
@@ -356,7 +356,7 @@ READ8_HANDLER ( pow3000_io_r )
 		}
 		else
 		{
-			if ((cassette_input(devtag_get_device(space->machine, "cassette")) < -0.75) && zx_tape_bit)
+			if ((cassette_input(space->machine->device("cassette")) < -0.75) && zx_tape_bit)
 			{
 				zx_tape_bit = 0x00;
 				timer_set(space->machine, ATTOTIME_IN_USEC(362), NULL, 0, zx_tape_pulse);
@@ -385,7 +385,7 @@ WRITE8_HANDLER( zx80_io_w )
 	UINT8 offs = offset & 0xff;
 
 	if (offs == 0xff)
-		cassette_output(devtag_get_device(space->machine, "cassette"), -0.75);
+		cassette_output(space->machine->device("cassette"), -0.75);
 	else
 		LOG_ZX81_IOR("Unmapped port");
 }
@@ -422,7 +422,7 @@ WRITE8_HANDLER ( zx81_io_w )
 	else
 	if (offs == 0xff)
 	{
-		cassette_output(devtag_get_device(space->machine, "cassette"), -0.75);
+		cassette_output(space->machine->device("cassette"), -0.75);
 		zx_ula_bkgnd(space->machine, 1);
 		if (ula_frame_vsync == 2)
 		{

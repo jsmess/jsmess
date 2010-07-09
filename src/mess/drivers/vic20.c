@@ -379,7 +379,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 	vic20_state *state = (vic20_state *)device->machine->driver_data;
 
 	/* cassette write */
-	cassette_output(devtag_get_device(device->machine, "cassette"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	cassette_output(device->machine->device("cassette"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
 	/* keyboard column */
 	state->key_col = data;
@@ -520,19 +520,19 @@ static MACHINE_START( vic20 )
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->via0 = devtag_get_device(machine, M6522_0_TAG);
-	state->via1 = devtag_get_device(machine, M6522_1_TAG);
-	state->iec = devtag_get_device(machine, IEC_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->via0 = machine->device(M6522_0_TAG);
+	state->via1 = machine->device(M6522_1_TAG);
+	state->iec = machine->device(IEC_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 	state->cassette_timer = machine->device<timer_device>(TIMER_C1530_TAG);
-	state->mos6560 = devtag_get_device(machine, M6560_TAG);
+	state->mos6560 = machine->device(M6560_TAG);
 
 	/* set VIA clocks */
 	state->via0->set_unscaled_clock(cputag_get_clock(machine, M6502_TAG));
 	state->via1->set_unscaled_clock(cputag_get_clock(machine, M6502_TAG));
 
 	/* memory expansions */
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 32*1024:
 		memory_install_ram(program, 0x6000, 0x7fff, 0, 0, NULL);

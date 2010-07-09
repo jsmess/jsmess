@@ -582,21 +582,21 @@ static MACHINE_START( tiki100 )
 	tiki100_state *state = (tiki100_state *)machine->driver_data;
 
 	/* find devices */
-	state->fd1797 = devtag_get_device(machine, FD1797_TAG);
-	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
+	state->fd1797 = machine->device(FD1797_TAG);
+	state->z80ctc = machine->device(Z80CTC_TAG);
 
 	/* allocate video RAM */
 	state->video_ram = auto_alloc_array(machine, UINT8, TIKI100_VIDEORAM_SIZE);
 
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", BANK_ROM, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, "bank1", BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank1", BANK_RAM, 1, messram_get_ptr(machine->device("messram")), 0);
 	memory_configure_bank(machine, "bank1", BANK_VIDEO_RAM, 1, state->video_ram, 0);
 
-	memory_configure_bank(machine, "bank2", BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000, 0);
+	memory_configure_bank(machine, "bank2", BANK_RAM, 1, messram_get_ptr(machine->device("messram")) + 0x4000, 0);
 	memory_configure_bank(machine, "bank2", BANK_VIDEO_RAM, 1, state->video_ram + 0x4000, 0);
 
-	memory_configure_bank(machine, "bank3", BANK_RAM, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0);
+	memory_configure_bank(machine, "bank3", BANK_RAM, 1, messram_get_ptr(machine->device("messram")) + 0x8000, 0);
 
 	tiki100_bankswitch(machine);
 

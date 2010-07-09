@@ -222,10 +222,10 @@ MACHINE_RESET( super80 )
 	super80_shared=0xff;
 	timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, super80_reset);
 	memory_set_bank(machine, "bank1", 1);
-	super80_z80pio = devtag_get_device(machine, "z80pio");
-	super80_speaker = devtag_get_device(machine, "speaker");
-	super80_cassette = devtag_get_device(machine, "cassette");
-	super80_printer = devtag_get_device(machine, "centronics");
+	super80_z80pio = machine->device("z80pio");
+	super80_speaker = machine->device("speaker");
+	super80_cassette = machine->device("cassette");
+	super80_printer = machine->device("centronics");
 }
 
 static void driver_init_common( running_machine *machine )

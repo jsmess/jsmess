@@ -1384,8 +1384,8 @@ static MACHINE_START( newbrain )
 	newbrain_state *state = (newbrain_state *)machine->driver_data;
 
 	/* find devices */
-	state->cassette1 = devtag_get_device(machine, CASSETTE1_TAG);
-	state->cassette2 = devtag_get_device(machine, CASSETTE2_TAG);
+	state->cassette1 = machine->device(CASSETTE1_TAG);
+	state->cassette2 = machine->device(CASSETTE2_TAG);
 
 	/* allocate reset timer */
 	state->reset_timer = timer_alloc(machine, reset_tick, NULL);
@@ -1447,9 +1447,9 @@ static MACHINE_START( newbrain_eim )
 	state->eim_ram = auto_alloc_array(machine, UINT8, NEWBRAIN_EIM_RAM_SIZE);
 
 	/* find devices */
-	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
-	state->mc6850 = devtag_get_device(machine, MC6850_TAG);
-	state->upd765 = devtag_get_device(machine, UPD765_TAG);
+	state->z80ctc = machine->device(Z80CTC_TAG);
+	state->mc6850 = machine->device(MC6850_TAG);
+	state->upd765 = machine->device(UPD765_TAG);
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine, state->eim_ram, NEWBRAIN_EIM_RAM_SIZE);

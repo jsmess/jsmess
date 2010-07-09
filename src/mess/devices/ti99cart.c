@@ -2797,7 +2797,7 @@ READ16_DEVICE_HANDLER( ti99_multicart_r )
 	cartridge_t *cart;
 
 	/* Idle the CPU */
-	cpu_adjust_icount(devtag_get_device(device->machine, "maincpu"),-4);
+	cpu_adjust_icount(device->machine->device("maincpu"),-4);
 	// Alternatively:
 	// cpu_spinuntil_time(device->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
@@ -2861,7 +2861,7 @@ WRITE16_DEVICE_HANDLER( ti99_multicart_w )
 	cartridge_t *cart;
 
 	/* Idle the CPU */
-	cpu_adjust_icount(devtag_get_device(device->machine, "maincpu"),-4);
+	cpu_adjust_icount(device->machine->device("maincpu"),-4);
 //  cpu_spinuntil_time(device->machine->firstcpu, ATTOTIME_IN_USEC(6));
 
 	// Handle GRAM Kracker
@@ -2980,7 +2980,7 @@ READ8_DEVICE_HANDLER(ti99_multicart8_r)
 	cartridge_t *cart;
 
 	/* Idle the CPU. TODO: Check whether this is correct for this machine. */
-	cpu_adjust_icount(devtag_get_device(device->machine, "maincpu"),-4);
+	cpu_adjust_icount(device->machine->device("maincpu"),-4);
 
 	// Handle GRAM Kracker
 	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine, "CARTSLOT")==CART_GK))
@@ -3020,7 +3020,7 @@ WRITE8_DEVICE_HANDLER(ti99_multicart8_w)
 	int slot = cartslots->active_slot;
 
 	/* Idle the CPU. TODO: Check whether this is correct for this machine. */
-	cpu_adjust_icount(devtag_get_device(device->machine, "maincpu"),-4);
+	cpu_adjust_icount(device->machine->device("maincpu"),-4);
 
 	// Handle GRAM Kracker
 	if ((cartslots->gk_slot != -1) && (input_port_read(device->machine, "CARTSLOT")==CART_GK))

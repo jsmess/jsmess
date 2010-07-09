@@ -188,7 +188,7 @@ static VIDEO_START( abc800m )
 	abc800_state *state = (abc800_state *)machine->driver_data;
 
 	/* find devices */
-	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
+	state->mc6845 = machine->device(MC6845_TAG);
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, "chargen");

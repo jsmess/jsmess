@@ -323,6 +323,6 @@ WRITE8_HANDLER( kaypro2x_videoram_w )
 
 VIDEO_START( kaypro )
 {
-	mc6845 = devtag_get_device(machine, "crtc");
+	mc6845 = machine->device("crtc");
 	FNT = memory_region(machine, "gfx1");
 }

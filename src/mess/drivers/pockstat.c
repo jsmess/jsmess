@@ -304,19 +304,19 @@ static void ps_intc_set_interrupt_line(running_machine *machine, UINT32 line, in
 	}
 	if(intc_regs.hold & intc_regs.enable & PS_INT_IRQ_MASK)
 	{
-		cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->device("maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 	if(intc_regs.hold & intc_regs.enable & PS_INT_FIQ_MASK)
 	{
-		cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->device("maincpu"), ARM7_FIRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(devtag_get_device(machine, "maincpu"), ARM7_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->device("maincpu"), ARM7_FIRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -803,7 +803,7 @@ static WRITE32_HANDLER( ps_audio_w )
 
 static WRITE32_HANDLER( ps_dac_w )
 {
-	dac_data_16_w(devtag_get_device(space->machine, "dac"), (UINT16)((data + 0x8000) & 0x0000ffff));
+	dac_data_16_w(space->machine->device("dac"), (UINT16)((data + 0x8000) & 0x0000ffff));
 }
 
 static ADDRESS_MAP_START(pockstat_mem, ADDRESS_SPACE_PROGRAM, 32)
@@ -884,7 +884,7 @@ static MACHINE_START( pockstat )
 
 static MACHINE_RESET( pockstat )
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, 0x4000000);
+	cpu_set_reg(machine->device("maincpu"), STATE_GENPC, 0x4000000);
 
 	ps_flash_write_enable_count = 0;
 	ps_flash_write_count = 0;

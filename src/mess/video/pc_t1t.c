@@ -175,7 +175,7 @@ static VIDEO_START( pc_pcjr )
 
 static VIDEO_UPDATE( mc6845_t1000 )
 {
-	running_device *devconf = devtag_get_device(screen->machine, T1000_MC6845_NAME);
+	running_device *devconf = screen->machine->device(T1000_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect);
 	return 0;
 }
@@ -485,7 +485,7 @@ static void pc_t1t_mode_switch( void )
 
 static void pc_pcjr_mode_switch( running_machine *machine )
 {
-	running_device *mc6845 = devtag_get_device(machine, T1000_MC6845_NAME);
+	running_device *mc6845 = machine->device(T1000_MC6845_NAME);
 
 	switch( pcjr.reg.data[0] & 0x1A )
 	{
@@ -761,8 +761,8 @@ static void pc_pcjr_bank_w(running_machine *machine, int data)
 			dram = ((data & 0x07) << 14);
 			vram = ((data & 0x38) << (14-3));
 		}
-		memory_set_bankptr( machine, "bank14", messram_get_ptr(devtag_get_device(machine, "messram")) + vram );
-		pcjr.displayram = messram_get_ptr(devtag_get_device(machine, "messram")) + dram;
+		memory_set_bankptr( machine, "bank14", messram_get_ptr(machine->device("messram")) + vram );
+		pcjr.displayram = messram_get_ptr(machine->device("messram")) + dram;
 		pc_pcjr_mode_switch(machine);
 	}
 }
@@ -787,11 +787,11 @@ WRITE8_HANDLER ( pc_T1T_w )
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
-			devconf = devtag_get_device(space->machine, T1000_MC6845_NAME);
+			devconf = space->machine->device(T1000_MC6845_NAME);
 			mc6845_address_w( devconf, offset, data );
 			break;
 		case 1: case 3: case 5: case 7:
-			devconf = devtag_get_device(space->machine, T1000_MC6845_NAME);
+			devconf = space->machine->device(T1000_MC6845_NAME);
 			mc6845_register_w( devconf, offset, data );
 			break;
 		case 8:
@@ -827,11 +827,11 @@ WRITE8_HANDLER( pc_pcjr_w )
 	switch( offset )
 	{
 		case 0: case 4:
-			devconf = devtag_get_device(space->machine, T1000_MC6845_NAME);
+			devconf = space->machine->device(T1000_MC6845_NAME);
 			mc6845_address_w( devconf, offset, data );
 			break;
 		case 1: case 5:
-			devconf = devtag_get_device(space->machine, T1000_MC6845_NAME);
+			devconf = space->machine->device(T1000_MC6845_NAME);
 			mc6845_register_w( devconf, offset, data );
 			break;
 		case 10:
@@ -872,7 +872,7 @@ WRITE8_HANDLER( pc_pcjr_w )
 			break;
 
 		case 1: case 3: case 5: case 7:
-			devconf = devtag_get_device(space->machine, T1000_MC6845_NAME);
+			devconf = space->machine->device(T1000_MC6845_NAME);
 			data = mc6845_register_r( devconf, offset );
 			break;
 
@@ -932,5 +932,5 @@ static WRITE_LINE_DEVICE_HANDLER( pcjr_vsync_changed )
 	{
 		pcjr.pc_framecnt++;
 	}
-	pic8259_ir5_w(devtag_get_device(device->machine, "pic8259"), state);
+	pic8259_ir5_w(device->machine->device("pic8259"), state);
 }

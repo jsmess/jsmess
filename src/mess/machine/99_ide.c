@@ -109,7 +109,7 @@ void ti99_ide_init(running_machine *machine)
 */
 void ti99_ide_reset(running_machine *machine, int in_tms9995_mode)
 {
-	expansion_box = devtag_get_device(machine, "per_exp_box");
+	expansion_box = machine->device("per_exp_box");
 	ti99_peb_set_card_handlers(expansion_box, 0x1000, & ide_handlers);
 
 	cur_page = 0;
@@ -187,7 +187,7 @@ static void ide_cru_w(running_machine *machine, int offset, int data)
 static READ8_HANDLER(ide_mem_r)
 {
 	int reply = 0;
-	running_device *ide_rtc = devtag_get_device(space->machine, "ide_rtc");
+	running_device *ide_rtc = space->machine->device("ide_rtc");
 
 	if ((offset <= 0xff) && (sram_enable == sram_enable_dip))
 	{	/* registers */
@@ -212,7 +212,7 @@ static READ8_HANDLER(ide_mem_r)
 		case 2:		/* IDE registers set 1 (CS1Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 			{	/* first read triggers 16-bit read cycle */
-				running_device *ide_device = devtag_get_device(space->machine, "ide");
+				running_device *ide_device = space->machine->device("ide");
 				input_latch = (! (offset & 0x10)) ? ide_bus_r(ide_device, 0, (offset >> 1) & 0x7) : 0;
 			}
 
@@ -224,7 +224,7 @@ static READ8_HANDLER(ide_mem_r)
 		case 3:		/* IDE registers set 2 (CS3Fx) */
 			if (tms9995_mode ? (!(offset & 1)) : (offset & 1))
 			{	/* first read triggers 16-bit read cycle */
-				running_device *ide_device = devtag_get_device(space->machine, "ide");
+				running_device *ide_device = space->machine->device("ide");
 				input_latch = (! (offset & 0x10)) ? ide_bus_r(ide_device, 1, (offset >> 1) & 0x7) : 0;
 			}
 
@@ -251,7 +251,7 @@ static READ8_HANDLER(ide_mem_r)
 */
 static WRITE8_HANDLER(ide_mem_w)
 {
-	running_device *ide_rtc = devtag_get_device(space->machine, "ide_rtc");
+	running_device *ide_rtc = space->machine->device("ide_rtc");
 
 	if (cru_register & cru_reg_page_switching)
 	{
@@ -294,7 +294,7 @@ static WRITE8_HANDLER(ide_mem_w)
 
 			if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 			{	/* second write triggers 16-bit write cycle */
-				running_device *ide_device = devtag_get_device(space->machine, "ide");
+				running_device *ide_device = space->machine->device("ide");
 				ide_bus_w(ide_device, 0, (offset >> 1) & 0x7, output_latch);
 			}
 			break;
@@ -314,7 +314,7 @@ static WRITE8_HANDLER(ide_mem_w)
 
 			if (tms9995_mode ? (offset & 1) : (!(offset & 1)))
 			{	/* second write triggers 16-bit write cycle */
-				running_device *ide_device = devtag_get_device(space->machine, "ide");
+				running_device *ide_device = space->machine->device("ide");
 				ide_bus_w(ide_device, 1, (offset >> 1) & 0x7, output_latch);
 			}
 			break;

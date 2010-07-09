@@ -143,7 +143,7 @@ static void pc8401a_bankswitch(running_machine *machine, UINT8 data)
 		break;
 
 	case 3: /* RAM cartridge */
-		if (messram_get_size(devtag_get_device(machine, "messram")) > 64)
+		if (messram_get_size(machine->device("messram")) > 64)
 		{
 			memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank3");
 			memory_set_bank(machine, "bank3", 3); // TODO or 4
@@ -516,7 +516,7 @@ static MACHINE_START( pc8401a )
 	pc8401a_state *state = (pc8401a_state *)machine->driver_data;
 
 	/* find devices */
-	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
+	state->upd1990a = machine->device(UPD1990A_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -526,20 +526,20 @@ static MACHINE_START( pc8401a )
 
 	/* set up A0/A1 memory banking */
 	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, Z80_TAG), 0x8000);
-	memory_configure_bank(machine, "bank1", 4, 2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x8000);
+	memory_configure_bank(machine, "bank1", 4, 2, messram_get_ptr(machine->device("messram")), 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* set up A2 memory banking */
-	memory_configure_bank(machine, "bank3", 0, 5, messram_get_ptr(devtag_get_device(machine, "messram")), 0x4000);
+	memory_configure_bank(machine, "bank3", 0, 5, messram_get_ptr(machine->device("messram")), 0x4000);
 	memory_set_bank(machine, "bank3", 0);
 
 	/* set up A3 memory banking */
-	memory_configure_bank(machine, "bank4", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000, 0);
+	memory_configure_bank(machine, "bank4", 0, 1, messram_get_ptr(machine->device("messram")) + 0xc000, 0);
 	memory_configure_bank(machine, "bank4", 1, 1, state->crt_ram, 0);
 	memory_set_bank(machine, "bank4", 0);
 
 	/* set up A4 memory banking */
-	memory_configure_bank(machine, "bank5", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe800, 0);
+	memory_configure_bank(machine, "bank5", 0, 1, messram_get_ptr(machine->device("messram")) + 0xe800, 0);
 	memory_set_bank(machine, "bank5", 0);
 
 	/* bank switch */

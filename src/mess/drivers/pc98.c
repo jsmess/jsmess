@@ -327,7 +327,7 @@ static READ8_HANDLER( sys_port_r )
 		return 0x38;
 
 	if(offset & 1)
-		return i8255a_r(devtag_get_device(space->machine, "ppi8255_0"), (offset & 6) >> 1);
+		return i8255a_r(space->machine->device("ppi8255_0"), (offset & 6) >> 1);
 
 	logerror("RS-232c R access %02x\n",offset >> 1);
 	return 0xff;
@@ -337,7 +337,7 @@ static READ8_HANDLER( sys_port_r )
 static WRITE8_HANDLER( sys_port_w )
 {
 	if(offset & 1)
-		i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), (offset & 6) >> 1, data);
+		i8255a_w(space->machine->device("ppi8255_0"), (offset & 6) >> 1, data);
 	else
 		logerror("RS-232c W access %02x %02x\n",offset >> 1,data);
 }
@@ -345,7 +345,7 @@ static WRITE8_HANDLER( sys_port_w )
 static READ8_HANDLER( sio_port_r )
 {
 	if(!(offset & 1))
-		return i8255a_r(devtag_get_device(space->machine, "ppi8255_1"), (offset & 6) >> 1);
+		return i8255a_r(space->machine->device("ppi8255_1"), (offset & 6) >> 1);
 
 	logerror("keyboard R access %02x\n",offset >> 1);
 	return 0xff;
@@ -355,7 +355,7 @@ static READ8_HANDLER( sio_port_r )
 static WRITE8_HANDLER( sio_port_w )
 {
 	if(!(offset & 1))
-		i8255a_w(devtag_get_device(space->machine, "ppi8255_1"), (offset & 6) >> 1, data);
+		i8255a_w(space->machine->device("ppi8255_1"), (offset & 6) >> 1, data);
 	else
 		logerror("keyboard W access %02x %02x\n",offset >> 1,data);
 }
@@ -476,7 +476,7 @@ static READ8_HANDLER( port_70_r )
 	if(offset & 1)
 	{
 		logerror("pit port $70 R access %02x\n",offset >> 1);
-		return pit8253_r(devtag_get_device(space->machine, "pit8253"), (offset & 6) >> 1);
+		return pit8253_r(space->machine->device("pit8253"), (offset & 6) >> 1);
 	}
 
 	logerror("crtc port $70 R access %02x\n",offset >> 1);
@@ -488,7 +488,7 @@ static WRITE8_HANDLER( port_70_w )
 	if(offset & 1)
 	{
 		logerror("pit port $70 W access %02x %02x\n",offset >> 1,data);
-		pit8253_w(devtag_get_device(space->machine, "pit8253"), (offset & 6) >> 1, data);
+		pit8253_w(space->machine->device("pit8253"), (offset & 6) >> 1, data);
 	}
 	else
 		logerror("crtc port $70 W access %02x %02x\n",offset >> 1,data);
@@ -499,11 +499,11 @@ static READ8_HANDLER( port_00_r )
 	if(!(offset & 1))
 	{
 		logerror("pic8259 port $00 R access %02x\n",offset >> 1);
-		return pic8259_r(devtag_get_device(space->machine, (offset & 8) ? "pic8259_slave" : "pic8259_master"), (offset & 2) >> 1);
+		return pic8259_r(space->machine->device((offset & 8) ? "pic8259_slave" : "pic8259_master"), (offset & 2) >> 1);
 	}
 
 	//logerror("DMA port $00 R access %02x\n",offset >> 1);
-	return i8237_r(devtag_get_device(space->machine, "dma8237_1"), (offset & 0x1e) >> 1);
+	return i8237_r(space->machine->device("dma8237_1"), (offset & 0x1e) >> 1);
 }
 
 static WRITE8_HANDLER( port_00_w )
@@ -511,12 +511,12 @@ static WRITE8_HANDLER( port_00_w )
 	if(!(offset & 1))
 	{
 		logerror("pic8259 port $00 W access %02x %02x\n",offset >> 1,data);
-		pic8259_w(devtag_get_device(space->machine, (offset & 8) ? "pic8259_slave" : "pic8259_master"), (offset & 2) >> 1, data);
+		pic8259_w(space->machine->device((offset & 8) ? "pic8259_slave" : "pic8259_master"), (offset & 2) >> 1, data);
 	}
 	else
 	{
 		//logerror("DMA port $00 W access %02x %02x\n",offset >> 1,data);
-		i8237_w(devtag_get_device(space->machine, "dma8237_1"), (offset & 0x1e) >> 1, data);
+		i8237_w(space->machine->device("dma8237_1"), (offset & 0x1e) >> 1, data);
 	}
 }
 
@@ -649,10 +649,10 @@ INPUT_PORTS_END
 static IRQ_CALLBACK(irq_callback)
 {
 	int r = 0;
-	r = pic8259_acknowledge( devtag_get_device( device->machine, "pic8259_slave" ));
+	r = pic8259_acknowledge( device->machine->device( "pic8259_slave" ));
 	if (r==0)
 	{
-		r = pic8259_acknowledge( devtag_get_device( device->machine, "pic8259_master" ));
+		r = pic8259_acknowledge( device->machine->device( "pic8259_master" ));
 		//printf("%02x ACK\n",r);
 	}
 	return r;
@@ -665,12 +665,12 @@ static MACHINE_RESET(pc9801)
 {
 	UINT8 *ROM = memory_region(machine, "cpudata");
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, 0);
 
 	gate_a20 = 0;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), I386_EIP, 0xffff0+0x10000);
+	cpu_set_reg(machine->device("maincpu"), I386_EIP, 0xffff0+0x10000);
 
 	memory_set_bankptr(machine, "bank1", &ROM[0x20000]);
 
@@ -681,12 +681,12 @@ static MACHINE_RESET(pc9801)
 static MACHINE_RESET(pc9821)
 {
 	UINT8 *ROM = memory_region(machine, "cpudata");
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_A20, 0);
 
 	gate_a20 = 0;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), I386_EIP, 0xffff0+0x10000);
+	cpu_set_reg(machine->device("maincpu"), I386_EIP, 0xffff0+0x10000);
 
 	memory_set_bankptr(machine, "bank1", &ROM[0x20000]);
 

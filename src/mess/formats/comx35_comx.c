@@ -53,7 +53,7 @@ QUICKLOAD_LOAD( comx35_comx )
 	UINT8 header[16] = {0};
 	int size = image.length();
 
-	if (size > messram_get_size(devtag_get_device(image.device().machine, "messram")))
+	if (size > messram_get_size(image.device().machine->device("messram")))
 	{
 		return IMAGE_INIT_FAIL;
 	}

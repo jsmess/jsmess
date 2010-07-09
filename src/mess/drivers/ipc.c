@@ -26,7 +26,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(ipc)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), I8085_PC, 0xE800);
+	cpu_set_reg(machine->device("maincpu"), I8085_PC, 0xE800);
 }
 
 static VIDEO_START( ipc )

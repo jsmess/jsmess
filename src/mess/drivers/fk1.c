@@ -256,8 +256,8 @@ static READ8_HANDLER( fk1_bank_ram_r )
 {
 	const address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write_bank(space_mem, 0x0000, 0x3fff, 0, 0, "bank1");
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
-	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x4000);
+	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
+	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram")) + 0x4000);
 	return 0;
 }
 
@@ -266,7 +266,7 @@ static READ8_HANDLER( fk1_bank_rom_r )
 	const address_space *space_mem = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_unmap_write(space_mem, 0x0000, 0x3fff, 0, 0);
 	memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu"));
-	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x10000);
+	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram")) + 0x10000);
 	return 0;
 }
 
@@ -382,11 +382,11 @@ static MACHINE_RESET(fk1)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu")); // ROM
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000); // VRAM
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
-	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x10000); // VRAM
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xc000);
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), fk1_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), fk1_irq_callback);
 }
 
 static MACHINE_START( fk1 )
@@ -400,7 +400,7 @@ static VIDEO_UPDATE( fk1 )
 	fk1_state *state = (fk1_state *)screen->machine->driver_data;
 	UINT8 code;
 	int y, x, b;
-	UINT8 *ram = messram_get_ptr(devtag_get_device(screen->machine, "messram"));
+	UINT8 *ram = messram_get_ptr(screen->machine->device("messram"));
 
 	for (x = 0; x < 64; x++)
 	{

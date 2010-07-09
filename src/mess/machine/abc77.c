@@ -76,7 +76,7 @@ DISCRETE_SOUND_END
 
 static TIMER_DEVICE_CALLBACK( clock_tick )
 {
-	running_device *device = devtag_get_device(timer.machine, ABC77_TAG);
+	running_device *device = timer.machine->device(ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->clock = !abc77->clock;
@@ -102,7 +102,7 @@ static TIMER_CALLBACK( reset_tick )
 
 static READ8_HANDLER( abc77_clock_r )
 {
-	running_device *device = devtag_get_device(space->machine, ABC77_TAG);
+	running_device *device = space->machine->device(ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	return abc77->clock;
@@ -114,7 +114,7 @@ static READ8_HANDLER( abc77_clock_r )
 
 static READ8_HANDLER( abc77_data_r )
 {
-	running_device *device = devtag_get_device(space->machine, ABC77_TAG);
+	running_device *device = space->machine->device(ABC77_TAG);
 	abc77_t *abc77 = get_safe_token(device);
 
 	static const char *const keynames[] = { "ABC77_X0", "ABC77_X1", "ABC77_X2", "ABC77_X3", "ABC77_X4", "ABC77_X5", "ABC77_X6", "ABC77_X7", "ABC77_X8", "ABC77_X9", "ABC77_X10", "ABC77_X11" };
@@ -128,8 +128,8 @@ static READ8_HANDLER( abc77_data_r )
 
 static WRITE8_HANDLER( abc77_data_w )
 {
-	running_device *device = devtag_get_device(space->machine, ABC77_TAG);
-	running_device *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *device = space->machine->device(ABC77_TAG);
+	running_device *discrete = space->machine->device("discrete");
 	abc77_t *abc77 = get_safe_token(device);
 
 	abc77->keylatch = data & 0x0f;
@@ -412,7 +412,7 @@ static DEVICE_START( abc77 )
 
 	/* find our CPU */
 	astring_printf(&tempstring, "%s:%s", device->tag(), I8035_TAG);
-	abc77->cpu = devtag_get_device(device->machine, astring_c(&tempstring));
+	abc77->cpu = device->machine->device(astring_c(&tempstring));
 
 	/* allocate reset timer */
 	abc77->reset_timer = timer_alloc(device->machine, reset_tick, (FPTR *) device);

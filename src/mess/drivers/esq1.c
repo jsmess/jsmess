@@ -84,7 +84,7 @@ static VIDEO_UPDATE( esq1 )
 
 static MACHINE_RESET( esq1 )
 {
-	es5503_set_base(devtag_get_device(machine, "es5503"), memory_region(machine, "ensoniq"));
+	es5503_set_base(machine->device("es5503"), memory_region(machine, "ensoniq"));
 
 	// set default OSROM banking
 	memory_set_bankptr(machine, "osbank", memory_region(machine, "osrom") );

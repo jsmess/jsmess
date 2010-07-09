@@ -304,7 +304,7 @@ TIMER_CALLBACK(x68k_crtc_raster_irq)
 
 TIMER_CALLBACK(x68k_crtc_vblank_irq)
 {
-	running_device *x68k_mfp = devtag_get_device(machine, MC68901_TAG);
+	running_device *x68k_mfp = machine->device(MC68901_TAG);
 	int val = param;
 	attotime irq_time;
 	int vblank_line;
@@ -485,7 +485,7 @@ WRITE16_HANDLER( x68k_crtc_w )
 		}
 		break;
 	}
-//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(devtag_get_device(space->machine, "maincpu")),data,offset);
+//  logerror("CRTC: [%08x] Wrote %04x to CRTC register %i\n",cpu_get_pc(space->machine->device("maincpu")),data,offset);
 }
 
 READ16_HANDLER( x68k_crtc_r )
@@ -501,7 +501,7 @@ READ16_HANDLER( x68k_crtc_r )
 
 	if(offset < 24)
 	{
-//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(devtag_get_device(space->machine, "maincpu")),x68k_sys.crtc.reg[offset],offset);
+//      logerror("CRTC: [%08x] Read %04x from CRTC register %i\n",cpu_get_pc(space->machine->device("maincpu")),x68k_sys.crtc.reg[offset],offset);
 		switch(offset)
 		{
 		case 9:
@@ -1273,7 +1273,7 @@ VIDEO_UPDATE( x68000 )
 //  popmessage("Graphic layer scroll - %i, %i - %i, %i - %i, %i - %i, %i",
 //      x68k_sys.crtc.reg[12],x68k_sys.crtc.reg[13],x68k_sys.crtc.reg[14],x68k_sys.crtc.reg[15],x68k_sys.crtc.reg[16],x68k_sys.crtc.reg[17],x68k_sys.crtc.reg[18],x68k_sys.crtc.reg[19]);
 //  popmessage("IOC IRQ status - %02x",x68k_sys.ioc.irqstatus);
-//  popmessage("RAM: mouse data - %02x %02x %02x %02x",messram_get_ptr(devtag_get_device(machine, "messram"))[0x931],messram_get_ptr(devtag_get_device(machine, "messram"))[0x930],messram_get_ptr(devtag_get_device(machine, "messram"))[0x933],messram_get_ptr(devtag_get_device(machine, "messram"))[0x932]);
+//  popmessage("RAM: mouse data - %02x %02x %02x %02x",messram_get_ptr(machine->device("messram"))[0x931],messram_get_ptr(machine->device("messram"))[0x930],messram_get_ptr(machine->device("messram"))[0x933],messram_get_ptr(machine->device("messram"))[0x932]);
 #endif
 	return 0;
 }

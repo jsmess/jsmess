@@ -86,7 +86,7 @@ WRITE8_HANDLER( odyssey2_bus_w )
 		if ( offset & 0x80 ) {
 			if ( data & 0x20 ) {
 				logerror("voice write %02X, data = %02X (p1 = %02X)\n", offset, data, p1 );
-				sp0256_ALD_w( devtag_get_device(space->machine, "sp0256_speech"), 0, offset & 0x7F );
+				sp0256_ALD_w( space->machine->device("sp0256_speech"), 0, offset & 0x7F );
 			} else {
 				/* TODO: Reset sp0256 in this case */
 			}

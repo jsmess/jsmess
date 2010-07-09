@@ -82,7 +82,7 @@
 
 static running_device *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE_TAG);
+	return machine->device(CASSETTE_TAG);
 }
 
 /* Read/Write Handlers */
@@ -137,7 +137,7 @@ static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 	switch (ram_bank)
 	{
 	case 0:
-		if (messram_get_size(devtag_get_device(machine, "messram")) > 16 * 1024)
+		if (messram_get_size(machine->device("messram")) > 16 * 1024)
 		{
 			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
 		}
@@ -153,14 +153,14 @@ static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 		break;
 
 	case 2:
-		if (messram_get_size(devtag_get_device(machine, "messram")) > 32 * 1024)
+		if (messram_get_size(machine->device("messram")) > 32 * 1024)
 			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
 		else
 			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
 		break;
 
 	case 3:
-		if (messram_get_size(devtag_get_device(machine, "messram")) > 64 * 1024)
+		if (messram_get_size(machine->device("messram")) > 64 * 1024)
 			memory_install_readwrite_bank(program, 0x8000, 0xffff, 0, 0, "bank2");
 		else
 			memory_unmap_readwrite(program, 0x8000, 0xffff, 0, 0);
@@ -428,7 +428,7 @@ static WRITE8_HANDLER( tandy200_bank_w )
 		memory_set_bank(space->machine, "bank1", rom_bank);
 	}
 
-	if (messram_get_size(devtag_get_device(space->machine, "messram")) < ((ram_bank + 1) * 24 * 1024))
+	if (messram_get_size(space->machine->device("messram")) < ((ram_bank + 1) * 24 * 1024))
 	{
 		/* invalid RAM bank */
 		memory_unmap_readwrite(program, 0xa000, 0xffff, 0, 0);
@@ -1134,10 +1134,10 @@ static MACHINE_START( kc85 )
 	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->upd1990a = machine->device(UPD1990A_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -1151,7 +1151,7 @@ static MACHINE_START( kc85 )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 16 * 1024:
 		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);
@@ -1163,7 +1163,7 @@ static MACHINE_START( kc85 )
 		break;
 	}
 
-	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(machine->device("messram")), 0);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
@@ -1178,10 +1178,10 @@ static MACHINE_START( pc8201 )
 	kc85_state *state = (kc85_state *)machine->driver_data;
 
 	/* find devices */
-	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->upd1990a = machine->device(UPD1990A_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -1190,12 +1190,12 @@ static MACHINE_START( pc8201 )
 	/* configure ROM banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "option"), 0);
-	memory_configure_bank(machine, "bank1", 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x8000);
+	memory_configure_bank(machine, "bank1", 2, 2, messram_get_ptr(machine->device("messram")) + 0x8000, 0x8000);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_configure_bank(machine, "bank2", 2, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x8000);
+	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(machine->device("messram")), 0);
+	memory_configure_bank(machine, "bank2", 2, 2, messram_get_ptr(machine->device("messram")) + 0x8000, 0x8000);
 	memory_set_bank(machine, "bank2", 0);
 
 	pc8201_bankswitch(machine, 0);
@@ -1215,10 +1215,10 @@ static MACHINE_START( trsm100 )
 	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->upd1990a = machine->device(UPD1990A_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -1232,7 +1232,7 @@ static MACHINE_START( trsm100 )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 8 * 1024:
 		memory_unmap_readwrite(program, 0x8000, 0xcfff, 0, 0);
@@ -1254,7 +1254,7 @@ static MACHINE_START( trsm100 )
 		break;
 	}
 
-	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(machine->device("messram")), 0);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */
@@ -1269,9 +1269,9 @@ static MACHINE_START( tandy200 )
 	tandy200_state *state = (tandy200_state *)machine->driver_data;
 
 	/* find devices */
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* configure ROM banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, I8085_TAG), 0);
@@ -1280,7 +1280,7 @@ static MACHINE_START( tandy200 )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* configure RAM banking */
-	memory_configure_bank(machine, "bank2", 0, 3, messram_get_ptr(devtag_get_device(machine, "messram")), 0x6000);
+	memory_configure_bank(machine, "bank2", 0, 3, messram_get_ptr(machine->device("messram")), 0x6000);
 	memory_set_bank(machine, "bank2", 0);
 
 	/* register for state saving */

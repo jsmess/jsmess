@@ -133,7 +133,7 @@ static NICK_STATE Nick;
 /* fetch a byte from "video ram" at Addr specified */
 static char Nick_FetchByte(running_machine *machine,unsigned long Addr)
 {
-   return messram_get_ptr(devtag_get_device(machine, "messram"))[Addr & 0x0ffff];
+   return messram_get_ptr(machine->device("messram"))[Addr & 0x0ffff];
 }
 
 // MESS specific

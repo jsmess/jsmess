@@ -324,8 +324,8 @@ static void bebox_set_irq_bit(running_machine *machine, unsigned int interrupt_b
 		assert_always((interrupt_bit < ARRAY_LENGTH(interrupt_names)) && (interrupt_names[interrupt_bit] != NULL), "Raising invalid interrupt");
 
 		logerror("bebox_set_irq_bit(): pc[0]=0x%08x pc[1]=0x%08x %s interrupt #%u (%s)\n",
-			(unsigned) cpu_get_reg(devtag_get_device(machine, "ppc1"), STATE_GENPC),
-			(unsigned) cpu_get_reg(devtag_get_device(machine, "ppc2"), STATE_GENPC),
+			(unsigned) cpu_get_reg(machine->device("ppc1"), STATE_GENPC),
+			(unsigned) cpu_get_reg(machine->device("ppc2"), STATE_GENPC),
 			val ? "Asserting" : "Clearing",
 			interrupt_bit, interrupt_names[interrupt_bit]);
 	}
@@ -431,7 +431,7 @@ static running_device *bebox_fdc_get_image(running_machine *machine, int floppy_
 
 static running_device * bebox_get_device(running_machine *machine )
 {
-	return devtag_get_device(machine, "smc37c78");
+	return machine->device("smc37c78");
 }
 
 
@@ -497,7 +497,7 @@ const struct pic8259_interface bebox_pic8259_slave_config =
 
 static running_device *ide_device(running_machine *machine)
 {
-	return devtag_get_device(machine, "ide");
+	return machine->device("ide");
 }
 
 static READ8_HANDLER( bebox_800001F0_8_r ) { return ide_controller_r(ide_device(space->machine), offset + 0x1F0, 1); }
@@ -854,7 +854,7 @@ static void bebox_keyboard_interrupt(running_machine *machine,int state)
 }
 
 static int bebox_get_out2(running_machine *machine) {
-	return pit8253_get_output(devtag_get_device(machine, "pit8254"), 2 );
+	return pit8253_get_output(machine->device("pit8254"), 2 );
 }
 
 static const struct kbdc8042_interface bebox_8042_interface =
@@ -1043,10 +1043,10 @@ static const struct LSI53C810interface scsi53c810_intf =
 
 
 static TIMER_CALLBACK( bebox_get_devices ) {
-	bebox_devices.pic8259_master = devtag_get_device(machine, "pic8259_master");
-	bebox_devices.pic8259_slave = devtag_get_device(machine, "pic8259_slave");
-	bebox_devices.dma8237_1 = devtag_get_device(machine, "dma8237_1");
-	bebox_devices.dma8237_2 = devtag_get_device(machine, "dma8237_2");
+	bebox_devices.pic8259_master = machine->device("pic8259_master");
+	bebox_devices.pic8259_slave = machine->device("pic8259_slave");
+	bebox_devices.dma8237_1 = machine->device("dma8237_1");
+	bebox_devices.dma8237_2 = machine->device("dma8237_2");
 }
 
 
@@ -1101,9 +1101,9 @@ DRIVER_INIT( bebox )
 	intelflash_init(machine, 0, FLASH_FUJITSU_29F016A, memory_region(machine, "user1"));
 
 	/* install MESS managed RAM */
-	memory_install_readwrite_bank(space_0, 0, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0x02000000, "bank3");
-	memory_install_readwrite_bank(space_1, 0, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0x02000000, "bank3");
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_install_readwrite_bank(space_0, 0, messram_get_size(machine->device("messram")) - 1, 0, 0x02000000, "bank3");
+	memory_install_readwrite_bank(space_1, 0, messram_get_size(machine->device("messram")) - 1, 0, 0x02000000, "bank3");
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")));
 
 	mc146818_init(machine, MC146818_STANDARD);
 	pc_vga_init(machine, &bebox_vga_interface, &cirrus_svga_interface);

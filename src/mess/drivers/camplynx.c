@@ -411,7 +411,7 @@ static VIDEO_START( lynx48k )
 {
 	camplynx_state *state = (camplynx_state *)machine->driver_data;
 
-	state->mc6845 = devtag_get_device(machine, "crtc");
+	state->mc6845 = machine->device("crtc");
 }
 
 static VIDEO_UPDATE( lynx48k )

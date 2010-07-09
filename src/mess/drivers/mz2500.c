@@ -277,7 +277,7 @@ static WRITE8_HANDLER( mz2500_irq_data_w )
 #if 0
 static READ8_HANDLER( mz2500_fdc_r )
 {
-	running_device* dev = devtag_get_device(space->machine,"fdc");
+	running_device* dev = space->machine->device("fdc");
 	//UINT8 ret = 0;
 
 	switch(offset+0xd8)
@@ -298,7 +298,7 @@ static READ8_HANDLER( mz2500_fdc_r )
 
 static WRITE8_HANDLER( mz2500_fdc_w )
 {
-	running_device* dev = devtag_get_device(space->machine,"mb8877a");
+	running_device* dev = space->machine->device("mb8877a");
 
 	switch(offset+0xdc)
 	{

@@ -229,7 +229,7 @@ static MACHINE_START( c80 )
 	c80_state *state = (c80_state *)machine->driver_data;
 
 	/* find devices */
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);

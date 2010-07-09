@@ -69,22 +69,22 @@ MACHINE_START( orion128 )
 
 READ8_HANDLER ( orion128_system_r )
 {
-	return i8255a_r(devtag_get_device(space->machine, "ppi8255_2"), offset & 3);
+	return i8255a_r(space->machine->device("ppi8255_2"), offset & 3);
 }
 
 WRITE8_HANDLER ( orion128_system_w )
 {
-	i8255a_w(devtag_get_device(space->machine, "ppi8255_2"), offset & 3, data);
+	i8255a_w(space->machine->device("ppi8255_2"), offset & 3, data);
 }
 
 READ8_HANDLER ( orion128_romdisk_r )
 {
-	return i8255a_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 3);
+	return i8255a_r(space->machine->device("ppi8255_1"), offset & 3);
 }
 
 WRITE8_HANDLER ( orion128_romdisk_w )
 {
-	i8255a_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 3, data);
+	i8255a_w(space->machine->device("ppi8255_1"), offset & 3, data);
 }
 
 static void orion_set_video_mode(running_machine *machine, int width)
@@ -159,7 +159,7 @@ WRITE8_HANDLER ( orion128_memory_page_w )
 {
 	if (data!=orion128_memory_page )
 	{
-		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")) + (data & 3) * 0x10000);
+		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")) + (data & 3) * 0x10000);
 		orion128_memory_page = (data & 3);
 	}
 }
@@ -170,7 +170,7 @@ MACHINE_RESET ( orion128 )
 	orion128_video_mode = 0;
 	orion128_memory_page = -1;
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0xf800);
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0xf000);
 	orion128_video_width = SCREEN_WIDTH_384;
 	orion_set_video_mode(machine,384);
 	radio86_init_keyboard();
@@ -178,7 +178,7 @@ MACHINE_RESET ( orion128 )
 
 static WRITE8_HANDLER ( orion_disk_control_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = space->machine->device("wd1793");
 
 	wd17xx_set_side(fdc,((data & 0x10) >> 4) ^ 1);
 	wd17xx_set_drive(fdc,data & 3);
@@ -186,7 +186,7 @@ static WRITE8_HANDLER ( orion_disk_control_w )
 
 READ8_HANDLER ( orion128_floppy_r )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = space->machine->device("wd1793");
 
 	switch(offset)
 	{
@@ -204,7 +204,7 @@ READ8_HANDLER ( orion128_floppy_r )
 
 WRITE8_HANDLER ( orion128_floppy_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = space->machine->device("wd1793");
 
 	switch(offset)
 	{
@@ -255,7 +255,7 @@ MACHINE_START( orionz80 )
 static UINT8 orion_speaker;
 WRITE8_HANDLER ( orionz80_sound_w )
 {
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 	if (orion_speaker == 0)
 	{
 		orion_speaker = data;
@@ -270,7 +270,7 @@ WRITE8_HANDLER ( orionz80_sound_w )
 
 static WRITE8_HANDLER ( orionz80_sound_fe_w )
 {
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 	speaker_level_w(speaker,(data>>4) & 0x01);
 }
 
@@ -287,14 +287,14 @@ static void orionz80_switch_bank(running_machine *machine)
 	memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 	if ((orionz80_dispatcher & 0x80)==0)
 	{ // dispatcher on
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * bank_select + segment_select * 0x4000 );
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x10000 * bank_select + segment_select * 0x4000 );
 	}
 	else
 	{ // dispatcher off
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * orionz80_memory_page);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x10000 * orionz80_memory_page);
 	}
 
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000 + 0x10000 * orionz80_memory_page);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000 + 0x10000 * orionz80_memory_page);
 
 	if ((orionz80_dispatcher & 0x20) == 0)
 	{
@@ -312,16 +312,16 @@ static void orionz80_switch_bank(running_machine *machine)
 		memory_unmap_write(space, 0xfc00, 0xfeff, 0, 0);
 		memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 
-		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xf000);
 		memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf800);
 
 	}
 	else
 	{
 		/* if it is full memory access */
-		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000 + 0x10000 * orionz80_memory_page);
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf400 + 0x10000 * orionz80_memory_page);
-		memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf800 + 0x10000 * orionz80_memory_page);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xf000 + 0x10000 * orionz80_memory_page);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xf400 + 0x10000 * orionz80_memory_page);
+		memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")) + 0xf800 + 0x10000 * orionz80_memory_page);
 	}
 }
 
@@ -361,8 +361,8 @@ MACHINE_RESET ( orionz80 )
 
 
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0xf800);
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xf000);
 	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf800);
 
 
@@ -388,7 +388,7 @@ READ8_HANDLER ( orionz80_io_r )
 {
 	if (offset == 0xFFFD)
 	{
-		return ay8910_r (devtag_get_device(space->machine, "ay8912"), 0);
+		return ay8910_r (space->machine->device("ay8912"), 0);
 	}
 	return 0xff;
 }
@@ -406,10 +406,10 @@ WRITE8_HANDLER ( orionz80_io_w )
 	}
 	switch(offset)
 	{
-		case 0xfffd : ay8910_address_w(devtag_get_device(space->machine, "ay8912"), 0, data);
+		case 0xfffd : ay8910_address_w(space->machine->device("ay8912"), 0, data);
 					  break;
 		case 0xbffd :
-		case 0xbefd : ay8910_data_w(devtag_get_device(space->machine, "ay8912"), 0, data);
+		case 0xbefd : ay8910_data_w(space->machine->device("ay8912"), 0, data);
 					  break;
 	}
 }
@@ -449,13 +449,13 @@ static void orionpro_bank_switch(running_machine *machine)
 
 	if ((orionpro_dispatcher & 0x01)==0x00)
 	{	// RAM0 segment disabled
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page);
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0x2000);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x10000 * page);
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x10000 * page + 0x2000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram0_segment & 31) * 0x4000);
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram0_segment & 31) * 0x4000 + 0x2000);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + (orionpro_ram0_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + (orionpro_ram0_segment & 31) * 0x4000 + 0x2000);
 	}
 	if ((orionpro_dispatcher & 0x10)==0x10)
 	{	// ROM1 enabled
@@ -470,27 +470,27 @@ static void orionpro_bank_switch(running_machine *machine)
 
 	if ((orionpro_dispatcher & 0x02)==0x00)
 	{	// RAM1 segment disabled
-		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0x4000);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x10000 * page + 0x4000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram1_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + (orionpro_ram1_segment & 31) * 0x4000);
 	}
 
 	if ((orionpro_dispatcher & 0x04)==0x00)
 	{	// RAM2 segment disabled
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0x8000);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x10000 * page + 0x8000);
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + (orionpro_ram2_segment & 31) * 0x4000);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + (orionpro_ram2_segment & 31) * 0x4000);
 	}
 
-	memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xc000);
+	memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")) + 0x10000 * page + 0xc000);
 
 	if (is128)
 	{
-		memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf000);
+		memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0x10000 * 0 + 0xf000);
 
 		memory_install_write8_handler(space, 0xf400, 0xf4ff, 0, 0, orion128_system_w);
 		memory_install_write8_handler(space, 0xf500, 0xf5ff, 0, 0, orion128_romdisk_w);
@@ -508,21 +508,21 @@ static void orionpro_bank_switch(running_machine *machine)
 		memory_install_write8_handler(space, 0xff00, 0xffff, 0, 0, orionz80_sound_w);
 
 
-		memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf800);
+		memory_set_bankptr(machine, "bank8", messram_get_ptr(machine->device("messram")) + 0x10000 * 0 + 0xf800);
 	}
 	else
 	{
 		if ((orionpro_dispatcher & 0x40)==0x40)
 		{	// FIX F000 enabled
-			memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf000);
-			memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf400);
-			memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * 0 + 0xf800);
+			memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0x10000 * 0 + 0xf000);
+			memory_set_bankptr(machine, "bank7", messram_get_ptr(machine->device("messram")) + 0x10000 * 0 + 0xf400);
+			memory_set_bankptr(machine, "bank8", messram_get_ptr(machine->device("messram")) + 0x10000 * 0 + 0xf800);
 		}
 		else
 		{
-			memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xf000);
-			memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xf400);
-			memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000 * page + 0xf800);
+			memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0x10000 * page + 0xf000);
+			memory_set_bankptr(machine, "bank7", messram_get_ptr(machine->device("messram")) + 0x10000 * page + 0xf400);
+			memory_set_bankptr(machine, "bank8", messram_get_ptr(machine->device("messram")) + 0x10000 * page + 0xf800);
 		}
 	}
 }
@@ -560,7 +560,7 @@ MACHINE_RESET ( orionpro )
 
 READ8_HANDLER ( orionpro_io_r )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = space->machine->device("wd1793");
 
 	switch (offset & 0xff)
 	{
@@ -587,14 +587,14 @@ READ8_HANDLER ( orionpro_io_r )
 	}
 	if (offset == 0xFFFD)
 	{
-		return ay8910_r (devtag_get_device(space->machine, "ay8912"), 0);
+		return ay8910_r (space->machine->device("ay8912"), 0);
 	}
 	return 0xff;
 }
 
 WRITE8_HANDLER ( orionpro_io_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = space->machine->device("wd1793");
 
 	switch (offset & 0xff)
 	{
@@ -627,10 +627,10 @@ WRITE8_HANDLER ( orionpro_io_w )
 	}
 	switch(offset)
 	{
-		case 0xfffd : ay8910_address_w(devtag_get_device(space->machine, "ay8912"), 0, data);
+		case 0xfffd : ay8910_address_w(space->machine->device("ay8912"), 0, data);
 					  break;
 		case 0xbffd :
-		case 0xbefd : ay8910_data_w(devtag_get_device(space->machine, "ay8912"), 0, data);
+		case 0xbefd : ay8910_data_w(space->machine->device("ay8912"), 0, data);
 					  break;
 	}
 }

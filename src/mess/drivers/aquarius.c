@@ -62,7 +62,7 @@ static UINT8 scrambler;
 */
 static READ8_HANDLER( cassette_r )
 {
-	running_device *cassette = devtag_get_device(space->machine, "cassette");
+	running_device *cassette = space->machine->device("cassette");
 	return (cassette_input(cassette) < +0.0) ? 0 : 1;
 }
 
@@ -74,8 +74,8 @@ static READ8_HANDLER( cassette_r )
 */
 static WRITE8_HANDLER( cassette_w )
 {
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
-	running_device *cassette = devtag_get_device(space->machine, "cassette");
+	running_device *speaker = space->machine->device("speaker");
+	running_device *cassette = space->machine->device("cassette");
 
 	speaker_level_w(speaker, BIT(data, 0));
 	cassette_output(cassette, BIT(data, 0) ? +1.0 : -1.0);
@@ -215,12 +215,12 @@ static WRITE8_HANDLER( floppy_w )
 static DRIVER_INIT( aquarius )
 {
 	/* install expansion memory if available */
-	if (messram_get_size(devtag_get_device(machine, "messram")) > 0x1000)
+	if (messram_get_size(machine->device("messram")) > 0x1000)
 	{
 		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-		memory_install_readwrite_bank(space, 0x4000, 0x4000 + messram_get_size(devtag_get_device(machine, "messram")) - 0x1000 - 1, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_install_readwrite_bank(space, 0x4000, 0x4000 + messram_get_size(machine->device("messram")) - 0x1000 - 1, 0, 0, "bank1");
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 	}
 }
 

@@ -104,7 +104,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		ddtdata.channel= -1;	// not used
 		ddtdata.mode= -1;		// copy from/to buffer
 		printf("ATAPI: DMA one sector to %x, %x remaining\n", atapi_xferbase, atapi_xferlen);
-		sh4_dma_ddt(devtag_get_device(machine, "maincpu"), &ddtdata);
+		sh4_dma_ddt(machine->device("maincpu"), &ddtdata);
 
 		atapi_xferbase += 2048;
 	}
@@ -578,7 +578,7 @@ void dreamcast_atapi_reset(running_machine *machine)
 	atapi_xferlen = 0;
 	atapi_xfermod = 0;
 
-	if ( mess_cd_get_cdrom_file(devtag_get_device( machine, "cdrom" )) != NULL )
+	if ( mess_cd_get_cdrom_file(machine->device( "cdrom" )) != NULL )
 	{
 		SCSIAllocInstance( machine, &SCSIClassGDROM, &gdrom_device, "cdrom" );
 	}

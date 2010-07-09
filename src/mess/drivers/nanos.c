@@ -26,7 +26,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(nanos_tc_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = space->machine->device("upd765");
 	upd765_tc_w(fdc, BIT(data,1));
 }
 
@@ -248,7 +248,7 @@ static VIDEO_UPDATE( nanos )
 			{
 				if (ra < 8)
 				{
-					chr = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0xf800+ x];
+					chr = messram_get_ptr(screen->machine->device("messram"))[0xf800+ x];
 
 					/* get pattern of pixels for that character scanline */
 					gfx = FNT[(chr<<3) | ra ];
@@ -299,7 +299,7 @@ static WRITE8_DEVICE_HANDLER (nanos_port_b_w)
 	if (BIT(data,7)) {
 		memory_set_bankptr(device->machine, "bank1", memory_region(device->machine, "maincpu"));
 	} else {
-		memory_set_bankptr(device->machine, "bank1", messram_get_ptr(devtag_get_device(device->machine, "messram")));
+		memory_set_bankptr(device->machine, "bank1", messram_get_ptr(device->machine->device("messram")));
 	}
 }
 static UINT8 row_number(UINT8 code) {
@@ -410,8 +410,8 @@ static MACHINE_RESET(nanos)
 	memory_install_write_bank(space, 0x1000, 0xffff, 0, 0, "bank2");
 
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1000);
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x1000);
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")));
 
 	floppy_mon_w(floppy_get_device(space->machine, 0), CLEAR_LINE);
 	floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,1);

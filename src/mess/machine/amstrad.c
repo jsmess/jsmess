@@ -543,13 +543,13 @@ static void amstrad_plus_dma_parse(running_machine *machine, int channel)
 		}
 		return;
 	}
-	command = (messram_get_ptr(devtag_get_device(machine, "messram"))[asic.dma_addr[channel]+1] << 8) + messram_get_ptr(devtag_get_device(machine, "messram"))[asic.dma_addr[channel]];
+	command = (messram_get_ptr(machine->device("messram"))[asic.dma_addr[channel]+1] << 8) + messram_get_ptr(machine->device("messram"))[asic.dma_addr[channel]];
 //  logerror("DMA #%i: address %04x: command %04x\n",channel,asic.dma_addr[channel],command);
 	switch (command & 0xf000)
 	{
 	case 0x0000:  // Load PSG register
 		{
-			running_device *ay8910 = devtag_get_device(machine, "ay");
+			running_device *ay8910 = machine->device("ay");
 			ay8910_address_w(ay8910, 0, (command & 0x0f00) >> 8);
 			ay8910_data_w(ay8910, 0, command & 0x00ff);
 			ay8910_address_w(ay8910, 0, prev_reg);
@@ -644,8 +644,8 @@ static MC6845_UPDATE_ROW( amstrad_update_row_mode0 )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16	address = ( ( ( ma + i ) & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ( ma + i ) & 0x3ff ) << 1 );
-		UINT8	data0 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address ];
-		UINT8	data1 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address + 1 ];
+		UINT8	data0 = messram_get_ptr(device->machine->device("messram"))[ address ];
+		UINT8	data1 = messram_get_ptr(device->machine->device("messram"))[ address + 1 ];
 		UINT16	c;
 
 		c = amstrad_GateArray_render_colours[ mode0_lookup[data0][0] ];
@@ -669,8 +669,8 @@ static MC6845_UPDATE_ROW( amstrad_update_row_mode1 )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16	address = ( ( ( ma + i ) & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ( ma + i ) & 0x3ff ) << 1 );
-		UINT8	data0 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address ];
-		UINT8	data1 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address + 1 ];
+		UINT8	data0 = messram_get_ptr(device->machine->device("messram"))[ address ];
+		UINT8	data1 = messram_get_ptr(device->machine->device("messram"))[ address + 1 ];
 		UINT16	c;
 
 		c = amstrad_GateArray_render_colours[ mode1_lookup[data0][0] ];
@@ -702,8 +702,8 @@ static MC6845_UPDATE_ROW( amstrad_update_row_mode2 )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16	address = ( ( ( ma + i ) & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ( ma + i ) & 0x3ff ) << 1 );
-		UINT8	data0 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address ];
-		UINT8	data1 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address + 1 ];
+		UINT8	data0 = messram_get_ptr(device->machine->device("messram"))[ address ];
+		UINT8	data1 = messram_get_ptr(device->machine->device("messram"))[ address + 1 ];
 
 		*p = amstrad_GateArray_render_colours[ ( data0 & 0x80 ) >> 7 ]; p++;
 		*p = amstrad_GateArray_render_colours[ ( data0 & 0x40 ) >> 6 ]; p++;
@@ -734,8 +734,8 @@ static MC6845_UPDATE_ROW( amstrad_update_row_mode3 )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16	address = ( ( ( ma + i ) & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ( ma + i ) & 0x3ff ) << 1 );
-		UINT8	data0 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address ];
-		UINT8	data1 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address + 1 ];
+		UINT8	data0 = messram_get_ptr(device->machine->device("messram"))[ address ];
+		UINT8	data1 = messram_get_ptr(device->machine->device("messram"))[ address + 1 ];
 		UINT16	c;
 
 		c = amstrad_GateArray_render_colours[ mode1_lookup[data0][0] ];
@@ -787,8 +787,8 @@ static MC6845_UPDATE_ROW( amstrad_plus_update_row_mode0 )
 	{
 		UINT16	address = ( ( ( ma + i ) & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ( ma + i ) & 0x3ff ) << 1 );
 		UINT16	caddr;
-		UINT8	data0 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address ];
-		UINT8	data1 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address + 1 ];
+		UINT8	data0 = messram_get_ptr(device->machine->device("messram"))[ address ];
+		UINT8	data1 = messram_get_ptr(device->machine->device("messram"))[ address + 1 ];
 
 		caddr = 0x2400 + mode0_lookup[data0][0] * 2;
 		c = amstrad_plus_asic_ram[caddr] + ( amstrad_plus_asic_ram[caddr+1] << 8 );
@@ -842,8 +842,8 @@ static MC6845_UPDATE_ROW( amstrad_plus_update_row_mode1 )
 	{
 		UINT16	address = ( ( ( ma + i ) & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ( ma + i ) & 0x3ff ) << 1 );
 		UINT16	caddr;
-		UINT8	data0 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address ];
-		UINT8	data1 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address + 1 ];
+		UINT8	data0 = messram_get_ptr(device->machine->device("messram"))[ address ];
+		UINT8	data1 = messram_get_ptr(device->machine->device("messram"))[ address + 1 ];
 
 		caddr = 0x2400 + mode1_lookup[data0][0] * 2;
 		c = amstrad_plus_asic_ram[caddr] + ( amstrad_plus_asic_ram[caddr+1] << 8 );
@@ -909,8 +909,8 @@ static MC6845_UPDATE_ROW( amstrad_plus_update_row_mode2 )
 	{
 		UINT16	address = ( ( ( ma + i ) & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ( ma + i ) & 0x3ff ) << 1 );
 		UINT16	caddr;
-		UINT8	data0 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address ];
-		UINT8	data1 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address + 1 ];
+		UINT8	data0 = messram_get_ptr(device->machine->device("messram"))[ address ];
+		UINT8	data1 = messram_get_ptr(device->machine->device("messram"))[ address + 1 ];
 
 		caddr = 0x2400 + ( ( data0 & 0x80 ) ? 2 : 0 );
 		c = amstrad_plus_asic_ram[caddr] + ( amstrad_plus_asic_ram[caddr+1] << 8 );
@@ -1000,8 +1000,8 @@ static MC6845_UPDATE_ROW( amstrad_plus_update_row_mode3 )
 	{
 		UINT16	address = ( ( ( ma + i ) & 0x3000 ) << 2 ) | ( ( ra & 0x07 ) << 11 ) | ( ( ( ma + i ) & 0x3ff ) << 1 );
 		UINT16	caddr;
-		UINT8	data0 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address ];
-		UINT8	data1 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address + 1 ];
+		UINT8	data0 = messram_get_ptr(device->machine->device("messram"))[ address ];
+		UINT8	data1 = messram_get_ptr(device->machine->device("messram"))[ address + 1 ];
 
 		caddr = 0x2400 + mode1_lookup[data0][0] * 2;
 		c = amstrad_plus_asic_ram[caddr] + ( amstrad_plus_asic_ram[caddr+1] << 8 );
@@ -1079,8 +1079,8 @@ static MC6845_UPDATE_ROW( aleste_update_row_mode2 )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16	address = ( ( ( ma + i ) & 0x2000 ) << 2 ) | ( ( ra & 0x06 ) << 11 ) | ( ( ra & 0x01 ) << 14 ) | ( ( ( ma + i ) & 0x7ff ) << 1 );
-		UINT8	data0 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address ];
-		UINT8	data1 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address + 1 ];
+		UINT8	data0 = messram_get_ptr(device->machine->device("messram"))[ address ];
+		UINT8	data1 = messram_get_ptr(device->machine->device("messram"))[ address + 1 ];
 		UINT16	c;
 
 		if ( ~ aleste_mode & 0x08 )
@@ -1125,8 +1125,8 @@ static MC6845_UPDATE_ROW( aleste_update_row_mode3 )
 	for ( i = 0; i < x_count; i++ )
 	{
 		UINT16	address = ( ( ( ma + i ) & 0x2000 ) << 2 ) | ( ( ra & 0x06 ) << 11 ) | ( ( ra & 0x01 ) << 14 ) | ( ( ( ma + i ) & 0x7ff ) << 1 );
-		UINT8	data0 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address ];
-		UINT8	data1 = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ address + 1 ];
+		UINT8	data0 = messram_get_ptr(device->machine->device("messram"))[ address ];
+		UINT8	data1 = messram_get_ptr(device->machine->device("messram"))[ address + 1 ];
 		UINT16	c;
 
 		if ( ~ aleste_mode & 0x08 )
@@ -1306,7 +1306,7 @@ VIDEO_START( amstrad )
 
 VIDEO_UPDATE( amstrad )
 {
-	running_device *mc6845 = devtag_get_device(screen->machine, "mc6845" );
+	running_device *mc6845 = screen->machine->device("mc6845" );
 	mc6845_update( mc6845, bitmap, cliprect );
 	return 0;
 }
@@ -1369,7 +1369,7 @@ static DIRECT_UPDATE_HANDLER( amstrad_multiface_directoverride )
 {
 		int pc;
 
-		pc = cpu_get_pc(devtag_get_device(space->machine, "maincpu"));
+		pc = cpu_get_pc(space->machine->device("maincpu"));
 
 		/* there are two places where CALL &0065 can be found
         in the multiface rom. At this address there is a RET.
@@ -1781,7 +1781,7 @@ static void AmstradCPC_GA_SetRamConfiguration(running_machine *machine)
 	    for (i=0;i<4;i++)
 		{
 			BankIndex = RamConfigurations[(ConfigurationIndex << 2) + i];
-			BankAddr = messram_get_ptr(devtag_get_device(machine, "messram")) + (BankIndex << 14);
+			BankAddr = messram_get_ptr(machine->device("messram")) + (BankIndex << 14);
 			Aleste_RamBanks[i] = BankAddr;
 			AmstradCPC_RamBanks[i] = BankAddr;
 		}
@@ -1895,7 +1895,7 @@ WRITE8_HANDLER( amstrad_plus_asic_6000_w )
 		if ( asic.enabled )
 		{
 			vector = (data & 0xf8) + (amstrad_plus_irq_cause);
-			cpu_set_input_line_vector(devtag_get_device(space->machine, "maincpu"), 0, vector);
+			cpu_set_input_line_vector(space->machine->device("maincpu"), 0, vector);
 			logerror("ASIC: IM 2 vector write %02x, data = &%02x\n",vector,data);
 		}
 		asic.dma_clear = data & 0x01;
@@ -2190,38 +2190,38 @@ static WRITE8_HANDLER( aleste_msx_mapper )
 		switch(page)
 		{
 		case 0:  /* 0x0000 - 0x3fff */
-			memory_set_bankptr(space->machine,"bank1",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank2",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank9",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank10",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			Aleste_RamBanks[0] = messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr;
+			memory_set_bankptr(space->machine,"bank1",messram_get_ptr(space->machine->device("messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank2",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank9",messram_get_ptr(space->machine->device("messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank10",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
+			Aleste_RamBanks[0] = messram_get_ptr(space->machine->device("messram"))+ramptr;
 			aleste_active_page[0] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x0000\n",ramptr,rampage);
 			break;
 		case 1:  /* 0x4000 - 0x7fff */
-			memory_set_bankptr(space->machine,"bank3",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank4",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank12",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			Aleste_RamBanks[1] = messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr;
+			memory_set_bankptr(space->machine,"bank3",messram_get_ptr(space->machine->device("messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank4",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank11",messram_get_ptr(space->machine->device("messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank12",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
+			Aleste_RamBanks[1] = messram_get_ptr(space->machine->device("messram"))+ramptr;
 			aleste_active_page[1] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x4000\n",ramptr,rampage);
 			break;
 		case 2:  /* 0x8000 - 0xbfff */
-			memory_set_bankptr(space->machine,"bank5",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank6",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank13",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank14",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			Aleste_RamBanks[2] = messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr;
+			memory_set_bankptr(space->machine,"bank5",messram_get_ptr(space->machine->device("messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank6",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank13",messram_get_ptr(space->machine->device("messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank14",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
+			Aleste_RamBanks[2] = messram_get_ptr(space->machine->device("messram"))+ramptr;
 			aleste_active_page[2] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0x8000\n",ramptr,rampage);
 			break;
 		case 3:  /* 0xc000 - 0xffff */
-			memory_set_bankptr(space->machine,"bank7",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank8",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			memory_set_bankptr(space->machine,"bank15",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr);
-			memory_set_bankptr(space->machine,"bank16",messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr+0x2000);
-			Aleste_RamBanks[3] = messram_get_ptr(devtag_get_device(space->machine, "messram"))+ramptr;
+			memory_set_bankptr(space->machine,"bank7",messram_get_ptr(space->machine->device("messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank8",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
+			memory_set_bankptr(space->machine,"bank15",messram_get_ptr(space->machine->device("messram"))+ramptr);
+			memory_set_bankptr(space->machine,"bank16",messram_get_ptr(space->machine->device("messram"))+ramptr+0x2000);
+			Aleste_RamBanks[3] = messram_get_ptr(space->machine->device("messram"))+ramptr;
 			aleste_active_page[3] = data;
 			logerror("RAM: RAM location 0x%06x (page %02x) mapped to 0xc000\n",ramptr,rampage);
 			break;
@@ -2294,8 +2294,8 @@ Expansion Peripherals Read/Write -   -   -   -   -   0   -   -   -   -   -   -  
 
 READ8_HANDLER ( amstrad_cpc_io_r )
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
-	running_device *mc6845 = devtag_get_device(space->machine, "mc6845" );
+	running_device *fdc = space->machine->device("upd765");
+	running_device *mc6845 = space->machine->device("mc6845" );
 
 	unsigned char data = 0xFF;
 	unsigned int r1r0 = (unsigned int)((offset & 0x0300) >> 8);
@@ -2354,7 +2354,7 @@ b9 b8 | PPI Function Read/Write status
 	if ((offset & (1<<11)) == 0)
 	{
 		if (r1r0 < 0x03 )
-			data = i8255a_r(devtag_get_device(space->machine, "ppi8255" ), r1r0);
+			data = i8255a_r(space->machine->device("ppi8255" ), r1r0);
 	}
 
 /* if b10 = 0 : Expansion Peripherals Read selected
@@ -2431,8 +2431,8 @@ static void amstrad_plus_seqcheck(int data)
 /* Offset handler for write */
 WRITE8_HANDLER ( amstrad_cpc_io_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
-	running_device *mc6845 = devtag_get_device(space->machine, "mc6845");
+	running_device *fdc = space->machine->device("upd765");
+	running_device *mc6845 = space->machine->device("mc6845");
 
 	static int printer_bit8_selected = FALSE;
 
@@ -2476,7 +2476,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 			/* printer port bit 8 */
 			if (printer_bit8_selected && amstrad_system_type == SYSTEM_PLUS)
 			{
-				running_device *printer = devtag_get_device(space->machine, "centronics");
+				running_device *printer = space->machine->device("centronics");
 				centronics_d7_w(printer, BIT(data, 3));
 				printer_bit8_selected = FALSE;
 			}
@@ -2500,7 +2500,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		if ((offset & (1<<12)) == 0)
 		{
-			running_device *printer = devtag_get_device(space->machine, "centronics");
+			running_device *printer = space->machine->device("centronics");
 
 			/* CPC has a 7-bit data port, bit 8 is the STROBE signal */
 			centronics_data_w(printer, 0, data & 0x7f);
@@ -2519,7 +2519,7 @@ WRITE8_HANDLER ( amstrad_cpc_io_w )
 	{
 		unsigned int Index = ((offset & 0x0300) >> 8);
 
-		i8255a_w(devtag_get_device(space->machine, "ppi8255" ), Index, data);
+		i8255a_w(space->machine->device("ppi8255" ), Index, data);
 	}
 
 	/* if b10 = 0 : Expansion Peripherals Write selected */
@@ -2593,77 +2593,77 @@ The exception is the case where none of b7-b0 are reset (i.e. port &FBFF), which
 static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSnapshot)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *mc6845 = devtag_get_device(space->machine, "mc6845" );
-	running_device *ay8910 = devtag_get_device(machine, "ay");
+	running_device *mc6845 = space->machine->device("mc6845" );
+	running_device *ay8910 = machine->device("ay");
 	int RegData;
 	int i;
 
 	/* init Z80 */
 	RegData = (pSnapshot[0x011] & 0x0ff) | ((pSnapshot[0x012] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_AF, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_AF, RegData);
 
 	RegData = (pSnapshot[0x013] & 0x0ff) | ((pSnapshot[0x014] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_BC, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_BC, RegData);
 
 	RegData = (pSnapshot[0x015] & 0x0ff) | ((pSnapshot[0x016] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_DE, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_DE, RegData);
 
 	RegData = (pSnapshot[0x017] & 0x0ff) | ((pSnapshot[0x018] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_HL, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_HL, RegData);
 
 	RegData = (pSnapshot[0x019] & 0x0ff) ;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_R, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_R, RegData);
 
 	RegData = (pSnapshot[0x01a] & 0x0ff);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_I, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_I, RegData);
 
 	if ((pSnapshot[0x01b] & 1)==1)
 	{
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, (UINT64)1);
+		cpu_set_reg(machine->device("maincpu"), Z80_IFF1, (UINT64)1);
 	}
 	else
 	{
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, (UINT64)0);
+		cpu_set_reg(machine->device("maincpu"), Z80_IFF1, (UINT64)0);
 	}
 
 	if ((pSnapshot[0x01c] & 1)==1)
 	{
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF2, (UINT64)1);
+		cpu_set_reg(machine->device("maincpu"), Z80_IFF2, (UINT64)1);
 	}
 	else
 	{
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF2, (UINT64)0);
+		cpu_set_reg(machine->device("maincpu"), Z80_IFF2, (UINT64)0);
 	}
 
 	RegData = (pSnapshot[0x01d] & 0x0ff) | ((pSnapshot[0x01e] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IX, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_IX, RegData);
 
 	RegData = (pSnapshot[0x01f] & 0x0ff) | ((pSnapshot[0x020] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IY, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_IY, RegData);
 
 	RegData = (pSnapshot[0x021] & 0x0ff) | ((pSnapshot[0x022] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_SP, RegData);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENSP, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_SP, RegData);
+	cpu_set_reg(machine->device("maincpu"), STATE_GENSP, RegData);
 
 	RegData = (pSnapshot[0x023] & 0x0ff) | ((pSnapshot[0x024] & 0x0ff)<<8);
 
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, RegData);
-//  cpu_set_reg(devtag_get_device(machine, "maincpu"), REG_SP, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_PC, RegData);
+//  cpu_set_reg(machine->device("maincpu"), REG_SP, RegData);
 
 	RegData = (pSnapshot[0x025] & 0x0ff);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IM, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_IM, RegData);
 
 	RegData = (pSnapshot[0x026] & 0x0ff) | ((pSnapshot[0x027] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_AF2, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_AF2, RegData);
 
 	RegData = (pSnapshot[0x028] & 0x0ff) | ((pSnapshot[0x029] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_BC2, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_BC2, RegData);
 
 	RegData = (pSnapshot[0x02a] & 0x0ff) | ((pSnapshot[0x02b] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_DE2, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_DE2, RegData);
 
 	RegData = (pSnapshot[0x02c] & 0x0ff) | ((pSnapshot[0x02d] & 0x0ff)<<8);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_HL2, RegData);
+	cpu_set_reg(machine->device("maincpu"), Z80_HL2, RegData);
 
 	/* init GA */
 	for (i=0; i<17; i++)
@@ -2692,11 +2692,11 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 	gate_array.upper_bank = pSnapshot[0x055];
 
 	/* PPI */
-	i8255a_w(devtag_get_device(machine, "ppi8255"),3,pSnapshot[0x059] & 0x0ff);
+	i8255a_w(machine->device("ppi8255"),3,pSnapshot[0x059] & 0x0ff);
 
-	i8255a_w(devtag_get_device(machine, "ppi8255"),0,pSnapshot[0x056] & 0x0ff);
-	i8255a_w(devtag_get_device(machine, "ppi8255"),1,pSnapshot[0x057] & 0x0ff);
-	i8255a_w(devtag_get_device(machine, "ppi8255"),2,pSnapshot[0x058] & 0x0ff);
+	i8255a_w(machine->device("ppi8255"),0,pSnapshot[0x056] & 0x0ff);
+	i8255a_w(machine->device("ppi8255"),1,pSnapshot[0x057] & 0x0ff);
+	i8255a_w(machine->device("ppi8255"),2,pSnapshot[0x058] & 0x0ff);
 
 	/* PSG */
 	for (i=0; i<16; i++)
@@ -2722,7 +2722,7 @@ static void amstrad_handle_snapshot(running_machine *machine, unsigned char *pSn
 			MemorySize = 64*1024;
 		}
 
-		memcpy(messram_get_ptr(devtag_get_device(machine, "messram")), &pSnapshot[0x0100], MemorySize);
+		memcpy(messram_get_ptr(machine->device("messram")), &pSnapshot[0x0100], MemorySize);
 	}
 	amstrad_rethinkMemory(machine);
 }
@@ -2864,7 +2864,7 @@ static unsigned char amstrad_Psg_FunctionSelected;
 static void update_psg(running_machine *machine)
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *ay8910 = devtag_get_device(machine, "ay");
+	running_device *ay8910 = machine->device("ay");
 
 	if(aleste_mode & 0x20)  // RTC selected
 	{
@@ -2956,7 +2956,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b7 with cassette tape input */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		if (cassette_input(devtag_get_device(device->machine, "cassette" )) > 0.03)
+		if (cassette_input(device->machine->device("cassette" )) > 0.03)
 		{
 			data |= (1<<7);
 		}
@@ -2964,7 +2964,7 @@ READ8_DEVICE_HANDLER (amstrad_ppi_portb_r)
 /* Set b6 with Parallel/Printer port ready */
 	if(amstrad_system_type != SYSTEM_GX4000)
 	{
-		running_device *printer = devtag_get_device(device->machine, "centronics");
+		running_device *printer = device->machine->device("centronics");
 		data |= centronics_busy_r(printer) << 6;
 	}
 /* Set b4-b1 50Hz/60Hz state and manufacturer name defined by links on PCB */
@@ -3024,7 +3024,7 @@ WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	{
 		if ((changed_data & 0x20) != 0)
 		{
-			cassette_output(devtag_get_device(device->machine, "cassette" ),
+			cassette_output(device->machine->device("cassette" ),
 				((data & 0x20) ? -1.0 : +1.0));
 		}
 	}
@@ -3034,7 +3034,7 @@ WRITE8_DEVICE_HANDLER ( amstrad_ppi_portc_w )
 	{
 		if ((changed_data & 0x10) != 0)
 		{
-			cassette_change_state(devtag_get_device(device->machine, "cassette" ),
+			cassette_change_state(device->machine->device("cassette" ),
 				((data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED),
 				CASSETTE_MASK_MOTOR);
 		}
@@ -3259,11 +3259,11 @@ static void amstrad_common_init(running_machine *machine)
 	memory_install_write_bank(space, 0xc000, 0xdfff, 0, 0, "bank15");
 	memory_install_write_bank(space, 0xe000, 0xffff, 0, 0, "bank16");
 
-	devtag_get_device(space->machine, "maincpu")->reset();
+	space->machine->device("maincpu")->reset();
 	if ( amstrad_system_type == SYSTEM_CPC || amstrad_system_type == SYSTEM_ALESTE )
-		cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), 0, 0xff);
+		cpu_set_input_line_vector(machine->device("maincpu"), 0, 0xff);
 	else
-		cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), 0, 0x00);
+		cpu_set_input_line_vector(machine->device("maincpu"), 0, 0x00);
 
 	/* The opcode timing in the Amstrad is different to the opcode
     timing in the core for the Z80 CPU.
@@ -3275,7 +3275,7 @@ static void amstrad_common_init(running_machine *machine)
 
 	/* Using the cool code Juergen has provided, I will override
     the timing tables with the values for the amstrad */
-	z80_set_cycle_tables(devtag_get_device(machine, "maincpu"),
+	z80_set_cycle_tables(machine->device("maincpu"),
 		(const UINT8*)amstrad_cycle_table_op,
 		(const UINT8*)amstrad_cycle_table_cb,
 		(const UINT8*)amstrad_cycle_table_ed,
@@ -3284,7 +3284,7 @@ static void amstrad_common_init(running_machine *machine)
 		(const UINT8*)amstrad_cycle_table_ex);
 
 	/* Juergen is a cool dude! */
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), amstrad_cpu_acknowledge_int);
+	cpu_set_irq_callback(machine->device("maincpu"), amstrad_cpu_acknowledge_int);
 }
 
 

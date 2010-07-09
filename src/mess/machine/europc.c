@@ -120,9 +120,9 @@ WRITE8_HANDLER ( europc_jim_w )
 	case 4:
 		switch(data & 0xc0)
 		{
-		case 0x00: cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), 1.0 / 2); break;
-		case 0x40: cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), 3.0 / 4); break;
-		default: cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), 1); break;
+		case 0x00: cpu_set_clockscale(space->machine->device("maincpu"), 1.0 / 2); break;
+		case 0x40: cpu_set_clockscale(space->machine->device("maincpu"), 3.0 / 4); break;
+		default: cpu_set_clockscale(space->machine->device("maincpu"), 1); break;
 		}
 		break;
 	case 0xa:
@@ -178,7 +178,7 @@ WRITE8_HANDLER( europc_pio_w )
 		europc_pio.port61=data;
 //      if (data == 0x30) pc1640.port62 = (pc1640.port65 & 0x10) >> 4;
 //      else if (data == 0x34) pc1640.port62 = pc1640.port65 & 0xf;
-		pit8253_gate2_w(devtag_get_device(space->machine, "pit8253"), BIT(data, 0));
+		pit8253_gate2_w(space->machine->device("pit8253"), BIT(data, 0));
 		pc_speaker_set_spkrdata(space->machine, BIT(data, 1));
 		pc_keyb_set_clock(BIT(data, 6));
 		break;
@@ -201,7 +201,7 @@ WRITE8_HANDLER( europc_pio_w )
 		data = europc_pio.port61;
 		break;
 	case 2:
-		if (pit8253_get_output(devtag_get_device(space->machine, "pit8253"), 2))
+		if (pit8253_get_output(space->machine->device("pit8253"), 2))
 			data |= 0x20;
 		break;
 	}

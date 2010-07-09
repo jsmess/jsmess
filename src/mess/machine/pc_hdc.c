@@ -231,16 +231,16 @@ static hard_disk_file *pc_hdc_file(running_machine *machine, int id)
 	switch( id )
 	{
 	case 0:
-		img = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "harddisk1"));
+		img = dynamic_cast<device_image_interface *>(machine->device("harddisk1"));
 		break;
 	case 1:
-		img = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "harddisk2"));
+		img = dynamic_cast<device_image_interface *>(machine->device("harddisk2"));
 		break;
 	case 2:
-		img = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "harddisk3"));
+		img = dynamic_cast<device_image_interface *>(machine->device("harddisk3"));
 		break;
 	case 3:
-		img = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "harddisk4"));
+		img = dynamic_cast<device_image_interface *>(machine->device("harddisk4"));
 		break;
 	}
 

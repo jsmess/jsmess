@@ -86,7 +86,7 @@
 
 static running_device *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, CASSETTE_TAG);
+	return machine->device(CASSETTE_TAG);
 }
 
 /* Discrete Sound */
@@ -248,7 +248,7 @@ static void abc806_bankswitch(running_machine *machine)
 {
 	abc806_state *state = (abc806_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT32 videoram_mask = messram_get_size(devtag_get_device(machine, "messram")) - (32 * 1024) - 1;
+	UINT32 videoram_mask = messram_get_size(machine->device("messram")) - (32 * 1024) - 1;
 	int bank;
 	char bank_name[10];
 
@@ -414,7 +414,7 @@ static WRITE8_HANDLER( abc806_mao_w )
 
 static READ8_HANDLER( abc800_pling_r )
 {
-	running_device *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = space->machine->device("discrete");
 	abc800_state *state = (abc800_state *)space->machine->driver_data;
 
 	state->pling = !state->pling;
@@ -426,7 +426,7 @@ static READ8_HANDLER( abc800_pling_r )
 
 static READ8_HANDLER( abc802_pling_r )
 {
-	running_device *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = space->machine->device("discrete");
 	abc802_state *state = (abc802_state *)space->machine->driver_data;
 
 	state->pling = !state->pling;
@@ -708,7 +708,7 @@ static ABC77_INTERFACE( abc800_abc77_intf )
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	running_device *z80ctc = devtag_get_device(timer.machine, Z80CTC_TAG);
+	running_device *z80ctc = timer.machine->device(Z80CTC_TAG);
 
 	z80ctc_trg0_w(z80ctc, 1);
 	z80ctc_trg0_w(z80ctc, 0);
@@ -722,7 +722,7 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 {
-	//running_device *z80sio = devtag_get_device(device->machine, Z80SIO_TAG);
+	//running_device *z80sio = device->machine->device(Z80SIO_TAG);
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
@@ -744,7 +744,7 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z0_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 {
-	//running_device *z80sio = devtag_get_device(device->machine, Z80SIO_TAG);
+	//running_device *z80sio = device->machine->device(Z80SIO_TAG);
 
 	UINT8 sb = input_port_read(device->machine, "SB");
 
@@ -764,7 +764,7 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_z1_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_z2_w )
 {
-	running_device *z80dart = devtag_get_device(device->machine, Z80DART_TAG);
+	running_device *z80dart = device->machine->device(Z80DART_TAG);
 
 	/* connected to DART channel A clock inputs */
 	z80dart_rxca_w(z80dart, state);
@@ -947,11 +947,11 @@ static MACHINE_START( abc800 )
 	abc800_state *state = (abc800_state *)machine->driver_data;
 
 	/* find devices */
-	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
-	state->z80dart = devtag_get_device(machine, Z80DART_TAG);
-	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
-	state->abc77 = devtag_get_device(machine, ABC77_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->z80ctc = machine->device(Z80CTC_TAG);
+	state->z80dart = machine->device(Z80DART_TAG);
+	state->z80sio = machine->device(Z80SIO_TAG);
+	state->abc77 = machine->device(ABC77_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->fetch_charram);
@@ -971,14 +971,14 @@ static MACHINE_START( abc802 )
 	abc802_state *state = (abc802_state *)machine->driver_data;
 
 	/* find devices */
-	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
-	state->z80dart = devtag_get_device(machine, Z80DART_TAG);
-	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
-	state->abc77 = devtag_get_device(machine, ABC77_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->z80ctc = machine->device(Z80CTC_TAG);
+	state->z80dart = machine->device(Z80DART_TAG);
+	state->z80sio = machine->device(Z80SIO_TAG);
+	state->abc77 = machine->device(ABC77_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* configure memory */
-	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(machine->device("messram")), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, Z80_TAG), 0);
 
 	/* register for state saving */
@@ -1013,17 +1013,17 @@ static MACHINE_START( abc806 )
 	abc806_state *state = (abc806_state *)machine->driver_data;
 
 	UINT8 *mem = memory_region(machine, Z80_TAG);
-	UINT32 videoram_size = messram_get_size(devtag_get_device(machine, "messram")) - (32 * 1024);
+	UINT32 videoram_size = messram_get_size(machine->device("messram")) - (32 * 1024);
 	int bank;
 	char bank_name[10];
 
 	/* find devices */
-	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
-	state->z80dart = devtag_get_device(machine, Z80DART_TAG);
-	state->z80sio = devtag_get_device(machine, Z80SIO_TAG);
-	state->e0516 = devtag_get_device(machine, E0516_TAG);
-	state->abc77 = devtag_get_device(machine, ABC77_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->z80ctc = machine->device(Z80CTC_TAG);
+	state->z80dart = machine->device(Z80DART_TAG);
+	state->z80sio = machine->device(Z80SIO_TAG);
+	state->e0516 = machine->device(E0516_TAG);
+	state->abc77 = machine->device(ABC77_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* setup memory banking */
 	state->videoram = auto_alloc_array(machine, UINT8, videoram_size);
@@ -1397,7 +1397,7 @@ static DIRECT_UPDATE_HANDLER( abc802_direct_update_handler )
 	}
 	else
 	{
-		direct->raw = direct->decrypted = messram_get_ptr(devtag_get_device(space->machine, "messram"));
+		direct->raw = direct->decrypted = messram_get_ptr(space->machine->device("messram"));
 		return ~0;
 	}
 

@@ -381,7 +381,7 @@ static void pce_cd_read_6( running_machine *machine )
 	if ( pce_cd.cdda_status != PCE_CD_CDDA_OFF )
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
-		cdda_stop_audio( devtag_get_device( machine, "cdda" ) );
+		cdda_stop_audio( machine->device( "cdda" ) );
 	}
 
 	pce_cd.current_frame = frame;
@@ -430,12 +430,12 @@ static void pce_cd_nec_set_audio_start_position( running_machine *machine )
 	if ( pce_cd.cdda_play_mode )
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
-		cdda_start_audio( devtag_get_device( machine, "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
+		cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
 	}
 	else
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
-		cdda_stop_audio( devtag_get_device( machine, "cdda" ) );
+		cdda_stop_audio( machine->device( "cdda" ) );
 		pce_cd.end_frame = pce_cd.last_frame;
 	}
 
@@ -477,18 +477,18 @@ static void pce_cd_nec_set_audio_stop_position( running_machine *machine )
 	{
 		if ( pce_cd.cdda_status == PCE_CD_CDDA_PAUSED )
 		{
-			cdda_pause_audio( devtag_get_device( machine, "cdda" ), 0 );
+			cdda_pause_audio( machine->device( "cdda" ), 0 );
 		}
 		else
 		{
-			cdda_start_audio( devtag_get_device( machine, "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
+			cdda_start_audio( machine->device( "cdda" ), pce_cd.current_frame, pce_cd.end_frame - pce_cd.current_frame );
 		}
 		pce_cd.cdda_status = PCE_CD_CDDA_PLAYING;
 	}
 	else
 	{
 		pce_cd.cdda_status = PCE_CD_CDDA_OFF;
-		cdda_stop_audio( devtag_get_device( machine, "cdda" ) );
+		cdda_stop_audio( machine->device( "cdda" ) );
 		pce_cd.end_frame = pce_cd.last_frame;
 //      assert( NULL == pce_cd_nec_set_audio_stop_position );
 	}
@@ -516,8 +516,8 @@ static void pce_cd_nec_pause( running_machine *machine )
 	}
 
 	pce_cd.cdda_status = PCE_CD_CDDA_PAUSED;
-	pce_cd.current_frame = cdda_get_audio_lba( devtag_get_device( machine, "cdda" ) );
-	cdda_pause_audio( devtag_get_device( machine, "cdda" ), 1 );
+	pce_cd.current_frame = cdda_get_audio_lba( machine->device( "cdda" ) );
+	cdda_pause_audio( machine->device( "cdda" ), 1 );
 	pce_cd_reply_status_byte( SCSI_STATUS_OK );
 }
 
@@ -540,11 +540,11 @@ static void pce_cd_nec_get_subq( running_machine *machine )
 	{
 	case PCE_CD_CDDA_PAUSED:
 		pce_cd.data_buffer[0] = 2;
-		frame = cdda_get_audio_lba( devtag_get_device( machine, "cdda" ) );
+		frame = cdda_get_audio_lba( machine->device( "cdda" ) );
 		break;
 	case PCE_CD_CDDA_PLAYING:
 		pce_cd.data_buffer[0] = 0;
-		frame = cdda_get_audio_lba( devtag_get_device( machine, "cdda" ) );
+		frame = cdda_get_audio_lba( machine->device( "cdda" ) );
 		break;
 	default:
 		pce_cd.data_buffer[0] = 3;
@@ -951,14 +951,14 @@ static void pce_cd_init( running_machine *machine )
 
 	pce_cd.subcode_buffer = auto_alloc_array(machine, UINT8, 96 );
 
-	device = devtag_get_device(machine, "cdrom");
+	device = machine->device("cdrom");
 	if ( device )
 	{
 		pce_cd.cd = mess_cd_get_cdrom_file(device);
 		if ( pce_cd.cd )
 		{
 			pce_cd.toc = cdrom_get_toc( pce_cd.cd );
-			cdda_set_cdrom( devtag_get_device(machine, "cdda"), pce_cd.cd );
+			cdda_set_cdrom( machine->device("cdda"), pce_cd.cd );
 			pce_cd.last_frame = cdrom_get_track_start( pce_cd.cd, cdrom_get_last_track( pce_cd.cd ) - 1 );
 			pce_cd.last_frame += pce_cd.toc->tracks[ cdrom_get_last_track( pce_cd.cd ) - 1 ].frames;
 			pce_cd.end_frame = pce_cd.last_frame;
@@ -1044,7 +1044,7 @@ WRITE8_HANDLER( pce_cd_intf_w )
 			/* Reset ADPCM hardware */
 			pce_cd.adpcm_read_ptr = 0;
 			pce_cd.adpcm_write_ptr = 0;
-			msm5205_reset_w( devtag_get_device( space->machine, "msm5205"), 0 );
+			msm5205_reset_w( space->machine->device( "msm5205"), 0 );
 		}
 		if ( data & 0x10 )
 		{

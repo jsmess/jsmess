@@ -116,7 +116,7 @@ static WRITE_LINE_DEVICE_HANDLER( lx800_paperempty_led_w )
 
 static WRITE_LINE_DEVICE_HANDLER( lx800_reset_w )
 {
-	devtag_get_device(device->machine, "maincpu")->reset();
+	device->machine->device("maincpu")->reset();
 }
 
 
@@ -128,7 +128,7 @@ static MACHINE_START( lx800 )
 {
 	lx800_state *lx800 = (lx800_state *)machine->driver_data;
 
-	lx800->speaker = devtag_get_device(machine, "beep");
+	lx800->speaker = machine->device("beep");
 
 	beep_set_state(lx800->speaker, 0);
 	beep_set_frequency(lx800->speaker, 4000); /* ? */

@@ -20,8 +20,8 @@
 
 static WRITE8_HANDLER (rt1717_set_bank )
 {
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
-	memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")));
+	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
+	memory_set_bankptr(space->machine, "bank3", messram_get_ptr(space->machine->device("messram")));
 }
 
 /* Address maps */

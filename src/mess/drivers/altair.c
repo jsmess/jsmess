@@ -34,7 +34,7 @@ static READ8_HANDLER(sio_data_r)
 
 static WRITE8_HANDLER(sio_data_w)
 {
-	running_device *devconf = devtag_get_device(space->machine, "terminal");
+	running_device *devconf = space->machine->device("terminal");
 	terminal_write(devconf,0,data);
 }
 
@@ -82,7 +82,7 @@ QUICKLOAD_LOAD(altair)
 static MACHINE_RESET(altair)
 {
 	// Set startup addess done by turn-key
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), I8085_PC, 0xFD00);
+	cpu_set_reg(machine->device("maincpu"), I8085_PC, 0xFD00);
 
 	term_data = 0;
 }

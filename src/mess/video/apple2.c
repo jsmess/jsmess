@@ -451,7 +451,7 @@ void apple2_video_start(running_machine *machine, const UINT8 *vram, size_t vram
 
 VIDEO_START( apple2 )
 {
-	apple2_video_start(machine, messram_get_ptr(devtag_get_device(machine, "messram")), messram_get_size(devtag_get_device(machine, "messram")), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
+	apple2_video_start(machine, messram_get_ptr(machine->device("messram")), messram_get_size(machine->device("messram")), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 4);
 
 	/* hack to fix the colors on apple2/apple2p */
 	fgcolor = 0;
@@ -461,7 +461,7 @@ VIDEO_START( apple2 )
 
 VIDEO_START( apple2p )
 {
-	apple2_video_start(machine, messram_get_ptr(devtag_get_device(machine, "messram")), messram_get_size(devtag_get_device(machine, "messram")), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
+	apple2_video_start(machine, messram_get_ptr(machine->device("messram")), messram_get_size(machine->device("messram")), VAR_80COL | VAR_ALTCHARSET | VAR_DHIRES, 8);
 
 	/* hack to fix the colors on apple2/apple2p */
 	fgcolor = 0;
@@ -471,7 +471,7 @@ VIDEO_START( apple2p )
 
 VIDEO_START( apple2e )
 {
-	apple2_video_start(machine, messram_get_ptr(devtag_get_device(machine, "messram")), messram_get_size(devtag_get_device(machine, "messram")), 0, 8);
+	apple2_video_start(machine, messram_get_ptr(machine->device("messram")), messram_get_size(machine->device("messram")), 0, 8);
 }
 
 

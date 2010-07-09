@@ -70,7 +70,7 @@ static READ8_DEVICE_HANDLER (specialist_8255_portb_r )
 	dat = (dat  << 2) ^0xff;
 	if (input_port_read(device->machine, "LINE12")!=0xff) dat ^= 0x02;
 
-	level = cassette_input(devtag_get_device(device->machine, "cassette"));
+	level = cassette_input(device->machine->device("cassette"));
 	if (level >=  0)
 	{
 			dat ^= 0x01;
@@ -98,11 +98,11 @@ static WRITE8_DEVICE_HANDLER (specialist_8255_portb_w )
 }
 static WRITE8_DEVICE_HANDLER (specialist_8255_portc_w )
 {
-	running_device *dac_device = devtag_get_device(device->machine, "dac");
+	running_device *dac_device = device->machine->device("dac");
 
 	specialist_8255_portc = data;
 
-	cassette_output(devtag_get_device(device->machine, "cassette"),data & 0x80 ? 1 : -1);
+	cassette_output(device->machine->device("cassette"),data & 0x80 ? 1 : -1);
 
 	dac_data_w(dac_device, data & 0x20); //beeper
 
@@ -132,12 +132,12 @@ MACHINE_RESET( special )
 
 READ8_HANDLER( specialist_keyboard_r )
 {
-	return i8255a_r(devtag_get_device(space->machine, "ppi8255"), (offset & 3));
+	return i8255a_r(space->machine->device("ppi8255"), (offset & 3));
 }
 
 WRITE8_HANDLER( specialist_keyboard_w )
 {
-	i8255a_w(devtag_get_device(space->machine, "ppi8255"), (offset & 3) , data );
+	i8255a_w(space->machine->device("ppi8255"), (offset & 3) , data );
 }
 
 
@@ -147,7 +147,7 @@ WRITE8_HANDLER( specialist_keyboard_w )
 
 static WRITE8_HANDLER( video_memory_w )
 {
-	messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x9000 + offset] = data;
+	messram_get_ptr(space->machine->device("messram"))[0x9000 + offset] = data;
 	specimx_colorram[offset]  = specimx_color;
 }
 
@@ -166,24 +166,24 @@ static void specimx_set_bank(running_machine *machine, int i,int data)
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write_bank(space, 0xc000, 0xffbf, 0, 0, "bank3");
 	memory_install_write_bank(space, 0xffc0, 0xffdf, 0, 0, "bank4");
-	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xffc0);
+	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xffc0);
 	switch(i)
 	{
 		case 0 :
 				memory_install_write_bank(space, 0x0000, 0x8fff, 0, 0, "bank1");
 				memory_install_write8_handler(space, 0x9000, 0xbfff, 0, 0, video_memory_w);
 
-				memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
-				memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x9000);
-				memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+				memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+				memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x9000);
+				memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xc000);
 				break;
 		case 1 :
 				memory_install_write_bank(space, 0x0000, 0x8fff, 0, 0, "bank1");
 				memory_install_write_bank(space, 0x9000, 0xbfff, 0, 0, "bank2");
 
-				memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000);
-				memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x19000);
-				memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1c000);
+				memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x10000);
+				memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x19000);
+				memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x1c000);
 				break;
 		case 2 :
 				memory_unmap_write(space, 0x0000, 0x8fff, 0, 0);
@@ -193,11 +193,11 @@ static void specimx_set_bank(running_machine *machine, int i,int data)
 				memory_set_bankptr(machine, "bank2", memory_region(machine, "maincpu") + 0x19000);
 				if (data & 0x80)
 				{
-					memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1c000);
+					memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x1c000);
 				}
 				else
 				{
-					memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+					memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xc000);
 				}
 				break;
 	}
@@ -251,13 +251,13 @@ const struct pit8253_config specimx_pit8253_intf =
 
 MACHINE_START( specimx )
 {
-	running_device *fdc = devtag_get_device(machine, "wd1793");
+	running_device *fdc = machine->device("wd1793");
 	wd17xx_dden_w(fdc, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( setup_pit8253_gates )
 {
-	running_device *pit8253 = devtag_get_device(machine, "pit8253");
+	running_device *pit8253 = machine->device("pit8253");
 
 	pit8253_gate0_w(pit8253, 0);
 	pit8253_gate1_w(pit8253, 0);
@@ -269,7 +269,7 @@ MACHINE_RESET( specimx )
 	specimx_set_bank(machine, 2,0x00); // Initiali load ROM disk
 	specimx_color = 0x70;
 	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
-	wd17xx_set_pause_time(devtag_get_device(machine, "wd1793"),12);
+	wd17xx_set_pause_time(machine->device("wd1793"),12);
 }
 
 READ8_HANDLER ( specimx_disk_ctrl_r )
@@ -279,7 +279,7 @@ READ8_HANDLER ( specimx_disk_ctrl_r )
 
 WRITE8_HANDLER( specimx_disk_ctrl_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = space->machine->device("wd1793");
 
 	switch(offset)
 	{
@@ -320,7 +320,7 @@ static void erik_set_bank(running_machine *machine)
 		case	1:
 		case	2:
 		case	3:
-						memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank1-1));
+						memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x10000*(bank1-1));
 						break;
 		case	0:
 						memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
@@ -332,7 +332,7 @@ static void erik_set_bank(running_machine *machine)
 		case	1:
 		case	2:
 		case	3:
-						memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank2-1) + 0x4000);
+						memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x10000*(bank2-1) + 0x4000);
 						break;
 		case	0:
 						memory_unmap_write(space, 0x4000, 0x8fff, 0, 0);
@@ -344,7 +344,7 @@ static void erik_set_bank(running_machine *machine)
 		case	1:
 		case	2:
 		case	3:
-						memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank3-1) + 0x9000);
+						memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x10000*(bank3-1) + 0x9000);
 						break;
 		case	0:
 						memory_unmap_write(space, 0x9000, 0xbfff, 0, 0);
@@ -356,9 +356,9 @@ static void erik_set_bank(running_machine *machine)
 		case	1:
 		case	2:
 		case	3:
-						memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank4-1) + 0x0c000);
-						memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank4-1) + 0x0f000);
-						memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000*(bank4-1) + 0x0f800);
+						memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x10000*(bank4-1) + 0x0c000);
+						memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")) + 0x10000*(bank4-1) + 0x0f000);
+						memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0x10000*(bank4-1) + 0x0f800);
 						break;
 		case	0:
 						memory_unmap_write(space, 0xc000, 0xefff, 0, 0);
@@ -416,7 +416,7 @@ READ8_HANDLER ( erik_disk_reg_r )
 
 WRITE8_HANDLER( erik_disk_reg_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = space->machine->device("wd1793");
 
 	wd17xx_set_side (fdc,data & 1);
 	wd17xx_set_drive(fdc,(data >> 1) & 1);

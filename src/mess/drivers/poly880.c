@@ -268,7 +268,7 @@ static MACHINE_START( poly880 )
 	poly880_state *state = (poly880_state *)machine->driver_data;
 
 	/* find devices */
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->digit);

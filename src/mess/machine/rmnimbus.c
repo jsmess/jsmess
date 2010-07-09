@@ -445,7 +445,7 @@ static void handle_eoi(running_machine *machine,int data)
 			case 0x0d:	i186.intr.in_service &= ~0x20;	break;
 			case 0x0e:	i186.intr.in_service &= ~0x40;	break;
 			case 0x0f:	i186.intr.in_service &= ~0x80;	break;
-			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(devtag_get_device(machine, MAINCPU_TAG)), data & 0x1f);
+			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(machine->device(MAINCPU_TAG)), data & 0x1f);
 		}
 		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time(machine)), data & 0x1f);
 	}
@@ -654,7 +654,7 @@ static void internal_timer_update(running_machine *machine,
 		diff = new_control ^ t->control;
 		if (diff & 0x001c)
 		  logerror("%05X:ERROR! -unsupported timer mode %04X\n",
-			   cpu_get_pc(devtag_get_device(machine, MAINCPU_TAG)), new_control);
+			   cpu_get_pc(machine->device(MAINCPU_TAG)), new_control);
 
 		/* if we have real changes, update things */
 		if (diff != 0)
@@ -753,7 +753,7 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 	diff = new_control ^ d->control;
 	if ((LOG_DMA) && (diff & 0x6811))
 	  logerror("%05X:ERROR! - unsupported DMA mode %04X\n",
-		   cpu_get_pc(devtag_get_device(machine, MAINCPU_TAG)), new_control);
+		   cpu_get_pc(machine->device(MAINCPU_TAG)), new_control);
 
 	/* if we're going live, set a timer */
 	if ((diff & 0x0002) && (new_control & 0x0002))
@@ -790,8 +790,8 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 static void drq_callback(running_machine *machine, int which)
 {
     struct dma_state *dma = &i186.dma[which];
-	const address_space *memory_space   = cpu_get_address_space(devtag_get_device(machine, MAINCPU_TAG), ADDRESS_SPACE_PROGRAM);
-    const address_space *io_space       = cpu_get_address_space(devtag_get_device(machine, MAINCPU_TAG), ADDRESS_SPACE_IO);
+	const address_space *memory_space   = cpu_get_address_space(machine->device(MAINCPU_TAG), ADDRESS_SPACE_PROGRAM);
+    const address_space *io_space       = cpu_get_address_space(machine->device(MAINCPU_TAG), ADDRESS_SPACE_IO);
 
     const address_space *src_space;
     const address_space *dest_space;
@@ -806,7 +806,7 @@ static void drq_callback(running_machine *machine, int which)
     if(!(dma->control & ST_STOP))
     {
         logerror("%05X:ERROR! - drq%d with dma channel stopped\n",
-		   cpu_get_pc(devtag_get_device(machine, MAINCPU_TAG)), which);
+		   cpu_get_pc(machine->device(MAINCPU_TAG)), which);
 
         return;
     }
@@ -926,7 +926,7 @@ READ16_HANDLER( i186_internal_port_r )
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", cpu_get_pc(space->cpu));
 			if (i186.intr.poll_status & 0x8000)
-				int_callback(devtag_get_device(space->machine, MAINCPU_TAG), 0);
+				int_callback(space->machine->device(MAINCPU_TAG), 0);
 			return i186.intr.poll_status;
 
 		case 0x13:
@@ -1429,7 +1429,7 @@ static void decode_subbios(running_device *device,offs_t pc)
 
     void (*dump_dssi)(running_device *,UINT16, UINT16) = NULL;
 
-    running_device *cpu = devtag_get_device(device->machine,MAINCPU_TAG);
+    running_device *cpu = device->machine->device(MAINCPU_TAG);
 
     UINT16  ax = cpu_get_reg(cpu,I8086_AX);
     UINT16  bx = cpu_get_reg(cpu,I8086_BX);
@@ -1943,11 +1943,11 @@ static const nimbus_blocks ramblocks[] =
 static void nimbus_bank_memory(running_machine *machine)
 {
     const address_space *space = cputag_get_address_space( machine, MAINCPU_TAG, ADDRESS_SPACE_PROGRAM );
-	int     ramsize = messram_get_size(devtag_get_device(machine, "messram"));
+	int     ramsize = messram_get_size(machine->device("messram"));
     int     ramblock = 0;
     int     blockno;
     char	bank[10];
-    UINT8   *ram    = &messram_get_ptr(devtag_get_device(machine, "messram"))[0];
+    UINT8   *ram    = &messram_get_ptr(machine->device("messram"))[0];
     UINT8   *map_blocks[3];
     UINT8   *map_base;
     int     map_blockno;
@@ -2230,11 +2230,11 @@ static WRITE_LINE_DEVICE_HANDLER( nimbus_fdc_drq_w )
 READ8_HANDLER( nimbus_disk_r )
 {
 	int result = 0;
-	running_device *fdc = devtag_get_device(space->machine, FDC_TAG);
-    running_device *hdc = devtag_get_device(space->machine, SCSIBUS_TAG);
+	running_device *fdc = space->machine->device(FDC_TAG);
+    running_device *hdc = space->machine->device(SCSIBUS_TAG);
 
     int pc=cpu_get_pc(space->cpu);
-    running_device *drive = devtag_get_device(space->machine, nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
+    running_device *drive = space->machine->device(nimbus_wd17xx_interface.floppy_drive_tags[FDC_DRIVE()]);
 
     switch(offset*2)
 	{
@@ -2298,8 +2298,8 @@ READ8_HANDLER( nimbus_disk_r )
 
 WRITE8_HANDLER( nimbus_disk_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, FDC_TAG);
-    running_device *hdc = devtag_get_device(space->machine, SCSIBUS_TAG);
+	running_device *fdc = space->machine->device(FDC_TAG);
+    running_device *hdc = space->machine->device(SCSIBUS_TAG);
     int                 pc=cpu_get_pc(space->cpu);
     UINT8               reg400_old = nimbus_drives.reg400;
 
@@ -2350,7 +2350,7 @@ WRITE8_HANDLER( nimbus_disk_w )
 
 static void hdc_reset(running_machine *machine)
 {
-    running_device *hdc = devtag_get_device(machine, SCSIBUS_TAG);
+    running_device *hdc = machine->device(SCSIBUS_TAG);
 
     init_scsibus(hdc);
 
@@ -2366,7 +2366,7 @@ static void hdc_reset(running_machine *machine)
 
 static void hdc_ctrl_write(running_machine *machine, UINT8 data)
 {
-	running_device *hdc = devtag_get_device(machine, SCSIBUS_TAG);
+	running_device *hdc = machine->device(SCSIBUS_TAG);
 
     // If we enable the HDC interupt, and an interrupt is pending, go deal with it.
     if(((data & HDC_IRQ_MASK) && (~nimbus_drives.reg410_out & HDC_IRQ_MASK)) &&
@@ -2381,7 +2381,7 @@ static void hdc_ctrl_write(running_machine *machine, UINT8 data)
 
 static void hdc_post_rw(running_machine *machine)
 {
-    running_device *hdc = devtag_get_device(machine, SCSIBUS_TAG);
+    running_device *hdc = machine->device(SCSIBUS_TAG);
 
     if((nimbus_drives.reg410_in & HDC_REQ_MASK)==0)
         set_scsi_line(hdc,SCSI_LINE_ACK,0);
@@ -2580,7 +2580,7 @@ WRITE8_HANDLER( pc8031_iou_w )
 
 READ8_HANDLER( pc8031_port_r )
 {
-	running_device *er59256 = devtag_get_device(space->machine, ER59256_TAG);
+	running_device *er59256 = space->machine->device(ER59256_TAG);
     int pc=cpu_get_pc(space->cpu);
     UINT8   result = 0;
 
@@ -2597,7 +2597,7 @@ READ8_HANDLER( pc8031_port_r )
 
 WRITE8_HANDLER( pc8031_port_w )
 {
-	running_device *er59256 = devtag_get_device(space->machine, ER59256_TAG);
+	running_device *er59256 = space->machine->device(ER59256_TAG);
     int pc=cpu_get_pc(space->cpu);
 
     switch (offset)
@@ -2631,7 +2631,7 @@ READ8_HANDLER( iou_r )
 WRITE8_HANDLER( iou_w )
 {
 	int pc=cpu_get_pc(space->cpu);
-    running_device *msm5205 = devtag_get_device(space->machine, MSM5205_TAG);
+    running_device *msm5205 = space->machine->device(MSM5205_TAG);
 
     if(LOG_IOU)
         logerror("Nimbus IOUW %08X write of %02X to %04X\n",pc,data,(offset*2)+0x92);
@@ -2664,8 +2664,8 @@ static void iou_reset(void)
 
 static void sound_reset(running_machine *machine)
 {
-    //running_device *ay8910 = devtag_get_device(machine, AY8910_TAG);
-    running_device *msm5205 = devtag_get_device(machine, MSM5205_TAG);
+    //running_device *ay8910 = machine->device(AY8910_TAG);
+    running_device *msm5205 = machine->device(MSM5205_TAG);
 
     //ay8910_reset_ym(ay8910);
     msm5205_reset_w(msm5205, 1);
@@ -2678,7 +2678,7 @@ static void sound_reset(running_machine *machine)
 
 READ8_HANDLER( sound_ay8910_r )
 {
-	running_device *ay8910 = devtag_get_device(space->machine, AY8910_TAG);
+	running_device *ay8910 = space->machine->device(AY8910_TAG);
     UINT8   result=0;
 
     if ((offset*2)==0)
@@ -2690,7 +2690,7 @@ READ8_HANDLER( sound_ay8910_r )
 WRITE8_HANDLER( sound_ay8910_w )
 {
 	int pc=cpu_get_pc(space->cpu);
-	running_device *ay8910 = devtag_get_device(space->machine, AY8910_TAG);
+	running_device *ay8910 = space->machine->device(AY8910_TAG);
 
     if(LOG_SOUND)
         logerror("Nimbus SoundW %05X write of %02X to %04X\n",pc,data,(offset*2)+0xE0);
@@ -2705,7 +2705,7 @@ WRITE8_HANDLER( sound_ay8910_w )
 
 WRITE8_HANDLER( sound_ay8910_porta_w )
 {
-    running_device *msm5205 = devtag_get_device(space->machine, MSM5205_TAG);
+    running_device *msm5205 = space->machine->device(MSM5205_TAG);
 
     msm5205_data_w(msm5205, data);
 
@@ -2715,7 +2715,7 @@ WRITE8_HANDLER( sound_ay8910_porta_w )
 
 WRITE8_HANDLER( sound_ay8910_portb_w )
 {
-    running_device *msm5205 = devtag_get_device(space->machine, MSM5205_TAG);
+    running_device *msm5205 = space->machine->device(MSM5205_TAG);
 
     if((data & 0x07)!=last_playmode)
     {
@@ -2758,7 +2758,7 @@ static TIMER_CALLBACK(mouse_callback)
 {
     UINT8   x = 0;
     UINT8   y = 0;
-//  int     pc=cpu_get_pc(devtag_get_device(machine,MAINCPU_TAG));
+//  int     pc=cpu_get_pc(machine->device(MAINCPU_TAG));
 
     UINT8   intstate_x;
     UINT8   intstate_y;
@@ -2904,7 +2904,7 @@ READ8_HANDLER( mouse_js_r )
 
     */
     UINT8   result;
-//  int     pc=cpu_get_pc(devtag_get_device(space->machine,MAINCPU_TAG));
+//  int     pc=cpu_get_pc(space->machine->device(MAINCPU_TAG));
 
     _mouse_joy_state *state = &nimbus_mouse;
 

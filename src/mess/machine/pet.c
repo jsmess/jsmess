@@ -71,17 +71,17 @@ static READ8_DEVICE_HANDLER( pia0_pa_r )
 
     */
 
-	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = device->machine->device("ieee_bus");
 	UINT8 data = 0;
 
 	/* key */
 	data |= pet_keyline_select;
 
 	/* #1 cassette switch */
-	data |= ((cassette_get_state(devtag_get_device(device->machine, "cassette1")) & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
+	data |= ((cassette_get_state(device->machine->device("cassette1")) & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 4;
 
 	/* #2 cassette switch */
-	data |= ((cassette_get_state(devtag_get_device(device->machine, "cassette2")) & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 5;
+	data |= ((cassette_get_state(device->machine->device("cassette2")) & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED) << 5;
 
 	/* end or identify in */
 	data |= ieee488_eoi_r(ieeebus) << 6;
@@ -180,12 +180,12 @@ static READ8_DEVICE_HANDLER( petb_kin_r )
 static READ8_DEVICE_HANDLER( cass1_r )
 {
 	// cassette 1 read
-	return (cassette_input(devtag_get_device(device->machine, "cassette1")) > +0.0) ? 1 : 0;
+	return (cassette_input(device->machine->device("cassette1")) > +0.0) ? 1 : 0;
 }
 
 static WRITE8_DEVICE_HANDLER( eoi_w )
 {
-	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = device->machine->device("ieee_bus");
 
 	ieee488_eoi_w(ieeebus, device, data);
 }
@@ -194,12 +194,12 @@ static WRITE8_DEVICE_HANDLER( cass1_motor_w )
 {
 	if (!data)
 	{
-		cassette_change_state(devtag_get_device(device->machine, "cassette1"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device->machine->device("cassette1"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		cassette_change_state(devtag_get_device(device->machine, "cassette1"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+		cassette_change_state(device->machine->device("cassette1"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 		timer_reset(datasette1_timer, attotime_never);
 	}
 }
@@ -272,21 +272,21 @@ static WRITE8_DEVICE_HANDLER( do_w )
 
     */
 
-	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = device->machine->device("ieee_bus");
 
 	ieee488_dio_w(ieeebus, device, data);
 }
 
 static WRITE8_DEVICE_HANDLER( ndac_w )
 {
-	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = device->machine->device("ieee_bus");
 
 	ieee488_ndac_w(ieeebus, device, data);
 }
 
 static WRITE8_DEVICE_HANDLER( dav_w )
 {
-	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = device->machine->device("ieee_bus");
 
 	ieee488_dav_w(ieeebus, device, data);
 }
@@ -351,7 +351,7 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 
     */
 
-	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = device->machine->device("ieee_bus");
 	UINT8 data = 0;
 
 	/* not data accepted in */
@@ -371,7 +371,7 @@ static READ8_DEVICE_HANDLER( via_pb_r )
 static READ_LINE_DEVICE_HANDLER( cass2_r )
 {
 	// cassette 2 read
-	return (cassette_input(devtag_get_device(device->machine, "cassette2")) > +0.0) ? 1 : 0;
+	return (cassette_input(device->machine->device("cassette2")) > +0.0) ? 1 : 0;
 }
 
 static WRITE8_DEVICE_HANDLER( via_pb_w )
@@ -391,7 +391,7 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 
     */
 
-	running_device *ieeebus = devtag_get_device(device->machine, "ieee_bus");
+	running_device *ieeebus = device->machine->device("ieee_bus");
 
 	/* not ready for data out */
 	ieee488_nrfd_w(ieeebus, device, BIT(data, 1));
@@ -400,18 +400,18 @@ static WRITE8_DEVICE_HANDLER( via_pb_w )
 	ieee488_atn_w(ieeebus, device, BIT(data, 2));
 
 	/* cassette write */
-	cassette_output(devtag_get_device(device->machine, "cassette1"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
-	cassette_output(devtag_get_device(device->machine, "cassette2"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	cassette_output(device->machine->device("cassette1"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+	cassette_output(device->machine->device("cassette2"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 
 	/* #2 cassette motor */
 	if (BIT(data, 4))
 	{
-		cassette_change_state(devtag_get_device(device->machine, "cassette2"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		cassette_change_state(device->machine->device("cassette2"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 		timer_adjust_periodic(datasette2_timer, attotime_zero, 0, ATTOTIME_IN_HZ(48000));	// I put 48000 because I was given some .wav with this freq
 	}
 	else
 	{
-		cassette_change_state(devtag_get_device(device->machine, "cassette2"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
+		cassette_change_state(device->machine->device("cassette2"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 		timer_reset(datasette2_timer, attotime_never);
 	}
 }
@@ -457,10 +457,10 @@ static struct {
 
 static WRITE8_HANDLER( cbm8096_io_w )
 {
-	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
-	running_device *pia_0 = devtag_get_device(space->machine, "pia_0");
-	running_device *pia_1 = devtag_get_device(space->machine, "pia_1");
-	running_device *mc6845 = devtag_get_device(space->machine, "crtc");
+	running_device *via_0 = space->machine->device("via6522_0");
+	running_device *pia_0 = space->machine->device("pia_0");
+	running_device *pia_1 = space->machine->device("pia_1");
+	running_device *mc6845 = space->machine->device("crtc");
 
 	if (offset < 0x10) ;
 	else if (offset < 0x14) pia6821_w(pia_0, offset & 3, data);
@@ -475,10 +475,10 @@ static WRITE8_HANDLER( cbm8096_io_w )
 
 static READ8_HANDLER( cbm8096_io_r )
 {
-	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
-	running_device *pia_0 = devtag_get_device(space->machine, "pia_0");
-	running_device *pia_1 = devtag_get_device(space->machine, "pia_1");
-	running_device *mc6845 = devtag_get_device(space->machine, "crtc");
+	running_device *via_0 = space->machine->device("via6522_0");
+	running_device *pia_0 = space->machine->device("pia_0");
+	running_device *pia_1 = space->machine->device("pia_1");
+	running_device *mc6845 = space->machine->device("crtc");
 
 	int data = 0xff;
 	if (offset < 0x10) ;
@@ -669,7 +669,7 @@ WRITE8_HANDLER( superpet_w )
 
 static TIMER_CALLBACK( pet_interrupt )
 {
-	running_device *pia_0 = devtag_get_device(machine, "pia_0");
+	running_device *pia_0 = machine->device("pia_0");
 	static int level = 0;
 
 	pia6821_cb1_w(pia_0, 0, level);
@@ -679,17 +679,17 @@ static TIMER_CALLBACK( pet_interrupt )
 
 static TIMER_CALLBACK( pet_tape1_timer )
 {
-	running_device *pia_0 = devtag_get_device(machine, "pia_0");
+	running_device *pia_0 = machine->device("pia_0");
 //  cassette 1
-	UINT8 data = (cassette_input(devtag_get_device(machine, "cassette1")) > +0.0) ? 1 : 0;
+	UINT8 data = (cassette_input(machine->device("cassette1")) > +0.0) ? 1 : 0;
 	pia6821_ca1_w(pia_0, 0, data);
 }
 
 static TIMER_CALLBACK( pet_tape2_timer )
 {
-	running_device *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = machine->device("via6522_0");
 //  cassette 2
-	UINT8 data = (cassette_input(devtag_get_device(machine, "cassette2")) > +0.0) ? 1 : 0;
+	UINT8 data = (cassette_input(machine->device("cassette2")) > +0.0) ? 1 : 0;
 	via_cb1_w(via_0, data);
 }
 
@@ -705,16 +705,16 @@ static void pet_common_driver_init( running_machine *machine )
 	state->superpet = 0;
 	state->cbm8096 = 0;
 
-	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, 0, "bank10");
+	memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, messram_get_size(machine->device("messram")) - 1, 0, 0, "bank10");
 	memory_set_bankptr(machine, "bank10", pet_memory);
 
-	if (messram_get_size(devtag_get_device(machine, "messram")) < 0x8000)
+	if (messram_get_size(machine->device("messram")) < 0x8000)
 	{
-		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), messram_get_size(devtag_get_device(machine, "messram")), 0x7FFF, 0, 0);
+		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), messram_get_size(machine->device("messram")), 0x7FFF, 0, 0);
 	}
 
 	/* 2114 poweron ? 64 x 0xff, 64x 0, and so on */
-	for (i = 0; i < messram_get_size(devtag_get_device(machine, "messram")); i += 0x40)
+	for (i = 0; i < messram_get_size(machine->device("messram")); i += 0x40)
 	{
 		memset (pet_memory + i, i & 0x40 ? 0 : 0xff, 0x40);
 	}
@@ -731,7 +731,7 @@ static void pet_common_driver_init( running_machine *machine )
 DRIVER_INIT( pet2001 )
 {
 	pet_state *state = (pet_state *)machine->driver_data;
-	pet_memory = messram_get_ptr(devtag_get_device(machine, "messram"));
+	pet_memory = messram_get_ptr(machine->device("messram"));
 	pet_common_driver_init(machine);
 	state->pet_basic1 = 1;
 	pet_vh_init(machine);
@@ -739,7 +739,7 @@ DRIVER_INIT( pet2001 )
 
 DRIVER_INIT( pet )
 {
-	pet_memory = messram_get_ptr(devtag_get_device(machine, "messram"));
+	pet_memory = messram_get_ptr(machine->device("messram"));
 	pet_common_driver_init(machine);
 	pet_vh_init(machine);
 }
@@ -760,7 +760,7 @@ DRIVER_INIT( pet80 )
 DRIVER_INIT( superpet )
 {
 	pet_state *state = (pet_state *)machine->driver_data;
-	pet_memory = messram_get_ptr(devtag_get_device(machine, "messram"));
+	pet_memory = messram_get_ptr(machine->device("messram"));
 	pet_common_driver_init(machine);
 	state->superpet = 1;
 
@@ -775,8 +775,8 @@ DRIVER_INIT( superpet )
 MACHINE_RESET( pet )
 {
 	pet_state *state = (pet_state *)machine->driver_data;
-	running_device *ieeebus = devtag_get_device(machine, "ieee_bus");
-	running_device *scapegoat = devtag_get_device(machine, "pia_0");
+	running_device *ieeebus = machine->device("ieee_bus");
+	running_device *scapegoat = machine->device("pia_0");
 
 	if (state->superpet)
 	{
@@ -810,7 +810,7 @@ MACHINE_RESET( pet )
 
 //removed   cbm_drive_0_config (input_port_read(machine, "CFG") & 2 ? IEEE : 0, 8);
 //removed   cbm_drive_1_config (input_port_read(machine, "CFG") & 1 ? IEEE : 0, 9);
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 
 	ieee488_ren_w(ieeebus, scapegoat, 0);
 	ieee488_ifc_w(ieeebus, scapegoat, 0);

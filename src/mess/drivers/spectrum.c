@@ -295,7 +295,7 @@ SamRam
 WRITE8_HANDLER(spectrum_port_fe_w)
 {
 	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 	unsigned char Changed;
 
 	Changed = state->port_fe_data^data;
@@ -316,7 +316,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & (1<<3))!=0)
 	{
 		/* write cassette data */
-		cassette_output(devtag_get_device(space->machine, "cassette"), (data & (1<<3)) ? -1.0 : +1.0);
+		cassette_output(space->machine->device("cassette"), (data & (1<<3)) ? -1.0 : +1.0);
 	}
 
 	state->port_fe_data = data;
@@ -326,9 +326,9 @@ static DIRECT_UPDATE_HANDLER(spectrum_direct)
 {
     /* Hack for correct handling 0xffff interrupt vector */
     if (address == 0x0001)
-        if (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), STATE_GENPCBASE)==0xffff)
+        if (cpu_get_reg(space->machine->device("maincpu"), STATE_GENPCBASE)==0xffff)
         {
-            cpu_set_reg(devtag_get_device(space->machine, "maincpu"), Z80_PC, 0xfff4);
+            cpu_set_reg(space->machine->device("maincpu"), Z80_PC, 0xfff4);
             return 0xfff4;
         }
     return address;
@@ -392,7 +392,7 @@ READ8_HANDLER(spectrum_port_fe_r)
 	data |= (0xe0); /* Set bits 5-7 - as reset above */
 
 	/* cassette input from wav */
-	if (cassette_input(devtag_get_device(space->machine, "cassette")) > 0.0038 )
+	if (cassette_input(space->machine->device("cassette")) > 0.0038 )
 	{
 		data &= ~0x40;
 	}
@@ -624,7 +624,7 @@ DRIVER_INIT( spectrum )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	    case 48*1024:
 		memory_install_ram(space, 0x8000, 0xffff, 0, 0, NULL); // Fall through

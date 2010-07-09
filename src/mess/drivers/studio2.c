@@ -407,7 +407,7 @@ static CDP1802_EF_READ( studio2_ef_r )
 
 static WRITE_LINE_DEVICE_HANDLER( studio2_q_w )
 {
-	running_device *speaker = devtag_get_device(device->machine, "beep");
+	running_device *speaker = device->machine->device("beep");
 	beep_set_state(speaker, state);
 }
 
@@ -470,7 +470,7 @@ static MACHINE_START( studio2 )
 	studio2_state *state = (studio2_state *)machine->driver_data;
 
 	/* find devices */
-	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
+	state->cdp1861 = machine->device(CDP1861_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);
@@ -495,7 +495,7 @@ static MACHINE_START( mpt02 )
 	studio2_state *state = (studio2_state *)machine->driver_data;
 
 	/* find devices */
-	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
+	state->cdp1864 = machine->device(CDP1864_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);
@@ -643,7 +643,7 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = machine->device("beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 300);
 }

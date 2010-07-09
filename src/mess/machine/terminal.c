@@ -393,7 +393,7 @@ static VIDEO_START( terminal )
 
 static VIDEO_UPDATE(terminal )
 {
-	running_device *devconf = devtag_get_device(screen->machine, TERMINAL_TAG);
+	running_device *devconf = screen->machine->device(TERMINAL_TAG);
 	generic_terminal_update( devconf, bitmap, cliprect);
 	return 0;
 }

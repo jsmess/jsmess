@@ -568,7 +568,7 @@ static CBM_IEC_DAISY( cbm_iec_daisy )
 
 static VIDEO_UPDATE( c64 )
 {
-	running_device *vic2 = devtag_get_device(screen->machine, "vic2");
+	running_device *vic2 = screen->machine->device("vic2");
 
 	vic2_video_update(vic2, bitmap, cliprect);
 	return 0;

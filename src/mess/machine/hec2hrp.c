@@ -296,7 +296,7 @@ static int counter_write=0; /* Attente de quelque cycles avant demettre en route
 }
 WRITE8_HANDLER( hector_color_b_w )
 {
-	running_device *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = space->machine->device("discrete");
     	hector_color[1] =  data        & 0x07;
 	hector_color[3] = (data >> 3)  & 0x07;
 
@@ -314,7 +314,7 @@ WRITE8_HANDLER( hector_color_b_w )
 
 static running_device *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, "cassette");
+	return machine->device("cassette");
 }
 
 
@@ -329,7 +329,7 @@ READ8_HANDLER( hector_mx_io_port_r)
 WRITE8_HANDLER( hector_mx40_io_port_w)
 {
    if ((offset &0x0ff) == 0xf0) /* Port A => to printer*/
-		printer_output(devtag_get_device(space->machine, "printer"), data);
+		printer_output(space->machine->device("printer"), data);
    if ((offset &0x0ff) == 0x40) /* Port page 0*/
       memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE0);
    if ((offset &0x0ff) == 0x41) /* Port page 1*/
@@ -346,7 +346,7 @@ WRITE8_HANDLER( hector_mx40_io_port_w)
 WRITE8_HANDLER( hector_mx80_io_port_w)
 {
    if ((offset &0x0ff) == 0xf0) /* Port A => to printer*/
-		printer_output(devtag_get_device(space->machine, "printer"), data);
+		printer_output(space->machine->device("printer"), data);
    if ((offset &0x0ff) == 0x40) /* Port page 0*/
       memory_set_bank(space->machine, "bank2", HECTORMX_BANK_PAGE0);
    if ((offset &0x0ff) == 0x41) /* Port page 1*/
@@ -558,7 +558,7 @@ static void Init_Value_SN76477_Hector(void)
 void Update_Sound(const address_space *space, UINT8 data)
 {
 	/* keep device*/
-	running_device *sn76477 = devtag_get_device(space->machine, "sn76477");
+	running_device *sn76477 = space->machine->device("sn76477");
 
 	/* MIXER*/
 	sn76477_mixer_a_w(sn76477, ((ValMixer & 0x04)==4) ? 1 : 0);

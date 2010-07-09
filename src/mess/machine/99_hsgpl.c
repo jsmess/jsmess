@@ -285,7 +285,7 @@ void ti99_hsgpl_reset(running_machine *machine)
 	hsgpl.cur_bank = 0;
 	hsgpl.cru_reg = 0;
 
-	expansion_box = devtag_get_device(machine, "per_exp_box");
+	expansion_box = machine->device("per_exp_box");
 
 	/* Card is enabled on startup. */
 	ti99_set_hsgpl_crdena(1);

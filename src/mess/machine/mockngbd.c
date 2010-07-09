@@ -144,8 +144,8 @@ READ8_DEVICE_HANDLER(mockingboard_r)
 
 WRITE8_DEVICE_HANDLER(mockingboard_w)
 {
-	running_device *ay8910_1 = devtag_get_device(device->machine, "ay8910.1");
-	running_device *ay8910_2 = devtag_get_device(device->machine, "ay8910.2");
+	running_device *ay8910_1 = device->machine->device("ay8910.1");
+	running_device *ay8910_2 = device->machine->device("ay8910.2");
 	mockingboard_token *token = get_token(device);
 
 	if (LOG_MOCKINGBOARD)

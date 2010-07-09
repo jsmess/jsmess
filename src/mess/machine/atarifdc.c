@@ -420,7 +420,7 @@ static void add_serout(running_device *device,int expect_data)
 static void clr_serin(running_device *device, int ser_delay)
 {
 	atari_fdc_t *fdc = get_safe_token(device);
-	running_device *pokey = devtag_get_device(device->machine, "pokey");
+	running_device *pokey = device->machine->device("pokey");
 	fdc->serin_chksum = 0;
 	fdc->serin_offs = 0;
 	fdc->serin_count = 0;
@@ -705,7 +705,7 @@ READ8_DEVICE_HANDLER ( atari_serin_r )
 
 	if (fdc->serin_count)
 	{
-		running_device *pokey = devtag_get_device(device->machine, "pokey");
+		running_device *pokey = device->machine->device("pokey");
 
 		data = fdc->serin_buff[fdc->serin_offs];
 		ser_delay = 2 * 40;
@@ -730,7 +730,7 @@ READ8_DEVICE_HANDLER ( atari_serin_r )
 
 WRITE8_DEVICE_HANDLER ( atari_serout_w )
 {
-	running_device *pia = devtag_get_device( device->machine, "pia" );
+	running_device *pia = device->machine->device( "pia" );
 	atari_fdc_t *fdc = get_safe_token(device);
 
 	/* ignore serial commands if no floppy image is specified */

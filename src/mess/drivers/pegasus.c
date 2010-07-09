@@ -44,7 +44,7 @@ static UINT8 *FNT;
 
 static TIMER_DEVICE_CALLBACK( pegasus_firq )
 {
-	running_device *cpu = devtag_get_device( timer.machine, "maincpu" );
+	running_device *cpu = timer.machine->device( "maincpu" );
 	cpu_set_input_line(cpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( pegasus_pcg_w )
 /* Must return the A register except when it is doing a rom search */
 static READ8_HANDLER( pegasus_protection_r )
 {
-	UINT8 data = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), M6809_A);
+	UINT8 data = cpu_get_reg(space->machine->device("maincpu"), M6809_A);
 	if (data == 0x20) data = 0xff;
 	return data;
 }
@@ -334,7 +334,7 @@ static DEVICE_IMAGE_LOAD( pegasus_cart_5 )
 
 static MACHINE_START( pegasus )
 {
-	pegasus_cass = devtag_get_device(machine, "cassette");
+	pegasus_cass = machine->device("cassette");
 	FNT = memory_region(machine, "pcg");
 }
 

@@ -278,7 +278,7 @@ static MACHINE_START(cat)
 static MACHINE_RESET(cat)
 {
 	cat_state *state = (cat_state *)machine->driver_data;
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), cat_int_ack);
+	cpu_set_irq_callback(machine->device("maincpu"), cat_int_ack);
 	timer_adjust_periodic(state->keyboard_timer, attotime_zero, 0, ATTOTIME_IN_HZ(120));
 }
 

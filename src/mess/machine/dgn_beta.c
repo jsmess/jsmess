@@ -310,17 +310,17 @@ static void UpdateBanks(running_machine *machine, int first, int last)
 		//
 		// Map block, $00-$BF are ram, $FC-$FF are Boot ROM
 		//
-		if ((MapPage*4) < ((messram_get_size(devtag_get_device(machine, "messram")) / 1024)-1))		// Block is ram
+		if ((MapPage*4) < ((messram_get_size(machine->device("messram")) / 1024)-1))		// Block is ram
 		{
 			if (!is_last_page(Page))
 			{
-				readbank = &messram_get_ptr(devtag_get_device(machine, "messram"))[MapPage*RamPageSize];
+				readbank = &messram_get_ptr(machine->device("messram"))[MapPage*RamPageSize];
 				if(LogDatWrites)
 					debug_console_printf(machine, "Mapping page %X, pageno=%X, mess_ram)[%X]\n",Page,MapPage,(MapPage*RamPageSize));
 			}
 			else
 			{
-				readbank = &messram_get_ptr(devtag_get_device(machine, "messram"))[(MapPage*RamPageSize)-256];
+				readbank = &messram_get_ptr(machine->device("messram"))[(MapPage*RamPageSize)-256];
 				logerror("Error RAM in Last page !\n");
 			}
 			writebank=bank_info[Page].handler;
@@ -387,7 +387,7 @@ static void SetDefaultTask(running_machine *machine)
 
 	/* Map video ram to base of area it can use, that way we can take the literal RA */
 	/* from the 6845 without having to mask it ! */
-	machine->generic.videoram.u8=&messram_get_ptr(devtag_get_device(machine, "messram"))[TextVidBasePage*RamPageSize];
+	machine->generic.videoram.u8=&messram_get_ptr(machine->device("messram"))[TextVidBasePage*RamPageSize];
 }
 
 // Return the value of a page register
@@ -706,7 +706,7 @@ static READ8_DEVICE_HANDLER(d_pia1_pa_r)
 static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 {
 	int	HALT_DMA;
-	running_device *fdc = devtag_get_device(device->machine, FDC_TAG);
+	running_device *fdc = device->machine->device(FDC_TAG);
 
 	/* Only play with halt line if halt bit changed since last write */
 	if((data & 0x80) != d_pia1_pa_last)
@@ -722,7 +722,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pa_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_DMA == CLEAR_LINE)
-			cpu_yield(devtag_get_device(device->machine, MAINCPU_TAG));
+			cpu_yield(device->machine->device(MAINCPU_TAG));
 
 		d_pia1_pa_last = data & 0x80;
 	}
@@ -760,7 +760,7 @@ static WRITE8_DEVICE_HANDLER(d_pia1_pb_w)
 
 		/* CPU un-halted let it run ! */
 		if (HALT_CPU == CLEAR_LINE)
-			cpu_yield(devtag_get_device(device->machine, DMACPU_TAG));
+			cpu_yield(device->machine->device(DMACPU_TAG));
 	}
 }
 
@@ -807,7 +807,7 @@ static WRITE8_DEVICE_HANDLER(d_pia2_pa_w)
 		{
 			cputag_set_input_line(device->machine, DMACPU_TAG, INPUT_LINE_NMI, ASSERT_LINE);
 			logerror("cpu_yield()\n");
-			cpu_yield(devtag_get_device(device->machine, DMACPU_TAG));	/* Let DMA CPU run */
+			cpu_yield(device->machine->device(DMACPU_TAG));	/* Let DMA CPU run */
 		}
 		else
 		{
@@ -878,9 +878,9 @@ static WRITE_LINE_DEVICE_HANDLER( d_pia2_irq_b )
 /* CPU 0 */
 static void cpu0_recalc_irq(running_machine *machine, int state)
 {
-	running_device *pia_0 = devtag_get_device( machine, PIA_0_TAG );
-	running_device *pia_1 = devtag_get_device( machine, PIA_1_TAG );
-	running_device *pia_2 = devtag_get_device( machine, PIA_2_TAG );
+	running_device *pia_0 = machine->device( PIA_0_TAG );
+	running_device *pia_1 = machine->device( PIA_1_TAG );
+	running_device *pia_2 = machine->device( PIA_2_TAG );
 	UINT8 pia0_irq_a = pia6821_get_irq_a(pia_0);
 	UINT8 pia1_irq_a = pia6821_get_irq_a(pia_1);
 	UINT8 pia1_irq_b = pia6821_get_irq_b(pia_1);
@@ -899,7 +899,7 @@ static void cpu0_recalc_irq(running_machine *machine, int state)
 
 static void cpu0_recalc_firq(running_machine *machine, int state)
 {
-	running_device *pia_0 = devtag_get_device( machine, PIA_0_TAG );
+	running_device *pia_0 = machine->device( PIA_0_TAG );
 	UINT8 pia0_irq_b = pia6821_get_irq_b(pia_0);
 	UINT8 FIRQ;
 
@@ -951,7 +951,7 @@ const wd17xx_interface dgnbeta_wd17xx_interface =
 READ8_HANDLER(dgnbeta_wd2797_r)
 {
 	int result = 0;
-	running_device *fdc = devtag_get_device(space->machine, FDC_TAG);
+	running_device *fdc = space->machine->device(FDC_TAG);
 
 	switch(offset & 0x03)
 	{
@@ -977,7 +977,7 @@ READ8_HANDLER(dgnbeta_wd2797_r)
 
 WRITE8_HANDLER(dgnbeta_wd2797_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, FDC_TAG);
+	running_device *fdc = space->machine->device(FDC_TAG);
 
     wd2797_written=1;
 
@@ -1039,7 +1039,7 @@ static void ScanInKeyboard(void)
 /* VBlank inturrupt */
 void dgn_beta_frame_interrupt (running_machine *machine, int data)
 {
-	running_device *pia_2 = devtag_get_device( machine, PIA_2_TAG );
+	running_device *pia_2 = machine->device( PIA_2_TAG );
 
     /* Set PIA line, so it recognises inturrupt */
     if (!data)
@@ -1070,10 +1070,10 @@ void dgn_beta_line_interrupt (int data)
 /********************************* Machine/Driver Initialization ****************************************/
 static void dgnbeta_reset(running_machine &machine)
 {
-	running_device *fdc = devtag_get_device(&machine, FDC_TAG);
-	running_device *pia_0 = devtag_get_device( &machine, PIA_0_TAG );
-	running_device *pia_1 = devtag_get_device( &machine, PIA_1_TAG );
-	running_device *pia_2 = devtag_get_device( &machine, PIA_2_TAG );
+	running_device *fdc = machine.device(FDC_TAG);
+	running_device *pia_0 = machine.device( PIA_0_TAG );
+	running_device *pia_1 = machine.device( PIA_1_TAG );
+	running_device *pia_2 = machine.device( PIA_2_TAG );
 
     logerror("MACHINE_RESET( dgnbeta )\n");
 
@@ -1112,7 +1112,7 @@ static void dgnbeta_reset(running_machine &machine)
 	wd17xx_dden_w(fdc, CLEAR_LINE);
 	wd17xx_set_drive(fdc, 0);
 
-	machine.generic.videoram.u8 = messram_get_ptr(devtag_get_device(&machine, "messram"));		/* Point video ram at the start of physical ram */
+	machine.generic.videoram.u8 = messram_get_ptr(machine.device("messram"));		/* Point video ram at the start of physical ram */
 
     dgnbeta_video_reset(&machine);
     wd17xx_reset(fdc);

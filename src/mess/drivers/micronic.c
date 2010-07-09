@@ -403,7 +403,7 @@ static NVRAM_HANDLER( micronic )
 	if (read_or_write)
 	{
 		mame_fwrite(file, state->ram, 0x8000);
-		mame_fwrite(file, messram_get_ptr(devtag_get_device(machine, "messram")), 224*1024);
+		mame_fwrite(file, messram_get_ptr(machine->device("messram")), 224*1024);
 		mc146818_save_stream(file);
 	}
 	else
@@ -411,7 +411,7 @@ static NVRAM_HANDLER( micronic )
 		if (file)
 		{
 			mame_fread(file, state->ram, 0x8000);
-			mame_fread(file, messram_get_ptr(devtag_get_device(machine, "messram")), 224*1024);
+			mame_fread(file, messram_get_ptr(machine->device("messram")), 224*1024);
 			mc146818_load_stream(file);
 
 			/* reload register A and B for restore the periodic irq state */
@@ -452,14 +452,14 @@ static MACHINE_START( micronic )
 	micronic_state *state = (micronic_state *)machine->driver_data;
 
 	/* find devices */
-	state->hd61830 = devtag_get_device(machine, HD61830_TAG);
-	state->speaker = devtag_get_device(machine, "beep");
+	state->hd61830 = machine->device(HD61830_TAG);
+	state->speaker = machine->device("beep");
 
 	/* ROM banks */
 	memory_configure_bank(machine, "bank1", 0x00, 0x02, memory_region(machine, Z80_TAG), 0x10000);
 
 	/* RAM banks */
-	memory_configure_bank(machine, "bank1", 0x02, 0x07, messram_get_ptr(devtag_get_device(machine, "messram")), 0x8000);
+	memory_configure_bank(machine, "bank1", 0x02, 0x07, messram_get_ptr(machine->device("messram")), 0x8000);
 
 	state->rtc_periodic_irq = timer_alloc(machine, rtc_periodic_irq, 0);
 

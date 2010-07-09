@@ -164,11 +164,11 @@ static void coco_vhd_readwrite(running_device *device, UINT8 data)
 	switch(data)
 	{
 		case VHDCMD_READ: /* Read sector */
-			memset(&messram_get_ptr(devtag_get_device(device->machine, "messram"))[phyOffset], 0, 256);
+			memset(&messram_get_ptr(device->machine->device("messram"))[phyOffset], 0, 256);
 			if (total_size > seek_position)
 			{
 				bytes_to_read = (UINT32) MIN((UINT64) 256, total_size - seek_position);
-				result = image->fread(&messram_get_ptr(devtag_get_device(device->machine, "messram"))[phyOffset], bytes_to_read);
+				result = image->fread(&messram_get_ptr(device->machine->device("messram"))[phyOffset], bytes_to_read);
 				if (result != bytes_to_read)
 				{
 					vhd->status = VHDSTATUS_ACCESS_DENIED;
@@ -180,7 +180,7 @@ static void coco_vhd_readwrite(running_device *device, UINT8 data)
 			break;
 
 		case VHDCMD_WRITE: /* Write Sector */
-			result = image->fwrite(&(messram_get_ptr(devtag_get_device(device->machine, "messram"))[phyOffset]), 256);
+			result = image->fwrite(&(messram_get_ptr(device->machine->device("messram"))[phyOffset]), 256);
 
 			if (result != 256)
 			{

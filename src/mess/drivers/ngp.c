@@ -615,12 +615,12 @@ static MACHINE_RESET( ngp )
 	ngp_state *state = (ngp_state *)machine->driver_data;
 
 	state->old_to3 = 0;
-	state->tlcs900 = devtag_get_device( machine, "maincpu" );
-	state->z80 = devtag_get_device( machine, "soundcpu" );
-	state->t6w28 = devtag_get_device( machine, "t6w28" );
-	state->dac_l = devtag_get_device( machine, "dac_l" );
-	state->dac_r = devtag_get_device( machine, "dac_r" );
-	state->k1ge = devtag_get_device( machine, "k1ge" );
+	state->tlcs900 = machine->device( "maincpu" );
+	state->z80 = machine->device( "soundcpu" );
+	state->t6w28 = machine->device( "t6w28" );
+	state->dac_l = machine->device( "dac_l" );
+	state->dac_r = machine->device( "dac_r" );
+	state->k1ge = machine->device( "k1ge" );
 
 	cpu_suspend( state->z80, SUSPEND_REASON_HALT, 1 );
 	cpu_set_input_line( state->z80, 0, CLEAR_LINE );

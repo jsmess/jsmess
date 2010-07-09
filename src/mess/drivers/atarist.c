@@ -1454,7 +1454,7 @@ static void atarist_configure_memory(running_machine *machine)
 	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *RAM = memory_region(machine, M68000_TAG);
 
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 256 * 1024:
 		memory_install_readwrite_bank(program, 0x000008, 0x03ffff, 0, 0, "bank1");
@@ -1524,13 +1524,13 @@ static MACHINE_START( atarist )
 	atarist_configure_memory(machine);
 
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(devtag_get_device(machine, M68000_TAG), atarist_int_ack);
+	cpu_set_irq_callback(machine->device(M68000_TAG), atarist_int_ack);
 
 	/* find devices */
-	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
-	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->rs232 = devtag_get_device(machine, RS232_TAG);
+	state->mc68901 = machine->device(MC68901_TAG);
+	state->wd1772 = machine->device(WD1772_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
+	state->rs232 = machine->device(RS232_TAG);
 
 	/* register for state saving */
 	atarist_state_save(machine);
@@ -1622,18 +1622,18 @@ static MACHINE_START( atariste )
 	atarist_configure_memory(machine);
 
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(devtag_get_device(machine, M68000_TAG), atarist_int_ack);
+	cpu_set_irq_callback(machine->device(M68000_TAG), atarist_int_ack);
 
 	/* allocate timers */
 	state->dmasound_timer = timer_alloc(machine, atariste_dmasound_tick, NULL);
 	state->microwire_timer = timer_alloc(machine, atariste_microwire_tick, NULL);
 
 	/* find devices */
-	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
-	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
-	state->lmc1992 = devtag_get_device(machine, LMC1992_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->rs232 = devtag_get_device(machine, RS232_TAG);
+	state->mc68901 = machine->device(MC68901_TAG);
+	state->wd1772 = machine->device(WD1772_TAG);
+	state->lmc1992 = machine->device(LMC1992_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
+	state->rs232 = machine->device(RS232_TAG);
 
 	/* register for state saving */
 	atariste_state_save(machine);
@@ -1653,7 +1653,7 @@ static void stbook_configure_memory(running_machine *machine)
 	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT8 *RAM = memory_region(machine, M68000_TAG);
 
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 1024 * 1024:
 		memory_install_readwrite_bank(program, 0x000008, 0x07ffff, 0, 0x080000, "bank1");
@@ -1778,13 +1778,13 @@ static MACHINE_START( stbook )
 	stbook_configure_memory(machine);
 
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(devtag_get_device(machine, M68000_TAG), atarist_int_ack);
+	cpu_set_irq_callback(machine->device(M68000_TAG), atarist_int_ack);
 
 	/* find devices */
-	state->mc68901 = devtag_get_device(machine, MC68901_TAG);
-	state->wd1772 = devtag_get_device(machine, WD1772_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->rs232 = devtag_get_device(machine, RS232_TAG);
+	state->mc68901 = machine->device(MC68901_TAG);
+	state->wd1772 = machine->device(WD1772_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
+	state->rs232 = machine->device(RS232_TAG);
 
 	/* register for state saving */
 	atariste_state_save(machine);

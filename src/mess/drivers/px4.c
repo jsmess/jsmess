@@ -994,7 +994,7 @@ static DRIVER_INIT( px4 )
 	px4_state *px4 = (px4_state *)machine->driver_data;
 
 	/* find devices */
-	px4->ram = devtag_get_device(machine, "messram");
+	px4->ram = machine->device("messram");
 
 	/* init 7508 */
 	px4->one_sec_int_enabled = TRUE;
@@ -1006,15 +1006,15 @@ static DRIVER_INIT( px4 )
 	px4->transmit_timer = timer_alloc(machine, transmit_data, NULL);
 
 	/* printer */
-	px4->printer = devtag_get_device(machine, "centronics");
+	px4->printer = machine->device("centronics");
 
 	/* external cassette or barcode reader */
 	px4->ext_cas_timer = timer_alloc(machine, ext_cassette_read, NULL);
-	px4->ext_cas = devtag_get_device(machine, "extcas");
+	px4->ext_cas = machine->device("extcas");
 	px4->ear_last_state = 0;
 
 	/* external devices */
-	px4->sio_device = devtag_get_device(machine, "floppy");
+	px4->sio_device = machine->device("floppy");
 	px4->rs232c_device = NULL;
 
 	/* map os rom and last half of memory */

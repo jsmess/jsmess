@@ -119,7 +119,7 @@ static DEVICE_START( dm9368 )
 	/* get the screen device */
 	if (config->rbo_tag)
 	{
-		dm9368->rbo_device = devtag_get_device(device->machine, config->rbo_tag);
+		dm9368->rbo_device = device->machine->device(config->rbo_tag);
 	}
 
 	/* register for state saving */

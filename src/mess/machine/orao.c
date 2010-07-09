@@ -57,7 +57,7 @@ READ8_HANDLER( orao_io_r )
 		case 0x03FF : return input_port_read(space->machine, "LINE19");
 		/* Tape */
 		case 0x07FF :
-					level = cassette_input(devtag_get_device(space->machine, "cassette"));
+					level = cassette_input(space->machine->device("cassette"));
 					if (level <  0) {
 						return 0x00;
 					}
@@ -73,7 +73,7 @@ WRITE8_HANDLER( orao_io_w )
 {
 	if (offset == 0x0800)
 	{
-		running_device *dac_device = devtag_get_device(space->machine, "dac");
+		running_device *dac_device = space->machine->device("dac");
 		dac_data_w(dac_device, data); //beeper
 	}
 }

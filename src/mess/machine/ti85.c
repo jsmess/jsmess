@@ -469,7 +469,7 @@ READ8_HANDLER ( ti85_port_0006_r )
 
 READ8_HANDLER ( ti85_port_0007_r )
 {
-	running_device *ti85serial = devtag_get_device(space->machine,"ti85serial");
+	running_device *ti85serial = space->machine->device("ti85serial");
 
 	ti85_update_serial(ti85serial);
 	return (ti85_white_out<<3)
@@ -622,8 +622,8 @@ WRITE8_HANDLER ( ti85_port_0006_w )
 
 WRITE8_HANDLER ( ti85_port_0007_w )
 {
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
-	running_device *ti85serial = devtag_get_device(space->machine, "ti85serial");
+	running_device *speaker = space->machine->device("speaker");
+	running_device *ti85serial = space->machine->device("ti85serial");
 
 	speaker_level_w(speaker,( (data>>2)|(data>>3) )&0x01 );
 	ti85_red_out=(data>>2)&0x01;
@@ -796,7 +796,7 @@ NVRAM_HANDLER( ti83p )
 			if (file)
 			{
 				mame_fread(file, ti8x_ram, sizeof(unsigned char)*32*1024);
-				cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC,0x0c59);
+				cpu_set_reg(machine->device("maincpu"), Z80_PC,0x0c59);
 			}
 			else
 				memset(ti8x_ram, 0, sizeof(unsigned char)*32*1024);
@@ -814,7 +814,7 @@ NVRAM_HANDLER( ti86 )
 			if (file)
 			{
 				mame_fread(file, ti8x_ram, sizeof(unsigned char)*128*1024);
-				cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC,0x0c59);
+				cpu_set_reg(machine->device("maincpu"), Z80_PC,0x0c59);
 			}
 			else
 				memset(ti8x_ram, 0, sizeof(unsigned char)*128*1024);
@@ -833,47 +833,47 @@ static void ti8x_snapshot_setup_registers (running_machine *machine, UINT8 * dat
 	/* Set registers */
 	lo = reg[0x00] & 0x0ff;
 	hi = reg[0x01] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_AF, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_AF, (hi << 8) | lo);
 	lo = reg[0x04] & 0x0ff;
 	hi = reg[0x05] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_BC, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_BC, (hi << 8) | lo);
 	lo = reg[0x08] & 0x0ff;
 	hi = reg[0x09] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_DE, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_DE, (hi << 8) | lo);
 	lo = reg[0x0c] & 0x0ff;
 	hi = reg[0x0d] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_HL, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_HL, (hi << 8) | lo);
 	lo = reg[0x10] & 0x0ff;
 	hi = reg[0x11] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IX, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_IX, (hi << 8) | lo);
 	lo = reg[0x14] & 0x0ff;
 	hi = reg[0x15] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IY, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_IY, (hi << 8) | lo);
 	lo = reg[0x18] & 0x0ff;
 	hi = reg[0x19] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_PC, (hi << 8) | lo);
 	lo = reg[0x1c] & 0x0ff;
 	hi = reg[0x1d] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_SP, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_SP, (hi << 8) | lo);
 	lo = reg[0x20] & 0x0ff;
 	hi = reg[0x21] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_AF2, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_AF2, (hi << 8) | lo);
 	lo = reg[0x24] & 0x0ff;
 	hi = reg[0x25] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_BC2, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_BC2, (hi << 8) | lo);
 	lo = reg[0x28] & 0x0ff;
 	hi = reg[0x29] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_DE2, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_DE2, (hi << 8) | lo);
 	lo = reg[0x2c] & 0x0ff;
 	hi = reg[0x2d] & 0x0ff;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_HL2, (hi << 8) | lo);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, reg[0x30]&0x0ff);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF2, reg[0x34]&0x0ff);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_HALT, reg[0x38]&0x0ff);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IM, reg[0x3c]&0x0ff);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_I, reg[0x40]&0x0ff);
+	cpu_set_reg(machine->device("maincpu"), Z80_HL2, (hi << 8) | lo);
+	cpu_set_reg(machine->device("maincpu"), Z80_IFF1, reg[0x30]&0x0ff);
+	cpu_set_reg(machine->device("maincpu"), Z80_IFF2, reg[0x34]&0x0ff);
+	cpu_set_reg(machine->device("maincpu"), Z80_HALT, reg[0x38]&0x0ff);
+	cpu_set_reg(machine->device("maincpu"), Z80_IM, reg[0x3c]&0x0ff);
+	cpu_set_reg(machine->device("maincpu"), Z80_I, reg[0x40]&0x0ff);
 
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
+	cpu_set_reg(machine->device("maincpu"), Z80_R, (reg[0x44]&0x7f) | (reg[0x48]&0x80));
 
 	cputag_set_input_line(machine, "maincpu", 0, 0);
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, 0);

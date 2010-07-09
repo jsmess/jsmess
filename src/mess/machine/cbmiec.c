@@ -371,7 +371,7 @@ static DEVICE_START( cbm_iec )
 		*tailptr = auto_alloc(device->machine, cbm_iec_daisy_state);
 
 		(*tailptr)->next = NULL;
-		(*tailptr)->device = devtag_get_device(device->machine, daisy->tag);
+		(*tailptr)->device = device->machine->device(daisy->tag);
 
 		if ((*tailptr)->device == NULL)
 		{

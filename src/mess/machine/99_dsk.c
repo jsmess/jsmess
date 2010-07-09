@@ -85,10 +85,10 @@ static void set_geometry(running_device *drive, floppy_type_t type)
 
 static void set_all_geometries(running_machine *machine, floppy_type_t type)
 {
-	set_geometry(devtag_get_device(machine, FLOPPY_0), type);
-	set_geometry(devtag_get_device(machine, FLOPPY_1), type);
-	set_geometry(devtag_get_device(machine, FLOPPY_2), type);
-	set_geometry(devtag_get_device(machine, FLOPPY_3), type);
+	set_geometry(machine->device(FLOPPY_0), type);
+	set_geometry(machine->device(FLOPPY_1), type);
+	set_geometry(machine->device(FLOPPY_2), type);
+	set_geometry(machine->device(FLOPPY_3), type);
 }
 
 /*
@@ -161,7 +161,7 @@ const wd17xx_interface ti99_wd17xx_interface =
 void ti99_floppy_controllers_init_all(running_machine *machine)
 {
 	motor_on_timer = timer_alloc(machine, motor_on_timer_callback, NULL);
-	expansion_box = devtag_get_device(machine, "per_exp_box");
+	expansion_box = machine->device("per_exp_box");
 }
 
 /*===========================================================================*/
@@ -192,7 +192,7 @@ static const ti99_peb_card_handlers_t fdc_handlers =
 */
 void ti99_fdc_reset(running_machine *machine)
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = machine->device("wd179x");
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_fdc_dsr;
 	DSEL = 0;
 	DSKnum = -1;
@@ -251,7 +251,7 @@ static int fdc_cru_r(running_machine *machine, int offset)
 */
 static void fdc_cru_w(running_machine *machine, int offset, int data)
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = machine->device("wd179x");
 
 	switch (offset)
 	{
@@ -331,7 +331,7 @@ static void fdc_cru_w(running_machine *machine, int offset, int data)
 */
 static  READ8_HANDLER(fdc_mem_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 
 	/* only use the even addresses from 1ff0 to 1ff6.
        Note that data is inverted. */
@@ -346,7 +346,7 @@ static  READ8_HANDLER(fdc_mem_r)
 */
 static WRITE8_HANDLER(fdc_mem_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 
 	/* only use the even addresses from 1ff8 to 1ffe.
        Note that data is inverted. */
@@ -385,7 +385,7 @@ static const ti99_peb_card_handlers_t ccfdc_handlers =
 #if HAS_99CCFDC
 void ti99_ccfdc_reset(running_machine *machine)
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = machine->device("wd179x");
 
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_ccfdc_dsr;
 	DSEL = 0;
@@ -441,7 +441,7 @@ static int ccfdc_cru_r(int offset)
 */
 static void ccfdc_cru_w(running_machine *machine, int offset, int data)
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = machine->device("wd179x");
 
 	switch (offset)
 	{
@@ -602,7 +602,7 @@ static UINT8 *bwg_ram;
 */
 void ti99_bwg_reset(running_machine *machine)
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = machine->device("wd179x");
 
 	ti99_disk_DSR = memory_region(machine, region_dsr) + offset_bwg_dsr;
         bwg_ram = memory_region(machine, region_dsr) + offset_bwg_ram;
@@ -661,7 +661,7 @@ static int bwg_cru_r(running_machine *machine, int offset)
 */
 static void bwg_cru_w(running_machine *machine, int offset, int data)
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = machine->device("wd179x");
 
 	switch (offset)
 	{
@@ -778,7 +778,7 @@ static void bwg_cru_w(running_machine *machine, int offset, int data)
 */
 static  READ8_HANDLER(bwg_mem_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 
 	int reply = 0;
 
@@ -789,7 +789,7 @@ static  READ8_HANDLER(bwg_mem_r)
 	else if (bwg_rtc_enable)
 	{
 		if (! (offset & 1))
-			reply = mm58274c_r(devtag_get_device(space->machine, "mm58274c_floppy"), (offset - 0x1FE0) >> 1);
+			reply = mm58274c_r(space->machine->device("mm58274c_floppy"), (offset - 0x1FE0) >> 1);
 	}
 	else
 	{
@@ -823,7 +823,7 @@ static  READ8_HANDLER(bwg_mem_r)
 */
 static WRITE8_HANDLER(bwg_mem_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 
 	if (offset < 0x1c00)
 		;
@@ -832,7 +832,7 @@ static WRITE8_HANDLER(bwg_mem_w)
 	else if (bwg_rtc_enable)
 	{
 		if (! (offset & 1))
-			mm58274c_w(devtag_get_device(space->machine, "mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
+			mm58274c_w(space->machine->device("mm58274c_floppy"), (offset - 0x1FE0) >> 1, data);
 	}
 	else
 	{
@@ -1144,7 +1144,7 @@ static void hfdc_harddisk_write_track(int head, UINT8 *buffer, int data_count)
 */
 void ti99_hfdc_reset(running_machine *machine)
 {
-	running_device *device = devtag_get_device(machine, "smc92x4");
+	running_device *device = machine->device("smc92x4");
 	const char *flopname[] = {FLOPPY_0, FLOPPY_1, FLOPPY_2, FLOPPY_3};
 	const char *hardname[] = {MFMHD_0, MFMHD_1, MFMHD_2};
 
@@ -1188,12 +1188,12 @@ void ti99_hfdc_reset(running_machine *machine)
 			floppy_unit[i] = device->owner()->subdevice(flopname[i]);
 			if (floppy_unit[i]==NULL)
 			{
-				floppy_unit[i] = devtag_get_device(device->machine, flopname[i]);
+				floppy_unit[i] = device->machine->device(flopname[i]);
 			}
 		}
 		else
 		{
-			floppy_unit[i] = devtag_get_device(device->machine, flopname[i]);
+			floppy_unit[i] = device->machine->device(flopname[i]);
 		}
 
 		if (floppy_unit[i]!=NULL)
@@ -1211,7 +1211,7 @@ void ti99_hfdc_reset(running_machine *machine)
 	/* In the HFDC ROM, WDSx selects drive x; drive 0 is not used */
 	for (i = 1; i < 4; i++)
 	{
-		harddisk_unit[i] = devtag_get_device(device->machine, hardname[i-1]);
+		harddisk_unit[i] = device->machine->device(hardname[i-1]);
 	}
 	harddisk_unit[0] = NULL;
 
@@ -1349,7 +1349,7 @@ static void hfdc_cru_w(running_machine *machine, int offset, int data)
 		/* reset fdc (active low) */
 		if (!data)
 		{
-			running_device *device = devtag_get_device(machine, "smc92x4");
+			running_device *device = machine->device("smc92x4");
 			smc92x4_reset(device);
 		}
 		break;
@@ -1427,7 +1427,7 @@ static void hfdc_cru_w(running_machine *machine, int offset, int data)
 */
 static  READ8_HANDLER(hfdc_mem_r)
 {
-	running_device *device = devtag_get_device(space->machine, "smc92x4");
+	running_device *device = space->machine->device("smc92x4");
 
 	if (offset >= 0x0000 && offset <= 0x0fbf)
 	{
@@ -1460,7 +1460,7 @@ static  READ8_HANDLER(hfdc_mem_r)
 		/* Real-time clock. Again, ignore odd addresses. */
 		if ((offset & 1) == 0)
 		{
-			running_device *clock = devtag_get_device(space->machine, "mm58274c_floppy");
+			running_device *clock = space->machine->device("mm58274c_floppy");
 			return mm58274c_r(clock, (offset - 0x0fe0) >> 1);
 		}
 		else return 0;
@@ -1484,7 +1484,7 @@ static  READ8_HANDLER(hfdc_mem_r)
 */
 static WRITE8_HANDLER(hfdc_mem_w)
 {
-	running_device *diskcnt = devtag_get_device(space->machine, "smc92x4");
+	running_device *diskcnt = space->machine->device("smc92x4");
 
 	if (offset >= 0x0000 && offset <= 0x0fbf)
 	{
@@ -1515,7 +1515,7 @@ static WRITE8_HANDLER(hfdc_mem_w)
 		/* Real-time clock. Again, ignore odd addresses. */
 		if ((offset & 1) == 0)
 		{
-			running_device *clock = devtag_get_device(space->machine, "mm58274c_floppy");
+			running_device *clock = space->machine->device("mm58274c_floppy");
 			mm58274c_w(clock, (offset - 0x0fe0) >> 1, data);
 		}
 		return;

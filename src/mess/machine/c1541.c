@@ -1217,7 +1217,7 @@ static DEVICE_START( c1541 )
 	/* find devices */
 	c1541->via0 = device->subdevice(M6522_0_TAG);
 	c1541->via1 = device->subdevice(M6522_1_TAG);
-	c1541->bus = devtag_get_device(device->machine, config->bus_tag);
+	c1541->bus = device->machine->device(config->bus_tag);
 	c1541->image = device->subdevice(FLOPPY_0);
 
 	/* install image callbacks */

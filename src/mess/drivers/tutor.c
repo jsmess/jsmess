@@ -365,13 +365,13 @@ static WRITE8_HANDLER(tutor_mapper_w)
 static TIMER_CALLBACK(tape_interrupt_handler)
 {
 	//assert(tape_interrupt_enable);
-	cputag_set_input_line(machine, "maincpu", 1, (cassette_input(devtag_get_device(machine, "cassette")) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(machine, "maincpu", 1, (cassette_input(machine->device("cassette")) > 0.0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* CRU handler */
 static  READ8_HANDLER(tutor_cassette_r)
 {
-	return (cassette_input(devtag_get_device(space->machine, "cassette")) > 0.0) ? 1 : 0;
+	return (cassette_input(space->machine->device("cassette")) > 0.0) ? 1 : 0;
 }
 
 /* memory handler */
@@ -388,7 +388,7 @@ static WRITE8_HANDLER(tutor_cassette_w)
 		{
 		case 0:
 			/* data out */
-			cassette_output(devtag_get_device(space->machine, "cassette"), (data) ? +1.0 : -1.0);
+			cassette_output(space->machine->device("cassette"), (data) ? +1.0 : -1.0);
 			break;
 		case 1:
 			/* interrupt control??? */

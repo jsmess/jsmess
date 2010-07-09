@@ -147,7 +147,7 @@ static READ8_DEVICE_HANDLER( mk2_read_b )
 
 static WRITE8_DEVICE_HANDLER( mk2_write_b )
 {
-	running_device *dac_device = devtag_get_device(device->machine, "dac");
+	running_device *dac_device = device->machine->device("dac");
 
 	if ((data&0x06)==0x06)
 		dac_data_w(dac_device,data&1?80:0);

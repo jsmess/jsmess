@@ -410,7 +410,7 @@ static MACHINE_RESET(cgc7900)
 
 	memcpy((UINT8*)chrom_ram,user1,8);
 
-	devtag_get_device(machine, M68000_TAG)->reset();
+	machine->device(M68000_TAG)->reset();
 }
 
 /***************************************************************************

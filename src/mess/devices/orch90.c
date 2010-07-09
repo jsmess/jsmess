@@ -53,8 +53,8 @@ static DEVICE_START(orch90)
 	orch90_t *info = get_token(device);
 
 	/* TODO - when we can instantiate DACs, we can do something better here */
-	info->left_dac = devtag_get_device(device->machine, "dac");
-	info->right_dac = devtag_get_device(device->machine, "dac");
+	info->left_dac = device->machine->device("dac");
+	info->right_dac = device->machine->device("dac");
 }
 
 

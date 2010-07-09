@@ -340,9 +340,9 @@ static MACHINE_START( phc25 )
 	phc25_state *state = (phc25_state *)machine->driver_data;
 
 	/* find devices */
-	state->mc6847 = devtag_get_device(machine, MC6847_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->mc6847 = machine->device(MC6847_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 //  state_save_register_global(machine, state->);

@@ -110,7 +110,7 @@ static void ssystem3_playfield_write(running_machine *machine, int reset, int si
       if (d) playfield.data|=1<<(playfield.bit^7);
       playfield.bit++;
       if (playfield.bit==8) {
-	logerror("%.4x playfield wrote %d %02x\n", (int)cpu_get_pc(devtag_get_device(machine, "maincpu")), playfield.count, playfield.data);
+	logerror("%.4x playfield wrote %d %02x\n", (int)cpu_get_pc(machine->device("maincpu")), playfield.count, playfield.data);
 	playfield.u.data[playfield.count]=playfield.data;
 	playfield.bit=0;
 	playfield.count=(playfield.count+1)%ARRAY_LENGTH(playfield.u.data);
@@ -216,7 +216,7 @@ static READ8_DEVICE_HANDLER(ssystem3_via_read_b)
 
 static WRITE8_DEVICE_HANDLER(ssystem3_via_write_b)
 {
-	running_device *via_0 = devtag_get_device(device->machine, "via6522_0");
+	running_device *via_0 = device->machine->device("via6522_0");
 	UINT8 d;
 
 	ssystem3_playfield_write(device->machine, data&1, data&8);

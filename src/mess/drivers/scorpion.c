@@ -186,7 +186,7 @@ D6-D7 - not used. ( yet ? )
 static void scorpion_update_memory(running_machine *machine)
 {
 	spectrum_state *state = (spectrum_state *)machine->driver_data;
-	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	state->screen_location = messram + ((state->port_7ffd_data & 8) ? (7<<14) : (5<<14));
@@ -219,8 +219,8 @@ static void scorpion_update_memory(running_machine *machine)
 static DIRECT_UPDATE_HANDLER( scorpion_direct )
 {
 	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
-	running_device *beta = devtag_get_device(space->machine, BETA_DISK_TAG);
-	UINT16 pc = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), STATE_GENPCBASE);
+	running_device *beta = space->machine->device(BETA_DISK_TAG);
+	UINT16 pc = cpu_get_reg(space->machine->device("maincpu"), STATE_GENPCBASE);
 
 	if (betadisk_is_active(beta))
 	{
@@ -304,8 +304,8 @@ ADDRESS_MAP_END
 static MACHINE_RESET( scorpion )
 {
 	spectrum_state *state = (spectrum_state *)machine->driver_data;
-	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
-	running_device *beta = devtag_get_device(machine, BETA_DISK_TAG);
+	UINT8 *messram = messram_get_ptr(machine->device("messram"));
+	running_device *beta = machine->device(BETA_DISK_TAG);
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_read_bank (space, 0x0000, 0x3fff, 0, 0, "bank1");

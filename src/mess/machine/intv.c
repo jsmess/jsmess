@@ -477,14 +477,14 @@ DRIVER_INIT( intv )
 /* Set Reset and INTR/INTRM Vector */
 MACHINE_RESET( intv )
 {
-	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), CP1610_RESET, 0x1000);
+	cpu_set_input_line_vector(machine->device("maincpu"), CP1610_RESET, 0x1000);
 
 	/* These are actually the same vector, and INTR is unused */
-	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), CP1610_INT_INTRM, 0x1004);
-	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), CP1610_INT_INTR,  0x1004);
+	cpu_set_input_line_vector(machine->device("maincpu"), CP1610_INT_INTRM, 0x1004);
+	cpu_set_input_line_vector(machine->device("maincpu"), CP1610_INT_INTR,  0x1004);
 
 	/* Set initial PC */
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), CP1610_R7, 0x1000);
+	cpu_set_reg(machine->device("maincpu"), CP1610_R7, 0x1000);
 
 	return;
 }

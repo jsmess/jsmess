@@ -34,7 +34,7 @@ static WRITE8_DEVICE_HANDLER( mbee_pio_interrupt )
 static WRITE8_DEVICE_HANDLER( pio_ardy )
 {
 	/* devices need to be redeclared in this callback for some strange reason */
-	mbee_printer = devtag_get_device(device->machine, "centronics");
+	mbee_printer = device->machine->device("centronics");
 	centronics_strobe_w(mbee_printer, (data) ? 0 : 1);
 }
 
@@ -162,11 +162,11 @@ MACHINE_RESET( mbee )
 {
 	timer_set(machine, ATTOTIME_IN_USEC(4), NULL, 0, mbee_reset);
 	memory_set_bank(machine, "bank1", 1);
-	mbee_z80pio = devtag_get_device(machine, "z80pio");
-	mbee_speaker = devtag_get_device(machine, "speaker");
-	mbee_cassette = devtag_get_device(machine, "cassette");
-	mbee_printer = devtag_get_device(machine, "centronics");
-	mbee_fdc = devtag_get_device(machine, "wd179x");
+	mbee_z80pio = machine->device("z80pio");
+	mbee_speaker = machine->device("speaker");
+	mbee_cassette = machine->device("cassette");
+	mbee_printer = machine->device("centronics");
+	mbee_fdc = machine->device("wd179x");
 }
 
 
@@ -196,7 +196,7 @@ INTERRUPT_GEN( mbee_interrupt )
 
 Z80BIN_EXECUTE( mbee )
 {
-	running_device *cpu = devtag_get_device(machine, "maincpu");
+	running_device *cpu = machine->device("maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_write_word_16le(space, 0xa6, execute_address);			/* fix the EXEC command */
@@ -214,7 +214,7 @@ Z80BIN_EXECUTE( mbee )
 
 QUICKLOAD_LOAD( mbee )
 {
-	running_device *cpu = devtag_get_device(image.device().machine, "maincpu");
+	running_device *cpu = image.device().machine->device("maincpu");
 	const address_space *space = cputag_get_address_space(image.device().machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 i, j;
 	UINT8 data, sw = input_port_read(image.device().machine, "CONFIG") & 1;	/* reading the dipswitch: 1 = autorun */

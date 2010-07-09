@@ -26,7 +26,7 @@ public:
 static WRITE8_HANDLER(out_w)
 {
 	mod8_state *state = (mod8_state *)space->machine->driver_data;
-	running_device *devconf = devtag_get_device(space->machine, TELEPRINTER_TAG);
+	running_device *devconf = space->machine->device(TELEPRINTER_TAG);
 
 	state->tty_data >>= 1;
 	state->tty_data |= (data & 0x01) ? 0x8000 : 0;
@@ -79,7 +79,7 @@ static IRQ_CALLBACK ( mod8_irq_callback )
 
 static MACHINE_RESET(mod8)
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), mod8_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), mod8_irq_callback);
 }
 
 static WRITE8_DEVICE_HANDLER( mod8_kbd_put )

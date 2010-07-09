@@ -539,7 +539,7 @@ static MACHINE_START( coleco )
 static MACHINE_RESET( coleco )
 {
 	last_state = 0;
-	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), INPUT_LINE_IRQ0, 0xff);
+	cpu_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&memory_region(machine, "maincpu")[0x6000], 0xff, 0x400);	// initialize RAM
 }
 

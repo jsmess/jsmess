@@ -522,7 +522,7 @@ NVRAM_HANDLER( ti68k )
 static MACHINE_RESET(ti68k)
 {
 	t68k_state *state = (t68k_state *)machine->driver_data;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), M68K_PC, state->initial_pc);
+	cpu_set_reg(machine->device("maincpu"), M68K_PC, state->initial_pc);
 
 	state->kb_mask = 0xff;
 	state->on_key = 0;

@@ -273,10 +273,10 @@ static MACHINE_START( tmc600 )
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* configure RAM */
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 8*1024:
 		memory_unmap_readwrite(program, 0x8000, 0xbfff, 0, 0);

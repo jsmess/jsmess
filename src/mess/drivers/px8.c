@@ -87,7 +87,7 @@ static void bankswitch(running_machine *machine)
 {
 	px8_state *state = (px8_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, UPD70008_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 	UINT8 *ipl_rom = memory_region(machine, UPD70008_TAG);
 
 	if (!state->bank0)
@@ -824,8 +824,8 @@ static MACHINE_START( px8 )
 	px8_state *state = (px8_state *)machine->driver_data;
 
 	/* find devices */
-	state->sed1320 = devtag_get_device(machine, SED1320_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->sed1320 = machine->device(SED1320_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->ier);

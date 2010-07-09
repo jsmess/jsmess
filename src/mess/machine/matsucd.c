@@ -67,7 +67,7 @@ void matsucd_init( running_device *cdrom_device, const char *cdda_tag )
 	memset(&cd, 0, sizeof( matsucd ) );
 
 	cd.cdrom = mess_cd_get_cdrom_file( cdrom_device );
-	cd.cdda = devtag_get_device(cdrom_device->machine, cdda_tag);
+	cd.cdda = cdrom_device->machine->device(cdda_tag);
 
 	cd.frame_timer = timer_alloc(cdrom_device->machine, matsu_subcode_proc, NULL);
 

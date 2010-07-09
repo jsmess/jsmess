@@ -388,7 +388,7 @@ static DIRECT_UPDATE_HANDLER( psx_setopbase )
 {
 	if( address == 0x80030000 )
 	{
-		running_device *cpu = devtag_get_device(space->machine, "maincpu");
+		running_device *cpu = space->machine->device("maincpu");
 
 		memory_set_direct_update_handler( space, NULL );
 
@@ -999,7 +999,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( psx )
 {
-	running_device *cdrom_dev = devtag_get_device(machine, "cdrom");
+	running_device *cdrom_dev = machine->device("cdrom");
 	if( cdrom_dev )
 	{
 		psx_cdrom = mess_cd_get_cdrom_file(cdrom_dev);

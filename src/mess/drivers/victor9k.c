@@ -147,7 +147,7 @@ static VIDEO_START( victor9k )
 	victor9k_state *state = (victor9k_state *)machine->driver_data;
 
 	/* find devices */
-	state->crt = devtag_get_device(machine, HD46505S_TAG);
+	state->crt = machine->device(HD46505S_TAG);
 }
 
 static VIDEO_UPDATE( victor9k )
@@ -980,17 +980,17 @@ static MACHINE_START( victor9k )
 	cpu_set_irq_callback(machine->firstcpu, victor9k_irq_callback);
 
 	/* find devices */
-	state->ieee488 = devtag_get_device(machine, IEEE488_TAG);
-	state->pic = devtag_get_device(machine, I8259A_TAG);
-	state->ssda = devtag_get_device(machine, MC6852_TAG);
-	state->cvsd = devtag_get_device(machine, HC55516_TAG);
-	state->floppy[0].image = devtag_get_device(machine, FLOPPY_0);
-	state->floppy[1].image = devtag_get_device(machine, FLOPPY_1);
+	state->ieee488 = machine->device(IEEE488_TAG);
+	state->pic = machine->device(I8259A_TAG);
+	state->ssda = machine->device(MC6852_TAG);
+	state->cvsd = machine->device(HC55516_TAG);
+	state->floppy[0].image = machine->device(FLOPPY_0);
+	state->floppy[1].image = machine->device(FLOPPY_1);
 
 	/* memory banking */
 	const address_space *program = cputag_get_address_space(machine, I8088_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
-	int ram_size = messram_get_size(devtag_get_device(machine, "messram"));
+	UINT8 *ram = messram_get_ptr(machine->device("messram"));
+	int ram_size = messram_get_size(machine->device("messram"));
 
 	memory_install_ram(program, 0x00000, ram_size - 1, 0, 0, ram);
 }

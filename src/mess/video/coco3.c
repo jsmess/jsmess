@@ -566,7 +566,7 @@ static void coco3_prepare_scanline(running_machine *machine, int scanline)
 		memcpy_dirty(&dirty, scanline_record->palette, video->palette_ram, 16);
 
 		/* get ready to copy the video memory; get position and offsets */
-		video_data = &messram_get_ptr(devtag_get_device(machine, "messram"))[video->video_position % messram_get_size(devtag_get_device(machine, "messram"))];
+		video_data = &messram_get_ptr(machine->device("messram"))[video->video_position % messram_get_size(machine->device("messram"))];
 		video_offset = (coco3_gimereg[15] & 0x7F) * 2;
 		video_data_size = sizeof(scanline_record->data);
 
@@ -791,7 +791,7 @@ static STATE_POSTLOAD( coco3_video_postload )
 
 static const UINT8 *get_video_ram_coco3(running_machine *machine,int scanline)
 {
-	running_device *sam = devtag_get_device(machine, "sam");
+	running_device *sam = machine->device("sam");
 	return sam6883_videoram(sam,scanline);
 }
 

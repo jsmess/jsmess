@@ -369,7 +369,7 @@ static READ8_HANDLER (konami_scc_bank5)
 	}
 	else
 	{
-		return k051649_waveform_r (devtag_get_device(space->machine, "k051649"), offset & 0x7f);
+		return k051649_waveform_r (space->machine->device("k051649"), offset & 0x7f);
 	}
 }
 
@@ -433,7 +433,7 @@ MSX_SLOT_WRITE(konami_scc)
 	}
 	else if (state->cart.scc.active && addr >= 0x9800 && addr < 0xa000)
 	{
-		running_device *k051649 = devtag_get_device(space->machine, "k051649");
+		running_device *k051649 = space->machine->device("k051649");
 		int offset = addr & 0xff;
 
 		if (offset < 0x80)
@@ -1252,13 +1252,13 @@ MSX_SLOT_INIT(diskrom)
 
 MSX_SLOT_RESET(diskrom)
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = machine->device("wd179x");
 	wd17xx_reset(fdc);
 }
 
 static READ8_HANDLER (msx_diskrom_page1_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
 	case 0: return wd17xx_status_r (fdc, 0);
@@ -1273,7 +1273,7 @@ static READ8_HANDLER (msx_diskrom_page1_r)
 
 static READ8_HANDLER (msx_diskrom_page2_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 	if (offset >= 0x7f8)
 	{
 		switch (offset)
@@ -1326,7 +1326,7 @@ MSX_SLOT_MAP(diskrom)
 
 MSX_SLOT_WRITE(diskrom)
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = machine->device("wd179x");
 	if (addr >= 0xa000 && addr < 0xc000)
 	{
 		addr -= 0x4000;
@@ -1377,13 +1377,13 @@ MSX_SLOT_INIT(diskrom2)
 
 MSX_SLOT_RESET(diskrom2)
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = machine->device("wd179x");
 	wd17xx_reset (fdc);
 }
 
 static READ8_HANDLER (msx_diskrom2_page1_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
 	case 0: return wd17xx_status_r(fdc, 0);
@@ -1398,7 +1398,7 @@ static READ8_HANDLER (msx_diskrom2_page1_r)
 
 static  READ8_HANDLER (msx_diskrom2_page2_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 	if (offset >= 0x7b8)
 	{
 		switch (offset)
@@ -1450,7 +1450,7 @@ MSX_SLOT_MAP(diskrom2)
 
 MSX_SLOT_WRITE(diskrom2)
 {
-	running_device *fdc = devtag_get_device(machine, "wd179x");
+	running_device *fdc = machine->device("wd179x");
 	if (addr >= 0xa000 && addr < 0xc000)
 	{
 		addr -= 0x4000;
@@ -1527,7 +1527,7 @@ MSX_SLOT_WRITE(synthesizer)
 {
 	if (addr >= 0x4000 && addr < 0x8000 && !(addr & 0x0010))
 	{
-		dac_data_w (devtag_get_device(machine, "dac"), val);
+		dac_data_w (machine->device("dac"), val);
 	}
 }
 
@@ -1583,7 +1583,7 @@ MSX_SLOT_WRITE(majutsushi)
 {
 	if (addr >= 0x5000 && addr < 0x6000)
 	{
-		dac_data_w (devtag_get_device(machine, "dac"), val);
+		dac_data_w (machine->device("dac"), val);
 	}
 	else if (addr >= 0x6000 && addr < 0x8000)
 	{
@@ -1716,13 +1716,13 @@ MSX_SLOT_WRITE(fmpac)
 	case 0x7ff4:
 		if (state->cart.fmpac.opll_active)
 		{
-			ym2413_w (devtag_get_device(space->machine, "ay8910"), 0, val);
+			ym2413_w (space->machine->device("ay8910"), 0, val);
 		}
 		break;
 	case 0x7ff5:
 		if (state->cart.fmpac.opll_active)
 		{
-			ym2413_w (devtag_get_device(space->machine, "ay8910"), 1, val);
+			ym2413_w (space->machine->device("ay8910"), 1, val);
 		}
 		break;
 	case 0x7ff6:
@@ -2206,7 +2206,7 @@ static  READ8_HANDLER (soundcartridge_scc)
 
 	if (reg < 0x80)
 	{
-		return k051649_waveform_r (devtag_get_device(space->machine, "k051649"), reg);
+		return k051649_waveform_r (space->machine->device("k051649"), reg);
 	}
 	else if (reg < 0xa0)
 	{
@@ -2215,7 +2215,7 @@ static  READ8_HANDLER (soundcartridge_scc)
 	else if (reg < 0xc0)
 	{
 		/* read wave 5 */
-		return k051649_waveform_r (devtag_get_device(space->machine, "k051649"), 0x80 + (reg & 0x1f));
+		return k051649_waveform_r (space->machine->device("k051649"), 0x80 + (reg & 0x1f));
 	}
 #if 0
 	else if (reg < 0xe0)
@@ -2241,7 +2241,7 @@ static  READ8_HANDLER (soundcartridge_sccp)
 
 	if (reg < 0xa0)
 	{
-		return k051649_waveform_r (devtag_get_device(space->machine, "k051649"), reg);
+		return k051649_waveform_r (space->machine->device("k051649"), reg);
 	}
 #if 0
 	else if (reg >= 0xc0 && reg < 0xe0)
@@ -2351,7 +2351,7 @@ MSX_SLOT_WRITE(soundcartridge)
 		}
 		else if (addr >= 0x9800 && state->cart.sccp.scc_active)
 		{
-			running_device *k051649 = devtag_get_device(space->machine, "k051649");
+			running_device *k051649 = space->machine->device("k051649");
 			int offset = addr & 0xff;
 
 			if (offset < 0x80)
@@ -2403,7 +2403,7 @@ MSX_SLOT_WRITE(soundcartridge)
 		}
 		else if (addr >= 0xb800 && state->cart.sccp.sccp_active)
 		{
-			running_device *k051649 = devtag_get_device(space->machine, "k051649");
+			running_device *k051649 = space->machine->device("k051649");
 			int offset = addr & 0xff;
 
 			if (offset < 0xa0)

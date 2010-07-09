@@ -74,7 +74,7 @@ static void bankswitch(running_machine *machine, UINT8 data)
     */
 
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	running_device *messram = devtag_get_device(machine, "messram");
+	running_device *messram = machine->device("messram");
 
 //  UINT8 cbm_mode = data >> 7 & 0x01;
 	UINT8 rom_page = data >> 4 & 0x07;
@@ -404,12 +404,12 @@ SNAPSHOT_LOAD( mtx )
 MACHINE_START( mtx512 )
 {
 	mtx_state *state = (mtx_state *)machine->driver_data;
-	running_device *messram = devtag_get_device(machine, "messram");
+	running_device *messram = machine->device("messram");
 
 	/* find devices */
-	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
-	state->z80dart = devtag_get_device(machine, Z80DART_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->z80ctc = machine->device(Z80CTC_TAG);
+	state->z80dart = machine->device(Z80DART_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* configure memory */
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1"));

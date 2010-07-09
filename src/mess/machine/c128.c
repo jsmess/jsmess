@@ -111,7 +111,7 @@ static UINT8 vicirq;
 static void c128_nmi( running_machine *machine )
 {
 	static int nmilevel = 0;
-	running_device *cia_1 = devtag_get_device(machine, "cia_1");
+	running_device *cia_1 = machine->device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
 	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
@@ -148,7 +148,7 @@ static void c128_nmi( running_machine *machine )
 
 static READ8_DEVICE_HANDLER( c128_cia0_port_a_r )
 {
-	UINT8 cia0portb = mos6526_pb_r(devtag_get_device(device->machine, "cia_0"), 0);
+	UINT8 cia0portb = mos6526_pb_r(device->machine->device("cia_0"), 0);
 
 	return cbm_common_cia0_port_a_r(device, cia0portb);
 }
@@ -156,8 +156,8 @@ static READ8_DEVICE_HANDLER( c128_cia0_port_a_r )
 static READ8_DEVICE_HANDLER( c128_cia0_port_b_r )
 {
 	UINT8 value = 0xff;
-	UINT8 cia0porta = mos6526_pa_r(devtag_get_device(device->machine, "cia_0"), 0);
-	running_device *vic2e = devtag_get_device(device->machine, "vic2e");
+	UINT8 cia0porta = mos6526_pa_r(device->machine->device("cia_0"), 0);
+	running_device *vic2e = device->machine->device("vic2e");
 
 	value &= cbm_common_cia0_port_b_r(device, cia0porta);
 
@@ -173,7 +173,7 @@ static READ8_DEVICE_HANDLER( c128_cia0_port_b_r )
 
 static WRITE8_DEVICE_HANDLER( c128_cia0_port_b_w )
 {
-	running_device *vic2e = devtag_get_device(device->machine, "vic2e");
+	running_device *vic2e = device->machine->device("vic2e");
 	vic2_lightpen_write(vic2e, data & 0x10);
 }
 
@@ -205,7 +205,7 @@ static void c128_cia0_interrupt( running_device *device, int level )
 
 void c128_vic_interrupt( running_machine *machine, int level )
 {
-	running_device *cia_0 = devtag_get_device(machine, "cia_0");
+	running_device *cia_0 = machine->device("cia_0");
 #if 1
 	if (level != vicirq)
 	{
@@ -217,8 +217,8 @@ void c128_vic_interrupt( running_machine *machine, int level )
 
 static void c128_iec_data_out_w(running_machine *machine)
 {
-	running_device *cia_1 = devtag_get_device(machine, "cia_1");
-	running_device *iec = devtag_get_device(machine, "iec");
+	running_device *cia_1 = machine->device("cia_1");
+	running_device *iec = machine->device("iec");
 	int data = !c128_data_out;
 
 	/* fast serial data */
@@ -229,8 +229,8 @@ static void c128_iec_data_out_w(running_machine *machine)
 
 static void c128_iec_srq_out_w(running_machine *machine)
 {
-	running_device *cia_1 = devtag_get_device(machine, "cia_1");
-	running_device *iec = devtag_get_device(machine, "iec");
+	running_device *cia_1 = machine->device("cia_1");
+	running_device *iec = machine->device("iec");
 	int srq = 1;
 
 	/* fast serial clock */
@@ -322,7 +322,7 @@ WRITE_LINE_DEVICE_HANDLER( c128_iec_data_w )
 static READ8_DEVICE_HANDLER( c128_cia1_port_a_r )
 {
 	UINT8 value = 0xff;
-	running_device *serbus = devtag_get_device(device->machine, "iec");
+	running_device *serbus = device->machine->device("iec");
 
 	if (!cbm_iec_clk_r(serbus))
 		value &= ~0x40;
@@ -336,7 +336,7 @@ static READ8_DEVICE_HANDLER( c128_cia1_port_a_r )
 static WRITE8_DEVICE_HANDLER( c128_cia1_port_a_w )
 {
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
-	running_device *serbus = devtag_get_device(device->machine, "iec");
+	running_device *serbus = device->machine->device("iec");
 
 	c128_data_out = BIT(data, 5);
 	c128_iec_data_out_w(device->machine);
@@ -398,11 +398,11 @@ static READ8_HANDLER( c128_dma8726_port_r )
 
 WRITE8_HANDLER( c128_write_d000 )
 {
-	running_device *cia_0 = devtag_get_device(space->machine, "cia_0");
-	running_device *cia_1 = devtag_get_device(space->machine, "cia_1");
-	running_device *sid = devtag_get_device(space->machine, "sid6581");
-	running_device *vic2e = devtag_get_device(space->machine, "vic2e");
-	running_device *vdc8563 = devtag_get_device(space->machine, "vdc8563");
+	running_device *cia_0 = space->machine->device("cia_0");
+	running_device *cia_1 = space->machine->device("cia_1");
+	running_device *sid = space->machine->device("sid6581");
+	running_device *vic2e = space->machine->device("vic2e");
+	running_device *vdc8563 = space->machine->device("vdc8563");
 
 	UINT8 c64_port6510 = m6510_get_port(space->machine->device<legacy_cpu_device>("m8502"));
 
@@ -455,11 +455,11 @@ WRITE8_HANDLER( c128_write_d000 )
 
 static READ8_HANDLER( c128_read_io )
 {
-	running_device *cia_0 = devtag_get_device(space->machine, "cia_0");
-	running_device *cia_1 = devtag_get_device(space->machine, "cia_1");
-	running_device *sid = devtag_get_device(space->machine, "sid6581");
-	running_device *vic2e= devtag_get_device(space->machine, "vic2e");
-	running_device *vdc8563 = devtag_get_device(space->machine, "vdc8563");
+	running_device *cia_0 = space->machine->device("cia_0");
+	running_device *cia_1 = space->machine->device("cia_1");
+	running_device *sid = space->machine->device("sid6581");
+	running_device *vic2e= space->machine->device("vic2e");
+	running_device *vdc8563 = space->machine->device("vdc8563");
 
 	if (offset < 0x400)
 		return vic2_port_r(vic2e, offset & 0x3ff);
@@ -522,12 +522,12 @@ void c128_bankswitch_64( running_machine *machine, int reset )
 
 	if ((!c64_game && c64_exrom) || (charen && (loram || hiram)))
 	{
-		memory_install_read8_handler(cpu_get_address_space(devtag_get_device(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
+		memory_install_read8_handler(cpu_get_address_space(machine->device("m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
 		c128_write_io = 1;
 	}
 	else
 	{
-		memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank5");
+		memory_install_read_bank(cpu_get_address_space(machine->device("m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank5");
 		c128_write_io = 0;
 		if ((!charen && (loram || hiram)))
 			memory_set_bankptr(machine, "bank13", c64_chargen);
@@ -706,17 +706,17 @@ static void c128_bankswitch_128( running_machine *machine, int reset )
 		else
 			c128_ram_top = 0x10000;
 
-		memory_install_read8_handler(cpu_get_address_space(devtag_get_device(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xff00, 0xff04, 0, 0, c128_mmu8722_ff00_r);
+		memory_install_read8_handler(cpu_get_address_space(machine->device("m8502"), ADDRESS_SPACE_PROGRAM), 0xff00, 0xff04, 0, 0, c128_mmu8722_ff00_r);
 
 		if (MMU_IO_ON)
 		{
 			c128_write_io = 1;
-			memory_install_read8_handler(cpu_get_address_space(devtag_get_device(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
+			memory_install_read8_handler(cpu_get_address_space(machine->device("m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, c128_read_io);
 		}
 		else
 		{
 			c128_write_io = 0;
-			memory_install_read_bank(cpu_get_address_space(devtag_get_device(machine, "m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank13");
+			memory_install_read_bank(cpu_get_address_space(machine->device("m8502"), ADDRESS_SPACE_PROGRAM), 0xd000, 0xdfff, 0, 0, "bank13");
 		}
 
 
@@ -828,8 +828,8 @@ static void c128_bankswitch( running_machine *machine, int reset )
              * driver used to work with this behavior, so I am doing this hack
              * where I set CPU #1's PC to 0x1100 on reset.
              */
-			if (cpu_get_reg(devtag_get_device(machine, "m8502"), STATE_GENPC) == 0x0000)
-				cpu_set_reg(devtag_get_device(machine, "m8502"), STATE_GENPC, 0x1100);
+			if (cpu_get_reg(machine->device("m8502"), STATE_GENPC) == 0x0000)
+				cpu_set_reg(machine->device("m8502"), STATE_GENPC, 0x1100);
 		}
 		mmu_cpu = MMU_CPU8502;
 		return;
@@ -1086,19 +1086,19 @@ void c128_m6510_port_write( running_device *device, UINT8 direction, UINT8 data 
 	{
 		if (direction & 0x08)
 		{
-			cassette_output(devtag_get_device(device->machine, "cassette"), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
+			cassette_output(device->machine->device("cassette"), (data & 0x08) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
 		}
 
 		if (direction & 0x20)
 		{
 			if (!(data & 0x20))
 			{
-				cassette_change_state(devtag_get_device(device->machine, "cassette"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+				cassette_change_state(device->machine->device("cassette"),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
 				timer_adjust_periodic(datasette_timer, attotime_zero, 0, ATTOTIME_IN_HZ(44100));
 			}
 			else
 			{
-				cassette_change_state(devtag_get_device(device->machine, "cassette"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
+				cassette_change_state(device->machine->device("cassette"),CASSETTE_MOTOR_DISABLED ,CASSETTE_MASK_MOTOR);
 				timer_reset(datasette_timer, attotime_never);
 			}
 		}
@@ -1114,7 +1114,7 @@ UINT8 c128_m6510_port_read( running_device *device, UINT8 direction )
 {
 	UINT8 data = c64_port_data;
 
-	if ((cassette_get_state(devtag_get_device(device->machine, "cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
+	if ((cassette_get_state(device->machine->device("cassette")) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
 		data &= ~0x10;
 	else
 		data |=  0x10;
@@ -1161,8 +1161,8 @@ static void c128_common_driver_init( running_machine *machine )
 
 DRIVER_INIT( c128 )
 {
-	running_device *vic2e = devtag_get_device(machine, "vic2e");
-	running_device *vdc8563 = devtag_get_device(machine, "vdc8563");
+	running_device *vic2e = machine->device("vic2e");
+	running_device *vdc8563 = machine->device("vdc8563");
 
 	c64_tape_on = 1;
 	c64_pal = 0;
@@ -1173,8 +1173,8 @@ DRIVER_INIT( c128 )
 
 DRIVER_INIT( c128pal )
 {
-	running_device *vic2e = devtag_get_device(machine, "vic2e");
-	running_device *vdc8563 = devtag_get_device(machine, "vdc8563");
+	running_device *vic2e = machine->device("vic2e");
+	running_device *vdc8563 = machine->device("vdc8563");
 
 	c64_tape_on = 1;
 	c64_pal = 1;
@@ -1231,8 +1231,8 @@ INTERRUPT_GEN( c128_frame_interrupt )
 	static int monitor = -1;
 	static const char *const c128ports[] = { "KP0", "KP1", "KP2" };
 	int i, value;
-	running_device *vic2e = devtag_get_device(device->machine, "vic2e");
-	running_device *vdc8563 = devtag_get_device(device->machine, "vdc8563");
+	running_device *vic2e = device->machine->device("vic2e");
+	running_device *vdc8563 = device->machine->device("vdc8563");
 
 	c128_nmi(device->machine);
 
@@ -1276,8 +1276,8 @@ INTERRUPT_GEN( c128_frame_interrupt )
 
 VIDEO_UPDATE( c128 )
 {
-	running_device *vic2e = devtag_get_device(screen->machine, "vic2e");
-	running_device *vdc8563 = devtag_get_device(screen->machine, "vdc8563");
+	running_device *vic2e = screen->machine->device("vic2e");
+	running_device *vdc8563 = screen->machine->device("vdc8563");
 
 	vdc8563_video_update(vdc8563, bitmap, cliprect);
 	vic2_video_update(vic2e, bitmap, cliprect);

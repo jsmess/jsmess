@@ -65,12 +65,12 @@ static WRITE8_HANDLER( memory_w )
 		if (MEMORY_PROTECT(space->machine))
 		{
 			/* latch data from memory */
-			data = messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset];
+			data = messram_get_ptr(space->machine->device("messram"))[offset];
 		}
 		else
 		{
 			/* write latched data to memory */
-			messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
+			messram_get_ptr(space->machine->device("messram"))[offset] = data;
 		}
 
 		/* write data to 7 segment displays */
@@ -278,11 +278,11 @@ static MACHINE_START( elf2 )
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
-	state->mm74c923 = devtag_get_device(machine, MM74C923_TAG);
-	state->dm9368_l = devtag_get_device(machine, DM9368_L_TAG);
-	state->dm9368_h = devtag_get_device(machine, DM9368_H_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cdp1861 = machine->device(CDP1861_TAG);
+	state->mm74c923 = machine->device(MM74C923_TAG);
+	state->dm9368_l = machine->device(DM9368_L_TAG);
+	state->dm9368_h = machine->device(DM9368_H_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* initialize LED displays */
 	dm9368_rbi_w(state->dm9368_l, 1);
@@ -291,7 +291,7 @@ static MACHINE_START( elf2 )
 	/* setup memory banking */
 	memory_install_read_bank(program, 0x0000, 0x00ff, 0, 0, "bank1");
 	memory_install_write8_handler(program, 0x0000, 0x00ff, 0, 0, memory_w);
-	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(machine->device("messram")), 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
@@ -356,12 +356,12 @@ static QUICKLOAD_LOAD( elf )
 {
 	int size = image.length();
 
-	if (size > messram_get_size(devtag_get_device(image.device().machine, "messram")))
+	if (size > messram_get_size(image.device().machine->device("messram")))
 	{
 		return IMAGE_INIT_FAIL;
 	}
 
-	image.fread( messram_get_ptr(devtag_get_device(image.device().machine, "messram")), size);
+	image.fread( messram_get_ptr(image.device().machine->device("messram")), size);
 
 	return IMAGE_INIT_PASS;
 }

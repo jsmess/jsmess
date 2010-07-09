@@ -66,7 +66,7 @@ static const struct upd765_interface elwro800jr_upd765_interface =
 
 static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = space->machine->device("upd765");
 
 	floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 0));
 	floppy_mon_w(floppy_get_device(space->machine, 1), !BIT(data, 1));
@@ -87,7 +87,7 @@ static WRITE8_HANDLER(elwro800jr_fdc_control_w)
 static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 {
 	UINT8 *prom = memory_region(machine, "proms") + 0x200;
-	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 	UINT8 cs;
 	UINT8 ls175;
 	spectrum_state *state = (spectrum_state *)machine->driver_data;
@@ -154,13 +154,13 @@ static void elwro800jr_mmu_w(running_machine *machine, UINT8 data)
 
 static READ8_DEVICE_HANDLER(i8255_port_c_r)
 {
-	running_device *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = device->machine->device("centronics");
 	return (centronics_ack_r(printer) << 2);
 }
 
 static WRITE8_DEVICE_HANDLER(i8255_port_c_w)
 {
-	running_device *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = device->machine->device("centronics");
 	centronics_strobe_w(printer, (data >> 7) & 0x01);
 }
 
@@ -242,7 +242,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 			}
 
 			/* cassette input from wav */
-			if (cassette_input(devtag_get_device(space->machine, "cassette")) > 0.0038 )
+			if (cassette_input(space->machine->device("cassette")) > 0.0038 )
 			{
 				data &= ~0x40;
 			}
@@ -261,13 +261,13 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		running_device *ppi = devtag_get_device(space->machine, "ppi8255");
+		running_device *ppi = space->machine->device("ppi8255");
 		return i8255a_r(ppi, (offset & 0x03) ^ 0x03);
 	}
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		running_device *fdc = devtag_get_device(space->machine, "upd765");
+		running_device *fdc = space->machine->device("upd765");
 		if (offset & 1)
 		{
 			return upd765_data_r(fdc,0);
@@ -280,7 +280,7 @@ static READ8_HANDLER(elwro800jr_io_r)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		running_device *usart = devtag_get_device(space->machine, "msm8251");
+		running_device *usart = space->machine->device("msm8251");
 		if (offset & 1)
 		{
 			return msm8251_status_r(usart, 0);
@@ -319,13 +319,13 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,2))
 	{
 		// CS55
-		running_device *ppi = devtag_get_device(space->machine, "ppi8255");
+		running_device *ppi = space->machine->device("ppi8255");
 		i8255a_w(ppi, (offset & 0x03) ^ 0x03, data);
 	}
 	else if (!BIT(cs,3))
 	{
 		// CSFDC
-		running_device *fdc = devtag_get_device(space->machine, "upd765");
+		running_device *fdc = space->machine->device("upd765");
 		if (offset & 1)
 		{
 			upd765_data_w(fdc, 0, data);
@@ -334,7 +334,7 @@ static WRITE8_HANDLER(elwro800jr_io_w)
 	else if (!BIT(cs,4))
 	{
 		// CS51
-		running_device *usart = devtag_get_device(space->machine, "msm8251");
+		running_device *usart = space->machine->device("msm8251");
 		if (offset & 1)
 		{
 			msm8251_control_w(usart, 0, data);
@@ -492,7 +492,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(elwro800)
 {
 	spectrum_state *state = (spectrum_state *)machine->driver_data;
-	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 
 	state->df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);

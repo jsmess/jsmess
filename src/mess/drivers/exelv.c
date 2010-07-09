@@ -271,7 +271,7 @@ static WRITE8_HANDLER(tms7020_portb_w)
 */
 static READ8_HANDLER(tms7041_porta_r)
 {
-	running_device *tms5220c = devtag_get_device( space->machine, "tms5220c" );
+	running_device *tms5220c = space->machine->device( "tms5220c" );
 	UINT8 data = 0x00;
 
 	logerror("tms7041_porta_r\n");
@@ -316,7 +316,7 @@ static READ8_HANDLER(tms7041_portb_r)
 
 static WRITE8_HANDLER(tms7041_portb_w)
 {
-	running_device *tms5220c = devtag_get_device( space->machine, "tms5220c" );
+	running_device *tms5220c = space->machine->device( "tms5220c" );
 
 	logerror("tms7041_portb_w: data = 0x%02x\n", data);
 
@@ -386,7 +386,7 @@ static READ8_HANDLER(tms7041_portd_r)
 
 static WRITE8_HANDLER(tms7041_portd_w)
 {
-	running_device *tms5220c = devtag_get_device( space->machine, "tms5220c" );
+	running_device *tms5220c = space->machine->device( "tms5220c" );
 
 	logerror("tms7041_portd_w: data = 0x%02x\n", data);
 

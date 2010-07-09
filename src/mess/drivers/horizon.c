@@ -40,12 +40,12 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(horizon)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xe800);
+	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xe800);
 }
 
 static MACHINE_RESET(horizon_sd)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xe900);
+	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xe900);
 }
 
 static WRITE8_DEVICE_HANDLER( horizon_kbd_put )

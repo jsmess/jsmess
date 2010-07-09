@@ -257,7 +257,7 @@ static void pcw_update_read_memory_block(running_machine *machine, int block, in
 		memory_install_read_bank(space,block * 0x04000 + 0x0000, block * 0x04000 + 0x3fff, 0, 0,block_name);
 //      LOG(("MEM: read block %i -> bank %i\n",block,bank));
 	}
-	memory_set_bankptr(machine, block_name, messram_get_ptr(devtag_get_device(machine, "messram")) + ((bank * 0x4000) % messram_get_size(devtag_get_device(machine, "messram"))));
+	memory_set_bankptr(machine, block_name, messram_get_ptr(machine->device("messram")) + ((bank * 0x4000) % messram_get_size(machine->device("messram"))));
 }
 
 
@@ -267,7 +267,7 @@ static void pcw_update_write_memory_block(running_machine *machine, int block, i
 	char block_name[10];
 
 	sprintf(block_name,"bank%d",block+5);
-	memory_set_bankptr(machine, block_name, messram_get_ptr(devtag_get_device(machine, "messram")) + ((bank * 0x4000) % messram_get_size(devtag_get_device(machine, "messram"))));
+	memory_set_bankptr(machine, block_name, messram_get_ptr(machine->device("messram")) + ((bank * 0x4000) % messram_get_size(machine->device("messram"))));
 //  LOG(("MEM: write block %i -> bank %i\n",block,bank));
 }
 
@@ -420,8 +420,8 @@ static WRITE8_HANDLER(pcw_vdu_video_control_register_w)
 
 static WRITE8_HANDLER(pcw_system_control_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
-	running_device *speaker = devtag_get_device(space->machine, "beep");
+	running_device *fdc = space->machine->device("upd765");
+	running_device *speaker = space->machine->device("beep");
 	LOG(("SYSTEM CONTROL: %d\n",data));
 
 	switch (data)
@@ -639,7 +639,7 @@ static WRITE8_HANDLER(pcw_expansion_w)
 
 static READ8_HANDLER(pcw_fdc_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = space->machine->device("upd765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
@@ -651,7 +651,7 @@ static READ8_HANDLER(pcw_fdc_r)
 
 static WRITE8_HANDLER(pcw_fdc_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = space->machine->device("upd765");
 	/* from Jacob Nevins docs. FDC I/O is not fully decoded */
 	if (offset & 1)
 	{
@@ -730,7 +730,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK(setup_beep)
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = machine->device("beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 3750);
 }
@@ -760,9 +760,9 @@ static MACHINE_RESET( pcw )
 	/* copy boot code into RAM - yes, it's skipping a step,
        but there is no verified dump of the boot sequence */
 
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0x00,messram_get_size(devtag_get_device(machine, "messram")));
+	memset(messram_get_ptr(machine->device("messram")),0x00,messram_get_size(machine->device("messram")));
 	for(x=0;x<256;x++)
-		messram_get_ptr(devtag_get_device(machine, "messram"))[x+2] = code[x];
+		messram_get_ptr(machine->device("messram"))[x+2] = code[x];
 
 }
 
@@ -770,7 +770,7 @@ static DRIVER_INIT(pcw)
 {
 	pcw_boot = 0;
 
-	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), 0, 0x0ff);
+	cpu_set_input_line_vector(machine->device("maincpu"), 0, 0x0ff);
 
 
 	/* lower 4 bits are interrupt counter */

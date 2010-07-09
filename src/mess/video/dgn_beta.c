@@ -230,7 +230,7 @@ void dgnbeta_vid_set_gctrl(running_machine *machine, int data)
 				     data & GCtrlHiLo		? "Hi" : "Lo",
 				     data & GCtrlSWChar		? "C0" : "C1",
 				     data & GCtrlWI		? "Wi" : "  ",
-				     cpu_get_pc(devtag_get_device(machine,"maincpu")));
+				     cpu_get_pc(machine->device("maincpu")));
 }
 
 // called when the 6845 changes the character row
@@ -314,7 +314,7 @@ void dgnbeta_init_video(running_machine *machine)
 
 	GCtrl=0;
 
-	machine->generic.videoram.u8=messram_get_ptr(devtag_get_device(machine, "messram"));
+	machine->generic.videoram.u8=messram_get_ptr(machine->device("messram"));
 
 	ClkMax=65000;
 	FlashCount=0;

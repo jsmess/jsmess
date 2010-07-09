@@ -223,7 +223,7 @@ const UINT8 *sam6883_videoram(running_device *device,int scanline)
 		logerror("sam_m6847_get_video_ram(): scanline=%d video_position=0x%04X\n", scanline, video_position);
 
 	/* return actual position */
-	ram_base = sam->intf->get_rambase ? sam->intf->get_rambase(device) : messram_get_ptr(devtag_get_device(device->machine, "messram"));
+	ram_base = sam->intf->get_rambase ? sam->intf->get_rambase(device) : messram_get_ptr(device->machine->device("messram"));
 	return &ram_base[video_position];
 }
 

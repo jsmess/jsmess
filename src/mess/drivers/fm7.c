@@ -280,7 +280,7 @@ static READ8_HANDLER( fm7_irq_cause_r )
 
 static TIMER_CALLBACK( fm7_beeper_off )
 {
-	beep_set_state(devtag_get_device(machine,"beeper"),0);
+	beep_set_state(machine->device("beeper"),0);
 	logerror("timed beeper off\n");
 }
 
@@ -290,23 +290,23 @@ static WRITE8_HANDLER( fm7_beeper_w )
 
 	if(!speaker_active)  // speaker not active, disable all beeper sound
 	{
-		beep_set_state(devtag_get_device(space->machine,"beeper"),0);
+		beep_set_state(space->machine->device("beeper"),0);
 		return;
 	}
 
 	if(data & 0x80)
 	{
 		if(speaker_active)
-			beep_set_state(devtag_get_device(space->machine,"beeper"),1);
+			beep_set_state(space->machine->device("beeper"),1);
 	}
 	else
-		beep_set_state(devtag_get_device(space->machine,"beeper"),0);
+		beep_set_state(space->machine->device("beeper"),0);
 
 	if(data & 0x40)
 	{
 		if(speaker_active)
 		{
-			beep_set_state(devtag_get_device(space->machine,"beeper"),1);
+			beep_set_state(space->machine->device("beeper"),1);
 			logerror("timed beeper on\n");
 			timer_set(space->machine,ATTOTIME_IN_MSEC(205),NULL,0,fm7_beeper_off);
 		}
@@ -323,7 +323,7 @@ READ8_HANDLER( fm7_sub_beeper_r )
 {
 	if(speaker_active)
 	{
-		beep_set_state(devtag_get_device(space->machine,"beeper"),1);
+		beep_set_state(space->machine->device("beeper"),1);
 		logerror("timed beeper on\n");
 		timer_set(space->machine,ATTOTIME_IN_MSEC(205),NULL,0,fm7_beeper_off);
 	}
@@ -452,7 +452,7 @@ static WRITE_LINE_DEVICE_HANDLER( fm7_fdc_drq_w )
 
 static READ8_HANDLER( fm7_fdc_r )
 {
-	running_device* dev = devtag_get_device(space->machine,"fdc");
+	running_device* dev = space->machine->device("fdc");
 	UINT8 ret = 0;
 
 	switch(offset)
@@ -486,7 +486,7 @@ static READ8_HANDLER( fm7_fdc_r )
 
 static WRITE8_HANDLER( fm7_fdc_w )
 {
-	running_device* dev = devtag_get_device(space->machine,"fdc");
+	running_device* dev = space->machine->device("fdc");
 	switch(offset)
 	{
 		case 0:
@@ -773,15 +773,15 @@ static READ8_HANDLER( fm7_cassette_printer_r )
 	// bit 1: printer error
 	// bit 0: printer busy
 	UINT8 ret = 0x00;
-	double data = cassette_input(devtag_get_device(space->machine,"cass"));
-	running_device* printer_dev = devtag_get_device(space->machine,"lpt");
+	double data = cassette_input(space->machine->device("cass"));
+	running_device* printer_dev = space->machine->device("lpt");
 	UINT8 pdata;
 	int x;
 
 	if(data > 0.03)
 		ret |= 0x80;
 
-	if(cassette_get_state(devtag_get_device(space->machine,"cass")) & CASSETTE_MOTOR_DISABLED)
+	if(cassette_get_state(space->machine->device("cass")) & CASSETTE_MOTOR_DISABLED)
 		ret |= 0x80;  // cassette input is high when not in use.
 
 	ret |= 0x70;
@@ -799,7 +799,7 @@ static READ8_HANDLER( fm7_cassette_printer_r )
 	}
 	else
 	{
-		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(space->machine,"lpt:printer"));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(space->machine->device("lpt:printer"));
 		if(image->exists())
 		{
 			if(centronics_pe_r(printer_dev))
@@ -828,15 +828,15 @@ static WRITE8_HANDLER( fm7_cassette_printer_w )
 		// bit 1: cassette motor
 		// bit 0: cassette output
 			if((data & 0x01) != (prev & 0x01))
-				cassette_output(devtag_get_device(space->machine,"cass"),(data & 0x01) ? +1.0 : -1.0);
+				cassette_output(space->machine->device("cass"),(data & 0x01) ? +1.0 : -1.0);
 			if((data & 0x02) != (prev & 0x02))
-				cassette_change_state(devtag_get_device(space->machine, "cass" ),(data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-			centronics_strobe_w(devtag_get_device(space->machine,"lpt"),!(data & 0x40));
+				cassette_change_state(space->machine->device("cass" ),(data & 0x02) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+			centronics_strobe_w(space->machine->device("lpt"),!(data & 0x40));
 			prev = data;
 			break;
 		case 1:
 		// Printer data
-			centronics_data_w(devtag_get_device(space->machine,"lpt"),0,data);
+			centronics_data_w(space->machine->device("lpt"),0,data);
 			break;
 	}
 }
@@ -875,15 +875,15 @@ static void fm7_update_psg(running_machine* machine)
 				break;
 			case 0x01:
 				// Data read
-				psg_data = ay8910_r(devtag_get_device(space->machine,"psg"),0);
+				psg_data = ay8910_r(space->machine->device("psg"),0);
 				break;
 			case 0x02:
 				// Data write
-				ay8910_data_w(devtag_get_device(space->machine,"psg"),0,psg_data);
+				ay8910_data_w(space->machine->device("psg"),0,psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				ay8910_address_w(devtag_get_device(space->machine,"psg"),0,psg_data);
+				ay8910_address_w(space->machine->device("psg"),0,psg_data);
 				break;
 		}
 	}
@@ -896,21 +896,21 @@ static void fm7_update_psg(running_machine* machine)
 				break;
 			case 0x01:
 				// Data read
-				psg_data = ym2203_r(devtag_get_device(space->machine,"ym"),1);
+				psg_data = ym2203_r(space->machine->device("ym"),1);
 				break;
 			case 0x02:
 				// Data write
-				ym2203_w(devtag_get_device(space->machine,"ym"),1,psg_data);
+				ym2203_w(space->machine->device("ym"),1,psg_data);
 				logerror("YM: data write 0x%02x\n",psg_data);
 				break;
 			case 0x03:
 				// Address latch
-				ym2203_w(devtag_get_device(space->machine,"ym"),0,psg_data);
+				ym2203_w(space->machine->device("ym"),0,psg_data);
 				logerror("YM: address latch 0x%02x\n",psg_data);
 				break;
 			case 0x04:
 				// Status register
-				psg_data = ym2203_r(devtag_get_device(space->machine,"ym"),0);
+				psg_data = ym2203_r(space->machine->device("ym"),0);
 				break;
 			case 0x09:
 				// Joystick port read
@@ -1705,8 +1705,8 @@ static DRIVER_INIT(fm7)
 	fm7_keyboard_timer = timer_alloc(machine,fm7_keyboard_poll,NULL);
 	if(fm7_type != SYS_FM7)
 		fm77av_vsync_timer = timer_alloc(machine,fm77av_vsync,NULL);
-	cpu_set_irq_callback(devtag_get_device(machine,"maincpu"),fm7_irq_ack);
-	cpu_set_irq_callback(devtag_get_device(machine,"sub"),fm7_sub_irq_ack);
+	cpu_set_irq_callback(machine->device("maincpu"),fm7_irq_ack);
+	cpu_set_irq_callback(machine->device("sub"),fm7_sub_irq_ack);
 }
 
 static MACHINE_START(fm7)
@@ -1721,8 +1721,8 @@ static MACHINE_START(fm7)
 	memset(fm7_shared_ram,0xff,0x80);
 	fm7_type = SYS_FM7;
 
-	beep_set_frequency(devtag_get_device(machine,"beeper"),1200);
-	beep_set_state(devtag_get_device(machine,"beeper"),0);
+	beep_set_frequency(machine->device("beeper"),1200);
+	beep_set_state(machine->device("beeper"),0);
 }
 
 static MACHINE_START(fm77av)
@@ -1742,8 +1742,8 @@ static MACHINE_START(fm77av)
 	memory_set_bankptr(machine,"bank21",RAM+0x800);
 
 	fm7_type = SYS_FM77AV;
-	beep_set_frequency(devtag_get_device(machine,"beeper"),1200);
-	beep_set_state(devtag_get_device(machine,"beeper"),0);
+	beep_set_frequency(machine->device("beeper"),1200);
+	beep_set_state(machine->device("beeper"),0);
 }
 
 static MACHINE_RESET(fm7)
@@ -1800,7 +1800,7 @@ static MACHINE_RESET(fm7)
 	}
 	if(fm7_type != SYS_FM7)  // set default RAM banks
 	{
-		fm7_mmr_refresh(cpu_get_address_space(devtag_get_device(machine,"maincpu"),ADDRESS_SPACE_PROGRAM));
+		fm7_mmr_refresh(cpu_get_address_space(machine->device("maincpu"),ADDRESS_SPACE_PROGRAM));
 	}
 }
 

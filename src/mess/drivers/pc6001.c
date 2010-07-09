@@ -255,14 +255,14 @@ static WRITE8_HANDLER ( pc6001_system_latch_w )
 	if((!(sys_latch & 8)) && data & 0x8) //PLAY tape cmd
 	{
 		cas_switch = 1;
-		cassette_change_state(devtag_get_device(space->machine, "cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		cassette_change_state(devtag_get_device(space->machine, "cass" ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+		cassette_change_state(space->machine->device("cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(space->machine->device("cass" ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 	}
 	if((sys_latch & 8) && ((data & 0x8) == 0)) //STOP tape cmd
 	{
 		cas_switch = 0;
-		cassette_change_state(devtag_get_device(space->machine, "cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		cassette_change_state(devtag_get_device(space->machine, "cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+		cassette_change_state(space->machine->device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		cassette_change_state(space->machine->device("cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 		//irq_vector = 0x00;
 		//cputag_set_input_line(space->machine,"maincpu", 0, ASSERT_LINE);
 	}
@@ -746,7 +746,7 @@ static TIMER_CALLBACK(cassette_callback)
 	{
 		static UINT8 cas_data_i = 0x80,cas_data_poll;
 		//cur_keycode = gfx_data[cas_offset++];
-		if(cassette_input(devtag_get_device(machine,"cass")) > 0.03)
+		if(cassette_input(machine->device("cass")) > 0.03)
 			cas_data_poll|= cas_data_i;
 		else
 			cas_data_poll&=~cas_data_i;
@@ -818,7 +818,7 @@ static MACHINE_RESET(pc6001)
 	port_c_8255=0;
 	//pc6001_video_ram =  pc6001_ram;
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"),pc6001_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
 	cas_switch = 0;
 	cas_offset = 0;
 }
@@ -828,7 +828,7 @@ static MACHINE_RESET(pc6001m2)
 	port_c_8255=0;
 	//pc6001_video_ram =  pc6001_ram;
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"),pc6001_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"),pc6001_irq_callback);
 	cas_switch = 0;
 	cas_offset = 0;
 

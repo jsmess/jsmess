@@ -141,7 +141,7 @@ UINT8 columnlatch;
 
 static READ8_DEVICE_HANDLER( vcc_portb_r )
 {
-	device = devtag_get_device(device->machine, "speech");
+	device = device->machine->device("speech");
 	if (s14001a_bsy_r(device) != 0)
 		return 0x80;
 	else
@@ -155,7 +155,7 @@ static READ8_DEVICE_HANDLER( vcc_portc_r )
 
 static WRITE8_DEVICE_HANDLER( vcc_porta_w )
 {
-	device = devtag_get_device(device->machine, "speech");
+	device = device->machine->device("speech");
 	s14001a_set_volume(device, 15); // hack, s14001a core should assume a volume of 15 unless otherwise stated...
 	s14001a_reg_w(device, data & 0x3f);
 	s14001a_rst_w(device, (data & 0x80)>>7);

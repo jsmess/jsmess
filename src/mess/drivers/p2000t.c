@@ -214,7 +214,7 @@ static INTERRUPT_GEN( p2000_interrupt )
 
 static VIDEO_UPDATE( p2000t )
 {
-	running_device *saa5050 = devtag_get_device(screen->machine, "saa5050");
+	running_device *saa5050 = screen->machine->device("saa5050");
 
 	saa5050_update(saa5050, bitmap, NULL);
 	return 0;

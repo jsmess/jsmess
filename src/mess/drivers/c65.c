@@ -215,7 +215,7 @@ static CBM_IEC_DAISY( cbm_iec_daisy )
 
 static VIDEO_UPDATE( c65 )
 {
-	running_device *vic3 = devtag_get_device(screen->machine, "vic3");
+	running_device *vic3 = screen->machine->device("vic3");
 
 	vic3_video_update(vic3, bitmap, cliprect);
 	return 0;
@@ -271,7 +271,7 @@ static const vic3_interface c65_vic3_pal_intf = {
 
 static INTERRUPT_GEN( vic3_raster_irq )
 {
-	running_device *vic3 = devtag_get_device(device->machine, "vic3");
+	running_device *vic3 = device->machine->device("vic3");
 
 	vic3_raster_interrupt_gen(vic3);
 }

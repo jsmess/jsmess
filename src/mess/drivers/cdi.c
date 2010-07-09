@@ -50,7 +50,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf );
+		logerror( "%08x: %s", cpu_get_pc(machine->device("maincpu")), buf );
 	}
 }
 #else
@@ -608,7 +608,7 @@ static TIMER_CALLBACK( scc68070_timer0_callback )
 	{
 		UINT8 interrupt = scc68070->picr1 & 7;
 		scc68070->timers.timer_status_register |= TSR_OV0;
-		cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+		cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
 		cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 	}
 	scc68070_set_timer_callback(&state->scc68070_regs, 0);
@@ -1705,7 +1705,7 @@ static TIMER_CALLBACK( audio_sample_trigger )
 
 		// Set the CDIC interrupt line
 		verboselog(machine, 0, "Setting CDIC interrupt line for soundmap decode\n" );
-		cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_4, 128);
+		cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_4, 128);
 		cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 	}
 	else
@@ -1931,7 +1931,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 
 							//printf( "Setting CDIC interrupt line\n" );
 							verboselog(machine, 0, "Setting CDIC interrupt line for audio sector\n" );
-							cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_4, 128);
+							cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_4, 128);
 							cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 						}
 					}
@@ -1951,7 +1951,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 						{
 							//printf( "Setting CDIC interrupt line\n" );
 							verboselog(machine, 0, "Setting CDIC interrupt line for message sector\n" );
-							cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_4, 128);
+							cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_4, 128);
 							cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 						}
 						else
@@ -1971,7 +1971,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 
 						//printf( "Setting CDIC interrupt line\n" );
 						verboselog(machine, 0, "Setting CDIC interrupt line for data sector\n" );
-						cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_4, 128);
+						cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_4, 128);
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 					}
 				}
@@ -2034,7 +2034,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 
 				verboselog(machine, 0, "Playing CDDA sector from MSF location %06x\n", cdic->time | 2 );
 
-				cdda_start_audio(devtag_get_device(machine, "cdda"), lba, rounded_next_msf);
+				cdda_start_audio(machine->device("cdda"), lba, rounded_next_msf);
 
 			}
 
@@ -2064,7 +2064,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			}
 
 			verboselog(machine, 0, "Setting CDIC interrupt line for CDDA sector\n" );
-			cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_4, 128);
+			cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_4, 128);
 			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 			break;
 		}
@@ -2115,7 +2115,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 			cdic->time = next_msf << 8;
 
 			verboselog(machine, 0, "Setting CDIC interrupt line for Seek sector\n" );
-			cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_4, 128);
+			cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_4, 128);
 			cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 			break;
 		}
@@ -2339,7 +2339,7 @@ static WRITE16_HANDLER( cdic_w )
 						break;
 					}
 					case 0x2b: // Stop CDDA
-						cdda_stop_audio(devtag_get_device(space->machine, "cdda"));
+						cdda_stop_audio(space->machine->device("cdda"));
 						timer_adjust_oneshot(cdic->interrupt_timer, attotime_never, 0);
 						break;
 					case 0x23: // Reset Mode 1
@@ -2421,7 +2421,7 @@ static TIMER_CALLBACK( slave_trigger_readback_int )
 	slave_regs_t *slave = &state->slave_regs;
 
 	verboselog(machine, 0, "Asserting IRQ2\n" );
-	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_2, 26);
+	cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_2, 26);
 	cputag_set_input_line(machine, "maincpu", M68K_IRQ_2, ASSERT_LINE);
 	timer_adjust_oneshot(slave->interrupt_timer, attotime_never, 0);
 }
@@ -3284,7 +3284,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 					UINT8 interrupt = (state->scc68070_regs.lir >> 4) & 7;
 					if(interrupt)
 					{
-						cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+						cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
@@ -3294,7 +3294,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 					UINT8 interrupt = state->scc68070_regs.lir & 7;
 					if(interrupt)
 					{
-						cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
+						cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
@@ -3375,7 +3375,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 					UINT8 interrupt = (state->scc68070_regs.lir >> 4) & 7;
 					if(interrupt)
 					{
-						cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+						cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
@@ -3385,7 +3385,7 @@ static void mcd212_process_dca(running_machine *machine, int channel)
 					UINT8 interrupt = state->scc68070_regs.lir & 7;
 					if(interrupt)
 					{
-						cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
+						cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
 						cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 					}
 				}
@@ -4470,8 +4470,8 @@ static VIDEO_START(cdi)
 static VIDEO_UPDATE(cdi)
 {
 	cdi_state *state = (cdi_state *)screen->machine->driver_data;
-	running_device *main_screen = devtag_get_device(screen->machine, "screen");
-	running_device *lcd_screen = devtag_get_device(screen->machine, "lcd");
+	running_device *main_screen = screen->machine->device("screen");
+	running_device *lcd_screen = screen->machine->device("lcd");
 
 	if (screen == main_screen)
 	{
@@ -4493,7 +4493,7 @@ static TIMER_CALLBACK( test_timer_callback )
 	if(state->timer_set == 0)
 	{
 		state->timer_set = 1;
-		cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_4, 60);
+		cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_4, 60);
 		cputag_set_input_line(machine, "maincpu", M68K_IRQ_4, ASSERT_LINE);
 		timer_adjust_oneshot(state->test_timer, ATTOTIME_IN_HZ(10000), 0);
 	}
@@ -4621,7 +4621,7 @@ static MACHINE_RESET( cdi )
 	cdi_state *state = (cdi_state *)machine->driver_data;
 	UINT16 *src   = (UINT16*)memory_region(machine, "maincpu");
 	UINT16 *dst   = state->planea;
-	running_device *cdrom_dev = devtag_get_device(machine, "cdrom");
+	running_device *cdrom_dev = machine->device("cdrom");
 	memcpy(dst, src, 0x8);
 
 	scc68070_init(machine, &state->scc68070_regs);
@@ -4631,10 +4631,10 @@ static MACHINE_RESET( cdi )
 	if( cdrom_dev )
 	{
 		state->cdic_regs.cd = mess_cd_get_cdrom_file(cdrom_dev);
-		cdda_set_cdrom(devtag_get_device(machine, "cdda"), state->cdic_regs.cd);
+		cdda_set_cdrom(machine->device("cdda"), state->cdic_regs.cd);
 	}
 
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 
 	state->dmadac[0] = machine->device<dmadac_sound_device>("dac1");
 	state->dmadac[1] = machine->device<dmadac_sound_device>("dac2");

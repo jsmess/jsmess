@@ -49,7 +49,7 @@ UINT8 *c65_interface;
 static void c65_nmi( running_machine *machine )
 {
 	static int nmilevel = 0;
-	running_device *cia_1 = devtag_get_device(machine, "cia_1");
+	running_device *cia_1 = machine->device("cia_1");
 	int cia1irq = mos6526_irq_r(cia_1);
 
 	if (nmilevel != (input_port_read(machine, "SPECIAL") & 0x80) || cia1irq)	/* KEY_RESTORE */
@@ -79,7 +79,7 @@ static void c65_nmi( running_machine *machine )
 
 static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
 {
-	UINT8 cia0portb = mos6526_pb_r(devtag_get_device(device->machine, "cia_0"), 0);
+	UINT8 cia0portb = mos6526_pb_r(device->machine->device("cia_0"), 0);
 
 	return cbm_common_cia0_port_a_r(device, cia0portb);
 }
@@ -87,7 +87,7 @@ static READ8_DEVICE_HANDLER( c65_cia0_port_a_r )
 static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 {
 	UINT8 value = 0xff;
-	UINT8 cia0porta = mos6526_pa_r(devtag_get_device(device->machine, "cia_0"), 0);
+	UINT8 cia0porta = mos6526_pa_r(device->machine->device("cia_0"), 0);
 
 	value &= cbm_common_cia0_port_b_r(device, cia0porta);
 
@@ -100,7 +100,7 @@ static READ8_DEVICE_HANDLER( c65_cia0_port_b_r )
 static WRITE8_DEVICE_HANDLER( c65_cia0_port_b_w )
 {
 //  was there lightpen support in c65 video chip?
-//  running_device *vic3 = devtag_get_device(device->machine, "vic3");
+//  running_device *vic3 = device->machine->device("vic3");
 //  vic3_lightpen_write(vic3, data & 0x10);
 }
 
@@ -125,7 +125,7 @@ static void c65_cia0_interrupt( running_device *device, int level )
 /* is this correct for c65 as well as c64? */
 void c65_vic_interrupt( running_machine *machine, int level )
 {
-	running_device *cia_0 = devtag_get_device(machine, "cia_0");
+	running_device *cia_0 = machine->device("cia_0");
 #if 1
 	if (level != vicirq)
 	{
@@ -187,7 +187,7 @@ const mos6526_interface c65_pal_cia0 =
 static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 {
 	UINT8 value = 0xff;
-	running_device *serbus = devtag_get_device(device->machine, "serial_bus");
+	running_device *serbus = device->machine->device("serial_bus");
 
 	if (!cbm_iec_clk_r(serbus))
 		value &= ~0x40;
@@ -201,7 +201,7 @@ static READ8_DEVICE_HANDLER( c65_cia1_port_a_r )
 static WRITE8_DEVICE_HANDLER( c65_cia1_port_a_w )
 {
 	static const int helper[4] = {0xc000, 0x8000, 0x4000, 0x0000};
-	running_device *serbus = devtag_get_device(device->machine, "serial_bus");
+	running_device *serbus = device->machine->device("serial_bus");
 
 	cbm_iec_atn_w(serbus, device, !BIT(data, 3));
 	cbm_iec_clk_w(serbus, device, !BIT(data, 4));
@@ -554,7 +554,7 @@ static void c65_fdc_state(void)
 
 static void c65_fdc_w( running_machine *machine, int offset, int data )
 {
-	DBG_LOG(machine, 1, "fdc write", ("%.5x %.2x %.2x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")), offset, data));
+	DBG_LOG(machine, 1, "fdc write", ("%.5x %.2x %.2x\n", cpu_get_pc(machine->device("maincpu")), offset, data));
 	switch (offset & 0xf)
 	{
 	case 0:
@@ -638,7 +638,7 @@ static int c65_fdc_r( running_machine *machine, int offset )
 		data = c65_fdc.reg[offset & 0xf];
 		break;
 	}
-	DBG_LOG(machine, 1, "fdc read", ("%.5x %.2x %.2x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")), offset, data));
+	DBG_LOG(machine, 1, "fdc read", ("%.5x %.2x %.2x\n", cpu_get_pc(machine->device("maincpu")), offset, data));
 	return data;
 }
 
@@ -664,7 +664,7 @@ static struct {
 static READ8_HANDLER( c65_ram_expansion_r )
 {
 	UINT8 data = 0xff;
-	if (messram_get_size(devtag_get_device(space->machine, "messram")) > (128 * 1024))
+	if (messram_get_size(space->machine->device("messram")) > (128 * 1024))
 		data = expansion_ram.reg;
 	return data;
 }
@@ -674,16 +674,16 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 	offs_t expansion_ram_begin;
 	offs_t expansion_ram_end;
 
-	if (messram_get_size(devtag_get_device(space->machine, "messram")) > (128 * 1024))
+	if (messram_get_size(space->machine->device("messram")) > (128 * 1024))
 	{
 		expansion_ram.reg = data;
 
 		expansion_ram_begin = 0x80000;
-		expansion_ram_end = 0x80000 + (messram_get_size(devtag_get_device(space->machine, "messram")) - 128*1024) - 1;
+		expansion_ram_end = 0x80000 + (messram_get_size(space->machine->device("messram")) - 128*1024) - 1;
 
 		if (data == 0x00) {
 			memory_install_readwrite_bank(space, expansion_ram_begin, expansion_ram_end,0,0,"bank16");
-			memory_set_bankptr(space->machine, "bank16", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 128*1024);
+			memory_set_bankptr(space->machine, "bank16", messram_get_ptr(space->machine->device("messram")) + 128*1024);
 		} else {
 			memory_nop_readwrite(space, expansion_ram_begin, expansion_ram_end,0,0);
 		}
@@ -692,9 +692,9 @@ static WRITE8_HANDLER( c65_ram_expansion_w )
 
 static WRITE8_HANDLER( c65_write_io )
 {
-	running_device *sid_0 = devtag_get_device(space->machine, "sid_r");
-	running_device *sid_1 = devtag_get_device(space->machine, "sid_l");
-	running_device *vic3 = devtag_get_device(space->machine, "vic3");
+	running_device *sid_0 = space->machine->device("sid_r");
+	running_device *sid_1 = space->machine->device("sid_l");
+	running_device *vic3 = space->machine->device("vic3");
 
 	switch (offset & 0xf00)
 	{
@@ -736,8 +736,8 @@ static WRITE8_HANDLER( c65_write_io )
 
 static WRITE8_HANDLER( c65_write_io_dc00 )
 {
-	running_device *cia_0 = devtag_get_device(space->machine, "cia_0");
-	running_device *cia_1 = devtag_get_device(space->machine, "cia_1");
+	running_device *cia_0 = space->machine->device("cia_0");
+	running_device *cia_1 = space->machine->device("cia_1");
 
 	switch (offset & 0xf00)
 	{
@@ -756,9 +756,9 @@ static WRITE8_HANDLER( c65_write_io_dc00 )
 
 static READ8_HANDLER( c65_read_io )
 {
-	running_device *sid_0 = devtag_get_device(space->machine, "sid_r");
-	running_device *sid_1 = devtag_get_device(space->machine, "sid_l");
-	running_device *vic3 = devtag_get_device(space->machine, "vic3");
+	running_device *sid_0 = space->machine->device("sid_r");
+	running_device *sid_1 = space->machine->device("sid_l");
+	running_device *vic3 = space->machine->device("vic3");
 
 	switch (offset & 0xf00)
 	{
@@ -799,8 +799,8 @@ static READ8_HANDLER( c65_read_io )
 
 static READ8_HANDLER( c65_read_io_dc00 )
 {
-	running_device *cia_0 = devtag_get_device(space->machine, "cia_0");
-	running_device *cia_1 = devtag_get_device(space->machine, "cia_1");
+	running_device *cia_0 = space->machine->device("cia_0");
+	running_device *cia_1 = space->machine->device("cia_1");
 
 	switch (offset & 0x300)
 	{
@@ -1044,7 +1044,7 @@ DRIVER_INIT( c65pal )
 MACHINE_START( c65 )
 {
 	/* clear upper memory */
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")) + 128*1024, 0xff, messram_get_size(devtag_get_device(machine, "messram")) -  128*1024);
+	memset(messram_get_ptr(machine->device("messram")) + 128*1024, 0xff, messram_get_size(machine->device("messram")) -  128*1024);
 
 //removed   cbm_drive_0_config (SERIAL, 10);
 //removed   cbm_drive_1_config (SERIAL, 11);

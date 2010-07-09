@@ -130,7 +130,7 @@ VIDEO_START( pc_mda )
 
 static VIDEO_UPDATE( mc6845_mda )
 {
-	running_device *devconf = devtag_get_device(screen->machine, MDA_MC6845_NAME);
+	running_device *devconf = screen->machine->device(MDA_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect );
 	return 0;
 }
@@ -365,7 +365,7 @@ static int pc_mda_status_r(void)
  *************************************************************************/
 WRITE8_HANDLER ( pc_MDA_w )
 {
-	running_device *devconf = devtag_get_device(space->machine, MDA_MC6845_NAME);
+	running_device *devconf = space->machine->device(MDA_MC6845_NAME);
 	switch( offset )
 	{
 		case 0: case 2: case 4: case 6:
@@ -382,7 +382,7 @@ WRITE8_HANDLER ( pc_MDA_w )
 
  READ8_HANDLER ( pc_MDA_r )
 {
-	running_device *devconf = devtag_get_device(space->machine, MDA_MC6845_NAME);
+	running_device *devconf = space->machine->device(MDA_MC6845_NAME);
 	int data = 0xff;
 	switch( offset )
 	{
@@ -524,7 +524,7 @@ static MC6845_UPDATE_ROW( hercules_gfx_update_row )
 
 static VIDEO_UPDATE( mc6845_hercules )
 {
-	running_device *devconf = devtag_get_device(screen->machine, HERCULES_MC6845_NAME);
+	running_device *devconf = screen->machine->device(HERCULES_MC6845_NAME);
 	mc6845_update( devconf, bitmap, cliprect );
 	return 0;
 }
@@ -532,7 +532,7 @@ static VIDEO_UPDATE( mc6845_hercules )
 
 static void hercules_mode_control_w(running_machine *machine, int data)
 {
-	running_device *devconf = devtag_get_device(machine, HERCULES_MC6845_NAME);
+	running_device *devconf = machine->device(HERCULES_MC6845_NAME);
 
 	MDA_LOG(1,"hercules_mode_control_w",("$%02x: colums %d, gfx %d, enable %d, blink %d\n",
 		data, (data&1)?80:40, (data>>1)&1, (data>>3)&1, (data>>5)&1));
@@ -568,7 +568,7 @@ static void hercules_config_w(running_machine *machine, int data)
 
 static WRITE8_HANDLER ( pc_hercules_w )
 {
-	running_device *devconf = devtag_get_device(space->machine, HERCULES_MC6845_NAME);
+	running_device *devconf = space->machine->device(HERCULES_MC6845_NAME);
 
 	switch( offset )
 	{
@@ -608,7 +608,7 @@ static int pc_hercules_status_r(void)
 
 static READ8_HANDLER ( pc_hercules_r )
 {
-	running_device *devconf = devtag_get_device(space->machine, HERCULES_MC6845_NAME);
+	running_device *devconf = space->machine->device(HERCULES_MC6845_NAME);
 	int data = 0xff;
 
 	switch( offset )

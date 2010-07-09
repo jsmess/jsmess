@@ -187,8 +187,8 @@ static MACHINE_START( exp85 )
 	memory_set_bank(machine, "bank1", 0);
 
 	/* find devices */
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 }
 
 /* Machine Driver */

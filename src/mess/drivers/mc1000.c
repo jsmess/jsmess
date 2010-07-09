@@ -41,7 +41,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	memory_set_bank(machine, "bank2", state->mc6845_bank);
 
 	/* extended RAM */
-	if (messram_get_size(devtag_get_device(machine, "messram")) > 16*1024)
+	if (messram_get_size(machine->device("messram")) > 16*1024)
 	{
 		memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
 	}
@@ -53,7 +53,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	/* MC6847 video RAM */
 	if (state->mc6847_bank)
 	{
-		if (messram_get_size(devtag_get_device(machine, "messram")) > 16*1024)
+		if (messram_get_size(machine->device("messram")) > 16*1024)
 		{
 			memory_install_readwrite_bank(program, 0x8000, 0x97ff, 0, 0, "bank4");
 		}
@@ -70,7 +70,7 @@ static void mc1000_bankswitch(running_machine *machine)
 	memory_set_bank(machine, "bank4", state->mc6847_bank);
 
 	/* extended RAM */
-	if (messram_get_size(devtag_get_device(machine, "messram")) > 16*1024)
+	if (messram_get_size(machine->device("messram")) > 16*1024)
 	{
 		memory_install_readwrite_bank(program, 0x9800, 0xbfff, 0, 0, "bank5");
 	}
@@ -323,10 +323,10 @@ static MACHINE_START( mc1000 )
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
-	state->mc6847 = devtag_get_device(machine, MC6847_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->mc6845 = machine->device(MC6845_TAG);
+	state->mc6847 = machine->device(MC6847_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* setup memory banking */
 	memory_install_readwrite_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");

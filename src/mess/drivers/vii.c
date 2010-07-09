@@ -113,7 +113,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%04x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf );
+		logerror( "%04x: %s", cpu_get_pc(machine->device("maincpu")), buf );
 	}
 }
 #else
@@ -607,7 +607,7 @@ static READ16_HANDLER( vii_io_r )
 			break;
 
 		case 0x2f: // Data Segment
-			val = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), UNSP_SR) >> 10;
+			val = cpu_get_reg(space->machine->device("maincpu"), UNSP_SR) >> 10;
 			verboselog(space->machine, 3, "vii_io_r: Data Segment = %04x (%04x)\n", val, mem_mask);
 			break;
 
@@ -686,8 +686,8 @@ static WRITE16_HANDLER( vii_io_w )
 			break;
 
 		case 0x2f: // Data Segment
-			temp = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), UNSP_SR);
-			cpu_set_reg(devtag_get_device(space->machine, "maincpu"), UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
+			temp = cpu_get_reg(space->machine->device("maincpu"), UNSP_SR);
+			cpu_set_reg(space->machine->device("maincpu"), UNSP_SR, (temp & 0x03ff) | ((data & 0x3f) << 10));
 			verboselog(space->machine, 3, "vii_io_w: Data Segment = %04x (%04x)\n", data, mem_mask);
 			break;
 

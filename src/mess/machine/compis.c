@@ -265,7 +265,7 @@ static void compis_keyb_init(void)
 /*-------------------------------------------------------------------------*/
 static void compis_fdc_reset(running_machine *machine)
 {
-	running_device *fdc = devtag_get_device(machine, "upd765");
+	running_device *fdc = machine->device("upd765");
 
 	upd765_reset(fdc, 0);
 
@@ -275,7 +275,7 @@ static void compis_fdc_reset(running_machine *machine)
 
 static void compis_fdc_tc(running_machine *machine, int state)
 {
-	running_device *fdc = devtag_get_device(machine, "upd765");
+	running_device *fdc = machine->device("upd765");
 	/* Terminal count if iSBX-218A has DMA enabled */
 	if (input_port_read(machine, "DSW1"))
 	{
@@ -316,7 +316,7 @@ const upd765_interface compis_fdc_interface =
 
 READ16_HANDLER (compis_fdc_dack_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = space->machine->device("upd765");
 	UINT16 data;
 	data = 0xffff;
 	/* DMA acknowledge if iSBX-218A has DMA enabled */
@@ -330,7 +330,7 @@ READ16_HANDLER (compis_fdc_dack_r)
 
 WRITE16_HANDLER (compis_fdc_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = space->machine->device("upd765");
 	switch(offset)
 	{
 		case 2:
@@ -344,7 +344,7 @@ WRITE16_HANDLER (compis_fdc_w)
 
 READ16_HANDLER (compis_fdc_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = space->machine->device("upd765");
 	UINT16 data;
 	data = 0xffff;
 	switch(offset)
@@ -486,13 +486,13 @@ const msm8251_interface compis_usart_interface=
 
 READ16_HANDLER ( compis_usart_r )
 {
-	running_device *uart = devtag_get_device(space->machine, "uart");
+	running_device *uart = space->machine->device("uart");
 	return msm8251_data_r(uart, offset);
 }
 
 WRITE16_HANDLER ( compis_usart_w )
 {
-	running_device *uart = devtag_get_device(space->machine, "uart");
+	running_device *uart = space->machine->device("uart");
 	switch (offset)
 	{
 		case 0x00:
@@ -653,7 +653,7 @@ static void handle_eoi(running_machine *machine,int data)
 			case 0x0d:	i186.intr.in_service &= ~0x20;	break;
 			case 0x0e:	i186.intr.in_service &= ~0x40;	break;
 			case 0x0f:	i186.intr.in_service &= ~0x80;	break;
-			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(devtag_get_device(machine, "maincpu")), data & 0x1f);
+			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(machine->device("maincpu")), data & 0x1f);
 		}
 		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time(machine)), data & 0x1f);
 	}
@@ -825,7 +825,7 @@ static void internal_timer_update(running_machine *machine,
 		diff = new_control ^ t->control;
 		if (diff & 0x001c)
 		  logerror("%05X:ERROR! -unsupported timer mode %04X\n",
-			   cpu_get_pc(devtag_get_device(machine, "maincpu")), new_control);
+			   cpu_get_pc(machine->device("maincpu")), new_control);
 
 		/* if we have real changes, update things */
 		if (diff != 0)
@@ -926,7 +926,7 @@ static void update_dma_control(running_machine *machine, int which, int new_cont
 	diff = new_control ^ d->control;
 	if (diff & 0x6811)
 	  logerror("%05X:ERROR! - unsupported DMA mode %04X\n",
-		   cpu_get_pc(devtag_get_device(machine, "maincpu")), new_control);
+		   cpu_get_pc(machine->device("maincpu")), new_control);
 
 	/* if we're going live, set a timer */
 	if ((diff & 0x0002) && (new_control & 0x0002))
@@ -987,7 +987,7 @@ READ16_HANDLER( compis_i186_internal_port_r )
 		case 0x12:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", cpu_get_pc(space->cpu));
 			if (i186.intr.poll_status & 0x8000)
-				int_callback(devtag_get_device(space->machine, "maincpu"), 0);
+				int_callback(space->machine->device("maincpu"), 0);
 			return i186.intr.poll_status;
 
 		case 0x13:
@@ -1461,7 +1461,7 @@ static const compis_gdc_interface i82720_interface =
 DRIVER_INIT( compis )
 {
 	compis_init( &i82720_interface );
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), compis_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), compis_irq_callback);
 	memset (&compis, 0, sizeof (compis) );
 }
 
@@ -1483,10 +1483,10 @@ MACHINE_RESET( compis )
 	compis_keyb_init();
 
 	/* OSP PIC 8259 */
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), compis_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), compis_irq_callback);
 
-	compis_devices.pic8259_master = devtag_get_device(machine, "pic8259_master");
-	compis_devices.pic8259_slave = devtag_get_device(machine, "pic8259_slave");
+	compis_devices.pic8259_master = machine->device("pic8259_master");
+	compis_devices.pic8259_slave = machine->device("pic8259_slave");
 }
 
 /*-------------------------------------------------------------------------*/

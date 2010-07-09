@@ -158,13 +158,13 @@ static DRIVER_INIT( mc10 )
 	mc10->keyboard_strobe = 0x00;
 
 	/* find devices */
-	mc10->mc6847 = devtag_get_device(machine, "mc6847");
-	mc10->dac = devtag_get_device(machine, "dac");
-	mc10->cassette = devtag_get_device(machine, "cassette");
+	mc10->mc6847 = machine->device("mc6847");
+	mc10->dac = machine->device("dac");
+	mc10->cassette = machine->device("cassette");
 
 	/* initialize memory */
-	mc10->ram = messram_get_ptr(devtag_get_device(machine, "messram"));
-	mc10->ram_size = messram_get_size(devtag_get_device(machine, "messram"));
+	mc10->ram = messram_get_ptr(machine->device("messram"));
+	mc10->ram_size = messram_get_size(machine->device("messram"));
 
 	memory_set_bankptr(machine, "bank1", mc10->ram);
 

@@ -91,7 +91,7 @@ static WRITE32_HANDLER( aga_overlay_w )
 static WRITE8_DEVICE_HANDLER( cd32_cia_0_porta_w )
 {
 	/* bit 1 = cd audio mute */
-	running_device *cdda = devtag_get_device(device->machine, "cdda");
+	running_device *cdda = device->machine->device("cdda");
 
 	if (cdda != NULL)
 		sound_set_output_gain(cdda, 0, BIT(data, 0) ? 0.0 : 1.0 );
@@ -380,7 +380,7 @@ INPUT_PORTS_END
 static READ8_DEVICE_HANDLER( a1200_cia_0_portA_r )
 {
 	UINT8 ret = input_port_read(device->machine, "CIA0PORTA") & 0xc0;	/* Gameport 1 and 0 buttons */
-	ret |= amiga_fdc_status_r(devtag_get_device(device->machine, "fdc"));
+	ret |= amiga_fdc_status_r(device->machine->device("fdc"));
 	return ret;
 }
 
@@ -576,7 +576,7 @@ ROM_END
 
 static UINT16 a1200_read_dskbytr(running_machine *machine)
 {
-	return amiga_fdc_get_byte(devtag_get_device(machine, "fdc"));
+	return amiga_fdc_get_byte(machine->device("fdc"));
 }
 
 static void a1200_write_dsklen(running_machine *machine, UINT16 data)
@@ -584,7 +584,7 @@ static void a1200_write_dsklen(running_machine *machine, UINT16 data)
 	if ( data & 0x8000 )
 	{
 		if ( CUSTOM_REG(REG_DSKLEN) & 0x8000 )
-			amiga_fdc_setup_dma(devtag_get_device(machine, "fdc"));
+			amiga_fdc_setup_dma(machine->device("fdc"));
 	}
 }
 

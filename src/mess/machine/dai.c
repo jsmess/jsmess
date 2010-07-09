@@ -48,7 +48,7 @@ static void dai_update_memory(running_machine *machine, int dai_rom_bank)
 
 static TIMER_CALLBACK(dai_bootstrap_callback)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, 0xc000);
+	cpu_set_reg(machine->device("maincpu"), STATE_GENPC, 0xc000);
 }
 
 static UINT8 dai_keyboard_scan_mask = 0;
@@ -144,7 +144,7 @@ static TIMER_CALLBACK( dai_timer )
 
 MACHINE_START( dai )
 {
-	dai_tms5501 = devtag_get_device(machine, "tms5501");
+	dai_tms5501 = machine->device("tms5501");
 
 	memory_configure_bank(machine, "bank2", 0, 4, memory_region(machine, "maincpu") + 0x010000, 0x1000);
 	timer_set(machine, attotime_zero, NULL, 0, dai_bootstrap_callback);
@@ -153,7 +153,7 @@ MACHINE_START( dai )
 
 MACHINE_RESET( dai )
 {
-	memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 }
 
 /***************************************************************************
@@ -195,7 +195,7 @@ READ8_HANDLER( dai_io_discrete_devices_r )
 		data |= 0x08;			// serial ready
 		if (mame_rand(space->machine)&0x01)
 			data |= 0x40;		// random number generator
-		if (cassette_input(devtag_get_device(space->machine, "cassette")) > 0.01)
+		if (cassette_input(space->machine->device("cassette")) > 0.01)
 			data |= 0x80;		// tape input
 		break;
 
@@ -230,8 +230,8 @@ WRITE8_HANDLER( dai_io_discrete_devices_w )
 		dai_paddle_enable = (data&0x08)>>3;
 		dai_cassette_motor[0] = (data&0x10)>>4;
 		dai_cassette_motor[1] = (data&0x20)>>5;
-		cassette_change_state(devtag_get_device(space->machine, "cassette"), dai_cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
-		cassette_output(devtag_get_device(space->machine, "cassette"), (data & 0x01) ? -1.0 : 1.0);
+		cassette_change_state(space->machine->device("cassette"), dai_cassette_motor[0]?CASSETTE_MOTOR_DISABLED:CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+		cassette_output(space->machine->device("cassette"), (data & 0x01) ? -1.0 : 1.0);
 		dai_update_memory (space->machine, (data&0xc0)>>6);
 		LOG_DAI_PORT_W (offset, (data&0x06)>>2, "discrete devices - paddle select");
 		LOG_DAI_PORT_W (offset, (data&0x08)>>3, "discrete devices - paddle enable");

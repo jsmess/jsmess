@@ -456,7 +456,7 @@ static VIDEO_START( tandy2k )
 	tandy2k_state *state = (tandy2k_state *)machine->driver_data;
 
 	/* find devices */
-	state->vpac = devtag_get_device(machine, CRT9007_TAG);
+	state->vpac = machine->device(CRT9007_TAG);
 }
 
 static VIDEO_UPDATE( tandy2k )
@@ -765,18 +765,18 @@ static MACHINE_START( tandy2k )
 	tandy2k_state *state = (tandy2k_state *)machine->driver_data;
 
 	/* find devices */
-	state->uart = devtag_get_device(machine, I8251A_TAG);
-	state->pit = devtag_get_device(machine, I8253_TAG);
-	state->pic0 = devtag_get_device(machine, I8259A_0_TAG);
-	state->pic1 = devtag_get_device(machine, I8259A_1_TAG);
-	state->fdc = devtag_get_device(machine, I8272A_TAG);
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->uart = machine->device(I8251A_TAG);
+	state->pit = machine->device(I8253_TAG);
+	state->pic0 = machine->device(I8259A_0_TAG);
+	state->pic1 = machine->device(I8259A_1_TAG);
+	state->fdc = machine->device(I8272A_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* memory banking */
 	const address_space *program = cputag_get_address_space(machine, I80186_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
-	int ram_size = messram_get_size(devtag_get_device(machine, "messram"));
+	UINT8 *ram = messram_get_ptr(machine->device("messram"));
+	int ram_size = messram_get_size(machine->device("messram"));
 
 	memory_install_ram(program, 0x00000, ram_size - 1, 0, 0, ram);
 

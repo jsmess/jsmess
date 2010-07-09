@@ -36,7 +36,7 @@ static READ8_DEVICE_HANDLER( vector06_8255_portb_r )
 
 static READ8_DEVICE_HANDLER (vector06_8255_portc_r )
 {
-	double level = cassette_input(devtag_get_device(device->machine, "cassette"));
+	double level = cassette_input(device->machine->device("cassette"));
 	UINT8 retVal = input_port_read(device->machine, "LINE8");
 	if (level >  0) {
 		retVal |= 0x10;
@@ -119,20 +119,20 @@ I8255A_INTERFACE( vector06_ppi8255_interface )
 };
 
 READ8_HANDLER(vector06_8255_1_r) {
-	return i8255a_r(devtag_get_device(space->machine, "ppi8255"), (offset ^ 0x03));
+	return i8255a_r(space->machine->device("ppi8255"), (offset ^ 0x03));
 }
 
 WRITE8_HANDLER(vector06_8255_1_w) {
-	i8255a_w(devtag_get_device(space->machine, "ppi8255"), (offset ^0x03) , data );
+	i8255a_w(space->machine->device("ppi8255"), (offset ^0x03) , data );
 
 }
 
 READ8_HANDLER(vector06_8255_2_r) {
-	return i8255a_r(devtag_get_device(space->machine, "ppi8255_2"), (offset ^ 0x03));
+	return i8255a_r(space->machine->device("ppi8255_2"), (offset ^ 0x03));
 }
 
 WRITE8_HANDLER(vector06_8255_2_w) {
-	i8255a_w(devtag_get_device(space->machine, "ppi8255_2"), (offset ^0x03) , data );
+	i8255a_w(space->machine->device("ppi8255_2"), (offset ^0x03) , data );
 
 }
 
@@ -156,17 +156,17 @@ static TIMER_CALLBACK(reset_check_callback)
 	UINT8 val = input_port_read(machine, "RESET");
 	if ((val & 1)==1) {
 		memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
-		devtag_get_device(machine, "maincpu")->reset();
+		machine->device("maincpu")->reset();
 	}
 	if ((val & 2)==2) {
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
-		devtag_get_device(machine, "maincpu")->reset();
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x0000);
+		machine->device("maincpu")->reset();
 	}
 }
 
 WRITE8_HANDLER(vector06_disc_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = space->machine->device("wd1793");
 	wd17xx_set_side (fdc,((data & 4) >> 2) ^ 1);
 	wd17xx_set_drive(fdc,data & 1);
 }
@@ -180,16 +180,16 @@ MACHINE_RESET( vector06 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), vector06_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), vector06_irq_callback);
 	memory_install_read_bank (space, 0x0000, 0x7fff, 0, 0, "bank1");
 	memory_install_write_bank(space, 0x0000, 0x7fff, 0, 0, "bank2");
 	memory_install_read_bank (space, 0x8000, 0xffff, 0, 0, "bank3");
 	memory_install_write_bank(space, 0x8000, 0xffff, 0, 0, "bank4");
 
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu") + 0x10000);
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
-	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x0000);
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x8000);
 
 	vector06_keyboard_mask = 0;
 	vector06_color_index = 0;

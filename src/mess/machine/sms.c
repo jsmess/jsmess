@@ -174,7 +174,7 @@ static TIMER_CALLBACK( lightgun_tick )
 static void sms_vdp_hcount_lphaser( running_machine *machine, int hpos)
 {
 	UINT8 tmp = ((hpos - 46) >> 1) & 0xff;
-	running_device *smsvdp = devtag_get_device(machine, "sms_vdp");
+	running_device *smsvdp = machine->device("sms_vdp");
 
 	//printf ("sms_vdp_hcount_lphaser: hpos %3d => hcount %2X\n", hpos, tmp);
 	sms_vdp_hcount_latch_w(smsvdp, 0, tmp);
@@ -214,7 +214,7 @@ static UINT8 sms_vdp_hcount( running_machine *machine )
 static void sms_vdp_hcount_latch( running_machine *machine )
 {
 	UINT8 value = sms_vdp_hcount(machine);
-	running_device *smsvdp = devtag_get_device(machine, "sms_vdp");
+	running_device *smsvdp = machine->device("sms_vdp");
 
 	sms_vdp_hcount_latch_w(smsvdp, 0, value);
 }
@@ -241,7 +241,7 @@ static int lphaser_sensor_is_on( running_machine *machine, const char *tag_x, co
 	int x = screen_hpos_nonscaled(machine->primary_screen, input_port_read(machine, tag_x));
 	int y = screen_vpos_nonscaled(machine->primary_screen, input_port_read(machine, tag_y));
 
-	if (sms_vdp_area_brightness(devtag_get_device(machine, "sms_vdp"), x, y, 60, 5) >= 0x7f)
+	if (sms_vdp_area_brightness(machine->device("sms_vdp"), x, y, 60, 5) >= 0x7f)
 	{
 		/* avoid latching hcount more than once in a line */
 		if (sms_state.lphaser_latch == 0)
@@ -456,7 +456,7 @@ WRITE8_HANDLER( sms_io_control_w )
 
 READ8_HANDLER( sms_count_r )
 {
-	running_device *smsvdp = devtag_get_device(space->machine, "sms_vdp");
+	running_device *smsvdp = space->machine->device("sms_vdp");
 
 	if (offset & 0x01)
 		return sms_vdp_hcount_latch_r(smsvdp, offset);
@@ -547,7 +547,7 @@ WRITE8_HANDLER( sms_ym2413_register_port_0_w )
 {
 	if (sms_state.has_fm)
 	{
-		running_device *ym = devtag_get_device(space->machine, "ym2413");
+		running_device *ym = space->machine->device("ym2413");
 		ym2413_w(ym, 0, (data & 0x3f));
 	}
 }
@@ -557,7 +557,7 @@ WRITE8_HANDLER( sms_ym2413_data_port_0_w )
 {
 	if (sms_state.has_fm)
 	{
-		running_device *ym = devtag_get_device(space->machine, "ym2413");
+		running_device *ym = space->machine->device("ym2413");
 		logerror("data_port_0_w %x %x\n", offset, data);
 		ym2413_w(ym, 1, data);
 	}
@@ -931,7 +931,7 @@ static void sms_machine_stop( running_machine &machine )
 {
 	/* Does the cartridge have SRAM that should be saved? */
 	if (sms_state.cartridge[sms_state.current_cartridge].sram_save) {
-		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(&machine, "cart1"));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart1"));
 		image->battery_save(sms_state.cartridge[sms_state.current_cartridge].cartSRAM, sizeof(UINT8) * NVRAM_SIZE );
 	}
 }
@@ -1429,7 +1429,7 @@ MACHINE_START( sms )
 MACHINE_RESET( sms )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *smsvdp = devtag_get_device(machine, "sms_vdp");
+	running_device *smsvdp = machine->device("sms_vdp");
 
 	sms_state.ctrl_reg = 0xff;
 	if (sms_state.has_fm)
@@ -1537,7 +1537,7 @@ WRITE8_HANDLER( sms_store_control_w )
 	else
 	{
 		/* Pull reset line of CPU #0 low */
-		devtag_get_device(space->machine, "maincpu")->reset();
+		space->machine->device("maincpu")->reset();
 		cputag_suspend(space->machine, "maincpu", SUSPEND_REASON_HALT, 1);
 	}
 	sms_state.store_control = data;
@@ -1618,10 +1618,10 @@ DRIVER_INIT( gamegeaj )
 /* This needs to be here to check if segascope has been enabled */
 VIDEO_UPDATE( sms1 )
 {
-	running_device *main_scr = devtag_get_device(screen->machine, "screen");
-	running_device *left_lcd = devtag_get_device(screen->machine, "left_lcd");
-	running_device *right_lcd = devtag_get_device(screen->machine, "right_lcd");
-	running_device *smsvdp = devtag_get_device(screen->machine, "sms_vdp");
+	running_device *main_scr = screen->machine->device("screen");
+	running_device *left_lcd = screen->machine->device("left_lcd");
+	running_device *right_lcd = screen->machine->device("right_lcd");
+	running_device *smsvdp = screen->machine->device("sms_vdp");
 	UINT8 segascope = input_port_read_safe(screen->machine, "SEGASCOPE", 0x00);
 
 	if (screen == main_scr)
@@ -1682,7 +1682,7 @@ VIDEO_UPDATE( sms1 )
 
 VIDEO_UPDATE( sms )
 {
-	running_device *smsvdp = devtag_get_device(screen->machine, "sms_vdp");
+	running_device *smsvdp = screen->machine->device("sms_vdp");
 	sms_vdp_update(smsvdp, bitmap, cliprect);
 
 	return 0;

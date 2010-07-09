@@ -174,7 +174,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( update_nmi )
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = machine->device("beep");
 	cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI,PULSE_LINE);
 	// dac_data_w(0,led_status&64?128:0);
 	beep_set_state(speaker,led_status&64?1:0);

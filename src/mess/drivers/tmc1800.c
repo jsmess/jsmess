@@ -198,7 +198,7 @@ static WRITE8_DEVICE_HANDLER( tmc2000_bankswitch_w )
 
 	memory_set_bank(device->machine, "bank1", TMC2000_BANK_RAM);
 
-	switch (messram_get_size(devtag_get_device(device->machine, "messram")))
+	switch (messram_get_size(device->machine->device("messram")))
 	{
 	case 4 * 1024:
 		memory_install_readwrite_bank(cputag_get_address_space(device->machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM), 0x0000, 0x0fff, 0, 0x7000, "bank1");
@@ -714,8 +714,8 @@ static MACHINE_START( tmc1800 )
 	tmc1800_state *state = (tmc1800_state *)machine->driver_data;
 
 	/* find devices */
-	state->cdp1861 = devtag_get_device(machine, CDP1861_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cdp1861 = machine->device(CDP1861_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1861_efx);
@@ -738,7 +738,7 @@ static MACHINE_START( osc1000b )
 	osc1000b_state *state = (osc1000b_state *)machine->driver_data;
 
 	/* find devices */
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);
@@ -773,8 +773,8 @@ static MACHINE_START( tmc2000 )
 	}
 
 	/* find devices */
-	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cdp1864 = machine->device(CDP1864_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine, state->colorram, TMC2000_COLORRAM_SIZE);
@@ -817,8 +817,8 @@ static MACHINE_START( oscnano )
 	state->monitor_ef4 = 1;
 
 	/* find devices */
-	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cdp1864 = machine->device(CDP1864_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->monitor_ef4);
@@ -998,7 +998,7 @@ static QUICKLOAD_LOAD( tmc1800 )
 	UINT8 *ptr = memory_region(image.device().machine, CDP1802_TAG);
 	int size = image.length();
 
-	if (size > messram_get_size(devtag_get_device(image.device().machine, "messram")))
+	if (size > messram_get_size(image.device().machine->device("messram")))
 	{
 		return IMAGE_INIT_FAIL;
 	}
@@ -1012,7 +1012,7 @@ static QUICKLOAD_LOAD( tmc1800 )
 
 static TIMER_CALLBACK(setup_beep)
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = machine->device("beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency( speaker, 0 );
 }

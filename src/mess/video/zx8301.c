@@ -302,7 +302,7 @@ static DEVICE_START( zx8301 )
 	zx8301->vsync = 1;
 
 	/* get the cpu */
-	zx8301->cpu = devtag_get_device(device->machine, intf->cpu_tag);
+	zx8301->cpu = device->machine->device(intf->cpu_tag);
 
 	/* get the screen device */
 	zx8301->screen = device->machine->device<screen_device>(intf->screen_tag);

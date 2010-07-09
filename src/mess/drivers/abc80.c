@@ -494,10 +494,10 @@ static MACHINE_START( abc80 )
 	abc80_state *state = (abc80_state *)machine->driver_data;
 
 	/* configure RAM expansion */
-	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank1", 0, 1, messram_get_ptr(machine->device("messram")), 0);
 	memory_set_bank(machine, "bank1", 0);
 
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 16*1024:
 		memory_unmap_readwrite(cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0);
@@ -509,8 +509,8 @@ static MACHINE_START( abc80 )
 	}
 
 	/* find devices */
-	state->z80pio = devtag_get_device(machine, Z80PIO_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->z80pio = machine->device(Z80PIO_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->key_data);

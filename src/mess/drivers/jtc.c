@@ -614,9 +614,9 @@ static MACHINE_START( jtc )
 	jtc_state *state = (jtc_state *)machine->driver_data;
 
 	/* find devices */
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* register for state saving */
 	//state_save_register_global(machine, state->);

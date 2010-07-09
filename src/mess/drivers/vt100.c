@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 static READ8_HANDLER(vt100_flags_r)
 {
 	UINT8 retVal = 0;
-	retVal |= vt_video_lba7_r(devtag_get_device(space->machine, "vt100_video"),0) * 0x40;
+	retVal |= vt_video_lba7_r(space->machine->device("vt100_video"),0) * 0x40;
 	retVal |= vt100_keyboard_int * 0x80;
 	return retVal;
 }
@@ -83,7 +83,7 @@ static TIMER_CALLBACK(keyboard_callback)
 static WRITE8_HANDLER(vt100_keyboard_w)
 {
 
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 
 	output_set_value("online_led",BIT(data,5) ? 0 : 1);
 	output_set_value("local_led", BIT(data,5));
@@ -261,7 +261,7 @@ INPUT_PORTS_END
 
 static VIDEO_UPDATE( vt100 )
 {
-	running_device *devconf = devtag_get_device(screen->machine, "vt100_video");
+	running_device *devconf = screen->machine->device("vt100_video");
 	vt_video_update( devconf, bitmap, cliprect);
 	return 0;
 }
@@ -299,7 +299,7 @@ static MACHINE_RESET(vt100)
 
 	vt100_key_scan = 0;
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), vt100_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), vt100_irq_callback);
 }
 
 static READ8_DEVICE_HANDLER (vt100_read_video_ram_r )

@@ -77,7 +77,7 @@ static UINT8 at_speaker_get_spk(void)
 
 static void at_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 {
-	running_device *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = machine->device("speaker");
 	at_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
@@ -85,7 +85,7 @@ static void at_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 
 static void at_speaker_set_input(running_machine *machine, UINT8 data)
 {
-	running_device *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = machine->device("speaker");
 	at_speaker_input = data ? 1 : 0;
 	speaker_level_w( speaker, at_speaker_get_spk() );
 }
@@ -174,12 +174,12 @@ static void init_at_common(running_machine *machine, const struct kbdc8042_inter
 	soundblaster_config(&soundblaster);
 	kbdc8042_init(machine, at8042);
 
-	if (messram_get_size(devtag_get_device(machine, "messram")) > 0x0a0000)
+	if (messram_get_size(machine->device("messram")) > 0x0a0000)
 	{
-		offs_t ram_limit = 0x100000 + messram_get_size(devtag_get_device(machine, "messram")) - 0x0a0000;
+		offs_t ram_limit = 0x100000 + messram_get_size(machine->device("messram")) - 0x0a0000;
 		memory_install_read_bank(space, 0x100000,  ram_limit - 1, 0, 0, "bank1");
 		memory_install_write_bank(space, 0x100000,  ram_limit - 1, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xa0000);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0xa0000);
 	}
 }
 
@@ -233,7 +233,7 @@ WRITE8_HANDLER(at_page8_w)
 	if (LOG_PORT80 && (offset == 0))
 	{
 		logerror(" at_page8_w(): Port 80h <== 0x%02x (PC=0x%08x)\n", data,
-							(unsigned) cpu_get_reg(devtag_get_device(space->machine, "maincpu"), STATE_GENPC));
+							(unsigned) cpu_get_reg(space->machine->device("maincpu"), STATE_GENPC));
 	}
 
 	switch(offset % 8) {
@@ -421,8 +421,8 @@ static void at_fdc_interrupt(running_machine *machine, int state)
 {
 	at_state *st = (at_state *)machine->driver_data;
 	pic8259_ir6_w(st->pic8259_master, state);
-//if ( messram_get_ptr(devtag_get_device(machine, "messram"))[0x0490] == 0x74 )
-//  messram_get_ptr(devtag_get_device(machine, "messram"))[0x0490] = 0x54;
+//if ( messram_get_ptr(machine->device("messram"))[0x0490] == 0x74 )
+//  messram_get_ptr(machine->device("messram"))[0x0490] = 0x54;
 }
 
 
@@ -434,7 +434,7 @@ static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
 
 static running_device *at_get_device(running_machine *machine)
 {
-	return devtag_get_device(machine, "upd765");
+	return machine->device("upd765");
 }
 
 static const struct pc_fdc_interface fdc_interface =
@@ -497,7 +497,7 @@ static struct {
 
 static READ8_HANDLER( at_kbdc8042_p1_r )
 {
-	//logerror("%04x: reading P1\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")) );
+	//logerror("%04x: reading P1\n", cpu_get_pc(space->machine->device("maincpu")) );
 	return 0xFF;
 }
 
@@ -511,9 +511,9 @@ static READ8_HANDLER( at_kbdc8042_p2_r )
 static WRITE8_HANDLER( at_kbdc8042_p2_w )
 {
 	at_state *st = (at_state *)space->machine->driver_data;
-	running_device *keyboard = devtag_get_device(space->machine, "keyboard");
+	running_device *keyboard = space->machine->device("keyboard");
 
-	//logerror("%04x: writing $%02x to P2\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), data );
+	//logerror("%04x: writing $%02x to P2\n", cpu_get_pc(space->machine->device("maincpu")), data );
 
 	at_set_gate_a20( space->machine, ( data & 0x02 ) ? 1 : 0 );
 
@@ -577,7 +577,7 @@ READ8_HANDLER(at_kbdc8042_r)
 	switch ( offset )
 	{
 	case 0:		/* A2 is wired to 8042 A0 */
-		data = upi41_master_r( devtag_get_device(space->machine, "kbdc8042"), 0 );
+		data = upi41_master_r( space->machine->device("kbdc8042"), 0 );
 		break;
 
 	case 1:
@@ -606,7 +606,7 @@ READ8_HANDLER(at_kbdc8042_r)
 		break;
 
 	case 4:		/* A2 is wired to 8042 A0 */
-		data = upi41_master_r( devtag_get_device(space->machine, "kbdc8042"), 1 );
+		data = upi41_master_r( space->machine->device("kbdc8042"), 1 );
 		break;
 	}
 
@@ -624,7 +624,7 @@ WRITE8_HANDLER(at_kbdc8042_w)
 
 	switch (offset) {
 	case 0:		/* A2 is wired to 8042 A0 */
-		upi41_master_w( devtag_get_device(space->machine, "kbdc8042"), 0, data );
+		upi41_master_w( space->machine->device("kbdc8042"), 0, data );
 		break;
 
 	case 1:
@@ -635,7 +635,7 @@ WRITE8_HANDLER(at_kbdc8042_w)
 
 	case 4:		/* A2 is wired to 8042 A0 */
 //printf("8042 command %02x\n", data );
-		upi41_master_w( devtag_get_device(space->machine, "kbdc8042"), 1, data );
+		upi41_master_w( space->machine->device("kbdc8042"), 1, data );
 		break;
     }
 }
@@ -765,7 +765,7 @@ static void pc_set_irq_line(running_machine *machine,int irq, int state)
 
 MACHINE_START( at )
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), at_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), at_irq_callback);
 	/* FDC/HDC hardware */
 	pc_fdc_init( machine, &fdc_interface );
 	pc_hdc_setup(machine, pc_set_irq_line);
@@ -776,13 +776,13 @@ MACHINE_START( at )
 MACHINE_RESET( at )
 {
 	at_state *st = (at_state *)machine->driver_data;
-	st->maincpu = devtag_get_device(machine, "maincpu");
-	st->pic8259_master = devtag_get_device(machine, "pic8259_master");
-	st->pic8259_slave = devtag_get_device(machine, "pic8259_slave");
-	st->dma8237_1 = devtag_get_device(machine, "dma8237_1");
-	st->dma8237_2 = devtag_get_device(machine, "dma8237_2");
-	st->pit8254 = devtag_get_device(machine, "pit8254");
-	pc_mouse_set_serial_port( devtag_get_device(machine, "ns16450_0") );
+	st->maincpu = machine->device("maincpu");
+	st->pic8259_master = machine->device("pic8259_master");
+	st->pic8259_slave = machine->device("pic8259_slave");
+	st->dma8237_1 = machine->device("dma8237_1");
+	st->dma8237_2 = machine->device("dma8237_2");
+	st->pit8254 = machine->device("pit8254");
+	pc_mouse_set_serial_port( machine->device("ns16450_0") );
 	pc_hdc_set_dma8237_device( st->dma8237_1 );
 	poll_delay = 4;
 }

@@ -153,7 +153,7 @@ static UINT8 read_expansion(running_machine *machine)
 
 static running_device *get_printer_device(running_machine *machine)
 {
-	return devtag_get_device(machine, "printer");
+	return machine->device("printer");
 }
 
 static int expansion_box_installed(running_machine *machine)
@@ -201,7 +201,7 @@ const wd17xx_interface comx35_wd17xx_interface =
 static UINT8 fdc_r(const address_space *space)
 {
 	comx35_state *state = (comx35_state *)space->machine->driver_data;
-	running_device *fdc = devtag_get_device(space->machine, WD1770_TAG);
+	running_device *fdc = space->machine->device(WD1770_TAG);
 
 	UINT8 data;
 
@@ -219,7 +219,7 @@ static UINT8 fdc_r(const address_space *space)
 
 static void fdc_w(const address_space *space, UINT8 data)
 {
-	running_device *fdc = devtag_get_device(space->machine, WD1770_TAG);
+	running_device *fdc = space->machine->device(WD1770_TAG);
 	/*
 
         bit     description
@@ -427,7 +427,7 @@ static void set_active_bank(running_machine *machine)
 
 	case BANK_80_COLUMNS:
 		{
-			running_device *mc6845 = devtag_get_device(machine, MC6845_TAG);
+			running_device *mc6845 = machine->device(MC6845_TAG);
 
 			memory_install_read_bank(program, 0xc000, 0xc7ff, 0, 0, "bank1"); // ROM
 			memory_unmap_write(program, 0xc000, 0xc7ff, 0, 0); // ROM
@@ -629,7 +629,7 @@ MACHINE_START( comx35p )
 	memory_configure_bank(machine, "bank1", BANK_PRINTER_THERMAL, 1, memory_region(machine, "thermal"), 0);
 	memory_configure_bank(machine, "bank1", BANK_JOYCARD, 1, memory_region(machine, CDP1802_TAG), 0);
 	memory_configure_bank(machine, "bank1", BANK_80_COLUMNS, 1, memory_region(machine, "80column"), 0);
-	memory_configure_bank(machine, "bank1", BANK_RAMCARD, 4, messram_get_ptr(devtag_get_device(machine, "messram")), 0x2000);
+	memory_configure_bank(machine, "bank1", BANK_RAMCARD, 4, messram_get_ptr(machine->device("messram")), 0x2000);
 
 	memory_set_bank(machine, "bank1", 0);
 

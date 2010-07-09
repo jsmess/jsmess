@@ -138,7 +138,7 @@ static WRITE16_HANDLER( glasgow_lcd_w )
 
 static WRITE16_HANDLER( glasgow_lcd_flag_w )
 {
-	running_device *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = space->machine->device("beep");
 	UINT16 lcd_flag = data & 0x8100;
 
 	beep_set_state(speaker, (lcd_flag & 0x100) ? 1 : 0);
@@ -362,7 +362,7 @@ static WRITE16_HANDLER( write_board )
 
 static WRITE16_HANDLER( write_irq_flag )
 {
-	running_device *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = space->machine->device("beep");
 
 	beep_set_state(speaker, data & 0x100);
 	logerror("Write 0x800004 = %x \n", data);
@@ -475,7 +475,7 @@ static WRITE32_HANDLER( write_board32 )
 
 static WRITE32_HANDLER ( write_beeper32 )
 {
-	running_device *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = space->machine->device("beep");
 	beep_set_state(speaker, data & 0x01000000);
 	logerror("Write 0x8000004 = %x \n", data);
 	irq_flag = 1;
@@ -502,7 +502,7 @@ static TIMER_CALLBACK( update_nmi32 )
 
 static MACHINE_START( glasgow )
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = machine->device("beep");
 
 	key_selector = 0;
 	irq_flag = 0;
@@ -514,7 +514,7 @@ static MACHINE_START( glasgow )
 
 static MACHINE_START( dallas32 )
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = machine->device("beep");
 
 	lcd_shift_counter = 3;
 	timer_pulse(machine, ATTOTIME_IN_HZ(50), NULL, 0, update_nmi32);

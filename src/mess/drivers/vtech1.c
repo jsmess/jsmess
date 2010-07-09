@@ -239,7 +239,7 @@ static SNAPSHOT_LOAD( vtech1 )
 		memory_write_byte(space, 0x788e, start % 256); /* usr subroutine address */
 		memory_write_byte(space, 0x788f, start / 256);
 		image.message(" %s (M)\nsize=%04X : start=%04X : end=%04X",pgmname,size,start,end);
-		cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, start);				/* start program */
+		cpu_set_reg(image.device().machine->device("maincpu"), STATE_GENPC, start);				/* start program */
 		break;
 
 	default:
@@ -253,7 +253,7 @@ static SNAPSHOT_LOAD( vtech1 )
 
 static Z80BIN_EXECUTE( vtech1 )
 {
-	running_device *cpu = devtag_get_device(machine, "maincpu");
+	running_device *cpu = machine->device("maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* A Microsoft Basic program needs some manipulation before it can be run.
@@ -689,14 +689,14 @@ static DRIVER_INIT( vtech1 )
 	int id;
 
 	/* find devices */
-	vtech1->mc6847 = devtag_get_device(machine, "mc6847");
-	vtech1->speaker = devtag_get_device(machine, "speaker");
-	vtech1->cassette = devtag_get_device(machine, "cassette");
-	vtech1->printer = devtag_get_device(machine, "printer");
+	vtech1->mc6847 = machine->device("mc6847");
+	vtech1->speaker = machine->device("speaker");
+	vtech1->cassette = machine->device("cassette");
+	vtech1->printer = machine->device("printer");
 
 	/* ram */
-	vtech1->ram = messram_get_ptr(devtag_get_device(machine, "messram"));
-	vtech1->ram_size = messram_get_size(devtag_get_device(machine, "messram"));
+	vtech1->ram = messram_get_ptr(machine->device("messram"));
+	vtech1->ram_size = messram_get_size(machine->device("messram"));
 
 	/* setup memory banking */
 	memory_set_bankptr(machine, "bank1", vtech1->ram);

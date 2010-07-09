@@ -252,13 +252,13 @@ static TIMER_DEVICE_CALLBACK( einstein_ctc_trigger_callback )
 
 static WRITE_LINE_DEVICE_HANDLER( einstein_serial_transmit_clock )
 {
-	running_device *uart = devtag_get_device(device->machine, IC_I060);
+	running_device *uart = device->machine->device(IC_I060);
 	msm8251_transmit_clock(uart);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
 {
-	running_device *uart = devtag_get_device(device->machine, IC_I060);
+	running_device *uart = device->machine->device(IC_I060);
 	msm8251_receive_clock(uart);
 }
 
@@ -270,7 +270,7 @@ static WRITE_LINE_DEVICE_HANDLER( einstein_serial_receive_clock )
 static void einstein_page_rom(running_machine *machine)
 {
 	einstein_state *einstein = (einstein_state *)machine->driver_data;
-	memory_set_bankptr(machine, "bank1", einstein->rom_enabled ? memory_region(machine, "bios") : messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank1", einstein->rom_enabled ? memory_region(machine, "bios") : messram_get_ptr(machine->device("messram")));
 }
 
 /* writing to this port is a simple trigger, and switches between RAM and ROM */
@@ -288,7 +288,7 @@ static WRITE8_HANDLER( einstein_rom_w )
 
 static READ8_HANDLER( einstein_kybintmsk_r )
 {
-	running_device *printer = devtag_get_device(space->machine, "centronics");
+	running_device *printer = space->machine->device("centronics");
 	einstein_state *einstein = (einstein_state *)space->machine->driver_data;
 	UINT8 data = 0;
 
@@ -395,12 +395,12 @@ static MACHINE_RESET( einstein )
 	UINT8 config = input_port_read(machine, "config");
 
 	/* save pointers to our devices */
-	einstein->color_screen = devtag_get_device(machine, "screen");
-	einstein->ctc = devtag_get_device(machine, IC_I058);
+	einstein->color_screen = machine->device("screen");
+	einstein->ctc = machine->device(IC_I058);
 
 	/* initialize memory mapping */
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")));
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")));
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
 	einstein->rom_enabled = 1;
 	einstein_page_rom(machine);
 
@@ -414,13 +414,13 @@ static MACHINE_RESET( einstein )
 	einstein->ctc_trigger = 0;
 
 	/* configure floppy drives */
-	floppy = devtag_get_device(machine, "floppy0");
+	floppy = machine->device("floppy0");
 	floppy_drive_set_geometry(floppy, config & 0x01 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
-	floppy = devtag_get_device(machine, "floppy1");
+	floppy = machine->device("floppy1");
 	floppy_drive_set_geometry(floppy, config & 0x02 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
-	floppy = devtag_get_device(machine, "floppy2");
+	floppy = machine->device("floppy2");
 	floppy_drive_set_geometry(floppy, config & 0x04 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
-	floppy = devtag_get_device(machine, "floppy3");
+	floppy = machine->device("floppy3");
 	floppy_drive_set_geometry(floppy, config & 0x08 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
 }
 
@@ -432,7 +432,7 @@ static MACHINE_RESET( einstein2 )
 	MACHINE_RESET_CALL(einstein);
 
 	/* get 80 column specific devices */
-	einstein->mc6845 = devtag_get_device(machine, "crtc");
+	einstein->mc6845 = machine->device("crtc");
 	einstein->crtc_screen = machine->device<screen_device>("80column");
 
 	/* 80 column card palette */

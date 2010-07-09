@@ -347,7 +347,7 @@ static struct
 
 INLINE void COPS_send_data_if_possible(running_machine *machine)
 {
-	running_device *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = machine->device("via6522_0");
 
 	if ((! hold_COPS_data) && fifo_size && (! COPS_Ready))
 	{
@@ -437,7 +437,7 @@ static void scan_keyboard(running_machine *machine)
 						if (keycode == NMIcode)
 						{	/* generate NMI interrupt */
 							cputag_set_input_line(machine, "maincpu", M68K_IRQ_7, PULSE_LINE);
-							cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
+							cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_7, M68K_INT_ACK_AUTOVECTOR);
 						}
 #endif
 						COPS_queue_data(machine, & keycode, 1);
@@ -535,7 +535,7 @@ static TIMER_CALLBACK(handle_mouse)
 static TIMER_CALLBACK(read_COPS_command)
 {
 	int command;
-	running_device *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = machine->device("via6522_0");
 
 	COPS_Ready = 0;
 
@@ -827,7 +827,7 @@ static READ8_DEVICE_HANDLER(COPS_via_in_b)
 
 static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 {
-	running_device *via_0 = devtag_get_device(device->machine, "via6522_0");
+	running_device *via_0 = device->machine->device("via6522_0");
 
 	/* pull-up */
 	data |= (~ via_r(via_0, VIA_DDRA)) & 0x01;
@@ -853,7 +853,7 @@ static WRITE8_DEVICE_HANDLER(COPS_via_out_b)
 
 static WRITE8_DEVICE_HANDLER(COPS_via_out_cb2)
 {
-	running_device *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = device->machine->device("speaker");
 	speaker_level_w(speaker, data);
 }
 
@@ -978,7 +978,7 @@ static DIRECT_UPDATE_HANDLER (lisa_OPbaseoverride)
 
 	}
 
-	if (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), M68K_SR) & 0x2000)
+	if (cpu_get_reg(space->machine->device("maincpu"), M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1159,7 +1159,7 @@ MACHINE_RESET( lisa )
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), lisa_OPbaseoverride);
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "fdccpu",  ADDRESS_SPACE_PROGRAM), lisa_fdc_OPbaseoverride);
 
-	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), /*lisa_reset_instr_callback*/NULL);
+	m68k_set_reset_callback(machine->device("maincpu"), /*lisa_reset_instr_callback*/NULL);
 
 	/* init MMU */
 
@@ -1188,14 +1188,14 @@ MACHINE_RESET( lisa )
 	init_COPS(machine);
 
 	{
-		running_device *via_0 = devtag_get_device(machine, "via6522_0");
+		running_device *via_0 = machine->device("via6522_0");
 		COPS_via_out_ca2(via_0, 0, 0);	/* VIA core forgets to do so */
 	}
 
 	/* initialize floppy */
 	{
 		if (lisa_features.floppy_hardware == sony_lisa2)
-			sony_set_enable_lines(devtag_get_device(machine, "fdc"),1);	/* on lisa2, drive unit 1 is always selected (?) */
+			sony_set_enable_lines(machine->device("fdc"),1);	/* on lisa2, drive unit 1 is always selected (?) */
 	}
 }
 
@@ -1325,7 +1325,7 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 			MT1 = offset & 1;
 			if (MT1 && ! oldMT1)
 			{
-				running_device *fdc = devtag_get_device(machine, "fdc");
+				running_device *fdc = machine->device("fdc");
 
 				PWM_floppy_motor_speed = (PWM_floppy_motor_speed << 1) & 0xff;
 				if (applefdc_get_lines(fdc) & APPLEFDC_PH0)
@@ -1347,7 +1347,7 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 		else
 #endif
 		if (lisa_features.floppy_hardware == sony_lisa210)
-			sony_set_sel_line(devtag_get_device(machine, "fdc"), offset & 1);
+			sony_set_sel_line(machine->device("fdc"), offset & 1);
 		break;
 	case 6:
 		DISK_DIAG = offset & 1;
@@ -1362,7 +1362,7 @@ INLINE void lisa_fdc_ttl_glue_access(running_machine *machine, offs_t offset)
 READ8_HANDLER ( lisa_fdc_io_r )
 {
 	int answer=0;
-	running_device *fdc = devtag_get_device(space->machine, "fdc");
+	running_device *fdc = space->machine->device("fdc");
 
 	switch ((offset & 0x0030) >> 4)
 	{
@@ -1389,7 +1389,7 @@ READ8_HANDLER ( lisa_fdc_io_r )
 
 WRITE8_HANDLER ( lisa_fdc_io_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "fdc");
+	running_device *fdc = space->machine->device("fdc");
 
 	switch ((offset & 0x0030) >> 4)
 	{
@@ -1522,7 +1522,7 @@ READ16_HANDLER ( lisa_r )
 		}
 	}
 
-	if (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), M68K_SR) & 0x2000)
+	if (cpu_get_reg(space->machine->device("maincpu"), M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1626,12 +1626,12 @@ READ16_HANDLER ( lisa_r )
 					if ((time_in_frame >= 364) && (time_in_frame <= 375))
 					{
 						answer = videoROM_ptr[videoROM_address|0x80] << 8;
-				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(devtag_get_device(space->machine, "maincpu")), time_in_frame);
+				logerror("reading1 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(space->machine->device("maincpu")), time_in_frame);
 					}
 					else
 					{
 						answer = videoROM_ptr[videoROM_address] << 8;
-				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(devtag_get_device(space->machine, "maincpu")), time_in_frame);
+				logerror("reading2 %06X=%04x PC=%06x time=%d\n", address, answer, cpu_get_pc(space->machine->device("maincpu")), time_in_frame);
 					}
 				}
 
@@ -1730,7 +1730,7 @@ WRITE16_HANDLER ( lisa_w )
 		}
 	}
 
-	if (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), M68K_SR) & 0x2000)
+	if (cpu_get_reg(space->machine->device("maincpu"), M68K_SR) & 0x2000)
 		/* supervisor mode -> force register file 0 */
 		the_seg = 0;
 
@@ -1892,19 +1892,19 @@ INLINE void cpu_board_control_access(running_machine *machine, offs_t offset)
 		seg &= ~2;
 		break;
 	case 0x0010:	/* SETUP register SET */
-    	logerror("setup SET PC=%x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")));
+    	logerror("setup SET PC=%x\n", cpu_get_pc(machine->device("maincpu")));
 		setup = 1;
 		break;
 	case 0x0012:	/* SETUP register RESET */
-    	logerror("setup UNSET PC=%x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")));
+    	logerror("setup UNSET PC=%x\n", cpu_get_pc(machine->device("maincpu")));
 		setup = 0;
 		break;
 	case 0x001A:	/* Enable Vertical Retrace Interrupt */
-    	logerror("enable retrace PC=%x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")));
+    	logerror("enable retrace PC=%x\n", cpu_get_pc(machine->device("maincpu")));
 		VTMSK = 1;
 		break;
 	case 0x0018:	/* Disable Vertical Retrace Interrupt */
-    	logerror("disable retrace PC=%x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")));
+    	logerror("disable retrace PC=%x\n", cpu_get_pc(machine->device("maincpu")));
 		VTMSK = 0;
 		set_VTIR(machine, 2);
 		break;
@@ -1923,8 +1923,8 @@ INLINE void cpu_board_control_access(running_machine *machine, offs_t offset)
 
 static READ16_HANDLER ( lisa_IO_r )
 {
-	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
-	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_0 = space->machine->device("via6522_0");
+	running_device *via_1 = space->machine->device("via6522_1");
 	int answer=0;
 
 	switch ((offset & 0x7000) >> 12)
@@ -2040,7 +2040,7 @@ static READ16_HANDLER ( lisa_IO_r )
 			else
 						answer |= 0x04;
 			/* huh... we need to emulate some other bits */
-			 logerror("read status PC=%x val=%x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), answer);
+			 logerror("read status PC=%x val=%x\n", cpu_get_pc(space->machine->device("maincpu")), answer);
 
 			break;
 		}
@@ -2052,8 +2052,8 @@ static READ16_HANDLER ( lisa_IO_r )
 
 static WRITE16_HANDLER ( lisa_IO_w )
 {
-	running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
-	running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
+	running_device *via_0 = space->machine->device("via6522_0");
+	running_device *via_1 = space->machine->device("via6522_1");
 
 	switch ((offset & 0x7000) >> 12)
 	{

@@ -187,7 +187,7 @@ static TIMER_CALLBACK(timer_callback)
 	timer ^=1;
 	if (timer==1) drum_index++;
 	if (drum_index==13) drum_index=0;
-	i4004_set_test(devtag_get_device(machine, "maincpu"),timer);
+	i4004_set_test(machine->device("maincpu"),timer);
 
 }
 

@@ -602,15 +602,15 @@ static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer 
 {
 	coco_state *state = (coco_state *)machine->driver_data;
 
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_PC, trailer->reg_pc);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_X, trailer->reg_x);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_Y, trailer->reg_y);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_U, trailer->reg_u);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_S, trailer->reg_s);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_DP, trailer->reg_dp);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_B, trailer->reg_b);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_A, trailer->reg_a);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), M6809_CC, trailer->reg_cc);
+	cpu_set_reg(machine->device("maincpu"), M6809_PC, trailer->reg_pc);
+	cpu_set_reg(machine->device("maincpu"), M6809_X, trailer->reg_x);
+	cpu_set_reg(machine->device("maincpu"), M6809_Y, trailer->reg_y);
+	cpu_set_reg(machine->device("maincpu"), M6809_U, trailer->reg_u);
+	cpu_set_reg(machine->device("maincpu"), M6809_S, trailer->reg_s);
+	cpu_set_reg(machine->device("maincpu"), M6809_DP, trailer->reg_dp);
+	cpu_set_reg(machine->device("maincpu"), M6809_B, trailer->reg_b);
+	cpu_set_reg(machine->device("maincpu"), M6809_A, trailer->reg_a);
+	cpu_set_reg(machine->device("maincpu"), M6809_CC, trailer->reg_cc);
 
 	/* I seem to only be able to get a small amount of the PIA state from the
      * snapshot trailers. Thus I am going to configure the PIA myself. The
@@ -660,11 +660,11 @@ static int generic_pak_load(device_image_interface &image, int rambase_index, in
 	int trailer_load = 0;
 
 	ROM = memory_region(image.device().machine, "maincpu");
-	rambase = &messram_get_ptr(devtag_get_device(image.device().machine, "messram"))[rambase_index];
+	rambase = &messram_get_ptr(image.device().machine->device("messram"))[rambase_index];
 	rombase = &ROM[rombase_index];
 	pakbase = &ROM[pakbase_index];
 
-	if (messram_get_size(devtag_get_device(image.device().machine, "messram")) < 0x10000)
+	if (messram_get_size(image.device().machine->device("messram")) < 0x10000)
 	{
 		if (LOG_PAK)
 			logerror("Cannot load PAK files without at least 64k.\n");
@@ -742,7 +742,7 @@ SNAPSHOT_LOAD ( coco_pak )
 
 SNAPSHOT_LOAD ( coco3_pak )
 {
-	return generic_pak_load(image, (0x70000 % messram_get_size(devtag_get_device(image.device().machine, "messram"))), 0x0000, 0xc000);
+	return generic_pak_load(image, (0x70000 % messram_get_size(image.device().machine->device("messram"))), 0x0000, 0xc000);
 }
 
 /***************************************************************************
@@ -775,7 +775,7 @@ QUICKLOAD_LOAD ( coco )
 		if (preamble != 0)
 		{
 			/* start address - just set the address and return */
-			cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, block_address);
+			cpu_set_reg(image.device().machine->device("maincpu"), STATE_GENPC, block_address);
 			done = TRUE;
 		}
 		else
@@ -1283,7 +1283,7 @@ READ8_HANDLER ( dgnalpha_psg_porta_read )
 
 WRITE8_HANDLER( dgnalpha_psg_porta_write )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd2797");
+	running_device *fdc = space->machine->device("wd2797");
 	/* Bits 0..3 are the drive select lines for the internal floppy interface */
 	/* Bit 4 is the motor on, in the real hardware these are inverted on their way to the drive */
 	/* Bits 5,6,7 are connected to /DDEN, ENP and 5/8 on the WD2797 */
@@ -1678,7 +1678,7 @@ static WRITE8_DEVICE_HANDLER( dragon64_pia1_pb_w )
 
 static WRITE8_DEVICE_HANDLER( dgnalpha_pia2_pa_w )
 {
-	running_device *ay8912 = devtag_get_device(device->machine, "ay8912");
+	running_device *ay8912 = device->machine->device("ay8912");
 	int	bc_flags;		/* BCDDIR/BC1, as connected to PIA2 port a bits 0 and 1 */
 
 	/* If bit 2 of the pia2 ddra is 1 then this pin is an output so use it */
@@ -1764,7 +1764,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_drq_w )
 /* The Dragon Alpha hardware reverses the order of the WD2797 registers */
 READ8_HANDLER(dgnalpha_wd2797_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd2797");
+	running_device *fdc = space->machine->device("wd2797");
 	int result = 0;
 
 	switch(offset & 0x03)
@@ -1790,7 +1790,7 @@ READ8_HANDLER(dgnalpha_wd2797_r)
 
 WRITE8_HANDLER(dgnalpha_wd2797_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd2797");
+	running_device *fdc = space->machine->device("wd2797");
     switch(offset & 0x3)
 	{
 		case 0:
@@ -1852,9 +1852,9 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco )
        to access 32K of ram, and also allows the cocoe driver to access
        the full 64K, as this uses Color Basic 1.2, which can configure 64K rams */
 
-	if (messram_get_size(devtag_get_device(device->machine, "messram")) > 0x8000)		/* 1 bank of 64K rams */
+	if (messram_get_size(device->machine->device("messram")) > 0x8000)		/* 1 bank of 64K rams */
 		result = (pia6821_get_output_b(state->pia_0) & 0x80) >> 5;
-	else if (messram_get_size(devtag_get_device(device->machine, "messram")) >= 0x4000)	/* 1 or 2 banks of 16K rams */
+	else if (messram_get_size(device->machine->device("messram")) >= 0x4000)	/* 1 or 2 banks of 16K rams */
 		result = 0x04;
 	else
 		result = 0x00;			/* 4K Rams */
@@ -1873,7 +1873,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_dragon32 )
        as both the 64 and Alpha, always have 64K rams, also the meaning of
        the bit is different with respect to the CoCo 1 */
 
-	if (messram_get_size(devtag_get_device(device->machine, "messram")) > 0x8000)
+	if (messram_get_size(device->machine->device("messram")) > 0x8000)
 		result = 0x00;		/* 1 bank of 64K, rams */
 	else
 		result = 0x04;		/* 2 banks of 16K rams */
@@ -1890,9 +1890,9 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
      */
 	int result;
 
-	if (messram_get_size(devtag_get_device(device->machine, "messram")) <= 0x1000)
+	if (messram_get_size(device->machine->device("messram")) <= 0x1000)
 		result = 0x00;					/* 4K: wire pia1_pb2 low */
-	else if (messram_get_size(devtag_get_device(device->machine, "messram")) <= 0x4000)
+	else if (messram_get_size(device->machine->device("messram")) <= 0x4000)
 		result = 0x04;					/* 16K: wire pia1_pb2 high */
 	else
 		result = (pia6821_get_output_b(state->pia_0) & 0x40) >> 4;		/* 32/64K: wire output of pia0_pb6 to input pia1_pb2  */
@@ -1933,11 +1933,11 @@ WRITE8_HANDLER ( dgnplus_reg_w )
 
 	switch (map)
 	{
-		case 0x00	: bottom_32k=&messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x00000]; break;
-		case 0x01	: bottom_32k=&messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x10000]; break;
-		case 0x02	: bottom_32k=&messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x18000]; break;
-		case 0x03	: bottom_32k=&messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x00000]; break;
-		default	: bottom_32k=&messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x00000]; break; // Just to shut the compiler up !
+		case 0x00	: bottom_32k=&messram_get_ptr(space->machine->device("messram"))[0x00000]; break;
+		case 0x01	: bottom_32k=&messram_get_ptr(space->machine->device("messram"))[0x10000]; break;
+		case 0x02	: bottom_32k=&messram_get_ptr(space->machine->device("messram"))[0x18000]; break;
+		case 0x03	: bottom_32k=&messram_get_ptr(space->machine->device("messram"))[0x00000]; break;
+		default	: bottom_32k=&messram_get_ptr(space->machine->device("messram"))[0x00000]; break; // Just to shut the compiler up !
 	}
 
 	setup_memory_map(space->machine);
@@ -1973,7 +1973,7 @@ static SAM6883_SET_MPU_RATE( d_sam_set_mpurate )
      * TODO:  Make the overclock more accurate.  In dual speed, ROM was a fast
      * access but RAM was not.  I don't know how to simulate this.
      */
-    cpu_set_clockscale(devtag_get_device(device->machine, "maincpu"), val ? 2 : 1);
+    cpu_set_clockscale(device->machine->device("maincpu"), val ? 2 : 1);
 }
 
 READ8_HANDLER(dgnalpha_mapped_irq_r)
@@ -2057,9 +2057,9 @@ static void setup_memory_map(running_machine *machine)
 		/* Lookup the apropreate wbank value dependent on ram size */
 		if (memsize==0)
 			wbank=memmap[block_index].wbank4;
-		else if ((memsize==1) && (messram_get_size(devtag_get_device(machine, "messram")) == 0x4000))	/* one bank of 16K rams */
+		else if ((memsize==1) && (messram_get_size(machine->device("messram")) == 0x4000))	/* one bank of 16K rams */
 			wbank=memmap[block_index].wbank16_1;
-		else if ((memsize==1) && (messram_get_size(devtag_get_device(machine, "messram")) == 0x8000))	/* two banks of 16K rams */
+		else if ((memsize==1) && (messram_get_size(machine->device("messram")) == 0x8000))	/* two banks of 16K rams */
 			wbank=memmap[block_index].wbank16_2;
 		else
 			wbank=memmap[block_index].wbank64;
@@ -2073,7 +2073,7 @@ static void setup_memory_map(running_machine *machine)
 			if(block_index<8)
 				memory_set_bankptr(machine, bank, &bottom_32k[memmap[wbank-1].start]);
 			else
-				memory_set_bankptr(machine, bank,&messram_get_ptr(devtag_get_device(machine, "messram"))[memmap[wbank-1].start]);
+				memory_set_bankptr(machine, bank,&messram_get_ptr(machine->device("messram"))[memmap[wbank-1].start]);
 
 			memory_install_readwrite_bank(space, memmap[block_index].start, memmap[block_index].end, 0, 0, bank);
 		}
@@ -2118,10 +2118,10 @@ static SAM6883_SET_PAGE_ONE_MODE( d_sam_set_pageonemode )
 
 	if (!sam6883_maptype(device))		// Ignored in maptype 1
 	{
-		if((messram_get_size(devtag_get_device(device->machine, "messram"))>0x8000) && val)
-			bottom_32k=&messram_get_ptr(devtag_get_device(device->machine, "messram"))[0x8000];
+		if((messram_get_size(device->machine->device("messram"))>0x8000) && val)
+			bottom_32k=&messram_get_ptr(device->machine->device("messram"))[0x8000];
 		else
-			bottom_32k=messram_get_ptr(devtag_get_device(device->machine, "messram"));
+			bottom_32k=messram_get_ptr(device->machine->device("messram"));
 
 		setup_memory_map(device->machine);
 	}
@@ -2248,7 +2248,7 @@ static void coco3_timer_init(running_machine *machine)
 static SAM6883_SET_MAP_TYPE( d_sam_set_maptype )
 {
 	if(val)
-		bottom_32k=messram_get_ptr(devtag_get_device(device->machine, "messram"));	// Always reset, when in maptype 1
+		bottom_32k=messram_get_ptr(device->machine->device("messram"));	// Always reset, when in maptype 1
 
 	setup_memory_map(device->machine);
 }
@@ -2296,7 +2296,7 @@ offs_t coco3_mmu_translate(running_machine *machine,int bank, int offset)
 			/* this GIME register fixes logical addresses $FExx to physical
              * addresses $7FExx ($1FExx if 128k */
 			assert(offset < 0x200);
-			return ((messram_get_size(devtag_get_device(machine, "messram")) - 0x200) & 0x7ffff) + offset;
+			return ((messram_get_size(machine->device("messram")) - 0x200) & 0x7ffff) + offset;
 		}
 		bank = 7;
 		offset += 0x1e00;
@@ -2346,7 +2346,7 @@ offs_t coco3_mmu_translate(running_machine *machine,int bank, int offset)
 	}
 	else
 	{
-		result = ((block * 0x2000) + offset) % messram_get_size(devtag_get_device(machine, "messram"));
+		result = ((block * 0x2000) + offset) % messram_get_size(machine->device("messram"));
 	}
 	return result;
 }
@@ -2396,7 +2396,7 @@ static void coco3_mmu_update(running_machine *machine, int lowblock, int hiblock
 		else
 		{
 			/* offset into normal RAM */
-			readbank = &messram_get_ptr(devtag_get_device(machine, "messram"))[offset];
+			readbank = &messram_get_ptr(machine->device("messram"))[offset];
 			memory_install_write_bank(space, bank_info[i].start, bank_info[i].end, 0, 0, bank);
 		}
 
@@ -2675,7 +2675,7 @@ static SAM6883_GET_RAMBASE( coco3_sam_get_rambase )
 {
 	UINT32 video_base;
 	video_base = coco3_get_video_base(0xE0, 0x3F);
-	return &messram_get_ptr(devtag_get_device(device->machine, "messram"))[video_base % messram_get_size(devtag_get_device(device->machine, "messram"))];
+	return &messram_get_ptr(device->machine->device("messram"))[video_base % messram_get_size(device->machine->device("messram"))];
 }
 
 
@@ -2786,15 +2786,15 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	coco_state *state = (coco_state *)(coco_state *) machine->driver_data;
 
 	/* locate devices */
-	state->cococart_device	= devtag_get_device(machine, "coco_cartslot");
-	state->cassette_device	= devtag_get_device(machine, "cassette");
-	state->bitbanger_device	= devtag_get_device(machine, "bitbanger");
-	state->printer_device	= devtag_get_device(machine, "printer");
-	state->dac				= devtag_get_device(machine, "dac");
-	state->sam				= devtag_get_device(machine, "sam");
-	state->pia_0			= devtag_get_device(machine, "pia_0");
-	state->pia_1			= devtag_get_device(machine, "pia_1");
-	state->pia_2			= devtag_get_device(machine, "pia_2");
+	state->cococart_device	= machine->device("coco_cartslot");
+	state->cassette_device	= machine->device("cassette");
+	state->bitbanger_device	= machine->device("bitbanger");
+	state->printer_device	= machine->device("printer");
+	state->dac				= machine->device("dac");
+	state->sam				= machine->device("sam");
+	state->pia_0			= machine->device("pia_0");
+	state->pia_1			= machine->device("pia_1");
+	state->pia_2			= machine->device("pia_2");
 
 	/* clear static variables */
 	coco_hiresjoy_ca = 1;
@@ -2819,7 +2819,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 	bas_rom_bank = coco_rom;
 
 	/* setup default pointer for botom 32K of ram */
-	bottom_32k = messram_get_ptr(devtag_get_device(machine, "messram"));
+	bottom_32k = messram_get_ptr(machine->device("messram"));
 
 	/* setup printer output callback */
 	printer_out = init->printer_out_;
@@ -2836,7 +2836,7 @@ static void generic_init_machine(running_machine *machine, const machine_init_in
 static void generic_coco12_dragon_init(running_machine *machine, const machine_init_interface *init)
 {
 	/* Set default RAM mapping */
-	memory_set_bankptr(machine, "bank1", &messram_get_ptr(devtag_get_device(machine, "messram"))[0]);
+	memory_set_bankptr(machine, "bank1", &messram_get_ptr(machine->device("messram"))[0]);
 
 	/* Do generic Inits */
 	generic_init_machine(machine, init);
@@ -2927,7 +2927,7 @@ MACHINE_START( dgnalpha )
 
 MACHINE_RESET( dgnalpha )
 {
-	running_device *fdc = devtag_get_device(machine, "wd2797");
+	running_device *fdc = machine->device("wd2797");
 	wd17xx_set_complete_command_delay(fdc,20);
 
 	/* dgnalpha_just_reset, is here to flag that we should ignore the first irq generated */

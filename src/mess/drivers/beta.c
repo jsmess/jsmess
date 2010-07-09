@@ -240,7 +240,7 @@ static MACHINE_START( beta )
 	beta_state *state = (beta_state *)machine->driver_data;
 
 	/* find devices */
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
 
 	state->led_refresh_timer = timer_alloc(machine, led_refresh, 0);
 

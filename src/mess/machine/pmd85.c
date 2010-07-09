@@ -55,11 +55,11 @@ static void pmd851_update_memory(running_machine *machine)
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+		memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")) + 0xc000);
 
 		memory_set_bankptr(machine, "bank6", mem + 0x010000);
 		memory_set_bankptr(machine, "bank7", mem + 0x010000);
-		memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+		memory_set_bankptr(machine, "bank8", messram_get_ptr(machine->device("messram")) + 0xc000);
 	}
 	else
 	{
@@ -72,11 +72,11 @@ static void pmd851_update_memory(running_machine *machine)
 		memory_install_read_bank(space, 0x1000, 0x1fff, 0, 0, "bank2");
 		memory_install_read_bank(space, 0x3000, 0x3fff, 0, 0, "bank4");
 
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1000);
-		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x3000);
-		memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x1000);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x2000);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x3000);
+		memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")) + 0x4000);
 	}
 }
 
@@ -92,15 +92,15 @@ static void pmd852a_update_memory(running_machine *machine)
 		memory_unmap_write(space, 0x2000, 0x2fff, 0, 0);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x9000);
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x9000);
 		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xb000);
-		memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xb000);
+		memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")) + 0xc000);
 		memory_set_bankptr(machine, "bank6", mem + 0x010000);
-		memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x9000);
+		memory_set_bankptr(machine, "bank7", messram_get_ptr(machine->device("messram")) + 0x9000);
 		memory_set_bankptr(machine, "bank8", mem + 0x010000);
-		memory_set_bankptr(machine, "bank9", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xb000);
-		memory_set_bankptr(machine, "bank10", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+		memory_set_bankptr(machine, "bank9", messram_get_ptr(machine->device("messram")) + 0xb000);
+		memory_set_bankptr(machine, "bank10", messram_get_ptr(machine->device("messram")) + 0xc000);
 
 	}
 	else
@@ -108,11 +108,11 @@ static void pmd852a_update_memory(running_machine *machine)
 		memory_install_write_bank(space, 0x0000, 0x0fff, 0, 0, "bank1");
 		memory_install_write_bank(space, 0x2000, 0x2fff, 0, 0, "bank3");
 
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1000);
-		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x5000);
-		memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x1000);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x2000);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x5000);
+		memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")) + 0x4000);
 	}
 }
 
@@ -130,25 +130,25 @@ static void pmd853_update_memory(running_machine *machine)
 		memory_set_bankptr(machine, "bank6", mem + 0x010000);
 		memory_set_bankptr(machine, "bank7", mem + 0x010000);
 		memory_set_bankptr(machine, "bank8", mem + 0x010000);
-		memory_set_bankptr(machine, "bank9", messram_get_ptr(devtag_get_device(machine, "messram")));
-		memory_set_bankptr(machine, "bank10", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
-		memory_set_bankptr(machine, "bank11", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
-		memory_set_bankptr(machine, "bank12", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
-		memory_set_bankptr(machine, "bank13", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
-		memory_set_bankptr(machine, "bank14", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xa000);
-		memory_set_bankptr(machine, "bank15", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
-		memory_set_bankptr(machine, "bank16", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe000);
+		memory_set_bankptr(machine, "bank9", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank10", messram_get_ptr(machine->device("messram")) + 0x2000);
+		memory_set_bankptr(machine, "bank11", messram_get_ptr(machine->device("messram")) + 0x4000);
+		memory_set_bankptr(machine, "bank12", messram_get_ptr(machine->device("messram")) + 0x6000);
+		memory_set_bankptr(machine, "bank13", messram_get_ptr(machine->device("messram")) + 0x8000);
+		memory_set_bankptr(machine, "bank14", messram_get_ptr(machine->device("messram")) + 0xa000);
+		memory_set_bankptr(machine, "bank15", messram_get_ptr(machine->device("messram")) + 0xc000);
+		memory_set_bankptr(machine, "bank16", messram_get_ptr(machine->device("messram")) + 0xe000);
 	}
 	else
 	{
-		memory_set_bankptr(machine,  "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
-		memory_set_bankptr(machine,  "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000);
-		memory_set_bankptr(machine,  "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
-		memory_set_bankptr(machine,  "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x6000);
-		memory_set_bankptr(machine,  "bank5", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
-		memory_set_bankptr(machine,  "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xa000);
-		memory_set_bankptr(machine,  "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
-		memory_set_bankptr(machine,  "bank8", pmd853_memory_mapping ? memory_region(machine, "maincpu") + 0x010000 : messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe000);
+		memory_set_bankptr(machine,  "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine,  "bank2", messram_get_ptr(machine->device("messram")) + 0x2000);
+		memory_set_bankptr(machine,  "bank3", messram_get_ptr(machine->device("messram")) + 0x4000);
+		memory_set_bankptr(machine,  "bank4", messram_get_ptr(machine->device("messram")) + 0x6000);
+		memory_set_bankptr(machine,  "bank5", messram_get_ptr(machine->device("messram")) + 0x8000);
+		memory_set_bankptr(machine,  "bank6", messram_get_ptr(machine->device("messram")) + 0xa000);
+		memory_set_bankptr(machine,  "bank7", messram_get_ptr(machine->device("messram")) + 0xc000);
+		memory_set_bankptr(machine,  "bank8", pmd853_memory_mapping ? memory_region(machine, "maincpu") + 0x010000 : messram_get_ptr(machine->device("messram")) + 0xe000);
 	}
 }
 
@@ -166,10 +166,10 @@ static void alfa_update_memory(running_machine *machine)
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
 		memory_set_bankptr(machine, "bank2", mem + 0x011000);
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xc000);
 		memory_set_bankptr(machine, "bank5", mem + 0x010000);
 		memory_set_bankptr(machine, "bank6", mem + 0x011000);
-		memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+		memory_set_bankptr(machine, "bank7", messram_get_ptr(machine->device("messram")) + 0xc000);
 	}
 	else
 	{
@@ -177,10 +177,10 @@ static void alfa_update_memory(running_machine *machine)
 		memory_install_write_bank(space, 0x1000, 0x33ff, 0, 0, "bank2");
 		memory_install_write_bank(space, 0x3400, 0x3fff, 0, 0, "bank3");
 
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1000);
-		memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x3400);
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x1000);
+		memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x3400);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x4000);
 	}
 }
 
@@ -195,16 +195,16 @@ static void mato_update_memory(running_machine *machine)
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0xc000);
 		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xc000);
 	}
 	else
 	{
 		memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
 	}
 }
 
@@ -218,15 +218,15 @@ static void c2717_update_memory(running_machine *machine)
 		memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 
 		memory_set_bankptr(machine, "bank1", mem + 0x010000);
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
 		memory_set_bankptr(machine, "bank3", mem + 0x010000);
-		memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+		memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xc000);
 	}
 	else
 	{
 		memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
 	}
 }
 
@@ -513,7 +513,7 @@ READ8_HANDLER ( pmd85_io_r )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return i8255a_r(devtag_get_device(space->machine, "ppi8255_0"), offset & 0x03);
+							return i8255a_r(space->machine->device("ppi8255_0"), offset & 0x03);
 				}
 				break;
 		case 0x08:	/* ROM module connector */
@@ -529,7 +529,7 @@ READ8_HANDLER ( pmd85_io_r )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-									return i8255a_r(devtag_get_device(space->machine, "ppi8255_3"), offset & 0x03);
+									return i8255a_r(space->machine->device("ppi8255_3"), offset & 0x03);
 							}
 						}
 						break;
@@ -544,16 +544,16 @@ READ8_HANDLER ( pmd85_io_r )
 								case 0x10:	/* 8251 (casette recorder, V24) */
 										switch (offset & 0x01)
 										{
-											case 0x00: return msm8251_data_r(devtag_get_device(space->machine, "uart"), offset & 0x01);
-											case 0x01: return msm8251_status_r(devtag_get_device(space->machine, "uart"), offset & 0x01);
+											case 0x00: return msm8251_data_r(space->machine->device("uart"), offset & 0x01);
+											case 0x01: return msm8251_status_r(space->machine->device("uart"), offset & 0x01);
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/1) */
-										return i8255a_r(devtag_get_device(space->machine, "ppi8255_1"), offset & 0x03);
+										return i8255a_r(space->machine->device("ppi8255_1"), offset & 0x03);
 								case 0x50:	/* 8253 */
-										return pit8253_r( devtag_get_device(space->machine, "pit8253"), offset & 0x03);
+										return pit8253_r( space->machine->device("pit8253"), offset & 0x03);
 								case 0x70:	/* 8255 (IMS-2) */
-										return i8255a_r(devtag_get_device(space->machine, "ppi8255_2"), offset & 0x03);
+										return i8255a_r(space->machine->device("ppi8255_2"), offset & 0x03);
 							}
 							break;
 					case 0x80:	/* external interfaces */
@@ -580,7 +580,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							i8255a_w(devtag_get_device(space-> machine, "ppi8255_0"), offset & 0x03, data);
+							i8255a_w(space-> machine->device("ppi8255_0"), offset & 0x03, data);
 							/* PMD-85.3 memory banking */
 							if ((offset & 0x03) == 0x03)
 							{
@@ -603,7 +603,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 							switch (offset & 0x80)
 							{
 								case 0x80:	/* ROM module 8255 */
-										i8255a_w(devtag_get_device(space->machine, "ppi8255_3"), offset & 0x03, data);
+										i8255a_w(space->machine->device("ppi8255_3"), offset & 0x03, data);
 										break;
 							}
 						}
@@ -619,19 +619,19 @@ WRITE8_HANDLER ( pmd85_io_w )
 								case 0x10:	/* 8251 (casette recorder, V24) */
 										switch (offset & 0x01)
 										{
-											case 0x00: msm8251_data_w(devtag_get_device(space->machine, "uart"), offset & 0x01, data); break;
-											case 0x01: msm8251_control_w(devtag_get_device(space->machine, "uart"), offset & 0x01, data); break;
+											case 0x00: msm8251_data_w(space->machine->device("uart"), offset & 0x01, data); break;
+											case 0x01: msm8251_control_w(space->machine->device("uart"), offset & 0x01, data); break;
 										}
 										break;
 								case 0x40:      /* 8255 (GPIO/0, GPIO/0) */
-										i8255a_w(devtag_get_device(space->machine, "ppi8255_1"), offset & 0x03, data);
+										i8255a_w(space->machine->device("ppi8255_1"), offset & 0x03, data);
 										break;
 								case 0x50:	/* 8253 */
-										pit8253_w(devtag_get_device(space->machine, "pit8253"), offset & 0x03, data);
+										pit8253_w(space->machine->device("pit8253"), offset & 0x03, data);
 										logerror ("8253 writing. Address: %02x, Data: %02x\n", offset, data);
 										break;
 								case 0x70:	/* 8255 (IMS-2) */
-										i8255a_w(devtag_get_device(space->machine, "ppi8255_2"), offset & 0x03, data);
+										i8255a_w(space->machine->device("ppi8255_2"), offset & 0x03, data);
 										break;
 							}
 							break;
@@ -665,7 +665,7 @@ WRITE8_HANDLER ( pmd85_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							return i8255a_r(devtag_get_device(space->machine, "ppi8255_0"), offset & 0x03);
+							return i8255a_r(space->machine->device("ppi8255_0"), offset & 0x03);
 				}
 				break;
 	}
@@ -688,7 +688,7 @@ WRITE8_HANDLER ( mato_io_w )
 				switch (offset & 0x80)
 				{
 					case 0x80:	/* Motherboard 8255 */
-							i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), offset & 0x03, data);
+							i8255a_w(space->machine->device("ppi8255_0"), offset & 0x03, data);
 							break;
 				}
 				break;
@@ -784,19 +784,19 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 	if (!(input_port_read(machine, "DSW0") & 0x02))	/* V.24 / Tape Switch */
 	{
 		/* tape reading */
-		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_PLAY)
+		if (cassette_get_state(machine->device("cassette"))&CASSETTE_PLAY)
 		{
 			switch (pmd85_model)
 			{
 				case PMD85_1:
 					if (clk_level_tape)
 					{
-						previous_level = (cassette_input(devtag_get_device(machine, "cassette")) > 0.038) ? 1 : 0;
+						previous_level = (cassette_input(machine->device("cassette")) > 0.038) ? 1 : 0;
 						clk_level_tape = 0;
 					}
 					else
 					{
-						current_level = (cassette_input(devtag_get_device(machine, "cassette")) > 0.038) ? 1 : 0;
+						current_level = (cassette_input(machine->device("cassette")) > 0.038) ? 1 : 0;
 
 						if (previous_level!=current_level)
 						{
@@ -804,7 +804,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 
 							set_out_data_bit(pmd85_cassette_serial_connection.State, data);
 							serial_connection_out(machine, &pmd85_cassette_serial_connection);
-							msm8251_receive_clock(devtag_get_device(machine, "uart"));
+							msm8251_receive_clock(machine->device("uart"));
 
 							clk_level_tape = 1;
 						}
@@ -821,14 +821,14 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 		}
 
 		/* tape writing */
-		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_RECORD)
+		if (cassette_get_state(machine->device("cassette"))&CASSETTE_RECORD)
 		{
 			data = get_in_data_bit(pmd85_cassette_serial_connection.input_state);
 			data ^= clk_level_tape;
-			cassette_output(devtag_get_device(machine, "cassette"), data&0x01 ? 1 : -1);
+			cassette_output(machine->device("cassette"), data&0x01 ? 1 : -1);
 
 			if (!clk_level_tape)
-				msm8251_transmit_clock(devtag_get_device(machine, "uart"));
+				msm8251_transmit_clock(machine->device("uart"));
 
 			clk_level_tape = clk_level_tape ? 0 : 1;
 
@@ -838,7 +838,7 @@ static TIMER_CALLBACK(pmd85_cassette_timer_callback)
 		clk_level_tape = 1;
 
 		if (!clk_level)
-			msm8251_transmit_clock(devtag_get_device(machine, "uart"));
+			msm8251_transmit_clock(machine->device("uart"));
 		clk_level = clk_level ? 0 : 1;
 	}
 }
@@ -911,7 +911,7 @@ static TIMER_CALLBACK( setup_machine_state )
 {
 	if (pmd85_model != MATO)
 	{
-		msm8251_connect(devtag_get_device(machine, "uart"), &pmd85_cassette_serial_connection);
+		msm8251_connect(machine->device("uart"), &pmd85_cassette_serial_connection);
 	}
 }
 
@@ -939,7 +939,7 @@ MACHINE_RESET( pmd85 )
 			pmd85_ppi_port_outputs[i][j] = 0;
 
 	/* memory initialization */
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, sizeof(unsigned char)*0x10000);
+	memset(messram_get_ptr(machine->device("messram")), 0, sizeof(unsigned char)*0x10000);
 	pmd85_startup_mem_map = 1;
 	pmd85_update_memory(machine);
 

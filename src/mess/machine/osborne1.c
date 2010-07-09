@@ -57,7 +57,7 @@ WRITE8_HANDLER( osborne1_0000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) )
 	{
-		messram_get_ptr(devtag_get_device(space->machine, "messram"))[ offset ] = data;
+		messram_get_ptr(space->machine->device("messram"))[ offset ] = data;
 	}
 }
 
@@ -67,7 +67,7 @@ WRITE8_HANDLER( osborne1_1000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) )
 	{
-		messram_get_ptr(devtag_get_device(space->machine, "messram"))[ 0x1000 + offset ] = data;
+		messram_get_ptr(space->machine->device("messram"))[ 0x1000 + offset ] = data;
 	}
 }
 
@@ -75,14 +75,14 @@ WRITE8_HANDLER( osborne1_1000_w )
 READ8_HANDLER( osborne1_2000_r )
 {
 	UINT8	data = 0xFF;
-	running_device *fdc = devtag_get_device(space->machine, "mb8877");
-	running_device *pia_0 = devtag_get_device(space->machine, "pia_0" );
-	running_device *pia_1 = devtag_get_device(space->machine, "pia_1" );
+	running_device *fdc = space->machine->device("mb8877");
+	running_device *pia_0 = space->machine->device("pia_0" );
+	running_device *pia_1 = space->machine->device("pia_1" );
 
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
 	{
-		data = messram_get_ptr(devtag_get_device(space->machine, "messram"))[ 0x2000 + offset ];
+		data = messram_get_ptr(space->machine->device("messram"))[ 0x2000 + offset ];
 	}
 	else
 	{
@@ -125,20 +125,20 @@ READ8_HANDLER( osborne1_2000_r )
 
 WRITE8_HANDLER( osborne1_2000_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "mb8877");
-	running_device *pia_0 = devtag_get_device(space->machine, "pia_0" );
-	running_device *pia_1 = devtag_get_device(space->machine, "pia_1" );
+	running_device *fdc = space->machine->device("mb8877");
+	running_device *pia_0 = space->machine->device("pia_0" );
+	running_device *pia_1 = space->machine->device("pia_1" );
 
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled )
 	{
-		messram_get_ptr(devtag_get_device(space->machine, "messram"))[ 0x2000 + offset ] = data;
+		messram_get_ptr(space->machine->device("messram"))[ 0x2000 + offset ] = data;
 	}
 	else
 	{
 		if ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE )
 		{
-			messram_get_ptr(devtag_get_device(space->machine, "messram"))[ 0x2000 + offset ] = data;
+			messram_get_ptr(space->machine->device("messram"))[ 0x2000 + offset ] = data;
 		}
 		/* Handle writes to the I/O area */
 		switch( offset & 0x0F00 )
@@ -164,7 +164,7 @@ WRITE8_HANDLER( osborne1_3000_w )
 	/* Check whether regular RAM is enabled */
 	if ( ! osborne1.bank2_enabled || ( osborne1.in_irq_handler && osborne1.bankswitch == RAMMODE ) )
 	{
-		messram_get_ptr(devtag_get_device(space->machine, "messram"))[ 0x3000 + offset ] = data;
+		messram_get_ptr(space->machine->device("messram"))[ 0x3000 + offset ] = data;
 	}
 }
 
@@ -209,11 +209,11 @@ WRITE8_HANDLER( osborne1_bankswitch_w )
 	}
 	else
 	{
-		memory_set_bankptr(space->machine,"bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")) );
-		memory_set_bankptr(space->machine,"bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x1000 );
-		memory_set_bankptr(space->machine,"bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x3000 );
+		memory_set_bankptr(space->machine,"bank1", messram_get_ptr(space->machine->device("messram")) );
+		memory_set_bankptr(space->machine,"bank2", messram_get_ptr(space->machine->device("messram")) + 0x1000 );
+		memory_set_bankptr(space->machine,"bank3", messram_get_ptr(space->machine->device("messram")) + 0x3000 );
 	}
-	osborne1.bank4_ptr = messram_get_ptr(devtag_get_device(space->machine, "messram")) + ( ( osborne1.bank3_enabled ) ? 0x10000 : 0xF000 );
+	osborne1.bank4_ptr = messram_get_ptr(space->machine->device("messram")) + ( ( osborne1.bank3_enabled ) ? 0x10000 : 0xF000 );
 	memory_set_bankptr(space->machine,"bank4", osborne1.bank4_ptr );
 	osborne1.bankswitch = offset;
 	osborne1.in_irq_handler = 0;
@@ -227,8 +227,8 @@ static DIRECT_UPDATE_HANDLER( osborne1_opbase )
 		if ( ! osborne1.bank2_enabled )
 		{
 			direct->bytemask = 0x0fff;
-			direct->decrypted = messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x2000;
-			direct->raw = messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x2000;
+			direct->decrypted = messram_get_ptr(space->machine->device("messram")) + 0x2000;
+			direct->raw = messram_get_ptr(space->machine->device("messram")) + 0x2000;
 			direct->bytestart = 0x2000;
 			direct->byteend = 0x2fff;
 			return ~0;
@@ -284,7 +284,7 @@ static WRITE8_DEVICE_HANDLER( video_pia_out_cb2_dummy )
 
 static WRITE8_DEVICE_HANDLER( video_pia_port_a_w )
 {
-	running_device *fdc = devtag_get_device(device->machine, "mb8877");
+	running_device *fdc = device->machine->device("mb8877");
 
 	osborne1.new_start_x = data >> 1;
 	wd17xx_dden_w(fdc, BIT(data, 0));
@@ -295,7 +295,7 @@ static WRITE8_DEVICE_HANDLER( video_pia_port_a_w )
 
 static WRITE8_DEVICE_HANDLER( video_pia_port_b_w )
 {
-	running_device *fdc = devtag_get_device(device->machine, "mb8877");
+	running_device *fdc = device->machine->device("mb8877");
 
 	osborne1.new_start_y = data & 0x1F;
 	osborne1.beep = ( data & 0x20 ) ? 1 : 0;
@@ -351,8 +351,8 @@ const pia6821_interface osborne1_video_pia_config =
 static TIMER_CALLBACK(osborne1_video_callback)
 {
 	const address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	running_device *speaker = devtag_get_device(space->machine, "beep");
-	running_device *pia_1 = devtag_get_device(space->machine, "pia_1");
+	running_device *speaker = space->machine->device("beep");
+	running_device *pia_1 = space->machine->device("pia_1");
 	int y = machine->primary_screen->vpos();
 
 	/* Check for start of frame */
@@ -377,9 +377,9 @@ static TIMER_CALLBACK(osborne1_video_callback)
 
 		for ( x = 0; x < 52; x++ )
 		{
-			UINT8	character = messram_get_ptr(devtag_get_device(machine, "messram"))[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
+			UINT8	character = messram_get_ptr(machine->device("messram"))[ 0xF000 + ( ( address + x ) & 0xFFF ) ];
 			UINT8	cursor = character & 0x80;
-			UINT8	dim = messram_get_ptr(devtag_get_device(machine, "messram"))[ 0x10000 + ( ( address + x ) & 0xFFF ) ] & 0x80;
+			UINT8	dim = messram_get_ptr(machine->device("messram"))[ 0x10000 + ( ( address + x ) & 0xFFF ) ] & 0x80;
 			UINT8	bits = osborne1.charrom[ osborne1.charline * 128 + ( character & 0x7F ) ];
 			int		bit;
 
@@ -416,8 +416,8 @@ static TIMER_CALLBACK(osborne1_video_callback)
 
 static TIMER_CALLBACK( setup_osborne1 )
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
-	running_device *pia_1 = devtag_get_device(machine, "pia_1");
+	running_device *speaker = machine->device("beep");
+	running_device *pia_1 = machine->device("pia_1");
 
 	beep_set_state( speaker, 0 );
 	beep_set_frequency( speaker, 300 /* 60 * 240 / 2 */ );
@@ -427,7 +427,7 @@ static TIMER_CALLBACK( setup_osborne1 )
 static void osborne1_load_proc(device_image_interface &image)
 {
 	int size = image.length();
-	running_device *fdc = devtag_get_device(image.device().machine, "mb8877");
+	running_device *fdc = image.device().machine->device("mb8877");
 
 	switch( size )
 	{
@@ -464,7 +464,7 @@ MACHINE_RESET( osborne1 )
 
 	osborne1.charrom = memory_region( machine, "gfx1" );
 
-	memset( messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000, 0xFF, 0x1000 );
+	memset( messram_get_ptr(machine->device("messram")) + 0x10000, 0xFF, 0x1000 );
 
 	for(drive=0;drive<2;drive++)
 	{

@@ -177,7 +177,7 @@ static VIDEO_UPDATE( apricot )
 static MC6845_UPDATE_ROW( apricot_update_row )
 {
 	apricot_state *apricot = (apricot_state *)device->machine->driver_data;
-	UINT8 *ram = messram_get_ptr(devtag_get_device(device->machine, "messram"));
+	UINT8 *ram = messram_get_ptr(device->machine->device("messram"));
 	int i, x;
 
 	if (apricot->video_mode)
@@ -237,20 +237,20 @@ static const mc6845_interface apricot_mc6845_intf =
 static DRIVER_INIT( apricot )
 {
 	apricot_state *apricot = (apricot_state *)machine->driver_data;
-	running_device *maincpu = devtag_get_device(machine, "maincpu");
+	running_device *maincpu = machine->device("maincpu");
 	const address_space *prg = cpu_get_address_space(maincpu, ADDRESS_SPACE_PROGRAM);
 
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
-	UINT32 ram_size = messram_get_size(devtag_get_device(machine, "messram"));
+	UINT8 *ram = messram_get_ptr(machine->device("messram"));
+	UINT32 ram_size = messram_get_size(machine->device("messram"));
 
 	memory_unmap_readwrite(prg, 0x40000, 0xeffff, 0, 0);
 	memory_install_ram(prg, 0x00000, ram_size - 1, 0, 0, ram);
 
 	cpu_set_irq_callback(maincpu, apricot_irq_ack);
 
-	apricot->pic8259 = devtag_get_device(machine, "ic31");
-	apricot->wd2793 = devtag_get_device(machine, "ic68");
-	apricot->mc6845 = devtag_get_device(machine, "ic30");
+	apricot->pic8259 = machine->device("ic31");
+	apricot->wd2793 = machine->device("ic68");
+	apricot->mc6845 = machine->device("ic30");
 
 	apricot->video_mode = 0;
 	apricot->display_on = 1;

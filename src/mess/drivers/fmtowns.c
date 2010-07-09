@@ -2145,8 +2145,8 @@ INPUT_PORTS_END
 static DRIVER_INIT( towns )
 {
 	towns_state* state = (towns_state*)machine->driver_data;
-	state->pic_master = devtag_get_device(machine,"pic8259_master");
-	state->pic_slave = devtag_get_device(machine,"pic8259_slave");
+	state->pic_master = machine->device("pic8259_master");
+	state->pic_slave = machine->device("pic8259_slave");
 	state->towns_vram = auto_alloc_array(machine,UINT32,0x20000);
 	state->towns_cmos = machine->generic.nvram.u8;
 	state->towns_gfxvram = auto_alloc_array(machine,UINT8,0x80000);
@@ -2160,9 +2160,9 @@ static DRIVER_INIT( towns )
 	state->towns_mouse_timer = timer_alloc(machine,towns_mouse_timeout,NULL);
 
 	// CD-ROM init
-	state->towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)devtag_get_device(machine,"dma_1"));
+	state->towns_cd.read_timer = timer_alloc(machine,towns_cdrom_read_byte,(void*)machine->device("dma_1"));
 
-	cpu_set_irq_callback(devtag_get_device(machine,"maincpu"), towns_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), towns_irq_callback);
 }
 
 static DRIVER_INIT( marty )
@@ -2175,16 +2175,16 @@ static DRIVER_INIT( marty )
 static MACHINE_RESET( towns )
 {
 	towns_state* state = (towns_state*)machine->driver_data;
-	state->maincpu = devtag_get_device(machine,"maincpu");
-	state->dma_1 = devtag_get_device(machine,"dma_1");
-	state->dma_2 = devtag_get_device(machine,"dma_2");
-	state->fdc = devtag_get_device(machine,"fdc");
-	state->pic_master = devtag_get_device(machine,"pic8259_master");
-	state->pic_slave = devtag_get_device(machine,"pic8259_slave");
-	state->pit = devtag_get_device(machine,"pit");
-	state->messram = devtag_get_device(machine,"messram");
-	state->cdrom = devtag_get_device(machine,"cdrom");
-	state->cdda = devtag_get_device(machine,"cdda");
+	state->maincpu = machine->device("maincpu");
+	state->dma_1 = machine->device("dma_1");
+	state->dma_2 = machine->device("dma_2");
+	state->fdc = machine->device("fdc");
+	state->pic_master = machine->device("pic8259_master");
+	state->pic_slave = machine->device("pic8259_slave");
+	state->pit = machine->device("pit");
+	state->messram = machine->device("messram");
+	state->cdrom = machine->device("cdrom");
+	state->cdda = machine->device("cdda");
 	state->ftimer = 0x00;
 	state->nmi_mask = 0x00;
 	state->compat_mode = 0x00;

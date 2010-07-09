@@ -106,7 +106,7 @@ static VIDEO_START( pecom )
 
 	/* find devices */
 
-	state->cdp1869 = devtag_get_device(machine, CDP1869_TAG);
+	state->cdp1869 = machine->device(CDP1869_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);

@@ -126,7 +126,7 @@ static VIDEO_START( zrt80 )
 
 static VIDEO_UPDATE( zrt80 )
 {
-	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
+	running_device *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }

@@ -23,7 +23,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(vt220)
 {
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,16*1024);
+	memset(messram_get_ptr(machine->device("messram")),0,16*1024);
 }
 
 static VIDEO_START( vt220 )

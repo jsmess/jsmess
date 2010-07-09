@@ -719,7 +719,7 @@ static void keyboard_scan(running_machine *machine)
 		if (!state->lcd_on)
 		{
 			state->lcd_on = 1;
-			cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xc3c3);
+			cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xc3c3);
 		}
 		else
 			state->kb_brk = 1;
@@ -977,7 +977,7 @@ static WRITE8_HANDLER( x07_IO_w )
 		state->enable_k7=((data & 0x0c) == 8) ? 1 : 0;
 		if((data & 0x0e) == 0x0e)
 		{
-			running_device *speaker = devtag_get_device(space->machine, "beep");
+			running_device *speaker = space->machine->device("beep");
 
 			beep_set_state(speaker, 1);
 			beep_set_frequency(speaker, 192000 / (state->regs_w[2] | (state->regs_w[3] << 8)));
@@ -1148,7 +1148,7 @@ static TIMER_CALLBACK( irq_clear )
 
 static TIMER_CALLBACK( beep_stop )
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = machine->device("beep");
 	beep_set_state(speaker, 0);
 }
 
@@ -1187,7 +1187,7 @@ static MACHINE_START( x07 )
 	state->irq_clear = timer_alloc(machine, irq_clear, 0);
 	state->beep_clear = timer_alloc(machine, beep_stop, 0);
 	state->kb_clear = timer_alloc(machine, keyboard_clear, 0);
-	state->printer = devtag_get_device(machine, "printer");
+	state->printer = machine->device("printer");
 
 	/* Save State */
 
@@ -1238,7 +1238,7 @@ static MACHINE_RESET( x07 )
 {
 	t6834_state *state = (t6834_state *)machine->driver_data;
 
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xc3c3);
+	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xc3c3);
 
 	memset(state->regs_r, 0, sizeof(state->regs_r));
 	memset(state->regs_w, 0, sizeof(state->regs_w));

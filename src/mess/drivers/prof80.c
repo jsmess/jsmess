@@ -153,7 +153,7 @@ static void prof80_bankswitch(running_machine *machine)
 {
 	prof80_state *state = (prof80_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 	UINT8 *rom = memory_region(machine, Z80_TAG);
 	int bank;
 
@@ -1187,8 +1187,8 @@ static MACHINE_START( prof80 )
 	prof80_state *state = (prof80_state *)machine->driver_data;
 
 	/* find devices */
-	state->upd765 = devtag_get_device(machine, UPD765_TAG);
-	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
+	state->upd765 = machine->device(UPD765_TAG);
+	state->upd1990a = machine->device(UPD1990A_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);
@@ -1235,10 +1235,10 @@ static MACHINE_START( grip )
 	MACHINE_START_CALL(prof80);
 
 	/* find devices */
-	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
-	state->ppi8255 = devtag_get_device(machine, I8255A_TAG);
-	state->z80sti = devtag_get_device(machine, Z80STI_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->mc6845 = machine->device(MC6845_TAG);
+	state->ppi8255 = machine->device(I8255A_TAG);
+	state->z80sti = machine->device(Z80STI_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* allocate video RAM */
 	state->video_ram = auto_alloc_array(machine, UINT8, GRIP_VIDEORAM_SIZE);

@@ -336,7 +336,7 @@ static MACHINE_START( amu880 )
 	amu880_state *state = (amu880_state *)machine->driver_data;
 
 	/* find devices */
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* find memory regions */
 	state->keyboard_rom = memory_region(machine, "keyboard");

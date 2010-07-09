@@ -715,7 +715,7 @@ VIDEO_UPDATE( kc85_3 )
 {
 #if 0
 	/* colour ram takes up 0x02800 bytes */
-	   unsigned char *pixel_ram = messram_get_ptr(devtag_get_device(machine, "messram"))+0x08000;
+	   unsigned char *pixel_ram = messram_get_ptr(machine->device("messram"))+0x08000;
     unsigned char *colour_ram = pixel_ram + 0x02800;
 
     int x,y;
@@ -756,8 +756,8 @@ VIDEO_UPDATE( kc85_3 )
 
 	struct grab_info grab_data;
 
-	grab_data.pixel_ram = messram_get_ptr(devtag_get_device(screen->machine, "messram"))+0x08000;
-	grab_data.colour_ram = messram_get_ptr(devtag_get_device(screen->machine, "messram"))+0x08000 + 0x02800;
+	grab_data.pixel_ram = messram_get_ptr(screen->machine->device("messram"))+0x08000;
+	grab_data.colour_ram = messram_get_ptr(screen->machine->device("messram"))+0x08000 + 0x02800;
 
 	kc85_common_process_frame(screen->machine, bitmap, kc85_3_pixel_grab_callback,&grab_data);
 

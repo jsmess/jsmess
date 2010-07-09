@@ -300,8 +300,8 @@ static MACHINE_START( eti660 )
 	eti660_state *state = (eti660_state *)machine->driver_data;
 
 	/* find devices */
-	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cdp1864 = machine->device(CDP1864_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->cdp1802_mode);

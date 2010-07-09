@@ -161,7 +161,7 @@ static void microtan_set_irq_line(running_machine *machine)
 
 static running_device *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, "cassette");
+	return machine->device("cassette");
 }
 
 /**************************************************************
@@ -340,7 +340,7 @@ const via6522_interface microtan_via6522_1 =
 static TIMER_CALLBACK(microtan_read_cassette)
 {
 	double level = cassette_input(cassette_device_image(machine));
-	running_device *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = machine->device("via6522_0");
 
 	LOG(("microtan_read_cassette: %g\n", level));
 	if (level < -0.07)

@@ -689,13 +689,13 @@ static MACHINE_START( mm1 )
 	const address_space *program = cputag_get_address_space(machine, I8085A_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* look up devices */
-	state->i8212 = devtag_get_device(machine, I8212_TAG);
-	state->i8237 = devtag_get_device(machine, I8237_TAG);
-	state->i8275 = devtag_get_device(machine, I8275_TAG);
-	state->upd765 = devtag_get_device(machine, UPD765_TAG);
-	state->upd7201 = devtag_get_device(machine, UPD7201_TAG);
-	state->upd7220 = devtag_get_device(machine, UPD7220_TAG);
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
+	state->i8212 = machine->device(I8212_TAG);
+	state->i8237 = machine->device(I8237_TAG);
+	state->i8275 = machine->device(I8275_TAG);
+	state->upd765 = machine->device(UPD765_TAG);
+	state->upd7201 = machine->device(UPD7201_TAG);
+	state->upd7220 = machine->device(UPD7220_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
 
 	/* find memory regions */
 	state->key_rom = memory_region(machine, "keyboard");
@@ -704,7 +704,7 @@ static MACHINE_START( mm1 )
 	memory_install_read_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
 	memory_unmap_write(program, 0x0000, 0x0fff, 0, 0);
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "bios"), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(machine->device("messram")), 0);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */

@@ -471,7 +471,7 @@ static void mea8000_stop_frame( running_machine *machine, mea8000_t* mea8000 )
 	/* enter stop mode */
 	timer_reset( mea8000->timer, attotime_never );
 	mea8000->state = MEA8000_STOPPED;
-	dac_signed_data_16_w(devtag_get_device(machine, mea8000->iface->channel), 0x8000);
+	dac_signed_data_16_w(machine->device(mea8000->iface->channel), 0x8000);
 }
 
 
@@ -488,7 +488,7 @@ static TIMER_CALLBACK( mea8000_timer_expire )
 		/* sample is really computed only every 8-th time */
 		mea8000->lastsample = mea8000->sample;
 		mea8000->sample = mea8000_compute_sample(mea8000);
-		dac_signed_data_16_w(devtag_get_device(machine, mea8000->iface->channel), 0x8000+mea8000->lastsample);
+		dac_signed_data_16_w(machine->device(mea8000->iface->channel), 0x8000+mea8000->lastsample);
 	}
 	else
 	{
@@ -496,7 +496,7 @@ static TIMER_CALLBACK( mea8000_timer_expire )
 		int sample =
 			mea8000->lastsample +
 			((pos*(mea8000->sample-mea8000->lastsample)) / SUPERSAMPLING);
-		dac_signed_data_16_w(devtag_get_device(machine, mea8000->iface->channel), 0x8000+sample);
+		dac_signed_data_16_w(machine->device(mea8000->iface->channel), 0x8000+sample);
 	}
 
 	mea8000->framepos++;

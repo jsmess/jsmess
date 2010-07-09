@@ -316,7 +316,7 @@ static DEVICE_START( beta_disk )
 
 	/* find our WD179x */
 	astring_printf(&tempstring, "%s:%s", device->tag(), "wd179x");
-	beta->wd179x = devtag_get_device(device->machine, astring_c(&tempstring));
+	beta->wd179x = device->machine->device(astring_c(&tempstring));
 }
 
 /*-------------------------------------------------

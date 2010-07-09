@@ -62,7 +62,7 @@ enum {
 	MBC_UNKNOWN,	/* Unknown mapper                                */
 };
 
-/* messram_get_ptr(devtag_get_device(machine, "messram")) layout defines */
+/* messram_get_ptr(machine->device("messram")) layout defines */
 #define CGB_START_VRAM_BANKS	0x0000
 #define CGB_START_RAM_BANKS	( 2 * 8 * 1024 )
 
@@ -290,7 +290,7 @@ static void gb_init(running_machine *machine)
 			break;
 	}
 
-	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x16, 0x00 );       /* Initialize sound hardware */
+	gb_sound_w(space->machine->device("custom"), 0x16, 0x00 );       /* Initialize sound hardware */
 
 	gb_driver_data.divcount = 0;
 	gb_driver_data.triggering_irq = 0;
@@ -390,9 +390,9 @@ MACHINE_RESET( gbpocket )
 	gb_init_regs(machine);
 
 	/* Initialize the Sound registers */
-	gb_sound_w(devtag_get_device(machine, "custom"), 0x16,0x80);
-	gb_sound_w(devtag_get_device(machine, "custom"), 0x15,0xF3);
-	gb_sound_w(devtag_get_device(machine, "custom"), 0x14,0x77);
+	gb_sound_w(machine->device("custom"), 0x16,0x80);
+	gb_sound_w(machine->device("custom"), 0x15,0xF3);
+	gb_sound_w(machine->device("custom"), 0x14,0x77);
 
 	/* Enable BIOS rom if we have one */
 	gb_rom16_0000( machine, gb_driver_data.ROMMap[gb_driver_data.ROMBank00] ? gb_driver_data.ROMMap[gb_driver_data.ROMBank00] : gb_driver_data.gb_dummy_rom_bank );
@@ -419,7 +419,7 @@ MACHINE_RESET( gbc )
 	/* Allocate memory for internal ram */
 	for( ii = 0; ii < 8; ii++ )
 	{
-		gb_driver_data.GBC_RAMMap[ii] = messram_get_ptr(devtag_get_device(machine, "messram")) + CGB_START_RAM_BANKS + ii * 0x1000;
+		gb_driver_data.GBC_RAMMap[ii] = messram_get_ptr(machine->device("messram")) + CGB_START_RAM_BANKS + ii * 0x1000;
 		memset (gb_driver_data.GBC_RAMMap[ii], 0, 0x1000);
 	}
 }
@@ -433,7 +433,7 @@ static void gb_machine_stop(running_machine &machine)
 	/* NOTE: The reason we save the carts RAM this way instead of using MAME's
        built in macros is because they force the filename to be the name of
        the machine.  We need to have a separate name for each game. */
-	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(&machine, "cart"));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("cart"));
 	image->battery_save(gb_driver_data.gb_cart_ram, gb_driver_data.RAMBanks * 0x2000);
 }
 
@@ -891,7 +891,7 @@ WRITE8_HANDLER ( gb_io_w )
 		break;
 	case 0x0F:						/* IF - Interrupt flag */
 		data &= 0x1F;
-		cpu_set_reg( devtag_get_device(space->machine, "maincpu"), LR35902_IF, data );
+		cpu_set_reg( space->machine->device("maincpu"), LR35902_IF, data );
 		break;
 	}
 
@@ -1446,12 +1446,12 @@ WRITE8_HANDLER ( sgb_io_w )
 /* Interrupt Enable register */
 READ8_HANDLER( gb_ie_r )
 {
-	return cpu_get_reg( devtag_get_device(space->machine, "maincpu"), LR35902_IE );
+	return cpu_get_reg( space->machine->device("maincpu"), LR35902_IE );
 }
 
 WRITE8_HANDLER ( gb_ie_w )
 {
-	cpu_set_reg( devtag_get_device(space->machine, "maincpu"), LR35902_IE, data & 0x1F );
+	cpu_set_reg( space->machine->device("maincpu"), LR35902_IE, data & 0x1F );
 }
 
 /* IO read */
@@ -1471,7 +1471,7 @@ READ8_HANDLER ( gb_io_r )
 			return gb_driver_data.gb_io[offset];
 		case 0x0F:
 			/* Make sure the internal states are up to date */
-			return 0xE0 | cpu_get_reg( devtag_get_device(space->machine, "maincpu"), LR35902_IF );
+			return 0xE0 | cpu_get_reg( space->machine->device("maincpu"), LR35902_IF );
 		default:
 			/* It seems unsupported registers return 0xFF */
 			return 0xFF;
@@ -2024,7 +2024,7 @@ WRITE8_HANDLER ( gbc_io2_w )
 	switch( offset )
 	{
 		case 0x0D:	/* KEY1 - Prepare speed switch */
-			cpu_set_reg( devtag_get_device(space->machine, "maincpu"), LR35902_SPEED, data );
+			cpu_set_reg( space->machine->device("maincpu"), LR35902_SPEED, data );
 			return;
 		case 0x10:	/* BFF - Bios disable */
 			gb_rom16_0000( space->machine, gb_driver_data.ROMMap[gb_driver_data.ROMBank00] );
@@ -2048,7 +2048,7 @@ READ8_HANDLER( gbc_io2_r )
 	switch( offset )
 	{
 	case 0x0D:	/* KEY1 */
-		return cpu_get_reg( devtag_get_device(space->machine, "maincpu"), LR35902_SPEED );
+		return cpu_get_reg( space->machine->device("maincpu"), LR35902_SPEED );
 	case 0x16:	/* RP - Infrared port */
 		break;
 	case 0x30:	/* SVBK - RAM bank select */
@@ -2151,25 +2151,25 @@ static const UINT8 megaduck_sound_offsets[16] = { 0, 2, 1, 3, 4, 6, 5, 7, 8, 9, 
 
 WRITE8_HANDLER( megaduck_sound_w1 )
 {
-	gb_sound_w(devtag_get_device(space->machine, "custom"), megaduck_sound_offsets[offset], data );
+	gb_sound_w(space->machine->device("custom"), megaduck_sound_offsets[offset], data );
 }
 
 READ8_HANDLER( megaduck_sound_r1 )
 {
-	return gb_sound_r( devtag_get_device(space->machine, "custom"), megaduck_sound_offsets[offset] );
+	return gb_sound_r( space->machine->device("custom"), megaduck_sound_offsets[offset] );
 }
 
 WRITE8_HANDLER( megaduck_sound_w2 )
 {
 	switch(offset)
 	{
-		case 0x00:	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x10, data );	break;
-		case 0x01:	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x12, data );	break;
-		case 0x02:	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x11, data );	break;
-		case 0x03:	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x13, data );	break;
-		case 0x04:	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x14, data );	break;
-		case 0x05:	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x16, data );	break;
-		case 0x06:	gb_sound_w(devtag_get_device(space->machine, "custom"), 0x15, data );	break;
+		case 0x00:	gb_sound_w(space->machine->device("custom"), 0x10, data );	break;
+		case 0x01:	gb_sound_w(space->machine->device("custom"), 0x12, data );	break;
+		case 0x02:	gb_sound_w(space->machine->device("custom"), 0x11, data );	break;
+		case 0x03:	gb_sound_w(space->machine->device("custom"), 0x13, data );	break;
+		case 0x04:	gb_sound_w(space->machine->device("custom"), 0x14, data );	break;
+		case 0x05:	gb_sound_w(space->machine->device("custom"), 0x16, data );	break;
+		case 0x06:	gb_sound_w(space->machine->device("custom"), 0x15, data );	break;
 		case 0x07:
 		case 0x08:
 		case 0x09:
@@ -2185,7 +2185,7 @@ WRITE8_HANDLER( megaduck_sound_w2 )
 
 READ8_HANDLER( megaduck_sound_r2 )
 {
-	return gb_sound_r(devtag_get_device(space->machine, "custom"), 0x10 + megaduck_sound_offsets[offset]);
+	return gb_sound_r(space->machine->device("custom"), 0x10 + megaduck_sound_offsets[offset]);
 }
 
 WRITE8_HANDLER( megaduck_rom_bank_select_type1 )

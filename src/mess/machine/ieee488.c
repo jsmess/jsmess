@@ -266,7 +266,7 @@ static DEVICE_START( ieee488 )
 
 		/* find device */
 		(*tailptr)->next = NULL;
-		(*tailptr)->device = devtag_get_device(device->machine, daisy->tag);
+		(*tailptr)->device = device->machine->device(daisy->tag);
 
 		if ((*tailptr)->device == NULL)
 		{

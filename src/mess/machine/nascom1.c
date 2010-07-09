@@ -83,7 +83,7 @@ READ8_HANDLER( nascom2_fdc_select_r )
 
 WRITE8_HANDLER( nascom2_fdc_select_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1793");
+	running_device *fdc = space->machine->device("wd1793");
 	nascom2_fdc.select = data;
 
 	logerror("nascom2_fdc_select_w: %02x\n", data);
@@ -128,7 +128,7 @@ READ8_HANDLER ( nascom1_port_00_r )
 WRITE8_HANDLER( nascom1_port_00_w )
 {
 
-	cassette_change_state( devtag_get_device(space->machine, "cassette"),
+	cassette_change_state( space->machine->device("cassette"),
 		( data & 0x10 ) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
 
 	if (!(data & NASCOM1_KEY_RESET))
@@ -259,7 +259,7 @@ SNAPSHOT_LOAD( nascom1 )
 
 MACHINE_RESET( nascom1 )
 {
-	nascom1_hd6402 = devtag_get_device(machine, "hd6402");
+	nascom1_hd6402 = machine->device("hd6402");
 
 	/* Set up hd6402 pins */
 	ay31015_set_input_pin( nascom1_hd6402, AY31015_SWE, 1 );
@@ -275,7 +275,7 @@ MACHINE_RESET( nascom1 )
 
 DRIVER_INIT( nascom1 )
 {
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 1 * 1024:
 		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
@@ -287,7 +287,7 @@ DRIVER_INIT( nascom1 )
 			0x1400, 0x4fff, 0, 0, "bank1");
 		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x5000, 0xafff, 0, 0);
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 		break;
 
 	case 32 * 1024:
@@ -295,13 +295,13 @@ DRIVER_INIT( nascom1 )
 			0x1400, 0x8fff, 0, 0, "bank1");
 		memory_nop_readwrite(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x9000, 0xafff, 0, 0);
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 		break;
 
 	case 40 * 1024:
 		memory_install_readwrite_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM),
 			0x1400, 0xafff, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 		break;
 	}
 }

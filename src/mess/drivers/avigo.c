@@ -340,7 +340,7 @@ static void avigo_refresh_memory(running_machine *machine)
 		/* %001 */
 		/* ram */
 		case 0x01:
-			addr = messram_get_ptr(devtag_get_device(machine, "messram")) + ((avigo_ram_bank_l & 0x07)<<14);
+			addr = messram_get_ptr(machine->device("messram")) + ((avigo_ram_bank_l & 0x07)<<14);
 			memory_set_bankptr(machine, "bank3", addr);
 			memory_set_bankptr(machine, "bank7", addr);
 			avigo_banked_opbase[2] = ((UINT8 *) addr) - (2 * 0x4000);
@@ -438,14 +438,14 @@ static MACHINE_RESET( avigo )
 	avigo_flash_at_0x8000 = 0;
 
 	/* clear */
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, 128*1024);
+	memset(messram_get_ptr(machine->device("messram")), 0, 128*1024);
 
 	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), avigo_opbase_handler);
 
 	addr = (unsigned char *)intelflash_getmemptr(0);
 	avigo_setbank(machine, 0, addr, avigo_flash_0x0000_read_handler, avigo_flash_0x0000_write_handler);
 
-	avigo_setbank(machine, 3, messram_get_ptr(devtag_get_device(machine, "messram")), NULL, NULL);
+	avigo_setbank(machine, 3, messram_get_ptr(machine->device("messram")), NULL, NULL);
 
 	/* 0x08000 is specially banked! */
 	avigo_refresh_memory(machine);
@@ -774,7 +774,7 @@ static  READ8_HANDLER(avigo_ad_data_r)
 
 static WRITE8_HANDLER(avigo_speaker_w)
 {
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 	UINT8 previous_speaker;
 
 	previous_speaker = avigo_speaker_data;

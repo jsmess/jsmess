@@ -74,11 +74,11 @@ static void dl1416_update(running_device *device, int index)
 
 static void aim65_pia(running_machine *machine)
 {
-	dl1416_update(devtag_get_device(machine, "ds1"), 0);
-	dl1416_update(devtag_get_device(machine, "ds2"), 1);
-	dl1416_update(devtag_get_device(machine, "ds3"), 2);
-	dl1416_update(devtag_get_device(machine, "ds4"), 3);
-	dl1416_update(devtag_get_device(machine, "ds5"), 4);
+	dl1416_update(machine->device("ds1"), 0);
+	dl1416_update(machine->device("ds2"), 1);
+	dl1416_update(machine->device("ds3"), 2);
+	dl1416_update(machine->device("ds4"), 3);
+	dl1416_update(machine->device("ds5"), 4);
 }
 
 
@@ -168,8 +168,8 @@ WRITE_LINE_DEVICE_HANDLER(aim65_riot_irq)
 
 MACHINE_START( aim65 )
 {
-	running_device *via_0 = devtag_get_device(machine, "via6522_0");
-	running_device *ram = devtag_get_device(machine, "messram");
+	running_device *via_0 = machine->device("via6522_0");
+	running_device *ram = machine->device("messram");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Init RAM */

@@ -1147,11 +1147,11 @@ void wd17xx_set_drive(running_device *device, UINT8 drive)
 		if (device->owner() != NULL) {
 			w->drive = device->owner()->subdevice(w->intf->floppy_drive_tags[drive]);
 			if (w->drive == NULL) {
-				w->drive = devtag_get_device(device->machine, w->intf->floppy_drive_tags[drive]);
+				w->drive = device->machine->device(w->intf->floppy_drive_tags[drive]);
 			}
 		}
 		else
-			w->drive = devtag_get_device(device->machine, w->intf->floppy_drive_tags[drive]);
+			w->drive = device->machine->device(w->intf->floppy_drive_tags[drive]);
 	}
 }
 
@@ -2027,11 +2027,11 @@ static DEVICE_RESET( wd1770 )
 			if (device->owner() != NULL)
 				img = device->owner()->subdevice(w->intf->floppy_drive_tags[i]);
 				if (img == NULL) {
-					img = devtag_get_device(device->machine, w->intf->floppy_drive_tags[i]);
+					img = device->machine->device(w->intf->floppy_drive_tags[i]);
 				}
 
 			else
-				img = devtag_get_device(device->machine, w->intf->floppy_drive_tags[i]);
+				img = device->machine->device(w->intf->floppy_drive_tags[i]);
 
 			if (img!=NULL) {
 				floppy_drive_set_controller(img,device);

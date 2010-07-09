@@ -24,7 +24,7 @@ static int clk_level_tape;
 static TIMER_CALLBACK(poly88_usart_timer_callback)
 {
 	int_vector = 0xe7;
-	cpu_set_input_line(devtag_get_device(machine, "maincpu"), 0, HOLD_LINE);
+	cpu_set_input_line(machine->device("maincpu"), 0, HOLD_LINE);
 }
 
 WRITE8_HANDLER(poly88_baud_rate_w)
@@ -154,16 +154,16 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 //  if (!(input_port_read(machine, "DSW0") & 0x02)) /* V.24 / Tape Switch */
 	//{
 		/* tape reading */
-		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_PLAY)
+		if (cassette_get_state(machine->device("cassette"))&CASSETTE_PLAY)
 		{
 					if (clk_level_tape)
 					{
-						previous_level = (cassette_input(devtag_get_device(machine, "cassette")) > 0.038) ? 1 : 0;
+						previous_level = (cassette_input(machine->device("cassette")) > 0.038) ? 1 : 0;
 						clk_level_tape = 0;
 					}
 					else
 					{
-						current_level = (cassette_input(devtag_get_device(machine, "cassette")) > 0.038) ? 1 : 0;
+						current_level = (cassette_input(machine->device("cassette")) > 0.038) ? 1 : 0;
 
 						if (previous_level!=current_level)
 						{
@@ -171,7 +171,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 //data = current_level;
 							set_out_data_bit(poly88_cassette_serial_connection.State, data);
 							serial_connection_out(machine, &poly88_cassette_serial_connection);
-							msm8251_receive_clock(devtag_get_device(machine, "uart"));
+							msm8251_receive_clock(machine->device("uart"));
 
 							clk_level_tape = 1;
 						}
@@ -179,14 +179,14 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 		}
 
 		/* tape writing */
-		if (cassette_get_state(devtag_get_device(machine, "cassette"))&CASSETTE_RECORD)
+		if (cassette_get_state(machine->device("cassette"))&CASSETTE_RECORD)
 		{
 			data = get_in_data_bit(poly88_cassette_serial_connection.input_state);
 			data ^= clk_level_tape;
-			cassette_output(devtag_get_device(machine, "cassette"), data&0x01 ? 1 : -1);
+			cassette_output(machine->device("cassette"), data&0x01 ? 1 : -1);
 
 			if (!clk_level_tape)
-				msm8251_transmit_clock(devtag_get_device(machine, "uart"));
+				msm8251_transmit_clock(machine->device("uart"));
 
 			clk_level_tape = clk_level_tape ? 0 : 1;
 
@@ -196,7 +196,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 		clk_level_tape = 1;
 
 		if (!clk_level)
-			msm8251_transmit_clock(devtag_get_device(machine, "uart"));
+			msm8251_transmit_clock(machine->device("uart"));
 		clk_level = clk_level ? 0 : 1;
 //  }
 }
@@ -204,7 +204,7 @@ static TIMER_CALLBACK(poly88_cassette_timer_callback)
 
 static TIMER_CALLBACK( setup_machine_state )
 {
-	msm8251_connect(devtag_get_device(machine, "uart"), &poly88_cassette_serial_connection);
+	msm8251_connect(machine->device("uart"), &poly88_cassette_serial_connection);
 }
 
 DRIVER_INIT ( poly88 )
@@ -222,7 +222,7 @@ DRIVER_INIT ( poly88 )
 
 MACHINE_RESET(poly88)
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), poly88_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), poly88_irq_callback);
 	intr = 0;
 	last_code = 0;
 
@@ -304,7 +304,7 @@ SNAPSHOT_LOAD( poly88 )
 					break;
 			case 3 :
     				/* 03 Auto Start @ Address */
-    				cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), I8085_PC, address);
+    				cpu_set_reg(image.device().machine->device("maincpu"), I8085_PC, address);
     				theend = 1;
     				break;
     		case 4 :
@@ -329,6 +329,6 @@ SNAPSHOT_LOAD( poly88 )
 		}
 		pos+=recordLen;
 	}
-	devtag_get_device(image.device().machine, "uart")->reset();
+	image.device().machine->device("uart")->reset();
 	return IMAGE_INIT_PASS;
 }

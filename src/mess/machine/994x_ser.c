@@ -132,10 +132,10 @@ static DEVICE_IMAGE_LOAD( ti99_4_rs232 )
 	running_device *tms9902 = NULL;
 
 	if (strcmp(image.device().tag(), "rs232:port0")) {
-		tms9902 = devtag_get_device(image.device().machine, "rs232:tms9902_0");
+		tms9902 = image.device().machine->device("rs232:tms9902_0");
 	}
 	if (strcmp(image.device().tag(), "rs232:port1")) {
-		tms9902 = devtag_get_device(image.device().machine, "rs232:tms9902_1");
+		tms9902 = image.device().machine->device("rs232:tms9902_1");
 	}
 
 	if (image)
@@ -173,7 +173,7 @@ static DEVICE_START( ti99_4_rs232 )
 static DEVICE_RESET( ti99_4_rs232 )
 {
 	rs232_DSR = memory_region(device->machine, region_dsr) + offset_rs232_dsr;
-	running_device *box = devtag_get_device(device->machine, "per_exp_box");
+	running_device *box = device->machine->device("per_exp_box");
 	ti99_peb_set_card_handlers(box, 0x1300, & rs232_handlers);
 }
 
@@ -303,7 +303,7 @@ static int rs232_cru_r(running_machine *machine, int offset)
 		switch (offset)
 		{
 		case 0:
-			reply = ti99_4_pio_r(devtag_get_device(machine, "rs232:pio"), offset);
+			reply = ti99_4_pio_r(machine->device("rs232:pio"), offset);
 			break;
 
 		default:
@@ -314,12 +314,12 @@ static int rs232_cru_r(running_machine *machine, int offset)
 
 	case 1:
 		/* first 9902 */
-		reply = tms9902_cru_r(devtag_get_device(machine, "rs232:tms9902_0"), offset);
+		reply = tms9902_cru_r(machine->device("rs232:tms9902_0"), offset);
 		break;
 
 	case 2:
 		/* second 9902 */
-		reply = tms9902_cru_r(devtag_get_device(machine, "rs232:tms9902_1"), offset);
+		reply = tms9902_cru_r(machine->device("rs232:tms9902_1"), offset);
 		break;
 
 	default:
@@ -340,17 +340,17 @@ static void rs232_cru_w(running_machine *machine, int offset, int data)
 	{
 	case 0:
 		/* custom buffer */
-		ti99_4_pio_w(devtag_get_device(machine, "rs232:pio"), offset, data);
+		ti99_4_pio_w(machine->device("rs232:pio"), offset, data);
 		break;
 
 	case 1:
 		/* first 9902 */
-		tms9902_cru_w(devtag_get_device(machine, "rs232:tms9902_0"), offset, data);
+		tms9902_cru_w(machine->device("rs232:tms9902_0"), offset, data);
 		break;
 
 	case 2:
 		/* second 9902 */
-		tms9902_cru_w(devtag_get_device(machine, "rs232:tms9902_1"), offset, data);
+		tms9902_cru_w(machine->device("rs232:tms9902_1"), offset, data);
 		break;
 
 	default:
@@ -375,7 +375,7 @@ static  READ8_HANDLER(rs232_mem_r)
 	else
 	{
 		/* PIO */
-		reply = ti99_4_pio_buf_r(devtag_get_device(space->machine, "rs232:pio"), offset);
+		reply = ti99_4_pio_buf_r(space->machine->device("rs232:pio"), offset);
 	}
 
 	return reply;
@@ -389,7 +389,7 @@ static WRITE8_HANDLER(rs232_mem_w)
 	if (offset >= 0x1000)
 	{
 		/* PIO */
-		ti99_4_pio_buf_w(devtag_get_device(space->machine, "rs232:pio"), offset, data);
+		ti99_4_pio_buf_w(space->machine->device("rs232:pio"), offset, data);
 	}
 	else
 	{
@@ -402,19 +402,19 @@ static WRITE8_HANDLER(rs232_mem_w)
 */
 static TMS9902_INT_CALLBACK( int_callback_0 )
 {
-	running_device *box = devtag_get_device(device->machine, "per_exp_box");
+	running_device *box = device->machine->device("per_exp_box");
 	ti99_peb_set_ila_bit(box, inta_rs232_1_bit, INT);
 }
 static TMS9902_INT_CALLBACK( int_callback_1 )
 {
-	running_device *box = devtag_get_device(device->machine, "per_exp_box");
+	running_device *box = device->machine->device("per_exp_box");
 	ti99_peb_set_ila_bit(box, inta_rs232_2_bit, INT);
 }
 
 static TMS9902_XMIT_CALLBACK( xmit_callback_0 )
 {
 	UINT8 buf = data;
-	device_image_interface *rs232_fp = dynamic_cast<device_image_interface *>(devtag_get_device(device->machine, "rs232:port0"));
+	device_image_interface *rs232_fp = dynamic_cast<device_image_interface *>(device->machine->device("rs232:port0"));
 
 	if (rs232_fp)
 		rs232_fp->fwrite(&buf, 1);
@@ -423,7 +423,7 @@ static TMS9902_XMIT_CALLBACK( xmit_callback_0 )
 static TMS9902_XMIT_CALLBACK( xmit_callback_1 )
 {
 	UINT8 buf = data;
-	device_image_interface *rs232_fp = dynamic_cast<device_image_interface *>(devtag_get_device(device->machine, "rs232:port1"));
+	device_image_interface *rs232_fp = dynamic_cast<device_image_interface *>(device->machine->device("rs232:port1"));
 
 	if (rs232_fp)
 		rs232_fp->fwrite(&buf, 1);

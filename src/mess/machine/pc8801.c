@@ -130,7 +130,7 @@ static void pc8801_init_interrupt(running_machine *machine)
 	interrupt_level_reg = 0;
 	interrupt_mask_reg = 0xf8;
 	interrupt_trig_reg = 0x0;
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pc8801_interrupt_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), pc8801_interrupt_callback);
 }
 
 WRITE8_HANDLER( pc88sr_outport_30 )
@@ -144,7 +144,7 @@ WRITE8_HANDLER( pc88sr_outport_40 )
 	/* bit 3,4,6 not implemented */
 	/* bit 7 incorrect behavior */
 	pc88_state *state = (pc88_state *)space->machine->driver_data;
-	running_device *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = space->machine->device("beep");
 
 	/* printer */
 	centronics_strobe_w(state->centronics, BIT(data, 0));
@@ -651,7 +651,7 @@ static void fix_V1V2(void)
 
 static void pc88sr_ch_reset(running_machine *machine, int hireso)
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = machine->device("beep");
 	int a;
 
 	// old code was allocating/freeing a smaller region depending on the "MEM" config,
@@ -759,7 +759,7 @@ static void pc8801_init_5fd(running_machine *machine)
 	else
 		cputag_resume(machine, "sub", SUSPEND_REASON_DISABLE);
 
-	cpu_set_input_line_vector(devtag_get_device(machine, "sub"), 0, 0);
+	cpu_set_input_line_vector(machine->device("sub"), 0, 0);
 
 	floppy_mon_w(floppy_get_device(machine, 0), CLEAR_LINE);
 	floppy_mon_w(floppy_get_device(machine, 1), CLEAR_LINE);
@@ -847,10 +847,10 @@ MACHINE_START( pc88srl )
 	pc88_state *state = (pc88_state *)machine->driver_data;
 
 	/* find devices */
-	state->upd765 = devtag_get_device(machine, UPD765_TAG);
-	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->upd765 = machine->device(UPD765_TAG);
+	state->upd1990a = machine->device(UPD1990A_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);

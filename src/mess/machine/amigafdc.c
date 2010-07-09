@@ -663,7 +663,7 @@ static TIMER_CALLBACK(fdc_rev_proc)
 	amiga_fdc_t *fdc = get_safe_token((running_device*)ptr);
 
 	/* Issue a index pulse when a disk revolution completes */
-	cia = devtag_get_device(machine, "cia_1");
+	cia = machine->device("cia_1");
 	mos6526_flag_w(cia, 0);
 	mos6526_flag_w(cia, 1);
 

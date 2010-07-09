@@ -37,7 +37,7 @@ static MACHINE_RESET(sage2)
 
 	memcpy((UINT8*)sage2_ram,user1,0x2000);
 
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 }
 
 static WRITE8_DEVICE_HANDLER( sage2_kbd_put )

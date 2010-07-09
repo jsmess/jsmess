@@ -432,15 +432,15 @@ static MACHINE_START( pc8001 )
 {
 	pc8001_state *state = (pc8001_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	running_device *messram = devtag_get_device(machine, "messram");
+	running_device *messram = machine->device("messram");
 
 	/* look up devices */
-	state->i8257 = devtag_get_device(machine, I8257_TAG);
-	state->upd1990a = devtag_get_device(machine, UPD1990A_TAG);
-	state->upd3301 = devtag_get_device(machine, UPD3301_TAG);
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->i8257 = machine->device(I8257_TAG);
+	state->upd1990a = machine->device(UPD1990A_TAG);
+	state->upd3301 = machine->device(UPD3301_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* initialize RTC */
 	upd1990a_cs_w(state->upd1990a, 1);

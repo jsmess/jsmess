@@ -76,9 +76,9 @@ static struct _wd17xx_state {
 static running_device *cassette_device_image(running_machine *machine)
 {
 	if (lx385_ctrl & 0x08)
-		return devtag_get_device(machine, "cassetteb");
+		return machine->device("cassetteb");
 	else
-		return devtag_get_device(machine, "cassettea");
+		return machine->device("cassettea");
 }
 
 static TIMER_CALLBACK(z80ne_cassette_tc)
@@ -239,7 +239,7 @@ static DIRECT_UPDATE_HANDLER( reset_delay_count )
 
 static void reset_lx388(running_machine *machine)
 {
-	lx388_kr2376 = devtag_get_device(machine, "lx388_kr2376");
+	lx388_kr2376 = machine->device("lx388_kr2376");
 	kr2376_set_input_pin( lx388_kr2376, KR2376_DSII, 0);
 	kr2376_set_input_pin( lx388_kr2376, KR2376_PII, 0);
 }
@@ -356,7 +356,7 @@ static MACHINE_RESET(z80ne_base)
 	cass_data.input.length = 0;
 	cass_data.input.bit = 1;
 
-	z80ne_ay31015 = devtag_get_device(machine, "ay_3_1015");
+	z80ne_ay31015 = machine->device("ay_3_1015");
 	ay31015_set_input_pin( z80ne_ay31015, AY31015_CS, 0 );
 	ay31015_set_input_pin( z80ne_ay31015, AY31015_NB1, 1 );
 	ay31015_set_input_pin( z80ne_ay31015, AY31015_NB2, 1 );
@@ -630,10 +630,10 @@ WRITE8_HANDLER(lx385_ctrl_w)
 	/* motors */
 	if(changed_bits & 0x18)
 	{
-		cassette_change_state(devtag_get_device(space->machine, "cassettea"),
+		cassette_change_state(space->machine->device("cassettea"),
 			(motor_a) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
-		cassette_change_state(devtag_get_device(space->machine, "cassetteb"),
+		cassette_change_state(space->machine->device("cassetteb"),
 			(motor_b) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 		if (motor_a || motor_b)
@@ -657,7 +657,7 @@ READ8_DEVICE_HANDLER( lx388_mc6847_videoram_r )
 
 VIDEO_UPDATE( lx388 )
 {
-	running_device *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	running_device *mc6847 = screen->machine->device("mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
 }
 
@@ -672,7 +672,7 @@ READ8_HANDLER(lx388_data_r)
 
 READ8_HANDLER( lx388_read_field_sync )
 {
-	running_device *mc6847 = devtag_get_device(space->machine, "mc6847");
+	running_device *mc6847 = space->machine->device("mc6847");
 	return mc6847_fs_r(mc6847) << 7;
 }
 
@@ -737,7 +737,7 @@ READ8_DEVICE_HANDLER(lx390_reset_bank)
 	offs_t pc;
 
 	/* if PC is not in range, we are under integrated debugger control, DON'T SWAP */
-	pc = cpu_get_pc(devtag_get_device(device->machine, "z80ne"));
+	pc = cpu_get_pc(device->machine->device("z80ne"));
 	if((pc >= 0xf000) && (pc <=0xffff))
 	{
 		LOG(("lx390_reset_bank, reset memory bank 1\n"));

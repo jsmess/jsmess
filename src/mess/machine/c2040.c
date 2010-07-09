@@ -1516,7 +1516,7 @@ static DEVICE_START( c2040 )
 	c2040->riot1 = device->subdevice(M6532_1_TAG);
 	c2040->miot = device->subdevice(M6530_TAG);
 	c2040->via = device->subdevice(M6522_TAG);
-	c2040->bus = devtag_get_device(device->machine, config->bus_tag);
+	c2040->bus = device->machine->device(config->bus_tag);
 	c2040->unit[0].image = device->subdevice(FLOPPY_0);
 	c2040->unit[1].image = device->subdevice(FLOPPY_1);
 

@@ -1968,7 +1968,7 @@ static DEVICE_START( vic3 )
 	int width, height;
 	int i;
 
-	vic3->cpu = devtag_get_device(device->machine, intf->cpu);
+	vic3->cpu = device->machine->device(intf->cpu);
 
 	vic3->main_screen = device->machine->device<screen_device>(intf->screen);
 	width = vic3->main_screen->width();

@@ -997,7 +997,7 @@ static MACHINE_START( sc3000 )
 	sg1000_state *state = (sg1000_state *)machine->driver_data;
 
 	/* find devices */
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
@@ -1030,9 +1030,9 @@ static MACHINE_START( sf7000 )
 	sg1000_state *state = (sg1000_state *)machine->driver_data;
 
 	/* find devices */
-	state->upd765 = devtag_get_device(machine, UPD765_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->upd765 = machine->device(UPD765_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
@@ -1042,8 +1042,8 @@ static MACHINE_START( sf7000 )
 
 	/* configure memory banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, Z80_TAG), 0);
-	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
-	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(devtag_get_device(machine, "messram")), 0);
+	memory_configure_bank(machine, "bank1", 1, 1, messram_get_ptr(machine->device("messram")), 0);
+	memory_configure_bank(machine, "bank2", 0, 1, messram_get_ptr(machine->device("messram")), 0);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);

@@ -132,7 +132,7 @@ static VIDEO_START( v1050 )
 	v1050_state *state = (v1050_state *)machine->driver_data;
 
 	/* find devices */
-	state->mc6845 = devtag_get_device(machine, H46505_TAG);
+	state->mc6845 = machine->device(H46505_TAG);
 
 	/* allocate memory */
 	state->attr_ram = auto_alloc_array(machine, UINT8, V1050_VIDEORAM_SIZE);

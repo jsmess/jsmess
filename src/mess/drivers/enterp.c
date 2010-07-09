@@ -82,10 +82,10 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 	case 0xfa:
 	case 0xfb:
 		/* additional 64k ram */
-		if (messram_get_size(devtag_get_device(space->machine, "messram")) == 128*1024)
+		if (messram_get_size(space->machine->device("messram")) == 128*1024)
 		{
 			memory_install_readwrite_bank(space, start, end, 0, 0, page_num);
-			memory_set_bankptr(space->machine, page_num, messram_get_ptr(devtag_get_device(space->machine, "messram")) + (index - 0xf4) * 0x4000);
+			memory_set_bankptr(space->machine, page_num, messram_get_ptr(space->machine->device("messram")) + (index - 0xf4) * 0x4000);
 		}
 		else
 		{
@@ -99,7 +99,7 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 	case 0xff:
 		/* basic 64k ram */
 		memory_install_readwrite_bank(space, start, end, 0, 0, page_num);
-		memory_set_bankptr(space->machine, page_num, messram_get_ptr(devtag_get_device(space->machine, "messram")) + (index - 0xfc) * 0x4000);
+		memory_set_bankptr(space->machine, page_num, messram_get_ptr(space->machine->device("messram")) + (index - 0xfc) * 0x4000);
 		break;
 
 	default:
@@ -183,7 +183,7 @@ static const dave_interface enterprise_dave_interface =
 
 static MACHINE_RESET( enterprise )
 {
-	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), 0, 0xff);
+	cpu_set_input_line_vector(machine->device("maincpu"), 0, 0xff);
 }
 
 
@@ -239,7 +239,7 @@ static READ8_HANDLER( exdos_card_r )
 */
 static WRITE8_HANDLER( exdos_card_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1770");
+	running_device *fdc = space->machine->device("wd1770");
 
 	/* drive */
 	if (BIT(data, 0)) wd17xx_set_drive(fdc, 0);

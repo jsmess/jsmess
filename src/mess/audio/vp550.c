@@ -239,8 +239,8 @@ static DEVICE_START( vp550 )
 	vp550_t *vp550 = get_safe_token(device);
 
 	/* look up devices */
-	vp550->cdp1863[CHANNEL_A] = devtag_get_device(device->machine, "vp550:u1");
-	vp550->cdp1863[CHANNEL_B] = devtag_get_device(device->machine, "vp550:u2");
+	vp550->cdp1863[CHANNEL_A] = device->machine->device("vp550:u1");
+	vp550->cdp1863[CHANNEL_B] = device->machine->device("vp550:u2");
 	vp550->sync_timer = device->machine->device<timer_device>("vp550:sync");
 
 	/* set initial values */

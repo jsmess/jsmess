@@ -161,13 +161,13 @@ static const eeprom_interface qsound_eeprom_interface =
 
 static READ16_HANDLER( cps1_eeprom_port_r )
 {
-	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = space->machine->device("eeprom");
 	return eeprom_read_bit(eeprom);
 }
 
 static WRITE16_HANDLER( cps1_eeprom_port_w )
 {
-	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = space->machine->device("eeprom");
 	if (ACCESSING_BITS_0_7)
 	{
 		/*

@@ -709,7 +709,7 @@ static device_image_interface *find_device_by_identity(running_machine *machine,
 	if (ident->type == IO_UNKNOWN)
 	{
 		/* no device_type was specified; use the new preferred mechanism */
-		device = dynamic_cast<device_image_interface *>(devtag_get_device(machine, ident->tag));
+		device = dynamic_cast<device_image_interface *>(machine->device(ident->tag));
 	}
 
 	/* did the image slot lookup fail? */

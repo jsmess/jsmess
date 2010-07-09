@@ -26,7 +26,7 @@ static READ16_HANDLER(sun1_upd7201_r)
 
 static WRITE16_HANDLER(sun1_upd7201_w)
 {
-	running_device *devconf = devtag_get_device(space->machine, "terminal");
+	running_device *devconf = space->machine->device("terminal");
 	if (offset==0) terminal_write(devconf,0,data >> 8);
 }
 
@@ -49,7 +49,7 @@ static MACHINE_RESET(sun1)
 
 	memcpy((UINT8*)sun1_ram,user1,0x4000);
 
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 }
 
 

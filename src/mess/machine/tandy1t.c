@@ -203,7 +203,7 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	{
 	case 1:
 		tandy_ppi.portb = data;
-		pit8253_gate2_w(devtag_get_device(space->machine, "pit8253"), BIT(data, 0));
+		pit8253_gate2_w(space->machine->device("pit8253"), BIT(data, 0));
 		pc_speaker_set_spkrdata( space->machine, data & 0x02 );
 		pc_keyb_set_clock(data&0x40);
 		if ( data & 0x80 )
@@ -214,9 +214,9 @@ WRITE8_HANDLER ( tandy1000_pio_w )
 	case 2:
 		tandy_ppi.portc = data;
 		if (data & 8)
-			cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), 1);
+			cpu_set_clockscale(space->machine->device("maincpu"), 1);
 		else
-			cpu_set_clockscale(devtag_get_device(space->machine, "maincpu"), 4.77/8);
+			cpu_set_clockscale(space->machine->device("maincpu"), 4.77/8);
 		break;
 	}
 }

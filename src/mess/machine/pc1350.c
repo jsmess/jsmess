@@ -91,7 +91,7 @@ int pc1350_brk(running_device *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1350 )
 {
-	running_device *main_cpu = devtag_get_device(machine, "maincpu");
+	running_device *main_cpu = machine->device("maincpu");
 	UINT8 *ram = memory_region(machine, "maincpu") + 0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 
@@ -124,22 +124,22 @@ MACHINE_START( pc1350 )
 	timer_set(machine, ATTOTIME_IN_SEC(1), NULL, 0, pc1350_power_up);
 
 	memory_install_readwrite_bank(space, 0x6000, 0x6fff, 0, 0, "bank1");
-	memory_set_bankptr(machine, "bank1", &messram_get_ptr(devtag_get_device(machine, "messram"))[0x0000]);
+	memory_set_bankptr(machine, "bank1", &messram_get_ptr(machine->device("messram"))[0x0000]);
 
-	if (messram_get_size(devtag_get_device(machine, "messram")) >= 0x3000)
+	if (messram_get_size(machine->device("messram")) >= 0x3000)
 	{
 		memory_install_readwrite_bank(space, 0x4000, 0x5fff, 0, 0, "bank2");
-		memory_set_bankptr(machine, "bank2", &messram_get_ptr(devtag_get_device(machine, "messram"))[0x1000]);
+		memory_set_bankptr(machine, "bank2", &messram_get_ptr(machine->device("messram"))[0x1000]);
 	}
 	else
 	{
 		memory_nop_readwrite(space, 0x4000, 0x5fff, 0, 0);
 	}
 
-	if (messram_get_size(devtag_get_device(machine, "messram")) >= 0x5000)
+	if (messram_get_size(machine->device("messram")) >= 0x5000)
 	{
 		memory_install_readwrite_bank(space, 0x2000, 0x3fff, 0, 0, "bank3");
-		memory_set_bankptr(machine, "bank3", &messram_get_ptr(devtag_get_device(machine, "messram"))[0x3000]);
+		memory_set_bankptr(machine, "bank3", &messram_get_ptr(machine->device("messram"))[0x3000]);
 	}
 	else
 	{

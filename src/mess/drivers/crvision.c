@@ -529,8 +529,8 @@ static MACHINE_START( creativision )
 	crvision_state *state = (crvision_state *)machine->driver_data;
 
 	/* find devices */
-	state->sn76489 = devtag_get_device(machine, SN76489_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->sn76489 = machine->device(SN76489_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);

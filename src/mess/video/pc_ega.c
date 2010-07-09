@@ -670,7 +670,7 @@ static VIDEO_START( pc_ega )
 
 	pc_ega_install_banks(machine);
 
-	ega.crtc_ega = devtag_get_device(machine, EGA_CRTC_NAME);
+	ega.crtc_ega = machine->device(EGA_CRTC_NAME);
 	ega.update_row = NULL;
 	ega.misc_output = 0;
 	ega.attribute.index_write = 1;

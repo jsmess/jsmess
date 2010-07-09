@@ -1104,15 +1104,15 @@ static MACHINE_START( v1050 )
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->i8214 = devtag_get_device(machine, UPB8214_TAG);
-	state->msm58321 = devtag_get_device(machine, MSM58321RS_TAG);
-	state->i8255a_crt_z80 = devtag_get_device(machine, I8255A_DISP_TAG);
-	state->i8255a_crt_m6502 = devtag_get_device(machine, I8255A_M6502_TAG);
-	state->i8251_kb = devtag_get_device(machine, I8251A_KB_TAG);
-	state->i8251_sio = devtag_get_device(machine, I8251A_SIO_TAG);
+	state->i8214 = machine->device(UPB8214_TAG);
+	state->msm58321 = machine->device(MSM58321RS_TAG);
+	state->i8255a_crt_z80 = machine->device(I8255A_DISP_TAG);
+	state->i8255a_crt_m6502 = machine->device(I8255A_M6502_TAG);
+	state->i8251_kb = machine->device(I8251A_KB_TAG);
+	state->i8251_sio = machine->device(I8251A_SIO_TAG);
 	state->timer_sio = machine->device<timer_device>(TIMER_SIO_TAG);
-	state->mb8877 = devtag_get_device(machine, MB8877_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
+	state->mb8877 = machine->device(MB8877_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* initialize I8214 */
 	i8214_etlg_w(state->i8214, 1);
@@ -1122,25 +1122,25 @@ static MACHINE_START( v1050 )
 	msm58321_cs1_w(state->msm58321, 1);
 
 	/* set CPU interrupt callback */
-	cpu_set_irq_callback(devtag_get_device(machine, Z80_TAG), v1050_int_ack);
+	cpu_set_irq_callback(machine->device(Z80_TAG), v1050_int_ack);
 
 	/* setup memory banking */
-	memory_configure_bank(machine, "bank1", 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")), 0x10000);
-	memory_configure_bank(machine, "bank1", 2, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1c000, 0);
+	memory_configure_bank(machine, "bank1", 0, 2, messram_get_ptr(machine->device("messram")), 0x10000);
+	memory_configure_bank(machine, "bank1", 2, 1, messram_get_ptr(machine->device("messram")) + 0x1c000, 0);
 	memory_configure_bank(machine, "bank1", 3, 1, memory_region(machine, Z80_TAG), 0);
 
 	memory_install_readwrite_bank(program, 0x2000, 0x3fff, 0, 0, "bank2");
-	memory_configure_bank(machine, "bank2", 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x2000, 0x10000);
-	memory_configure_bank(machine, "bank2", 2, 1, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x1e000, 0);
+	memory_configure_bank(machine, "bank2", 0, 2, messram_get_ptr(machine->device("messram")) + 0x2000, 0x10000);
+	memory_configure_bank(machine, "bank2", 2, 1, messram_get_ptr(machine->device("messram")) + 0x1e000, 0);
 
 	memory_install_readwrite_bank(program, 0x4000, 0x7fff, 0, 0, "bank3");
-	memory_configure_bank(machine, "bank3", 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000, 0x10000);
+	memory_configure_bank(machine, "bank3", 0, 2, messram_get_ptr(machine->device("messram")) + 0x4000, 0x10000);
 
 	memory_install_readwrite_bank(program, 0x8000, 0xbfff, 0, 0, "bank4");
-	memory_configure_bank(machine, "bank4", 0, 2, messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000, 0x10000);
+	memory_configure_bank(machine, "bank4", 0, 2, messram_get_ptr(machine->device("messram")) + 0x8000, 0x10000);
 
 	memory_install_readwrite_bank(program, 0xc000, 0xffff, 0, 0, "bank5");
-	memory_configure_bank(machine, "bank5", 0, 3, messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000, 0);
+	memory_configure_bank(machine, "bank5", 0, 3, messram_get_ptr(machine->device("messram")) + 0xc000, 0);
 
 	v1050_bankswitch(machine);
 

@@ -449,11 +449,11 @@ static MACHINE_START( c16 )
 	c16_state *state = (c16_state *)machine->driver_data;
 
 	state->maincpu = machine->device<legacy_cpu_device>("maincpu");
-	state->ted7360 = devtag_get_device(machine, "ted7360");
-	state->serbus = devtag_get_device(machine, "iec");
-	state->cassette = devtag_get_device(machine, "cassette");
-	state->messram = devtag_get_device(machine, "messram");
-	state->sid = devtag_get_device(machine, "sid");
+	state->ted7360 = machine->device("ted7360");
+	state->serbus = machine->device("iec");
+	state->cassette = machine->device("cassette");
+	state->messram = machine->device("messram");
+	state->sid = machine->device("sid");
 
 	state_save_register_global(machine, state->old_level);
 	state_save_register_global(machine, state->lowrom);

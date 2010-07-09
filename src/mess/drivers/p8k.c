@@ -177,7 +177,7 @@ static WRITE_LINE_DEVICE_HANDLER( p8k_dma_irq_w )
 {
 	if (state)
 	{
-		running_device *i8272 = devtag_get_device(device->machine, "i8272");
+		running_device *i8272 = device->machine->device("i8272");
 		upd765_tc_w(i8272, state);
 	}
 
@@ -315,14 +315,14 @@ static const z80_daisy_config p8k_daisy_chain[] =
 
 static WRITE_LINE_DEVICE_HANDLER( p8k_i8272_irq_w )
 {
-	running_device *z80pio = devtag_get_device(device->machine, "z80pio_2");
+	running_device *z80pio = device->machine->device("z80pio_2");
 
 	z80pio_pb_w(z80pio, 0, (state) ? 0x10 : 0x00);
 }
 
 static UPD765_DMA_REQUEST( p8k_i8272_drq_w )
 {
-	running_device *z80dma = devtag_get_device(device->machine, "z80dma");
+	running_device *z80dma = device->machine->device("z80dma");
 
 	z80dma_rdy_w(z80dma, state);
 }

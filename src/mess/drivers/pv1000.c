@@ -338,7 +338,7 @@ static MACHINE_START( pv1000 )
 
 	state->irq_on_timer = timer_alloc( machine, d65010_irq_on_cb, NULL );
 	state->irq_off_timer = timer_alloc( machine, d65010_irq_off_cb, NULL );
-	state->maincpu = devtag_get_device( machine, "maincpu" );
+	state->maincpu = machine->device( "maincpu" );
 	state->screen = machine->device<screen_device>("screen" );
 }
 

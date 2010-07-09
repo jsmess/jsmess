@@ -339,7 +339,7 @@ static PALETTE_INIT( p500 )
 
 static VIDEO_UPDATE( p500 )
 {
-	running_device *vic2 = devtag_get_device(screen->machine, "vic6567");
+	running_device *vic2 = screen->machine->device("vic6567");
 
 	vic2_video_update(vic2, bitmap, cliprect);
 	return 0;

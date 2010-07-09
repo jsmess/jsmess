@@ -127,7 +127,7 @@ int pc1403_inb(void)
 void pc1403_outc(running_device *device, int data)
 {
     pc1403_portc = data;
-//    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_pc(devtag_get_device(device->machine, "maincpu")), data);
+//    logerror("%g pc %.4x outc %.2x\n", attotime_to_double(timer_get_time(device->machine)), cpu_get_pc(device->machine->device("maincpu")), data);
 }
 
 
@@ -144,7 +144,7 @@ int pc1403_reset(running_device *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1403 )
 {
-	running_device *main_cpu = devtag_get_device(machine, "maincpu");
+	running_device *main_cpu = machine->device("maincpu");
 	UINT8 *ram = memory_region(machine, "maincpu") + 0x8000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

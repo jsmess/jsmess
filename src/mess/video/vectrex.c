@@ -98,7 +98,7 @@ static TIMER_CALLBACK(lightpen_trigger)
 {
 	if (vectrex_lightpen_port & 1)
 	{
-		running_device *via_0 = devtag_get_device(machine, "via6522_0");
+		running_device *via_0 = machine->device("via6522_0");
 		via_ca1_w(via_0, 1);
 		via_ca1_w(via_0, 0);
 	}
@@ -131,13 +131,13 @@ static TIMER_CALLBACK(lightpen_trigger)
 
 READ8_HANDLER(vectrex_via_r)
 {
-	running_device *via = devtag_get_device(space->machine, "via6522_0");
+	running_device *via = space->machine->device("via6522_0");
 	return via_r(via, offset);
 }
 
 WRITE8_HANDLER(vectrex_via_w)
 {
-	running_device *via = devtag_get_device(space->machine, "via6522_0");
+	running_device *via = space->machine->device("via6522_0");
 	attotime period;
 
 	switch (offset)
@@ -327,7 +327,7 @@ VIDEO_START(vectrex)
 
 static void vectrex_multiplexer(running_machine *machine, int mux)
 {
-	running_device *dac_device = devtag_get_device(machine, "dac");
+	running_device *dac_device = machine->device("dac");
 
 	timer_set(machine, ATTOTIME_IN_NSEC(ANALOG_DELAY), &analog[mux], vectrex_via_out[PORTA], update_signal);
 
@@ -401,7 +401,7 @@ static WRITE8_DEVICE_HANDLER(v_via_pb_w)
 	/* Sound */
 	if (data & 0x10)
 	{
-		running_device *ay8912 = devtag_get_device(device->machine, "ay8912");
+		running_device *ay8912 = device->machine->device("ay8912");
 
 		if (data & 0x08) /* BC1 (do we select a reg or write it ?) */
 			ay8910_address_w(ay8912, 0, vectrex_via_out[PORTA]);

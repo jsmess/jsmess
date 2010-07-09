@@ -84,7 +84,7 @@ static IRQ_CALLBACK(bk0010_irq_callback)
 
 MACHINE_RESET( bk0010 )
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), bk0010_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), bk0010_irq_callback);
 
 	kbd_state = 0;
 	bk_scrool = 01330;
@@ -107,7 +107,7 @@ READ16_HANDLER (bk_vid_scrool_r)
 
 READ16_HANDLER (bk_key_press_r)
 {
-	double level = cassette_input(devtag_get_device(space->machine, "cassette"));
+	double level = cassette_input(space->machine->device("cassette"));
 	UINT16 cas;
 	if (level < 0)
 	{

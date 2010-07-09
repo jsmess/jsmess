@@ -354,7 +354,7 @@ static TIMER_CALLBACK( check_halt_callback )
 {
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
-	INT64 led_halt = cpu_get_reg(devtag_get_device(machine, Z80_TAG), Z80_HALT);
+	INT64 led_halt = cpu_get_reg(machine->device(Z80_TAG), Z80_HALT);
 	set_led_status(machine, 1, led_halt);
 }
 
@@ -363,8 +363,8 @@ static MACHINE_START( mpf1 )
 	mpf1_state *state = (mpf1_state *)machine->driver_data;
 
 	/* find devices */
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	state->led_refresh_timer = timer_alloc(machine, led_refresh, 0);
 

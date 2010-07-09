@@ -305,11 +305,11 @@ static WRITE8_HANDLER( scv_portc_w )
 {
 	scv_state *state = (scv_state *)space->machine->driver_data;
 
-	//logerror("%04x: scv_portc_w: data = 0x%02x\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), data );
+	//logerror("%04x: scv_portc_w: data = 0x%02x\n", cpu_get_pc(space->machine->device("maincpu")), data );
 	state->portc = data;
 
 	scv_set_banks( space->machine );
-	upd1771_pcm_w( devtag_get_device( space->machine, "upd1771c" ), state->portc & 0x08 );
+	upd1771_pcm_w( space->machine->device( "upd1771c" ), state->portc & 0x08 );
 }
 
 

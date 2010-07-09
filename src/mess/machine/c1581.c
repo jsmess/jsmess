@@ -460,7 +460,7 @@ static DEVICE_START( c1581 )
 	/* find devices */
 	c1581->cia = device->subdevice(M8520_TAG);
 	c1581->wd1770 = device->subdevice(WD1770_TAG);
-	c1581->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
+	c1581->serial_bus = device->machine->device(config->serial_bus_tag);
 	c1581->image = device->subdevice(FLOPPY_0);
 
 	/* register for state saving */

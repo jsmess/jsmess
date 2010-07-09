@@ -19,7 +19,7 @@ static READ16_HANDLER(tricep_terminal_r)
 
 static WRITE16_HANDLER(tricep_terminal_w)
 {
-	running_device *devconf = devtag_get_device(space->machine, "terminal");
+	running_device *devconf = space->machine->device("terminal");
 	terminal_write(devconf,0,data >> 8);
 }
 
@@ -42,7 +42,7 @@ static MACHINE_RESET(tricep)
 
 	memcpy((UINT8*)tricep_ram,user1,0x2000);
 
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 }
 
 static WRITE8_DEVICE_HANDLER( tricep_kbd_put )

@@ -30,7 +30,7 @@ static gmaster_sound *get_token(running_device *device)
 
 int gmaster_io_callback(running_device *device, int ioline, int state)
 {	/* comes across with cpu device - need to use sound device */
-	gmaster_sound *token = get_token(devtag_get_device(device->machine, "custom"));
+	gmaster_sound *token = get_token(device->machine->device("custom"));
 
 	switch (ioline)
 	{

@@ -300,7 +300,7 @@ static DEVICE_START( vic1112 )
 	/* find devices */
 	vic1112->via0 = device->subdevice(M6522_0_TAG);
 	vic1112->via1 = device->subdevice(M6522_1_TAG);
-	vic1112->bus = devtag_get_device(device->machine, config->bus_tag);
+	vic1112->bus = device->machine->device(config->bus_tag);
 
 	/* set VIA clocks */
 	vic1112->via0->set_unscaled_clock(cpu_get_clock(device->machine->firstcpu));

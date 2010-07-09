@@ -113,7 +113,7 @@ QUICKLOAD_LOAD(kc)
 	addr = (header->load_address_l & 0x0ff) | ((header->load_address_h & 0x0ff)<<8);
 
 	for (i=0; i<datasize; i++)
-		messram_get_ptr(devtag_get_device(image.device().machine, "messram"))[(addr+i) & 0x0ffff] = data[i+128];
+		messram_get_ptr(image.device().machine->device("messram"))[(addr+i) & 0x0ffff] = data[i+128];
 	return IMAGE_INIT_PASS;
 }
 
@@ -191,7 +191,7 @@ WRITE8_HANDLER(kc85_disc_interface_latch_w)
 
 WRITE8_HANDLER(kc85_disc_hw_terminal_count_w)
 {
-	running_device *fdc = devtag_get_device(space->machine, "upd765");
+	running_device *fdc = space->machine->device("upd765");
 	logerror("kc85 disc hw tc w: %02x\n",data);
 	upd765_tc_w(fdc, data & 0x01);
 }
@@ -224,8 +224,8 @@ const upd765_interface kc_fdc_interface=
 
 static TIMER_CALLBACK(kc85_disk_reset_timer_callback)
 {
-	cpu_set_reg(devtag_get_device(machine, "disc"), STATE_GENPC, 0x0f000);
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, 0x0f000);
+	cpu_set_reg(machine->device("disc"), STATE_GENPC, 0x0f000);
+	cpu_set_reg(machine->device("maincpu"), STATE_GENPC, 0x0f000);
 }
 
 static void kc_disc_interface_init(running_machine *machine)
@@ -396,7 +396,7 @@ static TIMER_CALLBACK(kc_cassette_timer_callback)
 	bit = 0;
 
 	/* get data from cassette */
-	if (cassette_input(devtag_get_device(machine, "cassette")) > 0.0038)
+	if (cassette_input(machine->device("cassette")) > 0.0038)
 		bit = 1;
 
 	/* update astb with bit */
@@ -414,7 +414,7 @@ static void	kc_cassette_set_motor(running_machine *machine, int motor_state)
 	if (((kc_cassette_motor_state^motor_state)&0x01)!=0)
 	{
 		/* set new motor state in cassette device */
-		cassette_change_state(devtag_get_device(machine, "cassette"),
+		cassette_change_state(machine->device("cassette"),
 			motor_state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 			CASSETTE_MASK_MOTOR);
 
@@ -1128,7 +1128,7 @@ static void kc85_4_update_0x08000(running_machine *machine)
 		/* ram8 block chosen */
 		ram8_block = ((kc85_84_data)>>4) & 0x01;
 
-		mem_ptr = messram_get_ptr(devtag_get_device(machine, "messram"))+0x08000+(ram8_block<<14);
+		mem_ptr = messram_get_ptr(machine->device("messram"))+0x08000+(ram8_block<<14);
 
 		memory_set_bankptr(machine, "bank3", mem_ptr);
 		memory_set_bankptr(machine, "bank4", mem_ptr+0x02800);
@@ -1193,7 +1193,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 
 		/* yes; set address of bank */
 		memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 
 		/* write protect ram? */
 		if ((kc85_pio_data[0] & (1<<3))==0)
@@ -1210,7 +1210,7 @@ static void kc85_4_update_0x00000(running_machine *machine)
 
 			/* ram is enabled and write enabled; and set address of bank */
 			memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank7");
-			memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")));
+			memory_set_bankptr(machine, "bank7", messram_get_ptr(machine->device("messram")));
 		}
 	}
 	else
@@ -1233,7 +1233,7 @@ static void kc85_4_update_0x04000(running_machine *machine)
 	{
 		UINT8 *mem_ptr;
 
-		mem_ptr = messram_get_ptr(devtag_get_device(machine, "messram")) + 0x04000;
+		mem_ptr = messram_get_ptr(machine->device("messram")) + 0x04000;
 
 		/* yes */
 		memory_install_read_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
@@ -1352,7 +1352,7 @@ bit 0: TRUCK */
 
 WRITE8_HANDLER ( kc85_4_pio_data_w )
 {
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 	kc85_pio_data[offset] = data;
 	z80pio_d_w(kc85_z80pio, offset, data);
 
@@ -1477,7 +1477,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 		/* yes */
 		memory_install_read_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
 		/* set address of bank */
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 
 		/* write protect ram? */
 		if ((kc85_pio_data[0] & (1<<3))==0)
@@ -1495,7 +1495,7 @@ static void kc85_3_update_0x00000(running_machine *machine)
 			/* ram is enabled and write enabled */
 			memory_install_write_bank(space, 0x0000, 0x3fff, 0, 0, "bank6");
 			/* set address of bank */
-			memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")));
+			memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")));
 		}
 	}
 	else
@@ -1518,7 +1518,7 @@ static void kc85_3_update_0x08000(running_machine *machine)
     {
         /* IRM enabled */
         LOG(("IRM enabled\n"));
-		ram_page = messram_get_ptr(devtag_get_device(machine, "messram"))+0x08000;
+		ram_page = messram_get_ptr(machine->device("messram"))+0x08000;
 
 		memory_set_bankptr(machine, "bank3", ram_page);
 		memory_set_bankptr(machine, "bank8", ram_page);
@@ -1529,7 +1529,7 @@ static void kc85_3_update_0x08000(running_machine *machine)
     {
 		/* RAM8 ACCESS */
 		LOG(("RAM8 enabled\n"));
-		ram_page = messram_get_ptr(devtag_get_device(machine, "messram")) + 0x04000;
+		ram_page = messram_get_ptr(machine->device("messram")) + 0x04000;
 
 		memory_set_bankptr(machine, "bank3", ram_page);
 		memory_install_read_bank(space, 0x8000, 0xbfff, 0, 0, "bank3");
@@ -1581,7 +1581,7 @@ bit 0: TRUCK */
 
 WRITE8_HANDLER ( kc85_3_pio_data_w )
 {
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 	kc85_pio_data[offset] = data;
 	z80pio_d_w(kc85_z80pio, offset, data);
 
@@ -1652,7 +1652,7 @@ static DIRECT_UPDATE_HANDLER( kc85_4_opbaseoverride )
 
 static TIMER_CALLBACK(kc85_reset_timer_callback)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, 0x0f000);
+	cpu_set_reg(machine->device("maincpu"), STATE_GENPC, 0x0f000);
 }
 
  READ8_HANDLER ( kc85_pio_data_r )
@@ -1802,7 +1802,7 @@ MACHINE_START(kc85)
 	/* timer to transmit pulses to kc base unit */
 	timer_pulse(machine, ATTOTIME_IN_USEC(1024), NULL, 0, kc_keyboard_transmit_timer_callback);
 
-	timer_pulse(machine, ATTOTIME_IN_HZ(15625), (void *)devtag_get_device(machine, "z80ctc"), 0, kc85_15khz_timer_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(15625), (void *)machine->device("z80ctc"), 0, kc85_15khz_timer_callback);
 	timer_set(machine, attotime_zero, NULL, 0, kc85_reset_timer_callback);
 }
 
@@ -1831,7 +1831,7 @@ MACHINE_RESET( kc85_4 )
 	kc85_pio_data[0] = 0x0f;
 	kc85_pio_data[1] = 0x0f1;
 
-	kc85_z80pio = devtag_get_device(machine, "z80pio");
+	kc85_z80pio = machine->device("z80pio");
 
 	kc85_4_update_0x04000(machine);
 	kc85_4_update_0x08000(machine);
@@ -1864,10 +1864,10 @@ MACHINE_RESET( kc85_3 )
 	kc85_pio_data[0] = 0x0f;
 	kc85_pio_data[1] = 0x0f1;
 
-	memory_set_bankptr(machine, "bank2",messram_get_ptr(devtag_get_device(machine, "messram"))+0x0c000);
-	memory_set_bankptr(machine, "bank7",messram_get_ptr(devtag_get_device(machine, "messram"))+0x0c000);
+	memory_set_bankptr(machine, "bank2",messram_get_ptr(machine->device("messram"))+0x0c000);
+	memory_set_bankptr(machine, "bank7",messram_get_ptr(machine->device("messram"))+0x0c000);
 
-	kc85_z80pio = devtag_get_device(machine, "z80pio");
+	kc85_z80pio = machine->device("z80pio");
 
 	kc85_3_update_0x08000(machine);
 	kc85_3_update_0x0c000(machine);

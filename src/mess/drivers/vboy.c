@@ -635,7 +635,7 @@ static VIDEO_UPDATE( vboy )
 	vboy_state *state = (vboy_state *)screen->machine->driver_data;
 	int i;
 	UINT8 right = 0;
-	running_device *_3d_right_screen = devtag_get_device(screen->machine, "3dright");
+	running_device *_3d_right_screen = screen->machine->device("3dright");
 
 	bitmap_fill(state->screen_output, cliprect, state->vip_regs.BKCOL);
 

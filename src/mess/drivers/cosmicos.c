@@ -518,10 +518,10 @@ static MACHINE_START( cosmicos )
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->dm9368 = devtag_get_device(machine, DM9368_TAG);
-	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
-	state->speaker = devtag_get_device(machine, SPEAKER_TAG);
+	state->dm9368 = machine->device(DM9368_TAG);
+	state->cdp1864 = machine->device(CDP1864_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
+	state->speaker = machine->device(SPEAKER_TAG);
 
 	/* initialize LED display */
 	dm9368_rbi_w(state->dm9368, 1);
@@ -533,7 +533,7 @@ static MACHINE_START( cosmicos )
 	memory_configure_bank(machine, "bank2", 0, 1, memory_region(machine, CDP1802_TAG) + 0xff00, 0);
 	memory_set_bank(machine, "bank2", 0);
 
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 256:
 		memory_unmap_readwrite(program, 0x0000, 0xbfff, 0, 0);

@@ -205,7 +205,7 @@ static void duart_output(running_device *device, UINT8 data)
 
 static void duart_tx(running_device *device, int channel, UINT8 data)
 {
-	running_device *devconf = devtag_get_device(device->machine, "terminal");
+	running_device *devconf = device->machine->device("terminal");
 	terminal_write(devconf,0,data);
 #ifdef SERIAL_TO_STDERR
 	fprintf(stderr, "%02X ",data);
@@ -297,7 +297,7 @@ static UINT16 dectalk_outfifo_r ( running_machine *machine )
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
 static void dectalk_reset(running_device *device)
 {
-	const running_device *devconf = devtag_get_device(device->machine, "duart68681"); // this is probably an evil disgusting hack, and AaronGiles is gonna throttle me for doing this...
+	const running_device *devconf = device->machine->device("duart68681"); // this is probably an evil disgusting hack, and AaronGiles is gonna throttle me for doing this...
 	hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
 	dectalk.statusLED = 0; // clear status led latch
@@ -306,7 +306,7 @@ static void dectalk_reset(running_device *device)
 	dectalk.m68k_tlcflags_latch = 0; // initial status is tone detect int(d6) off, answer phone(d8) off, ring detect int(d14) off
 	DEVICE_RESET(devconf); // reset the DUART
 	devconf = devconf; // hack to make gcc shut up about unused variables. the variable IS USED!
-	//devtag_get_device(device->machine,"duart68681")->reset(); // reset the DUART
+	//device->machine->device("duart68681")->reset(); // reset the DUART
 	// stuff that is INDIRECTLY affected by the RESET line
 	dectalk_clear_all_fifos(device->machine); // speech reset clears the fifos, though we have to do it explicitly here since we're not actually in the m68k_spcflags_w function.
 	dectalk_semaphore_w(device->machine, 0); // on the original dectalk pcb revision, this is a semaphore for the INPUT fifo, later dec hacked on a check for the 3 output fifo chips to see if they're in sync, and set both of these latches if true.
@@ -322,7 +322,7 @@ static void dectalk_reset(running_device *device)
 static MACHINE_RESET( dectalk )
 {
 	/* hook the RESET line, which resets a slew of other components */
-	m68k_set_reset_callback(devtag_get_device(machine, "maincpu"), dectalk_reset);
+	m68k_set_reset_callback(machine->device("maincpu"), dectalk_reset);
 }
 
 /* Begin 68k i/o handlers */
@@ -675,7 +675,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK( outfifo_read_cb )
 {
 	UINT16 data;
-	running_device *speaker = devtag_get_device(machine, "dac");
+	running_device *speaker = machine->device("dac");
 	data = dectalk_outfifo_r(machine);
 #ifdef VERBOSE
 	if (data!= 0x8000) logerror("sample output: %04X\n", data);
@@ -694,7 +694,7 @@ static DRIVER_INIT( dectalk )
 
 static WRITE8_DEVICE_HANDLER( dectalk_kbd_put )
 {
-	duart68681_rx_data(devtag_get_device(device->machine, "duart68681"), 1, data);
+	duart68681_rx_data(device->machine->device("duart68681"), 1, data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( dectalk_terminal_intf )

@@ -121,13 +121,13 @@ static void z88_vh_render_line(bitmap_t *bitmap, int x, int y,int pen)
 /* convert absolute offset into correct address to get data from */
 static unsigned char *z88_convert_address(running_machine *machine, unsigned long offset)
 {
-//        return messram_get_ptr(devtag_get_device(machine, "messram"));
+//        return messram_get_ptr(machine->device("messram"));
 	if (offset>(32*16384))
 	{
 		unsigned long get_offset;
 		get_offset = offset - (32*16384);
 		get_offset = get_offset & 0x01fffff;
-		return messram_get_ptr(devtag_get_device(machine, "messram")) + get_offset;
+		return messram_get_ptr(machine->device("messram")) + get_offset;
 	}
 	else
 	{

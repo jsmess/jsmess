@@ -1827,7 +1827,7 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 
 static READ32_HANDLER( stv_scsp_regs_r32 )
 {
-	running_device *scsp = devtag_get_device(space->machine, "scsp");
+	running_device *scsp = space->machine->device("scsp");
 
 	offset <<= 1;
 	return (scsp_r(scsp, offset+1, 0xffff) | (scsp_r(scsp, offset, 0xffff)<<16));
@@ -1835,7 +1835,7 @@ static READ32_HANDLER( stv_scsp_regs_r32 )
 
 static WRITE32_HANDLER( stv_scsp_regs_w32 )
 {
-	running_device *scsp = devtag_get_device(space->machine, "scsp");
+	running_device *scsp = space->machine->device("scsp");
 
 	offset <<= 1;
 	scsp_w(scsp, offset, data>>16, mem_mask >> 16);
@@ -1849,14 +1849,14 @@ static WRITE32_HANDLER( minit_w )
 	logerror("cpu %s (PC=%08X) MINIT write = %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
 	cpuexec_trigger(space->machine, 1000);
-	sh2_set_frt_input(devtag_get_device(space->machine, "slave"), PULSE_LINE);
+	sh2_set_frt_input(space->machine->device("slave"), PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
 	logerror("cpu %s (PC=%08X) SINIT write = %08x\n", space->cpu->tag(), cpu_get_pc(space->cpu),data);
 	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
-	sh2_set_frt_input(devtag_get_device(space->machine, "maincpu"), PULSE_LINE);
+	sh2_set_frt_input(space->machine->device("maincpu"), PULSE_LINE);
 }
 
 static UINT32 backup[64*1024/4];
@@ -2172,8 +2172,8 @@ static void saturn_init_driver(running_machine *machine, int rgn)
 	saturn_region = rgn;
 
 	// set compatible options
-	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	sh2drc_set_options(devtag_get_device(machine, "slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(machine->device("maincpu"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	sh2drc_set_options(machine->device("slave"), SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* get the current date/time from the core */
 	machine->current_datetime(systime);
@@ -2220,7 +2220,7 @@ static int scsp_last_line = 0;
 
 static MACHINE_START( saturn )
 {
-	scsp_set_ram_base(devtag_get_device(machine, "scsp"), sound_ram);
+	scsp_set_ram_base(machine->device("scsp"), sound_ram);
 
 	// save states
 	state_save_register_global_pointer(machine, smpc_ram, 0x80);

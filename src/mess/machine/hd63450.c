@@ -249,7 +249,7 @@ static void dma_transfer_start(running_device* device, int channel, int dir)
 	// Burst transfers will halt the CPU until the transfer is complete
 	if((dmac->reg[channel].dcr & 0xc0) == 0x00)  // Burst transfer
 	{
-		running_device *cpu = devtag_get_device(device->machine, dmac->intf->cpu_tag);
+		running_device *cpu = device->machine->device(dmac->intf->cpu_tag);
 		cpu_set_input_line(cpu, INPUT_LINE_HALT, ASSERT_LINE);
 		timer_adjust_periodic(dmac->timer[channel], attotime_zero, channel, dmac->burst_clock[channel]);
 	}
@@ -431,7 +431,7 @@ void hd63450_single_transfer(running_device* device, int x)
 				// Burst transfer
 				if((dmac->reg[x].dcr & 0xc0) == 0x00)
 				{
-					running_device *cpu = devtag_get_device(device->machine, dmac->intf->cpu_tag);
+					running_device *cpu = device->machine->device(dmac->intf->cpu_tag);
 					cpu_set_input_line(cpu, INPUT_LINE_HALT, CLEAR_LINE);
 				}
 

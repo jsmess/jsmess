@@ -61,7 +61,7 @@
 
 static READ8_HANDLER( samcoupe_disk_r )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1772");
+	running_device *fdc = space->machine->device("wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive(fdc, (offset >> 4) & 1);
@@ -81,7 +81,7 @@ static READ8_HANDLER( samcoupe_disk_r )
 
 static WRITE8_HANDLER( samcoupe_disk_w )
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd1772");
+	running_device *fdc = space->machine->device("wd1772");
 
 	/* drive and side is encoded into bit 5 and 3 */
 	wd17xx_set_drive(fdc, (offset >> 4) & 1);
@@ -212,7 +212,7 @@ static WRITE8_HANDLER( samcoupe_midi_w )
 
 static READ8_HANDLER( samcoupe_keyboard_r )
 {
-	running_device *cassette = devtag_get_device(space->machine, "cassette");
+	running_device *cassette = space->machine->device("cassette");
 	UINT8 data = 0x1f;
 
 	/* bit 0-4, keyboard input */
@@ -250,8 +250,8 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 
 static WRITE8_HANDLER( samcoupe_border_w )
 {
-	running_device *cassette = devtag_get_device(space->machine, "cassette");
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *cassette = space->machine->device("cassette");
+	running_device *speaker = space->machine->device("speaker");
 	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
 
 	asic->border = data;

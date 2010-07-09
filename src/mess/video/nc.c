@@ -90,7 +90,7 @@ VIDEO_UPDATE( nc )
     {
 		int by;
 		/* 64 bytes per line */
-		char *line_ptr = ((char*)messram_get_ptr(devtag_get_device(screen->machine, "messram"))) + nc_display_memory_start + (y<<6);
+		char *line_ptr = ((char*)messram_get_ptr(screen->machine->device("messram"))) + nc_display_memory_start + (y<<6);
 
 		x = 0;
 		for (by=0; by<width>>3; by++)

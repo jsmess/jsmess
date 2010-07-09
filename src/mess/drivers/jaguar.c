@@ -132,13 +132,13 @@ static IRQ_CALLBACK(jaguar_irq_callback)
 
 static MACHINE_RESET( jaguar )
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), jaguar_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), jaguar_irq_callback);
 
 	protection_check = 0;
 
 	/* Set up pointers for Jaguar logo */
 	memcpy(jaguar_shared_ram, rom_base, 0x400);	// do not increase, or Doom breaks
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, rom_base[1]);
+	cpu_set_reg(machine->device("maincpu"), STATE_GENPC, rom_base[1]);
 
 #if 0
 	/* set up main CPU RAM/ROM banks */
@@ -160,8 +160,8 @@ static MACHINE_RESET( jaguar )
 	jaguar_dsp_resume(machine);
 
 	/* halt the CPUs */
-	jaguargpu_ctrl_w(devtag_get_device(machine, "gpu"), G_CTRL, 0, 0xffffffff);
-	jaguardsp_ctrl_w(devtag_get_device(machine, "audiocpu"), D_CTRL, 0, 0xffffffff);
+	jaguargpu_ctrl_w(machine->device("gpu"), G_CTRL, 0, 0xffffffff);
+	jaguardsp_ctrl_w(machine->device("audiocpu"), D_CTRL, 0, 0xffffffff);
 
 	joystick_data = 0xffffffff;
 	eeprom_bit_count = 0;
@@ -186,7 +186,7 @@ static MACHINE_RESET( jaguar )
 /*
 static mame_file *jaguar_nvram_fopen( running_machine *machine, UINT32 openflags)
 {
-    device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart"));
+    device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
     astring *fname;
     file_error filerr;
     mame_file *file;
@@ -257,7 +257,7 @@ static NVRAM_HANDLER( jaguar )
 */
 static WRITE32_HANDLER( jaguar_eeprom_w )
 {
-	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = space->machine->device("eeprom");
 	eeprom_bit_count++;
 	if (eeprom_bit_count != 9)		/* kill extra bit at end of address */
 	{
@@ -268,14 +268,14 @@ static WRITE32_HANDLER( jaguar_eeprom_w )
 
 static READ32_HANDLER( jaguar_eeprom_clk )
 {
-	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = space->machine->device("eeprom");
 	eeprom_set_clock_line(eeprom,PULSE_LINE);	/* get next bit when reading */
 	return 0;
 }
 
 static READ32_HANDLER( jaguar_eeprom_cs )
 {
-	running_device *eeprom = devtag_get_device(space->machine, "eeprom");
+	running_device *eeprom = space->machine->device("eeprom");
 	eeprom_set_cs_line(eeprom,ASSERT_LINE);	/* must do at end of an operation */
 	eeprom_set_cs_line(eeprom,CLEAR_LINE);		/* enable chip for next operation */
 	eeprom_write_bit(eeprom,1);			/* write a start bit */
@@ -293,7 +293,7 @@ static READ32_HANDLER( jaguar_eeprom_cs )
 
 static READ32_HANDLER( gpuctrl_r )
 {
-	UINT32 result = jaguargpu_ctrl_r(devtag_get_device(space->machine, "gpu"), offset);
+	UINT32 result = jaguargpu_ctrl_r(space->machine->device("gpu"), offset);
 	if (protection_check != 1) return result;
 
 	protection_check++;
@@ -305,7 +305,7 @@ static READ32_HANDLER( gpuctrl_r )
 static WRITE32_HANDLER( gpuctrl_w )
 {
 	if ((!protection_check) && (offset == 5) && (data == 1)) protection_check++;
-	jaguargpu_ctrl_w(devtag_get_device(space->machine, "gpu"), offset, data, mem_mask);
+	jaguargpu_ctrl_w(space->machine->device("gpu"), offset, data, mem_mask);
 }
 
 
@@ -318,13 +318,13 @@ static WRITE32_HANDLER( gpuctrl_w )
 
 static READ32_HANDLER( dspctrl_r )
 {
-	return jaguardsp_ctrl_r(devtag_get_device(space->machine, "audiocpu"), offset);
+	return jaguardsp_ctrl_r(space->machine->device("audiocpu"), offset);
 }
 
 
 static WRITE32_HANDLER( dspctrl_w )
 {
-	jaguardsp_ctrl_w(devtag_get_device(space->machine, "audiocpu"), offset, data, mem_mask);
+	jaguardsp_ctrl_w(space->machine->device("audiocpu"), offset, data, mem_mask);
 }
 
 
@@ -371,7 +371,7 @@ static READ32_HANDLER( joystick_r )
 		}
 	}
 
-	joystick_result |= eeprom_read_bit(devtag_get_device(space->machine, "eeprom"));
+	joystick_result |= eeprom_read_bit(space->machine->device("eeprom"));
 	joybuts_result |= (input_port_read(space->machine, "CONFIG") & 0x10);
 
 	return (joystick_result << 16) | joybuts_result;
@@ -775,11 +775,11 @@ static QUICKLOAD_LOAD( jaguar )
 
 
 	/* Some programs are too lazy to set a stack pointer */
-	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENSP, 0x1000);
+	cpu_set_reg(image.device().machine->device("maincpu"), STATE_GENSP, 0x1000);
 	jaguar_shared_ram[0]=0x1000;
 
 	/* Transfer control to image */
-	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, quickload_begin);
+	cpu_set_reg(image.device().machine->device("maincpu"), STATE_GENPC, quickload_begin);
 	jaguar_shared_ram[1]=quickload_begin;
 	return IMAGE_INIT_PASS;
 }
@@ -819,7 +819,7 @@ static DEVICE_IMAGE_LOAD( jaguar )
 //  cart_base[0x102] = 1;
 
 	/* Transfer control to the bios */
-	cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, rom_base[1]);
+	cpu_set_reg(image.device().machine->device("maincpu"), STATE_GENPC, rom_base[1]);
 	return IMAGE_INIT_PASS;
 }
 

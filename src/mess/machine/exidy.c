@@ -50,9 +50,9 @@ static emu_timer *cassette_timer;
 static running_device *cassette_device_image(running_machine *machine)
 {
 	if (exidy_fe & 0x20)
-		return devtag_get_device(machine, "cassette2");
+		return machine->device("cassette2");
 	else
-		return devtag_get_device(machine, "cassette1");
+		return machine->device("cassette1");
 }
 
 
@@ -203,27 +203,27 @@ WRITE8_HANDLER(exidy_fe_w)
 	{
 		if (data & 0x20)
 		{
-			cassette_change_state(devtag_get_device(space->machine, "cassette1"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-			cassette_change_state(devtag_get_device(space->machine, "cassette2"), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(space->machine->device("cassette1"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(space->machine->device("cassette2"), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 		}
 		else
 		{
-			cassette_change_state(devtag_get_device(space->machine, "cassette2"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-			cassette_change_state(devtag_get_device(space->machine, "cassette1"), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(space->machine->device("cassette2"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+			cassette_change_state(space->machine->device("cassette1"), CASSETTE_SPEAKER_ENABLED, CASSETTE_MASK_SPEAKER);
 		}
 	}
 	else
 	{
-		cassette_change_state(devtag_get_device(space->machine, "cassette2"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
-		cassette_change_state(devtag_get_device(space->machine, "cassette1"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(space->machine->device("cassette2"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
+		cassette_change_state(space->machine->device("cassette1"), CASSETTE_SPEAKER_MUTED, CASSETTE_MASK_SPEAKER);
 	}
 
 	/* cassette 1 motor */
-	cassette_change_state(devtag_get_device(space->machine, "cassette1"),
+	cassette_change_state(space->machine->device("cassette1"),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	/* cassette 2 motor */
-	cassette_change_state(devtag_get_device(space->machine, "cassette2"),
+	cassette_change_state(space->machine->device("cassette2"),
 		(data & 0x20) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 
 	if ((data & EXIDY_CASSETTE_MOTOR_MASK) && (~data & 0x80))
@@ -256,8 +256,8 @@ WRITE8_HANDLER(exidy_fe_w)
 
 WRITE8_HANDLER(exidy_ff_w)
 {
-	running_device *printer = devtag_get_device(space->machine, "centronics");
-	running_device *dac_device = devtag_get_device(space->machine, "dac");
+	running_device *printer = space->machine->device("centronics");
+	running_device *dac_device = space->machine->device("dac");
 	/* reading the config switch */
 	switch (input_port_read(space->machine, "CONFIG") & 0x06)
 	{
@@ -333,7 +333,7 @@ READ8_HANDLER(exidy_ff_r)
     This uses bit 7. The other bits have been set high (=nothing plugged in).
     This fixes those games that use a joystick. */
 
-	running_device *printer = devtag_get_device(space->machine, "centronics");
+	running_device *printer = space->machine->device("centronics");
 	UINT8 data=0x7f;
 
 	/* bit 7 = printer busy
@@ -386,12 +386,12 @@ Z80BIN_EXECUTE( exidy )
 		if ((execute_address != 0xc858) && autorun)
 			memory_write_word_16le(space, 0xf028, execute_address);
 
-		cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, 0xf01f);
+		cpu_set_reg(machine->device("maincpu"), STATE_GENPC, 0xf01f);
 	}
 	else
 	{
 		if (autorun)
-			cpu_set_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC, execute_address);
+			cpu_set_reg(machine->device("maincpu"), STATE_GENPC, execute_address);
 	}
 }
 
@@ -402,7 +402,7 @@ Z80BIN_EXECUTE( exidy )
 SNAPSHOT_LOAD(exidy)
 {
 	UINT8 *ptr = memory_region(image.device().machine, "maincpu");
-	running_device *cpu = devtag_get_device(image.device().machine, "maincpu");
+	running_device *cpu = image.device().machine->device("maincpu");
 	UINT8 header[28];
 
 	/* check size */
@@ -457,7 +457,7 @@ MACHINE_RESET( exidy )
 	cass_data.input.length = 0;
 	cass_data.input.bit = 1;
 
-	exidy_ay31015 = devtag_get_device(machine, "ay_3_1015");
+	exidy_ay31015 = machine->device("ay_3_1015");
 
 	exidy_fe_w(space, 0, 0);
 

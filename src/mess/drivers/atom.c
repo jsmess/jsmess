@@ -712,8 +712,8 @@ static MACHINE_START( atom )
 	memory_region(machine, SY6502_TAG)[0x0b] = mame_rand(machine) & 0x0ff;
 
 	/* find devices */
-	state->mc6847 = devtag_get_device(machine, MC6847_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->mc6847 = machine->device(MC6847_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 }
 
 /*-------------------------------------------------

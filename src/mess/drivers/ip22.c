@@ -69,7 +69,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf);
+		logerror("%08x: %s", cpu_get_pc(machine->device("maincpu")), buf);
 	}
 }
 
@@ -186,7 +186,7 @@ static void int3_lower_local1_irq(UINT8 source_mask)
 
 static READ32_HANDLER( hpc3_pbus6_r )
 {
-	running_device *lpt = devtag_get_device(space->machine, "lpt_0");
+	running_device *lpt = space->machine->device("lpt_0");
 	UINT8 ret8;
 	running_machine *machine = space->machine;
 
@@ -237,19 +237,19 @@ static READ32_HANDLER( hpc3_pbus6_r )
 //      mame_printf_info("INT3: r @ %x mask %08x (PC=%x)\n", offset*4, mem_mask, activecpu_get_pc());
 		return int3_regs[offset-0x80/4];
 	case 0xb0/4:
-		ret8 = pit8253_r(devtag_get_device(machine, "pit8254"), 0);
+		ret8 = pit8253_r(machine->device("pit8254"), 0);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb4/4:
-		ret8 = pit8253_r(devtag_get_device(machine, "pit8254"), 1);
+		ret8 = pit8253_r(machine->device("pit8254"), 1);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xb8/4:
-		ret8 = pit8253_r(devtag_get_device(machine, "pit8254"), 2);
+		ret8 = pit8253_r(machine->device("pit8254"), 2);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	case 0xbc/4:
-		ret8 = pit8253_r(devtag_get_device(machine, "pit8254"), 3);
+		ret8 = pit8253_r(machine->device("pit8254"), 3);
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Read: 0x%02x (%08x)\n", ret8, mem_mask );
 		return ret8;
 	default:
@@ -261,7 +261,7 @@ static READ32_HANDLER( hpc3_pbus6_r )
 
 static WRITE32_HANDLER( hpc3_pbus6_w )
 {
-	running_device *lpt = devtag_get_device(space->machine, "lpt_0");
+	running_device *lpt = space->machine->device("lpt_0");
 	char cChar;
 	running_machine *machine = space->machine;
 
@@ -343,19 +343,19 @@ static WRITE32_HANDLER( hpc3_pbus6_w )
 		break;
 	case 0xb0/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 0 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(devtag_get_device(machine, "pit8254"), 0, data & 0x000000ff);
+		pit8253_w(machine->device("pit8254"), 0, data & 0x000000ff);
 		return;
 	case 0xb4/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 1 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(devtag_get_device(machine, "pit8254"), 1, data & 0x000000ff);
+		pit8253_w(machine->device("pit8254"), 1, data & 0x000000ff);
 		return;
 	case 0xb8/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Counter 2 Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(devtag_get_device(machine, "pit8254"), 2, data & 0x000000ff);
+		pit8253_w(machine->device("pit8254"), 2, data & 0x000000ff);
 		return;
 	case 0xbc/4:
 		verboselog( machine, 0, "HPC PBUS6 IOC4 Timer Control Word Register Write: 0x%08x (%08x)\n", data, mem_mask );
-		pit8253_w(devtag_get_device(machine, "pit8254"), 3, data & 0x000000ff);
+		pit8253_w(machine->device("pit8254"), 3, data & 0x000000ff);
 		return;
 	default:
 		verboselog( machine, 0, "Unknown HPC PBUS6 Write: 0x%08x: 0x%08x (%08x)\n", 0x1fbd9800 + ( offset << 2 ), data, mem_mask );
@@ -1041,7 +1041,7 @@ static TIMER_CALLBACK(ip22_dma)
 		UINT16 temp16 = ( ip22_mainram[(nPBUS_DMA_CurPtr - 0x08000000)/4] & 0xffff0000 ) >> 16;
 		INT16 stemp16 = (INT16)((temp16 >> 8) | (temp16 << 8));
 
-		dac_signed_data_16_w(devtag_get_device(machine, "dac"), stemp16 ^ 0x8000);
+		dac_signed_data_16_w(machine->device("dac"), stemp16 ^ 0x8000);
 
 		nPBUS_DMA_CurPtr += 4;
 
@@ -1205,7 +1205,7 @@ static MACHINE_RESET( ip225015 )
 
 	nPBUS_DMA_Active = 0;
 
-	mips3drc_set_options(devtag_get_device(machine, "maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
+	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_COMPATIBLE_OPTIONS | MIPS3DRC_CHECK_OVERFLOWS);
 }
 
 static void dump_chain(const address_space *space, UINT32 ch_base)
@@ -1341,7 +1341,7 @@ static void scsi_irq(running_machine *machine, int state)
 
 				dump_chain(space, nHPC_SCSI0Descriptor);
 
-				printf("PC is %08x\n", cpu_get_pc(devtag_get_device(machine, "maincpu")));
+				printf("PC is %08x\n", cpu_get_pc(machine->device("maincpu")));
 				printf("DMA to device: length %x xie %d eox %d\n", length, xie, eox);
 
 				if (length <= 0x4000)
@@ -1488,7 +1488,7 @@ static void ip225015_exit(running_machine &machine)
 }
 
 static int ip22_get_out2(running_machine *machine) {
-	return pit8253_get_output(devtag_get_device(machine, "pit8254"), 2 );
+	return pit8253_get_output(machine->device("pit8254"), 2 );
 }
 
 static MACHINE_START( ip22 )

@@ -62,7 +62,7 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror("%08x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf);
+		logerror("%08x: %s", cpu_get_pc(machine->device("maincpu")), buf);
 	}
 }
 #else
@@ -305,7 +305,7 @@ static WRITE16_HANDLER(sgi_ip2_stklmt_w)
 
 static WRITE8_DEVICE_HANDLER( sgi_kbd_put )
 {
-	duart68681_rx_data(devtag_get_device(device->machine, "duart68681a"), 1, data);
+	duart68681_rx_data(device->machine->device("duart68681a"), 1, data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( sgi_terminal_intf )
@@ -379,7 +379,7 @@ static void duarta_output(running_device *device, UINT8 data)
 
 static void duarta_tx(running_device *device, int channel, UINT8 data)
 {
-	running_device *devconf = devtag_get_device(device->machine, "terminal");
+	running_device *devconf = device->machine->device("terminal");
 	verboselog(device->machine, 0, "duarta_tx: %02x\n", data);
 	terminal_write(devconf,0,data);
 }
@@ -500,7 +500,7 @@ static DRIVER_INIT( sgi_ip2 )
 	UINT32 *dst = mainram;
 	memcpy(dst, src, 8);
 
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 
 	mc146818_init(machine, MC146818_IGNORE_CENTURY);
 }

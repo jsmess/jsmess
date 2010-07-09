@@ -194,7 +194,7 @@ static MACHINE_START(vcs80)
 	vcs80_state *state = (vcs80_state *)machine->driver_data;
 
 	/* find devices */
-	state->z80pio = devtag_get_device(machine, Z80PIO_TAG);
+	state->z80pio = machine->device(Z80PIO_TAG);
 
 	z80pio_astb_w(state->z80pio, 1);
 	z80pio_bstb_w(state->z80pio, 1);

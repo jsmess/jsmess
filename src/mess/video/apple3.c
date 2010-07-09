@@ -100,15 +100,15 @@ static void apple3_video_text40(running_machine *machine,bitmap_t *bitmap)
 	{
 		for (x = 0; x < 40; x++)
 		{
-			offset = messram_get_size(devtag_get_device(machine, "messram")) - 0x8000 + text_map[y] + x + (apple3_flags & VAR_VM2 ? 0x0400 : 0x0000);
-			ch = messram_get_ptr(devtag_get_device(machine, "messram"))[offset];
+			offset = messram_get_size(machine->device("messram")) - 0x8000 + text_map[y] + x + (apple3_flags & VAR_VM2 ? 0x0400 : 0x0000);
+			ch = messram_get_ptr(machine->device("messram"))[offset];
 
 			if (apple3_flags & VAR_VM0)
 			{
 				/* color text */
-				offset = messram_get_size(devtag_get_device(machine, "messram")) - 0x8000 + text_map[y] + x + (apple3_flags & VAR_VM2 ? 0x0000 : 0x0400);
-				bg = (messram_get_ptr(devtag_get_device(machine, "messram"))[offset] >> 0) & 0x0F;
-				fg = (messram_get_ptr(devtag_get_device(machine, "messram"))[offset] >> 4) & 0x0F;
+				offset = messram_get_size(machine->device("messram")) - 0x8000 + text_map[y] + x + (apple3_flags & VAR_VM2 ? 0x0000 : 0x0400);
+				bg = (messram_get_ptr(machine->device("messram"))[offset] >> 0) & 0x0F;
+				fg = (messram_get_ptr(machine->device("messram"))[offset] >> 4) & 0x0F;
 			}
 			else
 			{
@@ -155,10 +155,10 @@ static void apple3_video_text80(running_machine *machine,bitmap_t *bitmap)
 	{
 		for (x = 0; x < 40; x++)
 		{
-			offset = messram_get_size(devtag_get_device(machine, "messram")) - 0x8000 + text_map[y] + x;
+			offset = messram_get_size(machine->device("messram")) - 0x8000 + text_map[y] + x;
 
 			/* first character */
-			ch = messram_get_ptr(devtag_get_device(machine, "messram"))[offset + 0x0000];
+			ch = messram_get_ptr(machine->device("messram"))[offset + 0x0000];
 			char_data = &char_mem[(ch & 0x7F) * 8];
 			fg = (ch & 0x80) ? GREEN : BLACK;
 			bg = (ch & 0x80) ? BLACK : GREEN;
@@ -173,7 +173,7 @@ static void apple3_video_text80(running_machine *machine,bitmap_t *bitmap)
 			}
 
 			/* second character */
-			ch = messram_get_ptr(devtag_get_device(machine, "messram"))[offset + 0x0400];
+			ch = messram_get_ptr(machine->device("messram"))[offset + 0x0400];
 			char_data = &char_mem[(ch & 0x7F) * 8];
 			fg = (ch & 0x80) ? GREEN : BLACK;
 			bg = (ch & 0x80) ? BLACK : GREEN;
@@ -203,9 +203,9 @@ static void apple3_video_graphics_hgr(running_machine *machine,bitmap_t *bitmap)
 	for (y = 0; y < 192; y++)
 	{
 		if (apple3_flags & VAR_VM2)
-			pix_info = &messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y]];
+			pix_info = &messram_get_ptr(machine->device("messram"))[hgr_map[y]];
 		else
-			pix_info = &messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y] - 0x2000];
+			pix_info = &messram_get_ptr(machine->device("messram"))[hgr_map[y] - 0x2000];
 		ptr = BITMAP_ADDR16(bitmap, y, 0);
 
 		for (i = 0; i < 40; i++)
@@ -248,13 +248,13 @@ static void apple3_video_graphics_chgr(running_machine *machine,bitmap_t *bitmap
 	{
 		if (apple3_flags & VAR_VM2)
 		{
-			pix_info = &messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y]];
-			col_info = &messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y] - 0x2000];
+			pix_info = &messram_get_ptr(machine->device("messram"))[hgr_map[y]];
+			col_info = &messram_get_ptr(machine->device("messram"))[hgr_map[y] - 0x2000];
 		}
 		else
 		{
-			pix_info = &messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y] - 0x2000];
-			col_info = &messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y]];
+			pix_info = &messram_get_ptr(machine->device("messram"))[hgr_map[y] - 0x2000];
+			col_info = &messram_get_ptr(machine->device("messram"))[hgr_map[y]];
 		}
 		ptr = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -292,13 +292,13 @@ static void apple3_video_graphics_shgr(running_machine *machine,bitmap_t *bitmap
 	{
 		if (apple3_flags & VAR_VM2)
 		{
-			pix_info1 = &messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y]];
-			pix_info2 = &messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y] + 0x2000];
+			pix_info1 = &messram_get_ptr(machine->device("messram"))[hgr_map[y]];
+			pix_info2 = &messram_get_ptr(machine->device("messram"))[hgr_map[y] + 0x2000];
 		}
 		else
 		{
-			pix_info1 = &messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y] - 0x2000];
-			pix_info2 = &messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y]];
+			pix_info1 = &messram_get_ptr(machine->device("messram"))[hgr_map[y] - 0x2000];
+			pix_info2 = &messram_get_ptr(machine->device("messram"))[hgr_map[y]];
 		}
 		ptr = BITMAP_ADDR16(bitmap, y, 0);
 
@@ -331,10 +331,10 @@ static void apple3_video_graphics_chires(running_machine *machine,bitmap_t *bitm
 		pen = BITMAP_ADDR16(bitmap, y, 0);
 		for (i = 0; i < 20; i++)
 		{
-			pix.b.l  = messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y] - 0x2000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 0];
-			pix.b.h  = messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y] - 0x0000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 0];
-			pix.b.h2 = messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y] - 0x2000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 1];
-			pix.b.h3 = messram_get_ptr(devtag_get_device(machine, "messram"))[hgr_map[y] - 0x0000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 1];
+			pix.b.l  = messram_get_ptr(machine->device("messram"))[hgr_map[y] - 0x2000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 0];
+			pix.b.h  = messram_get_ptr(machine->device("messram"))[hgr_map[y] - 0x0000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 0];
+			pix.b.h2 = messram_get_ptr(machine->device("messram"))[hgr_map[y] - 0x2000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 1];
+			pix.b.h3 = messram_get_ptr(machine->device("messram"))[hgr_map[y] - 0x0000 + (i * 2) + (apple3_flags & VAR_VM2 ? 1 : 0) + 1];
 
 			pen[ 0] = pen[ 1] = pen[ 2] = pen[ 3] = ((pix.d >>  0) & 0x0F);
 			pen[ 4] = pen[ 5] = pen[ 6] = pen[ 7] = ((pix.d >>  4) & 0x07) | ((pix.d >>  1) & 0x08);

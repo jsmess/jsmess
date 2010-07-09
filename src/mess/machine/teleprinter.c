@@ -256,7 +256,7 @@ static VIDEO_START( teleprinter )
 
 static VIDEO_UPDATE(teleprinter )
 {
-	running_device *devconf = devtag_get_device(screen->machine, TELEPRINTER_TAG);
+	running_device *devconf = screen->machine->device(TELEPRINTER_TAG);
 	generic_teleprinter_update( devconf, bitmap, cliprect);
 	return 0;
 }

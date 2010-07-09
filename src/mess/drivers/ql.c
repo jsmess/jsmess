@@ -105,7 +105,7 @@ static WRITE8_HANDLER( ipc_port2_w )
 
     */
 
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 	ql_state *state = (ql_state *)space->machine->driver_data;
 
 	int ipl = (BIT(data, 2) << 1) | BIT(data, 3);
@@ -472,12 +472,12 @@ INPUT_PORTS_END
 
 static READ8_HANDLER( ql_ram_r )
 {
-	return messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset];
+	return messram_get_ptr(space->machine->device("messram"))[offset];
 }
 
 static WRITE8_HANDLER( ql_ram_w )
 {
-	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
+	messram_get_ptr(space->machine->device("messram"))[offset] = data;
 }
 
 static ZX8301_INTERFACE( ql_zx8301_intf )
@@ -540,7 +540,7 @@ static MACHINE_START( ql )
 
 	/* configure RAM */
 
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 128*1024:
 		memory_unmap_readwrite(program, 0x040000, 0x0fffff, 0, 0);
@@ -576,8 +576,8 @@ static MACHINE_START( ql )
 
 	// find devices
 
-	state->zx8301 = devtag_get_device(machine, ZX8301_TAG);
-	state->zx8302 = devtag_get_device(machine, ZX8302_TAG);
+	state->zx8301 = machine->device(ZX8301_TAG);
+	state->zx8302 = machine->device(ZX8302_TAG);
 
 	// register for state saving
 
@@ -903,7 +903,7 @@ ROM_END
 
 static QUICKLOAD_LOAD( ql )
 {
-	image.fread(messram_get_ptr(devtag_get_device(image.device().machine, "messram")), 128*1024);
+	image.fread(messram_get_ptr(image.device().machine->device("messram")), 128*1024);
 
 	return IMAGE_INIT_PASS;
 }

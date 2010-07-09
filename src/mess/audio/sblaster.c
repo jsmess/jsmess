@@ -146,7 +146,7 @@ static int soundblaster_operation(int data)
 
 WRITE8_HANDLER( soundblaster_w )
 {
-	running_device *dac_device = devtag_get_device(space->machine, "dac");
+	running_device *dac_device = space->machine->device("dac");
 
 	switch (offset) {
 	case 6:

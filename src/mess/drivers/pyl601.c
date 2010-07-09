@@ -37,7 +37,7 @@ static WRITE8_HANDLER (rom_page_w)
 	}
 	else
 	{
-		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xc000);
+		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram")) + 0xc000);
 	}
 }
 
@@ -59,14 +59,14 @@ static WRITE8_HANDLER (vdisk_l_w)
 
 static WRITE8_HANDLER (vdisk_data_w)
 {
-	messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x10000 + (vdisk_addr & 0x7ffff)] = data;
+	messram_get_ptr(space->machine->device("messram"))[0x10000 + (vdisk_addr & 0x7ffff)] = data;
 	vdisk_addr++;
 	vdisk_addr&=0x7ffff;
 }
 
 static READ8_HANDLER (vdisk_data_r)
 {
-	UINT8 retVal = messram_get_ptr(devtag_get_device(space->machine, "messram"))[0x10000 + (vdisk_addr & 0x7ffff)];
+	UINT8 retVal = messram_get_ptr(space->machine->device("messram"))[0x10000 + (vdisk_addr & 0x7ffff)];
 	vdisk_addr++;
 	vdisk_addr &= 0x7ffff;
 	return retVal;
@@ -162,7 +162,7 @@ static WRITE8_HANDLER( floppy_w )
 	// bit 1 is TC state
 	// bit 2 is drive selected
 	// bit 3 is motor state
-	running_device *floppy = devtag_get_device(space->machine, "upd765");
+	running_device *floppy = space->machine->device("upd765");
 	if (BIT(data,0)==0) {
 		//reset
 		upd765_reset(floppy,0);
@@ -318,14 +318,14 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(pyl601)
 {
-	memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x0000);
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
-	memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe000);
-	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xe700);
+	memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + 0x0000);
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0xc000);
+	memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0xe000);
+	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xe700);
 	memory_set_bankptr(machine, "bank5", memory_region(machine, "maincpu") + 0xf000);
-	memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xf000);
+	memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0xf000);
 
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 }
 
 static VIDEO_START( pyl601 )
@@ -334,7 +334,7 @@ static VIDEO_START( pyl601 )
 
 static VIDEO_UPDATE( pyl601 )
 {
-	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
+	running_device *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
@@ -349,7 +349,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 	{
 		for (column = 0; column < x_count; column++)
 		{
-			UINT8 code = messram_get_ptr(devtag_get_device(device->machine, "messram"))[(((ma + column) & 0x0fff) + 0xf000)];
+			UINT8 code = messram_get_ptr(device->machine->device("messram"))[(((ma + column) & 0x0fff) + 0xf000)];
 			code = ((code << 1) | (code >> 7)) & 0xff;
 			if (column == cursor_x-2)
 			{
@@ -374,7 +374,7 @@ static MC6845_UPDATE_ROW( pyl601_update_row )
 	{
 		for (i = 0; i < x_count; i++)
 		{
-			data = messram_get_ptr(devtag_get_device(device->machine, "messram"))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			data = messram_get_ptr(device->machine->device("messram"))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
 				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;
@@ -394,7 +394,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 	{
 		for (column = 0; column < x_count; column++)
 		{
-			UINT8 code = messram_get_ptr(devtag_get_device(device->machine, "messram"))[(((ma + column) & 0x0fff) + 0xf000)];
+			UINT8 code = messram_get_ptr(device->machine->device("messram"))[(((ma + column) & 0x0fff) + 0xf000)];
 			data = charrom[((code << 4) | (ra & 0x07)) & 0xfff];
 			if (column == cursor_x)
 			{
@@ -416,7 +416,7 @@ static MC6845_UPDATE_ROW( pyl601a_update_row )
 	{
 		for (i = 0; i < x_count; i++)
 		{
-			data = messram_get_ptr(devtag_get_device(device->machine, "messram"))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
+			data = messram_get_ptr(device->machine->device("messram"))[(((ma + i) << 3) | (ra & 0x07)) & 0xffff];
 			for (bit = 0; bit < 8; bit++)
 			{
 				*BITMAP_ADDR16(bitmap, y, (i * 8) + bit) = BIT(data, 7) ? 1 : 0;
@@ -457,7 +457,7 @@ static const mc6845_interface pyl601a_crtc6845_interface =
 
 static DRIVER_INIT(pyl601)
 {
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, 64 * 1024);
+	memset(messram_get_ptr(machine->device("messram")), 0, 64 * 1024);
 }
 
 static INTERRUPT_GEN( pyl601_interrupt )

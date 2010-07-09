@@ -336,7 +336,7 @@ static MACHINE_RESET( nakajies )
 {
 	nakajies_state *state = (nakajies_state *)machine->driver_data;
 
-	state->cpu = devtag_get_device( machine, "v20hl" );
+	state->cpu = machine->device( "v20hl" );
 	state->irq_enabled = 0;
 	state->irq_active = 0;
 }

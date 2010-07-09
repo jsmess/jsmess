@@ -21,7 +21,7 @@ static UINT8 keyboard_line;
 
 static running_device *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, "cassette");
+	return machine->device("cassette");
 }
 
 static void pk8000_set_bank(running_machine *machine,UINT8 data)
@@ -35,50 +35,50 @@ static void pk8000_set_bank(running_machine *machine,UINT8 data)
 	switch(block1) {
 		case 0:
 				memory_set_bankptr(machine, "bank1", rom + 0x10000);
-				memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")));
+				memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")));
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
-				memory_set_bankptr(machine, "bank5", messram_get_ptr(devtag_get_device(machine, "messram")));
+				memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
+				memory_set_bankptr(machine, "bank5", messram_get_ptr(machine->device("messram")));
 				break;
 	}
 
 	switch(block2) {
 		case 0:
 				memory_set_bankptr(machine, "bank2", rom + 0x14000);
-				memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+				memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0x4000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
-				memory_set_bankptr(machine, "bank6", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+				memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
+				memory_set_bankptr(machine, "bank6", messram_get_ptr(machine->device("messram")) + 0x4000);
 				break;
 	}
 	switch(block3) {
 		case 0:
 				memory_set_bankptr(machine, "bank3", rom + 0x18000);
-				memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+				memory_set_bankptr(machine, "bank7", messram_get_ptr(machine->device("messram")) + 0x8000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
-				memory_set_bankptr(machine, "bank7", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+				memory_set_bankptr(machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
+				memory_set_bankptr(machine, "bank7", messram_get_ptr(machine->device("messram")) + 0x8000);
 				break;
 	}
 	switch(block4) {
 		case 0:
 				memory_set_bankptr(machine, "bank4", rom + 0x1c000);
-				memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+				memory_set_bankptr(machine, "bank8", messram_get_ptr(machine->device("messram")) + 0xc000);
 				break;
 		case 1: break;
 		case 2: break;
 		case 3:
-				memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
-				memory_set_bankptr(machine, "bank8", messram_get_ptr(devtag_get_device(machine, "messram")) + 0xc000);
+				memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0xc000);
+				memory_set_bankptr(machine, "bank8", messram_get_ptr(machine->device("messram")) + 0xc000);
 				break;
 	}
 }
@@ -100,7 +100,7 @@ static WRITE8_DEVICE_HANDLER(pk8000_80_portc_w)
 {
 	keyboard_line = data & 0x0f;
 
-	speaker_level_w(devtag_get_device(device->machine, "speaker"), BIT(data,7));
+	speaker_level_w(device->machine->device("speaker"), BIT(data,7));
 
 	cassette_change_state(cassette_device_image(device->machine),
 						(BIT(data,4)) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
@@ -303,7 +303,7 @@ static IRQ_CALLBACK(pk8000_irq_callback)
 static MACHINE_RESET(pk8000)
 {
 	pk8000_set_bank(machine,0);
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pk8000_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), pk8000_irq_callback);
 }
 
 static VIDEO_START( pk8000 )
@@ -312,7 +312,7 @@ static VIDEO_START( pk8000 )
 
 static VIDEO_UPDATE( pk8000 )
 {
-	return pk8000_video_update(screen, bitmap, cliprect, messram_get_ptr(devtag_get_device(screen->machine, "messram")));
+	return pk8000_video_update(screen, bitmap, cliprect, messram_get_ptr(screen->machine->device("messram")));
 }
 
 /* Machine driver */

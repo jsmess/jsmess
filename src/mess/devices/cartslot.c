@@ -107,7 +107,7 @@ static int load_cartridge(device_image_interface *image, const rom_entry *romrgn
 		datawidth = ROMREGION_GETWIDTH(romrgn) / 8;
 
 		/* if the region is inverted, do that now */
-		cpu = devtag_get_device(image->device().machine, type);
+		cpu = image->device().machine->device(type);
 		if (cpu != NULL)
 		{
 			datawidth = device_memory(cpu)->space_config(AS_PROGRAM)->m_databus_width / 8;

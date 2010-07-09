@@ -28,11 +28,11 @@ VIDEO_UPDATE( b2m )
 		for (y = 0; y < 256; y++)
 		{
 			if (state->b2m_video_page==0) {
-				code1 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0x11000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
-				code2 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0x15000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
+				code1 = messram_get_ptr(screen->machine->device("messram"))[0x11000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
+				code2 = messram_get_ptr(screen->machine->device("messram"))[0x15000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
 			} else {
-				code1 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0x19000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
-				code2 = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0x1d000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
+				code1 = messram_get_ptr(screen->machine->device("messram"))[0x19000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
+				code2 = messram_get_ptr(screen->machine->device("messram"))[0x1d000 + x*256 + ((y + state->b2m_video_scroll) & 0xff)];
 			}
 			for (b = 7; b >= 0; b--)
 			{

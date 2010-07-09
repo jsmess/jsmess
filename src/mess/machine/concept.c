@@ -330,7 +330,7 @@ READ16_HANDLER(concept_io_r)
 		/* calendar R/W */
 		VLOG(("concept_io_r: Calendar read at address 0x03%4.4x\n", offset << 1));
 		if (!clock_enable)
-			return mm58274c_r(devtag_get_device(space->machine, "mm58274c"), clock_address);
+			return mm58274c_r(space->machine->device("mm58274c"), clock_address);
 		break;
 
 	case 7:
@@ -378,7 +378,7 @@ READ16_HANDLER(concept_io_r)
 			/* NVIA versatile system interface */
 			LOG(("concept_io_r: VIA read at address 0x03%4.4x\n", offset << 1));
 			{
-				running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+				running_device *via_0 = space->machine->device("via6522_0");
 				return via_r(via_0, offset & 0xf);
 			}
 			break;
@@ -472,7 +472,7 @@ WRITE16_HANDLER(concept_io_w)
 		/* calendar R/W */
 		LOG(("concept_io_w: Calendar written to at address 0x03%4.4x, data: 0x%4.4x\n", offset << 1, data));
 		if (!clock_enable)
-			mm58274c_w(devtag_get_device(space->machine, "mm58274c"), clock_address, data & 0xf);
+			mm58274c_w(space->machine->device("mm58274c"), clock_address, data & 0xf);
 		break;
 
 	case 7:
@@ -491,7 +491,7 @@ WRITE16_HANDLER(concept_io_w)
 		case 3:
 			/* NVIA versatile system interface */
 			{
-				running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
+				running_device *via_0 = space->machine->device("via6522_0");
 				via_w(via_0, offset & 0xf, data);
 			}
 			break;
@@ -606,7 +606,7 @@ const wd17xx_interface concept_wd17xx_interface =
 
 static  READ8_HANDLER(concept_fdc_reg_r)
 {
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
 	case 0:
@@ -636,7 +636,7 @@ static  READ8_HANDLER(concept_fdc_reg_r)
 static WRITE8_HANDLER(concept_fdc_reg_w)
 {
 	int current_drive;
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 	switch (offset)
 	{
 	case 0:

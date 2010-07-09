@@ -14,7 +14,7 @@
 
 static WRITE8_HANDLER(swtpc_terminal_w)
 {
-	running_device *devconf = devtag_get_device(space->machine, "terminal");
+	running_device *devconf = space->machine->device("terminal");
 	terminal_write(devconf,0,data);
 }
 

@@ -71,12 +71,12 @@ static UINT32	svf_color;
 
 
 READ32_HANDLER( _3do_nvarea_r ) {
-	logerror( "%08X: NVRAM read offset = %08X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset );
+	logerror( "%08X: NVRAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
 	return 0;
 }
 
 WRITE32_HANDLER( _3do_nvarea_w ) {
-	logerror( "%08X: NVRAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset, data, mem_mask );
+	logerror( "%08X: NVRAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data, mem_mask );
 }
 
 
@@ -123,7 +123,7 @@ WRITE32_HANDLER( _3do_nvarea_w ) {
     several groups of 16 write actions or 16 read actions
 */
 READ32_HANDLER( _3do_unk_318_r ) {
-	logerror( "%08X: UNK_318 read offset = %08X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset );
+	logerror( "%08X: UNK_318 read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
 #if 0
 	switch( offset ) {
 	case 0:		/* Boot ROM checks here and expects to read 1, 0, 1, 0 in the lowest bit */
@@ -136,7 +136,7 @@ READ32_HANDLER( _3do_unk_318_r ) {
 
 WRITE32_HANDLER( _3do_unk_318_w )
 {
-	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset, data, mem_mask );
+	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data, mem_mask );
 
 	switch( offset )
 	{
@@ -152,7 +152,7 @@ WRITE32_HANDLER( _3do_unk_318_w )
 
 READ32_HANDLER( _3do_svf_r )
 {
-	logerror( "%08X: SVF read offset = %08X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset*4 );
+	logerror( "%08X: SVF read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
 	switch( offset & ( 0xE000 / 4 ) )
 	{
 	case 0x0000/4:		/* SPORT transfer */
@@ -169,7 +169,7 @@ READ32_HANDLER( _3do_svf_r )
 
 WRITE32_HANDLER( _3do_svf_w )
 {
-	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset*4, data, mem_mask );
+	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
 	switch( offset & ( 0xe000 / 4 ) )
 	{
 	case 0x0000/4:		/* SPORT transfer */
@@ -187,7 +187,7 @@ WRITE32_HANDLER( _3do_svf_w )
 
 
 READ32_HANDLER( _3do_madam_r ) {
-	logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset );
+	logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
 	switch( offset ) {
 	case 0x0000/4:		/* 03300000 - Revision */
 		return madam.revision;
@@ -340,7 +340,7 @@ READ32_HANDLER( _3do_madam_r ) {
 
 
 WRITE32_HANDLER( _3do_madam_w ) {
-	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset, data, mem_mask );
+	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data, mem_mask );
 	switch( offset ) {
 	case 0x0004/4:	/* 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM */
 		madam.msysbits = data;
@@ -519,7 +519,7 @@ void _3do_madam_init( void )
 
 READ32_HANDLER( _3do_clio_r )
 {
-	logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset );
+	logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
 
 	switch( offset )
 	{
@@ -557,7 +557,7 @@ READ32_HANDLER( _3do_clio_r )
 
 WRITE32_HANDLER( _3do_clio_w )
 {
-	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset, data, mem_mask );
+	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data, mem_mask );
 
 	switch( offset )
 	{

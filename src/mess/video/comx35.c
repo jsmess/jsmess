@@ -119,17 +119,17 @@ static VIDEO_START( comx35 )
 
 static VIDEO_UPDATE( comx35 )
 {
-	screen_device *screen_40 = downcast<screen_device *>(devtag_get_device(screen->machine, SCREEN_TAG));
+	screen_device *screen_40 = downcast<screen_device *>(screen->machine->device(SCREEN_TAG));
 
 	if (screen == screen_40)
 	{
-		running_device *cdp1869 = devtag_get_device(screen->machine, CDP1869_TAG);
+		running_device *cdp1869 = screen->machine->device(CDP1869_TAG);
 
 		cdp1869_update(cdp1869, bitmap, cliprect);
 	}
 	else
 	{
-		running_device *mc6845 = devtag_get_device(screen->machine, MC6845_TAG);
+		running_device *mc6845 = screen->machine->device(MC6845_TAG);
 
 		mc6845_update(mc6845, bitmap, cliprect);
 	}

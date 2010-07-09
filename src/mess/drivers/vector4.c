@@ -14,7 +14,7 @@ static UINT8 received_char = 0;
 
 static WRITE8_HANDLER(vector_terminal_w)
 {
-	running_device *devconf = devtag_get_device(space->machine, "terminal");
+	running_device *devconf = space->machine->device("terminal");
 	terminal_write(devconf,0,data);
 }
 
@@ -56,7 +56,7 @@ INPUT_PORTS_END
 static MACHINE_RESET(vector4)
 {
 	received_char = 0;
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xe000);
+	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xe000);
 }
 
 static WRITE8_DEVICE_HANDLER( vector4_kbd_put )

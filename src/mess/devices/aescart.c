@@ -503,7 +503,7 @@ static DEVICE_IMAGE_LOAD( aes_cartridge )
 	cartslot_t *cart;
 	multicart_open_error me;
 	UINT32 size;
-	running_device* ym = devtag_get_device(image.device().machine,"ymsnd");
+	running_device* ym = image.device().machine->device("ymsnd");
 
 	// first check software list
 	if(image.software_entry() != NULL)

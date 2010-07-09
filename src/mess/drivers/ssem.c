@@ -74,7 +74,7 @@ static INPUT_CHANGED( panel_check )
     UINT8 edit2_state = input_port_read(field->port->machine, "EDIT2");
     UINT8 edit3_state = input_port_read(field->port->machine, "EDIT3");
     UINT8 misc_state = input_port_read(field->port->machine, "MISC");
-    running_device *ssem_cpu = devtag_get_device(field->port->machine, "maincpu");
+    running_device *ssem_cpu = field->port->machine->device("maincpu");
 
     switch( (int)(FPTR)param )
     {
@@ -431,7 +431,7 @@ static void glyph_print(running_machine *machine, bitmap_t *bitmap, INT32 x, INT
 static VIDEO_UPDATE( ssem )
 {
     UINT32 line = 0;
-    running_device *ssem_cpu = devtag_get_device(screen->machine, "maincpu");
+    running_device *ssem_cpu = screen->machine->device("maincpu");
     UINT32 accum = cpu_get_reg(ssem_cpu, SSEM_A);
     UINT32 bit = 0;
     UINT32 word = 0;

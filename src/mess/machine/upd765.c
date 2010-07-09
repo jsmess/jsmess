@@ -177,7 +177,7 @@ static running_device *current_image(running_device *device)
 			if (device->owner() != NULL)
 				image = device->owner()->subdevice(fdc->intf->floppy_drive_tags[fdc->drive]);
 			else
-				image = devtag_get_device(device->machine, fdc->intf->floppy_drive_tags[fdc->drive]);
+				image = device->machine->device(fdc->intf->floppy_drive_tags[fdc->drive]);
 		}
 	}
 	else
@@ -2223,7 +2223,7 @@ void upd765_reset(running_device *device, int offset)
 				if (device->owner() != NULL)
 					img = device->owner()->subdevice(fdc->intf->floppy_drive_tags[i]);
 				else
-					img = devtag_get_device(device->machine, fdc->intf->floppy_drive_tags[i]);
+					img = device->machine->device(fdc->intf->floppy_drive_tags[i]);
 
 				device_image_interface *image = dynamic_cast<device_image_interface *>( img);
 				if (image->exists())
@@ -2353,7 +2353,7 @@ static DEVICE_RESET( upd765 )
 			if (device->owner() != NULL)
 				img = device->owner()->subdevice(fdc->intf->floppy_drive_tags[i]);
 			else
-				img = devtag_get_device(device->machine, fdc->intf->floppy_drive_tags[i]);
+				img = device->machine->device(fdc->intf->floppy_drive_tags[i]);
 
 			floppy_drive_set_controller(img, device);
 			floppy_drive_set_ready_state_change_callback(img, upd765_set_ready_change_callback);

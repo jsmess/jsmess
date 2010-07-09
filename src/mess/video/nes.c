@@ -14,7 +14,7 @@
 static void nes_vh_reset( running_machine &machine )
 {
 	nes_state *state = (nes_state *)machine.driver_data;
-	ppu2c0x_set_vidaccess_callback(devtag_get_device(&machine,"ppu"), nes_ppu_vidaccess);
+	ppu2c0x_set_vidaccess_callback(machine.device("ppu"), nes_ppu_vidaccess);
 
 	if (state->four_screen_vram)
 		set_nt_mirroring(&machine, PPU_MIRROR_4SCREEN);

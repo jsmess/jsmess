@@ -128,7 +128,7 @@ INPUT_PORTS_END
 static TIMER_CALLBACK(timer_callback)
 {
 	_4004clk_state *state = (_4004clk_state *)machine->driver_data;
-	i4004_set_test(devtag_get_device(machine, "maincpu"),state->timer);
+	i4004_set_test(machine->device("maincpu"),state->timer);
 	state->timer^=1;
 }
 
@@ -136,7 +136,7 @@ static MACHINE_START(4004clk)
 {
 	_4004clk_state *state = (_4004clk_state *)machine->driver_data;
 	state->timer = 0;
-	state->dac = devtag_get_device(machine, "dac");
+	state->dac = machine->device("dac");
 
 	timer_pulse(machine, ATTOTIME_IN_HZ(120), NULL, 0, timer_callback);
 

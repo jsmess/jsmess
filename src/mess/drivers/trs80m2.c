@@ -163,7 +163,7 @@ static void bankswitch(running_machine *machine)
 	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
 
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	running_device *messram = devtag_get_device(machine, "messram");
+	running_device *messram = machine->device("messram");
 	UINT8 *rom = memory_region(machine, Z80_TAG);
 	UINT8 *ram = messram_get_ptr(messram);
 	int last_page = (messram_get_size(messram) / 0x8000) - 1;
@@ -733,7 +733,7 @@ static VIDEO_START( trs80m2 )
 	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
 
 	/* find devices */
-	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
+	state->mc6845 = machine->device(MC6845_TAG);
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, MC6845_TAG);
@@ -953,11 +953,11 @@ static MACHINE_START( trs80m2 )
 	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
 
 	/* find devices */
-	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
-	state->z80pio = devtag_get_device(machine, Z80PIO_TAG);
-	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
-	state->centronics = devtag_get_device(machine, CENTRONICS_TAG);
-	state->floppy = devtag_get_device(machine, FLOPPY_0);
+	state->z80ctc = machine->device(Z80CTC_TAG);
+	state->z80pio = machine->device(Z80PIO_TAG);
+	state->mc6845 = machine->device(MC6845_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
+	state->floppy = machine->device(FLOPPY_0);
 
 	/* Shugart SA-800 motor spins constantly */
 	floppy_mon_w(state->floppy, CLEAR_LINE);

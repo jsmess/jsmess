@@ -478,7 +478,7 @@ static DEVICE_IMAGE_UNLOAD( sonydriv_floppy )
 	running_device *fdc;
 
 	/* locate the FDC */
-	fdc = devtag_get_device(image.device().machine, "fdc");
+	fdc = image.device().machine->device("fdc");
 
 	id = floppy_get_drive_by_type(&image.device(),FLOPPY_TYPE_SONY);
 	save_track_data(fdc, id);

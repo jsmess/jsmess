@@ -126,7 +126,7 @@ static QUICKLOAD_LOAD( z80bin )
 		else
 		{
 			if (autorun)
-				cpu_set_reg(devtag_get_device(image.device().machine, "maincpu"), STATE_GENPC, exec_addr);
+				cpu_set_reg(image.device().machine->device("maincpu"), STATE_GENPC, exec_addr);
 		}
 	}
 

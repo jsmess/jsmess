@@ -250,7 +250,7 @@ static READ8_HANDLER( osi600_keyboard_r )
 
 static WRITE8_HANDLER( osi600_keyboard_w )
 {
-	running_device *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = space->machine->device("discrete");
 	osi_state *state = (osi_state *)space->machine->driver_data;
 
 	state->keylatch = data;
@@ -282,7 +282,7 @@ static WRITE8_HANDLER( osi600_ctrl_w )
 
     */
 
-	running_device *discrete = devtag_get_device(space->machine, "discrete");
+	running_device *discrete = space->machine->device("discrete");
 	osi_state *state = (osi_state *)space->machine->driver_data;
 
 	state->_32 = BIT(data, 0);
@@ -293,7 +293,7 @@ static WRITE8_HANDLER( osi600_ctrl_w )
 
 static WRITE8_HANDLER( osi630_ctrl_w )
 {
-	running_device *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = space->machine->device("beep");
 	/*
 
         bit     description
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( osi630_ctrl_w )
 
 static WRITE8_HANDLER( osi630_sound_w )
 {
-	running_device *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = space->machine->device("beep");
 	if (data) beep_set_frequency(speaker, 49152/data);
 }
 
@@ -670,13 +670,13 @@ static MACHINE_START( osi600 )
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* configure RAM banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, M6502_TAG), 0);
 	memory_set_bank(machine, "bank1", 0);
 
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 4*1024:
 		memory_install_readwrite_bank(program, 0x0000, 0x0fff, 0, 0, "bank1");
@@ -700,13 +700,13 @@ static MACHINE_START( c1p )
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* configure RAM banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, M6502_TAG), 0);
 	memory_set_bank(machine, "bank1", 0);
 
-	switch (messram_get_size(devtag_get_device(machine, "messram")))
+	switch (messram_get_size(machine->device("messram")))
 	{
 	case 8*1024:
 		memory_install_readwrite_bank(program, 0x0000, 0x1fff, 0, 0, "bank1");
@@ -923,7 +923,7 @@ ROM_END
 
 static TIMER_CALLBACK( setup_beep )
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = machine->device("beep");
 	beep_set_state(speaker, 0);
 	beep_set_frequency(speaker, 300);
 }

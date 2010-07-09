@@ -197,7 +197,7 @@ WRITE8_HANDLER( laser_bank_select_w )
 
 static running_device *vtech2_cassette_image(running_machine *machine)
 {
-	return devtag_get_device(machine, "cassette");
+	return machine->device("cassette");
 }
 
 /*************************************************
@@ -302,7 +302,7 @@ static int mra_bank(running_machine *machine, int bank, int offs)
  ************************************************/
 static void mwa_bank(running_machine *machine, int bank, int offs, int data)
 {
-	running_device *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = machine->device("speaker");
 	offs += 0x4000 * laser_bank[bank];
     switch (laser_bank[bank])
     {
@@ -363,7 +363,7 @@ DEVICE_IMAGE_UNLOAD( laser_cart )
 
 static running_device *laser_file(running_machine *machine)
 {
-	return devtag_get_device( machine, laser_drive ? FLOPPY_1 : FLOPPY_0 );
+	return machine->device( laser_drive ? FLOPPY_1 : FLOPPY_0 );
 }
 
 static void laser_get_track(running_machine *machine)

@@ -15,7 +15,7 @@ static UINT8 received_char = 0;
 
 static WRITE16_HANDLER(isbc_terminal_w)
 {
-	running_device *devconf = devtag_get_device(space->machine, "terminal");
+	running_device *devconf = space->machine->device("terminal");
 	terminal_write(devconf,0,data);
 }
 

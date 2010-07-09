@@ -35,9 +35,9 @@ static VIDEO_START( pc8500 )
 	pc8401a_state *state = (pc8401a_state *)machine->driver_data;
 
 	/* find devices */
-	state->sed1330 = devtag_get_device(machine, SED1330_TAG);
-	state->mc6845 = devtag_get_device(machine, MC6845_TAG);
-	state->lcd = devtag_get_device(machine, SCREEN_TAG);
+	state->sed1330 = machine->device(SED1330_TAG);
+	state->mc6845 = machine->device(MC6845_TAG);
+	state->lcd = machine->device(SCREEN_TAG);
 
 	/* allocate video memory */
 	state->video_ram = auto_alloc_array(machine, UINT8, PC8500_LCD_VIDEORAM_SIZE);

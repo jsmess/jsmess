@@ -200,7 +200,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( dc_console )
 {
-	running_device *aica = devtag_get_device(machine, "aica");
+	running_device *aica = machine->device("aica");
 	MACHINE_RESET_CALL(dc);
 	aica_set_ram_base(aica, dc_sound_ram, 2*1024*1024);
 	dreamcast_atapi_reset(machine);

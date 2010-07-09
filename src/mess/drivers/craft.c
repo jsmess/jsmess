@@ -24,7 +24,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%08x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf );
+		logerror( "%08x: %s", cpu_get_pc(machine->device("maincpu")), buf );
 	}
 }
 #else
@@ -195,7 +195,7 @@ static TIMER_CALLBACK( ocr1a_timer_compare )
 	// TODO
 
     //avr8_maybe_start_timer_1(regs);
-    //cpu_set_input_line(devtag_get_device(machine, "maincpu"), AVR8_INT_T1COMPA, ASSERT_LINE);
+    //cpu_set_input_line(machine->device("maincpu"), AVR8_INT_T1COMPA, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( ocr1b_timer_compare )
@@ -206,7 +206,7 @@ static TIMER_CALLBACK( ocr1b_timer_compare )
 	// TODO
 
     //avr8_maybe_start_timer_1(regs);
-    //cpu_set_input_line(devtag_get_device(machine, "maincpu"), AVR8_INT_T1COMPB, ASSERT_LINE);
+    //cpu_set_input_line(machine->device("maincpu"), AVR8_INT_T1COMPB, ASSERT_LINE);
 }
 
 static READ8_HANDLER( avr8_read )
@@ -838,7 +838,7 @@ static MACHINE_RESET( craft )
     AVR8_TCNT1H = 0;
     AVR8_TCNT1L = 0;
 
-    dac_data_w(devtag_get_device(machine, "dac"), 0x00);
+    dac_data_w(machine->device("dac"), 0x00);
 }
 
 static MACHINE_DRIVER_START( craft )

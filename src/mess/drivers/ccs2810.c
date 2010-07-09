@@ -29,7 +29,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(ccs2810)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xf000);
+	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xf000);
 }
 
 static VIDEO_START( ccs2810 )

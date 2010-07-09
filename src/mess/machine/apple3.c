@@ -118,8 +118,8 @@ static void apple3_profile_w(offs_t offset, UINT8 data)
 
 static READ8_HANDLER( apple3_c0xx_r )
 {
-	running_device *acia = devtag_get_device(space->machine, "acia");
-	running_device *fdc = devtag_get_device(space->machine, "fdc");
+	running_device *acia = space->machine->device("acia");
+	running_device *fdc = space->machine->device("fdc");
 	UINT8 result = 0xFF;
 
 	switch(offset)
@@ -174,7 +174,7 @@ static READ8_HANDLER( apple3_c0xx_r )
 				apple3_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
 				apple3_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
-			apple3_update_drives(devtag_get_device(space->machine, "fdc"));
+			apple3_update_drives(space->machine->device("fdc"));
 			result = 0x00;
 			break;
 
@@ -203,8 +203,8 @@ static READ8_HANDLER( apple3_c0xx_r )
 
 static WRITE8_HANDLER( apple3_c0xx_w )
 {
-	running_device *acia = devtag_get_device(space->machine, "acia");
-	running_device *fdc = devtag_get_device(space->machine, "fdc");
+	running_device *acia = space->machine->device("acia");
+	running_device *fdc = space->machine->device("fdc");
 	switch(offset)
 	{
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -238,7 +238,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 				apple3_flags |= VAR_EXTA0 << ((offset - 0xD0) / 2);
 			else
 				apple3_flags &= ~(VAR_EXTA0 << ((offset - 0xD0) / 2));
-			apple3_update_drives(devtag_get_device(space->machine, "fdc"));
+			apple3_update_drives(space->machine->device("fdc"));
 			break;
 
 		case 0xDB:
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( apple3_c0xx_w )
 
 INTERRUPT_GEN( apple3_interrupt )
 {
-	running_device *via_1 = devtag_get_device(device->machine, "via6522_1");
+	running_device *via_1 = device->machine->device("via6522_1");
 
 	via_ca2_w(via_1, (AY3600_keydata_strobe_r() & 0x80) ? 1 : 0);
 	via_cb1_w(via_1, device->machine->primary_screen->vblank());
@@ -276,13 +276,13 @@ static UINT8 *apple3_bankaddr(running_machine *machine,UINT16 bank, offs_t offse
 {
 	if (bank != (UINT16) ~0)
 	{
-		bank %= messram_get_size(devtag_get_device(machine, "messram")) / 0x8000;
-		if ((bank + 1) == (messram_get_size(devtag_get_device(machine, "messram")) / 0x8000))
+		bank %= messram_get_size(machine->device("messram")) / 0x8000;
+		if ((bank + 1) == (messram_get_size(machine->device("messram")) / 0x8000))
 			bank = 0x02;
 	}
 	offset += ((offs_t) bank) * 0x8000;
-	offset %= messram_get_size(devtag_get_device(machine, "messram"));
-	return &messram_get_ptr(devtag_get_device(machine, "messram"))[offset];
+	offset %= messram_get_size(machine->device("messram"));
+	return &messram_get_ptr(machine->device("messram"))[offset];
 }
 
 
@@ -297,9 +297,9 @@ static void apple3_setbank(running_machine *machine,const char *mame_bank, UINT1
 	if (LOG_MEMORY)
 	{
 		#ifdef PTR64
-		//logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
+		//logerror("\tbank %s --> %02x/%04x [0x%08lx]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(machine->device("messram")));
 		#else
-		logerror("\tbank %s --> %02x/%04x [0x%08x]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(devtag_get_device(machine, "messram")));
+		logerror("\tbank %s --> %02x/%04x [0x%08x]\n", mame_bank, (unsigned) bank, (unsigned)offset, ptr - messram_get_ptr(machine->device("messram")));
 		#endif
 	}
 }
@@ -457,8 +457,8 @@ static void apple3_update_memory(running_machine *machine)
 
 	/* reinstall VIA handlers */
 	{
-		running_device *via_0 = devtag_get_device(space->machine, "via6522_0");
-		running_device *via_1 = devtag_get_device(space->machine, "via6522_1");
+		running_device *via_0 = space->machine->device("via6522_0");
+		running_device *via_1 = space->machine->device("via6522_1");
 		memory_install_read8_device_handler(space, via_0, 0xFFD0, 0xFFDF, 0, 0, via_r);
 		memory_install_write8_device_handler(space, via_0, 0xFFD0, 0xFFDF, 0, 0, via_w);
 		memory_install_read8_device_handler(space, via_1, 0xFFE0, 0xFFEF, 0, 0, via_r);
@@ -568,7 +568,7 @@ static UINT8 *apple3_get_indexed_addr(running_machine *machine,offs_t offset)
 			else if (offset > 0x9FFF)
 				result = apple3_bankaddr(machine,~0, offset - 0x8000);
 			else
-				result = &messram_get_ptr(devtag_get_device(machine, "messram"))[offset - 0x2000];
+				result = &messram_get_ptr(machine->device("messram"))[offset - 0x2000];
 		}
 		else if ((n >= 0x80) && (n <= 0x8E))
 		{
@@ -715,7 +715,7 @@ DRIVER_INIT( apple3 )
 	memory_region(machine, "maincpu")[0x0685] = 0x00;
 
 	apple3_enable_mask = 0;
-	apple3_update_drives(devtag_get_device(machine, "fdc"));
+	apple3_update_drives(machine->device("fdc"));
 
 	AY3600_init(machine);
 

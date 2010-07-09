@@ -627,7 +627,7 @@ static DEVICE_START( upd3301 )
 	devcb_resolve_write_line(&upd3301->out_vrtc_func, &intf->out_vrtc_func, device);
 
 	/* get the screen device */
-	upd3301->screen = downcast<screen_device *>(devtag_get_device(device->machine, intf->screen_tag));
+	upd3301->screen = downcast<screen_device *>(device->machine->device(intf->screen_tag));
 	assert(upd3301->screen != NULL);
 
 	/* get character width */

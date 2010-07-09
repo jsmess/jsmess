@@ -956,7 +956,7 @@ static DEVICE_START( c1571 )
 	c1571->via1 = device->subdevice(M6522_1_TAG);
 	c1571->cia = device->subdevice(M6526_TAG);
 	c1571->wd1770 = device->subdevice(WD1770_TAG);
-	c1571->serial_bus = devtag_get_device(device->machine, config->serial_bus_tag);
+	c1571->serial_bus = device->machine->device(config->serial_bus_tag);
 	c1571->image = device->subdevice(FLOPPY_0);
 
 	/* install image callbacks */

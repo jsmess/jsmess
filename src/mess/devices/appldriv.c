@@ -135,10 +135,10 @@ static void apple525_disk_set_lines(running_device *device,running_device *image
 
 int apple525_get_count(running_machine *machine) {
 	int cnt = 0;
-	if (devtag_get_device(machine,FLOPPY_0)!=NULL && flopimg_get_custom_data(devtag_get_device(machine,FLOPPY_0))!=NULL) cnt++;
-    if (devtag_get_device(machine,FLOPPY_1)!=NULL && flopimg_get_custom_data(devtag_get_device(machine,FLOPPY_1))!=NULL) cnt++;
-    if (devtag_get_device(machine,FLOPPY_2)!=NULL && flopimg_get_custom_data(devtag_get_device(machine,FLOPPY_2))!=NULL) cnt++;
-    if (devtag_get_device(machine,FLOPPY_3)!=NULL && flopimg_get_custom_data(devtag_get_device(machine,FLOPPY_3))!=NULL) cnt++;
+	if (machine->device(FLOPPY_0)!=NULL && flopimg_get_custom_data(machine->device(FLOPPY_0))!=NULL) cnt++;
+    if (machine->device(FLOPPY_1)!=NULL && flopimg_get_custom_data(machine->device(FLOPPY_1))!=NULL) cnt++;
+    if (machine->device(FLOPPY_2)!=NULL && flopimg_get_custom_data(machine->device(FLOPPY_2))!=NULL) cnt++;
+    if (machine->device(FLOPPY_3)!=NULL && flopimg_get_custom_data(machine->device(FLOPPY_3))!=NULL) cnt++;
 	return cnt;
 }
 

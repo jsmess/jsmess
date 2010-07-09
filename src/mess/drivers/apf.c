@@ -89,7 +89,7 @@ static WRITE_LINE_DEVICE_HANDLER( apf_mc6847_fs_w )
 
 static VIDEO_UPDATE( apf )
 {
-	running_device *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	running_device *mc6847 = screen->machine->device("mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
 }
 
@@ -145,7 +145,7 @@ static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_a_func)
 static WRITE8_DEVICE_HANDLER( apf_m1000_pia_out_b_func )
 {
 	apf_state *state = (apf_state *)device->machine->driver_data;
-	running_device *mc6847 = devtag_get_device(device->machine, "mc6847");
+	running_device *mc6847 = device->machine->device("mc6847");
 
 	/* bit 7..4 video control -- TODO: bit 5 and 4? */
 	mc6847_ag_w(mc6847, BIT(data, 7));
@@ -164,7 +164,7 @@ static WRITE_LINE_DEVICE_HANDLER(apf_m1000_pia_out_ca2_func)
 
 static WRITE8_DEVICE_HANDLER(apf_m1000_pia_out_cb2_func)
 {
-	running_device *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = device->machine->device("speaker");
 	speaker_level_w(speaker, data);
 }
 
@@ -247,7 +247,7 @@ static READ8_DEVICE_HANDLER(apf_imagination_pia_in_b_func)
 
 	data = 0x000;
 
-	if (cassette_input(devtag_get_device(device->machine, "cassette")) > 0.0038)
+	if (cassette_input(device->machine->device("cassette")) > 0.0038)
 		data =(1<<7);
 
 	return data;
@@ -296,12 +296,12 @@ static WRITE8_DEVICE_HANDLER(apf_imagination_pia_out_b_func)
 	state->keyboard_data = input_port_read(device->machine, keynames[keyboard_line]);
 
 	/* bit 4: cassette motor control */
-	cassette_change_state(devtag_get_device(device->machine, "cassette"),
+	cassette_change_state(device->machine->device("cassette"),
 		(data & 0x10) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MASK_MOTOR);
 
 	/* bit 6: cassette write */
-	cassette_output(devtag_get_device(device->machine, "cassette"),
+	cassette_output(device->machine->device("cassette"),
 		(data & 0x40) ? -1.0 : 1.0);
 }
 
@@ -373,7 +373,7 @@ static MACHINE_START( apf_imagination )
 static WRITE8_HANDLER(apf_dischw_w)
 {
 	int drive;
-	running_device *fdc = devtag_get_device(space->machine, "wd179x");
+	running_device *fdc = space->machine->device("wd179x");
 
 	/* bit 3 is index of drive to select */
 	drive = (data>>3) & 0x01;
@@ -396,42 +396,42 @@ static WRITE8_HANDLER(serial_w)
 
 static WRITE8_HANDLER(apf_wd179x_command_w)
 {
-	wd17xx_command_w(devtag_get_device(space->machine, "wd179x"), offset,~data);
+	wd17xx_command_w(space->machine->device("wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_track_w)
 {
-	wd17xx_track_w(devtag_get_device(space->machine, "wd179x"), offset,~data);
+	wd17xx_track_w(space->machine->device("wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_sector_w)
 {
-	wd17xx_sector_w(devtag_get_device(space->machine, "wd179x"), offset,~data);
+	wd17xx_sector_w(space->machine->device("wd179x"), offset,~data);
 }
 
 static WRITE8_HANDLER(apf_wd179x_data_w)
 {
-	wd17xx_data_w(devtag_get_device(space->machine, "wd179x"), offset,~data);
+	wd17xx_data_w(space->machine->device("wd179x"), offset,~data);
 }
 
 static READ8_HANDLER(apf_wd179x_status_r)
 {
-	return ~wd17xx_status_r(devtag_get_device(space->machine, "wd179x"), offset);
+	return ~wd17xx_status_r(space->machine->device("wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_track_r)
 {
-	return ~wd17xx_track_r(devtag_get_device(space->machine, "wd179x"), offset);
+	return ~wd17xx_track_r(space->machine->device("wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_sector_r)
 {
-	return ~wd17xx_sector_r(devtag_get_device(space->machine, "wd179x"), offset);
+	return ~wd17xx_sector_r(space->machine->device("wd179x"), offset);
 }
 
 static READ8_HANDLER(apf_wd179x_data_r)
 {
-	return wd17xx_data_r(devtag_get_device(space->machine, "wd179x"), offset);
+	return wd17xx_data_r(space->machine->device("wd179x"), offset);
 }
 
 static ADDRESS_MAP_START(apf_imagination_map, ADDRESS_SPACE_PROGRAM, 8)

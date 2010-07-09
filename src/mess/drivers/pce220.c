@@ -96,8 +96,8 @@ static WRITE8_HANDLER( ram_bank_w )
 	UINT8 bank = BIT(data,2);
 	memory_install_write_bank(space_prg, 0x0000, 0x3fff, 0, 0, "bank1");
 
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram"))+0x0000+bank*0x8000);
-	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram"))+0x4000+bank*0x8000);
+	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram"))+0x0000+bank*0x8000);
+	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram"))+0x4000+bank*0x8000);
 }
 
 static ADDRESS_MAP_START(pce220_mem, ADDRESS_SPACE_PROGRAM, 8)

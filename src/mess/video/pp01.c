@@ -25,9 +25,9 @@ VIDEO_UPDATE( pp01 )
     {
 	    for (x = 0; x < 32; x++)
 	    {
-            code_r = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0x6000 + ((y+pp01_video_scroll)&0xff)*32 + x];
-            code_g = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0xa000 + ((y+pp01_video_scroll)&0xff)*32 + x];
-            code_b = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[0xe000 + ((y+pp01_video_scroll)&0xff)*32 + x];
+            code_r = messram_get_ptr(screen->machine->device("messram"))[0x6000 + ((y+pp01_video_scroll)&0xff)*32 + x];
+            code_g = messram_get_ptr(screen->machine->device("messram"))[0xa000 + ((y+pp01_video_scroll)&0xff)*32 + x];
+            code_b = messram_get_ptr(screen->machine->device("messram"))[0xe000 + ((y+pp01_video_scroll)&0xff)*32 + x];
             for (b = 0; b < 8; b++)
             {
                 col = (((code_r >> b) & 0x01) ? 4 : 0) + (((code_g >> b) & 0x01) ? 2 : 0) + (((code_b >> b) & 0x01) ? 1 : 0);

@@ -61,7 +61,7 @@ static READ8_HANDLER(kc85_4_port_r)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			return kc85_ctc_r(devtag_get_device(space->machine, "z80ctc"), port&3);
+			return kc85_ctc_r(space->machine->device("z80ctc"), port&3);
 
 	}
 
@@ -105,7 +105,7 @@ static WRITE8_HANDLER(kc85_4_port_w)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			kc85_ctc_w(devtag_get_device(space->machine, "z80ctc"), port&3, data);
+			kc85_ctc_w(space->machine->device("z80ctc"), port&3, data);
 			return;
 	}
 
@@ -157,7 +157,7 @@ static READ8_HANDLER(kc85_3_port_r)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			return kc85_ctc_r(devtag_get_device(space->machine, "z80ctc"), port&3);
+			return kc85_ctc_r(space->machine->device("z80ctc"), port&3);
 	}
 
 	logerror("unhandled port r: %04x\n",offset);
@@ -190,7 +190,7 @@ static WRITE8_HANDLER(kc85_3_port_w)
 		case 0x08d:
 		case 0x08e:
 		case 0x08f:
-			kc85_ctc_w(devtag_get_device(space->machine, "z80ctc"), port&3, data);
+			kc85_ctc_w(space->machine->device("z80ctc"), port&3, data);
 			return;
 	}
 

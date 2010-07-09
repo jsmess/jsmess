@@ -211,7 +211,7 @@ void ti99_pcode_reset(running_machine *machine)
 	pcode_GROMs.addr = 0;
 	pcode_GROMs.data_ptr = ti99_pcode_grom;
 
-	expansion_box = devtag_get_device(machine, "per_exp_box");
+	expansion_box = machine->device("per_exp_box");
 
 	ti99_peb_set_card_handlers(expansion_box, 0x1f00, &pcode_handlers);
 }

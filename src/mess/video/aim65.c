@@ -84,7 +84,7 @@ static void aim65_printer_cr(void) {
 
 static TIMER_CALLBACK(aim65_printer_timer)
 {
-	running_device *via_0 = devtag_get_device(machine, "via6522_0");
+	running_device *via_0 = machine->device("via6522_0");
 
 	via_cb1_w(via_0, printer_level);
 	via_ca1_w(via_0, !printer_level);

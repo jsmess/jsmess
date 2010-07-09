@@ -159,7 +159,7 @@ static void amiga_ar1_init( running_machine *machine )
 	amiga_ar1_spurious = 0;
 
 	/* Install IRQ ACK callback */
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), amiga_ar1_irqack);
+	cpu_set_irq_callback(machine->device("maincpu"), amiga_ar1_irqack);
 }
 
 /***************************************************************************
@@ -255,7 +255,7 @@ static WRITE16_HANDLER( amiga_ar23_chipmem_w )
 
 static void amiga_ar23_freeze( running_machine *machine )
 {
-	int pc = cpu_get_pc(devtag_get_device(machine, "maincpu"));
+	int pc = cpu_get_pc(machine->device("maincpu"));
 
 	/* only freeze if we're not inside the cart's ROM */
 	if ( ((pc >> 16) & 0xfe ) != 0x40 )

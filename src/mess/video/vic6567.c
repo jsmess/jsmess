@@ -2528,7 +2528,7 @@ static DEVICE_START( vic2 )
 	int width, height;
 	int i;
 
-	vic2->cpu = devtag_get_device(device->machine, intf->cpu);
+	vic2->cpu = device->machine->device(intf->cpu);
 
 	vic2->screen = device->machine->device<screen_device>(intf->screen);
 	width = vic2->screen->width();

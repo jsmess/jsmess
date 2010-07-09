@@ -755,10 +755,10 @@ DEVICE_IMAGE_UNLOAD( floppy )
 running_device *floppy_get_device(running_machine *machine,int drive)
 {
 	switch(drive) {
-		case 0 : return devtag_get_device(machine,FLOPPY_0);
-		case 1 : return devtag_get_device(machine,FLOPPY_1);
-		case 2 : return devtag_get_device(machine,FLOPPY_2);
-		case 3 : return devtag_get_device(machine,FLOPPY_3);
+		case 0 : return machine->device(FLOPPY_0);
+		case 1 : return machine->device(FLOPPY_1);
+		case 2 : return machine->device(FLOPPY_2);
+		case 3 : return machine->device(FLOPPY_3);
 	}
 	return NULL;
 }
@@ -830,10 +830,10 @@ int floppy_get_drive_by_type(running_device *image,int ftype)
 int floppy_get_count(running_machine *machine)
 {
 	int cnt = 0;
-	if (devtag_get_device(machine,FLOPPY_0)) cnt++;
-    if (devtag_get_device(machine,FLOPPY_1)) cnt++;
-    if (devtag_get_device(machine,FLOPPY_2)) cnt++;
-    if (devtag_get_device(machine,FLOPPY_3)) cnt++;
+	if (machine->device(FLOPPY_0)) cnt++;
+    if (machine->device(FLOPPY_1)) cnt++;
+    if (machine->device(FLOPPY_2)) cnt++;
+    if (machine->device(FLOPPY_3)) cnt++;
 	return cnt;
 }
 

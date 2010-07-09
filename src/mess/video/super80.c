@@ -395,7 +395,7 @@ static void mc6845_screen_configure(running_machine *machine)
 
 VIDEO_START( super80v )
 {
-	mc6845 = devtag_get_device(machine, "crtc");
+	mc6845 = machine->device("crtc");
 	FNT = memory_region(machine, "gfx1");
 }
 

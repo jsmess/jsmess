@@ -37,7 +37,7 @@ static MACHINE_RESET(ht68k)
 
 	memcpy((UINT8*)ht68k_ram,user1,0x8000);
 
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 }
 
 static void duart_irq_handler(running_device *device, UINT8 vector)
@@ -47,7 +47,7 @@ static void duart_irq_handler(running_device *device, UINT8 vector)
 
 static void duart_tx(running_device *device, int channel, UINT8 data)
 {
-	running_device *devconf = devtag_get_device(device->machine, "terminal");
+	running_device *devconf = device->machine->device("terminal");
 	terminal_write(devconf,0,data);
 }
 
@@ -58,7 +58,7 @@ static UINT8 duart_input(running_device *device)
 
 static void duart_output(running_device *device, UINT8 data)
 {
-	running_device *fdc = devtag_get_device(device->machine, "wd1770");
+	running_device *fdc = device->machine->device("wd1770");
 	wd17xx_set_side(fdc,BIT(data,3) ? 0 : 1);
 	if (BIT(data,7)==0) {
 		wd17xx_set_drive(fdc,0);
@@ -73,7 +73,7 @@ static void duart_output(running_device *device, UINT8 data)
 
 static WRITE8_DEVICE_HANDLER( ht68k_kbd_put )
 {
-	duart68681_rx_data(devtag_get_device(device->machine, "duart68681"), 0, data);
+	duart68681_rx_data(device->machine->device("duart68681"), 0, data);
 }
 
 static GENERIC_TERMINAL_INTERFACE( ht68k_terminal_intf )

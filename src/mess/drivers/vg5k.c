@@ -300,10 +300,10 @@ static MACHINE_START( vg5k )
 {
 	vg5k_state *vg5k = (vg5k_state *)machine->driver_data;
 
-	vg5k->ef9345 = devtag_get_device(machine, "ef9345");
-	vg5k->dac = devtag_get_device(machine, "dac");
-	vg5k->printer = devtag_get_device(machine, "printer");
-	vg5k->cassette = devtag_get_device(machine, "cassette");
+	vg5k->ef9345 = machine->device("ef9345");
+	vg5k->dac = machine->device("dac");
+	vg5k->printer = machine->device("printer");
+	vg5k->cassette = machine->device("cassette");
 
 	timer_pulse(machine, ATTOTIME_IN_MSEC(20), NULL, 0, z80_irq);
 
@@ -363,8 +363,8 @@ static DRIVER_INIT( vg5k )
 
 	/* install expansion memory*/
 	const address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
-	UINT16 ram_size = messram_get_size(devtag_get_device(machine, "messram"));
+	UINT8 *ram = messram_get_ptr(machine->device("messram"));
+	UINT16 ram_size = messram_get_size(machine->device("messram"));
 
 	if (ram_size > 0x4000)
 		memory_install_ram(program, 0x8000, 0x3fff + ram_size, 0, 0, ram);

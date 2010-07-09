@@ -60,7 +60,7 @@ static MACHINE_RESET( zexall )
 
 static READ8_HANDLER( zexall_output_ack_r )
 {
-	running_device *devconf = devtag_get_device(space->machine, "terminal");
+	running_device *devconf = space->machine->device("terminal");
 // spit out the byte in out_byte if out_req is not equal to out_req_last
 	if (zexall.out_req != zexall.out_req_last)
 	{

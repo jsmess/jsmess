@@ -607,7 +607,7 @@ static VIDEO_UPDATE( apexc )
 
 	apexc_draw_led(bitmap, 0, 0, 1);
 
-	apexc_draw_led(bitmap, 0, 8, cpu_get_reg(devtag_get_device(screen->machine, "maincpu"), APEXC_STATE));
+	apexc_draw_led(bitmap, 0, 8, cpu_get_reg(screen->machine->device("maincpu"), APEXC_STATE));
 
 	for (i=0; i<32; i++)
 	{

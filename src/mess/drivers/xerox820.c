@@ -140,7 +140,7 @@ static void xerox820_bankswitch(running_machine *machine, int bank)
 {
 	xerox820_state *state = (xerox820_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 
 	if (bank)
 	{
@@ -161,7 +161,7 @@ static void xerox820ii_bankswitch(running_machine *machine, int bank)
 {
 	xerox820_state *state = (xerox820_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	UINT8 *ram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 
 	if (bank)
 	{
@@ -582,7 +582,7 @@ static const z80_daisy_config xerox820_daisy_chain[] =
 static WRITE_LINE_DEVICE_HANDLER( xerox820_wd1771_intrq_w )
 {
 	xerox820_state *driver_state = (xerox820_state *)device->machine->driver_data;
-	int halt = cpu_get_reg(devtag_get_device(device->machine, Z80_TAG), Z80_HALT);
+	int halt = cpu_get_reg(device->machine->device(Z80_TAG), Z80_HALT);
 
 	driver_state->fdc_irq = state;
 
@@ -595,7 +595,7 @@ static WRITE_LINE_DEVICE_HANDLER( xerox820_wd1771_intrq_w )
 static WRITE_LINE_DEVICE_HANDLER( xerox820_wd1771_drq_w )
 {
 	xerox820_state *driver_state = (xerox820_state *)device->machine->driver_data;
-	int halt = cpu_get_reg(devtag_get_device(device->machine, Z80_TAG), Z80_HALT);
+	int halt = cpu_get_reg(device->machine->device(Z80_TAG), Z80_HALT);
 
 	driver_state->fdc_drq = state;
 
@@ -718,9 +718,9 @@ static MACHINE_START( xerox820 )
 	xerox820_state *state = (xerox820_state *)machine->driver_data;
 
 	/* find devices */
-	state->kbpio = devtag_get_device(machine, Z80KBPIO_TAG);
-	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
-	state->wd1771 = devtag_get_device(machine, WD1771_TAG);
+	state->kbpio = machine->device(Z80KBPIO_TAG);
+	state->z80ctc = machine->device(Z80CTC_TAG);
+	state->wd1771 = machine->device(WD1771_TAG);
 
 	for (drive = 0; drive < 2; drive++)
 	{

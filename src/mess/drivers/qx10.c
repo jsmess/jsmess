@@ -91,7 +91,7 @@ static void update_memory_mapping(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")) + drambank*64*1024);
+		memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")) + drambank*64*1024);
 	}
 	if (state->memcmos)
 	{
@@ -99,7 +99,7 @@ static void update_memory_mapping(running_machine *machine)
 	}
 	else
 	{
-		memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + drambank*64*1024 + 32*1024);
+		memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")) + drambank*64*1024 + 32*1024);
 	}
 }
 
@@ -456,16 +456,16 @@ static MACHINE_START(qx10)
 {
 	qx10_state *state = (qx10_state *)machine->driver_data;
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
 	mc146818_init(machine, MC146818_STANDARD);
 	compis_init( &i82720_interface );
 
 	// find devices
-	state->pic8259_master = devtag_get_device(machine, "pic8259_master");
-	state->pic8259_slave = devtag_get_device(machine, "pic8259_slave");
-	state->dma8237_1 = devtag_get_device(machine, "8237dma_1");
-	state->upd765 = devtag_get_device(machine, "upd765");
+	state->pic8259_master = machine->device("pic8259_master");
+	state->pic8259_slave = machine->device("pic8259_slave");
+	state->dma8237_1 = machine->device("8237dma_1");
+	state->upd765 = machine->device("upd765");
 
 }
 

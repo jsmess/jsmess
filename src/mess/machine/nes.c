@@ -50,8 +50,8 @@ static void init_nes_core( running_machine *machine )
 	/* Brutal hack put in as a consequence of the new memory system; we really need to fix the NES code */
 	memory_install_readwrite_bank(space, 0x0000, 0x07ff, 0, 0x1800, "bank10");
 
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, nes_chr_r, nes_chr_w);
-	memory_install_readwrite8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nes_nt_r, nes_nt_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, nes_chr_r, nes_chr_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0x2000, 0x3eff, 0, 0, nes_nt_r, nes_nt_w);
 
 	memory_set_bankptr(machine, "bank10", state->rom);
 
@@ -177,7 +177,7 @@ static void init_nes_core( running_machine *machine )
 	}
 
 	if (state->pcb_id == WAIXING_SH2)
-		memory_install_read8_handler(cpu_get_address_space(devtag_get_device(machine, "ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, waixing_sh2_chr_r);
+		memory_install_read8_handler(cpu_get_address_space(machine->device("ppu"), ADDRESS_SPACE_PROGRAM), 0, 0x1fff, 0, 0, waixing_sh2_chr_r);
 }
 
 // to be probably removed (it does nothing since a long time)
@@ -200,7 +200,7 @@ MACHINE_RESET( nes )
 	state->in_0.shift = 0;
 	state->in_1.shift = 0;
 
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 }
 
 static TIMER_CALLBACK( nes_irq_callback )
@@ -281,10 +281,10 @@ MACHINE_START( nes )
 	init_nes_core(machine);
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, nes_machine_stop);
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->ppu = devtag_get_device(machine, "ppu");
-	state->sound = devtag_get_device(machine, "nessound");
-	state->cart = devtag_get_device(machine, "cart");
+	state->maincpu = machine->device("maincpu");
+	state->ppu = machine->device("ppu");
+	state->sound = machine->device("nessound");
+	state->cart = machine->device("cart");
 
 	state->irq_timer = timer_alloc(machine, nes_irq_callback, NULL);
 	nes_state_register(machine);

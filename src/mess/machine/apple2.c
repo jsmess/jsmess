@@ -203,11 +203,11 @@ void apple2_update_memory(running_machine *machine)
 			else
 			{
 				/* RAM */
-				if (end_r >= messram_get_size(devtag_get_device(machine, "messram")))
-					end_r = messram_get_size(devtag_get_device(machine, "messram")) - 1;
+				if (end_r >= messram_get_size(machine->device("messram")))
+					end_r = messram_get_size(machine->device("messram")) - 1;
 				offset = meminfo.read_mem & APPLE2_MEM_MASK;
 				if (end_r >= begin)
-					rbase = &messram_get_ptr(devtag_get_device(machine, "messram"))[offset];
+					rbase = &messram_get_ptr(machine->device("messram"))[offset];
 			}
 
 			/* install the actual handlers */
@@ -286,11 +286,11 @@ void apple2_update_memory(running_machine *machine)
 			else
 			{
 				/* RAM */
-				if (end_w >= messram_get_size(devtag_get_device(machine, "messram")))
-					end_w = messram_get_size(devtag_get_device(machine, "messram")) - 1;
+				if (end_w >= messram_get_size(machine->device("messram")))
+					end_w = messram_get_size(machine->device("messram")) - 1;
 				offset = meminfo.write_mem & APPLE2_MEM_MASK;
 				if (end_w >= begin)
-					wbase = &messram_get_ptr(devtag_get_device(machine, "messram"))[offset];
+					wbase = &messram_get_ptr(machine->device("messram"))[offset];
 			}
 
 
@@ -857,7 +857,7 @@ static const apple2_memmap_entry apple2_memmap_entries[] =
 void apple2_setvar(running_machine *machine, UINT32 val, UINT32 mask)
 {
 	LOG(("apple2_setvar(): val=0x%06x mask=0x%06x pc=0x%04x\n", val, mask,
-					(unsigned int) cpu_get_reg(devtag_get_device(machine, "maincpu"), STATE_GENPC)));
+					(unsigned int) cpu_get_reg(machine->device("maincpu"), STATE_GENPC)));
 
 	assert((val & mask) == val);
 
@@ -1018,7 +1018,7 @@ UINT8 apple2_getfloatingbusvalue(running_machine *machine)
 		//CMemory::mState |= CMemory::kVBLBar; // N: VBL' is true // FIX: MESS?
 	}
 
-	return messram_get_ptr(devtag_get_device(machine, "messram"))[address % messram_get_size(devtag_get_device(machine, "messram"))]; // FIX: this seems to work, but is it right!?
+	return messram_get_ptr(machine->device("messram"))[address % messram_get_size(machine->device("messram"))]; // FIX: this seems to work, but is it right!?
 }
 
 
@@ -1094,25 +1094,25 @@ INTERRUPT_GEN( apple2_interrupt )
 static WRITE8_HANDLER ( apple2_mainram0400_w )
 {
 	offset += 0x400;
-	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
+	messram_get_ptr(space->machine->device("messram"))[offset] = data;
 }
 
 static WRITE8_HANDLER ( apple2_mainram2000_w )
 {
 	offset += 0x2000;
-	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
+	messram_get_ptr(space->machine->device("messram"))[offset] = data;
 }
 
 static WRITE8_HANDLER ( apple2_auxram0400_w )
 {
 	offset += 0x10400;
-	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
+	messram_get_ptr(space->machine->device("messram"))[offset] = data;
 }
 
 static WRITE8_HANDLER ( apple2_auxram2000_w )
 {
 	offset += 0x12000;
-	messram_get_ptr(devtag_get_device(space->machine, "messram"))[offset] = data;
+	messram_get_ptr(space->machine->device("messram"))[offset] = data;
 }
 
 
@@ -1264,7 +1264,7 @@ READ8_HANDLER ( apple2_c03x_r )
 	{
 		if (!offset)
 		{
-			running_device *speaker_device = devtag_get_device(space->machine, "a2speaker");
+			running_device *speaker_device = space->machine->device("a2speaker");
 
 			if (a2_speaker_state == 1)
 			{
@@ -1334,7 +1334,7 @@ WRITE8_HANDLER ( apple2_c05x_w )
 
 static running_device *cassette_device_image(running_machine *machine)
 {
-	return devtag_get_device(machine, "cassette");
+	return machine->device("cassette");
 }
 
 READ8_HANDLER ( apple2_c06x_r )
@@ -1562,7 +1562,7 @@ void apple2_iwm_setdiskreg(running_machine *machine, UINT8 data)
 {
 	apple2_fdc_diskreg = data & 0xC0;
 	if (apple2_fdc_has_35(machine))
-		sony_set_sel_line( devtag_get_device(machine, "fdc"),apple2_fdc_diskreg & 0x80);
+		sony_set_sel_line( machine->device("fdc"),apple2_fdc_diskreg & 0x80);
 }
 
 
@@ -1613,7 +1613,7 @@ void apple2_init_common(running_machine *machine)
 	if (memory_region_length(machine, "maincpu") < 0x8000)
 		a2_mask &= ~VAR_ROMSWITCH;
 
-	if (messram_get_size(devtag_get_device(machine, "messram")) <= 64*1024)
+	if (messram_get_size(machine->device("messram")) <= 64*1024)
 		a2_mask &= ~(VAR_RAMRD | VAR_RAMWRT | VAR_80STORE | VAR_ALTZP | VAR_80COL);
 }
 

@@ -116,7 +116,7 @@ static READ8_DEVICE_HANDLER(sym1_riot_b_r)
 
 static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 {
-	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( devtag_get_device(device->machine, "maincpu") ), data);
+	logerror("%x: riot_a_w 0x%02x\n", cpu_get_pc( device->machine->device("maincpu") ), data);
 
 	/* save for later use */
 	riot_port_a = data;
@@ -125,13 +125,13 @@ static WRITE8_DEVICE_HANDLER(sym1_riot_a_w)
 
 static WRITE8_DEVICE_HANDLER(sym1_riot_b_w)
 {
-	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( devtag_get_device(device->machine, "maincpu") ), data);
+	logerror("%x: riot_b_w 0x%02x\n", cpu_get_pc( device->machine->device("maincpu") ), data);
 
 	/* save for later use */
 	riot_port_b = data;
 
 	/* first 4 pins are connected to the 74145 */
-	ttl74145_w(devtag_get_device(device->machine, "ttl74145"), 0, data & 0x0f);
+	ttl74145_w(device->machine->device("ttl74145"), 0, data & 0x0f);
 }
 
 
@@ -279,10 +279,10 @@ const via6522_interface sym1_via2 =
 DRIVER_INIT( sym1 )
 {
 	/* wipe expansion memory banks that are not installed */
-	if (messram_get_size(devtag_get_device(machine, "messram")) < 4*1024)
+	if (messram_get_size(machine->device("messram")) < 4*1024)
 	{
 		memory_nop_readwrite(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),
-			messram_get_size(devtag_get_device(machine, "messram")), 0x0fff, 0, 0);
+			messram_get_size(machine->device("messram")), 0x0fff, 0, 0);
 	}
 
 	/* allocate a timer to refresh the led display */
@@ -297,5 +297,5 @@ MACHINE_RESET( sym1 )
 	memory_install_read_bank(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0, "bank1");
 	memory_nop_write(cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ),0xf800, 0xffff, 0, 0);
 	memory_set_bankptr(machine, "bank1", sym1_monitor + 0x800);
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 }

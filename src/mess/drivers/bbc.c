@@ -710,7 +710,7 @@ ROM_END
 
 static INTERRUPT_GEN( bbcb_vsync )
 {
-	running_device *via_0 = devtag_get_device(device->machine, "via6522_0");
+	running_device *via_0 = device->machine->device("via6522_0");
 	via_ca1_w(via_0, 1);
 	via_ca1_w(via_0, 0);
 	bbc_frameclock();

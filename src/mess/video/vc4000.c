@@ -182,7 +182,7 @@ READ8_HANDLER(vc4000_video_r)
 	case 0xcc:		/* left joystick */
 		if (input_port_read(space->machine, "CONFIG")&1)
 		{		/* paddle */
-			if (!cpu_get_reg(devtag_get_device(space->machine, "maincpu"), S2650_FO))
+			if (!cpu_get_reg(space->machine->device("maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x03;
 				switch (data)
@@ -221,7 +221,7 @@ READ8_HANDLER(vc4000_video_r)
 		}
 		else
 		{		/* buttons */
-			if (!cpu_get_reg(devtag_get_device(space->machine, "maincpu"), S2650_FO))
+			if (!cpu_get_reg(space->machine->device("maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x03;
 				switch (data)
@@ -259,7 +259,7 @@ READ8_HANDLER(vc4000_video_r)
 	case 0xcd:		/* right joystick */
 		if (input_port_read(space->machine, "CONFIG")&1)
 		{
-			if (!cpu_get_reg(devtag_get_device(space->machine, "maincpu"), S2650_FO))
+			if (!cpu_get_reg(space->machine->device("maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x30;
 				switch (data)
@@ -298,7 +298,7 @@ READ8_HANDLER(vc4000_video_r)
 		}
 		else
 		{
-			if (!cpu_get_reg(devtag_get_device(space->machine, "maincpu"), S2650_FO))
+			if (!cpu_get_reg(space->machine->device("maincpu"), S2650_FO))
 			{
 				data = input_port_read(space->machine, "JOYS") & 0x30;
 				switch (data)
@@ -375,7 +375,7 @@ WRITE8_HANDLER(vc4000_video_w)
 
 	case 0xc7:						// Soundregister
 		vc4000_video.reg.data[offset] = data;
-		vc4000_soundport_w(devtag_get_device(space->machine, "custom"), 0, data);
+		vc4000_soundport_w(space->machine->device("custom"), 0, data);
 		break;
 
 	case 0xc8:						// Digits 1 and 2

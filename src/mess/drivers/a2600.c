@@ -685,7 +685,7 @@ static void mode3E_RAM_switch(running_machine *machine, UINT16 offset, UINT8 dat
 static void modeFV_switch(running_machine *machine, UINT16 offset, UINT8 data)
 {
 	//printf("ModeFV %04x\n",offset);
-	if (!FVlocked && ( cpu_get_pc(devtag_get_device(machine, "maincpu")) & 0x1F00 ) == 0x1F00 )
+	if (!FVlocked && ( cpu_get_pc(machine->device("maincpu")) & 0x1F00 ) == 0x1F00 )
 	{
 		FVlocked = 1;
 		current_bank = current_bank ^ 0x01;
@@ -702,7 +702,7 @@ static void modeJVP_switch(running_machine *machine, UINT16 offset, UINT8 data)
 		current_bank ^= 1;
 		break;
 	default:
-		printf("%04X: write to unknown mapper address %02X\n", cpu_get_pc(devtag_get_device(machine, "maincpu")), 0xfa0 + offset );
+		printf("%04X: write to unknown mapper address %02X\n", cpu_get_pc(machine->device("maincpu")), 0xfa0 + offset );
 		break;
 	}
 	bank_base[1] = CART + 0x1000 * current_bank;
@@ -782,11 +782,11 @@ static READ8_HANDLER(modeSS_r)
 {
 	UINT8 data = ( offset & 0x800 ) ? bank_base[2][offset & 0x7FF] : bank_base[1][offset];
 
-	//logerror("%04X: read from modeSS area offset = %04X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset);
+	//logerror("%04X: read from modeSS area offset = %04X\n", cpu_get_pc(space->machine->device("maincpu")), offset);
 	/* Check for control register "write" */
 	if ( offset == 0xFF8 )
 	{
-		//logerror("%04X: write to modeSS control register data = %02X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), modeSS_byte);
+		//logerror("%04X: write to modeSS control register data = %02X\n", cpu_get_pc(space->machine->device("maincpu")), modeSS_byte);
 		modeSS_write_enabled = modeSS_byte & 0x02;
 		modeSS_write_delay = modeSS_byte >> 5;
 		switch ( modeSS_byte & 0x1C )
@@ -838,8 +838,8 @@ static READ8_HANDLER(modeSS_r)
 	else if ( offset == 0xFF9 )
 	{
 		/* Cassette port read */
-		double tap_val = cassette_input( devtag_get_device(space->machine, "cassette") );
-		//logerror("%04X: Cassette port read, tap_val = %f\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), tap_val);
+		double tap_val = cassette_input( space->machine->device("cassette") );
+		//logerror("%04X: Cassette port read, tap_val = %f\n", cpu_get_pc(space->machine->device("maincpu")), tap_val);
 		if ( tap_val < 0 )
 		{
 			data = 0x00;
@@ -855,10 +855,10 @@ static READ8_HANDLER(modeSS_r)
 		if ( modeSS_write_enabled )
 		{
 			int diff = space->machine->device<cpu_device>("maincpu")->total_cycles() - modeSS_byte_started;
-			//logerror("%04X: offset = %04X, %d\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset, diff);
+			//logerror("%04X: offset = %04X, %d\n", cpu_get_pc(space->machine->device("maincpu")), offset, diff);
 			if ( diff - modeSS_diff_adjust == 5 )
 			{
-				//logerror("%04X: RAM write offset = %04X, data = %02X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset, modeSS_byte );
+				//logerror("%04X: RAM write offset = %04X, data = %02X\n", cpu_get_pc(space->machine->device("maincpu")), offset, modeSS_byte );
 				if ( offset & 0x800 )
 				{
 					if ( modeSS_high_ram_enabled )
@@ -896,7 +896,7 @@ static READ8_HANDLER(modeSS_r)
 	}
 	/* Because the mame core caches opcode data and doesn't perform reads like normal */
 	/* we have to put in this little hack here to get Suicide Mission to work. */
-	if ( offset != 0xFF8 && ( cpu_get_pc(devtag_get_device(space->machine, "maincpu")) & 0x1FFF ) == 0x1FF8 )
+	if ( offset != 0xFF8 && ( cpu_get_pc(space->machine->device("maincpu")) & 0x1FFF ) == 0x1FF8 )
 	{
 		modeSS_r( space, 0xFF8 );
 	}
@@ -960,7 +960,7 @@ static READ8_HANDLER(modeDPC_r)
 	UINT8	data_fetcher = offset & 0x07;
 	UINT8	data = 0xFF;
 
-	logerror("%04X: Read from DPC offset $%02X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset);
+	logerror("%04X: Read from DPC offset $%02X\n", cpu_get_pc(space->machine->device("maincpu")), offset);
 	if ( offset < 0x08 )
 	{
 		switch( offset & 0x06 )
@@ -1067,13 +1067,13 @@ static WRITE8_HANDLER(modeDPC_w)
 		dpc.movamt = data;
 		break;
 	case 0x28:			/* Not used */
-		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset, data);
+		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data);
 		break;
 	case 0x30:			/* Random number generator reset */
 		dpc.shift_reg = 0;
 		break;
 	case 0x38:			/* Not used */
-		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", cpu_get_pc(devtag_get_device(space->machine, "maincpu")), offset, data);
+		logerror("%04X: Write to unused DPC register $%02X, data $%02X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data);
 		break;
 	}
 }
@@ -1165,7 +1165,7 @@ static WRITE8_DEVICE_HANDLER(switch_A_w)
 		keypad_right_column = data & 0x0F;
 		break;
 	case 0x0a:	/* KidVid voice module */
-		cassette_change_state( devtag_get_device(machine, "cassette"), ( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( machine->device("cassette"), ( data & 0x02 ) ? (cassette_state)CASSETTE_MOTOR_DISABLED : (cassette_state)(CASSETTE_MOTOR_ENABLED | CASSETTE_PLAY), (cassette_state)CASSETTE_MOTOR_DISABLED );
 		break;
 	}
 }
@@ -1473,7 +1473,7 @@ static READ8_HANDLER(a2600_get_databus_contents)
 	UINT16	last_address, prev_address;
 	UINT8	last_byte, prev_byte;
 
-	last_address = cpu_get_pc(devtag_get_device(space->machine, "maincpu")) - 1;
+	last_address = cpu_get_pc(space->machine->device("maincpu")) - 1;
 	if ( ! ( last_address & 0x1080 ) )
 	{
 		return offset;
@@ -1873,7 +1873,7 @@ static MACHINE_RESET( a2600 )
 		modeSS_byte_started = 0;
 		memory_set_direct_update_handler(space, modeSS_opbase );
 		/* The Supercharger has no motor control so just enable it */
-		cassette_change_state( devtag_get_device(machine, "cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
+		cassette_change_state( machine->device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MOTOR_DISABLED );
 		break;
 
 	case modeFV:
@@ -1938,7 +1938,7 @@ static MACHINE_RESET( a2600 )
 	}
 
 	/* Banks may have changed, reset the cpu so it uses the correct reset vector */
-	devtag_get_device(machine, "maincpu")->reset();
+	machine->device("maincpu")->reset();
 }
 
 

@@ -48,16 +48,16 @@ static void samcoupe_install_ext_mem(const address_space *space)
 	UINT8 *mem;
 
 	/* bank 3 */
-	if (asic->lext >> 6 < messram_get_size(devtag_get_device(space->machine, "messram")) >> 20)
-		mem = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[(messram_get_size(devtag_get_device(space->machine, "messram")) & 0xfffff) + (asic->lext >> 6) * 0x100000 + (asic->lext & 0x3f) * 0x4000];
+	if (asic->lext >> 6 < messram_get_size(space->machine->device("messram")) >> 20)
+		mem = &messram_get_ptr(space->machine->device("messram"))[(messram_get_size(space->machine->device("messram")) & 0xfffff) + (asic->lext >> 6) * 0x100000 + (asic->lext & 0x3f) * 0x4000];
 	else
 		mem = NULL;
 
 	samcoupe_update_bank(space, 3, mem, FALSE);
 
 	/* bank 4 */
-	if (asic->hext >> 6 < messram_get_size(devtag_get_device(space->machine, "messram")) >> 20)
-		mem = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[(messram_get_size(devtag_get_device(space->machine, "messram")) & 0xfffff) + (asic->hext >> 6) * 0x100000 + (asic->hext & 0x3f) * 0x4000];
+	if (asic->hext >> 6 < messram_get_size(space->machine->device("messram")) >> 20)
+		mem = &messram_get_ptr(space->machine->device("messram"))[(messram_get_size(space->machine->device("messram")) & 0xfffff) + (asic->hext >> 6) * 0x100000 + (asic->hext & 0x3f) * 0x4000];
 	else
 		mem = NULL;
 
@@ -68,7 +68,7 @@ static void samcoupe_install_ext_mem(const address_space *space)
 void samcoupe_update_memory(const address_space *space)
 {
 	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
-	const int PAGE_MASK = ((messram_get_size(devtag_get_device(space->machine, "messram")) & 0xfffff) / 0x4000) - 1;
+	const int PAGE_MASK = ((messram_get_size(space->machine->device("messram")) & 0xfffff) / 0x4000) - 1;
 	UINT8 *rom = memory_region(space->machine, "maincpu");
 	UINT8 *memory;
 	int is_readonly;
@@ -77,7 +77,7 @@ void samcoupe_update_memory(const address_space *space)
     if (asic->lmpr & LMPR_RAM0)   /* Is ram paged in at bank 1 */
 	{
 		if ((asic->lmpr & 0x1F) <= PAGE_MASK)
-			memory = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[(asic->lmpr & PAGE_MASK) * 0x4000];
+			memory = &messram_get_ptr(space->machine->device("messram"))[(asic->lmpr & PAGE_MASK) * 0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
 		is_readonly = FALSE;
@@ -92,7 +92,7 @@ void samcoupe_update_memory(const address_space *space)
 
 	/* BANK2 */
 	if (((asic->lmpr + 1) & 0x1f) <= PAGE_MASK)
-		memory = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->lmpr + 1) & PAGE_MASK) * 0x4000];
+		memory = &messram_get_ptr(space->machine->device("messram"))[((asic->lmpr + 1) & PAGE_MASK) * 0x4000];
 	else
 		memory = NULL;	/* Attempt to page in non existant ram region */
 	samcoupe_update_bank(space, 2, memory, FALSE);
@@ -106,7 +106,7 @@ void samcoupe_update_memory(const address_space *space)
 	{
 		/* BANK3 */
 		if ((asic->hmpr & 0x1F) <= PAGE_MASK )
-			memory = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[(asic->hmpr & PAGE_MASK)*0x4000];
+			memory = &messram_get_ptr(space->machine->device("messram"))[(asic->hmpr & PAGE_MASK)*0x4000];
 		else
 			memory = NULL;	/* Attempt to page in non existant ram region */
 		samcoupe_update_bank(space, 3, memory, FALSE);
@@ -121,7 +121,7 @@ void samcoupe_update_memory(const address_space *space)
 		else
 		{
 			if (((asic->hmpr + 1) & 0x1f) <= PAGE_MASK)
-				memory = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->hmpr + 1) & PAGE_MASK) * 0x4000];
+				memory = &messram_get_ptr(space->machine->device("messram"))[((asic->hmpr + 1) & PAGE_MASK) * 0x4000];
 			else
 				memory = NULL;	/* Attempt to page in non existant ram region */
 			is_readonly = FALSE;
@@ -131,9 +131,9 @@ void samcoupe_update_memory(const address_space *space)
 
 	/* video memory location */
 	if (asic->vmpr & 0x40)	/* if bit set in 2 bank screen mode */
-		space->machine->generic.videoram.u8 = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
+		space->machine->generic.videoram.u8 = &messram_get_ptr(space->machine->device("messram"))[((asic->vmpr & 0x1e) & PAGE_MASK) * 0x4000];
 	else
-		space->machine->generic.videoram.u8 = &messram_get_ptr(devtag_get_device(space->machine, "messram"))[((asic->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
+		space->machine->generic.videoram.u8 = &messram_get_ptr(space->machine->device("messram"))[((asic->vmpr & 0x1f) & PAGE_MASK) * 0x4000];
 }
 
 
@@ -261,7 +261,7 @@ MACHINE_RESET( samcoupe )
 	if (input_port_read(machine, "config") & 0x01)
 	{
 		/* install RTC */
-		running_device *rtc = devtag_get_device(machine, "sambus_clock");
+		running_device *rtc = machine->device("sambus_clock");
 		memory_install_readwrite8_device_handler(spaceio, rtc, 0xef, 0xef, 0xffff, 0xff00, samcoupe_rtc_r, samcoupe_rtc_w);
 	}
 	else

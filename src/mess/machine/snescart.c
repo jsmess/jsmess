@@ -128,7 +128,7 @@ static void snes_load_sram(running_machine *machine)
 
 	battery_ram = (UINT8*)malloc(state->cart[0].sram_max);
 	ptr = battery_ram;
-	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart"));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
 	image->battery_load(battery_ram, state->cart[0].sram_max, 0xff);
 
 	if (state->cart[0].mode == SNES_MODE_20)
@@ -205,7 +205,7 @@ static void snes_save_sram(running_machine *machine)
 			ptr += 0x2000;
 		}
 	}
-	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "cart"));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device("cart"));
 	image->battery_save(battery_ram, state->cart[0].sram_max);
 
 	free(battery_ram);
@@ -235,7 +235,7 @@ static void sufami_load_sram(running_machine *machine, const char *cart_tag)
 
 	battery_ram = (UINT8*)malloc(0x20000);
 	ptr = battery_ram;
-	device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(machine, cart_tag));
+	device_image_interface *image = dynamic_cast<device_image_interface *>(machine->device(cart_tag));
 	image->battery_load(battery_ram, 0x20000, 0);
 
 	if (strcmp(cart_tag, "slot_a") == 0)
@@ -271,7 +271,7 @@ static void sufami_machine_stop(running_machine &machine)
 		{
 			memmove(ptr + ii * 0x8000, &snes_ram[0x608000 + (ii * 0x010000)], 0x8000);
 		}
-		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(&machine, "slot_a"));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("slot_a"));
 		image->battery_save(battery_ram, 0x20000);
 	}
 
@@ -281,7 +281,7 @@ static void sufami_machine_stop(running_machine &machine)
 		{
 			memmove(ptr + ii * 0x8000, &snes_ram[0x708000 + (ii * 0x010000)], 0x8000);
 		}
-		device_image_interface *image = dynamic_cast<device_image_interface *>(devtag_get_device(&machine, "slot_b"));
+		device_image_interface *image = dynamic_cast<device_image_interface *>(machine.device("slot_b"));
 		image->battery_save(battery_ram, 0x20000);
 	}
 

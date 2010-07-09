@@ -247,7 +247,7 @@ UINT8 pc_speaker_get_spk(running_machine *machine)
 
 void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 {
-	running_device *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = machine->device("speaker");
 	pc_state *st = (pc_state *)machine->driver_data;
 	st->pc_spkrdata = data ? 1 : 0;
 	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
@@ -256,7 +256,7 @@ void pc_speaker_set_spkrdata(running_machine *machine, UINT8 data)
 
 void pc_speaker_set_input(running_machine *machine, UINT8 data)
 {
-	running_device *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = machine->device("speaker");
 	pc_state *st = (pc_state *)machine->driver_data;
 	st->pc_input = data ? 1 : 0;
 	speaker_level_w( speaker, pc_speaker_get_spk(machine) );
@@ -617,7 +617,7 @@ static READ8_DEVICE_HANDLER (ibm5150_ppi_porta_r)
          * 6-7  The number of floppy disk drives
          */
 		data = input_port_read(device->machine, "DSW0") & 0xF3;
-		switch ( messram_get_size(devtag_get_device(machine, "messram")) )
+		switch ( messram_get_size(machine->device("messram")) )
 		{
 		case 16 * 1024:
 			data |= 0x00;
@@ -668,7 +668,7 @@ static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 		/* read hi nibble of SW2 */
 		data = data & 0xf0;
 
-		switch ( messram_get_size(devtag_get_device(machine, "messram")) - 64 * 1024 )
+		switch ( messram_get_size(machine->device("messram")) - 64 * 1024 )
 		{
 		case 64 * 1024:		data |= 0x00; break;
 		case 128 * 1024:	data |= 0x02; break;
@@ -686,7 +686,7 @@ static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 		case 896 * 1024:	data |= 0x0B; break;
 		case 960 * 1024:	data |= 0x0D; break;
 		}
-		if ( messram_get_size(devtag_get_device(machine, "messram")) > 960 * 1024 )
+		if ( messram_get_size(machine->device("messram")) > 960 * 1024 )
 			data |= 0x0D;
 
 		PIO_LOG(1,"PIO_C_r (hi)",("$%02x\n", data));
@@ -700,7 +700,7 @@ static READ8_DEVICE_HANDLER ( ibm5150_ppi_portc_r )
 
 	if ( ! ( st->ppi_portb & 0x08 ) )
 	{
-		double tap_val = cassette_input( devtag_get_device(device->machine, "cassette") );
+		double tap_val = cassette_input( device->machine->device("cassette") );
 
 		if ( tap_val < 0 )
 		{
@@ -736,7 +736,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_porta_w )
 static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
-	running_device *keyboard = devtag_get_device(device->machine, "keyboard");
+	running_device *keyboard = device->machine->device("keyboard");
 
 	/* KB controller port B */
 	st->ppi_portb = data;
@@ -746,7 +746,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portb_w )
 	pit8253_gate2_w(st->pit8253, BIT(data, 0));
 	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 
-	cassette_change_state( devtag_get_device(device->machine, "cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state( device->machine->device("cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 
 	st->ppi_clock_signal = ( st->ppi_keyb_clock ) ? 1 : 0;
 	kb_keytronic_clock_w(keyboard, st->ppi_clock_signal);
@@ -773,7 +773,7 @@ static WRITE8_DEVICE_HANDLER ( ibm5150_ppi_portc_w )
 WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 {
 	pc_state *st = (pc_state *)space->machine->driver_data;
-	running_device *keyboard = devtag_get_device(space->machine, "keyboard");
+	running_device *keyboard = space->machine->device("keyboard");
 
 	if ( st->ppi_clock_signal != data )
 	{
@@ -807,7 +807,7 @@ WRITE8_HANDLER( ibm5150_kb_set_clock_signal )
 WRITE8_HANDLER( ibm5150_kb_set_data_signal )
 {
 	pc_state *st = (pc_state *)space->machine->driver_data;
-	running_device *keyboard = devtag_get_device(space->machine, "keyboard");
+	running_device *keyboard = space->machine->device("keyboard");
 
 	st->ppi_data_signal = data;
 
@@ -894,7 +894,7 @@ static READ8_DEVICE_HANDLER ( ibm5160_ppi_portc_r )
 static WRITE8_DEVICE_HANDLER( ibm5160_ppi_portb_w )
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
-	running_device *keyboard = devtag_get_device(device->machine, "keyboard");
+	running_device *keyboard = device->machine->device("keyboard");
 
 	/* PPI controller port B*/
 	st->ppi_portb = data;
@@ -991,10 +991,10 @@ static WRITE8_DEVICE_HANDLER ( pcjr_ppi_portb_w )
 	/* KB controller port B */
 	st->ppi_portb = data;
 	st->ppi_portc_switch_high = data & 0x08;
-	pit8253_gate2_w(devtag_get_device(device->machine, "pit8253"), BIT(data, 0));
+	pit8253_gate2_w(device->machine->device("pit8253"), BIT(data, 0));
 	pc_speaker_set_spkrdata( device->machine, data & 0x02 );
 
-	cassette_change_state( devtag_get_device(device->machine, "cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+	cassette_change_state( device->machine->device("cassette"), ( data & 0x08 ) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
 }
 
 
@@ -1026,17 +1026,17 @@ static READ8_DEVICE_HANDLER (pcjr_ppi_porta_r )
 static READ8_DEVICE_HANDLER ( pcjr_ppi_portc_r )
 {
 	pc_state *st = (pc_state *)device->machine->driver_data;
-	int timer2_output = pit8253_get_output( devtag_get_device(device->machine, "pit8253"), 2 );
+	int timer2_output = pit8253_get_output( device->machine->device("pit8253"), 2 );
 	int data=0xff;
 
 	data&=~0x80;
 	data &= ~0x04;		/* floppy drive installed */
-	if ( messram_get_size(devtag_get_device(device->machine, "messram")) > 64 * 1024 )	/* more than 64KB ram installed */
+	if ( messram_get_size(device->machine->device("messram")) > 64 * 1024 )	/* more than 64KB ram installed */
 		data &= ~0x08;
 	data = ( data & ~0x01 ) | ( pcjr_keyb.latch ? 0x01: 0x00 );
 	if ( ! ( st->ppi_portb & 0x08 ) )
 	{
-		double tap_val = cassette_input( devtag_get_device(device->machine, "cassette") );
+		double tap_val = cassette_input( device->machine->device("cassette") );
 
 		if ( tap_val < 0 )
 		{
@@ -1095,7 +1095,7 @@ static void pc_fdc_dma_drq(running_machine *machine, int state, int read_)
 
 static running_device * pc_get_device(running_machine *machine )
 {
-	return devtag_get_device(machine, "upd765");
+	return machine->device("upd765");
 }
 
 static const struct pc_fdc_interface fdc_interface_nc =
@@ -1151,8 +1151,8 @@ void mess_init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb
 		init_pc_common(machine, flags, set_keyb_int_func);
 
 	/* MESS managed RAM */
-	if ( messram_get_ptr(devtag_get_device(machine, "messram")) )
-		memory_set_bankptr( machine, "bank10", messram_get_ptr(devtag_get_device(machine, "messram")) );
+	if ( messram_get_ptr(machine->device("messram")) )
+		memory_set_bankptr( machine, "bank10", messram_get_ptr(machine->device("messram")) );
 
 	/* FDC/HDC hardware */
 	pc_hdc_setup(machine, set_hdc_int_func);
@@ -1326,26 +1326,26 @@ MACHINE_START( pc )
 {
 	pc_state *st = (pc_state *)machine->driver_data;
 
-	st->pic8259 = devtag_get_device(machine, "pic8259");
-	st->dma8237 = devtag_get_device(machine, "dma8237");
-	st->pit8253 = devtag_get_device(machine, "pit8253");
+	st->pic8259 = machine->device("pic8259");
+	st->dma8237 = machine->device("dma8237");
+	st->pit8253 = machine->device("pit8253");
 	pc_fdc_init( machine, &fdc_interface_nc );
 }
 
 
 MACHINE_RESET( pc )
 {
-	running_device *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = machine->device("speaker");
 	pc_state *st = (pc_state *)machine->driver_data;
 	memset(st,0,sizeof(st));
-	st->maincpu = devtag_get_device(machine, "maincpu" );
+	st->maincpu = machine->device("maincpu" );
 	cpu_set_irq_callback(st->maincpu, pc_irq_callback);
 
 	st->u73_q2 = 0;
 	st->out1 = 0;
 	st->pc_spkrdata = 0;
 	st->pc_input = 0;
-	pc_mouse_set_serial_port( devtag_get_device(machine, "ins8250_0") );
+	pc_mouse_set_serial_port( machine->device("ins8250_0") );
 	pc_hdc_set_dma8237_device( st->dma8237 );
 	speaker_level_w( speaker, 0 );
 }
@@ -1357,25 +1357,25 @@ MACHINE_START( pcjr )
 	pc_fdc_init( machine, &pcjr_fdc_interface_nc );
 	pcjr_keyb.keyb_signal_timer = timer_alloc(machine,  pcjr_keyb_signal_callback, NULL );
 	pc_int_delay_timer = timer_alloc(machine,  pcjr_delayed_pic8259_irq, NULL );
-	st->maincpu = devtag_get_device(machine, "maincpu" );
+	st->maincpu = machine->device("maincpu" );
 	cpu_set_irq_callback(st->maincpu, pc_irq_callback);
 
-	st->pic8259 = devtag_get_device(machine, "pic8259");
+	st->pic8259 = machine->device("pic8259");
 	st->dma8237 = NULL;
-	st->pit8253 = devtag_get_device(machine, "pit8253");
+	st->pit8253 = machine->device("pit8253");
 }
 
 
 MACHINE_RESET( pcjr )
 {
-	running_device *speaker = devtag_get_device(machine, "speaker");
+	running_device *speaker = machine->device("speaker");
 	pc_state *st = (pc_state *)machine->driver_data;
 	memset(st,0,sizeof(st));
 	st->u73_q2 = 0;
 	st->out1 = 0;
 	st->pc_spkrdata = 0;
 	st->pc_input = 0;
-	pc_mouse_set_serial_port( devtag_get_device(machine, "ins8250_0") );
+	pc_mouse_set_serial_port( machine->device("ins8250_0") );
 	pc_hdc_set_dma8237_device( st->dma8237 );
 	speaker_level_w( speaker, 0 );
 

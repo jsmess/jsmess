@@ -407,7 +407,7 @@ static void pcw16_set_bank_handlers(running_machine *machine, int bank, PCW16_RA
 
 static void pcw16_update_bank(running_machine *machine, int bank)
 {
-	unsigned char *mem_ptr = messram_get_ptr(devtag_get_device(machine, "messram"));
+	unsigned char *mem_ptr = messram_get_ptr(machine->device("messram"));
 	int bank_id = 0;
 	int bank_offs = 0;
 	char bank1[10];
@@ -445,7 +445,7 @@ static void pcw16_update_bank(running_machine *machine, int bank)
 	{
 		bank_offs = 128;
 		/* dram */
-		mem_ptr = messram_get_ptr(devtag_get_device(machine, "messram"));
+		mem_ptr = messram_get_ptr(machine->device("messram"));
 	}
 
 	mem_ptr = mem_ptr + ((bank_id - bank_offs)<<14);
@@ -1053,7 +1053,7 @@ static READ8_HANDLER(pcw16_timer_interrupt_counter_r)
 
 static WRITE8_HANDLER(pcw16_system_control_w)
 {
-	running_device *speaker = devtag_get_device(space->machine, "beep");
+	running_device *speaker = space->machine->device("beep");
 	//logerror("0x0f8: function: %d\n",data);
 
 	/* lower 4 bits define function code */
@@ -1201,7 +1201,7 @@ static void	pcw16_fdc_interrupt(running_machine *machine, int state)
 
 static running_device * pcw16_get_device(running_machine *machine)
 {
-	return devtag_get_device(machine, "upd765");
+	return machine->device("upd765");
 }
 
 static const struct pc_fdc_interface pcw16_fdc_interface=
@@ -1331,7 +1331,7 @@ static void pcw16_reset(running_machine *machine)
 
 static MACHINE_START( pcw16 )
 {
-	running_device *speaker = devtag_get_device(machine, "beep");
+	running_device *speaker = machine->device("beep");
 	pcw16_system_status = 0;
 	pcw16_interrupt_counter = 0;
 
@@ -1347,7 +1347,7 @@ static MACHINE_START( pcw16 )
 
 	/* initialise mouse */
 	pc_mouse_initialise(machine);
-	pc_mouse_set_serial_port( devtag_get_device(machine, "ns16550_0") );
+	pc_mouse_set_serial_port( machine->device("ns16550_0") );
 
 	/* initialise keyboard */
 	at_keyboard_init(machine, AT_KEYBOARD_TYPE_AT);

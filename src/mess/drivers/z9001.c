@@ -38,7 +38,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(z9001)
 {
-	cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, 0xf000);
+	cpu_set_reg(machine->device("maincpu"), Z80_PC, 0xf000);
 }
 
 static VIDEO_START( z9001 )

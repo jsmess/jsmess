@@ -110,8 +110,8 @@ MACHINE_START( mz700 )
 {
 	mz_state *mz = (mz_state *)machine->driver_data;
 
-	mz->pit = devtag_get_device(machine, "pit8253");
-	mz->ppi = devtag_get_device(machine, "ppi8255");
+	mz->pit = machine->device("pit8253");
+	mz->ppi = machine->device("ppi8255");
 
 	/* reset memory map to defaults */
 	mz700_bank_4_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0, 0);
@@ -180,7 +180,7 @@ READ8_HANDLER( mz800_bank_0_r )
 
 			/* ram from 0xa000 to 0xbfff */
 			memory_install_readwrite_bank(spc, 0xa000, 0xbfff, 0, 0, "bank5");
-			memory_set_bankptr(space->machine, "bank5", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xa000);
+			memory_set_bankptr(space->machine, "bank5", messram_get_ptr(space->machine->device("messram")) + 0xa000);
 		}
 	}
 
@@ -192,7 +192,7 @@ WRITE8_HANDLER( mz700_bank_0_w )
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite_bank(spc, 0x0000, 0x0fff, 0, 0, "bank1");
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
+	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
 }
 
 WRITE8_HANDLER( mz800_bank_0_w )
@@ -200,7 +200,7 @@ WRITE8_HANDLER( mz800_bank_0_w )
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_install_readwrite_bank(spc, 0x0000, 0x7fff, 0, 0, "bank1");
-	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
+	memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
 }
 
 READ8_HANDLER( mz800_bank_1_r )
@@ -210,19 +210,19 @@ READ8_HANDLER( mz800_bank_1_r )
 
 	/* switch in ram from 0x1000 to 0x1fff */
 	memory_install_readwrite_bank(spc, 0x1000, 0x1fff, 0x1000, 0, "bank2");
-	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x1000);
+	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram")) + 0x1000);
 
 	if (mz->mz700_mode)
 	{
 		/* ram from 0xc000 to 0xcfff */
 		memory_install_readwrite_bank(spc, 0xc000, 0xcfff, 0, 0, "bank6");
-		memory_set_bankptr(space->machine, "bank6", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xc000);
+		memory_set_bankptr(space->machine, "bank6", messram_get_ptr(space->machine->device("messram")) + 0xc000);
 	}
 	else
 	{
 		/* ram from 0x8000 to 0xbfff */
 		memory_install_readwrite_bank(spc, 0x8000, 0xbfff, 0, 0, "bank4");
-		memory_set_bankptr(space->machine, "bank4", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank4", messram_get_ptr(space->machine->device("messram")) + 0x8000);
 	}
 
 	return 0xff;
@@ -239,7 +239,7 @@ WRITE8_HANDLER( mz700_bank_1_w )
 		if (!mz->mz700_ram_lock)
 		{
 			memory_install_readwrite_bank(spc, 0xd000, 0xffff, 0, 0, "bank7");
-			memory_set_bankptr(space->machine, "bank7", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xd000);
+			memory_set_bankptr(space->machine, "bank7", messram_get_ptr(space->machine->device("messram")) + 0xd000);
 			mz->mz700_ram_vram = FALSE;
 		}
 	}
@@ -249,7 +249,7 @@ WRITE8_HANDLER( mz700_bank_1_w )
 		if (!mz->mz800_ram_lock)
 		{
 			memory_install_readwrite_bank(spc, 0xe000, 0xffff, 0, 0, "bank8");
-			memory_set_bankptr(space->machine, "bank8", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xe000);
+			memory_set_bankptr(space->machine, "bank8", messram_get_ptr(space->machine->device("messram")) + 0xe000);
 			mz->mz800_ram_monitor = FALSE;
 		}
 	}
@@ -324,7 +324,7 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 		/* rest is ram is always ram in mz700 mode */
 		memory_install_readwrite_bank(spc, 0x1000, 0xcfff, 0, 0, "bank2");
-		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x1000);
+		memory_set_bankptr(space->machine, "bank2", messram_get_ptr(space->machine->device("messram")) + 0x1000);
 	}
 	else
 	{
@@ -335,7 +335,7 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 		/* ram from 0x2000 to 0x7fff */
 		memory_install_readwrite_bank(spc, 0x2000, 0x7fff, 0, 0, "bank3");
-		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")));
+		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(space->machine->device("messram")));
 
 		if (mz->hires_mode)
 		{
@@ -351,12 +351,12 @@ WRITE8_HANDLER( mz700_bank_4_w )
 
 			/* ram from 0xa000 to 0xbfff */
 			memory_install_readwrite_bank(spc, 0xa000, 0xbfff, 0, 0, "bank5");
-			memory_set_bankptr(space->machine, "bank5", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xa000);
+			memory_set_bankptr(space->machine, "bank5", messram_get_ptr(space->machine->device("messram")) + 0xa000);
 		}
 
 		/* ram from 0xc000 to 0xdfff */
 		memory_install_readwrite_bank(spc, 0xc000, 0xdfff, 0, 0, "bank6");
-		memory_set_bankptr(space->machine, "bank6", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0xc000);
+		memory_set_bankptr(space->machine, "bank6", messram_get_ptr(space->machine->device("messram")) + 0xc000);
 
 		/* mz800 monitor rom from 0xe000 to 0xffff */
 		memory_install_read_bank(spc, 0xe000, 0xffff, 0, 0, "bank8");
@@ -422,7 +422,7 @@ static UINT8 prev_state = 0;
 
 static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 {
-	running_device *speaker = devtag_get_device(device->machine, "speaker");
+	running_device *speaker = device->machine->device("speaker");
 	if((prev_state==0) && (state==1)) {
 		speaker_level ^= 1;
 	}
@@ -474,7 +474,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
  */
 static READ8_DEVICE_HANDLER( pio_port_c_r )
 {
-	running_device *cas = devtag_get_device(device->machine, "cassette");
+	running_device *cas = device->machine->device("cassette");
 	mz_state *mz = (mz_state *)device->machine->driver_data;
 	UINT8 data = 0;
 
@@ -517,7 +517,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
      * bit 0 out    unused
      */
 
-//  UINT8 state = cassette_get_state(devtag_get_device(device->machine, "cassette"));
+//  UINT8 state = cassette_get_state(device->machine->device("cassette"));
 //  UINT8 action = ((~pio_port_c_output & 8) & (data & 8));     /* detect low-to-high transition */
 
 	/* The motor control circuit consists of a resistor, capacitor, invertor, nand-gate, and D flip-flop.
@@ -530,7 +530,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
         If you load from the command-line or the software-picker, type in L <enter> immediately. */
 #if 0
 	cassette_change_state(
-		devtag_get_device(device->machine, "cassette"),
+		device->machine->device("cassette"),
 		((data & 0x08) && mz700_motor_on) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
 		CASSETTE_MOTOR_DISABLED);
 
@@ -538,7 +538,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_c_w )
 
 	LOG(2,"mz700_pio_port_c_w",("%02X\n", data),device->machine);
 
-	cassette_output(devtag_get_device(device->machine, "cassette"), (data & 0x02) ? +1.0 : -1.0);
+	cassette_output(device->machine->device("cassette"), (data & 0x02) ? +1.0 : -1.0);
 }
 
 
@@ -566,7 +566,7 @@ static void mz800_z80pio_irq(running_device *device, int which)
 
 static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )
 {
-	running_device *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = device->machine->device("centronics");
 	UINT8 result = 0;
 
 	result |= centronics_busy_r(printer);
@@ -578,7 +578,7 @@ static READ8_DEVICE_HANDLER( mz800_z80pio_port_a_r )
 
 static WRITE8_DEVICE_HANDLER( mz800_z80pio_port_a_w )
 {
-	running_device *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = device->machine->device("centronics");
 
 	centronics_prime_w(printer, BIT(data, 6));
 	centronics_strobe_w(printer, BIT(data, 7));
@@ -586,7 +586,7 @@ static WRITE8_DEVICE_HANDLER( mz800_z80pio_port_a_w )
 
 static WRITE8_DEVICE_HANDLER( mz800_printer_data_w )
 {
-	running_device *printer = devtag_get_device(device->machine, "centronics");
+	running_device *printer = device->machine->device("centronics");
 	centronics_data_w(printer, 0, data);
 }
 
@@ -678,7 +678,7 @@ WRITE8_HANDLER( mz800_ramdisk_w )
 /* port EB */
 WRITE8_HANDLER( mz800_ramaddr_w )
 {
-	mz800_ramaddr = (cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_BC) & 0xff00) | (data & 0xff);
+	mz800_ramaddr = (cpu_get_reg(space->machine->device("maincpu"), Z80_BC) & 0xff00) | (data & 0xff);
 	LOG(1,"mz800_ramaddr_w",("%04X\n", mz800_ramaddr),space->machine);
 }
 

@@ -505,11 +505,11 @@ static void s3c240x_check_pending_irq( running_machine *machine)
 		}
 		s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		cpu_set_input_line( devtag_get_device( machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_set_input_line( devtag_get_device( machine, "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, CLEAR_LINE);
 	}
 }
 
@@ -521,7 +521,7 @@ static void s3c240x_request_irq( running_machine *machine, UINT32 int_type)
 		s3c240x_irq_regs[0] |= (1 << int_type); // SRCPND
 		s3c240x_irq_regs[4] |= (1 << int_type); // INTPND
 		s3c240x_irq_regs[5] = int_type; // INTOFFSET
-		cpu_set_input_line( devtag_get_device( machine, "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line( machine->device( "maincpu"), ARM7_IRQ_LINE, ASSERT_LINE);
 	}
 	else
 	{
@@ -967,7 +967,7 @@ static void smc_init( running_machine *machine)
 
 static UINT8 smc_read( running_machine *machine)
 {
-	running_device *smartmedia = devtag_get_device( machine, "smartmedia");
+	running_device *smartmedia = machine->device( "smartmedia");
 	UINT8 data;
 	data = smartmedia_data_r( smartmedia);
 	verboselog( machine, 5, "smc_read %08X\n", data);
@@ -979,7 +979,7 @@ static void smc_write( running_machine *machine, UINT8 data)
 	verboselog( machine, 5, "smc_write %08X\n", data);
 	if ((smc.chip) && (!smc.read))
 	{
-		running_device *smartmedia = devtag_get_device( machine, "smartmedia");
+		running_device *smartmedia = machine->device( "smartmedia");
 		if (smc.cmd_latch)
 		{
 			verboselog( machine, 5, "smartmedia_command_w %08X\n", data);
@@ -1107,7 +1107,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		// PDDAT
 		case 0x24 / 4 :
 		{
-			running_device *smartmedia = devtag_get_device( machine, "smartmedia");
+			running_device *smartmedia = machine->device( "smartmedia");
 			// smartmedia
 			data = (data & ~0x000003C0);
 			if (!smc.busy) data = data | 0x00000200;
@@ -1119,7 +1119,7 @@ static READ32_HANDLER( s3c240x_gpio_r )
 		// PEDAT
 		case 0x30 / 4 :
 		{
-			running_device *smartmedia = devtag_get_device( machine, "smartmedia");
+			running_device *smartmedia = machine->device( "smartmedia");
 			// smartmedia
 			data = (data & ~0x0000003C);
 			if (smc.cmd_latch) data = data | 0x00000020;
@@ -1634,8 +1634,8 @@ static WRITE32_HANDLER( s3c240x_iis_w )
 			if (s3c240x_iis.fifo_index == 2)
 			{
 				running_device *dac[2];
-				dac[0] = devtag_get_device( machine, "dac1");
-				dac[1] = devtag_get_device( machine, "dac2");
+				dac[0] = machine->device( "dac1");
+				dac[1] = machine->device( "dac2");
 				s3c240x_iis.fifo_index = 0;
 				dac_signed_data_16_w( dac[0], s3c240x_iis.fifo[0] + 0x8000);
 				dac_signed_data_16_w( dac[1], s3c240x_iis.fifo[1] + 0x8000);

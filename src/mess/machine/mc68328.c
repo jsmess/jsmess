@@ -30,7 +30,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 static void mc68328_set_interrupt_line(running_device *device, UINT32 line, UINT32 active)
 {
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
-    running_device *cpu = devtag_get_device(device->machine, mc68328->iface->m68k_cpu_tag);
+    running_device *cpu = device->machine->device(mc68328->iface->m68k_cpu_tag);
 
     if(active)
     {
@@ -263,21 +263,21 @@ static void mc68328_timer_compare_event(running_device *device, UINT32 index)
 
 static TIMER_CALLBACK( mc68328_timer1_hit )
 {
-    running_device *device = devtag_get_device(machine, MC68328_TAG);
+    running_device *device = machine->device(MC68328_TAG);
 
     mc68328_timer_compare_event(device, 0);
 }
 
 static TIMER_CALLBACK( mc68328_timer2_hit )
 {
-    running_device *device = devtag_get_device(machine, MC68328_TAG);
+    running_device *device = machine->device(MC68328_TAG);
 
     mc68328_timer_compare_event(device, 1);
 }
 
 static TIMER_CALLBACK( mc68328_pwm_transition )
 {
-    running_device *device = devtag_get_device(machine, MC68328_TAG);
+    running_device *device = machine->device(MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
     if(mc68328->regs.pwmw >= mc68328->regs.pwmp || mc68328->regs.pwmw == 0 || mc68328->regs.pwmp == 0)
@@ -325,7 +325,7 @@ static TIMER_CALLBACK( mc68328_pwm_transition )
 
 static TIMER_CALLBACK( mc68328_rtc_tick )
 {
-    running_device *device = devtag_get_device(machine, MC68328_TAG);
+    running_device *device = machine->device(MC68328_TAG);
     mc68328_t* mc68328 = mc68328_get_safe_token( device );
 
     if(mc68328->regs.rtcctl & RTCCTL_ENABLE)

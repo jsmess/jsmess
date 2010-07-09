@@ -192,7 +192,7 @@ static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 void spectrum_128_update_memory(running_machine *machine)
 {
 	spectrum_state *state = (spectrum_state *)machine->driver_data;
-	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 	unsigned char *ChosenROM;
 	int ROMSelection;
 
@@ -255,7 +255,7 @@ ADDRESS_MAP_END
 static MACHINE_RESET( spectrum_128 )
 {
 	spectrum_state *state = (spectrum_state *)machine->driver_data;
-	UINT8 *messram = messram_get_ptr(devtag_get_device(machine, "messram"));
+	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 
 	memset(messram,0,128*1024);
 	/* 0x0000-0x3fff always holds ROM */

@@ -28,7 +28,7 @@ static UINT16 spim_data;
 static INPUT_CHANGED( pen_check )
 {
     UINT8 button = input_port_read(field->port->machine, "PENB");
-    running_device *mc68328_device = devtag_get_device(field->port->machine, "dragonball");
+    running_device *mc68328_device = field->port->machine->device("dragonball");
     if(button)
     {
         mc68328_set_penirq_line(mc68328_device, 1);
@@ -42,7 +42,7 @@ static INPUT_CHANGED( pen_check )
 static INPUT_CHANGED( button_check )
 {
     UINT8 button_state = input_port_read(field->port->machine, "PORTD");
-    running_device *mc68328_device = devtag_get_device(field->port->machine, "dragonball");
+    running_device *mc68328_device = field->port->machine->device("dragonball");
 
     mc68328_set_port_d_lines(mc68328_device, button_state, (int)(FPTR)param);
 }
@@ -92,9 +92,9 @@ static void palm_spim_exchange( running_device *device )
 static MACHINE_START( palm )
 {
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-    memory_install_read_bank (space, 0x000000, messram_get_size(devtag_get_device(machine, "messram")) - 1, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, "bank1");
-    memory_install_write_bank(space, 0x000000, messram_get_size(devtag_get_device(machine, "messram")) - 1, messram_get_size(devtag_get_device(machine, "messram")) - 1, 0, "bank1");
-    memory_set_bankptr(machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+    memory_install_read_bank (space, 0x000000, messram_get_size(machine->device("messram")) - 1, messram_get_size(machine->device("messram")) - 1, 0, "bank1");
+    memory_install_write_bank(space, 0x000000, messram_get_size(machine->device("messram")) - 1, messram_get_size(machine->device("messram")) - 1, 0, "bank1");
+    memory_set_bankptr(machine, "bank1", messram_get_ptr(machine->device("messram")));
 
     state_save_register_global(machine, port_f_latch);
     state_save_register_global(machine, spim_data);
@@ -107,10 +107,10 @@ static MACHINE_RESET( palm )
 {
     // Copy boot ROM
     UINT8* bios = memory_region(machine, "bios");
-    memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0, messram_get_size(devtag_get_device(machine, "messram")));
-    memcpy(messram_get_ptr(devtag_get_device(machine, "messram")), bios, 0x20000);
+    memset(messram_get_ptr(machine->device("messram")), 0, messram_get_size(machine->device("messram")));
+    memcpy(messram_get_ptr(machine->device("messram")), bios, 0x20000);
 
-    devtag_get_device(machine, "maincpu")->reset();
+    machine->device("maincpu")->reset();
 }
 
 
@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 
 static WRITE8_DEVICE_HANDLER( palm_dac_transition )
 {
-    dac_data_w( devtag_get_device(device->machine, "dac"), 0x7f * data );
+    dac_data_w( device->machine->device("dac"), 0x7f * data );
 }
 
 

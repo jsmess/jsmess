@@ -32,8 +32,8 @@ static WRITE8_HANDLER(spc1000_iplk_w)
 		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu"));
 		memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, "maincpu"));
 	} else {
-		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
-		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
+		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(space->machine->device("messram")) + 0x8000);
 	}
 }
 
@@ -44,8 +44,8 @@ static READ8_HANDLER(spc1000_iplk_r)
 		memory_set_bankptr(space->machine, "bank1", memory_region(space->machine, "maincpu"));
 		memory_set_bankptr(space->machine, "bank3", memory_region(space->machine, "maincpu"));
 	} else {
-		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(space->machine, "messram")));
-		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(space->machine, "messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank1", messram_get_ptr(space->machine->device("messram")));
+		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(space->machine->device("messram")) + 0x8000);
 	}
 	return 0;
 }
@@ -203,9 +203,9 @@ static MACHINE_RESET(spc1000)
 	memory_install_write_bank(space, 0x8000, 0xffff, 0, 0, "bank4");
 
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
-	memory_set_bankptr(machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")));
+	memory_set_bankptr(machine, "bank2", messram_get_ptr(machine->device("messram")));
 	memory_set_bankptr(machine, "bank3", memory_region(machine, "maincpu"));
-	memory_set_bankptr(machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+	memory_set_bankptr(machine, "bank4", messram_get_ptr(machine->device("messram")) + 0x8000);
 
 	IPLK = 1;
 }
@@ -239,7 +239,7 @@ static VIDEO_START( spc1000 )
 
 static VIDEO_UPDATE( spc1000 )
 {
-	running_device *mc6847 = devtag_get_device(screen->machine, "mc6847");
+	running_device *mc6847 = screen->machine->device("mc6847");
 	return mc6847_update(mc6847, bitmap, cliprect);
 }
 

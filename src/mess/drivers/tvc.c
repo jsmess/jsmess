@@ -31,17 +31,17 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 				break;
 		case 0x10 : // RAM selected
 				memory_install_readwrite_bank(space, 0x0000, 0x3fff, 0, 0, "bank1");
-				memory_set_bankptr(space->machine, "bank1", messram_get_ptr(devtag_get_device(machine, "messram")));
+				memory_set_bankptr(space->machine, "bank1", messram_get_ptr(machine->device("messram")));
 				break;
 	}
 	// Bank 2 is always RAM
-	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x4000);
+	memory_set_bankptr(space->machine, "bank2", messram_get_ptr(machine->device("messram")) + 0x4000);
 	if ((data & 0x20)==0) {
 		// Video RAM
-		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x10000);
+		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x10000);
 	} else {
 		// System RAM page 3
-		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(devtag_get_device(machine, "messram")) + 0x8000);
+		memory_set_bankptr(space->machine, "bank3", messram_get_ptr(machine->device("messram")) + 0x8000);
 	}
 	switch(data & 0xc0) {
 		case 0x00 : // Cart ROM selected
@@ -56,7 +56,7 @@ static void tvc_set_mem_page(running_machine *machine, UINT8 data)
 				break;
 		case 0x80 : // RAM selected
 				memory_install_readwrite_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
-				memory_set_bankptr(space->machine, "bank4", messram_get_ptr(devtag_get_device(machine, "messram"))+0xc000);
+				memory_set_bankptr(space->machine, "bank4", messram_get_ptr(machine->device("messram"))+0xc000);
 				break;
 		case 0xc0 : // External ROM selected
 				memory_install_read_bank(space, 0xc000, 0xffff, 0, 0, "bank4");
@@ -237,7 +237,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(tvc)
 {
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")),0,(64+14)*1024);
+	memset(messram_get_ptr(machine->device("messram")),0,(64+14)*1024);
 	tvc_set_mem_page(machine, 0);
 	tvc_video_mode = 0;
 }
@@ -248,7 +248,7 @@ static VIDEO_START( tvc )
 
 static VIDEO_UPDATE( tvc )
 {
-	running_device *mc6845 = devtag_get_device(screen->machine, "crtc");
+	running_device *mc6845 = screen->machine->device("crtc");
 	mc6845_update(mc6845, bitmap, cliprect);
 	return 0;
 }
@@ -263,7 +263,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ offset + 0x10000];
+					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
 					*p = col[(data >> 7)]; p++;
 					*p = col[(data >> 6)]; p++;
 					*p = col[(data >> 5)]; p++;
@@ -278,7 +278,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ offset + 0x10000];
+					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
 					*p = col[BIT(data,7)*2 + BIT(data,3)]; p++;
 					*p = col[BIT(data,7)*2 + BIT(data,3)]; p++;
 					*p = col[BIT(data,6)*2 + BIT(data,2)]; p++;
@@ -293,7 +293,7 @@ static MC6845_UPDATE_ROW( tvc_update_row )
 				for ( i = 0; i < x_count; i++ )
 				{
 					UINT16 offset = i  + (y * 64);
-					UINT8 data = messram_get_ptr(devtag_get_device(device->machine, "messram"))[ offset + 0x10000];
+					UINT8 data = messram_get_ptr(device->machine->device("messram"))[ offset + 0x10000];
 					*p = col[(data >> 4) & 0xf]; p++;
 					*p = col[(data >> 4) & 0xf]; p++;
 					*p = col[(data >> 4) & 0xf]; p++;

@@ -51,8 +51,8 @@ VIDEO_UPDATE( mac )
 	UINT16 *line;
 	int y, x, b;
 
-	video_base = messram_get_size(devtag_get_device(screen->machine, "messram")) - (screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	video_ram = (const UINT16 *) (messram_get_ptr(devtag_get_device(screen->machine, "messram")) + video_base);
+	video_base = messram_get_size(screen->machine->device("messram")) - (screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_ram = (const UINT16 *) (messram_get_ptr(screen->machine->device("messram")) + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{

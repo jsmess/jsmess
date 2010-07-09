@@ -485,7 +485,7 @@ static MACHINE_START( vidbrain )
 	vidbrain_state *state = (vidbrain_state *)machine->driver_data;
 
 	/* find devices */
-	state->discrete = devtag_get_device(machine, DISCRETE_TAG);
+	state->discrete = machine->device(DISCRETE_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);

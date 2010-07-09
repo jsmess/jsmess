@@ -207,7 +207,7 @@ static WRITE8_DEVICE_HANDLER( kim1_u2_write_b )
 	if ( data & 0x20 )
 	{
 		/* cassette write/speaker update */
-		cassette_output( devtag_get_device(device->machine, "cassette"), ( data & 0x80 ) ? -1.0 : 1.0 );
+		cassette_output( device->machine->device("cassette"), ( data & 0x80 ) ? -1.0 : 1.0 );
 	}
 
 	/* Set IRQ when bit 7 is cleared */
@@ -233,7 +233,7 @@ static MOS6530_INTERFACE( kim1_u3_mos6530_interface )
 
 static TIMER_CALLBACK( kim1_cassette_input )
 {
-	double tap_val = cassette_input( devtag_get_device(machine, "cassette") );
+	double tap_val = cassette_input( machine->device("cassette") );
 
 	if ( tap_val <= 0 )
 	{

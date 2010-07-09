@@ -897,11 +897,11 @@ MACHINE_START( trs80 )
 {
 	cassette_data_timer = timer_alloc(machine,  cassette_data_callback, NULL );
 	timer_adjust_periodic( cassette_data_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11025) );
-	trs80_printer = devtag_get_device(machine, "centronics");
-	trs80_ay31015 = devtag_get_device(machine, "tr1602");
-	trs80_cass = devtag_get_device(machine, "cassette");
-	trs80_speaker = devtag_get_device(machine, "speaker");
-	trs80_fdc = devtag_get_device(machine, "wd179x");
+	trs80_printer = machine->device("centronics");
+	trs80_ay31015 = machine->device("tr1602");
+	trs80_cass = machine->device("cassette");
+	trs80_speaker = machine->device("speaker");
+	trs80_fdc = machine->device("wd179x");
 	machine->generic.videoram_size = 0x800;
 }
 

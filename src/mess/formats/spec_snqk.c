@@ -277,7 +277,7 @@ void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
     UINT8 intr;
     UINT16 start, size, data, status;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     if (snapsize == SP_NEW_SIZE_16K || snapsize == SP_NEW_SIZE_48K)
@@ -479,7 +479,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data, addr;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     if ((snapsize != SNA48_SIZE) && (state->port_7ffd_data == -1))
@@ -702,7 +702,7 @@ void spectrum_setup_ach(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[ACH_OFFSET +   0] << 8) | snapdata[ACH_OFFSET +   4];
@@ -837,7 +837,7 @@ void spectrum_setup_prg(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 addr, data;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = snapdata[PRG_OFFSET +   0];
@@ -1009,7 +1009,7 @@ void spectrum_setup_plusd(running_machine *machine, UINT8 *snapdata, UINT32 snap
     UINT8 intr;
     UINT16 addr = 0, data;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[PLUSD_OFFSET + 15] << 8) | snapdata[PLUSD_OFFSET + 14];
@@ -1179,7 +1179,7 @@ void spectrum_setup_sem(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[SEM_OFFSET +  1] << 8) | snapdata[SEM_OFFSET +  0];
@@ -1300,7 +1300,7 @@ void spectrum_setup_sit(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[SIT_OFFSET +  7] << 8) | snapdata[SIT_OFFSET +  6];
@@ -1432,7 +1432,7 @@ void spectrum_setup_zx(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
     UINT8 intr;
     UINT16 data, mode;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     logerror("Skipping last 132 bytes of the 16K ROM dump at offset:0000\n");
@@ -1566,7 +1566,7 @@ void spectrum_setup_snp(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[SNP_OFFSET +  1] << 8) | snapdata[SNP_OFFSET +  0];
@@ -1795,7 +1795,7 @@ void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 data, addr;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     data = (snapdata[SNX_OFFSET +  4] << 8) | snapdata[SNX_OFFSET +  5];
@@ -1951,7 +1951,7 @@ void spectrum_setup_frz(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     UINT8 intr;
     UINT16 addr, data;
     spectrum_state *state = (spectrum_state *)machine->driver_data;
-    running_device *cpu = devtag_get_device(machine, "maincpu");
+    running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     if (state->port_7ffd_data == -1)
@@ -2217,27 +2217,27 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     /* AF */
     hi = snapdata[0] & 0x0ff;
     lo = snapdata[1] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_AF, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_AF, (hi << 8) | lo);
     /* BC */
     lo = snapdata[2] & 0x0ff;
     hi = snapdata[3] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_BC, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_BC, (hi << 8) | lo);
     /* HL */
     lo = snapdata[4] & 0x0ff;
     hi = snapdata[5] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_HL, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_HL, (hi << 8) | lo);
 
     /* SP */
     lo = snapdata[8] & 0x0ff;
     hi = snapdata[9] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_SP, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_SP, (hi << 8) | lo);
 
     /* I */
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_I, (snapdata[10] & 0x0ff));
+    cpu_set_reg(machine->device("maincpu"), Z80_I, (snapdata[10] & 0x0ff));
 
     /* R */
     data = (snapdata[11] & 0x07f) | ((snapdata[12] & 0x01) << 7);
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_R, data);
+    cpu_set_reg(machine->device("maincpu"), Z80_R, data);
 
     /* Set border color */
     state->port_fe_data = (state->port_fe_data & 0xf8) | ((snapdata[12] & 0x0e) >> 1);
@@ -2247,42 +2247,42 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
     lo = snapdata[13] & 0x0ff;
     hi = snapdata[14] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_DE, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_DE, (hi << 8) | lo);
 
     lo = snapdata[15] & 0x0ff;
     hi = snapdata[16] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_BC2, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_BC2, (hi << 8) | lo);
 
     lo = snapdata[17] & 0x0ff;
     hi = snapdata[18] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_DE2, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_DE2, (hi << 8) | lo);
 
     lo = snapdata[19] & 0x0ff;
     hi = snapdata[20] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_HL2, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_HL2, (hi << 8) | lo);
 
     hi = snapdata[21] & 0x0ff;
     lo = snapdata[22] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_AF2, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_AF2, (hi << 8) | lo);
 
     lo = snapdata[23] & 0x0ff;
     hi = snapdata[24] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IY, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_IY, (hi << 8) | lo);
 
     lo = snapdata[25] & 0x0ff;
     hi = snapdata[26] & 0x0ff;
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IX, (hi << 8) | lo);
+    cpu_set_reg(machine->device("maincpu"), Z80_IX, (hi << 8) | lo);
 
     /* Interrupt Flip/Flop */
     if (snapdata[27] == 0)
     {
-        cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, (UINT64)0);
-        /* cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IRQ_STATE, 0); */
+        cpu_set_reg(machine->device("maincpu"), Z80_IFF1, (UINT64)0);
+        /* cpu_set_reg(machine->device("maincpu"), Z80_IRQ_STATE, 0); */
     }
     else
     {
-        cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF1, 1);
-        /* cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IRQ_STATE, 1); */
+        cpu_set_reg(machine->device("maincpu"), Z80_IFF1, 1);
+        /* cpu_set_reg(machine->device("maincpu"), Z80_IRQ_STATE, 1); */
     }
 
     cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
@@ -2298,16 +2298,16 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     {
         data = 0;
     }
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IFF2, data);
+    cpu_set_reg(machine->device("maincpu"), Z80_IFF2, data);
 
     /* Interrupt Mode */
-    cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_IM, (snapdata[29] & 0x03));
+    cpu_set_reg(machine->device("maincpu"), Z80_IM, (snapdata[29] & 0x03));
 
     if (z80_type == SPECTRUM_Z80_SNAPSHOT_48K_OLD)
     {
         lo = snapdata[6] & 0x0ff;
         hi = snapdata[7] & 0x0ff;
-        cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, (hi << 8) | lo);
+        cpu_set_reg(machine->device("maincpu"), Z80_PC, (hi << 8) | lo);
 
         spectrum_page_basicrom(machine);
 
@@ -2332,11 +2332,11 @@ void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 
         lo = snapdata[32] & 0x0ff;
         hi = snapdata[33] & 0x0ff;
-        cpu_set_reg(devtag_get_device(machine, "maincpu"), Z80_PC, (hi << 8) | lo);
+        cpu_set_reg(machine->device("maincpu"), Z80_PC, (hi << 8) | lo);
 
         if ((z80_type == SPECTRUM_Z80_SNAPSHOT_128K) || ((z80_type == SPECTRUM_Z80_SNAPSHOT_TS2068) && !strcmp(machine->gamedrv->name,"ts2068")))
         {
-            running_device *ay8912 = devtag_get_device(machine, "ay8912");
+            running_device *ay8912 = machine->device("ay8912");
 
             /* Only set up sound registers for 128K machine or TS2068! */
             for (i = 0; i < 16; i++)

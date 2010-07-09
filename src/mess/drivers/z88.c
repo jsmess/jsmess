@@ -248,7 +248,7 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		}
 		else
 		{
-			read_addr = write_addr = messram_get_ptr(devtag_get_device(machine, "messram")) + (block<<14);
+			read_addr = write_addr = messram_get_ptr(machine->device("messram")) + (block<<14);
 		}
 	}
 	else
@@ -285,8 +285,8 @@ static void z88_refresh_memory_bank(running_machine *machine, int bank)
 		else
 		{
 			/* ram bank 20 */
-			read_addr = messram_get_ptr(devtag_get_device(machine, "messram"));
-			write_addr = messram_get_ptr(devtag_get_device(machine, "messram"));
+			read_addr = messram_get_ptr(machine->device("messram"));
+			write_addr = messram_get_ptr(machine->device("messram"));
 		}
 
 		z88_install_memory_handler_pair(machine, 0x0000, 0x2000, 9, read_addr, write_addr);
@@ -300,7 +300,7 @@ static MACHINE_START( z88 )
 
 static MACHINE_RESET( z88 )
 {
-	memset(messram_get_ptr(devtag_get_device(machine, "messram")), 0x0ff, messram_get_size(devtag_get_device(machine, "messram")));
+	memset(messram_get_ptr(machine->device("messram")), 0x0ff, messram_get_size(machine->device("messram")));
 
 	blink_reset();
 
@@ -400,7 +400,7 @@ blink w: 03b6 03
 
 static WRITE8_HANDLER(z88_port_w)
 {
-	running_device *speaker = devtag_get_device(space->machine, "speaker");
+	running_device *speaker = space->machine->device("speaker");
 	unsigned char port;
 
 	port = offset & 0x0ff;
@@ -554,7 +554,7 @@ static  READ8_HANDLER(z88_port_r)
 			{
 				z88_blink.z88_state = Z88_SNOOZE;
 				/* spin cycles until rtc timer */
-				cpu_spinuntil_trigger( devtag_get_device(space->machine, "maincpu"), Z88_SNOOZE_TRIGGER);
+				cpu_spinuntil_trigger( space->machine->device("maincpu"), Z88_SNOOZE_TRIGGER);
 
 				logerror("z88 entering snooze!\n");
 			}

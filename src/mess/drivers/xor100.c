@@ -43,7 +43,7 @@ static void xor100_bankswitch(running_machine *machine)
 {
 	xor100_state *state = (xor100_state *)machine->driver_data;
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
-	running_device *messram = devtag_get_device(machine, "messram");
+	running_device *messram = machine->device("messram");
 	int banks = messram_get_size(messram) / 0x10000;
 
 	switch (state->mode)
@@ -159,7 +159,7 @@ static WRITE8_DEVICE_HANDLER( baud_w )
 
 static WRITE8_DEVICE_HANDLER( i8251_b_data_w )
 {
-	running_device *terminal = devtag_get_device(device->machine, TERMINAL_TAG);
+	running_device *terminal = device->machine->device(TERMINAL_TAG);
 
 	msm8251_data_w(device, 0, data);
 	terminal_write(terminal, 0, data);
@@ -532,15 +532,15 @@ static GENERIC_TERMINAL_INTERFACE( xor100_terminal_intf )
 static MACHINE_START( xor100 )
 {
 	xor100_state *state = (xor100_state *)machine->driver_data;
-	running_device *messram = devtag_get_device(machine, "messram");
+	running_device *messram = machine->device("messram");
 	int banks = messram_get_size(messram) / 0x10000;
 
 	/* find devices */
-	state->i8251_a = devtag_get_device(machine, I8251_A_TAG);
-	state->i8251_b = devtag_get_device(machine, I8251_B_TAG);
-	state->wd1795 = devtag_get_device(machine, WD1795_TAG);
-	state->z80ctc = devtag_get_device(machine, Z80CTC_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->i8251_a = machine->device(I8251_A_TAG);
+	state->i8251_b = machine->device(I8251_B_TAG);
+	state->wd1795 = machine->device(WD1795_TAG);
+	state->z80ctc = machine->device(Z80CTC_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* setup memory banking */
 	memory_configure_bank(machine, "bank1", 1, banks, messram_get_ptr(messram), 0x10000);

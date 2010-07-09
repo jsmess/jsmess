@@ -137,9 +137,9 @@ void mac_set_sound_buffer(running_device *device, int buffer)
 	mac_sound *token = get_token(device);
 
 	if (buffer)
-		token->mac_snd_buf_ptr = (UINT16 *) (messram_get_ptr(devtag_get_device(device->machine, "messram")) + messram_get_size(devtag_get_device(device->machine, "messram")) - MAC_MAIN_SND_BUF_OFFSET);
+		token->mac_snd_buf_ptr = (UINT16 *) (messram_get_ptr(device->machine->device("messram")) + messram_get_size(device->machine->device("messram")) - MAC_MAIN_SND_BUF_OFFSET);
 	else
-		token->mac_snd_buf_ptr = (UINT16 *) (messram_get_ptr(devtag_get_device(device->machine, "messram")) + messram_get_size(devtag_get_device(device->machine, "messram")) - MAC_ALT_SND_BUF_OFFSET);
+		token->mac_snd_buf_ptr = (UINT16 *) (messram_get_ptr(device->machine->device("messram")) + messram_get_size(device->machine->device("messram")) - MAC_ALT_SND_BUF_OFFSET);
 }
 
 

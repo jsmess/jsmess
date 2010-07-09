@@ -194,8 +194,8 @@ void hp48_rs232_start_recv_byte( running_machine *machine, UINT8 data )
 /* end of send event */
 static TIMER_CALLBACK( hp48_rs232_byte_sent_cb )
 {
-	device_image_interface *xmodem = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "rs232_x"));
-	device_image_interface *kermit = dynamic_cast<device_image_interface *>(devtag_get_device(machine, "rs232_k"));
+	device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine->device("rs232_x"));
+	device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine->device("rs232_k"));
 
 	LOG_SERIAL(( "%f hp48_rs232_byte_sent_cb: end of send, data=%02x\n",
 		     attotime_to_double(timer_get_time(machine)), param ));
@@ -222,7 +222,7 @@ static void hp48_rs232_send_byte( running_machine *machine )
 	UINT8 data = HP48_IO_8(0x16); /* byte to send */
 
 	LOG_SERIAL(( "%05x %f hp48_rs232_send_byte: start sending, data=%02x\n",
-		     cpu_get_previouspc(devtag_get_device(machine, "maincpu")), attotime_to_double(timer_get_time(machine)), data ));
+		     cpu_get_previouspc(machine->device("maincpu")), attotime_to_double(timer_get_time(machine)), data ));
 
 	/* set byte sending and send buffer full */
 	hp48_io[0x12] |= 3;
@@ -296,7 +296,7 @@ static const chardev_interface hp48_chardev_iface =
 void hp48_reg_out( running_device *device, int out )
 {
 	LOG(( "%05x %f hp48_reg_out: %03x\n",
-	      cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), out ));
+	      cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), out ));
 
 	/* bits 0-8: keyboard lines */
 	hp48_out = out & 0x1ff;
@@ -304,7 +304,7 @@ void hp48_reg_out( running_device *device, int out )
 	/* bits 9-10: unused */
 
 	/* bit 11: beeper */
-	dac_data_w( devtag_get_device(device->machine, "dac"), (out & 0x800) ? 0x80 : 00 );
+	dac_data_w( device->machine->device("dac"), (out & 0x800) ? 0x80 : 00 );
 }
 
 static int hp48_get_in( running_machine *machine )
@@ -333,7 +333,7 @@ int hp48_reg_in( running_device *device )
 {
 	int in = hp48_get_in( device->machine );
 	LOG(( "%05x %f hp48_reg_in: %04x\n",
-	      cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), in ));
+	      cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), in ));
 	return in;
 }
 
@@ -375,7 +375,7 @@ static TIMER_CALLBACK( hp48_kbd_cb )
 /* RSI opcode */
 void hp48_rsi( running_device *device )
 {
-	LOG(( "%05x %f hp48_rsi\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)) ));
+	LOG(( "%05x %f hp48_rsi\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)) ));
 
 	/* enables interrupts on key repeat
        (normally, there is only one interrupt, when the key is pressed)
@@ -594,8 +594,8 @@ static READ8_HANDLER ( hp48_io_r )
 	{
                 /* second nibble of received data */
 
-		device_image_interface *xmodem = dynamic_cast<device_image_interface *>(devtag_get_device(space->machine, "rs232_x"));
-		device_image_interface *kermit = dynamic_cast<device_image_interface *>(devtag_get_device(space->machine, "rs232_k"));
+		device_image_interface *xmodem = dynamic_cast<device_image_interface *>(space->machine->device("rs232_x"));
+		device_image_interface *kermit = dynamic_cast<device_image_interface *>(space->machine->device("rs232_k"));
 
 		hp48_io[0x11] &= ~1;  /* clear byte received */
 		data = hp48_io[offset];
@@ -870,7 +870,7 @@ static void hp48_reset_modules( running_machine *machine )
 /* RESET opcode */
 void hp48_mem_reset( running_device *device )
 {
-	LOG(( "%05x %f hp48_mem_reset\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)) ));
+	LOG(( "%05x %f hp48_mem_reset\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)) ));
 	hp48_reset_modules( device->machine );
 }
 
@@ -880,7 +880,7 @@ void hp48_mem_config( running_device *device, int v )
 {
 	int i;
 
-	LOG(( "%05x %f hp48_mem_config: %05x\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), v ));
+	LOG(( "%05x %f hp48_mem_config: %05x\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), v ));
 
 	/* find the highest priority unconfigured module (except non-configurable NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -911,7 +911,7 @@ void hp48_mem_config( running_device *device, int v )
 void hp48_mem_unconfig( running_device *device, int v )
 {
 	int i;
-	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), v ));
+	LOG(( "%05x %f hp48_mem_unconfig: %05x\n", cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), v ));
 
 	/* find the highest priority fully configured module at address v (except NCE1)... */
 	for ( i = 0; i < 5; i++ )
@@ -954,7 +954,7 @@ int  hp48_mem_id( running_device *device )
 	}
 
 	LOG(( "%05x %f hp48_mem_id = %02x\n",
-	      cpu_get_previouspc(devtag_get_device(device->machine, "maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
+	      cpu_get_previouspc(device->machine->device("maincpu")), attotime_to_double(timer_get_time(device->machine)), data ));
 
 	return data; /* everything is configured */
 }

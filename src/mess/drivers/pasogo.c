@@ -463,12 +463,12 @@ static INTERRUPT_GEN( pasogo_interrupt )
 
 static IRQ_CALLBACK(pasogo_irq_callback)
 {
-	return pic8259_acknowledge( devtag_get_device(device->machine, "pic8259"));
+	return pic8259_acknowledge( device->machine->device("pic8259"));
 }
 
 static MACHINE_RESET( pasogo )
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), pasogo_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), pasogo_irq_callback);
 }
 
 //static const unsigned i86_address_mask = 0x000fffff;

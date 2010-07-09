@@ -158,7 +158,7 @@ static void pcw16_vh_decode_mode2(bitmap_t *bitmap, int x, int y, unsigned char 
 ***************************************************************************/
 VIDEO_UPDATE( pcw16 )
 {
-	unsigned char *pScanLine = (unsigned char *)messram_get_ptr(devtag_get_device(screen->machine, "messram")) + 0x0fc00;	//0x03c00;  //0x020FC00;
+	unsigned char *pScanLine = (unsigned char *)messram_get_ptr(screen->machine->device("messram")) + 0x0fc00;	//0x03c00;  //0x020FC00;
 
 	int y;
 	int x;
@@ -241,7 +241,7 @@ VIDEO_UPDATE( pcw16 )
 			{
 				int byte;
 
-				byte = messram_get_ptr(devtag_get_device(screen->machine, "messram"))[Addr];
+				byte = messram_get_ptr(screen->machine->device("messram"))[Addr];
 
 				switch (mode)
 				{

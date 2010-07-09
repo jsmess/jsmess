@@ -134,7 +134,7 @@ static VIDEO_START( tmc600 )
 
 	/* find devices */
 
-	state->cdp1869 = devtag_get_device(machine, CDP1869_TAG);
+	state->cdp1869 = machine->device(CDP1869_TAG);
 
 	/* find memory regions */
 

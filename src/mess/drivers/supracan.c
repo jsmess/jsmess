@@ -154,7 +154,7 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%06x: %s", cpu_get_pc(devtag_get_device(machine, "maincpu")), buf );
+		logerror( "%06x: %s", cpu_get_pc(machine->device("maincpu")), buf );
 	}
 }
 #else
@@ -913,7 +913,7 @@ static WRITE16_HANDLER( supracan_sound_w )
 				{
 					/* Reset and enable the sound cpu */
 					//cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_HALT, CLEAR_LINE);
-					//devtag_get_device(space->machine, "soundcpu")->reset();
+					//space->machine->device("soundcpu")->reset();
 				}
 			}
 			else

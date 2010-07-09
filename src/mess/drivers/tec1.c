@@ -170,7 +170,7 @@ static MACHINE_START( tec1 )
 {
 	tec1_kbd_timer = timer_alloc(machine,  tec1_kbd_callback, NULL );
 	timer_adjust_periodic( tec1_kbd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(500) );
-	tec1_speaker = devtag_get_device(machine, "speaker");
+	tec1_speaker = machine->device("speaker");
 }
 
 

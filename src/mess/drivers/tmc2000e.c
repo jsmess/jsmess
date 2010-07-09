@@ -272,8 +272,8 @@ static MACHINE_START( tmc2000e )
 	state->colorram = auto_alloc_array(machine, UINT8, TMC2000E_COLORRAM_SIZE);
 
 	/* find devices */
-	state->cdp1864 = devtag_get_device(machine, CDP1864_TAG);
-	state->cassette = devtag_get_device(machine, CASSETTE_TAG);
+	state->cdp1864 = machine->device(CDP1864_TAG);
+	state->cassette = machine->device(CASSETTE_TAG);
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine, state->colorram, TMC2000E_COLORRAM_SIZE);

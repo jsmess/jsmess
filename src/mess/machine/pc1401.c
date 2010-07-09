@@ -115,7 +115,7 @@ int pc1401_reset(running_device *device)
 /* currently enough to save the external ram */
 NVRAM_HANDLER( pc1401 )
 {
-	running_device *main_cpu = devtag_get_device(machine, "maincpu");
+	running_device *main_cpu = machine->device("maincpu");
 	UINT8 *ram = memory_region(machine, "maincpu")+0x2000;
 	UINT8 *cpu = sc61860_internal_ram(main_cpu);
 

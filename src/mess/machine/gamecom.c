@@ -693,7 +693,7 @@ void gamecom_update_timers( running_device *device, int cycles )
 
 DRIVER_INIT( gamecom )
 {
-	gamecom_cpu = devtag_get_device(machine, "maincpu");
+	gamecom_cpu = machine->device("maincpu");
 	gamecom_iram = sm8500_get_internal_ram(machine->device<legacy_cpu_device>("maincpu"));
 	gamecom_clock_timer = timer_alloc(machine,  gamecom_clock_timer_callback , NULL);
 }
