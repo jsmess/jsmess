@@ -1853,7 +1853,7 @@ static const floppy_config fm7_floppy_config =
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(default),
 	DO_NOT_KEEP_GEOMETRY,
-	NULL
+	"fm7_flop"
 };
 
 static MACHINE_DRIVER_START( fm7 )
@@ -1943,6 +1943,8 @@ static MACHINE_DRIVER_START( fm77av )
 	MDRV_CENTRONICS_ADD("lpt",standard_centronics)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+
+	MDRV_SOFTWARE_LIST_ADD("flop_list","fm77av")
 MACHINE_DRIVER_END
 
 /* ROM definition */
