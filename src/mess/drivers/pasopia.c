@@ -46,7 +46,7 @@ static VIDEO_UPDATE( paso7 )
 static READ8_HANDLER( vram_r )
 {
 	if(vram_sel)
-		return 0xff;
+		return 0xff; //TODO: investigate on this
 
 	return p7_vram[offset];
 }
@@ -141,24 +141,18 @@ static READ8_HANDLER( pac2_r )
 }
 
 /* writes always occurs to the RAM banks, even if the ROMs are selected. */
-static WRITE8_HANDLER( ram_bank1_w )
+static WRITE8_HANDLER( ram_bank_w )
 {
 	UINT8 *cpu = memory_region(space->machine, "maincpu");
 
 	cpu[offset] = data;
 }
 
-static WRITE8_HANDLER( ram_bank2_w )
-{
-	UINT8 *cpu = memory_region(space->machine, "maincpu");
-
-	cpu[offset+0x4000] = data;
-}
-
 static ADDRESS_MAP_START(paso7_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_ROMBANK("bank1") AM_WRITE( ram_bank1_w )
-	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK("bank2") AM_WRITE( ram_bank2_w )
+	AM_RANGE( 0x0000, 0x7fff ) AM_WRITE( ram_bank_w )
+	AM_RANGE( 0x0000, 0x3fff ) AM_ROMBANK("bank1")
+	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK("bank2")
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(vram_r, vram_w ) AM_BASE(&p7_vram)
 	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
@@ -281,10 +275,15 @@ static WRITE8_DEVICE_HANDLER( ppi8255_2a_w )
 	/* ---- --x- sound off */
 }
 
+/* TODO: investigate on these. */
+static READ8_DEVICE_HANDLER( unk_r )
+{
+	return 0xff;//mame_rand(device->machine);
+}
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
-	DEVCB_NULL,						/* Port A read */
+	DEVCB_HANDLER(unk_r),			/* Port A read */
 	DEVCB_HANDLER(crtc_portb_r),	/* Port B read */
 	DEVCB_NULL,						/* Port C read */
 	DEVCB_HANDLER(ppi8255_0a_w),		/* Port A write */
@@ -306,7 +305,7 @@ static I8255A_INTERFACE( ppi8255_intf_2 )
 {
 	DEVCB_NULL,						/* Port A read */
 	DEVCB_NULL,						/* Port B read */
-	DEVCB_NULL,						/* Port C read */
+	DEVCB_HANDLER(unk_r),			/* Port C read */
 	DEVCB_HANDLER(ppi8255_2a_w),	/* Port A write */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_NULL						/* Port C write */
@@ -377,9 +376,7 @@ ROM_END
 static DRIVER_INIT( paso7 )
 {
 	UINT8 *bios = memory_region(machine, "maincpu");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	memory_unmap_write(space, 0x0000, 0x7fff, 0, 0);
 	memory_set_bankptr(machine, "bank1", bios + 0x10000);
 	memory_set_bankptr(machine, "bank2", bios + 0x10000);
 //	memory_set_bankptr(machine, "bank3", bios + 0x10000);
