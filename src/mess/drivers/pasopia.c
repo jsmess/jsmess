@@ -57,33 +57,26 @@ static WRITE8_HANDLER( vram_w )
 		p7_vram[offset] = data;
 }
 
-// sketchy port 0x3c implementation to see what the CPU does...
-// however, it writes 0x11 - in theory setting BASIC+BIOS in the lower banks
-// and then it writes at 0x0000... maybe bank1 should be RAM? or
-// should we have writes to RAM and only reads to BIOS/BASIC?
 static WRITE8_HANDLER( paso7_bankswitch )
 {
 	UINT8 *cpu = memory_region(space->machine, "maincpu");
 	UINT8 *basic = memory_region(space->machine, "basic");
 
-	if (BIT(data, 0))
+	switch(data & 3)
 	{
-		memory_set_bankptr(space->machine, "bank1", basic);
-		memory_set_bankptr(space->machine, "bank2", cpu + 0x10000);
-		memory_unmap_write(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0);
-	}
-	else if (BIT(data, 1))
-	{
-		memory_set_bankptr(space->machine, "bank1", cpu);
-		memory_set_bankptr(space->machine, "bank2", cpu + 0x4000);
-		memory_install_write_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, "bank1");
-		memory_install_write_bank(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4000, 0x7fff, 0, 0, "bank2");
-	}
-	else
-	{
-		memory_set_bankptr(space->machine, "bank1", cpu + 0x10000);
-		memory_set_bankptr(space->machine, "bank2", cpu + 0x10000);
-		memory_unmap_write(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000, 0x7fff, 0, 0);
+		case 0:
+		case 3: //select Basic ROM
+			memory_set_bankptr(space->machine, "bank1", basic + 0x00000);
+			memory_set_bankptr(space->machine, "bank2", basic + 0x04000);
+			break;
+		case 1: //select Basic ROM + BIOS ROM
+			memory_set_bankptr(space->machine, "bank1", basic + 0x00000);
+			memory_set_bankptr(space->machine, "bank2", cpu   + 0x10000);
+			break;
+		case 2: //select Work RAM
+			memory_set_bankptr(space->machine, "bank1", cpu   + 0x00000);
+			memory_set_bankptr(space->machine, "bank2", cpu   + 0x04000);
+			break;
 	}
 
 	vram_sel = data & 4;
@@ -147,10 +140,25 @@ static READ8_HANDLER( pac2_r )
 	return 0xff;
 }
 
+/* writes always occurs to the RAM banks, even if the ROMs are selected. */
+static WRITE8_HANDLER( ram_bank1_w )
+{
+	UINT8 *cpu = memory_region(space->machine, "maincpu");
+
+	cpu[offset] = data;
+}
+
+static WRITE8_HANDLER( ram_bank2_w )
+{
+	UINT8 *cpu = memory_region(space->machine, "maincpu");
+
+	cpu[offset+0x4000] = data;
+}
+
 static ADDRESS_MAP_START(paso7_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE( 0x0000, 0x3fff ) AM_RAMBANK("bank1")
-	AM_RANGE( 0x4000, 0x7fff ) AM_RAMBANK("bank2")
+	AM_RANGE( 0x0000, 0x3fff ) AM_ROMBANK("bank1") AM_WRITE( ram_bank1_w )
+	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK("bank2") AM_WRITE( ram_bank2_w )
 	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(vram_r, vram_w ) AM_BASE(&p7_vram)
 	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
