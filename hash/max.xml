@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="ultimax" description="Commodore Max / Ultimax / VIC10 cartridges">
+<softwarelist name="max" description="Commodore Max / Ultimax / VIC10 cartridges">
 
 	<software name="avengera" cloneof="avenger">
 		<description>Avenger (Jpn, v.02)</description>

@@ -8,7 +8,7 @@ Are the following undumped?
 * Protector - by Songbird Productions, 1999
 
 -->
-<softwarelist name="jaguar_cart" description="Atari Jaguar cartridges">
+<softwarelist name="jaguar" description="Atari Jaguar cartridges">
 	<software name="aircars" supported="no">
 		<description>Air Cars</description>
 		<year>1997</year>
