@@ -45,7 +45,7 @@
 		<description>77AV Demo</description>
 		<year>19??</year>
 		<publisher>Fujitsu</publisher>
-		<part name="flop" interface="fm7_flop">
+		<part name="disk1" interface="fm7_flop">
 			<dataarea name="flop" size="353200">
 				<rom name="77avdemo.d77" size="353200" crc="7046810d" sha1="116a422147107943c0d378e99923cb14cd31a13f" offset="000000" />
 			</dataarea>
@@ -88,7 +88,7 @@
 		<description>Dragon Buster</description>
 		<year>1987</year>
 		<publisher>Dempa</publisher>
-		<part name="flop" interface="fm7_flop">
+		<part name="disk1" interface="fm7_flop">
 			<dataarea name="flop" size="348848">
 				<rom name="drabus.d77" size="348848" crc="6100e7f0" sha1="4671fadc689cb3e0c708119082f0db083d260232" offset="000000" />
 			</dataarea>
@@ -99,7 +99,7 @@
 		<description>The Tower of Druaga</description>
 		<year>19??</year>
 		<publisher>Dempa</publisher>
-		<part name="flop" interface="fm7_flop">
+		<part name="disk1" interface="fm7_flop">
 			<dataarea name="flop" size="348848">
 				<rom name="druaga.d77" size="348848" crc="2d5e1a08" sha1="c6cdcf38ca98514c96dab84eed22ed8cb277c54b" offset="000000" />
 			</dataarea>
@@ -110,7 +110,7 @@
 		<description>F-BASIC v3.3 L11</description>
 		<year>19??</year>
 		<publisher>Fujitsu</publisher>
-		<part name="flop" interface="fm7_flop">
+		<part name="disk1" interface="fm7_flop">
 			<dataarea name="flop" size="348848">
 				<rom name="v33l11.d77" size="348848" crc="d5d8393a" sha1="14b97869f650e913bceea91f02b428768ae7afc6" offset="000000" />
 			</dataarea>
@@ -125,7 +125,7 @@
 		<description>ぎゅわんぶらぁ自己中心派</description>
 		<year>1986</year>
 		<publisher>Game Arts</publisher>
-		<part name="flop" interface="fm7_flop">
+		<part name="disk1" interface="fm7_flop">
 			<dataarea name="flop" size="348848">
 				<rom name="ganjiko.d77" size="348848" crc="2cc9b92b" sha1="2bbc4f984a24812720ae9c56a991e4085155f90b" offset="000000" />
 			</dataarea>
@@ -184,7 +184,7 @@
 		<description>少年マイクのひとり旅</description>
 		<year>1986</year>
 		<publisher>Oh!FM</publisher>
-		<part name="flop" interface="fm7_flop">
+		<part name="disk1" interface="fm7_flop">
 			<dataarea name="flop" size="348848">
 				<rom name="mike.d77" size="348848" crc="4ba9d06d" sha1="70eefd207ca9d146534c7d8f295b941415f5f9ec" offset="000000" />
 			</dataarea>

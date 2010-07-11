@@ -5,8 +5,12 @@
   Undumped games
 
   - Game de check! Koutsuu Anzen
-  - Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or 131 games)
-  - a few other pirate multigame carts (4 Pak All Action + two versions of 4 in 1 carts)
+  - Great Ice Hockey Jpn ? (Only 1000 copies were distributed through a 
+  BEEP! magazine contest in 1987, to celebrate the release of Phantasy Star)
+  - Tec Toy SMS 3 with built-in games (74 game, 112 games, 120 games or 
+  131 games)
+  - a few other pirate multigame carts (4 Pak All Action + two versions of 
+  4 in 1 carts)
 
 -->
 
@@ -57,7 +61,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1305, 5055 - Releases: 1986-08-17 (JPN) -->
+	<!-- Id: G-1305, 5055 - Releases: 1986-08-17 (JPN) - Alt Title: アクションファイター -->
 	<software name="actionfg1" cloneof="actionfg">
 		<description>Action Fighter (Euro, Jpn, v1.1)</description>
 		<year>1986</year>
@@ -104,7 +108,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1340, 9001 - Releases: 1987-12-12 (JPN) - Notes: FM support -->
+	<!-- Id: G-1340, 9001 - Releases: 1987-12-12 (JPN) - Alt Title: アフターバーナー - Notes: FM support -->
 	<software name="afterb">
 		<description>After Burner (World)</description>
 		<year>1987</year>
@@ -151,7 +155,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1352, 5109 - Releases: 1988-02-29 (JPN) - Notes: FM support -->
+	<!-- Id: G-1352, 5109 - Releases: 1988-02-29 (JPN) - Alt Title: アレスタ - Notes: FM support -->
 	<software name="aleste" cloneof="powstrik">
 		<description>Aleste (Jpn)</description>
 		<year>1988</year>
@@ -163,7 +167,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1330 - Releases: 1987-11-15 (JPN) - Notes: FM support -->
+	<!-- Id: G-1330 - Releases: 1987-11-15 (JPN) - Alt Title: アレックスキッド BMXトライアル - Notes: FM support -->
 	<software name="alexbmx">
 		<description>Alex Kidd BMX Trial (Jpn)</description>
 		<year>1987</year>
@@ -219,7 +223,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1306, 5067 - Releases: 1986-11-01 (JPN) -->
+	<!-- Id: G-1306, 5067 - Releases: 1986-11-01 (JPN) - Alt Title: アレックスキッドのミラクルワールド -->
 	<software name="alexkiddj" cloneof="alexkidd">
 		<description>Alex Kidd no Miracle World (Jpn)</description>
 		<year>1986</year>
@@ -231,7 +235,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1347, 7005 - Releases: 1988-03-10 (JPN) - Notes: FM support -->
+	<!-- Id: G-1347, 7005 - Releases: 1988-03-10 (JPN) - Alt Title: アレックスキッド ザ・ロストスターズ - Notes: FM support -->
 	<software name="alexlost">
 		<description>Alex Kidd - The Lost Stars (World)</description>
 		<year>1988</year>
@@ -327,7 +331,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1328, 5116 - Releases: 1987-07-19 (JPN) - Note: the Western release, "Alex Kidd Hiigh-Tech World" is quite different -->
+	<!-- Id: G-1328, 5116 - Releases: 1987-07-19 (JPN) - Alt Title: あんみつ姫 - Note: the Western release, "Alex Kidd Hiigh-Tech World" is quite different -->
 	<software name="anmitsu" cloneof="alexhitw">
 		<description>Anmitsu Hime (Jpn)</description>
 		<year>1987</year>
@@ -362,7 +366,7 @@
 		</part>
 	</software>
 
-	<!-- S-001 - Releases: 1988-03-25 (JPN) -->
+	<!-- S-001 - Releases: 1988-03-25 (JPN) - Alt Title: アルゴスの十字剣 -->
 	<software name="argosnj1" cloneof="argosnj">
 		<description>Argos no Juujiken (Jpn, Alt)</description>
 		<year>1988</year>
@@ -386,7 +390,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1307, 5064 (USA), 5081 (EUR) - Releases: 1986-11-16 (JPN) -->
+	<!-- Id: G-1307, 5064 (USA), 5081 (EUR) - Releases: 1986-11-16 (JPN) - Alt Title: アシュラ - 阿修羅 -->
 	<software name="ashura" cloneof="secret">
 		<description>Ashura (Jpn)</description>
 		<year>1986</year>
@@ -516,7 +520,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1312, 5069 - Releases: 1986-11-16 (JPN) -->
+	<!-- Id: G-1312, 5069 - Releases: 1986-11-16 (JPN) - Alt Title: アストロ ウォリアー -->
 	<software name="astrowj" cloneof="astrow">
 		<description>Astro Warrior (Jpn, USA)</description>
 		<year>1986</year>
@@ -539,7 +543,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1339, 7006 - Releases: 1987-10-18 (JPN) - Notes: FM support -->
+	<!-- Id: G-1339, 7006 - Releases: 1987-10-18 (JPN) - Alt Title: エイリアン シンドローム - Notes: FM support -->
 	<software name="asyndromj" cloneof="asyndrom">
 		<description>Alien Syndrome (Jpn)</description>
 		<year>1987</year>
@@ -563,7 +567,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1335, 5100 - Releases: 1987-09-20 (JPN) - Notes: FM support -->
+	<!-- Id: G-1335, 5100 - Releases: 1987-09-20 (JPN) - Alt Title: ナスカ'88 -THE GOLDEN ROAD TO PARADISE- - Notes: FM support -->
 	<software name="aztecadv">
 		<description>Aztec Adventure - The Golden Road to Paradise (World) ~ Nazca '88 - The Golden Road to Paradise (Jpn)</description>
 		<year>1987</year>
@@ -729,7 +733,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1351, 8005 - Releases: 1988-03-26 (JPN) - Notes: FM support, 3D glasses support -->
+	<!-- Id: G-1351, 8005 - Releases: 1988-03-26 (JPN) - Alt Title: ブレード イーグル - Notes: FM support, 3D glasses support -->
 	<software name="bladeag">
 		<description>Blade Eagle (World)</description>
 		<year>1988</year>
@@ -752,7 +756,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1373, 27006 - Releases: 1989-02-04 (JPN) - Notes: FM support -->
+	<!-- Id: G-1373, 27006 - Releases: 1989-02-04 (JPN) - Alt Title: ボンバーレイド - Notes: FM support -->
 	<software name="bomber">
 		<description>Bomber Raid (World)</description>
 		<year>1989</year>
@@ -788,7 +792,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1371 - Releases: 1988-12-01 (JPN) - Notes: FM support -->
+	<!-- Id: G-1371 - Releases: 1988-12-01 (JPN) - Alt Title: 超音戦士ボーグマン - Notes: FM support -->
 	<software name="borgman" cloneof="cyborgh">
 		<description>Chouon Senshi Borgman (Jpn)</description>
 		<year>1988</year>
@@ -881,7 +885,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1356, 5117 - Releases: 1988-07-02 (JPN) - Notes: FM support -->
+	<!-- Id: G-1356, 5117 - Releases: 1988-07-02 (JPN) - Alt Title: キャプテン シルバー - Notes: FM support -->
 	<software name="captsilv">
 		<description>Captain Silver (Euro, Jpn)</description>
 		<year>1988</year>
@@ -1080,7 +1084,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1304 - Releases: 1986-09-21 (JPN) -->
+	<!-- Id: G-1304 - Releases: 1986-09-21 (JPN) - Alt Title: ザ・サーキット -->
 	<software name="circuit" cloneof="worldgp">
 		<description>The Circuit (Jpn)</description>
 		<year>1986</year>
@@ -1232,7 +1236,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1369, 7012 - Releases: 1988-10-01 (JPN) - Notes: FM support -->
+	<!-- Id: G-1369, 7012 - Releases: 1988-10-01 (JPN) - Alt Title: 双截龍（ダブルドラゴン） - Notes: FM support -->
 	<software name="ddragon">
 		<description>Double Dragon (World)</description>
 		<year>1988</year>
@@ -1314,7 +1318,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1334 - Releases: 1987-08-18 (JPN) - Notes: FM support -->
+	<!-- Id: G-1334 - Releases: 1987-08-18 (JPN) - Alt Title: どきどきペンギンランド 宇宙大冒険 - Notes: FM support -->
 	<software name="dokidoki" cloneof="penguin">
 		<description>Doki Doki Penguin Land - Uchuu Daibouken (Jpn)</description>
 		<year>1987</year>
@@ -1360,7 +1364,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1314 - Releases: 1987-01-18 (JPN) -->
+	<!-- Id: G-1314 - Releases: 1987-01-18 (JPN) - Alt Title: ダブルターゲット シンシアの眠り -->
 	<software name="doubltgt" cloneof="quartet">
 		<description>Double Target - Cynthia no Nemuri (Jpn)</description>
 		<year>1987</year>
@@ -1431,7 +1435,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1302, 5056 - Releases: 1986-07-20 (JPN) -->
+	<!-- Id: G-1302, 5056 - Releases: 1986-07-20 (JPN) - Alt Title: 極悪同盟 ダンプ松本 -->
 	<software name="dumpmats" cloneof="prowrest">
 		<description>Gokuaku Doumei Dump Matsumoto (Jpn)</description>
 		<year>1986</year>
@@ -1526,7 +1530,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1322, 5077 - Releases: 1987-05-18 (JPN) -->
+	<!-- Id: G-1322, 5077 - Releases: 1987-05-18 (JPN) - Alt Title: エンデューロレーサー -->
 	<software name="enduroj" cloneof="enduro">
 		<description>Enduro Racer (Jpn)</description>
 		<year>1987</year>
@@ -1619,7 +1623,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1342, 5103 - Releases: 1987-12-27 (JPN) - Notes: FM support -->
+	<!-- Id: G-1342, 5103 - Releases: 1987-12-27 (JPN) - Alt Title: ファミリーゲームズ - Notes: FM support -->
 	<software name="family" cloneof="parlour">
 		<description>Family Games (Jpn)</description>
 		<year>1987</year>
@@ -1655,7 +1659,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1329, 7004 - Releases: 1987-10-17 (JPN) - Notes: FM support -->
+	<!-- Id: G-1329, 7004 - Releases: 1987-10-17 (JPN) - Alt Title: ファンタジーゾーンII オパオパの涙 - Notes: FM support -->
 	<software name="fantzon2j" cloneof="fantzon2">
 		<description>Fantasy Zone II - Opa Opa no Namida (Jpn)</description>
 		<year>1987</year>
@@ -1689,7 +1693,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1301, 5052 - Releases: 1986-06-15 (JPN) -->
+	<!-- Id: G-1301, 5052 - Releases: 1986-06-15 (JPN) - Alt Title: ファンタジーゾーン -->
 	<software name="fantzonej" cloneof="fantzone">
 		<description>Fantasy Zone (Jpn)</description>
 		<year>1986</year>
@@ -1712,7 +1716,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1362, 7077 - Releases: 1988-07-02 (JPN) -->
+	<!-- Id: G-1362, 7077 - Releases: 1988-07-02 (JPN) - Alt Title: ファイナル バブル ボブル -->
 	<software name="fbubbobl" cloneof="bublbobl">
 		<description>Final Bubble Bobble (Jpn)</description>
 		<year>1988</year>
@@ -1900,7 +1904,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1348 - Releases: 1988-02-21 (JPN) - Notes: FM support -->
+	<!-- Id: G-1348 - Releases: 1988-02-21 (JPN) - Alt Title: ギャラクティック プロテクター - Notes: FM support -->
 	<software name="galactpr">
 		<description>Galactic Protector (Jpn)</description>
 		<year>1988</year>
@@ -2189,7 +2193,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1320, 5071 - Releases: 1987-03-29 (JPN) -->
+	<!-- Id: G-1320, 5071 - Releases: 1987-03-29 (JPN) - Alt Title: グレート バスケットボール -->
 	<software name="greatbsk">
 		<description>Great Basketball (World)</description>
 		<year>1987</year>
@@ -2201,7 +2205,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1321, 5058 - Releases: 1987-04-29 (JPN) -->
+	<!-- Id: G-1321, 5058 - Releases: 1987-04-29 (JPN) - Alt Title: グレート フットボール -->
 	<software name="greatftb">
 		<description>Great Football (World)</description>
 		<year>1987</year>
@@ -2213,7 +2217,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1332, 5057 - Releases: 1987-10-10 (JPN) - Notes: FM support -->
+	<!-- Id: G-1332, 5057 - Releases: 1987-10-10 (JPN) - Alt Title: マスターズ ゴルフ - Notes: FM support -->
 	<software name="greatglf">
 		<description>Great Golf (World) ~ Masters Golf (Japan)</description>
 		<year>1987</year>
@@ -2247,7 +2251,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1313 - Releases: 1986-12-20 (JPN) -->
+	<!-- Id: G-1313 - Releases: 1986-12-20 (JPN) - Alt Title: グレートゴルフ -->
 	<software name="greatglj">
 		<description>Great Golf (Jpn)</description>
 		<year>1986</year>
@@ -2329,7 +2333,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1317 - Releases: 1987-03-29 (JPN) -->
+	<!-- Id: G-1317 - Releases: 1987-03-29 (JPN) - Alt Title: グレート バレーボール -->
 	<software name="greatvolj" cloneof="greatvol">
 		<description>Great Volleyball (Jpn)</description>
 		<year>1987</year>
@@ -2341,7 +2345,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1331, 7500 - Releases: 1987-10-18 (JPN) - Notes: FM support -->
+	<!-- Id: G-1331, 7500 - Releases: 1987-10-18 (JPN) - Alt Title: 覇邪の封印 - Notes: FM support -->
 	<software name="hajafuin" cloneof="miracle">
 		<description>Haja no Fuuin (Jpn)</description>
 		<year>1987</year>
@@ -2423,7 +2427,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1309 - Releases: 1986-12-15 (JPN) -->
+	<!-- Id: G-1309 - Releases: 1986-12-15 (JPN) - Alt Title: ハイスクール！奇面組 -->
 	<software name="highsc">
 		<description>High School! Kimengumi (Jpn)</description>
 		<year>1986</year>
@@ -2435,7 +2439,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1303, 5054 - Releases: 1986-07-20 (JPN) - Motes: The Western version "Black Belt" is quite different -->
+	<!-- Id: G-1303, 5054 - Releases: 1986-07-20 (JPN) - Alt Title: 北斗の拳 - Motes: The Western version "Black Belt" is quite different -->
 	<software name="hokuto" cloneof="blackblt">
 		<description>Hokuto no Ken (Jpn)</description>
 		<year>1986</year>
@@ -2481,7 +2485,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1354 - Releases: 1988-04-02 (JPN) - Notes: FM support -->
+	<!-- Id: G-1354 - Releases: 1988-04-02 (JPN) - Alt Title: 星をさがして… - Notes: FM support -->
 	<software name="hoshiw">
 		<description>Hoshi wo Sagashite... (Jpn)</description>
 		<year>1988</year>
@@ -2678,7 +2682,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1358, 7013 - Releases: 1988-06-02 (JPN) - Notes: FM support -->
+	<!-- Id: G-1358, 7013 - Releases: 1988-06-02 (JPN) - Alt Title: 剣聖伝 - Notes: FM support -->
 	<software name="kenseidj" cloneof="kenseid">
 		<description>Kenseiden (Jpn)</description>
 		<year>1988</year>
@@ -2737,7 +2741,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1366, 9003 - Releases: 1988-09-23 (JPN) - Notes: FM support -->
+	<!-- Id: G-1366, 9003 - Releases: 1988-09-23 (JPN) - Alt Title: 孔雀王 - Notes: FM support -->
 	<software name="kujaku" cloneof="spellcst">
 		<description>Kujaku Ou (Jpn)</description>
 		<year>1988</year>
@@ -2855,7 +2859,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1361, 7016 - Releases: 1988-06-02 (JPN) - Notes: FM support -->
+	<!-- Id: G-1361, 7016 - Releases: 1988-06-02 (JPN) - Alt Title: ロード オブ ソード - Notes: FM support -->
 	<software name="lordswrdj" cloneof="lordswrd">
 		<description>Lord of Sword (Jpn)</description>
 		<year>1988</year>
@@ -2867,7 +2871,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1315 - Releases: 1987-02-18 (JPN) - Notes: This is actually compatible with SG-1000 and SG-1000 Mark II (and SC-3000) -->
+	<!-- Id: G-1315 - Releases: 1987-02-18 (JPN) - Alt Title: シャーロック・ホームズ - ロレッタの肖像 - Notes: This is actually compatible with SG-1000 and SG-1000 Mark II (and SC-3000) -->
 	<software name="loretta">
 		<description>Loretta no Shouzou (Jpn)</description>
 		<year>1987</year>
@@ -2902,7 +2906,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1337 - Releases: 1987-10-18 (JPN) -->
+	<!-- Id: G-1337 - Releases: 1987-10-18 (JPN) - Alt Title: 麻雀戦国時代 -->
 	<software name="mahjong">
 		<description>Mahjong Sengoku Jidai (Jpn)</description>
 		<year>1987</year>
@@ -2925,7 +2929,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1324 - Releases: 1987-05-17 (JPN) -->
+	<!-- Id: G-1324 - Releases: 1987-05-17 (JPN) - Alt Title: 魔界列伝 -->
 	<software name="makairet" cloneof="kungfuk">
 		<description>Makai Retsuden (Jpn)</description>
 		<year>1987</year>
@@ -2937,7 +2941,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1363, 7017 - Releases: 1988-08-14 (JPN) - Notes: FM support -->
+	<!-- Id: G-1363, 7017 - Releases: 1988-08-14 (JPN) - Alt Title: 魔王ゴルベリアス - Notes: FM support -->
 	<software name="maougolv" cloneof="golvell">
 		<description>Maou Golvellius (Jpn)</description>
 		<year>1988</year>
@@ -3030,7 +3034,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1345, 8003 - Releases: 1988-01-31 (JPN) - Notes: FM support, 3D glasses support -->
+	<!-- Id: G-1345, 8003 - Releases: 1988-01-31 (JPN) - Alt Title: メイズ ウォーカー - Notes: FM support, 3D glasses support -->
 	<software name="mazewalk" cloneof="mazehunt">
 		<description>Maze Walker (Jpn)</description>
 		<year>1988</year>
@@ -3042,7 +3046,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1359 - Releases: 1988-07-30 (JPN) - Notes: FM support -->
+	<!-- Id: G-1359 - Releases: 1988-07-30 (JPN) - Alt Title: (め)組レスキュー - Notes: FM support -->
 	<software name="megumi">
 		<description>Megumi Rescue (Jpn)</description>
 		<year>1988</year>
@@ -3275,7 +3279,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1367 - Releases: 1988-09-09 (JPN) - Notes: FM support -->
+	<!-- Id: G-1367 - Releases: 1988-09-09 (JPN) - Alt Title: 熱球甲子園 - Notes: FM support -->
 	<software name="nekkyu">
 		<description>Nekkyuu Koushien (Jpn)</description>
 		<year>1988</year>
@@ -3321,7 +3325,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1308, 5066 - Releases: 1986-11-08 (JPN) -->
+	<!-- Id: G-1308, 5066 - Releases: 1986-11-08 (JPN) - Alt Title: 忍者 忍者プリンセス1メガ版 -->
 	<software name="ninjaj" cloneof="ninja">
 		<description>The Ninja (Jpn)</description>
 		<year>1986</year>
@@ -3356,7 +3360,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1343 - Releases: 1987-12-20 (JPN) - Notes: FM support -->
+	<!-- Id: G-1343 - Releases: 1987-12-20 (JPN) - Alt Title: オパオパ - Notes: FM support -->
 	<software name="opaopa" cloneof="fantzonm">
 		<description>Opa Opa (Jpn)</description>
 		<year>1987</year>
@@ -3392,7 +3396,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1326, 7003 - Releases: 1987-06-30 (JPN) - Notes: FM support -->
+	<!-- Id: G-1326, 7003 - Releases: 1987-06-30 (JPN) - Alt Title: アウト ラン - Notes: FM support -->
 	<software name="outrun">
 		<description>Out Run (World)</description>
 		<year>1987</year>
@@ -3614,7 +3618,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1323 - Releases: 1987-08-17 (JPN) -->
+	<!-- Id: G-1323 - Releases: 1987-08-17 (JPN) - Alt Title: ザ・プロ野球 ペナントレース -->
 	<software name="proyakyu">
 		<description>The Pro Yakyuu Pennant Race (Jpn)</description>
 		<year>1987</year>
@@ -3659,7 +3663,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1341, 9500 - Releases: 1987-12-20 (JPN) - Notes: FM support -->
+	<!-- Id: G-1341, 9500 - Releases: 1987-12-20 (JPN) - Alt Title: ファンタシースター - Notes: FM support -->
 	<software name="pstarj" cloneof="pstar">
 		<description>Phantasy Star (Jpn)</description>
 		<year>1987</year>
@@ -3942,7 +3946,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1319, 7002 - Releases: 1987-04-19 (JPN) -->
+	<!-- Id: G-1319, 7002 - Releases: 1987-04-19 (JPN) - Alt Title: ロッキー -->
 	<software name="rocky">
 		<description>Rocky (World)</description>
 		<year>1987</year>
@@ -3954,7 +3958,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1364, 9002 - Releases: 1988-10-01 (JPN) - Notes: FM support -->
+	<!-- Id: G-1364, 9002 - Releases: 1988-10-01 (JPN) - Alt Title: アールタイプ - Notes: FM support -->
 	<software name="rtype">
 		<description>R-Type (World)</description>
 		<year>1988</year>
@@ -4115,7 +4119,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1338, 5102 - Releases: 1987-10-24 (JPN) - Notes: FM support -->
+	<!-- Id: G-1338, 5102 - Releases: 1987-10-24 (JPN) - Alt Title: SDI - Notes: FM support -->
 	<software name="sdi" cloneof="global">
 		<description>SDI (Jpn)</description>
 		<year>1987</year>
@@ -4266,7 +4270,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1349, 8004 - Releases: 1988-02-29 (JPN) - Notes: FM support, 3D glasses support -->
+	<!-- Id: G-1349, 8004 - Releases: 1988-02-29 (JPN) - Alt Title: スペースハリアー3D - Notes: FM support, 3D glasses support -->
 	<software name="sharr3dj" cloneof="sharr3d">
 		<description>Space Harrier 3D (Jpn)</description>
 		<year>1988</year>
@@ -4278,7 +4282,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1310, 7001, 7080 - Releases: 1986-12-21 (JPN) -->
+	<!-- Id: G-1310, 7001, 7080 - Releases: 1986-12-21 (JPN) - Alt Title: スペースハリアー -->
 	<software name="sharrj" cloneof="sharr">
 		<description>Space Harrier (Jpn)</description>
 		<year>1986</year>
@@ -4302,7 +4306,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1353 - Releases: 1988-06-19 (JPN) - Notes: FM support -->
+	<!-- Id: G-1353 - Releases: 1988-06-19 (JPN) - Alt Title: シノビ - SHINOBI 忍 - Notes: FM support -->
 	<software name="shinobij">
 		<description>Shinobi (Jpn)</description>
 		<year>1988</year>
@@ -4439,7 +4443,7 @@
 		</part>
 	</software>
 
-	<!-- 002 - Releases: 1988-04-17 (JPN) - Notes: FM support -->
+	<!-- 002 - Releases: 1988-04-17 (JPN) - Alt Title: ソロモンの鍵 －王女リヒタの涙－ - Notes: FM support -->
 	<software name="solomon">
 		<description>Solomon no Kagi - Oujo Rihita no Namida (Jpn)</description>
 		<year>1988</year>
@@ -4651,7 +4655,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1365 - Releases: 1988-10-29 (JPN) - Notes: Sports Pad support -->
+	<!-- Id: G-1365 - Releases: 1988-10-29 (JPN) - Alt Title: スポーツパッドサッカー - Notes: Sports Pad support -->
 	<software name="sportssc" cloneof="worldscr">
 		<description>Sports Pad Soccer (Jpn)</description>
 		<year>1988</year>
@@ -4791,7 +4795,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1318 - Releases: 1987-04-19 (JPN) -->
+	<!-- Id: G-1318 - Releases: 1987-04-19 (JPN) - Alt Title: デカ - スケバン刑事II 少女鉄仮面伝説 -->
 	<software name="sukeban">
 		<description>Sukeban Deka II - Shoujo Tekkamen Densetsu (Jpn)</description>
 		<year>1987</year>
@@ -4850,7 +4854,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1357 - Releases: 1988-07-02 (JPN) - Notes: FM support -->
+	<!-- Id: G-1357 - Releases: 1988-07-02 (JPN) - Alt Title: スーパーレーシング - Notes: FM support -->
 	<software name="superrac">
 		<description>Super Racing (Jpn)</description>
 		<year>1988</year>
@@ -5046,7 +5050,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1355 - Releases: 1988-06-02 (JPN) - Notes: FM support -->
+	<!-- Id: G-1355 - Releases: 1988-06-02 (JPN) - Alt Title: 天才バカボン - Notes: FM support -->
 	<software name="tensai">
 		<description>Tensai Bakabon (Jpn)</description>
 		<year>1988</year>
@@ -5104,7 +5108,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1360, 7011 - Releases: 1988-07-30 (JPN) - Notes: FM support -->
+	<!-- Id: G-1360, 7011 - Releases: 1988-07-30 (JPN) - Alt Title: サンダーブレード - Notes: FM support -->
 	<software name="thunderbj" cloneof="thunderb">
 		<description>Thunder Blade (Jpn)</description>
 		<year>1988</year>
@@ -5359,7 +5363,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1316, 5068 - Releases: 1987-03-22 (JPN) -->
+	<!-- Id: G-1316, 5068 - Releases: 1987-03-22 (JPN) - Alt Title: スーパーワンダーボーイ -->
 	<software name="wboyj" cloneof="wboy">
 		<description>Super Wonder Boy (Jpn)</description>
 		<year>1987</year>
@@ -5382,7 +5386,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1346, 7007 - Releases: 1988-01-31 (JPN) - Notes: FM support -->
+	<!-- Id: G-1346, 7007 - Releases: 1988-01-31 (JPN) - Alt Title: スーパーワンダーボーイ モンスターワールド - Notes: FM support -->
 	<software name="wboymlndj" cloneof="wboymlnd">
 		<description>Super Wonder Boy - Monster World (Jpn)</description>
 		<year>1988</year>
@@ -5603,7 +5607,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1327, 5059 - Releases: 1987-07-19 (JPN) -->
+	<!-- Id: G-1327, 5059 - Releases: 1987-07-19 (JPN) - Alt Title: ワールド サッカー -->
 	<software name="worldscr">
 		<description>World Soccer (World)</description>
 		<year>1987</year>
@@ -5685,7 +5689,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1370, 7501 - Releases: 1988-10-15 (JPN) - Notes: FM support -->
+	<!-- Id: G-1370, 7501 - Releases: 1988-10-15 (JPN) - Alt Title: イース - Notes: FM support -->
 	<software name="ys" cloneof="ysomens">
 		<description>Ys (Jpn)</description>
 		<year>1988</year>
@@ -5708,7 +5712,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1336, 8002 - Releases: 1987-11-07 (JPN) - Notes: FM support, 3D glasses support -->
+	<!-- Id: G-1336, 8002 - Releases: 1987-11-07 (JPN) - Alt Title: ザクソン3D - Notes: FM support, 3D glasses support -->
 	<software name="zaxxon3d">
 		<description>Zaxxon 3-D (World)</description>
 		<year>1987</year>
@@ -5742,7 +5746,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1344, 5105 - Releases: 1987-12-13 (JPN) - Notes: FM support -->
+	<!-- Id: G-1344, 5105 - Releases: 1987-12-13 (JPN) - Alt Title: トライフォーメーション - Notes: FM support -->
 	<software name="zillion2">
 		<description>Zillion II - The Tri Formation (Euro, USA) ~ Tri Formation (Jpn)</description>
 		<year>1987</year>
@@ -5754,7 +5758,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1325, 5075 - Releases: 1987-05-24 (JPN) -->
+	<!-- Id: G-1325, 5075 - Releases: 1987-05-24 (JPN) - Alt Title: 赤い光弾 ジリオン -->
 	<software name="zillionb" cloneof="zillion">
 		<description>Zillion (Euro) ~ Akai Koudan Zillion (Jpn)</description>
 		<year>1987</year>
