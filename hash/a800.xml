@@ -1,0 +1,1158 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+  All of the cartridges on this list run on the Atari 400-800 & XL/XE series except for the following ones
+  which only work (due to hardware & firmware issues in the original OS):
+
+  - BearJam (Chalk Board)
+  - Leo's 'Lectric Paintbrush (Chalk Board)
+  - LogicMaster (Chalk Board)
+  - MicroMaestro (Chalk Board)
+  - Micro Illustrator (Chalk Board)
+  - Monster Maze (Epyx)
+  - Demon Attack Imagic)
+  - K-Razy Kritters (K-Byte)
+  - Koala Painter (Koala)
+  - Astrochase (Parker Brothers)
+  - Gorf (Roklan)
+  - Attack at EP-CYG-4 (ROMOX)
+  - Chicken (Synapse)
+  - Picnic Paranoia (Synapse)
+  - Protector II (Synapse)
+  - Shamus (Synapse)
+  - Slime (Synapse)
+  - Kangaroo (Atari)
+  - Letter Perfect- 40 Column Version (LJK)
+-->
+
+<softwarelist name="a800" description="Atari 800 cartridges">
+
+<software name="810diag" supported="no">
+		<description>810 Diagnostic Cartridge</description>
+		<!-- <cart number>FD100006</cart number> -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="810 diagnostic cartridge.rom" size="8192" crc="b61f2a16" sha1="768299b3ca5bf391eeb0ac34dc3d94b5f31c0e91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+	<software name="3dtictac" supported="no">
+		<description>3D Tic-Tac-Toe</description>
+		<!-- <cart number>CXL4010</cart number> -->
+		<year>1979</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="3d tic-tac-toe.rom" size="8192" crc="1cf50ebe" sha1="2fd4c292d08d73dad61675206869746f58a401d2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abracada" supported="yes">
+		<description>Abracadabra!</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>TG Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="abracadabra!.rom" size="16384" crc="a35c775d" sha1="ed888289ee6c37ac3fa8b80e7e3250c7ca718fcd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="action" supported="no">
+		<description>Action! Programming Language</description>
+		<!-- <cart number></cart number> -->
+		<year>1984</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="action! programming language.rom" size="16384" crc="0bcd70c6" sha1="4bfa22c5b788b2c9eeeb5c917717d35a4bc82c7c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advcrtor" supported="yes">
+		<description>Adventure Creator</description>
+		<!-- <cart number>ADV-AT</cart number> -->
+		<year>1984</year>
+		<publisher>Spinnaker Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="adventure creator.rom" size="16384" crc="8746d9da" sha1="2e457c53969f6d8995049ce89b13204fcb79627d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alfclrcv" supported="yes">o
+		<description>Alf in the Color Caves</description>
+		<!-- <cart number>ALF-AT</cart number> -->
+		<year>1984</year>
+		<publisher>Spinnaker Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="alf in the color caves.rom" size="16384" crc="79df7f9d" sha1="d197de362de419f5963af89fc7ce34074c84ce10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alienamb" supported="no">
+		<description>Alien Ambush</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>DANA</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="alien ambush.rom" size="8192" crc="ad7bc30b" sha1="aba31902c7cda455c228bb3af6b7bb55422ea02d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alngrden" supported="no">
+		<description>Alien Garden</description>
+		<!-- <cart number>54</cart number> -->
+		<year>1982</year>
+		<publisher>Epyx</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="alien garden.rom" size="8192" crc="3e27ed0f" sha1="2a37f69183eb708dc843d3c38590c30f83a89ccd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphashd" supported="no">
+		<description>Alpha Shield</description>
+		<!-- <cart number>33022</cart number> -->
+		<year>1983</year>
+		<publisher>Sirius Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="alpha shield.rom" size="8192" crc="a7ade454" sha1="3ae82c0a2dc39f6e26adfb9bf4b10a3c195a6f1e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alphazoo" supported="yes">
+		<description>Alphabet Zoo</description>
+		<!-- <cart number>ABZ-AT</cart number> -->
+		<year>1983</year>
+		<publisher>Spinnaker Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="alphabet zoo.rom" size="16384" crc="c9613ecd" sha1="d7fe5688cf754615db87b5d031361fae9fcaada4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="animpuzl" supported="no">
+		<description>Animated Puzzle (Prototype)</description>
+		<!-- <cart number></cart number> -->
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="animated puzzle.rom" size="16384" crc="1a4c75a7" sha1="0c748721fb99d6f069ac263c253af2d13335c958" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="anteater" supported="no">
+		<description>Ant Eater</description>
+		<!-- <cart number></cart number> -->
+		<year>1982</year>
+		<publisher>Romox</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="ant eater.rom" size="8192" crc="c7290722" sha1="8a8031ac9611c119d6b4c90303460556a3321fd7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asmedit" supported="no">
+		<description>Assembler Editor Computing Language</description>
+		<!-- <cart number>CXL4003</cart number> -->
+		<year>1979</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="assembler editor computing language.rom" size="8192" crc="7dd6196c" sha1="42cb5fc35c76fde8cdf0c67db96a1c8a97af57ee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="asteroids" supported="no">
+		<description>Asteroids</description>
+		<!-- <cart number>CXL4013</cart number> -->
+		<year>1981</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="asteroids.rom" size="8192" crc="f9fff4a4" sha1="71b795834e575e17bf1deb259fc699315218454c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="achase" supported="yes">
+		<description>Astro Chase</description>
+		<!-- <cart number>1190</cart number> -->
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="astro chase.rom" size="16384" crc="11f1c7fa" sha1="36cca84a113e3adf6759a7c71df30cbed16924f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="astrgrvr" supported="yes">
+		<description>Astro Grover</description>
+		<!-- <cart number>4L-0502</cart number> -->
+		<year>1984</year>
+		<publisher>CBS Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="astro grover.rom" size="16384" crc="f44a0aeb" sha1="31b052644ca700fb2aa1952ecfd6ab53d0f47da6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basica" supported="no">
+		<description>Atari BASIC Programming Language (Revision A)</description>
+		<!-- <cart number>CXL4002</cart number> -->
+		<year>1979</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="atari basic programming language (revision a).rom" size="8192" crc="4bec4de2" sha1="70cdf57469a208528f78a14275837352e90e20f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicb" supported="no">
+		<description>Atari BASIC Programming Language (Revision B)</description>
+		<!-- <cart number>RX8002</cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="atari basic programming language (revision b).rom" size="8192" crc="f0202fb3" sha1="7ad88dd99ff4a6ee66f6d162074db6f8bef7a9b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basicc" supported="no">
+		<description>Atari BASIC Programming Language (Revision C)</description>
+		<!-- <cart number>RX8002</cart number> -->
+		<year>1986</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="atari basic programming language (revision c).rom" size="8192" crc="7d684184" sha1="3693c9cb9bf3b41bae1150f7a8264992468fc8c0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alogo" supported="no">
+		<description>Atari LOGO Computing Language</description>
+		<!-- <cart number>RX8032</cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="atari logo computing language.rom" size="16384" crc="9663db9d" sha1="b772587d9322adbdb995c96ac9f4fccd8316750f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="msbasic2" supported="no">
+		<description>Atari Microsoft BASIC II Programming Language</description>
+		<!-- <cart number>RX8035</cart number> -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="atari microsoft basic ii programming language.rom" size="16384" crc="24391ffb" sha1="9f0ee797e07bbc74d5d7b664157a80019634172d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aartist" supported="yes">
+		<description>AtariArtist</description>
+		<!-- <cart number>RX8053</cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="atariartist.rom" size="16384" crc="bbe37542" sha1="f7a8923c1e72b346a69b858bdd1f01c31b7c8dee" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="awriter" supported="partial">
+		<description>AtariWriter</description>
+		<!-- <cart number>RX8084</cart number> -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="atariwriter.rom" size="16384" crc="7be4533d" sha1="69a842a3b89e3f4780f3266262a4dabb57b2afb0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantis" supported="no">
+		<description>Atlantis</description>
+		<!-- <cart number>720125</cart number> -->
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="atlantis.rom" size="8192" crc="be0b390c" sha1="86b8be0921ef7250fae57cd459a773bbfa378e36" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="atlantisa" cloneof="atlantis" supported="no">
+		<description>Atlantis (Alt)</description>
+		<!-- <cart number>720125</cart number> -->
+		<year>1983</year>
+		<publisher>Imagic</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="atlantis [a].rom" size="8192" crc="f929f40f" sha1="c795029c69b7b88efad659e107cad415ff3e066e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="epcyg4" supported="yes">
+		<description>Attack at EP-CYG-4</description>
+		<!-- <cart number></cart number> -->
+		<year>1982</year>
+		<publisher>Romox</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="attack at ep-cyg-4.rom" size="16384" crc="dca02ca0" sha1="78d394217f9ad68907e7dd86464b02f751c2321b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mtntcmls" supported="no">
+		<description>Attack of the Mutant Camels</description>
+		<!-- <cart number>C518</cart number> -->
+		<year>1983</year>
+		<publisher>HesWare</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="attack of the mutant camels.rom" size="8192" crc="c933d741" sha1="06f4e357fe449be546d7059b22500a47b7c47798" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="agraphcs" supported="yes">
+		<description>AtariGraphics</description>
+		<!-- <cart number>RX8054)</cart number> -->
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="atarigraphics.rom" size="16384" crc="6ccdb004" sha1="9ebc119316113950c98e984cc9b0110047ad34a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baseball" supported="no">
+		<description>Baseball</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>Inhome Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="baseball.rom" size="16384" crc="065c3fd2" sha1="79e161cc29cf2e0b8ca1db8f42a8da3f5693254e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basxe41" supported="no">
+		<description>Basic XE Programming Language v4.1</description>
+		<!-- <cart number></cart number> -->
+		<year>1985</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="basic xe programming language v4.1.rom" size="16384" crc="003d3a36" sha1="76f06d212c5f972f9540bee26b23ecc010f3b535" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basxl103" supported="no">
+		<description>Basic XL Programming Language v1.03</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>OSS</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="basic xl programming language v1.03.rom" size="16384" crc="94a05568" sha1="01eefc1ed8625cf264a00b15acd6c3698cebfdcc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basketbl" supported="no">
+		<description>Atari Basketball</description>
+		<!-- <cart number>CXL4004</cart number> -->
+		<year>1979</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="atari basketball.rom" size="8192" crc="79934851" sha1="639e8f9bf907ed2c46d183f2cdbe33783f6da2fa" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bcquest" supported="no">
+		<description>BC's Quest for Tires</description>
+		<!-- <cart number>OTL-201</cart number> -->
+		<year>1983</year>
+		<publisher>Sierra On-Line</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="bc&apos;s quest for tires.rom" size="16384" crc="dddc6e36" sha1="c28f029ac5a388d791f22344ea078ed18660be4b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="beamridr" supported="no">
+		<description>Beamrider</description>
+		<!-- <cart number>CA-009</cart number> -->
+		<year>1984</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="beamrider.rom" size="16384" crc="2b05b8df" sha1="836b957e769632aace671a457fc07b7d0be1ca3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bearjam" supported="no">
+		<description>BearJam</description>
+		<!-- <cart number>10031A-3</cart number> -->
+		<year>1983</year>
+		<publisher>Chalk Board</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="bearjam.rom" size="8192" crc="1889c707" sha1="f6df83d8ef0410edd2eb177d503fe8e0e0be908f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berzerk" supported="no">
+		<description>Berzerk (Prototype)</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="berzerk.rom" size="16384" crc="1921f704" sha1="48b5735b2efdc19f91dde2f1b57f97a67d0f35ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="berzerka" cloneof="berzerk" supported="no">
+		<description>Berzerk (Prototype, Alt)</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="berzerk [a].rom" size="16384" crc="5a8f3353" sha1="e753f81aaac679f5061a7ef4816d470ec5454f45" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bigbrdfh" supported="no">
+		<description>Big Bird's Funhouse</description>
+		<!-- <cart number>4L-0505</cart number> -->
+		<year>1984</year>
+		<publisher>CBS Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="big bird&apos;s funhouse.rom" size="16384" crc="9fd095e0" sha1="f2bc6a83a31d8f1224026365558123ce5c9ef261" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bigbrdsd" supported="no">
+		<description>Big Bird's Special Delivery</description>
+		<!-- <cart number>4L-0109</cart number> -->
+		<year>1984</year>
+		<publisher>CBS Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="big bird&apos;s special delivery.rom" size="16384" crc="6d93b4fa" sha1="d8167ee465116425c6bd9ad254b2ba96844d000e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="blaster" supported="no">
+		<description>Blaster</description>
+		<!-- <cart number></cart number> -->
+		<year>1984</year>
+		<publisher>Williams</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="blaster.rom" size="16384" crc="ce1126a2" sha1="02eb5907b9e668ce57b7e561a146224728f01cb8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bdash" supported="no">
+		<description>Boulder Dash</description>
+		<!-- <cart number></cart number> -->
+		<year>1984</year>
+		<publisher>First Star Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="boulder dash.rom" size="16384" crc="af778329" sha1="151d12b58c30880a3640dffc5b1d67de790c0099" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bldrbmbs" supported="no">
+		<description>Boulder and Bombs</description>
+		<!-- <cart number>4L-2540</cart number> -->
+		<year>1982</year>
+		<publisher>CBS Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="boulders and bombs.rom" size="8192" crc="d6d51d3e" sha1="90901cd874f4ece8e18d9fff63e2368b4a315624" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bntybobs" supported="no">
+		<description>Bounty Bob Strikes Back!</description>
+		<!-- <cart number></cart number> -->
+		<year>1984</year>
+		<publisher>Big Five Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="40969">
+				<rom name="bounty bob strikes back!.rom" size="40960" crc="0d00f072" sha1="57e3856b6b00e94490350156620dc61cf0669c17" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bristles" supported="no">
+		<description>Bristles</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>First Star Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="bristles.rom" size="16384" crc="4263d64d" sha1="80a041bceb499e1466516488013aa4439b3db6f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="buckrog" supported="no">
+		<description>Buck Rogers : Planet of Zoom</description>
+		<!-- <cart number>005-03</cart number> -->
+		<year>1983</year>
+		<publisher>SEGA</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="buck rogers - planet of zoom.rom" size="16384" crc="84dd597c" sha1="cfea37ea951fede973faccba882afc7b64d02fcb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cptnbebl" supported="no">
+		<description>Captain Beeble</description>
+		<!-- <cart number>CR1002</cart number> -->
+		<year>1983</year>
+		<publisher>Inhome Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="captain beeble.rom" size="16384" crc="ad8400b1" sha1="bee1157a64578b1b714f17c644db5af2ac6980c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carnmass" supported="no">
+		<description>Carnival Massacre</description>
+		<!-- <cart number>THB12011</cart number> -->
+		<year>1983</year>
+		<publisher>Thorn EMI</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="carnival massacre.rom" size="16384" crc="0c8e8d5b" sha1="a3540dc84fbc1562eed92af22ea4407148bc9790" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castlhas" supported="no">
+		<description>Castle Hassle</description>
+		<!-- <cart number>09-01123</cart number> -->
+		<year>1983</year>
+		<publisher>Roklan</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="castle hassle.rom" size="16384" crc="844f7294" sha1="7411bf159b9ac31ed289c0ef3276b2e9e878ae86" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cstlkeys" supported="no">
+		<description>Castles and Keys</description>
+		<!-- <cart number>ECPC</cart number> -->
+		<year>1983</year>
+		<publisher>Romox</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="castles and keys.rom" size="16384" crc="be14c091" sha1="adbf3f7c5be41ae395ecca6a57fe8f2941061d2c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cvrnmars" supported="no">
+		<description>Caverns of Mars</description>
+		<!-- <cart number>RX8021</cart number> -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="caverns of mars.rom" size="16384" crc="8b9b2f5e" sha1="08b05c7a118530c9e3ac79eaef9514422b1bb5dc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centiped" supported="no">
+		<description>Centipede</description>
+		<!-- <cart number>CXL4020 & RX8020</cart number> -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="centipede.rom" size="8192" crc="44bb1842" sha1="2eed9a6bbc4c0396a0efc48fc810f9363c23a3c3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="centpedp" cloneof="centiped" supported="no">
+		<description>Centipede (Prototype)</description>
+		<!-- <cart number></cart number> -->
+		<year>1981</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="centipede (proto).rom" size="8192" crc="d54f0200" sha1="cece5a5023ea666826e538d2f02a599d241aeb57" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chess" supported="no">
+		<description>Chess</description>
+		<!-- <cart number>1100</cart number> -->
+		<year>1983</year>
+		<publisher>Parker Brothers</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="chess.rom" size="8192" crc="72860db1" sha1="0502b3946c80e064f46a607fc4df0a2977e8761f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chicken" supported="no">
+		<description>Chicken</description>
+		<!-- <cart number></cart number> -->
+		<year>1982</year>
+		<publisher>Synapse Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="chicken.rom" size="8192" crc="1ab4d8d8" sha1="ca13ce6116370cae7b464b53393ac801c6914a90" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chiffres" supported="no">
+		<description>Des Chiffres et des Lettres</description>
+		<!-- <cart number>RXF52001</cart number> -->
+		<year>1983</year>
+		<publisher>Atari France</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="chiffres et des lettres, des.rom" size="16384" crc="c7705c53" sha1="fd45a75178dbe2426373bf720639160ed91d892a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="choplift" supported="no">
+		<description>Choplifter!</description>
+		<!-- <cart number>ATCART191</cart number> -->
+		<year>1982</year>
+		<publisher>Br0derbund Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="choplifter!.rom" size="16384" crc="3ebc05ff" sha1="a8a28c18e249272c27f7d72f7c40dab2e8d712f2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="clamjmpr" supported="no">
+		<description>Claim Jumper</description>
+		<!-- <cart number></cart number> -->
+		<year>1982</year>
+		<publisher>Synapse Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="claim jumper.rom" size="16384" crc="fae1b7e4" sha1="3ab10714fe115d6ea229458c847db26a314e9adf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cldburst" supported="no">
+		<description>Cloudburst</description>
+		<!-- <cart number></cart number> -->
+		<year>1982</year>
+		<publisher>DANA</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="cloudburst.rom" size="8192" crc="32e5629e" sha1="56f2ec0ee4fd2f2c7532cd6a792a0a193cb5e91d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="coconots" supported="no">
+		<description>Coco-Notes</description>
+		<!-- <cart number>4L-9847</cart number> -->
+		<year>1984</year>
+		<publisher>CBS Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="coco-notes.rom" size="16384" crc="f93c615b" sha1="d70ef079097293256a9b0d2bb34f8b8a49eac565" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compchss" supported="no">
+		<description>Computer Chess</description>
+		<!-- <cart number>CXL4009</cart number> -->
+		<year>1979</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="computer chess.rom" size="8192" crc="5ce06e94" sha1="94ee63b7d0e65209575f576e78ba320f04c3eb20" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="compwar" supported="no">
+		<description>Computer War</description>
+		<!-- <cart number>THA12010</cart number> -->
+		<year>1983</year>
+		<publisher>Thorn EMI</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="computer war.rom" size="16384" crc="8a44d135" sha1="624e781b22e191f4aeb524f00997e1e8dfd05a0a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="congo" supported="no">
+		<description>Congo Bongo</description>
+		<!-- <cart number>006-03</cart number> -->
+		<year>1983</year>
+		<publisher>SEGA</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="congo bongo.rom" size="16384" crc="7a588045" sha1="64c0a80e7dc289a62669e6e770f0d2b622b01036" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmclfe" supported="no">
+		<description>Cosmic Life</description>
+		<!-- <cart number>COS-AT</cart number> -->
+		<year>1983</year>
+		<publisher>Spinnaker Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="cosmic life.rom" size="8192" crc="ec65758b" sha1="7c98acfb21cbc8059951c66893f4b077e8cb324c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cosmtnls" supported="no">
+		<description>Cosmic Tunnels (Prototype)</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>Datamost</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="cosmic tunnels (proto).rom" size="16384" crc="ad56c2bf" sha1="8ef473276b88049666c88c36f465a54cd98a2484" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crssfire" supported="no">
+		<description>CrossFire</description>
+		<!-- <cart number>ORM-001</cart number> -->
+		<year>1981</year>
+		<publisher>Sierra On-Line</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="crossfire.rom" size="8192" crc="4d7e0503" sha1="f307396c6230d79275f0a3d8898eca84c8b97209" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ccastles" supported="no">
+		<description>Crystal Castles (Prototype)</description>
+		<!-- <cart number></cart number> -->
+		<year>1984</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="crystal castles (proto).rom" size="16384" crc="6c64892c" sha1="d9f7a3185c17655ef3cfb848a13d2f1090b565e7" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dafuzz" supported="no">
+		<description>Da' Fuzz</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>Roklan</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="da&apos; fuzz.rom" size="16384" crc="b94f66ea" sha1="2385600e69163671c45fdb2e93d8bf20df5d65f3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dncfntsy" supported="no">
+		<description>Dance Fantasy</description>
+		<!-- <cart number>DCF-AT</cart number> -->
+		<year>1984</year>
+		<publisher>Fisher Price</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="dance fantasy.rom" size="8192" crc="faec94e7" sha1="85e64f5d599b8c9a69d2e4cdb09535731897bca9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decathln" supported="no">
+		<description>Decathalon</description>
+		<!-- <cart number>CC-008</cart number> -->
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="decathlon.rom" size="16384" crc="affbe54b" sha1="7a6e2761f9ba1983c2b76f71ca08ae097691617f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="decathln1" cloneof="decathln" supported="no">
+		<description>Decathalon (Alt)</description>
+		<!-- <cart number>CC-008</cart number> -->
+		<year>1983</year>
+		<publisher>Activision</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="decathlon (a).rom" size="16384" crc="76845603" sha1="b084f54f142ac9c6e9c010e0ae8d7427dbd5230c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="defender" supported="no">
+		<description>Defender</description>
+		<!-- <cart number>CXL4025 & RX8025</cart number> -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="defender.rom" size="16384" crc="161cbe09" sha1="81f8bc26963ee92df897cd025005020f78c0f4ae" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dltadraw" supported="no">
+		<description>Delta Drawing</description>
+		<!-- <cart number>DLD-AT</cart number> -->
+		<year>1983</year>
+		<publisher>Spinnaker Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="delta drawing.rom" size="8192" crc="20cbad07" sha1="ca9165d3ce9b77cc7e6f099ff24b0db0bec19c71" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dlxinvdr" supported="no">
+		<description>Deluxe Invaders</description>
+		<!-- <cart number>09-01101</cart number> -->
+		<year>1981</year>
+		<publisher>Roklan</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="deluxe invaders.rom" size="8192" crc="15dc9b31" sha1="c168b06d66afc07f0f49d21bc3e52ddf02ee5c91" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dmnattk" supported="no">
+		<description>Demon Attack</description>
+		<!-- <cart number>720149</cart number> -->
+		<year>1982</year>
+		<publisher>Imagic</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="demon attack.rom" size="8192" crc="f6471dd9" sha1="cb618400311aefa5b004208405a030231b983f2f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="destiny" supported="no">
+		<description>Destiny : The Cruiser (Prototype)</description>
+		<!-- <cart number></cart number> -->
+		<year>198?</year>
+		<publisher>Adventure International</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="destiny - the cruiser (proto).rom" size="16384" crc="0c847bb3" sha1="42ce8d92159e798f74ec9816017c464339f719a1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diamond" supported="no">
+		<description>Diamond Desktop v2.0</description>
+		<!-- <cart number></cart number> -->
+		<year>1989</year>
+		<publisher>Reeve Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="diamond desktop v2.0.rom" size="65536" crc="0ead07f8" sha1="e9203742580d50aba99bb85d8f04816ac76df730" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diamondm" supported="no">
+		<description>Diamond Mine</description>
+		<!-- <cart number>09-01131</cart number> -->
+		<year>1983</year>
+		<publisher>Roklan</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="diamond mine.rom" size="16384" crc="d8f9b867" sha1="1a88faf57a90ee5a69f9a1bdcc98ec436b38b867" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digdug" supported="no">
+		<description>Dig Dug</description>
+		<!-- <cart number>RX8026</cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="dig dug.rom" size="16384" crc="fdbc57ed" sha1="cbdf46cb6bc168a3473e3f5b958c22059080e11c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digdug1" cloneof="digdug" supported="no">
+		<description>Dig Dug (Earlier Release)</description>
+		<!-- <cart number>RX8026</cart number> -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="dig dug (alt).rom" size="16384" crc="29b44ff6" sha1="d4cf273de84e999c8da4148d452e1e62441eed1a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="digdug2" cloneof="digdug" supported="no">
+		<description>Dig Dug (Prototype)</description>
+		<!-- <cart number></cart number> -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="dig dug (proto).rom" size="16384" crc="6d68114e" sha1="de7ff90bb9c2b9f890a2cc8d3bb54766d6103684" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkong" supported="no">
+		<description>Donkey Kong</description>
+		<!-- <cart number>RX8031</cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="donkey kong.rom" size="16384" crc="f2b76a27" sha1="0b081e5447c0a4a24b11c9cec819b5b11b40afff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dkongjr" supported="no">
+		<description>Donkey Kong Jr.</description>
+		<!-- <cart number>RX8040</cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="donkey kong jr..rom" size="16384" crc="a4eb70ef" sha1="7870e05a20765e4536db21239cbffb83590dc706" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="droids" supported="no">
+		<description>Droids</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>TG Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="droids.rom" size="8192" crc="440082e6" sha1="5c1afe5dc5664b52fef6cf47f0b5a20bc54a79db" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="duckahoy" supported="no">
+		<description>Ducks Ahoy!</description>
+		<!-- <cart number>4L-9889</cart number> -->
+		<year>1984</year>
+		<publisher>CBS Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ducks ahoy!.rom" size="16384" crc="6b7a42bd" sha1="9c1f5d49eec4c65be86eaa01e97dd4a64f720282" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="etphone" supported="no">
+		<description>E.T. Phone Home!</description>
+		<!-- <cart number>RX8030</cart number> -->
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="e.t. phone home!.rom" size="16384" crc="bce4ef51" sha1="c4a10ce59ee183ef4299e50a0825ec23b4315b56" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eastfrnt" supported="no">
+		<description>Eastern Front : 1941</description>
+		<!-- <cart number>RX8039</cart number> -->
+		<year>1982</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="eastern front - 1941.rom" size="16384" crc="ccff4a03" sha1="aee71f33534cf566994358a909b4b2dca63a84f1" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="edusys" supported="no">
+		<description>Educational System Master Cartridge</description>
+		<!-- <cart number>CXL4001</cart number> -->
+		<year>1979</year>
+		<publisher>Atari</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="educational system master cartridge.rom" size="8192" crc="18cc7c94" sha1="9fd7936767b0a193da9b01e27dac78e68b5f52b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="embargo" supported="no">
+		<description>Embargo</description>
+		<!-- <cart number></cart number> -->
+		<year>1982</year>
+		<publisher>Gebelli Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="embargo.rom" size="8192" crc="07b1560c" sha1="464a127b9abb0700a34eb5068ef5c7a1c858e238" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mgcshaps" supported="no">
+		<description>Ernie's Magic Shapes</description>
+		<!-- <cart number>4L-0108</cart number> -->
+		<year>1984</year>
+		<publisher>CBS Software</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="ernie&apos;s magic shapes.rom" size="16384" crc="435f5aba" sha1="05b935e0a1cae9b72fad28e7ec0b443080ede57a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="espial" supported="no">
+		<description>Espial</description>
+		<!-- <cart number>7-012-468</cart number> -->
+		<year>1984</year>
+		<publisher>Tigervision</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="espial.rom" size="16384" crc="dcde7482" sha1="2e91cbe5a17ce1bddf5745691e5bf4ed29564979" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expando1" supported="no">
+		<description>Expando-Vision 1 - Weight Control and Exercise</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>Stimutech</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="expando-vision 1 - weight control and exercise.rom" size="8192" crc="1b5848c0" sha1="929d9d2d7f523e0a3bb86bb08d90905e60fd4e0b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="expando3" supported="no">
+		<description>Expando-Vision 3 - Stress Control and Positive Thinking</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>Stimutech</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="expando-vision 3 - stress control and positive thinking.rom" size="8192" crc="b68b0a9b" sha1="5095dc591f7209e55c4d754110f427d23a1abb10" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="expando4" supported="no">
+		<description>Expando-Vision 4 - Control Drinking and Responsibility</description>
+		<!-- <cart number></cart number> -->
+		<year>1983</year>
+		<publisher>Stimutech</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="expando-vision 4 - control drinking and responsibility.rom" size="8192" crc="2343acf3" sha1="1cea338dabfbf22ec9be0a76796e3fee6d4e78b6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+		<software name="express" supported="no">
+		<description>Express! v1.12</description>
+		<!-- <cart number></cart number> -->
+		<year>1989</year>
+		<publisher>Orion Micro Systems</publisher>
+		<part name="cart" interface="a800_cart">
+			<dataarea name="rom" size="65536">
+				<rom name="express! v1.12.rom" size="65536" crc="4a5fcefd" sha1="5ed02fc71cdc1ba661120e873fcf58feade78d7a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

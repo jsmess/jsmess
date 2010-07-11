@@ -1,7 +1,25 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!--
+
+Undumped carts:
+
+ * GPA-103 - Tutankham ~ ツターンカーム
+ * GPA-105 - Dig Dug ~ ディグダグ
+ * GPA-106 - Warp & Warp ~ ワープ＆ワープ
+ * GPA-107 - Turpin ~ ターピン
+ * GPA-108 - ??? [possibly no game used this ID]
+ * GPA-110 - Fighting Bug ~ ファイティング バグ
+ * GPA-111 - Space Panic ~ スペースパニック
+ * GPA-112 - Naughty Boy ~ ノーティーボーイ
+ * GPA-113 - ??? [possibly no game used this ID]
+ * GPA-114 - Dirty Chameleon ~ ダーティー カメレオン
+
+-->
+
 <softwarelist name="pv1000" description="Casio PV-1000 cartridges">
-	<!-- GPA-101 -->
+	<!-- Serial: GPA-101 - Alt Title: プーヤン -->
 	<software name="pooyan">
 		<description>Pooyan</description>
 		<year>1982</year>
@@ -13,7 +31,7 @@
 		</part>
 	</software>
 
-	<!-- GPA-102 -->
+	<!-- Serial: GPA-102 - Alt Title: スーパーコブラ -->
 	<software name="scobra">
 		<description>Super Cobra</description>
 		<year>1981</year>
@@ -25,7 +43,7 @@
 		</part>
 	</software>
 
-	<!-- GPA-104 -->
+	<!-- Serial: GPA-104 - Alt Title: アミダー -->
 	<software name="amidar">
 		<description>Amidar</description>
 		<year>1982</year>
@@ -37,7 +55,7 @@
 		</part>
 	</software>
 
-	<!-- GPA-109 -->
+	<!-- Serial: GPA-109 - Alt Title: パチンコＵＦＯ -->
 	<software name="pchnkufo" supported="no">
 		<description>Pachinko-UFO</description>
 		<year>1982</year>
@@ -49,7 +67,7 @@
 		</part>
 	</software>
 
-	<!-- GPA-115 -->
+	<!-- Serial: GPA-115 - Alt Title: エキサイト麻雀 -->
 	<software name="excitemj">
 		<description>Excite Mahjong</description>
 		<year>1982</year>
@@ -60,18 +78,5 @@
 			</dataarea>
 		</part>
 	</software>
-
-<!--
-	/* Tutankham GPA-103 */
-	/* Dig Dug GPA-105 */
-	/* Warp & Warp GPA-106 */
-	/* Turpin GPA-107 */
-	/* GPA-108 */
-	/* Fighting Bug GPA-110 */
-	/* Space Panic GPA-111 */
-	/* Naughty Boy GPA-112 */
-	/* GPA-113 */
-	/* Dirty Chameleon GPA-114 */
--->
 
 </softwarelist>
