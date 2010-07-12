@@ -158,7 +158,7 @@ void debug_view_state::recompute()
 	tailptr = &(*tailptr)->m_next;
 
 	// add a beam entry: frame:123456
-	*tailptr = auto_alloc(&m_machine, state_item(REG_FRAME, "frame", 3));
+	*tailptr = auto_alloc(&m_machine, state_item(REG_FRAME, "frame", 6));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a flags entry: flags:xxxxxxxx
@@ -290,7 +290,7 @@ void debug_view_state::view_update()
 						if (screen != NULL)
 						{
 							curitem->m_currval = screen->frame_number();
-							valstr.printf("%3d", (UINT32)curitem->m_currval);
+							valstr.printf("%6d", (UINT32)curitem->m_currval);
 						}
 						break;
 				}
