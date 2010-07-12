@@ -543,7 +543,11 @@ void legacy_image_device_base::clear()
 
 void legacy_image_device_base::unload()
 {
+	if (is_loaded()) {
+		call_unload();
+	}
     clear();
+	clear_error();
 }
 
 int legacy_image_device_base::call_load()
