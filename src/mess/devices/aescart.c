@@ -489,6 +489,16 @@ static void install_protection(device_image_interface& image)
 		install_pvc_protection(image.device().machine);
 		logerror("Decrypted Metal Slug 5 code and graphics, and installed protection routines.\n");
 	}
+	if(strcmp(crypt_feature,"kof2003_crypt") == 0)
+	{
+		kof2003h_decrypt_68k(image.device().machine);
+		neo_pcm2_swap(image.device().machine, 5);
+		state->fixed_layer_bank_type = 2;
+		neogeo_cmc50_m1_decrypt(image.device().machine);
+		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x9d);
+		install_pvc_protection(image.device().machine);
+		logerror("Decrypted KOF2003 code and graphicss, and installed protection routines.\n");
+	}
 }
 
 /*
