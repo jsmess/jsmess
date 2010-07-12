@@ -158,7 +158,7 @@ void debug_view_state::recompute()
 	tailptr = &(*tailptr)->m_next;
 
 	// add a beam entry: frame:123456
-	*tailptr = auto_alloc(&m_machine, state_item(REG_FRAME, "frame", 6));
+	*tailptr = auto_alloc(&m_machine, state_item(REG_FRAME, "frame", 3));
 	tailptr = &(*tailptr)->m_next;
 
 	// add a flags entry: flags:xxxxxxxx
