@@ -2,7 +2,7 @@
    
         Driver for Casio PV-2000
 
-        07/13/2010 Skeleton driver.
+        13/07/2010 Skeleton driver.
 
 ****************************************************************************/
 
@@ -11,6 +11,8 @@
 
 static ADDRESS_MAP_START(pv2000_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pv2000_io , ADDRESS_SPACE_IO, 8)
@@ -18,7 +20,7 @@ static ADDRESS_MAP_START( pv2000_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( pv2000 )
+static INPUT_PORTS_START( pv2000 )
 INPUT_PORTS_END
 
 
