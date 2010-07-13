@@ -1655,6 +1655,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/rvoice.o	\
 	$(MESS_DRIVERS)/sage2.o		\
 	$(MESS_DRIVERS)/sbc6510.o	\
+	$(MESS_DRIVERS)/smc777.o	\
 	$(MESS_DRIVERS)/swtpc.o		\
 	$(MESS_DRIVERS)/sys2900.o	\
 	$(MESS_DRIVERS)/tricep.o	\

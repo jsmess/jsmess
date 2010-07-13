@@ -21,6 +21,7 @@ Skeleton drivers:
 - Salora Manager [Curt Coder]
 - VTech PreComputer Prestige [Joseba Epalza, Curt Coder]
 - Casio PV-2000
+- Sony SMC-777
 
 
 System Driver Changes:
