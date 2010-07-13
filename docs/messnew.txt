@@ -22,6 +22,8 @@ Skeleton drivers:
 - VTech PreComputer Prestige [Joseba Epalza, Curt Coder]
 - Casio PV-2000
 - Sony SMC-777
+- Mitsubishi Multi 8
+- Bandai Gundam RX-78
 
 
 System Driver Changes:

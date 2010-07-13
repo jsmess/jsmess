@@ -1637,6 +1637,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mk14.o		\
 	$(MESS_DRIVERS)/mmd1.o		\
 	$(MESS_DRIVERS)/mod8.o		\
+	$(MESS_DRIVERS)/multi8.o	\
 	$(MESS_DRIVERS)/msbc1.o		\
 	$(MESS_DRIVERS)/nanos.o		\
 	$(MESS_DRIVERS)/next.o		\
@@ -1653,6 +1654,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/pyl601.o	\
 	$(MESS_DRIVERS)/qtsbc.o		\
 	$(MESS_DRIVERS)/rvoice.o	\
+	$(MESS_DRIVERS)/rx78.o	\
 	$(MESS_DRIVERS)/sage2.o		\
 	$(MESS_DRIVERS)/sbc6510.o	\
 	$(MESS_DRIVERS)/smc777.o	\

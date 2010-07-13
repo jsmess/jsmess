@@ -1710,5 +1710,7 @@ const game_driver * const drivers[] =
 	DRIVER( pasopia7 )
 	DRIVER( prestige )
 	DRIVER( smc777 )
+	DRIVER( multi8 )
+	DRIVER( rx78 )
 
 #endif /* DRIVER_RECURSIVE */

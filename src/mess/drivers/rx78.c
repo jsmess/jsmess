@@ -1,47 +1,47 @@
 /***************************************************************************
    
-        Driver for Casio PV-2000
+        Bandai Gundam RX-78
 
-        07/13/2010 Skeleton driver.
+        13/07/2010 Skeleton driver.
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 
-static ADDRESS_MAP_START(pv2000_mem, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START(rx78_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pv2000_io , ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( rx78_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( pv2000 )
+INPUT_PORTS_START( rx78 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(pv2000) 
+static MACHINE_RESET(rx78) 
 {	
 }
 
-static VIDEO_START( pv2000 )
+static VIDEO_START( rx78 )
 {
 }
 
-static VIDEO_UPDATE( pv2000 )
+static VIDEO_UPDATE( rx78 )
 {
     return 0;
 }
 
-static MACHINE_DRIVER_START( pv2000 )
+static MACHINE_DRIVER_START( rx78 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
-    MDRV_CPU_PROGRAM_MAP(pv2000_mem)
-    MDRV_CPU_IO_MAP(pv2000_io)	
+    MDRV_CPU_PROGRAM_MAP(rx78_mem)
+    MDRV_CPU_IO_MAP(rx78_io)	
 
-    MDRV_MACHINE_RESET(pv2000)
+    MDRV_MACHINE_RESET(rx78)
 	
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
@@ -53,18 +53,18 @@ static MACHINE_DRIVER_START( pv2000 )
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 
-    MDRV_VIDEO_START(pv2000)
-    MDRV_VIDEO_UPDATE(pv2000)
+    MDRV_VIDEO_START(rx78)
+    MDRV_VIDEO_UPDATE(rx78)
 MACHINE_DRIVER_END
 
 /* ROM definition */
-ROM_START( pv2000 )
+ROM_START( rx78 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "ipl.rom", 0x0000, 0x4000, CRC(78ecfb99) SHA1(cdf54cb713f65fd1197002cc5082eaafe13625aa))
+	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(a194ea53) SHA1(ba39e73e6eb7cbb8906fff1f81a98964cd62af0d))
 ROM_END
 
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( ????, pv2000,  0,       0, 	pv2000, 	pv2000, 	 0,   "Casio",   "PV-2000",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, rx78,  	0,       0, 		rx78, 	rx78, 	 0,  	  "Bandai",   "Gundam RX-78",		GAME_NOT_WORKING | GAME_NO_SOUND)
 
