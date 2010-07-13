@@ -14,6 +14,9 @@ http://hou4gong1.mo-blog.jp/.shared/image.html?/photos/uncategorized/pv_2000_k1.
 http://hou4gong1.mo-blog.jp/.shared/image.html?/photos/uncategorized/pv_2000_14.jpg
 http://hou4gong1.mo-blog.jp/.shared/image.html?/photos/uncategorized/pv_2000_15.jpg
 
+Keyboard inputs are partially supported. Keys missing from the input ports:
+DEL, MODE, CONT, TAB, SHIFT, ATTACK 0, ATTACK 1, COLOR, GAME?
+
 Also See:
 http://www2.odn.ne.jp/~haf09260/Pv2000/EnrPV.htm
 For BIOS CRC confirmation
@@ -27,22 +30,117 @@ For BIOS CRC confirmation
 #include "devices/cartslot.h"
 
 
-static int last_state=0;
+class pv2000_state
+{
+public:
+	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pv2000_state(machine)); }
+
+	pv2000_state(running_machine &machine) { last_state = 0; }
+
+	int		last_state;
+	UINT8	keyb_column;
+	UINT8	key_pressed;
+};
+
 
 static WRITE8_HANDLER( pv2000_keys_w )
 {
-	switch(offset){
-		default:break;
-	}
+	pv2000_state *state = (pv2000_state *)space->machine->driver_data;
+
+	logerror( "%s: pv2000_keys_w %02x\n", cpuexec_describe_context(space->machine), data );
+
+	state->keyb_column = data & 0x0f;
+
+	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-static READ8_HANDLER( pv2000_keys_r )
+
+static READ8_HANDLER( pv2000_keys_hi_r )
 {
-	switch(offset){
-		default:break;
+	pv2000_state *state = (pv2000_state *)space->machine->driver_data;
+	UINT8 data = 0;
+
+	switch ( state->keyb_column )
+	{
+	case 0:
+		data = input_port_read( space->machine, "IN0" ) >> 4;
+		break;
+	case 1:
+		data = input_port_read( space->machine, "IN1" ) >> 4;
+		break;
+	case 2:
+		data = input_port_read( space->machine, "IN2" ) >> 4;
+		break;
+	case 3:
+		data = input_port_read( space->machine, "IN3" ) >> 4;
+		break;
+	case 4:
+		data = input_port_read( space->machine, "IN4" ) >> 4;
+		break;
+	case 5:
+		data = input_port_read( space->machine, "IN5" ) >> 4;
+		break;
+	case 6:
+		data = input_port_read( space->machine, "IN6" ) >> 4;
+		break;
+	case 7:
+		data = input_port_read( space->machine, "IN7" ) >> 4;
+		break;
+	case 8:
+		data = input_port_read( space->machine, "IN8" ) >> 4;
+		break;
 	}
 
-	return 0;
+	return data;
+}
+
+
+static READ8_HANDLER( pv2000_keys_lo_r )
+{
+	pv2000_state *state = (pv2000_state *)space->machine->driver_data;
+	UINT8 data = 0;
+
+	logerror("%s: pv2000_keys_r\n", cpuexec_describe_context(space->machine) );
+
+	switch ( state->keyb_column )
+	{
+	case 0:
+		data = input_port_read( space->machine, "IN0" ) & 0x0f;
+		break;
+	case 1:
+		data = input_port_read( space->machine, "IN1" ) & 0x0f;
+		break;
+	case 2:
+		data = input_port_read( space->machine, "IN2" ) & 0x0f;
+		break;
+	case 3:
+		data = input_port_read( space->machine, "IN3" ) & 0x0f;
+		break;
+	case 4:
+		data = input_port_read( space->machine, "IN4" ) & 0x0f;
+		break;
+	case 5:
+		data = input_port_read( space->machine, "IN5" ) & 0x0f;
+		break;
+	case 6:
+		data = input_port_read( space->machine, "IN6" ) & 0x0f;
+		break;
+	case 7:
+		data = input_port_read( space->machine, "IN7" ) & 0x0f;
+		break;
+	case 8:
+		data = input_port_read( space->machine, "IN8" ) & 0x0f;
+		break;
+	case 9:
+		data = 0xff;
+
+		/* bit 3 = 0 => there is keyboard data */
+		if ( state->key_pressed )
+			data &= 0xf7;
+		break;
+	}
+
+	return data;
 }
 
 
@@ -66,8 +164,8 @@ static ADDRESS_MAP_START( pv2000_io_map, ADDRESS_SPACE_IO, 8 )
 	//theres also printer and tape I/O (TODO)
 
 	//keyboard/joystick
-	//AM_RANGE(0x10, 0x10) AM_READ(pv2000_keys_r)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(pv2000_keys_r, pv2000_keys_w)
+	AM_RANGE(0x10, 0x10) AM_READ(pv2000_keys_hi_r)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(pv2000_keys_lo_r, pv2000_keys_w)
 	//AM_RANGE(0x40, 0x40) AM_READ(pv2000_keys_r)
 
 	//sn76489a
@@ -77,6 +175,95 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pv2000 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Hiragana")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Yen")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN4_1") /* DEL / MODE / STOP ?? */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN4_2") /* DEL / MODE / STOP ?? */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_HOME) PORT_CHAR(UCHAR_MAMEKEY(HOME))
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+
+	PORT_START("IN5")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CRSR Up+Left")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CRSR Down+Left")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CRSR Up+Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("CRSR Down+Right")
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+
+	PORT_START("IN6")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_DOWN) PORT_CHAR(UCHAR_MAMEKEY(DOWN))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RIGHT) PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN6_2") /* Unknown ?? */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN6_3") /* Unknown ?? */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON) PORT_CHAR(';')
+
+	PORT_START("IN7")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LEFT) PORT_CHAR(UCHAR_MAMEKEY(LEFT))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN7_2") /* Unknown ?? */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN7_3") /* Unknown ?? */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
+
+	PORT_START("IN8")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_0") /* Unknown ? */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_1") /* Unknown ? */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_2") /* Unknown ? */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_3") /* Unknown ? */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_5") /* Unknown ? */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_6") /* Unknown ? */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_7") /* Unknown ? */
 
 INPUT_PORTS_END
 
@@ -86,13 +273,37 @@ static INTERRUPT_GEN( pv2000_interrupt )
    TMS9928A_interrupt(device->machine);
 }
 
-static void pv2000_vdp_interrupt(running_machine *machine, int state)
+static void pv2000_vdp_interrupt(running_machine *machine, int new_state)
 {
+	pv2000_state *state = (pv2000_state *)machine->driver_data;
+
     // only if it goes up
-	if (state && !last_state)
+	if (new_state && !state->last_state)
 		cputag_set_input_line(machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 
-	last_state = state;
+	state->last_state = new_state;
+
+	/* Check if irq triggering from keyboard presses is enabled */
+	if ( state->keyb_column == 0x0f )
+	{
+		/* Check if a key is pressed */
+		UINT8 key_pressed;
+
+		key_pressed = input_port_read( machine, "IN0" )
+			| input_port_read( machine, "IN1" )
+			| input_port_read( machine, "IN2" )
+			| input_port_read( machine, "IN3" )
+			| input_port_read( machine, "IN4" )
+			| input_port_read( machine, "IN5" )
+			| input_port_read( machine, "IN6" )
+			| input_port_read( machine, "IN7" )
+			| input_port_read( machine, "IN8" );
+
+		if ( key_pressed && state->key_pressed != key_pressed )
+			cputag_set_input_line(machine, "maincpu", INPUT_LINE_IRQ0, ASSERT_LINE);
+
+		state->key_pressed = key_pressed;
+	}
 }
 
 
@@ -114,7 +325,12 @@ static MACHINE_START( pv2000 )
 
 static MACHINE_RESET( pv2000 )
 {
-	last_state = 0;
+	pv2000_state *state = (pv2000_state *)machine->driver_data;
+
+	state->last_state = 0;
+	state->key_pressed = 0;
+	state->keyb_column = 0;
+
 	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&memory_region(machine, "maincpu")[0x7000], 0xff, 0x1000);	// initialize RAM
 }
@@ -123,6 +339,8 @@ static MACHINE_RESET( pv2000 )
 /* Machine Drivers */
 
 static MACHINE_DRIVER_START( pv2000 )
+	MDRV_DRIVER_DATA( pv2000_state )
+
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_7_15909MHz/2)	// 3.579545 MHz
 	MDRV_CPU_PROGRAM_MAP(pv2000_map)
