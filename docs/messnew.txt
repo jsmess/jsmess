@@ -24,6 +24,8 @@ Skeleton drivers:
 - Sony SMC-777
 - Mitsubishi Multi 8
 - Bandai Gundam RX-78
+- Hitachi Basic Master Jr (MB-6885)
+- Hitachi Basic Master Level 3 (MB-6890)
 
 
 System Driver Changes:

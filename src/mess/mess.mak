@@ -1611,6 +1611,8 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/alesis.o	\
 	$(MESS_DRIVERS)/amico2k.o	\
 	$(MESS_DRIVERS)/beehive.o	\
+	$(MESS_DRIVERS)/bmjr.o		\
+	$(MESS_DRIVERS)/bml3.o		\
 	$(MESS_DRIVERS)/bob85.o		\
 	$(MESS_DRIVERS)/busicom.o	\
 	$(MESS_VIDEO)/busicom.o		\

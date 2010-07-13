@@ -1712,5 +1712,7 @@ const game_driver * const drivers[] =
 	DRIVER( smc777 )
 	DRIVER( multi8 )
 	DRIVER( rx78 )
+	DRIVER( bmjr )
+	DRIVER( bml3 )
 
 #endif /* DRIVER_RECURSIVE */
