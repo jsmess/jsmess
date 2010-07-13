@@ -20,7 +20,7 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 /* Input ports */
-INPUT_PORTS_START( smc777 )
+static INPUT_PORTS_START( smc777 )
 INPUT_PORTS_END
 
 
@@ -36,6 +36,24 @@ static VIDEO_UPDATE( smc777 )
 {
     return 0;
 }
+
+/* F4 Character Displayer */
+static const gfx_layout smc777_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	320,					/* 320 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( smc777 )
+	GFXDECODE_ENTRY( "maincpu", 0x0200, smc777_charlayout, 0, 1 )
+GFXDECODE_END
 
 static MACHINE_DRIVER_START( smc777 )
     /* basic machine hardware */
@@ -54,6 +72,7 @@ static MACHINE_DRIVER_START( smc777 )
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
+	MDRV_GFXDECODE(smc777)
 
     MDRV_VIDEO_START(smc777)
     MDRV_VIDEO_UPDATE(smc777)
