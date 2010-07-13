@@ -26,7 +26,7 @@ Skeleton drivers:
 - Bandai Gundam RX-78
 - Hitachi Basic Master Jr (MB-6885)
 - Hitachi Basic Master Level 3 (MB-6890)
-
+- Sharp MZ-2000
 
 System Driver Changes:
 ----------------------

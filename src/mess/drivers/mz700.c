@@ -411,9 +411,10 @@ ROM_END
 
 ROM_START( mz700j )
 	ROM_REGION( 0x1000, "monitor", 0 )
-	ROM_LOAD( "1z-013a.rom", 0x0000, 0x1000, CRC(4c6c6b7b) SHA1(ef8f7399e86c1dc638a5cb83efdb73369c2b5735) )
-
+	ROM_LOAD( "1z-009b.rom", 0x0000, 0x1000, CRC(ab1fbe6f) SHA1(7b10d7965c541393e33a265bcf71a00314d2db7a))
+	
 	ROM_REGION( 0x1000, "cgrom", 0 )
+	//ROM_LOAD( "mz700fon.jp", 0x0000, 0x1000, CRC(697ec121) SHA1(5eb1d42d273b1fd2cab120486279ab8ff6c85dc7))	
 	ROM_LOAD( "mz700fon.jpn", 0x0000, 0x1000, CRC(425eedf5) SHA1(bd2cc750f2d2f63e50a59786668509e81a276e32) )
 ROM_END
 
@@ -423,8 +424,11 @@ ROM_START( mz800 )
 ROM_END
 
 ROM_START( mz1500 )
-	ROM_REGION( 0x4000, "monitor", 0 )
-	ROM_LOAD( "1z-009b.rom", 0x0000, 0x1000, CRC(ab1fbe6f) SHA1(7b10d7965c541393e33a265bcf71a00314d2db7a) )
+	ROM_REGION( 0x4000, "monitor", 0 )	
+	ROM_LOAD( "9z-502m.rom",  0x0000, 0x2800, CRC(643db428) SHA1(c2ad8af2ef00db32afde54d5741b07de5d4da16a))
+	ROM_REGION( 0x1000, "cgrom", 0 )
+	//ROM_LOAD( "mz700fon.jp", 0x0000, 0x1000, CRC(697ec121) SHA1(5eb1d42d273b1fd2cab120486279ab8ff6c85dc7))	
+	ROM_LOAD( "mz700fon.jpn", 0x0000, 0x1000, CRC(425eedf5) SHA1(bd2cc750f2d2f63e50a59786668509e81a276e32) )
 ROM_END
 
 /***************************************************************************

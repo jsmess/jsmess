@@ -345,6 +345,14 @@ ROM_START( mz80b )
 	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
 ROM_END
 
+ROM_START( mz2000 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mz20ipl.bin",0x0000, 0x0800, CRC(d7ccf37f) SHA1(692814ffc2cf50fa8bf9e30c96ebe4a9ee536a86))
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "mzfont.rom", 0x0000, 0x0800, CRC(0631efc3) SHA1(99b206af5c9845995733d877e9e93e9681b982a8) )
+ROM_END
+
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE  INPUT   INIT   COMPANY    FULLNAME */
 COMP( 1979, mz80kj,   0,        0,      mz80kj,  mz80k,  mz80k, "Sharp",   "MZ-80K (Japanese)", 0 )
@@ -353,3 +361,4 @@ COMP( 1979, mz80k,    mz80kj,   0,      mz80k,   mz80k,  mz80k, "Sharp",   "MZ-8
 // These may need a separate driver!
 COMP( 1982, mz80a,    0,        0,      mz80k,   mz80a,  mz80k, "Sharp",   "MZ-80A", GAME_NOT_WORKING )
 COMP( 1981, mz80b,    0,        0,      mz80k,   mz80k,  mz80k, "Sharp",   "MZ-80B", GAME_NOT_WORKING )
+COMP( 1982, mz2000,   mz80b,    0,      mz80k,   mz80k,  mz80k, "Sharp",   "MZ-2000", GAME_NOT_WORKING )
