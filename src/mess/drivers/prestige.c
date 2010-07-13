@@ -1,16 +1,83 @@
-/***************************************************************************
+/*
 
-        VTech PreComputer Prestige
+VTech PreComputer Prestige Elite
 
-        
+PCB Layout
+----------
 
-        13/07/2010 Skeleton driver.
+|-------------------------------------------|
+|   |-------CN1-------|     CN2             |
+|                                           |
+|                                       CN3 |
+|                                           |
+|CN10                                       |
+|CN9            RAM                         --|
+|CN8                                          |
+|                                             |
+|                       Z80         ROM       |
+|               04010                     CN4 |
+|CN7                                          |
+|CN6                                          |
+|                       |------CN5------|   --|
+|-------------------------------------------|
 
-****************************************************************************/
+Notes:
+    All IC's shown.
+
+    ROM     - VTech LH5S8R14, labeled "1998 27-6020-02" (dumped as 1Mx8)
+    Z80     - Z80 family SOC?
+    RAM     - LG Semicon GM76C256CLLFW55 32Kx8 Static RAM
+    04010   - ?
+    CN1     - Centronics connector
+    CN2     - mouse connector
+    CN3     - LCD ribbon cable
+    CN4     - expansion connector
+    CN5     - keyboard ribbon cable
+    CN6     - speaker wire
+    CN7     - volume wire
+    CN8     - ? wire
+    CN9     - power wire
+    CN10    - NVRAM battery wire
+*/
+
+/*
+	
+	Undumped cartridges:
+  
+	80-1410   Super Science
+	80-1533   Famous Things & Places
+	80-0989   Bible Knowledge
+	80-1001   Fantasy Trivia
+	80-1002   General Knowledge II
+	80-1003   Sports History
+	80-2314   Familiar Faces
+	80-2315   Historical Happenings
+	80-2333   Arts, Entertainment & More
+	80-2334   Customs & Cultures
+	80-1531   32K RAM Memory Expansion Cartridge
+	80-12051  Space Scholar
+	80-12053  Frenzy of Facts
+	80-12052  Spreadsheet Success
+
+*/
+
+/*
+
+	TODO:
+
+	- identify unknown chips
+	- boot animation won't play
+	- keyboard
+	- mouse
+	- sound
+	- cartridges
+
+*/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "devices/messram.h"
+#include "devices/cartslot.h"
 
 static UINT8 bank[6];
 
@@ -138,6 +205,11 @@ static VIDEO_UPDATE( prestige )
     return 0;
 }
 
+static DEVICE_IMAGE_LOAD( prestige_cart )
+{
+	return IMAGE_INIT_FAIL;
+}
+
 static MACHINE_DRIVER_START( prestige )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -161,9 +233,16 @@ static MACHINE_DRIVER_START( prestige )
     MDRV_VIDEO_START(prestige)
     MDRV_VIDEO_UPDATE(prestige)
 
+	/* cartridge */
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("bin")
+	MDRV_CARTSLOT_INTERFACE("prestige_cart")
+	MDRV_CARTSLOT_LOAD(prestige_cart)
+
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
-	MDRV_RAM_DEFAULT_SIZE("64K")
+	MDRV_RAM_DEFAULT_SIZE("32K")
+	MDRV_RAM_EXTRA_OPTIONS("64K")
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -175,4 +254,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1998, prestige,  0,       0,	prestige, 	prestige, 	 0,  "VTech",   "PC Prestige Elite",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1998, prestige,  0,       0,	prestige,	prestige,	 0,  "VTech",   "PC Prestige Elite",		GAME_NOT_WORKING | GAME_NO_SOUND)
