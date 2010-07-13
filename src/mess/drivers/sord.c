@@ -658,7 +658,10 @@ MACHINE_DRIVER_END
 
 ROM_START( sordm5 )
 	ROM_REGION(0x10000, "maincpu", 0)
-	ROM_LOAD("sordint.rom", 0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2))
+	ROM_SYSTEM_BIOS(0, "int", "International")
+	ROMX_LOAD("sordint.rom", 0x0000, 0x2000, CRC(78848d39) SHA1(ac042c4ae8272ad6abe09ae83492ef9a0026d0b2),ROM_BIOS(1))
+	ROM_SYSTEM_BIOS(1, "jap", "Japanese")
+    ROMX_LOAD("sordjap.rom", 0x0000, 0x2000, CRC(92cf9353) SHA1(b0a4b3658fde68cb1f344dfb095bac16a78e9b3e),ROM_BIOS(2))	
 ROM_END
 
 

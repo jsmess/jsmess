@@ -20,6 +20,9 @@ public:
 	/* video state */
 	UINT8 *video_ram;
 	UINT8 *char_rom;
+	UINT8 char_size;
+	UINT8 char_correct;
+	UINT8 char_substact;
 
 	/* devices */
 	running_device *mc6847;

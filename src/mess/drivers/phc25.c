@@ -269,7 +269,7 @@ static UINT8 phc25_char_rom_r(running_machine *machine, UINT8 ch, int line)
 {
 	phc25_state *state = (phc25_state *)machine->driver_data;
 
-	return state->char_rom[((ch - 2) * 12) + line + 4];
+	return state->char_rom[((ch - state->char_substact) * state->char_size) + line + state->char_correct];
 }
 
 static const mc6847_interface mc6847_intf =
@@ -294,6 +294,9 @@ static VIDEO_START( pal )
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, Z80_TAG) + 0x5000;
+	state->char_size = 12;
+	state->char_correct = 4;
+	state->char_substact = 2;
 }
 
 static VIDEO_START( ntsc )
@@ -301,7 +304,10 @@ static VIDEO_START( ntsc )
 	phc25_state *state = (phc25_state *)machine->driver_data;
 
 	/* find memory regions */
-	state->char_rom = memory_region(machine, "chargen");
+	state->char_rom = memory_region(machine, Z80_TAG) + 0x5000;
+	state->char_size = 16;
+	state->char_correct = 0;
+	state->char_substact = 0;
 }
 
 static VIDEO_UPDATE( phc25 )
@@ -422,19 +428,21 @@ MACHINE_DRIVER_END
 
 ROM_START( phc25 )
     ROM_REGION( 0x6000, Z80_TAG, 0 )
-	ROM_LOAD( "phc25rom.0", 0x0000, 0x2000, CRC(fa28336b) SHA1(582376bee455e124de24ba4ac02326c8a592fa5a) )
-	ROM_LOAD( "phc25rom.1", 0x2000, 0x2000, CRC(38fd578b) SHA1(dc3db78c0cdc89f1605200d39535be65a4091705) )
-	ROM_LOAD( "phc25rom.2", 0x4000, 0x2000, CRC(54392b27) SHA1(1587827fe9438780b50164727ce3fdea1b98078a) )
+	ROM_LOAD( "phc25rom.0", 0x0000, 0x2000, CRC(fa28336b) SHA1(582376bee455e124de24ba4ac02326c8a592fa5a))
+	ROM_LOAD( "phc25rom.1", 0x2000, 0x2000, CRC(38fd578b) SHA1(dc3db78c0cdc89f1605200d39535be65a4091705))
+	ROM_LOAD( "phc25rom.2", 0x4000, 0x2000, CRC(54392b27) SHA1(1587827fe9438780b50164727ce3fdea1b98078a))
 ROM_END
 
 ROM_START( phc25j )
     ROM_REGION( 0x6000, Z80_TAG, 0 )
-	ROM_LOAD( "022 00aa.ic", 0x0000, 0x2000, NO_DUMP )
-	ROM_LOAD( "022 01aa.ic", 0x2000, 0x2000, NO_DUMP )
-	ROM_LOAD( "022 02aa.ic", 0x4000, 0x2000, NO_DUMP )
-
-    ROM_REGION( 0x1000, "chargen", 0 )
-	ROM_LOAD( "022 04a.ic", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "phc25-11.0", 0x0000, 0x2000, CRC(287e83b0) SHA1(9fe960a8245f28efc04defeeeaceb1e5ec6793b8))
+	ROM_LOAD( "phc25-11.1", 0x2000, 0x2000, CRC(6223f945) SHA1(5d44b883b6264cb5d2e21b2269308630c62e0e56))
+	ROM_LOAD( "phc25-11.2", 0x4000, 0x2000, CRC(da859ae4) SHA1(6121e85947921e434d0157c378de3d81537f6b9f))
+	//ROM_LOAD( "022 00aa.ic", 0x0000, 0x2000, NO_DUMP )
+	//ROM_LOAD( "022 01aa.ic", 0x2000, 0x2000, NO_DUMP )
+	//ROM_LOAD( "022 02aa.ic", 0x4000, 0x2000, NO_DUMP )
+    //ROM_REGION( 0x1000, "chargen", 0 )
+	//ROM_LOAD( "022 04a.ic", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 /* Driver */
