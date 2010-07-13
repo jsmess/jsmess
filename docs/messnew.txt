@@ -19,6 +19,7 @@ Systems Promoted from GAME_NOT_WORKING:
 Skeleton drivers:
 -----------------
 - Salora Manager [Curt Coder]
+- VTech PreComputer Prestige [Joseba Epalza, Curt Coder]
 
 
 

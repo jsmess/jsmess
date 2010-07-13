@@ -1596,6 +1596,7 @@ $(MESSOBJ)/vtech.a:				\
 	$(MESS_AUDIO)/socrates.o	\
 	$(MESS_DRIVERS)/socrates.o	\
 	$(MESS_DRIVERS)/pc2000.o	\
+	$(MESS_DRIVERS)/prestige.o	\
 
 $(MESSOBJ)/xerox.a:				\
 	$(MESS_DRIVERS)/xerox820.o	\

@@ -206,7 +206,7 @@ const game_driver * const drivers[] =
 	DRIVER( plldium )		/* Palladium Video-Computer-Game    */
 	DRIVER( polyvcg )		/* Polybrain Video Computer Game    */
 	DRIVER( poppympt )		/* Poppy MPT-03 Tele Computer Spiel */
-	DRIVER( prestige )		/* Prestige Video Computer Game MPT-03  */
+	DRIVER( prestmpt )		/* Prestige Video Computer Game MPT-03  */
 	DRIVER( rowtrn2k )		/* Rowtron 2000 */
 	DRIVER( tvg2000 )		/* Schmid TVG 2000   */
 	DRIVER( sheenhvc )		/* Sheen Home Video Centre 2001  */
@@ -1705,5 +1705,6 @@ const game_driver * const drivers[] =
 	DRIVER( e01 )
 	DRIVER( e01s )
 	DRIVER( pasopia7 )
+	DRIVER( prestige )
 
 #endif /* DRIVER_RECURSIVE */

@@ -664,7 +664,7 @@ ROM_START(poppympt)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
 
-ROM_START(prestige)
+ROM_START(prestmpt)
 	ROM_REGION(0x8000,"maincpu", ROMREGION_ERASEFF)
 	ROM_REGION(0x100,"gfx1", ROMREGION_ERASEFF)
 ROM_END
@@ -891,7 +891,7 @@ CONS(198?, ormatu,    0,         arcadia,  arcadia,      arcadia,  arcadia,     
 CONS(198?, plldium,   0,         arcadia,  arcadia,      plldium,  arcadia,      "Neckermann",         "Palladium Video-Computer-Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )      /* Germany, 16 keys instead of 12 */
 CONS(1983, polyvcg,   plldium,   0,        arcadia,      arcadia,  arcadia,      "Polybrain",          "Polybrain Video Computer Game", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )      /* Germany */
 CONS(198?, poppympt,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Transonic",          "Poppy MPT-03 Tele Computer Spiel", GAME_IMPERFECT_SOUND )           /* Germany */
-CONS(198?, prestige,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Prestige",           "Prestige Video Computer Game MPT-03", GAME_IMPERFECT_SOUND )        /* France */
+CONS(198?, prestmpt,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Prestige",           "Prestige Video Computer Game MPT-03", GAME_IMPERFECT_SOUND )        /* France */
 CONS(198?, rowtrn2k,  intmpt03,  0,        arcadia,      arcadia,  arcadia,      "Rowtron",            "Rowtron 2000", GAME_IMPERFECT_SOUND )               /* UK */
 CONS(1982, tvg2000,   arcadia,   0,        arcadia,      arcadia,  arcadia,      "Schmid",             "Schmid TVG 2000", GAME_IMPERFECT_SOUND )            /* Germany */
 CONS(198?, sheenhvc,  ormatu,    0,        arcadia,      arcadia,  arcadia,      "Sheen",              "Sheen Home Video Centre 2001", GAME_IMPERFECT_SOUND )     /* Australia */
