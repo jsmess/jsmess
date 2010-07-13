@@ -4,7 +4,7 @@ New System Drivers Supported:
 -----------------------------
 - Bally Home Library Computer [ranger_lennier]
 - Commodore 64C (Swedish/Finland) [Curt Coder]
-
+- Sega SC-3000 [Miodrag Milanovic]
 
 
 Systems Promoted from GAME_NOT_WORKING:
