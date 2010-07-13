@@ -697,6 +697,7 @@ $(MESSOBJ)/capcom.a:			\
 
 $(MESSOBJ)/casio.a:				\
 	$(MESS_DRIVERS)/pv1000.o	\
+	$(MESS_DRIVERS)/pv2000.o	\
 
 $(MESSOBJ)/cbm.a:				\
 	$(MESS_VIDEO)/pet.o			\
