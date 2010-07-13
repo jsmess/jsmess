@@ -5,7 +5,7 @@ New System Drivers Supported:
 - Bally Home Library Computer [ranger_lennier]
 - Commodore 64C (Swedish/Finland) [Curt Coder]
 - Sega SC-3000 [Miodrag Milanovic]
-
+- Casio PV-2000 [anondumper]
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
@@ -20,7 +20,6 @@ Skeleton drivers:
 -----------------
 - Salora Manager [Curt Coder]
 - VTech PC Prestige Elite [Joseba Epalza, Curt Coder]
-- Casio PV-2000
 - Sony SMC-777
 - Mitsubishi Multi 8
 - Bandai Gundam RX-78
