@@ -32,6 +32,7 @@ For BIOS CRC confirmation
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
 
 
 class pv2000_state
@@ -43,8 +44,24 @@ public:
 
 	int		last_state;
 	UINT8	keyb_column;
+	UINT8	cass_conf;
 	UINT8	key_pressed;
 };
+
+
+static WRITE8_HANDLER( pv2000_cass_conf_w )
+{
+	pv2000_state *state = (pv2000_state *)space->machine->driver_data;
+
+	logerror( "%s: pv2000_cass_conf_w %02x\n", cpuexec_describe_context(space->machine), data );
+
+	state->cass_conf = data & 0x0f;
+
+	if ( state->cass_conf & 0x01 )
+		cassette_change_state( space->machine->device("cassette"), CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR );
+	else
+		cassette_change_state( space->machine->device("cassette"), CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR );
+}
 
 
 static WRITE8_HANDLER( pv2000_keys_w )
@@ -168,6 +185,7 @@ static ADDRESS_MAP_START( pv2000_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
 	//theres also printer and tape I/O (TODO)
+	AM_RANGE(0x00, 0x00) AM_WRITE(pv2000_cass_conf_w)
 
 	//keyboard/joystick
 	AM_RANGE(0x10, 0x10) AM_READ(pv2000_keys_hi_r)
@@ -355,8 +373,16 @@ static MACHINE_RESET( pv2000 )
 }
 
 
-/* Machine Drivers */
+static const cassette_config pv2000_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED),
+	NULL
+};
 
+
+/* Machine Drivers */
 static MACHINE_DRIVER_START( pv2000 )
 	MDRV_DRIVER_DATA( pv2000_state )
 
@@ -379,6 +405,9 @@ static MACHINE_DRIVER_START( pv2000 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sn76489a", SN76489A, XTAL_7_15909MHz/2)	/* 3.579545 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	/* cassette */
+	MDRV_CASSETTE_ADD( "cassette", pv2000_cassette_config )
 
 	/* cartridge */
 	MDRV_CARTSLOT_ADD("cart")
