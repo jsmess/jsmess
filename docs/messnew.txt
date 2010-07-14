@@ -3,9 +3,11 @@
 New System Drivers Supported:
 -----------------------------
 - Bally Home Library Computer [ranger_lennier]
-- Commodore 64C (Swedish/Finland) [Curt Coder]
+- Commodore 64C (Sweden/Finland) [Curt Coder]
 - Sega SC-3000 [Miodrag Milanovic]
 - Casio PV-2000 [anondumper]
+- Salora Manager [Curt Coder]
+
 
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
@@ -15,10 +17,8 @@ Systems Promoted from GAME_NOT_WORKING:
 - SGCPU aka TI-99/4P [Michael Zapf]
 
 
-
 Skeleton drivers:
 -----------------
-- Salora Manager [Curt Coder]
 - VTech PC Prestige Elite [Joseba Epalza, Curt Coder]
 - Sony SMC-777
 - Mitsubishi Multi 8
@@ -26,6 +26,7 @@ Skeleton drivers:
 - Hitachi Basic Master Jr (MB-6885)
 - Hitachi Basic Master Level 3 (MB-6890)
 - Sharp MZ-2000
+
 
 System Driver Changes:
 ----------------------
@@ -63,7 +64,6 @@ System Driver Changes:
 Imgtool Changes:
 ----------------
 (none)
-
 
 
 Source Changes:

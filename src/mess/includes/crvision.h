@@ -9,8 +9,8 @@
 #define CASSETTE_TAG	"cassette"
 #define CENTRONICS_TAG	"centronics"
 
-#define BANK_ROM1	"bank1"
-#define BANK_ROM2	"bank2"
+#define BANK_ROM1		"bank1"
+#define BANK_ROM2		"bank2"
 
 class crvision_state
 {
@@ -23,7 +23,7 @@ public:
 	int keylatch;
 
 	/* devices */
-	running_device *sn76489;
+	running_device *psg;
 	running_device *cassette;
 };
 
