@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<softwarelist name="pv2000" description="CASIO PV-2000 cartridges">
+	<software name="excitem2">
+		<description>Excite Mahjong 2</description>
+		<year>1983</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="excitem2.bin" size="16384" crc="a2698c56" sha1="90113d7c065a6f12126c03da8ee59185bf60efc3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="frntline">
+		<description>Front Line</description>
+		<year>1983</year>
+		<publisher>Casio / Taito</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="frntline.bin" size="8192" crc="86692c58" sha1="5891483952658589102f396b260fadf33ce9c32b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="galaga">
+		<description>Galaga</description>
+		<year>1981</year>
+		<publisher>Casio / Namco</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="galaga.bin" size="8192" crc="e5befcf6" sha1="e3b4c7b1dc1a741eb098709ac41297a2c91ea444" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pachiufo">
+		<description>Pachinko - UFO</description>
+		<year>1983</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="pachiufo.bin" size="16384" crc="1261e766" sha1="0c7a3f865e72fc8b3f39f66c0b48bf60cd2de599" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rakugaki">
+		<description>Rakugaki Special</description>
+		<year>1983</year>
+		<publisher>Casio</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="rakugaki.bin" size="16384" crc="a34d1bd1" sha1="54a543d08e865c85c32358edce8a6fcfa3ad9fcc" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="rocnrope">
+		<description>Roc'n Rope</description>
+		<year>1983</year>
+		<publisher>Casio / Konami</publisher>
+		<part name="cart" interface="pv2000_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="rocnrope.bin" size="8192" crc="f8c9c2d9" sha1="2744e448f9537fbca1e65cbd3646678100777de3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>
