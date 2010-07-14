@@ -37,21 +37,21 @@ Main board
 |-------------------------------------------------------------------------------|
 |               |-----CN1-----|             |-----CN2-----|                     |
 |                                                                   10.738MHz   --|
-|                                   X                                       CN3   |
+|                                   4116                                    CN3   |
 |       ROM01                                               VDC                   |
-|                                   X                                           --|
+|                                   4116                                        --|
 |                                                                               |
-|       ROM23                       X                                           |
-|                                                                               |
-|                                   X                                           |
-|   LS04                                                                        --|
-|                                   X                       6821                  |
-|   LS32                                                                          |
-|                                   X                                             |
+|       ROM23                       4116    -                                   |
+|                                           |                                   |
+|                                   4116    |                                   |
+|   LS04                                   CN6                                  --|
+|                                   4116    |                  6821               |
+|   LS32                                    |                                     |
+|                                   4116    -                                     |
 |   LS139                                           PSG                           |
-|                                   X                                             |
+|                                   4116                                          |
 |   LS138                                                                         |
-|                                   X                                       CN4   |
+|                                   4116                                    CN4   |
 |   LS244                                                                         |
 |                                                                                 |
 |   LS245                                                                         |
@@ -71,12 +71,14 @@ ROM23   - Toshiba TMM2464P 8Kx8 one-time PROM, labeled "23"
 6821    - Hitachi HD468B21P Peripheral Interface Adaptor
 VDC     - Texas Instruments TMS9929A Video Display Controller (covered w/heatsink)
 PSG     - Texas Instruments SN76489AN Programmable Sound Generator
-X       - some kind of RAM chip (covered w/heatsink)
+4116    - Toshiba TMM416P-3 16Kx1 RAM (covered w/heatsink)
 CN1     - sub board connector (17x2 pin header)
 CN2     - RF board connector (17x1 pin header)
 CN3     - tape connector (7x2 PCB edge male)
 CN4     - expansion connector (30x2 PCB edge male)
 CN5     - cartridge connector (18x2 PCB edge female)
+CN6		- ? connector (16x1 pin header)
+
 
 Sub board
 
