@@ -77,7 +77,7 @@ CN2     - RF board connector (17x1 pin header)
 CN3     - tape connector (7x2 PCB edge male)
 CN4     - expansion connector (30x2 PCB edge male)
 CN5     - cartridge connector (18x2 PCB edge female)
-CN6		- ? connector (16x1 pin header)
+CN6		- keyboard connector (16x1 pin header)
 
 
 Sub board
@@ -487,49 +487,18 @@ static READ8_DEVICE_HANDLER( crvision_pia_portb_r )
 	return data;
 }
 
-static READ_LINE_DEVICE_HANDLER( crvision_pia_cb1_r )
-{
-	crvision_state *state = (crvision_state *)device->machine->driver_data;
-
-	return sn76496_ready_r(state->sn76489, 0);
-}
-
-static WRITE_LINE_DEVICE_HANDLER( crvision_pia_cb2_w )
-{
-}
-
-static WRITE8_DEVICE_HANDLER( crvision_pia_portb_w )
-{
-	/*
-        Signal  Description
-
-        PB0     SN76489 data output
-        PB1     SN76489 data output
-        PB2     SN76489 data output
-        PB3     SN76489 data output
-        PB4     SN76489 data output
-        PB5     SN76489 data output
-        PB6     SN76489 data output
-        PB7     SN76489 data output
-    */
-
-	crvision_state *state = (crvision_state *)device->machine->driver_data;
-
-	sn76496_w(state->sn76489, 0, data);
-}
-
 static const pia6821_interface crvision_pia_intf =
 {
 	DEVCB_HANDLER(crvision_pia_porta_r),	// input A
 	DEVCB_HANDLER(crvision_pia_portb_r),	// input B
 	DEVCB_LINE_VCC,							// input CA1 (+5V)
-	DEVCB_LINE(crvision_pia_cb1_r),			// input CB1 (SN76489 pin READY )
+	DEVCB_DEVICE_LINE(SN76489_TAG, sn76496_ready_r),	// input CB1
 	DEVCB_LINE_VCC,							// input CA2 (+5V)
 	DEVCB_LINE_VCC,							// input CB2 (+5V)
 	DEVCB_HANDLER(crvision_pia_porta_w),	// output A
-	DEVCB_HANDLER(crvision_pia_portb_w),	// output B (SN76489 pins D0-D7)
+	DEVCB_DEVICE_HANDLER(SN76489_TAG, sn76496_w),	// output B
 	DEVCB_NULL,								// output CA2
-	DEVCB_LINE(crvision_pia_cb2_w),			// output CB2 (SN76489 pin CE_)
+	DEVCB_NULL,								// output CB2 (SN76489 pin CE_)
 	DEVCB_NULL,								// irq A
 	DEVCB_NULL								// irq B
 };
