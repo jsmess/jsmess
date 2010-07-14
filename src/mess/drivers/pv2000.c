@@ -15,11 +15,11 @@ http://hou4gong1.mo-blog.jp/.shared/image.html?/photos/uncategorized/pv_2000_14.
 http://hou4gong1.mo-blog.jp/.shared/image.html?/photos/uncategorized/pv_2000_15.jpg
 
 Keyboard inputs are partially supported. Keys missing from the input ports:
-- DEL - beep in basic
-- MODE - beep in basic
-- CONT - beep in basic
-- COLOR - no beep in basic
-- GAME - no beep in basic
+- GAME - no beep in basic - is this really a key?
+
+Todo:
+- Add joystick support
+- Cassette support
 
 Also See:
 http://www2.odn.ne.jp/~haf09260/Pv2000/EnrPV.htm
@@ -136,15 +136,11 @@ static READ8_HANDLER( pv2000_keys_lo_r )
 		data = input_port_read( space->machine, "IN8" ) & 0x0f;
 		break;
 	case 9:
-		data = 0xff;
-
-		/* bit 3 = 0 => there is keyboard data */
-		if ( state->key_pressed )
-			data &= 0xf7;
+		data = input_port_read( space->machine, "IN9" ) & 0x0f;
 		break;
 	}
 
-	return data;
+	return 0xf0 | data;
 }
 
 
@@ -272,15 +268,21 @@ static INPUT_PORTS_START( pv2000 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_2") /* Unknown ?, no beep in basic */
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_3") /* Unknown ?, no beep in basic */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER) PORT_CHAR(13)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_5") /* Unknown ?, beep in basic */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_6") /* Unknown ?, beep in basic */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Mode")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("Del")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN8_7") /* Unknown ?, no beeep in basic */
 
+	PORT_START("IN9")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F1) PORT_NAME("Stop")
+
 	PORT_START("MOD")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN9_0") /* Unknown, no beep in basic */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_RALT) PORT_NAME("Color")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_TAB) PORT_NAME("Func")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_LSHIFT) PORT_NAME("Shift")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("IN9_3") /* Unknown, possibly unused */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 INPUT_PORTS_END
 
