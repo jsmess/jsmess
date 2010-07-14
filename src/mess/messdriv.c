@@ -1469,6 +1469,7 @@ const game_driver * const drivers[] =
 
 	/* Fujitsu */
 	DRIVER( fm7 )
+	DRIVER( fm7a )
 	DRIVER( fm77av )
 	DRIVER( fm7740sx )
 	DRIVER( fmtowns )   /* 1989 Fujitsu FM-Towns */

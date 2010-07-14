@@ -1968,6 +1968,26 @@ ROM_START( fm7 )
 
 ROM_END
 
+ROM_START( fm7a )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "fbasic30_a.rom", 0x38000,  0x7c00, CRC(87c98494) SHA1(d7e3603b0a2442c7632dad45f9704d9ad71968f5) )
+
+	ROM_REGION( 0x20000, "sub", 0 )
+	ROM_LOAD( "subsys_c.rom", 0xd800,  0x2800, CRC(24cec93f) SHA1(50b7283db6fe1342c6063fc94046283f4feddc1c) )
+
+	// either one of these boot ROMs are selectable via DIP switch
+	ROM_REGION( 0x200, "basic", 0 )
+	ROM_LOAD( "boot_bas.rom", 0x0000,  0x0200, CRC(c70f0c74) SHA1(53b63a301cba7e3030e79c59a4d4291eab6e64b0) )
+
+	ROM_REGION( 0x200, "dos", 0 )
+	ROM_LOAD( "boot_dos_a.rom", 0x0000,  0x0200, CRC(bf441864) SHA1(616c17155f84fb0e3731a31ef0eb0cbb664a5600) )
+
+	// optional Kanji ROM
+	ROM_REGION( 0x20000, "kanji1", 0 )
+	ROM_LOAD_OPTIONAL( "kanji.rom", 0x0000, 0x20000, CRC(62402ac9) SHA1(bf52d22b119d54410dad4949b0687bb0edf3e143) )
+
+ROM_END
+
 ROM_START( fm77av )
 	ROM_REGION( 0x40000, "maincpu", 0 )
 	ROM_FILL(0x0000,0x40000,0xff)
@@ -2035,5 +2055,6 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT  COMPANY      FULLNAME        FLAGS */
 COMP( 1982, fm7,      0,      0,      fm7,     fm7,    fm7,  "Fujitsu",   "FM-7",         0)
+COMP( 1982, fm7a,     fm7,    0,      fm7,     fm7,    fm7,  "Fujitsu",   "FM-7 (alternate)", 0)
 COMP( 1985, fm77av,   fm7,    0,      fm77av,  fm7,    fm7,  "Fujitsu",   "FM-77AV",      GAME_IMPERFECT_GRAPHICS)
 COMP( 1985, fm7740sx, fm7,    0,      fm77av,  fm7,    fm7,  "Fujitsu",   "FM-77AV40SX",  GAME_NOT_WORKING)
