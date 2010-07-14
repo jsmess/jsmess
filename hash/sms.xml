@@ -2439,7 +2439,7 @@
 		</part>
 	</software>
 
-	<!-- Id: G-1303, 5054 - Releases: 1986-07-20 (JPN) - Alt Title: 北斗の拳 - Motes: The Western version "Black Belt" is quite different -->
+	<!-- Id: G-1303, 5054 - Releases: 1986-07-20 (JPN) - Alt Title: 北斗の拳 - Notes: The Western version "Black Belt" is quite different -->
 	<software name="hokuto" cloneof="blackblt">
 		<description>Hokuto no Ken (Jpn)</description>
 		<year>1986</year>
