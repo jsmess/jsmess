@@ -20,7 +20,10 @@ public:
 	crvision_state(running_machine &machine) { }
 
 	/* keyboard state */
-	int keylatch;
+	UINT8 keylatch;
+
+	/* joystick state */
+	UINT8 joylatch;
 
 	/* devices */
 	running_device *psg;

@@ -24,10 +24,8 @@
 
 	Salora Manager
 
-	- correct clocks
 	- keyboard Ctrl+I/J/N don't print out BASIC commands
-	- 16K RAM mapping
-	- joysticks
+	- RAM mapping
 	- cassette
 	- printer
 	- floppy (interface cartridge needed)
@@ -68,7 +66,7 @@ Main board
 |                   LS244                                                         |
 |       6502                                                                    --|
 |                   LS244                                                       |
-|                                                           CN5                 |
+|                                           |-------------CN5-------------|     |
 |-------------------------------------------------------------------------------|
 
 Notes:
@@ -83,7 +81,7 @@ PSG     - Texas Instruments SN76489AN Programmable Sound Generator
 4116    - Toshiba TMM416P-3 16Kx1 RAM (covered w/heatsink)
 CN1     - sub board connector (17x2 pin header)
 CN2     - RF board connector (17x1 pin header)
-CN3     - tape connector (7x2 PCB edge male)
+CN3     - printer connector (7x2 PCB edge male)
 CN4     - expansion connector (30x2 PCB edge male)
 CN5     - cartridge connector (18x2 PCB edge female)
 CN6		- keyboard connector (16x1 pin header)
@@ -127,6 +125,8 @@ CN1     - main board connector (17x2 pin header)
 #include "cpu/m6502/m6502.h"
 #include "devices/cartslot.h"
 #include "devices/cassette.h"
+#include "devices/flopdrv.h"
+#include "formats/basicdsk.h"
 #include "machine/ctronics.h"
 #include "machine/6821pia.h"
 #include "sound/sn76496.h"
@@ -181,7 +181,7 @@ static ADDRESS_MAP_START( crvision_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xe800) AM_DEVWRITE(CENTRONICS_TAG, centronics_data_w)
 	AM_RANGE(0xe801, 0xe801) AM_DEVREADWRITE(CENTRONICS_TAG, centronics_status_r, centronics_ctrl_w)
 //  AM_RANGE(0xe802, 0xf7ff) AM_RAMBANK(4)
-	AM_RANGE(0xf800, 0xffff) AM_ROM
+	AM_RANGE(0xf800, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -466,6 +466,34 @@ static INPUT_PORTS_START( manager )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_I) PORT_CHAR('I') PORT_CHAR('i')
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J) PORT_CHAR('J') PORT_CHAR('j')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_CODE(KEYCODE_M) PORT_CHAR('M') PORT_CHAR('m')
+	
+	PORT_START("JOY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("JOY1")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
+
+	PORT_START("JOY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_START("JOY3")
+	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -677,6 +705,38 @@ static READ8_DEVICE_HANDLER( lasr2001_pia_pa_r )
 	return data;
 }
 
+static WRITE8_DEVICE_HANDLER( lasr2001_pia_pa_w )
+{
+	/*
+        PA0     Keyboard raster player 1 output (joystick)
+        PA1     Keyboard raster player 1 output (hand keys)
+        PA2     Keyboard raster player 2 output (joystick)
+        PA3     Keyboard raster player 2 output (hand keys)
+        PA4     ?
+        PA5     ?
+        PA6     ?
+        PA7     ?
+    */
+
+	crvision_state *state = (crvision_state *)device->machine->driver_data;
+
+	state->joylatch = data;
+}
+
+static READ8_DEVICE_HANDLER( lasr2001_pia_pb_r )
+{
+	crvision_state *state = (crvision_state *)device->machine->driver_data;
+
+	UINT8 data = 0xff;
+
+	if (!BIT(state->joylatch, 0)) data &= input_port_read(device->machine, "JOY0");
+	if (!BIT(state->joylatch, 1)) data &= input_port_read(device->machine, "JOY1");
+	if (!BIT(state->joylatch, 2)) data &= input_port_read(device->machine, "JOY2");
+	if (!BIT(state->joylatch, 3)) data &= input_port_read(device->machine, "JOY3");
+
+	return data;
+}
+
 static WRITE8_DEVICE_HANDLER( lasr2001_pia_pb_w )
 {
 	/*
@@ -710,12 +770,12 @@ static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_cb2_w )
 static const pia6821_interface lasr2001_pia_intf =
 {
 	DEVCB_HANDLER(lasr2001_pia_pa_r),					// input A
-	DEVCB_NULL,											// input B
+	DEVCB_HANDLER(lasr2001_pia_pb_r),					// input B
 	DEVCB_NULL,											// input CA1 ?
 	DEVCB_DEVICE_LINE(SN76489_TAG, sn76496_ready_r),	// input CB1
 	DEVCB_NULL,											// input CA2 ?
 	DEVCB_LINE_VCC,										// input CB2 (+5V)
-	DEVCB_NULL,											// output A
+	DEVCB_HANDLER(lasr2001_pia_pa_w),					// output A
 	DEVCB_HANDLER(lasr2001_pia_pb_w),					// output B
 	DEVCB_NULL,											// output CA2 ?
 	DEVCB_DEVICE_LINE(SN76489_TAG, lasr2001_pia_cb2_w),	// output CB2 (SN76489 pin CE_)
@@ -732,6 +792,23 @@ static const cassette_config crvision_cassette_config =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
+};
+
+/*-------------------------------------------------
+    floppy_config lasr2001_floppy_config
+-------------------------------------------------*/
+
+static const floppy_config lasr2001_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_SS_80,
+	FLOPPY_OPTIONS_NAME(default),
+	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 
@@ -990,7 +1067,7 @@ static MACHINE_DRIVER_START( lasr2001 )
 	MDRV_DRIVER_DATA(crvision_state)
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD(M6502_TAG, M6502, 2000000)
+	MDRV_CPU_ADD(M6502_TAG, M6502, 17734470/9)
 	MDRV_CPU_PROGRAM_MAP(lasr2001_map)
 	MDRV_CPU_VBLANK_INT(SCREEN_TAG, crvision_int)
 
@@ -998,7 +1075,7 @@ static MACHINE_DRIVER_START( lasr2001 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD(SN76489_TAG, SN76489A, 2000000)
+	MDRV_SOUND_ADD(SN76489_TAG, SN76489A, 17734470/9)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_SOUND_WAVE_ADD("wave", CASSETTE_TAG)
@@ -1019,12 +1096,16 @@ static MACHINE_DRIVER_START( lasr2001 )
 	/* cassette */
 	MDRV_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_config)
 
+	/* floppy */
+	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, lasr2001_floppy_config)
+
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("16K")
+	MDRV_RAM_EXTRA_OPTIONS("32K")
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -1038,13 +1119,13 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( crvision )
-    ROM_REGION( 0x10000, M6502_TAG, 0 )
-    ROM_LOAD( "crvision.u20", 0xf800, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
+    ROM_REGION( 0x800, M6502_TAG, 0 )
+    ROM_LOAD( "crvision.u20", 0x0000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
 ROM_END
 
 ROM_START( fnvision )
-    ROM_REGION( 0x10000, M6502_TAG, 0 )
-    ROM_LOAD( "funboot.rom",  0xf800, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
+    ROM_REGION( 0x800, M6502_TAG, 0 )
+    ROM_LOAD( "funboot.rom",  0x0000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
 ROM_END
 
 #define rom_wizzard rom_crvision
@@ -1057,6 +1138,9 @@ ROM_START( manager )
     ROM_REGION( 0x4000, M6502_TAG, 0 )
     ROM_LOAD( "01", 0x0000, 0x2000, CRC(702f4cf5) SHA1(cd14ee74e787d24b76c166de484dae24206e219b) )
     ROM_LOAD( "23", 0x2000, 0x2000, CRC(46489d88) SHA1(467f5bcd62d0b4117c443e13373df8f3c45df7b2) )
+
+	ROM_REGION( 0x1000, "disk", 0 )
+	ROM_LOAD( "floppy interface cartridge", 0x0000, 0x1000, NO_DUMP )
 ROM_END
 
 /***************************************************************************
