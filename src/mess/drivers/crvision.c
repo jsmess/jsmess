@@ -757,6 +757,16 @@ static WRITE8_DEVICE_HANDLER( lasr2001_pia_pb_w )
 	state->keylatch = data;
 }
 
+static READ_LINE_DEVICE_HANDLER( lasr2001_pia_ca1_r )
+{
+	return cassette_input(device) > -0.1469;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_ca2_w )
+{
+	cassette_output(device, state ? +1.0 : -1.0);
+}
+
 static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_cb2_w )
 {
 	crvision_state *driver_state = (crvision_state *)device->machine->driver_data;
@@ -771,13 +781,13 @@ static const pia6821_interface lasr2001_pia_intf =
 {
 	DEVCB_HANDLER(lasr2001_pia_pa_r),					// input A
 	DEVCB_HANDLER(lasr2001_pia_pb_r),					// input B
-	DEVCB_NULL,											// input CA1 ?
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, lasr2001_pia_ca1_r),// input CA1
 	DEVCB_DEVICE_LINE(SN76489_TAG, sn76496_ready_r),	// input CB1
 	DEVCB_NULL,											// input CA2 ?
 	DEVCB_LINE_VCC,										// input CB2 (+5V)
 	DEVCB_HANDLER(lasr2001_pia_pa_w),					// output A
 	DEVCB_HANDLER(lasr2001_pia_pb_w),					// output B
-	DEVCB_NULL,											// output CA2 ?
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, lasr2001_pia_ca2_w),// output CA2
 	DEVCB_DEVICE_LINE(SN76489_TAG, lasr2001_pia_cb2_w),	// output CB2 (SN76489 pin CE_)
 	DEVCB_NULL,											// irq A (floating)
 	DEVCB_NULL											// irq B (floating)
@@ -792,6 +802,18 @@ static const cassette_config crvision_cassette_config =
 	cassette_default_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
+	NULL
+};
+
+/*-------------------------------------------------
+    cassette_config lasr2001_cassette_config
+-------------------------------------------------*/
+
+static const cassette_config lasr2001_cassette_config =
+{
+	cassette_default_formats,
+	NULL,
+	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_ENABLED),
 	NULL
 };
 
@@ -1094,7 +1116,7 @@ static MACHINE_DRIVER_START( lasr2001 )
 	MDRV_SOFTWARE_LIST_ADD("cart_list","crvision")
 
 	/* cassette */
-	MDRV_CASSETTE_ADD(CASSETTE_TAG, crvision_cassette_config)
+	MDRV_CASSETTE_ADD(CASSETTE_TAG, lasr2001_cassette_config)
 
 	/* floppy */
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, lasr2001_floppy_config)
