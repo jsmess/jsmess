@@ -83,7 +83,8 @@ static WRITE8_HANDLER( paso7_bankswitch )
 	bank_reg = data & 3;
 	vram_sel = data & 4;
 
-	// bit 3? PIO2 port C
+	if(data & 8) // as far as I can see, this enables a RAM bankswitch mapped on i/o ports ...
+		printf("Warning: i/o bank write enabled\n");
 
 	// bank4 is always RAM
 
@@ -245,8 +246,8 @@ static READ8_DEVICE_HANDLER( crtc_portb_r )
 {
 	// --x- ---- vsync bit
 	// ---- x--- disp bit
-	int vdisp = (device->machine->primary_screen->vpos() < 200) ? 0x08 : 0x00;
 	int lcd_bit = input_port_read(device->machine, "DSW") & 1;
+	int vdisp = (device->machine->primary_screen->vpos() < (lcd_bit ? 200 : 28)) ? 0x08 : 0x00; //TODO: check LCD vpos trigger
 
 	return 0xe7 | vdisp | (lcd_bit << 4);
 }
@@ -298,6 +299,7 @@ static WRITE8_DEVICE_HANDLER( nmi_mask_w )
 /* TODO: investigate on these. */
 static READ8_DEVICE_HANDLER( unk_r )
 {
+	printf("READ!\n");
 	return 0xff;//mame_rand(device->machine);
 }
 
@@ -397,10 +399,10 @@ static MACHINE_DRIVER_START( paso7 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489A, 18432000/4) // unknown clock / divider
+	MDRV_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("sn2", SN76489A, 18432000/4) // unknown clock / divider
+	MDRV_SOUND_ADD("sn2", SN76489A, 1996800) // unknown clock / divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
