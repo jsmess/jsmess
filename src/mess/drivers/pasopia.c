@@ -4,6 +4,9 @@
 
     preliminary driver by Angelo Salese
 
+	TODO:
+	- cursor seems too slow, missing irqs?
+
 ****************************************************************************/
 
 #include "emu.h"
@@ -16,6 +19,8 @@
 static UINT8 vram_sel;
 static UINT8 *p7_vram;
 static UINT8 bank_reg;
+static UINT16 cursor_addr;
+static UINT8 cursor_blink;
 
 static VIDEO_START( paso7 )
 {
@@ -36,10 +41,12 @@ static VIDEO_UPDATE( paso7 )
 
 			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,0,0,0,x*8,y*8);
 
+			if(((cursor_addr*8) == count) && !cursor_blink) // draw cursor
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],0x5f,0,0,0,x*8,y*8);
+
 			count+=8;
 		}
 	}
-
 
     return 0;
 }
@@ -151,6 +158,28 @@ static WRITE8_HANDLER( ram_bank_w )
 	cpu[offset] = data;
 }
 
+static WRITE8_HANDLER( pasopia7_6845_w )
+{
+	static int addr_latch;
+
+	if(offset == 0)
+	{
+		addr_latch = data;
+		mc6845_address_w(devtag_get_device(space->machine, "crtc"), 0,data);
+	}
+	else
+	{
+		/* FIXME: this should be inside the MC6845 core! */
+		if(addr_latch == 0x0e)
+			cursor_addr = ((data<<8) & 0x3f00) | (cursor_addr & 0xff);
+		else if(addr_latch == 0x0f)
+			cursor_addr = (cursor_addr & 0x3f00) | (data & 0xff);
+
+		mc6845_register_w(devtag_get_device(space->machine, "crtc"), 0,data);
+	}
+}
+
+
 static ADDRESS_MAP_START(paso7_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE( 0x0000, 0x7fff ) AM_WRITE( ram_bank_w )
@@ -165,8 +194,7 @@ static ADDRESS_MAP_START( paso7_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x08, 0x0b ) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
 	AM_RANGE( 0x0c, 0x0f ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
-	AM_RANGE( 0x10, 0x10 ) AM_DEVWRITE("crtc", mc6845_address_w)
-	AM_RANGE( 0x11, 0x11 ) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE( 0x10, 0x11 ) AM_WRITE(pasopia7_6845_w)
 	AM_RANGE( 0x18, 0x1b ) AM_READWRITE( pac2_r, pac2_w )
 	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
 	AM_RANGE( 0x28, 0x2b ) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
@@ -270,15 +298,14 @@ static WRITE8_DEVICE_HANDLER( video_attr_w )
 static WRITE8_DEVICE_HANDLER( video_misc_w )
 {
 	/*
-		else if(id == SIG_MEMORY_I8255_1_C)
-			attr_wrap = (data & 0x10) ? true : false;
-			pal_sel = (data & 0xc) ? true : false;
 		--x- ---- blinking
 		---x ---- attribute wrap
 		---- x--- pal disable
 		---- xx-- palette selector (both bits enables this, odd hook-up)
 	*/
 //	printf("VIDEO MISC REG %02x\n",data);
+	cursor_blink = data & 0x20;
+
 }
 
 static WRITE8_DEVICE_HANDLER( nmi_mask_w )
