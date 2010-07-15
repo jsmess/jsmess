@@ -1956,14 +1956,14 @@ static void mac_egret_response_std(mac_state *mac, int type, int flag, int cmd)
 	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 }
 
-static void mac_egret_response_read_pram(mac_state *mac, int addr)
+static void mac_egret_response_read_pram(mac_state *mac, int cmd, int addr)
 {
 	mac->adb_datasize = 4;
 
 	mac->adb_send = 0xaa;
 	mac->adb_buffer[4] = 1;	// type
 	mac->adb_buffer[3] = 0;	// flag
-	mac->adb_buffer[2] = 7;	// command
+	mac->adb_buffer[2] = cmd; // command
 	mac->adb_buffer[1] = mac->rtc_ram[addr]; 
 
 	mac->adb_state |= 1;
@@ -1973,6 +1973,24 @@ static void mac_egret_response_read_pram(mac_state *mac, int addr)
 	// read PRAM is a "streaming" command, don't drop the state line when we're out of data
 	mac->adb_streaming = MCU_STREAMING_PRAMRD;
 	mac->adb_stream_ptr = addr+1;
+}
+
+static void mac_egret_response_read_rtc(mac_state *mac)
+{
+	mac->adb_datasize = 7;
+
+	mac->adb_send = 0xaa;
+	mac->adb_buffer[7] = 1;	// type
+	mac->adb_buffer[6] = 0;	// flag
+	mac->adb_buffer[5] = 7;	// command
+	mac->adb_buffer[4] = mac->rtc_seconds[3];
+	mac->adb_buffer[3] = mac->rtc_seconds[2];
+	mac->adb_buffer[2] = mac->rtc_seconds[1];
+	mac->adb_buffer[1] = mac->rtc_seconds[0];
+
+	mac->adb_state |= 1;
+	mac->adb_timer_ticks = 8;
+	timer_adjust_oneshot(mac_adb_timer, attotime_make(0, ATTOSECONDS_IN_USEC(100)), 0);
 }
 
 static void mac_egret_mcu_exec(mac_state *mac)
@@ -1995,12 +2013,42 @@ static void mac_egret_mcu_exec(mac_state *mac)
 			mac_egret_response_std(mac, 1, 0, 1);
 			break;
 
+		case 0x02: // read 6805 address
+			{
+				int addr = mac->adb_buffer[2]<<8 | mac->adb_buffer[3];
+
+				#if LOG_ADB
+				printf("ADB: Egret read 6805 address %x\n", addr);
+				#endif
+
+				// check if this is a sneaky PRAM read (PRAM is at 6805 address 0x100)
+				if ((addr >= 0x100) && (addr <= 0x200))
+				{
+					mac_egret_response_read_pram(mac, 2, addr&0xff);
+				}
+				#if LOG_ADB
+				else
+				{
+					printf("ADB: Egret unhandled direct read @ %x\n", addr);
+				}
+				#endif
+			}
+			break;
+
+		case 0x03: // read RTC
+			#if LOG_ADB
+			printf("ADB: Egret read RTC = %08x\n", mac->rtc_seconds[3]<<24|mac->rtc_seconds[2]<<16|mac->rtc_seconds[1]<<8|mac->rtc_seconds[0]);
+			#endif
+
+			mac_egret_response_read_rtc(mac);
+			break;
+
 		case 0x07: // read PRAM
 			#if LOG_ADB
 			printf("ADB: Egret read PRAM from %x\n", mac->adb_buffer[2]<<8 | mac->adb_buffer[3]);
 			#endif
 
-			mac_egret_response_read_pram(mac, mac->adb_buffer[2]<<8 | mac->adb_buffer[3]);
+			mac_egret_response_read_pram(mac, 7, mac->adb_buffer[2]<<8 | mac->adb_buffer[3]);
 			break;
 
 		case 0x08: // write 6805 address
@@ -2023,7 +2071,7 @@ static void mac_egret_mcu_exec(mac_state *mac)
 				#if LOG_ADB
 				else
 				{
-					printf("ADB: Egret unhandled direct write\n");
+					printf("ADB: Egret unhandled direct write @ %x\n", addr);
 				}
 				#endif
 
