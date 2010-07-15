@@ -1,8 +1,8 @@
 /***************************************************************************
 
-        Toshiba PASOPIA / PASOPIA7 emulation
+	Toshiba Pasopia 7 (c) 1983 Toshiba
 
-        Skeleton driver.
+    preliminary driver by Angelo Salese
 
 ****************************************************************************/
 
@@ -15,6 +15,7 @@
 
 static UINT8 vram_sel;
 static UINT8 *p7_vram;
+static UINT8 bank_reg;
 
 static VIDEO_START( paso7 )
 {
@@ -25,7 +26,7 @@ static VIDEO_UPDATE( paso7 )
 	int x,y;
 	int count;
 
-	count = 0x10;
+	count = 0;
 
 	for(y=0;y<25;y++)
 	{
@@ -46,14 +47,14 @@ static VIDEO_UPDATE( paso7 )
 static READ8_HANDLER( vram_r )
 {
 	if(vram_sel)
-		return 0xff; //TODO: investigate on this
+		return 0xff;
 
 	return p7_vram[offset];
 }
 
 static WRITE8_HANDLER( vram_w )
 {
-	if(!vram_sel)
+	//if(!vram_sel)  //TODO: investigate on this
 		p7_vram[offset] = data;
 }
 
@@ -79,6 +80,7 @@ static WRITE8_HANDLER( paso7_bankswitch )
 			break;
 	}
 
+	bank_reg = data & 3;
 	vram_sel = data & 4;
 
 	// bit 3? PIO2 port C
@@ -176,11 +178,11 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( paso7 )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x01, "System type" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, "LCD" )
 INPUT_PORTS_END
-
-static MACHINE_RESET( paso7 )
-{
-}
 
 static const gfx_layout p7_chars_8x8 =
 {
@@ -244,35 +246,53 @@ static READ8_DEVICE_HANDLER( crtc_portb_r )
 	// --x- ---- vsync bit
 	// ---- x--- disp bit
 	int vdisp = (device->machine->primary_screen->vpos() < 200) ? 0x08 : 0x00;
+	int lcd_bit = input_port_read(device->machine, "DSW") & 1;
 
-	return 0xf7 | vdisp;
+	return 0xe7 | vdisp | (lcd_bit << 4);
 }
 
-static WRITE8_DEVICE_HANDLER( ppi8255_0a_w )
+static WRITE8_DEVICE_HANDLER( screen_mode_w )
 {
-
+	printf("GFX MODE %02x\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER( ppi8255_1a_w )
+static WRITE8_DEVICE_HANDLER( plane_reg_w )
 {
-
+	printf("PLANE %02x\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER( ppi8255_1b_w )
+static WRITE8_DEVICE_HANDLER( video_attr_w )
 {
-
+	printf("VIDEO ATTR %02x | TEXT_PAGE %02x\n",data & 0xf,data & 0x70);
 }
 
-static WRITE8_DEVICE_HANDLER( ppi8255_1c_w )
+static WRITE8_DEVICE_HANDLER( video_misc_w )
 {
-
+	/*
+		else if(id == SIG_MEMORY_I8255_1_C)
+			attr_wrap = (data & 0x10) ? true : false;
+			pal_sel = (data & 0xc) ? true : false;
+		--x- ---- blinking
+		---x ---- attribute wrap
+		---- x--- pal disable
+		---- xx-- palette selector (both bits enables this, odd hook-up)
+	*/
+//	printf("VIDEO MISC REG %02x\n",data);
 }
 
-static WRITE8_DEVICE_HANDLER( ppi8255_2a_w )
+static WRITE8_DEVICE_HANDLER( nmi_mask_w )
 {
-	/* --x- ---- (related to the data rec) */
-	/* ---x ---- data rec out */
-	/* ---- --x- sound off */
+	/*
+	--x- ---- (related to the data rec)
+	---x ---- data rec out
+	---- --x- sound off
+	---- ---x reset NMI (writes to port B = clears bits 1 & 2) (???)
+	*/
+	printf("SYSTEM MISC %02x\n",data);
+
+	if(data & 1)
+		i8255a_w(devtag_get_device(device->machine, "ppi8255_2"), 1, 0);
+
 }
 
 /* TODO: investigate on these. */
@@ -281,12 +301,34 @@ static READ8_DEVICE_HANDLER( unk_r )
 	return 0xff;//mame_rand(device->machine);
 }
 
+static READ8_DEVICE_HANDLER( nmi_reg_r )
+{
+	return 0xfc | bank_reg;//mame_rand(device->machine);
+}
+
+static UINT8 nmi_mask,nmi_enable_reg;
+
+static WRITE8_DEVICE_HANDLER( nmi_reg_w )
+{
+	/*
+		x--- ---- NMI mask
+		-x-- ---- enable NMI regs (?)
+	*/
+	nmi_mask = data & 0x80;
+	nmi_enable_reg = data & 0x40;
+
+	if(!nmi_mask && nmi_enable_reg)
+		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
+}
+
+
+
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
 	DEVCB_HANDLER(unk_r),			/* Port A read */
 	DEVCB_HANDLER(crtc_portb_r),	/* Port B read */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(ppi8255_0a_w),		/* Port A write */
+	DEVCB_HANDLER(screen_mode_w),		/* Port A write */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_NULL						/* Port C write */
 };
@@ -296,20 +338,30 @@ static I8255A_INTERFACE( ppi8255_intf_1 )
 	DEVCB_NULL,						/* Port A read */
 	DEVCB_NULL,						/* Port B read */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(ppi8255_1a_w),	/* Port A write */
-	DEVCB_HANDLER(ppi8255_1b_w),	/* Port B write */
-	DEVCB_HANDLER(ppi8255_1c_w)		/* Port C write */
+	DEVCB_HANDLER(plane_reg_w),		/* Port A write */
+	DEVCB_HANDLER(video_attr_w),	/* Port B write */
+	DEVCB_HANDLER(video_misc_w)		/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_intf_2 )
 {
 	DEVCB_NULL,						/* Port A read */
 	DEVCB_NULL,						/* Port B read */
-	DEVCB_HANDLER(unk_r),			/* Port C read */
-	DEVCB_HANDLER(ppi8255_2a_w),	/* Port A write */
+	DEVCB_HANDLER(nmi_reg_r),		/* Port C read */
+	DEVCB_HANDLER(nmi_mask_w),		/* Port A write */
 	DEVCB_NULL,						/* Port B write */
-	DEVCB_NULL						/* Port C write */
+	DEVCB_HANDLER(nmi_reg_w)		/* Port C write */
 };
+
+static MACHINE_RESET( paso7 )
+{
+	UINT8 *bios = memory_region(machine, "maincpu");
+
+	memory_set_bankptr(machine, "bank1", bios + 0x10000);
+	memory_set_bankptr(machine, "bank2", bios + 0x10000);
+//	memory_set_bankptr(machine, "bank3", bios + 0x10000);
+//	memory_set_bankptr(machine, "bank4", bios + 0x10000);
+}
 
 static MACHINE_DRIVER_START( paso7 )
     /* basic machine hardware */
@@ -375,12 +427,6 @@ ROM_END
 
 static DRIVER_INIT( paso7 )
 {
-	UINT8 *bios = memory_region(machine, "maincpu");
-
-	memory_set_bankptr(machine, "bank1", bios + 0x10000);
-	memory_set_bankptr(machine, "bank2", bios + 0x10000);
-//	memory_set_bankptr(machine, "bank3", bios + 0x10000);
-//	memory_set_bankptr(machine, "bank4", bios + 0x10000);
 }
 
 /* Driver */
