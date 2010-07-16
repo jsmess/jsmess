@@ -361,12 +361,12 @@ static TIMER_CALLBACK(osborne1_video_callback)
 		/* Clear CA1 on video PIA */
 		osborne1.start_y = ( osborne1.new_start_y - 1 ) & 0x1F;
 		osborne1.charline = 0;
-		pia6821_ca1_w( pia_1, 0, 0 );
+		pia6821_ca1_w( pia_1, 0 );
 	}
 	if ( y == 240 )
 	{
 		/* Set CA1 on video PIA */
-		pia6821_ca1_w( pia_1, 0, 0xFF );
+		pia6821_ca1_w( pia_1, 1 );
 	}
 	if ( y < 240 )
 	{
@@ -421,7 +421,7 @@ static TIMER_CALLBACK( setup_osborne1 )
 
 	beep_set_state( speaker, 0 );
 	beep_set_frequency( speaker, 300 /* 60 * 240 / 2 */ );
-	pia6821_ca1_w( pia_1, 0, 0 );
+	pia6821_ca1_w( pia_1, 0 );
 }
 
 static void osborne1_load_proc(device_image_interface &image)

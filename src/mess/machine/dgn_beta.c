@@ -930,7 +930,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnbeta_fdc_intrq_w )
 {
 	LOG_DISK(("dgnbeta_fdc_intrq_w(%d)\n", state));
     if(wd2797_written)
-        pia6821_ca1_w(device, 0, state);
+        pia6821_ca1_w(device, state);
 }
 
 /* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
@@ -1043,9 +1043,9 @@ void dgn_beta_frame_interrupt (running_machine *machine, int data)
 
     /* Set PIA line, so it recognises inturrupt */
     if (!data)
-        pia6821_cb2_w(pia_2, 0, ASSERT_LINE);
+        pia6821_cb2_w(pia_2, ASSERT_LINE);
     else
-        pia6821_cb2_w(pia_2, 0, CLEAR_LINE);
+        pia6821_cb2_w(pia_2, CLEAR_LINE);
 
 //    LOG_VIDEO(("Vblank\n"));
 	ScanInKeyboard();

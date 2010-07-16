@@ -19,6 +19,8 @@ public:
 
 	crvision_state(running_machine &machine) { }
 
+	int pia_ca2;
+
 	/* keyboard state */
 	UINT8 keylatch;
 
@@ -28,6 +30,7 @@ public:
 	/* devices */
 	running_device *psg;
 	running_device *cassette;
+	running_device *centronics;
 };
 
 #endif

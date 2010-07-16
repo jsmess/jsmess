@@ -672,7 +672,7 @@ static TIMER_CALLBACK( pet_interrupt )
 	running_device *pia_0 = machine->device("pia_0");
 	static int level = 0;
 
-	pia6821_cb1_w(pia_0, 0, level);
+	pia6821_cb1_w(pia_0, level);
 	level = !level;
 }
 
@@ -682,7 +682,7 @@ static TIMER_CALLBACK( pet_tape1_timer )
 	running_device *pia_0 = machine->device("pia_0");
 //  cassette 1
 	UINT8 data = (cassette_input(machine->device("cassette1")) > +0.0) ? 1 : 0;
-	pia6821_ca1_w(pia_0, 0, data);
+	pia6821_ca1_w(pia_0, data);
 }
 
 static TIMER_CALLBACK( pet_tape2_timer )

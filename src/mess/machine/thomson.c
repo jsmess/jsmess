@@ -645,8 +645,8 @@ static void to7_lightpen_cb ( running_machine *machine, int step )
 		return;
 
 	LOG_VIDEO(( "%f to7_lightpen_cb: step=%i\n", attotime_to_double(timer_get_time(machine)), step ));
-	pia6821_cb1_w( sys_pia, 0, 1 );
-	pia6821_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 1 );
+	pia6821_cb1_w( sys_pia, 0 );
 	to7_lightpen_step = step;
 }
 
@@ -662,7 +662,7 @@ static void to7_set_init ( running_machine *machine, int init )
 	/* INIT signal wired to system PIA 6821 */
 
 	LOG_VIDEO(( "%f to7_set_init: init=%i\n", attotime_to_double(timer_get_time(machine)), init ));
-	pia6821_ca1_w( sys_pia, 0, init );
+	pia6821_ca1_w( sys_pia, init );
 }
 
 
@@ -786,7 +786,7 @@ static WRITE_LINE_DEVICE_HANDLER( to7_io_ack )
 {
 	running_device *io_pia = device->machine->device( THOM_PIA_IO );
 
-	pia6821_cb1_w( io_pia, 0, state);
+	pia6821_cb1_w( io_pia, state);
 	//LOG_IO (( "%f to7_io_ack: CENTRONICS new state $%02X (ack=%i)\n", attotime_to_double(timer_get_time(machine)), data, ack ));
 }
 
@@ -1218,17 +1218,17 @@ static TIMER_CALLBACK(to7_game_update_cb)
 	{
 		/* mouse */
 		UINT8 mouse = to7_get_mouse_signal(machine);
-		pia6821_ca1_w( game_pia, 0, (mouse & 1) ? 1 : 0 ); /* XA */
-		pia6821_ca2_w( game_pia, 0, (mouse & 2) ? 1 : 0 ); /* YA */
+		pia6821_ca1_w( game_pia, (mouse & 1) ? 1 : 0 ); /* XA */
+		pia6821_ca2_w( game_pia, (mouse & 2) ? 1 : 0 ); /* YA */
 	}
 	else
 	{
 		/* joystick */
 		UINT8 in = input_port_read(machine, "game_port_buttons");
-		pia6821_cb2_w( game_pia, 0, (in & 0x80) ? 1 : 0 ); /* P2 action A */
-		pia6821_ca2_w( game_pia, 0, (in & 0x40) ? 1 : 0 ); /* P1 action A */
-		pia6821_cb1_w( game_pia, 0, (in & 0x08) ? 1 : 0 ); /* P2 action B */
-		pia6821_ca1_w( game_pia, 0, (in & 0x04) ? 1 : 0 ); /* P1 action B */
+		pia6821_cb2_w( game_pia, (in & 0x80) ? 1 : 0 ); /* P2 action A */
+		pia6821_ca2_w( game_pia, (in & 0x40) ? 1 : 0 ); /* P1 action A */
+		pia6821_cb1_w( game_pia, (in & 0x08) ? 1 : 0 ); /* P2 action B */
+		pia6821_ca1_w( game_pia, (in & 0x04) ? 1 : 0 ); /* P1 action B */
 		/* TODO:
            it seems that CM 90-112 behaves differently
            - ca1 is P1 action A, i.e., in & 0x40
@@ -1259,7 +1259,7 @@ static void to7_game_reset ( running_machine *machine )
 	running_device *game_pia = machine->device( THOM_PIA_GAME );
 
 	LOG (( "to7_game_reset called\n" ));
-	pia6821_ca1_w( game_pia, 0, 0 );
+	pia6821_ca1_w( game_pia, 0 );
 	to7_game_sound = 0;
 	to7_game_mute = 0;
 	to7_game_sound_update( machine );
@@ -1542,7 +1542,7 @@ MACHINE_RESET ( to7 )
 	thom_set_lightpen_callback( machine, 3, to7_lightpen_cb );
 	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( machine, 0 );
-	pia6821_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0 );
 
 	/* memory */
 	old_cart_bank = -1;
@@ -1798,7 +1798,7 @@ MACHINE_RESET( to770 )
 	thom_set_lightpen_callback( machine, 3, to7_lightpen_cb );
 	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( machine, 8 );
-	pia6821_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0 );
 
 	/* memory */
 	old_ram_bank = -1;
@@ -1867,8 +1867,8 @@ static void mo5_lightpen_cb ( running_machine *machine, int step )
 	if ( ! to7_lightpen )
 		return;
 
-	pia6821_ca1_w( sys_pia, 0, 1 );
-	pia6821_ca1_w( sys_pia, 0, 0 );
+	pia6821_ca1_w( sys_pia, 1 );
+	pia6821_ca1_w( sys_pia, 0 );
 	to7_lightpen_step = step;
 }
 
@@ -1890,8 +1890,8 @@ static TIMER_CALLBACK(mo5_periodic_cb)
 	running_device *sys_pia = machine->device( THOM_PIA_SYS );
 
 	/* pulse */
-	pia6821_cb1_w( sys_pia, 0, 1 );
-	pia6821_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 1 );
+	pia6821_cb1_w( sys_pia, 0 );
 }
 
 
@@ -2172,7 +2172,7 @@ MACHINE_RESET( mo5 )
 	thom_set_lightpen_callback( machine, 3, mo5_lightpen_cb );
 	thom_set_mode_point( machine, 0 );
 	thom_set_border_color( machine, 0 );
-	pia6821_ca1_w( sys_pia, 0, 0 );
+	pia6821_ca1_w( sys_pia, 0 );
 
 	/* memory */
 	old_cart_bank = -1;
@@ -3134,7 +3134,7 @@ MACHINE_RESET ( to9 )
 	thom_set_lightpen_callback( machine, 3, to7_lightpen_cb );
 	thom_set_border_color( machine, 8 );
 	thom_set_mode_point( machine, 0 );
-	pia6821_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0 );
 
 	/* memory */
 	old_ram_bank = -1;
@@ -4124,7 +4124,7 @@ MACHINE_RESET ( to8 )
 	thom_set_lightpen_callback( machine, 4, to8_lightpen_cb );
 	thom_set_border_color( machine, 0 );
 	thom_set_mode_point( machine, 0 );
-	pia6821_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0 );
 
 	/* memory */
 	old_ram_bank = -1;
@@ -4294,7 +4294,7 @@ MACHINE_RESET ( to9p )
 	thom_set_lightpen_callback( machine, 4, to8_lightpen_cb );
 	thom_set_border_color( machine, 0 );
 	thom_set_mode_point( machine, 0 );
-	pia6821_cb1_w( sys_pia, 0, 0 );
+	pia6821_cb1_w( sys_pia, 0 );
 
 	/* memory */
 	old_ram_bank = -1;
@@ -4537,7 +4537,7 @@ WRITE8_HANDLER ( mo6_ext_w )
 static WRITE_LINE_DEVICE_HANDLER( mo6_centronics_busy )
 {
 	running_device *game_pia = device->machine->device( THOM_PIA_GAME );
-	pia6821_cb1_w(game_pia, 0, state);
+	pia6821_cb1_w(game_pia, state);
 }
 
 
@@ -4600,15 +4600,15 @@ static TIMER_CALLBACK(mo6_game_update_cb)
 	if ( input_port_read(machine, "config") & 1 )
 	{
 		UINT8 mouse = to7_get_mouse_signal(machine);
-		pia6821_ca1_w( game_pia, 0, mouse & 1 ); /* XA */
-		pia6821_ca2_w( game_pia, 0, mouse & 2 ); /* YA */
+		pia6821_ca1_w( game_pia, BIT(mouse, 0) ); /* XA */
+		pia6821_ca2_w( game_pia, BIT(mouse, 1) ); /* YA */
 	}
 	else
 	{
 		/* joystick */
 		UINT8 in = input_port_read(machine, "game_port_buttons");
-		pia6821_ca1_w( game_pia, 0, in & 0x04 ); /* P1 action B */
-		pia6821_ca2_w( game_pia, 0, in & 0x40 ); /* P1 action A */
+		pia6821_ca1_w( game_pia, BIT(in, 2) ); /* P1 action B */
+		pia6821_ca2_w( game_pia, BIT(in, 6) ); /* P1 action A */
 	}
 }
 
@@ -4629,7 +4629,7 @@ static void mo6_game_reset ( running_machine *machine )
 {
 	running_device *game_pia = machine->device( THOM_PIA_GAME );
 	LOG (( "mo6_game_reset called\n" ));
-	pia6821_ca1_w( game_pia, 0, 0 );
+	pia6821_ca1_w( game_pia, 0 );
 	to7_game_sound = 0;
 	to7_game_mute = 0;
 	to7_game_sound_update(machine);
@@ -4921,7 +4921,7 @@ MACHINE_RESET ( mo6 )
 	thom_set_lightpen_callback( machine, 3, to8_lightpen_cb );
 	thom_set_border_color( machine, 0 );
 	thom_set_mode_point( machine, 0 );
-	pia6821_ca1_w( sys_pia, 0, 0 );
+	pia6821_ca1_w( sys_pia, 0 );
 
 	/* memory */
 	old_ram_bank = -1;
@@ -5142,7 +5142,7 @@ static void mo5nr_game_reset ( running_machine* machine )
 {
 	running_device *game_pia = machine->device( THOM_PIA_GAME );
 	LOG (( "mo5nr_game_reset called\n" ));
-	pia6821_ca1_w( game_pia, 0, 0 );
+	pia6821_ca1_w( game_pia, 0 );
 	to7_game_sound = 0;
 	to7_game_mute = 0;
 	to7_game_sound_update(machine);
@@ -5181,7 +5181,7 @@ MACHINE_RESET ( mo5nr )
 	thom_set_lightpen_callback( machine, 3, to8_lightpen_cb );
 	thom_set_border_color( machine, 0 );
 	thom_set_mode_point( machine, 0 );
-	pia6821_ca1_w( sys_pia, 0, 0 );
+	pia6821_ca1_w( sys_pia, 0 );
 
 	/* memory */
 	old_ram_bank = -1;

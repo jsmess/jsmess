@@ -647,7 +647,7 @@ static VIDEO_UPDATE( pet_crtc )
 static IEEE488_DAISY( ieee488_daisy )
 {
 	{ "pia_0" },
-	{ "pia_1", DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_HANDLER("pia_1", pia6821_cb1_w), DEVCB_DEVICE_HANDLER("pia_1", pia6821_ca1_w), DEVCB_NULL },
+	{ "pia_1", DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE("pia_1", pia6821_cb1_w), DEVCB_DEVICE_LINE("pia_1", pia6821_ca1_w), DEVCB_NULL },
 	{ "via6522_0" },
 	{ C2040_IEEE488("c4040") },
 	{ NULL}

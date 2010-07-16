@@ -334,7 +334,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	key_pressed = 0;
 
 	/* The keyboard strobe line should always be low when a scan starts. */
-	pia6821_ca1_w(pia, 0, 0);
+	pia6821_ca1_w(pia, 0);
 
 	shiftkeys = input_port_read(machine, "KEY4") & 0x0003;
 	ctrlkeys = input_port_read(machine, "KEY4") & 0x000c;
@@ -368,7 +368,7 @@ static TIMER_CALLBACK(apple1_kbd_poll)
 	{
 		/* The keyboard will pulse its strobe line when a key is
            pressed.  A 10-usec pulse is typical. */
-		pia6821_ca1_w(pia, 0, 1);
+		pia6821_ca1_w(pia, 1);
 		timer_set(machine, ATTOTIME_IN_USEC(10), NULL, 0, apple1_kbd_strobe_end);
 	}
 }
@@ -378,7 +378,7 @@ static TIMER_CALLBACK(apple1_kbd_strobe_end)
 	running_device *pia = machine->device( "pia" );
 
 	/* End of the keyboard strobe pulse. */
-	pia6821_ca1_w(pia, 0, 0);
+	pia6821_ca1_w(pia, 0);
 }
 
 
@@ -425,7 +425,7 @@ static TIMER_CALLBACK(apple1_dsp_ready_start)
        triggers a 74123 one-shot to send a 3.5-usec low pulse to PIA
        input CB1.  The end of this pulse will tell the PIA that the
        display is ready for another write. */
-	pia6821_cb1_w(pia, 0, 0);
+	pia6821_cb1_w(pia, 0);
 	timer_set(machine, ATTOTIME_IN_NSEC(3500), NULL, 0, apple1_dsp_ready_end);
 }
 
@@ -435,7 +435,7 @@ static TIMER_CALLBACK(apple1_dsp_ready_end)
 
 	/* The one-shot pulse has ended; return CB1 to high, so we can do
        another display write. */
-	pia6821_cb1_w(pia, 0, 1);
+	pia6821_cb1_w(pia, 1);
 }
 
 

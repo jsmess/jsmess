@@ -1037,7 +1037,7 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 void coco3_horizontal_sync_callback(running_machine *machine,int data)
 {
 	coco_state *state = (coco_state *)machine->driver_data;
-	pia6821_ca1_w(state->pia_0, 0, data);
+	pia6821_ca1_w(state->pia_0, data);
 	coco3_raise_interrupt(machine, COCO3_INT_HBORD, data);
 }
 
@@ -1046,7 +1046,7 @@ void coco3_horizontal_sync_callback(running_machine *machine,int data)
 void coco3_field_sync_callback(running_machine *machine,int data)
 {
 	coco_state *state = (coco_state *)machine->driver_data;
-	pia6821_cb1_w(state->pia_0, 0, data);
+	pia6821_cb1_w(state->pia_0, data);
 }
 
 void coco3_gime_field_sync_callback(running_machine *machine)
@@ -1758,7 +1758,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_intrq_w )
 static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_drq_w )
 {
 	coco_state *cstate = (coco_state *)device->machine->driver_data;
-	pia6821_cb1_w(cstate->pia_2, 0, state ? CARTLINE_ASSERTED : CARTLINE_CLEAR);
+	pia6821_cb1_w(cstate->pia_2, state ? CARTLINE_ASSERTED : CARTLINE_CLEAR);
 }
 
 /* The Dragon Alpha hardware reverses the order of the WD2797 registers */
@@ -2712,7 +2712,7 @@ static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype )
 void coco_cart_w(running_device *device, int data)
 {
 	coco_state *state = (coco_state *)device->machine->driver_data;
-	pia6821_cb1_w(state->pia_1, 0, data ? ASSERT_LINE : CLEAR_LINE);
+	pia6821_cb1_w(state->pia_1, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

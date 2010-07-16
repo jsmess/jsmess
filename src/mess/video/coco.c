@@ -65,7 +65,7 @@ ATTR_CONST UINT8 coco_get_attributes(running_machine *machine, UINT8 c, int scan
 static void coco_horizontal_sync_callback(running_machine *machine, int data)
 {
 	coco_state *state = (coco_state *)machine->driver_data;
-	pia6821_ca1_w(state->pia_0, 0, data);
+	pia6821_ca1_w(state->pia_0, data);
 }
 
 
@@ -73,7 +73,7 @@ static void coco_horizontal_sync_callback(running_machine *machine, int data)
 static void coco_field_sync_callback(running_machine *machine, int data)
 {
 	coco_state *state = (coco_state *)machine->driver_data;
-	pia6821_cb1_w(state->pia_0, 0, data);
+	pia6821_cb1_w(state->pia_0, data);
 }
 
 static const UINT8 *get_video_ram_coco(running_machine *machine,int scanline)

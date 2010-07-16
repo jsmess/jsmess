@@ -742,19 +742,21 @@ static WRITE8_DEVICE_HANDLER( lasr2001_pia_pb_w )
 	/*
         Signal  Description
 
-        PB0     Keyboard row 0
-        PB1     Keyboard row 1
-        PB2     Keyboard row 2
-        PB3     Keyboard row 3
-        PB4     Keyboard row 4
-        PB5     Keyboard row 5
-        PB6     Keyboard row 6
-        PB7     Keyboard row 7
+        PB0     Keyboard row 0, PSG data 7, centronics data 0
+        PB1     Keyboard row 1, PSG data 6, centronics data 1
+        PB2     Keyboard row 2, PSG data 5, centronics data 2
+        PB3     Keyboard row 3, PSG data 4, centronics data 3
+        PB4     Keyboard row 4, PSG data 3, centronics data 4
+        PB5     Keyboard row 5, PSG data 2, centronics data 5
+        PB6     Keyboard row 6, PSG data 1, centronics data 6
+        PB7     Keyboard row 7, PSG data 0, centronics data 7
     */
 
 	crvision_state *state = (crvision_state *)device->machine->driver_data;
 	
 	state->keylatch = data;
+
+	centronics_data_w(device, 0, data);
 }
 
 static READ_LINE_DEVICE_HANDLER( lasr2001_pia_ca1_r )
@@ -764,33 +766,49 @@ static READ_LINE_DEVICE_HANDLER( lasr2001_pia_ca1_r )
 
 static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_ca2_w )
 {
+	crvision_state *driver_state = (crvision_state *)device->machine->driver_data;
+
+	driver_state->pia_ca2 = state;
+
 	cassette_output(device, state ? +1.0 : -1.0);
+}
+
+static READ_LINE_DEVICE_HANDLER( lasr2001_pia_cb1_r )
+{
+	crvision_state *state = (crvision_state *)device->machine->driver_data;
+
+
+	return sn76496_ready_r(device) & centronics_not_busy_r(state->centronics);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_cb2_w )
 {
 	crvision_state *driver_state = (crvision_state *)device->machine->driver_data;
 
-	if (!state)
+	if (!driver_state->pia_ca2)
 	{
-		sn76496_w(device, 0, driver_state->keylatch);
+		if (!state) sn76496_w(device, 0, driver_state->keylatch);
+	}
+	else
+	{
+		centronics_strobe_w(driver_state->centronics, state);
 	}
 }
 
 static const pia6821_interface lasr2001_pia_intf =
 {
-	DEVCB_HANDLER(lasr2001_pia_pa_r),					// input A
-	DEVCB_HANDLER(lasr2001_pia_pb_r),					// input B
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, lasr2001_pia_ca1_r),// input CA1
-	DEVCB_DEVICE_LINE(SN76489_TAG, sn76496_ready_r),	// input CB1
-	DEVCB_NULL,											// input CA2 ?
-	DEVCB_LINE_VCC,										// input CB2 (+5V)
-	DEVCB_HANDLER(lasr2001_pia_pa_w),					// output A
-	DEVCB_HANDLER(lasr2001_pia_pb_w),					// output B
-	DEVCB_DEVICE_LINE(CASSETTE_TAG, lasr2001_pia_ca2_w),// output CA2
-	DEVCB_DEVICE_LINE(SN76489_TAG, lasr2001_pia_cb2_w),	// output CB2 (SN76489 pin CE_)
-	DEVCB_NULL,											// irq A (floating)
-	DEVCB_NULL											// irq B (floating)
+	DEVCB_HANDLER(lasr2001_pia_pa_r),							// input A
+	DEVCB_HANDLER(lasr2001_pia_pb_r),							// input B
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, lasr2001_pia_ca1_r),		// input CA1
+	DEVCB_DEVICE_LINE(SN76489_TAG, lasr2001_pia_cb1_r),			// input CB1
+	DEVCB_NULL,													// input CA2
+	DEVCB_LINE_VCC,												// input CB2 (+5V)
+	DEVCB_HANDLER(lasr2001_pia_pa_w),							// output A
+	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, lasr2001_pia_pb_w),	// output B
+	DEVCB_DEVICE_LINE(CASSETTE_TAG, lasr2001_pia_ca2_w),		// output CA2
+	DEVCB_DEVICE_LINE(SN76489_TAG, lasr2001_pia_cb2_w),			// output CB2
+	DEVCB_NULL,													// irq A (floating)
+	DEVCB_NULL													// irq B (floating)
 };
 
 /*-------------------------------------------------
@@ -834,6 +852,18 @@ static const floppy_config lasr2001_floppy_config =
 	NULL
 };
 
+/*-------------------------------------------------
+    centronics_interface lasr2001_centronics_intf
+-------------------------------------------------*/
+
+static const centronics_interface lasr2001_centronics_intf =
+{
+	FALSE,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_DEVICE_LINE(PIA6821_TAG, pia6821_cb1_w)
+};
+
 /***************************************************************************
     MACHINE INITIALIZATION
 ***************************************************************************/
@@ -849,6 +879,7 @@ static MACHINE_START( creativision )
 	/* find devices */
 	state->psg = machine->device(SN76489_TAG);
 	state->cassette = machine->device(CASSETTE_TAG);
+	state->centronics = machine->device(CENTRONICS_TAG);
 
 	/* register for state saving */
 	state_save_register_global(machine, state->keylatch);
@@ -1122,7 +1153,7 @@ static MACHINE_DRIVER_START( lasr2001 )
 	MDRV_FLOPPY_DRIVE_ADD(FLOPPY_0, lasr2001_floppy_config)
 
 	/* printer */
-	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
+	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, lasr2001_centronics_intf)
 
 	/* internal ram */
 	MDRV_RAM_ADD("messram")

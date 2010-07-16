@@ -536,7 +536,7 @@ static const pia6821_interface bw12_pia_config =
 static const centronics_interface bw12_centronics_intf =
 {
 	0,													/* is IBM PC? */
-	DEVCB_DEVICE_HANDLER(PIA6821_TAG, pia6821_ca1_w),	/* ACK output */
+	DEVCB_DEVICE_LINE(PIA6821_TAG, pia6821_ca1_w),		/* ACK output */
 	DEVCB_NULL,											/* BUSY output */
 	DEVCB_NULL											/* NOT BUSY output */
 };
@@ -637,7 +637,7 @@ static WRITE_LINE_DEVICE_HANDLER( bw2_ay3600_data_ready_w )
 
 	driver_state->key_stb = state;
 
-	pia6821_cb1_w(driver_state->pia6821, 0, state);
+	pia6821_cb1_w(driver_state->pia6821, state);
 
 	if (state)
 	{
