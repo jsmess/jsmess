@@ -4,6 +4,9 @@
 
         16/07/2010 Skeleton driver.
 
+		Memory map info :
+			http://archive.psion2.org/org2/techref/memory.htm
+			
 ****************************************************************************/
 
 #include "emu.h"
