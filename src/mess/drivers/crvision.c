@@ -1175,12 +1175,12 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( crvision )
-    ROM_REGION( 0x800, M6502_TAG, 0 )
+    ROM_REGION( 0x10000, M6502_TAG, 0 )
     ROM_LOAD( "crvision.u20", 0x0000, 0x0800, CRC(c3c590c6) SHA1(5ac620c529e4965efb5560fe824854a44c983757) )
 ROM_END
 
 ROM_START( fnvision )
-    ROM_REGION( 0x800, M6502_TAG, 0 )
+    ROM_REGION( 0x10000, M6502_TAG, 0 )
     ROM_LOAD( "funboot.rom",  0x0000, 0x0800, CRC(05602697) SHA1(c280b20c8074ba9abb4be4338b538361dfae517f) )
 ROM_END
 
