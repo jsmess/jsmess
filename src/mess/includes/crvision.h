@@ -19,8 +19,6 @@ public:
 
 	crvision_state(running_machine &machine) { }
 
-	int pia_ca2;
-
 	/* keyboard state */
 	UINT8 keylatch;
 

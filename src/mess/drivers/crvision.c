@@ -24,10 +24,10 @@
 
 	Salora Manager
 
+	- crvision cartridges
 	- keyboard Ctrl+I/J/N don't print out BASIC commands
 	- RAM mapping
-	- cassette
-	- printer
+	- cassette (figure out correct input level)
 	- floppy (interface cartridge needed)
 
 */
@@ -40,6 +40,9 @@ PCB Layout
 ----------
 
 Main board
+
+35 0352 02
+700391F
 
 |-------------------------------------------------------------------------------|
 |               |-----CN1-----|             |-----CN2-----|                     |
@@ -88,6 +91,9 @@ CN6		- keyboard connector (16x1 pin header)
 
 
 Sub board
+
+700472
+35 0473 03
 
 |---------------------------------------|
 |   17.73447MHz |-----CN1-----|         |
@@ -708,10 +714,10 @@ static READ8_DEVICE_HANDLER( lasr2001_pia_pa_r )
 static WRITE8_DEVICE_HANDLER( lasr2001_pia_pa_w )
 {
 	/*
-        PA0     Keyboard raster player 1 output (joystick)
-        PA1     Keyboard raster player 1 output (hand keys)
-        PA2     Keyboard raster player 2 output (joystick)
-        PA3     Keyboard raster player 2 output (hand keys)
+        PA0     Joystick player 1 output 0
+        PA1     Joystick player 1 output 1
+        PA2     Joystick player 2 output 0
+        PA3     Joystick player 2 output 1
         PA4     ?
         PA5     ?
         PA6     ?
@@ -753,9 +759,11 @@ static WRITE8_DEVICE_HANDLER( lasr2001_pia_pb_w )
     */
 
 	crvision_state *state = (crvision_state *)device->machine->driver_data;
-	
-	state->keylatch = data;
 
+	/* keyboard latch */
+	state->keylatch = data;
+	
+	/* centronics data */
 	centronics_data_w(device, 0, data);
 }
 
@@ -766,28 +774,24 @@ static READ_LINE_DEVICE_HANDLER( lasr2001_pia_ca1_r )
 
 static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_ca2_w )
 {
-	crvision_state *driver_state = (crvision_state *)device->machine->driver_data;
-
-	driver_state->pia_ca2 = state;
-
 	cassette_output(device, state ? +1.0 : -1.0);
 }
 
 static READ_LINE_DEVICE_HANDLER( lasr2001_pia_cb1_r )
 {
 	crvision_state *state = (crvision_state *)device->machine->driver_data;
-
-
-	return sn76496_ready_r(device) & centronics_not_busy_r(state->centronics);
+	
+	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if printer image is not mounted -> Manager won't boot */
+	return sn76496_ready_r(state->psg) & (centronics_not_busy_r(state->centronics) | pia6821_get_output_ca2_z(device));
 }
 
 static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_cb2_w )
 {
 	crvision_state *driver_state = (crvision_state *)device->machine->driver_data;
 
-	if (!driver_state->pia_ca2)
+	if (pia6821_get_output_ca2_z(device))
 	{
-		if (!state) sn76496_w(device, 0, driver_state->keylatch);
+		if (!state) sn76496_w(driver_state->psg, 0, driver_state->keylatch);
 	}
 	else
 	{
@@ -800,13 +804,13 @@ static const pia6821_interface lasr2001_pia_intf =
 	DEVCB_HANDLER(lasr2001_pia_pa_r),							// input A
 	DEVCB_HANDLER(lasr2001_pia_pb_r),							// input B
 	DEVCB_DEVICE_LINE(CASSETTE_TAG, lasr2001_pia_ca1_r),		// input CA1
-	DEVCB_DEVICE_LINE(SN76489_TAG, lasr2001_pia_cb1_r),			// input CB1
-	DEVCB_NULL,													// input CA2
+	DEVCB_LINE(lasr2001_pia_cb1_r),								// input CB1
+	DEVCB_LINE_GND,												// input CA2
 	DEVCB_LINE_VCC,												// input CB2 (+5V)
 	DEVCB_HANDLER(lasr2001_pia_pa_w),							// output A
 	DEVCB_DEVICE_HANDLER(CENTRONICS_TAG, lasr2001_pia_pb_w),	// output B
 	DEVCB_DEVICE_LINE(CASSETTE_TAG, lasr2001_pia_ca2_w),		// output CA2
-	DEVCB_DEVICE_LINE(SN76489_TAG, lasr2001_pia_cb2_w),			// output CB2
+	DEVCB_LINE(lasr2001_pia_cb2_w),								// output CB2
 	DEVCB_NULL,													// irq A (floating)
 	DEVCB_NULL													// irq B (floating)
 };
