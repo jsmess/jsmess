@@ -1716,5 +1716,13 @@ const game_driver * const drivers[] =
 	DRIVER( rx78 )
 	DRIVER( bmjr )
 	DRIVER( bml3 )
+	DRIVER( psioncm )
+	DRIVER( psionla )
+	DRIVER( psionp350 )
+	DRIVER( psionlam )
+	DRIVER( psionlz64 )
+	DRIVER( psionlz64s )
+	DRIVER( psionlz )
+	DRIVER( psionp464 )
 
 #endif /* DRIVER_RECURSIVE */

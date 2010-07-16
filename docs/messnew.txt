@@ -26,7 +26,14 @@ Skeleton drivers:
 - Hitachi Basic Master Jr (MB-6885)
 - Hitachi Basic Master Level 3 (MB-6890)
 - Sharp MZ-2000
-
+- Psion Organiser CM
+- Psion Organiser LA
+- Psion Organiser P350
+- Psion Organiser LAM
+- Psion Organiser LZ64
+- Psion Organiser LZ64S
+- Psion Organiser LZ
+- Psion Organiser P464
 
 System Driver Changes:
 ----------------------
