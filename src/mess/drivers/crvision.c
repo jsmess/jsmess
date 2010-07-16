@@ -24,7 +24,6 @@
 
 	Salora Manager
 
-	- crvision cartridges
 	- keyboard Ctrl+I/J/N don't print out BASIC commands
 	- RAM mapping
 	- cassette (figure out correct input level)
@@ -201,8 +200,8 @@ static ADDRESS_MAP_START( lasr2001_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2001, 0x2001) AM_MIRROR(0x0ffe) AM_READ(TMS9928A_register_r)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0x3001, 0x3001) AM_MIRROR(0x0ffe) AM_WRITE(TMS9928A_register_w)
-	AM_RANGE(0x4000, 0x7fff) AM_RAM//AM_ROMBANK(BANK_ROM2)
-	AM_RANGE(0x8000, 0xbfff) AM_RAM//AM_ROMBANK(BANK_ROM1)
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK(BANK_ROM2)
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(BANK_ROM1)
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(M6502_TAG, 0)
 ADDRESS_MAP_END
 
