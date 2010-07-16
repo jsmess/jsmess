@@ -102,11 +102,11 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
-COMP( ????, psioncm,  0,       0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II CM",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, psionla,  psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II LA",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, psionp350, psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II P350",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, psionlam,  psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II LAM",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, psionlz64,  psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II LZ64",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, psionlz64s,  psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II LZ64S",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, psionlz,  psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II LZ",		GAME_NOT_WORKING | GAME_NO_SOUND)
-COMP( ????, psionp464,  psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II P464",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1986, psioncm,	0,       0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II CM",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, psionla,	psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II LA",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, psionp350,	psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II P350",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, psionlam,	psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II LAM",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, psionlz64,  psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II LZ64",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, psionlz64s,	psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II LZ64S",	GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1989, psionlz,	psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II LZ",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 198?, psionp464,	psioncm, 0, 	psion, 		psion, 	 0,   "Psion",   "Organiser II P464",	GAME_NOT_WORKING | GAME_NO_SOUND)
