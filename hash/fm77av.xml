@@ -14,7 +14,7 @@
 		<publisher>Tecnosoft</publisher>
 		<part name="disk1" interface="fm7_flop">
 			<dataarea name="flop" size="416688">
-				<rom name="9gyokuden_a.d77" size="416688" crc="07248297" sha1="79784a38f4491ea0b81791e37a760676fb53b7e0" offset="000000" />
+				<rom name="9gyokuden_a.d77" size="416688" crc="c3757455" sha1="dcf9d2422daa7920d91c26171dd0334e65cf15f8" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="disk2" interface="fm7_flop">
