@@ -61,6 +61,71 @@ typedef struct {
 	UINT32	hdelay;			/* 03400080 */
 	UINT32	adbio;			/* 03400084 */
 	UINT32	adbctl;			/* 03400088 */
+							/* Timers */
+	UINT32	timer0;			/* 03400100 */
+	UINT32	timerback0;		/* 03400104 */
+	UINT32	timer1;			/* 03400108 */
+	UINT32	timerback1;		/* 0340010c */
+	UINT32	timer2;			/* 03400110 */
+	UINT32	timerback2;		/* 03400114 */
+	UINT32	timer3;			/* 03400118 */
+	UINT32	timerback3;		/* 0340011c */
+	UINT32	timer4;			/* 03400120 */
+	UINT32	timerback4;		/* 03400124 */
+	UINT32	timer5;			/* 03400128 */
+	UINT32	timerback5;		/* 0340012c */
+	UINT32	timer6;			/* 03400130 */
+	UINT32	timerback6;		/* 03400134 */
+	UINT32	timer7;			/* 03400138 */
+	UINT32	timerback7;		/* 0340013c */
+	UINT32	timer8;			/* 03400140 */
+	UINT32	timerback8;		/* 03400144 */
+	UINT32	timer9;			/* 03400148 */
+	UINT32	timerback9;		/* 0340014c */
+	UINT32	timer10;		/* 03400150 */
+	UINT32	timerback10;	/* 03400154 */
+	UINT32	timer11;		/* 03400158 */
+	UINT32	timerback11;	/* 0340015c */
+	UINT32	timer12;		/* 03400160 */
+	UINT32	timerback12;	/* 03400164 */
+	UINT32	timer13;		/* 03400168 */
+	UINT32	timerback13;	/* 0340016c */
+	UINT32	timer14;		/* 03400170 */
+	UINT32	timerback14;	/* 03400174 */
+	UINT32	timer15;		/* 03400178 */
+	UINT32	timerback15;	/* 0340017c */
+	UINT32	settm0;			/* 03400200 */
+	UINT32	clrtm0;			/* 03400204 */
+	UINT32	settm1;			/* 03400208 */
+	UINT32	clrtm1;			/* 0340020c */
+	UINT32	slack;			/* 03400220 */
+							/* DMA */
+	UINT32	dmareqdis;		/* 03400308 */
+							/* Expansion bus */
+	UINT32	type0_4;		/* 03400400 */
+	UINT32	dipir1;			/* 03400410 */
+	UINT32	dipir2;			/* 03400414 */
+							/* DSPP */
+	UINT32	semaphore;		/* 034017d0 */
+	UINT32	semaack;		/* 034017d4 */
+	UINT32	dsppdma;		/* 034017e0 */
+	UINT32	dspprst0;		/* 034017e4 */
+	UINT32	dspprst1;		/* 034017e8 */
+	UINT32	dspppc;			/* 034017f4 */
+	UINT32	dsppnr;			/* 034017f8 */
+	UINT32	dsppgw;			/* 034017fc */
+	UINT32	dsppn[0x400];	/* 03401800 - 03401bff DSPP N stack (32bit writes) */
+							/* 03402000 - 034027ff DSPP N stack (16bit writes) */
+	UINT32	dsppei[0x100];	/* 03403000 - 034030ff DSPP EI stack (32bit writes) */
+							/* 03403400 - 034035ff DSPP EI stack (16bit writes) */
+	UINT32	dsppeo[0x1f]	/* 03403800 - 0340381f DSPP EO stack (32bit reads) */
+							/* 03403c00 - 03403c3f DSPP EO stack (32bit reads) */
+	UINT32	dsppclkreload;	/* 034039dc / 03403fbc */
+							/* UNCLE */
+	UINT32	unclerev;		/* 0340c000 */
+	UINT32	uncle_soft_rev;	/* 0340c004 */
+	UINT32	uncle_addr;		/* 0340c008 */
+	UINT32	uncle_rom;		/* 0340c00c */
 } CLIO;
 
 
@@ -122,6 +187,7 @@ WRITE32_HANDLER( _3do_nvarea_w ) {
     write 00002000 to 03180000
     several groups of 16 write actions or 16 read actions
 */
+
 READ32_HANDLER( _3do_unk_318_r ) {
 	logerror( "%08X: UNK_318 read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
 #if 0
@@ -133,6 +199,7 @@ READ32_HANDLER( _3do_unk_318_r ) {
 #endif
 	return 0;
 }
+
 
 WRITE32_HANDLER( _3do_unk_318_w )
 {
@@ -187,7 +254,8 @@ WRITE32_HANDLER( _3do_svf_w )
 
 
 READ32_HANDLER( _3do_madam_r ) {
-	logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
+	//logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
+
 	switch( offset ) {
 	case 0x0000/4:		/* 03300000 - Revision */
 		return madam.revision;
@@ -334,14 +402,20 @@ READ32_HANDLER( _3do_madam_r ) {
 		return madam.mult_control;
 	case 0x07f8/4:
 		return madam.mult_status;
+	default:
+		logerror( "%08X: unhandled MADAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
+		break;
 	}
 	return 0;
 }
 
 
 WRITE32_HANDLER( _3do_madam_w ) {
-	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data, mem_mask );
+	//logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
+
 	switch( offset ) {
+	case 0x0000/4:
+		break;
 	case 0x0004/4:	/* 03300004 - Memory configuration 29 = 2MB DRAM, 1MB VRAM */
 		madam.msysbits = data;
 		break;
@@ -506,6 +580,10 @@ WRITE32_HANDLER( _3do_madam_w ) {
 		break;
 	case 0x07fc/4:	/* Start process */
 		break;
+
+	default:
+		logerror( "%08X: unhandled MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
+		break;
 	}
 }
 
@@ -519,7 +597,7 @@ void _3do_madam_init( void )
 
 READ32_HANDLER( _3do_clio_r )
 {
-	logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
+	//logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset * 4 );
 
 	switch( offset )
 	{
@@ -551,16 +629,48 @@ READ32_HANDLER( _3do_clio_r )
 		return clio.adbio;
 	case 0x0088/4:
 		return clio.adbctl;
+
+	case 0x0200/4:
+		return clio.settm0;
+	case 0x0204/4:
+		return clio.clrtm0;
+	case 0x0208/4:
+		return clio.settm1;
+	case 0x020c/4:
+		return clio.clrtm1;
+
+	case 0x0220/4:
+		return clio.slack;
+
+	case 0x0410/4:
+		return clio.dipir1;
+	case 0x0414/4:
+		return clio.dipir2;
+
+	case 0xc000/4:
+		return clio.unclerev;
+	case 0xc004/4:
+		return clio.uncle_soft_rev;
+	case 0xc008/4:
+		return clio.uncle_addr;
+	case 0xc00c/4:
+		return clio.uncle_rom;
+
+	default:
+		logerror( "%08X: unhandled CLIO read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset * 4 );
+		break;
 	}
 	return 0;
 }
 
 WRITE32_HANDLER( _3do_clio_w )
 {
-	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data, mem_mask );
+	//logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
 
 	switch( offset )
 	{
+	case 0x0000/4:
+		break;
 	case 0x0004/4:
 		clio.csysbits = data;
 		break;
@@ -576,7 +686,7 @@ WRITE32_HANDLER( _3do_clio_w )
 	case 0x0024/4:	/* 03400024 - c0020f0f is written here during boot */
 		clio.audout = data;
 		break;
-	case 0x0028/4:	/* 03400028 - bits 0,1, and 6 are tested (irq sources?) */
+	case 0x0028/4:	/* 03400028 - bits 0,1, and 6 are tested (reset source) */
 		clio.cstatbits = data;
 		break;
 	case 0x002c/4:	/* 0340002C - ?? during boot 0000000B is written here counter reload related?? */
@@ -637,7 +747,137 @@ WRITE32_HANDLER( _3do_clio_w )
 		clio.adbctl = data;
 		break;
 
-	case 0x88:	/* set timer frequency */
+	case 0x0100/4:
+		clio.timer0 = data & 0x0000ffff;
+		break;
+	case 0x0104/4:
+		clio.timerback0 = data & 0x0000ffff;
+		break;
+	case 0x0108/4:
+		clio.timer1 = data & 0x0000ffff;
+		break;
+	case 0x010c/4:
+		clio.timerback1 = data & 0x0000ffff;
+		break;
+	case 0x0110/4:
+		clio.timer2 = data & 0x0000ffff;
+		break;
+	case 0x0114/4:
+		clio.timerback2 = data & 0x0000ffff;
+		break;
+	case 0x0118/4:
+		clio.timer3 = data & 0x0000ffff;
+		break;
+	case 0x011c/4:
+		clio.timerback3 = data & 0x0000ffff;
+		break;
+	case 0x0120/4:
+		clio.timer4 = data & 0x0000ffff;
+		break;
+	case 0x0124/4:
+		clio.timerback4 = data & 0x0000ffff;
+		break;
+	case 0x0128/4:
+		clio.timer5 = data & 0x0000ffff;
+		break;
+	case 0x012c/4:
+		clio.timerback5 = data & 0x0000ffff;
+		break;
+	case 0x0130/4:
+		clio.timer6 = data & 0x0000ffff;
+		break;
+	case 0x0134/4:
+		clio.timerback6 = data & 0x0000ffff;
+		break;
+	case 0x0138/4:
+		clio.timer7 = data & 0x0000ffff;
+		break;
+	case 0x013c/4:
+		clio.timerback7 = data & 0x0000ffff;
+		break;
+	case 0x0140/4:
+		clio.timer8 = data & 0x0000ffff;
+		break;
+	case 0x0144/4:
+		clio.timerback8 = data & 0x0000ffff;
+		break;
+	case 0x0148/4:
+		clio.timer9 = data & 0x0000ffff;
+		break;
+	case 0x014c/4:
+		clio.timerback9 = data & 0x0000ffff;
+		break;
+	case 0x0150/4:
+		clio.timer10 = data & 0x0000ffff;
+		break;
+	case 0x0154/4:
+		clio.timerback10 = data & 0x0000ffff;
+		break;
+	case 0x0158/4:
+		clio.timer11 = data & 0x0000ffff;
+		break;
+	case 0x015c/4:
+		clio.timerback11 = data & 0x0000ffff;
+		break;
+	case 0x0160/4:
+		clio.timer12 = data & 0x0000ffff;
+		break;
+	case 0x0164/4:
+		clio.timerback12 = data & 0x0000ffff;
+		break;
+	case 0x0168/4:
+		clio.timer13 = data & 0x0000ffff;
+		break;
+	case 0x016c/4:
+		clio.timerback13 = data & 0x0000ffff;
+		break;
+	case 0x0170/4:
+		clio.timer14 = data & 0x0000ffff;
+		break;
+	case 0x0174/4:
+		clio.timerback14 = data & 0x0000ffff;
+		break;
+	case 0x0178/4:
+		clio.timer15 = data & 0x0000ffff;
+		break;
+	case 0x017c/4:
+		clio.timerback15 = data & 0x0000ffff;
+		break;
+
+	case 0x0200/4:
+		clio.settm0 = data;
+		break;
+	case 0x0204/4:
+		clio.clrtm0 = data;
+		break;
+	case 0x0208/4:
+		clio.settm0 = data;
+		break;
+	case 0x020c/4:
+		break;
+
+	case 0x0220/4:
+		clio.slack = data & 0x000003ff;
+		break;
+
+	case 0x0308/4:
+		clio.dmareqdis = data;
+		break;
+
+	case 0x0408/4:
+		clio.type0_4 = data;
+		break;
+
+	case 0xc000/4:
+	case 0xc004/4:
+	case 0xc00c/4:
+		break;
+	case 0xc008/4:
+		clio.uncle_addr = data;
+		break;
+
+	default:
+		logerror( "%08X: unhandled CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
 		break;
 	}
 }
@@ -647,5 +887,6 @@ void _3do_clio_init( void )
 	memset( &clio, 0, sizeof(CLIO) );
 	clio.revision = 0x02022000;
 	clio.cstatbits = 0x40;
+	clio.unclerev = 0x03800000;
 }
 
