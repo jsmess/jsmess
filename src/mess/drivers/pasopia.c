@@ -5,7 +5,7 @@
     preliminary driver by Angelo Salese
 
 	TODO:
-	- cursor seems too slow, missing irqs?
+	- floppy support (but floppy images are unobtainable at current time)
 
 ****************************************************************************/
 
@@ -13,6 +13,7 @@
 #include "cpu/z80/z80.h"
 #include "machine/z80ctc.h"
 #include "machine/i8255a.h"
+#include "machine/z80pio.h"
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 
@@ -198,11 +199,11 @@ static ADDRESS_MAP_START( paso7_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0x18, 0x1b ) AM_READWRITE( pac2_r, pac2_w )
 	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
 	AM_RANGE( 0x28, 0x2b ) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
-//	AM_RANGE( 0x30, 0x33 ) //I8255 related (port mirrors?)
+	AM_RANGE( 0x30, 0x33 ) AM_DEVREADWRITE("z80pio_0", z80pio_cd_ba_r, z80pio_cd_ba_w)
 	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("sn1", sn76496_w)
 	AM_RANGE( 0x3b, 0x3b ) AM_DEVWRITE("sn2", sn76496_w)
 	AM_RANGE( 0x3c, 0x3c ) AM_WRITE(paso7_bankswitch)
-//	AM_RANGE( 0xe0, 0xe6 ) AM_READWRITE( fdc_r, fdc_w )
+//	AM_RANGE( 0xe0, 0xe6 ) AM_READWRITE( fdc_r, fregdc_w )
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -263,10 +264,21 @@ static Z80CTC_INTERFACE( ctc_intf )
 	DEVCB_LINE(z80ctc_trg3_w),		// ZC/TO2 callback
 };
 
+static Z80PIO_INTERFACE( z80pio_intf )
+{
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
+};
 
 static const z80_daisy_config p7_daisy[] =
 {
 	{ "ctc" },
+	{ "z80pio_0" },
 	{ NULL }
 };
 
@@ -326,7 +338,6 @@ static WRITE8_DEVICE_HANDLER( nmi_mask_w )
 /* TODO: investigate on these. */
 static READ8_DEVICE_HANDLER( unk_r )
 {
-	printf("READ!\n");
 	return 0xff;//mame_rand(device->machine);
 }
 
@@ -357,7 +368,7 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 	DEVCB_HANDLER(unk_r),			/* Port A read */
 	DEVCB_HANDLER(crtc_portb_r),	/* Port B read */
 	DEVCB_NULL,						/* Port C read */
-	DEVCB_HANDLER(screen_mode_w),		/* Port A write */
+	DEVCB_HANDLER(screen_mode_w),	/* Port A write */
 	DEVCB_NULL,						/* Port B write */
 	DEVCB_NULL						/* Port C write */
 };
@@ -400,13 +411,14 @@ static MACHINE_DRIVER_START( paso7 )
 //	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_CPU_CONFIG(p7_daisy)
 
-	MDRV_Z80CTC_ADD( "ctc", XTAL_4MHz/4 , ctc_intf )
+	MDRV_Z80CTC_ADD( "ctc", XTAL_4MHz, ctc_intf )
 
     MDRV_MACHINE_RESET(paso7)
 
 	MDRV_I8255A_ADD( "ppi8255_0", ppi8255_intf_0 )
 	MDRV_I8255A_ADD( "ppi8255_1", ppi8255_intf_1 )
 	MDRV_I8255A_ADD( "ppi8255_2", ppi8255_intf_2 )
+	MDRV_Z80PIO_ADD( "z80pio_0", XTAL_4MHz, z80pio_intf )
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
