@@ -17,7 +17,7 @@
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 
-static UINT8 vram_sel;
+static UINT8 vram_sel,mio_sel;
 static UINT8 *p7_vram;
 static UINT8 bank_reg;
 static UINT16 cursor_addr;
@@ -66,7 +66,7 @@ static WRITE8_HANDLER( vram_w )
 		p7_vram[offset] = data;
 }
 
-static WRITE8_HANDLER( paso7_bankswitch )
+static WRITE8_HANDLER( pasopia7_memory_ctrl_w )
 {
 	UINT8 *cpu = memory_region(space->machine, "maincpu");
 	UINT8 *basic = memory_region(space->machine, "basic");
@@ -90,9 +90,7 @@ static WRITE8_HANDLER( paso7_bankswitch )
 
 	bank_reg = data & 3;
 	vram_sel = data & 4;
-
-	if(data & 8) // as far as I can see, this enables a RAM bankswitch mapped on i/o ports ...
-		printf("Warning: i/o bank write enabled\n");
+	mio_sel = data & 8;
 
 	// bank4 is always RAM
 
@@ -126,6 +124,7 @@ static WRITE8_HANDLER( pac2_w )
 		case 0: pac2_index[pac2_bank_select] = (pac2_index[pac2_bank_select] & 0x7f00) | (data & 0xff); break;
 		case 1: pac2_index[pac2_bank_select] = (pac2_index[pac2_bank_select] & 0xff) | ((data & 0x7f) << 8); break;
 		case 2: // RAM write
+			printf("Warning: write to RAM packs\n");
 			break;
 		case 3:
 		{
@@ -180,6 +179,68 @@ static WRITE8_HANDLER( pasopia7_6845_w )
 	}
 }
 
+static READ8_HANDLER( pasopia7_io_r )
+{
+	static UINT16 io_port;
+
+	if(mio_sel)
+	{
+		const address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		mio_sel = 0;
+		//return 0x0d; // hack: this is used for reading the keyboard data, we can fake it a little ... (modify fda4)
+		return memory_read_byte(ram_space, offset);
+	}
+
+	io_port = offset & 0xff; //trim down to 8-bit bus
+
+	if(io_port >= 0x08 && io_port <= 0x0b) 		{ return i8255a_r(devtag_get_device(space->machine, "ppi8255_0"), (io_port-0x08) & 3); }
+	else if(io_port >= 0x0c && io_port <= 0x0f) { return i8255a_r(devtag_get_device(space->machine, "ppi8255_1"), (io_port-0x0c) & 3); }
+//	else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
+	else if(io_port >= 0x18 && io_port <= 0x1b) { return pac2_r(space, io_port-0x1b);  }
+	else if(io_port >= 0x20 && io_port <= 0x23) { return i8255a_r(devtag_get_device(space->machine, "ppi8255_2"), (io_port-0x20) & 3); }
+	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(devtag_get_device(space->machine, "ctc"), io_port-0x28);  }
+	else if(io_port >= 0x30 && io_port <= 0x33) { return z80pio_cd_ba_r(devtag_get_device(space->machine, "z80pio_0"), (io_port-0x30) & 3); }
+//	else if(io_port == 0x3a) 				  	{ SN1 }
+//	else if(io_port == 0x3b) 				  	{ SN2 }
+//	else if(io_port == 0x3c) 				  	{ bankswitch }
+//	else if(io_port >= 0xe0 && io_port <= 0xe6) { fdc }
+	else
+	{
+		logerror("(PC=%06x) Read i/o address %02x\n",cpu_get_pc(space->cpu),io_port);
+	}
+	return 0xff;
+}
+
+static WRITE8_HANDLER( pasopia7_io_w )
+{
+	static UINT16 io_port;
+
+	if(mio_sel)
+	{
+		const address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		mio_sel = 0;
+		memory_write_byte(ram_space, offset, data);
+		return;
+	}
+
+	io_port = offset & 0xff; //trim down to 8-bit bus
+
+	if(io_port >= 0x08 && io_port <= 0x0b) 		{ i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), (io_port-0x08) & 3, data); }
+	else if(io_port >= 0x0c && io_port <= 0x0f) { i8255a_w(devtag_get_device(space->machine, "ppi8255_1"), (io_port-0x0c) & 3, data); }
+	else if(io_port >= 0x10 && io_port <= 0x11) { pasopia7_6845_w(space, io_port-0x10, data); }
+	else if(io_port >= 0x18 && io_port <= 0x1b) { pac2_w(space, io_port-0x1b, data);  }
+	else if(io_port >= 0x20 && io_port <= 0x23) { i8255a_w(devtag_get_device(space->machine, "ppi8255_2"), (io_port-0x20) & 3, data); }
+	else if(io_port >= 0x28 && io_port <= 0x2b) { z80ctc_w(devtag_get_device(space->machine, "ctc"), io_port-0x28,data);  }
+	else if(io_port >= 0x30 && io_port <= 0x33) { z80pio_cd_ba_w(devtag_get_device(space->machine, "z80pio_0"), (io_port-0x30) & 3, data); }
+	else if(io_port == 0x3a) 				  	{ sn76496_w(devtag_get_device(space->machine, "sn1"), 0, data); }
+	else if(io_port == 0x3b) 				  	{ sn76496_w(devtag_get_device(space->machine, "sn2"), 0, data); }
+	else if(io_port == 0x3c) 				  	{ pasopia7_memory_ctrl_w(space,0, data); }
+//	else if(io_port >= 0xe0 && io_port <= 0xe6) { fdc }
+	else
+	{
+		logerror("(PC=%06x) Write i/o address %02x = %02x\n",cpu_get_pc(space->cpu),offset,data);
+	}
+}
 
 static ADDRESS_MAP_START(paso7_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -192,18 +253,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( paso7_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x08, 0x0b ) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
-	AM_RANGE( 0x0c, 0x0f ) AM_DEVREADWRITE("ppi8255_1", i8255a_r, i8255a_w)
-	AM_RANGE( 0x10, 0x11 ) AM_WRITE(pasopia7_6845_w)
-	AM_RANGE( 0x18, 0x1b ) AM_READWRITE( pac2_r, pac2_w )
-	AM_RANGE( 0x20, 0x23 ) AM_DEVREADWRITE("ppi8255_2", i8255a_r, i8255a_w)
-	AM_RANGE( 0x28, 0x2b ) AM_DEVREADWRITE("ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE( 0x30, 0x33 ) AM_DEVREADWRITE("z80pio_0", z80pio_cd_ba_r, z80pio_cd_ba_w)
-	AM_RANGE( 0x3a, 0x3a ) AM_DEVWRITE("sn1", sn76496_w)
-	AM_RANGE( 0x3b, 0x3b ) AM_DEVWRITE("sn2", sn76496_w)
-	AM_RANGE( 0x3c, 0x3c ) AM_WRITE(paso7_bankswitch)
-//	AM_RANGE( 0xe0, 0xe6 ) AM_READWRITE( fdc_r, fregdc_w )
+	AM_RANGE( 0x0000, 0xffff) AM_READWRITE( pasopia7_io_r, pasopia7_io_w )
 ADDRESS_MAP_END
 
 /* Input ports */
