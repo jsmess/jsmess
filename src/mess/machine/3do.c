@@ -118,7 +118,7 @@ typedef struct {
 							/* 03402000 - 034027ff DSPP N stack (16bit writes) */
 	UINT32	dsppei[0x100];	/* 03403000 - 034030ff DSPP EI stack (32bit writes) */
 							/* 03403400 - 034035ff DSPP EI stack (16bit writes) */
-	UINT32	dsppeo[0x1f]	/* 03403800 - 0340381f DSPP EO stack (32bit reads) */
+	UINT32	dsppeo[0x1f];	/* 03403800 - 0340381f DSPP EO stack (32bit reads) */
 							/* 03403c00 - 03403c3f DSPP EO stack (32bit reads) */
 	UINT32	dsppclkreload;	/* 034039dc / 03403fbc */
 							/* UNCLE */
@@ -886,7 +886,7 @@ void _3do_clio_init( void )
 {
 	memset( &clio, 0, sizeof(CLIO) );
 	clio.revision = 0x02022000;
-	clio.cstatbits = 0x40;
+	clio.cstatbits = 0x01;	/* bit 0 = reset of clio caused by power on */
 	clio.unclerev = 0x03800000;
 }
 
