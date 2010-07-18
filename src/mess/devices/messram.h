@@ -16,11 +16,6 @@
 
 #define RAM_DEFAULT_VALUE	0xcd
 
-enum
-{
-	DEVINFO_STR_MESSRAM_SIZE = DEVINFO_STR_DEVICE_SPECIFIC
-};
-
 
 /***************************************************************************
     TYPE DEFINITIONS
