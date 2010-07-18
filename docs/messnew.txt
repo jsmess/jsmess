@@ -35,6 +35,9 @@ Skeleton drivers:
 - Psion Organiser II LZ
 - Psion Organiser II P464
 - Xircom / Intel REX 6000
+- Sharp Pocket Computer 1360
+- Sharp Pocket Computer 1450
+- Sharp Pocket Computer 1500
 
 System Driver Changes:
 ----------------------

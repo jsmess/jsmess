@@ -705,8 +705,11 @@ const game_driver * const drivers[] =
 	DRIVER( pc1401 )	/* Pocket Computer 1401  */
 	DRIVER( pc1402 )	/* Pocket Computer 1402  */
 	DRIVER( pc1350 )	/* Pocket Computer 1350  */
+	DRIVER( pc1360 )	/* Pocket Computer 1360  */
 	DRIVER( pc1403 )	/* Pocket Computer 1403  */
 	DRIVER( pc1403h )   /* Pocket Computer 1403H    */
+	DRIVER( pc1450 )	/* Pocket Computer 1450  */
+	DRIVER( pc1500 )	/* Pocket Computer 1500  */
 
 	DRIVER( mz700 )	 /* 1982 Sharp MZ700     */
 	DRIVER( mz700j )	/* 1982 Sharp MZ700 Japan      */
