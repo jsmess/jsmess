@@ -22,11 +22,91 @@ static UINT8 *p7_vram;
 static UINT8 bank_reg;
 static UINT16 cursor_addr;
 static UINT8 cursor_blink;
-static UINT8 plane_reg,attr_data;
+static UINT8 plane_reg,attr_data,attr_wrap,attr_latch;
 
 static VIDEO_START( paso7 )
 {
 	p7_vram = auto_alloc_array(machine, UINT8, 0x10000);
+}
+
+#define keyb_press(_val_,_charset_) \
+	if(input_code_pressed(machine, _val_)) \
+	{ \
+		memory_write_byte(ram_space,0xfda4,0x01); \
+		memory_write_byte(ram_space,0xfce1,_charset_); \
+	} \
+
+#define keyb_shift_press(_val_,_charset_) \
+	if(input_code_pressed(machine, _val_) && input_code_pressed(machine, KEYCODE_LSHIFT)) \
+	{ \
+		memory_write_byte(ram_space,0xfda4,0x01); \
+		memory_write_byte(ram_space,0xfce1,_charset_); \
+	} \
+
+/* cheap kludge to use the keyboard without going nuts with the debugger ... */
+static void fake_keyboard_data(running_machine *machine)
+{
+	const address_space *ram_space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	memory_write_byte(ram_space,0xfda4,0x00); //clear flag
+
+	keyb_press(KEYCODE_Z, 'z');
+	keyb_press(KEYCODE_X, 'x');
+	keyb_press(KEYCODE_C, 'c');
+	keyb_press(KEYCODE_V, 'v');
+	keyb_press(KEYCODE_B, 'b');
+	keyb_press(KEYCODE_N, 'n');
+	keyb_press(KEYCODE_M, 'm');
+
+	keyb_press(KEYCODE_A, 'a');
+	keyb_press(KEYCODE_S, 's');
+	keyb_press(KEYCODE_D, 'd');
+	keyb_press(KEYCODE_F, 'f');
+	keyb_press(KEYCODE_G, 'g');
+	keyb_press(KEYCODE_H, 'h');
+	keyb_press(KEYCODE_J, 'j');
+	keyb_press(KEYCODE_K, 'k');
+	keyb_press(KEYCODE_L, 'l');
+
+	keyb_press(KEYCODE_Q, 'q');
+	keyb_press(KEYCODE_W, 'w');
+	keyb_press(KEYCODE_E, 'e');
+	keyb_press(KEYCODE_R, 'r');
+	keyb_press(KEYCODE_T, 't');
+	keyb_press(KEYCODE_Y, 'y');
+	keyb_press(KEYCODE_U, 'u');
+	keyb_press(KEYCODE_I, 'i');
+	keyb_press(KEYCODE_O, 'o');
+	keyb_press(KEYCODE_P, 'p');
+
+	keyb_press(KEYCODE_0, '0');
+	keyb_press(KEYCODE_1, '1');
+	keyb_press(KEYCODE_2, '2');
+	keyb_press(KEYCODE_3, '3');
+	keyb_press(KEYCODE_4, '4');
+	keyb_press(KEYCODE_5, '5');
+	keyb_press(KEYCODE_6, '6');
+	keyb_press(KEYCODE_7, '7');
+	keyb_press(KEYCODE_8, '8');
+	keyb_press(KEYCODE_9, '9');
+
+	keyb_shift_press(KEYCODE_0, '=');
+	keyb_shift_press(KEYCODE_1, '!');
+	keyb_shift_press(KEYCODE_2, '"');
+	keyb_shift_press(KEYCODE_3, '£');
+	keyb_shift_press(KEYCODE_4, '$');
+	keyb_shift_press(KEYCODE_5, '%');
+	keyb_shift_press(KEYCODE_6, '&');
+	keyb_shift_press(KEYCODE_7, '/');
+	keyb_shift_press(KEYCODE_8, '(');
+	keyb_shift_press(KEYCODE_9, ')');
+
+	keyb_press(KEYCODE_ENTER, 0x0d);
+	keyb_press(KEYCODE_SPACE, ' ');
+	keyb_press(KEYCODE_STOP, '.');
+	keyb_shift_press(KEYCODE_STOP, ':');
+	keyb_press(KEYCODE_BACKSPACE, 0x08);
+
 }
 
 static VIDEO_UPDATE( paso7 )
@@ -35,6 +115,8 @@ static VIDEO_UPDATE( paso7 )
 	int count;
 
 	count = 0x0000;
+
+	fake_keyboard_data(screen->machine);
 
 	for(y=0;y<25;y++)
 	{
@@ -57,20 +139,26 @@ static VIDEO_UPDATE( paso7 )
 
 static READ8_HANDLER( vram_r )
 {
-//	if(!vram_sel)
-//		return 0xff;
+	//if(!vram_sel)
+	//	return 0xff;
+
+	attr_latch = p7_vram[offset | 0xc000];
+	i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), 1,  (attr_latch << 4) | (attr_latch & 0x7));
 
 	return p7_vram[offset | 0x8000]; //TODO
 }
 
 static WRITE8_HANDLER( vram_w )
 {
-//	if(vram_sel)
-
-	if((plane_reg & 0x44) == 0x44)
+	//if(vram_sel)
 	{
-		p7_vram[offset | 0x8000] = data;
-		p7_vram[offset | 0xc000] = attr_data;
+		if((plane_reg & 0x44) == 0x44)
+		{
+			p7_vram[offset | 0x8000] = data;
+			attr_latch = attr_wrap ? attr_latch : attr_data;
+			p7_vram[offset | 0xc000] = attr_latch;
+			i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), 1, (attr_latch << 4) | (attr_latch & 0x7));
+		}
 	}
 }
 
@@ -195,7 +283,7 @@ static READ8_HANDLER( pasopia7_io_r )
 	{
 		const address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		mio_sel = 0;
-		printf("%08x\n",offset);
+		//printf("%08x\n",offset);
 		//return 0x0d; // hack: this is used for reading the keyboard data, we can fake it a little ... (modify fda4)
 		return memory_read_byte(ram_space, offset);
 	}
@@ -378,6 +466,7 @@ static WRITE8_DEVICE_HANDLER( video_misc_w )
 	*/
 //	printf("VIDEO MISC REG %02x\n",data);
 	cursor_blink = data & 0x20;
+	attr_wrap = data & 0x10;
 
 }
 
@@ -474,8 +563,8 @@ static PALETTE_INIT( pasopia7 )
 
 		if(((i & 0x11) == 0x01) || ((i & 0x11) == 0x10))
 		{
-			r = ((i >> 3) & 1) ? 0xff : 0x00;
-			g = ((i >> 2) & 1) ? 0xff : 0x00;
+			r = ((i >> 2) & 1) ? 0xff : 0x00;
+			g = ((i >> 3) & 1) ? 0xff : 0x00;
 			b = ((i >> 1) & 1) ? 0xff : 0x00;
 		}
 		else { r = g = b = 0x00; }
