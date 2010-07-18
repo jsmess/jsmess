@@ -1,4 +1,4 @@
-/***************************************************************************
+/**************************************************************************************************
 
 	Toshiba Pasopia 7 (c) 1983 Toshiba
 
@@ -6,8 +6,11 @@
 
 	TODO:
 	- floppy support (but floppy images are unobtainable at current time)
+	- Z80PIO keyboard irq doesn't work at all, kludged keyboard inputs to work for now
+	- advanced BASIC commands (width 80, circle, line ...) makes the emulation to go to la-la-land
+	- some text garbage pops up in place, first example is when you type "10 for a=0 to n"
 
-****************************************************************************/
+***************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -18,15 +21,16 @@
 #include "video/mc6845.h"
 
 static UINT8 vram_sel,mio_sel;
-static UINT8 *p7_vram;
+static UINT8 *p7_vram,*p7_pal;
 static UINT8 bank_reg;
 static UINT16 cursor_addr;
 static UINT8 cursor_blink;
-static UINT8 plane_reg,attr_data,attr_wrap,attr_latch;
+static UINT8 plane_reg,attr_data,attr_wrap,attr_latch,pal_sel,x_width;
 
 static VIDEO_START( paso7 )
 {
 	p7_vram = auto_alloc_array(machine, UINT8, 0x10000);
+	p7_pal = auto_alloc_array(machine, UINT8, 0x10);
 }
 
 #define keyb_press(_val_,_charset_) \
@@ -106,29 +110,58 @@ static void fake_keyboard_data(running_machine *machine)
 	keyb_press(KEYCODE_STOP, '.');
 	keyb_shift_press(KEYCODE_STOP, ':');
 	keyb_press(KEYCODE_BACKSPACE, 0x08);
+	keyb_press(KEYCODE_0_PAD, '@'); //@
+	keyb_press(KEYCODE_COMMA, ',');
+	keyb_shift_press(KEYCODE_COMMA, ';');
+	keyb_press(KEYCODE_MINUS_PAD, '-');
 
 }
 
 static VIDEO_UPDATE( paso7 )
 {
-	int x,y;
+	int x,y,xi;
 	int count;
-
-	count = 0x0000;
+	int width;
 
 	fake_keyboard_data(screen->machine);
 
+	width = x_width ? 80 : 40;
+
+	count = 0x0000;
+
+	for(y=0;y<200;y++)
+	{
+		for(x=0;x<320;x+=8)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				int pen_b,pen_r,pen_g,color;
+
+				pen_b = (p7_vram[count+0x0000]>>(7-xi)) & 1;
+				pen_r = (p7_vram[count+0x4000]>>(7-xi)) & 1;
+				pen_g = 0;//(p7_vram[count+0x8000]>>(7-xi)) & 1;
+
+				color =  pen_g<<2 | pen_r<<1 | pen_b<<0;
+
+				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[color+0x20];
+			}
+			count++;
+		}
+	}
+
+	count = 0x0000;
+
 	for(y=0;y<25;y++)
 	{
-		for(x=0;x<40;x++)
+		for(x=0;x<width;x++)
 		{
 			int tile = p7_vram[count+0x8000];
 			int color = p7_vram[count+0xc000];
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8);
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8,0);
 
 			if(((cursor_addr*8) == count) && !cursor_blink) // draw cursor
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],0x5f,7,0,0,x*8,y*8);
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],0x5f,7,0,0,x*8,y*8,0);
 
 			count+=8;
 		}
@@ -139,22 +172,47 @@ static VIDEO_UPDATE( paso7 )
 
 static READ8_HANDLER( vram_r )
 {
+	static UINT8 res;
+
 	//if(!vram_sel)
 	//	return 0xff;
 
-	attr_latch = p7_vram[offset | 0xc000];
-	i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), 1,  (attr_latch << 4) | (attr_latch & 0x7));
+	if(pal_sel && (plane_reg & 0x70) == 0x00)
+		return p7_pal[offset & 0xf];
 
-	return p7_vram[offset | 0x8000]; //TODO
+	res = 0xff;
+
+	if((plane_reg & 0x11) == 0x11)
+		res &= p7_vram[offset | 0x0000];
+	if((plane_reg & 0x22) == 0x22)
+		res &= p7_vram[offset | 0x4000];
+	if((plane_reg & 0x44) == 0x44)
+	{
+		res &= p7_vram[offset | 0x8000];
+		attr_latch = p7_vram[offset | 0xc000];
+		i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), 1,  (attr_latch << 4) | (attr_latch & 0x7));
+	}
+
+	return res;
 }
 
 static WRITE8_HANDLER( vram_w )
 {
 	//if(vram_sel)
 	{
-		if((plane_reg & 0x44) == 0x44)
+		if(pal_sel && (plane_reg & 0x70) == 0x00)
 		{
-			p7_vram[offset | 0x8000] = data;
+			p7_pal[offset & 0xf] = data & 0xf;
+			return;
+		}
+
+		if(plane_reg & 0x10)
+			p7_vram[offset | 0x0000] = (plane_reg & 1) ? data : 0xff;
+		if(plane_reg & 0x20)
+			p7_vram[offset | 0x4000] = (plane_reg & 2) ? data : 0xff;
+		if(plane_reg & 0x40)
+		{
+			p7_vram[offset | 0x8000] = (plane_reg & 4) ? data : 0xff;
 			attr_latch = attr_wrap ? attr_latch : attr_data;
 			p7_vram[offset | 0xc000] = attr_latch;
 			i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), 1, (attr_latch << 4) | (attr_latch & 0x7));
@@ -240,8 +298,16 @@ static READ8_HANDLER( pac2_r )
 	UINT8 *pac2_ram = memory_region(space->machine, "rampac1");
 
 	if(offset == 2)
+	{
 		if(pac2_bank_select == 4)
+		{
 			return pac2_ram[pac2_index[4]];
+		}
+		else
+		{
+			printf("%02x\n",pac2_bank_select);
+		}
+	}
 
 	return 0xff;
 }
@@ -441,20 +507,25 @@ static READ8_DEVICE_HANDLER( crtc_portb_r )
 
 static WRITE8_DEVICE_HANDLER( screen_mode_w )
 {
-	printf("GFX MODE %02x\n",data);
+	if(data & 0xdf)
+		printf("GFX MODE %02x\n",data);
+	x_width = data & 0x20;
 }
 
 static WRITE8_DEVICE_HANDLER( plane_reg_w )
 {
-	printf("PLANE %02x\n",data);
+	//if(data & 0x11)
+	//printf("PLANE %02x\n",data);
 	plane_reg = data;
 }
 
 static WRITE8_DEVICE_HANDLER( video_attr_w )
 {
-	printf("VIDEO ATTR %02x | TEXT_PAGE %02x\n",data & 0xf,data & 0x70);
+	//printf("VIDEO ATTR %02x | TEXT_PAGE %02x\n",data & 0xf,data & 0x70);
 	attr_data = data & 0xf;
 }
+
+//#include "debugger.h"
 
 static WRITE8_DEVICE_HANDLER( video_misc_w )
 {
@@ -464,10 +535,14 @@ static WRITE8_DEVICE_HANDLER( video_misc_w )
 		---- x--- pal disable
 		---- xx-- palette selector (both bits enables this, odd hook-up)
 	*/
-//	printf("VIDEO MISC REG %02x\n",data);
+//	if(data & 2)
+//	{
+//		printf("VIDEO MISC %02x\n",data);
+//		debugger_break(device->machine);
+//	}
 	cursor_blink = data & 0x20;
 	attr_wrap = data & 0x10;
-
+//	pal_sel = data & 0x02;
 }
 
 static WRITE8_DEVICE_HANDLER( nmi_mask_w )
@@ -478,10 +553,10 @@ static WRITE8_DEVICE_HANDLER( nmi_mask_w )
 	---- --x- sound off
 	---- ---x reset NMI (writes to port B = clears bits 1 & 2) (???)
 	*/
-	printf("SYSTEM MISC %02x\n",data);
+//	printf("SYSTEM MISC %02x\n",data);
 
-	if(data & 1)
-		i8255a_w(devtag_get_device(device->machine, "ppi8255_2"), 1, 0);
+//	if(data & 1)
+//		i8255a_w(devtag_get_device(device->machine, "ppi8255_2"), 1, 0);
 
 }
 
@@ -571,6 +646,8 @@ static PALETTE_INIT( pasopia7 )
 
 		palette_set_color_rgb(machine, i, r,g,b);
 	}
+	for( i = 0x000; i < 8; i++)
+		palette_set_color_rgb(machine, i+0x020, pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 0));
 }
 
 static MACHINE_DRIVER_START( paso7 )
@@ -598,7 +675,7 @@ static MACHINE_DRIVER_START( paso7 )
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
-    MDRV_PALETTE_LENGTH(0x20)
+    MDRV_PALETTE_LENGTH(0x28)
     MDRV_PALETTE_INIT(pasopia7)
 
 	MDRV_GFXDECODE( pasopia7 )
