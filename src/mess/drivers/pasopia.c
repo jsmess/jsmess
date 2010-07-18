@@ -22,9 +22,11 @@ static UINT8 *p7_vram;
 static UINT8 bank_reg;
 static UINT16 cursor_addr;
 static UINT8 cursor_blink;
+static UINT8 plane_reg,attr_data;
 
 static VIDEO_START( paso7 )
 {
+	p7_vram = auto_alloc_array(machine, UINT8, 0x10000);
 }
 
 static VIDEO_UPDATE( paso7 )
@@ -32,18 +34,19 @@ static VIDEO_UPDATE( paso7 )
 	int x,y;
 	int count;
 
-	count = 0;
+	count = 0x0000;
 
 	for(y=0;y<25;y++)
 	{
 		for(x=0;x<40;x++)
 		{
-			int tile = p7_vram[count];
+			int tile = p7_vram[count+0x8000];
+			int color = p7_vram[count+0xc000];
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,0,0,0,x*8,y*8);
+			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8);
 
 			if(((cursor_addr*8) == count) && !cursor_blink) // draw cursor
-				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],0x5f,0,0,0,x*8,y*8);
+				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],0x5f,7,0,0,x*8,y*8);
 
 			count+=8;
 		}
@@ -54,16 +57,21 @@ static VIDEO_UPDATE( paso7 )
 
 static READ8_HANDLER( vram_r )
 {
-	if(vram_sel)
-		return 0xff;
+//	if(!vram_sel)
+//		return 0xff;
 
-	return p7_vram[offset];
+	return p7_vram[offset | 0x8000]; //TODO
 }
 
 static WRITE8_HANDLER( vram_w )
 {
-	//if(!vram_sel)  //TODO: investigate on this
-		p7_vram[offset] = data;
+//	if(vram_sel)
+
+	if((plane_reg & 0x44) == 0x44)
+	{
+		p7_vram[offset | 0x8000] = data;
+		p7_vram[offset | 0xc000] = attr_data;
+	}
 }
 
 static WRITE8_HANDLER( pasopia7_memory_ctrl_w )
@@ -187,6 +195,7 @@ static READ8_HANDLER( pasopia7_io_r )
 	{
 		const address_space *ram_space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		mio_sel = 0;
+		printf("%08x\n",offset);
 		//return 0x0d; // hack: this is used for reading the keyboard data, we can fake it a little ... (modify fda4)
 		return memory_read_byte(ram_space, offset);
 	}
@@ -247,7 +256,7 @@ static ADDRESS_MAP_START(paso7_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE( 0x0000, 0x7fff ) AM_WRITE( ram_bank_w )
 	AM_RANGE( 0x0000, 0x3fff ) AM_ROMBANK("bank1")
 	AM_RANGE( 0x4000, 0x7fff ) AM_ROMBANK("bank2")
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(vram_r, vram_w ) AM_BASE(&p7_vram)
+	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(vram_r, vram_w )
 	AM_RANGE( 0xc000, 0xffff ) AM_RAMBANK("bank4")
 ADDRESS_MAP_END
 
@@ -287,8 +296,8 @@ static const gfx_layout p7_chars_16x16 =
 };
 
 static GFXDECODE_START( pasopia7 )
-	GFXDECODE_ENTRY( "font",   0x00000, p7_chars_8x8,    0, 1 )
-	GFXDECODE_ENTRY( "kanji",  0x00000, p7_chars_16x16,  0, 1 )
+	GFXDECODE_ENTRY( "font",   0x00000, p7_chars_8x8,    0, 0x10 )
+	GFXDECODE_ENTRY( "kanji",  0x00000, p7_chars_16x16,  0, 0x10 )
 GFXDECODE_END
 
 static const mc6845_interface mc6845_intf =
@@ -316,7 +325,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static Z80PIO_INTERFACE( z80pio_intf )
 {
-	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0),
+	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_IRQ0), //doesn't work?
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
@@ -350,11 +359,13 @@ static WRITE8_DEVICE_HANDLER( screen_mode_w )
 static WRITE8_DEVICE_HANDLER( plane_reg_w )
 {
 	printf("PLANE %02x\n",data);
+	plane_reg = data;
 }
 
 static WRITE8_DEVICE_HANDLER( video_attr_w )
 {
 	printf("VIDEO ATTR %02x | TEXT_PAGE %02x\n",data & 0xf,data & 0x70);
+	attr_data = data & 0xf;
 }
 
 static WRITE8_DEVICE_HANDLER( video_misc_w )
@@ -453,6 +464,26 @@ static MACHINE_RESET( paso7 )
 //	memory_set_bankptr(machine, "bank4", bios + 0x10000);
 }
 
+static PALETTE_INIT( pasopia7 )
+{
+	int i;
+
+	for (i = 0x000; i < 0x020; i++)
+	{
+		UINT8 r,g,b;
+
+		if(((i & 0x11) == 0x01) || ((i & 0x11) == 0x10))
+		{
+			r = ((i >> 3) & 1) ? 0xff : 0x00;
+			g = ((i >> 2) & 1) ? 0xff : 0x00;
+			b = ((i >> 1) & 1) ? 0xff : 0x00;
+		}
+		else { r = g = b = 0x00; }
+
+		palette_set_color_rgb(machine, i, r,g,b);
+	}
+}
+
 static MACHINE_DRIVER_START( paso7 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -478,8 +509,8 @@ static MACHINE_DRIVER_START( paso7 )
     MDRV_SCREEN_SIZE(640, 480)
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MDRV_PALETTE_LENGTH(0x20)
+    MDRV_PALETTE_INIT(pasopia7)
 
 	MDRV_GFXDECODE( pasopia7 )
 
