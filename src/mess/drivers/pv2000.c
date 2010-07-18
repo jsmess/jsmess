@@ -372,6 +372,35 @@ static MACHINE_RESET( pv2000 )
 	memset(&memory_region(machine, "maincpu")[0x7000], 0xff, 0x1000);	// initialize RAM
 }
 
+static DEVICE_IMAGE_LOAD( pv2000_cart )
+{
+	UINT8 *cart = memory_region(image.device().machine, "maincpu") + 0xC000;
+	UINT32 size;
+
+	if (image.software_entry() == NULL)
+		size = image.length();
+	else
+		size = image.get_software_region_length("rom");
+
+	if (size != 0x2000 && size != 0x4000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (image.software_entry() == NULL)
+	{
+		if (image.fread( cart, size) != size)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			return IMAGE_INIT_FAIL;
+		}
+	}
+	else
+		memcpy(cart, image.get_software_region("rom"), size);
+
+	return IMAGE_INIT_PASS;
+}
 
 static const cassette_config pv2000_cassette_config =
 {
@@ -413,6 +442,11 @@ static MACHINE_DRIVER_START( pv2000 )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom,col,bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(pv2000_cart)
+	MDRV_CARTSLOT_INTERFACE("pv2000_cart")	
+	
+	/* Software lists */
+	MDRV_SOFTWARE_LIST_ADD("cart_list","pv2000")	
 MACHINE_DRIVER_END
 
 
