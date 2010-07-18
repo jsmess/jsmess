@@ -993,6 +993,7 @@ $(MESSOBJ)/intel.a:				\
 	$(MESS_DRIVERS)/ipds.o		\
 	$(MESS_DRIVERS)/sdk85.o		\
 	$(MESS_DRIVERS)/sdk86.o		\
+	$(MESS_DRIVERS)/rex6000.o	\
 
 $(MESSOBJ)/intelgnt.a:			\
 	$(MESS_AUDIO)/dave.o		\

@@ -34,6 +34,7 @@ Skeleton drivers:
 - Psion Organiser II LZ64S
 - Psion Organiser II LZ
 - Psion Organiser II P464
+- Xircom / Intel REX 6000
 
 System Driver Changes:
 ----------------------

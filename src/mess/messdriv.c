@@ -1724,5 +1724,6 @@ const game_driver * const drivers[] =
 	DRIVER( psionlz64s )
 	DRIVER( psionlz )
 	DRIVER( psionp464 )
+	DRIVER( rex6000 )
 
 #endif /* DRIVER_RECURSIVE */
