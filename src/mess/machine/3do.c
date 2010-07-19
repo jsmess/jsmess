@@ -199,7 +199,7 @@ READ32_HANDLER( _3do_slow2_r ) {
 	case 0:		/* Boot ROM checks here and expects to read 1, 0, 1, 0 in the lowest bit */
 		data = slow2.cg_output & 0x00000001;
 		slow2.cg_output = slow2.cg_output >> 1;
-		slow2_cg_w_count = 0;
+		slow2.cg_w_count = 0;
 	}
 	return data;
 }
