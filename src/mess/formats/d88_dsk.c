@@ -309,14 +309,13 @@ FLOPPY_IDENTIFY(d88_dsk_identify)
 
 	if(floppy_image_size(floppy) == size)
 	{
-		*vote = 100;
-		return FLOPPY_ERROR_SUCCESS;
+		*vote = 100;		
 	}
 	else
 	{
 		*vote = 0;
-		return FLOPPY_ERROR_INVALIDIMAGE;
 	}
+	return FLOPPY_ERROR_SUCCESS;
 }
 
 FLOPPY_CONSTRUCT(d88_dsk_construct)
