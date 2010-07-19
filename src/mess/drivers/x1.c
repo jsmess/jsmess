@@ -1985,7 +1985,7 @@ static const cassette_config x1_cassette_config =
 	x1_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
+	"x1_cass"
 };
 
 
@@ -2238,9 +2238,11 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_CASSETTE_ADD("cass",x1_cassette_config)
+	MDRV_SOFTWARE_LIST_ADD("cass_list","x1_cass")
 
 	MDRV_FLOPPY_4_DRIVES_ADD(x1_floppy_config)
-	MDRV_SOFTWARE_LIST_ADD("flop_list","x1")
+	MDRV_SOFTWARE_LIST_ADD("flop_list","x1_flop")
+
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( x1turbo )
