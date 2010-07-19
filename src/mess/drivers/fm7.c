@@ -1840,7 +1840,7 @@ static const cassette_config fm7_cassette_config =
 	fm7_cassette_formats,
 	NULL,
 	(cassette_state)(CASSETTE_STOPPED | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED),
-	NULL
+	"fm7_cass"
 };
 
 static const floppy_config fm7_floppy_config =
@@ -1899,6 +1899,8 @@ static MACHINE_DRIVER_START( fm7 )
 	MDRV_CENTRONICS_ADD("lpt",standard_centronics)
 
 	MDRV_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
+
+	MDRV_SOFTWARE_LIST_ADD("cass_list","fm7")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fm77av )
@@ -1944,6 +1946,7 @@ static MACHINE_DRIVER_START( fm77av )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
 
+	MDRV_SOFTWARE_LIST_ADD("cass_list","fm7")
 	MDRV_SOFTWARE_LIST_ADD("flop_list","fm77av")
 MACHINE_DRIVER_END
 
