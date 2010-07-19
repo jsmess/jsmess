@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd"> 
+
+
+<!--
+	FIXME: crc / sha1 info
+-->
+
+
+<softwarelist name="x1" description="Sharp X1 disk images">
+	<software name="177">
+		<description>177</description>
+		<year>1986</year>
+		<publisher>Macadamia</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="177.2d" size="327680" crc="0" sha1="0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="1942">
+		<description>1942</description>
+		<year>198?</year>
+		<publisher>Capcom?</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="1942.d88" size="348848" crc="0" sha1="0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+</softwarelist>

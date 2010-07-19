@@ -2186,7 +2186,7 @@ static const floppy_config x1_floppy_config =
 	FLOPPY_DRIVE_DS_40,
 	FLOPPY_OPTIONS_NAME(x1),
 	DO_NOT_KEEP_GEOMETRY,
-	NULL
+	"x1_flop"
 };
 
 static MACHINE_DRIVER_START( x1 )
@@ -2240,6 +2240,7 @@ static MACHINE_DRIVER_START( x1 )
 	MDRV_CASSETTE_ADD("cass",x1_cassette_config)
 
 	MDRV_FLOPPY_4_DRIVES_ADD(x1_floppy_config)
+	MDRV_SOFTWARE_LIST_ADD("flop_list","x1")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( x1turbo )
