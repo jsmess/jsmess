@@ -978,7 +978,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="tape1" interface="x1_cass">
 			<dataarea name="side1" size="3646247">
-				<rom name="salatoma.tap" size="3646247" crc="b29436cb" sha1="39c52dbe5985647d0b03411d4c2a97da3f1ab247" offset="0" />
+				<rom name="tomathim.tap" size="3646247" crc="b29436cb" sha1="39c52dbe5985647d0b03411d4c2a97da3f1ab247" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -989,7 +989,7 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="tape1" interface="x1_cass">
 			<dataarea name="side1" size="3646247">
-				<rom name="salatoma.tap" size="3646247" crc="36c77dfd" sha1="72c2a0eee78ebf213dc218364cba6aa55190007f" offset="0" />
+				<rom name="tomathima.tap" size="3646247" crc="36c77dfd" sha1="72c2a0eee78ebf213dc218364cba6aa55190007f" offset="0" />
 			</dataarea>
 		</part>
 	</software>
