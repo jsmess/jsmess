@@ -1,6 +1,25 @@
+/*
+
+With nothing on the slow2 expansion bus:
+- 0300035c - after determining memory size
+- dspp stuff
+- 03000568
+*/
 
 #include "emu.h"
 #include "includes/3do.h"
+
+
+typedef struct {
+	/* 03180000 - 0318003f - configuration group */
+	/* 03180040 - 0318007f - diagnostic UART */
+
+	UINT8	cg_r_count;
+	UINT8	cg_w_count;
+	UINT32	cg_input;
+	UINT32	cg_output;
+} SLOW2;
+
 
 typedef struct {
 	UINT32	revision;		/* 03300000 */
@@ -129,7 +148,7 @@ typedef struct {
 } CLIO;
 
 
-//static UINT32 unk_318_data_0 = 0;
+static SLOW2	slow2;
 static MADAM	madam;
 static CLIO		clio;
 static UINT32	svf_color;
@@ -147,61 +166,46 @@ WRITE32_HANDLER( _3do_nvarea_w ) {
 
 
 /*
-    I have no idea what piece of hardware this is. Possibly some kind of communication hardware.
+    I have no idea what piece of hardware this is. Possibly some kind of communication hardware using shift registers.
 
     During booting the following things get written/read:
-    write 03180000 to 03180000
-    4 read actions from 03180000, if lower bit is 1 0 1 0 then
-    write 02000000 to 03180000
-    write 04000000 to 03180000
-    write 08000000 to 03180000
-    write 10000000 to 03180000
-    write 20000000 to 03180000
-    write 40000000 to 03180000
-    write 80000000 to 03180000
-    write 00000001 to 03180000
-    write 00000002 to 03180000
-    write 00000004 to 03180000
-    write 00000008 to 03180000
-    write 00000010 to 03180000
-    write 00000020 to 03180000
-    write 00000040 to 03180000
-    write 00000080 to 03180000
-    write 00000100 to 03180000
-    read from 03180000
-    write 04000000 to 03180000
-    write 08000000 to 03180000
-    write 10000000 to 03180000
-    write 20000000 to 03180000
-    write 40000000 to 03180000
-    write 80000000 to 03180000
-    write 00000001 to 03180000
-    write 00000002 to 03180000
-    write 00000004 to 03180000
-    write 00000008 to 03180000
-    write 00000010 to 03180000
-    write 00000020 to 03180000
-    write 00000040 to 03180000
-    write 00000080 to 03180000
-    write 00000100 to 03180000
-    write 00002000 to 03180000
-    several groups of 16 write actions or 16 read actions
+    - write 03180000 to 03180000 (init reading sequence)
+    - 4 read actions from 03180000 bit#0, if lower bit is 1 0 1 0 then   (expect to read 0x0a)
+	- read from 03180000 (init writing sequence)
+	- write 0x0100 to shift register bit#0
+	- reset PON bit in CSTATBITS
+    - wait a little while
+    - read from 03180000
+	- write 0x0200 to shift register bit#0
+	- write 0x0002 to shift register bit#1
+	- dummy write to 03180000
+	- read from shift register bits #0 and #1.
+	- check if data read equals 0x44696167 (=Diag)   If so, jump 302196c in default bios
+	- dummy read from shift register
+	- write 0x0300 to shift register bit #0
+	- dummy write to shift register
+    - read data from shift register bit #0.
+    - xor that data with 0x07ff
+	- write that data & 0x00ff | 0x4000 to the shift register
+3022630
 */
 
-READ32_HANDLER( _3do_unk_318_r ) {
+READ32_HANDLER( _3do_slow2_r ) {
+	UINT32 data = 0;
+
 	logerror( "%08X: UNK_318 read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset );
-#if 0
+
 	switch( offset ) {
 	case 0:		/* Boot ROM checks here and expects to read 1, 0, 1, 0 in the lowest bit */
-		unk_318_data_0 ^= 1;
-		return unk_318_data_0;
+		data = slow2.cg_output & 0x00000001;
+		slow2.cg_output = slow2.cg_output >> 1;
+		slow2_cg_w_count = 0;
 	}
-#endif
-	return 0;
+	return data;
 }
 
 
-WRITE32_HANDLER( _3do_unk_318_w )
+WRITE32_HANDLER( _3do_slow2_w )
 {
 	logerror( "%08X: UNK_318 write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset, data, mem_mask );
 
@@ -212,8 +216,20 @@ WRITE32_HANDLER( _3do_unk_318_w )
 			/* disable ROM overlay */
 			memory_set_bank(space->machine, "bank1", 0);
 		}
+		slow2.cg_input = slow2.cg_input << 1 | ( data & 0x00000001 );
+		slow2.cg_w_count ++;
+		if ( slow2.cg_w_count == 16 )
+		{
+		}
 		break;
 	}
+}
+
+
+void _3do_slow2_init( running_machine *machine )
+{
+	slow2.cg_input = 0;
+	slow2.cg_output = 0x00000005 - 1;
 }
 
 
@@ -588,7 +604,7 @@ WRITE32_HANDLER( _3do_madam_w ) {
 }
 
 
-void _3do_madam_init( void )
+void _3do_madam_init( running_machine *machine )
 {
 	memset( &madam, 0, sizeof(MADAM) );
 	madam.revision = 0x01020000;
@@ -882,10 +898,10 @@ WRITE32_HANDLER( _3do_clio_w )
 	}
 }
 
-void _3do_clio_init( void )
+void _3do_clio_init( running_machine *machine )
 {
 	memset( &clio, 0, sizeof(CLIO) );
-	clio.revision = 0x02022000;
+	clio.revision = 0x02022000 /* 0x04000000 */;
 	clio.cstatbits = 0x01;	/* bit 0 = reset of clio caused by power on */
 	clio.unclerev = 0x03800000;
 }
