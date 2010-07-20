@@ -1,6 +1,12 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <softwarelist name="a5200" description="Atari 5200 cartridges">
+<!-- Undumped protos:
+
+  - Muppet Go-Round (CX5234)
+
+-->
+
 	<software name="5200menu">
 		<description>5200 Menu (Prototype)</description>
 		<year>1983</year>

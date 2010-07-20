@@ -24226,6 +24226,44 @@ Known undumped pirates
 			</dataarea>
 		</part>
 	</software>
+    
+    
+    <!-- The next development tools have been dumped by Tiido: all of them would require PC connection with Sega Loader Board and LPT cable.
+    We still need to find the PC-side software for these dumps... -->
+    
+	<software name="gems">
+		<description>GEMS v2.8</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="gems.bin" size="262144" crc="98ebb058" sha1="83412622877d9df8ac7c1486b06c490dfa52ebf6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+    
+	<software name="sndtool">
+		<description>Sound Tool v2.2?</description>
+		<year>1991</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="sndtool.bin" size="262144" crc="ee41b452" sha1="a99238e3fdedbeca602f05a4c83f70db1bf1ba84" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+    
+	<software name="arttool">
+		<description>Art Tool</description>
+		<year>199?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<dataarea name="rom" size="262144">
+				<rom name="arttool.bin" size="262144" crc="5353f532" sha1="7f3233f4938fcd26af0733e7645d1a401999de86" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+    
 
 <!--
 	<software name="debugc">
