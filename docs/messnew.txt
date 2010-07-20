@@ -1,4 +1,4 @@
-﻿0.138.1
+0.138.1
 
 New System Drivers Supported:
 -----------------------------
@@ -19,13 +19,10 @@ Systems Promoted from GAME_NOT_WORKING:
 
 Skeleton drivers:
 -----------------
-- VTech PC Prestige Elite [Joseba Epalza, Curt Coder]
-- Sony SMC-777
-- Mitsubishi Multi 8
 - Bandai Gundam RX-78
 - Hitachi Basic Master Jr (MB-6885)
 - Hitachi Basic Master Level 3 (MB-6890)
-- Sharp MZ-2000
+- Mitsubishi Multi 8
 - Psion Organiser II CM
 - Psion Organiser II LA
 - Psion Organiser II P350
@@ -34,10 +31,15 @@ Skeleton drivers:
 - Psion Organiser II LZ64S
 - Psion Organiser II LZ
 - Psion Organiser II P464
-- Xircom / Intel REX 6000
+- Sharp MZ-2000
 - Sharp Pocket Computer 1360
 - Sharp Pocket Computer 1450
 - Sharp Pocket Computer 1500
+- Sony SMC-777
+- Toshiba PASOPIA 7
+- VTech PC Prestige Elite [Joseba Epalza, Curt Coder]
+- Xircom / Intel REX 6000
+
 
 System Driver Changes:
 ----------------------
@@ -58,6 +60,17 @@ System Driver Changes:
 
 - [MAC] Improved Egret MCU simulation [R. Belmont]
 
+- [MICRONIC] Improved emulation and added NVRAM [Sandro Ronco]
+
+- [NES] Added support for loading proper dumps with separate PRG and CHR files
+  by using an xml software list, additional emulation features being based on 
+  the pcb_type attribute. Also, converted code for iNES and UNIF files to use 
+  the new code: this allowed to greatly simplify emulation for many boards and
+  mappers. [Fabio Priuli]
+
+- [NES] Simplified emulation of MMC3 clone boards, resulting in more boards 
+  correctly emulated and many new boards supported [Fabio Priuli]
+
 - [TI99] ti99cart: Fix for bug #1953 (assert with HSGPL set to on); 
   type paged379i can now handle 128 KiB, minimem now accepts cartridges without 
   rom part. Fixed at29c040a (CFI commands are only checked against A14 to A0).
@@ -69,7 +82,15 @@ System Driver Changes:
   structure support.
 
 - [VG5K] Added emulation for the EF9345 video chip, based on 
-  Daniel Coulom's implementation in DCVG5K [Sandro Ronco]
+  Daniel Coulom's implementation in DCVG5K. [Sandro Ronco]
+
+- [VG5K] Added support for cassettes in .k7 format. [Sandro Ronco]
+
+- [VG5K] Improved emulation (fixing some games like Mission Omega & Helicopter).
+  [Sandro Ronco]
+
+- [VG5K] Implemented double height chars (fixing US Rally intro) and 80 columns 
+  mode. [Sandro Ronco]
 
 
 Imgtool Changes:
@@ -79,13 +100,15 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.138u1.  This incorporates all features of the
+- The core is based on MAME 0.138u3.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Fixed setting of tape flags when reaching end of tape. This prevented
   the user from using any other tape beyond the first mounted tape image
   on certain systems.  [Wilbert Pol]
 
+- Added software lists in xml format for more systems [incog, k1w1, Kaylee, 
+  Micko, Fabio Priuli, Barry Rodewald]
 
 
 0.138
