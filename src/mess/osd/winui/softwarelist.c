@@ -43,7 +43,8 @@ struct _file_info
 	char file_name[MAX_PATH];
 	char publisher[MAX_PATH];
 	char year[10];
-
+	char full_name[MAX_PATH*2];
+	
 	char device[MAX_PATH];
 };
 
@@ -83,7 +84,7 @@ LPCSTR SoftwareList_LookupFilename(HWND hwndPicker, int nIndex)
 	pPickerInfo = GetSoftwareListInfo(hwndPicker);
 	if ((nIndex < 0) || (nIndex >= pPickerInfo->file_index_length))
 		return NULL;
-	return pPickerInfo->file_index[nIndex]->file_name;
+	return pPickerInfo->file_index[nIndex]->full_name;
 }
 
 LPCSTR SoftwareList_LookupDevice(HWND hwndPicker, int nIndex)
@@ -157,6 +158,8 @@ BOOL SoftwareList_AddFile(HWND hwndPicker,LPCSTR pszName, LPCSTR pszListname, LP
 	strcpy(pInfo->publisher, pszPublisher);
 	strcpy(pInfo->year, pszYear);
 	strcpy(pInfo->device, pszDevice);
+	sprintf(pInfo->full_name,"%s:%s", pszListname,pszName);
+	
 
 	ppNewIndex = (file_info**)malloc((pPickerInfo->file_index_length + 1) * sizeof(*pPickerInfo->file_index));
 	memcpy(ppNewIndex,pPickerInfo->file_index,pPickerInfo->file_index_length * sizeof(*pPickerInfo->file_index));
