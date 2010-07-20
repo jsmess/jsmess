@@ -1,9 +1,41 @@
 /*
 
-With nothing on the slow2 expansion bus:
-- 0300035c - after determining memory size
-- dspp stuff
-- 03000568
+Reset boot sequence:
+- jump to ROM address space
+- determine source of reset from cstatbits
+- write cstatbits to safe madam location
+- clear cstatbits
+- disable interrupts
+- set up audout register
+- set up brooktree part
+- wait 100ms
+- set msysbits register for max memory config
+- set sltime to 178906
+- write 0 to 0 to unmap ram address space
+- do 8 reads to 4 banks memory tyest
+- do cbr to both banks of vram
+- determine ram & vram sizes
+- do initial diagnostics, including test of initial 64kb of ram (0300021c)
+- copy remainder of code to ram at address 0 (030000224)
+- jump to address 0 and continue boot sequence
+- init stack pointer to 64k
+- set hdelay to c6
+- do remaining diagnostics
+- set up vdl for 3do logo screen
+- set up frame buffer 3do logo screen
+- transfer sherry from rom to 10000
+- transfer operator from rom to 20000
+- transfer dipir from rom to 200
+- transfer filesystem from rom to 28000
+- init stack pointer to 64k
+- store sherry address to 28 for use by dipir
+- delay for at least 600ms to allow expansion bus to start
+- wait for vcount = 10 and enable clut transfer
+- wait for vcount = 10 and enable video
+- set adbio to disable software controlled muting
+- init registers for entry to sherry
+- jump to sherry
+
 */
 
 #include "emu.h"
@@ -275,6 +307,8 @@ READ32_HANDLER( _3do_madam_r ) {
 	switch( offset ) {
 	case 0x0000/4:		/* 03300000 - Revision */
 		return madam.revision;
+	case 0x0004/4:
+		return madam.msysbits;
 	case 0x0008/4:
 		return madam.mctl;
 	case 0x000c/4:
