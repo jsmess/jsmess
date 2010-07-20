@@ -91,6 +91,8 @@ typedef struct {
 
 
 typedef struct {
+	screen_device *screen;
+
 	UINT32	revision;		/* 03400000 */
 	UINT32	csysbits;		/* 03400004 */
 	UINT32	vint0;			/* 03400008 */
@@ -661,15 +663,9 @@ READ32_HANDLER( _3do_clio_r )
 	case 0x0028/4:
 		return clio.cstatbits;
 	case 0x0030/4:
-		return clio.hcnt;
+		return clio.screen->hpos();
 	case 0x0034/4:
-		{
-			static const UINT32 irq_sequence[3] = { 0, 4, 12 };
-			static int counter = 0;
-
-			return irq_sequence[(counter++)%3];
-		}
-		return clio.vcnt;
+		return clio.screen->vpos();
 	case 0x0038/4:
 		return clio.seed;
 	case 0x003c/4:
@@ -933,9 +929,10 @@ WRITE32_HANDLER( _3do_clio_w )
 	}
 }
 
-void _3do_clio_init( running_machine *machine )
+void _3do_clio_init( running_machine *machine, screen_device *screen )
 {
 	memset( &clio, 0, sizeof(CLIO) );
+	clio.screen = screen;
 	clio.revision = 0x02022000 /* 0x04000000 */;
 	clio.cstatbits = 0x01;	/* bit 0 = reset of clio caused by power on */
 	clio.unclerev = 0x03800000;

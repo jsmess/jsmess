@@ -36,7 +36,8 @@ void _3do_madam_init( running_machine *machine );
 
 READ32_HANDLER( _3do_clio_r );
 WRITE32_HANDLER( _3do_clio_w );
-void _3do_clio_init( running_machine *machine );
+void _3do_clio_init( running_machine *machine, screen_device *screen );
+
 
 
 #endif /* _3DO_H_ */

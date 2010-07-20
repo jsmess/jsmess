@@ -149,7 +149,7 @@ static MACHINE_RESET( 3do )
 
 	_3do_slow2_init(machine);
 	_3do_madam_init(machine);
-	_3do_clio_init(machine);
+	_3do_clio_init(machine, downcast<screen_device *>(devtag_get_device(machine,"screen")));
 }
 
 
