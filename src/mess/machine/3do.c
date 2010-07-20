@@ -1,13 +1,13 @@
 /*
 
 Reset boot sequence:
-- jump to ROM address space
-- determine source of reset from cstatbits
-- write cstatbits to safe madam location
-- clear cstatbits
+- jump to ROM address space 03000028)
+- determine source of reset from cstatbits (03000068)
+- write cstatbits to safe madam location (03000078)
+- clear cstatbits (0300007c)
 - disable interrupts
 - set up audout register
-- set up brooktree part
+- set up brooktree part (03001020)
 - wait 100ms
 - set msysbits register for max memory config
 - set sltime to 178906
@@ -18,6 +18,7 @@ Reset boot sequence:
 - do initial diagnostics, including test of initial 64kb of ram (0300021c)
 - copy remainder of code to ram at address 0 (030000224)
 - jump to address 0 and continue boot sequence
+- do some more memory checks (00000298)
 - init stack pointer to 64k
 - set hdelay to c6
 - do remaining diagnostics
