@@ -9,6 +9,7 @@
       guesses ...
     - video emulation is just hacked up together to show something simple,
       dunno yet how it really works.
+    - Drop M6845 support and write custom code in place of it.
 
 ****************************************************************************/
 
@@ -80,15 +81,21 @@ static WRITE8_HANDLER( smc777_6845_w )
 static WRITE8_HANDLER( smc777_vram_w )
 {
 	static UINT8 *vram = memory_region(space->machine, "vram");
+	static UINT16 vram_index;
 
-	vram[cursor_addr] = data;
+	vram_index = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_B);
+
+	vram[vram_index | offset*0x100] = data;
 }
 
 static WRITE8_HANDLER( smc777_attr_w )
 {
 	static UINT8 *attr = memory_region(space->machine, "attr");
+	static UINT16 vram_index;
 
-	attr[cursor_addr] = data;
+	vram_index = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_B);
+
+	attr[vram_index | offset*0x100] = data;
 }
 
 static ADDRESS_MAP_START(smc777_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -167,8 +174,8 @@ static MACHINE_DRIVER_START( smc777 )
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_SCREEN_SIZE(640, 200)
+    MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 	MDRV_GFXDECODE(smc777)
