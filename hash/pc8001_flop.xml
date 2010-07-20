@@ -83,6 +83,28 @@
 		</part>
 	</software>
 
+	<software name="n80basic">
+		<description>N80 BASIC</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="pc8001_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="N80 BASIC (1983)(Microsoft - NEC).d88" size="348848" crc="ff9416a4" sha1="3321c6a723545ef7f413a372683a1e40ef7ea4ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n80basica" cloneof="n80basic">
+		<description>N80 BASIC v1.8</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="pc8001_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="N80 BASIC v1.8 (1981)(Microsoft).d88" size="348848" crc="00b2a439" sha1="ce234142ec31e8ec2e862042b2c6889650ed59d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- These are going to be replaced by the correspondent separate tapes, as soon as possible!! -->
 

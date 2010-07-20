@@ -40,6 +40,17 @@
 		</part>
 	</software>
 
+	<software name="5hgirlsa" cloneof="5hgirls">
+		<description>5 Holy Girls (Alt)</description>
+		<year>19??</year>
+		<publisher>Studio Blue</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="5hgirlsa.2d" size="327680" crc="815a292a" sha1="7884106ca86d5c807ba670ddaf0207334f802c83" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="bbreaker">
 		<description>Brain Breaker</description>
 		<year>1985</year>
@@ -445,6 +456,22 @@
 		</part>
 	</software>
 
+	<software name="woodpocob" cloneof="woodpoco">
+		<description>Woody Poco (Alt 2)</description>
+		<year>1986</year>
+		<publisher>db-Soft</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+                <rom name="wodypoco.d88" size="348848" crc="6c9dc652" sha1="0003c6916a1d2b5b1ac8f09a7be046d29eeaade6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk2" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+                <rom name="wodydata.d88" size="537520" crc="3ff620b9" sha1="0a6682318141c08c3e8c0f8865d824a44417da44" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="zeta5">
 		<description>Zeta 5</description>
 		<year>19??</year>
@@ -575,14 +602,25 @@
 	</software>
 
 
-
+<!-- This is not the real title, more probably a series name (with 5 Holy Girls being another title of the same series) -->
 	<software name="seijoden">
-		<description>Seijo Densetsu</description>
+		<description>Seijo Densetsu ?</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
 			<dataarea name="flop" size="327680">
 				<rom name="zzz-unk-seijopan.2d" size="327680" crc="0682a628" sha1="323852592d63456a33d0e2fdedabb3a767b7ef94" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="seijodena" cloneof="seijoden">
+		<description>Seijo Densetsu ? (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="seijodena.2d" size="327680" crc="de58f222" sha1="96fbfad4565c04a6d96b6d48b8078fb36ddc868e" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1011,6 +1049,17 @@
 		</part>
 	</software>
 
+	<software name="gradiusk">
+		<description>Gradius Kai</description>
+		<year>19??</year>
+		<publisher>Konami</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="gra_kai.d88" size="348848" crc="008bada3" sha1="b19eee31909e555e8f96900bcf49469e1891cd37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gruppe">
 		<description>Gruppe</description>
 		<year>19??</year>
@@ -1421,6 +1470,18 @@
 		</part>
 	</software>
 
+<!-- is this an alt disk1 ?? -->
+	<software name="crimsonb" cloneof="crimson">
+		<description>Crimson (Alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="crimsonb.d88"  size="348848" crc="26125d32" sha1="274dc32c55b678635a4b7cbabc334a6cd78dfe5c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="blassty">
 		<description>Cruise Chaser Blassty</description>
 		<year>19??</year>
@@ -1534,6 +1595,17 @@
 		</part>
 	</software>
 
+	<software name="hydlidea" cloneof="hydlide">
+		<description>Hydlide (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="353472">
+				<rom name="hydlidea.d88" size="353472" crc="95eeee72" sha1="d17f75b97126e28692fdd7ed0cfc4eee52097539" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- is this correct? it mixes hydlide 1 and 3 -->
 	<software name="hydlide3b" cloneof="hydlide3">
 		<description>The Hydlide 3 - Space Memories</description>
@@ -1573,6 +1645,33 @@
 		<part name="disk2" interface="x1_flop">
 			<dataarea name="flop" size="348848">
 				<rom name="hydlide2u.d88" size="348848" crc="fb0cd3a5" sha1="05026c6cd41d4a867eb3e901740e0d19fb8ddf32" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydlide2a" cloneof="hydlide2">
+		<description>Hydlide 2 (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="game.d88" size="348848" crc="aba63500" sha1="7ec04863fb6b7659348e0f3bbeccfe2d35db169b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydlide2b" cloneof="hydlide2">
+		<description>Hydlide 2 (Alt 2)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="hydlide2.d88" size="348848" crc="e5127048" sha1="6e9b8ad2b6ef674d5a03a5f2bd1ccd238765a3ca" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk2" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="hydlide2bu.d88" size="348848" crc="c18dea85" sha1="db11c27c85c758c0ac12287826d9667c88851415" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2247,18 +2346,18 @@
 		<year>1987</year>
 		<publisher>Falcom</publisher>
 		<part name="disk1" interface="x1_flop">
-			<dataarea name="flop" size="348848">
-				<rom name="user.d88" size="348848" crc="97e1d16a" sha1="cfcf4d849b90fe99c4f300d03ca9b9faeae0ad97" offset="0" />
-			</dataarea>
-		</part>
-		<part name="disk2" interface="x1_flop">
 			<dataarea name="flop" size="415840">
 				<rom name="ys_a.d88" size="415840" crc="b439fdc2" sha1="1fe34ce088740b348145008997dd65dd8050110f" offset="0" />
 			</dataarea>
 		</part>
-		<part name="disk3" interface="x1_flop">
+		<part name="disk2" interface="x1_flop">
 			<dataarea name="flop" size="415840">
 				<rom name="ys_b.d88" size="415840" crc="04bcaf77" sha1="26a6a06af93108a1d67fe40d22497825764e6a48" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk3" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="user.d88" size="348848" crc="97e1d16a" sha1="cfcf4d849b90fe99c4f300d03ca9b9faeae0ad97" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2321,12 +2420,23 @@
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
 			<dataarea name="flop" size="327680">
-				<rom name="daisenryaku x1 map_disk.2d" size="327680" crc="1de291a6" sha1="ffa3e0e2db07c82d723187d66f25917562ff820a" offset="0" />
+				<rom name="daisenryaku x1disk_a.2d" size="327680" crc="3108fd55" sha1="399dfe13569bb610a02597fc3bdffff4f14b805e" offset="0" />
 			</dataarea>
 		</part>
 		<part name="disk2" interface="x1_flop">
 			<dataarea name="flop" size="327680">
-				<rom name="daisenryaku x1disk_a.2d" size="327680" crc="3108fd55" sha1="399dfe13569bb610a02597fc3bdffff4f14b805e" offset="0" />
+				<rom name="daisenryaku x1 map_disk.2d" size="327680" crc="1de291a6" sha1="ffa3e0e2db07c82d723187d66f25917562ff820a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="daisenrya" cloneof="daisenry">
+		<description>Daisenryaku X1 (Alt)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="327680">
+				<rom name="daisenx1.d88" size="348848" crc="cf06fac8" sha1="19024c98bdd96842c8e035b7869de0df7ff03b39" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3078,6 +3188,121 @@
 			</dataarea>
 		</part>
 	</software>
+
+	<software name="stakemon">
+		<description>Shin Take to Monogatari</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="363536">
+                <rom name="shin take to monogatari.d88" size="363536" crc="b16b9f10" sha1="c049117e2243c51fa5d6133dc4fcfd9da0102086" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sbrenzsj">
+		<description>Shiro Bara Renzoku Satsujin Jiken</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="351712">
+                <rom name="shiro bara renzoku.d88" size="351712" crc="4c7aff07" sha1="3c19382c4610bbb6c35379a01440c304de9c7bd3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unk_fl1">
+		<description>Unknown Game by East Cube</description>
+		<year>1987</year>
+		<publisher>East Cube</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+                <rom name="unk_disk1_a.d88" size="348848" crc="2aa58976" sha1="3640c60c8b54961de8ef20e6f2cb0c668c88bcd1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk2" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+                <rom name="unk_disk1_b.d88" size="348848" crc="8de42d9f" sha1="20bfecef331af8496dfea010a5c271ca6cb03b6d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gyajiko">
+		<description>Gambler Jiko Chuushinha</description>
+		<year>198?</year>
+		<publisher>Game Arts</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+                <rom name="gyajiko1.d88" size="348848" crc="5063936e" sha1="76649c85bf4b7bd97428bacfa455ec1e33e43723" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="gyajiko2">
+		<description>Gambler Jiko Chuushinha 2</description>
+		<year>198?</year>
+		<publisher>Game Arts</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+                <rom name="gyajiko2.d88" size="348848" crc="81a7c4eb" sha1="71c15c75f46810ac8159b4784a4500c54e85b198" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unk_fl2">
+		<description>Unknown Game by Taito &amp; SPS</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+                <rom name="unk_disk2.d88" size="348848" crc="1b4fd2e1" sha1="ba078d57c1d544dedecd5ebe358d346015724ac0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="unk_fl3">
+		<description>Unknown Game</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="348848">
+                <rom name="unk_disk3.d88" size="348848" crc="821d3e69" sha1="8de8f1855fa97a2381b9a3328c331c14d3d79300" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="argos">
+		<description>Argos</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="327680">
+                <rom name="argos_1.2d" size="327680" crc="4c63544e" sha1="c7da6aeb8879a3cf81b7c774ad2e9e9ccd0d8878" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk2" interface="x1_flop">
+			<dataarea name="flop" size="327680">
+                <rom name="argos_2.2d" size="327680" crc="eb210fa5" sha1="dc5e281f12e14455cf6149edb1db2825459a595d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="majavent">
+		<description>Majaventure</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="disk1" interface="x1_flop">
+			<dataarea name="flop" size="327680">
+                <rom name="disk1.d88" size="348848" crc="3c17cce4" sha1="defff082c7ba49ac0f5e807c3cd1e9a9f4c7f1ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="disk2" interface="x1_flop">
+			<dataarea name="flop" size="327680">
+                <rom name="disk2.d88" size="348848" crc="50f1b9c7" sha1="1b1bfbe1cd1b1891be78c78dba6f44b735a78b48" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 	<software name="vip">
 		<description>VIP</description>
