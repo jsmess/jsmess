@@ -34,6 +34,25 @@ static VIDEO_UPDATE( mycom )
     return 0;
 }
 
+/* F4 Character Displayer */
+static const gfx_layout mycom_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( mycom )
+	GFXDECODE_ENTRY( "gfx", 0x0000, mycom_charlayout, 0, 1 )
+GFXDECODE_END
+
+
 static MACHINE_DRIVER_START( mycom )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -50,6 +69,7 @@ static MACHINE_DRIVER_START( mycom )
     MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
+	MDRV_GFXDECODE(mycom)
 
     MDRV_VIDEO_START(mycom)
     MDRV_VIDEO_UPDATE(mycom)
