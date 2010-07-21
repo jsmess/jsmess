@@ -107,8 +107,9 @@ static int load_cartridge(device_image_interface *image, const rom_entry *romrgn
 		datawidth = ROMREGION_GETWIDTH(romrgn) / 8;
 
 		/* if the region is inverted, do that now */
+		device_memory_interface *memory;
 		cpu = image->device().machine->device(type);
-		if (cpu != NULL)
+		if (cpu!=NULL && cpu->interface(memory))
 		{
 			datawidth = device_memory(cpu)->space_config(AS_PROGRAM)->m_databus_width / 8;
 			littleendian = (device_memory(cpu)->space_config()->m_endianness == ENDIANNESS_LITTLE);
