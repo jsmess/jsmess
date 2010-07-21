@@ -23,6 +23,11 @@
 #include "devices/flopdrv.h"
 
 static UINT16 cursor_addr;
+static UINT8 keyb_press,keyb_press_flag;
+static UINT8 backdrop_pen;
+
+#define CRTC_MIN_X 10
+#define CRTC_MIN_Y 10
 
 static VIDEO_START( smc777 )
 {
@@ -30,9 +35,37 @@ static VIDEO_START( smc777 )
 
 static VIDEO_UPDATE( smc777 )
 {
-	int x,y,count;
+	int x,y,yi;
+	UINT16 count;
 	static UINT8 *vram = memory_region(screen->machine, "vram");
 	static UINT8 *attr = memory_region(screen->machine, "attr");
+	static UINT8 *gram = memory_region(screen->machine, "fbuf");
+
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[backdrop_pen+0x10]);
+
+	count = 0x0000;
+	for(yi=0;yi<8;yi++)
+	{
+		for(y=0;y<200;y+=8)
+		{
+			for(x=0;x<640;x+=4)
+			{
+				static UINT16 color;
+
+				color = (gram[count] & 0xf0) >> 4;
+				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x+0+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x+1+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+
+				color = (gram[count] & 0x0f) >> 0;
+				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x+2+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x+3+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+
+				count++;
+			}
+		}
+//		count+= 48;
+
+	}
 
 	count = 0x0000;
 
@@ -43,21 +76,16 @@ static VIDEO_UPDATE( smc777 )
 			int tile = vram[count];
 			int color = attr[count] & 7;
 
-			drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8);
+			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8+CRTC_MIN_X,y*8+CRTC_MIN_Y,0);
 
 			if(((cursor_addr) == count) && screen->machine->primary_screen->frame_number() & 0x10) // draw cursor
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],0x87,7,0,0,x*8,y*8,0);
+				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],0x87,7,0,0,x*8+CRTC_MIN_X,y*8+CRTC_MIN_Y,0);
 
 			count++; //TODO: width 40 uses count += 2
 		}
 	}
 
     return 0;
-}
-
-static READ8_HANDLER( test_r )
-{
-	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER( smc777_6845_w )
@@ -67,7 +95,7 @@ static WRITE8_HANDLER( smc777_6845_w )
 	if(offset == 0)
 	{
 		addr_latch = data;
-		mc6845_address_w(space->machine->device("crtc"), 0,data);
+		//mc6845_address_w(space->machine->device("crtc"), 0,data);
 	}
 	else
 	{
@@ -77,7 +105,7 @@ static WRITE8_HANDLER( smc777_6845_w )
 		else if(addr_latch == 0x0f)
 			cursor_addr = (cursor_addr & 0x3f00) | (data & 0xff);
 
-		mc6845_register_w(space->machine->device("crtc"), 0,data);
+		//mc6845_register_w(space->machine->device("crtc"), 0,data);
 	}
 }
 
@@ -235,6 +263,30 @@ static WRITE8_HANDLER( smc777_rom_w )
 	rom[offset] = data;
 }
 
+#define keyb_press(_val_,_charset_) \
+	if(input_code_pressed(space->machine, _val_)) \
+		return _charset_ \
+
+static READ8_HANDLER( key_r )
+{
+	static UINT8 res;
+
+	if(offset == 1) //keyboard status
+		return (0xfc) | keyb_press_flag;
+
+	keyb_press_flag = 0;
+	res = keyb_press;
+//	keyb_press = 0xff;
+
+	return res;
+}
+
+static WRITE8_HANDLER( border_col_w )
+{
+	backdrop_pen = data & 0xf;
+}
+
+
 static ADDRESS_MAP_START(smc777_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE(smc777_rom_w)
@@ -248,14 +300,14 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x08, 0x0f) AM_READWRITE(smc777_attr_r,smc777_attr_w)
 	AM_RANGE(0x10, 0x17) AM_READWRITE(smc777_pcg_r, smc777_pcg_w)
 	AM_RANGE(0x18, 0x19) AM_WRITE(smc777_6845_w)
-	AM_RANGE(0x1a, 0x1b) AM_READ(test_r) AM_WRITENOP//keyboard data
+	AM_RANGE(0x1a, 0x1b) AM_READ(key_r) AM_WRITENOP//keyboard data
 //	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //status and control data / Printer strobe
 //	AM_RANGE(0x1d, 0x1d) AM_WRITENOP //status and control data / Printer status / strobe
 //	AM_RANGE(0x1e, 0x1f) AM_WRITENOP //RS232C irq control
 //	AM_RANGE(0x20, 0x20) AM_WRITENOP //display mode switching
 //	AM_RANGE(0x21, 0x21) AM_WRITENOP //60 Hz irq control
 //	AM_RANGE(0x22, 0x22) AM_WRITENOP //printer output data
-//	AM_RANGE(0x23, 0x23) AM_WRITENOP //border area control
+	AM_RANGE(0x23, 0x23) AM_WRITE(border_col_w) //border area control
 //	AM_RANGE(0x24, 0x24) AM_WRITENOP //Timer write / specify address (RTC?)
 //	AM_RANGE(0x25, 0x25) AM_READNOP  //Timer read (RTC?)
 //	AM_RANGE(0x26, 0x26) AM_WRITENOP //RS232C RX / TX
@@ -280,13 +332,156 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( smc777 )
+	PORT_START("key1") //0x00-0x1f
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED) //0x00 null
+	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_UNUSED) //0x01 soh
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_UNUSED) //0x02 stx
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_UNUSED) //0x03 etx
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_UNUSED) //0x04 etx
+	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_UNUSED) //0x05 eot
+	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_UNUSED) //0x06 enq
+	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_UNUSED) //0x07 ack
+	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Tab") PORT_CODE(KEYCODE_TAB) PORT_CHAR(9)
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0a
+	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0b lf
+	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0c vt
+	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(27)
+	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0e cr
+	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0f so
+
+	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x10 si
+	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x11 dle
+	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x12 dc1
+	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x13 dc2
+	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x14 dc3
+	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x15 dc4
+	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x16 nak
+	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x17 syn
+	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x18 etb
+	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x19 cancel
+	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1a em
+	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CHAR(27)
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1c ???
+	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1d fs
+	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1e gs
+	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1f us
+
+	PORT_START("key2") //0x20-0x3f
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
+	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_UNUSED) //0x21 !
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_UNUSED) //0x22 "
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_UNUSED) //0x23 #
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_UNUSED) //0x24 $
+	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_UNUSED) //0x25 %
+	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_UNUSED) //0x26 &
+	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_UNUSED) //0x27 '
+	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_UNUSED) //0x28 (
+	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_UNUSED) //0x29 )
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2a *
+	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2b +
+	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2c ,
+	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
+	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2e .
+	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2f /
+
+	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
+	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
+	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("2") PORT_CODE(KEYCODE_2) PORT_CHAR('2')
+	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("3") PORT_CODE(KEYCODE_3) PORT_CHAR('3')
+	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("4") PORT_CODE(KEYCODE_4) PORT_CHAR('4')
+	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("5") PORT_CODE(KEYCODE_5) PORT_CHAR('5')
+	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("6") PORT_CODE(KEYCODE_6) PORT_CHAR('6')
+	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("7") PORT_CODE(KEYCODE_7) PORT_CHAR('7')
+	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("8") PORT_CODE(KEYCODE_8) PORT_CHAR('8')
+	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
+	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':')
+	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';')
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3c <
+	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3d =
+	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3e >
+	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3f ?
+
+	PORT_START("key3") //0x40-0x5f
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("@") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('@')
+	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("A") PORT_CODE(KEYCODE_A) PORT_CHAR('A')
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("B") PORT_CODE(KEYCODE_B) PORT_CHAR('B')
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("C") PORT_CODE(KEYCODE_C) PORT_CHAR('C')
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("D") PORT_CODE(KEYCODE_D) PORT_CHAR('D')
+	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("E") PORT_CODE(KEYCODE_E) PORT_CHAR('E')
+	PORT_BIT(0x00000040,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("F") PORT_CODE(KEYCODE_F) PORT_CHAR('F')
+	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("G") PORT_CODE(KEYCODE_G) PORT_CHAR('G')
+	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("H") PORT_CODE(KEYCODE_H) PORT_CHAR('H')
+	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("I") PORT_CODE(KEYCODE_I) PORT_CHAR('I')
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("J") PORT_CODE(KEYCODE_J) PORT_CHAR('J')
+	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("K") PORT_CODE(KEYCODE_K) PORT_CHAR('K')
+	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("L") PORT_CODE(KEYCODE_L) PORT_CHAR('L')
+	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("M") PORT_CODE(KEYCODE_M) PORT_CHAR('M')
+	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("N") PORT_CODE(KEYCODE_N) PORT_CHAR('N')
+	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("O") PORT_CODE(KEYCODE_O) PORT_CHAR('O')
+	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("P") PORT_CODE(KEYCODE_P) PORT_CHAR('P')
+	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q) PORT_CHAR('Q')
+	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("R") PORT_CODE(KEYCODE_R) PORT_CHAR('R')
+	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S") PORT_CODE(KEYCODE_S) PORT_CHAR('S')
+	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("T") PORT_CODE(KEYCODE_T) PORT_CHAR('T')
+	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("U") PORT_CODE(KEYCODE_U) PORT_CHAR('U')
+	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("V") PORT_CODE(KEYCODE_V) PORT_CHAR('V')
+	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("W") PORT_CODE(KEYCODE_W) PORT_CHAR('W')
+	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("X") PORT_CODE(KEYCODE_X) PORT_CHAR('X')
+	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
+	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
+	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[')
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED)
+	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
+	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
+	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
 INPUT_PORTS_END
 
+static TIMER_CALLBACK( keyboard_callback )
+{
+	const char* portnames[3] = { "key1","key2","key3" };
+	int i,port_i,scancode;
+	//UINT8 keymod = input_port_read(machine,"key_modifiers") & 0x1f;
+	scancode = 0;
+
+	for(port_i=0;port_i<3;port_i++)
+	{
+		for(i=0;i<32;i++)
+		{
+			if((input_port_read(machine,portnames[port_i])>>i) & 1)
+			{
+				//key_flag = 1;
+//				if(keymod & 0x02)  // shift not pressed
+//				{
+//					if(scancode >= 0x41 && scancode < 0x5a)
+//						scancode += 0x20;  // lowercase
+//				}
+//				else
+//				{
+//					if(scancode >= 0x31 && scancode < 0x3a)
+//						scancode -= 0x10;
+//					if(scancode == 0x30)
+//					{
+//						scancode = 0x3d;
+//					}
+//				}
+				keyb_press = scancode;
+				keyb_press_flag = 1;
+				return;
+			}
+			scancode++;
+		}
+	}
+}
+
+static MACHINE_START(smc777)
+{
+	timer_pulse(machine, ATTOTIME_IN_HZ(240/32), NULL, 0, keyboard_callback);
+}
 
 static MACHINE_RESET(smc777)
 {
 }
-
 
 static const gfx_layout smc777_charlayout =
 {
@@ -317,6 +512,27 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
+static const rgb_t defcolors[]=
+{
+	MAKE_RGB(0x00,0x00,0x00),
+	MAKE_RGB(0x00,0x00,0xff),
+	MAKE_RGB(0x00,0xff,0x00),
+	MAKE_RGB(0x00,0xff,0xff),
+	MAKE_RGB(0xff,0x00,0x00),
+	MAKE_RGB(0xff,0x00,0xff),
+	MAKE_RGB(0xff,0xff,0x00),
+	MAKE_RGB(0xff,0xff,0xff),
+	/* TODO: values extracted from WinSMC emulator, almost certainly not 100% accurate */
+	MAKE_RGB(0x10,0x40,0x10), //dark green
+	MAKE_RGB(0x10,0x70,0x20), //moss green
+	MAKE_RGB(0xd0,0x50,0x20), //salmon
+	MAKE_RGB(0xe0,0x90,0x20), //tan
+	MAKE_RGB(0x10,0x50,0x80), //ash blue
+	MAKE_RGB(0x10,0x90,0xe0), //light blue
+	MAKE_RGB(0xf0,0x70,0x90), //pink
+	MAKE_RGB(0x80,0x80,0x80) //gray
+};
+
 static PALETTE_INIT( smc777 )
 {
 	int i;
@@ -335,6 +551,9 @@ static PALETTE_INIT( smc777 )
 
 		palette_set_color_rgb(machine, i, r,g,b);
 	}
+
+	for(i=0;i<0x10;i++)
+		palette_set_color(machine, 0x10+i,defcolors[i]);
 }
 
 static const wd17xx_interface smc777_mb8876_interface =
@@ -373,16 +592,17 @@ static MACHINE_DRIVER_START( smc777 )
     MDRV_CPU_PROGRAM_MAP(smc777_mem)
     MDRV_CPU_IO_MAP(smc777_io)
 
+    MDRV_MACHINE_START(smc777)
     MDRV_MACHINE_RESET(smc777)
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
+    MDRV_SCREEN_REFRESH_RATE(60)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 200)
-    MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-    MDRV_PALETTE_LENGTH(0x10)
+    MDRV_SCREEN_SIZE(0x400, 400)
+    MDRV_SCREEN_VISIBLE_AREA(0, 660-1, 0, 220-1) //normal 640 x 200 + 20 pixels for border color
+    MDRV_PALETTE_LENGTH(0x20)
     MDRV_PALETTE_INIT(smc777)
 	MDRV_GFXDECODE(smc777)
 
