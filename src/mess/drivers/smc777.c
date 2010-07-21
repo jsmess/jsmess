@@ -18,6 +18,10 @@
 #include "sound/sn76496.h"
 #include "video/mc6845.h"
 
+#include "machine/wd17xx.h"
+#include "formats/basicdsk.h"
+#include "devices/flopdrv.h"
+
 static UINT16 cursor_addr;
 
 static VIDEO_START( smc777 )
@@ -34,7 +38,7 @@ static VIDEO_UPDATE( smc777 )
 
 	for(y=0;y<25;y++)
 	{
-		for(x=0;x<40;x++)
+		for(x=0;x<80;x++)
 		{
 			int tile = vram[count];
 			int color = attr[count] & 7;
@@ -44,8 +48,7 @@ static VIDEO_UPDATE( smc777 )
 			if(((cursor_addr) == count) && screen->machine->primary_screen->frame_number() & 0x10) // draw cursor
 				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],0x87,7,0,0,x*8,y*8,0);
 
-
-			count+=2;
+			count++; //TODO: width 40 uses count += 2
 		}
 	}
 
@@ -160,9 +163,81 @@ static WRITE8_HANDLER( smc777_fbuf_w )
 	fbuf[vram_index | offset*0x100] = data;
 }
 
+static UINT8 fdc_irq_flag;
+static UINT8 fdc_drq_flag;
+
+static READ8_HANDLER( smc777_fdc_r )
+{
+	running_device* dev = space->machine->device("fdc");
+	//UINT8 ret = 0;
+
+	switch(offset+0x30)
+	{
+		case 0x30:
+			return wd17xx_status_r(dev,offset);
+		case 0x31:
+			return wd17xx_track_r(dev,offset);
+		case 0x32:
+			return wd17xx_sector_r(dev,offset);
+		case 0x33:
+			return wd17xx_data_r(dev,offset);
+		case 0x34: //irq / drq status
+			return (fdc_irq_flag ? 0x80 : 0x00) | (fdc_drq_flag ? 0x00 : 0x40);
+	}
+
+	return 0x00;
+}
+
+static WRITE8_HANDLER( smc777_fdc_w )
+{
+	running_device* dev = space->machine->device("fdc");
+
+	switch(offset+0x30)
+	{
+		case 0x30:
+			wd17xx_command_w(dev,offset,data);
+			break;
+		case 0x31:
+			wd17xx_track_w(dev,offset,data);
+			break;
+		case 0x32:
+			wd17xx_sector_w(dev,offset,data);
+			break;
+		case 0x33:
+			wd17xx_data_w(dev,offset,data);
+			break;
+		case 0x34:
+		//	wd17xx_set_drive(dev,data & 3);
+			/* TODO: understand the conditions of this */
+			floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 7));
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1,0);
+		//	wd17xx_set_side(dev,(data & 0x10)>>4);
+			if(data)
+			printf("%02x\n",data);
+			break;
+	}
+}
+
+static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_intrq_w )
+{
+	fdc_irq_flag = state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_drq_w )
+{
+	fdc_drq_flag = state;
+}
+
+static WRITE8_HANDLER( smc777_rom_w )
+{
+	static UINT8 *rom = memory_region(space->machine, "maincpu");
+
+	rom[offset] = data;
+}
+
 static ADDRESS_MAP_START(smc777_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE(smc777_rom_w)
 	AM_RANGE(0x4000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -188,7 +263,7 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 
 //	AM_RANGE(0x28, 0x2c) AM_NOP //fdc 2, MB8876 -> FD1791
 //	AM_RANGE(0x2d, 0x2f) AM_NOP //rs-232c no. 2
-//	AM_RANGE(0x30, 0x34) AM_NOP //fdc 1, MB8876 -> FD1791
+	AM_RANGE(0x30, 0x34) AM_READWRITE(smc777_fdc_r,smc777_fdc_w) //fdc 1, MB8876 -> FD1791
 //	AM_RANGE(0x35, 0x37) AM_NOP //rs-232c no. 3
 //	AM_RANGE(0x38, 0x3b) AM_NOP //cache disk unit
 //	AM_RANGE(0x3c, 0x3d) AM_NOP //RGB Superimposer
@@ -262,6 +337,36 @@ static PALETTE_INIT( smc777 )
 	}
 }
 
+static const wd17xx_interface smc777_mb8876_interface =
+{
+	DEVCB_NULL,
+	DEVCB_LINE(smc777_fdc_intrq_w),
+	DEVCB_LINE(smc777_fdc_drq_w),
+	{FLOPPY_0, FLOPPY_1, NULL, NULL}
+};
+
+static FLOPPY_OPTIONS_START( smc777 )
+	FLOPPY_OPTION( img, "img", "SMC70 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([1])
+		TRACKS([70])
+		SECTORS([16])
+		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+FLOPPY_OPTIONS_END
+
+static const floppy_config smc777_floppy_config =
+{
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	FLOPPY_DRIVE_SS_80,
+	FLOPPY_OPTIONS_NAME(smc777),
+	DO_NOT_KEEP_GEOMETRY,
+	NULL
+};
+
 static MACHINE_DRIVER_START( smc777 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz) //4,028 Mhz!
@@ -285,6 +390,9 @@ static MACHINE_DRIVER_START( smc777 )
 
     MDRV_VIDEO_START(smc777)
     MDRV_VIDEO_UPDATE(smc777)
+
+	MDRV_MB8877_ADD("fdc",smc777_mb8876_interface)
+	MDRV_FLOPPY_2_DRIVES_ADD(smc777_floppy_config)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
