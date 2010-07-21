@@ -24,7 +24,7 @@ static UINT8 vram_sel,mio_sel;
 static UINT8 *p7_vram,*p7_pal;
 static UINT8 bank_reg;
 static UINT16 cursor_addr;
-static UINT8 cursor_blink;
+static UINT8 cursor_blink,cursor_raster;
 static UINT8 plane_reg,attr_data,attr_wrap,attr_latch,pal_sel,x_width;
 
 static VIDEO_START( paso7 )
@@ -160,9 +160,31 @@ static VIDEO_UPDATE( paso7 )
 
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8,y*8,0);
 
-			if(((cursor_addr*8) == count) && !cursor_blink) // draw cursor
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],0x5f,7,0,0,x*8,y*8,0);
+			// draw cursor
+			if(cursor_addr*8 == count)
+			{
+				int xc,yc,cursor_on;
 
+				cursor_on = 0;
+				switch(cursor_raster & 0x60)
+				{
+					case 0x00: cursor_on = 1; break; //always on
+					case 0x20: cursor_on = 0; break; //always off
+					case 0x40: if(screen->machine->primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(screen->machine->primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+				}
+
+				if(cursor_on)
+				{
+					for(yc=0;yc<(8-(cursor_raster & 7));yc++)
+					{
+						for(xc=0;xc<8;xc++)
+						{
+							*BITMAP_ADDR16(bitmap, y*8-yc+7, x*8+xc) = screen->machine->pens[0x27];
+						}
+					}
+				}
+			}
 			count+=8;
 		}
 	}
@@ -190,7 +212,7 @@ static READ8_HANDLER( vram_r )
 	{
 		res &= p7_vram[offset | 0x8000];
 		attr_latch = p7_vram[offset | 0xc000];
-		i8255a_w(space->machine->device("ppi8255_0"), 1,  (attr_latch << 4) | (attr_latch & 0x7));
+		i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), 1,  (attr_latch << 4) | (attr_latch & 0x7));
 	}
 
 	return res;
@@ -215,7 +237,7 @@ static WRITE8_HANDLER( vram_w )
 			p7_vram[offset | 0x8000] = (plane_reg & 4) ? data : 0xff;
 			attr_latch = attr_wrap ? attr_latch : attr_data;
 			p7_vram[offset | 0xc000] = attr_latch;
-			i8255a_w(space->machine->device("ppi8255_0"), 1, (attr_latch << 4) | (attr_latch & 0x7));
+			i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), 1, (attr_latch << 4) | (attr_latch & 0x7));
 		}
 	}
 }
@@ -327,17 +349,19 @@ static WRITE8_HANDLER( pasopia7_6845_w )
 	if(offset == 0)
 	{
 		addr_latch = data;
-		mc6845_address_w(space->machine->device("crtc"), 0,data);
+		mc6845_address_w(devtag_get_device(space->machine, "crtc"), 0,data);
 	}
 	else
 	{
 		/* FIXME: this should be inside the MC6845 core! */
+		if(addr_latch == 0x0a)
+			cursor_raster = data;
 		if(addr_latch == 0x0e)
 			cursor_addr = ((data<<8) & 0x3f00) | (cursor_addr & 0xff);
 		else if(addr_latch == 0x0f)
 			cursor_addr = (cursor_addr & 0x3f00) | (data & 0xff);
 
-		mc6845_register_w(space->machine->device("crtc"), 0,data);
+		mc6845_register_w(devtag_get_device(space->machine, "crtc"), 0,data);
 	}
 }
 
@@ -356,13 +380,13 @@ static READ8_HANDLER( pasopia7_io_r )
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
-	if(io_port >= 0x08 && io_port <= 0x0b) 		{ return i8255a_r(space->machine->device("ppi8255_0"), (io_port-0x08) & 3); }
-	else if(io_port >= 0x0c && io_port <= 0x0f) { return i8255a_r(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3); }
+	if(io_port >= 0x08 && io_port <= 0x0b) 		{ return i8255a_r(devtag_get_device(space->machine, "ppi8255_0"), (io_port-0x08) & 3); }
+	else if(io_port >= 0x0c && io_port <= 0x0f) { return i8255a_r(devtag_get_device(space->machine, "ppi8255_1"), (io_port-0x0c) & 3); }
 //	else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { return pac2_r(space, io_port-0x1b);  }
-	else if(io_port >= 0x20 && io_port <= 0x23) { return i8255a_r(space->machine->device("ppi8255_2"), (io_port-0x20) & 3); }
-	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(space->machine->device("ctc"), io_port-0x28);  }
-	else if(io_port >= 0x30 && io_port <= 0x33) { return z80pio_cd_ba_r(space->machine->device("z80pio_0"), (io_port-0x30) & 3); }
+	else if(io_port >= 0x20 && io_port <= 0x23) { return i8255a_r(devtag_get_device(space->machine, "ppi8255_2"), (io_port-0x20) & 3); }
+	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(devtag_get_device(space->machine, "ctc"), io_port-0x28);  }
+	else if(io_port >= 0x30 && io_port <= 0x33) { return z80pio_cd_ba_r(devtag_get_device(space->machine, "z80pio_0"), (io_port-0x30) & 3); }
 //	else if(io_port == 0x3a) 				  	{ SN1 }
 //	else if(io_port == 0x3b) 				  	{ SN2 }
 //	else if(io_port == 0x3c) 				  	{ bankswitch }
@@ -388,15 +412,15 @@ static WRITE8_HANDLER( pasopia7_io_w )
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
-	if(io_port >= 0x08 && io_port <= 0x0b) 		{ i8255a_w(space->machine->device("ppi8255_0"), (io_port-0x08) & 3, data); }
-	else if(io_port >= 0x0c && io_port <= 0x0f) { i8255a_w(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3, data); }
+	if(io_port >= 0x08 && io_port <= 0x0b) 		{ i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), (io_port-0x08) & 3, data); }
+	else if(io_port >= 0x0c && io_port <= 0x0f) { i8255a_w(devtag_get_device(space->machine, "ppi8255_1"), (io_port-0x0c) & 3, data); }
 	else if(io_port >= 0x10 && io_port <= 0x11) { pasopia7_6845_w(space, io_port-0x10, data); }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { pac2_w(space, io_port-0x1b, data);  }
-	else if(io_port >= 0x20 && io_port <= 0x23) { i8255a_w(space->machine->device("ppi8255_2"), (io_port-0x20) & 3, data); }
-	else if(io_port >= 0x28 && io_port <= 0x2b) { z80ctc_w(space->machine->device("ctc"), io_port-0x28,data);  }
-	else if(io_port >= 0x30 && io_port <= 0x33) { z80pio_cd_ba_w(space->machine->device("z80pio_0"), (io_port-0x30) & 3, data); }
-	else if(io_port == 0x3a) 				  	{ sn76496_w(space->machine->device("sn1"), 0, data); }
-	else if(io_port == 0x3b) 				  	{ sn76496_w(space->machine->device("sn2"), 0, data); }
+	else if(io_port >= 0x20 && io_port <= 0x23) { i8255a_w(devtag_get_device(space->machine, "ppi8255_2"), (io_port-0x20) & 3, data); }
+	else if(io_port >= 0x28 && io_port <= 0x2b) { z80ctc_w(devtag_get_device(space->machine, "ctc"), io_port-0x28,data);  }
+	else if(io_port >= 0x30 && io_port <= 0x33) { z80pio_cd_ba_w(devtag_get_device(space->machine, "z80pio_0"), (io_port-0x30) & 3, data); }
+	else if(io_port == 0x3a) 				  	{ sn76496_w(devtag_get_device(space->machine, "sn1"), 0, data); }
+	else if(io_port == 0x3b) 				  	{ sn76496_w(devtag_get_device(space->machine, "sn2"), 0, data); }
 	else if(io_port == 0x3c) 				  	{ pasopia7_memory_ctrl_w(space,0, data); }
 //	else if(io_port >= 0xe0 && io_port <= 0xe6) { fdc }
 	else
@@ -556,7 +580,7 @@ static WRITE8_DEVICE_HANDLER( nmi_mask_w )
 //	printf("SYSTEM MISC %02x\n",data);
 
 //	if(data & 1)
-//		i8255a_w(device->machine->device("ppi8255_2"), 1, 0);
+//		i8255a_w(devtag_get_device(device->machine, "ppi8255_2"), 1, 0);
 
 }
 
@@ -673,7 +697,7 @@ static MACHINE_DRIVER_START( paso7 )
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
 	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
     MDRV_PALETTE_LENGTH(0x28)
     MDRV_PALETTE_INIT(pasopia7)
