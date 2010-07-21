@@ -39,7 +39,8 @@ Skeleton drivers:
 - Toshiba PASOPIA 7
 - VTech PC Prestige Elite [Joseba Epalza, Curt Coder]
 - Xircom / Intel REX 6000
-
+- NEC TK-80BS
+- Japan Electronics College MYCOMZ-80A
 
 System Driver Changes:
 ----------------------

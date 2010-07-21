@@ -1642,6 +1642,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/mod8.o		\
 	$(MESS_DRIVERS)/multi8.o	\
 	$(MESS_DRIVERS)/msbc1.o		\
+	$(MESS_DRIVERS)/mycom.o		\
 	$(MESS_DRIVERS)/nanos.o		\
 	$(MESS_DRIVERS)/next.o		\
 	$(MESS_DRIVERS)/pasopia.o	\
@@ -1664,6 +1665,7 @@ $(MESSOBJ)/skeleton.a:			\
 	$(MESS_DRIVERS)/smc777.o	\
 	$(MESS_DRIVERS)/swtpc.o		\
 	$(MESS_DRIVERS)/sys2900.o	\
+	$(MESS_DRIVERS)/tk80bs.o	\
 	$(MESS_DRIVERS)/tricep.o	\
 	$(MESS_DRIVERS)/tvc.o		\
 	$(MESS_DRIVERS)/unior.o		\
