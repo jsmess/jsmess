@@ -908,7 +908,9 @@ static MACHINE_START( vii )
 	state->controller_input[7] = 0;
 
 	UINT8 *rom = memory_region( machine, "cart" );
-	memcpy(state->cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
+	if (rom) { // to prevent batman crash
+		memcpy(state->cart, rom + 0x4000*2, (0x400000 - 0x4000) * 2);
+	}
 }
 
 static MACHINE_RESET( vii )
