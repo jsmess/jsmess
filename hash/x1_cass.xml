@@ -652,6 +652,7 @@
 		</part>
 	</software>
 
+    <!-- Perfect Mahjong? -->
 	<software name="mahjong">
 		<description>Mahjong</description>
 		<year>19??</year>
@@ -730,7 +731,7 @@
 	</software>
 
 	<software name="perseus">
-		<description>Perseus</description>
+		<description>Corageous Perseus</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="tape1" interface="x1_cass">
@@ -1138,7 +1139,7 @@
 	</software>
 
 	<software name="unk_tape">
-		<description>Unknow Tape</description>
+		<description>Unknown Tape</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="tape1" interface="x1_cass">

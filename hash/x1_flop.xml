@@ -144,7 +144,7 @@
 	</software>
 
 	<software name="gaia">
-		<description>gaia</description>
+		<description>Gaia no Monshu</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
@@ -543,7 +543,7 @@
 	</software>
 
 	<software name="ouji">
-		<description>Ouji</description>
+		<description>Ouji Binbin Monogatari</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
@@ -559,7 +559,7 @@
 	</software>
 
 	<software name="oujia" cloneof="ouji">
-		<description>Ouji (Alt)</description>
+		<description>Ouji Binbin Monogatari (Alt)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
@@ -723,7 +723,7 @@
 	</software>
 
 	<software name="hfox2">
-		<description>Harry Fox II</description>
+		<description>Harry Fox II - Yukinomao</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
@@ -1110,7 +1110,7 @@
 	</software>
 
 	<software name="knither">
-		<description>Knither</description>
+		<description>Knither - Demon Crystal II</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
@@ -1121,7 +1121,7 @@
 	</software>
 
 	<software name="kugyoku">
-		<description>Kugyoku Den</description>
+		<description>Ku Gyoku Den</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
@@ -1407,7 +1407,7 @@
 	</software>
 
 	<software name="bastard">
-		<description>Bastard!</description>
+		<description>Bastard!! Special</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
@@ -1677,7 +1677,7 @@
 	</software>
 
 	<software name="laplace">
-		<description>Laplace</description>
+		<description>Laplace no Ma</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
@@ -2501,7 +2501,7 @@
 	</software>
 
 	<software name="nobuseng">
-		<description>Nobunaga Seng. Guny ??</description>
+		<description>Nobunaga no Yabou - Sengoku Gunyuu Den</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
@@ -2967,7 +2967,6 @@
 		</part>
 	</software>
 
-
 	<software name="panch">
 		<description>Panch</description>
 		<year>19??</year>
@@ -2979,60 +2978,23 @@
 		</part>
 	</software>
 
-
-	<software name="wizardrya" cloneof="wizardry">
-		<description>Wizardry (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk1" interface="x1_flop">
-			<dataarea name="flop" size="697696">
-				<rom name="wiz1a.d88" size="697696" crc="c13bb4d0" sha1="7053b96ec0ecfa1713683c33c6d5ca0b0dee0962" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-
-	<software name="wizardr2a" cloneof="wizardr2">
-		<description>Wizardry 2 (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk1" interface="x1_flop">
-			<dataarea name="flop" size="697696">
-				<rom name="wiz2a.d88" size="697696" crc="abd0303a" sha1="85a7452abf914d88c8b83204b18fcd55ea076274" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-
-	<software name="wizardr3a" cloneof="wizardr3">
-		<description>Wizardry 3 (Alt)</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk1" interface="x1_flop">
-			<dataarea name="flop" size="697696">
-				<rom name="wiz3a.d88" size="697696" crc="133705e1" sha1="0cff0c6232ad8984d2b541cc9b8368c226dff1e9" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-
 	<software name="ys2">
 		<description>Ys II</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="disk1" interface="x1_flop">
 			<dataarea name="flop" size="415840">
-				<rom name="ys2_a.d88" size="415840" crc="077dd07e" sha1="9f4c4293674472937a8cb37f3866e5f5ad27e0ca" offset="0" />
+				<rom name="ys2_p.d88" size="415840" crc="9cd578d2" sha1="5099b8860580de76ac224d4fc11b7e42aeae340c" offset="0" />
 			</dataarea>
 		</part>
 		<part name="disk2" interface="x1_flop">
 			<dataarea name="flop" size="415840">
-				<rom name="ys2_b.d88" size="415840" crc="201e1aa6" sha1="e2937beff3097cf5827a57861e4ed901e7c37e36" offset="0" />
+				<rom name="ys2_a.d88" size="415840" crc="077dd07e" sha1="9f4c4293674472937a8cb37f3866e5f5ad27e0ca" offset="0" />
 			</dataarea>
 		</part>
 		<part name="disk3" interface="x1_flop">
 			<dataarea name="flop" size="415840">
-				<rom name="ys2_p.d88" size="415840" crc="9cd578d2" sha1="5099b8860580de76ac224d4fc11b7e42aeae340c" offset="0" />
+				<rom name="ys2_b.d88" size="415840" crc="201e1aa6" sha1="e2937beff3097cf5827a57861e4ed901e7c37e36" offset="0" />
 			</dataarea>
 		</part>
 		<part name="disk4" interface="x1_flop">
@@ -3196,17 +3158,6 @@
 		<part name="disk1" interface="x1_flop">
 			<dataarea name="flop" size="363536">
                 <rom name="shin take to monogatari.d88" size="363536" crc="b16b9f10" sha1="c049117e2243c51fa5d6133dc4fcfd9da0102086" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="sbrenzsj">
-		<description>Shiro Bara Renzoku Satsujin Jiken</description>
-		<year>19??</year>
-		<publisher>&lt;unknown&gt;</publisher>
-		<part name="disk1" interface="x1_flop">
-			<dataarea name="flop" size="351712">
-                <rom name="shiro bara renzoku.d88" size="351712" crc="4c7aff07" sha1="3c19382c4610bbb6c35379a01440c304de9c7bd3" offset="0" />
 			</dataarea>
 		</part>
 	</software>
