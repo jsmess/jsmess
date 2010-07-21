@@ -368,7 +368,7 @@ static MACHINE_RESET( pv2000 )
 	state->key_pressed = 0;
 	state->keyb_column = 0;
 
-	cpu_set_input_line_vector(devtag_get_device(machine, "maincpu"), INPUT_LINE_IRQ0, 0xff);
+	cpu_set_input_line_vector(machine->device("maincpu"), INPUT_LINE_IRQ0, 0xff);
 	memset(&memory_region(machine, "maincpu")[0x7000], 0xff, 0x1000);	// initialize RAM
 }
 
