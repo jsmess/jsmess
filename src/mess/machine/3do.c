@@ -37,6 +37,13 @@ Reset boot sequence:
 - init registers for entry to sherry
 - jump to sherry
 
+- 00000934 check svf sport interface?
+  000009cc
+
+svf
+6100 - 0110 0001 0000 0000 S = 0, A = 001 0000 0000
+6900 - 0110 1001 0000 0000
+
 */
 
 #include "emu.h"
@@ -183,10 +190,16 @@ typedef struct {
 } CLIO;
 
 
+typedef struct {
+	UINT32	sport[512];
+	UINT32	color;
+} SVF;
+
+
 static SLOW2	slow2;
 static MADAM	madam;
 static CLIO		clio;
-static UINT32	svf_color;
+static SVF		svf;
 
 
 READ32_HANDLER( _3do_nvarea_r ) {
@@ -270,13 +283,22 @@ void _3do_slow2_init( running_machine *machine )
 
 READ32_HANDLER( _3do_svf_r )
 {
+	_3do_state *state = (_3do_state *)space->machine->driver_data;
+	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
+	UINT32 *p = ( addr & 0x200000 ) ? state->vram + ( addr & 0xfffff ) : state->dram + ( addr & 0xfffff );
+
 	logerror( "%08X: SVF read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
+
 	switch( offset & ( 0xE000 / 4 ) )
 	{
 	case 0x0000/4:		/* SPORT transfer */
+		for ( int i = 0; i < 512; i++ )
+		{
+			svf.sport[i] = p[i];
+		}
 		break;
 	case 0x2000/4:		/* Write to color register */
-		return svf_color;
+		return svf.color;
 	case 0x4000/4:		/* Flash write */
 		break;
 	case 0x6000/4:		/* CAS before RAS refresh/reset (CBR). Used to initialize VRAM mode during boot. */
@@ -287,15 +309,29 @@ READ32_HANDLER( _3do_svf_r )
 
 WRITE32_HANDLER( _3do_svf_w )
 {
+	_3do_state *state = (_3do_state *)space->machine->driver_data;
+	/* Somehow we end up writing to the RAM locations for SPORT. This is probably not correct. Need to investigate the memory config setup routines */
+	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
+	UINT32 *p = ( addr & 0x200000 ) ? state->vram + ( addr & 0xfffff ) : state->dram + ( addr & 0xfffff );
+
 	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
+
 	switch( offset & ( 0xe000 / 4 ) )
 	{
 	case 0x0000/4:		/* SPORT transfer */
+		for ( int i = 0; i < 512; i++ )
+		{
+			p[i] = svf.sport[i];
+		}
 		break;
 	case 0x2000/4:		/* Write to color register */
-		svf_color = data;
+		svf.color = data;
 		break;
 	case 0x4000/4:		/* Flash write */
+		for ( int i = 0; i < 512; i++ )
+		{
+			p[i] = svf.color;
+		}
 		break;
 	case 0x6000/4:		/* CAS before RAS refresh/reset (CBR). Used to initialize VRAM mode during boot. */
 		break;
@@ -645,6 +681,7 @@ void _3do_madam_init( running_machine *machine )
 {
 	memset( &madam, 0, sizeof(MADAM) );
 	madam.revision = 0x01020000;
+	madam.msysbits = 0x51;
 }
 
 
@@ -665,7 +702,12 @@ READ32_HANDLER( _3do_clio_r )
 	case 0x0030/4:
 		return clio.screen->hpos();
 	case 0x0034/4:
-		return clio.screen->vpos();
+		/* This needs to moved to a proper timer callback function */
+		if ( clio.screen->vpos() == 0 )
+		{
+			clio.vcnt ^= 0x800;
+		}
+		return ( clio.vcnt & 0x800 ) | clio.screen->vpos();
 	case 0x0038/4:
 		return clio.seed;
 	case 0x003c/4:
