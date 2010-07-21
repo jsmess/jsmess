@@ -1437,7 +1437,7 @@
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="34030">
-				<rom name="1û╩âNâèâAâfü[â^.T77" size="34030" crc="BB3AD189" sha1="1A959989704B3616E9E9EA8112595A86E6E2936C" offset="000000" />
+				<rom name="salada3.T77" size="34030" crc="BB3AD189" sha1="1A959989704B3616E9E9EA8112595A86E6E2936C" offset="000000" />
 			</dataarea>
 		</part>
 		<part name="cass2" interface="fm7_cass">
