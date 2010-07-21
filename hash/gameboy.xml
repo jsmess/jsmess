@@ -8031,6 +8031,17 @@
 		</part>
 	</software>
 
+	<software name="mani4in1" cloneof="varpack">
+		<description>Mani 4 in 1 (Chi)</description>
+		<year>19??</year>
+		<publisher>&lt;unknown&gt;</publisher>
+		<part name="cart" interface="gameboy_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="mani 4 in 1 (china).bin" size="524288" crc="5bfc3ef5" sha1="c0639d6c993690022200f2fa4b3094249b9335c0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="marble">
 		<description>Marble Madness (Euro, USA)</description>
 		<year>19??</year>

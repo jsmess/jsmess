@@ -2,7 +2,6 @@
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 <!-- Othello Multivision carts are marked with OMV.
 Known undumped OMV games
-  OM-G005   Challenge Derby ~ チャレンジダービー
   OM-G007   Space Armor ~ スペースアーマー	
 
 Other Canceled titles (possibly exist in prototype form)
@@ -138,6 +137,32 @@ R-066 超級坦克 -> C-66 Super Tank
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="chack'n pop (japan).bin" size="32768" crc="d37bda49" sha1="08b5c1135f9678465ece6a886c948ce091637372" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="chaldrby">
+		<!-- Serial: OM-G005 - Release Date: 1984 - Alt Title: チャレンジダービー -->
+		<description>Challenge Derby (Jpn, OMV)</description>
+		<year>1984</year>
+		<publisher>Tsukuda Original</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="challenge derby [16k].bin" size="16384" crc="c91551da" sha1="47239898cc2ad5c4aeae1815dc54de6f87a8aa35" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This has been hacked to work in emus, by mirroring the first 8K up to 32K and then adding the second 8K. This can be removed when the emulation
+  of this kind of carts have been fixed (running the 16K image results in missing graphics, among other things, see the title screen) --> 
+	<software name="chaldrbya" cloneof="chaldrby">
+		<!-- Serial: OM-G005 - Release Date: 1984 - Alt Title: チャレンジダービー -->
+		<description>Challenge Derby (Jpn, Hacked, OMV)</description>
+		<year>1984</year>
+		<publisher>Tsukuda Original</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="40960">
+				<rom name="challenge derby [40k].bin" size="40960" crc="c5f014dc" sha1="8a5e6c9b10c9a99c1eaaee48374d1fede5966340" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1073,8 +1098,18 @@ R-066 超級坦克 -> C-66 Super Tank
 	</software>
 
 <!-- SC-3000 carts -->
+	<software name="uranaiac">
+		<description>Uranai Angel Cutie (Jpn)</description>
+		<year>198?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="uranai angel cutie (jp).bin" size="32768" crc="ae4f92cf" sha1="90e32471b68cb60449b30e5d5a19d3a88f9829d3" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="homebas">
-	<!-- SC3000 cart -->
 		<description>Home BASIC (Jpn)</description>
 		<year>1985</year>
 		<publisher>Sega</publisher>
@@ -1085,14 +1120,69 @@ R-066 超級坦克 -> C-66 Super Tank
 		</part>
 	</software>
 
-	<software name="uranaiac">
-	<!-- SC3000 cart -->
-		<description>Uranai Angel Cutie (Jpn)</description>
+	<!-- This is the export version -->
+	<software name="basic3">
+		<description>BASIC Level 3 (Euro?)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="basic3.bin" size="32768" crc="5d9f11ca" sha1="a43aef367857a681decea52377c2e7a992c2ac68" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="basic2" cloneof="basic3">
+		<description>BASIC Level 2 (Jpn)</description>
+		<year>1985</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="32768">
+				<rom name="basic2.bin" size="32768" crc="f691f9c7" sha1="1fa9f4ec347681d7909415b6d06179e44b0fcd5e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="musicj" cloneof="music">
+		<description>Sega Music Editor (Jpn)</description>
+ 		<year>198?</year>
+ 		<publisher>Sega</publisher>
+ 		<part name="cart" interface="sg1000_cart">
+ 			<dataarea name="rom" size="32768">
+				<rom name="musicj.bin" size="32768" crc="2ec28526" sha1="a2137e818242e8b361d5d5677797034c55fb1a2d" offset="000000" />
+ 			</dataarea>
+ 		</part>
+ 	</software>
+ 
+	<software name="music">
+		<description>Sega Music Editor (Euro?)</description>
 		<year>198?</year>
 		<publisher>Sega</publisher>
 		<part name="cart" interface="sg1000_cart">
 			<dataarea name="rom" size="32768">
-				<rom name="Uranai Angel Cutie (JP).bin" size="32768" crc="ae4f92cf" sha1="90e32471b68cb60449b30e5d5a19d3a88f9829d3" offset="000000" />
+				<rom name="music.bin" size="32768" crc="622010e1" sha1="61f40e4b7576d4d55322f3d6eef2038aa784336e" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tansansu">
+		<description>Tanoshii Sansu (Jpn)</description>
+		<year>198?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="tansansu.bin" size="16384" crc="6a96978d" sha1="751d82119e19d46a20165c8debbfe95b3241a701" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nihonshi">
+		<description>Nihonshi Nenpyu (Jpn)</description>
+		<year>198?</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sg1000_cart">
+			<dataarea name="rom" size="16384">
+				<rom name="nihonshi.bin" size="16384" crc="22f4f92a" sha1="972cf86f8f627c7b8e1ac9c5a837bd4673be6e54" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
