@@ -10,7 +10,7 @@
 #include "includes/cbm.h"
 #include "includes/c65.h"
 #include "includes/c64.h"
-#include "cpu/m6502/m6502.h"
+#include "cpu/m6502/m4510.h"
 #include "sound/sid6581.h"
 #include "machine/6526cia.h"
 #include "machine/cbmiec.h"
@@ -886,7 +886,7 @@ void c65_bankswitch( running_machine *machine )
 	static int old = -1;
 	int data, loram, hiram, charen;
 
-	data = m6510_get_port(machine->device<legacy_cpu_device>("maincpu"));
+	data = m4510_get_port(machine->device<legacy_cpu_device>("maincpu"));
 	if (data == old)
 		return;
 
