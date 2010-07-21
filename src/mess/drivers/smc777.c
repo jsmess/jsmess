@@ -9,13 +9,14 @@
       guesses ...
     - video emulation is just hacked up together to show something simple,
       dunno yet how it really works.
-    - Drop M6845 support and write custom code in place of it.
+	- BEEP pitch is horrible
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "sound/beep.h"
 #include "video/mc6845.h"
 
 #include "machine/wd17xx.h"
@@ -48,23 +49,23 @@ static VIDEO_UPDATE( smc777 )
 	{
 		for(y=0;y<200;y+=8)
 		{
-			for(x=0;x<640;x+=4)
+			for(x=0;x<160;x++)
 			{
 				static UINT16 color;
 
 				color = (gram[count] & 0xf0) >> 4;
-				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x+0+CRTC_MIN_X) = screen->machine->pens[color+0x10];
-				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x+1+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+0+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+1+CRTC_MIN_X) = screen->machine->pens[color+0x10];
 
 				color = (gram[count] & 0x0f) >> 0;
-				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x+2+CRTC_MIN_X) = screen->machine->pens[color+0x10];
-				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x+3+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+2+CRTC_MIN_X) = screen->machine->pens[color+0x10];
+				*BITMAP_ADDR16(bitmap, y+yi+CRTC_MIN_Y, x*4+3+CRTC_MIN_X) = screen->machine->pens[color+0x10];
 
 				count++;
+
 			}
 		}
-//		count+= 48;
-
+		count+= 0x60;
 	}
 
 	count = 0x0000;
@@ -286,6 +287,41 @@ static WRITE8_HANDLER( border_col_w )
 	backdrop_pen = data & 0xf;
 }
 
+static UINT8 system_data;
+
+static READ8_HANDLER( system_input_r )
+{
+	return system_data;
+}
+
+static WRITE8_HANDLER( system_output_w )
+{
+	/*
+	---x --- beep
+	all the rest is unknown at current time
+	*/
+	system_data = data;
+	beep_set_state(space->machine->device("beeper"),data & 0x10);
+}
+
+static READ8_HANDLER( unk_r )
+{
+	return 0;
+}
+
+static WRITE8_HANDLER( smc777_ramdac_w )
+{
+	static UINT8 pal_index,gradient_index,r,g,b;
+	pal_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B) & 0xf;
+	gradient_index = (cpu_get_reg(space->machine->device("maincpu"), Z80_B) & 0x30) >> 4;
+
+	switch(gradient_index)
+	{
+		case 0: r = data; palette_set_color_rgb(space->machine, pal_index+0x10, r,g,b); break;
+		case 1: g = data; palette_set_color_rgb(space->machine, pal_index+0x10, r,g,b); break;
+		case 2: b = data; palette_set_color_rgb(space->machine, pal_index+0x10, r,g,b); break;
+	}
+}
 
 static ADDRESS_MAP_START(smc777_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -301,7 +337,7 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x10, 0x17) AM_READWRITE(smc777_pcg_r, smc777_pcg_w)
 	AM_RANGE(0x18, 0x19) AM_WRITE(smc777_6845_w)
 	AM_RANGE(0x1a, 0x1b) AM_READ(key_r) AM_WRITENOP//keyboard data
-//	AM_RANGE(0x1c, 0x1c) AM_WRITENOP //status and control data / Printer strobe
+	AM_RANGE(0x1c, 0x1c) AM_READWRITE(system_input_r,system_output_w) //status and control data / Printer strobe
 //	AM_RANGE(0x1d, 0x1d) AM_WRITENOP //status and control data / Printer status / strobe
 //	AM_RANGE(0x1e, 0x1f) AM_WRITENOP //RS232C irq control
 //	AM_RANGE(0x20, 0x20) AM_WRITENOP //display mode switching
@@ -321,6 +357,8 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0x3c, 0x3d) AM_NOP //RGB Superimposer
 //	AM_RANGE(0x40, 0x47) AM_NOP //IEEE-488 interface unit
 //	AM_RANGE(0x48, 0x50) AM_NOP //HDD (Winchester)
+	AM_RANGE(0x51, 0x51) AM_READ(unk_r)
+	AM_RANGE(0x52, 0x52) AM_WRITE(smc777_ramdac_w)
 //	AM_RANGE(0x54, 0x59) AM_NOP //VTR Controller
 	AM_RANGE(0x53, 0x53) AM_DEVWRITE("sn1", sn76496_w) //not in the datasheet ... almost certainly SMC-777 specific
 //	AM_RANGE(0x5a, 0x5b) AM_WRITENOP //RAM banking
@@ -477,6 +515,8 @@ static TIMER_CALLBACK( keyboard_callback )
 static MACHINE_START(smc777)
 {
 	timer_pulse(machine, ATTOTIME_IN_HZ(240/32), NULL, 0, keyboard_callback);
+	beep_set_frequency(machine->device("beeper"),300); //guesswork
+	beep_set_state(machine->device("beeper"),0);
 }
 
 static MACHINE_RESET(smc777)
@@ -512,6 +552,7 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
+#if 0
 static const rgb_t defcolors[]=
 {
 	MAKE_RGB(0x00,0x00,0x00),
@@ -532,6 +573,7 @@ static const rgb_t defcolors[]=
 	MAKE_RGB(0xf0,0x70,0x90), //pink
 	MAKE_RGB(0x80,0x80,0x80) //gray
 };
+#endif
 
 static PALETTE_INIT( smc777 )
 {
@@ -552,8 +594,8 @@ static PALETTE_INIT( smc777 )
 		palette_set_color_rgb(machine, i, r,g,b);
 	}
 
-	for(i=0;i<0x10;i++)
-		palette_set_color(machine, 0x10+i,defcolors[i]);
+//	for(i=0;i<0x10;i++)
+//		palette_set_color(machine, 0x10+i,defcolors[i]);
 }
 
 static const wd17xx_interface smc777_mb8876_interface =
@@ -618,6 +660,9 @@ static MACHINE_DRIVER_START( smc777 )
 
 	MDRV_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("beeper", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_DRIVER_END
 
 /* ROM definition */
@@ -637,5 +682,5 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 1983, smc777,  0,       0, 	smc777, 	smc777, 	 0,  "Sony",   "SMC-777",		GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 1983, smc777,  0,       0, 	smc777, 	smc777, 	 0,  "Sony",   "SMC-777",		GAME_NOT_WORKING | GAME_IMPERFECT_SOUND)
 
