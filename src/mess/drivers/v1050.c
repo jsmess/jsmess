@@ -1165,6 +1165,8 @@ static MACHINE_RESET( v1050 )
 	state->bank = 0;
 
 	v1050_bankswitch(machine);
+	
+	state->timer_sio->adjust(attotime_zero, 0, ATTOTIME_IN_HZ((double)XTAL_16MHz/4/13/16));	
 }
 
 
@@ -1234,7 +1236,7 @@ static MACHINE_DRIVER_START( v1050 )
 	MDRV_WD1793_ADD(MB8877_TAG, /*XTAL_16MHz/16,*/ v1050_wd17xx_intf )
 	MDRV_FLOPPY_2_DRIVES_ADD(v1050_floppy_config)
 	MDRV_TIMER_ADD_PERIODIC(TIMER_KB_TAG, kb_8251_tick, HZ((double)XTAL_16MHz/4/13/8))
-	MDRV_TIMER_ADD_PERIODIC(TIMER_SIO_TAG, sio_8251_tick, HZ((double)XTAL_16MHz/4/13/16))
+	MDRV_TIMER_ADD(TIMER_SIO_TAG, sio_8251_tick)
 
 	/* printer */
 	MDRV_CENTRONICS_ADD(CENTRONICS_TAG, standard_centronics)
