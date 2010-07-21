@@ -64,7 +64,7 @@ static WRITE8_HANDLER( smc777_6845_w )
 	if(offset == 0)
 	{
 		addr_latch = data;
-		mc6845_address_w(devtag_get_device(space->machine, "crtc"), 0,data);
+		mc6845_address_w(space->machine->device("crtc"), 0,data);
 	}
 	else
 	{
@@ -74,7 +74,7 @@ static WRITE8_HANDLER( smc777_6845_w )
 		else if(addr_latch == 0x0f)
 			cursor_addr = (cursor_addr & 0x3f00) | (data & 0xff);
 
-		mc6845_register_w(devtag_get_device(space->machine, "crtc"), 0,data);
+		mc6845_register_w(space->machine->device("crtc"), 0,data);
 	}
 }
 
@@ -83,7 +83,7 @@ static READ8_HANDLER( smc777_vram_r )
 	static UINT8 *vram = memory_region(space->machine, "vram");
 	static UINT16 vram_index;
 
-	vram_index = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_B);
+	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
 	return vram[vram_index | offset*0x100];
 }
@@ -93,7 +93,7 @@ static READ8_HANDLER( smc777_attr_r )
 	static UINT8 *attr = memory_region(space->machine, "attr");
 	static UINT16 vram_index;
 
-	vram_index = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_B);
+	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
 	return attr[vram_index | offset*0x100];
 }
@@ -103,7 +103,7 @@ static READ8_HANDLER( smc777_pcg_r )
 	static UINT8 *pcg = memory_region(space->machine, "pcg");
 	static UINT16 vram_index;
 
-	vram_index = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_B);
+	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
 	return pcg[vram_index | offset*0x100];
 }
@@ -113,7 +113,7 @@ static WRITE8_HANDLER( smc777_vram_w )
 	static UINT8 *vram = memory_region(space->machine, "vram");
 	static UINT16 vram_index;
 
-	vram_index = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_B);
+	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
 	vram[vram_index | offset*0x100] = data;
 }
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( smc777_attr_w )
 	static UINT8 *attr = memory_region(space->machine, "attr");
 	static UINT16 vram_index;
 
-	vram_index = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_B);
+	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
 	attr[vram_index | offset*0x100] = data;
 }
@@ -133,7 +133,7 @@ static WRITE8_HANDLER( smc777_pcg_w )
 	static UINT8 *pcg = memory_region(space->machine, "pcg");
 	static UINT16 vram_index;
 
-	vram_index = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_B);
+	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
 	pcg[vram_index | offset*0x100] = data;
 
@@ -145,7 +145,7 @@ static READ8_HANDLER( smc777_fbuf_r )
 	static UINT8 *fbuf = memory_region(space->machine, "fbuf");
 	static UINT16 vram_index;
 
-	vram_index = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_B);
+	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
 	return fbuf[vram_index | offset*0x100];
 }
@@ -155,7 +155,7 @@ static WRITE8_HANDLER( smc777_fbuf_w )
 	static UINT8 *fbuf = memory_region(space->machine, "fbuf");
 	static UINT16 vram_index;
 
-	vram_index = cpu_get_reg(devtag_get_device(space->machine, "maincpu"), Z80_B);
+	vram_index = cpu_get_reg(space->machine->device("maincpu"), Z80_B);
 
 	fbuf[vram_index | offset*0x100] = data;
 }
