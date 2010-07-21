@@ -7,9 +7,8 @@
     TODO:
     - no documentation, the entire driver is just a bunch of educated
       guesses ...
-    - video emulation is just hacked up together to show something simple,
-      dunno yet how it really works.
 	- BEEP pitch is horrible
+	- 1dd disk support
 
 ****************************************************************************/
 
@@ -23,7 +22,7 @@
 #include "formats/basicdsk.h"
 #include "devices/flopdrv.h"
 
-static UINT16 cursor_addr;
+static UINT16 cursor_addr,cursor_raster;
 static UINT8 keyb_press,keyb_press_flag;
 static UINT8 backdrop_pen;
 
@@ -76,11 +75,50 @@ static VIDEO_UPDATE( smc777 )
 		{
 			int tile = vram[count];
 			int color = attr[count] & 7;
+			int bk_color = (attr[count] & 0x18) >> 3;
+			int yb,xb,bk_pen;
 
+			bk_pen = 0x00;
+			switch(bk_color)
+			{
+				case 1: bk_pen = 0x07; break; //white
+				case 2: bk_pen = 0x00; break; //black
+				case 3: bk_pen = (color ^ 7)+0x08; break; //complementary
+			}
+
+			if(bk_color)
+				for(yb=0;yb<8;yb++)
+					for(xb=0;xb<8;xb++)
+						*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y+yb, x*8+CRTC_MIN_X+xb) = screen->machine->pens[bk_pen+0x10];
+
+			/*TODO: make this custom code*/
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],tile,color,0,0,x*8+CRTC_MIN_X,y*8+CRTC_MIN_Y,0);
 
-			if(((cursor_addr) == count) && screen->machine->primary_screen->frame_number() & 0x10) // draw cursor
-				drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],0x87,7,0,0,x*8+CRTC_MIN_X,y*8+CRTC_MIN_Y,0);
+			// draw cursor
+			if(cursor_addr == count)
+			{
+				int xc,yc,cursor_on;
+
+				cursor_on = 0;
+				switch(cursor_raster & 0x60)
+				{
+					case 0x00: cursor_on = 1; break; //always on
+					case 0x20: cursor_on = 0; break; //always off
+					case 0x40: if(screen->machine->primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+					case 0x60: if(screen->machine->primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+				}
+
+				if(cursor_on)
+				{
+					for(yc=0;yc<(8-(cursor_raster & 7));yc++)
+					{
+						for(xc=0;xc<8;xc++)
+						{
+							*BITMAP_ADDR16(bitmap, y*8+CRTC_MIN_Y-yc+7, x*8+CRTC_MIN_X+xc) = screen->machine->pens[0x17];
+						}
+					}
+				}
+			}
 
 			count++; //TODO: width 40 uses count += 2
 		}
@@ -101,7 +139,9 @@ static WRITE8_HANDLER( smc777_6845_w )
 	else
 	{
 		/* FIXME: this should be inside the MC6845 core! */
-		if(addr_latch == 0x0e)
+		if(addr_latch == 0x0a)
+			cursor_raster = data;
+		else if(addr_latch == 0x0e)
 			cursor_addr = ((data<<8) & 0x3f00) | (cursor_addr & 0xff);
 		else if(addr_latch == 0x0f)
 			cursor_addr = (cursor_addr & 0x3f00) | (data & 0xff);
@@ -264,9 +304,6 @@ static WRITE8_HANDLER( smc777_rom_w )
 	rom[offset] = data;
 }
 
-#define keyb_press(_val_,_charset_) \
-	if(input_code_pressed(space->machine, _val_)) \
-		return _charset_ \
 
 static READ8_HANDLER( key_r )
 {
@@ -344,8 +381,8 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0x21, 0x21) AM_WRITENOP //60 Hz irq control
 //	AM_RANGE(0x22, 0x22) AM_WRITENOP //printer output data
 	AM_RANGE(0x23, 0x23) AM_WRITE(border_col_w) //border area control
-//	AM_RANGE(0x24, 0x24) AM_WRITENOP //Timer write / specify address (RTC?)
-//	AM_RANGE(0x25, 0x25) AM_READNOP  //Timer read (RTC?)
+//	AM_RANGE(0x24, 0x24) AM_WRITENOP //Timer write / specify address (RTC)
+//	AM_RANGE(0x25, 0x25) AM_READNOP  //Timer read (RTC)
 //	AM_RANGE(0x26, 0x26) AM_WRITENOP //RS232C RX / TX
 //	AM_RANGE(0x27, 0x27) AM_WRITENOP //RS232C Mode / Command / Status
 
@@ -388,16 +425,19 @@ static INPUT_PORTS_START( smc777 )
 	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0e cr
 	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x0f so
 
+	#if 0
+
+	#endif
 	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x10 si
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x11 dle
 	PORT_BIT(0x00040000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x12 dc1
 	PORT_BIT(0x00080000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x13 dc2
-	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x14 dc3
+	PORT_BIT(0x00100000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("HOME") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x00200000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x15 dc4
-	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x16 nak
+	PORT_BIT(0x00400000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x00800000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x17 syn
 	PORT_BIT(0x01000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x18 etb
-	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x19 cancel
+	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right") PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1a em
 	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CHAR(27)
 	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x1c ???
@@ -552,29 +592,6 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
-#if 0
-static const rgb_t defcolors[]=
-{
-	MAKE_RGB(0x00,0x00,0x00),
-	MAKE_RGB(0x00,0x00,0xff),
-	MAKE_RGB(0x00,0xff,0x00),
-	MAKE_RGB(0x00,0xff,0xff),
-	MAKE_RGB(0xff,0x00,0x00),
-	MAKE_RGB(0xff,0x00,0xff),
-	MAKE_RGB(0xff,0xff,0x00),
-	MAKE_RGB(0xff,0xff,0xff),
-	/* TODO: values extracted from WinSMC emulator, almost certainly not 100% accurate */
-	MAKE_RGB(0x10,0x40,0x10), //dark green
-	MAKE_RGB(0x10,0x70,0x20), //moss green
-	MAKE_RGB(0xd0,0x50,0x20), //salmon
-	MAKE_RGB(0xe0,0x90,0x20), //tan
-	MAKE_RGB(0x10,0x50,0x80), //ash blue
-	MAKE_RGB(0x10,0x90,0xe0), //light blue
-	MAKE_RGB(0xf0,0x70,0x90), //pink
-	MAKE_RGB(0x80,0x80,0x80) //gray
-};
-#endif
-
 static PALETTE_INIT( smc777 )
 {
 	int i;
@@ -585,17 +602,14 @@ static PALETTE_INIT( smc777 )
 
 		if((i & 0x01) == 0x01)
 		{
-			r = ((i >> 2) & 1) ? 0xff : 0x00;
-			g = ((i >> 3) & 1) ? 0xff : 0x00;
+			r = ((i >> 3) & 1) ? 0xff : 0x00;
+			g = ((i >> 2) & 1) ? 0xff : 0x00;
 			b = ((i >> 1) & 1) ? 0xff : 0x00;
 		}
 		else { r = g = b = 0x00; }
 
 		palette_set_color_rgb(machine, i, r,g,b);
 	}
-
-//	for(i=0;i<0x10;i++)
-//		palette_set_color(machine, 0x10+i,defcolors[i]);
 }
 
 static const wd17xx_interface smc777_mb8876_interface =
@@ -612,6 +626,13 @@ static FLOPPY_OPTIONS_START( smc777 )
 		TRACKS([70])
 		SECTORS([16])
 		SECTOR_LENGTH([256])
+		FIRST_SECTOR_ID([1]))
+	/* TODO */
+	FLOPPY_OPTION( img, "1dd", "SMC777 disk image", basicdsk_identify_default, basicdsk_construct_default,
+		HEADS([2])
+		TRACKS([64])
+		SECTORS([16])
+		SECTOR_LENGTH([128])
 		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
