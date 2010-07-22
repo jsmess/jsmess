@@ -2,7 +2,7 @@
     CRYSTAL SYSTEM by Brezzasoft (2001)
     using VRender0 System on a Chip
 
-    The VRender0 (http://www.mesdigital.com/english/Products/product_vrender0.asp) chip contains:
+    The VRender0 (info at archive.org for http://www.mesdigital.com) chip contains:
         - CPU Core SE3208 (info at www.adc.co.kr) @ 43Mhz
         - 2 DMA chans
         - 4 Timers
@@ -563,11 +563,11 @@ static MACHINE_START( crystal )
 	crystal_state *state = (crystal_state *)machine->driver_data;
 	int i;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->ds1302 = devtag_get_device(machine, "rtc");
-	state->vr0video = devtag_get_device(machine, "vr0");
+	state->maincpu = machine->device("maincpu");
+	state->ds1302 = machine->device("rtc");
+	state->vr0video = machine->device("vr0");
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), icallback);
+	cpu_set_irq_callback(machine->device("maincpu"), icallback);
 	for (i = 0; i < 4; i++)
 		state->Timer[i] = timer_alloc(machine, Timercb, (void*)(FPTR)i);
 
@@ -597,7 +597,7 @@ static MACHINE_RESET( crystal )
 	memset(state->vidregs, 0, 0x10000);
 	state->FlipCount = 0;
 	state->IntHigh = 0;
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), icallback);
+	cpu_set_irq_callback(machine->device("maincpu"), icallback);
 	state->Bank = 0;
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "user1") + 0);
 	state->FlashCmd = 0xff;
@@ -612,7 +612,7 @@ static MACHINE_RESET( crystal )
 		timer_adjust_oneshot(state->Timer[i], attotime_never, 0);
 	}
 
-	vr0_snd_set_areas(devtag_get_device(machine, "vrender"), state->textureram, state->frameram);
+	vr0_snd_set_areas(machine->device("vrender"), state->textureram, state->frameram);
 #ifdef IDLE_LOOP_SPEEDUP
 	state->FlipCntRead = 0;
 #endif
@@ -902,6 +902,10 @@ ROM_START( topbladv )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios
 	ROM_LOAD("mx27l1000.u14",  0x000000, 0x020000, CRC(BEFF39A9) SHA1(b6f6dda58d9c82273f9422c1bd623411e58982cb))
 
+	ROM_REGION( 0x4300, "pic", 0 ) // pic16c727 - we don't have a core for this
+	ROM_LOAD("top_blade_v_pic16c727.bin",  0x000000, 0x4300, CRC(9cdea57b) SHA1(884156085f9e780cdf719aedc2e8a0fd5983613b) )
+
+
 	ROM_REGION32_LE( 0x1000000, "user1", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(bd23f640) SHA1(1d22aa2c828642bb7c1dfea4e13f777f95acc701) )
 
@@ -912,6 +916,10 @@ ROM_END
 ROM_START( officeye )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios (not the standard one)
 	ROM_LOAD("bios.u14",  0x000000, 0x020000, CRC(ffc57e90) SHA1(6b6a17fd4798dea9c7b880f3063be8494e7db302) )
+
+	ROM_REGION( 0x4280, "pic", 0 ) // pic16f84a - we don't have a core for this
+	ROM_LOAD("office_yeo_in_cheon_ha_pic16f84a.bin",  0x000000, 0x4280, CRC(7561cdf5) SHA1(eade592823a110019b4af81a7dc56d01f7d6589f) )
+
 
 	ROM_REGION32_LE( 0x2000000, "user1", 0 ) // Flash
 	ROM_LOAD("flash.u1",  0x0000000, 0x1000000, CRC(d3f3eec4) SHA1(ea728415bd4906964b7d37f4379a8a3bd42a1c2d) )

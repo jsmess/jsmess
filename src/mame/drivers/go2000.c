@@ -14,7 +14,7 @@ Ram:
  3 Windbond W24257AK-15 (near TM29F550ZX)
  2 UM61256AK-15 (near Z80)
 
-P1, P2 & P3 4-pin connectors (unkown purpose)
+P1, P2 & P3 4-pin connectors (unknown purpose)
 
 2008-08:
 Added Dips and Dip locations based on Service Mode.
@@ -316,7 +316,7 @@ static MACHINE_START( go2000 )
 
 	memory_set_bank(machine, "bank1", 0);
 
-	state->soundcpu = devtag_get_device(machine, "soundcpu");
+	state->soundcpu = machine->device("soundcpu");
 }
 
 static MACHINE_DRIVER_START( go2000 )

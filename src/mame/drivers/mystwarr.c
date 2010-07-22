@@ -650,7 +650,7 @@ static INPUT_PORTS_START( mystwarr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
 	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )
 	PORT_DIPSETTING(    0x20, "Common" )
-	PORT_DIPSETTING(    0x00, "Independant" )
+	PORT_DIPSETTING(    0x00, "Independent" )
 	PORT_DIPNAME( 0x40, 0x40, "Number of Players" )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x40, "2" )
@@ -691,7 +691,7 @@ static INPUT_PORTS_START( metamrph )
 	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
 	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )
 	PORT_DIPSETTING(    0x20, "Common" )
-	PORT_DIPSETTING(    0x00, "Independant" )
+	PORT_DIPSETTING(    0x00, "Independent" )
 	PORT_DIPNAME( 0x40, 0x40, "Number of Players" )
 	PORT_DIPSETTING(    0x00, "4" )
 	PORT_DIPSETTING(    0x40, "2" )
@@ -737,7 +737,7 @@ static INPUT_PORTS_START( viostorm )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism" )
 	PORT_DIPSETTING(    0x40, "Common" )
-	PORT_DIPSETTING(    0x00, "Independant" )
+	PORT_DIPSETTING(    0x00, "Independent" )
 	PORT_DIPNAME( 0x80, 0x80, "Number of Players" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x80, "2" )
@@ -888,8 +888,8 @@ static MACHINE_START( mystwarr )
 
 static MACHINE_RESET(mystwarr)
 {
-	running_device *k054539_1 = devtag_get_device(machine, "konami1");
-	running_device *k054539_2 = devtag_get_device(machine, "konami2");
+	running_device *k054539_1 = machine->device("konami1");
+	running_device *k054539_2 = machine->device("konami2");
 	int i;
 
 	// soften chorus(chip 0 channel 0-3), boost voice(chip 0 channel 4-7)
@@ -905,7 +905,7 @@ static MACHINE_RESET(mystwarr)
 
 static MACHINE_RESET(dadandrn)
 {
-	running_device *k054539_1 = devtag_get_device(machine, "konami1");
+	running_device *k054539_1 = machine->device("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
@@ -914,7 +914,7 @@ static MACHINE_RESET(dadandrn)
 
 static MACHINE_RESET(viostorm)
 {
-	running_device *k054539_1 = devtag_get_device(machine, "konami1");
+	running_device *k054539_1 = machine->device("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 4-7)
@@ -923,8 +923,8 @@ static MACHINE_RESET(viostorm)
 
 static MACHINE_RESET(metamrph)
 {
-	running_device *k054539_1 = devtag_get_device(machine, "konami1");
-	running_device *k054539_2 = devtag_get_device(machine, "konami2");
+	running_device *k054539_1 = machine->device("konami1");
+	running_device *k054539_2 = machine->device("konami2");
 	int i;
 
 	// boost voice(chip 0 channel 4-7) and soften other channels
@@ -939,7 +939,7 @@ static MACHINE_RESET(metamrph)
 
 static MACHINE_RESET(martchmp)
 {
-	running_device *k054539_1 = devtag_get_device(machine, "konami1");
+	running_device *k054539_1 = machine->device("konami1");
 	int i;
 
 	k054539_init_flags(k054539_1, K054539_REVERSE_STEREO);
@@ -950,7 +950,7 @@ static MACHINE_RESET(martchmp)
 
 static MACHINE_RESET(gaiapols)
 {
-	running_device *k054539_1 = devtag_get_device(machine, "konami1");
+	running_device *k054539_1 = machine->device("konami1");
 	int i;
 
 	// boost voice(chip 0 channel 5-7)

@@ -3,7 +3,7 @@
     Bellfruit scorpion1 driver, (under heavy construction !!!)
 
     A.G.E Code Copyright J. Wallace and the AGEMAME Development Team.
-    Visit http://www.mameworld.net/agemame/ for more information.
+    Visit http://agemame.mameworld.info for more information.
 
     M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
     used under license from http://mamedev.org
@@ -180,7 +180,7 @@ static INTERRUPT_GEN( timer_irq )
 
 	    sc1_Inputs[2] = input_port_read(device->machine,"STROBE0");
 
-		generic_pulse_irq_line(devtag_get_device(device->machine, "maincpu"), M6809_IRQ_LINE);
+		generic_pulse_irq_line(device->machine->device("maincpu"), M6809_IRQ_LINE);
 	}
 }
 
@@ -277,7 +277,7 @@ static WRITE8_HANDLER( mmtr_w )
 			if ( changed & (1 << i) )
 			{
 				Mechmtr_update(i, cycles, data & (1 << i) );
-				generic_pulse_irq_line(devtag_get_device(space->machine, "maincpu"), M6809_FIRQ_LINE);
+				generic_pulse_irq_line(space->machine->device("maincpu"), M6809_FIRQ_LINE);
 			}
 		}
 	}

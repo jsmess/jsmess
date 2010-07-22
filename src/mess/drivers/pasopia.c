@@ -212,7 +212,7 @@ static READ8_HANDLER( vram_r )
 	{
 		res &= p7_vram[offset | 0x8000];
 		attr_latch = p7_vram[offset | 0xc000];
-		i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), 1,  (attr_latch << 4) | (attr_latch & 0x7));
+		i8255a_w(space->machine->device("ppi8255_0"), 1,  (attr_latch << 4) | (attr_latch & 0x7));
 	}
 
 	return res;
@@ -237,7 +237,7 @@ static WRITE8_HANDLER( vram_w )
 			p7_vram[offset | 0x8000] = (plane_reg & 4) ? data : 0xff;
 			attr_latch = attr_wrap ? attr_latch : attr_data;
 			p7_vram[offset | 0xc000] = attr_latch;
-			i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), 1, (attr_latch << 4) | (attr_latch & 0x7));
+			i8255a_w(space->machine->device("ppi8255_0"), 1, (attr_latch << 4) | (attr_latch & 0x7));
 		}
 	}
 }
@@ -349,7 +349,7 @@ static WRITE8_HANDLER( pasopia7_6845_w )
 	if(offset == 0)
 	{
 		addr_latch = data;
-		mc6845_address_w(devtag_get_device(space->machine, "crtc"), 0,data);
+		mc6845_address_w(space->machine->device("crtc"), 0,data);
 	}
 	else
 	{
@@ -361,7 +361,7 @@ static WRITE8_HANDLER( pasopia7_6845_w )
 		else if(addr_latch == 0x0f)
 			cursor_addr = (cursor_addr & 0x3f00) | (data & 0xff);
 
-		mc6845_register_w(devtag_get_device(space->machine, "crtc"), 0,data);
+		mc6845_register_w(space->machine->device("crtc"), 0,data);
 	}
 }
 
@@ -380,13 +380,13 @@ static READ8_HANDLER( pasopia7_io_r )
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
-	if(io_port >= 0x08 && io_port <= 0x0b) 		{ return i8255a_r(devtag_get_device(space->machine, "ppi8255_0"), (io_port-0x08) & 3); }
-	else if(io_port >= 0x0c && io_port <= 0x0f) { return i8255a_r(devtag_get_device(space->machine, "ppi8255_1"), (io_port-0x0c) & 3); }
+	if(io_port >= 0x08 && io_port <= 0x0b) 		{ return i8255a_r(space->machine->device("ppi8255_0"), (io_port-0x08) & 3); }
+	else if(io_port >= 0x0c && io_port <= 0x0f) { return i8255a_r(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3); }
 //	else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { return pac2_r(space, io_port-0x1b);  }
-	else if(io_port >= 0x20 && io_port <= 0x23) { return i8255a_r(devtag_get_device(space->machine, "ppi8255_2"), (io_port-0x20) & 3); }
-	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(devtag_get_device(space->machine, "ctc"), io_port-0x28);  }
-	else if(io_port >= 0x30 && io_port <= 0x33) { return z80pio_cd_ba_r(devtag_get_device(space->machine, "z80pio_0"), (io_port-0x30) & 3); }
+	else if(io_port >= 0x20 && io_port <= 0x23) { return i8255a_r(space->machine->device("ppi8255_2"), (io_port-0x20) & 3); }
+	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(space->machine->device("ctc"), io_port-0x28);  }
+	else if(io_port >= 0x30 && io_port <= 0x33) { return z80pio_cd_ba_r(space->machine->device("z80pio_0"), (io_port-0x30) & 3); }
 //	else if(io_port == 0x3a) 				  	{ SN1 }
 //	else if(io_port == 0x3b) 				  	{ SN2 }
 //	else if(io_port == 0x3c) 				  	{ bankswitch }
@@ -412,15 +412,15 @@ static WRITE8_HANDLER( pasopia7_io_w )
 
 	io_port = offset & 0xff; //trim down to 8-bit bus
 
-	if(io_port >= 0x08 && io_port <= 0x0b) 		{ i8255a_w(devtag_get_device(space->machine, "ppi8255_0"), (io_port-0x08) & 3, data); }
-	else if(io_port >= 0x0c && io_port <= 0x0f) { i8255a_w(devtag_get_device(space->machine, "ppi8255_1"), (io_port-0x0c) & 3, data); }
+	if(io_port >= 0x08 && io_port <= 0x0b) 		{ i8255a_w(space->machine->device("ppi8255_0"), (io_port-0x08) & 3, data); }
+	else if(io_port >= 0x0c && io_port <= 0x0f) { i8255a_w(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3, data); }
 	else if(io_port >= 0x10 && io_port <= 0x11) { pasopia7_6845_w(space, io_port-0x10, data); }
 	else if(io_port >= 0x18 && io_port <= 0x1b) { pac2_w(space, io_port-0x1b, data);  }
-	else if(io_port >= 0x20 && io_port <= 0x23) { i8255a_w(devtag_get_device(space->machine, "ppi8255_2"), (io_port-0x20) & 3, data); }
-	else if(io_port >= 0x28 && io_port <= 0x2b) { z80ctc_w(devtag_get_device(space->machine, "ctc"), io_port-0x28,data);  }
-	else if(io_port >= 0x30 && io_port <= 0x33) { z80pio_cd_ba_w(devtag_get_device(space->machine, "z80pio_0"), (io_port-0x30) & 3, data); }
-	else if(io_port == 0x3a) 				  	{ sn76496_w(devtag_get_device(space->machine, "sn1"), 0, data); }
-	else if(io_port == 0x3b) 				  	{ sn76496_w(devtag_get_device(space->machine, "sn2"), 0, data); }
+	else if(io_port >= 0x20 && io_port <= 0x23) { i8255a_w(space->machine->device("ppi8255_2"), (io_port-0x20) & 3, data); }
+	else if(io_port >= 0x28 && io_port <= 0x2b) { z80ctc_w(space->machine->device("ctc"), io_port-0x28,data);  }
+	else if(io_port >= 0x30 && io_port <= 0x33) { z80pio_cd_ba_w(space->machine->device("z80pio_0"), (io_port-0x30) & 3, data); }
+	else if(io_port == 0x3a) 				  	{ sn76496_w(space->machine->device("sn1"), 0, data); }
+	else if(io_port == 0x3b) 				  	{ sn76496_w(space->machine->device("sn2"), 0, data); }
 	else if(io_port == 0x3c) 				  	{ pasopia7_memory_ctrl_w(space,0, data); }
 //	else if(io_port >= 0xe0 && io_port <= 0xe6) { fdc }
 	else

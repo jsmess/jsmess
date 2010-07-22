@@ -9,12 +9,14 @@ New System Drivers Supported:
 - Salora Manager [Curt Coder]
 
 
+
 Systems Promoted from GAME_NOT_WORKING:
 ---------------------------------------
 - Canon X07 [Sandro Ronco]
 - Othello Multivision FG-1000/FG-2000 [Enri, Curt Coder]
 - Philips VG5000 [Daniel Coulom, Sandro Ronco]
 - SGCPU aka TI-99/4P [Michael Zapf]
+
 
 
 Skeleton drivers:
@@ -41,6 +43,8 @@ Skeleton drivers:
 - Xircom / Intel REX 6000
 - NEC TK-80BS
 - Japan Electronics College MYCOMZ-80A
+
+
 
 System Driver Changes:
 ----------------------
@@ -94,14 +98,16 @@ System Driver Changes:
   mode. [Sandro Ronco]
 
 
+
 Imgtool Changes:
 ----------------
 (none)
 
 
+
 Source Changes:
 ----------------
-- The core is based on MAME 0.138u3.  This incorporates all features of the
+- The core is based on MAME 0.138u4.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Fixed setting of tape flags when reaching end of tape. This prevented
@@ -110,6 +116,7 @@ Source Changes:
 
 - Added software lists in xml format for more systems [incog, k1w1, Kaylee, 
   Micko, Fabio Priuli, Barry Rodewald]
+
 
 
 0.138

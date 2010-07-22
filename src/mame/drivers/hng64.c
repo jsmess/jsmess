@@ -17,7 +17,7 @@ Notes:
     It's capable of changing the input ports dynamically (maybe explaining Roads Edge's "do not touch" quote below).
     It probably has a lot to do with the network (Roads Edge network connectors are on this board).
 
-  * The Toshiba CPU datasheet is here : http://www.semicon.toshiba.co.jp/openb2b/websearch/productDetails.jsp?partKey=TMP87CH40N
+  * The Toshiba CPU datasheet is here : http://kr.ic-on-line.cn/IOL/viewpdf/TMP87CH40N_1029113.htm
 
   * From the Roads Edge manual : "The Network Check screen will be displayed for about 40 seconds whether
                                   the cabinet is connected for communication competition or not.  After this,
@@ -1648,12 +1648,12 @@ static INTERRUPT_GEN( irq_start )
 static MACHINE_START(hyperneo)
 {
 	/* set the fastest DRC options */
-	mips3drc_set_options(devtag_get_device(machine, "maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x00000000, 0x00ffffff, FALSE, hng_mainram);
-	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x04000000, 0x05ffffff, TRUE,  hng_cart);
-	mips3drc_add_fastram(devtag_get_device(machine, "maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
+	mips3drc_add_fastram(machine->device("maincpu"), 0x00000000, 0x00ffffff, FALSE, hng_mainram);
+	mips3drc_add_fastram(machine->device("maincpu"), 0x04000000, 0x05ffffff, TRUE,  hng_cart);
+	mips3drc_add_fastram(machine->device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
 }
 
 

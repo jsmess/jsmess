@@ -399,7 +399,7 @@ static ADDRESS_MAP_START( cpu0_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
 	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
 	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w)
-	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continously
+	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
 	AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
 
@@ -470,7 +470,7 @@ static ADDRESS_MAP_START( cntrygrl_cpu0_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x11,0x11) AM_WRITE(mux_w)
 	AM_RANGE(0x12,0x17) AM_WRITE(blitter_process_w)
 	AM_RANGE(0x20,0x2f) AM_WRITE(blit_vregs_w )
-	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continously
+	AM_RANGE(0x30,0x30) AM_WRITENOP //? polls 0x03 continuously
 //  AM_RANGE(0x31,0x31) AM_WRITE(sound_latch_w)
 ADDRESS_MAP_END
 
@@ -800,10 +800,10 @@ static MACHINE_START( common )
 {
 	jangou_state *state = (jangou_state *)machine->driver_data;
 
-	state->cpu_0 = devtag_get_device(machine, "cpu0");
-	state->cpu_1 = devtag_get_device(machine, "cpu1");
-	state->cvsd = devtag_get_device(machine, "cvsd");
-	state->nsc = devtag_get_device(machine, "nsc");
+	state->cpu_0 = machine->device("cpu0");
+	state->cpu_1 = machine->device("cpu1");
+	state->cvsd = machine->device("cvsd");
+	state->nsc = machine->device("nsc");
 
 	state_save_register_global_array(machine, state->pen_data);
 	state_save_register_global_array(machine, state->blit_data);

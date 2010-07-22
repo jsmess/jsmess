@@ -1,11 +1,9 @@
 /***************************************************************************
 
 Deniam games
-
 driver by Nicola Salmoria
 
-
-http://deniam.co.kr/text/c_game01.htm
+Check archive.org for http://deniam.co.kr
 
 Title            System     Date
 ---------------- ---------- ----------
@@ -243,7 +241,7 @@ static MACHINE_START( deniam )
 {
 	deniam_state *state = (deniam_state *)machine->driver_data;
 
-	state->audio_cpu = devtag_get_device(machine, "audiocpu");
+	state->audio_cpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->display_enable);
 	state_save_register_global(machine, state->coinctrl);

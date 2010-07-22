@@ -79,7 +79,7 @@ READ8_DEVICE_HANDLER( frogger_portB_r )
 
 WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
-	running_device *target = devtag_get_device(device->machine, "konami_7474");
+	running_device *target = device->machine->device("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	ttl7474_clock_w(target, (~data & 0x08) >> 3);
@@ -90,7 +90,7 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 {
-	running_device *target = devtag_get_device(device->machine, "konami_7474");
+	running_device *target = device->machine->device("konami_7474");
 
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	ttl7474_clock_w(target, (~data & 0x08) >> 3);
@@ -98,7 +98,7 @@ WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 
 static IRQ_CALLBACK(scramble_sh_irq_callback)
 {
-	running_device *target = devtag_get_device(device->machine, "konami_7474");
+	running_device *target = device->machine->device("konami_7474");
 
 	/* interrupt acknowledge clears the flip-flop --
        we need to pulse the CLR line because MAME's core never clears this
@@ -144,27 +144,27 @@ static void filter_w(running_device *device, int data)
 
 WRITE8_HANDLER( scramble_filter_w )
 {
-	filter_w(devtag_get_device(space->machine, "filter.1.0"), (offset >>  0) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.1.1"), (offset >>  2) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.1.2"), (offset >>  4) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.0.0"), (offset >>  6) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.0.1"), (offset >>  8) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.0.2"), (offset >> 10) & 3);
+	filter_w(space->machine->device("filter.1.0"), (offset >>  0) & 3);
+	filter_w(space->machine->device("filter.1.1"), (offset >>  2) & 3);
+	filter_w(space->machine->device("filter.1.2"), (offset >>  4) & 3);
+	filter_w(space->machine->device("filter.0.0"), (offset >>  6) & 3);
+	filter_w(space->machine->device("filter.0.1"), (offset >>  8) & 3);
+	filter_w(space->machine->device("filter.0.2"), (offset >> 10) & 3);
 }
 
 WRITE8_HANDLER( frogger_filter_w )
 {
-	filter_w(devtag_get_device(space->machine, "filter.0.0"), (offset >>  6) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.0.1"), (offset >>  8) & 3);
-	filter_w(devtag_get_device(space->machine, "filter.0.2"), (offset >> 10) & 3);
+	filter_w(space->machine->device("filter.0.0"), (offset >>  6) & 3);
+	filter_w(space->machine->device("filter.0.1"), (offset >>  8) & 3);
+	filter_w(space->machine->device("filter.0.2"), (offset >> 10) & 3);
 }
 
 void scramble_sh_init(running_machine *machine)
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "audiocpu"), scramble_sh_irq_callback);
+	cpu_set_irq_callback(machine->device("audiocpu"), scramble_sh_irq_callback);
 
 	/* PR is always 0, D is always 1 */
-	ttl7474_d_w(devtag_get_device(machine, "konami_7474"), 1);
+	ttl7474_d_w(machine->device("konami_7474"), 1);
 }
 
 
@@ -352,11 +352,11 @@ MACHINE_DRIVER_START( ad2083_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay1", AY8910, 14318000/8)
 	MDRV_SOUND_CONFIG(ad2083_ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 14318000/8)
 	MDRV_SOUND_CONFIG(ad2083_ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	MDRV_SOUND_ADD("tms", TMS5110A, AD2083_TMS5110_CLOCK)
 	MDRV_SOUND_CONFIG(ad2083_tms5110_interface)

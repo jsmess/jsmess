@@ -93,13 +93,13 @@ static UINT8 dac_value[2];
 
 static WRITE16_HANDLER( exterm_host_data_w )
 {
-	tms34010_host_w(devtag_get_device(space->machine, "slave"), offset / TOWORD(0x00100000), data);
+	tms34010_host_w(space->machine->device("slave"), offset / TOWORD(0x00100000), data);
 }
 
 
 static READ16_HANDLER( exterm_host_data_r )
 {
-	return tms34010_host_r(devtag_get_device(space->machine, "slave"), offset / TOWORD(0x00100000));
+	return tms34010_host_r(space->machine->device("slave"), offset / TOWORD(0x00100000));
 }
 
 
@@ -393,7 +393,7 @@ static INPUT_PORTS_START( exterm )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_8C ) )
 	PORT_DIPNAME( 0x0040, 0x0040, "Memory Test" )
 	PORT_DIPSETTING(      0x0040, "Once" )
-	PORT_DIPSETTING(      0x0000, "Continous" )
+	PORT_DIPSETTING(      0x0000, "Continuous" )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

@@ -70,39 +70,8 @@ qcrayon  TC0510NIO TC0360PRI TC0260DAR
 qcrayon2 TC0510NIO TC0360PRI TC0260DAR
 driftout TC0510NIO TC0360PRI TC0260DAR TC0430GRW(zoom/rot)
 
-
-
-F2 Game List
-------------
-. Final Blow                                                                       (1)
-. Don Doko Don                                                                     (2)
-. Mega Blast               http://www.taito.co.jp/game-history/80b/megabla.html    (3)
-. Quiz Torimonochou        http://www.taito.co.jp/game-history/90a/qui_tori.html   (4)
-. Quiz HQ                  http://www.taito.co.jp/game-history/90a/quiz_hq.html
-. Thunder Fox              http://www.taito.co.jp/game-history/90a/thu_fox.html
-. Liquid Kids              http://www.taito.co.jp/game-history/90a/miz_bak.html    (7)
-. SSI / Majestic 12        http://www.taito.co.jp/game-history/90a/mj12.html       (8)
-. Gun Frontier             http://www.taito.co.jp/game-history/90a/gunfro.html     (9)
-. Growl / Runark           http://www.taito.co.jp/game-history/90a/runark.html    (10)
-. Hat Trick Hero           http://www.taito.co.jp/game-history/90a/hthero.html    (11)
-. Mahjong Quest            http://www.taito.co.jp/game-history/90a/mahque.html    (12)
-. Yuu-yu no Quiz de Go!Go! http://www.taito.co.jp/game-history/90a/youyu.html     (13)
-. Ah Eikou no Koshien      http://www.taito.co.jp/game-history/90a/koshien.html   (14)
-. Ninja Kids               http://www.taito.co.jp/game-history/90a/ninjakids.html (15)
-. Quiz Quest               http://www.taito.co.jp/game-history/90a/q_quest.html
-. Metal Black              http://www.taito.co.jp/game-history/90a/metabla.html
-. Quiz Chikyu Boueigun     http://www.taito.co.jp/game-history/90a/qui_tik.html
-. Dinorex                  http://www.taito.co.jp/game-history/90a/dinorex.html
-. Pulirula
-. Dead Connection          http://www.taito.co.jp/game-history/90a/deadconn.html
-. Quiz Jinsei Gekijou      http://www.taito.co.jp/game-history/90a/qui_jin.html
-. Quiz Crayon Shinchan     http://www.taito.co.jp/game-history/90a/qcrashin.html
-. Crayon Shinchan Orato Asobo
-
-
-This list is translated version of
-http://www.aianet.or.jp/~eisetu/rom/rom_tait.html
-This page also contains info for other Taito boards.
+A complete list of Taito Games can be still accessed with archive.org:
+http://web.archive.org/web/20010502131808/www.taito.co.jp/game-history/
 
 F2 Motherboard ( Big ) K1100432A, J1100183A
                (Small) K1100608A, J1100242A
@@ -3379,15 +3348,15 @@ static MACHINE_START( common )
 {
 	taitof2_state *state = (taitof2_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");;
-	state->tc0100scn = devtag_get_device(machine, "tc0100scn");;
-	state->tc0100scn_1 = devtag_get_device(machine, "tc0100scn_1");;
-	state->tc0100scn_2 = devtag_get_device(machine, "tc0100scn_2");;
-	state->tc0360pri = devtag_get_device(machine, "tc0360pri");;
-	state->tc0280grd = devtag_get_device(machine, "tc0280grd");;
-	state->tc0430grw = devtag_get_device(machine, "tc0430grw");;
-	state->tc0480scp = devtag_get_device(machine, "tc0480scp");;
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");;
+	state->tc0100scn = machine->device("tc0100scn");;
+	state->tc0100scn_1 = machine->device("tc0100scn_1");;
+	state->tc0100scn_2 = machine->device("tc0100scn_2");;
+	state->tc0360pri = machine->device("tc0360pri");;
+	state->tc0280grd = machine->device("tc0280grd");;
+	state->tc0430grw = machine->device("tc0430grw");;
+	state->tc0480scp = machine->device("tc0480scp");;
 }
 
 static MACHINE_START( f2 )

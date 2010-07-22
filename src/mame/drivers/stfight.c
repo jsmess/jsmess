@@ -175,7 +175,7 @@ usage for each character/tile.
 
 The 16 colours at offset $C0 appear to be the text palette. This group of
 colours does not appear to change throughout the game, and the lower 192
-colours fade in/out independantly of these 16 - consistent with observations
+colours fade in/out independently of these 16 - consistent with observations
 of the real game. You'd think then that the palette would be reaonably
 easy to deduce from the text video ram attribute byte - go ahead and try! :P
 
@@ -495,6 +495,10 @@ ROM_START( empcity )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
 	ROM_LOAD( "ec_04.rom",  0x0000,  0x8000, CRC(aa3e7d1e) SHA1(da350384d55f011253d19ce17fc327cd2604257f) )
+
+	// not hooked up yet, what's it for, coinage?
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "empirecity_68705.bin",  0x0000,  0x0800, CRC(182f7616) SHA1(38b4f23a559ae13f8ca1b974407a2a40fc52879f) )
 
 	ROM_REGION( 0x02000, "gfx1", 0 )	/* character data */
 	ROM_LOAD( "sf17.bin",   0x0000, 0x2000, CRC(1b3706b5) SHA1(61f069329a7a836523ffc8cce915b0d0129fd896) )

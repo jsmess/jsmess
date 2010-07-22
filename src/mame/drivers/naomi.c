@@ -171,7 +171,7 @@ Naomi 2 / GD-ROM             |           |              |
 
 NAOMI ROM cart usage
 -------------------------
-There are 3 know types of carts manufactured by Sega: 171-7919A, 171-7978B, 171-8132B
+There are 4 known types of carts manufactured by Sega: 171-7919A, 171-7978B, 171-8132B, 171-8346C
 There are also 2 types of carts manufactured by Namco: MASK-B, MASK-C
 
 837-13668  171-7919A (C) Sega 1998
@@ -192,7 +192,7 @@ Notes:
       The other side of the cart PCB just has more locations for
       SOP44 MASKROMs... IC12S to IC21S (ROM12 to ROM21)
 
-  IC1-IC21S - MaskROM (SOP44), either 32M or 64M. Not all positions are populated.
+  IC1-IC21S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are populated.
       IC22  - EPROM (DIP42), either 27C160 or 27C322
       JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
       IC37  - FLASHROM (SOIC8) Xicor X76F100 Secure SerialFlash
@@ -283,7 +283,7 @@ Notes:
       IC13S - EEPROM (SOIC8) 25LC040 serial EEPROM
       IC14  - 256 x 9 AsyncFIFO, 5.0V (SOP28)
       IC15  - SRAM (SOJ28) 32kx8, IDT71256
-IC17S-IC38S - MaskROM (SOP44), either 32M or 64M
+IC17S-IC38S - MaskROM (SOP44), either 32Mb or 64Mb
    CN1/2/3  - connectors joining to main board
 
 Games known to use this PCB include....
@@ -316,11 +316,11 @@ Virtua Tennis 2 / Power Smash 2 (Rev A) 840-0084C  22327A  18 (64Mb)  A54SX32   
 |                                                          |
 |        ----CN3----                    ----CN1----        |
 |----------------------------------------------------------|
-
 Notes:
+      The female side of the cart PCB only has traces
 
       OSC1  - oscillator 28.000MHz
-  IC1-IC11  - MaskROM (TSOP48), 128M
+  IC1-IC11  - MaskROM (TSOP48), 128Mb
       IC22  - EPROM (DIP42), either 27C160 or 27C322
       JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
       IC27  - PLD Sega 315-6319A ALTERA EPM7032 (PLCC44)
@@ -347,6 +347,45 @@ Wild Riders                             840-0046C  23622   10 (128Mb)  315-6319A
 WWF Royal Rumble                        840-0040C  22261    8 (128Mb)  315-6319   315-6213  317-0285-COM
 Zero Gunner 2                           841-0020C  23689    ? (128Mb)  315-6319A  315-6213  317-5073-COM
 
+
+
+171-8346C (C) Sega 2005
+|---------------------------------------------------------|
+|  IC12          IC8                    ----CN2----       -|
+|             (IC22,1-7)                    IC7            |
+|                          IC6                             |
+|  IC13          IC9                              IC4      |
+|             (IC8-15)                                     |
+|                            IC5            IC2      IC3   | male side
+|  IC14          IC10             JP1             IC16     |
+|             (IC16-21)           JP2                      |
+|                                           IC1            |
+|  IC15          IC11                                      |
+|        ----CN3----                    ----CN1----        |
+|----------------------------------------------------------|
+Notes:
+      The female side of the cart PCB only has traces
+
+      IC1   - 74LVCH16245A (16bit transceiver with direction pin)
+      IC2   - XC3S50 Xilinx Spartan FPGA (TQFP144)
+      IC3   - PIC16C621A EPROM-Based 8-Bit CMOS Microcontroller (PDIP18) with internal memory.
+              On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
+      IC4   - XCF01SVG Xilinx Platform Flash In-System Programmable Configuration PROMS (TSSOP20)
+      IC5   - 74LVC08A (Quad 2-input AND gate)
+      IC6   - 74LVCH16245A (16bit transceiver with direction pin)
+      IC7   - empty socket for EPROM (DIP42), either 27C160 or 27C322
+  IC8-IC15  - S29GL512N FlashROM (TSOP56), 512Mb.
+      IC16  - R3112N431A Low voltage detector with output delay (SOT-23-5)
+      JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
+      JP2   - JUMPER unknown function
+   CN1/2/3  - connectors joining to main board
+      CN4   - 6 legs connector for ISP programming
+
+   Games known to use this PCB include....
+                          Sticker    EPROM        # of SOP56
+Game                      on cart    IC7#         FLASHROMs   IC2#    IC3#          IC4#    Notes
+-----------------------------------------------------------------------------------------------------------------------
+Touch De Zunou (Rev A)    840-0166C  unpopulated   2 (512Mb)  XC3S50  317-0435-JPN  XCF01S  IC4# is marked "18"
 
 
       Note! Generally, games that require a special I/O board or controller will not boot at all with a
@@ -1816,7 +1855,7 @@ INPUT_PORTS_END
 static MACHINE_RESET( naomi )
 {
 	MACHINE_RESET_CALL(dc);
-	aica_set_ram_base(devtag_get_device(machine, "aica"), dc_sound_ram, 8*1024*1024);
+	aica_set_ram_base(machine->device("aica"), dc_sound_ram, 8*1024*1024);
 }
 
 /*
@@ -4633,8 +4672,6 @@ ROM_START( gundmgd )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0001", 0, SHA1(615e19c22f32096f3aad557019a14313b60a4070) )
 
@@ -4653,8 +4690,6 @@ ROM_START( sfz3ugd )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0002", 0, SHA1(af4669fdd7ce8e6ec4a170748d401e322a3d7ae8) )
 
@@ -4670,8 +4705,6 @@ ROM_END
 ROM_START( cvsgd )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0004", 0,  SHA1(7a7fba0fbbc769c5120b08e6d692f1ac63a42225) )
@@ -4690,8 +4723,6 @@ ROM_START( gundmxgd )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0006", 0, SHA1(b28d6598711b5a9c744bbf07ad03fc60962d2e28) )
 
@@ -4709,8 +4740,6 @@ ROM_START( cvs2gd )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0007a", 0, SHA1(56510390667b39b3915d8bc078660cbe093cf566) )
 
@@ -4726,8 +4755,6 @@ ROM_END
 ROM_START( ikaruga )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0010", 0, SHA1(65dcc22dd9e9b70975096464ad8e31a4a73dc5fd) )
@@ -4745,8 +4772,6 @@ ROM_END
 ROM_START( ggxx )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0011", 0, SHA1(b7328eb2c588d55284bdcea0fe89bb8e629a8669) )
@@ -4767,8 +4792,6 @@ ROM_START( cleoftp )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0012", 0, SHA1(aae4c1321fdee37d5405c6cbe648e0596624ed13) )
 
@@ -4785,7 +4808,7 @@ ROM_START( moeru )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0013", 0, SHA1(c8869069c28bc8eec96d820886bc388d69d46143) )
@@ -4804,7 +4827,7 @@ ROM_START( chocomk )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0014a", 0, SHA1(f88d8203c8692f51c9492d5549a3ad7d9583dc6f) )
@@ -4823,7 +4846,7 @@ ROM_START( quizqgd )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0017", 0, SHA1(94a9319633388968611892e36691b45c94b4f83f) )
@@ -4841,7 +4864,7 @@ ROM_START( azumanga )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0018", 0, SHA1(3e40ca7d43173fe7048d199fdc127b9411e10360) )
@@ -4856,7 +4879,7 @@ ROM_START( ggxxrl )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0019a", 0, SHA1(d44906505ff698eda6feee6c2b9402e19f64e5d3) )
@@ -4875,7 +4898,7 @@ ROM_START( tetkiwam )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0020", 0, SHA1(7b2ef47ca2038d6a93615b760b03e8f7cb1b83c2) )
@@ -4894,7 +4917,7 @@ ROM_START( shikgam2 )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0021", 0, SHA1(f5036711a28a211e8d71400a8322db3172c5733f) )
@@ -4913,7 +4936,7 @@ ROM_START( usagui )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0022", 0, SHA1(45deba05a12abbf6390c0fc0e4cdeaedfa7d2ca5) )
@@ -4932,7 +4955,7 @@ ROM_START( bdrdown )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0023a", 0, SHA1(caac915104d61f2122f5afe27da1ef5fa9cf9f9a) )
@@ -4952,7 +4975,7 @@ ROM_START( psyvar2 )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0024", 0,  SHA1(d346762036fb1c40a261a434b50e63459f306f14) )
@@ -4971,7 +4994,7 @@ ROM_START( cfield )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0025", 0, SHA1(be0d88eb4f48403a2ceaa7ef588ed60b96ba93bf) )
@@ -4991,7 +5014,7 @@ ROM_START( trizeal )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0026", 0, SHA1(e4c1e51292a7923b25bfc61d38fe386bf596002a) )
@@ -5011,7 +5034,7 @@ ROM_START( meltybld )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0028c", 0, SHA1(66de09738551e351784cc9695a58b35fdf6b6c4b) )
@@ -5030,7 +5053,7 @@ ROM_START( senko )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0030a", 0,  SHA1(1f7ade47e37a0026451b5baf3ba746400de8d156) )
@@ -5048,7 +5071,7 @@ ROM_START( senkoo )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
+
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0030", 0,  SHA1(c7f25c05f47a490c5da9369c588b6136e93c280e) )
@@ -5067,8 +5090,6 @@ ROM_START( ss2005 )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0031", 0, SHA1(83697f45f0ffbb964f0504b19171c554499cd709) )
 
@@ -5085,8 +5106,6 @@ ROM_END
 ROM_START( ss2005a )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0031a", 0, SHA1(6091525845fc2042ed43cae5a1b60c603e16cf97) )
@@ -5105,8 +5124,6 @@ ROM_START( radirgy )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0032", 0, SHA1(ebd7a40e59082e660ebf9a2d4ae7cb64371dae8d) )
 
@@ -5123,8 +5140,6 @@ ROM_END
 ROM_START( ggxxsla )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0033a", 0, SHA1(29de69ae97a9099b1bbe936dfa965bb4a3195f68) )
@@ -5144,8 +5159,6 @@ ROM_START( kurucham )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0034", 0, SHA1(10fd7edb0b620133c003d686e5af2ed27004fa09) )
 
@@ -5162,8 +5175,6 @@ ROM_END
 ROM_START( undefeat )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0035", 0, SHA1(91da482a6a082e48bee5b3bd20d9c92d23936965) )
@@ -5182,8 +5193,6 @@ ROM_START( trgheart )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0036a", 0, SHA1(91f1e19136997cb1e2edfb1ad342b9427d1d3bfb) )
 
@@ -5201,11 +5210,8 @@ ROM_START( jingystm )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0037", 0, SHA1(99ffe2987e3002b3871daf276d2be45f2e9c6e74) )
-
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//ROM_LOAD("317-5122-jpn.data", 0x00, 0x50, CRC(0b85b7e4) SHA1(f4e419682ddc4b98a330e5ae543f9276c9bde030) )
@@ -5221,11 +5227,8 @@ ROM_START( senkosp )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0038", 0, SHA1(430572f7e76c4fe009e2de91bf891d85613366b7) )
-
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 
@@ -5239,8 +5242,6 @@ ROM_END
 ROM_START( meltyb )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0039", 0, SHA1(ffc7f6e113ad69422a4f22f318bdf9b1dc5c25db) )
@@ -5258,8 +5259,6 @@ ROM_START( meltyba )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0039a", 0, SHA1(e6aa3d65b43a20606e6754bcb8665438770a1f8c) )
 
@@ -5276,8 +5275,6 @@ ROM_END
 ROM_START( karous )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0040", 0, SHA1(a62c8d4b6c5be44a4aeeea1a1a94f3d0fe542593) )
@@ -5317,8 +5314,6 @@ ROM_START( ggxxac )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0041", 0, SHA1(3a589e1c79ead971c821a7566032b0187e339684) )
 
@@ -5334,8 +5329,6 @@ ROM_END
 ROM_START( takoron )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0042", 0, SHA1(984a4fa012d83dd8c748304958c847c9867f4125) )
@@ -5377,8 +5370,6 @@ ROM_START( confmiss )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0001", 0, SHA1(bd05f197ba8643577883dd25d9d5a74c91b27ca9) )
 
@@ -5393,8 +5384,6 @@ ROM_END
 ROM_START( sprtjam )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0003", 0, SHA1(caaba214c1faca78b3370bcd4190eb2853d7f825) )
@@ -5413,8 +5402,6 @@ ROM_START( slashout )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0004", 0, SHA1(3cce788393ed194ba9b603f9896ff893691d6b00) )
 
@@ -5431,8 +5418,6 @@ ROM_END
 ROM_START( spkrbtl )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0005", 0, SHA1(d1c3fb2350e4a89372373e7f629c42b741af29b3) )
@@ -5471,8 +5456,6 @@ PIC
 ROM_START( monkeyba )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0008", 0, SHA1(2fadcd141bdbde77b2b335b270959a516af44d99) )
@@ -5520,10 +5503,8 @@ ROM_START( dygolf )
 	ROM_REGION( 0x10000, "io_board", 0)
 	ROM_LOAD("epr-22084.ic3", 0x0000, 0x10000, CRC(18cf58bb) SHA1(1494f8215231929e41bbe2a133658d01882fbb0f) )
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
-	DISK_IMAGE_READONLY( "gds-0009", 0, SHA1(d502155ddaf881c2c9505528004b9904aa32a59c) )
+	DISK_IMAGE_READONLY( "gds-0009a", 0, SHA1(d502155ddaf881c2c9505528004b9904aa32a59c) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 	//ROM_LOAD("317-0308-com.data", 0x00, 0x50,  CRC(56f63af0) SHA1(3c453226fc53d2f700b3634db3ef8ce206d94392) )
@@ -5538,8 +5519,6 @@ ROM_END
 ROM_START( wsbbgd )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0010", 0,  SHA1(c3135ede3a8bdadab91aed49abacbfbde8037069) )
@@ -5558,8 +5537,6 @@ ROM_START( vtennisg )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0011", 0,  SHA1(b778403d73c8cdd13383691c9be2094ddfc1ba84) )
 
@@ -5576,8 +5553,6 @@ ROM_START( keyboard )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0017", 0, SHA1(fb86eff3ef38de7fd78cfde897d5332d2092c172) )
 
@@ -5593,8 +5568,6 @@ ROM_END
 ROM_START( vathlete )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0019", 0, SHA1(955d3c0cb991be3057138c562cff69c5ef887787) )
@@ -5636,8 +5609,6 @@ ROM_START( vtennis2 )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0015a", 0, SHA1(c6e9c9901bd4f075454b7f18baf08df81bc2f1ad) )
 
@@ -5654,8 +5625,6 @@ ROM_START( lupinsho )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0018", 0, SHA1(0633a99a666f363ab30450a76b9753685d6b1f57) )
 
@@ -5670,8 +5639,6 @@ ROM_END
 ROM_START( luptype )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0021a", 0,  SHA1(15c6f9434494a31693cbb8e33da36e0e8a8f7c62) )
@@ -5712,8 +5679,6 @@ ROM_START( mok )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0022", 0, SHA1(70b41745225006e7876176cbd239edecd4c3f8b6) )
 
@@ -5729,8 +5694,6 @@ ROM_END
 ROM_START( ngdup23a )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0023a", 0, SHA1(cd9d808b59eb8f40673ec4353d476f2b9c7f783c) )
@@ -5749,8 +5712,6 @@ ROM_START( ngdup23c )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0023c", 0, SHA1(1fcb5530748886f4c4f45487d047859182ff7496))
 
@@ -5767,8 +5728,6 @@ ROM_END
 ROM_START( puyofev )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0031", 0, SHA1(da2d421da9472b149619b6931bb2fe624be75fa2) )
@@ -5852,7 +5811,7 @@ GAME( 2001, spkrbtl,   naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",      
 //GDS-0006 Virtua Striker 3 (NAOMI 2)
 //GDS-0007 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika
 GAME( 2001, monkeyba,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Monkey Ball (GDS-0008)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-GAME( 2001, dygolf,    naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2001, dygolf,    naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (Rev A) (GDS-0009A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2001, wsbbgd,    naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "World Series Baseball / Super Major League (GDS-0010)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Virtua Tennis (GDS-0011)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDS-0012 Virtua Fighter 4 (NAOMI 2)
@@ -6025,8 +5984,6 @@ ROM_START( vstrik3 )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0006", 0, SHA1(aca09a88506f5e462ad3fb33eac5478a2a010609) )
 
@@ -6042,8 +5999,6 @@ ROM_END
 ROM_START( vf4 )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0012", 0, SHA1(c34588f59c6091cd1c3ef235171dad8d5247e707) )
@@ -6062,8 +6017,6 @@ ROM_START( vf4b )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0012b", 0, SHA1(9b8e05c3d28a09323b13c198dfcc2b771bba67cd) )
 
@@ -6080,8 +6033,6 @@ ROM_END
 ROM_START( vf4c )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0012c", 0, SHA1(0ec149d7edfb326777cdc45a2ac8ad578a32aba1) )
@@ -6101,8 +6052,6 @@ ROM_START( vf4evo )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0024b", 0, SHA1(a829169542f3bed76095ad6bfbbde7d494d04d72) )
 
@@ -6120,8 +6069,6 @@ ROM_START( vf4evoa )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0024a", 0, SHA1(6225e778d73db18be26f882d4f9cd3b3a136d1c9) )
 
@@ -6138,8 +6085,6 @@ ROM_START( initdv2j )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
 
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
-
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0026", 0, SHA1(253acede106b7fbf49e24458e7fda868720e9549) )
 
@@ -6150,8 +6095,6 @@ ROM_END
 ROM_START( vf4tuned ) // are there multiple files on this GD-ROM? it only compresses to 500 meg when the rom file is closer to half tha
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0036f", 0, SHA1(ea35d6ecdf94e5c9a545952758da80f658755df0) )
@@ -6168,8 +6111,6 @@ ROM_END
 ROM_START( vf4tunedd )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0036d", 0, SHA1(2f7654307a4c978c5af6c8238c44e70275dd34f9) )
@@ -6188,8 +6129,6 @@ ROM_END
 ROM_START( vf4tuneda )
 	NAOMI2_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0036a", 0, SHA1(cd630fc4e8f7ed5641b85c609584d7efe0eac137) )
@@ -6230,10 +6169,7 @@ PIC
 
 ROM_START( beachspi )
 	NAOMI2_BIOS
-//  NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0014", 0, SHA1(1ebb3695196c11a86276e034df2e1c8d7fa6b96f) )
@@ -6250,10 +6186,7 @@ ROM_END
 
 ROM_START( initd )
 	NAOMI2_BIOS
-//  NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0020b", 0, SHA1(c0e901623ef4fcd97b7e4d29ae556e6f2e91b8ad) )
@@ -6272,10 +6205,7 @@ ROM_END
 
 ROM_START( initdexp )
 	NAOMI2_BIOS
-//  NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0025", 0, SHA1(8ea92cf6b493f21b9453832edad7cbc5e5b350c1) )
@@ -6289,10 +6219,7 @@ ROM_END
 
 ROM_START( initdv3j )
 	NAOMI2_BIOS
-//  NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
-
-	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0032b", 0, SHA1(568411aa72ca308a03a6b5b61c79833464b88bc6) )

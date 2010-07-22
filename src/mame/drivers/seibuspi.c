@@ -1837,7 +1837,7 @@ static MACHINE_RESET( spi )
 	UINT8 flash_data = rombase[0x1ffffc];
 
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_RESET, ASSERT_LINE );
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), spi_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
 
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000680, 0x00000683, 0, 0, sound_fifo_r);
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000688, 0x0000068b, 0, 0, z80_prg_fifo_w);
@@ -1920,10 +1920,10 @@ static MACHINE_RESET( sxx2f )
 
 	memcpy(z80_rom, rom, 0x40000);
 
-	memory_install_write32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), devtag_get_device(machine, "eeprom"), 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
+	memory_install_write32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), machine->device("eeprom"), 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000680, 0x00000683, 0, 0, sb_coin_r);
 
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), spi_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
 
 	sb_coin_latch = 0;
 }
@@ -2173,7 +2173,7 @@ static DRIVER_INIT( rdft2us )
 }
 
 
-static DRIVER_INIT( rfjet )
+static void init_rfjet(running_machine *machine)
 {
 	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
 	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
@@ -2186,6 +2186,11 @@ static DRIVER_INIT( rfjet )
 	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x560, 0x563, 0, 0, sprite_dma_start_w);
 }
 
+static DRIVER_INIT( rfjet )
+{
+	init_rfjet(machine);
+}
+
 /* SYS386 */
 
 static DRIVER_INIT( rdft22kc )
@@ -2193,9 +2198,14 @@ static DRIVER_INIT( rdft22kc )
 	init_rf2(machine);
 }
 
+static DRIVER_INIT( rfjet2k )
+{
+	init_rfjet(machine);
+}
+
 static MACHINE_RESET( seibu386 )
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), spi_irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
 }
 
 static MACHINE_DRIVER_START( seibu386 )
@@ -3416,6 +3426,34 @@ ROM_START( rdft22kc )
 	ROM_LOAD("pcm1.1023", 0x000000, 0x80000, CRC(8b716356) SHA1(42ee1896c02518cd1e9cb0dc130321834665a79e) )
 ROM_END
 
+ROM_START( rfjet2kc )
+	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
+	ROM_LOAD32_WORD("prg01.u267", 0x000000, 0x100000, CRC(36019fa8) SHA1(28baf0ed4a53b818c1e6986d5d3491373524eca1) )
+	ROM_LOAD32_WORD("prg23.u266", 0x000002, 0x100000, CRC(65695dde) SHA1(1b25dde03bc9319414144fc13b34c455112f4076) )
+
+	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */
+	ROM_LOAD24_BYTE("rfj-01.524", 0x000001, 0x10000, CRC(e9d53007) SHA1(29aa7b70d5d5eb5e31426ac84143be44bc0597aa) )
+	ROM_LOAD24_BYTE("rfj-02.518", 0x000000, 0x10000, CRC(dd3eabd3) SHA1(31c8f7a0cd262096a77673b040326605db542ab8) )
+	ROM_LOAD24_BYTE("rfj-03.514", 0x000002, 0x10000, CRC(0daa8aac) SHA1(08a98fb3079ea9f78aa5b950bfeb30b0a805bab7) )
+
+	ROM_REGION( 0xc00000, "gfx2", 0)	/* background layer roms */
+	ROM_LOAD24_WORD("bg-1d.u0535", 0x000000, 0x400000, CRC(edfd96da) SHA1(4813267f104619f569e5777e75b75304321abb49) )
+	ROM_LOAD24_BYTE("bg-1p.u0537", 0x000002, 0x200000, CRC(a4cc4631) SHA1(cc1c4f4de8a078ca774f5a328a9a58291949b1fb) )
+	ROM_LOAD24_WORD("bg-2d.u0536", 0x600000, 0x200000, CRC(731fbb59) SHA1(13cd29ec4d4c73582c5fb363218e737886826e5f) )
+	ROM_LOAD24_BYTE("bg-2p.u0547", 0x600002, 0x100000, CRC(03652c25) SHA1(c0d77285111bc84e008362981ac02a246678ed0a) )
+
+	ROM_REGION( 0x1800000, "gfx3", 0)	/* sprites */
+	ROM_LOAD("obj-1.u073",  0x0000000, 0x800000, CRC(58a59896) SHA1(edeaaa69987bd5d08c47ed9bf47a3901e2dcc892) )
+	ROM_LOAD("obj-2.u074",  0x0800000, 0x800000, CRC(a121d1e3) SHA1(1851ae81f2ae9d3404aadd9fbc0ed7f9230290b9) )
+	ROM_LOAD("obj-3.u0749", 0x1000000, 0x800000, CRC(bc2c0c63) SHA1(c8d395722f7012c3be366a0fc9b224c537afabae) )
+
+	ROM_REGION( 0x80000, "oki1", 0)	/* sound data for MSM6295 */
+	ROM_LOAD("rfj-05.u1022", 0x000000, 0x80000, CRC(fd599b35) SHA1(00c0307d1b503bd5ce02d7960ce5e1ad600a7290) )
+
+	ROM_REGION( 0x80000, "oki2", 0)	/* sound data for MSM6295 */
+	ROM_LOAD("rfj-04.u1023", 0x000000, 0x80000, CRC(1d10cd08) SHA1(c431d3f1a7b580024b083dafb76c53b771c88726) )
+ROM_END
+
 /*
 
 E-Jan Sakurasou
@@ -3507,15 +3545,15 @@ GAME( 1995, viprp1oj,  viprp1,  spi,      spi_3button, viprp1o, ROT270, "Seibu K
 GAME( 1995, viprp1ot,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Tuning license)", "Viper Phase 1 (Germany)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, viprp1hk,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu Kaihatsu (Metrotainment license)", "Viper Phase 1 (Hong Kong)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) /* "=HONG KONG=" seems part of title */
 
-GAME( 1996, ejanhs,    0,       spi,      spi_ejanhs,  ejanhs,   ROT0,   "Seibu Kaihatsu", "E-Jan High School (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, ejanhs,    0,       spi,      spi_ejanhs,  ejanhs,  ROT0,   "Seibu Kaihatsu", "E-Jan High School (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
-GAME( 1996, rdft,      0,       spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 1)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftu,     rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftau,    rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu", "Raiden Fighters (Australia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftj,     rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 2)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftdi,    rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters (Dream Island Co. license)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftit,    rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu", "Raiden Fighters (Italy)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdfta,     rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu", "Raiden Fighters (Austria)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdft,      0,       spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 1)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftu,     rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftau,    rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu", "Raiden Fighters (Australia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftj,     rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 2)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftdi,    rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters (Dream Island Co. license)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftit,    rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu", "Raiden Fighters (Italy)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdfta,     rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu", "Raiden Fighters (Austria)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 GAME( 1997, rdft2,     0,       spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden Fighters 2",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1997, rdft2a2,   rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters 2 (Asia, Dream Island license, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
@@ -3525,10 +3563,10 @@ GAME( 1997, rdft2j2,   rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Ka
 GAME( 1997, rdft2t,    rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 (Taiwan, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1997, rdft2u,    rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2 (USA, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
-GAME( 1998, rfjet,     0,       spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden Fighters Jet",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1998, rfjetu,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1998, rfjeta,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters Jet (Asia)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1998, rfjetj,    rfjet,   spi,      spi_2button, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1998, rfjet,     0,       spi,      spi_2button, rfjet,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden Fighters Jet",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1998, rfjetu,    rfjet,   spi,      spi_2button, rfjet,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1998, rfjeta,    rfjet,   spi,      spi_2button, rfjet,  ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters Jet (Asia)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1998, rfjetj,    rfjet,   spi,      spi_2button, rfjet,  ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 /* there is another rf dump rf_spi_asia.zip but it seems strange, 1 program rom, cart pic seems to show others as a different type of rom */
 
@@ -3540,6 +3578,7 @@ GAME( 1999, rfjetus,   rfjet,   sxx2g,    spi_2button, rfjet,    ROT270, "Seibu 
 
 /* SYS386 */
 GAME( 2000, rdft22kc,  rdft2,   seibu386, seibu386_2button, rdft22kc, ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - 2000 (China)", GAME_IMPERFECT_GRAPHICS )
+GAME( 2000, rfjet2kc,  rfjet,   seibu386, seibu386_2button, rfjet2k,  ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet - 2000 (China)", GAME_IMPERFECT_GRAPHICS )
 
 /* SYS386F V2.0 */
 GAME( 1999, ejsakura,   0,        sys386f2, spi_ejsakura, sys386f2, ROT0, "Seibu Kaihatsu", "E-Jan Sakurasou (v2.0)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

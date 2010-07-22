@@ -22,8 +22,11 @@ KR2-KR6 : VOICE
 
 50pin cable to 7seg&lamp control board.
 
-flyer.gif from
-http://www.hoizinger.com/ed/EM.HTML
+Information:
+http://www.wshin.com/games/review/ka/kung-fu-roushi.htm
+http://www.youtube.com/watch?v=ssEfw-RbSjs
+
+
 ----------------------------------------------------------------
 
 ***************************************************************************/
@@ -160,14 +163,14 @@ static WRITE8_DEVICE_HANDLER( kungfur_adpcm1_w )
 {
 	adpcm_pos[0] = 0x40000+(data & 0xff) * 0x100;
 	adpcm_idle[0] = 0;
-	msm5205_reset_w(devtag_get_device(device->machine, "adpcm1"),0);
+	msm5205_reset_w(device->machine->device("adpcm1"),0);
 }
 
 static WRITE8_DEVICE_HANDLER( kungfur_adpcm2_w )
 {
 	adpcm_pos[1] = (data & 0xff) * 0x400;
 	adpcm_idle[1] = 0;
-	msm5205_reset_w(devtag_get_device(device->machine, "adpcm2"),0);
+	msm5205_reset_w(device->machine->device("adpcm2"),0);
 }
 
 /*
@@ -262,7 +265,7 @@ static void kfr_adpcm1_int(running_device *device)
 
 	if (adpcm_pos[0] >= 0x40000 || adpcm_idle[0])
 	{
-		msm5205_reset_w(devtag_get_device(device->machine, "adpcm1"),1);
+		msm5205_reset_w(device->machine->device("adpcm1"),1);
 		trigger = 0;
 	}
 	else
@@ -270,7 +273,7 @@ static void kfr_adpcm1_int(running_device *device)
 		UINT8 *ROM = memory_region(device->machine, "adpcm1");
 
 		adpcm_data = ((trigger ? (ROM[adpcm_pos[0]] & 0x0f) : (ROM[adpcm_pos[0]] & 0xf0)>>4) );
-		msm5205_data_w(devtag_get_device(device->machine, "adpcm1"),adpcm_data & 0xf);
+		msm5205_data_w(device->machine->device("adpcm1"),adpcm_data & 0xf);
 		trigger^=1;
 		if(trigger == 0)
 		{
@@ -288,7 +291,7 @@ static void kfr_adpcm2_int(running_device *device)
 
 	if (adpcm_pos[1] >= 0x10000 || adpcm_idle[1])
 	{
-		msm5205_reset_w(devtag_get_device(device->machine, "adpcm2"),1);
+		msm5205_reset_w(device->machine->device("adpcm2"),1);
 		trigger = 0;
 	}
 	else
@@ -296,7 +299,7 @@ static void kfr_adpcm2_int(running_device *device)
 		UINT8 *ROM = memory_region(device->machine, "adpcm2");
 
 		adpcm_data = ((trigger ? (ROM[adpcm_pos[1]] & 0x0f) : (ROM[adpcm_pos[1]] & 0xf0)>>4) );
-		msm5205_data_w(devtag_get_device(device->machine, "adpcm2"),adpcm_data & 0xf);
+		msm5205_data_w(device->machine->device("adpcm2"),adpcm_data & 0xf);
 		trigger^=1;
 		if(trigger == 0)
 		{

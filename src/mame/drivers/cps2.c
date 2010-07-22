@@ -1195,8 +1195,8 @@ static MACHINE_START( cps2 )
 {
 	cps_state *state = (cps_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->scancount);
 
@@ -5432,6 +5432,30 @@ ROM_END
 
 ROM_START( sfzh )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "sfzh.03d", 0x000000, 0x80000, CRC(6e08cbe0) SHA1(c9d0e709004677b51efe0b62e0ae9b681dde1744) )
+	ROM_LOAD16_WORD_SWAP( "sfz.04c",  0x080000, 0x80000, CRC(bb90acd5) SHA1(a19795963b90f1152f44cae29e78dd2ce67a41d6) )
+	ROM_LOAD16_WORD_SWAP( "sfz.05c",  0x100000, 0x80000, CRC(0810544d) SHA1(5f39bda3e7b16508eb58e5a2e0cc58c09cf428ce) ) /* Same as revision "A" below */
+	ROM_LOAD16_WORD_SWAP( "sfz.06",   0x180000, 0x80000, CRC(806e8f38) SHA1(b6d6912aa8f2f590335d7ff9a8214648e7131ebb) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROM_FILL(              0x000000, 0x800000, 0 )
+	ROMX_LOAD( "sfz.14m",  0x800000, 0x200000, CRC(90fefdb3) SHA1(5eb28c8de57acfeaefebdd01509c7d9ba5244705) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfz.16m",  0x800002, 0x200000, CRC(5354c948) SHA1(07588f1ba6addc04fef3274c971174aaf3e632ab) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfz.18m",  0x800004, 0x200000, CRC(41a1e790) SHA1(ce25dad542308691dbe9606b26279bbd59ea4b81) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "sfz.20m",  0x800006, 0x200000, CRC(a549df98) SHA1(f054e95df650a891ef56da8bfb31cb2c945a9aed) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "sfz.01",   0x00000, 0x08000, CRC(ffffec7d) SHA1(75b4aef001b72a0f571b51b2b97803facc1832dd) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "sfz.02",   0x28000, 0x20000, CRC(45f46a08) SHA1(e32dbd27b52ab708278045b5a829376e55a4ca81) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "sfz.11m",   0x000000, 0x200000, CRC(c4b093cd) SHA1(256526bb693a0b72443f047e060304c9b739acd1) )
+	ROM_LOAD16_WORD_SWAP( "sfz.12m",   0x200000, 0x200000, CRC(8bdbc4b4) SHA1(0e21c9a75a17a7e7dfd8bb51098c2b9dc4c933ec) )
+ROM_END
+
+ROM_START( sfzhr1 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "sfzh.03c", 0x000000, 0x80000, CRC(bce635aa) SHA1(323da2de6c3ff6fd8c2c66ce6bd1d287873db9b1) )
 	ROM_LOAD16_WORD_SWAP( "sfz.04a",  0x080000, 0x80000, CRC(5f99e9a5) SHA1(e9f286315d17096adc08e6b4e6ff7c5351f5bef3) )
 	ROM_LOAD16_WORD_SWAP( "sfz.05a",  0x100000, 0x80000, CRC(0810544d) SHA1(5f39bda3e7b16508eb58e5a2e0cc58c09cf428ce) )
@@ -7207,7 +7231,7 @@ ROM_START( xmcotah )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "xmnh.03",  0x000000, 0x80000, CRC(e4b85a90) SHA1(1eaf94ce42438eea45cd5c813f2859abf258dd3a) )  /* These are later date, but no revision leter code? */
 	ROM_LOAD16_WORD_SWAP( "xmnh.04",  0x080000, 0x80000, CRC(7dfe1406) SHA1(4ddc0a8947d78ce587220f8188c8a8f00c7372c4) )  /* These are later date, but no revision leter code? */
-	ROM_LOAD16_WORD_SWAP( "xmn.05a",  0x100000, 0x80000, CRC(ac0d7759) SHA1(650d4474b13f16af7910a0f721fcda2ddb2414fd) )
+	ROM_LOAD16_WORD_SWAP( "xmnh.05",  0x100000, 0x80000, CRC(87b0ed0f) SHA1(f4d78fdd9fcf864e909d9a2bb351b49a5f8ec7a0) )  /* These are later date, but no revision leter code? */
 	ROM_LOAD16_WORD_SWAP( "xmn.06a",  0x180000, 0x80000, CRC(1b86a328) SHA1(2469cd705139ee9f1142e6e379e68d0c9675b37e) )
 	ROM_LOAD16_WORD_SWAP( "xmn.07a",  0x200000, 0x80000, CRC(2c142a44) SHA1(7624875f9c39b361fc83e52e87e0fd5e96279713) )
 	ROM_LOAD16_WORD_SWAP( "xmn.08a",  0x280000, 0x80000, CRC(f712d44f) SHA1(0d18d4a4eacad94a66beca6ec509ac7f690c6882) )
@@ -7238,7 +7262,7 @@ ROM_START( xmcotahr1 )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "xmnh.03d", 0x000000, 0x80000, CRC(63b0a84f) SHA1(4a0d604ff11e68313a0711702803390cb0d2f234) )
 	ROM_LOAD16_WORD_SWAP( "xmnh.04d", 0x080000, 0x80000, CRC(b1b9b727) SHA1(b04ae3b7aab88cbb1a55068343ff9a9806d331a4) )
-	ROM_LOAD16_WORD_SWAP( "xmnh.05",  0x100000, 0x80000, CRC(87b0ed0f) SHA1(f4d78fdd9fcf864e909d9a2bb351b49a5f8ec7a0) )
+	ROM_LOAD16_WORD_SWAP( "xmn.05a",  0x100000, 0x80000, CRC(ac0d7759) SHA1(650d4474b13f16af7910a0f721fcda2ddb2414fd) )
 	ROM_LOAD16_WORD_SWAP( "xmn.06a",  0x180000, 0x80000, CRC(1b86a328) SHA1(2469cd705139ee9f1142e6e379e68d0c9675b37e) )
 	ROM_LOAD16_WORD_SWAP( "xmn.07a",  0x200000, 0x80000, CRC(2c142a44) SHA1(7624875f9c39b361fc83e52e87e0fd5e96279713) )
 	ROM_LOAD16_WORD_SWAP( "xmn.08a",  0x280000, 0x80000, CRC(f712d44f) SHA1(0d18d4a4eacad94a66beca6ec509ac7f690c6882) )
@@ -7831,7 +7855,7 @@ static DRIVER_INIT( cps2 )
 	state->scancount = 0;
 	state->cps2networkpresent = 0;
 
-	cpu_set_clockscale(devtag_get_device(machine, "maincpu"), 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	machine->device("maincpu")->set_clock_scale(0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 static DRIVER_INIT( ssf2tb )
@@ -7887,7 +7911,7 @@ static DRIVER_INIT( gigamn2 )
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
 	memory_set_decrypted_region(space, 0x000000, (length) - 1, &rom[length/4]);
-	m68k_set_encrypted_opcode_range(devtag_get_device(machine, "maincpu"), 0, length);
+	m68k_set_encrypted_opcode_range(machine->device("maincpu"), 0, length);
 }
 
 
@@ -7983,7 +8007,8 @@ GAME( 1995, sfza,       sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "
 GAME( 1995, sfzj,       sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Japan 950727)", GAME_SUPPORTS_SAVE )
 GAME( 1995, sfzjr1,     sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Japan 950627)", GAME_SUPPORTS_SAVE )
 GAME( 1995, sfzjr2,     sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Japan 950605)", GAME_SUPPORTS_SAVE )
-GAME( 1995, sfzh,       sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Hispanic 950627)", GAME_SUPPORTS_SAVE )
+GAME( 1995, sfzh,       sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Hispanic 950718)", GAME_SUPPORTS_SAVE )
+GAME( 1995, sfzhr1,     sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Hispanic 950627)", GAME_SUPPORTS_SAVE )
 GAME( 1995, sfzb,       sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Brazil 951109)", GAME_SUPPORTS_SAVE )
 GAME( 1995, sfzbr1,     sfa,      cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero (Brazil 950727)", GAME_SUPPORTS_SAVE )
 GAME( 1995, mmancp2u,   megaman,  cps2, cps2_2p3b, cps2,     ROT0,   "Capcom", "Mega Man - The Power Battle (CPS2, USA 951006, SAMPLE Version)", GAME_SUPPORTS_SAVE )

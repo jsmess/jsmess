@@ -75,7 +75,7 @@ Warzard / Red Earth                                  1996   96/11/21       CAP-W
 ** NOT DUMPED but known to exist
 
 The Game Region / No CD Flags / Development flags etc. are controlled by a byte in the bios roms.  The CDs
-contain revisions of the game code and are independant of the region.
+contain revisions of the game code and are independent of the region.
 
 The CP SYSTEM III comprises a main board with several custom ASICs, custom 72-pin SIMMs for program
 and graphics storage (the same SIMMs are also used in some CPS2 titles), SCSI CDROM and CDROM disc,
@@ -694,7 +694,7 @@ static DRIVER_INIT( cps3 )
 	if (!cps3_user5region) cps3_user5region = auto_alloc_array(machine, UINT8, USER5REGION_LENGTH);
 
 	// set strict verify
-	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_STRICT_VERIFY);
+	sh2drc_set_options(machine->device("maincpu"), SH2DRC_STRICT_VERIFY);
 
 	cps3_decrypt_bios(machine);
 	decrypted_gamerom = auto_alloc_array(machine, UINT32, 0x1000000/4);

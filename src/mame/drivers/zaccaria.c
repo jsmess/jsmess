@@ -28,7 +28,12 @@ Notes:
   0-3 are connected to regular devices (6400-6407 has 4-bit RAM, while 6c00-6c07
   has a 4-bit input port).
 
-- The 6802 driving the TMS5220 has a push button connected to the NMI line. Test?
+- The 6802 driving the TMS5220 has a push button connected to the NMI line. On
+  Zaccaria pinballs, when pressed, this causes the speech 6802 and the slave
+  sound 6802 to play a few speech effects and sound effects;
+  This currently doesn't work in MAME, and tracing the code it seems the code is
+  possibly broken, made up of nonfunctional leftovers of some of the pinball test
+  mode code.
 
 ***************************************************************************/
 
@@ -105,7 +110,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_port0a_w )
 	/* 150 below to scale to volume 100 */
 	v = (150 * table[ba]) / (4700 + table[ba]);
 	//printf("dac1w %02d %04d\n", ba, v);
-	ay8910_set_volume(devtag_get_device(device->machine, "ay2"), 1, v);
+	ay8910_set_volume(device->machine->device("ay2"), 1, v);
 }
 
 
@@ -121,7 +126,7 @@ static WRITE_LINE_DEVICE_HANDLER( zaccaria_irq0b )
 
 static READ8_DEVICE_HANDLER( zaccaria_port0a_r )
 {
-	return ay8910_r(devtag_get_device(device->machine, (active_8910 == 0) ? "ay1" : "ay2"), 0);
+	return ay8910_r(device->machine->device((active_8910 == 0) ? "ay1" : "ay2"), 0);
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port0a_w )
@@ -136,7 +141,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 	if ((last_port0b & 0x02) == 0x02 && (data & 0x02) == 0x00)
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(device->machine, "ay1"), last_port0b, port0a);
+		ay8910_data_address_w(device->machine->device("ay1"), last_port0b, port0a);
 	}
 	else if ((last_port0b & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -148,7 +153,7 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 	if ((last_port0b & 0x08) == 0x08 && (data & 0x08) == 0x00)
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
-		ay8910_data_address_w(devtag_get_device(device->machine, "ay2"), last_port0b >> 2, port0a);
+		ay8910_data_address_w(device->machine->device("ay2"), last_port0b >> 2, port0a);
 	}
 	else if ((last_port0b & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -162,16 +167,16 @@ static WRITE8_DEVICE_HANDLER( zaccaria_port0b_w )
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
-	running_device *pia0 = devtag_get_device(device->machine, "pia0");
+	running_device *pia0 = device->machine->device("pia0");
 	static int toggle = 0;
 
-	pia6821_cb1_w(pia0,0, toggle & 1);
+	pia6821_cb1_w(pia0, toggle & 1);
 	toggle ^= 1;
 }
 
 static WRITE8_DEVICE_HANDLER( zaccaria_port1b_w )
 {
-	running_device *tms = devtag_get_device(device->machine, "tms");
+	running_device *tms = device->machine->device("tms");
 
 	// bit 0 = /RS
 	tms5220_rsq_w(tms, (data >> 0) & 0x01);
@@ -194,8 +199,8 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( sound1_command_w )
 {
-	running_device *pia0 = devtag_get_device(space->machine, "pia0");
-	pia6821_ca1_w(pia0, 0, data & 0x80);
+	running_device *pia0 = space->machine->device("pia0");
+	pia6821_ca1_w(pia0, data & 0x80);
 	soundlatch2_w(space, 0, data);
 }
 
@@ -282,21 +287,64 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
+/* slave sound cpu, produces music and sound effects */
+/* mapping:
+   A15 A14 A13 A12 A11 A10 A09 A08 A07 A06 A05 A04 A03 A02 A01 A00
+     0   0   0   0   0   0   0   0   0   *   *   *   *   *   *   *  RW 6802 internal ram
+     0   0   0   x   x   x   x   x   x   x   x   x   x   x   x   x  Open bus (for area that doesn't overlap ram)
+     0   0   1   x   x   x   x   x   x   x   x   x   x   x   x   x  Open bus
+     0   1   0   x   x   x   x   x   x   x   x   x   0   0   x   x  Open bus
+     0   1   0   x   x   x   x   x   x   x   x   x   0   1   x   x  Open bus
+     0   1   0   x   x   x   x   x   x   x   x   x   1   0   x   x  Open bus
+     0   1   0   x   x   x   x   x   x   x   x   x   1   1   *   *  RW 6821 PIA @ 4I
+     0   1   1   x   x   x   x   x   x   x   x   x   x   x   x   x  Open bus
+     1   0   %   %   *   *   *   *   *   *   *   *   *   *   *   *  R /CS4A: Enable Rom 13
+     1   1   %   %   *   *   *   *   *   *   *   *   *   *   *   *  R /CS5A: Enable Rom 9
+     note that the % bits go to pins 2 (6802 A12) and 26 (6802 A13) of the roms
+     monymony and jackrabt both use 2764 roms, which use pin 2 as A12 and pin 26 as N/C don't care
+     hence for actual chips used, the mem map is:
+     1   0   x   *   *   *   *   *   *   *   *   *   *   *   *   *  R /CS4A: Enable Rom 13
+     1   1   x   *   *   *   *   *   *   *   *   *   *   *   *   *  R /CS5A: Enable Rom 9
+
+     6821 PIA: CA1 comes from the master sound cpu's latch bit 7 (which is also connected to the AY chip at 4G's IOB1); CB1 comes from a periodic counter clocked by the 6802's clock, divided by 4096. CA2 and CB2 are disconnected. PA0-7 connect to the data busses of the AY-3-8910 chips; PB0 and PB1 connect to the BC1 and BDIR pins of the AY chip at 4G; PB2 and PB3 connect to the BC1 and BDIR pins of the AY chip at 4H.
+*/
 static ADDRESS_MAP_START( sound_map_1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
+	AM_RANGE(0x500c, 0x500f) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w) AM_MIRROR(0x1ff0)
+	AM_RANGE(0x8000, 0x9fff) AM_ROM AM_MIRROR(0x2000) // rom 13
+	AM_RANGE(0xc000, 0xdfff) AM_ROM AM_MIRROR(0x2000) // rom 9
 ADDRESS_MAP_END
 
+/* master sound cpu, controls speech directly */
+/* mapping:
+   A15 A14 A13 A12 A11 A10 A09 A08 A07 A06 A05 A04 A03 A02 A01 A00
+     0   0   0   0   0   0   0   0   0   *   *   *   *   *   *   *  RW 6802 internal ram
+**** x   0   0   0   x   x   x   x   1   x   x   0   x   x   *   *  Open bus (test mode writes as if there was another PIA here)
+     x   0   0   0   x   x   x   x   1   x   x   1   x   x   *   *  RW 6821 PIA @ 1I
+     x   0   0   1   0   0   x   x   x   x   x   x   x   x   x   x  W  MC1408 DAC
+     x   x   0   1   0   1   x   x   x   x   x   x   x   x   x   x  W  Command to slave sound1 cpu
+     x   x   0   1   1   0   x   x   x   x   x   x   x   x   x   x  R  Command read latch from z80
+     x   x   0   1   1   1   x   x   x   x   x   x   x   x   x   x  Open bus
+     %   %   1   0   *   *   *   *   *   *   *   *   *   *   *   *  R /CS1A: Enable Rom 8
+     %   %   1   1   *   *   *   *   *   *   *   *   *   *   *   *  R /CS0A: Enable Rom 7
+     note that the % bits go to pins 2 (6802 A14) and 26 (6802 A15) of the roms
+     monymony and jackrabt both use 2764 roms, which use pin 2 as A12 and pin 26 as N/C don't care
+     hence for actual chips used, the mem map is:
+     x   *   1   0   *   *   *   *   *   *   *   *   *   *   *   *  R /CS1A: Enable Rom 8
+     x   *   1   1   *   *   *   *   *   *   *   *   *   *   *   *  R /CS0A: Enable Rom 7
+
+     6821 PIA: PA0-7, CA2 and CB1 connect to the TMS5200; CA1 and CB2 are disconnected, though the test mode assumes there's something connected to CB2 (possibly another LED like the one connected to PB4); PB3 connects to 'ACS' which goes to the z80.
+*/
 static ADDRESS_MAP_START( sound_map_2, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
-	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac2", mc1408_data_w)	/* MC1408 */
-	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w)
-	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
-	AM_RANGE(0xa000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xffff) AM_ROM
+	AM_RANGE(0x0000, 0x007f) AM_RAM /* 6802 internal ram */
+	AM_RANGE(0x0090, 0x0093) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w) AM_MIRROR(0x8F6C)
+	AM_RANGE(0x1000, 0x1000) AM_DEVWRITE("dac2", mc1408_data_w) AM_MIRROR(0x83FF) /* MC1408 */
+	AM_RANGE(0x1400, 0x1400) AM_WRITE(sound1_command_w) AM_MIRROR(0xC3FF)
+	AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r) AM_MIRROR(0xC3FF)
+	AM_RANGE(0x2000, 0x2fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 low
+	AM_RANGE(0x3000, 0x3fff) AM_ROM AM_MIRROR(0x8000) // rom 7 with A12 low
+	AM_RANGE(0x6000, 0x6fff) AM_ROM AM_MIRROR(0x8000) // rom 8 with A12 high
+	AM_RANGE(0x7000, 0x7fff) AM_ROM AM_MIRROR(0x8000) // rom 7 with A12 high
 ADDRESS_MAP_END
 
 
@@ -532,8 +580,8 @@ static const pia6821_interface pia_1_config =
 
 static const tms5220_interface tms5220_config =
 {
-	DEVCB_DEVICE_HANDLER("pia1", pia6821_cb1_w),	/* IRQ handler */
-	DEVCB_DEVICE_HANDLER("pia1", pia6821_ca2_w)		/* READYQ handler */
+	DEVCB_DEVICE_LINE("pia1", pia6821_cb1_w),	/* IRQ handler */
+	DEVCB_DEVICE_LINE("pia1", pia6821_ca2_w)		/* READYQ handler */
 };
 
 
@@ -618,14 +666,14 @@ ROM_START( monymony )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for first 6802 */
-	ROM_LOAD( "snd13.2g",           0xa000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
-	ROM_LOAD( "snd9.1i",           0xe000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
+	ROM_LOAD( "snd13.2g",           0x8000, 0x2000, CRC(78b01b98) SHA1(2aabed56cdae9463deb513c0c5021f6c8dfd271e) )
+	ROM_LOAD( "snd9.1i",           0xc000, 0x2000, CRC(94e3858b) SHA1(04961f67b95798b530bd83355dec612389f22255) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* 64k for second 6802 */
-	ROM_LOAD( "snd8.1h",           0xa000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
-	ROM_CONTINUE(             0xe000, 0x1000 )
-	ROM_LOAD( "snd7.1g",           0xb000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
-	ROM_CONTINUE(             0xf000, 0x1000 )
+	ROM_LOAD( "snd8.1h",           0x2000, 0x1000, CRC(aad76193) SHA1(e08fc184efced392ee902c4cc9daaaf3310cdfe2) )
+	ROM_CONTINUE(             0x6000, 0x1000 )
+	ROM_LOAD( "snd7.1g",           0x3000, 0x1000, CRC(1e8ffe3e) SHA1(858ee7abe88d5801237e519cae2b50ae4bf33a58) )
+	ROM_CONTINUE(             0x7000, 0x1000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "bg1.2d",           0x0000, 0x2000, CRC(82ab4d1a) SHA1(5aaf42a508df236f2e7c844d377132d73053907b) )
@@ -653,14 +701,14 @@ ROM_START( jackrabt )
 	ROM_LOAD( "cpu-01.6h",    0xd000, 0x1000, CRC(dd5979cf) SHA1(e9afe7002b2258a1c3132bdd951c6e20d473fb6a) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for first 6802 */
-	ROM_LOAD( "13snd.2g",     0xa000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
-	ROM_LOAD( "9snd.1i",      0xe000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
+	ROM_LOAD( "13snd.2g",     0x8000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
+	ROM_LOAD( "9snd.1i",      0xc000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* 64k for second 6802 */
-	ROM_LOAD( "8snd.1h",      0xa000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
-	ROM_CONTINUE(             0xe000, 0x1000 )
-	ROM_LOAD( "7snd.1g",      0xb000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
-	ROM_CONTINUE(             0xf000, 0x1000 )
+	ROM_LOAD( "8snd.1h",      0x2000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
+	ROM_CONTINUE(             0x6000, 0x1000 )
+	ROM_LOAD( "7snd.1g",      0x3000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
+	ROM_CONTINUE(             0x7000, 0x1000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "1bg.2d",       0x0000, 0x2000, CRC(9f880ef5) SHA1(0ee20fb7c794f6dafdaf2c9ee8456221c9d668c5) )
@@ -692,14 +740,14 @@ ROM_START( jackrabt2 )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for first 6802 */
-	ROM_LOAD( "13snd.2g",     0xa000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
-	ROM_LOAD( "9snd.1i",      0xe000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
+	ROM_LOAD( "13snd.2g",     0x8000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
+	ROM_LOAD( "9snd.1i",      0xc000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* 64k for second 6802 */
-	ROM_LOAD( "8snd.1h",      0xa000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
-	ROM_CONTINUE(             0xe000, 0x1000 )
-	ROM_LOAD( "7snd.1g",      0xb000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
-	ROM_CONTINUE(             0xf000, 0x1000 )
+	ROM_LOAD( "8snd.1h",      0x2000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
+	ROM_CONTINUE(             0x6000, 0x1000 )
+	ROM_LOAD( "7snd.1g",      0x3000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
+	ROM_CONTINUE(             0x7000, 0x1000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "1bg.2d",       0x0000, 0x2000, CRC(9f880ef5) SHA1(0ee20fb7c794f6dafdaf2c9ee8456221c9d668c5) )
@@ -727,14 +775,14 @@ ROM_START( jackrabts )
 	ROM_CONTINUE(             0xd000, 0x1000 )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for first 6802 */
-	ROM_LOAD( "13snd.2g",     0xa000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
-	ROM_LOAD( "9snd.1i",      0xe000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
+	ROM_LOAD( "13snd.2g",     0x8000, 0x2000, CRC(fc05654e) SHA1(ed9c66672fe89c41e320e1d27b53f5efa92dce9c) )
+	ROM_LOAD( "9snd.1i",      0xc000, 0x2000, CRC(3dab977f) SHA1(3e79c06d2e70b050f01b7ac58be5127ba87904b0) )
 
 	ROM_REGION( 0x10000, "audio2", 0 ) /* 64k for second 6802 */
-	ROM_LOAD( "8snd.1h",      0xa000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
-	ROM_CONTINUE(             0xe000, 0x1000 )
-	ROM_LOAD( "7snd.1g",      0xb000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
-	ROM_CONTINUE(             0xf000, 0x1000 )
+	ROM_LOAD( "8snd.1h",      0x2000, 0x1000, CRC(f4507111) SHA1(0513f0831b94aeda84aa4f3b4a7c60dfc5113b2d) )
+	ROM_CONTINUE(             0x6000, 0x1000 )
+	ROM_LOAD( "7snd.1g",      0x3000, 0x1000, CRC(c722eff8) SHA1(d8d1c091ab80ea2d6616e4dc030adc9905c0a496) )
+	ROM_CONTINUE(             0x7000, 0x1000 )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "1bg.2d",       0x0000, 0x2000, CRC(9f880ef5) SHA1(0ee20fb7c794f6dafdaf2c9ee8456221c9d668c5) )

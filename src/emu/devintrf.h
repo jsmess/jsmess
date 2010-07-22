@@ -56,7 +56,6 @@
 #define DERIVED_CLOCK(num, den)		(0xff000000 | ((num) << 12) | ((den) << 0))
 
 // shorthand for accessing devices by machine/type/tag
-#define devtag_get_device(mach,tag)							(mach)->device(tag)
 #define devtag_reset(mach,tag)								(mach)->device(tag)->reset()
 
 
@@ -549,34 +548,6 @@ inline device_t *device_t::typenext() const
 	device_t *cur;
 	for (cur = m_next; cur != NULL && cur->type() != type(); cur = cur->m_next) ;
 	return cur;
-}
-
-
-
-// ======================> device clock management
-
-// returns the current device's unscaled running clock speed
-inline int device_get_clock(device_t *device)
-{
-	return device->unscaled_clock();
-}
-
-// sets the current device's clock speed and then adjusts for scaling
-inline void device_set_clock(device_t *device, int clock)
-{
-	device->set_unscaled_clock(clock);
-}
-
-// returns the current scaling factor for a device's clock speed
-inline double device_get_clock_scale(device_t *device)
-{
-	return device->clock_scale();
-}
-
-// sets the current scaling factor for a device's clock speed
-inline void device_set_clock_scale(device_t *device, double clockscale)
-{
-	device->set_clock_scale(clockscale);
 }
 
 

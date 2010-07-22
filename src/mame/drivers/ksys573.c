@@ -131,7 +131,7 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
   Note:
        Not all games listed above are confirmed to run on System 573.
        * - denotes not dumped yet. If you can help with the remaining undumped System 573 games,
-       please contact http://www.mameworld.net/gurudumps/comments.html
+       please contact http://guru.mameworld.info/
 
 
   Main PCB Layout
@@ -1626,7 +1626,7 @@ static void update_mode( running_machine *machine )
 	if( inserted_cdrom != new_cdrom )
 	{
 		inserted_cdrom = new_cdrom;
-		cdda_set_cdrom(devtag_get_device(machine, "cdda"), atapi_get_device());
+		cdda_set_cdrom(machine->device("cdda"), atapi_get_device());
 	}
 }
 
@@ -1661,7 +1661,7 @@ todo:
 
 static READ32_HANDLER( ge765pwbba_r )
 {
-	running_device *upd4701 = devtag_get_device(space->machine, "upd4701");
+	running_device *upd4701 = space->machine->device("upd4701");
 	UINT32 data = 0;
 
 	switch (offset)
@@ -1699,7 +1699,7 @@ static READ32_HANDLER( ge765pwbba_r )
 
 static WRITE32_HANDLER( ge765pwbba_w )
 {
-	running_device *upd4701 = devtag_get_device(space->machine, "upd4701");
+	running_device *upd4701 = space->machine->device("upd4701");
 	switch (offset)
 	{
 	case 0x04:

@@ -1360,7 +1360,7 @@ static const discrete_mixer_desc btime_sound_mixer_desc =
  */
 #define BTIME_R49	RES_K(47)	/* pcb: 47.4k */
 
-/* The input divider R51 R50 is not independant of R52, which
+/* The input divider R51 R50 is not independent of R52, which
  * also depends on ay internal resistance.
  * FIXME: Develop proper model when I am retired.
  *
@@ -1407,7 +1407,7 @@ static DISCRETE_SOUND_START( btime_sound )
 
 	/* Amplifier is upc1181H3
      *
-     * http://www.mydarc.de/dj7oh/fad/ics/upc1181/upc1181.htm
+     * http://www.ic-ts-histo.de/fad/ics/upc1181/upc1181.htm
      *
      * A linear frequency response is mentioned as well as a lower
      * edge frequency determined by cap on pin3, however no formula given.
@@ -1427,8 +1427,8 @@ static MACHINE_START( btime )
 {
 	btime_state *state = (btime_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->btime_palette);
 	state_save_register_global(machine, state->bnj_scroll1);
@@ -1831,7 +1831,7 @@ ROM_START( tisland )
 ROM_END
 
 /* There is a flyer with a screen shot for Lock'n'Chase at:
-   http://www.gamearchive.com/flyers/video/taito/locknchase_f.jpg  */
+   http://www.arcadeflyers.com/?page=flyer&db=videodb&id=608&image=1  */
 
 ROM_START( lnc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -2088,7 +2088,7 @@ static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 	for (addr = 0; addr < 0x10000; addr++)
 		decrypt[addr] = swap_bits_5_6(rom[addr]);
 
-	if (space->cpu == devtag_get_device(machine, "maincpu"))
+	if (space->cpu == machine->device("maincpu"))
 		decrypted = decrypt;
 }
 

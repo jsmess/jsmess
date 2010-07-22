@@ -1987,9 +1987,9 @@ static MACHINE_START( tumbleb )
 {
 	tumbleb_state *state = (tumbleb_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->oki = devtag_get_device(machine, "oki");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->oki = machine->device("oki");
 
 	state_save_register_global(machine, state->music_command);
 	state_save_register_global(machine, state->music_bank);
@@ -3348,7 +3348,7 @@ static DRIVER_INIT( tumblepb )
 
 static DRIVER_INIT( tumbleb2 )
 {
-	running_device *oki = devtag_get_device(machine, "oki");
+	running_device *oki = machine->device("oki");
 
 	tumblepb_gfx1_rearrange(machine);
 
@@ -3728,7 +3728,7 @@ GAME( 1993, jumpkids, 0,       jumpkids,  tumblepb, jumpkids, ROT0, "Comad", "Ju
 GAME( 1994, metlsavr, 0,       metlsavr,  metlsavr, chokchok, ROT0, "First Amusement", "Metal Saver", GAME_SUPPORTS_SAVE )
 GAME( 1994, pangpang, 0,       pangpang,  tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
 GAME( 1994, suprtrio, 0,       suprtrio,  suprtrio, suprtrio, ROT0, "Gameace", "Super Trio", GAME_SUPPORTS_SAVE )
-// Should also be 'Magicball Fighting' (c)1994  see  http://kmrb.or.kr/Game_Image/1999/%EC%A0%9C1248%ED%98%B8.jpg
+// Should also be 'Magicball Fighting' (c)1994
 GAME( 1995, htchctch, 0,       htchctch,  htchctch, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
 GAME( 1995, cookbib,  0,       cookbib,   cookbib,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
 GAME( 1995, chokchok, 0,       cookbib,   chokchok, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  ) // corruption during attract mode (tmap disable?)

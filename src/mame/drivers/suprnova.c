@@ -63,7 +63,7 @@ Linescroll:
 R,G,B Brightness:
    The Electro Design games have this set darker than 0xff for sprites and bg's anyway.
    Galpanis uses it to dim the bg's in attract on the stats screens for the characters (bg's hidden by white pen atm).
-Lots of games use them to fade, haven't seen r,g,b used independantly yet but you never know.
+Lots of games use them to fade, haven't seen r,g,b used independently yet but you never know.
 
 etc.etc.
 
@@ -995,15 +995,15 @@ static READ32_HANDLER( sengekij_speedup_r ) // 60006ee  600308e
 static void init_skns(running_machine *machine)
 {
 	// init DRC to fastest options
-	sh2drc_set_options(devtag_get_device(machine, "maincpu"), SH2DRC_FASTEST_OPTIONS);
+	sh2drc_set_options(machine->device("maincpu"), SH2DRC_FASTEST_OPTIONS);
 
-	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), 0x6f8);
+	sh2drc_add_pcflush(machine->device("maincpu"), 0x6f8);
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x6000028, 0x600002b, 0, 0, bios_skip_r );
 }
 
 static void set_drc_pcflush(running_machine *machine, UINT32 addr)
 {
-	sh2drc_add_pcflush(devtag_get_device(machine, "maincpu"), addr);
+	sh2drc_add_pcflush(machine->device("maincpu"), addr);
 }
 
 static DRIVER_INIT( galpani4 ) { skns_sprite_kludge(-5,-1); init_skns(machine);  }

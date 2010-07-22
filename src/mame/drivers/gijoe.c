@@ -237,7 +237,7 @@ static INPUT_PORTS_START( gijoe )
 	KONAMI16_MSB_40(2, IPT_BUTTON3 )
 	PORT_DIPNAME( 0x8000, 0x8000, "Coin mechanism" )	PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x8000, "Common" )
-	PORT_DIPSETTING(      0x0000, "Independant" )
+	PORT_DIPSETTING(      0x0000, "Independent" )
 
 	PORT_START("P3_P4")
 	KONAMI16_LSB_40(3, IPT_BUTTON3 )
@@ -278,12 +278,12 @@ static MACHINE_START( gijoe )
 {
 	gijoe_state *state = (gijoe_state *)machine->driver_data;
 
-	state->maincpu = devtag_get_device(machine, "maincpu");
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
-	state->k054539 = devtag_get_device(machine, "k054539");
-	state->k056832 = devtag_get_device(machine, "k056832");
-	state->k053246 = devtag_get_device(machine, "k053246");
-	state->k053251 = devtag_get_device(machine, "k053251");
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+	state->k054539 = machine->device("k054539");
+	state->k056832 = machine->device("k056832");
+	state->k053246 = machine->device("k053246");
+	state->k053251 = machine->device("k053251");
 
 	state->dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
 

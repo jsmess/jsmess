@@ -9,7 +9,7 @@ Driver's Eyes works,
     DIP4 ON for Screen on the right
     should not toggle on both
 
-    -The left, center and right screens have separate programs and boards, each would work independantly.
+    -The left, center and right screens have separate programs and boards, each would work independently.
     About projection angles of left and right screen, the angle is correct on "DRIVER'S EYES" title screen, however in the tracks of demo mode it doesn't seem correct.
 
     -On demo screen, should fog effects be turned off?
@@ -612,7 +612,7 @@ static WRITE16_HANDLER( dspram16_w )
 		}
 		else if (namcos2_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
-					space->cpu == devtag_get_device(space->machine, "maincpu"))
+					space->cpu == space->machine->device("maincpu"))
 		{ /* hack; synchronization for solvalou */
 			cpu_yield(space->cpu);
 		}

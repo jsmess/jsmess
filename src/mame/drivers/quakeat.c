@@ -31,7 +31,7 @@ The "backup" directory on hard disk was created by the dumper.
 
 
  -- Hardware info found in the following press release:
-http://www.quantum3d.com/press/HTMLarchive/4-20-98.html
+http://www.wave-report.com/archives/1998/98170702.htm
 
 QUANTUM3D'S HEAVY METAL SYSTEM - HM233G
 NLX form factor system that is based on the Intel 440LX chipset
@@ -140,10 +140,10 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_START(quakeat)
 {
-	cpu_set_irq_callback(devtag_get_device(machine, "maincpu"), irq_callback);
+	cpu_set_irq_callback(machine->device("maincpu"), irq_callback);
 
-	quakeat_devices.pic8259_1 = devtag_get_device( machine, "pic8259_1" );
-	quakeat_devices.pic8259_2 = devtag_get_device( machine, "pic8259_2" );
+	quakeat_devices.pic8259_1 = machine->device( "pic8259_1" );
+	quakeat_devices.pic8259_2 = machine->device( "pic8259_2" );
 }
 /*************************************************************/
 

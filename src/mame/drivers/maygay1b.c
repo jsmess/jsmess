@@ -3,7 +3,7 @@
     Maygay M1 A/B driver, (under heavy construction !!!)
 
     A.G.E Code Copyright J. Wallace and the AGEMAME Development Team.
-    Visit http://www.mameworld.net/agemame/ for more information.
+    Visit http://agemame.mameworld.info for more information.
 
     M.A.M.E Core Copyright Nicola Salmoria and the MAME Team,
     used under license from http://mamedev.org
@@ -455,7 +455,7 @@ static void m1_stepper_reset(void)
 static MACHINE_RESET( m1 )
 {
 	ROC10937_reset(0);	// reset display1
-	maygaym1_devices.duart68681 = devtag_get_device( machine, "duart68681" );
+	maygaym1_devices.duart68681 = machine->device( "duart68681" );
 	m1_stepper_reset();
 }
 

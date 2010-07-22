@@ -923,7 +923,7 @@ WRITE16_HANDLER( toaplan2_1_scroll_reg_select_w )
 static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, UINT16 data, UINT16 mem_mask, int controller)
 {
 	/************************************************************************/
-	/***** layer X and Y flips can be set independantly, so emulate it ******/
+	/***** layer X and Y flips can be set independently, so emulate it ******/
 	/************************************************************************/
 
 	//printf("toaplan2_scroll_reg_data_w %04x %04x\n", offset, data);
@@ -1036,7 +1036,7 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 					if ((toaplan2_sub_cpu == CPU_2_Z80) && (data == 3))
 					{
 						/* HACK! When tilted, sound CPU needs to be reset. */
-						running_device *ym = devtag_get_device(machine, "ymsnd");
+						running_device *ym = machine->device("ymsnd");
 
 						if (ym && ym->type() == SOUND_YM3812)
 						{

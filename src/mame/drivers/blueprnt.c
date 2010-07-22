@@ -40,12 +40,6 @@
     8001      8910 #1 write
 
 
-    TODO:
-
-    - the cross hatch pattern test in service mode is too fast, each phase
-      should take 15 seconds according to the service manual
-
-
     DIP locations verified for:
     - blueprnt (manual)
 
@@ -289,7 +283,7 @@ static MACHINE_START( blueprnt )
 {
 	blueprnt_state *state = (blueprnt_state *)machine->driver_data;
 
-	state->audiocpu = devtag_get_device(machine, "audiocpu");
+	state->audiocpu = machine->device("audiocpu");
 
 	state_save_register_global(machine, state->dipsw);
 }
