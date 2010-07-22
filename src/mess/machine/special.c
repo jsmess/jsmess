@@ -17,6 +17,7 @@
 #include "machine/wd17xx.h"
 #include "includes/special.h"
 #include "devices/messram.h"
+#include "devices/flopdrv.h"
 
 static UINT8 specimx_color;
 UINT8 *specimx_colorram;
@@ -421,4 +422,8 @@ WRITE8_HANDLER( erik_disk_reg_w )
 	wd17xx_set_side (fdc,data & 1);
 	wd17xx_set_drive(fdc,(data >> 1) & 1);
 	wd17xx_dden_w(fdc, BIT(data, 2));
+	floppy_mon_w(floppy_get_device(space->machine, (data >> 1) & 1), 0);
+	floppy_mon_w(floppy_get_device(space->machine, ((data >> 1) & 1) ? 0 : 1), 1);
+	floppy_drive_set_ready_state(floppy_get_device(space->machine, (data >> 1) & 1), 1, 1);
+
 }

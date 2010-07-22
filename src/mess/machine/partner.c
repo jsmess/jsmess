@@ -106,11 +106,17 @@ static WRITE8_HANDLER ( partner_floppy_w ) {
 			default   : wd17xx_data_w(fdc,0,data);break;
 		}
 	} else {
+		floppy_mon_w(floppy_get_device(space->machine, 0), 1);
+		floppy_mon_w(floppy_get_device(space->machine, 1), 1);
 		if (((data >> 6) & 1)==1) {
 			wd17xx_set_drive(fdc,0);
+			floppy_mon_w(floppy_get_device(space->machine, 0), 0);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, 0), 1, 1);
 		}
 		if (((data >> 3) & 1)==1) {
 			wd17xx_set_drive(fdc,1);
+			floppy_mon_w(floppy_get_device(space->machine, 1), 0);
+			floppy_drive_set_ready_state(floppy_get_device(space->machine, 1), 1, 1);
 		}
 		wd17xx_set_side(fdc,data >> 7);
 	}

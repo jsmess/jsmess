@@ -12,6 +12,7 @@
 #include "cpu/i8085/i8085.h"
 #include "machine/wd17xx.h"
 #include "devices/messram.h"
+#include "devices/flopdrv.h"
 
 static UINT8 attr = 0;
 static UINT8 text_attr = 0;
@@ -870,15 +871,28 @@ static WRITE8_DEVICE_HANDLER(pk8020_portc_w)
 static WRITE8_DEVICE_HANDLER(pk8020_portb_w)
 {
 	running_device *fdc = device->machine->device("wd1793");
+	// Turn all motors off
+	floppy_mon_w(floppy_get_device(device->machine, 0), 1);
+	floppy_mon_w(floppy_get_device(device->machine, 1), 1);
+	floppy_mon_w(floppy_get_device(device->machine, 2), 1);
+	floppy_mon_w(floppy_get_device(device->machine, 3), 1);	
 	wd17xx_set_side(fdc,BIT(data,4));
 	if (BIT(data,0)) {
 		wd17xx_set_drive(fdc,0);
+		floppy_mon_w(floppy_get_device(device->machine, 0), 0);
+		floppy_drive_set_ready_state(floppy_get_device(device->machine, 0), 1, 1);
 	} else if (BIT(data,1)) {
 		wd17xx_set_drive(fdc,1);
+		floppy_mon_w(floppy_get_device(device->machine, 1), 0);
+		floppy_drive_set_ready_state(floppy_get_device(device->machine, 1), 1, 1);
 	} else if (BIT(data,2)) {
 		wd17xx_set_drive(fdc,2);
+		floppy_mon_w(floppy_get_device(device->machine, 2), 0);
+		floppy_drive_set_ready_state(floppy_get_device(device->machine, 2), 1, 1);
 	} else if (BIT(data,3)) {
 		wd17xx_set_drive(fdc,3);
+		floppy_mon_w(floppy_get_device(device->machine, 3), 0);
+		floppy_drive_set_ready_state(floppy_get_device(device->machine, 3), 1, 1);
 	}
 }
 
