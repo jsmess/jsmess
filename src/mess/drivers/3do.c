@@ -94,13 +94,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "emu.h"
 #include "includes/3do.h"
 #include "devices/chd_cd.h"
-#include "cpu/arm7/arm7.h"
-
-
-/* The 3DO has an ARM6 core which is a bit different from the current
-   ARM cpu cores. This define 'hack' can be removed once the ARM6 core
-   is fully supported. */
-#define ARM6	ARM7
+#include "cpu/arm/arm.h"
 
 
 #define X2_CLOCK_PAL	59000000
@@ -110,7 +104,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 
 static ADDRESS_MAP_START( 3do_mem, ADDRESS_SPACE_PROGRAM, 32)
 	AM_RANGE(0x00000000, 0x001FFFFF) AM_RAMBANK("bank1") AM_BASE_MEMBER(_3do_state,dram)						/* DRAM */
-	AM_RANGE(0x00200000, 0x002FFFFF) AM_RAM	AM_BASE_MEMBER(_3do_state,vram)									/* VRAM */
+	AM_RANGE(0x00200000, 0x003FFFFF) AM_RAM	AM_BASE_MEMBER(_3do_state,vram)									/* VRAM */
 	AM_RANGE(0x03000000, 0x030FFFFF) AM_ROMBANK("bank2")									/* BIOS */
 	AM_RANGE(0x03100000, 0x0313FFFF) AM_RAM													/* Brooktree? */
 	AM_RANGE(0x03140000, 0x0315FFFF) AM_READWRITE(_3do_nvarea_r, _3do_nvarea_w)				/* NVRAM */
@@ -150,6 +144,8 @@ static MACHINE_RESET( 3do )
 	_3do_slow2_init(machine);
 	_3do_madam_init(machine);
 	_3do_clio_init(machine, downcast<screen_device *>(machine->device("screen")));
+
+	arm_set_endianness( downcast<legacy_cpu_device*>( machine->device("maincpu") ), ENDIANNESS_BIG );
 }
 
 
@@ -158,7 +154,7 @@ static MACHINE_DRIVER_START( 3do )
 	MDRV_DRIVER_DATA( _3do_state )
 
 	/* Basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", ARM6, XTAL_50MHz/4 )
+	MDRV_CPU_ADD( "maincpu", ARM, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem)
 
 	MDRV_MACHINE_RESET( 3do )
@@ -179,7 +175,7 @@ static MACHINE_DRIVER_START( 3do_pal )
 	MDRV_DRIVER_DATA( _3do_state )
 
 	/* Basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM6, XTAL_50MHz/4 )
+	MDRV_CPU_ADD("maincpu", ARM, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem)
 
 	MDRV_MACHINE_RESET( 3do )

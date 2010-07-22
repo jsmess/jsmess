@@ -9,17 +9,17 @@ Reset boot sequence:
 - set up audout register
 - set up brooktree part (03001020)
 - wait 100ms
-- set msysbits register for max memory config
-- set sltime to 178906
-- write 0 to 0 to unmap ram address space
-- do 8 reads to 4 banks memory tyest
-- do cbr to both banks of vram
-- determine ram & vram sizes
+- set msysbits register for max memory config (030002d0)
+- set sltime to 178906 (030002dc)
+- write 0 to 0 to unmap ram address space (030002e4)
+- do 8 reads to 4 banks memory tyest (030002fc)
+- do cbr to both banks of vram (03000320)
+- determine ram & vram sizes (03000330)
 - do initial diagnostics, including test of initial 64kb of ram (0300021c)
 - copy remainder of code to ram at address 0 (030000224)
-- jump to address 0 and continue boot sequence
+- jump to address 0 and continue boot sequence (00000124)
 - do some more memory checks (00000298)
-- init stack pointer to 64k
+- init stack pointer to 64k (00000054)
 - set hdelay to c6
 - do remaining diagnostics
 - set up vdl for 3do logo screen
@@ -28,21 +28,14 @@ Reset boot sequence:
 - transfer operator from rom to 20000
 - transfer dipir from rom to 200
 - transfer filesystem from rom to 28000
-- init stack pointer to 64k
+- init stack pointer to 64k (000000d8)
 - store sherry address to 28 for use by dipir
 - delay for at least 600ms to allow expansion bus to start
 - wait for vcount = 10 and enable clut transfer
 - wait for vcount = 10 and enable video
 - set adbio to disable software controlled muting
 - init registers for entry to sherry
-- jump to sherry
-
-- 00000934 check svf sport interface?
-  000009cc
-
-svf
-6100 - 0110 0001 0000 0000 S = 0, A = 001 0000 0000
-6900 - 0110 1001 0000 0000
+- jump to sherry (00010000)
 
 */
 
@@ -285,7 +278,7 @@ READ32_HANDLER( _3do_svf_r )
 {
 	_3do_state *state = (_3do_state *)space->machine->driver_data;
 	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
-	UINT32 *p = ( addr & 0x200000 ) ? state->vram + ( addr & 0xfffff ) : state->dram + ( addr & 0xfffff );
+	UINT32 *p = state->vram + ( addr & 0x1fffff );
 
 	logerror( "%08X: SVF read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
 
@@ -310,18 +303,21 @@ READ32_HANDLER( _3do_svf_r )
 WRITE32_HANDLER( _3do_svf_w )
 {
 	_3do_state *state = (_3do_state *)space->machine->driver_data;
-	/* Somehow we end up writing to the RAM locations for SPORT. This is probably not correct. Need to investigate the memory config setup routines */
 	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
-	UINT32 *p = ( addr & 0x200000 ) ? state->vram + ( addr & 0xfffff ) : state->dram + ( addr & 0xfffff );
+	UINT32 *p = state->vram + ( addr & 0x1fffff );
 
 	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
 
 	switch( offset & ( 0xe000 / 4 ) )
 	{
 	case 0x0000/4:		/* SPORT transfer */
-		for ( int i = 0; i < 512; i++ )
 		{
-			p[i] = svf.sport[i];
+			UINT32 keep_bits = data ^ 0xffffffff;
+
+			for ( int i = 0; i < 512; i++ )
+			{
+				p[i] = ( p[i] & keep_bits ) | ( svf.sport[i] & data );
+			}
 		}
 		break;
 	case 0x2000/4:		/* Write to color register */
