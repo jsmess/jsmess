@@ -8,7 +8,7 @@
     - no documentation, the entire driver is just a bunch of educated
       guesses ...
 	- BEEP pitch is horrible
-	- 1dd disk support
+	- fix fdc issue with 1dd disks (irq related?)
 
 ****************************************************************************/
 
@@ -25,6 +25,7 @@
 static UINT16 cursor_addr,cursor_raster;
 static UINT8 keyb_press,keyb_press_flag;
 static UINT8 backdrop_pen;
+static UINT8 display_reg;
 
 #define CRTC_MIN_X 10
 #define CRTC_MIN_Y 10
@@ -40,15 +41,20 @@ static VIDEO_UPDATE( smc777 )
 	static UINT8 *vram = memory_region(screen->machine, "vram");
 	static UINT8 *attr = memory_region(screen->machine, "attr");
 	static UINT8 *gram = memory_region(screen->machine, "fbuf");
+	static int x_width;
 
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[backdrop_pen+0x10]);
 
+	x_width = (display_reg & 0x80) ? 80 : 160;
+
 	count = 0x0000;
+
+	/* FIXME: Check width 40 there */
 	for(yi=0;yi<8;yi++)
 	{
 		for(y=0;y<200;y+=8)
 		{
-			for(x=0;x<160;x++)
+			for(x=0;x<x_width;x++)
 			{
 				static UINT16 color;
 
@@ -69,9 +75,11 @@ static VIDEO_UPDATE( smc777 )
 
 	count = 0x0000;
 
+	x_width = (display_reg & 0x80) ? 40 : 80;
+
 	for(y=0;y<25;y++)
 	{
-		for(x=0;x<80;x++)
+		for(x=0;x<x_width;x++)
 		{
 			int tile = vram[count];
 			int color = attr[count] & 7;
@@ -120,7 +128,7 @@ static VIDEO_UPDATE( smc777 )
 				}
 			}
 
-			count++; //TODO: width 40 uses count += 2
+			(display_reg & 0x80) ? count+=2 : count++;
 		}
 	}
 
@@ -360,6 +368,37 @@ static WRITE8_HANDLER( smc777_ramdac_w )
 	}
 }
 
+static READ8_HANDLER( display_reg_r )
+{
+	return display_reg;
+}
+
+static WRITE8_HANDLER( display_reg_w )
+{
+	/*
+	x--- ---- width 80 / 40 switch (0 = 640 x 200 1 = 320 x 200)
+	---- -x-- mode select?
+	*/
+
+	{
+		if((display_reg & 0x80) != (data & 0x80))
+		{
+			rectangle visarea = space->machine->primary_screen->visible_area();
+			int x_width;
+
+			x_width = (data & 0x80) ? 320 : 640;
+
+			visarea.min_x = visarea.min_y = 0;
+			visarea.max_y = (200+(CRTC_MIN_Y*2)) - 1;
+			visarea.max_x = (x_width+(CRTC_MIN_X*2)) - 1;
+
+			space->machine->primary_screen->configure(660, 220, visarea, space->machine->primary_screen->frame_period().attoseconds);
+		}
+	}
+
+	display_reg = data;
+}
+
 static ADDRESS_MAP_START(smc777_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE(smc777_rom_w)
@@ -377,7 +416,7 @@ static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x1c, 0x1c) AM_READWRITE(system_input_r,system_output_w) //status and control data / Printer strobe
 //	AM_RANGE(0x1d, 0x1d) AM_WRITENOP //status and control data / Printer status / strobe
 //	AM_RANGE(0x1e, 0x1f) AM_WRITENOP //RS232C irq control
-//	AM_RANGE(0x20, 0x20) AM_WRITENOP //display mode switching
+	AM_RANGE(0x20, 0x20) AM_READWRITE(display_reg_r,display_reg_w) //display mode switching
 //	AM_RANGE(0x21, 0x21) AM_WRITENOP //60 Hz irq control
 //	AM_RANGE(0x22, 0x22) AM_WRITENOP //printer output data
 	AM_RANGE(0x23, 0x23) AM_WRITE(border_col_w) //border area control
