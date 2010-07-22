@@ -39,6 +39,7 @@ struct d88_tag
 	UINT32 trackoffset[164];
 	UINT8 write_protect;
 	UINT8 disk_type;
+	UINT8 heads;
 };
 
 static struct d88_tag *get_d88_tag(floppy_image *floppy)
@@ -53,7 +54,7 @@ static int d88_get_sector_id(floppy_image *floppy, int head, int track, int sect
 	UINT8 sector_hdr[16];
 	int x;
 
-	offset = tag->trackoffset[(track*2)+head];
+	offset = tag->trackoffset[(track*tag->heads)+head];
 
 	if(offset == 0)
 		return 0;
@@ -80,7 +81,8 @@ static int d88_get_tracks_per_disk(floppy_image *floppy)
 
 static int d88_get_heads_per_disk(floppy_image *floppy)
 {
-	return 2;  // 2 heads
+	struct d88_tag* tag = get_d88_tag(floppy);
+	return tag->heads;
 }
 
 static int d88_get_sectors_per_track(floppy_image *floppy, int head, int track)
@@ -89,7 +91,7 @@ static int d88_get_sectors_per_track(floppy_image *floppy, int head, int track)
 	UINT32 offset;
 	UINT8 sector_hdr[16];
 
-	offset = tag->trackoffset[(track*2)+head];
+	offset = tag->trackoffset[(track*tag->heads)+head];
 
 	floppy_image_read(floppy,sector_hdr,offset,16);
 
@@ -104,7 +106,7 @@ static floperr_t d88_get_sector_length(floppy_image *floppy, int head, int track
 	UINT32 len;
 	int count,secs;
 
-	offset = tag->trackoffset[(track*2)+head];
+	offset = tag->trackoffset[(track*tag->heads)+head];
 
 	floppy_image_read(floppy,sector_hdr,offset,16);
 	secs = sector_hdr[4];
@@ -143,7 +145,7 @@ static UINT32 d88_get_sector_offset(floppy_image* floppy, int head, int track, i
 	int count;
 
 	// get offset of the beginning of the track
-	offset = tag->trackoffset[(track*2)+head];
+	offset = tag->trackoffset[(track*tag->heads)+head];
 
 	floppy_image_read(floppy,sector_hdr,offset,16);
 	secs = sector_hdr[4];
@@ -171,7 +173,7 @@ static floperr_t d88_get_indexed_sector_info(floppy_image *floppy, int head, int
 	UINT8 sector_hdr[16];
 	int x;
 
-	offset = tag->trackoffset[(track*2)+head];
+	offset = tag->trackoffset[(track*tag->heads)+head];
 
 	if(offset == 0)
 		return FLOPPY_ERROR_SEEKERROR;
@@ -277,7 +279,7 @@ static void d88_get_header(floppy_image* floppy,UINT32* size, UINT8* prot, UINT8
 	if(prot)
 		*prot = header[0x1a];
 	if(type)
-		*prot = header[0x1b];
+		*type = header[0x1b];
 	if(size)
 	{
 		s = 0;
@@ -344,6 +346,9 @@ FLOPPY_CONSTRUCT(d88_dsk_construct)
 
 	tag->write_protect = prot;
 	tag->disk_type = type;
+	tag->heads = 2;
+	if (tag->disk_type==0x30 || tag->disk_type==0x40) tag->heads = 1;
+	 
 	tag->image_size = size;
 	for(x=0;x<164;x++)
 		tag->trackoffset[x] = offs[x];
