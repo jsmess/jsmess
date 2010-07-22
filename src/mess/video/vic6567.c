@@ -1014,11 +1014,6 @@ static TIMER_CALLBACK( pal_timer_callback )
 		{
 			vic2->rasterline++;
 
-			if (vic2->rasterline == RASTERLINE)
-			{
-				vic2_set_interrupt(machine, 1, vic2);
-			}
-
 			if (vic2->rasterline == VIC2_FIRST_DMA_LINE)
 				vic2->bad_lines_enabled = SCREENON;
 
@@ -1056,6 +1051,11 @@ static TIMER_CALLBACK( pal_timer_callback )
 			{
 				vic2_set_interrupt(machine, 1, vic2);
 			}
+		}
+
+		if (vic2->rasterline == RASTERLINE)
+		{
+			vic2_set_interrupt(machine, 1, vic2);
 		}
 
 		vic2->graphic_x = VIC2_X_2_EMU(0);
@@ -1571,11 +1571,6 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 		{
 			vic2->rasterline++;
 
-			if (vic2->rasterline == RASTERLINE)
-			{
-				vic2_set_interrupt(machine, 1, vic2);
-			}
-
 			if (vic2->rasterline == VIC2_FIRST_DMA_LINE)
 				vic2->bad_lines_enabled = SCREENON;
 
@@ -1613,6 +1608,11 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 			{
 				vic2_set_interrupt(machine, 1, vic2);
 			}
+		}
+
+		if (vic2->rasterline == RASTERLINE)
+		{
+			vic2_set_interrupt(machine, 1, vic2);
 		}
 
 		vic2->graphic_x = VIC2_X_2_EMU(0);
