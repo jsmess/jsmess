@@ -511,7 +511,7 @@ static TIMER_CALLBACK( wd17xx_data_callback )
 			if (w->command_type == TYPE_II && w->command == FDC_READ_SEC && (w->read_cmd & 0x10))
 			{
 				if (VERBOSE)
-					logerror("wd17xx_data_callback: multi sector read\n")
+					logerror("wd17xx_data_callback: multi sector read\n");
 
 				if (w->sector == 0xff)
 					w->sector = 0x01;
