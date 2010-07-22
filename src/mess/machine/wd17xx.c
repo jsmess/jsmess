@@ -377,6 +377,8 @@ const wd17xx_interface default_wd17xx_interface_2_drives =
 static void wd17xx_complete_command(running_device *device, int delay);
 static void wd17xx_timed_data_request(running_device *device);
 static void wd17xx_index_pulse_callback(running_device *controller, running_device *img, int state);
+static int wd17xx_locate_sector(running_device *device);
+static void wd17xx_timed_read_sector_request(running_device *device);
 
 
 /*****************************************************************************
@@ -472,11 +474,72 @@ static TIMER_CALLBACK( wd17xx_command_callback )
 	}
 }
 
-/* set drq after delay */
+/* write next byte to data register and set drq */
 static TIMER_CALLBACK( wd17xx_data_callback )
 {
 	running_device *device = (running_device *)ptr;
-	wd17xx_set_drq(device);
+	wd1770_state *w = get_safe_token(device);
+
+	/* any bytes remaining? */
+	if (w->data_count >= 1)
+	{
+		/* yes */
+		w->data = w->buffer[w->data_offset++];
+
+		if (VERBOSE_DATA)
+			logerror("wd17xx_data_callback: $%02X (data_count %d)\n", w->data, w->data_count);
+
+		wd17xx_set_drq(device);
+
+		/* any bytes remaining? */
+		if (--w->data_count < 1)
+		{
+			/* no */
+			w->data_offset = 0;
+
+			/* clear ddam type */
+			w->status &=~STA_2_REC_TYPE;
+
+			/* read a sector with ddam set? */
+			if (w->command_type == TYPE_II && w->ddam != 0)
+			{
+				/* set it */
+				w->status |= STA_2_REC_TYPE;
+			}
+
+			/* check if we should handle the next sector for a multi record read */
+			if (w->command_type == TYPE_II && w->command == FDC_READ_SEC && (w->read_cmd & 0x10))
+			{
+				if (VERBOSE)
+					logerror("wd17xx_data_callback: multi sector read\n")
+
+				if (w->sector == 0xff)
+					w->sector = 0x01;
+				else
+					w->sector++;
+
+				wd17xx_timed_read_sector_request(device);
+			}
+			else
+			{
+				/* Delay the INTRQ 3 byte times because we need to read two CRC bytes and
+				   compare them with a calculated CRC */
+				wd17xx_complete_command(device, DELAY_DATADONE);
+
+				if (VERBOSE)
+					logerror("wd17xx_data_callback: data read completed\n");
+			}
+		}
+		else
+		{
+			/* requeue us for more data */
+			timer_adjust_oneshot(w->timer_data, ATTOTIME_IN_USEC(wd17xx_dden(device) ? 128 : 32), 0);
+		}
+	}
+	else
+	{
+		logerror("wd17xx_data_callback: (no new data) $%02X (data_count %d)\n", w->data, w->data_count);
+	}
 }
 
 
@@ -793,10 +856,10 @@ static void wd17xx_read_id(running_device *device)
 		wd17xx_set_busy(device, ATTOTIME_IN_USEC(400));
 		w->busy_count = 0;
 
-		wd17xx_set_drq(device);
-
 		if (VERBOSE)
 			logerror("read id succeeded.\n");
+
+		wd17xx_timed_data_request(device);
 	}
 	else
 	{
@@ -1050,7 +1113,7 @@ static TIMER_CALLBACK( wd17xx_read_sector_callback )
 
 
 /* callback to initiate write sector */
-static TIMER_CALLBACK(wd17xx_write_sector_callback)
+static TIMER_CALLBACK( wd17xx_write_sector_callback )
 {
 	running_device *device = (running_device *)ptr;
 	wd1770_state *w = get_safe_token(device);
@@ -1360,75 +1423,11 @@ READ8_DEVICE_HANDLER( wd17xx_data_r )
 {
 	wd1770_state *w = get_safe_token(device);
 
-	if (w->data_count >= 1)
-	{
-		/* clear data request */
-		wd17xx_clear_drq(device);
+	if (VERBOSE_DATA)
+		logerror("wd17xx_data_r: %02x\n", w->data);
 
-		/* yes */
-		w->data = w->buffer[w->data_offset++];
-
-		if (VERBOSE_DATA)
-			logerror("wd17xx_data_r: $%02X (data_count %d)\n", w->data, w->data_count);
-
-		/* any bytes remaining? */
-		if (--w->data_count < 1)
-		{
-			/* no */
-			w->data_offset = 0;
-
-			/* clear ddam type */
-			w->status &=~STA_2_REC_TYPE;
-			/* read a sector with ddam set? */
-			if (w->command_type == TYPE_II && w->ddam != 0)
-			{
-				/* set it */
-				w->status |= STA_2_REC_TYPE;
-			}
-
-			/* Check we should handle the next sector for a multi record read */
-			if ( w->command_type == TYPE_II && w->command == FDC_READ_SEC && ( w->read_cmd & 0x10 ) ) {
-				w->sector++;
-				if (wd17xx_locate_sector(device))
-				{
-					w->data_count = w->sector_length;
-
-					/* read data */
-					floppy_drive_read_sector_data(w->drive, w->hd, w->sector_data_id, (char *)w->buffer, w->sector_length);
-
-					wd17xx_timed_data_request(device);
-
-					w->status |= STA_2_BUSY;
-					w->busy_count = 0;
-				}
-				else
-				{
-					wd17xx_complete_command(device, DELAY_DATADONE);
-
-					if (VERBOSE)
-						logerror("wd17xx_data_r(): multi data read completed\n");
-				}
-			}
-			else
-			{
-				/* Delay the INTRQ 3 byte times because we need to read two CRC bytes and
-                   compare them with a calculated CRC */
-				wd17xx_complete_command(device, DELAY_DATADONE);
-
-				if (VERBOSE)
-					logerror("wd17xx_data_r(): data read completed\n");
-			}
-		}
-		else
-		{
-			/* issue a timed data request */
-			wd17xx_timed_data_request(device);
-		}
-	}
-	else
-	{
-		logerror("wd17xx_data_r: (no new data) $%02X (data_count %d)\n", w->data, w->data_count);
-	}
+	/* clear data request */
+	wd17xx_clear_drq(device);
 
 	return w->data;
 }
@@ -1975,7 +1974,7 @@ static DEVICE_START( wd1770 )
 	w->intf = (const wd17xx_interface*)device->baseconfig().static_config();
 
 	w->status = STA_1_TRACK0;
-	w->pause_time = 40;
+	w->pause_time = 1000;
     w->complete_command_delay = 12;
 
 	/* allocate timers */
