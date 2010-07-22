@@ -121,7 +121,7 @@ FLOPPY_CONSTRUCT(fdi_dsk_construct);
 		FLOPPY_OPTION( imd, "imd", "IMD floppy disk image",	imd_dsk_identify, imd_dsk_construct, NULL) \
 		FLOPPY_OPTION( cqm, "cqm,dsk", "CopyQM floppy disk image",	cqm_dsk_identify, cqm_dsk_construct, NULL) \
 		FLOPPY_OPTION( dsk, "dsk", "DSK floppy disk image",	dsk_dsk_identify, dsk_dsk_construct, NULL) \
-		FLOPPY_OPTION( d88, "d77,d88", "D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL) \
+		FLOPPY_OPTION( d88, "d77,d88,1dd", "D88 Floppy Disk image", d88_dsk_identify, d88_dsk_construct, NULL) \
 	FLOPPY_OPTIONS_END0
 
 FLOPPY_OPTIONS_EXTERN(default);
