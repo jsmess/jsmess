@@ -243,8 +243,6 @@ static READ8_HANDLER( samcoupe_keyboard_r )
 	/* bit 7, external memory */
 	data |= 1 << 7;
 
-	logerror("data = %02x\n", data);
-
 	return data;
 }
 
