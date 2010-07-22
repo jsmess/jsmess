@@ -8,29 +8,34 @@
     - Understand how keyboard works and decap/dump the keyboard MCU if possible;
     - Hook-up remaining .tap image formats;
     - Implement .rom format support (needs an image for it);
-    - Implement write support for the .d88 based images, later x1turbo games uses it as a copy
-      protection mechanism;
     - Implement tape commands;
     - Sort out / redump the BIOS gfx roms;
     - Implement SIO, they are X1Turbo only features.
     - clean-ups!
     - There are various unclear video things, these are:
         - Understand why some games still doesn't upload the proper PCG index;
-        - Implement PCG reading, used by Maison Ikkoku, Mule and Gyajiko for kanji reading.
-          Is there a way to select which ROM to use?
         - Implement the remaining scrn regs;
         - Interlace mode?
         - Implement the new features of the x1turbo, namely the 4096 color feature amongst other
           things
         - (anything else?)
 
-    per-game specific TODO:
+    per-game/program specific TODO:
     - Bosconian: title screen background is completely white because it reverts the pen used
       (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
       a btanb;
     - Mappy/Gradius: they sets 320x200 with fps = 30 Hz, due of that they are too slow (they must run at 60 Hz),
       HW limitation/MC6845 bug?
     - Exoa II - Warroid: major tile width/height positioning bugs (especially during gameplay);
+	- Hydlide 2 / 3: can't get the user disk to work properly
+	- Gruppe: shows a random bitmap graphic then returns "program load error"
+	- Sorcerian / Ys 3 / Psy-O-Blade (and others): they all fails tight loops with the fdc ready bit check
+	- Turbo Alpha: has z80dma / fdc bugs, doesn't show the presentation properly and then hangs;
+	- Legend of Kage: has serious graphic artifacts, pcg doesn't scroll properly, bitmap-based sprites aren't shown properly, dma bugs?
+	- "newtype": dies with a z80dma assert;
+	- Ys 2: fills the screen with "syntax errors"
+	- Thexder: Can't start a play, keyboard related issue?
+	- V.I.P.: can't get inputs to work at all there;
 
     Notes:
     - An interesting feature of the Sharp X-1 is the extended i/o bank. When the ppi port c bit 5
