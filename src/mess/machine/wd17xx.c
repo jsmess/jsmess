@@ -853,11 +853,9 @@ static void wd17xx_read_id(running_device *device)
 		w->buffer[5] = crc & 255;
 
 		w->sector = id.C;
-		wd17xx_set_busy(device, ATTOTIME_IN_USEC(400));
-		w->busy_count = 0;
 
 		if (VERBOSE)
-			logerror("read id succeeded.\n");
+			logerror("wd17xx_read_id: read id succeeded.\n");
 
 		wd17xx_timed_data_request(device);
 	}
@@ -867,7 +865,7 @@ static void wd17xx_read_id(running_device *device)
 		w->status |= STA_2_REC_N_FND;
 		//w->sector = w->track;
 		if (VERBOSE)
-			logerror("read id failed\n");
+			logerror("wd17xx_read_id: read id failed\n");
 
 		wd17xx_complete_command(device, DELAY_ERROR);
 	}
@@ -1611,6 +1609,8 @@ WRITE8_DEVICE_HANDLER( wd17xx_command_w )
 
 			w->command_type = TYPE_III;
 			w->status &= ~STA_2_LOST_DAT;
+			w->status |= STA_2_BUSY;
+
 			wd17xx_clear_drq(device);
 
 			if (floppy_drive_get_flag_state(w->drive, FLOPPY_DRIVE_READY))
