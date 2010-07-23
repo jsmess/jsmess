@@ -205,7 +205,6 @@ static const floppy_config kayproii_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(kayproii),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 static const floppy_config kaypro2x_floppy_config =
@@ -217,7 +216,6 @@ static const floppy_config kaypro2x_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(kaypro2x),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

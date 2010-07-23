@@ -86,7 +86,6 @@ struct _floppy_drive
 	int track;
 	void (*load_proc)(device_image_interface &image);
 	void (*unload_proc)(device_image_interface &image);
-	int (*tracktranslate_proc)(running_device *image, floppy_image *floppy, int physical_track);
 	void *custom_data;
 	int floppy_drive_type;
 };
@@ -143,19 +142,6 @@ void flopimg_alloc_custom_data(running_device *image,void *custom)
 {
 	floppy_drive *flopimg = get_safe_token( image );
 	flopimg->custom_data = custom;
-}
-
-static void flopimg_seek_callback(running_device *image, int physical_track)
-{
-	floppy_drive *flopimg = get_safe_token( image );
-	if (!flopimg || !flopimg->floppy)
-		return;
-
-	/* translate the track number if necessary */
-	if (flopimg->tracktranslate_proc)
-		physical_track = flopimg->tracktranslate_proc(image, flopimg->floppy, physical_track);
-
-	flopimg->track = physical_track;
 }
 
 static int flopimg_get_sectors_per_track(running_device *image, int side)
@@ -423,10 +409,10 @@ void floppy_drive_seek(running_device *img, signed int signed_tracks)
 	//devcb_call_write_line(&flopimg->out_dskchg_func, flopimg->dskchg);
 
 	/* inform disk image of step operation so it can cache information */
-	if (image->exists())
-		flopimg_seek_callback(img, pDrive->current_track);
+	if (image->exists()) 
+		pDrive->track = pDrive->current_track;
 
-        pDrive->id_index = 0;
+	pDrive->id_index = 0;
 }
 
 
@@ -556,12 +542,6 @@ void floppy_install_unload_proc(running_device *image, void (*proc)(device_image
 	flopimg->unload_proc = proc;
 }
 
-void floppy_install_tracktranslate_proc(running_device *image, int (*proc)(running_device *image, floppy_image *floppy, int physical_track))
-{
-	floppy_drive *flopimg = get_safe_token( image );
-	flopimg->tracktranslate_proc = proc;
-}
-
 /* set the callback for the index pulse */
 void floppy_drive_set_index_pulse_callback(running_device *img, void (*callback)(running_device *controller,running_device *image, int state))
 {
@@ -673,7 +653,7 @@ static int internal_floppy_device_load(device_image_interface *image, int create
 		if (err)
 			goto error;
 	}
-	if (((floppy_config*)image->device().baseconfig().static_config())->keep_drive_geometry==DO_NOT_KEEP_GEOMETRY && floppy_callbacks(flopimg->floppy)->get_heads_per_disk && floppy_callbacks(flopimg->floppy)->get_tracks_per_disk)
+	if (floppy_callbacks(flopimg->floppy)->get_heads_per_disk && floppy_callbacks(flopimg->floppy)->get_tracks_per_disk)
 	{
 		floppy_drive_set_geometry_absolute(&image->device(),
 			floppy_get_tracks_per_disk(flopimg->floppy),
@@ -759,17 +739,6 @@ running_device *floppy_get_device(running_machine *machine,int drive)
 		case 1 : return machine->device(FLOPPY_1);
 		case 2 : return machine->device(FLOPPY_2);
 		case 3 : return machine->device(FLOPPY_3);
-	}
-	return NULL;
-}
-
-running_device *floppy_get_device_owner(running_device *device,int drive)
-{
-	switch(drive) {
-		case 0 : return device->owner()->subdevice(FLOPPY_0);
-		case 1 : return device->owner()->subdevice(FLOPPY_1);
-		case 2 : return device->owner()->subdevice(FLOPPY_2);
-		case 3 : return device->owner()->subdevice(FLOPPY_3);
 	}
 	return NULL;
 }

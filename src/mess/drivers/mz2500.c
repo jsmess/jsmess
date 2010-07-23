@@ -356,7 +356,6 @@ static const floppy_config mz2500_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(default),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

@@ -24,12 +24,6 @@ typedef enum
 	FLOPPY_DRIVE_DS_80
 } floppy_type_t;
 
-typedef enum
-{
-	DO_NOT_KEEP_GEOMETRY=0,
-	KEEP_GEOMETRY
-} keep_geometry;
-
 typedef struct floppy_config_t	floppy_config;
 struct floppy_config_t
 {
@@ -42,7 +36,6 @@ struct floppy_config_t
 
 	floppy_type_t floppy_type;
 	const struct FloppyFormat *formats;
-	keep_geometry keep_drive_geometry;
 	const char *interface;
 };
 
@@ -113,11 +106,7 @@ void floppy_install_unload_proc(running_device *image, void (*proc)(device_image
 
 void floppy_install_load_proc(running_device *image, void (*proc)(device_image_interface &image));
 
-/* hack for TI99; replace this when we think of something better */
-void floppy_install_tracktranslate_proc(running_device *image, int (*proc)(running_device *image, floppy_image *floppy, int physical_track));
-
 running_device *floppy_get_device(running_machine *machine,int drive);
-running_device *floppy_get_device_owner(running_device *device,int drive);
 running_device *floppy_get_device_by_type(running_machine *machine,int ftype,int drive);
 int floppy_get_drive_type(running_device *image);
 void floppy_set_type(running_device *image,int ftype);

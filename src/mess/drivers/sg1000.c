@@ -785,7 +785,6 @@ static const floppy_config sf7000_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(sf7000),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

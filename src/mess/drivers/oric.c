@@ -370,7 +370,6 @@ static const floppy_config oric1_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(oric),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 
@@ -383,7 +382,6 @@ static const floppy_config prav8d_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
     FLOPPY_OPTIONS_NAME(apple2),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

@@ -314,7 +314,6 @@ static const floppy_config tmc2000e_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(tmc2000e),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

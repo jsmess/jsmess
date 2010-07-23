@@ -739,7 +739,6 @@ static const floppy_config bw12_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_80,
 	FLOPPY_OPTIONS_NAME(bw12),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 
@@ -786,7 +785,6 @@ static const floppy_config bw14_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(bw14),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

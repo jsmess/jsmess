@@ -214,7 +214,6 @@ static const floppy_config ti990_4_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(fd800),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

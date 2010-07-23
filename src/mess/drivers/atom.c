@@ -626,7 +626,6 @@ static const floppy_config atom_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_40,
 	FLOPPY_OPTIONS_NAME(atom),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

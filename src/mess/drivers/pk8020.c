@@ -166,7 +166,6 @@ static const floppy_config pk8020_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(pk8020),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

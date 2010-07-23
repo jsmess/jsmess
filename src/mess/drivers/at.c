@@ -477,7 +477,6 @@ static const floppy_config ibmat_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(pc),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

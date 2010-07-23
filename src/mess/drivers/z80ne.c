@@ -446,7 +446,6 @@ static const floppy_config z80netf_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(z80ne),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

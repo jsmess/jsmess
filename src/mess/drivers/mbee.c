@@ -401,7 +401,6 @@ static const floppy_config mbee_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(mbee),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

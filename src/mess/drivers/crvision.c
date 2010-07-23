@@ -851,7 +851,6 @@ static const floppy_config lasr2001_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_80,
 	FLOPPY_OPTIONS_NAME(default),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

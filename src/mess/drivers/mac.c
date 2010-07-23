@@ -654,7 +654,6 @@ static const floppy_config mac128512_floppy_config = //SONY_FLOPPY_ALLOW400K
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(apple35_mac),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 
@@ -668,7 +667,6 @@ static const floppy_config mac_floppy_config = //SONY_FLOPPY_ALLOW400K | SONY_FL
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(apple35_mac),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

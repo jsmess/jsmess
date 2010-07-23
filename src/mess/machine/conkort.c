@@ -811,7 +811,6 @@ static const floppy_config abc800_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_DS_80,
 	FLOPPY_OPTIONS_NAME(abc80),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 

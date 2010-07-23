@@ -1029,7 +1029,6 @@ static const floppy_config c1541_floppy_config =
 	DEVCB_NULL,
 	FLOPPY_DRIVE_SS_80,
 	FLOPPY_OPTIONS_NAME(c1541),
-	DO_NOT_KEEP_GEOMETRY,
 	NULL
 };
 
