@@ -105,6 +105,14 @@ static WRITE_LINE_DEVICE_HANDLER( atarist_fdc_drq_w )
 
 static const wd17xx_interface fdc_intf =
 {
+	DEVCB_LINE_GND,
+	DEVCB_LINE(atarist_fdc_intrq_w),
+	DEVCB_LINE(atarist_fdc_drq_w),
+	{ FLOPPY_0, FLOPPY_1, NULL, NULL }
+};
+
+static const wd17xx_interface stbook_fdc_intf =
+{
 	DEVCB_NULL,
 	DEVCB_LINE(atarist_fdc_intrq_w),
 	DEVCB_LINE(atarist_fdc_drq_w),
@@ -1699,7 +1707,8 @@ static WRITE8_DEVICE_HANDLER( stbook_ym2149_port_a_w )
 	centronics_strobe_w(state->centronics, BIT(data, 5));
 
 	// 0x40 = IDE RESET
-	// 0x80 = FDD_DENSE_SEL
+
+	wd17xx_dden_w(state->wd1772, BIT(data, 7));
 }
 
 static const ay8910_interface stbook_psg_intf =
@@ -2019,7 +2028,7 @@ static MACHINE_DRIVER_START( stbook )
 	MDRV_ACIA6850_ADD(MC6850_0_TAG, stbook_acia_ikbd_intf)
 	MDRV_ACIA6850_ADD(MC6850_1_TAG, acia_midi_intf)
 
-	MDRV_WD1772_ADD(WD1772_TAG, fdc_intf )
+	MDRV_WD1772_ADD(WD1772_TAG, stbook_fdc_intf )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(atarist_floppy_config)
 
