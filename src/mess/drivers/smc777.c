@@ -260,6 +260,8 @@ static READ8_HANDLER( smc777_fdc_r )
 		case 0x33:
 			return wd17xx_data_r(dev,offset);
 		case 0x34: //irq / drq status
+			popmessage("%02x %02x\n",fdc_irq_flag,fdc_drq_flag);
+
 			return (fdc_irq_flag ? 0x80 : 0x00) | (fdc_drq_flag ? 0x00 : 0x40);
 	}
 
@@ -600,6 +602,11 @@ static MACHINE_START(smc777)
 
 static MACHINE_RESET(smc777)
 {
+	static UINT8 *rom = memory_region(machine, "bios");
+	int i;
+
+	for(i=0;i<0x4000;i++)
+		smc777_wram[i] = rom[i];
 }
 
 static const gfx_layout smc777_charlayout =
