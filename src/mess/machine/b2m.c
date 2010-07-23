@@ -226,6 +226,7 @@ static WRITE8_DEVICE_HANDLER (b2m_ext_8255_portc_w )
 		floppy_drive_set_ready_state(floppy_get_device(device->machine, 1), 1, 1);
 		state->b2m_side = side;
 	}
+	wd17xx_dden_w(state->fdc, 0);
 }
 
 I8255A_INTERFACE( b2m_ppi8255_interface_2 )
