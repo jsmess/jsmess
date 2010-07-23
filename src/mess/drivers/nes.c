@@ -514,7 +514,8 @@ static MACHINE_DRIVER_START( nespal )
 	MDRV_IMPORT_FROM( nes )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", N2A03, PAL_CLOCK)
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_CLOCK( PAL_CLOCK )
 
 	MDRV_DEVICE_REMOVE( "ppu" )
 	MDRV_PPU2C07_ADD( "ppu", nes_ppu_interface )
@@ -535,7 +536,8 @@ static MACHINE_DRIVER_START( dendy )
 	MDRV_IMPORT_FROM( nes )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", N2A03, 26601712/15) /* 26.601712MHz / 15 == 1.77344746666... MHz */
+	MDRV_CPU_MODIFY( "maincpu" )
+	MDRV_CPU_CLOCK( 26601712/15 ) /* 26.601712MHz / 15 == 1.77344746666... MHz */
 
 	MDRV_DEVICE_REMOVE( "ppu" )
 	MDRV_PPU2C07_ADD( "ppu", nes_ppu_interface )
