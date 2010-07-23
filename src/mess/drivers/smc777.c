@@ -602,11 +602,7 @@ static MACHINE_START(smc777)
 
 static MACHINE_RESET(smc777)
 {
-	static UINT8 *rom = memory_region(machine, "bios");
-	int i;
 
-	for(i=0;i<0x4000;i++)
-		smc777_wram[i] = rom[i];
 }
 
 static const gfx_layout smc777_charlayout =
