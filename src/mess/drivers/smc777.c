@@ -26,6 +26,7 @@ static UINT16 cursor_addr,cursor_raster;
 static UINT8 keyb_press,keyb_press_flag;
 static UINT8 backdrop_pen;
 static UINT8 display_reg;
+static UINT8 *smc777_wram;
 
 #define CRTC_MIN_X 10
 #define CRTC_MIN_Y 10
@@ -298,18 +299,12 @@ static WRITE8_HANDLER( smc777_fdc_w )
 static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_intrq_w )
 {
 	fdc_irq_flag = state;
+//	cputag_set_input_line(device->machine, "maincpu", 0, (state) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( smc777_fdc_drq_w )
 {
 	fdc_drq_flag = state;
-}
-
-static WRITE8_HANDLER( smc777_rom_w )
-{
-	static UINT8 *rom = memory_region(space->machine, "maincpu");
-
-	rom[offset] = data;
 }
 
 
@@ -401,8 +396,7 @@ static WRITE8_HANDLER( display_reg_w )
 
 static ADDRESS_MAP_START(smc777_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITE(smc777_rom_w)
-	AM_RANGE(0x4000, 0xffff) AM_RAM
+	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE(&smc777_wram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( smc777_io , ADDRESS_SPACE_IO, 8)
@@ -593,6 +587,12 @@ static TIMER_CALLBACK( keyboard_callback )
 
 static MACHINE_START(smc777)
 {
+	static UINT8 *rom = memory_region(machine, "bios");
+	int i;
+
+	for(i=0;i<0x4000;i++)
+		smc777_wram[i] = rom[i];
+
 	timer_pulse(machine, ATTOTIME_IN_HZ(240/32), NULL, 0, keyboard_callback);
 	beep_set_frequency(machine->device("beeper"),300); //guesswork
 	beep_set_state(machine->device("beeper"),0);
@@ -666,13 +666,6 @@ static FLOPPY_OPTIONS_START( smc777 )
 		SECTORS([16])
 		SECTOR_LENGTH([256])
 		FIRST_SECTOR_ID([1]))
-	/* TODO */
-	FLOPPY_OPTION( img, "1dd", "SMC777 disk image", basicdsk_identify_default, basicdsk_construct_default,
-		HEADS([2])
-		TRACKS([64])
-		SECTORS([16])
-		SECTOR_LENGTH([128])
-		FIRST_SECTOR_ID([1]))
 FLOPPY_OPTIONS_END
 
 static const floppy_config smc777_floppy_config =
@@ -713,7 +706,7 @@ static MACHINE_DRIVER_START( smc777 )
     MDRV_VIDEO_START(smc777)
     MDRV_VIDEO_UPDATE(smc777)
 
-	MDRV_MB8877_ADD("fdc",smc777_mb8876_interface)
+	MDRV_WD179X_ADD("fdc",smc777_mb8876_interface)
 	MDRV_FLOPPY_2_DRIVES_ADD(smc777_floppy_config)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -728,6 +721,8 @@ MACHINE_DRIVER_END
 /* ROM definition */
 ROM_START( smc777 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+
+    ROM_REGION( 0x10000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD( "smcrom.dat", 0x0000, 0x4000, CRC(b2520d31) SHA1(3c24b742c38bbaac85c0409652ba36e20f4687a1))
 
     ROM_REGION( 0x800, "vram", ROMREGION_ERASE00 )
