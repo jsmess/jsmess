@@ -252,8 +252,6 @@ const struct pit8253_config specimx_pit8253_intf =
 
 MACHINE_START( specimx )
 {
-	running_device *fdc = machine->device("wd1793");
-	wd17xx_dden_w(fdc, ASSERT_LINE);
 }
 
 static TIMER_CALLBACK( setup_pit8253_gates )
@@ -270,7 +268,9 @@ MACHINE_RESET( specimx )
 	specimx_set_bank(machine, 2,0x00); // Initiali load ROM disk
 	specimx_color = 0x70;
 	timer_set(machine,  attotime_zero, NULL, 0, setup_pit8253_gates );
-	wd17xx_set_pause_time(machine->device("wd1793"),12);
+	running_device *fdc = machine->device("wd1793");
+	wd17xx_set_pause_time(fdc,12);	
+	wd17xx_dden_w(fdc, 0);
 }
 
 READ8_HANDLER ( specimx_disk_ctrl_r )
