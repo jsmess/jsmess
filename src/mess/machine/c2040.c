@@ -1230,7 +1230,7 @@ static const floppy_config c2040_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_80,
+	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(c2040),
 	NULL
 };
@@ -1246,7 +1246,7 @@ static const floppy_config c4040_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_80,
+	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(c4040),
 	NULL
 };
@@ -1262,7 +1262,7 @@ static const floppy_config c8050_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_80,
+	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(c8050),
 	NULL
 };
@@ -1278,7 +1278,7 @@ static const floppy_config c8250_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(c8250),
 	NULL
 };

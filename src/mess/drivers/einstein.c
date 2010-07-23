@@ -414,14 +414,16 @@ static MACHINE_RESET( einstein )
 	einstein->ctc_trigger = 0;
 
 	/* configure floppy drives */
+	floppy_type type_80 = FLOPPY_STANDARD_5_25_DSHD;
+	floppy_type type_40 = FLOPPY_STANDARD_5_25_SSDD_40;
 	floppy = machine->device("floppy0");
-	floppy_drive_set_geometry(floppy, config & 0x01 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(floppy, config & 0x01 ? type_80 : type_40);
 	floppy = machine->device("floppy1");
-	floppy_drive_set_geometry(floppy, config & 0x02 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(floppy, config & 0x02 ? type_80 : type_40);
 	floppy = machine->device("floppy2");
-	floppy_drive_set_geometry(floppy, config & 0x04 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(floppy, config & 0x04 ? type_80 : type_40);
 	floppy = machine->device("floppy3");
-	floppy_drive_set_geometry(floppy, config & 0x08 ? FLOPPY_DRIVE_DS_80 : FLOPPY_DRIVE_SS_40);
+	floppy_drive_set_geometry(floppy, config & 0x08 ? type_80 : type_40);
 }
 
 static MACHINE_RESET( einstein2 )
@@ -719,7 +721,7 @@ static const floppy_config einstein_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_40,
+	FLOPPY_STANDARD_5_25_SSDD_40,
 	FLOPPY_OPTIONS_NAME(default),
 	NULL
 };

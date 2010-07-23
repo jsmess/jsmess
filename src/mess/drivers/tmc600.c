@@ -316,7 +316,7 @@ static const floppy_config tmc600_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(tmc600),
 	NULL
 };

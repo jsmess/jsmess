@@ -12,17 +12,38 @@
 #define FLOPPY_TYPE_APPLE	1
 #define FLOPPY_TYPE_SONY	2
 
+#define FLOPPY_DRIVE_2_8_INCH	1
+#define FLOPPY_DRIVE_3_INCH	 	2
+#define FLOPPY_DRIVE_3_5_INCH	3
+#define FLOPPY_DRIVE_5_25_INCH	4
+#define FLOPPY_DRIVE_8_INCH		5
+
+// Maximum supoprted density
+#define FLOPPY_DRIVE_SD 1
+#define FLOPPY_DRIVE_DD 2
+#define FLOPPY_DRIVE_QD 3
+#define FLOPPY_DRIVE_HD 4
+#define FLOPPY_DRIVE_ED 5
+
+#define FLOPPY_STANDARD_3_5_DSHD     { FLOPPY_DRIVE_3_5_INCH,  2, 83, FLOPPY_DRIVE_HD }
+#define FLOPPY_STANDARD_5_25_DSHD    { FLOPPY_DRIVE_5_25_INCH, 2, 83, FLOPPY_DRIVE_HD }
+#define FLOPPY_STANDARD_5_25_SSDD    { FLOPPY_DRIVE_5_25_INCH, 1, 83, FLOPPY_DRIVE_DD }
+#define FLOPPY_STANDARD_3_SSDD       { FLOPPY_DRIVE_3_INCH,    1, 42, FLOPPY_DRIVE_DD }
+#define FLOPPY_STANDARD_3_DSDD       { FLOPPY_DRIVE_3_INCH,    2, 42, FLOPPY_DRIVE_DD }
+#define FLOPPY_STANDARD_5_25_DSDD_40 { FLOPPY_DRIVE_5_25_INCH, 2, 42, FLOPPY_DRIVE_DD }
+#define FLOPPY_STANDARD_5_25_SSDD_40 { FLOPPY_DRIVE_5_25_INCH, 1, 42, FLOPPY_DRIVE_DD }
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
-/* floppy drive types */
-typedef enum
+typedef struct floppy_type_t	floppy_type;
+struct floppy_type_t
 {
-	FLOPPY_DRIVE_SS_40,
-	FLOPPY_DRIVE_DS_40,
-	FLOPPY_DRIVE_SS_80,
-	FLOPPY_DRIVE_DS_80
-} floppy_type_t;
+	UINT8 media_size;
+	UINT8 head_number;
+	UINT8 max_track_number;
+	UINT8 max_density;
+};
 
 typedef struct floppy_config_t	floppy_config;
 struct floppy_config_t

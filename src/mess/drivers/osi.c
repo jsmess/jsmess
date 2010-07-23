@@ -750,7 +750,7 @@ static const floppy_config osi_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_40,
+	FLOPPY_STANDARD_5_25_SSDD_40,
 	FLOPPY_OPTIONS_NAME(osi),
 	NULL
 };

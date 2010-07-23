@@ -830,7 +830,7 @@ static const floppy_config amiga_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_STANDARD_3_5_DSHD,
 	FLOPPY_OPTIONS_NAME(amiga_only),
 	NULL
 };

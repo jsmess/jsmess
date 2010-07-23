@@ -200,34 +200,7 @@ static void floppy_drive_set_geometry_absolute(running_device *img, int tracks, 
 
 void floppy_drive_set_geometry(running_device *img, floppy_type_t type)
 {
-	int max_track, num_sides;
-
-	switch (type) {
-	case FLOPPY_DRIVE_SS_40:	/* single sided, 40 track drive e.g. Amstrad CPC internal 3" drive */
-		max_track = 42;
-		num_sides = 1;
-		break;
-
-	case FLOPPY_DRIVE_DS_40:	/* double sided, 40 track drive */
-		max_track = 42;
-		num_sides = 2;
-		break;
-
-	case FLOPPY_DRIVE_SS_80:	/* single sided, 80 track drive */
-		max_track = 83;
-		num_sides = 1;
-		break;
-
-	case FLOPPY_DRIVE_DS_80:	/* double sided, 80 track drive */
-		max_track = 83;
-		num_sides = 2;
-		break;
-
-	default:
-		assert(0);
-		return;
-	}
-	floppy_drive_set_geometry_absolute(img, max_track, num_sides);
+	floppy_drive_set_geometry_absolute(img, type.max_track_number, type.head_number);
 }
 
 static TIMER_CALLBACK(floppy_drive_index_callback);

@@ -203,7 +203,8 @@ void ti99_fdc_reset(running_machine *machine)
 
 	ti99_set_80_track_drives(FALSE);
 
-	set_all_geometries(machine, FLOPPY_DRIVE_DS_40);
+	floppy_type_t flop = FLOPPY_STANDARD_5_25_DSDD_40;
+	set_all_geometries(machine, flop);
 
 	ti99_peb_set_card_handlers(expansion_box, 0x1100, &fdc_handlers);
 	if (fdc) {
@@ -397,7 +398,8 @@ void ti99_ccfdc_reset(running_machine *machine)
 
 	ti99_set_80_track_drives(FALSE);
 
-	set_all_geometries(machine, FLOPPY_DRIVE_DS_40);
+	floppy_type_t flop = FLOPPY_STANDARD_5_25_DSDD_40;
+	set_all_geometries(machine, flop);
 
 	ti99_peb_set_card_handlers(expansion_box, 0x1100, &ccfdc_handlers);
 
@@ -619,7 +621,8 @@ void ti99_bwg_reset(running_machine *machine)
 
 	ti99_set_80_track_drives(FALSE);
 
-	set_all_geometries(machine, FLOPPY_DRIVE_DS_40);
+	floppy_type_t flop = FLOPPY_STANDARD_5_25_DSDD_40;
+	set_all_geometries(machine, flop);
 
 	ti99_peb_set_card_handlers(expansion_box, 0x1100, & bwg_handlers);
 
@@ -1173,7 +1176,8 @@ void ti99_hfdc_reset(running_machine *machine)
 
 	smc92x4_set_timing(device, input_port_read(machine, "DRVSPD"));
 
-	set_all_geometries(machine, FLOPPY_DRIVE_DS_80);
+	floppy_type_t flop = FLOPPY_STANDARD_5_25_DSHD;
+	set_all_geometries(machine, flop);
 
 	/* Connect floppy drives to controller. Note that *this* is the
        controller, not the controller chip. The pcb contains a select

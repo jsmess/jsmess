@@ -737,7 +737,7 @@ static const floppy_config bw12_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_80,
+	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(bw12),
 	NULL
 };
@@ -783,7 +783,7 @@ static const floppy_config bw14_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(bw14),
 	NULL
 };

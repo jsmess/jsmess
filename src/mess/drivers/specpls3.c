@@ -385,7 +385,7 @@ static const floppy_config specpls3_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_40,
+	FLOPPY_STANDARD_3_SSDD,
 	FLOPPY_OPTIONS_NAME(default),
 	NULL
 };

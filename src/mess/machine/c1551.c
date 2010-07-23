@@ -663,7 +663,7 @@ static const floppy_config c1551_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_80,
+	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(c1551),
 	NULL
 };

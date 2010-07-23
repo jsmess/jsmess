@@ -834,7 +834,7 @@ static const floppy_config c1570_floppy_config =
 	DEVCB_NULL,
 	DEVCB_LINE(wpt_w),
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_80,
+	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(c1571),
 	NULL
 };
@@ -850,7 +850,7 @@ static const floppy_config c1571_floppy_config =
 	DEVCB_NULL,
 	DEVCB_LINE(wpt_w),
 	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_STANDARD_5_25_DSHD,
 	FLOPPY_OPTIONS_NAME(c1571),
 	NULL
 };

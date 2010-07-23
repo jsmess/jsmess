@@ -675,7 +675,7 @@ static const floppy_config smc777_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_SS_80,
+	FLOPPY_STANDARD_5_25_SSDD,
 	FLOPPY_OPTIONS_NAME(smc777),
 	NULL
 };

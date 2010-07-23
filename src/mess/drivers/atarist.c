@@ -1825,7 +1825,7 @@ static const floppy_config atarist_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_DRIVE_DS_80,
+	FLOPPY_STANDARD_3_5_DSHD,
 	FLOPPY_OPTIONS_NAME(atarist),
 	NULL
 };
