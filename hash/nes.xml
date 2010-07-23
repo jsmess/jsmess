@@ -33994,7 +33994,7 @@
 				<rom size="16384" offset="4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="" size="8192" crc="e698cc99" sha1="16a152a1e81328c8c66d9c5781d102b018bb6c36" offset="00000" />
+				<rom name="0.chr" size="8192" crc="e698cc99" sha1="16a152a1e81328c8c66d9c5781d102b018bb6c36" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -34011,7 +34011,7 @@
 				<rom size="16384" offset="4000" loadflag="reload" />
 			</dataarea>
 			<dataarea name="chr" size="8192">
-				<rom name="" size="8192" crc="e698cc99" sha1="16a152a1e81328c8c66d9c5781d102b018bb6c36" offset="00000" />
+				<rom name="0.chr" size="8192" crc="e698cc99" sha1="16a152a1e81328c8c66d9c5781d102b018bb6c36" offset="00000" />
 			</dataarea>
 		</part>
 	</software>
