@@ -456,6 +456,15 @@ static void install_protection(device_image_interface& image)
 		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x0f);
 		logerror("Decrypted Samurai Shodown V code, sound and graphics.\n");
 	}
+	if(strcmp(crypt_feature,"kof2000_crypt") == 0)
+	{
+		kof2000_decrypt_68k(image.device().machine);
+		state->fixed_layer_bank_type = 2;
+		neogeo_cmc50_m1_decrypt(image.device().machine);
+		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x00);
+		kof2000_install_protection(image.device().machine);
+		logerror("Decrypted KOF2000 code, sound and graphics.\n");
+	}
 	if(strcmp(crypt_feature,"kof2001_crypt") == 0)
 	{
 		state->fixed_layer_bank_type = 1;
@@ -498,6 +507,14 @@ static void install_protection(device_image_interface& image)
 		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x9d);
 		install_pvc_protection(image.device().machine);
 		logerror("Decrypted KOF2003 code and graphicss, and installed protection routines.\n");
+	}
+	if(strcmp(crypt_feature,"samsho5s_crypt") == 0)
+	{
+		samsh5sp_decrypt_68k(image.device().machine);
+		neo_pcm2_swap(image.device().machine, 6);
+		state->fixed_layer_bank_type = 1;
+		neogeo_cmc50_m1_decrypt(image.device().machine);
+		kof2000_neogeo_gfx_decrypt(image.device().machine, 0x0d);
 	}
 }
 

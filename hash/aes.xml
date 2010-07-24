@@ -482,6 +482,35 @@
 		</part>
 	</software>
 
+<!-- ID 031 -->
+	<software name="socbrawl">
+		<description>Soccer Brawl</description>
+		<year>1991</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="031-p1.bin" size="524288" crc="a2801c24" sha1="627d76ff0740ca29586f37b268f47fb469822529" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="031-s1.bin" size="131072" crc="4c117174" sha1="26e52c4f628338a9aa1c159517cdf873f738fb98" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+				<rom name="031-m1.bin" size="131072" crc="cb37427c" sha1="99efe9600ebeda48331f396e3203c7588bdb7d24" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+				<rom name="031-v1.bin" size="1048576" crc="cc78497e" sha1="895bd647150fae9b2259ef043ed681f4c4de66ea" offset="000000" />
+				<rom name="031-v2.bin" size="1048576" crc="dda043c6" sha1="08165a59700ab6b1e523079dd2a3549e520cc594" offset="100000" />
+			</dataarea>
+			<dataarea name="sprites" size="3145728">
+				<rom name="031-c1.bin" size="1048576" crc="bd0a4eb8" sha1="b67988cb3e550d083e81c9bd436da55b242785ed" offset="000000" loadflag="load16_byte" />
+				<rom name="031-c2.bin" size="1048576" crc="efde5382" sha1="e42789c8d87ee3d4549d0a903e990c03338cbbd8" offset="000001" loadflag="load16_byte" />
+				<rom name="031-c3.bin" size="524288" crc="580f7f33" sha1="f4f95a7c8de00e1366a723fc4cd0e8c1905af636" offset="200000" loadflag="load16_byte" />
+				<rom name="031-c4.bin" size="524288" crc="ed297de8" sha1="616f8fa4c86231f3e79faf9f69f8bb909cbc35f0" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 034 -->
 	<software name="fbfrenzy">
 		<description>Football Frenzy</description>
@@ -709,6 +738,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 <!-- ID 053 -->
 	<software name="wh1">
 		<description>World Heroes</description>
@@ -740,6 +770,176 @@
 			</dataarea>
 		</part>
 	</software>
+
+<!-- ID 055 -->
+	<software name="kof94">
+		<description>The King of Fighters '94</description>
+		<year>1994</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="2097152">
+                <rom name="055-pg1.bin" size="1048576" crc="f10a2042" sha1="d08a3f3c28be4b1793de7d362456281329fe1828" offset="100000" />
+                <rom size="1048576" offset="000000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="055-s1.bin" size="131072" crc="825976c1" sha1="cb6a70bdd95d449d25196ca269b621c362db6743" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="055-m1.bin" size="131072" crc="f6e77cf5" sha1="292a3e3a4918ffe72bd1c41acb927b91844e035e" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="6291456">
+                <rom name="055-v1.bin" size="2097152" crc="8889596d" sha1="c9ce713b720511438dbd3fe3bcc7c246f475c6a2" offset="000000" />
+                <rom name="055-v2.bin" size="2097152" crc="25022b27" sha1="2b040a831c3c92ac6e4719de38009a0d55b64f6b" offset="200000" />
+                <rom name="055-v3.bin" size="2097152" crc="83cf32c0" sha1="34a31a37eb10945b5169e96321bcea06eec33a00" offset="400000" />
+			</dataarea>
+			<dataarea name="sprites" size="16777216">
+                <rom name="055-c1.bin" size="2097152" crc="b96ef460" sha1="e52f5303c17b50ce165c008be2837336369c110b" offset="000000" loadflag="load16_byte" />
+                <rom name="055-c2.bin" size="2097152" crc="15e096a7" sha1="237c2a3d059de00bfca66e0016ed325d7a32bfec" offset="000001" loadflag="load16_byte" />
+                <rom name="055-c3.bin" size="2097152" crc="54f66254" sha1="c594384bcd8b03beb8c595591505fecc44b185ac" offset="400000" loadflag="load16_byte" />
+                <rom name="055-c4.bin" size="2097152" crc="0b01765f" sha1="ec1fdcc944611408367bf5023d4ebe7edd9dfa88" offset="400001" loadflag="load16_byte" />
+                <rom name="055-c5.bin" size="2097152" crc="ee759363" sha1="8a5621c1b1f8267b9b9b6a14ab4944de542e1945" offset="800000" loadflag="load16_byte" />
+                <rom name="055-c6.bin" size="2097152" crc="498da52c" sha1="1e6e6202ee053a5261db889177ce3a087e078bda" offset="800001" loadflag="load16_byte" />
+                <rom name="055-c7.bin" size="2097152" crc="62f66888" sha1="ac91a0eab0753bee175ad40213a4ae5d38ed5b87" offset="c00000" loadflag="load16_byte" />
+                <rom name="055-c8.bin" size="2097152" crc="fe0a235d" sha1="a45c66836e4e3c77dfef9d4c6cc422cb59169149" offset="c00001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 056 -->
+	<software name="aof2">
+		<description>Art of Fighting 2 / Ryuuko no Ken 2</description>
+		<year>1994</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="2097152">
+                <rom name="056-p1.bin" size="1048576" crc="a3b1d021" sha1="ee42f3ca4516226b0088d0303ed28e3ecdabcd71" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="056-s1.bin" size="131072" crc="8b02638e" sha1="aa4d28804ca602da776948b5f223ea89e427906b" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="056-m1.bin" size="131072" crc="f27e9d52" sha1="dddae733d87ce7c88ad2580a8f64cb6ff9572e67" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="5242880">
+                <rom name="056-v1.bin" size="2097152" crc="4628fde0" sha1="ece2a50f5270d844d58401b1447d1d856d78ea45" offset="000000" />
+                <rom name="056-v2.bin" size="2097152" crc="b710e2f2" sha1="df4da585203eea7554d3ce718eb107e9cb6a0254" offset="200000" />
+                <rom name="056-v3.bin" size="1048576" crc="d168c301" sha1="969273d1d11943e81560959359a2c4e69522af0e" offset="400000" />
+			</dataarea>
+			<dataarea name="sprites" size="16777216">
+                <rom name="056-c1.bin" size="2097152" crc="17b9cbd2" sha1="1eee81e02763d384bd1c10a6012473ca931e4093" offset="000000" loadflag="load16_byte" />
+                <rom name="056-c2.bin" size="2097152" crc="5fd76b67" sha1="11925a41a53b53c6df4a5ebd28f98300950f743b" offset="000001" loadflag="load16_byte" />
+                <rom name="056-c3.bin" size="2097152" crc="d2c88768" sha1="22e2d84aa0c095944190e249ce87ef50d3f7b8ce" offset="400000" loadflag="load16_byte" />
+                <rom name="056-c4.bin" size="2097152" crc="db39b883" sha1="59de86c513dc4e230ae25d9e3b7e84621b657b54" offset="400001" loadflag="load16_byte" />
+                <rom name="056-c5.bin" size="2097152" crc="c3074137" sha1="9a75e3d63cb98d54f900dcfb3a03e21f3148d32f" offset="800000" loadflag="load16_byte" />
+                <rom name="056-c6.bin" size="2097152" crc="31de68d3" sha1="13ba7046cdd6863125f8284e60f102d4720af5a4" offset="800001" loadflag="load16_byte" />
+                <rom name="056-c7.bin" size="2097152" crc="3f36df57" sha1="79ee97e9ae811a51141b535633f90e1491209d54" offset="c00000" loadflag="load16_byte" />
+                <rom name="056-c8.bin" size="2097152" crc="e546d7a8" sha1="74a2fca994a5a93a5784a46c0f68193122456a09" offset="c00001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aof2a" cloneof="aof2">
+		<description>Art of Fighting 2 / Ryuuko no Ken 2 (set 2)</description>
+		<year>1994</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="2097152">
+                <rom name="056-p1.bin" size="1048576" crc="a3b1d021" sha1="ee42f3ca4516226b0088d0303ed28e3ecdabcd71" offset="000000" />
+                <!-- patch ROM -->
+                <rom name="056-ep1.bin" size="524288" crc="75d6301c" sha1="e72d15fba55f96be7b4fa29e705a7b78f56edf7d" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="056-s1.bin" size="131072" crc="8b02638e" sha1="aa4d28804ca602da776948b5f223ea89e427906b" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="056-m1.bin" size="131072" crc="f27e9d52" sha1="dddae733d87ce7c88ad2580a8f64cb6ff9572e67" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="5242880">
+                <rom name="056-v1.bin" size="2097152" crc="4628fde0" sha1="ece2a50f5270d844d58401b1447d1d856d78ea45" offset="000000" />
+                <rom name="056-v2.bin" size="2097152" crc="b710e2f2" sha1="df4da585203eea7554d3ce718eb107e9cb6a0254" offset="200000" />
+                <rom name="056-v3.bin" size="1048576" crc="d168c301" sha1="969273d1d11943e81560959359a2c4e69522af0e" offset="400000" />
+			</dataarea>
+			<dataarea name="sprites" size="16777216">
+                <rom name="056-c1.bin" size="2097152" crc="17b9cbd2" sha1="1eee81e02763d384bd1c10a6012473ca931e4093" offset="000000" loadflag="load16_byte" />
+                <rom name="056-c2.bin" size="2097152" crc="5fd76b67" sha1="11925a41a53b53c6df4a5ebd28f98300950f743b" offset="000001" loadflag="load16_byte" />
+                <rom name="056-c3.bin" size="2097152" crc="d2c88768" sha1="22e2d84aa0c095944190e249ce87ef50d3f7b8ce" offset="400000" loadflag="load16_byte" />
+                <rom name="056-c4.bin" size="2097152" crc="db39b883" sha1="59de86c513dc4e230ae25d9e3b7e84621b657b54" offset="400001" loadflag="load16_byte" />
+                <rom name="056-c5.bin" size="2097152" crc="c3074137" sha1="9a75e3d63cb98d54f900dcfb3a03e21f3148d32f" offset="800000" loadflag="load16_byte" />
+                <rom name="056-c6.bin" size="2097152" crc="31de68d3" sha1="13ba7046cdd6863125f8284e60f102d4720af5a4" offset="800001" loadflag="load16_byte" />
+                <rom name="056-c7.bin" size="2097152" crc="3f36df57" sha1="79ee97e9ae811a51141b535633f90e1491209d54" offset="c00000" loadflag="load16_byte" />
+                <rom name="056-c8.bin" size="2097152" crc="e546d7a8" sha1="74a2fca994a5a93a5784a46c0f68193122456a09" offset="c00001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 057 -->
+	<software name="wh2">
+		<description>World Heroes 2</description>
+		<year>1993</year>
+		<publisher>ADK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="2097152">
+                <rom name="057-p1.bin" size="1048576" crc="65a891d9" sha1="ff8d5ccb0dd22c523902bb3db3c645583a335056" offset="100000" />
+                <rom size="1048576" offset="000000" loadflag="continue" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="057-s1.bin" size="131072" crc="fcaeb3a4" sha1="1f3f85e38b8552333261c04ae5af0d6e3b310622" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="057-m1.bin" size="131072" crc="8fa3bc77" sha1="982f92978671e4ee66630948e6bb7565b37b5dc0" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="4194304">
+                <rom name="057-v1.bin" size="2097152" crc="8877e301" sha1="1bab988d74ea8fd12db201c257ec844622cf5f4e" offset="000000" />
+                <rom name="057-v2.bin" size="2097152" crc="c1317ff4" sha1="4c28b2b5998abaeaa5143f2f3a9ba52c6041f4f3" offset="200000" />
+			</dataarea>
+			<dataarea name="sprites" size="12582912">
+                <rom name="057-c1.bin" size="2097152" crc="21c6bb91" sha1="a2c17d0c91dd59528d8fa7fe110af8b20b25ff99" offset="000000" loadflag="load16_byte" />
+                <rom name="057-c2.bin" size="2097152" crc="a3999925" sha1="0ee861a77850d378d03c1bf00b9692abd860c759" offset="000001" loadflag="load16_byte" />
+                <rom name="057-c3.bin" size="2097152" crc="b725a219" sha1="4857687d156a9150a69b97d2729245a51c144a0c" offset="400000" loadflag="load16_byte" />
+                <rom name="057-c4.bin" size="2097152" crc="8d96425e" sha1="0f79c868a6a33ad25e38d842f30ec4440d809033" offset="400001" loadflag="load16_byte" />
+                <rom name="057-c5.bin" size="2097152" crc="b20354af" sha1="da7609fd467f2f4d71d92970f438a04d11ab1cc1" offset="800000" loadflag="load16_byte" />
+                <rom name="057-c6.bin" size="2097152" crc="b13d1de3" sha1="7d749c23a33d90fe50279e884540d71cf1aaaa6b" offset="800001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 058 -->
+	<software name="fatfursp">
+		<description>Fatal Fury Special / Garou Densetsu Special</description>
+		<year>1993</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1572864">
+                <rom name="058-p1.bin" size="1048576" crc="2f585ba2" sha1="429b4bf43fb9b1082c15d645ca328f9d175b976b" offset="000000" />
+                <rom name="058-p2.bin" size="524288" crc="d7c71a6b" sha1="b3428063031a2e5857da40a5d2ffa87fb550c1bb" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="058-s1.bin" size="131072" crc="2df03197" sha1="24083cfc97e720ac9e131c9fe37df57e27c49294" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="058-m1.bin" size="131072" crc="ccc5186e" sha1="cf9091c523c182aebfb928c91640b2d72fd70123" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="5242880">
+                <rom name="058-v1.bin" size="2097152" crc="55d7ce84" sha1="05ac6a395d9bf9166925acca176a8d6129f533c8" offset="000000" />
+                <rom name="058-v2.bin" size="2097152" crc="ee080b10" sha1="29814fc21bbe30d37745c8918fab00c83a309be4" offset="200000" />
+                <rom name="058-v3.bin" size="1048576" crc="f9eb3d4a" sha1="d1747f9460b965f6daf4f881ed4ecd04c5253434" offset="400000" />
+			</dataarea>
+			<dataarea name="sprites" size="12582912">
+                <rom name="058-c1.bin" size="2097152" crc="044ab13c" sha1="569d283638a132bc163faac2a9055497017ee0d2" offset="000000" loadflag="load16_byte" />
+                <rom name="058-c2.bin" size="2097152" crc="11e6bf96" sha1="c093a4f93f13e07b276e28b30c2a14dda9135d8f" offset="000001" loadflag="load16_byte" />
+                <rom name="058-c3.bin" size="2097152" crc="6f7938d5" sha1="be057b0a3faeb76d5fff161d3e6fea8a26e11d2c" offset="400000" loadflag="load16_byte" />
+                <rom name="058-c4.bin" size="2097152" crc="4ad066ff" sha1="4e304646d954d5f7bbabc5d068e85de31d38830f" offset="400001" loadflag="load16_byte" />
+                <rom name="058-c5.bin" size="2097152" crc="49c5e0bf" sha1="f3784178f90751990ea47a082a6aa869ee3566c9" offset="800000" loadflag="load16_byte" />
+                <rom name="058-c6.bin" size="2097152" crc="8ff1f43d" sha1="6180ceb5412a3e2e34e9513a3283b9f63087f747" offset="800001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 063 -->
 	<software name="samsho2">
 		<description>Samurai Shodown II / Shin Samurai Spirits - Haohmaru jigokuhen</description>
@@ -1084,6 +1284,42 @@
 		</part>
 	</software>
 
+<!-- ID 242 -->
+	<software name="kof98">
+		<description>The King of Fighters '98</description>
+		<year>1998</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="5242880">
+                <rom name="242-pn1.bin" size="1048576" crc="61ac868a" sha1="26577264aa72d6af272952a876fcd3775f53e3fa" offset="000000" />
+                <rom name="242-p2.bin" size="4194304" crc="980aba4c" sha1="5e735929ec6c3ca5b2efae3c7de47bcbb8ade2c5" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="242-s1.bin" size="131072" crc="7f7b4805" sha1="80ee6e5d0ece9c34ebca54b043a7cb33f9ff6b92" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="327680">
+                <rom name="242-m1.bin" size="262144" crc="4e7a6b1b" sha1="b54d08f88713ed0271aa06f9f7c9c572ef555b1a" offset="000000" />
+				<rom size="262144" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="242-v1.bin" size="4194304" crc="b9ea8051" sha1="49606f64eb249263b3341b4f50cc1763c390b2af" offset="000000" />
+                <rom name="242-v2.bin" size="4194304" crc="cc11106e" sha1="d3108bc05c9bf041d4236b2fa0c66b013aa8db1b" offset="400000" />
+                <rom name="242-v3.bin" size="4194304" crc="044ea4e1" sha1="062a2f2e52098d73bc31c9ad66f5db8080395ce8" offset="800000" />
+                <rom name="242-v4.bin" size="4194304" crc="7985ea30" sha1="54ed5f0324de6164ea81943ebccb3e8d298368ec" offset="c00000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="242-c1.bin" size="8388608" crc="e564ecd6" sha1="78f22787a204f26bae9b2b1c945ddbc27143352f" offset="0000000" loadflag="load16_byte" />
+                <rom name="242-c2.bin" size="8388608" crc="bd959b60" sha1="2c97c59e77c9a3fe7d664e741d37944f3d56c10b" offset="0000001" loadflag="load16_byte" />
+                <rom name="242-c3.bin" size="8388608" crc="22127b4f" sha1="bd0d00f889d9da7c6ac48f287d9ed8c605ae22cf" offset="1000000" loadflag="load16_byte" />
+                <rom name="242-c4.bin" size="8388608" crc="0b4fa044" sha1="fa13c3764fae6b035a626601bc43629f1ebaaffd" offset="1000001" loadflag="load16_byte" />
+                <rom name="242-c5.bin" size="8388608" crc="9d10bed3" sha1="4d44addc7c808649bfb03ec45fb9529da413adff" offset="2000000" loadflag="load16_byte" />
+                <rom name="242-c6.bin" size="8388608" crc="da07b6a2" sha1="9c3f0da7cde1ffa8feca89efc88f07096e502acf" offset="2000001" loadflag="load16_byte" />
+                <rom name="242-c7.bin" size="8388608" crc="f6d7a38a" sha1="dd295d974dd4a7e5cb26a3ef3febcd03f28d522b" offset="3000000" loadflag="load16_byte" />
+                <rom name="242-c8.bin" size="8388608" crc="c823e045" sha1="886fbf64bcb58bc4eabb1fc9262f6ac9901a0f28" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 243 -->
 	<software name="lastbld2">
 		<description>The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi</description>
@@ -1189,6 +1425,46 @@
                 <rom name="256-c6.bin" size="8388608" crc="c698fd5d" sha1="16818883b06849ba2f8d61bdd5e21aaf99bd8408" offset="2000001" loadflag="load16_byte" />
                 <rom name="256-c7.bin" size="8388608" crc="cfceddd2" sha1="7def666adf8bd1703f40c61f182fc040b6362dc9" offset="3000000" loadflag="load16_byte" />
                 <rom name="256-c8.bin" size="8388608" crc="4d9be34c" sha1="a737bdfa2b815aea7067e7af2636e83a9409c414" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 257 -->
+	<software name="kof2000">
+		<description>The King of Fighters 2000</description>
+		<year>2000</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="kof2000_crypt" />
+			<dataarea name="maincpu" size="9437184">
+                <rom name="257-sma.bin" size="262144" crc="71c6e6bb" sha1="1bd29ded4c6b29780db8e8b772c452189699ca89" offset="0c0000" />
+                <rom name="257-p1.bin" size="4194304" crc="60947b4c" sha1="5faa0a7ac7734d6c8e276589bd12dd574264647d" offset="100000" />
+                <rom name="257-p2.bin" size="4194304" crc="1b7ec415" sha1="f19fa44e9ee5b5a6eb4a051349d6bc4acc3bbbdb" offset="500000" />
+			</dataarea>
+			<dataarea name="fixed" size="524288">
+                <rom value="0" length="524288" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="589824">
+                <rom value="ff" length="589824" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocrypt" size="524288">
+                <rom name="257-m1.bin" size="262144" crc="4b749113" sha1="2af2361146edd0ce3966614d90165a5c1afb8de4" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="257-v1.bin" size="4194304" crc="17cde847" sha1="4bcc0205b70dc6d9216b29025450c9c5b08cb65d" offset="000000" />
+                <rom name="257-v2.bin" size="4194304" crc="1afb20ff" sha1="57dfd2de058139345ff2b744a225790baaecd5a2" offset="400000" />
+                <rom name="257-v3.bin" size="4194304" crc="4605036a" sha1="51b228a0600d38a6ec37aec4822879ec3b0ee106" offset="800000" />
+                <rom name="257-v4.bin" size="4194304" crc="764bbd6b" sha1="df23c09ca6cf7d0ae5e11ff16e30c159725106b3" offset="c00000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="257-c1.bin" size="8388608" crc="cef1cdfa" sha1="6135080f3a6b4712b76cc217edcc58e72b55c2b9" offset="000000" loadflag="load16_byte" />
+                <rom name="257-c2.bin" size="8388608" crc="f7bf0003" sha1="9f7b19a2100cf7d12867e742f440dd5277b4f895" offset="000001" loadflag="load16_byte" />
+                <rom name="257-c3.bin" size="8388608" crc="101e6560" sha1="8073ae1139e215d1167f8d32c14079a46ce3ee1c" offset="1000000" loadflag="load16_byte" />
+                <rom name="257-c4.bin" size="8388608" crc="bd2fc1b1" sha1="da0006761923ad49b404a08d7a151193ee307a69" offset="1000001" loadflag="load16_byte" />
+                <rom name="257-c5.bin" size="8388608" crc="89775412" sha1="b221b30224bc4239f1b3c2d2fd1cd4fa84e3523c" offset="2000000" loadflag="load16_byte" />
+                <rom name="257-c6.bin" size="8388608" crc="fa7200d5" sha1="6f2b0d38af34e280d56a58955400e5c679906871" offset="2000001" loadflag="load16_byte" />
+                <rom name="257-c7.bin" size="8388608" crc="7da11fe4" sha1="065336cf166807acb6c8569d59d3bf37a19b0a42" offset="3000000" loadflag="load16_byte" />
+                <rom name="257-c8.bin" size="8388608" crc="b1afa60b" sha1="b916184f5cfe4121752270f4f65abf35d8eb0519" offset="3000001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -1486,6 +1762,79 @@
                 <rom name="271-c6k.bin" size="8388608" crc="d5cae4e0" sha1="248cd9eaac7a04d6b5d80c7534de90b057d566d7" offset="2000001" loadflag="load16_byte" />
                 <rom name="271-c7k.bin" size="8388608" crc="e65ae2d0" sha1="39744e10697d7ac539ecfcfa597e75597f321955" offset="3000000" loadflag="load16_byte" />
                 <rom name="271-c8k.bin" size="8388608" crc="312f528c" sha1="b4ad75f54f730ada6cb00112b74022250f055725" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 272 -->
+	<software name="samsh5sp">
+		<description>Samurai Shodown V Special / Samurai Spirits Zero Special</description>
+		<year>2003</year>
+		<publisher>Yuki Enterprise / SNK Playmore</publisher>
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="samsho5s_crypt" />
+			<dataarea name="maincpu" size="8388608">
+                <rom name="272-p1c.bin" size="4194304" crc="9291794d" sha1="66588ff9b00ffad6508b03423548984e28a3209d" offset="000000" />
+                <rom name="272-p2c.bin" size="4194304" crc="fa1a7dd8" sha1="62443dad76d6c1e18f515d7d4ef8e1295a4b7f1d" offset="400000" />
+			</dataarea>
+			<dataarea name="fixed" size="524288">
+                <rom value="0" length="524288" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="589824">
+                <rom value="ff" length="589824" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocrypt" size="524288">
+                <rom name="272-m1.bin" size="524288" crc="adeebf40" sha1="8cbd63dda3fff4de38060405bf70cd9308c9e66e" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="272-v1.bin" size="8388608" crc="76a94127" sha1="c3affd7ff1eb02345cfb755962ec173a8ec34acd" offset="000000" />
+                <rom name="272-v2.bin" size="8388608" crc="4ba507f1" sha1="728d139da3fe8a391fd8be4d24bb7fdd4bf9548a" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="272-c1.bin" size="8388608" crc="4f97661a" sha1="87f1721bae5ef16bc23c06b05e64686c396413df" offset="000000" loadflag="load16_byte" />
+                <rom name="272-c2.bin" size="8388608" crc="a3afda4f" sha1="86b475fce0bc0aa04d34e31324e8c7c7c847df19" offset="000001" loadflag="load16_byte" />
+                <rom name="272-c3.bin" size="8388608" crc="8c3c7502" sha1="6639020a8860d2400308e110d7277cbaf6eccc2a" offset="1000000" loadflag="load16_byte" />
+                <rom name="272-c4.bin" size="8388608" crc="32d5e2e2" sha1="2b5612017152afd7433aaf99951a084ef5ad6bf0" offset="1000001" loadflag="load16_byte" />
+                <rom name="272-c5.bin" size="8388608" crc="6ce085bc" sha1="0432b04a2265c649bba1bbd934dfb425c5d80fb1" offset="2000000" loadflag="load16_byte" />
+                <rom name="272-c6.bin" size="8388608" crc="05c8dc8e" sha1="da45c222893f25495a66bdb302f9b0b1de3c8ae0" offset="2000001" loadflag="load16_byte" />
+                <rom name="272-c7.bin" size="8388608" crc="1417b742" sha1="dfe35eb4bcd022d2f2dc544ccbbb77078f08c0aa" offset="3000000" loadflag="load16_byte" />
+                <rom name="272-c8.bin" size="8388608" crc="d49773cd" sha1="cd8cf3b762d381c1f8f12919579c84a7ef7efb3f" offset="3000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samsh5spn" cloneof="samsh5sp">
+		<description>Samurai Shodown V Special / Samurai Spirits Zero Special (less censored)</description>
+		<year>2003</year>
+		<publisher>Yuki Enterprise / SNK Playmore</publisher>
+		<part name="cart" interface="aes_cart">
+			<feature name="crypt" value="samsho5s_crypt" />
+			<dataarea name="maincpu" size="8388608">
+                <rom name="272-p1ca.bin" size="4194304" crc="c30a08dd" sha1="66864954017c841d7ca8490112c3aa7a71a4da70" offset="000000" />
+                <rom name="272-p2ca.bin" size="4194304" crc="bd64a518" sha1="aa259a168930f106377d680db444535411b3bce0" offset="400000" />
+			</dataarea>
+			<dataarea name="fixed" size="524288">
+                <rom value="0" length="524288" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocpu" size="589824">
+                <rom value="ff" length="589824" offset="000000" loadflag="fill" />
+			</dataarea>
+			<dataarea name="audiocrypt" size="524288">
+                <rom name="272-m1.bin" size="524288" crc="adeebf40" sha1="8cbd63dda3fff4de38060405bf70cd9308c9e66e" offset="000000" />
+			</dataarea>
+			<dataarea name="ymsnd" size="16777216">
+                <rom name="272-v1.bin" size="8388608" crc="76a94127" sha1="c3affd7ff1eb02345cfb755962ec173a8ec34acd" offset="000000" />
+                <rom name="272-v2.bin" size="8388608" crc="4ba507f1" sha1="728d139da3fe8a391fd8be4d24bb7fdd4bf9548a" offset="800000" />
+			</dataarea>
+			<dataarea name="sprites" size="67108864">
+                <rom name="272-c1.bin" size="8388608" crc="4f97661a" sha1="87f1721bae5ef16bc23c06b05e64686c396413df" offset="000000" loadflag="load16_byte" />
+                <rom name="272-c2.bin" size="8388608" crc="a3afda4f" sha1="86b475fce0bc0aa04d34e31324e8c7c7c847df19" offset="000001" loadflag="load16_byte" />
+                <rom name="272-c3.bin" size="8388608" crc="8c3c7502" sha1="6639020a8860d2400308e110d7277cbaf6eccc2a" offset="1000000" loadflag="load16_byte" />
+                <rom name="272-c4.bin" size="8388608" crc="32d5e2e2" sha1="2b5612017152afd7433aaf99951a084ef5ad6bf0" offset="1000001" loadflag="load16_byte" />
+                <rom name="272-c5.bin" size="8388608" crc="6ce085bc" sha1="0432b04a2265c649bba1bbd934dfb425c5d80fb1" offset="2000000" loadflag="load16_byte" />
+                <rom name="272-c6.bin" size="8388608" crc="05c8dc8e" sha1="da45c222893f25495a66bdb302f9b0b1de3c8ae0" offset="2000001" loadflag="load16_byte" />
+                <rom name="272-c7.bin" size="8388608" crc="1417b742" sha1="dfe35eb4bcd022d2f2dc544ccbbb77078f08c0aa" offset="3000000" loadflag="load16_byte" />
+                <rom name="272-c8.bin" size="8388608" crc="d49773cd" sha1="cd8cf3b762d381c1f8f12919579c84a7ef7efb3f" offset="3000001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
