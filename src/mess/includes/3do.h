@@ -39,5 +39,7 @@ WRITE32_HANDLER( _3do_clio_w );
 void _3do_clio_init( running_machine *machine, screen_device *screen );
 
 
+VIDEO_START( _3do );
+VIDEO_UPDATE( _3do );
 
 #endif /* _3DO_H_ */

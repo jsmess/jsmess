@@ -159,8 +159,10 @@ static MACHINE_DRIVER_START( 3do )
 
 	MDRV_MACHINE_RESET( 3do )
 
-	MDRV_VIDEO_START( generic_bitmapped )
-	MDRV_VIDEO_UPDATE( generic_bitmapped )
+//	MDRV_VIDEO_START( generic_bitmapped )
+//	MDRV_VIDEO_UPDATE( generic_bitmapped )
+	MDRV_VIDEO_START( _3do )
+	MDRV_VIDEO_UPDATE( _3do )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT( BITMAP_FORMAT_RGB32 )

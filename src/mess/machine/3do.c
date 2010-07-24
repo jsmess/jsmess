@@ -22,8 +22,9 @@ Reset boot sequence:
 - init stack pointer to 64k (00000054)
 - set hdelay to c6
 - do remaining diagnostics
-- set up vdl for 3do logo screen
-- set up frame buffer 3do logo screen
+- set up vdl for 3do logo screen (at 003b0000)
+- set up frame buffer 3do logo screen (at 003c000, 0000166c)
+16bc (done)
 - transfer sherry from rom to 10000
 - transfer operator from rom to 20000
 - transfer dipir from rom to 200
@@ -324,9 +325,14 @@ WRITE32_HANDLER( _3do_svf_w )
 		svf.color = data;
 		break;
 	case 0x4000/4:		/* Flash write */
-		for ( int i = 0; i < 512; i++ )
 		{
-			p[i] = svf.color;
+			UINT32 keep_bits = data ^ 0xffffffff;
+			UINT32 new_bits = svf.color & data;
+
+			for ( int i = 0; i < 512; i++ )
+			{
+				p[i] = ( p[i] & keep_bits ) | new_bits;
+			}
 		}
 		break;
 	case 0x6000/4:		/* CAS before RAS refresh/reset (CBR). Used to initialize VRAM mode during boot. */
@@ -967,6 +973,7 @@ WRITE32_HANDLER( _3do_clio_w )
 	}
 }
 
+
 void _3do_clio_init( running_machine *machine, screen_device *screen )
 {
 	memset( &clio, 0, sizeof(CLIO) );
@@ -974,5 +981,64 @@ void _3do_clio_init( running_machine *machine, screen_device *screen )
 	clio.revision = 0x02022000 /* 0x04000000 */;
 	clio.cstatbits = 0x01;	/* bit 0 = reset of clio caused by power on */
 	clio.unclerev = 0x03800000;
+}
+
+
+/* 9 -> 5 bits translation */
+static UINT8 video_bits[512];
+
+VIDEO_START( _3do )
+{
+	/* We only keep the odd bits and get rid of the even bits */
+	for ( int i = 0; i < 512; i++ )
+	{
+		video_bits[i] = ( i & 1 ) | ( ( i & 4 ) >> 1 ) | ( ( i & 0x10 ) >> 2 ) | ( ( i & 0x40 ) >> 3 ) | ( ( i & 0x100 ) >> 4 );
+	}
+}
+
+
+/* This is incorrect! Just testing stuff */
+VIDEO_UPDATE( _3do )
+{
+	_3do_state *state = (_3do_state *)screen->machine->driver_data;
+	UINT32 *source_p = state->vram + 0x1c0000 / 4;
+
+	for ( int i = 0; i < 120; i++ )
+	{
+		UINT32	*dest_p0 = BITMAP_ADDR32( bitmap, 22 + i * 2, 254 );
+		UINT32	*dest_p1 = BITMAP_ADDR32( bitmap, 22 + i * 2 + 1, 254 );
+
+		for ( int j = 0; j < 320; j++ )
+		{
+			/* Odd numbered bits go to lower half, even numbered bits to upper half */
+			UINT32 lower = *source_p & 0x55555555;
+			UINT32 upper = ( *source_p >> 1 ) & 0x55555555;
+			UINT32 rgb = 0;
+
+			rgb = ( ( video_bits[upper & 0x1ff] << 3 ) << 8 );
+			rgb |= ( ( video_bits[ ( upper >> 10 ) & 0x1ff ] << 3 ) << 0 );
+			rgb |= ( ( video_bits[ ( upper >> 20 ) & 0x1ff ] << 3 ) << 16 );
+
+			dest_p0[0] = rgb;
+			dest_p0[1] = rgb;
+			dest_p0[2] = rgb;
+			dest_p0[3] = rgb;
+
+			rgb = ( ( video_bits[lower & 0x1ff] << 3 ) << 8 );
+			rgb |= ( ( video_bits[ ( lower >> 10 ) & 0x1ff ] << 3 ) << 0 );
+			rgb |= ( ( video_bits[ ( lower >> 20 ) & 0x1ff ] << 3 ) << 16 );
+
+			dest_p1[0] = rgb;
+			dest_p1[1] = rgb;
+			dest_p1[2] = rgb;
+			dest_p1[3] = rgb;
+
+			source_p++;
+			dest_p0 += 4;
+			dest_p1 += 4;
+		}
+	}
+
+	return 0;
 }
 
