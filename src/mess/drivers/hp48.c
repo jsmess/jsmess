@@ -1007,7 +1007,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( hp48sx )
 	MDRV_IMPORT_FROM    ( hp48_common )
-	MDRV_CPU_REPLACE    ( "maincpu", SATURN, 2000000 )
+	MDRV_CPU_MODIFY     ( "maincpu" )
+	MDRV_CPU_CLOCK      ( 2000000 )
 	MDRV_MACHINE_START  ( hp48sx )
 	MDRV_DEFAULT_LAYOUT ( layout_hp48sx )
 
@@ -1021,7 +1022,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START ( hp48s )
 	MDRV_IMPORT_FROM    ( hp48_common )
-	MDRV_CPU_REPLACE    ( "maincpu", SATURN, 2000000 )
+	MDRV_CPU_MODIFY     ( "maincpu" )
+	MDRV_CPU_CLOCK      ( 2000000 )
 	MDRV_MACHINE_START  ( hp48s )
 	MDRV_DEFAULT_LAYOUT ( layout_hp48s )
 
