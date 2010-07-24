@@ -1,14 +1,19 @@
 /***************************************************************************
 
-        Bandai Gundam RX-78
+	Gundam RX-78 (c) 1983 Bandai
 
-        13/07/2010 Skeleton driver.
+	preliminary driver by Angelo Salese
+
+	TODO:
+	- Rewrite vram routines, they aren't quite right (we're currently drawing
+	  stuff from the work ram and not the proper bitmap buffer)
 
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
+#include "devices/cartslot.h"
 
 static VIDEO_START( rx78 )
 {
@@ -85,15 +90,15 @@ static WRITE8_HANDLER( key_w )
 static ADDRESS_MAP_START(rx78_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-
-	AM_RANGE(0x2000, 0xffff) AM_RAM AM_REGION("maincpu", 0x2000)
+	AM_RANGE(0x2000, 0x5fff) AM_ROM AM_REGION("cart_img", 0x0000)
+	AM_RANGE(0x6000, 0xffff) AM_RAM AM_REGION("maincpu", 0x6000)
 /*
 	base memory map:
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x5fff) AM_ROM //cart
 	AM_RANGE(0x6000, 0xafff) AM_RAM //ext ram
-	AM_RANGE(0xb000, 0xefff) AM_RAM //work ram
-	AM_RANGE(0xf000, 0xffff) AM_NOP
+	AM_RANGE(0xb000, 0xebff) AM_RAM //work ram
+	AM_RANGE(0xec00, 0xffff) AM_RAM //bitmap vram (banked)
 */
 ADDRESS_MAP_END
 
@@ -258,6 +263,10 @@ static MACHINE_DRIVER_START( rx78 )
     MDRV_VIDEO_START(rx78)
     MDRV_VIDEO_UPDATE(rx78)
 
+	MDRV_CARTSLOT_ADD("cart")
+	MDRV_CARTSLOT_EXTENSION_LIST("rom")
+	MDRV_CARTSLOT_NOT_MANDATORY
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
@@ -268,6 +277,9 @@ MACHINE_DRIVER_END
 ROM_START( rx78 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "ipl.rom", 0x0000, 0x2000, CRC(a194ea53) SHA1(ba39e73e6eb7cbb8906fff1f81a98964cd62af0d))
+
+	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASEFF )
+	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_NOMIRROR)
 ROM_END
 
 /* Driver */
