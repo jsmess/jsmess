@@ -180,7 +180,7 @@ FLOPPY_CONSTRUCT( apridisk_construct )
 				UINT16 length;
 				UINT8 value;
 
-				floppy_image_read(floppy, &buffer, pos, data_size);
+				floppy_image_read(floppy, buffer, pos, data_size);
 
 				length = pick_integer_le(buffer, 0, 2);
 				value = pick_integer_le(buffer, 2, 1);
