@@ -577,9 +577,10 @@ const game_driver * const drivers[] =
 
 	/* PC Junior */
 	DRIVER( ibmpcjr )   /* 1984 IBM PC Jr      */
-	DRIVER( t1000hx )   /* 1987 Tandy 1000HX (similiar to PCJr)  */
-	DRIVER( t1000sx )   /* 1987 Tandy 1000SX (similiar to PCJr)  */
-	DRIVER( t1000rl )	/* 1989 Tandy 1000RL    */
+	DRIVER( t1000hx )   /* 1987 Tandy 1000 HX (similiar to PCJr)  */
+	DRIVER( t1000sx )   /* 1987 Tandy 1000 SX (similiar to PCJr)  */
+	DRIVER( t1000tx )	/* 1987 Tandy 1000 TX */
+	DRIVER( t1000rl )	/* 1989 Tandy 1000 RL */
 
 	/* XT */
 	DRIVER( ibm5160 )   /* 1982 IBM XT 5160  */

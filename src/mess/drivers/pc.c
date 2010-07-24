@@ -111,6 +111,7 @@ TODO: Which clock signals are available in a PC Jr?
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"
+#include "cpu/i86/i286.h"
 #include "sound/speaker.h"
 #include "sound/saa1099.h"
 #include "deprecat.h"
@@ -406,6 +407,39 @@ static ADDRESS_MAP_START(tandy1000_16_io, ADDRESS_SPACE_IO, 16)
 	AM_RANGE(0xffea, 0xffeb) AM_READWRITE8(tandy1000_bank_r, tandy1000_bank_w, 0xffff)
 ADDRESS_MAP_END
 
+
+
+static ADDRESS_MAP_START(tandy1000_286_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
+	AM_RANGE(0xa0000, 0xaffff) AM_RAM
+	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
+	AM_RANGE(0xb8000, 0xbffff) AM_READWRITE8(pc_t1t_videoram_r, pc_video_videoram_w, 0xffff)
+	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
+	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
+	AM_RANGE(0xca000, 0xcffff) AM_NOP
+	AM_RANGE(0xe0000, 0xeffff) AM_NOP
+	AM_RANGE(0xf8000, 0xfffff) AM_ROM 
+ADDRESS_MAP_END
+
+
+
+static ADDRESS_MAP_START(tandy1000_286_io, ADDRESS_SPACE_IO, 16)
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE8("dma8237", i8237_r, i8237_w, 0xffff)
+	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE8("pic8259", pic8259_r, pic8259_w, 0xffff)
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE8("pit8253", pit8253_r, pit8253_w, 0xffff)
+	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(tandy1000_pio_r,         tandy1000_pio_w, 0xffff)
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE8(pc_page_r,               pc_page_w, 0xffff)
+	AM_RANGE(0x00c0, 0x00c1) AM_DEVWRITE8("sn76496",    sn76496_w, 0xffff)
+	AM_RANGE(0x0200, 0x0207) AM_READWRITE8(pc_JOY_r,                    pc_JOY_w, 0xffff)
+	AM_RANGE(0x02f8, 0x02ff) AM_DEVREADWRITE8("ins8250_1", ins8250_r, ins8250_w, 0xffff)
+	AM_RANGE(0x0320, 0x0323) AM_READWRITE8(pc_HDC1_r,               pc_HDC1_w, 0xffff)
+	AM_RANGE(0x0324, 0x0327) AM_READWRITE8(pc_HDC2_r,               pc_HDC2_w, 0xffff)
+	AM_RANGE(0x0378, 0x037f) AM_READWRITE8(pc_t1t_p37x_r,           pc_t1t_p37x_w, 0xffff)
+	AM_RANGE(0x03bc, 0x03bf) AM_DEVREADWRITE8("lpt_0", pc_lpt_r, pc_lpt_w, 0xffff)
+	AM_RANGE(0x03d0, 0x03df) AM_READWRITE8(pc_T1T_r,                    pc_T1T_w, 0xffff)
+	AM_RANGE(0x03f0, 0x03f7) AM_READWRITE8(pc_fdc_r,                    pc_fdc_w, 0xffff)
+	AM_RANGE(0x03f8, 0x03ff) AM_DEVREADWRITE8("ins8250_0", ins8250_r, ins8250_w, 0xffff)
+ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(ibmpcjr_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2344,6 +2378,56 @@ static MACHINE_DRIVER_START( t1000_16 )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( t1000_286 )
+	MDRV_DRIVER_DATA(pc_state)
+	/* basic machine hardware */
+	MDRV_CPU_PC(tandy1000_286, tandy1000_286, I80286, XTAL_28_63636MHz / 2, pc_frame_interrupt)
+
+	MDRV_MACHINE_START(pc)
+	MDRV_MACHINE_RESET(pc)
+
+	MDRV_PIT8253_ADD( "pit8253", ibm5150_pit8253_config )
+
+	MDRV_I8237_ADD( "dma8237", XTAL_14_31818MHz/3, ibm5150_dma8237_config )
+
+	MDRV_PIC8259_ADD( "pic8259", ibm5150_pic8259_config )
+
+	MDRV_I8255A_ADD( "ppi8255", pc_ppi8255_interface )
+
+	MDRV_INS8250_ADD( "ins8250_0", ibm5150_com_interface[0] )			/* TODO: Verify model */
+	MDRV_INS8250_ADD( "ins8250_1", ibm5150_com_interface[1] )			/* TODO: Verify model */
+
+	/* video hardware */
+	MDRV_IMPORT_FROM( pcvideo_t1000 )
+	MDRV_GFXDECODE(europc)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ADD("sn76496", NCR7496, 2386360)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+
+	MDRV_NVRAM_HANDLER( tandy1000 )
+
+	/* printer */
+	MDRV_PC_LPT_ADD("lpt_0", pc_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_1", pc_lpt_config)
+	MDRV_PC_LPT_ADD("lpt_2", pc_lpt_config)
+
+	/* harddisk */
+	MDRV_IMPORT_FROM( pc_hdc )
+
+	MDRV_UPD765A_ADD("upd765", pc_fdc_upd765_not_connected_interface)
+
+	MDRV_FLOPPY_2_DRIVES_ADD(ibmpc_floppy_config)
+
+	/* internal ram */
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("640K")
+MACHINE_DRIVER_END
+
+
 static GFXDECODE_START( ibmpcjr )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, pc_8_charlayout, 3, 1 )
 GFXDECODE_END
@@ -2812,6 +2896,18 @@ ROM_START( t1000sx )
 ROM_END
 
 
+ROM_START( t1000tx )
+    ROM_REGION(0x100000,"maincpu", 0)
+    ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */   // not sure about this one
+	/* There might be a second 32KB rom, but it seems to work fine with just this one */
+    ROM_LOAD("t1000tx.bin", 0xf8000, 0x8000, CRC(9b34765c) SHA1(0b07e87f6843393f7d4ca4634b832b0c0bec304e))
+
+    ROM_REGION(0x08000,"gfx1", 0)
+    // expects 8x9 charset!
+    ROM_LOAD("50146", 0x00000, 0x02000, BAD_DUMP CRC(1305dcf5) SHA1(aca488a16ae4ff05a1f4d14574379ff49cd48343)) //taken from europc, 9th blank
+ROM_END
+
+
 ROM_START( t1000rl )
 	ROM_REGION(0x100000,"maincpu", 0)
 //  ROM_LOAD("wdbios.rom",  0xc8000, 0x02000, CRC(8e9e2bd4) SHA1(601d7ceab282394ebab50763c267e915a6a2166a)) /* WDC IDE Superbios 2.0 (06/28/89) Expansion Rom C8000-C9FFF  */   // not sure about this one
@@ -3248,9 +3344,10 @@ COMP(  1988,	europc,     ibm5150,	0,	europc,     europc,	europc,     "Schneider 
 COMP(  1983,	ibmpcjr,    ibm5150,	0,	ibmpcjr,    tandy1t,	pcjr,       "International Business Machines",  "IBM PC Jr", GAME_IMPERFECT_COLORS )
 
 // tandy 1000
-COMP(  1987,	t1000hx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000HX", 0)
-COMP(  1987,	t1000sx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000SX", GAME_NOT_WORKING)
-COMP(  1989,	t1000rl,    ibm5150,	0,	t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack",  "Tandy 1000RL", 0)
+COMP(  1987,	t1000hx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 HX", 0)
+COMP(  1987,	t1000sx,    ibm5150,	0,	t1000hx,    tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 SX", GAME_NOT_WORKING)
+COMP(  1987,	t1000tx,    ibm5150,	0,	t1000_286,  tandy1t,	t1000hx,    "Tandy Radio Shack",  "Tandy 1000 TX", 0)
+COMP(  1989,	t1000rl,    ibm5150,	0,	t1000_16,   tandy1t,    t1000hx,    "Tandy Radio Shack",  "Tandy 1000 RL", 0)
 
 // xt class (pc but 8086)
 COMP(  1982,	ibm5160,    ibm5150,	0,	ibm5160,    ibm5150,	ibm5150,    "International Business Machines",  "IBM XT 5160" , 0)
