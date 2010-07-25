@@ -20,7 +20,7 @@
 #include "sound/beep.h"
 
 static UINT8 mcu_init;
-static UINT8 keyb_press,keyb_press_flag,display_reg;
+static UINT8 keyb_press,keyb_press_flag,shift_press_flag,display_reg;
 static UINT16 cursor_addr,cursor_raster;
 static UINT8 vram_bank;
 static UINT8 pen_clut[8],bw_mode;
@@ -168,7 +168,7 @@ static READ8_HANDLER( key_status_r )
 	if(mcu_init == 1){ mcu_init++;	return 1; }
 	if(mcu_init == 2){ mcu_init++;	return 0; }
 
-	return keyb_press_flag;
+	return keyb_press_flag | (shift_press_flag << 7);
 }
 
 static READ8_HANDLER( multi8_vram_r )
@@ -361,11 +361,11 @@ static INPUT_PORTS_START( multi8 )
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
 
 	PORT_START("key_modifiers")
-	PORT_BIT(0x00000001,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
-	PORT_BIT(0x00000002,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x00000004,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL)
-	PORT_BIT(0x00000008,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x00000010,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
+	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
+	PORT_BIT(0x00000004,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL)
+	PORT_BIT(0x00000008,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
+	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
 INPUT_PORTS_END
 
 static TIMER_CALLBACK( keyboard_callback )
@@ -375,6 +375,8 @@ static TIMER_CALLBACK( keyboard_callback )
 	UINT8 keymod = input_port_read(machine,"key_modifiers") & 0x1f;
 	scancode = 0;
 
+	shift_press_flag = ((keymod & 0x02) >> 1);
+
 	for(port_i=0;port_i<3;port_i++)
 	{
 		for(i=0;i<32;i++)
@@ -382,7 +384,7 @@ static TIMER_CALLBACK( keyboard_callback )
 			if((input_port_read(machine,portnames[port_i])>>i) & 1)
 			{
 				//key_flag = 1;
-				if(keymod & 0x02)  // shift not pressed
+				if(!shift_press_flag)  // shift not pressed
 				{
 					if(scancode >= 0x41 && scancode < 0x5b)
 						scancode += 0x20;  // lowercase
@@ -405,7 +407,7 @@ static TIMER_CALLBACK( keyboard_callback )
 						scancode = 0x3e;
 				}
 				keyb_press = scancode;
-				keyb_press_flag = 1 | ((keymod & 0x02) ? 0x00 : 0x80);
+				keyb_press_flag = 1;
 				return;
 			}
 			scancode++;
