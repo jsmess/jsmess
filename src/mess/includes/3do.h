@@ -14,6 +14,7 @@ public:
 
 	_3do_state(running_machine &machine) { }
 
+	legacy_cpu_device* maincpu;
 	UINT32 *dram;
 	UINT32 *vram;
 };
