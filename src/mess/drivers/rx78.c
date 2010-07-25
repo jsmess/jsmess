@@ -5,8 +5,9 @@
 	preliminary driver by Angelo Salese
 
 	TODO:
-	- Rewrite vram routines, they aren't quite right (we're currently drawing
-	  stuff from the work ram and not the proper bitmap buffer)
+	- caps lock doesn't seem quite right;
+	- implement cmt / printer (hovewer no dumps are available right now)
+	- implement joystick inputs
 
 ****************************************************************************/
 
@@ -15,43 +16,57 @@
 #include "sound/sn76496.h"
 #include "devices/cartslot.h"
 
+static UINT8 vram_read_bank,vram_write_bank,pal_reg[7],pri_mask;
+
 static VIDEO_START( rx78 )
 {
 }
 
 static VIDEO_UPDATE( rx78 )
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0xe8be,x;
-	UINT8 *RAM = memory_region(screen->machine, "maincpu");
+	static UINT8 *vram = memory_region(screen->machine,"vram");
+	int x,y,count;
 
-	/* TODO: screw this up */
-	for (y = 0; y < 23; y++)
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x10]);
+
+	count = 0x2c0; //first 0x2bf bytes aren't used for bitmap drawing apparently
+
+	for(y=0;y<184;y++)
 	{
-		for (ra = 0; ra < 8; ra++)
+		for(x=0;x<192;x+=8)
 		{
-			UINT16  *p = BITMAP_ADDR16(bitmap, sy++, 0);
+			int color,pen[3],i;
 
-			for (x = ma; x < ma+30; x++)
+			for (i = 0; i < 8; i++)
 			{
-				chr = RAM[x];
+				/* bg color */
+				pen[0] = (pri_mask & 0x08) ? (vram[count + 0x6000] >> (i)) : 0x00;
+				pen[1] = (pri_mask & 0x10) ? (vram[count + 0x8000] >> (i)) : 0x00;
+				pen[2] = (pri_mask & 0x20) ? (vram[count + 0xa000] >> (i)) : 0x00;
 
-				/* get pattern of pixels for that character scanline */
-				gfx = RAM[0x1a27 + (chr<<3) + ra];
+				color  = ((pen[0] & 1) << 0);
+				color |= ((pen[1] & 1) << 1);
+				color |= ((pen[2] & 1) << 2);
 
-				/* Display a scanline of a character (8 pixels) */
-				*p = ( gfx & 0x01 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x02 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x04 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x08 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x10 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x20 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x40 ) ? 1 : 0; p++;
-				*p = ( gfx & 0x80 ) ? 1 : 0; p++;
+				if(color)
+					*BITMAP_ADDR16(bitmap, y, x+i) = screen->machine->pens[color];
+
+				/* fg color */
+				pen[0] = (pri_mask & 0x01) ? (vram[count + 0x0000] >> (i)) : 0x00;
+				pen[1] = (pri_mask & 0x02) ? (vram[count + 0x2000] >> (i)) : 0x00;
+				pen[2] = (pri_mask & 0x04) ? (vram[count + 0x4000] >> (i)) : 0x00;
+
+				color  = ((pen[0] & 1) << 0);
+				color |= ((pen[1] & 1) << 1);
+				color |= ((pen[2] & 1) << 2);
+
+				if(color)
+					*BITMAP_ADDR16(bitmap, y, x+i) = screen->machine->pens[color];
 			}
+			count++;
 		}
-		ma+=30;
 	}
+
 	return 0;
 }
 
@@ -86,20 +101,81 @@ static WRITE8_HANDLER( key_w )
 	key_mux = data;
 }
 
+static READ8_HANDLER( rx78_vram_r )
+{
+	static UINT8 *vram = memory_region(space->machine,"vram");
+
+	if(vram_read_bank == 0 || vram_read_bank > 6)
+		return 0xff;
+
+	return vram[offset + ((vram_read_bank - 1) * 0x2000)];
+}
+
+static WRITE8_HANDLER( rx78_vram_w )
+{
+	static UINT8 *vram = memory_region(space->machine,"vram");
+
+	if(vram_write_bank & 0x01) { vram[offset + 0 * 0x2000] = data; }
+	if(vram_write_bank & 0x02) { vram[offset + 1 * 0x2000] = data; }
+	if(vram_write_bank & 0x04) { vram[offset + 2 * 0x2000] = data; }
+	if(vram_write_bank & 0x08) { vram[offset + 3 * 0x2000] = data; }
+	if(vram_write_bank & 0x10) { vram[offset + 4 * 0x2000] = data; }
+	if(vram_write_bank & 0x20) { vram[offset + 5 * 0x2000] = data; }
+}
+
+static WRITE8_HANDLER( vram_read_bank_w )
+{
+	vram_read_bank = data;
+}
+
+static WRITE8_HANDLER( vram_write_bank_w )
+{
+	vram_write_bank = data;
+}
+
+static WRITE8_HANDLER( vdp_reg_w )
+{
+	UINT8 r,g,b,res,i;
+
+	pal_reg[offset] = data;
+
+	for(i=0;i<16;i++)
+	{
+		res = ((i & 1) ? pal_reg[0 + (i & 8 ? 3 : 0)] : 0) | ((i & 2) ? pal_reg[1 + (i & 8 ? 3 : 0)] : 0) | ((i & 4) ? pal_reg[2 + (i & 8 ? 3 : 0)] : 0);
+		if(res & pal_reg[6]) //color mask, TODO: check this
+			res &= pal_reg[6];
+
+		r = (res & 0x11) == 0x11 ? 0xff : ((res & 0x11) == 0x01 ? 0x7f : 0x00);
+		g = (res & 0x22) == 0x22 ? 0xff : ((res & 0x22) == 0x02 ? 0x7f : 0x00);
+		b = (res & 0x44) == 0x44 ? 0xff : ((res & 0x44) == 0x04 ? 0x7f : 0x00);
+
+		palette_set_color(space->machine, i, MAKE_RGB(r,g,b));
+	}
+}
+
+static WRITE8_HANDLER( vdp_bg_reg_w )
+{
+	int r,g,b;
+
+	r = (data & 0x11) == 0x11 ? 0xff : ((data & 0x11) == 0x01 ? 0x7f : 0x00);
+	g = (data & 0x22) == 0x22 ? 0xff : ((data & 0x22) == 0x02 ? 0x7f : 0x00);
+	b = (data & 0x44) == 0x44 ? 0xff : ((data & 0x44) == 0x04 ? 0x7f : 0x00);
+
+	palette_set_color(space->machine, 0x10, MAKE_RGB(r,g,b));
+}
+
+static WRITE8_HANDLER( vdp_pri_mask_w )
+{
+	pri_mask = data;
+}
 
 static ADDRESS_MAP_START(rx78_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x5fff) AM_ROM AM_REGION("cart_img", 0x0000)
-	AM_RANGE(0x6000, 0xffff) AM_RAM AM_REGION("maincpu", 0x6000)
-/*
-	base memory map:
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x5fff) AM_ROM //cart
-	AM_RANGE(0x6000, 0xafff) AM_RAM //ext ram
-	AM_RANGE(0xb000, 0xebff) AM_RAM //work ram
-	AM_RANGE(0xec00, 0xffff) AM_RAM //bitmap vram (banked)
-*/
+	AM_RANGE(0x6000, 0xafff) AM_RAM //ext RAM
+	AM_RANGE(0xb000, 0xebff) AM_RAM
+	AM_RANGE(0xec00, 0xffff) AM_READWRITE(rx78_vram_r, rx78_vram_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rx78_io , ADDRESS_SPACE_IO, 8)
@@ -108,10 +184,12 @@ static ADDRESS_MAP_START( rx78_io , ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
 //	AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
 //	AM_RANGE(0xf0, 0xf0) AM_NOP //cmt
-//	AM_RANGE(0xf1, 0xf2) AM_WRITENOP //memory banking
+	AM_RANGE(0xf1, 0xf1) AM_WRITE(vram_read_bank_w)
+	AM_RANGE(0xf2, 0xf2) AM_WRITE(vram_write_bank_w)
 	AM_RANGE(0xf4, 0xf4) AM_READWRITE(key_r,key_w) //keyboard
-//	AM_RANGE(0xf5, 0xfc) AM_WRITENOP //vdp
-//	AM_RANGE(0xfe, 0xfe) AM_WRITENOP //vdp pmask
+	AM_RANGE(0xf5, 0xfb) AM_WRITE(vdp_reg_w) //vdp
+	AM_RANGE(0xfc, 0xfc) AM_WRITE(vdp_bg_reg_w) //vdp
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(vdp_pri_mask_w)
 	AM_RANGE(0xff, 0xff) AM_DEVWRITE("sn1",sn76496_w) //psg
 ADDRESS_MAP_END
 
@@ -172,10 +250,10 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x02,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT(0x04,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_OPENBRACE) PORT_CHAR('[')
-	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR('\\')
+	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\\") PORT_CODE(KEYCODE_BACKSLASH)
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR(']')
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Arrow Up") //???
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Backspace") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Up Down Arrow") //???
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Right Left Arrow") //???
 
 	PORT_START("KEY6")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Space") PORT_CODE(KEYCODE_SPACE) PORT_CHAR(' ')
@@ -185,15 +263,15 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Left") PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("HOME") PORT_CODE(KEYCODE_HOME)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_UNUSED )
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("<unknown>") //clear screen?
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("INST / DEL") PORT_CODE(KEYCODE_BACKSPACE)
 
 	PORT_START("KEY7")
 	PORT_BIT(0x07,IP_ACTIVE_HIGH,IPT_UNUSED )
-	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("<unknown>") //0x08, goes to new line
+	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("STOP")
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_UNUSED )
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("RETURN") PORT_CODE(KEYCODE_ENTER) PORT_CHAR(27)
 	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_UNUSED )
-	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("<unknown>") //0x14, cursor change
+	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("SHIFT LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
 
 	PORT_START("KEY8")
 	PORT_BIT(0x01,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL) //kana shift?
@@ -254,10 +332,10 @@ static MACHINE_DRIVER_START( rx78 )
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(240, 184)
-    MDRV_SCREEN_VISIBLE_AREA(0, 240-1, 0, 184-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MDRV_SCREEN_SIZE(192, 184)
+    MDRV_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
+    MDRV_PALETTE_LENGTH(16+1) //+1 for the background color
+//  MDRV_PALETTE_INIT(black_and_white)
 	MDRV_GFXDECODE(rx78)
 
     MDRV_VIDEO_START(rx78)
@@ -269,7 +347,7 @@ static MACHINE_DRIVER_START( rx78 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
+	MDRV_SOUND_ADD("sn1", SN76489A, 3579545) // unknown divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -280,6 +358,8 @@ ROM_START( rx78 )
 
 	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASEFF )
 	ROM_CART_LOAD("cart", 0x0000, 0x4000, ROM_OPTIONAL | ROM_NOMIRROR)
+
+	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
 /* Driver */
