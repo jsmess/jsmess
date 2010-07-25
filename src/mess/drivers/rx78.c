@@ -1,20 +1,28 @@
-/***************************************************************************
+/************************************************************************************************************
 
 	Gundam RX-78 (c) 1983 Bandai
 
 	preliminary driver by Angelo Salese
 
 	TODO:
-	- caps lock doesn't seem quite right;
-	- implement cmt / printer (hovewer no dumps are available right now)
-	- implement joystick inputs
+	- implement cmt (hovewer no dumps are available right now)
+	- implement printer
+	- caps lock doesn't seem quite right, I need to press it twice to have the desired effect;
 
-****************************************************************************/
+	Notes:
+	- BS-BASIC v1.0 have a graphic bug with the RX-78 logo, it doesn't set the read bank so all of the color
+	  info minus plane 1 is lost when the screen scrolls vertically. Almost certainly a btanb.
+	- To stop a cmt load, press STOP + SHIFT keys
+
+*************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "devices/cartslot.h"
+#include "devices/messram.h"
+
+#define MASTER_CLOCK XTAL_28_63636MHz
 
 static UINT8 vram_read_bank,vram_write_bank,pal_reg[7],pri_mask;
 
@@ -90,7 +98,7 @@ static READ8_HANDLER( key_r )
 		return res;
 	}
 
-	if(key_mux >= 1 && key_mux <= 9)
+	if(key_mux >= 1 && key_mux <= 15)
 		return input_port_read(space->machine, keynames[key_mux - 1]);
 
 	return 0;
@@ -105,7 +113,7 @@ static READ8_HANDLER( rx78_vram_r )
 {
 	static UINT8 *vram = memory_region(space->machine,"vram");
 
-	if(vram_read_bank == 0 || vram_read_bank > 6)
+	if(vram_read_bank == 0) //|| vram_read_bank > 6)
 		return 0xff;
 
 	return vram[offset + ((vram_read_bank - 1) * 0x2000)];
@@ -169,6 +177,7 @@ static WRITE8_HANDLER( vdp_pri_mask_w )
 	pri_mask = data;
 }
 
+
 static ADDRESS_MAP_START(rx78_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -183,7 +192,7 @@ static ADDRESS_MAP_START( rx78_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //	AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
 //	AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
-//	AM_RANGE(0xf0, 0xf0) AM_NOP //cmt
+//	AM_RANGE(0xf0, 0xf0) AM_READ(cmt_r) //cmt
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(vram_read_bank_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITE(vram_write_bank_w)
 	AM_RANGE(0xf4, 0xf4) AM_READWRITE(key_r,key_w) //keyboard
@@ -280,17 +289,41 @@ static INPUT_PORTS_START( rx78 )
 	PORT_BIT(0xf8,IP_ACTIVE_HIGH,IPT_UNUSED )
 
 	PORT_START("JOY1P_0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Up Left") PORT_PLAYER(1)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+
 	PORT_START("JOY1P_1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Down Left")  PORT_PLAYER(1)
+	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Up Right") PORT_PLAYER(1)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_START("JOY1P_2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY  PORT_PLAYER(1)
+	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P1 Down Right") PORT_PLAYER(1)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_PLAYER(1)
+	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+
 	PORT_START("JOY2P_0")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Up Left") PORT_PLAYER(2)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+
 	PORT_START("JOY2P_1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Down Left")  PORT_PLAYER(2)
+	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Up Right") PORT_PLAYER(2)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 	PORT_START("JOY2P_2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x11, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY  PORT_PLAYER(2)
+	PORT_BIT( 0x22, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("P2 Down Right") PORT_PLAYER(2)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY  PORT_PLAYER(2)
+	PORT_BIT( 0x88, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+
 	PORT_START("UNUSED")
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
@@ -320,7 +353,7 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( rx78 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)	// 4.1mhz
+    MDRV_CPU_ADD("maincpu",Z80, MASTER_CLOCK/7)	// unknown divider
     MDRV_CPU_PROGRAM_MAP(rx78_mem)
     MDRV_CPU_IO_MAP(rx78_io)
 	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
@@ -329,13 +362,12 @@ static MACHINE_DRIVER_START( rx78 )
 
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(50)
+    MDRV_SCREEN_REFRESH_RATE(60)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(192, 184)
     MDRV_SCREEN_VISIBLE_AREA(0, 192-1, 0, 184-1)
     MDRV_PALETTE_LENGTH(16+1) //+1 for the background color
-//  MDRV_PALETTE_INIT(black_and_white)
 	MDRV_GFXDECODE(rx78)
 
     MDRV_VIDEO_START(rx78)
@@ -345,9 +377,13 @@ static MACHINE_DRIVER_START( rx78 )
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
 
+	MDRV_RAM_ADD("messram")
+	MDRV_RAM_DEFAULT_SIZE("32k")
+	MDRV_RAM_EXTRA_OPTIONS("16k")
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489A, 3579545) // unknown divider
+	MDRV_SOUND_ADD("sn1", SN76489A, XTAL_28_63636MHz/8) // unknown divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -362,8 +398,17 @@ ROM_START( rx78 )
 	ROM_REGION( 6 * 0x2000, "vram", ROMREGION_ERASE00 )
 ROM_END
 
+static DRIVER_INIT( rx78 )
+{
+	UINT32 ram_size = messram_get_size(machine->device("messram"));
+	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	if(ram_size == 0x4000)
+		memory_unmap_readwrite(prg, 0x6000, 0xafff, 0, 0);
+}
+
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1983, rx78,  	0,       0, 		rx78, 	rx78, 	 0,  	  "Bandai",   "Gundam RX-78",		GAME_NOT_WORKING)
+COMP( 1983, rx78,  	0,       0, 		rx78, 	rx78, 	 rx78,  	  "Bandai",   "Gundam RX-78",		GAME_NOT_WORKING)
 
