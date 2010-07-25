@@ -14,7 +14,7 @@
 
 static UINT8 *vram;
 static UINT8 mcu_init;
-static UINT8 keyb_press,keyb_press_flag;
+static UINT8 keyb_press,keyb_press_flag,display_reg;
 static UINT16 cursor_addr,cursor_raster;
 
 static VIDEO_START( multi8 )
@@ -24,11 +24,14 @@ static VIDEO_START( multi8 )
 static VIDEO_UPDATE( multi8 )
 {
 	int x,y,count;
+	int x_width;
 	count = 0x0000;
+
+	x_width = (display_reg & 0x40) ? 80 : 40;
 
 	for(y=0;y<25;y++)
 	{
-		for(x=0;x<40;x++)
+		for(x=0;x<x_width;x++)
 		{
 			int tile = vram[count];
 			int color = vram[count+0x800] & 0x20;
@@ -60,7 +63,7 @@ static VIDEO_UPDATE( multi8 )
 					}
 				}
 			}
-			count+=2;
+			(display_reg & 0x40) ? count++ : count+=2;
 		}
 	}
     return 0;
@@ -366,6 +369,25 @@ static WRITE8_DEVICE_HANDLER( porta_w )
 static WRITE8_DEVICE_HANDLER( portb_w )
 {
 //	printf("Port B w = %02x\n",data);
+
+	{
+		if((display_reg & 0x40) != (data & 0x40))
+		{
+			rectangle visarea = device->machine->primary_screen->visible_area();
+			int x_width;
+
+			x_width = (data & 0x40) ? 640 : 320;
+
+			visarea.min_x = visarea.min_y = 0;
+			visarea.max_y = (200) - 1;
+			visarea.max_x = (x_width) - 1;
+
+			device->machine->primary_screen->configure(640, 200, visarea, device->machine->primary_screen->frame_period().attoseconds);
+		}
+	}
+
+
+	display_reg = data;
 }
 
 static WRITE8_DEVICE_HANDLER( portc_w )
