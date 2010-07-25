@@ -132,6 +132,8 @@ static MACHINE_RESET( 3do )
 {
 	_3do_state *state = (_3do_state *)machine->driver_data;
 
+	state->maincpu = downcast<legacy_cpu_device*>( machine->device("maincpu") );
+
 	memory_set_bankptr(machine, "bank2",memory_region(machine, "user1"));
 
 	/* configure overlay */
@@ -144,8 +146,6 @@ static MACHINE_RESET( 3do )
 	_3do_slow2_init(machine);
 	_3do_madam_init(machine);
 	_3do_clio_init(machine, downcast<screen_device *>(machine->device("screen")));
-
-	arm_set_endianness( downcast<legacy_cpu_device*>( machine->device("maincpu") ), ENDIANNESS_BIG );
 }
 
 
@@ -154,7 +154,7 @@ static MACHINE_DRIVER_START( 3do )
 	MDRV_DRIVER_DATA( _3do_state )
 
 	/* Basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", ARM, XTAL_50MHz/4 )
+	MDRV_CPU_ADD( "maincpu", ARM_BE, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem)
 
 	MDRV_MACHINE_RESET( 3do )
@@ -177,7 +177,7 @@ static MACHINE_DRIVER_START( 3do_pal )
 	MDRV_DRIVER_DATA( _3do_state )
 
 	/* Basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM, XTAL_50MHz/4 )
+	MDRV_CPU_ADD("maincpu", ARM_BE, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem)
 
 	MDRV_MACHINE_RESET( 3do )
