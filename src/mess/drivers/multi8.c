@@ -1,5 +1,5 @@
 /***************************************************************************
-   
+
         Mitsubishi Multi 8
 
         13/07/2010 Skeleton driver.
@@ -8,6 +8,33 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "video/mc6845.h"
+
+static VIDEO_START( multi8 )
+{
+}
+
+static VIDEO_UPDATE( multi8 )
+{
+    return 0;
+}
+
+static WRITE8_HANDLER( multi8_6845_w )
+{
+	static int addr_latch;
+
+	if(offset == 0)
+	{
+		addr_latch = data;
+		mc6845_address_w(space->machine->device("crtc"), 0,data);
+	}
+	else
+	{
+		mc6845_register_w(space->machine->device("crtc"), 0,data);
+	}
+}
+
 
 static ADDRESS_MAP_START(multi8_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -17,15 +44,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( multi8_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	/* This is all a guess... ports used in the bootup process:
-	in 00 = ascii code from the keyboard
-	in 01 = is a key pressed? (bit 1) also bits 6 and 7 are used
-	out 10 = unknown
-	out 18, 19 = audio channel
-	in 1A = unknown
-	out 1C, 1D = possibly a mc6845
-	out 25, 26, 27, 2A, 2B, 2C, 2D, 30, 78 = unknown
-	in 28 = unknown (bit 5 is a status line) */
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+
+//	AM_RANGE(0x00, 0x01) //keyboard line
+	AM_RANGE(0x18, 0x19) AM_DEVWRITE("ymsnd", ym2203_w)
+//	AM_RANGE(0x18, 0x18) //opn read 0
+//	AM_RANGE(0x1a, 0x1a) //opn read 1
+	AM_RANGE(0x1c, 0x1d) AM_WRITE(multi8_6845_w)
+//	AM_RANGE(0x20, 0x21) //sio, cmt
+//	AM_RANGE(0x24, 0x27) //pit
+//	AM_RANGE(0x28, 0x2b) //i8255 0
+//	AM_RANGE(0x2c, 0x2d) //i8259
+//	AM_RANGE(0x30, 0x37) //vdp regs
+//	AM_RANGE(0x40, 0x41) //kanji regs
+//	AM_RANGE(0x70, 0x74) //upd765a fdc
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -33,17 +65,8 @@ static INPUT_PORTS_START( multi8 )
 INPUT_PORTS_END
 
 
-static MACHINE_RESET(multi8) 
-{	
-}
-
-static VIDEO_START( multi8 )
+static MACHINE_RESET(multi8)
 {
-}
-
-static VIDEO_UPDATE( multi8 )
-{
-    return 0;
 }
 
 /* F4 Character Displayer */
@@ -64,27 +87,50 @@ static GFXDECODE_START( multi8 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, multi8_charlayout, 0, 1 )
 GFXDECODE_END
 
+static const mc6845_interface mc6845_intf =
+{
+	"screen",	/* screen we are acting on */
+	8,			/* number of pixels per video memory address */
+	NULL,		/* before pixel update callback */
+	NULL,		/* row update callback */
+	NULL,		/* after pixel update callback */
+	DEVCB_NULL,	/* callback for display state changes */
+	DEVCB_NULL,	/* callback for cursor state changes */
+	DEVCB_NULL,	/* HSYNC callback */
+	DEVCB_NULL,	/* VSYNC callback */
+	NULL		/* update address callback */
+};
+
+
 static MACHINE_DRIVER_START( multi8 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
     MDRV_CPU_PROGRAM_MAP(multi8_mem)
-    MDRV_CPU_IO_MAP(multi8_io)	
+    MDRV_CPU_IO_MAP(multi8_io)
 
     MDRV_MACHINE_RESET(multi8)
-	
+
     /* video hardware */
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_SCREEN_SIZE(640, 200)
+    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 200-1)
     MDRV_PALETTE_LENGTH(2)
     MDRV_PALETTE_INIT(black_and_white)
 	MDRV_GFXDECODE(multi8)
 
+	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/2, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
+
     MDRV_VIDEO_START(multi8)
     MDRV_VIDEO_UPDATE(multi8)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000) //unknown clock / divider
+//	MDRV_SOUND_CONFIG(ym2203_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 /* ROM definition */
