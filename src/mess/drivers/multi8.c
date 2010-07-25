@@ -319,7 +319,7 @@ static INPUT_PORTS_START( multi8 )
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("9") PORT_CODE(KEYCODE_9) PORT_CHAR('9')
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(":") PORT_CODE(KEYCODE_QUOTE) PORT_CHAR(':')
 	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(";") PORT_CODE(KEYCODE_COLON) PORT_CHAR(';')
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3c <
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("<") PORT_CODE(KEYCODE_BACKSLASH2) PORT_CHAR('<')
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3d =
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3e >
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x3f ?
@@ -382,7 +382,7 @@ static TIMER_CALLBACK( keyboard_callback )
 				//key_flag = 1;
 				if(keymod & 0x02)  // shift not pressed
 				{
-					if(scancode >= 0x41 && scancode < 0x5a)
+					if(scancode >= 0x41 && scancode < 0x5b)
 						scancode += 0x20;  // lowercase
 				}
 				else
@@ -399,6 +399,8 @@ static TIMER_CALLBACK( keyboard_callback )
 						scancode = 0x2e;
 					if(scancode == 0x5b)
 						scancode = 0x2b;
+					if(scancode == 0x3c)
+						scancode = 0x3e;
 				}
 				keyb_press = scancode;
 				keyb_press_flag = 1;
