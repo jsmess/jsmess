@@ -1,8 +1,12 @@
 /***************************************************************************
 
-        Mitsubishi Multi 8
+	Multi 8 (c) 1983 Mitsubishi
 
-        13/07/2010 Skeleton driver.
+	preliminary driver by Angelo Salese
+
+	TODO:
+	- can't compile any code snippet out of BASIC, just single commands seems
+	  to work
 
 ****************************************************************************/
 
@@ -12,10 +16,10 @@
 #include "video/mc6845.h"
 #include "machine/i8255a.h"
 
-static UINT8 *vram;
 static UINT8 mcu_init;
 static UINT8 keyb_press,keyb_press_flag,display_reg;
 static UINT16 cursor_addr,cursor_raster;
+static UINT8 vram_bank;
 
 static VIDEO_START( multi8 )
 {
@@ -25,21 +29,64 @@ static VIDEO_UPDATE( multi8 )
 {
 	int x,y,count;
 	int x_width;
+	int xi,yi;
+	static UINT8 *vram = memory_region(screen->machine, "vram");
+	static UINT8 *gfx_rom = memory_region(screen->machine, "chargen");
+
 	count = 0x0000;
 
+	x_width = (display_reg & 0x40) ? 640 : 320;
+
+	for(y=0;y<200;y++)
+	{
+		for(x=0;x<x_width;x+=8)
+		{
+			for(xi=0;xi<8;xi++)
+			{
+				int pen_r,pen_g,pen_b,color;
+
+				pen_b = (vram[count | 0x0000] >> (7-xi)) & 1;
+				pen_r = (vram[count | 0x4000] >> (7-xi)) & 1;
+				pen_g = (vram[count | 0x8000] >> (7-xi)) & 1;
+
+				color = (pen_b) | (pen_r << 1) | (pen_g << 2);
+
+				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[color];
+			}
+			count++;
+		}
+	}
+
 	x_width = (display_reg & 0x40) ? 80 : 40;
+	count = 0xc000;
 
 	for(y=0;y<25;y++)
 	{
 		for(x=0;x<x_width;x++)
 		{
 			int tile = vram[count];
-			int color = vram[count+0x800] & 0x20;
+			int color = (vram[count+0x800] & 0x38) >> 3;
 
-			drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], tile,color >> 5, 0, 0, x*8, y*8);
+			if(color == 0)
+				color = 7;
+
+			for(yi=0;yi<8;yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					int pen;
+
+					pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
+
+					if(pen)
+						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
+				}
+			}
+
+			//drawgfx_opaque(bitmap, cliprect, screen->machine->gfx[0], tile,color >> 5, 0, 0, x*8, y*8);
 
 			// draw cursor
-			if(cursor_addr == count)
+			if(cursor_addr+0xc000 == count)
 			{
 				int xc,yc,cursor_on;
 
@@ -58,11 +105,12 @@ static VIDEO_UPDATE( multi8 )
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							*BITMAP_ADDR16(bitmap, y*8+yc+7, x*8+xc) = screen->machine->pens[0x1];
+							*BITMAP_ADDR16(bitmap, y*8+yc, x*8+xc) = screen->machine->pens[0x7];
 						}
 					}
 				}
 			}
+
 			(display_reg & 0x40) ? count++ : count+=2;
 		}
 	}
@@ -109,11 +157,36 @@ static READ8_HANDLER( key_status_r )
 	return keyb_press_flag;
 }
 
+static READ8_HANDLER( multi8_vram_r )
+{
+	static UINT8 *vram = memory_region(space->machine, "vram");
+	UINT8 res;
+
+	res = 0xff;
+	if(!(vram_bank & 1)) { res &= vram[offset | 0x0000]; }
+	if(!(vram_bank & 2)) { res &= vram[offset | 0x4000]; }
+	if(!(vram_bank & 4)) { res &= vram[offset | 0x8000]; }
+	if(!(vram_bank & 8)) { res &= vram[offset | 0xc000]; }
+
+	return res;
+}
+
+static WRITE8_HANDLER( multi8_vram_w )
+{
+	static UINT8 *vram = memory_region(space->machine, "vram");
+
+	if(!(vram_bank & 1)) { vram[offset | 0x0000] = data; }
+	if(!(vram_bank & 2)) { vram[offset | 0x4000] = data; }
+	if(!(vram_bank & 4)) { vram[offset | 0x8000] = data; }
+	if(!(vram_bank & 8)) { vram[offset | 0xc000] = data; }
+}
+
+
 static ADDRESS_MAP_START(multi8_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&vram)
-	AM_RANGE(0x9000, 0xffff) AM_RAM
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE( multi8_vram_r, multi8_vram_w )
+	AM_RANGE(0xc000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( multi8_io , ADDRESS_SPACE_IO, 8)
@@ -276,9 +349,13 @@ static TIMER_CALLBACK( keyboard_callback )
 					if(scancode >= 0x31 && scancode < 0x3a)
 						scancode -= 0x10;
 					if(scancode == 0x30)
-					{
 						scancode = 0x3d;
-					}
+
+					if(scancode == 0x3b)
+						scancode = 0x2c;
+
+					if(scancode == 0x3a)
+						scancode = 0x2e;
 				}
 				keyb_press = scancode;
 				keyb_press_flag = 1;
@@ -333,11 +410,10 @@ static const mc6845_interface mc6845_intf =
 
 static PALETTE_INIT( multi8 )
 {
-	palette_set_color_rgb(machine, 0, 0x00,0x00,0x00);
-	palette_set_color_rgb(machine, 1, 0xff,0xff,0xff);
-	palette_set_color_rgb(machine, 2, 0xff,0xff,0xff);
-	palette_set_color_rgb(machine, 3, 0x00,0x00,0x00);
+	int i;
 
+	for(i=0;i<8;i++)
+		palette_set_color_rgb(machine, i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
 static READ8_DEVICE_HANDLER( porta_r )
@@ -393,6 +469,10 @@ static WRITE8_DEVICE_HANDLER( portb_w )
 static WRITE8_DEVICE_HANDLER( portc_w )
 {
 //	printf("Port C w = %02x\n",data);
+	vram_bank = data & 0xf;
+
+//	if(data & 0x20)
+//		fatalerror("Work RAM bank selected");
 }
 
 
@@ -424,7 +504,7 @@ static MACHINE_DRIVER_START( multi8 )
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(640, 200)
     MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-    MDRV_PALETTE_LENGTH(4)
+    MDRV_PALETTE_LENGTH(8)
     MDRV_PALETTE_INIT(multi8)
 	MDRV_GFXDECODE(multi8)
 
@@ -444,8 +524,11 @@ MACHINE_DRIVER_END
 ROM_START( multi8 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD( "basic.rom", 0x0000, 0x8000, CRC(2131a3a8) SHA1(0f5a565ecfbf79237badbf9011dcb374abe74a57))
+
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.rom",  0x0000, 0x0800, CRC(08f9ed0e) SHA1(57480510fb30af1372df5a44b23066ca61c6f0d9))
+
+	ROM_REGION( 0x10000, "vram", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
