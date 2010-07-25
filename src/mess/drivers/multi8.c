@@ -5,8 +5,9 @@
 	preliminary driver by Angelo Salese
 
 	TODO:
-	- can't compile any code snippet out of BASIC, just single commands seems
-	  to work
+	- dunno how to trigger the text color mode in BASIC, I just modify
+	  $f0b1 to 1 for now
+	- bitmap B/W mode is untested
 
 ****************************************************************************/
 
@@ -20,6 +21,7 @@ static UINT8 mcu_init;
 static UINT8 keyb_press,keyb_press_flag,display_reg;
 static UINT16 cursor_addr,cursor_raster;
 static UINT8 vram_bank;
+static UINT8 pen_clut[8],bw_mode;
 
 static VIDEO_START( multi8 )
 {
@@ -49,9 +51,18 @@ static VIDEO_UPDATE( multi8 )
 				pen_r = (vram[count | 0x4000] >> (7-xi)) & 1;
 				pen_g = (vram[count | 0x8000] >> (7-xi)) & 1;
 
-				color = (pen_b) | (pen_r << 1) | (pen_g << 2);
+				if(bw_mode)
+				{
+					pen_b = (display_reg & 1) ? pen_b : 0;
+					pen_r = (display_reg & 2) ? pen_r : 0;
+					pen_g = (display_reg & 4) ? pen_g : 0;
 
-				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[color];
+					color = ((pen_b) | (pen_r) | (pen_g)) ? 7 : 0;
+				}
+				else
+					color = (pen_b) | (pen_r << 1) | (pen_g << 2);
+
+				*BITMAP_ADDR16(bitmap, y, x+xi) = screen->machine->pens[pen_clut[color]];
 			}
 			count++;
 		}
@@ -65,10 +76,8 @@ static VIDEO_UPDATE( multi8 )
 		for(x=0;x<x_width;x++)
 		{
 			int tile = vram[count];
-			int color = (vram[count+0x800] & 0x38) >> 3;
-
-			if(color == 0)
-				color = 7;
+			int attr = vram[count+0x800];
+			int color = (display_reg & 0x80) ? 7 : (attr & 0x07);
 
 			for(yi=0;yi<8;yi++)
 			{
@@ -77,6 +86,9 @@ static VIDEO_UPDATE( multi8 )
 					int pen;
 
 					pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
+
+					if(attr & 0x20)
+						pen^=7;
 
 					if(pen)
 						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
@@ -160,7 +172,11 @@ static READ8_HANDLER( key_status_r )
 static READ8_HANDLER( multi8_vram_r )
 {
 	static UINT8 *vram = memory_region(space->machine, "vram");
+	static UINT8 *wram = memory_region(space->machine, "wram");
 	UINT8 res;
+
+	if(!(vram_bank & 0x10)) //select plain work ram
+		return wram[offset];
 
 	res = 0xff;
 	if(!(vram_bank & 1)) { res &= vram[offset | 0x0000]; }
@@ -174,6 +190,13 @@ static READ8_HANDLER( multi8_vram_r )
 static WRITE8_HANDLER( multi8_vram_w )
 {
 	static UINT8 *vram = memory_region(space->machine, "vram");
+	static UINT8 *wram = memory_region(space->machine, "wram");
+
+	if(!(vram_bank & 0x10)) //select plain work ram
+	{
+		wram[offset] = data;
+		return;
+	}
 
 	if(!(vram_bank & 1)) { vram[offset | 0x0000] = data; }
 	if(!(vram_bank & 2)) { vram[offset | 0x4000] = data; }
@@ -181,6 +204,24 @@ static WRITE8_HANDLER( multi8_vram_w )
 	if(!(vram_bank & 8)) { vram[offset | 0xc000] = data; }
 }
 
+static READ8_HANDLER( pal_r )
+{
+	return pen_clut[offset];
+}
+
+static WRITE8_HANDLER( pal_w )
+{
+	pen_clut[offset] = data;
+
+	{
+		int i;
+		for(i=0;i<8;i++)
+		{
+			if(pen_clut[i]) { bw_mode = 0; return; }
+		}
+		bw_mode = 1;
+	}
+}
 
 static ADDRESS_MAP_START(multi8_mem, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
@@ -190,7 +231,7 @@ static ADDRESS_MAP_START(multi8_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( multi8_io , ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_UNMAP_HIGH
+//	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(key_input_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x01, 0x01) AM_READ(key_status_r) AM_WRITENOP//keyboard
@@ -202,7 +243,7 @@ static ADDRESS_MAP_START( multi8_io , ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0x24, 0x27) //pit
 	AM_RANGE(0x28, 0x2b) AM_DEVREADWRITE("ppi8255_0", i8255a_r, i8255a_w)
 //	AM_RANGE(0x2c, 0x2d) //i8259
-//	AM_RANGE(0x30, 0x37) //vdp regs
+	AM_RANGE(0x30, 0x37) AM_READWRITE(pal_r,pal_w)
 //	AM_RANGE(0x40, 0x41) //kanji regs
 //	AM_RANGE(0x70, 0x74) //upd765a fdc
 //	AM_RANGE(0x78, 0x78) //memory banking
@@ -260,7 +301,7 @@ static INPUT_PORTS_START( multi8 )
 	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_UNUSED) //0x28 (
 	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_UNUSED) //0x29 )
 	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2a *
-	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2b +
+	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2c ,
 	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
 	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2e .
@@ -356,6 +397,8 @@ static TIMER_CALLBACK( keyboard_callback )
 
 					if(scancode == 0x3a)
 						scancode = 0x2e;
+					if(scancode == 0x5b)
+						scancode = 0x2b;
 				}
 				keyb_press = scancode;
 				keyb_press_flag = 1;
@@ -420,31 +463,21 @@ static READ8_DEVICE_HANDLER( porta_r )
 {
 	int vsync = (input_port_read(device->machine, "VBLANK") & 0x1) << 5;
 
-	return 0xdf | vsync;
+	return ~0x60 | vsync;
 }
 
-static READ8_DEVICE_HANDLER( portb_r )
-{
-//	printf("Port B r\n");
-
-	return 0xff;
-}
-
-static READ8_DEVICE_HANDLER( portc_r )
-{
-//	printf("Port C r\n");
-
-	return 0xff;
-}
-
-static WRITE8_DEVICE_HANDLER( porta_w )
-{
-//	printf("Port A w = %02x\n",data);
-}
 
 static WRITE8_DEVICE_HANDLER( portb_w )
 {
-//	printf("Port B w = %02x\n",data);
+	/*
+		x--- ---- color mode
+		-x-- ---- screen width (80 / 40)
+		---- x--- memory bank status
+		---- -xxx page screen graphics in B/W mode
+	*/
+//	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+//	printf("Port B w = %02x %04x\n",data,cpu_get_pc(space->cpu));
 
 	{
 		if((display_reg & 0x40) != (data & 0x40))
@@ -462,16 +495,16 @@ static WRITE8_DEVICE_HANDLER( portb_w )
 		}
 	}
 
-
 	display_reg = data;
 }
 
 static WRITE8_DEVICE_HANDLER( portc_w )
 {
 //	printf("Port C w = %02x\n",data);
-	vram_bank = data & 0xf;
+	vram_bank = data & 0x1f;
 
-//	if(data & 0x20)
+	if(data & 0x20 && data != 0xff)
+		printf("Work RAM bank selected!\n");
 //		fatalerror("Work RAM bank selected");
 }
 
@@ -479,9 +512,9 @@ static WRITE8_DEVICE_HANDLER( portc_w )
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
 	DEVCB_HANDLER(porta_r),			/* Port A read */
-	DEVCB_HANDLER(portb_r),			/* Port B read */
-	DEVCB_HANDLER(portc_r),			/* Port C read */
-	DEVCB_HANDLER(porta_w),			/* Port A write */
+	DEVCB_NULL,						/* Port B read */
+	DEVCB_NULL,						/* Port C read */
+	DEVCB_NULL,						/* Port A write */
 	DEVCB_HANDLER(portb_w),			/* Port B write */
 	DEVCB_HANDLER(portc_w)			/* Port C write */
 };
@@ -528,7 +561,12 @@ ROM_START( multi8 )
 	ROM_REGION( 0x0800, "chargen", 0 )
 	ROM_LOAD( "font.rom",  0x0000, 0x0800, CRC(08f9ed0e) SHA1(57480510fb30af1372df5a44b23066ca61c6f0d9))
 
+	ROM_REGION( 0x1000, "fdc_bios", 0 )
+	ROM_LOAD( "disk.rom",  0x0000, 0x1000, NO_DUMP )
+
 	ROM_REGION( 0x10000, "vram", ROMREGION_ERASEFF )
+
+	ROM_REGION( 0x4000, "wram", ROMREGION_ERASEFF )
 ROM_END
 
 /* Driver */
