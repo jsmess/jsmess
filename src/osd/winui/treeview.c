@@ -926,7 +926,7 @@ void CreateCPUFolders(int parent_index)
 	LPTREEFOLDER folder;
 	machine_config *config = NULL;
 	const machine_config_token *last_tokens = NULL;
-	const device_config_execute_interface *device;
+	const device_config_execute_interface *device = NULL;
 	int nFolder = numFolders;
 
 	for (i = 0; drivers[i] != NULL; i++)
@@ -998,7 +998,7 @@ void CreateSoundFolders(int parent_index)
 	LPTREEFOLDER folder;
 	machine_config *config = NULL;
 	const machine_config_token *last_tokens = NULL;
-	const device_config_sound_interface *device;
+	const device_config_sound_interface *device = NULL;
 	int nFolder = numFolders;
 
 	for (i = 0; drivers[i] != NULL; i++)

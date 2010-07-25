@@ -414,7 +414,7 @@ static struct DriversInfo* GetDriversInfo(int driver_index)
 			gameinfo->usesSamples = FALSE;
 			
 			{
-				const device_config_sound_interface *sound;
+				const device_config_sound_interface *sound = NULL;
 				const char * const * samplenames = NULL;
 				for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound)) {
 					if (sound->devconfig().type() == SOUND_SAMPLES)
