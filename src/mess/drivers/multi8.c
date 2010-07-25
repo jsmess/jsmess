@@ -8,6 +8,7 @@
 	- dunno how to trigger the text color mode in BASIC, I just modify
 	  $f0b1 to 1 for now
 	- bitmap B/W mode is untested
+	- Beeper keeps ringing, is it due of an HW failure?
 
 ****************************************************************************/
 
@@ -16,6 +17,7 @@
 #include "sound/2203intf.h"
 #include "video/mc6845.h"
 #include "machine/i8255a.h"
+#include "sound/beep.h"
 
 static UINT8 mcu_init;
 static UINT8 keyb_press,keyb_press_flag,display_reg;
@@ -237,7 +239,7 @@ static ADDRESS_MAP_START( multi8_io , ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x01, 0x01) AM_READ(key_status_r) AM_WRITENOP//keyboard
 	AM_RANGE(0x18, 0x19) AM_DEVWRITE("ymsnd", ym2203_w)
 //	AM_RANGE(0x18, 0x18) //opn read 0
-//	AM_RANGE(0x1a, 0x1a) //opn read 1
+	AM_RANGE(0x1a, 0x1a) AM_DEVREAD("ymsnd", ym2203_r)
 	AM_RANGE(0x1c, 0x1d) AM_WRITE(multi8_6845_w)
 //	AM_RANGE(0x20, 0x21) //sio, cmt
 //	AM_RANGE(0x24, 0x27) //pit
@@ -411,16 +413,6 @@ static TIMER_CALLBACK( keyboard_callback )
 	}
 }
 
-static MACHINE_START(multi8)
-{
-	timer_pulse(machine, ATTOTIME_IN_HZ(240/32), NULL, 0, keyboard_callback);
-}
-
-static MACHINE_RESET(multi8)
-{
-	mcu_init = 0;
-}
-
 /* F4 Character Displayer */
 static const gfx_layout multi8_charlayout =
 {
@@ -521,6 +513,34 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 	DEVCB_HANDLER(portc_w)			/* Port C write */
 };
 
+static WRITE8_DEVICE_HANDLER( ym2203_porta_w )
+{
+	beep_set_state(device->machine->device("beeper"),data & 0x08);
+}
+
+static const ym2203_interface ym2203_config =
+{
+	{
+		AY8910_LEGACY_OUTPUT,
+		AY8910_DEFAULT_LOADS,
+		DEVCB_NULL, DEVCB_NULL, DEVCB_HANDLER( ym2203_porta_w ), DEVCB_NULL
+	},
+	NULL
+};
+
+
+static MACHINE_START(multi8)
+{
+	timer_pulse(machine, ATTOTIME_IN_HZ(240/32), NULL, 0, keyboard_callback);
+}
+
+static MACHINE_RESET(multi8)
+{
+	beep_set_frequency(machine->device("beeper"),300); //guesswork
+	beep_set_state(machine->device("beeper"),0);
+	mcu_init = 0;
+}
+
 static MACHINE_DRIVER_START( multi8 )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",Z80, XTAL_4MHz)
@@ -551,8 +571,11 @@ static MACHINE_DRIVER_START( multi8 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000) //unknown clock / divider
-//	MDRV_SOUND_CONFIG(ym2203_config)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("beeper", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.00) //FIXME: temporarly silenced
 MACHINE_DRIVER_END
 
 /* ROM definition */
