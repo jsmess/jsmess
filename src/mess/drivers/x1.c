@@ -24,8 +24,6 @@
     - Bosconian: title screen background is completely white because it reverts the pen used
       (it's gray in the Arcade version),could be either flickering for pseudo-alpha effect or it's
       a btanb;
-    - Mappy/Gradius: they sets 320x200 with fps = 30 Hz, due of that they are too slow (they must run at 60 Hz),
-      HW limitation/MC6845 bug?
     - Exoa II - Warroid: major tile width/height positioning bugs (especially during gameplay);
 	- Hydlide 2 / 3: can't get the user disk to work properly
 	- Gruppe: shows a random bitmap graphic then returns "program load error"
@@ -1204,6 +1202,9 @@ static WRITE8_HANDLER( x1_6845_w )
 			crtc_start_addr = (crtc_start_addr & 0x3f00) | (data & 0xff);
 
 		mc6845_register_w(space->machine->device("crtc"), 0,data);
+
+		/* double pump the pixel clock if we are in 640 x 200 mode */
+		mc6845_set_clock(space->machine->device("crtc"), (space->machine->primary_screen->width() < 640) ? VDP_CLOCK/48 : VDP_CLOCK/24);
 	}
 }
 
