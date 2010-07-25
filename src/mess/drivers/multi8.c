@@ -405,7 +405,7 @@ static TIMER_CALLBACK( keyboard_callback )
 						scancode = 0x3e;
 				}
 				keyb_press = scancode;
-				keyb_press_flag = 1;
+				keyb_press_flag = 1 | ((keymod & 0x02) ? 0x00 : 0x80);
 				return;
 			}
 			scancode++;
