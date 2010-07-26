@@ -95,6 +95,7 @@ Part list of Goldstar 3DO Interactive Multiplayer
 #include "includes/3do.h"
 #include "devices/chd_cd.h"
 #include "cpu/arm/arm.h"
+#include "cpu/arm7/arm7.h"
 
 
 #define X2_CLOCK_PAL	59000000
@@ -154,7 +155,7 @@ static MACHINE_DRIVER_START( 3do )
 	MDRV_DRIVER_DATA( _3do_state )
 
 	/* Basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", ARM_BE, XTAL_50MHz/4 )
+	MDRV_CPU_ADD( "maincpu", ARM7_BE, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem)
 
 	MDRV_MACHINE_RESET( 3do )
@@ -177,7 +178,7 @@ static MACHINE_DRIVER_START( 3do_pal )
 	MDRV_DRIVER_DATA( _3do_state )
 
 	/* Basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM_BE, XTAL_50MHz/4 )
+	MDRV_CPU_ADD("maincpu", ARM7_BE, XTAL_50MHz/4 )
 	MDRV_CPU_PROGRAM_MAP( 3do_mem)
 
 	MDRV_MACHINE_RESET( 3do )

@@ -24,7 +24,7 @@ Reset boot sequence:
 - do remaining diagnostics
 - set up vdl for 3do logo screen (at 003b0000)
 - set up frame buffer 3do logo screen (at 003c000, 0000166c)
-16bc (done)
+00000064 (done)
 - transfer sherry from rom to 10000
 - transfer operator from rom to 20000
 - transfer dipir from rom to 200
@@ -37,6 +37,14 @@ Reset boot sequence:
 - set adbio to disable software controlled muting
 - init registers for entry to sherry
 - jump to sherry (00010000)
+
+00010000
+0001cbbc - ldr offset issue
+0001cbcc
+
+at address 00013914 is value 000031ED which gets read as 0031ED00. This breaks the executing code.
+this data comes from 00010100 stored by the loop at 1cba4 (read from 00010100, store to 00013917)
+this data comes from 0300d4f8 stored to 00010100 (done by loop at 000000a8)
 
 */
 
@@ -157,9 +165,16 @@ typedef struct {
 							/* DMA */
 	UINT32	dmareqdis;		/* 03400308 */
 							/* Expansion bus */
-	UINT32	type0_4;		/* 03400400 */
+	UINT32	setexpctl;		/* 03400400 */
+	UINT32	clrexpctl;		/* 03400404 */
+	UINT32	type0_4;		/* 03400408 */
 	UINT32	dipir1;			/* 03400410 */
 	UINT32	dipir2;			/* 03400414 */
+							/* Bus signals */
+	UINT32	sel[16];		/* 03400500 - 0340053f */
+	UINT32	poll[16];		/* 03400540 - 0340057f */
+	UINT32	cmdstat[16];	/* 03400580 - 034005bf */
+	UINT32	data[16];		/* 034005c0 - 034005ff */
 							/* DSPP */
 	UINT32	semaphore;		/* 034017d0 */
 	UINT32	semaack;		/* 034017d4 */
@@ -279,7 +294,7 @@ READ32_HANDLER( _3do_svf_r )
 {
 	_3do_state *state = (_3do_state *)space->machine->driver_data;
 	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
-	UINT32 *p = state->vram + ( addr & 0x1fffff );
+	UINT32 *p = state->vram + addr;
 
 	logerror( "%08X: SVF read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
 
@@ -305,7 +320,7 @@ WRITE32_HANDLER( _3do_svf_w )
 {
 	_3do_state *state = (_3do_state *)space->machine->driver_data;
 	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
-	UINT32 *p = state->vram + ( addr & 0x1fffff );
+	UINT32 *p = state->vram + addr;
 
 	logerror( "%08X: SVF write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
 
@@ -343,7 +358,7 @@ WRITE32_HANDLER( _3do_svf_w )
 
 
 READ32_HANDLER( _3do_madam_r ) {
-	//logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
+	logerror( "%08X: MADAM read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4 );
 
 	switch( offset ) {
 	case 0x0000/4:		/* 03300000 - Revision */
@@ -502,7 +517,7 @@ READ32_HANDLER( _3do_madam_r ) {
 
 
 WRITE32_HANDLER( _3do_madam_w ) {
-	//logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
+	logerror( "%08X: MADAM write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
 
 	switch( offset ) {
 	case 0x0000/4:
@@ -689,7 +704,7 @@ void _3do_madam_init( running_machine *machine )
 
 READ32_HANDLER( _3do_clio_r )
 {
-	//logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset * 4 );
+	logerror( "%08X: CLIO read offset = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset * 4 );
 
 	switch( offset )
 	{
@@ -733,10 +748,24 @@ READ32_HANDLER( _3do_clio_r )
 	case 0x0220/4:
 		return clio.slack;
 
+	case 0x0400/4:
+		return clio.setexpctl | 0x80;		/* bit 7 - ARM has bus control */
 	case 0x0410/4:
 		return clio.dipir1;
 	case 0x0414/4:
 		return clio.dipir2;
+
+	case 0x0500/4: case 0x0504/4: case 0x0508/4: case 0x050c/4:
+	case 0x0510/4: case 0x0514/4: case 0x0518/4: case 0x051c/4:
+	case 0x0520/4: case 0x0524/4: case 0x0528/4: case 0x052c/4:
+	case 0x0530/4: case 0x0534/4: case 0x0538/4: case 0x053c/4:
+		return clio.sel[offset & 0x1f];
+
+	case 0x0540/4: case 0x0544/4: case 0x0548/4: case 0x054c/4:
+	case 0x0550/4: case 0x0554/4: case 0x0558/4: case 0x055c/4:
+	case 0x0560/4: case 0x0564/4: case 0x0568/4: case 0x056c/4:
+	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
+		return clio.poll[offset & 0x1f];
 
 	case 0xc000/4:
 		return clio.unclerev;
@@ -756,7 +785,7 @@ READ32_HANDLER( _3do_clio_r )
 
 WRITE32_HANDLER( _3do_clio_w )
 {
-	//logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
+	logerror( "%08X: CLIO write offset = %08X, data = %08X, mask = %08X\n", cpu_get_pc(space->machine->device("maincpu")), offset*4, data, mem_mask );
 
 	switch( offset )
 	{
@@ -957,6 +986,15 @@ WRITE32_HANDLER( _3do_clio_w )
 
 	case 0x0408/4:
 		clio.type0_4 = data;
+		break;
+
+	case 0x0500/4: case 0x0504/4: case 0x0508/4: case 0x050c/4:
+	case 0x0510/4: case 0x0514/4: case 0x0518/4: case 0x051c/4:
+	case 0x0520/4: case 0x0524/4: case 0x0528/4: case 0x052c/4:
+	case 0x0530/4: case 0x0534/4: case 0x0538/4: case 0x053c/4:
+		clio.sel[offset & 0x1f] = data;
+		/* Start WRSEL cycle */
+		clio.poll[offset & 0x1f] = 0x10;
 		break;
 
 	case 0xc000/4:
