@@ -20,9 +20,28 @@
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "devices/cartslot.h"
+#include "devices/cassette.h"
 #include "devices/messram.h"
 
 #define MASTER_CLOCK XTAL_28_63636MHz
+
+static running_device *rx78_cassette;
+
+static WRITE8_HANDLER( rx78_f0_w )
+{
+	cassette_output(rx78_cassette, (data & 1) ? -1.0 : +1.0);
+}
+
+static READ8_HANDLER( rx78_f0_r )
+{
+	UINT8 data = 0;
+
+	if (cassette_input(rx78_cassette) > 0.03)
+		data++;
+
+	return data;
+}
+
 
 static UINT8 vram_read_bank,vram_write_bank,pal_reg[7],pri_mask;
 
@@ -193,6 +212,7 @@ static ADDRESS_MAP_START( rx78_io , ADDRESS_SPACE_IO, 8)
 //	AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
 //	AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
 //	AM_RANGE(0xf0, 0xf0) AM_READ(cmt_r) //cmt
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE(rx78_f0_r,rx78_f0_w)
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(vram_read_bank_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITE(vram_write_bank_w)
 	AM_RANGE(0xf4, 0xf4) AM_READWRITE(key_r,key_w) //keyboard
@@ -331,6 +351,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET(rx78)
 {
+	rx78_cassette = machine->device("cassette");
 }
 
 static DEVICE_IMAGE_LOAD( rx78_cart )
@@ -378,7 +399,7 @@ static const gfx_layout rx78_charlayout =
 };
 
 static GFXDECODE_START( rx78 )
-	GFXDECODE_ENTRY( "maincpu", 0x1a27, rx78_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "maincpu", 0x1a27, rx78_charlayout, 0, 8 )
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( rx78 )
@@ -412,6 +433,8 @@ static MACHINE_DRIVER_START( rx78 )
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32k")
 	MDRV_RAM_EXTRA_OPTIONS("16k")
+
+	MDRV_CASSETTE_ADD( "cassette", default_cassette_config )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
