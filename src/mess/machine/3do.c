@@ -46,6 +46,11 @@ at address 00013914 is value 000031ED which gets read as 0031ED00. This breaks t
 this data comes from 00010100 stored by the loop at 1cba4 (read from 00010100, store to 00013917)
 this data comes from 0300d4f8 stored to 00010100 (done by loop at 000000a8)
 
+
+Expansion bus stuff:
+00022ba4 - init exp bus, write 17x 00 to the selection register to let all expansion devices determine their id on the bus.
+00022bd0 - write 0x8f to the selection register to determine if there are too many devices attached.
+
 */
 
 #include "emu.h"
@@ -165,16 +170,15 @@ typedef struct {
 							/* DMA */
 	UINT32	dmareqdis;		/* 03400308 */
 							/* Expansion bus */
-	UINT32	setexpctl;		/* 03400400 */
-	UINT32	clrexpctl;		/* 03400404 */
+	UINT32	expctl;			/* 03400400/03400404 */
 	UINT32	type0_4;		/* 03400408 */
 	UINT32	dipir1;			/* 03400410 */
 	UINT32	dipir2;			/* 03400414 */
 							/* Bus signals */
-	UINT32	sel[16];		/* 03400500 - 0340053f */
-	UINT32	poll[16];		/* 03400540 - 0340057f */
-	UINT32	cmdstat[16];	/* 03400580 - 034005bf */
-	UINT32	data[16];		/* 034005c0 - 034005ff */
+	UINT32	sel;			/* 03400500 - 0340053f */
+	UINT32	poll;			/* 03400540 - 0340057f */
+	UINT32	cmdstat;		/* 03400580 - 034005bf */
+	UINT32	data;			/* 034005c0 - 034005ff */
 							/* DSPP */
 	UINT32	semaphore;		/* 034017d0 */
 	UINT32	semaack;		/* 034017d4 */
@@ -736,6 +740,71 @@ READ32_HANDLER( _3do_clio_r )
 	case 0x0088/4:
 		return clio.adbctl;
 
+	case 0x0100/4:
+		return clio.timer0;
+	case 0x0104/4:
+		return clio.timerback0;
+	case 0x0108/4:
+		return clio.timer1;
+	case 0x010c/4:
+		return clio.timerback1;
+	case 0x0110/4:
+		return clio.timer2;
+	case 0x0114/4:
+		return clio.timerback2;
+	case 0x0118/4:
+		return clio.timer3;
+	case 0x011c/4:
+		return clio.timerback3;
+	case 0x0120/4:
+		return clio.timer4;
+	case 0x0124/4:
+		return clio.timerback4;
+	case 0x0128/4:
+		return clio.timer5;
+	case 0x012c/4:
+		return clio.timerback5;
+	case 0x0130/4:
+		return clio.timer6;
+	case 0x0134/4:
+		return clio.timerback6;
+	case 0x0138/4:
+		return clio.timer7;
+	case 0x013c/4:
+		return clio.timerback7;
+	case 0x0140/4:
+		return clio.timer8;
+	case 0x0144/4:
+		return clio.timerback8;
+	case 0x0148/4:
+		return clio.timer9;
+	case 0x014c/4:
+		return clio.timerback9;
+	case 0x0150/4:
+		return clio.timer10;
+	case 0x0154/4:
+		return clio.timerback10;
+	case 0x0158/4:
+		return clio.timer11;
+	case 0x015c/4:
+		return clio.timerback11;
+	case 0x0160/4:
+		return clio.timer12;
+	case 0x0164/4:
+		return clio.timerback12;
+	case 0x0168/4:
+		return clio.timer13;
+	case 0x016c/4:
+		return clio.timerback13;
+	case 0x0170/4:
+		return clio.timer14;
+	case 0x0174/4:
+		return clio.timerback14;
+	case 0x0178/4:
+		return clio.timer15;
+	case 0x017c/4:
+		return clio.timerback15;
+
 	case 0x0200/4:
 		return clio.settm0;
 	case 0x0204/4:
@@ -749,7 +818,8 @@ READ32_HANDLER( _3do_clio_r )
 		return clio.slack;
 
 	case 0x0400/4:
-		return clio.setexpctl | 0x80;		/* bit 7 - ARM has bus control */
+	case 0x0404/4:
+		return clio.expctl;
 	case 0x0410/4:
 		return clio.dipir1;
 	case 0x0414/4:
@@ -759,13 +829,13 @@ READ32_HANDLER( _3do_clio_r )
 	case 0x0510/4: case 0x0514/4: case 0x0518/4: case 0x051c/4:
 	case 0x0520/4: case 0x0524/4: case 0x0528/4: case 0x052c/4:
 	case 0x0530/4: case 0x0534/4: case 0x0538/4: case 0x053c/4:
-		return clio.sel[offset & 0x1f];
+		return clio.sel;
 
 	case 0x0540/4: case 0x0544/4: case 0x0548/4: case 0x054c/4:
 	case 0x0550/4: case 0x0554/4: case 0x0558/4: case 0x055c/4:
 	case 0x0560/4: case 0x0564/4: case 0x0568/4: case 0x056c/4:
 	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
-		return clio.poll[offset & 0x1f];
+		return clio.poll;
 
 	case 0xc000/4:
 		return clio.unclerev;
@@ -984,6 +1054,12 @@ WRITE32_HANDLER( _3do_clio_w )
 		clio.dmareqdis = data;
 		break;
 
+	case 0x0400/4:
+		clio.expctl = clio.expctl | ( data & 0xca00 );
+		break;
+	case 0x0404/4:
+		clio.expctl = clio.expctl & ~( data & 0xca00 );
+		break;
 	case 0x0408/4:
 		clio.type0_4 = data;
 		break;
@@ -992,9 +1068,26 @@ WRITE32_HANDLER( _3do_clio_w )
 	case 0x0510/4: case 0x0514/4: case 0x0518/4: case 0x051c/4:
 	case 0x0520/4: case 0x0524/4: case 0x0528/4: case 0x052c/4:
 	case 0x0530/4: case 0x0534/4: case 0x0538/4: case 0x053c/4:
-		clio.sel[offset & 0x1f] = data;
+		clio.sel = data & 0xff;
 		/* Start WRSEL cycle */
-		clio.poll[offset & 0x1f] = 0x10;
+
+		/* Detection of too many devices on the bus */
+		switch ( data & 0xff )
+		{
+		case 0x8f:
+			/* Everything is fine, there are not too many devices in the system */
+			clio.poll = ( clio.poll & 0x0f );
+			break;
+		default:
+			clio.poll = ( clio.poll & 0x0f ) | 0x90;
+		}
+		break;
+
+	case 0x0540/4: case 0x0544/4: case 0x0548/4: case 0x054c/4:
+	case 0x0550/4: case 0x0554/4: case 0x0558/4: case 0x055c/4:
+	case 0x0560/4: case 0x0564/4: case 0x0568/4: case 0x056c/4:
+	case 0x0570/4: case 0x0574/4: case 0x0578/4: case 0x057c/4:
+		clio.poll = ( clio.poll & 0xf8 ) | ( data & 0x07 );
 		break;
 
 	case 0xc000/4:
@@ -1019,6 +1112,7 @@ void _3do_clio_init( running_machine *machine, screen_device *screen )
 	clio.revision = 0x02022000 /* 0x04000000 */;
 	clio.cstatbits = 0x01;	/* bit 0 = reset of clio caused by power on */
 	clio.unclerev = 0x03800000;
+	clio.expctl = 0x80;	/* ARM has the expansion bus */
 }
 
 
