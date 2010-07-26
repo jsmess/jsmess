@@ -333,6 +333,36 @@ static MACHINE_RESET(rx78)
 {
 }
 
+static DEVICE_IMAGE_LOAD( rx78_cart )
+{
+	UINT8 *cart = memory_region(image.device().machine, "cart_img");
+	UINT32 size;
+
+	if (image.software_entry() == NULL)
+		size = image.length();
+	else
+		size = image.get_software_region_length("rom");
+
+	if (size != 0x2000 && size != 0x4000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
+		return IMAGE_INIT_FAIL;
+	}
+
+	if (image.software_entry() == NULL)
+	{
+		if (image.fread( cart, size) != size)
+		{
+			image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+			return IMAGE_INIT_FAIL;
+		}
+	}
+	else
+		memcpy(cart, image.get_software_region("rom"), size);
+
+	return IMAGE_INIT_PASS;
+}
+
 /* F4 Character Displayer */
 static const gfx_layout rx78_charlayout =
 {
@@ -376,7 +406,9 @@ static MACHINE_DRIVER_START( rx78 )
 	MDRV_CARTSLOT_ADD("cart")
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
-
+	MDRV_CARTSLOT_LOAD(rx78_cart)
+	MDRV_CARTSLOT_INTERFACE("rx78_cart")	
+	
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32k")
 	MDRV_RAM_EXTRA_OPTIONS("16k")
@@ -385,6 +417,9 @@ static MACHINE_DRIVER_START( rx78 )
 
 	MDRV_SOUND_ADD("sn1", SN76489A, XTAL_28_63636MHz/8) // unknown divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+		
+	/* Software lists */
+	MDRV_SOFTWARE_LIST_ADD("cart_list","rx78")		
 MACHINE_DRIVER_END
 
 /* ROM definition */
