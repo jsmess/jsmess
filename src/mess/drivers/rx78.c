@@ -6,7 +6,6 @@
 	Monitor command list, and cassette interface added by Robbbert.
 
 	TODO:
-	- implement cmt (hovewer no dumps are available right now)
 	- implement printer
 	- caps lock doesn't seem quite right, I need to press it twice to have the desired effect;
 
@@ -15,6 +14,7 @@
 	  info minus plane 1 is lost when the screen scrolls vertically. Almost certainly a btanb.
 	- To stop a cmt load, press STOP + SHIFT keys
 
+==============================================================================================================
 	Summary of Monitor commands.
 	- The monitor is entered at bootup. The prompt is the * character. This is followed by a command
 	  letter (upper case). Some commands require hex parameters. You must enter all 4 characters of
@@ -453,8 +453,8 @@ static MACHINE_DRIVER_START( rx78 )
 	MDRV_CARTSLOT_EXTENSION_LIST("rom")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_LOAD(rx78_cart)
-	MDRV_CARTSLOT_INTERFACE("rx78_cart")	
-	
+	MDRV_CARTSLOT_INTERFACE("rx78_cart")
+
 	MDRV_RAM_ADD("messram")
 	MDRV_RAM_DEFAULT_SIZE("32k")
 	MDRV_RAM_EXTRA_OPTIONS("16k")
@@ -468,7 +468,7 @@ static MACHINE_DRIVER_START( rx78 )
 
 	MDRV_SOUND_ADD("sn1", SN76489A, XTAL_28_63636MHz/8) // unknown divider
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-		
+
 	/* Software lists */
 	MDRV_SOFTWARE_LIST_ADD("cart_list","rx78")
 MACHINE_DRIVER_END
