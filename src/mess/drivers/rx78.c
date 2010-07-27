@@ -157,7 +157,7 @@ static READ8_HANDLER( rx78_vram_r )
 {
 	static UINT8 *vram = memory_region(space->machine,"vram");
 
-	if(vram_read_bank == 0) //|| vram_read_bank > 6)
+	if(vram_read_bank == 0 || vram_read_bank > 6)
 		return 0xff;
 
 	return vram[offset + ((vram_read_bank - 1) * 0x2000)];
@@ -236,8 +236,7 @@ static ADDRESS_MAP_START( rx78_io , ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //	AM_RANGE(0xe2, 0xe2) AM_READNOP AM_WRITENOP //printer
 //	AM_RANGE(0xe3, 0xe3) AM_WRITENOP //printer
-//	AM_RANGE(0xf0, 0xf0) AM_READ(cmt_r) //cmt
-	AM_RANGE(0xf0, 0xf0) AM_READWRITE(rx78_f0_r,rx78_f0_w)
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE(rx78_f0_r,rx78_f0_w) //cmt
 	AM_RANGE(0xf1, 0xf1) AM_WRITE(vram_read_bank_w)
 	AM_RANGE(0xf2, 0xf2) AM_WRITE(vram_write_bank_w)
 	AM_RANGE(0xf4, 0xf4) AM_READWRITE(key_r,key_w) //keyboard
