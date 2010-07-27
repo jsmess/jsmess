@@ -236,6 +236,19 @@ static void upd765_clear_data_request(running_device *device)
 	fdc->FDC_main &= ~0x080;
 }
 
+static int upd765_get_rdy(running_device *device)
+{
+	upd765_t *fdc = get_safe_token(device);
+
+	if (fdc->rdy_pin == UPD765_RDY_PIN_CONNECTED)
+	{
+		running_device *img = current_image(device);
+		return floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY);
+	}
+	else
+		return 1;
+}
+
 static void upd765_seek_complete(running_device *device)
 {
 	/* tested on Amstrad CPC */
@@ -299,7 +312,7 @@ static void upd765_seek_complete(running_device *device)
 	fdc->upd765_status[0] = 0x20;
 
 	/* drive ready? */
-	if (img != NULL && floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
+	if (img != NULL && upd765_get_rdy(device))
 	{
 		/* recalibrate? */
 		if (fdc->upd765_flags & UPD765_SEEK_OPERATION_IS_RECALIBRATE)
@@ -496,9 +509,7 @@ static void upd765_seek_setup(running_device *device, int is_recalibrate)
 		fdc->ncn = 0;
 
 		/* if drive is already at track 0, or drive is not ready */
-		if (img == NULL || floppy_tk00_r(img) == CLEAR_LINE ||
-			(!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
-			)
+		if (img == NULL || floppy_tk00_r(img) == CLEAR_LINE || (!upd765_get_rdy(device)))
 		{
 			/* seek completed */
 //          upd765_seek_complete(device);
@@ -551,7 +562,7 @@ static void upd765_seek_setup(running_device *device, int is_recalibrate)
 		signed_tracks = fdc->ncn - fdc->pcn[fdc->drive];
 
 		/* if no tracks to seek, or drive is not ready, seek is complete */
-		if (img == NULL || (signed_tracks==0) || (!floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY)))
+		if (img == NULL || (signed_tracks==0) || (!upd765_get_rdy(device)))
 		{
 			upd765_seek_complete(device);
 		}
@@ -960,7 +971,7 @@ static void upd765_read_data(running_device *device)
 	upd765_t *fdc = get_safe_token(device);
 	running_device *img = current_image(device);
 
-	if (!(floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY)))
+	if (!upd765_get_rdy(device))
 	{
 		fdc->upd765_status[0] = 0x0c0 | (1<<4) | fdc->drive | (fdc->side<<2);
 		fdc->upd765_status[1] = 0x00;
@@ -1152,7 +1163,7 @@ static void upd765_write_complete(running_device *device)
 static void upd765_write_data(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
-	if (!(floppy_drive_get_flag_state(current_image(device), FLOPPY_DRIVE_READY)))
+	if (!upd765_get_rdy(device))
 	{
 		fdc->upd765_status[0] = 0x0c0 | (1<<4) | fdc->drive | (fdc->side<<2);
         fdc->upd765_status[1] = 0x00;
@@ -1879,7 +1890,7 @@ static void upd765_setup_command(running_device *device)
 				fdc->upd765_status[3] |= !floppy_tk00_r(img) << 4;
 				fdc->upd765_status[3] |= !floppy_wpt_r(img) << 6;
 
-				if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
+				if (upd765_get_rdy(device))
 				{
 					fdc->upd765_status[3] |= 0x20;
 				}
@@ -1909,7 +1920,7 @@ static void upd765_setup_command(running_device *device)
 			fdc->upd765_status[2] = 0;
 
 			/* drive ready? */
-			if (floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY))
+			if (upd765_get_rdy(device))
 			{
 				/* is disk inserted? */
 				device_image_interface *image = dynamic_cast<device_image_interface *>( img);
