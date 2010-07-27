@@ -42,6 +42,8 @@ WRITE_LINE_DEVICE_HANDLER( tf20_poutc_r );
 READ_LINE_DEVICE_HANDLER( tf20_pinc_w );
 #endif
 
+INPUT_PORTS_EXTERN( tf20 );
+
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

@@ -22,6 +22,8 @@
     CONSTANTS
 ***************************************************************************/
 
+#define VERBOSE 0
+
 /* interrupt sources */
 #define INT0_7508	0x01
 #define INT1_ART	0x02
@@ -137,7 +139,8 @@ public:
 
 static WRITE_LINE_DEVICE_HANDLER( px4_sio_txd )
 {
-	logerror("px4_sio_txd: %d\n", state);
+	if (VERBOSE)
+		logerror("px4_sio_txd: %d\n", state);
 
 	if (device != NULL)
 		tf20_txs_w(device, state);
@@ -145,7 +148,8 @@ static WRITE_LINE_DEVICE_HANDLER( px4_sio_txd )
 
 static READ_LINE_DEVICE_HANDLER( px4_sio_rxd )
 {
-	logerror("px4_sio_rxd\n");
+	if (VERBOSE)
+		logerror("px4_sio_rxd\n");
 
 	if (device != NULL)
 		return tf20_rxs_r(device);
@@ -155,7 +159,8 @@ static READ_LINE_DEVICE_HANDLER( px4_sio_rxd )
 
 static READ_LINE_DEVICE_HANDLER( px4_sio_pin )
 {
-	logerror("px4_sio_pin\n");
+	if (VERBOSE)
+		logerror("px4_sio_pin\n");
 
 	if (device != NULL)
 		return tf20_pins_r(device);
@@ -165,7 +170,8 @@ static READ_LINE_DEVICE_HANDLER( px4_sio_pin )
 
 static WRITE_LINE_DEVICE_HANDLER( px4_sio_pout )
 {
-	logerror("px4_sio_pout: %d\n", state);
+	if (VERBOSE)
+		logerror("px4_sio_pout: %d\n", state);
 
 	if (device != NULL)
 		tf20_pouts_w(device, state);
@@ -180,42 +186,52 @@ static WRITE_LINE_DEVICE_HANDLER( px4_sio_pout )
 
 static WRITE_LINE_DEVICE_HANDLER( px4_rs232c_txd )
 {
-	logerror("px4_rs232c_txd: %d\n", state);
+	if (VERBOSE)
+		logerror("px4_rs232c_txd: %d\n", state);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ_LINE_DEVICE_HANDLER( px4_rs232c_rxd )
 {
-	logerror("px4_rs232c_rxd\n");
+	if (VERBOSE)
+		logerror("px4_rs232c_rxd\n");
 	return ASSERT_LINE;
 }
 #endif
 
 static WRITE_LINE_DEVICE_HANDLER( px4_rs232c_rts )
 {
-	logerror("px4_rs232c_rts: %d\n", state);
+	if (VERBOSE)
+		logerror("px4_rs232c_rts: %d\n", state);
 }
 
 static READ_LINE_DEVICE_HANDLER( px4_rs232c_cts )
 {
-	logerror("px4_rs232c_cts\n");
+	if (VERBOSE)
+		logerror("px4_rs232c_cts\n");
+
 	return ASSERT_LINE;
 }
 
 static READ_LINE_DEVICE_HANDLER( px4_rs232c_dsr )
 {
-	logerror("px4_rs232c_dsr\n");
+	if (VERBOSE)
+		logerror("px4_rs232c_dsr\n");
+
 	return ASSERT_LINE;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( px4_rs232c_dtr )
 {
-	logerror("px4_rs232c_dtr: %d\n", state);
+	if (VERBOSE)
+		logerror("px4_rs232c_dtr: %d\n", state);
 }
 
 static READ_LINE_DEVICE_HANDLER( px4_rs232c_dcd )
 {
-	logerror("px4_rs232c_dcd\n");
+	if (VERBOSE)
+		logerror("px4_rs232c_dcd\n");
+
 	return ASSERT_LINE;
 }
 
@@ -304,7 +320,9 @@ static TIMER_DEVICE_CALLBACK( frc_tick )
 static READ8_HANDLER( px4_icrlc_r )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_icrlc_r\n", cpuexec_describe_context(space->machine));
+
+	if (VERBOSE)
+		logerror("%s: px4_icrlc_r\n", cpuexec_describe_context(space->machine));
 
 	/* latch value */
 	px4->frc_latch = px4->frc_value;
@@ -318,7 +336,8 @@ static WRITE8_HANDLER( px4_ctrl1_w )
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	int baud;
 
-	logerror("%s: px4_ctrl1_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+	if (VERBOSE)
+		logerror("%s: px4_ctrl1_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	/* baudrate generator */
 	baud = data >> 4;
@@ -337,7 +356,8 @@ static READ8_HANDLER( px4_icrhc_r )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
-	logerror("%s: px4_icrhc_r\n", cpuexec_describe_context(space->machine));
+	if (VERBOSE)
+		logerror("%s: px4_icrhc_r\n", cpuexec_describe_context(space->machine));
 
 	return (px4->frc_latch >> 8) & 0xff;
 }
@@ -347,7 +367,8 @@ static WRITE8_HANDLER( px4_cmdr_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
-	logerror("%s: px4_cmdr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+	if (VERBOSE)
+		logerror("%s: px4_cmdr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	/* clear overflow interrupt? */
 	if (BIT(data, 2))
@@ -362,7 +383,8 @@ static READ8_HANDLER( px4_icrlb_r )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
-	logerror("%s: px4_icrlb_r\n", cpuexec_describe_context(space->machine));
+	if (VERBOSE)
+		logerror("%s: px4_icrlb_r\n", cpuexec_describe_context(space->machine));
 
 	return px4->icrb & 0xff;
 }
@@ -372,7 +394,8 @@ static WRITE8_HANDLER( px4_ctrl2_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
-	logerror("%s: px4_ctrl2_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+	if (VERBOSE)
+		logerror("%s: px4_ctrl2_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	/* bit 0, MIC, cassette output */
 	cassette_output(px4->ext_cas, BIT(data, 0) ? -1.0 : +1.0);
@@ -394,7 +417,9 @@ static WRITE8_HANDLER( px4_ctrl2_w )
 static READ8_HANDLER( px4_icrhb_r )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_icrhb_r\n", cpuexec_describe_context(space->machine));
+
+	if (VERBOSE)
+		logerror("%s: px4_icrhb_r\n", cpuexec_describe_context(space->machine));
 
 	/* clear icf interrupt */
 	px4->isr &= ~INT2_ICF;
@@ -407,7 +432,9 @@ static READ8_HANDLER( px4_icrhb_r )
 static READ8_HANDLER( px4_isr_r )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_isr_r\n", cpuexec_describe_context(space->machine));
+
+	if (VERBOSE)
+		logerror("%s: px4_isr_r\n", cpuexec_describe_context(space->machine));
 
 	return px4->isr;
 }
@@ -416,7 +443,9 @@ static READ8_HANDLER( px4_isr_r )
 static WRITE8_HANDLER( px4_ier_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_ier_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	if (VERBOSE)
+		logerror("%s: px4_ier_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->ier = data;
 	gapnit_interrupt(space->machine);
@@ -428,7 +457,8 @@ static READ8_HANDLER( px4_str_r )
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	UINT8 result = 0;
 
-	logerror("%s: px4_str_r\n", cpuexec_describe_context(space->machine));
+	if (VERBOSE)
+		logerror("%s: px4_str_r\n", cpuexec_describe_context(space->machine));
 
 	result |= cassette_input(px4->ext_cas) > 0 ? 1 : 0;
 	result |= 1 << 1;	/* BCRD, barcode reader input */
@@ -472,7 +502,8 @@ static WRITE8_HANDLER( px4_bankr_w )
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	logerror("%s: px4_bankr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+	if (VERBOSE)
+		logerror("%s: px4_bankr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->bankr = data;
 
@@ -502,7 +533,8 @@ static WRITE8_HANDLER( px4_bankr_w )
 	case 0x0e: install_rom_capsule(space_program, 0x8000, "capsule2"); break;
 
 	default:
-		logerror("invalid bank switch value: 0x%02x\n", data >> 4);
+		if (VERBOSE)
+			logerror("invalid bank switch value: 0x%02x\n", data >> 4);
 
 	}
 }
@@ -511,8 +543,9 @@ static WRITE8_HANDLER( px4_bankr_w )
 static READ8_HANDLER( px4_sior_r )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_sior_r\n", cpuexec_describe_context(space->machine));
-	logerror("sior = 0x%02x\n", px4->sior);
+
+	if (VERBOSE)
+		logerror("%s: px4_sior_r 0x%02x\n", cpuexec_describe_context(space->machine), px4->sior);
 
 	return px4->sior;
 }
@@ -521,20 +554,30 @@ static READ8_HANDLER( px4_sior_r )
 static WRITE8_HANDLER( px4_sior_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_sior_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	if (VERBOSE)
+		logerror("%s: px4_sior_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->sior = data;
 
 	switch (data)
 	{
-	case 0x01: logerror("7508 cmd: Power OFF\n"); break;
+	case 0x01:
+
+		if (VERBOSE)
+			logerror("7508 cmd: Power OFF\n");
+
+		break;
 
 	case 0x02:
-		logerror("7508 cmd: Read Status\n");
+
+		if (VERBOSE)
+			logerror("7508 cmd: Read Status\n");
 
 		if (px4->interrupt_status != 0)
 		{
-			logerror("> 7508 has interrupts pending: 0x%02x\n", px4->interrupt_status);
+			if (VERBOSE)
+				logerror("> 7508 has interrupts pending: 0x%02x\n", px4->interrupt_status);
 
 			/* signal the interrupt(s) */
 			px4->sior = 0xc1 | px4->interrupt_status;
@@ -553,65 +596,84 @@ static WRITE8_HANDLER( px4_sior_w )
 
 		break;
 
-	case 0x03: logerror("7508 cmd: KB Reset\n"); break;
-	case 0x04: logerror("7508 cmd: KB Repeat Timer 1 Set\n"); break;
-	case 0x14: logerror("7508 cmd: KB Repeat Timer 2 Set\n"); break;
-	case 0x24: logerror("7508 cmd: KB Repeat Timer 1 Read\n"); break;
-	case 0x34: logerror("7508 cmd: KB Repeat Timer 2 Read\n"); break;
-	case 0x05: logerror("7508 cmd: KB Repeat OFF\n"); break;
-	case 0x15: logerror("7508 cmd: KB Repeat ON\n"); break;
+	case 0x03: if (VERBOSE) logerror("7508 cmd: KB Reset\n"); break;
+	case 0x04: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 1 Set\n"); break;
+	case 0x14: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 2 Set\n"); break;
+	case 0x24: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 1 Read\n"); break;
+	case 0x34: if (VERBOSE) logerror("7508 cmd: KB Repeat Timer 2 Read\n"); break;
+	case 0x05: if (VERBOSE) logerror("7508 cmd: KB Repeat OFF\n"); break;
+	case 0x15: if (VERBOSE) logerror("7508 cmd: KB Repeat ON\n"); break;
 
 	case 0x06:
-		logerror("7508 cmd: KB Interrupt OFF\n");
+
+		if (VERBOSE)
+			logerror("7508 cmd: KB Interrupt OFF\n");
+
 		px4->key_int_enabled = FALSE;
 		break;
 
 	case 0x16:
-		logerror("7508 cmd: KB Interrupt ON\n");
+
+		if (VERBOSE)
+			logerror("7508 cmd: KB Interrupt ON\n");
+
 		px4->key_int_enabled = TRUE;
 		break;
 
-	case 0x07: logerror("7508 cmd: Clock Read\n"); break;
-	case 0x17: logerror("7508 cmd: Clock Write\n"); break;
+	case 0x07: if (VERBOSE) logerror("7508 cmd: Clock Read\n"); break;
+	case 0x17: if (VERBOSE) logerror("7508 cmd: Clock Write\n"); break;
 
 	case 0x08:
-		logerror("7508 cmd: Power Switch Read\n");
+
+		if (VERBOSE)
+			logerror("7508 cmd: Power Switch Read\n");
 
 		/* indicate that the power switch is in the "ON" position */
 		px4->sior = 0x01;
 		break;
 
-	case 0x09: logerror("7508 cmd: Alarm Read\n"); break;
-	case 0x19: logerror("7508 cmd: Alarm Set\n"); break;
-	case 0x29: logerror("7508 cmd: Alarm OFF\n"); break;
-	case 0x39: logerror("7508 cmd: Alarm ON\n"); break;
+	case 0x09: if (VERBOSE) logerror("7508 cmd: Alarm Read\n"); break;
+	case 0x19: if (VERBOSE) logerror("7508 cmd: Alarm Set\n"); break;
+	case 0x29: if (VERBOSE) logerror("7508 cmd: Alarm OFF\n"); break;
+	case 0x39: if (VERBOSE) logerror("7508 cmd: Alarm ON\n"); break;
 
 	case 0x0a:
-		logerror("7508 cmd: DIP Switch Read\n");
+
+		if (VERBOSE)
+			logerror("7508 cmd: DIP Switch Read\n");
 		px4->sior = input_port_read(space->machine, "dips");
 		break;
 
-	case 0x0b: logerror("7508 cmd: Stop Key Interrupt disable\n"); break;
-	case 0x1b: logerror("7508 cmd: Stop Key Interrupt enable\n"); break;
-	case 0x0c: logerror("7508 cmd: 7 chr. Buffer\n"); break;
-	case 0x1c: logerror("7508 cmd: 1 chr. Buffer\n"); break;
+	case 0x0b: if (VERBOSE) logerror("7508 cmd: Stop Key Interrupt disable\n"); break;
+	case 0x1b: if (VERBOSE) logerror("7508 cmd: Stop Key Interrupt enable\n"); break;
+	case 0x0c: if (VERBOSE) logerror("7508 cmd: 7 chr. Buffer\n"); break;
+	case 0x1c: if (VERBOSE) logerror("7508 cmd: 1 chr. Buffer\n"); break;
 
 	case 0x0d:
-		logerror("7508 cmd: 1 sec. Interrupt OFF\n");
+
+		if (VERBOSE)
+			logerror("7508 cmd: 1 sec. Interrupt OFF\n");
+
 		px4->one_sec_int_enabled = FALSE;
 		break;
 
 	case 0x1d:
-		logerror("7508 cmd: 1 sec. Interrupt ON\n");
+
+		if (VERBOSE)
+			logerror("7508 cmd: 1 sec. Interrupt ON\n");
+
 		px4->one_sec_int_enabled = TRUE;
 		break;
 
 	case 0x0e:
-		logerror("7508 cmd: KB Clear\n");
+
+		if (VERBOSE)
+			logerror("7508 cmd: KB Clear\n");
+
 		px4->sior = 0xbf;
 		break;
 
-	case 0x0f: logerror("7508 cmd: System Reset\n"); break;
+	case 0x0f: if (VERBOSE) logerror("7508 cmd: System Reset\n"); break;
 	}
 }
 
@@ -624,7 +686,9 @@ static WRITE8_HANDLER( px4_sior_w )
 static WRITE8_HANDLER( px4_vadr_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_vadr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	if (VERBOSE)
+		logerror("%s: px4_vadr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->vadr = data;
 }
@@ -633,7 +697,9 @@ static WRITE8_HANDLER( px4_vadr_w )
 static WRITE8_HANDLER( px4_yoff_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_yoff_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	if (VERBOSE)
+		logerror("%s: px4_yoff_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->yoff = data;
 }
@@ -641,13 +707,15 @@ static WRITE8_HANDLER( px4_yoff_w )
 /* frame register */
 static WRITE8_HANDLER( px4_fr_w )
 {
-	logerror("%s: px4_fr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+	if (VERBOSE)
+		logerror("%s: px4_fr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 }
 
 /* speed-up register */
 static WRITE8_HANDLER( px4_spur_w )
 {
-	logerror("%s: px4_spur_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+	if (VERBOSE)
+		logerror("%s: px4_spur_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 }
 
 
@@ -678,21 +746,26 @@ static TIMER_CALLBACK( receive_data )
 /* cartridge interface */
 static READ8_HANDLER( px4_ctgif_r )
 {
-	logerror("%s: px4_ctgif_r @ 0x%02x\n", cpuexec_describe_context(space->machine), offset);
+	if (VERBOSE)
+		logerror("%s: px4_ctgif_r @ 0x%02x\n", cpuexec_describe_context(space->machine), offset);
+
 	return 0xff;
 }
 
 /* cartridge interface */
 static WRITE8_HANDLER( px4_ctgif_w )
 {
-	logerror("%s: px4_ctgif_w (0x%02x @ 0x%02x)\n", cpuexec_describe_context(space->machine), data, offset);
+	if (VERBOSE)
+		logerror("%s: px4_ctgif_w (0x%02x @ 0x%02x)\n", cpuexec_describe_context(space->machine), data, offset);
 }
 
 /* art data input register */
 static READ8_HANDLER( px4_artdir_r )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_artdir_r\n", cpuexec_describe_context(space->machine));
+
+	if (VERBOSE)
+		logerror("%s: px4_artdir_r\n", cpuexec_describe_context(space->machine));
 
 	return px4->artdir;
 }
@@ -701,7 +774,9 @@ static READ8_HANDLER( px4_artdir_r )
 static WRITE8_HANDLER( px4_artdor_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_artdor_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	if (VERBOSE)
+		logerror("%s: px4_artdor_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	/* clear ready */
 	px4->artsr &= ~ART_TXRDY;
@@ -715,7 +790,8 @@ static READ8_HANDLER( px4_artsr_r )
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	UINT8 result = 0;
 
-	logerror("%s: px4_artsr_r\n", cpuexec_describe_context(space->machine));
+	if (VERBOSE)
+		logerror("%s: px4_artsr_r\n", cpuexec_describe_context(space->machine));
 
 	result |= px4_rs232c_dsr(px4->rs232c_device) << 7;
 
@@ -726,7 +802,9 @@ static READ8_HANDLER( px4_artsr_r )
 static WRITE8_HANDLER( px4_artmr_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_artmr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	if (VERBOSE)
+		logerror("%s: px4_artmr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->artmr = data;
 }
@@ -737,7 +815,8 @@ static READ8_HANDLER( px4_iostr_r )
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
 	UINT8 result = 0;
 
-	logerror("%s: px4_iostr_r\n", cpuexec_describe_context(space->machine));
+	if (VERBOSE)
+		logerror("%s: px4_iostr_r\n", cpuexec_describe_context(space->machine));
 
 	result |= centronics_busy_r(px4->printer) << 0;
 	result |= !centronics_pe_r(px4->printer) << 1;
@@ -755,7 +834,9 @@ static READ8_HANDLER( px4_iostr_r )
 static WRITE8_HANDLER( px4_artcr_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_artcr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	if (VERBOSE)
+		logerror("%s: px4_artcr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->artcr = data;
 
@@ -787,7 +868,9 @@ static WRITE8_HANDLER( px4_artcr_w )
 static WRITE8_HANDLER( px4_swr_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
-	logerror("%s: px4_swr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+
+	if (VERBOSE)
+		logerror("%s: px4_swr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	px4->swr = data;
 }
@@ -797,7 +880,8 @@ static WRITE8_HANDLER( px4_ioctlr_w )
 {
 	px4_state *px4 = (px4_state *)space->machine->driver_data;
 
-	logerror("%s: px4_ioctlr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
+	if (VERBOSE)
+		logerror("%s: px4_ioctlr_w (0x%02x)\n", cpuexec_describe_context(space->machine), data);
 
 	centronics_strobe_w(px4->printer, !BIT(data, 0));
 	centronics_prime_w(px4->printer, BIT(data, 1));
@@ -851,7 +935,8 @@ static INPUT_CHANGED( key_callback )
 			if ((scancode & 0xa0) == 0xa0)
 				scancode |= down;
 
-			logerror("upd7508: key callback, key=0x%02x\n", scancode);
+			if (VERBOSE)
+				logerror("upd7508: key callback, key=0x%02x\n", scancode);
 
 			break;
 		}
@@ -863,7 +948,9 @@ static INPUT_CHANGED( key_callback )
 
 		if (px4->key_int_enabled)
 		{
-			logerror("upd7508: key interrupt\n");
+			if (VERBOSE)
+				logerror("upd7508: key interrupt\n");
+
 			px4->isr |= INT0_7508;
 			gapnit_interrupt(field->port->machine);
 		}
@@ -1100,7 +1187,7 @@ static INPUT_PORTS_START( px4_dips )
 	PORT_START("dips")
 
 	PORT_DIPNAME(0x0f, 0x0f, "Character set")
-	PORT_DIPLOCATION("DIP:8,7,6,5")
+	PORT_DIPLOCATION("PX-4 DIP:8,7,6,5")
 	PORT_DIPSETTING(0x0f, "ASCII")
 	PORT_DIPSETTING(0x0e, "France")
 	PORT_DIPSETTING(0x0d, "Germany")
@@ -1135,6 +1222,7 @@ INPUT_PORTS_END
 /* US ASCII keyboard */
 static INPUT_PORTS_START( px4_h450a )
 	PORT_INCLUDE(px4_dips)
+	PORT_INCLUDE(tf20)
 
 	PORT_START("keyboard_0")
 	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CHANGED(key_callback, (void *)0) PORT_CODE(KEYCODE_F1) PORT_CHAR(UCHAR_MAMEKEY(ESC))	// 00
@@ -1235,6 +1323,7 @@ INPUT_PORTS_END
 /* item keyboard */
 static INPUT_PORTS_START( px4_h421a )
 	PORT_INCLUDE(px4_dips)
+	PORT_INCLUDE(tf20)
 INPUT_PORTS_END
 
 
@@ -1311,7 +1400,7 @@ static MACHINE_DRIVER_START( px4 )
 	MDRV_CARTSLOT_NOT_MANDATORY
 
 	/* tf20 floppy drive */
-//  MDRV_TF20_ADD("floppy")
+  MDRV_TF20_ADD("floppy")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( px4p )

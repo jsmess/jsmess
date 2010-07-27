@@ -77,29 +77,28 @@ static READ8_HANDLER( tf20_rom_disable )
 	/* switch in ram */
 	memory_install_ram(prg, 0x0000, 0x7fff, 0, 0, messram_get_ptr(tf20->ram));
 
-	/* clear tc */
-	upd765_tc_w(tf20->upd765a, CLEAR_LINE);
-
 	return 0xff;
 }
 
 static READ8_HANDLER( tf20_dip_r )
 {
-	tf20_state *tf20 = get_safe_token(space->cpu->owner());
 	logerror("%s: tf20_dip_r\n", cpuexec_describe_context(space->machine));
 
-	/* clear tc */
-	upd765_tc_w(tf20->upd765a, CLEAR_LINE);
+	return input_port_read(space->machine, "tf20_dip");
+}
 
-	return 0xff;
+static TIMER_CALLBACK( tf20_upd765_tc_reset )
+{
+	upd765_tc_w((device_t *)ptr, CLEAR_LINE);
 }
 
 static READ8_DEVICE_HANDLER( tf20_upd765_tc_r )
 {
 	logerror("%s: tf20_upd765_tc_r\n", cpuexec_describe_context(device->machine));
 
-	/* set tc on read */
+	/* toggle tc on read */
 	upd765_tc_w(device, ASSERT_LINE);
+	timer_set(device->machine, attotime_zero, device, 0, tf20_upd765_tc_reset);
 
 	return 0xff;
 }
@@ -112,11 +111,6 @@ static WRITE8_HANDLER( tf20_fdc_control_w )
 	/* bit 0, motor on signal */
 	floppy_mon_w(tf20->floppy_0, !BIT(data, 0));
 	floppy_mon_w(tf20->floppy_1, !BIT(data, 0));
-	floppy_drive_set_ready_state(tf20->floppy_0, BIT(data, 0), 1);
-	floppy_drive_set_ready_state(tf20->floppy_1, BIT(data, 0), 1);
-
-	/* set tc on write */
-	upd765_tc_w(tf20->upd765a, ASSERT_LINE);
 }
 
 static IRQ_CALLBACK( tf20_irq_ack )
@@ -219,6 +213,19 @@ static ADDRESS_MAP_START( tf20_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xfa, 0xfa) AM_DEVREAD("5a", upd765_status_r)
 	AM_RANGE(0xfb, 0xfb) AM_DEVREADWRITE("5a", upd765_data_r, upd765_data_w)
 ADDRESS_MAP_END
+
+
+/***************************************************************************
+    INPUT PORTS
+***************************************************************************/
+
+INPUT_PORTS_START( tf20 )
+	PORT_START("tf20_dip")
+	PORT_DIPNAME(0x0f, 0x0f, "Drive extension")
+	PORT_DIPLOCATION("TF-20 TFX:8,7,6,5")
+	PORT_DIPSETTING(0x0f, "A & B Drive")
+	PORT_DIPSETTING(0x07, "C & D Drive")
+INPUT_PORTS_END
 
 
 /*****************************************************************************
