@@ -3,6 +3,7 @@
 	Gundam RX-78 (c) 1983 Bandai
 
 	preliminary driver by Angelo Salese
+	Monitor command list, and cassette interface added by Robbbert.
 
 	TODO:
 	- implement cmt (hovewer no dumps are available right now)
@@ -13,6 +14,29 @@
 	- BS-BASIC v1.0 have a graphic bug with the RX-78 logo, it doesn't set the read bank so all of the color
 	  info minus plane 1 is lost when the screen scrolls vertically. Almost certainly a btanb.
 	- To stop a cmt load, press STOP + SHIFT keys
+
+	Summary of Monitor commands.
+	- The monitor is entered at bootup. The prompt is the * character. This is followed by a command
+	  letter (upper case). Some commands require hex parameters. You must enter all 4 characters of
+	  these. No spaces allowed except where shown.
+	- While in BASIC, you may enter the monitor by using the MON command. After you have finished,
+	  you can return to BASIC by entering the command *J2005.
+
+	- Tape commands:
+	*L Load a tape
+	*V Verify a tape
+	*S Save a block of memory to tape. You are asked for a filename (blank is allowed), the start address,
+	   the end address, and the Jump address (where it should begin execution)
+
+	- Memory commands:
+	*Dnnnn nnnn Displays a hex dump in the address range entered
+	*Mnnnn      Allows you to examine and modify memory. Enter to skip to next, period (.) to quit.
+	*Jnnnn      Transfer execution (Jump) to a program in memory at the specified address
+
+	- Other:
+	*R          This is a block transfer load from a mystery parallel device, using ports E0 and E1,
+	            using handshaking similar to a centronics printer. The incoming file is loaded into
+	            memory and it appears that the operator is not provided any information of what happened.
 
 *************************************************************************************************************/
 
