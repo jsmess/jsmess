@@ -89,8 +89,7 @@ struct _upd765_t
 	unsigned long	sector_counter;
 	/* version of fdc to emulate */
 	UPD765_VERSION version;
-	/* is the RDY pin connected or not */
-	UPD765_RDY_PIN	rdy_pin;
+
 	/* main status register */
 	unsigned char    FDC_main;
 	/* data register */
@@ -240,7 +239,7 @@ static int upd765_get_rdy(running_device *device)
 {
 	upd765_t *fdc = get_safe_token(device);
 
-	if (fdc->rdy_pin == UPD765_RDY_PIN_CONNECTED)
+	if (fdc->intf->rdy_pin == UPD765_RDY_PIN_CONNECTED)
 	{
 		running_device *img = current_image(device);
 		return floppy_drive_get_flag_state(img, FLOPPY_DRIVE_READY);
