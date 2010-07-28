@@ -4,7 +4,8 @@
 
     Dual floppy drive with HX-20 factory option
 
-    Skeleton driver, not working
+
+    Status: Boots from system disk, missing µPD7201 emulation
 
 ***************************************************************************/
 
@@ -282,7 +283,7 @@ static const floppy_config tf20_floppy_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	FLOPPY_STANDARD_5_25_DSHD,
+	FLOPPY_STANDARD_5_25_DSDD_40,
 	FLOPPY_OPTIONS_NAME(default),
 	NULL
 };

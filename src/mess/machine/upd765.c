@@ -328,8 +328,8 @@ static void upd765_seek_complete(running_device *device)
 		fdc->upd765_status[0] |= 0x40 | 0x08;
 	}
 
-	/* set drive and side */
-	fdc->upd765_status[0] |= fdc->drive | (fdc->side<<2);
+	/* set drive and side. note: commented out side to avoid problems with the tf20 */
+	fdc->upd765_status[0] |= fdc->drive; //| (fdc->side<<2);
 
 	upd765_set_int(device,0);
 	upd765_set_int(device,1);
