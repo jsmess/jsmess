@@ -351,7 +351,7 @@
 	<software name="denzeni">
 		<description>デゼニランド</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>Hudson Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="55598">
 				<rom name="dezeni1.t77" size="55598" crc="63299423" sha1="EE0C36FFD66BA06A59108DBB840E185773ACA606" offset="000000" />
@@ -744,7 +744,7 @@
 	<software name="hydlide1">
 		<description>Hydlide 1</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>T&amp;E Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3282720">
 				<rom name="HYDLIDE.T77" size="3282720" crc="0DB66952" sha1="D21FC6D686AAE43C98CC7285144E5C0444907550" offset="000000" />
@@ -756,7 +756,7 @@
 	<software name="hydlidea" cloneof="hydlide1">
 		<description>Hydlide 1 (alternate)</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>T&amp;E Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3442312">
 				<rom name="hyd.t77" size="3442312" crc="47F22A6E" sha1="E02AFEFA7C865CC76AE6B42E99CA15E2EBE88596" offset="000000" />
@@ -768,7 +768,7 @@
 	<software name="hydlide2">
 		<description>Hydlide 2</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>T&amp;E Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1403954">
 				<rom name="hyd2_1.t77" size="1403954" crc="4B2DC372" sha1="D477B0D6847A08D6154C206F57D2B0D4BE806953" offset="000000" />
@@ -789,7 +789,7 @@
 	<software name="hydlide2a" cloneof="hydlide2">
 		<description>Hydlide 2 (alternate)</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>T&amp;E Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1080668">
 				<rom name="hydlide2_0.t77" size="1080668" crc="47314FEB" sha1="F4000FDCD61BD3D63D0F64F4E96B63CD0823CA1A" offset="000000" />
@@ -1952,3 +1952,4 @@
 	</software>
 
 </softwarelist>
+

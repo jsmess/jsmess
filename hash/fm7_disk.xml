@@ -1,0 +1,775 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+
+<!-- FM-7 floppy disk images -->
+<!-- Multi-image games are untested -->
+
+<softwarelist name="fm7_flop" description="Fujitsu FM-7 disk images">
+
+	<software name="albatros">
+		<description>Albatross</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="albatross_1.d77" size="348848" crc="DD12F9EB" sha1="5BAD68E7BA783EB3995DE7C199474F965C06154F" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="albatross_2.d77" size="348848" crc="045FD2C1" sha1="1F82451D94132661DC917E6EEEDBF3545AD6FC22" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="albatross_3.d77" size="348848" crc="31D2E739" sha1="2C3C9BB080CF695A879F1222B2687EFCF008BD39" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- アリオン -->
+	<software name="arion">
+		<description>アリオン</description>
+		<year>19??</year>
+		<publisher>ASCII</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="arion_a.d77" size="348848" crc="7BC01A77" sha1="AE894BF2FD0DE60A43A0F80C458FC193FA32D4DC" offset="000000"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="arion_b.d77" size="348848" crc="0996E1EE" sha1="0F8283554843A7C57804DCA6DF211A8A06D1D67E" offset="000000"/>
+			</dataarea>
+		</part>
+	</software>
+
+<!-- A列車で行こう -->
+	<software name="atrain">
+		<description>A列車で行こう</description>
+		<year>1986</year>
+		<publisher>Artdink</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="A-TRAIN.D77" size="348848" crc="257C7052" sha1="0349A90A8F132F829DF8335A9E22003B879B93D2" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ｿフトセット（ナイザー メイガス ビデオ君 BlueFox Lizerd) -->
+<!-- Does not autoboot, run from F-Basic -->
+	<software name="bluefox">
+		<description>ナイザー メイガス ビデオ君 BlueFox Lizard</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="DISK1.D77" size="348848" crc="9D46E9BA" sha1="1CED7F39C95299C32382BFAFB8402019BD52D26B" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ザ・キャッスル&キャッスルエクセレント -->
+	<software name="cas_casx">
+		<description>The Castle &amp; The Castle Excellent</description>
+		<year>19??</year>
+		<publisher>ASCII</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="CASTLE.d77" size="348848" crc="E69D5A7A" sha1="8D24B38A3C823003EE3FCC4AB1ABCDC1879456FD" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="castleex">
+		<description>The Castle Excellent</description>
+		<year>19??</year>
+		<publisher>ASCII</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="347168">
+				<rom name="CASTLEEX.D77" size="347168" crc="59298C31" sha1="810D5FEBD6EB39DF8E14E025EDEFE39E53BFE5D6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 超次元伝説ラル -->
+	<software name="chojigen">
+		<description>超次元伝説ラル</description>
+		<year>1988</year>
+		<publisher>Pony Canyon</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="349392">
+				<rom name="chojigen_a.d77" size="349392" crc="FDC244E4" sha1="EF40F54BA73411AD0A975DD13F476C6D2800A491" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="349392">
+				<rom name="chojigen_b.d77" size="349392" crc="59853CC9" sha1="28892C47C78E660DD02311968D178CEAF6E6392E" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="crisismt">
+		<description>Crisis Mountain</description>
+		<year>19??</year>
+		<publisher>Microfun</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="392368">
+				<rom name="CRISISMT.D77" size="392368" crc="EAF9E14B" sha1="7006D19BA6F63CA768E37721EC7682BA2F4FFC8F" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="cristine">
+		<description>Christine</description>
+		<year>19??</year>
+		<publisher>PSK</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="CRISTINE.D77" size="348848" crc="71964D2A" sha1="B237E88631A96467A3B2087205D5FA73496C7C3A" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- does not work, AV only, perhaps.  A different AV-specific version does exist, and works on the fm77av driver, see fm77av.xml   -->
+	<software name="daiva">
+		<description>Daiva</description>
+		<year>19??</year>
+		<publisher>T&amp;E Soft</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="Daiva_A.d77" size="348848" crc="21FC2E80" sha1="85CA20F41DBC48C675A8448A6C27779E6A06CF09" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="Daiva_B.d77" size="348848" crc="22ECFF45" sha1="32ED0D9BCAC1D3098CD2BD9191DCC0AB92F4014C" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="darkcrys">
+		<description>Dark Crystal</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="344496">
+				<rom name="DARKCR0.D77" size="344496" crc="497850CA" sha1="B9058989EC5A6D1B5F789B460466EEB5BCA5D9E1" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="DARKCR1A.D77" size="348848" crc="7E584EB4" sha1="DA059ADCE55E6640C669075A28C09AA14F79E45E" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="DARKCR1B.D77" size="348848" crc="5DEEAABC" sha1="70FED569A6DBE0AC2A2F60B885BC4E51861519B9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 魔法使いの妹子２ -->
+	<software name="deshi2">
+		<description>魔法使いの妹子２</description>
+		<year>1986</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="deshi2_a.d77" size="348848" crc="75A053F8" sha1="6B6BF840F4CCA2BD88C23164A9AB65C0BBFBD3F6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="deshi2_b.d77" size="348848" crc="041DCFC5" sha1="95DECCB5AB6F372393B63AEE5C0FC8762BFA39AA" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- デゼニランド -->
+	<software name="dezeni">
+		<description>デゼニランド</description>
+		<year>19??</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="274864">
+				<rom name="DEZENIFM.D77" size="274864" crc="1AE3AB0B" sha1="CBF286B35B816ABB9CC39528D558D3F7DE195B2A" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- デスフォース - not working -->
+	<software name="dforce">
+		<description>デスフォース</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="392880">
+				<rom name="DFORCE1.D77" size="392880" crc="968512C6" sha1="FE7FE9BEC16949A4F24CBDB7B1E842C743D4688D" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="392880">
+				<rom name="DFORCE2.D77" size="392880" crc="C7FEB23C" sha1="FB5A25C736C20A2DD0BA3AC2BE488612C7017855" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="diskfm1">
+		<description>DiskFM 1</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="DISKFM1.D77" size="348848" crc="3C531EF3" sha1="27275EFD310FE5E848DE32D911970805B94BB3B9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fbasic">
+		<description>F-BASIC 3.0 (disk version)</description>
+		<year>1981</year>
+		<publisher>Fujitsu / Microsoft</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="F-BASIC.D77" size="348848" crc="D5A4551C" sha1="4CAEA850D2024EC3B25B8C4F1F9B544ABE60163E" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="flolita">
+		<description>Final Lolita</description>
+		<year>19??</year>
+		<publisher>PSK</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="FLOLITA.D77" size="348848" crc="085E989D" sha1="87F9D94E944AE07896CE4F52434F99AE0C2DF7E5" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- FILEMASTERandHotFileExpress -->
+<!-- This one won't load, as the image needs to be split -->
+<!-- commented out for now...
+	<software name="fmaster">
+		<description>Filemaster and Hot File Express</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="3488480">
+				<rom name="Tfm-hfe.d77" size="3488480" crc="1D635297" sha1="BA40C6BC4D51BF33A657B53B7BAE201C95D2769B" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+-->
+
+	<software name="greed">
+		<description>Greed</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="GREED_1.D77" size="348848" crc="08C878A5" sha1="163E2B72059C79A38CBA88081CFE5EC51541684F" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="GREED_2.D77" size="348848" crc="72ACFF27" sha1="B659183530CE5CFEA3EC62EDB5FD473F0BB36DFA" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hcc">
+		<description>Hudson Country Club</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="96432">
+				<rom name="golfkyo.D77" size="96432" crc="836014EF" sha1="7A5D4EDE2B8A85AFCDCA134FAE932F34066B1E34" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ヘリコイド -->
+	<software name="helicoid">
+		<description>Helicoid</description>
+		<year>19??</year>
+		<publisher>Microfun</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="347488">
+				<rom name="heli.d77" size="347488" crc="CED1D125" sha1="C9F29081BAE14AB87E4AB0E59173826C6F592FD6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 北斗の拳 -->
+	<software name="hokuto">
+		<description>北斗の拳</description>
+		<year>19??</year>
+		<publisher>Enix</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="380048">
+				<rom name="hokuto_1.D77" size="380048" crc="5AEE50A9" sha1="60C21DDCB9834E83716F117E703AE1F4D94BA7FA" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="380048">
+				<rom name="hokuto_2.D77" size="380048" crc="910ABC60" sha1="DF4147B568FCE591344B492B21765C2E4B3E49B0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 夕なぎのホライゾン -->
+	<software name="horizon">
+		<description>Horizon - 夕なぎのホライゾン</description>
+		<year>19??</year>
+		<publisher>Cross Media Soft</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="350480">
+				<rom name="YUNAGI.D77" size="350480" crc="383B8095" sha1="5FD7F22BCBB50FA448B9311E847B2C31AA422DF6" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ホットドッグ - not working -->
+	<software name="hotdog">
+		<description>ホットドッグ</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="364976">
+				<rom name="HOTDOG.D77" size="364976" crc="4E63FA35" sha1="6F094715EDBE60EDBB091E3B5F8BCBF6E019BE6C" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hydlide2">
+		<description>Hydlide 2</description>
+		<year>19??</year>
+		<publisher>T&amp;E Soft</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="HYDLIDE2.D77" size="348848" crc="50061F19" sha1="89B7640713EEF4F3449956912323AFA9875D65E9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- スーパー漢字住所録 -->
+	<software name="jushorok">
+		<description>スーパー漢字住所録</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="JUSHOROK.D77" size="348848" crc="DF48A011" sha1="A3E22E5BF5605C2E2FD863C5D886C9B1F437BD5A" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 賢者の遺言 -->
+	<software name="kenja">
+		<description>賢者の遺言 - They, Adventurers Go On</description>
+		<year>1986</year>
+		<publisher>ASCII</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="415840">
+				<rom name="KENJA0.D77" size="415840" crc="D64193F5" sha1="6CB18B2199109BB4FD70BD15FCF1AF550FB866BD" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="415840">
+				<rom name="KENJA1.D77" size="415840" crc="7DBD06CA" sha1="7AF7F3D990252E73E9D7254AD55AB503CC01A657" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ザ ナイト オブ ワンダーランド -->
+	<software name="kow">
+		<description>The Knight of Wonderland</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348752">
+				<rom name="night.D77" size="348752" crc="A837C718" sha1="6BFDFBD5CA87E4749BEE4D1F5EE663EAA06EF26B" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kohaku">
+		<description>Kohaku</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="473776">
+				<rom name="kohaku1d.D77" size="473776" crc="3778278B" sha1="EE61C6756BD6A882056C8123E56491DE3E7681CB" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="473776">
+				<rom name="Kohaku2d.D77" size="473776" crc="029F9AFE" sha1="0810835A6E9CF3774C66E2F5081D9A4AD435E948" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="fm7_flop">
+			<dataarea name="flop" size="473776">
+				<rom name="Kohaku3d.D77" size="473776" crc="A2DCE416" sha1="14259104D2A023876BECD09B461C9A7CD512506E" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="fm7_flop">
+			<dataarea name="flop" size="473776">
+				<rom name="Kohaku4d.D77" size="473776" crc="A317B71D" sha1="C45EA740CE2138B15E5FF2DB4E1282539809CDC0" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kohakuo">
+		<description>Kohaku (original?)</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="416384">
+				<rom name="K1.D77" size="416384" crc="00E0C527" sha1="7017440AD4F2EB09E0D036905DCA010BFB31AFF0" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="416688">
+				<rom name="K2.D77" size="416688" crc="CC35B1D0" sha1="622A69B1156849D9D6C3F4965BBF0949D41B5C36" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="fm7_flop">
+			<dataarea name="flop" size="416688">
+				<rom name="K3.D77" size="416688" crc="A98A8B0C" sha1="1B9B521F4B2EC79FA3E28A2C7D16D8D776F0684B" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="fm7_flop">
+			<dataarea name="flop" size="416688">
+				<rom name="K4.D77" size="416688" crc="C03F7FF5" sha1="8FD07D1FA49E6B07B02175ED63E7D08B11C15D16" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 魔法使いの妹子 -->
+	<software name="mahoutsu">
+		<description>魔法使いの妹子</description>
+		<year>1985</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="mahoutsu.d77" size="348848" crc="41826B87" sha1="3FE215EFC02AA08FBD8D39A5326D4B33870212C1" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- メルヘンヴェール - not working -->
+	<software name="merchen">
+		<description>メルヘンヴェール</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="451888">
+				<rom name="MerchenVeil.d77" size="451888" crc="C88D90CB" sha1="EC58661BFBAB850B23D04BE1AE9094C6DE6139FC" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mine2049">
+		<description>Miner 2049er</description>
+		<year>1982</year>
+		<publisher>Compu-vid International / Big Five Software</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="392368">
+				<rom name="MINE2049.D77" size="392368" crc="C59333D2" sha1="8BF835E5024BCD421E7FE64487E5E7B51E79DDEA" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ムービングスクール -->
+	<software name="mschool">
+		<description>Moving School</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="school.D77" size="348848" crc="BDE764C2" sha1="60DB1B5A944B099CB1A5121F72477F3979647A90" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="palms">
+		<description>The Palms</description>
+		<year>1983</year>
+		<publisher>Hummingbird Soft</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="344496">
+				<rom name="PALMS.D77" size="344496" crc="9B9C67B6" sha1="545FAC7571F1264D440C7AB12C921D5B23DA55EC" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- プリンセスクエスト -->
+	<software name="pquest">
+		<description>Princess Quest</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="409248">
+				<rom name="PQUEST.D77" size="409248" crc="8F880625" sha1="CC30F8A4E28BF7DCCF3E6E47900CF63593303CB3" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="473776">
+				<rom name="PQUEST_U.D77" size="473776" crc="1A8805CE" sha1="4DA739407FEEED927924A66FA4D589641CFD0B26" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- PRINCESS QUEST(正常版) -->
+	<software name="pquesta" cloneof="pquest">
+		<description>Princess Quest (正常版)</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="409248">
+				<rom name="PQUEST.D77" size="409248" crc="9B8C04B0" sha1="8967C5C12EE37A8C26ABAB83CEB7F8673DD77915" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="473776">
+				<rom name="PQUEST_U.D77" size="473776" crc="1A8805CE" sha1="4DA739407FEEED927924A66FA4D589641CFD0B26" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- リバイバー -->
+	<software name="reviver">
+		<description>リバイバー</description>
+		<year>19??</year>
+		<publisher>Arsys</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="414992">
+				<rom name="REVIVER1.D77" size="414992" crc="C8B28869" sha1="17B24A60EA115714DDFF5E97E3B50A165CE48592" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- リグラス -->
+	<software name="riglas">
+		<description>Riglas</description>
+		<year>1985</year>
+		<publisher>Random House</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="384608">
+				<rom name="RIGLAS.d77" size="384608" crc="57828D4D" sha1="774966B21D06177B6A0AAC9C271E769B00FF6BE4" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- does not autoboot, must be run from F-Basic -->
+	<software name="sod">
+		<description>SOD</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="SOD.D77" size="348848" crc="E083A342" sha1="3E18A330E60C267A8FC150CF375E9689094F5BC8" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 倉庫番２ -->
+	<software name="sokoban2">
+		<description>倉庫番２</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="349888">
+				<rom name="SOKOBAN2.D77" size="349888" crc="EA4B0035" sha1="565B0B894A763FE897DA2D1E4934721081AA4B67" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tforce">
+		<description>Thunder Force</description>
+		<year>1984</year>
+		<publisher>Tecno Soft</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348560">
+				<rom name="THUNDERC.D77" size="348560" crc="D0202B6B" sha1="4F87D770033A29DFF2E41784A1CAA85EC49DFE94" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="transylv">
+		<description>Transylvania</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="344496">
+				<rom name="TRANSYL0.D77" size="344496" crc="88832270" sha1="CC47FC7CF491412237392AF7E9C37A570E1804CE" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="TRANSYL1.D77" size="348848" crc="84F06AB2" sha1="8C8B45C0736DE4A3394CFD4CE71F072471C67435" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- トリトーン -->
+	<software name="tritorn">
+		<description>トリトーン</description>
+		<year>19??</year>
+		<publisher>Sein Soft</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="TRITORN.D77" size="348848" crc="5A04DEB9" sha1="D1A6AEC0D3E517F7C1E1F162E539969FE089FA27" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ユリシーズ -->
+	<software name="ulysses">
+		<description>ユリシーズ</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="344496">
+				<rom name="ULYSSES0.D77" size="344496" crc="0F01FFD8" sha1="619FDF7EBAE4723F61E4333FCAFA07DB74EE616C" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="ULYSSES1.D77" size="348848" crc="A5DF43E3" sha1="6E78C64C0FDC86DFE868EC1C2EF2DFD73106AE6A" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 占いプログラム集 -->
+<!-- Disk is not bootable, must be run from F-Basic -->
+	<software name="uranaifm">
+		<description>占いプログラム集</description>
+		<year>19??</year>
+		<publisher>A.R.C.</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="URANAIFM.D77" size="348848" crc="1AC4B98D" sha1="12179A924E54F3DB12EF8C75AEBA7EE4C1AA8869" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- 美しき獲物たち -->
+	<software name="utsuku">
+		<description>美しき獲物たち</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="utsuku.D77" size="348848" crc="D40D27EC" sha1="98B0683BB2D6690EA03E2279903E5177CD640192" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="weird2">
+		<description>Weird 2</description>
+		<year>19??</year>
+		<publisher>Policy</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="377520">
+				<rom name="WEIRD2.D77" size="377520" crc="11C851F3" sha1="E644E5F4AA8623E0F5CA11034A6A4D3CCC4ADFD9" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- XANADU1&2(Alt) -->
+	<software name="xanadu12">
+		<description>Xanadu 1 and 2</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="415840">
+				<rom name="xanadu_a.d77" size="415840" crc="B1C07482" sha1="8CB26731DB7F7F5EB0089F3615C24E7990975030" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="415840">
+				<rom name="xanadu_b.d77" size="415840" crc="01060464" sha1="DD0A227171439BC34D8204F03F4BB8E255BAD5E8" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="fm7_flop">
+			<dataarea name="flop" size="415840">
+				<rom name="xanadu_u.d77" size="415840" crc="EA89FFFD" sha1="6F646119D72354D93717CFE202544B704580133A" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="fm7_flop">
+			<dataarea name="flop" size="415840">
+				<rom name="xanadu2d.d77" size="415840" crc="6E5E8827" sha1="337E6F4E945D6790141F21A31035C9D8BFF79838" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="fm7_flop">
+			<dataarea name="flop" size="415840">
+				<rom name="xanadu2e.d77" size="415840" crc="86C86877" sha1="D907D8E3E4E6F3DCC4849A2CFDD15C223F3888B6" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="fm7_flop">
+			<dataarea name="flop" size="415840">
+				<rom name="xanadu2u.d77" size="415840" crc="87D04B23" sha1="910AAE50771313C859E692D2614EEFECF54DB859" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xevious">
+		<description>Xevious</description>
+		<year>19??</year>
+		<publisher>Dempa</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="XEVIOUS.D77" size="348848" crc="ABD96CCC" sha1="1C6BB9FAD36730654FBFD11FA3E06D24FD63A1BC" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ヤンパラアドベンチャー -->
+<!-- Does not autoboot, must be run from F-BASIC -->
+	<software name="yanpara">
+		<description>ヤンパラアドベンチャー</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="YANPARA1.D77" size="348848" crc="34992E32" sha1="14D15FF72029BF9C056AF2CE82695442E860B789" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ylemon">
+		<description>Yellow Lemon</description>
+		<year>19??</year>
+		<publisher>PSK</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="YLEMON.D77" size="348848" crc="9EF4EB64" sha1="392F7597DFFFEC9344C0320BAE85E9E435B4218C" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ys">
+		<description>Ancient Ys Vanished Omen</description>
+		<year>19??</year>
+		<publisher>Unknown</publisher>
+		<part name="flop1" interface="fm7_flop">
+			<dataarea name="flop" size="415840">
+				<rom name="ys_7a.d77" size="415840" crc="3B1AE509" sha1="496CD5701D675D2C2AEC22BB69CAE21D1B54D171" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="fm7_flop">
+			<dataarea name="flop" size="415840">
+				<rom name="ys_7b.d77" size="415840" crc="FC5F33F4" sha1="C4138B3C4C1EABBBC128A459199CF1AF375A5C07" offset="000000" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="fm7_flop">
+			<dataarea name="flop" size="348848">
+				<rom name="ys_7data.d77" size="348848" crc="2D0AA7F3" sha1="0FCDD6ABD67F280945278F63B4A46381ED1AB21D" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>

@@ -1899,7 +1899,8 @@ static MACHINE_DRIVER_START( fm7 )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
 
-	MDRV_SOFTWARE_LIST_ADD("cass_list","fm7")
+	MDRV_SOFTWARE_LIST_ADD("cass_list","fm7_cass")
+	MDRV_SOFTWARE_LIST_ADD("flop_list","fm7_disk")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fm77av )
@@ -1945,8 +1946,9 @@ static MACHINE_DRIVER_START( fm77av )
 
 	MDRV_FLOPPY_2_DRIVES_ADD(fm7_floppy_config)
 
-	MDRV_SOFTWARE_LIST_ADD("cass_list","fm7")
-	MDRV_SOFTWARE_LIST_ADD("flop_list","fm77av")
+	MDRV_SOFTWARE_LIST_ADD("av_flop_list","fm77av")
+	MDRV_SOFTWARE_LIST_COMPATIBLE_ADD("cass_list","fm7_cass")
+	MDRV_SOFTWARE_LIST_COMPATIBLE_ADD("flop_list","fm7_disk")
 MACHINE_DRIVER_END
 
 /* ROM definition */
