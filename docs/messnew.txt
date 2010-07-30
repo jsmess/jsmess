@@ -44,7 +44,7 @@ Skeleton drivers:
 - Xircom / Intel REX 6000
 - NEC TK-80BS
 - Japan Electronics College MYCOMZ-80A
-
+- Acorn Archimedes 7000/7000+
 
 
 System Driver Changes:

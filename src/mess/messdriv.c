@@ -316,6 +316,8 @@ const game_driver * const drivers[] =
 	DRIVER( bbcbc )	 /* 1985 BBC Bridge Companion   */
 	DRIVER( electron )  /* 1983 Acorn Electron    */
 	DRIVER( a310 )	  /* 1988 Acorn Archimedes 310  */
+	DRIVER( a7000 )	  /* 1995 Acorn Archimedes 7000  */
+	DRIVER( a7000p )	  /* 1997 Acorn Archimedes 7000+  */
 	DRIVER( a6809 )
 
 	/* ACT */
