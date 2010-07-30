@@ -110,5 +110,6 @@ MODULE(thom_fd_basic)
 MODULE(thom_qd_basic)
 MODULE(thom_sap_basic)
 MODULE(cybiko)
+MODULE(cybikoxt)
 
 #endif /* MODULES_RECURSIVE */

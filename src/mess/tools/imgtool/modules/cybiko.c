@@ -1,6 +1,6 @@
 /*
 
-    Cybiko File System
+    Cybiko Classic File System
 
     (c) 2007 Tim Schuerewegen
 
@@ -569,7 +569,7 @@ void cybiko_get_info( const imgtool_class *imgclass, UINT32 state, union imgtool
 //      case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE   : info->writefile_optguide   = cybiko_image_writefile_optguide; break;
 		// --- the following bits of info are returned as NULL-terminated strings ---
 		case IMGTOOLINFO_STR_NAME            : strcpy( info->s = imgtool_temp_str(), "cybiko"); break;
-		case IMGTOOLINFO_STR_DESCRIPTION     : strcpy( info->s = imgtool_temp_str(), "Cybiko File System"); break;
+		case IMGTOOLINFO_STR_DESCRIPTION     : strcpy( info->s = imgtool_temp_str(), "Cybiko Classic File System"); break;
 		case IMGTOOLINFO_STR_FILE            : strcpy( info->s = imgtool_temp_str(), __FILE__); break;
 		case IMGTOOLINFO_STR_FILE_EXTENSIONS : strcpy( info->s = imgtool_temp_str(), "bin,nv"); break;
 		case IMGTOOLINFO_STR_EOLN            : strcpy( info->s = imgtool_temp_str(), "\r\n"); break;
