@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- Based of MAME 0.138u3 Neo Geo driver -->
+<!-- Based of MAME 0.139 Neo Geo driver -->
 
 <softwarelist name="aes" description="SNK Neo Geo AES cartridges">
 <!-- ID 001 -->
@@ -38,6 +38,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 <!-- ID 002 -->
 	<software name="bstars">
 		<description>Baseball Stars Professional</description>
@@ -73,6 +74,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 <!-- ID 003 -->
 	<software name="tpgolf">
 		<description>Top Player's Golf</description>
@@ -111,6 +113,7 @@
 			</dataarea>
 		</part>
 	</software>
+
 <!-- ID 005 -->
 	<software name="maglord">
 		<description>Magician Lord</description>
@@ -916,6 +919,40 @@
 			<dataarea name="maincpu" size="1572864">
                 <rom name="058-p1.bin" size="1048576" crc="2f585ba2" sha1="429b4bf43fb9b1082c15d645ca328f9d175b976b" offset="000000" />
                 <rom name="058-p2.bin" size="524288" crc="d7c71a6b" sha1="b3428063031a2e5857da40a5d2ffa87fb550c1bb" offset="100000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="058-s1.bin" size="131072" crc="2df03197" sha1="24083cfc97e720ac9e131c9fe37df57e27c49294" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="058-m1.bin" size="131072" crc="ccc5186e" sha1="cf9091c523c182aebfb928c91640b2d72fd70123" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="5242880">
+                <rom name="058-v1.bin" size="2097152" crc="55d7ce84" sha1="05ac6a395d9bf9166925acca176a8d6129f533c8" offset="000000" />
+                <rom name="058-v2.bin" size="2097152" crc="ee080b10" sha1="29814fc21bbe30d37745c8918fab00c83a309be4" offset="200000" />
+                <rom name="058-v3.bin" size="1048576" crc="f9eb3d4a" sha1="d1747f9460b965f6daf4f881ed4ecd04c5253434" offset="400000" />
+			</dataarea>
+			<dataarea name="sprites" size="12582912">
+                <rom name="058-c1.bin" size="2097152" crc="044ab13c" sha1="569d283638a132bc163faac2a9055497017ee0d2" offset="000000" loadflag="load16_byte" />
+                <rom name="058-c2.bin" size="2097152" crc="11e6bf96" sha1="c093a4f93f13e07b276e28b30c2a14dda9135d8f" offset="000001" loadflag="load16_byte" />
+                <rom name="058-c3.bin" size="2097152" crc="6f7938d5" sha1="be057b0a3faeb76d5fff161d3e6fea8a26e11d2c" offset="400000" loadflag="load16_byte" />
+                <rom name="058-c4.bin" size="2097152" crc="4ad066ff" sha1="4e304646d954d5f7bbabc5d068e85de31d38830f" offset="400001" loadflag="load16_byte" />
+                <rom name="058-c5.bin" size="2097152" crc="49c5e0bf" sha1="f3784178f90751990ea47a082a6aa869ee3566c9" offset="800000" loadflag="load16_byte" />
+                <rom name="058-c6.bin" size="2097152" crc="8ff1f43d" sha1="6180ceb5412a3e2e34e9513a3283b9f63087f747" offset="800001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="fatfurspa" cloneof="fatfursp">
+		<description>Fatal Fury Special / Garou Densetsu Special (set 2)</description>
+		<year>1993</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1572864">
+                <rom name="058-p1.bin" size="1048576" crc="2f585ba2" sha1="429b4bf43fb9b1082c15d645ca328f9d175b976b" offset="000000" />
+                <rom name="058-p2.bin" size="524288" crc="d7c71a6b" sha1="b3428063031a2e5857da40a5d2ffa87fb550c1bb" offset="100000" />
+				<!-- patch ROM -->
+                <rom name="058-ep1.bin" size="524288" crc="9f0c1e1a" sha1="02861b0f230541becccc3df6a2c85dbe8733e7ce" offset="000000" />
 			</dataarea>
 			<dataarea name="fixed" size="262144">
                 <rom name="058-s1.bin" size="131072" crc="2df03197" sha1="24083cfc97e720ac9e131c9fe37df57e27c49294" offset="000000"/>
