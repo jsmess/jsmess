@@ -1,4 +1,4 @@
-0.138.1
+0.139
 
 New System Drivers Supported:
 -----------------------------
@@ -108,7 +108,7 @@ Imgtool Changes:
 
 Source Changes:
 ----------------
-- The core is based on MAME 0.138u4.  This incorporates all features of the
+- The core is based on MAME 0.139.  This incorporates all features of the
   update to this core.  [MAME team]
 
 - Fixed setting of tape flags when reaching end of tape. This prevented
