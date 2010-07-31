@@ -156,4 +156,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT    COMPANY   FULLNAME       FLAGS */
-COMP( 19??, h19,     0,       0,	h19,	h19,	 0, 	"Heath, Inc.", "Heathkit H19", GAME_NOT_WORKING | GAME_NO_SOUND)
+COMP( 19??, h19,     0,       0,	h19,	h19,	 0, 	"Heath, Inc.", "Heathkit H-19", GAME_NOT_WORKING | GAME_NO_SOUND)
