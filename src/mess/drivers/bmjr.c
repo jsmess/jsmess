@@ -17,6 +17,35 @@ static VIDEO_START( bmjr )
 
 static VIDEO_UPDATE( bmjr )
 {
+	int x,y,xi,yi,count;
+	static UINT8 *gfx_rom = memory_region(screen->machine, "char");
+
+	count = 0x0100;
+
+	for(y=0;y<24;y++)
+	{
+		for(x=0;x<32;x++)
+		{
+			int tile = wram[count];
+			int color = 4;
+
+			for(yi=0;yi<8;yi++)
+			{
+				for(xi=0;xi<8;xi++)
+				{
+					int pen;
+
+					pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
+
+					*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
+				}
+			}
+
+			count++;
+		}
+
+	}
+
     return 0;
 }
 
@@ -66,6 +95,14 @@ static GFXDECODE_START( bmjr )
 	GFXDECODE_ENTRY( "char", 0x0000, bmjr_charlayout, 0, 8 )
 GFXDECODE_END
 
+static PALETTE_INIT( bmjr )
+{
+	int i;
+
+	for(i=0;i<8;i++)
+		palette_set_color_rgb(machine, i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
+}
+
 static MACHINE_DRIVER_START( bmjr )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6800, XTAL_4MHz)
@@ -78,10 +115,10 @@ static MACHINE_DRIVER_START( bmjr )
     MDRV_SCREEN_REFRESH_RATE(50)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-    MDRV_PALETTE_LENGTH(2)
-    MDRV_PALETTE_INIT(black_and_white)
+    MDRV_SCREEN_SIZE(256, 192)
+    MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
+    MDRV_PALETTE_LENGTH(8)
+    MDRV_PALETTE_INIT(bmjr)
 
     MDRV_GFXDECODE(bmjr)
 
