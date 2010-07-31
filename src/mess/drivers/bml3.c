@@ -8,6 +8,7 @@
 	- no documentation, the entire driver is just a bunch of educated
       guesses ...
 	- keyboard shift key, necessary for some key commands
+	- understand how to load a tape
 	- every time that you switch with NEW ON command, there's a "device i/o error" if
 	  the hres_reg bit 5 is active.
 
@@ -34,6 +35,7 @@
 static UINT16 cursor_addr,cursor_raster;
 static UINT8 attr_latch,io_latch;
 static UINT8 hres_reg, vres_reg;
+static UINT8 keyb_press,keyb_press_flag;
 
 static VIDEO_START( bml3 )
 {
@@ -52,7 +54,7 @@ static VIDEO_UPDATE( bml3 )
 	width = (hres_reg & 0x80) ? 80 : 40;
 	height = (vres_reg & 0x08) ? 1 : 0;
 
-	popmessage("%02x %02x",hres_reg,vres_reg);
+//	popmessage("%02x %02x",hres_reg,vres_reg);
 
 	for(y=0;y<25;y++)
 	{
@@ -146,19 +148,12 @@ static WRITE8_HANDLER( bml3_6845_w )
 
 static READ8_HANDLER( bml3_keyboard_r )
 {
-	const char* portnames[3] = { "key1","key2","key3" };
-	int i,port_i,scancode;
-	scancode = 0;
-
-	for(port_i=0;port_i<3;port_i++)
+	if(keyb_press_flag)
 	{
-		for(i=0;i<32;i++)
-		{
-			if((input_port_read(space->machine,portnames[port_i])>>i) & 1)
-				return scancode | 0x80;
-
-			scancode++;
-		}
+		int res;
+		res = keyb_press;
+		keyb_press = keyb_press_flag = 0;
+		return res | 0x80;
 	}
 
 	return 0;
@@ -171,7 +166,7 @@ static READ8_HANDLER( bml3_io_r )
 
 	if(offset == 0x19) return io_latch;
 	if(offset == 0xc4) return 0xff; //some video modes wants this to be high
-//maybe 0xc4 is the status and 0xc5 the data? d7 and ea seems to be related too
+//	if(offset == 0xc5 || offset == 0xca) return mame_rand(space->machine); //tape related
 	if(offset == 0xc8) return 0; //??? checks bit 7, scrolls vertically if active high
 	if(offset == 0xc9) return 0x11; //0x01 put 320 x 200 mode, 0x07 = 640 x 375
 
@@ -241,6 +236,7 @@ static WRITE8_HANDLER( bml3_vres_reg_w )
 static WRITE8_HANDLER( bml3_io_w )
 {
 	if(offset == 0x19)					 		{ io_latch = data; } //???
+//	else if(offset == 0xc4)						{ /* system latch, writes 0x53 -> 0x51 when a tape is loaded */}
 	else if(offset == 0xc6 || offset == 0xc7) 	{ bml3_6845_w(space,offset-0xc6,data); }
 	else if(offset == 0xd0)						{ bml3_hres_reg_w(space,0,data);  }
 	else if(offset == 0xd3)						{ /* every time that the user presses a key, unknown purpose */ }
@@ -376,16 +372,6 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0xffe00000,IP_ACTIVE_HIGH,IPT_UNKNOWN)
 INPUT_PORTS_END
 
-static MACHINE_START(bml3)
-{
-	beep_set_frequency(machine->device("beeper"),300); //guesswork
-	beep_set_state(machine->device("beeper"),0);
-}
-
-static MACHINE_RESET(bml3)
-{
-}
-
 static const mc6845_interface mc6845_intf =
 {
 	"screen",	/* screen we are acting on */
@@ -400,14 +386,38 @@ static const mc6845_interface mc6845_intf =
 	NULL		/* update address callback */
 };
 
+static TIMER_CALLBACK( keyboard_callback )
+{
+	const char* portnames[3] = { "key1","key2","key3" };
+	int i,port_i,scancode;
+	scancode = 0;
+
+	for(port_i=0;port_i<3;port_i++)
+	{
+		for(i=0;i<32;i++)
+		{
+			if((input_port_read(machine,portnames[port_i])>>i) & 1)
+			{
+				keyb_press = scancode;
+				keyb_press_flag = 1;
+				cputag_set_input_line(machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
+				return;
+			}
+
+			scancode++;
+		}
+	}
+}
+
+#if 0
 static INTERRUPT_GEN( bml3_irq )
 {
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
-#if 0
 static INTERRUPT_GEN( bml3_firq )
 {
+	/* almost surely used to load the tapes */
 	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
 }
 #endif
@@ -420,12 +430,22 @@ static PALETTE_INIT( bml3 )
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
+static MACHINE_START(bml3)
+{
+	timer_pulse(machine, ATTOTIME_IN_HZ(240/8), NULL, 0, keyboard_callback);
+	beep_set_frequency(machine->device("beeper"),300); //guesswork
+	beep_set_state(machine->device("beeper"),0);
+}
+
+static MACHINE_RESET(bml3)
+{
+}
 
 static MACHINE_DRIVER_START( bml3 )
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809, XTAL_1MHz)
 	MDRV_CPU_PROGRAM_MAP(bml3_mem)
-	MDRV_CPU_VBLANK_INT("screen", bml3_irq )
+//	MDRV_CPU_VBLANK_INT("screen", bml3_irq )
 //	MDRV_CPU_PERIODIC_INT(bml3_firq,45)
 
 	MDRV_MACHINE_START(bml3)
