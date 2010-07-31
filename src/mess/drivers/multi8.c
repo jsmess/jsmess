@@ -87,10 +87,10 @@ static VIDEO_UPDATE( multi8 )
 				{
 					int pen;
 
-					pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
-
 					if(attr & 0x20)
-						pen^=7;
+						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? 0 : color;
+					else
+						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
 
 					if(pen)
 						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
