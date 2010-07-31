@@ -1,17 +1,39 @@
-/***************************************************************************
+/**************************************************************************************
 
-        Hitachi Basic Master Level 3 (MB-6890)
+	Basic Master Level 3 (MB-6890) (c) 1980 Hitachi
 
-        13/07/2010 Skeleton driver.
+	preliminary driver by Angelo Salese
 
-****************************************************************************/
+	TODO:
+	- no documentation, the entire driver is just a bunch of educated
+      guesses ...
+	- keyboard shift key, necessary for some key commands
+	- every time that you switch with NEW ON command, there's a "device i/o error" if
+	  the hres_reg bit 5 is active.
+
+	NOTES:
+	- NEW ON changes the video mode, they are:
+		0: 320 x 200, bit 5 active
+		1: 320 x 200, bit 5 unactive
+		2: 320 x 375, bit 5 active
+		3: 320 x 375, bit 5 unactive
+		4: 640 x 200, bit 5 active
+		5: 640 x 200, bit 5 unactive
+		6: 640 x 375, bit 5 active
+		7: 640 x 375, bit 5 unactive
+		8-15: same as above plus sets bit 4
+		16-31: same as above plus shows the bar at the bottom
+
+**************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
+#include "sound/beep.h"
 
 static UINT16 cursor_addr,cursor_raster;
-static UINT8 attr_latch;
+static UINT8 attr_latch,io_latch;
+static UINT8 hres_reg, vres_reg;
 
 static VIDEO_START( bml3 )
 {
@@ -21,14 +43,20 @@ static VIDEO_UPDATE( bml3 )
 {
 	int x,y,count;
 	int xi,yi;
+	int width,height;
 	static UINT8 *gfx_rom = memory_region(screen->machine, "char");
 	static UINT8 *vram = memory_region(screen->machine, "vram");
 
 	count = 0x0000;
 
+	width = (hres_reg & 0x80) ? 80 : 40;
+	height = (vres_reg & 0x08) ? 1 : 0;
+
+	popmessage("%02x %02x",hres_reg,vres_reg);
+
 	for(y=0;y<25;y++)
 	{
-		for(x=0;x<40;x++)
+		for(x=0;x<width;x++)
 		{
 			int tile = vram[count+0x0000];
 			int color = vram[count+0x4000] & 7;
@@ -46,7 +74,13 @@ static VIDEO_UPDATE( bml3 )
 					else
 						pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? color : 0;
 
-					*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
+					if(height)
+					{
+						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+0, x*8+xi) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, (y*8+yi)*2+1, x*8+xi) = screen->machine->pens[pen];
+					}
+					else
+						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
 				}
 			}
 
@@ -69,7 +103,13 @@ static VIDEO_UPDATE( bml3 )
 					{
 						for(xc=0;xc<8;xc++)
 						{
-							*BITMAP_ADDR16(bitmap, y*8+yc+7, x*8+xc) = screen->machine->pens[0x7];
+							if(height)
+							{
+								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+0, x*8+xc) = screen->machine->pens[0x7];
+								*BITMAP_ADDR16(bitmap, (y*8+yc+7)*2+1, x*8+xc) = screen->machine->pens[0x7];
+							}
+							else
+								*BITMAP_ADDR16(bitmap, y*8+yc+7, x*8+xc) = screen->machine->pens[0x7];
 						}
 					}
 				}
@@ -129,10 +169,18 @@ static READ8_HANDLER( bml3_io_r )
 {
 	static UINT8 *rom = memory_region(space->machine, "maincpu");
 
-//	if(offset == 0xc4) return bml3_cmt_r(space,0); //maybe 0xc4 is the status and 0xc5 the data? d7 and ea seems to be related too
+	if(offset == 0x19) return io_latch;
+	if(offset == 0xc4) return 0xff; //some video modes wants this to be high
+//maybe 0xc4 is the status and 0xc5 the data? d7 and ea seems to be related too
 	if(offset == 0xc8) return 0; //??? checks bit 7, scrolls vertically if active high
 	if(offset == 0xc9) return 0x11; //0x01 put 320 x 200 mode, 0x07 = 640 x 375
-//	if(offset == 0xcb) return mame_rand(space->machine);
+
+	/* one of these sets something, apparently available RAM space is smaller if one of these bits is zero (?) */
+//	if(offset == 0x40) return 0 ? 0xff : 0x00;
+//	if(offset == 0x42) return 0 ? 0xff : 0x00;
+//	if(offset == 0x44) return 0 ? 0xff : 0x00;
+//	if(offset == 0x46) return 0 ? 0xff : 0x00;
+
 	if(offset == 0xd8) return attr_latch;
 	if(offset == 0xe0) return bml3_keyboard_r(space,0);
 
@@ -140,21 +188,64 @@ static READ8_HANDLER( bml3_io_r )
 
 //	if(offset == 0x40 || offset == 0x42 || offset == 0x44 || offset == 0x46)
 
-
 	if(offset < 0xf0)
 	{
-		logerror("I/O read [%02x] at PC=%04x\n",offset,cpu_get_pc(space->cpu));
-		return 0;
+		//if(cpu_get_pc(space->cpu) != 0xf838 && cpu_get_pc(space->cpu) != 0xfac4 && cpu_get_pc(space->cpu) != 0xf83c)
+		if(offset >= 0xd0 && offset < 0xe0)
+			logerror("I/O read [%02x] at PC=%04x\n",offset,cpu_get_pc(space->cpu));
+		return 0;//mame_rand(space->machine);
 	}
 
 	/* TODO: pretty sure that there's a bankswitch for this */
 	return rom[offset+0xff00];
 }
 
+static void m6845_change_clock(running_machine *machine, UINT8 setting)
+{
+	int m6845_clock = XTAL_3_579545MHz;
+
+	switch(setting & 0x88)
+	{
+		case 0x00: m6845_clock = XTAL_3_579545MHz/4; break; //320 x 200
+		case 0x08: m6845_clock = XTAL_3_579545MHz/2; break; //320 x 375
+		case 0x80: m6845_clock = XTAL_3_579545MHz/2; break; //640 x 200
+		case 0x88: m6845_clock = XTAL_3_579545MHz/1; break; //640 x 375
+	}
+
+	mc6845_set_clock(machine->device("crtc"), m6845_clock);
+}
+
+static WRITE8_HANDLER( bml3_hres_reg_w )
+{
+	/*
+	x--- ---- width (1) 80 / (0) 40
+	-x-- ---- used in some modes, unknown purpose
+	--x- ---- used in some modes, unknown purpose (also wants $ffc4 to be 0xff), color / monochrome switch?
+	*/
+
+	hres_reg = data;
+
+	m6845_change_clock(space->machine,(hres_reg & 0x80) | (vres_reg & 0x08));
+}
+
+static WRITE8_HANDLER( bml3_vres_reg_w )
+{
+	/*
+	---- x--- char height
+	*/
+	vres_reg = data;
+
+	m6845_change_clock(space->machine,(hres_reg & 0x80) | (vres_reg & 0x08));
+}
+
 static WRITE8_HANDLER( bml3_io_w )
 {
-	if(offset == 0xc6 || offset == 0xc7) { bml3_6845_w(space,offset-0xc6,data); }
-	else if(offset == 0xd8)				 { attr_latch = data; }
+	if(offset == 0x19)					 		{ io_latch = data; } //???
+	else if(offset == 0xc6 || offset == 0xc7) 	{ bml3_6845_w(space,offset-0xc6,data); }
+	else if(offset == 0xd0)						{ bml3_hres_reg_w(space,0,data);  }
+	else if(offset == 0xd3)						{ /* every time that the user presses a key, unknown purpose */ }
+	else if(offset == 0xd6)						{ bml3_vres_reg_w(space,0,data); }
+	else if(offset == 0xd8)				 		{ attr_latch = data; }
 	else
 	{
 		logerror("I/O write %02x -> [%02x] at PC=%04x\n",data,offset,cpu_get_pc(space->cpu));
@@ -285,6 +376,11 @@ static INPUT_PORTS_START( bml3 )
 	PORT_BIT(0xffe00000,IP_ACTIVE_HIGH,IPT_UNKNOWN)
 INPUT_PORTS_END
 
+static MACHINE_START(bml3)
+{
+	beep_set_frequency(machine->device("beeper"),300); //guesswork
+	beep_set_state(machine->device("beeper"),0);
+}
 
 static MACHINE_RESET(bml3)
 {
@@ -309,6 +405,13 @@ static INTERRUPT_GEN( bml3_irq )
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
+#if 0
+static INTERRUPT_GEN( bml3_firq )
+{
+	cputag_set_input_line(device->machine, "maincpu", M6809_FIRQ_LINE, HOLD_LINE);
+}
+#endif
+
 static PALETTE_INIT( bml3 )
 {
 	int i;
@@ -320,26 +423,33 @@ static PALETTE_INIT( bml3 )
 
 static MACHINE_DRIVER_START( bml3 )
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu",M6809, XTAL_1MHz)
-    MDRV_CPU_PROGRAM_MAP(bml3_mem)
+	MDRV_CPU_ADD("maincpu",M6809, XTAL_1MHz)
+	MDRV_CPU_PROGRAM_MAP(bml3_mem)
 	MDRV_CPU_VBLANK_INT("screen", bml3_irq )
+//	MDRV_CPU_PERIODIC_INT(bml3_firq,45)
 
-    MDRV_MACHINE_RESET(bml3)
+	MDRV_MACHINE_START(bml3)
+ 	MDRV_MACHINE_RESET(bml3)
 
-    /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-    MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(bml3)
+ 	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(640, 480)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+	MDRV_PALETTE_LENGTH(8)
+    MDRV_PALETTE_INIT(bml3)
 
 	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
-    MDRV_VIDEO_START(bml3)
-    MDRV_VIDEO_UPDATE(bml3)
+	MDRV_VIDEO_START(bml3)
+	MDRV_VIDEO_UPDATE(bml3)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("beeper", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_DRIVER_END
 
 /* ROM definition */
