@@ -83,5 +83,5 @@ ROM_END
 ***************************************************************************/
 
 /*    YEAR  NAME        PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY FULLNAME        FLAGS */
-CONS( 1995, a7000,      0,      0,      a7000,      a7000,	0,      "Acorn",  "Archimedes 7000",   GAME_NOT_WORKING | GAME_NO_SOUND )
-CONS( 1997, a7000p,     a7000,  0,      a7000,      a7000,	0,      "Acorn",  "Archimedes 7000+",  GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1995, a7000,      0,      0,      a7000,      a7000,	0,      "Acorn",  "Archimedes A7000",   GAME_NOT_WORKING | GAME_NO_SOUND )
+COMP( 1997, a7000p,     a7000,  0,      a7000,      a7000,	0,      "Acorn",  "Archimedes A7000+",  GAME_NOT_WORKING | GAME_NO_SOUND )
