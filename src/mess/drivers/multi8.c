@@ -8,7 +8,6 @@
 	- dunno how to trigger the text color mode in BASIC, I just modify
 	  $f0b1 to 1 for now
 	- bitmap B/W mode is untested
-	- Beeper keeps ringing, is it due of an HW failure?
 
 ****************************************************************************/
 
@@ -517,7 +516,7 @@ static I8255A_INTERFACE( ppi8255_intf_0 )
 
 static WRITE8_DEVICE_HANDLER( ym2203_porta_w )
 {
-	beep_set_state(device->machine->device("beeper"),data & 0x08);
+	beep_set_state(device->machine->device("beeper"),!(data & 0x08));
 }
 
 static const ym2203_interface ym2203_config =
@@ -538,7 +537,7 @@ static MACHINE_START(multi8)
 
 static MACHINE_RESET(multi8)
 {
-	beep_set_frequency(machine->device("beeper"),300); //guesswork
+	beep_set_frequency(machine->device("beeper"),1200); //guesswork
 	beep_set_state(machine->device("beeper"),0);
 	mcu_init = 0;
 }
@@ -577,7 +576,7 @@ static MACHINE_DRIVER_START( multi8 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("beeper", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.00) //FIXME: temporarly silenced
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_DRIVER_END
 
 /* ROM definition */

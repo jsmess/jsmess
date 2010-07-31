@@ -8,8 +8,10 @@
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "sound/beep.h"
 
 static UINT8 *wram;
+static UINT8 tape_switch;
 
 static VIDEO_START( bmjr )
 {
@@ -64,10 +66,35 @@ static READ8_HANDLER( key_r )
 static WRITE8_HANDLER( key_w )
 {
 	key_mux = data & 0xf;
+
+	if(data & 0xf0)
+		printf("%02x",data & 0xf0);
+}
+
+static READ8_HANDLER( ff_r )
+{
+	return 0xff;
+}
+
+static READ8_HANDLER( tape_r )
+{
+	return 0xff; //TODO
+}
+
+static WRITE8_HANDLER( tape_w )
+{
+	if(!tape_switch)
+	{
+		beep_set_state(space->machine->device("beeper"),!(data & 0x80));
+	}
+	else
+	{
+		// ...
+	}
 }
 
 static ADDRESS_MAP_START(bmjr_mem, ADDRESS_SPACE_PROGRAM, 8)
-//	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_UNMAP_HIGH
 	//0x0100, 0x03ff basic vram
 	//0x0900, 0x20ff vram, modes 0x40 / 0xc0
 	//0x2100, 0x38ff vram, modes 0x44 / 0xcc
@@ -79,9 +106,9 @@ static ADDRESS_MAP_START(bmjr_mem, ADDRESS_SPACE_PROGRAM, 8)
 //	AM_RANGE(0xee00, 0xee00) R stop tape
 //	AM_RANGE(0xee20, 0xee20) R start tape
 //	AM_RANGE(0xee40, 0xee40) W Picture reverse (?)
-//	AM_RANGE(0xee80, 0xee80) RW tape input / output
+	AM_RANGE(0xee80, 0xee80) AM_READWRITE(tape_r,tape_w)//RW tape input / output
 	AM_RANGE(0xeec0, 0xeec0) AM_READWRITE(key_r,key_w)//RW keyboard
-//	AM_RANGE(0xef00, 0xef00) R timer
+	AM_RANGE(0xef00, 0xef00) AM_READ(ff_r) //R timer
 //	AM_RANGE(0xef40, 0xef40) R unknown
 //	AM_RANGE(0xef80, 0xef80) R unknown
 //	AM_RANGE(0xefe0, 0xefe0) W screen mode
@@ -207,11 +234,6 @@ static INPUT_PORTS_START( bmjr )
 	PORT_BIT(0xf0,IP_ACTIVE_LOW,IPT_UNUSED )
 INPUT_PORTS_END
 
-
-static MACHINE_RESET(bmjr)
-{
-}
-
 static const gfx_layout bmjr_charlayout =
 {
 	8, 8,
@@ -235,11 +257,25 @@ static PALETTE_INIT( bmjr )
 		palette_set_color_rgb(machine, i, pal1bit(i >> 1),pal1bit(i >> 2),pal1bit(i >> 0));
 }
 
+
+static MACHINE_START(bmjr)
+{
+	beep_set_frequency(machine->device("beeper"),1200); //guesswork
+	beep_set_state(machine->device("beeper"),0);
+}
+
+static MACHINE_RESET(bmjr)
+{
+	tape_switch = 0;
+}
+
 static MACHINE_DRIVER_START( bmjr )
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",M6800, XTAL_4MHz/4) //unknown clock / divider
     MDRV_CPU_PROGRAM_MAP(bmjr_mem)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START(bmjr)
     MDRV_MACHINE_RESET(bmjr)
 
     /* video hardware */
@@ -256,6 +292,11 @@ static MACHINE_DRIVER_START( bmjr )
 
     MDRV_VIDEO_START(bmjr)
     MDRV_VIDEO_UPDATE(bmjr)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("beeper", BEEP, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS,"mono",0.50)
 MACHINE_DRIVER_END
 
 /* ROM definition */
