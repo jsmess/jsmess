@@ -132,6 +132,7 @@ static READ8_HANDLER( bml3_io_r )
 //	if(offset == 0xc4) return bml3_cmt_r(space,0); //maybe 0xc4 is the status and 0xc5 the data? d7 and ea seems to be related too
 	if(offset == 0xc8) return 0; //??? checks bit 7, scrolls vertically if active high
 	if(offset == 0xc9) return 0x11; //0x01 put 320 x 200 mode, 0x07 = 640 x 375
+//	if(offset == 0xcb) return mame_rand(space->machine);
 	if(offset == 0xd8) return attr_latch;
 	if(offset == 0xe0) return bml3_keyboard_r(space,0);
 
@@ -331,7 +332,7 @@ static MACHINE_DRIVER_START( bml3 )
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
     MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
     MDRV_SCREEN_SIZE(640, 480)
-    MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+    MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
     MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(bml3)
 
@@ -344,7 +345,11 @@ MACHINE_DRIVER_END
 /* ROM definition */
 ROM_START( bml3 )
     ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "l3bas.rom", 0xa000, 0x6000, CRC(d81baa07) SHA1(a8fd6b29d8c505b756dbf5354341c48f9ac1d24d))
+//	ROM_LOAD( "l3bas.rom", 0xa000, 0x6000, BAD_DUMP CRC(d81baa07) SHA1(a8fd6b29d8c505b756dbf5354341c48f9ac1d24d)) //original, 24k isn't a proper rom size!
+	/* Handcrafted ROMs, rom labels and contents might not match */
+	ROM_LOAD( "598 p16611.ic3", 0xa000, 0x2000, BAD_DUMP CRC(954b9bad) SHA1(047948fac6808717c60a1d0ac9205a5725362430))
+	ROM_LOAD( "599 p16561.ic4", 0xc000, 0x2000, BAD_DUMP CRC(b27a48f5) SHA1(94cb616df4caa6415c5076f9acdf675acb7453e2))
+	ROM_LOAD( "600 p16681.ic5", 0xe000, 0x2000, BAD_DUMP CRC(fe3988a5) SHA1(edc732f1cd421e0cf45ffcfc71c5589958ceaae7))
 
     ROM_REGION( 0x800, "char", 0 )
 	ROM_LOAD("char.rom", 0x00000, 0x00800, BAD_DUMP CRC(e3995a57) SHA1(1c1a0d8c9f4c446ccd7470516b215ddca5052fb2) ) //Taken from Sharp X1
