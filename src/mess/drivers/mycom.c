@@ -1,8 +1,8 @@
 /***************************************************************************
 
-        Japan Electronics College MYCOMZ-80A
+	MYCOMZ-80A (c) 1981 Japan Electronics College
 
-        21/07/2010 Skeleton driver.
+	preliminary driver by Angelo Salese
 
 ****************************************************************************/
 
@@ -16,6 +16,7 @@ static UINT8 ram_bank;
 static UINT16 vram_addr;
 static UINT16 cursor_addr,cursor_raster;
 static UINT8 keyb_press,keyb_press_flag,shift_press_flag;
+static UINT8 video_mode;
 
 static VIDEO_START( mycom )
 {
@@ -25,57 +26,100 @@ static VIDEO_UPDATE( mycom )
 {
 	int x,y,count;
 	int xi,yi;
+	int width;
 	static UINT8 *vram = memory_region(screen->machine, "vram");
 	static UINT8 *gfx_rom = memory_region(screen->machine, "gfx");
 
 	count = 0;
 
-	for(y=0;y<24;y++)
+	if(video_mode & 0x40)
 	{
-		for(x=0;x<40;x++)
+		width = (video_mode & 0x80) ? 160 : 320;
+
+		for(y=0;y<24;y++)
 		{
-			int tile = vram[count];
-			//int color = (display_reg & 0x80) ? 7 : (attr & 0x07);
-
-			for(yi=0;yi<8;yi++)
+			for(x=0;x<width;x+=4)
 			{
-				for(xi=0;xi<8;xi++)
+				//int xi,yi;
+				int xi,yi;
+
+				for(yi=0;yi<4;yi++)
 				{
-					int pen;
-
-					pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? 1 : 0;
-
-					//if(pen)
-						*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
-				}
-			}
-
-			if(cursor_addr == count)
-			{
-				int xc,yc,cursor_on;
-
-				cursor_on = 0;
-				switch(cursor_raster & 0x60)
-				{
-					case 0x00: cursor_on = 1; break; //always on
-					case 0x20: cursor_on = 0; break; //always off
-					case 0x40: if(screen->machine->primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
-					case 0x60: if(screen->machine->primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
-				}
-
-				if(cursor_on)
-				{
-					for(yc=0;yc<(8-(cursor_raster & 7));yc++)
+					for(xi=0;xi<2;xi++)
 					{
-						for(xc=0;xc<8;xc++)
-						{
-							*BITMAP_ADDR16(bitmap, y*8+yc, x*8+xc) = screen->machine->pens[0x1];
-						}
+						int pen;
+
+						pen = vram[count] >> (yi+(xi*4));
+						pen &= 1;
+
+						*BITMAP_ADDR16(bitmap, y*8+(yi*2+0), (x+(xi*2+0))*2+0) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, y*8+(yi*2+0), (x+(xi*2+1))*2+0) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, y*8+(yi*2+1), (x+(xi*2+0))*2+0) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, y*8+(yi*2+1), (x+(xi*2+1))*2+0) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, y*8+(yi*2+0), (x+(xi*2+0))*2+1) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, y*8+(yi*2+0), (x+(xi*2+1))*2+1) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, y*8+(yi*2+1), (x+(xi*2+0))*2+1) = screen->machine->pens[pen];
+						*BITMAP_ADDR16(bitmap, y*8+(yi*2+1), (x+(xi*2+1))*2+1) = screen->machine->pens[pen];
 					}
 				}
-			}
 
-			count++;
+				count++;
+			}
+		}
+
+		return 0;
+	}
+	else
+	{
+		width = (video_mode & 0x80) ? 40 : 80;
+
+		for(y=0;y<24;y++)
+		{
+			for(x=0;x<width;x++)
+			{
+				int tile = vram[count];
+				//int color = (display_reg & 0x80) ? 7 : (attr & 0x07);
+
+					for(yi=0;yi<8;yi++)
+					{
+						for(xi=0;xi<8;xi++)
+						{
+							int pen;
+
+							pen = (gfx_rom[tile*8+yi] >> (7-xi) & 1) ? 1 : 0;
+
+							//if(pen)
+								*BITMAP_ADDR16(bitmap, y*8+yi, x*8+xi) = screen->machine->pens[pen];
+						}
+					}
+
+					if(cursor_addr == count)
+					{
+						int xc,yc,cursor_on;
+
+						cursor_on = 0;
+						switch(cursor_raster & 0x60)
+						{
+							case 0x00: cursor_on = 1; break; //always on
+							case 0x20: cursor_on = 0; break; //always off
+							case 0x40: if(screen->machine->primary_screen->frame_number() & 0x10) { cursor_on = 1; } break; //fast blink
+							case 0x60: if(screen->machine->primary_screen->frame_number() & 0x20) { cursor_on = 1; } break; //slow blink
+						}
+
+						if(cursor_on)
+						{
+							for(yc=0;yc<(8-(cursor_raster & 7));yc++)
+							{
+								for(xc=0;xc<8;xc++)
+								{
+									*BITMAP_ADDR16(bitmap, y*8+yc, x*8+xc) = screen->machine->pens[0x1];
+								}
+							}
+						}
+					}
+
+				count++;
+			}
 		}
 	}
 
@@ -210,7 +254,7 @@ static INPUT_PORTS_START( mycom )
 	PORT_BIT(0x00000080,IP_ACTIVE_HIGH,IPT_UNUSED) //0x27 '
 	PORT_BIT(0x00000100,IP_ACTIVE_HIGH,IPT_UNUSED) //0x28 (
 	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_UNUSED) //0x29 )
-	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2a *
+	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("*") PORT_CODE(KEYCODE_ASTERISK) PORT_CHAR('*') //0x2a *
 	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2c ,
 	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
@@ -346,6 +390,22 @@ static READ8_DEVICE_HANDLER( key_r )
 	return keyb_press;
 }
 
+static WRITE8_DEVICE_HANDLER( output_1c )
+{
+	/*
+	x--- ---- width 80/40 (0 = 80, 1 = 40)
+	-x-- ---- video mode (0= tile, 1 = bitmap)
+	--x- ---- PSG CS bit
+	---x ---- PSG WE bit
+	---- x--- cmt remote
+	---- -x-- cmt output
+	---- --x- printer reset
+	---- ---x printer strobe
+	*/
+
+	video_mode = data & 0xc0;
+}
+
 static I8255A_INTERFACE( ppi8255_intf_0 )
 {
 	DEVCB_NULL,						/* Port A read */
@@ -363,7 +423,7 @@ static I8255A_INTERFACE( ppi8255_intf_1 )
 	DEVCB_NULL,			/* Port C read */
 	DEVCB_NULL,			/* Port A write */
 	DEVCB_NULL,			/* Port B write */
-	DEVCB_NULL			/* Port C write */
+	DEVCB_HANDLER(output_1c)		/* Port C write */
 };
 
 static I8255A_INTERFACE( ppi8255_intf_2 )
