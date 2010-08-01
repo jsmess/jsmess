@@ -11,6 +11,8 @@
     - cassette handling requires a decap of the MCU. It could be possible to
       do some tight synch between the master CPU and a code simulation,but I think
       it's not worth the effort...
+    - many games won't boot, check why;
+    - make the later model to work;
     - Currently rewriting the video part without the MC6847 for two reasons:
         A) the later models have a custom video chip in the place of the MC6847,
            so this implementation will be used in the end.
@@ -979,9 +981,7 @@ ROM_START( pc6001 )	/* screen = 8000-83FF */
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
-	/* Load here your tape for now (and change the cas length macro according to what MESS returns) */
-//  ROM_LOAD( "car.cas", 0x0000, CAS_LENGTH, CRC(1) SHA1(1) )
+	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
 	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
@@ -997,7 +997,7 @@ ROM_START( pc6001a )
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
 	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
@@ -1017,7 +1017,7 @@ ROM_START( pc6001m2 )
 	ROM_REGION( 0x1000, "gfx1", 0 )
 	ROM_COPY( "maincpu", 0x1c000, 0x00000, 0x1000 )
 
-	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
 	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
@@ -1035,7 +1035,7 @@ ROM_START( pc6001sr )
 	ROM_REGION( 0x4000, "gfx1", 0 )
 	ROM_LOAD( "cgrom68.64", 0x0000, 0x4000, CRC(73bc3256) SHA1(5f80d62a95331dc39b2fb448a380fd10083947eb) )
 
-	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
 	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
@@ -1054,7 +1054,7 @@ ROM_START( pc6600 )	/* Variant of pc6001m2 */
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
 	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
@@ -1076,7 +1076,7 @@ ROM_START( pc6600sr )	/* Variant of pc6001sr */
 	ROM_REGION( 0x1000, "mcu", ROMREGION_ERASEFF )
 	ROM_LOAD( "i8049", 0x0000, 0x1000, NO_DUMP )
 
-	ROM_REGION( 0x10000, "cas", ROMREGION_ERASEFF )
+	ROM_REGION( 0x20000, "cas", ROMREGION_ERASEFF )
 
 	ROM_REGION( 0x4000, "cart_img", ROMREGION_ERASE00 )
 	ROM_CART_LOAD("cart", 0x0000, 0x3fff, ROM_OPTIONAL | ROM_MIRROR)
