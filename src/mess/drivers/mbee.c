@@ -756,6 +756,6 @@ COMP( 1982, mbeeic,   mbee,	0,	mbeeic,   mbee,     mbeeic, 		"Applied Technology
 COMP( 1982, mbeepc,   mbee,	0,	mbeepc,   mbee,     mbeepc, 		"Applied Technology",  "Microbee 32 Personal Communicator" , 0)
 COMP( 1985, mbeepc85, mbee,	0,	mbeepc85, mbee,     mbeepc85,		"Applied Technology",  "Microbee 32 PC85" , 0)
 COMP( 1985, mbeeppc,  mbee,	0,	mbeeppc,  mbee,     mbeeppc,		"Applied Technology",  "Microbee 32 Premium PC85" , GAME_NOT_WORKING)
-COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56, 		"Applied Technology",  "Microbee 56k" , 0 )
+COMP( 1986, mbee56,   mbee,	0,	mbee56,   mbee,     mbee56, 		"Applied Technology",  "Microbee 56k" , GAME_NOT_WORKING )
 COMP( 1986, mbee64,   mbee,	0,	mbee64,   mbee,     mbee64, 		"Applied Technology",  "Microbee 64k" , GAME_NOT_WORKING)
 

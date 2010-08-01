@@ -167,6 +167,8 @@ MACHINE_RESET( mbee )
 	mbee_cassette = machine->device("cassette");
 	mbee_printer = machine->device("centronics");
 	mbee_fdc = machine->device("wd179x");
+	wd17xx_set_pause_time(mbee_fdc, 45);       /* default is 40 usec if not set */
+	//wd17xx_set_complete_command_delay(mbee_fdc, 50);   /* default is 12 usec if not set */
 }
 
 

@@ -1379,7 +1379,6 @@ READ8_DEVICE_HANDLER( wd17xx_status_r )
 				w->status &= ~ STA_1_HD_LOADED;
 		}
 
-		if (w->command_type==TYPE_IV) result &= 0x63; /* to allow microbee to boot up */
 	}
 
 	/* eventually set data request bit */
