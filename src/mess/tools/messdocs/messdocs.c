@@ -8,7 +8,6 @@
 
 #include "pool.h"
 #include "sys/stat.h"
-#include "utils.h"
 #include "osdcore.h"
 #include "strconv.h"
 #include "winutf8.h"
@@ -37,6 +36,8 @@ struct messdocs_state
 static void *expat_malloc(size_t size);
 static void *expat_realloc(void *ptr, size_t size);
 static void expat_free(void *ptr);
+static void rtrim(char *buf);
+
 
 //============================================================
 //  win_error_to_mame_file_error
@@ -773,6 +774,21 @@ int CLIB_DECL main(int argc, char **argv)
 
 void CLIB_DECL logerror(const char *text,...)
 {
+}
+
+
+
+static void rtrim(char *buf)
+{
+	size_t buflen;
+	char *s;
+
+	buflen = strlen(buf);
+	if (buflen)
+	{
+		for (s = &buf[buflen-1]; s >= buf && (*s >= '\0') && isspace(*s); s--)
+			*s = '\0';
+	}
 }
 
 
