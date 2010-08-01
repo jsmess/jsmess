@@ -2,6 +2,44 @@
 
 New System Drivers Supported:
 -----------------------------
+(none)
+
+
+
+Systems Promoted from GAME_NOT_WORKING:
+---------------------------------------
+(none)
+
+
+
+Skeleton drivers:
+-----------------
+(none)
+
+
+
+System Driver Changes:
+----------------------
+(none)
+
+
+
+Imgtool Changes:
+----------------
+(none)
+
+
+
+Source Changes:
+----------------
+(none)
+
+
+
+0.139
+
+New System Drivers Supported:
+-----------------------------
 - Bally Home Library Computer [ranger_lennier]
 - Commodore 64C (Sweden/Finland) [Curt Coder]
 - Sega SC-3000 [Miodrag Milanovic]
