@@ -105,8 +105,9 @@ static UINT8 *pc6001_video_ram;
 static UINT8 irq_vector = 0x00;
 static UINT8 cas_switch,sys_latch;
 static UINT32 cas_offset;
+static UINT32 cas_maxsize;
 
-#define CAS_LENGTH 0x1655
+//#define CAS_LENGTH 0x1655
 
 static VIDEO_START( pc6001 )
 {
@@ -255,14 +256,14 @@ static WRITE8_HANDLER ( pc6001_system_latch_w )
 	if((!(sys_latch & 8)) && data & 0x8) //PLAY tape cmd
 	{
 		cas_switch = 1;
-		cassette_change_state(space->machine->device("cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
-		cassette_change_state(space->machine->device("cass" ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_MOTOR_ENABLED,CASSETTE_MASK_MOTOR);
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_PLAY,CASSETTE_MASK_UISTATE);
 	}
 	if((sys_latch & 8) && ((data & 0x8) == 0)) //STOP tape cmd
 	{
 		cas_switch = 0;
-		cassette_change_state(space->machine->device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
-		cassette_change_state(space->machine->device("cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_MOTOR_DISABLED,CASSETTE_MASK_MOTOR);
+		//cassette_change_state(space->machine->device("cass" ),CASSETTE_STOPPED,CASSETTE_MASK_UISTATE);
 		//irq_vector = 0x00;
 		//cputag_set_input_line(space->machine,"maincpu", 0, ASSERT_LINE);
 	}
@@ -740,10 +741,9 @@ static UINT8 check_keyboard_press(running_machine *machine)
 
 static TIMER_CALLBACK(cassette_callback)
 {
-	//UINT8 *gfx_data = memory_region(machine, "cas");
-
 	if(cas_switch == 1)
 	{
+		#if 0
 		static UINT8 cas_data_i = 0x80,cas_data_poll;
 		//cur_keycode = gfx_data[cas_offset++];
 		if(cassette_input(machine->device("cass")) > 0.03)
@@ -760,16 +760,23 @@ static TIMER_CALLBACK(cassette_callback)
 		}
 		else
 			cas_data_i>>=1;
+		#else
+			UINT8 *cas_data = memory_region(machine, "cas");
 
-		//popmessage("%04x %02x",cas_offset,cas_switch);
-		#if 0
-		if(cas_offset >= CAS_LENGTH)
-		{
-			cas_offset = 0;
-			cas_switch = 0;
-			irq_vector = 0x12;
-			cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
-		}
+			cur_keycode = cas_data[cas_offset++];
+			popmessage("%04x %02x",cas_offset,cas_switch);
+			if(cas_offset >= cas_maxsize)
+			{
+				cas_offset = 0;
+				cas_switch = 0;
+				irq_vector = 0x12;
+				cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+			}
+			else
+			{
+				irq_vector = 0x08;
+				cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+			}
 		#endif
 	}
 }
@@ -876,6 +883,23 @@ static const cassette_config pc6001_cassette_config =
 	NULL
 };
 
+static DEVICE_IMAGE_LOAD( pc6001_cass )
+{
+	UINT8 *cas = memory_region(image.device().machine, "cas");
+	UINT32 size;
+
+	size = image.length();
+	if (image.fread( cas, size) != size)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unable to fully read from file");
+		return IMAGE_INIT_FAIL;
+	}
+
+	cas_maxsize = size;
+
+	return IMAGE_INIT_PASS;
+}
+
 static MACHINE_DRIVER_START( pc6001 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 7987200 / 4)
@@ -909,7 +933,12 @@ static MACHINE_DRIVER_START( pc6001 )
 	MDRV_CARTSLOT_EXTENSION_LIST("bin")
 	MDRV_CARTSLOT_NOT_MANDATORY
 
-	MDRV_CASSETTE_ADD("cass",pc6001_cassette_config)
+//	MDRV_CASSETTE_ADD("cass",pc6001_cassette_config)
+	MDRV_CARTSLOT_ADD("cass")
+	MDRV_CARTSLOT_EXTENSION_LIST("cass")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_INTERFACE("pc6001_cass")
+	MDRV_CARTSLOT_LOAD(pc6001_cass)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8910", AY8910, XTAL_4MHz/2)
