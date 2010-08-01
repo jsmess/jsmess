@@ -239,7 +239,7 @@ static WRITE8_HANDLER( bml3_io_w )
 //	else if(offset == 0xc4)						{ /* system latch, writes 0x53 -> 0x51 when a tape is loaded */}
 	else if(offset == 0xc6 || offset == 0xc7) 	{ bml3_6845_w(space,offset-0xc6,data); }
 	else if(offset == 0xd0)						{ bml3_hres_reg_w(space,0,data);  }
-	else if(offset == 0xd3)						{ /* every time that the user presses a key, unknown purpose */ }
+	else if(offset == 0xd3)						{ beep_set_state(space->machine->device("beeper"),!(data & 0x80)); }
 	else if(offset == 0xd6)						{ bml3_vres_reg_w(space,0,data); }
 	else if(offset == 0xd8)				 		{ attr_latch = data; }
 	else
@@ -433,7 +433,7 @@ static PALETTE_INIT( bml3 )
 static MACHINE_START(bml3)
 {
 	timer_pulse(machine, ATTOTIME_IN_HZ(240/8), NULL, 0, keyboard_callback);
-	beep_set_frequency(machine->device("beeper"),300); //guesswork
+	beep_set_frequency(machine->device("beeper"),1200); //guesswork
 	beep_set_state(machine->device("beeper"),0);
 }
 
