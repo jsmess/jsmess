@@ -4,19 +4,27 @@
 
 	preliminary driver by Angelo Salese
 
+	TODO:
+	- SN doesn't seem to work properly, needs to find out what's the WE bit
+	  for.
+	- Hook-up FDC and CMT load / save;
+	- Printer
+	- RTC
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "video/mc6845.h"
 #include "machine/i8255a.h"
+#include "sound/sn76496.h"
 
 static UINT16 mycom_amask;
 static UINT8 ram_bank;
 static UINT16 vram_addr;
 static UINT16 cursor_addr,cursor_raster;
 static UINT8 keyb_press,keyb_press_flag,shift_press_flag;
-static UINT8 video_mode;
+static UINT8 video_mode,sn_we;
 
 static VIDEO_START( mycom )
 {
@@ -354,17 +362,23 @@ static const mc6845_interface mc6845_intf =
 
 static WRITE8_DEVICE_HANDLER( vram_laddr_w )
 {
-	vram_addr = (vram_addr & 0x700) | (data & 0xff);
+	vram_addr = (vram_addr & 0x700) | (data & 0x0ff);
+
+	/* doesn't work? */
+	//printf("%02x %02x\n",data,sn_we);
+	//if(sn_we)
+	//	sn76496_w(device->machine->device("sn1"), 0, data);
 }
 
 static WRITE8_DEVICE_HANDLER( vram_haddr_w )
 {
-	vram_addr = (vram_addr & 0xff) | ((data & 0x07) << 8);
+	vram_addr = (vram_addr & 0x0ff) | ((data & 0x007) << 8);
 }
 
 static READ8_DEVICE_HANDLER( input_1a )
 {
 	/*
+	x--- ---- display flag
 	---- --x- keyboard shift
 	---- ---x keyboard strobe
 	*/
@@ -395,8 +409,8 @@ static WRITE8_DEVICE_HANDLER( output_1c )
 	/*
 	x--- ---- width 80/40 (0 = 80, 1 = 40)
 	-x-- ---- video mode (0= tile, 1 = bitmap)
-	--x- ---- PSG CS bit
-	---x ---- PSG WE bit
+	--x- ---- PSG Chip Select bit
+	---x ---- PSG Write Enable bit
 	---- x--- cmt remote
 	---- -x-- cmt output
 	---- --x- printer reset
@@ -404,6 +418,8 @@ static WRITE8_DEVICE_HANDLER( output_1c )
 	*/
 
 	video_mode = data & 0xc0;
+	sn_we = data & 0x10;
+//	printf("%02x\n",data & 0x10);
 }
 
 static I8255A_INTERFACE( ppi8255_intf_0 )
@@ -521,6 +537,11 @@ static MACHINE_DRIVER_START( mycom )
 
     MDRV_VIDEO_START(mycom)
     MDRV_VIDEO_UPDATE(mycom)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("sn1", SN76489A, 1996800) // unknown clock / divider
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 /* ROM definition */
