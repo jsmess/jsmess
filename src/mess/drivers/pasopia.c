@@ -285,6 +285,9 @@ static UINT8 pac2_bank_select;
 
 static WRITE8_HANDLER( pac2_w )
 {
+	UINT8 *pac2_ram1 = memory_region(space->machine, "rampac1");
+	UINT8 *pac2_ram2 = memory_region(space->machine, "rampac2");
+
 	/*
 	select register:
 	4 = ram1;
@@ -297,10 +300,13 @@ static WRITE8_HANDLER( pac2_w )
 
 	switch(offset)
 	{
-		case 0: pac2_index[pac2_bank_select] = (pac2_index[pac2_bank_select] & 0x7f00) | (data & 0xff); break;
+		case 0:	pac2_index[pac2_bank_select] = (pac2_index[pac2_bank_select] & 0x7f00) | (data & 0xff); break;
 		case 1: pac2_index[pac2_bank_select] = (pac2_index[pac2_bank_select] & 0xff) | ((data & 0x7f) << 8); break;
 		case 2: // RAM write
-			printf("Warning: write to RAM packs\n");
+			if(pac2_bank_select == 3)
+				pac2_ram1[pac2_index[pac2_bank_select]] = data;
+			else if(pac2_bank_select == 4)
+				pac2_ram2[pac2_index[pac2_bank_select]] = data;
 			break;
 		case 3:
 		{
@@ -317,14 +323,15 @@ static WRITE8_HANDLER( pac2_w )
 
 static READ8_HANDLER( pac2_r )
 {
-	UINT8 *pac2_ram = memory_region(space->machine, "rampac1");
+	UINT8 *pac2_ram1 = memory_region(space->machine, "rampac1");
+	UINT8 *pac2_ram2 = memory_region(space->machine, "rampac2");
 
 	if(offset == 2)
 	{
-		if(pac2_bank_select == 4)
-		{
-			return pac2_ram[pac2_index[4]];
-		}
+		if(pac2_bank_select == 3)
+			return pac2_ram1[pac2_index[pac2_bank_select]];
+		else if(pac2_bank_select == 4)
+			return pac2_ram2[pac2_index[pac2_bank_select]];
 		else
 		{
 			printf("%02x\n",pac2_bank_select);
@@ -383,7 +390,7 @@ static READ8_HANDLER( pasopia7_io_r )
 	if(io_port >= 0x08 && io_port <= 0x0b) 		{ return i8255a_r(space->machine->device("ppi8255_0"), (io_port-0x08) & 3); }
 	else if(io_port >= 0x0c && io_port <= 0x0f) { return i8255a_r(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3); }
 //	else if(io_port == 0x10 || io_port == 0x11) { M6845 read }
-	else if(io_port >= 0x18 && io_port <= 0x1b) { return pac2_r(space, io_port-0x1b);  }
+	else if(io_port >= 0x18 && io_port <= 0x1b) { return pac2_r(space, io_port-0x18);  }
 	else if(io_port >= 0x20 && io_port <= 0x23) { return i8255a_r(space->machine->device("ppi8255_2"), (io_port-0x20) & 3); }
 	else if(io_port >= 0x28 && io_port <= 0x2b) { return z80ctc_r(space->machine->device("ctc"), io_port-0x28);  }
 	else if(io_port >= 0x30 && io_port <= 0x33) { return z80pio_cd_ba_r(space->machine->device("z80pio_0"), (io_port-0x30) & 3); }
@@ -415,7 +422,7 @@ static WRITE8_HANDLER( pasopia7_io_w )
 	if(io_port >= 0x08 && io_port <= 0x0b) 		{ i8255a_w(space->machine->device("ppi8255_0"), (io_port-0x08) & 3, data); }
 	else if(io_port >= 0x0c && io_port <= 0x0f) { i8255a_w(space->machine->device("ppi8255_1"), (io_port-0x0c) & 3, data); }
 	else if(io_port >= 0x10 && io_port <= 0x11) { pasopia7_6845_w(space, io_port-0x10, data); }
-	else if(io_port >= 0x18 && io_port <= 0x1b) { pac2_w(space, io_port-0x1b, data);  }
+	else if(io_port >= 0x18 && io_port <= 0x1b) { pac2_w(space, io_port-0x18, data);  }
 	else if(io_port >= 0x20 && io_port <= 0x23) { i8255a_w(space->machine->device("ppi8255_2"), (io_port-0x20) & 3, data); }
 	else if(io_port >= 0x28 && io_port <= 0x2b) { z80ctc_w(space->machine->device("ctc"), io_port-0x28,data);  }
 	else if(io_port >= 0x30 && io_port <= 0x33) { z80pio_cd_ba_w(space->machine->device("z80pio_0"), (io_port-0x30) & 3, data); }
@@ -730,10 +737,10 @@ ROM_START( pasopia7 )
 	ROM_REGION( 0x20000, "kanji", ROMREGION_ERASEFF )
 	ROM_LOAD( "kanji.rom", 0x0000, 0x20000, CRC(6109e308) SHA1(5c21cf1f241ef1fa0b41009ea41e81771729785f))
 
-	ROM_REGION( 0x8000, "rampac1", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "rampac1", ROMREGION_ERASEFF )
 //	ROM_LOAD( "rampac1.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
 
-	ROM_REGION( 0x8000, "rampac2", ROMREGION_ERASE00 )
+	ROM_REGION( 0x8000, "rampac2", ROMREGION_ERASEFF )
 //	ROM_LOAD( "rampac2.bin", 0x0000, 0x8000, CRC(0e4f09bd) SHA1(4088906d57e4f6085a75b249a6139a0e2eb531a1) )
 ROM_END
 
