@@ -29,7 +29,7 @@ static VIDEO_UPDATE( mycom )
 
 	count = 0;
 
-	for(y=0;y<25;y++)
+	for(y=0;y<24;y++)
 	{
 		for(x=0;x<40;x++)
 		{
