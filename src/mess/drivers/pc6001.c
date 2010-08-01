@@ -764,7 +764,7 @@ static TIMER_CALLBACK(cassette_callback)
 			UINT8 *cas_data = memory_region(machine, "cas");
 
 			cur_keycode = cas_data[cas_offset++];
-			popmessage("%04x %02x",cas_offset,cas_switch);
+			popmessage("%04x %04x",cas_offset,cas_maxsize);
 			if(cas_offset >= cas_maxsize)
 			{
 				cas_offset = 0;
@@ -935,7 +935,7 @@ static MACHINE_DRIVER_START( pc6001 )
 
 //	MDRV_CASSETTE_ADD("cass",pc6001_cassette_config)
 	MDRV_CARTSLOT_ADD("cass")
-	MDRV_CARTSLOT_EXTENSION_LIST("cass")
+	MDRV_CARTSLOT_EXTENSION_LIST("cas,p6")
 	MDRV_CARTSLOT_NOT_MANDATORY
 	MDRV_CARTSLOT_INTERFACE("pc6001_cass")
 	MDRV_CARTSLOT_LOAD(pc6001_cass)
