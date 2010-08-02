@@ -23,6 +23,15 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/beep.h"
+#include "devices/cartslot.h"
+
+struct datapack
+{
+	UINT8 id;
+	UINT8 len;
+	UINT16 counter;
+	UINT8* data;
+};
 
 static struct _psion
 {
@@ -37,6 +46,13 @@ static struct _psion
 	UINT8 ram_bank;
 	UINT8 ram_bank_count;
 	UINT8 rom_bank_count;
+
+	UINT8 port2_ddr;
+	UINT8 port6_ddr;
+	UINT8 port6;
+
+	struct datapack pack1;
+	struct datapack pack2;
 } psion;
 
 /*************************************************
@@ -271,12 +287,76 @@ void update_bank(running_machine *machine)
 	}
 }
 
+void datapack_w(running_machine *machine, UINT8 data)
+{
+	//TODO
+}
+
+UINT8 datapack_r(running_machine *machine)
+{
+	if (!(psion.port6 & 0x80))
+	{
+		if (!(psion.port6 & 0x10) && psion.pack1.len > 0)
+			return psion.pack1.data[psion.pack1.counter];
+		else if (!(psion.port6 & 0x20) && psion.pack2.len > 0)
+			return psion.pack2.data[psion.pack2.counter];
+	}
+
+	return 0;
+}
+
 WRITE8_HANDLER( hd63701_int_reg_w )
 {
 	switch (offset)
 	{
+	case 0x01:
+		psion.port2_ddr = data;
+		break;
+	case 0x03:
+		/* datapack i/o data bus */
+		datapack_w(space->machine, data);
+		break;
 	case 0x08:
 		psion.tcsr_value = data;
+		break;
+	case 0x16:
+		psion.port6_ddr = data;
+		break;
+	case 0x17:
+		/*
+		datapack control lines
+		x--- ---- slot on/off
+		-x-- ---- slot 3
+		--x- ---- slot 2
+		---x ---- slot 1
+		---- x--- output enable
+		---- -x-- program line
+		---- --x- reset line
+		---- ---x clock line
+		*/
+		if (psion.port6_ddr == 0xff)
+		{
+			if ((psion.port6 & 0x01) != (data & 0x01))
+			{
+				if (!(data & 0x10))
+					psion.pack1.counter++;
+				else if (!(data & 0x20))
+					psion.pack2.counter++;
+
+				if (psion.pack1.counter >= psion.pack1.len * 0x2000)
+					psion.pack1.counter -= 0x2000;
+			}
+
+			if (psion.port6 & 0x02)
+			{
+				if (!(data & 0x10))
+					psion.pack1.counter = 0;
+				else if (!(data & 0x20))
+					psion.pack2.counter = 0;
+			}
+
+			psion.port6 = data;
+		}
 		break;
 	}
 
@@ -287,6 +367,9 @@ READ8_HANDLER( hd63701_int_reg_r )
 {
 	switch (offset)
 	{
+	case 0x03:
+		/* datapack i/o data bus */
+		return datapack_r(space->machine);
 	case 0x15:
 		/*
 		x--- ---- ON key active high
@@ -295,6 +378,8 @@ READ8_HANDLER( hd63701_int_reg_r )
 		---- ---x battery status
 		*/
 		return kb_read(space->machine) | input_port_read(space->machine, "BATTERY") | input_port_read(space->machine, "ON");
+	case 0x17:
+		return psion.port6;
 	case 0x08:
 		hd63701_internal_registers_w(space, offset, psion.tcsr_value);
 	default:
@@ -496,6 +581,32 @@ INPUT_PORTS_START( psion )
 		PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("D [)]") PORT_CODE(KEYCODE_D)
 INPUT_PORTS_END
 
+static DEVICE_IMAGE_LOAD( psion_pack1 )
+{
+	running_machine *machine = image.device().machine;
+	char opk_head[6];
+
+	image.fread(opk_head, 6);
+	image.fread(&psion.pack1.id, 1);
+	image.fread(&psion.pack1.len, 1);
+
+	if(strcmp(opk_head, "OPK") || psion.pack1.len * 0x2000 < image.length() - 6)
+		return IMAGE_INIT_FAIL;
+
+	image.fseek(6, SEEK_SET);
+	psion.pack1.data = auto_alloc_array(machine, UINT8, psion.pack1.len * 0x2000);
+	memset(psion.pack1.data, 0xff, psion.pack1.len * 0x2000);
+	image.fread(psion.pack1.data, image.length() - 6);
+
+	return IMAGE_INIT_PASS;
+}
+
+static DEVICE_IMAGE_UNLOAD( psion_pack1 )
+{
+	auto_free(image.device().machine, psion.pack1.data);
+	memset(&psion.pack1, 0, sizeof(psion.pack1));
+}
+
 static MACHINE_START(psion)
 {
 	if (!strcmp(machine->gamedrv->name, "psionlam"))
@@ -602,7 +713,7 @@ static VIDEO_UPDATE( psion_2lines )
 					*BITMAP_ADDR16(bitmap, (cur_y-1) * 9 + l, cur_x*6 + i) = 1;
 	}
 
-#if(1)
+#if(0)
 	popmessage("cur: %u, pos %u, shift %u", hd44780.cursor_on, hd44780.ddram_a, hd44780.disp_shift);
 #endif
     return 0;
@@ -673,7 +784,7 @@ static VIDEO_UPDATE( psion_4lines )
 					*BITMAP_ADDR16(bitmap, (cur_y-1) * 9 + l, cur_x*6 + i) = 1;
 	}
 
-#if(1)
+#if(0)
 	popmessage("cur: %u, pos %u, shift %u", hd44780.cursor_on, hd44780.cursor_pos, hd44780.disp_shift);
 #endif
     return 0;
@@ -699,6 +810,16 @@ static const gfx_layout psion_charlayout =
 static GFXDECODE_START( psion )
 	GFXDECODE_ENTRY( "chargen", 0x0000, psion_charlayout, 0, 1 )
 GFXDECODE_END
+
+
+static MACHINE_DRIVER_START( psion_slot )
+	/* Datapack slot 1 */
+	MDRV_CARTSLOT_ADD("pack1")
+	MDRV_CARTSLOT_EXTENSION_LIST("opk")
+	MDRV_CARTSLOT_NOT_MANDATORY
+	MDRV_CARTSLOT_LOAD(psion_pack1)
+	MDRV_CARTSLOT_UNLOAD(psion_pack1)
+MACHINE_DRIVER_END
 
 /* basic configuration for 2 lines display */
 static MACHINE_DRIVER_START( psion_2lines )
@@ -728,6 +849,7 @@ static MACHINE_DRIVER_START( psion_2lines )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
 
+	MDRV_IMPORT_FROM( psion_slot )
 MACHINE_DRIVER_END
 
 /* basic configuration for 4 lines display */
@@ -757,6 +879,8 @@ static MACHINE_DRIVER_START( psion_4lines )
 	MDRV_SPEAKER_STANDARD_MONO( "mono" )
 	MDRV_SOUND_ADD( "beep", BEEP, 0 )
 	MDRV_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.00 )
+
+	MDRV_IMPORT_FROM( psion_slot )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( psioncm )
