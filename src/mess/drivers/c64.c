@@ -620,7 +620,7 @@ static int c64_dma_read_color( running_machine *machine, int offset )
 
 static UINT8 c64_rdy_cb( running_machine *machine )
 {
-	return input_port_read(machine, "CTRLSEL") & 0x08;
+	return input_port_read(machine, "CYCLES") & 0x07;
 }
 
 static const vic2_interface c64_vic2_ntsc_intf = {

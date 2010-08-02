@@ -316,20 +316,15 @@ READ8_HANDLER( c64_read_io )
 	else if (offset < 0xc00)
 		return c64_colorram[offset & 0x3ff];
 
-	else if (offset == 0xc00)
-		{
-			cia_set_port_mask_value(cia_0, 0, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
-			return mos6526_r(cia_0, offset);
-		}
-
-	else if (offset == 0xc01)
-		{
-			cia_set_port_mask_value(cia_0, 1, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
-			return mos6526_r(cia_0, offset);
-		}
-
 	else if (offset < 0xd00)
-		return mos6526_r(cia_0, offset);
+		{
+			if (offset & 1)
+				cia_set_port_mask_value(cia_0, 1, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[9] : c64_keyline[8] );
+			else
+				cia_set_port_mask_value(cia_0, 0, input_port_read(space->machine, "CTRLSEL") & 0x80 ? c64_keyline[8] : c64_keyline[9] );
+
+			return mos6526_r(cia_0, offset);
+		}
 
 	else if (c64_cia1_on && (offset < 0xe00))
 		return mos6526_r(cia_1, offset);

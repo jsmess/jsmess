@@ -374,7 +374,7 @@ INLINE void vic2_suspend_cpu( running_machine *machine, vic2_state *vic2 )
 	if (vic2->cpu_suspended == 0)
 	{
 		vic2->first_ba_cycle = vic2->cycles_counter;
-		if (vic2->rdy_workaround_cb != NULL && vic2->rdy_workaround_cb(machine))
+		if ((vic2->rdy_workaround_cb != NULL) && (vic2->rdy_workaround_cb(machine) != 7 ))
 			cpu_suspend(machine->firstcpu, SUSPEND_REASON_SPIN, 0);
 		vic2->cpu_suspended = 1;
 	}
@@ -385,7 +385,7 @@ INLINE void vic2_resume_cpu( running_machine *machine, vic2_state *vic2 )
 {
 	if (vic2->cpu_suspended == 1)
 	{
-		if (vic2->rdy_workaround_cb != NULL && vic2->rdy_workaround_cb(machine))
+		if ((vic2->rdy_workaround_cb != NULL))
 			cpu_resume(machine->firstcpu, SUSPEND_REASON_SPIN);
 		vic2->cpu_suspended = 0;
 	}
@@ -446,7 +446,7 @@ INLINE void vic2_check_sprite_dma( vic2_state *vic2 )
 // Video matrix access
 INLINE void vic2_matrix_access( running_machine *machine, vic2_state *vic2 )
 {
-	if (vic2->cpu_suspended == 1)
+//	if (vic2->cpu_suspended == 1)
 	{
 		if ((vic2->cycles_counter - vic2->first_ba_cycle) < 0)
 			vic2->matrix_line[vic2->ml_index] = vic2->color_line[vic2->ml_index] = 0xff;
@@ -1186,6 +1186,9 @@ static TIMER_CALLBACK( pal_timer_callback )
 
 		vic2->raster_x = 0xfffc;
 
+		if ((vic2->rdy_workaround_cb(machine) == 0 ) && (vic2->is_bad_line))
+			vic2_suspend_cpu(machine, vic2);
+
 		vic2->cycle++;
 		break;
 
@@ -1197,6 +1200,9 @@ static TIMER_CALLBACK( pal_timer_callback )
 		vic2_rc_if_bad_line(vic2);
 
 		vic2->vc = vic2->vc_base;
+
+		if ((vic2->rdy_workaround_cb(machine) == 1 ) && (vic2->is_bad_line))
+			vic2_suspend_cpu(machine, vic2);
 
 		vic2->cycle++;
 		break;
@@ -1212,11 +1218,11 @@ static TIMER_CALLBACK( pal_timer_callback )
 			if (vic2->spr_exp_y & (1 << i))
 				vic2->mc_base[i] += 2;
 
-		if (vic2->is_bad_line)
-			vic2_suspend_cpu(machine, vic2);
-
 		vic2->ml_index = 0;
 		vic2_matrix_access(machine, vic2);
+
+		if ((vic2->rdy_workaround_cb(machine) == 2 ) && (vic2->is_bad_line))
+			vic2_suspend_cpu(machine, vic2);
 
 		vic2->cycle++;
 		break;
@@ -1238,6 +1244,9 @@ static TIMER_CALLBACK( pal_timer_callback )
 		}
 
 		vic2_matrix_access(machine, vic2);
+
+		if ((vic2->rdy_workaround_cb(machine) == 3 ) && (vic2->is_bad_line))
+			vic2_suspend_cpu(machine, vic2);
 
 		vic2->cycle++;
 		break;
@@ -1272,6 +1281,9 @@ static TIMER_CALLBACK( pal_timer_callback )
 		vic2_graphics_access(machine, vic2);
 		vic2_fetch_if_bad_line(vic2);
 		vic2_matrix_access(machine, vic2);
+
+		if ((vic2->rdy_workaround_cb(machine) == 4 ) && (vic2->is_bad_line))
+			vic2_suspend_cpu(machine, vic2);
 
 		vic2->cycle++;
 		break;
