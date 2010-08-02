@@ -444,6 +444,24 @@ static MACHINE_RESET(bml3)
 {
 }
 
+/* F4 Character Displayer */
+static const gfx_layout bml3_charlayout =
+{
+	8, 8,					/* 8 x 8 characters */
+	256,					/* 256 characters */
+	1,					/* 1 bits per pixel */
+	{ 0 },					/* no bitplanes */
+	/* x offsets */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	/* y offsets */
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8					/* every char takes 8 bytes */
+};
+
+static GFXDECODE_START( bml3 )
+	GFXDECODE_ENTRY( "char", 0, bml3_charlayout, 0, 4 )
+GFXDECODE_END
+
 static MACHINE_DRIVER_START( bml3 )
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809, XTAL_1MHz)
@@ -462,7 +480,8 @@ static MACHINE_DRIVER_START( bml3 )
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
 	MDRV_PALETTE_LENGTH(8)
-    MDRV_PALETTE_INIT(bml3)
+	MDRV_PALETTE_INIT(bml3)
+	MDRV_GFXDECODE(bml3)
 
 	MDRV_MC6845_ADD("crtc", H46505, XTAL_3_579545MHz/4, mc6845_intf)	/* unknown clock, hand tuned to get ~60 fps */
 
