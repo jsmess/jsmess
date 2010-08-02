@@ -755,9 +755,9 @@ static void pc8801_init_5fd(running_machine *machine)
 	use_5FD = (input_port_read(machine, "DSW2") & 0x80) != 0x00;
 
 	if (!use_5FD)
-		cputag_suspend(machine, "sub", SUSPEND_REASON_DISABLE, 1);
+		machine->device<cpu_device>("sub")->suspend(SUSPEND_REASON_DISABLE, 1);
 	else
-		cputag_resume(machine, "sub", SUSPEND_REASON_DISABLE);
+		machine->device<cpu_device>("sub")->resume(SUSPEND_REASON_DISABLE);
 
 	cpu_set_input_line_vector(machine->device("sub"), 0, 0);
 

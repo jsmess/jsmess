@@ -198,88 +198,88 @@ static WRITE8_HANDLER( addr_ctrl_w )
 	logerror("Address Control %02x\n", data);
 }
 
-static READ8_HANDLER( keyboard_x0_r )
-{
-	/*
-
-        bit     description
-
-        0       X0
-        1       X1
-        2       X2
-        3       X3
-        4       X4
-        5       X5
-        6       X6
-        7       X7
-
-    */
-
-	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
-
-	UINT8 data = 0xff;
-
-	if (!BIT(state->keylatch,  0)) data &= input_port_read(space->machine,  "Y0");
-	if (!BIT(state->keylatch,  1)) data &= input_port_read(space->machine,  "Y1");
-	if (!BIT(state->keylatch,  2)) data &= input_port_read(space->machine,  "Y2");
-	if (!BIT(state->keylatch,  3)) data &= input_port_read(space->machine,  "Y3");
-	if (!BIT(state->keylatch,  4)) data &= input_port_read(space->machine,  "Y4");
-	if (!BIT(state->keylatch,  5)) data &= input_port_read(space->machine,  "Y5");
-	if (!BIT(state->keylatch,  6)) data &= input_port_read(space->machine,  "Y6");
-	if (!BIT(state->keylatch,  7)) data &= input_port_read(space->machine,  "Y7");
-	if (!BIT(state->keylatch,  8)) data &= input_port_read(space->machine,  "Y8");
-	if (!BIT(state->keylatch,  9)) data &= input_port_read(space->machine,  "Y9");
-	if (!BIT(state->keylatch, 10)) data &= input_port_read(space->machine, "Y10");
-	if (!BIT(state->keylatch, 11)) data &= input_port_read(space->machine, "Y11");
-
-	return ~data;
-}
-
-static WRITE8_HANDLER( keyboard_y0_w )
-{
-	/*
-
-        bit     description
-
-        0       Y0
-        1       Y1
-        2       Y2
-        3       Y3
-        4       Y4
-        5       Y5
-        6       Y6
-        7       Y7
-
-    */
-
-	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
-
-	/* keyboard row select */
-	state->keylatch = (state->keylatch & 0xff00) | data;
-}
-
-static WRITE8_HANDLER( keyboard_y8_w )
-{
-	/*
-
-        bit     description
-
-        0       Y8
-        1       Y9
-        2       Y10
-        3       Y11
-        4       LED 2
-        5       LED 1
-        6
-        7
-
-    */
-
-	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
-
-	/* keyboard row select */
-	state->keylatch = ((data & 0x0f) << 8) | (state->keylatch & 0xff);
-}
+//static READ8_HANDLER( keyboard_x0_r )
+//{
+//	/*
+//
+//        bit     description
+//
+//        0       X0
+//        1       X1
+//        2       X2
+//        3       X3
+//        4       X4
+//        5       X5
+//        6       X6
+//        7       X7
+//
+//    */
+//
+//	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+//
+//	UINT8 data = 0xff;
+//
+//	if (!BIT(state->keylatch,  0)) data &= input_port_read(space->machine,  "Y0");
+//	if (!BIT(state->keylatch,  1)) data &= input_port_read(space->machine,  "Y1");
+//	if (!BIT(state->keylatch,  2)) data &= input_port_read(space->machine,  "Y2");
+//	if (!BIT(state->keylatch,  3)) data &= input_port_read(space->machine,  "Y3");
+//	if (!BIT(state->keylatch,  4)) data &= input_port_read(space->machine,  "Y4");
+//	if (!BIT(state->keylatch,  5)) data &= input_port_read(space->machine,  "Y5");
+//	if (!BIT(state->keylatch,  6)) data &= input_port_read(space->machine,  "Y6");
+//	if (!BIT(state->keylatch,  7)) data &= input_port_read(space->machine,  "Y7");
+//	if (!BIT(state->keylatch,  8)) data &= input_port_read(space->machine,  "Y8");
+//	if (!BIT(state->keylatch,  9)) data &= input_port_read(space->machine,  "Y9");
+//	if (!BIT(state->keylatch, 10)) data &= input_port_read(space->machine, "Y10");
+//	if (!BIT(state->keylatch, 11)) data &= input_port_read(space->machine, "Y11");
+//
+//	return ~data;
+//}
+//
+//static WRITE8_HANDLER( keyboard_y0_w )
+//{
+//	/*
+//
+//        bit     description
+//
+//        0       Y0
+//        1       Y1
+//        2       Y2
+//        3       Y3
+//        4       Y4
+//        5       Y5
+//        6       Y6
+//        7       Y7
+//
+//    */
+//
+//	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+//
+//	/* keyboard row select */
+//	state->keylatch = (state->keylatch & 0xff00) | data;
+//}
+//
+//static WRITE8_HANDLER( keyboard_y8_w )
+//{
+//	/*
+//
+//        bit     description
+//
+//        0       Y8
+//        1       Y9
+//        2       Y10
+//        3       Y11
+//        4       LED 2
+//        5       LED 1
+//        6
+//        7
+//
+//    */
+//
+//	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+//
+//	/* keyboard row select */
+//	state->keylatch = ((data & 0x0f) << 8) | (state->keylatch & 0xff);
+//}
 
 /* Memory Maps */
 
@@ -319,11 +319,11 @@ static ADDRESS_MAP_START( tandy2k_hd_io, ADDRESS_SPACE_IO, 16 )
 //  AM_RANGE(0x0026e, 0x0027f) AM_DEVREADWRITE8(WD1010_TAG, wd1010_r, wd1010_w, 0x00ff)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_y0_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_y8_w)
-	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(keyboard_x0_r)
-ADDRESS_MAP_END
+//static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
+//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_y0_w)
+//	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_y8_w)
+//	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(keyboard_x0_r)
+//ADDRESS_MAP_END
 
 /* Input Ports */
 

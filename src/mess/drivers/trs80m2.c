@@ -323,89 +323,89 @@ static WRITE8_HANDLER( nmi_w )
 	bankswitch(space->machine);
 }
 
-static READ8_HANDLER( keyboard_busy_r )
-{
-	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
-
-	return state->kbirq;
-}
-
-static READ8_HANDLER( keyboard_data_r )
-{
-	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
-
-	static const char *const KEY_ROW[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11" };
-
-	return input_port_read(space->machine, KEY_ROW[state->key_latch]);
-}
-
-static WRITE8_HANDLER( keyboard_ctrl_w )
-{
-	/*
-
-        bit     description
-
-        0       DATA
-        1       CLOCK
-        2       LED
-        3
-        4       LED
-        5
-        6
-        7
-
-    */
-
-	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
-
-	int kbdata = BIT(data, 0);
-	int kbclk = BIT(data, 1);
-
-	if (state->key_bit == 8)
-	{
-		if (!state->kbdata && kbdata)
-		{
-			/* trigger keyboard interrupt */
-			state->kbirq = 0;
-			z80ctc_trg3_w(state->z80ctc, state->kbirq);
-		}
-	}
-	else
-	{
-		if (!state->kbclk && kbclk)
-		{
-			/* shift in keyboard data bit */
-			state->key_data <<= 1;
-			state->key_data |= kbdata;
-			state->key_bit++;
-		}
-	}
-
-	state->kbdata = kbdata;
-	state->kbclk = kbclk;
-}
-
-static WRITE8_HANDLER( keyboard_latch_w )
-{
-	/*
-
-        bit     description
-
-        0       D
-        1       C
-        2       B
-        3       A
-        4
-        5
-        6
-        7
-
-    */
-
-	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
-
-	state->key_latch = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
-}
+//static READ8_HANDLER( keyboard_busy_r )
+//{
+//	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+//
+//	return state->kbirq;
+//}
+//
+//static READ8_HANDLER( keyboard_data_r )
+//{
+//	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+//
+//	static const char *const KEY_ROW[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11" };
+//
+//	return input_port_read(space->machine, KEY_ROW[state->key_latch]);
+//}
+//
+//static WRITE8_HANDLER( keyboard_ctrl_w )
+//{
+//	/*
+//
+//        bit     description
+//
+//        0       DATA
+//        1       CLOCK
+//        2       LED
+//        3
+//        4       LED
+//        5
+//        6
+//        7
+//
+//    */
+//
+//	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+//
+//	int kbdata = BIT(data, 0);
+//	int kbclk = BIT(data, 1);
+//
+//	if (state->key_bit == 8)
+//	{
+//		if (!state->kbdata && kbdata)
+//		{
+//			/* trigger keyboard interrupt */
+//			state->kbirq = 0;
+//			z80ctc_trg3_w(state->z80ctc, state->kbirq);
+//		}
+//	}
+//	else
+//	{
+//		if (!state->kbclk && kbclk)
+//		{
+//			/* shift in keyboard data bit */
+//			state->key_data <<= 1;
+//			state->key_data |= kbdata;
+//			state->key_bit++;
+//		}
+//	}
+//
+//	state->kbdata = kbdata;
+//	state->kbclk = kbclk;
+//}
+//
+//static WRITE8_HANDLER( keyboard_latch_w )
+//{
+//	/*
+//
+//        bit     description
+//
+//        0       D
+//        1       C
+//        2       B
+//        3       A
+//        4
+//        5
+//        6
+//        7
+//
+//    */
+//
+//	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+//
+//	state->key_latch = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
+//}
 
 /* Memory Maps */
 
@@ -429,15 +429,15 @@ static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xff, 0xff) AM_READWRITE(nmi_r, nmi_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( trs80m2_keyboard_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(keyboard_busy_r)
-	AM_RANGE(MCS48_PORT_P0, MCS48_PORT_P0) AM_READ(keyboard_data_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_ctrl_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_latch_w)
-ADDRESS_MAP_END
+//static ADDRESS_MAP_START( trs80m2_keyboard_io, ADDRESS_SPACE_IO, 8 )
+//	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(keyboard_busy_r)
+//	AM_RANGE(MCS48_PORT_P0, MCS48_PORT_P0) AM_READ(keyboard_data_r)
+//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(keyboard_ctrl_w)
+//	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(keyboard_latch_w)
+//ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( m68000_mem, ADDRESS_SPACE_PROGRAM, 16 )
-ADDRESS_MAP_END
+//static ADDRESS_MAP_START( m68000_mem, ADDRESS_SPACE_PROGRAM, 16 )
+//ADDRESS_MAP_END
 
 /* Input Ports */
 

@@ -1542,7 +1542,7 @@ static TIMER_CALLBACK( pal_timer_callback )
 	}
 
 	vic2->raster_x += 8;
-	timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), vic2, 0, pal_timer_callback);
+	timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), vic2, 0, pal_timer_callback);
 }
 
 static TIMER_CALLBACK( ntsc_timer_callback )
@@ -2121,7 +2121,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 	}
 
 	vic2->raster_x += 8;
-	timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), vic2, 0, ntsc_timer_callback);
+	timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), vic2, 0, ntsc_timer_callback);
 }
 
 

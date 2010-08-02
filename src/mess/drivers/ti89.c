@@ -84,7 +84,7 @@ WRITE16_HANDLER ( ti68k_io_w )
 			break;
 		case 0x02:
 			if (!(data & 0x10) && data != state->io_hw1[offset])
-				cputag_suspend(space->machine, "maincpu", SUSPEND_REASON_DISABLE, 1);
+				space->machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_DISABLE, 1);
 			break;
 		case 0x08:
 				state->lcd_base = data << 3;
@@ -330,7 +330,7 @@ static INPUT_CHANGED( ti68k_on_key )
 	if (state->on_key)
 	{
 		if (field->port->machine->device<cpu_device>("maincpu")->suspended(SUSPEND_REASON_DISABLE))
-			cputag_resume(field->port->machine, "maincpu", SUSPEND_REASON_DISABLE);
+			field->port->machine->device<cpu_device>("maincpu")->resume(SUSPEND_REASON_DISABLE);
 
 		cputag_set_input_line(field->port->machine, "maincpu", M68K_IRQ_6, HOLD_LINE);
 	}

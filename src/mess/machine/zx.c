@@ -412,7 +412,7 @@ WRITE8_HANDLER ( zx81_io_w )
 	else
 	if (offs == 0xfe)
 	{
-		timer_adjust_periodic(ula_nmi, attotime_zero, 0, cputag_clocks_to_attotime(space->machine, "maincpu", 207));
+		timer_adjust_periodic(ula_nmi, attotime_zero, 0, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(207));
 
 		LOG_ZX81_IOW("ULA NMIs on");
 

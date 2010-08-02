@@ -176,7 +176,7 @@ void zx_ula_r(running_machine *machine, int offs, const char *region, const UINT
 		for (y = charline_ptr; y < ARRAY_LENGTH(charline); y++)
 			charline[y] = 0;
 
-		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", ((32 - charline_ptr) << 2)), NULL, 0, zx_ula_irq);
+		timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(((32 - charline_ptr) << 2)), NULL, 0, zx_ula_irq);
 		ula_irq_active++;
 
 		scanline = BITMAP_ADDR16(bitmap, ula_scanline_count, 0);

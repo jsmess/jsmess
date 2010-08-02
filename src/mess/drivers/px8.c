@@ -460,60 +460,60 @@ static WRITE8_HANDLER( gah40s_ier_w )
 	state->ier = data;
 }
 
-/*-------------------------------------------------
-    krtn_read - read keyboard return
--------------------------------------------------*/
-
-static UINT8 krtn_read(running_machine *machine)
-{
-	px8_state *state = (px8_state *)machine->driver_data;
-	UINT8 data = 0xff;
-
-	switch (state->ksc)
-	{
-	case 0: data = input_port_read(machine, "KSC0"); break;
-	case 1: data = input_port_read(machine, "KSC1"); break;
-	case 2: data = input_port_read(machine, "KSC2"); break;
-	case 3: data = input_port_read(machine, "KSC3"); break;
-	case 4: data = input_port_read(machine, "KSC4"); break;
-	case 5: data = input_port_read(machine, "KSC5"); break;
-	case 6: data = input_port_read(machine, "KSC6"); break;
-	case 7: data = input_port_read(machine, "KSC7"); break;
-	case 8: data = input_port_read(machine, "KSC8"); break;
-	case 9: data = input_port_read(machine, "SW4");  break;
-	}
-
-	return data;
-}
-
-/*-------------------------------------------------
-    krtn_0_3_r - keyboard return 0..3 read
--------------------------------------------------*/
-
-static READ8_HANDLER( krtn_0_3_r )
-{
-	return krtn_read(space->machine) & 0x0f;
-}
-
-/*-------------------------------------------------
-    krtn_4_7_r - keyboard return 4..7 read
--------------------------------------------------*/
-
-static READ8_HANDLER( krtn_4_7_r )
-{
-	return krtn_read(space->machine) >> 4;
-}
-
-/*-------------------------------------------------
-    ksc_w - keyboard scan write
--------------------------------------------------*/
-
-static WRITE8_HANDLER( ksc_w )
-{
-	px8_state *state = (px8_state *)space->machine->driver_data;
-
-	state->ksc = data;
-}
+///*-------------------------------------------------
+//    krtn_read - read keyboard return
+//-------------------------------------------------*/
+//
+//static UINT8 krtn_read(running_machine *machine)
+//{
+//	px8_state *state = (px8_state *)machine->driver_data;
+//	UINT8 data = 0xff;
+//
+//	switch (state->ksc)
+//	{
+//	case 0: data = input_port_read(machine, "KSC0"); break;
+//	case 1: data = input_port_read(machine, "KSC1"); break;
+//	case 2: data = input_port_read(machine, "KSC2"); break;
+//	case 3: data = input_port_read(machine, "KSC3"); break;
+//	case 4: data = input_port_read(machine, "KSC4"); break;
+//	case 5: data = input_port_read(machine, "KSC5"); break;
+//	case 6: data = input_port_read(machine, "KSC6"); break;
+//	case 7: data = input_port_read(machine, "KSC7"); break;
+//	case 8: data = input_port_read(machine, "KSC8"); break;
+//	case 9: data = input_port_read(machine, "SW4");  break;
+//	}
+//
+//	return data;
+//}
+//
+///*-------------------------------------------------
+//    krtn_0_3_r - keyboard return 0..3 read
+//-------------------------------------------------*/
+//
+//static READ8_HANDLER( krtn_0_3_r )
+//{
+//	return krtn_read(space->machine) & 0x0f;
+//}
+//
+///*-------------------------------------------------
+//    krtn_4_7_r - keyboard return 4..7 read
+//-------------------------------------------------*/
+//
+//static READ8_HANDLER( krtn_4_7_r )
+//{
+//	return krtn_read(space->machine) >> 4;
+//}
+//
+///*-------------------------------------------------
+//    ksc_w - keyboard scan write
+//-------------------------------------------------*/
+//
+//static WRITE8_HANDLER( ksc_w )
+//{
+//	px8_state *state = (px8_state *)space->machine->driver_data;
+//
+//	state->ksc = data;
+//}
 
 /***************************************************************************
     MEMORY MAPS
@@ -573,16 +573,16 @@ ADDRESS_MAP_END
     ADDRESS_MAP( px8_sub_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( px8_sub_io, ADDRESS_SPACE_IO, 8 )
-//  AM_RANGE(0x00, 0x00) AM_READWRITE()
-	AM_RANGE(0x01, 0x01) AM_READ(krtn_0_3_r)
-//  AM_RANGE(0x02, 0x02) AM_WRITE()
-	AM_RANGE(0x03, 0x03) AM_WRITE(ksc_w)
-//  AM_RANGE(0x04, 0x04) AM_WRITE()
-	AM_RANGE(0x05, 0x05) AM_READ(krtn_4_7_r)
-//  AM_RANGE(0x06, 0x06) AM_READ()
-//  AM_RANGE(0x07, 0x07) AM_WRITE()
-ADDRESS_MAP_END
+//static ADDRESS_MAP_START( px8_sub_io, ADDRESS_SPACE_IO, 8 )
+////  AM_RANGE(0x00, 0x00) AM_READWRITE()
+//	AM_RANGE(0x01, 0x01) AM_READ(krtn_0_3_r)
+////  AM_RANGE(0x02, 0x02) AM_WRITE()
+//	AM_RANGE(0x03, 0x03) AM_WRITE(ksc_w)
+////  AM_RANGE(0x04, 0x04) AM_WRITE()
+//	AM_RANGE(0x05, 0x05) AM_READ(krtn_4_7_r)
+////  AM_RANGE(0x06, 0x06) AM_READ()
+////  AM_RANGE(0x07, 0x07) AM_WRITE()
+//ADDRESS_MAP_END
 
 /***************************************************************************
     INPUT PORTS

@@ -126,7 +126,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-		timer_adjust_oneshot(atapi_timer, cputag_clocks_to_attotime(machine, "maincpu", (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+		timer_adjust_oneshot(atapi_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
 	}
 	else
 	{
@@ -717,7 +717,7 @@ WRITE64_HANDLER( dc_mess_g1_ctrl_w )
 			}
 
 			atapi_xferbase = g1bus_regs[SB_GDSTAR];
-			timer_adjust_oneshot(atapi_timer, cputag_clocks_to_attotime(space->machine, "maincpu", (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+			timer_adjust_oneshot(atapi_timer, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
 		}
 		break;
 	}

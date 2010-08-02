@@ -1532,13 +1532,13 @@ WRITE8_HANDLER( sms_store_control_w )
 	logerror("0x%04X: sms_store_control write 0x%02X\n", cpu_get_pc(space->cpu), data);
 	if (data & 0x02)
 	{
-		cputag_resume(space->machine, "maincpu", SUSPEND_REASON_HALT);
+		space->machine->device<cpu_device>("maincpu")->resume(SUSPEND_REASON_HALT);
 	}
 	else
 	{
 		/* Pull reset line of CPU #0 low */
 		space->machine->device("maincpu")->reset();
-		cputag_suspend(space->machine, "maincpu", SUSPEND_REASON_HALT, 1);
+		space->machine->device<cpu_device>("maincpu")->suspend(SUSPEND_REASON_HALT, 1);
 	}
 	sms_state.store_control = data;
 }

@@ -294,20 +294,20 @@ ADDRESS_MAP_END
     ADDRESS_MAP( keyboard_mem )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( keyboard_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000, 0x7ff) AM_ROM
-ADDRESS_MAP_END
+//static ADDRESS_MAP_START( keyboard_mem, ADDRESS_SPACE_PROGRAM, 8 )
+//	AM_RANGE(0x000, 0x7ff) AM_ROM
+//ADDRESS_MAP_END
 
 /*-------------------------------------------------
     ADDRESS_MAP( keyboard_io )
 -------------------------------------------------*/
 
-static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
+//static ADDRESS_MAP_START( keyboard_io, ADDRESS_SPACE_IO, 8 )
 /*  AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1)
     AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2)
     AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1)
     AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS)*/
-ADDRESS_MAP_END
+//ADDRESS_MAP_END
 
 /***************************************************************************
     INPUT PORTS

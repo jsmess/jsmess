@@ -938,7 +938,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	if((prev1 & 0x10) == 0x00 && (data & 0x10) == 0x10)
 	{
 		x68k_sys.mdctrl.seq1++;
-		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout1,cputag_clocks_to_attotime(device->machine, "maincpu", 8192),0);
+		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout1,device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192),0);
 	}
 	prev1 = data;
 
@@ -947,7 +947,7 @@ static WRITE8_DEVICE_HANDLER( ppi_port_c_w )
 	if((prev2 & 0x20) == 0x00 && (data & 0x20) == 0x20)
 	{
 		x68k_sys.mdctrl.seq2++;
-		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout2,cputag_clocks_to_attotime(device->machine, "maincpu", 8192),0);
+		timer_adjust_oneshot(x68k_sys.mdctrl.io_timeout2,device->machine->device<cpu_device>("maincpu")->cycles_to_attotime(8192),0);
 	}
 	prev2 = data;
 
@@ -1698,7 +1698,7 @@ static READ16_HANDLER( x68k_rom0_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
+		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
 	}
 	return 0xff;
 }
@@ -1715,7 +1715,7 @@ static WRITE16_HANDLER( x68k_rom0_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
+		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), NULL, 0xbffffc+offset,x68k_fake_bus_error);
 	}
 }
 
@@ -1731,7 +1731,7 @@ static READ16_HANDLER( x68k_emptyram_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 4), NULL, offset,x68k_fake_bus_error);
+		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), NULL, offset,x68k_fake_bus_error);
 	}
 	return 0xff;
 }
@@ -1748,7 +1748,7 @@ static WRITE16_HANDLER( x68k_emptyram_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 4), NULL, offset,x68k_fake_bus_error);
+		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(4), NULL, offset,x68k_fake_bus_error);
 	}
 }
 
@@ -1762,7 +1762,7 @@ static READ16_HANDLER( x68k_exp_r )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
+		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
 //      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
 	}
 	return 0xffff;
@@ -1778,7 +1778,7 @@ static WRITE16_HANDLER( x68k_exp_w )
 		offset *= 2;
 		if(ACCESSING_BITS_0_7)
 			offset++;
-		timer_set(space->machine, cputag_clocks_to_attotime(space->machine, "maincpu", 16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
+		timer_set(space->machine, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(16), NULL, 0xeafa00+offset,x68k_fake_bus_error);
 //      cputag_set_input_line_and_vector(machine, "maincpu",2,ASSERT_LINE,current_vector[2]);
 	}
 }

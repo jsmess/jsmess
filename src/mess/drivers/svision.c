@@ -155,7 +155,7 @@ static WRITE8_HANDLER(svision_w)
 			else
 				delay = 256;
 			timer_enable(svision.timer1, TRUE);
-			timer_reset(svision.timer1, cputag_clocks_to_attotime(space->machine, "maincpu", value * delay));
+			timer_reset(svision.timer1, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(value * delay));
 			break;
 		case 0x10: case 0x11: case 0x12: case 0x13:
 			svision_soundport_w(space->machine, svision_channel + 0, offset & 3, data);

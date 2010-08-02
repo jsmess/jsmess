@@ -1172,7 +1172,7 @@ static void iot_dcc(running_device *device, int op2, int nac, int mb, int *io, i
 		if (parallel_drum.wc)
 			delay = attotime_add(delay, PARALLEL_DRUM_WORD_TIME);
 	} while (parallel_drum.wc);
-	cpu_adjust_icount(device->machine->device("maincpu"),-cputag_attotime_to_clocks(device->machine, "maincpu", delay));
+	cpu_adjust_icount(device->machine->device("maincpu"),-device->machine->device<cpu_device>("maincpu")->attotime_to_cycles(delay));
 	/* if no error, skip */
 	cpu_set_reg(device->machine->device("maincpu"), PDP1_PC, cpu_get_reg(device->machine->device("maincpu"), PDP1_PC)+1);
 }

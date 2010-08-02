@@ -1091,7 +1091,7 @@ static UINT8 pce_cd_get_cd_data_byte(running_machine *machine)
 		if ( pce_cd.scsi_IO )
 		{
 			pce_cd.scsi_ACK = 1;
-			timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 15), NULL, 0, pce_cd_clear_ack );
+			timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(15), NULL, 0, pce_cd_clear_ack );
 		}
 	}
 	return data;

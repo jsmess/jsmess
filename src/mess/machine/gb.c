@@ -850,7 +850,7 @@ WRITE8_HANDLER ( gb_io_w )
 		case 0x81:				/* enabled & internal clock */
 			SIODATA = 0xFF;
 			gb_driver_data.SIOCount = 8;
-			timer_adjust_periodic(gb_driver_data.gb_serial_timer, cputag_clocks_to_attotime(space->machine, "maincpu", 512), 0, cputag_clocks_to_attotime(space->machine, "maincpu", 512));
+			timer_adjust_periodic(gb_driver_data.gb_serial_timer, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(512), 0, space->machine->device<cpu_device>("maincpu")->cycles_to_attotime(512));
 			timer_enable( gb_driver_data.gb_serial_timer, 1 );
 			break;
 		}

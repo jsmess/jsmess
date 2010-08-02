@@ -240,7 +240,7 @@ static ADDRESS_MAP_START(cru_map, ADDRESS_SPACE_IO, 8)
 	AM_RANGE(0x0100, 0x01ff) AM_DEVREAD("per_exp_box", geneve_peb_cru_r)
 
 	AM_RANGE(0x0000, 0x07ff) AM_DEVWRITE("tms9901", tms9901_cru_w)
-	AM_RANGE(0x0800, 0x0fff) AM_DEVWRITE("per_exp_box", geneve_peb_mode_cru_w)
+	AM_RANGE(0x0800, 0x0fff) AM_WRITE(geneve_peb_mode_cru_w)
 ADDRESS_MAP_END
 
 

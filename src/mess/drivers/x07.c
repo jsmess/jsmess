@@ -777,7 +777,7 @@ static void irq_exec(running_machine *machine)
 		state->kb_size--;
 		state->regs_r[2] |= 0x01;
 		cputag_set_input_line(machine, "maincpu", NSC800_RSTA, ASSERT_LINE);
-		timer_adjust_oneshot(state->irq_clear, cputag_clocks_to_attotime(machine, "maincpu", 500), 0);
+		timer_adjust_oneshot(state->irq_clear, machine->device<cpu_device>("maincpu")->cycles_to_attotime(500), 0);
 		return;
 	}
 	else if (state->kb_brk)
@@ -787,7 +787,7 @@ static void irq_exec(running_machine *machine)
 		state->regs_r[2] |= 0x01;
 		state->kb_brk = 0;
 		cputag_set_input_line(machine, "maincpu", NSC800_RSTA, ASSERT_LINE );
-		timer_adjust_oneshot(state->irq_clear, cputag_clocks_to_attotime(machine, "maincpu", 500), 0);
+		timer_adjust_oneshot(state->irq_clear, machine->device<cpu_device>("maincpu")->cycles_to_attotime(500), 0);
 		return;
 	}
 	else if ( state->z80_irq&1 )
@@ -795,7 +795,7 @@ static void irq_exec(running_machine *machine)
 		receive_from_t6834 (machine);
 		state->z80_irq &= ~1;
 		cputag_set_input_line(machine, "maincpu", NSC800_RSTA, ASSERT_LINE);
-		timer_adjust_oneshot(state->irq_clear, cputag_clocks_to_attotime(machine, "maincpu", 500), 0);
+		timer_adjust_oneshot(state->irq_clear, machine->device<cpu_device>("maincpu")->cycles_to_attotime(500), 0);
 		return;
 	}
 }

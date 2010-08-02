@@ -811,7 +811,7 @@ static WRITE16_HANDLER ( ti99_wspeech_w )
 	if (! tms5220_readyq_r(space->machine->device("tmc0285")))
 	{
 		attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(space->machine->device("tmc0285")));
-		int cycles_to_ready = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
+		int cycles_to_ready = space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
 
 		logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready), (int) cycles_to_ready);
 
@@ -2883,7 +2883,7 @@ WRITE8_HANDLER ( ti99_8_w )
 					if (! tms5220_readyq_r(space->machine->device("tms5220")))
 					{
 						attotime time_to_ready = double_to_attotime(tms5220_time_to_ready(space->machine->device("tms5220")));
-						double d = cputag_attotime_to_clocks(space->machine, "maincpu", time_to_ready);
+						double d = space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(time_to_ready);
 						int cycles_to_ready = ((int) (d + 3)) & ~3;
 
 						logerror("time to ready: %f -> %d\n", attotime_to_double(time_to_ready)

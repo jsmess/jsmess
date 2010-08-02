@@ -1081,7 +1081,7 @@ void coco_set_halt_line(running_machine *machine, int halt_line)
 {
 	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, halt_line);
 	if (halt_line == CLEAR_LINE)
-		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", 1), NULL, 0, recalc_interrupts);
+		timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(1), NULL, 0, recalc_interrupts);
 }
 #endif
 

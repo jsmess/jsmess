@@ -370,7 +370,7 @@ static TIMER_CALLBACK(intv_interrupt2_complete)
 static INTERRUPT_GEN( intv_interrupt2 )
 {
 	cputag_set_input_line(device->machine, "keyboard", 0, ASSERT_LINE);
-	timer_set(device->machine, cputag_clocks_to_attotime(device->machine, "keyboard", 100), NULL, 0, intv_interrupt2_complete);
+	timer_set(device->machine, device->machine->device<cpu_device>("keyboard")->cycles_to_attotime(100), NULL, 0, intv_interrupt2_complete);
 }
 
 static MACHINE_DRIVER_START( intv )

@@ -304,7 +304,7 @@ WRITE8_HANDLER(spectrum_port_fe_w)
 	if ((Changed & 0x07)!=0)
 	{
 		/* yes - send event */
-		EventList_AddItemOffset(space->machine, 0x0fe, data & 0x07, cputag_attotime_to_clocks(space->machine, "maincpu", attotime_mul(space->machine->primary_screen->scan_period(), space->machine->primary_screen->vpos())));
+		EventList_AddItemOffset(space->machine, 0x0fe, data & 0x07, space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(attotime_mul(space->machine->primary_screen->scan_period(), space->machine->primary_screen->vpos())));
 	}
 
 	if ((Changed & (1<<4))!=0)

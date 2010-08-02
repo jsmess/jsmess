@@ -886,7 +886,7 @@ static void lynx_blitter(running_machine *machine)
 	}
 
 	if (0)
-		timer_set(machine, cputag_clocks_to_attotime(machine, "maincpu", blitter.memory_accesses*20), NULL, 0, lynx_blitter_timer);
+		timer_set(machine, machine->device<cpu_device>("maincpu")->cycles_to_attotime(blitter.memory_accesses*20), NULL, 0, lynx_blitter_timer);
 }
 
 
@@ -1005,7 +1005,7 @@ static READ8_HANDLER( suzy_read )
 		case 0x92:	/* Better check this with docs! */
 			if (!attotime_compare(blitter.time, attotime_zero))
 			{
-				if (cputag_attotime_to_clocks(space->machine, "maincpu", attotime_sub(timer_get_time(space->machine), blitter.time)) > blitter.memory_accesses * 20)
+				if (space->machine->device<cpu_device>("maincpu")->attotime_to_cycles(attotime_sub(timer_get_time(space->machine), blitter.time)) > blitter.memory_accesses * 20)
 				{
 					suzy.data[offset] &= ~0x01; //blitter finished
 					blitter.time = attotime_zero;

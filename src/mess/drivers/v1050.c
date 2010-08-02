@@ -377,7 +377,7 @@ static WRITE8_HANDLER( dvint_clr_w )
 
 /* i8049 Read/Write Handlers */
 
-static READ8_HANDLER( keyboard_r )
+/*static READ8_HANDLER( keyboard_r )
 {
 	v1050_state *state = (v1050_state *)space->machine->driver_data;
 
@@ -392,30 +392,30 @@ static WRITE8_HANDLER( keyboard_w )
 
 	state->keylatch = data & 0x0f;
 }
-
-static WRITE8_HANDLER( p2_w )
-{
-	/*
-
-        bit     description
-
-        P20
-        P21
-        P22
-        P23
-        P24
-        P25     led output
-        P26     speaker (NE555) output
-        P27     serial output
-
-    */
-
-	v1050_state *state = (v1050_state *)space->machine->driver_data;
-
-	output_set_led_value(0, BIT(data, 5));
-//  discrete_sound_w(discrete, NODE_01, BIT(data, 6));
-	state->kb_so = BIT(data, 7);
-}
+*/
+//static WRITE8_HANDLER( p2_w )
+//{
+//	/*
+//
+//        bit     description
+//
+//        P20
+//        P21
+//        P22
+//        P23
+//        P24
+//        P25     led output
+//        P26     speaker (NE555) output
+//        P27     serial output
+//
+//    */
+//
+//	v1050_state *state = (v1050_state *)space->machine->driver_data;
+//
+//	output_set_led_value(0, BIT(data, 5));
+////  discrete_sound_w(discrete, NODE_01, BIT(data, 6));
+//	state->kb_so = BIT(data, 7);
+//}
 
 /* Memory Maps */
 
@@ -459,10 +459,10 @@ static ADDRESS_MAP_START( v1050_crt_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( v1050_kbd_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_r, keyboard_w)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
-ADDRESS_MAP_END
+//static ADDRESS_MAP_START( v1050_kbd_io, ADDRESS_SPACE_IO, 8 )
+//	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(keyboard_r, keyboard_w)
+//	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(p2_w)
+//ADDRESS_MAP_END
 
 /* Input Ports */
 
