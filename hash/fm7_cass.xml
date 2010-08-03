@@ -8,7 +8,7 @@
 	Loading instructions:
 	At the F-Basic Ready prompt, type run"" and press Return.
 	If a Bad File Mode error occurs, then you must type loadm"",r and press Return.  Once the loader has loaded,
-	type exec and press Return, and the application will continue to load.
+	type exec and press Return, and the application will run, or continue to load.
 	
 	If you are using a disk version of F-Basic, then put CAS0: in the quotes.  Note that this is case-sensitive.
 -->
@@ -93,8 +93,8 @@
 	</software>
 
 <!-- バトルﾎﾟッド - use loadm"",r to load -->
-	<software name="bat">
-		<description>バトルポッド</description>
+	<software name="battlep">
+		<description>Battle Pod</description>
 		<year>19??</year>
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
@@ -492,7 +492,7 @@
 
 <!-- エクスプローラ - use loadm"",r to load -->
 	<software name="explorer">
-		<description>エクスプローラ</description>
+		<description>Explorer</description>
 		<year>19??</year>
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
@@ -590,11 +590,23 @@
 		</part>
 	</software>
 
+<!-- フライトシミュレータ - use loadm"",r to load -->
+	<software name="flsim">
+		<description>Flight Simulator</description>
+		<year>1983</year>
+		<publisher>Carry</publisher>
+		<part name="cass1" interface="fm7_cass">
+			<dataarea name="cass" size="2267792">
+				<rom name="sim.t77" size="2267792" crc="3CA69955" sha1="80A24FC8A82B88FFB8B5A4FB72ED68C724B5B983" offset="000000" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- フロントライン - use loadm"",r to load -->
-	<software name="front">
-		<description>フロントライン</description>
+	<software name="frontlin">
+		<description>Front Line</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>Nidecom / Carry / Taito</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="3739772">
 				<rom name="fr6nt.t77" size="3739772" crc="AE6DDB27" sha1="BB78020C903E29B5A0F0C15EA2AE40206F61705E" offset="000000" />
@@ -616,7 +628,7 @@
 
 <!-- ギャラクシーフライ - use loadm"",r to load -->
 	<software name="galaxy">
-		<description>ギャラクシーフライ</description>
+		<description>Galaxy Fly</description>
 		<year>19??</year>
 		<publisher>Unknown</publisher>
 		<part name="cass1" interface="fm7_cass">
@@ -679,7 +691,7 @@
 		</part>
 	</software>
 
-<!-- 機動戦士ガンダム・ジェットストリームアタック - not working (Bad File Mode error?) -->
+<!-- 機動戦士ガンダム・ジェットストリームアタック - not working (Device I/O error) -->
 	<software name="gundam">
 		<description>ガンダム</description>
 		<year>19??</year>
@@ -693,9 +705,9 @@
 
 <!-- ガンマン - use loadm"",r to load -->
 	<software name="gunman">
-		<description>ガンマン</description>
-		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<description>Gunman</description>
+		<year>1983</year>
+		<publisher>Hudson Soft</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1256418">
 				<rom name="GUNMAN.t77" size="1256418" crc="43A1C580" sha1="551F6D24C6AB4EF3E86C4056C3A266AE439B8E30" offset="000000" />
@@ -1197,7 +1209,7 @@
 	<software name="oushou">
 		<description>王将</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>Zero Soft / Carry</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="789194">
 				<rom name="a.t77" size="789194" crc="DFE924D6" sha1="ABC7EE2C30A9378C7EDAC0CAB22EA086D08BC5F4" offset="000000" />
@@ -1205,7 +1217,7 @@
 		</part>
 	</software>
 
-<!-- パックマン - use loadm"",r to load -->
+<!-- パックマン - use loadm"",r to load - Device I/O Error -->
 	<software name="pacman">
 		<description>パックマン</description>
 		<year>19??</year>
@@ -1233,7 +1245,7 @@
 	<software name="penguin">
 		<description>ペンギンくん</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>Open-Reach</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1289414">
 				<rom name="pen.t77" size="1289414" crc="C8DC8D16" sha1="DBF3ABD721D2652A409AA19BEBC5832EBEFCCF74" offset="000000" />
@@ -1427,7 +1439,7 @@
 		</part>
 	</software>
 
-<!-- リングの上はおおさわぎ - use loadm"",r to load -->
+<!-- リングの上はおおさわぎ - not working -->
 	<software name="ringnoue">
 		<description>リングの上はおおさわぎ</description>
 		<year>19??</year>
@@ -1493,18 +1505,6 @@
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1521974">
 				<rom name="ser.t77" size="1521974" crc="3C023DFA" sha1="6356CAAD4C17CA4EF27F447B8145D53AB88E94D1" offset="000000" />
-			</dataarea>
-		</part>
-	</software>
-
-<!-- フライトシミュレータ - use loadm"",r to load -->
-	<software name="sim">
-		<description>フライトシミュレータ</description>
-		<year>19??</year>
-		<publisher>Unknown</publisher>
-		<part name="cass1" interface="fm7_cass">
-			<dataarea name="cass" size="2267792">
-				<rom name="sim.t77" size="2267792" crc="3CA69955" sha1="80A24FC8A82B88FFB8B5A4FB72ED68C724B5B983" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -1589,9 +1589,9 @@
 
 <!-- スペースビー - use loadm"",r to load -->
 	<software name="spacebee">
-		<description>スペースビー</description>
+		<description>Space Bee</description>
 		<year>19??</year>
-		<publisher>Unknown</publisher>
+		<publisher>Carry</publisher>
 		<part name="cass1" interface="fm7_cass">
 			<dataarea name="cass" size="1481242">
 				<rom name="spb.t77" size="1481242" crc="4AE55FD5" sha1="1BDA789F415A7CB851E63318E3DFD403EDE7F897" offset="000000" />
