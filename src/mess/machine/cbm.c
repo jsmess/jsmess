@@ -23,7 +23,7 @@ UINT8 c64_keyline[10] =
 
 static TIMER_CALLBACK( lightpen_tick )
 {
-	if ((input_port_read(machine, "CTRLSEL") & 0x07) == 0x04)
+	if (((input_port_read(machine, "CTRLSEL") & 0x07) == 0x04) || ((input_port_read(machine, "CTRLSEL") & 0x07) == 0x06))
 	{
 		/* enable lightpen crosshair */
 		crosshair_set_screen(machine, 0, CROSSHAIR_SCREEN_ALL);

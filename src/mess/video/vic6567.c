@@ -205,8 +205,8 @@ struct _vic2_state
 #define VIC6569_Y_BEGIN			-6
 #define VIC2_X_BEGIN			((vic2->type == VIC6569 || vic2->type == VIC8566) ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
 #define VIC2_Y_BEGIN			((vic2->type == VIC6569 || vic2->type == VIC8566) ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
-#define VIC2_X_VALUE			((LIGHTPEN_X_VALUE + VIC2_X_BEGIN + VIC2_MAME_XPOS))
-#define VIC2_Y_VALUE			((LIGHTPEN_Y_VALUE + VIC2_Y_BEGIN + VIC2_MAME_YPOS))
+#define VIC2_X_VALUE			((LIGHTPEN_X_VALUE + 38) / 2)
+#define VIC2_Y_VALUE			((LIGHTPEN_Y_VALUE +  6)    )
 
 #define VIC2E_K0_LEVEL			(vic2->reg[0x2f] & 0x01)
 #define VIC2E_K1_LEVEL			(vic2->reg[0x2f] & 0x02)
