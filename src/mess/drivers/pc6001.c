@@ -892,7 +892,7 @@ static MACHINE_START(pc6001)
 	/* TODO: accurate timing on these (especially for the first one) */
 	timer_pulse(machine, ATTOTIME_IN_HZ(540), NULL, 0, audio_callback);
 	timer_pulse(machine, ATTOTIME_IN_HZ(250), NULL, 0, keyboard_callback);
-	timer_pulse(machine, ATTOTIME_IN_HZ(160), NULL, 0, cassette_callback);
+	timer_pulse(machine, ATTOTIME_IN_HZ(160/4), NULL, 0, cassette_callback);
 }
 
 static MACHINE_RESET(pc6001)
