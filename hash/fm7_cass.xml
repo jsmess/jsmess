@@ -4,6 +4,15 @@
 <!-- Fujitsu FM-7 cassette images -->
 <!-- Multi-image games are currently untested -->
 
+<!--
+	Loading instructions:
+	At the F-Basic Ready prompt, type run"" and press Return.
+	If a Bad File Mode error occurs, then you must type loadm"",r and press Return.  Once the loader has loaded,
+	type exec and press Return, and the application will continue to load.
+	
+	If you are using a disk version of F-Basic, then put CAS0: in the quotes.  Note that this is case-sensitive.
+-->
+
 <softwarelist name="fm7_cass" description="Fujitsu FM-7 cassette images">
 
 <!-- アルデバラン＃ -->
@@ -83,7 +92,7 @@
 		</part>
 	</software>
 
-<!-- バトルﾎﾟッド.zip - not working (Bad File Mode Error) -->
+<!-- バトルﾎﾟッド - use loadm"",r to load -->
 	<software name="bat">
 		<description>バトルポッド</description>
 		<year>19??</year>
@@ -287,7 +296,7 @@
 		</part>
 	</software>
 
-<!-- チョップリフター - not working -->
+<!-- チョップリフター - use loadm"",r to load -->
 	<software name="choplift">
 		<description>チョップリフター</description>
 		<year>19??</year>
@@ -481,7 +490,7 @@
 		</part>
 	</software>
 
-<!-- エクスプローラ - not working (Bad File Mode error) -->
+<!-- エクスプローラ - use loadm"",r to load -->
 	<software name="explorer">
 		<description>エクスプローラ</description>
 		<year>19??</year>
@@ -558,7 +567,7 @@
 		</part>
 	</software>
 
-<!-- フィールドウォーズ - not working (Bad File Mode error) -->
+<!-- フィールドウォーズ - use loadm"",r to load -->
 	<software name="field">
 		<description>フィールドウォーズ</description>
 		<year>19??</year>
@@ -581,7 +590,7 @@
 		</part>
 	</software>
 
-<!-- フロントライン - not working (Bad File Mode error) -->
+<!-- フロントライン - use loadm"",r to load -->
 	<software name="front">
 		<description>フロントライン</description>
 		<year>19??</year>
@@ -605,7 +614,7 @@
 		</part>
 	</software>
 
-<!-- ギャラクシーフライ - not working (Bad File Mode error) -->
+<!-- ギャラクシーフライ - use loadm"",r to load -->
 	<software name="galaxy">
 		<description>ギャラクシーフライ</description>
 		<year>19??</year>
@@ -682,7 +691,7 @@
 		</part>
 	</software>
 
-<!-- ガンマン - not working (Bad File Mode error) -->
+<!-- ガンマン - use loadm"",r to load -->
 	<software name="gunman">
 		<description>ガンマン</description>
 		<year>19??</year>
@@ -740,7 +749,7 @@
 		</part>
 	</software>
 
-<!-- Hydlide 1 - Not working (Bad File Mode error) -->
+<!-- Hydlide 1 - use loadm"",r to load -->
 	<software name="hydlide1">
 		<description>Hydlide 1</description>
 		<year>19??</year>
@@ -752,7 +761,7 @@
 		</part>
 	</software>
 
-<!-- ハイドライド - not working (Bad File Mode error) -->
+<!-- ハイドライド - use loadm"",r to load -->
 	<software name="hydlidea" cloneof="hydlide1">
 		<description>Hydlide 1 (alternate)</description>
 		<year>19??</year>
@@ -831,7 +840,7 @@
 		</part>
 	</software>
 
-<!-- 華麗なる怪盗 - not working (Bad File Mode error) -->
+<!-- 華麗なる怪盗 - use loadm"",r to load -->
 	<software name="kaito">
 		<description>華麗なる怪盗</description>
 		<year>19??</year>
@@ -843,7 +852,7 @@
 		</part>
 	</software>
 	
-<!-- (FM7)カムイの剣(T77).zip -->
+<!-- カムイの剣 -->
 	<software name="kami">
 		<description>カムイの剣</description>
 		<year>19??</year>
@@ -968,7 +977,7 @@
 		</part>
 	</software>
 
-<!-- ロードランナー.zip -->
+<!-- ロードランナー -->
 	<software name="lode">
 		<description>Lode Runner</description>
 		<year>19??</year>
@@ -1078,7 +1087,7 @@
 		</part>
 	</software>
 
-<!-- ミスターバタフライ - not working (Bad File Mode error) -->
+<!-- ミスターバタフライ - use loadm"",r to load -->
 	<software name="mrbatfry">
 		<description>ミスターバタフライ</description>
 		<year>19??</year>
@@ -1184,7 +1193,7 @@
 		</part>
 	</software>
 
-<!-- 王将 - not working (Bad File Mode error) -->
+<!-- 王将 - use loadm"",r to load -->
 	<software name="oushou">
 		<description>王将</description>
 		<year>19??</year>
@@ -1196,7 +1205,7 @@
 		</part>
 	</software>
 
-<!-- パックマン - not working (Bad File Mode error) -->
+<!-- パックマン - use loadm"",r to load -->
 	<software name="pacman">
 		<description>パックマン</description>
 		<year>19??</year>
@@ -1220,7 +1229,7 @@
 		</part>
 	</software>
 
-<!-- ペンギンくん - not working (Bad File Mode error) -->
+<!-- ペンギンくん - use loadm"",r to load -->
 	<software name="penguin">
 		<description>ペンギンくん</description>
 		<year>19??</year>
@@ -1283,7 +1292,7 @@
 		</part>
 	</software>
 
-<!-- プロ野球スーパーシミュレーション - not working (Bad File Mode error) -->
+<!-- プロ野球スーパーシミュレーション - use loadm"",r to load -->
 	<software name="proyakyu">
 		<description>プロ野球スーパーシミュレーション</description>
 		<year>19??</year>
@@ -1389,7 +1398,7 @@
 		</part>
 	</software>
 
-<!-- 連珠 - not working (Bad File Mode error) -->
+<!-- 連珠 - use loadm"",r to load -->
 	<software name="ren">
 		<description>連珠</description>
 		<year>19??</year>
@@ -1418,7 +1427,7 @@
 		</part>
 	</software>
 
-<!-- リングの上はおおさわぎ - not working (Bad File Mode error) -->
+<!-- リングの上はおおさわぎ - use loadm"",r to load -->
 	<software name="ringnoue">
 		<description>リングの上はおおさわぎ</description>
 		<year>19??</year>
@@ -1488,7 +1497,7 @@
 		</part>
 	</software>
 
-<!-- フライトシミュレータ - not working (Bad File Mode error) -->
+<!-- フライトシミュレータ - use loadm"",r to load -->
 	<software name="sim">
 		<description>フライトシミュレータ</description>
 		<year>19??</year>
@@ -1578,7 +1587,7 @@
 		</part>
 	</software>
 
-<!-- スペースビー - not working (Bad File Mode error) -->
+<!-- スペースビー - use loadm"",r to load -->
 	<software name="spacebee">
 		<description>スペースビー</description>
 		<year>19??</year>
@@ -1692,7 +1701,7 @@
 		</part>
 	</software>
 
-<!-- タンクゲーム - not working (Bad File Mode error) -->
+<!-- タンクゲーム - use loadm"",r to load -->
 	<software name="tankgame">
 		<description>タンクゲーム</description>
 		<year>19??</year>
@@ -1927,7 +1936,7 @@
 		</part>
 	</software>
 
-<!-- 零戦 - not working (Bad File Mode error) -->
+<!-- 零戦 - use loadm"",r to load -->
 	<software name="zero">
 		<description>零戦</description>
 		<year>19??</year>
