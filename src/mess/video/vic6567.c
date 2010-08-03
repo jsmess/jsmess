@@ -205,7 +205,7 @@ struct _vic2_state
 #define VIC6569_Y_BEGIN			-6
 #define VIC2_X_BEGIN			((vic2->type == VIC6569 || vic2->type == VIC8566) ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
 #define VIC2_Y_BEGIN			((vic2->type == VIC6569 || vic2->type == VIC8566) ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
-#define VIC2_X_VALUE			((LIGHTPEN_X_VALUE + VIC2_X_BEGIN + VIC2_MAME_XPOS) / 2)
+#define VIC2_X_VALUE			((LIGHTPEN_X_VALUE + VIC2_X_BEGIN + VIC2_MAME_XPOS))
 #define VIC2_Y_VALUE			((LIGHTPEN_Y_VALUE + VIC2_Y_BEGIN + VIC2_MAME_YPOS))
 
 #define VIC2E_K0_LEVEL			(vic2->reg[0x2f] & 0x01)
@@ -321,15 +321,15 @@ static TIMER_CALLBACK( vic2_timer_timeout )
 
 	switch (which)
 	{
-	case 1:						   /* light pen */
-		/* and diode must recognize light */
-		if (1)
-		{
-			vic2->reg[0x13] = VIC2_X_VALUE;
-			vic2->reg[0x14] = VIC2_Y_VALUE;
-		}
-		vic2_set_interrupt(machine, 8, vic2);
-		break;
+		case 1:						   /* light pen */
+			/* and diode must recognize light */
+			if (1)
+			{
+				vic2->reg[0x13] = VIC2_X_VALUE;
+				vic2->reg[0x14] = VIC2_Y_VALUE;
+			}
+			vic2_set_interrupt(machine, 8, vic2);
+			break;
 	}
 }
 

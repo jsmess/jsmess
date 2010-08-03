@@ -634,7 +634,6 @@ int c64_paddle_read( running_device *device, int which )
 	UINT8 cia0porta = mos6526_pa_r(machine->device("cia_0"), 0);
 	int controller1 = input_port_read(machine, "CTRLSEL") & 0x07;
 	int controller2 = input_port_read(machine, "CTRLSEL") & 0x70;
-
 	/* Notice that only a single input is defined for Mouse & Lightpen in both ports */
 	switch (controller1)
 	{
@@ -662,6 +661,11 @@ int c64_paddle_read( running_device *device, int which )
 				pot2 = input_port_read(machine, "LIGHTY");
 			else
 				pot1 = input_port_read(machine, "LIGHTX");
+			break;
+
+		case 0x06:
+			if (which && (input_port_read(machine, "OTHER") & 0x04))	/* Lightpen Signal */
+				pot2 = 0x00;
 			break;
 
 		case 0x00:
@@ -701,6 +705,11 @@ int c64_paddle_read( running_device *device, int which )
 				pot3 = input_port_read(machine, "LIGHTX");
 			break;
 
+		case 0x60:
+			if (which && (input_port_read(machine, "OTHER") & 0x04))	/* Lightpen Signal */
+				pot4 = 0x00;
+			break;
+
 		case 0x00:
 		case 0x70:
 			break;
@@ -712,20 +721,23 @@ int c64_paddle_read( running_device *device, int which )
 
 	if (input_port_read(machine, "CTRLSEL") & 0x80)		/* Swap */
 	{
-		temp = pot1; pot1 = pot2; pot2 = temp;
-		temp = pot3; pot3 = pot4; pot4 = temp;
+		temp = pot1; pot1 = pot3; pot3 = temp;
+		temp = pot2; pot2 = pot4; pot4 = temp;
 	}
 
 	switch (cia0porta & 0xc0)
 	{
-	case 0x40:
-		return which ? pot2 : pot1;
+		case 0x40:
+			return which ? pot2 : pot1;
 
-	case 0x80:
-		return which ? pot4 : pot3;
+		case 0x80:
+			return which ? pot4 : pot3;
 
-	default:
-		return 0;
+		case 0xc0:
+			return which ? pot2 : pot1;
+
+		default:
+			return 0;
 	}
 }
 
