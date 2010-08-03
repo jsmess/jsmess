@@ -248,12 +248,32 @@ static void draw_tile_text(running_machine *machine, bitmap_t *bitmap,const rect
 	}
 }
 
+static void draw_border(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int attr)
+{
+	int x,y,color;
+
+	for(y=0;y<240;y++)
+	{
+		for(x=0;x<320;x++)
+		{
+			if(attr & 0x80 && (!(attr & 0x10)))
+				color = ((attr & 2)<<1) + 8;
+			else
+				color = 0; //FIXME: other modes not yet checked
+
+			*BITMAP_ADDR16(bitmap, y, x) = machine->pens[color];
+		}
+	}
+}
+
 static void pc6001_screen_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int has_mc6847)
 {
 	int x,y;
 	int tile,attr;
 
 	attr = pc6001_video_ram[0];
+
+	draw_border(machine,bitmap,cliprect,attr);
 
 	if(attr & 0x80) // gfx mode
 	{
