@@ -19,6 +19,11 @@
         B) It's easier to me to see what the attribute vram does since I don't
            have any docs atm.
 
+	TODO (game specific):
+	- 3D Asteroid Fire (and others): inputs doesn't work during gameplay;
+	- Arm Wrestling: returns an "?OM Error" during loading, it seems to be a N66
+	  BASIC -> PC-6001Mk2 game actually;
+
 ==================================================================================
 
     PC-6001 (1981-09):
@@ -126,6 +131,7 @@ static VIDEO_START( pc6001 )
 	pc6001_video_ram = auto_alloc_array(machine, UINT8, 0x2000); //0x400? We'll see...
 }
 
+/* FIXME: colors of this aren't 100% accurate */
 static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int attr)
 {
 	int x,y,xi;
@@ -256,8 +262,10 @@ static void draw_border(running_machine *machine, bitmap_t *bitmap,const rectang
 	{
 		for(x=0;x<320;x++)
 		{
-			if(attr & 0x80 && (!(attr & 0x10)))
+			if((attr & 0x90) == 0x80) //2bpp
 				color = ((attr & 2)<<1) + 8;
+			else if((attr & 0x90) == 0x90) //1bpp
+				color = (attr & 2) ? 7 : 2; //FIXME: colors aren't right there either
 			else
 				color = 0; //FIXME: other modes not yet checked
 
