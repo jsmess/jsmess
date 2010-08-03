@@ -126,12 +126,132 @@ static VIDEO_START( pc6001 )
 	pc6001_video_ram = auto_alloc_array(machine, UINT8, 0x2000); //0x400? We'll see...
 }
 
-static VIDEO_UPDATE( pc6001 )
+static void draw_bitmap_1bpp(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int attr)
 {
-	UINT8 *gfx_data = memory_region(screen->machine, "gfx1");
-	int x,y,xi,yi;
-	int tile,attr,pen,color;
-	int fgcol;
+	int x,y,xi;
+	int fgcol,color;
+
+	fgcol = (attr & 2) ? 7 : 2;
+
+	for(y=0;y<192;y++)
+	{
+		for(x=0;x<32;x++)
+		{
+			int tile = pc6001_video_ram[(x+(y*32))+0x200];
+
+			for(xi=0;xi<8;xi++)
+			{
+				color = ((tile)>>(7-xi) & 1) ? fgcol : 0;
+
+				*BITMAP_ADDR16(bitmap, (y+24), (x*8+xi)+32) = machine->pens[color];
+			}
+		}
+	}
+}
+
+static void draw_bitmap_2bpp(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int attr)
+{
+	int color,x,y,xi,yi;
+
+	int shrink_x = 2*4;
+	int shrink_y = (attr & 8) ? 1 : 2;
+	int w = (shrink_x == 8) ? 32 : 16;
+	int col_bank = ((attr & 2)<<1);
+
+	for(y=0;y<(192/shrink_y);y++)
+	{
+		for(x=0;x<w;x++)
+		{
+			int tile = pc6001_video_ram[(x+(y*32))+0x200];
+
+			for(yi=0;yi<shrink_y;yi++)
+			{
+				for(xi=0;xi<shrink_x;xi++)
+				{
+					int i;
+					i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
+					color = ((tile >> i) & 3)+8;
+					color+= col_bank;
+
+					*BITMAP_ADDR16(bitmap, ((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = machine->pens[color];
+				}
+			}
+		}
+	}
+}
+
+static void draw_tile_3bpp(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int tile,int attr)
+{
+	int color,pen,xi,yi;
+
+	if(attr & 0x10) //2x2 squares on a single cell
+		pen = (tile & 0x70)>>4;
+	else //2x3
+		pen = (tile & 0xc0) >> 6 | (attr & 2)<<1;
+
+	for(yi=0;yi<12;yi++)
+	{
+		for(xi=0;xi<8;xi++)
+		{
+			int i;
+			i = (xi & 4)>>2; //x-axis
+			if(attr & 0x10) //2x2
+			{
+				i+= (yi >= 6) ? 2 : 0; //y-axis
+			}
+			else //2x3
+			{
+				i+= (yi & 4)>>1; //y-axis 1
+				i+= (yi & 8)>>1; //y-axis 2
+			}
+
+			color = ((tile >> i) & 1) ? pen+8 : 0;
+
+			*BITMAP_ADDR16(bitmap, ((y*12+(11-yi))+24), (x*8+(7-xi))+32) = machine->pens[color];
+		}
+	}
+}
+
+static void draw_tile_text(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int x,int y,int tile,int attr,int has_mc6847)
+{
+	int xi,yi,pen,fgcol,color;
+	UINT8 *gfx_data = memory_region(machine, "gfx1");
+
+	for(yi=0;yi<12;yi++)
+	{
+		for(xi=0;xi<8;xi++)
+		{
+			pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
+
+			if(has_mc6847)
+			{
+				fgcol = (attr & 2) ? 0x12 : 0x10;
+
+				if(attr & 1)
+					color = pen ? (fgcol+0) : (fgcol+1);
+				else
+					color = pen ? (fgcol+1) : (fgcol+0);
+
+			}
+			else
+			{
+				fgcol = (attr & 2) ? 2 : 7;
+
+				if(attr & 1)
+					color = pen ? 0 : fgcol;
+				else
+					color = pen ? fgcol : 0;
+			}
+
+			*BITMAP_ADDR16(bitmap, ((y*12+yi)+24), (x*8+xi)+32) = machine->pens[color];
+		}
+	}
+}
+
+static void pc6001_screen_draw(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect, int has_mc6847)
+{
+	int x,y;
+	int tile,attr;
 
 	attr = pc6001_video_ram[0];
 
@@ -139,50 +259,11 @@ static VIDEO_UPDATE( pc6001 )
 	{
 		if(attr & 0x10) // 256x192x1 mode (FIXME: might be a different trigger)
 		{
-			fgcol = (attr & 2) ? 7 : 2;
-
-			for(y=0;y<192;y++)
-			{
-				for(x=0;x<32;x++)
-				{
-					tile = pc6001_video_ram[(x+(y*32))+0x200];
-
-					for(xi=0;xi<8;xi++)
-					{
-						color = ((tile)>>(7-xi) & 1) ? fgcol : 0;
-
-						*BITMAP_ADDR16(bitmap, (y+24), (x*8+xi)+32) = screen->machine->pens[color];
-					}
-				}
-			}
+			draw_bitmap_1bpp(machine,bitmap,cliprect,attr);
 		}
 		else // 128x192x2 mode
 		{
-			int shrink_x = 2*4;
-			int shrink_y = (attr & 8) ? 1 : 2;
-			int w = (shrink_x == 8) ? 32 : 16;
-			int col_bank = ((attr & 2)<<1);
-
-			for(y=0;y<(192/shrink_y);y++)
-			{
-				for(x=0;x<w;x++)
-				{
-					tile = pc6001_video_ram[(x+(y*32))+0x200];
-
-					for(yi=0;yi<shrink_y;yi++)
-					{
-						for(xi=0;xi<shrink_x;xi++)
-						{
-							int i;
-							i = (shrink_x == 8) ? (xi & 0x06) : (xi & 0x0c)>>1;
-							color = ((tile >> i) & 3)+8;
-							color+= col_bank;
-
-							*BITMAP_ADDR16(bitmap, ((y*shrink_y+yi)+24), (x*shrink_x+((shrink_x-1)-xi))+32) = screen->machine->pens[color];
-						}
-					}
-				}
-			}
+			draw_bitmap_2bpp(machine,bitmap,cliprect,attr);
 		}
 	}
 	else // text mode
@@ -196,55 +277,27 @@ static VIDEO_UPDATE( pc6001 )
 
 				if(attr & 0x40)
 				{
-					if(attr & 0x10) //2x2 squares on a single cell
-						pen = (tile & 0x70)>>4;
-					else //2x3
-						pen = (tile & 0xc0) >> 6 | (attr & 2)<<1;
-
-					for(yi=0;yi<12;yi++)
-					{
-						for(xi=0;xi<8;xi++)
-						{
-							int i;
-							i = (xi & 4)>>2; //x-axis
-							if(attr & 0x10) //2x2
-							{
-								i+= (yi >= 6) ? 2 : 0; //y-axis
-							}
-							else //2x3
-							{
-								i+= (yi & 4)>>1; //y-axis 1
-								i+= (yi & 8)>>1; //y-axis 2
-							}
-
-							color = ((tile >> i) & 1) ? pen+8 : 0;
-
-							*BITMAP_ADDR16(bitmap, ((y*12+(11-yi))+24), (x*8+(7-xi))+32) = screen->machine->pens[color];
-						}
-					}
+					draw_tile_3bpp(machine,bitmap,cliprect,x,y,tile,attr);
 				}
 				else
 				{
-					for(yi=0;yi<12;yi++)
-					{
-						for(xi=0;xi<8;xi++)
-						{
-							pen = gfx_data[(tile*0x10)+yi]>>(7-xi) & 1;
-
-							fgcol = (attr & 2) ? 2 : 7;
-
-							if(attr & 1)
-								color = pen ? 0 : fgcol;
-							else
-								color = pen ? fgcol : 0;
-
-							*BITMAP_ADDR16(bitmap, ((y*12+yi)+24), (x*8+xi)+32) = screen->machine->pens[color];
-						}
-					}
+					draw_tile_text(machine,bitmap,cliprect,x,y,tile,attr,has_mc6847);
 				}
 			}
 		}
 	}
+}
+
+static VIDEO_UPDATE( pc6001 )
+{
+	pc6001_screen_draw(screen->machine,bitmap,cliprect,1);
+
+	return 0;
+}
+
+static VIDEO_UPDATE( pc6001m2 )
+{
+	pc6001_screen_draw(screen->machine,bitmap,cliprect,0);
 
 	return 0;
 }
@@ -353,7 +406,7 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
 
 static ADDRESS_MAP_START(pc6001_map, ADDRESS_SPACE_PROGRAM, 8)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_WRITENOP
 	AM_RANGE(0x4000, 0x5fff) AM_ROM AM_REGION("cart_img",0)
 	AM_RANGE(0x6000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_RAM AM_BASE(&pc6001_ram)
@@ -667,12 +720,12 @@ static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
 
 static WRITE8_DEVICE_HANDLER (pc6001_8255_portb_w )
 {
-//  printf("pc6001_8255_portb_w %02x\n",data);
+	//printf("pc6001_8255_portb_w %02x\n",data);
 }
 
 static WRITE8_DEVICE_HANDLER (pc6001_8255_portc_w )
 {
-//  printf("pc6001_8255_portc_w %02x\n",data);
+	//printf("pc6001_8255_portc_w %02x\n",data);
 }
 
 static READ8_DEVICE_HANDLER (pc6001_8255_portc_r )
@@ -866,14 +919,21 @@ static const rgb_t defcolors[] =
 	MAKE_RGB(0xff, 0xff, 0xff),	/* BUFF */
 	MAKE_RGB(0x00, 0xff, 0xff),	/* CYAN */
 	MAKE_RGB(0xff, 0x00, 0xff),	/* MAGENTA */
-	MAKE_RGB(0xff, 0x80, 0x00)	/* ORANGE */
+	MAKE_RGB(0xff, 0x80, 0x00),	/* ORANGE */
+
+	/* MC6847 specific */
+	MAKE_RGB(0x00, 0x40, 0x00),	/* ALPHANUMERIC DARK GREEN */
+	MAKE_RGB(0x00, 0xff, 0x00),	/* ALPHANUMERIC BRIGHT GREEN */
+	MAKE_RGB(0x40, 0x10, 0x00),	/* ALPHANUMERIC DARK ORANGE */
+	MAKE_RGB(0xff, 0xc4, 0x18)	/* ALPHANUMERIC BRIGHT ORANGE */
+
 };
 
 static PALETTE_INIT(pc6001)
 {
 	int i;
 
-	for(i=0;i<8;i++)
+	for(i=0;i<8+4;i++)
 		palette_set_color(machine, i+8,defcolors[i]);
 }
 
@@ -923,8 +983,8 @@ static MACHINE_DRIVER_START( pc6001 )
 //  MDRV_VIDEO_UPDATE(m6847)
 //  MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 25+192+26)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 1, 239)
-	MDRV_PALETTE_LENGTH(16)
+	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MDRV_PALETTE_LENGTH(16+4)
 	MDRV_PALETTE_INIT(pc6001)
 
 	MDRV_I8255A_ADD( "ppi8255", pc6001_ppi8255_interface )
@@ -955,6 +1015,8 @@ static MACHINE_DRIVER_START( pc6001m2 )
 
 	MDRV_MACHINE_RESET(pc6001m2)
 
+	MDRV_VIDEO_UPDATE(pc6001m2)
+
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pc6001m2_map)
@@ -963,6 +1025,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pc6001sr )
 	MDRV_IMPORT_FROM(pc6001)
+
+	MDRV_VIDEO_UPDATE(pc6001m2)
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", Z80, XTAL_3_579545MHz)
