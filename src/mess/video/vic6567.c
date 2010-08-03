@@ -205,8 +205,8 @@ struct _vic2_state
 #define VIC6569_Y_BEGIN			-6
 #define VIC2_X_BEGIN			((vic2->type == VIC6569 || vic2->type == VIC8566) ? VIC6569_X_BEGIN : VIC6567_X_BEGIN)
 #define VIC2_Y_BEGIN			((vic2->type == VIC6569 || vic2->type == VIC8566) ? VIC6569_Y_BEGIN : VIC6567_Y_BEGIN)
-#define VIC2_X_VALUE			((LIGHTPEN_X_VALUE + 38) / 2)
-#define VIC2_Y_VALUE			((LIGHTPEN_Y_VALUE +  6)    )
+#define VIC2_X_VALUE			((LIGHTPEN_X_VALUE / 1.3) + 12)
+#define VIC2_Y_VALUE			((LIGHTPEN_Y_VALUE      ) + 10)
 
 #define VIC2E_K0_LEVEL			(vic2->reg[0x2f] & 0x01)
 #define VIC2E_K1_LEVEL			(vic2->reg[0x2f] & 0x02)
@@ -1004,7 +1004,7 @@ static TIMER_CALLBACK( pal_timer_callback )
 		{
 			vic2->vblanking = 1;
 
-			if (LIGHTPEN_BUTTON)
+//			if (LIGHTPEN_BUTTON)
 			{
 				/* lightpen timer start */
 				timer_set(machine, attotime_make(0, 0), vic2, 1, vic2_timer_timeout);
@@ -1573,7 +1573,7 @@ static TIMER_CALLBACK( ntsc_timer_callback )
 		{
 			vic2->vblanking = 1;
 
-			if (LIGHTPEN_BUTTON)
+//			if (LIGHTPEN_BUTTON)
 			{
 				/* lightpen timer starten */
 				timer_set(machine, attotime_make(0, 0), vic2, 1, vic2_timer_timeout);
