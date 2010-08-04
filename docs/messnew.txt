@@ -2,7 +2,7 @@
 
 New System Drivers Supported:
 -----------------------------
-(none)
+- Tomy Pyuuta [anondumper]
 
 
 

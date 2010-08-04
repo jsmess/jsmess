@@ -762,6 +762,7 @@ const game_driver * const drivers[] =
 
 	/* TI 99 clones */
 	DRIVER( tutor)	  /* 1983? Tomy Tutor    */
+	DRIVER( pyuuta )	/* 1982 Tomy Pyuuta		*/
 	DRIVER( geneve )	/* 1987? Myarc Geneve 9640    */
 	DRIVER( genmod )	/* 199?? Myarc Geneve 9640    */
 	DRIVER( ti99_4p )   /* 1996 SNUG 99/4P (a.k.a. SGCPU)      */
