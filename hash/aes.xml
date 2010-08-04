@@ -114,6 +114,40 @@
 		</part>
 	</software>
 
+<!-- ID 004 -->
+	<software name="mahretsu">
+		<description>Mahjong Kyo Retsuden</description>
+		<year>1990</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="004-p1.bin" size="524288" crc="fc6f53db" sha1="64a62ca4c8fb68954e06121399c9402278bd0467" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="004-s1.bin" size="131072" crc="2bd05a06" sha1="876deadd4645373d82a503154eeddf18f440d743" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+				<rom name="004-m1.bin" size="131072" crc="c71fbb3b" sha1="59c58665b53da61352359d191a0569de5dd1f4b3" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="1048576">
+				<rom name="004-v11.bin" size="524288" crc="b2fb2153" sha1="36e0cc8927b11105de40188af46f6cf532794c10" offset="000000" />
+				<rom name="004-v12.bin" size="524288" crc="8503317b" sha1="ab22f1aba1e977ab234a4f1d73dc6ed789dbeb85" offset="080000" />
+			</dataarea>
+			<dataarea name="ymsnd.deltat" size="1572864">
+				<rom name="004-v21.bin" size="524288" crc="4999fb27" sha1="2d4926a220ea21bdd5e816bb16f985fff089500a" offset="000000" />
+				<rom name="004-v22.bin" size="524288" crc="776fa2a2" sha1="e7d5a362ab7806b7b009700a435c815a20e8ec68" offset="080000" />
+				<rom name="004-v23.bin" size="524288" crc="b3e7eeea" sha1="4d1e97f380702a3a06e7f954b4caddd9c4119d8f" offset="100000" />
+			</dataarea>
+			<dataarea name="sprites" size="2097152">
+				<rom name="004-c1.bin" size="524288" crc="f1ae16bc" sha1="df68feed4dcba1e1566032b01ebb7b478a1792bf" offset="000000" loadflag="load16_byte" />
+				<rom name="004-c2.bin" size="524288" crc="bdc13520" sha1="2bc4c996d019a4c539f6c3188ef18089e54b7efa" offset="000001" loadflag="load16_byte" />
+				<rom name="004-c3.bin" size="524288" crc="9c571a37" sha1="21388aeb92bb8e15a55a063701ca9df79e292127" offset="100000" loadflag="load16_byte" />
+				<rom name="004-c4.bin" size="524288" crc="7e81cb29" sha1="5036f04df30cf6903bd1a8cc06ff6f015c24a74b" offset="100001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 005 -->
 	<software name="maglord">
 		<description>Magician Lord</description>
@@ -456,6 +490,32 @@
 		</part>
 	</software>
 
+<!-- ID 023 -->
+	<software name="quizdais">
+		<description>Quiz Daisousa Sen - The Last Count Down</description>
+		<year>1991</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+                <rom name="023-p1.bin" size="1048576" crc="c488fda3" sha1="4cdf2f1837fffd720efef42f81f933bdf2ef1402" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="023-s1.bin" size="131072" crc="ac31818a" sha1="93c8d67a93606a2e02f12ca4cab849dc3f3de286" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="023-m1.bin" size="131072" crc="2a2105e0" sha1="26fc13556fda2dbeb7b5b035abd994e302dc7662" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="1048576">
+                <rom name="023-v1.bin" size="1048576" crc="a53e5bd3" sha1="cf115c6478ce155d889e6a5acb962339e08e024b" offset="000000" />
+			</dataarea>
+			<dataarea name="sprites" size="2097152">
+                <rom name="023-c1.bin" size="1048576" crc="2999535a" sha1="0deabf771039987b559edc2444eea741bd7ba861" offset="000000" loadflag="load16_byte" />
+                <rom name="023-c2.bin" size="1048576" crc="876a99e6" sha1="8d1dcfc0927d7523f8be8203573192406ec654b4" offset="000001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- ID 030 -->
 	<software name="2020bb">
 		<description>2020 Super Baseball</description>
@@ -539,6 +599,35 @@
 				<rom name="034-c2.bin" size="1048576" crc="9743ea2f" sha1="cf4fccdf10d521d555e92bc24123142393c2b3bb" offset="000001" loadflag="load16_byte" />
 				<rom name="034-c3.bin" size="524288" crc="e5aa65f5" sha1="714356a2cee976ec0f515b1034ce971018e5c02e" offset="200000" loadflag="load16_byte" />
 				<rom name="034-c4.bin" size="524288" crc="0eb138cc" sha1="21d31e1f136c674caa6dd44073281cd07b72ea9b" offset="200001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 036 -->
+	<software name="bakatono">
+		<description>Bakatonosama Mahjong Manyuuki</description>
+		<year>1991</year>
+		<publisher>Monolith Corp.</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+				<rom name="036-p1.bin" size="524288" crc="1c66b6fa" sha1="6c50cc452971c46c763ae0b2def95792671a1798" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+				<rom name="036-s1.bin" size="131072" crc="f3ef4485" sha1="c30bfceed7e669e4c97b0b3ec2e9f4271e5b6662" offset="000000" />
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+				<rom name="036-m1.bin" size="131072" crc="f1385b96" sha1="e7e3d1484188a115e262511116aaf466b8b1f428" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="2097152">
+				<rom name="036-v1.bin" size="1048576" crc="1c335dce" sha1="493c273fa71bf81861a20af4c4eaae159e169f39" offset="000000" />
+				<rom name="036-v2.bin" size="1048576" crc="bbf79342" sha1="45a4f40e415cdf35c3073851506648c8f7d53958" offset="100000" />
+			</dataarea>
+			<dataarea name="sprites" size="4194304">
+				<rom name="036-c1.bin" size="1048576" crc="fe7f1010" sha1="5b6f5053821f4da8dc3768371e2cd51bb29da963" offset="000000" loadflag="load16_byte" />
+				<rom name="036-c2.bin" size="1048576" crc="bbf003f5" sha1="054b2a3327e038836eece652055bb84c115cf8ed" offset="000001" loadflag="load16_byte" />
+				<rom name="036-c3.bin" size="1048576" crc="9ac0708e" sha1="8decfe06d73a3dd3c3cf280719978fcf6d559d29" offset="200000" loadflag="load16_byte" />
+				<rom name="036-c4.bin" size="1048576" crc="f2577d22" sha1="a37db8055ca4680e244c556dc6df8bdba16c2083" offset="200001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -738,6 +827,33 @@
                 <rom size="1048576" offset="600000" loadflag="continue" />
                 <rom name="047-c4.bin" size="1048576" crc="9fe27432" sha1="89d22d77ba8bc6d1f6c974195c34ad61b9010de7" offset="200001" loadflag="load16_byte" />
                 <rom size="1048576" offset="600001" loadflag="continue" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 049 -->
+	<software name="androdun">
+		<description>Andro Dunos</description>
+		<year>1992</year>
+		<publisher>Visco</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+                <rom name="049-p1.bin" size="524288" crc="3b857da2" sha1="4dd86c739944696c16c3cdd85935d6dfa9fdc276" offset="000000" />
+                <rom name="049-p2.bin" size="524288" crc="2f062209" sha1="991cf3e3677929b2cc0b2787b0c7b6ad3700f618" offset="080000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="049-s1.bin" size="131072" crc="6349de5d" sha1="bcc44b9576d7bedd9a39294530bb66f707690c72" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="049-m1.bin" size="131072" crc="edd2acf4" sha1="c4ee6ba834d54b9fc5a854dbc41a05877e090371" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="1048576">
+                <rom name="049-v1.bin" size="1048576" crc="ce43cb89" sha1="47f82e077abb6efc6b1b0490412ae147d5d2acef" offset="000000" />
+			</dataarea>
+			<dataarea name="sprites" size="2097152">
+                <rom name="049-c1.bin" size="1048576" crc="7ace6db3" sha1="c41cc9de8c0788dcc49ca494fd3bb3124062d9dd" offset="000000" loadflag="load16_byte" />
+                <rom name="049-c2.bin" size="1048576" crc="b17024f7" sha1="fcf7efae48fcdccaf5255c145de414fb246128f0" offset="000001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
@@ -973,6 +1089,35 @@
                 <rom name="058-c4.bin" size="2097152" crc="4ad066ff" sha1="4e304646d954d5f7bbabc5d068e85de31d38830f" offset="400001" loadflag="load16_byte" />
                 <rom name="058-c5.bin" size="2097152" crc="49c5e0bf" sha1="f3784178f90751990ea47a082a6aa869ee3566c9" offset="800000" loadflag="load16_byte" />
                 <rom name="058-c6.bin" size="2097152" crc="8ff1f43d" sha1="6180ceb5412a3e2e34e9513a3283b9f63087f747" offset="800001" loadflag="load16_byte" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- ID 061 -->
+	<software name="ssideki2">
+		<description>Super Sidekicks 2 - The World Championship / Tokuten Ou 2 - real fight football</description>
+		<year>1994</year>
+		<publisher>SNK</publisher>
+		<part name="cart" interface="aes_cart">
+			<dataarea name="maincpu" size="1048576">
+                <rom name="061-p1.bin" size="1048576" crc="5969e0dc" sha1="78abea880c125ec5a85bef6404478512a34b5513" offset="000000" />
+			</dataarea>
+			<dataarea name="fixed" size="262144">
+                <rom name="061-s1.bin" size="131072" crc="226d1b68" sha1="de010f6fda3ddadb181fe37daa6105f22e78b970" offset="000000"/>
+			</dataarea>
+			<dataarea name="audiocpu" size="196608">
+                <rom name="061-m1.bin" size="131072" crc="156f6951" sha1="49686f615f109a02b4f23931f1c84fee13872ffd" offset="000000" />
+				<rom size="131072" offset="010000" loadflag="reload" />
+			</dataarea>
+			<dataarea name="ymsnd" size="4194304">
+                <rom name="061-v1.bin" size="2097152" crc="f081c8d3" sha1="fc9da0ddc1ddd1f9ae1443a726815c25e9dc38ae" offset="000000" />
+                <rom name="061-v2.bin" size="2097152" crc="7cd63302" sha1="c39984c0ae0a8e76f1fc036344bbb83635c18937" offset="200000" />
+			</dataarea>
+			<dataarea name="sprites" size="8388608">
+                <rom name="061-c1.bin" size="2097152" crc="a626474f" sha1="d695f0dcb9480088b3a7c1488bd541b4c159528a" offset="000000" loadflag="load16_byte" />
+                <rom name="061-c2.bin" size="2097152" crc="c3be42ae" sha1="7fa65538bd0a0a162e4d3e9f49913da59d915e02" offset="000001" loadflag="load16_byte" />
+                <rom name="061-c3.bin" size="2097152" crc="2a7b98b9" sha1="75e1019dca8a8583afcc53651ac856cba3a96315" offset="400000" loadflag="load16_byte" />
+                <rom name="061-c4.bin" size="2097152" crc="c0be9a1f" sha1="228f41eaefdf3e147761f8ef849e3b5f321877d4" offset="400001" loadflag="load16_byte" />
 			</dataarea>
 		</part>
 	</software>
