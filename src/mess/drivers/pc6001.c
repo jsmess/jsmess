@@ -1,7 +1,6 @@
-/*********************************************************************************
+/*******************************************************************************************************************************************************
 
-    NEC PC-6001 series
-    NEC PC-6600 series
+    PC-6001 series (c) 1981 NEC
 
     preliminary driver by Angelo Salese
 
@@ -11,7 +10,7 @@
     - cassette handling requires a decap of the MCU. It could be possible to
       do some tight synch between the master CPU and a code simulation,but I think
       it's not worth the effort...
-    - many games won't boot, check why;
+	- joypad polling probably needs some kind of masking when you're on BASIC.
     - make the later model to work;
     - Currently rewriting the video part without the MC6847 for two reasons:
         A) the later models have a custom video chip in the place of the MC6847,
@@ -20,8 +19,7 @@
            have any docs atm.
 
 	TODO (game specific):
-	- 3D Asteroid Fire (and others): inputs doesn't work during gameplay;
-	- Arm Wrestling: returns an "?OM Error" during loading, it seems to be a N66
+	- Arm Wrestling (PD): returns an "?OM Error" during loading, it seems to be a N66
 	  BASIC -> PC-6001Mk2 game actually;
 
 ==================================================================================
@@ -79,21 +77,30 @@
 
 ==================================================================================
 
-irq vector 00: writes 0x00 to [$fa19]
-irq vector 02: (A = 0, B = 0) tests ppi port c, does something with ay ports (plus more?) ;keyboard data ready, no kanji lock, no caps lock
-irq vector 04: uart irq
-irq vector 06: operates with $fa28, $fa2e, $fd1b ;hblank? joypad irq?
-irq vector 08: tests ppi port c, puts port A to $fa1d,puts 0x02 to [$fa19] ;tape data ready
-irq vector 0A: writes 0x00 to [$fa19]
-irq vector 0C: writes 0x00 to [$fa19]
-irq vector 0E: same as 2, (A = 0x03, B = 0x00) ;? any press has the same effect as enter pressed twice, break input?
-irq vector 10: same as 2, (A = 0x03, B = 0x00)
-irq vector 12: writes 0x10 to [$fa19] ;end of tape reached
-irq vector 14: same as 2, (A = 0x00, B = 0x01) ;kanji lock enabled
-irq vector 16: tests ppi port c, writes the result to $feca. ;vblank
+PC-6001 irq table:
+irq vector 0x00: writes 0x00 to [$fa19]													  	;(unused)
+irq vector 0x02: (A = 0, B = 0) tests ppi port c, does something with ay ports (plus more?) ;keyboard data ready, no kanji lock, no caps lock
+irq vector 0x04: 																			;uart irq
+irq vector 0x06: operates with $fa28, $fa2e, $fd1b 											;timer irq
+irq vector 0x08: tests ppi port c, puts port A to $fa1d,puts 0x02 to [$fa19] 				;tape data ready
+irq vector 0x0a: writes 0x00 to [$fa19]														;(unused)
+irq vector 0x0c: writes 0x00 to [$fa19]														;(unused)
+irq vector 0x0e: same as 2, (A = 0x03, B = 0x00) 											;keyboard data ready, unknown type
+irq vector 0x10: same as 2, (A = 0x03, B = 0x00)											;(unused)
+irq vector 0x12: writes 0x10 to [$fa19] 													;end of tape reached
+irq vector 0x14: same as 2, (A = 0x00, B = 0x01) 											;kanji lock enabled
+irq vector 0x16: tests ppi port c, writes the result to $feca. 								;joystick
+irq vector 0x18: 																			;TVR (?)
+irq vector 0x1a: 																			;Date
+irq vector 0x1c: 																			;(unused)
+irq vector 0x1e: 																			;(unused)
+irq vector 0x20: 																			;voice
+irq vector 0x22: 																			;VRTC (?)
+irq vector 0x24: 																			;(unused)
+irq vector 0x26: 																			;(unused)
 
 
-*********************************************************************************/
+*******************************************************************************************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -352,7 +359,7 @@ static WRITE8_HANDLER ( pc6001_system_latch_w )
 	}
 
 	sys_latch = data;
-	printf("%02x\n",data);
+	//printf("%02x\n",data);
 }
 
 #if 0
@@ -385,29 +392,51 @@ static UINT8 pc6001_get_char_rom(running_machine *machine, UINT8 ch, int line)
 
 static UINT8 port_c_8255,cur_keycode;
 
-static READ8_DEVICE_HANDLER(nec_ppi8255_r) {
-	if (offset==2) {
-		return port_c_8255;
+static READ8_DEVICE_HANDLER(nec_ppi8255_r)
+{
+	//printf("%02x R\n",offset);
+	static UINT8 test;
+
+	if(input_code_pressed_once(device->machine,KEYCODE_Z))
+		test^=1;
+
+	if(test)
+	{
+		static int test2;
+
+		if(input_code_pressed_once(device->machine,KEYCODE_A))
+			test2++;
+		if(input_code_pressed_once(device->machine,KEYCODE_S))
+			test2--;
+
+		cur_keycode = test2;
+		popmessage("%02x",test2);
 	}
+
+	if (offset==2)
+		return port_c_8255;
 	else if(offset==0)
 	{
 		UINT8 res;
 		res = cur_keycode;
-		cur_keycode = 0;
+		//cur_keycode = 0;
 		return res;
 	}
-	else {
-		return i8255a_r(device,offset);
-	}
+
+	return i8255a_r(device,offset);
 }
 
-static WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
-	if (offset==3) {
-		if(data & 1) {
+static WRITE8_DEVICE_HANDLER(nec_ppi8255_w)
+{
+//	printf("%02x %02x W\n",offset,data);
+
+	if (offset==3)
+	{
+		if(data & 1)
 			port_c_8255 |=   1<<((data>>1)&0x07);
-		} else {
+		else
 			port_c_8255 &= ~(1<<((data>>1)&0x07));
-		}
+
 		switch(data) {
         	case 0x08: port_c_8255 |= 0x88; break;
         	case 0x09: port_c_8255 &= 0xf7; break;
@@ -415,6 +444,7 @@ static WRITE8_DEVICE_HANDLER(nec_ppi8255_w) {
         	case 0x0d: port_c_8255 &= 0xf7; break;
         	default: break;
 		}
+
 		port_c_8255 |= 0xa8;
 
 		{
@@ -737,8 +767,8 @@ static READ8_DEVICE_HANDLER (pc6001_8255_porta_r )
 
 static WRITE8_DEVICE_HANDLER (pc6001_8255_porta_w )
 {
-	if(data != 0x06)
-		printf("pc6001_8255_porta_w %02x\n",data);
+//	if(data != 0x06)
+//		printf("pc6001_8255_porta_w %02x\n",data);
 }
 
 static READ8_DEVICE_HANDLER (pc6001_8255_portb_r )
@@ -831,6 +861,35 @@ static UINT8 check_keyboard_press(running_machine *machine)
 	return 0;
 }
 
+static UINT8 check_joy_press(running_machine *machine)
+{
+	/* check joycode */
+	{
+		UINT8 p1_key = input_port_read(machine,"P1") ^ 0xff;
+
+		popmessage("%02x",p1_key);
+
+		/*
+			PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+			PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+			PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+			PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+			PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+			PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+			PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+			PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+		*/
+
+		if(p1_key & 0x01) return 0x64; //up
+		if(p1_key & 0x02) return 0x68; //down
+		if(p1_key & 0x04) return 0x60; //left
+		if(p1_key & 0x08) return 0x70; //right
+		if(p1_key & 0x10) return 0x80; //fire
+	}
+
+	return 0;
+}
+
 static TIMER_CALLBACK(cassette_callback)
 {
 	if(cas_switch == 1)
@@ -889,6 +948,7 @@ static TIMER_CALLBACK(keyboard_callback)
 	UINT32 key2 = input_port_read(machine,"key2");
 	UINT32 key3 = input_port_read(machine,"key3");
 	static UINT32 old_key1,old_key2,old_key3;
+//	UINT8 p1_key = input_port_read(machine, "P1");;
 
 	if(cas_switch == 0)
 	{
@@ -900,6 +960,15 @@ static TIMER_CALLBACK(keyboard_callback)
 			old_key1 = key1;
 			old_key2 = key2;
 			old_key3 = key3;
+		}
+		else /* joypad polling */
+		{
+			cur_keycode = check_joy_press(space->machine);
+			if(cur_keycode)
+			{
+				irq_vector = 0x02;
+				cputag_set_input_line(machine,"maincpu", 0, ASSERT_LINE);
+			}
 		}
 	}
 }
