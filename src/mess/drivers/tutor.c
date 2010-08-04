@@ -196,6 +196,14 @@ static DRIVER_INIT(tutor)
 	memory_set_bank(machine, "bank1", 0);
 }
 
+
+static DRIVER_INIT(pyuuta)
+{
+	DRIVER_INIT_CALL(tutor);
+	memory_set_bank(machine, "bank1", 1);
+}
+
+
 static const TMS9928a_interface tms9929a_interface =
 {
 	TMS9929A,
@@ -723,5 +731,5 @@ ROM_END
 
 /*      YEAR    NAME    PARENT      COMPAT  MACHINE     INPUT   INIT    COMPANY     FULLNAME */
 COMP(	1983?,	tutor,	0,			0,		tutor,		tutor,	tutor,	"Tomy",		"Tomy Tutor" , 0)
-COMP(	1982,	pyuuta,	tutor,		0,		tutor,		tutor,	tutor,	"Tomy",		"Tomy Pyuuta" , 0)
+COMP(	1982,	pyuuta,	tutor,		0,		tutor,		tutor,	pyuuta,	"Tomy",		"Tomy Pyuuta" , 0)
 
