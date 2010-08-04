@@ -21,6 +21,9 @@
 	TODO (game specific):
 	- Arm Wrestling (PD): returns an "?OM Error" during loading, it seems to be a N66
 	  BASIC -> PC-6001Mk2 game actually;
+	- The Outlaw (AX-10): is now broken due of the joycode stuff
+	- Portpia: hangs after a bunch of text screens
+	- Galaxy Mission Part I / II: can't start a play
 
 ==================================================================================
 
@@ -888,7 +891,7 @@ static UINT8 check_joy_press(running_machine *machine)
 		case 0x06: joy_press = 0x28; break; //down-left
 		case 0x08: joy_press = 0x10; break; //right
 		case 0x09: joy_press = 0x14; break; //up-right
-		case 0x0a: joy_press = 0x18; break;//down-right
+		case 0x0a: joy_press = 0x18; break; //down-right
 	}
 
 	if(p1_key & 0x10) { joy_press |= 0x80; } //button 1 (space?)
