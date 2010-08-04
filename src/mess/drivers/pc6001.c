@@ -622,7 +622,7 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -632,7 +632,7 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -863,11 +863,8 @@ static UINT8 check_keyboard_press(running_machine *machine)
 
 static UINT8 check_joy_press(running_machine *machine)
 {
-	/* check joycode */
-	{
-		UINT8 p1_key = input_port_read(machine,"P1") ^ 0xff;
-
-		popmessage("%02x",p1_key);
+	UINT8 p1_key = input_port_read(machine,"P1") ^ 0xff;
+	static UINT8 joy_press;
 
 		/*
 			PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -880,14 +877,24 @@ static UINT8 check_joy_press(running_machine *machine)
 			PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 		*/
 
-		if(p1_key & 0x01) return 0x64; //up
-		if(p1_key & 0x02) return 0x68; //down
-		if(p1_key & 0x04) return 0x60; //left
-		if(p1_key & 0x08) return 0x70; //right
-		if(p1_key & 0x10) return 0x80; //fire
+	joy_press = 0;
+
+	switch(p1_key & 0xf)
+	{
+		case 0x01: joy_press = 0x04; break; //up
+		case 0x02: joy_press = 0x08; break; //down
+		case 0x04: joy_press = 0x20; break;
+		case 0x05: joy_press = 0x24; break; //up-left
+		case 0x06: joy_press = 0x28; break; //down-left
+		case 0x08: joy_press = 0x10; break; //right
+		case 0x09: joy_press = 0x14; break; //up-right
+		case 0x0a: joy_press = 0x18; break;//down-right
 	}
 
-	return 0;
+	if(p1_key & 0x10) { joy_press |= 0x80; } //button 1 (space?)
+	if(p1_key & 0x20) { joy_press |= 0x01; } //button 2 (shift)
+
+	return joy_press;
 }
 
 static TIMER_CALLBACK(cassette_callback)
