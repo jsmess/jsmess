@@ -397,25 +397,6 @@ static UINT8 port_c_8255,cur_keycode;
 
 static READ8_DEVICE_HANDLER(nec_ppi8255_r)
 {
-	//printf("%02x R\n",offset);
-	static UINT8 test;
-
-	if(input_code_pressed_once(device->machine,KEYCODE_Z))
-		test^=1;
-
-	if(test)
-	{
-		static int test2;
-
-		if(input_code_pressed_once(device->machine,KEYCODE_A))
-			test2++;
-		if(input_code_pressed_once(device->machine,KEYCODE_S))
-			test2--;
-
-		cur_keycode = test2;
-		popmessage("%02x",test2);
-	}
-
 	if (offset==2)
 		return port_c_8255;
 	else if(offset==0)
@@ -431,8 +412,6 @@ static READ8_DEVICE_HANDLER(nec_ppi8255_r)
 
 static WRITE8_DEVICE_HANDLER(nec_ppi8255_w)
 {
-//	printf("%02x %02x W\n",offset,data);
-
 	if (offset==3)
 	{
 		if(data & 1)
