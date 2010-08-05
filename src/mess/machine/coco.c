@@ -600,7 +600,7 @@ static int load_pak_into_region(device_image_interface &image, int *pakbase, int
 
 static void pak_load_trailer(running_machine *machine, const pak_decodedtrailer *trailer)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 
 	cpu_set_reg(machine->device("maincpu"), M6809_PC, trailer->reg_pc);
 	cpu_set_reg(machine->device("maincpu"), M6809_X, trailer->reg_x);
@@ -909,7 +909,7 @@ enum
 
 static void d_recalc_irq(running_machine *machine)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 	UINT8 pia0_irq_a = pia6821_get_irq_a(state->pia_0);
 	UINT8 pia0_irq_b = pia6821_get_irq_b(state->pia_0);
 
@@ -921,7 +921,7 @@ static void d_recalc_irq(running_machine *machine)
 
 static void d_recalc_firq(running_machine *machine)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 	UINT8 pia1_firq_a = pia6821_get_irq_a(state->pia_1);
 	UINT8 pia1_firq_b = pia6821_get_irq_b(state->pia_1);
 	UINT8 pia2_firq_a = (state->pia_2 != NULL) ? pia6821_get_irq_a(state->pia_2) : 0x00;
@@ -1036,7 +1036,7 @@ static void coco3_raise_interrupt(running_machine *machine, UINT8 mask, int stat
 
 void coco3_horizontal_sync_callback(running_machine *machine,int data)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 	pia6821_ca1_w(state->pia_0, data);
 	coco3_raise_interrupt(machine, COCO3_INT_HBORD, data);
 }
@@ -1045,7 +1045,7 @@ void coco3_horizontal_sync_callback(running_machine *machine,int data)
 
 void coco3_field_sync_callback(running_machine *machine,int data)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 	pia6821_cb1_w(state->pia_0, data);
 }
 
@@ -1175,31 +1175,31 @@ static int coco_hiresjoy_ry( running_machine *machine )
 
 static running_device *cassette_device_image(running_machine *machine)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 	return state->cassette_device;
 }
 
 static running_device *bitbanger_image(running_machine *machine)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 	return state->bitbanger_device;
 }
 
 static running_device *printer_image(running_machine *machine)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 	return state->printer_device;
 }
 
 static running_device *cococart_device(running_machine *machine)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 	return state->cococart_device;
 }
 
 static int get_soundmux_status(running_machine *machine)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 
 	int soundmux_status = 0;
 	if (pia6821_get_output_cb2(state->pia_1))
@@ -1242,7 +1242,7 @@ static void soundmux_update(running_machine *machine)
 
 static void coco_sound_update(running_machine *machine)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 
 	/* Call this function whenever you need to update the sound. It will
      * automatically mute any devices that are switched out.
@@ -1356,7 +1356,7 @@ static attotime get_relative_time( running_machine *machine, attotime absolute_t
 
 static UINT8 coco_update_keyboard( running_machine *machine )
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 	UINT8 porta = 0x7f, port_za = 0x7f;
 	int joyval;
 	static const int joy_rat_table[] = {15, 24, 42, 33 };
@@ -1542,7 +1542,7 @@ static void printer_out_coco(running_machine *machine, int data)
 /* Printer output for the Dragon, output to Paralel port */
 static void printer_out_dragon(running_machine *machine, int data)
 {
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 
 	/* If strobe bit is high send data from pia0 port b to dragon parallel printer */
 	if (data & 0x02)
@@ -1735,7 +1735,7 @@ static void dragon_page_rom(running_machine *machine, int romswitch)
 /* The NMI line on the alphaAlpha is gated through IC16 (early PLD), and is gated by pia2 CA2  */
 static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_intrq_w )
 {
-	coco_state *cstate = (coco_state *)device->machine->driver_data;
+	coco_state *cstate = device->machine->driver_data<coco_state>();
 
 	if (state)
 	{
@@ -1757,7 +1757,7 @@ static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_intrq_w )
 /* for pia1 cb1 */
 static WRITE_LINE_DEVICE_HANDLER( dgnalpha_fdc_drq_w )
 {
-	coco_state *cstate = (coco_state *)device->machine->driver_data;
+	coco_state *cstate = device->machine->driver_data<coco_state>();
 	pia6821_cb1_w(cstate->pia_2, state ? CARTLINE_ASSERTED : CARTLINE_CLEAR);
 }
 
@@ -1839,7 +1839,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pa_r )
 
 static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco )
 {
-	coco_state *state = (coco_state *)device->machine->driver_data;
+	coco_state *state = device->machine->driver_data<coco_state>();
 
 	/* This handles the reading of the memory sense switch (pb2) for the CoCo 1,
      * and serial-in (pb0). Serial-in not yet implemented. */
@@ -1883,7 +1883,7 @@ static READ8_DEVICE_HANDLER ( d_pia1_pb_r_dragon32 )
 
 static READ8_DEVICE_HANDLER ( d_pia1_pb_r_coco2 )
 {
-	coco_state *state = (coco_state *)device->machine->driver_data;
+	coco_state *state = device->machine->driver_data<coco_state>();
 
 	/* This handles the reading of the memory sense switch (pb2) for the CoCo 2 and 3,
      * and serial-in (pb0). Serial-in not yet implemented.
@@ -2034,7 +2034,7 @@ static void setup_memory_map(running_machine *machine)
 
 	/* We need to init these vars from the sam, as this may be called from outside the sam callbacks */
 	const address_space *space = cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM );
-	coco_state *state = (coco_state *)machine->driver_data;
+	coco_state *state = machine->driver_data<coco_state>();
 	UINT8 memsize	= sam6883_memorysize(state->sam);
 	UINT8 maptype	= sam6883_maptype(state->sam);
 	//UINT8 pagemode  = sam6883_pagemode(machine);
@@ -2711,7 +2711,7 @@ static SAM6883_SET_MAP_TYPE( coco3_sam_set_maptype )
 
 void coco_cart_w(running_device *device, int data)
 {
-	coco_state *state = (coco_state *)device->machine->driver_data;
+	coco_state *state = device->machine->driver_data<coco_state>();
 	pia6821_cb1_w(state->pia_1, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -2783,7 +2783,7 @@ struct _machine_init_interface
 /* for everything except the coco3, so it made sense not to pass it as a parameter */
 static void generic_init_machine(running_machine *machine, const machine_init_interface *init)
 {
-	coco_state *state = (coco_state *)(coco_state *) machine->driver_data;
+	coco_state *state = (coco_state *) machine->driver_data<coco_state>();
 
 	/* locate devices */
 	state->cococart_device	= machine->device("coco_cartslot");

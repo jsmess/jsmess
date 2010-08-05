@@ -84,7 +84,7 @@ static WRITE8_HANDLER( enable_w )
 
     */
 
-	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+	tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
 
 	/* keyboard enable */
 	state->kben = BIT(data, 0);
@@ -128,7 +128,7 @@ static WRITE8_HANDLER( dma_mux_w )
 
     */
 
-	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+	tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
 
 	state->dma_mux = data;
 
@@ -181,7 +181,7 @@ static WRITE8_HANDLER( addr_ctrl_w )
 
     */
 
-	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+	tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
 
 	/* video access */
 	state->vram_base = data << 15;
@@ -215,7 +215,7 @@ static WRITE8_HANDLER( addr_ctrl_w )
 //
 //    */
 //
-//	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+//	tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
 //
 //	UINT8 data = 0xff;
 //
@@ -252,7 +252,7 @@ static WRITE8_HANDLER( addr_ctrl_w )
 //
 //    */
 //
-//	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+//	tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
 //
 //	/* keyboard row select */
 //	state->keylatch = (state->keylatch & 0xff00) | data;
@@ -275,7 +275,7 @@ static WRITE8_HANDLER( addr_ctrl_w )
 //
 //    */
 //
-//	tandy2k_state *state = (tandy2k_state *)space->machine->driver_data;
+//	tandy2k_state *state = space->machine->driver_data<tandy2k_state>();
 //
 //	/* keyboard row select */
 //	state->keylatch = ((data & 0x0f) << 8) | (state->keylatch & 0xff);
@@ -453,7 +453,7 @@ INPUT_PORTS_END
 
 static VIDEO_START( tandy2k )
 {
-	tandy2k_state *state = (tandy2k_state *)machine->driver_data;
+	tandy2k_state *state = machine->driver_data<tandy2k_state>();
 
 	/* find devices */
 	state->vpac = machine->device(CRT9007_TAG);
@@ -461,7 +461,7 @@ static VIDEO_START( tandy2k )
 
 static VIDEO_UPDATE( tandy2k )
 {
-	tandy2k_state *state = (tandy2k_state *)screen->machine->driver_data;
+	tandy2k_state *state = screen->machine->driver_data<tandy2k_state>();
 
 	//if (state->vidouts)
 	{
@@ -473,7 +473,7 @@ static VIDEO_UPDATE( tandy2k )
 
 static CRT9007_DRAW_SCANLINE( tandy2k_crt9007_display_pixels )
 {
-	tandy2k_state *state = (tandy2k_state *)device->machine->driver_data;
+	tandy2k_state *state = device->machine->driver_data<tandy2k_state>();
 	const address_space *program = cputag_get_address_space(device->machine, I80186_TAG, ADDRESS_SPACE_PROGRAM);
 
 	for (int sx = 0; sx < x_count; sx++)
@@ -512,7 +512,7 @@ static CRT9007_INTERFACE( crt9007_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( rxrdy_w )
 {
-	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
+	tandy2k_state *driver_state = device->machine->driver_data<tandy2k_state>();
 
 	driver_state->rxrdy = state;
 	pic8259_ir2_w(driver_state->pic0, driver_state->rxrdy | driver_state->txrdy);
@@ -520,7 +520,7 @@ static WRITE_LINE_DEVICE_HANDLER( rxrdy_w )
 
 static WRITE_LINE_DEVICE_HANDLER( txrdy_w )
 {
-	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
+	tandy2k_state *driver_state = device->machine->driver_data<tandy2k_state>();
 
 	driver_state->txrdy = state;
 	pic8259_ir2_w(driver_state->pic0, driver_state->rxrdy | driver_state->txrdy);
@@ -537,7 +537,7 @@ static const msm8251_interface i8251_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( outspkr_w )
 {
-	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
+	tandy2k_state *driver_state = device->machine->driver_data<tandy2k_state>();
 
 	driver_state->outspkr = state;
 	speaker_update(driver_state);
@@ -545,7 +545,7 @@ static WRITE_LINE_DEVICE_HANDLER( outspkr_w )
 
 static WRITE_LINE_DEVICE_HANDLER( intbrclk_w )
 {
-	tandy2k_state *driver_state = (tandy2k_state *)device->machine->driver_data;
+	tandy2k_state *driver_state = device->machine->driver_data<tandy2k_state>();
 
 	if (!driver_state->extclk && state)
 	{
@@ -603,7 +603,7 @@ static READ8_DEVICE_HANDLER( ppi_pb_r )
 
     */
 
-	tandy2k_state *state = (tandy2k_state *)device->machine->driver_data;
+	tandy2k_state *state = device->machine->driver_data<tandy2k_state>();
 
 	UINT8 data = 0;
 
@@ -656,7 +656,7 @@ static WRITE8_DEVICE_HANDLER( ppi_pc_w )
 
     */
 
-	tandy2k_state *state = (tandy2k_state *)device->machine->driver_data;
+	tandy2k_state *state = device->machine->driver_data<tandy2k_state>();
 
 	/* input select */
 	state->pb_sel = (data >> 1) & 0x03;
@@ -761,7 +761,7 @@ static const centronics_interface centronics_intf =
 
 static MACHINE_START( tandy2k )
 {
-	tandy2k_state *state = (tandy2k_state *)machine->driver_data;
+	tandy2k_state *state = machine->driver_data<tandy2k_state>();
 
 	/* find devices */
 	state->uart = machine->device(I8251A_TAG);

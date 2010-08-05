@@ -42,7 +42,7 @@
 static void atarist_fdc_dma_transfer(running_machine *machine)
 {
 	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	if ((state->fdc_mode & ATARIST_FLOPPY_MODE_DMA_DISABLE) == 0)
 	{
@@ -83,14 +83,14 @@ static void atarist_fdc_dma_transfer(running_machine *machine)
 
 static WRITE_LINE_DEVICE_HANDLER( atarist_fdc_intrq_w )
 {
-	atarist_state *driver_state = (atarist_state *)device->machine->driver_data;
+	atarist_state *driver_state = device->machine->driver_data<atarist_state>();
 
 	driver_state->fdc_irq = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( atarist_fdc_drq_w )
 {
-	atarist_state *driver_state = (atarist_state *)device->machine->driver_data;
+	atarist_state *driver_state = device->machine->driver_data<atarist_state>();
 
 	if (state)
 	{
@@ -121,7 +121,7 @@ static const wd17xx_interface stbook_fdc_intf =
 
 static READ16_HANDLER( atarist_fdc_data_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
 	{
@@ -145,7 +145,7 @@ static READ16_HANDLER( atarist_fdc_data_r )
 
 static WRITE16_HANDLER( atarist_fdc_data_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if (state->fdc_mode & ATARIST_FLOPPY_MODE_SECTOR_COUNT)
 	{
@@ -176,14 +176,14 @@ static WRITE16_HANDLER( atarist_fdc_data_w )
 
 static READ16_HANDLER( atarist_fdc_dma_status_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->fdc_status;
 }
 
 static WRITE16_HANDLER( atarist_fdc_dma_mode_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if ((data & ATARIST_FLOPPY_MODE_WRITE) != (state->fdc_mode & ATARIST_FLOPPY_MODE_WRITE))
 	{
@@ -196,7 +196,7 @@ static WRITE16_HANDLER( atarist_fdc_dma_mode_w )
 
 static READ16_HANDLER( atarist_fdc_dma_base_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -213,7 +213,7 @@ static READ16_HANDLER( atarist_fdc_dma_base_r )
 
 static WRITE16_HANDLER( atarist_fdc_dma_base_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -235,14 +235,14 @@ static WRITE16_HANDLER( atarist_fdc_dma_base_w )
 
 static READ16_HANDLER( atarist_mmu_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->mmu;
 }
 
 static WRITE16_HANDLER( atarist_mmu_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->mmu = data & 0xff;
 }
@@ -269,7 +269,7 @@ static READ8_HANDLER( ikbd_port1_r )
 
     */
 
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->ikbd_keylatch;
 }
@@ -288,7 +288,7 @@ static READ8_HANDLER( ikbd_port2_r )
 
     */
 
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return (state->ikbd_tx << 3) | (input_port_read_safe(space->machine, "IKBD_JOY1", 0xff) & 0x06);
 }
@@ -307,7 +307,7 @@ static WRITE8_HANDLER( ikbd_port2_w )
 
     */
 
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->ikbd_rx = (data & 0x10) >> 4;
 }
@@ -329,7 +329,7 @@ static WRITE8_HANDLER( ikbd_port3_w )
 
     */
 
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	set_led_status(space->machine, 1, data & 0x01);
 
@@ -359,7 +359,7 @@ static READ8_HANDLER( ikbd_port4_r )
 
     */
 
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if (input_port_read(space->machine, "config") & 0x01)
 	{
@@ -442,7 +442,7 @@ static WRITE8_HANDLER( ikbd_port4_w )
 
     */
 
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if (~data & 0x01) state->ikbd_keylatch = input_port_read(space->machine, "P40");
 	if (~data & 0x02) state->ikbd_keylatch = input_port_read(space->machine, "P41");
@@ -460,7 +460,7 @@ static const int DMASOUND_RATE[] = { Y2/640/8, Y2/640/4, Y2/640/2, Y2/640 };
 
 static void atariste_dmasound_set_state(running_machine *machine, int level)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	state->dmasnd_active = level;
 	mc68901_tai_w(state->mc68901, level);
@@ -478,7 +478,7 @@ static void atariste_dmasound_set_state(running_machine *machine, int level)
 
 static TIMER_CALLBACK( atariste_dmasound_tick )
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	if (state->dmasnd_samples == 0)
 	{
@@ -528,14 +528,14 @@ static TIMER_CALLBACK( atariste_dmasound_tick )
 
 static READ16_HANDLER( atariste_sound_dma_control_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->dmasnd_ctrl;
 }
 
 static READ16_HANDLER( atariste_sound_dma_base_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -552,7 +552,7 @@ static READ16_HANDLER( atariste_sound_dma_base_r )
 
 static READ16_HANDLER( atariste_sound_dma_counter_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -569,7 +569,7 @@ static READ16_HANDLER( atariste_sound_dma_counter_r )
 
 static READ16_HANDLER( atariste_sound_dma_end_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -586,14 +586,14 @@ static READ16_HANDLER( atariste_sound_dma_end_r )
 
 static READ16_HANDLER( atariste_sound_mode_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->dmasnd_mode;
 }
 
 static WRITE16_HANDLER( atariste_sound_dma_control_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->dmasnd_ctrl = data & 0x03;
 
@@ -614,7 +614,7 @@ static WRITE16_HANDLER( atariste_sound_dma_control_w )
 
 static WRITE16_HANDLER( atariste_sound_dma_base_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -637,7 +637,7 @@ static WRITE16_HANDLER( atariste_sound_dma_base_w )
 
 static WRITE16_HANDLER( atariste_sound_dma_end_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -660,7 +660,7 @@ static WRITE16_HANDLER( atariste_sound_dma_end_w )
 
 static WRITE16_HANDLER( atariste_sound_mode_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->dmasnd_mode = data & 0x8f;
 }
@@ -669,7 +669,7 @@ static WRITE16_HANDLER( atariste_sound_mode_w )
 
 static void atariste_microwire_shift(running_machine *machine)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	if (BIT(state->mw_mask, 15))
 	{
@@ -687,7 +687,7 @@ static void atariste_microwire_shift(running_machine *machine)
 
 static TIMER_CALLBACK( atariste_microwire_tick )
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	switch (state->mw_shift)
 	{
@@ -711,14 +711,14 @@ static TIMER_CALLBACK( atariste_microwire_tick )
 
 static READ16_HANDLER( atariste_microwire_data_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->mw_data;
 }
 
 static WRITE16_HANDLER( atariste_microwire_data_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if (!timer_enabled(state->microwire_timer))
 	{
@@ -729,14 +729,14 @@ static WRITE16_HANDLER( atariste_microwire_data_w )
 
 static READ16_HANDLER( atariste_microwire_mask_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->mw_mask;
 }
 
 static WRITE16_HANDLER( atariste_microwire_mask_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if (!timer_enabled(state->microwire_timer))
 	{
@@ -748,14 +748,14 @@ static WRITE16_HANDLER( atariste_microwire_mask_w )
 
 static READ16_HANDLER( megaste_cache_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->megaste_cache;
 }
 
 static WRITE16_HANDLER( megaste_cache_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->megaste_cache = data;
 
@@ -1288,7 +1288,7 @@ INPUT_PORTS_END
 
 static WRITE8_DEVICE_HANDLER( ym2149_port_a_w )
 {
-	atarist_state *state = (atarist_state *)device->machine->driver_data;
+	atarist_state *state = device->machine->driver_data<atarist_state>();
 
 	wd17xx_set_side(state->wd1772, BIT(data, 0) ? 0 : 1);
 
@@ -1325,35 +1325,35 @@ static const ay8910_interface psg_intf =
 
 static READ_LINE_DEVICE_HANDLER( ikbd_rx )
 {
-	atarist_state *driver_state = (atarist_state *)device->machine->driver_data;
+	atarist_state *driver_state = device->machine->driver_data<atarist_state>();
 
 	return driver_state->ikbd_rx;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( ikbd_tx )
 {
-	atarist_state *driver_state = (atarist_state *)device->machine->driver_data;
+	atarist_state *driver_state = device->machine->driver_data<atarist_state>();
 
 	driver_state->ikbd_tx = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( midi_rx )
 {
-	atarist_state *driver_state = (atarist_state *)device->machine->driver_data;
+	atarist_state *driver_state = device->machine->driver_data<atarist_state>();
 
 	return driver_state->midi_rx;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( midi_tx )
 {
-	atarist_state *driver_state = (atarist_state *)device->machine->driver_data;
+	atarist_state *driver_state = device->machine->driver_data<atarist_state>();
 
 	driver_state->midi_tx = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( acia_interrupt )
 {
-	atarist_state *driver_state = (atarist_state *)device->machine->driver_data;
+	atarist_state *driver_state = device->machine->driver_data<atarist_state>();
 
 	driver_state->acia_irq = state;
 }
@@ -1384,7 +1384,7 @@ static ACIA6850_INTERFACE( acia_midi_intf )
 
 static IRQ_CALLBACK( atarist_int_ack )
 {
-	atarist_state *state = (atarist_state *)device->machine->driver_data;
+	atarist_state *state = device->machine->driver_data<atarist_state>();
 
 	if (irqline == M68K_IRQ_6)
 	{
@@ -1411,7 +1411,7 @@ static READ8_DEVICE_HANDLER( mfp_gpio_r )
 
     */
 
-	atarist_state *state = (atarist_state *)device->machine->driver_data;
+	atarist_state *state = device->machine->driver_data<atarist_state>();
 
 	UINT8 data = centronics_busy_r(state->centronics);
 
@@ -1435,7 +1435,7 @@ static WRITE8_DEVICE_HANDLER( mfp_tdo_w )
 
 static WRITE_LINE_DEVICE_HANDLER( mfp_so_w )
 {
-	atarist_state *driver_state = (atarist_state *)device->machine->driver_data;
+	atarist_state *driver_state = device->machine->driver_data<atarist_state>();
 
 	rs232_td_w(driver_state->rs232, device, state);
 }
@@ -1500,7 +1500,7 @@ static void atarist_configure_memory(running_machine *machine)
 
 static void atarist_state_save(running_machine *machine)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	state->fdc_status |= ATARIST_FLOPPY_STATUS_DMA_ERROR;
 
@@ -1526,7 +1526,7 @@ static void atarist_state_save(running_machine *machine)
 
 static MACHINE_START( atarist )
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	/* configure RAM banking */
 	atarist_configure_memory(machine);
@@ -1571,7 +1571,7 @@ static READ8_DEVICE_HANDLER( atariste_mfp_gpio_r )
 
     */
 
-	atarist_state *state = (atarist_state *)device->machine->driver_data;
+	atarist_state *state = device->machine->driver_data<atarist_state>();
 
 	UINT8 data = centronics_busy_r(state->centronics);
 
@@ -1603,7 +1603,7 @@ static MC68901_INTERFACE( atariste_mfp_intf )
 
 static void atariste_state_save(running_machine *machine)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	atarist_state_save(machine);
 
@@ -1624,7 +1624,7 @@ static void atariste_state_save(running_machine *machine)
 
 static MACHINE_START( atariste )
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	/* configure RAM banking */
 	atarist_configure_memory(machine);
@@ -1649,7 +1649,7 @@ static MACHINE_START( atariste )
 
 static MACHINE_START( megaste )
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	MACHINE_START_CALL(atariste);
 
@@ -1687,7 +1687,7 @@ static void stbook_configure_memory(running_machine *machine)
 
 static WRITE8_DEVICE_HANDLER( stbook_ym2149_port_a_w )
 {
-	atarist_state *state = (atarist_state *)device->machine->driver_data;
+	atarist_state *state = device->machine->driver_data<atarist_state>();
 
 	wd17xx_set_side(state->wd1772, (data & 0x01) ? 0 : 1);
 
@@ -1750,7 +1750,7 @@ static READ8_DEVICE_HANDLER( stbook_mfp_gpio_r )
 
     */
 
-	atarist_state *state = (atarist_state *)device->machine->driver_data;
+	atarist_state *state = device->machine->driver_data<atarist_state>();
 
 	UINT8 data = centronics_busy_r(state->centronics);
 
@@ -1781,7 +1781,7 @@ static MC68901_INTERFACE( stbook_mfp_intf )
 
 static MACHINE_START( stbook )
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	/* configure RAM banking */
 	stbook_configure_memory(machine);

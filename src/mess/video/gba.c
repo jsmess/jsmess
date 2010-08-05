@@ -1767,7 +1767,7 @@ void gba_draw_scanline(running_machine *machine, int y)
 	UINT16 *scanline = BITMAP_ADDR16(bitmap, y, 0);
 	int i, x;
 	static UINT32 xferscan[7][240+2048];	// up to 1024 pixels of slop on either side to allow easier clip handling
-	gba_state *state = (gba_state *)machine->driver_data;
+	gba_state *state = machine->driver_data<gba_state>();
 	UINT8 submode = 0;
 	int bpp = 0;
 

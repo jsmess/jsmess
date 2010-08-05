@@ -82,7 +82,7 @@ const struct pit8253_config mz800_pit8253_config =
 
 DRIVER_INIT( mz700 )
 {
-	mz_state *mz = (mz_state *)machine->driver_data;
+	mz_state *mz = machine->driver_data<mz_state>();
 	mz->mz700 = TRUE;
 	mz->mz700_mode = TRUE;
 
@@ -93,7 +93,7 @@ DRIVER_INIT( mz700 )
 
 DRIVER_INIT( mz800 )
 {
-	mz_state *mz = (mz_state *)machine->driver_data;
+	mz_state *mz = machine->driver_data<mz_state>();
 	mz->mz700 = FALSE;
 	mz->mz700_mode = FALSE;
 
@@ -108,7 +108,7 @@ DRIVER_INIT( mz800 )
 
 MACHINE_START( mz700 )
 {
-	mz_state *mz = (mz_state *)machine->driver_data;
+	mz_state *mz = machine->driver_data<mz_state>();
 
 	mz->pit = machine->device("pit8253");
 	mz->ppi = machine->device("ppi8255");
@@ -124,7 +124,7 @@ MACHINE_START( mz700 )
 
 static READ8_HANDLER( mz700_e008_r )
 {
-	mz_state *mz = (mz_state *)space->machine->driver_data;
+	mz_state *mz = space->machine->driver_data<mz_state>();
 	UINT8 data = 0;
 
 	data |= mz->other_timer;
@@ -138,7 +138,7 @@ static READ8_HANDLER( mz700_e008_r )
 
 static WRITE8_HANDLER( mz700_e008_w )
 {
-	mz_state *mz = (mz_state *)space->machine->driver_data;
+	mz_state *mz = space->machine->driver_data<mz_state>();
 	pit8253_gate0_w(mz->pit, BIT(data, 0));
 }
 
@@ -150,7 +150,7 @@ static WRITE8_HANDLER( mz700_e008_w )
 READ8_HANDLER( mz800_bank_0_r )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	mz_state *mz = (mz_state *)space->machine->driver_data;
+	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	/* switch in cgrom */
 	memory_install_read_bank(spc, 0x1000, 0x1fff, 0, 0, "bank2");
@@ -206,7 +206,7 @@ WRITE8_HANDLER( mz800_bank_0_w )
 READ8_HANDLER( mz800_bank_1_r )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	mz_state *mz = (mz_state *)space->machine->driver_data;
+	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	/* switch in ram from 0x1000 to 0x1fff */
 	memory_install_readwrite_bank(spc, 0x1000, 0x1fff, 0x1000, 0, "bank2");
@@ -231,7 +231,7 @@ READ8_HANDLER( mz800_bank_1_r )
 WRITE8_HANDLER( mz700_bank_1_w )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	mz_state *mz = (mz_state *)space->machine->driver_data;
+	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
 	{
@@ -267,7 +267,7 @@ WRITE8_HANDLER( mz700_bank_2_w )
 WRITE8_HANDLER( mz700_bank_3_w )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	mz_state *mz = (mz_state *)space->machine->driver_data;
+	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
 	{
@@ -314,7 +314,7 @@ WRITE8_HANDLER( mz700_bank_3_w )
 WRITE8_HANDLER( mz700_bank_4_w )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	mz_state *mz = (mz_state *)space->machine->driver_data;
+	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
 	{
@@ -371,7 +371,7 @@ WRITE8_HANDLER( mz700_bank_4_w )
 WRITE8_HANDLER( mz700_bank_5_w )
 {
 	const address_space *spc = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	mz_state *mz = (mz_state *)space->machine->driver_data;
+	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
 	{
@@ -389,7 +389,7 @@ WRITE8_HANDLER( mz700_bank_5_w )
 
 WRITE8_HANDLER( mz700_bank_6_w )
 {
-	mz_state *mz = (mz_state *)space->machine->driver_data;
+	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	if (mz->mz700_mode)
 	{
@@ -433,7 +433,7 @@ static WRITE_LINE_DEVICE_HANDLER( pit_out0_changed )
 /* timer 2 is the AM/PM (12 hour) interrupt */
 static WRITE_LINE_DEVICE_HANDLER( pit_irq_2 )
 {
-	mz_state *mz = (mz_state *)device->machine->driver_data;
+	mz_state *mz = device->machine->driver_data<mz_state>();
 
 	if (mz->intmsk)
 		cputag_set_input_line(device->machine, "maincpu", 0, ASSERT_LINE);
@@ -475,7 +475,7 @@ static READ8_DEVICE_HANDLER( pio_port_b_r )
 static READ8_DEVICE_HANDLER( pio_port_c_r )
 {
 	running_device *cas = device->machine->device("cassette");
-	mz_state *mz = (mz_state *)device->machine->driver_data;
+	mz_state *mz = device->machine->driver_data<mz_state>();
 	UINT8 data = 0;
 
 	/* note: this is actually connected to Q output of the motor-control flip-flop (see below) */
@@ -644,7 +644,7 @@ WRITE8_HANDLER( mz800_read_format_w )
  */
 WRITE8_HANDLER( mz800_display_mode_w )
 {
-	mz_state *mz = (mz_state *)space->machine->driver_data;
+	mz_state *mz = space->machine->driver_data<mz_state>();
 
 	mz->mz700_mode = BIT(data, 3);
 	mz->hires_mode = BIT(data, 2);

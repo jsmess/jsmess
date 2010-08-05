@@ -185,7 +185,7 @@ D6-D7 - not used. ( yet ? )
 
 static void scorpion_update_memory(running_machine *machine)
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -218,7 +218,7 @@ static void scorpion_update_memory(running_machine *machine)
 
 static DIRECT_UPDATE_HANDLER( scorpion_direct )
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 	running_device *beta = space->machine->device(BETA_DISK_TAG);
 	UINT16 pc = cpu_get_reg(space->machine->device("maincpu"), STATE_GENPCBASE);
 
@@ -249,7 +249,7 @@ static DIRECT_UPDATE_HANDLER( scorpion_direct )
 
 static TIMER_CALLBACK(nmi_check_callback)
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 
 	if ((input_port_read(machine, "NMI") & 1)==1)
 	{
@@ -261,7 +261,7 @@ static TIMER_CALLBACK(nmi_check_callback)
 
 static WRITE8_HANDLER(scorpion_port_7ffd_w)
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 
 	/* disable paging */
 	if (state->port_7ffd_data & 0x20)
@@ -276,7 +276,7 @@ static WRITE8_HANDLER(scorpion_port_7ffd_w)
 
 static WRITE8_HANDLER(scorpion_port_1ffd_w)
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 
 	/* if paging not disabled */
 	if ((state->port_7ffd_data & 0x20)==0)
@@ -303,7 +303,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( scorpion )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 	running_device *beta = machine->device(BETA_DISK_TAG);
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);

@@ -151,7 +151,7 @@ static READ8_DEVICE_HANDLER( kin_r )
 static READ8_DEVICE_HANDLER( petb_kin_r )
 {
 	UINT8 data = 0xff;
-	pet_state *state = (pet_state *)device->machine->driver_data;
+	pet_state *state = device->machine->driver_data<pet_state>();
 	static const char *const keynames[] = {
 		"ROW0", "ROW1", "ROW2", "ROW3", "ROW4",
 		"ROW5", "ROW6", "ROW7", "ROW8", "ROW9"
@@ -206,7 +206,7 @@ static WRITE8_DEVICE_HANDLER( cass1_motor_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia0_irq_w )
 {
-	pet_state *driver_state = (pet_state *)device->machine->driver_data;
+	pet_state *driver_state = device->machine->driver_data<pet_state>();
 
 	driver_state->pia0_irq = state;
 	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
@@ -293,7 +293,7 @@ static WRITE8_DEVICE_HANDLER( dav_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pia1_irq_w )
 {
-	pet_state *driver_state = (pet_state *)device->machine->driver_data;
+	pet_state *driver_state = device->machine->driver_data<pet_state>();
 
 	driver_state->pia1_irq = state;
 	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
@@ -425,7 +425,7 @@ static WRITE_LINE_DEVICE_HANDLER( gb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
 {
-	pet_state *driver_state = (pet_state *)device->machine->driver_data;
+	pet_state *driver_state = device->machine->driver_data<pet_state>();
 
 	driver_state->via_irq = state;
 	int level = (driver_state->pia0_irq | driver_state->pia1_irq | driver_state->via_irq) ? ASSERT_LINE : CLEAR_LINE;
@@ -697,7 +697,7 @@ static TIMER_CALLBACK( pet_tape2_timer )
 static void pet_common_driver_init( running_machine *machine )
 {
 	int i;
-	pet_state *state = (pet_state *)machine->driver_data;
+	pet_state *state = machine->driver_data<pet_state>();
 
 	pet_font = 0;
 
@@ -730,7 +730,7 @@ static void pet_common_driver_init( running_machine *machine )
 
 DRIVER_INIT( pet2001 )
 {
-	pet_state *state = (pet_state *)machine->driver_data;
+	pet_state *state = machine->driver_data<pet_state>();
 	pet_memory = messram_get_ptr(machine->device("messram"));
 	pet_common_driver_init(machine);
 	state->pet_basic1 = 1;
@@ -746,7 +746,7 @@ DRIVER_INIT( pet )
 
 DRIVER_INIT( pet80 )
 {
-	pet_state *state = (pet_state *)machine->driver_data;
+	pet_state *state = machine->driver_data<pet_state>();
 	pet_memory = memory_region(machine, "maincpu");
 
 	pet_common_driver_init(machine);
@@ -759,7 +759,7 @@ DRIVER_INIT( pet80 )
 
 DRIVER_INIT( superpet )
 {
-	pet_state *state = (pet_state *)machine->driver_data;
+	pet_state *state = machine->driver_data<pet_state>();
 	pet_memory = messram_get_ptr(machine->device("messram"));
 	pet_common_driver_init(machine);
 	state->superpet = 1;
@@ -774,7 +774,7 @@ DRIVER_INIT( superpet )
 
 MACHINE_RESET( pet )
 {
-	pet_state *state = (pet_state *)machine->driver_data;
+	pet_state *state = machine->driver_data<pet_state>();
 	running_device *ieeebus = machine->device("ieee_bus");
 	running_device *scapegoat = machine->device("pia_0");
 
@@ -820,7 +820,7 @@ MACHINE_RESET( pet )
 
 INTERRUPT_GEN( pet_frame_interrupt )
 {
-	pet_state *state = (pet_state *)device->machine->driver_data;
+	pet_state *state = device->machine->driver_data<pet_state>();
 	if (state->superpet)
 	{
 		if (input_port_read(device->machine, "CFG") & 0x04)

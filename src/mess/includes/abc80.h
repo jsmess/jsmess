@@ -51,12 +51,13 @@
 #define ABCBUS_TAG		"abcbus"
 #define CASSETTE_TAG	"cassette"
 
-class abc80_state
+class abc80_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, abc80_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, abc80_state(machine)); }
 
-	abc80_state(running_machine &machine) { }
+	abc80_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* keyboard state */
 	int key_data;

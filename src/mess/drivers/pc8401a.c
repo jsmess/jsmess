@@ -45,7 +45,7 @@ static UINT8 key_latch;
 
 static void pc8401a_keyboard_scan(running_machine *machine)
 {
-	pc8401a_state *state = (pc8401a_state *)machine->driver_data;
+	pc8401a_state *state = machine->driver_data<pc8401a_state>();
 	int row, strobe = 0;
 
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
@@ -190,7 +190,7 @@ static WRITE8_HANDLER( mmr_w )
 
     */
 
-	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 
 	if (data != state->mmr)
 	{
@@ -202,7 +202,7 @@ static WRITE8_HANDLER( mmr_w )
 
 static READ8_HANDLER( mmr_r )
 {
-	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 
 	return state->mmr;
 }
@@ -224,7 +224,7 @@ static READ8_HANDLER( rtc_r )
 
     */
 
-	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 
 	return (state->rtc_data << 1) | (state->rtc_tp << 2);
 }
@@ -246,7 +246,7 @@ static WRITE8_HANDLER( rtc_cmd_w )
 
     */
 
-	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 
 	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
 	upd1990a_c1_w(state->upd1990a, BIT(data, 1));
@@ -271,7 +271,7 @@ static WRITE8_HANDLER( rtc_ctrl_w )
 
     */
 
-	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 
 	upd1990a_oe_w(state->upd1990a, BIT(data, 0));
 	upd1990a_stb_w(state->upd1990a, BIT(data, 1));
@@ -280,7 +280,7 @@ static WRITE8_HANDLER( rtc_ctrl_w )
 
 static READ8_HANDLER( io_rom_data_r )
 {
-	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 
 	UINT8 *iorom = memory_region(space->machine, "iorom");
 
@@ -291,7 +291,7 @@ static READ8_HANDLER( io_rom_data_r )
 
 static WRITE8_HANDLER( io_rom_addr_w )
 {
-	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 
 	switch (offset)
 	{
@@ -330,7 +330,7 @@ static READ8_HANDLER( port70_r )
 
     */
 
-	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 
 	return 0x10 | state->key_strobe;
 }
@@ -342,7 +342,7 @@ static READ8_HANDLER( port71_r )
 
 static WRITE8_HANDLER( port70_w )
 {
-	pc8401a_state *state = (pc8401a_state *)space->machine->driver_data;
+	pc8401a_state *state = space->machine->driver_data<pc8401a_state>();
 
 	state->key_strobe = 0;
 }
@@ -513,7 +513,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( pc8401a )
 {
-	pc8401a_state *state = (pc8401a_state *)machine->driver_data;
+	pc8401a_state *state = machine->driver_data<pc8401a_state>();
 
 	/* find devices */
 	state->upd1990a = machine->device(UPD1990A_TAG);
@@ -605,14 +605,14 @@ static I8255A_INTERFACE( pc8401a_8255_interface )
 
 static WRITE_LINE_DEVICE_HANDLER( pc8401a_upd1990a_data_w )
 {
-	pc8401a_state *driver_state = (pc8401a_state *)device->machine->driver_data;
+	pc8401a_state *driver_state = device->machine->driver_data<pc8401a_state>();
 
 	driver_state->rtc_data = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( pc8401a_upd1990a_tp_w )
 {
-	pc8401a_state *driver_state = (pc8401a_state *)device->machine->driver_data;
+	pc8401a_state *driver_state = device->machine->driver_data<pc8401a_state>();
 
 	driver_state->rtc_tp = state;
 }

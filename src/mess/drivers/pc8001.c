@@ -55,7 +55,7 @@ static WRITE8_HANDLER( port30_w )
 
     */
 
-	pc8001_state *state = (pc8001_state *)space->machine->driver_data;
+	pc8001_state *state = space->machine->driver_data<pc8001_state>();
 
 	/* characters per line */
 	state->width80 = BIT(data, 0);
@@ -309,7 +309,7 @@ static PALETTE_INIT( pc8001 )
 
 static VIDEO_START( pc8001 )
 {
-	pc8001_state *state = (pc8001_state *)machine->driver_data;
+	pc8001_state *state = machine->driver_data<pc8001_state>();
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, "chargen");
@@ -317,7 +317,7 @@ static VIDEO_START( pc8001 )
 
 static VIDEO_UPDATE( pc8001 )
 {
-	pc8001_state *state = (pc8001_state *)screen->machine->driver_data;
+	pc8001_state *state = screen->machine->driver_data<pc8001_state>();
 
 	upd3301_update(state->upd3301, bitmap, cliprect);
 
@@ -328,7 +328,7 @@ static VIDEO_UPDATE( pc8001 )
 
 static UPD3301_DISPLAY_PIXELS( pc8001_display_pixels )
 {
-	pc8001_state *state = (pc8001_state *)device->machine->driver_data;
+	pc8001_state *state = device->machine->driver_data<pc8001_state>();
 
 	UINT8 data = state->char_rom[(cc << 3) | lc];
 	int i;
@@ -430,7 +430,7 @@ static UPD1990A_INTERFACE( pc8001_upd1990a_intf )
 
 static MACHINE_START( pc8001 )
 {
-	pc8001_state *state = (pc8001_state *)machine->driver_data;
+	pc8001_state *state = machine->driver_data<pc8001_state>();
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	running_device *messram = machine->device("messram");
 

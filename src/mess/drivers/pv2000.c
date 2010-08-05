@@ -35,12 +35,13 @@ For BIOS CRC confirmation
 #include "devices/cassette.h"
 
 
-class pv2000_state
+class pv2000_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pv2000_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, pv2000_state(machine)); }
 
-	pv2000_state(running_machine &machine) { last_state = 0; }
+	pv2000_state(running_machine &machine) 
+		: driver_data_t(machine) { last_state = 0; }
 
 	int		last_state;
 	UINT8	keyb_column;
@@ -51,7 +52,7 @@ public:
 
 static WRITE8_HANDLER( pv2000_cass_conf_w )
 {
-	pv2000_state *state = (pv2000_state *)space->machine->driver_data;
+	pv2000_state *state = space->machine->driver_data<pv2000_state>();
 
 	logerror( "%s: pv2000_cass_conf_w %02x\n", cpuexec_describe_context(space->machine), data );
 
@@ -66,7 +67,7 @@ static WRITE8_HANDLER( pv2000_cass_conf_w )
 
 static WRITE8_HANDLER( pv2000_keys_w )
 {
-	pv2000_state *state = (pv2000_state *)space->machine->driver_data;
+	pv2000_state *state = space->machine->driver_data<pv2000_state>();
 
 	logerror( "%s: pv2000_keys_w %02x\n", cpuexec_describe_context(space->machine), data );
 
@@ -78,7 +79,7 @@ static WRITE8_HANDLER( pv2000_keys_w )
 
 static READ8_HANDLER( pv2000_keys_hi_r )
 {
-	pv2000_state *state = (pv2000_state *)space->machine->driver_data;
+	pv2000_state *state = space->machine->driver_data<pv2000_state>();
 	UINT8 data = 0;
 
 	switch ( state->keyb_column )
@@ -118,7 +119,7 @@ static READ8_HANDLER( pv2000_keys_hi_r )
 
 static READ8_HANDLER( pv2000_keys_lo_r )
 {
-	pv2000_state *state = (pv2000_state *)space->machine->driver_data;
+	pv2000_state *state = space->machine->driver_data<pv2000_state>();
 	UINT8 data = 0;
 
 	logerror("%s: pv2000_keys_r\n", cpuexec_describe_context(space->machine) );
@@ -312,7 +313,7 @@ static INTERRUPT_GEN( pv2000_interrupt )
 
 static void pv2000_vdp_interrupt(running_machine *machine, int new_state)
 {
-	pv2000_state *state = (pv2000_state *)machine->driver_data;
+	pv2000_state *state = machine->driver_data<pv2000_state>();
 
     // only if it goes up
 	if (new_state && !state->last_state)
@@ -362,7 +363,7 @@ static MACHINE_START( pv2000 )
 
 static MACHINE_RESET( pv2000 )
 {
-	pv2000_state *state = (pv2000_state *)machine->driver_data;
+	pv2000_state *state = machine->driver_data<pv2000_state>();
 
 	state->last_state = 0;
 	state->key_pressed = 0;

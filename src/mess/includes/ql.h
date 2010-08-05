@@ -18,12 +18,13 @@
 #define X4 XTAL_11MHz
 
 
-class ql_state
+class ql_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ql_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ql_state(machine)); }
 
-	ql_state(running_machine &machine) { }
+	ql_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* IPC state */
 	UINT8 keylatch;

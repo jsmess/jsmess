@@ -19,14 +19,14 @@ static UINT8 pecom_prev_caps_state = 4;
 
 static TIMER_CALLBACK( reset_tick )
 {
-	pecom_state *state = (pecom_state *)machine->driver_data;
+	pecom_state *state = machine->driver_data<pecom_state>();
 
 	state->cdp1802_mode = CDP1802_MODE_RUN;
 }
 
 MACHINE_START( pecom )
 {
-	pecom_state *state = (pecom_state *)machine->driver_data;
+	pecom_state *state = machine->driver_data<pecom_state>();
 	state->reset_timer = timer_alloc(machine, reset_tick, NULL);
 }
 
@@ -35,7 +35,7 @@ MACHINE_RESET( pecom )
 	UINT8 *rom = memory_region(machine, "maincpu");
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	pecom_state *state = (pecom_state *)machine->driver_data;
+	pecom_state *state = machine->driver_data<pecom_state>();
 
 	memory_unmap_write(space, 0x0000, 0x3fff, 0, 0);
 	memory_install_write_bank(space, 0x4000, 0x7fff, 0, 0, "bank2");
@@ -104,7 +104,7 @@ READ8_HANDLER (pecom_keyboard_r)
 /* CDP1802 Interface */
 static CDP1802_MODE_READ( pecom64_mode_r )
 {
-	pecom_state *state = (pecom_state *)device->machine->driver_data;
+	pecom_state *state = device->machine->driver_data<pecom_state>();
 
 	return (cdp1802_control_mode)state->cdp1802_mode;
 }

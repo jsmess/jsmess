@@ -85,13 +85,13 @@
 
 static TIMER_DEVICE_CALLBACK( ne556_cursor_callback )
 {
-	mz_state *mz = (mz_state *)timer.machine->driver_data;
+	mz_state *mz = timer.machine->driver_data<mz_state>();
 	mz->cursor_timer ^= 1;
 }
 
 static TIMER_DEVICE_CALLBACK( ne556_other_callback )
 {
-	mz_state *mz = (mz_state *)timer.machine->driver_data;
+	mz_state *mz = timer.machine->driver_data<mz_state>();
 	mz->other_timer ^= 1;
 }
 

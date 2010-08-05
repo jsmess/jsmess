@@ -164,7 +164,7 @@ static WRITE16_HANDLER( interrupt_mask_w )
 
     */
 
-	cgc7900_state *state = (cgc7900_state *)space->machine->driver_data;
+	cgc7900_state *state = space->machine->driver_data<cgc7900_state>();
 
 	state->int_mask = data;
 }
@@ -394,7 +394,7 @@ static const ay8910_interface ay8910_intf =
 
 static MACHINE_START( cgc7900 )
 {
-	cgc7900_state *state = (cgc7900_state *)machine->driver_data;
+	cgc7900_state *state = machine->driver_data<cgc7900_state>();
 
 	/* register for state saving */
 	state_save_register_global_pointer(machine, state->overlay_ram, 0x4000);

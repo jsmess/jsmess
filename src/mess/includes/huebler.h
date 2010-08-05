@@ -9,12 +9,13 @@
 #define Z80PIO2_TAG		"z80pio2"
 #define CASSETTE_TAG	"cassette"
 
-class amu880_state
+class amu880_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, amu880_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, amu880_state(machine)); }
 
-	amu880_state(running_machine &machine) { }
+	amu880_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* keyboard state */
 	int key_y;

@@ -123,13 +123,13 @@ static READ8_HANDLER( samcoupe_pen_r )
 
 static WRITE8_HANDLER( samcoupe_clut_w )
 {
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	asic->clut[(offset >> 8) & 0x0f] = data & 0x7f;
 }
 
 static READ8_HANDLER( samcoupe_status_r )
 {
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	UINT8 data = 0xe0;
 
 	/* bit 5-7, keyboard input */
@@ -150,20 +150,20 @@ static READ8_HANDLER( samcoupe_status_r )
 
 static WRITE8_HANDLER( samcoupe_line_int_w )
 {
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	asic->line_int = data;
 }
 
 static READ8_HANDLER( samcoupe_lmpr_r )
 {
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	return asic->lmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_lmpr_w )
 {
 	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 
 	asic->lmpr = data;
 	samcoupe_update_memory(space_program);
@@ -171,14 +171,14 @@ static WRITE8_HANDLER( samcoupe_lmpr_w )
 
 static READ8_HANDLER( samcoupe_hmpr_r )
 {
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	return asic->hmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_hmpr_w )
 {
 	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 
 	asic->hmpr = data;
 	samcoupe_update_memory(space_program);
@@ -186,14 +186,14 @@ static WRITE8_HANDLER( samcoupe_hmpr_w )
 
 static READ8_HANDLER( samcoupe_vmpr_r )
 {
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	return asic->vmpr;
 }
 
 static WRITE8_HANDLER( samcoupe_vmpr_w )
 {
 	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 
 	asic->vmpr = data;
 	samcoupe_update_memory(space_program);
@@ -250,7 +250,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 {
 	running_device *cassette = space->machine->device("cassette");
 	running_device *speaker = space->machine->device("speaker");
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 
 	asic->border = data;
 
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( samcoupe_border_w )
 
 static READ8_HANDLER( samcoupe_attributes_r )
 {
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	return asic->attribute;
 }
 
@@ -325,7 +325,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( irq_off )
 {
-	coupe_asic *asic = (coupe_asic *)machine->driver_data;
+	coupe_asic *asic = machine->driver_data<coupe_asic>();
 
 	/* adjust STATUS register */
 	asic->status |= param;
@@ -338,7 +338,7 @@ static TIMER_CALLBACK( irq_off )
 
 void samcoupe_irq(running_device *device, UINT8 src)
 {
-	coupe_asic *asic = (coupe_asic *)device->machine->driver_data;
+	coupe_asic *asic = device->machine->driver_data<coupe_asic>();
 
 	/* assert irq and a timer to set it off again */
 	cpu_set_input_line(device, 0, ASSERT_LINE);

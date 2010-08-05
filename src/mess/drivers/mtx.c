@@ -211,7 +211,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	mtx_state *state = (mtx_state *)timer.machine->driver_data;
+	mtx_state *state = timer.machine->driver_data<mtx_state>();
 
 	z80ctc_trg1_w(state->z80ctc, 1);
 	z80ctc_trg1_w(state->z80ctc, 0 );
@@ -221,7 +221,7 @@ static TIMER_DEVICE_CALLBACK( ctc_tick )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_trg1_w )
 {
-	mtx_state *driver_state = (mtx_state *)device->machine->driver_data;
+	mtx_state *driver_state = device->machine->driver_data<mtx_state>();
 
 	if (driver_state->z80dart != NULL)
 	{
@@ -232,7 +232,7 @@ static WRITE_LINE_DEVICE_HANDLER( ctc_trg1_w )
 
 static WRITE_LINE_DEVICE_HANDLER( ctc_trg2_w )
 {
-	mtx_state *driver_state = (mtx_state *)device->machine->driver_data;
+	mtx_state *driver_state = device->machine->driver_data<mtx_state>();
 
 	if (driver_state->z80dart != NULL)
 	{
@@ -301,7 +301,7 @@ static const z80_daisy_config rs128_daisy_chain[] =
 
 static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
-	mtx_state *state = (mtx_state *)timer.machine->driver_data;
+	mtx_state *state = timer.machine->driver_data<mtx_state>();
 	int data = (cassette_input(state->cassette) > +0.0) ? 0 : 1;
 
 	z80ctc_trg3_w(state->z80ctc, data);

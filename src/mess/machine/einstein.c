@@ -74,7 +74,7 @@ void einstein_keyboard_daisy_device::device_start()
 
 int einstein_keyboard_daisy_device::z80daisy_irq_state()
 {
-	einstein_state *einstein = (einstein_state *)device().machine->driver_data;
+	einstein_state *einstein = device().machine->driver_data<einstein_state>();
 
 	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_KEY_INT)
 		return Z80_DAISY_INT;
@@ -173,7 +173,7 @@ void einstein_adc_daisy_device::device_start()
 
 int einstein_adc_daisy_device::z80daisy_irq_state()
 {
-	einstein_state *einstein = (einstein_state *)device().machine->driver_data;
+	einstein_state *einstein = device().machine->driver_data<einstein_state>();
 
 	if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_ADC_INT)
 		return Z80_DAISY_INT;
@@ -272,7 +272,7 @@ void einstein_fire_daisy_device::device_start()
 
 int einstein_fire_daisy_device::z80daisy_irq_state()
 {
-  einstein_state *einstein = (einstein_state *)device().machine->driver_data;
+  einstein_state *einstein = device().machine->driver_data<einstein_state>();
 
   if (einstein->interrupt & einstein->interrupt_mask & EINSTEIN_FIRE_INT)
       return Z80_DAISY_INT;

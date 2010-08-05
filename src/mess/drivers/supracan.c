@@ -87,12 +87,13 @@ struct _acan_sprdma_regs_t
 	UINT16 control;
 };
 
-class supracan_state
+class supracan_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supracan_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, supracan_state(machine)); }
 
-	supracan_state(running_machine &machine) { }
+	supracan_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	acan_dma_regs_t acan_dma_regs;
 	acan_sprdma_regs_t acan_sprdma_regs;
@@ -163,14 +164,14 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 
 static VIDEO_START( supracan )
 {
-    supracan_state *state = (supracan_state *)machine->driver_data;
+    supracan_state *state = machine->driver_data<supracan_state>();
     state->roz_bitmap = auto_bitmap_alloc(machine, 1024, 512, BITMAP_FORMAT_INDEXED16);
     state->roz_final_bitmap = auto_bitmap_alloc(machine, 1024, 512, BITMAP_FORMAT_INDEXED16);
 }
 
 static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int layer)
 {
-	supracan_state *state = (supracan_state *)machine->driver_data;
+	supracan_state *state = machine->driver_data<supracan_state>();
 	UINT16 *supracan_vram = state->vram;
 	UINT32 count;
 	int x,y;
@@ -240,7 +241,7 @@ static void draw_tilemap(running_machine *machine, bitmap_t *bitmap, const recta
 /* */
 static void draw_roz_bitmap_scanline(running_machine *machine, bitmap_t *roz_bitmap, UINT16 *scanline, int ypos, INT32 X, INT32 Y, INT32 PA, INT32 PB, INT32 PC, INT32 PD, INT32 *currentx, INT32 *currenty, int changed)
 {
-    supracan_state *state = (supracan_state *)machine->driver_data;
+    supracan_state *state = machine->driver_data<supracan_state>();
 
     INT32 sx = 0;
     INT32 sy = 0;
@@ -328,7 +329,7 @@ static void draw_roz_bitmap_scanline(running_machine *machine, bitmap_t *roz_bit
 
 static void draw_roz(running_machine *machine, const rectangle *cliprect)
 {
-    supracan_state *state = (supracan_state *)machine->driver_data;
+    supracan_state *state = machine->driver_data<supracan_state>();
     UINT16 *supracan_vram = state->vram;
     UINT32 roz_base_addr = state->roz_base_addr;
     int region = 0;
@@ -375,7 +376,7 @@ static void draw_roz(running_machine *machine, const rectangle *cliprect)
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	supracan_state *state = (supracan_state *)machine->driver_data;
+	supracan_state *state = machine->driver_data<supracan_state>();
 	UINT16 *supracan_vram = state->vram;
 	int x, y;
 	int xtile, ytile;
@@ -493,7 +494,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 #if DRAW_DEBUG_ROZ
 static void draw_debug_roz(running_machine *machine, bitmap_t *bitmap)
 {
-    supracan_state *state = (supracan_state *)machine->driver_data;
+    supracan_state *state = machine->driver_data<supracan_state>();
     UINT16 *supracan_vram = state->vram;
 
     for(int y = 0; y < 240; y++)
@@ -522,7 +523,7 @@ static void draw_debug_roz(running_machine *machine, bitmap_t *bitmap)
 
 static VIDEO_UPDATE( supracan )
 {
-	supracan_state *state = (supracan_state *)screen->machine->driver_data;
+	supracan_state *state = screen->machine->driver_data<supracan_state>();
 
 	bitmap_fill(bitmap, cliprect, 0);
 
@@ -623,7 +624,7 @@ static VIDEO_UPDATE( supracan )
 
 static WRITE16_HANDLER( supracan_dma_w )
 {
-	supracan_state *state = (supracan_state *)space->machine->driver_data;
+	supracan_state *state = space->machine->driver_data<supracan_state>();
 	acan_dma_regs_t *acan_dma_regs = &state->acan_dma_regs;
 	int i;
 	int ch;
@@ -729,7 +730,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( supracan_char_w )
 {
-	supracan_state *state = (supracan_state *)space->machine->driver_data;
+	supracan_state *state = space->machine->driver_data<supracan_state>();
 	UINT16 *supracan_vram = state->vram;
 
 	COMBINE_DATA(&supracan_vram[offset]);
@@ -880,7 +881,7 @@ static PALETTE_INIT( supracan )
 
 static WRITE16_HANDLER( supracan_soundram_w )
 {
-	supracan_state *state = (supracan_state *)space->machine->driver_data;
+	supracan_state *state = space->machine->driver_data<supracan_state>();
 
 	state->soundram_16[offset] = data;
 
@@ -898,7 +899,7 @@ static READ16_HANDLER( supracan_unk1_r )
 
 static WRITE16_HANDLER( supracan_sound_w )
 {
-	supracan_state *state = (supracan_state *)space->machine->driver_data;
+	supracan_state *state = space->machine->driver_data<supracan_state>();
 
 	switch ( offset )
 	{
@@ -932,7 +933,7 @@ static WRITE16_HANDLER( supracan_sound_w )
 
 static READ16_HANDLER( supracan_video_r )
 {
-	supracan_state *state = (supracan_state *)space->machine->driver_data;
+	supracan_state *state = space->machine->driver_data<supracan_state>();
 	UINT16 data = state->video_regs[offset];
 
 	switch(offset)
@@ -950,7 +951,7 @@ static READ16_HANDLER( supracan_video_r )
 
 static TIMER_CALLBACK( supracan_video_callback )
 {
-	supracan_state *state = (supracan_state *)machine->driver_data;
+	supracan_state *state = machine->driver_data<supracan_state>();
 	int vpos = machine->primary_screen->vpos();
 
 	switch( vpos )
@@ -993,7 +994,7 @@ f0001e is the trigger
 */
 static WRITE16_HANDLER( supracan_video_w )
 {
-	supracan_state *state = (supracan_state *)space->machine->driver_data;
+	supracan_state *state = space->machine->driver_data<supracan_state>();
 	acan_sprdma_regs_t *acan_sprdma_regs = &state->acan_sprdma_regs;
 	int i;
 
@@ -1148,7 +1149,7 @@ static DEVICE_IMAGE_LOAD( supracan_cart )
 
 static MACHINE_START( supracan )
 {
-	supracan_state *state = (supracan_state *)machine->driver_data;
+	supracan_state *state = machine->driver_data<supracan_state>();
 
 	state->video_timer = timer_alloc( machine, supracan_video_callback, NULL );
 }
@@ -1156,7 +1157,7 @@ static MACHINE_START( supracan )
 
 static MACHINE_RESET( supracan )
 {
-	supracan_state *state = (supracan_state *)machine->driver_data;
+	supracan_state *state = machine->driver_data<supracan_state>();
 
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 	timer_adjust_oneshot( state->video_timer, machine->primary_screen->time_until_pos(0, 0 ), 0 );
@@ -1204,7 +1205,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( supracan_irq )
 {
-	supracan_state *state = (supracan_state *)device->machine->driver_data;
+	supracan_state *state = device->machine->driver_data<supracan_state>();
 
 	if(state->irq_mask)
 		cpu_set_input_line(device, 7, HOLD_LINE);

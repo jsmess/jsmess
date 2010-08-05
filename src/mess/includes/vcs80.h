@@ -5,12 +5,13 @@
 #define Z80_TAG			"z80"
 #define Z80PIO_TAG		"z80pio"
 
-class vcs80_state
+class vcs80_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vcs80_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, vcs80_state(machine)); }
 
-	vcs80_state(running_machine &machine) { }
+	vcs80_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* keyboard state */
 	int keylatch;

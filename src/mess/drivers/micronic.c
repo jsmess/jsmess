@@ -124,7 +124,7 @@
 
 static UINT8 keypad_r (running_machine *machine)
 {
-	micronic_state *state = (micronic_state *)machine->driver_data;
+	micronic_state *state = machine->driver_data<micronic_state>();
 	static const char *const bitnames[] = {"BIT0", "BIT1", "BIT2", "BIT3", "BIT4", "BIT5"};
 	UINT8 port, bit, data = 0;
 
@@ -142,25 +142,25 @@ READ8_HANDLER( kp_r )
 
 READ8_HANDLER( status_flag_r )
 {
-	micronic_state *state = (micronic_state *)space->machine->driver_data;
+	micronic_state *state = space->machine->driver_data<micronic_state>();
 	return  state->status_flag;
 }
 
 WRITE8_HANDLER( status_flag_w )
 {
-	micronic_state *state = (micronic_state *)space->machine->driver_data;
+	micronic_state *state = space->machine->driver_data<micronic_state>();
 	state->status_flag = data;
 }
 
 WRITE8_HANDLER( kp_matrix_w )
 {
-	micronic_state *state = (micronic_state *)space->machine->driver_data;
+	micronic_state *state = space->machine->driver_data<micronic_state>();
 	state->kp_matrix = data;
 }
 
 WRITE8_HANDLER( beep_w )
 {
-	micronic_state *state = (micronic_state *)space->machine->driver_data;
+	micronic_state *state = space->machine->driver_data<micronic_state>();
 	UINT16 frequency = 0;
 
 	beep_set_state(state->speaker, (data) ? 1 : 0);
@@ -209,7 +209,7 @@ WRITE8_HANDLER( bank_select_w )
 
 WRITE8_HANDLER( lcd_contrast_w )
 {
-	micronic_state *state = (micronic_state *)space->machine->driver_data;
+	micronic_state *state = space->machine->driver_data<micronic_state>();
 
 	state->lcd_contrast = data;
 }
@@ -221,7 +221,7 @@ WRITE8_HANDLER( lcd_contrast_w )
 
 void set_146818_periodic_irq(running_machine *machine, UINT8 data)
 {
-	micronic_state *state = (micronic_state *)machine->driver_data;
+	micronic_state *state = machine->driver_data<micronic_state>();
 
 	attotime timer_per = ATTOTIME_IN_SEC(0);
 
@@ -250,7 +250,7 @@ void set_146818_periodic_irq(running_machine *machine, UINT8 data)
 
 WRITE8_HANDLER( rtc_address_w )
 {
-	micronic_state *state = (micronic_state *)space->machine->driver_data;
+	micronic_state *state = space->machine->driver_data<micronic_state>();
 	state->rtc_address = data;
 
 	mc146818_port_w(space, 0, data);
@@ -258,7 +258,7 @@ WRITE8_HANDLER( rtc_address_w )
 
 READ8_HANDLER( rtc_data_r )
 {
-	micronic_state *state = (micronic_state *)space->machine->driver_data;
+	micronic_state *state = space->machine->driver_data<micronic_state>();
 	UINT8 data = 0;
 
 	switch(state->rtc_address & 0x3f)
@@ -276,7 +276,7 @@ READ8_HANDLER( rtc_data_r )
 
 WRITE8_HANDLER( rtc_data_w )
 {
-	micronic_state *state = (micronic_state *)space->machine->driver_data;
+	micronic_state *state = space->machine->driver_data<micronic_state>();
 
 	mc146818_port_w(space, 1, data);
 
@@ -293,7 +293,7 @@ WRITE8_HANDLER( rtc_data_w )
 
 static TIMER_CALLBACK( rtc_periodic_irq )
 {
-	micronic_state *state = (micronic_state *)machine->driver_data;
+	micronic_state *state = machine->driver_data<micronic_state>();
 
 	if (state->periodic_irq)
 		cputag_set_input_line(machine, Z80_TAG, 0, HOLD_LINE);
@@ -397,7 +397,7 @@ INPUT_PORTS_END
 
 static NVRAM_HANDLER( micronic )
 {
-	micronic_state *state = (micronic_state *)machine->driver_data;
+	micronic_state *state = machine->driver_data<micronic_state>();
 	UINT8 reg_a = 0, reg_b = 0;
 
 	if (read_or_write)
@@ -440,7 +440,7 @@ static VIDEO_START( micronic )
 
 static VIDEO_UPDATE( micronic )
 {
-	micronic_state *state = (micronic_state *)screen->machine->driver_data;
+	micronic_state *state = screen->machine->driver_data<micronic_state>();
 
 	hd61830_update(state->hd61830, bitmap, cliprect);
 
@@ -449,7 +449,7 @@ static VIDEO_UPDATE( micronic )
 
 static MACHINE_START( micronic )
 {
-	micronic_state *state = (micronic_state *)machine->driver_data;
+	micronic_state *state = machine->driver_data<micronic_state>();
 
 	/* find devices */
 	state->hd61830 = machine->device(HD61830_TAG);

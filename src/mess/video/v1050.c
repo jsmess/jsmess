@@ -22,21 +22,21 @@
 
 READ8_HANDLER( v1050_attr_r )
 {
-	v1050_state *state = (v1050_state *)space->machine->driver_data;
+	v1050_state *state = space->machine->driver_data<v1050_state>();
 
 	return state->attr;
 }
 
 WRITE8_HANDLER( v1050_attr_w )
 {
-	v1050_state *state = (v1050_state *)space->machine->driver_data;
+	v1050_state *state = space->machine->driver_data<v1050_state>();
 
 	state->attr = data;
 }
 
 READ8_HANDLER( v1050_videoram_r )
 {
-	v1050_state *state = (v1050_state *)space->machine->driver_data;
+	v1050_state *state = space->machine->driver_data<v1050_state>();
 
 	if (offset >= 0x2000)
 	{
@@ -48,7 +48,7 @@ READ8_HANDLER( v1050_videoram_r )
 
 WRITE8_HANDLER( v1050_videoram_w )
 {
-	v1050_state *state = (v1050_state *)space->machine->driver_data;
+	v1050_state *state = space->machine->driver_data<v1050_state>();
 
 	state->video_ram[offset] = data;
 
@@ -62,7 +62,7 @@ WRITE8_HANDLER( v1050_videoram_w )
 
 static MC6845_UPDATE_ROW( v1050_update_row )
 {
-	v1050_state *state = (v1050_state *)device->machine->driver_data;
+	v1050_state *state = device->machine->driver_data<v1050_state>();
 
 	int column, bit;
 
@@ -129,7 +129,7 @@ static PALETTE_INIT( v1050 )
 
 static VIDEO_START( v1050 )
 {
-	v1050_state *state = (v1050_state *)machine->driver_data;
+	v1050_state *state = machine->driver_data<v1050_state>();
 
 	/* find devices */
 	state->mc6845 = machine->device(H46505_TAG);
@@ -146,7 +146,7 @@ static VIDEO_START( v1050 )
 
 static VIDEO_UPDATE( v1050 )
 {
-	v1050_state *state = (v1050_state *)screen->machine->driver_data;
+	v1050_state *state = screen->machine->driver_data<v1050_state>();
 
 	mc6845_update(state->mc6845, bitmap, cliprect);
 

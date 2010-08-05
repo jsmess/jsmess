@@ -37,12 +37,13 @@ enum
 	BANK_RAMCARD
 };
 
-class comx35_state
+class comx35_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, comx35_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, comx35_state(machine)); }
 
-	comx35_state(running_machine &machine) { }
+	comx35_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* processor state */
 	int cdp1802_mode;		/* CPU mode */

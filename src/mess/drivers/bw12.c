@@ -54,7 +54,7 @@ INLINE running_device *get_floppy_image(running_machine *machine, int drive)
 
 static void bw12_bankswitch(running_machine *machine)
 {
-	bw12_state *state =(bw12_state *) machine->driver_data;
+	bw12_state *state = machine->driver_data<bw12_state>();
 
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -87,7 +87,7 @@ static void bw12_bankswitch(running_machine *machine)
 
 static TIMER_CALLBACK( floppy_motor_off_tick )
 {
-	bw12_state *state =(bw12_state *) machine->driver_data;
+	bw12_state *state = machine->driver_data<bw12_state>();
 
 	floppy_mon_w(get_floppy_image(machine, 0), ASSERT_LINE);
 	floppy_mon_w(get_floppy_image(machine, 1), ASSERT_LINE);
@@ -100,7 +100,7 @@ static TIMER_CALLBACK( floppy_motor_off_tick )
 
 static void bw12_set_floppy_motor_off_timer(running_machine *machine)
 {
-	bw12_state *state =(bw12_state *) machine->driver_data;
+	bw12_state *state = machine->driver_data<bw12_state>();
 
 	if (state->motor0 || state->motor1)
 	{
@@ -122,7 +122,7 @@ static void bw12_set_floppy_motor_off_timer(running_machine *machine)
 
 static void ls259_w(running_machine *machine, int address, int data)
 {
-	bw12_state *state =(bw12_state *) machine->driver_data;
+	bw12_state *state = machine->driver_data<bw12_state>();
 
 	switch (address)
 	{
@@ -363,7 +363,7 @@ INPUT_PORTS_END
 
 static MC6845_UPDATE_ROW( bw12_update_row )
 {
-	bw12_state *state =(bw12_state *) device->machine->driver_data;
+	bw12_state *state = device->machine->driver_data<bw12_state>();
 
 	int column, bit;
 
@@ -406,7 +406,7 @@ static const mc6845_interface bw12_mc6845_interface =
 
 static VIDEO_START( bw12 )
 {
-	bw12_state *state =(bw12_state *) machine->driver_data;
+	bw12_state *state = machine->driver_data<bw12_state>();
 
 	/* find devices */
 	state->mc6845 = machine->device(MC6845_TAG);
@@ -417,7 +417,7 @@ static VIDEO_START( bw12 )
 
 static VIDEO_UPDATE( bw12 )
 {
-	bw12_state *state =(bw12_state *) screen->machine->driver_data;
+	bw12_state *state = screen->machine->driver_data<bw12_state>();
 
 	mc6845_update(state->mc6845, bitmap, cliprect);
 
@@ -428,7 +428,7 @@ static VIDEO_UPDATE( bw12 )
 
 static WRITE_LINE_DEVICE_HANDLER( bw12_upd765_interrupt )
 {
-	bw12_state *driver_state = (bw12_state *)device->machine->driver_data;
+	bw12_state *driver_state = device->machine->driver_data<bw12_state>();
 
 	driver_state->fdcint = state;
 }
@@ -476,7 +476,7 @@ static READ8_DEVICE_HANDLER( bw12_pia6821_pa_r )
 
     */
 
-	bw12_state *state =(bw12_state *) device->machine->driver_data;
+	bw12_state *state = device->machine->driver_data<bw12_state>();
 
 	UINT8 data = 0;
 
@@ -494,14 +494,14 @@ static READ8_DEVICE_HANDLER( bw12_pia6821_pa_r )
 
 static READ_LINE_DEVICE_HANDLER( bw12_pia6821_cb1_r )
 {
-	bw12_state *state =(bw12_state *) device->machine->driver_data;
+	bw12_state *state = device->machine->driver_data<bw12_state>();
 
 	return state->key_stb;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( bw12_pia6821_cb2_w )
 {
-	bw12_state *driver_state = (bw12_state *)device->machine->driver_data;
+	bw12_state *driver_state = device->machine->driver_data<bw12_state>();
 
 	if (state)
 	{
@@ -572,7 +572,7 @@ static WRITE_LINE_DEVICE_HANDLER( bw12_pit8253_out1_w )
 
 static WRITE_LINE_DEVICE_HANDLER( bw12_pit8253_out2_w )
 {
-	bw12_state *driver_state = (bw12_state *)device->machine->driver_data;
+	bw12_state *driver_state = device->machine->driver_data<bw12_state>();
 
 	/* PIA6821 PA4 */
 	driver_state->pit_out2 = state;
@@ -633,7 +633,7 @@ static READ_LINE_DEVICE_HANDLER( bw2_ay3600_control_r )
 
 static WRITE_LINE_DEVICE_HANDLER( bw2_ay3600_data_ready_w )
 {
-	bw12_state *driver_state = (bw12_state *)device->machine->driver_data;
+	bw12_state *driver_state = device->machine->driver_data<bw12_state>();
 
 	driver_state->key_stb = state;
 
@@ -671,7 +671,7 @@ static AY3600_INTERFACE( bw12_ay3600_intf )
 
 static MACHINE_START( bw12 )
 {
-	bw12_state *state =(bw12_state *) machine->driver_data;
+	bw12_state *state = machine->driver_data<bw12_state>();
 
 	/* find devices */
 	state->pia6821 = machine->device(PIA6821_TAG);

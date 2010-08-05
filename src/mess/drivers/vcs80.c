@@ -92,7 +92,7 @@ INPUT_PORTS_END
 
 static TIMER_DEVICE_CALLBACK( vcs80_keyboard_tick )
 {
-	vcs80_state *state = (vcs80_state *)timer.machine->driver_data;
+	vcs80_state *state = timer.machine->driver_data<vcs80_state>();
 
 	if (state->keyclk)
 	{
@@ -122,7 +122,7 @@ static READ8_DEVICE_HANDLER( pio_port_a_r )
 
     */
 
-	vcs80_state *state = (vcs80_state *)device->machine->driver_data;
+	vcs80_state *state = device->machine->driver_data<vcs80_state>();
 
 	UINT8 data = 0;
 
@@ -157,7 +157,7 @@ static WRITE8_DEVICE_HANDLER( pio_port_b_w )
 
     */
 
-	vcs80_state *state = (vcs80_state *)device->machine->driver_data;
+	vcs80_state *state = device->machine->driver_data<vcs80_state>();
 
 	UINT8 led_data = BITSWAP8(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = state->keylatch;
@@ -191,7 +191,7 @@ static const z80_daisy_config vcs80_daisy_chain[] =
 
 static MACHINE_START(vcs80)
 {
-	vcs80_state *state = (vcs80_state *)machine->driver_data;
+	vcs80_state *state = machine->driver_data<vcs80_state>();
 
 	/* find devices */
 	state->z80pio = machine->device(Z80PIO_TAG);
@@ -242,7 +242,7 @@ ROM_END
 
 static DIRECT_UPDATE_HANDLER( vcs80_direct_update_handler )
 {
-	vcs80_state *state = (vcs80_state *)space->machine->driver_data;
+	vcs80_state *state = space->machine->driver_data<vcs80_state>();
 
 	/* _A0 is connected to PIO PB7 */
 	z80pio_pb_w(state->z80pio, 0, (!BIT(address, 0)) << 7);

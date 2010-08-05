@@ -11,7 +11,7 @@
 
 static DIRECT_UPDATE_HANDLER( atm_direct )
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 	running_device *beta = space->machine->device(BETA_DISK_TAG);
 	UINT16 pc = cpu_get_reg(space->machine->device("maincpu"), STATE_GENPCBASE);
 
@@ -48,7 +48,7 @@ static DIRECT_UPDATE_HANDLER( atm_direct )
 
 static void atm_update_memory(running_machine *machine)
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	running_device *beta = machine->device(BETA_DISK_TAG);
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 
@@ -70,7 +70,7 @@ static void atm_update_memory(running_machine *machine)
 
 static WRITE8_HANDLER(atm_port_7ffd_w)
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 
 	/* disable paging */
 	if (state->port_7ffd_data & 0x20)
@@ -98,7 +98,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( atm )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	running_device *beta = machine->device(BETA_DISK_TAG);

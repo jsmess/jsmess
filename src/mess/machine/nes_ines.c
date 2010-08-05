@@ -30,7 +30,7 @@ we need to decrement it by 114 (Each scanline consists of 341 dots and, on NTSC,
 there are 3 dots to every 1 CPU cycle, hence 114 is the number of cycles per scanline ) */
 static void ffe_irq( running_device *device, int scanline, int vblank, int blanked )
 {
-	nes_state *state = (nes_state *)device->machine->driver_data;
+	nes_state *state = device->machine->driver_data<nes_state>();
 
 	/* 114 is the number of cycles per scanline */
 	/* TODO: change to reflect the actual number of cycles spent */
@@ -48,7 +48,7 @@ static void ffe_irq( running_device *device, int scanline, int vblank, int blank
 
 static WRITE8_HANDLER( mapper6_l_w )
 {
-	nes_state *state = (nes_state *)space->machine->driver_data;
+	nes_state *state = space->machine->driver_data<nes_state>();
 	LOG_MMC(("mapper6_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)
@@ -76,7 +76,7 @@ static WRITE8_HANDLER( mapper6_l_w )
 
 static WRITE8_HANDLER( mapper6_w )
 {
-	nes_state *state = (nes_state *)space->machine->driver_data;
+	nes_state *state = space->machine->driver_data<nes_state>();
 	LOG_MMC(("mapper6_w, offset: %04x, data: %02x\n", offset, data));
 
 	if (!state->mmc_latch1)	// when in "FFE mode" we are forced to use CHRRAM/EXRAM bank?
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( mapper8_w )
 
 static WRITE8_HANDLER( mapper17_l_w )
 {
-	nes_state *state = (nes_state *)space->machine->driver_data;
+	nes_state *state = space->machine->driver_data<nes_state>();
 	LOG_MMC(("mapper17_l_w, offset: %04x, data: %02x\n", offset, data));
 
 	switch (offset)

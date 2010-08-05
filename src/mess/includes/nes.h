@@ -64,12 +64,13 @@ typedef struct
 typedef void (*nes_prg_callback)(running_machine *machine, int start, int bank);
 typedef void (*nes_chr_callback)(running_machine *machine, int start, int bank, int source);
 
-class nes_state
+class nes_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nes_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nes_state(machine)); }
 
-	nes_state(running_machine &machine) { }
+	nes_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* input_related - this part has to be cleaned up (e.g. in_2 and in_3 are not really necessary here...) */
 	nes_input in_0, in_1, in_2, in_3;

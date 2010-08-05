@@ -10,12 +10,13 @@
 #include "cpu/apexc/apexc.h"
 
 
-class apexc_state
+class apexc_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, apexc_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, apexc_state(machine)); }
 
-	apexc_state(running_machine &machine) { }
+	apexc_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT32 panel_data_reg;	/* value of a data register on the control panel which can
                                 be edited - the existence of this register is a personnal
@@ -392,7 +393,7 @@ INPUT_PORTS_END
 */
 static INTERRUPT_GEN( apexc_interrupt )
 {
-	apexc_state *state = (apexc_state *)device->machine->driver_data;
+	apexc_state *state = device->machine->driver_data<apexc_state>();
 	const address_space* space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 edit_keys;
 	int control_keys;
@@ -552,7 +553,7 @@ static PALETTE_INIT( apexc )
 
 static VIDEO_START( apexc )
 {
-	apexc_state *state = (apexc_state *)machine->driver_data;
+	apexc_state *state = machine->driver_data<apexc_state>();
 	screen_device *screen = screen_first(*machine);
 	int width = screen->width();
 	int height = screen->height();
@@ -593,7 +594,7 @@ static void apexc_draw_string(running_machine *machine, bitmap_t *bitmap, const 
 
 static VIDEO_UPDATE( apexc )
 {
-	apexc_state *state = (apexc_state *)screen->machine->driver_data;
+	apexc_state *state = screen->machine->driver_data<apexc_state>();
 	int i;
 	char the_char;
 
@@ -625,7 +626,7 @@ static VIDEO_UPDATE( apexc )
 
 static void apexc_teletyper_init(running_machine *machine)
 {
-	apexc_state *state = (apexc_state *)machine->driver_data;
+	apexc_state *state = machine->driver_data<apexc_state>();
 
 	state->letters = FALSE;
 	state->pos = 0;
@@ -633,7 +634,7 @@ static void apexc_teletyper_init(running_machine *machine)
 
 static void apexc_teletyper_linefeed(running_machine *machine)
 {
-	apexc_state *state = (apexc_state *)machine->driver_data;
+	apexc_state *state = machine->driver_data<apexc_state>();
 	UINT8 buf[teletyper_window_width];
 	int y;
 
@@ -672,7 +673,7 @@ static void apexc_teletyper_putchar(running_machine *machine, int character)
 		}
 	};
 
-	apexc_state *state = (apexc_state *)machine->driver_data;
+	apexc_state *state = machine->driver_data<apexc_state>();
 	char buffer[2] = "x";
 
 	character &= 0x1f;

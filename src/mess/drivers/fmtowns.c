@@ -164,7 +164,7 @@ INLINE UINT32 msf_to_lba(UINT32 val)  // because the CDROM core doesn't provide 
 static void towns_init_serial_rom(running_machine* machine)
 {
 	// TODO: init serial ROM contents
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	int x;
 	UINT8 code[8] = { 0x04,0x65,0x54,0xA4,0x95,0x45,0x35,0x5F };
 	UINT8* srom = memory_region(machine,"serial");
@@ -202,7 +202,7 @@ static void towns_init_serial_rom(running_machine* machine)
 
 static void towns_init_rtc(running_machine* machine)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	// for now, we'll just keep a static time stored here
 	// seconds
 	state->towns_rtc_reg[0] = 0;
@@ -228,7 +228,7 @@ static void towns_init_rtc(running_machine* machine)
 
 static READ8_HANDLER(towns_system_r)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	UINT8 ret = 0;
 
 	switch(offset)
@@ -267,7 +267,7 @@ static READ8_HANDLER(towns_system_r)
 
 static WRITE8_HANDLER(towns_system_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 
 	switch(offset)
 	{
@@ -309,14 +309,14 @@ static READ8_HANDLER(towns_sys6c_r)
 
 static WRITE8_HANDLER(towns_sys6c_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 //  logerror("SYS: (0x6c) write to timer (0x%02x)\n",data);
 	state->ftimer -= 0x54;
 }
 
 static READ8_HANDLER(towns_dma1_r)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	running_device* dev = state->dma_1;
 
 	logerror("DMA#1: read register %i\n",offset);
@@ -325,7 +325,7 @@ static READ8_HANDLER(towns_dma1_r)
 
 static WRITE8_HANDLER(towns_dma1_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	running_device* dev = state->dma_1;
 
 	logerror("DMA#1: wrote 0x%02x to register %i\n",data,offset);
@@ -334,7 +334,7 @@ static WRITE8_HANDLER(towns_dma1_w)
 
 static READ8_HANDLER(towns_dma2_r)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	running_device* dev = state->dma_2;
 
 	logerror("DMA#2: read register %i\n",offset);
@@ -343,7 +343,7 @@ static READ8_HANDLER(towns_dma2_r)
 
 static WRITE8_HANDLER(towns_dma2_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	running_device* dev = state->dma_2;
 
 	logerror("DMA#2: wrote 0x%02x to register %i\n",data,offset);
@@ -356,7 +356,7 @@ static WRITE8_HANDLER(towns_dma2_w)
 
 static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_irq_w )
 {
-	towns_state* tstate = (towns_state*)device->machine->driver_data;
+	towns_state* tstate = device->machine->driver_data<towns_state>();
 
 	if(tstate->towns_fdc_irq6mask == 0)
 		state = 0;
@@ -371,7 +371,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_mb8877a_drq_w )
 
 static READ8_HANDLER(towns_floppy_r)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	running_device* fdc = state->fdc;
 
 	switch(offset)
@@ -401,7 +401,7 @@ static READ8_HANDLER(towns_floppy_r)
 
 static WRITE8_HANDLER(towns_floppy_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	running_device* fdc = state->fdc;
 
 	switch(offset)
@@ -468,14 +468,14 @@ static WRITE8_HANDLER(towns_floppy_w)
 
 static UINT16 towns_fdc_dma_r(running_machine* machine)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	running_device* fdc = state->fdc;
 	return wd17xx_data_r(fdc,0);
 }
 
 static void towns_fdc_dma_w(running_machine* machine, UINT16 data)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	running_device* fdc = state->fdc;
 	wd17xx_data_w(fdc,0,data);
 }
@@ -498,7 +498,7 @@ static void towns_fdc_dma_w(running_machine* machine, UINT16 data)
  */
 static void towns_kb_sendcode(running_machine* machine, UINT8 scancode, int release)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	running_device* dev = state->pic_master;
 
 	switch(release)
@@ -566,7 +566,7 @@ static TIMER_CALLBACK( poll_keyboard )
 
 static READ8_HANDLER(towns_keyboard_r)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	UINT8 ret = 0x00;
 
 	switch(offset)
@@ -594,7 +594,7 @@ static READ8_HANDLER(towns_keyboard_r)
 
 static WRITE8_HANDLER(towns_keyboard_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 
 	switch(offset)
 	{
@@ -623,7 +623,7 @@ static WRITE8_HANDLER(towns_keyboard_w)
  */
 static READ8_HANDLER(towns_port60_r)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	UINT8 val = 0x00;
 
 	if ( pit8253_get_output(state->pit, 0 ) )
@@ -639,7 +639,7 @@ static READ8_HANDLER(towns_port60_r)
 
 static WRITE8_HANDLER(towns_port60_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	running_device* dev = state->pic_master;
 
 	if(data & 0x80)
@@ -653,7 +653,7 @@ static WRITE8_HANDLER(towns_port60_w)
 
 static READ32_HANDLER(towns_sys5e8_r)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 
 	switch(offset)
 	{
@@ -677,7 +677,7 @@ static READ32_HANDLER(towns_sys5e8_r)
 
 static WRITE32_HANDLER(towns_sys5e8_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 
 	switch(offset)
 	{
@@ -704,7 +704,7 @@ static WRITE32_HANDLER(towns_sys5e8_w)
 // W/O  -- (0x4ec) LED control
 static READ8_HANDLER(towns_sound_ctrl_r)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	UINT8 ret = 0;
 
 	switch(offset)
@@ -730,7 +730,7 @@ static READ8_HANDLER(towns_sound_ctrl_r)
 
 static WRITE8_HANDLER(towns_sound_ctrl_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	switch(offset)
 	{
 		case 0x02:  // PCM channel interrupt mask
@@ -745,13 +745,13 @@ static WRITE8_HANDLER(towns_sound_ctrl_w)
 // Joysticks are multiplexed, with fire buttons available when bits 0 and 1 of port 0x4d6 are high. (bits 2 and 3 for second port?)
 static TIMER_CALLBACK(towns_mouse_timeout)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	state->towns_mouse_output = MOUSE_START;  // reset mouse data
 }
 
 static READ32_HANDLER(towns_padport_r)
 {
-	towns_state* tstate = (towns_state*)space->machine->driver_data;
+	towns_state* tstate = space->machine->driver_data<towns_state>();
 	UINT32 ret = 0;
 	UINT32 porttype = input_port_read(space->machine,"ctrltype");
 	UINT8 extra1;
@@ -870,7 +870,7 @@ static READ32_HANDLER(towns_padport_r)
 
 static WRITE32_HANDLER(towns_pad_mask_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	static UINT8 prev;
 	static UINT8 prev_x,prev_y;
 	UINT8 current_x,current_y;
@@ -956,19 +956,19 @@ static WRITE32_HANDLER(towns_pad_mask_w)
 
 static READ8_HANDLER( towns_cmos8_r )
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	return state->towns_cmos[offset];
 }
 
 static WRITE8_HANDLER( towns_cmos8_w )
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	state->towns_cmos[offset] = data;
 }
 
 static READ8_HANDLER( towns_cmos_low_r )
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	if(state->towns_mainmem_enable != 0)
 		return messram_get_ptr(state->messram)[offset + 0xd8000];
 
@@ -977,7 +977,7 @@ static READ8_HANDLER( towns_cmos_low_r )
 
 static WRITE8_HANDLER( towns_cmos_low_w )
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	if(state->towns_mainmem_enable != 0)
 		messram_get_ptr(state->messram)[offset+0xd8000] = data;
 	else
@@ -986,19 +986,19 @@ static WRITE8_HANDLER( towns_cmos_low_w )
 
 static READ8_HANDLER( towns_cmos_r )
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	return state->towns_cmos[offset];
 }
 
 static WRITE8_HANDLER( towns_cmos_w )
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	state->towns_cmos[offset] = data;
 }
 
 void towns_update_video_banks(const address_space* space)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	UINT8* ROM;
 
 	if(state->towns_mainmem_enable != 0)  // first MB is RAM
@@ -1049,7 +1049,7 @@ void towns_update_video_banks(const address_space* space)
 
 static READ8_HANDLER( towns_sys480_r )
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	if(state->towns_system_port & 0x02)
 		return 0x02;
 	else
@@ -1058,7 +1058,7 @@ static READ8_HANDLER( towns_sys480_r )
 
 static WRITE8_HANDLER( towns_sys480_w )
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 
 	state->towns_system_port = data;
 	state->towns_ram_enable = data & 0x02;
@@ -1067,7 +1067,7 @@ static WRITE8_HANDLER( towns_sys480_w )
 
 static WRITE32_HANDLER( towns_video_404_w )
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	if(ACCESSING_BITS_0_7)
 	{
 		state->towns_mainmem_enable = data & 0x80;
@@ -1078,7 +1078,7 @@ static WRITE32_HANDLER( towns_video_404_w )
 
 static READ32_HANDLER( towns_video_404_r )
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	if(ACCESSING_BITS_0_7)
 	{
 		logerror("mainmem_enable - reading 0x%02x\n",state->towns_mainmem_enable);
@@ -1127,7 +1127,7 @@ static READ32_HANDLER( towns_video_404_r )
  */
 static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 {
-	towns_state* tstate = (towns_state*)machine->driver_data;
+	towns_state* tstate = machine->driver_data<towns_state>();
 	switch(line)
 	{
 		case TOWNS_CD_IRQ_MPU:
@@ -1175,7 +1175,7 @@ static void towns_cdrom_set_irq(running_machine* machine,int line,int state)
 
 static TIMER_CALLBACK( towns_cd_status_ready )
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	state->towns_cd.status |= 0x02;  // status read request
 	state->towns_cd.status |= 0x01;  // ready
 	state->towns_cd.cmd_status_ptr = 0;
@@ -1184,7 +1184,7 @@ static TIMER_CALLBACK( towns_cd_status_ready )
 
 static void towns_cd_set_status(running_machine* machine, UINT8 st0, UINT8 st1, UINT8 st2, UINT8 st3)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	state->towns_cd.cmd_status[0] = st0;
 	state->towns_cd.cmd_status[1] = st1;
 	state->towns_cd.cmd_status[2] = st2;
@@ -1195,7 +1195,7 @@ static void towns_cd_set_status(running_machine* machine, UINT8 st0, UINT8 st1, 
 
 static UINT8 towns_cd_get_track(running_machine* machine)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	running_device* cdrom = state->cdrom;
 	running_device* cdda = state->cdda;
 	UINT32 lba = cdda_get_audio_lba(cdda);
@@ -1212,7 +1212,7 @@ static UINT8 towns_cd_get_track(running_machine* machine)
 static TIMER_CALLBACK( towns_cdrom_read_byte )
 {
 	running_device* device = (running_device* )ptr;
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	int masked;
 	// TODO: support software transfers, for now DMA is assumed.
 
@@ -1269,7 +1269,7 @@ static void towns_cdrom_read(running_device* device)
 	// parameters:
 	//          3 bytes: MSF of first sector to read
 	//          3 bytes: MSF of last sector to read
-	towns_state* state = (towns_state*)device->machine->driver_data;
+	towns_state* state = device->machine->driver_data<towns_state>();
 	UINT32 lba1,lba2,track;
 
 	lba1 = state->towns_cd.parameter[7] << 16;
@@ -1315,7 +1315,7 @@ static void towns_cdrom_play_cdda(running_device* device)
 	// Parameters:
 	//          3 bytes: starting MSF of audio to play
 	//          3 bytes: ending MSF of audio to play (can span multiple tracks)
-	towns_state* state = (towns_state*)device->machine->driver_data;
+	towns_state* state = device->machine->driver_data<towns_state>();
 	UINT32 lba1,lba2;
 	running_device* cdda = state->cdda;
 
@@ -1338,7 +1338,7 @@ static void towns_cdrom_play_cdda(running_device* device)
 
 static void towns_cdrom_execute_command(running_device* device)
 {
-	towns_state* state = (towns_state*)device->machine->driver_data;
+	towns_state* state = device->machine->driver_data<towns_state>();
 
 	if(mess_cd_get_cdrom_file(device) == NULL)
 	{  // No CD in drive
@@ -1440,7 +1440,7 @@ static void towns_cdrom_execute_command(running_device* device)
 
 static UINT16 towns_cdrom_dma_r(running_machine* machine)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	if(state->towns_cd.buffer_ptr >= 2048)
 		return 0x00;
 	return state->towns_cd.buffer[state->towns_cd.buffer_ptr++];
@@ -1448,7 +1448,7 @@ static UINT16 towns_cdrom_dma_r(running_machine* machine)
 
 static READ8_HANDLER(towns_cdrom_r)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	UINT32 addr = 0;
 	UINT8 ret = 0;
 
@@ -1598,7 +1598,7 @@ static READ8_HANDLER(towns_cdrom_r)
 
 static WRITE8_HANDLER(towns_cdrom_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	int x;
 	switch(offset)
 	{
@@ -1654,7 +1654,7 @@ static WRITE8_HANDLER(towns_cdrom_w)
  */
 static READ32_HANDLER(towns_rtc_r)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	if(ACCESSING_BITS_0_7)
 		return 0x80 | state->towns_rtc_reg[state->towns_rtc_select];
 
@@ -1663,14 +1663,14 @@ static READ32_HANDLER(towns_rtc_r)
 
 static WRITE32_HANDLER(towns_rtc_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	if(ACCESSING_BITS_0_7)
 		state->towns_rtc_data = data;
 }
 
 static WRITE32_HANDLER(towns_rtc_select_w)
 {
-	towns_state* state = (towns_state*)space->machine->driver_data;
+	towns_state* state = space->machine->driver_data<towns_state>();
 	if(ACCESSING_BITS_0_7)
 	{
 		if(data & 0x80)
@@ -1683,7 +1683,7 @@ static WRITE32_HANDLER(towns_rtc_select_w)
 
 static void rtc_hour(running_machine* machine)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 
 	state->towns_rtc_reg[4]++;
 	if(state->towns_rtc_reg[4] > 4 && state->towns_rtc_reg[5] == 2)
@@ -1700,7 +1700,7 @@ static void rtc_hour(running_machine* machine)
 
 static void rtc_minute(running_machine* machine)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 
 	state->towns_rtc_reg[2]++;
 	if(state->towns_rtc_reg[2] > 9)
@@ -1717,7 +1717,7 @@ static void rtc_minute(running_machine* machine)
 
 static TIMER_CALLBACK(rtc_second)
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	// increase RTC time by one second
 	state->towns_rtc_reg[0]++;
 	if(state->towns_rtc_reg[0] > 9)
@@ -1750,7 +1750,7 @@ static READ8_HANDLER(towns_41ff_r)
 
 static IRQ_CALLBACK( towns_irq_callback )
 {
-	towns_state* state = (towns_state*)device->machine->driver_data;
+	towns_state* state = device->machine->driver_data<towns_state>();
 	running_device* pic1 = state->pic_master;
 	running_device* pic2 = state->pic_slave;
 	int r;
@@ -1767,7 +1767,7 @@ static IRQ_CALLBACK( towns_irq_callback )
 // YM3438 interrupt (IRQ 13)
 void towns_fm_irq(running_device* device, int irq)
 {
-	towns_state* state = (towns_state*)device->machine->driver_data;
+	towns_state* state = device->machine->driver_data<towns_state>();
 	running_device* pic = state->pic_slave;
 	if(irq)
 	{
@@ -1786,7 +1786,7 @@ void towns_fm_irq(running_device* device, int irq)
 // PCM interrupt (IRQ 13)
 void towns_pcm_irq(running_device* device, int channel)
 {
-	towns_state* state = (towns_state*)device->machine->driver_data;
+	towns_state* state = device->machine->driver_data<towns_state>();
 	running_device* pic = state->pic_slave;
 
 	state->towns_pcm_irq_flag = 1;
@@ -1806,7 +1806,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pic_irq )
 
 static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 {
-	towns_state* tstate = (towns_state*)device->machine->driver_data;
+	towns_state* tstate = device->machine->driver_data<towns_state>();
 	running_device* dev = tstate->pic_master;
 
 	if(tstate->towns_timer_mask & 0x01)
@@ -1818,7 +1818,7 @@ static WRITE_LINE_DEVICE_HANDLER( towns_pit_out0_changed )
 
 static WRITE_LINE_DEVICE_HANDLER( towns_pit_out1_changed )
 {
-	towns_state* tstate = (towns_state*)device->machine->driver_data;
+	towns_state* tstate = device->machine->driver_data<towns_state>();
 //  running_device* dev = tstate->pic_master;
 
 	if(tstate->towns_timer_mask & 0x02)
@@ -2144,7 +2144,7 @@ INPUT_PORTS_END
 
 static DRIVER_INIT( towns )
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	state->pic_master = machine->device("pic8259_master");
 	state->pic_slave = machine->device("pic8259_slave");
 	state->towns_vram = auto_alloc_array(machine,UINT32,0x20000);
@@ -2167,14 +2167,14 @@ static DRIVER_INIT( towns )
 
 static DRIVER_INIT( marty )
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	DRIVER_INIT_CALL(towns);
 	state->towns_machine_id = 0x034a;
 }
 
 static MACHINE_RESET( towns )
 {
-	towns_state* state = (towns_state*)machine->driver_data;
+	towns_state* state = machine->driver_data<towns_state>();
 	state->maincpu = machine->device("maincpu");
 	state->dma_1 = machine->device("dma_1");
 	state->dma_2 = machine->device("dma_2");

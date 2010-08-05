@@ -17,12 +17,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class lx800_state
+class lx800_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lx800_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lx800_state(machine)); }
 
-	lx800_state(running_machine &machine) { }
+	lx800_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	running_device *speaker;
 };
@@ -84,7 +85,7 @@ static READ8_HANDLER( lx800_portc_r )
 
 static WRITE8_HANDLER( lx800_portc_w )
 {
-	lx800_state *lx800 = (lx800_state *)space->machine->driver_data;
+	lx800_state *lx800 = space->machine->driver_data<lx800_state>();
 
 	logerror("%s: lx800_portc_w(%02x): %02x\n", cpuexec_describe_context(space->machine), offset, data);
 	logerror("--> err: %d, ack: %d, fire: %d, buzzer: %d\n", BIT(data, 4), BIT(data, 5), BIT(data, 6), BIT(data, 7));
@@ -126,7 +127,7 @@ static WRITE_LINE_DEVICE_HANDLER( lx800_reset_w )
 
 static MACHINE_START( lx800 )
 {
-	lx800_state *lx800 = (lx800_state *)machine->driver_data;
+	lx800_state *lx800 = machine->driver_data<lx800_state>();
 
 	lx800->speaker = machine->device("beep");
 

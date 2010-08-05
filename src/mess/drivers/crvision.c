@@ -570,7 +570,7 @@ static WRITE8_DEVICE_HANDLER( pia_pa_w )
         PA7     Cassette data in/out
     */
 
-	crvision_state *state = (crvision_state *)device->machine->driver_data;
+	crvision_state *state = device->machine->driver_data<crvision_state>();
 
 	/* keyboard raster */
 	state->keylatch = ~data & 0x0f;
@@ -623,7 +623,7 @@ static READ8_DEVICE_HANDLER( pia_pa_r )
         PA7     Cassette data in/out
     */
 
-	crvision_state *state = (crvision_state *)device->machine->driver_data;
+	crvision_state *state = device->machine->driver_data<crvision_state>();
 
 	UINT8 data = 0x7f;
 
@@ -647,7 +647,7 @@ static READ8_DEVICE_HANDLER( pia_pb_r )
         PB7     Keyboard input
     */
 
-	crvision_state *state = (crvision_state *)device->machine->driver_data;
+	crvision_state *state = device->machine->driver_data<crvision_state>();
 
 	UINT8 data = 0xff;
 
@@ -694,7 +694,7 @@ static READ8_DEVICE_HANDLER( lasr2001_pia_pa_r )
         PA7     Keyboard column 7
     */
 
-	crvision_state *state = (crvision_state *)device->machine->driver_data;
+	crvision_state *state = device->machine->driver_data<crvision_state>();
 
 	UINT8 data = 0xff;
 
@@ -723,14 +723,14 @@ static WRITE8_DEVICE_HANDLER( lasr2001_pia_pa_w )
         PA7     ?
     */
 
-	crvision_state *state = (crvision_state *)device->machine->driver_data;
+	crvision_state *state = device->machine->driver_data<crvision_state>();
 
 	state->joylatch = data;
 }
 
 static READ8_DEVICE_HANDLER( lasr2001_pia_pb_r )
 {
-	crvision_state *state = (crvision_state *)device->machine->driver_data;
+	crvision_state *state = device->machine->driver_data<crvision_state>();
 
 	UINT8 data = 0xff;
 
@@ -757,7 +757,7 @@ static WRITE8_DEVICE_HANDLER( lasr2001_pia_pb_w )
         PB7     Keyboard row 7, PSG data 0, centronics data 7
     */
 
-	crvision_state *state = (crvision_state *)device->machine->driver_data;
+	crvision_state *state = device->machine->driver_data<crvision_state>();
 
 	/* keyboard latch */
 	state->keylatch = data;
@@ -778,7 +778,7 @@ static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_ca2_w )
 
 static READ_LINE_DEVICE_HANDLER( lasr2001_pia_cb1_r )
 {
-	crvision_state *state = (crvision_state *)device->machine->driver_data;
+	crvision_state *state = device->machine->driver_data<crvision_state>();
 	
 	/* actually this is a diode-AND (READY & _BUSY), but ctronics.c returns busy status if printer image is not mounted -> Manager won't boot */
 	return sn76496_ready_r(state->psg) & (centronics_not_busy_r(state->centronics) | pia6821_get_output_ca2_z(device));
@@ -786,7 +786,7 @@ static READ_LINE_DEVICE_HANDLER( lasr2001_pia_cb1_r )
 
 static WRITE_LINE_DEVICE_HANDLER( lasr2001_pia_cb2_w )
 {
-	crvision_state *driver_state = (crvision_state *)device->machine->driver_data;
+	crvision_state *driver_state = device->machine->driver_data<crvision_state>();
 
 	if (pia6821_get_output_ca2_z(device))
 	{
@@ -876,7 +876,7 @@ static const centronics_interface lasr2001_centronics_intf =
 
 static MACHINE_START( creativision )
 {
-	crvision_state *state = (crvision_state *)machine->driver_data;
+	crvision_state *state = machine->driver_data<crvision_state>();
 
 	/* find devices */
 	state->psg = machine->device(SN76489_TAG);

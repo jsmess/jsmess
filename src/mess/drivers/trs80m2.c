@@ -80,7 +80,7 @@ static const UINT8 trs80m2_keycodes[3][9][8] =
 
 static void trs80m2_keyboard_scan(running_machine *machine)
 {
-	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
+	trs80m2_state *state = machine->driver_data<trs80m2_state>();
 
 	if (!state->kbirq) return;
 
@@ -160,7 +160,7 @@ static WRITE8_DEVICE_HANDLER( drvslt_w )
 
 static void bankswitch(running_machine *machine)
 {
-	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
+	trs80m2_state *state = machine->driver_data<trs80m2_state>();
 
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 	running_device *messram = machine->device("messram");
@@ -214,7 +214,7 @@ static WRITE8_HANDLER( rom_enable_w )
 
     */
 
-	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
 
 	state->boot_rom = BIT(data, 0);
 	bankswitch(space->machine);
@@ -222,7 +222,7 @@ static WRITE8_HANDLER( rom_enable_w )
 
 static READ8_HANDLER( keyboard_r )
 {
-	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
 
 	/* clear keyboard interrupt */
 	if (!state->kbirq)
@@ -261,7 +261,7 @@ static READ8_HANDLER( nmi_r )
 
     */
 
-	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
 
 	UINT8 data = 0;
 
@@ -297,7 +297,7 @@ static WRITE8_HANDLER( nmi_w )
 
     */
 
-	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
 
 	/* memory bank select */
 	state->bank = data & 0x0f;
@@ -325,14 +325,14 @@ static WRITE8_HANDLER( nmi_w )
 
 //static READ8_HANDLER( keyboard_busy_r )
 //{
-//	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+//	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
 //
 //	return state->kbirq;
 //}
 //
 //static READ8_HANDLER( keyboard_data_r )
 //{
-//	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+//	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
 //
 //	static const char *const KEY_ROW[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9", "ROW10", "ROW11" };
 //
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( nmi_w )
 //
 //    */
 //
-//	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+//	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
 //
 //	int kbdata = BIT(data, 0);
 //	int kbclk = BIT(data, 1);
@@ -402,7 +402,7 @@ static WRITE8_HANDLER( nmi_w )
 //
 //    */
 //
-//	trs80m2_state *state = (trs80m2_state *)space->machine->driver_data;
+//	trs80m2_state *state = space->machine->driver_data<trs80m2_state>();
 //
 //	state->key_latch = BITSWAP8(data, 7, 6, 5, 4, 0, 1, 2, 3) & 0x0f;
 //}
@@ -666,7 +666,7 @@ INPUT_PORTS_END
 
 static MC6845_UPDATE_ROW( trs80m2_update_row )
 {
-	trs80m2_state *state = (trs80m2_state *)device->machine->driver_data;
+	trs80m2_state *state = device->machine->driver_data<trs80m2_state>();
 
 	for (int column = 0; column < x_count; column++)
 	{
@@ -693,14 +693,14 @@ static MC6845_UPDATE_ROW( trs80m2_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( de_w )
 {
-	trs80m2_state *driver_state = (trs80m2_state *)device->machine->driver_data;
+	trs80m2_state *driver_state = device->machine->driver_data<trs80m2_state>();
 
 	driver_state->de = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( vsync_w )
 {
-	trs80m2_state *driver_state = (trs80m2_state *)device->machine->driver_data;
+	trs80m2_state *driver_state = device->machine->driver_data<trs80m2_state>();
 
 	if (state)
 	{
@@ -730,7 +730,7 @@ static const mc6845_interface mc6845_intf =
 
 static VIDEO_START( trs80m2 )
 {
-	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
+	trs80m2_state *state = machine->driver_data<trs80m2_state>();
 
 	/* find devices */
 	state->mc6845 = machine->device(MC6845_TAG);
@@ -741,7 +741,7 @@ static VIDEO_START( trs80m2 )
 
 static VIDEO_UPDATE( trs80m2 )
 {
-	trs80m2_state *state = (trs80m2_state *)screen->machine->driver_data;
+	trs80m2_state *state = screen->machine->driver_data<trs80m2_state>();
 
 	if (state->blnkvid)
 	{
@@ -787,7 +787,7 @@ static READ8_DEVICE_HANDLER( pio_pa_r )
 
     */
 
-	trs80m2_state *state = (trs80m2_state *)device->machine->driver_data;
+	trs80m2_state *state = device->machine->driver_data<trs80m2_state>();
 
 	UINT8 data = 0;
 
@@ -829,7 +829,7 @@ static WRITE8_DEVICE_HANDLER( pio_pa_w )
 
     */
 
-	trs80m2_state *state = (trs80m2_state *)device->machine->driver_data;
+	trs80m2_state *state = device->machine->driver_data<trs80m2_state>();
 
 	/* prime */
 	centronics_prime_w(state->centronics, BIT(data, 3));
@@ -882,7 +882,7 @@ static const z80sio_interface sio_intf =
 
 static TIMER_DEVICE_CALLBACK( ctc_tick )
 {
-	trs80m2_state *state = (trs80m2_state *) timer.machine->driver_data;
+	trs80m2_state *state =  timer.machine->driver_data<trs80m2_state>();
 
 	z80ctc_trg0_w(state->z80ctc, 1);
 	z80ctc_trg0_w(state->z80ctc, 0);
@@ -919,7 +919,7 @@ static const floppy_config trs80m2_floppy_config =
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_intrq_w )
 {
-	trs80m2_state *driver_state = (trs80m2_state *)device->machine->driver_data;
+	trs80m2_state *driver_state = device->machine->driver_data<trs80m2_state>();
 
 	driver_state->fdc_intrq = state;
 
@@ -949,7 +949,7 @@ static const z80_daisy_config trs80m2_daisy_chain[] =
 
 static MACHINE_START( trs80m2 )
 {
-	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
+	trs80m2_state *state = machine->driver_data<trs80m2_state>();
 
 	/* find devices */
 	state->z80ctc = machine->device(Z80CTC_TAG);
@@ -981,7 +981,7 @@ static MACHINE_START( trs80m2 )
 
 static MACHINE_RESET( trs80m2 )
 {
-	trs80m2_state *state = (trs80m2_state *)machine->driver_data;
+	trs80m2_state *state = machine->driver_data<trs80m2_state>();
 
 	/* clear keyboard interrupt */
 	state->kbirq = 1;

@@ -31,7 +31,7 @@
 
 static TIMER_DEVICE_CALLBACK( keyboard_tick )
 {
-	amu880_state *state = (amu880_state *)timer.machine->driver_data;
+	amu880_state *state = timer.machine->driver_data<amu880_state>();
 
 	state->key_y++;
 
@@ -57,7 +57,7 @@ static READ8_HANDLER( keyboard_r )
 
     */
 
-	amu880_state *state = (amu880_state *)space->machine->driver_data;
+	amu880_state *state = space->machine->driver_data<amu880_state>();
 
 	static const char *const keynames[] = { "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12", "Y13", "Y14", "Y15" };
 
@@ -215,7 +215,7 @@ INPUT_PORTS_END
 
 static VIDEO_START( amu880 )
 {
-	amu880_state *state = (amu880_state *)machine->driver_data;
+	amu880_state *state = machine->driver_data<amu880_state>();
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, "chargen");
@@ -223,7 +223,7 @@ static VIDEO_START( amu880 )
 
 static VIDEO_UPDATE( amu880 )
 {
-	amu880_state *state = (amu880_state *)screen->machine->driver_data;
+	amu880_state *state = screen->machine->driver_data<amu880_state>();
 
 	int y, sx, x, line;
 
@@ -333,7 +333,7 @@ static const z80_daisy_config amu880_daisy_chain[] =
 
 static MACHINE_START( amu880 )
 {
-	amu880_state *state = (amu880_state *)machine->driver_data;
+	amu880_state *state = machine->driver_data<amu880_state>();
 
 	/* find devices */
 	state->cassette = machine->device(CASSETTE_TAG);

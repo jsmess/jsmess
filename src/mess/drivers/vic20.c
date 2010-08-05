@@ -185,7 +185,7 @@ static READ8_DEVICE_HANDLER( via0_pa_r )
 
     */
 
-	vic20_state *state = (vic20_state *)device->machine->driver_data;
+	vic20_state *state = device->machine->driver_data<vic20_state>();
 	UINT8 data = 0xfc;
 
 	/* serial clock in */
@@ -223,7 +223,7 @@ static WRITE8_DEVICE_HANDLER( via0_pa_w )
 
     */
 
-	vic20_state *state = (vic20_state *)device->machine->driver_data;
+	vic20_state *state = device->machine->driver_data<vic20_state>();
 
 	/* serial attention out */
 	cbm_iec_atn_w(state->iec, device, !BIT(data, 7));
@@ -269,7 +269,7 @@ static WRITE8_DEVICE_HANDLER( via0_pb_w )
 
 static WRITE8_DEVICE_HANDLER( via0_ca2_w )
 {
-	vic20_state *state = (vic20_state *)device->machine->driver_data;
+	vic20_state *state = device->machine->driver_data<vic20_state>();
 
 	if (!BIT(data, 0))
 	{
@@ -319,7 +319,7 @@ static READ8_DEVICE_HANDLER( via1_pa_r )
 
     */
 
-	vic20_state *state = (vic20_state *)device->machine->driver_data;
+	vic20_state *state = device->machine->driver_data<vic20_state>();
 	UINT8 data = 0xff;
 
 	if (!BIT(state->key_col, 0)) data &= input_port_read(device->machine, "ROW0");
@@ -376,7 +376,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
     */
 
-	vic20_state *state = (vic20_state *)device->machine->driver_data;
+	vic20_state *state = device->machine->driver_data<vic20_state>();
 
 	/* cassette write */
 	cassette_output(device->machine->device("cassette"), BIT(data, 3) ? -(0x5a9e >> 1) : +(0x5a9e >> 1));
@@ -387,7 +387,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
 {
-	vic20_state *driver_state = (vic20_state *)device->machine->driver_data;
+	vic20_state *driver_state = device->machine->driver_data<vic20_state>();
 
 	/* serial clock out */
 	cbm_iec_clk_w(driver_state->iec, device, !state);
@@ -395,7 +395,7 @@ static WRITE_LINE_DEVICE_HANDLER( via1_ca2_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via1_cb2_w )
 {
-	vic20_state *driver_state = (vic20_state *)device->machine->driver_data;
+	vic20_state *driver_state = device->machine->driver_data<vic20_state>();
 
 	/* serial data out */
 	cbm_iec_data_w(driver_state->iec, device, !state);
@@ -424,7 +424,7 @@ static const via6522_interface vic20_via1_intf =
 
 static TIMER_DEVICE_CALLBACK( cassette_tick )
 {
-	vic20_state *state = (vic20_state *)timer.machine->driver_data;
+	vic20_state *state = timer.machine->driver_data<vic20_state>();
 	int data = (cassette_input(state->cassette) > +0.0) ? 1 : 0;
 
 	via_ca1_w(state->via1, data);
@@ -516,7 +516,7 @@ static const mos6560_interface vic20_6561_intf =
 
 static MACHINE_START( vic20 )
 {
-	vic20_state *state = (vic20_state *)machine->driver_data;
+	vic20_state *state = machine->driver_data<vic20_state>();
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
@@ -622,7 +622,7 @@ static PALETTE_INIT( vic20 )
 
 static VIDEO_UPDATE( vic20 )
 {
-	vic20_state *state = (vic20_state *)screen->machine->driver_data;
+	vic20_state *state = screen->machine->driver_data<vic20_state>();
 	mos6560_video_update(state->mos6560, bitmap, cliprect);
 	return 0;
 }
@@ -631,7 +631,7 @@ static VIDEO_UPDATE( vic20 )
 
 static INTERRUPT_GEN( vic20_raster_interrupt )
 {
-	vic20_state *state = (vic20_state *)device->machine->driver_data;
+	vic20_state *state = device->machine->driver_data<vic20_state>();
 	mos6560_raster_interrupt_gen(state->mos6560);
 }
 

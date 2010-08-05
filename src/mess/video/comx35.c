@@ -10,7 +10,7 @@
 
 static READ8_DEVICE_HANDLER( comx35_pageram_r )
 {
-	comx35_state *state = (comx35_state *)device->machine->driver_data;
+	comx35_state *state = device->machine->driver_data<comx35_state>();
 
 	UINT16 addr = offset & COMX35_PAGERAM_MASK;
 
@@ -19,7 +19,7 @@ static READ8_DEVICE_HANDLER( comx35_pageram_r )
 
 static WRITE8_DEVICE_HANDLER( comx35_pageram_w )
 {
-	comx35_state *state = (comx35_state *)device->machine->driver_data;
+	comx35_state *state = device->machine->driver_data<comx35_state>();
 
 	UINT16 addr = offset & COMX35_PAGERAM_MASK;
 
@@ -28,7 +28,7 @@ static WRITE8_DEVICE_HANDLER( comx35_pageram_w )
 
 static CDP1869_CHAR_RAM_READ( comx35_charram_r )
 {
-	comx35_state *state = (comx35_state *)device->machine->driver_data;
+	comx35_state *state = device->machine->driver_data<comx35_state>();
 
 	UINT16 pageaddr = pma & COMX35_PAGERAM_MASK;
 	UINT8 column = state->pageram[pageaddr] & 0x7f;
@@ -39,7 +39,7 @@ static CDP1869_CHAR_RAM_READ( comx35_charram_r )
 
 static CDP1869_CHAR_RAM_WRITE( comx35_charram_w )
 {
-	comx35_state *state = (comx35_state *)device->machine->driver_data;
+	comx35_state *state = device->machine->driver_data<comx35_state>();
 
 	UINT16 pageaddr = pma & COMX35_PAGERAM_MASK;
 	UINT8 column = state->pageram[pageaddr] & 0x7f;
@@ -50,7 +50,7 @@ static CDP1869_CHAR_RAM_WRITE( comx35_charram_w )
 
 static CDP1869_PCB_READ( comx35_pcb_r )
 {
-	comx35_state *state = (comx35_state *)device->machine->driver_data;
+	comx35_state *state = device->machine->driver_data<comx35_state>();
 
 	UINT16 pageaddr = pma & COMX35_PAGERAM_MASK;
 
@@ -59,7 +59,7 @@ static CDP1869_PCB_READ( comx35_pcb_r )
 
 static WRITE_LINE_DEVICE_HANDLER( comx35_prd_w )
 {
-	comx35_state *driver_state = (comx35_state *)device->machine->driver_data;
+	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
 
 	if (!driver_state->iden && !state)
 	{
@@ -99,7 +99,7 @@ static CDP1869_INTERFACE( ntsc_cdp1869_intf )
 
 static VIDEO_START( comx35 )
 {
-	comx35_state *state = (comx35_state *)machine->driver_data;
+	comx35_state *state = machine->driver_data<comx35_state>();
 
 	// allocate memory
 
@@ -141,21 +141,21 @@ static VIDEO_UPDATE( comx35 )
 
 READ8_HANDLER( comx35_videoram_r )
 {
-	comx35_state *state = (comx35_state *)space->machine->driver_data;
+	comx35_state *state = space->machine->driver_data<comx35_state>();
 
 	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( comx35_videoram_w )
 {
-	comx35_state *state = (comx35_state *)space->machine->driver_data;
+	comx35_state *state = space->machine->driver_data<comx35_state>();
 
 	state->videoram[offset] = data;
 }
 
 static MC6845_UPDATE_ROW( comx35_update_row )
 {
-	comx35_state *state = (comx35_state *)device->machine->driver_data;
+	comx35_state *state = device->machine->driver_data<comx35_state>();
 
 	UINT8 *charrom = memory_region(device->machine, "chargen");
 
@@ -186,7 +186,7 @@ static MC6845_UPDATE_ROW( comx35_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( comx35_hsync_changed )
 {
-	comx35_state *driver_state = (comx35_state *)device->machine->driver_data;
+	comx35_state *driver_state = device->machine->driver_data<comx35_state>();
 
 	driver_state->cdp1802_ef4 = state;
 }

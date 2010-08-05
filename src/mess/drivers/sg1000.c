@@ -107,7 +107,7 @@ Notes:
 
 static WRITE8_HANDLER( tvdraw_axis_w )
 {
-	sg1000_state *state = (sg1000_state *)space->machine->driver_data;
+	sg1000_state *state = space->machine->driver_data<sg1000_state>();
 
 	if (data & 0x01)
 	{
@@ -137,7 +137,7 @@ static READ8_HANDLER( tvdraw_status_r )
 
 static READ8_HANDLER( tvdraw_data_r )
 {
-	sg1000_state *state = (sg1000_state *)space->machine->driver_data;
+	sg1000_state *state = space->machine->driver_data<sg1000_state>();
 
 	return state->tvdraw_data;
 }
@@ -574,7 +574,7 @@ static READ8_DEVICE_HANDLER( sc3000_ppi_pa_r )
         PA7     Keyboard input
     */
 
-	sg1000_state *state = (sg1000_state *)device->machine->driver_data;
+	sg1000_state *state = device->machine->driver_data<sg1000_state>();
 
 	static const char *const keynames[] = { "PA0", "PA1", "PA2", "PA3", "PA4", "PA5", "PA6", "PA7" };
 
@@ -596,7 +596,7 @@ static READ8_DEVICE_HANDLER( sc3000_ppi_pb_r )
         PB7     Cassette tape input
     */
 
-	sg1000_state *state = (sg1000_state *)device->machine->driver_data;
+	sg1000_state *state = device->machine->driver_data<sg1000_state>();
 
 	static const char *const keynames[] = { "PB0", "PB1", "PB2", "PB3", "PB4", "PB5", "PB6", "PB7" };
 
@@ -630,7 +630,7 @@ static WRITE8_DEVICE_HANDLER( sc3000_ppi_pc_w )
         PC7     /FEED to printer
     */
 
-	sg1000_state *state = (sg1000_state *)device->machine->driver_data;
+	sg1000_state *state = device->machine->driver_data<sg1000_state>();
 
 	/* keyboard */
 	state->keylatch = data & 0x07;
@@ -682,7 +682,7 @@ static READ8_DEVICE_HANDLER( sf7000_ppi_pa_r )
         PA7
     */
 
-	sg1000_state *state = (sg1000_state *)device->machine->driver_data;
+	sg1000_state *state = device->machine->driver_data<sg1000_state>();
 	UINT8 result = 0;
 
 	result |= state->fdc_irq;
@@ -707,7 +707,7 @@ static WRITE8_DEVICE_HANDLER( sf7000_ppi_pc_w )
         PC7     /STROBE to Centronics printer
     */
 
-	sg1000_state *state = (sg1000_state *)device->machine->driver_data;
+	sg1000_state *state = device->machine->driver_data<sg1000_state>();
 
 	/* floppy motor */
 	floppy_mon_w(floppy_get_device(device->machine, 0), BIT(data, 1));
@@ -745,7 +745,7 @@ static I8255A_INTERFACE( sf7000_ppi_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( sf7000_fdc_interrupt )
 {
-	sg1000_state *driver_state = (sg1000_state *)device->machine->driver_data;
+	sg1000_state *driver_state = device->machine->driver_data<sg1000_state>();
 
 	driver_state->fdc_irq = state;
 }
@@ -975,7 +975,7 @@ static TIMER_CALLBACK( lightgun_tick )
 
 static MACHINE_START( sg1000 )
 {
-	sg1000_state *state = (sg1000_state *)machine->driver_data;
+	sg1000_state *state = machine->driver_data<sg1000_state>();
 
 	/* configure VDP */
 	TMS9928A_configure(&tms9928a_interface);
@@ -993,7 +993,7 @@ static MACHINE_START( sg1000 )
 
 static MACHINE_START( sc3000 )
 {
-	sg1000_state *state = (sg1000_state *)machine->driver_data;
+	sg1000_state *state = machine->driver_data<sg1000_state>();
 
 	/* find devices */
 	state->cassette = machine->device(CASSETTE_TAG);
@@ -1015,7 +1015,7 @@ static MACHINE_START( sc3000 )
 
 static void sf7000_fdc_index_callback(running_device *controller, running_device *img, int state)
 {
-	sg1000_state *driver_state = (sg1000_state *)img->machine->driver_data;
+	sg1000_state *driver_state = img->machine->driver_data<sg1000_state>();
 
 	driver_state->fdc_index = state;
 }
@@ -1026,7 +1026,7 @@ static void sf7000_fdc_index_callback(running_device *controller, running_device
 
 static MACHINE_START( sf7000 )
 {
-	sg1000_state *state = (sg1000_state *)machine->driver_data;
+	sg1000_state *state = machine->driver_data<sg1000_state>();
 
 	/* find devices */
 	state->upd765 = machine->device(UPD765_TAG);

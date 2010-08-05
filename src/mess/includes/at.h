@@ -11,12 +11,13 @@
 
 #include "machine/8237dma.h"
 
-class at_state
+class at_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, at_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, at_state(machine)); }
 
-	at_state(running_machine &machine) { }
+	at_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	running_device *maincpu;
 	running_device *pic8259_master;

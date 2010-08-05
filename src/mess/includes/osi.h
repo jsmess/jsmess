@@ -11,12 +11,13 @@
 #define OSI600_VIDEORAM_SIZE	0x400
 #define OSI630_COLORRAM_SIZE	0x400
 
-class osi_state
+class osi_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, osi_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, osi_state(machine)); }
 
-	osi_state(running_machine &machine) { }
+	osi_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* keyboard state */
 	UINT8 keylatch;

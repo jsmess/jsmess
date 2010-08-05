@@ -34,7 +34,7 @@
 
 static void mc1000_bankswitch(running_machine *machine)
 {
-	mc1000_state *state = (mc1000_state *)machine->driver_data;
+	mc1000_state *state = machine->driver_data<mc1000_state>();
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* MC6845 video RAM */
@@ -84,21 +84,21 @@ static void mc1000_bankswitch(running_machine *machine)
 
 static READ8_HANDLER( printer_r )
 {
-	mc1000_state *state = (mc1000_state *)space->machine->driver_data;
+	mc1000_state *state = space->machine->driver_data<mc1000_state>();
 
 	return centronics_busy_r(state->centronics);
 }
 
 static WRITE8_HANDLER( printer_w )
 {
-	mc1000_state *state = (mc1000_state *)space->machine->driver_data;
+	mc1000_state *state = space->machine->driver_data<mc1000_state>();
 
 	centronics_strobe_w(state->centronics, BIT(data, 0));
 }
 
 static WRITE8_HANDLER( mc6845_ctrl_w )
 {
-	mc1000_state *state = (mc1000_state *)space->machine->driver_data;
+	mc1000_state *state = space->machine->driver_data<mc1000_state>();
 
 	state->mc6845_bank = BIT(data, 0);
 
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( mc6847_attr_w )
 
     */
 
-	mc1000_state *state = (mc1000_state *)space->machine->driver_data;
+	mc1000_state *state = space->machine->driver_data<mc1000_state>();
 
 	state->mc6847_bank = BIT(data, 0);
 	mc6847_css_w(state->mc6847, BIT(data, 1));
@@ -247,19 +247,19 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( mc1000_mc6847_fs_w )
 {
-	mc1000_state *mc1000 = (mc1000_state *)device->machine->driver_data;
+	mc1000_state *mc1000 = device->machine->driver_data<mc1000_state>();
 	mc1000->vsync = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( mc1000_mc6847_hs_w )
 {
-	mc1000_state *mc1000 = (mc1000_state *)device->machine->driver_data;
+	mc1000_state *mc1000 = device->machine->driver_data<mc1000_state>();
 	mc1000->hsync = state;
 }
 
 static READ8_DEVICE_HANDLER( mc1000_mc6847_videoram_r )
 {
-	mc1000_state *state = (mc1000_state *)device->machine->driver_data;
+	mc1000_state *state = device->machine->driver_data<mc1000_state>();
 
 	mc6847_inv_w(device, BIT(state->mc6847_video_ram[offset], 7));
 
@@ -268,7 +268,7 @@ static READ8_DEVICE_HANDLER( mc1000_mc6847_videoram_r )
 
 static VIDEO_UPDATE( mc1000 )
 {
-	mc1000_state *state = (mc1000_state *)screen->machine->driver_data;
+	mc1000_state *state = screen->machine->driver_data<mc1000_state>();
 	return mc6847_update(state->mc6847, bitmap, cliprect);
 }
 
@@ -276,7 +276,7 @@ static VIDEO_UPDATE( mc1000 )
 
 static WRITE8_DEVICE_HANDLER( keylatch_w )
 {
-	mc1000_state *state = (mc1000_state *)device->machine->driver_data;
+	mc1000_state *state = device->machine->driver_data<mc1000_state>();
 
 	state->keylatch = data;
 
@@ -285,7 +285,7 @@ static WRITE8_DEVICE_HANDLER( keylatch_w )
 
 static READ8_DEVICE_HANDLER( keydata_r )
 {
-	mc1000_state *state = (mc1000_state *)device->machine->driver_data;
+	mc1000_state *state = device->machine->driver_data<mc1000_state>();
 
 	UINT8 data = 0xff;
 
@@ -319,7 +319,7 @@ static const ay8910_interface ay8910_intf =
 
 static MACHINE_START( mc1000 )
 {
-	mc1000_state *state = (mc1000_state *)machine->driver_data;
+	mc1000_state *state = machine->driver_data<mc1000_state>();
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */
@@ -364,7 +364,7 @@ static MACHINE_START( mc1000 )
 
 static MACHINE_RESET( mc1000 )
 {
-	mc1000_state *state = (mc1000_state *)machine->driver_data;
+	mc1000_state *state = machine->driver_data<mc1000_state>();
 
 	memory_set_bank(machine, "bank1", 1);
 
@@ -375,7 +375,7 @@ static MACHINE_RESET( mc1000 )
 
 static TIMER_DEVICE_CALLBACK( ne555_tick )
 {
-	mc1000_state *state = (mc1000_state *)timer.machine->driver_data;
+	mc1000_state *state = timer.machine->driver_data<mc1000_state>();
 
 	if (state->ne555_int == ASSERT_LINE)
 	{
@@ -469,7 +469,7 @@ ROM_END
 
 static DIRECT_UPDATE_HANDLER( mc1000_direct_update_handler )
 {
-	mc1000_state *state = (mc1000_state *)space->machine->driver_data;
+	mc1000_state *state = space->machine->driver_data<mc1000_state>();
 
 	if (state->rom0000)
 	{

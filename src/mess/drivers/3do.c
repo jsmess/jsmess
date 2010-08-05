@@ -131,7 +131,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( 3do )
 {
-	_3do_state *state = (_3do_state *)machine->driver_data;
+	_3do_state *state = machine->driver_data<_3do_state>();
 
 	state->maincpu = downcast<legacy_cpu_device*>( machine->device("maincpu") );
 

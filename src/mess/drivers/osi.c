@@ -233,7 +233,7 @@ DISCRETE_SOUND_END
 
 static READ8_HANDLER( osi600_keyboard_r )
 {
-	osi_state *state = (osi_state *)space->machine->driver_data;
+	osi_state *state = space->machine->driver_data<osi_state>();
 
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 
@@ -251,7 +251,7 @@ static READ8_HANDLER( osi600_keyboard_r )
 static WRITE8_HANDLER( osi600_keyboard_w )
 {
 	running_device *discrete = space->machine->device("discrete");
-	osi_state *state = (osi_state *)space->machine->driver_data;
+	osi_state *state = space->machine->driver_data<osi_state>();
 
 	state->keylatch = data;
 
@@ -260,7 +260,7 @@ static WRITE8_HANDLER( osi600_keyboard_w )
 
 static WRITE8_HANDLER( uk101_keyboard_w )
 {
-	osi_state *state = (osi_state *)space->machine->driver_data;
+	osi_state *state = space->machine->driver_data<osi_state>();
 
 	state->keylatch = data;
 }
@@ -283,7 +283,7 @@ static WRITE8_HANDLER( osi600_ctrl_w )
     */
 
 	running_device *discrete = space->machine->device("discrete");
-	osi_state *state = (osi_state *)space->machine->driver_data;
+	osi_state *state = space->machine->driver_data<osi_state>();
 
 	state->_32 = BIT(data, 0);
 	state->coloren = BIT(data, 1);
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( osi630_sound_w )
 
 static void osi470_index_callback(running_device *controller, running_device *img, int state)
 {
-	osi_state *driver_state = (osi_state *)img->machine->driver_data;
+	osi_state *driver_state = img->machine->driver_data<osi_state>();
 
 	driver_state->fdc_index = state;
 }
@@ -379,7 +379,7 @@ static READ8_DEVICE_HANDLER( osi470_pia_a_r )
 
     */
 
-	osi_state *state = (osi_state *)device->machine->driver_data;
+	osi_state *state = device->machine->driver_data<osi_state>();
 
 	return (state->fdc_index << 7);
 }
@@ -615,14 +615,14 @@ INPUT_PORTS_END
 
 static READ_LINE_DEVICE_HANDLER( cassette_rx )
 {
-	osi_state *driver_state = (osi_state *)device->machine->driver_data;
+	osi_state *driver_state = device->machine->driver_data<osi_state>();
 
 	return (cassette_input(driver_state->cassette) > 0.0) ? 1 : 0;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cassette_tx )
 {
-	osi_state *driver_state = (osi_state *)device->machine->driver_data;
+	osi_state *driver_state = device->machine->driver_data<osi_state>();
 
 	cassette_output(driver_state->cassette, state ? +1.0 : -1.0);
 }
@@ -665,7 +665,7 @@ static ACIA6850_INTERFACE( osi470_acia_intf )
 
 static MACHINE_START( osi600 )
 {
-	osi_state *state = (osi_state *)machine->driver_data;
+	osi_state *state = machine->driver_data<osi_state>();
 
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -695,7 +695,7 @@ static MACHINE_START( osi600 )
 
 static MACHINE_START( c1p )
 {
-	osi_state *state = (osi_state *)machine->driver_data;
+	osi_state *state = machine->driver_data<osi_state>();
 
 	const address_space *program = cputag_get_address_space(machine, M6502_TAG, ADDRESS_SPACE_PROGRAM);
 

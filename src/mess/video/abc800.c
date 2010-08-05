@@ -41,14 +41,14 @@ static PALETTE_INIT( abc800c )
 
 WRITE8_HANDLER( abc800_hrs_w )
 {
-	abc800_state *state = (abc800_state *)space->machine->driver_data;
+	abc800_state *state = space->machine->driver_data<abc800_state>();
 
 	state->hrs = data;
 }
 
 WRITE8_HANDLER( abc800_hrc_w )
 {
-	abc800_state *state = (abc800_state *)space->machine->driver_data;
+	abc800_state *state = space->machine->driver_data<abc800_state>();
 
 	state->fgctl = data;
 }
@@ -57,7 +57,7 @@ WRITE8_HANDLER( abc800_hrc_w )
 
 static MC6845_UPDATE_ROW( abc800m_update_row )
 {
-	abc800_state *state = (abc800_state *)device->machine->driver_data;
+	abc800_state *state = device->machine->driver_data<abc800_state>();
 
 	int column;
 
@@ -96,7 +96,7 @@ static MC6845_UPDATE_ROW( abc800m_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( abc800_vsync_changed )
 {
-	abc800_state *driver_state = (abc800_state *)device->machine->driver_data;
+	abc800_state *driver_state = device->machine->driver_data<abc800_state>();
 
 	z80dart_rib_w(driver_state->z80dart, state);
 }
@@ -126,7 +126,7 @@ static void abc800c_update(running_machine *machine, bitmap_t *bitmap, const rec
 
 static void abc800m_hr_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	abc800_state *state = (abc800_state *)machine->driver_data;
+	abc800_state *state = machine->driver_data<abc800_state>();
 
 	UINT16 addr = 0;
 	int sx, y, dot;
@@ -155,7 +155,7 @@ static void abc800m_hr_update(running_machine *machine, bitmap_t *bitmap, const 
 
 static void abc800c_hr_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	abc800_state *state = (abc800_state *)machine->driver_data;
+	abc800_state *state = machine->driver_data<abc800_state>();
 
 	UINT16 addr = 0;
 	int sx, y, dot;
@@ -185,7 +185,7 @@ static void abc800c_hr_update(running_machine *machine, bitmap_t *bitmap, const 
 
 static VIDEO_START( abc800m )
 {
-	abc800_state *state = (abc800_state *)machine->driver_data;
+	abc800_state *state = machine->driver_data<abc800_state>();
 
 	/* find devices */
 	state->mc6845 = machine->device(MC6845_TAG);
@@ -201,7 +201,7 @@ static VIDEO_START( abc800m )
 
 static VIDEO_START( abc800c )
 {
-	abc800_state *state = (abc800_state *)machine->driver_data;
+	abc800_state *state = machine->driver_data<abc800_state>();
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, "chargen");
@@ -216,7 +216,7 @@ static VIDEO_START( abc800c )
 
 static VIDEO_UPDATE( abc800m )
 {
-	abc800_state *state = (abc800_state *)screen->machine->driver_data;
+	abc800_state *state = screen->machine->driver_data<abc800_state>();
 
 	/* expand visible area to workaround MC6845 */
 	screen->set_visible_area(0, 767, 0, 311);
@@ -238,7 +238,7 @@ static VIDEO_UPDATE( abc800m )
 
 static VIDEO_UPDATE( abc800c )
 {
-	abc800_state *state = (abc800_state *)screen->machine->driver_data;
+	abc800_state *state = screen->machine->driver_data<abc800_state>();
 
 	/* clear screen */
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));

@@ -19,7 +19,7 @@
 ***************************************************************************/
 VIDEO_START( advision )
 {
-	advision_state *state = (advision_state *)machine->driver_data;
+	advision_state *state = machine->driver_data<advision_state>();
 
 	state->video_hpos = 0;
 	state->display = auto_alloc_array(machine, UINT8, 8 * 8 * 256);
@@ -51,7 +51,7 @@ PALETTE_INIT( advision )
 
 void advision_vh_write(running_machine *machine, int data)
 {
-	advision_state *state = (advision_state *)machine->driver_data;
+	advision_state *state = machine->driver_data<advision_state>();
 
 	if (state->video_bank >= 1 && state->video_bank <=5)
 	{
@@ -61,7 +61,7 @@ void advision_vh_write(running_machine *machine, int data)
 
 void advision_vh_update(running_machine *machine, int x)
 {
-	advision_state *state = (advision_state *)machine->driver_data;
+	advision_state *state = machine->driver_data<advision_state>();
 
 	UINT8 *dst = &state->display[x];
 	int y;
@@ -94,7 +94,7 @@ void advision_vh_update(running_machine *machine, int x)
 
 VIDEO_UPDATE( advision )
 {
-	advision_state *state = (advision_state *)screen->machine->driver_data;
+	advision_state *state = screen->machine->driver_data<advision_state>();
 
 	int x, y;
 

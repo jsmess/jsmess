@@ -15,12 +15,13 @@
 #include "devices/flopdrv.h"
 #include "formats/basicdsk.h"
 
-class act_state
+class act_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, act_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, act_state(machine)); }
 
-	act_state(running_machine &machine) { }
+	act_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT16 *paletteram;
 	UINT16 *vram;
@@ -35,7 +36,7 @@ static VIDEO_START( act_f1 )
 
 static VIDEO_UPDATE( act_f1 )
 {
-	act_state *state = (act_state *)screen->machine->driver_data;
+	act_state *state = screen->machine->driver_data<act_state>();
 	int x,y,i;
 	int x_count;
 
@@ -74,7 +75,7 @@ static VIDEO_UPDATE( act_f1 )
 
 static READ8_HANDLER( act_fdc_r )
 {
-	act_state *state = (act_state *)space->machine->driver_data;
+	act_state *state = space->machine->driver_data<act_state>();
 	running_device* dev = space->machine->device("fdc");
 
 //  printf("%02x\n",offset);
@@ -102,7 +103,7 @@ static READ8_HANDLER( act_fdc_r )
 
 static WRITE8_HANDLER( act_fdc_w )
 {
-	act_state *state = (act_state *)space->machine->driver_data;
+	act_state *state = space->machine->driver_data<act_state>();
 	running_device* dev = space->machine->device("fdc");
 
 //  printf("%02x %02x\n",offset,data);
@@ -132,14 +133,14 @@ static WRITE8_HANDLER( act_fdc_w )
 
 static READ16_HANDLER( act_pal_r )
 {
-	act_state *state = (act_state *)space->machine->driver_data;
+	act_state *state = space->machine->driver_data<act_state>();
 
 	return state->paletteram[offset];
 }
 
 static WRITE16_HANDLER( act_pal_w )
 {
-	act_state *state = (act_state *)space->machine->driver_data;
+	act_state *state = space->machine->driver_data<act_state>();
 	UINT8 i,r,g,b;
 	COMBINE_DATA(&state->paletteram[offset]);
 

@@ -28,12 +28,13 @@ enum
 	LED_CASSETTE
 };
 
-class cosmicos_state
+class cosmicos_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cosmicos_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cosmicos_state(machine)); }
 
-	cosmicos_state(running_machine &machine) { }
+	cosmicos_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* CPU state */
 	cdp1802_control_mode cdp1802_mode;

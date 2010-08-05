@@ -28,7 +28,7 @@
 
 static void draw_mode4_line(running_machine *machine, int y, int hpos)
 {
-	coupe_asic *asic = (coupe_asic *)machine->driver_data;
+	coupe_asic *asic = machine->driver_data<coupe_asic>();
 
 	/* get start address */
 	UINT8 *vram = machine->generic.videoram.u8 + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
@@ -52,7 +52,7 @@ static void draw_mode4_line(running_machine *machine, int y, int hpos)
 
 static void draw_mode3_line(running_machine *machine, int y, int hpos)
 {
-	coupe_asic *asic = (coupe_asic *)machine->driver_data;
+	coupe_asic *asic = machine->driver_data<coupe_asic>();
 
 	/* get start address */
 	UINT8 *vram = machine->generic.videoram.u8 + ((y - SAM_BORDER_TOP) * 128) + ((hpos - SAM_BORDER_LEFT) / 4);
@@ -90,7 +90,7 @@ static void draw_mode12_block(coupe_asic *asic, bitmap_t *bitmap, int vpos, int 
 
 static void draw_mode2_line(running_machine *machine, int y, int hpos)
 {
-	coupe_asic *asic = (coupe_asic *)machine->driver_data;
+	coupe_asic *asic = machine->driver_data<coupe_asic>();
 
 	int cell = (y - SAM_BORDER_TOP) * 32 + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2;
 
@@ -102,7 +102,7 @@ static void draw_mode2_line(running_machine *machine, int y, int hpos)
 
 static void draw_mode1_line(running_machine *machine, int y, int hpos)
 {
-	coupe_asic *asic = (coupe_asic *)machine->driver_data;
+	coupe_asic *asic = machine->driver_data<coupe_asic>();
 
 	UINT8 mask = machine->generic.videoram.u8[((((y - SAM_BORDER_TOP) & 0xc0) << 5) | (((y - SAM_BORDER_TOP) & 0x07) << 8) | (((y - SAM_BORDER_TOP) & 0x38) << 2)) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
 	asic->attribute = machine->generic.videoram.u8[32*192 + (((y - SAM_BORDER_TOP) & 0xf8) << 2) + (hpos - SAM_BORDER_LEFT) / SAM_BLOCK / 2];
@@ -112,7 +112,7 @@ static void draw_mode1_line(running_machine *machine, int y, int hpos)
 
 TIMER_CALLBACK( sam_video_update_callback )
 {
-	coupe_asic *asic = (coupe_asic *)machine->driver_data;
+	coupe_asic *asic = machine->driver_data<coupe_asic>();
 
 	int vpos = machine->primary_screen->vpos();
 	int hpos = machine->primary_screen->hpos();

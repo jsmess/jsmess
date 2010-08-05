@@ -79,7 +79,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( led_refresh )
 {
-	beta_state *state = (beta_state *)machine->driver_data;
+	beta_state *state = machine->driver_data<beta_state>();
 
 	if (state->ls145_p < 6)
 	{
@@ -105,7 +105,7 @@ static READ8_DEVICE_HANDLER( beta_riot_a_r )
 
     */
 
-	beta_state *state = (beta_state *)device->machine->driver_data;
+	beta_state *state = device->machine->driver_data<beta_state>();
 
 	UINT8 data = 0xff;
 
@@ -143,7 +143,7 @@ static WRITE8_DEVICE_HANDLER( beta_riot_a_w )
 
     */
 
-	beta_state *state = (beta_state *)device->machine->driver_data;
+	beta_state *state = device->machine->driver_data<beta_state>();
 
 //  logerror("PA %02x\n", data);
 
@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( beta_riot_b_w )
 
     */
 
-	beta_state *state = (beta_state *)device->machine->driver_data;
+	beta_state *state = device->machine->driver_data<beta_state>();
 
 	//logerror("PB %02x %02x\n", data, olddata);
 
@@ -237,7 +237,7 @@ static DEVICE_IMAGE_UNLOAD( beta_eprom )
 
 static MACHINE_START( beta )
 {
-	beta_state *state = (beta_state *)machine->driver_data;
+	beta_state *state = machine->driver_data<beta_state>();
 
 	/* find devices */
 	state->speaker = machine->device(SPEAKER_TAG);

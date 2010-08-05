@@ -82,7 +82,7 @@
 
 static READ8_HANDLER(mac_asc_r)
 {
-	mac_state *mac = (mac_state *)space->machine->driver_data;
+	mac_state *mac = space->machine->driver_data<mac_state>();
 
 	logerror("ASC: Read @ %x (PC %x)\n", offset, cpu_get_pc(space->machine->device("maincpu")));
 
@@ -121,7 +121,7 @@ static WRITE8_HANDLER(mac_asc_w)
 {
 	static dmadac_sound_device *dacs[2];
 	INT32 i;
-	mac_state *mac = (mac_state *)space->machine->driver_data;
+	mac_state *mac = space->machine->driver_data<mac_state>();
 
 	logerror("ASC: %02x to %x (PC %x)\n", data, offset, cpu_get_pc(space->machine->device("maincpu")));
 

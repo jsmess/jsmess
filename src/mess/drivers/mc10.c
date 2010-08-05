@@ -21,12 +21,13 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-class mc10_state
+class mc10_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mc10_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mc10_state(machine)); }
 
-	mc10_state(running_machine &machine) { }
+	mc10_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	running_device *mc6847;
 	running_device *dac;
@@ -45,7 +46,7 @@ public:
 
 static READ8_HANDLER( mc10_bfff_r )
 {
-	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
+	mc10_state *mc10 = space->machine->driver_data<mc10_state>();
 	UINT8 result = 0xff;
 
 	if (!BIT(mc10->keyboard_strobe, 0)) result &= input_port_read(space->machine, "pb0");
@@ -62,7 +63,7 @@ static READ8_HANDLER( mc10_bfff_r )
 
 static WRITE8_HANDLER( mc10_bfff_w )
 {
-	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
+	mc10_state *mc10 = space->machine->driver_data<mc10_state>();
 
 	/* bit 2 to 6, mc6847 mode lines */
 	mc6847_gm2_w(mc10->mc6847, BIT(data, 2));
@@ -84,20 +85,20 @@ static WRITE8_HANDLER( mc10_bfff_w )
 /* keyboard strobe */
 static READ8_HANDLER( mc10_port1_r )
 {
-	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
+	mc10_state *mc10 = space->machine->driver_data<mc10_state>();
 	return mc10->keyboard_strobe;
 }
 
 /* keyboard strobe */
 static WRITE8_HANDLER( mc10_port1_w )
 {
-	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
+	mc10_state *mc10 = space->machine->driver_data<mc10_state>();
 	mc10->keyboard_strobe = data;
 }
 
 static READ8_HANDLER( mc10_port2_r )
 {
-	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
+	mc10_state *mc10 = space->machine->driver_data<mc10_state>();
 	UINT8 result = 0xef;
 
 	/* bit 1, keyboard line pa6 */
@@ -117,7 +118,7 @@ static READ8_HANDLER( mc10_port2_r )
 
 static WRITE8_HANDLER( mc10_port2_w )
 {
-	mc10_state *mc10 = (mc10_state *)space->machine->driver_data;
+	mc10_state *mc10 = space->machine->driver_data<mc10_state>();
 
 	/* bit 0, cassette & printer output */
 	cassette_output(mc10->cassette, BIT(data, 0) ? +1.0 : -1.0);
@@ -130,7 +131,7 @@ static WRITE8_HANDLER( mc10_port2_w )
 
 static READ8_DEVICE_HANDLER( mc10_mc6847_videoram_r )
 {
-	mc10_state *mc10 = (mc10_state *)device->machine->driver_data;
+	mc10_state *mc10 = device->machine->driver_data<mc10_state>();
 
 	mc6847_inv_w(device, BIT(mc10->ram[offset], 6));
 	mc6847_as_w(device, BIT(mc10->ram[offset], 7));
@@ -140,7 +141,7 @@ static READ8_DEVICE_HANDLER( mc10_mc6847_videoram_r )
 
 static VIDEO_UPDATE( mc10 )
 {
-	mc10_state *mc10 = (mc10_state *)screen->machine->driver_data;
+	mc10_state *mc10 = screen->machine->driver_data<mc10_state>();
 	return mc6847_update(mc10->mc6847, bitmap, cliprect);
 }
 
@@ -151,7 +152,7 @@ static VIDEO_UPDATE( mc10 )
 
 static DRIVER_INIT( mc10 )
 {
-	mc10_state *mc10 = (mc10_state *)machine->driver_data;
+	mc10_state *mc10 = machine->driver_data<mc10_state>();
 	const address_space *prg = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* initialize keyboard strobe */

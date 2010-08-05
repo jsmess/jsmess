@@ -11,12 +11,13 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/68681.h"
 
-class cat_state
+class cat_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cat_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cat_state(machine)); }
 
-	cat_state(running_machine &machine) { }
+	cat_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT16 *video_ram;
 
@@ -31,7 +32,7 @@ public:
 
 static WRITE16_HANDLER( cat_video_status_w )
 {
-	cat_state *state = (cat_state *)space->machine->driver_data;
+	cat_state *state = space->machine->driver_data<cat_state>();
 
 	state->video_enable = BIT( data, 3 );
 }
@@ -56,7 +57,7 @@ static READ16_HANDLER( cat_battery_r )
 }
 static WRITE16_HANDLER( cat_printer_w )
 {
-	cat_state *state = (cat_state *)space->machine->driver_data;
+	cat_state *state = space->machine->driver_data<cat_state>();
 
 	state->pr_cont = data;
 }
@@ -70,7 +71,7 @@ static WRITE16_HANDLER( cat_floppy_w )
 
 static READ16_HANDLER( cat_keyboard_r )
 {
-	cat_state *state = (cat_state *)space->machine->driver_data;
+	cat_state *state = space->machine->driver_data<cat_state>();
 	UINT16 retVal = 0;
 	// Read country code
 	if (state->pr_cont == 0x0900)
@@ -97,7 +98,7 @@ static READ16_HANDLER( cat_keyboard_r )
 }
 static WRITE16_HANDLER( cat_keyboard_w )
 {
-	cat_state *state = (cat_state *)space->machine->driver_data;
+	cat_state *state = space->machine->driver_data<cat_state>();
 
 	state->keyboard_line = data >> 8;
 }
@@ -269,7 +270,7 @@ static IRQ_CALLBACK(cat_int_ack)
 
 static MACHINE_START(cat)
 {
-	cat_state *state = (cat_state *)machine->driver_data;
+	cat_state *state = machine->driver_data<cat_state>();
 
 	state->duart_inp = 0x0e;
 	state->keyboard_timer = timer_alloc(machine, keyboard_callback, NULL);
@@ -277,7 +278,7 @@ static MACHINE_START(cat)
 
 static MACHINE_RESET(cat)
 {
-	cat_state *state = (cat_state *)machine->driver_data;
+	cat_state *state = machine->driver_data<cat_state>();
 	cpu_set_irq_callback(machine->device("maincpu"), cat_int_ack);
 	timer_adjust_periodic(state->keyboard_timer, attotime_zero, 0, ATTOTIME_IN_HZ(120));
 }
@@ -288,7 +289,7 @@ static VIDEO_START( cat )
 
 static VIDEO_UPDATE( cat )
 {
-	cat_state *state = (cat_state *)screen->machine->driver_data;
+	cat_state *state = screen->machine->driver_data<cat_state>();
 	UINT16 code;
 	int y, x, b;
 
@@ -334,7 +335,7 @@ static VIDEO_START( swyft )
 
 static VIDEO_UPDATE( swyft )
 {
-	cat_state *state = (cat_state *)screen->machine->driver_data;
+	cat_state *state = screen->machine->driver_data<cat_state>();
 	UINT16 code;
 	int y, x, b;
 
@@ -365,7 +366,7 @@ static void duart_tx(running_device *device, int channel, UINT8 data)
 
 static UINT8 duart_input(running_device *device)
 {
-	cat_state *state = (cat_state *)device->machine->driver_data;
+	cat_state *state = device->machine->driver_data<cat_state>();
 
 	if (state->duart_inp != 0)
 	{
@@ -389,7 +390,7 @@ static const duart68681_config cat_duart68681_config =
 
 static NVRAM_HANDLER( cat )
 {
-	cat_state *state = (cat_state *)machine->driver_data;
+	cat_state *state = machine->driver_data<cat_state>();
 
 	if (read_or_write)
 	{

@@ -559,12 +559,13 @@ struct _mcd212_ab_t
 	BYTE68K deltaUV[BYTE68K_MAX + 1];
 };
 
-class cdi_state
+class cdi_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cdi_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cdi_state(machine)); }
 
-	cdi_state(running_machine &machine) { }
+	cdi_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT16 *planea;
 	UINT16 *planeb;
@@ -599,7 +600,7 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
 
 static TIMER_CALLBACK( scc68070_timer0_callback )
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	scc68070_regs_t *scc68070 = &state->scc68070_regs;
 
 	scc68070->timers.timer0 = scc68070->timers.reload_register;
@@ -616,7 +617,7 @@ static TIMER_CALLBACK( scc68070_timer0_callback )
 
 static READ16_HANDLER( scc68070_periphs_r )
 {
-	cdi_state *state = (cdi_state *)space->machine->driver_data;
+	cdi_state *state = space->machine->driver_data<cdi_state>();
 	scc68070_regs_t *scc68070 = &state->scc68070_regs;
 
 	switch(offset)
@@ -859,7 +860,7 @@ static READ16_HANDLER( scc68070_periphs_r )
 
 static WRITE16_HANDLER( scc68070_periphs_w )
 {
-	cdi_state *state = (cdi_state *)space->machine->driver_data;
+	cdi_state *state = space->machine->driver_data<cdi_state>();
 	scc68070_regs_t *scc68070 = &state->scc68070_regs;
 
 	switch(offset)
@@ -1560,7 +1561,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 {
 	// Get XA format from sector header
 
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	cdic_regs_t *cdic = &state->cdic_regs;
 	const unsigned char *hdr = xa + 4;
 	int channels;
@@ -1687,7 +1688,7 @@ static void cdic_decode_audio_sector(running_machine *machine, const unsigned ch
 // After an appropriate delay for decoding to take place...
 static TIMER_CALLBACK( audio_sample_trigger )
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	cdic_regs_t *cdic = &state->cdic_regs;
 
 	if(cdic->decode_addr == 0xffff)
@@ -1814,7 +1815,7 @@ static UINT32 increment_cdda_sector_bcd(UINT32 bcd)
 
 static TIMER_CALLBACK( cdic_trigger_readback_int )
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	cdic_regs_t *cdic = &state->cdic_regs;
 
 	switch(cdic->command)
@@ -2124,7 +2125,7 @@ static TIMER_CALLBACK( cdic_trigger_readback_int )
 
 static READ16_HANDLER( cdic_r )
 {
-	cdi_state *state = (cdi_state *)space->machine->driver_data;
+	cdi_state *state = space->machine->driver_data<cdi_state>();
 	cdic_regs_t *cdic = &state->cdic_regs;
 
 	offset += 0x3c00/2;
@@ -2209,7 +2210,7 @@ static READ16_HANDLER( cdic_r )
 
 static WRITE16_HANDLER( cdic_w )
 {
-	cdi_state *state = (cdi_state *)space->machine->driver_data;
+	cdi_state *state = space->machine->driver_data<cdi_state>();
 	cdic_regs_t *cdic = &state->cdic_regs;
 
 	offset += 0x3c00/2;
@@ -2417,7 +2418,7 @@ static void cdic_register_globals(running_machine *machine, cdic_regs_t *cdic)
 
 static TIMER_CALLBACK( slave_trigger_readback_int )
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	slave_regs_t *slave = &state->slave_regs;
 
 	verboselog(machine, 0, "Asserting IRQ2\n" );
@@ -2428,7 +2429,7 @@ static TIMER_CALLBACK( slave_trigger_readback_int )
 
 static void slave_prepare_readback(running_machine *machine, attotime delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	slave_regs_t *slave = &state->slave_regs;
 
 	slave->channel[channel].out_index = 0;
@@ -2444,7 +2445,7 @@ static void slave_prepare_readback(running_machine *machine, attotime delay, UIN
 
 static void perform_mouse_update(running_machine *machine)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	slave_regs_t *slave = &state->slave_regs;
 	UINT16 x = input_port_read(machine, "MOUSEX");
 	UINT16 y = input_port_read(machine, "MOUSEY");
@@ -2491,7 +2492,7 @@ static INPUT_CHANGED( mouse_update )
 
 static READ16_HANDLER( slave_r )
 {
-	cdi_state *state = (cdi_state *)space->machine->driver_data;
+	cdi_state *state = space->machine->driver_data<cdi_state>();
 	slave_regs_t *slave = &state->slave_regs;
 
 	if(slave->channel[offset].out_count)
@@ -2528,7 +2529,7 @@ static READ16_HANDLER( slave_r )
 
 static void set_mouse_position(running_machine* machine)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	slave_regs_t *slave = &state->slave_regs;
 	UINT16 x, y;
 
@@ -2548,7 +2549,7 @@ static void set_mouse_position(running_machine* machine)
 
 static WRITE16_HANDLER( slave_w )
 {
-	cdi_state *state = (cdi_state *)space->machine->driver_data;
+	cdi_state *state = space->machine->driver_data<cdi_state>();
 	slave_regs_t *slave = &state->slave_regs;
 
 	switch(offset)
@@ -2886,7 +2887,7 @@ static const UINT16 cdi220_lcd_char[20*22] =
 
 static void cdi220_draw_lcd(running_machine *machine, int y)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	bitmap_t *bitmap = state->lcdbitmap;
 	UINT32 *scanline = BITMAP_ADDR32(bitmap, y, 0);
 	int x = 0;
@@ -2911,7 +2912,7 @@ static void cdi220_draw_lcd(running_machine *machine, int y)
 
 static READ16_HANDLER(mcd212_r)
 {
-	cdi_state *state = (cdi_state *)space->machine->driver_data;
+	cdi_state *state = space->machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 	UINT8 channel = 1 - (offset / 8);
 
@@ -2974,7 +2975,7 @@ static READ16_HANDLER(mcd212_r)
 
 static void mcd212_update_visible_area(running_machine *machine)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 	const rectangle &visarea = machine->primary_screen->visible_area();
 	rectangle visarea1;
@@ -3000,7 +3001,7 @@ static void mcd212_update_visible_area(running_machine *machine)
 
 static WRITE16_HANDLER(mcd212_w)
 {
-	cdi_state *state = (cdi_state *)space->machine->driver_data;
+	cdi_state *state = space->machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 
 	switch(offset)
@@ -3040,7 +3041,7 @@ static WRITE16_HANDLER(mcd212_w)
 
 static void mcd212_set_register(running_machine *machine, int channel, UINT8 reg, UINT32 value)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 
 	switch(reg)
@@ -3232,7 +3233,7 @@ static void mcd212_set_display_parameters(mcd212_regs_t *mcd212, int channel, UI
 
 static void mcd212_process_ica(running_machine *machine, int channel)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 	UINT16 *ica = channel ? state->planeb : state->planea;
 	UINT32 addr = 0x000400/2;
@@ -3317,7 +3318,7 @@ static void mcd212_process_ica(running_machine *machine, int channel)
 
 static void mcd212_process_dca(running_machine *machine, int channel)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 	UINT16 *dca = channel ? state->planeb : state->planea;
 	UINT32 addr = (mcd212->channel[channel].dca & 0x0007ffff) / 2; //(mcd212_get_dcp(mcd212, channel) & 0x0007ffff) / 2; // mcd212->channel[channel].dca / 2;
@@ -3465,7 +3466,7 @@ INLINE UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 
 static void mcd212_update_region_arrays(running_machine *machine)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 	int x = 0;
 	int latched_rf0 = 0;
@@ -3698,7 +3699,7 @@ static void mcd212_update_region_arrays(running_machine *machine)
 
 static int mcd212_get_screen_width(running_machine *machine)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 
 	if((mcd212->channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (mcd212->channel[0].csrw & MCD212_CSR1W_ST))
@@ -3710,7 +3711,7 @@ static int mcd212_get_screen_width(running_machine *machine)
 
 static void mcd212_process_vsr(running_machine *machine, int channel, UINT8 *pixels_r, UINT8 *pixels_g, UINT8 *pixels_b)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 	UINT8 *data = channel ? (UINT8*)state->planeb : (UINT8*)state->planea;
 	UINT32 vsr = mcd212_get_vsr(mcd212, channel) & 0x0007ffff;
@@ -4019,7 +4020,7 @@ static const UINT32 mcd212_4bpp_color[16] =
 
 static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 
 	if(mcd212->channel[0].cursor_control & MCD212_CURCNT_EN)
@@ -4067,7 +4068,7 @@ static void mcd212_draw_cursor(running_machine *machine, UINT32 *scanline, int y
 
 static void mcd212_mix_lines(running_machine *machine, UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a_b, UINT8 *plane_b_r, UINT8 *plane_b_g, UINT8 *plane_b_b, UINT32 *out)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 	int x = 0;
 	UINT8 debug_mode = input_port_read(machine, "DEBUG");
@@ -4263,7 +4264,7 @@ static void mcd212_draw_scanline(running_machine *machine, int y)
 
 static TIMER_CALLBACK( mcd212_perform_scan )
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	mcd212_regs_t *mcd212 = &state->mcd212_regs;
 	int scanline = machine->primary_screen->vpos();
 
@@ -4456,7 +4457,7 @@ static void mcd212_ab_init(mcd212_ab_t *mcd212_ab)
 
 static VIDEO_START(cdi)
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 
 	VIDEO_START_CALL(generic_bitmapped);
 	mcd212_ab_init(&state->mcd212_ab);
@@ -4469,7 +4470,7 @@ static VIDEO_START(cdi)
 
 static VIDEO_UPDATE(cdi)
 {
-	cdi_state *state = (cdi_state *)screen->machine->driver_data;
+	cdi_state *state = screen->machine->driver_data<cdi_state>();
 	running_device *main_screen = screen->machine->device("screen");
 	running_device *lcd_screen = screen->machine->device("lcd");
 
@@ -4487,7 +4488,7 @@ static VIDEO_UPDATE(cdi)
 
 static TIMER_CALLBACK( test_timer_callback )
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 
 	// This function manually triggers interrupt requests as a test.
 	if(state->timer_set == 0)
@@ -4511,7 +4512,7 @@ static TIMER_CALLBACK( test_timer_callback )
 
 static WRITE16_HANDLER(cdic_ram_w)
 {
-	cdi_state *state = (cdi_state *)space->machine->driver_data;
+	cdi_state *state = space->machine->driver_data<cdi_state>();
 	cdic_regs_t *cdic = &state->cdic_regs;
 
 	verboselog(space->machine, 0, "cdic_ram_w: %08x = %04x & %04x\n", 0x00300000 + offset*2, data, mem_mask);
@@ -4520,7 +4521,7 @@ static WRITE16_HANDLER(cdic_ram_w)
 
 static READ16_HANDLER(cdic_ram_r)
 {
-	cdi_state *state = (cdi_state *)space->machine->driver_data;
+	cdi_state *state = space->machine->driver_data<cdi_state>();
 	cdic_regs_t *cdic = &state->cdic_regs;
 
 	verboselog(space->machine, 0, "cdic_ram_r: %08x = %04x & %04x\n", 0x00300000 + offset*2, cdic->ram[offset], mem_mask);
@@ -4594,7 +4595,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( cdi )
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 
 	scc68070_register_globals(machine, &state->scc68070_regs);
 	cdic_register_globals(machine, &state->cdic_regs);
@@ -4618,7 +4619,7 @@ static MACHINE_START( cdi )
 
 static MACHINE_RESET( cdi )
 {
-	cdi_state *state = (cdi_state *)machine->driver_data;
+	cdi_state *state = machine->driver_data<cdi_state>();
 	UINT16 *src   = (UINT16*)memory_region(machine, "maincpu");
 	UINT16 *dst   = state->planea;
 	running_device *cdrom_dev = machine->device("cdrom");

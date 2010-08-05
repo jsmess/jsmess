@@ -432,21 +432,21 @@ static CBM_IEC_DAISY( c16_iec_1541 )
 
 static VIDEO_UPDATE( c16 )
 {
-	c16_state *state = (c16_state *)screen->machine->driver_data;
+	c16_state *state = screen->machine->driver_data<c16_state>();
 	ted7360_video_update(state->ted7360, bitmap, cliprect);
 	return 0;
 }
 
 static INTERRUPT_GEN( c16_raster_interrupt )
 {
-	c16_state *state = (c16_state *)device->machine->driver_data;
+	c16_state *state = device->machine->driver_data<c16_state>();
 	ted7360_raster_interrupt_gen(state->ted7360);
 }
 
 
 static MACHINE_START( c16 )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 
 	state->maincpu = machine->device<legacy_cpu_device>("maincpu");
 	state->ted7360 = machine->device("ted7360");

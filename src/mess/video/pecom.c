@@ -14,7 +14,7 @@
 
 static READ8_DEVICE_HANDLER( pecom_page_ram_r )
 {
-	pecom_state *state = (pecom_state *)device->machine->driver_data;
+	pecom_state *state = device->machine->driver_data<pecom_state>();
 
 	UINT16 addr = offset & PECOM_PAGE_RAM_MASK;
 
@@ -23,7 +23,7 @@ static READ8_DEVICE_HANDLER( pecom_page_ram_r )
 
 static WRITE8_DEVICE_HANDLER( pecom_page_ram_w )
 {
-	pecom_state *state = (pecom_state *)device->machine->driver_data;
+	pecom_state *state = device->machine->driver_data<pecom_state>();
 
 	UINT16 addr = offset & PECOM_PAGE_RAM_MASK;
 
@@ -33,7 +33,7 @@ static WRITE8_DEVICE_HANDLER( pecom_page_ram_w )
 
 static CDP1869_CHAR_RAM_READ( pecom_char_ram_r )
 {
-	pecom_state *state = (pecom_state *)device->machine->driver_data;
+	pecom_state *state = device->machine->driver_data<pecom_state>();
 
 	UINT16 pageaddr = pma & PECOM_PAGE_RAM_MASK;
 	UINT8 column = state->page_ram[pageaddr] & 0x7f;
@@ -44,7 +44,7 @@ static CDP1869_CHAR_RAM_READ( pecom_char_ram_r )
 
 static CDP1869_CHAR_RAM_WRITE( pecom_char_ram_w )
 {
-	pecom_state *state = (pecom_state *)device->machine->driver_data;
+	pecom_state *state = device->machine->driver_data<pecom_state>();
 
 	UINT16 pageaddr = pma & PECOM_PAGE_RAM_MASK;
 	UINT8 column = state->page_ram[pageaddr] & 0x7f;
@@ -55,7 +55,7 @@ static CDP1869_CHAR_RAM_WRITE( pecom_char_ram_w )
 
 static CDP1869_PCB_READ( pecom_pcb_r )
 {
-	pecom_state *state = (pecom_state *)device->machine->driver_data;
+	pecom_state *state = device->machine->driver_data<pecom_state>();
 
 	UINT16 pageaddr = pma & PECOM_PAGE_RAM_MASK;
 
@@ -65,7 +65,7 @@ static CDP1869_PCB_READ( pecom_pcb_r )
 
 static WRITE_LINE_DEVICE_HANDLER( pecom_prd_w )
 {
-	pecom_state *driver_state = (pecom_state *)device->machine->driver_data;
+	pecom_state *driver_state = device->machine->driver_data<pecom_state>();
 	// every other PRD triggers a DMAOUT request
 	if (driver_state->dma)
 	{
@@ -97,7 +97,7 @@ static CDP1869_INTERFACE( pecom_cdp1869_intf )
 
 static VIDEO_START( pecom )
 {
-	pecom_state *state = (pecom_state *)machine->driver_data;
+	pecom_state *state = machine->driver_data<pecom_state>();
 
 	/* allocate memory */
 
@@ -116,7 +116,7 @@ static VIDEO_START( pecom )
 
 static VIDEO_UPDATE( pecom )
 {
-	pecom_state *state = (pecom_state *)screen->machine->driver_data;
+	pecom_state *state = screen->machine->driver_data<pecom_state>();
 
 	cdp1869_update(state->cdp1869, bitmap, cliprect);
 

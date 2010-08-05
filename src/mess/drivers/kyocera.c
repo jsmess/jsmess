@@ -104,14 +104,14 @@ static READ8_HANDLER( pc8201_bank_r )
 
     */
 
-	kc85_state *state = (kc85_state *)space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data<kc85_state>();
 
 	return (state->iosel << 5) | state->bank;
 }
 
 static void pc8201_bankswitch(running_machine *machine, UINT8 data)
 {
-	kc85_state *state = (kc85_state *)machine->driver_data;
+	kc85_state *state = machine->driver_data<kc85_state>();
 
 	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -207,7 +207,7 @@ static WRITE8_HANDLER( pc8201_ctrl_w )
 
     */
 
-	kc85_state *state = (kc85_state *)space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data<kc85_state>();
 
 	/* cassette motor */
 	cassette_change_state(state->cassette, BIT(data, 3) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
@@ -239,7 +239,7 @@ static WRITE8_HANDLER( uart_ctrl_w )
 
     */
 #if 0
-    kc85_state *state = (kc85_state *)space->machine->driver_data;
+    kc85_state *state = space->machine->driver_data<kc85_state>();
 
     im6402_sbs_w(state->im6402, BIT(data, 0));
     im6402_epe_w(state->im6402, BIT(data, 1));
@@ -266,7 +266,7 @@ static READ8_HANDLER( uart_status_r )
 
     */
 #if 0
-    kc85_state *state = (kc85_state *)space->machine->driver_data;
+    kc85_state *state = space->machine->driver_data<kc85_state>();
 
     UINT8 data = 0;
 
@@ -301,7 +301,7 @@ static READ8_HANDLER( pc8201_uart_status_r )
 
     */
 #if 0
-    kc85_state *state = (kc85_state *)space->machine->driver_data;
+    kc85_state *state = space->machine->driver_data<kc85_state>();
 
     UINT8 data = 0;
 
@@ -336,7 +336,7 @@ static WRITE8_HANDLER( modem_w )
 
     */
 #if 0
-    kc85_state *state = (kc85_state *)space->machine->driver_data;
+    kc85_state *state = space->machine->driver_data<kc85_state>();
 
     mc14412_en_w(state->mc14412, BIT(data, 1));
 #endif
@@ -359,7 +359,7 @@ static WRITE8_HANDLER( kc85_ctrl_w )
 
     */
 
-	kc85_state *state = (kc85_state *)space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data<kc85_state>();
 
 	/* ROM bank selection */
 	memory_set_bank(space->machine, "bank1", BIT(data, 0));
@@ -393,21 +393,21 @@ static UINT8 read_keyboard(running_machine *machine, UINT16 keylatch)
 
 static READ8_HANDLER( keyboard_r )
 {
-	kc85_state *state = (kc85_state *)space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data<kc85_state>();
 
 	return read_keyboard(space->machine, state->keylatch);
 }
 
 static READ8_HANDLER( tandy200_bank_r )
 {
-	tandy200_state *state = (tandy200_state *)space->machine->driver_data;
+	tandy200_state *state = space->machine->driver_data<tandy200_state>();
 
 	return state->bank;
 }
 
 static WRITE8_HANDLER( tandy200_bank_w )
 {
-	tandy200_state *state = (tandy200_state *)space->machine->driver_data;
+	tandy200_state *state = space->machine->driver_data<tandy200_state>();
 
 	const address_space *program = cputag_get_address_space(space->machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -442,7 +442,7 @@ static WRITE8_HANDLER( tandy200_bank_w )
 
 static READ8_HANDLER( tandy200_stbk_r )
 {
-	tandy200_state *state = (tandy200_state *)space->machine->driver_data;
+	tandy200_state *state = space->machine->driver_data<tandy200_state>();
 
 	return read_keyboard(space->machine, state->keylatch);
 }
@@ -464,7 +464,7 @@ static WRITE8_HANDLER( tandy200_stbk_w )
 
     */
 
-	tandy200_state *state = (tandy200_state *)space->machine->driver_data;
+	tandy200_state *state = space->machine->driver_data<tandy200_state>();
 
 	/* printer strobe */
 	centronics_strobe_w(state->centronics, BIT(data, 0));
@@ -475,7 +475,7 @@ static WRITE8_HANDLER( tandy200_stbk_w )
 
 static READ8_HANDLER( lcd_r )
 {
-	kc85_state *state = (kc85_state *)space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data<kc85_state>();
 
 	UINT8 data = 0;
 	int i;
@@ -490,7 +490,7 @@ static READ8_HANDLER( lcd_r )
 
 static WRITE8_HANDLER( lcd_w )
 {
-	kc85_state *state = (kc85_state *)space->machine->driver_data;
+	kc85_state *state = space->machine->driver_data<kc85_state>();
 	int i;
 
 	for (i = 0; i < 10; i++)
@@ -843,7 +843,7 @@ static READ8_DEVICE_HANDLER( kc85_8155_port_c_r )
 
     */
 
-	kc85_state *state = (kc85_state *)device->machine->driver_data;
+	kc85_state *state = device->machine->driver_data<kc85_state>();
 
 	UINT8 data = 0;
 
@@ -871,7 +871,7 @@ static WRITE8_DEVICE_HANDLER( kc85_8155_port_a_w )
 
     */
 
-	kc85_state *state = (kc85_state *)device->machine->driver_data;
+	kc85_state *state = device->machine->driver_data<kc85_state>();
 
 	/* keyboard */
 	state->keylatch = (state->keylatch & 0x100) | data;
@@ -911,7 +911,7 @@ static WRITE8_DEVICE_HANDLER( kc85_8155_port_b_w )
 
     */
 
-	kc85_state *state = (kc85_state *)device->machine->driver_data;
+	kc85_state *state = device->machine->driver_data<kc85_state>();
 
 	/* keyboard */
 	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
@@ -929,7 +929,7 @@ static WRITE8_DEVICE_HANDLER( kc85_8155_port_b_w )
 
 static WRITE_LINE_DEVICE_HANDLER( kc85_8155_to_w )
 {
-	kc85_state *driver_state = (kc85_state *)device->machine->driver_data;
+	kc85_state *driver_state = device->machine->driver_data<kc85_state>();
 
 	if (!driver_state->buzzer && driver_state->bell)
 	{
@@ -963,7 +963,7 @@ static READ8_DEVICE_HANDLER( pc8201_8155_port_c_r )
 
     */
 
-	kc85_state *state = (kc85_state *)device->machine->driver_data;
+	kc85_state *state = device->machine->driver_data<kc85_state>();
 
 	UINT8 data = 0;
 
@@ -991,7 +991,7 @@ static WRITE8_DEVICE_HANDLER( pc8201_8155_port_b_w )
 
     */
 
-	kc85_state *state = (kc85_state *)device->machine->driver_data;
+	kc85_state *state = device->machine->driver_data<kc85_state>();
 
 	/* keyboard */
 	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
@@ -1033,7 +1033,7 @@ static READ8_DEVICE_HANDLER( tandy200_8155_port_c_r )
 
     */
 
-	tandy200_state *state = (tandy200_state *)device->machine->driver_data;
+	tandy200_state *state = device->machine->driver_data<tandy200_state>();
 
 	UINT8 data = 0x01;
 
@@ -1060,7 +1060,7 @@ static WRITE8_DEVICE_HANDLER( tandy200_8155_port_a_w )
 
     */
 
-	tandy200_state *state = (tandy200_state *)device->machine->driver_data;
+	tandy200_state *state = device->machine->driver_data<tandy200_state>();
 
 	centronics_data_w(state->centronics, 0, data);
 
@@ -1084,7 +1084,7 @@ static WRITE8_DEVICE_HANDLER( tandy200_8155_port_b_w )
 
     */
 
-	tandy200_state *state = (tandy200_state *)device->machine->driver_data;
+	tandy200_state *state = device->machine->driver_data<tandy200_state>();
 
 	/* keyboard */
 	state->keylatch = (BIT(data, 0) << 8) | (state->keylatch & 0xff);
@@ -1098,7 +1098,7 @@ static WRITE8_DEVICE_HANDLER( tandy200_8155_port_b_w )
 
 static WRITE_LINE_DEVICE_HANDLER( tandy200_8155_to_w )
 {
-	tandy200_state *driver_state = (tandy200_state *)device->machine->driver_data;
+	tandy200_state *driver_state = device->machine->driver_data<tandy200_state>();
 
 	if (!driver_state->buzzer && driver_state->bell)
 	{
@@ -1129,7 +1129,7 @@ static msm8251_interface tandy200_msm8251_interface = {
 
 static MACHINE_START( kc85 )
 {
-	kc85_state *state = (kc85_state *)machine->driver_data;
+	kc85_state *state = machine->driver_data<kc85_state>();
 
 	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -1175,7 +1175,7 @@ static MACHINE_START( kc85 )
 
 static MACHINE_START( pc8201 )
 {
-	kc85_state *state = (kc85_state *)machine->driver_data;
+	kc85_state *state = machine->driver_data<kc85_state>();
 
 	/* find devices */
 	state->upd1990a = machine->device(UPD1990A_TAG);
@@ -1210,7 +1210,7 @@ static MACHINE_START( pc8201 )
 
 static MACHINE_START( trsm100 )
 {
-	kc85_state *state = (kc85_state *)machine->driver_data;
+	kc85_state *state = machine->driver_data<kc85_state>();
 
 	const address_space *program = cputag_get_address_space(machine, I8085_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -1266,7 +1266,7 @@ static MACHINE_START( trsm100 )
 
 static MACHINE_START( tandy200 )
 {
-	tandy200_state *state = (tandy200_state *)machine->driver_data;
+	tandy200_state *state = machine->driver_data<tandy200_state>();
 
 	/* find devices */
 	state->centronics = machine->device(CENTRONICS_TAG);
@@ -1319,7 +1319,7 @@ static I8085_CONFIG( kc85_i8085_config )
 
 static TIMER_DEVICE_CALLBACK( tandy200_tp_tick )
 {
-	tandy200_state *state = (tandy200_state *)timer.machine->driver_data;
+	tandy200_state *state = timer.machine->driver_data<tandy200_state>();
 
 	cputag_set_input_line(timer.machine, I8085_TAG, I8085_RST75_LINE, state->tp);
 

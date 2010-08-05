@@ -93,7 +93,7 @@ READ16_HANDLER( cgc7900_sync_r )
 
 static void update_clut(running_machine *machine)
 {
-	cgc7900_state *state = (cgc7900_state *)machine->driver_data;
+	cgc7900_state *state = machine->driver_data<cgc7900_state>();
 
 	for (int i = 0; i < 256; i++)
 	{
@@ -121,7 +121,7 @@ static void draw_bitmap(screen_device *screen, bitmap_t *bitmap)
 
 static void draw_overlay(screen_device *screen, bitmap_t *bitmap)
 {
-	cgc7900_state *state = (cgc7900_state *)screen->machine->driver_data;
+	cgc7900_state *state = screen->machine->driver_data<cgc7900_state>();
 
 	for (int y = 0; y < 768; y++)
 	{
@@ -167,7 +167,7 @@ static void draw_overlay(screen_device *screen, bitmap_t *bitmap)
 
 static TIMER_DEVICE_CALLBACK( blink_tick )
 {
-	cgc7900_state *state = (cgc7900_state *)timer.machine->driver_data;
+	cgc7900_state *state = timer.machine->driver_data<cgc7900_state>();
 
 	state->blink = !state->blink;
 }
@@ -194,7 +194,7 @@ static PALETTE_INIT( cgc7900 )
 
 static VIDEO_START( cgc7900 )
 {
-	cgc7900_state *state = (cgc7900_state *)machine->driver_data;
+	cgc7900_state *state = machine->driver_data<cgc7900_state>();
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, "gfx1");

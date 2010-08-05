@@ -51,7 +51,7 @@ WRITE8_HANDLER( abc806_hrs_w )
 
     */
 
-	abc806_state *state = (abc806_state *)space->machine->driver_data;
+	abc806_state *state = space->machine->driver_data<abc806_state>();
 
 	state->hrs = data;
 }
@@ -60,7 +60,7 @@ WRITE8_HANDLER( abc806_hrs_w )
 
 WRITE8_HANDLER( abc806_hrc_w )
 {
-	abc806_state *state = (abc806_state *)space->machine->driver_data;
+	abc806_state *state = space->machine->driver_data<abc806_state>();
 
 	int reg = (offset >> 8) & 0x0f;
 
@@ -71,7 +71,7 @@ WRITE8_HANDLER( abc806_hrc_w )
 
 READ8_HANDLER( abc806_charram_r )
 {
-	abc806_state *state = (abc806_state *)space->machine->driver_data;
+	abc806_state *state = space->machine->driver_data<abc806_state>();
 
 	state->attr_data = state->colorram[offset];
 
@@ -80,7 +80,7 @@ READ8_HANDLER( abc806_charram_r )
 
 WRITE8_HANDLER( abc806_charram_w )
 {
-	abc806_state *state = (abc806_state *)space->machine->driver_data;
+	abc806_state *state = space->machine->driver_data<abc806_state>();
 
 	state->colorram[offset] = state->attr_data;
 	state->charram[offset] = data;
@@ -90,14 +90,14 @@ WRITE8_HANDLER( abc806_charram_w )
 
 READ8_HANDLER( abc806_ami_r )
 {
-	abc806_state *state = (abc806_state *)space->machine->driver_data;
+	abc806_state *state = space->machine->driver_data<abc806_state>();
 
 	return state->attr_data;
 }
 
 WRITE8_HANDLER( abc806_amo_w )
 {
-	abc806_state *state = (abc806_state *)space->machine->driver_data;
+	abc806_state *state = space->machine->driver_data<abc806_state>();
 
 	state->attr_data = data;
 }
@@ -106,7 +106,7 @@ WRITE8_HANDLER( abc806_amo_w )
 
 READ8_HANDLER( abc806_cli_r )
 {
-	abc806_state *state = (abc806_state *)space->machine->driver_data;
+	abc806_state *state = space->machine->driver_data<abc806_state>();
 
 	/*
 
@@ -155,7 +155,7 @@ READ8_HANDLER( abc806_sti_r )
 
 WRITE8_HANDLER( abc806_sto_w )
 {
-	abc806_state *state = (abc806_state *)space->machine->driver_data;
+	abc806_state *state = space->machine->driver_data<abc806_state>();
 
 	int level = BIT(data, 7);
 
@@ -199,7 +199,7 @@ WRITE8_HANDLER( abc806_sto_w )
 
 WRITE8_HANDLER( abc806_sso_w )
 {
-	abc806_state *state = (abc806_state *)space->machine->driver_data;
+	abc806_state *state = space->machine->driver_data<abc806_state>();
 
 	state->sync = data & 0x3f;
 }
@@ -208,7 +208,7 @@ WRITE8_HANDLER( abc806_sso_w )
 
 static MC6845_UPDATE_ROW( abc806_update_row )
 {
-	abc806_state *state = (abc806_state *)device->machine->driver_data;
+	abc806_state *state = device->machine->driver_data<abc806_state>();
 
 	int column;
 
@@ -324,7 +324,7 @@ static MC6845_UPDATE_ROW( abc806_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( abc806_hsync_changed )
 {
-	abc806_state *driver_state = (abc806_state *)device->machine->driver_data;
+	abc806_state *driver_state = device->machine->driver_data<abc806_state>();
 
 	int vsync;
 
@@ -369,7 +369,7 @@ static WRITE_LINE_DEVICE_HANDLER( abc806_hsync_changed )
 
 static WRITE_LINE_DEVICE_HANDLER( abc806_vsync_changed )
 {
-	abc806_state *driver_state = (abc806_state *)device->machine->driver_data;
+	abc806_state *driver_state = device->machine->driver_data<abc806_state>();
 
 	driver_state->vsync = state;
 }
@@ -393,7 +393,7 @@ static const mc6845_interface abc806_mc6845_interface = {
 
 static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	abc806_state *state = (abc806_state *)machine->driver_data;
+	abc806_state *state = machine->driver_data<abc806_state>();
 
 	UINT32 addr = (state->hrs & 0x0f) << 15;
 	int sx, y, pixel;
@@ -424,7 +424,7 @@ static void abc806_hr_update(running_machine *machine, bitmap_t *bitmap, const r
 
 static VIDEO_START(abc806)
 {
-	abc806_state *state = (abc806_state *)machine->driver_data;
+	abc806_state *state = machine->driver_data<abc806_state>();
 
 	int i;
 
@@ -480,7 +480,7 @@ static VIDEO_START(abc806)
 
 static VIDEO_UPDATE( abc806 )
 {
-	abc806_state *state = (abc806_state *)screen->machine->driver_data;
+	abc806_state *state = screen->machine->driver_data<abc806_state>();
 
 	/* expand visible area to workaround MC6845 */
 	screen->set_visible_area(0, 767, 0, 311);

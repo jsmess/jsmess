@@ -253,7 +253,7 @@ DISCRETE_SOUND_END
 
 static WRITE8_HANDLER( keylatch_w )
 {
-	vip_state *state = (vip_state *)space->machine->driver_data;
+	vip_state *state = space->machine->driver_data<vip_state>();
 
 	state->keylatch = data & 0x0f;
 }
@@ -383,7 +383,7 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( vip_efx_w )
 {
-	vip_state *driver_state = (vip_state *)device->machine->driver_data;
+	vip_state *driver_state = device->machine->driver_data<vip_state>();
 
 	driver_state->cdp1861_efx = state;
 }
@@ -399,21 +399,21 @@ static CDP1861_INTERFACE( vip_cdp1861_intf )
 
 static READ_LINE_DEVICE_HANDLER( rd_r )
 {
-	vip_state *state = (vip_state *)device->machine->driver_data;
+	vip_state *state = device->machine->driver_data<vip_state>();
 
 	return BIT(state->color, 1);
 }
 
 static READ_LINE_DEVICE_HANDLER( bd_r )
 {
-	vip_state *state = (vip_state *)device->machine->driver_data;
+	vip_state *state = device->machine->driver_data<vip_state>();
 
 	return BIT(state->color, 2);
 }
 
 static READ_LINE_DEVICE_HANDLER( gd_r )
 {
-	vip_state *state = (vip_state *)device->machine->driver_data;
+	vip_state *state = device->machine->driver_data<vip_state>();
 
 	return BIT(state->color, 3);
 }
@@ -436,7 +436,7 @@ static CDP1862_INTERFACE( vip_cdp1862_intf )
 
 static WRITE8_HANDLER( vip_colorram_w )
 {
-	vip_state *state = (vip_state *)space->machine->driver_data;
+	vip_state *state = space->machine->driver_data<vip_state>();
 	UINT8 mask = 0xff;
 
 	state->a12 = (offset & 0x1000) ? 1 : 0;
@@ -455,7 +455,7 @@ static WRITE8_HANDLER( vip_colorram_w )
 
 static VIDEO_UPDATE( vip )
 {
-	vip_state *state = (vip_state *)screen->machine->driver_data;
+	vip_state *state = screen->machine->driver_data<vip_state>();
 
 	switch (input_port_read(screen->machine, "VIDEO"))
 	{
@@ -475,7 +475,7 @@ static VIDEO_UPDATE( vip )
 
 static CDP1802_MODE_READ( vip_mode_r )
 {
-	vip_state *state = (vip_state *)device->machine->driver_data;
+	vip_state *state = device->machine->driver_data<vip_state>();
 
 	if (input_port_read(device->machine, "RUN") & 0x01)
 	{
@@ -502,7 +502,7 @@ static CDP1802_MODE_READ( vip_mode_r )
 
 static CDP1802_EF_READ( vip_ef_r )
 {
-	vip_state *state = (vip_state *)device->machine->driver_data;
+	vip_state *state = device->machine->driver_data<vip_state>();
 
 	UINT8 flags = 0x0f;
 
@@ -549,7 +549,7 @@ static CDP1802_SC_WRITE( vip_sc_w )
 
 static WRITE_LINE_DEVICE_HANDLER( vip_q_w )
 {
-	vip_state *driver_state = (vip_state *)device->machine->driver_data;
+	vip_state *driver_state = device->machine->driver_data<vip_state>();
 
 	/* sound output */
 
@@ -584,7 +584,7 @@ static WRITE_LINE_DEVICE_HANDLER( vip_q_w )
 
 static WRITE8_DEVICE_HANDLER( vip_dma_w )
 {
-	vip_state *state = (vip_state *)device->machine->driver_data;
+	vip_state *state = device->machine->driver_data<vip_state>();
 
 	switch (input_port_read(device->machine, "VIDEO"))
 	{
@@ -624,7 +624,7 @@ static CDP1802_INTERFACE( vip_config )
 
 static MACHINE_START( vip )
 {
-	vip_state *state = (vip_state *)machine->driver_data;
+	vip_state *state = machine->driver_data<vip_state>();
 
 	UINT8 *ram = memory_region(machine, CDP1802_TAG);
 	UINT16 addr;
@@ -675,7 +675,7 @@ static MACHINE_START( vip )
 
 static MACHINE_RESET( vip )
 {
-	vip_state *state = (vip_state *)machine->driver_data;
+	vip_state *state = machine->driver_data<vip_state>();
 
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 	const address_space *io = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_IO);

@@ -10,12 +10,13 @@
 #define TMC600_PAGE_RAM_SIZE	0x400
 #define TMC600_PAGE_RAM_MASK	0x3ff
 
-class tmc600_state
+class tmc600_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc600_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc600_state(machine)); }
 
-	tmc600_state(running_machine &machine) { }
+	tmc600_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* video state */
 	int vismac_reg_latch;	/* video register latch */

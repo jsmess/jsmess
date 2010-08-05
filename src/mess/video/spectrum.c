@@ -21,7 +21,7 @@
 ***************************************************************************/
 VIDEO_START( spectrum )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	state->frame_number = 0;
 	state->flash_invert = 0;
 
@@ -34,7 +34,7 @@ VIDEO_START( spectrum )
 
 VIDEO_START( spectrum_128 )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	state->frame_number = 0;
 	state->flash_invert = 0;
 
@@ -57,7 +57,7 @@ INLINE unsigned char get_display_color (unsigned char color, int invert)
    independent of frame skip etc. */
 VIDEO_EOF( spectrum )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	EVENT_LIST_ITEM *pItem;
 	int NumItems;
 
@@ -114,7 +114,7 @@ INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 VIDEO_UPDATE( spectrum )
 {
         /* for now do a full-refresh */
-	spectrum_state *state = (spectrum_state *)screen->machine->driver_data;
+	spectrum_state *state = screen->machine->driver_data<spectrum_state>();
 	int x, y, b, scrx, scry;
 	unsigned short ink, pap;
 	unsigned char *attr, *scr;

@@ -8,12 +8,13 @@
 
 #define TMC2000E_COLORRAM_SIZE 0x100 // ???
 
-class tmc2000e_state
+class tmc2000e_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc2000e_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc2000e_state(machine)); }
 
-	tmc2000e_state(running_machine &machine) { }
+	tmc2000e_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* video state */
 	int cdp1864_efx;		/* EFx */

@@ -216,7 +216,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( led_refresh )
 {
-	mpf1_state *state = (mpf1_state *)machine->driver_data;
+	mpf1_state *state = machine->driver_data<mpf1_state>();
 
 	if (BIT(state->lednum, 5)) output_set_digit_value(0, param);
 	if (BIT(state->lednum, 4)) output_set_digit_value(1, param);
@@ -228,7 +228,7 @@ static TIMER_CALLBACK( led_refresh )
 
 static READ8_DEVICE_HANDLER( mpf1_porta_r )
 {
-	mpf1_state *state = (mpf1_state *)device->machine->driver_data;
+	mpf1_state *state = device->machine->driver_data<mpf1_state>();
 	UINT8 data = 0x7f;
 
 	/* bit 0 to 5, keyboard rows 0 to 5 */
@@ -250,7 +250,7 @@ static READ8_DEVICE_HANDLER( mpf1_porta_r )
 
 static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
 {
-	mpf1_state *state = (mpf1_state *)device->machine->driver_data;
+	mpf1_state *state = device->machine->driver_data<mpf1_state>();
 
 	/* swap bits around for the mame 7-segment emulation */
 	UINT8 led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
@@ -261,7 +261,7 @@ static WRITE8_DEVICE_HANDLER( mpf1_portb_w )
 
 static WRITE8_DEVICE_HANDLER( mpf1_portc_w )
 {
-	mpf1_state *state = (mpf1_state *)device->machine->driver_data;
+	mpf1_state *state = device->machine->driver_data<mpf1_state>();
 
 	/* bits 0-5, led select and keyboard latch */
 	state->lednum = data & 0x3f;
@@ -360,7 +360,7 @@ static TIMER_CALLBACK( check_halt_callback )
 
 static MACHINE_START( mpf1 )
 {
-	mpf1_state *state = (mpf1_state *)machine->driver_data;
+	mpf1_state *state = machine->driver_data<mpf1_state>();
 
 	/* find devices */
 	state->speaker = machine->device(SPEAKER_TAG);
@@ -378,7 +378,7 @@ static MACHINE_START( mpf1 )
 
 static MACHINE_RESET( mpf1 )
 {
-	mpf1_state *state = (mpf1_state *)machine->driver_data;
+	mpf1_state *state = machine->driver_data<mpf1_state>();
 
 	state->lednum = 0;
 }
@@ -495,7 +495,7 @@ ROM_END
 
 static DIRECT_UPDATE_HANDLER( mpf1_direct_update_handler )
 {
-	mpf1_state *state = (mpf1_state *)space->machine->driver_data;
+	mpf1_state *state = space->machine->driver_data<mpf1_state>();
 
 	if (!state->_break)
 	{

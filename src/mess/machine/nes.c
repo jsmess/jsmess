@@ -35,7 +35,7 @@ static void fds_irq(running_device *device, int scanline, int vblank, int blanke
 
 static void init_nes_core( running_machine *machine )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
+	nes_state *state = machine->driver_data<nes_state>();
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	static const char *const bank_names[] = { "bank1", "bank2", "bank3", "bank4" };
 	int prg_banks = (state->prg_chunks == 1) ? (2 * 2) : (state->prg_chunks * 2);
@@ -188,7 +188,7 @@ int nes_ppu_vidaccess( running_device *device, int address, int data )
 
 MACHINE_RESET( nes )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
+	nes_state *state = machine->driver_data<nes_state>();
 
 	/* Reset the mapper variables. Will also mark the char-gen ram as dirty */
 	if (state->disk_expansion && state->pcb_id == NO_BOARD)
@@ -205,14 +205,14 @@ MACHINE_RESET( nes )
 
 static TIMER_CALLBACK( nes_irq_callback )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
+	nes_state *state = machine->driver_data<nes_state>();
 	cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
 	timer_adjust_oneshot(state->irq_timer, attotime_never, 0);
 }
 
 static STATE_POSTLOAD( nes_banks_restore )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
+	nes_state *state = machine->driver_data<nes_state>();
 
 	memory_set_bank(machine, "bank1", state->prg_bank[0]);
 	memory_set_bank(machine, "bank2", state->prg_bank[1]);
@@ -223,7 +223,7 @@ static STATE_POSTLOAD( nes_banks_restore )
 
 static void nes_state_register( running_machine *machine )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
+	nes_state *state = machine->driver_data<nes_state>();
 
 	state_save_register_global_array(machine, state->prg_bank);
 
@@ -276,7 +276,7 @@ static void nes_state_register( running_machine *machine )
 
 MACHINE_START( nes )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
+	nes_state *state = machine->driver_data<nes_state>();
 
 	init_nes_core(machine);
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, nes_machine_stop);
@@ -292,7 +292,7 @@ MACHINE_START( nes )
 
 static void nes_machine_stop( running_machine &machine )
 {
-	nes_state *state = (nes_state *)machine.driver_data;
+	nes_state *state = machine.driver_data<nes_state>();
 	device_image_interface *image = dynamic_cast<device_image_interface *>(state->cart);
 	/* Write out the battery file if necessary */
 	if (state->battery)
@@ -306,7 +306,7 @@ static void nes_machine_stop( running_machine &machine )
 
 READ8_HANDLER( nes_IN0_r )
 {
-	nes_state *state = (nes_state *)space->machine->driver_data;
+	nes_state *state = space->machine->driver_data<nes_state>();
 	int cfg = input_port_read(space->machine, "CTRLSEL");
 	int ret;
 
@@ -374,7 +374,7 @@ static UINT8 nes_read_subor_keyboard_line( running_machine *machine, UINT8 scan,
 
 READ8_HANDLER( nes_IN1_r )
 {
-	nes_state *state = (nes_state *)space->machine->driver_data;
+	nes_state *state = space->machine->driver_data<nes_state>();
 	int cfg = input_port_read(space->machine, "CTRLSEL");
 	int ret;
 
@@ -453,7 +453,7 @@ READ8_HANDLER( nes_IN1_r )
 // to also emulate the fact that nothing should be in Port 2 if there is a Crazy Climber pad, etc.
 static void nes_read_input_device( running_machine *machine, int cfg, nes_input *vals, int pad_port, int supports_zapper )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
+	nes_state *state = machine->driver_data<nes_state>();
 	static const char *const padnames[] = { "PAD1", "PAD2", "PAD3", "PAD4", "CC_LEFT", "CC_RIGHT" };
 	
 	vals->i0 = 0;
@@ -528,7 +528,7 @@ static TIMER_CALLBACK( lightgun_tick )
 
 WRITE8_HANDLER( nes_IN0_w )
 {
-	nes_state *state = (nes_state *)space->machine->driver_data;
+	nes_state *state = space->machine->driver_data<nes_state>();
 	int cfg = input_port_read(space->machine, "CTRLSEL");
 
 	/* Check if lightgun has been chosen as input: if so, enable crosshair */
@@ -641,7 +641,7 @@ static int nes_cart_get_line( const char *feature )
 
 DEVICE_IMAGE_LOAD( nes_cart )
 {
-	nes_state *state = (nes_state *)image.device().machine->driver_data;
+	nes_state *state = image.device().machine->driver_data<nes_state>();
 	state->pcb_id = NO_BOARD;	// initialization
 
 	if (image.software_entry() == NULL)
@@ -1511,7 +1511,7 @@ void nes_partialhash( char *dest, const unsigned char *data, unsigned long lengt
 
 static void fds_irq( running_device *device, int scanline, int vblank, int blanked )
 {
-	nes_state *state = (nes_state *)device->machine->driver_data;
+	nes_state *state = device->machine->driver_data<nes_state>();
 
 	if (state->IRQ_enable_latch)
 		cpu_set_input_line(state->maincpu, M6502_IRQ_LINE, HOLD_LINE);
@@ -1531,7 +1531,7 @@ static void fds_irq( running_device *device, int scanline, int vblank, int blank
 
 static READ8_HANDLER( nes_fds_r )
 {
-	nes_state *state = (nes_state *)space->machine->driver_data;
+	nes_state *state = space->machine->driver_data<nes_state>();
 	UINT8 ret = 0x00;
 
 	switch (offset)
@@ -1581,7 +1581,7 @@ static READ8_HANDLER( nes_fds_r )
 
 static WRITE8_HANDLER( nes_fds_w )
 {
-	nes_state *state = (nes_state *)space->machine->driver_data;
+	nes_state *state = space->machine->driver_data<nes_state>();
 
 	switch (offset)
 	{
@@ -1622,7 +1622,7 @@ static WRITE8_HANDLER( nes_fds_w )
 
 static void nes_load_proc( device_image_interface &image )
 {
-	nes_state *state = (nes_state *)image.device().machine->driver_data;
+	nes_state *state = image.device().machine->driver_data<nes_state>();
 	int header = 0;
 	state->fds_sides = 0;
 
@@ -1643,7 +1643,7 @@ static void nes_load_proc( device_image_interface &image )
 
 static void nes_unload_proc( device_image_interface &image )
 {
-	nes_state *state = (nes_state *)image.device().machine->driver_data;
+	nes_state *state = image.device().machine->driver_data<nes_state>();
 
 	/* TODO: should write out changes here as well */
 	state->fds_sides =  0;
@@ -1651,7 +1651,7 @@ static void nes_unload_proc( device_image_interface &image )
 
 DRIVER_INIT( famicom )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
+	nes_state *state = machine->driver_data<nes_state>();
 	int i;
 
 	/* clear some of the variables we don't use */

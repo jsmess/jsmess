@@ -44,7 +44,7 @@ static void samcoupe_update_bank(const address_space *space, int bank_num, UINT8
 
 static void samcoupe_install_ext_mem(const address_space *space)
 {
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	UINT8 *mem;
 
 	/* bank 3 */
@@ -67,7 +67,7 @@ static void samcoupe_install_ext_mem(const address_space *space)
 
 void samcoupe_update_memory(const address_space *space)
 {
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 	const int PAGE_MASK = ((messram_get_size(space->machine->device("messram")) & 0xfffff) / 0x4000) - 1;
 	UINT8 *rom = memory_region(space->machine, "maincpu");
 	UINT8 *memory;
@@ -140,7 +140,7 @@ void samcoupe_update_memory(const address_space *space)
 WRITE8_HANDLER( samcoupe_ext_mem_w )
 {
 	const address_space *space_program = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	coupe_asic *asic = (coupe_asic *)space->machine->driver_data;
+	coupe_asic *asic = space->machine->driver_data<coupe_asic>();
 
 	if (offset & 1)
 		asic->hext = data;
@@ -177,13 +177,13 @@ static WRITE8_DEVICE_HANDLER( samcoupe_rtc_w )
 
 static TIMER_CALLBACK( samcoupe_mouse_reset )
 {
-	coupe_asic *asic = (coupe_asic *)machine->driver_data;
+	coupe_asic *asic = machine->driver_data<coupe_asic>();
 	asic->mouse_index = 0;
 }
 
 UINT8 samcoupe_mouse_r(running_machine *machine)
 {
-	coupe_asic *asic = (coupe_asic *)machine->driver_data;
+	coupe_asic *asic = machine->driver_data<coupe_asic>();
 	UINT8 result;
 
 	/* on a read, reset the timer */
@@ -228,7 +228,7 @@ UINT8 samcoupe_mouse_r(running_machine *machine)
 
 MACHINE_START( samcoupe )
 {
-	coupe_asic *asic = (coupe_asic *)machine->driver_data;
+	coupe_asic *asic = machine->driver_data<coupe_asic>();
 	asic->mouse_reset = timer_alloc(machine, samcoupe_mouse_reset, 0);
 
 	/* schedule our video updates */
@@ -244,7 +244,7 @@ MACHINE_RESET( samcoupe )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const address_space *spaceio = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	coupe_asic *asic = (coupe_asic *)machine->driver_data;
+	coupe_asic *asic = machine->driver_data<coupe_asic>();
 
 	/* initialize asic */
 	asic->lmpr = 0x0f;      /* ROM0 paged in, ROM1 paged out RAM Banks */

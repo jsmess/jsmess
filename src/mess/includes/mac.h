@@ -177,12 +177,13 @@ void mac_sh_updatebuffer(running_device *device);
 
 /* Mac driver data */
 
-class mac_state
+class mac_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mac_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mac_state(machine)); }
 
-	mac_state(running_machine &machine) { }
+	mac_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	mac_model_t mac_model;
 

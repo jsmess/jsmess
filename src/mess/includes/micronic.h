@@ -5,12 +5,13 @@
 #define Z80_TAG			"z80"
 #define MC146818_TAG	"mc146818"
 
-class micronic_state
+class micronic_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, micronic_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, micronic_state(machine)); }
 
-	micronic_state(running_machine &machine) { }
+	micronic_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT8 *ram;
 	UINT8 kp_matrix;

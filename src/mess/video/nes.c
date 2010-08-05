@@ -13,7 +13,7 @@
 
 static void nes_vh_reset( running_machine &machine )
 {
-	nes_state *state = (nes_state *)machine.driver_data;
+	nes_state *state = machine.driver_data<nes_state>();
 	ppu2c0x_set_vidaccess_callback(machine.device("ppu"), nes_ppu_vidaccess);
 
 	if (state->four_screen_vram)
@@ -37,7 +37,7 @@ static void nes_vh_reset( running_machine &machine )
 
 VIDEO_START( nes )
 {
-	nes_state *state = (nes_state *)machine->driver_data;
+	nes_state *state = machine->driver_data<nes_state>();
 
 	state->last_frame_flip =  0;
 
@@ -58,7 +58,7 @@ PALETTE_INIT( nes )
 
 VIDEO_UPDATE( nes )
 {
-	nes_state *state = (nes_state *)screen->machine->driver_data;
+	nes_state *state = screen->machine->driver_data<nes_state>();
 
 	/* render the ppu */
 	ppu2c0x_render(state->ppu, bitmap, 0, 0, 0, 0);

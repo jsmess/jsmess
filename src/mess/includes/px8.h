@@ -12,12 +12,13 @@
 
 #define PX8_VIDEORAM_MASK	0x17ff
 
-class px8_state
+class px8_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, px8_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, px8_state(machine)); }
 
-	px8_state(running_machine &machine) { }
+	px8_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* GAH40M state */
 	UINT16 icr;				/* input capture register */

@@ -68,7 +68,7 @@ static void bw2_set_banks(running_machine *machine, UINT8 data)
 
     */
 
-	bw2_state *state = (bw2_state *) machine->driver_data;
+	bw2_state *state =  machine->driver_data<bw2_state>();
 
 	int max_ram_bank = 0;
 
@@ -150,7 +150,7 @@ static void ramcard_set_banks(running_machine *machine, UINT8 data)
 
     */
 
-	bw2_state *state = (bw2_state *) machine->driver_data;
+	bw2_state *state =  machine->driver_data<bw2_state>();
 
 	int max_ram_bank = BANK_RAM1;
 
@@ -217,7 +217,7 @@ static void ramcard_set_banks(running_machine *machine, UINT8 data)
 
 static WRITE8_HANDLER( ramcard_bank_w )
 {
-	bw2_state *state = (bw2_state *) space->machine->driver_data;
+	bw2_state *state =  space->machine->driver_data<bw2_state>();
 
 	UINT8 ramcard_bank = data & 0x0f;
 	UINT32 bank_offset = ramcard_bank * 0x8000;
@@ -327,7 +327,7 @@ static WRITE8_DEVICE_HANDLER( bw2_8255_a_w )
 
     */
 
-	bw2_state *state = (bw2_state *) device->machine->driver_data;
+	bw2_state *state =  device->machine->driver_data<bw2_state>();
 
 	state->keyboard_row = data & 0x0f;
 
@@ -361,7 +361,7 @@ static READ8_DEVICE_HANDLER( bw2_8255_b_r )
 
     */
 
-	bw2_state *state = (bw2_state *) device->machine->driver_data;
+	bw2_state *state =  device->machine->driver_data<bw2_state>();
 
 	UINT8 row;
 	static const char *const rownames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8", "ROW9" };
@@ -406,7 +406,7 @@ static READ8_DEVICE_HANDLER( bw2_8255_c_r )
 
     */
 
-	bw2_state *state = (bw2_state *) device->machine->driver_data;
+	bw2_state *state =  device->machine->driver_data<bw2_state>();
 
 	UINT8 data = 0;
 
@@ -432,7 +432,7 @@ static I8255A_INTERFACE( bw2_8255_interface )
 
 static WRITE_LINE_DEVICE_HANDLER( bw2_timer0_w )
 {
-	bw2_state *driver_state = (bw2_state *)device->machine->driver_data;
+	bw2_state *driver_state = device->machine->driver_data<bw2_state>();
 
 	msm8251_transmit_clock(driver_state->msm8251);
 	msm8251_receive_clock(driver_state->msm8251);
@@ -440,7 +440,7 @@ static WRITE_LINE_DEVICE_HANDLER( bw2_timer0_w )
 
 static WRITE_LINE_DEVICE_HANDLER( bw2_timer2_w )
 {
-	bw2_state *driver_state = (bw2_state *)device->machine->driver_data;
+	bw2_state *driver_state = device->machine->driver_data<bw2_state>();
 
 	driver_state->mtron = state;
 	driver_state->mfdbk = !state;
@@ -488,7 +488,7 @@ static VIDEO_START( bw2 )
 
 static VIDEO_UPDATE( bw2 )
 {
-	bw2_state *state = (bw2_state *) screen->machine->driver_data;
+	bw2_state *state =  screen->machine->driver_data<bw2_state>();
 
 	msm6255_update(state->msm6255, bitmap, cliprect);
 
@@ -499,7 +499,7 @@ static VIDEO_UPDATE( bw2 )
 
 static DRIVER_INIT( bw2 )
 {
-	bw2_state *state = (bw2_state *) machine->driver_data;
+	bw2_state *state =  machine->driver_data<bw2_state>();
 
 	/* allocate work memory */
 	state->work_ram = auto_alloc_array(machine, UINT8, messram_get_size(machine->device("messram")));
@@ -513,7 +513,7 @@ static DRIVER_INIT( bw2 )
 
 static MACHINE_START( bw2 )
 {
-	bw2_state *state = (bw2_state *) machine->driver_data;
+	bw2_state *state =  machine->driver_data<bw2_state>();
 
 	/* find devices */
 	state->msm8251 = machine->device(MSM8251_TAG);
@@ -538,7 +538,7 @@ static MACHINE_START( bw2 )
 
 static MACHINE_RESET( bw2 )
 {
-	bw2_state *state = (bw2_state *) machine->driver_data;
+	bw2_state *state =  machine->driver_data<bw2_state>();
 
 	if (get_ramdisk_size(machine) > 0)
 	{
@@ -728,7 +728,7 @@ INPUT_PORTS_END
 
 static MSM6255_CHAR_RAM_READ( bw2_charram_r )
 {
-	bw2_state *state = (bw2_state *) device->machine->driver_data;
+	bw2_state *state =  device->machine->driver_data<bw2_state>();
 
 	return state->video_ram[ma & 0x3fff];
 }
@@ -779,7 +779,7 @@ static const wd17xx_interface bw2_wd17xx_interface =
 
 static DEVICE_IMAGE_LOAD( bw2_serial )
 {
-	bw2_state *state = (bw2_state *) image.device().machine->driver_data;
+	bw2_state *state =  image.device().machine->driver_data<bw2_state>();
 
 	if (device_load_serial(image) == IMAGE_INIT_PASS)
 	{

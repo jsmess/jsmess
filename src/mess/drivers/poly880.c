@@ -44,7 +44,7 @@ static void update_display(poly880_state *state)
 
 static WRITE8_HANDLER( cldig_w )
 {
-	poly880_state *state = (poly880_state *)space->machine->driver_data;
+	poly880_state *state = space->machine->driver_data<poly880_state>();
 
 	state->digit = data;
 
@@ -164,7 +164,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 
     */
 
-	poly880_state *state = (poly880_state *)device->machine->driver_data;
+	poly880_state *state = device->machine->driver_data<poly880_state>();
 
 	state->segment = BITSWAP8(data, 3, 4, 6, 0, 1, 2, 7, 5);
 
@@ -188,7 +188,7 @@ static READ8_DEVICE_HANDLER( pio1_port_b_r )
 
     */
 
-	poly880_state *state = (poly880_state *)device->machine->driver_data;
+	poly880_state *state = device->machine->driver_data<poly880_state>();
 
 	UINT8 data = 0xf0 | ((cassette_input(state->cassette) < +0.0) << 1);
 	int i;
@@ -223,7 +223,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
     */
 
-	poly880_state *state = (poly880_state *)device->machine->driver_data;
+	poly880_state *state = device->machine->driver_data<poly880_state>();
 
 	/* tape output */
 	cassette_output(state->cassette, BIT(data, 2) ? +1.0 : -1.0);
@@ -265,7 +265,7 @@ static const z80_daisy_config poly880_daisy_chain[] =
 
 static MACHINE_START( poly880 )
 {
-	poly880_state *state = (poly880_state *)machine->driver_data;
+	poly880_state *state = machine->driver_data<poly880_state>();
 
 	/* find devices */
 	state->cassette = machine->device(CASSETTE_TAG);

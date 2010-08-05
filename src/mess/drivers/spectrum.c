@@ -294,7 +294,7 @@ SamRam
 
 WRITE8_HANDLER(spectrum_port_fe_w)
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 	running_device *speaker = space->machine->device("speaker");
 	unsigned char Changed;
 
@@ -425,7 +425,7 @@ READ8_HANDLER(spectrum_port_df_r)
 
 static READ8_HANDLER ( spectrum_port_ula_r )
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 	int vpos = space->machine->primary_screen->vpos();
 
 	return vpos<193 ? state->video_ram[(vpos&0xf8)<<2]:0xff;
@@ -635,7 +635,7 @@ DRIVER_INIT( spectrum )
 
 MACHINE_RESET( spectrum )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_set_direct_update_handler(space, spectrum_direct);

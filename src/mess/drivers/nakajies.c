@@ -197,12 +197,13 @@ disabled). Perhaps power on/off related??
 #include "sound/speaker.h"
 
 
-class nakajies_state
+class nakajies_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nakajies_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, nakajies_state(machine)); }
 
-	nakajies_state(running_machine &machine) { }
+	nakajies_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* Device lookups */
 	running_device *cpu;
@@ -240,7 +241,7 @@ ADDRESS_MAP_END
 
 static void nakajies_update_irqs( running_machine *machine )
 {
-	nakajies_state *state = (nakajies_state *)machine->driver_data;
+	nakajies_state *state = machine->driver_data<nakajies_state>();
 	UINT8 irq = state->irq_enabled & state->irq_active;
 	UINT8 vector = 0xff;
 
@@ -272,7 +273,7 @@ static READ8_HANDLER( irq_clear_r )
 
 static WRITE8_HANDLER( irq_clear_w )
 {
-	nakajies_state *state = (nakajies_state *)space->machine->driver_data;
+	nakajies_state *state = space->machine->driver_data<nakajies_state>();
 
 	state->irq_active &= ~data;
 	nakajies_update_irqs( space->machine );
@@ -281,7 +282,7 @@ static WRITE8_HANDLER( irq_clear_w )
 
 static READ8_HANDLER( irq_enable_r )
 {
-	nakajies_state *state = (nakajies_state *)space->machine->driver_data;
+	nakajies_state *state = space->machine->driver_data<nakajies_state>();
 
 	return state->irq_enabled;
 }
@@ -289,7 +290,7 @@ static READ8_HANDLER( irq_enable_r )
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	nakajies_state *state = (nakajies_state *)space->machine->driver_data;
+	nakajies_state *state = space->machine->driver_data<nakajies_state>();
 
 	state->irq_enabled = data;
 	nakajies_update_irqs( space->machine );
@@ -311,7 +312,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_irq )
 {
-	nakajies_state *state = (nakajies_state *)field->port->machine->driver_data;
+	nakajies_state *state = field->port->machine->driver_data<nakajies_state>();
 	UINT8 irqs = input_port_read( field->port->machine, "debug" );
 
 	state->irq_active |= irqs;
@@ -334,7 +335,7 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( nakajies )
 {
-	nakajies_state *state = (nakajies_state *)machine->driver_data;
+	nakajies_state *state = machine->driver_data<nakajies_state>();
 
 	state->cpu = machine->device( "v20hl" );
 	state->irq_enabled = 0;

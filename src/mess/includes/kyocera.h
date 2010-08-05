@@ -18,12 +18,13 @@
 #define TCM5089_TAG		"m11"
 #define MSM8251_TAG		"m20"
 
-class kc85_state
+class kc85_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, kc85_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, kc85_state(machine)); }
 
-	kc85_state(running_machine &machine) { }
+	kc85_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory state */
 	UINT8 bank;				/* memory bank selection */
@@ -47,12 +48,13 @@ public:
 	running_device *cassette;
 };
 
-class tandy200_state
+class tandy200_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tandy200_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tandy200_state(machine)); }
 
-	tandy200_state(running_machine &machine) { }
+	tandy200_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* memory state */
 	UINT8 bank;				/* memory bank selection */

@@ -25,7 +25,7 @@ INLINE void spectrum_plot_pixel(bitmap_t *bitmap, int x, int y, UINT32 color)
 /* Update FLASH status for ts2068. Assumes flash update every 1/2s. */
 VIDEO_EOF( ts2068 )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	EVENT_LIST_ITEM *pItem;
 	int NumItems;
 
@@ -75,7 +75,7 @@ VIDEO_EOF( ts2068 )
 /* Draw a scanline in TS2068/TC2048 hires mode (code modified from COUPE.C) */
 static void ts2068_hires_scanline(running_machine *machine,bitmap_t *bitmap, int y, int borderlines)
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	int x,b,scrx,scry;
 	unsigned short ink,pap;
 	unsigned char *attr, *scr;
@@ -155,7 +155,7 @@ static void ts2068_64col_scanline(running_machine *machine,bitmap_t *bitmap, int
 /* Draw a scanline in TS2068/TC2048 lores (normal Spectrum) mode */
 static void ts2068_lores_scanline(running_machine *machine,bitmap_t *bitmap, int y, int borderlines, int screen)
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	int x,b,scrx,scry;
 	unsigned short ink,pap;
 	unsigned char *attr, *scr;
@@ -201,7 +201,7 @@ static void ts2068_lores_scanline(running_machine *machine,bitmap_t *bitmap, int
 VIDEO_UPDATE( ts2068 )
 {
 	/* for now TS2068 will do a full-refresh */
-	spectrum_state *state = (spectrum_state *)screen->machine->driver_data;
+	spectrum_state *state = screen->machine->driver_data<spectrum_state>();
 	int count;
 	int full_refresh = 1;
 
@@ -242,7 +242,7 @@ VIDEO_UPDATE( ts2068 )
 VIDEO_UPDATE( tc2048 )
 {
 	/* for now TS2068 will do a full-refresh */
-	spectrum_state *state = (spectrum_state *)screen->machine->driver_data;
+	spectrum_state *state = screen->machine->driver_data<spectrum_state>();
 	int count;
 	int full_refresh = 1;
 

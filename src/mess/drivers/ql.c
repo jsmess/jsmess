@@ -58,7 +58,7 @@ static QUICKLOAD_LOAD( ql );
 
 static WRITE8_HANDLER( ipc_w )
 {
-	ql_state *state = (ql_state *)space->machine->driver_data;
+	ql_state *state = space->machine->driver_data<ql_state>();
 
 	// pulse COMCTL line
 
@@ -83,7 +83,7 @@ static WRITE8_HANDLER( ipc_port1_w )
 
     */
 
-	ql_state *state = (ql_state *)space->machine->driver_data;
+	ql_state *state = space->machine->driver_data<ql_state>();
 
 	state->keylatch = data;
 }
@@ -106,7 +106,7 @@ static WRITE8_HANDLER( ipc_port2_w )
     */
 
 	running_device *speaker = space->machine->device("speaker");
-	ql_state *state = (ql_state *)space->machine->driver_data;
+	ql_state *state = space->machine->driver_data<ql_state>();
 
 	int ipl = (BIT(data, 2) << 1) | BIT(data, 3);
 
@@ -162,7 +162,7 @@ static READ8_HANDLER( ipc_port2_r )
 
     */
 
-	ql_state *state = (ql_state *)space->machine->driver_data;
+	ql_state *state = space->machine->driver_data<ql_state>();
 
 	int irq = (state->ser2_rxd | state->ser1_txd);
 
@@ -173,14 +173,14 @@ static READ8_HANDLER( ipc_port2_r )
 
 static READ8_HANDLER( ipc_t1_r )
 {
-	ql_state *state = (ql_state *)space->machine->driver_data;
+	ql_state *state = space->machine->driver_data<ql_state>();
 
 	return state->baudx4;
 }
 
 static READ8_HANDLER( ipc_bus_r )
 {
-	ql_state *state = (ql_state *)space->machine->driver_data;
+	ql_state *state = space->machine->driver_data<ql_state>();
 
 	/*
 
@@ -493,14 +493,14 @@ static ZX8301_INTERFACE( ql_zx8301_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( ql_baudx4_w )
 {
-	ql_state *driver_state = (ql_state *)device->machine->driver_data;
+	ql_state *driver_state = device->machine->driver_data<ql_state>();
 
 	driver_state->baudx4 = state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( ql_comdata_w )
 {
-	ql_state *driver_state = (ql_state *)device->machine->driver_data;
+	ql_state *driver_state = device->machine->driver_data<ql_state>();
 
 	driver_state->comdata = state;
 }
@@ -517,7 +517,7 @@ static ZX8302_INTERFACE( ql_zx8302_intf )
 
 static VIDEO_UPDATE( ql )
 {
-	ql_state *state = (ql_state *)screen->machine->driver_data;
+	ql_state *state = screen->machine->driver_data<ql_state>();
 
 	zx8301_update(state->zx8301, bitmap, cliprect);
 
@@ -528,7 +528,7 @@ static VIDEO_UPDATE( ql )
 
 static MACHINE_START( ql )
 {
-	ql_state *state = (ql_state *)machine->driver_data;
+	ql_state *state = machine->driver_data<ql_state>();
 
 	const address_space *program = cputag_get_address_space(machine, M68008_TAG, ADDRESS_SPACE_PROGRAM);
 

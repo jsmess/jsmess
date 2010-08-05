@@ -19,12 +19,13 @@
 #define X1	XTAL_3_579545MHz	// MC6847 Clock
 #define X2	XTAL_4MHz			// CPU Clock - a divider reduces it to 1MHz
 
-class atom_state
+class atom_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atom_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, atom_state(machine)); }
 
-	atom_state(running_machine &machine) { }
+	atom_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* eprom state */
 	int eprom;

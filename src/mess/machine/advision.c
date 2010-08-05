@@ -27,7 +27,7 @@
 
 MACHINE_START( advision )
 {
-	advision_state *state = (advision_state *)machine->driver_data;
+	advision_state *state = machine->driver_data<advision_state>();
 	/* configure EA banking */
 	memory_configure_bank(machine, "bank1", 0, 1, memory_region(machine, "bios"), 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, I8048_TAG), 0);
@@ -40,7 +40,7 @@ MACHINE_START( advision )
 
 MACHINE_RESET( advision )
 {
-	advision_state *state = (advision_state *)machine->driver_data;
+	advision_state *state = machine->driver_data<advision_state>();
 
 	/* enable internal ROM */
 	cputag_set_input_line(machine, I8048_TAG, MCS48_INPUT_EA, CLEAR_LINE);
@@ -59,7 +59,7 @@ MACHINE_RESET( advision )
 
 WRITE8_HANDLER( advision_bankswitch_w )
 {
-	advision_state *state = (advision_state *)space->machine->driver_data;
+	advision_state *state = space->machine->driver_data<advision_state>();
 
 	int ea = BIT(data, 2);
 
@@ -74,7 +74,7 @@ WRITE8_HANDLER( advision_bankswitch_w )
 
 READ8_HANDLER( advision_extram_r )
 {
-	advision_state *state = (advision_state *)space->machine->driver_data;
+	advision_state *state = space->machine->driver_data<advision_state>();
 
 	UINT8 data = state->extram[state->rambank + offset];
 
@@ -94,7 +94,7 @@ READ8_HANDLER( advision_extram_r )
 
 WRITE8_HANDLER( advision_extram_w )
 {
-	advision_state *state = (advision_state *)space->machine->driver_data;
+	advision_state *state = space->machine->driver_data<advision_state>();
 
 	state->extram[state->rambank + offset] = data;
 }
@@ -103,7 +103,7 @@ WRITE8_HANDLER( advision_extram_w )
 
 READ8_HANDLER( advision_sound_cmd_r )
 {
-	advision_state *state = (advision_state *)space->machine->driver_data;
+	advision_state *state = space->machine->driver_data<advision_state>();
 
 	return state->sound_cmd;
 }
@@ -111,7 +111,7 @@ READ8_HANDLER( advision_sound_cmd_r )
 static void update_dac(running_machine *machine)
 {
 	running_device *dac_device = machine->device("dac");
-	advision_state *state = (advision_state *)machine->driver_data;
+	advision_state *state = machine->driver_data<advision_state>();
 
 	if (state->sound_g == 0 && state->sound_d == 0)
 		dac_data_w(dac_device, 0xff);
@@ -123,7 +123,7 @@ static void update_dac(running_machine *machine)
 
 WRITE8_HANDLER( advision_sound_g_w )
 {
-	advision_state *state = (advision_state *)space->machine->driver_data;
+	advision_state *state = space->machine->driver_data<advision_state>();
 	state->sound_g = data & 0x01;
 	update_dac(space->machine);
 }
@@ -131,7 +131,7 @@ WRITE8_HANDLER( advision_sound_g_w )
 
 WRITE8_HANDLER( advision_sound_d_w )
 {
-	advision_state *state = (advision_state *)space->machine->driver_data;
+	advision_state *state = space->machine->driver_data<advision_state>();
 	state->sound_d = data & 0x01;
 	update_dac(space->machine);
 }
@@ -140,7 +140,7 @@ WRITE8_HANDLER( advision_sound_d_w )
 
 WRITE8_HANDLER( advision_av_control_w )
 {
-	advision_state *state = (advision_state *)space->machine->driver_data;
+	advision_state *state = space->machine->driver_data<advision_state>();
 
 	state->sound_cmd = data >> 4;
 
@@ -163,7 +163,7 @@ WRITE8_HANDLER( advision_av_control_w )
 
 READ8_HANDLER( advision_vsync_r )
 {
-	advision_state *state = (advision_state *)space->machine->driver_data;
+	advision_state *state = space->machine->driver_data<advision_state>();
 
 	if (state->frame_start)
 	{

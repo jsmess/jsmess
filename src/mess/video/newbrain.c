@@ -3,7 +3,7 @@
 
 static VIDEO_START( newbrain )
 {
-	newbrain_state *state = (newbrain_state *)machine->driver_data;
+	newbrain_state *state = machine->driver_data<newbrain_state>();
 
 	/* find memory regions */
 
@@ -19,7 +19,7 @@ static VIDEO_START( newbrain )
 
 static void newbrain_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	newbrain_state *state = (newbrain_state *)machine->driver_data;
+	newbrain_state *state = machine->driver_data<newbrain_state>();
 
 	const address_space *program = cputag_get_address_space(machine, Z80_TAG, ADDRESS_SPACE_PROGRAM);
 
@@ -109,7 +109,7 @@ static void newbrain_update(running_machine *machine, bitmap_t *bitmap, const re
 
 static VIDEO_UPDATE( newbrain )
 {
-	newbrain_state *state = (newbrain_state *)screen->machine->driver_data;
+	newbrain_state *state = screen->machine->driver_data<newbrain_state>();
 
 	if (state->enrg1 & NEWBRAIN_ENRG1_TVP)
 	{

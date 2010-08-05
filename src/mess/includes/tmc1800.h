@@ -7,12 +7,13 @@
 #define CDP1864_TAG		"m3"
 #define CASSETTE_TAG	"cassette"
 
-class tmc1800_state
+class tmc1800_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc1800_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc1800_state(machine)); }
 
-	tmc1800_state(running_machine &machine) { }
+	tmc1800_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* cpu state */
 	int reset;				/* reset activated */
@@ -28,12 +29,13 @@ public:
 	running_device *cassette;
 };
 
-class osc1000b_state
+class osc1000b_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, osc1000b_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, osc1000b_state(machine)); }
 
-	osc1000b_state(running_machine &machine) { }
+	osc1000b_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* cpu state */
 	int reset;				/* reset activated */
@@ -45,12 +47,13 @@ public:
 	running_device *cassette;
 };
 
-class tmc2000_state
+class tmc2000_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc2000_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, tmc2000_state(machine)); }
 
-	tmc2000_state(running_machine &machine) { }
+	tmc2000_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* video state */
 	int cdp1864_efx;		/* EFx */
@@ -67,12 +70,13 @@ public:
 	running_device *cassette;
 };
 
-class oscnano_state
+class oscnano_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, oscnano_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, oscnano_state(machine)); }
 
-	oscnano_state(running_machine &machine) { }
+	oscnano_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* cpu state */
 	int monitor_ef4;		/* EF4 line */

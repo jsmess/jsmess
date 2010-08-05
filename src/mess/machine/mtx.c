@@ -115,7 +115,7 @@ WRITE8_HANDLER( mtx_bankswitch_w )
 
 READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
 {
-	mtx_state *state = (mtx_state *)device->machine->driver_data;
+	mtx_state *state = device->machine->driver_data<mtx_state>();
 
 	sn76496_w(device, 0, state->sound_latch);
 
@@ -128,7 +128,7 @@ READ8_DEVICE_HANDLER( mtx_sound_strobe_r )
 
 WRITE8_HANDLER( mtx_sound_latch_w )
 {
-	mtx_state *state = (mtx_state *)space->machine->driver_data;
+	mtx_state *state = space->machine->driver_data<mtx_state>();
 
 	state->sound_latch = data;
 }
@@ -189,7 +189,7 @@ READ8_DEVICE_HANDLER( mtx_prt_r )
 
 WRITE8_HANDLER( mtx_sense_w )
 {
-	mtx_state *state = (mtx_state *)space->machine->driver_data;
+	mtx_state *state = space->machine->driver_data<mtx_state>();
 
 	state->key_sense = data;
 }
@@ -200,7 +200,7 @@ WRITE8_HANDLER( mtx_sense_w )
 
 READ8_HANDLER( mtx_key_lo_r )
 {
-	mtx_state *state = (mtx_state *)space->machine->driver_data;
+	mtx_state *state = space->machine->driver_data<mtx_state>();
 
 	UINT8 data = 0xff;
 
@@ -222,7 +222,7 @@ READ8_HANDLER( mtx_key_lo_r )
 
 READ8_HANDLER( mtx_key_hi_r )
 {
-	mtx_state *state = (mtx_state *)space->machine->driver_data;
+	mtx_state *state = space->machine->driver_data<mtx_state>();
 
 	UINT8 data = input_port_read(space->machine, "country_code");
 
@@ -338,7 +338,7 @@ WRITE8_HANDLER( hrx_attr_w )
 
 static void mtx_tms9929a_interrupt(running_machine *machine, int data)
 {
-	mtx_state *state = (mtx_state *)machine->driver_data;
+	mtx_state *state = machine->driver_data<mtx_state>();
 
 	z80ctc_trg0_w(state->z80ctc, data ? 0 : 1);
 }
@@ -403,7 +403,7 @@ SNAPSHOT_LOAD( mtx )
 
 MACHINE_START( mtx512 )
 {
-	mtx_state *state = (mtx_state *)machine->driver_data;
+	mtx_state *state = machine->driver_data<mtx_state>();
 	running_device *messram = machine->device("messram");
 
 	/* find devices */

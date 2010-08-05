@@ -94,7 +94,7 @@ Notes:
 
 static WRITE8_HANDLER( keyboard_latch_w )
 {
-	tmc600_state *state = (tmc600_state *)space->machine->driver_data;
+	tmc600_state *state = space->machine->driver_data<tmc600_state>();
 
 	state->keylatch = data;
 }
@@ -225,7 +225,7 @@ static CDP1802_MODE_READ( tmc600_mode_r )
 
 static CDP1802_EF_READ( tmc600_ef_r )
 {
-	tmc600_state *state = (tmc600_state *)device->machine->driver_data;
+	tmc600_state *state = device->machine->driver_data<tmc600_state>();
 
 	int flags = 0x0f;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
@@ -250,7 +250,7 @@ static CDP1802_EF_READ( tmc600_ef_r )
 
 static WRITE_LINE_DEVICE_HANDLER( tmc600_q_w )
 {
-	tmc600_state *driver_state = (tmc600_state *)device->machine->driver_data;
+	tmc600_state *driver_state = device->machine->driver_data<tmc600_state>();
 
 	cassette_output(driver_state->cassette, state ? +1.0 : -1.0);
 }
@@ -269,7 +269,7 @@ static CDP1802_INTERFACE( tmc600_cdp1802_config )
 
 static MACHINE_START( tmc600 )
 {
-	tmc600_state *state = (tmc600_state *)machine->driver_data;
+	tmc600_state *state = machine->driver_data<tmc600_state>();
 	const address_space *program = cputag_get_address_space(machine, CDP1802_TAG, ADDRESS_SPACE_PROGRAM);
 
 	/* find devices */

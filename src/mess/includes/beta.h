@@ -7,12 +7,13 @@
 #define EPROM_TAG		"eprom"
 #define SPEAKER_TAG		"b237"
 
-class beta_state
+class beta_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, beta_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, beta_state(machine)); }
 
-	beta_state(running_machine &machine) { }
+	beta_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* EPROM state */
 	int eprom_oe;

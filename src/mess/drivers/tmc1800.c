@@ -141,7 +141,7 @@ static MACHINE_RESET( oscnano );
 
 static WRITE8_HANDLER( tmc1800_keylatch_w )
 {
-	tmc1800_state *state = (tmc1800_state *)space->machine->driver_data;
+	tmc1800_state *state = space->machine->driver_data<tmc1800_state>();
 
 	state->keylatch = data;
 }
@@ -163,7 +163,7 @@ static WRITE8_HANDLER( tmc2000_keylatch_w )
 
     */
 
-	tmc2000_state *state = (tmc2000_state *)space->machine->driver_data;
+	tmc2000_state *state = space->machine->driver_data<tmc2000_state>();
 
 	state->keylatch = data & 0x3f;
 }
@@ -185,7 +185,7 @@ static WRITE8_HANDLER( oscnano_keylatch_w )
 
     */
 
-	oscnano_state *state = (oscnano_state *)space->machine->driver_data;
+	oscnano_state *state = space->machine->driver_data<oscnano_state>();
 
 	state->keylatch = data & 0x0f;
 }
@@ -440,7 +440,7 @@ INPUT_PORTS_END
 
 static CDP1802_MODE_READ( tmc1800_mode_r )
 {
-	tmc1800_state *state = (tmc1800_state *)device->machine->driver_data;
+	tmc1800_state *state = device->machine->driver_data<tmc1800_state>();
 
 	if (input_port_read(device->machine, "RUN") & 0x01)
 	{
@@ -464,7 +464,7 @@ static CDP1802_MODE_READ( tmc1800_mode_r )
 
 static CDP1802_EF_READ( tmc1800_ef_r )
 {
-	tmc1800_state *state = (tmc1800_state *)device->machine->driver_data;
+	tmc1800_state *state = device->machine->driver_data<tmc1800_state>();
 
 	UINT8 flags = 0x0f;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
@@ -490,7 +490,7 @@ static CDP1802_EF_READ( tmc1800_ef_r )
 
 static WRITE_LINE_DEVICE_HANDLER( tmc1800_q_w )
 {
-	tmc1800_state *driver_state = (tmc1800_state *)device->machine->driver_data;
+	tmc1800_state *driver_state = device->machine->driver_data<tmc1800_state>();
 
 	/* tape output */
 	cassette_output(driver_state->cassette, state ? 1.0 : -1.0);
@@ -520,7 +520,7 @@ static CDP1802_INTERFACE( osc1000b_config )
 
 static CDP1802_MODE_READ( tmc2000_mode_r )
 {
-	tmc2000_state *state = (tmc2000_state *)device->machine->driver_data;
+	tmc2000_state *state = device->machine->driver_data<tmc2000_state>();
 
 	if (input_port_read(device->machine, "RUN") & 0x01)
 	{
@@ -544,7 +544,7 @@ static CDP1802_MODE_READ( tmc2000_mode_r )
 
 static CDP1802_EF_READ( tmc2000_ef_r )
 {
-	tmc2000_state *state = (tmc2000_state *)device->machine->driver_data;
+	tmc2000_state *state = device->machine->driver_data<tmc2000_state>();
 
 	int flags = 0x0f;
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
@@ -570,7 +570,7 @@ static CDP1802_EF_READ( tmc2000_ef_r )
 
 static WRITE_LINE_DEVICE_HANDLER( tmc2000_q_w )
 {
-	tmc2000_state *driver_state = (tmc2000_state *)device->machine->driver_data;
+	tmc2000_state *driver_state = device->machine->driver_data<tmc2000_state>();
 
 	/* CDP1864 audio output enable */
 	cdp1864_aoe_w(driver_state->cdp1864, state);
@@ -584,7 +584,7 @@ static WRITE_LINE_DEVICE_HANDLER( tmc2000_q_w )
 
 static WRITE8_DEVICE_HANDLER( tmc2000_dma_w )
 {
-	tmc2000_state *state = (tmc2000_state *)device->machine->driver_data;
+	tmc2000_state *state = device->machine->driver_data<tmc2000_state>();
 
 	state->color = ~(state->colorram[offset & 0x1ff]) & 0x07;
 
@@ -606,7 +606,7 @@ static CDP1802_INTERFACE( tmc2000_config )
 
 static TIMER_CALLBACK( oscnano_ef4_tick )
 {
-	oscnano_state *state = (oscnano_state *)machine->driver_data;
+	oscnano_state *state = machine->driver_data<oscnano_state>();
 
 	/* assert EF4 */
 	state->monitor_ef4 = 1;
@@ -614,7 +614,7 @@ static TIMER_CALLBACK( oscnano_ef4_tick )
 
 static CDP1802_MODE_READ( oscnano_mode_r )
 {
-	oscnano_state *state = (oscnano_state *)device->machine->driver_data;
+	oscnano_state *state = device->machine->driver_data<oscnano_state>();
 
 	int run = input_port_read(device->machine, "RUN") & 0x01;
 	int monitor = input_port_read(device->machine, "MONITOR") & 0x01;
@@ -653,7 +653,7 @@ static CDP1802_MODE_READ( oscnano_mode_r )
 
 static CDP1802_EF_READ( oscnano_ef_r )
 {
-	oscnano_state *state = (oscnano_state *)device->machine->driver_data;
+	oscnano_state *state = device->machine->driver_data<oscnano_state>();
 
 	static const char *const keynames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
@@ -683,7 +683,7 @@ static CDP1802_EF_READ( oscnano_ef_r )
 
 static WRITE_LINE_DEVICE_HANDLER( oscnano_q_w )
 {
-	oscnano_state *driver_state = (oscnano_state *)device->machine->driver_data;
+	oscnano_state *driver_state = device->machine->driver_data<oscnano_state>();
 
 	/* CDP1864 audio output enable */
 	cdp1864_aoe_w(driver_state->cdp1864, state);
@@ -711,7 +711,7 @@ static CDP1802_INTERFACE( oscnano_config )
 
 static MACHINE_START( tmc1800 )
 {
-	tmc1800_state *state = (tmc1800_state *)machine->driver_data;
+	tmc1800_state *state = machine->driver_data<tmc1800_state>();
 
 	/* find devices */
 	state->cdp1861 = machine->device(CDP1861_TAG);
@@ -725,7 +725,7 @@ static MACHINE_START( tmc1800 )
 
 static MACHINE_RESET( tmc1800 )
 {
-	tmc1800_state *state = (tmc1800_state *)machine->driver_data;
+	tmc1800_state *state = machine->driver_data<tmc1800_state>();
 
 	/* reset CDP1861 */
 	state->cdp1861->reset();
@@ -735,7 +735,7 @@ static MACHINE_RESET( tmc1800 )
 
 static MACHINE_START( osc1000b )
 {
-	osc1000b_state *state = (osc1000b_state *)machine->driver_data;
+	osc1000b_state *state = machine->driver_data<osc1000b_state>();
 
 	/* find devices */
 	state->cassette = machine->device(CASSETTE_TAG);
@@ -753,7 +753,7 @@ static MACHINE_RESET( osc1000b )
 
 static MACHINE_START( tmc2000 )
 {
-	tmc2000_state *state = (tmc2000_state *)machine->driver_data;
+	tmc2000_state *state = machine->driver_data<tmc2000_state>();
 
 	UINT16 addr;
 
@@ -785,7 +785,7 @@ static MACHINE_START( tmc2000 )
 
 static MACHINE_RESET( tmc2000 )
 {
-	tmc2000_state *state = (tmc2000_state *)machine->driver_data;
+	tmc2000_state *state = machine->driver_data<tmc2000_state>();
 
 	/* reset CDP1864 */
 	state->cdp1864->reset();
@@ -805,7 +805,7 @@ static MACHINE_RESET( tmc2000 )
 
 static MACHINE_START( oscnano )
 {
-	oscnano_state *state = (oscnano_state *)machine->driver_data;
+	oscnano_state *state = machine->driver_data<oscnano_state>();
 
 	/* RAM/ROM banking */
 	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, CDP1802_TAG), 0x8000);
@@ -829,7 +829,7 @@ static MACHINE_START( oscnano )
 
 static MACHINE_RESET( oscnano )
 {
-	oscnano_state *state = (oscnano_state *)machine->driver_data;
+	oscnano_state *state = machine->driver_data<oscnano_state>();
 
 	/* reset CDP1864 */
 	state->cdp1864->reset();

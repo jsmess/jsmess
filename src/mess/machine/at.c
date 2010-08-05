@@ -100,7 +100,7 @@ static void at_speaker_set_input(running_machine *machine, UINT8 data)
 
 static WRITE_LINE_DEVICE_HANDLER( at_pit8254_out0_changed )
 {
-	at_state *st = (at_state *)device->machine->driver_data;
+	at_state *st = device->machine->driver_data<at_state>();
 	if (st->pic8259_master)
 	{
 		pic8259_ir0_w(st->pic8259_master, state);
@@ -143,7 +143,7 @@ static void at_set_gate_a20(running_machine *machine, int a20)
 
 static void at_set_irq_line(running_machine *machine,int irq, int state)
 {
-	at_state *st = (at_state *)machine->driver_data;
+	at_state *st = machine->driver_data<at_state>();
 
 	switch (irq)
 	{
@@ -161,7 +161,7 @@ static void at_set_irq_line(running_machine *machine,int irq, int state)
 
 static void at_set_keyb_int(running_machine *machine, int state)
 {
-	at_state *st = (at_state *)machine->driver_data;
+	at_state *st = machine->driver_data<at_state>();
 	pic8259_ir1_w(st->pic8259_master, state);
 }
 
@@ -187,7 +187,7 @@ static void init_at_common(running_machine *machine, const struct kbdc8042_inter
 
 static void at_keyboard_interrupt(running_machine *machine, int state)
 {
-	at_state *st = (at_state *)machine->driver_data;
+	at_state *st = machine->driver_data<at_state>();
 	pic8259_ir1_w(st->pic8259_master, state);
 }
 
@@ -255,7 +255,7 @@ WRITE8_HANDLER(at_page8_w)
 
 static WRITE_LINE_DEVICE_HANDLER( pc_dma_hrq_changed )
 {
-	at_state *st = (at_state *)device->machine->driver_data;
+	at_state *st = device->machine->driver_data<at_state>();
 	cpu_set_input_line(st->maincpu, INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* Assert HLDA */
@@ -350,13 +350,13 @@ I8237_INTERFACE( at_dma8237_2_config )
 /* called when a interrupt is set/cleared from com hardware */
 static INS8250_INTERRUPT( at_com_interrupt_1 )
 {
-	at_state *st = (at_state *)device->machine->driver_data;
+	at_state *st = device->machine->driver_data<at_state>();
 	pic8259_ir4_w(st->pic8259_master, state);
 }
 
 static INS8250_INTERRUPT( at_com_interrupt_2 )
 {
-	at_state *st = (at_state *)device->machine->driver_data;
+	at_state *st = device->machine->driver_data<at_state>();
 	pic8259_ir3_w(st->pic8259_master, state);
 }
 
@@ -419,7 +419,7 @@ const ins8250_interface ibm5170_com_interface[4]=
 
 static void at_fdc_interrupt(running_machine *machine, int state)
 {
-	at_state *st = (at_state *)machine->driver_data;
+	at_state *st = machine->driver_data<at_state>();
 	pic8259_ir6_w(st->pic8259_master, state);
 //if ( messram_get_ptr(machine->device("messram"))[0x0490] == 0x74 )
 //  messram_get_ptr(machine->device("messram"))[0x0490] = 0x54;
@@ -428,7 +428,7 @@ static void at_fdc_interrupt(running_machine *machine, int state)
 
 static void at_fdc_dma_drq(running_machine *machine, int state, int read_)
 {
-	at_state *st = (at_state *)machine->driver_data;
+	at_state *st = machine->driver_data<at_state>();
 	i8237_dreq2_w( st->dma8237_1, state);
 }
 
@@ -447,7 +447,7 @@ static const struct pc_fdc_interface fdc_interface =
 
 
 static int at_get_out2(running_machine *machine) {
-	at_state *st = (at_state *)machine->driver_data;
+	at_state *st = machine->driver_data<at_state>();
 	return pit8253_get_output(st->pit8254, 2 );
 }
 
@@ -510,7 +510,7 @@ static READ8_HANDLER( at_kbdc8042_p2_r )
 
 static WRITE8_HANDLER( at_kbdc8042_p2_w )
 {
-	at_state *st = (at_state *)space->machine->driver_data;
+	at_state *st = space->machine->driver_data<at_state>();
 	running_device *keyboard = space->machine->device("keyboard");
 
 	//logerror("%04x: writing $%02x to P2\n", cpu_get_pc(space->machine->device("maincpu")), data );
@@ -572,7 +572,7 @@ MACHINE_DRIVER_END
 READ8_HANDLER(at_kbdc8042_r)
 {
     UINT8 data = 0;
-	at_state *st = (at_state *)space->machine->driver_data;
+	at_state *st = space->machine->driver_data<at_state>();
 
 	switch ( offset )
 	{
@@ -618,7 +618,7 @@ READ8_HANDLER(at_kbdc8042_r)
 
 WRITE8_HANDLER(at_kbdc8042_w)
 {
-	at_state *st = (at_state *)space->machine->driver_data;
+	at_state *st = space->machine->driver_data<at_state>();
 	if (LOG_KBDC)
 		logerror("kbdc8042_8_w(): ofset=%d data=0x%02x\n", offset, data);
 
@@ -742,13 +742,13 @@ DRIVER_INIT( ps2m30286 )
 
 static IRQ_CALLBACK(at_irq_callback)
 {
-	at_state *st = (at_state *)device->machine->driver_data;
+	at_state *st = device->machine->driver_data<at_state>();
 	return pic8259_acknowledge( st->pic8259_master);
 }
 
 static void pc_set_irq_line(running_machine *machine,int irq, int state)
 {
-	pc_state *st = (pc_state*)machine->driver_data;
+	pc_state *st = machine->driver_data<pc_state>();;
 
 	switch (irq)
 	{
@@ -775,7 +775,7 @@ MACHINE_START( at )
 
 MACHINE_RESET( at )
 {
-	at_state *st = (at_state *)machine->driver_data;
+	at_state *st = machine->driver_data<at_state>();
 	st->maincpu = machine->device("maincpu");
 	st->pic8259_master = machine->device("pic8259_master");
 	st->pic8259_slave = machine->device("pic8259_slave");

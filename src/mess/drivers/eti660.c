@@ -39,7 +39,7 @@ static WRITE8_DEVICE_HANDLER( pia_w )
 
 static WRITE8_HANDLER( eti660_colorram_w )
 {
-	eti660_state *state = (eti660_state *)space->machine->driver_data;
+	eti660_state *state = space->machine->driver_data<eti660_state>();
 	int colorram_offset = RX(space->machine) & 0xff;
 
 	colorram_offset = ((colorram_offset & 0xf8) >> 1) || (colorram_offset & 0x03);
@@ -65,7 +65,7 @@ ADDRESS_MAP_END
 
 static INPUT_CHANGED( trigger_reset )
 {
-	eti660_state *state = (eti660_state *)field->port->machine->driver_data;
+	eti660_state *state = field->port->machine->driver_data<eti660_state>();
 
 	state->cdp1802_mode = newval ? CDP1802_MODE_RUN : CDP1802_MODE_RESET;
 }
@@ -104,28 +104,28 @@ INPUT_PORTS_END
 
 static WRITE_LINE_DEVICE_HANDLER( eti660_efx_w )
 {
-	eti660_state *driver_state = (eti660_state *)device->machine->driver_data;
+	eti660_state *driver_state = device->machine->driver_data<eti660_state>();
 
 	driver_state->cdp1864_efx = state;
 }
 
 static READ_LINE_DEVICE_HANDLER( rdata_r )
 {
-	eti660_state *state = (eti660_state *)device->machine->driver_data;
+	eti660_state *state = device->machine->driver_data<eti660_state>();
 
 	return BIT(state->color, 0);
 }
 
 static READ_LINE_DEVICE_HANDLER( bdata_r )
 {
-	eti660_state *state = (eti660_state *)device->machine->driver_data;
+	eti660_state *state = device->machine->driver_data<eti660_state>();
 
 	return BIT(state->color, 1);
 }
 
 static READ_LINE_DEVICE_HANDLER( gdata_r )
 {
-	eti660_state *state = (eti660_state *)device->machine->driver_data;
+	eti660_state *state = device->machine->driver_data<eti660_state>();
 
 	return BIT(state->color, 2);
 }
@@ -149,7 +149,7 @@ static CDP1864_INTERFACE( eti660_cdp1864_intf )
 
 static VIDEO_UPDATE( eti660 )
 {
-	eti660_state *state = (eti660_state *)screen->machine->driver_data;
+	eti660_state *state = screen->machine->driver_data<eti660_state>();
 
 	cdp1864_update(state->cdp1864, bitmap, cliprect);
 
@@ -160,14 +160,14 @@ static VIDEO_UPDATE( eti660 )
 
 static CDP1802_MODE_READ( eti660_mode_r )
 {
-	eti660_state *state = (eti660_state *)device->machine->driver_data;
+	eti660_state *state = device->machine->driver_data<eti660_state>();
 
 	return state->cdp1802_mode;
 }
 
 static CDP1802_EF_READ( eti660_ef_r )
 {
-	eti660_state *state = (eti660_state *)device->machine->driver_data;
+	eti660_state *state = device->machine->driver_data<eti660_state>();
 
 	int ef = 0x0f;
 
@@ -185,7 +185,7 @@ static CDP1802_EF_READ( eti660_ef_r )
 
 static WRITE_LINE_DEVICE_HANDLER( eti660_q_w )
 {
-	eti660_state *driver_state = (eti660_state *)device->machine->driver_data;
+	eti660_state *driver_state = device->machine->driver_data<eti660_state>();
 
 	/* CDP1864 audio output enable */
 	cdp1864_aoe_w(driver_state->cdp1864, state);
@@ -199,7 +199,7 @@ static WRITE_LINE_DEVICE_HANDLER( eti660_q_w )
 
 static WRITE8_DEVICE_HANDLER( eti660_dma_w )
 {
-	eti660_state *state = (eti660_state *)device->machine->driver_data;
+	eti660_state *state = device->machine->driver_data<eti660_state>();
 	UINT8 colorram_offset = ((offset & 0xf8) >> 1) || (offset & 0x03);
 
 	state->color = state->color_ram[colorram_offset];
@@ -237,7 +237,7 @@ static READ8_DEVICE_HANDLER( eti660_pia_a_r )
 
     */
 
-	eti660_state *state = (eti660_state *)device->machine->driver_data;
+	eti660_state *state = device->machine->driver_data<eti660_state>();
 	UINT8 data = 0xf0;
 
 	if (!BIT(state->keylatch, 0)) data &= input_port_read(device->machine, "PA0");
@@ -265,7 +265,7 @@ static WRITE8_DEVICE_HANDLER( eti660_pia_a_w )
 
     */
 
-	eti660_state *state = (eti660_state *)device->machine->driver_data;
+	eti660_state *state = device->machine->driver_data<eti660_state>();
 
 	state->keylatch = data & 0x0f;
 }
@@ -290,14 +290,14 @@ static const pia6821_interface eti660_mc6821_intf =
 
 static TIMER_CALLBACK( set_cpu_mode )
 {
-	eti660_state *state = (eti660_state *)machine->driver_data;
+	eti660_state *state = machine->driver_data<eti660_state>();
 
 	state->cdp1802_mode = CDP1802_MODE_RUN;
 }
 
 static MACHINE_START( eti660 )
 {
-	eti660_state *state = (eti660_state *)machine->driver_data;
+	eti660_state *state = machine->driver_data<eti660_state>();
 
 	/* find devices */
 	state->cdp1864 = machine->device(CDP1864_TAG);
@@ -310,7 +310,7 @@ static MACHINE_START( eti660 )
 
 static MACHINE_RESET( eti660 )
 {
-	eti660_state *state = (eti660_state *)machine->driver_data;
+	eti660_state *state = machine->driver_data<eti660_state>();
 
 	/* reset CPU */
 	state->cdp1802_mode = CDP1802_MODE_RESET;

@@ -58,12 +58,13 @@
 /* PI-5 interface is required. mode 2 of the 8255 is used to communicate with the FD-5 */
 
 
-class sord_state
+class sord_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sord_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sord_state(machine)); }
 
-	sord_state(running_machine &machine) { }
+	sord_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT8 fd5_databus;
 	int fd5_port_0x020_data;
@@ -83,7 +84,7 @@ ADDRESS_MAP_END
 /* stb and ack automatically set on read/write? */
 static WRITE8_HANDLER(fd5_communication_w)
 {
-	sord_state *state = (sord_state *)space->machine->driver_data;
+	sord_state *state = space->machine->driver_data<sord_state>();
 
 	cpu_yield(space->cpu);
 
@@ -93,7 +94,7 @@ static WRITE8_HANDLER(fd5_communication_w)
 
 static  READ8_HANDLER(fd5_communication_r)
 {
-	sord_state *state = (sord_state *)space->machine->driver_data;
+	sord_state *state = space->machine->driver_data<sord_state>();
 	int data;
 
 	cpu_yield(space->cpu);
@@ -106,7 +107,7 @@ static  READ8_HANDLER(fd5_communication_r)
 
 static READ8_HANDLER(fd5_data_r)
 {
-	sord_state *state = (sord_state *)space->machine->driver_data;
+	sord_state *state = space->machine->driver_data<sord_state>();
 
 	cpu_yield(space->cpu);
 
@@ -121,7 +122,7 @@ static READ8_HANDLER(fd5_data_r)
 
 static WRITE8_HANDLER(fd5_data_w)
 {
-	sord_state *state = (sord_state *)space->machine->driver_data;
+	sord_state *state = space->machine->driver_data<sord_state>();
 
 	LOG(("fd5 0x010 w: %02x %04x\n",data,cpu_get_pc(space->cpu)));
 
@@ -201,7 +202,7 @@ static MACHINE_RESET( sord_m5_fd5 )
 
 static READ8_DEVICE_HANDLER(sord_ppi_porta_r)
 {
-	sord_state *state = (sord_state *)device->machine->driver_data;
+	sord_state *state = device->machine->driver_data<sord_state>();
 
 	cpu_yield(device->machine->device("maincpu"));
 
@@ -219,7 +220,7 @@ static READ8_DEVICE_HANDLER(sord_ppi_portb_r)
 
 static READ8_DEVICE_HANDLER(sord_ppi_portc_r)
 {
-	sord_state *state = (sord_state *)device->machine->driver_data;
+	sord_state *state = device->machine->driver_data<sord_state>();
 
 	cpu_yield(device->machine->device("maincpu"));
 
@@ -252,7 +253,7 @@ static READ8_DEVICE_HANDLER(sord_ppi_portc_r)
 
 static WRITE8_DEVICE_HANDLER(sord_ppi_porta_w)
 {
-	sord_state *state = (sord_state *)device->machine->driver_data;
+	sord_state *state = device->machine->driver_data<sord_state>();
 
 	cpu_yield(device->machine->device("maincpu"));
 
@@ -283,7 +284,7 @@ static WRITE8_DEVICE_HANDLER(sord_ppi_portb_w)
 
 static WRITE8_DEVICE_HANDLER(sord_ppi_portc_w)
 {
-	sord_state *state = (sord_state *)device->machine->driver_data;
+	sord_state *state = device->machine->driver_data<sord_state>();
 
 	state->obfa = (data & 0x80) ? 1 : 0;
 	state->intra = (data & 0x08) ? 1 : 0;

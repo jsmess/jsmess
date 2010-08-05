@@ -47,7 +47,7 @@
  *******************************************************************/
 static void spectrum_update_paging(running_machine *machine)
 {
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     if (state->port_7ffd_data == -1)
         return;
     if (state->port_1ffd_data == -1)
@@ -67,7 +67,7 @@ static void spectrum_update_paging(running_machine *machine)
 /* Page in the 48K Basic ROM. Used when running 48K snapshots on a 128K machine. */
 static void spectrum_page_basicrom(running_machine *machine)
 {
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     if (state->port_7ffd_data == -1)
         return;
     state->port_7ffd_data |= 0x10;
@@ -276,7 +276,7 @@ void spectrum_setup_sp(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
     int i, SP_OFFSET;
     UINT8 intr;
     UINT16 start, size, data, status;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -478,7 +478,7 @@ void spectrum_setup_sna(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     long bank_offset;
     UINT8 intr;
     UINT16 data, addr;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -701,7 +701,7 @@ void spectrum_setup_ach(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     int i;
     UINT8 intr;
     UINT16 data;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -836,7 +836,7 @@ void spectrum_setup_prg(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     int i;
     UINT8 intr;
     UINT16 addr, data;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -1008,7 +1008,7 @@ void spectrum_setup_plusd(running_machine *machine, UINT8 *snapdata, UINT32 snap
     int i, j;
     UINT8 intr;
     UINT16 addr = 0, data;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -1178,7 +1178,7 @@ void spectrum_setup_sem(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     int i;
     UINT8 intr;
     UINT16 data;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -1299,7 +1299,7 @@ void spectrum_setup_sit(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     int i;
     UINT8 intr;
     UINT16 data;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -1431,7 +1431,7 @@ void spectrum_setup_zx(running_machine *machine, UINT8 *snapdata, UINT32 snapsiz
     int i;
     UINT8 intr;
     UINT16 data, mode;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -1565,7 +1565,7 @@ void spectrum_setup_snp(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     int i;
     UINT8 intr;
     UINT16 data;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -1794,7 +1794,7 @@ void spectrum_setup_snx(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
 {
     UINT8 intr;
     UINT16 data, addr;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -1950,7 +1950,7 @@ void spectrum_setup_frz(running_machine *machine, UINT8 *snapdata, UINT32 snapsi
     int i, j;
     UINT8 intr;
     UINT16 addr, data;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     running_device *cpu = machine->device("maincpu");
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -2172,7 +2172,7 @@ static SPECTRUM_Z80_SNAPSHOT_TYPE spectrum_identify_z80 (UINT8 *snapdata, UINT32
 /* now supports 48k & 128k .Z80 files */
 void spectrum_setup_z80(running_machine *machine, UINT8 *snapdata, UINT32 snapsize)
 {
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     int i;
     UINT8 lo, hi, data;
     SPECTRUM_Z80_SNAPSHOT_TYPE z80_type;
@@ -2543,7 +2543,7 @@ void spectrum_setup_raw(running_machine *machine, UINT8 *quickdata, UINT32 quick
     int i;
 	UINT8 data;
     UINT16 start, len;
-    spectrum_state *state = (spectrum_state *)machine->driver_data;
+    spectrum_state *state = machine->driver_data<spectrum_state>();
     const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
     start = (quickdata[RAW_OFFSET + 4] << 8) | quickdata[RAW_OFFSET + 3];

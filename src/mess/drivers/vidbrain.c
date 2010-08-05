@@ -62,7 +62,7 @@ static READ8_HANDLER( vlsi_r )
 
 static WRITE8_HANDLER( vlsi_w )
 {
-	vidbrain_state *state = (vidbrain_state *)space->machine->driver_data;
+	vidbrain_state *state = space->machine->driver_data<vidbrain_state>();
 
 	switch (offset)
 	{
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( keyboard_w )
 
     */
 
-	vidbrain_state *state = (vidbrain_state *)space->machine->driver_data;
+	vidbrain_state *state = space->machine->driver_data<vidbrain_state>();
 
 	state->keylatch = data;
 }
@@ -142,7 +142,7 @@ static READ8_HANDLER( keyboard_r )
 
     */
 
-	vidbrain_state *state = (vidbrain_state *)space->machine->driver_data;
+	vidbrain_state *state = space->machine->driver_data<vidbrain_state>();
 
 	UINT8 data = 0;//input_port_read(space->machine, "JOY-R");
 
@@ -180,7 +180,7 @@ static WRITE8_HANDLER( sound_w )
 
     */
 
-	vidbrain_state *state = (vidbrain_state *)space->machine->driver_data;
+	vidbrain_state *state = space->machine->driver_data<vidbrain_state>();
 
 	/* sound clock */
 	int sound_clk = BIT(data, 7);
@@ -370,7 +370,7 @@ static VIDEO_START( vidbrain )
 
 static VIDEO_UPDATE( vidbrain )
 {
-	vidbrain_state *state = (vidbrain_state *)screen->machine->driver_data;
+	vidbrain_state *state = screen->machine->driver_data<vidbrain_state>();
 
 	UINT16 addr = 0x2f;
 
@@ -482,7 +482,7 @@ static DEVICE_IMAGE_LOAD( vidbrain_cart )
 
 static MACHINE_START( vidbrain )
 {
-	vidbrain_state *state = (vidbrain_state *)machine->driver_data;
+	vidbrain_state *state = machine->driver_data<vidbrain_state>();
 
 	/* find devices */
 	state->discrete = machine->device(DISCRETE_TAG);

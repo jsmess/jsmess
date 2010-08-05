@@ -171,7 +171,7 @@ static const ay8910_interface spectrum_ay_interface =
 
 static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 
    /* D0-D2: RAM page located at 0x0c000-0x0ffff */
    /* D3 - Screen select (screen 0 in ram page 5, screen 1 in ram page 7 */
@@ -191,7 +191,7 @@ static WRITE8_HANDLER(spectrum_128_port_7ffd_w)
 
 void spectrum_128_update_memory(running_machine *machine)
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 	unsigned char *ChosenROM;
 	int ROMSelection;
@@ -228,7 +228,7 @@ void spectrum_128_update_memory(running_machine *machine)
 
 static  READ8_HANDLER ( spectrum_128_ula_r )
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 	int vpos = space->machine->primary_screen->vpos();
 
 	return vpos<193 ? state->screen_location[0x1800|(vpos&0xf8)<<2]:0xff;
@@ -254,7 +254,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( spectrum_128 )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 
 	memset(messram,0,128*1024);

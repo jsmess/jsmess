@@ -22,12 +22,13 @@
 #define VIA6522_1_TAG "via6522_1"
 #define MC6845_TAG "mc6845"
 
-class ec65_state
+class ec65_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ec65_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ec65_state(machine)); }
 
-	ec65_state(running_machine &machine) { }
+	ec65_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT8 *video_ram;
 };
@@ -158,7 +159,7 @@ static VIDEO_UPDATE( ec65 )
 
 static MC6845_UPDATE_ROW( ec65_update_row )
 {
-	ec65_state *state = (ec65_state *)device->machine->driver_data;
+	ec65_state *state = device->machine->driver_data<ec65_state>();
 	UINT8 *charrom = memory_region(device->machine, "chargen");
 	int column, bit;
 

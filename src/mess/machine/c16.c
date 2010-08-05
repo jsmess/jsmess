@@ -70,7 +70,7 @@
 
 void c16_m7501_port_write( running_device *device, UINT8 direction, UINT8 data )
 {
-	c16_state *state = (c16_state *)device->machine->driver_data;
+	c16_state *state = device->machine->driver_data<c16_state>();
 
 	/* bit zero then output 0 */
 	cbm_iec_atn_w(state->serbus, device, !BIT(data, 2));
@@ -84,7 +84,7 @@ void c16_m7501_port_write( running_device *device, UINT8 direction, UINT8 data )
 
 UINT8 c16_m7501_port_read( running_device *device, UINT8 direction )
 {
-	c16_state *state = (c16_state *)device->machine->driver_data;
+	c16_state *state = device->machine->driver_data<c16_state>();
 	UINT8 data = 0xff;
 	UINT8 c16_port7501 = m6510_get_port(state->maincpu);
 
@@ -106,7 +106,7 @@ UINT8 c16_m7501_port_read( running_device *device, UINT8 direction )
 
 static void c16_bankswitch( running_machine *machine )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 	UINT8 *rom = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine, "bank9", messram_get_ptr(state->messram));
 
@@ -150,7 +150,7 @@ static void c16_bankswitch( running_machine *machine )
 
 WRITE8_HANDLER( c16_switch_to_rom )
 {
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 
 	ted7360_rom_switch_w(state->ted7360, 1);
 	c16_bankswitch(space->machine);
@@ -171,7 +171,7 @@ WRITE8_HANDLER( c16_switch_to_rom )
  * 1  1  c2 high */
 WRITE8_HANDLER( c16_select_roms )
 {
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 
 	state->lowrom = offset & 0x03;
 	state->highrom = (offset & 0x0c) >> 2;
@@ -181,7 +181,7 @@ WRITE8_HANDLER( c16_select_roms )
 
 WRITE8_HANDLER( c16_switch_to_ram )
 {
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 
 	ted7360_rom_switch_w(state->ted7360, 0);
 
@@ -193,7 +193,7 @@ WRITE8_HANDLER( c16_switch_to_ram )
 
 UINT8 c16_read_keyboard( running_machine *machine, int databus )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 	UINT8 value = 0xff;
 	int i;
 
@@ -228,13 +228,13 @@ UINT8 c16_read_keyboard( running_machine *machine, int databus )
  */
 WRITE8_HANDLER( c16_6529_port_w )
 {
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 	state->port6529 = data;
 }
 
 READ8_HANDLER( c16_6529_port_r )
 {
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 	return state->port6529 & (c16_read_keyboard (space->machine, 0xff /*databus */ ) | (state->port6529 ^ 0xff));
 }
 
@@ -254,7 +254,7 @@ WRITE8_HANDLER( plus4_6529_port_w )
 
 READ8_HANDLER( plus4_6529_port_r )
 {
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 	int data = 0x00;
 
 	if ((cassette_get_state(state->cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
@@ -267,7 +267,7 @@ READ8_HANDLER( plus4_6529_port_r )
 
 READ8_HANDLER( c16_fd1x_r )
 {
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 	int data = 0x00;
 
 	if ((cassette_get_state(state->cassette) & CASSETTE_MASK_UISTATE) != CASSETTE_STOPPED)
@@ -317,7 +317,7 @@ READ8_HANDLER( c16_fd1x_r )
   */
 WRITE8_HANDLER( c16_6551_port_w )
 {
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 
 	offset &= 0x03;
 	DBG_LOG(space->machine, 3, "6551", ("port write %.2x %.2x\n", offset, data));
@@ -335,13 +335,13 @@ READ8_HANDLER( c16_6551_port_r )
 
 int c16_dma_read( running_machine *machine, int offset )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 	return messram_get_ptr(state->messram)[offset % messram_get_size(state->messram)];
 }
 
 int c16_dma_read_rom( running_machine *machine, int offset )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 
 	/* should read real c16 system bus from 0xfd00 -ff1f */
 	if (offset >= 0xc000)
@@ -382,7 +382,7 @@ int c16_dma_read_rom( running_machine *machine, int offset )
 
 void c16_interrupt( running_machine *machine, int level )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 
 	if (level != state->old_level)
 	{
@@ -394,7 +394,7 @@ void c16_interrupt( running_machine *machine, int level )
 
 static void c16_common_driver_init( running_machine *machine )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	/* initial bankswitch (notice that TED7360 is init to ROM) */
@@ -415,7 +415,7 @@ static void c16_common_driver_init( running_machine *machine )
 
 DRIVER_INIT( c16 )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 	c16_common_driver_init(machine);
 
 	state->sidcard = 0;
@@ -424,7 +424,7 @@ DRIVER_INIT( c16 )
 
 DRIVER_INIT( plus4 )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 	c16_common_driver_init(machine);
 
 	state->sidcard = 0;
@@ -433,7 +433,7 @@ DRIVER_INIT( plus4 )
 
 DRIVER_INIT( c16sid )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 	c16_common_driver_init(machine);
 
 	state->sidcard = 1;
@@ -442,7 +442,7 @@ DRIVER_INIT( c16sid )
 
 DRIVER_INIT( plus4sid )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 	c16_common_driver_init(machine);
 
 	state->sidcard = 1;
@@ -452,7 +452,7 @@ DRIVER_INIT( plus4sid )
 MACHINE_RESET( c16 )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 
 	memset(state->keyline, 0xff, ARRAY_LENGTH(state->keyline));
 
@@ -487,7 +487,7 @@ MACHINE_RESET( c16 )
 // would a real SID Card allow for this? If not, this should be removed completely
 static WRITE8_HANDLER( c16_sidcart_16k )
 {
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 
 	messram_get_ptr(state->messram)[0x1400 + offset] = data;
 	messram_get_ptr(state->messram)[0x5400 + offset] = data;
@@ -499,7 +499,7 @@ static WRITE8_HANDLER( c16_sidcart_16k )
 
 static WRITE8_HANDLER( c16_sidcart_64k )
 {
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 
 	messram_get_ptr(state->messram)[0xd400 + offset] = data;
 
@@ -509,7 +509,7 @@ static WRITE8_HANDLER( c16_sidcart_64k )
 static TIMER_CALLBACK( c16_sidhack_tick )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	c16_state *state = (c16_state *)space->machine->driver_data;
+	c16_state *state = space->machine->driver_data<c16_state>();
 
 	if (input_port_read_safe(machine, "SID", 0x00) & 0x02)
 	{
@@ -527,7 +527,7 @@ static TIMER_CALLBACK( c16_sidhack_tick )
 
 static TIMER_CALLBACK( c16_sidcard_tick )
 {
-	c16_state *state = (c16_state *)machine->driver_data;
+	c16_state *state = machine->driver_data<c16_state>();
 	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	if (input_port_read_safe(machine, "SID", 0x00) & 0x01)
@@ -538,7 +538,7 @@ static TIMER_CALLBACK( c16_sidcard_tick )
 
 INTERRUPT_GEN( c16_frame_interrupt )
 {
-	c16_state *state = (c16_state *)device->machine->driver_data;
+	c16_state *state = device->machine->driver_data<c16_state>();
 	int value, i;
 	static const char *const c16ports[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7" };
 

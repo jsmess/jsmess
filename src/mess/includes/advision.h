@@ -11,12 +11,13 @@
 #define I8048_TAG	"i8048"
 #define COP411_TAG	"cop411"
 
-class advision_state
+class advision_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, advision_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, advision_state(machine)); }
 
-	advision_state(running_machine &machine) { }
+	advision_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* external RAM state */
 	UINT8 *extram;

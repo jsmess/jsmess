@@ -57,7 +57,7 @@ static READ8_HANDLER( port40_r )
 
     */
 
-	phc25_state *state = (phc25_state *)space->machine->driver_data;
+	phc25_state *state = space->machine->driver_data<phc25_state>();
 
 	UINT8 data = 0;
 
@@ -93,7 +93,7 @@ static WRITE8_HANDLER( port40_w )
 
     */
 
-	phc25_state *state = (phc25_state *)space->machine->driver_data;
+	phc25_state *state = space->machine->driver_data<phc25_state>();
 
 	/* cassette output */
 	cassette_output(state->cassette, BIT(data, 0) ? -1.0 : +1.0);
@@ -260,14 +260,14 @@ INPUT_PORTS_END
 
 static READ8_DEVICE_HANDLER( phc25_video_ram_r )
 {
-	phc25_state *state = (phc25_state *)device->machine->driver_data;
+	phc25_state *state = device->machine->driver_data<phc25_state>();
 
 	return state->video_ram[offset & 0x17ff];
 }
 
 static UINT8 phc25_char_rom_r(running_machine *machine, UINT8 ch, int line)
 {
-	phc25_state *state = (phc25_state *)machine->driver_data;
+	phc25_state *state = machine->driver_data<phc25_state>();
 
 	return state->char_rom[((ch - state->char_substact) * state->char_size) + line + state->char_correct];
 }
@@ -290,7 +290,7 @@ static const mc6847_interface mc6847_intf =
 
 static VIDEO_START( pal )
 {
-	phc25_state *state = (phc25_state *)machine->driver_data;
+	phc25_state *state = machine->driver_data<phc25_state>();
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, Z80_TAG) + 0x5000;
@@ -301,7 +301,7 @@ static VIDEO_START( pal )
 
 static VIDEO_START( ntsc )
 {
-	phc25_state *state = (phc25_state *)machine->driver_data;
+	phc25_state *state = machine->driver_data<phc25_state>();
 
 	/* find memory regions */
 	state->char_rom = memory_region(machine, Z80_TAG) + 0x5000;
@@ -312,7 +312,7 @@ static VIDEO_START( ntsc )
 
 static VIDEO_UPDATE( phc25 )
 {
-	phc25_state *state = (phc25_state *)screen->machine->driver_data;
+	phc25_state *state = screen->machine->driver_data<phc25_state>();
 
 	return mc6847_update(state->mc6847, bitmap, cliprect);
 }
@@ -343,7 +343,7 @@ static const cassette_config phc25_cassette_config =
 
 static MACHINE_START( phc25 )
 {
-	phc25_state *state = (phc25_state *)machine->driver_data;
+	phc25_state *state = machine->driver_data<phc25_state>();
 
 	/* find devices */
 	state->mc6847 = machine->device(MC6847_TAG);

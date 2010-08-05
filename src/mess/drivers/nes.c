@@ -38,7 +38,7 @@ static WRITE8_DEVICE_HANDLER( psg_4017_w )
 
 static WRITE8_HANDLER(nes_vh_sprite_dma_w)
 {
-	nes_state *state = (nes_state *)space->machine->driver_data;
+	nes_state *state = space->machine->driver_data<nes_state>();
 	ppu2c0x_spriteram_dma(space, state->ppu, data);
 }
 

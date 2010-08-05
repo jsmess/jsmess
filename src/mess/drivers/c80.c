@@ -96,7 +96,7 @@ static READ8_DEVICE_HANDLER( pio1_port_a_r )
 
     */
 
-	c80_state *state = (c80_state *)device->machine->driver_data;
+	c80_state *state = device->machine->driver_data<c80_state>();
 
 	UINT8 data = !state->pio1_brdy << 4 | 0x07;
 
@@ -134,7 +134,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_a_w )
 
     */
 
-	c80_state *state = (c80_state *)device->machine->driver_data;
+	c80_state *state = device->machine->driver_data<c80_state>();
 
 	state->pio1_a5 = BIT(data, 5);
 
@@ -163,7 +163,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
     */
 
-	c80_state *state = (c80_state *)device->machine->driver_data;
+	c80_state *state = device->machine->driver_data<c80_state>();
 
 	if (!state->pio1_a5)
 	{
@@ -175,7 +175,7 @@ static WRITE8_DEVICE_HANDLER( pio1_port_b_w )
 
 static WRITE_LINE_DEVICE_HANDLER( pio1_brdy_w )
 {
-	c80_state *driver_state = (c80_state *)device->machine->driver_data;
+	c80_state *driver_state = device->machine->driver_data<c80_state>();
 
 	driver_state->pio1_brdy = state;
 
@@ -226,7 +226,7 @@ static const z80_daisy_config c80_daisy_chain[] =
 
 static MACHINE_START( c80 )
 {
-	c80_state *state = (c80_state *)machine->driver_data;
+	c80_state *state = machine->driver_data<c80_state>();
 
 	/* find devices */
 	state->cassette = machine->device(CASSETTE_TAG);

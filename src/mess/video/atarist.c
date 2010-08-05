@@ -17,7 +17,7 @@
 
 INLINE pen_t atarist_shift_mode_0(running_machine *machine)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	int color = (BIT(state->shifter_rr[3], 15) << 3) | (BIT(state->shifter_rr[2], 15) << 2) | (BIT(state->shifter_rr[1], 15) << 1) | BIT(state->shifter_rr[0], 15);
 
@@ -31,7 +31,7 @@ INLINE pen_t atarist_shift_mode_0(running_machine *machine)
 
 INLINE pen_t atarist_shift_mode_1(running_machine *machine)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	int color = (BIT(state->shifter_rr[1], 15) << 1) | BIT(state->shifter_rr[0], 15);
 
@@ -52,7 +52,7 @@ INLINE pen_t atarist_shift_mode_1(running_machine *machine)
 
 INLINE pen_t atarist_shift_mode_2(running_machine *machine)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	int color = BIT(state->shifter_rr[0], 15);
 
@@ -86,7 +86,7 @@ INLINE pen_t atarist_shift_mode_2(running_machine *machine)
 
 static TIMER_CALLBACK( atarist_shifter_tick )
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	int y = machine->primary_screen->vpos();
 	int x = machine->primary_screen->hpos();
@@ -117,7 +117,7 @@ static TIMER_CALLBACK( atarist_shifter_tick )
 
 INLINE void atarist_shifter_load(running_machine *machine)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT16 data = memory_read_word_16be(program, state->shifter_ofs);
@@ -139,7 +139,7 @@ INLINE void atarist_shifter_load(running_machine *machine)
 
 static TIMER_CALLBACK( atarist_glue_tick )
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	int y = machine->primary_screen->vpos();
 	int x = machine->primary_screen->hpos();
@@ -175,7 +175,7 @@ static TIMER_CALLBACK( atarist_glue_tick )
 
 static void atarist_set_screen_parameters(running_machine *machine)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	if (state->shifter_sync & 0x02)
 	{
@@ -201,7 +201,7 @@ static void atarist_set_screen_parameters(running_machine *machine)
 
 READ16_HANDLER( atarist_shifter_base_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -216,7 +216,7 @@ READ16_HANDLER( atarist_shifter_base_r )
 
 WRITE16_HANDLER( atarist_shifter_base_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -233,7 +233,7 @@ WRITE16_HANDLER( atarist_shifter_base_w )
 
 READ16_HANDLER( atarist_shifter_counter_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -250,14 +250,14 @@ READ16_HANDLER( atarist_shifter_counter_r )
 
 READ8_HANDLER( atarist_shifter_sync_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->shifter_sync;
 }
 
 WRITE8_HANDLER( atarist_shifter_sync_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->shifter_sync = data;
 	logerror("SHIFTER Sync %x\n", state->shifter_sync);
@@ -266,14 +266,14 @@ WRITE8_HANDLER( atarist_shifter_sync_w )
 
 READ8_HANDLER( atarist_shifter_mode_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->shifter_mode;
 }
 
 WRITE8_HANDLER( atarist_shifter_mode_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->shifter_mode = data;
 	logerror("SHIFTER Mode %x\n", state->shifter_mode);
@@ -281,14 +281,14 @@ WRITE8_HANDLER( atarist_shifter_mode_w )
 
 READ16_HANDLER( atarist_shifter_palette_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->shifter_palette[offset];
 }
 
 WRITE16_HANDLER( atarist_shifter_palette_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->shifter_palette[offset] = data;
 	logerror("SHIFTER Palette[%x] = %x\n", offset, data);
@@ -300,14 +300,14 @@ WRITE16_HANDLER( atarist_shifter_palette_w )
 
 READ16_HANDLER( atariste_shifter_base_low_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->shifter_base & 0xfe;
 }
 
 WRITE16_HANDLER( atariste_shifter_base_low_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->shifter_base = (state->shifter_base & 0x3fff00) | (data & 0xfe);
 	logerror("SHIFTER Video Base Address %06x\n", state->shifter_base);
@@ -315,7 +315,7 @@ WRITE16_HANDLER( atariste_shifter_base_low_w )
 
 READ16_HANDLER( atariste_shifter_counter_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -332,7 +332,7 @@ READ16_HANDLER( atariste_shifter_counter_r )
 
 WRITE16_HANDLER( atariste_shifter_counter_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -353,7 +353,7 @@ WRITE16_HANDLER( atariste_shifter_counter_w )
 
 WRITE16_HANDLER( atariste_shifter_palette_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	int r = ((data >> 7) & 0x0e) | BIT(data, 11);
 	int g = ((data >> 3) & 0x0e) | BIT(data, 7);
@@ -367,14 +367,14 @@ WRITE16_HANDLER( atariste_shifter_palette_w )
 
 READ16_HANDLER( atariste_shifter_lineofs_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->shifter_lineofs;
 }
 
 WRITE16_HANDLER( atariste_shifter_lineofs_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->shifter_lineofs = data & 0xff;
 	logerror("SHIFTER Line Offset %x\n", state->shifter_lineofs);
@@ -382,14 +382,14 @@ WRITE16_HANDLER( atariste_shifter_lineofs_w )
 
 READ16_HANDLER( atariste_shifter_pixelofs_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->shifter_pixelofs;
 }
 
 WRITE16_HANDLER( atariste_shifter_pixelofs_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->shifter_pixelofs = data & 0x0f;
 	logerror("SHIFTER Pixel Offset %x\n", state->shifter_pixelofs);
@@ -419,7 +419,7 @@ static const int BLITTER_NOPS[16][4] =
 
 static void atarist_blitter_source(running_machine *machine)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 	UINT16 data = memory_read_word_16be(program, state->blitter_src);
@@ -436,7 +436,7 @@ static void atarist_blitter_source(running_machine *machine)
 
 static UINT16 atarist_blitter_hop(running_machine *machine)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	UINT16 source = state->blitter_srcbuf >> (state->blitter_skew & 0x0f);
 	UINT16 halftone = state->blitter_halftone[state->blitter_ctrl & 0x0f];
@@ -463,7 +463,7 @@ static UINT16 atarist_blitter_hop(running_machine *machine)
 
 static void atarist_blitter_op(running_machine *machine, UINT16 s, UINT32 dstaddr, UINT16 mask)
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 	const address_space *program = cputag_get_address_space(machine, M68000_TAG, ADDRESS_SPACE_PROGRAM);
 
 	UINT16 d = memory_read_word_16be(program, dstaddr);
@@ -479,7 +479,7 @@ static void atarist_blitter_op(running_machine *machine, UINT16 s, UINT32 dstadd
 
 static TIMER_CALLBACK( atarist_blitter_tick )
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	do
 	{
@@ -538,28 +538,28 @@ static TIMER_CALLBACK( atarist_blitter_tick )
 
 READ16_HANDLER( atarist_blitter_halftone_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->blitter_halftone[offset];
 }
 
 READ16_HANDLER( atarist_blitter_src_inc_x_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->blitter_src_inc_x;
 }
 
 READ16_HANDLER( atarist_blitter_src_inc_y_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->blitter_src_inc_y;
 }
 
 READ16_HANDLER( atarist_blitter_src_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -574,7 +574,7 @@ READ16_HANDLER( atarist_blitter_src_r )
 
 READ16_HANDLER( atarist_blitter_end_mask_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -591,21 +591,21 @@ READ16_HANDLER( atarist_blitter_end_mask_r )
 
 READ16_HANDLER( atarist_blitter_dst_inc_x_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->blitter_dst_inc_x;
 }
 
 READ16_HANDLER( atarist_blitter_dst_inc_y_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->blitter_dst_inc_y;
 }
 
 READ16_HANDLER( atarist_blitter_dst_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -620,21 +620,21 @@ READ16_HANDLER( atarist_blitter_dst_r )
 
 READ16_HANDLER( atarist_blitter_count_x_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->blitter_xcount;
 }
 
 READ16_HANDLER( atarist_blitter_count_y_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	return state->blitter_ycount;
 }
 
 READ16_HANDLER( atarist_blitter_op_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -648,7 +648,7 @@ READ16_HANDLER( atarist_blitter_op_r )
 
 READ16_HANDLER( atarist_blitter_ctrl_r )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -662,28 +662,28 @@ READ16_HANDLER( atarist_blitter_ctrl_r )
 
 WRITE16_HANDLER( atarist_blitter_halftone_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->blitter_halftone[offset] = data;
 }
 
 WRITE16_HANDLER( atarist_blitter_src_inc_x_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->blitter_src_inc_x = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_src_inc_y_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->blitter_src_inc_y = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_src_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -696,7 +696,7 @@ WRITE16_HANDLER( atarist_blitter_src_w )
 
 WRITE16_HANDLER( atarist_blitter_end_mask_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -711,21 +711,21 @@ WRITE16_HANDLER( atarist_blitter_end_mask_w )
 
 WRITE16_HANDLER( atarist_blitter_dst_inc_x_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->blitter_dst_inc_x = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_dst_inc_y_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->blitter_dst_inc_y = data & 0xfffe;
 }
 
 WRITE16_HANDLER( atarist_blitter_dst_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	switch (offset)
 	{
@@ -738,21 +738,21 @@ WRITE16_HANDLER( atarist_blitter_dst_w )
 
 WRITE16_HANDLER( atarist_blitter_count_x_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->blitter_xcount = data;
 }
 
 WRITE16_HANDLER( atarist_blitter_count_y_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	state->blitter_ycount = data;
 }
 
 WRITE16_HANDLER( atarist_blitter_op_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -766,7 +766,7 @@ WRITE16_HANDLER( atarist_blitter_op_w )
 
 WRITE16_HANDLER( atarist_blitter_ctrl_w )
 {
-	atarist_state *state = (atarist_state *)space->machine->driver_data;
+	atarist_state *state = space->machine->driver_data<atarist_state>();
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -791,7 +791,7 @@ WRITE16_HANDLER( atarist_blitter_ctrl_w )
 
 VIDEO_START( atarist )
 {
-	atarist_state *state = (atarist_state *)machine->driver_data;
+	atarist_state *state = machine->driver_data<atarist_state>();
 
 	state->shifter_timer = timer_alloc(machine, atarist_shifter_tick, NULL);
 	state->glue_timer = timer_alloc(machine, atarist_glue_tick, NULL);

@@ -13,12 +13,13 @@
 #define AM2910_TAG		"11d"
 #define SCREEN_TAG		"screen"
 
-class cgc7900_state
+class cgc7900_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cgc7900_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cgc7900_state(machine)); }
 
-	cgc7900_state(running_machine &machine) { }
+	cgc7900_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* interrupt state */
 	UINT16 int_mask;

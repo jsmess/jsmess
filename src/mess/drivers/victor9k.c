@@ -88,7 +88,7 @@ INPUT_PORTS_END
 
 static MC6845_UPDATE_ROW( victor9k_update_row )
 {
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 	const address_space *program = cputag_get_address_space(device->machine, I8088_TAG, ADDRESS_SPACE_PROGRAM);
 
 	if (BIT(ma, 13))
@@ -122,7 +122,7 @@ static MC6845_UPDATE_ROW( victor9k_update_row )
 
 static WRITE_LINE_DEVICE_HANDLER( vsync_w )
 {
-	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
 
 	pic8259_ir7_w(driver_state->pic, state);
 	driver_state->vert = state;
@@ -144,7 +144,7 @@ static const mc6845_interface hd46505s_intf =
 
 static VIDEO_START( victor9k )
 {
-	victor9k_state *state = (victor9k_state *)machine->driver_data;
+	victor9k_state *state = machine->driver_data<victor9k_state>();
 
 	/* find devices */
 	state->crt = machine->device(HD46505S_TAG);
@@ -152,7 +152,7 @@ static VIDEO_START( victor9k )
 
 static VIDEO_UPDATE( victor9k )
 {
-	victor9k_state *state = (victor9k_state *)screen->machine->driver_data;
+	victor9k_state *state = screen->machine->driver_data<victor9k_state>();
 
 	mc6845_update(state->crt, bitmap, cliprect);
 
@@ -250,7 +250,7 @@ static UPD7201_INTERFACE( mpsc_intf )
 
 static WRITE_LINE_DEVICE_HANDLER( ssda_irq_w )
 {
-	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
 
 	driver_state->via6_irq = state;
 
@@ -289,7 +289,7 @@ static READ8_DEVICE_HANDLER( via1_pa_r )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	return ieee488_dio_r(state->ieee488, 0);
 }
@@ -311,7 +311,7 @@ static WRITE8_DEVICE_HANDLER( via1_pa_w )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	ieee488_dio_w(state->ieee488, device, data);
 }
@@ -333,7 +333,7 @@ static READ8_DEVICE_HANDLER( via1_pb_r )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	UINT8 data = 0;
 
@@ -381,7 +381,7 @@ static WRITE8_DEVICE_HANDLER( via1_pb_w )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	/* data valid */
 	ieee488_dav_w(state->ieee488, device, BIT(data, 0));
@@ -414,7 +414,7 @@ static WRITE_LINE_DEVICE_HANDLER( codec_vol_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via1_irq_w )
 {
-	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
 
 	driver_state->via1_irq = state;
 
@@ -457,7 +457,7 @@ static READ8_DEVICE_HANDLER( via2_pa_r )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	UINT8 data = 0;
 
@@ -502,7 +502,7 @@ static WRITE8_DEVICE_HANDLER( via2_pb_w )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	/* brightness */
 	state->brt = (data >> 2) & 0x07;
@@ -513,7 +513,7 @@ static WRITE8_DEVICE_HANDLER( via2_pb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via2_irq_w )
 {
-	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
 
 	driver_state->via2_irq = state;
 
@@ -614,7 +614,7 @@ static WRITE8_DEVICE_HANDLER( via3_pb_w )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	/* codec clock output */
 	mc6852_rx_clk_w(state->ssda, BIT(data, 7));
@@ -623,7 +623,7 @@ static WRITE8_DEVICE_HANDLER( via3_pb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via3_irq_w )
 {
-	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
 
 	driver_state->via3_irq = state;
 
@@ -691,7 +691,7 @@ static WRITE_LINE_DEVICE_HANDLER( mode_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via4_irq_w )
 {
-	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
 
 	driver_state->via4_irq = state;
 
@@ -757,7 +757,7 @@ static WRITE8_DEVICE_HANDLER( via5_pb_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via5_irq_w )
 {
-	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
 
 	driver_state->via5_irq = state;
 
@@ -800,7 +800,7 @@ static READ8_DEVICE_HANDLER( via6_pa_r )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	UINT8 data = 0;
 
@@ -833,7 +833,7 @@ static WRITE8_DEVICE_HANDLER( via6_pa_w )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	/* side select */
 	state->side = BIT(data, 4);
@@ -859,7 +859,7 @@ static READ8_DEVICE_HANDLER( via6_pb_r )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	UINT8 data = 0;
 
@@ -892,7 +892,7 @@ static WRITE8_DEVICE_HANDLER( via6_pb_w )
 
     */
 
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	/* motor speed controller reset */
 	cputag_set_input_line(device->machine, I8048_TAG, INPUT_LINE_RESET, BIT(data, 2));
@@ -914,7 +914,7 @@ static WRITE_LINE_DEVICE_HANDLER( erase_w )
 
 static WRITE_LINE_DEVICE_HANDLER( via6_irq_w )
 {
-	victor9k_state *driver_state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *driver_state = device->machine->driver_data<victor9k_state>();
 
 	driver_state->via6_irq = state;
 
@@ -966,14 +966,14 @@ static IEEE488_DAISY( ieee488_daisy )
 
 static IRQ_CALLBACK( victor9k_irq_callback )
 {
-	victor9k_state *state = (victor9k_state *)device->machine->driver_data;
+	victor9k_state *state = device->machine->driver_data<victor9k_state>();
 
 	return pic8259_acknowledge(state->pic);
 }
 
 static MACHINE_START( victor9k )
 {
-	victor9k_state *state = (victor9k_state *)machine->driver_data;
+	victor9k_state *state = machine->driver_data<victor9k_state>();
 
 	/* set interrupt callback */
 	cpu_set_irq_callback(machine->firstcpu, victor9k_irq_callback);

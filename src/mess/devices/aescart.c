@@ -403,7 +403,7 @@ static DEVICE_START( aes_cartridge )
 // handle protected carts
 static void install_protection(device_image_interface& image)
 {
-	neogeo_state *state = (neogeo_state *)image.device().machine->driver_data;
+	neogeo_state *state = image.device().machine->driver_data<neogeo_state>();
 	const char *crypt_feature = image.get_feature( "crypt" );
 
 	if(crypt_feature == NULL)

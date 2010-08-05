@@ -68,7 +68,7 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	e01_state *state = (e01_state *)machine->driver_data;
+	e01_state *state = machine->driver_data<e01_state>();
 
 	cputag_set_input_line(machine, R65C102_TAG, INPUT_LINE_IRQ0, (state->via_irq || (state->hdc_ie & state->hdc_irq) || state->rtc_irq) ? ASSERT_LINE : CLEAR_LINE);
 	cputag_set_input_line(machine, R65C102_TAG, INPUT_LINE_NMI, (state->fdc_drq || (state->adlc_ie & state->adlc_irq)) ? ASSERT_LINE : CLEAR_LINE);
@@ -80,7 +80,7 @@ static void update_interrupts(running_machine *machine)
 
 static void network_irq_enable(running_machine *machine, int enabled)
 {
-	e01_state *state = (e01_state *)machine->driver_data;
+	e01_state *state = machine->driver_data<e01_state>();
 
 	state->adlc_ie = enabled;
 
@@ -93,7 +93,7 @@ static void network_irq_enable(running_machine *machine, int enabled)
 
 static void hdc_irq_enable(running_machine *machine, int enabled)
 {
-	e01_state *state = (e01_state *)machine->driver_data;
+	e01_state *state = machine->driver_data<e01_state>();
 
 	state->hdc_ie = enabled;
 
@@ -272,7 +272,7 @@ INPUT_PORTS_END
 /*
 static WRITE_LINE_DEVICE_HANDLER( rtc_irq_w )
 {
-    e01_state *driver_state = (e01_state *)device->machine->driver_data;
+    e01_state *driver_state = device->machine->driver_data<e01_state>();
 
     driver_state->rtc_irq = state;
 
@@ -281,7 +281,7 @@ static WRITE_LINE_DEVICE_HANDLER( rtc_irq_w )
 */
 static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
 {
-	e01_state *state = (e01_state *)timer.machine->driver_data;
+	e01_state *state = timer.machine->driver_data<e01_state>();
 
 	state->rtc_irq = !state->rtc_irq;
 
@@ -294,7 +294,7 @@ static TIMER_DEVICE_CALLBACK( rtc_irq_hack )
 /*
 static WRITE_LINE_DEVICE_HANDLER( adlc_irq_w )
 {
-    e01_state *driver_state = (e01_state *)device->machine->driver_data;
+    e01_state *driver_state = device->machine->driver_data<e01_state>();
 
     driver_state->adlc_irq = state;
 
@@ -315,7 +315,7 @@ static const mc6854_interface adlc_intf =
 
 static WRITE_LINE_DEVICE_HANDLER( via_irq_w )
 {
-	e01_state *driver_state = (e01_state *)device->machine->driver_data;
+	e01_state *driver_state = device->machine->driver_data<e01_state>();
 
 	driver_state->via_irq = state;
 
@@ -361,7 +361,7 @@ static const floppy_config e01_floppy_config =
 
 static WRITE_LINE_DEVICE_HANDLER( fdc_drq_w )
 {
-	e01_state *driver_state = (e01_state *)device->machine->driver_data;
+	e01_state *driver_state = device->machine->driver_data<e01_state>();
 
 	driver_state->fdc_drq = state;
 
@@ -386,7 +386,7 @@ static const wd17xx_interface fdc_intf =
 
 static MACHINE_START( e01 )
 {
-	e01_state *state = (e01_state *)machine->driver_data;
+	e01_state *state = machine->driver_data<e01_state>();
 
 	UINT8 *ram = messram_get_ptr(machine->device("messram"));
 	UINT8 *rom = memory_region(machine, R65C102_TAG);

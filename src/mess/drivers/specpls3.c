@@ -183,14 +183,14 @@ static const int spectrum_plus3_memory_selections[]=
 
 static WRITE8_HANDLER(spectrum_plus3_port_3ffd_w)
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 	if (state->floppy==1)
 		upd765_data_w(space->machine->device("upd765"), 0,data);
 }
 
 static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 	if (state->floppy==0)
 		return 0xff;
 	else
@@ -200,7 +200,7 @@ static  READ8_HANDLER(spectrum_plus3_port_3ffd_r)
 
 static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 {
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 	if (state->floppy==0)
 			return 0xff;
 	else
@@ -210,7 +210,7 @@ static  READ8_HANDLER(spectrum_plus3_port_2ffd_r)
 
 void spectrum_plus3_update_memory(running_machine *machine)
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 
@@ -301,7 +301,7 @@ static WRITE8_HANDLER(spectrum_plus3_port_7ffd_w)
 	   /* D4 - ROM select - which rom paged into 0x0000-0x03fff */
 	   /* D5 - Disable paging */
 
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 
 	/* disable paging? */
 	if (state->port_7ffd_data & 0x20)
@@ -321,7 +321,7 @@ static WRITE8_HANDLER(spectrum_plus3_port_1ffd_w)
 	/* D3 - Disk motor on/off */
 	/* D4 - parallel port strobe */
 
-	spectrum_state *state = (spectrum_state *)space->machine->driver_data;
+	spectrum_state *state = space->machine->driver_data<spectrum_state>();
 
 	floppy_mon_w(floppy_get_device(space->machine, 0), !BIT(data, 3));
 	floppy_mon_w(floppy_get_device(space->machine, 1), !BIT(data, 3));
@@ -354,7 +354,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( spectrum_plus3 )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	UINT8 *messram = messram_get_ptr(machine->device("messram"));
 	memset(messram,0,128*1024);
 
@@ -368,13 +368,13 @@ static MACHINE_RESET( spectrum_plus3 )
 
 static DRIVER_INIT( plus3 )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	state->floppy = 1;
 }
 
 static DRIVER_INIT( plus2 )
 {
-	spectrum_state *state = (spectrum_state *)machine->driver_data;
+	spectrum_state *state = machine->driver_data<spectrum_state>();
 	state->floppy = 0;
 }
 

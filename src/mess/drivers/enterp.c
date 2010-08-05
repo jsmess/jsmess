@@ -27,12 +27,13 @@
 #define ENTERPRISE_XTAL_X1	XTAL_8MHz
 
 
-class ep_state
+class ep_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ep_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ep_state(machine)); }
 
-	ep_state(running_machine &machine) { }
+	ep_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT8 exdos_card_value;  /* state of the wd1770 irq/drq lines */
 	UINT8 keyboard_line;     /* index of keyboard line to read */
@@ -111,7 +112,7 @@ static void enterprise_update_memory_page(const address_space *space, offs_t pag
 /* EP specific handling of dave register write */
 static WRITE8_DEVICE_HANDLER( enterprise_dave_reg_write )
 {
-	ep_state *ep = (ep_state *)device->machine->driver_data;
+	ep_state *ep = device->machine->driver_data<ep_state>();
 
 	switch (offset)
 	{
@@ -137,7 +138,7 @@ static READ8_DEVICE_HANDLER( enterprise_dave_reg_read )
 		"LINE5", "LINE6", "LINE7", "LINE8", "LINE9"
 	};
 
-	ep_state *ep = (ep_state *)device->machine->driver_data;
+	ep_state *ep = device->machine->driver_data<ep_state>();
 
 	switch (offset)
 	{
@@ -193,7 +194,7 @@ static MACHINE_RESET( enterprise )
 
 static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_intrq_w )
 {
-	ep_state *ep = (ep_state *)device->machine->driver_data;
+	ep_state *ep = device->machine->driver_data<ep_state>();
 
 	if (state)
 		ep->exdos_card_value |= 0x02;
@@ -203,7 +204,7 @@ static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_intrq_w )
 
 static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_drq_w )
 {
-	ep_state *ep = (ep_state *)device->machine->driver_data;
+	ep_state *ep = device->machine->driver_data<ep_state>();
 
 	if (state)
 		ep->exdos_card_value |= 0x80;
@@ -223,7 +224,7 @@ static WRITE_LINE_DEVICE_HANDLER( enterp_wd1770_drq_w )
 */
 static READ8_HANDLER( exdos_card_r )
 {
-	ep_state *ep = (ep_state *)space->machine->driver_data;
+	ep_state *ep = space->machine->driver_data<ep_state>();
 	return ep->exdos_card_value;
 }
 

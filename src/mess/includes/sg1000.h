@@ -24,12 +24,13 @@
 #define IS_CARTRIDGE_MUSIC_EDITOR(ptr) \
 	(!strncmp("PIANO", (const char *)&ptr[0x0841], 5))
 
-class sg1000_state
+class sg1000_state : public driver_data_t
 {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sg1000_state(machine)); }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sg1000_state(machine)); }
 
-	sg1000_state(running_machine &machine) { }
+	sg1000_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	/* keyboard state */
 	UINT8 keylatch;

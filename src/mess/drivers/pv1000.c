@@ -14,10 +14,11 @@ DECLARE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
 DEFINE_LEGACY_SOUND_DEVICE(PV1000,pv1000_sound);
 
 
-class d65010_state {
+class d65010_state : public driver_data_t {
 public:
-	static void *alloc(running_machine &machine) { return auto_alloc_clear(&machine, d65010_state(machine)); }
-	d65010_state(running_machine &machine) { }
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, d65010_state(machine)); }
+	d65010_state(running_machine &machine)
+		: driver_data_t(machine) { }
 
 	UINT8	io_regs[8];
 	UINT8	fd_data;
@@ -69,7 +70,7 @@ static WRITE8_HANDLER( pv1000_gfxram_w )
 
 static WRITE8_HANDLER( pv1000_io_w )
 {
-	d65010_state *state = (d65010_state *)space->machine->driver_data;
+	d65010_state *state = space->machine->driver_data<d65010_state>();
 
 	switch ( offset )
 	{
@@ -95,7 +96,7 @@ static WRITE8_HANDLER( pv1000_io_w )
 
 static READ8_HANDLER( pv1000_io_r )
 {
-	d65010_state *state = (d65010_state *)space->machine->driver_data;
+	d65010_state *state = space->machine->driver_data<d65010_state>();
 	UINT8 data = state->io_regs[offset];
 
 //  logerror("pv1000_io_r offset=%02x\n", offset );
@@ -213,7 +214,7 @@ static DEVICE_IMAGE_LOAD( pv1000_cart )
 
 static VIDEO_UPDATE( pv1000 )
 {
-	d65010_state *state = (d65010_state *)screen->machine->driver_data;
+	d65010_state *state = screen->machine->driver_data<d65010_state>();
 	int x, y;
 
 	for ( y = 0; y < 24; y++ )
@@ -251,7 +252,7 @@ static VIDEO_UPDATE( pv1000 )
 
 static STREAM_UPDATE( pv1000_sound_update )
 {
-	d65010_state *state = (d65010_state *)device->machine->driver_data;
+	d65010_state *state = device->machine->driver_data<d65010_state>();
 	stream_sample_t *buffer = outputs[0];
 
 	while ( samples > 0 )
@@ -284,7 +285,7 @@ static STREAM_UPDATE( pv1000_sound_update )
 
 static DEVICE_START( pv1000_sound )
 {
-	d65010_state *state = (d65010_state *)device->machine->driver_data;
+	d65010_state *state = device->machine->driver_data<d65010_state>();
 	state->sh_channel = stream_create( device, 0, 1, device->clock()/1024, 0, pv1000_sound_update );
 }
 
@@ -307,7 +308,7 @@ DEVICE_GET_INFO( pv1000_sound )
 /* we have chosen to trigger on scanlines 195, 199, 203, 207, 211, 215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255 */
 static TIMER_CALLBACK( d65010_irq_on_cb )
 {
-	d65010_state *state = (d65010_state *)machine->driver_data;
+	d65010_state *state = machine->driver_data<d65010_state>();
 	int vpos = state->screen->vpos();
 	int next_vpos = vpos + 12;
 
@@ -326,7 +327,7 @@ static TIMER_CALLBACK( d65010_irq_on_cb )
 
 static TIMER_CALLBACK( d65010_irq_off_cb )
 {
-	d65010_state *state = (d65010_state *)machine->driver_data;
+	d65010_state *state = machine->driver_data<d65010_state>();
 
 	cpu_set_input_line( state->maincpu, 0, CLEAR_LINE );
 }
@@ -334,7 +335,7 @@ static TIMER_CALLBACK( d65010_irq_off_cb )
 
 static MACHINE_START( pv1000 )
 {
-	d65010_state *state = (d65010_state *)machine->driver_data;
+	d65010_state *state = machine->driver_data<d65010_state>();
 
 	state->irq_on_timer = timer_alloc( machine, d65010_irq_on_cb, NULL );
 	state->irq_off_timer = timer_alloc( machine, d65010_irq_off_cb, NULL );
@@ -345,7 +346,7 @@ static MACHINE_START( pv1000 )
 
 static MACHINE_RESET( pv1000 )
 {
-	d65010_state *state = (d65010_state *)machine->driver_data;
+	d65010_state *state = machine->driver_data<d65010_state>();
 
 	state->io_regs[5] = 0;
 	state->fd_data = 0;

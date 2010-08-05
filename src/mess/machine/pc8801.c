@@ -47,7 +47,7 @@ static int FM_IRQ_save;
 
 WRITE8_HANDLER( pc88_rtc_w )
 {
-	pc88_state *state = (pc88_state *)space->machine->driver_data;
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 
 	/* real time clock */
 	upd1990a_c0_w(state->upd1990a, BIT(data, 0));
@@ -143,7 +143,7 @@ WRITE8_HANDLER( pc88sr_outport_40 )
 {
 	/* bit 3,4,6 not implemented */
 	/* bit 7 incorrect behavior */
-	pc88_state *state = (pc88_state *)space->machine->driver_data;
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	running_device *speaker = space->machine->device("beep");
 
 	/* printer */
@@ -175,7 +175,7 @@ WRITE8_HANDLER( pc88sr_outport_40 )
 READ8_HANDLER( pc88sr_inport_40 )
 {
 	/* bit 2 not implemented */
-	pc88_state *state = (pc88_state *)space->machine->driver_data;
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 	UINT8 r;
 
 	r = centronics_busy_r(state->centronics);
@@ -679,14 +679,14 @@ static void pc88sr_ch_reset(running_machine *machine, int hireso)
 
 static READ8_DEVICE_HANDLER( cpu_8255_c_r )
 {
-	pc88_state *state = (pc88_state *)device->machine->driver_data;
+	pc88_state *state = device->machine->driver_data<pc88_state>();
 
 	return state->i8255_1_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( cpu_8255_c_w )
 {
-	pc88_state *state = (pc88_state *)device->machine->driver_data;
+	pc88_state *state = device->machine->driver_data<pc88_state>();
 
 	state->i8255_0_pc = data;
 }
@@ -703,14 +703,14 @@ I8255A_INTERFACE( pc8801_8255_config_0 )
 
 static READ8_DEVICE_HANDLER( fdc_8255_c_r )
 {
-	pc88_state *state = (pc88_state *)device->machine->driver_data;
+	pc88_state *state = device->machine->driver_data<pc88_state>();
 
 	return state->i8255_0_pc >> 4;
 }
 
 static WRITE8_DEVICE_HANDLER( fdc_8255_c_w )
 {
-	pc88_state *state = (pc88_state *)device->machine->driver_data;
+	pc88_state *state = device->machine->driver_data<pc88_state>();
 
 	state->i8255_1_pc = data;
 }
@@ -727,14 +727,14 @@ I8255A_INTERFACE( pc8801_8255_config_1 )
 
 static TIMER_CALLBACK( pc8801fd_upd765_tc_to_zero )
 {
-	pc88_state *state = (pc88_state *)machine->driver_data;
+	pc88_state *state = machine->driver_data<pc88_state>();
 
 	upd765_tc_w(state->upd765, 0);
 }
 
 READ8_HANDLER( pc8801fd_upd765_tc )
 {
-	pc88_state *state = (pc88_state *)space->machine->driver_data;
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 
 	upd765_tc_w(state->upd765, 1);
 	timer_set(space->machine,  attotime_zero, NULL, 0, pc8801fd_upd765_tc_to_zero );
@@ -790,7 +790,7 @@ void pc88sr_sound_interupt(running_device *device, int irq)
 
 READ8_HANDLER( pc88_kanji_r )
 {
-	pc88_state *state = (pc88_state *)space->machine->driver_data;
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 
 	UINT8 *kanji = memory_region(space->machine, "gfx1");
 	UINT32 addr = (state->kanji << 1) | !offset;
@@ -800,7 +800,7 @@ READ8_HANDLER( pc88_kanji_r )
 
 WRITE8_HANDLER( pc88_kanji_w )
 {
-	pc88_state *state = (pc88_state *)space->machine->driver_data;
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 
 	switch (offset)
 	{
@@ -816,7 +816,7 @@ WRITE8_HANDLER( pc88_kanji_w )
 
 READ8_HANDLER( pc88_kanji2_r )
 {
-	pc88_state *state = (pc88_state *)space->machine->driver_data;
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 
 	UINT8 *kanji2 = memory_region(space->machine, "kanji2");
 	UINT32 addr = (state->kanji2 << 1) | !offset;
@@ -826,7 +826,7 @@ READ8_HANDLER( pc88_kanji2_r )
 
 WRITE8_HANDLER( pc88_kanji2_w )
 {
-	pc88_state *state = (pc88_state *)space->machine->driver_data;
+	pc88_state *state = space->machine->driver_data<pc88_state>();
 
 	switch (offset)
 	{
@@ -844,7 +844,7 @@ WRITE8_HANDLER( pc88_kanji2_w )
 
 MACHINE_START( pc88srl )
 {
-	pc88_state *state = (pc88_state *)machine->driver_data;
+	pc88_state *state = machine->driver_data<pc88_state>();
 
 	/* find devices */
 	state->upd765 = machine->device(UPD765_TAG);

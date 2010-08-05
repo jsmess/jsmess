@@ -296,7 +296,7 @@ void _3do_slow2_init( running_machine *machine )
 
 READ32_HANDLER( _3do_svf_r )
 {
-	_3do_state *state = (_3do_state *)space->machine->driver_data;
+	_3do_state *state = space->machine->driver_data<_3do_state>();
 	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	UINT32 *p = state->vram + addr;
 
@@ -322,7 +322,7 @@ READ32_HANDLER( _3do_svf_r )
 
 WRITE32_HANDLER( _3do_svf_w )
 {
-	_3do_state *state = (_3do_state *)space->machine->driver_data;
+	_3do_state *state = space->machine->driver_data<_3do_state>();
 	UINT32 addr = ( offset & ( 0x07fc / 4 ) ) << 9;
 	UINT32 *p = state->vram + addr;
 
@@ -1132,7 +1132,7 @@ VIDEO_START( _3do )
 /* This is incorrect! Just testing stuff */
 VIDEO_UPDATE( _3do )
 {
-	_3do_state *state = (_3do_state *)screen->machine->driver_data;
+	_3do_state *state = screen->machine->driver_data<_3do_state>();
 	UINT32 *source_p = state->vram + 0x1c0000 / 4;
 
 	for ( int i = 0; i < 120; i++ )
