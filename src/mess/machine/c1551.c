@@ -337,7 +337,7 @@ static const m6502_interface m6510t_intf =
 static ADDRESS_MAP_START( c1551_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0x4000, 0x4007) AM_MIRROR(0x3ff8) AM_DEVREADWRITE(M6523_0_TAG, tpi6525_r, tpi6525_w)
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1551", 0)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("c1551:c1551", 0)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------

@@ -432,7 +432,7 @@ static ADDRESS_MAP_START( c2040_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x6000, 0x7fff) AM_MIRROR(0x0000) AM_ROM AM_REGION(C2040_REGION, 0x0000)
+	AM_RANGE(0x6000, 0x7fff) AM_MIRROR(0x0000) AM_ROM AM_REGION("drive:c2040", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -448,7 +448,7 @@ static ADDRESS_MAP_START( c2040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM AM_REGION(C2040_REGION, 0x2000) // 6530
+	AM_RANGE(0x1c00, 0x1fff) AM_ROM AM_REGION("drive:c2040", 0x2000) // 6530
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -465,7 +465,7 @@ static ADDRESS_MAP_START( c4040_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x5000, 0x7fff) AM_ROM AM_REGION(C4040_REGION, 0x0000)
+	AM_RANGE(0x5000, 0x7fff) AM_ROM AM_REGION("drive:c4040", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -481,7 +481,7 @@ static ADDRESS_MAP_START( c4040_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM AM_REGION(C4040_REGION, 0x3000) // 6530
+	AM_RANGE(0x1c00, 0x1fff) AM_ROM AM_REGION("drive:c4040", 0x3000) // 6530
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -497,7 +497,7 @@ static ADDRESS_MAP_START( c8050_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(C8050_REGION, 0x0000)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("drive:c8050", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -513,7 +513,7 @@ static ADDRESS_MAP_START( c8050_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x1c00, 0x1fff) AM_ROM AM_REGION(C8050_REGION, 0x4000) // 6530
+	AM_RANGE(0x1c00, 0x1fff) AM_ROM AM_REGION("drive:c8050", 0x4000) // 6530
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -529,7 +529,7 @@ static ADDRESS_MAP_START( sfd1001_dos_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(SFD1001_REGION, 0x0000)
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("drive:sfd1001", 0x0000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------
@@ -545,7 +545,7 @@ static ADDRESS_MAP_START( sfd1001_fdc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0bff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x0c00, 0x0fff) AM_RAM AM_SHARE("share3")
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_SHARE("share4")
-	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION(SFD1001_REGION, 0x4000)
+	AM_RANGE(0x1800, 0x1fff) AM_ROM AM_REGION("drive:sfd1001", 0x4000)
 ADDRESS_MAP_END
 
 /*-------------------------------------------------

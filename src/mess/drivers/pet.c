@@ -649,7 +649,7 @@ static IEEE488_DAISY( ieee488_daisy )
 	{ "pia_0" },
 	{ "pia_1", DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE("pia_1", pia6821_cb1_w), DEVCB_DEVICE_LINE("pia_1", pia6821_ca1_w), DEVCB_NULL },
 	{ "via6522_0" },
-	{ C2040_IEEE488("c4040") },
+	{ C2040_IEEE488("drive") },
 	{ NULL}
 };
 
@@ -706,7 +706,7 @@ static MACHINE_DRIVER_START( pet )
 
 	/* IEEE bus */
 	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C4040_ADD("c4040", "ieee_bus", 8)
+	MDRV_C4040_ADD("drive", "ieee_bus", 8)
 MACHINE_DRIVER_END
 
 
@@ -727,7 +727,7 @@ static MACHINE_DRIVER_START( pet2001 )
 
 	/* IEEE bus */
 	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C4040_ADD("c4040", "ieee_bus", 8)
+	MDRV_C4040_ADD("drive", "ieee_bus", 8)
 MACHINE_DRIVER_END
 
 
@@ -783,7 +783,7 @@ static MACHINE_DRIVER_START( pet80 )
 
 	/* IEEE bus */
 	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C8050_ADD("c4040", "ieee_bus", 8)
+	MDRV_C8050_ADD("drive", "ieee_bus", 8)
 MACHINE_DRIVER_END
 
 

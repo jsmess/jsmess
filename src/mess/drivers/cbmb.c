@@ -415,7 +415,7 @@ static IEEE488_DAISY( ieee488_daisy )
 {
 	{ "tpi6525_0" },
 	{ "cia" },
-	{ C2040_IEEE488("c8250") },
+	{ C2040_IEEE488("drive") },
 	{ NULL}
 };
 
@@ -460,7 +460,7 @@ static MACHINE_DRIVER_START( cbm600 )
 
 	/* IEEE bus */
 	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C8250_ADD("c8250", "ieee_bus", 8)
+	MDRV_C8250_ADD("drive", "ieee_bus", 8)
 
 	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END
@@ -542,7 +542,7 @@ static MACHINE_DRIVER_START( p500 )
 
 	/* IEEE bus */
 	MDRV_IEEE488_ADD("ieee_bus", ieee488_daisy)
-	MDRV_C8250_ADD("c8250", "ieee_bus", 8)
+	MDRV_C8250_ADD("drive", "ieee_bus", 8)
 
 	MDRV_IMPORT_FROM(cbmb_cartslot)
 MACHINE_DRIVER_END
